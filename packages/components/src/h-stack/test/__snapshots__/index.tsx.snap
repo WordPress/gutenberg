@@ -6,6 +6,9 @@ exports[`props should render alignment 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-1 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -21,22 +24,18 @@ exports[`props should render alignment 1`] = `
   width: 100%;
 }
 
-.emotion-0>* {
+.emotion-2>* {
   min-width: 0;
 }
 
 <div>
   <div
-    class="components-flex components-h-stack emotion-0 emotion-1"
+    class="emotion-0 emotion-1 emotion-2 components-flex components-h-stack"
     data-wp-c16t="true"
     data-wp-component="HStack"
   >
-    <div
-      class="emotion-2 emotion-1"
-    />
-    <div
-      class="emotion-2 emotion-1"
-    />
+    <div />
+    <div />
   </div>
 </div>
 `;
@@ -47,6 +46,9 @@ exports[`props should render correctly 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-1 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -61,22 +63,18 @@ exports[`props should render correctly 1`] = `
   width: 100%;
 }
 
-.emotion-0>* {
+.emotion-2>* {
   min-width: 0;
 }
 
 <div>
   <div
-    class="components-flex components-h-stack emotion-0 emotion-1"
+    class="emotion-0 emotion-1 emotion-2 components-flex components-h-stack"
     data-wp-c16t="true"
     data-wp-component="HStack"
   >
-    <div
-      class="emotion-2 emotion-1"
-    />
-    <div
-      class="emotion-2 emotion-1"
-    />
+    <div />
+    <div />
   </div>
 </div>
 `;
@@ -87,6 +85,9 @@ exports[`props should render spacing 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-1 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -101,22 +102,18 @@ exports[`props should render spacing 1`] = `
   width: 100%;
 }
 
-.emotion-0>* {
+.emotion-2>* {
   min-width: 0;
 }
 
 <div>
   <div
-    class="components-flex components-h-stack emotion-0 emotion-1"
+    class="emotion-0 emotion-1 emotion-2 components-flex components-h-stack"
     data-wp-c16t="true"
     data-wp-component="HStack"
   >
-    <div
-      class="emotion-2 emotion-1"
-    />
-    <div
-      class="emotion-2 emotion-1"
-    />
+    <div />
+    <div />
   </div>
 </div>
 `;

@@ -56,6 +56,8 @@ function Edit( {
 		},
 		[ clientId ]
 	);
+	const { isBlockSelected, hasSelectedInnerBlock } =
+		useSelect( blockEditorStore );
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const { insertTab, removeTab } = useTabActions( tabsClientId );
@@ -90,24 +92,32 @@ function Edit( {
 			return;
 		}
 
+		// Only move focus during active editing, not external data changes.
+		if (
+			! isBlockSelected( tabsClientId ) &&
+			! hasSelectedInnerBlock( tabsClientId, true )
+		) {
+			return;
+		}
+
 		const focusButtonAt = ( index ) => {
 			window.requestAnimationFrame( () => {
-				const buttons = menuRef.current?.querySelectorAll( 'button' );
-				const target = buttons?.[ index ];
-				if ( ! target ) {
-					return;
-				}
-				const richText = target.querySelector( '[contenteditable]' );
-				if ( richText ) {
-					richText.focus();
-				} else {
-					target.focus();
-				}
+				const button =
+					menuRef.current?.querySelectorAll( 'button' )?.[ index ];
+				(
+					button?.querySelector( '[contenteditable]' ) ?? button
+				)?.focus();
 			} );
 		};
 
 		focusButtonAt( effectiveActiveIndex );
-	}, [ tabsList.length, effectiveActiveIndex ] );
+	}, [
+		effectiveActiveIndex,
+		hasSelectedInnerBlock,
+		isBlockSelected,
+		tabsClientId,
+		tabsList.length,
+	] );
 
 	const blockProps = useBlockProps( {
 		role: 'tablist',

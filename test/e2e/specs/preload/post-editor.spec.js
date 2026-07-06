@@ -6,7 +6,10 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 /**
  * Internal dependencies
  */
-const { recordRequests } = require( './record-requests' );
+const {
+	recordRequests,
+	waitForRequestsToSettle,
+} = require( './record-requests' );
 
 test.describe( 'Preload', () => {
 	let postId;
@@ -56,11 +59,10 @@ test.describe( 'Preload', () => {
 			.filter( { hasText: 'Hello' } )
 			.waitFor();
 		// This spec is explicitly testing network behaviour, so waiting for
-		// the network to settle (rather than a UI marker) is the right
+		// the REST traffic to settle (rather than a UI marker) is the right
 		// signal here: it ensures trailing startup fetches and the racy
 		// resolver duplicates have all been observed before we assert.
-		// eslint-disable-next-line playwright/no-networkidle
-		await page.waitForLoadState( 'networkidle' );
+		await waitForRequestsToSettle( requests );
 		stop();
 
 		// Only collab side effects (CRDT persist + first wp-sync poll)

@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
+import { debounce, useEvent } from '@wordpress/compose';
 import {
 	createContext,
 	useCallback,
@@ -48,6 +49,12 @@ function resolveGridSettings(
 
 const DEFAULT_RESOLVE_WIDGET_MODULE: ResolveWidgetModule = ( moduleId ) =>
 	import( /* webpackIgnore: true */ moduleId );
+
+/**
+ * Inline widget-instance edits stage live, then publish once the user pauses.
+ * A single global timer, so editing several widgets settles into one save.
+ */
+const AUTO_SAVE_DELAY_MS = 5000;
 
 /**
  * Canonical form of `layout`: widgets sorted by `placement.order` (falling
@@ -125,6 +132,20 @@ interface InternalDashboardContextValue {
 	 * edits while customize mode is active).
 	 */
 	cancel: ( options?: CancelOptions ) => void;
+
+	/**
+	 * Debounced auto-save for inline widget-instance edits. Controls call it
+	 * after staging a change; a single global timer publishes once the edits
+	 * settle. The settings drawer does not use it (it commits on Save).
+	 */
+	scheduleAutoSave: () => void;
+
+	/**
+	 * Publishes any pending auto-save immediately. Called when leaving the
+	 * inline surface (opening the drawer, entering customize) so staged inline
+	 * edits do not commingle with the drawer's explicit-save flow.
+	 */
+	flushAutoSave: () => void;
 
 	hasUncommittedChanges: boolean;
 	editMode: boolean;
@@ -286,6 +307,36 @@ export function WidgetDashboardProvider( {
 		]
 	);
 
+	// Auto-save for inline edits.
+	// A single debounced timer publishes through `useEvent`, so it always
+	// reads the latest `commit` (and so the current staging) without
+	// resetting on staging re-renders.
+	const publishAutoSave = useEvent( () => commit( { exitEditMode: false } ) );
+
+	const scheduleAutoSave = useMemo(
+		() => debounce( publishAutoSave, AUTO_SAVE_DELAY_MS ),
+		[ publishAutoSave ]
+	);
+
+	const flushAutoSave = useCallback(
+		() => scheduleAutoSave.flush(),
+		[ scheduleAutoSave ]
+	);
+
+	// Entering customize flushes any pending inline save first, so it does not
+	// commingle with the layout edit flow.
+	useEffect( () => {
+		if ( ! editMode ) {
+			return;
+		}
+
+		scheduleAutoSave.flush();
+	}, [ editMode, scheduleAutoSave ] );
+
+	// Flush, not cancel, on unmount: an edit still inside the debounce window
+	// must persist when the user navigates away from the dashboard.
+	useEffect( () => () => scheduleAutoSave.flush(), [ scheduleAutoSave ] );
+
 	const cancel = useCallback(
 		( options?: CancelOptions ) => {
 			if ( options?.revertLayout !== false ) {
@@ -359,6 +410,8 @@ export function WidgetDashboardProvider( {
 			commit,
 			commitGridModelChange,
 			cancel,
+			scheduleAutoSave,
+			flushAutoSave,
 			hasUncommittedChanges,
 			editMode,
 			onEditChange,
@@ -375,6 +428,8 @@ export function WidgetDashboardProvider( {
 			commit,
 			commitGridModelChange,
 			cancel,
+			scheduleAutoSave,
+			flushAutoSave,
 			hasUncommittedChanges,
 			editMode,
 			onEditChange,

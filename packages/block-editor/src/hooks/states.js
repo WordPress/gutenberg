@@ -22,18 +22,12 @@ export const RESPONSIVE_STATE_LABELS = {
 	'@mobile': __( 'Mobile' ),
 };
 
-// Viewport states are selected globally via the editor's device preview
-// (Responsive editing). 'default' maps to the Desktop device, the remaining
-// options are derived from the shared responsive-state labels.
-const DEVICE_STATE_OPTIONS = [
-	{ value: 'default', label: __( 'Desktop' ) },
-	...Object.entries( RESPONSIVE_STATE_LABELS ).map(
-		( [ value, label ] ) => ( {
-			value,
-			label,
-		} )
-	),
-];
+const DEVICE_STATE_OPTIONS = Object.entries( RESPONSIVE_STATE_LABELS ).map(
+	( [ value, label ] ) => ( {
+		value,
+		label,
+	} )
+);
 
 // Keep in sync with WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS
 // and packages/global-styles-engine/src/core/render.tsx.

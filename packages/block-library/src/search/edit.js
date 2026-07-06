@@ -421,7 +421,6 @@ export default function SearchEdit( {
 					>
 						<VStack>
 							<UnitControl
-								__next40pxDefaultSize
 								label={ __( 'Width' ) }
 								id={ unitControlInputId } // Unused, kept for backwards compatibility
 								min={
@@ -473,7 +472,6 @@ export default function SearchEdit( {
 									} );
 								} }
 								isBlock
-								__next40pxDefaultSize
 							>
 								{ PERCENTAGE_WIDTHS.map( ( widthValue ) => {
 									return (

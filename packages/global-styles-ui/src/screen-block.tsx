@@ -364,15 +364,6 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					</VStack>
 				</div>
 			) }
-			{ hasBackgroundPanel && (
-				<StylesBackgroundPanel
-					inheritedValue={ inheritedStyle }
-					value={ style }
-					onChange={ setStyle }
-					settings={ settings }
-					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
-				/>
-			) }
 			{ hasTypographyPanel && (
 				<StylesTypographyPanel
 					inheritedValue={ inheritedStyle }
@@ -383,6 +374,24 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					// paragraphs") when not editing a state-specific variation,
 					// because those settings are global and cannot be per-breakpoint.
 					isGlobalStyles={ ! hasSelectedState }
+				/>
+			) }
+			{ hasBackgroundPanel && (
+				<StylesBackgroundPanel
+					inheritedValue={ inheritedStyle }
+					value={ style }
+					onChange={ setStyle }
+					settings={ settings }
+					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
+				/>
+			) }
+			{ shouldShowFiltersPanel && (
+				<StylesFiltersPanel
+					inheritedValue={ inheritedStyleWithLayout }
+					value={ styleWithLayout }
+					onChange={ setStyle }
+					settings={ settings }
+					includeLayoutControls
 				/>
 			) }
 			{ hasDimensionsPanel && (
@@ -400,15 +409,6 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					value={ style }
 					onChange={ onChangeBorders }
 					settings={ settings }
-				/>
-			) }
-			{ shouldShowFiltersPanel && (
-				<StylesFiltersPanel
-					inheritedValue={ inheritedStyleWithLayout }
-					value={ styleWithLayout }
-					onChange={ setStyle }
-					settings={ settings }
-					includeLayoutControls
 				/>
 			) }
 			{ hasColorPanel && (

@@ -9,13 +9,9 @@ This is a temporary rule to help migrate components to the new default size. Onc
 The following components are checked by this rule:
 
 -   Button
--   CustomSelectControl
--   FormTokenField
 -   InputControl
 -   NumberControl
 -   SelectControl
--   ToggleGroupControl
--   UnitControl
 
 Examples of **incorrect** code for this rule:
 
