@@ -19,8 +19,9 @@ on:
 
 # Prevents overlapping package releases without canceling an in-progress release.
 concurrency:
-    # Scope package release dispatches by release type, and by WordPress version for wp releases.
-    group: ${{ github.workflow }}-${{ github.event.inputs.release_type }}-${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version || 'all' }}
+    # Scope package release dispatches by target npm release branch.
+    # `latest` and `bugfix` both target wp/latest and must serialize.
+    group: ${{ github.workflow }}-wp-${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version || github.event.inputs.release_type == 'development' && 'next' || 'latest' }}
     cancel-in-progress: false
 
 # Disable permissions for all available scopes by default.

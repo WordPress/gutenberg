@@ -409,6 +409,18 @@ function getTagRefspec( tagName ) {
 }
 
 /**
+ * Returns a fully qualified branch refspec.
+ *
+ * @param {string} commitHash Commit hash to push.
+ * @param {string} branchName Branch name.
+ *
+ * @return {string} Branch refspec.
+ */
+function getBranchRefspec( commitHash, branchName ) {
+	return `${ commitHash }:refs/heads/${ branchName }`;
+}
+
+/**
  * Splits an array into chunks.
  *
  * @param {Array}  items     Items to chunk.
@@ -463,8 +475,11 @@ function getNpmReleaseGitRecoveryCommands( {
 } ) {
 	return [
 		'Push and verify the release branch:',
-		`git push origin "${ publishCommit }:refs/heads/${ npmReleaseBranch }"`,
-		`git ls-remote --heads origin "${ npmReleaseBranch }"`,
+		`git push origin "${ getBranchRefspec(
+			publishCommit,
+			npmReleaseBranch
+		) }"`,
+		`git ls-remote --heads origin "refs/heads/${ npmReleaseBranch }"`,
 		...( packageTags.length
 			? [
 					'',
@@ -528,14 +543,13 @@ async function getRemoteBranchSha(
 	deps = {}
 ) {
 	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
-	const output = await git.raw(
-		'ls-remote',
-		'--heads',
-		'origin',
-		branchName
-	);
-	const [ firstLine = '' ] = output.trim().split( '\n' );
-	const [ sha ] = firstLine.split( /\s+/ );
+	const branchRef = `refs/heads/${ branchName }`;
+	const output = await git.raw( 'ls-remote', '--heads', 'origin', branchRef );
+	const matchingLine = output
+		.trim()
+		.split( '\n' )
+		.find( ( line ) => line.split( /\s+/ )[ 1 ] === branchRef );
+	const [ sha ] = ( matchingLine || '' ).split( /\s+/ );
 	return sha || null;
 }
 
@@ -681,6 +695,20 @@ function parseNpmJsonOutput( output, description ) {
 }
 
 /**
+ * Gets the version string npm stores in the registry.
+ *
+ * npm strips SemVer build metadata on publish. Local prerelease versions can
+ * include build metadata, so registry comparisons must ignore the `+...` part.
+ *
+ * @param {string} version Local package version.
+ *
+ * @return {string} Registry-comparable package version.
+ */
+function getNpmRegistryVersion( version ) {
+	return version.split( '+' )[ 0 ];
+}
+
+/**
  * Runs a pragmatic npm preflight before publishing.
  *
  * @param {Object}   options                         Options.
@@ -721,6 +749,7 @@ async function runNpmPublishPreflight(
 	// Keep the first hardening pass sequential so registry errors stay easy to read.
 	for ( const { name, version } of releasePackages ) {
 		let registryVersion;
+		const expectedRegistryVersion = getNpmRegistryVersion( version );
 		try {
 			const { stdout } = await commandFn(
 				`npm view ${ name }@${ version } version --json`,
@@ -740,9 +769,9 @@ async function runNpmPublishPreflight(
 			throw error;
 		}
 
-		if ( registryVersion !== version ) {
+		if ( registryVersion !== expectedRegistryVersion ) {
 			throw new Error(
-				`Expected npm registry lookup for ${ name }@${ version } to return version ${ version }, got ${ registryVersion }.`
+				`Expected npm registry lookup for ${ name }@${ version } to return version ${ expectedRegistryVersion }, got ${ registryVersion }.`
 			);
 		}
 
@@ -760,7 +789,7 @@ async function runNpmPublishPreflight(
 			}
 		);
 		const distTags = parseNpmJsonOutput( stdout, `${ name } dist-tags` );
-		if ( distTags[ distTag ] !== version ) {
+		if ( distTags[ distTag ] !== expectedRegistryVersion ) {
 			throw new Error(
 				`${ name }@${ version } exists in the npm registry, but dist-tag "${ distTag }" points to ${
 					distTags[ distTag ] || 'nothing'
@@ -800,7 +829,7 @@ async function pushNpmReleaseGitMetadata(
 			await git.raw(
 				'push',
 				'origin',
-				`${ publishCommit }:refs/heads/${ npmReleaseBranch }`
+				getBranchRefspec( publishCommit, npmReleaseBranch )
 			);
 		} );
 		await runPhase( 'Release branch verification', async () =>
@@ -884,6 +913,11 @@ async function publishVersionedPackagesToNpm(
 	const releasePackages = await getNpmReleasePackagesFn(
 		gitWorkingDirectoryPath
 	);
+	if ( resume && releasePackages.length === 0 ) {
+		throw new Error(
+			'Resuming a partial npm package publish requires local package version tags at HEAD.'
+		);
+	}
 	await runNpmPublishPreflightFn( {
 		distTag,
 		gitWorkingDirectoryPath,
@@ -1264,8 +1298,10 @@ async function publishNpmNext( options ) {
 }
 
 module.exports = {
+	getBranchRefspec,
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
+	getRemoteBranchSha,
 	getRemoteTagShas,
 	getTagPushCommands,
 	getTagRefspec,
