@@ -268,7 +268,6 @@ export function PositionPanelPure( {
 		<InspectorControls group="position">
 			<BaseControl help={ stickyHelpText }>
 				<CustomSelectControl
-					__next40pxDefaultSize
 					label={ __( 'Position' ) }
 					hideLabelFromVision
 					describedBy={ sprintf(
@@ -281,7 +280,6 @@ export function PositionPanelPure( {
 					onChange={ ( { selectedItem } ) => {
 						onChangeType( selectedItem.value );
 					} }
-					size="__unstable-large"
 				/>
 			</BaseControl>
 		</InspectorControls>

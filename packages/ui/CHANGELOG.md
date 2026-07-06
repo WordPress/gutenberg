@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `Skeleton` component ([#79671](https://github.com/WordPress/gutenberg/pull/79671)).
+
 ### Enhancements
 
 -   Add `LinkButton` component ([#78944](https://github.com/WordPress/gutenberg/pull/78944)).

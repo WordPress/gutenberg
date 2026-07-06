@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widgets: carry the optional `help` field (content plus links) from
+    `widget.json` into the generated PHP registry.
+
 ## 0.18.0 (2026-07-01)
 
 ## 0.17.0 (2026-06-24)
