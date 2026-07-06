@@ -250,7 +250,7 @@ Notes:
 
 ### UltraHDR JPEG
 
-UltraHDR JPEGs — the HDR photo format produced by recent Android phone cameras — embed an ISO 21496-1 gain map alongside a standard SDR base image. The format is backwards compatible: SDR displays simply show the base image.
+UltraHDR JPEGs embed an ISO 21496-1 gain map alongside a standard SDR base image. Gain maps are a new, backwards-compatible way of adding HDR data to SDR images, supported by Google (UltraHDR), Apple (Adaptive HDR), and Adobe (Camera Raw, Lightroom, and Photoshop). SDR displays simply show the base image, while HDR displays apply the gain map to recover the full dynamic range. The pipeline detects gain maps in JPEG files regardless of which camera or app produced them.
 
 When a JPEG is uploaded, the client probes it for a gain map (`getUltraHdrInfo()` in `@wordpress/vips`, backed by libvips's `uhdrload` loader). When a gain map is found:
 
