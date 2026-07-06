@@ -137,7 +137,6 @@ const LibraryExample = ( {
 						onChange={ ( value: string | number | undefined ) =>
 							updateArgs( { size: value } )
 						}
-						__next40pxDefaultSize
 					>
 						{ [ '16', '24', '32' ].map( ( option ) => (
 							<ToggleGroupControlOption

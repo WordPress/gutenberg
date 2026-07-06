@@ -5,6 +5,7 @@
  */
 import spawn from 'cross-spawn';
 import { fileURLToPath } from 'url';
+import { parseArgs } from 'util';
 import path from 'path';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
@@ -78,7 +79,13 @@ function exec( command, args = [], options = {} ) {
  * Main build orchestration function.
  */
 async function build() {
-	const skipTypes = process.argv.includes( '--skip-types' );
+	const { values } = parseArgs( {
+		options: {
+			'skip-types': { type: 'boolean', default: false },
+		},
+		strict: false,
+	} );
+	const skipTypes = values[ 'skip-types' ];
 
 	console.log( '🔨 Starting build process...\n' );
 
