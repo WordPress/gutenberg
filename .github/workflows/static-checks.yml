@@ -115,6 +115,8 @@ jobs:
                   npm run lint:css:update-suppressions
 
             - name: Type checking
+              env:
+                  WP_BUILD_CONCURRENCY: 4
               run: npm run build
 
             - name: Validate package contents
