@@ -46,11 +46,11 @@ jobs:
                     - icons
                     - interface
                     - style-runtime
-                    - theme
                     - ui
                     - undo-manager
                     - views
                     # Other packages
+                    - theme
                     - components
                     - private-apis
                     - wp-build
