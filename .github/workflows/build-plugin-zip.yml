@@ -68,9 +68,14 @@ jobs:
               run: |
                   gh auth status --hostname github.com
 
+                  token_follow_up="Release managers/repository admins must fix this before the next RC day: "
+                  token_follow_up+="either make the default GITHUB_TOKEN with contents: write able to create draft releases and remove this PAT dependency, "
+                  token_follow_up+="or rotate/replace GUTENBERG_TOKEN with a token that can create draft releases in this repository."
+
                   headers_file="$(mktemp)"
                   if ! gh api -i "repos/${GITHUB_REPOSITORY}" > "$headers_file"; then
                     echo "::error::GUTENBERG_TOKEN cannot access ${GITHUB_REPOSITORY}. The release workflow token must be able to create draft releases in this repository."
+                    echo "::error::$token_follow_up"
                     rm -f "$headers_file"
                     exit 1
                   fi
@@ -87,6 +92,7 @@ jobs:
                   # under-scoping while the repository access check remains the fallback.
                   if [[ -n "$oauth_scopes" ]] && ! tr ',' '\n' <<< "$oauth_scopes" | sed 's/^ *//;s/ *$//' | grep -qx 'repo'; then
                     echo "::error::GUTENBERG_TOKEN is visibly under-scoped (${oauth_scopes}). The release workflow token must be able to create draft releases in this repository."
+                    echo "::error::$token_follow_up"
                     rm -f "$headers_file"
                     exit 1
                   fi
