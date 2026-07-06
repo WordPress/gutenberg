@@ -3,6 +3,9 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+const LINE_START_KEY =
+	process.platform === 'darwin' ? 'Meta+ArrowLeft' : 'Home';
+
 test.describe( 'Details', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -111,7 +114,6 @@ test.describe( 'Details', () => {
 	test( 'moves focus to the summary when pressing Backspace at the start of body content', async ( {
 		editor,
 		page,
-		pageUtils,
 	} ) => {
 		await editor.insertBlock( {
 			name: 'core/details',
@@ -138,7 +140,7 @@ test.describe( 'Details', () => {
 
 		await paragraph.click();
 		await expect( paragraph ).toBeFocused();
-		await pageUtils.pressKeys( 'primary+ArrowLeft' );
+		await page.keyboard.press( LINE_START_KEY );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( ' updated' );
 
