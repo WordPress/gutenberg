@@ -1927,10 +1927,8 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 
 	/**
 	 * The URL requested by the most recent mocked HTTP download.
-	 *
-	 * @var string|null
 	 */
-	protected $last_download_url = null;
+	protected ?string $last_download_url = null;
 
 	/**
 	 * Short-circuits download_url()'s HTTP request, writing a local fixture into
@@ -1940,12 +1938,12 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * non-false value from `pre_http_request` skips the network, so the mock must
 	 * copy the fixture into the `filename` the request would have streamed to.
 	 *
-	 * @param false|array|WP_Error $response A preempted response, or false to continue.
-	 * @param array                $args     HTTP request arguments.
-	 * @param string               $url      The request URL.
-	 * @return array A faked 200 response.
+	 * @param false|mixed[]|WP_Error     $response A preempted response, or false to continue.
+	 * @param array{ filename?: string } $args     HTTP request arguments.
+	 * @param string                     $url      The request URL.
+	 * @return array<string, mixed> A faked 200 response.
 	 */
-	public function mock_image_download( $response, $args, $url ) {
+	public function mock_image_download( $response, array $args, string $url ): array {
 		$this->last_download_url = $url;
 
 		if ( ! empty( $args['filename'] ) ) {
@@ -1973,7 +1971,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * @covers ::create_item
 	 * @covers ::create_item_from_url
 	 */
-	public function test_create_item_from_url_sideloads_without_subsizes() {
+	public function test_create_item_from_url_sideloads_without_subsizes(): void {
 		wp_set_current_user( self::$admin_id );
 
 		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
@@ -2004,11 +2002,11 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * @covers ::create_item
 	 * @covers ::create_item_from_url
 	 */
-	public function test_create_item_from_url_fires_rest_after_insert_attachment() {
+	public function test_create_item_from_url_fires_rest_after_insert_attachment(): void {
 		wp_set_current_user( self::$admin_id );
 
 		$fired = array();
-		$spy   = static function ( $attachment, $request, $creating ) use ( &$fired ) {
+		$spy   = static function ( WP_Post $attachment, $request, $creating ) use ( &$fired ) {
 			$fired = array(
 				'id'       => $attachment->ID,
 				'creating' => $creating,
@@ -2041,7 +2039,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * @covers ::create_item
 	 * @covers ::create_item_from_url
 	 */
-	public function test_create_item_from_url_attaches_to_post() {
+	public function test_create_item_from_url_attaches_to_post(): void {
 		wp_set_current_user( self::$admin_id );
 
 		$parent_post = self::factory()->post->create();
@@ -2070,7 +2068,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * @covers ::create_item
 	 * @covers ::create_item_from_url
 	 */
-	public function test_create_item_from_url_returns_error_on_download_failure() {
+	public function test_create_item_from_url_returns_error_on_download_failure(): void {
 		wp_set_current_user( self::$admin_id );
 
 		$fail_download = static function () {
@@ -2097,7 +2095,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 *
 	 * @covers ::create_item_from_url
 	 */
-	public function test_create_item_from_url_rejects_url_without_filename() {
+	public function test_create_item_from_url_rejects_url_without_filename(): void {
 		wp_set_current_user( self::$admin_id );
 
 		// Fail loudly if the guard does not bail and a download is attempted.
@@ -2126,7 +2124,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 *
 	 * @covers ::create_item_from_url
 	 */
-	public function test_create_item_from_url_requires_upload_capability() {
+	public function test_create_item_from_url_requires_upload_capability(): void {
 		$subscriber_id = self::factory()->user->create( array( 'role' => 'subscriber' ) );
 		wp_set_current_user( $subscriber_id );
 
@@ -2163,7 +2161,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 *
 	 * @covers ::get_endpoint_args_for_item_schema
 	 */
-	public function test_create_item_from_url_rejects_non_string_url() {
+	public function test_create_item_from_url_rejects_non_string_url(): void {
 		wp_set_current_user( self::$admin_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
@@ -2181,7 +2179,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 *
 	 * @covers ::get_endpoint_args_for_item_schema
 	 */
-	public function test_url_registered_as_creatable_arg() {
+	public function test_url_registered_as_creatable_arg(): void {
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayHasKey( '/wp/v2/media', $routes );
 
