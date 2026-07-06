@@ -180,6 +180,81 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		$this->assertFalse( $autosave, 'Expected no autosave revision for an unchanged autosave.' );
 	}
 
+	public function test_peer_autosave_matching_latest_revision_does_not_create_a_blank_revision() {
+		$original_title   = 'Shared RTC draft title';
+		$original_content = '<!-- wp:paragraph --><p>Shared RTC draft original</p><!-- /wp:paragraph -->';
+		$post_id          = $this->create_draft( $original_title, $original_content );
+
+		$shared_title   = 'Shared RTC draft title edited';
+		$shared_content = '<!-- wp:paragraph --><p>Shared RTC draft edited in collaboration</p><!-- /wp:paragraph -->';
+
+		// The author autosaves an edit. Under RTC it is stored as a revision and
+		// the parent draft is left stale, so the latest revision (not the parent)
+		// now holds the most recent shared content.
+		$author_response = $this->dispatch_autosave( $post_id, $shared_title, $shared_content );
+		$this->assertSame( 200, $author_response->get_status() );
+
+		$author_autosave = wp_get_post_autosave( $post_id, self::$author_id );
+		$this->assertInstanceOf( WP_Post::class, $author_autosave );
+
+		// A peer autosaves the same shared content. It matches the latest
+		// revision and differs only from the stale parent, so storing it would
+		// create a second, identical revision that renders as a blank diff. It
+		// must be recognized as redundant instead.
+		wp_set_current_user( self::$editor_id );
+		$peer_response = $this->dispatch_autosave( $post_id, $shared_title, $shared_content );
+		$this->assertSame( 200, $peer_response->get_status() );
+
+		$peer_autosave = wp_get_post_autosave( $post_id, self::$editor_id );
+		$this->assertFalse(
+			$peer_autosave,
+			'Expected no redundant peer autosave revision matching the latest revision.'
+		);
+	}
+
+	public function test_autosave_compares_against_parent_not_latest_revision_without_collaboration() {
+		update_option( 'wp_collaboration_enabled', 0 );
+
+		$published_title   = 'Published title';
+		$published_content = '<!-- wp:paragraph --><p>Published content</p><!-- /wp:paragraph -->';
+		$post_id           = self::factory()->post->create(
+			array(
+				'post_author'  => self::$author_id,
+				'post_content' => $published_content,
+				'post_status'  => 'publish',
+				'post_title'   => $published_title,
+				'post_type'    => 'post',
+			)
+		);
+
+		$edited_title   = 'Edited title';
+		$edited_content = '<!-- wp:paragraph --><p>Edited content</p><!-- /wp:paragraph -->';
+
+		// The author autosaves an edit. A published post is never updated in
+		// place, so the edit is stored as a revision while the parent keeps its
+		// published content.
+		$author_response = $this->dispatch_autosave( $post_id, $edited_title, $edited_content );
+		$this->assertSame( 200, $author_response->get_status() );
+
+		$author_autosave = wp_get_post_autosave( $post_id, self::$author_id );
+		$this->assertInstanceOf( WP_Post::class, $author_autosave );
+
+		// A peer autosaves the same edited content. It matches the author's
+		// revision but differs from the published parent. Without collaboration
+		// the baseline is the parent (core's behavior), so this is not redundant
+		// and the peer's own autosave revision is still stored.
+		wp_set_current_user( self::$editor_id );
+		$peer_response = $this->dispatch_autosave( $post_id, $edited_title, $edited_content );
+		$this->assertSame( 200, $peer_response->get_status() );
+
+		$peer_autosave = wp_get_post_autosave( $post_id, self::$editor_id );
+		$this->assertInstanceOf(
+			WP_Post::class,
+			$peer_autosave,
+			'Without collaboration the parent post is the comparison baseline, so a peer autosave that differs from the parent must still be stored.'
+		);
+	}
+
 	public function test_draft_autosave_creates_revision_when_revisioned_meta_changes() {
 		// `footnotes` is the real-world example of a revisioned meta key, but a
 		// dedicated key is registered here so the test does not depend on whether
