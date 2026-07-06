@@ -38,8 +38,6 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Npm build
-              env:
-                  WP_BUILD_CONCURRENCY: 4
               run: npm run build -- --skip-types
 
             # Wider than the `build*` directories, because the build also emits
@@ -296,8 +294,6 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Npm build
-              env:
-                  WP_BUILD_CONCURRENCY: 4
               run: npm run build -- --skip-types
 
             - name: Report flaky tests
