@@ -716,6 +716,42 @@ test.describe( 'Connectors', () => {
 				password: APPLICATION_PASSWORD,
 			} );
 		} );
+
+		test( 'should show an environment-configured connector as connected and read-only', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			const card = getConnectorCardByName(
+				page,
+				'Test Env Configured WordPress'
+			);
+			await expect(
+				card.getByText( 'Connected', { exact: true } )
+			).toBeVisible();
+			await card.getByRole( 'button', { name: 'Edit' } ).click();
+
+			const usernameInput = card.getByRole( 'textbox', {
+				name: 'Username',
+			} );
+			await expect( usernameInput ).toBeDisabled();
+			await expect( usernameInput ).toHaveValue( '•'.repeat( 16 ) );
+			await expect(
+				card.getByLabel( 'Application password' )
+			).toBeDisabled();
+			await expect(
+				card.getByText(
+					'These credentials are configured using an environment variable.'
+				)
+			).toBeVisible();
+			await expect(
+				card.getByRole( 'button', { name: 'Remove and replace' } )
+			).toBeHidden();
+		} );
 	} );
 
 	test.describe( 'JS extensibility', () => {

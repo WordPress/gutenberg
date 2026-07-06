@@ -10,6 +10,9 @@
  */
 
 const GUTENBERG_TEST_CONNECTOR_CREDENTIALS_SETTING = 'connectors_content_source_test_remote_wordpress_credentials';
+const GUTENBERG_TEST_CONNECTOR_ENV_VAR_NAME        = 'GUTENBERG_TEST_CONNECTOR_REMOTE_CREDENTIALS';
+
+putenv( GUTENBERG_TEST_CONNECTOR_ENV_VAR_NAME . '=env-remote-user:abcd efgh ijkl mnop 1234' );
 
 add_action(
 	'wp_connectors_init',
@@ -24,6 +27,19 @@ add_action(
 					'method'          => 'application_password',
 					'credentials_url' => 'https://example.com/wp-admin/profile.php',
 					'setting_name'    => GUTENBERG_TEST_CONNECTOR_CREDENTIALS_SETTING,
+				),
+			)
+		);
+
+		$registry->register(
+			'test-env-configured-wordpress',
+			array(
+				'name'           => 'Test Env Configured WordPress',
+				'description'    => 'Connects using environment-variable credentials.',
+				'type'           => 'content_source',
+				'authentication' => array(
+					'method'       => 'application_password',
+					'env_var_name' => GUTENBERG_TEST_CONNECTOR_ENV_VAR_NAME,
 				),
 			)
 		);
