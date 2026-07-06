@@ -33,6 +33,13 @@ function gutenberg_block_editor_preload_paths_7_1( $paths, $context ) {
 		$paths[] = '/wp/v2/taxonomies?context=edit';
 		$paths[] = array( rest_get_route_for_post_type_items( $context->post->post_type ), 'OPTIONS' );
 
+		if ( gutenberg_is_experiment_enabled( 'gutenberg-dataform-inspector' ) ) {
+			// The DataForm-based inspector requests the entity form config on
+			// mount. The `_fields` subset must match the request issued by the
+			// `getViewConfig` resolver in `@wordpress/core-data`.
+			$paths[] = '/wp/v2/view-config?kind=postType&name=' . $context->post->post_type . '&_fields=form';
+		}
+
 		$author_id = (int) get_post_field( 'post_author', $context->post->ID );
 		if ( post_type_supports( $context->post->post_type, 'author' ) && $author_id > 0 ) {
 			$paths[] = sprintf(
