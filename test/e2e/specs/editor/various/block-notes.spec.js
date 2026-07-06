@@ -159,7 +159,7 @@ test.describe( 'Block Notes', () => {
 		await blockNoteUtils.openBlockNoteSidebar();
 
 		const thread = page
-			.getByRole( 'region', { name: 'Collab panel' } )
+			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'treeitem', {
 				name: 'Note: Test comment to resolve.',
 			} );
@@ -212,7 +212,7 @@ test.describe( 'Block Notes', () => {
 		const commentForm = page.getByRole( 'textbox', { name: 'Reply to' } );
 		await commentForm.fill( 'Test reply that reopens the comment.' );
 		await page
-			.getByRole( 'region', { name: 'Collab panel' } )
+			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Reopen & Reply', exact: true } )
 			.click();
 
