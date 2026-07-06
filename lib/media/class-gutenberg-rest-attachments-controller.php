@@ -675,6 +675,21 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		/*
+		 * Only download URLs whose extension maps to an allowed image MIME type.
+		 * The sideload handler would reject other types anyway (via
+		 * wp_check_filetype_and_ext()), but checking first avoids downloading
+		 * files that can never be accepted, such as PHP scripts.
+		 */
+		$filetype = wp_check_filetype( $filename );
+		if ( ! $filetype['type'] || ! str_starts_with( $filetype['type'], 'image/' ) ) {
+			return new WP_Error(
+				'rest_invalid_url',
+				__( 'The provided URL does not point to a supported image file.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		/*
 		 * Download the remote file with WordPress's HTTP API, which validates
 		 * the host and blocks requests to private or local addresses. This is
 		 * the same primitive core's media_sideload_image() relies on.

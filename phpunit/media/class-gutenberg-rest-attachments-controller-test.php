@@ -2119,6 +2119,53 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that a URL pointing to a file without an allowed image extension,
+	 * such as a PHP script, is rejected before any download is attempted.
+	 *
+	 * @dataProvider data_create_item_from_url_rejects_non_image_extension
+	 * @covers ::create_item_from_url
+	 *
+	 * @param string $url URL with a disallowed file extension.
+	 */
+	public function test_create_item_from_url_rejects_non_image_extension( string $url ): void {
+		wp_set_current_user( self::$admin_id );
+
+		// Fail loudly if the guard does not bail and a download is attempted.
+		$downloaded = false;
+		$track      = static function () use ( &$downloaded ) {
+			$downloaded = true;
+			return new WP_Error( 'http_request_failed', 'Should not be reached.' );
+		};
+		add_filter( 'pre_http_request', $track );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', $url );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', $track );
+
+		$this->assertSame( 'rest_invalid_url', $response->get_data()['code'] );
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertFalse( $downloaded, 'No download should be attempted for a non-image URL.' );
+	}
+
+	/**
+	 * Data provider for test_create_item_from_url_rejects_non_image_extension().
+	 *
+	 * @return array<string, array{string}>
+	 */
+	public function data_create_item_from_url_rejects_non_image_extension(): array {
+		return array(
+			'PHP script'       => array( 'https://example.com/evil.php' ),
+			'HTML document'    => array( 'https://example.com/page.html' ),
+			'video file'       => array( 'https://example.com/clip.mp4' ),
+			'no extension'     => array( 'https://example.com/image' ),
+			'double extension' => array( 'https://example.com/photo.jpg.php' ),
+		);
+	}
+
+	/**
 	 * Verifies that a user without the `upload_files` capability cannot sideload
 	 * an external image and that the request bails before any download happens.
 	 *
