@@ -21,6 +21,10 @@
     tooltips. Also carried by `WidgetModuleRecord`, overlaid onto the
     metadata module's value.
 
+### Documentation
+
+-   Add a widget anatomy doc and lighten the widget system doc.
+
 ## 0.2.0 (2026-07-01)
 
 ## 0.1.0 (2026-06-24)

@@ -21,6 +21,7 @@
     -   `FormTokenField` ([#79720](https://github.com/WordPress/gutenberg/pull/79720))
     -   `RangeControl` ([#79590](https://github.com/WordPress/gutenberg/pull/79590))
     -   `Radio` ([#79657](https://github.com/WordPress/gutenberg/pull/79657))
+    -   `SelectControl` ([#79797](https://github.com/WordPress/gutenberg/pull/79797))
     -   `ToggleGroupControl` ([#79656](https://github.com/WordPress/gutenberg/pull/79656))
     -   `TreeSelect` ([#79550](https://github.com/WordPress/gutenberg/pull/79550))
     -   `UnitControl` ([#79721](https://github.com/WordPress/gutenberg/pull/79721))
@@ -46,6 +47,8 @@
 
 -   Add a private, presentational `RichTextControl`: a labeled `contentEditable` form field with the selection tracking format UI needs. The rich-text behavior is injected by the consumer (e.g. the DataViews `richtext` control), keeping the component free of any `@wordpress/rich-text` dependency ([#79345](https://github.com/WordPress/gutenberg/pull/79345)).
 -   Enforce CSS Module class selector naming for component-library packages ([#79504](https://github.com/WordPress/gutenberg/pull/79504)).
+-   Update `@ariakit/react` to `0.4.32` ([#79860](https://github.com/WordPress/gutenberg/pull/79860)).
+-   `Flex`: Migrate styles from Emotion to SCSS Modules ([#79450](https://github.com/WordPress/gutenberg/pull/79450)).
 -   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
 -   `Truncate`: Migrate styles from Emotion to SCSS Modules ([#79446](https://github.com/WordPress/gutenberg/pull/79446)).
 -   `View`: Migrate away from Emotion while preserving polymorphic `as` behavior and style cascade order ([#79443](https://github.com/WordPress/gutenberg/pull/79443)).
