@@ -145,12 +145,17 @@ function gutenberg_wrap_ssr_islands_render_callback( $args ) {
 				$content = '<wp-inner-block-slot data-slot-index="0" style="display:contents"></wp-inner-block-slot>';
 			} elseif ( $is_synced ) {
 				// The pattern renders as the block's inner blocks so the
-				// instance context (the overrides) reaches the bindings,
-				// mirroring render_block_core_block().
+				// instance context (the overrides) reaches the bindings.
+				// Rendering the children directly, rather than re-entering
+				// $block->render(), keeps the block's own `render_block`
+				// filters (layout, typography, plugins) from running twice.
 				$block->parsed_block['innerBlocks']  = parse_blocks( $pattern );
 				$block->parsed_block['innerContent'] = array_fill( 0, count( $block->parsed_block['innerBlocks'] ), null );
 				$block->refresh_context_dependents();
-				$content = $block->render( array( 'dynamic' => false ) );
+				$content = '';
+				foreach ( $block->inner_blocks as $inner_block ) {
+					$content .= $inner_block->render();
+				}
 			} else {
 				// Everywhere else an empty block falls back to the pattern:
 				// the front end, and REST renders like a post's
