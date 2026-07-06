@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { test, expect } from './fixtures';
-import { SECOND_USER } from './fixtures/collaboration-utils';
+import { test, expect } from '../fixtures';
+import { SECOND_USER } from '../fixtures/collaboration-utils';
 
 const EXTRA_POST_COUNT = 40;
 const LARGE_FIELD_SIZE = 450 * 1024;
