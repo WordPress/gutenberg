@@ -48,6 +48,7 @@ const NPM_RELEASE_TAG_PUSH_BATCH_SIZE = 25;
  *
  * @property {boolean} [ci]             Disables interactive mode when executed in CI mode.
  * @property {string}  [repositoryPath] Relative path to the git repository.
+ * @property {boolean} [resume]         Whether to resume a partial npm package publish.
  * @property {SemVer}  [semver]         The selected semantic versioning. Defaults to `patch`.
  * @property {string}  [wpVersion]      The major WordPress version number, example: `6.0`.
  */
@@ -62,6 +63,7 @@ const NPM_RELEASE_TAG_PUSH_BATCH_SIZE = 25;
  * @property {SemVer}      minimumVersionBump      The selected minimum version bump.
  * @property {string}      npmReleaseBranch        The selected branch for npm release.
  * @property {ReleaseType} releaseType             The selected release type.
+ * @property {boolean}     resume                  Whether to resume a partial npm package publish.
  */
 
 /**
@@ -661,16 +663,36 @@ function isNpmPackageVersionMissing( error ) {
 }
 
 /**
+ * Parses npm JSON command output.
+ *
+ * @param {string} output      Command stdout.
+ * @param {string} description Output description for error messages.
+ *
+ * @return {*} Parsed JSON output.
+ */
+function parseNpmJsonOutput( output, description ) {
+	try {
+		return JSON.parse( output );
+	} catch {
+		throw new Error(
+			`Unable to parse npm registry ${ description }: ${ output }`
+		);
+	}
+}
+
+/**
  * Runs a pragmatic npm preflight before publishing.
  *
  * @param {Object}   options                         Options.
+ * @param {string}   options.distTag                 The dist-tag used for npm publishing.
  * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
  * @param {Array}    options.releasePackages         Packages to publish.
+ * @param {boolean}  options.resume                  Whether to resume a partial npm package publish.
  * @param {Object}   deps                            Dependencies.
  * @param {Function} deps.commandFn                  Command runner.
  */
 async function runNpmPublishPreflight(
-	{ gitWorkingDirectoryPath, releasePackages },
+	{ distTag, gitWorkingDirectoryPath, releasePackages, resume = false },
 	deps = {}
 ) {
 	const { commandFn = command } = deps;
@@ -684,20 +706,53 @@ async function runNpmPublishPreflight(
 	// TODO: Consider bounded concurrency here if this preflight becomes too slow.
 	// Keep the first hardening pass sequential so registry errors stay easy to read.
 	for ( const { name, version } of releasePackages ) {
+		let registryVersion;
 		try {
-			await commandFn( `npm view ${ name }@${ version } version --json`, {
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'pipe',
-			} );
+			const { stdout } = await commandFn(
+				`npm view ${ name }@${ version } version --json`,
+				{
+					cwd: gitWorkingDirectoryPath,
+					stdio: 'pipe',
+				}
+			);
+			registryVersion = parseNpmJsonOutput(
+				stdout,
+				`${ name }@${ version } version`
+			);
 		} catch ( error ) {
 			if ( isNpmPackageVersionMissing( error ) ) {
 				continue;
 			}
 			throw error;
 		}
-		throw new Error(
-			`${ name }@${ version } already exists in the npm registry.`
+
+		if ( registryVersion !== version ) {
+			throw new Error(
+				`Expected npm registry lookup for ${ name }@${ version } to return version ${ version }, got ${ registryVersion }.`
+			);
+		}
+
+		if ( ! resume ) {
+			throw new Error(
+				`${ name }@${ version } already exists in the npm registry.`
+			);
+		}
+
+		const { stdout } = await commandFn(
+			`npm view ${ name } dist-tags --json`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'pipe',
+			}
 		);
+		const distTags = parseNpmJsonOutput( stdout, `${ name } dist-tags` );
+		if ( distTags[ distTag ] !== version ) {
+			throw new Error(
+				`${ name }@${ version } exists in the npm registry, but dist-tag "${ distTag }" points to ${
+					distTags[ distTag ] || 'nothing'
+				}.`
+			);
+		}
 	}
 }
 
@@ -785,6 +840,7 @@ async function pushNpmReleaseGitMetadata(
  * @param {string}   options.gitWorkingDirectoryPath  Git working directory path.
  * @param {string}   options.noVerifyAccessFlag       Lerna no-verify-access flag.
  * @param {string}   options.npmReleaseBranch         Npm release branch.
+ * @param {boolean}  options.resume                   Whether to resume a partial npm package publish.
  * @param {string}   options.yesFlag                  Lerna yes flag.
  * @param {Object}   deps                             Dependencies.
  * @param {Function} deps.commandFn                   Command runner.
@@ -799,6 +855,7 @@ async function publishVersionedPackagesToNpm(
 		gitWorkingDirectoryPath,
 		noVerifyAccessFlag,
 		npmReleaseBranch,
+		resume = false,
 		yesFlag,
 	},
 	deps = {}
@@ -814,8 +871,10 @@ async function publishVersionedPackagesToNpm(
 		gitWorkingDirectoryPath
 	);
 	await runNpmPublishPreflightFn( {
+		distTag,
 		gitWorkingDirectoryPath,
 		releasePackages,
+		resume,
 	} );
 
 	log( '>> Publishing modified packages to npm.' );
@@ -865,6 +924,7 @@ async function publishPackagesToNpm(
 		minimumVersionBump,
 		npmReleaseBranch,
 		releaseType,
+		resume,
 	},
 	deps = {}
 ) {
@@ -896,7 +956,11 @@ async function publishPackagesToNpm(
 	const noVerifyAccessFlag = interactive ? '' : '--no-verify-access';
 	// Keep version commits and package tags local until npm publishing succeeds,
 	// then push and verify Git metadata explicitly.
-	if ( releaseType === 'next' ) {
+	if ( resume ) {
+		log(
+			'>> Resuming npm publishing from the existing local version commit and package tags.'
+		);
+	} else if ( releaseType === 'next' ) {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
 		);
@@ -926,11 +990,12 @@ async function publishPackagesToNpm(
 		gitWorkingDirectoryPath,
 		noVerifyAccessFlag,
 		npmReleaseBranch,
+		resume,
 		yesFlag,
 	} );
 
 	const afterCommitHash = await git.revparse( [ '--short', 'HEAD' ] );
-	if ( afterCommitHash === beforeCommitHash ) {
+	if ( afterCommitHash === beforeCommitHash && ! resume ) {
 		return;
 	}
 
@@ -1006,6 +1071,11 @@ async function runPackagesRelease( config, customMessages ) {
 	}
 
 	const temporaryFolders = [];
+	if ( config.resume && ! config.gitWorkingDirectoryPath ) {
+		throw new Error(
+			'Resuming a partial npm package publish requires --repository-path pointing to the checkout with the local version commit and package tags.'
+		);
+	}
 	if ( ! config.gitWorkingDirectoryPath ) {
 		const gitPath = getRandomTemporaryPath();
 		config.gitWorkingDirectoryPath = gitPath;
@@ -1028,7 +1098,11 @@ async function runPackagesRelease( config, customMessages ) {
 	}
 
 	let pluginReleaseBranch;
-	if ( [ 'latest', 'next' ].includes( config.releaseType ) ) {
+	if ( config.resume ) {
+		log(
+			'>> Resuming npm publishing; skipping release branch preparation and changelog processing.'
+		);
+	} else if ( [ 'latest', 'next' ].includes( config.releaseType ) ) {
 		pluginReleaseBranch =
 			config.releaseType === 'next'
 				? 'trunk'
@@ -1040,11 +1114,16 @@ async function runPackagesRelease( config, customMessages ) {
 		await checkoutNpmReleaseBranch( config );
 	}
 
-	const commitHashChangelogUpdates = await updatePackages( config );
+	const commitHashChangelogUpdates = config.resume
+		? undefined
+		: await updatePackages( config );
 
 	const commitHashNpmPublish = await publishPackagesToNpm( config );
 
-	if ( [ 'latest', 'bugfix' ].includes( config.releaseType ) ) {
+	if (
+		! config.resume &&
+		[ 'latest', 'bugfix' ].includes( config.releaseType )
+	) {
 		const commits = [
 			commitHashChangelogUpdates,
 			commitHashNpmPublish,
@@ -1087,7 +1166,7 @@ async function runPackagesRelease( config, customMessages ) {
  */
 function getConfig(
 	releaseType,
-	{ ci, repositoryPath, semver = 'patch', wpVersion }
+	{ ci, repositoryPath, resume = false, semver = 'patch', wpVersion }
 ) {
 	let distTag = 'latest';
 	let npmReleaseBranch = 'wp/latest';
@@ -1108,6 +1187,7 @@ function getConfig(
 		minimumVersionBump: semver,
 		npmReleaseBranch,
 		releaseType,
+		resume,
 	};
 }
 
