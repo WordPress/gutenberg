@@ -114,21 +114,21 @@ export function useConnectorPlugin( {
 				name: 'plugin',
 			} );
 
+			const common = {
+				currentApiKey: apiKey,
+				currentUsername: credentials?.username ?? '',
+				hasStoredCredentials: credentialsExist,
+				hasResolvedSettings: settingsResolved,
+				canInstallPlugins: canCreate,
+			};
+
 			if ( ! pluginFileFromServer ) {
-				const hasLoaded = store.hasFinishedResolution(
-					'getEntityRecord',
-					[ 'root', 'site' ]
-				);
 				return {
-					derivedPluginStatus: ( hasLoaded
+					...common,
+					derivedPluginStatus: ( settingsResolved
 						? 'active'
 						: 'checking' ) as PluginStatus,
 					canManagePlugins: undefined as boolean | undefined,
-					currentApiKey: apiKey,
-					currentUsername: credentials?.username ?? '',
-					hasStoredCredentials: credentialsExist,
-					hasResolvedSettings: settingsResolved,
-					canInstallPlugins: canCreate,
 				};
 			}
 
@@ -145,13 +145,9 @@ export function useConnectorPlugin( {
 
 			if ( ! hasFinished ) {
 				return {
+					...common,
 					derivedPluginStatus: 'checking' as PluginStatus,
 					canManagePlugins: undefined as boolean | undefined,
-					currentApiKey: apiKey,
-					currentUsername: credentials?.username ?? '',
-					hasStoredCredentials: credentialsExist,
-					hasResolvedSettings: settingsResolved,
-					canInstallPlugins: canCreate,
 				};
 			}
 
@@ -162,15 +158,11 @@ export function useConnectorPlugin( {
 					plugin.status === 'active' ||
 					plugin.status === 'network-active';
 				return {
+					...common,
 					derivedPluginStatus: ( isPluginActive
 						? 'active'
 						: 'inactive' ) as PluginStatus,
 					canManagePlugins: true,
-					currentApiKey: apiKey,
-					currentUsername: credentials?.username ?? '',
-					hasStoredCredentials: credentialsExist,
-					hasResolvedSettings: settingsResolved,
-					canInstallPlugins: canCreate,
 				};
 			}
 
@@ -184,13 +176,9 @@ export function useConnectorPlugin( {
 				status = 'inactive';
 			}
 			return {
+				...common,
 				derivedPluginStatus: status,
 				canManagePlugins: false,
-				currentApiKey: apiKey,
-				currentUsername: credentials?.username ?? '',
-				hasStoredCredentials: credentialsExist,
-				hasResolvedSettings: settingsResolved,
-				canInstallPlugins: canCreate,
 			};
 		},
 		[
