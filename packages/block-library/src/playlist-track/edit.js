@@ -18,9 +18,11 @@ import {
 	Button,
 	PanelBody,
 	TextControl,
+	TextareaControl,
 	BaseControl,
 	Spinner,
 } from '@wordpress/components';
+import { Link } from '@wordpress/ui';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
@@ -190,46 +192,74 @@ const PlaylistTrackEdit = ( {
 						} }
 					/>
 					<MediaUploadCheck>
-						<div className="editor-video-poster-control">
+						<BaseControl>
 							<BaseControl.VisualLabel>
 								{ __( 'Album cover image' ) }
 							</BaseControl.VisualLabel>
-							{ !! image && (
-								<img
-									src={ image }
-									alt={ __(
-										'Preview of the album cover image'
+							<div className="editor-video-poster-control">
+								{ !! image && (
+									<img
+										src={ image }
+										alt={ __(
+											'Preview of the album cover image'
+										) }
+									/>
+								) }
+								<MediaUpload
+									title={ __( 'Select image' ) }
+									onSelect={ onSelectAlbumCoverImage }
+									allowedTypes={
+										ALBUM_COVER_ALLOWED_MEDIA_TYPES
+									}
+									render={ ( { open } ) => (
+										<Button
+											__next40pxDefaultSize
+											variant="primary"
+											onClick={ open }
+											ref={ imageButton }
+										>
+											{ ! image
+												? __( 'Select' )
+												: __( 'Replace' ) }
+										</Button>
 									) }
 								/>
-							) }
-							<MediaUpload
-								title={ __( 'Select image' ) }
-								onSelect={ onSelectAlbumCoverImage }
-								allowedTypes={ ALBUM_COVER_ALLOWED_MEDIA_TYPES }
-								render={ ( { open } ) => (
+								{ !! image && (
 									<Button
 										__next40pxDefaultSize
-										variant="primary"
-										onClick={ open }
-										ref={ imageButton }
+										onClick={ onRemoveAlbumCoverImage }
+										variant="tertiary"
 									>
-										{ ! image
-											? __( 'Select' )
-											: __( 'Replace' ) }
+										{ __( 'Remove' ) }
 									</Button>
 								) }
-							/>
-							{ !! image && (
-								<Button
-									__next40pxDefaultSize
-									onClick={ onRemoveAlbumCoverImage }
-									variant="tertiary"
-								>
-									{ __( 'Remove' ) }
-								</Button>
-							) }
-						</div>
+							</div>
+						</BaseControl>
 					</MediaUploadCheck>
+					{ !! image && (
+						<TextareaControl
+							label={ __( 'Alternative text' ) }
+							value={ imageAlt || '' }
+							onChange={ ( value ) =>
+								setAttributes( { imageAlt: value } )
+							}
+							help={
+								<Link
+									openInNewTab
+									href={
+										// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+										__(
+											'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+										)
+									}
+								>
+									{ __(
+										'Describe the purpose of the image.'
+									) }
+								</Link>
+							}
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
