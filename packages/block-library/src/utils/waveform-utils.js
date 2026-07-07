@@ -497,34 +497,75 @@ function removeEmptyPlaylistFooter( footerDiv ) {
 }
 
 /**
+ * Normalize the library's time markup to a compact current/total display.
+ *
+ * @param {Element} timeEl - The waveform time element.
+ */
+function normalizeWaveformTime( timeEl ) {
+	const currentTimeEl = timeEl.querySelector( '.time-current' );
+	const totalTimeEl = timeEl.querySelector( '.time-total' );
+
+	if ( ! currentTimeEl || ! totalTimeEl ) {
+		return;
+	}
+
+	timeEl.replaceChildren( currentTimeEl, '/', totalTimeEl );
+}
+
+/**
  * Move the player metadata into the footer row below the waveform.
  *
  * @param {Element} container - The waveform player container.
  * @param {Object}  instance  - The WaveformPlayer library instance.
  * @return {Function} Cleanup function.
  */
-function setupPlaylistMetadata( container, instance ) {
+export function setupPlaylistMetadata( container, instance ) {
+	const artworkEl =
+		instance?.artworkEl || container.querySelector( '.waveform-artwork' );
 	const titleEl =
 		instance?.titleEl || container.querySelector( '.waveform-title' );
 	const subtitleEl =
 		instance?.subtitleEl || container.querySelector( '.waveform-subtitle' );
+	const timeEl = container.querySelector( '.waveform-time' );
 
-	if ( ! titleEl && ! subtitleEl ) {
+	if ( ! artworkEl && ! titleEl && ! subtitleEl && ! timeEl ) {
 		return () => {};
 	}
 
+	const infoEl = container.querySelector( '.waveform-info' );
 	const footerDiv = getPlaylistFooter( container );
 	const metadataDiv = container.ownerDocument.createElement( 'div' );
 	metadataDiv.className = 'wp-block-playlist__metadata';
+	const metadataTextDiv = container.ownerDocument.createElement( 'div' );
+	metadataTextDiv.className = 'wp-block-playlist__metadata-text';
+	const titleRowDiv = container.ownerDocument.createElement( 'div' );
+	titleRowDiv.className = 'wp-block-playlist__metadata-title-row';
 
+	if ( artworkEl ) {
+		metadataDiv.appendChild( artworkEl );
+	}
 	if ( titleEl ) {
-		metadataDiv.appendChild( titleEl );
+		titleRowDiv.appendChild( titleEl );
 	}
+	if ( timeEl ) {
+		normalizeWaveformTime( timeEl );
+		titleRowDiv.appendChild( timeEl );
+	}
+	metadataTextDiv.appendChild( titleRowDiv );
 	if ( subtitleEl ) {
-		metadataDiv.appendChild( subtitleEl );
+		metadataTextDiv.appendChild( subtitleEl );
 	}
+	metadataDiv.appendChild( metadataTextDiv );
 
 	footerDiv.appendChild( metadataDiv );
+	if (
+		infoEl &&
+		! infoEl.querySelector(
+			'.waveform-artwork, .waveform-title, .waveform-subtitle, .waveform-time, .waveform-bpm, .waveform-speed'
+		)
+	) {
+		infoEl.remove();
+	}
 
 	return () => {
 		metadataDiv.remove();

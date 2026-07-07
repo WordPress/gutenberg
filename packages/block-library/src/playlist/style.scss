@@ -38,7 +38,7 @@ $playlist-control-size: 24px;
 			transform: none;
 		}
 
-		&:focus:not(:focus-visible) {
+		&:focus:not( :focus-visible ) {
 			box-shadow: none;
 			outline: none;
 		}
@@ -103,7 +103,7 @@ $playlist-control-size: 24px;
 			opacity: 0.8;
 		}
 
-		&:focus:not(:focus-visible) {
+		&:focus:not( :focus-visible ) {
 			box-shadow: none;
 			outline: none;
 		}
@@ -146,22 +146,38 @@ $playlist-control-size: 24px;
 	.wp-block-playlist__metadata {
 		display: flex;
 		flex: 1 1 auto;
-		flex-direction: column;
+		align-items: center;
 		justify-content: center;
+		gap: 8px;
 		// Keep the track name from sitting too close to the controls.
 		margin-inline-start: 12px;
 		min-width: 0;
 
-		.waveform-info,
-		.waveform-artist,
-		.waveform-subtitle,
-		.waveform-title,
-		.waveform-time {
-			font-size: inherit;
+		.waveform-artwork {
+			width: 40px !important;
+			height: 40px !important;
+			border-radius: 0 !important;
+			object-fit: cover;
+			flex-shrink: 0;
+		}
+
+		.wp-block-playlist__metadata-text {
+			display: flex;
+			flex: 1 1 auto;
+			flex-direction: column;
+			min-width: 0;
+		}
+
+		.wp-block-playlist__metadata-title-row {
+			display: flex;
+			align-items: baseline;
+			gap: 8px;
+			min-width: 0;
 		}
 
 		.waveform-title,
-		.waveform-subtitle {
+		.waveform-subtitle,
+		.waveform-time {
 			overflow: hidden;
 			color: currentColor !important;
 			font-family: inherit !important;
@@ -170,9 +186,27 @@ $playlist-control-size: 24px;
 			white-space: nowrap;
 		}
 
+		.waveform-title,
+		.waveform-subtitle {
+			font-size: inherit;
+		}
+
 		.waveform-subtitle {
 			font-size: inherit !important;
 			opacity: 0.7;
+		}
+
+		.waveform-title {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+
+		.waveform-time {
+			flex: 0 0 auto;
+			font-size: 0.85em !important;
+			overflow: visible;
+			opacity: 0.7;
+			text-overflow: clip;
 		}
 	}
 

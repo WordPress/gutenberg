@@ -18,6 +18,7 @@ import {
 	getNextRepeatMode,
 	getPlaylistPlaybackAction,
 	replayWaveformPlayerTrack,
+	setupPlaylistMetadata,
 	setupPlaylistControls,
 } from '../waveform-utils';
 
@@ -739,6 +740,74 @@ describe( 'Waveform utilities', () => {
 			expect( repeatBtn.innerHTML ).toBe( repeatAllIcon );
 			expect( onRepeatToggle ).toHaveBeenLastCalledWith( 'none' );
 			expect( onRepeatToggle ).toHaveBeenCalledTimes( 3 );
+		} );
+	} );
+
+	describe( 'setupPlaylistMetadata', () => {
+		const createContainer = () => {
+			const container = document.createElement( 'div' );
+			const waveformTrack = document.createElement( 'div' );
+			waveformTrack.className = 'waveform-track';
+			const info = document.createElement( 'div' );
+			info.className = 'waveform-info';
+			const artwork = document.createElement( 'img' );
+			artwork.className = 'waveform-artwork';
+			const title = document.createElement( 'span' );
+			title.className = 'waveform-title';
+			title.textContent = 'Track title';
+			const subtitle = document.createElement( 'span' );
+			subtitle.className = 'waveform-subtitle';
+			subtitle.textContent = 'Artist';
+			const time = document.createElement( 'span' );
+			time.className = 'waveform-time';
+			const currentTime = document.createElement( 'span' );
+			currentTime.className = 'time-current';
+			currentTime.textContent = '0:01';
+			const totalTime = document.createElement( 'span' );
+			totalTime.className = 'time-total';
+			totalTime.textContent = '4:00';
+			time.append( currentTime, ' / ', totalTime );
+
+			info.append( artwork, title, subtitle, time );
+			container.append( waveformTrack, info );
+			document.body.appendChild( container );
+
+			return { container, artwork, title, subtitle, time };
+		};
+
+		afterEach( () => {
+			document.body.innerHTML = '';
+		} );
+
+		it( 'places artwork, title, and time in the playlist metadata row', () => {
+			const { container, artwork, title, subtitle, time } =
+				createContainer();
+
+			setupPlaylistMetadata( container, {
+				artworkEl: artwork,
+				titleEl: title,
+				subtitleEl: subtitle,
+			} );
+
+			const metadata = container.querySelector(
+				'.wp-block-playlist__metadata'
+			);
+			const titleRow = container.querySelector(
+				'.wp-block-playlist__metadata-title-row'
+			);
+			const metadataText = container.querySelector(
+				'.wp-block-playlist__metadata-text'
+			);
+
+			expect( metadata.firstChild ).toBe( artwork );
+			expect( metadataText ).toContainElement( titleRow );
+			expect( Array.from( titleRow.children ) ).toEqual( [
+				title,
+				time,
+			] );
+			expect( time ).toHaveTextContent( '0:01/4:00' );
+			expect( metadataText ).toContainElement( subtitle );
+			expect( container.querySelector( '.waveform-info' ) ).toBeNull();
 		} );
 	} );
 
