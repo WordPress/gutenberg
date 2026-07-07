@@ -29,6 +29,31 @@
 	color: var(--wpds-color-foreground-content-neutral);
 }
 
+.popoverPopup {
+	max-width: 300px;
+}
+
+/**
+ * Infotip trigger: a bare icon button beside the title.
+ */
+.help {
+	display: inline-flex;
+	align-items: center;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	cursor: var(--wpds-cursor-control);
+}
+
+/**
+ * Divide adjacent links in the infotip.
+ */
+.link + .link {
+	border-inline-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+	padding-inline-start: var(--wpds-dimension-gap-sm);
+}
+
 .toolbar {
 	margin-inline-start: auto;
 }

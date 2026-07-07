@@ -69,6 +69,11 @@
 
 .dataviews-loading-more {
 	text-align: center;
+
+	// Hidden but keeps its box so the reserved height stays constant.
+	&[aria-hidden="true"] {
+		visibility: hidden;
+	}
 }
 
 @container (max-width: 430px) {

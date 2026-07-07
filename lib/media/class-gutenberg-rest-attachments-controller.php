@@ -268,7 +268,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @param string $method Optional. HTTP method of the request. The arguments for `CREATABLE` requests are
 	 *                       checked for required values and may fall-back to a given default, this is not done
 	 *                       on `EDITABLE` requests. Default WP_REST_Server::CREATABLE.
-	 * @return array Endpoint arguments.
+	 * @return array<string, array<string, mixed>> Endpoint arguments keyed by argument name.
 	 */
 	public function get_endpoint_args_for_item_schema( $method = WP_REST_Server::CREATABLE ) {
 		$args = rest_get_endpoint_args_for_schema( $this->get_item_schema(), $method );
@@ -283,6 +283,39 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				'type'        => 'boolean',
 				'default'     => true,
 				'description' => __( 'Whether to convert image formats.', 'gutenberg' ),
+			);
+			$args['url']                = array(
+				'type'              => 'string',
+				'format'            => 'uri',
+				'description'       => __( 'URL of an external image to sideload into the media library, instead of uploading a file.', 'gutenberg' ),
+				'sanitize_callback' => 'sanitize_url',
+				'validate_callback' => static function ( $url, WP_REST_Request $request, string $param ) {
+					/*
+					 * A custom validate_callback replaces the default
+					 * rest_validate_request_arg(), so re-apply it first to keep
+					 * the schema checks (string type, uri format) enforced.
+					 */
+					$valid = rest_validate_request_arg( $url, $request, $param );
+					if ( is_wp_error( $valid ) ) {
+						return $valid;
+					}
+					/** @var non-empty-string $url */
+
+					/*
+					 * Reject URLs that are not safe to request server-side. wp_http_validate_url()
+					 * enforces an HTTP(S) scheme and blocks private, local, and otherwise
+					 * disallowed hosts, guarding the sideload against SSRF.
+					 */
+					if ( false === wp_http_validate_url( $url ) ) {
+						return new WP_Error(
+							'rest_invalid_url',
+							__( 'Invalid URL. Provide a valid, publicly reachable HTTP or HTTPS image URL.', 'gutenberg' ),
+							array( 'status' => 400 )
+						);
+					}
+
+					return true;
+				},
 			);
 		}
 
@@ -553,7 +586,17 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			add_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 		}
 
-		$response = parent::create_item( $request );
+		/*
+		 * When a URL is supplied instead of an uploaded file, sideload the
+		 * remote image on the server. This avoids a cross-origin browser fetch,
+		 * which fails under cross-origin isolation. The sub-size and scaling
+		 * filters applied above still govern whether derivatives are generated.
+		 */
+		if ( ! empty( $request['url'] ) ) {
+			$response = $this->create_item_from_url( $request );
+		} else {
+			$response = parent::create_item( $request );
+		}
 
 		remove_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 100 );
 		remove_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
@@ -589,6 +632,106 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				$response->set_data( $data );
 			}
 		}
+
+		return $response;
+	}
+
+	/**
+	 * Sideloads an external image from a URL into the media library.
+	 *
+	 * Downloads the remote file on the server, avoiding a cross-origin browser
+	 * fetch that fails under cross-origin isolation. Whether sub-sizes are
+	 * generated is governed by the filters applied in create_item().
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
+	 */
+	private function create_item_from_url( WP_REST_Request $request ) {
+		// Sideloading downloads and stores a file, so require the upload capability.
+		if ( ! current_user_can( 'upload_files' ) ) {
+			return new WP_Error(
+				'rest_cannot_create',
+				__( 'Sorry, you are not allowed to upload media on this site.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+
+		$url     = $request['url'];
+		$post_id = ! empty( $request['post'] ) ? (int) $request['post'] : 0;
+
+		// Derive the filename from the URL path before downloading anything.
+		$url_path = wp_parse_url( $url, PHP_URL_PATH );
+		$filename = $url_path ? wp_basename( $url_path ) : '';
+		if ( '' === $filename ) {
+			return new WP_Error(
+				'rest_invalid_url',
+				__( 'Could not determine a filename from the provided URL.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		/*
+		 * Only download URLs whose extension maps to an allowed image MIME type.
+		 * The sideload handler would reject other types anyway (via
+		 * wp_check_filetype_and_ext()), but checking first avoids downloading
+		 * files that can never be accepted, such as PHP scripts.
+		 */
+		$filetype = wp_check_filetype( $filename );
+		if ( ! $filetype['type'] || ! str_starts_with( $filetype['type'], 'image/' ) ) {
+			return new WP_Error(
+				'rest_invalid_url',
+				__( 'The provided URL does not point to a supported image file.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		/*
+		 * Download the remote file with WordPress's HTTP API, which validates
+		 * the host and blocks requests to private or local addresses. This is
+		 * the same primitive core's media_sideload_image() relies on.
+		 */
+		$tmp_file = download_url( $url );
+		if ( is_wp_error( $tmp_file ) ) {
+			return $tmp_file;
+		}
+
+		$file_array = array(
+			'name'     => $filename,
+			'tmp_name' => $tmp_file,
+		);
+
+		$attachment_id = media_handle_sideload( $file_array, $post_id );
+
+		if ( is_wp_error( $attachment_id ) ) {
+			/*
+			 * media_handle_sideload() deletes the temp file on success; remove
+			 * it explicitly when the sideload fails.
+			 */
+			if ( file_exists( $tmp_file ) ) {
+				wp_delete_file( $tmp_file );
+			}
+			return $attachment_id;
+		}
+
+		$attachment = get_post( $attachment_id );
+
+		$request->set_param( 'context', 'edit' );
+
+		/*
+		 * media_handle_sideload() fires the standard insert hooks (including
+		 * wp_after_insert_post), but not the REST-specific action, so fire it
+		 * here for parity with the uploaded-file path in create_item().
+		 */
+		/** This action is documented in wp-includes/rest-api/endpoints/class-wp-rest-attachments-controller.php */
+		do_action( 'rest_after_insert_attachment', $attachment, $request, true );
+
+		$response = $this->prepare_item_for_response( $attachment, $request );
+		$response->set_status( 201 );
+		$response->header( 'Location', rest_url( rest_get_route_for_post( $attachment_id ) ) );
 
 		return $response;
 	}

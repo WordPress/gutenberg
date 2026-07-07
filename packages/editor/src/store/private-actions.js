@@ -209,9 +209,13 @@ export const saveDirtyEntities =
 		registry
 			.dispatch( blockEditorStore )
 			.__unstableMarkLastChangeAsPersistent();
+
 		Promise.all( pendingSavedRecords )
-			.then( ( values ) => {
-				return onSave ? onSave( values ) : values;
+			.then( async ( values ) => {
+				if ( onSave ) {
+					await onSave();
+				}
+				return values;
 			} )
 			.then( ( values ) => {
 				if (
