@@ -62,6 +62,17 @@ For the best development experience, we recommend configuring the [Stylelint rul
 
 If you reference `--wpds-*` tokens in CSS or JS/TS source, use the [build plugins](#build-plugins) to inject fallback values at build time so components render correctly even when the tokens stylesheet is not loaded. If you use `@wordpress/build`, these plugins are already enabled by default when `@wordpress/theme` is installed.
 
+### Accessibility and Browser Support
+
+The semantic color tokens are designed so the default foreground/background pairs used by the design system meet WCAG AA text contrast. Components still need to choose the correct semantic pair for the UI state they render, and must not rely on color alone to convey information.
+
+Design tokens do not replace component-level accessibility handling:
+
+-   **Forced colors:** components are still responsible for `forced-colors` overrides where native high-contrast rendering would otherwise hide borders, icons, focus rings, or state indicators.
+-   **Reduced motion:** motion tokens provide shared durations and easing curves, but consuming components are still responsible for respecting `prefers-reduced-motion` for non-essential animations.
+
+The raw CSS tokens stylesheet targets modern evergreen browsers and may rely on modern CSS features such as `color-mix()`. For source processed by the provided build plugins, fallback values are injected at build time for configured CSS and JS/TS sources.
+
 ## Theme Provider
 
 The `ThemeProvider` is a React component that should wrap your application to provide design tokens and theme context to the child UI components. It accepts a set of customizable seed values and automatically generates a set of design tokens, which are exposed as CSS custom properties for use throughout the application.
