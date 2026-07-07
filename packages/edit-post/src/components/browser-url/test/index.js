@@ -171,7 +171,7 @@ describe( 'BrowserURL', () => {
 		replaceStateSpy.mockReset();
 
 		rerender( <BrowserURL /> );
-		// No timer flush: the write happens synchronously.
+		// The write happens synchronously, so there is nothing to flush.
 		expect( replaceStateSpy ).toHaveBeenCalledWith(
 			{ id: 1 },
 			'Post 1',

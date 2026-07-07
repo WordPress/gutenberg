@@ -51,15 +51,15 @@ test.describe( 'Site editor revisions shareable URLs', () => {
 			},
 		} );
 
-		// Revisions are returned date-desc: [0] newest, last oldest.
+		// The REST API returns revisions newest first.
 		const revisions = await requestUtils.rest( {
 			path: `/wp/v2/pages/${ post.id }/revisions`,
 		} );
 		const oldestRevisionId = revisions[ revisions.length - 1 ].id;
 		const newestRevisionId = revisions[ 0 ].id;
 
-		// Visit once without the arg so the welcome guide preferences are
-		// persisted before the deep link.
+		// Visit once without the arg so the editor can save the welcome
+		// guide preference before the deep link.
 		await admin.visitSiteEditor();
 		await admin.visitAdminPage(
 			'site-editor.php',

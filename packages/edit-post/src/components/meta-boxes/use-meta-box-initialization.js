@@ -69,8 +69,8 @@ export const useMetaBoxInitialization = ( enabled ) => {
 				updateEditorSettings( { disableVisualRevisions: true } );
 
 				// The flag arrives after the editor is ready, so revisions
-				// mode may already be active (deep link or a click that
-				// beat the flag). Honor the intent on the classic screen.
+				// mode may already be active (a deep link, or a click
+				// that beat the flag). Send those to the classic screen.
 				const revisionId = unlock(
 					registry.select( editorStore )
 				).getCurrentRevisionId();

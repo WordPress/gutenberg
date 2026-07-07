@@ -15,18 +15,17 @@ import { unlock } from '../../lock-unlock';
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 /**
- * Quiet period that collapses rapid URL changes (slider drags, held
- * arrow keys) into one trailing write; a change after a quiet period
- * writes immediately. Safari throws when the History API is called
+ * Wait this long before writing a burst of URL changes (slider drags,
+ * held arrow keys) as one update. If a change arrives after a pause,
+ * write it right away. Safari throws when the History API is called
  * more than 100 times per 30 seconds.
  */
 const URL_WRITE_DEBOUNCE_MS = 300;
 
 /**
- * Keeps the `revision` query arg in sync with revisions mode: opens the
- * revision from the URL when the editor loads, and reflects the current
- * revision in the URL while previewing revisions, so the address bar is
- * always shareable.
+ * Keep the `revision` query arg in sync with revisions mode. On load,
+ * open the revision from the URL. After that, write the current revision
+ * back to the URL so the address bar stays shareable.
  *
  * @param {boolean} enabled Whether the sync is active (edit mode only).
  */
@@ -56,9 +55,9 @@ export default function useRevisionsURLSync( enabled ) {
 		openRevision( revision );
 	}, [ enabled, postId, location.query.revision, openRevision ] );
 
-	// Seeded on the first sync so the initial write always goes through
-	// the trailing timeout, giving a deep-linked revision time to land
-	// in the store before the URL is first rewritten.
+	// Null until the first sync, so the first write always waits for the
+	// trailing timeout. That gives a deep-linked revision time to land in
+	// the store before the URL is rewritten.
 	const lastURLWriteTimeRef = useRef( null );
 
 	useEffect( () => {
@@ -76,8 +75,8 @@ export default function useRevisionsURLSync( enabled ) {
 		}
 		const write = () => {
 			lastURLWriteTimeRef.current = Date.now();
-			// `location.path` carries the current query args; an undefined
-			// value removes the arg.
+			// `location.path` already includes the current query args;
+			// passing undefined removes the arg.
 			history.navigate(
 				addQueryArgs( location.path, { revision: revisionArg } ),
 				{ replace: true }

@@ -661,9 +661,9 @@ export const setRevisionPage =
 	};
 
 /**
- * Enter revisions mode at a specific revision, locating the revisions
- * page that contains it. Exits revisions mode with a notice when the
- * revision does not belong to the current post.
+ * Enter revisions mode at the requested revision and find the revisions
+ * page that contains it. If the revision belongs to another post, exit
+ * revisions mode and show a notice.
  *
  * Used to open a revision from a shared URL (`revision` query arg).
  *
@@ -672,8 +672,8 @@ export const setRevisionPage =
 export const openRevision =
 	( revisionId ) =>
 	async ( { dispatch, select, registry } ) => {
-		// Enter revisions mode right away; the canvas and slider render
-		// loading states until the revision's page is located.
+		// Enter revisions mode right away; the canvas and slider show
+		// loading states until we know which page holds the revision.
 		dispatch.setCurrentRevisionId( revisionId );
 
 		const postType = select.getCurrentPostType();
@@ -683,10 +683,10 @@ export const openRevision =
 			.getEntityConfig( 'postType', postType );
 		const revisionKey = entityConfig?.revisionKey || 'id';
 
-		// Fetch the full id list in one request (`per_page: -1` is not
-		// paginated) to both validate the revision and find its position.
-		// Ordering must match `buildRevisionsPageQuery` so the position
-		// maps to the page the slider fetches.
+		// Fetch just the revision ids in one request (`per_page: -1`
+		// skips pagination) to validate the revision and find its position.
+		// The ordering must match `buildRevisionsPageQuery` so the
+		// position maps to the page the slider fetches.
 		const revisions = await registry
 			.resolveSelect( coreStore )
 			.getRevisions( 'postType', postType, postId, {

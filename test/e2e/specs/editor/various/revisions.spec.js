@@ -371,8 +371,8 @@ test.describe( 'Post revisions with classic meta boxes', () => {
 			`post=${ post.id }&action=edit&revision=${ oldestRevisionId }`
 		);
 
-		// Visual revisions are disabled with active classic meta boxes;
-		// the deep link is honored on the classic screen instead.
+		// Active classic meta boxes disable visual revisions, so this
+		// deep link should end up on the classic screen.
 		await expect( page ).toHaveURL(
 			new RegExp( `revision\\.php\\?revision=${ oldestRevisionId }` )
 		);
@@ -668,15 +668,15 @@ test.describe( 'Post revisions shareable URLs', () => {
 			},
 		} );
 
-		// Revisions are returned date-desc: [0] newest, last oldest.
+		// The REST API returns revisions newest first.
 		const revisions = await requestUtils.rest( {
 			path: `/wp/v2/posts/${ post.id }/revisions`,
 		} );
 		const oldestRevisionId = revisions[ revisions.length - 1 ].id;
 		const newestRevisionId = revisions[ 0 ].id;
 
-		// Visit once without the arg so editor preferences (welcome
-		// guide, fullscreen mode) are persisted before the deep link.
+		// Visit once without the arg so the editor can save preferences
+		// like the welcome guide and fullscreen mode before the deep link.
 		await admin.editPost( post.id );
 		await admin.visitAdminPage(
 			'post.php',
@@ -734,7 +734,7 @@ test.describe( 'Post revisions shareable URLs', () => {
 				.filter( { hasText: 'Invalid revision ID.' } )
 		).toBeVisible();
 
-		// Back in the normal editor with a self-healed URL.
+		// The normal editor is back, and the arg is gone from the URL.
 		await expect(
 			page.getByRole( 'button', { name: 'Restore' } )
 		).toBeHidden();

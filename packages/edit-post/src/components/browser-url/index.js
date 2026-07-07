@@ -12,9 +12,9 @@ import { store as editorStore } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
 
 /**
- * Quiet period that collapses rapid URL changes (slider drags, held
- * arrow keys) into one trailing write; a change after a quiet period
- * writes immediately. Safari throws when the History API is called
+ * Wait this long before writing a burst of URL changes (slider drags,
+ * held arrow keys) as one update. If a change arrives after a pause,
+ * write it right away. Safari throws when the History API is called
  * more than 100 times per 30 seconds.
  */
 const URL_WRITE_DEBOUNCE_MS = 300;
@@ -23,7 +23,7 @@ const URL_WRITE_DEBOUNCE_MS = 300;
  * Returns the Post's Edit URL.
  *
  * @param {number}  postId     Post ID.
- * @param {?number} revisionId Optional revision ID being previewed.
+ * @param {?number} revisionId Revision being previewed, if any.
  *
  * @return {string} Post edit URL.
  */
@@ -36,7 +36,7 @@ export function getPostEditURL( postId, revisionId ) {
 }
 
 export default function BrowserURL() {
-	// Captured during the first render, before the URL sync below
+	// Read once during the first render, before the URL sync below
 	// rewrites the address bar.
 	const [ initialRevisionId ] = useState( () => {
 		const revision = Number(
@@ -62,8 +62,8 @@ export default function BrowserURL() {
 			return {
 				postId: id,
 				postStatus: status,
-				// A revision belongs to the edited post; never attach it
-				// to a template opened from within the post editor.
+				// In template mode the URL points at the template, not
+				// at the post the revision belongs to.
 				currentRevisionId: isTemplate ? null : getCurrentRevisionId(),
 				disableVisualRevisions:
 					!! getEditorSettings().disableVisualRevisions,
@@ -89,9 +89,9 @@ export default function BrowserURL() {
 		openRevision( initialRevisionId );
 	}, [ initialRevisionId, postId, disableVisualRevisions, openRevision ] );
 
-	// Seeded on the first sync so the initial write always goes through
-	// the trailing timeout, giving a deep-linked revision time to land
-	// in the store before the URL is first rewritten.
+	// Null until the first sync, so the first write always waits for the
+	// trailing timeout. That gives a deep-linked revision time to land in
+	// the store before the URL is rewritten.
 	const lastURLWriteTimeRef = useRef( null );
 
 	useEffect( () => {
@@ -111,8 +111,8 @@ export default function BrowserURL() {
 					url
 				);
 			} catch {
-				// The browser rate-limited the write; the next change
-				// will retry.
+				// The browser rate-limited the write. The next change
+				// will try again.
 			}
 		};
 		if (

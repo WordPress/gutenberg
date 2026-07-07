@@ -4,7 +4,7 @@
 
 ### New Features
 
--   `useHistory().navigate` accepts a `replace` option to replace the current history entry instead of pushing a new one.
+-   Add a `replace` option to `useHistory().navigate` to update the current history entry instead of pushing a new one.
 
 ## 1.50.0 (2026-07-01)
 
