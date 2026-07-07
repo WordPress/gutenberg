@@ -475,7 +475,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 				),
 			);
 
-			$result = gutenberg_render_block_visibility_support( '<div>Test content</div>', $block );
+			$result            = gutenberg_render_block_visibility_support( '<div>Test content</div>', $block );
 			$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
 
 			$this->assertStringContainsString(

@@ -244,7 +244,7 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 			);
 
 			gutenberg_render_block_style_variation_support_styles( $parsed_block );
-			$inline_styles    = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
+			$inline_styles     = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
 			$actual_stylesheet = is_array( $inline_styles ) ? implode( '', $inline_styles ) : '';
 
 			$this->assertStringContainsString(
