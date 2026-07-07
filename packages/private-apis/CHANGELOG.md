@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Allow `@wordpress/global-styles-engine` to opt in to private APIs.
+
 ## 1.50.0 (2026-07-01)
 
 ## 1.49.0 (2026-06-24)
