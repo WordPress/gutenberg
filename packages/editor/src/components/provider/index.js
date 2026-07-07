@@ -51,6 +51,8 @@ import {
 	SuggestionOverlayProvider,
 	SuggestionAutoSave,
 	SuggestionStoreInterceptor,
+	SuggestionUndoGuard,
+	SuggestionNoteGC,
 	SuggestionAnnotations,
 	SuggestionAuthorColors,
 	SuggestionDeletionKeyboard,
@@ -510,6 +512,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 											{ isSuggestionModeEnabled() && (
 												<>
 													<SuggestionStoreInterceptor />
+													<SuggestionUndoGuard />
+													<SuggestionNoteGC />
 													<SuggestionAutoSave />
 													<SuggestionAnnotations />
 													<SuggestionAuthorColors />

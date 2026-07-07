@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -397,6 +397,46 @@ export function parseSuggestionPayload( raw ) {
 	return parsed;
 }
 
+/*
+ * Comment ids with an apply/reject decision currently in flight. Deciding a
+ * suggestion mutates block content (clears markers) BEFORE the comment's
+ * lifecycle status lands on the server, so the note garbage collector (see
+ * suggestion-note-gc.js) would briefly observe "marker gone, note still
+ * pending" and trash a note that was just resolved. Module-scoped because
+ * `useSuggestionsProvider` is instantiated once per consumer and the guard
+ * must be shared across all of them.
+ */
+const decisionsInFlight = new Set();
+
+/**
+ * Whether an apply/reject decision for the given comment is in flight.
+ *
+ * @param {number|string} commentId Comment id to check.
+ * @return {boolean} True while a decision is being processed.
+ */
+export function isSuggestionDecisionInFlight( commentId ) {
+	return decisionsInFlight.has( String( commentId ) );
+}
+
+/**
+ * Wrap a decision callback (apply/reject) so its comment id is registered as
+ * in flight for the duration of the call.
+ *
+ * @param {Function} decide Decision callback taking `{ commentId, ... }`.
+ * @return {Function} Wrapped callback.
+ */
+function withDecisionInFlight( decide ) {
+	return async ( args ) => {
+		const key = String( args?.commentId );
+		decisionsInFlight.add( key );
+		try {
+			return await decide( args );
+		} finally {
+			decisionsInFlight.delete( key );
+		}
+	};
+}
+
 /**
  * Comment-meta backed suggestions provider. The provider shape is stable so
  * a future Yjs-backed provider can swap in without touching the UI.
@@ -434,8 +474,12 @@ export function useSuggestionsProvider() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
-	const { updateBlockAttributes, removeBlock, moveBlockToPosition } =
-		useDispatch( blockEditorStore );
+	const {
+		updateBlockAttributes,
+		removeBlock,
+		moveBlockToPosition,
+		__unstableMarkNextChangeAsNotPersistent: markNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 	const {
 		getBlockAttributes: selectBlockAttributes,
 		getBlockRootClientId: selectBlockRootClientId,
@@ -496,6 +540,14 @@ export function useSuggestionsProvider() {
 					// are preserved by `addNoteIdToMetadata`.
 					const existingMeta =
 						selectBlockAttributes( clientId )?.metadata ?? {};
+					/*
+					 * The linkage is system bookkeeping, not a user edit: it
+					 * must never be captured by undo history. Left
+					 * persistent, the first Ctrl+Z after making a suggestion
+					 * pops this write instead of the suggestion, leaving the
+					 * marker in place.
+					 */
+					markNextChangeAsNotPersistent?.( { history: 'ignore' } );
 					updateBlockAttributes( clientId, {
 						metadata: addNoteIdToMetadata(
 							existingMeta,
@@ -528,6 +580,7 @@ export function useSuggestionsProvider() {
 			postModified,
 			saveEntityRecord,
 			updateBlockAttributes,
+			markNextChangeAsNotPersistent,
 			selectBlockAttributes,
 			createNotice,
 			getActiveComplementaryArea,
@@ -1154,12 +1207,25 @@ export function useSuggestionsProvider() {
 		]
 	);
 
+	// Decisions are wrapped so the note garbage collector can distinguish a
+	// marker deliberately cleared by apply/reject from one withdrawn by the
+	// user (undo, deleting the marked text). Wrapped here — not per-callback —
+	// so every consumer of the provider gets the guard.
+	const applySuggestionGuarded = useMemo(
+		() => withDecisionInFlight( applySuggestion ),
+		[ applySuggestion ]
+	);
+	const rejectSuggestionGuarded = useMemo(
+		() => withDecisionInFlight( rejectSuggestion ),
+		[ rejectSuggestion ]
+	);
+
 	return {
 		createSuggestion,
 		updateSuggestion,
 		deleteSuggestion,
-		applySuggestion,
-		rejectSuggestion,
+		applySuggestion: applySuggestionGuarded,
+		rejectSuggestion: rejectSuggestionGuarded,
 	};
 }
 

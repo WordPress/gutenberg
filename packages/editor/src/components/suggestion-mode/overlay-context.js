@@ -52,6 +52,25 @@ import { createSuggestionWriteQueue } from './suggestion-write-queue';
 // skipped in those environments.
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 
+/*
+ * Monotonic sequence shared by every capture path so the undo guard can order
+ * an overlay-held attribute suggestion against marker/structural captures
+ * (which live on the real undo stack). Module-scoped: the ordering only needs
+ * to be consistent within a session, not persisted.
+ */
+let captureSequence = 0;
+const nextCaptureSeq = () => ++captureSequence;
+
+/*
+ * How long an armed undo/redo adoption token stays valid. The token is armed
+ * synchronously when undo/redo dispatches, but the block-editor tree only
+ * reflects the entity change after React re-renders and the block-sync effect
+ * runs — an async gap the interceptor can't observe directly. The expiry
+ * bounds the window so a stale token (an undo that ended up changing nothing
+ * block-related) can't swallow a later genuine edit.
+ */
+const UNDO_ADOPTION_TTL_MS = 1000;
+
 /**
  * @typedef {Object} OverlayEntry
  * @property {string} blockName          The block name at the time the
@@ -98,6 +117,9 @@ const OverlayContext = createContext( {
 	unmarkDeferredInsertion: () => {},
 	isDeferredInsertion: () => false,
 	clearDeferredInsertions: () => {},
+	getLastContentCaptureSeq: () => 0,
+	armUndoRedoAdoption: () => {},
+	consumeUndoRedoAdoption: () => false,
 } );
 
 /**
@@ -137,6 +159,11 @@ export function overlayReducer( state, action ) {
 						...entry.overlayAttributes,
 						...action.attributes,
 					},
+					// Capture-order stamp read by the undo guard to find the
+					// most recently edited attribute suggestion. Kept from
+					// the previous state when the action carries no sequence
+					// (e.g. reducer unit tests).
+					lastEditSeq: action.seq ?? entry.lastEditSeq,
 				},
 			};
 		}
@@ -188,7 +215,11 @@ export function overlayReducer( state, action ) {
 					overlayAttributes: existing?.overlayAttributes ?? {},
 					commentId: existing?.commentId ?? null,
 					syncedOpsKey: existing?.syncedOpsKey ?? null,
+					lastEditSeq: existing?.lastEditSeq,
 					structuralOp: action.op,
+					// Capture-order stamp read by the undo guard to find the
+					// most recently captured structural suggestion.
+					structuralOpSeq: action.seq ?? existing?.structuralOpSeq,
 				},
 			};
 		}
@@ -246,6 +277,7 @@ export function SuggestionOverlayProvider( { children } ) {
 				type: 'SET_OVERLAY_ATTRIBUTES',
 				clientId,
 				attributes,
+				seq: nextCaptureSeq(),
 			} ),
 		[]
 	);
@@ -267,16 +299,30 @@ export function SuggestionOverlayProvider( { children } ) {
 		[]
 	);
 
-	const setStructuralOp = useCallback(
-		( clientId, blockName, op ) =>
-			dispatch( {
-				type: 'SET_STRUCTURAL_OP',
-				clientId,
-				blockName,
-				op,
-			} ),
+	/*
+	 * Sequence stamp of the most recent capture that lives on the real undo
+	 * stack (an inline marker write or a structural marker). The undo guard
+	 * compares it against overlay entries' `lastEditSeq` to decide whether
+	 * Ctrl+Z should cancel a pending attribute suggestion or perform a normal
+	 * undo. A ref because it is written from `registry.subscribe` and event
+	 * handlers, and read synchronously inside the wrapped undo dispatch.
+	 */
+	const lastContentCaptureSeqRef = useRef( 0 );
+
+	const getLastContentCaptureSeq = useCallback(
+		() => lastContentCaptureSeqRef.current,
 		[]
 	);
+
+	const setStructuralOp = useCallback( ( clientId, blockName, op ) => {
+		dispatch( {
+			type: 'SET_STRUCTURAL_OP',
+			clientId,
+			blockName,
+			op,
+			seq: nextCaptureSeq(),
+		} );
+	}, [] );
 
 	const hasEntries = Object.keys( entries ).length > 0;
 
@@ -302,6 +348,15 @@ export function SuggestionOverlayProvider( { children } ) {
 	const requestInterceptorBypass = useCallback( ( clientId ) => {
 		if ( clientId ) {
 			bypassClientIdsRef.current.add( clientId );
+			/*
+			 * Every inline marker write (addition/deletion/format keyboards,
+			 * content reconciler) requests a bypass first, so this doubles as
+			 * the "an inline capture happened" stamp for the undo guard.
+			 * Apply/reject flows bump it too, which is harmless — ordering
+			 * only matters relative to pending attribute and structural
+			 * captures still held by the overlay.
+			 */
+			lastContentCaptureSeqRef.current = nextCaptureSeq();
 		}
 	}, [] );
 
@@ -423,6 +478,38 @@ export function SuggestionOverlayProvider( { children } ) {
 		deferredInsertionsRef.current.clear();
 	}, [] );
 
+	/*
+	 * Undo/redo adoption tokens. The undo guard arms one token per undo/redo
+	 * dispatch; the store interceptor consumes a token when the resulting
+	 * block-editor change lands, and adopts that change as the new capture
+	 * baseline instead of treating it as a fresh user edit (which would
+	 * re-capture the undo as a brand-new suggestion). Tokens expire (see
+	 * UNDO_ADOPTION_TTL_MS) because the block sync happens a React commit
+	 * after the dispatch and an undo may turn out to touch nothing
+	 * block-related. A counter-of-expiries rather than a boolean so two quick
+	 * undo presses arm two adoptions.
+	 */
+	const undoAdoptionExpiriesRef = useRef( [] );
+
+	const armUndoRedoAdoption = useCallback( () => {
+		undoAdoptionExpiriesRef.current.push(
+			Date.now() + UNDO_ADOPTION_TTL_MS
+		);
+	}, [] );
+
+	const consumeUndoRedoAdoption = useCallback( () => {
+		const expiries = undoAdoptionExpiriesRef.current;
+		const now = Date.now();
+		while ( expiries.length > 0 && expiries[ 0 ] <= now ) {
+			expiries.shift();
+		}
+		if ( expiries.length === 0 ) {
+			return false;
+		}
+		expiries.shift();
+		return true;
+	}, [] );
+
 	// Prune overlay entries whose block was removed from the editor. This
 	// prevents stale baselines from persisting after a block is deleted.
 	// The block-count subscription only runs when there are entries to
@@ -479,6 +566,9 @@ export function SuggestionOverlayProvider( { children } ) {
 			unmarkDeferredInsertion,
 			isDeferredInsertion,
 			clearDeferredInsertions,
+			getLastContentCaptureSeq,
+			armUndoRedoAdoption,
+			consumeUndoRedoAdoption,
 		} ),
 		[
 			entries,
@@ -500,6 +590,9 @@ export function SuggestionOverlayProvider( { children } ) {
 			unmarkDeferredInsertion,
 			isDeferredInsertion,
 			clearDeferredInsertions,
+			getLastContentCaptureSeq,
+			armUndoRedoAdoption,
+			consumeUndoRedoAdoption,
 		]
 	);
 

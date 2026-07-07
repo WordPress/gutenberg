@@ -28,6 +28,12 @@ const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
 
+// Prefer the installed React version for linting, but fall back to the detected version.
+let reactVersion = 'detect';
+try {
+	reactVersion = require( 'react/package.json' ).version;
+} catch {}
+
 /**
  * ESLint v10 forbids redefining a plugin under the same key unless the
  * reference is strictly identical. Because the @wordpress/eslint-plugin
@@ -180,21 +186,25 @@ const restrictedSyntax = [
 		'BorderControl',
 		'BoxControl',
 		'ComboboxControl',
+		'CustomSelectControl',
 		'FocalPointPicker',
 		'FontAppearanceControl',
 		'FontFamilyControl',
 		'FontSizePicker',
 		'FormFileUpload',
+		'FormTokenField',
 		'LetterSpacingControl',
 		'LineHeightControl',
 		'QueryControls',
 		'RangeControl',
 		'Radio',
 		'SearchControl',
+		'SelectControl',
 		'TextControl',
 		'TextIndentControl',
 		'ToggleGroupControl',
 		'TreeSelect',
+		'UnitControl',
 	].map( ( componentName ) => ( {
 		selector: `JSXOpeningElement[name.name="${ componentName }"] > JSXAttribute[name.name="__next40pxDefaultSize"]`,
 		message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,
@@ -555,6 +565,12 @@ export default dedupePlugins( [
 						'CallExpression[callee.name="require"][arguments.0.value="uuid"]',
 					message:
 						'`uuid` is ESM-only and breaks `require()` call sites (see #77960). Use the built-in `crypto.randomUUID()` instead.',
+				},
+				{
+					selector:
+						'CallExpression[callee.property.name="waitForFunction"][arguments.length=2] > ObjectExpression.arguments:has(Property[key.name=/^(timeout|polling)$/])',
+					message:
+						'`waitForFunction( fn, arg, options )`: options is the third argument. Pass `undefined` as the second arg, otherwise `timeout`/`polling` is ignored and falls back to `actionTimeout`.',
 				},
 			],
 			'playwright/no-conditional-in-test': 'off',
@@ -949,4 +965,8 @@ export default dedupePlugins( [
 
 	// Package-level configs (kept alongside the code they apply to).
 	...wpBuildConfig,
+
+	{
+		settings: { react: { version: reactVersion } },
+	},
 ] );
