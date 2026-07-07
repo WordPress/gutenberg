@@ -1,6 +1,6 @@
-/**
- * @jest-environment node
- */
+jest.mock( 'esbuild', () => ( {
+	build: jest.fn(),
+} ) );
 
 /**
  * Internal dependencies
