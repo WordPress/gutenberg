@@ -311,21 +311,19 @@ export interface ApplicationPasswordConnectorSettingsProps {
 	helpLabel?: string;
 	readOnly?: boolean;
 	keySource?: ApiKeySource;
-	externalCredentialsMalformed?: boolean;
 }
 
 /**
  * Default settings form for application password connectors.
  *
- * @param props                              - Component props.
- * @param props.onSave                       - Callback invoked with the username and application password.
- * @param props.onRemove                     - Callback invoked when the credentials are removed.
- * @param props.initialUsername              - Initial value for the username field.
- * @param props.helpUrl                      - URL where users can create an application password.
- * @param props.helpLabel                    - Custom label for the help link.
- * @param props.readOnly                     - Whether the form is in read-only mode.
- * @param props.keySource                    - The source of the credentials: 'env', 'constant', 'database', or 'none'.
- * @param props.externalCredentialsMalformed - Whether externally configured credentials failed to parse.
+ * @param props                 - Component props.
+ * @param props.onSave          - Callback invoked with the username and application password.
+ * @param props.onRemove        - Callback invoked when the credentials are removed.
+ * @param props.initialUsername - Initial value for the username field.
+ * @param props.helpUrl         - URL where users can create an application password.
+ * @param props.helpLabel       - Custom label for the help link.
+ * @param props.readOnly        - Whether the form is in read-only mode.
+ * @param props.keySource       - The source of the credentials: 'env', 'constant', 'database', or 'none'.
  */
 export function ApplicationPasswordConnectorSettings( {
 	onSave,
@@ -335,7 +333,6 @@ export function ApplicationPasswordConnectorSettings( {
 	helpLabel,
 	readOnly = false,
 	keySource,
-	externalCredentialsMalformed = false,
 }: ApplicationPasswordConnectorSettingsProps ) {
 	const [ username, setUsername ] = useState( initialUsername );
 	const [ applicationPassword, setApplicationPassword ] = useState( '' );
@@ -353,15 +350,7 @@ export function ApplicationPasswordConnectorSettings( {
 	);
 
 	let applicationPasswordHelp: ReactNode = help;
-	if ( externalCredentialsMalformed ) {
-		applicationPasswordHelp = (
-			<span role="alert" className="connector-settings__error">
-				{ __(
-					'The configured credentials are malformed. Expected format: username:password.'
-				) }
-			</span>
-		);
-	} else if ( keySource === 'env' ) {
+	if ( keySource === 'env' ) {
 		applicationPasswordHelp = __(
 			'These credentials are configured using an environment variable.'
 		);
@@ -399,11 +388,7 @@ export function ApplicationPasswordConnectorSettings( {
 			/>
 			<TextControl
 				label={ __( 'Application password' ) }
-				value={
-					readOnly && ! externalCredentialsMalformed
-						? '••••••••••••••••'
-						: applicationPassword
-				}
+				value={ readOnly ? '••••••••••••••••' : applicationPassword }
 				onChange={ ( value ) => {
 					if ( ! readOnly ) {
 						setSaveError( null );

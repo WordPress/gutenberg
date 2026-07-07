@@ -289,8 +289,9 @@ function _gutenberg_parse_application_password_credentials( string $value ): arr
  * environment variable and constant are only checked when their respective
  * names are provided, and must contain the credentials as a single
  * `username:password` string. A non-empty environment variable or constant
- * claims the source even when malformed, in which case the resolved
- * credentials are empty.
+ * that cannot be parsed as `username:password` is reported with
+ * `_doing_it_wrong()` and ignored, so resolution falls through to the next
+ * source.
  *
  * @access private
  *
@@ -305,9 +306,21 @@ function _gutenberg_get_application_password_credentials( array $auth ): array {
 	if ( '' !== $env_var_name ) {
 		$env_value = getenv( $env_var_name );
 		if ( false !== $env_value && '' !== $env_value ) {
-			$credentials           = _gutenberg_parse_application_password_credentials( $env_value );
-			$credentials['source'] = 'env';
-			return $credentials;
+			$credentials = _gutenberg_parse_application_password_credentials( $env_value );
+			if ( '' !== $credentials['username'] && '' !== $credentials['password'] ) {
+				$credentials['source'] = 'env';
+				return $credentials;
+			}
+
+			_doing_it_wrong(
+				__FUNCTION__,
+				sprintf(
+					/* translators: %s: Environment variable name. */
+					__( 'The %s environment variable must contain application password credentials in "username:password" format.', 'gutenberg' ),
+					$env_var_name
+				),
+				'7.0.0'
+			);
 		}
 	}
 
@@ -316,9 +329,21 @@ function _gutenberg_get_application_password_credentials( array $auth ): array {
 	if ( '' !== $constant_name && defined( $constant_name ) ) {
 		$const_value = constant( $constant_name );
 		if ( is_string( $const_value ) && '' !== $const_value ) {
-			$credentials           = _gutenberg_parse_application_password_credentials( $const_value );
-			$credentials['source'] = 'constant';
-			return $credentials;
+			$credentials = _gutenberg_parse_application_password_credentials( $const_value );
+			if ( '' !== $credentials['username'] && '' !== $credentials['password'] ) {
+				$credentials['source'] = 'constant';
+				return $credentials;
+			}
+
+			_doing_it_wrong(
+				__FUNCTION__,
+				sprintf(
+					/* translators: %s: PHP constant name. */
+					__( 'The %s constant must contain application password credentials in "username:password" format.', 'gutenberg' ),
+					$constant_name
+				),
+				'7.0.0'
+			);
 		}
 	}
 
