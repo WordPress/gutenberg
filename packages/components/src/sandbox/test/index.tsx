@@ -91,6 +91,25 @@ describe( 'SandBox', () => {
 		);
 	} );
 
+	it( 'places the resize script in the head, before the user content', () => {
+		// The resize script must parse before the (possibly malformed) user
+		// content in the body. Otherwise an unclosed attribute quote in that
+		// content swallows the <script> tag and its source leaks into the
+		// preview as visible text.
+		render( <SandBox html="<p>User content</p>" title="Head Script" /> );
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Head Script' );
+		const srcDoc = iframe.getAttribute( 'srcdoc' ) ?? '';
+
+		const resizeScriptIndex = srcDoc.indexOf( 'MutationObserver' );
+		const bodyIndex = srcDoc.indexOf( '<body' );
+		const userContentIndex = srcDoc.indexOf( '<p>User content</p>' );
+
+		expect( resizeScriptIndex ).toBeGreaterThan( -1 );
+		expect( resizeScriptIndex ).toBeLessThan( bodyIndex );
+		expect( resizeScriptIndex ).toBeLessThan( userContentIndex );
+	} );
+
 	it( 'should update srcdoc when html prop changes', () => {
 		render( <TestWrapper /> );
 

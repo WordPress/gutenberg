@@ -37,7 +37,7 @@ export const VIEWPORT_UNIT_VALUE_REGEX =
 const observeAndResizeJS = function () {
 	const { MutationObserver } = window;
 
-	if ( ! MutationObserver || ! document.body || ! window.parent ) {
+	if ( ! MutationObserver || ! window.parent ) {
 		return;
 	}
 
@@ -54,60 +54,74 @@ const observeAndResizeJS = function () {
 		);
 	}
 
-	const observer = new MutationObserver( sendResize );
-	observer.observe( document.body, {
-		attributes: true,
-		attributeOldValue: false,
-		characterData: true,
-		characterDataOldValue: false,
-		childList: true,
-		subtree: true,
-	} );
+	// Runs the body-dependent setup once the document body is available.
+	function connect() {
+		const observer = new MutationObserver( sendResize );
+		observer.observe( document.body, {
+			attributes: true,
+			attributeOldValue: false,
+			characterData: true,
+			characterDataOldValue: false,
+			childList: true,
+			subtree: true,
+		} );
 
-	window.addEventListener( 'load', sendResize, true );
-
-	// Hack: Remove viewport unit styles, as these are relative
-	// the iframe root and interfere with our mechanism for
-	// determining the unconstrained page bounds.
-	function removeViewportStyles( ruleOrNode: ElementCSSInlineStyle ) {
-		if ( ruleOrNode.style ) {
-			(
-				[ 'width', 'height', 'minHeight', 'maxHeight' ] as const
-			 ).forEach( function ( style ) {
-				if (
-					/^\d*\.?\d+(?:vw|vh|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)$/.test(
-						ruleOrNode.style[ style ]
-					)
-				) {
-					ruleOrNode.style[ style ] = '';
-				}
-			} );
+		// Hack: Remove viewport unit styles, as these are relative
+		// the iframe root and interfere with our mechanism for
+		// determining the unconstrained page bounds.
+		function removeViewportStyles( ruleOrNode: ElementCSSInlineStyle ) {
+			if ( ruleOrNode.style ) {
+				(
+					[ 'width', 'height', 'minHeight', 'maxHeight' ] as const
+				 ).forEach( function ( style ) {
+					if (
+						/^\d*\.?\d+(?:vw|vh|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)$/.test(
+							ruleOrNode.style[ style ]
+						)
+					) {
+						ruleOrNode.style[ style ] = '';
+					}
+				} );
+			}
 		}
+
+		Array.prototype.forEach.call(
+			document.querySelectorAll( '[style]' ),
+			removeViewportStyles
+		);
+		Array.prototype.forEach.call(
+			document.styleSheets,
+			function ( stylesheet ) {
+				Array.prototype.forEach.call(
+					stylesheet.cssRules || stylesheet.rules,
+					removeViewportStyles
+				);
+			}
+		);
+
+		document.body.style.position = 'absolute';
+		document.body.style.width = '100%';
+		document.body.setAttribute( 'data-resizable-iframe-connected', '' );
+
+		sendResize();
 	}
 
-	Array.prototype.forEach.call(
-		document.querySelectorAll( '[style]' ),
-		removeViewportStyles
-	);
-	Array.prototype.forEach.call(
-		document.styleSheets,
-		function ( stylesheet ) {
-			Array.prototype.forEach.call(
-				stylesheet.cssRules || stylesheet.rules,
-				removeViewportStyles
-			);
-		}
-	);
-
-	document.body.style.position = 'absolute';
-	document.body.style.width = '100%';
-	document.body.setAttribute( 'data-resizable-iframe-connected', '' );
-
-	sendResize();
+	window.addEventListener( 'load', sendResize, true );
 
 	// Resize events can change the width of elements with 100% width, but we don't
 	// get an DOM mutations for that, so do the resize when the window is resized, too.
 	window.addEventListener( 'resize', sendResize, true );
+
+	// This script is injected into the document <head> so it parses before the
+	// (possibly malformed) user content in <body>: an unclosed attribute quote
+	// in that content can't then swallow this <script> tag and dump its source
+	// into the preview as visible text. Because <head> runs before <body>
+	// exists, defer the body-dependent setup until the DOM is ready.
+	if ( document.body ) {
+		connect();
+	} else {
+		document.addEventListener( 'DOMContentLoaded', connect );
+	}
 };
 
 // TODO: These styles shouldn't be coupled with WordPress.
@@ -161,18 +175,18 @@ function buildSandBoxDocument( {
 						dangerouslySetInnerHTML={ { __html: rules } }
 					/>
 				) ) }
-			</head>
-			<body
-				data-resizable-iframe-connected="data-resizable-iframe-connected"
-				className={ type }
-			>
-				<div dangerouslySetInnerHTML={ { __html: html } } />
 				<script
 					type="text/javascript"
 					dangerouslySetInnerHTML={ {
 						__html: `(${ observeAndResizeJS.toString() })();`,
 					} }
 				/>
+			</head>
+			<body
+				data-resizable-iframe-connected="data-resizable-iframe-connected"
+				className={ type }
+			>
+				<div dangerouslySetInnerHTML={ { __html: html } } />
 				{ scripts.map( ( src ) => (
 					<script key={ src } src={ src } />
 				) ) }
@@ -363,18 +377,18 @@ function SameOriginSandBox( {
 							dangerouslySetInnerHTML={ { __html: rules } }
 						/>
 					) ) }
-				</head>
-				<body
-					data-resizable-iframe-connected="data-resizable-iframe-connected"
-					className={ type }
-				>
-					<div dangerouslySetInnerHTML={ { __html: html } } />
 					<script
 						type="text/javascript"
 						dangerouslySetInnerHTML={ {
 							__html: `(${ observeAndResizeJS.toString() })();`,
 						} }
 					/>
+				</head>
+				<body
+					data-resizable-iframe-connected="data-resizable-iframe-connected"
+					className={ type }
+				>
+					<div dangerouslySetInnerHTML={ { __html: html } } />
 					{ scripts.map( ( src ) => (
 						<script key={ src } src={ src } />
 					) ) }
