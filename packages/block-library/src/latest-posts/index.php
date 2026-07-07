@@ -72,7 +72,11 @@ function render_block_core_latest_posts( $attributes ) {
 	}
 
 	$list_items_markup = '';
-	$previous_post     = $post ?? null;
+	// Snapshot the current global post so it can be restored after the loop.
+	// We use have_posts()/the_post() rather than foreach so that setup_postdata()
+	// is called for each post, establishing the correct global context for
+	// do_blocks() and other filters that run during full-content rendering.
+	$previous_post = $post ?? null;
 
 	while ( $query->have_posts() ) {
 		$query->the_post();
@@ -216,6 +220,9 @@ function render_block_core_latest_posts( $attributes ) {
 	}
 
 	// Restore the post context that was active before this secondary query.
+	// wp_reset_postdata() is intentionally not used here: when this block is
+	// rendered inside another post's content (e.g. via do_blocks()), it would
+	// restore to the main query post rather than the outer rendering post.
 	$post = $previous_post;
 	if ( $previous_post instanceof WP_Post ) {
 		setup_postdata( $previous_post );
