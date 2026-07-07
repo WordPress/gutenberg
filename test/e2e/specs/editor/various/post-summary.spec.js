@@ -293,9 +293,7 @@ test.describe( 'Post Summary', () => {
 			const editButton = summary.getByRole( 'button', {
 				name: 'Edit Status',
 			} );
-			await expect(
-				editButton.locator( '..' ).getByText( 'Draft', { exact: true } )
-			).toBeVisible();
+			await expect( editButton ).toHaveAccessibleDescription( 'Draft' );
 
 			await editButton.click();
 			await expect(
