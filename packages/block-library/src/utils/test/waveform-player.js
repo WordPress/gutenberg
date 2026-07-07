@@ -12,6 +12,7 @@ import { initWaveformPlayer } from '../waveform-utils';
 
 jest.mock( '../waveform-utils', () => ( {
 	initWaveformPlayer: jest.fn(),
+	updateSeekControlLabel: jest.fn(),
 } ) );
 
 /**

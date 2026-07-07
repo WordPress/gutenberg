@@ -857,11 +857,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/spacer/hook.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/spinner/styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
@@ -888,11 +883,6 @@
 		}
 	},
 	"packages/components/src/textarea-control/styles/textarea-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
-	"packages/components/src/theme/styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
 		}

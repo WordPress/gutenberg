@@ -195,6 +195,7 @@ const restrictedSyntax = [
 		'FormTokenField',
 		'LetterSpacingControl',
 		'LineHeightControl',
+		'NumberControl',
 		'QueryControls',
 		'RangeControl',
 		'Radio',

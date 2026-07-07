@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
+import deprecated from '@wordpress/deprecated';
 import warning from '@wordpress/warning';
 
 /**
@@ -20,13 +21,20 @@ import {
 import {
 	isBlockRegistered,
 	normalizeBlockType,
-	__experimentalSanitizeBlockAttributes,
+	sanitizeBlockAttributes,
 } from './utils';
 import type { Block, BlockType, BlockTransform } from '../types';
 
 type BlockTypeWithTransformMetadata = BlockType & {
 	variationName?: string;
 };
+
+type TemplateBlock = [
+	string,
+	Record< string, unknown >?,
+	Array< unknown >?,
+	Array< string | null >?,
+];
 
 const getBlockTypeWithTransformMetadata = (
 	blockType: BlockType,
@@ -62,10 +70,7 @@ export function createBlock(
 		} );
 	}
 
-	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
-		name,
-		attributes
-	);
+	const sanitizedAttributes = sanitizeBlockAttributes( name, attributes );
 
 	const clientId = uuid();
 
@@ -105,28 +110,26 @@ export function createBlock(
  * @return Array of Block objects.
  */
 export function createBlocksFromInnerBlocksTemplate(
-	innerBlocksOrTemplate: Array<
-		Block | [ string, Record< string, unknown >?, Array< unknown >? ]
-	> = []
+	innerBlocksOrTemplate: Array< Block | TemplateBlock > = []
 ): Block[] {
 	return innerBlocksOrTemplate.map( ( innerBlock ) => {
-		const innerBlockTemplate = Array.isArray( innerBlock )
+		const innerBlockTemplate: TemplateBlock = Array.isArray( innerBlock )
 			? innerBlock
 			: [
 					innerBlock.name,
 					innerBlock.attributes,
 					innerBlock.innerBlocks,
+					innerBlock.innerContent,
 			  ];
-		const [ name, attributes, innerBlocks = [] ] = innerBlockTemplate;
+		const [ name, attributes, innerBlocks = [], innerContent ] =
+			innerBlockTemplate;
 		return createBlock(
 			name as string,
 			attributes as Record< string, unknown >,
 			createBlocksFromInnerBlocksTemplate(
-				innerBlocks as Array<
-					| Block
-					| [ string, Record< string, unknown >?, Array< unknown >? ]
-				>
-			)
+				innerBlocks as Array< Block | TemplateBlock >
+			),
+			innerContent
 		);
 	} );
 }
@@ -141,7 +144,7 @@ export function createBlocksFromInnerBlocksTemplate(
  *
  * @return A cloned block.
  */
-export function __experimentalCloneSanitizedBlock(
+export function cloneSanitizedBlock(
 	block: Block,
 	mergeAttributes: Record< string, unknown > = {},
 	newInnerBlocks?: Block[]
@@ -158,7 +161,7 @@ export function __experimentalCloneSanitizedBlock(
 
 	const clientId = uuid();
 
-	const sanitizedAttributes = __experimentalSanitizeBlockAttributes( name, {
+	const sanitizedAttributes = sanitizeBlockAttributes( name, {
 		...block.attributes,
 		...mergeAttributes,
 	} );
@@ -170,9 +173,22 @@ export function __experimentalCloneSanitizedBlock(
 		innerBlocks:
 			newInnerBlocks ||
 			block.innerBlocks.map( ( innerBlock ) =>
-				__experimentalCloneSanitizedBlock( innerBlock )
+				cloneSanitizedBlock( innerBlock )
 			),
 	};
+}
+
+export function __experimentalCloneSanitizedBlock(
+	block: Block,
+	mergeAttributes: Record< string, unknown > = {},
+	newInnerBlocks?: Block[]
+): Block {
+	deprecated( '__experimentalCloneSanitizedBlock', {
+		since: '7.1',
+		alternative: 'cloneSanitizedBlock',
+	} );
+
+	return cloneSanitizedBlock( block, mergeAttributes, newInnerBlocks );
 }
 
 /**

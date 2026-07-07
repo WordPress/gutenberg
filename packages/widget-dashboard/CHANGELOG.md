@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+-   Remove layout-settings editing: the customize-toolbar button, the
+    settings drawer, the layout-model switch commands, and the
+    `onGridSettingsChange` prop. `gridSettings` is now read-only rendering
+    configuration; the consumer owns the values and their persistence.
+
 ### New Features
 
 -   Widget toolbar: edit high-relevance widget attributes inline from the
