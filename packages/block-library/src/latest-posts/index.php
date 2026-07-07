@@ -183,7 +183,9 @@ function render_block_core_latest_posts( $attributes ) {
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
 			&& isset( $attributes['displayPostContentRadio'] ) && 'full_post' === $attributes['displayPostContentRadio'] ) {
 
-			$post_content = html_entity_decode( $post->post_content, ENT_QUOTES, get_option( 'blog_charset' ) );
+			/** This filter is documented in wp-includes/post-template.php */
+			$post_content = apply_filters( 'the_content', get_the_content( null, false, $post ) );
+			$post_content = str_replace( ']]>', ']]&gt;', $post_content );
 
 			if ( post_password_required( $post ) ) {
 				$post_content = __( 'This content is password protected.' );
@@ -191,7 +193,7 @@ function render_block_core_latest_posts( $attributes ) {
 
 			$list_items_markup .= sprintf(
 				'<div class="wp-block-latest-posts__post-full-content">%1$s</div>',
-				wp_kses_post( $post_content )
+				$post_content
 			);
 		}
 
