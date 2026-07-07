@@ -1,18 +1,31 @@
 /**
+ * External dependencies
+ */
+import type { getOctokit } from '@actions/github';
+import type { PullRequestEvent } from '@octokit/webhooks-types';
+
+/**
  * Internal dependencies
  */
-const debug = require( '../../debug' );
+import debug from '../../debug';
 
+/**
+ * Type definitions
+ */
+type GitHub = ReturnType< typeof getOctokit >;
 /** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
 /** @typedef {import('@octokit/webhooks-types').EventPayloadMap['pull_request']} WebhookPayloadPullRequest */
 
 /**
  * Assigns any issues 'fixed' by a newly opened PR to the author of that PR.
  *
- * @param {WebhookPayloadPullRequest} payload Pull request event payload.
- * @param {GitHub}                    octokit Initialized Octokit REST client.
+ * @param payload Pull request event payload.
+ * @param octokit Initialized Octokit REST client.
  */
-async function assignFixedIssues( payload, octokit ) {
+async function assignFixedIssues(
+	payload: PullRequestEvent,
+	octokit: GitHub
+): Promise< void > {
 	const regex =
 		/(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved):? +(?:\#?|https?:\/\/github\.com\/WordPress\/gutenberg\/issues\/)(\d+)/gi;
 
@@ -47,4 +60,4 @@ async function assignFixedIssues( payload, octokit ) {
 	}
 }
 
-module.exports = assignFixedIssues;
+export default assignFixedIssues;

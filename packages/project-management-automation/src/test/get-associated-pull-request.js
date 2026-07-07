@@ -3,13 +3,13 @@
  */
 import getAssociatedPullRequest from '../get-associated-pull-request';
 
-/** @typedef {import('../get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
+/** @typedef {import('@octokit/webhooks-types').Commit} Commit */
 
 /**
  * An example commit which can be associated with a pull request, e.g. a pull
  * request merge commit.
  *
- * @type {WebhookPayloadPushCommit}
+ * @type {Commit}
  */
 const VALID_COMMIT = {
 	message:
@@ -20,7 +20,7 @@ const VALID_COMMIT = {
  * An example commit which cannot be associated with a pull request, e.g. when
  * someone commits directly to trunk.
  *
- * @type {WebhookPayloadPushCommit}
+ * @type {Commit}
  */
 const INVALID_COMMIT = {
 	message: 'Add basic placeholder content to post title, content, and date.',

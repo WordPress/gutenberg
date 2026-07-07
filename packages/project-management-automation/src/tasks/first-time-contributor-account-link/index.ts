@@ -1,11 +1,20 @@
 /**
+ * External dependencies
+ */
+import type { getOctokit } from '@actions/github';
+import type { PushEvent } from '@octokit/webhooks-types';
+
+/**
  * Internal dependencies
  */
-const debug = require( '../../debug' );
-const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
-const hasWordPressProfile = require( '../../has-wordpress-profile' );
+import debug from '../../debug';
+import getAssociatedPullRequest from '../../get-associated-pull-request';
+import hasWordPressProfile from '../../has-wordpress-profile';
 
-/** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
+/**
+ * Type definitions
+ */
+type GitHub = ReturnType< typeof getOctokit >;
 /** @typedef {import('@octokit/webhooks-types').EventPayloadMap['push']} WebhookPayloadPush */
 /** @typedef {import('../../get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
 
@@ -13,11 +22,10 @@ const hasWordPressProfile = require( '../../has-wordpress-profile' );
  * Returns the message text to be used for the comment prompting contributor to
  * link their GitHub account from their WordPress.org profile for props credit.
  *
- * @param {string} author GitHub username of author.
- *
- * @return {string} Message text.
+ * @param author GitHub username of author.
+ * @return Message text.
  */
-function getPromptMessageText( author ) {
+function getPromptMessageText( author: string ): string {
 	return (
 		'Congratulations on your first merged pull request, @' +
 		author +
@@ -36,10 +44,13 @@ function getPromptMessageText( author ) {
  * Prompts the user to link their GitHub account to their WordPress.org profile
  * if necessary for props credit.
  *
- * @param {WebhookPayloadPush} payload Push event payload.
- * @param {GitHub}             octokit Initialized Octokit REST client.
+ * @param payload Push event payload.
+ * @param octokit Initialized Octokit REST client.
  */
-async function firstTimeContributorAccountLink( payload, octokit ) {
+async function firstTimeContributorAccountLink(
+	payload: PushEvent,
+	octokit: GitHub
+): Promise< void > {
 	if ( payload.ref !== 'refs/heads/trunk' ) {
 		debug(
 			'first-time-contributor-account-link: Commit is not to `trunk`. Aborting'
@@ -47,9 +58,7 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 		return;
 	}
 
-	const commit = /** @type {WebhookPayloadPushCommit} */ (
-		payload.commits[ 0 ]
-	);
+	const commit = payload.commits[ 0 ];
 	const pullRequest = getAssociatedPullRequest( commit );
 	if ( ! pullRequest ) {
 		debug(
@@ -59,7 +68,7 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 	}
 
 	const { data: user } = await octokit.rest.users.getByUsername( {
-		username: commit.author.username,
+		username: commit.author.username!,
 	} );
 
 	if ( user.type === 'Bot' ) {
@@ -69,7 +78,7 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 
 	const repo = payload.repository.name;
 	const owner = payload.repository.owner.login;
-	const author = commit.author.username;
+	const author = commit.author.username!;
 
 	debug(
 		`first-time-contributor-account-link: Searching for commits in ${ owner }/${ repo } by @${ author }`
@@ -123,4 +132,4 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 	} );
 }
 
-module.exports = firstTimeContributorAccountLink;
+export default firstTimeContributorAccountLink;

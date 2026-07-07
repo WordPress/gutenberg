@@ -11,3 +11,7 @@ paths:
         ignore:
             # This file gets created in the step prior.
             - 'file "build/index.cjs" does not exist.+'
+    .github/workflows/pull-request-automation.yml:
+        ignore:
+            # This file gets created in the previous step.
+            - 'file "build/index.js" does not exist.+'

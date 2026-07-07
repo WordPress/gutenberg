@@ -7,4 +7,4 @@ inputs:
         required: true
 runs:
     using: node20
-    main: lib/index.js
+    main: build/index.js

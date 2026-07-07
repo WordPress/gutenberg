@@ -1,39 +1,41 @@
 /**
  * External dependencies
  */
-const { setFailed, getInput } = require( '@actions/core' );
-const { getOctokit, context } = require( '@actions/github' );
+import { setFailed, getInput } from '@actions/core';
+import { getOctokit, context } from '@actions/github';
 
 /**
  * Internal dependencies
  */
-const assignFixedIssues = require( './tasks/assign-fixed-issues' );
-const firstTimeContributorAccountLink = require( './tasks/first-time-contributor-account-link' );
-const firstTimeContributorLabel = require( './tasks/first-time-contributor-label' );
-const addMilestone = require( './tasks/add-milestone' );
-const debug = require( './debug' );
+import assignFixedIssues from './tasks/assign-fixed-issues';
+import firstTimeContributorAccountLink from './tasks/first-time-contributor-account-link';
+import firstTimeContributorLabel from './tasks/first-time-contributor-label';
+import addMilestone from './tasks/add-milestone';
+import debug from './debug';
+
+/**
+ * Type definitions
+ */
+type GitHub = ReturnType< typeof getOctokit >;
 
 /**
  * Automation task function.
  *
  * @typedef {( payload: any, octokit: ReturnType<typeof getOctokit> ) => void} WPAutomationTask
  */
+type WPAutomationTask = ( payload: any, octokit: GitHub ) => Promise< void >;
 
 /**
  * Full list of automations, matched by given properties against the incoming
  * payload object.
- *
- * @typedef WPAutomation
- *
- * @property {string}           event    Webhook event name to match.
- * @property {string}           [action] Action to match, if applicable.
- * @property {WPAutomationTask} task     Task to run.
  */
+interface WPAutomation {
+	event: string;
+	action?: string;
+	task: WPAutomationTask;
+}
 
-/**
- * @type {WPAutomation[]}
- */
-const automations = [
+const automations: WPAutomation[] = [
 	{
 		event: 'pull_request_target',
 		action: 'opened',

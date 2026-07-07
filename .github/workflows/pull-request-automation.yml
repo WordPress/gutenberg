@@ -29,6 +29,9 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
+            - name: Build project management automation package
+              run: npx tsc -p packages/project-management-automation/tsconfig.json
+
             - uses: ./packages/project-management-automation
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}

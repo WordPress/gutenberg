@@ -1,17 +1,28 @@
 /**
+ * External dependencies
+ */
+import type { getOctokit } from '@actions/github';
+import type { PushEvent } from '@octokit/webhooks-types';
+
+/**
  * Internal dependencies
  */
-const debug = require( '../../debug' );
-const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
+import debug from '../../debug';
+import getAssociatedPullRequest from '../../get-associated-pull-request';
 
+/**
+ * Type definitions
+ */
+type GitHub = ReturnType< typeof getOctokit >;
+type Milestone = Awaited<
+	ReturnType< GitHub[ 'rest' ][ 'issues' ][ 'listMilestones' ] >
+>[ 'data' ][ 0 ];
 /** @typedef {import('@octokit/request-error').RequestError} RequestError */
 /** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
 /** @typedef {import('@octokit/webhooks-types').EventPayloadMap['push']} WebhookPayloadPush */
 
 /**
  * Number of expected days elapsed between releases.
- *
- * @type {number}
  */
 const DAYS_PER_RELEASE = 14;
 
@@ -19,18 +30,19 @@ const DAYS_PER_RELEASE = 14;
  * Returns true if the given error object represents a duplicate entry error, or
  * false otherwise.
  *
- * @param {unknown} requestError Error to test.
+ * @param requestError Error to test.
  *
- * @return {boolean} Whether error is a duplicate validation request error.
+ * @return Whether error is a duplicate validation request error.
  */
-const isDuplicateValidationError = ( requestError ) => {
+const isDuplicateValidationError = ( requestError: unknown ): boolean => {
 	// The included version of RequestError provides no way to access the
 	// full 'errors' array that the github REST API returns. Hopefully they
 	// resolve this soon!
 	const errorMessage =
 		requestError &&
 		typeof requestError === 'object' &&
-		/** @type {{message?: string}} */ ( requestError ).message;
+		'message' in requestError &&
+		requestError.message;
 	return (
 		typeof errorMessage === 'string' &&
 		errorMessage.includes( 'already_exists' )
@@ -40,14 +52,19 @@ const isDuplicateValidationError = ( requestError ) => {
 /**
  * Returns a promise resolving to a milestone by a given title, if exists.
  *
- * @param {GitHub} octokit Initialized Octokit REST client.
- * @param {string} owner   Repository owner.
- * @param {string} repo    Repository name.
- * @param {string} title   Milestone title.
+ * @param octokit Initialized Octokit REST client.
+ * @param owner   Repository owner.
+ * @param repo    Repository name.
+ * @param title   Milestone title.
  *
- * @return {Promise<any|void>} Promise resolving to milestone, if exists.
+ * @return Promise resolving to milestone, if exists.
  */
-async function getMilestoneByTitle( octokit, owner, repo, title ) {
+async function getMilestoneByTitle(
+	octokit: GitHub,
+	owner: string,
+	repo: string,
+	title: string
+): Promise< Milestone | void > {
 	const responses = octokit.paginate.iterator(
 		octokit.rest.issues.listMilestones,
 		{
@@ -72,10 +89,13 @@ async function getMilestoneByTitle( octokit, owner, repo, title ) {
 /**
  * Assigns the correct milestone to PRs once merged.
  *
- * @param {WebhookPayloadPush} payload Push event payload.
- * @param {GitHub}             octokit Initialized Octokit REST client.
+ * @param payload Push event payload.
+ * @param octokit Initialized Octokit REST client.
  */
-async function addMilestone( payload, octokit ) {
+async function addMilestone(
+	payload: PushEvent,
+	octokit: GitHub
+): Promise< void > {
 	if ( payload.ref !== 'refs/heads/trunk' ) {
 		debug( 'add-milestone: Commit is not to `trunk`. Aborting' );
 		return;
@@ -149,7 +169,8 @@ async function addMilestone( payload, octokit ) {
 	}
 
 	// Using UTC for the calculation ensures it's not affected by daylight savings.
-	const dueDate = new Date( lastMilestone.due_on );
+	// If the milestone has no due date, use current date as fallback, reflects previous behavior before TypeScript conversion.
+	const dueDate = new Date( lastMilestone.due_on || new Date() );
 	dueDate.setUTCDate( dueDate.getUTCDate() + DAYS_PER_RELEASE );
 
 	debug(
@@ -202,4 +223,4 @@ async function addMilestone( payload, octokit ) {
 	} );
 }
 
-module.exports = addMilestone;
+export default addMilestone;

@@ -2,8 +2,15 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "lib",
-		"types": [ "node" ]
+		"target": "es2020",
+		"module": "commonjs",
+		"lib": [ "es2020" ],
+		"outDir": "./build",
+		"rootDir": "src",
+		"types": [ "node" ],
+		"checkJs": false,
+		"emitDeclarationOnly": false
 	},
-	"include": [ "lib" ]
+	"include": [ "src" ],
+	"exclude": [ "**/*.test.*", "**/test/**" ]
 }
