@@ -22,6 +22,10 @@ const postTypeConfig = {
 	kind: 'postType',
 	name: 'post',
 	baseURL: '/wp/v2/posts',
+	getRevisionsUrl: ( parentId, revisionId ) =>
+		`/wp/v2/posts/${ parentId }/revisions${
+			revisionId ? '/' + revisionId : ''
+		}`,
 	transientEdits: { blocks: true, selection: true },
 	mergedEdits: { meta: true },
 	rawAttributes: [ 'title', 'excerpt', 'content' ],
@@ -273,6 +277,131 @@ describe( 'Post actions', () => {
 			// Check that no notice has been shown on autosave.
 			const notices = registry.select( noticesStore ).getNotices();
 			expect( notices ).toMatchObject( [] );
+		} );
+	} );
+
+	describe( 'restoreRevision()', () => {
+		const revisionId = 123;
+		const revision = {
+			id: revisionId,
+			date: '2026-01-02T03:04:05',
+			modified: '2026-01-02T03:04:05',
+			author: 1,
+			meta: {},
+			title: { raw: 'Restored title' },
+			content: { raw: 'Restored content' },
+			excerpt: { raw: 'Restored excerpt' },
+		};
+		const post = {
+			id: postId,
+			type: 'post',
+			title: 'Original title',
+			content: 'Original content',
+			excerpt: 'Original excerpt',
+			status: 'draft',
+		};
+
+		function setupRestoreRevisionTest( savePost ) {
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'GET' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/revisions/${ revisionId }`
+					)
+				) {
+					return revision;
+				}
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					return savePost( data );
+				}
+
+				if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {
+						json: () => Promise.resolve( {} ),
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+			registry
+				.dispatch( noticesStore )
+				.createWarningNotice( 'Autosave exists.', {
+					id: 'autosave-exists',
+				} );
+
+			return registry;
+		}
+
+		it( 'removes the autosave notice after a successful restore save', async () => {
+			const registry = setupRestoreRevisionTest( ( data ) => ( {
+				...post,
+				...data,
+			} ) );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			const notices = registry.select( noticesStore ).getNotices();
+			expect( notices ).not.toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( { id: 'autosave-exists' } ),
+				] )
+			);
+			expect( notices ).toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( {
+						id: 'editor-revision-restored',
+						status: 'success',
+					} ),
+				] )
+			);
+		} );
+
+		it( 'keeps the autosave notice when the restore save fails', async () => {
+			const registry = setupRestoreRevisionTest( () => {
+				throw {
+					code: 'rest_error',
+					message: 'Save failed.',
+				};
+			} );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			const notices = registry.select( noticesStore ).getNotices();
+			expect( notices ).toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( { id: 'autosave-exists' } ),
+				] )
+			);
+			expect( notices ).not.toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( {
+						id: 'editor-revision-restored',
+					} ),
+				] )
+			);
 		} );
 	} );
 
