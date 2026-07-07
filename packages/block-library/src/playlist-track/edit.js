@@ -46,6 +46,7 @@ const PlaylistTrackEdit = ( {
 	const { id, src, album, artist, image, length, title } = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const showArtists = context?.showArtists;
+	const showImages = context?.showImages ?? true;
 	const imageButton = useRef();
 	const blockProps = useBlockProps();
 	const { currentTrackClientId, setCurrentTrackClientId } =
@@ -242,6 +243,13 @@ const PlaylistTrackEdit = ( {
 						currentTrackClientId === clientId ? 'true' : 'false'
 					}
 				>
+					{ showImages && !! image && (
+						<img
+							className="wp-block-playlist-track__image"
+							src={ image }
+							alt=""
+						/>
+					) }
 					<span className="wp-block-playlist-track__content">
 						<RichText
 							tagName="span"
