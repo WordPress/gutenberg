@@ -118,22 +118,22 @@ function gutenberg_rest_theme_global_styles_link_rel_7_0( $response, $theme ) {
 add_filter( 'rest_prepare_theme', 'gutenberg_rest_theme_global_styles_link_rel_7_0', 10, 2 );
 
 /**
- * Overrides the default REST controller for autosaves to fix real-time
- * collaboration on draft posts.
+ * Overrides the default REST controller for revisions to support nested
+ * _fields parameters (e.g. content.raw without content.rendered).
  *
- * When RTC is enabled, draft autosaves from all users update the post directly
- * instead of creating per-user autosave revisions depending on post lock and
- * assigned author.
+ * The core WP_REST_Revisions_Controller uses in_array() checks for content,
+ * title, excerpt, and guid fields, which prevents sub-field filtering via
+ * the _fields parameter. The Gutenberg override uses rest_is_field_included()
+ * so that clients can avoid expensive server-side rendering when only raw
+ * data is needed.
  *
- * Only overrides when autosave_rest_controller_class is not explicitly set,
- * i.e. when WP_REST_Autosaves_Controller would be used by default. Post types
- * with their own specialized autosave controller (e.g. templates) are left alone.
+ * Only overrides when revisions_rest_controller_class is not explicitly set.
  */
-function gutenberg_override_autosaves_rest_controller( $args ) {
-	if ( empty( $args['autosave_rest_controller_class'] ) ) {
-		$args['autosave_rest_controller_class'] = 'Gutenberg_REST_Autosaves_Controller';
+function gutenberg_override_revisions_rest_controller( $args ) {
+	if ( empty( $args['revisions_rest_controller_class'] ) ) {
+		$args['revisions_rest_controller_class'] = 'Gutenberg_REST_Revisions_Controller';
 	}
 	return $args;
 }
 
-add_filter( 'register_post_type_args', 'gutenberg_override_autosaves_rest_controller', 10, 1 );
+add_filter( 'register_post_type_args', 'gutenberg_override_revisions_rest_controller', 10, 1 );

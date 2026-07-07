@@ -16,7 +16,6 @@ import {
 	FlexBlock,
 	FocalPointPicker,
 	MenuItem,
-	VisuallyHidden,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 	Dropdown,
@@ -25,6 +24,7 @@ import {
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
 } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { reset as resetIcon } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -162,7 +162,7 @@ function InspectorImagePreviewItem( {
 					>
 						{ label }
 					</Truncate>
-					<VisuallyHidden as="span">
+					<VisuallyHidden render={ <span /> }>
 						{ imgUrl
 							? sprintf(
 									/* translators: %s: file name */
@@ -579,7 +579,6 @@ function BackgroundSizeControls( {
 				onChange={ toggleScrollWithPage }
 			/>
 			<ToggleGroupControl
-				size="__unstable-large"
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
 				onChange={ updateBackgroundSize }
@@ -618,7 +617,6 @@ function BackgroundSizeControls( {
 					aria-label={ __( 'Background image width' ) }
 					onChange={ updateBackgroundSize }
 					value={ sizeValue }
-					size="__unstable-large"
 					__unstableInputWidth="100px"
 					min={ 0 }
 					placeholder={ __( 'Auto' ) }

@@ -18,6 +18,7 @@ import Modal from '../';
 import type { ModalProps } from '../types';
 
 const meta: Meta< typeof Modal > = {
+	tags: [ 'manifest' ],
 	component: Modal,
 	title: 'Components/Overlays/Modal',
 	id: 'components-modal',
@@ -45,7 +46,7 @@ const meta: Meta< typeof Modal > = {
 	parameters: {
 		controls: { expanded: true },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Will be superseded by `Dialog` in `@wordpress/ui`, but continue using for now.',
 		},

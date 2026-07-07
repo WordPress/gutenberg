@@ -11,6 +11,7 @@ import {
 	getLastInsertedBlocksClientIds,
 	isBlockSubtreeDisabled,
 	getEnabledClientIdsTree,
+	getListViewClientIdsTree,
 	getEnabledBlockParents,
 	getExpandedBlock,
 	isDragging,
@@ -24,6 +25,10 @@ import {
 	getViewportModalClientIds,
 	isSectionBlock,
 	getParentSectionBlock,
+	getSelectedBlockStyleState,
+	hasSelectedStyleState,
+	isSelectedBlockStyleStateShownOnCanvas,
+	shouldRenderBlockListView,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -69,6 +74,287 @@ describe( 'private selectors', () => {
 				'123456',
 				'78910',
 			] );
+		} );
+	} );
+
+	describe( 'shouldRenderBlockListView', () => {
+		const blockWithListViewSupport = 'core/test-list-view-support';
+		const blockWithoutListViewSupport = 'core/test-no-list-view-support';
+
+		const createState = (
+			blockName,
+			{ allowedBlocks, innerBlocks = [] } = {}
+		) => {
+			const blockListSettings = new Map();
+			if ( allowedBlocks !== undefined ) {
+				blockListSettings.set( 'client-1', { allowedBlocks } );
+			}
+
+			return {
+				blocks: {
+					byClientId: new Map( [
+						[ 'client-1', { name: blockName } ],
+					] ),
+					order: new Map( [ [ 'client-1', innerBlocks ] ] ),
+					parents: new Map(),
+				},
+				blockListSettings,
+			};
+		};
+
+		beforeAll( () => {
+			registerBlockType( blockWithListViewSupport, {
+				apiVersion: 3,
+				title: 'List View support',
+				category: 'text',
+				supports: {
+					listView: true,
+				},
+			} );
+			registerBlockType( blockWithoutListViewSupport, {
+				apiVersion: 3,
+				title: 'No List View support',
+				category: 'text',
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( blockWithListViewSupport );
+			unregisterBlockType( blockWithoutListViewSupport );
+		} );
+
+		it( 'returns true for blocks with list view support', () => {
+			const state = createState( blockWithListViewSupport );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns false when empty and insertion is disallowed via `allowedBlocks: []`', () => {
+			const state = createState( blockWithListViewSupport, {
+				allowedBlocks: [],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'returns false when empty and insertion is disallowed via `allowedBlocks: false`', () => {
+			const state = createState( blockWithListViewSupport, {
+				allowedBlocks: false,
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'returns true when empty but insertion is allowed', () => {
+			// e.g. a static, still-empty gallery: nothing yet, but the user can
+			// start inserting, so its List View stays available.
+			const state = createState( blockWithListViewSupport, {
+				allowedBlocks: [ 'core/image' ],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns true when empty with no allowedBlocks restriction', () => {
+			const state = createState( blockWithListViewSupport );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns true when insertion is disallowed but the block still has inner blocks', () => {
+			const state = createState( blockWithListViewSupport, {
+				allowedBlocks: [],
+				innerBlocks: [ 'child-1' ],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'does not grant list view support to unsupported block types', () => {
+			const state = createState( blockWithoutListViewSupport, {
+				allowedBlocks: [],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'preserves the navigation block special case', () => {
+			const state = createState( 'core/navigation' );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'keeps navigation in list view even when empty and insertion is disallowed', () => {
+			// The navigation special case takes precedence over the
+			// `allowedBlocks` exclusion: even with nothing to show and no
+			// insertion allowed, navigation still participates in List View.
+			const state = createState( 'core/navigation', {
+				allowedBlocks: [],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+	} );
+
+	describe( 'getSelectedBlockStyleState', () => {
+		it( 'returns default when the block has no selected state', () => {
+			const state = {};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
+		} );
+
+		it( 'returns the per-block pseudo with the global viewport', () => {
+			const state = {
+				styleStateViewport: '@mobile',
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { pseudo: ':hover' },
+				},
+			};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: '@mobile',
+				pseudo: ':hover',
+			} );
+		} );
+
+		it( 'returns default pseudo when the selected state has no value', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+				},
+			};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
+		} );
+
+		it( 'returns the global viewport even when another block holds the per-block state', () => {
+			const state = {
+				styleStateViewport: '@mobile',
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					value: { pseudo: ':hover' },
+				},
+			};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: '@mobile',
+				pseudo: 'default',
+			} );
+		} );
+	} );
+
+	describe( 'hasSelectedStyleState', () => {
+		it( 'returns false when the block has no selected state', () => {
+			const state = {};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( false );
+		} );
+
+		it( 'returns false when another block has the selected state', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when a global viewport state is selected', () => {
+			const state = {
+				styleStateViewport: '@mobile',
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { pseudo: 'default' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when a pseudo state is selected', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when global viewport and per-block pseudo states are selected', () => {
+			const state = {
+				styleStateViewport: '@mobile',
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isSelectedBlockStyleStateShownOnCanvas', () => {
+		it( 'returns true when the block has no canvas preview state', () => {
+			const state = {};
+
+			expect(
+				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
+			).toBe( true );
+		} );
+
+		it( 'returns the canvas preview state for the block', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					showStateOnCanvas: false,
+				},
+			};
+
+			expect(
+				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
+			).toBe( false );
+		} );
+
+		it( 'returns true when another block has canvas preview state', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					showStateOnCanvas: false,
+				},
+			};
+
+			expect(
+				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
+			).toBe( true );
 		} );
 	} );
 
@@ -131,13 +417,13 @@ describe( 'private selectors', () => {
 						'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
 					],
 				] ),
+				blockEditingModes: new Map(),
 			},
-			blockListSettings: {
-				'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337': {},
-				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {},
-			},
-			blockEditingModes: new Map( [] ),
-			derivedBlockEditingModes: new Map( [] ),
+			blockListSettings: new Map( [
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', {} ],
+				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ],
+			] ),
+			derivedBlockEditingModes: new Map(),
 		};
 
 		const hasContentRoleAttribute = jest.fn( () => false );
@@ -152,8 +438,11 @@ describe( 'private selectors', () => {
 		it( 'should return false when top level block is not disabled', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [] ),
-				derivedBlockEditingModes: new Map( [] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map(),
+				},
+				derivedBlockEditingModes: new Map(),
 			};
 			expect(
 				isBlockSubtreeDisabled(
@@ -166,9 +455,12 @@ describe( 'private selectors', () => {
 		it( 'should return true when top level block is disabled and there are no editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
@@ -187,7 +479,10 @@ describe( 'private selectors', () => {
 		it( 'should return true when top level block is disabled via inheritance and there are no editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
@@ -208,10 +503,13 @@ describe( 'private selectors', () => {
 		it( 'should return true when top level block is disabled and there are disabled editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+						[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
@@ -229,10 +527,13 @@ describe( 'private selectors', () => {
 		it( 'should return false when top level block is disabled and there are non-disabled editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+						[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
@@ -250,10 +551,13 @@ describe( 'private selectors', () => {
 		it( 'should return false when top level block is disabled via inheritance and there are non-disabled editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
@@ -331,10 +635,10 @@ describe( 'private selectors', () => {
 					],
 				] ),
 			},
-			blockListSettings: {
-				'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337': {},
-				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {},
-			},
+			blockListSettings: new Map( [
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', {} ],
+				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ],
+			] ),
 		};
 		getEnabledClientIdsTree.registry = {
 			select: jest.fn( () => ( {} ) ),
@@ -343,8 +647,11 @@ describe( 'private selectors', () => {
 		it( 'should return tree containing only clientId and innerBlocks', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [] ),
-				derivedBlockEditingModes: new Map( [] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map(),
+				},
+				derivedBlockEditingModes: new Map(),
 			};
 			expect( getEnabledClientIdsTree( state ) ).toEqual( [
 				{
@@ -381,8 +688,11 @@ describe( 'private selectors', () => {
 		it( 'should return a subtree when rootBlockClientId is given', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [] ),
-				derivedBlockEditingModes: new Map( [] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map(),
+				},
+				derivedBlockEditingModes: new Map(),
 			};
 			expect(
 				getEnabledClientIdsTree(
@@ -413,11 +723,20 @@ describe( 'private selectors', () => {
 		it( 'should filter out disabled blocks', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'contentOnly' ],
-					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'contentOnly' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[
+							'b26fc763-417d-4f01-b81c-2ec61e14a972',
+							'contentOnly',
+						],
+						[
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							'contentOnly',
+						],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
@@ -443,6 +762,427 @@ describe( 'private selectors', () => {
 				},
 			] );
 		} );
+
+		it( 'filters out disabled blocks when a content-only section is being edited', () => {
+			const state = {
+				...baseState,
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[
+							'b26fc763-417d-4f01-b81c-2ec61e14a972',
+							'contentOnly',
+						],
+						[
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							'contentOnly',
+						],
+					] ),
+				},
+				// The Group (ef45d5fd) is the section being edited.
+				editedContentOnlySection:
+					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+				derivedBlockEditingModes: new Map( [
+					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
+				] ),
+			};
+			expect( getEnabledClientIdsTree( state ) ).toEqual( [
+				{
+					clientId: 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+					innerBlocks: [
+						{
+							clientId: 'b26fc763-417d-4f01-b81c-2ec61e14a972',
+							innerBlocks: [],
+						},
+						{
+							clientId: '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							innerBlocks: [
+								{
+									clientId:
+										'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+									innerBlocks: [],
+								},
+								{
+									clientId:
+										'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+									innerBlocks: [],
+								},
+							],
+						},
+					],
+				},
+			] );
+		} );
+	} );
+
+	describe( 'getListViewClientIdsTree', () => {
+		const TEST_CONTENT_BLOCK = 'core/test-list-view-content-block';
+		const TEST_STRUCTURE_BLOCK = 'core/test-list-view-structure-block';
+
+		const createBaseState = () => ( {
+			settings: {},
+			blocks: {
+				byClientId: new Map( [
+					[
+						'header',
+						{
+							name: TEST_STRUCTURE_BLOCK,
+						},
+					],
+					[
+						'edited-pattern',
+						{
+							name: TEST_STRUCTURE_BLOCK,
+						},
+					],
+					[
+						'edited-content',
+						{
+							name: TEST_CONTENT_BLOCK,
+						},
+					],
+					[
+						'other-pattern',
+						{
+							name: TEST_STRUCTURE_BLOCK,
+						},
+					],
+					[
+						'other-content',
+						{
+							name: TEST_CONTENT_BLOCK,
+						},
+					],
+					[
+						'other-structure',
+						{
+							name: TEST_STRUCTURE_BLOCK,
+						},
+					],
+				] ),
+				attributes: new Map( [
+					[
+						'edited-pattern',
+						{
+							metadata: {
+								patternName: 'test/edited-pattern',
+							},
+						},
+					],
+					[
+						'other-pattern',
+						{
+							metadata: {
+								patternName: 'test/other-pattern',
+							},
+						},
+					],
+				] ),
+				order: new Map( [
+					[ '', [ 'header', 'edited-pattern', 'other-pattern' ] ],
+					[ 'header', [] ],
+					[ 'edited-pattern', [ 'edited-content' ] ],
+					[ 'edited-content', [] ],
+					[ 'other-pattern', [ 'other-content', 'other-structure' ] ],
+					[ 'other-content', [] ],
+					[ 'other-structure', [] ],
+				] ),
+				parents: new Map( [
+					[ 'header', '' ],
+					[ 'edited-pattern', '' ],
+					[ 'edited-content', 'edited-pattern' ],
+					[ 'other-pattern', '' ],
+					[ 'other-content', 'other-pattern' ],
+					[ 'other-structure', 'other-pattern' ],
+				] ),
+				blockEditingModes: new Map(),
+			},
+			blockListSettings: new Map(),
+			editedContentOnlySection: 'edited-pattern',
+			derivedBlockEditingModes: new Map( [
+				[ 'header', 'disabled' ],
+				[ 'other-pattern', 'disabled' ],
+				[ 'other-content', 'disabled' ],
+				[ 'other-structure', 'disabled' ],
+			] ),
+		} );
+
+		beforeAll( () => {
+			registerBlockType( TEST_CONTENT_BLOCK, {
+				apiVersion: 3,
+				title: 'Test content block',
+				category: 'text',
+				attributes: {
+					content: {
+						type: 'string',
+						role: 'content',
+					},
+				},
+				save: () => null,
+			} );
+			registerBlockType( TEST_STRUCTURE_BLOCK, {
+				apiVersion: 3,
+				title: 'Test structure block',
+				category: 'design',
+				save: () => null,
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( TEST_CONTENT_BLOCK );
+			unregisterBlockType( TEST_STRUCTURE_BLOCK );
+		} );
+
+		beforeEach( () => {
+			getListViewClientIdsTree.registry = {
+				select: jest.fn( () => ( {} ) ),
+			};
+		} );
+
+		it( 'includes disabled outside-section context while preserving the edited section', () => {
+			const state = createBaseState();
+
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{
+					clientId: 'header',
+					innerBlocks: [],
+				},
+				{
+					clientId: 'edited-pattern',
+					innerBlocks: [
+						{
+							clientId: 'edited-content',
+							innerBlocks: [],
+						},
+					],
+				},
+				{
+					clientId: 'other-pattern',
+					innerBlocks: [
+						{
+							clientId: 'other-content',
+							innerBlocks: [],
+						},
+					],
+				},
+			] );
+		} );
+
+		it( 'keeps descendants of explicitly disabled blocks hidden', () => {
+			const baseState = createBaseState();
+			const state = {
+				...baseState,
+				blocks: {
+					...baseState.blocks,
+					byClientId: new Map( [
+						...baseState.blocks.byClientId,
+						[
+							'header-content',
+							{
+								name: TEST_CONTENT_BLOCK,
+							},
+						],
+					] ),
+					order: new Map( [
+						...baseState.blocks.order,
+						[ 'header', [ 'header-content' ] ],
+						[ 'header-content', [] ],
+					] ),
+					parents: new Map( [
+						...baseState.blocks.parents,
+						[ 'header-content', 'header' ],
+					] ),
+					blockEditingModes: new Map( [ [ 'header', 'disabled' ] ] ),
+				},
+				derivedBlockEditingModes: new Map( [
+					...baseState.derivedBlockEditingModes,
+					[ 'header-content', 'disabled' ],
+				] ),
+			};
+
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{
+					clientId: 'edited-pattern',
+					innerBlocks: [
+						{
+							clientId: 'edited-content',
+							innerBlocks: [],
+						},
+					],
+				},
+				{
+					clientId: 'other-pattern',
+					innerBlocks: [
+						{
+							clientId: 'other-content',
+							innerBlocks: [],
+						},
+					],
+				},
+			] );
+		} );
+
+		it( 'includes blocks with explicit modes inside explicitly disabled parents', () => {
+			const baseState = createBaseState();
+			const state = {
+				...baseState,
+				blocks: {
+					...baseState.blocks,
+					byClientId: new Map( [
+						...baseState.blocks.byClientId,
+						[
+							'header-content',
+							{
+								name: TEST_CONTENT_BLOCK,
+							},
+						],
+					] ),
+					order: new Map( [
+						...baseState.blocks.order,
+						[ 'header', [ 'header-content' ] ],
+						[ 'header-content', [] ],
+					] ),
+					parents: new Map( [
+						...baseState.blocks.parents,
+						[ 'header-content', 'header' ],
+					] ),
+					blockEditingModes: new Map( [
+						[ 'header', 'disabled' ],
+						[ 'header-content', 'contentOnly' ],
+					] ),
+				},
+				derivedBlockEditingModes: new Map( [
+					...baseState.derivedBlockEditingModes,
+					[ 'header-content', 'disabled' ],
+				] ),
+			};
+
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{
+					clientId: 'header-content',
+					innerBlocks: [],
+				},
+				{
+					clientId: 'edited-pattern',
+					innerBlocks: [
+						{
+							clientId: 'edited-content',
+							innerBlocks: [],
+						},
+					],
+				},
+				{
+					clientId: 'other-pattern',
+					innerBlocks: [
+						{
+							clientId: 'other-content',
+							innerBlocks: [],
+						},
+					],
+				},
+			] );
+		} );
+
+		it( 'keeps structural blocks hidden inside other content-only sections', () => {
+			const state = createBaseState();
+
+			expect(
+				getListViewClientIdsTree( state )[ 2 ].innerBlocks
+			).toEqual( [
+				{
+					clientId: 'other-content',
+					innerBlocks: [],
+				},
+			] );
+		} );
+
+		it( 'uses section-block settings when deciding which disabled blocks were already hidden', () => {
+			const baseState = createBaseState();
+			const state = {
+				...baseState,
+				settings: {
+					disableContentOnlyForTemplateParts: true,
+				},
+				blocks: {
+					...baseState.blocks,
+					byClientId: new Map( [
+						[
+							'edited-pattern',
+							{
+								name: TEST_STRUCTURE_BLOCK,
+							},
+						],
+						[
+							'edited-content',
+							{
+								name: TEST_CONTENT_BLOCK,
+							},
+						],
+						[
+							'template-part',
+							{
+								name: 'core/template-part',
+							},
+						],
+						[
+							'template-part-structure',
+							{
+								name: TEST_STRUCTURE_BLOCK,
+							},
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'edited-pattern',
+							{
+								metadata: {
+									patternName: 'test/edited-pattern',
+								},
+							},
+						],
+					] ),
+					order: new Map( [
+						[ '', [ 'edited-pattern', 'template-part' ] ],
+						[ 'edited-pattern', [ 'edited-content' ] ],
+						[ 'edited-content', [] ],
+						[ 'template-part', [ 'template-part-structure' ] ],
+						[ 'template-part-structure', [] ],
+					] ),
+					parents: new Map( [
+						[ 'edited-pattern', '' ],
+						[ 'edited-content', 'edited-pattern' ],
+						[ 'template-part', '' ],
+						[ 'template-part-structure', 'template-part' ],
+					] ),
+				},
+				derivedBlockEditingModes: new Map( [
+					[ 'template-part', 'disabled' ],
+					[ 'template-part-structure', 'disabled' ],
+				] ),
+			};
+
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{
+					clientId: 'edited-pattern',
+					innerBlocks: [
+						{
+							clientId: 'edited-content',
+							innerBlocks: [],
+						},
+					],
+				},
+				{
+					clientId: 'template-part',
+					innerBlocks: [
+						{
+							clientId: 'template-part-structure',
+							innerBlocks: [],
+						},
+					],
+				},
+			] );
+		} );
 	} );
 
 	describe( 'getEnabledBlockParents', () => {
@@ -457,8 +1197,8 @@ describe( 'private selectors', () => {
 						[ '6cf70164-9097-4460-bcbf-200560546988', [] ],
 						[ '', [ '6cf70164-9097-4460-bcbf-200560546988' ] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockEditingModes: new Map(),
 				derivedBlockEditingModes: new Map(),
 			};
 			expect(
@@ -503,16 +1243,16 @@ describe( 'private selectors', () => {
 							[ '4c2b7140-fffd-44b4-b2a7-820c670a6514' ],
 						],
 					] ),
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'default' ],
+					] ),
 				},
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'default' ],
-				] ),
 				derivedBlockEditingModes: new Map( [
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
 				] ),
-				blockListSettings: {},
+				blockListSettings: new Map(),
 			};
 			expect(
 				getEnabledBlockParents(
@@ -556,15 +1296,15 @@ describe( 'private selectors', () => {
 							[ '4c2b7140-fffd-44b4-b2a7-820c670a6514' ],
 						],
 					] ),
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'default' ],
+					] ),
 				},
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'default' ],
-				] ),
 				derivedBlockEditingModes: new Map( [
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 				] ),
-				blockListSettings: {},
+				blockListSettings: new Map(),
 			};
 			expect(
 				getEnabledBlockParents(
@@ -766,9 +1506,9 @@ describe( 'private selectors', () => {
 				] ),
 			},
 			settings: {},
-			blockListSettings: {
-				'parent-block': templateLock ? { templateLock } : {},
-			},
+			blockListSettings: new Map( [
+				[ 'parent-block', templateLock ? { templateLock } : {} ],
+			] ),
 		} );
 
 		it( 'returns false when block has no lock and no templateLock', () => {
@@ -819,9 +1559,9 @@ describe( 'private selectors', () => {
 				] ),
 			},
 			settings: {},
-			blockListSettings: {
-				'parent-block': templateLock ? { templateLock } : {},
-			},
+			blockListSettings: new Map( [
+				[ 'parent-block', templateLock ? { templateLock } : {} ],
+			] ),
 		} );
 
 		it( 'returns false when block has no lock and no templateLock', () => {
@@ -877,9 +1617,9 @@ describe( 'private selectors', () => {
 				] ),
 			},
 			settings: {},
-			blockListSettings: {
-				'parent-block': templateLock ? { templateLock } : {},
-			},
+			blockListSettings: new Map( [
+				[ 'parent-block', templateLock ? { templateLock } : {} ],
+			] ),
 		} );
 
 		it( 'returns false when block is not locked in any way', () => {
@@ -1347,6 +2087,7 @@ describe( 'private selectors', () => {
 			blockName = 'core/group',
 			patternName,
 			disableContentOnlyForUnsyncedPatterns,
+			disableContentOnlyForTemplateParts,
 			templateLock,
 			rootTemplateLock,
 		} = {} ) => {
@@ -1362,16 +2103,23 @@ describe( 'private selectors', () => {
 					attributes: new Map( [ [ clientId, attributes ] ] ),
 					parents: new Map( [ [ clientId, rootClientId ] ] ),
 				},
-				blockListSettings: {
-					[ clientId ]: templateLock ? { templateLock } : {},
-					'': rootTemplateLock
-						? { templateLock: rootTemplateLock }
-						: {},
-				},
-				settings:
-					disableContentOnlyForUnsyncedPatterns !== undefined
+				blockListSettings: new Map( [
+					[ clientId, templateLock ? { templateLock } : {} ],
+					[
+						'',
+						rootTemplateLock
+							? { templateLock: rootTemplateLock }
+							: {},
+					],
+				] ),
+				settings: {
+					...( disableContentOnlyForUnsyncedPatterns !== undefined
 						? { disableContentOnlyForUnsyncedPatterns }
-						: {},
+						: {} ),
+					...( disableContentOnlyForTemplateParts !== undefined
+						? { disableContentOnlyForTemplateParts }
+						: {} ),
+				},
 				editedContentOnlySection: undefined,
 			};
 		};
@@ -1415,6 +2163,22 @@ describe( 'private selectors', () => {
 			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
+		it( 'should return false for template parts when disableContentOnlyForTemplateParts is true', () => {
+			const state = createState( {
+				blockName: 'core/template-part',
+				disableContentOnlyForTemplateParts: true,
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should return true for template parts when disableContentOnlyForTemplateParts is false', () => {
+			const state = createState( {
+				blockName: 'core/template-part',
+				disableContentOnlyForTemplateParts: false,
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
 		it( 'returns false when nested inside another section block', () => {
 			const state = {
 				blocks: {
@@ -1437,7 +2201,7 @@ describe( 'private selectors', () => {
 						[ 'inner-pattern', 'outer-pattern' ],
 					] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: undefined,
 			};
@@ -1476,7 +2240,7 @@ describe( 'private selectors', () => {
 						[ 'block-1', 'outer-pattern' ],
 					] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: 'outer-pattern',
 			};
@@ -1502,7 +2266,7 @@ describe( 'private selectors', () => {
 						[ 'pattern-b', '' ],
 					] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: 'pattern-a',
 			};
@@ -1521,7 +2285,7 @@ describe( 'private selectors', () => {
 					attributes: new Map( [ [ 'block-1', {} ] ] ),
 					parents: new Map( [ [ 'block-1', '' ] ] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: undefined,
 			};
@@ -1547,7 +2311,7 @@ describe( 'private selectors', () => {
 						[ 'inner-block', 'pattern-block' ],
 					] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: undefined,
 			};
@@ -1575,7 +2339,7 @@ describe( 'private selectors', () => {
 						[ 'inner-block', 'pattern-block' ],
 					] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: 'pattern-block',
 			};
@@ -1612,7 +2376,7 @@ describe( 'private selectors', () => {
 						[ 'deep-block', 'nested-pattern' ],
 					] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: 'outer-pattern',
 			};
@@ -1643,7 +2407,7 @@ describe( 'private selectors', () => {
 						[ 'pattern-b', '' ],
 					] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: 'pattern-b',
 			};

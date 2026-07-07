@@ -11,14 +11,14 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		await requestUtils.deleteAllMenus();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.deleteAllPages();
 		await requestUtils.deleteAllMenus();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test.describe( 'Overlay menu', () => {
@@ -599,6 +599,10 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 					.getByRole( 'button', { name: 'Save', exact: true } );
 
 				await saveButton.click();
+				await page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'updated' } )
+					.waitFor();
 
 				// Fetch the post from the database to see what was actually saved
 				const savedPost = await requestUtils.rest( {
@@ -627,6 +631,142 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 				// Should still have open-on-click class after migration
 				await expect( submenuItem ).toHaveClass( /open-on-click/ );
+			} );
+		} );
+
+		test.describe( 'Submenu touch device interactions', () => {
+			test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+				await admin.visitSiteEditor( {
+					postId: 'emptytheme//header',
+					postType: 'wp_template_part',
+					canvas: 'edit',
+				} );
+				await requestUtils.createNavigationMenu( {
+					title: 'Touch test menu',
+					content: `
+					<!-- wp:navigation-submenu {"label":"Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- /wp:navigation-submenu -->
+					`,
+				} );
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: { overlayMenu: 'off' },
+				} );
+				await editor.saveSiteEditorEntities( {
+					isOnlyCurrentEntityDirty: true,
+				} );
+			} );
+
+			test( 'submenu does not open via hover on touch devices', async ( {
+				page,
+				browser,
+			} ) => {
+				// Create a touch device context where (hover: none) matches.
+				const touchContext = await browser.newContext( {
+					hasTouch: true,
+				} );
+				const touchPage = await touchContext.newPage();
+
+				// Copy auth cookies from the original context.
+				const cookies = await page.context().cookies();
+				await touchContext.addCookies( cookies );
+
+				await touchPage.goto( new URL( '/', page.url() ).href );
+
+				const innerElement = touchPage.getByRole( 'link', {
+					name: 'Submenu Link',
+				} );
+
+				// Submenu should be hidden initially.
+				await expect( innerElement ).toBeHidden();
+
+				// Simulate a touch pointerenter event. On real touch devices,
+				// tapping an element fires pointerenter with pointerType "touch"
+				// before the click event, which would previously set hover=true
+				// and leave the submenu stuck open. Our guard should return early
+				// and leave the submenu hidden.
+				const submenuLi = touchPage.locator( 'li.has-child' ).first();
+				await submenuLi.dispatchEvent( 'pointerenter', {
+					pointerType: 'touch',
+				} );
+				await expect( innerElement ).toBeHidden();
+
+				await touchContext.close();
+			} );
+
+			test( 'chevron opens and closes submenu on touch devices', async ( {
+				page,
+				browser,
+			} ) => {
+				// Create a touch device context where (hover: none) matches.
+				const touchContext = await browser.newContext( {
+					hasTouch: true,
+				} );
+				const touchPage = await touchContext.newPage();
+
+				// Copy auth cookies from the original context.
+				const cookies = await page.context().cookies();
+				await touchContext.addCookies( cookies );
+
+				await touchPage.goto( new URL( '/', page.url() ).href );
+
+				const arrowButton = touchPage.getByRole( 'button', {
+					name: 'Submenu submenu',
+				} );
+				const innerElement = touchPage.getByRole( 'link', {
+					name: 'Submenu Link',
+				} );
+
+				// Submenu should be hidden initially.
+				await expect( innerElement ).toBeHidden();
+
+				// Click the chevron to open the submenu.
+				await arrowButton.click();
+				await expect( arrowButton ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+				await expect( innerElement ).toBeVisible();
+
+				// Click the chevron again to close the submenu.
+				await arrowButton.click();
+				await expect( arrowButton ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
+
+				// The submenu may still be visible due to CSS :focus-within
+				// while the button retains focus. Clicking elsewhere removes
+				// focus and the submenu should then be hidden.
+				await touchPage
+					.locator( 'body' )
+					.click( { position: { x: 0, y: 0 } } );
+				await expect( innerElement ).toBeHidden();
+
+				await touchContext.close();
+			} );
+
+			test( 'submenu still opens via hover on non-touch devices', async ( {
+				page,
+			} ) => {
+				await page.goto( '/' );
+
+				const innerElement = page.getByRole( 'link', {
+					name: 'Submenu Link',
+				} );
+
+				// Submenu should be hidden initially.
+				await expect( innerElement ).toBeHidden();
+
+				// On a non-touch device (default Playwright context),
+				// pointerenter with pointerType "mouse" should still open the
+				// submenu via hover — verifying we haven't broken desktop hover.
+				const submenuLi = page.locator( 'li.has-child' ).first();
+				await submenuLi.dispatchEvent( 'pointerenter', {
+					pointerType: 'mouse',
+				} );
+				await expect( innerElement ).toBeVisible();
 			} );
 		} );
 	} );

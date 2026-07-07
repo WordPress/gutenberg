@@ -11,6 +11,18 @@
 		"icon": {
 			"type": "string",
 			"role": "content"
+		},
+		"flipHorizontal": {
+			"type": "boolean",
+			"default": false
+		},
+		"flipVertical": {
+			"type": "boolean",
+			"default": false
+		},
+		"rotation": {
+			"type": "number",
+			"default": 0
 		}
 	},
 	"supports": {
@@ -59,19 +71,10 @@
 		}
 	},
 	"selectors": {
-		"root": ".wp-block-icon",
-		"color": {
-			"root": ".wp-block-icon svg"
-		},
-		"border": {
-			"root": ".wp-block-icon svg"
-		},
+		"root": ".wp-block-icon svg",
+		"css": ".wp-block-icon",
 		"spacing": {
-			"padding": ".wp-block-icon svg"
-		},
-		"dimensions": {
-			"root": ".wp-block-icon svg",
-			"width": ".wp-block-icon svg"
+			"margin": ".wp-block-icon"
 		}
 	},
 	"style": "wp-block-icon",

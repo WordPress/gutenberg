@@ -14,10 +14,10 @@ import {
  * WordPress dependencies
  */
 import {
+	createRef,
 	forwardRef,
 	useEffect,
 	useImperativeHandle,
-	useRef,
 } from '@wordpress/element';
 
 /**
@@ -91,15 +91,17 @@ describe( 'withNotices return type', () => {
 } );
 
 describe( 'withNotices operations', () => {
-	let handle: React.RefObject< any >;
-	const Handle = ( props: any ) => {
-		handle = useRef( null );
-		return <TestNoticeOperations { ...props } ref={ handle } />;
-	};
+	function setup( props: any = {} ) {
+		const handle = createRef< any >();
+		const utils = render(
+			<TestNoticeOperations { ...props } ref={ handle } />
+		);
+		return { ...utils, handle };
+	}
 
 	it( 'should create notices with createNotice', () => {
 		const message = 'Aló!';
-		const { container } = render( <Handle /> );
+		const { container, handle } = setup();
 		const { getByText } = within( container );
 		act( () => {
 			handle.current.createNotice( { content: message } );
@@ -109,7 +111,7 @@ describe( 'withNotices operations', () => {
 
 	it( 'should create notices of error status with createErrorNotice', () => {
 		const message = 'can’t touch this';
-		const { container } = render( <Handle /> );
+		const { container, handle } = setup();
 		const { getByText } = within( container );
 		act( () => {
 			handle.current.createErrorNotice( message );
@@ -120,7 +122,7 @@ describe( 'withNotices operations', () => {
 
 	it( 'should remove a notice with removeNotice', async () => {
 		const notice = { id: 'so real', content: 'so why can’t I touch it?' };
-		const { container } = render( <Handle /> );
+		const { container, handle } = setup();
 		const { getByText } = within( container );
 		act( () => {
 			handle.current.createNotice( notice );
@@ -137,7 +139,7 @@ describe( 'withNotices operations', () => {
 	it( 'should remove all notices with removeAllNotices', async () => {
 		const messages = [ 'Aló!', 'hu dis?', 'Otis' ];
 		const notices = noticesFrom( messages );
-		const { container } = render( <Handle notifications={ notices } /> );
+		const { container, handle } = setup( { notifications: notices } );
 		const { getByText } = within( container );
 		expect(
 			await waitForElementToBeRemoved( () => {

@@ -11,10 +11,14 @@ import {
 	DropdownMenu,
 	TextControl,
 	ToolbarButton,
-	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import {
+	flipHorizontal as flipHorizontalIcon,
+	flipVertical as flipVerticalIcon,
+	rotateRight,
+} from '@wordpress/icons';
 import {
 	BlockControls,
 	InspectorControls,
@@ -58,7 +62,8 @@ const IconPlaceholder = ( { className, style } ) => (
 );
 
 export function Edit( { attributes, setAttributes } ) {
-	const { icon, ariaLabel } = attributes;
+	const { icon, ariaLabel, flipHorizontal, flipVertical, rotation } =
+		attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 
@@ -78,9 +83,7 @@ export function Edit( { attributes, setAttributes } ) {
 					? getEntityRecord( 'root', 'icon', icon )
 					: null,
 				allIcons: isInserterOpen
-					? getEntityRecords( 'root', 'icon', {
-							per_page: -1,
-					  } )
+					? getEntityRecords( 'root', 'icon' )
 					: undefined,
 			};
 		},
@@ -89,9 +92,49 @@ export function Edit( { attributes, setAttributes } ) {
 
 	const iconToDisplay = selectedIcon?.content || '';
 
+	const flipClasses = {
+		'is-flip-horizontal': flipHorizontal,
+		'is-flip-vertical': flipVertical,
+	};
+
+	const rotationStyle = rotation ? { rotate: `${ rotation }deg` } : {};
+
 	const blockControls = (
 		<>
-			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
+			{ icon && (
+				<BlockControls group="block">
+					<ToolbarButton
+						icon={ flipHorizontalIcon }
+						label={ __( 'Flip horizontal' ) }
+						isPressed={ flipHorizontal }
+						onClick={ () =>
+							setAttributes( {
+								flipHorizontal: ! flipHorizontal,
+							} )
+						}
+					/>
+					<ToolbarButton
+						icon={ flipVerticalIcon }
+						label={ __( 'Flip vertical' ) }
+						isPressed={ flipVertical }
+						onClick={ () =>
+							setAttributes( {
+								flipVertical: ! flipVertical,
+							} )
+						}
+					/>
+					<ToolbarButton
+						icon={ rotateRight }
+						label={ __( 'Rotate' ) }
+						onClick={ () =>
+							setAttributes( {
+								rotation: ( ( rotation || 0 ) + 90 ) % 360,
+							} )
+						}
+					/>
+				</BlockControls>
+			) }
+			<BlockControls group="other">
 				<ToolbarButton
 					onClick={ () => {
 						setInserterOpen( true );
@@ -99,38 +142,38 @@ export function Edit( { attributes, setAttributes } ) {
 				>
 					{ icon ? __( 'Replace' ) : __( 'Choose icon' ) }
 				</ToolbarButton>
+				{ isContentOnlyMode && icon && (
+					// Add some extra controls for content attributes when content only mode is active.
+					// With content only mode active, the inspector is hidden, so users need another way
+					// to edit these attributes.
+					<DropdownMenu
+						icon=""
+						toggleProps={ {
+							as: ToolbarButton,
+						} }
+						popoverProps={ {
+							className: 'is-alternate',
+						} }
+						text={ __( 'Label' ) }
+					>
+						{ () => (
+							<TextControl
+								className="wp-block-icon__toolbar-content"
+								label={ __( 'Label' ) }
+								value={ ariaLabel || '' }
+								onChange={ ( value ) =>
+									setAttributes( {
+										ariaLabel: value,
+									} )
+								}
+								help={ __(
+									'Briefly describe the icon to help screen reader users. Leave blank for decorative icons.'
+								) }
+							/>
+						) }
+					</DropdownMenu>
+				) }
 			</BlockControls>
-			{ isContentOnlyMode && icon && (
-				// Add some extra controls for content attributes when content only mode is active.
-				// With content only mode active, the inspector is hidden, so users need another way
-				// to edit these attributes.
-				<BlockControls group="other">
-					<ToolbarGroup className="components-toolbar-group">
-						<DropdownMenu
-							icon=""
-							popoverProps={ {
-								className: 'is-alternate',
-							} }
-							text={ __( 'Label' ) }
-						>
-							{ () => (
-								<TextControl
-									className="wp-block-icon__toolbar-content"
-									label={ __( 'Label' ) }
-									value={ ariaLabel || '' }
-									onChange={ ( value ) =>
-										setAttributes( { ariaLabel: value } )
-									}
-									help={ __(
-										'Briefly describe the icon to help screen reader users. Leave blank for decorative icons.'
-									) }
-									__next40pxDefaultSize
-								/>
-							) }
-						</DropdownMenu>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
 		</>
 	);
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -163,7 +206,6 @@ export function Edit( { attributes, setAttributes } ) {
 							onChange={ ( value ) =>
 								setAttributes( { ariaLabel: value } )
 							}
-							__next40pxDefaultSize
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
@@ -184,13 +226,15 @@ export function Edit( { attributes, setAttributes } ) {
 								colorProps.className,
 								borderProps.className,
 								spacingProps.className,
-								dimensionsProps.className
+								dimensionsProps.className,
+								flipClasses
 							),
 							style: {
 								...colorProps.style,
 								...borderProps.style,
 								...spacingProps.style,
 								...dimensionsProps.style,
+								...rotationStyle,
 							},
 						} }
 					/>
@@ -199,12 +243,14 @@ export function Edit( { attributes, setAttributes } ) {
 						className={ clsx(
 							borderProps.className,
 							spacingProps.className,
-							dimensionsProps.className
+							dimensionsProps.className,
+							flipClasses
 						) }
 						style={ {
 							...borderProps.style,
 							...spacingProps.style,
 							...dimensionsProps.style,
+							...rotationStyle,
 							height: 'auto',
 						} }
 					/>

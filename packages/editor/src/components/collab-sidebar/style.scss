@@ -16,6 +16,7 @@
 }
 
 .editor-collab-sidebar-panel {
+	position: relative;
 	padding: $grid-unit-20 $grid-unit-20 $grid-unit-30;
 	height: 100%;
 	overflow: hidden;
@@ -46,6 +47,14 @@
 		right: $grid-unit-20;
 		position: absolute;
 		margin-top: $grid-unit-20;
+		// Inherits `--canvas-scroll` from the panel (set by `useFloatingBoard`)
+		// so each thread tracks the canvas scroll.
+		transform: translateY(var(--canvas-scroll, 0));
+		will-change: transform;
+		// Keep the reply input reachable when a thread is taller than the viewport
+		// (e.g. many replies on short content where the canvas can't scroll).
+		max-height: calc(100dvh - var(--wp-admin--admin-bar--height, 0px) - #{$header-height + $grid-unit-80});
+		overflow-y: auto;
 	}
 }
 
@@ -66,9 +75,29 @@
 	color: $gray-700;
 }
 
-.editor-collab-sidebar-panel__user-comment {
+.editor-collab-sidebar-panel__show-more-button {
+	width: fit-content;
+	color: var(--wpds-color-foreground-interactive-brand);
+	cursor: var(--wpds-cursor-control);
+
+	&:hover,
+	&:focus,
+	&:active {
+		color: var(--wpds-color-foreground-interactive-brand-active);
+	}
+}
+
+.editor-collab-sidebar-panel__note-content {
 	p:last-child {
 		margin-bottom: 0;
+	}
+
+	&.is-collapsed {
+		-webkit-line-clamp: 3;
+		line-clamp: 3;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
 	}
 }
 
@@ -81,7 +110,7 @@
 	background: $white;
 }
 
-.editor-collab-sidebar-panel__comment-status {
+.editor-collab-sidebar-panel__note-actions {
 	margin-left: auto;
 
 	button {
@@ -93,10 +122,6 @@
 			flex-shrink: 0;
 		}
 	}
-}
-
-.editor-collab-sidebar-panel__comment-dropdown-menu {
-	flex-shrink: 0;
 }
 
 .editor-collab-sidebar-panel__more-reply-separator {
@@ -115,11 +140,16 @@
 	font-weight: $font-weight-medium;
 }
 
+.editor-collab-sidebar-panel__deleted-block-notice {
+	font-weight: $font-weight-medium;
+	color: $gray-700;
+}
+
 .editor-collab-sidebar-panel__resolution-text {
 	font-style: italic;
 }
 
-.editor-collab-sidebar-panel__comment-form textarea {
+.editor-collab-sidebar-panel__note-form textarea {
 	@include input-control;
 	// Vertical padding is to match the standard 40px control height when rows=1,
 	// in conjunction with the 20px line-height.
@@ -130,7 +160,7 @@
 }
 
 // Visually hidden until focused (skip link pattern)
-.editor-collab-sidebar-panel__skip-to-comment,
+.editor-collab-sidebar-panel__skip-to-note,
 .editor-collab-sidebar-panel__skip-to-block {
 	position: absolute;
 	top: -9999px;
@@ -147,7 +177,7 @@
 		right: $grid-unit-10;
 	}
 }
-.editor-collab-sidebar-panel__skip-to-comment:focus {
+.editor-collab-sidebar-panel__skip-to-note:focus {
 	top: $grid-unit-10;
 }
 .editor-collab-sidebar-panel__skip-to-block:focus {
@@ -155,7 +185,7 @@
 	bottom: $grid-unit-10;
 }
 
-.comment-avatar {
+.editor-note-indicator__avatar {
 	width: $icon-size;
 	border-radius: $radius-round;
 	margin-left: -12px;
@@ -170,8 +200,12 @@
 	}
 }
 
+.editor-note-indicator__overflow {
+	font-weight: $font-weight-medium;
+}
+
 .show-icon-labels {
-	.comment-avatar-indicator {
+	.editor-note-indicator {
 		width: auto;
 		// Hide the user avatars container when labels are set to display...
 		div {
@@ -183,4 +217,13 @@
 			font-size: $helptext-font-size;
 		}
 	}
+}
+
+// Inline-note highlight applied to the `core/note` marker (`mark.wp-note`).
+// Each marker is tinted by `<NoteHighlightStyles>` using the note author's
+// color from `AVATAR_BORDER_COLORS`; this base rule only provides shared
+// layout/transition properties.
+mark.wp-note {
+	border-radius: 1px;
+	transition: background-color 0.1s ease-in-out;
 }

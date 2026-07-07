@@ -1,0 +1,152 @@
+{
+	"widgets/events/style.module.css": {
+		"selector-class-pattern": {
+			"count": 3
+		}
+	},
+	"widgets/quick-draft/style.module.css": {
+		"selector-class-pattern": {
+			"count": 6
+		}
+	},
+	"widgets/site-preview/style.module.css": {
+		"selector-class-pattern": {
+			"count": 8
+		}
+	},
+	"packages/grid/src/dashboard-grid/grid.module.css": {
+		"selector-class-pattern": {
+			"count": 6
+		}
+	},
+	"packages/grid/src/dashboard-lanes/lanes.module.css": {
+		"selector-class-pattern": {
+			"count": 6
+		}
+	},
+	"widgets/news/components/news-list/news-list.module.css": {
+		"selector-class-pattern": {
+			"count": 2
+		}
+	},
+	"widgets/events/components/events-list/events-list.module.css": {
+		"selector-class-pattern": {
+			"count": 5
+		}
+	},
+	"widgets/events/components/location-picker/location-picker.module.css": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"widgets/quick-draft/components/drafts-list/drafts-list.module.css": {
+		"selector-class-pattern": {
+			"count": 5
+		}
+	},
+	"widgets/quick-draft/components/saved-post/saved-post.module.css": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"widgets/welcome/components/banner/banner.module.css": {
+		"selector-class-pattern": {
+			"count": 2
+		}
+	},
+	"widgets/welcome/components/feature-highlight/feature-highlight.module.css": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/widget-dashboard/src/components/actions/actions.module.css": {
+		"selector-class-pattern": {
+			"count": 7
+		}
+	},
+	"packages/widget-dashboard/src/components/widget-chrome/widget-chrome.module.css": {
+		"selector-class-pattern": {
+			"count": 3
+		}
+	},
+	"packages/widget-dashboard/src/components/widget-frame/widget-frame.module.css": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/widget-dashboard/src/components/widget-header/widget-header.module.css": {
+		"selector-class-pattern": {
+			"count": 2
+		}
+	},
+	"packages/widget-dashboard/src/components/widget-toolbar/widget-toolbar.module.css": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/widget-dashboard/src/components/widgets/widget-resize-handle.module.css": {
+		"selector-class-pattern": {
+			"count": 21
+		}
+	},
+	"packages/widget-dashboard/src/components/widgets/widgets.module.css": {
+		"selector-class-pattern": {
+			"count": 4
+		}
+	},
+	"packages/widget-dashboard/src/components/layout-settings/layout-model-edit-field/style.module.css": {
+		"selector-class-pattern": {
+			"count": 3
+		}
+	},
+	"routes/template-list/add-new-template/style.scss": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/image/editor.scss": {
+		"selector-class-pattern": {
+			"count": 2
+		}
+	},
+	"packages/block-library/src/navigation/style.scss": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/editor.scss": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/global-styles-ui/src/font-library/style.scss": {
+		"selector-class-pattern": {
+			"count": 2
+		}
+	},
+	"packages/global-styles-ui/src/variations/style.scss": {
+		"selector-class-pattern": {
+			"count": 6
+		}
+	},
+	"packages/block-editor/src/components/link-control/style.scss": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/components/dataviews-filters/style.scss": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/add-new-template/style.scss": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen/style.scss": {
+		"selector-class-pattern": {
+			"count": 5
+		}
+	}
+}

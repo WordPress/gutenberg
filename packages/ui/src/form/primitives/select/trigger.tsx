@@ -2,6 +2,7 @@ import { Select as _Select } from '@base-ui/react/select';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { chevronDown } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 import focusStyles from '../../../utils/css/focus.module.css';
 import selectTriggerStyles from '../../../utils/css/select-trigger.module.css';
 import { InputLayout } from '../input-layout';
@@ -10,7 +11,14 @@ import type { SelectTriggerProps } from './types';
 
 export const Trigger = forwardRef< HTMLButtonElement, SelectTriggerProps >(
 	function Trigger(
-		{ className, size, variant, children, ...restProps },
+		{
+			className,
+			size,
+			variant,
+			children,
+			placeholder = __( 'Select' ),
+			...restProps
+		},
 		ref
 	) {
 		return (
@@ -36,13 +44,8 @@ export const Trigger = forwardRef< HTMLButtonElement, SelectTriggerProps >(
 					ref={ ref }
 				>
 					<_Select.Value
-						className={ ( state ) =>
-							clsx(
-								selectTriggerStyles[ 'trigger-value' ],
-								state.value === '' &&
-									selectTriggerStyles[ 'is-placeholder' ]
-							)
-						}
+						placeholder={ placeholder }
+						className={ selectTriggerStyles[ 'trigger-value' ] }
 					>
 						{ children }
 					</_Select.Value>

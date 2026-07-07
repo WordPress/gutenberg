@@ -30,6 +30,9 @@ import {
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
 import { unlock } from '../lock-unlock';
+import { setCanvasWidth } from './private-actions';
+import { getCanvasWidthByDeviceType } from '../utils/device-type';
+
 /**
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
@@ -189,10 +192,7 @@ export const savePost =
 		}
 
 		const content = select.getEditedPostContent();
-
-		if ( ! options.isAutosave ) {
-			dispatch.editPost( { content }, { undoIgnore: true } );
-		}
+		dispatch.editPost( { content }, { undoIgnore: true } );
 
 		const previousRecord = select.getCurrentPost();
 		let edits = {
@@ -760,9 +760,9 @@ export const setRenderingMode =
  * @return {Object} Action object.
  */
 export function setDeviceType( deviceType ) {
-	return {
-		type: 'SET_DEVICE_TYPE',
-		deviceType,
+	return ( { dispatch } ) => {
+		const width = getCanvasWidthByDeviceType( deviceType );
+		dispatch( setCanvasWidth( width ) );
 	};
 }
 

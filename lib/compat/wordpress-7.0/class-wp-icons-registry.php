@@ -7,7 +7,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 *
 		 * @var array[]
 		 */
-		private $registered_icons = array();
+		protected $registered_icons = array();
 
 
 		/**
@@ -15,14 +15,21 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 *
 		 * @var WP_Icons_Registry|null
 		 */
-		private static $instance = null;
+		protected static $instance = null;
 
 		/**
 		 * Constructor.
 		 *
-		 * WP_Icons_Registry is a singleton class, so keep this private.
+		 * WP_Icons_Registry is a singleton class, so keep this protected.
+		 *
+		 * For WP 7.0, the Icons Registry is closed for third-party icon
+		 * registry, serving only a subset of core icons.
+		 *
+		 * These icons are defined in @wordpress/packages as SVG files and as
+		 * entries in a single manifest file. On init, the registry is loaded
+		 * with those icons listed in the manifest.
 		 */
-		private function __construct() {
+		protected function __construct() {
 			$icons_directory = __DIR__ . '/../../../packages/icons/src/';
 			$icons_directory = trailingslashit( $icons_directory );
 			$manifest_path   = $icons_directory . 'manifest.php';
@@ -52,7 +59,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 				) {
 					_doing_it_wrong(
 						__METHOD__,
-						__( 'Core icon collection manifest must provide valid a "filePath" for each icon.', 'gutenberg' ),
+						__( 'Core icon collection manifest must provide a valid "filePath" for each icon.', 'gutenberg' ),
 						'7.0.0'
 					);
 					return;
@@ -61,8 +68,8 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 				$this->register(
 					'core/' . $icon_name,
 					array(
-						'label'    => $icon_data['label'],
-						'filePath' => $icons_directory . $icon_data['filePath'],
+						'label'     => $icon_data['label'],
+						'file_path' => $icons_directory . $icon_data['filePath'],
 					)
 				);
 			}
@@ -77,13 +84,13 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 *
 		 *     @type string $label    Required. A human-readable label for the icon.
 		 *     @type string $content  Optional. SVG markup for the icon.
-		 *                            If not provided, the content will be retrieved from the `filePath` if set.
-		 *                            If both `content` and `filePath` are not set, the icon will not be registered.
-		 *     @type string $filePath Optional. The full path to the file containing the icon content.
+		 *                            If not provided, the content will be retrieved from the `file_path` if set.
+		 *                            If both `content` and `file_path` are not set, the icon will not be registered.
+		 *     @type string $file_path Optional. The full path to the file containing the icon content.
 		 * }
 		 * @return bool True if the icon was registered with success and false otherwise.
 		 */
-		private function register( $icon_name, $icon_properties ) {
+		protected function register( $icon_name, $icon_properties ) {
 			if ( ! isset( $icon_name ) || ! is_string( $icon_name ) ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -93,7 +100,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 				return false;
 			}
 
-			$allowed_keys = array_fill_keys( array( 'label', 'content', 'filePath' ), 1 );
+			$allowed_keys = array_fill_keys( array( 'label', 'content', 'file_path' ), 1 );
 			foreach ( array_keys( $icon_properties ) as $key ) {
 				if ( ! array_key_exists( $key, $allowed_keys ) ) {
 					_doing_it_wrong(
@@ -119,12 +126,12 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 			}
 
 			if (
-				( ! isset( $icon_properties['content'] ) && ! isset( $icon_properties['filePath'] ) ) ||
-				( isset( $icon_properties['content'] ) && isset( $icon_properties['filePath'] ) )
+				( ! isset( $icon_properties['content'] ) && ! isset( $icon_properties['file_path'] ) ) ||
+				( isset( $icon_properties['content'] ) && isset( $icon_properties['file_path'] ) )
 			) {
 				_doing_it_wrong(
 					__METHOD__,
-					__( 'Icons must provide either `content` or `filePath`.', 'gutenberg' ),
+					__( 'Icons must provide either `content` or `file_path`.', 'gutenberg' ),
 					'7.0.0'
 				);
 				return false;
@@ -170,7 +177,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 * @param string $icon_content The icon SVG content to sanitize.
 		 * @return string The sanitized icon SVG content.
 		 */
-		private function sanitize_icon_content( $icon_content ) {
+		protected function sanitize_icon_content( $icon_content ) {
 			$allowed_tags = array(
 				'svg'     => array(
 					'class'       => true,
@@ -205,12 +212,26 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 * @param string $icon_name Icon name including namespace.
 		 * @return string|null The content of the icon, if found.
 		 */
-		private function get_content( $icon_name ) {
+		protected function get_content( $icon_name ) {
 			if ( ! isset( $this->registered_icons[ $icon_name ]['content'] ) ) {
-				$content = file_get_contents(
-					$this->registered_icons[ $icon_name ]['filePath']
-				);
-				$content = $this->sanitize_icon_content( $content );
+				$file_path  = $this->registered_icons[ $icon_name ]['file_path'] ?? '';
+				$is_stringy = is_string( $file_path ) || ( is_object( $file_path ) && method_exists( $file_path, '__toString' ) );
+				$icon_path  = $is_stringy ? realpath( (string) $file_path ) : false;
+
+				if (
+					! is_string( $icon_path ) ||
+					! str_ends_with( $icon_path, '.svg' ) ||
+					! is_file( $icon_path ) ||
+					! is_readable( $icon_path )
+				) {
+					wp_trigger_error(
+						__METHOD__,
+						__( 'Icon file is missing or unreadable.', 'gutenberg' )
+					);
+					return null;
+				}
+
+				$content = $this->sanitize_icon_content( file_get_contents( $icon_path ) );
 
 				if ( empty( $content ) ) {
 					wp_trigger_error(

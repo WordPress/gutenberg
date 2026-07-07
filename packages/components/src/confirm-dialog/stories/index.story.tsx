@@ -24,7 +24,7 @@ const meta: Meta< typeof ConfirmDialog > = {
 			control: false,
 		},
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	args: {
 		onCancel: fn(),
 		onConfirm: fn(),
@@ -34,8 +34,9 @@ const meta: Meta< typeof ConfirmDialog > = {
 			expanded: true,
 		},
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
+			notes: 'Will be superseded by `AlertDialog` in `@wordpress/ui`, but continue using for now.',
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 	},

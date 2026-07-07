@@ -58,7 +58,8 @@ export default function RelativeDateControl< Item >( {
 			operator === OPERATOR_IN_THE_PAST ? 'inThePast' : 'over'
 		];
 
-	const { id, label, getValue, setValue } = field;
+	const { id, label, description, getValue, setValue } = field;
+	const disabled = field.isDisabled( { item: data, field } );
 	const fieldValue = getValue( { item: data } );
 	const { value: relValue = '', unit = options[ 0 ].value } =
 		fieldValue && typeof fieldValue === 'object' ? fieldValue : {};
@@ -91,25 +92,26 @@ export default function RelativeDateControl< Item >( {
 			className={ clsx( className, 'dataviews-controls__relative-date' ) }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
+			help={ description }
 		>
 			<Stack direction="row" gap="sm">
 				<NumberControl
-					__next40pxDefaultSize
 					className="dataviews-controls__relative-date-number"
 					spinControls="none"
 					min={ 1 }
 					step={ 1 }
 					value={ relValue }
 					onChange={ onChangeValue }
+					disabled={ disabled }
 				/>
 				<SelectControl
 					className="dataviews-controls__relative-date-unit"
-					__next40pxDefaultSize
 					label={ __( 'Unit' ) }
 					value={ unit }
 					options={ options }
 					onChange={ onChangeUnit }
 					hideLabelFromVision
+					disabled={ disabled }
 				/>
 			</Stack>
 		</BaseControl>

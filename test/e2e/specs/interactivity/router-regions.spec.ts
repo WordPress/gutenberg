@@ -500,7 +500,7 @@ test.describe( 'Router regions', () => {
 		await expect( region1 ).toHaveAttribute( 'data-tag', 'region-1' );
 	} );
 
-	test( 'should be preserved on first navigation with `data-wp-key` and other directives ', async ( {
+	test( 'should be preserved on first navigation with `data-wp-key` and other directives', async ( {
 		page,
 	} ) => {
 		const region2 = page.getByTestId( 'region-2' );
@@ -708,6 +708,36 @@ test.describe( 'Router regions', () => {
 			await clientCounter.click( { clickCount: 3, delay: 50 } );
 			await expect( clientCounter ).toHaveText( '13' );
 		}
+	} );
+
+	// Regression test for https://github.com/WordPress/gutenberg/issues/76447.
+	test( 'should not reload the page when clicking a hash anchor link', async ( {
+		page,
+	} ) => {
+		const counter = page.getByTestId( 'state-counter' );
+
+		// Accumulate some in-memory state so a reload would be detectable.
+		await counter.click( { clickCount: 3, delay: 50 } );
+		await expect( counter ).toHaveText( '3' );
+
+		// Set up a listener for the `load` event before clicking. A full-page
+		// reload fires `load`; a same-document hash navigation does not.
+		const loadPromise = page
+			.waitForEvent( 'load', { timeout: 1000 } )
+			.then( () => 'reloaded' )
+			.catch( () => 'no-reload' );
+
+		// Click a plain hash anchor — this fires `popstate` with `state: null`.
+		await page.getByTestId( 'hash-link' ).click();
+
+		// The URL should now include the fragment.
+		await expect( page ).toHaveURL( /#hash-link-target$/ );
+
+		// A full-page reload should not have been triggered.
+		expect( await loadPromise ).toBe( 'no-reload' );
+
+		// In-memory state must be preserved.
+		await expect( counter ).toHaveText( '3' );
 	} );
 
 	// Regression test for https://github.com/WordPress/gutenberg/issues/70500.

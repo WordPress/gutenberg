@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
-import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
@@ -10,22 +9,25 @@ import styled from '@emotion/styled';
 import { CONFIG, COLORS } from '../../utils';
 import type { ToggleGroupControlProps } from '../types';
 
+export const block = css`
+	display: flex;
+	width: 100%;
+`;
+
 export const toggleGroupControl = ( {
 	isBlock,
 	isDeselectable,
-	size,
-}: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > & {
-	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
-} ) => css`
+}: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > ) => css`
 	background: ${ COLORS.ui.background };
 	border: 1px solid transparent;
 	border-radius: ${ CONFIG.radiusSmall };
 	display: inline-flex;
+	height: 40px;
 	min-width: 0;
 	position: relative;
 
-	${ toggleGroupControlSize( size ) }
 	${ ! isDeselectable && enclosingBorders( isBlock ) }
+	${ isBlock && block }
 
 	@media not ( prefers-reduced-motion ) {
 		&[data-indicator-animated]::before {
@@ -80,28 +82,3 @@ const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
 		}
 	`;
 };
-
-export const toggleGroupControlSize = (
-	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
-) => {
-	const styles = {
-		default: css`
-			height: 36px;
-		`,
-		'__unstable-large': css`
-			height: 40px;
-		`,
-	};
-
-	return styles[ size ];
-};
-
-export const block = css`
-	display: flex;
-	width: 100%;
-`;
-
-export const VisualLabelWrapper = styled.div`
-	// Makes the inline label be the correct height, equivalent to setting line-height: 0
-	display: flex;
-`;

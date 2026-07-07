@@ -23,17 +23,30 @@ export type NormalizedRegularLayout = {
 
 export type EditVisibility = 'always' | 'on-hover';
 
+type PanelOpenAsDropdown = {
+	type: 'dropdown';
+};
+export type PanelOpenAsModal = {
+	type: 'modal';
+	applyLabel: string;
+	cancelLabel: string;
+};
+
 export type PanelLayout = {
 	type: 'panel';
 	labelPosition?: LabelPosition;
-	openAs?: 'dropdown' | 'modal';
+	openAs?:
+		| 'dropdown'
+		| 'modal'
+		| { type: 'dropdown' }
+		| { type: 'modal'; applyLabel?: string; cancelLabel?: string };
 	summary?: PanelSummaryField;
 	editVisibility?: EditVisibility;
 };
 export type NormalizedPanelLayout = {
 	type: 'panel';
 	labelPosition: LabelPosition;
-	openAs: 'dropdown' | 'modal';
+	openAs: PanelOpenAsDropdown | PanelOpenAsModal;
 	summary: NormalizedPanelSummaryField;
 	editVisibility: EditVisibility;
 };

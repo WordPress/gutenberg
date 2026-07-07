@@ -1,11 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	TextareaControl,
-	Notice,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { TextareaControl, Notice } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -29,6 +26,41 @@ export function validateCSS( css ) {
 	return true;
 }
 
+/**
+ * Returns the error message string if the CSS contains HTML markup, or null if it is clean.
+ *
+ * @param {string} css The CSS string to check.
+ * @return {string|null} An error message, or null if the CSS is valid.
+ */
+function getMarkupValidationError( css ) {
+	return validateCSS( css )
+		? null
+		: __( 'The custom CSS is invalid. Do not use <> markup.' );
+}
+
+/**
+ * Full CSS validation: markup check first (fast), then a CSS parser (slower).
+ *
+ * @param {string} css The CSS string to validate.
+ * @return {string|null} An error message, or null if the CSS is valid.
+ */
+function getCSSValidationError( css ) {
+	if ( ! css ) {
+		return null;
+	}
+	const markupError = getMarkupValidationError( css );
+	if ( markupError ) {
+		return markupError;
+	}
+	const [ transformed ] = transformStyles(
+		[ { css } ],
+		'.for-validation-only'
+	);
+	return transformed === null
+		? __( 'There is an error with your CSS structure.' )
+		: null;
+}
+
 export default function AdvancedPanel( {
 	value,
 	onChange,
@@ -36,51 +68,28 @@ export default function AdvancedPanel( {
 	help,
 } ) {
 	// Custom CSS
-	const [ cssError, setCSSError ] = useState( null );
 	const customCSS = inheritedValue?.css;
+	const [ cssError, setCSSError ] = useState( () =>
+		getCSSValidationError( customCSS )
+	);
 	function handleOnChange( newValue ) {
 		onChange( {
 			...value,
 			css: newValue,
 		} );
 
-		// Validate immediately on change for quick feedback.
-		if ( ! validateCSS( newValue ) ) {
-			setCSSError(
-				__( 'The custom CSS is invalid. Do not use <> markup.' )
-			);
-			return;
-		}
-
-		// Clear HTML markup error if CSS is now valid.
-		if ( cssError ) {
-			setCSSError( null );
-		}
+		setCSSError( getMarkupValidationError( newValue ) );
 	}
 	function handleOnBlur( event ) {
-		const cssValue = event?.target?.value;
-
-		if ( ! cssValue || ! validateCSS( cssValue ) ) {
-			return;
-		}
-
-		// Check if the value is valid CSS structure on blur (more expensive check).
-		// Pass a wrapping selector to ensure that `transformStyles` validates the CSS.
-		// Note that the wrapping selector here is not used in the actual output of any styles.
-		const [ transformed ] = transformStyles(
-			[ { css: cssValue } ],
-			'.for-validation-only'
-		);
-
-		setCSSError(
-			transformed === null
-				? __( 'There is an error with your CSS structure.' )
-				: null
-		);
+		setCSSError( getCSSValidationError( event?.target?.value ) );
 	}
 
 	return (
-		<VStack spacing={ 3 }>
+		<Stack
+			direction="column"
+			gap="md"
+			className="block-editor-global-styles-advanced-panel"
+		>
 			{ cssError && (
 				<Notice status="error" onRemove={ () => setCSSError( null ) }>
 					{ cssError }
@@ -95,6 +104,6 @@ export default function AdvancedPanel( {
 				spellCheck={ false }
 				help={ help }
 			/>
-		</VStack>
+		</Stack>
 	);
 }

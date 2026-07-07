@@ -1,0 +1,4 @@
+.wrapper {
+	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Preserve Theme's currentColor fallback when no foreground variable is generated. */
+	color: var(--wp-components-color-foreground, currentColor);
+}

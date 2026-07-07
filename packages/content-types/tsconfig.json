@@ -1,0 +1,25 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"types": [ "style-imports", "react-css-custom-properties" ]
+	},
+	"references": [
+		{ "path": "../admin-ui" },
+		{ "path": "../components" },
+		{ "path": "../compose" },
+		{ "path": "../core-data" },
+		{ "path": "../data" },
+		{ "path": "../dataviews" },
+		{ "path": "../element" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../is-shallow-equal" },
+		{ "path": "../notices" },
+		{ "path": "../private-apis" },
+		{ "path": "../route" },
+		{ "path": "../ui" },
+		{ "path": "../url" },
+		{ "path": "../views" }
+	]
+}

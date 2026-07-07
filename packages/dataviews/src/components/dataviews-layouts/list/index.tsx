@@ -11,7 +11,6 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 	Spinner,
-	VisuallyHidden,
 	Composite,
 } from '@wordpress/components';
 import {
@@ -25,7 +24,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
-import { Stack } from '@wordpress/ui';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -217,6 +216,10 @@ function ListItem< Item >( {
 			<titleField.render item={ item } field={ titleField } />
 		) : null;
 
+	const renderDescription = showDescription && descriptionField?.render;
+	// When we have only the media and title fields, we want to center them vertically in the list item.
+	const hasOnlyMediaAndTitle =
+		!! renderedMediaField && ! renderDescription && ! otherFields.length;
 	const usedActions = eligibleActions?.length > 0 && (
 		<Stack
 			direction="row"
@@ -315,7 +318,7 @@ function ListItem< Item >( {
 					direction="row"
 					gap="md"
 					justify="start"
-					align="flex-start"
+					align={ hasOnlyMediaAndTitle ? 'center' : 'flex-start' }
 					style={ { flex: 1, minWidth: 0 } }
 				>
 					{ renderedMediaField }
@@ -333,7 +336,7 @@ function ListItem< Item >( {
 							</div>
 							{ usedActions }
 						</Stack>
-						{ showDescription && descriptionField?.render && (
+						{ renderDescription && (
 							<div className="dataviews-view-list__field">
 								<descriptionField.render
 									item={ item }
@@ -351,8 +354,8 @@ function ListItem< Item >( {
 									className="dataviews-view-list__field"
 								>
 									<VisuallyHidden
-										as="span"
 										className="dataviews-view-list__field-label"
+										render={ <span /> }
 									>
 										{ field.label }
 									</VisuallyHidden>
@@ -391,6 +394,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list' );
 	const isDelayedLoading = useDelayedLoading( !! isLoading );
+	const { paginationInfo } = useContext( DataViewsContext );
 
 	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( getItemId( item ) )
@@ -532,6 +536,11 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const dataByGroup =
 		hasData && groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	// Whether the server has more rows beyond the current window.
+	const hasMoreItems =
+		isInfiniteScroll &&
+		( view.startPosition ?? 1 ) + ( view.perPage ?? 0 ) <
+			paginationInfo.totalItems;
 	if ( ! hasData ) {
 		return (
 			<div
@@ -660,8 +669,14 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					);
 				} ) }
 			</Composite>
-			{ isInfiniteScroll && isLoading && (
-				<p className="dataviews-loading-more">
+			{ ( hasMoreItems || ( isInfiniteScroll && isLoading ) ) && (
+				// Keep the spinner's height reserved while loading more so the
+				// scroll position doesn't bounce. Hidden, and silent to a11y,
+				// while idle.
+				<p
+					className="dataviews-loading-more"
+					aria-hidden={ ! isLoading }
+				>
 					<Spinner />
 				</p>
 			) }

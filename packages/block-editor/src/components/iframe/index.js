@@ -2,18 +2,14 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import { version as reactVersion } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { useState, createPortal, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	useMergeRefs,
-	useRefEffect,
-	useDisabled,
-	useViewportMatch,
-} from '@wordpress/compose';
+import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
@@ -24,8 +20,6 @@ import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
 import { store as blockEditorStore } from '../../store';
-
-const ViewportWidthProvider = useViewportMatch.__experimentalWidthProvider;
 
 function bubbleEvent( event, Constructor, frame ) {
 	const init = {};
@@ -109,6 +103,12 @@ function getIframeSrc( resolvedAssets ) {
 		return src;
 	}
 
+	let body = '';
+	if ( reactVersion.split( '.' )[ 0 ] === '18' ) {
+		body =
+			'<body><script>document.currentScript.parentElement.remove()</script></body>';
+	}
+
 	// Correct doctype is required to enable rendering in standards mode.
 	// Also preload the styles to avoid a flash of unstyled content.
 	const html = `<!doctype html>
@@ -116,7 +116,6 @@ function getIframeSrc( resolvedAssets ) {
 	<head>
 		<meta charset="utf-8">
 		<base href="${ window.location.href }">
-		<script>window.frameElement._load()</script>
 		<style>
 			html{
 				height: auto !important;
@@ -133,9 +132,7 @@ function getIframeSrc( resolvedAssets ) {
 		${ resolvedAssets.styles ?? '' }
 		${ resolvedAssets.scripts ?? '' }
 	</head>
-	<body>
-		<script>document.currentScript.parentElement.remove()</script>
-	</body>
+	${ body }
 </html>`;
 
 	src = URL.createObjectURL( new Blob( [ html ], { type: 'text/html' } ) );
@@ -168,9 +165,6 @@ function Iframe( {
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 
 	const setRef = useRefEffect( ( node ) => {
-		node._load = () => {
-			setIframeDocument( node.contentDocument );
-		};
 		let iFrameDocument;
 		// Prevent the default browser action for files dropped outside of dropzones.
 		function preventFileDropDefault( event ) {
@@ -218,6 +212,7 @@ function Iframe( {
 			const { contentDocument } = node;
 			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
+			setIframeDocument( contentDocument );
 
 			documentElement.classList.add( 'block-editor-iframe__html' );
 
@@ -257,7 +252,7 @@ function Iframe( {
 		node.addEventListener( 'load', onLoad );
 
 		return () => {
-			delete node._load;
+			setIframeDocument( undefined );
 			node.removeEventListener( 'load', onLoad );
 			iFrameDocument?.removeEventListener(
 				'dragover',
@@ -274,7 +269,6 @@ function Iframe( {
 	const {
 		contentResizeListener,
 		containerResizeListener,
-		containerWidth,
 		isZoomedOut,
 		scaleContainerWidth,
 	} = useScaleCanvas( {
@@ -284,12 +278,28 @@ function Iframe( {
 	} );
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
-	const bodyRef = useMergeRefs( [
+
+	const unguardedBodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
 		contentRef,
 		writingFlowRef,
 		disabledRef,
 	] );
+
+	// Attach the body ref only when the iframe document and window are available.
+	// When an iframe element is moved in the DOM, like when reordering a list,
+	// its `window` object is destroyed and recreated, and the `defaultView` field is
+	// briefly `null`. We need to guard for such calls of the ref callbacks.
+	const bodyRef = useRefEffect(
+		( node ) => {
+			if ( node.ownerDocument.defaultView ) {
+				unguardedBodyRef( node );
+				return () => unguardedBodyRef( null );
+			}
+			return () => {};
+		},
+		[ unguardedBodyRef ]
+	);
 
 	const src = getIframeSrc( resolvedAssets );
 
@@ -355,9 +365,7 @@ function Iframe( {
 						>
 							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>
-								<ViewportWidthProvider value={ containerWidth }>
-									{ children }
-								</ViewportWidthProvider>
+								{ children }
 							</StyleProvider>
 						</body>,
 						iframeDocument.documentElement

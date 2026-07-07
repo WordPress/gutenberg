@@ -4,7 +4,9 @@
 import {
 	detectClientSideMediaSupport,
 	isClientSideMediaSupported,
+	isHeicCanvasSupported,
 	clearFeatureDetectionCache,
+	exceedsClientProcessingMemory,
 } from '../feature-detection';
 
 describe( 'feature-detection', () => {
@@ -45,19 +47,6 @@ describe( 'feature-detection', () => {
 		);
 		global.URL.revokeObjectURL = jest.fn();
 
-		// Mock credentialless iframe support so the check passes by default.
-		if ( ! ( 'credentialless' in window.HTMLIFrameElement.prototype ) ) {
-			Object.defineProperty(
-				window.HTMLIFrameElement.prototype,
-				'credentialless',
-				{
-					value: false,
-					writable: true,
-					configurable: true,
-				}
-			);
-		}
-
 		// Remove navigator.deviceMemory and navigator.connection by default
 		// so they don't interfere with unrelated tests.
 		if ( 'deviceMemory' in navigator ) {
@@ -81,11 +70,6 @@ describe( 'feature-detection', () => {
 		global.Worker = originalWorker;
 		global.URL.createObjectURL = originalCreateObjectURL;
 		global.URL.revokeObjectURL = originalRevokeObjectURL;
-
-		// Restore credentialless property.
-		if ( 'credentialless' in window.HTMLIFrameElement.prototype ) {
-			delete ( window.HTMLIFrameElement.prototype as any ).credentialless;
-		}
 
 		// Restore navigator.deviceMemory.
 		if ( originalDeviceMemoryDescriptor ) {
@@ -166,23 +150,6 @@ describe( 'feature-detection', () => {
 			);
 		} );
 
-		it( 'returns not supported when credentialless iframes are not supported', () => {
-			// Remove credentialless from the prototype.
-			delete ( window.HTMLIFrameElement.prototype as any ).credentialless;
-
-			const result = detectClientSideMediaSupport();
-
-			expect( result.supported ).toBe( false );
-			expect( result.reason ).toContain( 'credentialless iframes' );
-		} );
-
-		it( 'returns supported when credentialless iframes are supported', () => {
-			// credentialless is already mocked in beforeEach.
-			const result = detectClientSideMediaSupport();
-
-			expect( result.supported ).toBe( true );
-		} );
-
 		it( 'returns not supported when device memory is 2 GB or less', () => {
 			Object.defineProperty( navigator, 'deviceMemory', {
 				value: 2,
@@ -206,9 +173,9 @@ describe( 'feature-detection', () => {
 			expect( result.supported ).toBe( true );
 		} );
 
-		it( 'returns not supported when hardware concurrency is less than 4', () => {
+		it( 'returns not supported when hardware concurrency is less than 2', () => {
 			Object.defineProperty( navigator, 'hardwareConcurrency', {
-				value: 2,
+				value: 1,
 				configurable: true,
 			} );
 
@@ -218,9 +185,9 @@ describe( 'feature-detection', () => {
 			expect( result.reason ).toContain( 'insufficient CPU cores' );
 		} );
 
-		it( 'returns supported when hardware concurrency is 4 or more', () => {
+		it( 'returns supported when hardware concurrency is 2 or more', () => {
 			Object.defineProperty( navigator, 'hardwareConcurrency', {
-				value: 4,
+				value: 2,
 				configurable: true,
 			} );
 
@@ -253,7 +220,7 @@ describe( 'feature-detection', () => {
 			expect( result.reason ).toContain( 'too slow' );
 		} );
 
-		it( 'returns not supported when connection is 3g', () => {
+		it( 'returns supported when connection is 3g', () => {
 			Object.defineProperty( navigator, 'connection', {
 				value: { saveData: false, effectiveType: '3g' },
 				configurable: true,
@@ -261,8 +228,7 @@ describe( 'feature-detection', () => {
 
 			const result = detectClientSideMediaSupport();
 
-			expect( result.supported ).toBe( false );
-			expect( result.reason ).toContain( 'too slow' );
+			expect( result.supported ).toBe( true );
 		} );
 
 		it( 'returns not supported when connection is slow-2g', () => {
@@ -325,6 +291,67 @@ describe( 'feature-detection', () => {
 		} );
 	} );
 
+	describe( 'isHeicCanvasSupported', () => {
+		const originalCreateImageBitmap =
+			global.createImageBitmap as typeof createImageBitmap;
+		const originalOffscreenCanvas =
+			global.OffscreenCanvas as typeof OffscreenCanvas;
+
+		afterEach( () => {
+			// Restore globals after each test.
+			if ( originalCreateImageBitmap !== undefined ) {
+				global.createImageBitmap =
+					originalCreateImageBitmap as typeof createImageBitmap;
+			} else {
+				// @ts-ignore
+				delete global.createImageBitmap;
+			}
+			if ( originalOffscreenCanvas !== undefined ) {
+				global.OffscreenCanvas =
+					originalOffscreenCanvas as typeof OffscreenCanvas;
+			} else {
+				// @ts-ignore
+				delete global.OffscreenCanvas;
+			}
+		} );
+
+		it( 'returns true when both createImageBitmap and OffscreenCanvas are available', () => {
+			global.createImageBitmap =
+				jest.fn() as unknown as typeof createImageBitmap;
+			global.OffscreenCanvas =
+				jest.fn() as unknown as typeof OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( true );
+		} );
+
+		it( 'returns false when createImageBitmap is unavailable', () => {
+			// @ts-ignore
+			delete global.createImageBitmap;
+			global.OffscreenCanvas =
+				jest.fn() as unknown as typeof OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( false );
+		} );
+
+		it( 'returns false when OffscreenCanvas is unavailable', () => {
+			global.createImageBitmap =
+				jest.fn() as unknown as typeof createImageBitmap;
+			// @ts-ignore
+			delete global.OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( false );
+		} );
+
+		it( 'returns false when both are unavailable', () => {
+			// @ts-ignore
+			delete global.createImageBitmap;
+			// @ts-ignore
+			delete global.OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( false );
+		} );
+	} );
+
 	describe( 'clearFeatureDetectionCache', () => {
 		it( 'clears the cached result', () => {
 			const result1 = detectClientSideMediaSupport();
@@ -337,6 +364,65 @@ describe( 'feature-detection', () => {
 
 			const result2 = detectClientSideMediaSupport();
 			expect( result2.supported ).toBe( false );
+		} );
+	} );
+
+	describe( 'exceedsClientProcessingMemory', () => {
+		it( 'allows typical images', () => {
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 4000,
+					height: 3000,
+					interlaced: false,
+				} )
+			).toBe( false );
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 4000,
+					height: 3000,
+					interlaced: true,
+				} )
+			).toBe( false );
+		} );
+
+		it( 'gates the reported interlaced flower.jpg (20000x11857)', () => {
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 20000,
+					height: 11857,
+					interlaced: true,
+				} )
+			).toBe( true );
+		} );
+
+		it( 'applies a tighter budget to interlaced images', () => {
+			// ~150 MP: over the ~0.5 GiB interlaced budget but under the
+			// ~0.9 GiB baseline budget.
+			const dimensions = { width: 15000, height: 10000 };
+
+			expect(
+				exceedsClientProcessingMemory( {
+					...dimensions,
+					interlaced: true,
+				} )
+			).toBe( true );
+			expect(
+				exceedsClientProcessingMemory( {
+					...dimensions,
+					interlaced: false,
+				} )
+			).toBe( false );
+		} );
+
+		it( 'gates extremely large baseline images', () => {
+			// ~300 MP exceeds even the generous baseline budget.
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 20000,
+					height: 15000,
+					interlaced: false,
+				} )
+			).toBe( true );
 		} );
 	} );
 } );

@@ -2,14 +2,14 @@
  * WordPress dependencies
  */
 import {
-	Icon,
+	Icon as WCIcon,
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { moreVertical, close } from '@wordpress/icons';
+import { close } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -28,7 +28,7 @@ import { unlock } from '../../lock-unlock';
 import PostActions from '../post-actions';
 import usePageTypeBadge from '../../utils/pageTypeBadge';
 import { getTemplateInfo } from '../../utils/get-template-info';
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 /**
  * Renders a title of the post type and the available quick actions available within a 3-dot dropdown.
@@ -52,7 +52,7 @@ export default function PostCardPanel( {
 		() => ( Array.isArray( postId ) ? postId : [ postId ] ),
 		[ postId ]
 	);
-	const { postTitle, icon, labels, isRevision } = useSelect(
+	const { postTitle, icon, labels } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getCurrentTheme, getPostType } =
 				select( coreStore );
@@ -75,7 +75,6 @@ export default function PostCardPanel( {
 						area: _record?.area,
 					} ),
 					labels: getPostType( parentPostType )?.labels,
-					isRevision: true,
 				};
 			}
 
@@ -131,8 +130,11 @@ export default function PostCardPanel( {
 				className="editor-post-card-panel__header"
 				alignment="flex-start"
 			>
-				<Icon className="editor-post-card-panel__icon" icon={ icon } />
-				<Text
+				<WCIcon
+					className="editor-post-card-panel__icon"
+					icon={ icon }
+				/>
+				<WCText
 					numberOfLines={ 2 }
 					truncate
 					className="editor-post-card-panel__title"
@@ -142,28 +144,15 @@ export default function PostCardPanel( {
 						{ title }
 					</span>
 					{ pageTypeBadge && postIds.length === 1 && (
-						<Badge>{ pageTypeBadge }</Badge>
+						<WCBadge>{ pageTypeBadge }</WCBadge>
 					) }
-				</Text>
+				</WCText>
 				{ ! hideActions && postIds.length === 1 && (
-					<>
-						{ isRevision ? (
-							<Button
-								size="small"
-								icon={ moreVertical }
-								label={ __( 'Actions' ) }
-								disabled
-								accessibleWhenDisabled
-								className="editor-all-actions-button"
-							/>
-						) : (
-							<PostActions
-								postType={ postType }
-								postId={ postIds[ 0 ] }
-								onActionPerformed={ onActionPerformed }
-							/>
-						) }
-					</>
+					<PostActions
+						postType={ postType }
+						postId={ postIds[ 0 ] }
+						onActionPerformed={ onActionPerformed }
+					/>
 				) }
 				{ onClose && (
 					<Button
@@ -175,13 +164,13 @@ export default function PostCardPanel( {
 				) }
 			</HStack>
 			{ postIds.length > 1 && (
-				<Text className="editor-post-card-panel__description">
+				<WCText className="editor-post-card-panel__description">
 					{ sprintf(
 						// translators: %s: Name of the plural post type e.g: "Posts".
 						__( 'Changes will be applied to all selected %s.' ),
-						labels?.name.toLowerCase()
+						labels?.name?.toLowerCase()
 					) }
-				</Text>
+				</WCText>
 			) }
 		</VStack>
 	);

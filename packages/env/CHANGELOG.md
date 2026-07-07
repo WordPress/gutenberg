@@ -2,6 +2,40 @@
 
 ## Unreleased
 
+## 11.10.0 (2026-07-01)
+
+## 11.9.0 (2026-06-24)
+
+## 11.8.1 (2026-06-16)
+
+## 11.8.0 (2026-06-10)
+
+### Enhancements
+
+-   Use partial clones (`--filter=blob:none`) when downloading git sources and the PHPUnit test suite to reduce download size. ([#78918](https://github.com/WordPress/gutenberg/pull/78918))
+
+### Bug Fixes
+
+-   Replace `extract-zip` with `adm-zip` to fix silent hang on Node 24.16.0 (libuv 1.52.1) when downloading URL-based zip sources. ([#78762](https://github.com/WordPress/gutenberg/issues/78762))
+
+## 11.7.0 (2026-05-27)
+
+## 11.6.0 (2026-05-14)
+
+## 11.5.0 (2026-04-29)
+
+## 11.4.0 (2026-04-15)
+
+### Bug Fixes
+
+-   Fix WP-Cron, REST API loopback, and Site Health loopback failures when wp-env runs on a non-default port. Apache inside the WordPress container now also listens on the host-mapped port, so PHP loopback requests to `WP_HOME` succeed instead of being refused. ([#20569](https://github.com/WordPress/gutenberg/issues/20569))
+
+## 11.3.0 (2026-04-01)
+
+## 11.2.0 (2026-03-18)
+
+## 11.1.0 (2026-03-04)
+
 ### Bug Fixes
 
 -   Suppress spinner and success message output when using `--json` flag to ensure clean, parseable JSON output.
@@ -14,9 +48,14 @@
 -   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is fully initialized. Uses MariaDB's official `healthcheck.sh` script with `MARIADB_AUTO_UPGRADE` to support both new and existing installations.
 -   Remove non-functional `WP_ENV_MULTISITE` config.
 
+### New Features
+
+-   Added `--auto-port` flag to the `start` command. When passed, `wp-env` automatically finds available ports if the configured ports are busy. Without this flag, ports default to `8888`/`8889` and Docker reports an error if they are busy (matching pre-existing behavior).
+
 ### Breaking Changes
 
 -   Pretty permalinks (`/%year%/%monthnum%/%day%/%postname%/`) are now enabled by default, matching WordPress core behavior on fresh installs. Previously, plain permalinks were used because the loopback test that WordPress runs during installation fails inside Docker.
+-   The `port` option now defaults to `null` (auto-select) instead of `8888`. When `null`, `wp-env` tries port 8888 (or 8889 for tests) first, then falls back to an available ephemeral port. Set an explicit port number to preserve the previous behavior.
 -   Replaced `install-path` command with `status` command. The work directory path is now available as part of the status output.
 
 ### New Features

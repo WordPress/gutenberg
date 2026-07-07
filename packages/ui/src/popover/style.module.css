@@ -1,0 +1,131 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.positioner {
+			z-index: var(--wp-ui-popover-z-index, initial);
+		}
+
+		/*
+		 * The popup is the motion layer: it carries the shared dropdown
+		 * slide/fade and is therefore transformed (and `will-change`d). Visual
+		 * chrome lives on `.surface` instead, so this element stays borderless.
+		 *
+		 * Why the split: a transform (or `will-change: transform`) makes this the
+		 * containing block for the absolutely-positioned `Popover.Arrow`. If the
+		 * border lived here, the arrow would resolve against the padding box and
+		 * sit 1px inside the border. With the border on `.surface` and this layer
+		 * borderless, the arrow resolves against an edge identical to the
+		 * positioner's, so it stays aligned while animating with the surface.
+		 */
+		.popup {
+			composes: dropdown-motion from "../utils/css/dropdown-motion.module.css";
+
+			outline: 0;
+		}
+
+		/*
+		 * Keep `.surface` from establishing a containing block. The arrow stays
+		 * aligned only because the nearest containing block for `Popover.Arrow`
+		 * remains `.popup` (the transformed motion layer), which shares the
+		 * positioner's edge. Adding `transform`, `filter`, `perspective`,
+		 * `will-change` of any of those, `contain: layout/paint/strict/content`,
+		 * or similar here would make `.surface` the containing block instead and
+		 * shift the arrow inward by the border width. Keep visual chrome only.
+		 */
+		.surface {
+			background-color: var(--wpds-color-background-surface-neutral-strong);
+			padding: var(--wpds-dimension-padding-lg);
+			border-radius: var(--wpds-border-radius-md);
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			box-shadow: var(--wpds-elevation-md);
+			font-family: var(--wpds-typography-font-family-body);
+			font-size: var(--wpds-typography-font-size-md);
+			line-height: var(--wpds-typography-line-height-md);
+			color: var(--wpds-color-foreground-content-neutral);
+		}
+
+		/*
+		 * When a backdrop is rendered alongside the popup, hide the
+		 * regular-mode border. The backdrop already provides visual
+		 * containment, so the border becomes redundant noise.
+		 * `transparent` (not `none`) keeps surface geometry identical
+		 * regardless of the `backdrop` prop — `box-sizing: border-box`
+		 * absorbs the 1px into the existing box.
+		 */
+		.backdrop ~ * .surface {
+			border-color: transparent;
+		}
+
+		/*
+		 * Forced-colors mode strips `box-shadow` and substitutes
+		 * `background-color` with `Canvas` (the page background), so the
+		 * boundary depends entirely on the border. Set `CanvasText`
+		 * explicitly for both backdrop and non-backdrop popups:
+		 * `transparent` is not substituted by the UA, and being
+		 * explicit also removes any reliance on UA color-substitution
+		 * behavior for the non-backdrop case.
+		 */
+		@media (forced-colors: active) {
+			.surface,
+			.backdrop ~ * .surface {
+				border-color: CanvasText;
+			}
+		}
+
+		.arrow {
+			display: flex;
+
+			&[data-side="top"] {
+				bottom: -8px;
+				rotate: 180deg;
+			}
+
+			&[data-side="bottom"] {
+				top: -8px;
+				rotate: 0deg;
+			}
+
+			&[data-side="left"] {
+				inset-inline-end: -13px;
+				rotate: 90deg;
+			}
+
+			&[data-side="right"] {
+				inset-inline-start: -13px;
+				rotate: -90deg;
+			}
+		}
+
+		.arrow-fill {
+			fill: var(--wpds-color-background-surface-neutral-strong);
+		}
+
+		.arrow-stroke {
+			fill: var(--wpds-color-stroke-surface-neutral);
+		}
+
+		.title {
+			color: var(--wpds-color-foreground-content-neutral);
+			--_gcd-heading-color: var(--wpds-color-foreground-content-neutral);
+		}
+
+		.backdrop {
+			position: fixed;
+			inset: 0;
+			z-index: var(--wp-ui-popover-z-index, initial);
+			/* TODO: Replace with a WPDS overlay/scrim token when one exists. */
+			background-color: rgba(0, 0, 0, 0.15);
+			opacity: 1;
+
+			&[data-starting-style],
+			&[data-ending-style] {
+				opacity: 0;
+			}
+
+			@media not (prefers-reduced-motion) {
+				transition: opacity var(--wpds-motion-duration-sm) var(--wpds-motion-easing-subtle);
+			}
+		}
+	}
+}

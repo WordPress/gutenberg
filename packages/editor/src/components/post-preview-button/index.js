@@ -2,18 +2,19 @@
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
-import { Button, Path, SVG, VisuallyHidden } from '@wordpress/components';
+import { Button, Path, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 
-function writeInterstitialMessage( targetDocument ) {
+function buildInterstitialMarkup() {
 	let markup = renderToString(
 		<div className="editor-post-preview-button__interstitial-message">
 			<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
@@ -94,9 +95,75 @@ function writeInterstitialMessage( targetDocument ) {
 	 */
 	markup = applyFilters( 'editor.PostPreview.interstitialMarkup', markup );
 
+	return markup;
+}
+
+function writeInterstitialMessage( targetDocument, markup ) {
 	targetDocument.write( markup );
 	targetDocument.title = __( 'Generating preview…' );
 	targetDocument.close();
+}
+
+/**
+ * Resolves the preview window's `document`, working around
+ * `Document-Isolation-Policy` (DIP) isolation.
+ *
+ * The editor screen is served with `Document-Isolation-Policy:
+ * isolate-and-credentialless` to enable cross-origin isolation. This places the
+ * editor tab and an already-open preview tab in separate agent clusters, so
+ * synchronous access to a reused preview tab's `document` throws a
+ * `SecurityError`. Navigating the reused tab back to `about:blank` returns it to
+ * the opener's agent cluster and restores access. That navigation is
+ * asynchronous and we can't attach a cross-isolation `load` listener, so poll
+ * the `document` access (the operation that throws) until it succeeds, up to a
+ * short timeout.
+ *
+ * @param {Window} previewWindow The preview window/tab.
+ *
+ * @return {?Document} The reachable preview document, or `null` if it never
+ *                     becomes reachable within the timeout.
+ */
+async function getPreviewDocument( previewWindow ) {
+	// A freshly opened tab is already on `about:blank` and accessible, so this
+	// succeeds on the first preview without any reset.
+	try {
+		return previewWindow.document;
+	} catch {
+		// The reused preview tab is isolated from the editor; reset it below.
+	}
+
+	previewWindow.location = 'about:blank';
+
+	const timeoutMs = 1000;
+	const intervalMs = 50;
+	const deadline = Date.now() + timeoutMs;
+	do {
+		await new Promise( ( resolve ) => setTimeout( resolve, intervalMs ) );
+		try {
+			return previewWindow.document;
+		} catch {
+			// Navigation to `about:blank` hasn't completed yet; keep polling.
+		}
+	} while ( Date.now() < deadline );
+
+	return null;
+}
+
+/**
+ * Writes the preview interstitial into the preview window, working around
+ * `Document-Isolation-Policy` (DIP) isolation.
+ *
+ * The interstitial is a progressive enhancement: if the document never becomes
+ * reachable we simply skip it, and the caller still navigates the preview to the
+ * real content.
+ *
+ * @param {Window} previewWindow The preview window/tab.
+ */
+async function writeInterstitialIntoPreviewWindow( previewWindow ) {
+	const previewDocument = await getPreviewDocument( previewWindow );
+	if ( previewDocument ) {
+		writeInterstitialMessage( previewDocument, buildInterstitialMarkup() );
+	}
 }
 
 /**
@@ -167,7 +234,7 @@ export default function PostPreviewButton( {
 		// https://html.spec.whatwg.org/multipage/interaction.html#dom-window-focus
 		previewWindow.focus();
 
-		writeInterstitialMessage( previewWindow.document );
+		await writeInterstitialIntoPreviewWindow( previewWindow );
 
 		const link = await __unstableSaveForPreview( { forceIsAutosaveable } );
 
@@ -196,7 +263,7 @@ export default function PostPreviewButton( {
 			{ textContent || (
 				<>
 					{ _x( 'Preview', 'imperative verb' ) }
-					<VisuallyHidden as="span">
+					<VisuallyHidden render={ <span /> }>
 						{
 							/* translators: accessibility text */
 							__( '(opens in a new tab)' )

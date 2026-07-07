@@ -1,13 +1,17 @@
 /**
  * External dependencies
  */
-import type { RefCallback, SyntheticEvent } from 'react';
+import type {
+	KeyboardEvent,
+	KeyboardEventHandler,
+	RefCallback,
+	SyntheticEvent,
+} from 'react';
 
 /**
  * WordPress dependencies
  */
 import { useRef, useEffect, useCallback } from '@wordpress/element';
-import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -44,6 +48,10 @@ type DialogOptions = {
 	constrainTabbing?: boolean;
 	onClose?: () => void;
 	/**
+	 * Optional `onKeyDown` handler, merged with the built-in one.
+	 */
+	onKeyDown?: KeyboardEventHandler< HTMLElement >;
+	/**
 	 * Use the `onClose` prop instead.
 	 *
 	 * @deprecated
@@ -56,7 +64,9 @@ type DialogOptions = {
 
 type useDialogReturn = [
 	RefCallback< HTMLElement >,
-	ReturnType< typeof useFocusOutside > & Pick< HTMLElement, 'tabIndex' >,
+	ReturnType< typeof useFocusOutside > & {
+		onKeyDown: ( event: KeyboardEvent< HTMLElement > ) => void;
+	} & Pick< HTMLElement, 'tabIndex' >,
 ];
 
 /**
@@ -86,22 +96,23 @@ function useDialog( options: DialogOptions ): useDialogReturn {
 			currentOptions.current.onClose();
 		}
 	} );
-	const closeOnEscapeRef = useCallback( ( node: HTMLElement ) => {
-		if ( ! node ) {
-			return;
+	// Close on Escape via a React `onKeyDown` (rather than a native listener)
+	// so portaled descendants that handle Escape and call
+	// `event.stopPropagation()` correctly prevent the dialog from closing.
+	// See https://github.com/WordPress/gutenberg/issues/78432.
+	const onKeyDown = useCallback( ( event: KeyboardEvent< HTMLElement > ) => {
+		// Let the consumer-provided handler (if any) run first so it can
+		// call `preventDefault()` to opt out of close-on-Escape.
+		currentOptions.current?.onKeyDown?.( event );
+		if (
+			event.key === 'Escape' &&
+			! event.defaultPrevented &&
+			currentOptions.current?.onClose
+		) {
+			event.preventDefault();
+			event.stopPropagation();
+			currentOptions.current.onClose();
 		}
-
-		node.addEventListener( 'keydown', ( event: KeyboardEvent ) => {
-			// Close on escape.
-			if (
-				event.keyCode === ESCAPE &&
-				! event.defaultPrevented &&
-				currentOptions.current?.onClose
-			) {
-				event.preventDefault();
-				currentOptions.current.onClose();
-			}
-		} );
 	}, [] );
 
 	return [
@@ -109,10 +120,10 @@ function useDialog( options: DialogOptions ): useDialogReturn {
 			constrainTabbing ? constrainedTabbingRef : null,
 			options.focusOnMount !== false ? focusReturnRef : null,
 			options.focusOnMount !== false ? focusOnMountRef : null,
-			closeOnEscapeRef,
 		] ),
 		{
 			...focusOutsideProps,
+			onKeyDown,
 			tabIndex: -1,
 		},
 	];
