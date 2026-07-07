@@ -11,6 +11,7 @@ import {
 	logPlayError,
 	updateSeekControlLabel,
 	getPlaylistPlaybackAction,
+	getPlayedTracksAfterTrackSelection,
 	replayWaveformPlayerTrack,
 } from '../utils/waveform-utils';
 
@@ -58,6 +59,10 @@ const { state } = store(
 
 				context.isPlaying = false;
 				context.currentId = context.trackId;
+				context.playedTracks = getPlayedTracksAfterTrackSelection(
+					context.trackId,
+					context.isShuffled
+				);
 			},
 		},
 		callbacks: {
@@ -182,6 +187,10 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 				context.tracks[ context.tracks.length - 1 ];
 			if ( prevTrack ) {
 				context.currentId = prevTrack;
+				context.playedTracks = getPlayedTracksAfterTrackSelection(
+					prevTrack,
+					context.isShuffled
+				);
 			}
 		},
 		onNext: () => {

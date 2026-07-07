@@ -108,6 +108,21 @@ export function isShuffleCycleComplete( trackIds, currentId, playedIds = [] ) {
 }
 
 /**
+ * Get the played-track state after a manual track selection.
+ *
+ * In shuffle mode, a manually selected track starts a fresh cycle and is
+ * treated as already playing. In ordered playback, no shuffle cycle state is
+ * needed.
+ *
+ * @param {string|null} trackId    - The selected track ID.
+ * @param {boolean}     isShuffled - Whether shuffle is active.
+ * @return {string[]} Updated played-track state.
+ */
+export function getPlayedTracksAfterTrackSelection( trackId, isShuffled ) {
+	return isShuffled && trackId ? [ trackId ] : [];
+}
+
+/**
  * Get the next playlist playback action for track end or skip controls.
  *
  * Repeat-one replays the current track on track end or skip. Repeat-all

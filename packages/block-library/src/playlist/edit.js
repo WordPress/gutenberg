@@ -40,6 +40,7 @@ import { WaveformPlayer } from '../utils/waveform-player';
 import { PlaylistContext } from './context';
 import {
 	getPlaylistPlaybackAction,
+	getPlayedTracksAfterTrackSelection,
 	replayWaveformPlayerTrack,
 } from '../utils/waveform-utils';
 import { getTrackAttributes } from './utils';
@@ -115,11 +116,21 @@ const PlaylistEdit = ( {
 			} ) ),
 		[ validTracks ]
 	);
+	const selectTrackClientId = useCallback(
+		( trackClientId ) => {
+			setCurrentTrackClientId( trackClientId );
+			setPlayedTracks(
+				getPlayedTracksAfterTrackSelection( trackClientId, isShuffled )
+			);
+		},
+		[ isShuffled, setCurrentTrackClientId, setPlayedTracks ]
+	);
 
 	useEffect( () => {
 		if ( validTracks.length === 0 ) {
 			if ( currentTrackClientId !== null ) {
 				setCurrentTrackClientId( null );
+				setPlayedTracks( [] );
 			}
 			return;
 		}
@@ -128,13 +139,22 @@ const PlaylistEdit = ( {
 			( block ) => block.clientId === currentTrackClientId
 		);
 		if ( ! currentTrackExists ) {
-			setCurrentTrackClientId( validTracks[ 0 ].clientId );
+			selectTrackClientId( validTracks[ 0 ].clientId );
 		}
-	}, [ currentTrackClientId, setCurrentTrackClientId, validTracks ] );
+	}, [
+		currentTrackClientId,
+		selectTrackClientId,
+		setCurrentTrackClientId,
+		setPlayedTracks,
+		validTracks,
+	] );
 
 	const playlistContext = useMemo(
-		() => ( { currentTrackClientId, setCurrentTrackClientId } ),
-		[ currentTrackClientId, setCurrentTrackClientId ]
+		() => ( {
+			currentTrackClientId,
+			setCurrentTrackClientId: selectTrackClientId,
+		} ),
+		[ currentTrackClientId, selectTrackClientId ]
 	);
 
 	const onSelectTracks = useCallback(
@@ -152,11 +172,11 @@ const PlaylistEdit = ( {
 			const newBlocks = trackList.map( ( track ) =>
 				createBlock( 'core/playlist-track', track )
 			);
-			setCurrentTrackClientId( newBlocks[ 0 ]?.clientId ?? null );
+			selectTrackClientId( newBlocks[ 0 ]?.clientId ?? null );
 			// Replace the inner blocks with the new tracks.
 			replaceInnerBlocks( clientId, newBlocks );
 		},
-		[ replaceInnerBlocks, clientId, setCurrentTrackClientId ]
+		[ replaceInnerBlocks, clientId, selectTrackClientId ]
 	);
 
 	// Get current track data by finding the track with matching client ID.
@@ -198,9 +218,9 @@ const PlaylistEdit = ( {
 		const prevTrack =
 			tracks[ currentIndex - 1 ] || tracks[ tracks.length - 1 ];
 		if ( prevTrack?.clientId ) {
-			setCurrentTrackClientId( prevTrack.clientId );
+			selectTrackClientId( prevTrack.clientId );
 		}
-	}, [ currentTrackClientId, setCurrentTrackClientId, tracks ] );
+	}, [ currentTrackClientId, selectTrackClientId, tracks ] );
 
 	const onNext = useCallback(
 		( playerInstance ) => {
@@ -250,7 +270,7 @@ const PlaylistEdit = ( {
 				return titleB.localeCompare( titleA );
 			} );
 			replaceInnerBlocks( clientId, sortedBlocks );
-			setCurrentTrackClientId( sortedBlocks[ 0 ]?.clientId ?? null );
+			selectTrackClientId( sortedBlocks[ 0 ]?.clientId ?? null );
 			setAttributes( {
 				order: trackOrder,
 			} );
@@ -259,8 +279,8 @@ const PlaylistEdit = ( {
 			clientId,
 			innerBlockTracks,
 			replaceInnerBlocks,
+			selectTrackClientId,
 			setAttributes,
-			setCurrentTrackClientId,
 		]
 	);
 

@@ -38,10 +38,15 @@ $playlist-control-size: 24px;
 			transform: none;
 		}
 
-		&:focus,
-		&:focus-visible {
+		&:focus:not(:focus-visible) {
 			box-shadow: none;
 			outline: none;
+		}
+
+		&:focus-visible {
+			box-shadow: none;
+			outline: 2px solid currentColor;
+			outline-offset: 2px;
 		}
 
 		svg {
@@ -98,10 +103,15 @@ $playlist-control-size: 24px;
 			opacity: 0.8;
 		}
 
-		&:focus,
-		&:focus-visible {
+		&:focus:not(:focus-visible) {
 			box-shadow: none;
 			outline: none;
+		}
+
+		&:focus-visible {
+			box-shadow: none;
+			outline: 2px solid currentColor;
+			outline-offset: 2px;
 		}
 
 		// Toggled-on state (shuffle/repeat): invert to a solid text-color

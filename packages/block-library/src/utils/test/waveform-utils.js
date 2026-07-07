@@ -14,6 +14,7 @@ import {
 	logPlayError,
 	getNextShuffledTrack,
 	isShuffleCycleComplete,
+	getPlayedTracksAfterTrackSelection,
 	getNextRepeatMode,
 	getPlaylistPlaybackAction,
 	replayWaveformPlayerTrack,
@@ -434,6 +435,18 @@ describe( 'Waveform utilities', () => {
 				isShuffleCycleComplete( [ 'a', 'b', 'c' ], 'b', [ 'a' ] )
 			).toBe( false );
 		} );
+
+		it( 'should start a fresh cycle from a manually selected shuffled track', () => {
+			expect( getPlayedTracksAfterTrackSelection( 'b', true ) ).toEqual( [
+				'b',
+			] );
+		} );
+
+		it( 'should clear cycle state for manual selection when shuffle is off', () => {
+			expect( getPlayedTracksAfterTrackSelection( 'b', false ) ).toEqual(
+				[]
+			);
+		} );
 	} );
 
 	describe( 'getPlaylistPlaybackAction', () => {
@@ -507,6 +520,24 @@ describe( 'Waveform utilities', () => {
 			expect(
 				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'a', {
 					isShuffled: true,
+				} )
+			).toEqual( {
+				action: 'advance',
+				nextId: 'b',
+				playedIds: [ 'a', 'b' ],
+			} );
+		} );
+
+		it( 'continues shuffle after manually selecting a track from a completed cycle', () => {
+			const playedTracks = getPlayedTracksAfterTrackSelection(
+				'a',
+				true
+			);
+
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'a', {
+					isShuffled: true,
+					playedTracks,
 				} )
 			).toEqual( {
 				action: 'advance',
