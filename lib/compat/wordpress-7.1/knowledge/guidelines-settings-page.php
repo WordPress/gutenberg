@@ -5,22 +5,26 @@
  * @package gutenberg
  */
 
-add_action( 'admin_menu', 'gutenberg_register_guidelines_settings_submenu', 10 );
+add_action( 'admin_menu', 'gutenberg_register_guidelines_settings_submenu', 11 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_guidelines_enqueue_block_registry_scripts', 5 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_guidelines_preload_rest', 6 );
 
 /**
  * Registers the Guidelines submenu item under Settings.
- * Uses the same layout/style as the Font Library admin page (wp-admin integrated).
+ * The page is placed right after Privacy, the last core item.
  */
 function gutenberg_register_guidelines_settings_submenu() {
+	// Remove core's Guidelines submenu item if it exists.
+	remove_submenu_page( 'options-general.php', 'options-guidelines.php' );
+
 	add_submenu_page(
 		'options-general.php',
 		__( 'Guidelines', 'gutenberg' ),
 		__( 'Guidelines', 'gutenberg' ),
 		'manage_options',
 		'guidelines-wp-admin',
-		'gutenberg_guidelines_wp_admin_render_page'
+		'gutenberg_guidelines_wp_admin_render_page',
+		8
 	);
 }
 

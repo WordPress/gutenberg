@@ -111,11 +111,6 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),
 				),
 				array(
-					'id'          => 'gutenberg-guidelines',
-					'label'       => __( 'Guidelines', 'gutenberg' ),
-					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),
-				),
-				array(
 					'id'          => 'gutenberg-content-types',
 					'label'       => __( 'Content types', 'gutenberg' ),
 					'description' => __( 'Enables a UI for creating and managing custom taxonomies and custom post types under Settings.', 'gutenberg' ),

@@ -93,18 +93,11 @@ async function saveSectionGuidelines( page, title, text ) {
 
 test.describe( 'Guidelines', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-guidelines',
-		] );
 		await deleteAllGuidelines( requestUtils );
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await deleteAllGuidelines( requestUtils );
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
 	test( 'shows a Guidelines link in the Settings menu', async ( {
