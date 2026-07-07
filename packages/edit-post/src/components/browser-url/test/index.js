@@ -152,6 +152,33 @@ describe( 'BrowserURL', () => {
 		);
 	} );
 
+	it( 'writes immediately after a quiet period', () => {
+		setupUseSelectMock( {
+			postId: 1,
+			postStatus: 'draft',
+			currentRevisionId: 5,
+		} );
+		const { rerender } = render( <BrowserURL /> );
+		flushURLWrites();
+
+		// Let the quiet period elapse, then change the revision.
+		act( () => jest.advanceTimersByTime( 301 ) );
+		setupUseSelectMock( {
+			postId: 1,
+			postStatus: 'draft',
+			currentRevisionId: 6,
+		} );
+		replaceStateSpy.mockReset();
+
+		rerender( <BrowserURL /> );
+		// No timer flush: the write happens synchronously.
+		expect( replaceStateSpy ).toHaveBeenCalledWith(
+			{ id: 1 },
+			'Post 1',
+			'post.php?post=1&action=edit&revision=6'
+		);
+	} );
+
 	it( 'removes the revision arg after exiting revisions mode', () => {
 		setupUseSelectMock( {
 			postId: 1,

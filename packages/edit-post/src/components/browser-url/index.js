@@ -12,9 +12,10 @@ import { store as editorStore } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
 
 /**
- * Milliseconds to wait before writing a URL change. Sliding through
- * revisions updates the URL once per slider mark; Safari throws when the
- * History API is called more than 100 times per 30 seconds.
+ * Quiet period that groups rapid URL changes into a single write.
+ * Sliding through revisions updates the URL once per slider mark;
+ * Safari throws when the History API is called more than 100 times
+ * per 30 seconds.
  */
 const URL_WRITE_DEBOUNCE_MS = 300;
 
@@ -88,12 +89,21 @@ export default function BrowserURL() {
 		openRevision( initialRevisionId );
 	}, [ initialRevisionId, postId, disableVisualRevisions, openRevision ] );
 
+	// Seeded on the first sync so the initial write always goes through
+	// the trailing timeout, giving a deep-linked revision time to land
+	// in the store before the URL is first rewritten.
+	const lastURLWriteTimeRef = useRef( null );
+
 	useEffect( () => {
 		if ( ! postId || postStatus === 'auto-draft' ) {
 			return;
 		}
+		if ( lastURLWriteTimeRef.current === null ) {
+			lastURLWriteTimeRef.current = Date.now();
+		}
 		const url = getPostEditURL( postId, currentRevisionId );
-		const timeoutId = setTimeout( () => {
+		const write = () => {
+			lastURLWriteTimeRef.current = Date.now();
 			try {
 				window.history.replaceState(
 					{ id: postId },
@@ -104,7 +114,18 @@ export default function BrowserURL() {
 				// The browser rate-limited the write; the next change
 				// will retry.
 			}
-		}, URL_WRITE_DEBOUNCE_MS );
+		};
+		// Write immediately after a quiet period so single changes feel
+		// instant; collapse rapid streams (slider drags, held arrow
+		// keys) into one trailing write.
+		if (
+			Date.now() - lastURLWriteTimeRef.current >=
+			URL_WRITE_DEBOUNCE_MS
+		) {
+			write();
+			return;
+		}
+		const timeoutId = setTimeout( write, URL_WRITE_DEBOUNCE_MS );
 		return () => clearTimeout( timeoutId );
 	}, [ postId, postStatus, currentRevisionId ] );
 

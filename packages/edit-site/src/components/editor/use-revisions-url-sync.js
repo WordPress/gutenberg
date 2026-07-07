@@ -15,9 +15,10 @@ import { unlock } from '../../lock-unlock';
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 /**
- * Milliseconds to wait before writing a URL change. Sliding through
- * revisions updates the URL once per slider mark; Safari throws when the
- * History API is called more than 100 times per 30 seconds.
+ * Quiet period that groups rapid URL changes into a single write.
+ * Sliding through revisions updates the URL once per slider mark;
+ * Safari throws when the History API is called more than 100 times
+ * per 30 seconds.
  */
 const URL_WRITE_DEBOUNCE_MS = 300;
 
@@ -55,9 +56,17 @@ export default function useRevisionsURLSync( enabled ) {
 		openRevision( revision );
 	}, [ enabled, postId, location.query.revision, openRevision ] );
 
+	// Seeded on the first sync so the initial write always goes through
+	// the trailing timeout, giving a deep-linked revision time to land
+	// in the store before the URL is first rewritten.
+	const lastURLWriteTimeRef = useRef( null );
+
 	useEffect( () => {
 		if ( ! enabled ) {
 			return;
+		}
+		if ( lastURLWriteTimeRef.current === null ) {
+			lastURLWriteTimeRef.current = Date.now();
 		}
 		const revisionArg = currentRevisionId
 			? String( currentRevisionId )
@@ -65,14 +74,26 @@ export default function useRevisionsURLSync( enabled ) {
 		if ( location.query.revision === revisionArg ) {
 			return;
 		}
-		const timeoutId = setTimeout( () => {
+		const write = () => {
+			lastURLWriteTimeRef.current = Date.now();
 			// `location.path` carries the current query args; an undefined
 			// value removes the arg.
 			history.navigate(
 				addQueryArgs( location.path, { revision: revisionArg } ),
 				{ replace: true }
 			);
-		}, URL_WRITE_DEBOUNCE_MS );
+		};
+		// Write immediately after a quiet period so single changes feel
+		// instant; collapse rapid streams (slider drags, held arrow
+		// keys) into one trailing write.
+		if (
+			Date.now() - lastURLWriteTimeRef.current >=
+			URL_WRITE_DEBOUNCE_MS
+		) {
+			write();
+			return;
+		}
+		const timeoutId = setTimeout( write, URL_WRITE_DEBOUNCE_MS );
 		return () => clearTimeout( timeoutId );
 	}, [ enabled, currentRevisionId, location, history ] );
 }
