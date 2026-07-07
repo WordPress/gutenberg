@@ -56,7 +56,6 @@ function SizeControl( props: SizeControlProps ) {
 			<Flex>
 				<FlexItem isBlock>
 					<UnitControl
-						__next40pxDefaultSize
 						label={ label }
 						hideLabelFromVision
 						value={ value }

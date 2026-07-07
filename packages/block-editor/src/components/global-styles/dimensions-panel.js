@@ -544,7 +544,6 @@ export default function DimensionsPanel( {
 					panelId={ panelId }
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label={ __( 'Content width' ) }
 						labelPosition="top"
 						value={ contentSizeValue || '' }
@@ -571,7 +570,6 @@ export default function DimensionsPanel( {
 					panelId={ panelId }
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label={ __( 'Wide width' ) }
 						labelPosition="top"
 						value={ wideSizeValue || '' }
@@ -710,7 +708,6 @@ export default function DimensionsPanel( {
 							/>
 						) : (
 							<UnitControl
-								__next40pxDefaultSize
 								label={ __( 'Block spacing' ) }
 								min={ 0 }
 								onChange={ setGapValue }

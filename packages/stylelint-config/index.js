@@ -49,7 +49,10 @@ export default {
 			},
 		],
 		'function-url-quotes': 'never',
-		'length-zero-no-unit': true,
+		'length-zero-no-unit': [
+			true,
+			{ ignore: [ 'custom-properties' ], ignoreFunctions: [ 'var' ] },
+		],
 		'rule-empty-line-before': [
 			'always',
 			{
