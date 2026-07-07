@@ -58,9 +58,9 @@ const POPOVER_CONTAINER_SELECTOR =
  *     isSelected={ isSelected }
  *     onSelectedChange={ setIsSelected }
  * >
- *     <keyboardShortcutContext.Provider value={ shortcuts }>
+ *     <KeyboardShortcutContext.Provider value={ shortcuts }>
  *         <FormatEdit … />
- *     </keyboardShortcutContext.Provider>
+ *     </KeyboardShortcutContext.Provider>
  * </RichTextControl>
  * ```
  */

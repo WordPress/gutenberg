@@ -257,7 +257,7 @@ describe( 'RichTextControl', () => {
 
 		// Re-implement `RichTextShortcut` locally to keep the assertion on
 		// the registration contract explicit. It registers a callback into
-		// the shared `keyboardShortcutContext` (now owned by
+		// the shared `KeyboardShortcutContext` (now owned by
 		// `@wordpress/rich-text`) that the control provides — the same
 		// context the real `RichTextShortcut` reads. Mirrors the contract of
 		// `packages/block-editor/src/components/rich-text/shortcut.js`.
@@ -266,8 +266,8 @@ describe( 'RichTextControl', () => {
 			const {
 				privateApis: richTextPrivateApis,
 			} = require( '@wordpress/rich-text' );
-			const { keyboardShortcutContext } = unlock( richTextPrivateApis );
-			const keyboardShortcuts = useContext( keyboardShortcutContext );
+			const { KeyboardShortcutContext } = unlock( richTextPrivateApis );
+			const keyboardShortcuts = useContext( KeyboardShortcutContext );
 			useEffect( () => {
 				const shortcuts = keyboardShortcuts.current;
 				const handler = ( event ) => {

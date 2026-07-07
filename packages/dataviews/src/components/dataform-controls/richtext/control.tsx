@@ -35,7 +35,7 @@ const { RichTextControl: RichTextControlShell } = unlock(
 	componentsPrivateApis
 );
 
-// `keyboardShortcutContext` / `inputEventContext` are the same context objects
+// `KeyboardShortcutContext` / `InputEventContext` are the same context objects
 // that format types' `RichTextShortcut` / `RichTextInputEvent` read. Format
 // types render those components, so providing these contexts here (below) is
 // what wires their keyboard shortcuts and input events to this field.
@@ -43,8 +43,8 @@ const { RichTextControl: RichTextControlShell } = unlock(
 // callbacks from the editable element's own events.
 const {
 	useRichText,
-	keyboardShortcutContext,
-	inputEventContext,
+	KeyboardShortcutContext,
+	InputEventContext,
 	shortcutsListener,
 	inputEventsListener,
 } = unlock( richTextPrivateApis );
@@ -356,8 +356,8 @@ export default function RichTextControl( {
 			onSelectedChange={ setIsSelected }
 		>
 			{ /* The shell mounts these only while the field is selected. */ }
-			<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
-				<inputEventContext.Provider value={ inputEvents }>
+			<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
+				<InputEventContext.Provider value={ inputEvents }>
 					<FormatEdit
 						value={ value }
 						onChange={ onRichTextChange }
@@ -366,8 +366,8 @@ export default function RichTextControl( {
 						forwardedRef={ anchorRef }
 						isVisible={ false }
 					/>
-				</inputEventContext.Provider>
-			</keyboardShortcutContext.Provider>
+				</InputEventContext.Provider>
+			</KeyboardShortcutContext.Provider>
 		</RichTextControlShell>
 	);
 }

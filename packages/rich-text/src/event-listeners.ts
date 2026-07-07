@@ -5,7 +5,7 @@ import type { MutableRefObject } from 'react';
 
 /*
  * Format types register their keyboard shortcut and input event callbacks
- * into these Sets via `keyboardShortcutContext` / `inputEventContext` (see
+ * into these Sets via `KeyboardShortcutContext` / `InputEventContext` (see
  * `./contexts`). The rich text field that owns the editable element provides
  * the Sets and attaches these listeners to dispatch the callbacks.
  */
@@ -18,7 +18,7 @@ export type EventListenersProps = {
 
 /**
  * Attaches a `keydown` listener that dispatches the keyboard shortcut
- * callbacks format types registered through `keyboardShortcutContext`.
+ * callbacks format types registered through `KeyboardShortcutContext`.
  *
  * @param props Ref holding the registered callback Sets.
  *
@@ -43,7 +43,7 @@ export const shortcutsListener =
 
 /**
  * Attaches an `input` listener that dispatches the `InputEvent` callbacks
- * format types registered through `inputEventContext`.
+ * format types registered through `InputEventContext`.
  *
  * @param props Ref holding the registered callback Sets.
  *
