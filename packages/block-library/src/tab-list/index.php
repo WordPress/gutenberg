@@ -22,7 +22,18 @@
  * @return string Updated HTML.
  */
 function block_core_tab_list_render_callback( array $attributes, string $content, \WP_Block $block ): string {
-	$tabs_list = $block->context['core/tabs-list'] ?? array();
+	$tabs_list  = $block->context['core/tabs-list'] ?? array();
+	$aria_label = empty( $attributes['ariaLabel'] )
+		? ''
+		: wp_strip_all_tags( $attributes['ariaLabel'] );
+
+	if ( '' !== $aria_label ) {
+		$tag_processor = new WP_HTML_Tag_Processor( $content );
+		if ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-tab-list' ) ) ) {
+			$tag_processor->set_attribute( 'aria-label', $aria_label );
+			$content = $tag_processor->get_updated_html();
+		}
+	}
 
 	if ( empty( $tabs_list ) ) {
 		return $content;
