@@ -348,11 +348,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/list-item/hooks/use-enter.js": {
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/math/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
