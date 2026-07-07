@@ -193,6 +193,7 @@ test.describe( 'Block Hiding', () => {
 	test( 'should hide a block only on Mobile viewport', async ( {
 		page,
 		editor,
+		pageUtils,
 	} ) => {
 		// Insert a paragraph block.
 		await editor.insertBlock( {
@@ -214,6 +215,13 @@ test.describe( 'Block Hiding', () => {
 			.getByRole( 'dialog', { name: 'Hide block' } )
 			.getByRole( 'button', { name: 'Apply' } )
 			.click();
+
+		/*
+		 * Open List View so switching device preview does not clear selection for a block
+		 * that becomes hidden in the target viewport (inspector needs a selected block).
+		 * See: https://github.com/WordPress/gutenberg/issues/76275
+		 */
+		await pageUtils.pressKeys( 'access+o' );
 
 		// Toggle to mobile preview.
 		await page
