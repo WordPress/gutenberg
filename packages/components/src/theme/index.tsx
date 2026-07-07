@@ -9,48 +9,23 @@ import { generateThemeVariables } from './color-algorithms';
 import styles from './style.module.scss';
 import { PolymorphicElement } from '../utils/polymorphic-element';
 
-const getColorVariables = ( { colors }: ThemeOutputValues ) => {
-	const style: CSSProperties = {};
-
-	if ( colors.accent ) {
-		style[ '--wp-components-color-accent' ] = colors.accent;
-	}
-
-	if ( colors.accentDarker10 ) {
-		style[ '--wp-components-color-accent-darker-10' ] =
-			colors.accentDarker10;
-	}
-
-	if ( colors.accentDarker20 ) {
-		style[ '--wp-components-color-accent-darker-20' ] =
-			colors.accentDarker20;
-	}
-
-	if ( colors.accentInverted ) {
-		style[ '--wp-components-color-accent-inverted' ] =
-			colors.accentInverted;
-	}
-
-	if ( colors.background ) {
-		style[ '--wp-components-color-background' ] = colors.background;
-	}
-
-	if ( colors.foreground ) {
-		style[ '--wp-components-color-foreground' ] = colors.foreground;
-	}
-
-	if ( colors.foregroundInverted ) {
-		style[ '--wp-components-color-foreground-inverted' ] =
-			colors.foregroundInverted;
-	}
-
-	Object.entries( colors.gray || {} ).forEach( ( [ key, value ] ) => {
-		const customProperty = `--wp-components-color-gray-${ key }` as const;
-		style[ customProperty ] = value;
-	} );
-
-	return style;
-};
+const getColorVariables = ( {
+	colors,
+}: ThemeOutputValues ): CSSProperties => ( {
+	'--wp-components-color-accent': colors.accent,
+	'--wp-components-color-accent-darker-10': colors.accentDarker10,
+	'--wp-components-color-accent-darker-20': colors.accentDarker20,
+	'--wp-components-color-accent-inverted': colors.accentInverted,
+	'--wp-components-color-background': colors.background,
+	'--wp-components-color-foreground': colors.foreground,
+	'--wp-components-color-foreground-inverted': colors.foregroundInverted,
+	...Object.fromEntries(
+		Object.entries( colors.gray ?? {} ).map( ( [ key, value ] ) => [
+			`--wp-components-color-gray-${ key }`,
+			value,
+		] )
+	),
+} );
 
 /**
  * `Theme` allows defining theme variables for components in the `@wordpress/components` package.
