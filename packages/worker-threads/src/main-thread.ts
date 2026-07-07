@@ -163,16 +163,20 @@ export function wrap< T extends object >( worker: Worker ): Remote< T > {
 
 				return new Promise( ( resolve, reject ) => {
 					state.pendingRejects.add( reject );
-					( value( ...args ) as Promise< unknown > ).then(
-						( result ) => {
-							state.pendingRejects.delete( reject );
-							resolve( result );
-						},
-						( error ) => {
-							state.pendingRejects.delete( reject );
-							reject( error );
-						}
-					);
+					// Wrap the call so a synchronous throw or a non-thenable
+					// return value still removes the rejecter from the set.
+					Promise.resolve()
+						.then( () => value( ...args ) )
+						.then(
+							( result ) => {
+								state.pendingRejects.delete( reject );
+								resolve( result );
+							},
+							( error ) => {
+								state.pendingRejects.delete( reject );
+								reject( error );
+							}
+						);
 				} );
 			};
 		},
