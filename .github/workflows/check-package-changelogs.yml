@@ -50,12 +50,12 @@ jobs:
                     - style-runtime
                     - ui
                     - views
+                    - widget-dashboard
+                    - widget-primitives
                     # Other packages
                     - theme
                     - components
                     - private-apis
-                    - widget-dashboard
-                    - widget-primitives
                     - wp-build
         steps:
             - name: 'Get PR commit count'
