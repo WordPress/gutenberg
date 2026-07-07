@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { link, more, wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import TabPanel from '..';
 
 const meta: Meta< typeof TabPanel > = {
@@ -22,9 +11,9 @@ const meta: Meta< typeof TabPanel > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'When building for the Gutenberg repo, use `Tabs` instead. Otherwise, continue using for now.',
+			notes: 'Use `Tabs` from `@wordpress/ui` instead.',
 		},
 	},
 	args: {

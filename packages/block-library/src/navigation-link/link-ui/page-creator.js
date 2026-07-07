@@ -103,7 +103,7 @@ export function LinkUIPageCreator( {
 
 				onPageCreated( pageLink );
 			}
-		} catch ( error ) {
+		} catch {
 			// Show error notice
 			createErrorNotice(
 				__( 'Failed to create page. Please try again.' ),
@@ -128,7 +128,6 @@ export function LinkUIPageCreator( {
 				<form onSubmit={ createPage }>
 					<VStack spacing={ 4 }>
 						<TextControl
-							__next40pxDefaultSize
 							label={ __( 'Title' ) }
 							onChange={ setTitle }
 							placeholder={ __( 'No title' ) }

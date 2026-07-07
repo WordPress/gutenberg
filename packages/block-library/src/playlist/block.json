@@ -10,9 +10,6 @@
 	"textdomain": "default",
 	"allowedBlocks": [ "core/playlist-track" ],
 	"attributes": {
-		"currentTrack": {
-			"type": "string"
-		},
 		"type": {
 			"type": "string",
 			"default": "audio"
@@ -37,13 +34,16 @@
 			"type": "boolean",
 			"default": true
 		},
+		"showTrackLength": {
+			"type": "boolean",
+			"default": true
+		},
 		"caption": {
 			"type": "string"
 		}
 	},
 	"providesContext": {
-		"showArtists": "showArtists",
-		"currentTrack": "currentTrack"
+		"showArtists": "showArtists"
 	},
 	"supports": {
 		"anchor": true,
@@ -58,12 +58,10 @@
 		},
 		"__experimentalBorder": {
 			"color": true,
-			"radius": true,
 			"style": true,
 			"width": true,
 			"__experimentalDefaultControls": {
 				"color": true,
-				"radius": true,
 				"style": true,
 				"width": true
 			}
@@ -74,6 +72,14 @@
 			"padding": true
 		}
 	},
+	"styles": [
+		{ "name": "bars", "label": "Bars", "isDefault": true },
+		{ "name": "mirror", "label": "Mirror" },
+		{ "name": "line", "label": "Line" },
+		{ "name": "blocks", "label": "Blocks" },
+		{ "name": "dots", "label": "Dots" },
+		{ "name": "seekbar", "label": "Seekbar" }
+	],
 	"editorStyle": "wp-block-playlist-editor",
 	"style": "wp-block-playlist"
 }

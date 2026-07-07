@@ -345,3 +345,291 @@ describe( 'useMergeRefs', () => {
 		] );
 	} );
 } );
+
+describe( 'useMergeRefs with cleanup-returning ref callbacks', () => {
+	// Setup
+	// =====
+	//
+	// Same structure as the suite above, but the ref callbacks return a
+	// cleanup function. React 19 (and `useMergeRefs`) invokes the cleanup at
+	// teardown instead of calling the callback with `null`. The cleanup pushes
+	// the string `'cleanup'` into the same history array, so each call site's
+	// full lifecycle is captured as `[ node, 'cleanup', newNode, 'cleanup' ]`.
+	// The strict invariant is that `null` never appears in the history of a
+	// cleanup-returning ref.
+
+	function renderCallback( args ) {
+		renderCallback.history.push( args );
+	}
+
+	renderCallback.history = [];
+
+	function MergedRefs( {
+		count,
+		tagName: TagName = 'ul',
+		disable1,
+		disable2,
+	} ) {
+		function refCallback1( value ) {
+			refCallback1.history.push( value );
+			return () => {
+				refCallback1.history.push( 'cleanup' );
+			};
+		}
+
+		refCallback1.history = [];
+
+		function refCallback2( value ) {
+			refCallback2.history.push( value );
+			return () => {
+				refCallback2.history.push( 'cleanup' );
+			};
+		}
+
+		refCallback2.history = [];
+
+		renderCallback( [ refCallback1.history, refCallback2.history ] );
+
+		const ref1 = useCallback( refCallback1, [] );
+		const ref2 = useCallback( refCallback2, [ count ] );
+		const mergedRefs = useMergeRefs( [
+			! disable1 && ref1,
+			! disable2 && ref2,
+		] );
+
+		return <TagName ref={ mergedRefs } />;
+	}
+
+	afterEach( () => {
+		renderCallback.history = [];
+	} );
+
+	it( 'should invoke cleanup on unmount instead of calling ref with null', () => {
+		const { unmount } = render( <MergedRefs /> );
+
+		const originalElement = screen.getByRole( 'list' );
+
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement ], [ originalElement ] ],
+		] );
+
+		unmount();
+
+		// Cleanups run; refs are NOT called with `null`.
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, 'cleanup' ],
+				[ originalElement, 'cleanup' ],
+			],
+		] );
+	} );
+
+	it( 'should invoke cleanup on node change instead of calling ref with null', () => {
+		const { rerender, unmount } = render( <MergedRefs /> );
+
+		const originalElement = screen.getByRole( 'list' );
+
+		rerender( <MergedRefs tagName="button" /> );
+
+		const newElement = screen.getByRole( 'button' );
+
+		// Node change triggers the outer callback first with `null` (which
+		// runs the cleanups) and then with the new node (which sets up new
+		// cleanups).
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, 'cleanup', newElement ],
+				[ originalElement, 'cleanup', newElement ],
+			],
+			[ [], [] ],
+		] );
+
+		unmount();
+
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, 'cleanup', newElement, 'cleanup' ],
+				[ originalElement, 'cleanup', newElement, 'cleanup' ],
+			],
+			[ [], [] ],
+		] );
+	} );
+
+	it( 'should invoke cleanup on dependency change instead of calling ref with null', () => {
+		const { rerender, unmount } = render( <MergedRefs count={ 1 } /> );
+
+		const originalElement = screen.getByRole( 'list' );
+
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement ], [ originalElement ] ],
+		] );
+
+		rerender( <MergedRefs count={ 2 } /> );
+
+		// Only ref2's deps changed. Its previous cleanup runs and the new ref
+		// callback is called with the still-attached node. ref1 is untouched.
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement ], [ originalElement, 'cleanup' ] ],
+			[ [], [ originalElement ] ],
+		] );
+
+		unmount();
+
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, 'cleanup' ],
+				[ originalElement, 'cleanup' ],
+			],
+			[ [], [ originalElement, 'cleanup' ] ],
+		] );
+	} );
+
+	it( 'should invoke cleanup on simultaneous node and dependency change', () => {
+		const { rerender, unmount } = render( <MergedRefs count={ 1 } /> );
+
+		const originalElement = screen.getByRole( 'list' );
+
+		rerender( <MergedRefs count={ 2 } tagName="button" /> );
+
+		const newElement = screen.getByRole( 'button' );
+
+		// Outer callback's null/new-node pair runs both cleanups and sets
+		// up the new ones (ref1 reused, ref2 has a new identity).
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, 'cleanup', newElement ],
+				[ originalElement, 'cleanup' ],
+			],
+			[ [], [ newElement ] ],
+		] );
+
+		unmount();
+
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, 'cleanup', newElement, 'cleanup' ],
+				[ originalElement, 'cleanup' ],
+			],
+			[ [], [ newElement, 'cleanup' ] ],
+		] );
+	} );
+
+	it( 'should invoke cleanup when a ref becomes disabled', () => {
+		const { rerender, unmount } = render( <MergedRefs /> );
+
+		const originalElement = screen.getByRole( 'list' );
+
+		rerender( <MergedRefs disable1 /> );
+
+		// ref1 is disabled: its stored cleanup must fire. ref2 is unchanged.
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement, 'cleanup' ], [ originalElement ] ],
+			[ [], [] ],
+		] );
+
+		unmount();
+
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, 'cleanup' ],
+				[ originalElement, 'cleanup' ],
+			],
+			[ [], [] ],
+		] );
+	} );
+
+	it( 'should support mixing a cleanup-returning ref with a void-returning ref', () => {
+		function MergedRefsMixed() {
+			function refCleanup( value ) {
+				refCleanup.history.push( value );
+				return () => {
+					refCleanup.history.push( 'cleanup' );
+				};
+			}
+
+			refCleanup.history = [];
+
+			function refVoid( value ) {
+				refVoid.history.push( value );
+			}
+
+			refVoid.history = [];
+
+			renderCallback( [ refCleanup.history, refVoid.history ] );
+
+			const r1 = useCallback( refCleanup, [] );
+			const r2 = useCallback( refVoid, [] );
+			const merged = useMergeRefs( [ r1, r2 ] );
+
+			return <ul ref={ merged } />;
+		}
+
+		const { unmount } = render( <MergedRefsMixed /> );
+
+		const el = screen.getByRole( 'list' );
+
+		expect( renderCallback.history ).toEqual( [ [ [ el ], [ el ] ] ] );
+
+		unmount();
+
+		// Cleanup ref sees the cleanup; void ref still sees null. Independent.
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ el, 'cleanup' ],
+				[ el, null ],
+			],
+		] );
+	} );
+
+	it( 'should support mixing an object ref with a cleanup-returning ref', () => {
+		const objectRef = { current: null };
+
+		function MergedRefsMixed( { tagName: TagName = 'ul' } ) {
+			function refCleanup( value ) {
+				refCleanup.history.push( value );
+				return () => {
+					refCleanup.history.push( 'cleanup' );
+				};
+			}
+
+			refCleanup.history = [];
+
+			renderCallback( [ refCleanup.history ] );
+
+			const r = useCallback( refCleanup, [] );
+			const merged = useMergeRefs( [ objectRef, r ] );
+
+			return <TagName ref={ merged } />;
+		}
+
+		const { rerender, unmount } = render( <MergedRefsMixed /> );
+
+		const originalElement = screen.getByRole( 'list' );
+
+		// Object ref's .current is set; cleanup ref is called with the node.
+		expect( objectRef.current ).toBe( originalElement );
+		expect( renderCallback.history ).toEqual( [ [ [ originalElement ] ] ] );
+
+		rerender( <MergedRefsMixed tagName="button" /> );
+
+		const newElement = screen.getByRole( 'button' );
+
+		// Node change: object ref retargets, callback ref's cleanup fires
+		// and the callback is re-invoked with the new node.
+		expect( objectRef.current ).toBe( newElement );
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement, 'cleanup', newElement ] ],
+			[ [] ],
+		] );
+
+		unmount();
+
+		// Object ref nulled via the fallback assignRef path; callback ref
+		// sees its cleanup, never null.
+		expect( objectRef.current ).toBe( null );
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement, 'cleanup', newElement, 'cleanup' ] ],
+			[ [] ],
+		] );
+	} );
+} );

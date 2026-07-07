@@ -46,7 +46,7 @@ Setting that enables the following UI tools:
 - background: backgroundImage, backgroundSize
 - border: color, radius, style, width
 - color: link, heading, button, caption
-- dimensions: aspectRatio, height, minHeight, width
+- dimensions: aspectRatio, height, minHeight, minWidth, width
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
@@ -61,6 +61,7 @@ Settings related to background.
 | -------- | ----------- | ---- | ------- |
 | backgroundImage | Allow users to set a background image. | `boolean` | `false` |
 | backgroundSize | Allow users to set values related to the size of a background image, including size, position, and repeat controls. | `boolean` | `false` |
+| gradient | Allow users to set a gradient background. | `boolean` | `false` |
 
 ---
 
@@ -113,6 +114,7 @@ Settings related to dimensions.
 | aspectRatios | Allow users to define aspect ratios for some blocks. | `[ { name, slug, ratio } ]` |  |
 | height | Allow users to set custom height. | `boolean` | `false` |
 | minHeight | Allow users to set custom minimum height. | `boolean` | `false` |
+| minWidth | Allow users to set custom minimum width. | `boolean` | `false` |
 | width | Allow users to set custom width. | `boolean` | `false` |
 | dimensionSizes | Dimension size presets for dimension block supports. | `[ { name, slug, size } ]` |  |
 
@@ -273,6 +275,7 @@ Dimensions styles.
 | aspectRatio | Sets the `aspect-ratio` CSS property. | `string`, `{ ref }` |
 | height | Sets the `height` CSS property. | `string`, `{ ref }` |
 | minHeight | Sets the `min-height` CSS property. | `string`, `{ ref }` |
+| minWidth | Sets the `min-width` CSS property. | `string`, `{ ref }` |
 | width | Sets the `width` CSS property. | `string`, `{ ref }` |
 
 ---
@@ -334,6 +337,7 @@ Typography styles.
 | textAlign | Sets the `text-align` CSS property. | `string`, `{ ref }` |
 | textColumns | Sets the `column-count` CSS property. | `string`, `{ ref }` |
 | textDecoration | Sets the `text-decoration` CSS property. | `string`, `{ ref }` |
+| textShadow | Sets the `text-shadow` CSS property. | `string`, `{ ref }` |
 | writingMode | Sets the `writing-mode` CSS property. | `string`, `{ ref }` |
 | textTransform | Sets the `text-transform` CSS property. | `string`, `{ ref }` |
 

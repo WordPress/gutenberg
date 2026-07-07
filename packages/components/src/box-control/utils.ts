@@ -13,7 +13,6 @@ import type {
 	CustomValueUnits,
 	Preset,
 } from './types';
-import deprecated from '@wordpress/deprecated';
 
 export const CUSTOM_VALUE_SETTINGS: CustomValueUnits = {
 	px: { max: 300, step: 1 },
@@ -161,24 +160,6 @@ export function isValuesDefined( values?: BoxControlValue ) {
 }
 
 /**
- * Get initial selected side, factoring in whether the sides are linked,
- * and whether the vertical / horizontal directions are grouped via splitOnAxis.
- *
- * @param isLinked    Whether the box control's fields are linked.
- * @param splitOnAxis Whether splitting by horizontal or vertical axis.
- * @return The initial side.
- */
-export function getInitialSide( isLinked: boolean, splitOnAxis: boolean ) {
-	let initialSide: keyof typeof LABELS = 'all';
-
-	if ( ! isLinked ) {
-		initialSide = splitOnAxis ? 'vertical' : 'top';
-	}
-
-	return initialSide;
-}
-
-/**
  * Normalizes provided sides configuration to an array containing only top,
  * right, bottom and left. This essentially just maps `horizontal` or `vertical`
  * to their appropriate sides to facilitate correctly determining value for
@@ -204,48 +185,6 @@ export function normalizeSides( sides: BoxControlProps[ 'sides' ] ) {
 	}
 
 	return filteredSides;
-}
-
-/**
- * Applies a value to an object representing top, right, bottom and left sides
- * while taking into account any custom side configuration.
- *
- * @deprecated
- *
- * @param currentValues The current values for each side.
- * @param newValue      The value to apply to the sides object.
- * @param sides         Array defining valid sides.
- *
- * @return Object containing the updated values for each side.
- */
-export function applyValueToSides(
-	currentValues: BoxControlValue,
-	newValue?: string,
-	sides?: BoxControlProps[ 'sides' ]
-): BoxControlValue {
-	deprecated( 'applyValueToSides', {
-		since: '6.8',
-		version: '7.0',
-	} );
-	const newValues = { ...currentValues };
-
-	if ( sides?.length ) {
-		sides.forEach( ( side ) => {
-			if ( side === 'vertical' ) {
-				newValues.top = newValue;
-				newValues.bottom = newValue;
-			} else if ( side === 'horizontal' ) {
-				newValues.left = newValue;
-				newValues.right = newValue;
-			} else {
-				newValues[ side ] = newValue;
-			}
-		} );
-	} else {
-		ALL_SIDES.forEach( ( side ) => ( newValues[ side ] = newValue ) );
-	}
-
-	return newValues;
 }
 
 /**

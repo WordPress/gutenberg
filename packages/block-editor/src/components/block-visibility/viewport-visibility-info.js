@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import {
-	Icon,
-	__experimentalText as Text,
+	Icon as WCIcon,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -17,14 +17,15 @@ import { unseen } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import useBlockVisibility from './use-block-visibility';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { deviceTypeKey } from '../../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 const DEFAULT_VISIBILITY_STATE = {
 	currentBlockVisibility: undefined,
 	hasParentHiddenEverywhere: false,
-	selectedDeviceType: BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
+	selectedDeviceType: BLOCK_VISIBILITY_VIEWPORTS.desktop.key,
 };
 
 export default function ViewportVisibilityInfo( { clientId } ) {
@@ -48,7 +49,7 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 					getBlockAttributes( clientId )?.metadata?.blockVisibility,
 				selectedDeviceType:
 					getSettings()?.[ deviceTypeKey ]?.toLowerCase() ||
-					BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
+					BLOCK_VISIBILITY_VIEWPORTS.desktop.key,
 				hasParentHiddenEverywhere:
 					isBlockParentHiddenEverywhere( clientId ),
 			};
@@ -56,10 +57,16 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 		[ clientId ]
 	);
 
-	// Use hook to get current viewport and if block is currently hidden (accurate viewport detection)
+	// Get the block's DOM element to derive the canvas iframe window,
+	// so viewport detection matches the actual block rendering context.
+	const blockElement = useBlockElement( clientId );
+	const rawCanvasView = blockElement?.ownerDocument?.defaultView;
+	const canvasView = rawCanvasView === null ? undefined : rawCanvasView;
+
 	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
 		blockVisibility: currentBlockVisibility,
 		deviceType: selectedDeviceType,
+		view: canvasView,
 	} );
 
 	/*
@@ -121,11 +128,11 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 	}
 
 	return (
-		<Badge className="block-editor-block-visibility-info">
+		<WCBadge className="block-editor-block-visibility-info">
 			<HStack spacing={ 2 } justify="start">
-				<Icon icon={ unseen } />
-				<Text>{ label }</Text>
+				<WCIcon icon={ unseen } />
+				<WCText>{ label }</WCText>
 			</HStack>
-		</Badge>
+		</WCBadge>
 	);
 }

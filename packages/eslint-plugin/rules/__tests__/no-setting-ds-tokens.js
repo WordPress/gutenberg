@@ -2,10 +2,12 @@ import { RuleTester } from 'eslint';
 import rule from '../no-setting-ds-tokens';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 6,
-		ecmaFeatures: {
-			jsx: true,
+		parserOptions: {
+			ecmaFeatures: {
+				jsx: true,
+			},
 		},
 	},
 } );
@@ -16,7 +18,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			code: `<div style={ { '--my-custom-prop': 'value' } } />`,
 		},
 		{
-			code: `<div style={ { color: 'var(--wpds-color-fg-content-neutral)' } } />`,
+			code: `<div style={ { color: 'var(--wpds-color-foreground-content-neutral)' } } />`,
 		},
 		{
 			code: `<div style={ { '--other-prefix-token': '10px' } } />`,
@@ -28,15 +30,27 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			code: `const styles = { '--my-custom-prop': 'value' };`,
 		},
 		{
-			code: `const styles = { color: 'var(--wpds-color-fg-content-neutral)' };`,
+			code: `const styles = { color: 'var(--wpds-color-foreground-content-neutral)' };`,
 		},
 		{
-			code: `const { '--wpds-color-fg-content-neutral': neutralColor } = styles;`,
+			code: `const { '--wpds-color-foreground-content-neutral': neutralColor } = styles;`,
+		},
+		{
+			code: `const css = '--my-custom-prop: red;';`,
+		},
+		{
+			code: 'const css = `--my-custom-prop-${ suffix }: red;`;',
+		},
+		{
+			code: 'const css = `--my-custom-prop: red;`;',
+		},
+		{
+			code: '<style>{ `--my-custom-prop-${ suffix }: red;` }</style>',
 		},
 	],
 	invalid: [
 		{
-			code: `<div style={ { '--wpds-color-fg-content-neutral': 'red' } } />`,
+			code: `<div style={ { '--wpds-color-foreground-content-neutral': 'red' } } />`,
 			errors: [
 				{
 					messageId: 'disallowedSet',
@@ -44,7 +58,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			],
 		},
 		{
-			code: `<div style={ { '--wpds-font-size-md': '10px', color: 'blue' } } />`,
+			code: `<div style={ { '--wpds-typography-font-size-md': '10px', color: 'blue' } } />`,
 			errors: [
 				{
 					messageId: 'disallowedSet',
@@ -52,7 +66,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			],
 		},
 		{
-			code: `const styles = { '--wpds-color-fg-content-neutral': 'red' };`,
+			code: `const styles = { '--wpds-color-foreground-content-neutral': 'red' };`,
 			errors: [
 				{
 					messageId: 'disallowedSet',
@@ -60,7 +74,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			],
 		},
 		{
-			code: `function getStyles() { return { '--wpds-font-size-md': '10px' }; }`,
+			code: `function getStyles() { return { '--wpds-typography-font-size-md': '10px' }; }`,
 			errors: [
 				{
 					messageId: 'disallowedSet',
@@ -68,7 +82,47 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			],
 		},
 		{
-			code: `const config = { inner: { '--wpds-color-fg-content-neutral': 'red' } };`,
+			code: `const config = { inner: { '--wpds-color-foreground-content-neutral': 'red' } };`,
+			errors: [
+				{
+					messageId: 'disallowedSet',
+				},
+			],
+		},
+		{
+			code: `const css = '--wpds-color-foreground-content-neutral: red;';`,
+			errors: [
+				{
+					messageId: 'disallowedSet',
+				},
+			],
+		},
+		{
+			code: 'const css = `--wpds-color-foreground-content-neutral: red;`;',
+			errors: [
+				{
+					messageId: 'disallowedSet',
+				},
+			],
+		},
+		{
+			code: 'const css = `--wpds-color-foreground-content-neutral: ${ value };`;',
+			errors: [
+				{
+					messageId: 'disallowedSet',
+				},
+			],
+		},
+		{
+			code: 'const css = `--wpds-color-${ suffix }: red;`;',
+			errors: [
+				{
+					messageId: 'disallowedSet',
+				},
+			],
+		},
+		{
+			code: '<style>{ `--wpds-color-${ suffix }: red;` }</style>',
 			errors: [
 				{
 					messageId: 'disallowedSet',

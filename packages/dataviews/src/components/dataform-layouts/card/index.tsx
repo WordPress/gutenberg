@@ -5,14 +5,10 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
-	useId,
 	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
-// TODO: enable in the ESlint rule once we complete
-// https://github.com/WordPress/gutenberg/issues/76135.
-// eslint-disable-next-line @wordpress/use-recommended-components
 import { Card, CollapsibleCard, Stack } from '@wordpress/ui';
 
 /**
@@ -87,7 +83,6 @@ function isSummaryFieldVisible< Item >(
 function HeaderContent< Item >( {
 	data,
 	fields,
-	descriptionId,
 	label,
 	layout,
 	isOpen,
@@ -96,7 +91,6 @@ function HeaderContent< Item >( {
 }: {
 	data: Item;
 	fields: NormalizedField< Item >[];
-	descriptionId: string;
 	label: string | undefined;
 	layout: NormalizedCardLayout;
 	isOpen: boolean;
@@ -120,11 +114,7 @@ function HeaderContent< Item >( {
 		>
 			<Card.Title>{ label }</Card.Title>
 			{ ( hasBadge || hasSummary ) && (
-				<div
-					id={ descriptionId }
-					aria-hidden="true"
-					className="dataforms-layouts-card__field-header-content-description"
-				>
+				<CollapsibleCard.HeaderDescription className="dataforms-layouts-card__field-header-content-description">
 					{ hasBadge && <ValidationBadge validity={ validity } /> }
 					{ hasSummary && (
 						<div className="dataforms-layouts-card__field-summary">
@@ -137,7 +127,7 @@ function HeaderContent< Item >( {
 							) ) }
 						</div>
 					) }
-				</div>
+				</CollapsibleCard.HeaderDescription>
 			) }
 		</Stack>
 	);
@@ -208,7 +198,6 @@ export default function FormCardField< Item >( {
 	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedCardLayout;
 	const contentRef = useRef< HTMLDivElement >( null );
-	const descriptionId = useId();
 
 	const form: NormalizedForm = useMemo(
 		() => ( {
@@ -284,7 +273,6 @@ export default function FormCardField< Item >( {
 		<HeaderContent
 			data={ data }
 			fields={ fields }
-			descriptionId={ descriptionId }
 			label={ label }
 			layout={ layout }
 			isOpen={ isCollapsible ? !! isOpen : true }
@@ -300,7 +288,7 @@ export default function FormCardField< Item >( {
 				open={ isOpen }
 				onOpenChange={ handleOpenChange }
 			>
-				<CollapsibleCard.Header aria-describedby={ descriptionId }>
+				<CollapsibleCard.Header>
 					{ headerContent }
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content

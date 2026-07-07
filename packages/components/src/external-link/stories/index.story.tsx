@@ -21,8 +21,9 @@ const meta: Meta< typeof ExternalLink > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'not-recommended',
 			whereUsed: 'global',
+			notes: 'Use `Link` from `@wordpress/ui` instead, with the `openInNewTab` prop set.',
 		},
 	},
 };

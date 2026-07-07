@@ -113,6 +113,7 @@ export const AddNavigationModal = ( {
 							onClick={ closeModal }
 							disabled={ isBusy }
 							accessibleWhenDisabled
+							__next40pxDefaultSize
 						>
 							{ __( 'Cancel' ) }
 						</Button>
@@ -122,6 +123,7 @@ export const AddNavigationModal = ( {
 							aria-busy={ isBusy }
 							disabled={ isBusy || ! menuTitle?.trim() }
 							accessibleWhenDisabled
+							__next40pxDefaultSize
 						>
 							{ __( 'Create Menu' ) }
 						</Button>

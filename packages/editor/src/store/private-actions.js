@@ -16,6 +16,12 @@ import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
  * Internal dependencies
  */
 import isTemplateRevertable from './utils/is-template-revertable';
+import { buildRevisionsPageQuery } from './private-selectors';
+import {
+	getDeviceTypeByCanvasWidth,
+	VIEWPORT_STATE_BY_DEVICE_TYPE,
+} from '../utils/device-type';
+import { unlock } from '../lock-unlock';
 export * from '../dataviews/store/private-actions';
 
 /**
@@ -203,9 +209,13 @@ export const saveDirtyEntities =
 		registry
 			.dispatch( blockEditorStore )
 			.__unstableMarkLastChangeAsPersistent();
+
 		Promise.all( pendingSavedRecords )
-			.then( ( values ) => {
-				return onSave ? onSave( values ) : values;
+			.then( async ( values ) => {
+				if ( onSave ) {
+					await onSave();
+				}
+				return values;
 			} )
 			.then( ( values ) => {
 				if (
@@ -576,15 +586,30 @@ export function resetStylesNavigation() {
 }
 
 /**
- * Set the minimum height of the canvas.
+ * Set the width of the canvas.
  *
- * @param {number} minHeight
- * @return {Object} Action object.
+ * @param {number} width The width of the canvas in pixels.
  */
-export function setCanvasMinHeight( minHeight ) {
-	return {
-		type: 'SET_CANVAS_MIN_HEIGHT',
-		minHeight,
+export function setCanvasWidth( width ) {
+	return ( { dispatch, registry } ) => {
+		dispatch( {
+			type: 'SET_CANVAS_WIDTH',
+			width,
+		} );
+
+		// While Responsive editing is enabled, the canvas width also drives the
+		// viewport style state, whether changed via the device preview or by
+		// manually resizing the canvas.
+		if (
+			unlock( registry.select( blockEditorStore ) ).isResponsiveEditing()
+		) {
+			const deviceType = getDeviceTypeByCanvasWidth( width );
+			unlock(
+				registry.dispatch( blockEditorStore )
+			).setStyleStateViewport(
+				VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
+			);
+		}
 	};
 }
 
@@ -601,6 +626,39 @@ export function setCurrentRevisionId( revisionId ) {
 		revisionId,
 	};
 }
+
+/**
+ * Set the current revisions page number and select the newest
+ * revision on that page once it loads.
+ *
+ * @param {number} page The page number.
+ */
+export const setRevisionPage =
+	( page ) =>
+	async ( { dispatch, select, registry } ) => {
+		const postType = select.getCurrentPostType();
+		const postId = select.getCurrentPostId();
+		const entityConfig = registry
+			.select( coreStore )
+			.getEntityConfig( 'postType', postType );
+		const revisionKey = entityConfig?.revisionKey || 'id';
+
+		const revisions = await registry
+			.resolveSelect( coreStore )
+			.getRevisions(
+				'postType',
+				postType,
+				postId,
+				buildRevisionsPageQuery( revisionKey, page )
+			);
+
+		registry.batch( () => {
+			dispatch( { type: 'SET_REVISION_PAGE', page } );
+			if ( revisions?.length ) {
+				dispatch.setCurrentRevisionId( revisions[ 0 ][ revisionKey ] );
+			}
+		} );
+	};
 
 /**
  * Set whether the revision diff highlighting is shown.
@@ -688,12 +746,7 @@ export const restoreRevision =
 			sprintf(
 				/* translators: %s: Date and time of the revision. */
 				__( 'Restored to revision from %s.' ),
-				dateI18n(
-					getDateSettings().formats.datetime,
-					// Template revisions use the template REST API format, which
-					// exposes 'modified' instead of 'date'.
-					revisionKey === 'wp_id' ? revision.modified : revision.date
-				)
+				dateI18n( getDateSettings().formats.datetime, revision.date )
 			),
 			{
 				type: 'snackbar',

@@ -9,7 +9,7 @@ const ruleName = 'plugin-wpds/no-token-fallback-values';
 
 /**
  * Matches `var(--wpds-<name>,` — the comma signals a fallback value.
- * Captures the token name (e.g. `--wpds-color-fg-content-neutral`).
+ * Captures the token name (e.g. `--wpds-color-foreground-content-neutral`).
  */
 const varWithFallbackRegex = /var\(\s*(--wpds-[\w-]+)\s*,/g;
 

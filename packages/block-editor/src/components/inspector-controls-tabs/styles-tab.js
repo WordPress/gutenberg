@@ -3,23 +3,33 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockStyles from '../block-styles';
 import InspectorControls from '../inspector-controls';
+import PositionControls from './position-controls-panel';
 import { useBorderPanelLabel } from '../../hooks/border';
 import { useBlockSettings } from '../../hooks/utils';
 import { store as blockEditorStore } from '../../store';
-import { ColorEdit } from '../../hooks/color';
+import { ElementsEdit } from '../../hooks/elements';
+import { TypographyPanel } from '../../hooks/typography';
+import { BackgroundImagePanel } from '../../hooks/background';
 import { ColorToolsPanel } from '../global-styles/color-panel';
+import { TypographyToolsPanel } from '../global-styles/typography-panel';
+import { BackgroundToolsPanel } from '../global-styles/background-panel';
 
-function SectionBlockColorControls( {
-	blockName,
-	clientId,
-	contentClientIds,
-} ) {
+// Section blocks present a curated subset of the normal block style panels.
+// Their block-support fills are gated off by editing mode (see
+// `BlockStyleControls` in hooks/style.js), so each panel is direct-rendered
+// here rather than via the inspector slots, with settings restricted to the
+// supports a section should expose:
+// - Typography: text color only (font controls disabled).
+// - Background: color + gradient only (image controls disabled).
+// - Elements: link/heading/button/caption colors (unchanged).
+function SectionStyleControls( { blockName, clientId, contentClientIds } ) {
 	const settings = useBlockSettings( blockName );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
@@ -41,21 +51,51 @@ function SectionBlockColorControls( {
 		updateBlockAttributes( clientId, newAttributes );
 	};
 
+	const typographySettings = useMemo(
+		() => ( { ...settings, typography: {} } ),
+		[ settings ]
+	);
+	const backgroundSettings = useMemo(
+		() => ( {
+			...settings,
+			background: {
+				...settings.background,
+				backgroundImage: false,
+				backgroundSize: false,
+			},
+		} ),
+		[ settings ]
+	);
+
 	return (
-		<ColorEdit
-			clientId={ clientId }
-			name={ blockName }
-			settings={ settings }
-			setAttributes={ setAttributes }
-			asWrapper={ ColorToolsPanel }
-			label={ __( 'Color' ) }
-			defaultControls={ {
-				text: true,
-				background: true,
-				button: hasButtons,
-				heading: hasHeading,
-			} }
-		/>
+		<>
+			<TypographyPanel
+				clientId={ clientId }
+				name={ blockName }
+				settings={ typographySettings }
+				setAttributes={ setAttributes }
+				asWrapper={ TypographyToolsPanel }
+			/>
+			<BackgroundImagePanel
+				clientId={ clientId }
+				name={ blockName }
+				settings={ backgroundSettings }
+				setAttributes={ setAttributes }
+				asWrapper={ BackgroundToolsPanel }
+			/>
+			<ElementsEdit
+				clientId={ clientId }
+				name={ blockName }
+				settings={ settings }
+				setAttributes={ setAttributes }
+				asWrapper={ ColorToolsPanel }
+				label={ __( 'Elements' ) }
+				defaultControls={ {
+					button: hasButtons,
+					heading: hasHeading,
+				} }
+			/>
+		</>
 	);
 }
 
@@ -71,15 +111,25 @@ const StylesTab = ( {
 	return (
 		<>
 			{ hasBlockStyles && <BlockStyles clientId={ clientId } /> }
-			{ isSectionBlock && (
-				<SectionBlockColorControls
+			{ isSectionBlock && blockName !== 'core/template-part' && (
+				<SectionStyleControls
 					blockName={ blockName }
 					clientId={ clientId }
 					contentClientIds={ contentClientIds }
 				/>
 			) }
-			{ ! isSectionBlock && (
+			{
+				// Extenders have in the past always been allowed to add controls to group
+				// the restrictions are lessened for that block. Template parts are
+				// excluded from the curated section controls above and fall through
+				// to the full panel set here.
+			 }
+			{ ( ! isSectionBlock || blockName === 'core/template-part' ) && (
 				<>
+					<InspectorControls.Slot
+						group="typography"
+						label={ __( 'Typography' ) }
+					/>
 					<InspectorControls.Slot
 						group="color"
 						label={ __( 'Color' ) }
@@ -87,12 +137,13 @@ const StylesTab = ( {
 					/>
 					<InspectorControls.Slot
 						group="background"
-						label={ __( 'Background image' ) }
+						label={ __( 'Background' ) }
+						className="background-block-support-panel__inner-wrapper"
 					/>
 					<InspectorControls.Slot group="filter" />
 					<InspectorControls.Slot
-						group="typography"
-						label={ __( 'Typography' ) }
+						group="layout"
+						label={ __( 'Layout' ) }
 					/>
 					<InspectorControls.Slot
 						group="dimensions"
@@ -102,6 +153,12 @@ const StylesTab = ( {
 						group="border"
 						label={ borderPanelLabel }
 					/>
+					<InspectorControls.Slot
+						group="elements"
+						label={ __( 'Elements' ) }
+						className="elements-block-support-panel__inner-wrapper"
+					/>
+					<PositionControls />
 					<InspectorControls.Slot group="styles" />
 				</>
 			) }

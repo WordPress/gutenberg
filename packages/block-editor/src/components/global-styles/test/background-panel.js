@@ -2,7 +2,12 @@
  * Internal dependencies
  */
 
-import { hasBackgroundImageValue } from '../background-panel';
+import {
+	hasBackgroundImageValue,
+	hasBackgroundGradientValue,
+	hasBackgroundColorValue,
+	hasLegacyColorGradientValue,
+} from '../background-panel';
 
 describe( 'hasBackgroundImageValue', () => {
 	it( 'should return `true` when id and url exist', () => {
@@ -33,6 +38,100 @@ describe( 'hasBackgroundImageValue', () => {
 		expect(
 			hasBackgroundImageValue( {
 				background: { backgroundImage: {} },
+			} )
+		).toBe( false );
+	} );
+} );
+
+describe( 'hasBackgroundGradientValue', () => {
+	it( 'should return `true` when a gradient string is set', () => {
+		expect(
+			hasBackgroundGradientValue( {
+				background: {
+					gradient: 'linear-gradient(135deg, red 0%, blue 100%)',
+				},
+			} )
+		).toBe( true );
+	} );
+
+	it( 'should return `true` for a preset slug reference', () => {
+		expect(
+			hasBackgroundGradientValue( {
+				background: { gradient: 'var:preset|gradient|vivid-cyan-blue' },
+			} )
+		).toBe( true );
+	} );
+
+	it( 'should return `false` when gradient is undefined', () => {
+		expect( hasBackgroundGradientValue( { background: {} } ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'should return `false` when gradient is an empty string', () => {
+		expect(
+			hasBackgroundGradientValue( { background: { gradient: '' } } )
+		).toBe( false );
+	} );
+
+	it( 'should return `false` when background is undefined', () => {
+		expect( hasBackgroundGradientValue( {} ) ).toBe( false );
+	} );
+
+	it( 'should return `false` when style is undefined', () => {
+		expect( hasBackgroundGradientValue( undefined ) ).toBe( false );
+	} );
+} );
+
+describe( 'hasBackgroundColorValue', () => {
+	it( 'should return `true` when a background color string is set', () => {
+		expect(
+			hasBackgroundColorValue( { color: { background: '#ff0000' } } )
+		).toBe( true );
+	} );
+
+	it( 'should return `true` for a preset slug reference', () => {
+		expect(
+			hasBackgroundColorValue( {
+				color: { background: 'var:preset|color|vivid-red' },
+			} )
+		).toBe( true );
+	} );
+
+	it( 'should return `false` when background color is undefined', () => {
+		expect( hasBackgroundColorValue( { color: {} } ) ).toBe( false );
+	} );
+
+	it( 'should return `false` when color is undefined', () => {
+		expect( hasBackgroundColorValue( {} ) ).toBe( false );
+	} );
+
+	it( 'should return `false` when style is undefined', () => {
+		expect( hasBackgroundColorValue( undefined ) ).toBe( false );
+	} );
+} );
+
+describe( 'hasLegacyColorGradientValue', () => {
+	it( 'should return `true` when a legacy color.gradient string is set', () => {
+		expect(
+			hasLegacyColorGradientValue( {
+				color: { gradient: 'linear-gradient(135deg, red, blue)' },
+			} )
+		).toBe( true );
+	} );
+
+	it( 'should return `false` when color.gradient is undefined', () => {
+		expect( hasLegacyColorGradientValue( { color: {} } ) ).toBe( false );
+	} );
+
+	it( 'should return `false` when style is undefined', () => {
+		expect( hasLegacyColorGradientValue( undefined ) ).toBe( false );
+	} );
+
+	it( 'should not be confused by background.gradient', () => {
+		expect(
+			hasLegacyColorGradientValue( {
+				background: { gradient: 'linear-gradient(red, blue)' },
 			} )
 		).toBe( false );
 	} );

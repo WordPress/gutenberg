@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { timeToRead as icon } from '@wordpress/icons';
+import { time as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies

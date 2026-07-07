@@ -31,6 +31,7 @@ import { store as uploadStore } from '@wordpress/upload-media';
  * Internal dependencies
  */
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import { getCarriedGifConversionAttributes } from '../utils/gif-conversion-attributes';
 import Image from './image';
 import { isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
@@ -142,8 +143,6 @@ export function ImageEdit( {
 			setAttributes( {
 				width: undefined,
 				height: undefined,
-				aspectRatio: undefined,
-				scale: undefined,
 			} );
 		}
 	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
@@ -236,6 +235,57 @@ export function ImageEdit( {
 
 		if ( isBlobURL( media.url ) ) {
 			setTemporaryURL( media.url );
+			return;
+		}
+
+		// Switch to a converted GIF video block when the selected media is
+		// an animated GIF whose sideloaded video companion is available.
+		// Triggering off the upload's onChange (rather than watching the
+		// attachment record) means already-saved image blocks are left
+		// alone on page load - the explicit "Display as video" toolbar
+		// button is the path for converting those. `animated_video` is
+		// only ever set on GIF image attachments, so its presence is a
+		// sufficient signal that this swap applies.
+		//
+		// A gallery only accepts `core/image` children, so the swap is
+		// skipped there; the converted video is still sideloaded and
+		// stored for use elsewhere.
+		const rootClientId = getBlockRootClientId( clientId );
+		const isInGallery =
+			!! rootClientId && getBlockName( rootClientId ) === 'core/gallery';
+		if (
+			! isInGallery &&
+			media.media_details?.animated_video &&
+			media.url
+		) {
+			const dir = media.url.slice( 0, media.url.lastIndexOf( '/' ) + 1 );
+			const poster = media.media_details.animated_video_poster;
+			__unstableMarkNextChangeAsNotPersistent();
+			replaceBlock(
+				clientId,
+				createBlock( 'core/video', {
+					...getCarriedGifConversionAttributes( attributes ),
+					id: media.id,
+					src: dir + media.media_details.animated_video,
+					poster: poster ? dir + poster : undefined,
+					caption: media.caption?.raw ?? media.caption,
+					controls: false,
+					loop: true,
+					autoplay: true,
+					muted: true,
+					playsInline: true,
+					/*
+					 * Carry the GIF's intrinsic dimensions so the <video> keeps
+					 * its aspect ratio from the first paint. Without them the
+					 * element collapses to the browser-default size and then
+					 * jumps once the poster/metadata load, which shows up as a
+					 * brief duplicated image during the swap.
+					 */
+					width: media.media_details.width,
+					height: media.media_details.height,
+				} )
+			);
+			setTemporaryURL();
 			return;
 		}
 
@@ -355,7 +405,11 @@ export function ImageEdit( {
 
 	const isSideloading = useSelect(
 		( select ) => {
-			if ( ! window.__clientSideMediaProcessing || ! id ) {
+			if (
+				( ! window.__clientSideMediaProcessing &&
+					! window.__heicUploadSupport ) ||
+				! id
+			) {
 				return false;
 			}
 			return select( uploadStore ).isUploadingById( id );
@@ -420,6 +474,11 @@ export function ImageEdit( {
 		},
 		[ context, isSingleSelected, metadata?.bindings?.url ]
 	);
+	// `height: 'auto'` is not a pinned dimension (it lets the height follow the
+	// aspect ratio, e.g. for an image pasted with both width and height). Treat
+	// it as absent so the placeholder box keeps its aspect ratio and pinned
+	// width instead of collapsing to a 100%×100% fill.
+	const pinnedHeight = height === 'auto' ? undefined : height;
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
@@ -442,11 +501,11 @@ export function ImageEdit( {
 				}
 				style={ {
 					aspectRatio:
-						! ( width && height ) && aspectRatio
+						! ( width && pinnedHeight ) && aspectRatio
 							? aspectRatio
 							: undefined,
-					width: height && aspectRatio ? '100%' : width,
-					height: width && aspectRatio ? '100%' : height,
+					width: pinnedHeight && aspectRatio ? '100%' : width,
+					height: width && aspectRatio ? '100%' : pinnedHeight,
 					objectFit: scale,
 					...borderProps.style,
 					...shadowProps.style,

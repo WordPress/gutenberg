@@ -15,7 +15,6 @@
 # Blocks
 /packages/block-library                         @ajitbohra @fabiankaegy
 /packages/block-library/src/gallery
-/packages/block-library/src/table-of-contents   @ZebulanStanphill
 
 # Duotone
 /lib/block-supports/duotone.php									@sgomes
@@ -46,6 +45,7 @@
 /packages/edit-widgets                          @draganescu @adamziel @kevin940726
 /packages/customize-widgets
 /packages/widgets
+/packages/widget-primitives                     @retrofox
 
 # Full Site Editing
 /packages/edit-site
@@ -54,14 +54,13 @@
 /packages/interactivity                         @luisherranz @darerodz
 
 # Tooling
-/bin                                            @ntwb @nerrad @ajitbohra
-/bin/api-docs                                   @ntwb @nerrad @ajitbohra
-/docs/tool                                      @ajitbohra
+/bin                                            @ntwb @nerrad @ajitbohra @manzoorwanijk
+/tools                                          @manzoorwanijk
 /packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @ntwb @nerrad @ajitbohra
 /packages/browserslist-config                   @ntwb @nerrad @ajitbohra
-/packages/create-block                          @gziolo @ryanwelcher
+/packages/create-block                          @ryanwelcher
 /packages/create-block-tutorial-template        @ryanwelcher
 /packages/dependency-extraction-webpack-plugin
 /packages/docgen
@@ -74,13 +73,14 @@
 /packages/npm-package-json-lint-config          @ntwb @nerrad @ajitbohra
 /packages/postcss-themes                        @ntwb @nerrad @ajitbohra
 /packages/prettier-config                       @ntwb
-/packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
+/packages/scripts                               @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
 /test/php/gutenberg-coding-standards            @anton-vlasenko
 
 # UI Components
 /packages/components                            @ajitbohra @WordPress/gutenberg-components
 /packages/compose                               @ajitbohra
+/packages/design-system-mcp                     @WordPress/gutenberg-components
 /packages/element                               @ajitbohra
 /packages/notices                               @ajitbohra
 /packages/nux                                   @ajitbohra @peterwilsoncc
@@ -91,6 +91,8 @@
 /packages/dataviews                             @oandregal @gigitux @ntsekouras
 /packages/theme                                 @WordPress/gutenberg-components
 /packages/ui                                    @WordPress/gutenberg-components
+/packages/widget-dashboard                      @retrofox
+/packages/grid                                  @retrofox
 
 # Utilities
 /packages/a11y
@@ -127,7 +129,11 @@
 /packages/report-flaky-tests                    @kevin940726
 
 # wp-env
-/packages/env                                   @ObliviousHarmony @t-hamano
+/packages/env                                   @t-hamano
+
+# Widget Dashboard
+/routes/dashboard                               @retrofox
+/lib/experimental/dashboard-widgets             @retrofox
 
 # PHP
 /lib                                            @spacedmonkey
@@ -137,11 +143,3 @@
 /lib/experimental/rest-api.php                  @timothybjacobs
 /lib/experimental/class-wp-rest-*               @timothybjacobs
 /lib/experimental/class-wp-rest-block-editor-settings-controller.php @timothybjacobs @spacedmonkey
-
-# Native (Unowned)
-*.native.js
-*.android.js
-*.ios.js
-*.native.scss
-*.android.scss
-*.ios.scss

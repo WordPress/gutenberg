@@ -3,7 +3,7 @@
  */
 import {
 	privateApis as coreDataPrivateApis,
-	SelectionType,
+	type CoreDataPrivateApis,
 	type PostEditorAwarenessState as ActiveCollaborator,
 } from '@wordpress/core-data';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -18,6 +18,10 @@ import { useDebouncedRecompute } from './use-debounced-recompute';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
+const { SelectionType } = unlock( coreDataPrivateApis ) as Pick<
+	CoreDataPrivateApis,
+	'SelectionType'
+>;
 
 export interface BlockHighlightData {
 	blockId: string;

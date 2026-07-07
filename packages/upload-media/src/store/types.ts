@@ -1,3 +1,23 @@
+/**
+ * Sub-size data returned by the sideload endpoint.
+ *
+ * Each sideload returns this lightweight object instead of a full attachment.
+ * The client accumulates these and sends them all to the finalize endpoint.
+ */
+export interface SubSizeData {
+	/**
+	 * Size name, or an array of names when the same sideloaded file is
+	 * registered under multiple sizes that share identical dimensions.
+	 */
+	image_size: string | string[];
+	width?: number;
+	height?: number;
+	file: string;
+	mime_type?: string;
+	filesize?: number;
+	original_image?: string;
+}
+
 export type QueueItemId = string;
 
 export type QueueStatus = 'active' | 'paused';
@@ -8,6 +28,15 @@ export interface QueueItem {
 	id: QueueItemId;
 	sourceFile: File;
 	file: File;
+	// Original HEIC/HEIF file, kept separately so it can be sideloaded
+	// as the attachment's "original_image" after the converted JPEG is
+	// uploaded. Not set for non-HEIC items.
+	originalHeicFile?: File;
+	// Original animated GIF, kept separately so it can be transcoded to a
+	// video and sideloaded as a companion file of the GIF image attachment
+	// (recorded in attachment metadata as `animated_video`). Not set for
+	// non-animated-GIF items.
+	animatedGifFile?: File;
 	poster?: File;
 	attachment?: Partial< Attachment >;
 	status: ItemStatus;
@@ -20,12 +49,14 @@ export interface QueueItem {
 	operations?: Operation[];
 	error?: Error;
 	retryCount?: number;
+	nextRetryTimestamp?: number;
 	progress?: number;
 	batchId?: string;
 	sourceUrl?: string;
 	sourceAttachmentId?: number;
 	abortController?: AbortController;
 	parentId?: QueueItemId;
+	subSizes?: SubSizeData[];
 }
 
 export interface State {
@@ -42,6 +73,7 @@ export enum Type {
 	Cancel = 'CANCEL_ITEM',
 	Remove = 'REMOVE_ITEM',
 	RetryItem = 'RETRY_ITEM',
+	ScheduleRetry = 'SCHEDULE_RETRY',
 	PauseItem = 'PAUSE_ITEM',
 	ResumeItem = 'RESUME_ITEM',
 	PauseQueue = 'PAUSE_QUEUE',
@@ -52,6 +84,7 @@ export enum Type {
 	CacheBlobUrl = 'CACHE_BLOB_URL',
 	RevokeBlobUrls = 'REVOKE_BLOB_URLS',
 	UpdateProgress = 'UPDATE_PROGRESS',
+	AccumulateSubSize = 'ACCUMULATE_SUB_SIZE',
 	UpdateSettings = 'UPDATE_SETTINGS',
 }
 
@@ -87,6 +120,15 @@ export type CancelAction = Action<
 	{ id: QueueItemId; error: Error }
 >;
 export type RetryItemAction = Action< Type.RetryItem, { id: QueueItemId } >;
+export type ScheduleRetryAction = Action<
+	Type.ScheduleRetry,
+	{
+		id: QueueItemId;
+		error: Error;
+		retryCount: number;
+		nextRetryTimestamp: number;
+	}
+>;
 export type PauseItemAction = Action< Type.PauseItem, { id: QueueItemId } >;
 export type ResumeItemAction = Action< Type.ResumeItem, { id: QueueItemId } >;
 export type PauseQueueAction = Action< Type.PauseQueue >;
@@ -103,6 +145,10 @@ export type RevokeBlobUrlsAction = Action<
 export type UpdateProgressAction = Action<
 	Type.UpdateProgress,
 	{ id: QueueItemId; progress: number }
+>;
+export type AccumulateSubSizeAction = Action<
+	Type.AccumulateSubSize,
+	{ id: QueueItemId; subSize: SubSizeData }
 >;
 export type UpdateSettingsAction = Action<
 	Type.UpdateSettings,
@@ -145,8 +191,8 @@ export interface SideloadMediaArgs {
 	additionalData?: AdditionalData;
 	/** Function called when an error happens. */
 	onError?: OnErrorHandler;
-	/** Function called when the file or a temporary representation is available. */
-	onFileChange?: OnChangeHandler;
+	/** Function called when the sideload completes with sub-size data. */
+	onSuccess?: ( subSize: SubSizeData ) => void;
 	/** Abort signal to cancel the sideload operation. */
 	signal?: AbortSignal;
 }
@@ -170,19 +216,29 @@ export interface Settings {
 	// Images larger than this will be scaled down.
 	// Default is 2560 (matching WordPress core).
 	bigImageSizeThreshold?: number;
-	// Map of source MIME types to output MIME types for transcoding.
-	imageOutputFormats?: Record< string, string >;
-	// Whether to use progressive/interlaced encoding for JPEG.
-	jpegInterlaced?: boolean;
-	// Whether to use interlaced encoding for PNG.
-	pngInterlaced?: boolean;
-	// Whether to use interlaced encoding for GIF.
-	gifInterlaced?: boolean;
 	// Default image quality (0-1) for resize/crop operations.
 	// Default is 0.82 if not set.
 	imageQuality?: number;
 	// Function for finalizing an upload after all client-side processing is complete.
-	mediaFinalize?: ( id: number ) => Promise< void >;
+	// May return the up-to-date attachment so the queue and block markup can pick
+	// up the post-finalize URL (the scaled file), which is required for `srcset`.
+	mediaFinalize?: (
+		id: number,
+		subSizes: SubSizeData[]
+	) => Promise< Partial< Attachment > | void >;
+	// Whether to convert animated GIFs to video (MP4/WebM) during upload.
+	// When enabled, animated GIFs are transcoded to video for smaller file sizes.
+	// Default is true.
+	gifConvert?: boolean;
+	// Output format for GIF-to-video conversion.
+	// Accepts 'video/mp4' or 'video/webm'. Default is 'video/mp4'.
+	videoOutputFormat?: 'video/mp4' | 'video/webm';
+	// Retry settings for automatic retry on failure.
+	retry?: RetrySettings;
+	// Function for deleting an attachment from the server. Used to clean up
+	// the parent attachment when client-side sub-size processing fails after
+	// the parent file has already been uploaded.
+	mediaDelete?: ( id: number ) => Promise< void >;
 }
 
 // Matches the Attachment type from the media-utils package.
@@ -199,6 +255,11 @@ export interface Attachment {
 	featured_media?: number;
 	missing_image_sizes?: string[];
 	poster?: string;
+	meta?:
+		| []
+		| {
+				[ k: string ]: unknown;
+		  };
 	/**
 	 * EXIF orientation value from the original image.
 	 * Values 1-8 follow the EXIF specification.
@@ -215,6 +276,19 @@ export interface Attachment {
 	 * 8 = Rotated 90° CCW
 	 */
 	exif_orientation?: number;
+	/** Output MIME type for format conversion, or null/undefined if no conversion needed. */
+	image_output_format?: string | null;
+	/** Whether to use progressive/interlaced encoding. */
+	image_save_progressive?: boolean;
+	/**
+	 * Encode quality (1-100) from the `wp_editor_set_quality` filter.
+	 * `default` applies to the full-size image; `sizes` holds per-registered-size
+	 * overrides keyed by size name, present only where they differ from `default`.
+	 */
+	image_quality?: {
+		default: number;
+		sizes: Record< string, number >;
+	};
 }
 
 export type OnChangeHandler = ( attachments: Partial< Attachment >[] ) => void;
@@ -226,6 +300,7 @@ export enum ItemStatus {
 	Queued = 'QUEUED',
 	Processing = 'PROCESSING',
 	Paused = 'PAUSED',
+	PendingRetry = 'PENDING_RETRY',
 	Uploaded = 'UPLOADED',
 	Error = 'ERROR',
 }
@@ -236,8 +311,11 @@ export enum OperationType {
 	ResizeCrop = 'RESIZE_CROP',
 	Rotate = 'ROTATE',
 	TranscodeImage = 'TRANSCODE_IMAGE',
+	TranscodeGif = 'TRANSCODE_GIF',
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
 	Finalize = 'FINALIZE',
+	// UltraHDR operations
+	DetectUltraHdr = 'DETECT_ULTRAHDR',
 }
 
 /**
@@ -269,6 +347,12 @@ export interface OperationArgs {
 		 * If true, uses '-scaled' suffix instead of dimension suffix.
 		 */
 		isThresholdResize?: boolean;
+		/**
+		 * Re-encode quality (0-1) for the resized image, derived from the
+		 * `wp_editor_set_quality` filter. Falls back to the vips default
+		 * when omitted.
+		 */
+		quality?: number;
 	};
 	[ OperationType.Rotate ]: {
 		/**
@@ -284,6 +368,10 @@ export interface OperationArgs {
 		outputQuality: number;
 		/** Whether to use interlaced encoding. */
 		interlaced: boolean;
+	};
+	[ OperationType.TranscodeGif ]: {
+		/** Video output format: 'mp4' or 'webm'. */
+		outputFormat: 'mp4' | 'webm';
 	};
 }
 
@@ -303,8 +391,24 @@ export type AdditionalData = Record< string, unknown >;
 export interface SideloadAdditionalData extends AdditionalData {
 	/** The attachment ID to add the image size to. */
 	post: number;
-	/** The name of the image size being generated (e.g., 'thumbnail', 'medium'). */
-	image_size: string;
+	/** The name(s) of the image size being generated (e.g., 'thumbnail', 'medium'). When multiple size names share the same dimensions, an array can be passed to register one file under all names. */
+	image_size: string | string[];
 }
 
 export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif';
+
+/**
+ * Configuration for automatic retry behavior on upload failures.
+ */
+export interface RetrySettings {
+	/** Maximum number of retry attempts before giving up. */
+	maxRetryAttempts: number;
+	/** Initial delay in milliseconds before the first retry. */
+	initialRetryDelayMs: number;
+	/** Maximum delay in milliseconds (cap for exponential growth). */
+	maxRetryDelayMs: number;
+	/** Multiplier for exponential backoff (e.g., 2 means double each time). */
+	backoffMultiplier: number;
+	/** Jitter factor (0-1) to add randomness and prevent thundering herd. */
+	retryJitter: number;
+}

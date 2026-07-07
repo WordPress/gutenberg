@@ -3,14 +3,20 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
-import { insertObject, useAnchor } from '@wordpress/rich-text';
+import {
+	insert,
+	insertObject,
+	slice,
+	getTextContent,
+	useAnchor,
+} from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	Popover,
 	TextControl,
-	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { math as icon } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 
@@ -19,7 +25,7 @@ import { speak } from '@wordpress/a11y';
  */
 import { unlock } from '../lock-unlock';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 const name = 'core/math';
 const title = __( 'Math' );
@@ -88,9 +94,8 @@ function InlineUI( {
 			className="block-editor-format-toolbar__math-popover"
 		>
 			<div style={ { minWidth: '300px', padding: '4px' } }>
-				<VStack spacing={ 1 }>
+				<Stack direction="column" gap="xs">
 					<TextControl
-						__next40pxDefaultSize
 						hideLabelFromVision
 						label={ __( 'LaTeX math syntax' ) }
 						value={ latex }
@@ -101,7 +106,7 @@ function InlineUI( {
 					/>
 					{ error && (
 						<>
-							<Badge
+							<WCBadge
 								intent="error"
 								className="wp-block-math__error"
 							>
@@ -110,11 +115,11 @@ function InlineUI( {
 									__( 'Error: %s' ),
 									error
 								) }
-							</Badge>
+							</WCBadge>
 							<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
 						</>
 					) }
-				</VStack>
+				</Stack>
 			</div>
 		</Popover>
 	);
@@ -135,23 +140,51 @@ function Edit( {
 			setLatexToMathML( () => module.default );
 		} );
 	}, [] );
+
+	function onClick() {
+		let newValue;
+
+		if ( isObjectActive ) {
+			// Revert the active math object to its LaTeX source so clicking
+			// the button toggles back to the exact text it was created from.
+			// Keep the restored text selected so it can be edited or
+			// re-marked right away.
+			const latex = activeObjectAttributes?.[ 'data-latex' ] || '';
+			newValue = insert( value, latex );
+			newValue.start = newValue.end - latex.length;
+		} else {
+			// If there's a selection, seed the format with it so you can type
+			// LaTeX inline and then mark it as math.
+			const selectedText = getTextContent( slice( value ) );
+			let innerHTML = '';
+			if ( selectedText && latexToMathML ) {
+				try {
+					innerHTML = latexToMathML( selectedText, {
+						displayMode: false,
+					} );
+				} catch {
+					// Leave unrendered; the popover opens with the text
+					// prefilled so the expression can be corrected.
+				}
+			}
+			newValue = insertObject( value, {
+				type: name,
+				attributes: { 'data-latex': selectedText },
+				innerHTML,
+			} );
+			newValue.start = newValue.end - 1;
+		}
+
+		onChange( newValue );
+		onFocus();
+	}
+
 	return (
 		<>
 			<RichTextToolbarButton
 				icon={ icon }
 				title={ title }
-				onClick={ () => {
-					const newValue = insertObject( value, {
-						type: name,
-						attributes: {
-							'data-latex': '',
-						},
-						innerHTML: '',
-					} );
-					newValue.start = newValue.end - 1;
-					onChange( newValue );
-					onFocus();
-				} }
+				onClick={ onClick }
 				isActive={ isObjectActive }
 			/>
 			{ isObjectActive && (

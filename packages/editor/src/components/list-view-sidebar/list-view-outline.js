@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalText as Text } from '@wordpress/components';
+import { __experimentalText as WCText } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -17,17 +17,17 @@ export default function ListViewOutline() {
 		<>
 			<div className="editor-list-view-sidebar__outline">
 				<div>
-					<Text>{ __( 'Characters:' ) }</Text>
-					<Text>
+					<WCText>{ __( 'Characters:' ) }</WCText>
+					<WCText>
 						<CharacterCount />
-					</Text>
+					</WCText>
 				</div>
 				<div>
-					<Text>{ __( 'Words:' ) }</Text>
+					<WCText>{ __( 'Words:' ) }</WCText>
 					<WordCount />
 				</div>
 				<div>
-					<Text>{ __( 'Time to read:' ) }</Text>
+					<WCText>{ __( 'Time to read:' ) }</WCText>
 					<TimeToRead />
 				</div>
 			</div>

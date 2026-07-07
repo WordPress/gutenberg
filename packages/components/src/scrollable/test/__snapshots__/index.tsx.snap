@@ -3,26 +3,24 @@
 exports[`props should render correctly 1`] = `
 .emotion-0 {
   height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
 }
 
 @media only screen and ( min-device-width: 40em ) {
-  .emotion-0::-webkit-scrollbar {
+  .emotion-1::-webkit-scrollbar {
     height: 12px;
     width: 12px;
   }
 
-  .emotion-0::-webkit-scrollbar-track {
+  .emotion-1::-webkit-scrollbar-track {
     background-color: transparent;
   }
 
-  .emotion-0::-webkit-scrollbar-track {
+  .emotion-1::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.04);
     border-radius: 8px;
   }
 
-  .emotion-0::-webkit-scrollbar-thumb {
+  .emotion-1::-webkit-scrollbar-thumb {
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     background-color: rgba(0, 0, 0, 0.2);
@@ -30,13 +28,18 @@ exports[`props should render correctly 1`] = `
     border-radius: 7px;
   }
 
-  .emotion-0:hover::-webkit-scrollbar-thumb {
+  .emotion-1:hover::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.5);
   }
 }
 
+.emotion-2 {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 <div
-  class="components-scrollable emotion-0 emotion-1"
+  class="emotion-0 emotion-1 emotion-2 components-scrollable"
   data-testid="scrollable"
   data-wp-c16t="true"
   data-wp-component="Scrollable"
@@ -50,12 +53,14 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-  Array [
+@@ -4,9 +4,6 @@
+    },
     Object {
-      "height": "100%",
       "overflow-x": "hidden",
       "overflow-y": "auto",
--     "scroll-behavior": "smooth",
     },
+-   Object {
+-     "scroll-behavior": "smooth",
+-   },
   ]
 `;

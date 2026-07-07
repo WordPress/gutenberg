@@ -158,7 +158,6 @@ const BorderControlDropdown = (
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonWrapperClassName,
-		size,
 		__unstablePopoverProps,
 		...otherProps
 	} = useBorderControlDropdown( props );
@@ -188,7 +187,7 @@ const BorderControlDropdown = (
 			tooltipPosition={ dropdownPosition }
 			label={ __( 'Border color and style picker' ) }
 			showTooltip
-			__next40pxDefaultSize={ size === '__unstable-large' }
+			__next40pxDefaultSize
 		>
 			<span className={ indicatorWrapperClassName }>
 				<ColorIndicator

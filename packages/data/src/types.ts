@@ -476,10 +476,21 @@ type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
  *     };
  * ```
  */
-export interface ThunkArgs< S extends StoreDescriptor = StoreDescriptor > {
+export interface ThunkArgs<
+	S extends StoreDescriptor = StoreDescriptor,
+	PrivateSelectors extends Record< string, Function > = {},
+	PrivateActions extends Record< string, ActionCreator > = {},
+> {
 	dispatch: ActionCreatorsOf< S > &
-		( ( action: Record< string, unknown > | Function ) => unknown );
-	select: CurriedSelectorsOf< S >;
+		PromisifiedActionCreators< PrivateActions > & {
+			< R >( thunk: ( ...args: any[] ) => R ): R;
+			( action: Record< string, unknown > ): unknown;
+		};
+	select: CurriedSelectorsOf< S > & {
+		[ key in keyof PrivateSelectors ]: CurriedState<
+			PrivateSelectors[ key ]
+		>;
+	};
 	resolveSelect: CurriedSelectorsResolveOf< S >;
 	registry: DataRegistry;
 }

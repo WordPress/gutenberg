@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * External dependencies
  */
@@ -82,4 +81,3 @@ function updatePackageJSON() {
 }
 
 updatePackageJSON();
-/* eslint-enable no-console */

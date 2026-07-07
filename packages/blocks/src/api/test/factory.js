@@ -10,6 +10,7 @@ import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	cloneBlock,
+	cloneSanitizedBlock,
 	__experimentalCloneSanitizedBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
@@ -26,6 +27,7 @@ import {
 	unregisterBlockType,
 	setGroupingBlockName,
 } from '../registration';
+import { logged as warningLoggedSet } from '../../../../warning/src/utils';
 
 const noop = () => {};
 
@@ -45,6 +47,11 @@ describe( 'block factory', () => {
 	beforeAll( () => {
 		// Load blocks store.
 		require( '../../store' );
+	} );
+
+	beforeEach( () => {
+		// Reset warning logging so deduped warnings fire within each test.
+		warningLoggedSet.clear();
 	} );
 
 	afterEach( () => {
@@ -180,6 +187,28 @@ describe( 'block factory', () => {
 			} );
 
 			expect( block.attributes ).toEqual( {} );
+		} );
+
+		it( 'should attach innerContent for the Custom HTML block', () => {
+			registerBlockType( 'core/html', defaultBlockSettings );
+
+			const block = createBlock( 'core/html', {}, [], [ '<div></div>' ] );
+
+			expect( block.innerContent ).toEqual( [ '<div></div>' ] );
+		} );
+
+		it( 'should ignore innerContent and warn for other blocks', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const block = createBlock(
+				'core/test-block',
+				{},
+				[],
+				[ '<div></div>' ]
+			);
+
+			expect( block.innerContent ).toBeUndefined();
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -434,8 +463,8 @@ describe( 'block factory', () => {
 		} );
 	} );
 
-	describe( '__experimentalCloneSanitizedBlock', () => {
-		it( 'should sanitize attributes not defined in the block type', () => {
+	describe( 'cloneSanitizedBlock', () => {
+		beforeEach( () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
 				attributes: {
@@ -444,7 +473,21 @@ describe( 'block factory', () => {
 					},
 				},
 			} );
+		} );
 
+		it( 'sanitizes attributes not defined in the block type', () => {
+			const block = createBlock( 'core/test-block', {
+				notDefined: 'not-defined',
+			} );
+
+			const clonedBlock = cloneSanitizedBlock( block, {
+				notDefined2: 'not-defined-2',
+			} );
+
+			expect( clonedBlock.attributes ).toEqual( {} );
+		} );
+
+		it( 'keeps the experimental function as a deprecated alias', () => {
 			const block = createBlock( 'core/test-block', {
 				notDefined: 'not-defined',
 			} );
@@ -454,6 +497,9 @@ describe( 'block factory', () => {
 			} );
 
 			expect( clonedBlock.attributes ).toEqual( {} );
+			expect( console ).toHaveWarnedWith(
+				'__experimentalCloneSanitizedBlock is deprecated since version 7.1. Please use cloneSanitizedBlock instead.'
+			);
 		} );
 	} );
 
@@ -528,6 +574,45 @@ describe( 'block factory', () => {
 
 			expect( availableBlocks ).toHaveLength( 1 );
 			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
+		} );
+
+		it( 'should preserve variation metadata for possible transformations', () => {
+			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							variationName: 'grid',
+							transform: noop,
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [
+				block,
+			] );
+
+			expect( availableBlocks ).toHaveLength( 1 );
+			expect( availableBlocks[ 0 ] ).toMatchObject( {
+				name: 'core/text-block',
+				variationName: 'grid',
+			} );
 		} );
 
 		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block (for a "from" transform)', () => {
@@ -1257,6 +1342,70 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
 			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
 				value: 'chicken ribs',
+			} );
+		} );
+
+		it( 'should switch the blockType of a block using a variation transform', () => {
+			registerBlockType( 'core/group-block', {
+				...defaultBlockSettings,
+				attributes: {
+					layout: {
+						type: 'object',
+					},
+				},
+			} );
+			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/group-block' ],
+							transform: () =>
+								createBlock( 'core/group-block', {
+									layout: { type: 'constrained' },
+								} ),
+						},
+						{
+							type: 'block',
+							blocks: [ 'core/group-block' ],
+							variationName: 'grid',
+							transform: () =>
+								createBlock( 'core/group-block', {
+									layout: { type: 'grid' },
+								} ),
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'text-block',
+			} );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/group-block',
+				'grid'
+			);
+			const defaultTransformedBlocks = switchToBlockType(
+				block,
+				'core/group-block'
+			);
+
+			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
+				layout: { type: 'grid' },
+			} );
+			expect( defaultTransformedBlocks[ 0 ].attributes ).toEqual( {
+				layout: { type: 'constrained' },
 			} );
 		} );
 

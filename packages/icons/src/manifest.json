@@ -1083,6 +1083,11 @@
 		"public": true
 	},
 	{
+		"slug": "pause",
+		"label": "Pause",
+		"filePath": "library/pause.svg"
+	},
+	{
 		"slug": "payment",
 		"label": "Payment",
 		"filePath": "library/payment.svg",
@@ -1124,6 +1129,11 @@
 		"slug": "plugins",
 		"label": "Plugins",
 		"filePath": "library/plugins.svg"
+	},
+	{
+		"slug": "play",
+		"label": "Play",
+		"filePath": "library/play.svg"
 	},
 	{
 		"slug": "plus",
@@ -1302,6 +1312,21 @@
 		"filePath": "library/replace.svg"
 	},
 	{
+		"slug": "repeat",
+		"label": "Repeat",
+		"filePath": "library/repeat.svg"
+	},
+	{
+		"slug": "repeat-all",
+		"label": "Repeat All",
+		"filePath": "library/repeat-all.svg"
+	},
+	{
+		"slug": "replay",
+		"label": "Replay",
+		"filePath": "library/replay.svg"
+	},
+	{
 		"slug": "reset",
 		"label": "Reset",
 		"filePath": "library/reset.svg"
@@ -1450,6 +1475,16 @@
 		"filePath": "library/sides-vertical.svg"
 	},
 	{
+		"slug": "skip-back",
+		"label": "Skip Back",
+		"filePath": "library/skip-back.svg"
+	},
+	{
+		"slug": "skip-forward",
+		"label": "Skip Forward",
+		"filePath": "library/skip-forward.svg"
+	},
+	{
 		"slug": "site-logo",
 		"label": "Site Logo",
 		"filePath": "library/site-logo.svg"
@@ -1579,24 +1614,19 @@
 		"public": true
 	},
 	{
-		"slug": "tab",
-		"label": "Tab",
-		"filePath": "library/tab.svg"
+		"slug": "tab-list",
+		"label": "Tab List",
+		"filePath": "library/tab-list.svg"
+	},
+	{
+		"slug": "tab-panel",
+		"label": "Tab Panel",
+		"filePath": "library/tab-panel.svg"
 	},
 	{
 		"slug": "tabs",
 		"label": "Tabs",
 		"filePath": "library/tabs.svg"
-	},
-	{
-		"slug": "tabs-menu",
-		"label": "Tabs Menu",
-		"filePath": "library/tabs-menu.svg"
-	},
-	{
-		"slug": "tabs-menu-item",
-		"label": "Tabs Menu Item",
-		"filePath": "library/tabs-menu-item.svg"
 	},
 	{
 		"slug": "tag",
@@ -1645,9 +1675,9 @@
 		"filePath": "library/thumbs-up.svg"
 	},
 	{
-		"slug": "time-to-read",
-		"label": "Time To Read",
-		"filePath": "library/time-to-read.svg"
+		"slug": "time",
+		"label": "Time",
+		"filePath": "library/time.svg"
 	},
 	{
 		"slug": "tip",

@@ -3,8 +3,20 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"moduleResolution": "bundler",
-		"types": [ "css-modules" ]
+		"types": [
+			"jest",
+			"node",
+			"style-imports",
+			"react-css-custom-properties"
+		]
 	},
+	"exclude": [],
 	"files": [ "global.d.ts" ],
-	"references": [ { "path": "../element" }, { "path": "../private-apis" } ]
+	"references": [
+		{ "path": "../compose" },
+		{ "path": "../deprecated" },
+		{ "path": "../element" },
+		{ "path": "../private-apis" },
+		{ "path": "../style-runtime" }
+	]
 }

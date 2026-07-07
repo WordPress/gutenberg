@@ -3,7 +3,6 @@
  */
 // @ts-expect-error: Not typed yet.
 import { BlockPreview } from '@wordpress/block-editor';
-// @ts-expect-error: Not typed yet.
 import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
 import { __experimentalSpacer as Spacer } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
@@ -17,13 +16,22 @@ import { getVariationClassName } from './utils';
 interface BlockPreviewPanelProps {
 	name: string;
 	variation?: string;
+	selectedViewport?: string;
 	selectedState?: string;
 	stateStyles?: any;
 }
 
+// Keep in sync with responsive breakpoint media queries in the global styles engine.
+const PREVIEW_WIDTH_BY_VIEWPORT: Record< string, number > = {
+	default: 783,
+	'@tablet': 600,
+	'@mobile': 480,
+};
+
 const BlockPreviewPanel = ( {
 	name,
 	variation = '',
+	selectedViewport = 'default',
 	selectedState = 'default',
 	stateStyles,
 }: BlockPreviewPanelProps ) => {
@@ -56,7 +64,17 @@ const BlockPreviewPanel = ( {
 		return generatePreviewStateStyles( stateStyles, name );
 	}, [ selectedState, stateStyles, name ] );
 
-	const viewportWidth = blockExample?.viewportWidth ?? 500;
+	if ( ! blockExample ) {
+		return null;
+	}
+
+	const viewportWidth =
+		PREVIEW_WIDTH_BY_VIEWPORT[ selectedViewport ] ??
+		blockExample.viewportWidth ??
+		500;
+	const normalizedViewportWidth = blockExample.viewportWidth ?? 500;
+	const previewScale = Math.max( viewportWidth / normalizedViewportWidth, 1 );
+	const previewPadding = 24 * previewScale;
 	// Same as height of InserterPreviewPanel.
 	const previewHeight = 144;
 	const sidebarWidth = 235;
@@ -65,10 +83,6 @@ const BlockPreviewPanel = ( {
 		scale !== 0 && scale < 1 && previewHeight
 			? previewHeight / scale
 			: previewHeight;
-
-	if ( ! blockExample ) {
-		return null;
-	}
 
 	return (
 		<Spacer marginX={ 4 } marginBottom={ 4 }>
@@ -86,12 +100,15 @@ const BlockPreviewPanel = ( {
 							{
 								css: `
 								body{
-									padding: 24px;
+									padding: ${ previewPadding }px;
 									min-height:${ Math.round( minHeight ) }px;
 									display:flex;
-									align-items:center;
 								}
-								.is-root-container { width: 100%; }
+								.is-root-container {
+									width: ${ 100 / previewScale }%;
+									transform: scale(${ previewScale });
+									transform-origin: top left;
+								}
 								${ stateCSS }
 							`,
 							},

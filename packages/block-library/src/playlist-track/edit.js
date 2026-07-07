@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import { v4 as uuid } from 'uuid';
-
-/**
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
-import { useRef, useState } from '@wordpress/element';
+import { useContext, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
@@ -35,25 +30,41 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
+import { PlaylistContext } from '../playlist/context';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const ALBUM_COVER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
-const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
-	// Note that 'id' is the media attachment ID, while 'uniqueId' is a unique identifier.
-	// This is to make sure that the same media can be used in more than one track.
-	const { id, uniqueId, src, album, artist, image, length, title } =
-		attributes;
+const PlaylistTrackEdit = ( {
+	attributes,
+	setAttributes,
+	context,
+	clientId,
+	isSelected,
+} ) => {
+	const { id, src, album, artist, image, length, title } = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const showArtists = context?.showArtists;
-	const currentTrack = context?.currentTrack;
 	const imageButton = useRef();
 	const blockProps = useBlockProps();
+	const { currentTrackClientId, setCurrentTrackClientId } =
+		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
+
+	useEffect( () => {
+		if ( isSelected && currentTrackClientId !== clientId ) {
+			setCurrentTrackClientId( clientId );
+		}
+	}, [
+		isSelected,
+		clientId,
+		currentTrackClientId,
+		setCurrentTrackClientId,
+	] );
 
 	useUploadMediaFromBlobURL( {
 		src: temporaryURL,
@@ -69,7 +80,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 			setAttributes( {
 				blob: undefined,
 				id: undefined,
-				uniqueId: undefined,
 				artist: undefined,
 				album: undefined,
 				image: undefined,
@@ -89,7 +99,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 		setAttributes( {
 			blob: undefined,
 			id: media.id,
-			uniqueId: uuid(),
 			src: media.url,
 			artist:
 				media.artist ||
@@ -161,7 +170,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Artist' ) }
 						value={ artist ? stripHTML( artist ) : '' }
 						onChange={ ( artistValue ) => {
@@ -169,7 +177,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						} }
 					/>
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Album' ) }
 						value={ album ? stripHTML( album ) : '' }
 						onChange={ ( albumValue ) => {
@@ -177,7 +184,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						} }
 					/>
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Title' ) }
 						value={ title ? stripHTML( title ) : '' }
 						onChange={ ( titleValue ) => {
@@ -231,9 +237,9 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 				{ !! temporaryURL && <Spinner /> }
 				<button
 					className="wp-block-playlist-track__button"
-					data-wp-context={ JSON.stringify( { uniqueId } ) }
+					onClick={ () => setCurrentTrackClientId( clientId ) }
 					aria-current={
-						currentTrack === uniqueId ? 'true' : 'false'
+						currentTrackClientId === clientId ? 'true' : 'false'
 					}
 				>
 					<span className="wp-block-playlist-track__content">

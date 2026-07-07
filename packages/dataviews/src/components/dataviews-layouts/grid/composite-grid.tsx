@@ -10,11 +10,10 @@ import type { ComponentProps, ReactElement, HTMLAttributes } from 'react';
 import {
 	Flex,
 	FlexItem,
-	Tooltip,
 	Composite,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Tooltip } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isAppleOS } from '@wordpress/keycodes';
@@ -43,7 +42,7 @@ import type {
 } from '../../../types';
 import type { SetSelection } from '../../../types/private';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 import { useGridColumns } from './preview-size-picker';
 import { GridItems } from '../utils/grid-items';
 import {
@@ -236,7 +235,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 					</div>
 				) }
 				{ showTitle && (
-					<div className="dataviews-view-grid__title">
+					<div className="dataviews-view-grid__title-actions">
 						<ItemClickWrapper
 							item={ item }
 							isItemClickable={ isItemClickable }
@@ -273,7 +272,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 						>
 							{ badgeFields.map( ( field ) => {
 								return (
-									<Badge
+									<WCBadge
 										key={ field.id }
 										className="dataviews-view-grid__field-value"
 									>
@@ -281,7 +280,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 											item={ item }
 											field={ field }
 										/>
-									</Badge>
+									</WCBadge>
 								);
 							} ) }
 						</Stack>
@@ -304,11 +303,18 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 										direction="row"
 									>
 										<>
-											<Tooltip text={ field.label }>
-												<FlexItem className="dataviews-view-grid__field-name">
-													{ field.header }
-												</FlexItem>
-											</Tooltip>
+											<Tooltip.Root>
+												<Tooltip.Trigger
+													render={
+														<FlexItem className="dataviews-view-grid__field-name">
+															{ field.header }
+														</FlexItem>
+													}
+												/>
+												<Tooltip.Popup>
+													{ field.label }
+												</Tooltip.Popup>
+											</Tooltip.Root>
 											<FlexItem
 												className="dataviews-view-grid__field-value"
 												style={ { maxHeight: 'none' } }

@@ -119,7 +119,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   ref: ${{ matrix.branch }}
                   token: ${{ secrets.GUTENBERG_TOKEN }}
@@ -173,7 +173,7 @@ jobs:
                   fi
 
             - name: Upload Changelog artifact
-              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
                   name: changelog ${{ matrix.label }}
                   path: ./changelog.txt
@@ -227,7 +227,30 @@ jobs:
                   name: changelog trunk
                   path: trunk
 
+            - name: Check if SVN tag already exists
+              id: check_svn_tag
+              run: |
+                  svn_error_file="$(mktemp)"
+                  if svn list "$PLUGIN_REPO_URL/tags/$VERSION" \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --non-interactive --no-auth-cache >/dev/null 2>"$svn_error_file"; then
+                    echo "::warning::SVN tag tags/$VERSION already exists. Skipping release commit to avoid E150002."
+                    echo "exists=true" >> "$GITHUB_OUTPUT"
+                  else
+                    svn_status=$?
+                    # WP.org SVN may report a missing tag as W160013 followed by E200009.
+                    if grep -Eq 'E160013|W160013|E200009|non-existent' "$svn_error_file"; then
+                      echo "exists=false" >> "$GITHUB_OUTPUT"
+                    else
+                      cat "$svn_error_file" >&2
+                      rm -f "$svn_error_file"
+                      exit "$svn_status"
+                    fi
+                  fi
+                  rm -f "$svn_error_file"
+
             - name: Commit the release
+              if: steps.check_svn_tag.outputs.exists != 'true'
               working-directory: ./trunk
               run: |
                   svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
@@ -279,7 +302,30 @@ jobs:
                   name: changelog trunk
                   path: ${{ github.event.release.name }}
 
+            - name: Check if SVN tag already exists
+              id: check_svn_tag
+              run: |
+                  svn_error_file="$(mktemp)"
+                  if svn list "$PLUGIN_REPO_URL/tags/$VERSION" \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --non-interactive --no-auth-cache >/dev/null 2>"$svn_error_file"; then
+                    echo "::warning::SVN tag tags/$VERSION already exists. Skipping import to avoid E150002."
+                    echo "exists=true" >> "$GITHUB_OUTPUT"
+                  else
+                    svn_status=$?
+                    # WP.org SVN may report a missing tag as W160013 followed by E200009.
+                    if grep -Eq 'E160013|W160013|E200009|non-existent' "$svn_error_file"; then
+                      echo "exists=false" >> "$GITHUB_OUTPUT"
+                    else
+                      cat "$svn_error_file" >&2
+                      rm -f "$svn_error_file"
+                      exit "$svn_status"
+                    fi
+                  fi
+                  rm -f "$svn_error_file"
+
             - name: Add the new version directory and commit changes to the SVN repository
+              if: steps.check_svn_tag.outputs.exists != 'true'
               run: |
                   svn import "$VERSION" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Committing version $VERSION" \
                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \

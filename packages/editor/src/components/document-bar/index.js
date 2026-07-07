@@ -10,13 +10,12 @@ import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
 import { chevronLeftSmall, chevronRightSmall, layout } from '@wordpress/icons';
-import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
 import { useRef, useEffect } from '@wordpress/element';
@@ -206,7 +205,7 @@ export default function DocumentBar( props ) {
 				/>
 			) }
 			{ isNotFound ? (
-				<Text>{ __( 'Document not found' ) }</Text>
+				<WCText>{ __( 'Document not found' ) }</WCText>
 			) : (
 				<Button
 					className="editor-document-bar__command"
@@ -236,7 +235,7 @@ export default function DocumentBar( props ) {
 						}
 					>
 						{ icon && <BlockIcon icon={ icon } /> }
-						<Text size="body" as="h1">
+						<WCText size="body" as="h1">
 							<span className="editor-document-bar__post-title">
 								{ title
 									? stripHTML( title )
@@ -265,11 +264,8 @@ export default function DocumentBar( props ) {
 										) }` }
 									</span>
 								) }
-						</Text>
+						</WCText>
 					</motion.div>
-					<span className="editor-document-bar__shortcut">
-						{ displayShortcut.primary( 'k' ) }
-					</span>
 				</Button>
 			) }
 		</div>

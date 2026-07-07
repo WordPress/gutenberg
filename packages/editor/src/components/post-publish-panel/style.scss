@@ -226,7 +226,7 @@
 		}
 
 		body.is-fullscreen-mode & {
-			top: 0;
+			top: var(--wp-admin--admin-bar--height, 0);
 		}
 
 		// Keep it open on focus to avoid conflict with navigate-regions animation.

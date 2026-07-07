@@ -11,7 +11,6 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 	Spinner,
-	VisuallyHidden,
 	Composite,
 } from '@wordpress/components';
 import {
@@ -25,7 +24,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
-import { Stack } from '@wordpress/ui';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -355,8 +354,8 @@ function ListItem< Item >( {
 									className="dataviews-view-list__field"
 								>
 									<VisuallyHidden
-										as="span"
 										className="dataviews-view-list__field-label"
+										render={ <span /> }
 									>
 										{ field.label }
 									</VisuallyHidden>
@@ -395,6 +394,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list' );
 	const isDelayedLoading = useDelayedLoading( !! isLoading );
+	const { paginationInfo } = useContext( DataViewsContext );
 
 	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( getItemId( item ) )
@@ -536,6 +536,11 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const dataByGroup =
 		hasData && groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	// Whether the server has more rows beyond the current window.
+	const hasMoreItems =
+		isInfiniteScroll &&
+		( view.startPosition ?? 1 ) + ( view.perPage ?? 0 ) <
+			paginationInfo.totalItems;
 	if ( ! hasData ) {
 		return (
 			<div
@@ -664,8 +669,14 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					);
 				} ) }
 			</Composite>
-			{ isInfiniteScroll && isLoading && (
-				<p className="dataviews-loading-more">
+			{ ( hasMoreItems || ( isInfiniteScroll && isLoading ) ) && (
+				// Keep the spinner's height reserved while loading more so the
+				// scroll position doesn't bounce. Hidden, and silent to a11y,
+				// while idle.
+				<p
+					className="dataviews-loading-more"
+					aria-hidden={ ! isLoading }
+				>
 					<Spinner />
 				</p>
 			) }

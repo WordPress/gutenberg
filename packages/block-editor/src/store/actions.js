@@ -4,7 +4,7 @@
  */
 import {
 	cloneBlock,
-	__experimentalCloneSanitizedBlock,
+	cloneSanitizedBlock,
 	createBlock,
 	doBlocksMatchTemplate,
 	getBlockType,
@@ -87,6 +87,12 @@ export const validateBlocksToTemplate =
 
 /**
  * A block selection object.
+ *
+ * This type is duplicated to avoid creating circular dependencies.
+ *
+ * @see {import("@wordpress/block-editor/src/store/selectors").WPBlockSelection}
+ * @see {import("@wordpress/core-data/src/types").WPBlockSelection}
+ * @see {import("@wordpress/editor/src/store/selectors").WPBlockSelection}
  *
  * @typedef {Object} WPBlockSelection
  *
@@ -816,6 +822,8 @@ export const __unstableDeleteSelection =
 					...targetBlock.attributes,
 					...updatedAttributes,
 				},
+				// Block A's inner blocks sit inside the selection; only B's survive.
+				innerBlocks: blockB.innerBlocks,
 			},
 			...( isForward ? [] : blocksWithTheSameType ),
 		];
@@ -1640,12 +1648,20 @@ export function __unstableMarkLastChangeAsPersistent() {
 }
 
 /**
- * Action that signals that the next block change should be marked explicitly as not persistent.
+ * Action that signals that the next block change should be marked explicitly
+ * as not persistent.
  *
+ * By default, non-persistent changes may still merge into undo history. Use
+ * `history: 'ignore'` for derived changes that should never be captured by undo.
+ *
+ * @param {Object} options         Options object.
+ * @param {string} options.history How the change should interact with history.
  * @return {Object} Action object.
  */
-export function __unstableMarkNextChangeAsNotPersistent() {
-	return { type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT' };
+export function __unstableMarkNextChangeAsNotPersistent( {
+	history = 'merge',
+} = {} ) {
+	return { type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT', history };
 }
 
 /**
@@ -1739,7 +1755,7 @@ export const duplicateBlocks =
 			clientIdsArray[ clientIdsArray.length - 1 ]
 		);
 		const clonedBlocks = blocks.map( ( block ) =>
-			__experimentalCloneSanitizedBlock( block )
+			cloneSanitizedBlock( block )
 		);
 		dispatch.insertBlocks(
 			clonedBlocks,
@@ -1768,15 +1784,11 @@ export const insertBeforeBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
-		if ( isLocked ) {
-			return;
-		}
 
 		const blockIndex = select.getBlockIndex( clientId );
-		const directInsertBlock = rootClientId
-			? select.getDirectInsertBlock( rootClientId )
-			: null;
+		const { defaultBlock: directInsertBlock } = rootClientId
+			? select.getBlockListSettings( rootClientId ) ?? {}
+			: {};
 
 		if ( ! directInsertBlock ) {
 			return dispatch.insertDefaultBlock( {}, rootClientId, blockIndex );
@@ -1811,15 +1823,11 @@ export const insertAfterBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
-		if ( isLocked ) {
-			return;
-		}
 
 		const blockIndex = select.getBlockIndex( clientId );
-		const directInsertBlock = rootClientId
-			? select.getDirectInsertBlock( rootClientId )
-			: null;
+		const { defaultBlock: directInsertBlock } = rootClientId
+			? select.getBlockListSettings( rootClientId ) ?? {}
+			: {};
 
 		if ( ! directInsertBlock ) {
 			return dispatch.insertDefaultBlock(
@@ -2043,6 +2051,7 @@ export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
  *                                                                                                   the report url for the media item. It accepts the `InserterMediaItem` as an argument.
  * @property {boolean}                                                [isExternalResource]           If the media category is an external resource, this should be set to true.
  *                                                                                                   This is used to avoid making a request to the external resource when the user
+ * @property {string}                                                 [emptyMessage]                 Optional message shown in place of the generic "No results found." when the source has no items and there is no active search. Providing it also keeps the source in the tab list while empty, so the message stays reachable.
  */
 export const registerInserterMediaCategory =
 	( category ) =>

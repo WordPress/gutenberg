@@ -19,7 +19,9 @@ import {
 	useBlockProps,
 	useSettings,
 	useBlockEditingMode,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import { formatLTR } from '@wordpress/icons';
 /**
@@ -27,6 +29,7 @@ import { formatLTR } from '@wordpress/icons';
  */
 import { useOnEnter } from './use-enter';
 import useDeprecatedAlign from './deprecated-attributes';
+import { unlock } from '../lock-unlock';
 
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
@@ -53,8 +56,17 @@ function DropCapControl( { clientId, attributes, setAttributes, name } ) {
 	// and type performance. By moving it within InspectorControls, the subscription is
 	// now only added for the selected block(s).
 	const [ isDropCapFeatureEnabled ] = useSettings( 'typography.dropCap' );
+	const hasSelectedStyleState = useSelect(
+		( select ) => {
+			const { hasSelectedStyleState: hasSelectedBlockStyleState } =
+				unlock( select( blockEditorStore ) );
 
-	if ( ! isDropCapFeatureEnabled ) {
+			return hasSelectedBlockStyleState( clientId );
+		},
+		[ clientId ]
+	);
+
+	if ( ! isDropCapFeatureEnabled || hasSelectedStyleState ) {
 		return null;
 	}
 

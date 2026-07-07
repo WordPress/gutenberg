@@ -52,15 +52,14 @@ export async function copyToClipboard(
 }
 
 /**
- * Clears the current selection and restores focus to the trigger element.
+ * Restores focus to the trigger element.
  *
  * @param trigger The element that triggered the copy.
  */
-export function clearSelection( trigger: Element ): void {
+export function restoreFocus( trigger: Element ): void {
 	if ( 'focus' in trigger && typeof trigger.focus === 'function' ) {
 		trigger.focus();
 	}
-	trigger.ownerDocument?.defaultView?.getSelection()?.removeAllRanges();
 }
 
 /**
@@ -93,7 +92,7 @@ export default function useCopyToClipboard< T extends HTMLElement >(
 	const textRef = useUpdatedRef( text );
 	const onSuccessRef = useUpdatedRef( onSuccess );
 	return useRefEffect( ( node ) => {
-		// Flag to prevent callbacks after unmount when the Promise resolves.
+		// Tracks whether the node is still mounted when the Promise resolves.
 		let isActive = true;
 		const handleClick = async () => {
 			const textToCopy =
@@ -101,11 +100,12 @@ export default function useCopyToClipboard< T extends HTMLElement >(
 					? textRef.current()
 					: textRef.current || '';
 			const success = await copyToClipboard( textToCopy, node );
-			if ( ! isActive ) {
-				return;
-			}
 			if ( success ) {
-				clearSelection( node );
+				// Restoring focus only matters while the node is mounted.
+				if ( isActive ) {
+					restoreFocus( node );
+				}
+				// Always run, even after unmount, to allow updating other UI.
 				if ( onSuccessRef.current ) {
 					onSuccessRef.current();
 				}
