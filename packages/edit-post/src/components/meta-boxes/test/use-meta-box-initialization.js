@@ -42,6 +42,7 @@ const updateEditorSettings = jest.fn( () => ( {
 function createMockStores( {
 	isEditorReady = true,
 	isCollaborationEnabled = true,
+	currentRevisionId = null,
 	metaBoxes = [],
 } = {} ) {
 	return {
@@ -56,6 +57,7 @@ function createMockStores( {
 				isCollaborationEnabledForCurrentPost: jest.fn(
 					() => isCollaborationEnabled
 				),
+				getCurrentRevisionId: jest.fn( () => currentRevisionId ),
 			},
 		},
 		core: {
