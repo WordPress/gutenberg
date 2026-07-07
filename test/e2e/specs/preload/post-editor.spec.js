@@ -129,12 +129,7 @@ test.describe( 'Preload with the DataForm inspector experiment', () => {
 		} );
 
 		await admin.editPost( postId );
-		await editor.openDocumentSettingsSidebar();
-		await page
-			.frameLocator( 'iframe[name="editor-canvas"]' )
-			.getByRole( 'document', { name: 'Block: Heading' } )
-			.filter( { hasText: 'Hello' } )
-			.waitFor();
+		await openPostSummary( { editor, page } );
 		await waitForRequestsToSettle( requests );
 		stop();
 
@@ -153,3 +148,12 @@ test.describe( 'Preload with the DataForm inspector experiment', () => {
 		).toEqual( [] );
 	} );
 } );
+
+async function openPostSummary( { editor, page } ) {
+	await editor.openDocumentSettingsSidebar();
+
+	const summary = page.locator( '.editor-post-summary' );
+	await expect( summary ).toBeVisible();
+
+	return summary;
+}
