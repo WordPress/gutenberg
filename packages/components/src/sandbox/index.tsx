@@ -106,10 +106,16 @@ const observeAndResizeJS = function () {
 		Array.prototype.forEach.call(
 			document.styleSheets,
 			function ( stylesheet ) {
-				Array.prototype.forEach.call(
-					stylesheet.cssRules || stylesheet.rules,
-					removeViewportStyles
-				);
+				let rules;
+				try {
+					rules = stylesheet.cssRules || stylesheet.rules;
+				} catch {
+					// Reading `cssRules` throws a SecurityError for a
+					// cross-origin stylesheet (e.g. a remote <link> in the
+					// user's HTML). Skip those rather than aborting the setup.
+					return;
+				}
+				Array.prototype.forEach.call( rules, removeViewportStyles );
 			}
 		);
 
