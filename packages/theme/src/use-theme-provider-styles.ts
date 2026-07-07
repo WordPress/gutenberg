@@ -157,8 +157,8 @@ function generateStyles( {
 		[
 			// Semantic color tokens
 			colorTokensCSS( computedColorRamps ),
-			// Default legacy color aliases live in the generated design-tokens
-			// CSS. Runtime overrides keep those aliases scoped to custom
+			// Prebuilt CSS exposes default legacy aliases without requiring a
+			// provider. Runtime overrides keep those aliases scoped to custom
 			// provider colors.
 			hasCustomPrimary ? legacyWpAdminThemeOverridesCSS( primary ) : [],
 			hasCustomColors ? legacyWpComponentsOverridesCSS : [],

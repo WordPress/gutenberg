@@ -36,7 +36,7 @@ The design system splits token delivery into two complementary layers:
 -   **Static stylesheet (`design-tokens.css`)** — defines the default value for every `--wpds-*` custom property at the document `:root`. Loaded once per document (the main page, _and_ each iframe you render React into). Provides a working baseline even before any JavaScript runs.
 -   **Runtime `<ThemeProvider>`** — applies per-instance overrides for a subtree, on top of the static defaults. Use it to override individual settings (e.g. `color.primary`, `cursor.control`).
 
-The static stylesheet also provides low-specificity defaults for legacy `--wp-components-*` color aliases used by older `@wordpress/components` styles. These aliases are compatibility defaults, not new tokens. Existing `:root` definitions, scoped overrides, and runtime `<ThemeProvider>` custom colors take precedence.
+The static stylesheet also provides low-specificity defaults for legacy `--wp-components-*` color aliases used by older `@wordpress/components` styles. These aliases are compatibility defaults, not new tokens, and allow legacy alias references to resolve before a runtime provider mounts. Existing `:root` definitions, scoped overrides, and runtime `<ThemeProvider>` custom colors take precedence.
 
 #### Within WordPress
 

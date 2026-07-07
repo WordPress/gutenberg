@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Move default legacy `--wp-components-*` color aliases to the generated design token CSS, and only emit runtime legacy color overrides when `ThemeProvider` receives custom colors ([#79772](https://github.com/WordPress/gutenberg/pull/79772)).
+-   Expose default legacy `--wp-components-*` color aliases in the generated design token CSS, while preserving scoped runtime overrides for custom `ThemeProvider` colors ([#79772](https://github.com/WordPress/gutenberg/pull/79772)).
 -   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
 
 ### Documentation

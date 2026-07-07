@@ -420,7 +420,7 @@
 	--wpds-border-radius-xl: 26px;
 }
 
-/* Legacy @wordpress/components color aliases. */
+/* Default legacy @wordpress/components color alias compatibility baseline. */
 :where( :root ) {
 	--wp-components-color-accent: var( --wp-admin-theme-color, #3858e9 );
 	--wp-components-color-accent-darker-10: var(

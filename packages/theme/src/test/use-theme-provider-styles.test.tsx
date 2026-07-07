@@ -19,8 +19,8 @@ import { useThemeProviderStyles } from '../use-theme-provider-styles';
 import { DEFAULT_SEED_COLORS } from '../color-ramps';
 
 describe( 'useThemeProviderStyles', () => {
-	describe( 'generated legacy CSS aliases', () => {
-		it( 'defines static wp-components aliases in the prebuilt root CSS', () => {
+	describe( 'generated legacy compatibility aliases', () => {
+		it( 'exposes default wp-components aliases in the prebuilt root CSS', () => {
 			const prebuiltCSS = readFileSync(
 				join(
 					import.meta.dirname,
@@ -132,7 +132,7 @@ describe( 'useThemeProviderStyles', () => {
 	} );
 
 	describe( 'legacy wp-admin / wp-components bridge', () => {
-		it( 'does not emit default legacy color variables at runtime', () => {
+		it( 'uses the prebuilt CSS for default legacy color aliases', () => {
 			const { result } = renderHook( () => useThemeProviderStyles() );
 			const styles = result.current.themeProviderStyles;
 

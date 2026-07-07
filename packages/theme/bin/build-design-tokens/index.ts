@@ -5,7 +5,7 @@ import { parse, build } from '@terrazzo/parser';
 import config from '../../terrazzo.config';
 
 const legacyWpComponentsAliasesCSS = `
-/* Legacy @wordpress/components color aliases. */
+/* Default legacy @wordpress/components color alias compatibility baseline. */
 :where(:root) {
 \t--wp-components-color-accent: var(--wp-admin-theme-color, #3858e9);
 \t--wp-components-color-accent-darker-10: var(--wp-admin-theme-color-darker-10, #2145e6);
