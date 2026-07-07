@@ -181,7 +181,8 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 								'children' => array( 'comment_status', 'ping_status' ),
 							),
 						),
-					)
+					),
+					1
 				);
 			},
 			9

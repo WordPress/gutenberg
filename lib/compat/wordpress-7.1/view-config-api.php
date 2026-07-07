@@ -328,8 +328,8 @@ function _gutenberg_get_entity_view_config_post_type_page( $data ) {
 		),
 	);
 
-	$data->set( 'default_layouts', $default_layouts );
-	$data->set( 'default_view', $default_view );
+	$data->set( 'default_layouts', $default_layouts, 1 );
+	$data->set( 'default_view', $default_view, 1 );
 	// Append the status views onto the inherited base "all items" view rather
 	// than replacing it, so its post-type-specific title is kept. The version
 	// is pinned to the literal this patch was authored against as an extra guard,
@@ -373,8 +373,8 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $data ) {
 		'layout'     => $default_layouts['grid']['layout'],
 	);
 
-	$data->set( 'default_layouts', $default_layouts );
-	$data->set( 'default_view', $default_view );
+	$data->set( 'default_layouts', $default_layouts, 1 );
+	$data->set( 'default_view', $default_view, 1 );
 
 	$view_list = array(
 		array(
@@ -423,7 +423,7 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $data ) {
 		);
 	}
 
-	$data->set( 'view_list', $view_list );
+	$data->set( 'view_list', $view_list, 1 );
 
 	$data->set(
 		'form',
@@ -447,7 +447,8 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $data ) {
 				'sync-status',
 				'revisions',
 			),
-		)
+		),
+		1
 	);
 
 	return $data;
@@ -485,8 +486,8 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $data ) {
 		'layout'     => $default_layouts['grid']['layout'],
 	);
 
-	$data->set( 'default_layouts', $default_layouts );
-	$data->set( 'default_view', $default_view );
+	$data->set( 'default_layouts', $default_layouts, 1 );
+	$data->set( 'default_view', $default_view, 1 );
 
 	$view_list = array(
 		array(
@@ -529,7 +530,7 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $data ) {
 		);
 	}
 
-	$data->set( 'view_list', $view_list );
+	$data->set( 'view_list', $view_list, 1 );
 
 	$data->set(
 		'form',
@@ -545,7 +546,8 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $data ) {
 				),
 				'revisions',
 			),
-		)
+		),
+		1
 	);
 
 	return $data;
@@ -579,8 +581,8 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $data ) {
 		'list'  => array( 'showMedia' => false ),
 	);
 
-	$data->set( 'default_view', $default_view );
-	$data->set( 'default_layouts', $default_layouts );
+	$data->set( 'default_view', $default_view, 1 );
+	$data->set( 'default_layouts', $default_layouts, 1 );
 
 	$view_list = array(
 		array(
@@ -720,7 +722,7 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $data ) {
 		}
 	}
 
-	$data->set( 'view_list', array_merge( $view_list, $registered_authors, $user_authors ) );
+	$data->set( 'view_list', array_merge( $view_list, $registered_authors, $user_authors ), 1 );
 
 	$data->set(
 		'form',
@@ -757,7 +759,8 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $data ) {
 				'posts_per_page',
 				'default_comment_status',
 			),
-		)
+		),
+		1
 	);
 
 	return $data;

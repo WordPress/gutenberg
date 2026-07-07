@@ -29,10 +29,10 @@
  * Patches follow three shared rules: an associative array merges key by
  * key, a numerically indexed array replaces the current value wholesale,
  * and `null` deletes what it names — deleting a whole top-level key resets
- * it to its default. Each patch also declares the configuration schema
- * version it was written against (currently 1), so a future WordPress
- * release that changes the configuration shape can migrate existing patches
- * forward instead of breaking them.
+ * it to its default. Each patch and each `set()` value also declares the
+ * configuration schema version it was written against (currently 1), so a
+ * future WordPress release that changes the configuration shape can migrate
+ * existing patches forward instead of breaking them.
  *
  * @since 7.1.0
  */
@@ -91,13 +91,21 @@ class Gutenberg_View_Config_Data {
 	 * inheriting core's future changes to that key — but it's useful for
 	 * cases like a post type that doesn't want the default form at all.
 	 *
+	 * A value that declares an unsupported schema version is rejected and
+	 * does not replace anything.
+	 *
 	 * @since 7.1.0
 	 *
-	 * @param string $key   The configuration key to replace.
-	 * @param mixed  $value The new value.
+	 * @param string $key     The configuration key to replace.
+	 * @param mixed  $value   The new value.
+	 * @param int    $version The schema version the value was authored against.
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
-	public function set( $key, $value ) {
+	public function set( $key, $value, int $version ) {
+		if ( ! $this->check_version( $version, __METHOD__ ) ) {
+			return $this;
+		}
+
 		if ( ! in_array( $key, self::CONFIG_KEYS, true ) ) {
 			_doing_it_wrong(
 				__METHOD__,

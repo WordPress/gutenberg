@@ -22,7 +22,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				),
 			)
 		);
-		$data->set( 'default_view', array( 'type' => 'grid' ) );
+		$data->set( 'default_view', array( 'type' => 'grid' ), 1 );
 
 		$this->assertSame( array( 'type' => 'grid' ), $data->get_config()['default_view'] );
 	}
@@ -37,7 +37,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 
 		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
 		$before = $data->get_config();
-		$data->set( 'not_a_real_key', 'nope' );
+		$data->set( 'not_a_real_key', 'nope', 1 );
 
 		$this->assertSame( $before, $data->get_config() );
 	}
@@ -370,17 +370,19 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Every update function rejects a patch whose version cannot be migrated —
-	 * newer than the latest supported version.
+	 * Every update function and set() reject a patch whose version cannot be
+	 * migrated — newer than the latest supported version.
 	 *
 	 * @covers ::update_properties
 	 * @covers ::update_view_list_items
 	 * @covers ::update_form_fields
+	 * @covers ::set
 	 */
 	public function test_update_functions_reject_unmigratable_version() {
 		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_properties' );
 		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_view_list_items' );
 		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_form_fields' );
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
 
 		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
 		$before = $data->get_config();
@@ -389,6 +391,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$data->update_properties( array( 'default_view' => array( 'type' => 'grid' ) ), $version );
 		$data->update_view_list_items( array( 'mine' => array( 'title' => 'Mine' ) ), $version );
 		$data->update_form_fields( array( 'excerpt' => array( 'layout' => array( 'labelPosition' => 'side' ) ) ), $version );
+		$data->set( 'default_view', array( 'type' => 'grid' ), $version );
 
 		$this->assertSame( $before, $data->get_config() );
 	}
