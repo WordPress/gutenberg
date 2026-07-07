@@ -266,8 +266,10 @@ function _gutenberg_get_api_key_source( string $setting_name, string $env_var_na
  */
 function _gutenberg_parse_application_password_credentials( string $value ): array {
 	$separator = strpos( $value, ':' );
-	$username  = false === $separator ? '' : substr( $value, 0, $separator );
-	$password  = false === $separator ? '' : substr( $value, $separator + 1 );
+	// Trim so surrounding whitespace or a trailing newline (common when the
+	// value comes from a file or `.env`) does not become part of the credentials.
+	$username  = false === $separator ? '' : trim( substr( $value, 0, $separator ) );
+	$password  = false === $separator ? '' : trim( substr( $value, $separator + 1 ) );
 
 	if ( '' === $username || '' === $password ) {
 		return array(
