@@ -476,7 +476,6 @@ export function useConnectorPlugin( {
 			// eslint-disable-next-line no-console
 			console.error( 'Failed to remove API key:', error );
 			createDisconnectErrorNotice();
-			throw error;
 		}
 	};
 
@@ -492,7 +491,6 @@ export function useConnectorPlugin( {
 			// eslint-disable-next-line no-console
 			console.error( 'Failed to remove credentials:', error );
 			createDisconnectErrorNotice();
-			throw error;
 		}
 	};
 
