@@ -30,6 +30,7 @@ import {
 	mergeCrdtBlocks,
 	type MergeCursorPosition,
 	mergeRichTextUpdate,
+	stripEmptyBlockMetadata,
 	type YBlock,
 	type YBlocks,
 } from './crdt-blocks';
@@ -415,11 +416,16 @@ export function getPostChangesFromCRDTDoc(
 						ydoc.meta?.get( CRDT_DOC_META_PERSISTENCE_KEY ) &&
 						editedRecord.content
 					) {
-						const blocksJson = ymap.get( 'blocks' )?.toJSON() ?? [];
+						// Empty metadata containers exist on every block in
+						// the document but are never serialized to content.
+						const blocksJson = stripEmptyBlockMetadata(
+							ymap.get( 'blocks' )?.toJSON() ?? []
+						);
 
 						return (
-							__unstableSerializeAndClean( blocksJson ).trim() !==
-							getRawValue( editedRecord.content )
+							__unstableSerializeAndClean(
+								blocksJson as WPBlock[]
+							).trim() !== getRawValue( editedRecord.content )
 						);
 					}
 

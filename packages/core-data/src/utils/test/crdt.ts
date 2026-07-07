@@ -74,7 +74,13 @@ import {
 	type PostChanges,
 	type YPostRecord,
 } from '../crdt';
-import type { Block, YBlock, YBlockRecord, YBlocks } from '../crdt-blocks';
+import {
+	stripEmptyBlockMetadata,
+	type Block,
+	type YBlock,
+	type YBlockRecord,
+	type YBlocks,
+} from '../crdt-blocks';
 import { updateSelectionHistory } from '../crdt-selection';
 import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
 import type { Post } from '../../entity-types';
@@ -330,9 +336,14 @@ describe( 'crdt', () => {
 
 			applyPostChangesToCRDTDoc( doc, changes, defaultSyncedProperties );
 
-			expect( ( map.get( 'blocks' ) as YBlocks ).toJSON() ).toEqual(
-				changes.blocks
-			);
+			// The document materializes empty metadata containers on every
+			// block so concurrent metadata writes from peers can merge; they
+			// are stripped again when blocks are read out of the document.
+			expect(
+				stripEmptyBlockMetadata(
+					( map.get( 'blocks' ) as YBlocks ).toJSON()
+				)
+			).toEqual( changes.blocks );
 		} );
 
 		it( 'initializes blocks as Y.Array when not present', () => {

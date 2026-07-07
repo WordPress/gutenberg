@@ -235,7 +235,7 @@ export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
 		return {
 			...rest,
 			name,
-			attributes: newAttributes,
+			attributes: withoutEmptyMetadata( name, newAttributes ),
 			innerBlocks: deserializeBlockAttributes( innerBlocks ?? [] ),
 		};
 	} );
@@ -254,9 +254,24 @@ function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 		innerBlocks: null,
 		clientId: null,
 	};
+	// The Y.Doc materializes empty metadata containers on every block
+	// (see createYMetadataMap) which editor blocks omit; ignore them when
+	// comparing.
 	const res = fastDeepEqual(
-		Object.assign( {}, gblock, overwrites ),
-		Object.assign( {}, yblockAsJson, overwrites )
+		Object.assign( {}, gblock, overwrites, {
+			attributes: gblock.attributes
+				? withoutEmptyMetadata( gblock.name, gblock.attributes )
+				: gblock.attributes,
+		} ),
+		Object.assign( {}, yblockAsJson, overwrites, {
+			attributes: yblockAsJson.attributes
+				? withoutEmptyMetadata(
+						gblock.name,
+						// toJSON() returns plain values despite the Y types.
+						yblockAsJson.attributes as unknown as BlockAttributes
+				  )
+				: yblockAsJson.attributes,
+		} )
 	);
 	const inners = gblock.innerBlocks || [];
 	const yinners = yblock.get( 'innerBlocks' );
@@ -273,20 +288,33 @@ function createNewYAttributeMap(
 	blockName: string,
 	attributes: BlockAttributes
 ): YBlockAttributes {
-	return new Y.Map(
-		Object.entries( attributes ).map(
-			( [ attributeName, attributeValue ] ) => {
-				return [
+	const entries: [ string, unknown ][] = Object.entries( attributes ).map(
+		( [ attributeName, attributeValue ] ): [ string, unknown ] => {
+			return [
+				attributeName,
+				createNewYAttributeValue(
+					blockName,
 					attributeName,
-					createNewYAttributeValue(
-						blockName,
-						attributeName,
-						attributeValue
-					),
-				];
-			}
-		)
+					attributeValue
+				),
+			];
+		}
 	);
+
+	// Materialize the metadata containers for every block, so concurrent
+	// first writes from peers merge into the same shared containers
+	// instead of racing to create them (see createYMetadataMap).
+	if (
+		! Object.hasOwn( attributes, METADATA_ATTRIBUTE_NAME ) &&
+		isGenericMetadataAttribute( blockName, METADATA_ATTRIBUTE_NAME )
+	) {
+		entries.push( [
+			METADATA_ATTRIBUTE_NAME,
+			createYMetadataMap( undefined ),
+		] );
+	}
+
+	return new Y.Map( entries );
 }
 
 function createNewYAttributeValue(
@@ -294,6 +322,10 @@ function createNewYAttributeValue(
 	attributeName: string,
 	attributeValue: unknown
 ): Y.Text | Y.Array< unknown > | Y.Map< unknown > | unknown {
+	if ( isGenericMetadataAttribute( blockName, attributeName ) ) {
+		return createYMetadataMap( attributeValue );
+	}
+
 	const schema = getBlockAttributeSchema( blockName, attributeName );
 	return createYValueFromSchema( schema, attributeValue );
 }
@@ -376,6 +408,243 @@ function createYMapFromQuery(
 	);
 
 	return new Y.Map( entries );
+}
+
+/*
+ * The `metadata` attribute is injected for every block type as a plain
+ * `{ type: 'object' }` attribute with no query schema (see
+ * block-editor/src/hooks/metadata.js). It is the shared storage mechanism
+ * for cross-cutting features such as note threads (`noteId`), custom block
+ * names, and block bindings. Without structured merging, two peers writing
+ * metadata concurrently (e.g. both attaching a note to the same block)
+ * would race on a plain `Y.Map.set()` and one peer's write would be
+ * discarded. See https://github.com/WordPress/gutenberg/issues/74751.
+ */
+const METADATA_ATTRIBUTE_NAME = 'metadata';
+
+/*
+ * Metadata keys holding arrays of primitive ids that must merge as sets
+ * across peers. They are stored as Y.Array so concurrent insertions
+ * commute, and the arrays are materialized for every block (even when
+ * empty) so concurrent first writes land in the same shared array instead
+ * of racing to create it (concurrent container creation is last-writer-wins
+ * in Yjs, which would discard one peer's contents).
+ */
+const METADATA_SET_KEYS = [ 'noteId' ];
+
+/**
+ * Whether the attribute is the generic block `metadata` attribute.
+ *
+ * Block types may register their own `metadata` attribute with a query
+ * schema; those keep the schema-driven merge behavior.
+ *
+ * @param blockName     The block type name.
+ * @param attributeName The attribute name.
+ * @return True if this is the generic (schema-less) metadata attribute.
+ */
+function isGenericMetadataAttribute(
+	blockName: string,
+	attributeName: string
+): boolean {
+	return (
+		attributeName === METADATA_ATTRIBUTE_NAME &&
+		! getBlockAttributeSchema( blockName, attributeName )?.query
+	);
+}
+
+/**
+ * Create the Y.Map for the generic block `metadata` attribute, with all
+ * set-type keys materialized as Y.Array (see METADATA_SET_KEYS).
+ *
+ * @param value The plain metadata object, if any.
+ * @return A Y.Map holding the metadata.
+ */
+function createYMetadataMap( value: unknown ): Y.Map< unknown > {
+	const record = isRecord( value ) ? value : {};
+	const entries: [ string, unknown ][] = Object.entries( record ).filter(
+		( [ key ] ) => ! METADATA_SET_KEYS.includes( key )
+	);
+
+	for ( const key of METADATA_SET_KEYS ) {
+		const yArray = new Y.Array< unknown >();
+		const raw = record[ key ];
+
+		if ( Array.isArray( raw ) && raw.length > 0 ) {
+			yArray.insert( 0, Array.from( new Set( raw ) ) );
+		}
+
+		entries.push( [ key, yArray ] );
+	}
+
+	return new Y.Map( entries );
+}
+
+/**
+ * Merge an incoming plain metadata object into the block's metadata Y.Map.
+ *
+ * Set-type keys are diffed into their shared Y.Array so concurrent
+ * insertions from peers commute; their containers are cleared but never
+ * deleted. Other keys are replaced per-key.
+ *
+ * @param yAttributes   The Y.Map holding the block's attributes.
+ * @param incomingValue The incoming plain metadata object (may be absent).
+ */
+function mergeYMetadataAttribute(
+	yAttributes: YBlockAttributes,
+	incomingValue: unknown
+): void {
+	const currentMetadata = yAttributes.get( METADATA_ATTRIBUTE_NAME );
+
+	// Adopt or upgrade (e.g. from documents created before metadata was
+	// stored as a Y.Map) by replacing wholesale.
+	if ( ! ( currentMetadata instanceof Y.Map ) ) {
+		yAttributes.set(
+			METADATA_ATTRIBUTE_NAME,
+			createYMetadataMap( incomingValue )
+		);
+		return;
+	}
+
+	const record = isRecord( incomingValue ) ? incomingValue : {};
+
+	for ( const key of METADATA_SET_KEYS ) {
+		const raw = record[ key ];
+		const newValues = Array.isArray( raw )
+			? Array.from( new Set( raw ) )
+			: [];
+		const yArray = currentMetadata.get( key );
+
+		if ( yArray instanceof Y.Array ) {
+			mergeYPrimitiveSet( yArray, newValues );
+		} else {
+			// Key was lost or holds a plain value: rebuild the container.
+			const newYArray = new Y.Array< unknown >();
+			if ( newValues.length > 0 ) {
+				newYArray.insert( 0, newValues );
+			}
+			currentMetadata.set( key, newYArray );
+		}
+	}
+
+	for ( const [ key, val ] of Object.entries( record ) ) {
+		if ( METADATA_SET_KEYS.includes( key ) ) {
+			continue;
+		}
+
+		if ( ! fastDeepEqual( currentMetadata.get( key ), val ) ) {
+			currentMetadata.set( key, val );
+		}
+	}
+
+	// Delete keys absent from the incoming object, except the set-type
+	// containers, which are kept alive (cleared above) so concurrent
+	// insertions from peers are never lost to container re-creation.
+	for ( const key of Array.from( currentMetadata.keys() ) ) {
+		if (
+			! METADATA_SET_KEYS.includes( key ) &&
+			! Object.hasOwn( record, key )
+		) {
+			currentMetadata.delete( key );
+		}
+	}
+}
+
+/**
+ * Merge a plain array of unique primitive values into a Y.Array in-place,
+ * with set semantics: values missing from `newValues` are deleted and new
+ * values are appended. Element order is not significant.
+ *
+ * @param yArray    The existing Y.Array to update.
+ * @param newValues The new set of values.
+ */
+function mergeYPrimitiveSet(
+	yArray: Y.Array< unknown >,
+	newValues: unknown[]
+): void {
+	const newSet = new Set( newValues );
+
+	// Delete from the end so indices stay valid while deleting.
+	for ( let i = yArray.length - 1; i >= 0; i-- ) {
+		if ( ! newSet.has( yArray.get( i ) ) ) {
+			yArray.delete( i, 1 );
+		}
+	}
+
+	const currentSet = new Set( yArray.toArray() );
+	const toAppend = newValues.filter( ( value ) => ! currentSet.has( value ) );
+
+	if ( toAppend.length > 0 ) {
+		yArray.insert( yArray.length, toAppend );
+	}
+}
+
+/**
+ * Remove empty metadata containers from a block's attributes.
+ *
+ * The CRDT document always materializes the generic `metadata` attribute
+ * (and its set-type keys) for every block so concurrent writes from peers
+ * merge instead of racing on container creation. Blocks in the editor omit
+ * the attribute entirely when it holds no values, so empty containers are
+ * stripped whenever blocks are read out of the document.
+ *
+ * @param blockName  The block type name.
+ * @param attributes The block attributes (plain values, from toJSON()).
+ * @return Attributes without empty metadata containers.
+ */
+function withoutEmptyMetadata(
+	blockName: string,
+	attributes: BlockAttributes
+): BlockAttributes {
+	const metadata = attributes?.[ METADATA_ATTRIBUTE_NAME ];
+
+	if (
+		! isRecord( metadata ) ||
+		! isGenericMetadataAttribute( blockName, METADATA_ATTRIBUTE_NAME )
+	) {
+		return attributes;
+	}
+
+	const newMetadata = { ...metadata };
+
+	for ( const key of METADATA_SET_KEYS ) {
+		const value = newMetadata[ key ];
+		if ( Array.isArray( value ) && value.length === 0 ) {
+			delete newMetadata[ key ];
+		}
+	}
+
+	if (
+		Object.keys( newMetadata ).length === Object.keys( metadata ).length
+	) {
+		return attributes;
+	}
+
+	const newAttributes = { ...attributes };
+
+	if ( Object.keys( newMetadata ).length === 0 ) {
+		delete newAttributes[ METADATA_ATTRIBUTE_NAME ];
+	} else {
+		newAttributes[ METADATA_ATTRIBUTE_NAME ] = newMetadata;
+	}
+
+	return newAttributes;
+}
+
+/**
+ * Recursively remove empty metadata containers from blocks extracted from
+ * the CRDT document (see withoutEmptyMetadata).
+ *
+ * @param blocks Blocks as extracted from the CRDT document via toJSON().
+ * @return Blocks without empty metadata containers.
+ */
+export function stripEmptyBlockMetadata( blocks: Block[] ): Block[] {
+	return blocks.map( ( block: Block ) => ( {
+		...block,
+		attributes: block.attributes
+			? withoutEmptyMetadata( block.name, block.attributes )
+			: block.attributes,
+		innerBlocks: stripEmptyBlockMetadata( block.innerBlocks ?? [] ),
+	} ) );
 }
 
 function createNewYBlock( block: Block ): YBlock {
@@ -530,6 +799,19 @@ export function mergeCrdtBlocks(
 								incomingAttributeName,
 								incomingAttributeValue,
 							] ) => {
+								if (
+									isGenericMetadataAttribute(
+										incomingYBlock.name,
+										incomingAttributeName
+									)
+								) {
+									mergeYMetadataAttribute(
+										localAttributes,
+										incomingAttributeValue
+									);
+									return;
+								}
+
 								const currentAttribute = localAttributes?.get(
 									incomingAttributeName
 								);
@@ -568,9 +850,41 @@ export function mergeCrdtBlocks(
 							}
 						);
 
+						// The metadata containers are kept alive even when
+						// the incoming block carries no metadata: deleting
+						// and re-creating them would reintroduce the
+						// container-creation race for concurrent writes.
+						// Merging an empty object clears their values
+						// instead.
+						if (
+							! incomingAttributes.hasOwnProperty(
+								METADATA_ATTRIBUTE_NAME
+							) &&
+							isGenericMetadataAttribute(
+								incomingYBlock.name,
+								METADATA_ATTRIBUTE_NAME
+							)
+						) {
+							mergeYMetadataAttribute(
+								localAttributes,
+								undefined
+							);
+						}
+
 						// Delete any attributes that are no longer present.
 						localAttributes.forEach(
 							( _attrValue: unknown, attrName: string ) => {
+								if (
+									attrName === METADATA_ATTRIBUTE_NAME &&
+									isGenericMetadataAttribute(
+										incomingYBlock.name,
+										attrName
+									)
+								) {
+									// Cleared above, never deleted.
+									return;
+								}
+
 								if (
 									! incomingBlockPropertyValue.hasOwnProperty(
 										attrName
