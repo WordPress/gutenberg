@@ -55,6 +55,7 @@ export const readOnlyDescriptionField: Field< Template > = {
 	readOnly: true,
 	isVisible: ( item ) => ! isCustomTemplate( item ) && !! item.description,
 	enableSorting: false,
+	enableHiding: false,
 	filterBy: false,
 };
 

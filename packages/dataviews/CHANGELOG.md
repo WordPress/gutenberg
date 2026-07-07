@@ -2,7 +2,17 @@
 
 ## Unreleased
 
-## 17.0.0-next.0 (2026-06-19)
+### Bug Fix
+
+- DataViews: Stop the infinite-scroll list from jumping while pages load asynchronously. The scroll-anchor restoration no longer discards scrolling the user did during the load, and the footer's visibility no longer depends on the loading state, so it no longer mounts mid-load (resizing the scroll container). [#79546](https://github.com/WordPress/gutenberg/pull/79546)
+
+### Internal
+
+-   Update `@ariakit/react` to `0.4.32` ([#79860](https://github.com/WordPress/gutenberg/pull/79860)).
+
+## 17.1.0 (2026-07-01)
+
+## 17.0.0 (2026-06-24)
 
 ### Breaking Changes
 
@@ -10,6 +20,7 @@
 
 ### Bug Fix
 
+- DataForm panel layout: fix double-clicking a field row leaving the flyout stuck open. [#79348](https://github.com/WordPress/gutenberg/pull/79348)
 - DataForm panel layout: use `overflow: clip` on field controls so focus rings of inner elements are no longer clipped. [#79275](https://github.com/WordPress/gutenberg/pull/79275)
 
 ### Code Quality
@@ -20,11 +31,13 @@
 
 ### Documentation
 
-- Fix `overriden` typo to `overridden` in README. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
+-   Fix `overriden` typo to `overridden` in README. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
+-   Add component documentation for `DataViews`, `DataViewsPicker`, and `DataForm` components ([#79460](https://github.com/WordPress/gutenberg/pull/79460)).
 
 ### Internal
 
 - Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
+- Migrate the remaining `var(--wpds-dimension-base)` usages off the removed primitive token [#79254](https://github.com/WordPress/gutenberg/pull/79254).
 
 ## 16.0.1 (2026-06-16)
 

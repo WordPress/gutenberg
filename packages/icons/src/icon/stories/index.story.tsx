@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { ReactElement } from 'react';
+import type { StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -38,4 +39,29 @@ export const Default = (): ReactElement => {
 			</div>
 		</>
 	);
+};
+
+/**
+ *
+ */
+export const CurrentColor: StoryFn< typeof Icon > = ( args ) => {
+	return (
+		<div
+			style={ {
+				display: 'flex',
+				alignItems: 'center',
+				padding: '4px',
+				gap: '4px',
+				color: 'blue',
+				border: '1px solid blue',
+			} }
+		>
+			<Icon { ...args } />
+			This div has a blue <code>color</code>, and the icon will be
+			rendered in the same color.
+		</div>
+	);
+};
+CurrentColor.args = {
+	icon: icons.wordpress,
 };

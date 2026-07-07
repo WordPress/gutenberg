@@ -95,17 +95,11 @@
 
 			/*
 			 * The shared `outset-ring--focus-visible` utility (composed by
-			 * the Content components) uses an `outline-offset` of `+1px`,
-			 * which for this scroll container would put the ring outside
-			 * the popup's rounded corners and have it clipped by the
-			 * popup's `overflow: hidden`. Inset the ring by the focus
-			 * width instead, so it sits flush inside the content box.
-			 *
-			 * The shared utility's transition shorthand (`transition:
-			 * outline …`) only animates outline-color and outline-width,
-			 * not outline-offset, so the negative offset applied here is
-			 * static — visually, the ring still fades in/out via color
-			 * change while the offset stays put.
+			 * the Content components) uses a positive `outline-offset`,
+			 * which for this scroll container would put the ring outside the
+			 * popup's rounded corners and have it clipped by the popup's
+			 * `overflow: hidden`. Inset the ring by the focus width instead,
+			 * so it sits flush inside the content box.
 			 */
 			&:focus-visible {
 				outline-offset: calc(var(--wpds-border-width-focus) * -1);

@@ -5,12 +5,12 @@ type AdminThemeColors = {
 
 const DEFAULT_THEME_COLORS: AdminThemeColors = {
 	primary: '#3858e9',
-	background: '#25292b',
+	background: '#222524',
 };
 
 const ADMIN_THEME_COLORS = new Map< string, AdminThemeColors >( [
-	[ 'fresh', DEFAULT_THEME_COLORS ],
-	[ 'modern', { primary: '#3858e9', background: '#222524' } ],
+	[ 'modern', DEFAULT_THEME_COLORS ],
+	[ 'fresh', { primary: '#3858e9', background: '#25292b' } ],
 	[ 'midnight', { primary: '#cf4339', background: '#3d4042' } ],
 	[ 'coffee', { primary: '#916745', background: '#5b534d' } ],
 	[ 'ocean', { primary: '#567958', background: '#5f787f' } ],
@@ -31,7 +31,7 @@ const ADMIN_THEME_COLORS = new Map< string, AdminThemeColors >( [
 export function getAdminThemeColors(): AdminThemeColors {
 	const scheme =
 		document.body.className.match( /admin-color-([\w-]+)/ )?.[ 1 ] ??
-		'fresh';
+		'modern';
 
 	return ADMIN_THEME_COLORS.get( scheme ) ?? DEFAULT_THEME_COLORS;
 }

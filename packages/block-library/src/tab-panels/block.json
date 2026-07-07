@@ -9,7 +9,6 @@
 	"textdomain": "default",
 	"parent": [ "core/tabs" ],
 	"allowedBlocks": [ "core/tab-panel" ],
-	"attributes": {},
 	"supports": {
 		"html": false,
 		"visibility": false,

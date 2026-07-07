@@ -45,6 +45,7 @@ _Parameters_
 -   _name_ `string`: Block name.
 -   _attributes_ `Record< string, unknown >`: Block attributes.
 -   _innerBlocks_ `Block[]`: Nested blocks.
+-   _innerContent_ `Array< string | null >`: Static HTML fragments interleaved with inner blocks, where `null` entries mark inner block positions. Only applies to the Custom HTML block.
 
 _Returns_
 
@@ -56,7 +57,7 @@ Given an array of InnerBlocks templates or Block Objects, returns an array of cr
 
 _Parameters_
 
--   _innerBlocksOrTemplate_ `Array< Block | [ string, Record< string, unknown >?, Array< unknown >? ] >`: Nested blocks or InnerBlocks templates.
+-   _innerBlocksOrTemplate_ `Array< Block | TemplateBlock >`: Nested blocks or InnerBlocks templates.
 
 _Returns_
 

@@ -61,7 +61,6 @@ export function AllowOverridesModal( {
 						) }
 					</Text>
 					<TextControl
-						__next40pxDefaultSize
 						value={ editedBlockName }
 						label={ __( 'Name' ) }
 						help={ __(
@@ -70,7 +69,7 @@ export function AllowOverridesModal( {
 						placeholder={ placeholder }
 						onChange={ setEditedBlockName }
 					/>
-					<Stack justify="end">
+					<Stack gap="sm" justify="end">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
@@ -78,7 +77,6 @@ export function AllowOverridesModal( {
 						>
 							{ __( 'Cancel' ) }
 						</Button>
-
 						<Button
 							__next40pxDefaultSize
 							aria-disabled={ ! isNameValid }

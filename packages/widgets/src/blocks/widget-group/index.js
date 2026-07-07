@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
+import {
+	createBlock,
+	__experimentalCloneSanitizedBlock,
+} from '@wordpress/blocks';
 import { group as icon } from '@wordpress/icons';
 
 /**
@@ -39,15 +42,9 @@ export const settings = {
 				},
 				__experimentalConvert( blocks ) {
 					// Put the selected blocks inside the new Widget Group's innerBlocks.
-					let innerBlocks = [
-						...blocks.map( ( block ) => {
-							return createBlock(
-								block.name,
-								block.attributes,
-								block.innerBlocks
-							);
-						} ),
-					];
+					let innerBlocks = blocks.map( ( block ) =>
+						__experimentalCloneSanitizedBlock( block )
+					);
 
 					// If the first block is a heading then assume this is intended
 					// to be the Widget's "title".
