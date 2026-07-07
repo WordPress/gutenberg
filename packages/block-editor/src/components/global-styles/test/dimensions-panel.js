@@ -147,16 +147,22 @@ function expectLocalOverride( el ) {
 }
 /* eslint-enable testing-library/no-node-access */
 
-// Asserts the at-rest placeholder treatment for a control: when a placeholder
-// is expected the input shows it and carries the inherited cue; otherwise it
-// shows neither. Kept as a helper so the branch isn't a conditional `expect`
-// in the test body (which `jest/no-conditional-expect` disallows).
-function expectPlaceholderState( el, placeholder ) {
+// Asserts the at-rest placeholder treatment for a control. The single-string
+// placeholder and the inherited at-rest label treatment are independent: a
+// control can inherit a value (at-rest) while showing no placeholder when the
+// inherited sides differ (BoxControl cannot render a per-side placeholder).
+// `atRest` defaults to whether a placeholder is expected. Kept as a helper so
+// the branch isn't a conditional `expect` in the test body (which
+// `jest/no-conditional-expect` disallows).
+function expectPlaceholderState( el, placeholder, atRest = !! placeholder ) {
 	if ( placeholder ) {
 		expect( el ).toHaveAttribute( 'placeholder', placeholder );
-		expectAtRest( el );
 	} else {
 		expect( el ).not.toHaveAttribute( 'placeholder' );
+	}
+	if ( atRest ) {
+		expectAtRest( el );
+	} else {
 		expectNotAtRest( el );
 	}
 }
@@ -322,8 +328,10 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				placeholder: '20px',
 			},
 			{
-				// Per-side mismatch is deferred: the single "All sides"
-				// input cannot represent differing sides, so no placeholder.
+				// Per-side mismatch: the single "All sides" input cannot
+				// represent differing sides, so no placeholder is shown, but
+				// the control still reflects the inherited value via the
+				// at-rest label treatment.
 				name: 'object with sides that differ',
 				padding: {
 					top: '16px',
@@ -332,10 +340,24 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 					left: '8px',
 				},
 				placeholder: null,
+				atRest: true,
+			},
+			{
+				// Only some sides defined (e.g. the top/bottom-only margin a
+				// theme may set). No common single-string placeholder, but the
+				// inherited value is present so the control still shows the
+				// at-rest label treatment.
+				name: 'object with only some sides defined',
+				padding: {
+					top: '16px',
+					bottom: '16px',
+				},
+				placeholder: null,
+				atRest: true,
 			},
 		] )(
 			'renders an inherited padding $name as placeholder $placeholder when `value` is empty',
-			( { padding, placeholder } ) => {
+			( { padding, placeholder, atRest } ) => {
 				renderPanel( {
 					value: {},
 					inheritedValue: { spacing: { padding } },
@@ -343,7 +365,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				} );
 
 				const paddingAllSides = getPaddingAllSides();
-				expectPlaceholderState( paddingAllSides, placeholder );
+				expectPlaceholderState( paddingAllSides, placeholder, atRest );
 			}
 		);
 
@@ -361,28 +383,66 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 		} );
 	} );
 
-	// DimensionControl-based inputs (minHeight, width) render the
-	// custom-value path of PresetInputControl when no presets are configured.
+	// The min-dimension DimensionControls (minHeight, minWidth) use the
+	// local-then-inherited pattern: the inherited value is rendered as the
+	// control's value (so the unit parses from it) and marked at-rest, rather
+	// than shown as a placeholder. It is only committed to local on user
+	// change.
 	describe.each( [
 		{
 			name: 'minHeight',
 			leaf: 'minHeight',
 			label: /minimum height/i,
 			inherited: '320px',
+			expected: 320,
 		},
-		{ name: 'width', leaf: 'width', label: /^width$/i, inherited: '640px' },
-	] )( 'DimensionControl ($name)', ( { leaf, label, inherited } ) => {
+		{
+			name: 'minWidth',
+			leaf: 'minWidth',
+			label: /minimum width/i,
+			inherited: '200px',
+			expected: 200,
+		},
+	] )(
+		'DimensionControl ($name)',
+		( { leaf, label, inherited, expected } ) => {
+			it( 'renders an inherited value as the control value when `value` is empty', () => {
+				renderPanel( {
+					value: {},
+					inheritedValue: { dimensions: { [ leaf ]: inherited } },
+					settings: settingsWithDimensions,
+				} );
+
+				const input = getDimensionInput( label );
+				expect( input ).toBeDefined();
+				expect( input ).toHaveValue( expected );
+				// The placeholder carries only the numeric portion of the
+				// inherited value; the unit selector reflects the inherited
+				// unit separately, so the raw unit string must not leak in.
+				expect( input ).toHaveAttribute(
+					'placeholder',
+					`${ expected }`
+				);
+				expect( input ).not.toHaveAttribute( 'placeholder', inherited );
+				expectAtRest( input );
+			} );
+		}
+	);
+
+	// The plain `width` DimensionControl still uses the native-placeholder
+	// pattern for its inherited value.
+	describe( 'DimensionControl (width)', () => {
 		it( 'renders an inherited value as placeholder when `value` is empty', () => {
 			renderPanel( {
 				value: {},
-				inheritedValue: { dimensions: { [ leaf ]: inherited } },
+				inheritedValue: { dimensions: { width: '640px' } },
 				settings: settingsWithDimensions,
 			} );
 
-			const input = getDimensionInput( label );
+			const input = getDimensionInput( /^width$/i );
 			expect( input ).toBeDefined();
 			expect( input ).toHaveValue( null );
-			expect( input ).toHaveAttribute( 'placeholder', inherited );
+			expect( input ).toHaveAttribute( 'placeholder', '640px' );
 			expectAtRest( input );
 		} );
 	} );

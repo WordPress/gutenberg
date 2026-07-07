@@ -143,11 +143,12 @@ const settingsWithFonts = {
 };
 
 describe( 'TypographyPanel — inheritedValue round-trip', () => {
-	it( 'renders a numeric leaf from `inheritedValue` as placeholder when `value` is empty', () => {
-		// LineHeightControl uses the placeholder pattern: the inherited
-		// value is communicated via the input's `placeholder` attribute
-		// and an inherited-value class hook on the wrapper, rather than
-		// as the rendered `value`.
+	it( 'renders a numeric leaf from `inheritedValue` as the control value when `value` is empty', () => {
+		// LineHeightControl uses the local-then-inherited pattern: the
+		// inherited value is rendered as the control's value (so the
+		// numeric stepper increments from the inherited base) and an
+		// inherited-value class hook marks it as at-rest. It is only
+		// committed to local on user change.
 		const inheritedValue = {
 			typography: { lineHeight: '1.7' },
 		};
@@ -155,8 +156,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		renderPanel( { inheritedValue } );
 
 		const lineHeightInput = screen.getByLabelText( /line height/i );
-		expect( lineHeightInput ).toHaveValue( null );
-		expect( lineHeightInput ).toHaveAttribute( 'placeholder', '1.7' );
+		expect( lineHeightInput ).toHaveValue( 1.7 );
 		expectInheritedCue( lineHeightInput, true );
 	} );
 
@@ -304,11 +304,12 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		expectInheritedCue( lineHeightInput, false );
 	} );
 
-	it( 'renders a unit-string leaf from `inheritedValue` as placeholder when `value` is empty', () => {
-		// LetterSpacingControl uses UnitControl under the hood; the
-		// per-control placeholder pattern threads `placeholder` and
-		// `className` through to the inner input the same way as
-		// LineHeightControl and the textColumns NumberControl.
+	it( 'renders a unit-string leaf from `inheritedValue` as the control value when `value` is empty', () => {
+		// LetterSpacingControl uses the local-then-inherited pattern: the
+		// inherited value is rendered as the control's value (so the unit
+		// parses from it rather than sitting behind a default px unit) and an
+		// inherited-value class hook marks it at-rest. It is only committed to
+		// local on user change.
 		const inheritedValue = {
 			typography: { letterSpacing: '0.5px' },
 		};
@@ -316,8 +317,15 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		renderPanel( { inheritedValue } );
 
 		const letterSpacingInput = screen.getByLabelText( /letter spacing/i );
-		expect( letterSpacingInput ).toHaveValue( null );
-		expect( letterSpacingInput ).toHaveAttribute( 'placeholder', '0.5px' );
+		expect( letterSpacingInput ).toHaveValue( 0.5 );
+		// The placeholder carries only the numeric portion of the inherited
+		// value; the unit selector reflects the inherited unit separately, so
+		// the raw unit string ("0.5px") must never leak into the placeholder.
+		expect( letterSpacingInput ).toHaveAttribute( 'placeholder', '0.5' );
+		expect( letterSpacingInput ).not.toHaveAttribute(
+			'placeholder',
+			'0.5px'
+		);
 		expectInheritedCue( letterSpacingInput, true );
 	} );
 
@@ -337,11 +345,11 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		expectInheritedCue( letterSpacingInput, false );
 	} );
 
-	it( 'placeholder for one input does not leak when other inputs are committed', () => {
-		// A locally-set lineHeight should not affect placeholder
+	it( 'value for one input does not leak when other inputs are committed', () => {
+		// A locally-set lineHeight should not affect the inherited value
 		// rendering for letterSpacing, and vice versa. Each control's
-		// `isPlaceholder` boolean is computed independently from its
-		// own leaf path.
+		// local/inherited resolution is computed independently from its own
+		// leaf path.
 		const inheritedValue = {
 			typography: { lineHeight: '1.7', letterSpacing: '0.5px' },
 		};
@@ -351,15 +359,14 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 		renderPanel( { value, inheritedValue } );
 
-		// lineHeight: locally-set, no placeholder.
+		// lineHeight: locally-set, not at-rest.
 		const lineHeightInput = screen.getByLabelText( /line height/i );
 		expect( lineHeightInput ).toHaveValue( 1.4 );
 		expectInheritedCue( lineHeightInput, false );
 
-		// letterSpacing: not locally set, placeholder still active.
+		// letterSpacing: not locally set, shows the inherited value at rest.
 		const letterSpacingInput = screen.getByLabelText( /letter spacing/i );
-		expect( letterSpacingInput ).toHaveValue( null );
-		expect( letterSpacingInput ).toHaveAttribute( 'placeholder', '0.5px' );
+		expect( letterSpacingInput ).toHaveValue( 0.5 );
 		expectInheritedCue( letterSpacingInput, true );
 	} );
 
@@ -516,7 +523,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 	} );
 
 	describe( 'TextIndent (input archetype)', () => {
-		it( 'renders an inherited textIndent as placeholder when local is unset', async () => {
+		it( 'renders an inherited textIndent as the control value when local is unset', async () => {
 			const inheritedValue = {
 				typography: { textIndent: '2rem' },
 			};
@@ -526,12 +533,15 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			// `TextIndentControl` in `withSlider` mode renders both a
 			// UnitControl number input AND a RangeControl slider with
 			// the same label, so we target the spinbutton role to
-			// pick the UnitControl input specifically.
+			// pick the UnitControl input specifically. The inherited
+			// value is rendered as the control's value (parsed quantity),
+			// so the unit selector reflects the inherited unit and the
+			// stepper starts from it; it is committed to local only on
+			// user change.
 			const indentInput = screen.getByRole( 'spinbutton', {
 				name: /line indent/i,
 			} );
-			expect( indentInput ).toHaveValue( null );
-			expect( indentInput ).toHaveAttribute( 'placeholder', '2rem' );
+			expect( indentInput ).toHaveValue( 2 );
 			expectInheritedCue( indentInput, true );
 		} );
 
