@@ -787,7 +787,6 @@ export default function GalleryEdit( props ) {
 								options={ imageSizeOptions }
 								onChange={ updateImagesSize }
 								hideCancelButton
-								size="__unstable-large"
 							/>
 						</ToolsPanelItem>
 					) }
@@ -843,7 +842,6 @@ export default function GalleryEdit( props ) {
 							isShownByDefault
 						>
 							<SelectControl
-								__next40pxDefaultSize
 								label={ __( 'Aspect ratio' ) }
 								help={ __(
 									'Set a consistent aspect ratio for all images in the gallery.'
