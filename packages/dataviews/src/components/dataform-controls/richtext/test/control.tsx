@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, screen, fireEvent, act } from '@testing-library/react';
+import type { MutableRefObject } from 'react';
 
 /**
  * WordPress dependencies
@@ -283,7 +284,11 @@ describe( 'RichTextControl', () => {
 		// `packages/rich-text/src/keyboard-shortcut.js`.
 		function TestShortcut( { onUse }: { onUse: () => void } ) {
 			const { KeyboardShortcutContext } = unlock( richTextPrivateApis );
-			const keyboardShortcuts = useContext( KeyboardShortcutContext );
+			// The context is created without a type argument on the private
+			// API side, so type the ref it carries here.
+			const keyboardShortcuts = useContext(
+				KeyboardShortcutContext
+			) as MutableRefObject< Set< ( event: KeyboardEvent ) => void > >;
 			useEffect( () => {
 				const shortcuts = keyboardShortcuts.current;
 				const handler = ( event: KeyboardEvent ) => {

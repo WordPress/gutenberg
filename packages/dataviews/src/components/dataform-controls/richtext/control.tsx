@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { FocusEvent, MutableRefObject } from 'react';
+import type { FocusEvent, MutableRefObject, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -91,7 +91,7 @@ export type RichTextControlProps = {
 	/**
 	 * Help text displayed below the field and linked via `aria-describedby`.
 	 */
-	help?: string;
+	help?: ReactNode;
 	/**
 	 * Whether the field is non-editable.
 	 */
