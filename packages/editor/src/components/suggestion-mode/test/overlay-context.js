@@ -91,6 +91,64 @@ describe( 'overlayReducer', () => {
 		expect( next ).toBe( INITIAL );
 	} );
 
+	it( 'stamps structural ops with the capture sequence and keeps attribute stamps', () => {
+		const withBaseline = overlayReducer( INITIAL, {
+			type: 'CAPTURE_BASELINE',
+			clientId: CLIENT_ID,
+			blockName: 'core/paragraph',
+			attributes: { content: 'A' },
+		} );
+		const withAttr = overlayReducer( withBaseline, {
+			type: 'SET_OVERLAY_ATTRIBUTES',
+			clientId: CLIENT_ID,
+			attributes: { content: 'B' },
+			seq: 3,
+		} );
+		const withOp = overlayReducer( withAttr, {
+			type: 'SET_STRUCTURAL_OP',
+			clientId: CLIENT_ID,
+			blockName: 'core/paragraph',
+			op: { type: 'block-remove' },
+			seq: 5,
+		} );
+		expect( withOp[ CLIENT_ID ].structuralOpSeq ).toBe( 5 );
+		// The attribute stamp survives the structural rewrite of the entry.
+		expect( withOp[ CLIENT_ID ].lastEditSeq ).toBe( 3 );
+	} );
+
+	it( 'stamps overlay writes with the capture sequence and keeps the last one', () => {
+		const withBaseline = overlayReducer( INITIAL, {
+			type: 'CAPTURE_BASELINE',
+			clientId: CLIENT_ID,
+			blockName: 'core/heading',
+			attributes: { level: 2 },
+		} );
+		const first = overlayReducer( withBaseline, {
+			type: 'SET_OVERLAY_ATTRIBUTES',
+			clientId: CLIENT_ID,
+			attributes: { level: 3 },
+			seq: 7,
+		} );
+		expect( first[ CLIENT_ID ].lastEditSeq ).toBe( 7 );
+
+		// A later write without a sequence (reducer-level consumers) keeps
+		// the previous stamp instead of clearing it.
+		const second = overlayReducer( first, {
+			type: 'SET_OVERLAY_ATTRIBUTES',
+			clientId: CLIENT_ID,
+			attributes: { level: 4 },
+		} );
+		expect( second[ CLIENT_ID ].lastEditSeq ).toBe( 7 );
+
+		const third = overlayReducer( second, {
+			type: 'SET_OVERLAY_ATTRIBUTES',
+			clientId: CLIENT_ID,
+			attributes: { level: 5 },
+			seq: 9,
+		} );
+		expect( third[ CLIENT_ID ].lastEditSeq ).toBe( 9 );
+	} );
+
 	it( 'prunes entries whose clientId is no longer live', () => {
 		const state = {
 			'alive-1': {

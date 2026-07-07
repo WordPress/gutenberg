@@ -10,6 +10,8 @@ export {
 } from './with-suggestion-overlay';
 export { default as SuggestionAutoSave } from './auto-save';
 export { default as SuggestionStoreInterceptor } from './store-interceptor';
+export { default as SuggestionUndoGuard } from './suggestion-undo-guard';
+export { default as SuggestionNoteGC } from './suggestion-note-gc';
 export {
 	useSuggestionsProvider,
 	operationsFromOverlay,

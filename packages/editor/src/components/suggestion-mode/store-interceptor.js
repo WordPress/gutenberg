@@ -722,6 +722,7 @@ export default function SuggestionStoreInterceptor() {
 		unmarkDeferredInsertion,
 		isDeferredInsertion,
 		clearDeferredInsertions,
+		consumeUndoRedoAdoption,
 	} = useSuggestionOverlay();
 	const registry = useRegistry();
 
@@ -749,6 +750,9 @@ export default function SuggestionStoreInterceptor() {
 
 	const consumeInterceptorBypassRef = useRef( consumeInterceptorBypass );
 	consumeInterceptorBypassRef.current = consumeInterceptorBypass;
+
+	const consumeUndoRedoAdoptionRef = useRef( consumeUndoRedoAdoption );
+	consumeUndoRedoAdoptionRef.current = consumeUndoRedoAdoption;
 
 	// The deferred-insertion callbacks are identity-stable (`useCallback`
 	// with no dependencies in the overlay provider), so unlike the values
@@ -807,8 +811,95 @@ export default function SuggestionStoreInterceptor() {
 		// detected mutation, so the resulting subscribe fire doesn't loop.
 		let isReverting = false;
 
+		/*
+		 * Whether the live tree drifted from the capture baseline: a block
+		 * appeared, disappeared, or changed attribute identity. Used to gate
+		 * undo/redo adoption below — a selection-only store update must not
+		 * consume an armed adoption token. Same-parent reorders always come
+		 * with a marker (metadata) change in the undo cases this guards, so
+		 * membership + identity is a sufficient drift signal.
+		 */
+		const hasBaselineDrift = () => {
+			const liveClientIds =
+				blockEditor.getClientIdsWithDescendants?.() ?? [];
+			// Deferred empty placeholders are intentionally unsnapshotted;
+			// their presence is not drift.
+			let tracked = 0;
+			for ( const clientId of liveClientIds ) {
+				if ( isDeferredInsertion( clientId ) ) {
+					continue;
+				}
+				tracked++;
+				const previous = snapshot.get( clientId );
+				if (
+					previous === undefined ||
+					previous !== blockEditor.getBlockAttributes( clientId )
+				) {
+					return true;
+				}
+			}
+			return tracked !== snapshot.size;
+		};
+
+		/*
+		 * Adopt the live tree as the new capture baseline: re-seed the
+		 * attribute snapshot and the tree snapshot from current state. Used
+		 * when an undo/redo lands — the resulting state is the user's
+		 * explicit target, not an edit to capture. A block whose snapshot
+		 * carried a `pending-insert` marker and is back to an unmodified
+		 * default block was a suggested insertion the undo emptied out:
+		 * re-defer it so typing into it re-registers the insertion instead
+		 * of writing through as a plain edit.
+		 */
+		const adoptLiveTreeAsBaseline = () => {
+			const liveClientIds =
+				blockEditor.getClientIdsWithDescendants?.() ?? [];
+			const live = new Set( liveClientIds );
+			for ( const clientId of [ ...snapshot.keys() ] ) {
+				if ( ! live.has( clientId ) ) {
+					snapshot.delete( clientId );
+				}
+			}
+			for ( const clientId of liveClientIds ) {
+				if ( isDeferredInsertion( clientId ) ) {
+					continue;
+				}
+				const previous = snapshot.get( clientId );
+				const block = blockEditor.getBlock?.( clientId );
+				if (
+					previous?.metadata?.suggestion?.type === 'pending-insert' &&
+					block &&
+					isUnmodifiedDefaultBlock( block )
+				) {
+					snapshot.delete( clientId );
+					markDeferredInsertion( clientId );
+					continue;
+				}
+				snapshot.set(
+					clientId,
+					blockEditor.getBlockAttributes( clientId )
+				);
+			}
+			tree = captureTreeSnapshot( blockEditor );
+		};
+
 		const unsubscribe = registry.subscribe( () => {
 			if ( isReverting ) {
+				return;
+			}
+
+			/*
+			 * An armed undo/redo landing: adopt the resulting state wholesale
+			 * instead of diffing it — capturing an undo as a fresh suggestion
+			 * (or reverting it) would defeat the user's intent. Drift is
+			 * checked first so unrelated fires (selection changes) don't
+			 * consume the token before the entity → block sync arrives.
+			 */
+			if (
+				hasBaselineDrift() &&
+				consumeUndoRedoAdoptionRef.current?.()
+			) {
+				adoptLiveTreeAsBaseline();
 				return;
 			}
 

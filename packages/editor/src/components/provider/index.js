@@ -51,6 +51,8 @@ import {
 	SuggestionOverlayProvider,
 	SuggestionAutoSave,
 	SuggestionStoreInterceptor,
+	SuggestionUndoGuard,
+	SuggestionNoteGC,
 	registerSuggestionOverlayFilter,
 	isSuggestionModeEnabled,
 } from '../suggestion-mode';
@@ -484,6 +486,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 										{ isSuggestionModeEnabled() && (
 											<>
 												<SuggestionStoreInterceptor />
+												<SuggestionUndoGuard />
+												<SuggestionNoteGC />
 												<SuggestionAutoSave />
 											</>
 										) }

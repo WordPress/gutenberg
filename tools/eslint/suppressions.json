@@ -1377,12 +1377,25 @@
 	},
 	"packages/editor/src/components/suggestion-mode/store-interceptor.js": {
 		"react-hooks/refs": {
-			"count": 5
+			"count": 6
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/suggestion-note-gc.js": {
+		"@wordpress/react-no-unsafe-timeout": {
+			"count": 1
+		},
+		"react-hooks/refs": {
+			"count": 2
 		}
 	},
 	"packages/editor/src/components/suggestion-mode/suggestion-summary.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/suggestion-undo-guard.js": {
+		"react-hooks/refs": {
+			"count": 4
 		}
 	},
 	"packages/editor/src/components/suggestion-mode/test/auto-save.js": {
