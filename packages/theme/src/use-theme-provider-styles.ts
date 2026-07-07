@@ -19,6 +19,7 @@ import {
 	type RampResult,
 } from './color-ramps';
 import { getColorString } from './color-ramps/lib/color-utils';
+import { legacyWpComponentsRuntimeColorAliasEntries } from './legacy-color-aliases';
 import type { ThemeProviderProps } from './types';
 
 type Entry = [ string, string ];
@@ -27,62 +28,6 @@ type Entry = [ string, string ];
 // Without memoizing background ramps, accent ramp memoization would not work at all.
 const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
 const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
-
-const legacyWpComponentsOverridesCSS: Entry[] = [
-	[ '--wp-components-color-accent', 'var(--wp-admin-theme-color)' ],
-	[
-		'--wp-components-color-accent-darker-10',
-		'var(--wp-admin-theme-color-darker-10)',
-	],
-	[
-		'--wp-components-color-accent-darker-20',
-		'var(--wp-admin-theme-color-darker-20)',
-	],
-	[
-		'--wp-components-color-accent-inverted',
-		'var(--wpds-color-foreground-interactive-brand-strong)',
-	],
-	[
-		'--wp-components-color-background',
-		'var(--wpds-color-background-surface-neutral-strong)',
-	],
-	[
-		'--wp-components-color-foreground',
-		'var(--wpds-color-foreground-content-neutral)',
-	],
-	[
-		'--wp-components-color-foreground-inverted',
-		'var(--wpds-color-background-surface-neutral)',
-	],
-	[
-		'--wp-components-color-gray-100',
-		'var(--wpds-color-background-surface-neutral)',
-	],
-	[
-		'--wp-components-color-gray-200',
-		'var(--wpds-color-stroke-surface-neutral)',
-	],
-	[
-		'--wp-components-color-gray-300',
-		'var(--wpds-color-stroke-surface-neutral)',
-	],
-	[
-		'--wp-components-color-gray-400',
-		'var(--wpds-color-stroke-interactive-neutral)',
-	],
-	[
-		'--wp-components-color-gray-600',
-		'var(--wpds-color-stroke-interactive-neutral)',
-	],
-	[
-		'--wp-components-color-gray-700',
-		'var(--wpds-color-foreground-content-neutral-weak)',
-	],
-	[
-		'--wp-components-color-gray-800',
-		'var(--wpds-color-foreground-content-neutral)',
-	],
-];
 
 function customRgbFormat( color: PlainColorObject ): string {
 	const rgb = to( color, sRGB );
@@ -144,24 +89,18 @@ function colorTokensCSS(
 
 function generateStyles( {
 	primary,
-	hasCustomPrimary,
-	hasCustomColors,
 	computedColorRamps,
 }: {
 	primary: string;
-	hasCustomPrimary: boolean;
-	hasCustomColors: boolean;
 	computedColorRamps: Map< string, RampResult >;
 } ): CSSProperties {
 	return Object.fromEntries(
 		[
 			// Semantic color tokens
 			colorTokensCSS( computedColorRamps ),
-			// Prebuilt CSS exposes default legacy aliases without requiring a
-			// provider. Runtime overrides keep those aliases scoped to custom
-			// provider colors.
-			hasCustomPrimary ? legacyWpAdminThemeOverridesCSS( primary ) : [],
-			hasCustomColors ? legacyWpComponentsOverridesCSS : [],
+			// Legacy overrides
+			legacyWpAdminThemeOverridesCSS( primary ),
+			legacyWpComponentsRuntimeColorAliasEntries,
 		].flat()
 	);
 }
@@ -175,11 +114,7 @@ export function useThemeProviderStyles( {
 	cursor?: ThemeProviderProps[ 'cursor' ];
 	cornerRadius?: ThemeProviderProps[ 'cornerRadius' ];
 } = {} ) {
-	const {
-		resolvedSettings: inheritedSettings,
-		hasCustomPrimary: inheritedHasCustomPrimary,
-		hasCustomBackground: inheritedHasCustomBackground,
-	} = useContext( ThemeContext );
+	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
 
 	// Compute settings:
 	// - used provided prop value;
@@ -196,11 +131,6 @@ export function useThemeProviderStyles( {
 	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
 	const cornerRadiusPreset =
 		cornerRadius ?? inheritedSettings.cornerRadius ?? 'subtle';
-	const hasCustomPrimary =
-		color.primary !== undefined || inheritedHasCustomPrimary;
-	const hasCustomBackground =
-		color.background !== undefined || inheritedHasCustomBackground;
-	const hasCustomColors = hasCustomPrimary || hasCustomBackground;
 
 	const resolvedSettings = useMemo(
 		() => ( {
@@ -241,11 +171,9 @@ export function useThemeProviderStyles( {
 
 		return generateStyles( {
 			primary: seeds.primary,
-			hasCustomPrimary,
-			hasCustomColors,
 			computedColorRamps,
 		} );
-	}, [ primary, background, hasCustomPrimary, hasCustomColors ] );
+	}, [ primary, background ] );
 
 	const themeProviderStyles: CSSProperties = useMemo(
 		() => ( {
@@ -260,7 +188,5 @@ export function useThemeProviderStyles( {
 	return {
 		resolvedSettings,
 		themeProviderStyles,
-		hasCustomPrimary,
-		hasCustomBackground,
 	};
 }

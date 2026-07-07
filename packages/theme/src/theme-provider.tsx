@@ -22,12 +22,7 @@ export const ThemeProvider = ( {
 	cornerRadius,
 	isRoot = false,
 }: ThemeProviderProps ) => {
-	const {
-		themeProviderStyles,
-		resolvedSettings,
-		hasCustomPrimary,
-		hasCustomBackground,
-	} = useThemeProviderStyles( {
+	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
 		color,
 		cursor,
 		cornerRadius,
@@ -38,10 +33,8 @@ export const ThemeProvider = ( {
 	const contextValue = useMemo(
 		() => ( {
 			resolvedSettings,
-			hasCustomPrimary,
-			hasCustomBackground,
 		} ),
-		[ resolvedSettings, hasCustomPrimary, hasCustomBackground ]
+		[ resolvedSettings ]
 	);
 
 	const wrapperRef = useRef< HTMLDivElement >( null );

@@ -132,17 +132,7 @@ describe( 'useThemeProviderStyles', () => {
 	} );
 
 	describe( 'legacy wp-admin / wp-components bridge', () => {
-		it( 'uses the prebuilt CSS for default legacy color aliases', () => {
-			const { result } = renderHook( () => useThemeProviderStyles() );
-			const styles = result.current.themeProviderStyles;
-
-			expect( styles ).not.toHaveProperty( '--wp-admin-theme-color' );
-			expect( styles ).not.toHaveProperty(
-				'--wp-components-color-accent'
-			);
-		} );
-
-		it( 'derives provider-scoped legacy colors from the primary seed', () => {
+		it( 'derives the wp-admin theme color from the primary seed', () => {
 			const { result } = renderHook( () =>
 				useThemeProviderStyles( { color: { primary: '#1e90ff' } } )
 			);
@@ -152,42 +142,17 @@ describe( 'useThemeProviderStyles', () => {
 			expect( styles[ '--wp-admin-theme-color--rgb' ] ).toBe(
 				'30, 144, 255'
 			);
+		} );
+
+		it( 'aliases the wp-components colors onto the wp-admin and semantic tokens', () => {
+			const { result } = renderHook( () => useThemeProviderStyles() );
+			const styles = result.current.themeProviderStyles;
+
 			expect( styles[ '--wp-components-color-accent' ] ).toBe(
 				'var(--wp-admin-theme-color)'
 			);
-			expect( styles[ '--wp-components-color-background' ] ).toBe(
-				'var(--wpds-color-background-surface-neutral-strong)'
-			);
-		} );
-
-		it( 'emits provider-scoped component aliases for custom background colors', () => {
-			const { result } = renderHook( () =>
-				useThemeProviderStyles( { color: { background: '#1e1e1e' } } )
-			);
-			const styles = result.current.themeProviderStyles;
-
-			expect( styles ).not.toHaveProperty( '--wp-admin-theme-color' );
-			expect( styles[ '--wp-components-color-background' ] ).toBe(
-				'var(--wpds-color-background-surface-neutral-strong)'
-			);
-		} );
-
-		it( 'keeps inherited custom legacy colors active', () => {
-			const wrapper = ( { children }: { children: ReactNode } ) => (
-				<ThemeProvider
-					color={ { primary: '#1e90ff', background: '#1e1e1e' } }
-				>
-					{ children }
-				</ThemeProvider>
-			);
-			const { result } = renderHook( () => useThemeProviderStyles(), {
-				wrapper,
-			} );
-			const styles = result.current.themeProviderStyles;
-
-			expect( styles[ '--wp-admin-theme-color' ] ).toBe( '#1e90ff' );
-			expect( styles[ '--wp-components-color-accent' ] ).toBe(
-				'var(--wp-admin-theme-color)'
+			expect( styles[ '--wp-components-color-accent-inverted' ] ).toBe(
+				'var(--wpds-color-foreground-interactive-brand-strong)'
 			);
 			expect( styles[ '--wp-components-color-background' ] ).toBe(
 				'var(--wpds-color-background-surface-neutral-strong)'

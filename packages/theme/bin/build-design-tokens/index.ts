@@ -3,24 +3,14 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse, build } from '@terrazzo/parser';
 import config from '../../terrazzo.config';
+import { legacyWpComponentsStaticColorAliasEntries } from '../../src/legacy-color-aliases';
 
 const legacyWpComponentsAliasesCSS = `
 /* Default legacy @wordpress/components color alias compatibility baseline. */
 :where(:root) {
-\t--wp-components-color-accent: var(--wp-admin-theme-color, #3858e9);
-\t--wp-components-color-accent-darker-10: var(--wp-admin-theme-color-darker-10, #2145e6);
-\t--wp-components-color-accent-darker-20: var(--wp-admin-theme-color-darker-20, #183ad6);
-\t--wp-components-color-accent-inverted: var(--wpds-color-foreground-interactive-brand-strong);
-\t--wp-components-color-background: var(--wpds-color-background-surface-neutral-strong);
-\t--wp-components-color-foreground: var(--wpds-color-foreground-content-neutral);
-\t--wp-components-color-foreground-inverted: var(--wpds-color-background-surface-neutral);
-\t--wp-components-color-gray-100: var(--wpds-color-background-surface-neutral);
-\t--wp-components-color-gray-200: var(--wpds-color-stroke-surface-neutral);
-\t--wp-components-color-gray-300: var(--wpds-color-stroke-surface-neutral);
-\t--wp-components-color-gray-400: var(--wpds-color-stroke-interactive-neutral);
-\t--wp-components-color-gray-600: var(--wpds-color-stroke-interactive-neutral);
-\t--wp-components-color-gray-700: var(--wpds-color-foreground-content-neutral-weak);
-\t--wp-components-color-gray-800: var(--wpds-color-foreground-content-neutral);
+${ legacyWpComponentsStaticColorAliasEntries
+	.map( ( [ property, value ] ) => `\t${ property }: ${ value };` )
+	.join( '\n' ) }
 }
 `;
 

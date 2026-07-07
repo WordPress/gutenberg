@@ -3,8 +3,6 @@ import type { ThemeProviderSettings } from './types';
 
 interface ThemeContextType {
 	resolvedSettings: ThemeProviderSettings;
-	hasCustomPrimary: boolean;
-	hasCustomBackground: boolean;
 }
 
 export const ThemeContext = createContext< ThemeContextType >( {
@@ -13,6 +11,4 @@ export const ThemeContext = createContext< ThemeContextType >( {
 		cursor: undefined,
 		cornerRadius: undefined,
 	},
-	hasCustomPrimary: false,
-	hasCustomBackground: false,
 } );
