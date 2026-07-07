@@ -251,6 +251,9 @@ export default function BlockTools( {
 		} else if (
 			isMatch( 'core/block-editor/toggle-block-visibility', event )
 		) {
+			if ( blockVisibilitySetting === false ) {
+				return;
+			}
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
@@ -277,9 +280,6 @@ export default function BlockTools( {
 				}
 
 				// Open the visibility breakpoints modal.
-				if ( blockVisibilitySetting === false ) {
-					return;
-				}
 				showViewportModal( clientIds );
 			}
 		}

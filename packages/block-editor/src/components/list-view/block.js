@@ -398,6 +398,9 @@ function ListViewBlock( {
 		} else if (
 			isMatch( 'core/block-editor/toggle-block-visibility', event )
 		) {
+			if ( blockVisibilitySetting === false ) {
+				return;
+			}
 			event.preventDefault();
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const blocks = getBlocksByClientId( blocksToUpdate );
@@ -416,10 +419,6 @@ function ListViewBlock( {
 					( id ) => getBlockEditingMode( id ) !== 'default'
 				)
 			) {
-				return;
-			}
-
-			if ( blockVisibilitySetting === false ) {
 				return;
 			}
 
