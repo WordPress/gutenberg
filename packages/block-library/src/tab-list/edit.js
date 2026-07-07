@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { __ } from '@wordpress/i18n';
 import {
+	InspectorControls,
 	useBlockProps,
 	store as blockEditorStore,
 	RichText,
@@ -15,6 +16,11 @@ import {
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
+import {
+	TextControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 
@@ -23,17 +29,22 @@ import { useEffect, useMemo, useRef } from '@wordpress/element';
  */
 import TabToolbarControls from '../tabs/tab-toolbar-controls';
 import useTabActions from '../tabs/use-tab-actions';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const EMPTY_ARRAY = [];
 
 function Edit( {
 	attributes,
 	clientId,
+	setAttributes,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
+	const { ariaLabel } = attributes;
+
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { tabsClientId, tabPanels, editorActiveTabIndex, activeTabIndex } =
 		useSelect(
@@ -145,6 +156,39 @@ function Edit( {
 
 	return (
 		<>
+			<InspectorControls group="settings">
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () =>
+						setAttributes( {
+							ariaLabel: undefined,
+						} )
+					}
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						label={ __( 'Label' ) }
+						isShownByDefault
+						hasValue={ () => !! ariaLabel }
+						onDeselect={ () =>
+							setAttributes( { ariaLabel: undefined } )
+						}
+					>
+						<TextControl
+							label={ __( 'Label' ) }
+							help={ __(
+								'Briefly describe this tab section for screen reader users. Examples: Event information, Product details, and Account settings.'
+							) }
+							value={ ariaLabel || '' }
+							onChange={ ( value ) =>
+								setAttributes( {
+									ariaLabel: value || undefined,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</InspectorControls>
 			<TabToolbarControls tabsClientId={ tabsClientId } />
 			<div { ...blockProps }>
 				{ tabsList.map( ( tab, index ) => {
