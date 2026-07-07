@@ -354,6 +354,10 @@ jobs:
                     exit 1
                   fi
 
+    # Create a tag in the wordpress.org plugin directory SVN repository.
+    #
+    # The tag is created from trunk when a new latest version is published. Otherwise, the tag is created from the
+    # corresponding release branch.
     tag-release:
         name: Tag the release
         runs-on: 'ubuntu-24.04'
@@ -367,8 +371,7 @@ jobs:
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
             VERSION: ${{ github.event.release.name }}
-            SVN_BRANCH: branches/${{ needs.compute-major-version.outputs.major_version }}
-
+            SVN_PATH: ${{ needs.compute-should-update-trunk.outputs.should_update_trunk && 'trunk' || format( 'branches/{0}', needs.compute-major-version.outputs.major_version ) }}
         steps:
             - name: Install Subversion
               run: sudo apt-get update -y && sudo apt-get install -y subversion
@@ -380,7 +383,7 @@ jobs:
                   if svn list "$PLUGIN_REPO_URL/tags/$VERSION" \
                     --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
                     --non-interactive --no-auth-cache >/dev/null 2>"$svn_error_file"; then
-                    echo "::warning::SVN tag tags/$VERSION already exists. It will be removed and recreated from $SVN_BRANCH."
+                    echo "::warning::SVN tag tags/$VERSION already exists. It will be removed and recreated from $SVN_PATH."
                     echo "exists=true" >> "$GITHUB_OUTPUT"
                   else
                     svn_status=$?
@@ -399,7 +402,7 @@ jobs:
               if: steps.check_svn_tag.outputs.exists == 'true'
               run: |
                   svn rm "$PLUGIN_REPO_URL/tags/$VERSION" \
-                    -m "Removing tag $VERSION to recreate it from $SVN_BRANCH" \
+                    -m "Removing tag $VERSION to recreate it from $SVN_PATH" \
                     --no-auth-cache --non-interactive \
                     --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
                     --config-option=servers:global:http-timeout=600
@@ -408,7 +411,7 @@ jobs:
               run: |
                   # A cheap server-side copy from the branch, which the upload job guarantees
                   # exists and holds this release's content.
-                  svn cp "$PLUGIN_REPO_URL/$SVN_BRANCH" "$PLUGIN_REPO_URL/tags/$VERSION" \
+                  svn cp "$PLUGIN_REPO_URL/$SVN_PATH" "$PLUGIN_REPO_URL/tags/$VERSION" \
                     -m "Tagging version $VERSION" \
                     --no-auth-cache --non-interactive \
                     --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
