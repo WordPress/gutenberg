@@ -267,7 +267,6 @@ function PostAuthorEdit( {
 							}
 						>
 							<SelectControl
-								__next40pxDefaultSize
 								label={ __( 'Avatar size' ) }
 								value={ avatarSize }
 								options={ avatarSizes }
