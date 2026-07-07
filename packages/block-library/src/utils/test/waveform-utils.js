@@ -10,6 +10,7 @@ import {
 	createWaveformContainer,
 	styleSvgIcons,
 	setupPlayButtonAccessibility,
+	setupPlayButtonArtwork,
 	updateSeekControlLabel,
 	logPlayError,
 } from '../waveform-utils';
@@ -319,6 +320,112 @@ describe( 'Waveform utilities', () => {
 			expect( () =>
 				setupPlayButtonAccessibility( container )
 			).not.toThrow();
+		} );
+	} );
+
+	describe( 'setupPlayButtonArtwork', () => {
+		it( 'should move artwork into the play button', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			const artworkEl = document.createElement( 'img' );
+			artworkEl.src = 'https://example.com/cover.jpg';
+			container.append( playBtn, artworkEl );
+
+			setupPlayButtonArtwork(
+				container,
+				{ artworkEl },
+				'https://example.com/cover.jpg'
+			);
+
+			expect( playBtn ).toHaveClass( 'has-artwork' );
+			expect( artworkEl ).toHaveClass(
+				'wp-block-playlist__play-button-artwork'
+			);
+			expect( artworkEl ).toHaveAttribute( 'aria-hidden', 'true' );
+			expect( artworkEl ).toHaveAttribute( 'alt', '' );
+			expect( playBtn.firstChild ).toBe( artworkEl );
+		} );
+
+		it( 'should force play button icon paths to white', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			const svg = document.createElementNS(
+				'http://www.w3.org/2000/svg',
+				'svg'
+			);
+			const path = document.createElementNS(
+				'http://www.w3.org/2000/svg',
+				'path'
+			);
+			const artworkEl = document.createElement( 'img' );
+			svg.appendChild( path );
+			playBtn.appendChild( svg );
+			container.append( playBtn, artworkEl );
+
+			setupPlayButtonArtwork(
+				container,
+				{ artworkEl },
+				'https://example.com/cover.jpg'
+			);
+
+			expect( path ).toHaveStyle( { fill: '#ffffff' } );
+		} );
+
+		it( 'should do nothing when play button is missing', () => {
+			const container = document.createElement( 'div' );
+			const artworkEl = document.createElement( 'img' );
+			container.appendChild( artworkEl );
+
+			expect( () =>
+				setupPlayButtonArtwork(
+					container,
+					{ artworkEl },
+					'https://example.com/cover.jpg'
+				)
+			).not.toThrow();
+			expect( artworkEl.parentElement ).toBe( container );
+		} );
+
+		it( 'should create button artwork when artwork element is missing', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			expect( () =>
+				setupPlayButtonArtwork(
+					container,
+					{},
+					'https://example.com/cover.jpg'
+				)
+			).not.toThrow();
+			expect( playBtn ).toHaveClass( 'has-artwork' );
+			expect(
+				playBtn.querySelector(
+					'.wp-block-playlist__play-button-artwork'
+				)
+			).toHaveAttribute( 'src', 'https://example.com/cover.jpg' );
+		} );
+
+		it( 'should remove existing button artwork when artwork URL is empty', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn has-artwork';
+			const artworkEl = document.createElement( 'img' );
+			artworkEl.className = 'wp-block-playlist__play-button-artwork';
+			playBtn.appendChild( artworkEl );
+			container.appendChild( playBtn );
+
+			setupPlayButtonArtwork( container, { artworkEl }, '' );
+
+			expect( playBtn ).not.toHaveClass( 'has-artwork' );
+			expect(
+				playBtn.querySelector(
+					'.wp-block-playlist__play-button-artwork'
+				)
+			).toBeNull();
 		} );
 	} );
 
