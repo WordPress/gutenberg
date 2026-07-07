@@ -26,7 +26,13 @@ export default function RichText< Item >( {
 		disableLineBreaks,
 	} = config || {};
 	const { label, placeholder, id, setValue } = field;
-	const value = field.getValue( { item: data } );
+	/*
+	 * DataForm fields commonly represent empty values as `null`/`undefined`.
+	 * `useRichText` only defaults `undefined` (and with `null` it can report
+	 * changes as `RichTextData` rather than an HTML string), so normalize to
+	 * an empty string at the DataForm boundary like the sibling text controls.
+	 */
+	const value = field.getValue( { item: data } ) ?? '';
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>

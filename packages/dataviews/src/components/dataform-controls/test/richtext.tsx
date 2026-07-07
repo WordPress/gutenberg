@@ -36,6 +36,7 @@ jest.mock( '../richtext/control', () => ( {
 				data-allowed-formats={ JSON.stringify(
 					props.allowedFormats ?? null
 				) }
+				data-raw-value={ JSON.stringify( props.value ) }
 				value={ props.value ?? '' }
 				onChange={ handleChange }
 			/>
@@ -100,6 +101,31 @@ describe( 'dataform-controls/richtext', () => {
 		await user.type( control, 'A' );
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange ).toHaveBeenLastCalledWith( { content: 'A' } );
+	} );
+
+	it( 'normalizes a null field value to an empty string and still sets string values', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+		render(
+			<RichText< { content: string | null } >
+				data={ { content: null } }
+				field={ buildField() as any }
+				onChange={ onChange }
+				hideLabelFromVision={ false }
+				config={ {} }
+			/>
+		);
+
+		const control = screen.getByLabelText( 'Content' );
+		/*
+		 * `useRichText` behaves differently for `null` than for `undefined`
+		 * (with `null` it can report changes as `RichTextData` instead of an
+		 * HTML string), so the control must receive a string, never `null`.
+		 */
+		expect( control.dataset.rawValue ).toBe( JSON.stringify( '' ) );
+
+		await user.type( control, 'A' );
 		expect( onChange ).toHaveBeenLastCalledWith( { content: 'A' } );
 	} );
 
