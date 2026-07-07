@@ -10,6 +10,7 @@ import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	cloneBlock,
+	cloneSanitizedBlock,
 	__experimentalCloneSanitizedBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
@@ -462,8 +463,8 @@ describe( 'block factory', () => {
 		} );
 	} );
 
-	describe( '__experimentalCloneSanitizedBlock', () => {
-		it( 'should sanitize attributes not defined in the block type', () => {
+	describe( 'cloneSanitizedBlock', () => {
+		beforeEach( () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
 				attributes: {
@@ -472,7 +473,21 @@ describe( 'block factory', () => {
 					},
 				},
 			} );
+		} );
 
+		it( 'sanitizes attributes not defined in the block type', () => {
+			const block = createBlock( 'core/test-block', {
+				notDefined: 'not-defined',
+			} );
+
+			const clonedBlock = cloneSanitizedBlock( block, {
+				notDefined2: 'not-defined-2',
+			} );
+
+			expect( clonedBlock.attributes ).toEqual( {} );
+		} );
+
+		it( 'keeps the experimental function as a deprecated alias', () => {
 			const block = createBlock( 'core/test-block', {
 				notDefined: 'not-defined',
 			} );
@@ -482,6 +497,9 @@ describe( 'block factory', () => {
 			} );
 
 			expect( clonedBlock.attributes ).toEqual( {} );
+			expect( console ).toHaveWarnedWith(
+				'__experimentalCloneSanitizedBlock is deprecated since version 7.1. Please use cloneSanitizedBlock instead.'
+			);
 		} );
 	} );
 
