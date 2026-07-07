@@ -247,7 +247,7 @@ export const saveDirtyEntities =
 			.dispatch( blockEditorStore )
 			.__unstableMarkLastChangeAsPersistent();
 
-		Promise.all( pendingSavedRecords )
+		return Promise.all( pendingSavedRecords )
 			.then( async ( values ) => {
 				if ( onSave ) {
 					await onSave();
