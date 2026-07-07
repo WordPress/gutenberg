@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 
 import { Spacer } from '../index';
+import styles from '../style.module.scss';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {
@@ -174,5 +175,29 @@ describe( 'props', () => {
 			'--wp-components-spacer-padding-block-end': 'calc(4px * 2)',
 			'--wp-components-spacer-padding-inline-start': 'calc(4px * 3)',
 		} );
+	} );
+
+	test( 'should render nested instances without passing spacing variables to children', () => {
+		render(
+			<Spacer padding={ 4 } data-testid="outer-spacer">
+				<Spacer data-testid="inner-spacer" />
+			</Spacer>
+		);
+
+		const outerSpacer = screen.getByTestId( 'outer-spacer' );
+		const innerSpacer = screen.getByTestId( 'inner-spacer' );
+
+		expect( outerSpacer ).toHaveClass( styles.spacer );
+		expect( innerSpacer ).toHaveClass( styles.spacer );
+		expect(
+			outerSpacer.style.getPropertyValue(
+				'--wp-components-spacer-padding'
+			)
+		).toBe( 'calc(4px * 4)' );
+		expect(
+			innerSpacer.style.getPropertyValue(
+				'--wp-components-spacer-padding'
+			)
+		).toBe( '' );
 	} );
 } );
