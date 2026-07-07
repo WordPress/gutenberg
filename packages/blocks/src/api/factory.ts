@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
+import deprecated from '@wordpress/deprecated';
 import warning from '@wordpress/warning';
 
 /**
@@ -146,7 +147,7 @@ export function createBlocksFromInnerBlocksTemplate(
  *
  * @return A cloned block.
  */
-export function __experimentalCloneSanitizedBlock(
+export function cloneSanitizedBlock(
 	block: Block,
 	mergeAttributes: Record< string, unknown > = {},
 	newInnerBlocks?: Block[]
@@ -175,9 +176,22 @@ export function __experimentalCloneSanitizedBlock(
 		innerBlocks:
 			newInnerBlocks ||
 			block.innerBlocks.map( ( innerBlock ) =>
-				__experimentalCloneSanitizedBlock( innerBlock )
+				cloneSanitizedBlock( innerBlock )
 			),
 	};
+}
+
+export function __experimentalCloneSanitizedBlock(
+	block: Block,
+	mergeAttributes: Record< string, unknown > = {},
+	newInnerBlocks?: Block[]
+): Block {
+	deprecated( '__experimentalCloneSanitizedBlock', {
+		since: '7.1',
+		alternative: 'cloneSanitizedBlock',
+	} );
+
+	return cloneSanitizedBlock( block, mergeAttributes, newInnerBlocks );
 }
 
 /**

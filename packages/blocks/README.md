@@ -36,6 +36,20 @@ _Returns_
 
 -   `Block`: A cloned block.
 
+### cloneSanitizedBlock
+
+Given a block object, returns a copy of the block object while sanitizing its attributes, optionally merging new attributes and/or replacing its inner blocks.
+
+_Parameters_
+
+-   _block_ `Block`: Block instance.
+-   _mergeAttributes_ `Record< string, unknown >`: Block attributes.
+-   _newInnerBlocks_ `Block[]`: Nested blocks.
+
+_Returns_
+
+-   `Block`: A cloned block.
+
 ### createBlock
 
 Returns a block object given its type and attributes.

@@ -4,7 +4,7 @@
 import { RichText } from '@wordpress/block-editor';
 import {
 	createBlock,
-	__experimentalCloneSanitizedBlock,
+	cloneSanitizedBlock,
 	switchToBlockType,
 } from '@wordpress/blocks';
 
@@ -96,9 +96,7 @@ const transforms = {
 				createBlock(
 					'core/quote',
 					{},
-					blocks.map( ( block ) =>
-						__experimentalCloneSanitizedBlock( block )
-					)
+					blocks.map( ( block ) => cloneSanitizedBlock( block ) )
 				),
 		},
 	],
