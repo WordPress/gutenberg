@@ -92,6 +92,7 @@ export default {
 		'foreground-content-neutral',
 		'foreground-interactive-neutral',
 		'foreground-interactive-neutral-active',
+		'foreground-interactive-neutral-weak-active',
 	],
 	'bg-fgSurface3': [
 		'foreground-content-neutral-weak',

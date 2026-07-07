@@ -13,6 +13,7 @@
 ### New Features
 
 -   Add `--wpds-color-background-thumb-brand-disabled` for parity with the existing brand thumb state tokens ([#79770](https://github.com/WordPress/gutenberg/pull/79770)).
+-   Add `--wpds-color-foreground-interactive-neutral-weak-active` for parity with the existing neutral weak foreground interactive state tokens ([#79770](https://github.com/WordPress/gutenberg/pull/79770)).
 
 ### Documentation
 

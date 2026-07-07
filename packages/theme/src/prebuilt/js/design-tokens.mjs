@@ -76,6 +76,7 @@ export default [
 	'--wpds-color-foreground-interactive-neutral-strong-active',
 	'--wpds-color-foreground-interactive-neutral-strong-disabled',
 	'--wpds-color-foreground-interactive-neutral-weak',
+	'--wpds-color-foreground-interactive-neutral-weak-active',
 	'--wpds-color-foreground-interactive-neutral-weak-disabled',
 	'--wpds-color-foreground-interactive-brand',
 	'--wpds-color-foreground-interactive-brand-active',
