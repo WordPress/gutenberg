@@ -48,6 +48,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 **Uses context:**
 
 - `showArtists`
+- `showImages`
 
 ## Block Markup
 
