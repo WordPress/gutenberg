@@ -15,7 +15,7 @@ import { useEventListeners } from '../../../components/rich-text/event-listeners
 import FormatEdit from '../../../components/rich-text/format-edit';
 import { unlock } from '../../../lock-unlock';
 
-const { useRichText, keyboardShortcutContext, inputEventContext } =
+const { useRichText, KeyboardShortcutContext, InputEventContext } =
 	unlock( richTextPrivateApis );
 
 export default function RichTextControl( {
@@ -81,8 +81,8 @@ export default function RichTextControl( {
 	return (
 		<>
 			{ isSelected && (
-				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
-					<inputEventContext.Provider value={ inputEvents }>
+				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
+					<InputEventContext.Provider value={ inputEvents }>
 						<div>
 							<FormatEdit
 								value={ value }
@@ -93,8 +93,8 @@ export default function RichTextControl( {
 								isVisible={ false }
 							/>
 						</div>
-					</inputEventContext.Provider>
-				</keyboardShortcutContext.Provider>
+					</InputEventContext.Provider>
+				</KeyboardShortcutContext.Provider>
 			) }
 			<BaseControl { ...baseControlProps }>
 				<div

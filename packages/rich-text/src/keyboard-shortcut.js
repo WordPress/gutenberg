@@ -8,10 +8,10 @@ import { useEvent } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { keyboardShortcutContext } from './contexts';
+import { KeyboardShortcutContext } from './contexts';
 
 export function RichTextShortcut( { character, type, onUse } ) {
-	const keyboardShortcuts = useContext( keyboardShortcutContext );
+	const keyboardShortcuts = useContext( KeyboardShortcutContext );
 
 	/*
 	 * Keep a stable reference to the latest `onUse` so the registered

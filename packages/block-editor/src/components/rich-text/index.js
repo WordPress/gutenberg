@@ -40,7 +40,7 @@ import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
 
-const { useRichText, keyboardShortcutContext, inputEventContext } =
+const { useRichText, KeyboardShortcutContext, InputEventContext } =
 	unlock( richTextPrivateApis );
 
 const instanceIdKey = Symbol( 'instanceId' );
@@ -348,8 +348,8 @@ export function RichTextWrapper(
 	return (
 		<>
 			{ isSelected && (
-				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
-					<inputEventContext.Provider value={ inputEvents }>
+				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
+					<InputEventContext.Provider value={ inputEvents }>
 						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
 							{ children &&
 								children( { value, onChange, onFocus } ) }
@@ -362,8 +362,8 @@ export function RichTextWrapper(
 								forwardedRef={ anchorRef }
 							/>
 						</Popover.__unstableSlotNameProvider>
-					</inputEventContext.Provider>
-				</keyboardShortcutContext.Provider>
+					</InputEventContext.Provider>
+				</KeyboardShortcutContext.Provider>
 			) }
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
