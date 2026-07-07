@@ -1,22 +1,23 @@
 <?php
 /**
- * Tab List block rendering tests.
+ * Tabs block rendering tests.
  *
  * @package WordPress
  * @subpackage Blocks
  */
 
 /**
- * Tests for the Tab List block.
+ * Tests for the Tabs block.
  *
  * @group blocks
  */
-class Tests_Blocks_Render_Tab_List extends WP_UnitTestCase {
+class Tests_Blocks_Render_Tabs extends WP_UnitTestCase {
 
 	/**
+	 * @covers ::block_core_tabs_render_callback
 	 * @covers ::block_core_tab_list_render_callback
 	 */
-	public function test_should_add_aria_label_from_attribute(): void {
+	public function test_should_add_tab_list_aria_label_from_attribute(): void {
 		$tabs_block = <<<'BLOCK_CONTENT'
 			<!-- wp:tabs -->
 			<div class="wp-block-tabs"><!-- wp:tab-list {"ariaLabel":"Product details"} -->
@@ -43,9 +44,10 @@ class Tests_Blocks_Render_Tab_List extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::block_core_tabs_render_callback
 	 * @covers ::block_core_tab_list_render_callback
 	 */
-	public function test_should_add_default_aria_label(): void {
+	public function test_should_add_default_tab_list_aria_label(): void {
 		$tabs_block = <<<'BLOCK_CONTENT'
 			<!-- wp:tabs -->
 			<div class="wp-block-tabs"><!-- wp:tab-list -->
