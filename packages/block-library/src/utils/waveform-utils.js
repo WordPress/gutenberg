@@ -689,6 +689,7 @@ export function setupPlaylistControls(
  * @param {Function} options.onRepeatToggle  - Callback for repeat toggle.
  * @param {boolean}  options.isShuffled      - Initial shuffle state.
  * @param {string}   options.repeatMode      - Initial repeat mode.
+ * @param {boolean}  options.showControls    - Whether to show playlist controls.
  * @return {Object} Object with instance, container, and destroy function.
  */
 export function initWaveformPlayer(
@@ -709,6 +710,7 @@ export function initWaveformPlayer(
 		onRepeatToggle,
 		isShuffled,
 		repeatMode,
+		showControls = true,
 	}
 ) {
 	// Get colors from computed styles.
@@ -757,7 +759,10 @@ export function initWaveformPlayer(
 			);
 
 			// Set up playlist controls if callbacks are provided.
-			if ( onPrev || onNext || onShuffleToggle || onRepeatToggle ) {
+			if (
+				showControls &&
+				( onPrev || onNext || onShuffleToggle || onRepeatToggle )
+			) {
 				const controls = setupPlaylistControls(
 					container,
 					{

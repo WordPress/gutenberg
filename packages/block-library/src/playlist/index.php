@@ -135,16 +135,17 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 		'data-wp-context',
 		wp_json_encode(
 			array(
-				'playlistId'       => $playlist_id,
-				'currentId'        => $playlist_tracks[0],
-				'isPlaying'        => false,
-				'tracks'           => $playlist_tracks,
-				'waveformStyle'    => $waveform_style,
-				'isShuffled'       => false,
-				'repeatMode'       => 'none',
-				'playedTracks'     => array(),
-				'labelPauseTrack'  => __( 'Pause' ),
-				'labelSelectTrack' => __( 'Play' ),
+				'playlistId'            => $playlist_id,
+				'currentId'             => $playlist_tracks[0],
+				'isPlaying'             => false,
+				'tracks'                => $playlist_tracks,
+				'waveformStyle'         => $waveform_style,
+				'isShuffled'            => false,
+				'repeatMode'            => 'none',
+				'playedTracks'          => array(),
+				'showPlaybackControls'  => $attributes['showPlaybackControls'] ?? true,
+				'labelPauseTrack'       => __( 'Pause' ),
+				'labelSelectTrack'      => __( 'Play' ),
 			)
 		)
 	);

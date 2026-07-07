@@ -69,6 +69,7 @@ const PlaylistEdit = ( {
 		showImages,
 		showArtists,
 		showTrackLength,
+		showPlaybackControls,
 		waveformStyle = DEFAULT_WAVEFORM_STYLE,
 	} = attributes;
 
@@ -343,6 +344,7 @@ const PlaylistEdit = ( {
 							showNumbers: true,
 							showTrackLength: true,
 							showImages: true,
+							showPlaybackControls: true,
 							order: 'asc',
 						} );
 					} }
@@ -437,6 +439,22 @@ const PlaylistEdit = ( {
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
+						label={ __( 'Show playback controls' ) }
+						isShownByDefault
+						hasValue={ () => showPlaybackControls === false }
+						onDeselect={ () =>
+							setAttributes( { showPlaybackControls: true } )
+						}
+					>
+						<ToggleControl
+							label={ __( 'Show playback controls' ) }
+							onChange={ toggleAttribute(
+								'showPlaybackControls'
+							) }
+							checked={ showPlaybackControls !== false }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
 						label={ __( 'Order' ) }
 						isShownByDefault
 						hasValue={ () => order !== 'asc' }
@@ -509,6 +527,7 @@ const PlaylistEdit = ( {
 						onRepeatToggle={ onRepeatToggle }
 						isShuffled={ isShuffled }
 						repeatMode={ repeatMode }
+						showControls={ showPlaybackControls !== false }
 					/>
 				</Disabled>
 				{ showTracklist && (

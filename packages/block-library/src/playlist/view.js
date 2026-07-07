@@ -214,6 +214,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		},
 		isShuffled: context.isShuffled,
 		repeatMode: context.repeatMode,
+		showControls: context.showPlaybackControls !== false,
 	} );
 	const setIsPlaying = ( isPlaying ) => {
 		context.isPlaying = isPlaying;

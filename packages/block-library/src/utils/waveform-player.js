@@ -67,6 +67,7 @@ function updatePlayerMetadata( instance, { title, artist, image, imageAlt } ) {
  * @param {Function} props.onRepeatToggle  - Callback for repeat toggle.
  * @param {boolean}  props.isShuffled      - Whether shuffle is active.
  * @param {string}   props.repeatMode      - Current repeat mode.
+ * @param {boolean}  props.showControls    - Whether to show playlist controls.
  * @return {Element} The WaveformPlayer element.
  */
 export function WaveformPlayer( {
@@ -83,6 +84,7 @@ export function WaveformPlayer( {
 	onRepeatToggle,
 	isShuffled,
 	repeatMode,
+	showControls = true,
 } ) {
 	// Store onEnded in a stable callback so it doesn't need to be a useRefEffect dependency.
 	// The callback changes reference on every render (its dependency chain
@@ -175,6 +177,7 @@ export function WaveformPlayer( {
 					onRepeatToggle: onRepeatToggleEvent,
 					isShuffled: getIsShuffled(),
 					repeatMode: getRepeatMode(),
+					showControls,
 				} );
 				playerRef.current = player;
 				updatePlayerMetadata( player.instance, metadata );
@@ -209,6 +212,7 @@ export function WaveformPlayer( {
 			src,
 			waveformStyle,
 			hasImage,
+			showControls,
 		]
 	);
 

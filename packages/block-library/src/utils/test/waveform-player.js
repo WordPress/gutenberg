@@ -108,6 +108,22 @@ describe( 'WaveformPlayer', () => {
 				artist: 'Original Artist',
 				image: 'https://example.com/cover.jpg',
 				imageAlt: 'A bright abstract album cover',
+				showControls: true,
+			} )
+		);
+	} );
+
+	it( 'passes through hidden playlist controls', () => {
+		render( <WaveformPlayer { ...baseProps } showControls={ false } /> );
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		expect( initWaveformPlayer ).toHaveBeenCalledWith(
+			expect.anything(),
+			expect.objectContaining( {
+				showControls: false,
 			} )
 		);
 	} );
