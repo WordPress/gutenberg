@@ -374,60 +374,6 @@ export function updateSeekControlLabel( instance, label ) {
 }
 
 /**
- * Move the waveform player's artwork image into the play button.
- *
- * @param {Element} container  - The waveform player container element.
- * @param {Object}  instance   - The WaveformPlayer library instance.
- * @param {string}  artworkUrl - The album artwork URL.
- */
-export function setupPlayButtonArtwork( container, instance, artworkUrl ) {
-	const playBtn = container.querySelector( '.waveform-btn' );
-	if ( ! playBtn ) {
-		return;
-	}
-
-	const existingButtonArtwork = playBtn.querySelector(
-		'.wp-block-playlist__play-button-artwork'
-	);
-	let artworkEl =
-		instance?.artworkEl ||
-		existingButtonArtwork ||
-		container.querySelector( '.waveform-artwork' );
-
-	if ( ! artworkUrl ) {
-		existingButtonArtwork?.remove();
-		playBtn.classList.remove( 'has-artwork' );
-		// The button background reverts from the dark artwork to its themed
-		// color, so recolor the icon to keep it legible (it was forced white).
-		styleSvgIcons( playBtn, getComputedStyle( playBtn ).backgroundColor );
-		return;
-	}
-
-	if ( ! artworkEl ) {
-		artworkEl = container.ownerDocument.createElement( 'img' );
-	}
-
-	if ( existingButtonArtwork && existingButtonArtwork !== artworkEl ) {
-		existingButtonArtwork.remove();
-	}
-
-	artworkEl.src = artworkUrl;
-	artworkEl.classList.add( 'wp-block-playlist__play-button-artwork' );
-	artworkEl.setAttribute( 'aria-hidden', 'true' );
-	artworkEl.alt = '';
-	artworkEl.removeAttribute( 'width' );
-	artworkEl.removeAttribute( 'height' );
-	// Layout/sizing is enforced by the .wp-block-playlist__play-button-artwork
-	// rule (with !important) so it overrides the library's inline styles.
-	playBtn.classList.add( 'has-artwork' );
-	playBtn.prepend( artworkEl );
-
-	playBtn.querySelectorAll( 'svg path' ).forEach( ( path ) => {
-		path.style.fill = '#ffffff';
-	} );
-}
-
-/**
  * Log play errors, filtering out expected AbortError.
  *
  * @param {Error} error - The error from play().
@@ -478,9 +424,7 @@ function applyPlayerColors(
 	if ( playBtn ) {
 		playBtn.style.borderColor = textColor;
 		playBtn.style.color = textColor;
-		if ( ! playBtn.classList.contains( 'has-artwork' ) ) {
-			styleSvgIcons( playBtn, textColor );
-		}
+		styleSvgIcons( playBtn, textColor );
 	}
 
 	instance.drawWaveform();
@@ -806,7 +750,6 @@ export function initWaveformPlayer(
 				waveformColor,
 				progressColor,
 			} );
-			setupPlayButtonArtwork( container, instance, image );
 			cleanupMetadata = setupPlaylistMetadata( container, instance );
 			cleanupAccessibility = setupPlayButtonAccessibility(
 				container,

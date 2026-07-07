@@ -10,7 +10,6 @@ import {
 	initWaveformPlayer,
 	logPlayError,
 	updateSeekControlLabel,
-	setupPlayButtonArtwork,
 	getPlaylistPlaybackAction,
 	replayWaveformPlayerTrack,
 } from '../utils/waveform-utils';
@@ -109,40 +108,26 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 
 	// If a player already exists, load the new track without recreating.
 	if ( existing?.instance ) {
-		const shouldRecreatePlayer =
-			!! existing.instance.artworkEl !== !! track.image;
-
-		if ( shouldRecreatePlayer ) {
-			existing.destroy?.();
-			playerState.delete( ref );
-		} else {
-			playlistPlayerState.set( context.playlistId, existing );
-			existing.instance
-				.loadTrack( track.url, track.title, track.artist, {
-					artwork: track.image,
-				} )
-				.then( () => {
-					existing.url = track.url;
-					if ( existing.instance.artworkEl ) {
-						existing.instance.artworkEl.alt = track.imageAlt || '';
-					}
-					// loadTrack() preserves the previous explicit seekLabel option.
-					updateSeekControlLabel(
-						existing.instance,
-						track.title || ref.dataset.labelSeek
-					);
-					setupPlayButtonArtwork(
-						existing.container,
-						existing.instance,
-						track.image
-					);
-					if ( shouldAutoPlay ) {
-						existing.instance.play()?.catch( logPlayError );
-					}
-				} )
-				.catch( logPlayError );
-			return;
-		}
+		existing.instance
+			.loadTrack( track.url, track.title, track.artist, {
+				artwork: track.image,
+			} )
+			.then( () => {
+				existing.url = track.url;
+				if ( existing.instance.artworkEl ) {
+					existing.instance.artworkEl.alt = track.imageAlt || '';
+				}
+				// loadTrack() preserves the previous explicit seekLabel option.
+				updateSeekControlLabel(
+					existing.instance,
+					track.title || ref.dataset.labelSeek
+				);
+				if ( shouldAutoPlay ) {
+					existing.instance.play()?.catch( logPlayError );
+				}
+			} )
+			.catch( logPlayError );
+		return;
 	}
 
 	// Read translated labels from server-rendered data attributes.
