@@ -35,9 +35,8 @@ interface BaseProps {
 	 */
 	__next36pxDefaultSize?: boolean;
 	/**
-	 * Start opting into the larger default height that will become the default size in a future version.
-	 *
-	 * @default false
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
 	/**
@@ -229,12 +228,6 @@ export type PrefixSuffixWrapperProps = {
 	 * @ignore
 	 */
 	size?: BaseProps[ 'size' ];
-	/**
-	 * Internal prop used to control the padding size of the wrapper.
-	 *
-	 * @ignore
-	 */
-	__next40pxDefaultSize?: BaseProps[ '__next40pxDefaultSize' ];
 	/**
 	 * Adjust the wrapper based on the prefix or suffix content.
 	 *

@@ -20,6 +20,7 @@
     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
     -   `FormFileUpload` ([#79655](https://github.com/WordPress/gutenberg/pull/79655))
     -   `FormTokenField` ([#79720](https://github.com/WordPress/gutenberg/pull/79720))
+    -   `InputControl` ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD))
     -   `RangeControl` ([#79590](https://github.com/WordPress/gutenberg/pull/79590))
     -   `Radio` ([#79657](https://github.com/WordPress/gutenberg/pull/79657))
     -   `SelectControl` ([#79797](https://github.com/WordPress/gutenberg/pull/79797))
