@@ -6,15 +6,15 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
+import { unlock } from '../../lock-unlock';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
-	const { keyboardShortcuts } = props.current;
+	const { events } = props.current;
 	function onKeyDown( event ) {
-		for ( const keyboardShortcut of keyboardShortcuts.current ) {
-			keyboardShortcut( event );
+		for ( const callback of events.keyboardShortcuts.current ) {
+			callback( event );
 		}
 	}
 

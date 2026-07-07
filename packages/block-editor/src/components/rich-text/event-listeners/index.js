@@ -11,8 +11,6 @@ import beforeInputRules from './before-input-rules';
 import inputRules from './input-rules';
 import insertReplacementText from './insert-replacement-text';
 import removeBrowserShortcuts from './remove-browser-shortcuts';
-import shortcuts from './shortcuts';
-import inputEvents from './input-events';
 import undoAutomaticChange from './undo-automatic-change';
 import pasteHandler from './paste-handler';
 import _delete from './delete';
@@ -24,8 +22,6 @@ const allEventListeners = [
 	inputRules,
 	insertReplacementText,
 	removeBrowserShortcuts,
-	shortcuts,
-	inputEvents,
 	undoAutomaticChange,
 	pasteHandler,
 	_delete,

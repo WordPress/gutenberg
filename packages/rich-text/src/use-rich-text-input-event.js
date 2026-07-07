@@ -7,10 +7,18 @@ import { useEvent } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { inputEventContext } from './contexts';
+import { InputEventContext } from './events';
 
-export function RichTextInputEvent( { inputType, onInput } ) {
-	const callbacks = useContext( inputEventContext );
+/**
+ * Calls `onInput` when an `input` event of the given `inputType` occurs
+ * within the rich text field, and prevents the default behavior of the event.
+ *
+ * @param {Object}   props
+ * @param {string}   props.inputType The `InputEvent.inputType` to match.
+ * @param {Function} props.onInput   Called when the input event occurs.
+ */
+export function useRichTextInputEvent( { inputType, onInput } ) {
+	const callbacks = useContext( InputEventContext );
 
 	/*
 	 * Keep a stable reference to the latest `onInput` so the registered
@@ -33,6 +41,4 @@ export function RichTextInputEvent( { inputType, onInput } ) {
 			inputCallbacks.delete( callback );
 		};
 	}, [ inputType, callbacks, stableOnInput ] );
-
-	return null;
 }

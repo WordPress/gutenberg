@@ -17,6 +17,7 @@ import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useEventListeners } from './event-listeners';
 import { useFormatTypes } from './use-format-types';
+import { useEventCallbacks } from '../events';
 
 function useRichTextBase( {
 	value = '',
@@ -204,6 +205,8 @@ function useRichTextBase( {
 		hadSelectionUpdateRef.current = false;
 	}, [ hadSelectionUpdateRef.current ] );
 
+	const events = useEventCallbacks();
+
 	const mergedRefs = useMergeRefs( [
 		ref,
 		useDefaultStyle(),
@@ -216,6 +219,7 @@ function useRichTextBase( {
 			isSelected,
 			onSelectionChange,
 			forceRender,
+			events,
 		} ),
 		useRefEffect( () => {
 			applyFromProps();
@@ -233,6 +237,9 @@ function useRichTextBase( {
 		getValue: () => recordRef.current,
 		onChange: handleChange,
 		ref: mergedRefs,
+		// Pass to `RichTextEventsProvider` to let descendants register
+		// keyboard shortcut and input event callbacks with this field.
+		events,
 	};
 }
 

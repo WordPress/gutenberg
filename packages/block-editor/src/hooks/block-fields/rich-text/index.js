@@ -15,8 +15,7 @@ import { useEventListeners } from '../../../components/rich-text/event-listeners
 import FormatEdit from '../../../components/rich-text/format-edit';
 import { unlock } from '../../../lock-unlock';
 
-const { useRichText, keyboardShortcutContext, inputEventContext } =
-	unlock( richTextPrivateApis );
+const { useRichText, RichTextEventsProvider } = unlock( richTextPrivateApis );
 
 export default function RichTextControl( {
 	data,
@@ -35,8 +34,6 @@ export default function RichTextControl( {
 	} );
 	const [ isSelected, setIsSelected ] = useState( false );
 	const anchorRef = useRef();
-	const inputEvents = useRef( new Set() );
-	const keyboardShortcuts = useRef( new Set() );
 
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats: fieldConfig?.allowedFormats,
@@ -53,6 +50,7 @@ export default function RichTextControl( {
 		onChange: onRichTextChange,
 		ref: richTextRef,
 		formatTypes,
+		events,
 	} = useRichText( {
 		value: attrValue,
 		onChange( html ) {
@@ -81,20 +79,18 @@ export default function RichTextControl( {
 	return (
 		<>
 			{ isSelected && (
-				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
-					<inputEventContext.Provider value={ inputEvents }>
-						<div>
-							<FormatEdit
-								value={ value }
-								onChange={ onRichTextChange }
-								onFocus={ onFocus }
-								formatTypes={ formatTypes }
-								forwardedRef={ anchorRef }
-								isVisible={ false }
-							/>
-						</div>
-					</inputEventContext.Provider>
-				</keyboardShortcutContext.Provider>
+				<RichTextEventsProvider events={ events }>
+					<div>
+						<FormatEdit
+							value={ value }
+							onChange={ onRichTextChange }
+							onFocus={ onFocus }
+							formatTypes={ formatTypes }
+							forwardedRef={ anchorRef }
+							isVisible={ false }
+						/>
+					</div>
+				</RichTextEventsProvider>
 			) }
 			<BaseControl { ...baseControlProps }>
 				<div
@@ -114,8 +110,6 @@ export default function RichTextControl( {
 							value,
 							tagName: 'div',
 							disableLineBreaks: fieldConfig?.disableLineBreaks,
-							keyboardShortcuts,
-							inputEvents,
 						} ),
 						anchorRef,
 					] ) }

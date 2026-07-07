@@ -40,8 +40,7 @@ import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
 
-const { useRichText, keyboardShortcutContext, inputEventContext } =
-	unlock( richTextPrivateApis );
+const { useRichText, RichTextEventsProvider } = unlock( richTextPrivateApis );
 
 const instanceIdKey = Symbol( 'instanceId' );
 
@@ -307,6 +306,7 @@ export function RichTextWrapper(
 		onChange,
 		ref: richTextRef,
 		formatTypes,
+		events,
 	} = useRichText( {
 		value: adjustedValue,
 		onChange: adjustedOnChange,
@@ -337,9 +337,6 @@ export function RichTextWrapper(
 
 	useMarkPersistent( { html: adjustedValue, value } );
 
-	const keyboardShortcuts = useRef( new Set() );
-	const inputEvents = useRef( new Set() );
-
 	function onFocus() {
 		anchorRef.current?.focus();
 	}
@@ -348,22 +345,19 @@ export function RichTextWrapper(
 	return (
 		<>
 			{ isSelected && (
-				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
-					<inputEventContext.Provider value={ inputEvents }>
-						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
-							{ children &&
-								children( { value, onChange, onFocus } ) }
+				<RichTextEventsProvider events={ events }>
+					<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
+						{ children && children( { value, onChange, onFocus } ) }
 
-							<FormatEdit
-								value={ value }
-								onChange={ onChange }
-								onFocus={ onFocus }
-								formatTypes={ formatTypes }
-								forwardedRef={ anchorRef }
-							/>
-						</Popover.__unstableSlotNameProvider>
-					</inputEventContext.Provider>
-				</keyboardShortcutContext.Provider>
+						<FormatEdit
+							value={ value }
+							onChange={ onChange }
+							onFocus={ onFocus }
+							formatTypes={ formatTypes }
+							forwardedRef={ anchorRef }
+						/>
+					</Popover.__unstableSlotNameProvider>
+				</RichTextEventsProvider>
 			) }
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
@@ -414,8 +408,6 @@ export function RichTextWrapper(
 						disableLineBreaks,
 						onSplitAtEnd,
 						onSplitAtDoubleLineEnd,
-						keyboardShortcuts,
-						inputEvents,
 					} ),
 					anchorRef,
 					setAnchorElement,

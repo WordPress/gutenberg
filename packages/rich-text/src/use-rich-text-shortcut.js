@@ -8,10 +8,20 @@ import { useEvent } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { keyboardShortcutContext } from './contexts';
+import { KeyboardShortcutContext } from './events';
 
-export function RichTextShortcut( { character, type, onUse } ) {
-	const keyboardShortcuts = useContext( keyboardShortcutContext );
+/**
+ * Calls `onUse` when the given keyboard shortcut is pressed within the rich
+ * text field, and prevents the default behavior of the keystroke.
+ *
+ * @param {Object}   props
+ * @param {string}   props.character The character to match.
+ * @param {string}   props.type      The modifier combination to match. See
+ *                                   `isKeyboardEvent` in `@wordpress/keycodes`.
+ * @param {Function} props.onUse     Called when the shortcut is pressed.
+ */
+export function useRichTextShortcut( { character, type, onUse } ) {
+	const keyboardShortcuts = useContext( KeyboardShortcutContext );
 
 	/*
 	 * Keep a stable reference to the latest `onUse` so the registered
@@ -34,6 +44,4 @@ export function RichTextShortcut( { character, type, onUse } ) {
 			shortcuts.delete( callback );
 		};
 	}, [ character, type, keyboardShortcuts, stableOnUse ] );
-
-	return null;
 }
