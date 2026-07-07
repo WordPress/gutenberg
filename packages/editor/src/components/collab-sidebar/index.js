@@ -222,7 +222,7 @@ function NotesSidebar( { postId } ) {
 							size: 'compact',
 						} }
 					>
-						{ () => (
+						{ ( { onClose } ) => (
 							<MenuGroup>
 								<MenuItemsChoice
 									choices={ [
@@ -259,6 +259,7 @@ function NotesSidebar( { postId } ) {
 											}
 											setNotesDisplayMode( value );
 										}
+										onClose();
 									} }
 								/>
 							</MenuGroup>
