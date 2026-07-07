@@ -332,6 +332,10 @@ function ApplicationPasswordConnector( {
 	} );
 	const isExternallyConfigured =
 		keySource === 'env' || keySource === 'constant';
+	// The server claims the env/constant source even when the value fails to
+	// parse as `username:password`, in which case it reports not connected.
+	const hasMalformedExternalCredentials =
+		isExternallyConfigured && ! isConnected;
 
 	const actionButtonRef = useRef< HTMLButtonElement >( null );
 	const showUnavailableBadge =
@@ -366,7 +370,8 @@ function ApplicationPasswordConnector( {
 					<ApplicationPasswordConnectorSettings
 						key={ isConnected ? 'connected' : 'setup' }
 						initialUsername={
-							isExternallyConfigured
+							isExternallyConfigured &&
+							! hasMalformedExternalCredentials
 								? '••••••••••••••••'
 								: currentUsername
 						}
@@ -374,6 +379,9 @@ function ApplicationPasswordConnector( {
 						helpLabel={ helpLabel }
 						readOnly={ isConnected || isExternallyConfigured }
 						keySource={ keySource }
+						externalCredentialsMalformed={
+							hasMalformedExternalCredentials
+						}
 						onRemove={
 							isExternallyConfigured
 								? undefined
