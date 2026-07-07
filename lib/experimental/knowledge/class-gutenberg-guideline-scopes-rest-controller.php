@@ -100,10 +100,10 @@ class Gutenberg_Guideline_Scopes_REST_Controller extends WP_REST_Controller {
 			$data['slug'] = $item['slug'];
 		}
 		if ( rest_is_field_included( 'title', $fields ) ) {
-			$data['title'] = isset( $item['title'] ) ? $item['title'] : '';
+			$data['title'] = $item['title'] ?? '';
 		}
 		if ( rest_is_field_included( 'description', $fields ) ) {
-			$data['description'] = isset( $item['description'] ) ? $item['description'] : '';
+			$data['description'] = $item['description'] ?? '';
 		}
 		if ( rest_is_field_included( 'order', $fields ) ) {
 			$data['order'] = isset( $item['order'] ) ? (int) $item['order'] : 0;
