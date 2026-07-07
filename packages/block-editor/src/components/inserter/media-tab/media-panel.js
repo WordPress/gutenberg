@@ -113,12 +113,16 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	// canvas, the featured-image panel, this panel's own "Attach images"
 	// button), and uploading in it attaches media to the current post. Closing
 	// such a modal invalidates the cached attachment queries; subscribe so this
-	// grid refetches and reflects the newly attached images. Categories without
-	// `subscribe` (Images, Videos, Audio, Openverse) simply opt out.
+	// grid refetches and reflects the newly attached images. Categories that
+	// aren't core-data-backed (e.g. Openverse) expose no `subscribe` and opt out.
 	useEffect( () => {
 		if ( ! category.subscribe ) {
 			return undefined;
 		}
+		// The returned unsubscribe is React's cleanup: it runs on unmount (e.g.
+		// switching category, since only the active panel is mounted) and before
+		// each re-subscribe when `category`/`query` change, so there's only ever
+		// one live subscription per panel.
 		return category.subscribe(
 			() => setRefreshKey( ( key ) => key + 1 ),
 			query
