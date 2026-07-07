@@ -2,14 +2,14 @@
 
 ## Introduction
 
-Client-side media processing is a capability shipping in WordPress 7.1 that handles image compression, resizing, format conversion, rotation, and thumbnail generation directly in the user's browser using WebAssembly, rather than on the server.
+WordPress today relies on the web server - and image processing libraries like GD or Imagick - to handle image uploads. The image handling depend entirely on the server environment - so not all users get the same experience. Client-side media processing is a new feature shipping in WordPress 7.1 that shifts image processing entirely to the browser where it performs compression, resizing, format conversion, rotation, and thumbnail generation before uploading them to the server.
 
 Key benefits include:
 
+-   **Consistent processing**: All users get the same high-quality image processing powered by [libvips](https://www.libvips.org/) via WebAssembly, regardless of their host or server. WordPress can ship new or updated library versions in any release, so users always get the latest improvements when they update.
 -   **Reduced server load**: Image processing is offloaded to the user's device, freeing server resources.
--   **No PHP memory limits**: Server-side image processing is often constrained by PHP's memory limit, causing failures with large images. Browser-based processing avoids server limits entirely (although client limits apply).
--   **Consistent processing**: All users get the same high-quality image processing powered by [libvips](https://www.libvips.org/) via WebAssembly, regardless of which PHP image editor (GD or Imagick) is available on the server.
--   **Faster downloads**: libvips generally produces better-compressed JPEGs than GD/Imagick and supports all modern formats, so the generated images visitors receive are smaller and load faster.
+-   **No PHP memory limits**: Server-side image processing is often constrained by PHP's memory limit, causing failures with large images.
+-   **Faster downloads**: libvips generally produces better-compressed JPEGs than GD/Imagick and supports all modern formats, so generated images are smaller and load faster.
 
 When client-side processing is not available (unsupported browser, insufficient device resources, or explicitly disabled), WordPress transparently falls back to traditional server-side processing with no user intervention required.
 
@@ -153,16 +153,11 @@ WordPress sends the `Document-Isolation-Policy` (DIP) header on block editor scr
 Document-Isolation-Policy: isolate-and-credentialless
 ```
 
-This header provides per-document cross-origin isolation without affecting other iframes on the page, avoiding the breakage for third-party plugins and embeds.
+This header provides per-document cross-origin isolation which is required to use the SharedArrayBuffer capability. Client-side media uses this capability to run the processing in a separate worker thread, which improves performance and avoids blocking the main thread during image processing.
 
 The header is set via `gutenberg_start_cross_origin_isolation_output_buffer()` (in `lib/media/load.php`), which uses PHP output buffering on `load-post.php`, `load-post-new.php`, `load-site-editor.php`, and `load-widgets.php` screens. DIP is skipped on admin pages with an `action` parameter other than `edit` to avoid conflicts with page builders that rely on same-origin iframe access.
 
-The `gutenberg_use_document_isolation_policy` filter can be used to control whether DIP is applied:
-
-```php
-// Force DIP on or off regardless of browser version.
-add_filter( 'gutenberg_use_document_isolation_policy', '__return_true' );
-```
+The `gutenberg_use_document_isolation_policy` filter can be used to control whether DIP is applied. Disabling DIP will also disable client-side media processing, since the WASM worker cannot run without SharedArrayBuffer.
 
 ### HTML attribute injection
 
