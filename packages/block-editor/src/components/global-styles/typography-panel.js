@@ -5,6 +5,7 @@ import {
 	FontSizePicker,
 	__experimentalNumberControl as NumberControl,
 	__experimentalToolsPanel as ToolsPanel,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	Notice,
 	ToggleControl,
 } from '@wordpress/components';
@@ -196,6 +197,23 @@ const EMPTY_VALUES = [ undefined, null, '' ];
 
 function hasValue( value ) {
 	return ! EMPTY_VALUES.includes( value );
+}
+
+/**
+ * Extracts the numeric quantity from a raw CSS value so it can be used as a
+ * unit-control placeholder. The control's unit selector already reflects the
+ * inherited unit, so the placeholder must contain only the number (e.g.
+ * `1.5em` -> `1.5`) rather than the full unit string.
+ *
+ * @param {string|number|undefined} rawValue Inherited value to parse.
+ * @return {number|undefined} The numeric quantity, or `undefined` when absent.
+ */
+function getNumericPlaceholder( rawValue ) {
+	if ( ! hasValue( rawValue ) ) {
+		return undefined;
+	}
+	const [ quantity ] = parseQuantityAndUnitFromRawValue( rawValue );
+	return quantity;
 }
 
 export default function TypographyPanel( {
@@ -896,11 +914,17 @@ export default function TypographyPanel( {
 				>
 					<LineHeightControl
 						__unstableInputWidth="auto"
-						value={ localLineHeight }
+						// Local-then-inherited: render the inherited value as
+						// the control's value at rest so the numeric stepper
+						// increments from the inherited base (e.g. 1.7 → 1.8,
+						// not the default 1.5). It is only written to local on
+						// user change. Matches the ToggleGroup/FontSize controls
+						// rather than the native-placeholder pattern.
+						value={ localLineHeight ?? inheritedLineHeight }
 						onChange={ setLineHeight }
 						placeholder={
 							isLineHeightPlaceholder
-								? inheritedLineHeight
+								? getNumericPlaceholder( inheritedLineHeight )
 								: undefined
 						}
 					/>
@@ -921,12 +945,21 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				>
 					<LetterSpacingControl
-						value={ localLetterSpacing }
+						// Local-then-inherited: render the inherited value as
+						// the control's value at rest so the unit parses from
+						// it (e.g. "0.02em" keeps the em unit rather than the
+						// value string sitting behind a default px unit). It is
+						// only written to local on user change. Matches the
+						// ToggleGroup/FontSize controls rather than the
+						// native-placeholder pattern.
+						value={ localLetterSpacing ?? inheritedLetterSpacing }
 						onChange={ setLetterSpacing }
 						__unstableInputWidth="auto"
 						placeholder={
 							isLetterSpacingPlaceholder
-								? inheritedLetterSpacing
+								? getNumericPlaceholder(
+										inheritedLetterSpacing
+								  )
 								: undefined
 						}
 					/>
@@ -945,14 +978,20 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				>
 					<TextIndentControl
-						value={ localTextIndent }
+						// Local-then-inherited: render the inherited value as
+						// the control's value at rest so the UnitControl parses
+						// and shows the inherited unit (e.g. `1.5em` selects the
+						// `em` unit) instead of a raw string in the placeholder
+						// while the unit stays at the default `px`. Written to
+						// local only on user change.
+						value={ localTextIndent ?? inheritedTextIndent }
 						onChange={ setTextIndentValue }
 						__unstableInputWidth="auto"
 						withSlider
 						hasBottomMargin={ isGlobalStyles }
 						placeholder={
 							isTextIndentPlaceholder
-								? inheritedTextIndent
+								? getNumericPlaceholder( inheritedTextIndent )
 								: undefined
 						}
 					/>

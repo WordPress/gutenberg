@@ -12,6 +12,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import { Icon, alignNone, stretchWide } from '@wordpress/icons';
 import { useCallback, useState } from '@wordpress/element';
@@ -159,6 +160,23 @@ function hasValue( value ) {
 }
 
 /**
+ * Extracts the numeric quantity from a raw CSS value so it can be used as a
+ * unit-control placeholder. The control's unit selector already reflects the
+ * inherited unit, so the placeholder must contain only the number (e.g.
+ * `120px` -> `120`) rather than the full unit string.
+ *
+ * @param {string|number|undefined} rawValue Inherited value to parse.
+ * @return {number|undefined} The numeric quantity, or `undefined` when absent.
+ */
+function getNumericPlaceholder( rawValue ) {
+	if ( ! hasValue( rawValue ) ) {
+		return undefined;
+	}
+	const [ quantity ] = parseQuantityAndUnitFromRawValue( rawValue );
+	return quantity;
+}
+
+/**
  * Layers whose contributions should not bubble up into block-level
  * spacing/dimensions controls. Root-level `spacing.padding`, `spacing.margin`,
  * and `spacing.blockGap` apply to the post content wrapper or root selector
@@ -248,6 +266,34 @@ function getCommonSidesValue( sidesValue ) {
 	}
 	const first = values[ 0 ];
 	return values.every( ( v ) => v === first ) ? first : undefined;
+}
+
+/**
+ * Returns whether a sides object (top/right/bottom/left) or shorthand string
+ * holds any value on at least one side.
+ *
+ * Unlike `getCommonSidesValue`, this does not require every side to be defined
+ * or equal. It is used to drive the inherited-from-Global-Styles label
+ * treatment and the local-override dot, which should reflect the mere presence
+ * of an inherited value regardless of whether the individual sides match (a
+ * constraint that only applies to BoxControl's single-string placeholder).
+ *
+ * @param {Object|string|undefined} sidesValue The sides shape.
+ * @return {boolean} Whether any side holds a value.
+ */
+function hasAnySideValue( sidesValue ) {
+	if ( ! hasValue( sidesValue ) ) {
+		return false;
+	}
+	if ( typeof sidesValue === 'string' ) {
+		return sidesValue !== '';
+	}
+	if ( typeof sidesValue !== 'object' ) {
+		return false;
+	}
+	return [ 'top', 'right', 'bottom', 'left' ].some( ( side ) =>
+		hasValue( sidesValue[ side ] )
+	);
 }
 
 function splitGapValue( value, isAxialGap ) {
@@ -474,6 +520,13 @@ export default function DimensionsPanel( {
 	const isPaddingPlaceholder =
 		! hasValue( value?.spacing?.padding ) &&
 		inheritedPaddingPlaceholder !== undefined;
+	// Label/dot inheritance treatment is independent of whether the inherited
+	// sides share a common value — it only reflects the presence of an
+	// inherited value (the all-sides-equal constraint applies solely to the
+	// single-string BoxControl placeholder above).
+	const hasInheritedPadding = hasAnySideValue( inheritedPaddingValues );
+	const isPaddingInherited =
+		! hasValue( value?.spacing?.padding ) && hasInheritedPadding;
 	const paddingSides = Array.isArray( settings?.spacing?.padding )
 		? settings?.spacing?.padding
 		: settings?.spacing?.padding?.sides;
@@ -513,6 +566,9 @@ export default function DimensionsPanel( {
 	const isMarginPlaceholder =
 		! hasValue( value?.spacing?.margin ) &&
 		inheritedMarginPlaceholder !== undefined;
+	const hasInheritedMargin = hasAnySideValue( inheritedMarginValues );
+	const isMarginInherited =
+		! hasValue( value?.spacing?.margin ) && hasInheritedMargin;
 	const marginSides = Array.isArray( settings?.spacing?.margin )
 		? settings?.spacing?.margin
 		: settings?.spacing?.margin?.sides;
@@ -814,9 +870,8 @@ export default function DimensionsPanel( {
 						defaultControls.padding ?? DEFAULT_CONTROLS.padding
 					}
 					{ ...inheritanceProps(
-						isPaddingPlaceholder,
-						hasPaddingValue() &&
-							inheritedPaddingPlaceholder !== undefined,
+						isPaddingInherited,
+						hasPaddingValue() && hasInheritedPadding,
 						{
 							'tools-panel-item-spacing':
 								showSpacingPresetsControl,
@@ -866,9 +921,8 @@ export default function DimensionsPanel( {
 						defaultControls.margin ?? DEFAULT_CONTROLS.margin
 					}
 					{ ...inheritanceProps(
-						isMarginPlaceholder,
-						hasMarginValue() &&
-							inheritedMarginPlaceholder !== undefined,
+						isMarginInherited,
+						hasMarginValue() && hasInheritedMargin,
 						{
 							'tools-panel-item-spacing':
 								showSpacingPresetsControl,
@@ -1010,11 +1064,18 @@ export default function DimensionsPanel( {
 				>
 					<DimensionControl
 						label={ __( 'Minimum height' ) }
-						value={ localMinHeightValue }
+						// Local-then-inherited: render the inherited value as the
+						// control's value at rest so the unit parses from it
+						// (e.g. "120px" keeps its unit rather than the value
+						// string sitting behind a default px unit). It is only
+						// written to local on user change.
+						value={ localMinHeightValue ?? inheritedMinHeightValue }
 						onChange={ setMinHeightValue }
 						placeholder={
 							isMinHeightPlaceholder
-								? inheritedMinHeightValue
+								? getNumericPlaceholder(
+										inheritedMinHeightValue
+								  )
 								: undefined
 						}
 						dimensionSizes={ dimensions?.dimensionSizes }
@@ -1038,11 +1099,17 @@ export default function DimensionsPanel( {
 				>
 					<DimensionControl
 						label={ __( 'Minimum width' ) }
-						value={ localMinWidthValue }
+						// Local-then-inherited: render the inherited value as the
+						// control's value at rest so the unit parses from it
+						// rather than the value string sitting behind a default
+						// px unit. It is only written to local on user change.
+						value={ localMinWidthValue ?? inheritedMinWidthValue }
 						onChange={ setMinWidthValue }
 						placeholder={
 							isMinWidthPlaceholder
-								? inheritedMinWidthValue
+								? getNumericPlaceholder(
+										inheritedMinWidthValue
+								  )
 								: undefined
 						}
 						dimensionSizes={ dimensions?.dimensionSizes }
