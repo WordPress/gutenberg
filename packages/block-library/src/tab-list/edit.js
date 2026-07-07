@@ -16,7 +16,7 @@ import {
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,32 +35,21 @@ function Edit( {
 	const borderProps = useBorderProps( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 
-	const { tabsClientId, tabsList, editorActiveTabIndex, activeTabIndex } =
+	const { tabsClientId, tabPanels, editorActiveTabIndex, activeTabIndex } =
 		useSelect(
 			( select ) => {
 				const { getBlockRootClientId, getBlockAttributes, getBlocks } =
 					select( blockEditorStore );
 
-				const _tabsClientId = getBlockRootClientId( clientId );
-				const tabsAttributes = _tabsClientId
-					? getBlockAttributes( _tabsClientId )
-					: {};
-
-				const tabPanelsBlock = _tabsClientId
-					? getBlocks( _tabsClientId ).find(
-							( block ) => block.name === 'core/tab-panels'
-					  )
-					: undefined;
-				const _tabsList = (
-					tabPanelsBlock?.innerBlocks ?? EMPTY_ARRAY
-				).map( ( tab ) => ( {
-					label: tab.attributes.label || '',
-					clientId: tab.clientId,
-				} ) );
+				const rootClientId = getBlockRootClientId( clientId );
+				const tabsAttributes = getBlockAttributes( rootClientId );
+				const tabPanelsBlock = getBlocks( rootClientId )?.find(
+					( block ) => block.name === 'core/tab-panels'
+				);
 
 				return {
-					tabsClientId: _tabsClientId,
-					tabsList: _tabsList,
+					tabsClientId: rootClientId,
+					tabPanels: tabPanelsBlock?.innerBlocks ?? EMPTY_ARRAY,
 					editorActiveTabIndex: tabsAttributes?.editorActiveTabIndex,
 					activeTabIndex: tabsAttributes?.activeTabIndex ?? 0,
 				};
@@ -74,6 +63,14 @@ function Edit( {
 	const { insertTab, removeTab } = useTabActions( tabsClientId );
 
 	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
+	const tabsList = useMemo(
+		() =>
+			tabPanels.map( ( tab ) => ( {
+				label: tab.attributes.label || '',
+				clientId: tab.clientId,
+			} ) ),
+		[ tabPanels ]
+	);
 
 	function selectTabPanel( tabIndex ) {
 		if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
