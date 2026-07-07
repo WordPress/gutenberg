@@ -100,6 +100,7 @@ function NotesSidebar( { postId } ) {
 	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
+			notesDisplayMode !== 'hide' &&
 			( unresolvedNotes.length > 0 || selectedNoteId !== undefined )
 	);
 
@@ -227,6 +228,10 @@ function NotesSidebar( { postId } ) {
 							<MenuGroup>
 								<MenuItemsChoice
 									choices={ [
+										{
+											value: 'show',
+											label: __( 'Show notes' ),
+										},
 										{
 											value: 'show-all',
 											label: __( 'Show all notes' ),
