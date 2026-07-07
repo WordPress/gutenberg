@@ -3,7 +3,8 @@
  */
 import { Warning } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import { createBlock, rawHandler } from '@wordpress/blocks';
+import { createBlock, pasteHandler } from '@wordpress/blocks';
+import { removep } from '@wordpress/autop';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -23,7 +24,17 @@ export default function MigrationNotice( { content, onReplace } ) {
 			__next40pxDefaultSize
 			key="convert-to-blocks"
 			variant="primary"
-			onClick={ () => onReplace( rawHandler( { HTML: content } ) ) }
+			onClick={ () => {
+				const plainContent = removep( content );
+
+				onReplace(
+					pasteHandler( {
+						HTML: plainContent,
+						plainText: plainContent,
+						mode: 'BLOCKS',
+					} )
+				);
+			} }
 		>
 			{ __( 'Convert to blocks' ) }
 		</Button>,
