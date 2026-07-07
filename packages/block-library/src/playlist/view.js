@@ -104,6 +104,7 @@ const { state } = store(
  */
 function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const existing = playerState.get( ref );
+	const showPlayButtonArtwork = context.showPlayButtonArtwork === true;
 
 	// If a player already exists, load the new track without recreating.
 	if ( existing?.instance ) {
@@ -130,11 +131,13 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 						existing.instance,
 						track.title || ref.dataset.labelSeek
 					);
-					setupPlayButtonArtwork(
-						existing.container,
-						existing.instance,
-						track.image
-					);
+					if ( showPlayButtonArtwork ) {
+						setupPlayButtonArtwork(
+							existing.container,
+							existing.instance,
+							track.image
+						);
+					}
 					if ( shouldAutoPlay ) {
 						existing.instance.play()?.catch( logPlayError );
 					}
@@ -162,6 +165,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		autoPlay: shouldAutoPlay,
 		labels,
 		waveformStyle: context.waveformStyle,
+		showPlayButtonArtwork,
 		onEnded: () => {
 			// Advance to next track (autoPlay handles playback).
 			const currentIndex = context.tracks.findIndex(

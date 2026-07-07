@@ -26,6 +26,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `order` | `string` | `"asc"` | — |
 | `showTracklist` | `boolean` | `true` | — |
 | `showImages` | `boolean` | `true` | — |
+| `showPlayButtonArtwork` | `boolean` | `false` | — |
 | `showArtists` | `boolean` | `true` | — |
 | `showNumbers` | `boolean` | `true` | — |
 | `showTrackLength` | `boolean` | `true` | — |
@@ -62,7 +63,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
 
 ```html
-<!-- wp:playlist {"type":"audio","order":"asc","showTracklist":true,"showImages":true,"showArtists":true,"showNumbers":true,"showTrackLength":true,"waveformStyle":"bars"} -->
+<!-- wp:playlist {"type":"audio","order":"asc","showTracklist":true,"showImages":true,"showPlayButtonArtwork":false,"showArtists":true,"showNumbers":true,"showTrackLength":true,"waveformStyle":"bars"} -->
 <!-- Content... -->
 <!-- /wp:playlist -->
 ```

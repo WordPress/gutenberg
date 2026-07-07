@@ -40,7 +40,16 @@ function updatePlayerMetadata( instance, { title, artist, image, imageAlt } ) {
 		instance.syncArtwork( image || null, imageAlt || '' );
 	} else if ( instance.artworkEl && image ) {
 		instance.artworkEl.src = image;
-		instance.artworkEl.alt = imageAlt || '';
+		if (
+			instance.artworkEl.classList.contains(
+				'wp-block-playlist__play-button-artwork'
+			)
+		) {
+			instance.artworkEl.alt = '';
+			instance.artworkEl.setAttribute( 'aria-hidden', 'true' );
+		} else {
+			instance.artworkEl.alt = imageAlt || '';
+		}
 	}
 }
 
@@ -50,14 +59,15 @@ function updatePlayerMetadata( instance, { title, artist, image, imageAlt } ) {
  * Renders an audio waveform visualization with play/pause controls.
  * Automatically inherits colors from the parent block's text color.
  *
- * @param {Object}   props               - Component props.
- * @param {string}   props.src           - The audio file URL.
- * @param {string}   props.title         - The track title.
- * @param {string}   props.artist        - The artist name.
- * @param {string}   props.image         - The artwork image URL.
- * @param {string}   props.imageAlt      - The artwork image alt text.
- * @param {string}   props.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
- * @param {Function} props.onEnded       - Callback when the track finishes playing.
+ * @param {Object}   props                       - Component props.
+ * @param {string}   props.src                   - The audio file URL.
+ * @param {string}   props.title                 - The track title.
+ * @param {string}   props.artist                - The artist name.
+ * @param {string}   props.image                 - The artwork image URL.
+ * @param {string}   props.imageAlt              - The artwork image alt text.
+ * @param {string}   props.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {Function} props.onEnded               - Callback when the track finishes playing.
+ * @param {boolean}  props.showPlayButtonArtwork - Whether to show artwork on the play button.
  * @return {Element} The WaveformPlayer element.
  */
 export function WaveformPlayer( {
@@ -68,6 +78,7 @@ export function WaveformPlayer( {
 	imageAlt,
 	waveformStyle,
 	onEnded,
+	showPlayButtonArtwork = false,
 } ) {
 	// Store onEnded in a stable callback so it doesn't need to be a useRefEffect dependency.
 	// The callback changes reference on every render (its dependency chain
@@ -119,6 +130,7 @@ export function WaveformPlayer( {
 						),
 					},
 					onEnded: () => onEndedEvent?.(),
+					showPlayButtonArtwork,
 				} );
 				playerRef.current = player;
 				const { destroy } = player;
@@ -141,7 +153,7 @@ export function WaveformPlayer( {
 				playerDestroy?.();
 			};
 		},
-		[ onEndedEvent, hasSrc, waveformStyle ]
+		[ onEndedEvent, hasSrc, waveformStyle, showPlayButtonArtwork ]
 	);
 
 	useEffect( () => {

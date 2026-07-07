@@ -63,6 +63,7 @@ const PlaylistEdit = ( {
 		showTracklist,
 		showNumbers,
 		showImages,
+		showPlayButtonArtwork,
 		showArtists,
 		showTrackLength,
 		waveformStyle = DEFAULT_WAVEFORM_STYLE,
@@ -271,6 +272,7 @@ const PlaylistEdit = ( {
 							showNumbers: true,
 							showTrackLength: true,
 							showImages: true,
+							showPlayButtonArtwork: false,
 							order: 'asc',
 						} );
 					} }
@@ -367,6 +369,22 @@ const PlaylistEdit = ( {
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
+						label={ __( 'Show album art on play button' ) }
+						isShownByDefault
+						hasValue={ () => showPlayButtonArtwork === true }
+						onDeselect={ () =>
+							setAttributes( { showPlayButtonArtwork: false } )
+						}
+					>
+						<ToggleControl
+							label={ __( 'Show album art on play button' ) }
+							onChange={ toggleAttribute(
+								'showPlayButtonArtwork'
+							) }
+							checked={ showPlayButtonArtwork === true }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
 						label={ __( 'Order' ) }
 						isShownByDefault
 						hasValue={ () => order !== 'asc' }
@@ -433,6 +451,10 @@ const PlaylistEdit = ( {
 						}
 						waveformStyle={ waveformStyle }
 						onEnded={ onTrackEnded }
+						showPlayButtonArtwork={
+							showImages !== false &&
+							showPlayButtonArtwork === true
+						}
 					/>
 				</Disabled>
 				{ showTracklist && (

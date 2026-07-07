@@ -259,17 +259,18 @@ export function logPlayError( error ) {
  * This is the shared core logic used by both the React component (editor)
  * and the Interactivity API (frontend).
  *
- * @param {Element}  element               - The container element (must be in DOM).
- * @param {Object}   options               - Configuration options.
- * @param {string}   options.src           - The audio file URL.
- * @param {string}   options.title         - The track title.
- * @param {string}   options.artist        - The artist name.
- * @param {string}   options.image         - The artwork image URL.
- * @param {string}   options.imageAlt      - The artwork image alt text.
- * @param {boolean}  options.autoPlay      - Whether to auto-play when ready.
- * @param {Function} options.onEnded       - Callback when track ends.
- * @param {Object}   options.labels        - Translated button labels.
- * @param {string}   options.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {Element}  element                       - The container element (must be in DOM).
+ * @param {Object}   options                       - Configuration options.
+ * @param {string}   options.src                   - The audio file URL.
+ * @param {string}   options.title                 - The track title.
+ * @param {string}   options.artist                - The artist name.
+ * @param {string}   options.image                 - The artwork image URL.
+ * @param {string}   options.imageAlt              - The artwork image alt text.
+ * @param {boolean}  options.autoPlay              - Whether to auto-play when ready.
+ * @param {Function} options.onEnded               - Callback when track ends.
+ * @param {Object}   options.labels                - Translated button labels.
+ * @param {string}   options.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {boolean}  options.showPlayButtonArtwork - Whether to show artwork on the play button.
  * @return {Object} Object with instance, container, and destroy function.
  */
 export function initWaveformPlayer(
@@ -284,6 +285,7 @@ export function initWaveformPlayer(
 		onEnded,
 		labels,
 		waveformStyle,
+		showPlayButtonArtwork = false,
 	}
 ) {
 	// Get colors from computed styles.
@@ -318,7 +320,9 @@ export function initWaveformPlayer(
 	const handlers = {
 		ready: () => {
 			styleSvgIcons( container, textColor );
-			setupPlayButtonArtwork( container, instance, image );
+			if ( showPlayButtonArtwork ) {
+				setupPlayButtonArtwork( container, instance, image );
+			}
 			cleanupPlayButtonAccessibility = setupPlayButtonAccessibility(
 				container,
 				labels
