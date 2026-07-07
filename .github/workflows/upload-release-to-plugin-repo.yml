@@ -363,7 +363,8 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions: {}
         environment: wp.org plugin
-        needs: [compute-major-version, commit-changes]
+        needs:
+            [compute-should-update-trunk, compute-major-version, commit-changes]
         if: |
             github.event.release.assets[0]
         env:
