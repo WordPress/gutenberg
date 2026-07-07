@@ -40,8 +40,17 @@ import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
 
-const { useRichText, KeyboardShortcutContext, InputEventContext } =
-	unlock( richTextPrivateApis );
+// `RichTextShortcut` and `RichTextInputEvent` now live in
+// `@wordpress/rich-text` so they share the shortcut and input-event contexts
+// with standalone rich text fields. Re-exported below for back-compat (e.g.
+// `@wordpress/format-library` imports them from `@wordpress/block-editor`).
+const {
+	useRichText,
+	KeyboardShortcutContext,
+	InputEventContext,
+	RichTextShortcut,
+	RichTextInputEvent,
+} = unlock( richTextPrivateApis );
 
 const instanceIdKey = Symbol( 'instanceId' );
 
@@ -515,6 +524,6 @@ PublicForwardedRichTextContainer.isEmpty = ( value ) => {
 };
 
 export default PublicForwardedRichTextContainer;
-export { RichTextShortcut } from './shortcut';
+export { RichTextShortcut };
 export { RichTextToolbarButton } from './toolbar-button';
-export { RichTextInputEvent as __unstableRichTextInputEvent } from './input-event';
+export { RichTextInputEvent as __unstableRichTextInputEvent };
