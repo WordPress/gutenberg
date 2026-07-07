@@ -62,8 +62,9 @@ function InputBase(
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const {
-		__next40pxDefaultSize: _,
-		__next36pxDefaultSize: __,
+		// Prevent passing legacy props to internal components.
+		__next40pxDefaultSize: _next40pxDefaultSize,
+		__next36pxDefaultSize: _next36pxDefaultSize,
 		__unstableInputWidth,
 		children,
 		className,
