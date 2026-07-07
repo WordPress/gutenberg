@@ -302,6 +302,23 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::render_block_core_playlist_track
+	 */
+	public function test_playlist_track_renders_without_block_context() {
+		$output = render_block_core_playlist_track(
+			array(
+				'id'    => 1,
+				'title' => 'Song One',
+				'src'   => 'http://example.com/song1.mp3',
+				'image' => 'http://example.com/image1.jpg',
+			)
+		);
+
+		$this->assertStringContainsString( 'class="wp-block-playlist-track__image"', $output );
+		$this->assertStringContainsString( 'src="http://example.com/image1.jpg"', $output );
+	}
+
+	/**
 	 * @covers ::render_block_core_playlist
 	 */
 	public function test_aria_label_with_title_artist_and_album() {

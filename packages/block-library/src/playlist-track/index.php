@@ -22,7 +22,10 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();
-	$show_images        = ! isset( $block->context['showImages'] ) || $block->context['showImages'];
+	$show_images        = true;
+	if ( $block instanceof WP_Block && isset( $block->context['showImages'] ) ) {
+		$show_images = $block->context['showImages'];
+	}
 
 	$artist = $attributes['artist'] ?? '';
 	$image  = $attributes['image'] ?? '';
