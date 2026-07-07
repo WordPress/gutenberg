@@ -892,11 +892,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/theme/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
