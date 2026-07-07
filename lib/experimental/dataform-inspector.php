@@ -13,12 +13,18 @@
  * @return array Filtered preload paths.
  */
 function gutenberg_dataform_inspector_preload_paths( $paths, $context ) {
-	if ( 'core/edit-post' === $context->name && isset( $context->post ) ) {
-		// `DataFormPostSummary` requests the post type form config through
-		// `useViewConfig` with `fields: [ 'form' ]`, so the preload path must
-		// match the resulting `_fields=form` REST API request.
-		$paths[] = '/wp/v2/view-config?kind=postType&name=' . $context->post->post_type . '&_fields=form';
+	if (
+		! gutenberg_is_experiment_enabled( 'gutenberg-dataform-inspector' ) ||
+		'core/edit-post' !== $context->name ||
+		! isset( $context->post )
+	) {
+		return $paths;
 	}
+
+	// `DataFormPostSummary` requests the post type form config through
+	// `useViewConfig` with `fields: [ 'form' ]`, so the preload path must
+	// match the resulting `_fields=form` REST API request.
+	$paths[] = '/wp/v2/view-config?kind=postType&name=' . $context->post->post_type . '&_fields=form';
 
 	return $paths;
 }
