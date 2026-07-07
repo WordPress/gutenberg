@@ -1,6 +1,12 @@
 /* eslint-disable no-bitwise, jsdoc/require-param */
 
 /**
+ * External dependencies
+ */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+/**
  * Internal dependencies
  */
 import {
@@ -891,6 +897,62 @@ describe( 'parseExifOrientation / getUnappliedExifOrientation', () => {
 				withIrot: true,
 			} );
 			expect( getUnappliedExifOrientation( buffer ) ).toBe( 1 );
+		} );
+	} );
+
+	/*
+	 * Real encoder output (ImageMagick/libheif + exiftool), complementing the
+	 * hand-built boxes above — mirroring the rotated-image fixture set used
+	 * by WordPress core's PHPUnit media tests. Generated with:
+	 *
+	 *     magick -size 32x32 xc:'#cc0000' -size 32x32 xc:'#0000cc' +append base.png
+	 *     magick base.png -quality 60 exif-base.avif   # also base.heic
+	 *     exiftool -n -Orientation=6 -o exif-rotated-90cw.avif exif-base.avif
+	 *     exiftool -n -Orientation=8 -o exif-rotated-90ccw.avif exif-base.avif
+	 *     exiftool -n -Orientation=3 -o exif-upside-down.avif exif-base.avif
+	 *     exiftool -n -Orientation=6 -o exif-rotated-90cw.heic base.heic
+	 *     heif-enc base.png --rotate-cw 90 -A -o irot-rotated-90.avif
+	 *     exiftool -n -Orientation=6 -o irot-and-exif.avif irot-rotated-90.avif
+	 */
+	describe( 'real encoder fixtures', () => {
+		const loadFixture = ( file: string ): ArrayBuffer => {
+			const contents = readFileSync(
+				join( __dirname, 'fixtures', file )
+			);
+			return contents.buffer.slice(
+				contents.byteOffset,
+				contents.byteOffset + contents.byteLength
+			) as ArrayBuffer;
+		};
+
+		it.each( [
+			[ 'exif-rotated-90cw.avif', 6 ],
+			[ 'exif-rotated-90ccw.avif', 8 ],
+			[ 'exif-upside-down.avif', 3 ],
+			[ 'exif-rotated-90cw.heic', 6 ],
+		] )(
+			'reads the unapplied EXIF orientation from %s',
+			( file, orientation ) => {
+				expect(
+					getUnappliedExifOrientation( loadFixture( file ) )
+				).toBe( orientation );
+			}
+		);
+
+		it( 'returns 1 when an EXIF tag coexists with a native irot transform', () => {
+			// Some encoders write both; libheif already applies the `irot`
+			// on decode, so rotating again from EXIF would double-rotate.
+			expect(
+				getUnappliedExifOrientation(
+					loadFixture( 'irot-and-exif.avif' )
+				)
+			).toBe( 1 );
+		} );
+
+		it( 'returns 1 for a file without an orientation tag', () => {
+			expect(
+				getUnappliedExifOrientation( loadFixture( 'exif-base.avif' ) )
+			).toBe( 1 );
 		} );
 	} );
 } );
