@@ -414,7 +414,8 @@
 					"properties": {
 						"blockVisibility": {
 							"description": "Controls the block visibility feature. Set to `false` to disable all viewport visibility controls in the editor. Saved block visibility attributes are always rendered regardless of this setting.",
-							"type": "boolean"
+							"type": "boolean",
+							"default": true
 						}
 					},
 					"additionalProperties": false

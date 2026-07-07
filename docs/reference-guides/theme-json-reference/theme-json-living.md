@@ -160,7 +160,7 @@ Settings related to responsive behavior.
 
 | Property | Description | Type | Default |
 | -------- | ----------- | ---- | ------- |
-| blockVisibility | Controls the block visibility feature. Set to `false` to disable all viewport visibility controls in the editor. Saved block visibility attributes are always rendered regardless of this setting. | `boolean` |  |
+| blockVisibility | Controls the block visibility feature. Set to `false` to disable all viewport visibility controls in the editor. Saved block visibility attributes are always rendered regardless of this setting. | `boolean` | `true` |
 
 ---
 
