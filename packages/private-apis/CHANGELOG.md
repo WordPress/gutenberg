@@ -4,7 +4,7 @@
 
 ### Enhancements
 
-- Allow `@wordpress/global-styles-engine` to opt in to private APIs.
+- Allow `@wordpress/global-styles-engine` to opt in to private APIs. ([#79104](https://github.com/WordPress/gutenberg/pull/79104))
 
 ## 1.50.0 (2026-07-01)
 
