@@ -10,6 +10,7 @@
     -   `Truncate` ([#79446](https://github.com/WordPress/gutenberg/pull/79446))
     -   `Divider` ([#79444](https://github.com/WordPress/gutenberg/pull/79444))
     -   `Surface` ([#79445](https://github.com/WordPress/gutenberg/pull/79445))
+    -   `Theme` ([#79447](https://github.com/WordPress/gutenberg/pull/79447))
     -   `View` ([#79443](https://github.com/WordPress/gutenberg/pull/79443))
 -   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
     -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
@@ -49,7 +50,6 @@
 -   Update `@ariakit/react` to `0.4.32` ([#79860](https://github.com/WordPress/gutenberg/pull/79860)).
 -   `Flex`: Migrate styles from Emotion to SCSS Modules ([#79450](https://github.com/WordPress/gutenberg/pull/79450)).
 -   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
--   `Theme`: Migrate away from Emotion while preserving polymorphic `as` behavior and user style precedence ([#79447](https://github.com/WordPress/gutenberg/pull/79447)).
 -   `Truncate`: Migrate styles from Emotion to SCSS Modules ([#79446](https://github.com/WordPress/gutenberg/pull/79446)).
 -   `View`: Migrate away from Emotion while preserving polymorphic `as` behavior and style cascade order ([#79443](https://github.com/WordPress/gutenberg/pull/79443)).
 
