@@ -146,7 +146,6 @@ function TextShadowControl( { textShadow, onChange } ) {
 				</div>
 				{ presets.length >= PRESETS_SELECT_THRESHOLD ? (
 					<SelectControl
-						__next40pxDefaultSize
 						hideLabelFromVision
 						label={ __( 'Text shadow preset' ) }
 						value={ activeValue }

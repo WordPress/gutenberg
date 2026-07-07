@@ -531,7 +531,6 @@ function TextShadowInputControl( {
 	return (
 		<UnitControl
 			label={ label }
-			__next40pxDefaultSize
 			value={ value }
 			onChange={ onValueChange }
 		/>
