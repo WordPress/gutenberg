@@ -124,7 +124,7 @@ The interactive state of the element. The default (no modifier) is the idle stat
 The semantic token set is not a complete matrix of every property, target, tone, emphasis, and state combination. Omitted combinations are intentional when they do not map to a supported design-system role.
 
 -   Do not create a new token only to fill a missing slot in the naming pattern. Add a token when there is a documented role and a concrete component need.
--   Add a missing state token when the same role already exists for that target and tone in other states, such as `--wpds-color-background-thumb-brand-disabled` complementing the brand thumb tokens.
+-   Add a missing state token when the same role already exists for that target, tone, and emphasis in other states, such as `--wpds-color-background-thumb-brand-disabled` complementing the brand thumb tokens.
 -   Use the normal-emphasis stroke tokens for brand or error interactive borders unless a component specifically needs a distinct strong stroke role, such as `--wpds-color-stroke-interactive-brand` or `--wpds-color-stroke-interactive-error`.
 
 <!-- START GENERATED TOKEN TABLES: Do not edit this section directly. -->
@@ -192,7 +192,7 @@ The semantic token set is not a complete matrix of every property, target, tone,
 | `--wpds-color-background-thumb-brand`                         | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track).                                      |
 | `--wpds-color-background-thumb-brand-active`                  | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active. |
 | `--wpds-color-background-thumb-brand-disabled`                | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state.             |
-| `--wpds-color-background-thumb-neutral-disabled`              | Background color for thumbs with a neutral tone and normal emphasis (eg. slider thumb and filled track), in their disabled state.           |
+| `--wpds-color-background-thumb-neutral-weak-disabled`         | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb), in their disabled state.                           |
 | `--wpds-color-foreground-content-neutral`                     | Foreground color for content like text with normal emphasis.                                                                                |
 | `--wpds-color-foreground-content-neutral-weak`                | Foreground color for content like text with weak emphasis.                                                                                  |
 | `--wpds-color-foreground-content-success`                     | Foreground color for content like text with success tone and normal emphasis.                                                               |

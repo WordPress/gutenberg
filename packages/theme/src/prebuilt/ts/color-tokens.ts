@@ -118,7 +118,7 @@ export default {
 	],
 	'bg-stroke2': [
 		'background-thumb-brand-disabled',
-		'background-thumb-neutral-disabled',
+		'background-thumb-neutral-weak-disabled',
 		'background-track-neutral',
 		'stroke-interactive-brand-disabled',
 		'stroke-interactive-error-disabled',

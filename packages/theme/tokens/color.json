@@ -1278,9 +1278,9 @@
 					"$value": "{wpds-color.primitive.bg.stroke2}",
 					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
 				},
-				"neutral-disabled": {
+				"neutral-weak-disabled": {
 					"$value": "{wpds-color.primitive.bg.stroke2}",
-					"$description": "Background color for thumbs with a neutral tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
+					"$description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb), in their disabled state."
 				}
 			},
 			"$extensions": {
