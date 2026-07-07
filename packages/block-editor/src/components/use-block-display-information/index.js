@@ -77,6 +77,7 @@ export default function useBlockDisplayInformation( clientId ) {
 			const {
 				getBlockName,
 				getBlockAttributes,
+				getBlock,
 				__experimentalGetParsedPattern,
 			} = blockEditorSelect;
 			const { getBlockType, getActiveBlockVariation } =
@@ -108,7 +109,12 @@ export default function useBlockDisplayInformation( clientId ) {
 				};
 			}
 
-			const match = getActiveBlockVariation( blockName, attributes );
+			const match = getActiveBlockVariation(
+				blockName,
+				attributes,
+				undefined,
+				getBlock?.( clientId )?.innerContent
+			);
 			const isSynced =
 				isReusableBlock( blockType ) || isTemplatePart( blockType );
 			const syncedTitle = isSynced

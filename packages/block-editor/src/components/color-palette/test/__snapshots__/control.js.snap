@@ -18,32 +18,6 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
 }
 
 .emotion-4 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.emotion-5 {
-  -webkit-align-items: stretch;
-  -webkit-box-align: stretch;
-  -ms-flex-align: stretch;
-  align-items: stretch;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  gap: calc(4px * 1);
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-}
-
-.emotion-6>* {
-  min-height: 0;
-}
-
-.emotion-7 {
   font-size: 11px;
   font-weight: 499;
   line-height: 1.4;
@@ -51,51 +25,6 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   display: block;
   margin-bottom: calc(4px * 2);
   padding: 0;
-}
-
-.emotion-10 {
-  -webkit-align-items: stretch;
-  -webkit-box-align: stretch;
-  -ms-flex-align: stretch;
-  align-items: stretch;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  gap: calc(4px * 3);
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-}
-
-.emotion-13 {
-  -webkit-align-items: stretch;
-  -webkit-box-align: stretch;
-  -ms-flex-align: stretch;
-  align-items: stretch;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  gap: 0;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-}
-
-.emotion-16 {
-  -webkit-align-items: stretch;
-  -webkit-box-align: stretch;
-  -ms-flex-align: stretch;
-  align-items: stretch;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  gap: calc(4px * 0.5);
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
 }
 
 <div>
@@ -109,16 +38,17 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
         class="block-editor-color-gradient-control__fieldset"
       >
         <div
-          class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack components-v-stack"
+          class="style-flex style-items-column components-flex components-h-stack components-v-stack"
           data-wp-c16t="true"
           data-wp-component="VStack"
+          style="--wp-components-flex-align: stretch; --wp-components-flex-direction: column; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 1); --wp-components-flex-justify: center;"
         >
           <legend>
             <div
               class="block-editor-color-gradient-control__color-indicator"
             >
               <span
-                class="components-base-control__label emotion-7 emotion-8"
+                class="components-base-control__label emotion-4 emotion-5"
               >
                 Test Color
               </span>
@@ -128,18 +58,20 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             class="block-editor-color-gradient-control__panel"
           >
             <div
-              class="emotion-4 emotion-10 emotion-6 components-flex components-h-stack components-v-stack"
+              class="style-flex style-items-column components-flex components-h-stack components-v-stack"
               data-wp-c16t="true"
               data-wp-component="VStack"
+              style="--wp-components-flex-align: stretch; --wp-components-flex-direction: column; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 3); --wp-components-flex-justify: center;"
             >
               <div
                 class="components-dropdown"
                 tabindex="-1"
               >
                 <div
-                  class="emotion-4 emotion-13 emotion-6 components-flex components-h-stack components-v-stack components-color-palette__custom-color-wrapper"
+                  class="style-flex style-items-column components-flex components-h-stack components-v-stack components-color-palette__custom-color-wrapper"
                   data-wp-c16t="true"
                   data-wp-component="VStack"
+                  style="--wp-components-flex-align: stretch; --wp-components-flex-direction: column; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: 0; --wp-components-flex-justify: center;"
                 >
                   <button
                     aria-expanded="false"
@@ -150,9 +82,10 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                     type="button"
                   />
                   <div
-                    class="emotion-4 emotion-16 emotion-6 components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper"
+                    class="style-flex style-items-column components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper"
                     data-wp-c16t="true"
                     data-wp-component="VStack"
+                    style="--wp-components-flex-align: stretch; --wp-components-flex-direction: column; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 0.5); --wp-components-flex-justify: center;"
                   >
                     <span
                       class="style-truncate components-truncate components-color-palette__custom-color-name"

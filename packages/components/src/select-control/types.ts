@@ -12,7 +12,6 @@ import type { BaseControlProps } from '../base-control/types';
 type SelectControlBaseProps< V extends string > = Pick<
 	InputBaseProps,
 	| '__next36pxDefaultSize'
-	| '__next40pxDefaultSize'
 	| '__shouldNotWarnDeprecated36pxSize'
 	| 'disabled'
 	| 'hideLabelFromVision'
@@ -23,6 +22,13 @@ type SelectControlBaseProps< V extends string > = Pick<
 	| 'suffix'
 > &
 	Pick< BaseControlProps, '__nextHasNoMarginBottom' | 'help' > & {
+		/**
+		 * Start opting into the larger default height that will become the default size in a future version.
+		 *
+		 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+		 * @ignore
+		 */
+		__next40pxDefaultSize?: boolean;
 		/**
 		 * An array of option property objects to be rendered,
 		 * each with a `label` and `value` property, as well as any other
