@@ -99,6 +99,21 @@ function normalizePackagePath( path ) {
 	return path.replace( /^\.\//, '' );
 }
 
+/**
+ * @return {Record<string, unknown> | undefined} Package export map.
+ */
+function getPackageExportsMap() {
+	if (
+		! packageJson.exports ||
+		typeof packageJson.exports !== 'object' ||
+		Array.isArray( packageJson.exports )
+	) {
+		return;
+	}
+
+	return packageJson.exports;
+}
+
 const env = {
 	...process.env,
 	npm_config_cache:
@@ -128,6 +143,7 @@ const packResult = spawnSync( packCommand, packArgs, {
 } );
 
 if ( packResult.error ) {
+	rmSync( packDirectory, { force: true, recursive: true } );
 	throw packResult.error;
 }
 
@@ -148,19 +164,20 @@ const tarballPath = join( packDirectory, pack.filename );
 const disallowedPaths = packedPaths.filter( ( path ) =>
 	disallowedPathPatterns.some( ( pattern ) => pattern.test( path ) )
 );
+const packageExports = getPackageExportsMap();
+const missingAttwExcludedEntryPoints = attwOptions.excludedEntryPoints.filter(
+	( entryPoint ) =>
+		! packageExports || ! Object.hasOwn( packageExports, entryPoint )
+);
 // attw does not model non-JavaScript entry points like CSS. Keep explicit
 // exclusions honest by checking only the package targets skipped by attw.
 const missingAttwExcludedTargetPaths = attwOptions.excludedEntryPoints
 	.flatMap( ( entryPoint ) => {
-		if (
-			! packageJson.exports ||
-			typeof packageJson.exports !== 'object' ||
-			Array.isArray( packageJson.exports )
-		) {
+		if ( ! packageExports ) {
 			return [];
 		}
 
-		const exportValue = packageJson.exports[ entryPoint ];
+		const exportValue = packageExports[ entryPoint ];
 
 		return getExportTargets( exportValue )
 			.filter( ( target ) => target.startsWith( './' ) )
@@ -204,6 +221,7 @@ if ( attwResult.error ) {
 if (
 	packedPaths.length === 0 ||
 	disallowedPaths.length ||
+	missingAttwExcludedEntryPoints.length ||
 	missingAttwExcludedTargetPaths.length
 ) {
 	if ( packedPaths.length === 0 ) {
@@ -229,6 +247,17 @@ if (
 			].join( '\n' )
 		);
 	}
+
+	if ( missingAttwExcludedEntryPoints.length ) {
+		console.error(
+			[
+				'The package exports do not include entry points excluded from attw:',
+				...missingAttwExcludedEntryPoints.map(
+					( entryPoint ) => `- ${ entryPoint }`
+				),
+			].join( '\n' )
+		);
+	}
 }
 
 if ( attwResult.status !== 0 ) {
@@ -241,6 +270,7 @@ rmSync( packDirectory, { force: true, recursive: true } );
 if (
 	packedPaths.length === 0 ||
 	disallowedPaths.length ||
+	missingAttwExcludedEntryPoints.length ||
 	missingAttwExcludedTargetPaths.length ||
 	attwResult.status !== 0
 ) {

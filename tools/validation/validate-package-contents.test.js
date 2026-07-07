@@ -4,7 +4,13 @@
  * External dependencies
  */
 const { spawnSync } = require( 'node:child_process' );
-const { mkdtempSync, mkdirSync, rmSync, writeFileSync } = require( 'node:fs' );
+const {
+	mkdtempSync,
+	mkdirSync,
+	readdirSync,
+	rmSync,
+	writeFileSync,
+} = require( 'node:fs' );
 const { tmpdir } = require( 'node:os' );
 const { dirname, join } = require( 'node:path' );
 
@@ -43,19 +49,28 @@ function createPackage( { files, packageJson } ) {
 	return root;
 }
 
-function runValidator( packageRoot, args = [] ) {
+function runValidator( packageRoot, args = [], envOverrides = {} ) {
+	const env = {
+		...process.env,
+		WORDPRESS_PACKAGE_NPM_CACHE: join(
+			tmpdir(),
+			'wordpress-package-npm-cache'
+		),
+		...envOverrides,
+	};
+
+	for ( const [ name, value ] of Object.entries( env ) ) {
+		if ( value === undefined ) {
+			delete env[ name ];
+		}
+	}
+
 	return spawnSync(
 		process.execPath,
 		[ validatorPath, packageRoot, ...args ],
 		{
 			encoding: 'utf8',
-			env: {
-				...process.env,
-				WORDPRESS_PACKAGE_NPM_CACHE: join(
-					tmpdir(),
-					'wordpress-package-npm-cache'
-				),
-			},
+			env,
 		}
 	);
 }
@@ -144,6 +159,73 @@ test( 'fails when an entry point excluded from attw has a missing package target
 	expect( result.stderr ).toMatch(
 		/The package tarball is missing targets for entry points excluded from attw:\n- styles\.css/
 	);
+} );
+
+test( 'fails when an entry point excluded from attw is not exported', () => {
+	const packageRoot = createPackage( {
+		files: {
+			'index.cjs': "exports.value = 'ok';\n",
+			'index.d.ts': 'export declare const value: string;\n',
+		},
+		packageJson: {
+			files: [ 'index.cjs', 'index.d.ts' ],
+			main: './index.cjs',
+			types: './index.d.ts',
+			exports: {
+				'.': {
+					types: './index.d.ts',
+					default: './index.cjs',
+				},
+			},
+		},
+	} );
+
+	const result = runValidator( packageRoot, [
+		'--attw-exclude-entrypoint',
+		'./styles.css',
+	] );
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toMatch(
+		/The package exports do not include entry points excluded from attw:\n- \.\/styles\.css/
+	);
+} );
+
+test( 'cleans the pack directory when npm pack fails to spawn', () => {
+	const tempRoot = mkdtempSync(
+		join( tmpdir(), 'validate-package-contents-tmp-' )
+	);
+	temporaryRoots.push( tempRoot );
+	const packageRoot = createPackage( {
+		files: {
+			'index.cjs': "exports.value = 'ok';\n",
+			'index.d.ts': 'export declare const value: string;\n',
+		},
+		packageJson: {
+			files: [ 'index.cjs', 'index.d.ts' ],
+			main: './index.cjs',
+			types: './index.d.ts',
+			exports: {
+				'.': {
+					types: './index.d.ts',
+					default: './index.cjs',
+				},
+			},
+		},
+	} );
+
+	const result = runValidator( packageRoot, [], {
+		PATH: '',
+		TMPDIR: tempRoot,
+		npm_execpath: undefined,
+	} );
+
+	expect( result.status ).not.toBe( 0 );
+	expect(
+		readdirSync( tempRoot ).filter( ( path ) =>
+			path.startsWith( 'wordpress-package-contents-' )
+		)
+	).toEqual( [] );
 } );
 
 test( 'fails when an exported types target is missing from the packed package', () => {
