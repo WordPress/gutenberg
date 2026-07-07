@@ -40,7 +40,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"wpScript": false,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {

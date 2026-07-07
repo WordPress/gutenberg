@@ -41,6 +41,7 @@
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
 	},
+	"wpScript": false,
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",

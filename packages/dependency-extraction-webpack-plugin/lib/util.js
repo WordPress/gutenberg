@@ -105,8 +105,8 @@ function getPackageMetadata( request ) {
 
 /**
  * Determine whether a package should stay bundled in script builds.
- * Packages with `wpScript: true` are externalized as `wp.*`.
- * Packages with `wpScriptModuleExports` are script modules, not classic scripts.
+ * Packages are bundled only when they explicitly opt out of script registration
+ * via `wpScript: false`.
  *
  * @param {string} request Module request (the module name in `import from`).
  * @return {boolean} True when package should remain bundled in scripts.
@@ -117,9 +117,7 @@ function isBundledPackageForScripts( request ) {
 		return false;
 	}
 
-	return (
-		! packageMetadata.wpScript && ! packageMetadata.wpScriptModuleExports
-	);
+	return packageMetadata.wpScript === false;
 }
 
 /**
