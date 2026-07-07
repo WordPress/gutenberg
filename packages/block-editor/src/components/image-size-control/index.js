@@ -96,7 +96,6 @@ export default function ImageSizeControl( {
 					options={ imageSizeOptions }
 					onChange={ onChangeImage }
 					help={ imageSizeHelp }
-					size="__unstable-large"
 				/>
 			) }
 			{ isResizable && (

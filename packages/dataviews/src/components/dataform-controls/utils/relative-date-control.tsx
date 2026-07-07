@@ -107,7 +107,6 @@ export default function RelativeDateControl< Item >( {
 				/>
 				<SelectControl
 					className="dataviews-controls__relative-date-unit"
-					__next40pxDefaultSize
 					label={ __( 'Unit' ) }
 					value={ unit }
 					options={ options }

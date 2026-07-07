@@ -69,6 +69,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// WordPress 7.1 compat.
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php';
+	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-view-config-data.php';
 	require __DIR__ . '/compat/wordpress-7.1/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-wp-icon-collections-registry.php';
@@ -124,7 +125,6 @@ require __DIR__ . '/compat/wordpress-7.1/admin-bar.php';
 require __DIR__ . '/compat/wordpress-7.1/kses.php';
 require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/preload.php';
-require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
 require __DIR__ . '/compat/wordpress-7.1/icons.php';
 
 // Experimental features.
