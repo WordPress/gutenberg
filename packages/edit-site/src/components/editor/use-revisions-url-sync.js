@@ -73,14 +73,19 @@ export default function useRevisionsURLSync( enabled ) {
 		if ( location.query.revision === revisionArg ) {
 			return;
 		}
-		const write = () => {
+		const write = async () => {
 			lastURLWriteTimeRef.current = Date.now();
 			// `location.path` already includes the current query args;
 			// passing undefined removes the arg.
-			history.navigate(
-				addQueryArgs( location.path, { revision: revisionArg } ),
-				{ replace: true }
-			);
+			try {
+				await history.navigate(
+					addQueryArgs( location.path, { revision: revisionArg } ),
+					{ replace: true }
+				);
+			} catch {
+				// The browser rate-limited the write. The next change
+				// will try again.
+			}
 		};
 		if (
 			Date.now() - lastURLWriteTimeRef.current >=
