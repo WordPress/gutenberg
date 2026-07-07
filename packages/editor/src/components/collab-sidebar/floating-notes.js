@@ -12,7 +12,7 @@ import { Notes } from './notes';
 import { NOTES_PANEL_WIDTH } from './constants';
 
 export const { Slot: FloatingNotesSlot, Fill: FloatingNotesFill } =
-	createSlotFill( 'EditorFloatingNotes' );
+	createSlotFill( Symbol( 'EditorFloatingNotes' ) );
 
 /**
  * Reserves space at the right edge of the canvas so content never flows
