@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -109,18 +109,13 @@ describe( 'RichTextControl (presentational shell)', () => {
 	} );
 
 	describe( 'selection', () => {
-		// The shell derives selection from the focus/blur transitions, usable
-		// both controlled (`isSelected`) and uncontrolled. Blur is deferred via
-		// a 0ms `setTimeout` so a portal-rendered popover (e.g. the inline link
-		// UI) can claim focus before the consumer's `FormatEdit` -- and
-		// therefore the popover -- unmounts.
-		async function flushBlurTimer() {
-			await act( async () => {
-				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
-			} );
-		}
-
-		it( 'mounts children only while selected (uncontrolled)', async () => {
+		// The shell derives selection directly from the focus/blur
+		// transitions, usable both controlled (`isSelected`) and uncontrolled.
+		// It deliberately has no knowledge of popovers: a consumer whose
+		// format UI opens popovers controls `isSelected` and implements its
+		// own blur handling (covered by the richtext DataForm control tests
+		// in `@wordpress/dataviews`).
+		it( 'mounts children only while selected (uncontrolled)', () => {
 			const { container } = render(
 				<RichTextControl label="Field">
 					<span data-testid="assembly" />
@@ -136,7 +131,6 @@ describe( 'RichTextControl (presentational shell)', () => {
 			expect( screen.getByTestId( 'assembly' ) ).toBeInTheDocument();
 
 			fireEvent.blur( textbox );
-			await flushBlurTimer();
 			expect(
 				screen.queryByTestId( 'assembly' )
 			).not.toBeInTheDocument();
@@ -197,7 +191,7 @@ describe( 'RichTextControl (presentational shell)', () => {
 			expect( onSelectedChange ).toHaveBeenCalledWith( true );
 		} );
 
-		it( 'reports deselection on blur to nowhere', async () => {
+		it( 'reports deselection on blur', () => {
 			const onSelectedChange = jest.fn();
 			const { container } = render(
 				<RichTextControl
@@ -209,152 +203,45 @@ describe( 'RichTextControl (presentational shell)', () => {
 
 			fireEvent.focus( textbox );
 			fireEvent.blur( textbox );
-			await flushBlurTimer();
 
 			expect( onSelectedChange ).toHaveBeenLastCalledWith( false );
 		} );
 
-		// Focus the textbox, move focus into the supplied stand-in element,
-		// then blur the textbox and flush the deferred deselection timer.
-		async function blurWithFocusIn(
-			textbox: HTMLElement,
-			button: HTMLElement
-		) {
+		it( 'leaves selection to the consumer when controlled without `onSelectedChange`', () => {
+			// A controlling consumer (e.g. the richtext DataForm control)
+			// keeps the field selected through blur, so a popover its format
+			// UI opened can claim focus without unmounting; the shell must
+			// not fight the controlled value.
+			const { container } = render(
+				<RichTextControl label="Field" isSelected>
+					<span data-testid="assembly" />
+				</RichTextControl>
+			);
+			const textbox = getTextbox( container )!;
+
 			fireEvent.focus( textbox );
-			button.focus();
 			fireEvent.blur( textbox );
-			await flushBlurTimer();
-		}
 
-		it( 'stays selected when focus moves into an ambient popover slot', async () => {
-			const onSelectedChange = jest.fn();
-			const { container } = render(
-				<>
-					<RichTextControl
-						label="Field"
-						onSelectedChange={ onSelectedChange }
-					/>
-					{ /* Stand-in for the inline link UI popover, rendered into
-					   an ambient `Popover.Slot` up the tree. */ }
-					<div className="popover-slot">
-						<button type="button">Inside popover</button>
-					</div>
-				</>
-			);
-
-			await blurWithFocusIn(
-				getTextbox( container )!,
-				screen.getByRole( 'button', { name: 'Inside popover' } )
-			);
-
-			expect( onSelectedChange ).not.toHaveBeenCalledWith( false );
+			expect( screen.getByTestId( 'assembly' ) ).toBeInTheDocument();
 		} );
 
-		it( 'stays selected when focus moves into the popover fallback container', async () => {
-			const onSelectedChange = jest.fn();
+		it( 'calls consumer-supplied focus and blur handlers', () => {
+			const onFocus = jest.fn();
+			const onBlur = jest.fn();
 			const { container } = render(
-				<>
-					<RichTextControl
-						label="Field"
-						onSelectedChange={ onSelectedChange }
-					/>
-					{ /* Stand-in for a popover portaled to the body-level
-					   fallback container `Popover` creates when no slot is
-					   registered. */ }
-					<div className="components-popover__fallback-container">
-						<button type="button">Inside popover</button>
-					</div>
-				</>
+				<RichTextControl
+					label="Field"
+					onFocus={ onFocus }
+					onBlur={ onBlur }
+				/>
 			);
+			const textbox = getTextbox( container )!;
 
-			await blurWithFocusIn(
-				getTextbox( container )!,
-				screen.getByRole( 'button', { name: 'Inside popover' } )
-			);
+			fireEvent.focus( textbox );
+			expect( onFocus ).toHaveBeenCalledTimes( 1 );
 
-			expect( onSelectedChange ).not.toHaveBeenCalledWith( false );
-		} );
-
-		it( 'stays selected when focus moves into a `@wordpress/ui` compat overlay', async () => {
-			const onSelectedChange = jest.fn();
-			const { container } = render(
-				<>
-					<RichTextControl
-						label="Field"
-						onSelectedChange={ onSelectedChange }
-					/>
-					{ /* Stand-in for a popover migrated to `@wordpress/ui`,
-					   which portals into the shared compat overlay slot. */ }
-					<div data-wp-compat-overlay-slot>
-						<button type="button">Inside overlay</button>
-					</div>
-				</>
-			);
-
-			await blurWithFocusIn(
-				getTextbox( container )!,
-				screen.getByRole( 'button', { name: 'Inside overlay' } )
-			);
-
-			expect( onSelectedChange ).not.toHaveBeenCalledWith( false );
-		} );
-
-		it( 'deselects once focus leaves the control popover for elsewhere', async () => {
-			const onSelectedChange = jest.fn();
-			const { container } = render(
-				<>
-					<RichTextControl
-						label="Field"
-						onSelectedChange={ onSelectedChange }
-					/>
-					<div className="popover-slot">
-						<button type="button">Inside popover</button>
-					</div>
-					<button type="button">Outside</button>
-				</>
-			);
-			const popoverButton = screen.getByRole( 'button', {
-				name: 'Inside popover',
-			} );
-
-			await blurWithFocusIn( getTextbox( container )!, popoverButton );
-			expect( onSelectedChange ).not.toHaveBeenCalledWith( false );
-
-			/*
-			 * Focus now leaves the popover for an element that belongs to
-			 * neither the field nor its popovers. The field's own `onBlur`
-			 * already fired, so this exercises the document-level focus
-			 * tracking that takes over during the popover excursion.
-			 */
-			screen.getByRole( 'button', { name: 'Outside' } ).focus();
-			fireEvent.focusOut( popoverButton );
-			await flushBlurTimer();
-
-			expect( onSelectedChange ).toHaveBeenLastCalledWith( false );
-		} );
-
-		it( 'deselects when focus moves outside any popover container', async () => {
-			const onSelectedChange = jest.fn();
-			const { container } = render(
-				<>
-					<RichTextControl
-						label="Field"
-						onSelectedChange={ onSelectedChange }
-					/>
-					{ /* An element outside the field and outside every popover
-					   container must not keep the field selected. */ }
-					<div>
-						<button type="button">Elsewhere</button>
-					</div>
-				</>
-			);
-
-			await blurWithFocusIn(
-				getTextbox( container )!,
-				screen.getByRole( 'button', { name: 'Elsewhere' } )
-			);
-
-			expect( onSelectedChange ).toHaveBeenLastCalledWith( false );
+			fireEvent.blur( textbox );
+			expect( onBlur ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );

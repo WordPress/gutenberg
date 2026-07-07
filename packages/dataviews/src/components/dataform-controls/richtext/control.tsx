@@ -1,14 +1,19 @@
 /**
  * External dependencies
  */
-import type { MutableRefObject } from 'react';
+import type { FocusEvent, MutableRefObject } from 'react';
 
 /**
  * WordPress dependencies
  */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import {
+	Popover,
+	SlotFillProvider,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
+	useEffect,
 	useInsertionEffect,
 	useMemo,
 	useRef,
@@ -150,6 +155,90 @@ export default function RichTextControl( {
 	const keyboardShortcuts = useRef(
 		new Set< ( event: KeyboardEvent ) => void >()
 	);
+
+	/*
+	 * The assembly owns the selection ("active") lifetime, because only it
+	 * can prove that a popover receiving focus belongs to this field: format
+	 * popovers (e.g. the inline link UI opened via Cmd+K) portal into the
+	 * `Popover.Slot` this component renders below inside its own
+	 * `SlotFillProvider`, so "focus is in one of this field's popovers" is
+	 * simply containment in that slot.
+	 */
+	const popoverSlotRef = useRef< HTMLDivElement | null >( null );
+	// When the editable blurs, defer flipping the selection off so a
+	// portal-rendered popover can claim focus without `FormatEdit` — and
+	// therefore the popover itself — unmounting underneath it.
+	const blurDeselectTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
+	/*
+	 * Once focus moves into one of the field's popovers, the editable has
+	 * already blurred and its `onBlur` will not fire again when focus later
+	 * leaves that popover. Watch document-level `focusout` for the duration
+	 * of the popover excursion so the field still deselects (and tears down
+	 * its format UI) once focus settles outside both the editable and its
+	 * popovers.
+	 */
+	const stopPopoverFocusTrackingRef = useRef< ( () => void ) | undefined >(
+		undefined
+	);
+	useEffect(
+		() => () => {
+			clearTimeout( blurDeselectTimeoutRef.current );
+			stopPopoverFocusTrackingRef.current?.();
+		},
+		[]
+	);
+
+	function isFocusInField( ownerDocument: Document ) {
+		const active = ownerDocument.activeElement;
+		return !! (
+			active &&
+			( anchorRef.current?.contains( active ) ||
+				popoverSlotRef.current?.contains( active ) )
+		);
+	}
+
+	function trackPopoverFocusOut( ownerDocument: Document ) {
+		stopPopoverFocusTrackingRef.current?.();
+
+		function onDocumentFocusOut() {
+			clearTimeout( blurDeselectTimeoutRef.current );
+			blurDeselectTimeoutRef.current = setTimeout( () => {
+				if ( isFocusInField( ownerDocument ) ) {
+					return;
+				}
+				stopPopoverFocusTrackingRef.current?.();
+				setIsSelected( false );
+			}, 0 );
+		}
+
+		ownerDocument.addEventListener( 'focusout', onDocumentFocusOut );
+		stopPopoverFocusTrackingRef.current = () => {
+			ownerDocument.removeEventListener( 'focusout', onDocumentFocusOut );
+			stopPopoverFocusTrackingRef.current = undefined;
+		};
+	}
+
+	function onEditableFocus() {
+		clearTimeout( blurDeselectTimeoutRef.current );
+		// Focus is back in the editable, so its own blur handling takes over
+		// from the popover focus tracking again.
+		stopPopoverFocusTrackingRef.current?.();
+		setIsSelected( true );
+	}
+
+	function onEditableBlur( event: FocusEvent< HTMLElement > ) {
+		clearTimeout( blurDeselectTimeoutRef.current );
+		const { ownerDocument } = event.currentTarget;
+		blurDeselectTimeoutRef.current = setTimeout( () => {
+			// Stay selected while focus is inside one of the popovers this
+			// field's format UI opened.
+			if ( isFocusInField( ownerDocument ) ) {
+				trackPopoverFocusOut( ownerDocument );
+				return;
+			}
+			setIsSelected( false );
+		}, 0 );
+	}
 
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -345,37 +434,50 @@ export default function RichTextControl( {
 	] );
 
 	return (
-		<RichTextControlShell
-			label={ label }
-			id={ id }
-			className={ className }
-			hideLabelFromVision={ hideLabelFromVision }
-			disableLineBreaks={ disableLineBreaks }
-			ref={ editableRef }
-			isSelected={ isSelected }
-			onSelectedChange={ setIsSelected }
-		>
-			{ /* The shell mounts these only while the field is selected. */ }
-			<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
-				<InputEventContext.Provider value={ inputEvents }>
-					{ /*
-					 * Format types gate both their toolbar buttons and their
-					 * inline UIs (e.g. the link popover opened via Cmd+K) on
-					 * `isVisible`. A standalone field renders no
-					 * `RichText.ToolbarControls` slot, so the toolbar-button
-					 * fills mount into nothing while the inline UIs stay
-					 * functional.
-					 */ }
-					<FormatEdit
-						value={ value }
-						onChange={ onRichTextChange }
-						onFocus={ onFocus }
-						formatTypes={ formatTypes }
-						forwardedRef={ anchorRef }
-						isVisible
-					/>
-				</InputEventContext.Provider>
-			</KeyboardShortcutContext.Provider>
-		</RichTextControlShell>
+		/*
+		 * The provider scopes every slot/fill rendered by this field — most
+		 * importantly the format popovers, which land in the `Popover.Slot`
+		 * below. That containment is what the blur handling above checks to
+		 * decide whether focus is still within the field's own UI. A format
+		 * popover using a custom `__unstableSlotName` would portal to the
+		 * body-level fallback container instead and deselect the field;
+		 * `core/link` (and every other core format) uses the default slot.
+		 */
+		<SlotFillProvider>
+			<RichTextControlShell
+				label={ label }
+				id={ id }
+				className={ className }
+				hideLabelFromVision={ hideLabelFromVision }
+				disableLineBreaks={ disableLineBreaks }
+				ref={ editableRef }
+				isSelected={ isSelected }
+				onFocus={ onEditableFocus }
+				onBlur={ onEditableBlur }
+			>
+				{ /* The shell mounts these only while the field is selected. */ }
+				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
+					<InputEventContext.Provider value={ inputEvents }>
+						{ /*
+						 * Format types gate both their toolbar buttons and
+						 * their inline UIs (e.g. the link popover opened via
+						 * Cmd+K) on `isVisible`. A standalone field renders no
+						 * `RichText.ToolbarControls` slot, so the
+						 * toolbar-button fills mount into nothing while the
+						 * inline UIs stay functional.
+						 */ }
+						<FormatEdit
+							value={ value }
+							onChange={ onRichTextChange }
+							onFocus={ onFocus }
+							formatTypes={ formatTypes }
+							forwardedRef={ anchorRef }
+							isVisible
+						/>
+					</InputEventContext.Provider>
+				</KeyboardShortcutContext.Provider>
+			</RichTextControlShell>
+			<Popover.Slot ref={ popoverSlotRef } />
+		</SlotFillProvider>
 	);
 }

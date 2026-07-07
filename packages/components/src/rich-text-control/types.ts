@@ -18,9 +18,11 @@ export type RichTextControlProps = Pick<
 	label: string;
 	/**
 	 * The selection ("active") state of the field, for controlled usage.
-	 * When omitted, the control manages its own selection state from the
-	 * focus/blur transitions (deferring deselection so a format popover opened
-	 * from the field can claim focus without the field deselecting).
+	 * When omitted, the control manages its own selection state directly from
+	 * the focus/blur transitions. Consumers whose format UI opens popovers
+	 * must control this prop and implement their own blur handling, since
+	 * only the consumer can tell whether the element receiving focus belongs
+	 * to one of its popovers.
 	 */
 	isSelected?: boolean;
 	/**

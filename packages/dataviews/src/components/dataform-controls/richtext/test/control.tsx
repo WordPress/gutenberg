@@ -6,6 +6,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
+import { Fill } from '@wordpress/components';
 import { useContext, useEffect } from '@wordpress/element';
 import {
 	unregisterFormatType,
@@ -309,10 +310,26 @@ describe( 'RichTextControl', () => {
 				className: null,
 				edit: () => <TestShortcut onUse={ () => currentOnUse() } />,
 			} );
+			// Stand-in for a format type that opens a popover (e.g. the
+			// inline link UI). `Popover` renders its content through a
+			// `Fill` for the ambient popover slot — here that is the slot
+			// the assembly owns, which is exactly what its blur handling
+			// checks to prove the popover belongs to this field.
+			registerTestFormatType( 'core/test-popover-ui', {
+				title: 'Test Popover UI',
+				tagName: 'kbd',
+				className: null,
+				edit: () => (
+					<Fill name="Popover">
+						<button type="button">Inside popover</button>
+					</Fill>
+				),
+			} );
 		} );
 
 		afterAll( () => {
 			unregisterFormatType( 'core/test-shortcut' );
+			unregisterFormatType( 'core/test-popover-ui' );
 		} );
 
 		beforeEach( () => {
@@ -392,44 +409,41 @@ describe( 'RichTextControl', () => {
 			expect( currentOnUse ).not.toHaveBeenCalled();
 		} );
 
-		// Focus the textbox, move focus into the supplied stand-in popover,
-		// then blur the textbox and flush the deferred deselection timer.
-		async function blurWithFocusInPopover(
+		// Focus the textbox, move focus into the supplied element, then blur
+		// the textbox and flush the deferred deselection timer.
+		async function blurWithFocusIn(
 			textbox: HTMLElement,
-			popoverButton: HTMLElement
+			target: HTMLElement
 		) {
 			await focusTextbox( textbox );
-			// Focus the popover-internal button before firing the textbox
-			// blur so `document.activeElement` is the popover descendant by
-			// the time the deferred check runs.
-			popoverButton.focus();
+			// Focus the target before firing the textbox blur so
+			// `document.activeElement` points at it by the time the deferred
+			// check runs.
+			target.focus();
 			fireEvent.blur( textbox );
 			await act( async () => {
 				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 			} );
 		}
 
-		it( 'keeps dispatching shortcuts when focus moves into a popover container', async () => {
+		it( "keeps dispatching shortcuts while focus is in the field's own popover", async () => {
 			const { container } = render(
-				<>
-					<RichTextControl
-						label="Shortcut popover"
-						value=""
-						onChange={ () => {} }
-					/>
-					{ /* Stand-in for the inline link UI popover, rendered into
-					   an ambient `Popover.Slot` up the tree. */ }
-					<div className="popover-slot">
-						<button type="button">Inside popover</button>
-					</div>
-				</>
+				<RichTextControl
+					label="Shortcut popover"
+					value=""
+					onChange={ () => {} }
+				/>
 			);
 			const textbox = getTextbox( container );
 
-			await blurWithFocusInPopover(
-				textbox,
-				screen.getByRole( 'button', { name: 'Inside popover' } )
-			);
+			// Selecting the field mounts the stub format's popover content,
+			// which portals into the `Popover.Slot` the field owns.
+			await focusTextbox( textbox );
+			const popoverButton = screen.getByRole( 'button', {
+				name: 'Inside popover',
+			} );
+
+			await blurWithFocusIn( textbox, popoverButton );
 
 			// `FormatEdit` should stay mounted, so the shortcut still
 			// fires on a subsequent keydown delivered to the textbox.
@@ -437,33 +451,7 @@ describe( 'RichTextControl', () => {
 			expect( currentOnUse ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'keeps dispatching shortcuts when focus moves into a `@wordpress/ui` compat overlay', async () => {
-			const { container } = render(
-				<>
-					<RichTextControl
-						label="Shortcut overlay"
-						value=""
-						onChange={ () => {} }
-					/>
-					{ /* Stand-in for a popover migrated to `@wordpress/ui`,
-					   which portals into the shared compat overlay slot. */ }
-					<div data-wp-compat-overlay-slot>
-						<button type="button">Inside overlay</button>
-					</div>
-				</>
-			);
-			const textbox = getTextbox( container );
-
-			await blurWithFocusInPopover(
-				textbox,
-				screen.getByRole( 'button', { name: 'Inside overlay' } )
-			);
-
-			dispatchPrimaryB( textbox );
-			expect( currentOnUse ).toHaveBeenCalledTimes( 1 );
-		} );
-
-		it( 'deselects once focus leaves the control popover for elsewhere', async () => {
+		it( "deselects once focus leaves the field's popover for elsewhere", async () => {
 			const { container } = render(
 				<>
 					<RichTextControl
@@ -471,18 +459,17 @@ describe( 'RichTextControl', () => {
 						value=""
 						onChange={ () => {} }
 					/>
-					<div className="popover-slot">
-						<button type="button">Inside popover</button>
-					</div>
 					<button type="button">Outside</button>
 				</>
 			);
 			const textbox = getTextbox( container );
+
+			await focusTextbox( textbox );
 			const popoverButton = screen.getByRole( 'button', {
 				name: 'Inside popover',
 			} );
 
-			await blurWithFocusInPopover( textbox, popoverButton );
+			await blurWithFocusIn( textbox, popoverButton );
 
 			/*
 			 * Focus now leaves the popover for an element that belongs to
@@ -502,7 +489,7 @@ describe( 'RichTextControl', () => {
 			expect( currentOnUse ).not.toHaveBeenCalled();
 		} );
 
-		it( 'deselects when focus moves outside any popover container', async () => {
+		it( 'deselects when focus moves into a popover the field did not open', async () => {
 			const { container } = render(
 				<>
 					<RichTextControl
@@ -510,16 +497,17 @@ describe( 'RichTextControl', () => {
 						value=""
 						onChange={ () => {} }
 					/>
-					{ /* An element outside the field and outside every popover
-					   container must not keep the field selected. */ }
-					<div className="components-popover">
+					{ /* Stand-in for a popover owned by unrelated UI (an
+					   ambient popover slot outside the field): it must not
+					   keep the field selected. */ }
+					<div className="popover-slot">
 						<button type="button">Unrelated popover</button>
 					</div>
 				</>
 			);
 			const textbox = getTextbox( container );
 
-			await blurWithFocusInPopover(
+			await blurWithFocusIn(
 				textbox,
 				screen.getByRole( 'button', { name: 'Unrelated popover' } )
 			);
