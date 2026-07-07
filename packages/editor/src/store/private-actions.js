@@ -718,8 +718,8 @@ export const openRevision =
 
 		const page = Math.floor( index / select.getRevisionsPerPage() ) + 1;
 		if ( page !== select.getRevisionPage() ) {
-			// Raw action on purpose: the `setRevisionPage` thunk would
-			// re-select the newest revision of the page.
+			// Not the `setRevisionPage` thunk, which would re-select
+			// the newest revision of the page.
 			dispatch( { type: 'SET_REVISION_PAGE', page } );
 		}
 	};

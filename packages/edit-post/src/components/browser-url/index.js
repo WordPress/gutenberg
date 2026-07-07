@@ -12,10 +12,10 @@ import { store as editorStore } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
 
 /**
- * Quiet period that groups rapid URL changes into a single write.
- * Sliding through revisions updates the URL once per slider mark;
- * Safari throws when the History API is called more than 100 times
- * per 30 seconds.
+ * Quiet period that collapses rapid URL changes (slider drags, held
+ * arrow keys) into one trailing write; a change after a quiet period
+ * writes immediately. Safari throws when the History API is called
+ * more than 100 times per 30 seconds.
  */
 const URL_WRITE_DEBOUNCE_MS = 300;
 
@@ -115,9 +115,6 @@ export default function BrowserURL() {
 				// will retry.
 			}
 		};
-		// Write immediately after a quiet period so single changes feel
-		// instant; collapse rapid streams (slider drags, held arrow
-		// keys) into one trailing write.
 		if (
 			Date.now() - lastURLWriteTimeRef.current >=
 			URL_WRITE_DEBOUNCE_MS
