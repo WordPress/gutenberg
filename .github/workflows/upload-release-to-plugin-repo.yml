@@ -226,6 +226,67 @@ jobs:
                   name: changelog trunk
                   path: trunk
 
+            - name: Add new files
+              working-directory: ./trunk
+              run: svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
+
+            - name: Remove deleted files
+              working-directory: ./trunk
+              run: svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
+
+            - name: Check for changes
+              id: svn_diff
+              working-directory: ./trunk
+              run: |
+                  if [ -n "$(svn status -q)" ]; then
+                    echo "has_changes=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "has_changes=false" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Commit changes
+              if: steps.svn_diff.outputs.has_changes == 'true'
+              working-directory: ./trunk
+              run: |
+                  svn commit -m "Releasing version $VERSION" \
+                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                   --config-option=servers:global:http-timeout=600
+
+            - name: Verify stable version
+              run: |
+                  trunk_version="$(
+                    svn cat "$PLUGIN_REPO_URL/trunk/readme.txt" \
+                    --no-auth-cache --non-interactive \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --config-option=servers:global:http-timeout=600 \
+                    | grep -i '^Stable tag:' | head -n 1 | sed 's/^Stable tag:[[:space:]]*//' | tr -d '[:space:]'
+                  )"
+
+                  if [ "$trunk_version" = "$VERSION" ]; then
+                      echo "Verified: Stable tag in trunk is $trunk_version."
+                  else
+                    echo "::error::Version mismatch: expected Stable tag in trunk of '$VERSION'. Found '$trunk_version'."
+                    exit 1
+                  fi
+
+            - name: Verify plugin version
+              run: |
+                  plugin_version="$(
+                    svn cat "$PLUGIN_REPO_URL/trunk/gutenberg.php" \
+                    --no-auth-cache --non-interactive \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --config-option=servers:global:http-timeout=600 \
+                    | grep -iE '^[[:space:]*]*Version:' | head -n 1 \
+                    | sed -E 's/^[[:space:]*]*Version:[[:space:]]*//I' | tr -d '[:space:]'
+                  )"
+
+                  if [ "$plugin_version" = "$VERSION" ]; then
+                    echo "Verified: Plugin version in trunk is $plugin_version."
+                  else
+                    echo "::error::Version mismatch: expected plugin version in trunk of '$VERSION'. Found '$plugin_version'."
+                    exit 1
+                  fi
+
             - name: Check if SVN tag already exists
               id: check_svn_tag
               run: |
@@ -248,30 +309,55 @@ jobs:
                   fi
                   rm -f "$svn_error_file"
 
-            - name: Add new files
-              if: steps.check_svn_tag.outputs.exists != 'true'
-              working-directory: ./trunk
-              run: svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
-
-            - name: Remove deleted files
-              if: steps.check_svn_tag.outputs.exists != 'true'
-              working-directory: ./trunk
-              run: svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
-
-            - name: Commit changes
-              if: steps.check_svn_tag.outputs.exists != 'true'
-              working-directory: ./trunk
-              run: |
-                  svn commit -m "Releasing version $VERSION" \
-                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
-                   --config-option=servers:global:http-timeout=600
-
-            - name: Tag the new version
+            - name: Tag the new version (fresh)
               if: steps.check_svn_tag.outputs.exists != 'true'
               run: |
                   svn cp "$PLUGIN_REPO_URL/trunk" "$PLUGIN_REPO_URL/tags/$VERSION" \
                    -m "Tagging version $VERSION" \
                    --no-auth-cache --non-interactive --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+
+            - name: Checkout tag
+              if: steps.check_svn_tag.outputs.exists == 'true'
+              run: |
+                  # Check out the existing tag into its own working copy.
+                  svn checkout "$PLUGIN_REPO_URL/tags/$VERSION" tag \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --no-auth-cache --non-interactive \
+                    --config-option=servers:global:http-timeout=600
+
+            - name: Copy changes
+              if: steps.check_svn_tag.outputs.exists == 'true'
+              run: rsync -a --delete --exclude='.svn' ./trunk/ ./tag/
+
+            - name: Add new files
+              if: steps.check_svn_tag.outputs.exists == 'true'
+              working-directory: ./tag
+              run: svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
+
+            - name: Remove deleted files
+              if: steps.check_svn_tag.outputs.exists == 'true'
+              working-directory: ./tag
+              run: svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
+
+            - name: Check for tag changes
+              if: steps.check_svn_tag.outputs.exists == 'true'
+              id: svn_tag_diff
+              working-directory: ./tag
+              run: |
+                  if [ -n "$(svn status -q)" ]; then
+                    echo "has_changes=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "has_changes=false" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Commit changes to tag
+              if: steps.check_svn_tag.outputs.exists == 'true' && steps.svn_tag_diff.outputs.has_changes == 'true'
+              working-directory: ./tag
+              run: |
+                  svn commit -m "Updating version $VERSION" \
+                      --no-auth-cache --non-interactive \
+                      --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                      --config-option=servers:global:http-timeout=600
 
     upload-tag:
         name: Publish as tag
