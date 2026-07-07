@@ -2,7 +2,7 @@
 
 ## Introduction
 
-WordPress today relies on the web server - and image processing libraries like GD or Imagick - to handle image uploads. The image handling depend entirely on the server environment - so not all users get the same experience. Client-side media processing is a new feature shipping in WordPress 7.1 that shifts image processing entirely to the browser where it performs compression, resizing, format conversion, rotation, and thumbnail generation before uploading them to the server.
+The goal of client-side media is to provide the highest quality media processing to all WordPress sites. WordPress today relies on the web server - and image processing libraries like GD or Imagick - to handle image uploads. This approach depends entirely on the server environment - so not all users get the same experience. Client-side media processing is a new feature shipping in WordPress 7.1 that shifts image processing to the browser where it performs compression, resizing, format conversion, rotation, and "thumbnail" generation before uploading media to the server. Best in class media handling is now provided out of the box using modern web capabilities and native browser APIs.
 
 Key benefits include:
 
