@@ -39,11 +39,8 @@ test.describe( 'Block Notes', () => {
 
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
 		await expect( form ).toBeFocused();
-		// Close the pinned notes sidebar.
-		await page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'All notes', exact: true } )
-			.click();
+		// Hide the notes sidebars via the Notes dropdown.
+		await blockNoteUtils.selectNotesDisplayOption( 'Hide notes' );
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
 		await expect( form ).toBeFocused();
 	} );
@@ -1476,6 +1473,129 @@ test.describe( 'Block Notes', () => {
 			await expect.poll( alphaOf ).toBeGreaterThan( 0.4 );
 		} );
 	} );
+
+	test.describe( 'Notes visibility toggle', () => {
+		test( 'shows the display options with the current state selected', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Toggle menu block' },
+				comment: 'Toggle menu note',
+			} );
+
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Notes', exact: true } )
+				.click();
+
+			const menu = page.getByRole( 'menu', {
+				name: 'Notes display options',
+			} );
+			await expect( menu.getByRole( 'menuitemradio' ) ).toHaveText( [
+				'Show notes',
+				'Show all notes',
+				'Hide notes',
+			] );
+			// The floating notes are visible by default, so "Show notes" is
+			// the selected choice.
+			await expect(
+				menu.getByRole( 'menuitemradio', {
+					name: 'Show notes',
+					exact: true,
+				} )
+			).toHaveAttribute( 'aria-checked', 'true' );
+			await page.keyboard.press( 'Escape' );
+		} );
+
+		test( 'can hide and show notes', async ( { page, blockNoteUtils } ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Hide and show' },
+				comment: 'Now you see me',
+			} );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Now you see me' } );
+			await expect( thread ).toBeVisible();
+
+			await blockNoteUtils.selectNotesDisplayOption( 'Hide notes' );
+			await expect( thread ).toBeHidden();
+
+			await blockNoteUtils.selectNotesDisplayOption( 'Show notes' );
+			await expect( thread ).toBeVisible();
+		} );
+
+		test( 'opens and closes the All notes sidebar from the dropdown', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Sidebar block' },
+				comment: 'Sidebar note',
+			} );
+
+			await blockNoteUtils.selectNotesDisplayOption( 'Show all notes' );
+			const closeButton = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Close Notes' } );
+			await expect( closeButton ).toBeVisible();
+
+			// The dropdown reflects the open sidebar.
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Notes', exact: true } )
+				.click();
+			await expect(
+				page.getByRole( 'menuitemradio', {
+					name: 'Show all notes',
+					exact: true,
+				} )
+			).toHaveAttribute( 'aria-checked', 'true' );
+			await page.keyboard.press( 'Escape' );
+
+			// Hiding notes closes the All notes sidebar too.
+			await blockNoteUtils.selectNotesDisplayOption( 'Hide notes' );
+			await expect( closeButton ).toBeHidden();
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'treeitem', { name: 'Note: Sidebar note' } )
+			).toBeHidden();
+		} );
+
+		test( 'adding a note while hidden makes notes visible again', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'First block' },
+				comment: 'Existing note',
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Second block' },
+			} );
+
+			await blockNoteUtils.selectNotesDisplayOption( 'Hide notes' );
+			const existingThread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Existing note' } );
+			await expect( existingThread ).toBeHidden();
+
+			// Adding a note from the block options menu unhides notes.
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'New note', exact: true } )
+			).toBeFocused();
+			await expect( existingThread ).toBeVisible();
+		} );
+	} );
 } );
 
 class BlockNoteUtils {
@@ -1490,22 +1610,30 @@ class BlockNoteUtils {
 	}
 
 	async openBlockNoteSidebar() {
-		const toggleButton = this.#page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'All notes', exact: true } );
+		const closeButton = this.#page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Close Notes' } );
 
-		const isClosed =
-			( await toggleButton.getAttribute( 'aria-expanded' ) ) === 'false';
-
-		if ( isClosed ) {
-			await toggleButton.click();
-			await this.#page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Close Notes' } )
-				.waitFor();
+		if ( ! ( await closeButton.isVisible() ) ) {
+			await this.selectNotesDisplayOption( 'Show all notes' );
+			await closeButton.waitFor();
 		}
+	}
 
-		return toggleButton;
+	async selectNotesDisplayOption( option ) {
+		await this.#page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Notes', exact: true } )
+			.click();
+		await this.#page.getByRole( 'menuitemradio', { name: option } ).click();
+		// The dropdown stays open after selecting a choice; close it so it
+		// doesn't overlap subsequent interactions.
+		const menu = this.#page.getByRole( 'menu', {
+			name: 'Notes display options',
+		} );
+		if ( await menu.isVisible() ) {
+			await this.#page.keyboard.press( 'Escape' );
+		}
 	}
 
 	async addBlockWithNote( { type, attributes = {}, comment } ) {
