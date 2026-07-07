@@ -17,33 +17,13 @@ When client-side processing is not available (unsupported browser, insufficient 
 
 Both paths converge at `wp_generate_attachment_metadata`, so server-side hooks see the same surface regardless of which path was taken:
 
-```mermaid
-flowchart TD
-    A[User uploads image in the editor] --> B{Client-side<br/>processing available?}
-    B -- Yes --> C[WASM worker decodes,<br/>resizes, and encodes<br/>original + thumbnails]
-    C --> D[Upload files via<br/>sideload endpoint]
-    B -- No --> E[POST file to /wp/v2/media]
-    E --> F[PHP GD/Imagick<br/>generates thumbnails]
-    D --> G[Finalize: wp_generate_attachment_metadata<br/>context: 'update']
-    F --> G
-    G --> H[Attachment ready in post]
-```
+![Upload flow: the client-side path (WASM worker processing plus the sideload endpoint) and the server-side path (POST /wp/v2/media plus PHP thumbnails) both converge at wp_generate_attachment_metadata](https://github.com/user-attachments/assets/97e12422-754b-4e82-9a3f-ebeeaaae24b1)
 
 ## Architecture overview
 
 The client-side media processing pipeline flows through several layers:
 
-```mermaid
-flowchart TD
-    A["<b>Block Editor</b><br/>(Image block, Gallery block, etc.)<br/>Calls <code>mediaUpload()</code> from <code>@wordpress/block-editor</code>"]
-    B["<b>@wordpress/media-utils</b><br/><code>uploadMedia()</code> / <code>sideloadMedia()</code><br/>HTTP transport to REST API"]
-    C["<b>@wordpress/upload-media</b> (<code>core/upload-media</code> store)<br/>Upload queue, concurrency management,<br/>operation orchestration"]
-    D["<b>@wordpress/vips</b><br/>WASM image processing<br/>(Web Worker)"]
-    E["<b>REST API</b><br/>POST /wp/v2/media<br/>POST /wp/v2/media/{id}/sideload<br/>POST /wp/v2/media/{id}/finalize"]
-    A --> B --> C
-    C --> D
-    C --> E
-```
+![Architecture overview: the block editor calls mediaUpload() from @wordpress/media-utils, which hands off to the @wordpress/upload-media store, which orchestrates the @wordpress/vips web worker and the REST API endpoints](https://github.com/user-attachments/assets/02d335a6-32f6-4472-a70e-a312017ec89f)
 
 ## Three-package split
 
@@ -88,6 +68,8 @@ Provides the `uploadMedia()` and `sideloadMedia()` functions that handle the act
 ## Processing pipeline
 
 When a user uploads an image in the block editor, the following pipeline executes:
+
+![The six-step processing pipeline: prepare, transcode (optional), upload the original, generate thumbnails, sideload sub-sizes, and finalize](https://github.com/user-attachments/assets/fb854e91-a3dc-4dc2-8ea3-8131c0d97c12)
 
 ### 1. Prepare
 
@@ -288,6 +270,8 @@ Conversion lives in a dedicated package that mirrors the `@wordpress/vips` worke
 -   `packages/video-conversion/src/loader.ts` — Thin loader for WordPress script-module discovery.
 
 ### Conversion pipeline
+
+![The GIF to video conversion pipeline: detect an opaque animated GIF, decode frames with ImageDecoder, encode with the WebCodecs VideoEncoder and mediabunny, store the video and poster as companion files, and swap the block in the editor](https://github.com/user-attachments/assets/02529a47-4498-4f06-95d0-f7778b89cad2)
 
 1.  **Detection.** `isAnimatedGif()` (in `packages/upload-media/src/utils.ts`) inspects the GIF89a Graphic Control Extension blocks to confirm the file is actually animated. Transparent GIFs are excluded — a `<video>` cannot reproduce GIF transparency — so they upload as a normal image with no companion.
 2.  **Decode.** The browser's `ImageDecoder` decodes each GIF frame, honoring the real per-frame `delay` values (defaulting to the GIF spec's 100ms / 10fps when a frame reports none).
