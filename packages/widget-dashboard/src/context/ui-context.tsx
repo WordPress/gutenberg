@@ -17,8 +17,6 @@ interface DashboardUIContextValue {
 	inserterOpen: boolean;
 	setInserterOpen: ( next: boolean ) => void;
 
-	layoutSettingsOpen: boolean;
-	setLayoutSettingsOpen: ( next: boolean ) => void;
 	resetDialogOpen: boolean;
 	setResetDialogOpen: ( next: boolean ) => void;
 
@@ -61,7 +59,6 @@ interface ProviderProps {
  */
 export function WidgetDashboardUIProvider( { children }: ProviderProps ) {
 	const [ inserterOpen, setInserterOpen ] = useState( false );
-	const [ layoutSettingsOpen, setLayoutSettingsOpen ] = useState( false );
 	const [ resetDialogOpen, setResetDialogOpen ] = useState( false );
 	const [ settingsWidgetUuid, setSettingsWidgetUuid ] = useState<
 		string | null
@@ -71,19 +68,12 @@ export function WidgetDashboardUIProvider( { children }: ProviderProps ) {
 		() => ( {
 			inserterOpen,
 			setInserterOpen,
-			layoutSettingsOpen,
-			setLayoutSettingsOpen,
 			resetDialogOpen,
 			setResetDialogOpen,
 			settingsWidgetUuid,
 			setSettingsWidgetUuid,
 		} ),
-		[
-			inserterOpen,
-			layoutSettingsOpen,
-			resetDialogOpen,
-			settingsWidgetUuid,
-		]
+		[ inserterOpen, resetDialogOpen, settingsWidgetUuid ]
 	);
 
 	return <Context.Provider value={ value }>{ children }</Context.Provider>;

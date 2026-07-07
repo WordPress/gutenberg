@@ -135,6 +135,13 @@ export interface SaveOptions< T extends string > {
 	 * it is most relevant for AVIF, as it is slow by default.
 	 */
 	effort?: number;
+	/**
+	 * Number of bits per sample to write (e.g. 8, 10, or 12).
+	 *
+	 * Used for AVIF/HEIF to preserve high-bit-depth (HDR) images instead of
+	 * flattening them to 8-bit.
+	 */
+	bitdepth?: number;
 }
 
 export interface ThumbnailOptions {

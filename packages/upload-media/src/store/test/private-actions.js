@@ -96,6 +96,28 @@ describe( 'private actions', () => {
 			] );
 		} );
 
+		it( 'should use the provided quality instead of the default', async () => {
+			const file = new File( [ 'test' ], 'test.jpg', {
+				type: 'image/jpeg',
+			} );
+
+			const result = await getTranscodeImageOperation(
+				file,
+				'image/webp',
+				false,
+				0.6
+			);
+
+			expect( result ).toEqual( [
+				OperationType.TranscodeImage,
+				{
+					outputFormat: 'webp',
+					outputQuality: 0.6,
+					interlaced: false,
+				},
+			] );
+		} );
+
 		it( 'should return null for invalid output format', async () => {
 			const file = new File( [ 'test' ], 'test.jpg', {
 				type: 'image/jpeg',
@@ -765,7 +787,7 @@ describe( 'private actions', () => {
 			expect( poster.additionalData ).toEqual(
 				expect.objectContaining( {
 					post: 42,
-					image_size: 'animated-video-poster',
+					image_size: 'animated_video_poster',
 					convert_format: false,
 				} )
 			);
@@ -874,7 +896,7 @@ describe( 'private actions', () => {
 			);
 		}
 
-		it( 'sideloads the converted video as an animated-video companion', async () => {
+		it( 'sideloads the converted video as an animated_video companion', async () => {
 			const gif = makeGif();
 			const item = {
 				id: 'g',
@@ -900,7 +922,7 @@ describe( 'private actions', () => {
 			expect( sideload.additionalData ).toEqual(
 				expect.objectContaining( {
 					post: 42,
-					image_size: 'animated-video',
+					image_size: 'animated_video',
 					convert_format: false,
 				} )
 			);

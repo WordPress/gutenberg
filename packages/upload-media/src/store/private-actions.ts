@@ -680,12 +680,14 @@ function isValidImageFormat( format: string ): format is ImageFormat {
  * @param file           The image file.
  * @param outputMimeType The target output MIME type.
  * @param interlaced     Whether to use interlaced encoding.
+ * @param quality        Re-encode quality (0-1). Defaults to DEFAULT_OUTPUT_QUALITY.
  * @return The transcode operation tuple if transcoding is needed, null otherwise.
  */
 export async function getTranscodeImageOperation(
 	file: File,
 	outputMimeType: string,
-	interlaced: boolean = false
+	interlaced: boolean = false,
+	quality: number = DEFAULT_OUTPUT_QUALITY
 ): Promise<
 	| [
 			OperationType.TranscodeImage,
@@ -721,7 +723,7 @@ export async function getTranscodeImageOperation(
 		OperationType.TranscodeImage,
 		{
 			outputFormat: formatPart,
-			outputQuality: DEFAULT_OUTPUT_QUALITY,
+			outputQuality: quality,
 			interlaced,
 		},
 	];
@@ -1141,7 +1143,8 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				false, // smartCrop
 				addSuffix,
 				item.abortController?.signal,
-				scaledSuffix
+				scaledSuffix,
+				args.quality
 			);
 
 			measure( {
@@ -1354,7 +1357,7 @@ type TranscodeGifItemArgs = OperationArgs[ OperationType.TranscodeGif ];
  * Runs inside a sideload item whose parent is the GIF's image attachment
  * (see generateThumbnails). The next Upload op then sideloads the
  * transcoded video as a companion of that attachment under the
- * `animated-video` image size; the GIF stays the primary attachment and
+ * `animated_video` image size; the GIF stays the primary attachment and
  * the editor block stays `core/image`.
  *
  * @param id     Item ID.
@@ -1408,7 +1411,7 @@ export function transcodeGifItem(
 				parentId: item.parentId,
 				additionalData: {
 					post: item.additionalData?.post,
-					image_size: 'animated-video-poster',
+					image_size: 'animated_video_poster',
 					convert_format: false,
 				},
 				operations: [
@@ -1489,7 +1492,9 @@ export function generateThumbnails( id: QueueItemId ) {
 		// sideload flow owns. The HEIC was kept on item.originalHeicFile;
 		// the uploaded file is a JPEG conversion. parentId guarantees
 		// processItem routes this to the sideload endpoint, never the main
-		// create endpoint.
+		// create endpoint. The `source_original` image_size token is
+		// format-agnostic (it also covers HEIF) and matches the server-side
+		// WP_REST_Attachments_Controller::IMAGE_SIZE_SOURCE_ORIGINAL constant.
 		if ( item.originalHeicFile && attachment.id ) {
 			dispatch.addSideloadItem( {
 				file: item.originalHeicFile,
@@ -1497,7 +1502,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				parentId: item.id,
 				additionalData: {
 					post: attachment.id,
-					image_size: 'original-heic',
+					image_size: 'source_original',
 					convert_format: false,
 				},
 				operations: [ OperationType.Upload ],
@@ -1520,7 +1525,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				parentId: item.id,
 				additionalData: {
 					post: attachment.id,
-					image_size: 'animated-video',
+					image_size: 'animated_video',
 					convert_format: false,
 				},
 				operations: [
@@ -1644,6 +1649,26 @@ export function generateThumbnails( id: QueueItemId ) {
 			const outputMimeType = attachment.image_output_format;
 			const interlaced = attachment.image_save_progressive ?? false;
 
+			// Resolve the size-aware encode quality from the
+			// wp_editor_set_quality filter, carried in the upload response.
+			// Quality is reported as 1-100 (WordPress scale); the vips worker
+			// expects 0-1. Fall back to the generic setting, then the
+			// hardcoded default, when the response predates this field.
+			const imageQuality = attachment.image_quality;
+			const fallbackQuality =
+				settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY;
+			const defaultQuality =
+				typeof imageQuality?.default === 'number'
+					? imageQuality.default / 100
+					: fallbackQuality;
+			const qualityForSize = ( sizeName: string ): number => {
+				const sized = imageQuality?.sizes?.[ sizeName ];
+				if ( typeof sized === 'number' ) {
+					return sized / 100;
+				}
+				return defaultQuality;
+			};
+
 			// Check if thumbnails should be transcoded to a different format.
 			// Uses the same transparency-aware logic as the main image
 			// to avoid converting transparent PNGs to JPEG.
@@ -1658,7 +1683,8 @@ export function generateThumbnails( id: QueueItemId ) {
 				thumbnailTranscodeOperation = await getTranscodeImageOperation(
 					thumbnailSource,
 					outputMimeType,
-					interlaced
+					interlaced,
+					defaultQuality
 				);
 			}
 
@@ -1688,16 +1714,33 @@ export function generateThumbnails( id: QueueItemId ) {
 			for ( const [ , names ] of dimensionGroups ) {
 				const imageSize = allImageSizes[ names[ 0 ] ];
 
+				// Sizes grouped here share dimensions, so wp_editor_set_quality
+				// (which is dimension-aware) resolves to the same value for
+				// every name in the group.
+				const sizeQuality = qualityForSize( names[ 0 ] );
+
 				// Build operations list for this thumbnail. The resize step
 				// is UltraHDR-aware and will preserve the gain map automatically.
 				const thumbnailOperations: Operation[] = [
-					[ OperationType.ResizeCrop, { resize: imageSize } ],
+					[
+						OperationType.ResizeCrop,
+						{ resize: imageSize, quality: sizeQuality },
+					],
 				];
 
+				// Add transcoding if format conversion is configured and
+				// the transparency check passed. For UltraHDR sources the
+				// transcode is skipped so the gain map survives the resize.
+				// Otherwise override the template's quality with this size's
+				// resolved value.
 				if ( ! isUltraHdr && thumbnailTranscodeOperation ) {
-					// Add transcoding if format conversion is configured and
-					// the transparency check passed.
-					thumbnailOperations.push( thumbnailTranscodeOperation );
+					thumbnailOperations.push( [
+						thumbnailTranscodeOperation[ 0 ],
+						{
+							...thumbnailTranscodeOperation[ 1 ],
+							outputQuality: sizeQuality,
+						},
+					] );
 				}
 
 				thumbnailOperations.push( OperationType.Upload );
@@ -1751,6 +1794,7 @@ export function generateThumbnails( id: QueueItemId ) {
 										height: bigImageSizeThreshold,
 									},
 									isThresholdResize: true,
+									quality: defaultQuality,
 								},
 							],
 						];
