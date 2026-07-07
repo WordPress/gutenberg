@@ -6,7 +6,12 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { unregisterFormatType, registerFormatType } from '@wordpress/rich-text';
+import { useContext, useEffect } from '@wordpress/element';
+import {
+	unregisterFormatType,
+	registerFormatType,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -14,8 +19,22 @@ import { unregisterFormatType, registerFormatType } from '@wordpress/rich-text';
 import RichTextControl from '../control';
 import { unlock } from '../../../../lock-unlock';
 
-function getTextbox( container ) {
-	return container.querySelector( '.wp-rich-text-control' );
+/*
+ * `registerFormatType` types its settings as the full `WPFormat` shape; the
+ * minimal stubs in this file only need the members the control exercises.
+ */
+function registerTestFormatType(
+	name: string,
+	settings: Record< string, unknown >
+) {
+	registerFormatType(
+		name,
+		settings as unknown as Parameters< typeof registerFormatType >[ 1 ]
+	);
+}
+
+function getTextbox( container: HTMLElement ) {
+	return container.querySelector< HTMLElement >( '.wp-rich-text-control' )!;
 }
 
 /*
@@ -29,7 +48,7 @@ const flushMicrotasks = () =>
 		await Promise.resolve();
 	} );
 
-async function focusTextbox( textbox ) {
+async function focusTextbox( textbox: HTMLElement ) {
 	fireEvent.focus( textbox );
 	await flushMicrotasks();
 }
@@ -38,7 +57,7 @@ describe( 'RichTextControl', () => {
 	beforeAll( () => {
 		// Register a minimal stub for `core/bold` so the optional
 		// `allowedFormats` codepath has something to resolve when exercised.
-		registerFormatType( 'core/bold', {
+		registerTestFormatType( 'core/bold', {
 			title: 'Bold',
 			tagName: 'strong',
 			className: null,
@@ -253,24 +272,20 @@ describe( 'RichTextControl', () => {
 		// format type can be registered once in `beforeAll` (avoiding store
 		// updates during render that would re-fire `useSelect` outside
 		// `act(...)`), while each test can still assert on a fresh mock.
-		let currentOnUse;
+		let currentOnUse: jest.Mock;
 
 		// Re-implement `RichTextShortcut` locally to keep the assertion on
 		// the registration contract explicit. It registers a callback into
-		// the shared `KeyboardShortcutContext` (now owned by
+		// the shared `KeyboardShortcutContext` (owned by
 		// `@wordpress/rich-text`) that the control provides — the same
 		// context the real `RichTextShortcut` reads. Mirrors the contract of
-		// `packages/block-editor/src/components/rich-text/shortcut.js`.
-		function TestShortcut( { onUse } ) {
-			const { useContext, useEffect } = require( '@wordpress/element' );
-			const {
-				privateApis: richTextPrivateApis,
-			} = require( '@wordpress/rich-text' );
+		// `packages/rich-text/src/keyboard-shortcut.js`.
+		function TestShortcut( { onUse }: { onUse: () => void } ) {
 			const { KeyboardShortcutContext } = unlock( richTextPrivateApis );
 			const keyboardShortcuts = useContext( KeyboardShortcutContext );
 			useEffect( () => {
 				const shortcuts = keyboardShortcuts.current;
-				const handler = ( event ) => {
+				const handler = ( event: KeyboardEvent ) => {
 					if (
 						event.key === 'b' &&
 						( event.ctrlKey || event.metaKey )
@@ -288,7 +303,7 @@ describe( 'RichTextControl', () => {
 		}
 
 		beforeAll( () => {
-			registerFormatType( 'core/test-shortcut', {
+			registerTestFormatType( 'core/test-shortcut', {
 				title: 'Test Shortcut',
 				tagName: 'mark',
 				className: null,
@@ -304,7 +319,7 @@ describe( 'RichTextControl', () => {
 			currentOnUse = jest.fn();
 		} );
 
-		async function blurTextbox( textbox ) {
+		async function blurTextbox( textbox: HTMLElement ) {
 			fireEvent.blur( textbox );
 			// `RichTextControl` defers deselection on blur via a 0ms
 			// `setTimeout` so a portal-rendered popover (e.g., the
@@ -318,7 +333,7 @@ describe( 'RichTextControl', () => {
 
 		// Dispatch a `primary+b` keydown — on non-Apple platforms (jsdom's
 		// default), the `primary` modifier maps to Ctrl, not Meta.
-		function dispatchPrimaryB( textbox ) {
+		function dispatchPrimaryB( textbox: HTMLElement ) {
 			return fireEvent.keyDown( textbox, {
 				key: 'b',
 				code: 'KeyB',
@@ -379,7 +394,10 @@ describe( 'RichTextControl', () => {
 
 		// Focus the textbox, move focus into the supplied stand-in popover,
 		// then blur the textbox and flush the deferred deselection timer.
-		async function blurWithFocusInPopover( textbox, popoverButton ) {
+		async function blurWithFocusInPopover(
+			textbox: HTMLElement,
+			popoverButton: HTMLElement
+		) {
 			await focusTextbox( textbox );
 			// Focus the popover-internal button before firing the textbox
 			// blur so `document.activeElement` is the popover descendant by
@@ -520,12 +538,12 @@ describe( 'RichTextControl', () => {
 		// to make the transform observable from a unit test without standing
 		// up the full `core/code` machinery.
 		beforeAll( () => {
-			registerFormatType( 'core/test-input-rule', {
+			registerTestFormatType( 'core/test-input-rule', {
 				title: 'Test Input Rule',
 				tagName: 'span',
 				className: 'test-input-rule',
 				edit: () => null,
-				__unstableInputRule( value ) {
+				__unstableInputRule( value: { text: string } ) {
 					if ( ! value.text.includes( 'abc' ) ) {
 						return value;
 					}
