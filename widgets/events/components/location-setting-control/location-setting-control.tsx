@@ -41,6 +41,7 @@ export function LocationSettingControl( {
 		<LocationPicker
 			seedInput={ value ?? '' }
 			hideLabelFromVision={ hideLabelFromVision }
+			showDescription={ ! hideLabelFromVision }
 			selectButton={ false }
 			onChange={ onLocationChange }
 		/>

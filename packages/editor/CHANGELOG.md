@@ -6,6 +6,8 @@
 
 -   Add an "Attachments" source to the block inserter's Media tab, listing images attached to the current post with the ability to attach and detach them ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
 
+## 14.50.0 (2026-07-01)
+
 ## 14.49.0 (2026-06-24)
 
 ## 14.48.1 (2026-06-16)
