@@ -7,12 +7,7 @@ import {
 	useMemo,
 	createInterpolateElement,
 } from '@wordpress/element';
-import {
-	TextControl,
-	ToolbarButton,
-	Popover,
-	ExternalLink,
-} from '@wordpress/components';
+import { TextControl, ToolbarButton, Popover } from '@wordpress/components';
 import {
 	BlockControls,
 	InspectorControls,
@@ -45,6 +40,11 @@ import {
 	privateApis as composePrivateApis,
 } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { Link } from '@wordpress/ui';
+
+/**
+ * Internal dependencies
+ */
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
@@ -68,7 +68,9 @@ function useEnter( props ) {
 	const { getBlock, getBlockRootClientId, getBlockIndex } =
 		useSelect( blockEditorStore );
 	const propsRef = useRef( props );
-	propsRef.current = props;
+	useEffect( () => {
+		propsRef.current = props;
+	}, [ props ] );
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
@@ -456,7 +458,10 @@ function ButtonEdit( props ) {
 							),
 							{
 								a: (
-									<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+									<Link
+										openInNewTab
+										href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel"
+									/>
 								),
 							}
 						) }

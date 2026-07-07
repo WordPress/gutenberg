@@ -313,14 +313,6 @@
 			"count": 2
 		}
 	},
-	"packages/block-library/src/button/edit.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/columns/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
