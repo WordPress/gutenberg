@@ -419,6 +419,56 @@ test.describe( 'Suggestion mode review flows', () => {
 		).toBeVisible();
 	} );
 
+	test( 'accept — an accepted text-alignment change lands in the post content', async ( {
+		editor,
+		page,
+	} ) => {
+		/*
+		 * Text alignment is a block support writing `style.typography
+		 * .textAlign` straight to the store, so the store interceptor
+		 * captures it as an attribute suggestion. Note the treatment class is
+		 * the only visible cue while pending: the alignment class itself is
+		 * applied by the support's `useBlockProps` hook from the (reverted)
+		 * store attributes, so the proposed alignment renders only once
+		 * accepted.
+		 */
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Align me' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await editor.selectBlocks( paragraph );
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Align text' } )
+			.click();
+		// Attach the auto-save listener before the edit starts the debounce.
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page
+			.getByRole( 'menuitemradio', { name: 'Align text center' } )
+			.click();
+		await suggestionSaved;
+
+		// Captured as a pending attribute suggestion; nothing committed.
+		await expect( paragraph ).toHaveClass( /is-suggestion-pending/ );
+		let serialized = await editor.getEditedPostContent();
+		expect( serialized ).not.toContain( 'has-text-align-center' );
+
+		// Review as the post author, outside Suggest mode.
+		await switchIntent( page, 'Editing' );
+		await decideSuggestion( page, 'Accept' );
+
+		// The alignment lands in the block and the post content.
+		await expect( paragraph ).toHaveClass( /has-text-align-center/ );
+		serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'has-text-align-center' );
+	} );
+
 	// --- Review: block-remove ------------------------------------------------
 
 	test( 'accept — an accepted block removal actually removes the block', async ( {
