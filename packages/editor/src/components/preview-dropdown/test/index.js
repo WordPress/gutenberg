@@ -132,6 +132,11 @@ describe( 'PreviewDropdown', () => {
 						isListViewOpened: () => false,
 					};
 				}
+				if ( store === blockEditorStore ) {
+					return {
+						isResponsiveEditing: () => false,
+					};
+				}
 				return {
 					getEntityRecord: () => ( { home: 'https://example.com' } ),
 					getPostType: () => ( { viewable: true } ),
