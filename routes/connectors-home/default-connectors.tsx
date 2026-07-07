@@ -184,14 +184,6 @@ function getPluginSlug( pluginFile?: string ) {
 		: pluginBasename;
 }
 
-function getHelpLabel( helpUrl?: string ) {
-	try {
-		return helpUrl ? new URL( helpUrl ).hostname : undefined;
-	} catch {
-		return undefined;
-	}
-}
-
 function ApiKeyConnector( {
 	name,
 	description,
@@ -203,7 +195,6 @@ function ApiKeyConnector( {
 		authentication?.method === 'api_key' ? authentication : undefined;
 	const settingName = auth?.settingName ?? '';
 	const helpUrl = auth?.credentialsUrl ?? undefined;
-	const helpLabel = getHelpLabel( helpUrl );
 	const pluginSlug = getPluginSlug( plugin?.file );
 
 	const {
@@ -271,7 +262,6 @@ function ApiKeyConnector( {
 								: currentApiKey
 						}
 						helpUrl={ helpUrl }
-						helpLabel={ helpLabel }
 						readOnly={ isConnected || isExternallyConfigured }
 						keySource={ keySource }
 						onRemove={
@@ -306,7 +296,6 @@ function ApplicationPasswordConnector( {
 			: undefined;
 	const settingName = auth?.settingName ?? '';
 	const helpUrl = auth?.credentialsUrl ?? undefined;
-	const helpLabel = getHelpLabel( helpUrl );
 	const pluginSlug = getPluginSlug( plugin?.file );
 
 	const {
@@ -374,7 +363,6 @@ function ApplicationPasswordConnector( {
 								: currentUsername
 						}
 						helpUrl={ helpUrl }
-						helpLabel={ helpLabel }
 						readOnly={ isConnected || isExternallyConfigured }
 						keySource={ keySource }
 						onRemove={
