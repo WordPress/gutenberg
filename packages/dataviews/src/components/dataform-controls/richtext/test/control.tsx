@@ -531,6 +531,52 @@ describe( 'RichTextControl', () => {
 		} );
 	} );
 
+	describe( 'format edit UIs', () => {
+		// Format types receive `isVisible` and gate both their toolbar
+		// buttons and their inline UIs (e.g. the link popover opened via
+		// Cmd+K) on it. The assembly must pass `isVisible` so the inline
+		// UIs can open; the toolbar-button fills render into nothing since
+		// a standalone field mounts no `RichText.ToolbarControls` slot.
+		beforeAll( () => {
+			registerTestFormatType( 'core/test-edit-ui', {
+				title: 'Test Edit UI',
+				tagName: 'samp',
+				className: null,
+				edit: ( { isVisible }: { isVisible: boolean } ) => (
+					<div data-testid="format-edit-ui">
+						{ String( isVisible ) }
+					</div>
+				),
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterFormatType( 'core/test-edit-ui' );
+		} );
+
+		it( 'mounts format edit components with `isVisible` while the field is selected', async () => {
+			const { container } = render(
+				<RichTextControl
+					label="Format UI"
+					value=""
+					onChange={ () => {} }
+				/>
+			);
+			const textbox = getTextbox( container );
+
+			// Not selected yet: `FormatEdit` is unmounted.
+			expect(
+				screen.queryByTestId( 'format-edit-ui' )
+			).not.toBeInTheDocument();
+
+			await focusTextbox( textbox );
+
+			expect( screen.getByTestId( 'format-edit-ui' ) ).toHaveTextContent(
+				'true'
+			);
+		} );
+	} );
+
 	describe( 'format input rules', () => {
 		// `__unstableInputRule` lets a format type transform the value when
 		// the user types (e.g. wrapping a snippet in backticks auto-applies

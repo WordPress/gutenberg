@@ -358,13 +358,21 @@ export default function RichTextControl( {
 			{ /* The shell mounts these only while the field is selected. */ }
 			<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
 				<InputEventContext.Provider value={ inputEvents }>
+					{ /*
+					 * Format types gate both their toolbar buttons and their
+					 * inline UIs (e.g. the link popover opened via Cmd+K) on
+					 * `isVisible`. A standalone field renders no
+					 * `RichText.ToolbarControls` slot, so the toolbar-button
+					 * fills mount into nothing while the inline UIs stay
+					 * functional.
+					 */ }
 					<FormatEdit
 						value={ value }
 						onChange={ onRichTextChange }
 						onFocus={ onFocus }
 						formatTypes={ formatTypes }
 						forwardedRef={ anchorRef }
-						isVisible={ false }
+						isVisible
 					/>
 				</InputEventContext.Provider>
 			</KeyboardShortcutContext.Provider>
