@@ -42,9 +42,9 @@ export const settings = {
 				},
 				__experimentalConvert( blocks ) {
 					// Put the selected blocks inside the new Widget Group's innerBlocks.
-					let innerBlocks = blocks.map( ( block ) => {
-						return __experimentalCloneSanitizedBlock( block );
-					} );
+					let innerBlocks = blocks.map( ( block ) =>
+						__experimentalCloneSanitizedBlock( block )
+					);
 
 					// If the first block is a heading then assume this is intended
 					// to be the Widget's "title".

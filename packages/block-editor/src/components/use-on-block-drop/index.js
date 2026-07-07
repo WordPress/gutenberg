@@ -267,9 +267,9 @@ export default function useOnBlockDrop(
 					blocks.unshift( targetBlock );
 				}
 
-				const groupInnerBlocks = blocks.map( ( block ) => {
-					return __experimentalCloneSanitizedBlock( block );
-				} );
+				const groupInnerBlocks = blocks.map( ( block ) =>
+					__experimentalCloneSanitizedBlock( block )
+				);
 
 				const areAllImages = blocks.every( ( block ) => {
 					return block.name === 'core/image';
