@@ -357,6 +357,8 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 *
 		 * @since 7.0.0
 		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
 		 * @param string $room_hash MD5 hash of the room identifier.
 		 * @param int    $post_id   Post ID to promote.
 		 * @return int|null Promoted post ID on success.

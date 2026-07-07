@@ -61,7 +61,6 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 					value={ computedValue }
 					units={ units }
 					label={ label }
-					__next40pxDefaultSize
 				/>
 			) : (
 				<div className="tools-panel-item-spacing">

@@ -338,7 +338,7 @@ export function isBlockRegistered( name: string ): boolean {
  * @param attributes The block's attributes.
  * @return The sanitized attributes.
  */
-export function __experimentalSanitizeBlockAttributes(
+export function sanitizeBlockAttributes(
 	name: string,
 	attributes: Record< string, unknown >
 ): Record< string, unknown > {
@@ -392,6 +392,18 @@ export function __experimentalSanitizeBlockAttributes(
 		},
 		{}
 	);
+}
+
+export function __experimentalSanitizeBlockAttributes(
+	name: string,
+	attributes: Record< string, unknown >
+): Record< string, unknown > {
+	deprecated( '__experimentalSanitizeBlockAttributes', {
+		since: '7.1',
+		alternative: 'sanitizeBlockAttributes',
+	} );
+
+	return sanitizeBlockAttributes( name, attributes );
 }
 
 /**

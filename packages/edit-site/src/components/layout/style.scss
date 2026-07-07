@@ -165,7 +165,6 @@
 	height: 100%;
 }
 
-/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
 html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	animation-delay: 255ms;
 }
@@ -177,16 +176,13 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 		animation: none !important;
 	}
 }
-/* stylelint-enable  */
 
 .edit-site-layout.is-full-canvas .edit-site-layout__sidebar-region .edit-site-layout__view-mode-toggle {
 	display: none;
 }
 
 .edit-site-layout__view-mode-toggle.components-button {
-	/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
 	view-transition-name: toggle;
-	/* stylelint-enable  */
 	position: relative;
 	color: var(--wpds-color-foreground-interactive-neutral);
 	height: $header-height;

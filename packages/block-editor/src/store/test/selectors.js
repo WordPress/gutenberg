@@ -7,6 +7,8 @@ import {
 	setFreeformContentHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
@@ -3655,6 +3657,54 @@ describe( 'selectors', () => {
 				title: 'Reusable Block 1',
 				utility: 1,
 			} );
+		} );
+
+		it( 'surfaces innerContent on a block variation inserter item', () => {
+			registerBlockType( 'core/html', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'widgets',
+				title: 'Custom HTML',
+				variations: [
+					{
+						name: 'card',
+						title: 'Card',
+						innerContent: [ '<div class="card">', null, '</div>' ],
+						innerBlocks: [ [ 'core/test-block-a' ] ],
+					},
+				],
+			} );
+
+			const items = select( store ).getInserterItems();
+			const variationItem = items.find(
+				( item ) => item.id === 'core/html/card'
+			);
+
+			expect( variationItem.innerContent ).toEqual( [
+				'<div class="card">',
+				null,
+				'</div>',
+			] );
+
+			// Replicate how `useBlockTypesState` builds the block on insert,
+			// to guard the full path from variation to created block.
+			const block = createBlock(
+				variationItem.name,
+				variationItem.initialAttributes,
+				createBlocksFromInnerBlocksTemplate(
+					variationItem.innerBlocks
+				),
+				variationItem.innerContent
+			);
+			expect( block.innerContent ).toEqual( [
+				'<div class="card">',
+				null,
+				'</div>',
+			] );
+			expect( block.innerBlocks ).toHaveLength( 1 );
+			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/test-block-a' );
+
+			unregisterBlockType( 'core/html' );
 		} );
 
 		it( 'should correctly cache the return values', async () => {
