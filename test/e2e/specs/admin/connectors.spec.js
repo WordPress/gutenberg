@@ -655,7 +655,7 @@ test.describe( 'Connectors', () => {
 			).toHaveValue( 'remote-user' );
 			await expect(
 				reloadedCard.getByLabel( 'Application password' )
-			).not.toHaveValue( APPLICATION_PASSWORD );
+			).toHaveValue( '•'.repeat( 16 ) );
 			await reloadedCard
 				.getByRole( 'button', { name: 'Remove and replace' } )
 				.click();
