@@ -28,7 +28,6 @@
 		"src/*-plugins/**",
 		"src/prebuilt/css",
 		"src/prebuilt/js/*.mjs",
-		"utils.scss",
 		"*.md",
 		"!**/__snapshots__/**",
 		"!**/fixtures/**",
@@ -43,9 +42,6 @@
 			"default": "./build-module/index.mjs"
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
-		"./utils": {
-			"sass": "./utils.scss"
-		},
 		"./design-tokens.js": {
 			"types": "./build-package-types/prebuilt/js/design-tokens.d.mts",
 			"default": "./src/prebuilt/js/design-tokens.mjs"
@@ -144,6 +140,6 @@
 		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss",
 		"prevalidate:package-contents": "npm run build:package-types && npm run validate:package-types",
 		"validate:package-types": "node bin/validate-package-types/index.mjs",
-		"validate:package-contents": "node ../../tools/validation/validate-package-contents.mjs . --attw-profile node16 --attw-exclude-entrypoint ./design-tokens.css --attw-exclude-entrypoint ./utils"
+		"validate:package-contents": "node ../../tools/validation/validate-package-contents.mjs . --attw-profile node16 --attw-exclude-entrypoint ./design-tokens.css"
 	}
 }
