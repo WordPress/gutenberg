@@ -79,7 +79,8 @@ export default function QueryContent( {
 		};
 	}, [] );
 
-	// Exclude the current post by default, if we're in a singular template and the post type matches the query.
+	// Whether the "exclude current" filter applies: we're in a singular template
+	// and the post type matches the query.
 	const shouldExcludeCurrentPost =
 		isSingular &&
 		! inherit &&
@@ -110,13 +111,9 @@ export default function QueryContent( {
 		} else if ( ! query.perPage && postsPerPage ) {
 			newQuery.perPage = postsPerPage;
 		}
-		// Exclude the current post if needed, otherwise remove the exclusion.
-		if ( shouldExcludeCurrentPost && query.excludeCurrent === null ) {
-			newQuery.excludeCurrent = true;
-		} else if (
-			! shouldExcludeCurrentPost &&
-			query.excludeCurrent !== null
-		) {
+		// Remove the exclusion when it no longer applies, so the filters stay
+		// clean. We never force it on: enabling the exclusion is left to the user.
+		if ( ! shouldExcludeCurrentPost && query.excludeCurrent !== null ) {
 			newQuery.excludeCurrent = null;
 		}
 		if ( !! Object.keys( newQuery ).length ) {
