@@ -11,6 +11,7 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -102,6 +103,34 @@ describe( 'InnerContent', () => {
 		expect( root.querySelector( '.shell-b' ) ).not.toBeNull();
 		expect( root.querySelector( '.shell-a' ) ).toBeNull();
 		expect( root.querySelector( 'wp-inner-block-slot' ) ).toBe( slot );
+	} );
+
+	it( 'mounts provided children only once, inside the slot', () => {
+		const block = createBlock( BLOCK_NAME, {}, [], [] );
+		const onMount = jest.fn();
+		function Probe() {
+			useEffect( () => {
+				onMount();
+			}, [] );
+			return <span className="probe" />;
+		}
+		const shell =
+			'<div class="shell"><wp-inner-block-slot data-slot-index="0"></wp-inner-block-slot></div>';
+		const { container } = render(
+			<BlockEditorProvider value={ [ block ] }>
+				<InnerContent clientId={ block.clientId } html={ shell }>
+					<Probe />
+				</InnerContent>
+			</BlockEditorProvider>
+		);
+		const root = container.querySelector( '.block-editor-inner-content' );
+
+		// Mounting inline first and swapping into the portal would call the
+		// mount effect twice.
+		expect( onMount ).toHaveBeenCalledTimes( 1 );
+		expect(
+			root.querySelector( 'wp-inner-block-slot .probe' )
+		).not.toBeNull();
 	} );
 
 	it( 'uses the `html` prop verbatim instead of building from innerContent', () => {

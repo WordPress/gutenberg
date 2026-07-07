@@ -45,8 +45,8 @@ function gutenberg_enqueue_auto_register_pattern_blocks() {
 		// Structural lock for the editable blocks: 'all' prevents add/move/remove
 		// while keeping the content editable and the generated controls visible.
 		// Canvas blocks can soften it with `'patternLock' => false`. SSR-islands
-		// blocks are always locked: the editor portals one block per slot and the
-		// slot count is fixed by the pattern, so the structure cannot change.
+		// blocks keep the lock for now: unlocked structure inside the shell has
+		// no appender yet, so honoring the opt-out there is a follow-up.
 		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- camelCase matches sibling block-registration args like supports.autoRegister.
 		$lock = ( 'canvas' === $editor_mode && isset( $block_type->patternLock ) && false === $block_type->patternLock ) ? false : 'all';
 
@@ -75,10 +75,10 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_auto_register_patt
  * goes, and only the block's own callback knows where that is. Instead of
  * making every author detect the editor context and emit the marker by hand,
  * this wraps the callback at registration so `$content` is always filled in:
- * the saved blocks when there are any, one slot per top-level pattern block
- * when the editor's SSR preview renders the block bare, or the rendered
- * pattern when an empty block renders on the front end. The callback places
- * `$content` like any other content, with no branches.
+ * the saved blocks when there are any, a content slot when the editor's SSR
+ * preview renders the block bare, or the rendered pattern when an empty block
+ * renders on the front end. The callback places `$content` like any other
+ * content, with no branches.
  *
  * @param array $args Arguments passed to `register_block_type()`.
  * @return array Filtered arguments.
@@ -97,35 +97,18 @@ function gutenberg_wrap_ssr_islands_render_callback( $args ) {
 		return $args;
 	}
 
-	// One slot per top-level pattern block; the editable islands portal into
-	// them by index. `parse_blocks()` also returns whitespace nodes with a null
-	// block name; the filter drops them.
-	$top_level_blocks = array_filter(
-		parse_blocks( $args['pattern'] ),
-		static function ( $block ) {
-			return ! empty( $block['blockName'] );
-		}
-	);
-	$slot_count       = max( 1, count( $top_level_blocks ) );
-
 	$original_render_callback = $args['render_callback'];
 	$pattern                  = $args['pattern'];
 
-	$args['render_callback'] = static function ( $attributes, $content, $block ) use ( $original_render_callback, $slot_count, $pattern ) {
+	$args['render_callback'] = static function ( $attributes, $content, $block ) use ( $original_render_callback, $pattern ) {
 		if ( '' === trim( (string) $content ) ) {
 			$rest_route = isset( $GLOBALS['wp']->query_vars['rest_route'] ) ? $GLOBALS['wp']->query_vars['rest_route'] : '';
 			if ( defined( 'REST_REQUEST' ) && REST_REQUEST && str_contains( $rest_route, '/block-renderer/' ) ) {
 				// Only the editor's block-renderer preview renders the block
-				// bare on purpose. Pass the slots as `$content` so the editor
-				// has somewhere to portal the editable islands.
-				$slots = '';
-				for ( $index = 0; $index < $slot_count; $index++ ) {
-					$slots .= sprintf(
-						'<wp-inner-block-slot data-slot-index="%d" style="display:contents"></wp-inner-block-slot>',
-						$index
-					);
-				}
-				$content = $slots;
+				// bare on purpose. Pass a slot as `$content` so the editor has
+				// somewhere to portal the editable islands: one content area,
+				// matching the single `$content` a callback receives.
+				$content = '<wp-inner-block-slot data-slot-index="0" style="display:contents"></wp-inner-block-slot>';
 			} else {
 				// Everywhere else an empty block falls back to the pattern:
 				// the front end, and REST renders like a post's

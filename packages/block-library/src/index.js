@@ -422,6 +422,11 @@ function createPatternBlockComponents(
  * @return {{ edit: Function, save: Function }} The edit and save components.
  */
 function createSsrIslandsComponents( blockName, markup ) {
+	// A bare slot stands in until the server shell arrives. The slot node is
+	// carried over between injections, so the portalled islands never remount.
+	const INITIAL_SHELL =
+		'<wp-inner-block-slot data-slot-index="0" style="display:contents"></wp-inner-block-slot>';
+
 	function Edit( { clientId, attributes } ) {
 		useSeedPatternBlocks( clientId, markup );
 
@@ -439,25 +444,24 @@ function createSsrIslandsComponents( blockName, markup ) {
 			}
 		}, [ status, content ] );
 
-		// The hook call applies the structural lock even when the portal path
-		// below ignores its output. The lock is `'all'` rather than
-		// `'contentOnly'` so the generated inspector controls stay visible to
-		// drive the shell re-fetch.
+		// The hook call applies the structural lock and renders the islands
+		// as its children, portalled into the shell's single content slot.
+		// The lock is `'all'` rather than `'contentOnly'` so the generated
+		// inspector controls stay visible to drive the shell re-fetch.
 		const blockProps = useBlockProps();
 		const innerBlocksProps = useInnerBlocksProps( blockProps, {
 			templateLock: 'all',
 			renderAppender: false,
 		} );
 
-		// The islands must stay visible while the shell is missing, whether
-		// that's the first load or an error.
-		if ( ! shell ) {
-			return <div { ...innerBlocksProps } />;
-		}
-
 		return (
 			<div { ...blockProps }>
-				<InnerContent clientId={ clientId } html={ shell } />
+				<InnerContent
+					clientId={ clientId }
+					html={ shell ?? INITIAL_SHELL }
+				>
+					{ innerBlocksProps.children }
+				</InnerContent>
 			</div>
 		);
 	}
