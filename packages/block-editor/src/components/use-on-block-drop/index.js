@@ -5,6 +5,7 @@ import { useCallback } from '@wordpress/element';
 import {
 	cloneBlock,
 	createBlock,
+	__experimentalCloneSanitizedBlock,
 	findTransform,
 	getBlockTransforms,
 	pasteHandler,
@@ -267,7 +268,7 @@ export default function useOnBlockDrop(
 				}
 
 				const groupInnerBlocks = blocks.map( ( block ) => {
-					return cloneBlock( block );
+					return __experimentalCloneSanitizedBlock( block );
 				} );
 
 				const areAllImages = blocks.every( ( block ) => {

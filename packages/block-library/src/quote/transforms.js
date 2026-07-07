@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
-import { cloneBlock, createBlock, switchToBlockType } from '@wordpress/blocks';
+import {
+	createBlock,
+	__experimentalCloneSanitizedBlock,
+	switchToBlockType,
+} from '@wordpress/blocks';
 
 const transforms = {
 	from: [
@@ -92,7 +96,9 @@ const transforms = {
 				createBlock(
 					'core/quote',
 					{},
-					blocks.map( ( block ) => cloneBlock( block ) )
+					blocks.map( ( block ) =>
+						__experimentalCloneSanitizedBlock( block )
+					)
 				),
 		},
 	],

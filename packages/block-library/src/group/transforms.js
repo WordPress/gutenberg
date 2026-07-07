@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { createBlock, cloneBlock } from '@wordpress/blocks';
+import {
+	createBlock,
+	__experimentalCloneSanitizedBlock,
+} from '@wordpress/blocks';
 
 const transforms = {
 	from: [
@@ -30,7 +33,7 @@ const transforms = {
 				// are removed both from their original location and within the
 				// new group block.
 				const groupInnerBlocks = blocks.map( ( block ) =>
-					cloneBlock( block )
+					__experimentalCloneSanitizedBlock( block )
 				);
 
 				return createBlock(
