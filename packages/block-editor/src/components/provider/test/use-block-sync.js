@@ -14,6 +14,7 @@ import { render } from '@testing-library/react';
 import useBlockSync from '../use-block-sync';
 import withRegistryProvider from '../with-registry-provider';
 import * as blockEditorActions from '../../../store/actions';
+import { SelectionContext } from '../selection-context';
 
 import { store as blockEditorStore } from '../../../store';
 jest.mock( '../../../store/actions', () => {
@@ -35,6 +36,32 @@ const TestWrapper = withRegistryProvider( ( props ) => {
 	useBlockSync( props );
 	return null;
 } );
+
+// Renders one useBlockSync controller. Several of these can be nested
+// under a single SelectionTestWrapper to simulate multiple controlled
+// blocks (e.g. two Navigation blocks) sharing one block-editor store.
+function Controller( props ) {
+	useBlockSync( props );
+	return null;
+}
+
+// Provides a single registry and a SelectionContext (normally provided
+// by BlockEditorProvider) so tests can control the entity-level
+// selection that restoreSelection() reads.
+const SelectionTestWrapper = withRegistryProvider(
+	( { registry, setRegistry, getSelection, children } ) => {
+		if ( setRegistry ) {
+			setRegistry( registry );
+		}
+		return (
+			<SelectionContext.Provider
+				value={ { getSelection, onChangeSelection: () => {} } }
+			>
+				{ children }
+			</SelectionContext.Provider>
+		);
+	}
+);
 
 describe( 'useBlockSync hook', () => {
 	beforeAll( () => {
@@ -672,5 +699,190 @@ describe( 'useBlockSync hook', () => {
 
 		// The internal IDs should be different from the external IDs (due to cloning)
 		expect( replacedBlocks[ 0 ].clientId ).not.toBe( originalClientId );
+	} );
+
+	describe( 'selection restoration', () => {
+		// The entity blocks shared by the duplicate controllers below,
+		// like a wp_navigation menu used by two Navigation blocks.
+		const sharedEntityBlocks = [
+			{
+				name: 'test/test-block',
+				clientId: 'link-1',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
+		];
+
+		it( 'restores the entity selection onto its own clones when an inner block controller syncs', () => {
+			let registry;
+			const setRegistry = ( reg ) => {
+				registry = reg;
+			};
+			const selection = {
+				selectionStart: { clientId: 'link-1' },
+				selectionEnd: { clientId: 'link-1' },
+			};
+
+			render(
+				<SelectionTestWrapper
+					setRegistry={ setRegistry }
+					getSelection={ () => selection }
+				>
+					<Controller
+						clientId="nav-a"
+						value={ sharedEntityBlocks }
+						onChange={ jest.fn() }
+						onInput={ jest.fn() }
+					/>
+				</SelectionTestWrapper>
+			);
+
+			// The selection uses the external ID ('link-1'), and must be
+			// restored onto the controller's internal clone of it.
+			const clone = registry
+				.select( blockEditorStore )
+				.getBlocks( 'nav-a' )[ 0 ];
+			expect(
+				registry.select( blockEditorStore ).getSelectionStart().clientId
+			).toBe( clone.clientId );
+		} );
+
+		it( 'does not let a duplicate controller steal the selection when a shared entity updates', () => {
+			let registry;
+			const setRegistry = ( reg ) => {
+				registry = reg;
+			};
+			// Holds the entity-level selection, unset until the user selects.
+			const contextSelection = { current: undefined };
+			const getSelection = () => contextSelection.current;
+			const renderControllers = ( value ) => (
+				<SelectionTestWrapper
+					setRegistry={ setRegistry }
+					getSelection={ getSelection }
+				>
+					<Controller
+						clientId="nav-a"
+						value={ value }
+						onChange={ jest.fn() }
+						onInput={ jest.fn() }
+					/>
+					<Controller
+						clientId="nav-b"
+						value={ value }
+						onChange={ jest.fn() }
+						onInput={ jest.fn() }
+					/>
+				</SelectionTestWrapper>
+			);
+
+			const { rerender } = render(
+				renderControllers( sharedEntityBlocks )
+			);
+
+			// The user selects the block inside the first controller.
+			const cloneA = registry
+				.select( blockEditorStore )
+				.getBlocks( 'nav-a' )[ 0 ];
+			registry
+				.dispatch( blockEditorStore )
+				.selectBlock( cloneA.clientId );
+
+			// The selection is recorded on the entity with external IDs,
+			// which both controllers can map — neither map identifies the
+			// owner, so this is where the ownership ambiguity comes from.
+			contextSelection.current = {
+				selectionStart: { clientId: 'link-1' },
+				selectionEnd: { clientId: 'link-1' },
+			};
+
+			// The shared entity updates, so both controllers re-clone
+			// their blocks and try to restore the selection.
+			rerender(
+				renderControllers( [
+					{ ...sharedEntityBlocks[ 0 ], attributes: { foo: 2 } },
+				] )
+			);
+
+			const { getSelectionStart, getBlockParents } =
+				registry.select( blockEditorStore );
+			const selectedClientId = getSelectionStart().clientId;
+			expect( selectedClientId ).toBeTruthy();
+			// The selection must stay within the controller that owned it,
+			// not move to the duplicate that synced last.
+			expect( getBlockParents( selectedClientId ) ).toContain( 'nav-a' );
+			expect( getBlockParents( selectedClientId ) ).not.toContain(
+				'nav-b'
+			);
+		} );
+
+		it( 'restores the entity selection when the root controller resets blocks (undo/redo)', () => {
+			let registry;
+			const setRegistry = ( reg ) => {
+				registry = reg;
+			};
+			// Holds the entity-level selection, unset until the user selects.
+			const contextSelection = { current: undefined };
+			const getSelection = () => contextSelection.current;
+			const renderRoot = ( value ) => (
+				<SelectionTestWrapper
+					setRegistry={ setRegistry }
+					getSelection={ getSelection }
+				>
+					<Controller
+						value={ value }
+						onChange={ jest.fn() }
+						onInput={ jest.fn() }
+					/>
+				</SelectionTestWrapper>
+			);
+
+			const { rerender } = render(
+				renderRoot( [
+					{
+						name: 'test/test-block',
+						clientId: 'a',
+						innerBlocks: [],
+						attributes: { foo: 1 },
+					},
+				] )
+			);
+
+			// The user places the caret in the block ("typing").
+			registry
+				.dispatch( blockEditorStore )
+				.selectionChange( 'a', 'foo', 5, 5 );
+
+			// Undo: the entity restores an earlier value AND an earlier
+			// selection (different offset). Because block 'a' still exists
+			// after the reset, the store keeps the stale caret — the
+			// entity selection must still win, or undo would leave the
+			// caret where it was after typing.
+			contextSelection.current = {
+				selectionStart: {
+					clientId: 'a',
+					attributeKey: 'foo',
+					offset: 2,
+				},
+				selectionEnd: {
+					clientId: 'a',
+					attributeKey: 'foo',
+					offset: 2,
+				},
+			};
+			rerender(
+				renderRoot( [
+					{
+						name: 'test/test-block',
+						clientId: 'a',
+						innerBlocks: [],
+						attributes: { foo: 0 },
+					},
+				] )
+			);
+
+			expect(
+				registry.select( blockEditorStore ).getSelectionStart()
+			).toEqual( { clientId: 'a', attributeKey: 'foo', offset: 2 } );
+		} );
 	} );
 } );

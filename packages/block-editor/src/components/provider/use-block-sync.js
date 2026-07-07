@@ -202,6 +202,31 @@ export default function useBlockSync( {
 			: !! getBlockName( startClientId );
 
 		if ( isOurs ) {
+			// The check above cannot tell duplicate controllers apart: two
+			// controllers synced from the same entity (e.g. two Navigation
+			// blocks using the same menu) map the same external IDs, so both
+			// consider the selection theirs and the last one to sync would
+			// steal it. The store's current selection breaks the tie: it
+			// holds an internal (per-controller) clone ID. If that block is
+			// alive and is not one of our own clones, another controller owns
+			// the user's selection and we must leave it alone. If it is one
+			// of our removed clones (getBlockName returns null right after we
+			// replaced our blocks), restoring it onto the fresh clones is our
+			// job. The root controller never skips: it doesn't clone, so a
+			// selection surviving its reset is always its own (and skipping
+			// would break caret restoration on undo/redo).
+			if ( clientId ) {
+				const currentClientId = getSelectionStart()?.clientId;
+				const isSelectionElsewhere =
+					currentClientId &&
+					! idMappingRef.current.internalToExternal.has(
+						currentClientId
+					) &&
+					!! getBlockName( currentClientId );
+				if ( isSelectionElsewhere ) {
+					return;
+				}
+			}
 			appliedSelectionRef.current = selection;
 			// Inner block controllers need to convert external→internal
 			// IDs via the clone mapping; the root controller uses
