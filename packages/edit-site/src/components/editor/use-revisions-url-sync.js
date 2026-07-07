@@ -61,7 +61,7 @@ export default function useRevisionsURLSync( enabled ) {
 	const lastURLWriteTimeRef = useRef( null );
 
 	useEffect( () => {
-		if ( ! enabled ) {
+		if ( ! enabled || ! postId ) {
 			return;
 		}
 		if ( lastURLWriteTimeRef.current === null ) {
@@ -91,5 +91,5 @@ export default function useRevisionsURLSync( enabled ) {
 		}
 		const timeoutId = setTimeout( write, URL_WRITE_DEBOUNCE_MS );
 		return () => clearTimeout( timeoutId );
-	}, [ enabled, currentRevisionId, location, history ] );
+	}, [ enabled, postId, currentRevisionId, location, history ] );
 }
