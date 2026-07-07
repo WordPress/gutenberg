@@ -63,21 +63,22 @@ const LINK_SETTINGS = [
 	},
 ];
 
-function useEnter( props ) {
+function useEnter( clientId ) {
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
-	const { getBlock, getBlockRootClientId, getBlockIndex } =
-		useSelect( blockEditorStore );
-	const propsRef = useRef( props );
-	useEffect( () => {
-		propsRef.current = props;
-	}, [ props ] );
+	const {
+		getBlock,
+		getBlockAttributes,
+		getBlockRootClientId,
+		getBlockIndex,
+	} = useSelect( blockEditorStore );
+
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
 				return;
 			}
-			const { content, clientId } = propsRef.current;
-			if ( content.length ) {
+			const { text } = getBlockAttributes( clientId ) ?? {};
+			if ( text?.length ) {
 				return;
 			}
 			event.preventDefault();
@@ -268,7 +269,7 @@ function ButtonEdit( props ) {
 		[ url, opensInNewTab, nofollow ]
 	);
 
-	const useEnterRef = useEnter( { content: text, clientId } );
+	const useEnterRef = useEnter( clientId );
 	const mergedRef = useMergeRefs( [ useEnterRef, richTextRef ] );
 
 	const [ fluidTypographySettings, layout, dimensionSizes ] = useSettings(
