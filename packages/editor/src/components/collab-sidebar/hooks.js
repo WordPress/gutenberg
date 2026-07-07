@@ -506,12 +506,17 @@ export function useEnableFloatingSidebar( enabled = false ) {
 		const { disableComplementaryArea, enableComplementaryArea } =
 			registry.dispatch( interfaceStore );
 
-		const unsubscribe = registry.subscribe( () => {
+		const maybeEnable = () => {
 			// Return `null` to indicate the user hid the complementary area.
 			if ( getActiveComplementaryArea( 'core' ) === null ) {
 				enableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
 			}
-		} );
+		};
+
+		// Check immediately so re-activating the hook (e.g. unhiding notes)
+		// restores the floating sidebar without waiting for a store change.
+		maybeEnable();
+		const unsubscribe = registry.subscribe( maybeEnable );
 
 		return () => {
 			unsubscribe();
