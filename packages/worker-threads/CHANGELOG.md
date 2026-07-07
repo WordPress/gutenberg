@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Reject pending RPC calls when the worker fails (`error` / `messageerror` events) or is terminated via `terminate()`, instead of leaving the promises pending forever ([#79955](https://github.com/WordPress/gutenberg/pull/79955)).
+
 ## 1.10.0 (2026-07-01)
 
 ## 1.9.0 (2026-06-24)
