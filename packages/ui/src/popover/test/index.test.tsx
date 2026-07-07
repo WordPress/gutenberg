@@ -450,6 +450,8 @@ describe( 'Popover', () => {
 			expect(
 				await screen.findByText( 'Unstyled content' )
 			).toBeVisible();
+			const unstyledPopup = unstyledRef.current;
+			expect( unstyledPopup ).not.toBeNull();
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Open styled' } )
@@ -458,7 +460,7 @@ describe( 'Popover', () => {
 
 			const styledClasses = Array.from( styledPopup.classList );
 			for ( const cls of styledClasses ) {
-				expect( unstyledRef.current! ).not.toHaveClass( cls );
+				expect( unstyledPopup! ).not.toHaveClass( cls );
 			}
 		} );
 	} );

@@ -6,7 +6,10 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 /**
  * Internal dependencies
  */
-const { recordRequests } = require( './record-requests' );
+const {
+	recordRequests,
+	waitForRequestsToSettle,
+} = require( './record-requests' );
 
 test.describe( 'Preload', () => {
 	let postId;
@@ -56,21 +59,17 @@ test.describe( 'Preload', () => {
 			.filter( { hasText: 'Hello' } )
 			.waitFor();
 		// This spec is explicitly testing network behaviour, so waiting for
-		// the network to settle (rather than a UI marker) is the right
+		// the REST traffic to settle (rather than a UI marker) is the right
 		// signal here: it ensures trailing startup fetches and the racy
 		// resolver duplicates have all been observed before we assert.
-		// eslint-disable-next-line playwright/no-networkidle
-		await page.waitForLoadState( 'networkidle' );
+		await waitForRequestsToSettle( requests );
 		stop();
 
-		// Only collab side effects (CRDT save + first wp-sync poll)
+		// Only collab side effects (CRDT persist + first wp-sync poll)
 		// should escape before mount — they're detached promise chains
 		// off `receiveEntityRecords`.
 		expect( Array.from( new Set( requestsUntilMount ) ).sort() ).toEqual(
-			[
-				`POST /wp/v2/posts/${ postId }`,
-				'POST /wp-sync/v1/updates',
-			].sort()
+			[ 'POST /wp-sync/v1/save', 'POST /wp-sync/v1/updates' ].sort()
 		);
 		// Every preloaded path should be consumed by the kickoff.
 		expect( preloadStatus ).toBe(
@@ -83,7 +82,7 @@ test.describe( 'Preload', () => {
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
 				`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
-				`POST /wp/v2/posts/${ postId }`,
+				'POST /wp-sync/v1/save',
 				'POST /wp-sync/v1/updates',
 				'POST /wp/v2/users/me',
 			].sort()

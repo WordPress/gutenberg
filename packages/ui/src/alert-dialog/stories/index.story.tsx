@@ -158,7 +158,7 @@ export const WithCustomZIndex: Story = {
 };
 
 const menuPopupStyles: React.CSSProperties = {
-	background: 'var(--wpds-color-bg-surface-neutral-strong)',
+	background: 'var(--wpds-color-background-surface-neutral-strong)',
 	border: '1px solid var(--wpds-color-stroke-surface-neutral)',
 	borderRadius: '8px',
 	padding: '4px',

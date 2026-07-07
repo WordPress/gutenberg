@@ -34,7 +34,7 @@ export default meta;
 
 export const Default: StoryObj< typeof ColorGen > = {
 	render: ( args ) => {
-		const bgSeed = args.background ?? DEFAULT_SEED_COLORS.bg;
+		const bgSeed = args.background ?? DEFAULT_SEED_COLORS.background;
 		const primarySeed = args.primary ?? DEFAULT_SEED_COLORS.primary;
 		const bgRamp = buildBgRamp( bgSeed );
 

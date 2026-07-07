@@ -834,7 +834,7 @@ For the `flow` layout type only, determines display of the "Inner blocks use con
 -   Type: `boolean`
 -   Default value: `false`
 
-For the `flex` layout type only, determines display of sizing controls (Fit/Fill/Fixed) on all child blocks of the flex block.
+For the `flex` layout type only, determines display of sizing controls (Fit/Grow/Max width/Fixed) on all child blocks of the flex block.
 
 ### layout.allowVerticalAlignment
 

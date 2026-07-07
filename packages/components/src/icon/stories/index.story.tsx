@@ -26,21 +26,6 @@ Default.args = {
 	icon: wordpress,
 };
 
-export const FillColor: StoryFn< typeof Icon > = ( args ) => {
-	return (
-		<div
-			style={ {
-				fill: 'blue',
-			} }
-		>
-			<Icon { ...args } />
-		</div>
-	);
-};
-FillColor.args = {
-	...Default.args,
-};
-
 /**
  * When `icon` is a function, it will be passed the `size` prop and any other additional props.
  */

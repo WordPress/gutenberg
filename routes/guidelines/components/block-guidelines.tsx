@@ -16,17 +16,16 @@ import {
 } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { blockDefault } from '@wordpress/icons';
-import { store as blocksStore } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import BlockGuidelineModal from './block-guideline-modal';
-import { saveGuidelines } from '../api';
-import { store as coreGuidelinesStore } from '../store';
+import { blockSlug, deleteGuidelineRow } from '../data';
+import type { ContentBlock, GuidelineRow, GuidelineQuery } from '../types';
 import './block-guidelines.scss';
 
 const PER_PAGE = 5;
@@ -40,9 +39,9 @@ const initialView: View = {
 	mediaField: 'icon',
 	showMedia: true,
 	titleField: 'label',
-	layout: {
-		density: 'compact',
-	},
+	// Default (non-compact) density: its 48px media tile gives block icons
+	// padding around the canonical 24px render, without shrinking the icon
+	// (which would crop icons that lack a viewBox, e.g. core/icon).
 };
 
 interface DataRow {
@@ -55,9 +54,13 @@ const fields = [
 		id: 'icon',
 		label: __( 'Icon' ),
 		type: 'media' as const,
+		// No `size` prop: block icons render at their native 24px, matching the
+		// editor's `.block-editor-block-icon`. That keeps viewBox-less icons
+		// (e.g. core/icon) centered and uncropped. Painted and clamped in
+		// block-guidelines.scss.
 		render: ( { item } ) => (
 			<div className="block-guidelines__icon">
-				<WCIcon icon={ item.icon ?? blockDefault } size={ 16 } />
+				<WCIcon icon={ item.icon ?? blockDefault } />
 			</div>
 		),
 	},
@@ -71,7 +74,17 @@ const fields = [
 	},
 ];
 
-export default function BlockGuidelines() {
+interface BlockGuidelinesProps {
+	contentBlocks: ContentBlock[];
+	bySlug: Record< string, GuidelineRow >;
+	query: GuidelineQuery;
+}
+
+export default function BlockGuidelines( {
+	contentBlocks,
+	bySlug,
+	query,
+}: BlockGuidelinesProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const [ view, setView ] = useState< View >( initialView );
 	const [ selectedItem, setSelectedItem ] = useState< string >();
@@ -82,31 +95,19 @@ export default function BlockGuidelines() {
 	);
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const blockGuidelines = useSelect(
-		( select ) => select( coreGuidelinesStore ).getBlockGuidelines(),
-		[]
-	);
-
-	const blockTypes = useSelect(
-		// @ts-ignore
-		( select ) => select( blocksStore ).getBlockTypes(),
-		[]
-	);
-
 	const rows = useMemo(
 		() =>
-			blockTypes
-				.filter( ( blockType ) => blockGuidelines[ blockType.name ] )
-				.map( ( blockType ) => ( {
-					id: blockType.name,
-					label: blockType.title,
-					guidelines: blockGuidelines[ blockType.name ] ?? '',
-					icon: blockType.icon?.src,
+			contentBlocks
+				.filter( ( block ) => bySlug[ blockSlug( block.name ) ] )
+				.map( ( block ) => ( {
+					id: block.name,
+					label: block.title,
+					guidelines:
+						bySlug[ blockSlug( block.name ) ]?.content ?? '',
+					icon: block.icon?.src,
 				} ) ),
-		[ blockGuidelines, blockTypes ]
+		[ contentBlocks, bySlug ]
 	);
-
-	const { setBlockGuideline } = useDispatch( coreGuidelinesStore );
 
 	const handleRowClick = ( id: string ) => {
 		setSelectedItem( id );
@@ -119,16 +120,14 @@ export default function BlockGuidelines() {
 				id: 'edit',
 				label: __( 'Edit' ),
 				callback: ( items: DataRow[] ) => {
-					const item = items[ 0 ];
-					handleRowClick( item.id );
+					handleRowClick( items[ 0 ].id );
 				},
 			},
 			{
 				id: 'remove',
 				label: __( 'Remove' ),
 				callback: ( items: DataRow[] ) => {
-					const item = items[ 0 ];
-					setItemToDelete( item );
+					setItemToDelete( items[ 0 ] );
 				},
 			},
 		],
@@ -139,22 +138,20 @@ export default function BlockGuidelines() {
 		if ( ! itemToDelete ) {
 			return;
 		}
-		const oldValue = blockGuidelines[ itemToDelete.id ];
-		// We need to pass an empty string to remove the guideline.
-		// This is because the API will only remove the guideline if the value is an empty string.
-		setBlockGuideline( itemToDelete.id, '' );
+		const row = bySlug[ blockSlug( itemToDelete.id ) ];
+		if ( ! row ) {
+			setItemToDelete( null );
+			return;
+		}
 		setBusy( true );
-		saveGuidelines()
+		deleteGuidelineRow( row.id )
 			.then( () => {
 				setError( null );
 				createSuccessNotice( __( 'Guidelines removed.' ), {
 					type: 'snackbar',
 				} );
 			} )
-			.catch( ( e: Error ) => {
-				setError( e.message );
-				setBlockGuideline( itemToDelete.id, oldValue );
-			} )
+			.catch( ( e: Error ) => setError( e.message ) )
 			.finally( () => {
 				setBusy( false );
 				setItemToDelete( null );
@@ -214,8 +211,7 @@ export default function BlockGuidelines() {
 					actions={ actions }
 					config={ { perPageSizes: [ PER_PAGE ] } }
 					onChangeSelection={ ( items ) => {
-						const id = items[ 0 ];
-						handleRowClick( id );
+						handleRowClick( items[ 0 ] );
 					} }
 					defaultLayouts={ {
 						list: true,
@@ -244,6 +240,9 @@ export default function BlockGuidelines() {
 				<BlockGuidelineModal
 					closeModal={ closeModal }
 					initialBlock={ selectedItem }
+					contentBlocks={ contentBlocks }
+					bySlug={ bySlug }
+					query={ query }
 				/>
 			) }
 			<ConfirmDialog
@@ -259,7 +258,7 @@ export default function BlockGuidelines() {
 				{ sprintf(
 					/* translators: %s: Block name. */
 					__(
-						'You are about to remove the block guidelines for the %s block. This can be undone from revision history.'
+						'You are about to remove the block guidelines for the %s block.'
 					),
 					itemToDelete?.label ?? ''
 				) }

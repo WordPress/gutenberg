@@ -341,16 +341,12 @@ export function useToolsPanel(
 
 	const cx = useCx();
 	const classes = useMemo( () => {
-		const wrapperStyle =
-			hasInnerWrapper &&
-			styles.ToolsPanelWithInnerWrapper( DEFAULT_COLUMNS );
-		const emptyStyle =
-			areAllOptionalControlsHidden && styles.ToolsPanelHiddenInnerWrapper;
-
 		return cx(
-			styles.ToolsPanel( DEFAULT_COLUMNS ),
-			wrapperStyle,
-			emptyStyle,
+			styles.getToolsPanelStyles( {
+				columns: DEFAULT_COLUMNS,
+				hasInnerWrapper,
+				areAllOptionalControlsHidden,
+			} ),
 			className
 		);
 	}, [ areAllOptionalControlsHidden, className, cx, hasInnerWrapper ] );

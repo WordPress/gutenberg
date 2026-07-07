@@ -195,7 +195,6 @@ export function PageAttributesParent() {
 
 	return (
 		<ComboboxControl
-			__next40pxDefaultSize
 			className="editor-page-attributes__parent"
 			label={ __( 'Parent' ) }
 			help={ __( 'Choose a parent page.' ) }

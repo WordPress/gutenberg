@@ -96,7 +96,6 @@ export default function ImageSizeControl( {
 					options={ imageSizeOptions }
 					onChange={ onChangeImage }
 					help={ imageSizeHelp }
-					size="__unstable-large"
 				/>
 			) }
 			{ isResizable && (
@@ -127,7 +126,6 @@ export default function ImageSizeControl( {
 						onChange={ handleUpdateDimensions }
 						value={ selectedValue }
 						isBlock
-						__next40pxDefaultSize
 					>
 						{ IMAGE_SIZE_PRESETS.map( ( scale ) => {
 							return (

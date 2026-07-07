@@ -3,6 +3,14 @@
  */
 import { DELETE, BACKSPACE } from '@wordpress/keycodes';
 import { isCollapsed, isEmpty } from '@wordpress/rich-text';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
 	function onKeyDown( event ) {
@@ -46,8 +54,5 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	element.addEventListener( 'keydown', onKeyDown );
-	return () => {
-		element.removeEventListener( 'keydown', onKeyDown );
-	};
+	return subscribeDelegatedListener( element, 'keydown', onKeyDown );
 };

@@ -156,7 +156,6 @@ export function TimePicker( {
 				className="components-datetime__time-field components-datetime__time-field-month" // Unused, for backwards compatibility.
 				label={ __( 'Month' ) }
 				hideLabelFromVision
-				__next40pxDefaultSize
 				value={ month }
 				options={ monthOptions }
 				onChange={ ( value ) => {

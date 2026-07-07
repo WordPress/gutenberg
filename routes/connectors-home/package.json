@@ -12,6 +12,7 @@
 		"@wordpress/a11y": "file:../../packages/a11y",
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
 		"@wordpress/api-fetch": "file:../../packages/api-fetch",
+		"@wordpress/base-styles": "file:../../packages/base-styles",
 		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/connectors": "file:../../packages/connectors",
 		"@wordpress/core-data": "file:../../packages/core-data",
@@ -20,6 +21,7 @@
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/ui": "file:../../packages/ui",
 		"@wordpress/url": "file:../../packages/url"
 	},
@@ -27,5 +29,8 @@
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0"
 	}
 }

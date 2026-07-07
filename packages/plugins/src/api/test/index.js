@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { memo } from '@wordpress/element';
 import { registerPlugin, unregisterPlugin, getPlugin, getPlugins } from '../';
 
 describe( 'registerPlugin', () => {
@@ -23,6 +24,24 @@ describe( 'registerPlugin', () => {
 		expect( getPlugin( name ) ).toEqual( {
 			name,
 			render: Component,
+			icon,
+		} );
+	} );
+
+	it( 'successfully registers a plugin with a memoized render', () => {
+		const name = 'plugin';
+		const icon = 'smiley';
+		const Component = () => 'plugin content';
+		const MemoizedComponent = memo( Component );
+
+		registerPlugin( name, {
+			render: MemoizedComponent,
+			icon,
+		} );
+
+		expect( getPlugin( name ) ).toEqual( {
+			name,
+			render: MemoizedComponent,
 			icon,
 		} );
 	} );
@@ -54,7 +73,7 @@ describe( 'registerPlugin', () => {
 	it( 'fails to register a plugin without a render function', () => {
 		registerPlugin( 'another-plugin', {} );
 		expect( console ).toHaveErroredWith(
-			'The "render" property must be specified and must be a valid function.'
+			'The "render" property must be specified and must be a valid component.'
 		);
 	} );
 

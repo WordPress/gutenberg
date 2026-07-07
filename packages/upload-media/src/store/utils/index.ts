@@ -126,7 +126,22 @@ export async function vipsHasTransparency( url: string ) {
 }
 
 /**
+ * Probes a JPEG buffer for UltraHDR (ISO 21496-1 gain map) support using vips
+ * in a web worker.
+ *
+ * @param buffer Image buffer to probe.
+ * @return UltraHDR info if the buffer is a valid UltraHDR JPEG, otherwise null.
+ */
+export async function vipsGetUltraHdrInfo( buffer: ArrayBuffer ) {
+	const { vipsGetUltraHdrInfo: getUltraHdrInfo } = await loadVipsModule();
+	return getUltraHdrInfo( buffer );
+}
+
+/**
  * Resizes an image using vips in a web worker.
+ *
+ * UltraHDR JPEGs are auto-detected by libvips and their gain map is
+ * preserved through the resize.
  *
  * @param id           Queue item ID.
  * @param file         File object.

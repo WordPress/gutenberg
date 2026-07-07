@@ -33,8 +33,24 @@ jest.mock( '../utils', () => ( {
 	terminateVipsWorker: jest.fn(),
 } ) );
 
-// Import the mocked module to access the mock function.
+/*
+ * actions.ts transitively imports private-actions, which also pulls in
+ * convertGifToVideo / isUnsupportedConversionError, so the mock must cover the
+ * whole module surface. isUnsupportedConversionError is kept real.
+ */
+jest.mock( '../utils/video-conversion', () => {
+	const actual = jest.requireActual( '../utils/video-conversion' );
+	return {
+		convertGifToVideo: jest.fn(),
+		cancelGifToVideoOperations: jest.fn( () => Promise.resolve( true ) ),
+		terminateVideoConversionWorker: jest.fn(),
+		isUnsupportedConversionError: actual.isUnsupportedConversionError,
+	};
+} );
+
+// Import the mocked modules to access the mock functions.
 import { vipsCancelOperations } from '../utils';
+import { cancelGifToVideoOperations } from '../utils/video-conversion';
 
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
@@ -334,6 +350,61 @@ describe( 'actions', () => {
 			);
 			expect( updatedItem.additionalData.convert_format ).toBe( true );
 		} );
+
+		it( 'routes very large interlaced images to the server', async () => {
+			// A progressive JPEG (SOF2) header reporting 20000x11857, which
+			// exceeds the client-side memory budget for interlaced images.
+			const dimensions = new Uint8Array( 4 );
+			const dimView = new DataView( dimensions.buffer );
+			dimView.setUint16( 0, 11857 ); // height
+			dimView.setUint16( 2, 20000 ); // width
+			const bytes = new Uint8Array( [
+				0xff,
+				0xd8, // SOI
+				0xff,
+				0xc2, // SOF2 (progressive)
+				0x00,
+				0x11, // segment length
+				0x08, // precision
+				...dimensions, // height (2) + width (2)
+				0x03, // components
+				0x00,
+				0x00,
+				0x00,
+			] );
+			const largeJpeg = new File( [ bytes ], 'huge.jpg', {
+				type: 'image/jpeg',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: largeJpeg,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Should fall back to server-side processing: only Upload, no
+			// client-side thumbnail generation.
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [ OperationType.Upload ] )
+			);
+			expect( updatedItem.operations ).not.toEqual(
+				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
+			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
+			);
+			expect( updatedItem.additionalData.convert_format ).toBe( true );
+		} );
 	} );
 
 	describe( 'concurrent sideloads', () => {
@@ -512,6 +583,7 @@ describe( 'actions', () => {
 	describe( 'cancelItem', () => {
 		beforeEach( () => {
 			( vipsCancelOperations as jest.Mock ).mockClear();
+			( cancelGifToVideoOperations as jest.Mock ).mockClear();
 		} );
 
 		it( 'calls vipsCancelOperations when cancelling', async () => {
@@ -533,6 +605,30 @@ describe( 'actions', () => {
 
 			expect( vipsCancelOperations ).toHaveBeenCalledWith( item.id );
 			expect( consoleErrorSpy ).toHaveBeenCalled();
+
+			consoleErrorSpy.mockRestore();
+		} );
+
+		it( 'cancels any in-flight GIF-to-video conversion when cancelling', async () => {
+			// Suppress console.error that fires when there's no onError callback.
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'User cancelled' ) );
+
+			expect( cancelGifToVideoOperations ).toHaveBeenCalledWith(
+				item.id
+			);
 
 			consoleErrorSpy.mockRestore();
 		} );
@@ -605,9 +701,11 @@ describe( 'actions', () => {
 			const setUpParentAndChild = ( {
 				parentSubSizes,
 				parentOnError,
+				imageSize = 'medium',
 			}: {
 				parentSubSizes?: { name: string; id: number }[];
 				parentOnError?: jest.Mock;
+				imageSize?: string;
 			} = {} ) => {
 				unlock( registry.dispatch( uploadStore ) ).addItem( {
 					file: jpegFile,
@@ -634,7 +732,7 @@ describe( 'actions', () => {
 				unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
 					file: jpegFile,
 					parentId: parent.id,
-					additionalData: { post: 42, image_size: 'medium' },
+					additionalData: { post: 42, image_size: imageSize },
 				} );
 
 				const child = unlock( registry.select( uploadStore ) )
@@ -776,6 +874,39 @@ describe( 'actions', () => {
 						message: 'The image could not be uploaded.',
 					} )
 				);
+			} );
+
+			it( 'keeps the parent GIF when its only child is a failed animated_video companion', async () => {
+				const mediaDelete = jest.fn().mockResolvedValue( undefined );
+				const parentOnError = jest.fn();
+				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+					mediaDelete,
+				} );
+
+				// The converted video is the sole child of the GIF and has no
+				// accumulated sub-sizes — the pre-fix "total failure" case.
+				const { parent, child } = setUpParentAndChild( {
+					parentOnError,
+					imageSize: 'animated_video',
+				} );
+
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem(
+						child!.id,
+						new Error( 'conversion failed' ),
+						true
+					);
+
+				// The optional companion failing must not delete or cancel the
+				// already-uploaded GIF attachment.
+				expect( mediaDelete ).not.toHaveBeenCalled();
+				expect( parentOnError ).not.toHaveBeenCalled();
+				expect(
+					unlock( registry.select( uploadStore ) ).getItem(
+						parent.id
+					)
+				).toBeDefined();
 			} );
 		} );
 	} );

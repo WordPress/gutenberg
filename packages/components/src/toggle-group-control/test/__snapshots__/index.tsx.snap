@@ -28,16 +28,16 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 }
 
 .emotion-6 {
-  background: var(--wp-components-color-background, #fff);
+  background: var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong, #fff));
   border: 1px solid transparent;
   border-radius: 2px;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
+  height: 40px;
   min-width: 0;
   position: relative;
-  height: 40px;
 }
 
 .emotion-6:hover {
@@ -62,8 +62,8 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   content: '';
   position: absolute;
   pointer-events: none;
-  background: var(--wp-components-color-gray-100, #f0f0f0);
-  border: 1px solid var(--wp-components-color-gray-700, #757575);
+  background: var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral, #fcfcfc));
+  border: 1px solid var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   outline: 2px solid transparent;
   outline-offset: -3px;
   border-radius: 2px;
@@ -81,7 +81,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   		);
 }
 
-.emotion-8 {
+.emotion-7 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -94,7 +94,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   flex: 1;
 }
 
-.emotion-10 {
+.emotion-9 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -106,7 +106,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: var(--wp-components-color-gray-700, #757575);
+  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -134,32 +134,32 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
-  color: var(--wp-components-color-foreground, #1e1e1e);
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
   font-weight: 499;
 }
 
 @media not ( prefers-reduced-motion ) {
-  .emotion-10 {
+  .emotion-9 {
     -webkit-transition: color 160ms linear,font-weight 60ms linear;
     transition: color 160ms linear,font-weight 60ms linear;
   }
 }
 
-.emotion-10::-moz-focus-inner {
+.emotion-9::-moz-focus-inner {
   border: 0;
 }
 
-.emotion-10[disabled],
-.emotion-10[aria-disabled='true'] {
+.emotion-9[disabled],
+.emotion-9[aria-disabled='true'] {
   opacity: 0.4;
   cursor: default;
 }
 
-.emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
-  color: var(--wp-components-color-foreground, #1e1e1e);
+.emotion-9:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
 }
 
-.emotion-11 {
+.emotion-10 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -168,7 +168,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   line-height: 1;
 }
 
-.emotion-15 {
+.emotion-14 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -180,7 +180,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: var(--wp-components-color-gray-700, #757575);
+  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -211,24 +211,24 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 }
 
 @media not ( prefers-reduced-motion ) {
-  .emotion-15 {
+  .emotion-14 {
     -webkit-transition: color 160ms linear,font-weight 60ms linear;
     transition: color 160ms linear,font-weight 60ms linear;
   }
 }
 
-.emotion-15::-moz-focus-inner {
+.emotion-14::-moz-focus-inner {
   border: 0;
 }
 
-.emotion-15[disabled],
-.emotion-15[aria-disabled='true'] {
+.emotion-14[disabled],
+.emotion-14[aria-disabled='true'] {
   opacity: 0.4;
   cursor: default;
 }
 
-.emotion-15:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
-  color: var(--wp-components-color-foreground, #1e1e1e);
+.emotion-14:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
 }
 
 <div>
@@ -246,33 +246,35 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
       </label>
       <div
         aria-label="Test Toggle Group Control"
-        class="components-toggle-group-control emotion-6 emotion-7"
+        class="emotion-6 components-toggle-group-control"
         data-wp-c16t="true"
         data-wp-component="ToggleGroupControl"
         id="wp-components-base-control-19"
         role="radiogroup"
       >
         <div
-          class="emotion-8 emotion-9"
+          class="emotion-7 emotion-8"
         >
           <button
             aria-checked="true"
             aria-label="Uppercase"
-            class="emotion-10 components-toggle-group-control-option-base"
+            class="emotion-9 components-toggle-group-control-option-base"
             data-active-item="true"
             data-value="uppercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="wp-components-base-control-19-40"
+            name=":r3e:"
             role="radio"
             type="button"
             value="uppercase"
           >
             <div
-              class="emotion-11 emotion-12"
+              class="emotion-10 emotion-11"
             >
               <svg
                 aria-hidden="true"
+                fill="currentColor"
                 focusable="false"
                 height="24"
                 viewBox="0 0 24 24"
@@ -287,25 +289,27 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
           </button>
         </div>
         <div
-          class="emotion-8 emotion-9"
+          class="emotion-7 emotion-8"
         >
           <button
             aria-checked="false"
             aria-label="Lowercase"
-            class="emotion-15 components-toggle-group-control-option-base"
+            class="emotion-14 components-toggle-group-control-option-base"
             data-value="lowercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="wp-components-base-control-19-41"
+            name=":r3e:"
             role="radio"
             type="button"
             value="lowercase"
           >
             <div
-              class="emotion-11 emotion-12"
+              class="emotion-10 emotion-11"
             >
               <svg
                 aria-hidden="true"
+                fill="currentColor"
                 focusable="false"
                 height="24"
                 viewBox="0 0 24 24"
@@ -359,16 +363,16 @@ exports[`ToggleGroupControl controlled should render correctly with text options
 }
 
 .emotion-6 {
-  background: var(--wp-components-color-background, #fff);
+  background: var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong, #fff));
   border: 1px solid transparent;
   border-radius: 2px;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
+  height: 40px;
   min-width: 0;
   position: relative;
-  height: 40px;
 }
 
 .emotion-6:hover {
@@ -393,8 +397,8 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   content: '';
   position: absolute;
   pointer-events: none;
-  background: var(--wp-components-color-gray-100, #f0f0f0);
-  border: 1px solid var(--wp-components-color-gray-700, #757575);
+  background: var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral, #fcfcfc));
+  border: 1px solid var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   outline: 2px solid transparent;
   outline-offset: -3px;
   border-radius: 2px;
@@ -412,7 +416,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   		);
 }
 
-.emotion-8 {
+.emotion-7 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -425,7 +429,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   flex: 1;
 }
 
-.emotion-10 {
+.emotion-9 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -437,7 +441,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: var(--wp-components-color-gray-700, #757575);
+  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -464,27 +468,27 @@ exports[`ToggleGroupControl controlled should render correctly with text options
 }
 
 @media not ( prefers-reduced-motion ) {
-  .emotion-10 {
+  .emotion-9 {
     -webkit-transition: color 160ms linear,font-weight 60ms linear;
     transition: color 160ms linear,font-weight 60ms linear;
   }
 }
 
-.emotion-10::-moz-focus-inner {
+.emotion-9::-moz-focus-inner {
   border: 0;
 }
 
-.emotion-10[disabled],
-.emotion-10[aria-disabled='true'] {
+.emotion-9[disabled],
+.emotion-9[aria-disabled='true'] {
   opacity: 0.4;
   cursor: default;
 }
 
-.emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
-  color: var(--wp-components-color-foreground, #1e1e1e);
+.emotion-9:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
 }
 
-.emotion-11 {
+.emotion-10 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -508,51 +512,53 @@ exports[`ToggleGroupControl controlled should render correctly with text options
       </label>
       <div
         aria-label="Test Toggle Group Control"
-        class="components-toggle-group-control emotion-6 emotion-7"
+        class="emotion-6 components-toggle-group-control"
         data-wp-c16t="true"
         data-wp-component="ToggleGroupControl"
         id="wp-components-base-control-18"
         role="radiogroup"
       >
         <div
-          class="emotion-8 emotion-9"
+          class="emotion-7 emotion-8"
         >
           <button
             aria-checked="false"
             aria-label="R"
-            class="emotion-10 components-toggle-group-control-option-base"
+            class="emotion-9 components-toggle-group-control-option-base"
             data-value="rigas"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="wp-components-base-control-18-38"
+            name=":r37:"
             role="radio"
             type="button"
             value="rigas"
           >
             <div
-              class="emotion-11 emotion-12"
+              class="emotion-10 emotion-11"
             >
               R
             </div>
           </button>
         </div>
         <div
-          class="emotion-8 emotion-9"
+          class="emotion-7 emotion-8"
         >
           <button
             aria-checked="false"
             aria-label="J"
-            class="emotion-10 components-toggle-group-control-option-base"
+            class="emotion-9 components-toggle-group-control-option-base"
             data-value="jack"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="wp-components-base-control-18-39"
+            name=":r37:"
             role="radio"
             type="button"
             value="jack"
           >
             <div
-              class="emotion-11 emotion-12"
+              class="emotion-10 emotion-11"
             >
               J
             </div>
@@ -598,16 +604,16 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 }
 
 .emotion-6 {
-  background: var(--wp-components-color-background, #fff);
+  background: var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong, #fff));
   border: 1px solid transparent;
   border-radius: 2px;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
+  height: 40px;
   min-width: 0;
   position: relative;
-  height: 40px;
 }
 
 .emotion-6:hover {
@@ -632,8 +638,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   content: '';
   position: absolute;
   pointer-events: none;
-  background: var(--wp-components-color-gray-100, #f0f0f0);
-  border: 1px solid var(--wp-components-color-gray-700, #757575);
+  background: var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral, #fcfcfc));
+  border: 1px solid var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   outline: 2px solid transparent;
   outline-offset: -3px;
   border-radius: 2px;
@@ -651,7 +657,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   		);
 }
 
-.emotion-8 {
+.emotion-7 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -664,7 +670,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   flex: 1;
 }
 
-.emotion-10 {
+.emotion-9 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -676,7 +682,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: var(--wp-components-color-gray-700, #757575);
+  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -704,32 +710,32 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
-  color: var(--wp-components-color-foreground, #1e1e1e);
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
   font-weight: 499;
 }
 
 @media not ( prefers-reduced-motion ) {
-  .emotion-10 {
+  .emotion-9 {
     -webkit-transition: color 160ms linear,font-weight 60ms linear;
     transition: color 160ms linear,font-weight 60ms linear;
   }
 }
 
-.emotion-10::-moz-focus-inner {
+.emotion-9::-moz-focus-inner {
   border: 0;
 }
 
-.emotion-10[disabled],
-.emotion-10[aria-disabled='true'] {
+.emotion-9[disabled],
+.emotion-9[aria-disabled='true'] {
   opacity: 0.4;
   cursor: default;
 }
 
-.emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
-  color: var(--wp-components-color-foreground, #1e1e1e);
+.emotion-9:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
 }
 
-.emotion-11 {
+.emotion-10 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -738,7 +744,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   line-height: 1;
 }
 
-.emotion-15 {
+.emotion-14 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -750,7 +756,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: var(--wp-components-color-gray-700, #757575);
+  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -781,24 +787,24 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 }
 
 @media not ( prefers-reduced-motion ) {
-  .emotion-15 {
+  .emotion-14 {
     -webkit-transition: color 160ms linear,font-weight 60ms linear;
     transition: color 160ms linear,font-weight 60ms linear;
   }
 }
 
-.emotion-15::-moz-focus-inner {
+.emotion-14::-moz-focus-inner {
   border: 0;
 }
 
-.emotion-15[disabled],
-.emotion-15[aria-disabled='true'] {
+.emotion-14[disabled],
+.emotion-14[aria-disabled='true'] {
   opacity: 0.4;
   cursor: default;
 }
 
-.emotion-15:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
-  color: var(--wp-components-color-foreground, #1e1e1e);
+.emotion-14:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
 }
 
 <div>
@@ -816,33 +822,35 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
       </label>
       <div
         aria-label="Test Toggle Group Control"
-        class="components-toggle-group-control emotion-6 emotion-7"
+        class="emotion-6 components-toggle-group-control"
         data-wp-c16t="true"
         data-wp-component="ToggleGroupControl"
         id="wp-components-base-control-1"
         role="radiogroup"
       >
         <div
-          class="emotion-8 emotion-9"
+          class="emotion-7 emotion-8"
         >
           <button
             aria-checked="true"
             aria-label="Uppercase"
-            class="emotion-10 components-toggle-group-control-option-base"
+            class="emotion-9 components-toggle-group-control-option-base"
             data-active-item="true"
             data-value="uppercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="wp-components-base-control-1-2"
+            name=":r7:"
             role="radio"
             type="button"
             value="uppercase"
           >
             <div
-              class="emotion-11 emotion-12"
+              class="emotion-10 emotion-11"
             >
               <svg
                 aria-hidden="true"
+                fill="currentColor"
                 focusable="false"
                 height="24"
                 viewBox="0 0 24 24"
@@ -857,25 +865,27 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
           </button>
         </div>
         <div
-          class="emotion-8 emotion-9"
+          class="emotion-7 emotion-8"
         >
           <button
             aria-checked="false"
             aria-label="Lowercase"
-            class="emotion-15 components-toggle-group-control-option-base"
+            class="emotion-14 components-toggle-group-control-option-base"
             data-value="lowercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="wp-components-base-control-1-3"
+            name=":r7:"
             role="radio"
             type="button"
             value="lowercase"
           >
             <div
-              class="emotion-11 emotion-12"
+              class="emotion-10 emotion-11"
             >
               <svg
                 aria-hidden="true"
+                fill="currentColor"
                 focusable="false"
                 height="24"
                 viewBox="0 0 24 24"
@@ -923,16 +933,16 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
 }
 
 .emotion-6 {
-  background: var(--wp-components-color-background, #fff);
+  background: var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong, #fff));
   border: 1px solid transparent;
   border-radius: 2px;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
+  height: 40px;
   min-width: 0;
   position: relative;
-  height: 40px;
 }
 
 .emotion-6:hover {
@@ -957,8 +967,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   content: '';
   position: absolute;
   pointer-events: none;
-  background: var(--wp-components-color-gray-100, #f0f0f0);
-  border: 1px solid var(--wp-components-color-gray-700, #757575);
+  background: var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral, #fcfcfc));
+  border: 1px solid var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   outline: 2px solid transparent;
   outline-offset: -3px;
   border-radius: 2px;
@@ -976,7 +986,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   		);
 }
 
-.emotion-8 {
+.emotion-7 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -989,7 +999,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   flex: 1;
 }
 
-.emotion-10 {
+.emotion-9 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -1001,7 +1011,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: var(--wp-components-color-gray-700, #757575);
+  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -1028,27 +1038,27 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
 }
 
 @media not ( prefers-reduced-motion ) {
-  .emotion-10 {
+  .emotion-9 {
     -webkit-transition: color 160ms linear,font-weight 60ms linear;
     transition: color 160ms linear,font-weight 60ms linear;
   }
 }
 
-.emotion-10::-moz-focus-inner {
+.emotion-9::-moz-focus-inner {
   border: 0;
 }
 
-.emotion-10[disabled],
-.emotion-10[aria-disabled='true'] {
+.emotion-9[disabled],
+.emotion-9[aria-disabled='true'] {
   opacity: 0.4;
   cursor: default;
 }
 
-.emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
-  color: var(--wp-components-color-foreground, #1e1e1e);
+.emotion-9:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
 }
 
-.emotion-11 {
+.emotion-10 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1072,51 +1082,53 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
       </label>
       <div
         aria-label="Test Toggle Group Control"
-        class="components-toggle-group-control emotion-6 emotion-7"
+        class="emotion-6 components-toggle-group-control"
         data-wp-c16t="true"
         data-wp-component="ToggleGroupControl"
         id="wp-components-base-control-0"
         role="radiogroup"
       >
         <div
-          class="emotion-8 emotion-9"
+          class="emotion-7 emotion-8"
         >
           <button
             aria-checked="false"
             aria-label="R"
-            class="emotion-10 components-toggle-group-control-option-base"
+            class="emotion-9 components-toggle-group-control-option-base"
             data-value="rigas"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="wp-components-base-control-0-0"
+            name=":r0:"
             role="radio"
             type="button"
             value="rigas"
           >
             <div
-              class="emotion-11 emotion-12"
+              class="emotion-10 emotion-11"
             >
               R
             </div>
           </button>
         </div>
         <div
-          class="emotion-8 emotion-9"
+          class="emotion-7 emotion-8"
         >
           <button
             aria-checked="false"
             aria-label="J"
-            class="emotion-10 components-toggle-group-control-option-base"
+            class="emotion-9 components-toggle-group-control-option-base"
             data-value="jack"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="wp-components-base-control-0-1"
+            name=":r0:"
             role="radio"
             type="button"
             value="jack"
           >
             <div
-              class="emotion-11 emotion-12"
+              class="emotion-10 emotion-11"
             >
               J
             </div>
