@@ -9,16 +9,28 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { useRegistry } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useEffect } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-function getLatestHeadings( select, clientId ) {
+// Can't import `useHeadingBlockTypes` from `@wordpress/editor`: this package
+// must not depend on it (see the `core/editor` string-store access below for
+// the same reason). Blocks added through the `editor.headingBlockTypes`
+// filter must have `level` and `content` attributes, same as `core/heading`.
+const HEADING_BLOCK_TYPES = [ 'core/heading' ];
+
+export function getLatestHeadings( select, clientId ) {
 	const {
 		getBlockAttributes,
 		getBlockName,
 		getBlocksByName,
 		getClientIdsOfDescendants,
 	} = select( blockEditorStore );
+
+	const headingBlockTypes = applyFilters(
+		'editor.headingBlockTypes',
+		HEADING_BLOCK_TYPES
+	);
 
 	// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 	// Blocks can be loaded into a *non-post* block editor, so to avoid
@@ -97,7 +109,7 @@ function getLatestHeadings( select, clientId ) {
 		// the same page as the Table of Contents block, add them to the
 		// list.
 		else if ( ! onlyIncludeCurrentPage || headingPage === tocPage ) {
-			if ( blockName === 'core/heading' ) {
+			if ( headingBlockTypes.includes( blockName ) ) {
 				const headingAttributes = getBlockAttributes( blockClientId );
 
 				// Skip headings that are deeper than maxLevel

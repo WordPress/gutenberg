@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add an "Attachments" source to the block inserter's Media tab, listing images attached to the current post with the ability to attach and detach them ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
+-   Add `editor.headingBlockTypes` filter to let third-party blocks register as headings for the Document Outline panel and heading count.
 
 ### Bug Fixes
 

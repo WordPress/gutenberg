@@ -280,7 +280,7 @@ _Returns_
 
 ### DocumentOutlineCheck
 
-Component check if there are any headings (core/heading blocks) present in the document.
+Component check if there are any headings (core/heading blocks, or blocks added via the `editor.headingBlockTypes` filter) present in the document.
 
 _Parameters_
 
