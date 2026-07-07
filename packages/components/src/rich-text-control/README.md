@@ -22,6 +22,16 @@ Placeholder slot for the rich-text assembly (e.g. `FormatEdit` and its
 context providers), mounted only while the field has an active
 selection.
 
+### `disabled`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
+
+Whether the field is non-editable. A disabled field is not
+`contentEditable` (so it is neither focusable nor editable), exposes
+`aria-disabled` to assistive technology, and does not mount `children`.
+
 ### `defaultIsSelected`
 
  - Type: `boolean`
@@ -44,6 +54,15 @@ Whether line breaks are disabled. Drives `aria-multiline`.
  - Default: `false`
 
 If true, the label will only be visible to screen readers.
+
+### `help`
+
+ - Type: `ReactNode`
+ - Required: No
+
+Additional description for the control.
+
+Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
 
 ### `isSelected`
 
@@ -78,3 +97,12 @@ Label text for the control.
 
 Called when the field gains or loses an "active" selection, in both
 controlled and uncontrolled usage.
+
+### `required`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
+
+Whether the field is required. Exposed to assistive technology via
+`aria-required`.
