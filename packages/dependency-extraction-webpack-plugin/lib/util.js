@@ -1,17 +1,63 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
-const BUNDLED_PACKAGES = [
-	'@wordpress/admin-ui',
-	'@wordpress/dataviews',
-	'@wordpress/dataviews/wp',
-	'@wordpress/fields',
-	'@wordpress/grid',
-	'@wordpress/icons',
-	'@wordpress/interface',
-	'@wordpress/style-runtime',
-	'@wordpress/ui',
-	'@wordpress/undo-manager',
-	'@wordpress/views',
-];
+const packageMetadataCache = new Map();
+
+/**
+ * Read package metadata for an import request.
+ *
+ * @param {string} request Module request (the module name in `import from`).
+ * @return {{wpScript?: boolean, wpScriptModuleExports?: string|Object}|undefined} Package metadata when resolvable.
+ */
+function getPackageMetadata( request ) {
+	const packageName = getPackageNameFromRequest( request );
+
+	if ( ! packageName ) {
+		return;
+	}
+
+	if ( packageMetadataCache.has( packageName ) ) {
+		return packageMetadataCache.get( packageName );
+	}
+
+	let packageMetadata;
+	try {
+		packageMetadata = require( `${ packageName }/package.json` );
+	} catch {}
+
+	packageMetadataCache.set( packageName, packageMetadata );
+	return packageMetadata;
+}
+
+/**
+ * Determine whether a package should stay bundled in script builds.
+ * Packages with `wpScript: true` are externalized as `wp.*`.
+ * Packages with `wpScriptModuleExports` are script modules, not classic scripts.
+ *
+ * @param {string} request Module request (the module name in `import from`).
+ * @return {boolean} True when package should remain bundled in scripts.
+ */
+function isBundledPackageForScripts( request ) {
+	const packageMetadata = getPackageMetadata( request );
+	if ( ! packageMetadata ) {
+		return false;
+	}
+
+	return (
+		! packageMetadata.wpScript && ! packageMetadata.wpScriptModuleExports
+	);
+}
+
+/**
+ * Extract package name (`@scope/name`) from an import request.
+ *
+ * @param {string} request Module request (the module name in `import from`).
+ * @return {string|undefined} Package name when request is namespaced.
+ */
+function getPackageNameFromRequest( request ) {
+	const parts = request.split( '/' );
+	if ( parts[ 0 ]?.startsWith( '@' ) && parts.length >= 2 ) {
+		return `${ parts[ 0 ] }/${ parts[ 1 ] }`;
+	}
+}
 
 /**
  * Default request to global transformation
@@ -55,7 +101,7 @@ function defaultRequestToExternal( request ) {
 		return 'ReactRefreshRuntime';
 	}
 
-	if ( BUNDLED_PACKAGES.includes( request ) ) {
+	if ( isBundledPackageForScripts( request ) ) {
 		return undefined;
 	}
 

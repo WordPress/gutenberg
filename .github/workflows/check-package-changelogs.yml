@@ -49,7 +49,6 @@ jobs:
                     - interface
                     - style-runtime
                     - ui
-                    - undo-manager
                     - views
                     # Other packages
                     - theme

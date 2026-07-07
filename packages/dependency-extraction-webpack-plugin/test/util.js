@@ -48,6 +48,16 @@ describe( 'defaultRequestToExternal', () => {
 		).toEqual( [ 'wp', 'someFuturePackage' ] );
 	} );
 
+	test( 'Keeps bundled @wordpress packages internal', () => {
+		expect( defaultRequestToExternal( '@wordpress/ui' ) ).toBeUndefined();
+	} );
+
+	test( 'Externalizes wpScript packages', () => {
+		expect( defaultRequestToExternal( '@wordpress/undo-manager' ) ).toEqual(
+			[ 'wp', 'undoManager' ]
+		);
+	} );
+
 	test( 'Handles react request', () => {
 		expect( defaultRequestToExternal( 'react' ) ).toBe( 'React' );
 	} );
