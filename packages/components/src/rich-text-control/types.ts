@@ -10,12 +10,27 @@ import type { BaseControlProps } from '../base-control/types';
 
 export type RichTextControlProps = Pick<
 	BaseControlProps,
-	'className' | 'hideLabelFromVision'
+	'className' | 'hideLabelFromVision' | 'help'
 > & {
 	/**
 	 * Label text for the control.
 	 */
 	label: string;
+	/**
+	 * Whether the field is non-editable. A disabled field is not
+	 * `contentEditable` (so it is neither focusable nor editable), exposes
+	 * `aria-disabled` to assistive technology, and does not mount `children`.
+	 *
+	 * @default false
+	 */
+	disabled?: boolean;
+	/**
+	 * Whether the field is required. Exposed to assistive technology via
+	 * `aria-required`.
+	 *
+	 * @default false
+	 */
+	required?: boolean;
 	/**
 	 * The selection ("active") state of the field, for controlled usage.
 	 * When omitted, the control manages its own selection state directly from

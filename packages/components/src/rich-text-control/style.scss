@@ -25,4 +25,13 @@
 	// on newer components like InputControl, SelectControl, etc.
 	// These values should be shared with the `controlPaddingX` in ./utils/config-values.js
 	padding: $grid-unit-15;
+
+	// Match the disabled treatment of native form controls (see the
+	// `&:disabled` rules in the textarea/input control styles).
+	&.is-disabled {
+		background: $gray-100;
+		border-color: $gray-300;
+		color: $gray-700;
+		cursor: default;
+	}
 }

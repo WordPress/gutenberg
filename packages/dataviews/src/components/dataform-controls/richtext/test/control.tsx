@@ -519,6 +519,108 @@ describe( 'RichTextControl', () => {
 		} );
 	} );
 
+	describe( 'disabled and validation states', () => {
+		it( 'renders a non-editable field with a disabled state when `disabled`', () => {
+			const onChange = jest.fn();
+			const { container } = render(
+				<RichTextControl
+					label="Summary"
+					value="hi"
+					onChange={ onChange }
+					disabled
+				/>
+			);
+			const textbox = getTextbox( container );
+
+			expect( textbox ).toHaveAttribute( 'contenteditable', 'false' );
+			expect( textbox ).toHaveAttribute( 'aria-disabled', 'true' );
+
+			// A non-`contentEditable` div is not focusable, so real keyboard
+			// input cannot reach the field; the listeners must not react to
+			// programmatic events either.
+			fireEvent.keyDown( textbox, { key: 'Enter' } );
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'appends the required indicator to the label and exposes `aria-required`', () => {
+			const { container } = render(
+				<RichTextControl
+					label="Summary"
+					value=""
+					onChange={ () => {} }
+					required
+				/>
+			);
+
+			// The same "(Required)" label treatment the sibling validated
+			// text controls get.
+			expect( screen.getByText( 'Summary (Required)' ) ).toBeVisible();
+			expect( getTextbox( container ) ).toHaveAttribute(
+				'aria-required',
+				'true'
+			);
+		} );
+
+		it( 'marks the label optional with `markWhenOptional`', () => {
+			render(
+				<RichTextControl
+					label="Summary"
+					value=""
+					onChange={ () => {} }
+					markWhenOptional
+				/>
+			);
+
+			expect( screen.getByText( 'Summary (Optional)' ) ).toBeVisible();
+		} );
+
+		it( 'surfaces an invalid state once the field has been touched', async () => {
+			const { container } = render(
+				<RichTextControl
+					label="Summary"
+					value=""
+					onChange={ () => {} }
+					customValidity={ {
+						type: 'invalid',
+						message: 'Enter a summary',
+					} }
+				/>
+			);
+			const textbox = getTextbox( container );
+
+			expect( textbox ).toHaveAttribute( 'aria-invalid', 'true' );
+			// The validity message only shows once the field has been
+			// touched (blurred at least once), matching the sibling
+			// validated controls.
+			expect(
+				screen.queryByText( 'Enter a summary' )
+			).not.toBeInTheDocument();
+
+			await focusTextbox( textbox );
+			fireEvent.blur( textbox );
+			await act( async () => {
+				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			} );
+
+			expect( screen.getByText( 'Enter a summary' ) ).toBeVisible();
+		} );
+
+		it( 'connects `help` to the field as its description', () => {
+			const { container } = render(
+				<RichTextControl
+					label="Summary"
+					value=""
+					onChange={ () => {} }
+					help="Add a short summary"
+				/>
+			);
+			const textbox = getTextbox( container );
+			const help = screen.getByText( 'Add a short summary' );
+
+			expect( textbox ).toHaveAttribute( 'aria-describedby', help.id );
+		} );
+	} );
+
 	describe( 'format edit UIs', () => {
 		// Format types receive `isVisible` and gate both their toolbar
 		// buttons and their inline UIs (e.g. the link popover opened via

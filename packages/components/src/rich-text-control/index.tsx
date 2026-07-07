@@ -64,7 +64,10 @@ function UnforwardedRichTextControl(
 		children,
 		id,
 		className,
+		help,
 		hideLabelFromVision,
+		disabled,
+		required,
 		disableLineBreaks,
 		onFocus,
 		onBlur,
@@ -84,19 +87,24 @@ function UnforwardedRichTextControl(
 
 	const { baseControlProps, controlProps } = useBaseControlProps( {
 		id,
+		help,
 		hideLabelFromVision,
 		label,
 	} );
 
 	return (
 		<>
-			{ isSelected && children }
+			{ isSelected && ! disabled && children }
 			<BaseControl { ...baseControlProps }>
 				<div
-					className={ clsx( 'wp-rich-text-control', className ) }
+					className={ clsx( 'wp-rich-text-control', className, {
+						'is-disabled': disabled,
+					} ) }
 					role="textbox"
 					aria-multiline={ ! disableLineBreaks }
 					aria-label={ label }
+					aria-disabled={ disabled || undefined }
+					aria-required={ required || undefined }
 					ref={ forwardedRef }
 					onFocus={ ( event: FocusEvent< HTMLDivElement > ) => {
 						onFocus?.( event );
@@ -106,7 +114,9 @@ function UnforwardedRichTextControl(
 						onBlur?.( event );
 						setIsSelected?.( false );
 					} }
-					contentEditable
+					// A disabled field is not `contentEditable`, which also
+					// removes it from the tab order.
+					contentEditable={ ! disabled }
 					suppressContentEditableWarning
 					{ ...additionalProps }
 					{ ...controlProps }

@@ -37,6 +37,13 @@ jest.mock( '../richtext/control', () => ( {
 					props.allowedFormats ?? null
 				) }
 				data-raw-value={ JSON.stringify( props.value ) }
+				data-help={ props.help ?? '' }
+				data-required={ String( !! props.required ) }
+				data-mark-when-optional={ String( !! props.markWhenOptional ) }
+				data-custom-validity={ JSON.stringify(
+					props.customValidity ?? null
+				) }
+				disabled={ !! props.disabled }
 				value={ props.value ?? '' }
 				onChange={ handleChange }
 			/>
@@ -60,6 +67,10 @@ function buildField( overrides: Record< string, any > = {} ) {
 			...item,
 			content: value,
 		} ),
+		// DataForm always hands controls a normalized field, which includes
+		// `isDisabled` and `isValid`.
+		isDisabled: () => false,
+		isValid: {},
 		...overrides,
 	};
 }
@@ -171,6 +182,49 @@ describe( 'dataform-controls/richtext', () => {
 		expect( control.dataset.preserveWhiteSpace ).toBe( 'true' );
 		expect( control.dataset.allowedFormats ).toBe(
 			JSON.stringify( [ 'core/bold' ] )
+		);
+	} );
+
+	it( 'derives the disabled state from field.isDisabled', () => {
+		render(
+			<RichText< TestItem >
+				data={ { content: '' } }
+				field={ buildField( { isDisabled: () => true } ) as any }
+				onChange={ jest.fn() }
+				hideLabelFromVision={ false }
+				config={ {} }
+			/>
+		);
+
+		expect( screen.getByLabelText( 'Content' ) ).toBeDisabled();
+	} );
+
+	it( 'forwards required, optional marking, help, and validity like the sibling text controls', () => {
+		render(
+			<RichText< TestItem >
+				data={ { content: '' } }
+				field={
+					buildField( {
+						description: 'Add a summary',
+						isValid: { required: {} },
+					} ) as any
+				}
+				onChange={ jest.fn() }
+				hideLabelFromVision={ false }
+				markWhenOptional
+				config={ {} }
+				validity={ {
+					required: { type: 'invalid', message: 'Required field' },
+				} }
+			/>
+		);
+
+		const control = screen.getByLabelText( 'Content' );
+		expect( control ).toHaveAttribute( 'data-required', 'true' );
+		expect( control.dataset.markWhenOptional ).toBe( 'true' );
+		expect( control.dataset.help ).toBe( 'Add a summary' );
+		expect( control.dataset.customValidity ).toBe(
+			JSON.stringify( { type: 'invalid', message: 'Required field' } )
 		);
 	} );
 

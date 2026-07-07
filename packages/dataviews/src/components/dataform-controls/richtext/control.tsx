@@ -32,11 +32,12 @@ import { unlock } from '../../../lock-unlock';
 import { getAllowedFormats } from './utils';
 import FormatEdit from './format-edit';
 
-// The presentational shell. It owns the chrome (`BaseControl` + label, the
-// `contentEditable` element, and the blur/focus selection heuristic) and has
-// no `@wordpress/rich-text` dependency. This module is the "assembly" that
+// The presentational shell: `RichTextControl` owns the chrome (`BaseControl`
+// + label and the `contentEditable` element) and has no `@wordpress/rich-text`
+// dependency; the `Validated` wrapper adds the same required/validity
+// treatment the sibling text controls get. This module is the "assembly" that
 // injects the rich-text wiring into it.
-const { RichTextControl: RichTextControlShell } = unlock(
+const { ValidatedRichTextControl: RichTextControlShell } = unlock(
 	componentsPrivateApis
 );
 
@@ -88,6 +89,31 @@ export type RichTextControlProps = {
 	 */
 	hideLabelFromVision?: boolean;
 	/**
+	 * Help text displayed below the field and linked via `aria-describedby`.
+	 */
+	help?: string;
+	/**
+	 * Whether the field is non-editable.
+	 */
+	disabled?: boolean;
+	/**
+	 * Whether the field is required.
+	 */
+	required?: boolean;
+	/**
+	 * Label the field as "optional" when not `required`, instead of the
+	 * inverse.
+	 */
+	markWhenOptional?: boolean;
+	/**
+	 * A custom validity message, matching the contract of the `Validated`
+	 * form controls in `@wordpress/components`.
+	 */
+	customValidity?: {
+		type: 'validating' | 'valid' | 'invalid';
+		message?: string;
+	};
+	/**
 	 * Array of allowed format types.
 	 */
 	allowedFormats?: string[];
@@ -135,6 +161,11 @@ export default function RichTextControl( {
 	clientId,
 	className,
 	hideLabelFromVision,
+	help,
+	disabled,
+	required,
+	markWhenOptional,
+	customValidity,
 	allowedFormats,
 	disableFormats,
 	withoutInteractiveFormatting,
@@ -316,6 +347,12 @@ export default function RichTextControl( {
 	 */
 	const enterRef = useRefEffect< HTMLElement >(
 		( element ) => {
+			// A disabled field is not editable; nothing to handle. (Real
+			// keyboard input cannot reach it either, since a
+			// non-`contentEditable` div is not focusable.)
+			if ( disabled ) {
+				return;
+			}
 			function onKeyDown( event: KeyboardEvent ) {
 				if (
 					event.key !== 'Enter' ||
@@ -346,7 +383,7 @@ export default function RichTextControl( {
 			element.addEventListener( 'keydown', onKeyDown );
 			return () => element.removeEventListener( 'keydown', onKeyDown );
 		},
-		[ disableLineBreaks ]
+		[ disableLineBreaks, disabled ]
 	);
 
 	const eventListenersRef = useRefEffect< HTMLElement >(
@@ -418,11 +455,11 @@ export default function RichTextControl( {
 	// form opts in.
 	const focusOnMountRef = useRefEffect< HTMLElement >(
 		( element ) => {
-			if ( focusOnMount ) {
+			if ( focusOnMount && ! disabled ) {
 				element.focus();
 			}
 		},
-		[ focusOnMount ]
+		[ focusOnMount, disabled ]
 	);
 
 	const editableRef = useMergeRefs( [
@@ -449,6 +486,14 @@ export default function RichTextControl( {
 				id={ id }
 				className={ className }
 				hideLabelFromVision={ hideLabelFromVision }
+				help={ help }
+				disabled={ disabled }
+				required={ required }
+				markWhenOptional={ markWhenOptional }
+				customValidity={ customValidity }
+				// The shell manages the editable content through the ref; the
+				// value only drives its hidden validity delegate.
+				value={ attrValue }
 				disableLineBreaks={ disableLineBreaks }
 				ref={ editableRef }
 				isSelected={ isSelected }
