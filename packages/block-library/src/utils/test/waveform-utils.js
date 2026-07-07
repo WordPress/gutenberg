@@ -10,6 +10,7 @@ import {
 	createWaveformContainer,
 	styleSvgIcons,
 	setupPlayButtonAccessibility,
+	updateSeekControlLabel,
 	logPlayError,
 } from '../waveform-utils';
 
@@ -49,6 +50,7 @@ describe( 'Waveform utilities', () => {
 				'data-button-color',
 				'#000000'
 			);
+			expect( container ).toHaveAttribute( 'data-seek-label', 'Seek' );
 		} );
 
 		it( 'should set optional attributes when provided', () => {
@@ -57,6 +59,7 @@ describe( 'Waveform utilities', () => {
 				title: 'My Song',
 				artist: 'The Artist',
 				artwork: 'https://example.com/cover.jpg',
+				seekLabel: 'My Song',
 			} );
 
 			expect( container ).toHaveAttribute( 'data-title', 'My Song' );
@@ -68,6 +71,19 @@ describe( 'Waveform utilities', () => {
 				'data-artwork',
 				'https://example.com/cover.jpg'
 			);
+			expect( container ).toHaveAttribute( 'data-seek-label', 'My Song' );
+		} );
+
+		it( 'should set the seek value-text template when provided', () => {
+			const container = createWaveformContainer( {
+				...basePlayerData,
+				seekValueText: '%1$s of %2$s',
+			} );
+
+			expect( container ).toHaveAttribute(
+				'data-seek-value-text',
+				'%1$s of %2$s'
+			);
 		} );
 
 		it( 'should not set optional attributes when not provided', () => {
@@ -76,6 +92,7 @@ describe( 'Waveform utilities', () => {
 			expect( container ).not.toHaveAttribute( 'data-title' );
 			expect( container ).not.toHaveAttribute( 'data-subtitle' );
 			expect( container ).not.toHaveAttribute( 'data-artwork' );
+			expect( container ).not.toHaveAttribute( 'data-seek-value-text' );
 		} );
 
 		it( 'should use custom height when provided', () => {
@@ -194,6 +211,39 @@ describe( 'Waveform utilities', () => {
 			styleSvgIcons( container, '#ffff00' );
 
 			expect( path ).toHaveStyle( { fill: '#000000' } );
+		} );
+	} );
+
+	describe( 'updateSeekControlLabel', () => {
+		afterEach( () => {
+			document.body.innerHTML = '';
+		} );
+
+		it( 'updates the seek control label on the library slider', () => {
+			const container = document.createElement( 'div' );
+			const seekControl = document.createElement( 'div' );
+			seekControl.className = 'waveform-container';
+			container.appendChild( seekControl );
+			document.body.appendChild( container );
+
+			const instance = {
+				container,
+				options: {},
+				applySeekLabel: jest.fn( ( label ) => {
+					seekControl.setAttribute( 'aria-label', label );
+				} ),
+			};
+
+			updateSeekControlLabel( instance, 'Updated Song' );
+
+			expect( instance.options.seekLabel ).toBe( 'Updated Song' );
+			expect( instance.applySeekLabel ).toHaveBeenCalledWith(
+				'Updated Song'
+			);
+			expect( seekControl ).toHaveAttribute(
+				'aria-label',
+				'Updated Song'
+			);
 		} );
 	} );
 
