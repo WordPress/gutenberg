@@ -644,8 +644,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Breakpoint values are read from `settings.viewport`, sanitized, and
 	 * normalized before the media query strings are generated. By default, the
 	 * returned keys are the theme.json style-state names (`@mobile`, `@tablet`).
-	 * When `$options['include_desktop']` is truthy, the returned keys are
-	 * `mobile`, `tablet`, and `desktop` for block visibility support.
+	 * When `$options['include_desktop']` is truthy, `@desktop` is included.
 	 *
 	 * @since 7.1.0
 	 *
@@ -660,37 +659,30 @@ class WP_Theme_JSON_Gutenberg {
 	public static function get_viewport_media_queries( $viewport_settings = null, $options = array() ) {
 		$breakpoints = static::sanitize_viewport_settings( $viewport_settings );
 
-		$responsive_media_queries = array(
-			'@mobile' => "@media (width <= {$breakpoints['mobile']})",
-		);
+		$responsive_media_queries = array();
 
-		if ( isset( $breakpoints['tablet'] ) ) {
-			$responsive_media_queries['@tablet'] = sprintf(
-				'@media (%s < width <= %s)',
-				$breakpoints['mobile'],
-				$breakpoints['tablet']
-			);
+		if ( isset( $breakpoints['mobile'] ) ) {
+			$responsive_media_queries['@mobile'] = "@media (width <= {$breakpoints['mobile']})";
 		}
 
-		if ( ! empty( $options['include_desktop'] ) ) {
-			$desktop_breakpoint = $breakpoints['mobile'];
-			if ( isset( $breakpoints['tablet'] ) ) {
-				$desktop_breakpoint = $breakpoints['tablet'];
-			}
-
-			$responsive_media_queries = array(
-				'mobile' => $responsive_media_queries['@mobile'],
-			);
-
-			if ( isset( $breakpoints['tablet'] ) ) {
-				$responsive_media_queries['tablet'] = sprintf(
+		if ( isset( $breakpoints['tablet'] ) ) {
+			$responsive_media_queries['@tablet'] = isset( $breakpoints['mobile'] )
+				? sprintf(
 					'@media (%s < width <= %s)',
 					$breakpoints['mobile'],
 					$breakpoints['tablet']
-				);
+				)
+				: "@media (width <= {$breakpoints['tablet']})";
+		}
+
+		if ( ! empty( $options['include_desktop'] ) ) {
+			if ( isset( $breakpoints['tablet'] ) ) {
+				$desktop_breakpoint = $breakpoints['tablet'];
+			} else {
+				$desktop_breakpoint = $breakpoints['mobile'];
 			}
 
-			$responsive_media_queries['desktop'] =
+			$responsive_media_queries['@desktop'] =
 				"@media (width > {$desktop_breakpoint})";
 		}
 
@@ -761,8 +753,9 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * Keeps only supported breakpoint keys, trims valid CSS lengths, and returns
 	 * the default breakpoints when no valid custom breakpoint is provided. When
-	 * only `tablet` is valid, it is treated as `mobile`. When `tablet` is not
-	 * larger than `mobile`, it is removed.
+	 * only one breakpoint is valid, it remains keyed by its configured state and
+	 * uses a single max-width media query. When `tablet` is not larger than
+	 * `mobile`, it is removed.
 	 *
 	 * @since 7.1.0
 	 *
@@ -774,7 +767,7 @@ class WP_Theme_JSON_Gutenberg {
 			return static::DEFAULT_VIEWPORT_BREAKPOINTS;
 		}
 
-				$breakpoints = array();
+		$breakpoints = array();
 		foreach ( array_keys( static::DEFAULT_VIEWPORT_BREAKPOINTS ) as $breakpoint ) {
 			$value = $viewport_settings[ $breakpoint ] ?? null;
 			$px    = static::get_viewport_breakpoint_value_in_pixels( $value );
@@ -790,8 +783,9 @@ class WP_Theme_JSON_Gutenberg {
 			return static::DEFAULT_VIEWPORT_BREAKPOINTS;
 		}
 
-		if ( ! isset( $breakpoints['mobile'] ) ) {
-			return array( 'mobile' => $breakpoints['tablet']['value'] );
+		if ( 1 === count( $breakpoints ) ) {
+			$breakpoint = key( $breakpoints );
+			return array( $breakpoint => $breakpoints[ $breakpoint ]['value'] );
 		}
 
 		$sanitized = array( 'mobile' => $breakpoints['mobile']['value'] );

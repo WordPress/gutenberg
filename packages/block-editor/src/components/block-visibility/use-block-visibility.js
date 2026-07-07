@@ -31,13 +31,16 @@ export default function useBlockVisibility( options = {} ) {
 	} = options;
 
 	const viewportBreakpoints = getViewportBreakpoints( viewportSettings );
-	const isMobileViewport = useMediaQuery(
-		`(width <= ${ viewportBreakpoints.mobile })`,
-		view
-	);
-	const tabletMediaQuery = viewportBreakpoints.tablet
-		? `(${ viewportBreakpoints.mobile } < width <= ${ viewportBreakpoints.tablet })`
-		: '(width < 0px)';
+	const mobileMediaQuery = viewportBreakpoints.mobile
+		? `(width <= ${ viewportBreakpoints.mobile })`
+		: undefined;
+	const isMobileViewport = useMediaQuery( mobileMediaQuery, view );
+	let tabletMediaQuery;
+	if ( viewportBreakpoints.tablet ) {
+		tabletMediaQuery = viewportBreakpoints.mobile
+			? `(${ viewportBreakpoints.mobile } < width <= ${ viewportBreakpoints.tablet })`
+			: `(width <= ${ viewportBreakpoints.tablet })`;
+	}
 	const isTabletViewport = useMediaQuery( tabletMediaQuery, view );
 
 	/*
@@ -46,7 +49,10 @@ export default function useBlockVisibility( options = {} ) {
 	 * 2. Actual window size (Desktop mode) - uses viewport detection
 	 */
 	let currentViewport;
-	if ( deviceType === BLOCK_VISIBILITY_VIEWPORTS.mobile.key ) {
+	if (
+		deviceType === BLOCK_VISIBILITY_VIEWPORTS.mobile.key &&
+		viewportBreakpoints.mobile
+	) {
 		currentViewport = BLOCK_VISIBILITY_VIEWPORTS.mobile.key;
 	} else if (
 		deviceType === BLOCK_VISIBILITY_VIEWPORTS.tablet.key &&

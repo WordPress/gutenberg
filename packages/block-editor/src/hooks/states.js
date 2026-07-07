@@ -35,7 +35,8 @@ function getDeviceStateOptions( viewportSettings ) {
 	return Object.entries( RESPONSIVE_STATE_LABELS )
 		.filter(
 			( [ value ] ) =>
-				value !== '@tablet' || breakpoints.tablet !== undefined
+				( value !== '@tablet' || breakpoints.tablet !== undefined ) &&
+				( value !== '@mobile' || breakpoints.mobile !== undefined )
 		)
 		.map( ( [ value, label ] ) => ( {
 			value,

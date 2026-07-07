@@ -50,6 +50,17 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 			)
 		);
 
+		/*
+		 * Viewport media queries are keyed by style-state names (`@mobile`,
+		 * `@tablet`, and `@desktop`). Block visibility metadata and generated
+		 * classes use plain viewport names, so map the keys at this boundary.
+		 */
+		$block_visibility_media_queries = array();
+		foreach ( $viewport_media_queries as $viewport_state => $media_query ) {
+			$block_visibility_media_queries[ ltrim( $viewport_state, '@' ) ] = $media_query;
+		}
+		$viewport_media_queries = $block_visibility_media_queries;
+
 		$hidden_on = array();
 
 		// Collect which viewport the block is hidden on (only known viewport sizes).

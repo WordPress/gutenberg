@@ -48,7 +48,7 @@ function getPreviewWidthByViewport(
 		breakpoints.mobile
 	);
 
-	if ( selectedViewport === 'mobile' && mobileWidth ) {
+	if ( selectedViewport === '@mobile' && mobileWidth ) {
 		return mobileWidth;
 	}
 
@@ -56,18 +56,24 @@ function getPreviewWidthByViewport(
 		breakpoints.tablet
 	);
 
-	if ( selectedViewport === 'tablet' && mobileWidth && tabletWidth ) {
+	if ( selectedViewport === '@tablet' && tabletWidth ) {
+		if ( ! mobileWidth ) {
+			return tabletWidth;
+		}
 		if (
 			breakpoints.mobile === '480px' &&
 			breakpoints.tablet === '782px'
 		) {
-			return DEFAULT_PREVIEW_WIDTH_BY_VIEWPORT.tablet;
+			return DEFAULT_PREVIEW_WIDTH_BY_VIEWPORT[ '@tablet' ];
 		}
 		return Math.round( ( mobileWidth + tabletWidth ) / 2 );
 	}
 
-	if ( selectedViewport === 'default' && tabletWidth ) {
-		return tabletWidth + 1;
+	if ( selectedViewport === 'default' ) {
+		const desktopBreakpoint = tabletWidth ?? mobileWidth;
+		if ( desktopBreakpoint ) {
+			return desktopBreakpoint + 1;
+		}
 	}
 
 	return DEFAULT_PREVIEW_WIDTH_BY_VIEWPORT[ selectedViewport ];

@@ -250,6 +250,36 @@ describe( 'useBlockVisibility', () => {
 			expect( result.current.isBlockCurrentlyHidden ).toBe( true );
 		} );
 
+		it( 'should use tablet viewport detection for a single tablet breakpoint', () => {
+			setupViewport( {
+				isMobileViewport: false,
+				isTabletViewport: true,
+			} );
+
+			const { result } = renderHook( () =>
+				useBlockVisibility( {
+					blockVisibility: { viewport: { tablet: false } },
+					deviceType: 'desktop',
+					viewportSettings: {
+						tablet: '64rem',
+					},
+				} )
+			);
+
+			expect( useMediaQuery ).toHaveBeenNthCalledWith(
+				1,
+				undefined,
+				window
+			);
+			expect( useMediaQuery ).toHaveBeenNthCalledWith(
+				2,
+				'(width <= 64rem)',
+				window
+			);
+			expect( result.current.currentViewport ).toBe( 'tablet' );
+			expect( result.current.isBlockCurrentlyHidden ).toBe( true );
+		} );
+
 		it( 'should not use tablet viewport detection when the tablet breakpoint is not larger than mobile', () => {
 			setupViewport( {
 				isMobileViewport: false,
@@ -274,7 +304,7 @@ describe( 'useBlockVisibility', () => {
 			);
 			expect( useMediaQuery ).toHaveBeenNthCalledWith(
 				2,
-				'(width < 0px)',
+				undefined,
 				window
 			);
 			expect( result.current.currentViewport ).toBe( 'desktop' );

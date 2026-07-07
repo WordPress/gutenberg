@@ -48,14 +48,14 @@ const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 export { getBlockSettings } from './get-block-settings';
 
 function isViewportAvailable( state, viewport ) {
-	if ( viewport !== BLOCK_VISIBILITY_VIEWPORTS.tablet.key ) {
+	if ( viewport === BLOCK_VISIBILITY_VIEWPORTS.desktop.key ) {
 		return true;
 	}
 
 	return (
 		getViewportBreakpoints(
 			getSettings( state )?.__experimentalFeatures?.viewport
-		).tablet !== undefined
+		)[ viewport ] !== undefined
 	);
 }
 

@@ -106,7 +106,8 @@ export function getValidViewportStates(
 
 	return RESPONSIVE_STATES.filter(
 		( state ) =>
-			state.value !== '@tablet' || breakpoints.tablet !== undefined
+			( state.value !== '@tablet' || breakpoints.tablet !== undefined ) &&
+			( state.value !== '@mobile' || breakpoints.mobile !== undefined )
 	);
 }
 

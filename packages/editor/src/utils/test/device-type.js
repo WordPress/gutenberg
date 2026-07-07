@@ -67,6 +67,25 @@ describe( 'device type utilities', () => {
 		);
 	} );
 
+	it( 'uses the tablet device type for a single tablet breakpoint', () => {
+		const viewportSettings = {
+			tablet: '64rem',
+		};
+
+		expect( getCanvasWidthByDeviceType( 'Mobile', viewportSettings ) ).toBe(
+			undefined
+		);
+		expect( getCanvasWidthByDeviceType( 'Tablet', viewportSettings ) ).toBe(
+			1024
+		);
+		expect( getDeviceTypeByCanvasWidth( 800, viewportSettings ) ).toBe(
+			'Tablet'
+		);
+		expect( getDeviceTypeByCanvasWidth( 1200, viewportSettings ) ).toBe(
+			'Desktop'
+		);
+	} );
+
 	it( 'omits tablet when its breakpoint is not larger than mobile', () => {
 		const viewportSettings = {
 			mobile: '64rem',

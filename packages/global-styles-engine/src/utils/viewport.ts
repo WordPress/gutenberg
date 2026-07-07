@@ -7,10 +7,7 @@ const DEFAULT_VIEWPORT_BREAKPOINTS = {
 
 type ViewportBreakpoint = keyof typeof DEFAULT_VIEWPORT_BREAKPOINTS;
 type ViewportSettings = Partial< Record< ViewportBreakpoint, string > >;
-type ViewportBreakpoints = {
-	mobile: string;
-	tablet?: string;
-};
+type ViewportBreakpoints = Partial< Record< ViewportBreakpoint, string > >;
 
 // Matches positive CSS length values supported for viewport breakpoints, and
 // captures the numeric value and unit for conversion to pixels.
@@ -79,13 +76,13 @@ export function getViewportBreakpointValueInPixels(
 }
 
 /**
- * Returns sanitized viewport breakpoints from a global styles config or
- * viewport settings object.
+ * Returns sanitized viewport breakpoints keyed by viewport state.
  *
  * Falls back to default breakpoints when no valid values are provided. If the
- * mobile breakpoint is missing, a valid tablet breakpoint is used as mobile. If
- * the tablet breakpoint is missing, invalid, or not larger than the mobile
- * breakpoint, the result only includes a mobile breakpoint.
+ * mobile breakpoint is missing, a valid tablet breakpoint remains keyed as
+ * tablet so the editor can present it as a tablet breakpoint. If the tablet
+ * breakpoint is missing, invalid, or not larger than the mobile breakpoint, the
+ * result only includes the mobile breakpoint.
  *
  * @param configOrSettings Global styles config or viewport settings.
  * @return Sanitized viewport breakpoints.
@@ -94,47 +91,39 @@ export function getViewportBreakpoints(
 	configOrSettings?: GlobalStylesConfig | ViewportSettings
 ): ViewportBreakpoints {
 	const viewportSettings = getViewportSettings( configOrSettings );
-	const breakpoints: Partial< Record< ViewportBreakpoint, string > > = {};
+	const breakpoints: ViewportBreakpoints = {};
+	const breakpointValuesInPixels: Partial<
+		Record< ViewportBreakpoint, number >
+	> = {};
 
 	Object.keys( DEFAULT_VIEWPORT_BREAKPOINTS ).forEach( ( breakpoint ) => {
 		const key = breakpoint as ViewportBreakpoint;
 		const value = viewportSettings[ key ];
-		if ( isValidViewportSize( value ) ) {
+		const px = getViewportBreakpointValueInPixels( value );
+		if ( px !== undefined && isValidViewportSize( value ) ) {
 			breakpoints[ key ] = value.trim();
+			breakpointValuesInPixels[ key ] = px;
 		}
 	} );
 
-	if ( ! breakpoints.mobile && ! breakpoints.tablet ) {
+	const breakpointNames = Object.keys( breakpoints );
+	if ( ! breakpointNames.length ) {
 		return { ...DEFAULT_VIEWPORT_BREAKPOINTS };
 	}
 
-	if ( ! breakpoints.mobile ) {
-		return { mobile: breakpoints.tablet as string };
+	if ( 1 === breakpointNames.length ) {
+		return breakpoints;
 	}
 
-	if ( ! breakpoints.tablet ) {
-		return { mobile: breakpoints.mobile };
-	}
-
-	const mobileBreakpoint = getViewportBreakpointValueInPixels(
-		breakpoints.mobile
-	);
-	const tabletBreakpoint = getViewportBreakpointValueInPixels(
-		breakpoints.tablet
-	);
-
+	const mobile = breakpoints.mobile!;
+	const tablet = breakpoints.tablet!;
 	if (
-		mobileBreakpoint === undefined ||
-		tabletBreakpoint === undefined ||
-		mobileBreakpoint >= tabletBreakpoint
+		breakpointValuesInPixels.mobile! >= breakpointValuesInPixels.tablet!
 	) {
-		return { mobile: breakpoints.mobile };
+		return { mobile };
 	}
 
-	return {
-		mobile: breakpoints.mobile,
-		tablet: breakpoints.tablet,
-	};
+	return { mobile, tablet };
 }
 
 /**
@@ -148,14 +137,16 @@ export function getResponsiveMediaQueries(
 	configOrSettings?: GlobalStylesConfig | ViewportSettings
 ): Record< string, string > {
 	const breakpoints = getViewportBreakpoints( configOrSettings );
-	const mediaQueries: Record< string, string > = {
-		'@mobile': `@media (width <= ${ breakpoints.mobile })`,
-	};
+	const mediaQueries: Record< string, string > = {};
+
+	if ( breakpoints.mobile ) {
+		mediaQueries[ '@mobile' ] = `@media (width <= ${ breakpoints.mobile })`;
+	}
 
 	if ( breakpoints.tablet ) {
-		mediaQueries[
-			'@tablet'
-		] = `@media (${ breakpoints.mobile } < width <= ${ breakpoints.tablet })`;
+		mediaQueries[ '@tablet' ] = breakpoints.mobile
+			? `@media (${ breakpoints.mobile } < width <= ${ breakpoints.tablet })`
+			: `@media (width <= ${ breakpoints.tablet })`;
 	}
 
 	return mediaQueries;

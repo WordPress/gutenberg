@@ -1173,6 +1173,53 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'uses a single max-width tablet query when only the tablet breakpoint is valid', () => {
+			const tree = {
+				settings: {
+					viewport: {
+						mobile: '100%',
+						tablet: '64rem',
+					},
+				},
+				styles: {
+					blocks: {
+						'core/button': {
+							'@mobile': {
+								color: {
+									text: 'blue',
+								},
+							},
+							'@tablet': {
+								color: {
+									text: 'green',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 64rem){:root :where(.wp-block-button){color: green;}}'
+			);
+		} );
+
 		it( 'handles responsive pseudo selector styles', () => {
 			const tree = {
 				styles: {

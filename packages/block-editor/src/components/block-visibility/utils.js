@@ -18,10 +18,13 @@ const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 export function getBlockVisibilityViewportEntries( viewportSettings ) {
 	const breakpoints = getViewportBreakpoints( viewportSettings );
 
+	// Desktop has no breakpoint, so only filter mobile/tablet by configured viewport support.
 	return BLOCK_VISIBILITY_VIEWPORT_ENTRIES.filter(
 		( [ viewport ] ) =>
-			viewport !== BLOCK_VISIBILITY_VIEWPORTS.tablet.key ||
-			breakpoints.tablet !== undefined
+			( viewport !== BLOCK_VISIBILITY_VIEWPORTS.tablet.key ||
+				breakpoints.tablet !== undefined ) &&
+			( viewport !== BLOCK_VISIBILITY_VIEWPORTS.mobile.key ||
+				breakpoints.mobile !== undefined )
 	);
 }
 

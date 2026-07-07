@@ -38,6 +38,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	const {
 		deviceType,
 		homeUrl,
+		hasMobileViewport,
 		hasTabletViewport,
 		isTemplate,
 		isViewable,
@@ -59,13 +60,14 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
 		const _currentPostType = getCurrentPostType();
+		const viewportBreakpoints = getViewportBreakpoints(
+			blockEditorSettings.__experimentalFeatures?.viewport
+		);
 		return {
 			deviceType: getDeviceType(),
 			homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
-			hasTabletViewport:
-				getViewportBreakpoints(
-					blockEditorSettings.__experimentalFeatures?.viewport
-				).tablet !== undefined,
+			hasMobileViewport: viewportBreakpoints.mobile !== undefined,
+			hasTabletViewport: viewportBreakpoints.tablet !== undefined,
 			isTemplate: _currentPostType === 'wp_template',
 			isViewable: getPostType( _currentPostType )?.viewable ?? false,
 			showIconLabels: get( 'core', 'showIconLabels' ),
@@ -149,14 +151,18 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 					},
 			  ]
 			: [] ),
-		{
-			value: 'Mobile',
-			label: __( 'Mobile' ),
-			icon: mobile,
-			info: isResponsiveEditing
-				? __( 'Make mobile exclusive changes.' )
-				: __( 'Preview mobile viewport.' ),
-		},
+		...( hasMobileViewport
+			? [
+					{
+						value: 'Mobile',
+						label: __( 'Mobile' ),
+						icon: mobile,
+						info: isResponsiveEditing
+							? __( 'Make mobile exclusive changes.' )
+							: __( 'Preview mobile viewport.' ),
+					},
+			  ]
+			: [] ),
 	];
 
 	return (

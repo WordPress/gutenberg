@@ -74,13 +74,24 @@ describe( 'viewport utils', () => {
 			} );
 		} );
 
-		it( 'uses a single valid custom breakpoint as mobile-only', () => {
+		it( 'returns the configured viewport for a single breakpoint', () => {
 			expect(
 				getViewportBreakpoints( {
 					tablet: '64rem',
 				} )
 			).toEqual( {
-				mobile: '64rem',
+				tablet: '64rem',
+			} );
+		} );
+
+		it( 'preserves the tablet key when mobile is invalid', () => {
+			expect(
+				getViewportBreakpoints( {
+					mobile: '100%',
+					tablet: '64rem',
+				} )
+			).toEqual( {
+				tablet: '64rem',
 			} );
 		} );
 
@@ -129,6 +140,17 @@ describe( 'viewport utils', () => {
 				} )
 			).toEqual( {
 				'@mobile': '@media (width <= 640px)',
+			} );
+		} );
+
+		it( 'uses a single max-width tablet media query when only tablet is valid', () => {
+			expect(
+				getResponsiveMediaQueries( {
+					mobile: '100%',
+					tablet: '64rem',
+				} )
+			).toEqual( {
+				'@tablet': '@media (width <= 64rem)',
 			} );
 		} );
 
