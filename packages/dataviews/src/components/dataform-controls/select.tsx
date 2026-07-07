@@ -53,7 +53,6 @@ export default function Select< Item >( {
 			help={ description }
 			options={ elements }
 			onChange={ onChangeControl }
-			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
 			multiple={ isMultiple }
 			disabled={ disabled }

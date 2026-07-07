@@ -69,6 +69,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// WordPress 7.1 compat.
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php';
+	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-view-config-data.php';
 	require __DIR__ . '/compat/wordpress-7.1/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-wp-icon-collections-registry.php';

@@ -57,7 +57,7 @@ Given an array of InnerBlocks templates or Block Objects, returns an array of cr
 
 _Parameters_
 
--   _innerBlocksOrTemplate_ `Array< Block | [ string, Record< string, unknown >?, Array< unknown >? ] >`: Nested blocks or InnerBlocks templates.
+-   _innerBlocksOrTemplate_ `Array< Block | TemplateBlock >`: Nested blocks or InnerBlocks templates.
 
 _Returns_
 
