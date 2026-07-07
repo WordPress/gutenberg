@@ -737,6 +737,10 @@ export const restoreRevision =
 		// Save the post to persist the restored revision.
 		await dispatch.savePost();
 
+		// The saved post is now newer than any autosave, so the
+		// autosave notice is stale.
+		registry.dispatch( noticesStore ).removeNotice( 'autosave-exists' );
+
 		// Show success notice.
 		registry.dispatch( noticesStore ).createSuccessNotice(
 			sprintf(
