@@ -42,6 +42,12 @@ const observeAndResizeJS = function () {
 	}
 
 	function sendResize() {
+		// This runs in the document <head>, and as a `load`/`resize` listener,
+		// so the body may not exist yet. Bail rather than throw on a null body.
+		if ( ! document.body ) {
+			return;
+		}
+
 		const clientBoundingRect = document.body.getBoundingClientRect();
 
 		window.parent.postMessage(
