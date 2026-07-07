@@ -344,8 +344,14 @@ export const registerCoreBlocks = (
 					apiVersion: 3,
 				} ),
 				// Always pass the postId context so the server-side render can
-				// reproduce the same output as the front end.
-				usesContext: [ 'postId' ],
+				// reproduce the same output as the front end, while preserving
+				// any context declared in the block's PHP registration.
+				usesContext: Array.from(
+					new Set( [
+						...( bootstrappedBlockType?.usesContext ?? [] ),
+						'postId',
+					] )
+				),
 				// Inspector controls are rendered by the auto-register hook in block-editor
 				edit: function Edit( { attributes, context } ) {
 					const disabledRef = useDisabled();
