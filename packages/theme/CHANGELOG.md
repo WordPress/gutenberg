@@ -29,6 +29,7 @@
 
 ### Enhancements
 
+-   Improve the `plugin-wpds/no-token-fallback-values` Stylelint rule message to point developers to the `@wordpress/theme` README for fallback setup guidance ([#79768](https://github.com/WordPress/gutenberg/pull/79768)).
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
 ## 0.17.0 (2026-06-30)
