@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -442,6 +442,7 @@ export function useSuggestionsProvider() {
 		getClientIdsWithDescendants: selectClientIdsWithDescendants,
 	} = useSelect( blockEditorStore );
 	const { requestInterceptorBypass, clearOverlay } = useSuggestionOverlay();
+	const registry = useRegistry();
 
 	const createSuggestion = useCallback(
 		async ( { clientId, blockName, operations } ) => {
@@ -972,27 +973,39 @@ export function useSuggestionsProvider() {
 					const clearAttrs = clearSuggestionMarkerAttributes(
 						selectBlockAttributes( clientId )
 					);
-					if ( clearAttrs ) {
-						requestInterceptorBypass( clientId );
-						updateBlockAttributes( clientId, clearAttrs );
-					}
 					requestInterceptorBypass( clientId );
 					clearOverlay( clientId );
-					moveBlockToPosition(
-						clientId,
-						/*
-						 * `fromRootClientId` must be the block's CURRENT
-						 * parent: after a cross-parent move the block lives
-						 * in the destination parent, and the reducer looks
-						 * the block up there. Passing the original parent
-						 * for both roots made cross-parent rejects silently
-						 * no-op. `moveBlockToPosition` expects '' (not null)
-						 * for the root.
-						 */
-						selectBlockRootClientId( clientId ) ?? '',
-						structuralOp.fromParentClientId ?? '',
-						structuralOp.fromIndex ?? 0
-					);
+					/*
+					 * Batch the marker-clear and the restoring move into ONE
+					 * store update. The interceptor recognizes a reject
+					 * landing by their combination — a block that moved in
+					 * the same tick its pending-move marker disappeared —
+					 * and adopts it instead of re-capturing the restore as
+					 * a fresh move suggestion (which is what happens when
+					 * the two dispatches fire the subscriber separately and
+					 * the reviewer is in Suggesting intent). This is also
+					 * the shape a remote reject arrives in through sync.
+					 */
+					registry.batch( () => {
+						if ( clearAttrs ) {
+							updateBlockAttributes( clientId, clearAttrs );
+						}
+						moveBlockToPosition(
+							clientId,
+							/*
+							 * `fromRootClientId` must be the block's CURRENT
+							 * parent: after a cross-parent move the block lives
+							 * in the destination parent, and the reducer looks
+							 * the block up there. Passing the original parent
+							 * for both roots made cross-parent rejects silently
+							 * no-op. `moveBlockToPosition` expects '' (not null)
+							 * for the root.
+							 */
+							selectBlockRootClientId( clientId ) ?? '',
+							structuralOp.fromParentClientId ?? '',
+							structuralOp.fromIndex ?? 0
+						);
+					} );
 				} else {
 					const clearAttrs = clearSuggestionMarkerAttributes(
 						selectBlockAttributes( clientId )
@@ -1137,6 +1150,7 @@ export function useSuggestionsProvider() {
 			moveBlockToPosition,
 			requestInterceptorBypass,
 			clearOverlay,
+			registry,
 		]
 	);
 

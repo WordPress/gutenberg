@@ -31,6 +31,7 @@ import SuggestionStoreInterceptor, {
 	topLevelRemoved,
 	withSuggestionMarker,
 	lcsClientIds,
+	stableSiblingSet,
 } from '../store-interceptor';
 import {
 	SuggestionOverlayProvider,
@@ -930,6 +931,166 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		} );
 	} );
 
+	it( 'attributes an ambiguous adjacent swap to the selected (moved) block', async () => {
+		// Moving B above A produces the same order as moving A below B, so
+		// order-diffing alone can tag the wrong block. The user's move keeps
+		// B selected — the marker must land on B, with A left untouched.
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const c = createBlock( TEST_BLOCK_NAME, { content: 'C' } );
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ a, b, c ],
+		} );
+
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).selectBlock( b.clientId );
+			registry
+				.dispatch( blockEditorStore )
+				.moveBlocksUp( [ b.clientId ], '' );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks.map( ( bl ) => bl.attributes?.content ) ).toEqual( [
+			'B',
+			'A',
+			'C',
+		] );
+
+		// The marker sits on the moved block, recording its true origin.
+		expect(
+			liveBlocks.find( ( bl ) => bl.clientId === b.clientId )?.attributes
+				?.metadata?.suggestion
+		).toMatchObject( {
+			type: 'pending-move',
+			fromIndex: 1,
+			fromAnchorClientId: a.clientId,
+		} );
+		// The block it swapped past is NOT tagged.
+		expect(
+			liveBlocks.find( ( bl ) => bl.clientId === a.clientId )?.attributes
+				?.metadata?.suggestion
+		).toBeUndefined();
+
+		expect( getOverlay().entries[ a.clientId ] ).toBeUndefined();
+		expect(
+			getOverlay().entries[ b.clientId ]?.structuralOp
+		).toMatchObject( {
+			type: 'block-move',
+			clientId: b.clientId,
+			fromIndex: 1,
+		} );
+	} );
+
+	it( 'keeps a single pending-move entry when the selected block is nudged twice', async () => {
+		// Two "Move up" clicks on the same block are one logical suggestion:
+		// each hop must update the same marker and overlay entry, not tag a
+		// different displaced sibling per hop.
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const c = createBlock( TEST_BLOCK_NAME, { content: 'C' } );
+		const d = createBlock( TEST_BLOCK_NAME, { content: 'D' } );
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ a, b, c, d ],
+		} );
+
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).selectBlock( c.clientId );
+			registry
+				.dispatch( blockEditorStore )
+				.moveBlocksUp( [ c.clientId ], '' );
+		} );
+		await flushSubscribers();
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.moveBlocksUp( [ c.clientId ], '' );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks.map( ( bl ) => bl.attributes?.content ) ).toEqual( [
+			'C',
+			'A',
+			'B',
+			'D',
+		] );
+
+		// Exactly one block is tagged — the one the user moved — and its
+		// marker still points at the true origin (index 2).
+		const tagged = liveBlocks.filter(
+			( bl ) =>
+				bl.attributes?.metadata?.suggestion?.type === 'pending-move'
+		);
+		expect( tagged ).toHaveLength( 1 );
+		expect( tagged[ 0 ].clientId ).toBe( c.clientId );
+		expect( tagged[ 0 ].attributes.metadata.suggestion ).toMatchObject( {
+			fromIndex: 2,
+			fromAnchorClientId: b.clientId,
+		} );
+
+		// Only the moved block has an overlay entry to auto-save.
+		expect( getOverlay().entries[ a.clientId ] ).toBeUndefined();
+		expect( getOverlay().entries[ b.clientId ] ).toBeUndefined();
+		expect(
+			getOverlay().entries[ c.clientId ]?.structuralOp
+		).toMatchObject( {
+			type: 'block-move',
+			clientId: c.clientId,
+			fromIndex: 2,
+			fromAnchorClientId: b.clientId,
+		} );
+	} );
+
+	it( 'adopts a batched marker-clear + restore move as a reject landing', async () => {
+		// Rejecting a pending move clears the marker and restores the block
+		// to its origin in one batched update (the provider does this
+		// locally; a remote reject arrives through sync in the same shape).
+		// The interceptor must adopt that reorder — re-capturing it would
+		// spawn a phantom move suggestion right after the reject.
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const c = createBlock( TEST_BLOCK_NAME, { content: 'C' } );
+		const { registry } = setup( { initialBlocks: [ a, b, c ] } );
+
+		// The user's move: B up, tagged pending-move.
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).selectBlock( b.clientId );
+			registry
+				.dispatch( blockEditorStore )
+				.moveBlocksUp( [ b.clientId ], '' );
+		} );
+		await flushSubscribers();
+		expect(
+			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
+				?.metadata?.suggestion?.type
+		).toBe( 'pending-move' );
+
+		// The reject landing: marker-clear + restoring move in one batch.
+		await act( async () => {
+			registry.batch( () => {
+				registry
+					.dispatch( blockEditorStore )
+					.updateBlockAttributes( b.clientId, { metadata: {} } );
+				registry
+					.dispatch( blockEditorStore )
+					.moveBlockToPosition( b.clientId, '', '', 1 );
+			} );
+		} );
+		await flushSubscribers();
+
+		// Order is restored and NOTHING is re-tagged.
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks.map( ( bl ) => bl.attributes?.content ) ).toEqual( [
+			'A',
+			'B',
+			'C',
+		] );
+		for ( const bl of liveBlocks ) {
+			expect( bl.attributes?.metadata?.suggestion ).toBeUndefined();
+		}
+	} );
+
 	it( 'tags only the top-level new block when an inserted subtree contains nested children', async () => {
 		// A Group block with a child paragraph dispatches both as new in
 		// the same tick. The interceptor must tag only the top-level
@@ -1316,6 +1477,60 @@ describe( 'lcsClientIds', () => {
 	it( 'returns an empty set when either side is empty', () => {
 		expect( lcsClientIds( [], [ 'a' ] ).size ).toBe( 0 );
 		expect( lcsClientIds( [ 'a' ], [] ).size ).toBe( 0 );
+	} );
+} );
+
+describe( 'stableSiblingSet', () => {
+	it( 'attributes an ambiguous adjacent swap to the selected block', () => {
+		// [A, B, C] → [B, A, C] could be "B moved up" or "A moved down";
+		// pure LCS can pick either. The selection breaks the tie: B was
+		// the block the user acted on, so A and C are stable.
+		const stable = stableSiblingSet(
+			[ 'a', 'b', 'c' ],
+			[ 'b', 'a', 'c' ],
+			new Set( [ 'b' ] )
+		);
+		expect( Array.from( stable ).sort() ).toEqual( [ 'a', 'c' ] );
+	} );
+
+	it( 'flags every block of a multi-selection that moved together', () => {
+		const stable = stableSiblingSet(
+			[ 'a', 'b', 'c', 'd' ],
+			[ 'b', 'c', 'a', 'd' ],
+			new Set( [ 'b', 'c' ] )
+		);
+		expect( Array.from( stable ).sort() ).toEqual( [ 'a', 'd' ] );
+	} );
+
+	it( 'keeps a selected block stable when it did not change position', () => {
+		// C is selected alongside B, but only B moved: C keeps its slot in
+		// the candidate order and must not be tagged.
+		const stable = stableSiblingSet(
+			[ 'a', 'b', 'c', 'd' ],
+			[ 'b', 'a', 'c', 'd' ],
+			new Set( [ 'b', 'c' ] )
+		);
+		expect( Array.from( stable ).sort() ).toEqual( [ 'a', 'c', 'd' ] );
+	} );
+
+	it( 'falls back to the LCS when the selection does not explain the reorder', () => {
+		// B is selected but C is what moved — removing B from both orders
+		// does not leave equal sequences, so the LCS heuristic decides.
+		const stable = stableSiblingSet(
+			[ 'a', 'b', 'c', 'd' ],
+			[ 'c', 'a', 'b', 'd' ],
+			new Set( [ 'b' ] )
+		);
+		expect( Array.from( stable ).sort() ).toEqual( [ 'a', 'b', 'd' ] );
+	} );
+
+	it( 'falls back to the LCS when nothing is selected', () => {
+		const stable = stableSiblingSet(
+			[ 'a', 'b', 'c', 'd' ],
+			[ 'a', 'c', 'd', 'b' ],
+			new Set()
+		);
+		expect( Array.from( stable ).sort() ).toEqual( [ 'a', 'c', 'd' ] );
 	} );
 } );
 

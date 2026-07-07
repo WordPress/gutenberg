@@ -212,6 +212,135 @@ test.describe( 'Suggestion mode review flows', () => {
 		await expect( summary ).toContainText( 'Move block:' );
 	} );
 
+	test( 'move — moving a block up attributes the suggestion to the moved block', async ( {
+		editor,
+		page,
+	} ) => {
+		// An adjacent swap is ambiguous to order-diffing alone: "Beta moved
+		// up" and "Alpha moved down" produce the same order. The suggestion
+		// must be attributed to the block the user actually acted on — the
+		// selected block — with the ghost at ITS origin, not the other way
+		// around.
+		for ( const content of [ 'Alpha', 'Beta', 'Gamma' ] ) {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content },
+			} );
+		}
+
+		await switchIntent( page, 'Suggesting' );
+
+		const mover = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Beta' } );
+		await editor.selectBlocks( mover );
+		// Attach the auto-save listener before the edit starts the debounce.
+		const suggestionSaved = suggestionSavedPromise( page );
+		await editor.clickBlockToolbarButton( 'Move up' );
+
+		// The moved block carries the pending-move treatment; the block it
+		// swapped past keeps no marker.
+		await expect( mover ).toHaveClass( /is-suggestion-pending-move/ );
+		await expect(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.filter( { hasText: 'Alpha' } )
+		).not.toHaveClass( /is-suggestion-pending-move/ );
+
+		// The ghost previews the MOVED block's content at its origin slot.
+		await expect(
+			editor.canvas
+				.getByTestId( 'suggestion-move-ghost' )
+				.locator( '.is-suggestion-move-ghost__excerpt' )
+		).toHaveText( 'Beta' );
+
+		// The marker records the moved block's true origin (index 1), which
+		// is what places the ghost and what Reject restores.
+		const blocks = await editor.getBlocks();
+		expect( blocks[ 0 ].attributes.content ).toBe( 'Beta' );
+		expect( blocks[ 0 ].attributes.metadata.suggestion ).toMatchObject( {
+			type: 'pending-move',
+			fromIndex: 1,
+		} );
+		expect( blocks[ 1 ].attributes.metadata?.suggestion ).toBeUndefined();
+
+		await suggestionSaved;
+
+		// One move action creates exactly one note.
+		const sidebar = await openNotesSidebar( page );
+		const summaries = sidebar.locator(
+			'.editor-collab-sidebar-panel__suggestion-summary'
+		);
+		await expect( summaries ).toHaveCount( 1 );
+		await expect( summaries ).toContainText( 'Move block:' );
+
+		// Rejecting restores the original order.
+		await decideSuggestion( page, 'Reject' );
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized.indexOf( 'Alpha' ) ).toBeLessThan(
+			serialized.indexOf( 'Beta' )
+		);
+		expect( serialized ).not.toContain( 'pending-move' );
+	} );
+
+	test( 'move — moving the same block twice keeps a single note', async ( {
+		editor,
+		page,
+	} ) => {
+		// Nudging a block up two slots is one logical suggestion. Each hop
+		// must update the same pending-move marker and note — not tag a
+		// different sibling per hop and pile up notes.
+		for ( const content of [ 'Alpha', 'Beta', 'Gamma', 'Delta' ] ) {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content },
+			} );
+		}
+
+		await switchIntent( page, 'Suggesting' );
+
+		const mover = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Gamma' } );
+		await editor.selectBlocks( mover );
+		const firstSaved = suggestionSavedPromise( page );
+		await editor.clickBlockToolbarButton( 'Move up' );
+		await firstSaved;
+
+		const secondSaved = suggestionSavedPromise( page );
+		await editor.clickBlockToolbarButton( 'Move up' );
+		await secondSaved;
+
+		// Only the block the user moved is tagged, and its marker still
+		// points at the true origin (index 2).
+		const blocks = await editor.getBlocks();
+		const tagged = blocks.filter(
+			( block ) =>
+				block.attributes.metadata?.suggestion?.type === 'pending-move'
+		);
+		expect( tagged ).toHaveLength( 1 );
+		expect( tagged[ 0 ].attributes.content ).toBe( 'Gamma' );
+		expect( tagged[ 0 ].attributes.metadata.suggestion.fromIndex ).toBe(
+			2
+		);
+
+		// Both hops fold into a single note.
+		const sidebar = await openNotesSidebar( page );
+		const summaries = sidebar.locator(
+			'.editor-collab-sidebar-panel__suggestion-summary'
+		);
+		await expect( summaries ).toHaveCount( 1 );
+		await expect( summaries ).toContainText( 'Move block:' );
+
+		// Rejecting the single note restores the original order.
+		await decideSuggestion( page, 'Reject' );
+		const serialized = await editor.getEditedPostContent();
+		const order = [ 'Alpha', 'Beta', 'Gamma', 'Delta' ].map( ( text ) =>
+			serialized.indexOf( text )
+		);
+		expect( order ).toEqual( [ ...order ].sort( ( x, y ) => x - y ) );
+	} );
+
 	// --- Review: attribute-set (heading level) ------------------------------
 
 	test( 'accept — an accepted heading-level change lands in the post content', async ( {
