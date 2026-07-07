@@ -244,7 +244,8 @@ jobs:
                   svn_error_file="$(mktemp)"
                   if svn list "$PLUGIN_REPO_URL/$SVN_PATH" \
                     --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
-                    --non-interactive --no-auth-cache >/dev/null 2>"$svn_error_file"; then
+                    --non-interactive --no-auth-cache \
+                    --config-option=servers:global:http-timeout=600 >/dev/null 2>"$svn_error_file"; then
                     echo "SVN branch $SVN_PATH already exists."
                   else
                     if grep -Eq 'E160013|W160013|E200009|non-existent' "$svn_error_file"; then
@@ -383,7 +384,8 @@ jobs:
                   svn_error_file="$(mktemp)"
                   if svn list "$PLUGIN_REPO_URL/tags/$VERSION" \
                     --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
-                    --non-interactive --no-auth-cache >/dev/null 2>"$svn_error_file"; then
+                    --non-interactive --no-auth-cache \
+                    --config-option=servers:global:http-timeout=600 >/dev/null 2>"$svn_error_file"; then
                     echo "::warning::SVN tag tags/$VERSION already exists. It will be removed and recreated from $SVN_PATH."
                     echo "exists=true" >> "$GITHUB_OUTPUT"
                   else
