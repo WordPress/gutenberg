@@ -8,6 +8,7 @@
 
 ### Internal
 
+-   Declare `wpScript: false` to mark the package as bundled rather than externalized. ([#79945](https://github.com/WordPress/gutenberg/pull/79945))
 -   Update `@ariakit/react` to `0.4.32` ([#79860](https://github.com/WordPress/gutenberg/pull/79860)).
 
 ## 17.1.0 (2026-07-01)
