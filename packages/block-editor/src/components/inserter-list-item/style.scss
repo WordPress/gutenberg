@@ -82,15 +82,6 @@
 				pointer-events: none;
 			}
 		}
-
-		&.is-active {
-			color: $white;
-			background: $gray-900;
-
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 2px solid transparent;
-			outline-offset: -2px;
-		}
 	}
 }
 
