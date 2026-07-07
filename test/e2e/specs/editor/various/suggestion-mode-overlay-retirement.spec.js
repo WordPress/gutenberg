@@ -19,9 +19,10 @@
  *      markers via the deletion/addition keyboards; multi-line paste and
  *      autocorrect-style replacements reach RichText's `onChange` as a fresh
  *      `content` value and are diffed into markers by the content reconciler
- *      (exercised below). IME and drag-drop share that reconciler path but
- *      need input injection e2e can't drive; the reconcile-edit unit tests
- *      cover their diff shapes.
+ *      (exercised below). IME composition is driven through the Chrome
+ *      DevTools Protocol; drag-drop shares that reconciler path but needs
+ *      input injection e2e can't drive — the reconcile-edit unit tests
+ *      cover its diff shapes.
  *
  * The `fixme`s are the executable checklist: un-fixme each as its phase lands.
  * Formatting and block-attribute characterization already live in
@@ -423,14 +424,109 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		expect( serialized ).toContain( 'data-suggestion-type="add"' );
 	} );
 
+	test( 'seam: a committed IME composition becomes an add marker via the reconciler', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello ' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+
+		/*
+		 * Drive a real IME composition through the Chrome DevTools Protocol
+		 * (Playwright's own keyboard API can't compose): set composition text,
+		 * then commit it. RichText holds `onChange` until `compositionend`,
+		 * after which the committed text reaches the singleton content
+		 * reconciler as a fresh `content` value and must come back as an add
+		 * marker, not a raw commit.
+		 */
+		const saved = waitForSuggestionSaved( page );
+		const session = await page.context().newCDPSession( page );
+		await session.send( 'Input.imeSetComposition', {
+			text: 'ねこ',
+			selectionStart: 2,
+			selectionEnd: 2,
+		} );
+		await session.send( 'Input.insertText', { text: 'ねこ' } );
+		await saved;
+		await deselect( page );
+
+		await expect(
+			paragraph
+				.locator( `${ SUGGESTION_MARK }[data-suggestion-type="add"]` )
+				.filter( { hasText: 'ねこ' } )
+		).toBeVisible();
+		// The committed text is a suggestion, not part of the base content.
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'data-suggestion-type="add"' );
+	} );
+
+	test( 'seam: a delete straddling an existing marker never corrupts it', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' NEW' );
+		const addMarker = paragraph.locator(
+			`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+		);
+		await expect( addMarker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		/*
+		 * Select "ld NEW" — a range straddling the add marker's boundary —
+		 * and delete it. The deletion keyboard declines ranges overlapping an
+		 * existing suggestion (no nested marks), and the reconciler's diff
+		 * declares the straddling edit unresolvable, so the store interceptor
+		 * captures it as a whole-attribute suggestion. The one behavior this
+		 * seam pins: the existing suggestion is never corrupted.
+		 */
+		const saved = waitForSuggestionSaved( page );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
+		await page.keyboard.press( 'Backspace' );
+		await saved;
+		await deselect( page );
+
+		// Never nested: a marker inside a marker would corrupt both.
+		await expect(
+			paragraph.locator( `${ SUGGESTION_MARK } ${ SUGGESTION_MARK }` )
+		).toHaveCount( 0 );
+		// The straddling edit fell back to an attribute suggestion…
+		await expect( paragraph ).toHaveClass( /is-suggestion-pending/ );
+		// …and the baseline — including the earlier add suggestion, intact —
+		// is what serializes.
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'Hello world' );
+		expect( serialized ).toContain( 'data-suggestion-type="add"' );
+		expect( serialized ).toContain( 'NEW' );
+	} );
+
 	/*
-	 * Remaining seams that need lower-level input injection than Playwright's
-	 * event APIs expose end-to-end:
-	 *   - IME composition (`compositionstart` / `compositionend`)
-	 *   - drag-and-drop text
-	 * The `onChange` diff->marker converter (`SuggestionContentReconciler`) is
-	 * input-event-agnostic and covers them by construction; the autocorrect
-	 * test above exercises that seam, and the converter's edge cases are
+	 * Remaining seam that needs lower-level input injection than Playwright's
+	 * event APIs expose end-to-end: drag-and-drop text. The `onChange`
+	 * diff->marker converter (`SuggestionContentReconciler`) is
+	 * input-event-agnostic and covers it by construction; the autocorrect and
+	 * IME tests above exercise that seam, and the converter's edge cases are
 	 * validated by the reconcile-edit unit tests.
 	 */
 } );

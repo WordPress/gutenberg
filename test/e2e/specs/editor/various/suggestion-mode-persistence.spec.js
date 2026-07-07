@@ -274,6 +274,79 @@ test.describe( 'Suggestion mode persistence', () => {
 		).toBeHidden();
 	} );
 
+	test( 'pending inline suggestions on the front end: additions are hidden, deletions and format runs render their text', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		/*
+		 * The render_block strip is type-aware: a proposed addition must never
+		 * reach the front end, while a proposed deletion or format change only
+		 * unwraps — the marked text is real content and keeps rendering until
+		 * the suggestion is accepted.
+		 */
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Addition target' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Keep rendering me' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Format target' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraphs = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+
+		// A typed addition…
+		const first = paragraphs.filter( { hasText: 'Addition target' } );
+		await first.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' PROPOSED' );
+		await expect(
+			first.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		// …a deletion of "rendering"…
+		const second = paragraphs.filter( { hasText: 'Keep rendering me' } );
+		await second.click();
+		await pageUtils.pressKeys( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 3 } );
+		await page.keyboard.press( 'Backspace' );
+		await expect(
+			second.locator( 'mark.wp-suggestion[data-suggestion-type="del"]' )
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		// …and a format change.
+		const third = paragraphs.filter( { hasText: 'Format target' } );
+		await third.click();
+		await pageUtils.pressKeys( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
+		await pageUtils.pressKeys( 'primary+b' );
+		await expect(
+			third.locator( 'mark.wp-suggestion[data-suggestion-type="format"]' )
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const body = page.locator( 'body' );
+		// The proposed addition never renders until accepted…
+		await expect( body.getByText( 'Addition target' ) ).toBeVisible();
+		await expect( body.getByText( 'PROPOSED' ) ).toBeHidden();
+		// …while deletion and format runs still render their real text…
+		await expect( body.getByText( 'Keep rendering me' ) ).toBeVisible();
+		await expect( body.getByText( 'Format target' ) ).toBeVisible();
+		// …with the marker wrappers stripped.
+		await expect( body.locator( 'mark.wp-suggestion' ) ).toHaveCount( 0 );
+	} );
+
 	test( 'a typed inline addition survives a reload and can still be accepted', async ( {
 		editor,
 		page,

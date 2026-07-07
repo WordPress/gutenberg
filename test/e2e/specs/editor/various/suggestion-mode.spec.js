@@ -58,6 +58,7 @@ test.describe( 'Suggestion mode', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllComments( 'note' );
+		await requestUtils.deleteAllUsers();
 		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
@@ -419,6 +420,135 @@ test.describe( 'Suggestion mode', () => {
 		await expect( paragraph ).toContainText( 'abcdef' );
 	} );
 
+	test( 'collapsed delete: repeated Backspace grows a single del marker', async ( {
+		editor,
+		page,
+	} ) => {
+		// Holding/repeating Backspace must not open a new suggestion (and a
+		// new note) per keystroke: the first press opens the note and each
+		// repeat grows the same marker leftward.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'abcdef' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+
+		const markers = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="del"]'
+		);
+		await expect( markers ).toHaveCount( 1 );
+		await expect( markers ).toHaveText( 'def' );
+		// The text is kept until the suggestion is accepted.
+		await expect( paragraph ).toContainText( 'abcdef' );
+
+		// The sidebar summarizes the run as one deletion.
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+		const summaries = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summaries ).toHaveCount( 1 );
+		await expect( summaries ).toContainText( 'Delete:' );
+		await expect( summaries ).toContainText( 'def' );
+	} );
+
+	test( 'collapsed delete: Backspace over an emoji ZWJ sequence marks the whole grapheme', async ( {
+		editor,
+		page,
+	} ) => {
+		// One Backspace at a caret after a 👨‍👩‍👧 family emoji (three emoji
+		// joined by zero-width joiners) must mark the whole grapheme — not a
+		// single code unit, which would split the sequence and corrupt it.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Family 👨‍👩‍👧' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Backspace' );
+
+		const markers = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="del"]'
+		);
+		await expect( markers ).toHaveCount( 1 );
+		await expect( markers ).toHaveText( '👨‍👩‍👧' );
+		// The grapheme survives, whole, until the suggestion is accepted.
+		await expect( paragraph ).toHaveText( 'Family 👨‍👩‍👧' );
+	} );
+
+	test( 'cut — the clipboard still receives the cut text', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Suggest mode intercepts Cmd/Ctrl+X so the removal becomes a del
+		// marker, but the copy half of the cut must still happen: pasting
+		// elsewhere reproduces the cut text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Target' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const source = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Hello world' } );
+		// Move the block toolbar off the source paragraph before clicking
+		// into it — the toolbar of the (selected) second paragraph floats
+		// over the first and would intercept the click.
+		await editor.selectBlocks( source );
+		await source.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+x' );
+
+		// The cut becomes a del marker (the text stays, struck through)…
+		await expect(
+			source.locator( 'mark.wp-suggestion[data-suggestion-type="del"]' )
+		).toContainText( 'world' );
+
+		// …and the clipboard received the cut text: pasting it into another
+		// paragraph proposes it there as an add marker.
+		const target = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Target' } );
+		await target.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'primary+v' );
+		await expect(
+			target.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+		).toContainText( 'world' );
+	} );
+
 	test( 'style — golden path: bolding a word wraps the run in one format marker (no duplication)', async ( {
 		editor,
 		page,
@@ -489,6 +619,70 @@ test.describe( 'Suggestion mode', () => {
 		await expect( summary ).toBeVisible();
 		await expect( summary ).toContainText( 'Formatting:' );
 		await expect( summary ).toContainText( 'bold' );
+	} );
+
+	test( 'style — italicizing a word wraps the run in one format marker', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+i' );
+
+		const marker = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="format"]'
+		);
+		await expect( marker ).toContainText( 'world' );
+		// The proposed italic lives inside the marker; the run shows once.
+		await expect( paragraph.locator( 'em' ) ).toContainText( 'world' );
+		await expect( paragraph ).toHaveText( 'Hello world' );
+	} );
+
+	test( 'style — applying a link wraps the run in one format marker', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+k' );
+		await page
+			.getByRole( 'combobox', { name: 'Search or type URL' } )
+			.fill( 'https://example.com/' );
+		await page.keyboard.press( 'Enter' );
+
+		const marker = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="format"]'
+		);
+		await expect( marker ).toContainText( 'world' );
+		// The proposed link lives inside the marker; the run shows once.
+		await expect(
+			paragraph.locator( 'a[href="https://example.com/"]' )
+		).toContainText( 'world' );
+		await expect( paragraph ).toHaveText( 'Hello world' );
 	} );
 
 	test( 'captures a heading-level change made via the block-switcher variation picker', async ( {
@@ -704,5 +898,169 @@ test.describe( 'Suggestion mode', () => {
 				'.editor-collab-sidebar-panel__suggestion-summary'
 			)
 		).toContainText( 'Add:' );
+	} );
+
+	test( 'a closed sidebar stays closed when a suggestion is created', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		// Close the (default-open) settings sidebar before suggesting.
+		const settingsToggle = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Settings', exact: true } );
+		if (
+			( await settingsToggle.getAttribute( 'aria-pressed' ) ) === 'true'
+		) {
+			await settingsToggle.click();
+		}
+		const sidebar = page.getByRole( 'region', { name: 'Editor settings' } );
+		await expect( sidebar ).toBeHidden();
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '!' );
+
+		// The marker id is written only after the note saves, so its presence
+		// puts this assertion safely after the moment the sidebar would have
+		// been switched open.
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		await expect( sidebar ).toBeHidden();
+	} );
+
+	test( 'with multiple suggesters, markers are tinted per author', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// Two typed additions in two paragraphs: two markers, two notes, both
+		// authored by the current user.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Alpha' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Beta' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const alpha = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Alpha' } );
+		const beta = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Beta' } );
+
+		// Move the block toolbar off the first paragraph before clicking into
+		// it — the toolbar of the (selected) second paragraph floats over the
+		// first and would intercept the click.
+		await editor.selectBlocks( alpha );
+		await alpha.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' one' );
+		await expect(
+			alpha.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		await beta.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' two' );
+		await expect(
+			beta.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		// Each marker records who proposed it.
+		const currentUserId = await page.evaluate(
+			() => window.wp.data.select( 'core' ).getCurrentUser().id
+		);
+		await expect( alpha.locator( 'mark.wp-suggestion' ) ).toHaveAttribute(
+			'data-author',
+			String( currentUserId )
+		);
+		await expect( beta.locator( 'mark.wp-suggestion' ) ).toHaveAttribute(
+			'data-author',
+			String( currentUserId )
+		);
+
+		// Reassign the second suggestion to another user via REST — the
+		// state a second suggester's note and marker would be saved in.
+		const secondNoteId = Number(
+			await beta
+				.locator( 'mark.wp-suggestion' )
+				.getAttribute( 'data-suggestion-id' )
+		);
+		const secondAuthor = await requestUtils.createUser( {
+			username: 'secondsuggester',
+			email: 'second.suggester@example.com',
+			password: 'secondsuggesterpassword',
+			roles: [ 'editor' ],
+		} );
+		await requestUtils.rest( {
+			method: 'PUT',
+			path: `/wp/v2/comments/${ secondNoteId }`,
+			data: { author: secondAuthor.id },
+		} );
+		await editor.saveDraft();
+		const postId = await page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).getCurrentPostId()
+		);
+		const post = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ postId }`,
+			params: { context: 'edit' },
+		} );
+		await requestUtils.rest( {
+			method: 'PUT',
+			path: `/wp/v2/posts/${ postId }`,
+			data: {
+				content: post.content.raw.replace(
+					new RegExp(
+						`(data-suggestion-id="${ secondNoteId }"[^>]*data-author=")\\d+`
+					),
+					`$1${ secondAuthor.id }`
+				),
+			},
+		} );
+		await page.reload();
+
+		// Each author's marker resolves its own tint.
+		const tintOf = ( locator ) =>
+			locator.evaluate( ( el ) =>
+				window
+					.getComputedStyle( el )
+					.getPropertyValue( '--suggestion-author-color' )
+					.trim()
+			);
+		const alphaMark = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Alpha' } )
+			.locator( 'mark.wp-suggestion' );
+		const betaMark = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Beta' } )
+			.locator( 'mark.wp-suggestion' );
+		await expect( alphaMark ).toBeVisible();
+		await expect( betaMark ).toBeVisible();
+		// The per-author rules are injected asynchronously with the note
+		// threads, so poll rather than reading once.
+		await expect.poll( () => tintOf( alphaMark ) ).not.toBe( '' );
+		await expect.poll( () => tintOf( betaMark ) ).not.toBe( '' );
+		expect( await tintOf( alphaMark ) ).not.toBe(
+			await tintOf( betaMark )
+		);
 	} );
 } );
