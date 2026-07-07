@@ -154,6 +154,7 @@ export {
 	isValidIcon,
 	getBlockLabel as __experimentalGetBlockLabel,
 	getAccessibleBlockLabel as __experimentalGetAccessibleBlockLabel,
+	sanitizeBlockAttributes,
 	__experimentalSanitizeBlockAttributes,
 	getBlockAttributesNamesByRole,
 	__experimentalGetBlockAttributesNamesByRole,

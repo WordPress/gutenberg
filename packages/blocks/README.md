@@ -691,6 +691,19 @@ _Parameters_
 -   _blockName_ `string`: Name of the block (example: “core/columns”).
 -   _variation_ `BlockVariation | BlockVariation[]`: Object describing a block variation.
 
+### sanitizeBlockAttributes
+
+Ensure attributes contains only values defined by block type, and merge default values for missing attributes.
+
+_Parameters_
+
+-   _name_ `string`: The block's name.
+-   _attributes_ `Record< string, unknown >`: The block's attributes.
+
+_Returns_
+
+-   `Record< string, unknown >`: The sanitized attributes.
+
 ### serialize
 
 Takes a block or set of blocks and returns the serialized post content.

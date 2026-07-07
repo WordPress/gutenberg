@@ -21,7 +21,7 @@ import {
 import {
 	isBlockRegistered,
 	normalizeBlockType,
-	__experimentalSanitizeBlockAttributes,
+	sanitizeBlockAttributes,
 } from './utils';
 import type { Block, BlockType, BlockTransform } from '../types';
 
@@ -70,10 +70,7 @@ export function createBlock(
 		} );
 	}
 
-	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
-		name,
-		attributes
-	);
+	const sanitizedAttributes = sanitizeBlockAttributes( name, attributes );
 
 	const clientId = uuid();
 
@@ -164,7 +161,7 @@ export function cloneSanitizedBlock(
 
 	const clientId = uuid();
 
-	const sanitizedAttributes = __experimentalSanitizeBlockAttributes( name, {
+	const sanitizedAttributes = sanitizeBlockAttributes( name, {
 		...block.attributes,
 		...mergeAttributes,
 	} );
