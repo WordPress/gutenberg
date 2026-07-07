@@ -30,7 +30,9 @@ export function getBlockBindingsContext(
 	if ( blockTypeUsesContext ) {
 		for ( const [ key, value ] of Object.entries( blockContext ) ) {
 			if ( blockTypeUsesContext.includes( key ) ) {
-				context ??= {};
+				if ( context === undefined ) {
+					context = {};
+				}
 				context[ key ] = value;
 			}
 		}
@@ -39,7 +41,9 @@ export function getBlockBindingsContext(
 		for ( const source of sources ) {
 			source?.usesContext?.forEach( ( key ) => {
 				if ( key in blockContext ) {
-					context ??= {};
+					if ( context === undefined ) {
+						context = {};
+					}
 					context[ key ] = blockContext[ key ];
 				}
 			} );
