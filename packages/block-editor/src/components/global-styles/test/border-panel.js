@@ -432,5 +432,82 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
+
+		it( 'renders no reset affordance when the shadow is only inherited (no local override)', () => {
+			const inheritedValue = { shadow: 'var:preset|shadow|soft' };
+
+			render(
+				<BorderPanel
+					value={ {} }
+					inheritedValue={ inheritedValue }
+					settings={ settingsAll }
+					onChange={ () => {} }
+					panelId="test-panel"
+				/>
+			);
+
+			// A merely-inherited value must not show the default remove
+			// button nor the local-override blue-dot reset.
+			expect(
+				screen.queryByRole( 'button', { name: /^remove$/i } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', {
+					name: /reset to inherited value/i,
+				} )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'renders the blue-dot InheritanceResetButton for a local override', () => {
+			const inheritedValue = { shadow: 'var:preset|shadow|soft' };
+			const value = { shadow: 'var:preset|shadow|hard' };
+
+			render(
+				<BorderPanel
+					value={ value }
+					inheritedValue={ inheritedValue }
+					settings={ settingsAll }
+					onChange={ () => {} }
+					panelId="test-panel"
+				/>
+			);
+
+			// The local override renders the blue-dot reset (mirroring the
+			// color/gradient controls), not the plain remove button.
+			const resetButton = screen.getByRole( 'button', {
+				name: /reset to inherited value/i,
+			} );
+			expect( resetButton ).toHaveClass(
+				'has-local-override-from-global-styles__reset'
+			);
+			expect(
+				screen.queryByRole( 'button', { name: /^remove$/i } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'renders the default remove button for a locally-set shadow with no inherited value', () => {
+			const value = { shadow: 'var:preset|shadow|hard' };
+
+			render(
+				<BorderPanel
+					value={ value }
+					inheritedValue={ {} }
+					settings={ settingsAll }
+					onChange={ () => {} }
+					panelId="test-panel"
+				/>
+			);
+
+			// With no inherited value there is no override to reset to, so
+			// the plain remove button is used, not the blue-dot affordance.
+			expect(
+				screen.getByRole( 'button', { name: /^remove$/i } )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', {
+					name: /reset to inherited value/i,
+				} )
+			).not.toBeInTheDocument();
+		} );
 	} );
 } );

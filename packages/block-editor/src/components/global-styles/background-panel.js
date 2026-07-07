@@ -462,6 +462,9 @@ export default function BackgroundImagePanel( {
 						inheritedValue={ inheritedValue }
 						defaultControls={ defaultControls }
 						defaultValues={ defaultValues }
+						showInheritanceLabelIndicators={
+							showInheritanceLabelIndicators
+						}
 					/>
 				</InheritanceToolsPanelItem>
 			) }

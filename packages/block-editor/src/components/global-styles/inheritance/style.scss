@@ -7,7 +7,14 @@
 // inherited values: a blue reset dot is rendered as a sibling at the item's
 // inline-end. The states are mutually exclusive.
 .is-inherited-from-global-styles {
-	.components-base-control__label {
+	// `.components-base-control__label` covers most controls (ToggleGroup,
+	// selects, the visible `<span>` label some controls render). Controls
+	// built on a bare `UnitControl`/`NumberControl` (Line height, Letter
+	// spacing, Columns, and unit-based dimension inputs) instead expose their
+	// visible label as `.components-input-control__label`, so it must be
+	// targeted too or those controls silently miss the inherited treatment.
+	.components-base-control__label,
+	.components-input-control__label {
 		text-decoration-line: underline;
 		text-decoration-style: dotted;
 		text-decoration-thickness: 1px;
@@ -121,6 +128,22 @@
 	&.block-editor-panel-color-gradient-settings__reset {
 		position: absolute;
 		justify-content: center;
+		top: 50%;
+		transform: translateY(-50%);
+		margin-block: 0;
+		margin-inline-start: 0;
+		opacity: 1;
+	}
+
+	// Shadow control context: the blue-dot override reset reuses the shadow
+	// remove-button slot, which is absolutely positioned and hover-revealed
+	// (`opacity: 0`). The override dot must stay visible, so re-assert
+	// placement and force `opacity: 1` (this compound selector wins on
+	// specificity).
+	&.block-editor-global-styles__shadow-editor__remove-button {
+		position: absolute;
+		justify-content: center;
+		inset-inline-end: 8px;
 		top: 50%;
 		transform: translateY(-50%);
 		margin-block: 0;

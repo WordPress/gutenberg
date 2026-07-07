@@ -665,6 +665,7 @@ export default function BackgroundImagePanel( {
 	inheritedValue = value,
 	settings,
 	defaultValues = {},
+	showInheritanceLabelIndicators = true,
 } ) {
 	/*
 	 * Resolve inherited `ref` pointers for background controls.
@@ -713,8 +714,14 @@ export default function BackgroundImagePanel( {
 	const localHasImageValue = hasBackgroundImageValue( value );
 	const hasImageValue =
 		localHasImageValue || hasBackgroundImageValue( resolvedInheritedValue );
+	// The blue-dot local-override affordance is part of the inherited-value
+	// treatment. When that treatment is disabled (e.g. in the Global Styles
+	// panel, where the edited value *is* the global style rather than a local
+	// override of it), fall back to the plain reset control.
 	const hasLocalOverride =
-		localHasImageValue && hasBackgroundImageValue( resolvedInheritedValue );
+		showInheritanceLabelIndicators &&
+		localHasImageValue &&
+		hasBackgroundImageValue( resolvedInheritedValue );
 
 	const imageValue =
 		value?.background?.backgroundImage ||
