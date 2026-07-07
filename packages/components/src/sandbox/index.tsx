@@ -60,10 +60,18 @@ const observeAndResizeJS = function () {
 		);
 	}
 
-	// Runs the body-dependent setup once the document body is available.
+	// Runs the body-dependent setup once the document body is available. Reads
+	// `document.body` into a local so the null check narrows it for the rest of
+	// the function: this runs in <head> and via DOMContentLoaded, so the body
+	// isn't guaranteed to exist yet.
 	function connect() {
+		const { body } = document;
+		if ( ! body ) {
+			return;
+		}
+
 		const observer = new MutationObserver( sendResize );
-		observer.observe( document.body, {
+		observer.observe( body, {
 			attributes: true,
 			attributeOldValue: false,
 			characterData: true,
@@ -105,9 +113,9 @@ const observeAndResizeJS = function () {
 			}
 		);
 
-		document.body.style.position = 'absolute';
-		document.body.style.width = '100%';
-		document.body.setAttribute( 'data-resizable-iframe-connected', '' );
+		body.style.position = 'absolute';
+		body.style.width = '100%';
+		body.setAttribute( 'data-resizable-iframe-connected', '' );
 
 		sendResize();
 	}
@@ -261,6 +269,9 @@ function IsolatedSandBox( {
 				type,
 				styles,
 				scripts,
+				// Read inside the memo: the `no-dom-globals-in-react-fc` lint
+				// rule forbids DOM globals in the render body. `lang` rarely
+				// changes after load, so leaving it out of the deps is fine.
 				lang: document.documentElement.lang,
 			} ),
 		[ html, title, type, styles, scripts ]
