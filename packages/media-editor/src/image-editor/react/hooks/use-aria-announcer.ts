@@ -31,22 +31,44 @@ function buildFlipAnnouncement( state: CropperState ): string {
 	return __( 'Flip removed' );
 }
 
-function buildRotationAnnouncement( degrees: number ): string {
-	const rounded = Math.round( degrees );
+function buildRotationAnnouncement(
+	degrees: number,
+	previousDegrees?: number
+): string {
+	const rounded = Math.round( degrees % 360 );
 	if ( rounded === 0 ) {
-		return __( 'Rotation reset' );
+		return __( 'Rotation 0 degrees' );
 	}
-	if ( rounded > 0 ) {
-		return sprintf(
-			/* translators: %d: rotation angle in degrees. */
-			__( 'Rotated %d degrees clockwise' ),
-			rounded
-		);
+
+	if ( previousDegrees !== undefined ) {
+		// Compute signed shortest-arc delta to determine direction.
+		let delta = ( degrees - previousDegrees ) % 360;
+		if ( delta > 180 ) {
+			delta -= 360;
+		}
+		if ( delta < -180 ) {
+			delta += 360;
+		}
+		if ( delta > 0 ) {
+			return sprintf(
+				/* translators: %d: rotation angle in degrees. */
+				__( 'Rotated %d degrees clockwise' ),
+				rounded
+			);
+		}
+		if ( delta < 0 ) {
+			return sprintf(
+				/* translators: %d: rotation angle in degrees. */
+				__( 'Rotated %d degrees counterclockwise' ),
+				360 - rounded
+			);
+		}
 	}
+
 	return sprintf(
-		/* translators: %d: rotation angle in degrees (positive). */
-		__( 'Rotated %d degrees counterclockwise' ),
-		Math.abs( rounded )
+		/* translators: %d: rotation angle in degrees. */
+		__( 'Rotation %d degrees' ),
+		rounded
 	);
 }
 
@@ -97,7 +119,10 @@ function buildAnnouncement(
 				Math.round( state.cropRect.height * 100 );
 
 		if ( rotationChanged && ! zoomChanged && ! cropChanged ) {
-			return buildRotationAnnouncement( state.rotation );
+			return buildRotationAnnouncement(
+				state.rotation,
+				previousState.rotation
+			);
 		}
 		if ( cropChanged && ! zoomChanged && ! rotationChanged ) {
 			return buildCropAnnouncement( state );
@@ -111,7 +136,9 @@ function buildAnnouncement(
 	const parts: string[] = [];
 	parts.push( buildZoomAnnouncement( state ) );
 	if ( state.rotation !== 0 ) {
-		parts.push( buildRotationAnnouncement( state.rotation ) );
+		parts.push(
+			buildRotationAnnouncement( state.rotation, previousState?.rotation )
+		);
 	}
 	parts.push( buildCropAnnouncement( state ) );
 	if ( state.flip.horizontal || state.flip.vertical ) {

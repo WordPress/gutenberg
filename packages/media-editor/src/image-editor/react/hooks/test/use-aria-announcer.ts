@@ -113,7 +113,7 @@ describe( 'useAriaAnnouncer', () => {
 		expect( result.current ).toBe( 'Rotated 15 degrees clockwise' );
 	} );
 
-	it( 'announces counterclockwise rotation for negative angles', () => {
+	it( 'announces counterclockwise rotation for shortest-arc CCW changes', () => {
 		const { result, rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{ initialProps: { state: makeState() } }
@@ -121,12 +121,29 @@ describe( 'useAriaAnnouncer', () => {
 
 		act( () => jest.advanceTimersByTime( 300 ) );
 
+		// 0 → 350 is a -10° shortest-arc delta (counterclockwise).
 		rerender( {
-			state: makeState( { rotation: -10 } ),
+			state: makeState( { rotation: 350 } ),
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
 		expect( result.current ).toBe( 'Rotated 10 degrees counterclockwise' );
+	} );
+
+	it( 'announces rotation back to zero', () => {
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{ initialProps: { state: makeState( { rotation: 15 } ) } }
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		rerender( {
+			state: makeState( { rotation: 0 } ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Rotation 0 degrees' );
 	} );
 
 	it( 'announces only zoom when only zoom changes', () => {
