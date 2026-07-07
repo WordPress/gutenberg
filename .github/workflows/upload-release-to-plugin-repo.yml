@@ -372,7 +372,7 @@ jobs:
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
             VERSION: ${{ github.event.release.name }}
-            SVN_PATH: ${{ needs.compute-should-update-trunk.outputs.should_update_trunk && 'trunk' || format( 'branches/{0}', needs.compute-major-version.outputs.major_version ) }}
+            SVN_PATH: ${{ needs.compute-should-update-trunk.outputs.should_update_trunk == 'true' && 'trunk' || format( 'branches/{0}', needs.compute-major-version.outputs.major_version ) }}
         steps:
             - name: Install Subversion
               run: sudo apt-get update -y && sudo apt-get install -y subversion
