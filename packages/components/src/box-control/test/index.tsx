@@ -29,7 +29,6 @@ const ControlledBoxControl = (
 
 	return (
 		<BoxControl
-			__next40pxDefaultSize
 			values={ state }
 			onChange={ ( next ) => setState( next ) }
 			{ ...extraProps }
@@ -42,7 +41,7 @@ const UncontrolledBoxControl = ( {
 	...props
 }: DistributiveOmit< BoxControlProps, 'onChange' > & {
 	onChange?: BoxControlProps[ 'onChange' ];
-} ) => <BoxControl __next40pxDefaultSize onChange={ onChange } { ...props } />;
+} ) => <BoxControl onChange={ onChange } { ...props } />;
 
 describe( 'BoxControl', () => {
 	describe( 'Basic rendering', () => {

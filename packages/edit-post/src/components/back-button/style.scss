@@ -7,8 +7,11 @@
 .edit-post-fullscreen-mode-close__view-mode-toggle {
 	top: 0;
 	left: 0;
-	height: $header-height;
-	width: $header-height;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: $button-size-compact;
+	width: $button-size-compact;
 	z-index: 100;
 
 	.components-button {
@@ -31,28 +34,9 @@
 		}
 	}
 
-	.edit-post-fullscreen-mode-close__view-mode-toggle-icon {
-		svg,
-		img {
-			background: $gray-900;
-			display: block;
-		}
+	&:hover .edit-post-fullscreen-mode-close__back-icon {
+		color: var(--wp-admin-theme-color);
 	}
-}
-
-.edit-post-fullscreen-mode-close-site-icon__icon {
-	fill: currentColor;
-	width: 100%;
-	height: 100%;
-	padding: $grid-unit-15;
-}
-
-.edit-post-fullscreen-mode-close-site-icon__image {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	background: #333;
-	aspect-ratio: 1 / 1;
 }
 
 .edit-post-fullscreen-mode-close.components-button:focus {
@@ -73,38 +57,14 @@
 
 .edit-post-fullscreen-mode-close__back-icon {
 	position: absolute;
-	top: 0;
-	left: 0;
-	width: $header-height;
-	height: $header-height;
+	width: $button-size-compact;
+	height: $button-size-compact;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background-color: hsla(0, 0%, 80%);
 	pointer-events: none;
 
 	svg {
 		fill: currentColor;
-	}
-
-	&.has-site-icon {
-		background-color: hsla(0, 0%, 100%, 0.6);
-		-webkit-backdrop-filter: saturate(180%) blur(15px);
-		backdrop-filter: saturate(180%) blur(15px);
-	}
-}
-
-/**
- *  Show icon label overrides.
- */
-.show-icon-labels .editor-header {
-	.edit-post-fullscreen-mode-close.has-icon {
-		width: $header-height;
-		svg {
-			display: block;
-		}
-		&::after {
-			content: none;
-		}
 	}
 }

@@ -5,6 +5,7 @@
  */
 import { execSync, spawn } from 'child_process';
 import { fileURLToPath } from 'url';
+import { parseArgs } from 'util';
 import path from 'path';
 import fs from 'fs';
 
@@ -114,6 +115,14 @@ const readyMarkerFile = {
  * Main dev orchestration function.
  */
 async function dev() {
+	const { values } = parseArgs( {
+		options: {
+			'skip-types': { type: 'boolean', default: false },
+		},
+		strict: false,
+	} );
+	const skipTypes = values[ 'skip-types' ];
+
 	console.log( '🔨 Starting development build...\n' );
 
 	const startTime = Date.now();
@@ -162,24 +171,26 @@ async function dev() {
 			path.join( __dirname, 'packages/generate-worker-placeholders.mjs' ),
 		] );
 
-		console.log( '\n📘 Building TypeScript types...\n' );
-		const tsStartTime = Date.now();
-		await exec( 'tsgo', [ '--build' ] ).catch( () => {
-			console.error(
-				'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
-			);
-			throw new Error( 'TypeScript compilation failed' );
-		} );
-		const buildTime = Date.now() - tsStartTime;
-		console.log( `   ✔ Built TypeScript types (${ buildTime }ms)` );
+		if ( ! skipTypes ) {
+			console.log( '\n📘 Building TypeScript types...\n' );
+			const tsStartTime = Date.now();
+			await exec( 'tsgo', [ '--build' ] ).catch( () => {
+				console.error(
+					'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
+				);
+				throw new Error( 'TypeScript compilation failed' );
+			} );
+			const buildTime = Date.now() - tsStartTime;
+			console.log( `   ✔ Built TypeScript types (${ buildTime }ms)` );
 
-		console.log( '\n✅ Checking type declaration files...' );
-		await exec( 'node', [
-			path.join(
-				__dirname,
-				'packages/check-build-type-declaration-files.cjs'
-			),
-		] );
+			console.log( '\n✅ Checking type declaration files...' );
+			await exec( 'node', [
+				path.join(
+					__dirname,
+					'packages/check-build-type-declaration-files.cjs'
+				),
+			] );
+		}
 
 		console.log( '\n📦 Building vendor files...' );
 		await exec( 'node', [
@@ -194,15 +205,19 @@ async function dev() {
 		);
 
 		console.log( '👀 Starting watch mode...\n' );
-		console.log( '   - TypeScript compiler watching for type changes' );
+		if ( ! skipTypes ) {
+			console.log( '   - TypeScript compiler watching for type changes' );
+		}
 		console.log( '   - Package builder watching for source changes\n' );
 
-		// Start TypeScript watch
-		const tscWatch = execAsync( 'tsgo', [
-			'--build',
-			'--watch',
-			'--preserveWatchOutput',
-		] );
+		// Start TypeScript watch (unless types are skipped).
+		const tscWatch = skipTypes
+			? null
+			: execAsync( 'tsgo', [
+					'--build',
+					'--watch',
+					'--preserveWatchOutput',
+			  ] );
 
 		// Start package build watch and wait for initial build to complete
 		// before signaling ready. wp-build outputs "Watching for changes..."
@@ -217,7 +232,7 @@ async function dev() {
 		// Handle process termination
 		const cleanup = () => {
 			console.log( '\n\n👋 Stopping watch mode...' );
-			tscWatch.kill();
+			tscWatch?.kill();
 			buildWatch.kill();
 			readyMarkerFile.cleanup();
 			process.exit( 0 );

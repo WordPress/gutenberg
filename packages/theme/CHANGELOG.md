@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
+
+### Documentation
+
+-   Document that `ThemeProvider` does not accept wrapper customization props ([#79763](https://github.com/WordPress/gutenberg/pull/79763)).
+-   Clarify the design token documentation entry points and keep the generated token guidance source internal ([#79829](https://github.com/WordPress/gutenberg/pull/79829)).
+-   Clarify that `--wpds-color-stroke-focus` is a standalone exception to the normal color token naming pattern ([#79764](https://github.com/WordPress/gutenberg/pull/79764)).
+
+## 0.17.0 (2026-06-30)
+
+### Breaking Changes
+
+-   Remove the root `CornerRadiusPreset` type export. Derive it from `ThemeProvider`'s `cornerRadius` prop instead ([#79620](https://github.com/WordPress/gutenberg/pull/79620)).
+
+### Internal
+
+-   Temporarily restore previously removed private APIs to allow for an easier consumer migration before they are removed in WordPress 7.3 ([#79594](https://github.com/WordPress/gutenberg/pull/79594), [#79620](https://github.com/WordPress/gutenberg/pull/79620)).
+
+## 0.16.0 (2026-06-24)
+
 ### Breaking Changes
 
 -   Rename the `bg` and `fg` design token groups to `background` and `foreground`. All `--wpds-color-bg-*` custom properties are now `--wpds-color-background-*`, and all `--wpds-color-fg-*` custom properties are now `--wpds-color-foreground-*` ([#79098](https://github.com/WordPress/gutenberg/pull/79098)).

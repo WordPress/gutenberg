@@ -14,7 +14,12 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 /**
  * Internal dependencies
  */
-import { cloneFile, convertBlobToFile, renameFile } from '../utils';
+import {
+	cloneFile,
+	convertBlobToFile,
+	isAnimatedGif,
+	renameFile,
+} from '../utils';
 import { canvasConvertToJpeg } from '../canvas-utils';
 import {
 	isClientSideMediaSupported,
@@ -34,6 +39,11 @@ import {
 	terminateVipsWorker,
 	maybeRecycleVipsWorker,
 } from './utils';
+import {
+	convertGifToVideo,
+	isUnsupportedConversionError,
+	terminateVideoConversionWorker,
+} from './utils/video-conversion';
 import type {
 	AccumulateSubSizeAction,
 	AddAction,
@@ -94,6 +104,7 @@ type ActionCreators = {
 	resizeCropItem: typeof resizeCropItem;
 	rotateItem: typeof rotateItem;
 	transcodeImageItem: typeof transcodeImageItem;
+	transcodeGifItem: typeof transcodeGifItem;
 	generateThumbnails: typeof generateThumbnails;
 	finalizeItem: typeof finalizeItem;
 	updateItemProgress: typeof updateItemProgress;
@@ -332,6 +343,17 @@ export function processItem( id: QueueItemId ) {
 			}
 		}
 
+		/*
+		 * GIF-to-video conversion is memory-intensive (WebCodecs encode).
+		 * Limit to 1 concurrent transcoding operation.
+		 */
+		if ( operation === OperationType.TranscodeGif ) {
+			const activeCount = select.getActiveVideoProcessingCount();
+			if ( activeCount >= 1 ) {
+				return;
+			}
+		}
+
 		if ( attachment ) {
 			// Don't update the block with a HEIC URL — the browser can't
 			// display it.  The scaled JPEG sideload will call onChange
@@ -445,6 +467,13 @@ export function processItem( id: QueueItemId ) {
 				);
 				break;
 
+			case OperationType.TranscodeGif:
+				dispatch.transcodeGifItem(
+					item.id,
+					operationArgs as OperationArgs[ OperationType.TranscodeGif ]
+				);
+				break;
+
 			case OperationType.Upload:
 				if ( item.parentId ) {
 					dispatch.sideloadItem( id );
@@ -546,11 +575,13 @@ export function removeItem( id: QueueItemId ) {
 		} );
 
 		/*
-		 * If the queue is now empty, terminate the VIPS worker to free
-		 * WASM memory. The worker will be lazily re-created if needed.
+		 * If the queue is now empty, terminate the background workers to free
+		 * their memory (WASM for VIPS, the WebCodecs encoder for video
+		 * conversion). Both are lazily re-created if needed.
 		 */
 		if ( select.getAllItems().length === 0 ) {
 			terminateVipsWorker();
+			terminateVideoConversionWorker();
 		}
 	};
 }
@@ -603,6 +634,17 @@ export function finishOperation(
 			}
 		}
 
+		/*
+		 * If a video processing operation just finished, there may be items
+		 * waiting due to the video processing concurrency limit.
+		 */
+		if ( previousOperation === OperationType.TranscodeGif ) {
+			const pendingItems = select.getPendingVideoProcessing();
+			for ( const pendingItem of pendingItems ) {
+				dispatch.processItem( pendingItem.id );
+			}
+		}
+
 		// Track vips operations across success and failure paths so a
 		// burst of failures can't bypass the recycle budget; the cancel
 		// path calls the same helper.
@@ -637,12 +679,14 @@ function isValidImageFormat( format: string ): format is ImageFormat {
  * @param file           The image file.
  * @param outputMimeType The target output MIME type.
  * @param interlaced     Whether to use interlaced encoding.
+ * @param quality        Re-encode quality (0-1). Defaults to DEFAULT_OUTPUT_QUALITY.
  * @return The transcode operation tuple if transcoding is needed, null otherwise.
  */
 export async function getTranscodeImageOperation(
 	file: File,
 	outputMimeType: string,
-	interlaced: boolean = false
+	interlaced: boolean = false,
+	quality: number = DEFAULT_OUTPUT_QUALITY
 ): Promise<
 	| [
 			OperationType.TranscodeImage,
@@ -678,7 +722,7 @@ export async function getTranscodeImageOperation(
 		OperationType.TranscodeImage,
 		{
 			outputFormat: formatPart,
-			outputQuality: DEFAULT_OUTPUT_QUALITY,
+			outputQuality: quality,
 			interlaced,
 		},
 	];
@@ -711,6 +755,75 @@ export function prepareItem( id: QueueItemId ) {
 
 		const operations: Operation[] = [];
 		const settings = select.getSettings();
+
+		// Animated GIF → video. WebCodecs is required; client-side media
+		// already runs only under cross-origin isolation, so this is a
+		// capability check, not a browser-support fallback path.
+		//
+		// The GIF uploads through the normal image pipeline so the block
+		// starts as a valid core/image. The converted video is sideloaded as
+		// a companion file of this same attachment after upload (see
+		// generateThumbnails) — like the HEIC original — not as a separate
+		// media library attachment. It is recorded in attachment metadata; the
+		// editor then switches the block to the Video block's GIF variation
+		// playing that companion (see
+		// packages/block-library/src/image/animated-gif-converter.js).
+		if (
+			file.type === 'image/gif' &&
+			settings.gifConvert !== false &&
+			typeof ImageDecoder !== 'undefined' &&
+			typeof VideoEncoder !== 'undefined'
+		) {
+			let isAnimated = false;
+			try {
+				isAnimated = isAnimatedGif( await file.arrayBuffer() );
+			} catch {
+				// If the GIF cannot be read/inspected, fall through to the
+				// normal image pipeline rather than failing the upload.
+				isAnimated = false;
+			}
+			if ( isAnimated ) {
+				// Skip the conversion for transparent GIFs: a <video> cannot
+				// reproduce GIF transparency, so converting would visibly
+				// change the image (e.g. small decorative or emoji-like GIFs
+				// over a colored background). Such GIFs upload as a normal
+				// image instead. Mirrors the PNG → JPEG transparency check in
+				// getTranscodeImageOperation().
+				let hasTransparency = false;
+				const blobUrl = createBlobURL( file );
+				try {
+					hasTransparency = await vipsHasTransparency( blobUrl );
+				} catch {
+					// If the check fails, err on the side of caution and keep
+					// the GIF rather than risk a lossy conversion.
+					hasTransparency = true;
+				} finally {
+					revokeBlobURL( blobUrl );
+				}
+
+				if ( ! hasTransparency ) {
+					operations.push(
+						OperationType.Upload,
+						OperationType.ThumbnailGeneration,
+						OperationType.Finalize
+					);
+
+					dispatch< AddOperationsAction >( {
+						type: Type.AddOperations,
+						id,
+						operations,
+					} );
+
+					// Keep the original GIF so generateThumbnails can
+					// transcode and sideload it once the attachment exists.
+					dispatch.finishOperation( id, {
+						animatedGifFile: item.file,
+					} );
+					return;
+				}
+			}
+		}
+
 		let heicJpeg: File | null = null;
 
 		const isImage = file.type.startsWith( 'image/' );
@@ -1029,7 +1142,8 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				false, // smartCrop
 				addSuffix,
 				item.abortController?.signal,
-				scaledSuffix
+				scaledSuffix,
+				args.quality
 			);
 
 			measure( {
@@ -1234,6 +1348,122 @@ export function transcodeImageItem(
 	};
 }
 
+type TranscodeGifItemArgs = OperationArgs[ OperationType.TranscodeGif ];
+
+/**
+ * Converts an animated GIF to a video file (MP4 or WebM).
+ *
+ * Runs inside a sideload item whose parent is the GIF's image attachment
+ * (see generateThumbnails). The next Upload op then sideloads the
+ * transcoded video as a companion of that attachment under the
+ * `animated_video` image size; the GIF stays the primary attachment and
+ * the editor block stays `core/image`.
+ *
+ * @param id     Item ID.
+ * @param [args] Transcode arguments including output format.
+ */
+export function transcodeGifItem(
+	id: QueueItemId,
+	args?: TranscodeGifItemArgs
+) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const outputFormat = args?.outputFormat ?? 'mp4';
+		const outputMimeType = `video/${ outputFormat }`;
+
+		/*
+		 * item.file is the original GIF until finishOperation swaps in the
+		 * transcoded video below; capture it for the poster sideload.
+		 */
+		const gifFile = item.file;
+
+		try {
+			const file = await convertGifToVideo(
+				item.id,
+				gifFile,
+				outputMimeType
+			);
+
+			// Hand the transcoded video to the next Upload op as the
+			// sideload's payload. The parent attachment (the GIF) is
+			// already uploaded; no blob URL is needed for any block.
+			dispatch.finishOperation( id, { file } );
+
+			/*
+			 * Only now that the video exists, sideload a static first-frame
+			 * poster as a companion (vips decodes just the first GIF frame).
+			 * Queued here rather than alongside the video in
+			 * generateThumbnails so an unsupported/failed conversion never
+			 * leaves an orphaned `animated_video_poster` with no matching
+			 * `animated_video`. This sibling is registered while the video's
+			 * own Upload op is still pending, so the parent's finalize gate
+			 * stays closed until both companions finish. Stored under
+			 * metadata `animated_video_poster`.
+			 */
+			dispatch.addSideloadItem( {
+				file: gifFile,
+				batchId: uuidv4(),
+				parentId: item.parentId,
+				additionalData: {
+					post: item.additionalData?.post,
+					image_size: 'animated_video_poster',
+					convert_format: false,
+				},
+				operations: [
+					[
+						OperationType.TranscodeImage,
+						{
+							outputFormat: 'jpeg',
+							outputQuality: DEFAULT_OUTPUT_QUALITY,
+							interlaced: false,
+						} as OperationArgs[ OperationType.TranscodeImage ],
+					],
+					OperationType.Upload,
+				],
+			} );
+		} catch ( error ) {
+			// An "Unsupported" outcome is a graceful skip, not a failure:
+			// the parent GIF attachment already exists and stays as-is, so
+			// we silently cancel this sideload (no companion video, no
+			// user-facing error). Uploading the original GIF here would
+			// create an `animated_video` meta entry pointing at the GIF
+			// itself — meaningless.
+			if ( isUnsupportedConversionError( error ) ) {
+				dispatch.cancelItem(
+					id,
+					new Error( 'Animated GIF conversion unsupported' ),
+					true
+				);
+				return;
+			}
+			// Real engine failure. The parent GIF attachment is fine —
+			// the user just won't get a companion video. Log the cause
+			// for debuggability and silently cancel the sideload; we do
+			// not surface a "could not be converted to video" toast on
+			// what the user thinks of as an image upload.
+			// eslint-disable-next-line no-console
+			console.error(
+				'[video-conversion] GIF to video conversion failed:',
+				error
+			);
+			dispatch.cancelItem(
+				id,
+				new UploadError( {
+					code: ErrorCode.GIF_TRANSCODING_ERROR,
+					message: 'Animated GIF could not be converted to video',
+					file: item.file,
+					cause: error instanceof Error ? error : undefined,
+				} ),
+				true
+			);
+		}
+	};
+}
+
 /**
  * Adds thumbnail versions to the queue for sideloading.
  *
@@ -1261,7 +1491,9 @@ export function generateThumbnails( id: QueueItemId ) {
 		// sideload flow owns. The HEIC was kept on item.originalHeicFile;
 		// the uploaded file is a JPEG conversion. parentId guarantees
 		// processItem routes this to the sideload endpoint, never the main
-		// create endpoint.
+		// create endpoint. The `source_original` image_size token is
+		// format-agnostic (it also covers HEIF) and matches the server-side
+		// WP_REST_Attachments_Controller::IMAGE_SIZE_SOURCE_ORIGINAL constant.
 		if ( item.originalHeicFile && attachment.id ) {
 			dispatch.addSideloadItem( {
 				file: item.originalHeicFile,
@@ -1269,11 +1501,49 @@ export function generateThumbnails( id: QueueItemId ) {
 				parentId: item.id,
 				additionalData: {
 					post: attachment.id,
-					image_size: 'original-heic',
+					image_size: 'source_original',
 					convert_format: false,
 				},
 				operations: [ OperationType.Upload ],
 			} );
+		}
+
+		// Animated GIF: transcode the original to a video and sideload it
+		// as a companion file of this attachment (recorded in metadata as
+		// `animated_video`), mirroring the HEIC original flow. The
+		// TranscodeGif step keeps the WebCodecs concurrency limit;
+		// parentId routes the result to the sideload endpoint, so no
+		// separate attachment is created.
+		if ( item.animatedGifFile && attachment.id ) {
+			const outputFormat =
+				settings.videoOutputFormat === 'video/webm' ? 'webm' : 'mp4';
+
+			dispatch.addSideloadItem( {
+				file: item.animatedGifFile,
+				batchId: uuidv4(),
+				parentId: item.id,
+				additionalData: {
+					post: attachment.id,
+					image_size: 'animated_video',
+					convert_format: false,
+				},
+				operations: [
+					[
+						OperationType.TranscodeGif,
+						{
+							outputFormat,
+						} as OperationArgs[ OperationType.TranscodeGif ],
+					],
+					OperationType.Upload,
+				],
+			} );
+
+			/*
+			 * The static first-frame poster companion is sideloaded by the
+			 * TranscodeGif operation once the video conversion succeeds (see
+			 * transcodeGifItem), so a failed conversion leaves no orphaned
+			 * poster.
+			 */
 		}
 
 		// Check if image needs rotation.
@@ -1347,6 +1617,26 @@ export function generateThumbnails( id: QueueItemId ) {
 			const outputMimeType = attachment.image_output_format;
 			const interlaced = attachment.image_save_progressive ?? false;
 
+			// Resolve the size-aware encode quality from the
+			// wp_editor_set_quality filter, carried in the upload response.
+			// Quality is reported as 1-100 (WordPress scale); the vips worker
+			// expects 0-1. Fall back to the generic setting, then the
+			// hardcoded default, when the response predates this field.
+			const imageQuality = attachment.image_quality;
+			const fallbackQuality =
+				settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY;
+			const defaultQuality =
+				typeof imageQuality?.default === 'number'
+					? imageQuality.default / 100
+					: fallbackQuality;
+			const qualityForSize = ( sizeName: string ): number => {
+				const sized = imageQuality?.sizes?.[ sizeName ];
+				if ( typeof sized === 'number' ) {
+					return sized / 100;
+				}
+				return defaultQuality;
+			};
+
 			// Check if thumbnails should be transcoded to a different format.
 			// Uses the same transparency-aware logic as the main image
 			// to avoid converting transparent PNGs to JPEG.
@@ -1361,7 +1651,8 @@ export function generateThumbnails( id: QueueItemId ) {
 				thumbnailTranscodeOperation = await getTranscodeImageOperation(
 					thumbnailSource,
 					outputMimeType,
-					interlaced
+					interlaced,
+					defaultQuality
 				);
 			}
 
@@ -1391,16 +1682,33 @@ export function generateThumbnails( id: QueueItemId ) {
 			for ( const [ , names ] of dimensionGroups ) {
 				const imageSize = allImageSizes[ names[ 0 ] ];
 
+				// Sizes grouped here share dimensions, so wp_editor_set_quality
+				// (which is dimension-aware) resolves to the same value for
+				// every name in the group.
+				const sizeQuality = qualityForSize( names[ 0 ] );
+
 				// Build operations list for this thumbnail. The resize step
 				// is UltraHDR-aware and will preserve the gain map automatically.
 				const thumbnailOperations: Operation[] = [
-					[ OperationType.ResizeCrop, { resize: imageSize } ],
+					[
+						OperationType.ResizeCrop,
+						{ resize: imageSize, quality: sizeQuality },
+					],
 				];
 
+				// Add transcoding if format conversion is configured and
+				// the transparency check passed. For UltraHDR sources the
+				// transcode is skipped so the gain map survives the resize.
+				// Otherwise override the template's quality with this size's
+				// resolved value.
 				if ( ! isUltraHdr && thumbnailTranscodeOperation ) {
-					// Add transcoding if format conversion is configured and
-					// the transparency check passed.
-					thumbnailOperations.push( thumbnailTranscodeOperation );
+					thumbnailOperations.push( [
+						thumbnailTranscodeOperation[ 0 ],
+						{
+							...thumbnailTranscodeOperation[ 1 ],
+							outputQuality: sizeQuality,
+						},
+					] );
 				}
 
 				thumbnailOperations.push( OperationType.Upload );
@@ -1454,6 +1762,7 @@ export function generateThumbnails( id: QueueItemId ) {
 										height: bigImageSizeThreshold,
 									},
 									isThresholdResize: true,
+									quality: defaultQuality,
 								},
 							],
 						];

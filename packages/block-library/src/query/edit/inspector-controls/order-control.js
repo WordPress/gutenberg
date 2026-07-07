@@ -33,7 +33,6 @@ function OrderControl( {
 } ) {
 	return (
 		<SelectControl
-			__next40pxDefaultSize
 			label={ __( 'Order by' ) }
 			value={ `${ orderBy }/${ order }` }
 			options={ orderByOptions }

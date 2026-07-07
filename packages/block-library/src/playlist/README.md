@@ -22,7 +22,6 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 
 | Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `currentTrack` | `string` | — | — |
 | `type` | `string` | `"audio"` | — |
 | `order` | `string` | `"asc"` | — |
 | `showTracklist` | `boolean` | `true` | — |
@@ -53,7 +52,6 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 **Provides context:**
 
 - `showArtists` → attribute `showArtists`
-- `currentTrack` → attribute `currentTrack`
 
 ## Block Styles
 

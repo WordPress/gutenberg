@@ -68,6 +68,7 @@ import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import {
 	applyPostChangesToCRDTDoc,
 	defaultCollectionSyncConfig,
+	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 	type PostChanges,
@@ -92,6 +93,52 @@ const defaultSyncedProperties = new Set< string >( [
 	'tags',
 	'title',
 ] );
+
+describe( 'defaultSyncConfig', () => {
+	// Regression test for https://github.com/WordPress/gutenberg/issues/79907:
+	// reporting unchanged properties as changes marks resolved records
+	// (e.g. taxonomy terms) as dirty whenever a synced update arrives.
+	it( 'getChangesFromCRDTDoc returns no changes when the document matches the edited record', () => {
+		const doc = new Y.Doc();
+		const record = {
+			id: 1,
+			name: 'Uncategorized',
+			slug: 'uncategorized',
+			meta: [],
+			_links: { self: [ { href: 'https://example.com' } ] },
+		};
+		defaultSyncConfig.applyChangesToCRDTDoc( doc, record );
+
+		// The edited record deep-equals the document contents, but
+		// `Y.Map.toJSON()` returns fresh object instances.
+		const changes = defaultSyncConfig.getChangesFromCRDTDoc( doc, {
+			...record,
+			meta: [],
+			_links: { self: [ { href: 'https://example.com' } ] },
+		} );
+
+		expect( changes ).toEqual( {} );
+		doc.destroy();
+	} );
+
+	it( 'getChangesFromCRDTDoc returns only the properties that differ from the edited record', () => {
+		const doc = new Y.Doc();
+		defaultSyncConfig.applyChangesToCRDTDoc( doc, {
+			id: 1,
+			name: 'Renamed category',
+			slug: 'uncategorized',
+		} );
+
+		const changes = defaultSyncConfig.getChangesFromCRDTDoc( doc, {
+			id: 1,
+			name: 'Uncategorized',
+			slug: 'uncategorized',
+		} );
+
+		expect( changes ).toEqual( { name: 'Renamed category' } );
+		doc.destroy();
+	} );
+} );
 
 describe( 'defaultCollectionSyncConfig', () => {
 	it( 'has no-op applyChangesToCRDTDoc', () => {
