@@ -42,11 +42,14 @@ export function NoteThread( {
 	onAddReply,
 	onDeleteNote,
 	isSelected,
+	isCompact = false,
 	sidebarRef,
 	floating,
 	onKeyDown,
 } ) {
 	const isFloating = !! floating;
+	// Minimized threads show only the author byline until selected.
+	const showCompact = isCompact && ! isSelected;
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -196,6 +199,7 @@ export function NoteThread( {
 			}
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
+				'is-compact': showCompact,
 			} ) }
 			id={ `note-thread-${ note.id }` }
 			gap="md"
@@ -231,18 +235,22 @@ export function NoteThread( {
 			>
 				{ __( 'Add new reply' ) }
 			</Button>
-			{ ! note.blockClientId && (
+			{ ! note.blockClientId && ! showCompact && (
 				<p className="editor-collab-sidebar-panel__deleted-block-notice">
 					{ __( 'Original block deleted.' ) }
 				</p>
 			) }
-			<Note
-				note={ note }
-				isSelected={ isSelected }
-				onEditNote={ onEditNote }
-				onDeleteNote={ onDeleteNote }
-				onResolve={ handleResolve }
-			/>
+			{ showCompact ? (
+				<NoteCard note={ note } />
+			) : (
+				<Note
+					note={ note }
+					isSelected={ isSelected }
+					onEditNote={ onEditNote }
+					onDeleteNote={ onDeleteNote }
+					onResolve={ handleResolve }
+				/>
+			) }
 			{ isSelected &&
 				allReplies.map( ( reply ) => (
 					<Note
@@ -254,7 +262,7 @@ export function NoteThread( {
 						onDeleteNote={ onDeleteNote }
 					/>
 				) ) }
-			{ ! isSelected && restReplies.length > 0 && (
+			{ ! isSelected && ! isCompact && restReplies.length > 0 && (
 				<Stack
 					direction="row"
 					align="center"
@@ -282,7 +290,7 @@ export function NoteThread( {
 					</Button>
 				</Stack>
 			) }
-			{ ! isSelected && lastReply && (
+			{ ! isSelected && ! isCompact && lastReply && (
 				<Note
 					note={ lastReply }
 					parentNote={ note }

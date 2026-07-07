@@ -89,7 +89,10 @@ export function NoteByline( { avatar, name, date, userId } ) {
 					),
 				} }
 			/>
-			<Stack direction="column">
+			<Stack
+				direction="column"
+				className="editor-collab-sidebar-panel__user-meta"
+			>
 				<span className="editor-collab-sidebar-panel__user-name">
 					{ name ?? currentUserName }
 				</span>

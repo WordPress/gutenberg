@@ -184,11 +184,9 @@ function NotesSidebar( { postId } ) {
 			: [];
 	const currentThread = pickPrimaryNote( currentThreads );
 
-	let notesDropdownValue = 'show';
+	let notesDropdownValue = notesDisplayMode;
 	if ( isAllNotesSidebarActive ) {
 		notesDropdownValue = 'show-all';
-	} else if ( notesDisplayMode === 'hide' ) {
-		notesDropdownValue = 'hide';
 	}
 
 	if ( isDistractionFree ) {
@@ -235,6 +233,10 @@ function NotesSidebar( { postId } ) {
 										{
 											value: 'show-all',
 											label: __( 'Show all notes' ),
+										},
+										{
+											value: 'minimize',
+											label: __( 'Minimize notes' ),
 										},
 										{
 											value: 'hide',
@@ -295,6 +297,7 @@ function NotesSidebar( { postId } ) {
 						sidebarRef={ sidebarRef }
 						styles={ { backgroundColor } }
 						isFloating
+						isCompact={ notesDisplayMode === 'minimize' }
 					/>
 				</PluginSidebar>
 			) }
