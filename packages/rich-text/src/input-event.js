@@ -7,10 +7,10 @@ import { useEvent } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { inputEventContext } from './contexts';
+import { InputEventContext } from './contexts';
 
 export function RichTextInputEvent( { inputType, onInput } ) {
-	const callbacks = useContext( inputEventContext );
+	const callbacks = useContext( InputEventContext );
 
 	/*
 	 * Keep a stable reference to the latest `onInput` so the registered

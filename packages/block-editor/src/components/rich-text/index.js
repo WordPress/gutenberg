@@ -40,8 +40,17 @@ import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
 
-const { useRichText, keyboardShortcutContext, inputEventContext } =
-	unlock( richTextPrivateApis );
+// `RichTextShortcut` and `RichTextInputEvent` now live in
+// `@wordpress/rich-text` so they share the shortcut and input-event contexts
+// with standalone rich text fields. Re-exported below for back-compat (e.g.
+// `@wordpress/format-library` imports them from `@wordpress/block-editor`).
+const {
+	useRichText,
+	KeyboardShortcutContext,
+	InputEventContext,
+	RichTextShortcut,
+	RichTextInputEvent,
+} = unlock( richTextPrivateApis );
 
 const instanceIdKey = Symbol( 'instanceId' );
 
@@ -348,8 +357,8 @@ export function RichTextWrapper(
 	return (
 		<>
 			{ isSelected && (
-				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
-					<inputEventContext.Provider value={ inputEvents }>
+				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
+					<InputEventContext.Provider value={ inputEvents }>
 						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
 							{ children &&
 								children( { value, onChange, onFocus } ) }
@@ -362,8 +371,8 @@ export function RichTextWrapper(
 								forwardedRef={ anchorRef }
 							/>
 						</Popover.__unstableSlotNameProvider>
-					</inputEventContext.Provider>
-				</keyboardShortcutContext.Provider>
+					</InputEventContext.Provider>
+				</KeyboardShortcutContext.Provider>
 			) }
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
@@ -515,6 +524,6 @@ PublicForwardedRichTextContainer.isEmpty = ( value ) => {
 };
 
 export default PublicForwardedRichTextContainer;
-export { RichTextShortcut } from './shortcut';
+export { RichTextShortcut };
 export { RichTextToolbarButton } from './toolbar-button';
-export { RichTextInputEvent as __unstableRichTextInputEvent } from './input-event';
+export { RichTextInputEvent as __unstableRichTextInputEvent };
