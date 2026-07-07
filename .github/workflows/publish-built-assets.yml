@@ -1,0 +1,38 @@
+# Builds and publishes the built assets for consumption by `wordpress-develop`.
+name: Publish Built Assets
+
+on:
+    # Running after the plugin zip workflow completes ensures all version bumps are pushed and release branches exist.
+    workflow_run:
+        workflows: [' Build Gutenberg Plugin Zip']
+        types:
+            - completed
+
+# Cancels all previous workflow runs for the same source branch.
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch }}
+    cancel-in-progress: true
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    publish-built-assets:
+        name: Publish to GitHub Container Registry
+        permissions:
+            contents: read
+            packages: write
+        if: |
+            github.repository == 'WordPress/gutenberg' &&
+            github.event.workflow_run.conclusion == 'success' &&
+            (
+              github.event.workflow_run.event != 'pull_request' ||
+              github.event.workflow_run.head_repository.full_name == github.repository
+            )
+        uses: ./.github/workflows/reusable-publish-built-assets.yml
+        with:
+            source_sha: ${{ github.event.workflow_run.head_sha }}
+            source_event: ${{ github.event.workflow_run.event }}
+            head_branch: ${{ github.event.workflow_run.head_branch }}
+            pr_number: ${{ github.event.workflow_run.pull_requests[0].number }}
