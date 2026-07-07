@@ -1496,6 +1496,7 @@ test.describe( 'Block Notes', () => {
 			await expect( menu.getByRole( 'menuitemradio' ) ).toHaveText( [
 				'Show notes',
 				'Show all notes',
+				'Minimize notes',
 				'Hide notes',
 			] );
 			// The floating notes are visible by default, so "Show notes" is
@@ -1556,6 +1557,11 @@ test.describe( 'Block Notes', () => {
 				} )
 			).toHaveAttribute( 'aria-checked', 'true' );
 			await page.keyboard.press( 'Escape' );
+			// Wait for the menu to fully close; clicking the toggle while the
+			// menu is still dismissing leaves it closed.
+			await expect(
+				page.getByRole( 'menu', { name: 'Notes display options' } )
+			).toBeHidden();
 
 			// Hiding notes closes the All notes sidebar too.
 			await blockNoteUtils.selectNotesDisplayOption( 'Hide notes' );
@@ -1596,6 +1602,96 @@ test.describe( 'Block Notes', () => {
 			await expect( existingThread ).toBeVisible();
 		} );
 	} );
+
+	test.describe( 'Minimize notes mode', () => {
+		test( 'collapses floating threads to avatars and reveals the byline on hover', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'First block' },
+				comment: 'First note',
+			} );
+
+			// Deselect the freshly added note so no thread is expanded.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+
+			await blockNoteUtils.selectNotesDisplayOption( 'Minimize notes' );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: First note' } );
+
+			// Minimized: the note content is not rendered, only the avatar.
+			await expect( thread ).toBeVisible();
+			await expect( thread.getByText( 'First note' ) ).toBeHidden();
+			await expect(
+				thread.locator( '.editor-collab-sidebar-panel__user-avatar' )
+			).toBeVisible();
+			await expect(
+				thread.locator( '.editor-collab-sidebar-panel__user-name' )
+			).toBeHidden();
+
+			// Hovering reveals the author byline.
+			await thread.hover();
+			await expect(
+				thread.locator( '.editor-collab-sidebar-panel__user-name' )
+			).toBeVisible();
+
+			// Move the pointer away; the byline hides again.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.hover();
+			await expect(
+				thread.locator( '.editor-collab-sidebar-panel__user-name' )
+			).toBeHidden();
+
+			// Switching back to Show notes restores the full display.
+			await blockNoteUtils.selectNotesDisplayOption( 'Show notes' );
+			await expect( thread.getByText( 'First note' ) ).toBeVisible();
+		} );
+
+		test( 'expands a minimized thread on selection and re-collapses on Escape', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'First block' },
+				comment: 'First note',
+			} );
+
+			// Deselect the freshly added note so no thread is expanded.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+
+			await blockNoteUtils.selectNotesDisplayOption( 'Minimize notes' );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: First note' } );
+			await expect( thread.getByText( 'First note' ) ).toBeHidden();
+
+			// Selecting the thread expands it fully, including the reply form.
+			await thread.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect( thread.getByText( 'First note' ) ).toBeVisible();
+			await expect(
+				thread.getByRole( 'textbox', { name: 'Reply to' } )
+			).toBeVisible();
+
+			// Escape deselects the thread, collapsing it back to an avatar.
+			await thread.press( 'Escape' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+			await expect( thread.getByText( 'First note' ) ).toBeHidden();
+		} );
+	} );
 } );
 
 class BlockNoteUtils {
@@ -1626,14 +1722,10 @@ class BlockNoteUtils {
 			.getByRole( 'button', { name: 'Notes', exact: true } )
 			.click();
 		await this.#page.getByRole( 'menuitemradio', { name: option } ).click();
-		// The dropdown stays open after selecting a choice; close it so it
-		// doesn't overlap subsequent interactions.
-		const menu = this.#page.getByRole( 'menu', {
-			name: 'Notes display options',
-		} );
-		if ( await menu.isVisible() ) {
-			await this.#page.keyboard.press( 'Escape' );
-		}
+		// The dropdown closes itself after selecting a choice.
+		await this.#page
+			.getByRole( 'menu', { name: 'Notes display options' } )
+			.waitFor( { state: 'hidden' } );
 	}
 
 	async addBlockWithNote( { type, attributes = {}, comment } ) {
