@@ -234,7 +234,7 @@ export const saveDirtyEntities =
 			} )
 			.then( ( values ) => {
 				const errors = values.filter( ( v ) => v instanceof Error );
-				if ( errors ) {
+				if ( errors.length ) {
 					const firstMessage = errors.find(
 						( e ) => e.message
 					)?.message;
