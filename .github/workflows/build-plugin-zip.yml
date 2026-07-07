@@ -58,49 +58,30 @@ jobs:
     preflight-release-token:
         name: Preflight release token
         runs-on: 'ubuntu-24.04'
+        environment: 'GitHub Releases'
         permissions: {}
         if: ${{ github.event_name == 'workflow_dispatch' }}
 
         steps:
+            # Request the same elevated permissions as create-release so a
+            # misconfigured GitHub App fails before version bump commits are pushed.
+            - name: Generate application token
+              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+              id: app-token
+              with:
+                  client-id: ${{ vars.APP_CLIENT_ID }}
+                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
+                  permission-contents: write
+                  permission-workflows: write
+
             - name: Validate GitHub release token
               env:
-                  GH_TOKEN: ${{ secrets.GUTENBERG_TOKEN }}
+                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
               run: |
-                  gh auth status --hostname github.com
-
-                  # This workflow currently relies on GUTENBERG_TOKEN for release
-                  # branch pushes and draft release creation. If repository policy
-                  # later allows the default GITHUB_TOKEN to create draft releases,
-                  # that can be handled as a separate workflow simplification.
-                  token_follow_up="Release managers should ask repository admins to rotate or replace GUTENBERG_TOKEN before the next RC day "
-                  token_follow_up+="with a token that can create draft releases in ${GITHUB_REPOSITORY}."
-
-                  headers_file="$(mktemp)"
-                  if ! gh api -i "repos/${GITHUB_REPOSITORY}" > "$headers_file"; then
-                    echo "::error::GUTENBERG_TOKEN cannot access ${GITHUB_REPOSITORY}. The release workflow token must be able to create draft releases in this repository."
-                    echo "::error::$token_follow_up"
-                    rm -f "$headers_file"
+                  if ! gh api "repos/${GITHUB_REPOSITORY}" > /dev/null; then
+                    echo "::error::Could not validate the GitHub App release token for ${GITHUB_REPOSITORY}. Check that the GitHub Releases environment exposes APP_CLIENT_ID and APP_PRIVATE_KEY, and that the installed app has contents: write and workflows: write permissions for this repository."
                     exit 1
                   fi
-
-                  oauth_scopes="$(
-                    awk -F': ' 'tolower($1) == "x-oauth-scopes" { print tolower($2) }' "$headers_file" |
-                    tr -d '\r' |
-                    tail -n 1
-                  )"
-
-                  # GitHub only exposes x-oauth-scopes for classic PATs. Fine-grained
-                  # PATs and GitHub App tokens may omit it, and GitHub does not expose
-                  # a non-mutating release-creation permission check. This catches visible
-                  # under-scoping while the repository access check remains the fallback.
-                  if [[ -n "$oauth_scopes" ]] && ! tr ',' '\n' <<< "$oauth_scopes" | sed 's/^ *//;s/ *$//' | grep -qxE 'repo|public_repo'; then
-                    echo "::error::GUTENBERG_TOKEN is visibly under-scoped (${oauth_scopes}). The release workflow token must be able to create draft releases in this repository."
-                    echo "::error::$token_follow_up"
-                    rm -f "$headers_file"
-                    exit 1
-                  fi
-
-                  rm -f "$headers_file"
 
     bump-version:
         name: Bump version
