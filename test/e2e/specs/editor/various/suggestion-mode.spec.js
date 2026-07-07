@@ -168,16 +168,10 @@ test.describe( 'Suggestion mode', () => {
 		 * Typing in Suggest mode writes the add marker via
 		 * updateBlockAttributes, so it participates in the editor undo stack
 		 * like any attribute edit. Undo must remove the marker (and its
-		 * proposed text) from content without crashing the editor.
-		 *
-		 * TODO: redo does NOT currently restore the marker — the marker
-		 * write coalesces with surrounding non-persistent bookkeeping so
-		 * there is no redo level to reapply. Defining redo semantics is part
-		 * of the undo/redo follow-up. Undo also leaves the backing note
-		 * comment in place — an orphaned note with no marker. Reconciling
-		 * orphaned notes/markers is a pending design discussion; see the
-		 * "Known limitations" section of
-		 * docs/explanations/architecture/suggestions.md.
+		 * proposed text) from content without crashing the editor; the
+		 * orphaned backing note is trashed by SuggestionNoteGC (covered in
+		 * suggestion-mode-undo.spec.js). Redo restores the marker, and the
+		 * garbage collector restores the note along with it.
 		 */
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -209,12 +203,11 @@ test.describe( 'Suggestion mode', () => {
 		const serializedAfterUndo = await editor.getEditedPostContent();
 		expect( serializedAfterUndo ).not.toContain( 'data-suggestion-id' );
 
-		// Redo must not crash the editor or reintroduce a marker (see the
-		// TODO above for actual marker-restoring redo semantics).
+		// …and redo restores the marker with its proposed text (the note is
+		// restored with it by SuggestionNoteGC).
 		await pageUtils.pressKeys( 'primaryShift+z' );
-		await expect( paragraph ).toBeVisible();
-		const serializedAfterRedo = await editor.getEditedPostContent();
-		expect( serializedAfterRedo ).not.toContain( 'data-suggestion-id' );
+		await expect( marker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		await expect( paragraph ).toHaveText( 'Hello!' );
 	} );
 
 	test( 'add — the note summarizes the addition as "Add: …", not "Format: content"', async ( {

@@ -1,7 +1,6 @@
 /**
  * E2E coverage for undo (cmd/ctrl+Z) while composing suggestions in Suggest
- * mode (#73411). Structural and attribute suggestions are covered here;
- * inline text/format markers are exercised where the marker layer lands.
+ * mode (#73411).
  *
  * The contract these tests pin down: undoing right after making a suggestion
  * restores the document to its pre-suggestion state — the proposed change is
@@ -15,17 +14,21 @@
  * insertion must not spawn a "Remove block" suggestion, undoing a suggested
  * move must not spawn a counter-move, and so on).
  *
- * Granularity differs by kind. Attribute suggestions live outside the undo
- * stack entirely (the proposed value is parked in the suggestion overlay
- * while the real store stays at baseline), and structural suggestions are
- * compound state spread across history transactions — for both, undo
- * withdraws the pending suggestion as a single unit.
+ * Granularity differs by kind. Inline text suggestions ride the real undo
+ * stack, so undo steps back through them the way typing normally undoes.
+ * Attribute suggestions live outside the undo stack entirely (the proposed
+ * value is parked in the suggestion overlay while the real store stays at
+ * baseline), and structural suggestions are compound state spread across
+ * history transactions — for both, undo withdraws the pending suggestion
+ * as a single unit.
  */
 
 /**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+const SUGGESTION_MARK = 'mark.wp-suggestion';
 
 async function switchIntent( page, intentLabel ) {
 	await page
@@ -103,6 +106,176 @@ test.describe( 'Suggestion mode undo', () => {
 	} );
 
 	// --- Inline text suggestions ---------------------------------------------
+
+	test( 'undo reverts a typed addition and removes its note', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' world' );
+
+		// A populated id proves the note comment saved before we undo.
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		const summaries = await openSuggestionSummaries( page );
+		await expect( summaries ).toHaveCount( 1 );
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		// The proposed text and its marker are gone; the block reads as it
+		// did before the suggestion.
+		await expect( paragraph ).toHaveText( 'Hello' );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).not.toContain( 'world' );
+		expect( serialized ).not.toContain( 'data-suggestion' );
+
+		// The note has nothing left to resolve, so it is removed too.
+		await expect( summaries ).toHaveCount( 0 );
+	} );
+
+	test( 'undo reverts a suggested deletion and removes its note', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="del"]`
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		const summaries = await openSuggestionSummaries( page );
+		await expect( summaries ).toHaveCount( 1 );
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		// The strikethrough proposal is withdrawn: text intact, marker gone.
+		await expect( paragraph ).toHaveText( 'Hello world' );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'Hello world' );
+		expect( serialized ).not.toContain( 'data-suggestion' );
+
+		await expect( summaries ).toHaveCount( 0 );
+	} );
+
+	test( 'undo reverts a type-over replacement and removes both notes', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await page.keyboard.type( 'there' );
+
+		// Typing over a selection proposes a delete + add pair.
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="del"]`
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		const summaries = await openSuggestionSummaries( page );
+		await expect( summaries ).toHaveCount( 2 );
+
+		// The replacement was one gesture, so one undo withdraws it whole:
+		// the proposed text, the deletion marker, and both notes.
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect( paragraph ).toHaveText( 'Hello world' );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).not.toContain( 'there' );
+		expect( serialized ).not.toContain( 'data-suggestion' );
+
+		await expect( summaries ).toHaveCount( 0 );
+	} );
+
+	test( 'undo reverts a format suggestion and removes its note', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+b' );
+
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="format"]`
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		const summaries = await openSuggestionSummaries( page );
+		await expect( summaries ).toHaveCount( 1 );
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		// The proposed bold is withdrawn along with its marker and note.
+		await expect( paragraph ).toHaveText( 'Hello world' );
+		await expect( paragraph.locator( 'strong' ) ).toHaveCount( 0 );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).not.toContain( '<strong>' );
+		expect( serialized ).not.toContain( 'data-suggestion' );
+
+		await expect( summaries ).toHaveCount( 0 );
+	} );
 
 	// --- Structural suggestions ----------------------------------------------
 
@@ -281,4 +454,64 @@ test.describe( 'Suggestion mode undo', () => {
 	} );
 
 	// --- Stacking ---------------------------------------------------------------
+
+	test( 'repeated undo withdraws suggestions newest-first', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Alpha' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Beta' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		// Suggestion 1: append text to the first paragraph. Select via the
+		// store first: the freshly-inserted second block's floating toolbar
+		// hovers over the first paragraph and intercepts a raw click.
+		const alpha = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Alpha' } );
+		await editor.selectBlocks( alpha );
+		await alpha.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' one' );
+		await expect(
+			alpha.locator( `${ SUGGESTION_MARK }[data-suggestion-type="add"]` )
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		// Suggestion 2: remove the second paragraph.
+		const beta = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Beta' } );
+		await beta.click();
+		const suggestionSaved = suggestionSavedPromise( page );
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+		await expect( beta ).toHaveClass( /is-suggestion-pending-remove/ );
+		await suggestionSaved;
+
+		const summaries = await openSuggestionSummaries( page );
+		await expect( summaries ).toHaveCount( 2 );
+
+		// First undo withdraws the newest suggestion (the removal)…
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( beta ).not.toHaveClass( /is-suggestion-pending-remove/ );
+		await expect( summaries ).toHaveCount( 1 );
+		await expect(
+			alpha.locator( `${ SUGGESTION_MARK }[data-suggestion-type="add"]` )
+		).toBeVisible();
+
+		// …the second one withdraws the typed addition.
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( alpha ).toHaveText( 'Alpha' );
+		await expect( summaries ).toHaveCount( 0 );
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).not.toContain( 'data-suggestion' );
+		expect( serialized ).not.toContain( '"suggestion"' );
+	} );
 } );
