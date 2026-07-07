@@ -215,6 +215,7 @@ function ApiKeyConnector( {
 		isBusy,
 		isConnected,
 		currentApiKey,
+		hasResolvedSettings,
 		keySource,
 		handleButtonClick,
 		getButtonLabel,
@@ -259,33 +260,35 @@ function ApiKeyConnector( {
 				/>
 			}
 		>
-			{ isExpanded && pluginStatus === 'active' && (
-				<DefaultConnectorSettings
-					key={ isConnected ? 'connected' : 'setup' }
-					initialValue={
-						isExternallyConfigured
-							? '••••••••••••••••'
-							: currentApiKey
-					}
-					helpUrl={ helpUrl }
-					helpLabel={ helpLabel }
-					readOnly={ isConnected || isExternallyConfigured }
-					keySource={ keySource }
-					onRemove={
-						isExternallyConfigured
-							? undefined
-							: async () => {
-									await removeApiKey();
-									actionButtonRef.current?.focus();
-							  }
-					}
-					onSave={ async ( apiKey: string ) => {
-						await saveApiKey( apiKey );
-						setIsExpanded( false );
-						actionButtonRef.current?.focus();
-					} }
-				/>
-			) }
+			{ isExpanded &&
+				pluginStatus === 'active' &&
+				hasResolvedSettings && (
+					<DefaultConnectorSettings
+						key={ isConnected ? 'connected' : 'setup' }
+						initialValue={
+							isExternallyConfigured
+								? '••••••••••••••••'
+								: currentApiKey
+						}
+						helpUrl={ helpUrl }
+						helpLabel={ helpLabel }
+						readOnly={ isConnected || isExternallyConfigured }
+						keySource={ keySource }
+						onRemove={
+							isExternallyConfigured
+								? undefined
+								: async () => {
+										await removeApiKey();
+										actionButtonRef.current?.focus();
+								  }
+						}
+						onSave={ async ( apiKey: string ) => {
+							await saveApiKey( apiKey );
+							setIsExpanded( false );
+							actionButtonRef.current?.focus();
+						} }
+					/>
+				) }
 		</ConnectorItem>
 	);
 }
