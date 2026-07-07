@@ -69,7 +69,17 @@ export function ConnectorItem( {
 export type { ApiKeySource } from './types';
 
 function getHelpLinkLabel( helpUrl?: string, helpLabel?: string ) {
-	return helpLabel || helpUrl?.replace( /^https?:\/\//, '' );
+	if ( helpLabel ) {
+		return helpLabel;
+	}
+	if ( ! helpUrl ) {
+		return undefined;
+	}
+	try {
+		return new URL( helpUrl ).hostname;
+	} catch {
+		return helpUrl;
+	}
 }
 
 function createConnectorHelpLink(
@@ -204,7 +214,7 @@ export interface DefaultConnectorSettingsProps {
  * @param props.onRemove     - Callback invoked when the user removes the connector.
  * @param props.initialValue - Initial value for the API key field.
  * @param props.helpUrl      - URL to documentation for obtaining an API key.
- * @param props.helpLabel    - Custom label for the help link. Defaults to the URL without protocol.
+ * @param props.helpLabel    - Custom label for the help link. Defaults to the URL's hostname.
  * @param props.readOnly     - Whether the form is in read-only mode.
  * @param props.keySource    - The source of the API key: 'env', 'constant', 'database', or 'none'.
  */
@@ -321,7 +331,7 @@ export interface ApplicationPasswordConnectorSettingsProps {
  * @param props.onRemove        - Callback invoked when the credentials are removed.
  * @param props.initialUsername - Initial value for the username field.
  * @param props.helpUrl         - URL where users can create an application password.
- * @param props.helpLabel       - Custom label for the help link.
+ * @param props.helpLabel       - Custom label for the help link. Defaults to the URL's hostname.
  * @param props.readOnly        - Whether the form is in read-only mode.
  * @param props.keySource       - The source of the credentials: 'env', 'constant', 'database', or 'none'.
  */
