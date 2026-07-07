@@ -268,8 +268,8 @@ function _gutenberg_parse_application_password_credentials( string $value ): arr
 	$separator = strpos( $value, ':' );
 	// Trim so surrounding whitespace or a trailing newline (common when the
 	// value comes from a file or `.env`) does not become part of the credentials.
-	$username  = false === $separator ? '' : trim( substr( $value, 0, $separator ) );
-	$password  = false === $separator ? '' : trim( substr( $value, $separator + 1 ) );
+	$username = false === $separator ? '' : trim( substr( $value, 0, $separator ) );
+	$password = false === $separator ? '' : trim( substr( $value, $separator + 1 ) );
 
 	if ( '' === $username || '' === $password ) {
 		return array(

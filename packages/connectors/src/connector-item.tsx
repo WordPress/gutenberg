@@ -12,7 +12,7 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { createInterpolateElement, useId, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, type TransformedText } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -68,6 +68,11 @@ export function ConnectorItem( {
 
 export type { ApiKeySource } from './types';
 
+type ConnectorHelpMessage =
+	| `${ string }%s${ string }`
+	| TransformedText< `${ string }%s${ string }` >;
+type ConnectorHelpInterpolatedMessage = `${ string }<a></a>${ string }`;
+
 function getHelpLinkLabel( helpUrl?: string, helpLabel?: string ) {
 	if ( helpLabel ) {
 		return helpLabel;
@@ -85,19 +90,22 @@ function getHelpLinkLabel( helpUrl?: string, helpLabel?: string ) {
 function createConnectorHelpLink(
 	helpUrl: string | undefined,
 	helpLabel: string | undefined,
-	message: string
+	message: ConnectorHelpMessage
 ) {
 	if ( ! helpUrl ) {
 		return undefined;
 	}
 
-	return createInterpolateElement( sprintf( message, '<a></a>' ), {
-		a: (
-			<ExternalLink href={ helpUrl }>
-				{ getHelpLinkLabel( helpUrl, helpLabel ) }
-			</ExternalLink>
-		),
-	} );
+	return createInterpolateElement(
+		sprintf( message, '<a></a>' ) as ConnectorHelpInterpolatedMessage,
+		{
+			a: (
+				<ExternalLink href={ helpUrl }>
+					{ getHelpLinkLabel( helpUrl, helpLabel ) }
+				</ExternalLink>
+			),
+		}
+	);
 }
 
 function useConnectorSettingsSave< TValue >(
