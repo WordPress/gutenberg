@@ -9,10 +9,14 @@ const LIVE_REGION_ARIA_ROLES = new Set( [
 const hiddenElementsByDepth: Element[][] = [];
 
 /**
- * Hides all elements in the body element from screen-readers and keyboard
- * navigation except the provided element and elements that should not be
- * hidden. Uses the `inert` attribute so that hidden regions are both
- * removed from the accessibility tree and unreachable via keyboard.
+ * Hides all elements in the body element from screen-readers except
+ * the provided element and elements that should not be hidden from
+ * screen-readers.
+ *
+ * The reason we do this is because `aria-modal="true"` currently is bugged
+ * in Safari, and support is spotty in other browsers overall. In the future
+ * we should consider removing these helper functions in favor of
+ * `aria-modal="true"`.
  *
  * @param modalElement The element that should not be hidden.
  */
@@ -26,7 +30,7 @@ export function modalize( modalElement?: HTMLDivElement ) {
 		}
 
 		if ( elementShouldBeHidden( element ) ) {
-			( element as HTMLElement ).inert = true;
+			element.setAttribute( 'aria-hidden', 'true' );
 			hiddenElements.push( element );
 		}
 	}
@@ -44,7 +48,6 @@ export function elementShouldBeHidden( element: Element ) {
 	return ! (
 		element.tagName === 'SCRIPT' ||
 		element.hasAttribute( 'hidden' ) ||
-		( element as HTMLElement ).inert ||
 		element.hasAttribute( 'aria-hidden' ) ||
 		element.hasAttribute( 'aria-live' ) ||
 		( role && LIVE_REGION_ARIA_ROLES.has( role ) )
@@ -61,6 +64,6 @@ export function unmodalize() {
 	}
 
 	for ( const element of hiddenElements ) {
-		( element as HTMLElement ).inert = false;
+		element.removeAttribute( 'aria-hidden' );
 	}
 }
