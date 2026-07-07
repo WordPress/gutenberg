@@ -25,7 +25,7 @@ function BlockGroupToolbar() {
 		useConvertToGroupButtonProps();
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
-	const { canInsertGallery, canRemove, variations } = useSelect(
+	const { canTransformToGallery, canRemove, variations } = useSelect(
 		( select ) => {
 			const {
 				canRemoveBlocks,
@@ -39,13 +39,11 @@ function BlockGroupToolbar() {
 				blocksSelection,
 				rootClientId
 			);
-			const canTransformToGallery = possibleBlockTransformations.some(
-				( { name, isDisabled } ) =>
-					name === 'core/gallery' && ! isDisabled
-			);
-
 			return {
-				canInsertGallery: canTransformToGallery,
+				canTransformToGallery: possibleBlockTransformations.some(
+					( { name, isDisabled } ) =>
+						name === 'core/gallery' && ! isDisabled
+				),
 				canRemove: canRemoveBlocks( clientIds ),
 				variations: getBlockVariations(
 					groupingBlockName,
@@ -106,7 +104,7 @@ function BlockGroupToolbar() {
 
 	return (
 		<ToolbarGroup>
-			{ canInsertGallery && (
+			{ canTransformToGallery && (
 				<ToolbarButton
 					icon={ gallery }
 					label={ _x(
