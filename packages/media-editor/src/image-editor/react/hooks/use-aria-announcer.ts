@@ -31,7 +31,46 @@ function buildFlipAnnouncement( state: CropperState ): string {
 	return __( 'Flip removed' );
 }
 
-// Build a human-readable announcement string from cropper state.
+function buildRotationAnnouncement( degrees: number ): string {
+	const rounded = Math.round( degrees );
+	if ( rounded === 0 ) {
+		return __( 'Rotation reset' );
+	}
+	if ( rounded > 0 ) {
+		return sprintf(
+			/* translators: %d: rotation angle in degrees. */
+			__( 'Rotated %d degrees clockwise' ),
+			rounded
+		);
+	}
+	return sprintf(
+		/* translators: %d: rotation angle in degrees (positive). */
+		__( 'Rotated %d degrees counterclockwise' ),
+		Math.abs( rounded )
+	);
+}
+
+function buildCropAnnouncement( state: CropperState ): string {
+	const cropW = Math.round( state.cropRect.width * 100 );
+	const cropH = Math.round( state.cropRect.height * 100 );
+	return sprintf(
+		/* translators: 1: crop width as a percentage, 2: crop height as a percentage. */
+		__( 'Crop width %1$d%%, height %2$d%%' ),
+		cropW,
+		cropH
+	);
+}
+
+function buildZoomAnnouncement( state: CropperState ): string {
+	return sprintf(
+		/* translators: %d: zoom level as a percentage. */
+		__( 'Zoom %d%%' ),
+		Math.round( state.zoom * 100 )
+	);
+}
+
+// Build a human-readable announcement string from cropper state,
+// leading with the value that actually changed.
 function buildAnnouncement(
 	state: CropperState,
 	previousState: CropperState | null
@@ -44,33 +83,37 @@ function buildAnnouncement(
 		return buildFlipAnnouncement( state );
 	}
 
-	const parts: string[] = [];
-	parts.push(
-		sprintf(
-			/* translators: %d: zoom level as a percentage. */
-			__( 'Zoom %d%%' ),
-			Math.round( state.zoom * 100 )
-		)
-	);
-	if ( state.rotation !== 0 ) {
-		parts.push(
-			sprintf(
-				/* translators: %d: rotation angle in degrees. */
-				__( 'Rotation %d degrees' ),
-				Math.round( state.rotation )
-			)
-		);
+	if ( previousState ) {
+		const rotationChanged =
+			Math.round( previousState.rotation ) !==
+			Math.round( state.rotation );
+		const zoomChanged =
+			Math.round( previousState.zoom * 100 ) !==
+			Math.round( state.zoom * 100 );
+		const cropChanged =
+			Math.round( previousState.cropRect.width * 100 ) !==
+				Math.round( state.cropRect.width * 100 ) ||
+			Math.round( previousState.cropRect.height * 100 ) !==
+				Math.round( state.cropRect.height * 100 );
+
+		if ( rotationChanged && ! zoomChanged && ! cropChanged ) {
+			return buildRotationAnnouncement( state.rotation );
+		}
+		if ( cropChanged && ! zoomChanged && ! rotationChanged ) {
+			return buildCropAnnouncement( state );
+		}
+		if ( zoomChanged && ! rotationChanged && ! cropChanged ) {
+			return buildZoomAnnouncement( state );
+		}
 	}
-	const cropW = Math.round( state.cropRect.width * 100 );
-	const cropH = Math.round( state.cropRect.height * 100 );
-	parts.push(
-		sprintf(
-			/* translators: 1: crop width as a percentage, 2: crop height as a percentage. */
-			__( 'Crop %1$d%% by %2$d%%' ),
-			cropW,
-			cropH
-		)
-	);
+
+	// Multiple values changed or no previous state — announce all.
+	const parts: string[] = [];
+	parts.push( buildZoomAnnouncement( state ) );
+	if ( state.rotation !== 0 ) {
+		parts.push( buildRotationAnnouncement( state.rotation ) );
+	}
+	parts.push( buildCropAnnouncement( state ) );
 	if ( state.flip.horizontal || state.flip.vertical ) {
 		parts.push( buildFlipAnnouncement( state ) );
 	}

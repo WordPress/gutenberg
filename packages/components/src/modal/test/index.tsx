@@ -232,26 +232,26 @@ describe( 'Modal', () => {
 		};
 		const { container } = render( <AriaDemo /> );
 
-		// Opens outer modal > hides container.
+		// Opens outer modal > makes container inert.
 		await user.click( screen.getByRole( 'button', { name: 'Start' } ) );
-		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
+		expect( container ).toHaveProperty( 'inert', true );
 
 		// Disable reason: No semantic query can reach the overlay.
 		// eslint-disable-next-line testing-library/no-node-access
 		const outer = screen.getByRole( 'dialog' ).parentElement!;
 
-		// Opens inner modal > hides outer modal.
+		// Opens inner modal > makes outer modal inert.
 		await user.click( screen.getByRole( 'button', { name: 'Nest' } ) );
-		expect( outer ).toHaveAttribute( 'aria-hidden', 'true' );
+		expect( outer ).toHaveProperty( 'inert', true );
 
-		// Closes inner modal > Unhides outer modal and container stays hidden.
+		// Closes inner modal > Un-inerts outer modal and container stays inert.
 		await user.keyboard( '[Escape]' );
-		expect( outer ).not.toHaveAttribute( 'aria-hidden' );
-		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
+		expect( outer ).toHaveProperty( 'inert', false );
+		expect( container ).toHaveProperty( 'inert', true );
 
-		// Closes outer modal > Unhides container.
+		// Closes outer modal > Un-inerts container.
 		await user.keyboard( '[Escape]' );
-		expect( container ).not.toHaveAttribute( 'aria-hidden' );
+		expect( container ).toHaveProperty( 'inert', false );
 	} );
 
 	it( 'should render `headerActions` React nodes', async () => {

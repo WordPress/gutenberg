@@ -65,5 +65,12 @@ describe( 'aria-helper', () => {
 
 			expect( elementShouldBeHidden( element ) ).toBe( false );
 		} );
+
+		it( 'should return false when an element is inert', () => {
+			const element = document.createElement( 'div' );
+			element.inert = true;
+
+			expect( elementShouldBeHidden( element ) ).toBe( false );
+		} );
 	} );
 } );

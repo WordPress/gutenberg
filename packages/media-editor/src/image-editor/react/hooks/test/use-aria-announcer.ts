@@ -78,4 +78,70 @@ describe( 'useAriaAnnouncer', () => {
 
 		expect( result.current ).toBe( 'Flipped horizontally and vertically' );
 	} );
+
+	it( 'announces only crop when only crop dimensions change', () => {
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{ initialProps: { state: makeState() } }
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		rerender( {
+			state: makeState( {
+				cropRect: { x: 0, y: 0, width: 0.8, height: 0.95 },
+			} ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Crop width 80%, height 95%' );
+	} );
+
+	it( 'announces only rotation with direction when only rotation changes', () => {
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{ initialProps: { state: makeState() } }
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		rerender( {
+			state: makeState( { rotation: 15 } ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Rotated 15 degrees clockwise' );
+	} );
+
+	it( 'announces counterclockwise rotation for negative angles', () => {
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{ initialProps: { state: makeState() } }
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		rerender( {
+			state: makeState( { rotation: -10 } ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Rotated 10 degrees counterclockwise' );
+	} );
+
+	it( 'announces only zoom when only zoom changes', () => {
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{ initialProps: { state: makeState() } }
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		rerender( {
+			state: makeState( { zoom: 1.5 } ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Zoom 150%' );
+	} );
 } );
