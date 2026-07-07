@@ -169,10 +169,9 @@ export default function SuggestionAdditionKeyboard() {
 				);
 			};
 			try {
+				let delId = null;
 				if ( isTypeOver ) {
-					const baseValue =
-						getBlockAttributes( clientId )?.[ attributeKey ];
-					const delId = await openInlineNote(
+					delId = await openInlineNote(
 						clientId,
 						attributeKey,
 						SUGGESTION_TYPE_DELETION
@@ -183,22 +182,6 @@ export default function SuggestionAdditionKeyboard() {
 					if ( ! delId || ! caretStillAnchored() ) {
 						resetRun();
 						return;
-					}
-					const deleted = wrapInlineMarker( baseValue, {
-						formatType: SUGGESTION_FORMAT_NAME,
-						attributes: buildSuggestionMarkerAttributes( {
-							id: delId,
-							type: SUGGESTION_TYPE_DELETION,
-							authorId,
-						} ),
-						start,
-						end,
-					} );
-					if ( deleted ) {
-						requestInterceptorBypass( clientId );
-						updateBlockAttributes( clientId, {
-							[ attributeKey ]: deleted,
-						} );
 					}
 				}
 
@@ -219,10 +202,33 @@ export default function SuggestionAdditionKeyboard() {
 				const buffered = run.pending;
 				run.id = addId;
 				run.pending = '';
-				// Wrapping a type-over selection in the `del` marker doesn't
-				// change the text length, so `markerStart` (the selection end)
-				// is still the insertion point for the replacement.
-				const value = getBlockAttributes( clientId )?.[ attributeKey ];
+				/*
+				 * Compose the whole gesture into ONE content value — the `del`
+				 * marker over the replaced range plus the addition run — and
+				 * write it once. A type-over is a single user gesture, so it
+				 * must occupy a single undo level: written separately, Ctrl+Z
+				 * would peel off the addition but leave the deletion marker
+				 * behind.
+				 */
+				let value = getBlockAttributes( clientId )?.[ attributeKey ];
+				if ( isTypeOver ) {
+					// Wrapping the selection in the `del` marker doesn't
+					// change the text length, so `markerStart` (the selection
+					// end) is still the insertion point for the replacement.
+					const deleted = wrapInlineMarker( value, {
+						formatType: SUGGESTION_FORMAT_NAME,
+						attributes: buildSuggestionMarkerAttributes( {
+							id: delId,
+							type: SUGGESTION_TYPE_DELETION,
+							authorId,
+						} ),
+						start,
+						end,
+					} );
+					if ( deleted ) {
+						value = deleted;
+					}
+				}
 				const inserted = insertInlineAddition( value, {
 					text: buffered,
 					attributes: buildSuggestionMarkerAttributes( {
@@ -248,8 +254,6 @@ export default function SuggestionAdditionKeyboard() {
 			getSelectionStart,
 			getSelectionEnd,
 			openInlineNote,
-			updateBlockAttributes,
-			requestInterceptorBypass,
 			commit,
 			resetRun,
 			authorId,

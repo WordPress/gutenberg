@@ -1,12 +1,13 @@
 /**
  * Garbage collection for orphaned suggestion notes.
  *
- * Every suggestion note is anchored to something the user can see: a
- * structural `metadata.suggestion` marker on a block, or a pending attribute
- * entry in the suggestion overlay. When the anchor disappears without the
- * note being resolved — the classic case is Ctrl+Z right after making the
- * suggestion, but deleting the block in Editing intent lands here too — the
- * note has nothing left to accept or reject. Leaving it behind produces the
+ * Every suggestion note is anchored to something the user can see: an inline
+ * `<mark class="wp-suggestion">` marker in block content, a structural
+ * `metadata.suggestion` marker on a block, or a pending attribute entry in
+ * the suggestion overlay. When the anchor disappears without the note being
+ * resolved — the classic case is Ctrl+Z right after making the suggestion,
+ * but deleting the marked text in Editing intent lands here too — the note
+ * has nothing left to accept or reject. Leaving it behind produces the
  * orphaned-note problem called out in
  * `docs/explanations/architecture/suggestions.md`: a pending suggestion in
  * the sidebar whose Apply/Reject can no longer do anything.
@@ -16,6 +17,11 @@
  * Transition-based on purpose: a note whose anchor was never seen (editor
  * still loading, marker write still in flight) is never collected, so load
  * order can't mass-trash healthy suggestions.
+ *
+ * Redo support: when an inline marker withdrawn by undo reappears (Ctrl+
+ * Shift+Z), the trashed note is restored to pending so the marker stays
+ * resolvable. Structural redo instead re-lands as a real edit under the
+ * undo guard's adoption token (see suggestion-undo-guard.js).
  *
  * Deliberate-removal races are excluded two ways: apply/reject decisions
  * register their comment id as in flight (provider.js) for their duration,
@@ -27,7 +33,7 @@
  * WordPress dependencies
  */
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -36,18 +42,20 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { useSuggestionOverlay } from './overlay-context';
 import {
+	findInlineOp,
 	findStructuralOp,
 	isSuggestionDecisionInFlight,
 	parseSuggestionPayload,
 } from './provider';
+import { findSuggestionRange } from '../inline-suggestions';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 import { store as editorStore } from '../../store';
 import { useNoteThreads } from '../collab-sidebar/hooks';
 
 /*
  * Grace period between observing an anchor's disappearance and trashing the
- * note. Absorbs transient states (multi-dispatch undo application) and gives
- * the fire-time recheck a settled tree.
+ * note. Absorbs transient states (multi-dispatch undo application, a marker
+ * moving between blocks) and gives the fire-time recheck a settled tree.
  */
 const GC_GRACE_MS = 500;
 
@@ -76,6 +84,10 @@ function describeAnchor( note ) {
 			pendingType: PENDING_MARKER_BY_OP[ structuralOp.type ],
 		};
 	}
+	const inlineOp = findInlineOp( payload.operations );
+	if ( inlineOp ) {
+		return { kind: 'inline', attribute: inlineOp.attribute };
+	}
 	// Attribute-set suggestions: anchored to their overlay entry. Their
 	// note lifecycle is normally owned by the auto-saver (which trashes a
 	// note when the overlay reverts to baseline); the collector only covers
@@ -103,16 +115,29 @@ function isAnchorPresent( note, anchor, blockEditor, entries ) {
 		);
 	}
 	const liveClientIds = blockEditor.getClientIdsWithDescendants?.() ?? [];
-	for ( const clientId of liveClientIds ) {
-		const metadata = blockEditor.getBlockAttributes( clientId )?.metadata;
-		if ( metadata?.suggestion?.type !== anchor.pendingType ) {
-			continue;
+	if ( anchor.kind === 'structural' ) {
+		for ( const clientId of liveClientIds ) {
+			const metadata =
+				blockEditor.getBlockAttributes( clientId )?.metadata;
+			if ( metadata?.suggestion?.type !== anchor.pendingType ) {
+				continue;
+			}
+			if (
+				getNoteIdsFromMetadata( metadata ).some(
+					( noteId ) => String( noteId ) === idKey
+				)
+			) {
+				return true;
+			}
 		}
-		if (
-			getNoteIdsFromMetadata( metadata ).some(
-				( noteId ) => String( noteId ) === idKey
-			)
-		) {
+		return false;
+	}
+	// Inline: the marker travels with content, so scan every block's target
+	// attribute rather than trusting a (possibly undone) metadata linkage.
+	for ( const clientId of liveClientIds ) {
+		const value =
+			blockEditor.getBlockAttributes( clientId )?.[ anchor.attribute ];
+		if ( value && findSuggestionRange( value, note.id ) ) {
 			return true;
 		}
 	}
@@ -120,8 +145,9 @@ function isAnchorPresent( note, anchor, blockEditor, entries ) {
 }
 
 /**
- * Invisible component that trashes suggestion notes whose anchor disappears.
- * Mounted for every intent — withdrawals can happen outside Suggest mode too.
+ * Invisible component that trashes suggestion notes whose anchor disappears
+ * and restores inline notes whose marker comes back (redo). Mounted for
+ * every intent — withdrawals can happen outside Suggest mode too.
  *
  * @return {null} Renders nothing.
  */
@@ -148,6 +174,12 @@ export default function SuggestionNoteGC() {
 		}
 	}
 
+	// Notes this collector trashed, kept so a marker restored by redo can
+	// resurrect its note. Version state re-runs the presence probe below
+	// when the map changes.
+	const trashedRef = useRef( new Map() );
+	const [ trashedVersion, setTrashedVersion ] = useState( 0 );
+
 	const entriesRef = useRef( entries );
 	entriesRef.current = entries;
 	const clearOverlayRef = useRef( clearOverlay );
@@ -156,7 +188,8 @@ export default function SuggestionNoteGC() {
 	/*
 	 * Reactive presence signature. Computed inside `useSelect` so it updates
 	 * whenever block content changes (a marker can disappear without the
-	 * notes list changing).
+	 * notes list changing). Mirrors the signature pattern in
+	 * annotate-suggestions.js.
 	 */
 	const presenceSignature = useSelect(
 		( select ) => {
@@ -171,10 +204,24 @@ export default function SuggestionNoteGC() {
 					}`
 				);
 			}
+			for ( const [ idKey, info ] of trashedRef.current ) {
+				parts.push(
+					`t${ idKey }:${
+						isAnchorPresent(
+							info.note,
+							info.anchor,
+							blockEditor,
+							entries
+						)
+							? 1
+							: 0
+					}`
+				);
+			}
 			return parts.join( '|' );
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[ notes, entries ]
+		[ notes, entries, trashedVersion ]
 	);
 
 	// Anchors observed at least once this session, keyed by note id.
@@ -188,8 +235,8 @@ export default function SuggestionNoteGC() {
 
 		const collect = ( note, anchor ) => {
 			timers.delete( String( note.id ) );
-			// Recheck against settled state: the anchor may be back or the
-			// note may have been decided.
+			// Recheck against settled state: the anchor may be back (redo
+			// beat the grace period) or the note may have been decided.
 			if (
 				isAnchorPresent( note, anchor, blockEditor, entriesRef.current )
 			) {
@@ -217,6 +264,13 @@ export default function SuggestionNoteGC() {
 			)
 				.then( () => {
 					seenRef.current.delete( String( note.id ) );
+					if ( anchor.kind === 'inline' ) {
+						trashedRef.current.set( String( note.id ), {
+							note,
+							anchor,
+						} );
+						setTrashedVersion( ( version ) => version + 1 );
+					}
 					// Drop the stale overlay entry (structural op or
 					// attribute baseline) so a later edit on the same block
 					// can't resurrect the withdrawn note's operations.
@@ -265,6 +319,32 @@ export default function SuggestionNoteGC() {
 				idKey,
 				setTimeout( () => collect( note, anchor ), GC_GRACE_MS )
 			);
+		}
+
+		// Redo: a previously collected inline marker is back — restore its
+		// note so the marker stays resolvable.
+		for ( const [ idKey, info ] of [ ...trashedRef.current ] ) {
+			if (
+				! isAnchorPresent(
+					info.note,
+					info.anchor,
+					blockEditor,
+					entriesRef.current
+				)
+			) {
+				continue;
+			}
+			trashedRef.current.delete( idKey );
+			setTrashedVersion( ( version ) => version + 1 );
+			saveEntityRecord(
+				'root',
+				'comment',
+				{ id: info.note.id, status: 'hold' },
+				{ throwOnError: true }
+			).catch( () => {
+				// Restore failed; put it back so a later pass retries.
+				trashedRef.current.set( idKey, info );
+			} );
 		}
 		// `presenceSignature` fully determines the work; the other values are
 		// read through refs or stable.
