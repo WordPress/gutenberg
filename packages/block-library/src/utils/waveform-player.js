@@ -29,13 +29,14 @@ const EMPTY_ARTIST_PLACEHOLDER = '\u00a0';
  * subtitle, and artwork elements directly, which is what `loadTrack()` itself
  * does internally for these fields.
  *
- * @param {Object} instance        - The waveform player instance.
- * @param {Object} metadata        - The track metadata.
- * @param {string} metadata.title  - The track title.
- * @param {string} metadata.artist - The artist name.
- * @param {string} metadata.image  - The artwork image URL.
+ * @param {Object} instance          - The waveform player instance.
+ * @param {Object} metadata          - The track metadata.
+ * @param {string} metadata.title    - The track title.
+ * @param {string} metadata.artist   - The artist name.
+ * @param {string} metadata.image    - The artwork image URL.
+ * @param {string} metadata.imageAlt - The artwork image alt text.
  */
-function updatePlayerMetadata( instance, { title, artist, image } ) {
+function updatePlayerMetadata( instance, { title, artist, image, imageAlt } ) {
 	if ( instance.titleEl ) {
 		instance.titleEl.textContent = title ?? '';
 	}
@@ -46,6 +47,7 @@ function updatePlayerMetadata( instance, { title, artist, image } ) {
 	}
 	if ( instance.artworkEl && image ) {
 		instance.artworkEl.src = image;
+		instance.artworkEl.alt = imageAlt || '';
 	}
 }
 
@@ -60,6 +62,7 @@ function updatePlayerMetadata( instance, { title, artist, image } ) {
  * @param {string}   props.title         - The track title.
  * @param {string}   props.artist        - The artist name.
  * @param {string}   props.image         - The artwork image URL.
+ * @param {string}   props.imageAlt      - The artwork image alt text.
  * @param {string}   props.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
  * @param {Function} props.onEnded       - Callback when the track finishes playing.
  * @return {Element} The WaveformPlayer element.
@@ -69,6 +72,7 @@ export function WaveformPlayer( {
 	title,
 	artist,
 	image,
+	imageAlt,
 	waveformStyle,
 	onEnded,
 } ) {
@@ -78,7 +82,7 @@ export function WaveformPlayer( {
 	// and recreate the entire player on every re-render, making it disappear
 	// during editor resizes.
 	const onEndedEvent = useEvent( onEnded );
-	const metadataRef = useRef( { title, artist, image } );
+	const metadataRef = useRef( { title, artist, image, imageAlt } );
 	const playerRef = useRef();
 
 	// The artwork element only exists when an image was present when the
@@ -93,13 +97,18 @@ export function WaveformPlayer( {
 	// player, which would flash it on every keystroke while editing a
 	// track's title or artist.
 	useEffect( () => {
-		metadataRef.current = { title, artist, image };
+		metadataRef.current = { title, artist, image, imageAlt };
 
 		const instance = playerRef.current?.instance;
 		if ( instance ) {
-			updatePlayerMetadata( instance, { title, artist, image } );
+			updatePlayerMetadata( instance, {
+				title,
+				artist,
+				image,
+				imageAlt,
+			} );
 		}
-	}, [ title, artist, image ] );
+	}, [ title, artist, image, imageAlt ] );
 
 	const ref = useRefEffect(
 		( element ) => {

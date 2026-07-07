@@ -29,6 +29,7 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 
 	$artist = $attributes['artist'] ?? '';
 	$image  = $attributes['image'] ?? '';
+	$alt    = empty( $attributes['imageAlt'] ) ? '' : wp_strip_all_tags( $attributes['imageAlt'] );
 	$length = $attributes['length'] ?? '';
 	$title  = isset( $attributes['title'] ) && ! empty( $attributes['title'] ) ? $attributes['title'] : __( 'Unknown title' );
 
@@ -36,7 +37,7 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 	$html .= '<button data-wp-on--click="actions.changeTrack" data-wp-bind--aria-current="state.isCurrentTrack" class="wp-block-playlist-track__button">';
 
 	if ( $show_images && $image ) {
-		$html .= '<img class="wp-block-playlist-track__image" src="' . esc_url( $image ) . '" alt="" />';
+		$html .= '<img class="wp-block-playlist-track__image" src="' . esc_url( $image ) . '" alt="' . esc_attr( $alt ) . '" />';
 	}
 
 	$html .= '<span class="wp-block-playlist-track__content">';

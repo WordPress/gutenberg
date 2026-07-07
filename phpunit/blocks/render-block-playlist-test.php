@@ -263,10 +263,11 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 			array( 'showImages' => true ),
 			array(
 				array(
-					'id'    => 1,
-					'title' => 'Song One',
-					'src'   => 'http://example.com/song1.mp3',
-					'image' => 'http://example.com/image1.jpg',
+					'id'       => 1,
+					'title'    => 'Song One',
+					'src'      => 'http://example.com/song1.mp3',
+					'image'    => 'http://example.com/image1.jpg',
+					'imageAlt' => 'A bright abstract album cover',
 				),
 			)
 		);
@@ -275,7 +276,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'class="wp-block-playlist-track__image"', $output );
 		$this->assertStringContainsString( 'src="http://example.com/image1.jpg"', $output );
-		$this->assertStringContainsString( 'alt=""', $output );
+		$this->assertStringContainsString( 'alt="A bright abstract album cover"', $output );
 	}
 
 	/**

@@ -369,6 +369,11 @@ const PlaylistEdit = ( {
 								? currentTrackData?.image
 								: undefined
 						}
+						imageAlt={
+							showImages !== false
+								? currentTrackData?.imageAlt
+								: undefined
+						}
 						waveformStyle={ waveformStyle }
 						onEnded={ onTrackEnded }
 					/>

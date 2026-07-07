@@ -31,6 +31,7 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
  * Internal dependencies
  */
 import { PlaylistContext } from '../playlist/context';
+import { getAlbumCoverAttributes } from '../playlist/utils';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
@@ -43,7 +44,8 @@ const PlaylistTrackEdit = ( {
 	clientId,
 	isSelected,
 } ) => {
-	const { id, src, album, artist, image, length, title } = attributes;
+	const { id, src, album, artist, image, imageAlt, length, title } =
+		attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const showArtists = context?.showArtists;
 	const showImages = context?.showImages ?? true;
@@ -84,6 +86,7 @@ const PlaylistTrackEdit = ( {
 				artist: undefined,
 				album: undefined,
 				image: undefined,
+				imageAlt: undefined,
 				length: undefined,
 				title: undefined,
 				url: undefined,
@@ -111,12 +114,7 @@ const PlaylistTrackEdit = ( {
 				media?.meta?.album ||
 				media?.media_details?.album ||
 				__( 'Unknown album' ),
-			// Prevent using the default media attachment icon as the track image.
-			image:
-				media?.image?.src &&
-				media?.image?.src.endsWith( '/images/media/audio.svg' )
-					? ''
-					: media?.image?.src,
+			...getAlbumCoverAttributes( media?.image ),
 			length: media?.fileLength || media?.media_details?.length_formatted,
 			title: media.title,
 		} );
@@ -124,11 +122,11 @@ const PlaylistTrackEdit = ( {
 	}
 
 	function onSelectAlbumCoverImage( coverImage ) {
-		setAttributes( { image: coverImage.url } );
+		setAttributes( getAlbumCoverAttributes( coverImage ) );
 	}
 
 	function onRemoveAlbumCoverImage() {
-		setAttributes( { image: undefined } );
+		setAttributes( { image: undefined, imageAlt: undefined } );
 
 		// Move focus back to the Media Upload button.
 		imageButton.current.focus();
@@ -247,7 +245,7 @@ const PlaylistTrackEdit = ( {
 						<img
 							className="wp-block-playlist-track__image"
 							src={ image }
-							alt=""
+							alt={ imageAlt || '' }
 						/>
 					) }
 					<span className="wp-block-playlist-track__content">

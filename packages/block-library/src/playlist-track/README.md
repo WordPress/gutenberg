@@ -29,6 +29,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `album` | `string` | — | — |
 | `artist` | `string` | — | — |
 | `image` | `string` | — | — |
+| `imageAlt` | `string` | — | — |
 | `length` | `string` | — | — |
 | `title` | `string` | — | — |
 
