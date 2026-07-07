@@ -4,7 +4,9 @@ module.exports = {
 		() => 'npm run prelint:js',
 		'node ./tools/eslint/lint-js.cjs --config eslint.config.strict.cjs',
 	],
-	'*.scss': [ 'wp-scripts lint-style' ],
+	'*.{scss,module.css}': [
+		'wp-scripts lint-style --suppress-location=tools/stylelint/stylelint-suppressions.json',
+	],
 	'package-lock.json': [ 'npm run lint:lockfile' ],
 	'packages/*/package.json': [ 'wp-scripts lint-pkg-json' ],
 	'{docs/toc.json,tools/docs/*.cjs,packages/{*/README.md,components/src/*/**/README.md,block-library/src/*/README.md}}':

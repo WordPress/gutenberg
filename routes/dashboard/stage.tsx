@@ -27,7 +27,7 @@ function Dashboard() {
 		'gutenberg_dashboard'
 	);
 
-	const [ gridSettings, setGridSettings ] = useDashboardGridSettings();
+	const gridSettings = useDashboardGridSettings();
 
 	const widgetsModules = useSelect(
 		( select ) =>
@@ -69,7 +69,6 @@ function Dashboard() {
 			onLayoutChange={ handleLayoutChange }
 			onLayoutReset={ resetLayout }
 			gridSettings={ gridSettings }
-			onGridSettingsChange={ setGridSettings }
 			editMode={ editMode }
 			onEditChange={ setEditMode }
 		>
