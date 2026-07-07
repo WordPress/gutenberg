@@ -432,32 +432,47 @@
 		#183ad6
 	);
 	--wp-components-color-accent-inverted: var(
-		--wpds-color-foreground-interactive-brand-strong
+		--wpds-color-foreground-interactive-brand-strong,
+		#fff
 	);
 	--wp-components-color-background: var(
-		--wpds-color-background-surface-neutral-strong
+		--wpds-color-background-surface-neutral-strong,
+		#fff
 	);
 	--wp-components-color-foreground: var(
-		--wpds-color-foreground-content-neutral
+		--wpds-color-foreground-content-neutral,
+		#1e1e1e
 	);
 	--wp-components-color-foreground-inverted: var(
-		--wpds-color-background-surface-neutral
+		--wpds-color-background-surface-neutral,
+		#fcfcfc
 	);
 	--wp-components-color-gray-100: var(
-		--wpds-color-background-surface-neutral
+		--wpds-color-background-surface-neutral,
+		#fcfcfc
 	);
-	--wp-components-color-gray-200: var( --wpds-color-stroke-surface-neutral );
-	--wp-components-color-gray-300: var( --wpds-color-stroke-surface-neutral );
+	--wp-components-color-gray-200: var(
+		--wpds-color-stroke-surface-neutral,
+		#dbdbdb
+	);
+	--wp-components-color-gray-300: var(
+		--wpds-color-stroke-surface-neutral,
+		#dbdbdb
+	);
 	--wp-components-color-gray-400: var(
-		--wpds-color-stroke-interactive-neutral
+		--wpds-color-stroke-interactive-neutral,
+		#8d8d8d
 	);
 	--wp-components-color-gray-600: var(
-		--wpds-color-stroke-interactive-neutral
+		--wpds-color-stroke-interactive-neutral,
+		#8d8d8d
 	);
 	--wp-components-color-gray-700: var(
-		--wpds-color-foreground-content-neutral-weak
+		--wpds-color-foreground-content-neutral-weak,
+		#707070
 	);
 	--wp-components-color-gray-800: var(
-		--wpds-color-foreground-content-neutral
+		--wpds-color-foreground-content-neutral,
+		#1e1e1e
 	);
 }

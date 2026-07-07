@@ -36,7 +36,7 @@ describe( 'useThemeProviderStyles', () => {
 				/--wp-components-color-accent:\s*var\(\s*--wp-admin-theme-color\s*,\s*#3858e9\s*\);/
 			);
 			expect( prebuiltCSS ).toMatch(
-				/--wp-components-color-background:\s*var\(\s*--wpds-color-background-surface-neutral-strong\s*\);/
+				/--wp-components-color-background:\s*var\(\s*--wpds-color-background-surface-neutral-strong\s*,\s*#fff\s*\);/
 			);
 		} );
 	} );
