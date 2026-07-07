@@ -402,15 +402,21 @@ function _gutenberg_is_ai_api_key_valid( string $key, string $provider_id ): ?bo
  *
  * @access private
  *
- * @param mixed $value The submitted setting value.
+ * @param mixed  $value  The submitted setting value.
+ * @param string $option The option name being sanitized. Passed explicitly by the
+ *                       registered sanitize callback; falls back to the current
+ *                       `sanitize_option_{$option}` filter name when omitted.
  * @return array{username: string, password: string} Sanitized credentials.
  */
-function _gutenberg_sanitize_application_password_credentials( $value ): array {
+function _gutenberg_sanitize_application_password_credentials( $value, string $option = '' ): array {
 	if ( ! is_array( $value ) ) {
 		$value = array();
 	}
 
-	$option = str_replace( 'sanitize_option_', '', (string) current_filter() );
+	if ( '' === $option ) {
+		$option = str_replace( 'sanitize_option_', '', (string) current_filter() );
+	}
+
 	$stored = get_option( $option );
 	if ( ! is_array( $stored ) ) {
 		$stored = array();
@@ -603,7 +609,9 @@ function _gutenberg_register_default_connector_settings(): void {
 							'additionalProperties' => false,
 						),
 					),
-					'sanitize_callback' => '_gutenberg_sanitize_application_password_credentials',
+					'sanitize_callback' => static function ( $value ) use ( $setting_name ) {
+						return _gutenberg_sanitize_application_password_credentials( $value, $setting_name );
+					},
 				)
 			);
 		}
