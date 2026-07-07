@@ -11,7 +11,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import SandBox, { VIEWPORT_UNIT_VALUE_REGEX } from '..';
+import SandBox, { VIEWPORT_UNIT_VALUE_REGEX, buildSandBoxDocument } from '..';
 
 describe( 'SandBox', () => {
 	const TestWrapper = () => {
@@ -104,6 +104,28 @@ describe( 'SandBox', () => {
 		const resizeScriptIndex = srcDoc.indexOf( 'MutationObserver' );
 		const bodyIndex = srcDoc.indexOf( '<body' );
 		const userContentIndex = srcDoc.indexOf( '<p>User content</p>' );
+
+		expect( resizeScriptIndex ).toBeGreaterThan( -1 );
+		expect( resizeScriptIndex ).toBeLessThan( bodyIndex );
+		expect( resizeScriptIndex ).toBeLessThan( userContentIndex );
+	} );
+
+	it( 'builds a document with the resize script in the head, before the body', () => {
+		// Both sandboxes render this document: the isolated one as `srcdoc`,
+		// the same-origin one via `contentDocument.write()`. Testing the shared
+		// builder covers the write path too, so a future change cannot move the
+		// resize helper back into the body on either path.
+		const doc = buildSandBoxDocument( {
+			html: '<p>User content</p>',
+			title: 'Doc',
+			styles: [],
+			scripts: [],
+			lang: 'en',
+		} );
+
+		const resizeScriptIndex = doc.indexOf( 'MutationObserver' );
+		const bodyIndex = doc.indexOf( '<body' );
+		const userContentIndex = doc.indexOf( '<p>User content</p>' );
 
 		expect( resizeScriptIndex ).toBeGreaterThan( -1 );
 		expect( resizeScriptIndex ).toBeLessThan( bodyIndex );

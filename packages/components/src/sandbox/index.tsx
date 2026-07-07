@@ -155,23 +155,48 @@ const style = `
 `;
 
 /**
- * Builds the full HTML document string for the sandbox iframe content.
+ * Builds the full HTML document string for the sandbox iframe content. Shared
+ * by both the isolated (`srcdoc`) and same-origin (`contentDocument.write`)
+ * sandboxes so the two paths always emit the same markup — notably keeping the
+ * resize script in `<head>`, ahead of the user content, on both. A single
+ * builder means the write path cannot drift back to putting the script in
+ * `<body>` while the `srcdoc` path keeps it in `<head>`.
+ *
+ * `lang` is passed in rather than read here because the two callers source it
+ * from different documents: the isolated sandbox uses the module's `document`,
+ * while the same-origin sandbox uses the iframe's `ownerDocument`. They are
+ * normally the same document, but keeping the argument preserves each path's
+ * exact prior behavior.
+ *
+ * Exported for tests.
+ *
+ * @param props
+ * @param props.html    User-supplied HTML for the iframe body.
+ * @param props.title   Document title.
+ * @param props.type    Optional class name for the `<html>`/`<body>` elements.
+ * @param props.styles  CSS rule strings, injected as `<style>` tags in the head.
+ * @param props.scripts External script URLs, injected as `<script src>` in the
+ *                      body (embeds expect their scripts there).
+ * @param props.lang    Language for the `<html lang>` attribute.
+ * @return The full `<!DOCTYPE html>…` document string.
  */
-function buildSandBoxDocument( {
+export function buildSandBoxDocument( {
 	html,
 	title,
 	type,
 	styles,
 	scripts,
+	lang,
 }: {
 	html: string;
 	title: string;
 	type?: string;
 	styles: string[];
 	scripts: string[];
+	lang: string;
 } ): string {
 	const htmlDoc = (
-		<html lang={ document.documentElement.lang } className={ type }>
+		<html lang={ lang } className={ type }>
 			<head>
 				<title>{ title }</title>
 				<style dangerouslySetInnerHTML={ { __html: style } } />
@@ -229,7 +254,15 @@ function IsolatedSandBox( {
 	const [ height, setHeight ] = useState( 0 );
 
 	const srcDoc = useMemo(
-		() => buildSandBoxDocument( { html, title, type, styles, scripts } ),
+		() =>
+			buildSandBoxDocument( {
+				html,
+				title,
+				type,
+				styles,
+				scripts,
+				lang: document.documentElement.lang,
+			} ),
 		[ html, title, type, styles, scripts ]
 	);
 
@@ -365,48 +398,25 @@ function SameOriginSandBox( {
 			return;
 		}
 
-		// Put the html snippet into a html document, and then write it to the iframe's document
-		// we can use this in the future to inject custom styles or scripts.
-		// Scripts go into the body rather than the head, to support embedded content such as Instagram
-		// that expect the scripts to be part of the body.
-		const htmlDoc = (
-			<html
-				lang={ ownerDocument.documentElement.lang }
-				className={ type }
-			>
-				<head>
-					<title>{ title }</title>
-					<style dangerouslySetInnerHTML={ { __html: style } } />
-					{ styles.map( ( rules, i ) => (
-						<style
-							key={ i }
-							dangerouslySetInnerHTML={ { __html: rules } }
-						/>
-					) ) }
-					<script
-						type="text/javascript"
-						dangerouslySetInnerHTML={ {
-							__html: `(${ observeAndResizeJS.toString() })();`,
-						} }
-					/>
-				</head>
-				<body
-					data-resizable-iframe-connected="data-resizable-iframe-connected"
-					className={ type }
-				>
-					<div dangerouslySetInnerHTML={ { __html: html } } />
-					{ scripts.map( ( src ) => (
-						<script key={ src } src={ src } />
-					) ) }
-				</body>
-			</html>
-		);
-
-		// Writing the document like this makes it act in the same way as if it was
-		// loaded over the network, so DOM creation and mutation, script execution, etc.
-		// all work as expected.
+		// Put the html snippet into a html document, and then write it to the
+		// iframe's document. The external `scripts` still go into the body to
+		// support embedded content such as Instagram that expects them there;
+		// only the resize helper lives in the head.
+		//
+		// Writing the document like this makes it act in the same way as if it
+		// was loaded over the network, so DOM creation and mutation, script
+		// execution, etc. all work as expected.
 		contentDocument.open();
-		contentDocument.write( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
+		contentDocument.write(
+			buildSandBoxDocument( {
+				html,
+				title,
+				type,
+				styles,
+				scripts,
+				lang: ownerDocument.documentElement.lang,
+			} )
+		);
 		contentDocument.close();
 	}
 
