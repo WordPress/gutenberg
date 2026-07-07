@@ -14,7 +14,7 @@ import { comment as commentIcon } from '@wordpress/icons';
  */
 import { ALL_NOTES_SIDEBAR } from './constants';
 import { store as editorStore } from '../../store';
-import { useBlockComments } from './hooks';
+import { useNoteThreads } from './hooks';
 import { unlock } from '../../lock-unlock';
 
 const getCollabSidebarCommandsLoader = () =>
@@ -39,7 +39,7 @@ const getCollabSidebarCommandsLoader = () =>
 			};
 		}, [] );
 
-		const { resultComments } = useBlockComments( postId ?? 0 );
+		const { notes } = useNoteThreads( postId ?? 0 );
 
 		const { enableComplementaryArea, disableComplementaryArea } =
 			useDispatch( interfaceStore );
@@ -47,8 +47,7 @@ const getCollabSidebarCommandsLoader = () =>
 		// On large viewports with no notes the sidebar isn't rendered, so calling
 		// enableComplementaryArea for it would produce no visible result.
 		const showFloatingSidebar = isLargeViewport;
-		const showAllNotesSidebar =
-			resultComments.length > 0 || ! showFloatingSidebar;
+		const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
 
 		const commands = useMemo( () => {
 			if ( ! showAllNotesSidebar && ! isNotesAreaOpen ) {
