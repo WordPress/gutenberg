@@ -296,6 +296,14 @@ export default function BorderPanel( {
 	};
 	const hasShadow = () => !! value?.shadow;
 	const resetShadow = () => setShadow( undefined );
+	// A local override exists when the user has set a shadow that shadows an
+	// inherited one. Only then does the toggle render the blue-dot reset
+	// affordance (mirroring the color/gradient controls); a merely-inherited
+	// value at rest shows no reset button.
+	const hasShadowLocalOverride =
+		showInheritanceLabelIndicators &&
+		hasShadow() &&
+		inheritedShadow !== undefined;
 
 	const resetBorder = () => {
 		if ( hasBorderRadius() ) {
@@ -383,7 +391,6 @@ export default function BorderPanel( {
 					) }
 					hasValue={ () => isDefinedBorder( value?.border ) }
 					label={ __( 'Border' ) }
-					hasInlineEndToggle
 					onDeselect={ () => resetBorder() }
 					isShownByDefault={ showBorderByDefault }
 					panelId={ panelId }
@@ -448,6 +455,11 @@ export default function BorderPanel( {
 					hasValue={ hasShadow }
 					onDeselect={ resetShadow }
 					isShownByDefault={ defaultControls.shadow }
+					// The shadow toggle renders its own reset affordance (blue
+					// dot for a local override, default reset otherwise) inside
+					// the control, mirroring the color/gradient controls, so the
+					// panel item must not render a second sibling reset dot.
+					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>
 					{ hasBorderControl ? (
@@ -460,6 +472,9 @@ export default function BorderPanel( {
 						shadow={ shadow }
 						onShadowChange={ setShadowWithInheritedCommit }
 						settings={ settings }
+						hasLocalValue={ hasShadow() }
+						hasLocalOverride={ hasShadowLocalOverride }
+						onReset={ resetShadow }
 					/>
 				</InheritanceToolsPanelItem>
 			) }
