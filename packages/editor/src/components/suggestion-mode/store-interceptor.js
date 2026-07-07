@@ -34,8 +34,10 @@
  *   - New blocks → tagged `metadata.suggestion = pending-insert` (the block
  *     stays in the tree; the marker drives the dimmed visual treatment).
  *   - Moved blocks → tagged `metadata.suggestion = pending-move` with the
- *     pre-move parent + anchor; an LCS-based heuristic isolates the moved
- *     block from siblings whose index just shifted as a side-effect.
+ *     pre-move parent + anchor; the moved block is isolated from siblings
+ *     whose index just shifted as a side-effect by preferring the current
+ *     selection (the block a user moves stays selected), with an LCS-based
+ *     heuristic as the fallback.
  *
  * In every case the live block carries the marker and a corresponding
  * structural op is written to the overlay so auto-save persists it.
@@ -516,11 +518,56 @@ function lcsClientIds( a, b ) {
 }
 
 /**
+ * Resolve which siblings stayed put when a parent's order changed.
+ *
+ * Order-diffing alone cannot attribute an adjacent swap: after moving B
+ * above A, "B moved up" and "A moved down" describe the same before/after
+ * orders, and the LCS tie-break can pick either reading. A user-initiated
+ * move keeps the moved block(s) selected (`moveBlocksUp` / `moveBlocksDown`
+ * / drag-and-drop all act on the selection), so prefer the reading in which
+ * the selected blocks are the movers: when removing them from both orders
+ * leaves identical sequences, the selection fully explains the reorder and
+ * everything else is stable. A selected block that kept its position among
+ * the candidates didn't move and stays stable too. When the selection does
+ * not explain the reorder (programmatic reorders, no selection), fall back
+ * to the LCS heuristic.
+ *
+ * @param {string[]}    oldSiblings Candidate ids in previous-tick order.
+ * @param {string[]}    newSiblings Candidate ids in live order.
+ * @param {Set<string>} selectedIds Currently selected block client ids.
+ * @return {Set<string>} Ids of siblings that did NOT move.
+ */
+function stableSiblingSet( oldSiblings, newSiblings, selectedIds ) {
+	if ( selectedIds?.size > 0 ) {
+		const isSelected = ( id ) => selectedIds.has( id );
+		if ( oldSiblings.some( isSelected ) ) {
+			const oldRest = oldSiblings.filter( ( id ) => ! isSelected( id ) );
+			const newRest = newSiblings.filter( ( id ) => ! isSelected( id ) );
+			const restUnchanged =
+				oldRest.length === newRest.length &&
+				oldRest.every( ( id, i ) => id === newRest[ i ] );
+			if ( restUnchanged ) {
+				const stable = new Set( oldRest );
+				for ( let i = 0; i < newSiblings.length; i++ ) {
+					const id = newSiblings[ i ];
+					if ( isSelected( id ) && oldSiblings[ i ] === id ) {
+						stable.add( id );
+					}
+				}
+				return stable;
+			}
+		}
+	}
+	return lcsClientIds( oldSiblings, newSiblings );
+}
+
+/**
  * Detect blocks that moved between two ticks of the live tree. A block has
  * "moved" when its parent changed (cross-parent move) or, within the same
- * parent, its position falls outside the LCS of the parent's old vs new
- * sibling order. The LCS heuristic prevents tagging blocks whose index
- * just shifted as a side-effect of another block moving past them.
+ * parent, its position falls outside the stable set of the parent's old vs
+ * new sibling order (see `stableSiblingSet`: selection-first, LCS fallback).
+ * The stable set prevents tagging blocks whose index just shifted as a
+ * side-effect of another block moving past them.
  *
  * Blocks that are new (not in the previous-tick tree) or removed (in the
  * previous-tick tree but not live) are handled by the insertion / removal
@@ -553,6 +600,10 @@ function detectMovedBlocks( liveClientIds, tree, blockEditor ) {
 		candidatesByNewParent.get( newParent ).push( clientId );
 	}
 
+	const selectedIds = new Set(
+		blockEditor.getSelectedBlockClientIds?.() ?? []
+	);
+
 	for ( const [ parent, candidates ] of candidatesByNewParent ) {
 		const oldSiblings = candidates
 			.slice()
@@ -575,7 +626,11 @@ function detectMovedBlocks( liveClientIds, tree, blockEditor ) {
 		if ( samePosition ) {
 			continue;
 		}
-		const stable = lcsClientIds( oldSiblings, newSiblings );
+		const stable = stableSiblingSet(
+			oldSiblings,
+			newSiblings,
+			selectedIds
+		);
 		for ( const clientId of newSiblings ) {
 			if ( ! stable.has( clientId ) ) {
 				movedRaw.push( {
@@ -969,6 +1024,25 @@ export default function SuggestionStoreInterceptor() {
 				if ( ! currentAttrs ) {
 					continue;
 				}
+				/*
+				 * "Reject landing": rejecting a pending move clears the
+				 * marker and dispatches the restoring `moveBlockToPosition`
+				 * in one batched update (locally from the provider; a remote
+				 * reject arrives through sync in the same shape). The
+				 * previous-tick tree still shows the marker while the live
+				 * block no longer carries one — that reorder is the
+				 * suggestion being resolved, not a fresh user move. Adopt it
+				 * instead of re-capturing the restore as a new suggestion.
+				 */
+				const trackedMoveMarker = tree.blocksByClientId.get(
+					move.clientId
+				)?.attributes?.metadata?.suggestion?.type;
+				if (
+					trackedMoveMarker === 'pending-move' &&
+					currentAttrs.metadata?.suggestion?.type !== 'pending-move'
+				) {
+					continue;
+				}
 				const block = blockEditor.getBlock?.( move.clientId );
 				if ( ! block ) {
 					continue;
@@ -1201,5 +1275,6 @@ export {
 	topLevelRemoved,
 	withSuggestionMarker,
 	lcsClientIds,
+	stableSiblingSet,
 	detectMovedBlocks,
 };
