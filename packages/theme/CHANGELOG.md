@@ -6,6 +6,10 @@
 
 -   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
 
+### New Features
+
+-   Add `--wpds-color-background-thumb-brand-disabled` for parity with the existing brand thumb state tokens ([#79770](https://github.com/WordPress/gutenberg/pull/79770)).
+
 ### Documentation
 
 -   Document that `ThemeProvider` does not accept wrapper customization props ([#79763](https://github.com/WordPress/gutenberg/pull/79763)).
