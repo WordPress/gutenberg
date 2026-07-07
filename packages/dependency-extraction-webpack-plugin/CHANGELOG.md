@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.50.1-next.0 (2026-07-07)
+
 ### Bug Fixes
 
 -   Extract dynamically imported external modules that webpack code-splits into their own async chunk in the module build ([#79633](https://github.com/WordPress/gutenberg/pull/79633)).

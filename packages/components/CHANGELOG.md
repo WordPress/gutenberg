@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 37.0.0-next.0 (2026-07-07)
+
 ### Breaking Changes
 
 -   `ExternalLink`: No longer sets the `rel` attribute by default. Consumers relying on the previous behavior should pass `rel` explicitly ([#79743](https://github.com/WordPress/gutenberg/pull/79743)).

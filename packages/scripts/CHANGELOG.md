@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 32.7.0-next.0 (2026-07-07)
+
 ### Enhancements
 
 -   Update `stylelint` to `^16.26.1` ([#79648](https://github.com/WordPress/gutenberg/pull/79648)).

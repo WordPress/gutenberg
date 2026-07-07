@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 23.43.0-next.0 (2026-07-07)
+
 ### Enhancements
 
 -   `length-zero-no-unit` rule now ignores custom properties and `var` functions, for better compatibility with usage inside `calc` functions. `calc` functions are already [exempt from the rule by default](https://stylelint.io/user-guide/rules/length-zero-no-unit/), and this change extends the same exemption to variables that may be used within `calc` functions, as [unitless zeros are not valid in CSS math functions](https://www.w3.org/TR/css-values-4/#calc-type-checking) ([#79786](https://github.com/WordPress/gutenberg/pull/79786)).

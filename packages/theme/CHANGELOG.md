@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.17.1-next.0 (2026-07-07)
+
 ### Bug Fixes
 
 -   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).

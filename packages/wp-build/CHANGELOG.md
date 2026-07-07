@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.19.0-next.0 (2026-07-07)
+
 ### Enhancements
 
 -   Widgets: carry the optional metadata fields from `widget.json` into

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.3.0-next.0 (2026-07-07)
+
 ### New Features
 
 -   `WidgetAttributeField< Item >`: authoring helper narrowing a DataViews

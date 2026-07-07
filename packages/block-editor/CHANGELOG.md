@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 16.0.0-next.0 (2026-07-07)
+
 ### Bug Fixes
 
 -   `DimensionControl`: Include component styles in the block editor stylesheet so the fieldset reset is applied in Storybook and other contexts without WordPress core styles ([#79916](https://github.com/WordPress/gutenberg/pull/79916)).
