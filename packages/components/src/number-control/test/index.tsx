@@ -17,7 +17,7 @@ import type { NumberControlProps } from '../types';
 
 const NumberControl = (
 	props: React.ComponentProps< typeof _NumberControl >
-) => <_NumberControl __next40pxDefaultSize { ...props } />;
+) => <_NumberControl { ...props } />;
 
 function StatefulNumberControl( props: NumberControlProps ) {
 	const [ value, setValue ] = useState( props.value );

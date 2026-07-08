@@ -129,6 +129,7 @@ figure.wp-block-image:not(.wp-block) {
 	width: 100%;
 	overflow: hidden;
 
+	// stylelint-disable selector-class-pattern -- react-easy-crop library class names.
 	.reactEasyCrop_Container {
 		// The linked Image block has `pointer-events: none` applied. Override it
 		// here to enable the crop action.
@@ -143,6 +144,7 @@ figure.wp-block-image:not(.wp-block) {
 			border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
 		}
 	}
+	// stylelint-enable selector-class-pattern
 }
 
 .wp-block-image__crop-icon {

@@ -191,6 +191,91 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that state styles in block style variations use custom viewport breakpoints.
+	 */
+	public function test_block_style_variation_state_styles_use_custom_viewport_breakpoints() {
+		switch_theme( 'block-theme' );
+
+		register_block_style(
+			'core/group',
+			array(
+				'name'       => 'custom-breakpoint-variation',
+				'style_data' => array(
+					'color'   => array(
+						'text' => 'blue',
+					),
+					'@mobile' => array(
+						'color' => array(
+							'text' => 'red',
+						),
+					),
+					'@tablet' => array(
+						'color' => array(
+							'text' => 'green',
+						),
+					),
+				),
+			)
+		);
+
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array(
+						'viewport' => array(
+							'mobile' => '640px',
+							'tablet' => '960px',
+						),
+					),
+				)
+			);
+		};
+
+		add_filter( 'wp_theme_json_data_theme', $filter );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		try {
+			$parsed_block = array(
+				'blockName' => 'core/group',
+				'attrs'     => array(
+					'className' => 'wp-block-group is-style-custom-breakpoint-variation',
+				),
+			);
+
+			gutenberg_render_block_style_variation_support_styles( $parsed_block );
+			$inline_styles     = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
+			$actual_stylesheet = is_array( $inline_styles ) ? implode( '', $inline_styles ) : '';
+
+			$this->assertStringContainsString(
+				'@media (width <= 640px)',
+				$actual_stylesheet,
+				'CSS should contain the custom mobile viewport media query.'
+			);
+			$this->assertStringContainsString(
+				'@media (640px < width <= 960px)',
+				$actual_stylesheet,
+				'CSS should contain the custom tablet viewport media query.'
+			);
+			$this->assertStringNotContainsString(
+				'@media (width <= 480px)',
+				$actual_stylesheet,
+				'CSS should not use the default mobile viewport media query.'
+			);
+			$this->assertStringNotContainsString(
+				'@media (480px < width <= 782px)',
+				$actual_stylesheet,
+				'CSS should not use the default tablet viewport media query.'
+			);
+		} finally {
+			remove_filter( 'wp_theme_json_data_theme', $filter );
+			unregister_block_style( 'core/group', 'custom-breakpoint-variation' );
+			wp_deregister_style( 'block-style-variation-styles' );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
+	}
+
+	/**
 	 * Tests that block style variations resolve any `ref` values when generating styles.
 	 */
 	public function test_block_style_variation_ref_values() {

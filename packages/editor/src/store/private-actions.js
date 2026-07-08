@@ -209,9 +209,13 @@ export const saveDirtyEntities =
 		registry
 			.dispatch( blockEditorStore )
 			.__unstableMarkLastChangeAsPersistent();
+
 		Promise.all( pendingSavedRecords )
-			.then( ( values ) => {
-				return onSave ? onSave( values ) : values;
+			.then( async ( values ) => {
+				if ( onSave ) {
+					await onSave();
+				}
+				return values;
 			} )
 			.then( ( values ) => {
 				if (
@@ -593,13 +597,19 @@ export function setCanvasWidth( width ) {
 			width,
 		} );
 
+		const blockEditorSelect = unlock( registry.select( blockEditorStore ) );
+
 		// While Responsive editing is enabled, the canvas width also drives the
 		// viewport style state, whether changed via the device preview or by
 		// manually resizing the canvas.
-		if (
-			unlock( registry.select( blockEditorStore ) ).isResponsiveEditing()
-		) {
-			const deviceType = getDeviceTypeByCanvasWidth( width );
+		if ( blockEditorSelect.isResponsiveEditing() ) {
+			const viewportSettings =
+				blockEditorSelect.getSettings().__experimentalFeatures
+					?.viewport;
+			const deviceType = getDeviceTypeByCanvasWidth(
+				width,
+				viewportSettings
+			);
 			unlock(
 				registry.dispatch( blockEditorStore )
 			).setStyleStateViewport(

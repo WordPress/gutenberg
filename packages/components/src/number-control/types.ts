@@ -5,7 +5,14 @@ import type { InputControlProps } from '../input-control/types';
 
 export type NumberControlProps = Omit<
 	InputControlProps,
-	'isDragEnabled' | 'min' | 'max' | 'required' | 'step' | 'type' | 'value'
+	| 'isDragEnabled'
+	| 'min'
+	| 'max'
+	| 'required'
+	| 'step'
+	| 'type'
+	| 'value'
+	| '__next40pxDefaultSize'
 > & {
 	/**
 	 * If true, the default `input` HTML arrows will be hidden.
@@ -98,4 +105,11 @@ export type NumberControlProps = Omit<
 	 * @ignore
 	 */
 	__shouldNotWarnDeprecated36pxSize?: boolean;
+	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
+	 */
+	__next40pxDefaultSize?: boolean;
 };

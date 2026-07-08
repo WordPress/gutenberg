@@ -10,6 +10,10 @@
 
 -   The "View the autosave" notice now opens the autosave in the visual revisions view with its changes highlighted, instead of the classic revisions screen. It falls back to the classic screen when visual revisions are disabled ([#79947](https://github.com/WordPress/gutenberg/pull/79947)).
 
+### Bug Fixes
+
+-   External images are now sideloaded on the server when uploaded to the media library, via a new `mediaSideloadFromUrl` block editor setting, so the upload works when the editor is cross-origin isolated (e.g. with client-side media processing enabled) ([#79409](https://github.com/WordPress/gutenberg/pull/79409)).
+
 ## 14.50.0 (2026-07-01)
 
 ## 14.49.0 (2026-06-24)

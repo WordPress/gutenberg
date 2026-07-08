@@ -141,6 +141,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		$response = array(
 			'kind'            => $kind,
 			'name'            => $name,
+			'version'         => Gutenberg_View_Config_Data::LATEST_VERSION,
 			'default_view'    => $this->cast_empty_objects( $config['default_view'], $schema['properties']['default_view'] ),
 			'default_layouts' => $this->cast_empty_objects( $config['default_layouts'], $schema['properties']['default_layouts'] ),
 			'view_list'       => $this->cast_empty_objects( $config['view_list'], $schema['properties']['view_list'] ),
@@ -248,6 +249,11 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 				'name'            => array(
 					'description' => __( 'Entity name.', 'gutenberg' ),
 					'type'        => 'string',
+					'readonly'    => true,
+				),
+				'version'         => array(
+					'description' => __( 'The schema version of the configuration.', 'gutenberg' ),
+					'type'        => 'integer',
 					'readonly'    => true,
 				),
 				'default_view'    => array(

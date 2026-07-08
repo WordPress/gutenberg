@@ -8,7 +8,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,24 +24,29 @@ const TEMPLATE = [
 	],
 ];
 
-export default function Edit( { clientId, context, isSelected } ) {
-	// Consume tab indices from context
-	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ];
-	const editorActiveTabIndex = context[ 'core/tabs-editorActiveTabIndex' ];
-	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
-
-	const { blockIndex, hasInnerBlocksSelected, tabsClientId } = useSelect(
+export default function Edit( { clientId, isSelected } ) {
+	const {
+		activeTabIndex,
+		editorActiveTabIndex,
+		blockIndex,
+		hasInnerBlocksSelected,
+		tabsClientId,
+	} = useSelect(
 		( select ) => {
 			const {
 				getBlockRootClientId,
 				getBlockIndex,
 				hasSelectedInnerBlock,
+				getBlockAttributes,
 			} = select( blockEditorStore );
 
 			// Get the tab-panel parent first
 			const tabPanelsClientId = getBlockRootClientId( clientId );
 			// Then get the tabs parent
 			const _tabsClientId = getBlockRootClientId( tabPanelsClientId );
+
+			// Read the active tab indices directly from the tabs block.
+			const tabsAttributes = getBlockAttributes( _tabsClientId ) ?? {};
 
 			// Get data about this instance of core/tab.
 			const _blockIndex = getBlockIndex( clientId );
@@ -51,6 +56,8 @@ export default function Edit( { clientId, context, isSelected } ) {
 			);
 
 			return {
+				activeTabIndex: tabsAttributes.activeTabIndex,
+				editorActiveTabIndex: tabsAttributes.editorActiveTabIndex,
 				blockIndex: _blockIndex,
 				hasInnerBlocksSelected: _hasInnerBlocksSelected,
 				tabsClientId: _tabsClientId,
@@ -58,6 +65,8 @@ export default function Edit( { clientId, context, isSelected } ) {
 		},
 		[ clientId ]
 	);
+
+	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
 
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -93,22 +102,8 @@ export default function Edit( { clientId, context, isSelected } ) {
 	// Determine if this is the default tab (for the "Default Tab" toggle in controls)
 	const isDefaultTab = activeTabIndex === blockIndex;
 
-	/**
-	 * This hook determines if the current tab panel should be visible.
-	 * This is true if it is the editor active tab, or if it is selected directly.
-	 */
-	const isSelectedTab = useMemo( () => {
-		// Show if this tab is directly selected or has selected inner blocks
-		if ( isSelected || hasInnerBlocksSelected ) {
-			return true;
-		}
-		// Always show the active tab (at effectiveActiveIndex) regardless of other selection state.
-		// This ensures the tab panel remains visible when editing labels in tab-list.
-		if ( isActiveTab ) {
-			return true;
-		}
-		return false;
-	}, [ isSelected, hasInnerBlocksSelected, isActiveTab ] );
+	// Visible when selected, containing the selection, or the active tab.
+	const isSelectedTab = isSelected || hasInnerBlocksSelected || isActiveTab;
 
 	const blockProps = useBlockProps( {
 		hidden: ! isSelectedTab,
