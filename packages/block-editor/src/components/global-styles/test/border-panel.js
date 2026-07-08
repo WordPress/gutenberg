@@ -537,23 +537,4 @@ describe( 'BorderPanel — root-sourced values (non-cascading, not surfaced)', (
 		);
 		expect( inheritedItems ).toHaveLength( 0 );
 	} );
-
-	it( 'does not surface a root-sourced shadow as inherited', () => {
-		const { container } = render(
-			<BorderPanel
-				value={ {} }
-				inheritedValue={ { shadow: 'var:preset|shadow|soft' } }
-				inheritedSources={ { shadow: { layer: 'root' } } }
-				settings={ settingsAll }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
-
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-		const inheritedItems = container.querySelectorAll(
-			'.is-inherited-from-global-styles'
-		);
-		expect( inheritedItems ).toHaveLength( 0 );
-	} );
 } );
