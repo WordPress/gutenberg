@@ -1,8 +1,4 @@
 /**
- * @jest-environment jsdom
- */
-
-/**
  * External dependencies
  */
 import '@testing-library/jest-dom';
@@ -16,6 +12,7 @@ import { initWaveformPlayer } from '../waveform-utils';
 
 jest.mock( '../waveform-utils', () => ( {
 	initWaveformPlayer: jest.fn(),
+	updateSeekControlLabel: jest.fn(),
 } ) );
 
 /**

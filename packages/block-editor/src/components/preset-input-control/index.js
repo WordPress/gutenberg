@@ -267,7 +267,6 @@ export default function PresetInputControl( {
 					step={ 1 }
 					value={ currentValue }
 					withInputField={ false }
-					__next40pxDefaultSize
 				/>
 			) }
 			{ hasPresets && ! showRangeControl && ! showCustomValueControl && (
@@ -295,7 +294,6 @@ export default function PresetInputControl( {
 					onMouseOut={ onMouseOut }
 					onMouseOver={ onMouseOver }
 					options={ options }
-					size="__unstable-large"
 					value={
 						// passing empty string as a fallback to continue using the
 						// component in controlled mode

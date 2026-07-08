@@ -56,8 +56,7 @@ jobs:
     bump-version:
         name: Bump version
         runs-on: 'ubuntu-24.04'
-        permissions:
-            contents: write
+        environment: 'GitHub Releases'
         needs: compute-stable-branches
         if: |
             github.event_name == 'workflow_dispatch' && (
@@ -80,10 +79,18 @@ jobs:
             trunk_commit: ${{ steps.commit_version_bump_to_trunk.outputs.version_bump_commit }}
 
         steps:
-            - name: Checkout code
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - name: Generate application token
+              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+              id: app-token
               with:
-                  token: ${{ secrets.GUTENBERG_TOKEN }}
+                  client-id: ${{ vars.APP_CLIENT_ID }}
+                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
+                  permission-contents: write
+
+            - name: Checkout code
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              with:
+                  token: ${{ steps.app-token.outputs.token }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: true
 
@@ -196,7 +203,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
@@ -345,20 +352,27 @@ jobs:
         name: Revert version bump if build failed
         needs: [bump-version, build]
         runs-on: 'ubuntu-24.04'
-        permissions:
-            contents: write
+        environment: 'GitHub Releases'
         if: |
             always() &&
             needs.build.result == 'failure' &&
             needs.bump-version.outputs.release_branch_commit
 
         steps:
+            - name: Generate application token
+              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+              id: app-token
+              with:
+                  client-id: ${{ vars.APP_CLIENT_ID }}
+                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
+                  permission-contents: write
+
             - name: Checkout code
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   fetch-depth: 2
                   ref: ${{ needs.bump-version.outputs.release_branch }}
-                  token: ${{ secrets.GUTENBERG_TOKEN }}
+                  token: ${{ steps.app-token.outputs.token }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: true
 
@@ -401,10 +415,18 @@ jobs:
         name: Create Release Draft and Attach Asset
         needs: [bump-version, build]
         runs-on: 'ubuntu-24.04'
-        permissions:
-            contents: write
+        environment: 'GitHub Releases'
 
         steps:
+            - name: Generate application token
+              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+              id: app-token
+              with:
+                  client-id: ${{ vars.APP_CLIENT_ID }}
+                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
+                  permission-contents: write
+                  permission-workflows: write
+
             - name: Set Release Version
               id: get_release_version
               env:
@@ -421,29 +443,45 @@ jobs:
               with:
                   name: release-notes
 
-            - name: Create Release Draft
-              id: create_release
-              uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
+            - name: Create Release Draft and Attach Asset
+              uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  ASSET_CONTENT_TYPE: application/zip
+                  ASSET_NAME: gutenberg.zip
+                  ASSET_PATH: gutenberg.zip
+                  BODY_PATH: release-notes.txt
+                  COMMITISH: ${{ needs.bump-version.outputs.release_branch || github.ref }}
+                  PRERELEASE: ${{ contains(needs.bump-version.outputs.new_version, 'rc') }}
+                  RELEASE_NAME: ${{ steps.get_release_version.outputs.version }}
+                  VERSION: ${{ needs.bump-version.outputs.new_version }}
               with:
-                  tag_name: 'v${{ needs.bump-version.outputs.new_version }}'
-                  release_name: ${{ steps.get_release_version.outputs.version }}
-                  commitish: ${{ needs.bump-version.outputs.release_branch || github.ref }}
-                  draft: true
-                  prerelease: ${{ contains(needs.bump-version.outputs.new_version, 'rc') }}
-                  body_path: release-notes.txt
+                  github-token: ${{ steps.app-token.outputs.token }}
+                  script: |
+                      const fs = require('fs');
 
-            - name: Upload Release Asset
-              id: upload-release-asset
-              uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: ./gutenberg.zip
-                  asset_name: gutenberg.zip
-                  asset_content_type: application/zip
+                      const release = await github.rest.repos.createRelease({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        tag_name: `v${process.env.VERSION}`,
+                        name: process.env.RELEASE_NAME,
+                        target_commitish: process.env.COMMITISH,
+                        draft: true,
+                        prerelease: process.env.PRERELEASE === 'true',
+                        body: fs.readFileSync(process.env.BODY_PATH, 'utf8')
+                      });
+
+                      const asset = fs.readFileSync(process.env.ASSET_PATH);
+                      await github.rest.repos.uploadReleaseAsset({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        release_id: release.data.id,
+                        name: process.env.ASSET_NAME,
+                        data: asset,
+                        headers: {
+                          'content-type': process.env.ASSET_CONTENT_TYPE,
+                          'content-length': asset.length
+                        }
+                      });
 
     npm-publish:
         name: Publish WordPress packages to npm
@@ -455,7 +493,7 @@ jobs:
         if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
         steps:
             - name: Checkout (for CLI)
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   path: main
                   ref: trunk
@@ -463,7 +501,7 @@ jobs:
                   persist-credentials: false
 
             - name: Checkout (for publishing)
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.

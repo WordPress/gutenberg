@@ -269,6 +269,11 @@ function DataViewsPicker< Item >( {
 	);
 }
 
+/**
+ * `DataViewsPicker` renders a dataset allowing users to select one or multiple
+ * items. It shares the layouts, search, and filtering of `DataViews` but is
+ * geared toward choosing items rather than managing them.
+ */
 // Populate the DataViews sub components
 const DataViewsPickerSubComponents =
 	DataViewsPicker as typeof DataViewsPicker & {

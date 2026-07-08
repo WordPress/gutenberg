@@ -53,7 +53,7 @@
 			border-color: var(--wp-ui-button-border-color);
 			border-radius: var(--wpds-border-radius-sm);
 			background-color: var(--wp-ui-button-background-color);
-			background-clip: padding-box;
+			background-clip: border-box;
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wp-ui-button-font-size);
 			font-weight: var(--wp-ui-button-font-weight);
@@ -146,7 +146,7 @@
 		}
 
 		.is-small {
-			--wp-ui-button-padding-block: 0;
+			--wp-ui-button-padding-block: 0px;
 			--wp-ui-button-padding-inline: var(--wpds-dimension-padding-sm);
 			--wp-ui-button-height: var(--wpds-dimension-size-sm);
 		}
