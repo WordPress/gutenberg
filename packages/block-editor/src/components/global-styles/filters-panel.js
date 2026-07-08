@@ -30,7 +30,11 @@ import { getValueFromVariable } from '@wordpress/global-styles-engine';
  */
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
-import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
+import {
+	getInheritanceProps,
+	InheritanceToolsPanelItem,
+	InheritanceResetButton,
+} from './inheritance';
 import { isRootSourced } from './inheritance/root-source';
 
 const EMPTY_ARRAY = [];
@@ -115,12 +119,18 @@ const LabeledColorIndicator = ( { indicator, label } ) => (
 				) }
 			</Flex>
 		</ZStack>
-		<FlexItem title={ label }>{ label }</FlexItem>
+		<FlexItem
+			className="block-editor-panel-duotone-settings__label"
+			title={ label }
+		>
+			{ label }
+		</FlexItem>
 	</HStack>
 );
 
-const renderToggle = ( duotone, resetDuotone ) =>
+const renderToggle = ( duotone, resetConfig ) =>
 	function Toggle( { onToggle, isOpen } ) {
+		const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
 		const duotoneButtonRef = useRef( undefined );
 
 		const toggleProps = {
@@ -133,17 +143,13 @@ const renderToggle = ( duotone, resetDuotone ) =>
 			ref: duotoneButtonRef,
 		};
 
-		const removeButtonProps = {
-			onClick: () => {
-				if ( isOpen ) {
-					onToggle();
-				}
-				resetDuotone();
-				// Return focus to parent button.
-				duotoneButtonRef.current?.focus();
-			},
-			className: 'block-editor-panel-duotone-settings__reset',
-			label: __( 'Reset' ),
+		const handleReset = () => {
+			if ( isOpen ) {
+				onToggle();
+			}
+			onReset();
+			// Return focus to parent button.
+			duotoneButtonRef.current?.focus();
 		};
 
 		return (
@@ -154,13 +160,21 @@ const renderToggle = ( duotone, resetDuotone ) =>
 						label={ __( 'Duotone' ) }
 					/>
 				</Button>
-				{ duotone && (
-					<Button
-						size="small"
-						icon={ resetIcon }
-						{ ...removeButtonProps }
-					/>
-				) }
+				{ hasLocalValue &&
+					( hasLocalOverride ? (
+						<InheritanceResetButton
+							className="block-editor-panel-duotone-settings__reset"
+							onResetToInherited={ handleReset }
+						/>
+					) : (
+						<Button
+							size="small"
+							icon={ resetIcon }
+							label={ __( 'Reset' ) }
+							className="block-editor-panel-duotone-settings__reset"
+							onClick={ handleReset }
+						/>
+					) ) }
 			</>
 		);
 	};
@@ -228,6 +242,11 @@ export default function FiltersPanel( {
 	};
 	const hasDuotone = () => !! value?.filter?.duotone;
 	const resetDuotone = () => setDuotone( undefined );
+	// Only a local value shadowing an inherited one shows the blue-dot reset.
+	const hasDuotoneLocalOverride =
+		showInheritanceLabelIndicators &&
+		hasDuotone() &&
+		inheritedDuotone !== undefined;
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -257,12 +276,19 @@ export default function FiltersPanel( {
 					hasValue={ hasDuotone }
 					onDeselect={ resetDuotone }
 					isShownByDefault={ defaultControls.duotone }
+					// Toggle renders its own reset dot, so the item must not
+					// add a second.
+					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>
 					<Dropdown
 						popoverProps={ popoverProps }
 						className="block-editor-global-styles-filters-panel__dropdown"
-						renderToggle={ renderToggle( duotone, resetDuotone ) }
+						renderToggle={ renderToggle( duotone, {
+							hasLocalValue: hasDuotone(),
+							hasLocalOverride: hasDuotoneLocalOverride,
+							onReset: resetDuotone,
+						} ) }
 						renderContent={ () => (
 							<DropdownContentWrapper paddingSize="small">
 								<MenuGroup label={ __( 'Duotone' ) }>

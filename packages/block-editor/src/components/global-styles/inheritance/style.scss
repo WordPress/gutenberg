@@ -21,12 +21,11 @@
 		text-underline-offset: 0.2em;
 	}
 
-	// The color name and the background image title both live inside
-	// flex/truncated containers where an offset `text-decoration` underline
-	// is clipped by `overflow: hidden`. A dotted bottom border renders on the
-	// border edge, so it stays visible and matches the color label treatment.
+	// These labels sit in truncated flex containers where an underline is
+	// clipped by `overflow: hidden`; a dotted bottom border stays visible.
 	.block-editor-panel-color-gradient-settings__color-name,
-	.block-editor-global-styles-background-panel__inspector-media-replace-title {
+	.block-editor-global-styles-background-panel__inspector-media-replace-title,
+	.block-editor-panel-duotone-settings__label {
 		border-bottom: 1px dotted currentColor;
 	}
 }
@@ -141,6 +140,19 @@
 	// placement and force `opacity: 1` (this compound selector wins on
 	// specificity).
 	&.block-editor-global-styles__shadow-editor__remove-button {
+		position: absolute;
+		justify-content: center;
+		inset-inline-end: 8px;
+		top: 50%;
+		transform: translateY(-50%);
+		margin-block: 0;
+		margin-inline-start: 0;
+		opacity: 1;
+	}
+
+	// Reuses the hover-revealed remove-button slot; keep the override dot
+	// placed and always visible.
+	&.block-editor-panel-duotone-settings__reset {
 		position: absolute;
 		justify-content: center;
 		inset-inline-end: 8px;

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -91,6 +91,60 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 			'.components-tools-panel-item.has-local-override-from-global-styles'
 		);
 		expect( item ).not.toBeNull();
+	} );
+
+	it( 'renders the blue-dot InheritanceResetButton for a local override', () => {
+		const inheritedValue = {
+			filter: { duotone: [ '#000000', '#ffffff' ] },
+		};
+		const value = {
+			filter: { duotone: [ '#8c00b7', '#fcff41' ] },
+		};
+
+		render(
+			<FiltersPanel
+				value={ value }
+				inheritedValue={ inheritedValue }
+				settings={ baseSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		const resetButton = screen.getByRole( 'button', {
+			name: /reset to inherited value/i,
+		} );
+		expect( resetButton ).toHaveClass(
+			'has-local-override-from-global-styles__reset'
+		);
+		expect( resetButton ).toHaveClass(
+			'block-editor-panel-duotone-settings__reset'
+		);
+	} );
+
+	it( 'renders the default reset button for a locally-set duotone with no inherited value', () => {
+		const value = {
+			filter: { duotone: [ '#8c00b7', '#fcff41' ] },
+		};
+
+		render(
+			<FiltersPanel
+				value={ value }
+				inheritedValue={ {} }
+				settings={ baseSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: /^reset$/i } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', {
+				name: /reset to inherited value/i,
+			} )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'does not invoke onChange on mount when only inherited duotone is present (display-without-commit)', () => {
