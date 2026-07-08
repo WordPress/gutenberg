@@ -90,6 +90,7 @@
 		}
 
 		@media (forced-colors: active) {
+			// The accent background is flattened in forced-colors mode, so draw a border.
 			outline: 1px solid ButtonBorder;
 		}
 	}
@@ -100,20 +101,12 @@
 
 	&.is-secondary,
 	&.is-tertiary {
-		&:active:not(:disabled) {
-			box-shadow: none;
-		}
-
 		&:disabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
 			color: $gray-600;
 			background: transparent;
 			transform: none;
-		}
-
-		@media (forced-colors: active) {
-			outline: 1px solid ButtonBorder;
 		}
 	}
 
@@ -123,36 +116,33 @@
 
 	&.is-secondary {
 		@media not ( prefers-reduced-motion ) {
-			transition: box-shadow 0.1s linear;
+			transition: border-color 0.1s linear;
 		}
 
-		box-shadow:
-			inset 0 0 0 $border-width $components-color-accent,
-			0 0 0 currentColor;
+		border: $border-width solid $components-color-accent;
 		white-space: nowrap;
 		color: $components-color-accent;
 		background: transparent;
 
+		&:active:not(:disabled) {
+			// Hide the border while pressed, keeping its width to avoid a size shift.
+			border-color: transparent;
+		}
+
 		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
-			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-20;
+			border-color: $components-color-accent-darker-20;
 			color: $components-color-accent-darker-20;
 			background: color-mix(in srgb, $components-color-accent 4%, transparent);
 		}
 
 		&:focus:not(:active) {
-			// Restore the visual border that the outset-ring__focus mixin resets.
-			box-shadow: inset 0 0 0 $border-width $components-color-accent, 0 0 0 currentColor;
+			border-color: $components-color-accent;
 		}
 
 		&:disabled:not(:focus),
 		&[aria-disabled="true"]:not(:focus),
 		&[aria-disabled="true"]:hover:not(:focus) {
-			box-shadow: inset 0 0 0 $border-width var(--wpds-color-stroke-interactive-neutral-disabled);
-		}
-
-		@media (forced-colors: active) {
-			// Inset box-shadow borders are not reliable in forced-colors mode.
-			box-shadow: none;
+			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 		}
 	}
 
@@ -177,6 +167,11 @@
 		// Pull left if the tertiary button stands alone after a description, so as to vertically align with items above.
 		p + & {
 			margin-left: -($grid-unit-15 * 0.5);
+		}
+
+		@media (forced-colors: active) {
+			// Tertiary buttons have no border, so draw one in forced-colors mode.
+			outline: 1px solid ButtonBorder;
 		}
 	}
 
