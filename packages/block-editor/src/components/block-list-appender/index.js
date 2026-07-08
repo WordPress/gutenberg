@@ -78,9 +78,6 @@ export default function BlockListAppender( {
 			tabIndex={ -1 }
 			className={ clsx( 'block-list-appender wp-block', className, {
 				'is-drag-over': isDragOver,
-				// Explicitly provided appenders are not gated on block
-				// selection, in rendering or in styling.
-				'has-custom-appender': !! CustomAppender,
 			} ) }
 			// Needed in case the whole editor is content editable (for multi
 			// selection). It fixes an edge case where ArrowDown and ArrowRight
