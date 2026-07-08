@@ -35,6 +35,7 @@ import {
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
+	readMultiBlockSelection,
 	removeNoteFormat,
 	removeNoteIdFromMetadata,
 } from './utils';
@@ -81,7 +82,13 @@ export function useNoteThreads( postId ) {
 			if ( noteIds.length > 0 ) {
 				blocksWithNotes[ clientId ] = noteIds;
 				for ( const noteId of noteIds ) {
-					clientIdByNoteId.set( noteId, clientId );
+					// First-wins: a multi-block note lists its id in every
+					// block it spans; clientIds are iterated in document order,
+					// so the anchor is the topmost block and the floating thread
+					// aligns to the start of the range.
+					if ( ! clientIdByNoteId.has( noteId ) ) {
+						clientIdByNoteId.set( noteId, clientId );
+					}
 				}
 			}
 		}
@@ -131,6 +138,12 @@ export function useNoteThreads( postId ) {
 				.map( ( noteId ) => {
 					const thread = threadsById.get( noteId );
 					if ( ! thread ) {
+						return null;
+					}
+					// A multi-block note is listed in several blocks' metadata;
+					// emit it once, at its anchor (topmost) block, so it isn't
+					// duplicated in the list.
+					if ( clientIdByNoteId.get( noteId ) !== clientId ) {
 						return null;
 					}
 					return {
@@ -235,13 +248,13 @@ function wrapInlineNote( value, id, start, end ) {
 }
 
 /**
- * Strip a note's inline `core/note` marker from whichever block holds it, if
- * any, so a deleted or resolved note's highlight does not linger in the content.
- * No-op for block-level notes (those carry no marker). Used by the resolve path,
- * which only knows the note id; the delete path strips the marker inline since
- * it already has the block.
+ * Strip a note's inline `core/note` marker from every block that holds it, so a
+ * deleted or resolved note's highlight does not linger in the content. A
+ * multi-block note carries a marker in each block it spans, so this scans them
+ * all. No-op for block-level notes (those carry no marker). Used by the resolve
+ * path, which only knows the note id; the delete path strips markers inline.
  *
- * @param {number}   noteId                      Note id whose marker to remove.
+ * @param {number}   noteId                      Note id whose markers to remove.
  * @param {Function} getClientIdsWithDescendants Block-editor selector.
  * @param {Function} getBlockAttributes          Block-editor selector.
  * @param {Function} updateBlockAttributes       Block-editor action.
@@ -265,7 +278,6 @@ function clearInlineNoteMarker(
 		if ( next ) {
 			updateBlockAttributes( clientId, { [ found.attributeKey ]: next } );
 		}
-		return;
 	}
 }
 
@@ -277,6 +289,7 @@ export function useNoteActions() {
 		getBlockAttributes,
 		getClientIdsWithDescendants,
 		getSelectedBlockClientId,
+		getSelectedBlockClientIds,
 		getSelectionStart,
 		getSelectionEnd,
 	} = useSelect( blockEditorStore );
@@ -293,15 +306,37 @@ export function useNoteActions() {
 		} );
 	};
 
+	// Resolve the anchor for a new note as an ordered list of per-block segments:
+	// a single-block inline selection, a cross-block text selection, or - failing
+	// both - the selected block as a block-level anchor. Read *before* the async
+	// save because focus (and the stored selection) can shift during the
+	// round-trip; each text segment's marker is the note's only durable anchor.
+	const readNoteSegments = () => {
+		const inline = readInlineSelection(
+			getSelectionStart,
+			getSelectionEnd
+		);
+		if ( inline ) {
+			return [ inline ];
+		}
+		const multi = readMultiBlockSelection( {
+			getSelectionStart,
+			getSelectionEnd,
+			getSelectedBlockClientIds,
+			getBlockAttributes,
+		} );
+		if ( multi ) {
+			return multi;
+		}
+		const clientId = getSelectedBlockClientId();
+		return clientId
+			? [ { clientId, attributeKey: null, start: null, end: null } ]
+			: [];
+	};
+
 	const onCreate = async ( { content, parent } ) => {
 		try {
-			// Capture inline selection *before* the async save: focus may shift
-			// during the round-trip and the editor's stored selection can
-			// collapse if the user clicks elsewhere. The selection drives the
-			// in-content marker written below, which is the note's only anchor.
-			const inlineSelection = ! parent
-				? readInlineSelection( getSelectionStart, getSelectionEnd )
-				: null;
+			const segments = ! parent ? readNoteSegments() : [];
 
 			const savedRecord = await saveEntityRecord(
 				'root',
@@ -316,42 +351,44 @@ export function useNoteActions() {
 				{ throwOnError: true }
 			);
 
-			// If it's a top-level note, update the block attributes with the note id.
-			// Read-modify-write on metadata is racy under concurrent edits:
-			// two near-simultaneous adds against the same base will each write
-			// a 2-element array and the later write wins, dropping the other
-			// id. Tracking issue: https://github.com/WordPress/gutenberg/issues/74751.
+			// Anchor a top-level note to every block it spans: add the id to each
+			// block's metadata and, where the segment covers text, wrap that text
+			// in a shared core/note marker. Read-modify-write on metadata is racy
+			// under concurrent edits (later write wins, dropping the other id):
+			// https://github.com/WordPress/gutenberg/issues/74751.
 			if ( ! parent && savedRecord?.id ) {
-				const clientId =
-					inlineSelection?.clientId || getSelectedBlockClientId();
-				if ( ! clientId ) {
-					return savedRecord;
-				}
-				const attributes = getBlockAttributes( clientId );
-				const metadata = attributes?.metadata;
-				const updatedMetadata = addNoteIdToMetadata(
-					metadata,
-					savedRecord.id
-				);
-				const newAttributes = {
-					metadata: cleanEmptyObject( updatedMetadata ),
-				};
-
-				// Inline path: also wrap the selected text with a core/note
-				// marker so the anchor survives later edits.
-				if ( inlineSelection ) {
-					const wrapped = wrapInlineNote(
-						attributes?.[ inlineSelection.attributeKey ],
-						savedRecord.id,
-						inlineSelection.start,
-						inlineSelection.end
-					);
-					if ( wrapped ) {
-						newAttributes[ inlineSelection.attributeKey ] = wrapped;
+				for ( const segment of segments ) {
+					const { clientId, attributeKey, start, end } = segment;
+					if ( ! clientId ) {
+						continue;
 					}
-				}
+					const attributes = getBlockAttributes( clientId );
+					const newAttributes = {
+						metadata: cleanEmptyObject(
+							addNoteIdToMetadata(
+								attributes?.metadata,
+								savedRecord.id
+							)
+						),
+					};
 
-				updateBlockAttributes( clientId, newAttributes );
+					// Text segments also carry the marker so the anchor survives
+					// later edits; edge/interior blocks with no range stay
+					// block-level (metadata only).
+					if ( attributeKey ) {
+						const wrapped = wrapInlineNote(
+							attributes?.[ attributeKey ],
+							savedRecord.id,
+							start,
+							end
+						);
+						if ( wrapped ) {
+							newAttributes[ attributeKey ] = wrapped;
+						}
+					}
+
+					updateBlockAttributes( clientId, newAttributes );
+				}
 			}
 
 			createNotice(
@@ -450,36 +487,41 @@ export function useNoteActions() {
 				throwOnError: true,
 			} );
 
+			// Strip the note's anchor from every block it spans: remove the id
+			// from metadata and remove the inline marker (if any). A multi-block
+			// note lives in several blocks, so scan them all rather than a single
+			// anchor. Each block's metadata + marker fold into one attribute
+			// update so it's a single undo step per block.
 			if ( ! note.parent ) {
-				// Use blockClientId if available, otherwise fall back to selected block.
-				const clientId =
-					note.blockClientId || getSelectedBlockClientId();
-				if ( ! clientId ) {
-					return;
-				}
-				const attributes = getBlockAttributes( clientId );
-				const newAttributes = {
-					metadata: cleanEmptyObject(
-						removeNoteIdFromMetadata(
-							attributes?.metadata,
-							note.id
-						)
-					),
-				};
-				// Strip the inline marker too (if any) so the deleted note's
-				// highlight doesn't linger in the content. Folded into the same
-				// attribute update so it's a single undo step.
-				const found = findNoteInBlock( attributes, note.id );
-				if ( found ) {
-					const next = removeNoteFormat(
-						attributes[ found.attributeKey ],
-						note.id
-					);
-					if ( next ) {
-						newAttributes[ found.attributeKey ] = next;
+				for ( const clientId of getClientIdsWithDescendants() ) {
+					const attributes = getBlockAttributes( clientId );
+					const hasMetadataId = getNoteIdsFromMetadata(
+						attributes?.metadata
+					).includes( note.id );
+					const found = findNoteInBlock( attributes, note.id );
+					if ( ! hasMetadataId && ! found ) {
+						continue;
 					}
+					const newAttributes = {};
+					if ( hasMetadataId ) {
+						newAttributes.metadata = cleanEmptyObject(
+							removeNoteIdFromMetadata(
+								attributes?.metadata,
+								note.id
+							)
+						);
+					}
+					if ( found ) {
+						const next = removeNoteFormat(
+							attributes[ found.attributeKey ],
+							note.id
+						);
+						if ( next ) {
+							newAttributes[ found.attributeKey ] = next;
+						}
+					}
+					updateBlockAttributes( clientId, newAttributes );
 				}
-				updateBlockAttributes( clientId, newAttributes );
 			}
 
 			createNotice( 'snackbar', __( 'Note deleted.' ), {
