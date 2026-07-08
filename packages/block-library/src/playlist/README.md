@@ -52,6 +52,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 **Provides context:**
 
 - `showArtists` → attribute `showArtists`
+- `showImages` → attribute `showImages`
 
 ## Block Styles
 

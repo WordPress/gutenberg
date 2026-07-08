@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Extract a shared `getBlockBindingsContext` helper for assembling the context handed to block-bindings sources; only entries present in the surrounding block context are copied ([#79855](https://github.com/WordPress/gutenberg/pull/79855)).
+
 ### Bug Fixes
 
 -   `DimensionControl`: Include component styles in the block editor stylesheet so the fieldset reset is applied in Storybook and other contexts without WordPress core styles ([#79916](https://github.com/WordPress/gutenberg/pull/79916)).

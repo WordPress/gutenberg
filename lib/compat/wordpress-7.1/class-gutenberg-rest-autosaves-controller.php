@@ -151,7 +151,7 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	 * skipped. Non-revisioned meta (e.g. the constantly changing `_crdt_document`)
 	 * is naturally excluded because it is not a revisioned meta key.
 	 *
-	 * @since 7.0.0
+	 * @since 7.1.0
 	 *
 	 * @param WP_Post $post      The saved parent post.
 	 * @param array   $post_data Prepared autosave post data.

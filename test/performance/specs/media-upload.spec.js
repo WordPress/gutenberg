@@ -42,6 +42,49 @@ async function createTempImage( sourceFile, ext ) {
 }
 
 /**
+ * Waits for the client-side upload queue to fully settle.
+ *
+ * With client-side media processing, the image `src` flips to the server URL
+ * as soon as the main file is uploaded, but thumbnail and original-image
+ * sideloads plus finalization are still in flight. Cleaning up (deleting
+ * media) while those requests are pending deletes the attachment out from
+ * under them, causing 404s and intermittently wedging the upload queue so
+ * the next upload never completes. See
+ * https://github.com/WordPress/gutenberg/issues/79923.
+ *
+ * @param {Object} page Playwright page.
+ */
+async function waitForUploadQueueEmpty( page ) {
+	await page.waitForFunction(
+		() => {
+			const store = window.wp.data.select( 'core/upload-media' );
+			return ! store || store.getItems().length === 0;
+		},
+		undefined,
+		{ timeout: 120_000 }
+	);
+}
+
+/**
+ * Deletes all media as a best effort, tolerating already-deleted items.
+ *
+ * When an upload errors client-side after the attachment was created, the
+ * upload queue deletes its own orphaned attachment in a fire-and-forget
+ * request. That request can race this cleanup, making one of the deletes
+ * 404. Leftovers, if any, are swept by the next iteration's cleanup.
+ *
+ * @param {Object} requestUtils Request utility.
+ */
+async function deleteAllMediaBestEffort( requestUtils ) {
+	try {
+		await requestUtils.deleteAllMedia();
+	} catch ( error ) {
+		// eslint-disable-next-line no-console
+		console.warn( `Media cleanup failed, continuing: ${ error.message }` );
+	}
+}
+
+/**
  * Runs upload iterations for a single image variant within one editor lifecycle.
  *
  * Inserts an image block, uploads the file, measures elapsed time, then
@@ -99,13 +142,17 @@ async function runUploadIterations( {
 			bucket.push( elapsed );
 		}
 
+		// Let pending sideloads/finalization finish before cleanup so
+		// deleting media doesn't race in-flight requests.
+		await waitForUploadQueueEmpty( page );
+
 		// Reset state for next iteration. Use resetBlocks rather than
 		// selecting and pressing Backspace because after upload, DOM focus
 		// is inside the block and Backspace is consumed by an inner element.
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/block-editor' ).resetBlocks( [] );
 		} );
-		await requestUtils.deleteAllMedia();
+		await deleteAllMediaBestEffort( requestUtils );
 		await fs.rm( tmpDirectory, {
 			recursive: true,
 			force: true,
@@ -246,13 +293,17 @@ test.describe( 'Media Upload Performance', () => {
 					results.multipleImageUploadProcessing.push( elapsed );
 				}
 
+				// Let pending sideloads/finalization finish before cleanup
+				// so deleting media doesn't race in-flight requests.
+				await waitForUploadQueueEmpty( page );
+
 				// Reset state for next iteration.
 				await page.evaluate( () => {
 					window.wp.data
 						.dispatch( 'core/block-editor' )
 						.resetBlocks( [] );
 				} );
-				await requestUtils.deleteAllMedia();
+				await deleteAllMediaBestEffort( requestUtils );
 				await fs.rm( tmpDirectory, {
 					recursive: true,
 					force: true,
