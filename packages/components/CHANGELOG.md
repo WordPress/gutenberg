@@ -41,6 +41,10 @@
 
 -   Document `clsx` object syntax for conditional CSS Module classes ([#79490](https://github.com/WordPress/gutenberg/pull/79490), [#79535](https://github.com/WordPress/gutenberg/pull/79535)).
 
+### Accessibility
+
+-   `Modal`: Use `inert` instead of `aria-hidden` to isolate non-modal regions, preventing keyboard access to background content while a modal is open ([#79969](https://github.com/WordPress/gutenberg/pull/79969)).
+
 ### Bug Fixes
 
 -   `Divider`: Restore lower-specificity border styles so custom border colors can override the default divider color. ([#79534](https://github.com/WordPress/gutenberg/pull/79534))
