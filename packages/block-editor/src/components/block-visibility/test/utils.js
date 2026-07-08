@@ -5,6 +5,7 @@ import {
 	getBlockVisibilityViewportEntries,
 	getViewportCheckboxState,
 	getHideEverywhereCheckboxState,
+	isBlockHiddenForViewport,
 } from '../utils';
 
 describe( 'block-visibility utils', () => {
@@ -288,6 +289,39 @@ describe( 'block-visibility utils', () => {
 				},
 			];
 			expect( getHideEverywhereCheckboxState( blocks ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isBlockHiddenForViewport', () => {
+		it( 'detects viewport-specific hidden state', () => {
+			expect(
+				isBlockHiddenForViewport(
+					{
+						attributes: {
+							metadata: {
+								blockVisibility: {
+									viewport: { mobile: false },
+								},
+							},
+						},
+					},
+					'mobile'
+				)
+			).toBe( true );
+			expect(
+				isBlockHiddenForViewport(
+					{
+						attributes: {
+							metadata: {
+								blockVisibility: {
+									viewport: { tablet: false },
+								},
+							},
+						},
+					},
+					'mobile'
+				)
+			).toBe( false );
 		} );
 	} );
 } );

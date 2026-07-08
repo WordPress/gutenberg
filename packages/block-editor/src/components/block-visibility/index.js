@@ -3,4 +3,5 @@ export { default as useBlockVisibility } from './use-block-visibility';
 export { default as ViewportVisibilityToolbar } from './viewport-toolbar';
 export { default as BlockVisibilityViewportMenuItem } from './viewport-menu-item';
 export { default as ViewportVisibilityInfo } from './viewport-visibility-info';
+export { default as ViewportVisibilityInspectorControl } from './viewport-inspector-control';
 export { getBlockVisibilityLabel } from './utils';
