@@ -39,7 +39,7 @@
 
 ### Bug Fixes
 
--   Restore a consistent medium (`500`) font weight on Windows by referencing the synthetic `Segoe UI WordPress Adjusted` font family in the default font stack and setting the medium font weight to `500`.
+-   Restore a consistent medium (`500`) font weight on Windows by referencing the synthetic `Segoe UI WordPress Adjusted` font family in the default font stack and setting the medium font weight to `500` ([#80020](https://github.com/WordPress/gutenberg/pull/80020)).
 
 ### Documentation
 
