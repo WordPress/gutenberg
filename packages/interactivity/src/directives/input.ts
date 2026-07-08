@@ -22,9 +22,9 @@
  * ```
  */
 import { directive, isDefaultDirectiveSuffix } from '../hooks';
-import { useInit, useLayoutEffect, useWatch, warn } from '../utils';
+import { useInit, useLayoutEffect, warn } from '../utils';
 import { store, setByPath } from '../store';
-import { PENDING_GETTER } from '../proxies/state';
+import { PENDING_GETTER, peek } from '../proxies/state';
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
@@ -238,13 +238,15 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 										typeof reader.result === 'string'
 											? reader.result
 											: '';
-									const match = result.match( dataURIRegex );								if ( globalThis.SCRIPT_DEBUG ) {
+								const match = result.match( dataURIRegex );
+								if ( globalThis.SCRIPT_DEBUG ) {
 									if ( ! match?.groups ) {
 										warn(
 											'data-wp-input: Invalid data URI for file input.'
 										);
 									}
-								}									resolve( {
+								}
+								resolve( {
 										name: f.name,
 										contents: match?.groups?.contents ?? '',
 										mime: match?.groups?.mime ?? '',
@@ -288,6 +290,10 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 	}
 
 	// ---- initial DOM sync (pre-paint): seed & sync ----
+	// NOTE: no dependencies → runs after every render.  This is necessary
+	// for <select multiple> where Preact diff does not update selected
+	// options; for all other element types the sync is a no-op when the
+	// props already match the DOM.
 	useLayoutEffect( () => {
 		const el = ( element.ref as { current?: InputBindingElement } ).current;
 		if ( ! el ) {
@@ -312,29 +318,28 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 			}
 		}
 
-		// Signal→element sync (re-read via evaluate in effect context;
-		// signal reads inside effects do not subscribe the component).
-		const current = evaluate( entry );
+		// Signal→element sync (re-read current value via peek — avoids
+		// evaluate/scope issues inside effects).
+		const syncParts = entry.value.split( '.' );
+		const syncLeaf = syncParts.pop();
+		let current: unknown = undefined;
+		if ( syncLeaf && syncParts.length ) {
+			const syncRoot = store( entry.namespace );
+			const syncParent = syncParts.reduce(
+				( prev: any, key: string ): any => {
+					if ( ! prev ) return undefined;
+					return peek( prev, key );
+				},
+				syncRoot
+			);
+			if ( syncParent ) {
+				current = peek( syncParent, syncLeaf );
+			}
+		}
 		if ( current != null && current !== PENDING_GETTER ) {
 			syncElementProp( el, desc, current, props );
 		}
-	}, [] );
-
-	// ---- multi-select: keep element in sync with signal (Preact diff
-	// does not handle <select multiple>) ----
-	if ( elementType === 'select' && props.multiple ) {
-		useWatch( () => {
-			const el = ( element.ref as { current?: HTMLSelectElement } )
-				.current;
-			if ( ! el ) {
-				return;
-			}
-			const current = evaluate( entry );
-			if ( Array.isArray( current ) ) {
-				syncElementProp( el, desc, current, props );
-			}
-		} );
-	}
+	} );
 
 	// ---- wire up event handlers ----
 	for ( const eventName of desc.events ) {
