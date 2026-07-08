@@ -15,6 +15,8 @@ const { state, actions } = store( 'directive-input', {
 		multiPet: [ 'dog' ],
 		tags0: 'a',
 		tags1: '',
+		selectNone: '',
+		radioNone: '',
 	},
 	actions: {
 		toggleText() {
