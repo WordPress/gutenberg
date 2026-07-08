@@ -38,18 +38,18 @@ async function firstTimeContributorLabel( payload, octokit ) {
 	// account, so it can miss commits made under a GitHub noreply address. When
 	// it finds nothing, confirm with a commit search, which matches by account.
 	// Search has a tighter rate limit, so it only runs in this rare fallback.
-	let previousCommits = commits.length;
-	if ( previousCommits === 0 ) {
+	let hasPreviousCommits = commits.length > 0;
+	if ( ! hasPreviousCommits ) {
 		const {
 			data: { total_count: searchCount },
 		} = await octokit.rest.search.commits( {
 			q: `repo:${ owner }/${ repo } author:${ author }`,
 			per_page: 1,
 		} );
-		previousCommits = searchCount;
+		hasPreviousCommits = searchCount > 0;
 	}
 
-	if ( previousCommits > 0 ) {
+	if ( hasPreviousCommits ) {
 		debug(
 			`first-time-contributor-label: Not the first commit for author. Aborting`
 		);
