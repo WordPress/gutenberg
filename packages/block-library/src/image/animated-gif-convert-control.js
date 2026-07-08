@@ -9,7 +9,6 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { video as videoIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -53,16 +52,18 @@ export default function AnimatedGifConvertControl( { attributes, clientId } ) {
 			if ( ! urlPath?.toLowerCase().endsWith( '.gif' ) ) {
 				return null;
 			}
-			// A gallery only accepts `core/image` children, so swapping the
-			// image for a video block there would be rejected. Hide the
-			// control inside a gallery; the converted video is still
+			// Only offer the conversion when a Video block can actually be
+			// inserted in place of this block (e.g. it isn't disabled and the
+			// parent allows it). This also covers galleries, whose children
+			// are restricted to `core/image`; the converted video is still
 			// sideloaded and stored for use elsewhere.
-			const { getBlockRootClientId, getBlockName } =
+			const { getBlockRootClientId, canInsertBlockType } =
 				select( blockEditorStore );
-			const rootClientId = getBlockRootClientId( clientId );
 			if (
-				rootClientId &&
-				getBlockName( rootClientId ) === 'core/gallery'
+				! canInsertBlockType(
+					'core/video',
+					getBlockRootClientId( clientId )
+				)
 			) {
 				return null;
 			}
@@ -126,7 +127,7 @@ export default function AnimatedGifConvertControl( { attributes, clientId } ) {
 	return (
 		<BlockControls group="other">
 			<ToolbarGroup>
-				<ToolbarButton icon={ videoIcon } onClick={ convertToVideo }>
+				<ToolbarButton onClick={ convertToVideo }>
 					{ __( 'Display as video' ) }
 				</ToolbarButton>
 			</ToolbarGroup>
