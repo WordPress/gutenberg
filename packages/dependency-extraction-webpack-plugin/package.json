@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dependency-extraction-webpack-plugin",
-	"version": "6.49.0",
+	"version": "6.50.0",
 	"description": "Extract WordPress script dependencies from webpack bundles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -46,7 +46,9 @@
 		"glob": "^7.1.2",
 		"lodash": "^4.17.21",
 		"mini-css-extract-plugin": "^2.9.2",
-		"mkdirp": "^3.0.1"
+		"mkdirp": "^3.0.1",
+		"rimraf": "^5.0.10",
+		"webpack": "^5.108.1"
 	},
 	"peerDependencies": {
 		"webpack": "^5.0.0"

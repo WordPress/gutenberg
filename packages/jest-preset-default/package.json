@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/jest-preset-default",
-	"version": "12.49.0",
+	"version": "12.50.0",
 	"description": "Default Jest preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -32,7 +32,11 @@
 	"main": "index.js",
 	"dependencies": {
 		"@wordpress/jest-console": "file:../jest-console",
-		"babel-jest": "^29.7.0"
+		"babel-jest": "^29.7.0",
+		"change-case": "^4.1.2"
+	},
+	"devDependencies": {
+		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {
 		"@babel/core": ">=7",

@@ -30,27 +30,48 @@ type LocationOption = {
 };
 
 const DRAFT_DEBOUNCE_MS = 300;
+const SEARCH_DEBOUNCE_MS = 500;
+
+type LocationPickerProps = {
+	/**
+	 * The initial input value.
+	 */
+	seedInput?: string;
+	/**
+	 * Whether to hide the label from vision.
+	 */
+	hideLabelFromVision?: boolean;
+
+	/**
+	 * Show the input's help text. Defaults to true.
+	 */
+	showDescription?: boolean;
+
+	/**
+	 * Controls Select button visibility.
+	 */
+	selectButton?: boolean;
+
+	/**
+	 * Called when the user selects a location.
+	 */
+	onSubmit?: ( location: string ) => void;
+
+	/**
+	 * Called after the input value settles (debounced). Used when `selectButton`
+	 * is false to stage attribute updates before they are persisted by the host.
+	 */
+	onChange?: ( location: string ) => void;
+};
 
 export function LocationPicker( {
 	onSubmit = () => {},
 	seedInput = '',
 	hideLabelFromVision = true,
+	showDescription = true,
 	selectButton = true,
 	onChange,
-}: {
-	onSubmit?: ( location: string ) => void;
-	seedInput?: string;
-	hideLabelFromVision?: boolean;
-	/**
-	 * Controls Select button visibility.
-	 */
-	selectButton?: boolean;
-	/**
-	 * Called after the input value settles (debounced). Used when `selectButton`
-	 * is false to stage attribute updates before Save.
-	 */
-	onChange?: ( location: string ) => void;
-} ) {
+}: LocationPickerProps ) {
 	const locationInputId = useId();
 	const [ locationInput, setLocationInput ] = useState( seedInput );
 	const [ locationOptions, setLocationOptions ] = useState<
@@ -226,7 +247,7 @@ export function LocationPicker( {
 				}
 				setLocationOptions( [] );
 			}
-		}, 200 );
+		}, SEARCH_DEBOUNCE_MS );
 
 		return () => {
 			clearTimeout( timeoutId );
@@ -258,9 +279,13 @@ export function LocationPicker( {
 								label={ __( 'City' ) }
 								hideLabelFromVision={ hideLabelFromVision }
 								size="compact"
-								description={ __(
-									'Select a city to view upcoming events.'
-								) }
+								description={
+									showDescription
+										? __(
+												'Select a city to view upcoming events.'
+										  )
+										: undefined
+								}
 								onValueChange={ () => {} }
 								onBlur={
 									! selectButton
@@ -284,7 +309,7 @@ export function LocationPicker( {
 								}
 							/>
 						}
-						placeholder={ __( 'City, like Tokyo…' ) }
+						placeholder={ __( 'Select city…' ) }
 					/>
 					{ locationOptions.length > 0 && (
 						<Autocomplete.Popup>

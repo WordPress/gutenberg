@@ -16,6 +16,7 @@ module.exports = {
 		'stylelint-plugin-logical-css',
 		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
 	],
+	reportNeedlessDisables: true,
 	rules: {
 		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,

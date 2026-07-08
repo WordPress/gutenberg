@@ -6,6 +6,9 @@ exports[`props should render alignment 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-1 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -20,22 +23,18 @@ exports[`props should render alignment 1`] = `
   justify-content: center;
 }
 
-.emotion-0>* {
+.emotion-2>* {
   min-height: 0;
 }
 
 <div>
   <div
-    class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
+    class="emotion-0 emotion-1 emotion-2 components-flex components-h-stack components-v-stack"
     data-wp-c16t="true"
     data-wp-component="VStack"
   >
-    <div
-      class="emotion-2 emotion-1"
-    />
-    <div
-      class="emotion-2 emotion-1"
-    />
+    <div />
+    <div />
   </div>
 </div>
 `;
@@ -46,6 +45,9 @@ exports[`props should render correctly 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-1 {
   -webkit-align-items: stretch;
   -webkit-box-align: stretch;
   -ms-flex-align: stretch;
@@ -60,22 +62,18 @@ exports[`props should render correctly 1`] = `
   justify-content: center;
 }
 
-.emotion-0>* {
+.emotion-2>* {
   min-height: 0;
 }
 
 <div>
   <div
-    class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
+    class="emotion-0 emotion-1 emotion-2 components-flex components-h-stack components-v-stack"
     data-wp-c16t="true"
     data-wp-component="VStack"
   >
-    <div
-      class="emotion-2 emotion-1"
-    />
-    <div
-      class="emotion-2 emotion-1"
-    />
+    <div />
+    <div />
   </div>
 </div>
 `;
@@ -86,6 +84,9 @@ exports[`props should render spacing 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-1 {
   -webkit-align-items: stretch;
   -webkit-box-align: stretch;
   -ms-flex-align: stretch;
@@ -100,22 +101,18 @@ exports[`props should render spacing 1`] = `
   justify-content: center;
 }
 
-.emotion-0>* {
+.emotion-2>* {
   min-height: 0;
 }
 
 <div>
   <div
-    class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
+    class="emotion-0 emotion-1 emotion-2 components-flex components-h-stack components-v-stack"
     data-wp-c16t="true"
     data-wp-component="VStack"
   >
-    <div
-      class="emotion-2 emotion-1"
-    />
-    <div
-      class="emotion-2 emotion-1"
-    />
+    <div />
+    <div />
   </div>
 </div>
 `;

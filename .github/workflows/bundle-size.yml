@@ -49,7 +49,7 @@ jobs:
             pull-requests: write
 
         steps:
-            - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   fetch-depth: 1
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
@@ -62,7 +62,7 @@ jobs:
                   check-latest: true
                   cache: npm
 
-            - uses: preactjs/compressed-size-action@66325aad6443cb7cf89c4bfcd414aea2367cda94 # v2.9.1
+            - uses: preactjs/compressed-size-action@f322c295dde06a1cb7ccaef105732dd8a726d1d9 # v2.10.0
               with:
                   omit-unchanged: true
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'

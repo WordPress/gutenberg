@@ -103,6 +103,14 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 				 */
 				container.ownerDocument.defaultView.requestAnimationFrame(
 					() => {
+						/*
+						 * A submit may have started between the blur and this
+						 * frame (e.g. Safari fires button-click blurs with no
+						 * relatedTarget); never dismiss mid-submit.
+						 */
+						if ( isSubmittingRef.current ) {
+							return;
+						}
 						const active = container.ownerDocument.activeElement;
 						if ( active && container.contains( active ) ) {
 							return;
@@ -122,11 +130,26 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 				<NoteForm
 					onSubmit={ async ( inputComment ) => {
 						isSubmittingRef.current = true;
-						const { id } = await onSubmit( {
-							content: inputComment,
-						} );
-						selectNote( id );
-						focusNoteThread( id, sidebarRef.current );
+						try {
+							/*
+							 * The create action resolves `undefined` when the
+							 * save fails (it surfaces its own error notice);
+							 * keep the form open so the draft isn't lost.
+							 */
+							const savedRecord = await onSubmit( {
+								content: inputComment,
+							} );
+							if ( savedRecord ) {
+								selectNote( savedRecord.id );
+								focusNoteThread(
+									savedRecord.id,
+									sidebarRef.current
+								);
+							}
+							return savedRecord;
+						} finally {
+							isSubmittingRef.current = false;
+						}
 					} }
 					onCancel={ unselectNote }
 					labels={ { input: __( 'New note' ) } }

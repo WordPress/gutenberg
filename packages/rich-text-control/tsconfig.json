@@ -1,0 +1,20 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"types": [ "gutenberg-env" ]
+	},
+	"references": [
+		{ "path": "../components" },
+		{ "path": "../compose" },
+		{ "path": "../element" },
+		{ "path": "../private-apis" },
+		{ "path": "../rich-text" }
+	],
+	"exclude": [
+		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
+		// The story imports `@wordpress/format-library` (untyped) for its
+		// side effect of registering the core formats.
+		"src/**/stories/**"
+	]
+}

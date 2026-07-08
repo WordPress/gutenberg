@@ -21,7 +21,8 @@ import { useEffect, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import TabToolbarControls from '../tab-panel/tab-toolbar-controls';
+import TabToolbarControls from '../tabs/tab-toolbar-controls';
+import useTabActions from '../tabs/use-tab-actions';
 
 const EMPTY_ARRAY = [];
 
@@ -55,11 +56,13 @@ function Edit( {
 		},
 		[ clientId ]
 	);
+	const { isBlockSelected, hasSelectedInnerBlock } =
+		useSelect( blockEditorStore );
+	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+	const { insertTab, removeTab } = useTabActions( tabsClientId );
 
 	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
-
-	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
-		useDispatch( blockEditorStore );
 
 	function selectTabPanel( tabIndex ) {
 		if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
@@ -89,24 +92,32 @@ function Edit( {
 			return;
 		}
 
+		// Only move focus during active editing, not external data changes.
+		if (
+			! isBlockSelected( tabsClientId ) &&
+			! hasSelectedInnerBlock( tabsClientId, true )
+		) {
+			return;
+		}
+
 		const focusButtonAt = ( index ) => {
 			window.requestAnimationFrame( () => {
-				const buttons = menuRef.current?.querySelectorAll( 'button' );
-				const target = buttons?.[ index ];
-				if ( ! target ) {
-					return;
-				}
-				const richText = target.querySelector( '[contenteditable]' );
-				if ( richText ) {
-					richText.focus();
-				} else {
-					target.focus();
-				}
+				const button =
+					menuRef.current?.querySelectorAll( 'button' )?.[ index ];
+				(
+					button?.querySelector( '[contenteditable]' ) ?? button
+				)?.focus();
 			} );
 		};
 
 		focusButtonAt( effectiveActiveIndex );
-	}, [ tabsList.length, effectiveActiveIndex ] );
+	}, [
+		effectiveActiveIndex,
+		hasSelectedInnerBlock,
+		isBlockSelected,
+		tabsClientId,
+		tabsList.length,
+	] );
 
 	const blockProps = useBlockProps( {
 		role: 'tablist',
@@ -154,6 +165,10 @@ function Edit( {
 								onChange={ ( newLabel ) =>
 									handleLabelChange( index, newLabel )
 								}
+								__unstableOnSplitAtEnd={ () =>
+									insertTab( index + 1 )
+								}
+								onRemove={ () => removeTab( index ) }
 							/>
 						</button>
 					);

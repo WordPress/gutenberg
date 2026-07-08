@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 /*
  * The note form pulls in @wordpress/components, @wordpress/ui, and
@@ -45,10 +45,12 @@ jest.mock( '@wordpress/ui', () => {
 	};
 } );
 
-// The form renders `RichTextControl` from `@wordpress/rich-text-control`,
-// whose import graph reaches the full rich-text/components machinery that
-// isn't relevant to the form's logic. Substitute a minimal contenteditable
-// stand-in so the test stays focused on the form's behavior.
+/*
+ * The form renders `RichTextControl` from `@wordpress/rich-text-control`,
+ * whose import graph reaches the full rich-text/components machinery that
+ * isn't relevant to the form's logic. Substitute a minimal contenteditable
+ * stand-in so the test stays focused on the form's behavior.
+ */
 const MockRichTextControl = ( {
 	value,
 	onChange,
@@ -166,16 +168,24 @@ describe( 'NoteForm', () => {
 		).toBeEnabled();
 	} );
 
-	it( 'submits the form on ⌘+Enter when the content is non-empty', () => {
+	it( 'submits the form on ⌘+Enter when the content is non-empty', async () => {
 		const { onSubmit } = setup();
 		const input = setInputValue( 'Hello' );
-		// `isKeyboardEvent.primary` uses Ctrl on non-Apple platforms; jsdom's
-		// navigator.platform is empty, so Ctrl is the primary modifier here.
+		/*
+		 * `isKeyboardEvent.primary` uses Ctrl on non-Apple platforms; jsdom's
+		 * navigator.platform is empty, so Ctrl is the primary modifier here.
+		 */
 		fireEvent.keyDown( input, { key: 'Enter', ctrlKey: true } );
 		expect( onSubmit ).toHaveBeenCalledWith( 'Hello' );
+		// Wait for the async submit state updates to settle.
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', { name: 'Add note' } )
+			).toBeEnabled()
+		);
 	} );
 
-	it( 'submits the entered content when the submit button is clicked', () => {
+	it( 'submits the entered content when the submit button is clicked', async () => {
 		/*
 		 * The reply and reopen flows reuse NoteForm and submit via this
 		 * button, so this covers that replies work independently of the
@@ -185,13 +195,43 @@ describe( 'NoteForm', () => {
 		setInputValue( 'A reply' );
 		fireEvent.click( screen.getByRole( 'button', { name: 'Reply' } ) );
 		expect( onSubmit ).toHaveBeenCalledWith( 'A reply' );
+		// Wait for the async submit state updates to settle.
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', { name: 'Reply' } )
+			).toBeEnabled()
+		);
+	} );
+
+	it( 'clears the draft only after the submitter reports success', async () => {
+		const { onSubmit } = setup();
+		onSubmit.mockResolvedValue( { id: 1 } );
+		const input = setInputValue( 'Hello' );
+		fireEvent.keyDown( input, { key: 'Enter', ctrlKey: true } );
+		await waitFor( () => expect( input ).toHaveTextContent( '' ) );
+	} );
+
+	it( 'keeps the draft when the submit fails', async () => {
+		const { onSubmit } = setup();
+		// The note actions resolve `undefined` when the save fails.
+		onSubmit.mockResolvedValue( undefined );
+		const input = setInputValue( 'Hello' );
+		fireEvent.keyDown( input, { key: 'Enter', ctrlKey: true } );
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', { name: 'Add note' } )
+			).toBeEnabled()
+		);
+		expect( input ).toHaveTextContent( 'Hello' );
 	} );
 
 	it( 'does not submit on ⌘+Enter when the content is empty', () => {
 		const { onSubmit } = setup();
 		const input = screen.getByTestId( 'note-rich-text' );
-		// `isKeyboardEvent.primary` uses Ctrl on non-Apple platforms; jsdom's
-		// navigator.platform is empty, so Ctrl is the primary modifier here.
+		/*
+		 * `isKeyboardEvent.primary` uses Ctrl on non-Apple platforms; jsdom's
+		 * navigator.platform is empty, so Ctrl is the primary modifier here.
+		 */
 		fireEvent.keyDown( input, { key: 'Enter', ctrlKey: true } );
 		expect( onSubmit ).not.toHaveBeenCalled();
 	} );

@@ -36,16 +36,18 @@ endpoint, exposed while the `gutenberg-dashboard-widgets` experiment is
 enabled. The dashboard reads it through a `@wordpress/core-data` entity and
 passes the records to the hook.
 
-With no records, or an empty list, `useWidgetTypes()` returns an empty list.
+An empty list of records resolves to an empty `widgetTypes` with
+`isResolvingWidgetTypes` set to `false`. Passing `null` (or `undefined`) keeps
+the hook in its loading state: `widgetTypes` is empty and
+`isResolvingWidgetTypes` stays `true`.
 
 ## Public API
 
--   `<WidgetRender>`: canonical entry point for any host that mounts a widget.
-    Resolves the widget's render module via a host-provided `resolveWidgetModule`
-    and mounts the resulting component with the standard `attributes` plus
-    `setAttributes` render contract. Error handling and chrome are host
-    concerns; because the component is mounted lazily, the host must also
-    wrap it in a `Suspense` boundary.
+-   `<WidgetRender>`: entry point for any host that mounts a widget. It
+    resolves the widget's render module via a host-provided
+    `resolveWidgetModule` and mounts the resulting component with the
+    `attributes` / `setAttributes` render contract. Error handling and chrome
+    stay with the host, which wraps the lazy render in a `Suspense` boundary.
 -   `useWidgetTypes( records )` → `[ widgetTypes, isResolvingWidgetTypes ]`:
     takes host-supplied records (`WidgetModuleRecord[]`, or `null` while
     loading) and imports each record's metadata module;
@@ -54,6 +56,9 @@ With no records, or an empty list, `useWidgetTypes()` returns an empty list.
     `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`.
     `WidgetIcon` is a rendered SVG element; hosts pass it to their icon
     primitive as is.
+-   `WidgetAttributeField< Item >`: authoring helper. It is a DataViews
+    `Field` whose `id` is narrowed to the keys of the widget's attribute
+    object.
 
 ## Architecture
 

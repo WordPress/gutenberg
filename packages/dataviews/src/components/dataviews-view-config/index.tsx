@@ -160,7 +160,6 @@ function SortDirectionControl() {
 	return (
 		<ToggleGroupControl
 			className="dataviews-view-config__sort-direction"
-			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Order' ) }
 			value={ value }
@@ -214,7 +213,6 @@ function ItemsPerPageControl() {
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Items per page' ) }
 			value={ view.perPage || 10 }
