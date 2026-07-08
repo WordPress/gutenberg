@@ -121,10 +121,13 @@ jobs:
                   RELEASE_BRANCH="release/${NEW_VERSION_ARRAY[0]}.${NEW_VERSION_ARRAY[1]}"
                   echo "release_branch=${RELEASE_BRANCH}" >> "$GITHUB_OUTPUT"
 
-            - name: Configure git user name and email
-              run: |
-                  git config user.name "Gutenberg Repository Automation"
-                  git config user.email gutenberg@wordpress.org
+            - name: Configure Git user name
+              run: git config user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
+
+            - name: Configure Git user email
+              env:
+                  APP_ID: ${{ vars.APP_ID }}
+              run: git config user.email "${APP_ID}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
 
             - name: Create and switch to release branch
               if: |
@@ -376,10 +379,13 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: true
 
-            - name: Configure git user name and email
-              run: |
-                  git config user.name "Gutenberg Repository Automation"
-                  git config user.email gutenberg@wordpress.org
+            - name: Configure Git user name
+              run: git config user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
+
+            - name: Configure Git user email
+              env:
+                  APP_ID: ${{ vars.APP_ID }}
+              run: git config user.email "${APP_ID}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
 
             - name: Revert version bump commit on release branch
               if: |
