@@ -271,6 +271,77 @@ test.describe( 'Block Notes', () => {
 		await expect( separator ).toHaveText( 'Resolved' );
 	} );
 
+	test( 'keeps a note whose block was deleted above the "Resolved" divider', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		// First block: its note is orphaned when the block is deleted.
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Orphan me.' },
+			comment: 'Note losing its block.',
+		} );
+		// Second block: this note will be resolved.
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Keep me.' },
+			comment: 'Note to resolve.',
+		} );
+
+		await blockNoteUtils.openBlockNoteSidebar();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		// Resolve the second note.
+		const resolvedThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Note to resolve.',
+		} );
+		await resolvedThread.click();
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note marked as resolved.' } )
+		).toBeVisible();
+
+		// Delete the first block via the store, orphaning its note. Clicking
+		// the block in the canvas is unreliable here because the selected
+		// note's block toolbar popover overlaps it.
+		const orphanBlock = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Orphan me.' } );
+		const orphanClientId = await orphanBlock.getAttribute( 'data-block' );
+		await page.evaluate(
+			( clientId ) =>
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.removeBlock( clientId ),
+			orphanClientId
+		);
+
+		// The orphaned note persists and is flagged as detached, rather than
+		// being auto-deleted or moved into the resolved section.
+		const orphanThread = sidebar.getByRole( 'treeitem', {
+			name: 'Original block deleted. Note: Note losing its block.',
+		} );
+		await expect( orphanThread ).toBeVisible();
+
+		const separator = sidebar.locator(
+			'.editor-collab-sidebar-panel__status-separator'
+		);
+		await expect( separator ).toBeVisible();
+
+		// The orphaned note stays with the active notes above the divider;
+		// the resolved note sits below it.
+		const orphanBox = await orphanThread.boundingBox();
+		const separatorBox = await separator.boundingBox();
+		const resolvedBox = await resolvedThread.boundingBox();
+		expect( orphanBox.y ).toBeLessThan( separatorBox.y );
+		expect( separatorBox.y ).toBeLessThan( resolvedBox.y );
+	} );
+
 	test( 'selecting a block or note marks it as an active', async ( {
 		editor,
 		page,
