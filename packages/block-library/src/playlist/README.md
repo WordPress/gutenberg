@@ -29,6 +29,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `showArtists` | `boolean` | `true` | — |
 | `showNumbers` | `boolean` | `true` | — |
 | `showTrackLength` | `boolean` | `true` | — |
+| `waveformStyle` | `string` | — | — |
 | `waveformColor` | `string` | — | — |
 | `customWaveformColor` | `string` | — | — |
 | `waveformColorValue` | `string` | — | — |
@@ -59,19 +60,6 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 - `showArtists` → attribute `showArtists`
 - `showImages` → attribute `showImages`
-
-## Block Styles
-
-_Defined via the [`styles`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/) property in block.json._
-
-| Style Name | Label | Default |
-|------------|-------|---------|
-| `bars` | Bars | Yes |
-| `mirror` | Mirror | No |
-| `line` | Line | No |
-| `blocks` | Blocks | No |
-| `dots` | Dots | No |
-| `seekbar` | Seekbar | No |
 
 ## Block Markup
 

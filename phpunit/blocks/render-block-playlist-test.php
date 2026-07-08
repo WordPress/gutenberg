@@ -156,10 +156,61 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	/**
 	 * @covers ::render_block_core_playlist
 	 */
-	public function test_waveform_style_extracted_from_single_word_style_class() {
+	public function test_waveform_style_uses_attribute() {
 		$markup = $this->build_playlist_markup(
 			array(
-				'className' => 'is-style-mirror',
+				'waveformStyle' => 'dots',
+			),
+			array(
+				array(
+					'id'    => 1,
+					'title' => 'Song One',
+					'src'   => 'http://example.com/song1.mp3',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+		$p      = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( 'figure' );
+
+		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
+		$this->assertSame( 'dots', $context['waveformStyle'] );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 */
+	public function test_waveform_style_attribute_takes_precedence_over_style_class() {
+		$markup = $this->build_playlist_markup(
+			array(
+				'className'     => 'waveform-style--mirror',
+				'waveformStyle' => 'line',
+			),
+			array(
+				array(
+					'id'    => 1,
+					'title' => 'Song One',
+					'src'   => 'http://example.com/song1.mp3',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+		$p      = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( 'figure' );
+
+		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
+		$this->assertSame( 'line', $context['waveformStyle'] );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 */
+	public function test_waveform_style_falls_back_to_style_class() {
+		$markup = $this->build_playlist_markup(
+			array(
+				'className' => 'custom-class waveform-style--mirror',
 			),
 			array(
 				array(
@@ -179,16 +230,12 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A hyphenated block style slug (e.g. one registered by a theme) must be
-	 * extracted in full. The `\w+` pattern stops at the first hyphen and would
-	 * yield 'thin' instead of 'thin-line'.
-	 *
 	 * @covers ::render_block_core_playlist
 	 */
-	public function test_waveform_style_extracted_from_hyphenated_style_class() {
+	public function test_waveform_style_ignores_unknown_style_class() {
 		$markup = $this->build_playlist_markup(
 			array(
-				'className' => 'is-style-thin-line',
+				'className' => 'waveform-style--thin-line',
 			),
 			array(
 				array(
@@ -204,7 +251,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 		$p->next_tag( 'figure' );
 
 		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
-		$this->assertSame( 'thin-line', $context['waveformStyle'] );
+		$this->assertSame( 'bars', $context['waveformStyle'] );
 	}
 
 	/**

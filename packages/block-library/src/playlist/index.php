@@ -133,10 +133,25 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$processor = new WP_HTML_Tag_Processor( $content );
 	$processor->next_tag( 'figure' );
 	$processor->set_attribute( 'data-wp-interactive', 'core/playlist' );
-	// Extract the waveform style from the block style variation class.
-	$waveform_style = 'bars';
-	if ( ! empty( $attributes['className'] ) && preg_match( '/is-style-([\w-]+)/', $attributes['className'], $matches ) ) {
-		$waveform_style = $matches[1];
+
+	$waveform_styles       = array( 'bars', 'mirror', 'line', 'blocks', 'dots', 'seekbar' );
+	$waveform_style        = 'bars';
+	$waveform_style_prefix = 'waveform-style--';
+
+	if ( ! empty( $attributes['waveformStyle'] ) && in_array( $attributes['waveformStyle'], $waveform_styles, true ) ) {
+		$waveform_style = $attributes['waveformStyle'];
+	} elseif ( ! empty( $attributes['className'] ) ) {
+		foreach ( preg_split( '/\s+/', trim( $attributes['className'] ) ) as $class_name ) {
+			if ( 0 !== strpos( $class_name, $waveform_style_prefix ) ) {
+				continue;
+			}
+
+			$style = substr( $class_name, strlen( $waveform_style_prefix ) );
+			if ( in_array( $style, $waveform_styles, true ) ) {
+				$waveform_style = $style;
+				break;
+			}
+		}
 	}
 
 	$processor->set_attribute(

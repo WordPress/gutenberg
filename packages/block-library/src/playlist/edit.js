@@ -44,6 +44,79 @@ import { PlaylistContext } from './context';
 import { getTrackAttributes } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+const DEFAULT_WAVEFORM_STYLE = 'bars';
+const WAVEFORM_STYLE_OPTIONS = [
+	{ label: __( 'Bars' ), value: 'bars' },
+	{ label: __( 'Mirror' ), value: 'mirror' },
+	{ label: __( 'Line' ), value: 'line' },
+	{ label: __( 'Blocks' ), value: 'blocks' },
+	{ label: __( 'Dots' ), value: 'dots' },
+	{ label: __( 'Seekbar' ), value: 'seekbar' },
+];
+const WAVEFORM_STYLE_VALUES = WAVEFORM_STYLE_OPTIONS.map(
+	( { value } ) => value
+);
+const WAVEFORM_STYLE_CLASS_PREFIX = 'waveform-style--';
+
+function getWaveformStyleClassName( waveformStyle ) {
+	return `${ WAVEFORM_STYLE_CLASS_PREFIX }${ waveformStyle }`;
+}
+
+function getWaveformStyleFromClassNamePart( classNamePart, prefix ) {
+	if ( ! classNamePart.startsWith( prefix ) ) {
+		return;
+	}
+
+	const waveformStyle = classNamePart.slice( prefix.length );
+	return WAVEFORM_STYLE_VALUES.includes( waveformStyle )
+		? waveformStyle
+		: undefined;
+}
+
+function getWaveformStyleFromClassNames( classNames, prefix ) {
+	return classNames
+		.map( ( classNamePart ) =>
+			getWaveformStyleFromClassNamePart( classNamePart, prefix )
+		)
+		.find( Boolean );
+}
+
+function getClassNames( className = '' ) {
+	return className.split( /\s+/ ).filter( Boolean );
+}
+
+function getWaveformStyleFromClassName( className ) {
+	const classNames = getClassNames( className );
+	return getWaveformStyleFromClassNames(
+		classNames,
+		WAVEFORM_STYLE_CLASS_PREFIX
+	);
+}
+
+function isWaveformStyle( waveformStyle ) {
+	return WAVEFORM_STYLE_VALUES.includes( waveformStyle );
+}
+
+function removeWaveformStyleClasses( className ) {
+	const nextClassName = getClassNames( className )
+		.filter(
+			( classNamePart ) =>
+				! classNamePart.startsWith( WAVEFORM_STYLE_CLASS_PREFIX )
+		)
+		.join( ' ' );
+
+	return nextClassName || undefined;
+}
+
+function getClassNameWithWaveformStyle( className, waveformStyle ) {
+	const classNames = getClassNames( removeWaveformStyleClasses( className ) );
+
+	if ( waveformStyle !== DEFAULT_WAVEFORM_STYLE ) {
+		classNames.push( getWaveformStyleClassName( waveformStyle ) );
+	}
+
+	return classNames.join( ' ' ) || undefined;
+}
 
 const PlaylistEdit = ( {
 	attributes,
@@ -63,13 +136,15 @@ const PlaylistEdit = ( {
 		showImages,
 		showArtists,
 		showTrackLength,
+		waveformStyle: waveformStyleAttribute,
 		waveformColorValue,
 		waveformBackgroundColorValue,
 	} = attributes;
 
-	// Extract the waveform style from the block style variation class.
-	const waveformStyle =
-		attributes.className?.match( /is-style-([\w-]+)/ )?.[ 1 ] || 'bars';
+	const waveformStyle = isWaveformStyle( waveformStyleAttribute )
+		? waveformStyleAttribute
+		: getWaveformStyleFromClassName( attributes.className ) ||
+		  DEFAULT_WAVEFORM_STYLE;
 	const blockProps = useBlockProps();
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	const resolvedWaveformColor = waveformColor.color || waveformColorValue;
@@ -202,6 +277,26 @@ const PlaylistEdit = ( {
 			setAttributes( { [ attribute ]: newValue } );
 		};
 	}
+
+	const onChangeWaveformStyle = useCallback(
+		( nextWaveformStyle ) => {
+			const nextStyle = isWaveformStyle( nextWaveformStyle )
+				? nextWaveformStyle
+				: DEFAULT_WAVEFORM_STYLE;
+
+			setAttributes( {
+				waveformStyle:
+					nextStyle === DEFAULT_WAVEFORM_STYLE
+						? undefined
+						: nextStyle,
+				className: getClassNameWithWaveformStyle(
+					attributes.className,
+					nextStyle
+				),
+			} );
+		},
+		[ attributes.className, setAttributes ]
+	);
 
 	const hasSelectedChild = useSelect(
 		( select ) =>
@@ -372,21 +467,43 @@ const PlaylistEdit = ( {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
-			{ colorGradientSettings.hasColorsOrGradients && (
-				<InspectorControls group="styles">
-					<ToolsPanel
-						label={ __( 'Waveform' ) }
-						resetAll={ () => {
-							setWaveformColor( undefined );
-							setWaveformBackgroundColor( undefined );
-							setAttributes( {
-								waveformColorValue: undefined,
-								waveformBackgroundColorValue: undefined,
-							} );
-						} }
+			<InspectorControls group="styles">
+				<ToolsPanel
+					label={ __( 'Waveform' ) }
+					resetAll={ () => {
+						setWaveformColor( undefined );
+						setWaveformBackgroundColor( undefined );
+						setAttributes( {
+							waveformStyle: undefined,
+							className: removeWaveformStyleClasses(
+								attributes.className
+							),
+							waveformColorValue: undefined,
+							waveformBackgroundColorValue: undefined,
+						} );
+					} }
+					panelId={ waveformPanelId }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						label={ __( 'Shape' ) }
+						isShownByDefault
+						hasValue={ () =>
+							waveformStyle !== DEFAULT_WAVEFORM_STYLE
+						}
+						onDeselect={ () =>
+							onChangeWaveformStyle( DEFAULT_WAVEFORM_STYLE )
+						}
 						panelId={ waveformPanelId }
-						dropdownMenuProps={ dropdownMenuProps }
 					>
+						<SelectControl
+							label={ __( 'Shape' ) }
+							value={ waveformStyle }
+							options={ WAVEFORM_STYLE_OPTIONS }
+							onChange={ onChangeWaveformStyle }
+						/>
+					</ToolsPanelItem>
+					{ colorGradientSettings.hasColorsOrGradients && (
 						<ColorGradientSettingsDropdown
 							__experimentalIsRenderedInSidebar
 							settings={ [
@@ -436,9 +553,9 @@ const PlaylistEdit = ( {
 							panelId={ waveformPanelId }
 							{ ...colorGradientSettings }
 						/>
-					</ToolsPanel>
-				</InspectorControls>
-			) }
+					) }
+				</ToolsPanel>
+			</InspectorControls>
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
 					<WaveformPlayer
