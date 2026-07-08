@@ -143,8 +143,5 @@ test.describe( 'Preload with the DataForm inspector experiment', () => {
 async function openPostSummary( { editor, page } ) {
 	await editor.openDocumentSettingsSidebar();
 
-	const summary = page.locator( '.editor-post-summary' );
-	await expect( summary ).toBeVisible();
-
-	return summary;
+	await expect( page.locator( '.editor-post-summary' ) ).toBeVisible();
 }
