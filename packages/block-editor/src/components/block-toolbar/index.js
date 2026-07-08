@@ -34,7 +34,7 @@ import { useShowHoveredOrFocusedGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import NavigableToolbar from '../navigable-toolbar';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
-import ChangeDesign from './change-design';
+import ReplacePattern from './replace-pattern';
 import SwitchSectionStyle from './switch-section-style';
 import EditSectionButton from './edit-section-button';
 import { unlock } from '../../lock-unlock';
@@ -71,7 +71,7 @@ export function PrivateBlockToolbar( {
 		isUsingBindings,
 		isSectionContainer,
 		hasContentOnlyLocking,
-		showShuffleButton,
+		showReplaceButton,
 		showSlots,
 		showGroupButtons,
 		showLockButtons,
@@ -157,7 +157,7 @@ export function PrivateBlockToolbar( {
 			isUsingBindings: _isUsingBindings,
 			isSectionContainer: _isSectionBlock,
 			hasContentOnlyLocking: _hasTemplateLock,
-			showShuffleButton: _isZoomOut,
+			showReplaceButton: _isZoomOut,
 			showSlots: ! _isZoomOut,
 			showGroupButtons: ! _isZoomOut,
 			showLockButtons: ! _isZoomOut,
@@ -253,8 +253,8 @@ export function PrivateBlockToolbar( {
 				{ ! isMultiToolbar && canEdit && (
 					<EditSectionButton clientId={ blockClientIds[ 0 ] } />
 				) }
-				{ ! areSelectedBlocksHiddenOnViewport && showShuffleButton && (
-					<ChangeDesign clientId={ blockClientIds[ 0 ] } />
+				{ ! areSelectedBlocksHiddenOnViewport && showReplaceButton && (
+					<ReplacePattern clientId={ blockClientIds[ 0 ] } />
 				) }
 				{ ! areSelectedBlocksHiddenOnViewport &&
 					showSwitchSectionStyleButton && (

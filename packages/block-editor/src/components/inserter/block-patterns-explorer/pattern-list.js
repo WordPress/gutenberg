@@ -54,6 +54,7 @@ function PatternList( {
 	patternCategories,
 	rootClientId,
 	onModalClose,
+	onPatternSelect,
 } ) {
 	const container = useRef();
 	const debouncedSpeak = useDebounce( speak, 500 );
@@ -66,6 +67,7 @@ function PatternList( {
 		destinationRootClientId,
 		selectedCategory
 	);
+	const handleClickPattern = onPatternSelect ?? onClickPattern;
 
 	const registeredPatternCategories = useMemo(
 		() =>
@@ -161,7 +163,7 @@ function PatternList( {
 						<BlockPatternsList
 							blockPatterns={ pagingProps.categoryPatterns }
 							onClickPattern={ ( pattern, blocks ) => {
-								onClickPattern( pattern, blocks );
+								handleClickPattern( pattern, blocks );
 								onModalClose();
 							} }
 							isDraggable={ false }
