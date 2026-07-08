@@ -18,7 +18,17 @@ import { getSourceRegion } from '../../core/source-region';
 /** Debounce delay for ARIA live announcements (ms). */
 const ARIA_DEBOUNCE_MS = 300;
 
-function buildFlipAnnouncement( state: CropperState ): string {
+function getFlipAnnouncement(
+	state: CropperState,
+	previousState: CropperState | null
+): string | undefined {
+	if (
+		! previousState ||
+		( previousState.flip.horizontal === state.flip.horizontal &&
+			previousState.flip.vertical === state.flip.vertical )
+	) {
+		return undefined;
+	}
 	const { horizontal, vertical } = state.flip;
 	if ( horizontal && vertical ) {
 		return __( 'Flipped horizontally and vertically' );
@@ -96,25 +106,18 @@ function getCropAnnouncement(
 	) {
 		return undefined;
 	}
-	if ( state.image ) {
-		const region = getSourceRegion( state, {
-			width: state.image.naturalWidth,
-			height: state.image.naturalHeight,
-		} );
-		return sprintf(
-			/* translators: 1: crop width in pixels, 2: crop height in pixels. */
-			__( 'Crop %1$d by %2$d pixels' ),
-			Math.round( region.width ),
-			Math.round( region.height )
-		);
+	if ( ! state.image ) {
+		return undefined;
 	}
-	const cropW = Math.round( state.cropRect.width * 100 );
-	const cropH = Math.round( state.cropRect.height * 100 );
+	const region = getSourceRegion( state, {
+		width: state.image.naturalWidth,
+		height: state.image.naturalHeight,
+	} );
 	return sprintf(
-		/* translators: 1: crop width as a percentage, 2: crop height as a percentage. */
-		__( 'Crop width %1$d%%, height %2$d%%' ),
-		cropW,
-		cropH
+		/* translators: 1: crop width in pixels, 2: crop height in pixels. */
+		__( 'Crop %1$d by %2$d pixels' ),
+		Math.round( region.width ),
+		Math.round( region.height )
 	);
 }
 
@@ -134,20 +137,6 @@ function getZoomAnnouncement(
 		__( 'Zoom %d%%' ),
 		Math.round( state.zoom * 100 )
 	);
-}
-
-function getFlipAnnouncement(
-	state: CropperState,
-	previousState: CropperState | null
-): string | undefined {
-	if (
-		! previousState ||
-		( previousState.flip.horizontal === state.flip.horizontal &&
-			previousState.flip.vertical === state.flip.vertical )
-	) {
-		return undefined;
-	}
-	return buildFlipAnnouncement( state );
 }
 
 function buildAnnouncement(

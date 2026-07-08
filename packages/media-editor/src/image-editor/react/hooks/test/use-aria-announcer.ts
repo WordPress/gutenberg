@@ -103,24 +103,6 @@ describe( 'useAriaAnnouncer', () => {
 		expect( result.current ).toBe( 'Crop 800 by 400 pixels' );
 	} );
 
-	it( 'falls back to percentages when image is not loaded', () => {
-		const { result, rerender } = renderHook(
-			( { state } ) => useAriaAnnouncer( state ),
-			{ initialProps: { state: makeState() } }
-		);
-
-		act( () => jest.advanceTimersByTime( 300 ) );
-
-		rerender( {
-			state: makeState( {
-				cropRect: { x: 0, y: 0, width: 0.8, height: 0.95 },
-			} ),
-		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
-
-		expect( result.current ).toBe( 'Crop width 80%, height 95%' );
-	} );
-
 	it( 'announces only rotation with direction when only rotation changes', () => {
 		const { result, rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
