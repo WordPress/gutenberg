@@ -229,6 +229,154 @@ export function getInlineMarkerStart( thread, attributes ) {
 }
 
 /**
+ * Find a block's primary editable rich-text attribute by detecting the first
+ * attribute whose value is a `RichTextData` instance. Rich-text (`source:
+ * 'rich-text'`) attributes hydrate to `RichTextData` at runtime, so this avoids
+ * block-type introspection and naturally only returns an attribute that
+ * `wrapInlineNote` can actually mark. Used to locate the attribute to mark on an
+ * interior block that a multi-block note selection fully covers.
+ *
+ * @param {?Object} attributes Block attributes.
+ * @return {?string} Attribute key, or null when the block has no rich-text field.
+ */
+export function findRichTextAttributeKey( attributes ) {
+	if ( ! attributes ) {
+		return null;
+	}
+	for ( const key of Object.keys( attributes ) ) {
+		if ( attributes[ key ] instanceof RichTextData ) {
+			return key;
+		}
+	}
+	return null;
+}
+
+/**
+ * Character length of a rich-text attribute value (RichTextData or HTML string),
+ * i.e. the number of markable positions. Returns 0 for non-text values.
+ *
+ * @param {*} value Block attribute value.
+ * @return {number} Text length.
+ */
+function getAttributeTextLength( value ) {
+	let html = null;
+	if ( value instanceof RichTextData ) {
+		html = value.toHTMLString();
+	} else if ( typeof value === 'string' ) {
+		html = value;
+	}
+	if ( html === null ) {
+		return 0;
+	}
+	return create( { html } ).text.length;
+}
+
+/**
+ * Read a cross-block text selection as an ordered list of per-block segments
+ * describing where a shared `core/note` marker should be applied. The block
+ * editor's selection state is the only primitive that expresses a range from an
+ * offset in one block to an offset in another; this turns it into concrete
+ * per-block ranges (document order):
+ * - first block: from the caret offset to the end of its attribute,
+ * - interior blocks: their whole primary rich-text attribute,
+ * - last block: from 0 to the caret offset.
+ *
+ * A block with no rich-text attribute (e.g. an image caught mid-range) yields a
+ * segment with `attributeKey: null` so it still gets a block-level metadata
+ * anchor but no marker. Boundary blocks whose range is empty (caret at the very
+ * edge) degrade the same way.
+ *
+ * Returns `null` for collapsed or single-block selections (the caller handles
+ * those via `readInlineSelection`) and for selections spanning different roots
+ * (`getSelectedBlockClientIds` is empty across roots).
+ *
+ * @param {Object}   selectors
+ * @param {Function} selectors.getSelectionStart         Block-editor selector.
+ * @param {Function} selectors.getSelectionEnd           Block-editor selector.
+ * @param {Function} selectors.getSelectedBlockClientIds Ordered client ids in the selection.
+ * @param {Function} selectors.getBlockAttributes        Block-editor selector.
+ * @return {?Array<{clientId: string, attributeKey: ?string, start: ?number, end: ?number}>} Ordered segments or null.
+ */
+export function readMultiBlockSelection( {
+	getSelectionStart,
+	getSelectionEnd,
+	getSelectedBlockClientIds,
+	getBlockAttributes,
+} ) {
+	const start = getSelectionStart();
+	const end = getSelectionEnd();
+	if (
+		! start?.clientId ||
+		! end?.clientId ||
+		start.clientId === end.clientId
+	) {
+		return null;
+	}
+
+	const clientIds = getSelectedBlockClientIds();
+	if ( ! clientIds || clientIds.length < 2 ) {
+		return null;
+	}
+
+	// The selection may run bottom-to-top; align the endpoints to document order
+	// so `head` belongs to the first block and `tail` to the last.
+	const firstId = clientIds[ 0 ];
+	const head = start.clientId === firstId ? start : end;
+	const tail = start.clientId === firstId ? end : start;
+
+	const segments = [];
+	for ( let i = 0; i < clientIds.length; i++ ) {
+		const clientId = clientIds[ i ];
+		const isFirst = i === 0;
+		const isLast = i === clientIds.length - 1;
+		const attributes = getBlockAttributes( clientId );
+
+		let attributeKey;
+		if ( isFirst && head.attributeKey ) {
+			attributeKey = head.attributeKey;
+		} else if ( isLast && tail.attributeKey ) {
+			attributeKey = tail.attributeKey;
+		} else {
+			attributeKey = findRichTextAttributeKey( attributes );
+		}
+
+		const blockLevel = {
+			clientId,
+			attributeKey: null,
+			start: null,
+			end: null,
+		};
+		if ( ! attributeKey ) {
+			segments.push( blockLevel );
+			continue;
+		}
+
+		const length = getAttributeTextLength( attributes?.[ attributeKey ] );
+		const segStart =
+			isFirst && head.offset !== undefined
+				? Math.min( head.offset, length )
+				: 0;
+		const segEnd =
+			isLast && tail.offset !== undefined
+				? Math.min( tail.offset, length )
+				: length;
+
+		// Empty range (caret sat at a block edge): anchor at the block level.
+		if ( segEnd <= segStart ) {
+			segments.push( blockLevel );
+			continue;
+		}
+		segments.push( {
+			clientId,
+			attributeKey,
+			start: segStart,
+			end: segEnd,
+		} );
+	}
+	return segments;
+}
+
+/**
  * Apply a `core/note` marker across `[start, end)` without removing notes
  * already present in that range.
  *

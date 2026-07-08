@@ -17,7 +17,9 @@ import { select } from '@wordpress/data';
 import {
 	findNoteRange,
 	findNoteInBlock,
+	findRichTextAttributeKey,
 	applyNoteFormat,
+	readMultiBlockSelection,
 	removeNoteFormat,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
@@ -996,5 +998,156 @@ describe( 'removeNoteFormat', () => {
 				'5'
 			).toHTMLString()
 		).toBe( 'a b c' );
+	} );
+} );
+
+describe( 'findRichTextAttributeKey', () => {
+	it( 'returns null for null/undefined attributes', () => {
+		expect( findRichTextAttributeKey( null ) ).toBe( null );
+		expect( findRichTextAttributeKey( undefined ) ).toBe( null );
+	} );
+
+	it( 'returns the first RichTextData attribute key', () => {
+		const attributes = {
+			align: 'left',
+			content: RichTextData.fromHTMLString( 'hello' ),
+		};
+		expect( findRichTextAttributeKey( attributes ) ).toBe( 'content' );
+	} );
+
+	it( 'returns null when no attribute is rich text', () => {
+		const attributes = { url: 'https://example.com', alt: 'text' };
+		expect( findRichTextAttributeKey( attributes ) ).toBe( null );
+	} );
+} );
+
+describe( 'readMultiBlockSelection', () => {
+	// Build a selectors bag from a per-block spec:
+	// blocks: [ { clientId, content } ] in document order,
+	// start/end: { clientId, attributeKey, offset }.
+	function makeSelectors( { blocks, start, end } ) {
+		const attributesByClientId = {};
+		for ( const block of blocks ) {
+			attributesByClientId[ block.clientId ] = block.attributes ?? {
+				content: RichTextData.fromHTMLString( block.content ),
+			};
+		}
+		return {
+			getSelectionStart: () => start,
+			getSelectionEnd: () => end,
+			getSelectedBlockClientIds: () =>
+				blocks.map( ( block ) => block.clientId ),
+			getBlockAttributes: ( clientId ) =>
+				attributesByClientId[ clientId ],
+		};
+	}
+
+	it( 'returns null for a collapsed / single-block selection', () => {
+		const selectors = makeSelectors( {
+			blocks: [ { clientId: 'a', content: 'Hello world' } ],
+			start: { clientId: 'a', attributeKey: 'content', offset: 1 },
+			end: { clientId: 'a', attributeKey: 'content', offset: 5 },
+		} );
+		expect( readMultiBlockSelection( selectors ) ).toBe( null );
+	} );
+
+	it( 'returns null when fewer than two blocks are selected (cross-root)', () => {
+		const selectors = {
+			getSelectionStart: () => ( {
+				clientId: 'a',
+				attributeKey: 'content',
+				offset: 1,
+			} ),
+			getSelectionEnd: () => ( {
+				clientId: 'b',
+				attributeKey: 'content',
+				offset: 2,
+			} ),
+			// Empty across roots.
+			getSelectedBlockClientIds: () => [],
+			getBlockAttributes: () => ( {} ),
+		};
+		expect( readMultiBlockSelection( selectors ) ).toBe( null );
+	} );
+
+	it( 'splits a two-block selection into head-to-end and start-to-tail', () => {
+		const selectors = makeSelectors( {
+			blocks: [
+				{ clientId: 'a', content: 'Hello world' }, // length 11
+				{ clientId: 'b', content: 'Second' }, // length 6
+			],
+			start: { clientId: 'a', attributeKey: 'content', offset: 6 },
+			end: { clientId: 'b', attributeKey: 'content', offset: 3 },
+		} );
+		expect( readMultiBlockSelection( selectors ) ).toEqual( [
+			{ clientId: 'a', attributeKey: 'content', start: 6, end: 11 },
+			{ clientId: 'b', attributeKey: 'content', start: 0, end: 3 },
+		] );
+	} );
+
+	it( 'marks interior blocks in full', () => {
+		const selectors = makeSelectors( {
+			blocks: [
+				{ clientId: 'a', content: 'Hello world' }, // 11
+				{ clientId: 'b', content: 'Middle block' }, // 12
+				{ clientId: 'c', content: 'Last one' }, // 8
+			],
+			start: { clientId: 'a', attributeKey: 'content', offset: 6 },
+			end: { clientId: 'c', attributeKey: 'content', offset: 4 },
+		} );
+		expect( readMultiBlockSelection( selectors ) ).toEqual( [
+			{ clientId: 'a', attributeKey: 'content', start: 6, end: 11 },
+			{ clientId: 'b', attributeKey: 'content', start: 0, end: 12 },
+			{ clientId: 'c', attributeKey: 'content', start: 0, end: 4 },
+		] );
+	} );
+
+	it( 'normalizes a reversed (bottom-to-top) selection to document order', () => {
+		const selectors = makeSelectors( {
+			blocks: [
+				{ clientId: 'a', content: 'Hello world' },
+				{ clientId: 'b', content: 'Second' },
+			],
+			// Anchor in the later block, focus in the earlier block.
+			start: { clientId: 'b', attributeKey: 'content', offset: 3 },
+			end: { clientId: 'a', attributeKey: 'content', offset: 6 },
+		} );
+		expect( readMultiBlockSelection( selectors ) ).toEqual( [
+			{ clientId: 'a', attributeKey: 'content', start: 6, end: 11 },
+			{ clientId: 'b', attributeKey: 'content', start: 0, end: 3 },
+		] );
+	} );
+
+	it( 'gives an interior block with no rich-text attribute a block-level anchor', () => {
+		const selectors = makeSelectors( {
+			blocks: [
+				{ clientId: 'a', content: 'Hello world' },
+				{ clientId: 'b', attributes: { url: 'https://x.png' } },
+				{ clientId: 'c', content: 'Last one' },
+			],
+			start: { clientId: 'a', attributeKey: 'content', offset: 6 },
+			end: { clientId: 'c', attributeKey: 'content', offset: 4 },
+		} );
+		expect( readMultiBlockSelection( selectors ) ).toEqual( [
+			{ clientId: 'a', attributeKey: 'content', start: 6, end: 11 },
+			{ clientId: 'b', attributeKey: null, start: null, end: null },
+			{ clientId: 'c', attributeKey: 'content', start: 0, end: 4 },
+		] );
+	} );
+
+	it( 'anchors a boundary block at the block level when its range is empty', () => {
+		const selectors = makeSelectors( {
+			blocks: [
+				{ clientId: 'a', content: 'Hello world' }, // 11
+				{ clientId: 'b', content: 'Second' },
+			],
+			// Caret sits at the very end of block a: nothing to mark there.
+			start: { clientId: 'a', attributeKey: 'content', offset: 11 },
+			end: { clientId: 'b', attributeKey: 'content', offset: 3 },
+		} );
+		expect( readMultiBlockSelection( selectors ) ).toEqual( [
+			{ clientId: 'a', attributeKey: null, start: null, end: null },
+			{ clientId: 'b', attributeKey: 'content', start: 0, end: 3 },
+		] );
 	} );
 } );
