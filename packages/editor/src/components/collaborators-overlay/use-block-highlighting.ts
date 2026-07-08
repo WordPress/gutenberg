@@ -167,14 +167,6 @@ export function useBlockHighlighting(
 					return [];
 				}
 
-				const color = getAvatarBorderColor(
-					userState.collaboratorInfo.id
-				);
-				const userName = userState.collaboratorInfo.name;
-				const avatarUrl = getAvatarUrl(
-					userState.collaboratorInfo.avatar_urls
-				);
-
 				// Yjs reports startEndpoint/endEndpoint in selection direction,
 				// not DOM order — a backward selection has startEndpoint below
 				// endEndpoint in the document. Normalise to DOM order so
@@ -187,9 +179,21 @@ export function useBlockHighlighting(
 				const endEl = blockEditorDocument.querySelector< HTMLElement >(
 					`[data-block="${ endId }"]`
 				);
-				let firstEl = startEl;
-				let lastEl = endEl;
-				if ( startEl && endEl && isNodeBefore( endEl, startEl ) ) {
+				if ( ! startEl || ! endEl ) {
+					return [];
+				}
+
+				const color = getAvatarBorderColor(
+					userState.collaboratorInfo.id
+				);
+				const userName = userState.collaboratorInfo.name;
+				const avatarUrl = getAvatarUrl(
+					userState.collaboratorInfo.avatar_urls
+				);
+
+				let firstEl: HTMLElement = startEl;
+				let lastEl: HTMLElement = endEl;
+				if ( isNodeBefore( endEl, startEl ) ) {
 					firstEl = endEl;
 					lastEl = startEl;
 				}
@@ -197,12 +201,8 @@ export function useBlockHighlighting(
 				// Promote inner blocks (e.g. list-items) to their nearest
 				// [data-block] ancestor so the whole container is treated as one
 				// visual unit rather than highlighting each inner block separately.
-				const effectiveFirstEl = firstEl
-					? blockContainerOf( firstEl )
-					: null;
-				const effectiveLastEl = lastEl
-					? blockContainerOf( lastEl )
-					: null;
+				const effectiveFirstEl = blockContainerOf( firstEl );
+				const effectiveLastEl = blockContainerOf( lastEl );
 				const effectiveFirstId =
 					effectiveFirstEl?.getAttribute( 'data-block' ) ?? startId;
 				const effectiveLastId =
