@@ -106,6 +106,7 @@ class MediaProcessingUtils {
 					.getItems();
 				return items.length === 0;
 			},
+			undefined,
 			{ timeout }
 		);
 	}

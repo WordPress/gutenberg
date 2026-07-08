@@ -30,13 +30,13 @@ function UnavailableWidget( { widgetTypeName }: UnavailableWidgetProps ) {
 		<>
 			<Card.Header>
 				<span
-					className={ styles.widgetChromeHeaderIcon }
+					className={ styles[ 'widget-chrome-header-icon' ] }
 					aria-hidden="true"
 				>
 					<Icon icon={ plugins } />
 				</span>
 			</Card.Header>
-			<Card.Content className={ styles.widgetChromeContent }>
+			<Card.Content className={ styles[ 'widget-chrome-content' ] }>
 				<Stack
 					direction="column"
 					justify="center"
@@ -56,19 +56,23 @@ export interface WidgetChromeProps {
 	widget: DashboardWidget< unknown >;
 	index: number;
 	/**
-	 * Lifted by `@wordpress/grid` into a sibling slot outside `Card.Root`, so
-	 * it stays interactive while edit mode makes the chrome `inert`.
+	 * Lifted by `@wordpress/grid` into a sibling slot outside `Card.Root`,
+	 * for full-bleed widgets with no in-card header to host the toolbar.
 	 */
 	actionableArea?: ReactNode;
+	/**
+	 * Toolbar rendered in the in-card header (framed and content-bleed).
+	 */
+	headerToolbar?: ReactNode;
 	className?: string;
 }
 
 /**
  * Dashboard chrome: wraps `WidgetFrame` in the grid tile's `Card.Root`, owning
- * identity, edit-mode `inert`, and the missing/resolving states.
+ * the missing and resolving states.
  */
 export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
-	function WidgetChrome( { widget, index, className }, ref ) {
+	function WidgetChrome( { widget, index, className, headerToolbar }, ref ) {
 		const { widgetTypes, isResolvingWidgetTypes, editMode } =
 			useDashboardInternalContext();
 		const widgetType = widgetTypes.find( ( t ) => t.name === widget.type );
@@ -90,12 +94,15 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 						<Card.Root
 							render={ <section /> }
 							ref={ ref }
-							className={ clsx( styles.widgetChrome, className ) }
+							className={ clsx(
+								styles[ 'widget-chrome' ],
+								className
+							) }
 							aria-busy="true"
 							aria-label={ __( 'Loading' ) }
 						>
 							<Card.Content
-								className={ styles.widgetChromeContent }
+								className={ styles[ 'widget-chrome-content' ] }
 							>
 								<LoadingOverlay />
 							</Card.Content>
@@ -109,7 +116,10 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 					<Card.Root
 						render={ <section /> }
 						ref={ ref }
-						className={ clsx( styles.widgetChrome, className ) }
+						className={ clsx(
+							styles[ 'widget-chrome' ],
+							className
+						) }
 						aria-label={ __( 'Missing widget' ) }
 					>
 						<UnavailableWidget widgetTypeName={ widget.type } />
@@ -123,14 +133,15 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 				<Card.Root
 					render={ <section /> }
 					ref={ ref }
-					className={ clsx( styles.widgetChrome, className ) }
+					className={ clsx( styles[ 'widget-chrome' ], className ) }
 					aria-labelledby={ widgetType.title ? titleId : undefined }
-					{ ...( editMode ? { inert: 'true' } : {} ) }
 				>
 					<WidgetFrame
 						widget={ widget }
 						widgetType={ widgetType }
 						titleId={ titleId }
+						editMode={ editMode }
+						headerToolbar={ headerToolbar }
 					/>
 				</Card.Root>
 			</WidgetContextProvider>

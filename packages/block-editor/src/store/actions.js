@@ -4,7 +4,7 @@
  */
 import {
 	cloneBlock,
-	__experimentalCloneSanitizedBlock,
+	cloneSanitizedBlock,
 	createBlock,
 	doBlocksMatchTemplate,
 	getBlockType,
@@ -1755,7 +1755,7 @@ export const duplicateBlocks =
 			clientIdsArray[ clientIdsArray.length - 1 ]
 		);
 		const clonedBlocks = blocks.map( ( block ) =>
-			__experimentalCloneSanitizedBlock( block )
+			cloneSanitizedBlock( block )
 		);
 		dispatch.insertBlocks(
 			clonedBlocks,
@@ -2050,7 +2050,8 @@ export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
  * @property {(InserterMediaItem) => string}                          [getReportUrl]                 If the media category supports reporting media items, this function should return
  *                                                                                                   the report url for the media item. It accepts the `InserterMediaItem` as an argument.
  * @property {boolean}                                                [isExternalResource]           If the media category is an external resource, this should be set to true.
- *                                                                                                   This is used to avoid making a request to the external resource when the user
+ *                                                                                                   This is used to avoid making a request to the external resource when checking
+ *                                                                                                   whether the category has any media items to display in the media tab.
  * @property {string}                                                 [emptyMessage]                 Optional message shown in place of the generic "No results found." when the source has no items and there is no active search. Providing it also keeps the source in the tab list while empty, so the message stays reachable.
  */
 export const registerInserterMediaCategory =

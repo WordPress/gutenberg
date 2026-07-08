@@ -3,7 +3,7 @@
  */
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { cog } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { IconButton } from '@wordpress/ui';
@@ -33,8 +33,8 @@ export interface WidgetSettingsTriggerProps {
  * Per-instance gear that toggles the shared settings drawer by writing the
  * instance `uuid` to the UI context; the single `WidgetSettings` at the root
  * reacts to it. Clicking the gear of the instance whose drawer is already
- * open closes it. Returns `null` when the type declares no attributes, so
- * chrome can mount it unconditionally.
+ * open closes it. Returns `null` when no attribute needs the drawer (none, or
+ * all already promoted inline), so chrome can mount it unconditionally.
  *
  * @param {WidgetSettingsTriggerProps} props Component props.
  */
@@ -44,7 +44,7 @@ export function WidgetSettingsTrigger( {
 }: WidgetSettingsTriggerProps ): React.ReactNode {
 	const { settingsWidgetUuid, setSettingsWidgetUuid } =
 		useDashboardUIContext();
-	const { cancel } = useDashboardInternalContext();
+	const { cancel, flushAutoSave } = useDashboardInternalContext();
 
 	const toggle = useCallback( () => {
 		// Re-clicking the open instance's gear closes the drawer, discarding
@@ -54,16 +54,31 @@ export function WidgetSettingsTrigger( {
 			setSettingsWidgetUuid( null );
 			return;
 		}
+		// Persist any pending inline edit before opening, so the drawer's edits
+		// stay isolated and its Cancel discards only the drawer's own changes.
+		flushAutoSave();
 		setSettingsWidgetUuid( widget.uuid );
-	}, [ cancel, settingsWidgetUuid, setSettingsWidgetUuid, widget.uuid ] );
+	}, [
+		cancel,
+		flushAutoSave,
+		settingsWidgetUuid,
+		setSettingsWidgetUuid,
+		widget.uuid,
+	] );
 
-	if ( ! widgetType.attributes?.length ) {
+	// Surface the drawer only when there are attributes not already promoted
+	// inline; if every attribute is high-relevance, the drawer would just
+	// repeat the toolbar.
+	const hasNonPromotedAttributes = widgetType.attributes?.some(
+		( attribute ) => attribute.relevance !== 'high'
+	);
+	if ( ! hasNonPromotedAttributes ) {
 		return null;
 	}
 
 	return (
 		<IconButton
-			icon={ cog }
+			icon={ moreVertical }
 			label={ __( 'Widget settings' ) }
 			variant="minimal"
 			tone="neutral"

@@ -870,6 +870,13 @@
 				"innerBlocks": {
 					"description": "Set the inner blocks that should be used within the block example. The blocks should be defined as a nested array like this:\n\n[ { \"name\": \"core/heading\", \"attributes\": { \"content\": \"This is an Example\" } } ]\n\nWhere each block itself is an object that contains the block name, the block attributes, and the blocks inner blocks.",
 					"type": "array"
+				},
+				"innerContent": {
+					"description": "Static HTML fragments interleaved with inner blocks, where null entries mark the positions of the inner blocks within the static markup. Only applies to the Custom HTML block.",
+					"type": "array",
+					"items": {
+						"type": [ "string", "null" ]
+					}
 				}
 			}
 		},
@@ -1044,6 +1051,13 @@
 								"type": "array",
 								"items": {
 									"type": "array"
+								}
+							},
+							"innerContent": {
+								"description": "Static HTML fragments interleaved with inner blocks, where null entries mark the positions of the inner blocks within the static markup. Only applies to the Custom HTML block.",
+								"type": "array",
+								"items": {
+									"type": [ "string", "null" ]
 								}
 							},
 							"example": {

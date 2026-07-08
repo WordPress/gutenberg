@@ -5,6 +5,9 @@
 ### Enhancement
 
 -   Add `optimizeExistingItem` action and a `FetchRemoteFile` operation (with a `fetchFile` utility) to re-process an already-uploaded attachment client-side: fetch the original, re-compress it, regenerate sub-sizes, and upload the result as a new attachment ([#79509](https://github.com/WordPress/gutenberg/pull/79509)).
+-   Honor the `wp_editor_set_quality` filter for client-side processed images. Sub-size resizing and transcoding now use the size-aware quality reported by the new `image_quality` field on the attachment upload response, instead of a hardcoded default.
+
+## 0.35.0 (2026-07-01)
 
 ## 0.34.0 (2026-06-24)
 
