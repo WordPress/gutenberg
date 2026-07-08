@@ -15,7 +15,7 @@ import {
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
@@ -56,6 +56,7 @@ function Edit( {
 			},
 			[ clientId ]
 		);
+	const registry = useRegistry();
 	const { isBlockSelected, hasSelectedInnerBlock } =
 		useSelect( blockEditorStore );
 	const {
@@ -77,13 +78,13 @@ function Edit( {
 
 	function selectTabPanel( tabIndex ) {
 		if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
-			// Select the tab list synchronously to deselect any block in the
-			// previously active panel, so its sync effect doesn't revert
-			// editorActiveTabIndex from a stale inner-block selection.
-			selectBlock( clientId );
-			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( tabsClientId, {
-				editorActiveTabIndex: tabIndex,
+			// Batch so the selection and the index update are observed together.
+			registry.batch( () => {
+				selectBlock( clientId );
+				__unstableMarkNextChangeAsNotPersistent();
+				updateBlockAttributes( tabsClientId, {
+					editorActiveTabIndex: tabIndex,
+				} );
 			} );
 		}
 	}
