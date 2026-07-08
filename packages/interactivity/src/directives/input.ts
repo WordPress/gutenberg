@@ -22,35 +22,16 @@
  * ```
  */
 import { directive, isDefaultDirectiveSuffix } from '../hooks';
-import { useInit } from '../utils';
-import { store } from '../store';
+import { useInit, useLayoutEffect } from '../utils';
+import { store, setByPath } from '../store';
 import { PENDING_GETTER } from '../proxies/state';
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-/**
- * Parses a directive value like "state.foo.bar" and sets the leaf
- * property on the store's state via the proxy, which triggers signal
- * updates.
- *
- * @param ns    The store namespace.
- * @param path  Dot-separated path starting with "state" (e.g. "state.text").
- * @param value The value to assign.
- */
-const setStateValue = ( ns: string, path: string, value: unknown ): void => {
-	const parts = path.split( '.' ).slice( 1 ); // Remove "state"
-	if ( parts.length === 0 ) {
-		return;
-	}
-	const { state } = store( ns );
-	let obj: any = state;
-	for ( let i = 0; i < parts.length - 1; i++ ) {
-		obj = obj[ parts[ i ] ];
-	}
-	obj[ parts[ parts.length - 1 ] ] = value;
-};
+/* setByPath is imported from ../store */
+
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -104,10 +85,20 @@ const detectDescriptor = (
 			fromSignal: ( signalValue ) => Boolean( signalValue ),
 			toSignal: ( el, signalType ) => {
 				const input = el as HTMLInputElement;
-				if ( signalType === 'boolean' ) {
-					return input.checked;
+				// Datastar parity: default value "on" → boolean;
+				// custom values reflect the checked value or empty string.
+				if ( input.value !== 'on' ) {
+					return signalType === 'boolean'
+						? input.checked
+						: input.checked
+							? input.value
+							: '';
 				}
-				return input.checked ? input.value : '';
+				return signalType === 'string'
+					? input.checked
+						? input.value
+						: ''
+					: input.checked;
 			},
 		};
 	}
@@ -234,8 +225,8 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 							} )
 					)
 				).then( ( signalFiles ) => {
-					setStateValue(
-						entryForFile.namespace,
+					setByPath(
+						store( entryForFile.namespace ),
 						entryForFile.value,
 						signalFiles
 					);
@@ -267,14 +258,38 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 		props[ desc.prop ] = props.value;
 	}
 
-	useInit( () => {
-		const el = ( element.ref as { current?: InputBindingElement }).current;
+	// ---- initial DOM sync (pre-paint): seed & sync ----
+	useLayoutEffect( () => {
+		const el = ( element.ref as { current?: InputBindingElement } ).current;
 		if ( ! el ) {
 			return;
 		}
 
-		syncElementProp( el, desc, signalValue, props );
-	} );
+		// Radio auto-name (Datastar parity: native grouping when name absent).
+		if (
+			el instanceof HTMLInputElement &&
+			el.type === 'radio' &&
+			! el.name
+		) {
+			el.name = entry.value;
+		}
+
+		// Element→signal seeding (ifMissing: adopt DOM value when signal is
+		// undefined — Datastar's `boundPath` + `mergePaths({ ifMissing })`).
+		if ( signalValue === undefined ) {
+			const elValue = desc.toSignal( el, 'undefined' );
+			if ( elValue !== undefined ) {
+				setByPath( store( entry.namespace ), entry.value, elValue );
+			}
+		}
+
+		// Signal→element sync (re-read via evaluate in effect context;
+		// signal reads inside effects do not subscribe the component).
+		const current = evaluate( entry );
+		if ( current != null && current !== PENDING_GETTER ) {
+			syncElementProp( el, desc, current, props );
+		}
+	}, [] );
 
 	// ---- wire up event handlers ----
 	for ( const eventName of desc.events ) {
@@ -298,7 +313,7 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 				return;
 			}
 
-			setStateValue( entry.namespace, entry.value, raw );
+			setByPath( store( entry.namespace ), entry.value, raw );
 		};
 	}
 } );
