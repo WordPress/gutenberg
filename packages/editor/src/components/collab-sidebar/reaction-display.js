@@ -222,6 +222,7 @@ function ReactionButton( {
 
 	return (
 		<Button
+			variant="secondary"
 			size="small"
 			className="editor-collab-sidebar-panel__reaction-button"
 			onClick={ ( event ) => {
@@ -244,7 +245,9 @@ function ReactionButton( {
 			label={ tooltipText || defaultLabel }
 			showTooltip
 		>
-			<span>{ emoji }</span>
+			<span className="editor-collab-sidebar-panel__reaction-button-emoji">
+				{ emoji }
+			</span>
 			<span>{ count }</span>
 		</Button>
 	);
@@ -317,7 +320,6 @@ export function AddReactionButton( {
 					size="small"
 					className="editor-collab-sidebar-panel__add-reaction-button"
 					icon={ smileyIcon }
-					iconSize={ 20 }
 					label={ __( 'Add reaction' ) }
 					aria-expanded={ isOpen }
 					disabled={ disabled }

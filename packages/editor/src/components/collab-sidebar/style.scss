@@ -1,7 +1,6 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "sass:math";
 
 .interface-interface-skeleton__sidebar:has(.editor-collab-sidebar) {
 	box-shadow: none;
@@ -232,51 +231,20 @@ mark.wp-note {
 }
 
 // Emoji Reactions
+//
+// The add-reaction trigger is a standard small icon Button and the
+// reaction pills are standard small secondary Buttons, so sizing,
+// hover, pressed, and focus styles all come from the component.
+// Only emoji-specific adjustments live here.
 .editor-collab-sidebar-panel__reaction-button {
 	gap: $grid-unit-05;
-	border: $border-width solid $gray-300;
-	background-color: $gray-100;
-	font-weight: $font-weight-medium;
-	color: $gray-700;
-	border-radius: math.div($button-size-compact, 2);
-	font-size: $font-size-small;
-
-	&.editor-collab-sidebar-panel__reaction-button[aria-pressed="true"] {
-		background-color: $gray-100;
-		border-color: var(--wp-admin-theme-color);
-		color: inherit;
-
-		&:hover {
-			color: var(--wp-admin-theme-color);
-			background-color: $gray-100;
-		}
-	}
-
-	&:hover {
-		color: var(--wp-admin-theme-color);
-		background-color: $gray-100;
-	}
 }
 
-.editor-collab-sidebar-panel__add-reaction-button {
-	border-radius: $radius-round;
-	border: $border-width solid $gray-300;
-	cursor: var(--wpds-cursor-control);
-
-	&:hover {
-		background-color: $gray-100;
-	}
-
-	&:focus {
-		outline:
-			var(--wp-admin-border-width-focus) solid
-			var(--wp-admin-theme-color);
-		outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
-	}
-
-	svg {
-		color: $gray-700;
-	}
+.editor-collab-sidebar-panel__reaction-button-emoji {
+	// Render the emoji glyph larger than the button's text size so it
+	// visually balances with the 24px reaction icon next to it.
+	font-size: 16px;
+	line-height: 1;
 }
 
 // Mirror the smiley trigger but render the plus icon with a filled
