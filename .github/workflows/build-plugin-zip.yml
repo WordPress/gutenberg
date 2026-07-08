@@ -126,8 +126,8 @@ jobs:
 
             - name: Configure Git user email
               env:
-                  APP_ID: ${{ vars.APP_ID }}
-              run: git config user.email "${APP_ID}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
+                  APP_USER_ID: ${{ vars.APP_USER_ID }}
+              run: git config user.email "${APP_USER_ID}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
 
             - name: Create and switch to release branch
               if: |
@@ -384,8 +384,8 @@ jobs:
 
             - name: Configure Git user email
               env:
-                  APP_ID: ${{ vars.APP_ID }}
-              run: git config user.email "${APP_ID}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
+                  APP_USER_ID: ${{ vars.APP_USER_ID }}
+              run: git config user.email "${APP_USER_ID}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
 
             - name: Revert version bump commit on release branch
               if: |
