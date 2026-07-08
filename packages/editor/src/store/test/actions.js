@@ -5,6 +5,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -388,6 +389,42 @@ describe( 'Post actions', () => {
 			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
 				revisionId
 			);
+
+			const notices = registry.select( noticesStore ).getNotices();
+			expect( notices ).toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( { id: 'autosave-exists' } ),
+				] )
+			);
+			expect( notices ).not.toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( {
+						id: 'editor-revision-restored',
+					} ),
+				] )
+			);
+		} );
+
+		it( 'keeps the autosave notice when a pre-save hook rejects the restore', async () => {
+			const registry = setupRestoreRevisionTest( ( data ) => ( {
+				...post,
+				...data,
+			} ) );
+			const namespace = 'editor/test/restore-revision-pre-save-error';
+			addFilter( 'editor.preSavePost', namespace, () => {
+				throw {
+					code: 'pre_save_error',
+					message: 'Pre-save failed.',
+				};
+			} );
+
+			try {
+				await unlock(
+					registry.dispatch( editorStore )
+				).restoreRevision( revisionId );
+			} finally {
+				removeFilter( 'editor.preSavePost', namespace );
+			}
 
 			const notices = registry.select( noticesStore ).getNotices();
 			expect( notices ).toEqual(

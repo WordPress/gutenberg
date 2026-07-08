@@ -188,7 +188,7 @@ export const savePost =
 	( options = {} ) =>
 	async ( { select, dispatch, registry } ) => {
 		if ( ! select.isEditedPostSaveable() ) {
-			return;
+			return false;
 		}
 
 		const content = select.getEditedPostContent();
@@ -316,6 +316,8 @@ export const savePost =
 					.__unstableMarkLastChangeAsPersistent();
 			}
 		}
+
+		return ! error;
 	};
 
 async function templateActivationNotice( { select, registry } ) {

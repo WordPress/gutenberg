@@ -735,9 +735,8 @@ export const restoreRevision =
 		dispatch.setCurrentRevisionId( null );
 
 		// Save the post to persist the restored revision.
-		await dispatch.savePost();
-
-		if ( select.didPostSaveRequestFail() ) {
+		const didSave = await dispatch.savePost();
+		if ( ! didSave ) {
 			return;
 		}
 
