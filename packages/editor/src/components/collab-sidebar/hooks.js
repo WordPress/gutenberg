@@ -369,13 +369,6 @@ export function useNoteActions() {
 	};
 
 	const onEdit = async ( { id, content, status } ) => {
-		const messageType = status ? status : 'updated';
-		const messages = {
-			approved: __( 'Note marked as resolved.' ),
-			hold: __( 'Note reopened.' ),
-			updated: __( 'Note updated.' ),
-		};
-
 		try {
 			// For resolution or reopen actions, create a new note with metadata.
 			if ( status === 'approved' || status === 'hold' ) {
@@ -429,16 +422,15 @@ export function useNoteActions() {
 				await saveEntityRecord( 'root', 'comment', updateData, {
 					throwOnError: true,
 				} );
-			}
 
-			createNotice(
-				'snackbar',
-				messages[ messageType ] ?? __( 'Note updated.' ),
-				{
+				// Resolving or reopening a note visibly updates the note in
+				// place, so those actions don't need a snackbar; only surface
+				// one when a note's content is edited.
+				createNotice( 'snackbar', __( 'Note updated.' ), {
 					type: 'snackbar',
 					isDismissible: true,
-				}
-			);
+				} );
+			}
 		} catch ( error ) {
 			onError( error );
 		}
