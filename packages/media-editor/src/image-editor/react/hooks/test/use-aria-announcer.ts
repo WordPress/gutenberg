@@ -161,6 +161,74 @@ describe( 'useAriaAnnouncer', () => {
 		expect( result.current ).toBe( 'Rotation 0 degrees' );
 	} );
 
+	it( 'announces rotation after 90° snap plus fine adjustment', () => {
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{ initialProps: { state: makeState() } }
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		// 90° CW snap + 15° fine = 105° stored.
+		rerender( {
+			state: makeState( { rotation: 105 } ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Rotation 105 degrees' );
+	} );
+
+	it( 'announces CCW fine rotation from 0° (stored as 350°)', () => {
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{ initialProps: { state: makeState() } }
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		// -10° from 0° is stored as 350° after normalization.
+		// baseAngle = round(350/90)*90 = 360 → 360%360 = 0
+		// offset = 350 - 360 = -10, visualRotation = 0 + (-10) = -10
+		rerender( {
+			state: makeState( { rotation: 350 } ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Rotation -10 degrees' );
+	} );
+
+	it( 'suppresses unchanged values in combined announcements', () => {
+		const image = {
+			src: 'test.jpg',
+			naturalWidth: 1000,
+			naturalHeight: 800,
+		};
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{
+				initialProps: {
+					state: makeState( { image, rotation: 15 } ),
+				},
+			}
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		// Only change crop — zoom and rotation should be suppressed.
+		rerender( {
+			state: makeState( {
+				image,
+				rotation: 15,
+				cropRect: { x: 0, y: 0, width: 0.5, height: 0.5 },
+			} ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Crop 500 by 400 pixels' );
+		expect( result.current ).not.toContain( 'Zoom' );
+		expect( result.current ).not.toContain( 'Rotation' );
+	} );
+
 	it( 'announces only zoom when only zoom changes', () => {
 		const { result, rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
