@@ -242,7 +242,6 @@ function CoverEdit( {
 		if ( getBlocks( clientId ).length > 0 ) {
 			return;
 		}
-		__unstableMarkNextChangeAsNotPersistent( { history: 'ignore' } );
 		replaceInnerBlocks(
 			clientId,
 			createBlocksFromInnerBlocksTemplate(
@@ -320,18 +319,20 @@ function CoverEdit( {
 			}
 		}
 
-		setAttributes( {
-			...mediaAttributes,
-			focalPoint: undefined,
-			useFeaturedImage: undefined,
-			dimRatio: newDimRatio,
-			isDark: newIsDark,
-			isUserOverlayColor: currentAttrs.isUserOverlayColor || false,
-		} );
+		registry.batch( () => {
+			setAttributes( {
+				...mediaAttributes,
+				focalPoint: undefined,
+				useFeaturedImage: undefined,
+				dimRatio: newDimRatio,
+				isDark: newIsDark,
+				isUserOverlayColor: currentAttrs.isUserOverlayColor || false,
+			} );
 
-		if ( mediaAttributes?.url ) {
-			scaffoldInnerBlocks();
-		}
+			if ( mediaAttributes?.url ) {
+				scaffoldInnerBlocks();
+			}
+		} );
 	};
 
 	const onClearMedia = () => {
@@ -379,14 +380,16 @@ function CoverEdit( {
 		// Make undo revert the next setAttributes and the previous setOverlayColor.
 		__unstableMarkNextChangeAsNotPersistent();
 
-		setAttributes( {
-			isUserOverlayColor: true,
-			isDark: newIsDark,
-		} );
+		registry.batch( () => {
+			setAttributes( {
+				isUserOverlayColor: true,
+				isDark: newIsDark,
+			} );
 
-		if ( newOverlayColor ) {
-			scaffoldInnerBlocks();
-		}
+			if ( newOverlayColor ) {
+				scaffoldInnerBlocks();
+			}
+		} );
 	};
 
 	const onUpdateDimRatio = async ( newDimRatio ) => {
@@ -644,20 +647,22 @@ function CoverEdit( {
 			averageBackgroundColor
 		);
 
-		setAttributes( {
-			id: undefined,
-			url: undefined,
-			useFeaturedImage: newUseFeaturedImage,
-			dimRatio: newDimRatio,
-			backgroundType: useFeaturedImage
-				? IMAGE_BACKGROUND_TYPE
-				: undefined,
-			isDark: newIsDark,
-		} );
+		registry.batch( () => {
+			setAttributes( {
+				id: undefined,
+				url: undefined,
+				useFeaturedImage: newUseFeaturedImage,
+				dimRatio: newDimRatio,
+				backgroundType: useFeaturedImage
+					? IMAGE_BACKGROUND_TYPE
+					: undefined,
+				isDark: newIsDark,
+			} );
 
-		if ( newUseFeaturedImage ) {
-			scaffoldInnerBlocks();
-		}
+			if ( newUseFeaturedImage ) {
+				scaffoldInnerBlocks();
+			}
+		} );
 	};
 
 	const blockControls = (
