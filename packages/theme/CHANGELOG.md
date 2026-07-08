@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Restore a consistent medium (`500`) font weight on Windows by registering a synthetic `Segoe UI WordPress Adjusted` font family that remaps the weight to Segoe UI Semibold, instead of relying on inconsistent browser fallback behavior ([#79525](https://github.com/WordPress/gutenberg/issues/79525)).
 -   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
 
 ### Documentation

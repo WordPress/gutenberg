@@ -312,13 +312,13 @@
 	/* Noticeable easing for enter/exit and spatial transitions like menus, popovers, dialogs, and drawers */
 	--wpds-motion-easing-expressive: cubic-bezier( 0.25, 0, 0, 1 );
 	/* Headings font family */
-	--wpds-typography-font-family-heading: -apple-system, system-ui, 'Segoe UI',
-		'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue',
-		sans-serif;
+	--wpds-typography-font-family-heading: -apple-system,
+		'Segoe UI WordPress Adjusted', system-ui, 'Segoe UI', 'Roboto',
+		'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
 	/* Body font family */
-	--wpds-typography-font-family-body: -apple-system, system-ui, 'Segoe UI',
-		'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue',
-		sans-serif;
+	--wpds-typography-font-family-body: -apple-system,
+		'Segoe UI WordPress Adjusted', system-ui, 'Segoe UI', 'Roboto',
+		'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
 	/* Monospace font family */
 	--wpds-typography-font-family-mono: 'Menlo', 'Consolas', monaco, monospace;
 	/* Extra small font size */
@@ -348,7 +348,7 @@
 	/* Regular font weight for body text */
 	--wpds-typography-font-weight-regular: 400;
 	/* Medium font weight for emphasis and headings */
-	--wpds-typography-font-weight-medium: 499;
+	--wpds-typography-font-weight-medium: 500;
 }
 
 @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {
@@ -418,4 +418,56 @@
 	--wpds-border-radius-lg: 24px;
 	/* Page and app shell surfaces. */
 	--wpds-border-radius-xl: 26px;
+}
+
+/*
+ * Synthetic font family that restores a consistent "medium" weight on Windows.
+ *
+ * Segoe UI (the Windows system font) ships without a medium (500) weight, so
+ * browsers resolve the design system's medium font weight inconsistently: some
+ * fall back to regular (400), while Chrome falls back to semibold (600) via a
+ * non-standard quirk. Referencing this family remaps the medium weight to Segoe
+ * UI Semibold deterministically across browsers.
+ */
+
+@font-face {
+	font-family: 'Segoe UI WordPress Adjusted';
+	src: local( 'Segoe UI' );
+	font-weight: 400;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Segoe UI WordPress Adjusted';
+	src: local( 'Segoe UI Semibold' );
+	font-weight: 500;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Segoe UI WordPress Adjusted';
+	src: local( 'Segoe UI Bold' );
+	font-weight: 600;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Segoe UI WordPress Adjusted';
+	src: local( 'Segoe UI Italic' );
+	font-weight: 400;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'Segoe UI WordPress Adjusted';
+	src: local( 'Segoe UI Semibold Italic' );
+	font-weight: 500;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'Segoe UI WordPress Adjusted';
+	src: local( 'Segoe UI Bold Italic' );
+	font-weight: 600;
+	font-style: italic;
 }

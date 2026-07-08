@@ -5,6 +5,7 @@
 			"heading": {
 				"$value": [
 					"-apple-system",
+					"Segoe UI WordPress Adjusted",
 					"system-ui",
 					"Segoe UI",
 					"Roboto",
@@ -19,6 +20,7 @@
 			"body": {
 				"$value": [
 					"-apple-system",
+					"Segoe UI WordPress Adjusted",
 					"system-ui",
 					"Segoe UI",
 					"Roboto",

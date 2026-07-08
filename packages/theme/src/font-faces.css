@@ -1,0 +1,51 @@
+/*
+ * Synthetic font family that restores a consistent "medium" weight on Windows.
+ *
+ * Segoe UI (the Windows system font) ships without a medium (500) weight, so
+ * browsers resolve the design system's medium font weight inconsistently: some
+ * fall back to regular (400), while Chrome falls back to semibold (600) via a
+ * non-standard quirk. Referencing this family remaps the medium weight to Segoe
+ * UI Semibold deterministically across browsers.
+ */
+
+@font-face {
+	font-family: "Segoe UI WordPress Adjusted";
+	src: local("Segoe UI");
+	font-weight: 400;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "Segoe UI WordPress Adjusted";
+	src: local("Segoe UI Semibold");
+	font-weight: 500;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "Segoe UI WordPress Adjusted";
+	src: local("Segoe UI Bold");
+	font-weight: 600;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "Segoe UI WordPress Adjusted";
+	src: local("Segoe UI Italic");
+	font-weight: 400;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: "Segoe UI WordPress Adjusted";
+	src: local("Segoe UI Semibold Italic");
+	font-weight: 500;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: "Segoe UI WordPress Adjusted";
+	src: local("Segoe UI Bold Italic");
+	font-weight: 600;
+	font-style: italic;
+}

@@ -172,9 +172,9 @@ export default {
 	'--wpds-motion-easing-expressive': 'cubic-bezier(0.25, 0, 0, 1)',
 	'--wpds-motion-easing-subtle': 'cubic-bezier(0.15, 0, 0.15, 1)',
 	'--wpds-typography-font-family-body':
-		'-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
+		'-apple-system, "Segoe UI WordPress Adjusted", system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
 	'--wpds-typography-font-family-heading':
-		'-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
+		'-apple-system, "Segoe UI WordPress Adjusted", system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
 	'--wpds-typography-font-family-mono':
 		'"Menlo", "Consolas", monaco, monospace',
 	'--wpds-typography-font-size-2xl': '32px',
@@ -183,7 +183,7 @@ export default {
 	'--wpds-typography-font-size-sm': '12px',
 	'--wpds-typography-font-size-xl': '20px',
 	'--wpds-typography-font-size-xs': '11px',
-	'--wpds-typography-font-weight-medium': '499',
+	'--wpds-typography-font-weight-medium': '500',
 	'--wpds-typography-font-weight-regular': '400',
 	'--wpds-typography-line-height-2xl': '40px',
 	'--wpds-typography-line-height-lg': '28px',

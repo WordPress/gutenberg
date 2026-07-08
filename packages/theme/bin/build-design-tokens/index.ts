@@ -38,8 +38,26 @@ const { outputFiles } = await build( tokens, {
 
 const outDir = fileURLToPath( config.outDir );
 
+// Append the hand-authored `@font-face` rules that back the synthetic font
+// families referenced by the typography tokens, so they always ship in the
+// same stylesheet as the tokens that reference them regardless of how
+// `design-tokens.css` is loaded.
+//
+// TODO: Ideally this should happen in Terrazzo itself during the build process.
+// Terrazzo's `permutations[].prepare()` hook on the CSS plugin is a perfect fit
+// for this, but it is mutually exclusive with `modeSelectors`/`baseSelector`
+// APIs, so this should be done as part of the work to migrate to the newer API.
+const fontFacesCSS = await readFile(
+	new URL( '../../src/font-faces.css', import.meta.url ),
+	'utf8'
+);
+
 for ( const file of outputFiles ) {
 	const filePath = resolve( outDir, file.filename );
 	await mkdir( dirname( filePath ), { recursive: true } );
-	await writeFile( filePath, file.contents );
+	const contents =
+		file.filename === 'css/design-tokens.css'
+			? `${ file.contents.toString() }\n${ fontFacesCSS }`
+			: file.contents;
+	await writeFile( filePath, contents );
 }
