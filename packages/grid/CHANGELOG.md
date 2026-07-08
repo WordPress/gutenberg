@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.2.0 (2026-07-01)
+
+## 0.1.0 (2026-06-24)
+
 ### New Features
 
 -   Initial experimental release. Ships two layout components sharing

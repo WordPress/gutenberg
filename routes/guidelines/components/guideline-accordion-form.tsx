@@ -12,32 +12,36 @@ import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
-import { store as coreGuidelinesStore } from '../store';
-import { saveGuidelines } from '../api';
+import { scopeSlug, saveGuidelineRow, deleteGuidelineRow } from '../data';
+import type { Scope, GuidelineQuery } from '../types';
 
-export default function GuidelineAccordionForm( { slug }: { slug: string } ) {
-	const { setGuideline } = useDispatch( coreGuidelinesStore );
+interface GuidelineAccordionFormProps {
+	scope: Scope;
+	existingId: number | undefined;
+	content: string;
+	query: GuidelineQuery;
+}
+
+export default function GuidelineAccordionForm( {
+	scope,
+	existingId,
+	content,
+	query,
+}: GuidelineAccordionFormProps ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ loading, setLoading ] = useState( false );
 	const [ error, setError ] = useState< string | null >( null );
 	const [ showClearConfirmation, setShowClearConfirmation ] =
 		useState( false );
 
-	const { value } = useSelect(
-		( select ) => ( {
-			value: select( coreGuidelinesStore ).getGuideline( slug ),
-		} ),
-		[ slug ]
-	);
-
-	const [ draft, setDraft ] = useState( value );
-	useEffect( () => setDraft( value ), [ value ] );
+	const [ draft, setDraft ] = useState( content );
+	useEffect( () => setDraft( content ), [ content ] );
 
 	const data = useMemo( () => ( { guidelines: draft } ), [ draft ] );
 
@@ -46,15 +50,15 @@ export default function GuidelineAccordionForm( { slug }: { slug: string } ) {
 			{
 				id: 'guidelines',
 				label: sprintf(
-					/* translators: %s: Guideline category. */
+					/* translators: %s: Guideline section title. */
 					__( '%s guidelines' ),
-					slug
+					scope.title
 				),
 				type: 'text',
 				Edit: 'textarea',
 			},
 		],
-		[ slug ]
+		[ scope.title ]
 	);
 
 	const form: Form = useMemo(
@@ -67,9 +71,14 @@ export default function GuidelineAccordionForm( { slug }: { slug: string } ) {
 
 	const handleSave = ( event: React.FormEvent< HTMLFormElement > ) => {
 		event.preventDefault();
-		setGuideline( slug, draft );
 		setLoading( true );
-		saveGuidelines()
+		saveGuidelineRow(
+			scopeSlug( scope.slug ),
+			scope.title,
+			draft,
+			existingId,
+			query
+		)
 			.then( () => {
 				setError( null );
 				createSuccessNotice( __( 'Guidelines saved.' ), {
@@ -91,29 +100,27 @@ export default function GuidelineAccordionForm( { slug }: { slug: string } ) {
 	const handleClearClick = () => setShowClearConfirmation( true );
 
 	const handleClearConfirm = () => {
-		const oldValue = draft;
-
-		// We need to pass an empty string to remove the guideline.
-		// This is because the API will only remove the guideline if the value is an empty string.
-		setGuideline( slug, '' );
+		if ( ! existingId ) {
+			setShowClearConfirmation( false );
+			return;
+		}
 		setLoading( true );
-		saveGuidelines()
+		deleteGuidelineRow( existingId )
 			.then( () => {
 				setError( null );
 				createSuccessNotice( __( 'Guidelines cleared.' ), {
 					type: 'snackbar',
 				} );
 			} )
-			.catch( ( e: Error ) => {
+			.catch( ( e: Error ) =>
 				setError(
 					sprintf(
 						/* translators: %s: Error message. */
 						__( 'Error clearing guidelines: %s' ),
 						e.message
 					)
-				);
-				setGuideline( slug, oldValue );
-			} )
+				)
+			)
 			.finally( () => {
 				setLoading( false );
 				setShowClearConfirmation( false );
@@ -150,7 +157,7 @@ export default function GuidelineAccordionForm( { slug }: { slug: string } ) {
 					<Button
 						variant="tertiary"
 						type="button"
-						disabled={ loading || ! value }
+						disabled={ loading || ! existingId }
 						accessibleWhenDisabled
 						isBusy={ loading }
 						onClick={ handleClearClick }
@@ -163,9 +170,9 @@ export default function GuidelineAccordionForm( { slug }: { slug: string } ) {
 			<ConfirmDialog
 				isOpen={ showClearConfirmation }
 				title={ sprintf(
-					/* translators: %s: Guideline category. */
+					/* translators: %s: Guideline section title. */
 					__( 'Clear %s guidelines' ),
-					slug
+					scope.title
 				) }
 				__experimentalHideHeader={ false }
 				onConfirm={ handleClearConfirm }
@@ -175,11 +182,9 @@ export default function GuidelineAccordionForm( { slug }: { slug: string } ) {
 				size="small"
 			>
 				{ sprintf(
-					/* translators: %s: Guideline category slug. */
-					__(
-						'You are about to clear the %s guidelines. This can be undone from revision history.'
-					),
-					slug
+					/* translators: %s: Guideline section title. */
+					__( 'You are about to clear the %s guidelines.' ),
+					scope.title
 				) }
 			</ConfirmDialog>
 		</form>

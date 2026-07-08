@@ -1,135 +1,189 @@
 /**
  * External dependencies
  */
-import { screen } from '@testing-library/react';
-import { click, render } from '@ariakit/test/react';
+import { renderHook } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
-import ColorPanel from '../color-panel';
+import {
+	useHasColorPanel,
+	useHasTextPanel,
+	useHasBackgroundColorPanel,
+	useHasLinkPanel,
+	useHasHeadingPanel,
+	useHasButtonPanel,
+	useHasCaptionPanel,
+} from '../color-panel';
 
-// ---------------------------------------------------------------------------
-// Shared fixtures
-// ---------------------------------------------------------------------------
-
-// Two palette entries that share the same decoded hex value (#000) but carry
-// distinct slugs. This mirrors the duplicate-color scenario that motivated
-// the slug-based selection work.
-const DUPLICATE_PALETTE_SETTINGS = {
+const settingsWithColors = ( overrides = {} ) => ( {
 	color: {
-		text: true,
-		link: false, // keep the panel simple so button queries are unambiguous
-		background: false,
-		custom: false,
-		customGradient: false,
-		defaultPalette: false,
 		palette: {
-			theme: [
-				{
-					color: '#000',
-					name: 'Dark Background',
-					slug: 'dark-background',
-				},
-				{ color: '#000', name: 'Dark Text', slug: 'dark-text' },
-			],
+			theme: [ { slug: 'red', color: '#ff0000', name: 'Red' } ],
 		},
+		...overrides,
 	},
-};
+} );
 
-// ---------------------------------------------------------------------------
-// ColorPanel — setTextColor behaviour (render tests)
-// ---------------------------------------------------------------------------
-
-describe( 'ColorPanel — setTextColor', () => {
-	// Helper: open the Text-color dropdown and return the rendered swatches.
-	async function openTextDropdown() {
-		await click(
-			screen.getByRole( 'button', { name: /Text/, expanded: false } )
+describe( 'useHasColorPanel', () => {
+	// After moving top-level text color to TypographyPanel and top-level
+	// background color to BackgroundPanel, the Color panel only aggregates
+	// link and element controls (heading, button, caption).
+	it( 'should be false when only text color is enabled', () => {
+		const { result } = renderHook( () =>
+			useHasColorPanel( settingsWithColors( { text: true } ) )
 		);
-		// `findAllByRole` waits for the Popover/portal content to appear.
-		return screen.findAllByRole( 'option' );
-	}
-
-	it( 'encodes a slug-selected color as var:preset|color|<slug> rather than falling back to a hex-value lookup', async () => {
-		const onChange = jest.fn();
-
-		await render(
-			<ColorPanel
-				value={ {} }
-				inheritedValue={ {} }
-				settings={ DUPLICATE_PALETTE_SETTINGS }
-				panelId="test"
-				onChange={ onChange }
-			/>
-		);
-
-		const swatches = await openTextDropdown();
-		// swatch[0] = 'dark-background', swatch[1] = 'dark-text'
-		await click( swatches[ 1 ] );
-
-		expect( onChange ).toHaveBeenCalledTimes( 1 );
-		const result = onChange.mock.calls[ 0 ][ 0 ];
-		// The slug must be encoded directly: not looked up by hex value.
-		expect( result?.color?.text ).toBe( 'var:preset|color|dark-text' );
+		expect( result.current ).toBeFalsy();
 	} );
 
-	it( 'syncs the link color when text and link share the same raw preset reference', async () => {
-		const onChange = jest.fn();
-		const sharedRef = 'var:preset|color|dark-background';
-
-		await render(
-			<ColorPanel
-				value={ {} }
-				inheritedValue={ {
-					color: { text: sharedRef },
-					elements: { link: { color: { text: sharedRef } } },
-				} }
-				settings={ DUPLICATE_PALETTE_SETTINGS }
-				panelId="test"
-				onChange={ onChange }
-			/>
+	it( 'should be false when only background color is enabled', () => {
+		const { result } = renderHook( () =>
+			useHasColorPanel( settingsWithColors( { background: true } ) )
 		);
-
-		const swatches = await openTextDropdown();
-		await click( swatches[ 1 ] );
-
-		const result = onChange.mock.calls[ 0 ][ 0 ];
-		expect( result?.color?.text ).toBe( 'var:preset|color|dark-text' );
-		// Link must be kept in sync because text and link shared the same ref.
-		expect( result?.elements?.link?.color?.text ).toBe(
-			'var:preset|color|dark-text'
-		);
+		expect( result.current ).toBeFalsy();
 	} );
 
-	it( 'does NOT sync the link color when text and link have different raw refs, even if their decoded hex values match', async () => {
-		const onChange = jest.fn();
+	it( 'should be false when both text and background are enabled but no element controls are', () => {
+		const { result } = renderHook( () =>
+			useHasColorPanel(
+				settingsWithColors( { text: true, background: true } )
+			)
+		);
+		expect( result.current ).toBeFalsy();
+	} );
 
-		await render(
-			<ColorPanel
-				value={ {} }
-				inheritedValue={ {
-					// Both resolve to #000, but they are different preset references.
-					color: { text: 'var:preset|color|dark-background' },
-					elements: {
-						link: {
-							color: { text: 'var:preset|color|dark-text' },
-						},
+	it( 'should be true when link color is enabled', () => {
+		const { result } = renderHook( () =>
+			useHasColorPanel( settingsWithColors( { link: true } ) )
+		);
+		expect( result.current ).toBeTruthy();
+	} );
+
+	it( 'should be true when heading element is enabled', () => {
+		const { result } = renderHook( () =>
+			useHasColorPanel( settingsWithColors( { heading: true } ) )
+		);
+		expect( result.current ).toBeTruthy();
+	} );
+
+	it( 'should be true when button element is enabled', () => {
+		const { result } = renderHook( () =>
+			useHasColorPanel( settingsWithColors( { button: true } ) )
+		);
+		expect( result.current ).toBeTruthy();
+	} );
+
+	it( 'should be true when caption element is enabled', () => {
+		const { result } = renderHook( () =>
+			useHasColorPanel( settingsWithColors( { caption: true } ) )
+		);
+		expect( result.current ).toBeTruthy();
+	} );
+
+	it( 'should be false when no color controls are enabled', () => {
+		const { result } = renderHook( () => useHasColorPanel( {} ) );
+		expect( result.current ).toBeFalsy();
+	} );
+} );
+
+describe( 'useHasTextPanel', () => {
+	// Still exported for TypographyPanel to consume as its text color gate.
+	it( 'should be true when text color is enabled and colors exist', () => {
+		const { result } = renderHook( () =>
+			useHasTextPanel( settingsWithColors( { text: true } ) )
+		);
+		expect( result.current ).toBeTruthy();
+	} );
+
+	it( 'should be true when text color is enabled with custom colors support', () => {
+		const { result } = renderHook( () =>
+			useHasTextPanel( { color: { text: true, custom: true } } )
+		);
+		expect( result.current ).toBeTruthy();
+	} );
+
+	it( 'should be false when text color is disabled', () => {
+		const { result } = renderHook( () =>
+			useHasTextPanel( settingsWithColors( { text: false } ) )
+		);
+		expect( result.current ).toBeFalsy();
+	} );
+
+	it( 'should be false when no colors or custom support exist', () => {
+		const { result } = renderHook( () =>
+			useHasTextPanel( { color: { text: true } } )
+		);
+		expect( result.current ).toBeFalsy();
+	} );
+} );
+
+describe( 'useHasBackgroundColorPanel', () => {
+	// Still exported for BackgroundPanel to consume as its background color gate.
+	it( 'should be true when background is enabled and colors exist', () => {
+		const { result } = renderHook( () =>
+			useHasBackgroundColorPanel(
+				settingsWithColors( { background: true } )
+			)
+		);
+		expect( result.current ).toBeTruthy();
+	} );
+
+	it( 'should be true when only gradients are available', () => {
+		const { result } = renderHook( () =>
+			useHasBackgroundColorPanel( {
+				color: {
+					background: true,
+					gradients: {
+						theme: [
+							{
+								slug: 'cyan',
+								gradient: 'linear-gradient(cyan, blue)',
+								name: 'Cyan',
+							},
+						],
 					},
-				} }
-				settings={ DUPLICATE_PALETTE_SETTINGS }
-				panelId="test"
-				onChange={ onChange }
-			/>
+				},
+			} )
 		);
+		expect( result.current ).toBeTruthy();
+	} );
 
-		const swatches = await openTextDropdown();
-		await click( swatches[ 1 ] );
+	it( 'should be false when background color is disabled', () => {
+		const { result } = renderHook( () =>
+			useHasBackgroundColorPanel(
+				settingsWithColors( { background: false } )
+			)
+		);
+		expect( result.current ).toBeFalsy();
+	} );
+} );
 
-		const result = onChange.mock.calls[ 0 ][ 0 ];
-		expect( result?.color?.text ).toBe( 'var:preset|color|dark-text' );
-		// Link must NOT be updated: raw-ref identity is what matters,
-		// not decoded-value equality.
-		expect( result?.elements?.link?.color?.text ).toBeUndefined();
+describe( 'element color hooks', () => {
+	it( 'useHasLinkPanel is truthy when link is enabled with colors', () => {
+		const { result } = renderHook( () =>
+			useHasLinkPanel( settingsWithColors( { link: true } ) )
+		);
+		expect( result.current ).toBeTruthy();
+	} );
+
+	it( 'useHasHeadingPanel is truthy when heading is enabled with colors', () => {
+		const { result } = renderHook( () =>
+			useHasHeadingPanel( settingsWithColors( { heading: true } ) )
+		);
+		expect( result.current ).toBeTruthy();
+	} );
+
+	it( 'useHasButtonPanel is truthy when button is enabled with colors', () => {
+		const { result } = renderHook( () =>
+			useHasButtonPanel( settingsWithColors( { button: true } ) )
+		);
+		expect( result.current ).toBeTruthy();
+	} );
+
+	it( 'useHasCaptionPanel is truthy when caption is enabled with colors', () => {
+		const { result } = renderHook( () =>
+			useHasCaptionPanel( settingsWithColors( { caption: true } ) )
+		);
+		expect( result.current ).toBeTruthy();
 	} );
 } );

@@ -121,7 +121,6 @@ export function CreatePatternModalContents( {
 					onChange={ setTitle }
 					placeholder={ __( 'My pattern' ) }
 					className="patterns-create-modal__name-input"
-					__next40pxDefaultSize
 				/>
 				<CategorySelector
 					categoryTerms={ categoryTerms }

@@ -2,7 +2,7 @@
 
 In the [previous part](/docs/how-to-guides/data-basics/3-building-an-edit-form.md) we created an *Edit page* feature, and in this part we will add a *Create page* feature. Here's a glimpse of what we're going to build:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/create-form/create-form-with-text.png)
+![](https://developer.wordpress.org/files/2026/06/create-form-with-text.png)
 
 ### Step 1: Add a _Create a new page_ button
 
@@ -59,7 +59,7 @@ function MyFirstApp() {
 
 The final result should look as follows:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/create-form/create-button.png)
+![](https://developer.wordpress.org/files/2026/06/create-button.png)
 
 ### Step 2: Extract a controlled PageForm
 
@@ -87,7 +87,6 @@ function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCanc
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
-				__next40pxDefaultSize
 				label="Page title:"
 				value={ title }
 				onChange={ onChangeTitle }
@@ -125,7 +124,7 @@ function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCanc
 
 This code quality change should not alter anything about how the application works. Let’s try to edit a page just to be sure:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/create-form/edit-page-form.png)
+![](https://developer.wordpress.org/files/2026/06/edit-page-form.png)
 
 Great! The edit form is still there, and now we have a building block to power the new `CreatePageForm`.
 
@@ -265,8 +264,8 @@ function CreatePageForm( { onCancel, onSaveFinished } ) {
 
 And that’s it! Here's what our new form looks like in action:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/create-form/create-saving.png)
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/create-form/created-item.png)
+![](https://developer.wordpress.org/files/2026/06/create-saving.png)
+![](https://developer.wordpress.org/files/2026/06/created-item.png)
 
 ### Wiring it all together
 
@@ -347,7 +346,6 @@ function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCanc
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
-				__next40pxDefaultSize
 				label="Page title:"
 				value={ title }
 				onChange={ onChangeTitle }
@@ -385,7 +383,7 @@ function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCanc
 
 All that’s left is to refresh the page and enjoy the form:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/create-form/create-form-with-text.png)
+![](https://developer.wordpress.org/files/2026/06/create-form-with-text.png)
 
 ## What's next?
 

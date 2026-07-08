@@ -68,6 +68,57 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		public $presentation = null;
 
 		/**
+		 * Widget types are grouped into categories to help users browse and
+		 * discover them. Static and declarative; not a user-editable attribute.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var string|null
+		 */
+		public $category = null;
+
+		/**
+		 * Human-readable title that names the widget type. Translated
+		 * at registration time using the widget's text domain.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var string|null
+		 */
+		public $title = null;
+
+		/**
+		 * Human-readable description of what the widget type does.
+		 * Translated at registration time using the widget's text domain.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var string|null
+		 */
+		public $description = null;
+
+		/**
+		 * Contextual help note: `content` plus optional `links`.
+		 * Translated at registration time using the widget's text domain.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var array|null
+		 */
+		public $help = null;
+
+		/**
+		 * Alternative terms used to match the widget type when searching,
+		 * e.g. "calendar" for an events widget. Translated at registration
+		 * time using the widget's text domain.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var string[]|null
+		 */
+		public $keywords = null;
+
+		/**
 		 * Constructor.
 		 *
 		 * @param string $name Widget type name including namespace.

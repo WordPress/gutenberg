@@ -9,6 +9,7 @@ exports[`PostSavedState returns a disabled button if the post is not saveable 1`
 >
   <svg
     aria-hidden="true"
+    fill="currentColor"
     focusable="false"
     height="24"
     viewBox="0 0 24 24"

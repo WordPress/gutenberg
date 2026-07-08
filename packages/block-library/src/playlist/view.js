@@ -6,7 +6,11 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
 /**
  * Internal dependencies
  */
-import { initWaveformPlayer, logPlayError } from '../utils/waveform-utils';
+import {
+	initWaveformPlayer,
+	logPlayError,
+	updateSeekControlLabel,
+} from '../utils/waveform-utils';
 
 /**
  * Store player state for each element.
@@ -19,14 +23,14 @@ const { state } = store(
 		state: {
 			playlists: {},
 			get isCurrentTrack() {
-				const { currentId, uniqueId } = getContext();
-				return currentId === uniqueId;
+				const { currentId, trackId } = getContext();
+				return currentId === trackId;
 			},
 		},
 		actions: {
 			changeTrack() {
 				const context = getContext();
-				context.currentId = context.uniqueId;
+				context.currentId = context.trackId;
 			},
 		},
 		callbacks: {
@@ -83,6 +87,14 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			} )
 			.then( () => {
 				existing.url = track.url;
+				if ( existing.instance.artworkEl ) {
+					existing.instance.artworkEl.alt = track.imageAlt || '';
+				}
+				// loadTrack() preserves the previous explicit seekLabel option.
+				updateSeekControlLabel(
+					existing.instance,
+					track.title || ref.dataset.labelSeek
+				);
 				if ( shouldAutoPlay ) {
 					existing.instance.play()?.catch( logPlayError );
 				}
@@ -95,6 +107,8 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const labels = {
 		play: ref.dataset.labelPlay,
 		pause: ref.dataset.labelPause,
+		seek: ref.dataset.labelSeek,
+		seekValueText: ref.dataset.labelSeekValue,
 	};
 
 	// Initialize using the shared core.
@@ -103,13 +117,14 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		title: track.title,
 		artist: track.artist,
 		image: track.image,
+		imageAlt: track.imageAlt,
 		autoPlay: shouldAutoPlay,
 		labels,
 		waveformStyle: context.waveformStyle,
 		onEnded: () => {
 			// Advance to next track (autoPlay handles playback).
 			const currentIndex = context.tracks.findIndex(
-				( uniqueId ) => uniqueId === context.currentId
+				( trackId ) => trackId === context.currentId
 			);
 			const nextTrack = context.tracks[ currentIndex + 1 ];
 			if ( nextTrack ) {

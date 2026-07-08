@@ -4,7 +4,10 @@
 import { useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
-import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
+import {
+	mergeGlobalStyles,
+	privateApis as globalStylesEnginePrivateApis,
+} from '@wordpress/global-styles-engine';
 import {
 	getBlockSupport,
 	getBlockType,
@@ -19,7 +22,8 @@ import { getCSSRules, compileCSS } from '@wordpress/style-engine';
  */
 import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
 import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
-import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
+import { COLOR_SUPPORT_KEY } from './color';
+import { ElementsEdit } from './elements';
 import {
 	TypographyPanel,
 	TYPOGRAPHY_SUPPORT_KEY,
@@ -48,18 +52,14 @@ import { VALID_BLOCK_PSEUDO_STATES } from './states';
 import { buildScopedBlockSelector } from './state-utils';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { useSettings } from '../components/use-settings';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
 
-const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
+const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
-// Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS and
-// packages/global-styles-engine/src/core/render.tsx.
-const RESPONSIVE_BREAKPOINTS = {
-	mobile: '@media (width <= 480px)',
-	tablet: '@media (480px < width <= 782px)',
-};
+const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -407,19 +407,30 @@ function getPseudoStateCSSRules( style, name, baseSelector ) {
  * pseudo-state styles. Generated rules are wrapped in the matching breakpoint
  * media query.
  *
- * @param {Object} style        Block style object containing responsive states.
- * @param {string} name         Block name.
- * @param {string} baseSelector Base selector used to scope generated CSS.
+ * @param {Object} style            Block style object containing responsive states.
+ * @param {string} name             Block name.
+ * @param {string} baseSelector     Base selector used to scope generated CSS.
+ * @param {Object} viewportSettings Viewport breakpoint settings.
  * @return {string[]} Generated CSS rule strings.
  */
-export function getResponsiveStateCSSRules( style, name, baseSelector ) {
+export function getResponsiveStateCSSRules(
+	style,
+	name,
+	baseSelector,
+	viewportSettings
+) {
 	const cssRules = [];
 	const validPseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ] ?? [];
 	const nestedStateKeys = [ 'elements', ...validPseudoStates ];
+	const responsiveMediaQueries =
+		getResponsiveMediaQueries( viewportSettings );
 
-	Object.entries( RESPONSIVE_BREAKPOINTS ).forEach(
+	Object.entries( responsiveMediaQueries ).forEach(
 		( [ viewport, mediaQuery ] ) => {
-			const viewportStyles = style?.[ viewport ];
+			const viewportStyles = getStyleForState( style, {
+				viewport,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+			} );
 			if ( ! viewportStyles ) {
 				return;
 			}
@@ -464,8 +475,8 @@ export function getResponsiveStateCSSRules( style, name, baseSelector ) {
  * Returns the style value used to force-preview a selected state on canvas.
  *
  * Responsive pseudo states inherit from their default-viewport pseudo state.
- * For example, selecting `mobile + :hover` should preview styles from
- * `:hover`, with `mobile.:hover` values layered on top when present.
+ * For example, selecting `@mobile + :hover` should preview styles from
+ * `:hover`, with `@mobile.:hover` values layered on top when present.
  *
  * @param {Object} style         Block style object.
  * @param {Object} selectedState Selected block style state.
@@ -848,7 +859,7 @@ function BlockStyleControls( {
 
 	return (
 		<BlockStyleStateProvider value={ selectedState }>
-			<ColorEdit { ...passedProps } />
+			<ElementsEdit { ...passedProps } />
 			<BackgroundImagePanel { ...passedProps } />
 			<TypographyPanel { ...passedProps } />
 			<BorderPanel { ...passedProps } />
@@ -966,6 +977,7 @@ function useBlockProps( { name, style } ) {
 
 	const baseElementSelector = `.${ blockElementsContainerIdentifier }`;
 	const blockElementStyles = style?.elements;
+	const [ viewportSettings ] = useSettings( 'viewport' );
 
 	const styles = useMemo( () => {
 		const cssRules = [];
@@ -984,11 +996,22 @@ function useBlockProps( { name, style } ) {
 		);
 
 		cssRules.push(
-			...getResponsiveStateCSSRules( style, name, baseElementSelector )
+			...getResponsiveStateCSSRules(
+				style,
+				name,
+				baseElementSelector,
+				viewportSettings
+			)
 		);
 
 		return cssRules.length > 0 ? cssRules.join( '' ) : undefined;
-	}, [ baseElementSelector, blockElementStyles, name, style ] );
+	}, [
+		baseElementSelector,
+		blockElementStyles,
+		name,
+		style,
+		viewportSettings,
+	] );
 
 	useStyleOverride( { css: styles } );
 

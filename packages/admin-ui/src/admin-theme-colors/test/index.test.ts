@@ -13,12 +13,12 @@ describe( 'getAdminThemeColors', () => {
 		} );
 	} );
 
-	it( 'should fall back to the fresh scheme colors when no admin-color class is present', () => {
+	it( 'should fall back to the modern scheme colors when no admin-color class is present', () => {
 		document.body.className = 'foo bar';
 
 		expect( getAdminThemeColors() ).toEqual( {
 			primary: '#3858e9',
-			background: '#25292b',
+			background: '#222524',
 		} );
 	} );
 
@@ -27,7 +27,7 @@ describe( 'getAdminThemeColors', () => {
 
 		expect( getAdminThemeColors() ).toEqual( {
 			primary: '#3858e9',
-			background: '#25292b',
+			background: '#222524',
 		} );
 	} );
 } );

@@ -52,7 +52,7 @@ test.describe( 'React 18 compatibility block (React 19 runtime)', () => {
 		// The subtree built with the bundled React 18 runtime renders, keeping
 		// the `inert` attribute on the important element.
 		const inert = block.locator( '.react-18-compat-block__inert' );
-		await expect( inert ).toHaveAttribute( 'inert', '' );
+		await expect( inert ).toHaveAttribute( 'inert' );
 		await expect( inert ).toContainText(
 			'This subtree is inert and built with the React 18 runtime.'
 		);

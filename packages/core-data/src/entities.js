@@ -247,6 +247,16 @@ export const rootEntitiesConfig = [
 		key: 'name',
 		supportsPagination: false,
 	},
+	{
+		label: __( 'Icon Collections' ),
+		name: 'iconCollection',
+		kind: 'root',
+		baseURL: '/wp/v2/icon-collections',
+		baseURLParams: { context: 'view' },
+		plural: 'iconCollections',
+		key: 'slug',
+		supportsPagination: false,
+	},
 ];
 
 export const deprecatedEntities = {

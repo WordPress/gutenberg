@@ -105,7 +105,6 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Name attribute' ) }
 					value={ name || '' }
 					onChange={ ( newName ) =>

@@ -17,6 +17,15 @@ figure.wp-block-image:not(.wp-block) {
 .wp-block-image {
 	position: relative;
 
+	// While uploading or processing client-side, hug the preview so the
+	// centered spinner lands on the image. A preview narrower than the content
+	// width (e.g. a small animated GIF being transcoded to a video) otherwise
+	// leaves the spinner off to one side. Wide and full alignments keep their
+	// own width.
+	&.is-transient:not(.alignwide):not(.alignfull) {
+		width: fit-content;
+	}
+
 	.is-applying img,
 	&.is-transient img {
 		opacity: 0.3;
@@ -120,6 +129,7 @@ figure.wp-block-image:not(.wp-block) {
 	width: 100%;
 	overflow: hidden;
 
+	// stylelint-disable selector-class-pattern -- react-easy-crop library class names.
 	.reactEasyCrop_Container {
 		// The linked Image block has `pointer-events: none` applied. Override it
 		// here to enable the crop action.
@@ -134,6 +144,7 @@ figure.wp-block-image:not(.wp-block) {
 			border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
 		}
 	}
+	// stylelint-enable selector-class-pattern
 }
 
 .wp-block-image__crop-icon {

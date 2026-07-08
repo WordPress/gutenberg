@@ -12,7 +12,7 @@ import { wordpress } from '@wordpress/icons';
  * Internal dependencies
  */
 import { Button } from '../..';
-import type { ButtonAsButtonProps } from '../../types';
+import type { ButtonAsButtonProps, ButtonAsAnchorProps } from '../../types';
 
 const meta: Meta< typeof Button > = {
 	component: Button,
@@ -21,7 +21,7 @@ const meta: Meta< typeof Button > = {
 export default meta;
 
 export const VariantStates: StoryFn< typeof Button > = (
-	props: ButtonAsButtonProps
+	props: ButtonAsButtonProps | ButtonAsAnchorProps
 ) => {
 	const variants: ( typeof props.variant )[] = [
 		undefined,
@@ -57,6 +57,11 @@ export const VariantStates: StoryFn< typeof Button > = (
 							{ ...props }
 							variant={ variant }
 							{ ...buttonProps }
+							// Drop an empty `href` so the buttons stay as
+							// `<button>` until an actual value is entered.
+							href={
+								( 'href' in props && props.href ) || undefined
+							}
 						/>
 					</td>
 				) ) }
@@ -140,6 +145,9 @@ export const VariantStates: StoryFn< typeof Button > = (
 };
 VariantStates.args = {
 	children: 'Code is poetry',
+};
+VariantStates.argTypes = {
+	href: { control: 'text' },
 };
 
 export const Icon = VariantStates.bind( {} );

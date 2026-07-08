@@ -36,6 +36,11 @@ export interface QueueItem {
 	// attachment's preserved original after the converted JPEG is uploaded.
 	// Not set for non-JXL items.
 	originalJxlFile?: File;
+	// Original animated GIF, kept separately so it can be transcoded to a
+	// video and sideloaded as a companion file of the GIF image attachment
+	// (recorded in attachment metadata as `animated_video`). Not set for
+	// non-animated-GIF items.
+	animatedGifFile?: File;
 	poster?: File;
 	attachment?: Partial< Attachment >;
 	status: ItemStatus;
@@ -225,6 +230,13 @@ export interface Settings {
 		id: number,
 		subSizes: SubSizeData[]
 	) => Promise< Partial< Attachment > | void >;
+	// Whether to convert animated GIFs to video (MP4/WebM) during upload.
+	// When enabled, animated GIFs are transcoded to video for smaller file sizes.
+	// Default is true.
+	gifConvert?: boolean;
+	// Output format for GIF-to-video conversion.
+	// Accepts 'video/mp4' or 'video/webm'. Default is 'video/mp4'.
+	videoOutputFormat?: 'video/mp4' | 'video/webm';
 	// Retry settings for automatic retry on failure.
 	retry?: RetrySettings;
 	// Function for deleting an attachment from the server. Used to clean up
@@ -272,6 +284,15 @@ export interface Attachment {
 	image_output_format?: string | null;
 	/** Whether to use progressive/interlaced encoding. */
 	image_save_progressive?: boolean;
+	/**
+	 * Encode quality (1-100) from the `wp_editor_set_quality` filter.
+	 * `default` applies to the full-size image; `sizes` holds per-registered-size
+	 * overrides keyed by size name, present only where they differ from `default`.
+	 */
+	image_quality?: {
+		default: number;
+		sizes: Record< string, number >;
+	};
 }
 
 export type OnChangeHandler = ( attachments: Partial< Attachment >[] ) => void;
@@ -294,6 +315,7 @@ export enum OperationType {
 	ResizeCrop = 'RESIZE_CROP',
 	Rotate = 'ROTATE',
 	TranscodeImage = 'TRANSCODE_IMAGE',
+	TranscodeGif = 'TRANSCODE_GIF',
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
 	Finalize = 'FINALIZE',
 	// UltraHDR operations
@@ -329,6 +351,12 @@ export interface OperationArgs {
 		 * If true, uses '-scaled' suffix instead of dimension suffix.
 		 */
 		isThresholdResize?: boolean;
+		/**
+		 * Re-encode quality (0-1) for the resized image, derived from the
+		 * `wp_editor_set_quality` filter. Falls back to the vips default
+		 * when omitted.
+		 */
+		quality?: number;
 	};
 	[ OperationType.Rotate ]: {
 		/**
@@ -344,6 +372,10 @@ export interface OperationArgs {
 		outputQuality: number;
 		/** Whether to use interlaced encoding. */
 		interlaced: boolean;
+	};
+	[ OperationType.TranscodeGif ]: {
+		/** Video output format: 'mp4' or 'webm'. */
+		outputFormat: 'mp4' | 'webm';
 	};
 }
 
