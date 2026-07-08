@@ -331,7 +331,7 @@
 
 	<!-- 15. File input -->
 	<div>
-		<p data-wp-text="state.fileCount" data-testid="file-count-output">0</p>
+		<p data-wp-text="state.fileName" data-testid="file-name-output"></p>
 		<input
 			type="file"
 			data-testid="file-input"
@@ -339,7 +339,7 @@
 		/>
 
 		<div data-wp-context='{ "ctxFileData": [] }'>
-			<p data-wp-text="context.ctxFileData" data-testid="ctx-file-count-output"></p>
+			<p data-wp-text="context.ctxFileData.0.name" data-testid="ctx-file-name-output"></p>
 			<input
 				type="file"
 				data-testid="ctx-file-input"

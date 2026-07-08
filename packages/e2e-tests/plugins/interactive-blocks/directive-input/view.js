@@ -18,8 +18,8 @@ const { state, actions } = store( 'directive-input', {
 		selectNone: '',
 		radioNone: '',
 		fileData: [],
-		get fileCount() {
-			return state.fileData.length;
+		get fileName() {
+			return state.fileData[ 0 ]?.name || '';
 		},
 	},
 	actions: {
