@@ -347,7 +347,6 @@ const PlaylistEdit = ( {
 						onDeselect={ () => setAttributes( { order: 'asc' } ) }
 					>
 						<SelectControl
-							__next40pxDefaultSize
 							label={ __( 'Order' ) }
 							value={ order }
 							options={ [

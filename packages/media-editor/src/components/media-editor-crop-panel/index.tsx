@@ -61,7 +61,6 @@ export default function MediaEditorCropPanel( {
 			</VisuallyHidden>
 			{ showTransformControls && <MediaEditorImageControls withLabels /> }
 			<SelectControl
-				__next40pxDefaultSize
 				label={ __( 'Aspect ratio' ) }
 				value={ aspectRatioValue }
 				onChange={ onAspectRatioChange }

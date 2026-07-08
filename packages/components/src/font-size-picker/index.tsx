@@ -184,7 +184,6 @@ const UnforwardedFontSizePicker = (
 					<Flex className="components-font-size-picker__custom-size-control">
 						<FlexItem isBlock>
 							<UnitControl
-								__next40pxDefaultSize
 								label={ __( 'Font size' ) }
 								labelPosition="top"
 								hideLabelFromVision

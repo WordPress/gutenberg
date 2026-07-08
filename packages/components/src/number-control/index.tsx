@@ -26,8 +26,6 @@ import type { NumberControlProps } from './types';
 import { HStack } from '../h-stack';
 import { Spacer } from '../spacer';
 import { useCx } from '../utils';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const noop = () => {};
 
@@ -55,16 +53,8 @@ function UnforwardedNumberControl(
 		size = 'default',
 		suffix,
 		onChange = noop,
-		__shouldNotWarnDeprecated36pxSize,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp< NumberControlProps >( props );
-
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'NumberControl',
-		size,
-		__next40pxDefaultSize: restProps.__next40pxDefaultSize,
-		__shouldNotWarnDeprecated36pxSize,
-	} );
+	} = props;
 
 	if ( hideHTMLArrows ) {
 		deprecated( 'wp.components.NumberControl hideHTMLArrows prop ', {
@@ -239,7 +229,7 @@ function UnforwardedNumberControl(
 			value={ valueProp }
 			__unstableStateReducer={ numberControlStateReducer }
 			size={ size }
-			__shouldNotWarnDeprecated36pxSize
+			__next40pxDefaultSize
 			suffix={
 				spinControls === 'custom' ? (
 					<>
