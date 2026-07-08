@@ -65,6 +65,16 @@ Settings related to background.
 
 ---
 
+### blockVisibility
+
+Settings related to block visibility.
+
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| allowEditing | Whether block visibility can be edited in the editor. Set to `false` to hide the block visibility controls. Saved block visibility attributes are always rendered regardless of this setting. | `boolean` | `true` |
+
+---
+
 ### border
 
 Settings related to borders.
@@ -151,16 +161,6 @@ Settings related to position.
 | Property | Description | Type | Default |
 | -------- | ----------- | ---- | ------- |
 | sticky | Allow users to set sticky position. | `boolean` | `false` |
-
----
-
-### responsive
-
-Settings related to responsive behavior.
-
-| Property | Description | Type | Default |
-| -------- | ----------- | ---- | ------- |
-| blockVisibility | Controls the block visibility feature. Set to `false` to disable all viewport visibility controls in the editor. Saved block visibility attributes are always rendered regardless of this setting. | `boolean` | `true` |
 
 ---
 

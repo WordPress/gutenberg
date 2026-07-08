@@ -54,6 +54,23 @@
 				}
 			}
 		},
+		"settingsBlockVisibilityProperties": {
+			"type": "object",
+			"properties": {
+				"blockVisibility": {
+					"description": "Settings related to block visibility.",
+					"type": "object",
+					"properties": {
+						"allowEditing": {
+							"description": "Whether block visibility can be edited in the editor. Set to `false` to hide the block visibility controls. Saved block visibility attributes are always rendered regardless of this setting.",
+							"type": "boolean",
+							"default": true
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsBorderProperties": {
 			"type": "object",
 			"properties": {
@@ -399,23 +416,6 @@
 							"description": "Allow users to set sticky position.",
 							"type": "boolean",
 							"default": false
-						}
-					},
-					"additionalProperties": false
-				}
-			}
-		},
-		"settingsResponsiveProperties": {
-			"type": "object",
-			"properties": {
-				"responsive": {
-					"description": "Settings related to responsive behavior.",
-					"type": "object",
-					"properties": {
-						"blockVisibility": {
-							"description": "Controls the block visibility feature. Set to `false` to disable all viewport visibility controls in the editor. Saved block visibility attributes are always rendered regardless of this setting.",
-							"type": "boolean",
-							"default": true
 						}
 					},
 					"additionalProperties": false
@@ -912,13 +912,13 @@
 			"allOf": [
 				{ "$ref": "#/definitions/settingsAppearanceToolsProperties" },
 				{ "$ref": "#/definitions/settingsBackgroundProperties" },
+				{ "$ref": "#/definitions/settingsBlockVisibilityProperties" },
 				{ "$ref": "#/definitions/settingsBorderProperties" },
 				{ "$ref": "#/definitions/settingsColorProperties" },
 				{ "$ref": "#/definitions/settingsDimensionsProperties" },
 				{ "$ref": "#/definitions/settingsLayoutProperties" },
 				{ "$ref": "#/definitions/settingsLightboxProperties" },
 				{ "$ref": "#/definitions/settingsPositionProperties" },
-				{ "$ref": "#/definitions/settingsResponsiveProperties" },
 				{ "$ref": "#/definitions/settingsShadowProperties" },
 				{ "$ref": "#/definitions/settingsSpacingProperties" },
 				{ "$ref": "#/definitions/settingsTypographyProperties" },
@@ -946,13 +946,13 @@
 			"enum": [
 				"appearanceTools",
 				"background",
+				"blockVisibility",
 				"border",
 				"color",
 				"dimensions",
 				"layout",
 				"lightbox",
 				"position",
-				"responsive",
 				"shadow",
 				"spacing",
 				"typography",

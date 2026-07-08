@@ -17,7 +17,7 @@ import { useSettings } from '../use-settings';
 
 export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 	const hasBlockVisibilityButtonShownRef = useRef( false );
-	const [ blockVisibility ] = useSettings( 'responsive.blockVisibility' );
+	const [ blockVisibility ] = useSettings( 'blockVisibility.allowEditing' );
 	const { canToggleBlockVisibility, areBlocksHiddenAnywhere } = useSelect(
 		( select ) => {
 			const { getBlocksByClientId, getBlockName, isBlockHiddenAnywhere } =

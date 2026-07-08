@@ -60,7 +60,7 @@ function selector( select ) {
 		viewportModalClientIds: getViewportModalClientIds(),
 		blockVisibilitySetting:
 			select( blockEditorStore ).getSettings().__experimentalFeatures
-				?.responsive?.blockVisibility,
+				?.blockVisibility?.allowEditing,
 	};
 }
 

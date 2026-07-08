@@ -14,7 +14,7 @@ import { unlock } from '../../lock-unlock';
 import { useSettings } from '../use-settings';
 
 export default function BlockVisibilityViewportMenuItem( { clientIds } ) {
-	const [ blockVisibility ] = useSettings( 'responsive.blockVisibility' );
+	const [ blockVisibility ] = useSettings( 'blockVisibility.allowEditing' );
 	const { areBlocksHiddenAnywhere, shortcut } = useSelect(
 		( select ) => {
 			const { isBlockHiddenAnywhere } = unlock(

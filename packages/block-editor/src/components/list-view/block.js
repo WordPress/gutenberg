@@ -153,8 +153,8 @@ function ListViewBlock( {
 				editedSection: getEditedContentOnlySection(),
 				viewportSettings: settings.__experimentalFeatures?.viewport,
 				blockVisibilitySetting:
-					settings.__experimentalFeatures?.responsive
-						?.blockVisibility,
+					settings.__experimentalFeatures?.blockVisibility
+						?.allowEditing,
 			};
 		},
 		[ clientId ]

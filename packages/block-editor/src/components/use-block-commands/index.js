@@ -169,8 +169,8 @@ const getQuickActionsCommands = () =>
 				isUngroupable: _isUngroupable(),
 				isGroupable: _isGroupable(),
 				blockVisibilitySetting:
-					getSettings().__experimentalFeatures?.responsive
-						?.blockVisibility,
+					getSettings().__experimentalFeatures?.blockVisibility
+						?.allowEditing,
 			};
 		}, [] );
 		const {

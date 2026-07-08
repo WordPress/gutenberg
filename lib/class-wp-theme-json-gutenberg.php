@@ -403,6 +403,9 @@ class WP_Theme_JSON_Gutenberg {
 			'backgroundSize'  => null,
 			'gradient'        => null,
 		),
+		'blockVisibility'               => array(
+			'allowEditing' => true,
+		),
 		'border'                        => array(
 			'color'       => null,
 			'radius'      => null,
@@ -451,9 +454,6 @@ class WP_Theme_JSON_Gutenberg {
 		'position'                      => array(
 			'fixed'  => null,
 			'sticky' => null,
-		),
-		'responsive'                    => array(
-			'blockVisibility' => true,
 		),
 		'spacing'                       => array(
 			'customSpacingSize'   => null,
