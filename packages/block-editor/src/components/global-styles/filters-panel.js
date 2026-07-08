@@ -35,7 +35,6 @@ import {
 	InheritanceToolsPanelItem,
 	InheritanceResetButton,
 } from './inheritance';
-import { isRootSourced } from './inheritance/root-source';
 
 const EMPTY_ARRAY = [];
 function useMultiOriginColorPresets(
@@ -184,7 +183,6 @@ export default function FiltersPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
-	inheritedSources = {},
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -208,11 +206,7 @@ export default function FiltersPanel( {
 		defaultSetting: 'defaultPalette',
 	} );
 	const localDuotone = decodeValue( value?.filter?.duotone );
-	// Duotone is non-cascading: a root-level Global Styles value does not reach
-	// this block, so it is not surfaced as inherited.
-	const inheritedDuotone = isRootSourced( inheritedSources, 'filter.duotone' )
-		? undefined
-		: decodeValue( inheritedValue?.filter?.duotone );
+	const inheritedDuotone = decodeValue( inheritedValue?.filter?.duotone );
 	const duotone = localDuotone ?? inheritedDuotone;
 	const isDuotonePlaceholder =
 		localDuotone === undefined && inheritedDuotone !== undefined;

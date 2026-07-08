@@ -2,10 +2,8 @@
  * WordPress dependencies
  */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
-import { useCallback, useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { getResolvedValue } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -15,18 +13,12 @@ import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasBackgroundColorPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
-import { store as blockEditorStore } from '../../store';
-import {
-	globalStylesDataKey,
-	globalStylesLinksDataKey,
-} from '../../store/private-keys';
 import { setImmutably } from '../../utils/object';
 import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
 import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
-import { dropRootSourced, isRootSourced } from './inheritance/root-source';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
@@ -131,70 +123,6 @@ export function hasLegacyColorGradientValue( style ) {
 	return !! style?.color?.gradient;
 }
 
-const BACKGROUND_STYLE_KEYS = [
-	'backgroundImage',
-	'gradient',
-	'backgroundPosition',
-	'backgroundRepeat',
-	'backgroundSize',
-	'backgroundAttachment',
-];
-
-/**
- * Merges a block's local background style with the inherited background style
- * so that, when the block sets *any* background property locally, the remaining
- * background properties fall back to the inherited (Global Styles) values
- * rather than being dropped. Mirrors the cascade the editor renders, used by
- * `hooks/background.js` to compute the effective background for block props.
- *
- * @param {Object} style          The block's local style object.
- * @param {Object} inheritedStyle The inherited (Global Styles) style object.
- * @return {Object} The style with background properties merged from inherited.
- */
-export function mergeInheritedBackgroundStyle( style, inheritedStyle ) {
-	const hasLocalBackgroundStyle =
-		!! style?.color?.gradient ||
-		BACKGROUND_STYLE_KEYS.some(
-			( key ) => style?.background?.[ key ] !== undefined
-		);
-
-	if ( ! hasLocalBackgroundStyle ) {
-		return style;
-	}
-
-	const mergedBackground = BACKGROUND_STYLE_KEYS.reduce( ( acc, key ) => {
-		const value = style?.background?.[ key ];
-		const inheritedValue = inheritedStyle?.background?.[ key ];
-
-		if ( value !== undefined ) {
-			acc[ key ] = value;
-		} else if ( inheritedValue !== undefined ) {
-			acc[ key ] = inheritedValue;
-		}
-
-		return acc;
-	}, {} );
-
-	if (
-		mergedBackground.gradient === undefined &&
-		inheritedStyle?.color?.gradient !== undefined
-	) {
-		mergedBackground.gradient = inheritedStyle.color.gradient;
-	}
-
-	if ( Object.keys( mergedBackground ).length === 0 ) {
-		return style;
-	}
-
-	return {
-		...style,
-		background: {
-			...style?.background,
-			...mergedBackground,
-		},
-	};
-}
-
 export function BackgroundToolsPanel( {
 	resetAllFilter,
 	onChange,
@@ -232,7 +160,6 @@ export default function BackgroundImagePanel( {
 	value,
 	onChange,
 	inheritedValue = value,
-	inheritedSources = {},
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -252,28 +179,6 @@ export default function BackgroundImagePanel( {
 		decodeValue,
 		encodeGradientValue,
 	} = useColorGradientSettings( settings );
-
-	// Global Styles payload used to resolve inherited `ref`/theme-file
-	// background image pointers for the inherited-label affordance.
-	const { globalStyles, _links } = useSelect( ( select ) => {
-		const _settings = select( blockEditorStore ).getSettings();
-		return {
-			globalStyles: _settings[ globalStylesDataKey ],
-			_links: _settings[ globalStylesLinksDataKey ],
-		};
-	}, [] );
-
-	// Resolve `ref`/theme-file pointers before detecting an inherited image so
-	// the label affordance matches what `BackgroundImageControl` displays,
-	// which also resolves the inherited value (see `background-image-control`).
-	const resolvedInheritedBackgroundImage = useMemo(
-		() =>
-			getResolvedValue( inheritedValue?.background?.backgroundImage, {
-				styles: globalStyles,
-				_links,
-			} ),
-		[ inheritedValue?.background?.backgroundImage, globalStyles, _links ]
-	);
 
 	const hasBackgroundGradientControl = useHasBackgroundControl(
 		settings,
@@ -353,17 +258,11 @@ export default function BackgroundImagePanel( {
 		onChange( newValue );
 	};
 
-	// Background is a non-cascading property: a root-level Global Styles value
-	// paints the root wrapper only and does not reach this block, so it is not
-	// surfaced as inherited (see `./inheritance/root-source`).
+	// Non-cascading root values are already dropped from `inheritedValue` by
+	// the builder, so inherited reads below are direct.
 
 	// Background color (written to `color.background`).
-	const backgroundColor = isRootSourced(
-		inheritedSources,
-		'color.background'
-	)
-		? undefined
-		: decodeValue( inheritedValue?.color?.background );
+	const backgroundColor = decodeValue( inheritedValue?.color?.background );
 	const userBackgroundColor = decodeValue( value?.color?.background );
 	const setBackgroundColor = ( newColor, newSlug ) => {
 		const newValue = setImmutably(
@@ -392,12 +291,7 @@ export default function BackgroundImagePanel( {
 	};
 
 	// Legacy `color.gradient` setters.
-	const legacyColorGradient = isRootSourced(
-		inheritedSources,
-		'color.gradient'
-	)
-		? undefined
-		: decodeValue( inheritedValue?.color?.gradient );
+	const legacyColorGradient = decodeValue( inheritedValue?.color?.gradient );
 	const userLegacyColorGradient = decodeValue( value?.color?.gradient );
 	const setLegacyColorGradient = ( newGradient ) => {
 		const newValue = setImmutably(
@@ -418,20 +312,8 @@ export default function BackgroundImagePanel( {
 	const currentGradient = decodeValue(
 		value?.background?.gradient ?? value?.color?.gradient
 	);
-	const inheritedBackgroundGradient = isRootSourced(
-		inheritedSources,
-		'background.gradient'
-	)
-		? undefined
-		: inheritedValue?.background?.gradient;
-	const inheritedLegacyGradient = isRootSourced(
-		inheritedSources,
-		'color.gradient'
-	)
-		? undefined
-		: inheritedValue?.color?.gradient;
 	const inheritedGradient = decodeValue(
-		inheritedBackgroundGradient ?? inheritedLegacyGradient
+		inheritedValue?.background?.gradient ?? inheritedValue?.color?.gradient
 	);
 
 	// Set gradient value, encoding preset matches as slug references.
@@ -452,16 +334,12 @@ export default function BackgroundImagePanel( {
 			? getInheritanceProps( isInherited, hasLocalOverride, classNames )
 			: { className: classNames };
 
-	// The inherited background image is resolved above (before the early
-	// return) so this detection matches what `BackgroundImageControl`
-	// renders and the label affordance appears whenever an image is inherited.
+	// The inherited value arrives already resolved (refs + theme-file pointers)
+	// with non-cascading root values dropped, so a presence check drives the
+	// label affordance and matches what `BackgroundImageControl` renders.
 	const inheritedBackgroundImage = hasBackgroundImageValue( {
 		background: {
-			backgroundImage: dropRootSourced(
-				resolvedInheritedBackgroundImage,
-				inheritedSources,
-				'background.backgroundImage'
-			),
+			backgroundImage: inheritedValue?.background?.backgroundImage,
 		},
 	} );
 	const hasLocalBackgroundImage = hasBackgroundImageValue( value );

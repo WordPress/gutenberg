@@ -13,7 +13,6 @@ import BackgroundPanel, {
 	hasBackgroundGradientValue,
 	hasBackgroundColorValue,
 	hasLegacyColorGradientValue,
-	mergeInheritedBackgroundStyle,
 } from '../background-panel';
 
 describe( 'hasBackgroundImageValue', () => {
@@ -87,142 +86,6 @@ describe( 'hasBackgroundGradientValue', () => {
 
 	it( 'should return `false` when style is undefined', () => {
 		expect( hasBackgroundGradientValue( undefined ) ).toBe( false );
-	} );
-} );
-
-describe( 'mergeInheritedBackgroundStyle', () => {
-	it( 'combines inherited background image fields with a local gradient override', () => {
-		expect(
-			mergeInheritedBackgroundStyle(
-				{
-					background: {
-						gradient: 'linear-gradient(135deg, red 0%, blue 100%)',
-					},
-				},
-				{
-					background: {
-						backgroundImage: {
-							id: 1,
-							url: 'http://example.com/inherited.jpg',
-						},
-						backgroundSize: 'cover',
-						backgroundPosition: '25% 75%',
-						backgroundRepeat: 'no-repeat',
-					},
-				}
-			)
-		).toEqual( {
-			background: {
-				backgroundImage: {
-					id: 1,
-					url: 'http://example.com/inherited.jpg',
-				},
-				gradient: 'linear-gradient(135deg, red 0%, blue 100%)',
-				backgroundSize: 'cover',
-				backgroundPosition: '25% 75%',
-				backgroundRepeat: 'no-repeat',
-			},
-		} );
-	} );
-
-	it( 'combines inherited gradient with a local background image override', () => {
-		expect(
-			mergeInheritedBackgroundStyle(
-				{
-					background: {
-						backgroundImage: {
-							id: 2,
-							url: 'http://example.com/local.jpg',
-						},
-						backgroundSize: 'contain',
-					},
-				},
-				{
-					background: {
-						gradient:
-							'linear-gradient(135deg, green 0%, yellow 100%)',
-						backgroundImage: {
-							id: 1,
-							url: 'http://example.com/inherited.jpg',
-						},
-						backgroundSize: 'cover',
-						backgroundPosition: '25% 75%',
-					},
-				}
-			)
-		).toEqual( {
-			background: {
-				backgroundImage: {
-					id: 2,
-					url: 'http://example.com/local.jpg',
-				},
-				gradient: 'linear-gradient(135deg, green 0%, yellow 100%)',
-				backgroundSize: 'contain',
-				backgroundPosition: '25% 75%',
-			},
-		} );
-	} );
-
-	it( 'combines inherited legacy color gradient with a local background image override', () => {
-		expect(
-			mergeInheritedBackgroundStyle(
-				{
-					background: {
-						backgroundImage: {
-							id: 2,
-							url: 'http://example.com/local.jpg',
-						},
-					},
-					color: {
-						gradient: undefined,
-					},
-				},
-				{
-					color: {
-						gradient:
-							'linear-gradient(135deg, green 0%, yellow 100%)',
-					},
-				}
-			)
-		).toEqual( {
-			background: {
-				backgroundImage: {
-					id: 2,
-					url: 'http://example.com/local.jpg',
-				},
-				gradient: 'linear-gradient(135deg, green 0%, yellow 100%)',
-			},
-			color: {
-				gradient: undefined,
-			},
-		} );
-	} );
-
-	it( 'preserves an explicit local background image removal', () => {
-		expect(
-			mergeInheritedBackgroundStyle(
-				{
-					background: {
-						backgroundImage: 'none',
-					},
-				},
-				{
-					background: {
-						backgroundImage: {
-							id: 1,
-							url: 'http://example.com/inherited.jpg',
-						},
-						gradient:
-							'linear-gradient(135deg, green 0%, yellow 100%)',
-					},
-				}
-			)
-		).toEqual( {
-			background: {
-				backgroundImage: 'none',
-				gradient: 'linear-gradient(135deg, green 0%, yellow 100%)',
-			},
-		} );
 	} );
 } );
 
@@ -614,38 +477,6 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 			await user.click( toggle );
 
 			expect( onChange ).not.toHaveBeenCalled();
-		} );
-	} );
-
-	describe( 'root-sourced values (non-cascading, not surfaced as inherited)', () => {
-		const colorBgSettings = {
-			color: {
-				background: true,
-				palette: {
-					theme: [ { name: 'Red', slug: 'red', color: '#ff0000' } ],
-				},
-			},
-		};
-
-		it( 'does not surface a root-sourced background color as inherited', () => {
-			const { container } = render(
-				<BackgroundPanel
-					value={ {} }
-					inheritedValue={ { color: { background: '#ff0000' } } }
-					inheritedSources={ {
-						'color.background': { layer: 'root' },
-					} }
-					settings={ colorBgSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
-
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const inheritedItems = container.querySelectorAll(
-				'.is-inherited-from-global-styles'
-			);
-			expect( inheritedItems ).toHaveLength( 0 );
 		} );
 	} );
 

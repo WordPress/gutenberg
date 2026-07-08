@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { getResolvedValue } from '@wordpress/global-styles-engine';
+
+/**
  * Internal dependencies
  */
 import { getValueFromObjectPath } from '../../utils/object';
@@ -288,6 +293,115 @@ function getStateSlice( layerObject, selectedState ) {
 }
 
 /**
+ * Root-level Global Styles for these property groups paint the root/layout
+ * element only and do not cascade to a descendant block, so a root-sourced
+ * leaf must not surface as the block's inherited value. Cascading properties
+ * (typography, `color.text`) and the `elements.*` passthrough are kept.
+ *
+ * `color.background` / `color.gradient` are the background-specific leaves
+ * under `color`; `color.text` deliberately stays.
+ */
+const NON_CASCADING_ROOT_PREFIXES = [
+	'color.background',
+	'color.gradient',
+	'background',
+	'spacing',
+	'dimensions',
+	'border',
+	'shadow',
+	'filter',
+];
+
+/**
+ * Whether a leaf dot-path is a non-cascading property (see
+ * `NON_CASCADING_ROOT_PREFIXES`). The `elements.*` passthrough is exempt: its
+ * values are emitted onto their own global selectors and do reach the block.
+ *
+ * @param {string} pathKey Leaf dot-path (e.g. `background.backgroundImage`).
+ * @return {boolean} Whether the path is a non-cascading property.
+ */
+function isNonCascadingRootPath( pathKey ) {
+	if ( pathKey.startsWith( 'elements.' ) ) {
+		return false;
+	}
+	return NON_CASCADING_ROOT_PREFIXES.some(
+		( prefix ) => pathKey === prefix || pathKey.startsWith( `${ prefix }.` )
+	);
+}
+
+/**
+ * Delete a leaf at `pathSegments` from `obj`, pruning any parent objects left
+ * empty by the removal.
+ *
+ * @param {Object}   obj          Object to mutate.
+ * @param {string[]} pathSegments Leaf path segments.
+ */
+function deleteAtPath( obj, pathSegments ) {
+	if ( ! obj || typeof obj !== 'object' ) {
+		return;
+	}
+	const [ head, ...rest ] = pathSegments;
+	if ( rest.length === 0 ) {
+		delete obj[ head ];
+		return;
+	}
+	const child = obj[ head ];
+	if ( child && typeof child === 'object' ) {
+		deleteAtPath( child, rest );
+		if ( Object.keys( child ).length === 0 ) {
+			delete obj[ head ];
+		}
+	}
+}
+
+/**
+ * Drop root-sourced non-cascading leaves from the merged value and its source
+ * map together, so an inspector control never surfaces a root value that does
+ * not actually reach the block. See `NON_CASCADING_ROOT_PREFIXES`.
+ *
+ * @param {Object} value   Merged inherited value (mutated).
+ * @param {Object} sources Source map keyed by dot-path (mutated).
+ */
+function dropNonCascadingRootLeaves( value, sources ) {
+	for ( const pathKey of Object.keys( sources ) ) {
+		if (
+			sources[ pathKey ].layer === 'root' &&
+			isNonCascadingRootPath( pathKey )
+		) {
+			deleteAtPath( value, pathKey.split( '.' ) );
+			delete sources[ pathKey ];
+		}
+	}
+}
+
+/**
+ * Resolve the inherited `background.backgroundImage` against the Global Styles
+ * tree and its theme-file links, so consumers receive a final image value and
+ * do not need their own store read. `{ ref }` envelopes are already resolved
+ * during the merge; this additionally resolves theme-file `.url` paths.
+ *
+ * The merge produces a fresh `backgroundImage` object, so resolving in place
+ * does not mutate the Global Styles store data.
+ *
+ * @param {Object}  value        Merged inherited value (mutated).
+ * @param {?Object} globalStyles Wrapped Global Styles payload (`{ styles }`).
+ * @param {?Object} links        Theme-file links (`settings[ globalStylesLinksDataKey ]`).
+ */
+function resolveThemeFileBackgroundImage( value, globalStyles, links ) {
+	const image = value?.background?.backgroundImage;
+	if ( ! image ) {
+		return;
+	}
+	const resolved = getResolvedValue( image, {
+		...globalStyles,
+		_links: links,
+	} );
+	if ( resolved !== undefined ) {
+		value.background.backgroundImage = resolved;
+	}
+}
+
+/**
  * Internal, uncached merge. Computes the merged Global Styles payload and a
  * source map describing which Global Styles layer supplied each winning leaf.
  * `buildInheritedValue` is the public, memoized entry point.
@@ -297,6 +411,7 @@ function getStateSlice( layerObject, selectedState ) {
  * @param {?string} [args.ownVariation]  Active block style variation slug, or null.
  * @param {Object}  [args.globalStyles]  The `settings[ globalStylesDataKey ]` payload.
  * @param {?Object} [args.selectedState] Selected block style state, or null for the default state.
+ * @param {?Object} [args._links]        Theme-file links (`settings[ globalStylesLinksDataKey ]`), used to resolve theme-file pointers.
  * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map.
  */
 function computeInheritedValue( {
@@ -304,6 +419,7 @@ function computeInheritedValue( {
 	ownVariation = null,
 	globalStyles,
 	selectedState = null,
+	_links = null,
 } = {} ) {
 	if ( ! globalStyles || ! globalStyles.styles ) {
 		return EMPTY_INHERITANCE;
@@ -401,6 +517,12 @@ function computeInheritedValue( {
 			),
 		{}
 	);
+
+	// Root-level non-cascading values do not reach the block; drop them from
+	// value and sources together. Then resolve theme-file image pointers so
+	// consumers receive fully-resolved values.
+	dropNonCascadingRootLeaves( value, sources );
+	resolveThemeFileBackgroundImage( value, globalStyles, _links );
 
 	return { value, sources };
 }

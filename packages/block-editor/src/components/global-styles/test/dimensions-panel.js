@@ -706,48 +706,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			);
 		} );
 
-		it( 'does not surface root-sourced spacing.padding as inherited on a block panel', () => {
-			// Mirrors the Twenty Twenty-Five + WP core defaults case where
-			// root-level padding is set and there's no block-level padding
-			// override for the block being inspected.
-			renderPanel( {
-				value: {},
-				inheritedValue: {
-					spacing: {
-						padding: {
-							top: '0px',
-							right: 'var:preset|spacing|40',
-							bottom: '0px',
-							left: 'var:preset|spacing|40',
-						},
-					},
-				},
-				inheritedSources: {
-					'spacing.padding.top': { layer: 'root' },
-					'spacing.padding.right': { layer: 'root' },
-					'spacing.padding.bottom': { layer: 'root' },
-					'spacing.padding.left': { layer: 'root' },
-				},
-				settings: settingsWithSpacingPresets,
-			} );
-
-			// The root-sourced inherited padding must not flip the
-			// SpacingSizesControl into custom-value mode.
-			const spinButtons = screen.queryAllByRole( 'spinbutton' );
-			const paddingSpinButtons = spinButtons.filter( ( s ) =>
-				/padding/i.test( s.getAttribute( 'aria-label' ) || '' )
-			);
-			expect( paddingSpinButtons ).toHaveLength( 0 );
-
-			// Sliders should sit at the None preset position because no
-			// inherited padding is surfaced.
-			const paddingSliders = getPaddingSliders();
-			expect( paddingSliders.length ).toBeGreaterThan( 0 );
-			expect( paddingSliders.every( ( s ) => s.value === '0' ) ).toBe(
-				true
-			);
-		} );
-
 		it( 'still surfaces block-sourced inherited padding on a block panel', () => {
 			renderPanel( {
 				value: {},
