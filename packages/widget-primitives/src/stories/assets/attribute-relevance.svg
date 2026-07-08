@@ -50,21 +50,21 @@
 
   <!-- Tile context (read-only) -->
   <rect x="576" y="104" width="168" height="156" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
-  <rect x="578" y="106" width="164" height="36" rx="7" fill="#f1f5f9"/>
+  <path d="M 585 106 H 735 Q 742 106 742 113 V 143 H 578 V 113 Q 578 106 585 106 Z" fill="#f1f5f9"/>
   <line x1="576" y1="143" x2="744" y2="143" stroke="#e2e8f0" stroke-width="1"/>
   <rect x="594" y="114" width="16" height="16" rx="4" fill="#2f54a5"/>
   <text x="618" y="127" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="700" fill="#334155">Events</text>
-  <rect x="674" y="116" width="56" height="16" rx="4" fill="#d7f0ea" stroke="#1d6b5a" stroke-width="1"/>
-  <text x="702" y="128" text-anchor="middle" font-family="ui-monospace, monospace" font-size="8" fill="#1d6b5a">location</text>
+  <rect x="682" y="116" width="56" height="16" rx="4" fill="#d7f0ea" stroke="#1d6b5a" stroke-width="1"/>
+  <text x="710" y="128" text-anchor="middle" font-family="ui-monospace, monospace" font-size="8" fill="#1d6b5a">location</text>
   <rect x="594" y="160" width="12" height="12" rx="3" fill="#e2e8f0"/>
   <line x1="614" y1="166" x2="710" y2="166" stroke="#cbd5e1" stroke-width="1.5"/>
   <rect x="594" y="182" width="12" height="12" rx="3" fill="#e2e8f0"/>
   <line x1="614" y1="188" x2="680" y2="188" stroke="#cbd5e1" stroke-width="1.5"/>
   <text x="660" y="240" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#94a3b8">widget render</text>
 
-  <line x1="524" y1="128" x2="572" y2="128" stroke="#1d6b5a" stroke-width="1.5" marker-end="url(#arrow-relevance-high)"/>
-  <rect x="478" y="108" width="68" height="14" rx="3" fill="#ffffff"/>
-  <text x="512" y="119" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9" fill="#1d6b5a">near instance</text>
+  <path d="M 524 167 H 554 V 127 H 576" fill="none" stroke="#1d6b5a" stroke-width="1.5" marker-end="url(#arrow-relevance-high)"/>
+  <rect x="518" y="172" width="68" height="14" rx="3" fill="#ffffff"/>
+  <text x="552" y="183" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9" fill="#1d6b5a">near instance</text>
 
   <text x="420" y="328" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11.5" font-weight="700" fill="#855317">importance, not surface. absent means low</text>
 </svg>
