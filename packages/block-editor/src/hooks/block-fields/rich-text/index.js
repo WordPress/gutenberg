@@ -13,13 +13,10 @@ import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { getAllowedFormats } from '../../../components/rich-text/utils';
 import { useEventListeners } from '../../../components/rich-text/event-listeners';
 import FormatEdit from '../../../components/rich-text/format-edit';
-import {
-	keyboardShortcutContext,
-	inputEventContext,
-} from '../../../components/rich-text';
 import { unlock } from '../../../lock-unlock';
 
-const { useRichText } = unlock( richTextPrivateApis );
+const { useRichText, KeyboardShortcutContext, InputEventContext } =
+	unlock( richTextPrivateApis );
 
 export default function RichTextControl( {
 	data,
@@ -84,8 +81,8 @@ export default function RichTextControl( {
 	return (
 		<>
 			{ isSelected && (
-				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
-					<inputEventContext.Provider value={ inputEvents }>
+				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
+					<InputEventContext.Provider value={ inputEvents }>
 						<div>
 							<FormatEdit
 								value={ value }
@@ -96,8 +93,8 @@ export default function RichTextControl( {
 								isVisible={ false }
 							/>
 						</div>
-					</inputEventContext.Provider>
-				</keyboardShortcutContext.Provider>
+					</InputEventContext.Provider>
+				</KeyboardShortcutContext.Provider>
 			) }
 			<BaseControl { ...baseControlProps }>
 				<div

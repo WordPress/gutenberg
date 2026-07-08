@@ -289,8 +289,6 @@ const getAllBlocks = () => {
 		blocks.push( playlistTrack );
 	}
 
-	// Always register the classic block. Inserter availability is controlled
-	// by the block's `supports.inserter` value in `freeform/init`.
 	blocks.push( classic );
 
 	return blocks.filter( Boolean );
