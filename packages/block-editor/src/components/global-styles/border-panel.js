@@ -414,12 +414,11 @@ export default function BorderPanel( {
 						// (which produces `.components-base-control__label`)
 						// rather than passing `label` to `BorderBoxControl`,
 						// whose internal `<StyledLabel>` carries no stable
-						// className. The inheritance CSS treatment and the
-						// portaled local-override dot both target
+						// className. The inheritance treatment and the
+						// local-override reset affordance both target
 						// `.components-base-control__label`, so the visible
-						// "Border" label has to be a `BaseControl` label for
-						// the synced-purple text and blue-dot menu to land on
-						// the Border control instead of being silently lost.
+						// "Border" label has to be a `BaseControl` label to
+						// receive them.
 						<BaseControl.VisualLabel as="legend">
 							{ __( 'Border' ) }
 						</BaseControl.VisualLabel>
