@@ -150,19 +150,27 @@ function NotesSidebar( { postId } ) {
 		} );
 	}
 
-	// Open the new-note form for the current multi-block selection. The
-	// cross-block text selection collapses once focus enters the sidebar form,
-	// so capture the per-block marker segments *now* and stash them on the
-	// pending note for `onCreate` to consume. Also deliberately avoids
-	// `selectBlock`/`toggleBlockSpotlight`, which would collapse the selection.
+	// Open the new-note form for the current multi-block selection. Capture the
+	// per-block marker segments *first*, while the cross-block selection is still
+	// live (it collapses once focus enters the form), and stash them on the
+	// pending note for `onCreate` to consume. Then select the first spanned block:
+	// the new-note form only renders when a single block is selected, and the
+	// already-captured segments still drive marking across every block.
 	function addNewNoteForSelection() {
 		const segments = readMultiBlockSelection( blockEditorSelectors );
+		const anchorClientId =
+			segments?.[ 0 ]?.clientId ??
+			blockEditorSelectors.getSelectedBlockClientId();
 		const currentArea = getActiveComplementaryArea( 'core' );
 		if ( ! SIDEBARS.includes( currentArea ) ) {
 			enableComplementaryArea(
 				'core',
 				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
 			);
+		}
+		if ( anchorClientId ) {
+			// `null` = keep focus available for the sidebar form.
+			selectBlock( anchorClientId, null );
 		}
 		selectNote( 'new', { focus: true, segments } );
 	}
