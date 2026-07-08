@@ -123,7 +123,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				return false;
 			}
 
-			$sanitized_icon_content = $this->sanitize_icon_content( $icon_properties['content'] );
+			$sanitized_icon_content = $this->sanitize_inline_svg( $icon_properties['content'] );
 			if ( empty( $sanitized_icon_content ) ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -169,21 +169,19 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	}
 
 	/**
-	 * Sanitizes the icon SVG content.
+	 * Sanitizes an SVG embedded in an HTML fragment.
 	 *
-	 * Uses WP_HTML_Processor to extract the SVG element in its entirety before
-	 * applying wp_kses. This avoids issues where HTML tags like <p> inside the
-	 * content would terminate the SVG element when parsed as HTML, and ensures
-	 * proper handling of SVG structure including self-closing tags.
+	 * The input must be an inline SVG as found in an HTML document, NOT raw XML
+	 * from a standalone `.svg` file: parsed as HTML, XML-only constructs (CDATA,
+	 * `<foreignObject>` integration points) are mis-parsed. WP_HTML_Processor
+	 * extracts the whole SVG element before wp_kses runs, so inner HTML tags
+	 * like <p> don't terminate the SVG and self-closing tags are handled
+	 * correctly.
 	 *
-	 * The signature is intentionally left without type declarations to stay
-	 * compatible with the parent WP_Icons_Registry::sanitize_icon_content()
-	 * shipped in WordPress core, which declares none.
-	 *
-	 * @param string $icon_content The icon SVG content to sanitize.
-	 * @return string The sanitized icon SVG content.
+	 * @param string $html_containing_svg HTML fragment containing the SVG to sanitize.
+	 * @return string The sanitized SVG, or an empty string when no valid SVG is found.
 	 */
-	protected function sanitize_icon_content( $icon_content ) {
+	private function sanitize_inline_svg( $html_containing_svg ) {
 		// Core attributes applicable to most elements. `data-*` is a wildcard
 		// supported by wp_kses() and matches any data attribute.
 		$core_attributes = $this->get_allowed_attribute_list( 'class', 'data-*', 'id', 'style' );
@@ -867,7 +865,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			),
 		);
 
-		$processor = WP_HTML_Processor::create_fragment( $icon_content );
+		$processor = WP_HTML_Processor::create_fragment( $html_containing_svg );
 		if ( ! $processor ) {
 			return '';
 		}
@@ -956,7 +954,10 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				return null;
 			}
 
-			$content = $this->sanitize_icon_content( file_get_contents( $icon_path ) );
+			// An external `.svg` file is XML, but sanitize_inline_svg() expects an
+			// inline HTML fragment. A dedicated XML sanitizer should handle this
+			// in the future.
+			$content = $this->sanitize_inline_svg( file_get_contents( $icon_path ) );
 
 			if ( empty( $content ) ) {
 				wp_trigger_error(

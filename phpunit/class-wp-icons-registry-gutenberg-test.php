@@ -98,17 +98,17 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Invokes the WP_Icons_Registry_Gutenberg::sanitize_icon_content method on the registry instance.
+	 * Invokes the WP_Icons_Registry_Gutenberg::sanitize_inline_svg method on the registry instance.
 	 *
-	 * @param string $icon_content The icon SVG content to sanitize.
-	 * @return string The sanitized icon SVG content.
+	 * @param string $html_containing_svg HTML fragment containing the SVG to sanitize.
+	 * @return string The sanitized SVG content.
 	 */
-	private function sanitize_icon_content( $icon_content ) {
-		$method = new ReflectionMethod( $this->registry, 'sanitize_icon_content' );
+	private function sanitize_inline_svg( $html_containing_svg ) {
+		$method = new ReflectionMethod( $this->registry, 'sanitize_inline_svg' );
 		if ( PHP_VERSION_ID < 80100 ) {
 			$method->setAccessible( true );
 		}
-		return $method->invoke( $this->registry, $icon_content );
+		return $method->invoke( $this->registry, $html_containing_svg );
 	}
 
 	/**
@@ -427,23 +427,23 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @dataProvider data_sanitize_icon_content
-	 * @covers WP_Icons_Registry_Gutenberg::sanitize_icon_content
+	 * @dataProvider data_sanitize_inline_svg
+	 * @covers WP_Icons_Registry_Gutenberg::sanitize_inline_svg
 	 *
 	 * @param string $input    The icon content to sanitize.
 	 * @param string $expected The expected sanitized output.
 	 */
-	public function test_sanitize_icon_content( $input, $expected ) {
-		$sanitized = $this->sanitize_icon_content( $input );
+	public function test_sanitize_inline_svg( $input, $expected ) {
+		$sanitized = $this->sanitize_inline_svg( $input );
 		$this->assertSame( $expected, $sanitized );
 	}
 
 	/**
-	 * Data provider for test_sanitize_icon_content.
+	 * Data provider for test_sanitize_inline_svg.
 	 *
 	 * @return array[] Array of arrays with input and expected sanitized output.
 	 */
-	public function data_sanitize_icon_content() {
+	public function data_sanitize_inline_svg() {
 		/*
 		 * WordPress 7.1 preserves the `xmlns:xlink` namespace attribute when
 		 * serializing inline SVG through WP_HTML_Processor; WordPress 7.0 strips
