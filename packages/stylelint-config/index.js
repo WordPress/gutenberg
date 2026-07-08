@@ -1,8 +1,10 @@
-'use strict';
+import { fileURLToPath } from 'node:url';
 
 /** @type {import('stylelint').Config} */
-module.exports = {
-	extends: [ 'stylelint-config-recommended' ].map( require.resolve ),
+export default {
+	extends: [ 'stylelint-config-recommended' ].map( ( m ) =>
+		fileURLToPath( import.meta.resolve( m ) )
+	),
 	plugins: [
 		'@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens',
 		'@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties',
@@ -47,7 +49,10 @@ module.exports = {
 			},
 		],
 		'function-url-quotes': 'never',
-		'length-zero-no-unit': true,
+		'length-zero-no-unit': [
+			true,
+			{ ignore: [ 'custom-properties' ], ignoreFunctions: [ 'var' ] },
+		],
 		'rule-empty-line-before': [
 			'always',
 			{

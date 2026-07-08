@@ -34,10 +34,10 @@ export type MasonryTilePlacement = Omit< DashboardLanesLayoutItem, 'key' >;
  * Structurally a union of every supported per-model shape, but the
  * intended invariant is stronger than the type suggests: every
  * placement in a given layout must match the shape of the currently
- * active `gridSettings.model`. `migrateLayout` is the only correct
- * way to transition placements across model changes; the render
- * layer is allowed to trust the active model and treat each
- * placement as the matching shape.
+ * active `gridSettings.model`. Consumers that switch the model must
+ * supply placements in the new shape; the render layer is allowed to
+ * trust the active model and treat each placement as the matching
+ * shape.
  *
  * The type system cannot enforce that invariant on its own (there is
  * no discriminator on the placement itself), so consider this union a
@@ -74,7 +74,7 @@ export interface DashboardWidget< Item = unknown > {
 	 * Grid-model-specific placement (column/row spans, ordering,
 	 * etc.). Must match the shape implied by the dashboard's active
 	 * `gridSettings.model`; see `DashboardTilePlacement` for the
-	 * invariant and `migrateLayout` for the transition mechanism.
+	 * invariant.
 	 */
 	placement?: DashboardTilePlacement;
 }
@@ -115,8 +115,8 @@ export type WidgetGridModel = 'grid' | 'masonry';
 
 /**
  * Maximum column count for the widget dashboard on wide containers.
- * Not exposed in layout settings; container width steps the count down
- * to two and one column at fixed breakpoints.
+ * Not user-configurable; container width steps the count down to two
+ * and one column at fixed breakpoints.
  */
 export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
 
@@ -244,17 +244,10 @@ export interface WidgetDashboardProps {
 
 	/**
 	 * Grid model configuration. See `WidgetGridSettings` for the shape.
+	 * Read-only for the dashboard: the consumer owns the settings and
+	 * their persistence.
 	 */
 	gridSettings?: WidgetGridSettings;
-
-	/**
-	 * Called when the user commits in-progress grid-settings edits via
-	 * the Done action. The dashboard maintains a staging copy of
-	 * settings internally; mutations stay local until commit. When
-	 * omitted, the `Layout settings` button in the customize toolbar is
-	 * hidden, since there is nowhere to persist the change.
-	 */
-	onGridSettingsChange?: ( gridSettings: WidgetGridSettings ) => void;
 
 	children?: ReactNode;
 }

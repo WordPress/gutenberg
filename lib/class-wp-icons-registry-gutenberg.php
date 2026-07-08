@@ -34,7 +34,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		if ( false === strpos( $icon_name, '/' ) ) {
+		if ( ! str_contains( $icon_name, '/' ) ) {
 			_doing_it_wrong(
 				__METHOD__,
 				__( 'Icon name must be namespaced in the form "collection/icon-name".', 'gutenberg' ),
@@ -54,10 +54,10 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		if ( ! preg_match( '/^[a-z][a-z0-9-]*$/', $unqualified_name ) ) {
+		if ( ! preg_match( '/^[a-z0-9]([a-z0-9_-]*[a-z0-9])?$/', $unqualified_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'Icon names must start with a lowercase letter and contain only lowercase letters, digits, and hyphens.', 'gutenberg' ),
+				__( 'Icon names must start and end with a lowercase letter or digit and contain only lowercase letters, digits, hyphens, and underscores.', 'gutenberg' ),
 				'7.1.0'
 			);
 			return false;
@@ -289,7 +289,7 @@ function gutenberg_override_wp_icons_registry() {
 	// the `core/` namespace onto the Gutenberg registry so they are not lost.
 	if ( null !== $original_registry ) {
 		foreach ( $original_registry->get_registered_icons() as $icon ) {
-			if ( strpos( $icon['name'], 'core/' ) === 0 ) {
+			if ( str_starts_with( $icon['name'], 'core/' ) ) {
 				continue;
 			}
 			$icon_properties = array( 'label' => $icon['label'] );

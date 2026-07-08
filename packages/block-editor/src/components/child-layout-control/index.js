@@ -178,7 +178,6 @@ function FlexControls( {
 			panelId={ panelId }
 		>
 			<ToggleGroupControl
-				size="__unstable-large"
 				label={ childLayoutOrientation( parentLayout ) }
 				value={ flexControlValue }
 				help={ helpText( flexControlValue, parentLayout ) }
@@ -225,7 +224,6 @@ function FlexControls( {
 			</ToggleGroupControl>
 			{ hasFlexSizeValue && (
 				<UnitControl
-					size="__unstable-large"
 					units={ units }
 					onChange={ ( value ) => {
 						onChange( {

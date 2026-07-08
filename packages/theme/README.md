@@ -9,15 +9,19 @@ A theming package that's part of the WordPress Design System. It has two parts:
 -   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more.
 -   **Theme System**: A flexible theming provider for consistent theming across applications.
 
+## Documentation
+
+This README is the entry point for package consumers. It covers how to load design tokens, use `ThemeProvider`, and configure the package's development tooling.
+
+-   To use design tokens and `ThemeProvider`, start here.
+-   To pick the right design token or browse every available token, see the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
+-   To edit token source files, see the [Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
+
 ## Design Tokens
 
-Design tokens are the visual design atoms of a design system. They are named entities that store visual design attributes like colors, spacing, typography, and shadows. They serve as a single source of truth that bridges design and development, ensuring consistency across platforms and making it easy to maintain and evolve the visual language of an application.
+Design tokens are named values that describe the visual purpose of a value. Rather than hardcoding values like `#3858e9` or `16px`, use semantic custom properties like `--wpds-color-background-interactive-brand-strong` or `--wpds-dimension-padding-2xl`.
 
-Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-background-interactive-brand-strong` or `--wpds-dimension-padding-2xl` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
-
-The **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)** contains a complete reference of all available design tokens including colors, spacing, typography, and more.
-
-The **[Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md)** describes how design tokens are implemented in the design system.
+The **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)** explains the naming pattern, how to choose a token, and the complete generated list of available design tokens.
 
 ### Using Design Tokens
 
@@ -40,7 +44,7 @@ Stylesheets are managed on your behalf in a WordPress context, so you don't need
 
 Outside of WordPress, you will need to install and load the design tokens stylesheet to support the full range of theming capabilities:
 
-```
+```sh
 npm install @wordpress/theme
 ```
 
@@ -57,8 +61,6 @@ If your application renders React content into additional documents (an iframe, 
 For the best development experience, we recommend configuring the [Stylelint rules](#stylelint-plugins) provided by this package. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
 
 If you reference `--wpds-*` tokens in CSS or JS/TS source, use the [build plugins](#build-plugins) to inject fallback values at build time so components render correctly even when the tokens stylesheet is not loaded. If you use `@wordpress/build`, these plugins are already enabled by default when `@wordpress/theme` is installed.
-
-If you write Sass/SCSS but cannot load the design tokens stylesheet, add build plugins to your pipeline, or use `@wordpress/build`, use the [Sass helper](#sass-helper) instead.
 
 ## Theme Provider
 
@@ -90,6 +92,8 @@ The `cursor` prop accepts an object with the following optional properties:
 The `cornerRadius` prop sets the overall roundness preset for the theme subtree. Accepts `'none'` (square corners), `'subtle'`, `'moderate'`, or `'pronounced'` (most rounded) (default: `'subtle'`). This scales the primitive `--wpds-border-radius-*` tokens for the provider subtree. The preset sets the overall amount of roundness, not an individual border-radius token size.
 
 When the `color`, `cursor`, or `cornerRadius` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
+
+`ThemeProvider` does not accept wrapper customization props such as `className`, `style`, `as`, `render`, or `ref`.
 
 ### Nesting Providers
 
@@ -232,8 +236,6 @@ This rule reports an error when a CSS declaration sets (defines) a custom proper
 
 This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. In CSS processed by the [build plugins](#build-plugins), fallback values are injected automatically, so manual fallbacks in `var(--wpds-*)` references are redundant and can drift out of sync with the token definitions.
 
-For Sass sources that cannot use the build plugins, use the [Sass helper](#sass-helper) instead of writing manual fallback values.
-
 ```css
 /* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-foreground-content-neutral' */
 .example {
@@ -307,30 +309,6 @@ export default defineConfig( {
 	},
 } );
 ```
-
-## Sass helper
-
-An alternative to loading the [design tokens stylesheet](#outside-wordpress), using the [build plugins](#build-plugins), or `@wordpress/build`. Use it when you write Sass/SCSS and cannot change your build setup to support any of those options.
-
-You do not need this helper if you already load the design tokens stylesheet or use fallback injection via the build plugins or `@wordpress/build`. In those cases, write bare `var(--wpds-*)` references in your source.
-
-The `@wordpress/theme/utils` export provides a generated `var()` function that wraps token references with the same fallback map used by the build plugins. For example, `wpds.var('--wpds-color-foreground-content-neutral')` compiles to `var(--wpds-color-foreground-content-neutral, #1e1e1e)`.
-
-```scss
-@use '@wordpress/theme/utils' as wpds;
-
-.example {
-	color: wpds.var( '--wpds-color-foreground-content-neutral' );
-}
-```
-
-When using Sass with [`NodePackageImporter`](https://sass-lang.com/documentation/js-api/classes/nodepackageimporter/), you can import via the `pkg:` scheme:
-
-```scss
-@use 'pkg:@wordpress/theme/utils' as wpds;
-```
-
-The same `@wordpress/theme/utils` import also supports Sass setups that resolve packages from `node_modules` with a load path.
 
 ## Contributing to this package
 
