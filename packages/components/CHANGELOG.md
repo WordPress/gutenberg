@@ -37,6 +37,10 @@
     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
     -   `ToggleGroupControl` ([#79656](https://github.com/WordPress/gutenberg/pull/79656))
 
+### Bug Fixes
+
+-   Restore a consistent medium (`500`) font weight on Windows by referencing the synthetic `Segoe UI WordPress Adjusted` font family in the default font stack and setting the medium font weight to `500`.
+
 ### Documentation
 
 -   Document `clsx` object syntax for conditional CSS Module classes ([#79490](https://github.com/WordPress/gutenberg/pull/79490), [#79535](https://github.com/WordPress/gutenberg/pull/79535)).
