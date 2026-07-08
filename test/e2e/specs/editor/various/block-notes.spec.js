@@ -1494,16 +1494,16 @@ test.describe( 'Block Notes', () => {
 				name: 'Notes display options',
 			} );
 			await expect( menu.getByRole( 'menuitemradio' ) ).toHaveText( [
-				'Show notes',
-				'Show all notes',
-				'Minimize notes',
 				'Hide notes',
+				'Minimize notes',
+				'Expand notes',
+				'Show all notes',
 			] );
-			// The floating notes are visible by default, so "Show notes" is
+			// The floating notes are visible by default, so "Expand notes" is
 			// the selected choice.
 			await expect(
 				menu.getByRole( 'menuitemradio', {
-					name: 'Show notes',
+					name: 'Expand notes',
 					exact: true,
 				} )
 			).toHaveAttribute( 'aria-checked', 'true' );
@@ -1525,7 +1525,7 @@ test.describe( 'Block Notes', () => {
 			await blockNoteUtils.selectNotesDisplayOption( 'Hide notes' );
 			await expect( thread ).toBeHidden();
 
-			await blockNoteUtils.selectNotesDisplayOption( 'Show notes' );
+			await blockNoteUtils.selectNotesDisplayOption( 'Expand notes' );
 			await expect( thread ).toBeVisible();
 		} );
 
@@ -1650,8 +1650,8 @@ test.describe( 'Block Notes', () => {
 				thread.locator( '.editor-collab-sidebar-panel__user-name' )
 			).toBeHidden();
 
-			// Switching back to Show notes restores the full display.
-			await blockNoteUtils.selectNotesDisplayOption( 'Show notes' );
+			// Switching back to Expand notes restores the full display.
+			await blockNoteUtils.selectNotesDisplayOption( 'Expand notes' );
 			await expect( thread.getByText( 'First note' ) ).toBeVisible();
 		} );
 

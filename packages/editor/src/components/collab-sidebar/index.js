@@ -10,7 +10,10 @@ import {
 } from '@wordpress/components';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore, PinnedItems } from '@wordpress/interface';
@@ -162,6 +165,18 @@ function NotesSidebar( { postId } ) {
 		} );
 	}
 
+	function applyNotesDisplayMode( value ) {
+		if ( value === 'show-all' ) {
+			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
+			setNotesDisplayMode( 'show' );
+		} else {
+			if ( isAllNotesSidebarActive ) {
+				disableComplementaryArea( 'core' );
+			}
+			setNotesDisplayMode( value );
+		}
+	}
+
 	useShortcut(
 		'core/editor/new-note',
 		( event ) => {
@@ -172,6 +187,52 @@ function NotesSidebar( { postId } ) {
 			isDisabled: isDistractionFree || isClassicBlock || ! clientId,
 		}
 	);
+
+	// Keyboard shortcuts for the Notes display modes, matching the dropdown.
+	const notesShortcutsDisabled = isDistractionFree || ! showAllNotesSidebar;
+	useShortcut(
+		'core/editor/hide-notes',
+		( event ) => {
+			event.preventDefault();
+			applyNotesDisplayMode( 'hide' );
+		},
+		{ isDisabled: notesShortcutsDisabled }
+	);
+	useShortcut(
+		'core/editor/minimize-notes',
+		( event ) => {
+			event.preventDefault();
+			applyNotesDisplayMode( 'minimize' );
+		},
+		{ isDisabled: notesShortcutsDisabled }
+	);
+	useShortcut(
+		'core/editor/expand-notes',
+		( event ) => {
+			event.preventDefault();
+			applyNotesDisplayMode( 'show' );
+		},
+		{ isDisabled: notesShortcutsDisabled }
+	);
+	useShortcut(
+		'core/editor/show-all-notes',
+		( event ) => {
+			event.preventDefault();
+			applyNotesDisplayMode( 'show-all' );
+		},
+		{ isDisabled: notesShortcutsDisabled }
+	);
+
+	// Human-readable shortcut representations for the dropdown menu items.
+	const notesShortcuts = useSelect( ( select ) => {
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		return {
+			hide: getShortcutRepresentation( 'core/editor/hide-notes' ),
+			minimize: getShortcutRepresentation( 'core/editor/minimize-notes' ),
+			show: getShortcutRepresentation( 'core/editor/expand-notes' ),
+			showAll: getShortcutRepresentation( 'core/editor/show-all-notes' ),
+		};
+	}, [] );
 
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStyles();
@@ -222,48 +283,60 @@ function NotesSidebar( { postId } ) {
 							size: 'compact',
 						} }
 					>
-						{ ( { onClose } ) => (
-							<MenuGroup>
-								<MenuItemsChoice
-									choices={ [
-										{
-											value: 'show',
-											label: __( 'Show notes' ),
-										},
-										{
-											value: 'show-all',
-											label: __( 'Show all notes' ),
-										},
-										{
-											value: 'minimize',
-											label: __( 'Minimize notes' ),
-										},
-										{
-											value: 'hide',
-											label: __( 'Hide notes' ),
-										},
-									] }
-									value={ notesDropdownValue }
-									onSelect={ ( value ) => {
-										if ( value === 'show-all' ) {
-											enableComplementaryArea(
-												'core',
-												ALL_NOTES_SIDEBAR
-											);
-											setNotesDisplayMode( 'show' );
-										} else {
-											if ( isAllNotesSidebarActive ) {
-												disableComplementaryArea(
-													'core'
-												);
-											}
-											setNotesDisplayMode( value );
-										}
-										onClose();
-									} }
-								/>
-							</MenuGroup>
-						) }
+						{ ( { onClose } ) => {
+							const selectMode = ( value ) => {
+								applyNotesDisplayMode( value );
+								onClose();
+							};
+							return (
+								<>
+									<MenuGroup>
+										<MenuItemsChoice
+											choices={ [
+												{
+													value: 'hide',
+													label: __( 'Hide notes' ),
+													shortcut:
+														notesShortcuts.hide,
+												},
+												{
+													value: 'minimize',
+													label: __(
+														'Minimize notes'
+													),
+													shortcut:
+														notesShortcuts.minimize,
+												},
+												{
+													value: 'show',
+													label: __( 'Expand notes' ),
+													shortcut:
+														notesShortcuts.show,
+												},
+											] }
+											value={ notesDropdownValue }
+											onSelect={ selectMode }
+										/>
+									</MenuGroup>
+									<MenuGroup>
+										<MenuItemsChoice
+											choices={ [
+												{
+													value: 'show-all',
+													label: __(
+														'Show all notes'
+													),
+													shortcut:
+														notesShortcuts.showAll,
+												},
+											] }
+											value={ notesDropdownValue }
+											onSelect={ selectMode }
+										/>
+									</MenuGroup>
+								</>
+							);
+						} }
 					</DropdownMenu>
 				</PinnedItems>
 			) }
