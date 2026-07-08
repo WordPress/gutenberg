@@ -282,8 +282,8 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 				 * even when the companion is the only child sideload.
 				 */
 				const isOptionalCompanion =
-					item.additionalData?.image_size === 'animated-video' ||
-					item.additionalData?.image_size === 'animated-video-poster';
+					item.additionalData?.image_size === 'animated_video' ||
+					item.additionalData?.image_size === 'animated_video_poster';
 
 				if ( select.hasPendingItemsByParentId( parentId ) ) {
 					// Other children remain — just notify the parent so

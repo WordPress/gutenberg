@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { renderHook, act } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 
 jest.mock( '../hooks', () => ( {
 	useSetting: jest.fn(),
@@ -15,7 +15,7 @@ import { usePresets } from '../presets/use-presets';
 const mockUseSetting = require( '../hooks' ).useSetting;
 
 describe( 'usePresets', () => {
-	const initialPresets = [
+	const presets = [
 		{ name: 'Small', slug: 'small', size: '12px' },
 		{ name: 'Medium', slug: 'medium', size: '16px' },
 	];
@@ -31,93 +31,50 @@ describe( 'usePresets', () => {
 		jest.clearAllMocks();
 	} );
 
-	function mockSettings( presets = initialPresets, base = basePresets ) {
-		mockUseSetting.mockImplementation( ( path, _blockName, readFrom ) => {
+	function mockSettings( value = presets, base = basePresets ) {
+		mockUseSetting.mockImplementation( ( path, blockName, readFrom ) => {
 			if ( readFrom === 'base' ) {
 				return [ base, jest.fn() ];
 			}
-			return [ presets, setPresets ];
+			return [ value, setPresets ];
 		} );
 	}
 
-	it( 'adds a preset', () => {
+	it( 'builds the origin-keyed path and returns the merged presets, base presets and setter', () => {
 		mockSettings();
-		const { result } = renderHook( () =>
-			usePresets( 'typography.fontSizes', 'custom' )
-		);
-		const newPreset = {
-			name: 'Large',
-			slug: 'large',
-			size: '20px',
-		};
 
-		act( () => {
-			result.current.add( newPreset );
-		} );
-
-		expect( setPresets ).toHaveBeenCalledWith( [
-			...initialPresets,
-			newPreset,
-		] );
-	} );
-
-	it( 'removes a preset by slug', () => {
-		mockSettings();
 		const { result } = renderHook( () =>
 			usePresets( 'typography.fontSizes', 'custom' )
 		);
 
-		act( () => {
-			result.current.remove( 'small' );
-		} );
-
-		expect( setPresets ).toHaveBeenCalledWith( [
-			{ name: 'Medium', slug: 'medium', size: '16px' },
-		] );
+		expect( mockUseSetting ).toHaveBeenCalledWith(
+			'typography.fontSizes.custom'
+		);
+		expect( result.current.presets ).toBe( presets );
+		expect( result.current.basePresets ).toBe( basePresets );
+		expect( result.current.setPresets ).toBe( setPresets );
 	} );
 
-	it( 'renames a preset', () => {
+	it( 'reads basePresets explicitly from the "base" source, not the merged one', () => {
 		mockSettings();
-		const { result } = renderHook( () =>
-			usePresets( 'typography.fontSizes', 'custom' )
+
+		renderHook( () => usePresets( 'shadow.presets', 'theme' ) );
+
+		expect( mockUseSetting ).toHaveBeenCalledWith(
+			'shadow.presets.theme',
+			undefined,
+			'base'
 		);
-
-		act( () => {
-			result.current.rename( 'small', 'Tiny' );
-		} );
-
-		expect( setPresets ).toHaveBeenCalledWith( [
-			{ name: 'Tiny', slug: 'small', size: '12px' },
-			{ name: 'Medium', slug: 'medium', size: '16px' },
-		] );
 	} );
 
-	it( 'resets a preset to its base value', () => {
-		mockSettings();
+	it( 'defaults presets and basePresets to an empty array when unset', () => {
+		mockUseSetting.mockImplementation( () => [ undefined, setPresets ] );
+
 		const { result } = renderHook( () =>
-			usePresets( 'typography.fontSizes', 'theme' )
+			usePresets( 'shadow.presets', 'custom' )
 		);
 
-		act( () => {
-			result.current.resetToBase( 'small' );
-		} );
-
-		expect( setPresets ).toHaveBeenCalledWith( [
-			{ name: 'Small', slug: 'small', size: '10px' },
-			{ name: 'Medium', slug: 'medium', size: '16px' },
-		] );
-	} );
-
-	it( 'does not reset when base preset is missing', () => {
-		mockSettings();
-		const { result } = renderHook( () =>
-			usePresets( 'typography.fontSizes', 'theme' )
-		);
-
-		act( () => {
-			result.current.resetToBase( 'unknown' );
-		} );
-
-		expect( setPresets ).not.toHaveBeenCalled();
+		expect( result.current.presets ).toEqual( [] );
+		expect( result.current.basePresets ).toEqual( [] );
 	} );
 } );

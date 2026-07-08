@@ -20,6 +20,7 @@ import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
+import useSyncBodyBackground from './use-sync-body-background';
 import './style.scss';
 import useRouteTitle from '../app/use-route-title';
 
@@ -44,6 +45,8 @@ export default function RootSinglePage() {
 
 	const themeColors = useMemo( getAdminThemeColors, [] );
 
+	const layoutRef = useSyncBodyBackground();
+
 	return (
 		<SlotFillProvider>
 			<ThemeProvider
@@ -52,6 +55,7 @@ export default function RootSinglePage() {
 			>
 				<ThemeProvider color={ themeColors }>
 					<div
+						ref={ layoutRef }
 						className={ clsx(
 							'boot-layout boot-layout--single-page',
 							{
