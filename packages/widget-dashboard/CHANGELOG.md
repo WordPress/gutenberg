@@ -14,6 +14,13 @@
 
 ### Enhancements
 
+-   Widget grid: reserve top paint space for outward tile focus rings so scroll
+    containers do not clip the widget chrome outline ([#79990](https://github.com/WordPress/gutenberg/pull/79990)).
+
+### Internal
+
+-   Rename CSS Module class selectors to kebab-case and drop the package
+    suppressions from `stylelint-suppressions.json` ([#79990](https://github.com/WordPress/gutenberg/pull/79990)).
 -   `WidgetHeader`: surface the widget type's `help` note as an infotip
     beside the title: a click-open popover with the note and its links.
 -   Widget inserter: render more accurate widget previews.

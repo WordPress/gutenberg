@@ -97,3 +97,41 @@ function gutenberg_add_svg_to_safe_style_css( array $attr ): array {
 	return array_unique( array_merge( $attr, $svg_properties ) );
 }
 add_filter( 'safe_style_css', 'gutenberg_add_svg_to_safe_style_css' );
+
+/**
+ * Allow gradient background-image values, including gradients combined with a
+ * url() image, in inline styles.
+ *
+ * Without this, {@see safecss_filter_attr()} strips gradients that use functions
+ * beyond rgb()/rgba(), or that are combined with a url() image. This removes each
+ * gradient from the test string and re-checks the remainder, so those values
+ * survive sanitization.
+ *
+ * @param bool   $allow_css       Whether the CSS is allowed.
+ * @param string $css_test_string The CSS declaration to test.
+ * @return bool Whether the CSS is allowed.
+ */
+function gutenberg_allow_extended_gradient_backgrounds( $allow_css, $css_test_string ) {
+	if ( $allow_css ) {
+		return $allow_css;
+	}
+
+	if ( ! preg_match( '/^background-image\s*:/', $css_test_string ) ) {
+		return $allow_css;
+	}
+
+	/*
+	 * Remove each gradient (allowing one level of nested functions such as
+	 * rgb(), hsl(), or calc()) and re-test. Any url() has already been removed
+	 * and protocol-checked by safecss_filter_attr() before this filter runs.
+	 */
+	$stripped = preg_replace( '/(?:repeating-)?(?:linear|radial|conic)-gradient\((?:[^()]|\([^()]*\))*\)/', '', $css_test_string );
+
+	if ( ! preg_match( '%[\\\(&=}]|/\*%', $stripped ) ) {
+		return true;
+	}
+
+	return $allow_css;
+}
+
+add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_extended_gradient_backgrounds', 10, 2 );
