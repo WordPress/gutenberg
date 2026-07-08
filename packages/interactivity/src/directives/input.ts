@@ -23,8 +23,9 @@
  */
 import { directive, isDefaultDirectiveSuffix } from '../hooks';
 import { useInit, useLayoutEffect, warn } from '../utils';
-import { store, setByPath } from '../store';
+import { store } from '../store';
 import { PENDING_GETTER, peek } from '../proxies/state';
+import { getContext } from '../scopes';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -198,6 +199,119 @@ const syncElementProp = (
 /*  Directive                                                          */
 /* ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ */
+/*  writeSignal / readSignal helpers                                   */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Writes a value to the signal at the given path (e.g. `'state.text'` or
+ * `'context.item.name'`).  Captures the store/context root at render time
+ * so it works correctly both during render and in event handlers.
+ *
+ * The helper navigates through the proxy normally (no peek), so each
+ * intermediate key returns a proxified nested object, and the final leaf
+ * assignment goes through the proxy's set/defineProperty traps → reactive.
+ * @param ns
+ * @param path
+ * @param stateRoot
+ * @param contextRoot
+ */
+const createSignalWriter = (
+	ns: string,
+	path: string,
+	stateRoot: Record< string, unknown >,
+	contextRoot: object | undefined
+) => {
+	const parts = path.split( '.' );
+	const leaf = parts.pop()!;
+	const rootKey = parts[ 0 ];
+
+	if ( rootKey === 'state' ) {
+		return ( value: unknown ) => {
+			let obj: any = stateRoot;
+			for ( const key of parts ) {
+				obj = obj[ key ];
+			}
+			obj[ leaf ] = value;
+		};
+	}
+
+	if ( rootKey === 'context' ) {
+		if ( ! contextRoot ) {
+			return () => undefined;
+		}
+		// For context paths the root IS the context; drop the 'context'
+		// segment.
+		const ctxParts = parts.slice( 1 );
+		return ( value: unknown ) => {
+			let obj: any = contextRoot;
+			for ( const key of ctxParts ) {
+				obj = obj[ key ];
+			}
+			obj[ leaf ] = value;
+		};
+	}
+
+	return () => undefined;
+};
+
+/**
+ * Reads the current value at the given path using `peek` (non-subscribing).
+ * Used inside the layout effect for signal→element sync.
+ * @param ns
+ * @param path
+ * @param stateRoot
+ * @param contextRoot
+ */
+const createSignalReader = (
+	ns: string,
+	path: string,
+	stateRoot: Record< string, unknown >,
+	contextRoot: object | undefined
+) => {
+	const parts = path.split( '.' );
+	const leaf = parts.pop()!;
+	const rootKey = parts[ 0 ];
+
+	if ( rootKey === 'state' ) {
+		return () => {
+			let obj: any = stateRoot;
+			for ( const key of parts ) {
+				if ( obj === null || obj === undefined ) {
+					return undefined;
+				}
+				obj = peek( obj, key );
+			}
+			if ( obj === null || obj === undefined ) {
+				return undefined;
+			}
+			return peek( obj, leaf );
+		};
+	}
+
+	if ( rootKey === 'context' ) {
+		if ( ! contextRoot ) {
+			return () => undefined;
+		}
+		const ctxParts = parts.slice( 1 );
+		return () => {
+			let obj: any = contextRoot;
+			for ( const key of ctxParts ) {
+				if ( obj === null || obj === undefined ) {
+					return undefined;
+				}
+				obj = peek( obj, key );
+			}
+			if ( obj === null || obj === undefined ) {
+				return undefined;
+			}
+			return peek( obj, leaf );
+		};
+	}
+
+	return () => undefined;
+};
+
 directive( 'input', ( { directives, element, evaluate } ) => {
 	const entries = directives.input;
 	const entry = entries.find( isDefaultDirectiveSuffix );
@@ -210,7 +324,6 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 
 	// ---- file inputs – handled via useInit + FileReader ----
 	if ( ( props.type as string | undefined ) === 'file' ) {
-		const entryForFile = entry;
 		useInit( () => {
 			const el = ( element.ref as { current?: HTMLInputElement } )
 				.current;
@@ -248,11 +361,7 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 							} )
 					)
 				).then( ( signalFiles ) => {
-					setByPath(
-						store( entryForFile.namespace ),
-						path,
-						signalFiles
-					);
+					writeSignal( signalFiles );
 				} );
 			};
 
@@ -267,6 +376,25 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 	if ( signalValue === PENDING_GETTER ) {
 		return;
 	}
+
+	// Capture write/read roots at render time (scope is active).
+	const stateRoot = store( entry.namespace );
+	const contextRoot = path.startsWith( 'context.' )
+		? getContext( entry.namespace )
+		: undefined;
+	const writeSignal = createSignalWriter(
+		entry.namespace,
+		path,
+		stateRoot,
+		contextRoot
+	);
+	const readSignal = createSignalReader(
+		entry.namespace,
+		path,
+		stateRoot,
+		contextRoot
+	);
+
 	const elementType =
 		typeof element.type === 'string' ? element.type.toLowerCase() : null;
 	const desc = detectDescriptor( elementType, props );
@@ -302,30 +430,13 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 		if ( signalValue === undefined ) {
 			const elValue = desc.toSignal( el, 'undefined' );
 			if ( elValue !== undefined ) {
-				setByPath( store( entry.namespace ), path, elValue );
+				writeSignal( elValue );
 			}
 		}
 
 		// Signal→element sync (re-read current value via peek — avoids
 		// evaluate/scope issues inside effects).
-		const syncParts = path.split( '.' );
-		const syncLeaf = syncParts.pop();
-		let current: unknown;
-		if ( syncLeaf && syncParts.length ) {
-			const syncRoot = store( entry.namespace );
-			const syncParent = syncParts.reduce(
-				( prev: any, key: string ): any => {
-					if ( ! prev ) {
-						return undefined;
-					}
-					return peek( prev, key );
-				},
-				syncRoot
-			);
-			if ( syncParent ) {
-				current = peek( syncParent, syncLeaf );
-			}
-		}
+		const current = readSignal();
 		if (
 			current !== null &&
 			current !== undefined &&
@@ -358,7 +469,7 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 				return;
 			}
 
-			setByPath( store( entry.namespace ), path, raw );
+			writeSignal( raw );
 		};
 	}
 } );

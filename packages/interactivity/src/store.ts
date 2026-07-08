@@ -275,37 +275,6 @@ export const parseServerData = ( dom = document ) => {
 	return {};
 };
 
-/**
- * Sets a value in the store at a specific dot-separated path (e.g.
- * "state.user.name").  Navigates from the given root object using
- * {@link peek} (non-subscribing) so the caller is not subscribed to
- * intermediate properties.
- *
- * @param root  The root object (e.g. `store( ns )`).
- * @param path  Dot-separated path to the property (e.g. `"state.text"`).
- * @param value The value to set.
- */
-export const setByPath = (
-	root: Record< string, unknown >,
-	path: string,
-	value: unknown
-): void => {
-	const parts = path.split( '.' );
-	const leaf = parts.pop();
-	if ( ! leaf || ! parts.length ) {
-		return;
-	}
-	const parent = parts.reduce( ( prev: any, key: string ): any => {
-		if ( ! prev ) {
-			return undefined;
-		}
-		return peek( prev, key );
-	}, root );
-	if ( parent ) {
-		parent[ leaf ] = value;
-	}
-};
-
 export const populateServerData = ( data?: {
 	state?: Record< string, unknown >;
 	config?: Record< string, unknown >;
@@ -343,15 +312,17 @@ export const populateServerData = ( data?: {
 						st
 					);
 
-					// The derived state prop is considered a pending getter
-					// only if its value is a plain object, which is how
-					// closures are serialized from PHP.
+					// Get the descriptor of the derived state prop.
 					const desc = Object.getOwnPropertyDescriptor(
 						parent,
 						prop
 					);
+
+					// The derived state prop is considered a pending getter
+					// only if its value is a plain object, which is how
+					// closures are serialized from PHP.
 					if ( isPlainObject( desc?.value ) ) {
-						setByPath( st, path, PENDING_GETTER );
+						parent[ prop ] = PENDING_GETTER;
 					}
 				} );
 			}

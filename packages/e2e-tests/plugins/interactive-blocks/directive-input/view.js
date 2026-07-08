@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store } from '@wordpress/interactivity';
+import { store, getContext } from '@wordpress/interactivity';
 
 const { state, actions } = store( 'directive-input', {
 	state: {
@@ -35,6 +35,33 @@ const { state, actions } = store( 'directive-input', {
 		toggleMultiPet() {
 			state.multiPet =
 				state.multiPet[ 0 ] === 'dog'
+					? [ 'cat', 'bird' ]
+					: [ 'dog' ];
+		},
+
+		// ---- context-based actions ----
+		toggleCtxText() {
+			const ctx = getContext();
+			ctx.ctxText =
+				ctx.ctxText === 'ctx-hello' ? 'ctx-world' : 'ctx-hello';
+		},
+		toggleCtxChecked() {
+			const ctx = getContext();
+			ctx.ctxChecked = ! ctx.ctxChecked;
+		},
+		toggleCtxNum() {
+			const ctx = getContext();
+			ctx.ctxNum = ctx.ctxNum === 0 ? 99 : 0;
+		},
+		toggleCtxPet() {
+			const ctx = getContext();
+			const next = { dog: 'cat', cat: 'bird', bird: 'dog' };
+			ctx.ctxPet = next[ ctx.ctxPet ] || 'dog';
+		},
+		toggleCtxMultiPet() {
+			const ctx = getContext();
+			ctx.ctxMultiPet =
+				ctx.ctxMultiPet[ 0 ] === 'dog'
 					? [ 'cat', 'bird' ]
 					: [ 'dog' ];
 		},

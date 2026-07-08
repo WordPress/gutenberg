@@ -28,6 +28,12 @@ test.describe( 'data-wp-input', () => {
 		await expect( output ).toHaveText( 'hello' );
 		await input.fill( 'world' );
 		await expect( output ).toHaveText( 'world' );
+
+		const ctxOutput = page.getByTestId( 'ctx-text-output' );
+		const ctxInput = page.getByTestId( 'ctx-text-input' );
+		await expect( ctxOutput ).toHaveText( 'ctx-hello' );
+		await ctxInput.fill( 'ctx-world' );
+		await expect( ctxOutput ).toHaveText( 'ctx-world' );
 	} );
 
 	/* ------------------------------------------------------------------ */
@@ -42,6 +48,14 @@ test.describe( 'data-wp-input', () => {
 		await expect( output ).toHaveText( 'true' );
 		await input.uncheck();
 		await expect( output ).toHaveText( 'false' );
+
+		const ctxOutput = page.getByTestId( 'ctx-checkbox-output' );
+		const ctxInput = page.getByTestId( 'ctx-checkbox-input' );
+		await expect( ctxOutput ).toHaveText( 'false' );
+		await ctxInput.check();
+		await expect( ctxOutput ).toHaveText( 'true' );
+		await ctxInput.uncheck();
+		await expect( ctxOutput ).toHaveText( 'false' );
 	} );
 
 	/* ------------------------------------------------------------------ */
@@ -56,6 +70,12 @@ test.describe( 'data-wp-input', () => {
 		await expect( output ).toHaveText( '0' );
 		await input.fill( '42' );
 		await expect( output ).toHaveText( '42' );
+
+		const ctxOutput = page.getByTestId( 'ctx-number-output' );
+		const ctxInput = page.getByTestId( 'ctx-number-input' );
+		await expect( ctxOutput ).toHaveText( '0' );
+		await ctxInput.fill( '77' );
+		await expect( ctxOutput ).toHaveText( '77' );
 	} );
 
 	/* ------------------------------------------------------------------ */
@@ -68,6 +88,12 @@ test.describe( 'data-wp-input', () => {
 		await expect( output ).toHaveText( 'dog' );
 		await input.selectOption( 'cat' );
 		await expect( output ).toHaveText( 'cat' );
+
+		const ctxOutput = page.getByTestId( 'ctx-select-output' );
+		const ctxInput = page.getByTestId( 'ctx-select-input' );
+		await expect( ctxOutput ).toHaveText( 'dog' );
+		await ctxInput.selectOption( 'cat' );
+		await expect( ctxOutput ).toHaveText( 'cat' );
 	} );
 
 	/* ------------------------------------------------------------------ */
@@ -100,6 +126,12 @@ test.describe( 'data-wp-input', () => {
 		await expect( output ).toHaveText( 'cat' );
 		expect( await radioDog.isChecked() ).toBe( false );
 		expect( await radioCat.isChecked() ).toBe( true );
+
+		const ctxOutput = page.getByTestId( 'ctx-radio-output' );
+		const ctxRadioCat = page.getByTestId( 'ctx-radio-cat' );
+		await expect( ctxOutput ).toHaveText( 'dog' );
+		await ctxRadioCat.check();
+		await expect( ctxOutput ).toHaveText( 'cat' );
 	} );
 
 	/* ------------------------------------------------------------------ */
@@ -134,6 +166,12 @@ test.describe( 'data-wp-input', () => {
 		await expect( output ).toHaveText( '50' );
 		await input.fill( '75' );
 		await expect( output ).toHaveText( '75' );
+
+		const ctxOutput = page.getByTestId( 'ctx-range-output' );
+		const ctxInput = page.getByTestId( 'ctx-range-input' );
+		await expect( ctxOutput ).toHaveText( '50' );
+		await ctxInput.fill( '25' );
+		await expect( ctxOutput ).toHaveText( '25' );
 	} );
 
 	/* ------------------------------------------------------------------ */
@@ -146,6 +184,12 @@ test.describe( 'data-wp-input', () => {
 		await expect( output ).toHaveText( 'default' );
 		await input.fill( 'updated' );
 		await expect( output ).toHaveText( 'updated' );
+
+		const ctxOutput = page.getByTestId( 'ctx-textarea-output' );
+		const ctxInput = page.getByTestId( 'ctx-textarea-input' );
+		await expect( ctxOutput ).toHaveText( 'default' );
+		await ctxInput.fill( 'modified' );
+		await expect( ctxOutput ).toHaveText( 'modified' );
 	} );
 
 	/* ------------------------------------------------------------------ */
@@ -232,6 +276,20 @@ test.describe( 'data-wp-input', () => {
 		await toggleBtn.click();
 		await expect( output ).toHaveText( 'hello' );
 		await expect( input ).toHaveValue( 'hello' );
+
+		const ctxOutput = page.getByTestId( 'ctx-text-output' );
+		const ctxInput = page.getByTestId( 'ctx-text-input' );
+		const ctxToggleBtn = page.getByTestId( 'toggle-ctx-text' );
+		await expect( ctxOutput ).toHaveText( 'ctx-hello' );
+		await expect( ctxInput ).toHaveValue( 'ctx-hello' );
+
+		await ctxToggleBtn.click();
+		await expect( ctxOutput ).toHaveText( 'ctx-world' );
+		await expect( ctxInput ).toHaveValue( 'ctx-world' );
+
+		await ctxToggleBtn.click();
+		await expect( ctxOutput ).toHaveText( 'ctx-hello' );
+		await expect( ctxInput ).toHaveValue( 'ctx-hello' );
 	} );
 
 	test( 'should update checkbox when signal changes via action', async ( {
@@ -251,6 +309,17 @@ test.describe( 'data-wp-input', () => {
 		await toggleBtn.click();
 		await expect( output ).toHaveText( 'false' );
 		expect( await input.isChecked() ).toBe( false );
+
+		const ctxOutput = page.getByTestId( 'ctx-checkbox-output' );
+		const ctxInput = page.getByTestId( 'ctx-checkbox-input' );
+		const ctxToggleBtn = page.getByTestId( 'toggle-ctx-checked' );
+		await expect( ctxOutput ).toHaveText( 'false' );
+		await ctxToggleBtn.click();
+		await expect( ctxOutput ).toHaveText( 'true' );
+		expect( await ctxInput.isChecked() ).toBe( true );
+		await ctxToggleBtn.click();
+		await expect( ctxOutput ).toHaveText( 'false' );
+		expect( await ctxInput.isChecked() ).toBe( false );
 	} );
 
 	test( 'should update number input when signal changes via action', async ( {
@@ -266,6 +335,14 @@ test.describe( 'data-wp-input', () => {
 		await toggleBtn.click();
 		await expect( output ).toHaveText( '99' );
 		await expect( input ).toHaveValue( '99' );
+
+		const ctxOutput = page.getByTestId( 'ctx-number-output' );
+		const ctxInput = page.getByTestId( 'ctx-number-input' );
+		const ctxToggleBtn = page.getByTestId( 'toggle-ctx-num' );
+		await expect( ctxOutput ).toHaveText( '0' );
+		await ctxToggleBtn.click();
+		await expect( ctxOutput ).toHaveText( '99' );
+		await expect( ctxInput ).toHaveValue( '99' );
 	} );
 
 	test( 'should update select when signal changes via action', async ( {
@@ -287,6 +364,18 @@ test.describe( 'data-wp-input', () => {
 
 		await toggleBtn.click();
 		await expect( output ).toHaveText( 'dog' );
+
+		const ctxOutput = page.getByTestId( 'ctx-select-output' );
+		const ctxInput = page.getByTestId( 'ctx-select-input' );
+		const ctxToggleBtn = page.getByTestId( 'toggle-ctx-pet' );
+		await expect( ctxOutput ).toHaveText( 'dog' );
+		await ctxToggleBtn.click();
+		await expect( ctxOutput ).toHaveText( 'cat' );
+		await expect( ctxInput ).toHaveValue( 'cat' );
+		await ctxToggleBtn.click();
+		await expect( ctxOutput ).toHaveText( 'bird' );
+		await ctxToggleBtn.click();
+		await expect( ctxOutput ).toHaveText( 'dog' );
 	} );
 
 	/* ------------------------------------------------------------------ */
@@ -304,4 +393,5 @@ test.describe( 'data-wp-input', () => {
 		await input.fill( 'updated' );
 		await expect( input ).toHaveValue( 'updated' );
 	} );
+
 } );
