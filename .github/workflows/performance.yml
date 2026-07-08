@@ -5,6 +5,9 @@ on:
         paths-ignore:
             - 'docs/**'
             - '.github/workflows/*.yml'
+            - 'storybook/**'
+            - 'test/storybook-playwright/**'
+            - 'packages/*/src/**/stories/**'
     release:
         types: [published]
     push:
