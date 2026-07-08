@@ -34,17 +34,12 @@ import { store as blockEditorStore } from '../../store';
  * @param {boolean} templateInsertUpdatesSelection Whether or not to update the
  *                                                 block-editor selection state when inner blocks
  *                                                 are replaced after template synchronization.
- * @param {boolean} [enableBlockTypeTemplate]      Whether a template declared in block type
- *                                                 settings may serve as the default when no
- *                                                 template is passed. Disabled for controlled
- *                                                 inner blocks.
  */
 export default function useInnerBlockTemplateSync(
 	clientId,
 	template,
 	templateLock,
-	templateInsertUpdatesSelection,
-	enableBlockTypeTemplate = true
+	templateInsertUpdatesSelection
 ) {
 	// Instead of adding a useSelect mapping here, please add to the useSelect
 	// mapping in InnerBlocks! Every subscription impacts performance.
@@ -75,18 +70,9 @@ export default function useInnerBlockTemplateSync(
 			}
 
 			// A template declared in block type settings serves as the
-			// default when no `template` prop is passed. It does not apply
-			// to controlled inner blocks, whose content comes from an
-			// entity rather than from block type scaffolding.
-			let resolvedTemplate = template;
-			if ( resolvedTemplate === undefined ) {
-				if ( ! enableBlockTypeTemplate ) {
-					return;
-				}
-				resolvedTemplate = getBlockType(
-					getBlockName( clientId )
-				)?.template;
-			}
+			// default when no `template` prop is passed.
+			const resolvedTemplate =
+				template ?? getBlockType( getBlockName( clientId ) )?.template;
 
 			// Only synchronize innerBlocks with template if innerBlocks are empty
 			// or a locking "all" or "contentOnly" exists directly on the block.
@@ -140,6 +126,5 @@ export default function useInnerBlockTemplateSync(
 		clientId,
 		registry,
 		templateInsertUpdatesSelection,
-		enableBlockTypeTemplate,
 	] );
 }
