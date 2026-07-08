@@ -18,7 +18,11 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
-import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
+import {
+	getCommonInheritanceTooltipText,
+	getInheritanceProps,
+	InheritanceToolsPanelItem,
+} from './inheritance';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
@@ -160,6 +164,7 @@ export default function BackgroundImagePanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedSources,
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -333,6 +338,18 @@ export default function BackgroundImagePanel( {
 		showInheritanceLabelIndicators
 			? getInheritanceProps( isInherited, hasLocalOverride, classNames )
 			: { className: classNames };
+	// The background image is stored as an object, so its source lives on the
+	// leaf sub-paths. Resolve the breadcrumb from the image leaves only (not
+	// size/position) so the tooltip reflects the inherited image itself.
+	const backgroundImageTooltipText = getCommonInheritanceTooltipText(
+		inheritedSources,
+		[
+			'background.backgroundImage.url',
+			'background.backgroundImage.id',
+			'background.backgroundImage.title',
+			'background.backgroundImage.source',
+		]
+	);
 
 	// The inherited value arrives already resolved (refs + theme-file pointers)
 	// with non-cascading root values dropped, so a presence check drives the
@@ -362,6 +379,7 @@ export default function BackgroundImagePanel( {
 					showLocalOverrideActionsInLabel={ false }
 					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
+					inheritanceTooltipText={ backgroundImageTooltipText }
 					onDeselect={ resetBackground }
 					isShownByDefault={ defaultControls.backgroundImage }
 					panelId={ panelId }
@@ -390,6 +408,7 @@ export default function BackgroundImagePanel( {
 					showInheritanceLabelIndicators={
 						showInheritanceLabelIndicators
 					}
+					inheritedSources={ inheritedSources }
 					isPlaceholder={
 						userBackgroundColor === undefined &&
 						backgroundColor !== undefined
@@ -399,6 +418,7 @@ export default function BackgroundImagePanel( {
 						{
 							key: 'background',
 							label: __( 'Color' ),
+							sourcePaths: [ 'color.background' ],
 							inheritedValue: backgroundColor,
 							// Resolve the slug from the same source as the
 							// displayed value (user value first, then the
@@ -440,6 +460,7 @@ export default function BackgroundImagePanel( {
 					showInheritanceLabelIndicators={
 						showInheritanceLabelIndicators
 					}
+					inheritedSources={ inheritedSources }
 					isPlaceholder={
 						currentGradient === undefined &&
 						inheritedGradient !== undefined
@@ -449,6 +470,10 @@ export default function BackgroundImagePanel( {
 						{
 							key: 'gradient',
 							label: __( 'Gradient' ),
+							sourcePaths: [
+								'background.gradient',
+								'color.gradient',
+							],
 							inheritedValue: inheritedGradient,
 							setValue: setGradient,
 							userValue: currentGradient,
@@ -477,6 +502,7 @@ export default function BackgroundImagePanel( {
 					showInheritanceLabelIndicators={
 						showInheritanceLabelIndicators
 					}
+					inheritedSources={ inheritedSources }
 					isPlaceholder={
 						userLegacyColorGradient === undefined &&
 						legacyColorGradient !== undefined
@@ -486,6 +512,7 @@ export default function BackgroundImagePanel( {
 						{
 							key: 'gradient',
 							label: __( 'Gradient' ),
+							sourcePaths: [ 'color.gradient' ],
 							inheritedValue: legacyColorGradient,
 							setValue: setLegacyColorGradient,
 							userValue: userLegacyColorGradient,

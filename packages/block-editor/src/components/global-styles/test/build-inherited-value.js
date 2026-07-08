@@ -12,6 +12,10 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { resolveStyles, privateHelpers } from '../build-inherited-value';
+import {
+	getCommonInheritanceTooltipText,
+	getInheritanceTooltipTextByPath,
+} from '../inheritance';
 import { useResolvedStyles } from '../inherited-value-context';
 
 import { globalStylesDataKey } from '../../../store/private-keys';
@@ -468,6 +472,67 @@ describe( 'resolveStyles – merged output', () => {
 		} );
 	} );
 
+	describe( 'tooltip formatting', () => {
+		test( 'formats a source breadcrumb', () => {
+			expect(
+				getInheritanceTooltipTextByPath(
+					{
+						typography: {
+							breadcrumb: [
+								'styles',
+								'blocks',
+								'blockName',
+								'variations',
+								'variationName',
+							],
+							blockName: 'core/group',
+							variation: 'subtitle',
+							variationTitle: 'Subtitle',
+						},
+					},
+					'typography'
+				)
+			).toBe(
+				'Default inherited from:\nStyles > Blocks > Group > Variations > Subtitle'
+			);
+		} );
+
+		test( 'uses common source for compound controls when breadcrumbs match', () => {
+			expect(
+				getCommonInheritanceTooltipText(
+					{
+						'border.color': {
+							breadcrumb: [ 'styles', 'blocks', 'blockName' ],
+							blockName: 'core/group',
+						},
+						'border.width': {
+							breadcrumb: [ 'styles', 'blocks', 'blockName' ],
+							blockName: 'core/group',
+						},
+					},
+					[ 'border.color', 'border.width' ]
+				)
+			).toBe( 'Default inherited from:\nStyles > Blocks > Group' );
+		} );
+
+		test( 'uses conservative text for mixed-source compound controls', () => {
+			expect(
+				getCommonInheritanceTooltipText(
+					{
+						'border.color': {
+							breadcrumb: [ 'styles' ],
+						},
+						'border.width': {
+							breadcrumb: [ 'styles', 'blocks', 'blockName' ],
+							blockName: 'core/group',
+						},
+					},
+					[ 'border.color', 'border.width' ]
+				)
+			).toBe( 'Default inherited from multiple Styles sources' );
+		} );
+	} );
+
 	describe( 'source provenance', () => {
 		const gs = {
 			styles: {
@@ -502,15 +567,27 @@ describe( 'resolveStyles – merged output', () => {
 			const { value, sources } = resolveStyles( {
 				blockName: 'core/heading',
 				ownVariation: 'plain',
+				blockStyles: [ { name: 'plain', label: 'Plain' } ],
 				globalStyles: gs,
 			} );
 			expect( value.typography.fontSize ).toBe( '20px' );
 			expect( value.typography.lineHeight ).toBe( '1.5' );
 			expect( sources[ 'typography.fontSize' ] ).toMatchObject( {
+				breadcrumb: [
+					'styles',
+					'blocks',
+					'blockName',
+					'variations',
+					'variationName',
+				],
 				layer: 'blockVariation',
+				blockName: 'core/heading',
+				variation: 'plain',
+				variationTitle: 'Plain',
 				path: [ 'typography', 'fontSize' ],
 			} );
 			expect( sources[ 'typography.lineHeight' ] ).toMatchObject( {
+				breadcrumb: [ 'styles' ],
 				layer: 'root',
 			} );
 		} );
@@ -521,6 +598,7 @@ describe( 'resolveStyles – merged output', () => {
 				globalStyles: gs,
 			} );
 			expect( sources[ 'elements.link.color.text' ] ).toMatchObject( {
+				breadcrumb: [ 'styles', 'elements', 'link' ],
 				layer: 'root',
 				path: [ 'elements', 'link', 'color', 'text' ],
 			} );
@@ -541,7 +619,9 @@ describe( 'resolveStyles – memoization', () => {
 		} );
 		expect( a ).toBe( b );
 		expect( a.value.typography.fontSize ).toBe( '16px' );
-		expect( a.sources[ 'typography.fontSize' ].layer ).toBe( 'root' );
+		expect( a.sources[ 'typography.fontSize' ].breadcrumb ).toEqual( [
+			'styles',
+		] );
 	} );
 
 	test( 'different composite key → different result', () => {
@@ -648,8 +728,8 @@ describe( 'useResolvedStyles hook', () => {
 		// `elements` passthrough, not folded up to the top level.
 		expect( parsed.value.elements.h2.typography.fontSize ).toBe( '24px' );
 		expect(
-			parsed.sources[ 'elements.h2.typography.fontSize' ].layer
-		).toBe( 'root' );
+			parsed.sources[ 'elements.h2.typography.fontSize' ].breadcrumb
+		).toEqual( [ 'styles', 'elements', 'h2' ] );
 	} );
 } );
 

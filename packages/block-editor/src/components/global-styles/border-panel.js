@@ -21,7 +21,12 @@ import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { useBorderPanelLabel } from '../../hooks/border';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
-import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
+import {
+	getCommonInheritanceTooltipText,
+	getInheritanceProps,
+	getInheritanceTooltipTextByPath,
+	InheritanceToolsPanelItem,
+} from './inheritance';
 
 export function useHasBorderPanel( settings ) {
 	const controls = Object.values( useHasBorderPanelControls( settings ) );
@@ -99,6 +104,7 @@ export default function BorderPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedSources,
 	settings,
 	panelId,
 	name,
@@ -115,6 +121,35 @@ export default function BorderPanel( {
 		showInheritanceLabelIndicators
 			? getInheritanceProps( isInherited, hasLocalOverride, className )
 			: {};
+	const tooltipText = ( path ) =>
+		getInheritanceTooltipTextByPath( inheritedSources, path );
+	const commonTooltipText = ( paths ) =>
+		getCommonInheritanceTooltipText( inheritedSources, paths );
+	const borderTooltipText = commonTooltipText( [
+		'border.color',
+		'border.style',
+		'border.width',
+		'border.top.color',
+		'border.top.style',
+		'border.top.width',
+		'border.right.color',
+		'border.right.style',
+		'border.right.width',
+		'border.bottom.color',
+		'border.bottom.style',
+		'border.bottom.width',
+		'border.left.color',
+		'border.left.style',
+		'border.left.width',
+	] );
+	const borderRadiusTooltipText = commonTooltipText( [
+		'border.radius',
+		'border.radius.topLeft',
+		'border.radius.topRight',
+		'border.radius.bottomLeft',
+		'border.radius.bottomRight',
+	] );
+	const shadowTooltipText = tooltipText( 'shadow' );
 	const encodeColorValue = ( colorValue ) => {
 		const allColors = colors.flatMap(
 			( { colors: originColors } ) => originColors
@@ -391,6 +426,7 @@ export default function BorderPanel( {
 					) }
 					hasValue={ () => isDefinedBorder( value?.border ) }
 					label={ __( 'Border' ) }
+					inheritanceTooltipText={ borderTooltipText }
 					onDeselect={ () => resetBorder() }
 					isShownByDefault={ showBorderByDefault }
 					panelId={ panelId }
@@ -430,6 +466,7 @@ export default function BorderPanel( {
 					) }
 					hasValue={ hasBorderRadius }
 					label={ __( 'Radius' ) }
+					inheritanceTooltipText={ borderRadiusTooltipText }
 					hasInlineEndToggle
 					onDeselect={ () => setBorderRadius( undefined ) }
 					isShownByDefault={ defaultControls.radius }
@@ -451,6 +488,7 @@ export default function BorderPanel( {
 						hasShadow() && inheritedShadow !== undefined
 					) }
 					label={ __( 'Shadow' ) }
+					inheritanceTooltipText={ shadowTooltipText }
 					hasValue={ hasShadow }
 					onDeselect={ resetShadow }
 					isShownByDefault={ defaultControls.shadow }

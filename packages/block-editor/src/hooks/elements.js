@@ -75,11 +75,8 @@ export function ElementsEdit( {
 		[ clientId, isEnabled ]
 	);
 
-	const { value: inheritedValue } = useResolvedStyles(
-		name,
-		className,
-		selectedState
-	);
+	const { value: inheritedValue, sources: inheritedSources } =
+		useResolvedStyles( name, className, selectedState );
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
@@ -146,6 +143,7 @@ export function ElementsEdit( {
 			label={ label }
 			contrastWarning={ contrastWarning }
 			inheritedValue={ inheritedValue }
+			inheritedSources={ inheritedSources }
 		/>
 	);
 }

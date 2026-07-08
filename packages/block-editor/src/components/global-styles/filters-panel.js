@@ -32,6 +32,7 @@ import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import {
 	getInheritanceProps,
+	getInheritanceTooltipTextByPath,
 	InheritanceToolsPanelItem,
 	InheritanceResetButton,
 } from './inheritance';
@@ -183,6 +184,7 @@ export default function FiltersPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedSources,
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -194,6 +196,8 @@ export default function FiltersPanel( {
 		showInheritanceLabelIndicators
 			? getInheritanceProps( isInherited, hasLocalOverride, className )
 			: {};
+	const tooltipText = ( path ) =>
+		getInheritanceTooltipTextByPath( inheritedSources, path );
 
 	// Duotone
 	const hasDuotoneEnabled = useHasDuotoneControl( settings );
@@ -267,6 +271,7 @@ export default function FiltersPanel( {
 							inheritedDuotone !== undefined
 					) }
 					label={ __( 'Duotone' ) }
+					inheritanceTooltipText={ tooltipText( 'filter.duotone' ) }
 					hasValue={ hasDuotone }
 					onDeselect={ resetDuotone }
 					isShownByDefault={ defaultControls.duotone }

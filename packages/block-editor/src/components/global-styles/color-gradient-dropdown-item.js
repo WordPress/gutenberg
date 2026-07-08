@@ -28,6 +28,7 @@ import ColorGradientControl from '../colors-gradients/control';
 import { unlock } from '../../lock-unlock';
 import {
 	getInheritanceProps,
+	getCommonInheritanceTooltipText,
 	InheritanceResetButton,
 	InheritanceToolsPanelItem,
 } from './inheritance';
@@ -208,6 +209,7 @@ export default function ColorGradientDropdownItem( {
 	isPlaceholder = false,
 	hasInheritedValue = false,
 	showInheritanceLabelIndicators = true,
+	inheritedSources = {},
 } ) {
 	const colorGradientDropdownButtonRef = useRef( undefined );
 	const itemClassName = clsx( 'block-editor-color-gradient-item', className );
@@ -219,12 +221,18 @@ export default function ColorGradientDropdownItem( {
 	const inheritanceProps = showInheritanceLabelIndicators
 		? getInheritanceProps( isPlaceholder, hasLocalOverride, itemClassName )
 		: { className: itemClassName };
+	const tabSourcePaths = tabs.flatMap( ( tab ) => tab.sourcePaths ?? [] );
+	const inheritanceTooltipText = getCommonInheritanceTooltipText(
+		inheritedSources,
+		tabSourcePaths
+	);
 	return (
 		<InheritanceToolsPanelItem
 			{ ...inheritanceProps }
 			showLocalOverrideActionsInLabel={ false }
 			hasValue={ hasValue }
 			label={ label }
+			inheritanceTooltipText={ inheritanceTooltipText }
 			onDeselect={ resetValue }
 			isShownByDefault={ isShownByDefault }
 			panelId={ panelId }

@@ -193,11 +193,8 @@ export function BackgroundImagePanel( {
 		[ clientId ]
 	);
 
-	const { value: inheritedValue } = useResolvedStyles(
-		name,
-		className,
-		selectedState
-	);
+	const { value: inheritedValue, sources: inheritedSources } =
+		useResolvedStyles( name, className, selectedState );
 
 	const backgroundGradientSupported = hasBackgroundSupport(
 		name,
@@ -393,6 +390,7 @@ export function BackgroundImagePanel( {
 			}
 			contrastWarning={ contrastWarning }
 			inheritedValue={ inheritedValue }
+			inheritedSources={ inheritedSources }
 		/>
 	);
 }

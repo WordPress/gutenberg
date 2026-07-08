@@ -21,15 +21,16 @@ import { InheritanceToolsPanelItem } from '../global-styles/inheritance';
 
 /**
  * @typedef {Object} AspectRatioToolProps
- * @property {string}                       [panelId]          ID of the panel this tool is associated with.
- * @property {string}                       [value]            Current aspect ratio value.
- * @property {AspectRatioToolPropsOnChange} [onChange]         Callback to update the aspect ratio value.
- * @property {SelectControlProps[]}         [options]          Aspect ratio options.
- * @property {string}                       [defaultValue]     Default aspect ratio value.
- * @property {boolean}                      [isShownByDefault] Whether the tool is shown by default.
- * @property {string}                       [className]        Additional CSS class on the wrapping panel item.
- * @property {boolean}                      [isInherited]      Whether the control is displaying an inherited Global Styles value.
- * @property {boolean}                      [hasLocalOverride] Whether a local value is overriding an inherited Global Styles value.
+ * @property {string}                       [panelId]                ID of the panel this tool is associated with.
+ * @property {string}                       [value]                  Current aspect ratio value.
+ * @property {AspectRatioToolPropsOnChange} [onChange]               Callback to update the aspect ratio value.
+ * @property {SelectControlProps[]}         [options]                Aspect ratio options.
+ * @property {string}                       [defaultValue]           Default aspect ratio value.
+ * @property {boolean}                      [isShownByDefault]       Whether the tool is shown by default.
+ * @property {string}                       [className]              Additional CSS class on the wrapping panel item.
+ * @property {boolean}                      [isInherited]            Whether the control is displaying an inherited Global Styles value.
+ * @property {boolean}                      [hasLocalOverride]       Whether a local value is overriding an inherited Global Styles value.
+ * @property {string}                       [inheritanceTooltipText] Tooltip text describing the inherited Global Styles source.
  */
 
 export default function AspectRatioTool( {
@@ -43,6 +44,7 @@ export default function AspectRatioTool( {
 	className,
 	isInherited,
 	hasLocalOverride,
+	inheritanceTooltipText,
 } ) {
 	// Match the CSS default so if the value is used directly in CSS it will look correct in the control.
 	const displayValue = value ?? 'auto';
@@ -86,6 +88,7 @@ export default function AspectRatioTool( {
 			className={ className }
 			isInherited={ isInherited }
 			hasLocalOverride={ hasLocalOverride }
+			inheritanceTooltipText={ inheritanceTooltipText }
 			hasValue={
 				hasValue ? hasValue : () => displayValue !== defaultValue
 			}
