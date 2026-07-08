@@ -356,7 +356,9 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	}
 }
 
-.block-editor-block-list__block:not(.is-selected):not(.has-child-selected) .block-editor-default-block-appender {
+// Explicitly provided appenders (see `has-custom-appender`) are exempt from
+// the selection gating.
+.block-editor-block-list__block:not(.is-selected):not(.has-child-selected) .block-list-appender:not(.has-custom-appender) .block-editor-default-block-appender {
 	display: none;
 
 	.block-editor-inserter__toggle {
