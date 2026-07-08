@@ -187,6 +187,24 @@ describe( 'Editor private actions', () => {
 				content: 'Lorem ipsum',
 			} );
 
+			// Throw an object with an empty `message` property
+			apiFetch.setFetchHandler( async () => {
+				throw {
+					message: '',
+				};
+			} );
+
+			await unlock( registry.dispatch( editorStore ) ).saveDirtyEntities(
+				{ dirtyEntityRecords: [ postEntityRecord ] }
+			);
+
+			expect(
+				registry.select( noticesStore ).getNotices().at( -1 )
+			).toMatchObject( {
+				status: 'error',
+				content: 'Saving failed.',
+			} );
+
 			// Throw an actual error
 			apiFetch.setFetchHandler( async () => {
 				throw new Error( 'Dolor sit amet' );
@@ -219,6 +237,26 @@ describe( 'Editor private actions', () => {
 				content: 'Consectetur adipiscing elit',
 			} );
 
+			// Throw an object implementing `toString`
+			apiFetch.setFetchHandler( async () => {
+				throw {
+					toString() {
+						return 'Sed do eiusmod tempor incididunt';
+					},
+				};
+			} );
+
+			await unlock( registry.dispatch( editorStore ) ).saveDirtyEntities(
+				{ dirtyEntityRecords: [ postEntityRecord ] }
+			);
+
+			expect(
+				registry.select( noticesStore ).getNotices().at( -1 )
+			).toMatchObject( {
+				status: 'error',
+				content: 'Sed do eiusmod tempor incididunt',
+			} );
+
 			// Throw something with no clear message
 			apiFetch.setFetchHandler( async () => {
 				throw {};
@@ -232,7 +270,7 @@ describe( 'Editor private actions', () => {
 				registry.select( noticesStore ).getNotices().at( -1 )
 			).toMatchObject( {
 				status: 'error',
-				content: 'Unknown error',
+				content: 'Saving failed.',
 			} );
 		} );
 

@@ -281,12 +281,23 @@ export const saveDirtyEntities =
 			}
 
 			// Expect certain errors to be plain objects with a `message`
-			// property, such as those thrown by `apiFetch`.
-			const message =
-				error?.message ??
-				( typeof error === 'string' && error
-					? error
-					: __( 'Unknown error' ) );
+			// property, such as those thrown by `apiFetch`. Otherwise, do our
+			// best to infer a message via duck typing.
+			let message;
+			if ( ! error ) {
+			} else if ( typeof error.message === 'string' ) {
+				message = error.message;
+			} else if ( typeof error === 'string' ) {
+				message = error;
+			} else if (
+				Object.hasOwn( error, 'toString' ) &&
+				typeof error.toString === 'function'
+			) {
+				const result = error.toString();
+				if ( typeof result === 'string' ) {
+					message = result;
+				}
+			}
 
 			return new Error( message, { cause: error } );
 		}
