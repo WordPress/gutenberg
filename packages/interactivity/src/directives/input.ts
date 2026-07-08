@@ -27,13 +27,6 @@ import { store, setByPath } from '../store';
 import { PENDING_GETTER, peek } from '../proxies/state';
 
 /* ------------------------------------------------------------------ */
-/*  Helpers                                                            */
-/* ------------------------------------------------------------------ */
-
-/* setByPath is imported from ../store */
-
-
-/* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
@@ -91,8 +84,8 @@ const detectDescriptor = (
 					return signalType === 'boolean'
 						? input.checked
 						: input.checked
-							? input.value
-							: '';
+						? input.value
+						: '';
 				}
 				return signalType === 'string'
 					? input.checked
@@ -214,6 +207,7 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 		return;
 	}
 
+	const path = entry.value;
 	const props = element.props as Record< string, unknown >;
 
 	// ---- file inputs – handled via useInit + FileReader ----
@@ -238,15 +232,15 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 										typeof reader.result === 'string'
 											? reader.result
 											: '';
-								const match = result.match( dataURIRegex );
-								if ( globalThis.SCRIPT_DEBUG ) {
-									if ( ! match?.groups ) {
-										warn(
-											'data-wp-input: Invalid data URI for file input.'
-										);
+									const match = result.match( dataURIRegex );
+									if ( globalThis.SCRIPT_DEBUG ) {
+										if ( ! match?.groups ) {
+											warn(
+												'data-wp-input: Invalid data URI for file input.'
+											);
+										}
 									}
-								}
-								resolve( {
+									resolve( {
 										name: f.name,
 										contents: match?.groups?.contents ?? '',
 										mime: match?.groups?.mime ?? '',
@@ -258,7 +252,7 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 				).then( ( signalFiles ) => {
 					setByPath(
 						store( entryForFile.namespace ),
-						entryForFile.value,
+						path,
 						signalFiles
 					);
 				} );
@@ -289,11 +283,7 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 		props[ desc.prop ] = props.value;
 	}
 
-	// ---- initial DOM sync (pre-paint): seed & sync ----
-	// NOTE: no dependencies → runs after every render.  This is necessary
-	// for <select multiple> where Preact diff does not update selected
-	// options; for all other element types the sync is a no-op when the
-	// props already match the DOM.
+	// ---- initial DOM sync: seed & element sync ----
 	useLayoutEffect( () => {
 		const el = ( element.ref as { current?: InputBindingElement } ).current;
 		if ( ! el ) {
@@ -306,7 +296,7 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 			el.type === 'radio' &&
 			! el.name
 		) {
-			el.name = entry.value;
+			el.name = path;
 		}
 
 		// Element→signal seeding (ifMissing: adopt DOM value when signal is
@@ -314,20 +304,22 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 		if ( signalValue === undefined ) {
 			const elValue = desc.toSignal( el, 'undefined' );
 			if ( elValue !== undefined ) {
-				setByPath( store( entry.namespace ), entry.value, elValue );
+				setByPath( store( entry.namespace ), path, elValue );
 			}
 		}
 
 		// Signal→element sync (re-read current value via peek — avoids
 		// evaluate/scope issues inside effects).
-		const syncParts = entry.value.split( '.' );
+		const syncParts = path.split( '.' );
 		const syncLeaf = syncParts.pop();
-		let current: unknown = undefined;
+		let current: unknown;
 		if ( syncLeaf && syncParts.length ) {
 			const syncRoot = store( entry.namespace );
 			const syncParent = syncParts.reduce(
 				( prev: any, key: string ): any => {
-					if ( ! prev ) return undefined;
+					if ( ! prev ) {
+						return undefined;
+					}
 					return peek( prev, key );
 				},
 				syncRoot
@@ -339,7 +331,7 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 		if ( current != null && current !== PENDING_GETTER ) {
 			syncElementProp( el, desc, current, props );
 		}
-	} );
+	}, [ signalValue ] );
 
 	// ---- wire up event handlers ----
 	for ( const eventName of desc.events ) {
@@ -363,7 +355,7 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 				return;
 			}
 
-			setByPath( store( entry.namespace ), entry.value, raw );
+			setByPath( store( entry.namespace ), path, raw );
 		};
 	}
 } );

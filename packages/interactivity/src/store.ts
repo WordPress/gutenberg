@@ -295,15 +295,12 @@ export const setByPath = (
 	if ( ! leaf || ! parts.length ) {
 		return;
 	}
-	const parent = parts.reduce(
-		( prev: any, key: string ): any => {
-			if ( ! prev ) {
-				return undefined;
-			}
-			return peek( prev, key );
-		},
-		root
-	);
+	const parent = parts.reduce( ( prev: any, key: string ): any => {
+		if ( ! prev ) {
+			return undefined;
+		}
+		return peek( prev, key );
+	}, root );
 	if ( parent ) {
 		parent[ leaf ] = value;
 	}

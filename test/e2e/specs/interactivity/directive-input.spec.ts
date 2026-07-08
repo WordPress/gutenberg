@@ -153,7 +153,7 @@ test.describe( 'data-wp-input', () => {
 	/* ------------------------------------------------------------------ */
 	/*  9. Checkbox group (explicit indices → array)                       */
 	/* ------------------------------------------------------------------ */
-	test( 'should bind checkbox group with explicit indices to array', async ( {
+	test( 'should bind checkbox group with top-level properties', async ( {
 		page,
 	} ) => {
 		const outputA = page.getByTestId( 'checkbox-group-output-a' );
@@ -161,18 +161,18 @@ test.describe( 'data-wp-input', () => {
 		const checkboxA = page.getByTestId( 'checkbox-group-a' );
 		const checkboxB = page.getByTestId( 'checkbox-group-b' );
 
-		// Initial: A checked (state.tags.0 = 'a'), B unchecked (state.tags.1 = '').
+		// Initial: A checked (state.tags0 = 'a'), B unchecked (state.tags1 = '').
 		await expect( outputA ).toHaveText( 'a' );
 		await expect( outputB ).toHaveText( '' );
 		expect( await checkboxA.isChecked() ).toBe( true );
 		expect( await checkboxB.isChecked() ).toBe( false );
 
-		// Check B → tags.1 = 'b'.
+		// Check B → tags1 = 'b'.
 		await checkboxB.check();
 		await expect( outputB ).toHaveText( 'b' );
 		expect( await checkboxB.isChecked() ).toBe( true );
 
-		// Uncheck B → tags.1 = ''.
+		// Uncheck B → tags1 = ''.
 		await checkboxB.uncheck();
 		await expect( outputB ).toHaveText( '' );
 		expect( await checkboxB.isChecked() ).toBe( false );
@@ -252,7 +252,7 @@ test.describe( 'data-wp-input', () => {
 	/* ------------------------------------------------------------------ */
 	/*  11. Element→signal seeding (state undefined → adopt DOM value)     */
 	/* ------------------------------------------------------------------ */
-	test.skip( 'should seed signal from element value when state is undefined (needs debug)', async ( {
+	test.skip( 'should update text input value when signal changes via action', async ( {
 		page,
 	} ) => {
 		const output = page.getByTestId( 'seed-output' );
