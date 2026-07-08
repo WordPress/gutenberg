@@ -10,11 +10,11 @@
 	background: $white;
 	display: grid;
 	grid-auto-flow: row;
-	grid-template: auto / $header-height minmax(0, max-content) minmax(min-content, 1fr) $header-height;
+	grid-template: auto / $button-size-compact minmax(0, max-content) minmax(min-content, 1fr) $header-height;
 	&:has(> .editor-header__center) {
-		grid-template: auto / $header-height min-content 1fr min-content $header-height;
+		grid-template: auto / $button-size-compact min-content 1fr min-content $header-height;
 		@include break-medium {
-			grid-template: auto / $header-height minmax(min-content, 2fr) 2.5fr minmax(min-content, 2fr) $header-height;
+			grid-template: auto / $button-size-compact minmax(min-content, 2fr) 2.5fr minmax(min-content, 2fr) $header-height;
 		}
 	}
 	@include break-mobile {
@@ -29,6 +29,10 @@
 	@include break-zoomed-in {
 		flex-wrap: nowrap;
 	}
+}
+
+.editor-header__back-button {
+	padding-left: $grid-unit;
 }
 
 .editor-header__toolbar {

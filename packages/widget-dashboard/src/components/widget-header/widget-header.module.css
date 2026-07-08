@@ -1,0 +1,59 @@
+/* Tile header row: identity leads, toolbar trails. */
+.widget-header {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-sm);
+}
+
+.identity,
+.toolbar {
+	display: flex;
+	align-items: center;
+	height: var(--wpds-dimension-size-lg);
+}
+
+.identity {
+	min-width: 0;
+}
+
+.icon {
+	display: inline-flex;
+	color: var(--wpds-color-foreground-content-neutral);
+}
+
+.popover-popup {
+	max-width: 300px;
+}
+
+.help {
+	display: inline-flex;
+	align-items: center;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	cursor: var(--wpds-cursor-control);
+}
+
+.link + .link {
+	border-inline-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+	padding-inline-start: var(--wpds-dimension-gap-sm);
+}
+
+.toolbar {
+	margin-inline-start: auto;
+}
+
+/* Floats over the tile; re-declares card padding outside Card.Root. */
+.overlay {
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline: 0;
+	z-index: 1;
+	pointer-events: none;
+	--wp-ui-card-padding: var(--wpds-dimension-padding-2xl);
+}
+
+.overlay .toolbar {
+	pointer-events: auto;
+}

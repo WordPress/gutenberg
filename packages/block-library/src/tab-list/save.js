@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
+	RichText,
 	useBlockProps,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
@@ -34,15 +35,15 @@ export default function save( { attributes } ) {
 	return (
 		<div { ...blockProps }>
 			{ tabs.map( ( tab, index ) => (
-				<button
+				<RichText.Content
 					key={ index }
 					className={ buttonClassName || undefined }
 					style={ buttonStyle }
+					tagName="button"
+					value={ tab.label }
 					type="button"
 					role="tab"
-				>
-					{ tab.label }
-				</button>
+				/>
 			) ) }
 		</div>
 	);

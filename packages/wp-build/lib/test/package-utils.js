@@ -23,7 +23,7 @@ describe( 'getPackageInfo() resolve-miss contract', () => {
 	} );
 
 	it( 'still resolves an installed package that exposes its package.json', () => {
-		const info = getPackageInfo( '@wordpress/build' );
+		const info = getPackageInfo( '@wordpress/build', __dirname );
 
 		expect( info ).toMatchObject( { name: '@wordpress/build' } );
 	} );

@@ -27,6 +27,8 @@ import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
 import { unlock } from '../../lock-unlock';
 
+const VIEW_CONFIG_FIELDS = [ 'view_list' ];
+
 const { useLocation } = unlock( routerPrivateApis );
 
 function CategoriesGroup( {
@@ -89,10 +91,12 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 	const { view_list: templatePartViews } = useViewConfig( {
 		kind: 'postType',
 		name: TEMPLATE_PART_POST_TYPE,
+		fields: VIEW_CONFIG_FIELDS,
 	} );
 	const { view_list: patternViews } = useViewConfig( {
 		kind: 'postType',
 		name: PATTERN_TYPES.user,
+		fields: VIEW_CONFIG_FIELDS,
 	} );
 
 	const { templatePartAreas, isLoading, hasTemplateParts } =

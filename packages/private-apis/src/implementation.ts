@@ -49,9 +49,11 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/media-editor',
 	'@wordpress/media-utils',
 	'@wordpress/upload-media',
+	'@wordpress/global-styles-engine',
 	'@wordpress/global-styles-ui',
 	'@wordpress/ui',
 	'@wordpress/views',
+	'@wordpress/widget-dashboard',
 ];
 
 /*

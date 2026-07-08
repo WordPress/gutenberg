@@ -67,9 +67,8 @@ const EntitiesSavedStatesForPreview = ( {
 	);
 
 	const activateTheme = useActivateTheme();
-	const onSave = async ( values ) => {
+	const onSave = async () => {
 		await activateTheme();
-		return values;
 	};
 
 	return (

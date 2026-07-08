@@ -1,0 +1,42 @@
+<svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="In framed presentation, the host reads the widget's identity into the chrome header and renders the widget's content with padding inside the frame. Shown with the Site Health widget.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect x="6" y="6" width="748" height="348" rx="12" fill="#ffffff"/>
+
+  <text x="380" y="42" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="12.5" font-weight="700" fill="#334155">In framed, the host paints identity into the header and pads the content.</text>
+
+  <!-- Identity -->
+  <rect x="40" y="116" width="172" height="128" rx="10" fill="#e2ecfd" stroke="#2f54a5" stroke-width="1.5"/>
+  <text x="60" y="144" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1e3a8a">Identity</text>
+  <text x="60" y="162" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#2f54a5" opacity="0.8">metadata</text>
+  <rect x="60" y="176" width="18" height="18" rx="4" fill="#2f54a5"/>
+  <text x="86" y="190" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11.5" fill="#2f54a5">icon</text>
+  <text x="60" y="220" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11.5" fill="#2f54a5">title: Site Health</text>
+
+  <line x1="212" y1="150" x2="300" y2="150" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="256" y="140" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#94a3b8">host reads</text>
+
+  <!-- Tile -->
+  <rect x="308" y="86" width="372" height="210" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- chrome header -->
+  <rect x="310" y="88" width="368" height="48" rx="8" fill="#f1f5f9"/>
+  <line x1="308" y1="137" x2="680" y2="137" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="328" y="100" width="24" height="24" rx="5" fill="#2f54a5"/>
+  <text x="364" y="117" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#334155">Site Health</text>
+
+  <!-- content, padded (margins visible on all sides) -->
+  <circle cx="350" cy="174" r="7" fill="#2b8d79"/>
+  <text x="366" y="179" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1d6b5a">Good</text>
+  <rect x="344" y="200" width="12" height="12" rx="3" fill="#e2e8f0"/>
+  <line x1="366" y1="206" x2="556" y2="206" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="344" y="222" width="12" height="12" rx="3" fill="#e2e8f0"/>
+  <line x1="366" y1="228" x2="512" y2="228" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="638" y="270" text-anchor="end" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#94a3b8">content, padded</text>
+
+  <text x="494" y="322" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">presentation: framed</text>
+</svg>

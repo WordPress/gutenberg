@@ -2,9 +2,23 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add an "Attachments" source to the block inserter's Media tab, listing images attached to the current post with the ability to attach and detach them ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
+
 ### Enhancements
 
 -   Notes Sidebar: Promote the "Add note" action from the block-toolbar overflow menu to a dedicated toolbar button placed before the ellipsis. Blocks that already have a thread continue to show the avatar indicator alongside the button ([#78188](https://github.com/WordPress/gutenberg/issues/78188)).
+
+### Bug Fixes
+
+-   External images are now sideloaded on the server when uploaded to the media library, via a new `mediaSideloadFromUrl` block editor setting, so the upload works when the editor is cross-origin isolated (e.g. with client-side media processing enabled) ([#79409](https://github.com/WordPress/gutenberg/pull/79409)).
+
+## 14.50.0 (2026-07-01)
+
+## 14.49.0 (2026-06-24)
+
+## 14.48.1 (2026-06-16)
 
 ## 14.48.0 (2026-06-10)
 

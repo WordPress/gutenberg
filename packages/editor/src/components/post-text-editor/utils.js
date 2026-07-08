@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { diffChars } from 'diff/lib/diff/character';
-import { diffLines } from 'diff/lib/diff/line';
+import { diffChars } from 'diff/lib/diff/character.js';
+import { diffLines } from 'diff/lib/diff/line.js';
 
 // Character diffing (Myers) is cheap when the edit distance is small but
 // degrades toward O(n^2) as the two strings diverge: a full replacement of

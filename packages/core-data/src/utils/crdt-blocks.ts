@@ -46,6 +46,7 @@ export interface Block {
 	attributes: BlockAttributes;
 	clientId?: string;
 	innerBlocks: Block[];
+	innerContent?: Array< string | null >;
 	isValid?: boolean;
 	name: string;
 	originalContent?: string;
