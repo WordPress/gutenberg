@@ -226,8 +226,27 @@ function CoverEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 
-	// Create the initial inner paragraph when the block gains a background
-	// and has no content yet.
+	// Mirrors the placeholder render condition, for reading the state
+	// before an action runs.
+	const isShowingPlaceholder = () => {
+		const { getBlocks, getBlockAttributes } =
+			registry.select( blockEditorStore );
+		const currentAttributes = getBlockAttributes( clientId );
+		return (
+			getBlocks( clientId ).length === 0 &&
+			! currentAttributes.useFeaturedImage &&
+			! currentAttributes.url &&
+			! currentAttributes.overlayColor &&
+			! currentAttributes.customOverlayColor &&
+			! currentAttributes.gradient &&
+			! currentAttributes.customGradient
+		);
+	};
+
+	// Create the initial inner paragraph when the block exits its
+	// placeholder. The template was only ever applied at that transition:
+	// afterwards, removing the paragraph is a content choice that further
+	// background changes should not override.
 	const scaffoldInnerBlocks = () => {
 		const {
 			getBlocks,
@@ -271,6 +290,7 @@ function CoverEdit( {
 	};
 
 	const onSelectMedia = async ( newMedia ) => {
+		const wasShowingPlaceholder = isShowingPlaceholder();
 		const mediaAttributes = attributesFromMedia( newMedia );
 		const isImage = [ newMedia?.type, newMedia?.media_type ].includes(
 			IMAGE_BACKGROUND_TYPE
@@ -345,7 +365,9 @@ function CoverEdit( {
 				isUserOverlayColor: currentAttrs.isUserOverlayColor || false,
 			} );
 
-			scaffoldInnerBlocks();
+			if ( wasShowingPlaceholder ) {
+				scaffoldInnerBlocks();
+			}
 		} );
 	};
 
@@ -378,6 +400,7 @@ function CoverEdit( {
 	};
 
 	const onSetOverlayColor = async ( newOverlayColor ) => {
+		const wasShowingPlaceholder = isShowingPlaceholder();
 		const averageBackgroundColor = await getMediaColor( url );
 
 		// Read latest dimRatio after await to avoid stale closure.
@@ -400,7 +423,9 @@ function CoverEdit( {
 				isDark: newIsDark,
 			} );
 
-			scaffoldInnerBlocks();
+			if ( wasShowingPlaceholder ) {
+				scaffoldInnerBlocks();
+			}
 		} );
 	};
 
@@ -626,6 +651,7 @@ function CoverEdit( {
 		!! openMediaEditorModal;
 
 	const toggleUseFeaturedImage = async () => {
+		const wasShowingPlaceholder = isShowingPlaceholder();
 		const newUseFeaturedImage = ! useFeaturedImage;
 
 		const averageBackgroundColor = newUseFeaturedImage
@@ -671,7 +697,9 @@ function CoverEdit( {
 				isDark: newIsDark,
 			} );
 
-			scaffoldInnerBlocks();
+			if ( wasShowingPlaceholder ) {
+				scaffoldInnerBlocks();
+			}
 		} );
 	};
 
