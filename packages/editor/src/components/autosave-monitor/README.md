@@ -2,6 +2,8 @@
 
 `AutosaveMonitor` monitors the changes made to the edited post and triggers an autosave when there is something new to save. The post is checked on an interval, which defaults to the editor's `autosaveInterval` setting and saves to the server via the editor store's `autosave` action. Both the interval and the save callback can be overridden with props.
 
+It also creates the `autosave-exists` warning notice when the server already holds an autosave more recent than the loaded post. This notice therefore only appears where `AutosaveMonitor` is rendered (and where the post type supports `autosave`). An editor that receives `settings.autosave` but does not render `AutosaveMonitor` will not surface this warning.
+
 ## Example
 
 ```js

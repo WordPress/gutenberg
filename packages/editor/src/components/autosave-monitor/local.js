@@ -185,9 +185,8 @@ function LocalAutosaveMonitorInner() {
 		[]
 	);
 
-	// Reference of the edits last saved to the local backup. Kept separately
-	// from the remote monitor's reference, so neither kind of autosave
-	// suppresses the other.
+	// Reference of the edits last considered for autosaving. Mutable state that
+	// must not trigger a re-render, hence a ref.
 	const lastEditsReferenceRef = useRef();
 
 	useInterval( () => {
