@@ -6,6 +6,10 @@
 
 -   Add `outset-ring__focus` mixin for outline-based focus rings using `--wpds-*` design tokens ([#78698](https://github.com/WordPress/gutenberg/pull/78698)).
 
+### Bug Fixes
+
+-   Restore a consistent medium (`500`) font weight on Windows by referencing the synthetic `Segoe UI WordPress Adjusted` font family in the default font stacks and setting `$font-weight-medium` to `500`, matching the design token behavior.
+
 ## 10.2.0 (2026-07-01)
 
 ## 10.1.0 (2026-06-24)
@@ -17,7 +21,7 @@
 ### Breaking Changes
 
 -   Remove the following entries from the `z-index()` helper ([#77773](https://github.com/WordPress/gutenberg/pull/77773)):
-   -   `.nux-dot-tip`
+    -   `.nux-dot-tip`
 
 ## 9.0.0 (2026-05-27)
 
