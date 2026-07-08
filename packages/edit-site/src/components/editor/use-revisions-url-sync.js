@@ -47,11 +47,11 @@ export default function useRevisionsURLSync( enabled ) {
 		if ( ! enabled || hasOpenedInitialRevisionRef.current || ! postId ) {
 			return;
 		}
+		hasOpenedInitialRevisionRef.current = true;
 		const revision = Number( location.query.revision );
 		if ( ! Number.isInteger( revision ) || revision <= 0 ) {
 			return;
 		}
-		hasOpenedInitialRevisionRef.current = true;
 		openRevision( revision );
 	}, [ enabled, postId, location.query.revision, openRevision ] );
 
