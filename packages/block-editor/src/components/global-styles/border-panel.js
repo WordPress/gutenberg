@@ -218,8 +218,11 @@ export default function BorderPanel( {
 			bottomRight: decodeValue( rawRadius?.bottomRight ),
 		};
 	}, [ inheritedValue?.border?.radius, inheritedSources, decodeValue ] );
+	// Spread the local border, not the merged display value, or setting a
+	// radius bakes the inherited border into the local override. Mirror of
+	// the guard in `onBorderChange`.
 	const setBorderRadius = ( newBorderRadius ) =>
-		setBorder( { ...border, radius: newBorderRadius } );
+		setBorder( { ...value?.border, radius: newBorderRadius } );
 	const hasBorderRadius = () => {
 		const borderValues = value?.border?.radius;
 		if ( typeof borderValues === 'object' ) {

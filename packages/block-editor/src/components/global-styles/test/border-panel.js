@@ -172,6 +172,40 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			expect( lastCall?.border?.radius ).toBeDefined();
 			expect( lastCall?.shadow ).toBeUndefined();
 		} );
+
+		it( 'does not bake the inherited border color/style/width into the local override when only a radius is set', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+			const inheritedValue = {
+				border: {
+					color: '#000000',
+					style: 'solid',
+					width: '1px',
+				},
+			};
+
+			render(
+				<BorderPanel
+					value={ {} }
+					inheritedValue={ inheritedValue }
+					settings={ settingsAll }
+					onChange={ onChange }
+					panelId="test-panel"
+				/>
+			);
+
+			const radiusInput = screen.getByRole( 'spinbutton', {
+				name: /border radius/i,
+			} );
+			await user.type( radiusInput, '20' );
+
+			expect( onChange ).toHaveBeenCalled();
+			const committedBorder = onChange.mock.calls.at( -1 )[ 0 ]?.border;
+			expect( committedBorder?.radius ).toBeDefined();
+			expect( committedBorder?.color ).toBeUndefined();
+			expect( committedBorder?.style ).toBeUndefined();
+			expect( committedBorder?.width ).toBeUndefined();
+		} );
 	} );
 
 	describe( 'Border box (compound archetype)', () => {
