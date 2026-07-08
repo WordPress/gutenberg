@@ -197,30 +197,38 @@ test.describe( 'Notes canvas layout', () => {
 		await expect( thread ).toBeVisible();
 
 		const threadBox = await thread.boundingBox();
-		const coverBox = await editor.canvas
-			.locator( '[data-type="core/cover"]' )
-			.first()
-			.boundingBox();
 		const canvasBox = await page
 			.locator( 'iframe[name="editor-canvas"]' )
 			.boundingBox();
-		// The reserved space is bounded by the full-width content on one side
-		// and the canvas scrollbar (at the content edge, inside the iframe) on
-		// the other. A tall cover forces the scrollbar so this exercises the
-		// scrollbar-width offset.
-		const contentEdge = await editor.canvas
+		// The reserved space is the padding applied to the canvas root. It ends
+		// where the scrollbar begins (the content edge), inset from the window
+		// edge by the scrollbar width; a tall cover forces the scrollbar so this
+		// exercises the scrollbar-width offset. Measuring the reserved padding
+		// directly is robust: the full-bleed cover's own box escapes the padding
+		// with negative margins and is only clipped visually, so its reported
+		// box can't delimit the gap.
+		const { contentEdge, reservedWidth } = await editor.canvas
 			.locator( 'body' )
-			.evaluate(
-				( body ) => body.ownerDocument.documentElement.clientWidth
-			);
+			.evaluate( ( body ) => {
+				const doc = body.ownerDocument;
+				const root = doc.documentElement;
+				return {
+					contentEdge: root.clientWidth,
+					reservedWidth: parseFloat(
+						doc.defaultView.getComputedStyle( root )
+							.paddingInlineEnd
+					),
+				};
+			} );
 
-		const gapStart = coverBox.x + coverBox.width;
 		const gapEnd = canvasBox.x + contentEdge;
+		const gapStart = gapEnd - reservedWidth;
 		const leftMargin = threadBox.x - gapStart;
 		const rightMargin = gapEnd - ( threadBox.x + threadBox.width );
 
-		// The note must sit inside the reserved gap with balanced margins,
-		// not tucked against the scrollbar.
+		// The note must sit inside the reserved space with balanced margins,
+		// not tucked against the scrollbar. Before the fix the overlay was
+		// shifted out by the scrollbar width (~31px/1px left/right on Linux).
 		expect( leftMargin ).toBeGreaterThan( 0 );
 		expect( rightMargin ).toBeGreaterThan( 0 );
 		expect( Math.abs( leftMargin - rightMargin ) ).toBeLessThan( 4 );
