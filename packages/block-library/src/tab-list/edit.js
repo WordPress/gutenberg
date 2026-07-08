@@ -16,7 +16,7 @@ import {
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -29,33 +29,33 @@ const EMPTY_ARRAY = [];
 function Edit( {
 	attributes,
 	clientId,
-	context,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
-	const tabsList = context[ 'core/tabs-list' ] || EMPTY_ARRAY;
-
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 
-	const { tabsClientId, editorActiveTabIndex, activeTabIndex } = useSelect(
-		( select ) => {
-			const { getBlockRootClientId, getBlockAttributes } =
-				select( blockEditorStore );
+	const { tabsClientId, tabPanels, editorActiveTabIndex, activeTabIndex } =
+		useSelect(
+			( select ) => {
+				const { getBlockRootClientId, getBlockAttributes, getBlocks } =
+					select( blockEditorStore );
 
-			const _tabsClientId = getBlockRootClientId( clientId );
-			const tabsAttributes = _tabsClientId
-				? getBlockAttributes( _tabsClientId )
-				: {};
+				const rootClientId = getBlockRootClientId( clientId );
+				const tabsAttributes = getBlockAttributes( rootClientId );
+				const tabPanelsBlock = getBlocks( rootClientId )?.find(
+					( block ) => block.name === 'core/tab-panels'
+				);
 
-			return {
-				tabsClientId: _tabsClientId,
-				editorActiveTabIndex: tabsAttributes?.editorActiveTabIndex,
-				activeTabIndex: tabsAttributes?.activeTabIndex ?? 0,
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					tabsClientId: rootClientId,
+					tabPanels: tabPanelsBlock?.innerBlocks ?? EMPTY_ARRAY,
+					editorActiveTabIndex: tabsAttributes?.editorActiveTabIndex,
+					activeTabIndex: tabsAttributes?.activeTabIndex ?? 0,
+				};
+			},
+			[ clientId ]
+		);
 	const { isBlockSelected, hasSelectedInnerBlock } =
 		useSelect( blockEditorStore );
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
@@ -63,6 +63,14 @@ function Edit( {
 	const { insertTab, removeTab } = useTabActions( tabsClientId );
 
 	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
+	const tabsList = useMemo(
+		() =>
+			tabPanels.map( ( tab ) => ( {
+				label: tab.attributes.label || '',
+				clientId: tab.clientId,
+			} ) ),
+		[ tabPanels ]
+	);
 
 	function selectTabPanel( tabIndex ) {
 		if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
