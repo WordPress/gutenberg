@@ -238,6 +238,20 @@ mark.wp-note {
 // Only emoji-specific adjustments live here.
 .editor-collab-sidebar-panel__reaction-button {
 	gap: $grid-unit-05;
+
+	// "You reacted" state: a light accent tint instead of the component's
+	// default dark pressed fill, which overpowers the emoji glyph. The
+	// doubled class matches `.components-button.is-pressed` specificity.
+	&.editor-collab-sidebar-panel__reaction-button[aria-pressed="true"] {
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+		color: var(--wp-admin-theme-color);
+		box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
+
+		&:hover:not(:disabled) {
+			background: rgba(var(--wp-admin-theme-color--rgb), 0.12);
+			color: var(--wp-admin-theme-color);
+		}
+	}
 }
 
 .editor-collab-sidebar-panel__reaction-button-emoji {
