@@ -46,29 +46,26 @@ export default function BrowserURL() {
 	} );
 	const hasHandledInitialRevisionRef = useRef( false );
 
-	const { postId, postStatus, currentRevisionId, disableVisualRevisions } =
-		useSelect( ( select ) => {
-			const { getCurrentPost, getEditorSettings } = select( editorStore );
-			const { getCurrentRevisionId } = unlock( select( editorStore ) );
-			const post = getCurrentPost();
-			let { id, status, type } = post;
-			const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
-				type
-			);
-			if ( isTemplate ) {
-				id = post.wp_id;
-			}
+	const { postId, postStatus, currentRevisionId } = useSelect( ( select ) => {
+		const { getCurrentPost } = select( editorStore );
+		const { getCurrentRevisionId } = unlock( select( editorStore ) );
+		const post = getCurrentPost();
+		let { id, status, type } = post;
+		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
+			type
+		);
+		if ( isTemplate ) {
+			id = post.wp_id;
+		}
 
-			return {
-				postId: id,
-				postStatus: status,
-				// In template mode the URL points at the template, not
-				// at the post the revision belongs to.
-				currentRevisionId: isTemplate ? null : getCurrentRevisionId(),
-				disableVisualRevisions:
-					!! getEditorSettings().disableVisualRevisions,
-			};
-		}, [] );
+		return {
+			postId: id,
+			postStatus: status,
+			// In template mode the URL points at the template, not
+			// at the post the revision belongs to.
+			currentRevisionId: isTemplate ? null : getCurrentRevisionId(),
+		};
+	}, [] );
 	const { openRevision } = unlock( useDispatch( editorStore ) );
 
 	useEffect( () => {
@@ -80,14 +77,11 @@ export default function BrowserURL() {
 			return;
 		}
 		hasHandledInitialRevisionRef.current = true;
-		if ( disableVisualRevisions ) {
-			window.location.href = addQueryArgs( 'revision.php', {
-				revision: initialRevisionId,
-			} );
-			return;
-		}
+		// Deep-linked revisions open in the visual editor. When classic
+		// meta boxes are active, meta box initialization redirects to the
+		// classic revision.php screen instead.
 		openRevision( initialRevisionId );
-	}, [ initialRevisionId, postId, disableVisualRevisions, openRevision ] );
+	}, [ initialRevisionId, postId, openRevision ] );
 
 	// Null until the first sync, so the first write always waits for the
 	// trailing timeout. That gives a deep-linked revision time to land in
