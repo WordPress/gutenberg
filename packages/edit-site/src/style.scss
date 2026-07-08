@@ -31,7 +31,6 @@
 @use "./components/pagination/style.scss" as *;
 @use "./components/sidebar-global-styles/style.scss" as *;
 
-/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
 ::view-transition-image-pair(root) {
 	isolation: auto;
 }
@@ -43,8 +42,7 @@
 	display: block;
 }
 
-/* stylelint-enable */
-
+// stylelint-disable selector-class-pattern -- WordPress admin body classes use underscores by convention.
 body.js #wpbody {
 	padding-top: 0;
 }
@@ -67,6 +65,7 @@ body.js.site-editor-php {
 		}
 	}
 }
+// stylelint-enable selector-class-pattern
 
 .edit-site {
 	@include reset;

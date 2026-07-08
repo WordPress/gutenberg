@@ -67,6 +67,16 @@ export interface WidgetFrameProps {
 	widget: DashboardWidget< unknown >;
 	widgetType: WidgetType;
 	titleId: string;
+
+	/**
+	 * Inert the body and identity while customizing.
+	 */
+	editMode?: boolean;
+
+	/**
+	 * Toolbar shown beside the identity in the in-card header.
+	 */
+	headerToolbar?: ReactNode;
 }
 
 /**
@@ -79,6 +89,8 @@ export function WidgetFrame( {
 	widget,
 	widgetType,
 	titleId,
+	editMode = false,
+	headerToolbar,
 }: WidgetFrameProps ) {
 	// full-bleed hides the header; full-bleed and content-bleed bleed the body.
 	const { presentation } = widgetType;
@@ -101,7 +113,10 @@ export function WidgetFrame( {
 					showIdentity
 					widgetType={ widgetType }
 					titleId={ titleId }
-				/>
+					editMode={ editMode }
+				>
+					{ headerToolbar }
+				</WidgetHeader>
 			) }
 
 			<Card.Content
@@ -109,6 +124,7 @@ export function WidgetFrame( {
 					styles.content,
 					isBodyBleeding && styles.bleedContent
 				) }
+				{ ...( editMode ? { inert: 'true' } : {} ) }
 			>
 				{ isHeaderHidden && widgetType.title && (
 					<VisuallyHidden render={ <h2 id={ titleId } /> }>

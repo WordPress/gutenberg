@@ -1349,12 +1349,15 @@ export function getRenderingMode( state ) {
  */
 export const getDeviceType = createRegistrySelector(
 	( select ) => ( state ) => {
-		const isZoomOut = unlock( select( blockEditorStore ) ).isZoomOut();
+		const blockEditorSelect = unlock( select( blockEditorStore ) );
+		const isZoomOut = blockEditorSelect.isZoomOut();
 		if ( isZoomOut ) {
 			return 'Desktop';
 		}
 		const canvasWidth = state.canvasWidth;
-		return getDeviceTypeByCanvasWidth( canvasWidth );
+		const viewportSettings =
+			blockEditorSelect.getSettings().__experimentalFeatures?.viewport;
+		return getDeviceTypeByCanvasWidth( canvasWidth, viewportSettings );
 	}
 );
 

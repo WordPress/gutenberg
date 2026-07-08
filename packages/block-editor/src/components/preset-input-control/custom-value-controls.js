@@ -71,7 +71,6 @@ export default function CustomValueControls( {
 			onFocus={ onMouseOver }
 			onMouseOut={ onMouseOut }
 			onMouseOver={ onMouseOver }
-			size="__unstable-large"
 			units={ units }
 			value={ [ parsedQuantity, computedUnit ].join( '' ) }
 			placeholder={ allPlaceholder }

@@ -67,7 +67,6 @@ export default function TextIndentControl( {
 		return (
 			<UnitControl
 				{ ...otherProps }
-				__next40pxDefaultSize
 				label={ __( 'Line indent' ) }
 				value={ value }
 				__unstableInputWidth={ __unstableInputWidth }
@@ -86,7 +85,6 @@ export default function TextIndentControl( {
 			<Flex>
 				<FlexItem isBlock>
 					<UnitControl
-						__next40pxDefaultSize
 						label={ __( 'Line indent' ) }
 						labelPosition="top"
 						hideLabelFromVision

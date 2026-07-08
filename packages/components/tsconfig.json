@@ -6,6 +6,7 @@
 			"gutenberg-env",
 			"gutenberg-test-env",
 			"jest",
+			"react-css-custom-properties",
 			"style-imports"
 		]
 	},

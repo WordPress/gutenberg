@@ -206,8 +206,6 @@ export default function BoxInputControl( {
 						<StyledUnitControl
 							{ ...props }
 							min={ min }
-							__shouldNotWarnDeprecated36pxSize
-							__next40pxDefaultSize
 							className="component-box-control__unit-control"
 							id={ inputId }
 							isPressEnterToChange
