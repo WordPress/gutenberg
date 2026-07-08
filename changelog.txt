@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 23.5.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Data Layer
+- Collaboration: Only report changed properties from the default sync configuration. ([79908](https://github.com/WordPress/gutenberg/pull/79908))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@adamsilverstein
+
+
 = 23.5.0 =
 
 ## Changelog

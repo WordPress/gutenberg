@@ -1,8 +1,10 @@
-'use strict';
+import { fileURLToPath } from 'node:url';
 
 /** @type {import('stylelint').Config} */
-module.exports = {
-	extends: [ 'stylelint-config-recommended' ].map( require.resolve ),
+export default {
+	extends: [ 'stylelint-config-recommended' ].map( ( m ) =>
+		fileURLToPath( import.meta.resolve( m ) )
+	),
 	plugins: [
 		'@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens',
 		'@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties',
