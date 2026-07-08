@@ -4,7 +4,7 @@
  */
 import {
 	cloneBlock,
-	__experimentalCloneSanitizedBlock,
+	cloneSanitizedBlock,
 	createBlock,
 	doBlocksMatchTemplate,
 	getBlockType,
@@ -1755,7 +1755,7 @@ export const duplicateBlocks =
 			clientIdsArray[ clientIdsArray.length - 1 ]
 		);
 		const clonedBlocks = blocks.map( ( block ) =>
-			__experimentalCloneSanitizedBlock( block )
+			cloneSanitizedBlock( block )
 		);
 		dispatch.insertBlocks(
 			clonedBlocks,

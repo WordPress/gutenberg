@@ -42,13 +42,13 @@ Snapshot Diff:
 @@ -1,8 +1,8 @@
   <div>
     <div
--     class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-14ezg3c-Footer-borderRadius-borderColor-medium-footerStyles components-card__footer components-card-footer"
-+     class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-zu9yjw-Footer-borderRadius-borderColor-medium-shady-footerStyles components-card__footer components-card-footer"
+-     class="style-flex style-items-row style-expanded-row components-flex css-14ezg3c-Footer-borderRadius-borderColor-medium-footerStyles components-card__footer components-card-footer"
++     class="style-flex style-items-row style-expanded-row components-flex css-zu9yjw-Footer-borderRadius-borderColor-medium-shady-footerStyles components-card__footer components-card-footer"
       data-wp-c16t="true"
       data-wp-component="CardFooter"
+      style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 2); --wp-components-flex-justify: space-between;"
     >
       Footer
-    </div>
 `;
 
 exports[`Card Card component CardFooter should use the justify prop to align its content, like a Flex container 1`] = `
@@ -56,16 +56,17 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -1,8 +1,8 @@
   <div>
     <div
--     class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-14ezg3c-Footer-borderRadius-borderColor-medium-footerStyles components-card__footer components-card-footer"
-+     class="css-a57899-Flex css-qs9i8n-base css-1ozeagb-ItemsRow components-flex css-14ezg3c-Footer-borderRadius-borderColor-medium-footerStyles components-card__footer components-card-footer"
+      class="style-flex style-items-row style-expanded-row components-flex css-14ezg3c-Footer-borderRadius-borderColor-medium-footerStyles components-card__footer components-card-footer"
       data-wp-c16t="true"
       data-wp-component="CardFooter"
+-     style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 2); --wp-components-flex-justify: space-between;"
++     style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 2); --wp-components-flex-justify: flex-end;"
     >
       Footer
     </div>
+  </div>
 `;
 
 exports[`Card Card component CardHeader should render with a darker background color when isShady is true 1`] = `
@@ -76,13 +77,13 @@ Snapshot Diff:
 @@ -1,8 +1,8 @@
   <div>
     <div
--     class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-knjbwb-Header-borderRadius-borderColor-medium-headerStyles components-card__header components-card-header"
-+     class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-1e8qxyk-Header-borderRadius-borderColor-medium-shady-headerStyles components-card__header components-card-header"
+-     class="style-flex style-items-row style-expanded-row components-flex css-knjbwb-Header-borderRadius-borderColor-medium-headerStyles components-card__header components-card-header"
++     class="style-flex style-items-row style-expanded-row components-flex css-1e8qxyk-Header-borderRadius-borderColor-medium-shady-headerStyles components-card__header components-card-header"
       data-wp-c16t="true"
       data-wp-component="CardHeader"
+      style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 2); --wp-components-flex-justify: space-between;"
     >
       Header
-    </div>
 `;
 
 exports[`Card Card component should add different amounts of white space when using the size prop 1`] = `
@@ -90,16 +91,17 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -6,18 +6,18 @@
+@@ -6,19 +6,19 @@
     >
       <div
         class="css-1ruapvy-Content"
       >
         <div
--         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-knjbwb-Header-borderRadius-borderColor-medium-headerStyles components-card__header components-card-header"
-+         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-1to91lo-Header-borderRadius-borderColor-large-headerStyles components-card__header components-card-header"
+-         class="style-flex style-items-row style-expanded-row components-flex css-knjbwb-Header-borderRadius-borderColor-medium-headerStyles components-card__header components-card-header"
++         class="style-flex style-items-row style-expanded-row components-flex css-1to91lo-Header-borderRadius-borderColor-large-headerStyles components-card__header components-card-header"
           data-wp-c16t="true"
           data-wp-component="CardHeader"
+          style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 2); --wp-components-flex-justify: space-between;"
         >
           Header
         </div>
@@ -132,16 +134,17 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -6,25 +6,25 @@
+@@ -6,26 +6,26 @@
     >
       <div
         class="css-1ruapvy-Content"
       >
         <div
--         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-1knfgzz-Header-borderRadius-borderColor-large-borderless-headerStyles components-card__header components-card-header"
-+         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-utqozr-Header-borderRadius-borderColor-small-headerStyles components-card__header components-card-header"
+-         class="style-flex style-items-row style-expanded-row components-flex css-1knfgzz-Header-borderRadius-borderColor-large-borderless-headerStyles components-card__header components-card-header"
++         class="style-flex style-items-row style-expanded-row components-flex css-utqozr-Header-borderRadius-borderColor-small-headerStyles components-card__header components-card-header"
           data-wp-c16t="true"
           data-wp-component="CardHeader"
+          style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 2); --wp-components-flex-justify: space-between;"
         >
           Header
         </div>
@@ -154,13 +157,13 @@ Snapshot Diff:
           Body
         </div>
         <div
--         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-jtu0fc-Footer-borderRadius-borderColor-large-borderless-footerStyles components-card__footer components-card-footer"
-+         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-egj1bt-Footer-borderRadius-borderColor-xSmallCardPadding-footerStyles components-card__footer components-card-footer"
+-         class="style-flex style-items-row style-expanded-row components-flex css-jtu0fc-Footer-borderRadius-borderColor-large-borderless-footerStyles components-card__footer components-card-footer"
++         class="style-flex style-items-row style-expanded-row components-flex css-egj1bt-Footer-borderRadius-borderColor-xSmallCardPadding-footerStyles components-card__footer components-card-footer"
           data-wp-c16t="true"
           data-wp-component="CardFooter"
+          style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 2); --wp-components-flex-justify: space-between;"
         >
           Footer
-        </div>
 `;
 
 exports[`Card Card component should pass the isBorderless and isSize props from its context to its sub-components 1`] = `
@@ -168,7 +171,7 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -1,30 +1,30 @@
+@@ -1,31 +1,31 @@
   <div>
     <div
 -     class="style-surface components-surface css-2wm9l0-Card-boxShadowless-rounded-cardStyles components-card"
@@ -180,10 +183,11 @@ Snapshot Diff:
         class="css-1ruapvy-Content"
       >
         <div
--         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-1knfgzz-Header-borderRadius-borderColor-large-borderless-headerStyles components-card__header components-card-header"
-+         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-utqozr-Header-borderRadius-borderColor-small-headerStyles components-card__header components-card-header"
+-         class="style-flex style-items-row style-expanded-row components-flex css-1knfgzz-Header-borderRadius-borderColor-large-borderless-headerStyles components-card__header components-card-header"
++         class="style-flex style-items-row style-expanded-row components-flex css-utqozr-Header-borderRadius-borderColor-small-headerStyles components-card__header components-card-header"
           data-wp-c16t="true"
           data-wp-component="CardHeader"
+          style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 2); --wp-components-flex-justify: space-between;"
         >
           Header
         </div>
@@ -196,13 +200,13 @@ Snapshot Diff:
           Body
         </div>
         <div
--         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-jtu0fc-Footer-borderRadius-borderColor-large-borderless-footerStyles components-card__footer components-card-footer"
-+         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-zrnqar-Footer-borderRadius-borderColor-small-footerStyles components-card__footer components-card-footer"
+-         class="style-flex style-items-row style-expanded-row components-flex css-jtu0fc-Footer-borderRadius-borderColor-large-borderless-footerStyles components-card__footer components-card-footer"
++         class="style-flex style-items-row style-expanded-row components-flex css-zrnqar-Footer-borderRadius-borderColor-small-footerStyles components-card__footer components-card-footer"
           data-wp-c16t="true"
           data-wp-component="CardFooter"
+          style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 2); --wp-components-flex-justify: space-between;"
         >
           Footer
-        </div>
 `;
 
 exports[`Card Card component should render correctly 1`] = `
@@ -217,117 +221,91 @@ exports[`Card Card component should render correctly 1`] = `
 }
 
 .emotion-2 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.emotion-3 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  gap: calc(4px * 2);
-  -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.emotion-4>* {
-  min-width: 0;
-}
-
-.emotion-5 {
   border-bottom: 1px solid;
   box-sizing: border-box;
   border-color: rgba(0, 0, 0, 0.1);
   padding: calc(4px * 4) calc(4px * 6);
 }
 
-.emotion-5:last-child {
+.emotion-2:last-child {
   border-bottom: none;
 }
 
-.emotion-5:first-of-type {
+.emotion-2:first-of-type {
   border-top-left-radius: calc(8px - 1px);
   border-top-right-radius: calc(8px - 1px);
 }
 
-.emotion-5:last-of-type {
+.emotion-2:last-of-type {
   border-bottom-left-radius: calc(8px - 1px);
   border-bottom-right-radius: calc(8px - 1px);
 }
 
-.emotion-6 {
+.emotion-3 {
   box-sizing: border-box;
   height: auto;
   max-height: 100%;
 }
 
-.emotion-7:first-of-type {
+.emotion-4:first-of-type {
   border-top-left-radius: calc(8px - 1px);
   border-top-right-radius: calc(8px - 1px);
 }
 
-.emotion-7:last-of-type {
+.emotion-4:last-of-type {
   border-bottom-left-radius: calc(8px - 1px);
   border-bottom-right-radius: calc(8px - 1px);
 }
 
-.emotion-8 {
+.emotion-5 {
   padding: calc(4px * 4) calc(4px * 6);
 }
 
-.emotion-12 {
+.emotion-9 {
   box-sizing: border-box;
   display: block;
   width: 100%;
 }
 
-.emotion-13 {
+.emotion-10 {
   border-color: rgba(0, 0, 0, 0.1);
 }
 
-.emotion-17 {
+.emotion-14 {
   box-sizing: border-box;
   overflow: hidden;
 }
 
-.emotion-17>img,
-.emotion-17>iframe {
+.emotion-14>img,
+.emotion-14>iframe {
   display: block;
   height: auto;
   max-width: 100%;
   width: 100%;
 }
 
-.emotion-22 {
+.emotion-16 {
   border-top: 1px solid;
   box-sizing: border-box;
   border-color: rgba(0, 0, 0, 0.1);
   padding: calc(4px * 4) calc(4px * 6);
 }
 
-.emotion-22:first-of-type {
+.emotion-16:first-of-type {
   border-top: none;
 }
 
-.emotion-22:first-of-type {
+.emotion-16:first-of-type {
   border-top-left-radius: calc(8px - 1px);
   border-top-right-radius: calc(8px - 1px);
 }
 
-.emotion-22:last-of-type {
+.emotion-16:last-of-type {
   border-bottom-left-radius: calc(8px - 1px);
   border-bottom-right-radius: calc(8px - 1px);
 }
 
-.emotion-23 {
+.emotion-17 {
   background: transparent;
   display: block;
   margin: 0!important;
@@ -344,13 +322,13 @@ exports[`Card Card component should render correctly 1`] = `
 }
 
 @media not ( prefers-reduced-motion ) {
-  .emotion-23 {
+  .emotion-17 {
     -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
     transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
   }
 }
 
-.emotion-24 {
+.emotion-18 {
   border-radius: 8px;
 }
 
@@ -364,21 +342,22 @@ exports[`Card Card component should render correctly 1`] = `
       class="emotion-1"
     >
       <div
-        class="emotion-2 emotion-3 emotion-4 components-flex emotion-5 components-card__header components-card-header"
+        class="style-flex style-items-row style-expanded-row components-flex emotion-2 components-card__header components-card-header"
         data-wp-c16t="true"
         data-wp-component="CardHeader"
+        style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 2); --wp-components-flex-justify: space-between;"
       >
         Card Header
       </div>
       <div
-        class="emotion-6 emotion-7 emotion-8 components-card__body components-card-body"
+        class="emotion-3 emotion-4 emotion-5 components-card__body components-card-body"
         data-wp-c16t="true"
         data-wp-component="CardBody"
       >
         Card Body 1
       </div>
       <div
-        class="emotion-6 emotion-7 emotion-8 components-card__body components-card-body"
+        class="emotion-3 emotion-4 emotion-5 components-card__body components-card-body"
         data-wp-c16t="true"
         data-wp-component="CardBody"
       >
@@ -386,20 +365,20 @@ exports[`Card Card component should render correctly 1`] = `
       </div>
       <hr
         aria-orientation="horizontal"
-        class="style-divider components-divider emotion-12 emotion-13 components-card__divider components-card-divider"
+        class="style-divider components-divider emotion-9 emotion-10 components-card__divider components-card-divider"
         data-wp-c16t="true"
         data-wp-component="CardDivider"
         role="separator"
       />
       <div
-        class="emotion-6 emotion-7 emotion-8 components-card__body components-card-body"
+        class="emotion-3 emotion-4 emotion-5 components-card__body components-card-body"
         data-wp-c16t="true"
         data-wp-component="CardBody"
       >
         Card Body 3
       </div>
       <div
-        class="emotion-17 emotion-7 components-card__media components-card-media"
+        class="emotion-14 emotion-4 components-card__media components-card-media"
         data-wp-c16t="true"
         data-wp-component="CardMedia"
       >
@@ -409,22 +388,23 @@ exports[`Card Card component should render correctly 1`] = `
         />
       </div>
       <div
-        class="emotion-2 emotion-3 emotion-4 components-flex emotion-22 components-card__footer components-card-footer"
+        class="style-flex style-items-row style-expanded-row components-flex emotion-16 components-card__footer components-card-footer"
         data-wp-c16t="true"
         data-wp-component="CardFooter"
+        style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 2); --wp-components-flex-justify: space-between;"
       >
         Card Footer
       </div>
     </div>
     <div
       aria-hidden="true"
-      class="emotion-23 components-elevation emotion-24"
+      class="emotion-17 components-elevation emotion-18"
       data-wp-c16t="true"
       data-wp-component="Elevation"
     />
     <div
       aria-hidden="true"
-      class="emotion-23 components-elevation emotion-24"
+      class="emotion-17 components-elevation emotion-18"
       data-wp-c16t="true"
       data-wp-component="Elevation"
     />

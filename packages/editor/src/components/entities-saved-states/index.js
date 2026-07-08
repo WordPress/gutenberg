@@ -27,10 +27,6 @@ import { useIsDirty } from './hooks/use-is-dirty';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-function identity( values ) {
-	return values;
-}
-
 /**
  * Renders the component for managing saved states of entities.
  *
@@ -79,7 +75,7 @@ export default function EntitiesSavedStates( {
 export function EntitiesSavedStatesExtensible( {
 	additionalPrompt = undefined,
 	close,
-	onSave = identity,
+	onSave = undefined,
 	saveEnabled: saveEnabledProp = undefined,
 	saveLabel = __( 'Save' ),
 	renderDialog,
