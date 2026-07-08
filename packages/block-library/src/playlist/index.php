@@ -91,9 +91,9 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	);
 
 	// Add waveform player container with translated button labels.
-	$label_play                         = esc_attr__( 'Play' );
-	$label_pause                        = esc_attr__( 'Pause' );
-	$label_seek                         = esc_attr__( 'Seek' );
+	$label_play  = esc_attr__( 'Play' );
+	$label_pause = esc_attr__( 'Pause' );
+	$label_seek  = esc_attr__( 'Seek' );
 	/* translators: %1$s: current audio time, %2$s: total audio duration. */
 	$label_seek_value                   = esc_attr_x(
 		'%1$s of %2$s',
