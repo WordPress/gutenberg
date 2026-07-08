@@ -4,7 +4,7 @@
 
 ### Internal
 
--   `Button`: Migrate hardcoded Sass color, spacing, and typography values to WPDS design tokens.
+-   `Button`: Migrate hardcoded Sass color, spacing, and typography values to WPDS design tokens ([#79993](https://github.com/WordPress/gutenberg/pull/79993)).
 
 ## 37.0.0 (2026-07-14)
 
