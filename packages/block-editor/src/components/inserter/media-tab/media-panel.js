@@ -84,12 +84,13 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const { createErrorNotice, createSuccessNotice, createWarningNotice } =
 		useDispatch( noticesStore );
 
-	// Attach/detach are first-party-only capabilities for local sources (the
-	// Attachments source). Categories registered through the public
-	// `registerInserterMediaCategory` API are always flagged as external, so this
-	// guard stops a third-party source from opting into the internal attach/detach
-	// workflow just by setting these props. It is also semantically correct:
-	// external resources can never own a post's attachments.
+	// The attach/detach workflow belongs to WordPress's built-in Attachments
+	// source, which manages images attached to the current post. Any category
+	// registered by an extender through the public `registerInserterMediaCategory`
+	// API is always flagged as an external resource, so this guard stops such a
+	// category from opting into that workflow just by setting these props. The
+	// guard also reflects the underlying semantics: an external resource can
+	// never own a post's attachments.
 	const supportsAttachments = ! category.isExternalResource;
 	const attach = supportsAttachments ? category.attach : undefined;
 	const detach = supportsAttachments ? category.detach : undefined;

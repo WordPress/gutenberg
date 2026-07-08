@@ -64,7 +64,7 @@ function renderPanel( category ) {
 }
 
 describe( 'MediaCategoryPanel attach/detach gating', () => {
-	it( 'exposes attach/detach for a first-party local source', () => {
+	it( 'exposes attach/detach for the built-in Attachments source', () => {
 		renderPanel( baseCategory );
 
 		expect(
@@ -77,9 +77,9 @@ describe( 'MediaCategoryPanel attach/detach gating', () => {
 	} );
 
 	it( 'ignores attach/detach when the source is an external resource', () => {
-		// Every category registered through the public
+		// Every category registered by an extender through the public
 		// `registerInserterMediaCategory` API is forced to `isExternalResource:
-		// true`, so a third-party source cannot opt into the internal workflow
+		// true`, so an extender-registered source cannot opt into the workflow
 		// even if it sets `attach`/`detach`.
 		renderPanel( { ...baseCategory, isExternalResource: true } );
 
