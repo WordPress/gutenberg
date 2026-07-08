@@ -91,15 +91,31 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	);
 
 	// Add waveform player container with translated button labels.
-	$label_play  = esc_attr__( 'Play' );
-	$label_pause = esc_attr__( 'Pause' );
-	$label_seek  = esc_attr__( 'Seek' );
+	$label_play                         = esc_attr__( 'Play' );
+	$label_pause                        = esc_attr__( 'Pause' );
+	$label_seek                         = esc_attr__( 'Seek' );
 	/* translators: %1$s: current audio time, %2$s: total audio duration. */
-	$label_seek_value = esc_attr_x(
+	$label_seek_value                   = esc_attr_x(
 		'%1$s of %2$s',
 		'audio current time of total duration'
 	);
-	$html             = '<div class="wp-block-playlist__waveform-player"
+	$waveform_color_data_attributes     = '';
+	$waveform_background_data_attribute = '';
+	if ( ! empty( $attributes['waveformColorValue'] ) ) {
+		$waveform_color_data_attributes = sprintf(
+			' data-waveform-player-color="%s"',
+			esc_attr( $attributes['waveformColorValue'] )
+		);
+	}
+	if ( ! empty( $attributes['waveformBackgroundColorValue'] ) ) {
+		$waveform_background_data_attribute = sprintf(
+			' data-waveform-player-background-color="%s"',
+			esc_attr( $attributes['waveformBackgroundColorValue'] )
+		);
+	}
+	$html = '<div class="wp-block-playlist__waveform-player"' .
+		$waveform_color_data_attributes .
+		$waveform_background_data_attribute . '
 		data-wp-watch="callbacks.initWaveformPlayer"
 		data-label-play="' . $label_play . '"
 		data-label-pause="' . $label_pause . '"

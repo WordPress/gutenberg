@@ -8,7 +8,11 @@ import { __, _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { initWaveformPlayer, updateSeekControlLabel } from './waveform-utils';
+import {
+	applyWaveformPlayerStyles,
+	initWaveformPlayer,
+	updateSeekControlLabel,
+} from './waveform-utils';
 
 const EMPTY_ARTIST_PLACEHOLDER = '\u00a0';
 
@@ -52,19 +56,37 @@ function updatePlayerMetadata( instance, { title, artist, image, imageAlt } ) {
 }
 
 /**
+ * Update custom colors on the generated waveform player container.
+ *
+ * @param {Object} player                 - The waveform player object.
+ * @param {Object} styles                 - The player styles.
+ * @param {string} styles.color           - The player color.
+ * @param {string} styles.backgroundColor - The player background color.
+ */
+function updatePlayerStyles( player, { color, backgroundColor } ) {
+	if ( ! player?.container ) {
+		return;
+	}
+
+	applyWaveformPlayerStyles( player.container, { color, backgroundColor } );
+}
+
+/**
  * A reusable WaveformPlayer component for the block editor.
  *
  * Renders an audio waveform visualization with play/pause controls.
- * Automatically inherits colors from the parent block's text color.
+ * Uses a provided color or falls back to the inherited text color.
  *
- * @param {Object}   props               - Component props.
- * @param {string}   props.src           - The audio file URL.
- * @param {string}   props.title         - The track title.
- * @param {string}   props.artist        - The artist name.
- * @param {string}   props.image         - The artwork image URL.
- * @param {string}   props.imageAlt      - The artwork image alt text.
- * @param {string}   props.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
- * @param {Function} props.onEnded       - Callback when the track finishes playing.
+ * @param {Object}   props                 - Component props.
+ * @param {string}   props.src             - The audio file URL.
+ * @param {string}   props.title           - The track title.
+ * @param {string}   props.artist          - The artist name.
+ * @param {string}   props.image           - The artwork image URL.
+ * @param {string}   props.imageAlt        - The artwork image alt text.
+ * @param {string}   props.color           - The player color.
+ * @param {string}   props.backgroundColor - The player background color.
+ * @param {string}   props.waveformStyle   - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {Function} props.onEnded         - Callback when the track finishes playing.
  * @return {Element} The WaveformPlayer element.
  */
 export function WaveformPlayer( {
@@ -73,6 +95,8 @@ export function WaveformPlayer( {
 	artist,
 	image,
 	imageAlt,
+	color,
+	backgroundColor,
 	waveformStyle,
 	onEnded,
 } ) {
@@ -83,6 +107,7 @@ export function WaveformPlayer( {
 	// during editor resizes.
 	const onEndedEvent = useEvent( onEnded );
 	const metadataRef = useRef( { title, artist, image, imageAlt } );
+	const stylesRef = useRef( { color, backgroundColor } );
 	const playerRef = useRef();
 
 	// The artwork element only exists when an image was present when the
@@ -110,6 +135,12 @@ export function WaveformPlayer( {
 		}
 	}, [ title, artist, image, imageAlt ] );
 
+	useEffect( () => {
+		stylesRef.current = { color, backgroundColor };
+
+		updatePlayerStyles( playerRef.current, stylesRef.current );
+	}, [ color, backgroundColor ] );
+
 	const ref = useRefEffect(
 		( element ) => {
 			if ( ! src ) {
@@ -126,6 +157,7 @@ export function WaveformPlayer( {
 				const player = initWaveformPlayer( element, {
 					src,
 					...metadataRef.current,
+					...stylesRef.current,
 					waveformStyle,
 					artist:
 						metadataRef.current.artist || EMPTY_ARTIST_PLACEHOLDER,
@@ -141,6 +173,7 @@ export function WaveformPlayer( {
 				} );
 				playerRef.current = player;
 				updatePlayerMetadata( player.instance, metadataRef.current );
+				updatePlayerStyles( player, stylesRef.current );
 				const { destroy } = player;
 				playerDestroy = destroy;
 			}
@@ -161,7 +194,7 @@ export function WaveformPlayer( {
 				playerDestroy?.();
 			};
 		},
-		[ onEndedEvent, src, waveformStyle, hasImage ]
+		[ onEndedEvent, src, waveformStyle, hasImage, color ]
 	);
 
 	return <div ref={ ref } className="wp-block-playlist__waveform-player" />;

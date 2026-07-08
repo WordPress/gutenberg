@@ -7,6 +7,7 @@ import '@testing-library/jest-dom';
  * Internal dependencies
  */
 import {
+	applyWaveformPlayerStyles,
 	createWaveformContainer,
 	styleSvgIcons,
 	setupPlayButtonAccessibility,
@@ -102,6 +103,52 @@ describe( 'Waveform utilities', () => {
 			} );
 
 			expect( container ).toHaveAttribute( 'data-height', '150' );
+		} );
+	} );
+
+	describe( 'applyWaveformPlayerStyles', () => {
+		it( 'should apply background color only to the waveform area', () => {
+			const container = document.createElement( 'div' );
+			const titleArea = document.createElement( 'div' );
+			const waveformContainer = document.createElement( 'div' );
+			waveformContainer.className = 'waveform-container';
+
+			container.appendChild( titleArea );
+			container.appendChild( waveformContainer );
+
+			applyWaveformPlayerStyles( container, {
+				color: '#111111',
+				backgroundColor: '#eeeeee',
+			} );
+
+			expect( container ).toHaveStyle( { color: '#111111' } );
+			expect( container ).not.toHaveStyle( {
+				backgroundColor: '#eeeeee',
+			} );
+			expect( titleArea ).not.toHaveStyle( {
+				backgroundColor: '#eeeeee',
+			} );
+			expect( waveformContainer ).toHaveStyle( {
+				backgroundColor: '#eeeeee',
+			} );
+		} );
+
+		it( 'should clear custom styles', () => {
+			const container = document.createElement( 'div' );
+			const waveformContainer = document.createElement( 'div' );
+			waveformContainer.className = 'waveform-container';
+			container.appendChild( waveformContainer );
+
+			applyWaveformPlayerStyles( container, {
+				color: '#111111',
+				backgroundColor: '#eeeeee',
+			} );
+			applyWaveformPlayerStyles( container );
+
+			expect( container ).not.toHaveStyle( { color: '#111111' } );
+			expect( waveformContainer ).not.toHaveStyle( {
+				backgroundColor: '#eeeeee',
+			} );
 		} );
 	} );
 

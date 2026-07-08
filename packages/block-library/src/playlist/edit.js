@@ -17,6 +17,9 @@ import {
 	BlockControls,
 	InspectorControls,
 	InnerBlocks,
+	withColors,
+	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -48,6 +51,10 @@ const PlaylistEdit = ( {
 	isSelected,
 	insertBlocksAfter,
 	clientId,
+	waveformColor,
+	setWaveformColor,
+	waveformBackgroundColor,
+	setWaveformBackgroundColor,
 } ) => {
 	const {
 		order,
@@ -56,15 +63,19 @@ const PlaylistEdit = ( {
 		showImages,
 		showArtists,
 		showTrackLength,
-		style,
-		textColor,
+		waveformColorValue,
+		waveformBackgroundColorValue,
 	} = attributes;
 
 	// Extract the waveform style from the block style variation class.
 	const waveformStyle =
 		attributes.className?.match( /is-style-([\w-]+)/ )?.[ 1 ] || 'bars';
 	const blockProps = useBlockProps();
-	const waveformColorKey = [ textColor, style?.color?.text ].join( '|' );
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+	const resolvedWaveformColor = waveformColor.color || waveformColorValue;
+	const resolvedWaveformBackgroundColor =
+		waveformBackgroundColor.color || waveformBackgroundColorValue;
+	const waveformPanelId = `${ clientId }-waveform`;
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -361,10 +372,76 @@ const PlaylistEdit = ( {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
+			{ colorGradientSettings.hasColorsOrGradients && (
+				<InspectorControls group="styles">
+					<ToolsPanel
+						label={ __( 'Waveform' ) }
+						resetAll={ () => {
+							setWaveformColor( undefined );
+							setWaveformBackgroundColor( undefined );
+							setAttributes( {
+								waveformColorValue: undefined,
+								waveformBackgroundColorValue: undefined,
+							} );
+						} }
+						panelId={ waveformPanelId }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<ColorGradientSettingsDropdown
+							__experimentalIsRenderedInSidebar
+							settings={ [
+								{
+									colorValue: resolvedWaveformColor,
+									label: __( 'Color' ),
+									onColorChange: ( colorValue ) => {
+										setWaveformColor( colorValue );
+										setAttributes( {
+											waveformColorValue: colorValue,
+										} );
+									},
+									isShownByDefault: true,
+									resetAllFilter: () => {
+										setWaveformColor( undefined );
+										setAttributes( {
+											waveformColorValue: undefined,
+										} );
+									},
+									enableAlpha: true,
+									clearable: true,
+								},
+								{
+									colorValue: resolvedWaveformBackgroundColor,
+									label: __( 'Background' ),
+									onColorChange: ( colorValue ) => {
+										setWaveformBackgroundColor(
+											colorValue
+										);
+										setAttributes( {
+											waveformBackgroundColorValue:
+												colorValue,
+										} );
+									},
+									isShownByDefault: true,
+									resetAllFilter: () => {
+										setWaveformBackgroundColor( undefined );
+										setAttributes( {
+											waveformBackgroundColorValue:
+												undefined,
+										} );
+									},
+									enableAlpha: true,
+									clearable: true,
+								},
+							] }
+							panelId={ waveformPanelId }
+							{ ...colorGradientSettings }
+						/>
+					</ToolsPanel>
+				</InspectorControls>
+			) }
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
 					<WaveformPlayer
-						key={ waveformColorKey }
 						src={ currentTrackData?.src }
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
@@ -378,6 +455,8 @@ const PlaylistEdit = ( {
 								? currentTrackData?.imageAlt
 								: undefined
 						}
+						color={ resolvedWaveformColor }
+						backgroundColor={ resolvedWaveformBackgroundColor }
 						waveformStyle={ waveformStyle }
 						onEnded={ onTrackEnded }
 					/>
@@ -410,4 +489,7 @@ const PlaylistEdit = ( {
 	);
 };
 
-export default PlaylistEdit;
+export default withColors(
+	{ waveformColor: 'color' },
+	{ waveformBackgroundColor: 'background-color' }
+)( PlaylistEdit );

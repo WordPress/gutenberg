@@ -38,6 +38,24 @@
 			"type": "boolean",
 			"default": true
 		},
+		"waveformColor": {
+			"type": "string"
+		},
+		"customWaveformColor": {
+			"type": "string"
+		},
+		"waveformColorValue": {
+			"type": "string"
+		},
+		"waveformBackgroundColor": {
+			"type": "string"
+		},
+		"customWaveformBackgroundColor": {
+			"type": "string"
+		},
+		"waveformBackgroundColorValue": {
+			"type": "string"
+		},
 		"caption": {
 			"type": "string"
 		}

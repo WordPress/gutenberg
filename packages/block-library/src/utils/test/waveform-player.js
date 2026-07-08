@@ -8,9 +8,13 @@ import { act, render } from '@testing-library/react';
  * Internal dependencies
  */
 import { WaveformPlayer } from '../waveform-player';
-import { initWaveformPlayer } from '../waveform-utils';
+import {
+	applyWaveformPlayerStyles,
+	initWaveformPlayer,
+} from '../waveform-utils';
 
 jest.mock( '../waveform-utils', () => ( {
+	applyWaveformPlayerStyles: jest.fn(),
 	initWaveformPlayer: jest.fn(),
 	updateSeekControlLabel: jest.fn(),
 } ) );
@@ -24,6 +28,10 @@ jest.mock( '../waveform-utils', () => ( {
  * @return {Object} The fake player.
  */
 function createFakePlayer( options, element ) {
+	const container = document.createElement( 'div' );
+	const waveformContainer = document.createElement( 'div' );
+	waveformContainer.className = 'waveform-container';
+
 	const titleEl = document.createElement( 'span' );
 	titleEl.textContent = options.title ?? '';
 	// The subtitle and artwork elements only exist when the track had an
@@ -40,16 +48,20 @@ function createFakePlayer( options, element ) {
 		artworkEl.alt = options.imageAlt || '';
 	}
 
-	element.append( titleEl );
+	container.append( titleEl );
 	if ( subtitleEl ) {
-		element.append( subtitleEl );
+		container.append( subtitleEl );
 	}
 	if ( artworkEl ) {
-		element.append( artworkEl );
+		container.append( artworkEl );
 	}
+	container.append( waveformContainer );
+	element.append( container );
 
 	return {
 		instance: { titleEl, subtitleEl, artworkEl },
+		container,
+		waveformContainer,
 		destroy: jest.fn(),
 	};
 }
@@ -65,6 +77,7 @@ describe( 'WaveformPlayer', () => {
 	afterEach( () => {
 		jest.runOnlyPendingTimers();
 		jest.useRealTimers();
+		applyWaveformPlayerStyles.mockReset();
 		initWaveformPlayer.mockReset();
 	} );
 
@@ -155,9 +168,9 @@ describe( 'WaveformPlayer', () => {
 		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 2 );
 	} );
 
-	it( 'destroys the player when remounted', () => {
+	it( 'recreates the player when the color changes', () => {
 		const { rerender } = render(
-			<WaveformPlayer key="before" { ...baseProps } />
+			<WaveformPlayer { ...baseProps } color="#000000" />
 		);
 
 		act( () => {
@@ -165,8 +178,15 @@ describe( 'WaveformPlayer', () => {
 		} );
 
 		const player = initWaveformPlayer.mock.results[ 0 ].value;
+		expect( initWaveformPlayer.mock.calls[ 0 ][ 0 ] ).not.toHaveStyle( {
+			color: '#000000',
+		} );
+		expect( applyWaveformPlayerStyles ).toHaveBeenLastCalledWith(
+			player.container,
+			expect.objectContaining( { color: '#000000' } )
+		);
 
-		rerender( <WaveformPlayer key="after" { ...baseProps } /> );
+		rerender( <WaveformPlayer { ...baseProps } color="#ffffff" /> );
 
 		act( () => {
 			jest.advanceTimersByTime( 100 );
@@ -174,6 +194,54 @@ describe( 'WaveformPlayer', () => {
 
 		expect( player.destroy ).toHaveBeenCalledTimes( 1 );
 		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 2 );
+		const secondPlayer = initWaveformPlayer.mock.results[ 1 ].value;
+		expect( initWaveformPlayer.mock.calls[ 1 ][ 0 ] ).not.toHaveStyle( {
+			color: '#ffffff',
+		} );
+		expect( applyWaveformPlayerStyles ).toHaveBeenLastCalledWith(
+			secondPlayer.container,
+			expect.objectContaining( { color: '#ffffff' } )
+		);
+	} );
+
+	it( 'updates the background color without recreating the player', () => {
+		const { rerender } = render(
+			<WaveformPlayer { ...baseProps } backgroundColor="#eeeeee" />
+		);
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		const player = initWaveformPlayer.mock.results[ 0 ].value;
+		const element = initWaveformPlayer.mock.calls[ 0 ][ 0 ];
+		expect( element ).not.toHaveStyle( {
+			backgroundColor: '#eeeeee',
+		} );
+		expect( player.container ).not.toHaveStyle( {
+			backgroundColor: '#eeeeee',
+		} );
+		expect( applyWaveformPlayerStyles ).toHaveBeenLastCalledWith(
+			player.container,
+			expect.objectContaining( { backgroundColor: '#eeeeee' } )
+		);
+
+		rerender(
+			<WaveformPlayer { ...baseProps } backgroundColor="#222222" />
+		);
+
+		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 1 );
+		expect( player.destroy ).not.toHaveBeenCalled();
+		expect( element ).not.toHaveStyle( {
+			backgroundColor: '#222222',
+		} );
+		expect( player.container ).not.toHaveStyle( {
+			backgroundColor: '#222222',
+		} );
+		expect( applyWaveformPlayerStyles ).toHaveBeenLastCalledWith(
+			player.container,
+			expect.objectContaining( { backgroundColor: '#222222' } )
+		);
 	} );
 
 	it( 'recreates the player to show an image added to a track that had none', () => {

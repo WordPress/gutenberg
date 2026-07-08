@@ -29,6 +29,12 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `showArtists` | `boolean` | `true` | — |
 | `showNumbers` | `boolean` | `true` | — |
 | `showTrackLength` | `boolean` | `true` | — |
+| `waveformColor` | `string` | — | — |
+| `customWaveformColor` | `string` | — | — |
+| `waveformColorValue` | `string` | — | — |
+| `waveformBackgroundColor` | `string` | — | — |
+| `customWaveformBackgroundColor` | `string` | — | — |
+| `waveformBackgroundColorValue` | `string` | — | — |
 | `caption` | `string` | — | — |
 
 ## Supports

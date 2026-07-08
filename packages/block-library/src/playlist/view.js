@@ -118,6 +118,8 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		artist: track.artist,
 		image: track.image,
 		imageAlt: track.imageAlt,
+		color: ref.dataset.waveformPlayerColor,
+		backgroundColor: ref.dataset.waveformPlayerBackgroundColor,
 		autoPlay: shouldAutoPlay,
 		labels,
 		waveformStyle: context.waveformStyle,

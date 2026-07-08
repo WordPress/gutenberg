@@ -29,11 +29,12 @@ function getComputedStyle( element ) {
 /**
  * Get all colors needed for the waveform player based on the element's styles.
  *
- * @param {Element} element - The element to derive colors from.
+ * @param {Element} element   - The element to derive colors from.
+ * @param {string}  textValue - The text color value to use.
  * @return {Object} Object containing textColor, waveformColor, and progressColor.
  */
-export function getWaveformColors( element ) {
-	const textColor = getComputedStyle( element ).color;
+export function getWaveformColors( element, textValue ) {
+	const textColor = textValue || getComputedStyle( element ).color;
 	const waveformColor = colord( textColor ).alpha( 0.3 ).toRgbString();
 	const progressColor = colord( textColor ).alpha( 0.6 ).toRgbString();
 
@@ -99,6 +100,36 @@ export function createWaveformContainer( {
 		container.setAttribute( 'data-artwork', artwork );
 	}
 	return container;
+}
+
+/**
+ * Apply custom styles to a generated waveform player.
+ *
+ * @param {Element} container              - The generated player container.
+ * @param {Object}  styles                 - The player styles.
+ * @param {string}  styles.color           - The player color.
+ * @param {string}  styles.backgroundColor - The waveform area background color.
+ */
+export function applyWaveformPlayerStyles(
+	container,
+	{ color, backgroundColor } = {}
+) {
+	if ( color ) {
+		container.style.color = color;
+	} else {
+		container.style.removeProperty( 'color' );
+	}
+
+	const waveformContainer = container.querySelector( '.waveform-container' );
+	if ( ! waveformContainer ) {
+		return;
+	}
+
+	if ( backgroundColor ) {
+		waveformContainer.style.backgroundColor = backgroundColor;
+	} else {
+		waveformContainer.style.removeProperty( 'background-color' );
+	}
 }
 
 /**
@@ -204,17 +235,19 @@ export function logPlayError( error ) {
  * This is the shared core logic used by both the React component (editor)
  * and the Interactivity API (frontend).
  *
- * @param {Element}  element               - The container element (must be in DOM).
- * @param {Object}   options               - Configuration options.
- * @param {string}   options.src           - The audio file URL.
- * @param {string}   options.title         - The track title.
- * @param {string}   options.artist        - The artist name.
- * @param {string}   options.image         - The artwork image URL.
- * @param {string}   options.imageAlt      - The artwork image alt text.
- * @param {boolean}  options.autoPlay      - Whether to auto-play when ready.
- * @param {Function} options.onEnded       - Callback when track ends.
- * @param {Object}   options.labels        - Translated button labels.
- * @param {string}   options.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {Element}  element                 - The container element (must be in DOM).
+ * @param {Object}   options                 - Configuration options.
+ * @param {string}   options.src             - The audio file URL.
+ * @param {string}   options.title           - The track title.
+ * @param {string}   options.artist          - The artist name.
+ * @param {string}   options.image           - The artwork image URL.
+ * @param {string}   options.imageAlt        - The artwork image alt text.
+ * @param {string}   options.color           - The player color.
+ * @param {string}   options.backgroundColor - The player background color.
+ * @param {boolean}  options.autoPlay        - Whether to auto-play when ready.
+ * @param {Function} options.onEnded         - Callback when track ends.
+ * @param {Object}   options.labels          - Translated button labels.
+ * @param {string}   options.waveformStyle   - Waveform style (bars, mirror, line, blocks, dots, seekbar).
  * @return {Object} Object with element, instance, container, and destroy function.
  */
 export function initWaveformPlayer(
@@ -225,6 +258,8 @@ export function initWaveformPlayer(
 		artist,
 		image,
 		imageAlt,
+		color,
+		backgroundColor,
 		autoPlay,
 		onEnded,
 		labels,
@@ -232,8 +267,10 @@ export function initWaveformPlayer(
 	}
 ) {
 	// Get colors from computed styles.
-	const { textColor, waveformColor, progressColor } =
-		getWaveformColors( element );
+	const { textColor, waveformColor, progressColor } = getWaveformColors(
+		element,
+		color
+	);
 
 	// Create the waveform container.
 	const container = createWaveformContainer( {
@@ -257,6 +294,7 @@ export function initWaveformPlayer(
 	if ( instance.artworkEl ) {
 		instance.artworkEl.alt = imageAlt || '';
 	}
+	applyWaveformPlayerStyles( container, { color, backgroundColor } );
 
 	// Set up event handlers.
 	let cleanupPlayButtonAccessibility;
