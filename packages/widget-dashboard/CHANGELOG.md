@@ -16,6 +16,8 @@
 
 -   Widget grid: reserve top paint space for outward tile focus rings so scroll
     containers do not clip the widget chrome outline.
+-   CSS Modules: rename camelCase class selectors to kebab-case in
+    `@wordpress/widget-dashboard`.
 -   `WidgetHeader`: surface the widget type's `help` note as an infotip
     beside the title: a click-open popover with the note and its links.
 -   Widget inserter: render more accurate widget previews.

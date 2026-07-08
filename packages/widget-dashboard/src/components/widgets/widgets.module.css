@@ -20,11 +20,11 @@
  * Edit-mode tiles stay at resting elevation (`xs`) on hover; only the
  * drag preview (`.drag-preview-frame` on `@wordpress/grid`) lifts to `md`.
  */
-.tileEditMode {
+.tile-edit-mode {
 	box-shadow: var(--wpds-elevation-xs);
 }
 
-.tileEditMode:focus-visible {
+.tile-edit-mode:focus-visible {
 	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
 	outline-offset: var(--wp-widget-dashboard-tile-focus-offset, 2px);
 }
@@ -37,10 +37,10 @@
  * `.drag-preview-frame` (`md` while dragging); strip the cloned tile shadow so it
  * does not stack on the frame.
  */
-.dragPreview {
+.drag-preview {
 	height: 100%;
 }
 
-.dragPreview .tile {
+.drag-preview .tile {
 	box-shadow: none;
 }
