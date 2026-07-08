@@ -33,6 +33,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -386,56 +387,66 @@ const PlaylistEdit = ( {
 						} }
 						panelId={ waveformPanelId }
 						dropdownMenuProps={ dropdownMenuProps }
+						__experimentalFirstVisibleItemClass="first"
+						__experimentalLastVisibleItemClass="last"
 					>
-						<ColorGradientSettingsDropdown
-							__experimentalIsRenderedInSidebar
-							settings={ [
-								{
-									colorValue: resolvedWaveformColor,
-									label: __( 'Color' ),
-									onColorChange: ( colorValue ) => {
-										setWaveformColor( colorValue );
-										setAttributes( {
-											waveformColorValue: colorValue,
-										} );
+						<Stack
+							direction="column"
+							style={ { gridColumn: '1 / -1' } }
+						>
+							<ColorGradientSettingsDropdown
+								__experimentalIsRenderedInSidebar
+								settings={ [
+									{
+										colorValue: resolvedWaveformColor,
+										label: __( 'Color' ),
+										onColorChange: ( colorValue ) => {
+											setWaveformColor( colorValue );
+											setAttributes( {
+												waveformColorValue: colorValue,
+											} );
+										},
+										isShownByDefault: true,
+										resetAllFilter: () => {
+											setWaveformColor( undefined );
+											setAttributes( {
+												waveformColorValue: undefined,
+											} );
+										},
+										enableAlpha: true,
+										clearable: true,
 									},
-									isShownByDefault: true,
-									resetAllFilter: () => {
-										setWaveformColor( undefined );
-										setAttributes( {
-											waveformColorValue: undefined,
-										} );
+									{
+										colorValue:
+											resolvedWaveformBackgroundColor,
+										label: __( 'Background' ),
+										onColorChange: ( colorValue ) => {
+											setWaveformBackgroundColor(
+												colorValue
+											);
+											setAttributes( {
+												waveformBackgroundColorValue:
+													colorValue,
+											} );
+										},
+										isShownByDefault: true,
+										resetAllFilter: () => {
+											setWaveformBackgroundColor(
+												undefined
+											);
+											setAttributes( {
+												waveformBackgroundColorValue:
+													undefined,
+											} );
+										},
+										enableAlpha: true,
+										clearable: true,
 									},
-									enableAlpha: true,
-									clearable: true,
-								},
-								{
-									colorValue: resolvedWaveformBackgroundColor,
-									label: __( 'Background' ),
-									onColorChange: ( colorValue ) => {
-										setWaveformBackgroundColor(
-											colorValue
-										);
-										setAttributes( {
-											waveformBackgroundColorValue:
-												colorValue,
-										} );
-									},
-									isShownByDefault: true,
-									resetAllFilter: () => {
-										setWaveformBackgroundColor( undefined );
-										setAttributes( {
-											waveformBackgroundColorValue:
-												undefined,
-										} );
-									},
-									enableAlpha: true,
-									clearable: true,
-								},
-							] }
-							panelId={ waveformPanelId }
-							{ ...colorGradientSettings }
-						/>
+								] }
+								panelId={ waveformPanelId }
+								{ ...colorGradientSettings }
+							/>
+						</Stack>
 					</ToolsPanel>
 				</InspectorControls>
 			) }
