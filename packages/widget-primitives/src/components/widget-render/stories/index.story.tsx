@@ -367,7 +367,6 @@ const demoWidgetTypeWithRelevance: WidgetType< DemoAttributes > = {
 			label: 'Greeting',
 			type: 'text',
 			isValid: { required: true },
-			relevance: 'high',
 		},
 		{
 			id: 'world',
@@ -377,6 +376,7 @@ const demoWidgetTypeWithRelevance: WidgetType< DemoAttributes > = {
 				value,
 				label,
 			} ) ),
+			relevance: 'high',
 		},
 	] satisfies WidgetAttributeField< DemoAttributes >[],
 };
@@ -458,9 +458,14 @@ function WidgetWithRelevance() {
 								/>
 							</span>
 						) }
-						<Card.Title id={ titleId } render={ <h3 /> }>
+						<Card.Title
+							id={ titleId }
+							render={ <h3 /> }
+							style={ { flexGrow: 1 } }
+						>
 							{ demoWidgetTypeWithRelevance.title }
 						</Card.Title>
+
 						{ prominentFields.length > 0 && (
 							<DataForm< DemoAttributes >
 								data={ attributes }
