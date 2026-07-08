@@ -379,6 +379,33 @@ test.describe( 'data-wp-input', () => {
 	} );
 
 	/* ------------------------------------------------------------------ */
+	/*  15. File input                                                     */
+	/* ------------------------------------------------------------------ */
+	test.skip( 'should handle file input', async ( { page } ) => {
+		const countOutput = page.getByTestId( 'file-count-output' );
+		const fileInput = page.getByTestId( 'file-input' );
+
+		await expect( countOutput ).toHaveText( '0' );
+
+		await fileInput.setInputFiles( {
+			name: 'test.txt',
+			mimeType: 'text/plain',
+			buffer: Buffer.from( 'hello world' ),
+		} );
+
+		// The file input runs FileReader asynchronously; wait for it.
+		await page.waitForFunction(
+			() => {
+				const el = document.querySelector(
+					'[data-testid="file-count-output"]'
+				);
+				return el && el.textContent === '1';
+			},
+			{ timeout: 15000 }
+		);
+	} );
+
+	/* ------------------------------------------------------------------ */
 	/*  11. Element→signal seeding (state undefined → adopt DOM value)     */
 	/* ------------------------------------------------------------------ */
 	test( 'should retain HTML value and respond to input for undefined state', async ( {

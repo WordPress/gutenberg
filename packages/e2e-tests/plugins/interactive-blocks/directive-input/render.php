@@ -329,6 +329,25 @@
 		</button>
 	</div>
 
+	<!-- 15. File input -->
+	<div>
+		<p data-wp-text="state.fileCount" data-testid="file-count-output">0</p>
+		<input
+			type="file"
+			data-testid="file-input"
+			data-wp-input="state.fileData"
+		/>
+
+		<div data-wp-context='{ "ctxFileData": [] }'>
+			<p data-wp-text="context.ctxFileData" data-testid="ctx-file-count-output"></p>
+			<input
+				type="file"
+				data-testid="ctx-file-input"
+				data-wp-input="context.ctxFileData"
+			/>
+		</div>
+	</div>
+
 	<!-- 11. Element→signal seeding (state.seededVal NOT defined in view.js) -->
 	<div>
 		<p data-wp-text="state.seededVal" data-testid="seed-output"></p>
