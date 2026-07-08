@@ -494,6 +494,15 @@ class MediaUpload extends Component {
 		// until the editor reloads. Invalidate the cached attachment queries on
 		// close so they refetch — mirroring the core-data-native media modal,
 		// which does the same on upload completion.
+		//
+		// This targets the default registry via the module-level `select` and
+		// `dispatch` rather than the contextual one. As a class component
+		// extended by plugins through the `editor.MediaUpload` filter, it can't
+		// read the contextual registry without `withRegistry`/`useRegistry`,
+		// which would break that subclassing contract (see
+		// https://github.com/WordPress/gutenberg/pull/70648). The editor runs on
+		// the default registry in practice, so the only case this misses is a
+		// custom registry, where the invalidation is effectively a no-op.
 		invalidateAttachmentResolutions( { select, dispatch } );
 
 		this.frame.detach();
