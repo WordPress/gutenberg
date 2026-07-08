@@ -250,11 +250,10 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			// Regression: `BorderBoxControl`'s built-in label is a styled
 			// component with no `.components-base-control__label`
 			// classname, so when the panel passed its visible "Border"
-			// label via that prop neither the synced-purple text rule
-			// nor the portaled local-override dot could find a target.
+			// label via that prop the inheritance treatment had no target.
 			// The panel must render its own `BaseControl.VisualLabel`
-			// inside the `ToolsPanelItem` so both visual treatments
-			// land on the Border control as designed.
+			// inside the `ToolsPanelItem` so the treatment lands on the
+			// Border control as designed.
 			const inheritedValue = {
 				border: {
 					color: '#000000',
