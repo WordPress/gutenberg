@@ -86,7 +86,7 @@
 ### Enhancements
 
 -   Use `--wpds-cursor-control` for interactive cursor styling and replace all instances ([#77354](https://github.com/WordPress/gutenberg/pull/77354)).
--   Inspector controls in the standard block-supports panels (Typography, Dimensions, Border, Color, Background, Filters) now reflect the value the block is inheriting from Global Styles whenever no local override is set. The control's label is rendered in the synced-purple accent colour (with a tooltip explaining "Inherited from Global Styles"); when the user sets a local override on top of an inherited value the label returns to default and a small synced-purple dot marks the override. Inputs additionally surface the inherited value via the native HTML `placeholder` attribute. Mounting, focusing, hovering, or tabbing onto an at-rest control does not commit; the local attribute is set only on explicit user activation. Reset strips the local attribute and the inherited value reappears at-rest. See [`docs/reference-guides/block-api/block-supports.md`](../../docs/reference-guides/block-api/block-supports.md#inherited-global-styles-values-in-inspector-panels) for the full rendering rules and known limitations.
+-   Inspector controls in the standard block-supports panels (Typography, Dimensions, Border, Color, Background, Filters) now reflect the value a block inherits from Global Styles when no local override is set. Inherited controls show that value at rest (as a placeholder, preselected option, or resolved value) and mark the label with a dotted underline; setting a local override reveals a reset affordance that clears the override back to the inherited value ([#77894](https://github.com/WordPress/gutenberg/pull/77894)).
 
 ## 15.17.0 (2026-04-15)
 
