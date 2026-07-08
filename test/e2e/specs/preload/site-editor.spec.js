@@ -83,7 +83,9 @@ test.describe( 'Preload', () => {
 		// To do: these should all be removed or preloaded.
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
-				`GET /wp/v2/comments?context=edit&post=${ pageId }&type=note&status=all&per_page=100`,
+				// The notes resolver streams pages via RECEIVE_INTERMEDIATE_RESULTS,
+				// so the request carries an explicit `page` param (page 1 here).
+				`GET /wp/v2/comments?context=edit&post=${ pageId }&type=note&status=all&per_page=100&page=1`,
 				`GET /wp/v2/pages/${ pageId }/autosaves?context=edit`,
 				'GET /wp/v2/taxonomies?context=edit',
 				'GET /wp/v2/templates/lookup?slug=front-page',

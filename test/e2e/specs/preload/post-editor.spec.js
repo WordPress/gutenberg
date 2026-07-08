@@ -81,7 +81,9 @@ test.describe( 'Preload', () => {
 		// To do: these should all be removed or preloaded.
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
-				`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
+				// The notes resolver streams pages via RECEIVE_INTERMEDIATE_RESULTS,
+				// so the request carries an explicit `page` param (page 1 here).
+				`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100&page=1`,
 				'POST /wp-sync/v1/save',
 				'POST /wp-sync/v1/updates',
 				'POST /wp/v2/users/me',
