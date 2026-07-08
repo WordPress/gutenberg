@@ -33,28 +33,31 @@ describe( 'firstTimeContributorLabel', () => {
 
 		const octokit = {
 			rest: {
-				repos: {
-					listCommits: jest.fn(),
+				search: {
+					commits: jest.fn(),
 				},
 			},
 		};
 
 		await firstTimeContributorLabel( payloadForBot, octokit );
 
-		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
+		expect( octokit.rest.search.commits ).not.toHaveBeenCalled();
 	} );
 
 	it( 'does nothing if the user has at least one commit', async () => {
 		const octokit = {
 			rest: {
-				repos: {
-					listCommits: jest.fn( () =>
+				search: {
+					commits: jest.fn( () =>
 						Promise.resolve( {
-							data: [
-								{
-									sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
-								},
-							],
+							data: {
+								total_count: 1,
+								items: [
+									{
+										sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
+									},
+								],
+							},
 						} )
 					),
 				},
@@ -67,10 +70,9 @@ describe( 'firstTimeContributorLabel', () => {
 
 		await firstTimeContributorLabel( payload, octokit );
 
-		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			author: 'ghost',
+		expect( octokit.rest.search.commits ).toHaveBeenCalledWith( {
+			q: 'repo:WordPress/gutenberg author:ghost',
+			per_page: 1,
 		} );
 		expect( octokit.rest.issues.addLabels ).not.toHaveBeenCalled();
 		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
@@ -79,10 +81,13 @@ describe( 'firstTimeContributorLabel', () => {
 	it( 'adds the First Time Contributor label if the user has no commits', async () => {
 		const octokit = {
 			rest: {
-				repos: {
-					listCommits: jest.fn( () =>
+				search: {
+					commits: jest.fn( () =>
 						Promise.resolve( {
-							data: [],
+							data: {
+								total_count: 0,
+								items: [],
+							},
 						} )
 					),
 				},
@@ -100,10 +105,9 @@ describe( 'firstTimeContributorLabel', () => {
 
 		await firstTimeContributorLabel( payload, octokit );
 
-		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			author: 'ghost',
+		expect( octokit.rest.search.commits ).toHaveBeenCalledWith( {
+			q: 'repo:WordPress/gutenberg author:ghost',
+			per_page: 1,
 		} );
 		expect( octokit.rest.issues.addLabels ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
