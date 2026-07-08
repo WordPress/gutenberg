@@ -1,7 +1,31 @@
 /**
+ * External dependencies
+ */
+import type { Page } from '@playwright/test';
+
+/**
  * Internal dependencies
  */
 import { test, expect } from './fixtures';
+
+/**
+ * Chooses a display option from the Notes dropdown in the top bar. The dropdown
+ * appears once the post has notes, which may take a moment after a note syncs.
+ *
+ * @param page The page to act on.
+ * @param view The dropdown choice, e.g. 'Show all notes'.
+ */
+async function chooseNotesView( page: Page, view: string ) {
+	const notesButton = page
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'Notes', exact: true } );
+	await expect( notesButton ).toBeVisible( { timeout: 10000 } );
+	await notesButton.click();
+	await page.getByRole( 'menuitemradio', { name: view } ).click();
+	// Selecting a choice leaves the dropdown open; close it so it doesn't
+	// overlap later interactions.
+	await page.keyboard.press( 'Escape' );
+}
 
 test.describe( 'Collaboration - Notes Sync', () => {
 	test.afterAll( async ( { requestUtils } ) => {
@@ -53,16 +77,7 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await collaborationUtils.waitForSyncCycle( page2 );
 
 		// Open the All Notes sidebar on User B's page.
-		const toggleButton = page2
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'All notes', exact: true } );
-
-		// The button may need a moment to appear after the note syncs.
-		await expect( toggleButton ).toBeVisible( { timeout: 10000 } );
-		const isExpanded = await toggleButton.getAttribute( 'aria-expanded' );
-		if ( isExpanded === 'false' ) {
-			await toggleButton.click();
-		}
+		await chooseNotesView( page2, 'Show all notes' );
 
 		// User B should see the note from User A.
 		await expect(
@@ -126,14 +141,7 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await collaborationUtils.waitForSyncCycle( page );
 
 		// Open notes sidebar on User A's page.
-		const toggleButton = page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'All notes', exact: true } );
-		await expect( toggleButton ).toBeVisible( { timeout: 10000 } );
-		const isExpanded = await toggleButton.getAttribute( 'aria-expanded' );
-		if ( isExpanded === 'false' ) {
-			await toggleButton.click();
-		}
+		await chooseNotesView( page, 'Show all notes' );
 
 		// User A should see the note from User B.
 		await expect(
@@ -200,14 +208,7 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await collaborationUtils.waitForSyncCycle( page2 );
 
 		// Open notes sidebar on User B's page.
-		const toggleButton = page2
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'All notes', exact: true } );
-		await expect( toggleButton ).toBeVisible( { timeout: 10000 } );
-		const isExpanded = await toggleButton.getAttribute( 'aria-expanded' );
-		if ( isExpanded === 'false' ) {
-			await toggleButton.click();
-		}
+		await chooseNotesView( page2, 'Show all notes' );
 
 		// User B should see the main note.
 		const thread = page2

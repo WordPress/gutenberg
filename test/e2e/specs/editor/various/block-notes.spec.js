@@ -39,11 +39,8 @@ test.describe( 'Block Notes', () => {
 
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
 		await expect( form ).toBeFocused();
-		// Close the pinned notes sidebar.
-		await page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'All notes', exact: true } )
-			.click();
+		// Hide the notes sidebars via the Notes dropdown.
+		await blockNoteUtils.chooseNotesView( 'Hide notes' );
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
 		await expect( form ).toBeFocused();
 	} );
@@ -156,7 +153,7 @@ test.describe( 'Block Notes', () => {
 			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment to resolve.',
 		} );
-		await blockNoteUtils.openBlockNoteSidebar();
+		await blockNoteUtils.chooseNotesView( 'Show all notes' );
 
 		const thread = page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -206,7 +203,7 @@ test.describe( 'Block Notes', () => {
 				.filter( { hasText: 'Note marked as resolved.' } )
 		).toBeVisible();
 
-		await blockNoteUtils.openBlockNoteSidebar();
+		await blockNoteUtils.chooseNotesView( 'Show all notes' );
 		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
 		await expect( resolveButton ).toBeDisabled();
 		const commentForm = page.getByRole( 'textbox', { name: 'Reply to' } );
@@ -1476,6 +1473,116 @@ test.describe( 'Block Notes', () => {
 			await expect.poll( alphaOf ).toBeGreaterThan( 0.4 );
 		} );
 	} );
+
+	test.describe( 'Notes visibility toggle', () => {
+		test( 'shows the display options with the current state selected', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Toggle menu block' },
+				comment: 'Toggle menu note',
+			} );
+
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Notes', exact: true } )
+				.click();
+
+			const menu = page.getByRole( 'menu', {
+				name: 'Notes display options',
+			} );
+			await expect( menu.getByRole( 'menuitemradio' ) ).toHaveText( [
+				'Show notes',
+				'Show all notes',
+				'Hide notes',
+			] );
+			// The floating notes are visible by default, so "Show notes" is
+			// the selected choice.
+			await expect(
+				menu.getByRole( 'menuitemradio', {
+					name: 'Show notes',
+					exact: true,
+				} )
+			).toHaveAttribute( 'aria-checked', 'true' );
+			await page.keyboard.press( 'Escape' );
+		} );
+
+		test( 'can hide and show notes', async ( { page, blockNoteUtils } ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Hide and show' },
+				comment: 'Now you see me',
+			} );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Now you see me' } );
+			await expect( thread ).toBeVisible();
+
+			await blockNoteUtils.chooseNotesView( 'Hide notes' );
+			await expect( thread ).toBeHidden();
+
+			await blockNoteUtils.chooseNotesView( 'Show notes' );
+			await expect( thread ).toBeVisible();
+		} );
+
+		test( 'opens and closes the All notes sidebar from the dropdown', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Sidebar block' },
+				comment: 'Sidebar note',
+			} );
+
+			await blockNoteUtils.chooseNotesView( 'Show all notes' );
+			const closeButton = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Close Notes' } );
+			await expect( closeButton ).toBeVisible();
+
+			// Hiding notes closes the All notes sidebar too.
+			await blockNoteUtils.chooseNotesView( 'Hide notes' );
+			await expect( closeButton ).toBeHidden();
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'treeitem', { name: 'Note: Sidebar note' } )
+			).toBeHidden();
+		} );
+
+		test( 'adding a note while hidden makes notes visible again', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'First block' },
+				comment: 'Existing note',
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Second block' },
+			} );
+
+			await blockNoteUtils.chooseNotesView( 'Hide notes' );
+			const existingThread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Existing note' } );
+			await expect( existingThread ).toBeHidden();
+
+			// Adding a note from the block options menu unhides notes.
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'New note', exact: true } )
+			).toBeFocused();
+			await expect( existingThread ).toBeVisible();
+		} );
+	} );
 } );
 
 class BlockNoteUtils {
@@ -1489,23 +1596,15 @@ class BlockNoteUtils {
 		this.#editor = editor;
 	}
 
-	async openBlockNoteSidebar() {
-		const toggleButton = this.#page
+	async chooseNotesView( view ) {
+		await this.#page
 			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'All notes', exact: true } );
-
-		const isClosed =
-			( await toggleButton.getAttribute( 'aria-expanded' ) ) === 'false';
-
-		if ( isClosed ) {
-			await toggleButton.click();
-			await this.#page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Close Notes' } )
-				.waitFor();
-		}
-
-		return toggleButton;
+			.getByRole( 'button', { name: 'Notes', exact: true } )
+			.click();
+		await this.#page.getByRole( 'menuitemradio', { name: view } ).click();
+		// Selecting a choice leaves the dropdown open; close it so it doesn't
+		// overlap later interactions.
+		await this.#page.keyboard.press( 'Escape' );
 	}
 
 	async addBlockWithNote( { type, attributes = {}, comment } ) {
