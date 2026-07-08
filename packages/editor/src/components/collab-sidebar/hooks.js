@@ -282,6 +282,7 @@ function clearInlineNoteMarker(
 }
 
 export function useNoteActions() {
+	const registry = useRegistry();
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
@@ -336,7 +337,15 @@ export function useNoteActions() {
 
 	const onCreate = async ( { content, parent } ) => {
 		try {
-			const segments = ! parent ? readNoteSegments() : [];
+			// Prefer segments captured at trigger time (multi-block notes,
+			// whose cross-block selection collapses once the form is focused);
+			// otherwise read the live selection (single-block inline / block-level).
+			const captured = ! parent
+				? unlock(
+						registry.select( editorStore )
+				  ).getPendingNoteSegments()
+				: null;
+			const segments = ! parent ? captured ?? readNoteSegments() : [];
 
 			const savedRecord = await saveEntityRecord(
 				'root',

@@ -29,7 +29,11 @@ import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
 import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
-import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
+import {
+	getNoteIdsFromMetadata,
+	pickPrimaryNote,
+	readMultiBlockSelection,
+} from './utils';
 import { NOTE_FORMAT_NAME, noteFormat } from './format';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
@@ -48,6 +52,10 @@ function NotesSidebar( { postId } ) {
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
+	// Bound block-editor selectors, read imperatively in handlers (no re-render
+	// on change). Passed straight to readMultiBlockSelection, which reads the
+	// selection keys it needs.
+	const blockEditorSelectors = useSelect( blockEditorStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const sidebarRef = useRef( null );
 
@@ -142,11 +150,13 @@ function NotesSidebar( { postId } ) {
 		} );
 	}
 
-	// Open the new-note form for the current multi-block selection. Unlike
-	// `focusNote`, this deliberately does NOT `selectBlock`/`toggleBlockSpotlight`
-	// - either would collapse the cross-block text selection before `onCreate`
-	// can read it to place the shared marker across every spanned block.
+	// Open the new-note form for the current multi-block selection. The
+	// cross-block text selection collapses once focus enters the sidebar form,
+	// so capture the per-block marker segments *now* and stash them on the
+	// pending note for `onCreate` to consume. Also deliberately avoids
+	// `selectBlock`/`toggleBlockSpotlight`, which would collapse the selection.
 	function addNewNoteForSelection() {
+		const segments = readMultiBlockSelection( blockEditorSelectors );
 		const currentArea = getActiveComplementaryArea( 'core' );
 		if ( ! SIDEBARS.includes( currentArea ) ) {
 			enableComplementaryArea(
@@ -154,7 +164,7 @@ function NotesSidebar( { postId } ) {
 				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
 			);
 		}
-		selectNote( 'new', { focus: true } );
+		selectNote( 'new', { focus: true, segments } );
 	}
 
 	useShortcut(
