@@ -279,14 +279,8 @@ export function TypographyPanel( {
 	);
 }
 
-/**
- * Internal bridge: consumes `InheritedValueContext` and threads the
- * merged placeholder payload into the shared global-styles panel. Kept
- * as a sibling component so the hook call sits strictly below the
- * Provider, as required by React's context rules.
- *
- * @param {Object} props Passthrough props for `StylesTypographyPanel`.
- */
+// Bridge component: reads the inherited value from context and hands it to
+// the panel. Kept below the Provider to satisfy React's rules of hooks.
 function TypographyPanelWithInheritedValue( props ) {
 	const { value: inheritedValue } = useInheritedValue();
 	return (

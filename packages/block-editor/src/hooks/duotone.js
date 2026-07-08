@@ -207,14 +207,8 @@ function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 	);
 }
 
-/**
- * Internal bridge: consumes `InheritedValueContext` and threads the
- * merged placeholder payload into the shared global-styles filters
- * panel. Kept as a sibling component so the hook call sits strictly
- * below the Provider, as required by React's context rules.
- *
- * @param {Object} props Passthrough props for `StylesFiltersPanel`.
- */
+// Bridge component: reads the inherited value from context and hands it to
+// the panel. Kept below the Provider to satisfy React's rules of hooks.
 function FiltersPanelWithInheritedValue( props ) {
 	const { value: inheritedValue, sources: inheritedSources } =
 		useInheritedValue();
