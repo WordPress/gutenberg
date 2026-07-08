@@ -159,15 +159,24 @@ describe( 'InheritanceToolsPanelItem inherited state', () => {
 		);
 	}
 
-	test( 'applies the inherited-from-global-styles class to the item', () => {
-		renderInheritedItem( 'Line height', 'components-base-control__label' );
-		expect(
-			screen
-				.getByText( 'Line height' )
+	// The SCSS treatment keys off the label class, and controls on a bare
+	// `UnitControl`/`NumberControl` expose `input-control__label` rather than
+	// the usual `base-control__label`, so guard both.
+	test.each( [
+		[ 'base-control', 'components-base-control__label' ],
+		[ 'input-control', 'components-input-control__label' ],
+	] )(
+		'nests the %s label inside the inherited-from-global-styles item',
+		( _name, labelClassName ) => {
+			renderInheritedItem( 'Line height', labelClassName );
+			const label = screen.getByText( 'Line height' );
+			expect( label ).toHaveClass( labelClassName );
+			expect(
 				// eslint-disable-next-line testing-library/no-node-access
-				.closest( '.is-inherited-from-global-styles' )
-		).not.toBeNull();
-	} );
+				label.closest( '.is-inherited-from-global-styles' )
+			).not.toBeNull();
+		}
+	);
 
 	test( 'does not render a reset dot in the inherited state', () => {
 		renderInheritedItem( 'Line height', 'components-base-control__label' );
