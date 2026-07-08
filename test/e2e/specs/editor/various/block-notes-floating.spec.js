@@ -8,7 +8,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  * rather than as a layout-occupying sidebar. See #73917 and the design
  * discussion in #66377 / #77484.
  */
-test.describe( 'Notes canvas layout', () => {
+test.describe( 'Block Notes: floating panel', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -295,5 +295,52 @@ test.describe( 'Notes canvas layout', () => {
 		await expect(
 			page.getByRole( 'region', { name: 'Notes' } )
 		).toBeHidden();
+	} );
+
+	test( 'floating notes yield when the canvas is too narrow', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph with a note' },
+		} );
+		await addNote( page, editor, 'Narrow canvas note' );
+
+		const notes = page.getByRole( 'region', { name: 'Notes' } );
+
+		// Reading the reserved padding applied to the canvas root.
+		const getReservedWidth = () =>
+			editor.canvas.locator( 'body' ).evaluate( ( body ) => {
+				const root = body.ownerDocument.documentElement;
+				return (
+					parseFloat(
+						body.ownerDocument.defaultView.getComputedStyle( root )
+							.paddingInlineEnd
+					) || 0
+				);
+			} );
+
+		// The Settings sidebar narrows the canvas without touching the admin
+		// viewport, which stays above the large-viewport breakpoint - so only
+		// the canvas-width guard (not the viewport gate) governs the panel.
+		await editor.openDocumentSettingsSidebar();
+		await page.setViewportSize( { width: 1200, height: 800 } );
+		await expect( notes ).toBeVisible();
+		expect( await getReservedWidth() ).toBeGreaterThan( 0 );
+
+		// Shrink the window so the canvas (minus the sidebar) is narrower than
+		// the panel needs, while the viewport itself stays "large".
+		await page.setViewportSize( { width: 800, height: 800 } );
+
+		// The floating panel yields and releases the reserved canvas padding so
+		// it doesn't crowd the narrow content column.
+		await expect( notes ).toBeHidden();
+		expect( await getReservedWidth() ).toBe( 0 );
+
+		// Widening the canvas again brings the panel (and reserved space) back.
+		await page.setViewportSize( { width: 1200, height: 800 } );
+		await expect( notes ).toBeVisible();
+		expect( await getReservedWidth() ).toBeGreaterThan( 0 );
 	} );
 } );
