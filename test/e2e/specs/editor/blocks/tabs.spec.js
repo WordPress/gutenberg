@@ -53,6 +53,7 @@ test.describe( 'Tabs', () => {
 		test( 'activates the next tab when the caret moves into its label with the right arrow key', async ( {
 			editor,
 			page,
+			pageUtils,
 		} ) => {
 			const tab1 = editor.canvas.getByRole( 'tab', { name: 'Tab 1' } );
 			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
@@ -73,11 +74,17 @@ test.describe( 'Tabs', () => {
 			).toBeFocused();
 			await expect( editor.canvas.getByText( 'Panel 1' ) ).toBeHidden();
 			await expect( editor.canvas.getByText( 'Panel 2' ) ).toBeVisible();
+
+			// Switching the active tab is non-persistent, so undo clears the
+			// inserted block instead of only reverting the tab switch.
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect.poll( editor.getBlocks ).toEqual( [] );
 		} );
 
 		test( 'activates the previous tab when the caret moves into its label with the left arrow key', async ( {
 			editor,
 			page,
+			pageUtils,
 		} ) => {
 			const tab1 = editor.canvas.getByRole( 'tab', { name: 'Tab 1' } );
 			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
@@ -98,10 +105,16 @@ test.describe( 'Tabs', () => {
 			).toBeFocused();
 			await expect( editor.canvas.getByText( 'Panel 1' ) ).toBeVisible();
 			await expect( editor.canvas.getByText( 'Panel 2' ) ).toBeHidden();
+
+			// Switching the active tab is non-persistent, so undo clears the
+			// inserted block instead of only reverting the tab switch.
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect.poll( editor.getBlocks ).toEqual( [] );
 		} );
 
 		test( 'switches the active tab and selects the tab list when a tab is clicked while a block in another panel is selected', async ( {
 			editor,
+			pageUtils,
 		} ) => {
 			const tab1 = editor.canvas.getByRole( 'tab', { name: 'Tab 1' } );
 			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
@@ -123,11 +136,17 @@ test.describe( 'Tabs', () => {
 					name: 'Block: Tab List',
 				} )
 			).toHaveClass( /is-selected/ );
+
+			// Switching the active tab is non-persistent, so undo clears the
+			// inserted block instead of only reverting the tab switch.
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect.poll( editor.getBlocks ).toEqual( [] );
 		} );
 
 		test( 'adds and activates a new tab when pressing Enter at the end of a tab label', async ( {
 			editor,
 			page,
+			pageUtils,
 		} ) => {
 			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
 			await tab2.click();
@@ -160,6 +179,21 @@ test.describe( 'Tabs', () => {
 			} );
 			await expect( panels ).toHaveCount( 3 );
 			await expect( panels.nth( 2 ) ).toBeVisible();
+
+			// The tab insertion is persistent, so undo removes the new tab
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect( tabs ).toHaveCount( 2 );
+
+			// TODO: This is not the intended behavior and should be fixed.
+			// After undo the second tab (not the first) should be the active,
+			// focused one.
+			await expect( tabs.nth( 0 ) ).toHaveAttribute(
+				'aria-selected',
+				'true'
+			);
+			await expect(
+				tabs.nth( 0 ).locator( '[contenteditable="true"]' )
+			).toBeFocused();
 		} );
 
 		test( 'removes the tab and activates the previous one when pressing Delete on an empty tab label', async ( {
@@ -185,6 +219,21 @@ test.describe( 'Tabs', () => {
 				tab1.locator( '[contenteditable="true"]' )
 			).toBeFocused();
 			await expect( editor.canvas.getByText( 'Panel 1' ) ).toBeVisible();
+
+			// The tab removal is persistent, so undo brings the tab back.
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect( tabs ).toHaveCount( 2 );
+
+			// TODO: This is not the intended behavior and should be fixed.
+			// After undo the restored second tab (not the first) should be the
+			// active, focused one.
+			await expect( tabs.nth( 0 ) ).toHaveAttribute(
+				'aria-selected',
+				'true'
+			);
+			await expect(
+				tabs.nth( 0 ).locator( '[contenteditable="true"]' )
+			).toBeFocused();
 		} );
 	} );
 
