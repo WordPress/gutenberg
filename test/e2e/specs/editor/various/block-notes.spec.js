@@ -224,6 +224,53 @@ test.describe( 'Block Notes', () => {
 		).toBeVisible();
 	} );
 
+	test( 'shows a "Resolved" separator above resolved notes', async ( {
+		page,
+		blockNoteUtils,
+	} ) => {
+		// First block: this note stays unresolved.
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Block one' },
+			comment: 'Unresolved note.',
+		} );
+		// Second block: this note will be resolved.
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Block two' },
+			comment: 'Note to resolve.',
+		} );
+
+		await blockNoteUtils.openBlockNoteSidebar();
+
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const separator = sidebar.locator(
+			'.editor-collab-sidebar-panel__status-separator'
+		);
+
+		// No resolved notes yet, so the separator is absent.
+		await expect( separator ).toBeHidden();
+
+		// Resolve the second note.
+		const thread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Note to resolve.',
+		} );
+		await thread.click();
+		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note marked as resolved.' } )
+		).toBeVisible();
+
+		// The separator now labels the resolved section.
+		await expect( separator ).toBeVisible();
+		await expect( separator ).toHaveText( 'Resolved' );
+	} );
+
 	test( 'selecting a block or note marks it as an active', async ( {
 		editor,
 		page,
