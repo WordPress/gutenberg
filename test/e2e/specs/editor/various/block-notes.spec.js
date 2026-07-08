@@ -990,11 +990,9 @@ test.describe( 'Block Notes', () => {
 			} );
 			await threadA.click();
 			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			// Re-select the note to confirm it is now resolved.
-			await threadA.click();
-			await expect(
-				page.getByRole( 'button', { name: 'Resolve' } )
-			).toBeDisabled();
+			// Resolving removes the note from the floating "Unresolved notes"
+			// view, which confirms the action completed.
+			await expect( threadA ).toBeHidden();
 
 			// Note B should still be visible and unresolved (expanded).
 			const threadB = settings.getByRole( 'treeitem', {
@@ -1033,11 +1031,9 @@ test.describe( 'Block Notes', () => {
 			} );
 			await firstThread.click();
 			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			// Re-select the note to confirm it is now resolved.
-			await firstThread.click();
-			await expect(
-				page.getByRole( 'button', { name: 'Resolve' } )
-			).toBeDisabled();
+			// Resolving removes the note from the floating "Unresolved notes"
+			// view, which confirms the action completed.
+			await expect( firstThread ).toBeHidden();
 
 			// Click the title to deselect the block and its comment.
 			await editor.canvas
