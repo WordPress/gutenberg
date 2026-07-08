@@ -78,7 +78,9 @@ function Edit( {
 
 	function selectTabPanel( tabIndex ) {
 		if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
-			// Batch so the selection and the index update are observed together.
+			// Batch the selection and index update so the sync effect in
+			// the tab-panel block can't revert the switch from a stale
+			// inner-block selection in the previously active panel.
 			registry.batch( () => {
 				selectBlock( clientId );
 				__unstableMarkNextChangeAsNotPersistent();
