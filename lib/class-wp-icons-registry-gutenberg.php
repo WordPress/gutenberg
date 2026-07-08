@@ -881,10 +881,10 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		while ( $processor->next_token() && $processor->get_current_depth() >= $depth ) {
 			$svg .= $processor->serialize_token();
 		}
-		if (
-			null !== $processor->get_last_error()
-			|| $processor->paused_at_incomplete_token()
-		) {
+		// An early stop inside an SVG means truncated input, not unsupported
+		// markup. Reject it: the parser can synthesize closing tags that were
+		// never written, so no valid document remains to trust.
+		if ( null !== $processor->get_last_error() || $processor->paused_at_incomplete_token() ) {
 			return '';
 		}
 		$svg .= '</svg>';
