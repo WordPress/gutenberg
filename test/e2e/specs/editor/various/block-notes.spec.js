@@ -1478,31 +1478,35 @@ test.describe( 'Block Notes', () => {
 	} );
 
 	test.describe( 'Multi-block notes', () => {
-		// Select text from the first paragraph down through the last, then open
-		// the multi-block "Add note" entry and submit a note. The inline
-		// rich-text "Add note" button is unavailable across a multi-block
-		// selection, so the entry point lives in the block options (⋮) menu.
+		// Establish a cross-block text selection spanning the first `blockCount`
+		// paragraphs, then open the multi-block "Add note" entry and submit a
+		// note. The inline rich-text "Add note" button is unavailable across a
+		// multi-block selection, so the entry point lives in the block options
+		// (⋮) menu. The selection is set through the store so it deterministically
+		// carries a text range into the first and last blocks (keyboard selection
+		// across blocks is sensitive to line-wrap and block-boundary offsets); the
+		// menu, form, and submit that follow are driven through the real UI.
 		async function addMultiBlockNote(
 			{ editor, page },
 			blockCount,
 			content
 		) {
-			const paragraphs = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} );
-			// Select from the last (bottom) block upward through the first. The
-			// block toolbar popover renders above its block, so clicking the
-			// bottom block keeps the click target clear, and extending upward
-			// then covers every block in the selection.
-			await paragraphs.last().click();
-			await page.keyboard.press( 'ControlOrMeta+a' );
-			// Collapse to the end of the last block, then extend the selection
-			// up through the start of the first block.
-			await page.keyboard.press( 'ArrowRight' );
-			for ( let i = 0; i < blockCount - 1; i++ ) {
-				await page.keyboard.press( 'Shift+ArrowUp' );
-			}
-			await page.keyboard.press( 'Shift+Home' );
+			await page.evaluate( ( count ) => {
+				const { dispatch, select } = window.wp.data;
+				const ids = select( 'core/block-editor' ).getBlockOrder();
+				dispatch( 'core/block-editor' ).selectionChange( {
+					start: {
+						clientId: ids[ 0 ],
+						attributeKey: 'content',
+						offset: 3,
+					},
+					end: {
+						clientId: ids[ count - 1 ],
+						attributeKey: 'content',
+						offset: 3,
+					},
+				} );
+			}, blockCount );
 
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await page
