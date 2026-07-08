@@ -6,6 +6,10 @@
 
 -   Add `outset-ring__focus` mixin for outline-based focus rings using `--wpds-*` design tokens ([#78698](https://github.com/WordPress/gutenberg/pull/78698)).
 
+### Bug Fixes
+
+-   Revert the `$font-weight-medium` `499` workaround back to `500` ([#79986](https://github.com/WordPress/gutenberg/pull/79986)).
+
 ## 10.2.0 (2026-07-01)
 
 ## 10.1.0 (2026-06-24)
