@@ -322,6 +322,15 @@
 				padding-left: $grid-unit-15;
 			}
 		}
+
+		// Offset the reserved 1px border so it doesn't widen the square
+		// icon button.
+		&:not(.has-text) {
+			svg,
+			.dashicon {
+				margin-inline: -$border-width;
+			}
+		}
 	}
 
 	// Toggled style.
