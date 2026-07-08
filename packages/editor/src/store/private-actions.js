@@ -193,22 +193,7 @@ export const saveDirtyEntities =
 						.saveEditedEntityRecord( kind, name, key, {
 							throwOnError: true,
 						} )
-						.catch( ( error ) => {
-							if ( error instanceof Error ) {
-								return error;
-							}
-
-							// Expect certain errors to be plain objects with a
-							// `message` property, such as those thrown by
-							// `apiFetch`.
-							const message =
-								error?.message ??
-								( typeof error === 'string' && error
-									? error
-									: __( 'Unknown error' ) );
-
-							return new Error( message, { cause: error } );
-						} )
+						.catch( ensureError )
 				);
 			}
 		} );
@@ -225,22 +210,7 @@ export const saveDirtyEntities =
 							throwOnError: true,
 						}
 					)
-					.catch( ( error ) => {
-						if ( error instanceof Error ) {
-							return error;
-						}
-
-						// Expect certain errors to be plain objects with a
-						// `message` property, such as those thrown by
-						// `apiFetch`.
-						const message =
-							error?.message ??
-							( typeof error === 'string' && error
-								? error
-								: __( 'Unknown error' ) );
-
-						return new Error( message, { cause: error } );
-					} )
+					.catch( ensureError )
 			);
 		}
 		registry
@@ -304,6 +274,22 @@ export const saveDirtyEntities =
 						}
 					)
 			);
+
+		function ensureError( error ) {
+			if ( error instanceof Error ) {
+				return error;
+			}
+
+			// Expect certain errors to be plain objects with a `message`
+			// property, such as those thrown by `apiFetch`.
+			const message =
+				error?.message ??
+				( typeof error === 'string' && error
+					? error
+					: __( 'Unknown error' ) );
+
+			return new Error( message, { cause: error } );
+		}
 	};
 
 /**
