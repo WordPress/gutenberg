@@ -238,6 +238,15 @@ if ( ! function_exists( 'gutenberg_notify_note_mentions' ) ) {
 
 		$mentioned_lookup = array_flip( $mentioned );
 
+		/*
+		 * The recipient set is bounded and small (one note's mentions plus that
+		 * thread's followers), so emails are sent synchronously here. Pausing
+		 * inline (e.g. sleep()) would only hold the REST request open without
+		 * easing mail-server load; if notification volume ever warrants it, the
+		 * right fix is to offload delivery to a background queue
+		 * (wp_schedule_single_event() / Action Scheduler) rather than throttle
+		 * within the request.
+		 */
 		foreach ( $recipient_ids as $user_id ) {
 			$user_id = (int) $user_id;
 
@@ -265,7 +274,17 @@ if ( ! function_exists( 'gutenberg_notify_note_mentions' ) ) {
 			gutenberg_send_note_notification( $user, $comment, $post, $was_mentioned );
 		}
 
-		// Subscribe the note author and everyone mentioned to the thread.
+		/*
+		 * Subscribe the note author and everyone mentioned to the thread. To opt
+		 * out later, a user removes their ID from the thread root's
+		 * `_wp_note_followers` meta: either via gutenberg_remove_note_followers()
+		 * or by editing that meta through the REST API (it is registered as
+		 * editable by users who can edit the note). Removing an `@` mention on a
+		 * later edit intentionally does not unfollow, once pulled into a thread a
+		 * user stays subscribed until they explicitly opt out. A follower is also
+		 * dropped automatically when the thread is trashed or deleted, since
+		 * comment meta is removed alongside the comment.
+		 */
 		$new_followers = $mentioned;
 		if ( $author_id > 0 ) {
 			$new_followers[] = $author_id;
