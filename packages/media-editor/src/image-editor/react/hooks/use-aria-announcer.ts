@@ -32,48 +32,70 @@ function buildFlipAnnouncement( state: CropperState ): string {
 	return __( 'Flip removed' );
 }
 
-function buildRotationAnnouncement(
-	degrees: number,
-	previousDegrees?: number
-): string {
-	const rounded = Math.round( degrees % 360 );
+function getRotationAnnouncement(
+	state: CropperState,
+	previousState: CropperState | null
+): string | undefined {
+	if ( ! previousState ) {
+		const rounded = Math.round( state.rotation % 360 );
+		if ( rounded === 0 ) {
+			return undefined;
+		}
+		return sprintf(
+			/* translators: %d: rotation angle in degrees. */
+			__( 'Rotation %d degrees' ),
+			rounded
+		);
+	}
+
+	if (
+		Math.round( previousState.rotation ) === Math.round( state.rotation )
+	) {
+		return undefined;
+	}
+
+	const rounded = Math.round( state.rotation % 360 );
+	// Compute signed shortest-arc delta to determine direction.
+	let delta = ( state.rotation - previousState.rotation ) % 360;
+	if ( delta > 180 ) {
+		delta -= 360;
+	}
+	if ( delta < -180 ) {
+		delta += 360;
+	}
 	if ( rounded === 0 ) {
 		return __( 'Rotation 0 degrees' );
 	}
-
-	if ( previousDegrees !== undefined ) {
-		// Compute signed shortest-arc delta to determine direction.
-		let delta = ( degrees - previousDegrees ) % 360;
-		if ( delta > 180 ) {
-			delta -= 360;
-		}
-		if ( delta < -180 ) {
-			delta += 360;
-		}
-		if ( delta > 0 ) {
-			return sprintf(
-				/* translators: %d: rotation angle in degrees. */
-				__( 'Rotated %d degrees clockwise' ),
-				rounded
-			);
-		}
-		if ( delta < 0 ) {
-			return sprintf(
-				/* translators: %d: rotation angle in degrees. */
-				__( 'Rotated %d degrees counterclockwise' ),
-				360 - rounded
-			);
-		}
+	if ( delta > 0 ) {
+		return sprintf(
+			/* translators: %d: rotation angle in degrees. */
+			__( 'Rotated %d degrees clockwise' ),
+			rounded
+		);
 	}
-
-	return sprintf(
-		/* translators: %d: rotation angle in degrees. */
-		__( 'Rotation %d degrees' ),
-		rounded
-	);
+	if ( delta < 0 ) {
+		return sprintf(
+			/* translators: %d: rotation angle in degrees. */
+			__( 'Rotated %d degrees counterclockwise' ),
+			360 - rounded
+		);
+	}
+	return undefined;
 }
 
-function buildCropAnnouncement( state: CropperState ): string {
+function getCropAnnouncement(
+	state: CropperState,
+	previousState: CropperState | null
+): string | undefined {
+	if (
+		previousState &&
+		Math.round( previousState.cropRect.width * 100 ) ===
+			Math.round( state.cropRect.width * 100 ) &&
+		Math.round( previousState.cropRect.height * 100 ) ===
+			Math.round( state.cropRect.height * 100 )
+	) {
+		return undefined;
+	}
 	if ( state.image ) {
 		const region = getSourceRegion( state, {
 			width: state.image.naturalWidth,
@@ -96,7 +118,17 @@ function buildCropAnnouncement( state: CropperState ): string {
 	);
 }
 
-function buildZoomAnnouncement( state: CropperState ): string {
+function getZoomAnnouncement(
+	state: CropperState,
+	previousState: CropperState | null
+): string | undefined {
+	if (
+		previousState &&
+		Math.round( previousState.zoom * 100 ) ===
+			Math.round( state.zoom * 100 )
+	) {
+		return undefined;
+	}
 	return sprintf(
 		/* translators: %d: zoom level as a percentage. */
 		__( 'Zoom %d%%' ),
@@ -104,59 +136,36 @@ function buildZoomAnnouncement( state: CropperState ): string {
 	);
 }
 
-// Build a human-readable announcement string from cropper state,
-// leading with the value that actually changed.
+function getFlipAnnouncement(
+	state: CropperState,
+	previousState: CropperState | null
+): string | undefined {
+	if (
+		! previousState ||
+		( previousState.flip.horizontal === state.flip.horizontal &&
+			previousState.flip.vertical === state.flip.vertical )
+	) {
+		return undefined;
+	}
+	return buildFlipAnnouncement( state );
+}
+
 function buildAnnouncement(
 	state: CropperState,
 	previousState: CropperState | null
 ): string {
-	if (
-		previousState &&
-		( previousState.flip.horizontal !== state.flip.horizontal ||
-			previousState.flip.vertical !== state.flip.vertical )
-	) {
-		return buildFlipAnnouncement( state );
+	// Flip changes are announced alone.
+	const flip = getFlipAnnouncement( state, previousState );
+	if ( flip ) {
+		return flip;
 	}
 
-	if ( previousState ) {
-		const rotationChanged =
-			Math.round( previousState.rotation ) !==
-			Math.round( state.rotation );
-		const zoomChanged =
-			Math.round( previousState.zoom * 100 ) !==
-			Math.round( state.zoom * 100 );
-		const cropChanged =
-			Math.round( previousState.cropRect.width * 100 ) !==
-				Math.round( state.cropRect.width * 100 ) ||
-			Math.round( previousState.cropRect.height * 100 ) !==
-				Math.round( state.cropRect.height * 100 );
+	const parts = [
+		getZoomAnnouncement( state, previousState ),
+		getRotationAnnouncement( state, previousState ),
+		getCropAnnouncement( state, previousState ),
+	].filter( ( part ): part is string => part !== undefined );
 
-		if ( rotationChanged && ! zoomChanged && ! cropChanged ) {
-			return buildRotationAnnouncement(
-				state.rotation,
-				previousState.rotation
-			);
-		}
-		if ( cropChanged && ! zoomChanged && ! rotationChanged ) {
-			return buildCropAnnouncement( state );
-		}
-		if ( zoomChanged && ! rotationChanged && ! cropChanged ) {
-			return buildZoomAnnouncement( state );
-		}
-	}
-
-	// Multiple values changed or no previous state — announce all.
-	const parts: string[] = [];
-	parts.push( buildZoomAnnouncement( state ) );
-	if ( state.rotation !== 0 ) {
-		parts.push(
-			buildRotationAnnouncement( state.rotation, previousState?.rotation )
-		);
-	}
-	parts.push( buildCropAnnouncement( state ) );
-	if ( state.flip.horizontal || state.flip.vertical ) {
-		parts.push( buildFlipAnnouncement( state ) );
-	}
 	return parts.join( ', ' );
 }
 
