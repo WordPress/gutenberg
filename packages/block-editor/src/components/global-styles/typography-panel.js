@@ -741,7 +741,6 @@ export default function TypographyPanel( {
 						max={ MAX_TEXT_COLUMNS }
 						min={ MIN_TEXT_COLUMNS }
 						onChange={ setTextColumns }
-						size="__unstable-large"
 						spinControls="custom"
 						value={ textColumns }
 						initialPosition={ 1 }

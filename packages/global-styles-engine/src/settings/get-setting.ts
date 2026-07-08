@@ -75,6 +75,8 @@ const VALID_SETTINGS = [
 	'typography.textShadowPresets',
 	'typography.textTransform',
 	'typography.writingMode',
+	'viewport.mobile',
+	'viewport.tablet',
 ];
 
 export function getSetting< T = any >(
