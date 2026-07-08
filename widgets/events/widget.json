@@ -1,4 +1,5 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/widget.json",
 	"name": "core/events",
 	"title": "WordPress events",
 	"description": "Displays upcoming WordPress community events.",

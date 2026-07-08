@@ -1,4 +1,5 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/widget.json",
 	"name": "core/activity",
 	"title": "Activity",
 	"description": "Displays recently published posts, scheduled posts, and recent comments.",

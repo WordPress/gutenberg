@@ -1,0 +1,92 @@
+{
+	"title": "JSON schema for WordPress dashboard widget static metadata",
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"definitions": {
+		"//": {
+			"reference": "https://github.com/WordPress/gutenberg/blob/HEAD/docs/explanations/architecture/dashboard-widgets.md",
+			"anatomyReference": "https://github.com/WordPress/gutenberg/blob/HEAD/packages/widget-primitives/src/stories/anatomy.md"
+		},
+		"helpLink": {
+			"type": "object",
+			"required": [ "label", "href" ],
+			"properties": {
+				"label": {
+					"description": "Link label. Translatable.",
+					"type": "string",
+					"minLength": 1
+				},
+				"href": {
+					"description": "Link destination.",
+					"type": "string",
+					"minLength": 1
+				}
+			},
+			"additionalProperties": false
+		},
+		"help": {
+			"type": "object",
+			"required": [ "content" ],
+			"properties": {
+				"content": {
+					"description": "Contextual help note for compact surfaces. Translatable. May carry `<em>`/`<strong>`; links belong in `links`.",
+					"type": "string",
+					"minLength": 1
+				},
+				"links": {
+					"description": "Links contextual to the help note.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/helpLink"
+					}
+				}
+			},
+			"additionalProperties": false
+		}
+	},
+	"type": "object",
+	"required": [ "name" ],
+	"properties": {
+		"$schema": {
+			"description": "JSON Schema URI for this file. Used by IDEs and validation tooling.",
+			"type": "string"
+		},
+		"name": {
+			"description": "Stable widget type identifier, structured as `<widget-namespace>/<widget-name>`. Both segments are lowercase, kebab-case.",
+			"type": "string",
+			"pattern": "^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$"
+		},
+		"title": {
+			"description": "Human-readable title that names the widget type. Translatable via `textdomain`.",
+			"type": "string"
+		},
+		"description": {
+			"description": "Human-readable description of what the widget type does. Translatable via `textdomain`.",
+			"type": "string"
+		},
+		"help": {
+			"description": "Contextual help note for compact surfaces such as tooltips beside the widget title. Translatable via `textdomain`.",
+			"$ref": "#/definitions/help"
+		},
+		"category": {
+			"description": "Grouping category. Core provides `dashboard`; plugins and themes may register custom categories.",
+			"type": "string"
+		},
+		"presentation": {
+			"description": "Authoring intent about how the widget asks to sit in the host's frame. Not a user-editable attribute. When absent, hosts treat the widget as `framed`.",
+			"type": "string",
+			"enum": [ "framed", "content-bleed", "full-bleed" ]
+		},
+		"keywords": {
+			"description": "Alternative terms used to match the widget type when searching. Translatable via `textdomain`.",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"textdomain": {
+			"description": "Gettext text domain for translating `title`, `description`, `help`, and `keywords`.",
+			"type": "string"
+		}
+	},
+	"additionalProperties": false
+}

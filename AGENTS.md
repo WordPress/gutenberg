@@ -21,7 +21,7 @@ npm run build # Production build
 -   `/lib/` - PHP code
 -   `/lib/compat/wordpress-X.Y/` - Version-specific features (new PHP features usually go here)
 -   `/phpunit/` - PHP tests
--   `/schemas/json/` - JSON Schemas for `block.json`, `theme.json`, `font-collection.json`, and `wp-env.json` (published to `schemas.wp.org`; tests in `/test/integration/`)
+-   `/schemas/json/` - JSON Schemas for `block.json`, `theme.json`, `font-collection.json`, `widget.json`, and `wp-env.json` (published to `schemas.wp.org`; tests in `/test/integration/`)
 -   `/docs/` - Documentation
     -   `/docs/contributors/` - Contributing guides
     -   `/docs/explanations/architecture/` - System architecture docs
