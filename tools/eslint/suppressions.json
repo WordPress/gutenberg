@@ -260,16 +260,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/rich-text/input-event.js": {
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/rich-text/shortcut.js": {
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/spacing-sizes-control/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -355,11 +345,6 @@
 	},
 	"packages/block-library/src/image/image.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/list-item/hooks/use-enter.js": {
-		"react-hooks/refs": {
 			"count": 1
 		}
 	},
@@ -512,11 +497,6 @@
 	"packages/block-library/src/video/tracks-editor.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		}
-	},
-	"packages/boot/src/components/canvas/back-button.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
 		}
 	},
 	"packages/boot/src/components/navigation/drilldown-item/index.tsx": {
