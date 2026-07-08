@@ -16,6 +16,22 @@
 			data-wp-input="state.text"
 			value="hello"
 		/>
+
+		<div data-wp-context='{ "ctxText": "ctx-hello" }'>
+			<p data-wp-text="context.ctxText" data-testid="ctx-text-output">ctx-hello</p>
+			<input
+				type="text"
+				data-testid="ctx-text-input"
+				data-wp-input="context.ctxText"
+				value="ctx-hello"
+			/>
+			<button
+				data-testid="toggle-ctx-text"
+				data-wp-on--click="actions.toggleCtxText"
+			>
+				Toggle ctx text
+			</button>
+		</div>
 	</div>
 
 	<!-- 2. Checkbox (auto-detect) -->
@@ -26,6 +42,21 @@
 			data-testid="checkbox-input"
 			data-wp-input="state.checkedVal"
 		/>
+
+		<div data-wp-context='{ "ctxChecked": false }'>
+			<p data-wp-text="context.ctxChecked" data-testid="ctx-checkbox-output">false</p>
+			<input
+				type="checkbox"
+				data-testid="ctx-checkbox-input"
+				data-wp-input="context.ctxChecked"
+			/>
+			<button
+				data-testid="toggle-ctx-checked"
+				data-wp-on--click="actions.toggleCtxChecked"
+			>
+				Toggle ctx checked
+			</button>
+		</div>
 	</div>
 
 	<!-- 3. Number input (type preservation) -->
@@ -37,6 +68,22 @@
 			data-wp-input="state.num"
 			value="0"
 		/>
+
+		<div data-wp-context='{ "ctxNum": 0 }'>
+			<p data-wp-text="context.ctxNum" data-testid="ctx-number-output">0</p>
+			<input
+				type="number"
+				data-testid="ctx-number-input"
+				data-wp-input="context.ctxNum"
+				value="0"
+			/>
+			<button
+				data-testid="toggle-ctx-num"
+				data-wp-on--click="actions.toggleCtxNum"
+			>
+				Toggle ctx num
+			</button>
+		</div>
 	</div>
 
 	<!-- 4. Single select -->
@@ -49,6 +96,23 @@
 			<option value="dog">Dog</option>
 			<option value="cat">Cat</option>
 		</select>
+
+		<div data-wp-context='{ "ctxPet": "dog" }'>
+			<p data-wp-text="context.ctxPet" data-testid="ctx-select-output">dog</p>
+			<select
+				data-testid="ctx-select-input"
+				data-wp-input="context.ctxPet"
+			>
+				<option value="dog">Dog</option>
+				<option value="cat">Cat</option>
+			</select>
+			<button
+				data-testid="toggle-ctx-pet"
+				data-wp-on--click="actions.toggleCtxPet"
+			>
+				Toggle ctx pet
+			</button>
+		</div>
 	</div>
 
 	<!-- 4b. Single select (no default) -->
@@ -85,6 +149,29 @@
 			/>
 			Cat
 		</label>
+
+		<div data-wp-context='{ "ctxRadioPet": "dog" }'>
+			<p data-wp-text="context.ctxRadioPet" data-testid="ctx-radio-output">dog</p>
+			<label>
+				<input
+					type="radio"
+					data-testid="ctx-radio-dog"
+					data-wp-input="context.ctxRadioPet"
+					value="dog"
+					checked
+				/>
+				Dog
+			</label>
+			<label>
+				<input
+					type="radio"
+					data-testid="ctx-radio-cat"
+					data-wp-input="context.ctxRadioPet"
+					value="cat"
+				/>
+				Cat
+			</label>
+		</div>
 	</div>
 
 	<!-- 5b. Radio group (no default) -->
@@ -119,6 +206,16 @@
 			data-wp-input="state.rangeVal"
 			value="50"
 		/>
+
+		<div data-wp-context='{ "ctxRangeVal": 50 }'>
+			<p data-wp-text="context.ctxRangeVal" data-testid="ctx-range-output">50</p>
+			<input
+				type="range"
+				data-testid="ctx-range-input"
+				data-wp-input="context.ctxRangeVal"
+				value="50"
+			/>
+		</div>
 	</div>
 
 	<!-- 7. Textarea -->
@@ -128,6 +225,14 @@
 			data-testid="textarea-input"
 			data-wp-input="state.textareaVal"
 		>default</textarea>
+
+		<div data-wp-context='{ "ctxTextareaVal": "default" }'>
+			<p data-wp-text="context.ctxTextareaVal" data-testid="ctx-textarea-output">default</p>
+			<textarea
+				data-testid="ctx-textarea-input"
+				data-wp-input="context.ctxTextareaVal"
+			>default</textarea>
+		</div>
 	</div>
 
 	<!-- 8. Multiple select -->
@@ -142,7 +247,28 @@
 			<option value="cat">Cat</option>
 			<option value="bird">Bird</option>
 		</select>
+
+		<div data-wp-context='{ "ctxMultiPet": ["dog"] }'>
+			<p data-wp-text="context.ctxMultiPet" data-testid="ctx-multiselect-output">dog</p>
+			<select
+				multiple
+				data-testid="ctx-multiselect-input"
+				data-wp-input="context.ctxMultiPet"
+			>
+				<option value="dog" selected>Dog</option>
+				<option value="cat">Cat</option>
+				<option value="bird">Bird</option>
+			</select>
+			<button
+				data-testid="toggle-ctx-multipet"
+				data-wp-on--click="actions.toggleCtxMultiPet"
+			>
+				Toggle ctx multiPet
+			</button>
+		</div>
 	</div>
+
+
 
 	<!-- 9. Checkbox group (top-level properties) -->
 	<div>
