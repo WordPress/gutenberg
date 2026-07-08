@@ -56,8 +56,7 @@ jobs:
     bump-version:
         name: Bump version
         runs-on: 'ubuntu-24.04'
-        permissions:
-            contents: write
+        environment: 'GitHub Releases'
         needs: compute-stable-branches
         if: |
             github.event_name == 'workflow_dispatch' && (
@@ -80,10 +79,18 @@ jobs:
             trunk_commit: ${{ steps.commit_version_bump_to_trunk.outputs.version_bump_commit }}
 
         steps:
+            - name: Generate application token
+              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+              id: app-token
+              with:
+                  client-id: ${{ vars.APP_CLIENT_ID }}
+                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
+                  permission-contents: write
+
             - name: Checkout code
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
-                  token: ${{ secrets.GUTENBERG_TOKEN }}
+                  token: ${{ steps.app-token.outputs.token }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: true
 
@@ -114,10 +121,13 @@ jobs:
                   RELEASE_BRANCH="release/${NEW_VERSION_ARRAY[0]}.${NEW_VERSION_ARRAY[1]}"
                   echo "release_branch=${RELEASE_BRANCH}" >> "$GITHUB_OUTPUT"
 
-            - name: Configure git user name and email
-              run: |
-                  git config user.name "Gutenberg Repository Automation"
-                  git config user.email gutenberg@wordpress.org
+            - name: Configure Git user name
+              run: git config user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
+
+            - name: Configure Git user email
+              env:
+                  APP_USER_ID: ${{ vars.APP_USER_ID }}
+              run: git config user.email "${APP_USER_ID}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
 
             - name: Create and switch to release branch
               if: |
@@ -345,27 +355,37 @@ jobs:
         name: Revert version bump if build failed
         needs: [bump-version, build]
         runs-on: 'ubuntu-24.04'
-        permissions:
-            contents: write
+        environment: 'GitHub Releases'
         if: |
             always() &&
             needs.build.result == 'failure' &&
             needs.bump-version.outputs.release_branch_commit
 
         steps:
+            - name: Generate application token
+              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+              id: app-token
+              with:
+                  client-id: ${{ vars.APP_CLIENT_ID }}
+                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
+                  permission-contents: write
+
             - name: Checkout code
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   fetch-depth: 2
                   ref: ${{ needs.bump-version.outputs.release_branch }}
-                  token: ${{ secrets.GUTENBERG_TOKEN }}
+                  token: ${{ steps.app-token.outputs.token }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: true
 
-            - name: Configure git user name and email
-              run: |
-                  git config user.name "Gutenberg Repository Automation"
-                  git config user.email gutenberg@wordpress.org
+            - name: Configure Git user name
+              run: git config user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
+
+            - name: Configure Git user email
+              env:
+                  APP_USER_ID: ${{ vars.APP_USER_ID }}
+              run: git config user.email "${APP_USER_ID}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
 
             - name: Revert version bump commit on release branch
               if: |
@@ -401,10 +421,18 @@ jobs:
         name: Create Release Draft and Attach Asset
         needs: [bump-version, build]
         runs-on: 'ubuntu-24.04'
-        permissions:
-            contents: write
+        environment: 'GitHub Releases'
 
         steps:
+            - name: Generate application token
+              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+              id: app-token
+              with:
+                  client-id: ${{ vars.APP_CLIENT_ID }}
+                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
+                  permission-contents: write
+                  permission-workflows: write
+
             - name: Set Release Version
               id: get_release_version
               env:
@@ -433,7 +461,7 @@ jobs:
                   RELEASE_NAME: ${{ steps.get_release_version.outputs.version }}
                   VERSION: ${{ needs.bump-version.outputs.new_version }}
               with:
-                  github-token: ${{ secrets.GUTENBERG_TOKEN }}
+                  github-token: ${{ steps.app-token.outputs.token }}
                   script: |
                       const fs = require('fs');
 

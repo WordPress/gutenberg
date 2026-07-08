@@ -42,7 +42,7 @@ export function WidgetToolbar( {
 			align="center"
 			gap="xs"
 			className={ clsx(
-				styles.widgetToolbar,
+				styles[ 'widget-toolbar' ],
 				editMode && styles.elevated
 			) }
 		>

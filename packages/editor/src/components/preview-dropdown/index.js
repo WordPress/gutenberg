@@ -21,6 +21,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { VisuallyHidden } from '@wordpress/ui';
 
 /**
@@ -31,10 +32,14 @@ import PostPreviewButton from '../post-preview-button';
 import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
 
+const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
+
 export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	const {
 		deviceType,
 		homeUrl,
+		hasMobileViewport,
+		hasTabletViewport,
 		isTemplate,
 		isViewable,
 		showIconLabels,
@@ -51,12 +56,18 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		const { isResponsiveEditing: _isResponsiveEditing } = unlock(
 			select( blockEditorStore )
 		);
+		const blockEditorSettings = select( blockEditorStore ).getSettings();
 		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
 		const _currentPostType = getCurrentPostType();
+		const viewportBreakpoints = getViewportBreakpoints(
+			blockEditorSettings.__experimentalFeatures?.viewport
+		);
 		return {
 			deviceType: getDeviceType(),
 			homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
+			hasMobileViewport: viewportBreakpoints.mobile !== undefined,
+			hasTabletViewport: viewportBreakpoints.tablet !== undefined,
 			isTemplate: _currentPostType === 'wp_template',
 			isViewable: getPostType( _currentPostType )?.viewable ?? false,
 			showIconLabels: get( 'core', 'showIconLabels' ),
@@ -128,22 +139,30 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 				? __( 'Edit across all breakpoints.' )
 				: __( 'Preview desktop viewport.' ),
 		},
-		{
-			value: 'Tablet',
-			label: __( 'Tablet' ),
-			icon: tablet,
-			info: isResponsiveEditing
-				? __( 'Make tablet exclusive style changes.' )
-				: __( 'Preview tablet viewport.' ),
-		},
-		{
-			value: 'Mobile',
-			label: __( 'Mobile' ),
-			icon: mobile,
-			info: isResponsiveEditing
-				? __( 'Make mobile exclusive style changes.' )
-				: __( 'Preview mobile viewport.' ),
-		},
+		...( hasTabletViewport
+			? [
+					{
+						value: 'Tablet',
+						label: __( 'Tablet' ),
+						icon: tablet,
+						info: isResponsiveEditing
+							? __( 'Make tablet exclusive changes.' )
+							: __( 'Preview tablet viewport.' ),
+					},
+			  ]
+			: [] ),
+		...( hasMobileViewport
+			? [
+					{
+						value: 'Mobile',
+						label: __( 'Mobile' ),
+						icon: mobile,
+						info: isResponsiveEditing
+							? __( 'Make mobile exclusive changes.' )
+							: __( 'Preview mobile viewport.' ),
+					},
+			  ]
+			: [] ),
 	];
 
 	return (
@@ -175,7 +194,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							role="menuitemcheckbox"
 							onClick={ handleResponsiveEditingChange }
 							info={ __(
-								'Style changes apply only to the current viewport.'
+								'Edits apply only to the current state.'
 							) }
 						>
 							{ __( 'Responsive editing' ) }

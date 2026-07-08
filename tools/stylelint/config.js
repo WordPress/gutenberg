@@ -1,14 +1,6 @@
 // CSS Baseline 2024 stepped-value functions not yet recognized by Stylelint.
 const CSS_BASELINE_2024_FUNCTIONS = [ 'round', 'rem', 'mod' ];
 
-const SELECTOR_CLASS_PATTERN = [
-	'^[a-z][a-z0-9]*(?:(?:__|--|-)[a-z0-9]+)*$',
-	{
-		message:
-			'Selector should use lowercase class segments separated with hyphens, double hyphens, or double underscores (selector-class-pattern)',
-	},
-];
-
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
@@ -55,7 +47,13 @@ module.exports = {
 			},
 		],
 		'rule-empty-line-before': null,
-		'selector-class-pattern': null,
+		'selector-class-pattern': [
+			'^[a-z][a-z0-9]*(?:(?:__|--|-)[a-z0-9]+)*$',
+			{
+				message:
+					'Selector should use lowercase class segments separated with hyphens, double hyphens, or double underscores (selector-class-pattern)',
+			},
+		],
 		'value-keyword-case': null,
 		'scss/operator-no-unspaced': null,
 		'scss/selector-no-redundant-nesting-selector': null,
@@ -153,16 +151,6 @@ module.exports = {
 						],
 					},
 				],
-			},
-		},
-		{
-			files: [
-				'packages/components/src/**/*.module.{css,scss}',
-				'packages/theme/src/**/*.module.{css,scss}',
-				'packages/ui/src/**/*.module.{css,scss}',
-			],
-			rules: {
-				'selector-class-pattern': SELECTOR_CLASS_PATTERN,
 			},
 		},
 	],

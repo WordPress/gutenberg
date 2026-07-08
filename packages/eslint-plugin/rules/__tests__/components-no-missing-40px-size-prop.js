@@ -112,7 +112,7 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 				<>
 					<FormTokenField />
 					<InputControl __next40pxDefaultSize />
-					<NumberControl __next40pxDefaultSize />
+					<NumberControl />
 					<RangeControl />
 					<SelectControl />
 					<ToggleGroupControl />
