@@ -24,6 +24,7 @@ import {
 import { Notes } from './notes';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
+import { AddNoteToSelectionMenuItem } from './add-note-to-selection-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
@@ -141,6 +142,21 @@ function NotesSidebar( { postId } ) {
 		} );
 	}
 
+	// Open the new-note form for the current multi-block selection. Unlike
+	// `focusNote`, this deliberately does NOT `selectBlock`/`toggleBlockSpotlight`
+	// - either would collapse the cross-block text selection before `onCreate`
+	// can read it to place the shared marker across every spanned block.
+	function addNewNoteForSelection() {
+		const currentArea = getActiveComplementaryArea( 'core' );
+		if ( ! SIDEBARS.includes( currentArea ) ) {
+			enableComplementaryArea(
+				'core',
+				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
+			);
+		}
+		selectNote( 'new', { focus: true } );
+	}
+
 	useShortcut(
 		'core/editor/new-note',
 		( event ) => {
@@ -183,6 +199,10 @@ function NotesSidebar( { postId } ) {
 				onClick={ ( menuClientId ) =>
 					addNewNoteForBlock( menuClientId )
 				}
+			/>
+			<AddNoteToSelectionMenuItem
+				onClick={ addNewNoteForSelection }
+				isDistractionFree={ isDistractionFree }
 			/>
 			{ showAllNotesSidebar && (
 				<PluginSidebar
