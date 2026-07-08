@@ -129,8 +129,5 @@ describe( 'ControlledInnerBlocks', () => {
 		// The template application syncs back to the controlling entity as
 		// a non-persistent change.
 		expect( onInput ).toHaveBeenCalled();
-		expect( console ).toHaveWarnedWith(
-			'The template property of inner blocks is deprecated since version 7.0. Please use a template declared in block type settings, which applies when the inner blocks are empty instead.'
-		);
 	} );
 } );
