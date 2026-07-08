@@ -9,15 +9,24 @@ import {
 	serialize,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Returns a generator converting a reusable block into a static block.
+ *
+ * @deprecated
  *
  * @param {string} clientId The client ID of the block to attach.
  */
 export const __experimentalConvertBlockToStatic =
 	( clientId ) =>
 	( { registry } ) => {
+		deprecated(
+			"wp.data.dispatch( 'core/reusable-blocks' ).__experimentalConvertBlockToStatic",
+			{
+				since: '7.1',
+			}
+		);
 		const oldBlock = registry
 			.select( blockEditorStore )
 			.getBlock( clientId );
@@ -42,6 +51,8 @@ export const __experimentalConvertBlockToStatic =
 /**
  * Returns a generator converting one or more static blocks into a pattern.
  *
+ * @deprecated
+ *
  * @param {string[]}             clientIds The client IDs of the block to detach.
  * @param {string}               title     Pattern title.
  * @param {undefined|'unsynced'} syncType  They way block is synced, current undefined (synced) and 'unsynced'.
@@ -49,6 +60,12 @@ export const __experimentalConvertBlockToStatic =
 export const __experimentalConvertBlocksToReusable =
 	( clientIds, title, syncType ) =>
 	async ( { registry, dispatch } ) => {
+		deprecated(
+			"wp.data.dispatch( 'core/reusable-blocks' ).__experimentalConvertBlocksToReusable",
+			{
+				since: '7.1',
+			}
+		);
 		const meta =
 			syncType === 'unsynced'
 				? {
@@ -90,11 +107,19 @@ export const __experimentalConvertBlocksToReusable =
 /**
  * Returns a generator deleting a reusable block.
  *
+ * @deprecated
+ *
  * @param {string} id The ID of the reusable block to delete.
  */
 export const __experimentalDeleteReusableBlock =
 	( id ) =>
 	async ( { registry } ) => {
+		deprecated(
+			"wp.data.dispatch( 'core/reusable-blocks' ).__experimentalDeleteReusableBlock",
+			{
+				since: '7.1',
+			}
+		);
 		const reusableBlock = registry
 			.select( 'core' )
 			.getEditedEntityRecord( 'postType', 'wp_block', id );
@@ -128,11 +153,19 @@ export const __experimentalDeleteReusableBlock =
 /**
  * Returns an action descriptor for SET_EDITING_REUSABLE_BLOCK action.
  *
+ * @deprecated
+ *
  * @param {string}  clientId  The clientID of the reusable block to target.
  * @param {boolean} isEditing Whether the block should be in editing state.
  * @return {Object} Action descriptor.
  */
 export function __experimentalSetEditingReusableBlock( clientId, isEditing ) {
+	deprecated(
+		"wp.data.dispatch( 'core/reusable-blocks' ).__experimentalSetEditingReusableBlock",
+		{
+			since: '7.1',
+		}
+	);
 	return {
 		type: 'SET_EDITING_REUSABLE_BLOCK',
 		clientId,

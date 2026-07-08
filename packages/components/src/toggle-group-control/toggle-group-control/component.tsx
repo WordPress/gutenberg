@@ -76,7 +76,6 @@ function UnconnectedToggleGroupControl(
 					isBlock,
 					isDeselectable,
 				} ),
-				isBlock && styles.block,
 				className
 			),
 		[ className, cx, isBlock, isDeselectable ]

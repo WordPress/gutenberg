@@ -2,6 +2,10 @@
 	"name": "core/site-health",
 	"title": "Site Health Status",
 	"description": "Shows an overview of your site health and any issues that need attention.",
+	"help": {
+		"content": "Results come from your site's latest health checks.",
+		"links": [ { "label": "Visit Site Health", "href": "site-health.php" } ]
+	},
 	"category": "site",
 	"presentation": "framed",
 	"textdomain": "default"

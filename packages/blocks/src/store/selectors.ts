@@ -2,6 +2,7 @@
  * External dependencies
  */
 import removeAccents from 'remove-accents';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
@@ -223,10 +224,13 @@ export const getBlockVariations = createSelector(
  * and the variation's attributes and determines if a variation is active.
  * A function that accepts a block's attributes and the variation's attributes and determines if a variation is active.
  *
- * @param state      Data state.
- * @param blockName  Name of block (example: "core/columns").
- * @param attributes Block attributes used to determine active variation.
- * @param scope      Block variation scope name.
+ * @param state        Data state.
+ * @param blockName    Name of block (example: "core/columns").
+ * @param attributes   Block attributes used to determine active variation.
+ * @param scope        Block variation scope name.
+ * @param innerContent Block inner content used to determine the active
+ *                     variation for blocks (such as the Custom HTML block)
+ *                     whose variations declare static inner content.
  *
  * @example
  * ```js
@@ -262,12 +266,29 @@ export function getActiveBlockVariation(
 	state: BlockStoreState,
 	blockName: string,
 	attributes: Record< string, unknown >,
-	scope?: BlockVariationScope
+	scope?: BlockVariationScope,
+	innerContent?: Array< string | null >
 ): BlockVariation | undefined {
 	const variations = getBlockVariations( state, blockName, scope );
 
 	if ( ! variations ) {
 		return variations;
+	}
+
+	// Variations that declare static inner content (the Custom HTML block)
+	// match when the block's inner content is deeply equal. Since inner
+	// content stores the static fragments and `null` slot markers — not the
+	// inner blocks themselves — editing the inner blocks keeps the match,
+	// while editing the static markup breaks it.
+	if ( innerContent ) {
+		const innerContentMatch = variations.find(
+			( variation ) =>
+				variation.innerContent &&
+				fastDeepEqual( variation.innerContent, innerContent )
+		);
+		if ( innerContentMatch ) {
+			return innerContentMatch;
+		}
 	}
 
 	const blockType = getBlockType( state, blockName );
@@ -276,6 +297,10 @@ export function getActiveBlockVariation(
 	let maxMatchedAttributes = 0;
 
 	for ( const variation of variations ) {
+		// Inner-content variations are handled above.
+		if ( variation.innerContent ) {
+			continue;
+		}
 		if ( Array.isArray( variation.isActive ) ) {
 			const definedAttributes = variation.isActive.filter(
 				( attribute ) => {

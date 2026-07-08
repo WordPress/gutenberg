@@ -230,7 +230,7 @@
 	.boot-layout__inspector,
 	.boot-layout__canvas:not(.has-mobile-drawer) {
 		top: var(--wp-admin--admin-bar--height, 0);
-		height: calc(100vh - var(--wp-admin--admin-bar--height, 0));
+		height: calc(100vh - var(--wp-admin--admin-bar--height, 0px));
 	}
 
 	.boot-layout__mobile-sidebar-drawer {
