@@ -1,3 +1,7 @@
 .wp-block-post-content {
 	display: flow-root;
 }
+
+.wp-block-post-content.has-drop-cap.has-background {
+	overflow: hidden;
+}
