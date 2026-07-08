@@ -22,7 +22,7 @@
  * ```
  */
 import { directive, isDefaultDirectiveSuffix } from '../hooks';
-import { useInit, useLayoutEffect } from '../utils';
+import { useInit, useLayoutEffect, useWatch, warn } from '../utils';
 import { store, setByPath } from '../store';
 import { PENDING_GETTER } from '../proxies/state';
 
@@ -146,7 +146,31 @@ const detectDescriptor = (
 		};
 	}
 
-	// text, email, password, search, url, tel, textarea, select …
+	// Custom elements (web components with a dash in the tag name).
+	if ( elementType && elementType.includes( '-' ) ) {
+		return {
+			prop: 'value',
+			events: [ 'input', 'change' ],
+			toSignal: ( el, signalType ) =>
+				signalType === 'number'
+					? +( el as HTMLInputElement ).value
+					: ( el as any ).value,
+		};
+	}
+
+	// Textarea — explicit branch for readability.
+	if ( elementType === 'textarea' ) {
+		return {
+			prop: 'value',
+			events: [ 'input' ],
+			toSignal: ( el, signalType ) =>
+				signalType === 'number'
+					? +( el as HTMLTextAreaElement ).value
+					: ( el as HTMLTextAreaElement ).value,
+		};
+	}
+
+	// text, email, password, search, url, tel, …
 	return {
 		prop: 'value',
 		events: [ 'input' ],
@@ -214,8 +238,13 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 										typeof reader.result === 'string'
 											? reader.result
 											: '';
-									const match = result.match( dataURIRegex );
-									resolve( {
+									const match = result.match( dataURIRegex );								if ( globalThis.SCRIPT_DEBUG ) {
+									if ( ! match?.groups ) {
+										warn(
+											'data-wp-input: Invalid data URI for file input.'
+										);
+									}
+								}									resolve( {
 										name: f.name,
 										contents: match?.groups?.contents ?? '',
 										mime: match?.groups?.mime ?? '',
@@ -290,6 +319,22 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 			syncElementProp( el, desc, current, props );
 		}
 	}, [] );
+
+	// ---- multi-select: keep element in sync with signal (Preact diff
+	// does not handle <select multiple>) ----
+	if ( elementType === 'select' && props.multiple ) {
+		useWatch( () => {
+			const el = ( element.ref as { current?: HTMLSelectElement } )
+				.current;
+			if ( ! el ) {
+				return;
+			}
+			const current = evaluate( entry );
+			if ( Array.isArray( current ) ) {
+				syncElementProp( el, desc, current, props );
+			}
+		} );
+	}
 
 	// ---- wire up event handlers ----
 	for ( const eventName of desc.events ) {
