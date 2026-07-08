@@ -103,7 +103,7 @@ describe( 'useAriaAnnouncer', () => {
 		expect( result.current ).toBe( 'Crop 800 by 400 pixels' );
 	} );
 
-	it( 'announces only rotation with direction when only rotation changes', () => {
+	it( 'announces visual rotation when rotation changes', () => {
 		const { result, rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{ initialProps: { state: makeState() } }
@@ -116,24 +116,33 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Rotated 15 degrees clockwise' );
+		expect( result.current ).toBe( 'Rotation 15 degrees' );
 	} );
 
-	it( 'announces counterclockwise rotation for shortest-arc CCW changes', () => {
+	it( 'announces negative visual rotation with single-axis flip', () => {
 		const { result, rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
-			{ initialProps: { state: makeState() } }
+			{
+				initialProps: {
+					state: makeState( {
+						flip: { horizontal: true, vertical: false },
+					} ),
+				},
+			}
 		);
 
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		// 0 → 350 is a -10° shortest-arc delta (counterclockwise).
+		// With a single-axis flip, rotation 10 appears as -10 visually.
 		rerender( {
-			state: makeState( { rotation: 350 } ),
+			state: makeState( {
+				rotation: 10,
+				flip: { horizontal: true, vertical: false },
+			} ),
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Rotated 10 degrees counterclockwise' );
+		expect( result.current ).toBe( 'Rotation -10 degrees' );
 	} );
 
 	it( 'announces rotation back to zero', () => {

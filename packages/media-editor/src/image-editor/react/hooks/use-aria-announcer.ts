@@ -46,51 +46,30 @@ function getRotationAnnouncement(
 	state: CropperState,
 	previousState: CropperState | null
 ): string | undefined {
-	if ( ! previousState ) {
-		const rounded = Math.round( state.rotation % 360 );
-		if ( rounded === 0 ) {
-			return undefined;
-		}
-		return sprintf(
-			/* translators: %d: rotation angle in degrees. */
-			__( 'Rotation %d degrees' ),
-			rounded
-		);
-	}
-
 	if (
+		previousState &&
 		Math.round( previousState.rotation ) === Math.round( state.rotation )
 	) {
 		return undefined;
 	}
-
-	const rounded = Math.round( state.rotation % 360 );
-	// Compute signed shortest-arc delta to determine direction.
-	let delta = ( state.rotation - previousState.rotation ) % 360;
-	if ( delta > 180 ) {
-		delta -= 360;
+	// Announce the visual rotation offset — the same value the fine-rotation
+	// slider shows. The offset is relative to the nearest 90° cardinal and
+	// accounts for single-axis flip inverting the visual direction.
+	const baseAngle = ( Math.round( state.rotation / 90 ) * 90 ) % 360;
+	const singleFlip = state.flip.horizontal !== state.flip.vertical;
+	const visualDir = singleFlip ? -1 : 1;
+	const offset = Math.round(
+		( state.rotation - Math.round( state.rotation / 90 ) * 90 ) * visualDir
+	);
+	const visualRotation = baseAngle + offset;
+	if ( visualRotation === 0 ) {
+		return previousState ? __( 'Rotation 0 degrees' ) : undefined;
 	}
-	if ( delta < -180 ) {
-		delta += 360;
-	}
-	if ( rounded === 0 ) {
-		return __( 'Rotation 0 degrees' );
-	}
-	if ( delta > 0 ) {
-		return sprintf(
-			/* translators: %d: rotation angle in degrees. */
-			__( 'Rotated %d degrees clockwise' ),
-			rounded
-		);
-	}
-	if ( delta < 0 ) {
-		return sprintf(
-			/* translators: %d: rotation angle in degrees. */
-			__( 'Rotated %d degrees counterclockwise' ),
-			360 - rounded
-		);
-	}
-	return undefined;
+	return sprintf(
+		/* translators: %d: rotation angle in degrees. */
+		__( 'Rotation %d degrees' ),
+		visualRotation
+	);
 }
 
 function getCropAnnouncement(
