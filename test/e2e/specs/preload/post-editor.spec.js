@@ -91,23 +91,14 @@ test.describe( 'Preload', () => {
 } );
 
 test.describe( 'Preload with the DataForm inspector experiment', () => {
-	let postId;
-
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
 			'gutenberg-dataform-inspector',
 		] );
-		const post = await requestUtils.createPost( {
-			content:
-				'<!-- wp:heading -->\n<h2 class="wp-block-heading">Hello</h2>\n<!-- /wp:heading -->',
-			status: 'draft',
-		} );
-		postId = post.id;
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [] );
-		await requestUtils.deleteAllPosts();
 	} );
 
 	test( 'Should serve the view config form request from the preload cache', async ( {
@@ -128,7 +119,7 @@ test.describe( 'Preload with the DataForm inspector experiment', () => {
 			}
 		} );
 
-		await admin.editPost( postId );
+		await admin.createNewPost();
 		await openPostSummary( { editor, page } );
 		await waitForRequestsToSettle( requests );
 		stop();
