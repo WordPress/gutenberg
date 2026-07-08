@@ -17,13 +17,13 @@ When client-side processing is not available (unsupported browser, insufficient 
 
 Both paths converge at `wp_generate_attachment_metadata`, so server-side hooks see the same surface regardless of which path was taken:
 
-![Upload flow: the client-side path (WASM worker processing plus the sideload endpoint) and the server-side path (POST /wp/v2/media plus PHP thumbnails) both converge at wp_generate_attachment_metadata](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/client-side-media-upload-flow.png)
+![Upload flow: the client-side path (WASM worker processing plus the sideload endpoint) and the server-side path (POST /wp/v2/media plus PHP thumbnails) both converge at wp_generate_attachment_metadata](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/client-side-media-upload-flow.svg)
 
 ## Architecture overview
 
 The client-side media processing pipeline flows through several layers:
 
-![Architecture overview: the block editor calls mediaUpload() from @wordpress/media-utils, which hands off to the @wordpress/upload-media store, which orchestrates the @wordpress/vips web worker and the REST API endpoints](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/client-side-media-architecture-overview.png)
+![Architecture overview: the block editor calls mediaUpload() from @wordpress/media-utils, which hands off to the @wordpress/upload-media store, which orchestrates the @wordpress/vips web worker and the REST API endpoints](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/client-side-media-architecture-overview.svg)
 
 ## Three-package split
 
@@ -69,7 +69,7 @@ Provides the `uploadMedia()` and `sideloadMedia()` functions that handle the act
 
 When a user uploads an image in the block editor, the following pipeline executes:
 
-![The six-step processing pipeline: prepare, transcode (optional), upload the original, generate thumbnails, sideload sub-sizes, and finalize](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/client-side-media-processing-pipeline.png)
+![The six-step processing pipeline: prepare, transcode (optional), upload the original, generate thumbnails, sideload sub-sizes, and finalize](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/client-side-media-processing-pipeline.svg)
 
 ### 1. Prepare
 
@@ -266,7 +266,7 @@ Conversion lives in a dedicated package that mirrors the `@wordpress/vips` worke
 
 ### Conversion pipeline
 
-![The GIF to video conversion pipeline: detect an opaque animated GIF, decode frames with ImageDecoder, encode with the WebCodecs VideoEncoder and mediabunny, store the video and poster as companion files, and swap the block in the editor](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/client-side-media-gif-to-video.png)
+![The GIF to video conversion pipeline: detect an opaque animated GIF, decode frames with ImageDecoder, encode with the WebCodecs VideoEncoder and mediabunny, store the video and poster as companion files, and swap the block in the editor](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/client-side-media-gif-to-video.svg)
 
 1.  **Detection.** `isAnimatedGif()` (in `packages/upload-media/src/utils.ts`) inspects the GIF89a Graphic Control Extension blocks to confirm the file is actually animated. Transparent GIFs are excluded — a `<video>` cannot reproduce GIF transparency — so they upload as a normal image with no companion.
 2.  **Decode.** The browser's `ImageDecoder` decodes each GIF frame, honoring the real per-frame `delay` values (defaulting to the GIF spec's 100ms / 10fps when a frame reports none).
