@@ -240,6 +240,17 @@ async function preloadResolutions( postType, postId ) {
 				kind: 'postType',
 				name: 'wp_template',
 			} ),
+			// The DataForm-based inspector requests the entity form config
+			// when the document sidebar mounts. The args must match the
+			// `useViewConfig` call in `@wordpress/views` exactly for the
+			// resolution (and its preload entry) to be shared.
+			...( postType && window?.__experimentalDataFormInspector
+				? [
+						unlock( core ).getViewConfig( 'postType', postType, {
+							fields: 'form',
+						} ),
+				  ]
+				: [] ),
 			// Per-post resolvers. `getPostType` and `getEditedEntityRecord`
 			// are shorthand/forward-resolver aliases with their own
 			// resolution metadata, so they need separate kicks.
