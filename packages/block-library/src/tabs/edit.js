@@ -14,9 +14,9 @@ function Edit( { clientId } ) {
 
 	const blockProps = useBlockProps();
 
-	// The template in block.json only specifies the two structural child
-	// blocks, without inner block entries for core/tab-list or
-	// core/tab-panels.
+	// The template in the block type settings only specifies the two
+	// structural child blocks, without inner block entries for
+	// core/tab-list or core/tab-panels.
 	//
 	// If inner blocks were included in that template,
 	// `synchronizeBlocksWithTemplate` (called whenever templateLock === 'all')
