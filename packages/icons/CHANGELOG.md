@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments.
+
 ## 15.1.0 (2026-07-01)
 
 ## 15.0.0 (2026-06-24)

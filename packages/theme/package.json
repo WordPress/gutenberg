@@ -106,11 +106,11 @@
 		"stylelint": "^16.26.1"
 	},
 	"peerDependencies": {
-		"@types/react": "^18.3.27",
+		"@types/react": "^18 || ^19",
 		"esbuild": "^0.27.2",
 		"postcss": "^8.0.0",
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19",
 		"stylelint": "^16.8.2",
 		"vite": "^7.3.2"
 	},
