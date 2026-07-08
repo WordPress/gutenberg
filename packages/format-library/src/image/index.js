@@ -165,20 +165,27 @@ function Edit( {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ getCurrentImageId( activeObjectAttributes ) }
 				onSelect={ ( { id, url, alt, width: imgWidth } ) => {
-					onChange(
-						insertObject( value, {
-							type: name,
-							attributes: {
-								className: `wp-image-${ id }`,
-								style: `width: ${ Math.min(
-									imgWidth,
-									150
-								) }px;`,
-								url,
-								alt,
-							},
-						} )
-					);
+					const existingFormats = isObjectActive
+						? value.formats[ value.start ] ?? []
+						: [];
+
+					let newValue = insertObject( value, {
+						type: name,
+						attributes: {
+							className: `wp-image-${ id }`,
+							style: `width: ${ Math.min( imgWidth, 150 ) }px;`,
+							url,
+							alt,
+						},
+					} );
+
+					if ( existingFormats.length ) {
+						const newFormats = newValue.formats.slice();
+						newFormats[ value.start ] = existingFormats;
+						newValue = { ...newValue, formats: newFormats };
+					}
+
+					onChange( newValue );
 					onFocus();
 				} }
 				render={ ( { open } ) => (
