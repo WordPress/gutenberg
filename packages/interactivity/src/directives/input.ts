@@ -322,6 +322,30 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 	const path = entry.value;
 	const props = element.props as Record< string, unknown >;
 
+	// Create write/read roots at render time (scope is active).
+	// NOTE: these are created early so file input and all other code paths
+	// can share the same write mechanism.  They do not depend on signalValue.
+
+	const stateRoot = store( entry.namespace );
+
+	const contextRoot = path.startsWith( 'context.' )
+		? getContext( entry.namespace )
+		: undefined;
+
+	const writeSignal = createSignalWriter(
+		entry.namespace,
+		path,
+		stateRoot,
+		contextRoot
+	);
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const readSignal = createSignalReader(
+		entry.namespace,
+		path,
+		stateRoot,
+		contextRoot
+	);
+
 	// ---- file inputs – handled via useInit + FileReader ----
 	if ( ( props.type as string | undefined ) === 'file' ) {
 		useInit( () => {
@@ -376,24 +400,6 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 	if ( signalValue === PENDING_GETTER ) {
 		return;
 	}
-
-	// Capture write/read roots at render time (scope is active).
-	const stateRoot = store( entry.namespace );
-	const contextRoot = path.startsWith( 'context.' )
-		? getContext( entry.namespace )
-		: undefined;
-	const writeSignal = createSignalWriter(
-		entry.namespace,
-		path,
-		stateRoot,
-		contextRoot
-	);
-	const readSignal = createSignalReader(
-		entry.namespace,
-		path,
-		stateRoot,
-		contextRoot
-	);
 
 	const elementType =
 		typeof element.type === 'string' ? element.type.toLowerCase() : null;

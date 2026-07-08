@@ -381,7 +381,7 @@ test.describe( 'data-wp-input', () => {
 	/* ------------------------------------------------------------------ */
 	/*  15. File input                                                     */
 	/* ------------------------------------------------------------------ */
-	test.skip( 'should handle file input', async ( { page } ) => {
+	test( 'should handle file input', async ( { page } ) => {
 		const countOutput = page.getByTestId( 'file-count-output' );
 		const fileInput = page.getByTestId( 'file-input' );
 
