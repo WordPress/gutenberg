@@ -348,7 +348,7 @@
 	/* Regular font weight for body text */
 	--wpds-typography-font-weight-regular: 400;
 	/* Medium font weight for emphasis and headings */
-	--wpds-typography-font-weight-medium: 499;
+	--wpds-typography-font-weight-medium: 500;
 }
 
 @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {

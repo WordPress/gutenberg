@@ -41,7 +41,7 @@ export const FONT_SIZE_X_SMALL = '11px';
 export const FONT_SIZE_MEDIUM = '13px';
 
 // _font.scss — $font-weight-medium
-export const FONT_WEIGHT_MEDIUM = '499';
+export const FONT_WEIGHT_MEDIUM = '500';
 
 // _font.scss — $font-line-height-small
 export const FONT_LINE_HEIGHT_SMALL = '20px';
