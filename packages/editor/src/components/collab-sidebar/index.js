@@ -4,11 +4,16 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
+import {
+	DropdownMenu,
+	MenuGroup,
+	MenuItemsChoice,
+} from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as interfaceStore } from '@wordpress/interface';
+import { PinnedItems, store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
 
@@ -17,9 +22,10 @@ import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
  */
 import PluginSidebar from '../plugin-sidebar';
 import {
+	SIDEBARS,
 	ALL_NOTES_SIDEBAR,
 	FLOATING_NOTES_SIDEBAR,
-	SIDEBARS,
+	NOOP_NOTES_SIDEBAR,
 } from './constants';
 import { Notes } from './notes';
 import { store as editorStore } from '../../store';
@@ -32,6 +38,54 @@ import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import { NOTE_FORMAT_NAME, noteFormat } from './format';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
+
+function NotesSidebarPinnedItems( { isLargeViewport } ) {
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const activeComplementaryArea = useSelect( ( select ) => {
+		return select( interfaceStore ).getActiveComplementaryArea( 'core' );
+	}, [] );
+
+	return (
+		<PinnedItems scope="core">
+			<DropdownMenu
+				icon={ commentIcon }
+				label={ __( 'Notes' ) }
+				menuProps={ {
+					'aria-label': __( 'Notes display options' ),
+				} }
+				toggleProps={ {
+					size: 'compact',
+				} }
+			>
+				{ () => (
+					<MenuGroup>
+						<MenuItemsChoice
+							choices={ [
+								{
+									value: FLOATING_NOTES_SIDEBAR,
+									label: __( 'Show notes' ),
+									disabled: ! isLargeViewport,
+								},
+								{
+									value: ALL_NOTES_SIDEBAR,
+									label: __( 'Show all notes' ),
+								},
+								{
+									value: NOOP_NOTES_SIDEBAR,
+									label: __( 'Hide notes' ),
+								},
+							] }
+							value={ activeComplementaryArea }
+							onSelect={ ( value ) => {
+								enableComplementaryArea( 'core', value );
+							} }
+						/>
+					</MenuGroup>
+				) }
+			</DropdownMenu>
+		</PinnedItems>
+	);
+}
 
 function NotesSidebar( { postId } ) {
 	useEffect( () => {
@@ -185,20 +239,26 @@ function NotesSidebar( { postId } ) {
 				}
 			/>
 			{ showAllNotesSidebar && (
-				<PluginSidebar
-					identifier={ ALL_NOTES_SIDEBAR }
-					name={ ALL_NOTES_SIDEBAR }
-					title={ __( 'All notes' ) }
-					header={
-						<h2 className="interface-complementary-area-header__title">
-							{ __( 'All notes' ) }
-						</h2>
-					}
-					icon={ commentIcon }
-					closeLabel={ __( 'Close Notes' ) }
-				>
-					<Notes notes={ notes } sidebarRef={ sidebarRef } />
-				</PluginSidebar>
+				<>
+					<NotesSidebarPinnedItems
+						isLargeViewport={ isLargeViewport }
+					/>
+					<PluginSidebar
+						isPinnable={ false }
+						identifier={ ALL_NOTES_SIDEBAR }
+						name={ ALL_NOTES_SIDEBAR }
+						title={ __( 'All notes' ) }
+						header={
+							<h2 className="interface-complementary-area-header__title">
+								{ __( 'All notes' ) }
+							</h2>
+						}
+						icon={ commentIcon }
+						closeLabel={ __( 'Close Notes' ) }
+					>
+						<Notes notes={ notes } sidebarRef={ sidebarRef } />
+					</PluginSidebar>
+				</>
 			) }
 			{ isLargeViewport && (
 				<PluginSidebar
