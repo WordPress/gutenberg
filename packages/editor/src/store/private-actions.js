@@ -776,3 +776,20 @@ export function selectNote( noteId, options = { focus: false } ) {
 		options,
 	};
 }
+
+/**
+ * Stash the per-block marker segments for a multi-block note, so note creation
+ * can apply a shared marker to every spanned block. Held in a dedicated store
+ * field (not on the pending note's options) so the `selectNote` calls that
+ * follow the entry point don't wipe it before the save resolves. Pass `null`
+ * to clear it.
+ *
+ * @param {?Array} segments Ordered per-block segments, or null to clear.
+ * @return {Object} Action object.
+ */
+export function setPendingNoteSegments( segments ) {
+	return {
+		type: 'SET_PENDING_NOTE_SEGMENTS',
+		segments,
+	};
+}

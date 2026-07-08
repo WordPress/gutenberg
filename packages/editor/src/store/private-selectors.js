@@ -536,17 +536,15 @@ export function isNoteFocused( state ) {
 /**
  * Returns the per-block marker segments captured when a multi-block note is
  * started. A cross-block text selection can collapse once focus enters the
- * sidebar form, so the entry point captures the segments up front and stashes
- * them on the pending "new" note; note creation reads them back here. Every
- * note entry point calls `selectNote`, so these are overwritten (cleared) when
- * a different note is started.
+ * sidebar form, so the entry point captures the segments up front with
+ * `setPendingNoteSegments`; note creation reads them back here and clears them.
  *
  * @param {Object} state Global application state.
  *
  * @return {?Array} Captured segments, or null when none were captured.
  */
 export function getPendingNoteSegments( state ) {
-	return state.selectedNote?.options?.segments ?? null;
+	return state.pendingNoteSegments ?? null;
 }
 
 /**

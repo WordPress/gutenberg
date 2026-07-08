@@ -486,6 +486,25 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer holding the per-block marker segments captured when a multi-block
+ * note is started. Kept separate from `selectedNote` so the reactive
+ * `selectNote` calls that follow (focus reset, block-transition sync) can't
+ * clobber the segments before the note is saved.
+ *
+ * @param {?Array} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {?Array} Updated state.
+ */
+export function pendingNoteSegments( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_PENDING_NOTE_SEGMENTS':
+			return action.segments ?? null;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -511,5 +530,6 @@ export default combineReducers( {
 	revisionPage,
 	showRevisionDiff,
 	selectedNote,
+	pendingNoteSegments,
 	dataviews: dataviewsReducer,
 } );

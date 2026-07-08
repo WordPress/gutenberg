@@ -24,7 +24,6 @@ import {
 import { Notes } from './notes';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
-import { AddNoteToSelectionMenuItem } from './add-note-to-selection-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
@@ -51,7 +50,9 @@ function NotesSidebar( { postId } ) {
 	const { toggleBlockSpotlight, selectBlock } = unlock(
 		useDispatch( blockEditorStore )
 	);
-	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const { selectNote, setPendingNoteSegments } = unlock(
+		useDispatch( editorStore )
+	);
 	// Bound block-editor selectors, read imperatively in handlers (no re-render
 	// on change). Passed straight to readMultiBlockSelection, which reads the
 	// selection keys it needs.
@@ -152,15 +153,19 @@ function NotesSidebar( { postId } ) {
 
 	// Open the new-note form for the current multi-block selection. Capture the
 	// per-block marker segments *first*, while the cross-block selection is still
-	// live (it collapses once focus enters the form), and stash them on the
-	// pending note for `onCreate` to consume. Then select the first spanned block:
-	// the new-note form only renders when a single block is selected, and the
+	// live (it collapses once a single block is selected), and stash them in the
+	// store for `onCreate` to consume. Then select the first spanned block: the
+	// new-note form only renders when a single block is selected, and the
 	// already-captured segments still drive marking across every block.
 	function addNewNoteForSelection() {
 		const segments = readMultiBlockSelection( blockEditorSelectors );
 		const anchorClientId =
 			segments?.[ 0 ]?.clientId ??
 			blockEditorSelectors.getSelectedBlockClientId();
+		// Stash the segments in a dedicated store field so the reactive
+		// `selectNote` calls that follow (focus reset, block-transition sync)
+		// can't clobber them before the save resolves.
+		setPendingNoteSegments( segments );
 		const currentArea = getActiveComplementaryArea( 'core' );
 		if ( ! SIDEBARS.includes( currentArea ) ) {
 			enableComplementaryArea(
@@ -172,7 +177,7 @@ function NotesSidebar( { postId } ) {
 			// `null` = keep focus available for the sidebar form.
 			selectBlock( anchorClientId, null );
 		}
-		selectNote( 'new', { focus: true, segments } );
+		selectNote( 'new', { focus: true } );
 	}
 
 	useShortcut(
@@ -217,10 +222,7 @@ function NotesSidebar( { postId } ) {
 				onClick={ ( menuClientId ) =>
 					addNewNoteForBlock( menuClientId )
 				}
-			/>
-			<AddNoteToSelectionMenuItem
-				onClick={ addNewNoteForSelection }
-				isDistractionFree={ isDistractionFree }
+				onClickSelection={ addNewNoteForSelection }
 			/>
 			{ showAllNotesSidebar && (
 				<PluginSidebar

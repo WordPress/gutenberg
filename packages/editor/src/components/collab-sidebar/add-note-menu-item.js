@@ -63,19 +63,60 @@ function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
 	);
 }
 
-export function AddNoteMenuItem( { onClick, isDistractionFree } ) {
+/**
+ * "Add note" item for a multi-block selection. The single-block variant keys off
+ * one block's validity and shows the new-note shortcut; a cross-block selection
+ * has neither, so this is a plain item that opens the form for the whole range.
+ *
+ * @param {Object}   props
+ * @param {Function} props.onClick           Opens the new-note form for the selection.
+ * @param {boolean}  props.isDistractionFree Whether distraction-free mode is on.
+ * @return {Element} The menu item.
+ */
+function SelectionNoteMenuItem( { onClick, isDistractionFree } ) {
+	return (
+		<MenuItem
+			onClick={ onClick }
+			aria-haspopup="dialog"
+			disabled={ isDistractionFree }
+			info={
+				isDistractionFree
+					? __( 'Notes are disabled in distraction free mode.' )
+					: undefined
+			}
+		>
+			{ __( 'Add note' ) }
+		</MenuItem>
+	);
+}
+
+export function AddNoteMenuItem( {
+	onClick,
+	onClickSelection,
+	isDistractionFree,
+} ) {
 	return (
 		<NoteIconSlotFill.Fill>
-			{ ( { clientId, onClose } ) => (
-				<NoteMenuItem
-					clientId={ clientId }
-					isDistractionFree={ isDistractionFree }
-					onClick={ () => {
-						onClick( clientId );
-						onClose();
-					} }
-				/>
-			) }
+			{ ( { clientId, count, onClose } ) =>
+				count > 1 ? (
+					<SelectionNoteMenuItem
+						isDistractionFree={ isDistractionFree }
+						onClick={ () => {
+							onClickSelection();
+							onClose();
+						} }
+					/>
+				) : (
+					<NoteMenuItem
+						clientId={ clientId }
+						isDistractionFree={ isDistractionFree }
+						onClick={ () => {
+							onClick( clientId );
+							onClose();
+						} }
+					/>
+				)
+			}
 		</NoteIconSlotFill.Fill>
 	);
 }

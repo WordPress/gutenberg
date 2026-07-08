@@ -34,11 +34,15 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 	);
 	const blockElement = useBlockElement( clientId );
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
-	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const { selectNote, setPendingNoteSegments } = unlock(
+		useDispatch( editorStore )
+	);
 	const isSubmittingRef = useRef( false );
 
 	const unselectNote = () => {
 		selectNote( undefined );
+		// Drop any captured multi-block segments for the abandoned note.
+		setPendingNoteSegments( null );
 		blockElement?.focus();
 		toggleBlockSpotlight( clientId, false );
 	};
@@ -74,6 +78,8 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 				}
 				toggleBlockSpotlight( clientId, false );
 				selectNote( undefined );
+				// Drop any captured multi-block segments for the abandoned note.
+				setPendingNoteSegments( null );
 			} }
 		>
 			<NoteCard>

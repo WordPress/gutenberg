@@ -346,6 +346,13 @@ export function useNoteActions() {
 				  ).getPendingNoteSegments()
 				: null;
 			const segments = ! parent ? captured ?? readNoteSegments() : [];
+			// Consume the stashed segments so a later single-block or inline note
+			// can't inherit this note's cross-block anchor.
+			if ( ! parent && captured ) {
+				unlock(
+					registry.dispatch( editorStore )
+				).setPendingNoteSegments( null );
+			}
 
 			const savedRecord = await saveEntityRecord(
 				'root',

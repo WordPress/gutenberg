@@ -348,10 +348,11 @@ export function BlockSettingsDropdown( {
 											</MenuItem>
 										</>
 									) }
-									{ canEdit && count === 1 && (
+									{ canEdit && count >= 1 && (
 										<NoteIconSlotFill.Slot
 											fillProps={ {
 												clientId: firstBlockClientId,
+												count,
 												onClose,
 											} }
 										/>
