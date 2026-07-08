@@ -646,7 +646,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
 	 */
-	private function create_item_from_url( WP_REST_Request $request ) {
+	protected function create_item_from_url( $request ) {
 		// Sideloading downloads and stores a file, so require the upload capability.
 		if ( ! current_user_can( 'upload_files' ) ) {
 			return new WP_Error(
