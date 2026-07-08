@@ -6,7 +6,6 @@ import {
 	getDefaultBlockName,
 	cloneBlock,
 } from '@wordpress/blocks';
-import { useRef } from '@wordpress/element';
 import {
 	useRefEffect,
 	privateApis as composePrivateApis,
@@ -23,28 +22,29 @@ import { unlock } from '../../lock-unlock';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
-export default function useEnter( props ) {
+export default function useEnter( clientId ) {
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
-	const { getBlock, getBlockRootClientId, getBlockIndex, getBlockName } =
-		useSelect( blockEditorStore );
-	const propsRef = useRef( props );
-	propsRef.current = props;
+	const {
+		getBlock,
+		getBlockAttributes,
+		getBlockRootClientId,
+		getBlockIndex,
+		getBlockName,
+	} = useSelect( blockEditorStore );
 	const outdentListItem = useOutdentListItem();
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
 				return;
 			}
-			const { content, clientId } = propsRef.current;
-			if ( content.length ) {
+			const { content } = getBlockAttributes( clientId ) ?? {};
+			if ( content?.length ) {
 				return;
 			}
 			event.preventDefault();
 			const canOutdent =
 				getBlockName(
-					getBlockRootClientId(
-						getBlockRootClientId( propsRef.current.clientId )
-					)
+					getBlockRootClientId( getBlockRootClientId( clientId ) )
 				) === 'core/list-item';
 			if ( canOutdent ) {
 				outdentListItem();

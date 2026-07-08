@@ -348,11 +348,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/list-item/hooks/use-enter.js": {
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/math/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -502,11 +497,6 @@
 	"packages/block-library/src/video/tracks-editor.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		}
-	},
-	"packages/boot/src/components/canvas/back-button.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
 		}
 	},
 	"packages/boot/src/components/navigation/drilldown-item/index.tsx": {

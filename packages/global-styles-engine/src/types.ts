@@ -193,6 +193,10 @@ export interface SpacingSettings {
  */
 export interface GlobalStylesSettings {
 	useRootPaddingAwareAlignments?: boolean;
+	viewport?: {
+		mobile?: string;
+		tablet?: string;
+	};
 	typography?: TypographySettings;
 	layout?: LayoutSettings;
 	spacing?: SpacingSettings;
