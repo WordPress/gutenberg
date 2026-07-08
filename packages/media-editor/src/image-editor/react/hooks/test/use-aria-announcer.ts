@@ -103,7 +103,7 @@ describe( 'useAriaAnnouncer', () => {
 		expect( result.current ).toBe( 'Crop 800 by 400 pixels' );
 	} );
 
-	it( 'announces visual rotation when rotation changes', () => {
+	it( 'announces clockwise rotation with direction', () => {
 		const { result, rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{ initialProps: { state: makeState() } }
@@ -116,10 +116,10 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Rotation 15 degrees' );
+		expect( result.current ).toBe( 'Rotated 15 degrees clockwise' );
 	} );
 
-	it( 'announces negative visual rotation with single-axis flip', () => {
+	it( 'announces counterclockwise when flip inverts visual direction', () => {
 		const { result, rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{
@@ -142,7 +142,7 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Rotation -10 degrees' );
+		expect( result.current ).toBe( 'Rotated 10 degrees counterclockwise' );
 	} );
 
 	it( 'announces rotation back to zero', () => {
@@ -175,7 +175,25 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Rotation 105 degrees' );
+		expect( result.current ).toBe( 'Rotated 105 degrees clockwise' );
+	} );
+
+	it( 'announces CCW for 90° snap CCW plus fine CCW adjustment', () => {
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{ initialProps: { state: makeState() } }
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		// 90° CCW snap (270°) + 15° CCW fine (255° stored).
+		// visualRotation = 255 → normalized to -105.
+		rerender( {
+			state: makeState( { rotation: 255 } ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Rotated 105 degrees counterclockwise' );
 	} );
 
 	it( 'announces CCW fine rotation from 0° (stored as 350°)', () => {
@@ -187,14 +205,13 @@ describe( 'useAriaAnnouncer', () => {
 		act( () => jest.advanceTimersByTime( 300 ) );
 
 		// -10° from 0° is stored as 350° after normalization.
-		// baseAngle = round(350/90)*90 = 360 → 360%360 = 0
-		// offset = 350 - 360 = -10, visualRotation = 0 + (-10) = -10
+		// visualRotation = -10 → counterclockwise.
 		rerender( {
 			state: makeState( { rotation: 350 } ),
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Rotation -10 degrees' );
+		expect( result.current ).toBe( 'Rotated 10 degrees counterclockwise' );
 	} );
 
 	it( 'suppresses unchanged values in combined announcements', () => {
@@ -226,7 +243,7 @@ describe( 'useAriaAnnouncer', () => {
 
 		expect( result.current ).toBe( 'Crop 500 by 400 pixels' );
 		expect( result.current ).not.toContain( 'Zoom' );
-		expect( result.current ).not.toContain( 'Rotation' );
+		expect( result.current ).not.toContain( 'Rotated' );
 	} );
 
 	it( 'announces only zoom when only zoom changes', () => {

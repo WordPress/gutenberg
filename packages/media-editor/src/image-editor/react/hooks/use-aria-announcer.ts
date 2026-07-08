@@ -61,14 +61,28 @@ function getRotationAnnouncement(
 	const offset = Math.round(
 		( state.rotation - Math.round( state.rotation / 90 ) * 90 ) * visualDir
 	);
-	const visualRotation = baseAngle + offset;
+	// Normalize to (-180, 180] so the sign indicates direction.
+	let visualRotation = ( baseAngle + offset ) % 360;
+	if ( visualRotation > 180 ) {
+		visualRotation -= 360;
+	}
+	if ( visualRotation <= -180 ) {
+		visualRotation += 360;
+	}
 	if ( visualRotation === 0 ) {
 		return previousState ? __( 'Rotation 0 degrees' ) : undefined;
 	}
+	if ( visualRotation > 0 ) {
+		return sprintf(
+			/* translators: %d: rotation angle in degrees. */
+			__( 'Rotated %d degrees clockwise' ),
+			visualRotation
+		);
+	}
 	return sprintf(
 		/* translators: %d: rotation angle in degrees. */
-		__( 'Rotation %d degrees' ),
-		visualRotation
+		__( 'Rotated %d degrees counterclockwise' ),
+		Math.abs( visualRotation )
 	);
 }
 
@@ -129,8 +143,8 @@ function buildAnnouncement(
 	}
 
 	const parts = [
-		getZoomAnnouncement( state, previousState ),
 		getRotationAnnouncement( state, previousState ),
+		getZoomAnnouncement( state, previousState ),
 		getCropAnnouncement( state, previousState ),
 	].filter( ( part ): part is string => part !== undefined );
 
