@@ -504,11 +504,6 @@
 			"count": 2
 		}
 	},
-	"packages/boot/src/components/canvas/back-button.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"packages/boot/src/components/navigation/drilldown-item/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
