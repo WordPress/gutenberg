@@ -36,7 +36,7 @@ const FILES = [ 'data.json', 'messages.json' ];
 
 // All locales Emojibase ships translated data for. Keep in sync with
 // `EMOJIBASE_LOCALES` in `packages/editor/src/components/collab-sidebar/
-// emoji-picker.js`. Each locale adds ~85KB gzipped on disk; only the
+// emojibase-data.js`. Each locale adds ~85KB gzipped on disk; only the
 // active locale is fetched per editor session.
 const LOCALES = [
 	'bn',

@@ -7,13 +7,8 @@ import path from 'node:path';
 /**
  * Internal dependencies
  */
-import {
-	EMOJIBASE_LOCALES,
-	chunkRows,
-	groupEmojis,
-	resolveEmojibaseLocale,
-	searchEmojis,
-} from '../emoji-picker';
+import { chunkRows, groupEmojis, searchEmojis } from '../emoji-picker';
+import { EMOJIBASE_LOCALES, resolveEmojibaseLocale } from '../emojibase-data';
 
 describe( 'resolveEmojibaseLocale', () => {
 	it( 'falls back to English for empty/invalid input', () => {

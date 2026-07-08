@@ -35,6 +35,11 @@ import ReactionEmojiPicker, {
 	hexKeyToEmoji,
 	buildEmojiBySlugMap,
 } from './reaction-emoji-picker';
+import {
+	detectLocale,
+	loadEmojibaseData,
+	useEmojiLabel,
+} from './emojibase-data';
 
 /**
  * Lazy-load the full emoji picker. Its bundle is only fetched when a
@@ -42,6 +47,21 @@ import ReactionEmojiPicker, {
  * the Emojibase JSON dataset is fetched separately on first open.
  */
 const FullEmojiPicker = lazy( () => import( './emoji-picker' ) );
+
+/**
+ * Warm the full picker before it opens: start fetching the lazy picker
+ * chunk and the Emojibase dataset for the active locale. Both loaders
+ * cache, so calling this repeatedly (every hover) is free after the
+ * first invocation.
+ */
+function prefetchFullPicker() {
+	import( './emoji-picker' ).catch( () => {} );
+	if ( typeof window !== 'undefined' && window.gutenbergEmojibaseUrl ) {
+		loadEmojibaseData( window.gutenbergEmojibaseUrl, detectLocale() ).catch(
+			() => {}
+		);
+	}
+}
 
 // The curated emoji set is static, so index it once at module load.
 const emojiBySlug = buildEmojiBySlugMap();
@@ -143,7 +163,8 @@ const reactionNamesCache = {};
  * @param {number}   props.count            The reaction count.
  * @param {boolean}  props.isActive         Whether the current user reacted.
  * @param {string}   props.emoji            The emoji character.
- * @param {string}   props.emojiLabel       The emoji label.
+ * @param {string}   props.emojiLabel       The emoji label, if known
+ *                                          (curated reactions only).
  * @param {Function} props.onToggleReaction Callback to toggle a reaction.
  */
 function ReactionButton( {
@@ -157,15 +178,18 @@ function ReactionButton( {
 } ) {
 	const [ tooltipText, setTooltipText ] = useState( '' );
 	const [ isFetching, setIsFetching ] = useState( false );
+	// Reactions picked from the full picker are stored as hex keys and
+	// carry no curated label; resolve their name from the Emojibase
+	// dataset so tooltips read "thumbs up" rather than echoing the "👍"
+	// character. Falls back to the emoji character until resolved.
+	const resolvedLabel = useEmojiLabel( slug, ! emojiLabel );
+	const label = emojiLabel || resolvedLabel || emoji;
 
 	const fetchReactionNames = useCallback( () => {
 		const cacheKey = `${ noteId }:${ slug }`;
 		if ( reactionNamesCache[ cacheKey ] ) {
 			setTooltipText(
-				formatReactionTooltip(
-					reactionNamesCache[ cacheKey ],
-					emojiLabel
-				)
+				formatReactionTooltip( reactionNamesCache[ cacheKey ], label )
 			);
 			return;
 		}
@@ -200,9 +224,7 @@ function ReactionButton( {
 
 				reactionNamesCache[ cacheKey ] = names;
 				if ( names.length > 0 ) {
-					setTooltipText(
-						formatReactionTooltip( names, emojiLabel )
-					);
+					setTooltipText( formatReactionTooltip( names, label ) );
 				}
 			} )
 			.catch( () => {
@@ -211,12 +233,12 @@ function ReactionButton( {
 			.finally( () => {
 				setIsFetching( false );
 			} );
-	}, [ noteId, slug, emojiLabel, isFetching ] );
+	}, [ noteId, slug, label, isFetching ] );
 
 	const defaultLabel = sprintf(
 		/* translators: 1: emoji label, 2: count of reactions */
 		_n( '%1$s, %2$d reaction', '%1$s, %2$d reactions', count ),
-		emojiLabel,
+		label,
 		count
 	);
 
@@ -287,7 +309,7 @@ export default function ReactionDisplay( {
 						count={ count }
 						isActive={ isActive }
 						emoji={ entry?.emoji ?? hexKeyToEmoji( slug ) }
-						emojiLabel={ entry?.label ?? hexKeyToEmoji( slug ) }
+						emojiLabel={ entry?.label }
 						onToggleReaction={ onToggleReaction }
 					/>
 				);
@@ -365,16 +387,33 @@ export function MoreEmojiButton( { onToggleReaction } ) {
 			contentClassName="editor-collab-sidebar-panel__picker-popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
-					size="compact"
+					size="small"
 					className="editor-collab-sidebar-panel__more-reaction-button"
 					icon={ plusIcon }
 					label={ __( 'More emojis' ) }
 					aria-expanded={ isOpen }
 					onClick={ onToggle }
+					// Warm up the picker while the user is still deciding:
+					// hovering or focusing the trigger starts loading the
+					// lazy picker module and the Emojibase dataset, so the
+					// popover usually opens fully populated.
+					onMouseEnter={ prefetchFullPicker }
+					onFocus={ prefetchFullPicker }
 				/>
 			) }
 			renderContent={ ( { onClose } ) => (
-				<Suspense fallback={ null }>
+				<Suspense
+					fallback={
+						<div className="editor-collab-sidebar-panel__picker">
+							<div
+								className="editor-collab-sidebar-panel__picker-status"
+								role="status"
+							>
+								{ __( 'Loading…' ) }
+							</div>
+						</div>
+					}
+				>
 					<FullEmojiPicker
 						onSelect={ ( emoji ) => {
 							onClose();

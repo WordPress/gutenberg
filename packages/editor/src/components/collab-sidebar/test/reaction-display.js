@@ -102,6 +102,57 @@ describe( 'ReactionDisplay', () => {
 		).toHaveTextContent( 'custom' );
 	} );
 
+	it( 'resolves the emoji name from the Emojibase dataset for hex-key reactions', async () => {
+		window.gutenbergEmojibaseUrl = 'https://example.test/emojibase';
+		const originalFetch = global.fetch;
+		global.fetch = jest.fn( ( url ) =>
+			Promise.resolve( {
+				ok: true,
+				json: () =>
+					Promise.resolve(
+						String( url ).includes( 'data.json' )
+							? [
+									{
+										hexcode: '1F44D',
+										emoji: '👍',
+										label: 'thumbs up',
+										group: 0,
+									},
+							  ]
+							: { groups: [] }
+					),
+			} )
+		);
+
+		try {
+			render(
+				<ReactionDisplay
+					noteId={ uniqueNoteId }
+					reactions={ {
+						'1f44d': {
+							count: 2,
+							reacted: false,
+							my_reaction_id: 0,
+						},
+					} }
+					onToggleReaction={ () => {} }
+				/>
+			);
+
+			// Until the dataset resolves, the emoji character stands in
+			// for the label; afterwards the accessible name uses the
+			// Emojibase label.
+			expect(
+				await screen.findByRole( 'button', {
+					name: 'thumbs up, 2 reactions',
+				} )
+			).toHaveTextContent( '👍' );
+		} finally {
+			global.fetch = originalFetch;
+			delete window.gutenbergEmojibaseUrl;
+		}
+	} );
+
 	it( 'calls onToggleReaction with the slug when a pill is clicked', async () => {
 		const user = userEvent.setup();
 		const onToggleReaction = jest.fn();
