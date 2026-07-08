@@ -25,6 +25,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/content-types',
 	'@wordpress/core-commands',
 	'@wordpress/core-data',
+	'@wordpress/core-data-ui',
 	'@wordpress/customize-widgets',
 	'@wordpress/data',
 	'@wordpress/edit-post',
