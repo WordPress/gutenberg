@@ -2,10 +2,13 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Revert the medium font-weight `499` workaround so the `font-weight.medium` token outputs `500` ([#79986](https://github.com/WordPress/gutenberg/pull/79986)).
+
 ### Bug Fixes
 
 -   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
--   Revert the medium font-weight `499` workaround so the `font-weight.medium` token outputs `500` ([#79986](https://github.com/WordPress/gutenberg/pull/79986)).
 
 ### Documentation
 

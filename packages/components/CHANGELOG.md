@@ -36,6 +36,7 @@
     -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
     -   `ToggleGroupControl` ([#79656](https://github.com/WordPress/gutenberg/pull/79656))
+-   Revert the medium font-weight `499` workaround back to `500` ([#79986](https://github.com/WordPress/gutenberg/pull/79986)).
 
 ### Documentation
 
@@ -47,7 +48,6 @@
 -   `Divider`: Restore lower-specificity border styles so custom border colors can override the default divider color. ([#79534](https://github.com/WordPress/gutenberg/pull/79534))
 -   `Button`: Fix the focus ring for buttons rendered as links ([#79837](https://github.com/WordPress/gutenberg/pull/79837)).
 -   `BorderBoxControl`: Fix the unlink button positioning by restoring the linked control's right-hand margin, which was overridden by `BorderControl`'s base `margin: 0` after `View` stopped rendering styles through Emotion ([#79967](https://github.com/WordPress/gutenberg/pull/79967)).
--   Revert the medium font-weight `499` workaround back to `500` ([#79986](https://github.com/WordPress/gutenberg/pull/79986)).
 
 ### Internal
 
