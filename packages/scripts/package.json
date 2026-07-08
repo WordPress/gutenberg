@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "32.5.1",
+	"version": "32.6.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -80,7 +80,7 @@
 		"puppeteer-core": "^23.10.1",
 		"react-refresh": "^0.14.0",
 		"read-pkg-up": "^7.0.1",
-		"resolve-bin": "^0.4.0",
+		"resolve-bin": "^1.0.1",
 		"rtlcss": "^4.3.0",
 		"sass": "^1.54.0",
 		"sass-loader": "^16.0.3",
@@ -98,12 +98,15 @@
 		"rimraf": "^5.0.10"
 	},
 	"peerDependencies": {
-		"@playwright/test": "^1.58.2",
+		"@playwright/test": ">=1",
 		"@wordpress/env": ">=10.0.0",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
 	},
 	"peerDependenciesMeta": {
+		"@playwright/test": {
+			"optional": true
+		},
 		"@wordpress/env": {
 			"optional": true
 		}

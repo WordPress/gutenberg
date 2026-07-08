@@ -132,7 +132,6 @@ function ParentControl( { parents, postType, onChange } ) {
 	};
 	return (
 		<FormTokenField
-			__next40pxDefaultSize
 			label={ __( 'Parents' ) }
 			value={ value }
 			onInputChange={ debouncedSearch }

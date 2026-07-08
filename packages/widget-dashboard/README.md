@@ -4,9 +4,10 @@
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes. While it is published as 0.x, breaking changes may ship in minor releases.
 
 This prerelease depends on WordPress core-private APIs and is built to run inside WordPress core. It is not yet safe to install and run as a standalone npm dependency from an external plugin.
+
 </div>
 
-Stateless rendering engine for widget dashboards. `WidgetDashboard` renders an editable grid of widget instances behind a consumer-controlled edit mode: drag-to-reorder, resize, a modal inserter, per-widget and grid-level settings, and command-palette integration.
+Stateless rendering engine for widget dashboards. `WidgetDashboard` renders an editable grid of widget instances behind a consumer-controlled edit mode: drag-to-reorder, resize, a modal inserter, per-widget settings, and command-palette integration.
 
 The engine owns no data. Widget types flow in through the `widgetTypes` prop (see [`@wordpress/widget-primitives`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/widget-primitives)), the consumer owns the committed `layout` array, and in-progress edits accumulate in an internal staging layer until the user commits them, at which point `onLayoutChange` fires with the updated array. Grid placement renders through [`@wordpress/grid`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/grid).
 
@@ -79,7 +80,7 @@ function Dashboard() {
 The dashboard is built from two kinds of parts:
 
 -   **Triggers and chrome you arrange.** `Actions`, `Widgets`, `WidgetChrome`, `NoWidgetsState`, and `Commands` are compound components; compose them as `children` to place them in your layout.
--   **Overlays the engine mounts.** The widget inserter, the layout-settings and per-widget-settings editors, and the reset confirmation are mounted by the engine and driven by shared UI state. Triggers open them only through that state — the "Add widget" button and the command palette both open the inserter — so there is no overlay to place in the tree.
+-   **Overlays the engine mounts.** The widget inserter, the per-widget settings editor, and the reset confirmation are mounted by the engine and driven by shared UI state. Triggers open them only through that state — the "Add widget" button and the command palette both open the inserter — so there is no overlay to place in the tree.
 
 Omitting `children` renders the default arrangement. When you pass `children`, the overlays mount regardless of what you compose.
 
@@ -121,10 +122,6 @@ Optional. Maps a `WidgetType.renderModule` id to the React component that render
 
 Optional. Grid model configuration; see [Grid settings](#grid-settings). Defaults to `DEFAULT_GRID`.
 
-#### `onGridSettingsChange`: `( gridSettings: WidgetGridSettings ) => void`
-
-Optional. Called when the user commits grid-settings edits. When omitted, the layout-settings entry points are hidden, since there is nowhere to persist the change.
-
 #### `children`: `ReactNode`
 
 Optional. Composition slot for the dashboard's triggers and chrome. When omitted, the engine renders the default arrangement: the empty state, the actions, the widgets grid, and the command palette integration. The engine-mounted overlays are present either way.
@@ -145,11 +142,11 @@ Renders its children only when `layout` is empty. Pair it with `<WidgetDashboard
 
 #### `<WidgetDashboard.Actions />`
 
-Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget", "Layout settings" (when `onGridSettingsChange` is provided), "Cancel", "Done" while it is on. The buttons and the more-actions menu are triggers: "Customize" and "Done" fire `onEditChange`, "Add widget" opens the inserter, "Layout settings" opens the layout-settings editor, and "Reset to default" opens the reset confirmation. Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally.
+Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget", "Cancel", "Done" while it is on. The buttons and the more-actions menu are triggers: "Customize" and "Done" fire `onEditChange`, "Add widget" opens the inserter, and "Reset to default" opens the reset confirmation. Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally.
 
 #### `<WidgetDashboard.Commands />`
 
-Command palette integration. It registers the dashboard's commands through `@wordpress/commands` (customize, add widgets, switch layout model, reset to default) and sets the active command context. It renders nothing, and surfaces wherever the host application mounts the command palette. Ships in the default arrangement; when passing custom children, compose it to keep the integration.
+Command palette integration. It registers the dashboard's commands through `@wordpress/commands` (customize, add widgets, reset to default) and sets the active command context. It renders nothing, and surfaces wherever the host application mounts the command palette. Ships in the default arrangement; when passing custom children, compose it to keep the integration.
 
 `<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin screens (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
 
@@ -183,26 +180,23 @@ On confirmation, the inserter creates instances (using each type's `example.attr
 
 ## Grid settings
 
-The dashboard supports two grid models, configured through the `gridSettings` prop: the 2D packed `grid` model, where tiles declare explicit spans over uniform rows, and the content-driven `masonry` model, where heights follow content and resize is horizontal-only. The package owns the definition and editing of these settings (the layout-settings editor in customize mode, the model-switch commands); the consumer owns persistence.
+The dashboard supports two grid models, configured through the `gridSettings` prop: the 2D packed `grid` model, where tiles declare explicit spans over uniform rows, and the content-driven `masonry` model, where heights follow content and resize is horizontal-only. The settings are read-only for the dashboard: there is no in-dashboard editing UI. The consumer owns the values and their persistence.
 
-The exported kit for building that persistence:
+The exported kit for handling them:
 
 -   `WidgetGridSettings` — discriminated union of the per-model settings shapes.
 -   `DEFAULT_GRID` — canonical default settings, applied when `gridSettings` is omitted.
 -   `normalizeGridSettings( settings, defaultRowHeight )` — coerces legacy freeform row heights to the nearest preset. Run it over stored payloads before passing them in.
--   `ROW_HEIGHT_PRESETS` / `DEFAULT_ROW_HEIGHT` — the row-height presets (`small`, `medium`, `large`) the layout-settings editor offers.
+-   `ROW_HEIGHT_PRESETS` / `DEFAULT_ROW_HEIGHT` — the row-height presets (`small`, `medium`, `large`) that `rowHeight` values normalize to.
 -   `WIDGET_DASHBOARD_COLUMN_COUNT` — maximum column count on wide containers. The effective count steps down from container width; persisted `columns` values are ignored.
 
 ```tsx
-const [ gridSettings, setGridSettings ] = useState( DEFAULT_GRID );
-
 <WidgetDashboard
 	layout={ layout }
 	onLayoutChange={ setLayout }
 	widgetTypes={ widgetTypes }
-	gridSettings={ gridSettings }
-	onGridSettingsChange={ setGridSettings }
-/>;
+	gridSettings={ { model: 'masonry' } }
+/>
 ```
 
 ## Authoring widgets

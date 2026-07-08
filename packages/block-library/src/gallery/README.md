@@ -22,6 +22,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 |-----------|------|---------|-------------|
 | `images` | `array` | `[]` | [Source](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `query`. [Selector](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `.blocks-gallery-item` |
 | `ids` | `array` | `[]` | — |
+| `dynamicContent` | `object` | — | — |
 | `navigationButtonType` | `string` | `"icon"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `icon`, `text`, `both` |
 | `shortCodeTransforms` | `array` | `[]` | — |
 | `columns` | `number` | — | — |
@@ -67,6 +68,8 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 **Uses context:**
 
 - `galleryId`
+- `postId`
+- `postType`
 
 **Provides context:**
 
