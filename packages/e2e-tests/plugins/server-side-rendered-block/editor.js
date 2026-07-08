@@ -28,7 +28,6 @@
 							value: attributes.count || 0,
 							min: 0,
 							max: 10,
-							__next40pxDefaultSize: true,
 							onChange: ( value ) => {
 								setAttributes( { count: value } );
 							},

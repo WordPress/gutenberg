@@ -5,6 +5,9 @@
 ### Enhancement
 
 -   Convert HEIC/HEIF image sequences (Apple Live Photos, Android bursts — `image/heic-sequence`, `image/heif-sequence`) to a web-safe video (MP4/WebM) client-side before upload. The temporal HEVC frames are demuxed and decoded with WebCodecs, then re-encoded via `@wordpress/video-conversion`. Falls back to uploading the original file when WebCodecs is unavailable ([#79642](https://github.com/WordPress/gutenberg/issues/79642)).
+-   Honor the `wp_editor_set_quality` filter for client-side processed images. Sub-size resizing and transcoding now use the size-aware quality reported by the new `image_quality` field on the attachment upload response, instead of a hardcoded default.
+
+## 0.35.0 (2026-07-01)
 
 ## 0.34.0 (2026-06-24)
 

@@ -57,9 +57,10 @@ export function useCard( props: CardProps ) {
 
 	const classes = useMemo( () => {
 		return cx(
-			styles.Card,
-			isBorderless && styles.boxShadowless,
-			isRounded && styles.rounded,
+			styles.getCardStyles( {
+				isBorderless,
+				isRounded,
+			} ),
 			className
 		);
 	}, [ className, cx, isBorderless, isRounded ] );

@@ -256,6 +256,66 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 
 	/**
 	 * @covers ::render_block_core_playlist
+	 * @covers ::render_block_core_playlist_track
+	 */
+	public function test_tracklist_renders_album_art_when_show_images_is_enabled() {
+		$markup = $this->build_playlist_markup(
+			array( 'showImages' => true ),
+			array(
+				array(
+					'id'       => 1,
+					'title'    => 'Song One',
+					'src'      => 'http://example.com/song1.mp3',
+					'image'    => 'http://example.com/image1.jpg',
+					'imageAlt' => 'A bright abstract album cover',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+
+		$this->assertStringContainsString( 'class="wp-block-playlist-track__image"', $output );
+		$this->assertStringContainsString( 'src="http://example.com/image1.jpg"', $output );
+		$this->assertStringContainsString( 'alt="A bright abstract album cover"', $output );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 * @covers ::render_block_core_playlist_track
+	 */
+	public function test_tracklist_does_not_render_album_art_when_show_images_is_disabled() {
+		$markup = $this->build_playlist_markup(
+			array( 'showImages' => false ),
+			array(
+				array(
+					'id'    => 1,
+					'title' => 'Song One',
+					'src'   => 'http://example.com/song1.mp3',
+					'image' => 'http://example.com/image1.jpg',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+
+		$this->assertStringNotContainsString( 'wp-block-playlist-track__image', $output );
+		$this->assertStringNotContainsString( 'src="http://example.com/image1.jpg"', $output );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist_track
+	 */
+	public function test_playlist_track_renders_without_block_context() {
+		$output = do_blocks(
+			'<!-- wp:playlist-track {"id":1,"title":"Song One","src":"http://example.com/song1.mp3","image":"http://example.com/image1.jpg"} /-->'
+		);
+
+		$this->assertStringContainsString( 'class="wp-block-playlist-track__image"', $output );
+		$this->assertStringContainsString( 'src="http://example.com/image1.jpg"', $output );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
 	 */
 	public function test_aria_label_with_title_artist_and_album() {
 		$markup = $this->build_playlist_markup(

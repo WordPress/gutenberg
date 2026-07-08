@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/stylelint-config",
-	"version": "23.41.0",
+	"version": "23.42.0",
 	"description": "stylelint config for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "MIT",
@@ -20,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
+		"node": "^20.19.0 || >=22.13.0",
 		"npm": ">=8.19.2"
 	},
 	"files": [
@@ -32,6 +32,7 @@
 		"scss-stylistic.js",
 		"stylistic.js"
 	],
+	"type": "module",
 	"main": "index.js",
 	"exports": {
 		".": "./index.js",

@@ -1,10 +1,8 @@
 # Design Tokens Maintainer's Guide
 
-Design tokens are the visual design atoms of a design system. They are named entities that store visual design attributes like colors, spacing, typography, and shadows. They serve as a single source of truth that bridges design and development, ensuring consistency across platforms and making it easy to maintain and evolve the visual language of an application.
+This maintainer-facing guide explains how the WordPress Design System token source files are organized and generated.
 
-Components that use these design tokens benefit from the consistency they guarantee with other components that extend from the same system. Future theming improvements or configurations like color theming (or "dark mode") or roundness will cascade automatically to these components without any additional effort on the part of the component maintainer.
-
-This document includes information about how the design system maintains its tokens implementation. For information about how to use design tokens, refer to the [`@wordpress/theme` package README](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/README.md) and [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
+For consumer-facing usage, start with the [`@wordpress/theme` package README](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/README.md) and the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
 
 ## Structure
 
@@ -23,7 +21,7 @@ Each JSON file contains both primitive and semantic token definitions in a hiera
 
 ## Token Naming
 
-Semantic tokens follow a consistent naming pattern that encodes the token's purpose. See the [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) for the naming pattern, the meaning of each segment (type, property, target, tone, emphasis, state), and guidance on how to pick the right token.
+Semantic tokens follow a consistent naming pattern that encodes the token's purpose. See the [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) for the naming pattern, the meaning of each segment (type, property, target, tone, emphasis, state), guidance on how to pick the right token, and the complete generated list of token names.
 
 ## Primitive and Semantic Tokens
 

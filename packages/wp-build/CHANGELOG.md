@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widgets: carry the optional metadata fields from `widget.json` into
+    the generated PHP registry: `title`, `description`, `category`,
+    `keywords`, `textdomain`, and the `help` note, so hosts can translate
+    the user-facing fields server-side
+    ([#79638](https://github.com/WordPress/gutenberg/pull/79638),
+    [#79701](https://github.com/WordPress/gutenberg/pull/79701),
+    [#79830](https://github.com/WordPress/gutenberg/pull/79830)).
+
+## 0.18.0 (2026-07-01)
+
 ## 0.17.0 (2026-06-24)
 
 ### Documentation
