@@ -79,7 +79,31 @@ describe( 'useAriaAnnouncer', () => {
 		expect( result.current ).toBe( 'Flipped horizontally and vertically' );
 	} );
 
-	it( 'announces only crop when only crop dimensions change', () => {
+	it( 'announces crop in pixels when image dimensions are available', () => {
+		const image = {
+			src: 'test.jpg',
+			naturalWidth: 1000,
+			naturalHeight: 800,
+		};
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{ initialProps: { state: makeState( { image } ) } }
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		rerender( {
+			state: makeState( {
+				image,
+				cropRect: { x: 0, y: 0, width: 0.8, height: 0.5 },
+			} ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Crop 800 by 400 pixels' );
+	} );
+
+	it( 'falls back to percentages when image is not loaded', () => {
 		const { result, rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{ initialProps: { state: makeState() } }

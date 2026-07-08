@@ -13,6 +13,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import type { CropperState } from '../../core/types';
+import { getSourceRegion } from '../../core/source-region';
 
 /** Debounce delay for ARIA live announcements (ms). */
 const ARIA_DEBOUNCE_MS = 300;
@@ -73,6 +74,18 @@ function buildRotationAnnouncement(
 }
 
 function buildCropAnnouncement( state: CropperState ): string {
+	if ( state.image ) {
+		const region = getSourceRegion( state, {
+			width: state.image.naturalWidth,
+			height: state.image.naturalHeight,
+		} );
+		return sprintf(
+			/* translators: 1: crop width in pixels, 2: crop height in pixels. */
+			__( 'Crop %1$d by %2$d pixels' ),
+			Math.round( region.width ),
+			Math.round( region.height )
+		);
+	}
 	const cropW = Math.round( state.cropRect.width * 100 );
 	const cropH = Math.round( state.cropRect.height * 100 );
 	return sprintf(
