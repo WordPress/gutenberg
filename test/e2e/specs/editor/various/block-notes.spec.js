@@ -1476,6 +1476,124 @@ test.describe( 'Block Notes', () => {
 			await expect.poll( alphaOf ).toBeGreaterThan( 0.4 );
 		} );
 	} );
+
+	test.describe( 'Multi-block notes', () => {
+		// Select text from the first paragraph down through the last, then open
+		// the multi-block "Add note" entry and submit a note. The inline
+		// rich-text "Add note" button is unavailable across a multi-block
+		// selection, so the entry point lives in the block options (⋮) menu.
+		async function addMultiBlockNote(
+			{ editor, page },
+			blockCount,
+			content
+		) {
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraphs.first().click();
+			await page.keyboard.press( 'ControlOrMeta+a' );
+			// Collapse to the start of the first block, then extend the
+			// selection down through the last block's end.
+			await page.keyboard.press( 'ArrowLeft' );
+			for ( let i = 0; i < blockCount - 1; i++ ) {
+				await page.keyboard.press( 'Shift+ArrowDown' );
+			}
+			await page.keyboard.press( 'Shift+End' );
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( content );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+		}
+
+		test( 'anchors one note to every block the selection spans', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'First paragraph.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Second paragraph.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Third paragraph.' },
+			} );
+
+			await addMultiBlockNote(
+				{ editor, page },
+				3,
+				'Spans three blocks'
+			);
+
+			// Exactly one thread is created for the cross-block note (not one
+			// per spanned block).
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'treeitem', {
+						name: 'Note: Spans three blocks',
+					} )
+			).toHaveCount( 1 );
+
+			// Every spanned block carries a marker, and all share one note id.
+			const marks = editor.canvas.locator( 'mark.wp-note' );
+			await expect( marks ).toHaveCount( 3 );
+			const ids = await marks.evaluateAll( ( els ) =>
+				els.map( ( el ) => el.getAttribute( 'data-id' ) )
+			);
+			expect( ids[ 0 ] ).toBeTruthy();
+			expect( new Set( ids ).size ).toBe( 1 );
+		} );
+
+		test( 'clears every block marker when the note is deleted', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Beta block.' },
+			} );
+
+			await addMultiBlockNote(
+				{ editor, page },
+				2,
+				'Delete across blocks'
+			);
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				2
+			);
+
+			// Deleting the note strips its marker from every block it spans,
+			// leaving the text untouched.
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			).toHaveText( [ 'Alpha block.', 'Beta block.' ] );
+		} );
+	} );
 } );
 
 class BlockNoteUtils {
