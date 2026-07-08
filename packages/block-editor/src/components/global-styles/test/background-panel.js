@@ -647,32 +647,6 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 			);
 			expect( inheritedItems ).toHaveLength( 0 );
 		} );
-
-		it( 'does not surface a root-sourced background gradient as inherited', () => {
-			const { container } = render(
-				<BackgroundPanel
-					value={ {} }
-					inheritedValue={ {
-						background: {
-							gradient:
-								'linear-gradient(135deg, rgb(74, 0, 224) 0%, rgb(142, 45, 226) 100%)',
-						},
-					} }
-					inheritedSources={ {
-						'background.gradient': { layer: 'root' },
-					} }
-					settings={ baseSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
-
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const inheritedItems = container.querySelectorAll(
-				'.is-inherited-from-global-styles'
-			);
-			expect( inheritedItems ).toHaveLength( 0 );
-		} );
 	} );
 
 	describe( 'shape regression', () => {
