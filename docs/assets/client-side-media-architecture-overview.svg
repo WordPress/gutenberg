@@ -12,6 +12,11 @@
       .body { fill:#3c434a; font-size:18px; }
       .mono { font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; }
       .bt { font-weight:700; font-size:12px; letter-spacing:1px; }
+      /* Inverted fills for text on the dark REST API panel. Declared after
+         .ct/.body so they win the cascade — a stylesheet rule outranks a
+         presentation fill attribute, so the light color must live here too. */
+      .ct-inv { fill:#ffffff; }
+      .body-inv { fill:#e8eaed; }
     </style>
   </defs>
 
@@ -63,8 +68,8 @@
   <rect x="660" y="584" width="540" height="150" rx="10" fill="#1e1e1e"/>
   <rect x="1114" y="602" width="70" height="24" rx="6" fill="#ffffff"/>
   <text class="bt" x="1149" y="619" fill="#1e1e1e" text-anchor="middle">SERVER</text>
-  <text class="ct" x="684" y="632" fill="#ffffff">REST API</text>
-  <text class="body mono" x="684" y="668" fill="#e8eaed">POST /wp/v2/media</text>
-  <text class="body mono" x="684" y="698" fill="#e8eaed">POST /wp/v2/media/{id}/sideload</text>
-  <text class="body mono" x="684" y="728" fill="#e8eaed">POST /wp/v2/media/{id}/finalize</text>
+  <text class="ct ct-inv" x="684" y="632">REST API</text>
+  <text class="body mono body-inv" x="684" y="668">POST /wp/v2/media</text>
+  <text class="body mono body-inv" x="684" y="698">POST /wp/v2/media/{id}/sideload</text>
+  <text class="body mono body-inv" x="684" y="728">POST /wp/v2/media/{id}/finalize</text>
 </svg>
