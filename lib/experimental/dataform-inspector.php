@@ -13,11 +13,7 @@
  * @return array Filtered preload paths.
  */
 function gutenberg_dataform_inspector_preload_paths( $paths, $context ) {
-	if (
-		! gutenberg_is_experiment_enabled( 'gutenberg-dataform-inspector' ) ||
-		'core/edit-post' !== $context->name ||
-		! isset( $context->post )
-	) {
+	if ( 'core/edit-post' !== $context->name || ! isset( $context->post ) ) {
 		return $paths;
 	}
 
