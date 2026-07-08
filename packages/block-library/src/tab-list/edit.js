@@ -58,8 +58,11 @@ function Edit( {
 		);
 	const { isBlockSelected, hasSelectedInnerBlock } =
 		useSelect( blockEditorStore );
-	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const {
+		updateBlockAttributes,
+		selectBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 	const { insertTab, removeTab } = useTabActions( tabsClientId );
 
 	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
@@ -74,6 +77,10 @@ function Edit( {
 
 	function selectTabPanel( tabIndex ) {
 		if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
+			// Select the tab list synchronously to deselect any block in the
+			// previously active panel, so its sync effect doesn't revert
+			// editorActiveTabIndex from a stale inner-block selection.
+			selectBlock( clientId );
 			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes( tabsClientId, {
 				editorActiveTabIndex: tabIndex,
