@@ -31,7 +31,6 @@
 @use "./components/pagination/style.scss" as *;
 @use "./components/sidebar-global-styles/style.scss" as *;
 
-/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
 ::view-transition-image-pair(root) {
 	isolation: auto;
 }
@@ -42,8 +41,6 @@
 	mix-blend-mode: normal;
 	display: block;
 }
-
-/* stylelint-enable */
 
 body.js #wpbody {
 	padding-top: 0;

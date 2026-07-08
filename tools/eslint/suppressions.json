@@ -766,7 +766,7 @@
 	},
 	"packages/components/src/form-token-field/styles.ts": {
 		"no-restricted-imports": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/components/src/grid/hook.ts": {

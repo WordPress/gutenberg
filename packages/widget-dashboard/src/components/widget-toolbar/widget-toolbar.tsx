@@ -21,20 +21,20 @@ export interface WidgetToolbarProps {
 	children: ReactNode;
 
 	/**
-	 * Subtle hover-revealed surface (normal) vs solid always-visible (customize).
+	 * Lift the toolbar with a shadow while customizing.
 	 */
-	revealOnHover?: boolean;
+	editMode?: boolean;
 }
 
 /**
- * The per-tile toolbar chip holding the active mode's controls. Solid and always
- * visible while customizing; subtle and revealed on hover in normal mode.
+ * The per-tile toolbar chip holding the active mode's controls.
+ * Always visible; lifted with a shadow only while customizing.
  *
  * @param {WidgetToolbarProps} props Component props.
  */
 export function WidgetToolbar( {
 	children,
-	revealOnHover = false,
+	editMode = false,
 }: WidgetToolbarProps ): React.ReactNode {
 	return (
 		<Stack
@@ -43,7 +43,7 @@ export function WidgetToolbar( {
 			gap="xs"
 			className={ clsx(
 				styles.widgetToolbar,
-				revealOnHover ? styles.subtle : styles.solid
+				editMode && styles.elevated
 			) }
 		>
 			{ children }

@@ -21,9 +21,8 @@ export default {
 			id: 'location',
 			type: 'text',
 			label: __( 'Event location' ),
-			description: __(
-				'City or region for nearby events. Edits apply when you save this panel.'
-			),
+			description: __( 'City or region for nearby events.' ),
+			relevance: 'high',
 			Edit: LocationSettingControl,
 		},
 	] satisfies WidgetAttributeField< EventsWidgetAttributes >[],
