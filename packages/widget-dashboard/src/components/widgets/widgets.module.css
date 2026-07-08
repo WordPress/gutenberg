@@ -5,6 +5,10 @@
 	/* Placeholder and drag-preview radii: match `.tile` and `@wordpress/ui` Card (`--wpds-border-radius-lg`). */
 	--wp-grid-placeholder-radius: var(--wpds-border-radius-lg);
 	--wp-grid-drag-preview-radius: var(--wpds-border-radius-lg);
+	/* Reserve top paint space so scroll containers do not clip tile focus rings. */
+	--wp-widget-dashboard-tile-focus-offset: 2px;
+	--wp-widget-dashboard-focus-ring-reserve: calc(var(--wpds-border-width-focus) + var(--wp-widget-dashboard-tile-focus-offset));
+	padding-block-start: var(--wp-widget-dashboard-focus-ring-reserve);
 }
 
 .tile {
@@ -22,7 +26,7 @@
 
 .tileEditMode:focus-visible {
 	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
-	outline-offset: 2px;
+	outline-offset: var(--wp-widget-dashboard-tile-focus-offset, 2px);
 }
 
 /*

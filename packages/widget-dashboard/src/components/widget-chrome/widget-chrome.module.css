@@ -1,7 +1,7 @@
-/* Outline the whole tile when the body holds keyboard focus; an inner ring is easy to miss. */
+/* Outward tile focus ring; paint space reserved on `.grid`. */
 .widgetChrome:has(:focus-visible) {
 	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
-	outline-offset: 2px;
+	outline-offset: var(--wp-widget-dashboard-tile-focus-offset, 2px);
 }
 
 .widgetChromeHeaderIcon {
