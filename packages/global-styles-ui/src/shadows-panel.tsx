@@ -30,12 +30,15 @@ export default function ShadowsPanel() {
 
 	const addCustomShadow = () => {
 		const index = getNewIndexFromPresets( custom.presets, 'shadow-' );
-		custom.add( {
-			/* translators: %d: is an index for a preset */
-			name: sprintf( __( 'Shadow %d' ), index ),
-			shadow: defaultShadow,
-			slug: `shadow-${ index }`,
-		} );
+		custom.setPresets( [
+			...custom.presets,
+			{
+				/* translators: %d: is an index for a preset */
+				name: sprintf( __( 'Shadow %d' ), index ),
+				shadow: defaultShadow,
+				slug: `shadow-${ index }`,
+			},
+		] );
 	};
 
 	return (
@@ -85,7 +88,7 @@ export default function ShadowsPanel() {
 								'Are you sure you want to remove all custom shadows?'
 							),
 							confirmButtonText: __( 'Remove' ),
-							onConfirm: custom.removeAll,
+							onConfirm: () => custom.setPresets( [] ),
 						} }
 					/>
 				</Stack>

@@ -53,8 +53,10 @@ export default function ShadowsEditPanel() {
 	const origin = params.category as string;
 	const slug = params.slug as string;
 
-	const { presets, basePresets, update, remove, rename, resetToBase } =
-		usePresets< ShadowPreset >( 'shadow.presets', origin );
+	const { presets, basePresets, setPresets } = usePresets< ShadowPreset >(
+		'shadow.presets',
+		origin
+	);
 
 	const shadow = presets.find( ( s ) => s.slug === slug );
 
@@ -74,7 +76,11 @@ export default function ShadowsEditPanel() {
 	const baseShadow = basePresets.find( ( s ) => s.slug === slug );
 
 	const onShadowChange = ( value: string ) =>
-		update( slug, { ...shadow, shadow: value } );
+		setPresets(
+			presets.map( ( p ) =>
+				p.slug === slug ? { ...shadow, shadow: value } : p
+			)
+		);
 
 	const menuItems: PresetEditHeaderMenuItem[] =
 		origin === 'custom'
@@ -91,7 +97,16 @@ export default function ShadowsEditPanel() {
 			: [
 					{
 						label: __( 'Reset' ),
-						onClick: () => resetToBase( slug ),
+						onClick: () => {
+							if ( ! baseShadow ) {
+								return;
+							}
+							setPresets(
+								presets.map( ( p ) =>
+									p.slug === slug ? baseShadow : p
+								)
+							);
+						},
 						disabled: shadow.shadow === baseShadow?.shadow,
 					},
 			  ];
@@ -121,7 +136,9 @@ export default function ShadowsEditPanel() {
 					) }
 					isOpen={ isDeleteOpen }
 					toggleOpen={ () => setIsDeleteOpen( false ) }
-					onConfirm={ () => remove( slug ) }
+					onConfirm={ () =>
+						setPresets( presets.filter( ( p ) => p.slug !== slug ) )
+					}
 				/>
 			) }
 			{ isRenameOpen && (
@@ -129,7 +146,13 @@ export default function ShadowsEditPanel() {
 					initialName={ shadow.name }
 					placeholder={ __( 'Shadow name' ) }
 					toggleOpen={ () => setIsRenameOpen( false ) }
-					onRename={ ( name ) => rename( slug, name ) }
+					onRename={ ( name ) =>
+						setPresets(
+							presets.map( ( p ) =>
+								p.slug === slug ? { ...p, name } : p
+							)
+						)
+					}
 				/>
 			) }
 		</>
