@@ -433,6 +433,43 @@ test.describe( 'Cover', () => {
 		await expect( coverImage ).toHaveCSS( 'object-position', '20% 30%' );
 	} );
 
+	test( 'exposes the focal point picker as a legend-labelled group', async ( {
+		editor,
+		coverBlockUtils,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/cover' } );
+		const coverBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
+
+		await coverBlockUtils.upload(
+			coverBlock.getByTestId( 'form-file-upload-input' )
+		);
+
+		await expect(
+			coverBlock.locator( 'img.wp-block-cover__image-background' )
+		).toBeVisible();
+
+		await editor.selectBlocks( coverBlock );
+
+		const focalPointGroup = page.getByRole( 'group', {
+			name: 'Focal point',
+		} );
+
+		await expect( focalPointGroup ).toBeVisible();
+		await expect(
+			focalPointGroup.getByRole( 'spinbutton', {
+				name: 'Focal point left position',
+			} )
+		).toBeVisible();
+		await expect(
+			focalPointGroup.getByRole( 'spinbutton', {
+				name: 'Focal point top position',
+			} )
+		).toBeVisible();
+	} );
+
 	test( 'correctly computes isDark based on dimRatio and overlay color', async ( {
 		page,
 		editor,

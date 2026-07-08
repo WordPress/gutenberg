@@ -1,7 +1,6 @@
 import { css } from '@emotion/react';
 import { COLORS, CONFIG, boxSizingReset, rtl } from '../utils';
 import { space } from '../utils/space';
-import { StyledLabel } from '../base-control/styles/base-control-styles';
 import {
 	ValueInput as UnitControlWrapper,
 	UnitSelect,
@@ -126,11 +125,11 @@ const swatchGap = 12;
 export const borderControlPopoverControls = css`
 	width: ${ swatchSize * 6 + swatchGap * 5 }px;
 
-	> div:first-of-type > ${ StyledLabel } {
+	> div:first-of-type > .components-base-control__label {
 		margin-bottom: 0;
 	}
 
-	&& ${ StyledLabel } + button:not( .has-text ) {
+	&& .components-base-control__label + button:not( .has-text ) {
 		min-width: 24px;
 		padding: 0;
 	}
