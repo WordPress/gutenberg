@@ -235,6 +235,31 @@ describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 			expect( inheritedItems ).toHaveLength( 1 );
 		} );
 
+		it( 'still surfaces a root-sourced link color as inherited (element rules apply globally)', () => {
+			const inheritedValue = {
+				elements: { link: { color: { text: '#0000ff' } } },
+			};
+
+			const { container } = render(
+				<ColorPanel
+					value={ {} }
+					inheritedValue={ inheritedValue }
+					inheritedSources={ {
+						'elements.link.color.text': { layer: 'root' },
+					} }
+					settings={ baseSettings }
+					onChange={ () => {} }
+					panelId="test-panel"
+				/>
+			);
+
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const inheritedItems = container.querySelectorAll(
+				'.is-inherited-from-global-styles'
+			);
+			expect( inheritedItems ).toHaveLength( 1 );
+		} );
+
 		it( 'applies the local-override className when local link.text is set', () => {
 			const inheritedValue = {
 				elements: { link: { color: { text: '#0000ff' } } },

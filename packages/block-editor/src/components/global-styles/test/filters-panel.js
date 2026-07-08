@@ -177,4 +177,27 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 
 		expect( onChange ).not.toHaveBeenCalled();
 	} );
+
+	it( 'does not surface a root-sourced duotone as inherited (non-cascading)', () => {
+		const inheritedValue = {
+			filter: { duotone: [ '#000000', '#ffffff' ] },
+		};
+
+		const { container } = render(
+			<FiltersPanel
+				value={ {} }
+				inheritedValue={ inheritedValue }
+				inheritedSources={ { 'filter.duotone': { layer: 'root' } } }
+				settings={ baseSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+		const item = container.querySelector(
+			'.components-tools-panel-item.is-inherited-from-global-styles'
+		);
+		expect( item ).toBeNull();
+	} );
 } );

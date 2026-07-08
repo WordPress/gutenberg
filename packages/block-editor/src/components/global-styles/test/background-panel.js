@@ -617,6 +617,64 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 		} );
 	} );
 
+	describe( 'root-sourced values (non-cascading, not surfaced as inherited)', () => {
+		const colorBgSettings = {
+			color: {
+				background: true,
+				palette: {
+					theme: [ { name: 'Red', slug: 'red', color: '#ff0000' } ],
+				},
+			},
+		};
+
+		it( 'does not surface a root-sourced background color as inherited', () => {
+			const { container } = render(
+				<BackgroundPanel
+					value={ {} }
+					inheritedValue={ { color: { background: '#ff0000' } } }
+					inheritedSources={ {
+						'color.background': { layer: 'root' },
+					} }
+					settings={ colorBgSettings }
+					onChange={ () => {} }
+					panelId="test-panel"
+				/>
+			);
+
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const inheritedItems = container.querySelectorAll(
+				'.is-inherited-from-global-styles'
+			);
+			expect( inheritedItems ).toHaveLength( 0 );
+		} );
+
+		it( 'does not surface a root-sourced background gradient as inherited', () => {
+			const { container } = render(
+				<BackgroundPanel
+					value={ {} }
+					inheritedValue={ {
+						background: {
+							gradient:
+								'linear-gradient(135deg, rgb(74, 0, 224) 0%, rgb(142, 45, 226) 100%)',
+						},
+					} }
+					inheritedSources={ {
+						'background.gradient': { layer: 'root' },
+					} }
+					settings={ baseSettings }
+					onChange={ () => {} }
+					panelId="test-panel"
+				/>
+			);
+
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const inheritedItems = container.querySelectorAll(
+				'.is-inherited-from-global-styles'
+			);
+			expect( inheritedItems ).toHaveLength( 0 );
+		} );
+	} );
+
 	describe( 'shape regression', () => {
 		it( 'returns null when no controls are enabled', () => {
 			const { container } = render(

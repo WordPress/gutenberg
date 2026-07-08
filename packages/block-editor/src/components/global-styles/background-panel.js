@@ -26,6 +26,7 @@ import {
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
 import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
+import { dropRootSourced, isRootSourced } from './inheritance/root-source';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
@@ -352,8 +353,17 @@ export default function BackgroundImagePanel( {
 		onChange( newValue );
 	};
 
+	// Background is a non-cascading property: a root-level Global Styles value
+	// paints the root wrapper only and does not reach this block, so it is not
+	// surfaced as inherited (see `./inheritance/root-source`).
+
 	// Background color (written to `color.background`).
-	const backgroundColor = decodeValue( inheritedValue?.color?.background );
+	const backgroundColor = isRootSourced(
+		inheritedSources,
+		'color.background'
+	)
+		? undefined
+		: decodeValue( inheritedValue?.color?.background );
 	const userBackgroundColor = decodeValue( value?.color?.background );
 	const setBackgroundColor = ( newColor, newSlug ) => {
 		const newValue = setImmutably(
@@ -382,7 +392,12 @@ export default function BackgroundImagePanel( {
 	};
 
 	// Legacy `color.gradient` setters.
-	const legacyColorGradient = decodeValue( inheritedValue?.color?.gradient );
+	const legacyColorGradient = isRootSourced(
+		inheritedSources,
+		'color.gradient'
+	)
+		? undefined
+		: decodeValue( inheritedValue?.color?.gradient );
 	const userLegacyColorGradient = decodeValue( value?.color?.gradient );
 	const setLegacyColorGradient = ( newGradient ) => {
 		const newValue = setImmutably(
@@ -403,8 +418,20 @@ export default function BackgroundImagePanel( {
 	const currentGradient = decodeValue(
 		value?.background?.gradient ?? value?.color?.gradient
 	);
+	const inheritedBackgroundGradient = isRootSourced(
+		inheritedSources,
+		'background.gradient'
+	)
+		? undefined
+		: inheritedValue?.background?.gradient;
+	const inheritedLegacyGradient = isRootSourced(
+		inheritedSources,
+		'color.gradient'
+	)
+		? undefined
+		: inheritedValue?.color?.gradient;
 	const inheritedGradient = decodeValue(
-		inheritedValue?.background?.gradient ?? inheritedValue?.color?.gradient
+		inheritedBackgroundGradient ?? inheritedLegacyGradient
 	);
 
 	// Set gradient value, encoding preset matches as slug references.
@@ -429,7 +456,13 @@ export default function BackgroundImagePanel( {
 	// return) so this detection matches what `BackgroundImageControl`
 	// renders and the label affordance appears whenever an image is inherited.
 	const inheritedBackgroundImage = hasBackgroundImageValue( {
-		background: { backgroundImage: resolvedInheritedBackgroundImage },
+		background: {
+			backgroundImage: dropRootSourced(
+				resolvedInheritedBackgroundImage,
+				inheritedSources,
+				'background.backgroundImage'
+			),
+		},
 	} );
 	const hasLocalBackgroundImage = hasBackgroundImageValue( value );
 
@@ -479,7 +512,6 @@ export default function BackgroundImagePanel( {
 					showInheritanceLabelIndicators={
 						showInheritanceLabelIndicators
 					}
-					inheritedSources={ inheritedSources }
 					isPlaceholder={
 						userBackgroundColor === undefined &&
 						backgroundColor !== undefined
@@ -489,7 +521,6 @@ export default function BackgroundImagePanel( {
 						{
 							key: 'background',
 							label: __( 'Color' ),
-							sourcePaths: [ 'color.background' ],
 							inheritedValue: backgroundColor,
 							// Resolve the slug from the same source as the
 							// displayed value (user value first, then the
@@ -531,7 +562,6 @@ export default function BackgroundImagePanel( {
 					showInheritanceLabelIndicators={
 						showInheritanceLabelIndicators
 					}
-					inheritedSources={ inheritedSources }
 					isPlaceholder={
 						currentGradient === undefined &&
 						inheritedGradient !== undefined
@@ -541,10 +571,6 @@ export default function BackgroundImagePanel( {
 						{
 							key: 'gradient',
 							label: __( 'Gradient' ),
-							sourcePaths: [
-								'background.gradient',
-								'color.gradient',
-							],
 							inheritedValue: inheritedGradient,
 							setValue: setGradient,
 							userValue: currentGradient,
@@ -573,7 +599,6 @@ export default function BackgroundImagePanel( {
 					showInheritanceLabelIndicators={
 						showInheritanceLabelIndicators
 					}
-					inheritedSources={ inheritedSources }
 					isPlaceholder={
 						userLegacyColorGradient === undefined &&
 						legacyColorGradient !== undefined
@@ -583,7 +608,6 @@ export default function BackgroundImagePanel( {
 						{
 							key: 'gradient',
 							label: __( 'Gradient' ),
-							sourcePaths: [ 'color.gradient' ],
 							inheritedValue: legacyColorGradient,
 							setValue: setLegacyColorGradient,
 							userValue: userLegacyColorGradient,

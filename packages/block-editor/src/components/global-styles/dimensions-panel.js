@@ -34,6 +34,7 @@ import {
 	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
 import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
+import { dropRootSourced, isRootSourced } from './inheritance/root-source';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
@@ -174,50 +175,6 @@ function getNumericPlaceholder( rawValue ) {
 	}
 	const [ quantity ] = parseQuantityAndUnitFromRawValue( rawValue );
 	return quantity;
-}
-
-/**
- * Layers whose contributions should not bubble up into block-level
- * spacing/dimensions controls. Root-level `spacing.padding`, `spacing.margin`,
- * and `spacing.blockGap` apply to the post content wrapper or root selector
- * only — they are not CSS-inherited cascade properties, so descendant block
- * panels should not surface them as "inherited" placeholders.
- */
-const NON_CASCADING_ROOT_LAYERS = new Set( [ 'root' ] );
-
-function isRootSourced( sources, pathKey ) {
-	return NON_CASCADING_ROOT_LAYERS.has( sources?.[ pathKey ]?.layer );
-}
-
-/**
- * Drops sides from a sides-shaped (or shorthand) inherited value when the
- * winning source for that side is the root layer. Returns `undefined` when
- * nothing remains. Leaves block- and variation-sourced values intact.
- *
- * @param {Object|string|undefined} value    Inherited value at `basePath`.
- * @param {Object}                  sources  Source map keyed by dot-path.
- * @param {string}                  basePath Dot-path of `value` (e.g. `spacing.padding`).
- * @return {Object|string|undefined} Filtered value, or `undefined` if all sides were root-sourced.
- */
-function dropRootSourcedSides( value, sources, basePath ) {
-	if ( ! hasValue( value ) ) {
-		return value;
-	}
-	if ( typeof value === 'string' ) {
-		return isRootSourced( sources, basePath ) ? undefined : value;
-	}
-	if ( typeof value !== 'object' ) {
-		return value;
-	}
-	const filtered = {};
-	let kept = false;
-	for ( const sideKey of Object.keys( value ) ) {
-		if ( ! isRootSourced( sources, `${ basePath }.${ sideKey }` ) ) {
-			filtered[ sideKey ] = value[ sideKey ];
-			kept = true;
-		}
-	}
-	return kept ? filtered : undefined;
 }
 
 function splitStyleValue( value ) {
@@ -496,7 +453,7 @@ export default function DimensionsPanel( {
 	const showPaddingControl = hasPadding( settings );
 	const inheritedPaddingValues = splitStyleValue(
 		decodeValue(
-			dropRootSourcedSides(
+			dropRootSourced(
 				inheritedValue?.spacing?.padding,
 				inheritedSources,
 				'spacing.padding'
@@ -547,7 +504,7 @@ export default function DimensionsPanel( {
 	const showMarginControl = hasMargin( settings );
 	const inheritedMarginValues = splitStyleValue(
 		decodeValue(
-			dropRootSourcedSides(
+			dropRootSourced(
 				inheritedValue?.spacing?.margin,
 				inheritedSources,
 				'spacing.margin'

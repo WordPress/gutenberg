@@ -966,3 +966,24 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 		expect( result?.elements?.link?.color?.text ).toBeUndefined();
 	} );
 } );
+
+describe( 'TypographyPanel — text color keeps root-sourced inheritance', () => {
+	it( 'still surfaces a root-sourced text color as inherited (typography cascades)', () => {
+		const { container } = render(
+			<TypographyPanel
+				value={ {} }
+				inheritedValue={ { color: { text: '#000' } } }
+				inheritedSources={ { 'color.text': { layer: 'root' } } }
+				settings={ DUPLICATE_PALETTE_SETTINGS }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			// eslint-disable-next-line testing-library/no-node-access, testing-library/no-container -- See class-hook rationale above.
+			container.querySelectorAll( '.is-inherited-from-global-styles' )
+				.length
+		).toBeGreaterThan( 0 );
+	} );
+} );
