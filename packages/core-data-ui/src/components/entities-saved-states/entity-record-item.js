@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import fastDeepEqual from 'fast-deep-equal';
+
+/**
  * WordPress dependencies
  */
 import { CheckboxControl, PanelRow } from '@wordpress/components';
@@ -16,39 +21,76 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 	const { name, kind, title, key } = record;
 
 	// Handle templates that might use default descriptive titles.
-	const entityRecordTitle = useSelect(
+	const { entityRecordTitle, hasPostMetaChanges } = useSelect(
 		( select ) => {
-			if ( 'postType' !== kind || 'wp_template' !== name ) {
-				return title;
-			}
+			const {
+				getEditedEntityRecord,
+				getCurrentTheme,
+				getEntityRecordNonTransientEdits,
+				getEntityRecord,
+			} = select( coreStore );
 
-			const template = select( coreStore ).getEditedEntityRecord(
-				kind,
+			// Whether the (post) record has unsaved meta changes other than
+			// `footnotes`. Mirrors the editor's `hasPostMetaChanges` selector,
+			// which — when called with an explicit record, as it is here — reads
+			// only from core-data and never touches the editor store.
+			const metaEdits = getEntityRecordNonTransientEdits(
+				'postType',
 				name,
 				key
-			);
+			)?.meta;
+			let metaChanged = false;
+			if ( metaEdits ) {
+				const originalMeta = getEntityRecord(
+					'postType',
+					name,
+					key
+				)?.meta;
+				metaChanged = ! fastDeepEqual(
+					{ ...originalMeta, footnotes: undefined },
+					{ ...metaEdits, footnotes: undefined }
+				);
+			}
 
+			if ( 'postType' !== kind || 'wp_template' !== name ) {
+				return {
+					entityRecordTitle: title,
+					hasPostMetaChanges: metaChanged,
+				};
+			}
+
+			const template = getEditedEntityRecord( kind, name, key );
 			const { default_template_types: templateTypes = [] } =
-				select( coreStore ).getCurrentTheme() ?? {};
+				getCurrentTheme() ?? {};
 
-			return getTemplateInfo( {
-				template,
-				templateTypes,
-			} ).title;
+			return {
+				entityRecordTitle: getTemplateInfo( {
+					template,
+					templateTypes,
+				} ).title,
+				hasPostMetaChanges: metaChanged,
+			};
 		},
 		[ name, kind, title, key ]
 	);
 
 	return (
-		<PanelRow>
-			<CheckboxControl
-				label={
-					decodeEntities( entityRecordTitle ) || __( 'Untitled' )
-				}
-				checked={ checked }
-				onChange={ onChange }
-				className="entities-saved-states__change-control"
-			/>
-		</PanelRow>
+		<>
+			<PanelRow>
+				<CheckboxControl
+					label={
+						decodeEntities( entityRecordTitle ) || __( 'Untitled' )
+					}
+					checked={ checked }
+					onChange={ onChange }
+					className="entities-saved-states__change-control"
+				/>
+			</PanelRow>
+			{ hasPostMetaChanges && (
+				<ul className="entities-saved-states__changes">
+					<li>{ __( 'Post Meta.' ) }</li>
+				</ul>
+			) }
+		</>
 	);
 }

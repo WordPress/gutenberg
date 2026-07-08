@@ -12,7 +12,7 @@
 
 ### Code Quality
 
--   The `EntitiesSavedStates` component (and its `EntitiesSavedStatesExtensible`/`useEntitiesSavedStatesIsDirty` exports) now lives in `@wordpress/core-data-ui`; `@wordpress/editor` re-exports them unchanged. The `saveDirtyEntities` save orchestration moved to a private `@wordpress/core-data` action. The panel's per-record "Post Meta." changes indicator was dropped as part of decoupling it from the editor store. [#79913](https://github.com/WordPress/gutenberg/pull/79913).
+-   The `EntitiesSavedStates` component (and its `EntitiesSavedStatesExtensible`/`useEntitiesSavedStatesIsDirty` exports) now lives in `@wordpress/core-data-ui`; `@wordpress/editor` re-exports them unchanged. The `saveDirtyEntities` implementation moved to a private `@wordpress/core-data` action; the private `core/editor` `saveDirtyEntities` action is retained as a thin backwards-compatible wrapper. No public or private API changes. [#79913](https://github.com/WordPress/gutenberg/pull/79913).
 
 ## 14.50.0 (2026-07-01)
 

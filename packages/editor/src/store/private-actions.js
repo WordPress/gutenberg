@@ -129,6 +129,25 @@ export const hideBlockTypes =
 	};
 
 /**
+ * Save entity records marked as dirty.
+ *
+ * The implementation now lives in the `core` (`@wordpress/core-data`) store;
+ * this thin wrapper is kept for backwards compatibility so existing consumers
+ * of the private `core/editor` `saveDirtyEntities` action keep working.
+ *
+ * @param {Object}   options                        Options for the action.
+ * @param {Function} [options.onSave]               Callback when saving happens.
+ * @param {object[]} [options.dirtyEntityRecords]   Array of dirty entities.
+ * @param {object[]} [options.entitiesToSkip]       Array of entities to skip saving.
+ * @param {Function} [options.close]                Callback when the actions is called. It should be consolidated with `onSave`.
+ * @param {string}   [options.successNoticeContent] Optional custom success notice content. Defaults to 'Site updated.'.
+ */
+export const saveDirtyEntities =
+	( options ) =>
+	( { registry } ) =>
+		unlock( registry.dispatch( coreStore ) ).saveDirtyEntities( options );
+
+/**
  * Reverts a template to its original theme-provided file.
  *
  * @param {Object}  template            The template to revert.

@@ -4,6 +4,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -323,6 +324,9 @@ export const saveDirtyEntities =
 				)
 			);
 		}
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkLastChangeAsPersistent();
 
 		Promise.all( pendingSavedRecords )
 			.then( async ( values ) => {

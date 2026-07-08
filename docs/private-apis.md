@@ -198,6 +198,7 @@ Private exports:
 Private actions:
 - `receiveRegisteredPostMeta`
 - `editMediaEntity`
+- `saveDirtyEntities`
 
 Private selectors:
 - `getBlockPatternsForPostType`
