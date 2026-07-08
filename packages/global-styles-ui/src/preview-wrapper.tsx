@@ -107,7 +107,7 @@ function PreviewWrapper( {
 				<Skeleton
 					className="global-styles-ui-preview__wrapper"
 					style={ {
-						aspectRatio: `${ normalizedWidth } / ${ normalizedHeight }`,
+						aspectRatio: normalizedWidth / normalizedHeight,
 					} }
 				/>
 			) }
