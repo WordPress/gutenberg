@@ -122,7 +122,7 @@ export function WidgetFrame( {
 			<Card.Content
 				className={ clsx(
 					styles.content,
-					isBodyBleeding && styles.bleedContent
+					isBodyBleeding && styles[ 'bleed-content' ]
 				) }
 				{ ...( editMode ? { inert: 'true' } : {} ) }
 			>
