@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	InnerBlocks,
 	InspectorControls,
 	useBlockProps,
 	useInnerBlocksProps,
@@ -77,7 +78,34 @@ function ReadOnlyContent( {
 	);
 }
 
-function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
+function EditableContentLoading( { tagName: TagName = 'div' } ) {
+	const blockProps = useBlockProps( { className: 'entry-content' } );
+	return <TagName { ...blockProps } />;
+}
+
+function EditableContentLoaded( {
+	blocks,
+	onInput,
+	onChange,
+	tagName: TagName = 'div',
+} ) {
+	const props = useInnerBlocksProps(
+		useBlockProps( { className: 'entry-content' } ),
+		{
+			value: blocks,
+			onInput,
+			onChange,
+			// Show a writing prompt for empty content, even when the block
+			// is not selected, so the content area remains discoverable.
+			renderAppender: blocks?.length
+				? undefined
+				: InnerBlocks.DefaultBlockAppender,
+		}
+	);
+	return <TagName { ...props } />;
+}
+
+function EditableContent( { context = {}, tagName } ) {
 	const { postType, postId } = context;
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
@@ -86,31 +114,36 @@ function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 		{ id: postId }
 	);
 
-	const entityRecord = useSelect(
-		( select ) => {
-			return select( coreStore ).getEntityRecord(
+	// Wait for the entity record before mounting the inner blocks area, so
+	// that an empty `blocks` value means an empty post rather than one that
+	// has not loaded yet.
+	const hasLoadedRecord = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord(
 				'postType',
 				postType,
 				postId
-			);
-		},
+			) !== undefined ||
+			select( coreStore ).hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				postType,
+				postId,
+			] ),
 		[ postType, postId ]
 	);
 
-	const hasInnerBlocks = !! entityRecord?.content?.raw || blocks?.length;
+	if ( ! hasLoadedRecord ) {
+		return <EditableContentLoading tagName={ tagName } />;
+	}
 
-	const initialInnerBlocks = [ [ 'core/paragraph' ] ];
-
-	const props = useInnerBlocksProps(
-		useBlockProps( { className: 'entry-content' } ),
-		{
-			value: blocks,
-			onInput,
-			onChange,
-			template: ! hasInnerBlocks ? initialInnerBlocks : undefined,
-		}
+	return (
+		<EditableContentLoaded
+			blocks={ blocks }
+			onInput={ onInput }
+			onChange={ onChange }
+			tagName={ tagName }
+		/>
 	);
-	return <TagName { ...props } />;
 }
 
 function Content( props ) {
