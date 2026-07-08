@@ -81,7 +81,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
               ↗
             </span>
           </a>
-           
+
           is now live.
         </div>
         <div
@@ -98,13 +98,13 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
             class="post-publish-panel__postpublish-post-address-container"
           >
             <div
-              class="components-base-control post-publish-panel__postpublish-post-address emotion-0 emotion-1"
+              class="style-wrapper components-base-control components-base-control post-publish-panel__postpublish-post-address"
             >
               <div
-                class="components-base-control__field emotion-2 emotion-3"
+                class="style-field components-base-control__field components-base-control__field"
               >
                 <label
-                  class="components-base-control__label emotion-4 emotion-5"
+                  class="style-label components-base-control__label components-base-control__label"
                   for="inspector-text-control-0"
                 >
                   post address
@@ -169,10 +169,10 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
       class="editor-post-publish-panel__footer"
     >
       <div
-        class="components-base-control components-checkbox-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-base-control components-checkbox-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -285,9 +285,9 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
               ↗
             </span>
           </a>
-           
+
           is now scheduled. It will go live on
-           
+
           Immediately
           .
         </div>
@@ -305,13 +305,13 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
             class="post-publish-panel__postpublish-post-address-container"
           >
             <div
-              class="components-base-control post-publish-panel__postpublish-post-address emotion-0 emotion-1"
+              class="style-wrapper components-base-control components-base-control post-publish-panel__postpublish-post-address"
             >
               <div
-                class="components-base-control__field emotion-2 emotion-3"
+                class="style-field components-base-control__field components-base-control__field"
               >
                 <label
-                  class="components-base-control__label emotion-4 emotion-5"
+                  class="style-label components-base-control__label components-base-control__label"
                   for="inspector-text-control-1"
                 >
                   post address
@@ -351,10 +351,10 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
       class="editor-post-publish-panel__footer"
     >
       <div
-        class="components-base-control components-checkbox-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-base-control components-checkbox-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -483,10 +483,10 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
       class="editor-post-publish-panel__footer"
     >
       <div
-        class="components-base-control components-checkbox-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-base-control components-checkbox-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -615,10 +615,10 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
       class="editor-post-publish-panel__footer"
     >
       <div
-        class="components-base-control components-checkbox-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-base-control components-checkbox-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"

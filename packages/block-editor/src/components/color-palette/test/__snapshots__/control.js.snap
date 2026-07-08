@@ -29,10 +29,10 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
 
 <div>
   <div
-    class="components-base-control block-editor-color-gradient-control emotion-0 emotion-1"
+    class="style-wrapper components-base-control components-base-control block-editor-color-gradient-control"
   >
     <div
-      class="components-base-control__field emotion-2 emotion-3"
+      class="style-field components-base-control__field components-base-control__field"
     >
       <fieldset
         class="block-editor-color-gradient-control__fieldset"
@@ -48,7 +48,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
               class="block-editor-color-gradient-control__color-indicator"
             >
               <span
-                class="components-base-control__label emotion-4 emotion-5"
+                class="style-label components-base-control__label components-base-control__label"
               >
                 Test Color
               </span>

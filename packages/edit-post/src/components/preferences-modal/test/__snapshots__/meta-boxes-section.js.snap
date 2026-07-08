@@ -36,10 +36,10 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
       class="preference-base-option"
     >
       <div
-        class="components-base-control components-toggle-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-base-control components-toggle-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -115,10 +115,10 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
       class="preference-base-option"
     >
       <div
-        class="components-base-control components-toggle-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-base-control components-toggle-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -158,10 +158,10 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
       class="preference-base-option"
     >
       <div
-        class="components-base-control components-toggle-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-base-control components-toggle-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -202,10 +202,10 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
       class="preference-base-option"
     >
       <div
-        class="components-base-control components-toggle-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-base-control components-toggle-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -282,10 +282,10 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
       class="preference-base-option"
     >
       <div
-        class="components-base-control components-toggle-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-base-control components-toggle-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -326,10 +326,10 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
       class="preference-base-option"
     >
       <div
-        class="components-base-control components-toggle-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-base-control components-toggle-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
