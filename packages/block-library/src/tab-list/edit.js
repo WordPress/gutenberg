@@ -99,14 +99,16 @@ function Edit( {
 	}
 
 	const menuRef = useRef();
-	const prevTabCountRef = useRef( tabsList.length );
+	const prevTabIdsRef = useRef( tabsList.map( ( tab ) => tab.clientId ) );
 
 	// When tabs are added or removed, focus the appropriate button.
 	useEffect( () => {
-		const prevCount = prevTabCountRef.current;
-		prevTabCountRef.current = tabsList.length;
+		const prevTabIds = prevTabIdsRef.current;
+		const tabIds = tabsList.map( ( tab ) => tab.clientId );
+		prevTabIdsRef.current = tabIds;
 
-		if ( ! menuRef.current || tabsList.length === prevCount ) {
+		// Only react when a tab was actually added or removed.
+		if ( ! menuRef.current || tabIds.length === prevTabIds.length ) {
 			return;
 		}
 
@@ -128,13 +130,40 @@ function Edit( {
 			} );
 		};
 
-		focusButtonAt( effectiveActiveIndex );
+		// The editor-only active index is a non-persistent attribute, so it
+		// isn't restored on undo/redo. Derive the tab to activate from the
+		// structural change.
+		const addedTabIndex = tabIds.findIndex(
+			( id ) => ! prevTabIds.includes( id )
+		);
+		let targetTabIndex;
+		if ( addedTabIndex !== -1 ) {
+			// A tab appeared (a new tab or undoing a removal): activate it.
+			targetTabIndex = addedTabIndex;
+		} else {
+			// A tab disappeared (undoing an insertion or a removal): activate
+			// the tab adjacent to the removed one.
+			const removedTabIndex = prevTabIds.findIndex(
+				( id ) => ! tabIds.includes( id )
+			);
+			targetTabIndex = Math.min( removedTabIndex, tabIds.length - 1 );
+		}
+
+		if ( targetTabIndex !== effectiveActiveIndex ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			updateBlockAttributes( tabsClientId, {
+				editorActiveTabIndex: targetTabIndex,
+			} );
+		}
+		focusButtonAt( targetTabIndex );
 	}, [
 		effectiveActiveIndex,
 		hasSelectedInnerBlock,
 		isBlockSelected,
 		tabsClientId,
-		tabsList.length,
+		tabsList,
+		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
 	const blockProps = useBlockProps( {

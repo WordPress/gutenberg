@@ -180,19 +180,18 @@ test.describe( 'Tabs', () => {
 			await expect( panels ).toHaveCount( 3 );
 			await expect( panels.nth( 2 ) ).toBeVisible();
 
-			// The tab insertion is persistent, so undo removes the new tab
+			// The tab insertion is persistent, so undo removes the new tab. The
+			// tab adjacent to the removed one (the second) becomes the active,
+			// focused one.
 			await pageUtils.pressKeys( 'primary+z' );
 			await expect( tabs ).toHaveCount( 2 );
 
-			// TODO: This is not the intended behavior and should be fixed.
-			// After undo the second tab (not the first) should be the active,
-			// focused one.
-			await expect( tabs.nth( 0 ) ).toHaveAttribute(
+			await expect( tabs.nth( 1 ) ).toHaveAttribute(
 				'aria-selected',
 				'true'
 			);
 			await expect(
-				tabs.nth( 0 ).locator( '[contenteditable="true"]' )
+				tabs.nth( 1 ).locator( '[contenteditable="true"]' )
 			).toBeFocused();
 		} );
 
@@ -220,19 +219,17 @@ test.describe( 'Tabs', () => {
 			).toBeFocused();
 			await expect( editor.canvas.getByText( 'Panel 1' ) ).toBeVisible();
 
-			// The tab removal is persistent, so undo brings the tab back.
+			// The tab removal is persistent, so undo brings the tab back. The
+			// restored (second) tab becomes the active, focused one.
 			await pageUtils.pressKeys( 'primary+z' );
 			await expect( tabs ).toHaveCount( 2 );
 
-			// TODO: This is not the intended behavior and should be fixed.
-			// After undo the restored second tab (not the first) should be the
-			// active, focused one.
-			await expect( tabs.nth( 0 ) ).toHaveAttribute(
+			await expect( tabs.nth( 1 ) ).toHaveAttribute(
 				'aria-selected',
 				'true'
 			);
 			await expect(
-				tabs.nth( 0 ).locator( '[contenteditable="true"]' )
+				tabs.nth( 1 ).locator( '[contenteditable="true"]' )
 			).toBeFocused();
 		} );
 	} );
