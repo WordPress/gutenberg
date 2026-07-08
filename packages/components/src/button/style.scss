@@ -22,7 +22,6 @@
 	font-size: $default-font-size;
 	font-weight: $font-weight-medium;
 	margin: 0;
-	border: 0;
 	cursor: var(--wpds-cursor-control);
 	appearance: none;
 	background: none;
@@ -32,6 +31,9 @@
 	padding: 4px 12px; // Allows 32px min-height.
 	border-radius: $radius-small;
 	color: $components-color-foreground;
+	// Every variant reserves a 1px border (transparent by default) so the box
+	// size stays identical whether or not a variant paints a visible border.
+	border: $border-width solid transparent;
 
 	&.is-next-40px-default-size {
 		height: $button-size-next-default-40px;
@@ -88,11 +90,6 @@
 			);
 			/* stylelint-enable */
 		}
-
-		@media (forced-colors: active) {
-			// The accent background is flattened in forced-colors mode, so draw a border.
-			outline: 1px solid ButtonBorder;
-		}
 	}
 
 	/**
@@ -119,7 +116,7 @@
 			transition: border-color 0.1s linear;
 		}
 
-		border: $border-width solid $components-color-accent;
+		border-color: $components-color-accent;
 		white-space: nowrap;
 		color: $components-color-accent;
 		background: transparent;
@@ -167,11 +164,6 @@
 		// Pull left if the tertiary button stands alone after a description, so as to vertically align with items above.
 		p + & {
 			margin-left: -($grid-unit-15 * 0.5);
-		}
-
-		@media (forced-colors: active) {
-			// Tertiary buttons have no border, so draw one in forced-colors mode.
-			outline: 1px solid ButtonBorder;
 		}
 	}
 
