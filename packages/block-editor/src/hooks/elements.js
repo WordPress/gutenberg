@@ -163,13 +163,6 @@ export function ElementsEdit( {
  * @param {Object} props Passthrough props for `StylesColorPanel`.
  */
 function ElementsPanelWithInheritedValue( props ) {
-	const { value: inheritedValue, sources: inheritedSources } =
-		useInheritedValue();
-	return (
-		<StylesColorPanel
-			{ ...props }
-			inheritedValue={ inheritedValue }
-			inheritedSources={ inheritedSources }
-		/>
-	);
+	const { value: inheritedValue } = useInheritedValue();
+	return <StylesColorPanel { ...props } inheritedValue={ inheritedValue } />;
 }

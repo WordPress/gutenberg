@@ -22,6 +22,7 @@ import { setImmutably } from '../../utils/object';
 import { useBorderPanelLabel } from '../../hooks/border';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
 import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
+import { dropRootSourced, isRootSourced } from './inheritance/root-source';
 
 export function useHasBorderPanel( settings ) {
 	const controls = Object.values( useHasBorderPanelControls( settings ) );
@@ -99,6 +100,7 @@ export default function BorderPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedSources = {},
 	settings,
 	panelId,
 	name,
@@ -160,8 +162,17 @@ export default function BorderPanel( {
 		[ value?.border, decodeBorder ]
 	);
 	const inheritedBorder = useMemo(
-		() => decodeBorder( inheritedValue?.border ),
-		[ inheritedValue?.border, decodeBorder ]
+		() =>
+			// Border is non-cascading: root-level Global Styles values paint the
+			// root wrapper only, so they are not surfaced as inherited here.
+			decodeBorder(
+				dropRootSourced(
+					inheritedValue?.border,
+					inheritedSources,
+					'border'
+				)
+			),
+		[ inheritedValue?.border, inheritedSources, decodeBorder ]
 	);
 	const isBorderPlaceholder =
 		! isDefinedBorder( value?.border ) &&
@@ -192,20 +203,21 @@ export default function BorderPanel( {
 		};
 	}, [ value?.border?.radius, decodeValue ] );
 	const inheritedBorderRadius = useMemo( () => {
-		if ( typeof inheritedValue?.border?.radius !== 'object' ) {
-			return decodeValue( inheritedValue?.border?.radius );
+		const rawRadius = dropRootSourced(
+			inheritedValue?.border?.radius,
+			inheritedSources,
+			'border.radius'
+		);
+		if ( typeof rawRadius !== 'object' ) {
+			return decodeValue( rawRadius );
 		}
 		return {
-			topLeft: decodeValue( inheritedValue?.border?.radius?.topLeft ),
-			topRight: decodeValue( inheritedValue?.border?.radius?.topRight ),
-			bottomLeft: decodeValue(
-				inheritedValue?.border?.radius?.bottomLeft
-			),
-			bottomRight: decodeValue(
-				inheritedValue?.border?.radius?.bottomRight
-			),
+			topLeft: decodeValue( rawRadius?.topLeft ),
+			topRight: decodeValue( rawRadius?.topRight ),
+			bottomLeft: decodeValue( rawRadius?.bottomLeft ),
+			bottomRight: decodeValue( rawRadius?.bottomRight ),
 		};
-	}, [ inheritedValue?.border?.radius, decodeValue ] );
+	}, [ inheritedValue?.border?.radius, inheritedSources, decodeValue ] );
 	const setBorderRadius = ( newBorderRadius ) =>
 		setBorder( { ...border, radius: newBorderRadius } );
 	const hasBorderRadius = () => {
@@ -255,7 +267,9 @@ export default function BorderPanel( {
 	// an explicit commit, mirroring the ToggleGroup pattern in the typography
 	// panel.
 	const localShadow = decodeValue( value?.shadow );
-	const inheritedShadow = decodeValue( inheritedValue?.shadow );
+	const inheritedShadow = isRootSourced( inheritedSources, 'shadow' )
+		? undefined
+		: decodeValue( inheritedValue?.shadow );
 	const isShadowPlaceholder =
 		localShadow === undefined &&
 		inheritedShadow !== undefined &&

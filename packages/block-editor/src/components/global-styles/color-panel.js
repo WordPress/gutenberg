@@ -142,7 +142,6 @@ export default function ColorPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
-	inheritedSources = {},
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -302,10 +301,6 @@ export default function ColorPanel( {
 		showLinkPanel && {
 			key: 'link',
 			label: __( 'Link' ),
-			sourcePaths: [
-				'elements.link.color.text',
-				'elements.link.:hover.color.text',
-			],
 			hasValue: hasLink,
 			resetValue: resetLink,
 			isShownByDefault: defaultControls.link,
@@ -324,7 +319,6 @@ export default function ColorPanel( {
 				{
 					key: 'link',
 					label: __( 'Default' ),
-					sourcePaths: [ 'elements.link.color.text' ],
 					inheritedValue: linkColor,
 					inheritedSlug: extractPresetSlug(
 						inheritedValue?.elements?.link?.color?.text,
@@ -338,7 +332,6 @@ export default function ColorPanel( {
 				{
 					key: 'hover',
 					label: __( 'Hover' ),
-					sourcePaths: [ 'elements.link.:hover.color.text' ],
 					inheritedValue: hoverLinkColor,
 					inheritedSlug: extractPresetSlug(
 						inheritedValue?.elements?.link?.[ ':hover' ]?.color
@@ -460,11 +453,6 @@ export default function ColorPanel( {
 		items.push( {
 			key: name,
 			label: elementLabel,
-			sourcePaths: [
-				`elements.${ name }.color.text`,
-				`elements.${ name }.color.background`,
-				`elements.${ name }.color.gradient`,
-			],
 			hasValue: hasElement,
 			resetValue: resetElement,
 			isShownByDefault: defaultControls[ name ],
@@ -483,7 +471,6 @@ export default function ColorPanel( {
 				hasSolidColors && {
 					key: 'text',
 					label: __( 'Text' ),
-					sourcePaths: [ `elements.${ name }.color.text` ],
 					inheritedValue: elementTextColor,
 					inheritedSlug: extractPresetSlug(
 						inheritedValue?.elements?.[ name ]?.color?.text,
@@ -497,7 +484,6 @@ export default function ColorPanel( {
 					supportsBackground && {
 						key: 'background',
 						label: __( 'Background' ),
-						sourcePaths: [ `elements.${ name }.color.background` ],
 						inheritedValue: elementBackgroundColor,
 						inheritedSlug: extractPresetSlug(
 							inheritedValue?.elements?.[ name ]?.color
@@ -512,7 +498,6 @@ export default function ColorPanel( {
 					supportsBackground && {
 						key: 'gradient',
 						label: __( 'Gradient' ),
-						sourcePaths: [ `elements.${ name }.color.gradient` ],
 						inheritedValue: elementGradient,
 						setValue: setElementGradient,
 						userValue: elementGradientUserColor,
@@ -532,7 +517,7 @@ export default function ColorPanel( {
 			label={ label }
 		>
 			{ items.map( ( item ) => {
-				const { key, sourcePaths, ...restItem } = item;
+				const { key, ...restItem } = item;
 				return (
 					<ColorGradientDropdownItem
 						key={ key }
@@ -540,7 +525,6 @@ export default function ColorPanel( {
 						showInheritanceLabelIndicators={
 							showInheritanceLabelIndicators
 						}
-						inheritedSources={ inheritedSources }
 						colorGradientControlSettings={ {
 							colors,
 							disableCustomColors: ! areCustomSolidsEnabled,

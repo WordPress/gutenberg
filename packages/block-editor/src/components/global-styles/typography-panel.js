@@ -221,7 +221,6 @@ export default function TypographyPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
-	inheritedSources = {},
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -796,7 +795,6 @@ export default function TypographyPanel( {
 					showInheritanceLabelIndicators={
 						showInheritanceLabelIndicators
 					}
-					inheritedSources={ inheritedSources }
 					isPlaceholder={
 						userTextColor === undefined && textColor !== undefined
 					}
@@ -805,7 +803,6 @@ export default function TypographyPanel( {
 						{
 							key: 'text',
 							label: __( 'Color' ),
-							sourcePaths: [ 'color.text' ],
 							inheritedValue: textColor,
 							inheritedSlug:
 								extractPresetSlug(
