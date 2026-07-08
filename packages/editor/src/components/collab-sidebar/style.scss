@@ -124,7 +124,8 @@
 	}
 }
 
-.editor-collab-sidebar-panel__more-reply-separator {
+.editor-collab-sidebar-panel__more-reply-separator,
+.editor-collab-sidebar-panel__status-separator {
 	&::before,
 	&::after {
 		content: "";
@@ -134,6 +135,15 @@
 		background-color: $gray-300;
 		flex: 1;
 	}
+}
+
+.editor-collab-sidebar-panel__status-separator p {
+	margin: 0;
+	padding: 0 $grid-unit-10;
+	color: $gray-700;
+	font-size: 11px;
+	font-weight: $font-weight-medium;
+	text-transform: uppercase;
 }
 
 .editor-collab-sidebar-panel__more-reply-button {
