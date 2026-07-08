@@ -382,12 +382,12 @@ test.describe( 'data-wp-input', () => {
 	/*  15. File input                                                     */
 	/* ------------------------------------------------------------------ */
 	test( 'should handle file input', async ( { page } ) => {
-		const countOutput = page.getByTestId( 'file-count-output' );
-		const fileInput = page.getByTestId( 'file-input' );
+		const stateOutput = page.getByTestId( 'file-name-output' );
+		const stateInput = page.getByTestId( 'file-input' );
 
-		await expect( countOutput ).toHaveText( '0' );
+		await expect( stateOutput ).toHaveText( '' );
 
-		await fileInput.setInputFiles( {
+		await stateInput.setInputFiles( {
 			name: 'test.txt',
 			mimeType: 'text/plain',
 			buffer: Buffer.from( 'hello world' ),
@@ -397,9 +397,31 @@ test.describe( 'data-wp-input', () => {
 		await page.waitForFunction(
 			() => {
 				const el = document.querySelector(
-					'[data-testid="file-count-output"]'
+					'[data-testid="file-name-output"]'
 				);
-				return el && el.textContent === '1';
+				return el && el.textContent === 'test.txt';
+			},
+			{ timeout: 15000 }
+		);
+
+		// --- Context variant ---
+		const ctxOutput = page.getByTestId( 'ctx-file-name-output' );
+		const ctxInput = page.getByTestId( 'ctx-file-input' );
+
+		await expect( ctxOutput ).toHaveText( '' );
+
+		await ctxInput.setInputFiles( {
+			name: 'test.txt',
+			mimeType: 'text/plain',
+			buffer: Buffer.from( 'hello world' ),
+		} );
+
+		await page.waitForFunction(
+			() => {
+				const el = document.querySelector(
+					'[data-testid="ctx-file-name-output"]'
+				);
+				return el && el.textContent === 'test.txt';
 			},
 			{ timeout: 15000 }
 		);
