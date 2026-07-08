@@ -136,7 +136,7 @@ test.describe( 'Font Library', () => {
 			await page.getByRole( 'button', { name: 'Upload Font' } ).click();
 			const fileChooser = await fileChooserPromise;
 			await fileChooser.setFiles( [
-				'./test/e2e/assets/Ephesis-modified-name.ttf',
+				'./assets/Ephesis-modified-name.ttf',
 			] );
 
 			// Check font was installed.
