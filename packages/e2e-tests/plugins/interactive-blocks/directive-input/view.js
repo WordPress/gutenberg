@@ -17,6 +17,10 @@ const { state, actions } = store( 'directive-input', {
 		tags1: '',
 		selectNone: '',
 		radioNone: '',
+		fileData: [],
+		get fileCount() {
+			return state.fileData.length;
+		},
 	},
 	actions: {
 		toggleText() {
