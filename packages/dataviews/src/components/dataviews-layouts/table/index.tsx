@@ -41,6 +41,7 @@ import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
 import { useScrollState } from './use-scroll-state';
 import getDataByGroup from '../utils/get-data-by-group';
+import { useIntersectionObserver } from '../utils/use-infinite-scroll';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
@@ -142,6 +143,8 @@ function TableRow< Item >( {
 		showDescription = true,
 		infiniteScrollEnabled,
 	} = view;
+	const rowRef = useRef< HTMLTableRowElement >( null );
+	useIntersectionObserver( rowRef, posinset );
 	// Will be set to true if `onTouchStart` fires. This happens before
 	// `onClick` and can be used to exclude touchscreen devices from certain
 	// behaviours.
@@ -154,6 +157,7 @@ function TableRow< Item >( {
 
 	return (
 		<tr
+			ref={ rowRef }
 			className={ clsx( 'dataviews-view-table__row', {
 				'is-selected': hasPossibleBulkAction && isSelected,
 				'has-bulk-actions': hasPossibleBulkAction,
@@ -300,7 +304,7 @@ function ViewTable< Item >( {
 	className,
 	empty,
 }: ViewTableProps< Item > ) {
-	const { containerRef } = useContext( DataViewsContext );
+	const { containerRef, paginationInfo } = useContext( DataViewsContext );
 	const isDelayedLoading = useDelayedLoading( isLoading );
 	const headerMenuRefs = useRef<
 		Map< string, { node: HTMLButtonElement; fallback: string } >
@@ -397,6 +401,10 @@ function ViewTable< Item >( {
 			}
 		};
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	const hasMoreItems =
+		isInfiniteScroll &&
+		( view.startPosition ?? 1 ) + ( view.perPage ?? 0 ) <
+			paginationInfo.totalItems;
 	const isRtl = isRTL();
 	if ( ! hasData ) {
 		return (
@@ -424,7 +432,9 @@ function ViewTable< Item >( {
 					'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 				} ) }
 				aria-busy={ isLoading }
-				aria-describedby={ tableNoticeId }
+				aria-describedby={
+					isInfiniteScroll && isLoading ? tableNoticeId : undefined
+				}
 				role={ isInfiniteScroll ? 'feed' : undefined }
 				// @ts-ignore Reason: inert is a recent HTML attribute
 				inert={ ! isInfiniteScroll && isLoading ? 'true' : undefined }
@@ -643,47 +653,60 @@ function ViewTable< Item >( {
 				) : (
 					<tbody>
 						{ hasData &&
-							data.map( ( item, index ) => (
-								<TableRow
-									key={ getItemId( item ) }
-									item={ item }
-									level={
-										view.showLevels &&
-										typeof getItemLevel === 'function'
-											? getItemLevel( item )
-											: undefined
-									}
-									hasBulkActions={ hasBulkActions }
-									actions={ actions }
-									fields={ fields }
-									id={ getItemId( item ) || index.toString() }
-									view={ view }
-									titleField={ titleField }
-									mediaField={ mediaField }
-									descriptionField={ descriptionField }
-									selection={ selection }
-									getItemId={ getItemId }
-									onChangeSelection={ onChangeSelection }
-									onClickItem={ onClickItem }
-									renderItemLink={ renderItemLink }
-									isItemClickable={ isItemClickable }
-									isActionsColumnSticky={
-										! isHorizontalScrollEnd
-									}
-									posinset={
-										isInfiniteScroll ? index + 1 : undefined
-									}
-								/>
-							) ) }
+							data.map( ( item, index ) => {
+								const itemId = getItemId( item );
+								const { position: posinset } = item as {
+									position?: number;
+								};
+								return (
+									<TableRow
+										key={ itemId }
+										item={ item }
+										level={
+											view.showLevels &&
+											typeof getItemLevel === 'function'
+												? getItemLevel( item )
+												: undefined
+										}
+										hasBulkActions={ hasBulkActions }
+										actions={ actions }
+										fields={ fields }
+										id={ itemId || index.toString() }
+										view={ view }
+										titleField={ titleField }
+										mediaField={ mediaField }
+										descriptionField={ descriptionField }
+										selection={ selection }
+										getItemId={ getItemId }
+										onChangeSelection={ onChangeSelection }
+										onClickItem={ onClickItem }
+										renderItemLink={ renderItemLink }
+										isItemClickable={ isItemClickable }
+										isActionsColumnSticky={
+											! isHorizontalScrollEnd
+										}
+										posinset={
+											isInfiniteScroll
+												? posinset
+												: undefined
+										}
+									/>
+								);
+							} ) }
 					</tbody>
 				) }
 			</table>
-			{ isInfiniteScroll && isLoading && (
-				<div className="dataviews-loading" id={ tableNoticeId }>
-					<p className="dataviews-loading-more">
-						<Spinner />
-					</p>
-				</div>
+			{ ( hasMoreItems || ( isInfiniteScroll && isLoading ) ) && (
+				// Keep the spinner's height reserved while loading more so the
+				// scroll position doesn't bounce. Hidden, and silent to a11y,
+				// while idle.
+				<p
+					className="dataviews-loading-more"
+					id={ tableNoticeId }
+					aria-hidden={ ! isLoading }
+				>
+					<Spinner />
+				</p>
 			) }
 		</>
 	);

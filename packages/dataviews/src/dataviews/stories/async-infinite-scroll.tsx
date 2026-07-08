@@ -7,7 +7,12 @@ import { useState, useMemo, useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import DataViews from '../index';
-import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../../constants';
+import {
+	LAYOUT_ACTIVITY,
+	LAYOUT_GRID,
+	LAYOUT_LIST,
+	LAYOUT_TABLE,
+} from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
 import { actions, data as fixtureData, fields } from './fixtures';
@@ -115,6 +120,7 @@ const AsyncInfiniteScroll = () => {
 					[ LAYOUT_TABLE ]: true,
 					[ LAYOUT_GRID ]: true,
 					[ LAYOUT_LIST ]: true,
+					[ LAYOUT_ACTIVITY ]: true,
 				} }
 			/>
 		</div>
