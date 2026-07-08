@@ -130,8 +130,8 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	 * Authoring intent about how the widget renders. Not a user-editable
 	 * attribute.
 	 *
-	 * - `'framed'` (default when absent): the widget renders its
-	 *   content only.
+	 * - `'framed'` (default when absent): the host paints a header from
+	 *   identity and pads the content area.
 	 * - `'content-bleed'`: the host's chrome stays visible while the
 	 *   content fills the content area edge-to-edge, with no padding.
 	 * - `'full-bleed'`: the widget renders edge-to-edge with no
