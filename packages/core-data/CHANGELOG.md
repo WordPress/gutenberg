@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a private `saveDirtyEntities` action that saves all dirty entity records (moved from `@wordpress/editor`), so entity-save UI can live outside the editor. [#79913](https://github.com/WordPress/gutenberg/pull/79913).
+
 ## 7.50.0 (2026-07-01)
 
 ## 7.49.0 (2026-06-24)

@@ -7,10 +7,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import {
-	useEntitiesSavedStatesIsDirty,
-	store as editorStore,
-} from '@wordpress/editor';
+import { useEntitiesSavedStatesIsDirty } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -35,7 +32,7 @@ export default function SaveButton( {
 } ) {
 	const { params } = useLocation();
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
-	const { saveDirtyEntities } = unlock( useDispatch( editorStore ) );
+	const { saveDirtyEntities } = unlock( useDispatch( coreStore ) );
 	const { dirtyEntityRecords } = useEntitiesSavedStatesIsDirty();
 	const { isSaving, isSaveViewOpen, previewingThemeName } = useSelect(
 		( select ) => {

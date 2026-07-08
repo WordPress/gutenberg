@@ -2352,6 +2352,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/core-data-ui",
+		"slug": "packages-core-data-ui",
+		"markdown_source": "../packages/core-data-ui/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/core-data",
 		"slug": "packages-core-data",
 		"markdown_source": "../packages/core-data/README.md",

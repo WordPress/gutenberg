@@ -7,12 +7,12 @@ import {
 	templateTitleField,
 } from '@wordpress/fields';
 import * as interfaceApis from '@wordpress/interface';
+import { privateApis as coreDataUIPrivateApis } from '@wordpress/core-data-ui';
 
 /**
  * Internal dependencies
  */
-import { lock } from './lock-unlock';
-import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
+import { lock, unlock } from './lock-unlock';
 import BackButton from './components/header/back-button';
 import Editor from './components/editor';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
@@ -32,6 +32,7 @@ import { GlobalStylesActionMenu } from './components/global-styles/menu';
 import UploadProgressSnackbar from './components/upload-progress-snackbar';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
+const { EntitiesSavedStatesExtensible } = unlock( coreDataUIPrivateApis );
 
 export const privateApis = {};
 lock( privateApis, {

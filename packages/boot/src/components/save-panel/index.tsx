@@ -4,12 +4,12 @@
 import { useState } from '@wordpress/element';
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { EntitiesSavedStates } from '@wordpress/core-data-ui';
 
 /**
  * Internal dependencies
  */
 import useSaveShortcut from './use-save-shortcut';
-import LazyEntitiesSavedStates from './lazy-entities-saved-states';
 
 export default function SavePanel() {
 	const [ isOpen, setIsOpen ] = useState< boolean >( false );
@@ -26,7 +26,7 @@ export default function SavePanel() {
 			title={ __( 'Review changes' ) }
 			size="small"
 		>
-			<LazyEntitiesSavedStates
+			<EntitiesSavedStates
 				close={ () => setIsOpen( false ) }
 				variant="inline"
 			/>

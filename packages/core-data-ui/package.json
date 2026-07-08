@@ -1,20 +1,20 @@
 {
-	"name": "@wordpress/core-data",
-	"version": "7.50.0",
-	"description": "Access to and manipulation of core WordPress entities.",
+	"name": "@wordpress/core-data-ui",
+	"version": "1.0.0",
+	"description": "UI components for WordPress core data entities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
 		"gutenberg",
-		"data",
-		"entities"
+		"core-data",
+		"components"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/core-data/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/core-data-ui/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/core-data"
+		"directory": "packages/core-data-ui"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
@@ -27,6 +27,7 @@
 		"src",
 		"build",
 		"build-module",
+		"build-style",
 		"build-types",
 		"*.md"
 	],
@@ -38,47 +39,33 @@
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
-		"./package.json": "./package.json"
+		"./package.json": "./package.json",
+		"./build-style/": "./build-style/"
 	},
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": [
+		"build-style/**",
+		"src/**/*.scss",
 		"src/index.js",
 		"build/index.cjs",
 		"build-module/index.mjs"
 	],
 	"dependencies": {
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/block-editor": "file:../block-editor",
-		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
-		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
+		"@wordpress/global-styles-engine": "file:../global-styles-engine",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
-		"@wordpress/notices": "file:../notices",
+		"@wordpress/icons": "file:../icons",
 		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/rich-text": "file:../rich-text",
-		"@wordpress/sync": "file:../sync",
-		"@wordpress/undo-manager": "file:../undo-manager",
-		"@wordpress/url": "file:../url",
-		"@wordpress/warning": "file:../warning",
-		"change-case": "^4.1.2",
-		"equivalent-key-map": "^0.2.2",
-		"fast-deep-equal": "^3.1.3",
-		"memize": "^2.1.0",
-		"uuid": "^14.0.0"
+		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
-		"@jest/globals": "^30.2.0",
-		"@testing-library/dom": "^10.4.1",
-		"@testing-library/react": "^16.3.2",
-		"@types/jest": "^29.5.14",
-		"@types/node": "^20.19.39",
-		"@wordpress/block-library": "file:../block-library",
-		"deep-freeze": "^0.0.1"
+		"@testing-library/react": "^16.3.2"
 	},
 	"peerDependencies": {
 		"@types/react": "^18.3.27",

@@ -1,0 +1,22 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"checkJs": false,
+		"noImplicitAny": false,
+		"types": [ "jest", "node", "style-imports" ]
+	},
+	"references": [
+		{ "path": "../components" },
+		{ "path": "../compose" },
+		{ "path": "../core-data" },
+		{ "path": "../data" },
+		{ "path": "../element" },
+		{ "path": "../global-styles-engine" },
+		{ "path": "../html-entities" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../private-apis" }
+	],
+	"exclude": [ "src/**/test/**/*.js" ]
+}

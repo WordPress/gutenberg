@@ -10,6 +10,10 @@
 
 -   External images are now sideloaded on the server when uploaded to the media library, via a new `mediaSideloadFromUrl` block editor setting, so the upload works when the editor is cross-origin isolated (e.g. with client-side media processing enabled) ([#79409](https://github.com/WordPress/gutenberg/pull/79409)).
 
+### Code Quality
+
+-   The `EntitiesSavedStates` component (and its `EntitiesSavedStatesExtensible`/`useEntitiesSavedStatesIsDirty` exports) now lives in `@wordpress/core-data-ui`; `@wordpress/editor` re-exports them unchanged. The `saveDirtyEntities` save orchestration moved to a private `@wordpress/core-data` action. The panel's per-record "Post Meta." changes indicator was dropped as part of decoupling it from the editor store. [#79913](https://github.com/WordPress/gutenberg/pull/79913).
+
 ## 14.50.0 (2026-07-01)
 
 ## 14.49.0 (2026-06-24)

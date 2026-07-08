@@ -9,13 +9,13 @@ import { displayShortcut, rawShortcut } from '@wordpress/keycodes';
 import { check } from '@wordpress/icons';
 import { Button, Modal } from '@wordpress/components';
 import { Tooltip } from '@wordpress/ui';
+import { EntitiesSavedStates } from '@wordpress/core-data-ui';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import useSaveShortcut from '../save-panel/use-save-shortcut';
-import LazyEntitiesSavedStates from '../save-panel/lazy-entities-saved-states';
 
 export default function SaveButton() {
 	const [ isSaveViewOpen, setIsSaveViewOpened ] = useState( false );
@@ -120,7 +120,7 @@ export default function SaveButton() {
 					onRequestClose={ () => setIsSaveViewOpened( false ) }
 					size="small"
 				>
-					<LazyEntitiesSavedStates
+					<EntitiesSavedStates
 						close={ () => setIsSaveViewOpened( false ) }
 						variant="inline"
 					/>
