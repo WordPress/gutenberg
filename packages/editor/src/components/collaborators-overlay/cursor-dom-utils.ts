@@ -196,8 +196,10 @@ export const getSelectionRects = (
  * @param el - The block element to promote.
  * @return The nearest [data-block] ancestor, or el itself.
  */
-export const blockContainerOf = ( el: HTMLElement ): HTMLElement =>
-	el.parentElement?.closest< HTMLElement >( '[data-block]' ) ?? el;
+export const blockContainerOf = ( el: HTMLElement ): HTMLElement => {
+	const parent = el.parentElement;
+	return parent?.hasAttribute( 'data-block' ) ? parent : el;
+};
 
 /**
  * Finds all block elements between two blocks in DOM order (exclusive of
