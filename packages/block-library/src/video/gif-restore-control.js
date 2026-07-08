@@ -57,9 +57,6 @@ export default function GifRestoreControl( { attributes, clientId } ) {
 
 			return {
 				gif: record?.mime_type?.startsWith( 'image/' ) ? record : null,
-				// Only offer the restore when an Image block can actually be
-				// inserted in place of this block (e.g. it isn't disabled and
-				// the parent allows it).
 				canRestoreToImage: canInsertBlockType(
 					'core/image',
 					getBlockRootClientId( clientId )

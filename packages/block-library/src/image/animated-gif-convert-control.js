@@ -52,11 +52,6 @@ export default function AnimatedGifConvertControl( { attributes, clientId } ) {
 			if ( ! urlPath?.toLowerCase().endsWith( '.gif' ) ) {
 				return null;
 			}
-			// Only offer the conversion when a Video block can actually be
-			// inserted in place of this block (e.g. it isn't disabled and the
-			// parent allows it). This also covers galleries, whose children
-			// are restricted to `core/image`; the converted video is still
-			// sideloaded and stored for use elsewhere.
 			const { getBlockRootClientId, canInsertBlockType } =
 				select( blockEditorStore );
 			if (
