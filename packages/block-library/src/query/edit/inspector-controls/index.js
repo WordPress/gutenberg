@@ -268,7 +268,6 @@ export default function QueryInspectorControls( props ) {
 						>
 							{ postTypesSelectOptions.length > 2 ? (
 								<SelectControl
-									__next40pxDefaultSize
 									options={ postTypesSelectOptions }
 									value={ postType }
 									label={ postTypeControlLabel }
