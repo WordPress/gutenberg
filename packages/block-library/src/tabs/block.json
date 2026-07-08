@@ -8,6 +8,7 @@
 	"category": "design",
 	"textdomain": "default",
 	"allowedBlocks": [ "core/tab-list", "core/tab-panels" ],
+	"template": [ [ "core/tab-list" ], [ "core/tab-panels" ] ],
 	"attributes": {
 		"activeTabIndex": {
 			"type": "number",

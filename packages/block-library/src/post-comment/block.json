@@ -13,6 +13,14 @@
 		"core/comment-edit-link",
 		"core/comment-reply-link"
 	],
+	"template": [
+		[ "core/avatar" ],
+		[ "core/comment-author-name" ],
+		[ "core/comment-date" ],
+		[ "core/comment-content" ],
+		[ "core/comment-reply-link" ],
+		[ "core/comment-edit-link" ]
+	],
 	"description": "This block is deprecated. Please use the Comments block instead.",
 	"textdomain": "default",
 	"attributes": {

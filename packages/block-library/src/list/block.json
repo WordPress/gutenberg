@@ -5,6 +5,7 @@
 	"title": "List",
 	"category": "text",
 	"allowedBlocks": [ "core/list-item" ],
+	"template": [ [ "core/list-item" ] ],
 	"description": "An organized collection of items displayed in a specific order.",
 	"keywords": [ "bullet list", "ordered list", "numbered list" ],
 	"textdomain": "default",

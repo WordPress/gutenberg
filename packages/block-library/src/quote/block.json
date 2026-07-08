@@ -4,6 +4,7 @@
 	"name": "core/quote",
 	"title": "Quote",
 	"category": "text",
+	"template": [ [ "core/paragraph", {} ] ],
 	"description": "Give quoted text visual emphasis. \"In quoting others, we cite ourselves.\" — Julio Cortázar",
 	"keywords": [ "blockquote", "cite" ],
 	"textdomain": "default",

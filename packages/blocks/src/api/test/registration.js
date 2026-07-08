@@ -468,6 +468,33 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( 'should keep metadata fields that a server-provided definition does not define', () => {
+			const blockName = 'core/test-block-with-server-definition';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					title: 'Server translated title',
+					category: 'text',
+				},
+			} );
+
+			registerBlockType(
+				{
+					apiVersion: 3,
+					name: blockName,
+					title: 'Client title',
+					category: 'text',
+					template: [ [ 'core/paragraph' ] ],
+				},
+				{ save: noop }
+			);
+
+			const blockType = getBlockType( blockName );
+			// The server definition wins for fields it defines.
+			expect( blockType.title ).toBe( 'Server translated title' );
+			// Fields the server does not define are filled from metadata.
+			expect( blockType.template ).toEqual( [ [ 'core/paragraph' ] ] );
+		} );
+
 		it( 'should merge settings provided by server and client', () => {
 			const blockName = 'core/test-block-with-merged-settings';
 			unstable__bootstrapServerSideBlockDefinitions( {
@@ -1023,6 +1050,7 @@ describe( 'blocks', () => {
 					title: 'Block from metadata',
 					category: 'text',
 					icon: 'palmtree',
+					template: [ [ 'core/paragraph', {} ] ],
 					variations: [
 						{
 							name: 'variation',
@@ -1052,6 +1080,7 @@ describe( 'blocks', () => {
 				selectors: {},
 				supports: {},
 				styles: [],
+				template: [ [ 'core/paragraph', {} ] ],
 				variations: [
 					{
 						name: 'variation',

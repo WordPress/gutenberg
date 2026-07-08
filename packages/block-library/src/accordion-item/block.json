@@ -7,6 +7,7 @@
 	"description": "Wraps the heading and panel in one unit.",
 	"parent": [ "core/accordion" ],
 	"allowedBlocks": [ "core/accordion-heading", "core/accordion-panel" ],
+	"template": [ [ "core/accordion-heading" ], [ "core/accordion-panel" ] ],
 	"supports": {
 		"html": false,
 		"color": {

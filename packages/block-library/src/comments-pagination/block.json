@@ -10,6 +10,11 @@
 		"core/comments-pagination-numbers",
 		"core/comments-pagination-next"
 	],
+	"template": [
+		[ "core/comments-pagination-previous" ],
+		[ "core/comments-pagination-numbers" ],
+		[ "core/comments-pagination-next" ]
+	],
 	"description": "Displays a paginated navigation to next/previous set of comments, when applicable.",
 	"textdomain": "default",
 	"attributes": {

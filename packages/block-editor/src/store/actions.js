@@ -399,7 +399,7 @@ export const replaceBlocks =
 			dispatch( {
 				type: 'REPLACE_BLOCKS',
 				clientIds,
-				blocks,
+				blocks: applyBlockTypeTemplates( blocks ),
 				time: Date.now(),
 				indexToSelect,
 				initialPosition,
@@ -551,6 +551,39 @@ export function insertBlock(
 }
 
 /**
+ * Applies block type templates to empty blocks. When a block type declares a
+ * `template` in its metadata, an empty block of that type receives the
+ * template's child blocks at creation, so insertion needs no follow-up
+ * template synchronization.
+ *
+ * @param {Object[]} blocks Block objects.
+ *
+ * @return {Object[]} Block objects with templates applied.
+ */
+function applyBlockTypeTemplates( blocks ) {
+	let hasChanges = false;
+	const result = blocks.map( ( block ) => {
+		let { innerBlocks } = block;
+		if ( innerBlocks?.length ) {
+			innerBlocks = applyBlockTypeTemplates( innerBlocks );
+		} else {
+			const { template } = getBlockType( block.name ) ?? {};
+			if ( template?.length ) {
+				innerBlocks = applyBlockTypeTemplates(
+					synchronizeBlocksWithTemplate( [], template )
+				);
+			}
+		}
+		if ( innerBlocks === block.innerBlocks ) {
+			return block;
+		}
+		hasChanges = true;
+		return { ...block, innerBlocks };
+	} );
+	return hasChanges ? result : blocks;
+}
+
+/**
  * Action that inserts an array of blocks, optionally at a specific index respective a root block list.
  *
  * Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if
@@ -601,7 +634,7 @@ export const insertBlocks =
 		if ( allowedBlocks.length ) {
 			dispatch( {
 				type: 'INSERT_BLOCKS',
-				blocks: allowedBlocks,
+				blocks: applyBlockTypeTemplates( allowedBlocks ),
 				index,
 				rootClientId,
 				time: Date.now(),

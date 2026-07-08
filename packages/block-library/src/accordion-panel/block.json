@@ -4,6 +4,7 @@
 	"name": "core/accordion-panel",
 	"title": "Accordion Panel",
 	"category": "design",
+	"template": [ [ "core/paragraph", {} ] ],
 	"description": "Contains the hidden or revealed content beneath the heading.",
 	"parent": [ "core/accordion-item" ],
 	"usesContext": [ "core/accordion-open-by-default" ],

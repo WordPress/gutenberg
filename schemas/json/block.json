@@ -80,6 +80,13 @@
 				"type": "string"
 			}
 		},
+		"template": {
+			"description": "The `template` property specifies the child blocks created when an empty block of this type is inserted. Each item is an array of block name, optional attributes object, and optional array of nested template items.",
+			"type": "array",
+			"items": {
+				"type": "array"
+			}
+		},
 		"icon": {
 			"description": "An icon property should be specified to make it easier to identify a block. These can be any of WordPress’ Dashicons (slug serving also as a fallback in non-js contexts).",
 			"type": "string"

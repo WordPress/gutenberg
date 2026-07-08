@@ -68,11 +68,6 @@ function bootstrappedBlockTypes(
 		case 'ADD_BOOTSTRAPPED_BLOCK_TYPE':
 			const { name, blockType } = action;
 			const serverDefinition = state[ name ];
-			// Don't overwrite if already set. It covers the case when metadata
-			// was initialized from the server.
-			if ( serverDefinition ) {
-				return state;
-			}
 			const newDefinition: Record< string, unknown > = Object.fromEntries(
 				Object.entries( blockType )
 					.filter(
@@ -80,6 +75,26 @@ function bootstrappedBlockTypes(
 					)
 					.map( ( [ key, value ] ) => [ camelCase( key ), value ] )
 			);
+			// A definition that was initialized from the server takes
+			// precedence for the fields it defines, since they may include
+			// server-side translations. Fields it does not define, such as
+			// block.json fields the server does not support, are filled in
+			// from the client-provided metadata.
+			if ( serverDefinition ) {
+				const hasNewFields = Object.keys( newDefinition ).some(
+					( key ) => ! ( key in serverDefinition )
+				);
+				if ( ! hasNewFields ) {
+					return state;
+				}
+				return {
+					...state,
+					[ name ]: {
+						...newDefinition,
+						...serverDefinition,
+					} as Partial< BlockType >,
+				};
+			}
 			newDefinition.name = name;
 			return {
 				...state,

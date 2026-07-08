@@ -4,6 +4,7 @@
 	"name": "core/term-template",
 	"title": "Term Template",
 	"category": "theme",
+	"template": [ [ "core/term-name" ] ],
 	"ancestor": [ "core/terms-query" ],
 	"description": "Contains the block elements used to render a taxonomy term, like the name, description, and more.",
 	"textdomain": "default",

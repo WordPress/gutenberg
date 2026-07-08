@@ -5,6 +5,14 @@
 	"title": "Comment Template",
 	"category": "design",
 	"parent": [ "core/comments" ],
+	"template": [
+		[ "core/avatar" ],
+		[ "core/comment-author-name" ],
+		[ "core/comment-date" ],
+		[ "core/comment-content" ],
+		[ "core/comment-reply-link" ],
+		[ "core/comment-edit-link" ]
+	],
 	"description": "Contains the block elements used to display a comment, like the title, date, author, avatar and more.",
 	"textdomain": "default",
 	"usesContext": [ "postId" ],

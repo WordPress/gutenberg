@@ -7,21 +7,10 @@ import { useState } from '@wordpress/element';
 import { blockDefault } from '@wordpress/icons';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
-const TEMPLATE = [
-	[ 'core/avatar' ],
-	[ 'core/comment-author-name' ],
-	[ 'core/comment-date' ],
-	[ 'core/comment-content' ],
-	[ 'core/comment-reply-link' ],
-	[ 'core/comment-edit-link' ],
-];
-
 export default function Edit( { attributes: { commentId }, setAttributes } ) {
 	const [ commentIdInput, setCommentIdInput ] = useState( commentId );
 	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps );
 
 	if ( ! commentId ) {
 		return (

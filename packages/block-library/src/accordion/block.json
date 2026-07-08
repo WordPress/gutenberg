@@ -85,6 +85,7 @@
 		"core/accordion-heading-level": "headingLevel"
 	},
 	"allowedBlocks": [ "core/accordion-item" ],
+	"template": [ [ "core/accordion-item" ] ],
 	"textdomain": "default",
 	"viewScriptModule": "@wordpress/block-library/accordion/view"
 }
