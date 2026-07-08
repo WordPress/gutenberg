@@ -606,11 +606,18 @@ export function createSyncManager( debug = false ): SyncManager {
 		} );
 
 		// Use the invalidated keys to get the updated values from the entity.
-		const changes = invalidatedKeys.reduce(
-			( acc, key ) =>
-				Object.assign( acc, {
-					[ key ]: record[ key ],
-				} ),
+		const changes = invalidatedKeys.reduce< Partial< ObjectData > >(
+			( acc, key ) => {
+				acc[ key ] = record[ key ];
+				// The entity record never exposes a `blocks` property (only
+				// serialized `content`), so also carry `content` along to let
+				// `applyPostChangesToCRDTDoc` re-derive blocks from content
+				// instead of wiping them.
+				if ( key === 'blocks' && record.content ) {
+					acc.content = record.content;
+				}
+				return acc;
+			},
 			{}
 		);
 

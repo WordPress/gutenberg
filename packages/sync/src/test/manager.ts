@@ -418,6 +418,49 @@ describe( 'SyncManager', () => {
 					1
 				);
 			} );
+
+			it( 'carries record.content along when blocks is an invalidated field', async () => {
+				mockRecord = {
+					...mockRecord,
+					content: 'Test content',
+				};
+
+				mockSyncConfig = {
+					...mockSyncConfig,
+					getPersistedCRDTDoc: jest.fn( () =>
+						createPersistedCRDTDoc( {
+							...mockRecord,
+							blocks: [ { name: 'core/paragraph' } ],
+						} )
+					),
+				};
+
+				const manager = createSyncManager();
+
+				await manager.load(
+					mockSyncConfig,
+					'post',
+					'123',
+					mockRecord,
+					mockHandlers
+				);
+
+				// The entity record never exposes a `blocks` property, so the
+				// change for the invalidated `blocks` key should also carry
+				// `content` along, letting the CRDT doc re-derive blocks from
+				// content instead of wiping them.
+				const expectedChanges = {
+					blocks: undefined,
+					content: mockRecord.content,
+				};
+
+				expect(
+					mockSyncConfig.applyChangesToCRDTDoc
+				).toHaveBeenCalledTimes( 1 );
+				expect(
+					mockSyncConfig.applyChangesToCRDTDoc
+				).toHaveBeenCalledWith( expect.any( Y.Doc ), expectedChanges );
+			} );
 		} );
 	} );
 
