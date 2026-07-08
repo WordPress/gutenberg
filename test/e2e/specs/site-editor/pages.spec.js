@@ -45,15 +45,21 @@ async function draftNewPage( page ) {
 }
 
 async function addPageContent( editor, page ) {
-	// Insert into Page Content using the default block appender shown for
-	// empty content.
 	await editor.canvas
 		.getByRole( 'document', {
 			name: 'Block: Content',
 		} )
-		.getByRole( 'button', { name: 'Add default block' } )
+		.getByRole( 'button', {
+			name: 'Add default block',
+		} )
 		.click();
-	await page.keyboard.type( 'Lorem ipsum dolor sit amet' );
+
+	// Insert into Page Content using default block.
+	await editor.canvas
+		.getByRole( 'document', {
+			name: 'Empty block; start writing or type forward slash to choose a block',
+		} )
+		.fill( 'Lorem ipsum dolor sit amet' );
 
 	// Insert into Page Content using global inserter.
 	await page
