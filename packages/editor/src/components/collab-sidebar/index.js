@@ -103,6 +103,11 @@ function NotesSidebar( { postId } ) {
 		notesDisplayMode !== 'hidden' &&
 		( unresolvedNotes.length > 0 || selectedNoteId !== undefined ) &&
 		! isAllNotesSidebarOpen;
+	// The floating-notes dropdown carries its own "All notes" choice, so the
+	// sidebar's pinned toolbar toggle would be a redundant second notes icon.
+	// Only expose that toggle when the dropdown isn't available (e.g. small
+	// viewports, or when there are only resolved notes to reach).
+	const showNotesDropdown = showFloatingNotes && unresolvedNotes.length > 0;
 
 	async function focusNote( {
 		targetClientId,
@@ -199,7 +204,7 @@ function NotesSidebar( { postId } ) {
 					addNewNoteForBlock( menuClientId )
 				}
 			/>
-			{ showFloatingNotes && unresolvedNotes.length > 0 && (
+			{ showNotesDropdown && (
 				<PinnedItems scope="core">
 					<DropdownMenu
 						icon={ commentIcon }
@@ -216,6 +221,10 @@ function NotesSidebar( { postId } ) {
 								<MenuItemsChoice
 									choices={ [
 										{
+											value: 'sidebar',
+											label: __( 'All notes' ),
+										},
+										{
 											value: 'full',
 											label: __( 'Full notes' ),
 										},
@@ -226,10 +235,6 @@ function NotesSidebar( { postId } ) {
 										{
 											value: 'hidden',
 											label: __( 'Hidden notes' ),
-										},
-										{
-											value: 'sidebar',
-											label: __( 'All notes' ),
 										},
 									] }
 									value={
@@ -269,6 +274,7 @@ function NotesSidebar( { postId } ) {
 				<PluginSidebar
 					identifier={ ALL_NOTES_SIDEBAR }
 					name={ ALL_NOTES_SIDEBAR }
+					isPinnable={ ! showNotesDropdown }
 					title={ __( 'All notes' ) }
 					header={
 						<h2 className="interface-complementary-area-header__title">
