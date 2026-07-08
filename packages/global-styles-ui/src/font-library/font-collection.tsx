@@ -314,7 +314,6 @@ function FontCollection( { slug }: { slug: string } ) {
 									hideLabelFromVision={ false }
 								/>
 								<SelectControl
-									__next40pxDefaultSize
 									label={ __( 'Category' ) }
 									value={ filters.category }
 									onChange={ handleCategoryFilter }

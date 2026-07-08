@@ -113,7 +113,7 @@ export function WidgetSettings(): React.ReactNode {
 	const handleOpenChange = useCallback(
 		( nextOpen: boolean ) => {
 			// Any path out of the drawer other than Save discards the
-			// staged edits, matching the layout-settings drawer.
+			// staged edits.
 			if ( ! nextOpen ) {
 				cancelStaging();
 				close();

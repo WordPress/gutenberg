@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, cloneSanitizedBlock } from '@wordpress/blocks';
 
 const transforms = {
 	from: [
@@ -29,13 +29,9 @@ const transforms = {
 				// to be replaced in the switchToBlockType call thereby meaning they
 				// are removed both from their original location and within the
 				// new group block.
-				const groupInnerBlocks = blocks.map( ( block ) => {
-					return createBlock(
-						block.name,
-						block.attributes,
-						block.innerBlocks
-					);
-				} );
+				const groupInnerBlocks = blocks.map( ( block ) =>
+					cloneSanitizedBlock( block )
+				);
 
 				return createBlock(
 					'core/group',
