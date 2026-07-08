@@ -941,10 +941,7 @@ export default function GalleryEdit( props ) {
 						/>
 					</BlockControls>
 				) }
-				<GapStyles
-					blockGap={ attributes.style?.spacing?.blockGap }
-					clientId={ clientId }
-				/>
+				<GapStyles style={ attributes.style } clientId={ clientId } />
 			</>
 			{ isDynamic ? (
 				<GalleryDynamicView
