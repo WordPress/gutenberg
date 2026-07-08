@@ -46,8 +46,6 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 **Uses context:**
 
-- `core/tabs-activeTabIndex`
-- `core/tabs-editorActiveTabIndex`
 - `core/tabs-id`
 
 **Provides context:**
