@@ -20,7 +20,6 @@ import {
 	withColors,
 	ColorPalette,
 	useBlockProps,
-	useSettings,
 	useInnerBlocksProps,
 	__experimentalUseGradient,
 	store as blockEditorStore,
@@ -227,21 +226,38 @@ function CoverEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 
-	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
-	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
-	const hasFontSizes = fontSizes?.length > 0;
-
 	// Create the initial inner paragraph when the block gains a background
 	// and has no content yet.
 	const scaffoldInnerBlocks = () => {
 		const {
 			getBlocks,
+			getBlockAttributes,
 			isBlockSelected,
 			getSelectedBlocksInitialCaretPosition,
 		} = registry.select( blockEditorStore );
 		if ( getBlocks( clientId ).length > 0 ) {
 			return;
 		}
+		// The calling actions can also remove the background, returning the
+		// block to its placeholder, which should remain empty.
+		const currentAttributes = getBlockAttributes( clientId );
+		const hasBackground = !! (
+			currentAttributes.url ||
+			currentAttributes.useFeaturedImage ||
+			currentAttributes.overlayColor ||
+			currentAttributes.customOverlayColor ||
+			currentAttributes.gradient ||
+			currentAttributes.customGradient
+		);
+		if ( ! hasBackground ) {
+			return;
+		}
+		// Check for fontSize support before we pass a fontSize attribute to
+		// the innerBlocks.
+		const [ fontSizes ] = unlock(
+			registry.select( blockEditorStore )
+		).getBlockSettings( clientId, 'typography.fontSizes' );
+		const hasFontSizes = fontSizes?.length > 0;
 		replaceInnerBlocks(
 			clientId,
 			createBlocksFromInnerBlocksTemplate(
@@ -329,9 +345,7 @@ function CoverEdit( {
 				isUserOverlayColor: currentAttrs.isUserOverlayColor || false,
 			} );
 
-			if ( mediaAttributes?.url ) {
-				scaffoldInnerBlocks();
-			}
+			scaffoldInnerBlocks();
 		} );
 	};
 
@@ -386,9 +400,7 @@ function CoverEdit( {
 				isDark: newIsDark,
 			} );
 
-			if ( newOverlayColor ) {
-				scaffoldInnerBlocks();
-			}
+			scaffoldInnerBlocks();
 		} );
 	};
 
@@ -659,9 +671,7 @@ function CoverEdit( {
 				isDark: newIsDark,
 			} );
 
-			if ( newUseFeaturedImage ) {
-				scaffoldInnerBlocks();
-			}
+			scaffoldInnerBlocks();
 		} );
 	};
 
