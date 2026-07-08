@@ -83,6 +83,17 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	);
 	const { createErrorNotice, createSuccessNotice, createWarningNotice } =
 		useDispatch( noticesStore );
+
+	// Attach/detach are first-party-only capabilities for local sources (the
+	// Attachments source). Categories registered through the public
+	// `registerInserterMediaCategory` API are always flagged as external, so this
+	// guard stops a third-party source from opting into the internal attach/detach
+	// workflow just by setting these props. It is also semantically correct:
+	// external resources can never own a post's attachments.
+	const supportsAttachments = ! category.isExternalResource;
+	const attach = supportsAttachments ? category.attach : undefined;
+	const detach = supportsAttachments ? category.detach : undefined;
+
 	// Dim (rather than blank) the populated grid while a refetch is in flight,
 	// but only once it has run long enough to be worth signalling — quick
 	// attach/detach refetches resolve before this and show nothing.
@@ -91,14 +102,16 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	// Invalidate the cached results and force `useMediaResults` to refetch so
 	// the grid reflects images that were just attached or detached.
 	const refresh = useCallback( () => {
-		category.invalidate?.( query );
+		if ( supportsAttachments ) {
+			category.invalidate?.( query );
+		}
 		setRefreshKey( ( key ) => key + 1 );
-	}, [ category, query ] );
+	}, [ category, query, supportsAttachments ] );
 
 	const handleAttach = useCallback(
 		async ( selectedMedia ) => {
 			try {
-				const attachedCount = await category.attach( selectedMedia );
+				const attachedCount = await attach( selectedMedia );
 
 				if ( ! attachedCount ) {
 					// This source only attaches images (the picker's "Upload
@@ -143,6 +156,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 			}
 		},
 		[
+			attach,
 			category,
 			refresh,
 			createErrorNotice,
@@ -154,7 +168,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const handleDetach = useCallback(
 		async ( media ) => {
 			try {
-				await category.detach( media );
+				await detach( media );
 				refresh();
 				createSuccessNotice(
 					category.postTypeLabel
@@ -173,7 +187,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 				} );
 			}
 		},
-		[ category, refresh, createErrorNotice, createSuccessNotice ]
+		[ detach, category, refresh, createErrorNotice, createSuccessNotice ]
 	);
 
 	// Detaching is confirmed first: the dropdown sets the pending item, which
@@ -192,7 +206,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 			className={ clsx( baseCssClass, {
 				// The attach footer supplies the breathing room beneath the
 				// grid, so the list drops its own bottom padding (see styles).
-				'has-attach-footer': !! category.attach,
+				'has-attach-footer': !! attach,
 			} ) }
 		>
 			<SearchControl
@@ -231,15 +245,13 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					<MediaList
 						rootClientId={ rootClientId }
 						onClick={ onInsert }
-						onDetach={
-							category.detach ? setMediaPendingDetach : undefined
-						}
+						onDetach={ detach ? setMediaPendingDetach : undefined }
 						mediaList={ mediaList }
 						category={ category }
 					/>
 				</div>
 			) }
-			{ category.attach && (
+			{ attach && (
 				// Pinned to the bottom of the panel as a fixed footer so it lines
 				// up with the "Open Media Library" button in the adjacent column.
 				<AttachImagesButton onSelect={ handleAttach } />
