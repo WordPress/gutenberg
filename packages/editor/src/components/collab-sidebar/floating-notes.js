@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __, isRTL } from '@wordpress/i18n';
@@ -9,7 +14,7 @@ import { createSlotFill } from '@wordpress/components';
  * Internal dependencies
  */
 import { Notes } from './notes';
-import { NOTES_PANEL_WIDTH } from './constants';
+import { NOTES_PANEL_WIDTH, NOTES_PANEL_COMPACT_WIDTH } from './constants';
 
 export const { Slot: FloatingNotesSlot, Fill: FloatingNotesFill } =
 	createSlotFill( Symbol( 'EditorFloatingNotes' ) );
@@ -21,8 +26,9 @@ export const { Slot: FloatingNotesSlot, Fill: FloatingNotesFill } =
  * background color and leaves the canvas scrollbar at the window edge.
  *
  * @param {Object} overlayRef Ref to the floating notes overlay element.
+ * @param {number} width      Width to reserve, in pixels.
  */
-function useReservedCanvasSpace( overlayRef ) {
+function useReservedCanvasSpace( overlayRef, width ) {
 	useEffect( () => {
 		const editor = overlayRef.current?.closest( '.editor-visual-editor' );
 		const iframe = editor?.querySelector( 'iframe[name="editor-canvas"]' );
@@ -37,10 +43,7 @@ function useReservedCanvasSpace( overlayRef ) {
 			reserved =
 				iframe?.contentDocument?.documentElement ??
 				editor?.querySelector( '.editor-styles-wrapper' );
-			reserved?.style.setProperty(
-				paddingSide,
-				`${ NOTES_PANEL_WIDTH }px`
-			);
+			reserved?.style.setProperty( paddingSide, `${ width }px` );
 			// Full-bleed content (e.g. `alignfull`) escapes root padding with
 			// negative margins or viewport units, so it can still render
 			// under the reserved space; clip it at the body edge instead.
@@ -58,22 +61,35 @@ function useReservedCanvasSpace( overlayRef ) {
 			reserved?.style.removeProperty( paddingSide );
 			clipped?.style.removeProperty( 'overflow-x' );
 		};
-	}, [ overlayRef ] );
+	}, [ overlayRef, width ] );
 }
 
-export function FloatingNotes( { notes, sidebarRef } ) {
+export function FloatingNotes( { notes, sidebarRef, isCompact = false } ) {
 	const overlayRef = useRef( null );
-	useReservedCanvasSpace( overlayRef );
+	// Minimized threads collapse to an avatar pill, so reserve less canvas.
+	// The overlay itself keeps the full width so a selected thread still
+	// expands to a readable size (overlapping the canvas content).
+	const reservedWidth = isCompact
+		? NOTES_PANEL_COMPACT_WIDTH
+		: NOTES_PANEL_WIDTH;
+	useReservedCanvasSpace( overlayRef, reservedWidth );
 
 	return (
 		<div
 			ref={ overlayRef }
 			role="region"
 			aria-label={ __( 'Notes' ) }
-			className="editor-collab-sidebar-overlay"
+			className={ clsx( 'editor-collab-sidebar-overlay', {
+				'is-compact': isCompact,
+			} ) }
 			style={ { width: NOTES_PANEL_WIDTH } }
 		>
-			<Notes notes={ notes } sidebarRef={ sidebarRef } isFloating />
+			<Notes
+				notes={ notes }
+				sidebarRef={ sidebarRef }
+				isFloating
+				isCompact={ isCompact }
+			/>
 		</div>
 	);
 }

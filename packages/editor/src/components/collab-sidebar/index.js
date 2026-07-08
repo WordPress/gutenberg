@@ -3,12 +3,17 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
+import {
+	DropdownMenu,
+	MenuGroup,
+	MenuItemsChoice,
+} from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as interfaceStore } from '@wordpress/interface';
+import { store as interfaceStore, PinnedItems } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
 
@@ -45,6 +50,9 @@ function NotesSidebar( { postId } ) {
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const sidebarRef = useRef( null );
+	// How the floating notes render in the canvas: 'full', 'minimized'
+	// (author avatars only), or 'hidden'.
+	const [ notesDisplayMode, setNotesDisplayMode ] = useState( 'full' );
 
 	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
@@ -91,6 +99,7 @@ function NotesSidebar( { postId } ) {
 	// the "All notes" sidebar, which lists the same threads.
 	const hasVisibleFloatingNotes =
 		showFloatingNotes &&
+		notesDisplayMode !== 'hidden' &&
 		( unresolvedNotes.length > 0 || selectedNoteId !== undefined ) &&
 		! isAllNotesSidebarOpen;
 
@@ -101,6 +110,11 @@ function NotesSidebar( { postId } ) {
 	} ) {
 		if ( ! targetClientId ) {
 			return;
+		}
+
+		// Acting on a note always brings the floating notes back into view.
+		if ( notesDisplayMode === 'hidden' ) {
+			setNotesDisplayMode( 'full' );
 		}
 
 		// Approved (resolved) notes only appear in the "All notes" sidebar.
@@ -184,6 +198,46 @@ function NotesSidebar( { postId } ) {
 					addNewNoteForBlock( menuClientId )
 				}
 			/>
+			{ showFloatingNotes && unresolvedNotes.length > 0 && (
+				<PinnedItems scope="core">
+					<DropdownMenu
+						icon={ commentIcon }
+						label={ __( 'Notes' ) }
+						menuProps={ {
+							'aria-label': __( 'Notes display options' ),
+						} }
+						toggleProps={ {
+							size: 'compact',
+						} }
+					>
+						{ ( { onClose } ) => (
+							<MenuGroup>
+								<MenuItemsChoice
+									choices={ [
+										{
+											value: 'full',
+											label: __( 'Full notes' ),
+										},
+										{
+											value: 'minimized',
+											label: __( 'Minimized notes' ),
+										},
+										{
+											value: 'hidden',
+											label: __( 'Hidden notes' ),
+										},
+									] }
+									value={ notesDisplayMode }
+									onSelect={ ( value ) => {
+										setNotesDisplayMode( value );
+										onClose();
+									} }
+								/>
+							</MenuGroup>
+						) }
+					</DropdownMenu>
+				</PinnedItems>
+			) }
 			{ showAllNotesSidebar && (
 				<PluginSidebar
 					identifier={ ALL_NOTES_SIDEBAR }
@@ -205,6 +259,7 @@ function NotesSidebar( { postId } ) {
 					<FloatingNotes
 						notes={ unresolvedNotes }
 						sidebarRef={ sidebarRef }
+						isCompact={ notesDisplayMode === 'minimized' }
 					/>
 				</FloatingNotesFill>
 			) }

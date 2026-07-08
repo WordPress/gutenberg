@@ -61,6 +61,27 @@
 		max-height: calc(100dvh - var(--wp-admin--admin-bar--height, 0px) - #{$header-height + $grid-unit-80});
 		overflow-y: auto;
 	}
+
+	// Minimized threads collapse to an avatar pill anchored to the inline-end
+	// edge, revealing the author name and time on hover or focus. A selected
+	// thread drops `is-compact` and expands back to the full thread.
+	&.is-compact {
+		&.is-floating {
+			left: auto;
+			width: fit-content;
+			padding: $grid-unit-10;
+		}
+
+		.editor-collab-sidebar-panel__user-meta {
+			white-space: nowrap;
+		}
+
+		&:not(:hover):not(:focus-within) {
+			.editor-collab-sidebar-panel__user-meta {
+				display: none;
+			}
+		}
+	}
 }
 
 .editor-collab-sidebar-panel__user-name {
