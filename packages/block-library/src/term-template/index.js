@@ -14,8 +14,11 @@ import save from './save';
 const { name } = metadata;
 export { metadata, name };
 
+const TEMPLATE = [ [ 'core/term-name' ] ];
+
 export const settings = {
 	icon,
+	template: TEMPLATE,
 	edit,
 	save,
 	example: {},

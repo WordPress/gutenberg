@@ -38,7 +38,6 @@ export default function Edit( { attributes, context, clientId, isSelected } ) {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks,
-		template: [ [ 'core/paragraph', {} ] ],
 		templateLock,
 	} );
 

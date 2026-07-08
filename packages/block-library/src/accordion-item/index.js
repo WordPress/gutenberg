@@ -15,8 +15,11 @@ const { name } = metadata;
 
 export { metadata, name };
 
+const TEMPLATE = [ [ 'core/accordion-heading' ], [ 'core/accordion-panel' ] ];
+
 export const settings = {
 	icon,
+	template: TEMPLATE,
 	edit,
 	save,
 };

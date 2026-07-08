@@ -15,8 +15,15 @@ import deprecated from './deprecated';
 const { name } = metadata;
 export { metadata, name };
 
+const TEMPLATE = [
+	[ 'core/query-pagination-previous' ],
+	[ 'core/query-pagination-numbers' ],
+	[ 'core/query-pagination-next' ],
+];
+
 export const settings = {
 	icon,
+	template: TEMPLATE,
 	edit,
 	save,
 	deprecated,

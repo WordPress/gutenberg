@@ -32,7 +32,6 @@ import TagName from './tag-name';
 const DEFAULT_BLOCK = {
 	name: 'core/list-item',
 };
-const TEMPLATE = [ [ 'core/list-item' ] ];
 
 /**
  * At the moment, deprecations don't handle create blocks from attributes
@@ -128,7 +127,6 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
-		template: TEMPLATE,
 		templateLock: false,
 		templateInsertUpdatesSelection: true,
 		__experimentalCaptureToolbars: true,

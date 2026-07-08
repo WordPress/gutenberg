@@ -26,8 +26,6 @@ import { verse } from '@wordpress/icons';
 import { migrateToQuoteV2 } from './deprecated';
 import { Caption } from '../utils/caption';
 
-const TEMPLATE = [ [ 'core/paragraph', {} ] ];
-
 /**
  * At the moment, deprecations don't handle create blocks from attributes
  * (like when using CPT templates). For this reason, this hook is necessary
@@ -82,7 +80,6 @@ export default function QuoteEdit( {
 		} ),
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
 		templateInsertUpdatesSelection: true,
 		__experimentalCaptureToolbars: true,
 		renderAppender: false,

@@ -15,17 +15,6 @@ import { useSelect } from '@wordpress/data';
  */
 import clsx from 'clsx';
 
-const TEMPLATE = [
-	[
-		'core/paragraph',
-		{
-			content: __(
-				"Enter the message you wish displayed for form submission error/success, and select the type of the message (success/error) from the block's options."
-			),
-		},
-	],
-];
-
 const Edit = ( { attributes, clientId } ) => {
 	const { type } = attributes;
 	const blockProps = useBlockProps( {
@@ -46,7 +35,6 @@ const Edit = ( { attributes, clientId } ) => {
 	);
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
 		renderAppender: hasInnerBlocks
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,

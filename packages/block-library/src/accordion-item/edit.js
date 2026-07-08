@@ -24,8 +24,6 @@ import clsx from 'clsx';
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-const TEMPLATE = [ [ 'core/accordion-heading' ], [ 'core/accordion-panel' ] ];
-
 export default function Edit( {
 	attributes,
 	clientId,
@@ -57,7 +55,6 @@ export default function Edit( {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
 		templateLock: 'all',
 		directInsert: true,
 		templateInsertUpdatesSelection: true,

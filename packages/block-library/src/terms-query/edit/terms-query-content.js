@@ -9,8 +9,6 @@ import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
  */
 import TermsQueryInspectorControls from './inspector-controls';
 
-const TEMPLATE = [ [ 'core/term-template' ] ];
-
 export default function TermsQueryContent( {
 	attributes,
 	setAttributes,
@@ -19,9 +17,7 @@ export default function TermsQueryContent( {
 } ) {
 	const { tagName: TagName } = attributes;
 	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {} );
 	const setQuery = useCallback(
 		( newQuery ) =>
 			setAttributes( ( prevAttributes ) => ( {
