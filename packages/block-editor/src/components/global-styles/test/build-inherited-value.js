@@ -348,7 +348,11 @@ describe( 'buildInheritedValue – merged output', () => {
 		test( 'zero-valued leaf is NOT empty', () => {
 			const gs = {
 				styles: {
-					spacing: { padding: { top: '0' } },
+					blocks: {
+						'core/group': {
+							spacing: { padding: { top: '0' } },
+						},
+					},
 				},
 			};
 			const { value: out } = buildInheritedValue( {
@@ -718,10 +722,11 @@ describe( 'Provider integration: production bare-tree shape', () => {
 	 *     font size and a different color.
 	 *   - Registers a `plain` variation under `core/quote` that
 	 *     drops the border and recolors the text.
-	 *   - Includes a `{ ref: 'color.background' }` envelope on the
-	 *     `core/group` background to verify ref resolution still
-	 *     works end-to-end (ref envelopes resolve against the bare
-	 *     tree directly, not the wrapped one).
+	 *   - Includes a `{ ref: 'styles.color.background' }` envelope on
+	 *     the `core/group` background to verify ref resolution still
+	 *     works end-to-end (ref envelopes resolve against the wrapped
+	 *     `{ styles }` tree). This is block-sourced, so it survives the
+	 *     non-cascading root drop.
 	 */
 	const productionShapeFixture = {
 		typography: { lineHeight: '1.6' },
@@ -755,7 +760,7 @@ describe( 'Provider integration: production bare-tree shape', () => {
 				},
 			},
 			'core/group': {
-				color: { background: { ref: 'color.background' } },
+				color: { background: { ref: 'styles.color.background' } },
 			},
 		},
 	};
@@ -860,5 +865,109 @@ describe( 'Provider integration: production bare-tree shape', () => {
 		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
 		expect( parsed.typography ).toBeUndefined();
 		expect( parsed.color ).toBeUndefined();
+	} );
+} );
+
+describe( 'buildInheritedValue – non-cascading root drop', () => {
+	// Each call builds against a fresh `globalStyles` object so the
+	// identity-keyed memo never returns a cross-test cache hit.
+	const build = ( styles, extra = {} ) =>
+		buildInheritedValue( {
+			blockName: 'core/paragraph',
+			globalStyles: { styles },
+			...extra,
+		} );
+
+	test( 'drops a root-sourced background color and its source', () => {
+		const { value, sources } = build( {
+			color: { background: '#ff0000' },
+		} );
+		expect( value?.color?.background ).toBeUndefined();
+		expect( sources[ 'color.background' ] ).toBeUndefined();
+	} );
+
+	test( 'drops a root-sourced background gradient', () => {
+		const { value } = build( {
+			color: { gradient: 'linear-gradient(#fff,#000)' },
+		} );
+		expect( value?.color?.gradient ).toBeUndefined();
+	} );
+
+	test( 'drops root-sourced spacing, border, shadow and duotone', () => {
+		const { value } = build( {
+			spacing: { padding: { top: '10px' } },
+			border: { width: '2px' },
+			shadow: 'var:preset|shadow|natural',
+			filter: { duotone: [ '#000', '#fff' ] },
+		} );
+		expect( value?.spacing?.padding ).toBeUndefined();
+		expect( value?.border?.width ).toBeUndefined();
+		expect( value?.shadow ).toBeUndefined();
+		expect( value?.filter?.duotone ).toBeUndefined();
+	} );
+
+	test( 'drops root-sourced dimensions (closes the minHeight gap)', () => {
+		// Dimensions are non-cascading; the panels never filtered them before,
+		// so this pins the closed gap.
+		const { value } = build( { dimensions: { minHeight: '50vh' } } );
+		expect( value?.dimensions?.minHeight ).toBeUndefined();
+	} );
+
+	test( 'keeps root-sourced typography and text color (they cascade)', () => {
+		const { value, sources } = build( {
+			typography: { fontSize: '16px' },
+			color: { text: '#111111' },
+		} );
+		expect( value.typography.fontSize ).toBe( '16px' );
+		expect( value.color.text ).toBe( '#111111' );
+		expect( sources[ 'color.text' ].layer ).toBe( 'root' );
+	} );
+
+	test( 'keeps the root-sourced elements passthrough (element rules apply globally)', () => {
+		const { value } = build( {
+			elements: { link: { color: { text: '#0000ff' } } },
+		} );
+		expect( value.elements.link.color.text ).toBe( '#0000ff' );
+	} );
+
+	test( 'keeps a block-sourced background color (only root is non-cascading)', () => {
+		const { value, sources } = build( {
+			blocks: {
+				'core/paragraph': { color: { background: '#00ff00' } },
+			},
+		} );
+		expect( value.color.background ).toBe( '#00ff00' );
+		expect( sources[ 'color.background' ].layer ).toBe( 'block' );
+	} );
+
+	test( 'resolves a theme-file background image url via _links', () => {
+		const { value } = buildInheritedValue( {
+			blockName: 'core/paragraph',
+			globalStyles: {
+				styles: {
+					blocks: {
+						'core/paragraph': {
+							background: {
+								backgroundImage: {
+									url: 'file:./img.jpg',
+									source: 'file',
+								},
+							},
+						},
+					},
+				},
+			},
+			_links: {
+				'wp:theme-file': [
+					{
+						name: 'file:./img.jpg',
+						href: 'https://example.test/img.jpg',
+					},
+				],
+			},
+		} );
+		expect( value.background.backgroundImage.url ).toBe(
+			'https://example.test/img.jpg'
+		);
 	} );
 } );

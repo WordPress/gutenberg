@@ -82,7 +82,6 @@ jest.mock( '../../components/global-styles/background-panel', () => ( {
 	useHasBackgroundPanel: () => true,
 	hasBackgroundImageValue: () => false,
 	hasBackgroundGradientValue: () => false,
-	mergeInheritedBackgroundStyle: ( style ) => style,
 } ) );
 
 // The Typography, Background and Elements wrappers now request a contrast

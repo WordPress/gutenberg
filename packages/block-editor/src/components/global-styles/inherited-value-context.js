@@ -9,7 +9,10 @@ import { store as blocksStore } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { globalStylesDataKey } from '../../store/private-keys';
+import {
+	globalStylesDataKey,
+	globalStylesLinksDataKey,
+} from '../../store/private-keys';
 import { buildInheritedValue } from './build-inherited-value';
 import { getVariationNameFromClass } from '../../hooks/block-style-variation';
 
@@ -22,27 +25,31 @@ import { getVariationNameFromClass } from '../../hooks/block-style-variation';
  * `null` means "no Provider above this panel"; the consumer hook then
  * returns an empty object and each panel preserves its existing behavior.
  *
- * @type {React.Context<?{ globalStyles: ?Object, blockName: ?string, ownVariation: ?string }>}
+ * @type {React.Context<?{ globalStyles: ?Object, links: ?Object, blockName: ?string, ownVariation: ?string }>}
  */
 export const InheritedValueContext = createContext( null );
 
 /**
  * Internal hook that reads the Global Styles payload and returns the wrapped
- * `{ styles }` shape the builder and ref-resolver helpers expect. Shared by
- * `InheritedValueProvider` (inspector) and `useInheritedStyleValue` (canvas).
+ * `{ styles }` shape the builder and ref-resolver helpers expect, along with
+ * the theme-file `_links` map used to resolve theme-file pointers (e.g.
+ * background images). Used by `InheritedValueProvider`.
  *
- * @return {{ globalStyles: ?Object }} Wrapped Global Styles payload.
+ * @return {{ globalStyles: ?Object, links: ?Object }} Wrapped Global Styles payload and links map.
  */
 function useRawGlobalStyles() {
-	const rawGlobalStylesData = useSelect( ( select ) => {
+	const { rawGlobalStylesData, links } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
-		return settings[ globalStylesDataKey ] ?? null;
+		return {
+			rawGlobalStylesData: settings[ globalStylesDataKey ] ?? null,
+			links: settings[ globalStylesLinksDataKey ] ?? null,
+		};
 	}, [] );
 	const globalStyles = useMemo(
 		() => ( rawGlobalStylesData ? { styles: rawGlobalStylesData } : null ),
 		[ rawGlobalStylesData ]
 	);
-	return { globalStyles };
+	return { globalStyles, links };
 }
 
 /**
@@ -66,16 +73,17 @@ export function InheritedValueProvider( {
 	selectedState = null,
 	children,
 } ) {
-	const { globalStyles } = useRawGlobalStyles();
+	const { globalStyles, links } = useRawGlobalStyles();
 
 	const contextValue = useMemo(
 		() => ( {
 			globalStyles,
+			links,
 			blockName: blockName ?? null,
 			ownVariation,
 			selectedState: selectedState ?? null,
 		} ),
-		[ globalStyles, blockName, ownVariation, selectedState ]
+		[ globalStyles, links, blockName, ownVariation, selectedState ]
 	);
 	return (
 		<InheritedValueContext.Provider value={ contextValue }>
@@ -109,28 +117,9 @@ export function useInheritedValue() {
 			ownVariation: ctx.ownVariation,
 			globalStyles: ctx.globalStyles,
 			selectedState: ctx.selectedState,
+			_links: ctx.links,
 		} );
 	}, [ ctx ] );
-}
-
-export function useInheritedStyleValue( {
-	blockName,
-	ownVariation = null,
-	selectedState = null,
-} ) {
-	const { globalStyles } = useRawGlobalStyles();
-
-	return useMemo( () => {
-		if ( ! blockName ) {
-			return { value: {}, sources: {} };
-		}
-		return buildInheritedValue( {
-			blockName,
-			ownVariation,
-			globalStyles,
-			selectedState,
-		} );
-	}, [ blockName, ownVariation, globalStyles, selectedState ] );
 }
 
 /**

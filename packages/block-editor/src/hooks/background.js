@@ -23,7 +23,6 @@ import {
 	useHasBackgroundPanel,
 	hasBackgroundImageValue,
 	hasBackgroundGradientValue,
-	mergeInheritedBackgroundStyle,
 } from '../components/global-styles/background-panel';
 import {
 	getStyleForState,
@@ -34,7 +33,6 @@ import {
 import {
 	InheritedValueProvider,
 	useInheritedValue,
-	useInheritedStyleValue,
 	useOwnVariation,
 } from '../components/global-styles/inherited-value-context';
 
@@ -99,28 +97,15 @@ export function setBackgroundStyleDefaults( backgroundStyle ) {
 	return backgroundStylesWithDefaults;
 }
 
-export function getEffectiveBackgroundStyle( style, inheritedStyle ) {
-	return mergeInheritedBackgroundStyle( style, inheritedStyle );
-}
-
-function useBlockProps( { name, className, style } ) {
-	const ownVariation = useOwnVariation( name, className );
-	const { value: inheritedValue } = useInheritedStyleValue( {
-		blockName: name,
-		ownVariation,
-	} );
-	const effectiveStyle = getEffectiveBackgroundStyle( style, inheritedValue );
-
+function useBlockProps( { name, style } ) {
 	if (
 		! hasBackgroundSupport( name ) ||
-		! effectiveStyle?.background?.backgroundImage
+		! style?.background?.backgroundImage
 	) {
 		return;
 	}
 
-	const backgroundStyles = setBackgroundStyleDefaults(
-		effectiveStyle?.background
-	);
+	const backgroundStyles = setBackgroundStyleDefaults( style?.background );
 
 	if ( ! backgroundStyles ) {
 		return;
@@ -435,6 +420,6 @@ function BackgroundPanelWithInheritedValue( props ) {
 
 export default {
 	useBlockProps,
-	attributeKeys: [ 'className', 'style' ],
+	attributeKeys: [ 'style' ],
 	hasSupport: hasBackgroundSupport,
 };

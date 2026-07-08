@@ -34,7 +34,6 @@ import {
 	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
 import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
-import { dropRootSourced, isRootSourced } from './inheritance/root-source';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
@@ -323,7 +322,6 @@ export default function DimensionsPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
-	inheritedSources = {},
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -452,13 +450,7 @@ export default function DimensionsPanel( {
 	// Padding
 	const showPaddingControl = hasPadding( settings );
 	const inheritedPaddingValues = splitStyleValue(
-		decodeValue(
-			dropRootSourced(
-				inheritedValue?.spacing?.padding,
-				inheritedSources,
-				'spacing.padding'
-			)
-		)
+		decodeValue( inheritedValue?.spacing?.padding )
 	);
 	// Local-only values feed BoxControl's `values` (with the inherited
 	// surfaced via the at-rest placeholder).
@@ -503,13 +495,7 @@ export default function DimensionsPanel( {
 	// Margin
 	const showMarginControl = hasMargin( settings );
 	const inheritedMarginValues = splitStyleValue(
-		decodeValue(
-			dropRootSourced(
-				inheritedValue?.spacing?.margin,
-				inheritedSources,
-				'spacing.margin'
-			)
-		)
+		decodeValue( inheritedValue?.spacing?.margin )
 	);
 	const localMarginValues = splitStyleValue(
 		decodeValue( value?.spacing?.margin )
@@ -550,12 +536,7 @@ export default function DimensionsPanel( {
 	const isAxialGap =
 		gapSides && gapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const localGapRaw = decodeValue( value?.spacing?.blockGap );
-	const inheritedGapRaw = isRootSourced(
-		inheritedSources,
-		'spacing.blockGap'
-	)
-		? undefined
-		: decodeValue( inheritedValue?.spacing?.blockGap );
+	const inheritedGapRaw = decodeValue( inheritedValue?.spacing?.blockGap );
 	// Merge local-then-inherited so SpacingSizesControl's chip slider and
 	// the axial-gap BoxControl reflect the local value when set and fall
 	// back to the inherited value at rest.
