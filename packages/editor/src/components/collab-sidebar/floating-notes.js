@@ -30,7 +30,8 @@ export const { Slot: FloatingNotesSlot, Fill: FloatingNotesFill } =
  */
 function useReservedCanvasSpace( overlayRef, width ) {
 	useEffect( () => {
-		const editor = overlayRef.current?.closest( '.editor-visual-editor' );
+		const overlay = overlayRef.current;
+		const editor = overlay?.closest( '.editor-visual-editor' );
 		const iframe = editor?.querySelector( 'iframe[name="editor-canvas"]' );
 		// The overlay is positioned at the inline end of the admin document;
 		// reserve the canvas space on the same physical side.
@@ -38,6 +39,24 @@ function useReservedCanvasSpace( overlayRef, width ) {
 
 		let reserved;
 		let clipped;
+		let resizeObserver;
+
+		// The canvas scrollbar stays at the window edge, but the reserved space
+		// ends where the scrollbar begins. Inset the overlay by the scrollbar
+		// width so the notes sit centered in the visible reserved space instead
+		// of tucked against the scrollbar. (0 with overlay scrollbars.)
+		const syncOverlayInset = () => {
+			const view = iframe?.contentWindow;
+			const scrollbarWidth = view
+				? view.innerWidth -
+				  iframe.contentDocument.documentElement.clientWidth
+				: 0;
+			overlay?.style.setProperty(
+				'inset-inline-end',
+				`${ scrollbarWidth }px`
+			);
+		};
+
 		const reserveSpace = () => {
 			// Fall back to the styles wrapper when the canvas is not iframed.
 			reserved =
@@ -49,6 +68,16 @@ function useReservedCanvasSpace( overlayRef, width ) {
 			// under the reserved space; clip it at the body edge instead.
 			clipped = iframe?.contentDocument?.body;
 			clipped?.style.setProperty( 'overflow-x', 'clip' );
+
+			syncOverlayInset();
+
+			// The scrollbar appears and disappears as the canvas content grows
+			// and shrinks; keep the overlay aligned when it toggles.
+			resizeObserver?.disconnect();
+			if ( clipped && window.ResizeObserver ) {
+				resizeObserver = new window.ResizeObserver( syncOverlayInset );
+				resizeObserver.observe( clipped );
+			}
 		};
 
 		reserveSpace();
@@ -58,8 +87,10 @@ function useReservedCanvasSpace( overlayRef, width ) {
 
 		return () => {
 			iframe?.removeEventListener( 'load', reserveSpace );
+			resizeObserver?.disconnect();
 			reserved?.style.removeProperty( paddingSide );
 			clipped?.style.removeProperty( 'overflow-x' );
+			overlay?.style.removeProperty( 'inset-inline-end' );
 		};
 	}, [ overlayRef, width ] );
 }
