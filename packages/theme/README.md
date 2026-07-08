@@ -93,6 +93,8 @@ The `cornerRadius` prop sets the overall roundness preset for the theme subtree.
 
 When the `color`, `cursor`, or `cornerRadius` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
 
+`ThemeProvider` does not accept wrapper customization props such as `className`, `style`, `as`, `render`, or `ref`.
+
 ### Nesting Providers
 
 The provider can be used recursively to override or modify the theme for a specific subtree.
