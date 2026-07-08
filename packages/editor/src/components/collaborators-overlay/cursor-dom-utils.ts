@@ -357,4 +357,5 @@ export const findInnerBlockOffset = (
  * @return True if `a` comes before `b`.
  */
 export const isNodeBefore = ( a: Node, b: Node ): boolean =>
-	a.compareDocumentPosition( b ) === Node.DOCUMENT_POSITION_FOLLOWING;
+	// eslint-disable-next-line no-bitwise
+	!! ( a.compareDocumentPosition( b ) & Node.DOCUMENT_POSITION_FOLLOWING );
