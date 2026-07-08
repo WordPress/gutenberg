@@ -28,16 +28,26 @@ async function firstTimeContributorLabel( payload, octokit ) {
 		`first-time-contributor: Searching for commits in ${ owner }/${ repo } by @${ author }`
 	);
 
-	// Use commit search instead of listing commits by author. The commits list
-	// only matches an account's verified emails, so it misses commits made
-	// under a GitHub noreply address and wrongly flags those contributors as
-	// new. Search matches by account, so it finds them whatever email they used.
-	const {
-		data: { total_count: previousCommits },
-	} = await octokit.rest.search.commits( {
-		q: `repo:${ owner }/${ repo } author:${ author }`,
-		per_page: 1,
+	const { data: commits } = await octokit.rest.repos.listCommits( {
+		owner,
+		repo,
+		author,
 	} );
+
+	// The commits list matches an author only by the emails verified on their
+	// account, so it can miss commits made under a GitHub noreply address. When
+	// it finds nothing, confirm with a commit search, which matches by account.
+	// Search has a tighter rate limit, so it only runs in this rare fallback.
+	let previousCommits = commits.length;
+	if ( previousCommits === 0 ) {
+		const {
+			data: { total_count: searchCount },
+		} = await octokit.rest.search.commits( {
+			q: `repo:${ owner }/${ repo } author:${ author }`,
+			per_page: 1,
+		} );
+		previousCommits = searchCount;
+	}
 
 	if ( previousCommits > 0 ) {
 		debug(
