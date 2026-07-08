@@ -226,49 +226,15 @@ function CoverEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 
-	// Mirrors the placeholder render condition, for reading the state
-	// before an action runs.
-	const isShowingPlaceholder = () => {
-		const { getBlocks, getBlockAttributes } =
-			registry.select( blockEditorStore );
-		const currentAttributes = getBlockAttributes( clientId );
-		return (
-			getBlocks( clientId ).length === 0 &&
-			! currentAttributes.useFeaturedImage &&
-			! currentAttributes.url &&
-			! currentAttributes.overlayColor &&
-			! currentAttributes.customOverlayColor &&
-			! currentAttributes.gradient &&
-			! currentAttributes.customGradient
-		);
-	};
-
-	// Create the initial inner paragraph when the block exits its
-	// placeholder. The template was only ever applied at that transition:
-	// afterwards, removing the paragraph is a content choice that further
-	// background changes should not override.
+	// Create the initial inner paragraph when the block gains a background
+	// and has no content yet.
 	const scaffoldInnerBlocks = () => {
 		const {
 			getBlocks,
-			getBlockAttributes,
 			isBlockSelected,
 			getSelectedBlocksInitialCaretPosition,
 		} = registry.select( blockEditorStore );
 		if ( getBlocks( clientId ).length > 0 ) {
-			return;
-		}
-		// The calling actions can also remove the background, returning the
-		// block to its placeholder, which should remain empty.
-		const currentAttributes = getBlockAttributes( clientId );
-		const hasBackground = !! (
-			currentAttributes.url ||
-			currentAttributes.useFeaturedImage ||
-			currentAttributes.overlayColor ||
-			currentAttributes.customOverlayColor ||
-			currentAttributes.gradient ||
-			currentAttributes.customGradient
-		);
-		if ( ! hasBackground ) {
 			return;
 		}
 		// Check for fontSize support before we pass a fontSize attribute to
@@ -290,7 +256,6 @@ function CoverEdit( {
 	};
 
 	const onSelectMedia = async ( newMedia ) => {
-		const wasShowingPlaceholder = isShowingPlaceholder();
 		const mediaAttributes = attributesFromMedia( newMedia );
 		const isImage = [ newMedia?.type, newMedia?.media_type ].includes(
 			IMAGE_BACKGROUND_TYPE
@@ -365,9 +330,7 @@ function CoverEdit( {
 				isUserOverlayColor: currentAttrs.isUserOverlayColor || false,
 			} );
 
-			if ( wasShowingPlaceholder ) {
-				scaffoldInnerBlocks();
-			}
+			scaffoldInnerBlocks();
 		} );
 	};
 
@@ -400,7 +363,6 @@ function CoverEdit( {
 	};
 
 	const onSetOverlayColor = async ( newOverlayColor ) => {
-		const wasShowingPlaceholder = isShowingPlaceholder();
 		const averageBackgroundColor = await getMediaColor( url );
 
 		// Read latest dimRatio after await to avoid stale closure.
@@ -423,7 +385,9 @@ function CoverEdit( {
 				isDark: newIsDark,
 			} );
 
-			if ( wasShowingPlaceholder ) {
+			// Skip when the color is cleared: that returns the block to its
+			// placeholder, which only renders while there is no content.
+			if ( newOverlayColor ) {
 				scaffoldInnerBlocks();
 			}
 		} );
@@ -651,7 +615,6 @@ function CoverEdit( {
 		!! openMediaEditorModal;
 
 	const toggleUseFeaturedImage = async () => {
-		const wasShowingPlaceholder = isShowingPlaceholder();
 		const newUseFeaturedImage = ! useFeaturedImage;
 
 		const averageBackgroundColor = newUseFeaturedImage
@@ -697,7 +660,10 @@ function CoverEdit( {
 				isDark: newIsDark,
 			} );
 
-			if ( wasShowingPlaceholder ) {
+			// Skip when the featured image is disabled: that can return the
+			// block to its placeholder, which only renders while there is no
+			// content.
+			if ( newUseFeaturedImage ) {
 				scaffoldInnerBlocks();
 			}
 		} );
