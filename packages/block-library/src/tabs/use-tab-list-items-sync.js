@@ -5,6 +5,8 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 
+const EMPTY_ARRAY = [];
+
 /**
  * Keep the tab-list block's `tabs` attribute in sync with the tab-panel blocks.
  *
@@ -12,11 +14,29 @@ import { useEffect } from '@wordpress/element';
  * label edit), this hook updates the `tabs` attribute on the core/tab-list
  * block so that save.js can render the correct buttons.
  *
- * @param {Object}      props
- * @param {Array}       props.tabPanels       Raw core/tab-panel block objects.
- * @param {string|null} props.tabListClientId Client ID of the core/tab-list block.
+ * @param {string} tabsClientId Client ID of the core/tabs block.
  */
-export default function useTabListItemsSync( { tabPanels, tabListClientId } ) {
+export default function useTabListItemsSync( tabsClientId ) {
+	const { tabPanels, tabListClientId } = useSelect(
+		( select ) => {
+			const { getBlocks } = select( blockEditorStore );
+			const innerBlocks = getBlocks( tabsClientId );
+
+			const tabPanelsBlock = innerBlocks.find(
+				( block ) => block.name === 'core/tab-panels'
+			);
+			const tabList = innerBlocks.find(
+				( block ) => block.name === 'core/tab-list'
+			);
+
+			return {
+				tabPanels: tabPanelsBlock?.innerBlocks ?? EMPTY_ARRAY,
+				tabListClientId: tabList?.clientId ?? null,
+			};
+		},
+		[ tabsClientId ]
+	);
+
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const { getBlockAttributes } = useSelect( blockEditorStore );
