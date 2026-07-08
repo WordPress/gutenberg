@@ -66,7 +66,12 @@ function block_core_gallery_get_column_gap_value( $gap, $fallback_gap ) {
 		$gap = $gap['left'] ?? $fallback_gap;
 	}
 
+	// Make sure $gap is a string to avoid PHP 8.1 deprecation error in preg_match() when the value is null.
 	$gap = is_string( $gap ) ? $gap : '';
+
+	// Skip if gap value contains unsupported characters.
+	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
+	// because we only want to match against the value, not the CSS attribute.
 	$gap = $gap && preg_match( '%[\\\(&=}]|/\*%', $gap ) ? null : $gap;
 
 	// Get spacing CSS variable from preset value if provided.
@@ -80,24 +85,6 @@ function block_core_gallery_get_column_gap_value( $gap, $fallback_gap ) {
 
 	// The unstable gallery gap calculation requires a real value (such as `0px`) and not `0`.
 	return '0' === $gap_column ? '0px' : $gap_column;
-}
-
-/**
- * Returns configured viewport media queries.
- *
- * @since 7.1.0
- *
- * @param mixed $viewport_settings Viewport settings from theme.json.
- * @return array Responsive media queries.
- */
-function block_core_gallery_get_viewport_media_queries( $viewport_settings ) {
-	foreach ( array( 'WP_Theme_JSON_Gutenberg', 'WP_Theme_JSON' ) as $theme_json_class_name ) {
-		if ( method_exists( $theme_json_class_name, 'get_viewport_media_queries' ) ) {
-			return $theme_json_class_name::get_viewport_media_queries( $viewport_settings );
-		}
-	}
-
-	return array();
 }
 
 /**
@@ -422,7 +409,13 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 
 	$global_settings          = wp_get_global_settings();
 	$viewport_settings        = $global_settings['viewport'] ?? null;
-	$responsive_media_queries = block_core_gallery_get_viewport_media_queries( $viewport_settings );
+	$responsive_media_queries = array();
+	foreach ( array( 'WP_Theme_JSON_Gutenberg', 'WP_Theme_JSON' ) as $theme_json_class_name ) {
+		if ( method_exists( $theme_json_class_name, 'get_viewport_media_queries' ) ) {
+			$responsive_media_queries = $theme_json_class_name::get_viewport_media_queries( $viewport_settings );
+			break;
+		}
+	}
 
 	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
 		$viewport_style = $style_attr[ $breakpoint ] ?? null;
