@@ -3,7 +3,7 @@
  */
 import { store, getContext } from '@wordpress/interactivity';
 
-const { state, actions } = store( 'directive-input', {
+const { state } = store( 'directive-input', {
 	state: {
 		text: 'hello',
 		checkedVal: false,
@@ -38,9 +38,7 @@ const { state, actions } = store( 'directive-input', {
 		},
 		toggleMultiPet() {
 			state.multiPet =
-				state.multiPet[ 0 ] === 'dog'
-					? [ 'cat', 'bird' ]
-					: [ 'dog' ];
+				state.multiPet[ 0 ] === 'dog' ? [ 'cat', 'bird' ] : [ 'dog' ];
 		},
 
 		// ---- context-based actions ----
@@ -65,9 +63,7 @@ const { state, actions } = store( 'directive-input', {
 		toggleCtxMultiPet() {
 			const ctx = getContext();
 			ctx.ctxMultiPet =
-				ctx.ctxMultiPet[ 0 ] === 'dog'
-					? [ 'cat', 'bird' ]
-					: [ 'dog' ];
+				ctx.ctxMultiPet[ 0 ] === 'dog' ? [ 'cat', 'bird' ] : [ 'dog' ];
 		},
 	},
 } );

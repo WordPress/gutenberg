@@ -119,13 +119,13 @@ test.describe( 'data-wp-input', () => {
 		const radioCat = page.getByTestId( 'radio-cat' );
 
 		await expect( output ).toHaveText( 'dog' );
-		expect( await radioDog.isChecked() ).toBe( true );
-		expect( await radioCat.isChecked() ).toBe( false );
+		await expect( radioDog ).toBeChecked();
+		await expect( radioCat ).not.toBeChecked();
 
 		await radioCat.check();
 		await expect( output ).toHaveText( 'cat' );
-		expect( await radioDog.isChecked() ).toBe( false );
-		expect( await radioCat.isChecked() ).toBe( true );
+		await expect( radioDog ).not.toBeChecked();
+		await expect( radioCat ).toBeChecked();
 
 		const ctxOutput = page.getByTestId( 'ctx-radio-output' );
 		const ctxRadioCat = page.getByTestId( 'ctx-radio-cat' );
@@ -145,13 +145,13 @@ test.describe( 'data-wp-input', () => {
 		const radioY = page.getByTestId( 'radio-none-y' );
 
 		await expect( output ).toHaveText( '' );
-		expect( await radioX.isChecked() ).toBe( false );
-		expect( await radioY.isChecked() ).toBe( false );
+		await expect( radioX ).not.toBeChecked();
+		await expect( radioY ).not.toBeChecked();
 
 		await radioY.check();
 		await expect( output ).toHaveText( 'y' );
-		expect( await radioX.isChecked() ).toBe( false );
-		expect( await radioY.isChecked() ).toBe( true );
+		await expect( radioX ).not.toBeChecked();
+		await expect( radioY ).toBeChecked();
 	} );
 
 	/* ------------------------------------------------------------------ */
@@ -203,27 +203,24 @@ test.describe( 'data-wp-input', () => {
 
 		// Initial: 'dog' selected (from store).
 		expect(
-			await input.evaluate(
-				( el: HTMLSelectElement ) =>
-					Array.from( el.selectedOptions ).map( ( o ) => o.value )
+			await input.evaluate( ( el: HTMLSelectElement ) =>
+				Array.from( el.selectedOptions ).map( ( o ) => o.value )
 			)
 		).toEqual( [ 'dog' ] );
 
 		// Toggle → state.multiPet becomes ['cat', 'bird'].
 		await toggleBtn.click();
 		expect(
-			await input.evaluate(
-				( el: HTMLSelectElement ) =>
-					Array.from( el.selectedOptions ).map( ( o ) => o.value )
+			await input.evaluate( ( el: HTMLSelectElement ) =>
+				Array.from( el.selectedOptions ).map( ( o ) => o.value )
 			)
 		).toEqual( [ 'cat', 'bird' ] );
 
 		// Toggle back → state.multiPet becomes ['dog'].
 		await toggleBtn.click();
 		expect(
-			await input.evaluate(
-				( el: HTMLSelectElement ) =>
-					Array.from( el.selectedOptions ).map( ( o ) => o.value )
+			await input.evaluate( ( el: HTMLSelectElement ) =>
+				Array.from( el.selectedOptions ).map( ( o ) => o.value )
 			)
 		).toEqual( [ 'dog' ] );
 	} );
@@ -242,18 +239,18 @@ test.describe( 'data-wp-input', () => {
 		// Initial: A checked (state.tags0 = 'a'), B unchecked (state.tags1 = '').
 		await expect( outputA ).toHaveText( 'a' );
 		await expect( outputB ).toHaveText( '' );
-		expect( await checkboxA.isChecked() ).toBe( true );
-		expect( await checkboxB.isChecked() ).toBe( false );
+		await expect( checkboxA ).toBeChecked();
+		await expect( checkboxB ).not.toBeChecked();
 
 		// Check B → tags1 = 'b'.
 		await checkboxB.check();
 		await expect( outputB ).toHaveText( 'b' );
-		expect( await checkboxB.isChecked() ).toBe( true );
+		await expect( checkboxB ).toBeChecked();
 
 		// Uncheck B → tags1 = ''.
 		await checkboxB.uncheck();
 		await expect( outputB ).toHaveText( '' );
-		expect( await checkboxB.isChecked() ).toBe( false );
+		await expect( checkboxB ).not.toBeChecked();
 	} );
 
 	/* ------------------------------------------------------------------ */
@@ -300,15 +297,15 @@ test.describe( 'data-wp-input', () => {
 		const toggleBtn = page.getByTestId( 'toggle-checked' );
 
 		await expect( output ).toHaveText( 'false' );
-		expect( await input.isChecked() ).toBe( false );
+		await expect( input ).not.toBeChecked();
 
 		await toggleBtn.click();
 		await expect( output ).toHaveText( 'true' );
-		expect( await input.isChecked() ).toBe( true );
+		await expect( input ).toBeChecked();
 
 		await toggleBtn.click();
 		await expect( output ).toHaveText( 'false' );
-		expect( await input.isChecked() ).toBe( false );
+		await expect( input ).not.toBeChecked();
 
 		const ctxOutput = page.getByTestId( 'ctx-checkbox-output' );
 		const ctxInput = page.getByTestId( 'ctx-checkbox-input' );
@@ -316,10 +313,10 @@ test.describe( 'data-wp-input', () => {
 		await expect( ctxOutput ).toHaveText( 'false' );
 		await ctxToggleBtn.click();
 		await expect( ctxOutput ).toHaveText( 'true' );
-		expect( await ctxInput.isChecked() ).toBe( true );
+		await expect( ctxInput ).toBeChecked();
 		await ctxToggleBtn.click();
 		await expect( ctxOutput ).toHaveText( 'false' );
-		expect( await ctxInput.isChecked() ).toBe( false );
+		await expect( ctxInput ).not.toBeChecked();
 	} );
 
 	test( 'should update number input when signal changes via action', async ( {
@@ -401,6 +398,7 @@ test.describe( 'data-wp-input', () => {
 				);
 				return el && el.textContent === 'test.txt';
 			},
+			undefined,
 			{ timeout: 15000 }
 		);
 
@@ -423,6 +421,7 @@ test.describe( 'data-wp-input', () => {
 				);
 				return el && el.textContent === 'test.txt';
 			},
+			undefined,
 			{ timeout: 15000 }
 		);
 	} );
@@ -442,5 +441,4 @@ test.describe( 'data-wp-input', () => {
 		await input.fill( 'updated' );
 		await expect( input ).toHaveValue( 'updated' );
 	} );
-
 } );
