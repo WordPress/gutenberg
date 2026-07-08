@@ -4,6 +4,8 @@ export const ALL_NOTES_SIDEBAR = 'edit-post/collab-history-sidebar';
 // inside the canvas so content never flows under the panel.
 export const NOTES_PANEL_WIDTH = 280;
 
-// Width of the floating notes panel when minimized. Threads collapse to an
-// avatar pill, so much less canvas space needs to be reserved.
-export const NOTES_PANEL_COMPACT_WIDTH = 60;
+// Space reserved in the canvas when notes are minimized. Threads collapse to
+// an avatar pill (~50px) anchored to the inline-end edge with a `$grid-unit-20`
+// (16px) margin; reserving pill + a matching margin on each side keeps the pill
+// from overlapping full-width content and centers it in the reserved gap.
+export const NOTES_PANEL_COMPACT_WIDTH = 82;

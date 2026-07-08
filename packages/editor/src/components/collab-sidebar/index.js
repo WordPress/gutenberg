@@ -43,7 +43,8 @@ function NotesSidebar( { postId } ) {
 	}, [] );
 
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
 	const { toggleBlockSpotlight, selectBlock } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -226,10 +227,36 @@ function NotesSidebar( { postId } ) {
 											value: 'hidden',
 											label: __( 'Hidden notes' ),
 										},
+										{
+											value: 'sidebar',
+											label: __( 'All notes' ),
+										},
 									] }
-									value={ notesDisplayMode }
+									value={
+										isAllNotesSidebarOpen
+											? 'sidebar'
+											: notesDisplayMode
+									}
 									onSelect={ ( value ) => {
-										setNotesDisplayMode( value );
+										if ( value === 'sidebar' ) {
+											// The "All notes" sidebar lists every
+											// thread (including resolved); the
+											// floating notes yield to it.
+											enableComplementaryArea(
+												'core',
+												ALL_NOTES_SIDEBAR
+											);
+										} else {
+											// Switching to a floating mode closes
+											// the sidebar so notes return to the
+											// canvas.
+											if ( isAllNotesSidebarOpen ) {
+												disableComplementaryArea(
+													'core'
+												);
+											}
+											setNotesDisplayMode( value );
+										}
 										onClose();
 									} }
 								/>
