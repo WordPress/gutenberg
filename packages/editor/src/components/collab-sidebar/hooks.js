@@ -8,7 +8,11 @@ import {
 	useMemo,
 	useSyncExternalStore,
 } from '@wordpress/element';
-import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import {
+	useEntityRecords,
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import {
 	store as blockEditorStore,
@@ -40,13 +44,21 @@ import {
 } from './utils';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
+const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreDataPrivateApis );
 
 export function useNoteThreads( postId ) {
+	// `per_page: -1` fetches every note for the post. Pairing it with
+	// RECEIVE_INTERMEDIATE_RESULTS makes the resolver stream the pages (100 at
+	// a time) into the store as they arrive, so the sidebar renders notes
+	// progressively instead of blocking on the full set. This keeps notes
+	// usable on posts with hundreds or thousands of notes. See
+	// https://github.com/WordPress/gutenberg/issues/71668.
 	const queryArgs = {
 		post: postId,
 		type: 'note',
 		status: 'all',
 		per_page: -1,
+		[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
 	};
 
 	const { records: threads } = useEntityRecords(
