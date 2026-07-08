@@ -1,5 +1,4 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/widget.json",
 	"name": "core/hello-world",
 	"title": "Hello World",
 	"description": "A minimal example widget.",

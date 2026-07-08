@@ -1,5 +1,4 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/widget.json",
 	"name": "core/welcome",
 	"title": "Welcome",
 	"description": "Displays a welcome panel to introduce users to WordPress.",

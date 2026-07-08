@@ -1,5 +1,4 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/widget.json",
 	"name": "core/quick-draft",
 	"title": "Quick draft",
 	"description": "Quickly draft a new post.",

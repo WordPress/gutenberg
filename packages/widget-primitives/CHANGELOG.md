@@ -26,8 +26,7 @@
 -   Add a widget anatomy doc and lighten the widget system doc.
 -   Document the `relevance` hint and `help` note across anatomy, authoring,
     and architecture docs; add an attribute-relevance diagram.
--   Add a `WithRelevance` Storybook story and publish `schemas/json/widget.json`
-    for static `widget.json` metadata.
+-   Add a `WithRelevance` Storybook story for attribute relevance hints.
 
 ## 0.2.0 (2026-07-01)
 

@@ -1,5 +1,4 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/widget.json",
 	"name": "core/news",
 	"title": "WordPress news",
 	"description": "Displays the latest news from WordPress.org and Planet WordPress.",

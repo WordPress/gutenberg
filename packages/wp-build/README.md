@@ -594,7 +594,6 @@ Rule of thumb: anything the host needs before loading a widget's module — iden
 
 ```json
 {
-	"$schema": "https://schemas.wp.org/trunk/widget.json",
 	"name": "my-plugin/hello-world",
 	"title": "Hello World",
 	"description": "A simple example widget.",
@@ -606,11 +605,8 @@ Rule of thumb: anything the host needs before loading a widget's module — iden
 }
 ```
 
-The canonical JSON Schema lives at [`schemas/json/widget.json`](../../../schemas/json/widget.json) and is validated in CI against every `widgets/**/widget.json` file.
-
 **Fields:**
 
-- **`$schema`** (recommended): JSON Schema URI for IDE validation (`https://schemas.wp.org/trunk/widget.json`)
 - **`name`** (required): Namespaced identifier (e.g., `"my-plugin/hello-world"`)
 - **`title`** (optional): Human-readable title. Translated server-side using `textdomain`.
 - **`description`** (optional): Short description. Translated server-side using `textdomain`.

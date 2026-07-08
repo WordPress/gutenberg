@@ -22,13 +22,13 @@ A widget is a directory under `widgets/`, discovered by convention; there is no 
 
 ```
 widgets/hello-world/
-├── widget.json        static metadata ($schema, name, title, description, help, keywords, category, presentation, textdomain)
+├── widget.json        static metadata (name, title, description, help, keywords, category, presentation, textdomain)
 ├── widget.ts          metadata module: default-exports icon, attributes, example
 ├── render.tsx         render module: default-exports the React component
 └── style.module.css   optional, injected at runtime by the build
 ```
 
-The split between `widget.json` and `widget.ts` is deliberate. `widget.json` is build-time input: plain JSON the pipeline can read without executing code, validated against [`schemas/json/widget.json`](../../../schemas/json/widget.json), including the translatable strings (`title`, `description`, `help`, `keywords`) the server localizes through `textdomain`. `widget.ts` is the live half of the metadata: values that only exist in JavaScript, such as the icon element or the `attributes` field schema (including optional `relevance` hints) that hosts feed into `DataForm`.
+The split between `widget.json` and `widget.ts` is deliberate. `widget.json` is build-time input: plain JSON the pipeline can read without executing code, including the translatable strings (`title`, `description`, `help`, `keywords`) the server localizes through `textdomain`. `widget.ts` is the live half of the metadata: values that only exist in JavaScript, such as the icon element or the `attributes` field schema (including optional `relevance` hints) that hosts feed into `DataForm`.
 
 Its render component receives the widget's `attributes` and, optionally, `setAttributes`:
 
