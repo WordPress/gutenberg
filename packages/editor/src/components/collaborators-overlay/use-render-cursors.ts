@@ -14,6 +14,7 @@ import { getAvatarUrl } from './get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { computeSelectionVisual } from './compute-selection';
 import { useDebouncedRecompute } from './use-debounced-recompute';
+import { blockContainerOf } from './cursor-dom-utils';
 import type { SelectionRect } from './cursor-dom-utils';
 
 const { useActiveCollaborators, useResolvedSelection } =
@@ -161,6 +162,37 @@ export function useRenderCursors(
 				} catch {
 					// Selection may reference a stale Yjs position.
 					return;
+				}
+
+				// Promote inner-block endpoints (e.g. list-items → list) to
+				// their direct [data-block] parent before passing to
+				// computeSelectionVisual, so that function receives
+				// container-level IDs and needs no promotion logic of its own.
+				const promote = ( r: ResolvedSelection ): ResolvedSelection => {
+					if ( ! r.localClientId ) {
+						return r;
+					}
+					const el = blockEditorDocument.querySelector< HTMLElement >(
+						`[data-block="${ r.localClientId }"]`
+					);
+					if ( ! el ) {
+						return r;
+					}
+					const container = blockContainerOf( el );
+					const containerId = container.getAttribute( 'data-block' );
+					if ( ! containerId || containerId === r.localClientId ) {
+						return r;
+					}
+					return {
+						...r,
+						localClientId: containerId,
+						richTextOffset: null,
+						attributeKey: null,
+					};
+				};
+				start = promote( start );
+				if ( end ) {
+					end = promote( end );
 				}
 			}
 

@@ -6,7 +6,6 @@ import type {
 
 import { unlock } from '../../lock-unlock';
 import {
-	blockContainerOf,
 	getCursorPosition,
 	getBlocksBetween,
 	getSelectionRects,
@@ -237,16 +236,19 @@ function blockBoundingRect(
 /**
  * Compute overlay rects for a multi-block selection.
  *
+ * Expects start/end to already carry container-level clientIds (inner-block
+ * promotion is performed by the caller, use-render-cursors, before this
+ * function is invoked). richTextOffset is null on promoted endpoints, which
+ * triggers the full bounding-box path for those blocks.
+ *
  * - Middle blocks always receive a full bounding-box overlay.
- * - First block: full bounding-box when the cursor starts at offset 0 or the
- *   endpoint is a WholeBlock; partial text-level rects otherwise.
- * - Last block: partial text-level rects from 0 to the cursor offset when the
- *   endpoint is a CursorEndpoint; full bounding-box for WholeBlock.
+ * - First block: full bounding-box when offset is null or 0; partial otherwise.
+ * - Last block: partial rects from 0 to offset; full bounding-box when null.
  * - Non-text blocks (image, spacer — no visible innerText) produce no rects;
  *   CSS outline in use-block-highlighting handles those instead.
  *
- * @param start          - Start endpoint (resolved block clientId + text offset).
- * @param end            - End endpoint (resolved block clientId + text offset).
+ * @param start          - Start endpoint (container-level clientId + text offset).
+ * @param end            - End endpoint (container-level clientId + text offset).
  * @param overlayContext - Shared editor document / overlay references.
  * @return selectionRects covering each text block in the selection, or {}.
  */
@@ -277,51 +279,35 @@ function computeMultiBlockOverlayRects(
 		[ docFirstEl, docLastEl ] = [ docLastEl, docFirstEl ];
 	}
 
-	// Promote inner blocks (e.g. list-items) to their nearest [data-block]
-	// ancestor. Without this, sibling inner blocks between the endpoint and the
-	// other end of the selection (e.g. the remaining list-items) appear as
-	// individual middle blocks, each getting its own highlight rect instead of
-	// one rect covering the whole list.
-	const effectiveFirstEl = blockContainerOf( docFirstEl );
-	const effectiveLastEl = blockContainerOf( docLastEl );
-	const effectiveFirstId =
-		effectiveFirstEl.getAttribute( 'data-block' ) ?? '';
-	const effectiveLastId = effectiveLastEl.getAttribute( 'data-block' ) ?? '';
-
-	// When both endpoints are inner blocks of the same container, show that
-	// container as a single unit (e.g. selecting across list-items within one list).
-	if ( effectiveFirstId && effectiveFirstId === effectiveLastId ) {
-		return effectiveFirstEl.innerText?.trim()
+	// After promotion in use-render-cursors, both endpoints may resolve to the
+	// same container (e.g. two list-items in the same list).
+	if ( docFirst.localClientId === docLast.localClientId ) {
+		return docFirstEl.innerText?.trim()
 			? {
 					selectionRects: [
-						blockBoundingRect( effectiveFirstEl, overlayRect ),
+						blockBoundingRect( docFirstEl, overlayRect ),
 					],
 			  }
 			: {};
 	}
 
 	const middleEls = getBlocksBetween(
-		effectiveFirstId,
-		effectiveLastId,
+		docFirst.localClientId!,
+		docLast.localClientId!,
 		editorDocument
 	).filter(
-		( el ) =>
-			! effectiveFirstEl.contains( el ) &&
-			! effectiveLastEl.contains( el )
+		( el ) => ! docFirstEl.contains( el ) && ! docLastEl.contains( el )
 	);
 
 	const MAX = Number.MAX_SAFE_INTEGER;
 	const rects: SelectionRect[] = [];
 
-	// First block — use effectiveFirstEl (the container when promoted).
-	// When the endpoint was promoted (e.g. list-item → list), always show the
-	// full bounding-box because the cursor offset is relative to the inner block,
-	// not the container. When not promoted, apply the normal partial/full logic.
-	if ( effectiveFirstEl.innerText?.trim() ) {
-		const wasPromoted = effectiveFirstEl !== docFirstEl;
-		const firstOffset = wasPromoted ? null : docFirst.richTextOffset;
+	// First block: full bounding-box when offset is null or 0 (includes
+	// promoted endpoints whose offset was nulled in use-render-cursors).
+	if ( docFirstEl.innerText?.trim() ) {
+		const firstOffset = docFirst.richTextOffset;
 		if ( firstOffset === null || firstOffset === 0 ) {
-			rects.push( blockBoundingRect( effectiveFirstEl, overlayRect ) );
+			rects.push( blockBoundingRect( docFirstEl, overlayRect ) );
 		} else {
 			const el = resolveTargetElement( editorDocument, docFirst );
 			const textRects = el
@@ -335,7 +321,7 @@ function computeMultiBlockOverlayRects(
 				: null;
 			rects.push(
 				...( textRects ?? [
-					blockBoundingRect( effectiveFirstEl, overlayRect ),
+					blockBoundingRect( docFirstEl, overlayRect ),
 				] )
 			);
 		}
@@ -348,12 +334,11 @@ function computeMultiBlockOverlayRects(
 		}
 	}
 
-	// Last block — use effectiveLastEl. Same promotion logic as the first block.
-	if ( effectiveLastEl.innerText?.trim() ) {
-		const wasPromoted = effectiveLastEl !== docLastEl;
-		const lastOffset = wasPromoted ? null : docLast.richTextOffset;
+	// Last block: partial rects from 0 to offset; full when null.
+	if ( docLastEl.innerText?.trim() ) {
+		const lastOffset = docLast.richTextOffset;
 		if ( lastOffset === null ) {
-			rects.push( blockBoundingRect( effectiveLastEl, overlayRect ) );
+			rects.push( blockBoundingRect( docLastEl, overlayRect ) );
 		} else if ( lastOffset > 0 ) {
 			const el = resolveTargetElement( editorDocument, docLast );
 			const textRects = el
@@ -367,12 +352,11 @@ function computeMultiBlockOverlayRects(
 				: null;
 			rects.push(
 				...( textRects ?? [
-					blockBoundingRect( effectiveLastEl, overlayRect ),
+					blockBoundingRect( docLastEl, overlayRect ),
 				] )
 			);
 		}
-		// lastOffset === 0: cursor is at the very start of the last block —
-		// nothing in this block is selected, so produce no rect.
+		// lastOffset === 0: cursor at the very start — nothing selected here.
 	}
 
 	return rects.length > 0 ? { selectionRects: rects } : {};
