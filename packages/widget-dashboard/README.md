@@ -172,8 +172,6 @@ import { Page } from '@wordpress/admin-ui';
 
 `<Page>` is optional. The compound renders inside any container, so a bare `<header>` or custom chrome works just as well.
 
-When the widgets grid sits inside a scroll container, `<WidgetDashboard.Widgets />` reserves a small amount of top padding so outward tile focus rings stay visible. Hosts that already pad the scroll viewport (for example `<Page hasPadding>`) do not need extra spacing.
-
 ## Inserting widgets
 
 The "Add widget" button in `<WidgetDashboard.Actions />` opens a modal inserter. It lists every entry in the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a "Select" action with bulk support so users can insert one or several widgets in a single layout change.
