@@ -28,15 +28,13 @@ function block_core_tab_list_render_callback( array $attributes, string $content
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 	if ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-tab-list' ) ) ) {
 		$tag_processor->set_attribute( 'aria-label', $aria_label );
-		$content = $tag_processor->get_updated_html();
 	}
 
 	if ( empty( $tabs_list ) ) {
-		return $content;
+		return $tag_processor->get_updated_html();
 	}
 
-	$tag_processor = new WP_HTML_Tag_Processor( $content );
-	$tab_index     = 0;
+	$tab_index = 0;
 
 	while ( $tag_processor->next_tag( 'button' ) ) {
 		$tab_id = $tabs_list[ $tab_index ] ?? null;
