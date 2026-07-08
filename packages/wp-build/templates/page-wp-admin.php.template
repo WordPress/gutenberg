@@ -10,7 +10,7 @@
  * @package {{PREFIX}}
  */
 
-// Global storage for {{PAGE_SLUG}} routes, menu items, and route classic dependencies
+// Global storage for {{PAGE_SLUG}} routes and menu items
 global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies;
 ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes             = array();
 ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items         = array();
@@ -156,12 +156,6 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 	if ( file_exists( $asset_file ) ) {
 		$asset = require $asset_file;
 
-		// Route content/route modules declare their own classic script dependencies
-		// (e.g. wp-viewport) that must be present before the module evaluates. Script
-		// modules cannot load classic-script dependencies themselves, so the deps
-		// collected during route registration are merged into the prerequisites script.
-		// This lets each route reliably receive its classic dependencies without relying
-		// on whatever @wordpress/boot happens to load eagerly.
 		global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies;
 		$prerequisite_dependencies = array_values(
 			array_unique(

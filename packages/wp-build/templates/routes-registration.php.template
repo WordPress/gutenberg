@@ -46,9 +46,6 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 		$content_handle = null;
 		$route_handle = null;
 
-		// Classic script dependencies declared by this route's modules. Script modules
-		// cannot load classic-script dependencies themselves, so they are collected here
-		// and enqueued by the page's prerequisites script (see the page render function).
 		$classic_dependencies = array();
 
 		// Register content module if exists

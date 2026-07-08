@@ -30,10 +30,6 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 				getEntityRecord,
 			} = select( coreStore );
 
-			// Whether the (post) record has unsaved meta changes other than
-			// `footnotes`. Mirrors the editor's `hasPostMetaChanges` selector,
-			// which — when called with an explicit record, as it is here — reads
-			// only from core-data and never touches the editor store.
 			const metaEdits = getEntityRecordNonTransientEdits(
 				'postType',
 				name,

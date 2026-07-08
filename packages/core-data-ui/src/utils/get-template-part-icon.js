@@ -9,10 +9,6 @@ import {
 	symbolFilled as symbolFilledIcon,
 } from '@wordpress/icons';
 
-// This mirrors `@wordpress/editor`'s util of the same name. It is duplicated
-// here (rather than shared) to keep this package free of any dependency on the
-// `editor` package.
-
 /**
  * Helper function to retrieve the corresponding icon by area name.
  *

@@ -8,10 +8,6 @@ import { layout } from '@wordpress/icons';
 import { getTemplatePartIcon } from './get-template-part-icon';
 const EMPTY_OBJECT = {};
 
-// This mirrors `@wordpress/editor`'s util of the same name. It is duplicated
-// here (rather than shared) to keep this package free of any dependency on the
-// `editor` package.
-
 /**
  * Helper function to retrieve the corresponding template info for a given template.
  * @param {Object} params

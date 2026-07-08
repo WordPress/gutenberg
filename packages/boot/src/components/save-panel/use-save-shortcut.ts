@@ -12,10 +12,6 @@ import { store as coreStore } from '@wordpress/core-data';
 
 const shortcutName = 'core/boot/save';
 
-// The editor store is provided by the classic @wordpress/editor script, which is
-// loaded lazily (via the canvas / lazy-editor). Referencing it by name here — rather
-// than importing the store descriptor — keeps @wordpress/editor out of boot's eager
-// dependency graph so the editor only loads when there is something to edit.
 const EDITOR_STORE_NAME = 'core/editor';
 
 /**
@@ -60,9 +56,6 @@ export default function useSaveShortcut( {
 		if ( ! hasDirtyEntities || isSaving ) {
 			return;
 		}
-		// The editor store is only registered once the editor has been loaded.
-		// When it isn't present there is nothing post-related to save, so fall
-		// back to the entity-only save panel.
 		const editorSelectors = registry.select( EDITOR_STORE_NAME );
 		if ( ! editorSelectors || editorSelectors.hasNonPostEntityChanges() ) {
 			openSavePanel();
