@@ -78,34 +78,27 @@ function ReadOnlyContent( {
 	);
 }
 
-function EditableContentLoading( { tagName: TagName = 'div' } ) {
-	const blockProps = useBlockProps( { className: 'entry-content' } );
-	return <TagName { ...blockProps } />;
-}
-
 function EditableContentLoaded( {
+	blockProps,
 	blocks,
 	onInput,
 	onChange,
 	tagName: TagName = 'div',
 } ) {
-	const props = useInnerBlocksProps(
-		useBlockProps( { className: 'entry-content' } ),
-		{
-			value: blocks,
-			onInput,
-			onChange,
-			// Show a writing prompt for empty content, even when the block
-			// is not selected, so the content area remains discoverable.
-			renderAppender: blocks?.length
-				? undefined
-				: InnerBlocks.DefaultBlockAppender,
-		}
-	);
+	const props = useInnerBlocksProps( blockProps, {
+		value: blocks,
+		onInput,
+		onChange,
+		// Show a writing prompt for empty content, even when the block
+		// is not selected, so the content area remains discoverable.
+		renderAppender: blocks?.length
+			? undefined
+			: InnerBlocks.DefaultBlockAppender,
+	} );
 	return <TagName { ...props } />;
 }
 
-function EditableContent( { context = {}, tagName } ) {
+function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 	const { postType, postId } = context;
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
@@ -132,16 +125,19 @@ function EditableContent( { context = {}, tagName } ) {
 		[ postType, postId ]
 	);
 
+	const blockProps = useBlockProps( { className: 'entry-content' } );
+
 	if ( ! hasLoadedRecord ) {
-		return <EditableContentLoading tagName={ tagName } />;
+		return <TagName { ...blockProps } />;
 	}
 
 	return (
 		<EditableContentLoaded
+			blockProps={ blockProps }
 			blocks={ blocks }
 			onInput={ onInput }
 			onChange={ onChange }
-			tagName={ tagName }
+			tagName={ TagName }
 		/>
 	);
 }
