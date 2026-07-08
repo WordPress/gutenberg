@@ -43,7 +43,18 @@ const config: StorybookConfig = {
 		disableTelemetry: true,
 	},
 	stories,
-	staticDirs: [ './static' ],
+	staticDirs: [
+		'./static',
+		// Serve the English Emojibase dataset for the Editor/EmojiPicker
+		// story, mirroring the `build/emojibase-data/<locale>/` layout the
+		// Gutenberg plugin exposes via `window.gutenbergEmojibaseUrl`. Only
+		// `en` is mapped (the story pins the document language) to keep the
+		// published Storybook artifact small.
+		{
+			from: '../node_modules/emojibase-data/en',
+			to: '/emojibase-data/en',
+		},
+	],
 	addons: [
 		{
 			name: '@storybook/addon-docs',
