@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { buildInheritedValue, __unstable } from '../build-inherited-value';
+import { buildInheritedValue, privateHelpers } from '../build-inherited-value';
 import {
 	InheritedValueProvider,
 	useInheritedValue,
@@ -23,7 +23,7 @@ const {
 	isRefObject,
 	pickLayerRootContribution,
 	deepMergeDroppingEmpties,
-} = __unstable;
+} = privateHelpers;
 
 jest.mock( '@wordpress/data', () => ( {
 	useSelect: jest.fn(),

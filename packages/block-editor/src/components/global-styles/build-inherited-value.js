@@ -451,9 +451,9 @@ export function buildInheritedValue( args ) {
 	return result;
 }
 
-// Internals exported for tests only — not re-exported from the package
-// root.
-export const __unstable = {
+// Internal helpers exported for unit tests only — not re-exported from the
+// package root.
+export const privateHelpers = {
 	isExplicitEmpty,
 	isRefObject,
 	pickLayerRootContribution,
