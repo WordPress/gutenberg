@@ -71,6 +71,20 @@ test.describe( 'data-wp-input', () => {
 	} );
 
 	/* ------------------------------------------------------------------ */
+	/*  4b. Single select (no default)                                     */
+	/* ------------------------------------------------------------------ */
+	test( 'should work for single select with no pre-selected option', async ( {
+		page,
+	} ) => {
+		const output = page.getByTestId( 'select-none-output' );
+		const input = page.getByTestId( 'select-none-input' );
+
+		await expect( output ).toHaveText( '' );
+		await input.selectOption( 'x' );
+		await expect( output ).toHaveText( 'x' );
+	} );
+
+	/* ------------------------------------------------------------------ */
 	/*  5. Radio group                                                     */
 	/* ------------------------------------------------------------------ */
 	test( 'should bind radio button value to state', async ( { page } ) => {
@@ -86,6 +100,26 @@ test.describe( 'data-wp-input', () => {
 		await expect( output ).toHaveText( 'cat' );
 		expect( await radioDog.isChecked() ).toBe( false );
 		expect( await radioCat.isChecked() ).toBe( true );
+	} );
+
+	/* ------------------------------------------------------------------ */
+	/*  5b. Radio group (no default)                                       */
+	/* ------------------------------------------------------------------ */
+	test( 'should work for radio with no pre-selected option', async ( {
+		page,
+	} ) => {
+		const output = page.getByTestId( 'radio-none-output' );
+		const radioX = page.getByTestId( 'radio-none-x' );
+		const radioY = page.getByTestId( 'radio-none-y' );
+
+		await expect( output ).toHaveText( '' );
+		expect( await radioX.isChecked() ).toBe( false );
+		expect( await radioY.isChecked() ).toBe( false );
+
+		await radioY.check();
+		await expect( output ).toHaveText( 'y' );
+		expect( await radioX.isChecked() ).toBe( false );
+		expect( await radioY.isChecked() ).toBe( true );
 	} );
 
 	/* ------------------------------------------------------------------ */
@@ -185,13 +219,19 @@ test.describe( 'data-wp-input', () => {
 		page,
 	} ) => {
 		const output = page.getByTestId( 'text-output' );
+		const input = page.getByTestId( 'text-input' );
 		const toggleBtn = page.getByTestId( 'toggle-text' );
 
 		await expect( output ).toHaveText( 'hello' );
+		await expect( input ).toHaveValue( 'hello' );
+
 		await toggleBtn.click();
 		await expect( output ).toHaveText( 'world' );
+		await expect( input ).toHaveValue( 'world' );
+
 		await toggleBtn.click();
 		await expect( output ).toHaveText( 'hello' );
+		await expect( input ).toHaveValue( 'hello' );
 	} );
 
 	test( 'should update checkbox when signal changes via action', async ( {
@@ -252,13 +292,12 @@ test.describe( 'data-wp-input', () => {
 	/* ------------------------------------------------------------------ */
 	/*  11. Element→signal seeding (state undefined → adopt DOM value)     */
 	/* ------------------------------------------------------------------ */
-	test.skip( 'should update text input value when signal changes via action', async ( {
+	test( 'should retain HTML value and respond to input for undefined state', async ( {
 		page,
 	} ) => {
-		const output = page.getByTestId( 'seed-output' );
 		const input = page.getByTestId( 'seed-input' );
 
-		// Input should retain its HTML value after hydration.
+		// Input should retain its HTML value after hydration (no clearing).
 		await expect( input ).toHaveValue( 'seeded-from-html' );
 
 		// Typing should still update input value.

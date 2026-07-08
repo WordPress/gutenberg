@@ -81,17 +81,15 @@ const detectDescriptor = (
 				// Datastar parity: default value "on" → boolean;
 				// custom values reflect the checked value or empty string.
 				if ( input.value !== 'on' ) {
-					return signalType === 'boolean'
-						? input.checked
-						: input.checked
-						? input.value
-						: '';
+					if ( signalType === 'boolean' ) {
+						return input.checked;
+					}
+					return input.checked ? input.value : '';
 				}
-				return signalType === 'string'
-					? input.checked
-						? input.value
-						: ''
-					: input.checked;
+				if ( signalType === 'string' ) {
+					return input.checked ? input.value : '';
+				}
+				return input.checked;
 			},
 		};
 	}
@@ -328,9 +326,14 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 				current = peek( syncParent, syncLeaf );
 			}
 		}
-		if ( current != null && current !== PENDING_GETTER ) {
+		if (
+			current !== null &&
+			current !== undefined &&
+			current !== PENDING_GETTER
+		) {
 			syncElementProp( el, desc, current, props );
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ signalValue ] );
 
 	// ---- wire up event handlers ----

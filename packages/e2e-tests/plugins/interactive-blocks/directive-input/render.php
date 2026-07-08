@@ -51,6 +51,18 @@
 		</select>
 	</div>
 
+	<!-- 4b. Single select (no default) -->
+	<div>
+		<p data-wp-text="state.selectNone" data-testid="select-none-output"></p>
+		<select
+			data-testid="select-none-input"
+			data-wp-input="state.selectNone"
+		>
+			<option value="x">X</option>
+			<option value="y">Y</option>
+		</select>
+	</div>
+
 	<!-- 5. Radio group -->
 	<div>
 		<p data-wp-text="state.petRadio" data-testid="radio-output">dog</p>
@@ -72,6 +84,29 @@
 				value="cat"
 			/>
 			Cat
+		</label>
+	</div>
+
+	<!-- 5b. Radio group (no default) -->
+	<div>
+		<p data-wp-text="state.radioNone" data-testid="radio-none-output"></p>
+		<label>
+			<input
+				type="radio"
+				data-testid="radio-none-x"
+				data-wp-input="state.radioNone"
+				value="x"
+			/>
+			X
+		</label>
+		<label>
+			<input
+				type="radio"
+				data-testid="radio-none-y"
+				data-wp-input="state.radioNone"
+				value="y"
+			/>
+			Y
 		</label>
 	</div>
 
