@@ -1126,6 +1126,7 @@ test.describe( 'Block Notes', () => {
 				comment: 'Open the full picker',
 			} );
 
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
 			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 
 			await blockNoteUtils.waitForFullPicker();
@@ -1151,6 +1152,7 @@ test.describe( 'Block Notes', () => {
 			// regex-based gridcell lookup would otherwise pick up the
 			// first "heart"-containing label (e.g. "smiling face with
 			// hearts") instead of the curated red heart.
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
 			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 			await page.getByPlaceholder( 'Search emoji' ).fill( 'Heart' );
@@ -1210,6 +1212,7 @@ test.describe( 'Block Notes', () => {
 				comment: 'Close picker with Escape',
 			} );
 
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
 			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 
@@ -1230,6 +1233,7 @@ test.describe( 'Block Notes', () => {
 				comment: 'Empty search state',
 			} );
 
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
 			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 
@@ -1313,6 +1317,7 @@ test.describe( 'Block Notes', () => {
 				comment: 'Tight layout',
 			} );
 
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
 			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 
@@ -1344,6 +1349,7 @@ test.describe( 'Block Notes', () => {
 				comment: 'Grid fill',
 			} );
 
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
 			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 
@@ -2075,13 +2081,17 @@ class BlockNoteUtils {
 	}
 
 	/**
-	 * Click the + button to open the full emoji picker, search by name,
+	 * Open the add-reaction popover, click its trailing + option to
+	 * swap in the full emoji picker, search by name,
 	 * and click the first matching emoji.
 	 *
 	 * @param {string} search Search term (matched against Emojibase
 	 *                        labels, e.g. "red heart" or "thumbs up").
 	 */
 	async pickFullPickerEmojiBySearch( search ) {
+		await this.#page
+			.getByRole( 'button', { name: 'Add reaction' } )
+			.click();
 		await this.#page.getByRole( 'button', { name: 'More emojis' } ).click();
 		await this.waitForFullPicker();
 

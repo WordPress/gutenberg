@@ -5,7 +5,6 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import { Button, Dropdown } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { SVG, Path } from '@wordpress/primitives';
-import { plus as plusIcon } from '@wordpress/icons';
 import { useState, useCallback, lazy, Suspense } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -319,8 +318,14 @@ export default function ReactionDisplay( {
 }
 
 /**
- * Standalone add-reaction button with the curated emoji picker
- * dropdown (the 5-emoji quick row).
+ * Standalone add-reaction button. Opens the curated emoji quick row
+ * (5 emoji); its trailing `+` option swaps the popover content to the
+ * full searchable picker, so a single trigger covers both.
+ *
+ * The `+` option only renders when `window.gutenbergEmojibaseUrl` is
+ * set — the Gutenberg plugin sets it via PHP, but npm consumers of the
+ * editor package must opt in by providing a URL pointing at a
+ * self-hosted emojibase dataset.
  *
  * @param {Object}   props                  Component props.
  * @param {number}   props.noteId           The parent note comment ID.
@@ -333,10 +338,18 @@ export function AddReactionButton( {
 	disabled = false,
 	onToggleReaction,
 } ) {
+	const [ isFullPicker, setIsFullPicker ] = useState( false );
+	const hasFullPicker =
+		typeof window !== 'undefined' && !! window.gutenbergEmojibaseUrl;
+
 	return (
 		<Dropdown
 			popoverProps={ POPOVER_PROPS }
-			contentClassName="editor-collab-sidebar-panel__add-reaction-popover"
+			contentClassName={
+				isFullPicker
+					? 'editor-collab-sidebar-panel__picker-popover'
+					: 'editor-collab-sidebar-panel__add-reaction-popover'
+			}
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					size="small"
@@ -346,82 +359,64 @@ export function AddReactionButton( {
 					aria-expanded={ isOpen }
 					disabled={ disabled }
 					accessibleWhenDisabled
-					onClick={ onToggle }
-				/>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<ReactionEmojiPicker
-					onSelect={ ( slug ) => {
-						onClose();
-						// Invalidate cached tooltip names since adding this
-						// reaction changes the set of users for the slug.
-						delete reactionNamesCache[ `${ noteId }:${ slug }` ];
-						onToggleReaction( slug );
+					onClick={ () => {
+						// Always reopen on the curated quick row.
+						setIsFullPicker( false );
+						onToggle();
 					} }
 				/>
 			) }
-		/>
-	);
-}
+			renderContent={ ( { onClose } ) => {
+				const pickReaction = ( slug ) => {
+					onClose();
+					// Invalidate cached tooltip names since adding this
+					// reaction changes the set of users for the slug.
+					delete reactionNamesCache[ `${ noteId }:${ slug }` ];
+					onToggleReaction( slug );
+				};
 
-/**
- * Standalone "+" button that opens the full emoji picker. Sibling of
- * AddReactionButton; not nested inside it so the curated and full picker
- * popovers never conflict.
- *
- * Renders nothing when `window.gutenbergEmojibaseUrl` is unset — the
- * Gutenberg plugin sets it via PHP, but npm consumers of @wordpress/editor
- * must opt in by providing a URL pointing at a self-hosted emojibase
- * dataset.
- *
- * @param {Object}   props                  Component props.
- * @param {Function} props.onToggleReaction Callback to toggle a reaction.
- */
-export function MoreEmojiButton( { onToggleReaction } ) {
-	if ( typeof window === 'undefined' || ! window.gutenbergEmojibaseUrl ) {
-		return null;
-	}
-	return (
-		<Dropdown
-			popoverProps={ POPOVER_PROPS }
-			contentClassName="editor-collab-sidebar-panel__picker-popover"
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
-					size="small"
-					className="editor-collab-sidebar-panel__more-reaction-button"
-					icon={ plusIcon }
-					label={ __( 'More emojis' ) }
-					aria-expanded={ isOpen }
-					onClick={ onToggle }
-					// Warm up the picker while the user is still deciding:
-					// hovering or focusing the trigger starts loading the
-					// lazy picker module and the Emojibase dataset, so the
-					// popover usually opens fully populated.
-					onMouseEnter={ prefetchFullPicker }
-					onFocus={ prefetchFullPicker }
-				/>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<Suspense
-					fallback={
-						<div className="editor-collab-sidebar-panel__picker">
-							<div
-								className="editor-collab-sidebar-panel__picker-status"
-								role="status"
-							>
-								{ __( 'Loading…' ) }
-							</div>
-						</div>
-					}
-				>
-					<FullEmojiPicker
-						onSelect={ ( emoji ) => {
-							onClose();
-							onToggleReaction( emojiToStorageKey( emoji ) );
-						} }
+				if ( isFullPicker ) {
+					return (
+						<Suspense
+							fallback={
+								<div className="editor-collab-sidebar-panel__picker">
+									<div
+										className="editor-collab-sidebar-panel__picker-status"
+										role="status"
+									>
+										{ __( 'Loading…' ) }
+									</div>
+								</div>
+							}
+						>
+							<FullEmojiPicker
+								onSelect={ ( emoji ) =>
+									pickReaction( emojiToStorageKey( emoji ) )
+								}
+							/>
+						</Suspense>
+					);
+				}
+
+				return (
+					<ReactionEmojiPicker
+						onSelect={ pickReaction }
+						onMore={
+							hasFullPicker
+								? () => setIsFullPicker( true )
+								: undefined
+						}
+						// Warm up the picker while the user is still
+						// deciding: hovering or focusing the `+` starts
+						// loading the lazy picker module and the Emojibase
+						// dataset, so the swapped-in view usually renders
+						// fully populated.
+						onMoreHover={
+							hasFullPicker ? prefetchFullPicker : undefined
+						}
 					/>
-				</Suspense>
-			) }
+				);
+			} }
 		/>
 	);
 }

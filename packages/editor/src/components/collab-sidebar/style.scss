@@ -265,6 +265,13 @@ mark.wp-note {
 // padding (8px) for breathing room around the listbox; no extra rule
 // needed.
 
+// Lays out the curated listbox and the trailing `+` "More emojis"
+// button (a sibling of the listbox, not one of its options) as a
+// single row.
+.editor-collab-sidebar-panel__emoji-picker-row {
+	display: flex;
+}
+
 .editor-collab-sidebar-panel__emoji-picker {
 	display: flex;
 }

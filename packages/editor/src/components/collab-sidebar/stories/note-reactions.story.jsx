@@ -12,10 +12,7 @@ import { Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import ReactionDisplay, {
-	AddReactionButton,
-	MoreEmojiButton,
-} from '../reaction-display';
+import ReactionDisplay, { AddReactionButton } from '../reaction-display';
 
 /**
  * Sample reaction summary, keyed by reaction slug. Curated reactions are
@@ -31,10 +28,10 @@ const INITIAL_REACTIONS = {
 /**
  * The complete Notes reaction row as rendered in the collab sidebar
  * (see `note.js`): the smiley button opens the curated 5-emoji quick
- * row, the plus button opens the full searchable emoji picker, and
- * existing reactions render as toggleable count pills.
+ * row, whose trailing `+` option swaps in the full searchable emoji
+ * picker, and existing reactions render as toggleable count pills.
  *
- * State is simulated locally so picking an emoji from either popover
+ * State is simulated locally so picking an emoji from either view
  * adds/toggles a pill just like it does against a real site. User-name
  * tooltips fall back to plain counts because there is no REST API in
  * Storybook.
@@ -74,7 +71,6 @@ function NoteReactions( { onToggleReaction } ) {
 				noteId={ 1 }
 				onToggleReaction={ toggleReaction }
 			/>
-			<MoreEmojiButton onToggleReaction={ toggleReaction } />
 			<ReactionDisplay
 				noteId={ 1 }
 				reactions={ reactions }

@@ -117,6 +117,15 @@ export default function EmojiPicker( { onSelect } ) {
 	);
 	const [ query, setQuery ] = useState( '' );
 	const viewportRef = useRef( null );
+	const searchRef = useRef( null );
+
+	// Focus the search field on mount. The picker is swapped into the
+	// add-reaction popover when the quick row's `+` option is clicked,
+	// and that option unmounts with the quick row — without this the
+	// focus would fall back to the document body.
+	useEffect( () => {
+		searchRef.current?.focus();
+	}, [] );
 
 	/**
 	 * Resolve the user-facing label for an emoji record. Prefers the
@@ -202,6 +211,7 @@ export default function EmojiPicker( { onSelect } ) {
 		<div className="editor-collab-sidebar-panel__picker">
 			<div className="editor-collab-sidebar-panel__picker-search">
 				<SearchControl
+					ref={ searchRef }
 					value={ query }
 					onChange={ setQuery }
 					placeholder={ __( 'Search emoji' ) }

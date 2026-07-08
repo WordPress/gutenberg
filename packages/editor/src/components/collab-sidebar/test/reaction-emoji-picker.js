@@ -61,4 +61,32 @@ describe( 'ReactionEmojiPicker', () => {
 		expect( onSelect ).toHaveBeenCalledTimes( 1 );
 		expect( onSelect ).toHaveBeenCalledWith( 'smile' );
 	} );
+
+	it( 'omits the "More emojis" trigger unless onMore is provided', () => {
+		render( <ReactionEmojiPicker onSelect={ () => {} } /> );
+
+		expect(
+			screen.queryByRole( 'button', { name: 'More emojis' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'renders the "More emojis" trigger outside the listbox and calls onMore', async () => {
+		const user = userEvent.setup();
+		const onMore = jest.fn();
+		render(
+			<ReactionEmojiPicker onSelect={ () => {} } onMore={ onMore } />
+		);
+
+		// The trigger is an action, not a selectable value, so it must not
+		// be one of the listbox options.
+		expect( screen.getAllByRole( 'option' ) ).toHaveLength(
+			REACTION_EMOJIS.length
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'More emojis' } )
+		);
+
+		expect( onMore ).toHaveBeenCalledTimes( 1 );
+	} );
 } );
