@@ -967,4 +967,39 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertArrayHasKey( 'reaction_summary', $data );
 		$this->assertEmpty( $data['reaction_summary'] );
 	}
+
+	public function test_notes_and_reactions_excluded_from_comment_count() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+
+		self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_approved' => 1,
+			)
+		);
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+		self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'reaction',
+				'comment_parent'   => $note_id,
+				'comment_content'  => 'heart',
+				'comment_approved' => 1,
+				'user_id'          => self::$editor_id,
+			)
+		);
+
+		// Recount from the database so the assertion exercises the
+		// filtered `wp_update_comment_count_now()` query directly rather
+		// than the incremental adjustments comment creation applied.
+		wp_update_comment_count_now( $post_id );
+		clean_post_cache( $post_id );
+
+		$this->assertSame(
+			'1',
+			get_post( $post_id )->comment_count,
+			'Only the regular comment should be counted; notes and reactions must be excluded.'
+		);
+	}
 }

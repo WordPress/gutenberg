@@ -66,21 +66,12 @@ function gutenberg_strip_inline_note_markers( $block_content ) {
 	// phpcs:disable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
 	$processor = new class( $block_content ) extends WP_HTML_Tag_Processor {
 		/**
-		 * Gets the span for the current token.
-		 *
-		 * @return WP_HTML_Span Current token span.
-		 */
-		private function get_span() {
-			// Always called after next_tag() returned true, so the bookmark is set.
-			$this->set_bookmark( 'here' );
-			return $this->bookmarks['here'];
-		}
-
-		/**
 		 * Removes the current token, keeping any text it wraps.
 		 */
-		public function remove_token() {
-			$span = $this->get_span();
+		public function remove_token(): void {
+			// Always called after next_tag() returned true, so the bookmark is set.
+			$this->set_bookmark( 'here' );
+			$span = $this->bookmarks['here'];
 
 			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $span->start, $span->length, '' );
 		}
@@ -271,27 +262,27 @@ function gutenberg_get_note_reaction_emojis() {
 	$default_emojis = array(
 		array(
 			'emoji' => '❤️',
-			'label' => __( 'Heart', 'gutenberg' ),
+			'label' => _x( 'Heart', 'emoji reaction', 'gutenberg' ),
 			'value' => 'heart',
 		),
 		array(
 			'emoji' => '🎉',
-			'label' => __( 'Celebration', 'gutenberg' ),
+			'label' => _x( 'Celebration', 'emoji reaction', 'gutenberg' ),
 			'value' => 'celebration',
 		),
 		array(
 			'emoji' => '😄',
-			'label' => __( 'Smile', 'gutenberg' ),
+			'label' => _x( 'Smile', 'emoji reaction', 'gutenberg' ),
 			'value' => 'smile',
 		),
 		array(
 			'emoji' => '👀',
-			'label' => __( 'Eyes', 'gutenberg' ),
+			'label' => _x( 'Eyes', 'emoji reaction', 'gutenberg' ),
 			'value' => 'eyes',
 		),
 		array(
 			'emoji' => '🚀',
-			'label' => __( 'Rocket', 'gutenberg' ),
+			'label' => _x( 'Rocket', 'emoji reaction', 'gutenberg' ),
 			'value' => 'rocket',
 		),
 	);

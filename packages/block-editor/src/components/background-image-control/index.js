@@ -579,7 +579,6 @@ function BackgroundSizeControls( {
 				onChange={ toggleScrollWithPage }
 			/>
 			<ToggleGroupControl
-				size="__unstable-large"
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
 				onChange={ updateBackgroundSize }
@@ -618,7 +617,6 @@ function BackgroundSizeControls( {
 					aria-label={ __( 'Background image width' ) }
 					onChange={ updateBackgroundSize }
 					value={ sizeValue }
-					size="__unstable-large"
 					__unstableInputWidth="100px"
 					min={ 0 }
 					placeholder={ __( 'Auto' ) }

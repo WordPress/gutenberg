@@ -644,7 +644,6 @@ export default function TypographyPanel( {
 						hasFontStyles={ hasFontStyles }
 						hasFontWeights={ hasFontWeights }
 						fontFamilyFaces={ fontFamilyFaces }
-						size="__unstable-large"
 					/>
 				</ToolsPanelItem>
 			) }
@@ -719,7 +718,6 @@ export default function TypographyPanel( {
 						max={ MAX_TEXT_COLUMNS }
 						min={ MIN_TEXT_COLUMNS }
 						onChange={ setTextColumns }
-						size="__unstable-large"
 						spinControls="custom"
 						value={ textColumns }
 						initialPosition={ 1 }

@@ -18,29 +18,6 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
 }
 
 .emotion-4 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: stretch;
-  -webkit-box-align: stretch;
-  -ms-flex-align: stretch;
-  align-items: stretch;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  gap: calc(4px * 1);
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-}
-
-.emotion-4>* {
-  min-height: 0;
-}
-
-.emotion-6 {
   font-size: 11px;
   font-weight: 499;
   line-height: 1.4;
@@ -48,75 +25,6 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   display: block;
   margin-bottom: calc(4px * 2);
   padding: 0;
-}
-
-.emotion-8 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: stretch;
-  -webkit-box-align: stretch;
-  -ms-flex-align: stretch;
-  align-items: stretch;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  gap: calc(4px * 3);
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-}
-
-.emotion-8>* {
-  min-height: 0;
-}
-
-.emotion-10 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: stretch;
-  -webkit-box-align: stretch;
-  -ms-flex-align: stretch;
-  align-items: stretch;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  gap: 0;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-}
-
-.emotion-10>* {
-  min-height: 0;
-}
-
-.emotion-12 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: stretch;
-  -webkit-box-align: stretch;
-  -ms-flex-align: stretch;
-  align-items: stretch;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  gap: calc(4px * 0.5);
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-}
-
-.emotion-12>* {
-  min-height: 0;
 }
 
 <div>
@@ -130,16 +38,17 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
         class="block-editor-color-gradient-control__fieldset"
       >
         <div
-          class="components-flex components-h-stack components-v-stack emotion-4 emotion-5"
+          class="style-flex style-items-column components-flex components-h-stack components-v-stack"
           data-wp-c16t="true"
           data-wp-component="VStack"
+          style="--wp-components-flex-align: stretch; --wp-components-flex-direction: column; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 1); --wp-components-flex-justify: center;"
         >
           <legend>
             <div
               class="block-editor-color-gradient-control__color-indicator"
             >
               <span
-                class="components-base-control__label emotion-6 emotion-7"
+                class="components-base-control__label emotion-4 emotion-5"
               >
                 Test Color
               </span>
@@ -149,18 +58,20 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             class="block-editor-color-gradient-control__panel"
           >
             <div
-              class="components-flex components-h-stack components-v-stack emotion-8 emotion-5"
+              class="style-flex style-items-column components-flex components-h-stack components-v-stack"
               data-wp-c16t="true"
               data-wp-component="VStack"
+              style="--wp-components-flex-align: stretch; --wp-components-flex-direction: column; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 3); --wp-components-flex-justify: center;"
             >
               <div
                 class="components-dropdown"
                 tabindex="-1"
               >
                 <div
-                  class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-wrapper emotion-10 emotion-5"
+                  class="style-flex style-items-column components-flex components-h-stack components-v-stack components-color-palette__custom-color-wrapper"
                   data-wp-c16t="true"
                   data-wp-component="VStack"
+                  style="--wp-components-flex-align: stretch; --wp-components-flex-direction: column; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: 0; --wp-components-flex-justify: center;"
                 >
                   <button
                     aria-expanded="false"
@@ -171,19 +82,20 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                     type="button"
                   />
                   <div
-                    class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper emotion-12 emotion-5"
+                    class="style-flex style-items-column components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper"
                     data-wp-c16t="true"
                     data-wp-component="VStack"
+                    style="--wp-components-flex-align: stretch; --wp-components-flex-direction: column; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 0.5); --wp-components-flex-justify: center;"
                   >
                     <span
-                      class="style-truncate components-truncate components-color-palette__custom-color-name emotion-14 emotion-5"
+                      class="style-truncate components-truncate components-color-palette__custom-color-name"
                       data-wp-c16t="true"
                       data-wp-component="Truncate"
                     >
                       red
                     </span>
                     <span
-                      class="style-truncate components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
+                      class="style-truncate components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex"
                       data-wp-c16t="true"
                       data-wp-component="Truncate"
                     >
