@@ -19,14 +19,21 @@ import styles from './style.module.css';
  * The last item represents the current page and its `to` prop is optional.
  * Only the last item (when it has no `to` prop) is rendered as an `h1`.
  *
+ * Link items may also forward router `search` (query params), `params`
+ * (dynamic path params), and `hash` to the underlying `@wordpress/route`
+ * `Link`, so navigating to a parent crumb can preserve URL state such as
+ * active filters or sort order.
+ *
  * @param props
- * @param props.items The breadcrumb items to display.
+ * @param props.items The breadcrumb items to display. Each item accepts
+ *                    `label`, optional `to`, and optional `search`, `params`,
+ *                    and `hash` for link items.
  *
  * @example
  * ```jsx
  * <Breadcrumbs
  *   items={ [
- *     { label: 'Home', to: '/' },
+ *     { label: 'Home', to: '/', search: { filter: 'active' } },
  *     { label: 'Settings', to: '/settings' },
  *     { label: 'General' },
  *   ] }
@@ -65,7 +72,14 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 							render={
 								<Link
 									tone="neutral"
-									render={ <RouterLink to={ item.to } /> }
+									render={
+										<RouterLink
+											to={ item.to }
+											search={ item.search as never }
+											params={ item.params as never }
+											hash={ item.hash }
+										/>
+									}
 								/>
 							}
 						>
@@ -87,7 +101,14 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 							render={
 								<Link
 									tone="neutral"
-									render={ <RouterLink to={ lastItem.to } /> }
+									render={
+										<RouterLink
+											to={ lastItem.to }
+											search={ lastItem.search as never }
+											params={ lastItem.params as never }
+											hash={ lastItem.hash }
+										/>
+									}
 								/>
 							}
 						>

@@ -43,3 +43,22 @@ export const ThreeLevels: Story = {
 		],
 	},
 };
+
+export const WithSearchParams: Story = {
+	args: {
+		items: [
+			{
+				label: 'Root breadcrumb',
+				to: '/settings',
+				search: { filter: 'active', sort: 'name' },
+			},
+			{
+				label: 'Level 1 breadcrumb',
+				to: '/settings/connectors',
+				search: { filter: 'active' },
+				params: { connectorId: 'example' },
+			},
+			{ label: 'Level 2 breadcrumb' },
+		],
+	},
+};

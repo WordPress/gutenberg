@@ -45,12 +45,14 @@ Renders a breadcrumb navigation trail.
 
 All items except the last one must provide a `to` prop for navigation. In development mode, an error is thrown when a non-last item is missing `to`. The last item represents the current page and its `to` prop is optional. Only the last item (when it has no `to` prop) is rendered as an `h1`.
 
+Link items may also forward router `search` (query params), `params` (dynamic path params), and `hash` to the underlying `@wordpress/route` `Link`, so navigating to a parent crumb can preserve URL state such as active filters or sort order.
+
 _Usage_
 
 ```jsx
 <Breadcrumbs
 	items={ [
-		{ label: 'Home', to: '/' },
+		{ label: 'Home', to: '/', search: { filter: 'active' } },
 		{ label: 'Settings', to: '/settings' },
 		{ label: 'General' },
 	] }
@@ -60,7 +62,7 @@ _Usage_
 _Parameters_
 
 -   _props_ `BreadcrumbsProps`:
--   _props.items_ `BreadcrumbsProps[ 'items' ]`: The breadcrumb items to display.
+-   _props.items_ `BreadcrumbsProps[ 'items' ]`: The breadcrumb items to display. Each item accepts `label`, optional `to`, and optional `search`, `params`, and `hash` for link items.
 
 ### getAdminThemeColors
 

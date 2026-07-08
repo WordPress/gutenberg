@@ -9,9 +9,42 @@ import { render, screen } from '@testing-library/react';
 import { Breadcrumbs } from '..';
 
 jest.mock( '@wordpress/route', () => ( {
-	Link: ( { to, children }: { to: string; children: React.ReactNode } ) => (
-		<a href={ to }>{ children }</a>
-	),
+	Link: ( {
+		to,
+		children,
+		search,
+		params,
+		hash,
+	}: {
+		to: string;
+		children: React.ReactNode;
+		search?: Record< string, unknown >;
+		params?: Record< string, unknown >;
+		hash?: string;
+	} ) => {
+		const searchString =
+			search && Object.keys( search ).length
+				? '?' +
+				  new URLSearchParams(
+						Object.fromEntries(
+							Object.entries( search ).map(
+								( [ key, value ] ) => [ key, String( value ) ]
+							)
+						)
+				  ).toString()
+				: '';
+		const href = `${ to }${ searchString }${ hash ? `#${ hash }` : '' }`;
+
+		return (
+			<a
+				href={ href }
+				data-params={ params ? JSON.stringify( params ) : undefined }
+				data-hash={ hash }
+			>
+				{ children }
+			</a>
+		);
+	},
 } ) );
 
 describe( 'Breadcrumbs', () => {
@@ -164,6 +197,100 @@ describe( 'Breadcrumbs', () => {
 			expect(
 				screen.getByRole( 'navigation', { name: 'Breadcrumbs' } )
 			).toBeInTheDocument();
+		} );
+
+		it( 'should forward search from a preceding item to its link', () => {
+			render(
+				<Breadcrumbs
+					items={ [
+						{
+							label: 'Home',
+							to: '/',
+							search: { filter: 'active', page: 2 },
+						},
+						{ label: 'Current Page' },
+					] }
+				/>
+			);
+
+			const link = screen.getByRole( 'link', { name: 'Home' } );
+			expect( link ).toHaveAttribute( 'href', '/?filter=active&page=2' );
+		} );
+
+		it( 'should forward search from the last item when it has `to`', () => {
+			render(
+				<Breadcrumbs
+					items={ [
+						{ label: 'Home', to: '/' },
+						{
+							label: 'Settings',
+							to: '/settings',
+							search: { tab: 'general' },
+						},
+					] }
+				/>
+			);
+
+			const link = screen.getByRole( 'link', { name: 'Settings' } );
+			expect( link ).toHaveAttribute( 'href', '/settings?tab=general' );
+		} );
+
+		it( 'should forward params to breadcrumb links', () => {
+			render(
+				<Breadcrumbs
+					items={ [
+						{
+							label: 'Post',
+							to: '/posts/$postId',
+							params: { postId: '42' },
+						},
+						{ label: 'Edit' },
+					] }
+				/>
+			);
+
+			const link = screen.getByRole( 'link', { name: 'Post' } );
+			expect( link ).toHaveAttribute(
+				'data-params',
+				JSON.stringify( { postId: '42' } )
+			);
+		} );
+
+		it( 'should forward hash to breadcrumb links', () => {
+			render(
+				<Breadcrumbs
+					items={ [
+						{
+							label: 'Settings',
+							to: '/settings',
+							hash: 'advanced',
+						},
+						{ label: 'General' },
+					] }
+				/>
+			);
+
+			const link = screen.getByRole( 'link', { name: 'Settings' } );
+			expect( link ).toHaveAttribute( 'href', '/settings#advanced' );
+			expect( link ).toHaveAttribute( 'data-hash', 'advanced' );
+		} );
+
+		it( 'should render links without search, params, or hash unchanged', () => {
+			render(
+				<Breadcrumbs
+					items={ [
+						{ label: 'Home', to: '/' },
+						{ label: 'Settings', to: '/settings' },
+						{ label: 'General' },
+					] }
+				/>
+			);
+
+			const links = screen.getAllByRole( 'link' );
+			expect( links[ 0 ] ).toHaveAttribute( 'href', '/' );
+			expect( links[ 0 ] ).not.toHaveAttribute( 'data-params' );
+			expect( links[ 0 ] ).not.toHaveAttribute( 'data-hash' );
+			expect( links[ 1 ] ).toHaveAttribute( 'href', '/settings' );
 		} );
 	} );
 } );

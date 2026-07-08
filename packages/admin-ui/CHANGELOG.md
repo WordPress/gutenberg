@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Breadcrumbs: forward `search`, `params`, and `hash` to breadcrumb links so crumbs can preserve router state. ([#PR](https://github.com/WordPress/gutenberg/pull/PR))
+
 ## 2.5.0 (2026-07-01)
 
 ## 2.4.0 (2026-06-24)

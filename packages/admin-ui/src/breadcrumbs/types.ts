@@ -10,6 +10,18 @@ export interface BreadcrumbItem {
 	 * All preceding items should provide a `to` prop.
 	 */
 	to?: string;
+
+	/**
+	 * Router search (query) params to forward to the link, so navigating to this
+	 * crumb preserves URL state. Only applies to items rendered as links.
+	 */
+	search?: Record< string, unknown >;
+
+	/** Router path params to forward to the link (for dynamic `to` paths). */
+	params?: Record< string, unknown >;
+
+	/** URL hash fragment to forward to the link. */
+	hash?: string;
 }
 
 export interface BreadcrumbsProps extends React.HTMLAttributes< HTMLElement > {
@@ -18,6 +30,8 @@ export interface BreadcrumbsProps extends React.HTMLAttributes< HTMLElement > {
 	 * The last item is considered the current item and has an optional `to` prop.
 	 * All preceding items must have a `to` prop — in development mode,
 	 * an error is thrown when this requirement is not met.
+	 * Each item accepts `label`, optional `to`, and optional `search`,
+	 * `params`, and `hash` for link items.
 	 */
 	items: BreadcrumbItem[];
 	/**
