@@ -34,7 +34,7 @@ function FontSize() {
 	const origin = params.origin as string;
 	const slug = params.slug as string;
 
-	const { presets, update, remove, rename } = usePresets< FontSizeType >(
+	const { presets, setPresets } = usePresets< FontSizeType >(
 		'typography.fontSizes',
 		origin
 	);
@@ -62,7 +62,13 @@ function FontSize() {
 	const isCustomFluid = typeof fontSize.fluid === 'object';
 
 	const set = ( key: keyof FontSizeType, value: unknown ) =>
-		update( slug, { ...fontSize, [ key ]: value } as FontSizeType );
+		setPresets(
+			presets.map( ( p ) =>
+				p.slug === slug
+					? ( { ...fontSize, [ key ]: value } as FontSizeType )
+					: p
+			)
+		);
 
 	const handleCustomFluidValues = ( value: boolean ) => {
 		if ( value ) {
@@ -184,7 +190,9 @@ function FontSize() {
 					) }
 					isOpen={ isDeleteOpen }
 					toggleOpen={ () => setIsDeleteOpen( false ) }
-					onConfirm={ () => remove( slug ) }
+					onConfirm={ () =>
+						setPresets( presets.filter( ( p ) => p.slug !== slug ) )
+					}
 				/>
 			) }
 			{ isRenameOpen && (
@@ -192,7 +200,13 @@ function FontSize() {
 					initialName={ fontSize.name }
 					placeholder={ __( 'Font size preset name' ) }
 					toggleOpen={ () => setIsRenameOpen( false ) }
-					onRename={ ( name ) => rename( slug, name ) }
+					onRename={ ( name ) =>
+						setPresets(
+							presets.map( ( p ) =>
+								p.slug === slug ? { ...p, name } : p
+							)
+						)
+					}
 				/>
 			) }
 		</>

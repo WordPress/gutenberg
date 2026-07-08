@@ -42,12 +42,15 @@ export default function FontSizes() {
 
 	const addFontSize = () => {
 		const index = getNewIndexFromPresets( custom.presets, 'custom-' );
-		custom.add( {
-			/* translators: %d: font size index */
-			name: sprintf( __( 'New Font Size %d' ), index ),
-			size: '16px',
-			slug: `custom-${ index }`,
-		} );
+		custom.setPresets( [
+			...custom.presets,
+			{
+				/* translators: %d: font size index */
+				name: sprintf( __( 'New Font Size %d' ), index ),
+				size: '16px',
+				slug: `custom-${ index }`,
+			},
+		] );
 	};
 
 	return (
@@ -124,7 +127,8 @@ export default function FontSizes() {
 												'Are you sure you want to remove all custom font size presets?'
 											),
 											confirmButtonText: __( 'Remove' ),
-											onConfirm: custom.removeAll,
+											onConfirm: () =>
+												custom.setPresets( [] ),
 									  }
 									: undefined
 							}
