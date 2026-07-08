@@ -13,7 +13,8 @@ const { state, actions } = store( 'directive-input', {
 		rangeVal: 50,
 		textareaVal: 'default',
 		multiPet: [ 'dog' ],
-		tags: [ 'a', '' ],
+		tags0: 'a',
+		tags1: '',
 	},
 	actions: {
 		toggleText() {

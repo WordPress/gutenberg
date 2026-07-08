@@ -109,15 +109,15 @@
 		</select>
 	</div>
 
-	<!-- 9. Checkbox group (explicit indices → array) -->
+	<!-- 9. Checkbox group (top-level properties) -->
 	<div>
-		<p data-wp-text="state.tags.0" data-testid="checkbox-group-output-a">a</p>
-		<p data-wp-text="state.tags.1" data-testid="checkbox-group-output-b"></p>
+		<p data-wp-text="state.tags0" data-testid="checkbox-group-output-a">a</p>
+		<p data-wp-text="state.tags1" data-testid="checkbox-group-output-b"></p>
 		<label>
 			<input
 				type="checkbox"
 				data-testid="checkbox-group-a"
-				data-wp-input="state.tags.0"
+				data-wp-input="state.tags0"
 				value="a"
 				checked
 			/>
@@ -127,7 +127,7 @@
 			<input
 				type="checkbox"
 				data-testid="checkbox-group-b"
-				data-wp-input="state.tags.1"
+				data-wp-input="state.tags1"
 				value="b"
 			/>
 			B
