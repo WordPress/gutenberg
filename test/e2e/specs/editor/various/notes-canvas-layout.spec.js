@@ -167,6 +167,65 @@ test.describe( 'Notes canvas layout', () => {
 		expect( hitsCover ).toBe( false );
 	} );
 
+	test( 'floating note is centered in the space reserved beside full-width content', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/cover',
+			attributes: {
+				align: 'full',
+				customOverlayColor: '#111111',
+				minHeight: 2000,
+			},
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Full width cover' },
+				},
+			],
+		} );
+		// Select the cover block (parent of the selected paragraph).
+		await page.keyboard.press( 'Escape' );
+		await editor.canvas
+			.locator( '[data-type="core/cover"]' )
+			.first()
+			.click( { position: { x: 10, y: 10 } } );
+		await addNote( page, editor, 'Centered note' );
+
+		const thread = page.locator( '.editor-collab-sidebar-panel__thread' );
+		await expect( thread ).toBeVisible();
+
+		const threadBox = await thread.boundingBox();
+		const coverBox = await editor.canvas
+			.locator( '[data-type="core/cover"]' )
+			.first()
+			.boundingBox();
+		const canvasBox = await page
+			.locator( 'iframe[name="editor-canvas"]' )
+			.boundingBox();
+		// The reserved space is bounded by the full-width content on one side
+		// and the canvas scrollbar (at the content edge, inside the iframe) on
+		// the other. A tall cover forces the scrollbar so this exercises the
+		// scrollbar-width offset.
+		const contentEdge = await editor.canvas
+			.locator( 'body' )
+			.evaluate(
+				( body ) => body.ownerDocument.documentElement.clientWidth
+			);
+
+		const gapStart = coverBox.x + coverBox.width;
+		const gapEnd = canvasBox.x + contentEdge;
+		const leftMargin = threadBox.x - gapStart;
+		const rightMargin = gapEnd - ( threadBox.x + threadBox.width );
+
+		// The note must sit inside the reserved gap with balanced margins,
+		// not tucked against the scrollbar.
+		expect( leftMargin ).toBeGreaterThan( 0 );
+		expect( rightMargin ).toBeGreaterThan( 0 );
+		expect( Math.abs( leftMargin - rightMargin ) ).toBeLessThan( 4 );
+	} );
+
 	test( 'floating notes remain visible when the Settings sidebar is open', async ( {
 		editor,
 		page,
