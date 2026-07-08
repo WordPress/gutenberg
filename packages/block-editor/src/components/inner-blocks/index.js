@@ -63,6 +63,8 @@ function UncontrolledInnerBlocks( props ) {
 		__experimentalDirectInsert,
 		template,
 		templateLock,
+		value,
+		onChange,
 		wrapperRef,
 		templateInsertUpdatesSelection,
 		__experimentalCaptureToolbars: captureToolbars,
@@ -96,7 +98,10 @@ function UncontrolledInnerBlocks( props ) {
 		clientId,
 		template,
 		templateLock,
-		templateInsertUpdatesSelection
+		templateInsertUpdatesSelection,
+		// Controlled inner blocks receive their content from an entity, so
+		// the block type template does not apply to them.
+		! ( value && onChange )
 	);
 
 	const defaultLayoutBlockSupport =
@@ -155,6 +160,9 @@ function ControlledInnerBlocks( props ) {
 	useBlockSync( props );
 	return <UncontrolledInnerBlocks { ...props } />;
 }
+
+// Exported for unit tests.
+export { ControlledInnerBlocks as __privateControlledInnerBlocks };
 
 const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
 	const innerBlocksProps = useInnerBlocksProps( { ref }, props );

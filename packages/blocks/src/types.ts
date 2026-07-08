@@ -292,6 +292,14 @@ export interface BlockType<
 	 */
 	allowedBlocks?: string[];
 	/**
+	 * Initial child blocks created when an empty block of this type
+	 * is inserted, as a list of `[ name, attributes, innerTemplate ]`
+	 * items.
+	 */
+	template?: Array<
+		[ string, Record< string, unknown >?, Array< unknown >? ]
+	>;
+	/**
 	 * Context provided for available access by descendants of
 	 * blocks of this type, in the form of an object which maps
 	 * a context name to one of the block's own attributes.

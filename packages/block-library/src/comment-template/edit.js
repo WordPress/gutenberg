@@ -19,15 +19,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { useCommentQueryArgs, useCommentTree } from './hooks';
 
-const TEMPLATE = [
-	[ 'core/avatar' ],
-	[ 'core/comment-author-name' ],
-	[ 'core/comment-date' ],
-	[ 'core/comment-content' ],
-	[ 'core/comment-reply-link' ],
-	[ 'core/comment-edit-link' ],
-];
-
 /**
  * Function that returns a comment structure that will be rendered with default placehoders.
  *
@@ -114,10 +105,7 @@ function CommentTemplateInnerBlocks( {
 	firstCommentId,
 	blocks,
 } ) {
-	const { children, ...innerBlocksProps } = useInnerBlocksProps(
-		{},
-		{ template: TEMPLATE }
-	);
+	const { children, ...innerBlocksProps } = useInnerBlocksProps( {} );
 
 	return (
 		<li { ...innerBlocksProps }>

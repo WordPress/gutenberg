@@ -394,6 +394,90 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'insertBlocks', () => {
+		afterEach( () => {
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
+			} );
+		} );
+
+		it( 'should apply block type templates to empty blocks', () => {
+			registerBlockType( 'core/test-container', {
+				...defaultBlockSettings,
+				template: [ [ 'core/test-item', { content: 'chicken' } ] ],
+			} );
+			registerBlockType( 'core/test-item', defaultBlockSettings );
+
+			const containerBlock = createBlock( 'core/test-container' );
+			const select = {
+				getSettings: () => null,
+				canInsertBlockType: () => true,
+			};
+			const dispatch = jest.fn();
+
+			insertBlocks(
+				[ containerBlock ],
+				5,
+				'testrootid',
+				false
+			)( {
+				select,
+				dispatch,
+			} );
+
+			expect( dispatch ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: 'INSERT_BLOCKS',
+					blocks: [
+						expect.objectContaining( {
+							name: 'core/test-container',
+							innerBlocks: [
+								expect.objectContaining( {
+									name: 'core/test-item',
+									attributes: expect.objectContaining( {
+										content: 'chicken',
+									} ),
+									innerBlocks: [],
+								} ),
+							],
+						} ),
+					],
+				} )
+			);
+		} );
+
+		it( 'should not apply block type templates to blocks with inner blocks', () => {
+			registerBlockType( 'core/test-container', {
+				...defaultBlockSettings,
+				template: [ [ 'core/test-item', { content: 'chicken' } ] ],
+			} );
+			registerBlockType( 'core/test-item', defaultBlockSettings );
+
+			const containerBlock = createBlock( 'core/test-container', {}, [
+				createBlock( 'core/test-item', { content: 'ribs' } ),
+			] );
+			const select = {
+				getSettings: () => null,
+				canInsertBlockType: () => true,
+			};
+			const dispatch = jest.fn();
+
+			insertBlocks(
+				[ containerBlock ],
+				5,
+				'testrootid',
+				false
+			)( {
+				select,
+				dispatch,
+			} );
+
+			expect( dispatch ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					blocks: [ containerBlock ],
+				} )
+			);
+		} );
+
 		it( 'should filter the allowed blocks in INSERT_BLOCKS action', () => {
 			const ribsBlock = {
 				clientId: 'ribs',

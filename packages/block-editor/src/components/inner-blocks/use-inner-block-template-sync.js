@@ -8,7 +8,8 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
  */
 import { useRef, useLayoutEffect } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
-import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import { getBlockType, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -16,29 +17,35 @@ import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 
 /**
- * This hook makes sure that a block's inner blocks stay in sync with the given
- * block "template". The template is a block hierarchy to which inner blocks must
- * conform. If the blocks get "out of sync" with the template and the template
- * is meant to be locked (e.g. templateLock = "all" or templateLock = "contentOnly"),
- * then we replace the inner blocks with the correct value after synchronizing it with the template.
+ * This hook applies the template declared in the block type settings to the
+ * block's inner blocks when they are empty: the template scaffolds initial
+ * content and is not applied again afterwards. Structural restrictions for
+ * locked blocks are enforced through the canInsertBlockType, canRemoveBlock,
+ * and canMoveBlock rules, not by the template.
+ *
+ * A template passed directly is deprecated and keeps its legacy behavior:
+ * it is also re-applied over existing inner blocks whenever a "all" or
+ * "contentOnly" lock is set directly on the block.
  *
  * @param {string}  clientId                       The block client ID.
- * @param {Object}  template                       The template to match.
- * @param {string}  templateLock                   The template lock state for the inner blocks. For
- *                                                 example, if the template lock is set to "all",
- *                                                 then the inner blocks will stay in sync with the
- *                                                 template. If not defined or set to false, then
- *                                                 the inner blocks will not be synchronized with
- *                                                 the given template.
+ * @param {Object}  template                       A template applied in place of the one
+ *                                                 declared by the block type. Deprecated.
+ * @param {string}  templateLock                   The template lock state for the inner blocks.
+ *                                                 Only used by the deprecated template argument.
  * @param {boolean} templateInsertUpdatesSelection Whether or not to update the
  *                                                 block-editor selection state when inner blocks
  *                                                 are replaced after template synchronization.
+ * @param {boolean} [enableBlockTypeTemplate]      Whether a template declared in block type
+ *                                                 settings may serve as the default when no
+ *                                                 template is passed. Disabled for controlled
+ *                                                 inner blocks.
  */
 export default function useInnerBlockTemplateSync(
 	clientId,
 	template,
 	templateLock,
-	templateInsertUpdatesSelection
+	templateInsertUpdatesSelection,
+	enableBlockTypeTemplate = true
 ) {
 	// Instead of adding a useSelect mapping here, please add to the useSelect
 	// mapping in InnerBlocks! Every subscription impacts performance.
@@ -50,7 +57,16 @@ export default function useInnerBlockTemplateSync(
 	useLayoutEffect( () => {
 		let isCancelled = false;
 
+		if ( template !== undefined ) {
+			deprecated( 'The template property of inner blocks', {
+				since: '7.0',
+				alternative:
+					'a template declared in block type settings, which applies when the inner blocks are empty',
+			} );
+		}
+
 		const {
+			getBlockName,
 			getBlocks,
 			getSelectedBlocksInitialCaretPosition,
 			isBlockSelected,
@@ -67,16 +83,34 @@ export default function useInnerBlockTemplateSync(
 				return;
 			}
 
-			// Only synchronize innerBlocks with template if innerBlocks are empty
-			// or a locking "all" or "contentOnly" exists directly on the block.
 			const currentInnerBlocks = getBlocks( clientId );
-			const shouldApplyTemplate =
-				currentInnerBlocks.length === 0 ||
-				templateLock === 'all' ||
-				templateLock === 'contentOnly';
+			let resolvedTemplate = template;
+			let shouldApplyTemplate;
+
+			if ( template !== undefined ) {
+				// Deprecated template argument: preserve the legacy behavior
+				// of synchronizing existing inner blocks with the template
+				// when a locking "all" or "contentOnly" is set directly on
+				// the block.
+				shouldApplyTemplate =
+					currentInnerBlocks.length === 0 ||
+					templateLock === 'all' ||
+					templateLock === 'contentOnly';
+			} else {
+				if ( ! enableBlockTypeTemplate ) {
+					return;
+				}
+				// Block type templates only scaffold initial content: they
+				// are applied when the inner blocks are empty and never
+				// rewrite existing content.
+				resolvedTemplate = getBlockType(
+					getBlockName( clientId )
+				)?.template;
+				shouldApplyTemplate = currentInnerBlocks.length === 0;
+			}
 
 			const hasTemplateChanged = ! fastDeepEqual(
-				template,
+				resolvedTemplate,
 				existingTemplateRef.current
 			);
 
@@ -84,10 +118,10 @@ export default function useInnerBlockTemplateSync(
 				return;
 			}
 
-			existingTemplateRef.current = template;
+			existingTemplateRef.current = resolvedTemplate;
 			const nextBlocks = synchronizeBlocksWithTemplate(
 				currentInnerBlocks,
-				template
+				resolvedTemplate
 			);
 
 			if ( ! fastDeepEqual( nextBlocks, currentInnerBlocks ) ) {
@@ -119,5 +153,6 @@ export default function useInnerBlockTemplateSync(
 		clientId,
 		registry,
 		templateInsertUpdatesSelection,
+		enableBlockTypeTemplate,
 	] );
 }
