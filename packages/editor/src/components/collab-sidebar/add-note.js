@@ -67,6 +67,14 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 				if ( ! document.hasFocus() ) {
 					return;
 				}
+				// Only cancel when focus moves to another real element. Focus can
+				// briefly land on nothing (the document body) while the editor
+				// settles - most visibly when opening the form collapses a
+				// multi-block selection onto its anchor - and cancelling then
+				// would discard the note before the user ever interacts with it.
+				if ( ! event.relatedTarget ) {
+					return;
+				}
 				// Prevent blur from closing the form while the async submit
 				// is in progress. Clicking "Add note" moves focus away,
 				// triggering blur before onSubmit completes.

@@ -60,20 +60,28 @@ function NotesSidebar( { postId } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const sidebarRef = useRef( null );
 
-	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
-			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-		return {
-			clientId: _clientId,
-			noteId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId
-				: null,
-			isClassicBlock: _clientId
-				? getBlockName( _clientId ) === 'core/freeform'
-				: false,
-		};
-	}, [] );
+	const { clientId, noteId, isClassicBlock, hasMultiSelection } = useSelect(
+		( select ) => {
+			const {
+				getBlockAttributes,
+				getSelectedBlockClientId,
+				getBlockName,
+				hasMultiSelection: _hasMultiSelection,
+			} = select( blockEditorStore );
+			const _clientId = getSelectedBlockClientId();
+			return {
+				clientId: _clientId,
+				noteId: _clientId
+					? getBlockAttributes( _clientId )?.metadata?.noteId
+					: null,
+				isClassicBlock: _clientId
+					? getBlockName( _clientId ) === 'core/freeform'
+					: false,
+				hasMultiSelection: _hasMultiSelection(),
+			};
+		},
+		[]
+	);
 
 	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 	const { isDistractionFree } = useSelect( ( select ) => {
@@ -154,9 +162,8 @@ function NotesSidebar( { postId } ) {
 	// Open the new-note form for the current multi-block selection. Capture the
 	// per-block marker segments *first*, while the cross-block selection is still
 	// live (it collapses once a single block is selected), and stash them in the
-	// store for `onCreate` to consume. Then select the first spanned block: the
-	// new-note form only renders when a single block is selected, and the
-	// already-captured segments still drive marking across every block.
+	// store for `onCreate` to consume. The already-captured segments still drive
+	// marking across every block once the note is saved.
 	function addNewNoteForSelection() {
 		const segments = readMultiBlockSelection( blockEditorSelectors );
 		const anchorClientId =
@@ -166,28 +173,44 @@ function NotesSidebar( { postId } ) {
 		// `selectNote` calls that follow (focus reset, block-transition sync)
 		// can't clobber them before the save resolves.
 		setPendingNoteSegments( segments );
-		const currentArea = getActiveComplementaryArea( 'core' );
-		if ( ! SIDEBARS.includes( currentArea ) ) {
-			enableComplementaryArea(
-				'core',
-				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
-			);
+		if ( ! anchorClientId ) {
+			return;
 		}
-		if ( anchorClientId ) {
-			// `null` = keep focus available for the sidebar form.
-			selectBlock( anchorClientId, null );
-		}
-		selectNote( 'new', { focus: true } );
+		// Collapse the cross-block selection to the anchor block first, then open
+		// the form on the next frames once that selection - and the focus the
+		// editor moves onto the block - has settled. Opening it in the same tick
+		// lets the collapse pull focus out of the form's input; AddNote's blur
+		// handler keeps the form open through that, but deferring lets the input
+		// keep focus so the user can type right away.
+		selectBlock( anchorClientId, null );
+		const openForm = () =>
+			focusNote( {
+				targetClientId: anchorClientId,
+				noteId: 'new',
+				isApproved: false,
+			} );
+		window.requestAnimationFrame( () =>
+			window.requestAnimationFrame( openForm )
+		);
 	}
 
 	useShortcut(
 		'core/editor/new-note',
 		( event ) => {
 			event.preventDefault();
-			addNewNoteForBlock( clientId );
+			// Mirror the "Add note" menu, which targets the whole selection when
+			// more than one block is selected and the current block otherwise.
+			if ( hasMultiSelection ) {
+				addNewNoteForSelection();
+			} else {
+				addNewNoteForBlock( clientId );
+			}
 		},
 		{
-			isDisabled: isDistractionFree || isClassicBlock || ! clientId,
+			isDisabled:
+				isDistractionFree ||
+				isClassicBlock ||
+				( ! clientId && ! hasMultiSelection ),
 		}
 	);
 

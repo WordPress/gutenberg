@@ -65,8 +65,9 @@ function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
 
 /**
  * "Add note" item for a multi-block selection. The single-block variant keys off
- * one block's validity and shows the new-note shortcut; a cross-block selection
- * has neither, so this is a plain item that opens the form for the whole range.
+ * one block's validity; a cross-block selection has none, so this is a plain item
+ * that opens the form for the whole range. It shows the same new-note shortcut,
+ * which also targets the selection when several blocks are selected.
  *
  * @param {Object}   props
  * @param {Function} props.onClick           Opens the new-note form for the selection.
@@ -74,6 +75,14 @@ function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
  * @return {Element} The menu item.
  */
 function SelectionNoteMenuItem( { onClick, isDistractionFree } ) {
+	const shortcut = useSelect(
+		( select ) =>
+			select( keyboardShortcutsStore ).getShortcutRepresentation(
+				'core/editor/new-note'
+			),
+		[]
+	);
+
 	return (
 		<MenuItem
 			onClick={ onClick }
@@ -84,6 +93,7 @@ function SelectionNoteMenuItem( { onClick, isDistractionFree } ) {
 					? __( 'Notes are disabled in distraction free mode.' )
 					: undefined
 			}
+			shortcut={ shortcut }
 		>
 			{ __( 'Add note' ) }
 		</MenuItem>
