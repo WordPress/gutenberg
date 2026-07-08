@@ -344,7 +344,7 @@ function gutenberg_filter_locked_posts_heartbeat_for_rtc( $response ) {
  * Outputs CSS to hide the post lock icon and user avatar in the post list
  * when real-time collaboration is enabled.
  *
- * Also re-enables checkboxes and row actions that WordPress core hides for
+ * Also re-enables checkboxes that WordPress core hides for
  * locked posts, since collaborative editing means the post is not exclusively
  * locked. Toggles "Edit" / "Join" action link text via the
  * `.wp-collaborative-editing` class that the heartbeat already manages.
@@ -365,16 +365,15 @@ function gutenberg_post_list_collaboration_styles() {
 			display: none;
 		}
 		/*
-		 * Re-enable controls that core hides for locked posts,
+		 * Re-enable bulk-edit checkboxes that core hides for locked posts,
 		 * since RTC allows collaborative editing.
 		 * Must use `tr.wp-locked` to match core's specificity in
 		 * list-tables.css and actually override its `display: none`.
+		 * Quick Edit intentionally stays hidden: it is not collaboration-aware,
+		 * so edits made through it diverge from the content in an active editor session.
 		 */
 		tr.wp-locked .check-column label,
 		tr.wp-locked .check-column input[type="checkbox"] {
-			display: revert;
-		}
-		tr.wp-locked .row-actions .inline {
 			display: revert;
 		}
 		/*
