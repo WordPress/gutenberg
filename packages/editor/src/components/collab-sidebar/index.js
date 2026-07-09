@@ -4,16 +4,12 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItemsChoice,
-} from '@wordpress/components';
+import { MenuGroup, MenuItemsChoice } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as interfaceStore, PinnedItems } from '@wordpress/interface';
+import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
 
@@ -21,6 +17,7 @@ import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
  * Internal dependencies
  */
 import PluginSidebar from '../plugin-sidebar';
+import ViewMoreMenuGroup from '../more-menu/view-more-menu-group';
 import { ALL_NOTES_SIDEBAR } from './constants';
 import { Notes } from './notes';
 import { FloatingNotes, FloatingNotesFill } from './floating-notes';
@@ -103,11 +100,10 @@ function NotesSidebar( { postId } ) {
 		notesDisplayMode !== 'hidden' &&
 		( unresolvedNotes.length > 0 || selectedNoteId !== undefined ) &&
 		! isAllNotesSidebarOpen;
-	// The floating-notes dropdown carries its own "All notes" choice, so the
-	// sidebar's pinned toolbar toggle would be a redundant second notes icon.
-	// Only expose that toggle when the dropdown isn't available (e.g. small
-	// viewports, or when there are only resolved notes to reach).
-	const showNotesDropdown = showFloatingNotes && unresolvedNotes.length > 0;
+	// The display-mode choices live in the editor's Options (ellipsis) menu;
+	// they only apply where the floating notes can render.
+	const showNotesDisplayOptions =
+		showFloatingNotes && unresolvedNotes.length > 0;
 
 	async function focusNote( {
 		targetClientId,
@@ -204,77 +200,45 @@ function NotesSidebar( { postId } ) {
 					addNewNoteForBlock( menuClientId )
 				}
 			/>
-			{ showNotesDropdown && (
-				<PinnedItems scope="core">
-					<DropdownMenu
-						icon={ commentIcon }
-						label={ __( 'Notes' ) }
-						menuProps={ {
-							'aria-label': __( 'Notes display options' ),
-						} }
-						toggleProps={ {
-							size: 'compact',
-						} }
-					>
-						{ ( { onClose } ) => (
-							<MenuGroup>
-								<MenuItemsChoice
-									choices={ [
-										{
-											value: 'sidebar',
-											label: __( 'All notes' ),
-										},
-										{
-											value: 'full',
-											label: __( 'Full notes' ),
-										},
-										{
-											value: 'minimized',
-											label: __( 'Minimized notes' ),
-										},
-										{
-											value: 'hidden',
-											label: __( 'Hidden notes' ),
-										},
-									] }
-									value={
-										isAllNotesSidebarOpen
-											? 'sidebar'
-											: notesDisplayMode
+			{ showNotesDisplayOptions && (
+				<ViewMoreMenuGroup>
+					{ ( { onClose } ) => (
+						<MenuGroup label={ __( 'Notes' ) }>
+							<MenuItemsChoice
+								choices={ [
+									{
+										value: 'full',
+										label: __( 'Full notes' ),
+									},
+									{
+										value: 'minimized',
+										label: __( 'Minimized notes' ),
+									},
+									{
+										value: 'hidden',
+										label: __( 'Hidden notes' ),
+									},
+								] }
+								value={ notesDisplayMode }
+								onSelect={ ( value ) => {
+									// Close the "All notes" sidebar so the
+									// chosen floating mode is visible on the
+									// canvas.
+									if ( isAllNotesSidebarOpen ) {
+										disableComplementaryArea( 'core' );
 									}
-									onSelect={ ( value ) => {
-										if ( value === 'sidebar' ) {
-											// The "All notes" sidebar lists every
-											// thread (including resolved); the
-											// floating notes yield to it.
-											enableComplementaryArea(
-												'core',
-												ALL_NOTES_SIDEBAR
-											);
-										} else {
-											// Switching to a floating mode closes
-											// the sidebar so notes return to the
-											// canvas.
-											if ( isAllNotesSidebarOpen ) {
-												disableComplementaryArea(
-													'core'
-												);
-											}
-											setNotesDisplayMode( value );
-										}
-										onClose();
-									} }
-								/>
-							</MenuGroup>
-						) }
-					</DropdownMenu>
-				</PinnedItems>
+									setNotesDisplayMode( value );
+									onClose();
+								} }
+							/>
+						</MenuGroup>
+					) }
+				</ViewMoreMenuGroup>
 			) }
 			{ showAllNotesSidebar && (
 				<PluginSidebar
 					identifier={ ALL_NOTES_SIDEBAR }
 					name={ ALL_NOTES_SIDEBAR }
-					isPinnable={ ! showNotesDropdown }
 					title={ __( 'All notes' ) }
 					header={
 						<h2 className="interface-complementary-area-header__title">

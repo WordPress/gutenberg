@@ -296,4 +296,104 @@ test.describe( 'Notes canvas layout', () => {
 			page.getByRole( 'region', { name: 'Notes' } )
 		).toBeHidden();
 	} );
+
+	test( 'floating notes collapse and yield as the canvas narrows', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph with a note' },
+		} );
+		await addNote( page, editor, 'Narrow canvas note' );
+
+		const notes = page.getByRole( 'region', { name: 'Notes' } );
+		const overlay = page.locator( '.editor-collab-sidebar-overlay' );
+
+		// Reads the reserved padding applied to the canvas root.
+		const getReservedWidth = () =>
+			editor.canvas.locator( 'body' ).evaluate( ( body ) => {
+				const root = body.ownerDocument.documentElement;
+				return (
+					parseFloat(
+						body.ownerDocument.defaultView.getComputedStyle( root )
+							.paddingInlineEnd
+					) || 0
+				);
+			} );
+
+		// The Settings sidebar and List View narrow the canvas without
+		// touching the admin viewport, which stays above the large-viewport
+		// breakpoint - so only the canvas-width guard (not the viewport gate)
+		// governs the panel.
+		await editor.openDocumentSettingsSidebar();
+		await page.setViewportSize( { width: 1280, height: 800 } );
+
+		// Wide canvas: full threads with the full reserved space.
+		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
+		await expect.poll( getReservedWidth ).toBe( 280 );
+
+		// Mid-width canvas: threads collapse to minimized avatar pills and
+		// release most of the reserved space.
+		await page.setViewportSize( { width: 900, height: 800 } );
+		await expect( overlay ).toHaveClass( /is-compact/ );
+		await expect( notes ).toBeVisible();
+		await expect.poll( getReservedWidth ).toBe( 82 );
+
+		// Narrow canvas (List View narrows it further): even the pills yield
+		// and release the reserved space so they don't crowd the content.
+		await page.getByRole( 'button', { name: 'Document Overview' } ).click();
+		await expect( notes ).toBeHidden();
+		await expect.poll( getReservedWidth ).toBe( 0 );
+
+		// Widening the canvas again brings the panel (and reserved space)
+		// back.
+		await page.getByRole( 'button', { name: 'Document Overview' } ).click();
+		await expect( notes ).toBeVisible();
+		await expect.poll( getReservedWidth ).toBe( 82 );
+	} );
+
+	test( 'notes display modes are switched from the Options menu', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph with a note' },
+		} );
+		await addNote( page, editor, 'Display mode note' );
+
+		const notes = page.getByRole( 'region', { name: 'Notes' } );
+		const overlay = page.locator( '.editor-collab-sidebar-overlay' );
+		const openOptionsMenu = () =>
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+
+		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
+
+		// Minimized: threads collapse to avatar pills.
+		await openOptionsMenu();
+		await page
+			.getByRole( 'menuitemradio', { name: 'Minimized notes' } )
+			.click();
+		await expect( overlay ).toHaveClass( /is-compact/ );
+		await expect( notes ).toBeVisible();
+
+		// Hidden: the floating panel disappears from the canvas.
+		await openOptionsMenu();
+		await page
+			.getByRole( 'menuitemradio', { name: 'Hidden notes' } )
+			.click();
+		await expect( notes ).toBeHidden();
+
+		// Full: the complete threads return.
+		await openOptionsMenu();
+		await page.getByRole( 'menuitemradio', { name: 'Full notes' } ).click();
+		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
+	} );
 } );
