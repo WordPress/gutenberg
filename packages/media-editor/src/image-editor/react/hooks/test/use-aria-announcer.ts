@@ -97,7 +97,7 @@ describe( 'useAriaAnnouncer', () => {
 			naturalWidth: 1000,
 			naturalHeight: 800,
 		};
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{ initialProps: { state: makeState( { image } ) } }
 		);
@@ -112,7 +112,7 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Crop 800 by 400 pixels' );
+		expect( speak ).toHaveBeenCalledWith( 'Crop 800 by 400 pixels' );
 	} );
 
 	it( 'announces a single-pixel crop change', () => {
@@ -121,7 +121,7 @@ describe( 'useAriaAnnouncer', () => {
 			naturalWidth: 2000,
 			naturalHeight: 1000,
 		};
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{
 				initialProps: {
@@ -145,7 +145,7 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Crop 1001 by 500 pixels' );
+		expect( speak ).toHaveBeenCalledWith( 'Crop 1001 by 500 pixels' );
 	} );
 
 	it( 'does not announce the crop when only zoom changes', () => {
@@ -154,7 +154,7 @@ describe( 'useAriaAnnouncer', () => {
 			naturalWidth: 2000,
 			naturalHeight: 1000,
 		};
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{
 				initialProps: {
@@ -177,7 +177,7 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Zoom 150%' );
+		expect( speak ).toHaveBeenCalledWith( 'Zoom 150%' );
 	} );
 
 	it( 'announces a single-pixel crop change on a rotated non-square image', () => {
@@ -189,7 +189,7 @@ describe( 'useAriaAnnouncer', () => {
 			naturalWidth: 800,
 			naturalHeight: 2000,
 		};
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{
 				initialProps: {
@@ -213,11 +213,11 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Crop 1001 by 400 pixels' );
+		expect( speak ).toHaveBeenCalledWith( 'Crop 1001 by 400 pixels' );
 	} );
 
 	it( 'announces clockwise rotation with direction', () => {
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{ initialProps: { state: makeState() } }
 		);
@@ -229,11 +229,11 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Rotated 15 degrees clockwise' );
+		expect( speak ).toHaveBeenCalledWith( 'Rotated 15 degrees clockwise' );
 	} );
 
 	it( 'announces counterclockwise when flip inverts visual direction', () => {
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{
 				initialProps: {
@@ -255,11 +255,13 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Rotated 10 degrees counterclockwise' );
+		expect( speak ).toHaveBeenCalledWith(
+			'Rotated 10 degrees counterclockwise'
+		);
 	} );
 
 	it( 'announces a 90° snap under a single flip in visual terms', () => {
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{
 				initialProps: {
@@ -283,11 +285,11 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Rotated 90 degrees clockwise' );
+		expect( speak ).toHaveBeenCalledWith( 'Rotated 90 degrees clockwise' );
 	} );
 
 	it( 'announces a 90° snap under a vertical flip in visual terms', () => {
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{
 				initialProps: {
@@ -308,13 +310,13 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Rotated 90 degrees clockwise' );
+		expect( speak ).toHaveBeenCalledWith( 'Rotated 90 degrees clockwise' );
 	} );
 
 	it( 'announces non-inverted rotation when both axes are flipped', () => {
 		// Two mirrors restore handedness (equivalent to a 180° rotation), so
 		// the visual direction matches the unflipped case, not the single-flip.
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{
 				initialProps: {
@@ -335,11 +337,13 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Rotated 90 degrees counterclockwise' );
+		expect( speak ).toHaveBeenCalledWith(
+			'Rotated 90 degrees counterclockwise'
+		);
 	} );
 
 	it( 'announces multiple changes with rotation first', () => {
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{ initialProps: { state: makeState() } }
 		);
@@ -351,13 +355,13 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe(
+		expect( speak ).toHaveBeenCalledWith(
 			'Rotated 90 degrees clockwise, Zoom 150%'
 		);
 	} );
 
 	it( 'announces rotation back to zero', () => {
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{ initialProps: { state: makeState( { rotation: 15 } ) } }
 		);
@@ -369,11 +373,11 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Rotation 0 degrees' );
+		expect( speak ).toHaveBeenCalledWith( 'Rotation 0 degrees' );
 	} );
 
 	it( 'announces rotation after 90° snap plus fine adjustment', () => {
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{ initialProps: { state: makeState() } }
 		);
@@ -386,11 +390,11 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Rotated 105 degrees clockwise' );
+		expect( speak ).toHaveBeenCalledWith( 'Rotated 105 degrees clockwise' );
 	} );
 
 	it( 'announces CCW for 90° snap CCW plus fine CCW adjustment', () => {
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{ initialProps: { state: makeState() } }
 		);
@@ -404,11 +408,13 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Rotated 105 degrees counterclockwise' );
+		expect( speak ).toHaveBeenCalledWith(
+			'Rotated 105 degrees counterclockwise'
+		);
 	} );
 
 	it( 'announces CCW fine rotation from 0° (stored as 350°)', () => {
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{ initialProps: { state: makeState() } }
 		);
@@ -422,7 +428,9 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Rotated 10 degrees counterclockwise' );
+		expect( speak ).toHaveBeenCalledWith(
+			'Rotated 10 degrees counterclockwise'
+		);
 	} );
 
 	it( 'suppresses unchanged values in combined announcements', () => {
@@ -431,7 +439,7 @@ describe( 'useAriaAnnouncer', () => {
 			naturalWidth: 1000,
 			naturalHeight: 800,
 		};
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{
 				initialProps: {
@@ -441,6 +449,8 @@ describe( 'useAriaAnnouncer', () => {
 		);
 
 		act( () => jest.advanceTimersByTime( 300 ) );
+
+		( speak as jest.Mock ).mockClear();
 
 		// Only change crop — zoom and rotation should be suppressed.
 		rerender( {
@@ -452,13 +462,17 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Crop 500 by 400 pixels' );
-		expect( result.current ).not.toContain( 'Zoom' );
-		expect( result.current ).not.toContain( 'Rotated' );
+		expect( speak ).toHaveBeenCalledWith( 'Crop 500 by 400 pixels' );
+		expect( speak ).not.toHaveBeenCalledWith(
+			expect.stringContaining( 'Zoom' )
+		);
+		expect( speak ).not.toHaveBeenCalledWith(
+			expect.stringContaining( 'Rotated' )
+		);
 	} );
 
 	it( 'announces only zoom when only zoom changes', () => {
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{ initialProps: { state: makeState() } }
 		);
@@ -470,6 +484,6 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Zoom 150%' );
+		expect( speak ).toHaveBeenCalledWith( 'Zoom 150%' );
 	} );
 } );
