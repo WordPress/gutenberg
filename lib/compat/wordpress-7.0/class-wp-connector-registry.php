@@ -59,7 +59,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 * Validates the provided arguments and stores the connector in the registry.
 		 * For connectors with `api_key` or `application_password` authentication, a
 		 * `setting_name` can be provided explicitly. When omitted, setting names are
-		 * automatically generated using the pattern `connectors_{$type}_{$id}_{$credential}`,
+		 * automatically generated using the pattern `connectors_{$type}_{$id}_{$method}`,
 		 * with hyphens in the type and ID normalized to underscores. These setting
 		 * names are used for Settings API registration and REST API exposure.
 		 *
