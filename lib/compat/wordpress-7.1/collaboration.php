@@ -342,7 +342,7 @@ function gutenberg_post_list_collaboration_ui() {
 
 	// Heartbeat filter applies globally (not just edit.php) since the
 	// heartbeat API can fire from any admin page.
-	add_filter( 'heartbeat_received', 'gutenberg_filter_locked_posts_heartbeat_for_rtc', 20, 3 );
+	add_filter( 'heartbeat_received', 'gutenberg_filter_locked_posts_heartbeat_for_rtc', 20, 2 );
 
 	// Reject Quick Edit saves while the post is open in an editor session.
 	// Registered globally since Quick Edit saves go through admin-ajax.php.
@@ -377,12 +377,11 @@ add_action( 'admin_init', 'gutenberg_post_list_collaboration_ui' );
  * Quick Edit is also disabled for the lock holder while they have the post
  * open in the editor (see gh-79640).
  *
- * @param array  $response  The heartbeat response.
- * @param array  $data      The data sent by the client.
- * @param string $screen_id The screen ID.
+ * @param array $response The heartbeat response.
+ * @param array $data     The data sent by the client.
  * @return array Modified heartbeat response.
  */
-function gutenberg_filter_locked_posts_heartbeat_for_rtc( $response, $data = array(), $screen_id = '' ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+function gutenberg_filter_locked_posts_heartbeat_for_rtc( $response, $data = array() ) {
 	if ( ! empty( $response['wp-check-locked-posts'] ) ) {
 		foreach ( $response['wp-check-locked-posts'] as $key => $lock_data ) {
 			$response['wp-check-locked-posts'][ $key ]['text'] = __( 'Currently being edited', 'gutenberg' );
@@ -481,6 +480,11 @@ if ( ! function_exists( 'gutenberg_release_own_edit_lock' ) ) {
 	 * gutenberg_block_quick_edit_for_active_lock() reject a follow-up
 	 * Quick Edit for the lock window even though no editor session exists.
 	 * An open editor session re-establishes its own lock via heartbeat.
+	 *
+	 * In the unlikely case that the user opens the post in the editor while
+	 * the Quick Edit request is still in flight, the editor's own lock could
+	 * be deleted here instead; the editor re-establishes it on its next
+	 * heartbeat tick.
 	 *
 	 * @since 7.1.0
 	 *

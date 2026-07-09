@@ -54,50 +54,45 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_active_edit_lock_user_returns_holder_for_fresh_lock() {
-		$this->set_edit_lock( self::$admin_id );
-
-		$this->assertSame( self::$admin_id, gutenberg_get_active_edit_lock_user( self::$post_id ) );
+	private function prime_inline_save_request() {
+		$_POST['post_ID']      = self::$post_id;
+		$_POST['_inline_edit'] = wp_create_nonce( 'inlineeditnonce' );
+		// check_ajax_referer() reads the nonce from $_REQUEST; in a real
+		// request PHP populates it from $_POST, but not when assigning to
+		// superglobals directly in tests.
+		$_REQUEST['_inline_edit'] = $_POST['_inline_edit'];
 	}
 
-	public function test_active_edit_lock_user_returns_zero_for_stale_lock() {
+	private function shutdown_callback_count(): int {
+		global $wp_filter;
+		return isset( $wp_filter['shutdown'] ) ? count( $wp_filter['shutdown']->callbacks, COUNT_RECURSIVE ) : 0;
+	}
+
+	public function test_active_edit_lock_user_reflects_lock_state() {
+		$this->assertSame( 0, gutenberg_get_active_edit_lock_user( self::$post_id ), 'Without a lock the helper should return 0.' );
+
 		$this->set_edit_lock( self::$admin_id, 1000 );
+		$this->assertSame( 0, gutenberg_get_active_edit_lock_user( self::$post_id ), 'A stale lock should return 0.' );
 
-		$this->assertSame( 0, gutenberg_get_active_edit_lock_user( self::$post_id ) );
-	}
-
-	public function test_active_edit_lock_user_returns_zero_without_lock() {
-		$this->assertSame( 0, gutenberg_get_active_edit_lock_user( self::$post_id ) );
-	}
-
-	public function test_heartbeat_adds_posts_locked_by_current_user() {
 		$this->set_edit_lock( self::$admin_id );
-		$key = 'post-' . self::$post_id;
+		$this->assertSame( self::$admin_id, gutenberg_get_active_edit_lock_user( self::$post_id ), 'A fresh lock should return its holder.' );
+	}
 
-		$response = gutenberg_filter_locked_posts_heartbeat_for_rtc(
-			array(),
-			array( 'wp-check-locked-posts' => array( $key ) ),
-			'edit-post'
-		);
+	public function test_heartbeat_marks_only_fresh_own_locks() {
+		$key  = 'post-' . self::$post_id;
+		$data = array( 'wp-check-locked-posts' => array( $key ) );
 
-		$this->assertArrayHasKey( $key, $response['wp-check-locked-posts'] );
+		$this->set_edit_lock( self::$admin_id, 1000 );
+		$response = gutenberg_filter_locked_posts_heartbeat_for_rtc( array(), $data );
+		$this->assertArrayNotHasKey( 'wp-check-locked-posts', $response, 'A stale own lock should not mark the row as locked.' );
+
+		$this->set_edit_lock( self::$admin_id );
+		$response = gutenberg_filter_locked_posts_heartbeat_for_rtc( array(), $data );
 		$this->assertSame(
-			'Currently being edited',
-			$response['wp-check-locked-posts'][ $key ]['text']
+			array( 'text' => 'Currently being edited' ),
+			$response['wp-check-locked-posts'][ $key ],
+			'A fresh own lock should mark the row as locked, without user details.'
 		);
-	}
-
-	public function test_heartbeat_ignores_stale_own_lock() {
-		$this->set_edit_lock( self::$admin_id, 1000 );
-		$key = 'post-' . self::$post_id;
-
-		$response = gutenberg_filter_locked_posts_heartbeat_for_rtc(
-			array(),
-			array( 'wp-check-locked-posts' => array( $key ) ),
-			'edit-post'
-		);
-
-		$this->assertArrayNotHasKey( 'wp-check-locked-posts', $response );
 	}
 
 	public function test_heartbeat_still_anonymizes_other_user_entries() {
@@ -113,40 +108,28 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 					),
 				),
 			),
-			array( 'wp-check-locked-posts' => array( $key ) ),
-			'edit-post'
+			array( 'wp-check-locked-posts' => array( $key ) )
 		);
 
 		$this->assertSame( 'Currently being edited', $response['wp-check-locked-posts'][ $key ]['text'] );
 		$this->assertArrayNotHasKey( 'avatar_src', $response['wp-check-locked-posts'][ $key ] );
 	}
 
-	public function test_row_actions_remove_quick_edit_for_own_fresh_lock() {
-		$this->set_edit_lock( self::$admin_id );
+	public function test_row_actions_remove_quick_edit_only_for_own_fresh_lock() {
 		$post = get_post( self::$post_id );
 
 		$filtered = gutenberg_post_list_collaboration_row_actions( $this->quick_edit_actions(), $post );
+		$this->assertArrayHasKey( 'inline hide-if-no-js', $filtered, 'Quick Edit should stay without a lock.' );
 
-		$this->assertArrayNotHasKey( 'inline hide-if-no-js', $filtered );
-	}
-
-	public function test_row_actions_keep_quick_edit_without_lock() {
-		$post = get_post( self::$post_id );
-
-		$filtered = gutenberg_post_list_collaboration_row_actions( $this->quick_edit_actions(), $post );
-
-		$this->assertArrayHasKey( 'inline hide-if-no-js', $filtered );
-	}
-
-	public function test_row_actions_keep_quick_edit_for_other_users_lock() {
 		// Other users' locks are handled by core: the row renders with
 		// .wp-locked and core CSS hides the Quick Edit action.
 		$this->set_edit_lock( self::$editor_id );
-		$post = get_post( self::$post_id );
-
 		$filtered = gutenberg_post_list_collaboration_row_actions( $this->quick_edit_actions(), $post );
+		$this->assertArrayHasKey( 'inline hide-if-no-js', $filtered, "Another user's lock is left to core." );
 
-		$this->assertArrayHasKey( 'inline hide-if-no-js', $filtered );
+		$this->set_edit_lock( self::$admin_id );
+		$filtered = gutenberg_post_list_collaboration_row_actions( $this->quick_edit_actions(), $post );
+		$this->assertArrayNotHasKey( 'inline hide-if-no-js', $filtered, "Quick Edit should be removed for the current user's own fresh lock." );
 	}
 
 	public function test_inline_save_guard_is_registered_on_core_quick_edit_ajax_hook() {
@@ -167,12 +150,7 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 
 	public function test_inline_save_guard_rejects_save_for_own_fresh_lock() {
 		$this->set_edit_lock( self::$admin_id );
-		$_POST['post_ID']      = self::$post_id;
-		$_POST['_inline_edit'] = wp_create_nonce( 'inlineeditnonce' );
-		// check_ajax_referer() reads the nonce from $_REQUEST; in a real
-		// request PHP populates it from $_POST, but not when assigning to
-		// superglobals directly in tests.
-		$_REQUEST['_inline_edit'] = $_POST['_inline_edit'];
+		$this->prime_inline_save_request();
 
 		$this->expectException( 'WPDieException' );
 		$this->expectExceptionMessage( 'Quick Edit is disabled: You are currently editing this post in another tab or window.' );
@@ -180,58 +158,44 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 		gutenberg_block_quick_edit_for_active_lock();
 	}
 
-	public function test_inline_save_guard_allows_save_without_lock() {
-		$this->expectNotToPerformAssertions();
-		$_POST['post_ID']      = self::$post_id;
-		$_POST['_inline_edit'] = wp_create_nonce( 'inlineeditnonce' );
-		// check_ajax_referer() reads the nonce from $_REQUEST; assigning to
-		// $_POST does not sync superglobals the way a real request does.
-		$_REQUEST['_inline_edit'] = $_POST['_inline_edit'];
-
-		gutenberg_block_quick_edit_for_active_lock();
-	}
-
 	public function test_inline_save_guard_defers_other_users_lock_to_core() {
-		$this->expectNotToPerformAssertions();
 		$this->set_edit_lock( self::$editor_id );
-		$_POST['post_ID']      = self::$post_id;
-		$_POST['_inline_edit'] = wp_create_nonce( 'inlineeditnonce' );
-		// check_ajax_referer() reads the nonce from $_REQUEST; assigning to
-		// $_POST does not sync superglobals the way a real request does.
-		$_REQUEST['_inline_edit'] = $_POST['_inline_edit'];
+		$this->prime_inline_save_request();
+		$before = $this->shutdown_callback_count();
 
 		gutenberg_block_quick_edit_for_active_lock();
+
+		$this->assertSame( $before, $this->shutdown_callback_count(), "Another user's lock is core's to reject; no lock release should be scheduled." );
 	}
 
-	public function test_release_own_edit_lock_deletes_own_fresh_lock() {
+	public function test_inline_save_guard_ignores_disabled_post_types() {
 		$this->set_edit_lock( self::$admin_id );
+		$this->prime_inline_save_request();
+		add_filter( 'wp_is_post_type_collaboration_disabled', '__return_true' );
+		$before = $this->shutdown_callback_count();
 
-		gutenberg_release_own_edit_lock( self::$post_id );
+		gutenberg_block_quick_edit_for_active_lock();
 
-		$this->assertSame( '', get_post_meta( self::$post_id, '_edit_lock', true ) );
-	}
-
-	public function test_release_own_edit_lock_keeps_other_users_lock() {
-		$this->set_edit_lock( self::$editor_id );
-
-		gutenberg_release_own_edit_lock( self::$post_id );
-
-		$this->assertNotSame( '', get_post_meta( self::$post_id, '_edit_lock', true ) );
+		remove_filter( 'wp_is_post_type_collaboration_disabled', '__return_true' );
+		$this->assertSame( $before, $this->shutdown_callback_count(), 'With collaboration disabled for the post type the guard should neither reject nor schedule a lock release.' );
 	}
 
 	public function test_inline_save_guard_schedules_lock_release_when_save_proceeds() {
-		global $wp_filter;
-		$_POST['post_ID']      = self::$post_id;
-		$_POST['_inline_edit'] = wp_create_nonce( 'inlineeditnonce' );
-		// check_ajax_referer() reads the nonce from $_REQUEST; assigning to
-		// $_POST does not sync superglobals the way a real request does.
-		$_REQUEST['_inline_edit'] = $_POST['_inline_edit'];
-
-		$before = isset( $wp_filter['shutdown'] ) ? count( $wp_filter['shutdown']->callbacks, COUNT_RECURSIVE ) : 0;
+		$this->prime_inline_save_request();
+		$before = $this->shutdown_callback_count();
 
 		gutenberg_block_quick_edit_for_active_lock();
 
-		$after = isset( $wp_filter['shutdown'] ) ? count( $wp_filter['shutdown']->callbacks, COUNT_RECURSIVE ) : 0;
-		$this->assertGreaterThan( $before, $after );
+		$this->assertGreaterThan( $before, $this->shutdown_callback_count() );
+	}
+
+	public function test_release_own_edit_lock_only_deletes_own_fresh_lock() {
+		$this->set_edit_lock( self::$editor_id );
+		gutenberg_release_own_edit_lock( self::$post_id );
+		$this->assertNotSame( '', get_post_meta( self::$post_id, '_edit_lock', true ), "Another user's lock should be kept." );
+
+		$this->set_edit_lock( self::$admin_id );
+		gutenberg_release_own_edit_lock( self::$post_id );
+		$this->assertSame( '', get_post_meta( self::$post_id, '_edit_lock', true ), "The current user's own fresh lock should be deleted." );
 	}
 }
