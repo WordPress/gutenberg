@@ -7,7 +7,9 @@ import '@testing-library/jest-dom';
  * Internal dependencies
  */
 import {
+	applyWaveformPlayerStyles,
 	createWaveformContainer,
+	getWaveformColors,
 	styleSvgIcons,
 	setupPlayButtonAccessibility,
 	setupPlayButtonArtwork,
@@ -100,6 +102,67 @@ describe( 'Waveform utilities', () => {
 			} );
 
 			expect( container ).toHaveAttribute( 'data-height', '150' );
+		} );
+	} );
+
+	describe( 'getWaveformColors', () => {
+		it( 'derives waveform colors from the computed text color', () => {
+			const element = document.createElement( 'div' );
+			element.style.color = '#336699';
+			document.body.appendChild( element );
+
+			const colors = getWaveformColors( element );
+
+			expect( colors ).toEqual( {
+				textColor: 'rgb(51, 102, 153)',
+				waveformColor: 'rgba(51, 102, 153, 0.3)',
+				progressColor: 'rgba(51, 102, 153, 0.6)',
+			} );
+
+			element.remove();
+		} );
+
+		it( 'uses explicit text and waveform color values when provided', () => {
+			const element = document.createElement( 'div' );
+
+			const colors = getWaveformColors( element, '#ff0000', '#0000ff' );
+
+			expect( colors ).toEqual( {
+				textColor: '#0000ff',
+				waveformColor: 'rgba(255, 0, 0, 0.3)',
+				progressColor: 'rgba(255, 0, 0, 0.6)',
+			} );
+		} );
+	} );
+
+	describe( 'applyWaveformPlayerStyles', () => {
+		it( 'applies the waveform background color', () => {
+			const container = document.createElement( 'div' );
+			const waveformContainer = document.createElement( 'div' );
+			waveformContainer.className = 'waveform-container';
+			container.appendChild( waveformContainer );
+
+			applyWaveformPlayerStyles( container, {
+				backgroundColor: '#ffeeaa',
+			} );
+
+			expect( waveformContainer ).toHaveStyle( {
+				backgroundColor: '#ffeeaa',
+			} );
+		} );
+
+		it( 'removes the waveform background color when cleared', () => {
+			const container = document.createElement( 'div' );
+			const waveformContainer = document.createElement( 'div' );
+			waveformContainer.className = 'waveform-container';
+			waveformContainer.style.backgroundColor = '#ffeeaa';
+			container.appendChild( waveformContainer );
+
+			applyWaveformPlayerStyles( container );
+
+			expect( waveformContainer ).not.toHaveStyle( {
+				backgroundColor: '#ffeeaa',
+			} );
 		} );
 	} );
 

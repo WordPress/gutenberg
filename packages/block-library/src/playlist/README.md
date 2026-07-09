@@ -31,6 +31,11 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `showNumbers` | `boolean` | `true` | — |
 | `showTrackLength` | `boolean` | `true` | — |
 | `waveformStyle` | `string` | `"bars"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `bars`, `mirror`, `line`, `blocks`, `dots`, `seekbar` |
+| `textColor` | `string` | — | — |
+| `backgroundColor` | `string` | — | — |
+| `backgroundGradient` | `string` | — | — |
+| `waveformColor` | `string` | — | — |
+| `waveformBackgroundColor` | `string` | — | — |
 | `caption` | `string` | — | — |
 
 ## Supports
@@ -39,9 +44,6 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 
 - [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
 - [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `true`
-- [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
-  - [`gradients`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
-  - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`

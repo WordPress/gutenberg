@@ -3,6 +3,21 @@
  */
 import { __ } from '@wordpress/i18n';
 
+export function getColorSupportAttributes( attributes ) {
+	const { style } = attributes;
+	return {
+		...attributes,
+		gradient: attributes.backgroundGradient,
+		style: {
+			...style,
+			color: {
+				...style?.color,
+				gradient: style?.background?.gradient || style?.color?.gradient,
+			},
+		},
+	};
+}
+
 /**
  * Transform media library image data into track image attributes.
  *

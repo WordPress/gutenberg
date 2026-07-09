@@ -11,7 +11,13 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	__experimentalGetElementClassName,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { getColorSupportAttributes } from './utils';
 
 export default function saveWithInnerBlocks( { attributes } ) {
 	const {
@@ -22,7 +28,10 @@ export default function saveWithInnerBlocks( { attributes } ) {
 		showTrackLength,
 	} = attributes;
 
-	const blockProps = useBlockProps.save();
+	const colorProps = getColorClassesAndStyles(
+		getColorSupportAttributes( attributes )
+	);
+	const blockProps = useBlockProps.save( colorProps );
 	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
 	return (
 		<figure { ...innerBlocksProps }>

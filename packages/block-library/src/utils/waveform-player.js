@@ -9,6 +9,7 @@ import { __, _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
+	applyWaveformPlayerStyles,
 	initWaveformPlayer,
 	setupPlayButtonArtwork,
 	updateSeekControlLabel,
@@ -74,6 +75,9 @@ function updatePlayerMetadata(
  * @param {string}   props.artist                - The artist name.
  * @param {string}   props.image                 - The track image URL.
  * @param {string}   props.imageAlt              - The track image alt text.
+ * @param {string}   props.color                 - The waveform color.
+ * @param {string}   props.backgroundColor       - The waveform background color.
+ * @param {string}   props.textColor             - The player text color.
  * @param {string}   props.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
  * @param {Function} props.onEnded               - Callback when the track finishes playing.
  * @param {boolean}  props.showPlayButtonArtwork - Whether to show artwork on the play button.
@@ -85,6 +89,9 @@ export function WaveformPlayer( {
 	artist,
 	image,
 	imageAlt,
+	color,
+	backgroundColor,
+	textColor,
 	waveformStyle,
 	onEnded,
 	showPlayButtonArtwork = false,
@@ -106,9 +113,22 @@ export function WaveformPlayer( {
 	// Combined props ref for `initWaveformPlayer`, which is called
 	// asynchronously after this component mounts.
 	const metadataRef = useRef( { src, title, artist, image, imageAlt } );
+	const stylesRef = useRef( { color, backgroundColor, textColor } );
 	useEffect( () => {
 		metadataRef.current = { src, title, artist, image, imageAlt };
 	}, [ src, title, artist, image, imageAlt ] );
+
+	useEffect( () => {
+		stylesRef.current = { color, backgroundColor, textColor };
+	}, [ color, backgroundColor, textColor ] );
+
+	useEffect( () => {
+		if ( playerRef.current?.container ) {
+			applyWaveformPlayerStyles( playerRef.current.container, {
+				backgroundColor,
+			} );
+		}
+	}, [ backgroundColor ] );
 
 	const ref = useRefEffect(
 		( element ) => {
@@ -129,6 +149,9 @@ export function WaveformPlayer( {
 					artist: metadataRef.current.artist,
 					image: metadataRef.current.image,
 					imageAlt: metadataRef.current.imageAlt,
+					waveformColor: stylesRef.current.color,
+					backgroundColor: stylesRef.current.backgroundColor,
+					textColor: stylesRef.current.textColor,
 					waveformStyle,
 					labels: {
 						seek: __( 'Seek' ),
@@ -162,8 +185,15 @@ export function WaveformPlayer( {
 				playerDestroy?.();
 			};
 		},
-		[ onEndedEvent, hasSrc, waveformStyle, showPlayButtonArtwork ]
-	);
+			[
+				onEndedEvent,
+				hasSrc,
+				waveformStyle,
+				color,
+				textColor,
+				showPlayButtonArtwork,
+			]
+		);
 
 	useEffect( () => {
 		if ( playerRef.current?.instance ) {

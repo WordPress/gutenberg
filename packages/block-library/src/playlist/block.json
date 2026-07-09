@@ -47,6 +47,21 @@
 			"enum": [ "bars", "mirror", "line", "blocks", "dots", "seekbar" ],
 			"default": "bars"
 		},
+		"textColor": {
+			"type": "string"
+		},
+		"backgroundColor": {
+			"type": "string"
+		},
+		"backgroundGradient": {
+			"type": "string"
+		},
+		"waveformColor": {
+			"type": "string"
+		},
+		"waveformBackgroundColor": {
+			"type": "string"
+		},
 		"caption": {
 			"type": "string"
 		}
@@ -58,14 +73,6 @@
 	"supports": {
 		"anchor": true,
 		"align": true,
-		"color": {
-			"gradients": true,
-			"link": true,
-			"__experimentalDefaultControls": {
-				"background": true,
-				"text": true
-			}
-		},
 		"__experimentalBorder": {
 			"color": true,
 			"style": true,

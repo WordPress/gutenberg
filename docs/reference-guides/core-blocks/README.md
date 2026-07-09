@@ -636,8 +636,8 @@ Embed a simple playlist.
 -	**Experimental:** true
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Allowed Blocks:** core/playlist-track
--	**Supports:** align, anchor, color (background, gradients, link, text), interactivity, spacing (margin, padding), typography (fontSize)
--	**Attributes:** caption, order, showArtists, showImages, showNumbers, showPlayButtonArtwork, showTrackLength, showTracklist, type, waveformStyle
+-	**Supports:** align, anchor, interactivity, spacing (margin, padding), typography (fontSize)
+-	**Attributes:** backgroundColor, backgroundGradient, caption, order, showArtists, showImages, showNumbers, showPlayButtonArtwork, showTrackLength, showTracklist, textColor, type, waveformBackgroundColor, waveformColor, waveformStyle
 
 ## Playlist track
 
