@@ -117,6 +117,7 @@ export default function CustomInserterModal( { onClose, value, onChange } ) {
 				{ [ { slug: '' }, ...( collections ?? [] ) ].map(
 					( collection ) => (
 						<Tabs.Panel
+							tabIndex={ -1 }
 							key={ collection.slug }
 							value={ collection.slug }
 							className="wp-block-icon__inserter-panel"
