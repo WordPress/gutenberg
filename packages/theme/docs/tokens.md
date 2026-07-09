@@ -119,6 +119,14 @@ The interactive state of the element. The default (no modifier) is the idle stat
 | `active`   | Hovered, pressed, or selected state |
 | `disabled` | Unavailable or inoperable state     |
 
+## Intentional omissions
+
+The semantic token set is role-based, not a complete matrix of every property, target, tone, emphasis, and state combination. A missing combination should stay omitted when it does not map to a supported design-system role.
+
+-   Do not create a token only to fill a missing slot in the naming pattern.
+-   Add a missing state token when the same target, tone, and emphasis already define the role in other states, and a component needs that state.
+-   Treat emphasis and tone variants as separate roles. For example, do not add strong interactive stroke variants unless a component specifically needs a distinct strong stroke role.
+
 <!-- START GENERATED TOKEN TABLES: Do not edit this section directly. -->
 
 ## Semantic tokens
@@ -183,7 +191,8 @@ The interactive state of the element. The default (no modifier) is the idle stat
 | `--wpds-color-background-thumb-neutral-weak-active`           | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active.               |
 | `--wpds-color-background-thumb-brand`                         | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track).                                      |
 | `--wpds-color-background-thumb-brand-active`                  | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active. |
-| `--wpds-color-background-thumb-neutral-disabled`              | Background color for thumbs with normal emphasis (eg. slider thumb and filled track), in their disabled state, regardless of the tone.      |
+| `--wpds-color-background-thumb-brand-disabled`                | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state.             |
+| `--wpds-color-background-thumb-neutral-weak-disabled`         | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb), in their disabled state.                           |
 | `--wpds-color-foreground-content-neutral`                     | Foreground color for content like text with normal emphasis.                                                                                |
 | `--wpds-color-foreground-content-neutral-weak`                | Foreground color for content like text with weak emphasis.                                                                                  |
 | `--wpds-color-foreground-content-success`                     | Foreground color for content like text with success tone and normal emphasis.                                                               |
@@ -203,6 +212,7 @@ The interactive state of the element. The default (no modifier) is the idle stat
 | `--wpds-color-foreground-interactive-neutral-strong-active`   | Foreground color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active.                       |
 | `--wpds-color-foreground-interactive-neutral-strong-disabled` | Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state.                                   |
 | `--wpds-color-foreground-interactive-neutral-weak`            | Foreground color for interactive elements with neutral tone and weak emphasis.                                                              |
+| `--wpds-color-foreground-interactive-neutral-weak-active`     | Foreground color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active.                         |
 | `--wpds-color-foreground-interactive-neutral-weak-disabled`   | Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state.                                     |
 | `--wpds-color-foreground-interactive-brand`                   | Foreground color for interactive elements with brand tone and normal emphasis.                                                              |
 | `--wpds-color-foreground-interactive-brand-active`            | Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active.                         |

@@ -11,16 +11,16 @@
 	&:hover,
 	&:focus,
 	&[aria-current="true"] {
-		color: var(--wpds-color-foreground-interactive-neutral-active);
+		color: var(--wpds-color-foreground-interactive-neutral-weak-active);
 
 		.edit-site-sidebar-navigation-item__drilldown-indicator {
-			fill: var(--wpds-color-foreground-interactive-neutral-active);
+			fill: var(--wpds-color-foreground-interactive-neutral-weak-active);
 		}
 	}
 
 	&[aria-current="true"] {
 		background: var(--wpds-color-background-interactive-neutral-weak-active);
-		color: var(--wpds-color-foreground-interactive-neutral-active);
+		color: var(--wpds-color-foreground-interactive-neutral-weak-active);
 		font-weight: $font-weight-medium;
 	}
 
