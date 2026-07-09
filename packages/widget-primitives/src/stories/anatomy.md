@@ -37,7 +37,7 @@ A host that hides the header still keeps the identity available, so assistive te
 
 ![In full-bleed, the widget owns the tile edge to edge while the host keeps the identity header in a VisuallyHidden node for accessibility. Shown with Welcome.](./assets/presentation-full-bleed.svg)
 
-Framing is the layer the host translates, and the one place where the same declaration can yield different results in different hosts. The dashboard makes these calls; another host could honor the same three values differently.
+Framing is the layer the host translates, and the one place where the same declaration can yield different results in different hosts. Each host makes these calls differently; another host could honor the same three values in its own way.
 
 ## Representation
 
@@ -45,11 +45,20 @@ How the widget represents its data: `attributes`, `example`, and the render modu
 
 The `attributes` are the contract between host and widget. The widget owns their shape and meaning; the host owns their values.
 
-A value can change from either side. The widget can ask, when the host grants it `setAttributes` (optional: without it the widget renders read-only). The host can also edit values on its own, mounting a settings form from the `attributes` schema. Both paths write the same instance state.
+Each entry in `attributes` is a DataViews `Field` plus an optional `relevance` hint (`'high' | 'low'`). The widget declares how important an attribute is; the host decides where, and whether, to expose it. When the hint is absent, treat it as `'low'`.
+
+- `'high'`: the host _may_ promote the field to a prominent surface near the instance, for quick in-context editing without opening a separate settings UI.
+- `'low'` (default): the field belongs in the host's settings surface, a form built from the full schema.
+
+The widget names importance, not a surface. One host might promote `'high'` fields inline; another might fold everything into a single panel. Both honor the same contract.
+
+![Each attribute may carry a relevance hint. The widget declares importance; the host may promote high-relevance fields to a prominent surface and edit the rest through a settings surface. Shown with the Events widget's location field.](./assets/attribute-relevance.svg)
+
+A value can change from either side. The widget can ask, when the host grants it `setAttributes` (optional: without it the widget renders read-only). The host can also edit values on its own, mounting a settings surface from the `attributes` schema. Both paths write the same instance state.
 
 Either way the host never interprets the values. It mounts the form from the declarative schema, stores and passes the values, and re-renders; the meaning stays the widget's.
 
-![The attributes are a contract both sides write: the render module reads them to produce the output, the widget asks for changes through setAttributes, and the host edits them through a settings form. The meaning stays the widget's.](./assets/representation.svg)
+![The attributes are a contract both sides write: the render module reads them to produce the output, the widget asks for changes through setAttributes, and the host edits them through a settings surface. The meaning stays the widget's.](./assets/representation.svg)
 
 ## Why the split matters
 

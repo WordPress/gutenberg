@@ -165,7 +165,7 @@ describe( 'Cropper', () => {
 
 		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 		const handle = await screen.findByRole( 'button', {
-			name: 'Resize top-left corner',
+			name: 'Resize from top-left corner',
 		} );
 
 		fireEvent.blur( canvas, { relatedTarget: handle } );
@@ -192,7 +192,7 @@ describe( 'Cropper', () => {
 
 		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 		const handle = await screen.findByRole( 'button', {
-			name: 'Resize top-left corner',
+			name: 'Resize from top-left corner',
 		} );
 		const focusVisibleClass =
 			'wp-media-editor-image-editor__canvas--focus-visible';
@@ -232,7 +232,7 @@ describe( 'Cropper', () => {
 
 		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 		const handle = await screen.findByRole( 'button', {
-			name: 'Resize top-left corner',
+			name: 'Resize from top-left corner',
 		} );
 
 		act( () => {
@@ -294,7 +294,7 @@ describe( 'Cropper', () => {
 		);
 
 		await screen.findByRole( 'button', {
-			name: 'Resize top-left corner',
+			name: 'Resize from top-left corner',
 		} );
 		( controller.setCropRect as jest.Mock ).mockClear();
 		( controller.adjustCropRectForViewport as jest.Mock ).mockClear();
@@ -310,7 +310,7 @@ describe( 'Cropper', () => {
 
 		expect(
 			screen.queryByRole( 'button', {
-				name: 'Resize top-left corner',
+				name: 'Resize from top-left corner',
 			} )
 		).not.toBeInTheDocument();
 		expect( controller.setCropRect ).not.toHaveBeenCalled();
@@ -358,7 +358,7 @@ describe( 'Cropper', () => {
 		);
 
 		const handle = await screen.findByRole( 'button', {
-			name: 'Resize top-left corner',
+			name: 'Resize from top-left corner',
 		} );
 		// The settle transition and viewport pan live on the stage, not the
 		// canvas (which stays fixed so the root background is never exposed).
@@ -414,7 +414,7 @@ describe( 'Cropper', () => {
 		);
 
 		const handle = await screen.findByRole( 'button', {
-			name: 'Resize top-left corner',
+			name: 'Resize from top-left corner',
 		} );
 		const stage = screen.getByTestId( 'cropper-stage' );
 
@@ -462,7 +462,7 @@ describe( 'Cropper', () => {
 		);
 
 		const handle = await screen.findByRole( 'button', {
-			name: 'Resize top-left corner',
+			name: 'Resize from top-left corner',
 		} );
 		const stage = screen.getByTestId( 'cropper-stage' );
 
@@ -502,7 +502,7 @@ describe( 'Cropper', () => {
 		);
 
 		const handle = await screen.findByRole( 'button', {
-			name: 'Resize top-left corner',
+			name: 'Resize from top-left corner',
 		} );
 		const stage = screen.getByTestId( 'cropper-stage' );
 
@@ -549,7 +549,7 @@ describe( 'Cropper', () => {
 
 		// East handle (4th button clockwise: nw, n, ne, e).
 		const eHandle = await screen.findByRole( 'button', {
-			name: 'Resize right edge',
+			name: 'Resize from right edge',
 		} );
 		const stage = screen.getByTestId( 'cropper-stage' );
 
@@ -582,7 +582,7 @@ describe( 'Cropper', () => {
 		);
 
 		const resizeHandle = await screen.findByRole( 'button', {
-			name: 'Resize top-left corner',
+			name: 'Resize from top-left corner',
 		} );
 		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 
@@ -622,7 +622,7 @@ describe( 'Cropper', () => {
 		);
 
 		await screen.findByRole( 'button', {
-			name: 'Resize top-left corner',
+			name: 'Resize from top-left corner',
 		} );
 		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 
@@ -670,7 +670,7 @@ describe( 'Cropper', () => {
 			);
 
 			const resizeHandle = await screen.findByRole( 'button', {
-				name: 'Resize top-left corner',
+				name: 'Resize from top-left corner',
 			} );
 			const canvas = screen.getByRole( 'group', {
 				name: 'Crop area',
@@ -892,7 +892,7 @@ describe( 'Cropper', () => {
 		expect( imageScale() ).toBeCloseTo( 2.4, 2 );
 
 		const handle = await screen.findByRole( 'button', {
-			name: 'Resize top-left corner',
+			name: 'Resize from top-left corner',
 		} );
 		fireEvent.pointerDown( handle, {
 			button: 0,
@@ -926,7 +926,7 @@ describe( 'Cropper', () => {
 		);
 
 		const handle = await screen.findByRole( 'button', {
-			name: 'Resize right edge',
+			name: 'Resize from right edge',
 		} );
 		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
 
@@ -968,7 +968,7 @@ describe( 'Cropper', () => {
 		);
 
 		const handle = await screen.findByRole( 'button', {
-			name: 'Resize right edge',
+			name: 'Resize from right edge',
 		} );
 		( controller.setCropRect as jest.Mock ).mockClear();
 		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
@@ -1003,7 +1003,7 @@ describe( 'Cropper', () => {
 		);
 
 		const handle = await screen.findByRole( 'button', {
-			name: 'Resize right edge',
+			name: 'Resize from right edge',
 		} );
 		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
 

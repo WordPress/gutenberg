@@ -211,6 +211,7 @@ export function logPlayError( error ) {
  * @param {string}   options.title         - The track title.
  * @param {string}   options.artist        - The artist name.
  * @param {string}   options.image         - The artwork image URL.
+ * @param {string}   options.imageAlt      - The artwork image alt text.
  * @param {boolean}  options.autoPlay      - Whether to auto-play when ready.
  * @param {Function} options.onEnded       - Callback when track ends.
  * @param {Object}   options.labels        - Translated button labels.
@@ -219,7 +220,17 @@ export function logPlayError( error ) {
  */
 export function initWaveformPlayer(
 	element,
-	{ src, title, artist, image, autoPlay, onEnded, labels, waveformStyle }
+	{
+		src,
+		title,
+		artist,
+		image,
+		imageAlt,
+		autoPlay,
+		onEnded,
+		labels,
+		waveformStyle,
+	}
 ) {
 	// Get colors from computed styles.
 	const { textColor, waveformColor, progressColor } =
@@ -244,6 +255,9 @@ export function initWaveformPlayer(
 	// seek label and value-text templates from the container's data attributes
 	// and owns the seek slider's accessible label and value text.
 	const instance = new WaveformPlayerLib( container );
+	if ( instance.artworkEl ) {
+		instance.artworkEl.alt = imageAlt || '';
+	}
 
 	// Set up event handlers.
 	let cleanupPlayButtonAccessibility;

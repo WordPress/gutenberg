@@ -53,6 +53,41 @@ function block_core_gallery_render_context( $context, $parsed_block ) {
 add_filter( 'render_block_context', 'block_core_gallery_render_context', 10, 2 );
 
 /**
+ * Returns the column gap value used for Gallery image width calculations.
+ *
+ * @since 7.1.0
+ *
+ * @param string|array|null $gap          Gallery block gap value.
+ * @param string            $fallback_gap Fallback gap value.
+ * @return string Gallery column gap value.
+ */
+function block_core_gallery_get_column_gap_value( $gap, $fallback_gap ) {
+	if ( is_array( $gap ) ) {
+		$gap = $gap['left'] ?? $fallback_gap;
+	}
+
+	// Make sure $gap is a string to avoid PHP 8.1 deprecation error in preg_match() when the value is null.
+	$gap = is_string( $gap ) ? $gap : '';
+
+	// Skip if gap value contains unsupported characters.
+	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
+	// because we only want to match against the value, not the CSS attribute.
+	$gap = $gap && preg_match( '%[\\\(&=}]|/\*%', $gap ) ? null : $gap;
+
+	// Get spacing CSS variable from preset value if provided.
+	if ( is_string( $gap ) && str_contains( $gap, 'var:preset|spacing|' ) ) {
+		$index_to_splice = strrpos( $gap, '|' ) + 1;
+		$slug            = _wp_to_kebab_case( substr( $gap, $index_to_splice ) );
+		$gap             = "var(--wp--preset--spacing--$slug)";
+	}
+
+	$gap_column = ( null !== $gap && '' !== $gap ) ? $gap : $fallback_gap;
+
+	// The unstable gallery gap calculation requires a real value (such as `0px`) and not `0`.
+	return '0' === $gap_column ? '0px' : $gap_column;
+}
+
+/**
  * Resolves a Gallery block's `dynamicContent` to an ordered list of image
  * attachment IDs.
  *
@@ -345,36 +380,15 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	// the current gap setting in order to maintain the number of flex columns
 	// so a css var is added to allow this.
 
-	$gap = $attributes['style']['spacing']['blockGap'] ?? null;
-	// Skip if gap value contains unsupported characters.
-	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
-	// because we only want to match against the value, not the CSS attribute.
-	if ( is_array( $gap ) ) {
-		foreach ( $gap as $key => $value ) {
-			// Make sure $value is a string to avoid PHP 8.1 deprecation error in preg_match() when the value is null.
-			$value = is_string( $value ) ? $value : '';
-			$value = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
-
-			// Get spacing CSS variable from preset value if provided.
-			if ( is_string( $value ) && str_contains( $value, 'var:preset|spacing|' ) ) {
-				$index_to_splice = strrpos( $value, '|' ) + 1;
-				$slug            = _wp_to_kebab_case( substr( $value, $index_to_splice ) );
-				$value           = "var(--wp--preset--spacing--$slug)";
-			}
-
-			$gap[ $key ] = $value;
-		}
-	} else {
-		// Make sure $gap is a string to avoid PHP 8.1 deprecation error in preg_match() when the value is null.
-		$gap = is_string( $gap ) ? $gap : '';
-		$gap = $gap && preg_match( '%[\\\(&=}]|/\*%', $gap ) ? null : $gap;
-
-		// Get spacing CSS variable from preset value if provided.
-		if ( is_string( $gap ) && str_contains( $gap, 'var:preset|spacing|' ) ) {
-			$index_to_splice = strrpos( $gap, '|' ) + 1;
-			$slug            = _wp_to_kebab_case( substr( $gap, $index_to_splice ) );
-			$gap             = "var(--wp--preset--spacing--$slug)";
-		}
+	$style_attr = is_array( $attributes['style'] ?? null )
+		? $attributes['style']
+		: array();
+	if (
+		defined( 'IS_GUTENBERG_PLUGIN' ) &&
+		IS_GUTENBERG_PLUGIN &&
+		function_exists( 'gutenberg_resolve_style_state_aliases' )
+	) {
+		$style_attr = gutenberg_resolve_style_state_aliases( $style_attr, 'core/gallery' );
 	}
 
 	$unique_gallery_classname = wp_unique_id( 'wp-block-gallery-' );
@@ -385,30 +399,45 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
 	// gap on the gallery.
 	$fallback_gap = 'var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )';
-	$gap_value    = $gap ? $gap : $fallback_gap;
-	$gap_column   = $gap_value;
+	$gap_column   = block_core_gallery_get_column_gap_value( $style_attr['spacing']['blockGap'] ?? null, $fallback_gap );
 
-	if ( is_array( $gap_value ) ) {
-		$gap_row    = $gap_value['top'] ?? $fallback_gap;
-		$gap_column = $gap_value['left'] ?? $fallback_gap;
-		$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
-	}
-
-	// The unstable gallery gap calculation requires a real value (such as `0px`) and not `0`.
-	if ( '0' === $gap_column ) {
-		$gap_column = '0px';
-	}
-
-	// Set the CSS variable to the column value, and the `gap` property to the combined gap value.
+	// Set the CSS variable to the column value for Gallery's flex width calculations.
 	$gallery_styles = array(
 		array(
 			'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
 			'declarations' => array(
 				'--wp--style--unstable-gallery-gap' => $gap_column,
-				'gap'                               => $gap_value,
 			),
 		),
 	);
+
+	$global_settings          = wp_get_global_settings();
+	$viewport_settings        = $global_settings['viewport'] ?? null;
+	$responsive_media_queries = array();
+	foreach ( array( 'WP_Theme_JSON_Gutenberg', 'WP_Theme_JSON' ) as $theme_json_class_name ) {
+		if ( method_exists( $theme_json_class_name, 'get_viewport_media_queries' ) ) {
+			$responsive_media_queries = $theme_json_class_name::get_viewport_media_queries( $viewport_settings );
+			break;
+		}
+	}
+
+	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
+		$viewport_style = $style_attr[ $breakpoint ] ?? null;
+		if ( ! is_array( $viewport_style ) || ! isset( $viewport_style['spacing']['blockGap'] ) ) {
+			continue;
+		}
+
+		$gallery_styles[] = array(
+			'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
+			'declarations' => array(
+				'--wp--style--unstable-gallery-gap' => block_core_gallery_get_column_gap_value(
+					$viewport_style['spacing']['blockGap'],
+					$fallback_gap
+				),
+			),
+			'rules_group'  => $media_query,
+		);
+	}
 
 	wp_style_engine_get_stylesheet_from_css_rules(
 		$gallery_styles,
