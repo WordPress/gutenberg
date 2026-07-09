@@ -43,7 +43,8 @@
 		}
 	},
 	"providesContext": {
-		"showArtists": "showArtists"
+		"showArtists": "showArtists",
+		"showImages": "showImages"
 	},
 	"supports": {
 		"anchor": true,

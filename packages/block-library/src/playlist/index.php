@@ -20,6 +20,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$playlist_id     = wp_unique_id( 'playlist-' );
 	$playlist_tracks = array();
 	$tracks_data     = array();
+	$show_images     = $attributes['showImages'] ?? true;
 
 	// Parse inner blocks to extract track data.
 	// This approach avoids duplicating track data in the HTML output.
@@ -40,6 +41,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				$artist     = $track_attributes['artist'] ?? '';
 				$album      = $track_attributes['album'] ?? '';
 				$image      = $track_attributes['image'] ?? '';
+				$image_alt  = $track_attributes['imageAlt'] ?? '';
 				$url        = $track_attributes['src'] ?? '';
 				$aria_label = $title;
 
@@ -61,7 +63,8 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					'title'     => wp_strip_all_tags( $title ),
 					'artist'    => wp_strip_all_tags( $artist ),
 					'album'     => wp_strip_all_tags( $album ),
-					'image'     => esc_url( $image ),
+					'image'     => $show_images ? esc_url( $image ) : '',
+					'imageAlt'  => $show_images ? wp_strip_all_tags( $image_alt ) : '',
 					'ariaLabel' => wp_strip_all_tags( $aria_label ),
 				);
 			}
@@ -90,10 +93,18 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	// Add waveform player container with translated button labels.
 	$label_play  = esc_attr__( 'Play' );
 	$label_pause = esc_attr__( 'Pause' );
-	$html        = '<div class="wp-block-playlist__waveform-player"
+	$label_seek  = esc_attr__( 'Seek' );
+	/* translators: %1$s: current audio time, %2$s: total audio duration. */
+	$label_seek_value = esc_attr_x(
+		'%1$s of %2$s',
+		'audio current time of total duration'
+	);
+	$html             = '<div class="wp-block-playlist__waveform-player"
 		data-wp-watch="callbacks.initWaveformPlayer"
 		data-label-play="' . $label_play . '"
 		data-label-pause="' . $label_pause . '"
+		data-label-seek="' . $label_seek . '"
+		data-label-seek-value="' . $label_seek_value . '"
 	></div>';
 
 	// Add the waveform player container inside the figure.

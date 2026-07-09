@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	useCallback,
-	useEffect,
-	useId,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useId, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { mapMarker } from '@wordpress/icons';
 import {
@@ -29,7 +23,6 @@ type LocationOption = {
 	value: string;
 };
 
-const DRAFT_DEBOUNCE_MS = 300;
 const SEARCH_DEBOUNCE_MS = 500;
 
 type LocationPickerProps = {
@@ -53,13 +46,15 @@ type LocationPickerProps = {
 	selectButton?: boolean;
 
 	/**
-	 * Called when the user selects a location.
+	 * Called when the user submits via the Select button.
 	 */
 	onSubmit?: ( location: string ) => void;
 
 	/**
-	 * Called after the input value settles (debounced). Used when `selectButton`
-	 * is false to stage attribute updates before they are persisted by the host.
+	 * Called when the staged location changes through a deliberate action: an
+	 * autocomplete selection, geolocation, or clearing the field. Never fires
+	 * for intermediate typing, so the saved value is always a real choice. Used
+	 * when `selectButton` is false.
 	 */
 	onChange?: ( location: string ) => void;
 };
@@ -78,59 +73,12 @@ export function LocationPicker( {
 		LocationOption[]
 	>( [] );
 	const [ isLocatingCity, setIsLocatingCity ] = useState( false );
-	const draftTimeoutRef = useRef< ReturnType< typeof setTimeout > | null >(
-		null
-	);
 
 	useEffect( () => {
 		if ( ! selectButton || seedInput ) {
 			setLocationInput( seedInput );
 		}
 	}, [ selectButton, seedInput ] );
-
-	const clearDraftTimeout = useCallback( () => {
-		if ( draftTimeoutRef.current ) {
-			clearTimeout( draftTimeoutRef.current );
-			draftTimeoutRef.current = null;
-		}
-	}, [] );
-
-	const tryPublishDraft = useCallback( () => {
-		if ( selectButton || ! onChange ) {
-			return;
-		}
-		const draft = locationInput.trim();
-		const saved = seedInput.trim();
-		if ( draft === saved ) {
-			return;
-		}
-		onChange( locationInput );
-	}, [ selectButton, locationInput, onChange, seedInput ] );
-
-	const scheduleDraftPublish = useCallback( () => {
-		if ( selectButton || ! onChange ) {
-			return;
-		}
-		clearDraftTimeout();
-		draftTimeoutRef.current = setTimeout( () => {
-			draftTimeoutRef.current = null;
-			tryPublishDraft();
-		}, DRAFT_DEBOUNCE_MS );
-	}, [ clearDraftTimeout, selectButton, onChange, tryPublishDraft ] );
-
-	useEffect( () => {
-		if ( selectButton || ! onChange ) {
-			clearDraftTimeout();
-			return;
-		}
-		scheduleDraftPublish();
-		return clearDraftTimeout;
-	}, [ clearDraftTimeout, selectButton, onChange, scheduleDraftPublish ] );
-
-	const flushDraftPublish = useCallback( () => {
-		clearDraftTimeout();
-		tryPublishDraft();
-	}, [ clearDraftTimeout, tryPublishDraft ] );
 
 	const fillCityFromGeolocation = async () => {
 		if ( ! navigator.geolocation || isLocatingCity ) {
@@ -170,6 +118,10 @@ export function LocationPicker( {
 
 			if ( city ) {
 				setLocationInput( city );
+				// Geolocation is a confirmed choice, so stage it.
+				if ( ! selectButton ) {
+					onChange?.( city );
+				}
 			}
 		} catch {
 			// No-op: keep manual location entry as fallback.
@@ -268,7 +220,18 @@ export function LocationPicker( {
 				<Autocomplete.Root
 					items={ locationOptions }
 					value={ locationInput }
-					onValueChange={ setLocationInput }
+					onValueChange={ ( value, eventDetails ) => {
+						setLocationInput( value );
+						// Stage only deliberate changes: pressing an item or
+						// clearing the field, never intermediate typing, so the
+						// saved value is always a real choice.
+						const isDeliberate =
+							eventDetails.reason === 'item-press' ||
+							eventDetails.reason === 'clear-press';
+						if ( ! selectButton && isDeliberate ) {
+							onChange?.( value );
+						}
+					} }
 				>
 					<Autocomplete.Input
 						id={ locationInputId }
@@ -287,11 +250,6 @@ export function LocationPicker( {
 										: undefined
 								}
 								onValueChange={ () => {} }
-								onBlur={
-									! selectButton
-										? flushDraftPublish
-										: undefined
-								}
 								suffix={
 									<InputLayout.Slot padding="minimal">
 										<Autocomplete.Clear />

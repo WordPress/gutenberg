@@ -70,7 +70,6 @@
 		{ "path": "packages/redux-routine" },
 		{ "path": "packages/report-flaky-tests" },
 		{ "path": "packages/rich-text" },
-		{ "path": "packages/rich-text-control" },
 		{ "path": "packages/route" },
 		{ "path": "packages/router" },
 		{ "path": "packages/server-side-render" },
