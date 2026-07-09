@@ -131,6 +131,10 @@ export const hideBlockTypes =
 /**
  * Save entity records marked as dirty.
  *
+ * The implementation now lives in the `core` (`@wordpress/core-data`) store;
+ * this thin wrapper is kept for backwards compatibility so existing consumers
+ * of the private `core/editor` `saveDirtyEntities` action keep working.
+ *
  * @param {Object}   options                        Options for the action.
  * @param {Function} [options.onSave]               Callback when saving happens.
  * @param {object[]} [options.dirtyEntityRecords]   Array of dirty entities.
@@ -139,118 +143,9 @@ export const hideBlockTypes =
  * @param {string}   [options.successNoticeContent] Optional custom success notice content. Defaults to 'Site updated.'.
  */
 export const saveDirtyEntities =
-	( {
-		onSave,
-		dirtyEntityRecords = [],
-		entitiesToSkip = [],
-		close,
-		successNoticeContent,
-	} = {} ) =>
-	( { registry } ) => {
-		const PUBLISH_ON_SAVE_ENTITIES = [
-			{ kind: 'postType', name: 'wp_navigation' },
-		];
-		const saveNoticeId = 'site-editor-save-success';
-		const homeUrl = registry
-			.select( coreStore )
-			.getEntityRecord( 'root', '__unstableBase' )?.home;
-		registry.dispatch( noticesStore ).removeNotice( saveNoticeId );
-		const entitiesToSave = dirtyEntityRecords.filter(
-			( { kind, name, key, property } ) => {
-				return ! entitiesToSkip.some(
-					( elt ) =>
-						elt.kind === kind &&
-						elt.name === name &&
-						elt.key === key &&
-						elt.property === property
-				);
-			}
-		);
-		close?.( entitiesToSave );
-		const siteItemsToSave = [];
-		const pendingSavedRecords = [];
-		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
-			if ( 'root' === kind && 'site' === name ) {
-				siteItemsToSave.push( property );
-			} else {
-				if (
-					PUBLISH_ON_SAVE_ENTITIES.some(
-						( typeToPublish ) =>
-							typeToPublish.kind === kind &&
-							typeToPublish.name === name
-					)
-				) {
-					registry
-						.dispatch( coreStore )
-						.editEntityRecord( kind, name, key, {
-							status: 'publish',
-						} );
-				}
-
-				pendingSavedRecords.push(
-					registry
-						.dispatch( coreStore )
-						.saveEditedEntityRecord( kind, name, key )
-				);
-			}
-		} );
-		if ( siteItemsToSave.length ) {
-			pendingSavedRecords.push(
-				registry
-					.dispatch( coreStore )
-					.__experimentalSaveSpecifiedEntityEdits(
-						'root',
-						'site',
-						undefined,
-						siteItemsToSave
-					)
-			);
-		}
-		registry
-			.dispatch( blockEditorStore )
-			.__unstableMarkLastChangeAsPersistent();
-
-		Promise.all( pendingSavedRecords )
-			.then( async ( values ) => {
-				if ( onSave ) {
-					await onSave();
-				}
-				return values;
-			} )
-			.then( ( values ) => {
-				if (
-					values.some( ( value ) => typeof value === 'undefined' )
-				) {
-					registry
-						.dispatch( noticesStore )
-						.createErrorNotice( __( 'Saving failed.' ) );
-				} else {
-					registry
-						.dispatch( noticesStore )
-						.createSuccessNotice(
-							successNoticeContent || __( 'Site updated.' ),
-							{
-								type: 'snackbar',
-								id: saveNoticeId,
-								actions: [
-									{
-										label: __( 'View site' ),
-										url: homeUrl,
-										openInNewTab: true,
-									},
-								],
-							}
-						);
-				}
-			} )
-			.catch( ( error ) =>
-				registry
-					.dispatch( noticesStore )
-					.createErrorNotice(
-						`${ __( 'Saving failed.' ) } ${ error }`
-					)
-			);
-	};
+	( options ) =>
+	( { registry } ) =>
+		registry.dispatch( coreStore ).saveDirtyEntities( options );
 
 /**
  * Reverts a template to its original theme-provided file.

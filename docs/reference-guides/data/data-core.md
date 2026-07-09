@@ -931,6 +931,19 @@ _Returns_
 
 Action triggered to redo the last undone edit to an entity record, if any.
 
+### saveDirtyEntities
+
+Save entity records marked as dirty.
+
+_Parameters_
+
+-   _options_ `Object`: Options for the action.
+-   _options.onSave_ `[Function]`: Callback when saving happens.
+-   _options.dirtyEntityRecords_ `[object[]]`: Array of dirty entities.
+-   _options.entitiesToSkip_ `[object[]]`: Array of entities to skip saving.
+-   _options.close_ `[Function]`: Callback when the actions is called. It should be consolidated with `onSave`.
+-   _options.successNoticeContent_ `[string]`: Optional custom success notice content. Defaults to 'Site updated.'.
+
 ### saveEditedEntityRecord
 
 Action triggered to save an entity record's edits.

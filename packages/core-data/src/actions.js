@@ -9,6 +9,9 @@ import { v4 as uuid } from 'uuid';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
+import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -1105,4 +1108,123 @@ export const receiveRevisions =
 			name,
 			invalidateCache,
 		} );
+	};
+
+/**
+ * Save entity records marked as dirty.
+ *
+ * @param {Object}   options                        Options for the action.
+ * @param {Function} [options.onSave]               Callback when saving happens.
+ * @param {object[]} [options.dirtyEntityRecords]   Array of dirty entities.
+ * @param {object[]} [options.entitiesToSkip]       Array of entities to skip saving.
+ * @param {Function} [options.close]                Callback when the actions is called. It should be consolidated with `onSave`.
+ * @param {string}   [options.successNoticeContent] Optional custom success notice content. Defaults to 'Site updated.'.
+ */
+export const saveDirtyEntities =
+	( {
+		onSave,
+		dirtyEntityRecords = [],
+		entitiesToSkip = [],
+		close,
+		successNoticeContent,
+	} = {} ) =>
+	( { dispatch, select, registry } ) => {
+		const PUBLISH_ON_SAVE_ENTITIES = [
+			{ kind: 'postType', name: 'wp_navigation' },
+		];
+		const saveNoticeId = 'site-editor-save-success';
+		const homeUrl = select.getEntityRecord(
+			'root',
+			'__unstableBase'
+		)?.home;
+		registry.dispatch( noticesStore ).removeNotice( saveNoticeId );
+		const entitiesToSave = dirtyEntityRecords.filter(
+			( { kind, name, key, property } ) => {
+				return ! entitiesToSkip.some(
+					( elt ) =>
+						elt.kind === kind &&
+						elt.name === name &&
+						elt.key === key &&
+						elt.property === property
+				);
+			}
+		);
+		close?.( entitiesToSave );
+		const siteItemsToSave = [];
+		const pendingSavedRecords = [];
+		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
+			if ( 'root' === kind && 'site' === name ) {
+				siteItemsToSave.push( property );
+			} else {
+				if (
+					PUBLISH_ON_SAVE_ENTITIES.some(
+						( typeToPublish ) =>
+							typeToPublish.kind === kind &&
+							typeToPublish.name === name
+					)
+				) {
+					dispatch.editEntityRecord( kind, name, key, {
+						status: 'publish',
+					} );
+				}
+
+				pendingSavedRecords.push(
+					dispatch.saveEditedEntityRecord( kind, name, key )
+				);
+			}
+		} );
+		if ( siteItemsToSave.length ) {
+			pendingSavedRecords.push(
+				dispatch.__experimentalSaveSpecifiedEntityEdits(
+					'root',
+					'site',
+					undefined,
+					siteItemsToSave
+				)
+			);
+		}
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkLastChangeAsPersistent();
+
+		Promise.all( pendingSavedRecords )
+			.then( async ( values ) => {
+				if ( onSave ) {
+					await onSave();
+				}
+				return values;
+			} )
+			.then( ( values ) => {
+				if (
+					values.some( ( value ) => typeof value === 'undefined' )
+				) {
+					registry
+						.dispatch( noticesStore )
+						.createErrorNotice( __( 'Saving failed.' ) );
+				} else {
+					registry
+						.dispatch( noticesStore )
+						.createSuccessNotice(
+							successNoticeContent || __( 'Site updated.' ),
+							{
+								type: 'snackbar',
+								id: saveNoticeId,
+								actions: [
+									{
+										label: __( 'View site' ),
+										url: homeUrl,
+										openInNewTab: true,
+									},
+								],
+							}
+						);
+				}
+			} )
+			.catch( ( error ) =>
+				registry
+					.dispatch( noticesStore )
+					.createErrorNotice(
+						`${ __( 'Saving failed.' ) } ${ error }`
+					)
+			);
 	};

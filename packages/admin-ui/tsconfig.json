@@ -2,12 +2,20 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
+		"checkJs": false,
+		"noImplicitAny": false,
 		"types": [ "style-imports" ]
 	},
 	"references": [
 		{ "path": "../components" },
+		{ "path": "../compose" },
+		{ "path": "../core-data" },
+		{ "path": "../data" },
 		{ "path": "../element" },
+		{ "path": "../global-styles-engine" },
+		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
+		{ "path": "../icons" },
 		{ "path": "../private-apis" },
 		{ "path": "../route" },
 		{ "path": "../style-runtime" },

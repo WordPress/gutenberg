@@ -7,9 +7,9 @@ import { _n, __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { displayShortcut, rawShortcut } from '@wordpress/keycodes';
 import { check } from '@wordpress/icons';
-import { EntitiesSavedStates } from '@wordpress/editor';
 import { Button, Modal } from '@wordpress/components';
 import { Tooltip } from '@wordpress/ui';
+import { EntitiesSavedStates } from '@wordpress/admin-ui';
 
 /**
  * Internal dependencies

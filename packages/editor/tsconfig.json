@@ -7,6 +7,7 @@
 	},
 	"references": [
 		{ "path": "../a11y" },
+		{ "path": "../admin-ui" },
 		{ "path": "../api-fetch" },
 		{ "path": "../blob" },
 		{ "path": "../block-editor" },

@@ -14,6 +14,10 @@
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
+### Code Quality
+
+-   The `EntitiesSavedStates` component (and its `EntitiesSavedStatesExtensible`/`useEntitiesSavedStatesIsDirty` exports) now lives in `@wordpress/admin-ui`; `@wordpress/editor` re-exports them unchanged. The `saveDirtyEntities` implementation moved to a public `@wordpress/core-data` action; the private `core/editor` `saveDirtyEntities` action is retained as a thin backwards-compatible wrapper. No public or private API changes. [#80074](https://github.com/WordPress/gutenberg/pull/80074).
+
 ## 14.50.0 (2026-07-01)
 
 ## 14.49.0 (2026-06-24)

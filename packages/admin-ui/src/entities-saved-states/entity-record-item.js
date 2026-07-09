@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import fastDeepEqual from 'fast-deep-equal';
+
+/**
  * WordPress dependencies
  */
 import { CheckboxControl, PanelRow } from '@wordpress/components';
@@ -10,9 +15,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-import { getTemplateInfo } from '../../utils/get-template-info';
+import { getTemplateInfo } from '../utils/get-template-info';
 
 export default function EntityRecordItem( { record, checked, onChange } ) {
 	const { name, kind, title, key } = record;
@@ -20,32 +23,48 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 	// Handle templates that might use default descriptive titles.
 	const { entityRecordTitle, hasPostMetaChanges } = useSelect(
 		( select ) => {
+			const {
+				getEditedEntityRecord,
+				getCurrentTheme,
+				getEntityRecordNonTransientEdits,
+				getEntityRecord,
+			} = select( coreStore );
+
+			const metaEdits = getEntityRecordNonTransientEdits(
+				'postType',
+				name,
+				key
+			)?.meta;
+			let metaChanged = false;
+			if ( metaEdits ) {
+				const originalMeta = getEntityRecord(
+					'postType',
+					name,
+					key
+				)?.meta;
+				metaChanged = ! fastDeepEqual(
+					{ ...originalMeta, footnotes: undefined },
+					{ ...metaEdits, footnotes: undefined }
+				);
+			}
+
 			if ( 'postType' !== kind || 'wp_template' !== name ) {
 				return {
 					entityRecordTitle: title,
-					hasPostMetaChanges: unlock(
-						select( editorStore )
-					).hasPostMetaChanges( name, key ),
+					hasPostMetaChanges: metaChanged,
 				};
 			}
 
-			const template = select( coreStore ).getEditedEntityRecord(
-				kind,
-				name,
-				key
-			);
-
+			const template = getEditedEntityRecord( kind, name, key );
 			const { default_template_types: templateTypes = [] } =
-				select( coreStore ).getCurrentTheme() ?? {};
+				getCurrentTheme() ?? {};
 
 			return {
 				entityRecordTitle: getTemplateInfo( {
 					template,
 					templateTypes,
 				} ).title,
-				hasPostMetaChanges: unlock(
-					select( editorStore )
-				).hasPostMetaChanges( name, key ),
+				hasPostMetaChanges: metaChanged,
 			};
 		},
 		[ name, kind, title, key ]

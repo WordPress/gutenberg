@@ -11,19 +11,21 @@
  */
 
 // Global storage for {{PAGE_SLUG}} routes and menu items
-global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items;
-${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes     = array();
-${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items = array();
+global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies;
+${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes             = array();
+${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items         = array();
+${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies = array();
 
 /**
  * Register a route for the {{PAGE_SLUG}}-wp-admin page.
  *
- * @param string      $path           Route path (e.g., '/types/$type/edit/$id').
- * @param string|null $content_module Script module ID for content (stage/inspector).
- * @param string|null $route_module   Script module ID for route lifecycle hooks.
+ * @param string      $path                 Route path (e.g., '/types/$type/edit/$id').
+ * @param string|null $content_module       Script module ID for content (stage/inspector).
+ * @param string|null $route_module         Script module ID for route lifecycle hooks.
+ * @param array       $classic_dependencies Classic script handles the route's modules depend on.
  */
-function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route( $path, $content_module = null, $route_module = null ) {
-	global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes;
+function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route( $path, $content_module = null, $route_module = null, $classic_dependencies = array() ) {
+	global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies;
 
 	$route = array( 'path' => $path );
 	if ( ! empty( $content_module ) ) {
@@ -33,7 +35,11 @@ function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route( $path, $co
 		$route['route_module'] = $route_module;
 	}
 
-	${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes[] = $route;
+	${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes[]             = $route;
+	${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies = array_merge(
+		${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies,
+		$classic_dependencies
+	);
 }
 
 /**
@@ -150,10 +156,17 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 	if ( file_exists( $asset_file ) ) {
 		$asset = require $asset_file;
 
+		global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies;
+		$prerequisite_dependencies = array_values(
+			array_unique(
+				array_merge( $asset['dependencies'], ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies )
+			)
+		);
+
 		// This script serves two purposes:
 		// 1. It ensures all the globals that are made available to the modules are loaded.
 		// 2. It initializes the boot module as an inline script.
-		wp_register_script( '{{PAGE_SLUG}}-wp-admin-prerequisites', '', $asset['dependencies'], $asset['version'], true );
+		wp_register_script( '{{PAGE_SLUG}}-wp-admin-prerequisites', '', $prerequisite_dependencies, $asset['version'], true );
 
 		$init_modules = {{INIT_MODULES_JSON}};
 
@@ -193,7 +206,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 
 		// Register prerequisites style by filtering script dependencies to find registered styles
 		$style_dependencies = array_filter(
-			$asset['dependencies'],
+			$prerequisite_dependencies,
 			function ( $handle ) {
 				return wp_style_is( $handle, 'registered' );
 			}

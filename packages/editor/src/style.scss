@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/default-custom-properties";
+@use "@wordpress/admin-ui/build-style/style.css" as *;
 @use "@wordpress/interface/build-style/style.css" as *;
 @use "@wordpress/global-styles-ui/build-style/style.css" as *;
 @use "@wordpress/dataviews/build-style/style.css" as *;
@@ -17,7 +18,6 @@
 @use "./components/document-outline/style.scss" as *;
 @use "./components/document-tools/style.scss" as *;
 @use "./components/editor-interface/style.scss" as *;
-@use "./components/entities-saved-states/style.scss" as *;
 @use "./components/error-boundary/style.scss" as *;
 @use "./components/global-styles/style.scss" as *;
 @use "./components/global-styles-sidebar/style.scss" as *;

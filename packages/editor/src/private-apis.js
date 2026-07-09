@@ -7,12 +7,12 @@ import {
 	templateTitleField,
 } from '@wordpress/fields';
 import * as interfaceApis from '@wordpress/interface';
+import { EntitiesSavedStatesExtensible } from '@wordpress/admin-ui';
 
 /**
  * Internal dependencies
  */
 import { lock } from './lock-unlock';
-import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import BackButton from './components/header/back-button';
 import Editor from './components/editor';
 import PluginPostExcerpt from './components/post-excerpt/plugin';

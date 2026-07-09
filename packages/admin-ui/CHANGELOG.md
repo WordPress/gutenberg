@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `EntitiesSavedStates` component (with `EntitiesSavedStatesExtensible` and `useEntitiesSavedStatesIsDirty`), moved from `@wordpress/editor`, so the entity-save "review changes" UI can be used without loading the editor. [#80074](https://github.com/WordPress/gutenberg/pull/80074).
+
 ### Enhancements
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
