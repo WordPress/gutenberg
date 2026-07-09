@@ -228,7 +228,7 @@ describe( 'actions', () => {
 			const select = {
 				getSettings: () => null,
 				getBlockRootClientId: () => null,
-				getSelectedBlockClientId: () => null,
+				getSelectedBlockClientIds: () => [],
 				canInsertBlockType: () => true,
 				getBlockCount: () => 1,
 			};
@@ -264,7 +264,7 @@ describe( 'actions', () => {
 			const select = {
 				getSettings: () => null,
 				getBlockRootClientId: () => null,
-				getSelectedBlockClientId: () => null,
+				getSelectedBlockClientIds: () => [],
 				canInsertBlockType: ( clientId ) => {
 					switch ( clientId ) {
 						case 'core/test-ribs':
@@ -297,7 +297,7 @@ describe( 'actions', () => {
 			const select = {
 				getSettings: () => null,
 				getBlockRootClientId: () => null,
-				getSelectedBlockClientId: () => null,
+				getSelectedBlockClientIds: () => [],
 				canInsertBlockType: () => true,
 				getBlockCount: () => 1,
 			};
@@ -336,7 +336,7 @@ describe( 'actions', () => {
 			const select = {
 				getSettings: () => null,
 				getBlockRootClientId: () => null,
-				getSelectedBlockClientId: () => null,
+				getSelectedBlockClientIds: () => [],
 				canInsertBlockType: () => true,
 				getBlockCount: () => 1,
 			};
@@ -778,7 +778,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getBlockRootClientId: () => null,
-				getSelectedBlockClientId: () => null,
+				getSelectedBlockClientIds: () => [],
 				canRemoveBlocks: () => true,
 				getBlockRemovalRules: () => false,
 			};
@@ -804,7 +804,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getBlockRootClientId: () => null,
-				getSelectedBlockClientId: () => null,
+				getSelectedBlockClientIds: () => [],
 				canRemoveBlocks: () => true,
 				getBlockRemovalRules: () => false,
 			};

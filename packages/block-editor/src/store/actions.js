@@ -394,9 +394,13 @@ export const replaceBlocks =
 			}
 		}
 		const blocksWithTemplates = applyBlockTypeTemplates( blocks );
-		const isReplacingSelection = clientIds.includes(
-			select.getSelectedBlockClientId()
-		);
+		// Mirrors the selection reducer, which reassigns the selection when
+		// a selection endpoint is one of the replaced blocks.
+		const isReplacingSelection = select
+			.getSelectedBlockClientIds()
+			.some( ( selectedClientId ) =>
+				clientIds.includes( selectedClientId )
+			);
 		// We're batching these two actions because an extra `undo/redo` step can
 		// be created, based on whether we insert a default block or not.
 		registry.batch( () => {
