@@ -213,6 +213,42 @@ describe( 'RichTextControl', () => {
 			}
 		);
 
+		it.each( [
+			[ 'mid-composition', { isComposing: true } ],
+			// Mac Safari fires the final Enter of a composition with
+			// `isComposing: false` but `keyCode: 229`.
+			[ 'ending a composition in Mac Safari', { keyCode: 229 } ],
+		] )(
+			'leaves Enter presses from an IME %s to the browser',
+			async ( _label, eventInit ) => {
+				const onChange = jest.fn();
+				const { container } = render(
+					<RichTextControl
+						label="Note"
+						value="こんにちは"
+						onChange={ onChange }
+					/>
+				);
+				const textbox = getTextbox( container );
+				await focusTextbox( textbox );
+
+				/*
+				 * During IME composition (e.g. CJK input), Enter confirms
+				 * the composed text rather than requesting a line break;
+				 * intercepting it would swallow the confirmation. The
+				 * handler must not `preventDefault()` (`fireEvent` returns
+				 * `true`) nor insert a break.
+				 */
+				expect(
+					fireEvent.keyDown( textbox, {
+						key: 'Enter',
+						...eventInit,
+					} )
+				).toBe( true );
+				expect( onChange ).not.toHaveBeenCalled();
+			}
+		);
+
 		it( 'leaves Enter presses with a meta or ctrl modifier to consumers', async () => {
 			const onChange = jest.fn();
 			const { container } = render(

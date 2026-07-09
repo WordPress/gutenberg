@@ -38,9 +38,10 @@ import FormatEdit from './format-edit';
 // `@wordpress/rich-text` dependency; the `Validated` wrapper adds the same
 // required/validity treatment the sibling text controls get. This module is
 // the "assembly" that injects the rich-text wiring into it.
-const { ValidatedContentEditableControl: RichTextControlShell } = unlock(
-	componentsPrivateApis
-);
+const {
+	ValidatedContentEditableControl: RichTextControlShell,
+	withIgnoreIMEEvents,
+} = unlock( componentsPrivateApis );
 
 // `KeyboardShortcutContext` / `InputEventContext` are the same context objects
 // that format types' `RichTextShortcut` / `RichTextInputEvent` read. Format
@@ -354,7 +355,10 @@ export default function RichTextControl( {
 			if ( disabled ) {
 				return;
 			}
-			function onKeyDown( event: KeyboardEvent ) {
+			// During IME composition (e.g. CJK input), Enter confirms the
+			// composition rather than requesting a line break, so those
+			// presses must reach the browser untouched.
+			const onKeyDown = withIgnoreIMEEvents( ( event: KeyboardEvent ) => {
 				if (
 					event.key !== 'Enter' ||
 					event.defaultPrevented ||
@@ -380,7 +384,7 @@ export default function RichTextControl( {
 						current.end ?? current.text.length
 					)
 				);
-			}
+			} );
 			element.addEventListener( 'keydown', onKeyDown );
 			return () => element.removeEventListener( 'keydown', onKeyDown );
 		},
