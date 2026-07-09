@@ -17,6 +17,71 @@ function titleCase( str: string ) {
 
 type TokensMap = Record< string, Record< string, string > >;
 
+function pluralize( str: string ) {
+	if ( str.endsWith( 'y' ) ) {
+		return `${ str.slice( 0, -1 ) }ies`;
+	}
+
+	if ( str.endsWith( 's' ) ) {
+		return str;
+	}
+
+	return `${ str }s`;
+}
+
+function getRoleGroup( tokenId: string ) {
+	const [ type, property, target ] = tokenId
+		.replace( /^wpds-/, '' )
+		.split( '.' );
+
+	if ( type === 'color' ) {
+		if ( property === 'stroke' && target === 'focus' ) {
+			return 'Focus indicators';
+		}
+
+		return `${ titleCase( target ) } ${ pluralize( property ) }`;
+	}
+
+	if ( type === 'dimension' ) {
+		switch ( property ) {
+			case 'padding':
+				return 'Padding';
+			case 'gap':
+				return 'Gaps';
+			case 'surface-width':
+				return 'Surface widths';
+			case 'size':
+				return 'Element sizes';
+			default:
+				return titleCase( pluralize( property ) );
+		}
+	}
+
+	if ( type === 'border' ) {
+		if ( property === 'width' && target === 'focus' ) {
+			return 'Focus indicators';
+		}
+
+		return property === 'radius' ? 'Border radii' : 'Border widths';
+	}
+
+	if ( type === 'motion' ) {
+		return property === 'duration'
+			? 'Animation durations'
+			: 'Animation easing curves';
+	}
+
+	if ( type === 'typography' ) {
+		return titleCase( pluralize( property.replace( '-', ' ' ) ) );
+	}
+
+	if ( type === 'cursor' ) {
+		return 'Control cursor';
+	}
+
+	return titleCase( pluralize( type ) );
+}
+
 export default function pluginDsTokenDocs( {
 	filename = 'design-tokens.md',
 	sourceFilename = '../../docs/tokens.md',
@@ -29,6 +94,7 @@ export default function pluginDsTokenDocs( {
 			}
 
 			const semanticTokens: TokensMap = {};
+			const semanticTokensByRole: TokensMap = {};
 			// Re-use transformed tokens from the CSS plugin
 			for ( const token of getTransforms( {
 				format: FORMAT_ID,
@@ -53,6 +119,11 @@ export default function pluginDsTokenDocs( {
 				semanticTokens[ group ] ??= {};
 				semanticTokens[ group ][ token.localID ] =
 					token.token.$description ?? 'N/A';
+
+				const roleGroup = getRoleGroup( token.token.id );
+				semanticTokensByRole[ roleGroup ] ??= {};
+				semanticTokensByRole[ roleGroup ][ token.localID ] =
+					token.token.$description ?? 'N/A';
 			}
 
 			function tokensToMdTable( tokens: TokensMap ) {
@@ -74,7 +145,14 @@ export default function pluginDsTokenDocs( {
 			const generatedTokenTables = [
 				GENERATED_SECTION_START,
 				'',
-				'## Semantic tokens',
+				'## Semantic tokens by role',
+				'',
+				'These generated tables group tokens by the purpose encoded in their semantic name. Start here when comparing related tokens for the same kind of UI element or CSS property.',
+				'',
+				...tokensToMdTable( semanticTokensByRole ),
+				'## Complete semantic token reference',
+				'',
+				'These generated tables list every public semantic token by token type.',
 				'',
 				...tokensToMdTable( semanticTokens ),
 				GENERATED_SECTION_END,

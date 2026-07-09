@@ -45,7 +45,7 @@ Other token families use shorter forms when a segment would be redundant:
 
 ### Type
 
-Indicates what kind of value the token represents, usually mapping to a [DTCG](https://design-tokens.github.io/community-group/format/) token type.
+Indicates what kind of value the token represents, usually mapping to a [Design Tokens Format Module](https://www.designtokens.org/tr/2025.10/format/) token type.
 
 | Value        | Description                                                                    |
 | ------------ | ------------------------------------------------------------------------------ |
@@ -172,7 +172,299 @@ The semantic token set is role-based, not a complete matrix of every property, t
 
 <!-- START GENERATED TOKEN TABLES: Do not edit this section directly. -->
 
-## Semantic tokens
+## Semantic tokens by role
+
+These generated tables group tokens by the purpose encoded in their semantic name. Start here when comparing related tokens for the same kind of UI element or CSS property.
+
+### Border radii
+
+| Variable name             | Description                                                   |
+| ------------------------- | ------------------------------------------------------------- |
+| `--wpds-border-radius-xs` | Buttons and other elements nested inside controls.            |
+| `--wpds-border-radius-sm` | Standalone buttons, inputs, and compact controls.             |
+| `--wpds-border-radius-md` | Menus, popovers, and other small portaled overlays.           |
+| `--wpds-border-radius-lg` | Cards, dialogs, notices, and other larger content containers. |
+| `--wpds-border-radius-xl` | Page and app shell surfaces.                                  |
+
+### Border widths
+
+| Variable name            | Description       |
+| ------------------------ | ----------------- |
+| `--wpds-border-width-xs` | Extra small width |
+| `--wpds-border-width-sm` | Small width       |
+| `--wpds-border-width-md` | Medium width      |
+| `--wpds-border-width-lg` | Large width       |
+
+### Focus indicators
+
+| Variable name               | Description                                     |
+| --------------------------- | ----------------------------------------------- |
+| `--wpds-border-width-focus` | Border width for focus ring                     |
+| `--wpds-color-stroke-focus` | Accessible stroke color applied to focus rings. |
+
+### Surface backgrounds
+
+| Variable name                                    | Description                                                          |
+| ------------------------------------------------ | -------------------------------------------------------------------- |
+| `--wpds-color-background-surface-neutral`        | Background color for surfaces with normal emphasis.                  |
+| `--wpds-color-background-surface-neutral-strong` | Background color for surfaces with strong emphasis.                  |
+| `--wpds-color-background-surface-neutral-weak`   | Background color for surfaces with weak emphasis.                    |
+| `--wpds-color-background-surface-brand`          | Background color for surfaces with brand tone and normal emphasis.   |
+| `--wpds-color-background-surface-success`        | Background color for surfaces with success tone and normal emphasis. |
+| `--wpds-color-background-surface-success-weak`   | Background color for surfaces with success tone and weak emphasis.   |
+| `--wpds-color-background-surface-info`           | Background color for surfaces with info tone and normal emphasis.    |
+| `--wpds-color-background-surface-info-weak`      | Background color for surfaces with info tone and weak emphasis.      |
+| `--wpds-color-background-surface-warning`        | Background color for surfaces with warning tone and normal emphasis. |
+| `--wpds-color-background-surface-warning-weak`   | Background color for surfaces with warning tone and weak emphasis.   |
+| `--wpds-color-background-surface-caution`        | Background color for surfaces with caution tone and normal emphasis. |
+| `--wpds-color-background-surface-caution-weak`   | Background color for surfaces with caution tone and weak emphasis.   |
+| `--wpds-color-background-surface-error`          | Background color for surfaces with error tone and normal emphasis.   |
+| `--wpds-color-background-surface-error-weak`     | Background color for surfaces with error tone and weak emphasis.     |
+
+### Interactive backgrounds
+
+| Variable name                                                 | Description                                                                                                           |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `--wpds-color-background-interactive-neutral-strong`          | Background color for interactive elements with neutral tone and strong emphasis.                                      |
+| `--wpds-color-background-interactive-neutral-strong-active`   | Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active. |
+| `--wpds-color-background-interactive-neutral-strong-disabled` | Background color for interactive elements with neutral tone and strong emphasis, in their disabled state.             |
+| `--wpds-color-background-interactive-neutral-weak`            | Background color for interactive elements with neutral tone and weak emphasis.                                        |
+| `--wpds-color-background-interactive-neutral-weak-active`     | Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active.   |
+| `--wpds-color-background-interactive-neutral-weak-disabled`   | Background color for interactive elements with neutral tone and weak emphasis, in their disabled state.               |
+| `--wpds-color-background-interactive-brand-strong`            | Background color for interactive elements with brand tone and strong emphasis.                                        |
+| `--wpds-color-background-interactive-brand-strong-active`     | Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active.   |
+| `--wpds-color-background-interactive-brand-strong-disabled`   | Background color for interactive elements with brand tone and strong emphasis, in their disabled state.               |
+| `--wpds-color-background-interactive-brand-weak`              | Background color for interactive elements with brand tone and weak emphasis.                                          |
+| `--wpds-color-background-interactive-brand-weak-active`       | Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active.     |
+| `--wpds-color-background-interactive-brand-weak-disabled`     | Background color for interactive elements with brand tone and weak emphasis, in their disabled state.                 |
+| `--wpds-color-background-interactive-error`                   | Background color for interactive elements with error tone and normal emphasis.                                        |
+| `--wpds-color-background-interactive-error-active`            | Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active.   |
+| `--wpds-color-background-interactive-error-disabled`          | Background color for interactive elements with error tone and normal emphasis, in their disabled state.               |
+| `--wpds-color-background-interactive-error-strong`            | Background color for interactive elements with error tone and strong emphasis.                                        |
+| `--wpds-color-background-interactive-error-strong-active`     | Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active.   |
+| `--wpds-color-background-interactive-error-strong-disabled`   | Background color for interactive elements with error tone and strong emphasis, in their disabled state.               |
+| `--wpds-color-background-interactive-error-weak`              | Background color for interactive elements with error tone and weak emphasis.                                          |
+| `--wpds-color-background-interactive-error-weak-active`       | Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active.     |
+| `--wpds-color-background-interactive-error-weak-disabled`     | Background color for interactive elements with error tone and weak emphasis, in their disabled state.                 |
+
+### Track backgrounds
+
+| Variable name                                | Description                                                                                            |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `--wpds-color-background-track-neutral-weak` | Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track).               |
+| `--wpds-color-background-track-neutral`      | Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track). |
+
+### Thumb backgrounds
+
+| Variable name                                         | Description                                                                                                                                 |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--wpds-color-background-thumb-neutral-weak`          | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb).                                                    |
+| `--wpds-color-background-thumb-neutral-weak-active`   | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active.               |
+| `--wpds-color-background-thumb-brand`                 | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track).                                      |
+| `--wpds-color-background-thumb-brand-active`          | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active. |
+| `--wpds-color-background-thumb-brand-disabled`        | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state.             |
+| `--wpds-color-background-thumb-neutral-weak-disabled` | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb), in their disabled state.                           |
+
+### Content foregrounds
+
+| Variable name                                  | Description                                                                   |
+| ---------------------------------------------- | ----------------------------------------------------------------------------- |
+| `--wpds-color-foreground-content-neutral`      | Foreground color for content like text with normal emphasis.                  |
+| `--wpds-color-foreground-content-neutral-weak` | Foreground color for content like text with weak emphasis.                    |
+| `--wpds-color-foreground-content-success`      | Foreground color for content like text with success tone and normal emphasis. |
+| `--wpds-color-foreground-content-success-weak` | Foreground color for content like text with success tone and weak emphasis.   |
+| `--wpds-color-foreground-content-info`         | Foreground color for content like text with info tone and normal emphasis.    |
+| `--wpds-color-foreground-content-info-weak`    | Foreground color for content like text with info tone and weak emphasis.      |
+| `--wpds-color-foreground-content-warning`      | Foreground color for content like text with warning tone and normal emphasis. |
+| `--wpds-color-foreground-content-warning-weak` | Foreground color for content like text with warning tone and weak emphasis.   |
+| `--wpds-color-foreground-content-caution`      | Foreground color for content like text with caution tone and normal emphasis. |
+| `--wpds-color-foreground-content-caution-weak` | Foreground color for content like text with caution tone and weak emphasis.   |
+| `--wpds-color-foreground-content-error`        | Foreground color for content like text with error tone and normal emphasis.   |
+| `--wpds-color-foreground-content-error-weak`   | Foreground color for content like text with error tone and weak emphasis.     |
+
+### Interactive foregrounds
+
+| Variable name                                                 | Description                                                                                                           |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `--wpds-color-foreground-interactive-neutral`                 | Foreground color for interactive elements with neutral tone and normal emphasis.                                      |
+| `--wpds-color-foreground-interactive-neutral-active`          | Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active. |
+| `--wpds-color-foreground-interactive-neutral-disabled`        | Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state.             |
+| `--wpds-color-foreground-interactive-neutral-strong`          | Foreground color for interactive elements with neutral tone and strong emphasis.                                      |
+| `--wpds-color-foreground-interactive-neutral-strong-active`   | Foreground color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active. |
+| `--wpds-color-foreground-interactive-neutral-strong-disabled` | Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state.             |
+| `--wpds-color-foreground-interactive-neutral-weak`            | Foreground color for interactive elements with neutral tone and weak emphasis.                                        |
+| `--wpds-color-foreground-interactive-neutral-weak-active`     | Foreground color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active.   |
+| `--wpds-color-foreground-interactive-neutral-weak-disabled`   | Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state.               |
+| `--wpds-color-foreground-interactive-brand`                   | Foreground color for interactive elements with brand tone and normal emphasis.                                        |
+| `--wpds-color-foreground-interactive-brand-active`            | Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active.   |
+| `--wpds-color-foreground-interactive-brand-disabled`          | Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state.               |
+| `--wpds-color-foreground-interactive-brand-strong`            | Foreground color for interactive elements with brand tone and strong emphasis.                                        |
+| `--wpds-color-foreground-interactive-brand-strong-active`     | Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active.   |
+| `--wpds-color-foreground-interactive-brand-strong-disabled`   | Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state.               |
+| `--wpds-color-foreground-interactive-error`                   | Foreground color for interactive elements with error tone and normal emphasis.                                        |
+| `--wpds-color-foreground-interactive-error-active`            | Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active.   |
+| `--wpds-color-foreground-interactive-error-disabled`          | Foreground color for interactive elements with error tone and normal emphasis, in their disabled state.               |
+| `--wpds-color-foreground-interactive-error-strong`            | Foreground color for interactive elements with error tone and strong emphasis.                                        |
+| `--wpds-color-foreground-interactive-error-strong-active`     | Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active.   |
+| `--wpds-color-foreground-interactive-error-strong-disabled`   | Foreground color for interactive elements with error tone and strong emphasis, in their disabled state.               |
+
+### Surface strokes
+
+| Variable name                                | Description                                                                                     |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `--wpds-color-stroke-surface-neutral`        | Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis. |
+| `--wpds-color-stroke-surface-neutral-weak`   | Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis.   |
+| `--wpds-color-stroke-surface-neutral-strong` | Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis. |
+| `--wpds-color-stroke-surface-brand`          | Decorative stroke color used to define brand-toned surface boundaries with normal emphasis.     |
+| `--wpds-color-stroke-surface-brand-strong`   | Decorative stroke color used to define brand-toned surface boundaries with strong emphasis.     |
+| `--wpds-color-stroke-surface-success`        | Decorative stroke color used to define success-toned surface boundaries with normal emphasis.   |
+| `--wpds-color-stroke-surface-success-strong` | Decorative stroke color used to define success-toned surface boundaries with strong emphasis.   |
+| `--wpds-color-stroke-surface-info`           | Decorative stroke color used to define info-toned surface boundaries with normal emphasis.      |
+| `--wpds-color-stroke-surface-info-strong`    | Decorative stroke color used to define info-toned surface boundaries with strong emphasis.      |
+| `--wpds-color-stroke-surface-warning`        | Decorative stroke color used to define warning-toned surface boundaries with normal emphasis.   |
+| `--wpds-color-stroke-surface-warning-strong` | Decorative stroke color used to define warning-toned surface boundaries with strong emphasis.   |
+| `--wpds-color-stroke-surface-caution`        | Decorative stroke color used to define caution-toned surface boundaries with normal emphasis.   |
+| `--wpds-color-stroke-surface-caution-strong` | Decorative stroke color used to define caution-toned surface boundaries with strong emphasis.   |
+| `--wpds-color-stroke-surface-error`          | Decorative stroke color used to define error-toned surface boundaries with normal emphasis.     |
+| `--wpds-color-stroke-surface-error-strong`   | Decorative stroke color used to define error-toned surface boundaries with strong emphasis.     |
+
+### Interactive strokes
+
+| Variable name                                      | Description                                                                                                                      |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `--wpds-color-stroke-interactive-neutral`          | Accessible stroke color used for interactive neutrally-toned elements with normal emphasis.                                      |
+| `--wpds-color-stroke-interactive-neutral-active`   | Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active. |
+| `--wpds-color-stroke-interactive-neutral-disabled` | Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state.             |
+| `--wpds-color-stroke-interactive-neutral-strong`   | Accessible stroke color used for interactive neutrally-toned elements with strong emphasis.                                      |
+| `--wpds-color-stroke-interactive-brand`            | Accessible stroke color used for interactive brand-toned elements with normal emphasis.                                          |
+| `--wpds-color-stroke-interactive-brand-active`     | Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active.     |
+| `--wpds-color-stroke-interactive-brand-disabled`   | Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state.                 |
+| `--wpds-color-stroke-interactive-error`            | Accessible stroke color used for interactive error-toned elements with normal emphasis.                                          |
+| `--wpds-color-stroke-interactive-error-active`     | Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active.     |
+| `--wpds-color-stroke-interactive-error-disabled`   | Accessible stroke color used for interactive error-toned elements with normal emphasis, in their disabled state.                 |
+| `--wpds-color-stroke-interactive-error-strong`     | Accessible stroke color used for interactive error-toned elements with strong emphasis.                                          |
+
+### Control cursor
+
+| Variable name           | Description                                                                                       |
+| ----------------------- | ------------------------------------------------------------------------------------------------- |
+| `--wpds-cursor-control` | Cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). |
+
+### Padding
+
+| Variable name                  | Description            |
+| ------------------------------ | ---------------------- |
+| `--wpds-dimension-padding-xs`  | Extra small padding    |
+| `--wpds-dimension-padding-sm`  | Small padding          |
+| `--wpds-dimension-padding-md`  | Medium padding         |
+| `--wpds-dimension-padding-lg`  | Large padding          |
+| `--wpds-dimension-padding-xl`  | Extra large padding    |
+| `--wpds-dimension-padding-2xl` | 2x extra large padding |
+| `--wpds-dimension-padding-3xl` | 3x extra large padding |
+
+### Gaps
+
+| Variable name              | Description        |
+| -------------------------- | ------------------ |
+| `--wpds-dimension-gap-xs`  | Extra small gap    |
+| `--wpds-dimension-gap-sm`  | Small gap          |
+| `--wpds-dimension-gap-md`  | Medium gap         |
+| `--wpds-dimension-gap-lg`  | Large gap          |
+| `--wpds-dimension-gap-xl`  | Extra large gap    |
+| `--wpds-dimension-gap-2xl` | 2x extra large gap |
+| `--wpds-dimension-gap-3xl` | 3x extra large gap |
+
+### Element sizes
+
+| Variable name               | Description                                                              |
+| --------------------------- | ------------------------------------------------------------------------ |
+| `--wpds-dimension-size-5xs` | Notification indicators                                                  |
+| `--wpds-dimension-size-4xs` | Visual size for small interactive elements like resize handles           |
+| `--wpds-dimension-size-3xs` | Small markers                                                            |
+| `--wpds-dimension-size-2xs` | For small controls like checkboxes and radios, or small decorative icons |
+| `--wpds-dimension-size-xs`  | For medium sized icons                                                   |
+| `--wpds-dimension-size-sm`  | For icons and small buttons                                              |
+| `--wpds-dimension-size-md`  | For medium-sized buttons and inputs                                      |
+| `--wpds-dimension-size-lg`  | Default size for buttons and inputs                                      |
+
+### Surface widths
+
+| Variable name                        | Description                  |
+| ------------------------------------ | ---------------------------- |
+| `--wpds-dimension-surface-width-xs`  | Extra small surface width    |
+| `--wpds-dimension-surface-width-sm`  | Small surface width          |
+| `--wpds-dimension-surface-width-md`  | Medium surface width         |
+| `--wpds-dimension-surface-width-lg`  | Large surface width          |
+| `--wpds-dimension-surface-width-xl`  | Extra large surface width    |
+| `--wpds-dimension-surface-width-2xl` | 2x extra large surface width |
+
+### Elevations
+
+| Variable name         | Description                                                                                                                       |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `--wpds-elevation-xs` | For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame.     |
+| `--wpds-elevation-sm` | For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar. |
+| `--wpds-elevation-md` | For components that offer additional actions. Example: Menus, Command Palette                                                     |
+| `--wpds-elevation-lg` | For components that confirm decisions or handle necessary interruptions. Example: Modals.                                         |
+
+### Animation durations
+
+| Variable name               | Description                                                |
+| --------------------------- | ---------------------------------------------------------- |
+| `--wpds-motion-duration-xs` | Micro-delays and transition offsets                        |
+| `--wpds-motion-duration-sm` | Micro-interactions like focus rings and state changes      |
+| `--wpds-motion-duration-md` | Standard transitions like menus and popovers               |
+| `--wpds-motion-duration-lg` | Deliberate animations like slides and reveals              |
+| `--wpds-motion-duration-xl` | Extended animations like complex or multi-step transitions |
+
+### Animation easing curves
+
+| Variable name                     | Description                                                                                         |
+| --------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `--wpds-motion-easing-subtle`     | Nearly imperceptible easing for hover, color, and background transitions                            |
+| `--wpds-motion-easing-balanced`   | General-purpose easing for on-screen movement like resizing, morphing, and layout shifts            |
+| `--wpds-motion-easing-expressive` | Noticeable easing for enter/exit and spatial transitions like menus, popovers, dialogs, and drawers |
+
+### Font families
+
+| Variable name                           | Description           |
+| --------------------------------------- | --------------------- |
+| `--wpds-typography-font-family-heading` | Headings font family  |
+| `--wpds-typography-font-family-body`    | Body font family      |
+| `--wpds-typography-font-family-mono`    | Monospace font family |
+
+### Font sizes
+
+| Variable name                     | Description           |
+| --------------------------------- | --------------------- |
+| `--wpds-typography-font-size-xs`  | Extra small font size |
+| `--wpds-typography-font-size-sm`  | Small font size       |
+| `--wpds-typography-font-size-md`  | Medium font size      |
+| `--wpds-typography-font-size-lg`  | Large font size       |
+| `--wpds-typography-font-size-xl`  | Extra large font size |
+| `--wpds-typography-font-size-2xl` | 2X large font size    |
+
+### Line heights
+
+| Variable name                       | Description             |
+| ----------------------------------- | ----------------------- |
+| `--wpds-typography-line-height-xs`  | Extra small line height |
+| `--wpds-typography-line-height-sm`  | Small line height       |
+| `--wpds-typography-line-height-md`  | Medium line height      |
+| `--wpds-typography-line-height-lg`  | Large line height       |
+| `--wpds-typography-line-height-xl`  | Extra large line height |
+| `--wpds-typography-line-height-2xl` | 2X large line height    |
+
+### Font weights
+
+| Variable name                           | Description                                  |
+| --------------------------------------- | -------------------------------------------- |
+| `--wpds-typography-font-weight-regular` | Regular font weight for body text            |
+| `--wpds-typography-font-weight-medium`  | Medium font weight for emphasis and headings |
+
+## Complete semantic token reference
+
+These generated tables list every public semantic token by token type.
 
 ### Border
 
