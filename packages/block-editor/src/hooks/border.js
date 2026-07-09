@@ -170,8 +170,11 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId, isEnabled ]
 	);
 
-	const { value: inheritedValue, sources: inheritedSources } =
-		useInheritedValue( name, className, selectedState );
+	const { value: inheritedValue } = useInheritedValue(
+		name,
+		className,
+		selectedState
+	);
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
@@ -216,7 +219,6 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 			onChange={ onChange }
 			defaultControls={ defaultControls }
 			inheritedValue={ inheritedValue }
-			inheritedSources={ inheritedSources }
 		/>
 	);
 }

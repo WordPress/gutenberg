@@ -685,12 +685,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 						},
 					},
 				},
-				inheritedSources: {
-					'spacing.padding.top': { layer: 'block' },
-					'spacing.padding.right': { layer: 'block' },
-					'spacing.padding.bottom': { layer: 'block' },
-					'spacing.padding.left': { layer: 'block' },
-				},
 				settings: settingsWithSpacingPresets,
 			} );
 
