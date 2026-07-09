@@ -11,7 +11,9 @@
 			width: var(--wp-ui-checkbox-input-size);
 			height: var(--wp-ui-checkbox-input-size);
 			border-radius: var(--wpds-border-radius-sm);
-			border: 1px solid var(--wpds-color-stroke-interactive-neutral);
+			border:
+				var(--wpds-border-width-xs) solid
+				var(--wpds-color-stroke-interactive-neutral);
 			padding: 0;
 			background-color: var(--wpds-color-background-interactive-neutral-weak);
 
@@ -44,9 +46,9 @@
 		}
 
 		.indicator-icon {
-			/* Ignore the 1px border width and take up the full 16px */
+			/* Ignore the border width and take up the full 16px */
 			position: absolute;
-			inset: -1px;
+			inset: calc(0px - var(--wpds-border-width-xs));
 		}
 	}
 }
