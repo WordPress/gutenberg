@@ -2,6 +2,7 @@
 	display: flow-root;
 }
 
+// Prevent the dropcap from breaking out of the box when a background is applied.
 .wp-block-post-content.has-drop-cap.has-background {
 	overflow: hidden;
 }
