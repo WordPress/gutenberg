@@ -16,28 +16,9 @@ import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
-/**
- * Removed falsy values from nested object.
- *
- * @param {*} object
- * @return {*} Object cleaned from falsy values
- */
-export const cleanEmptyObject = ( object ) => {
-	if (
-		object === null ||
-		typeof object !== 'object' ||
-		Array.isArray( object )
-	) {
-		return object;
-	}
-
-	const cleanedNestedObjects = Object.entries( object )
-		.map( ( [ key, value ] ) => [ key, cleanEmptyObject( value ) ] )
-		.filter( ( [ , value ] ) => value !== undefined );
-	return ! cleanedNestedObjects.length
-		? undefined
-		: Object.fromEntries( cleanedNestedObjects );
-};
+// Re-exported from `utils/object` for backwards compatibility of existing
+// import sites.
+export { cleanEmptyObject } from '../utils/object';
 
 export function transformStyles(
 	activeSupports,

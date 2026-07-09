@@ -27,6 +27,7 @@ import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
+import { getPerBlockAttributeUpdates } from '../../utils/object';
 import { useBlockVisibility } from '../block-visibility/';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
@@ -256,20 +257,34 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
 		setAttributes( nextAttributes ) {
-			const { getMultiSelectedBlockClientIds } =
+			const { getMultiSelectedBlockClientIds, getBlocksByClientId } =
 				registry.select( blockEditorStore );
 			const multiSelectedBlockClientIds =
 				getMultiSelectedBlockClientIds();
 			const { clientId, attributes } = ownProps;
-			const clientIds = multiSelectedBlockClientIds.length
-				? multiSelectedBlockClientIds
-				: [ clientId ];
 			const newAttributes =
 				typeof nextAttributes === 'function'
 					? nextAttributes( attributes )
 					: nextAttributes;
 
-			updateBlockAttributes( clientIds, newAttributes );
+			if ( multiSelectedBlockClientIds.length > 0 ) {
+				const updates = getPerBlockAttributeUpdates(
+					attributes,
+					newAttributes,
+					getBlocksByClientId( multiSelectedBlockClientIds )
+				);
+				if ( updates ) {
+					updateBlockAttributes(
+						multiSelectedBlockClientIds,
+						updates,
+						{
+							uniqueByBlock: true,
+						}
+					);
+				}
+			} else {
+				updateBlockAttributes( clientId, newAttributes );
+			}
 		},
 		onInsertBlocks( blocks, index ) {
 			const { rootClientId } = ownProps;

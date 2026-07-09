@@ -36,6 +36,7 @@
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
 -   Expose `isElementVisible` via private APIs so `@wordpress/editor`'s collaboration overlay can detect content hidden by a collapsed container (e.g. a closed `core/details` panel) without duplicating the visibility check ([#81322](https://github.com/WordPress/gutenberg/pull/81322)).
+-   Fix style edits applied to a multi-block selection overwriting each block's other styles. Only the changed values are now applied to every selected block, so distinct styles are preserved and resets propagate to the whole selection ([#80070](https://github.com/WordPress/gutenberg/pull/80070)).
 
 ## 16.2.0 (2026-08-12)
 
