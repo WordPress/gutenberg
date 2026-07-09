@@ -14,8 +14,22 @@ function escapeRegExp( str: string ) {
 type TokensMap = Record< string, Record< string, string > >;
 
 const ROLE_GROUPS = [
-	{ title: 'Border radii', tokenIds: [ /^wpds-border\.radius\./ ] },
-	{ title: 'Border widths', tokenIds: [ /^wpds-border\.width\.(?!focus$)/ ] },
+	{
+		title: 'Surface',
+		tokenIds: [
+			/^wpds-color\.(background|stroke)\.surface\./,
+			/^wpds-dimension\.surface-width\./,
+		],
+	},
+	{
+		title: 'Interactive',
+		tokenIds: [
+			/^wpds-color\.(background|foreground|stroke)\.interactive\./,
+		],
+	},
+	{ title: 'Content', tokenIds: [ /^wpds-color\.foreground\.content\./ ] },
+	{ title: 'Track', tokenIds: [ /^wpds-color\.background\.track\./ ] },
+	{ title: 'Thumb', tokenIds: [ /^wpds-color\.background\.thumb\./ ] },
 	{
 		title: 'Focus indicators',
 		tokenIds: [
@@ -23,61 +37,32 @@ const ROLE_GROUPS = [
 			/^wpds-color\.stroke\.focus$/,
 		],
 	},
+	{ title: 'Controls', tokenIds: [ /^wpds-cursor\.control$/ ] },
 	{
-		title: 'Surface backgrounds',
-		tokenIds: [ /^wpds-color\.background\.surface\./ ],
+		title: 'Spacing',
+		tokenIds: [ /^wpds-dimension\.(padding|gap)\./ ],
 	},
-	{
-		title: 'Interactive backgrounds',
-		tokenIds: [ /^wpds-color\.background\.interactive\./ ],
-	},
-	{
-		title: 'Track backgrounds',
-		tokenIds: [ /^wpds-color\.background\.track\./ ],
-	},
-	{
-		title: 'Thumb backgrounds',
-		tokenIds: [ /^wpds-color\.background\.thumb\./ ],
-	},
-	{
-		title: 'Content foregrounds',
-		tokenIds: [ /^wpds-color\.foreground\.content\./ ],
-	},
-	{
-		title: 'Interactive foregrounds',
-		tokenIds: [ /^wpds-color\.foreground\.interactive\./ ],
-	},
-	{
-		title: 'Surface strokes',
-		tokenIds: [ /^wpds-color\.stroke\.surface\./ ],
-	},
-	{
-		title: 'Interactive strokes',
-		tokenIds: [ /^wpds-color\.stroke\.interactive\./ ],
-	},
-	{ title: 'Control cursor', tokenIds: [ /^wpds-cursor\.control$/ ] },
-	{ title: 'Padding', tokenIds: [ /^wpds-dimension\.padding\./ ] },
-	{ title: 'Gaps', tokenIds: [ /^wpds-dimension\.gap\./ ] },
 	{ title: 'Element sizes', tokenIds: [ /^wpds-dimension\.size\./ ] },
 	{
-		title: 'Surface widths',
-		tokenIds: [ /^wpds-dimension\.surface-width\./ ],
+		title: 'Borders',
+		tokenIds: [
+			/^wpds-border\.radius\./,
+			/^wpds-border\.width\.(?!focus$)/,
+		],
 	},
 	{ title: 'Elevations', tokenIds: [ /^wpds-elevation\./ ] },
-	{ title: 'Animation durations', tokenIds: [ /^wpds-motion\.duration\./ ] },
 	{
-		title: 'Animation easing curves',
-		tokenIds: [ /^wpds-motion\.easing\./ ],
+		title: 'Motion',
+		tokenIds: [ /^wpds-motion\.(duration|easing)\./ ],
 	},
 	{
-		title: 'Font families',
-		tokenIds: [ /^wpds-typography\.font-family\./ ],
-	},
-	{ title: 'Font sizes', tokenIds: [ /^wpds-typography\.font-size\./ ] },
-	{ title: 'Line heights', tokenIds: [ /^wpds-typography\.line-height\./ ] },
-	{
-		title: 'Font weights',
-		tokenIds: [ /^wpds-typography\.font-weight\./ ],
+		title: 'Typography',
+		tokenIds: [
+			/^wpds-typography\.font-family\./,
+			/^wpds-typography\.font-size\./,
+			/^wpds-typography\.font-weight\./,
+			/^wpds-typography\.line-height\./,
+		],
 	},
 ] as const;
 
@@ -114,7 +99,9 @@ export default function pluginDsTokenDocs( {
 				return;
 			}
 
-			const semanticTokensByRole: TokensMap = {};
+			const semanticTokensByGroup: TokensMap = Object.fromEntries(
+				ROLE_GROUPS.map( ( { title } ) => [ title, {} ] )
+			);
 			// Re-use transformed tokens from the CSS plugin
 			for ( const token of getTransforms( {
 				format: FORMAT_ID,
@@ -129,15 +116,20 @@ export default function pluginDsTokenDocs( {
 				}
 
 				const roleGroup = getRoleGroup( token.token.id );
-				semanticTokensByRole[ roleGroup ] ??= {};
-				semanticTokensByRole[ roleGroup ][ token.localID ] =
+				semanticTokensByGroup[ roleGroup ][ token.localID ] =
 					token.token.$description ?? 'N/A';
 			}
 
 			function tokensToMdTable( tokens: TokensMap ) {
-				return Object.entries( tokens )
-					.map( ( [ group, tokensInGroup ] ) => [
-						`### ${ group }`,
+				return ROLE_GROUPS.flatMap( ( { title } ) => {
+					const tokensInGroup = tokens[ title ];
+
+					if ( Object.keys( tokensInGroup ).length === 0 ) {
+						return [];
+					}
+
+					return [
+						`### ${ title }`,
 						'',
 						'| Variable name | Description |',
 						'|---|---|',
@@ -146,8 +138,8 @@ export default function pluginDsTokenDocs( {
 								`| \`${ name }\` | ${ description } |`
 						),
 						'',
-					] )
-					.flat( 2 );
+					];
+				} );
 			}
 
 			const generatedTokenTables = [
@@ -155,9 +147,9 @@ export default function pluginDsTokenDocs( {
 				'',
 				'## Semantic tokens',
 				'',
-				'These generated tables list every public semantic token, grouped by the purpose encoded in each token name. Use them to compare related tokens for the same kind of UI element or CSS property.',
+				'These generated tables list every public semantic token, grouped by the element or token family encoded in each token name. Use them to compare related tokens for the same kind of UI element.',
 				'',
-				...tokensToMdTable( semanticTokensByRole ),
+				...tokensToMdTable( semanticTokensByGroup ),
 				GENERATED_SECTION_END,
 			].join( '\n' );
 
