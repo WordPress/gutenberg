@@ -170,18 +170,44 @@ jobs:
               if: ${{ github.ref != 'refs/heads/trunk' }}
               run: git fetch --depth=1 origin trunk
 
-            - name: Cherry-pick the version bump commit to trunk
+            - name: Apply the version bump to trunk
               id: commit_version_bump_to_trunk
               env:
-                  TARGET_BRANCH: ${{ steps.get_version.outputs.release_branch }}
                   OLD_VERSION: ${{ steps.get_version.outputs.old_version }}
+                  VERSION: ${{ steps.get_version.outputs.new_version }}
               run: |
                   git checkout trunk
                   git pull
                   TRUNK_VERSION="$(jq --raw-output '.version' package.json)"
                   if [[ "$OLD_VERSION" == "$TRUNK_VERSION" ]]; then
-                    git cherry-pick "$TARGET_BRANCH"
-                    git push
+                    # A PR merged to trunk mid-process would reject the push as a
+                    # non-fast-forward. Re-derive the bump from the latest trunk on
+                    # each attempt so there is nothing to merge, and no conflict.
+                    PUSH_ATTEMPTS=5
+                    for (( attempt = 1; attempt <= PUSH_ATTEMPTS; attempt++ )); do
+                      jq --tab --arg version "${VERSION}" '.version = $version' package.json > package.json.tmp
+                      mv package.json.tmp package.json
+                      jq --tab --arg version "${VERSION}" '.version = $version | .packages[""].version = $version' package-lock.json > package-lock.json.tmp
+                      mv package-lock.json.tmp package-lock.json
+                      sed -i "s/${OLD_VERSION}/${VERSION}/g" gutenberg.php
+                      git add gutenberg.php package.json package-lock.json
+                      git commit -m "Bump plugin version to ${VERSION}"
+                      if git push; then
+                        break
+                      fi
+                      if [[ "$attempt" -eq "$PUSH_ATTEMPTS" ]]; then
+                        echo "::error::Failed to push the version bump to trunk after ${PUSH_ATTEMPTS} attempts."
+                        exit 1
+                      fi
+                      echo "Push to trunk was rejected, likely because trunk was updated. Resetting to the latest trunk and retrying (attempt ${attempt} of ${PUSH_ATTEMPTS})."
+                      git fetch origin trunk
+                      git reset --hard FETCH_HEAD
+                      TRUNK_VERSION="$(jq --raw-output '.version' package.json)"
+                      if [[ "$OLD_VERSION" != "$TRUNK_VERSION" ]]; then
+                        echo "::error::trunk is at version ${TRUNK_VERSION} but expected ${OLD_VERSION}; not re-applying the bump."
+                        exit 1
+                      fi
+                    done
                     echo "version_bump_commit=$(git rev-parse --verify --short HEAD)" >> "$GITHUB_OUTPUT"
                   fi
 
