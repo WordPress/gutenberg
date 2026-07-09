@@ -6,6 +6,10 @@
 
 -   Add an "Attachments" source to the block inserter's Media tab, listing images attached to the current post with the ability to attach and detach them ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
 
+### Bug Fixes
+
+-   External images are now sideloaded on the server when uploaded to the media library, via a new `mediaSideloadFromUrl` block editor setting, so the upload works when the editor is cross-origin isolated (e.g. with client-side media processing enabled) ([#79409](https://github.com/WordPress/gutenberg/pull/79409)).
+
 ## 14.50.0 (2026-07-01)
 
 ## 14.49.0 (2026-06-24)

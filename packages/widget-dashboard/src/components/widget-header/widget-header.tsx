@@ -13,11 +13,13 @@ import type { WidgetType } from '@wordpress/widget-primitives';
 /**
  * Internal dependencies
  */
+import { WidgetInfotip } from './widget-header-infotip';
 import styles from './widget-header.module.css';
 
 export interface WidgetHeaderProps {
 	/**
-	 * Widget type, source of the icon and title shown as identity.
+	 * Widget type, source of the icon, title, and help note shown as
+	 * identity.
 	 */
 	widgetType?: WidgetType;
 
@@ -64,7 +66,10 @@ export function WidgetHeader( {
 }: WidgetHeaderProps ): React.ReactNode {
 	return (
 		<Card.Header
-			className={ clsx( styles.widgetHeader, overlay && styles.overlay ) }
+			className={ clsx(
+				styles[ 'widget-header' ],
+				overlay && styles.overlay
+			) }
 		>
 			{ showIdentity && widgetType?.title && (
 				<Stack
@@ -83,8 +88,16 @@ export function WidgetHeader( {
 					<Card.Title id={ titleId } render={ <h2 /> }>
 						{ widgetType.title }
 					</Card.Title>
+
+					{ widgetType.help && (
+						<WidgetInfotip
+							content={ widgetType.help.content }
+							links={ widgetType.help.links }
+						/>
+					) }
 				</Stack>
 			) }
+
 			{ children && <div className={ styles.toolbar }>{ children }</div> }
 		</Card.Header>
 	);

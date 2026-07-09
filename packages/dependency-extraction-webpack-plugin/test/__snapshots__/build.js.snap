@@ -310,7 +310,7 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`runtime-chunk-singl
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`style-imports\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => '3c934db1d1abd24df590', 'type' => 'module');
+"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => '92ea15aace211d977373', 'type' => 'module');
 "
 `;
 
@@ -747,7 +747,7 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-singl
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`style-imports\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '6b9c03a10ce7f2850f41');
+"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'c2b6a03053f847f92d0c');
 "
 `;
 

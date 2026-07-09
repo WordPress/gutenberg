@@ -36,6 +36,13 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 				<Button size="small" />
 			`,
 		},
+		// SelectControl no longer requires __next40pxDefaultSize
+		{
+			code: `
+				import { SelectControl } from '@wordpress/components';
+				<SelectControl />
+			`,
+		},
 		// Component with size="compact"
 		{
 			code: `
@@ -96,7 +103,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 		{
 			code: `
 				import {
-					CustomSelectControl,
 					InputControl,
 					NumberControl,
 					RangeControl,
@@ -104,12 +110,11 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 					ToggleGroupControl,
 				} from '@wordpress/components';
 				<>
-					<CustomSelectControl __next40pxDefaultSize />
 					<FormTokenField />
 					<InputControl __next40pxDefaultSize />
-					<NumberControl __next40pxDefaultSize />
+					<NumberControl />
 					<RangeControl />
-					<SelectControl __next40pxDefaultSize />
+					<SelectControl />
 					<ToggleGroupControl />
 				</>
 			`,
@@ -145,13 +150,13 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 		// Component with __next40pxDefaultSize={false}
 		{
 			code: `
-				import { SelectControl } from '@wordpress/components';
-				<SelectControl __next40pxDefaultSize={false} />
+				import { Button } from '@wordpress/components';
+				<Button __next40pxDefaultSize={false} />
 			`,
 			errors: [
 				{
 					messageId: 'missingProp',
-					data: { component: 'SelectControl' },
+					data: { component: 'Button' },
 				},
 			],
 		},
@@ -210,10 +215,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 				{
 					messageId: 'missingProp',
 					data: { component: 'Button' },
-				},
-				{
-					messageId: 'missingProp',
-					data: { component: 'SelectControl' },
 				},
 			],
 		},
