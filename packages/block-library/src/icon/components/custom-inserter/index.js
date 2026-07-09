@@ -102,7 +102,7 @@ export default function CustomInserterModal( { onClose, value, onChange } ) {
 						value={ searchInput }
 						onChange={ debouncedSetSearchInput }
 					/>
-					<Tabs.List className="wp-block-icon__inserter-collections">
+					<Tabs.List>
 						<Tabs.Tab value="">{ __( 'All' ) }</Tabs.Tab>
 						{ collections?.map( ( collection ) => (
 							<Tabs.Tab
