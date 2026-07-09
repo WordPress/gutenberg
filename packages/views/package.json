@@ -39,6 +39,7 @@
 		},
 		"./package.json": "./package.json"
 	},
+	"wpScript": false,
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/core-data": "file:../core-data",

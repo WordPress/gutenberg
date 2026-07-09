@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Determine bundled packages from `wpScript: false` in `package.json` instead of a hardcoded list. ([#79945](https://github.com/WordPress/gutenberg/pull/79945))
+
 ### Bug Fixes
 
 -   Extract dynamically imported external modules that webpack code-splits into their own async chunk in the module build ([#79633](https://github.com/WordPress/gutenberg/pull/79633)).

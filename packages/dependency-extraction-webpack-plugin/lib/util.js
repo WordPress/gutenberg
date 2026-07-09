@@ -1,17 +1,137 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
-const BUNDLED_PACKAGES = [
-	'@wordpress/admin-ui',
-	'@wordpress/dataviews',
-	'@wordpress/dataviews/wp',
-	'@wordpress/fields',
-	'@wordpress/grid',
-	'@wordpress/icons',
-	'@wordpress/interface',
-	'@wordpress/style-runtime',
-	'@wordpress/ui',
-	'@wordpress/undo-manager',
-	'@wordpress/views',
-];
+const { readFileSync, existsSync } = require( 'fs' );
+const path = require( 'path' );
+const { createRequire } = require( 'module' );
+
+const packageJsonCache = new Map();
+const packagePathCache = new Map();
+
+/**
+ * Find the nearest package root directory by walking up from the given directory.
+ * Looks for a directory containing package.json.
+ *
+ * @param {string} startDir The directory to start searching from.
+ * @return {string} The package root directory, or the start directory if no package.json found.
+ */
+function findPackageRoot( startDir ) {
+	let current = startDir;
+	const root = path.parse( current ).root;
+
+	while ( current !== root ) {
+		const packageJsonPath = path.join( current, 'package.json' );
+		if ( existsSync( packageJsonPath ) ) {
+			return current;
+		}
+		current = path.dirname( current );
+	}
+
+	// Fallback to the start directory if no package.json found.
+	return startDir;
+}
+
+/**
+ * Reads package.json info using Node's module resolution.
+ *
+ * @param {string}      fullPackageName The full package name (e.g. '@wordpress/blocks').
+ * @param {string|null} resolveDir      Optional directory context for resolution.
+ * @return {{wpScript?: boolean, wpScriptModuleExports?: string|Object}|null} Package metadata when resolvable.
+ */
+function getPackageInfo( fullPackageName, resolveDir = null ) {
+	const packageRoot = resolveDir
+		? findPackageRoot( resolveDir )
+		: process.cwd();
+	const cacheKey = `${ fullPackageName }@${ packageRoot }`;
+
+	if ( packageJsonCache.has( cacheKey ) ) {
+		return packageJsonCache.get( cacheKey );
+	}
+
+	const contextPath = path.join( packageRoot, 'package.json' );
+	const contextRequire = createRequire( contextPath );
+
+	let resolved;
+	try {
+		resolved = contextRequire.resolve(
+			`${ fullPackageName }/package.json`
+		);
+	} catch ( error ) {
+		const code = error.code;
+		if (
+			code === 'MODULE_NOT_FOUND' ||
+			code === 'ERR_PACKAGE_PATH_NOT_EXPORTED'
+		) {
+			packageJsonCache.set( cacheKey, null );
+			return null;
+		}
+		throw error;
+	}
+
+	const result = getPackageInfoFromFile( resolved );
+	packageJsonCache.set( cacheKey, result );
+
+	return result;
+}
+
+/**
+ * Reads package.json info from an explicit file path.
+ *
+ * @param {string} packageJsonPath Absolute path to package.json file.
+ * @return {{wpScript?: boolean, wpScriptModuleExports?: string|Object}|null} Package metadata when resolvable.
+ */
+function getPackageInfoFromFile( packageJsonPath ) {
+	if ( packagePathCache.has( packageJsonPath ) ) {
+		return packagePathCache.get( packageJsonPath );
+	}
+	const packageJson = JSON.parse( readFileSync( packageJsonPath, 'utf8' ) );
+	packagePathCache.set( packageJsonPath, packageJson );
+	return packageJson;
+}
+
+/**
+ * Read package metadata for an import request.
+ *
+ * @param {string} request Module request (the module name in `import from`).
+ * @return {{wpScript?: boolean, wpScriptModuleExports?: string|Object}|undefined} Package metadata when resolvable.
+ */
+function getPackageMetadata( request ) {
+	const packageName = getPackageNameFromRequest( request );
+
+	if ( ! packageName ) {
+		return;
+	}
+
+	return getPackageInfo( packageName );
+}
+
+/**
+ * Determine whether a package should stay bundled in script builds.
+ * Packages are bundled only when they explicitly opt out of script registration
+ * via `wpScript: false`.
+ *
+ * @param {string} request Module request (the module name in `import from`).
+ * @return {boolean} True when package should remain bundled in scripts.
+ */
+function isBundledPackageForScripts( request ) {
+	const packageMetadata = getPackageMetadata( request );
+	if ( ! packageMetadata ) {
+		return false;
+	}
+
+	return packageMetadata.wpScript === false;
+}
+
+/**
+ * Extract package name (`@scope/name`) from an import request.
+ *
+ * @param {string} request Module request (the module name in `import from`).
+ * @return {string|undefined} Package name when request is namespaced.
+ */
+function getPackageNameFromRequest( request ) {
+	const parts = request.split( '/' );
+	if ( parts[ 0 ]?.startsWith( '@' ) && parts.length >= 2 ) {
+		return `${ parts[ 0 ] }/${ parts[ 1 ] }`;
+	}
+}
 
 /**
  * Default request to global transformation
@@ -55,7 +175,7 @@ function defaultRequestToExternal( request ) {
 		return 'ReactRefreshRuntime';
 	}
 
-	if ( BUNDLED_PACKAGES.includes( request ) ) {
+	if ( isBundledPackageForScripts( request ) ) {
 		return undefined;
 	}
 
