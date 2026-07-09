@@ -159,13 +159,6 @@
 	white-space: pre-wrap;
 	word-wrap: break-word;
 
-	// The placeholder is a child `<span data-rich-text-placeholder>` whose
-	// text the package stylesheet draws via `::after`; only the color needs
-	// overriding here.
-	[data-rich-text-placeholder]::after {
-		color: $gray-700;
-	}
-
 	// Inline formats inherit the surrounding text styles but keep
 	// their semantic emphasis (RichText renders <strong>, <em>, etc.).
 	code {

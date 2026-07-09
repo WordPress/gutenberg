@@ -116,7 +116,6 @@ export function NoteForm( { onSubmit, onCancel, note, labels, focusOnMount } ) {
 				value={ inputComment }
 				onChange={ setInputComment }
 				allowedFormats={ ALLOWED_NOTE_FORMATS }
-				placeholder={ labels?.input ?? __( 'Note' ) }
 			/>
 			<Stack
 				direction="row"
