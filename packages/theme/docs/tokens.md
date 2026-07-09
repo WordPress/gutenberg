@@ -6,7 +6,7 @@ Design tokens are named values. They encode design decisions which describe the 
 
 ## How to pick a token
 
-Pick tokens by meaning first, then by the CSS property they will feed. The raw value is an implementation detail; a token name should describe the role that value plays in the interface.
+Start from what you are styling and the CSS property you are setting. For example, when setting the text or icon color for an interactive control with neutral intent, choose `--wpds-color-foreground-interactive-neutral`: `foreground` for the CSS property, `interactive` for the target, and `neutral` for the tone. The raw value is an implementation detail; a token name should describe the role that value plays in the interface.
 
 Each segment of a public token name answers one question about the value being applied:
 
@@ -61,23 +61,23 @@ Indicates what kind of value the token represents, usually mapping to a [DTCG](h
 
 The specific design property being defined.
 
-| Value           | Description                        |
-| --------------- | ---------------------------------- |
-| `background`    | Background color                   |
-| `foreground`    | Foreground color (text and icons)  |
-| `stroke`        | Border and outline color           |
-| `padding`       | Internal spacing within an element |
-| `gap`           | Spacing between elements           |
-| `radius`        | Border radius for rounded corners  |
-| `width`         | Border width                       |
-| `size`          | Control, icon, and marker sizing   |
-| `surface-width` | Maximum width for layout surfaces  |
-| `duration`      | Animation duration                 |
-| `easing`        | Animation easing curve             |
-| `font-size`     | Font size                          |
-| `font-family`   | Font family                        |
-| `font-weight`   | Font weight                        |
-| `line-height`   | Line height                        |
+| Value           | Description                         |
+| --------------- | ----------------------------------- |
+| `background`    | Background color                    |
+| `foreground`    | Foreground color (text and icons)   |
+| `stroke`        | Border and outline color            |
+| `padding`       | Internal spacing within an element  |
+| `gap`           | Spacing between elements            |
+| `radius`        | Border radius for rounded corners   |
+| `width`         | Width for the relevant token family |
+| `size`          | Control, icon, and marker sizing    |
+| `surface-width` | Maximum width for layout surfaces   |
+| `duration`      | Animation duration                  |
+| `easing`        | Animation easing curve              |
+| `font-size`     | Font size                           |
+| `font-family`   | Font family                         |
+| `font-weight`   | Font weight                         |
+| `line-height`   | Line height                         |
 
 ### Target
 
