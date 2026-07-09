@@ -59,6 +59,15 @@ Only use for meaningful description or instructions for the control. An element 
 
 Label text for the control.
 
+### `placeholder`
+
+ - Type: `string`
+ - Required: No
+
+Placeholder text shown while the element has no content. Exposed to
+assistive technology via `aria-placeholder` and drawn by the stylesheet
+when the element is empty.
+
 ### `required`
 
  - Type: `boolean`

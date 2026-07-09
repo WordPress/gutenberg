@@ -11,11 +11,10 @@
 	@include input-control( $components-color-accent );
 	border-color: $gray-600;
 
-	// The rich-text hook renders the placeholder as a child
-	// `<span data-rich-text-placeholder>`; `::placeholder` only applies to
-	// native form fields, so draw the text from the attribute instead.
-	[data-rich-text-placeholder]::after {
-		content: attr(data-rich-text-placeholder);
+	// `::placeholder` only applies to native form fields, so draw the text
+	// from the `aria-placeholder` attribute while the element has no content.
+	&[aria-placeholder]:empty::before {
+		content: attr(aria-placeholder);
 		color: $components-color-dark-gray-placeholder;
 	}
 

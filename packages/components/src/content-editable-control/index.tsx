@@ -25,6 +25,7 @@ function UnforwardedContentEditableControl(
 		hideLabelFromVision,
 		disabled,
 		required,
+		placeholder,
 		...additionalProps
 	}: WordPressComponentProps< ContentEditableControlProps, 'div', false >,
 	forwardedRef: ForwardedRef< HTMLDivElement >
@@ -44,6 +45,7 @@ function UnforwardedContentEditableControl(
 				role="textbox"
 				aria-multiline
 				aria-label={ label }
+				aria-placeholder={ placeholder || undefined }
 				aria-disabled={ disabled || undefined }
 				aria-required={ required || undefined }
 				ref={ forwardedRef }

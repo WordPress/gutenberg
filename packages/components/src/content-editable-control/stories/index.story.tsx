@@ -27,5 +27,6 @@ type Story = StoryObj< typeof ContentEditableControl >;
 export const Default: Story = {
 	args: {
 		label: 'Title',
+		placeholder: 'Add a title…',
 	},
 };

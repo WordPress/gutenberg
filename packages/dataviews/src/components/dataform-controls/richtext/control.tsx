@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import clsx from 'clsx';
 import type { FocusEvent, MutableRefObject, ReactNode } from 'react';
 
 /**
@@ -484,7 +485,12 @@ export default function RichTextControl( {
 			<RichTextControlShell
 				label={ label }
 				id={ id }
-				className={ className }
+				className={ clsx( 'dataviews-controls__richtext', className ) }
+				// The shell draws this while the element is empty, and the
+				// rich-text hook below renders its own placeholder element
+				// once it takes over the contents; either way the attribute
+				// keeps `aria-placeholder` exposed to assistive technology.
+				placeholder={ placeholder }
 				hideLabelFromVision={ hideLabelFromVision }
 				help={ help }
 				disabled={ disabled }

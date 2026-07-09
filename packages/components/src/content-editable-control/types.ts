@@ -26,4 +26,10 @@ export type ContentEditableControlProps = Pick<
 	 * @default false
 	 */
 	required?: boolean;
+	/**
+	 * Placeholder text shown while the element has no content. Exposed to
+	 * assistive technology via `aria-placeholder` and drawn by the stylesheet
+	 * when the element is empty.
+	 */
+	placeholder?: string;
 };

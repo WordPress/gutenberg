@@ -71,6 +71,17 @@ describe( 'ContentEditableControl', () => {
 		expect( screen.getByRole( 'textbox' ) ).toBeRequired();
 	} );
 
+	it( 'exposes `placeholder` via aria-placeholder', () => {
+		render(
+			<ContentEditableControl label="Note" placeholder="Add a note…" />
+		);
+
+		expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(
+			'aria-placeholder',
+			'Add a note…'
+		);
+	} );
+
 	it( 'uses a consumer-supplied `id` for the textbox and label', () => {
 		render(
 			<ContentEditableControl
