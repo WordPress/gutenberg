@@ -4,34 +4,57 @@
 import {
 	__experimentalGetGapCSSValue as getGapCSSValue,
 	useStyleOverride,
+	useSettings,
 } from '@wordpress/block-editor';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 
-export default function GapStyles( { blockGap, clientId } ) {
-	// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
-	// gap on the gallery.
-	const fallbackValue = `var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )`;
-	let gapValue = fallbackValue;
-	let column = fallbackValue;
-	let row;
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
 
-	// Check for the possibility of split block gap values. See: https://github.com/WordPress/gutenberg/pull/37736
-	if ( !! blockGap ) {
-		row =
-			typeof blockGap === 'string'
-				? getGapCSSValue( blockGap )
-				: getGapCSSValue( blockGap?.top ) || fallbackValue;
+const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
+
+// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
+// gap on the gallery.
+const FALLBACK_VALUE = `var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )`;
+
+function getGalleryGapCustomPropertyStyle( selector, blockGap ) {
+	let column = FALLBACK_VALUE;
+	if ( blockGap ) {
 		column =
 			typeof blockGap === 'string'
-				? getGapCSSValue( blockGap )
-				: getGapCSSValue( blockGap?.left ) || fallbackValue;
-		gapValue = row === column ? row : `${ row } ${ column }`;
+				? getGapCSSValue( blockGap ) || FALLBACK_VALUE
+				: getGapCSSValue( blockGap?.left ) || FALLBACK_VALUE;
 	}
 
 	// The unstable gallery gap calculation requires a real value (such as `0px`) and not `0`.
-	const gap = `#block-${ clientId } {
-		--wp--style--unstable-gallery-gap: ${ column === '0' ? '0px' : column };
-		gap: ${ gapValue }
+	return `${ selector } {
+		--wp--style--unstable-gallery-gap: ${ column === '0' ? '0px' : column }
 	}`;
+}
+
+export default function GalleryGapCustomProperties( { style, clientId } ) {
+	const selector = `#block-${ clientId }`;
+	const [ viewportSettings ] = useSettings( 'viewport' );
+	let gap = getGalleryGapCustomPropertyStyle(
+		selector,
+		style?.spacing?.blockGap
+	);
+
+	Object.entries( getResponsiveMediaQueries( viewportSettings ) ).forEach(
+		( [ viewport, mediaQuery ] ) => {
+			const viewportBlockGap = style?.[ viewport ]?.spacing?.blockGap;
+			if ( viewportBlockGap === undefined || viewportBlockGap === null ) {
+				return;
+			}
+
+			gap += `${ mediaQuery }{${ getGalleryGapCustomPropertyStyle(
+				selector,
+				viewportBlockGap
+			) }}`;
+		}
+	);
 
 	useStyleOverride( { css: gap } );
 

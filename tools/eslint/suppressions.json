@@ -1144,11 +1144,6 @@
 			"count": 3
 		}
 	},
-	"packages/edit-site/src/components/site-hub/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/edit-widgets/src/components/layout/index.js": {
 		"react-hooks/refs": {
 			"count": 3
