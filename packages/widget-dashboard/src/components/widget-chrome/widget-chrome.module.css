@@ -1,16 +1,16 @@
-/* Outline the whole tile when the body holds keyboard focus; an inner ring is easy to miss. */
-.widgetChrome:has(:focus-visible) {
+/* Outward tile focus ring; paint space reserved on `.grid`. */
+.widget-chrome:has(:focus-visible) {
 	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
-	outline-offset: 2px;
+	outline-offset: var(--wp-widget-dashboard-tile-focus-offset, 2px);
 }
 
-.widgetChromeHeaderIcon {
+.widget-chrome-header-icon {
 	display: inline-flex;
 	color: var(--wpds-color-foreground-content-neutral);
 }
 
 /* Fill the tile so placeholder states center in the full height. */
-.widgetChromeContent {
+.widget-chrome-content {
 	flex: 1;
 	height: 100%;
 	min-width: 0;
