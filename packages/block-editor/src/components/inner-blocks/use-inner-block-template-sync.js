@@ -15,19 +15,6 @@ import { getBlockType, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
  */
 import { store as blockEditorStore } from '../../store';
 
-// Compares block lists disregarding the client IDs.
-function isSameBlockList( a, b ) {
-	return (
-		a.length === b.length &&
-		a.every(
-			( block, index ) =>
-				block.name === b[ index ].name &&
-				fastDeepEqual( block.attributes, b[ index ].attributes ) &&
-				isSameBlockList( block.innerBlocks, b[ index ].innerBlocks )
-		)
-	);
-}
-
 /**
  * This hook makes sure that a block's inner blocks stay in sync with the given
  * block "template". The template is a block hierarchy to which inner blocks must
@@ -70,11 +57,8 @@ export default function useInnerBlockTemplateSync(
 			getSelectedBlocksInitialCaretPosition,
 			isBlockSelected,
 		} = registry.select( blockEditorStore );
-		const {
-			replaceInnerBlocks,
-			selectBlock,
-			__unstableMarkNextChangeAsNotPersistent,
-		} = registry.dispatch( blockEditorStore );
+		const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+			registry.dispatch( blockEditorStore );
 
 		// There's an implicit dependency between useInnerBlockTemplateSync and useNestedSettingsUpdate
 		// The former needs to happen after the latter and since the latter is using microtasks to batch updates (performance optimization),
@@ -86,43 +70,22 @@ export default function useInnerBlockTemplateSync(
 			}
 
 			// A template declared in block type settings serves as the
-			// default when no `template` prop is passed.
-			const resolvedTemplate =
-				template ?? getBlockType( getBlockName( clientId ) )?.template;
+			// default when no `template` prop is passed, along with whether
+			// applying it moves the selection.
+			let resolvedTemplate = template;
+			let resolvedUpdatesSelection = templateInsertUpdatesSelection;
+			if ( template === undefined ) {
+				const blockType = getBlockType( getBlockName( clientId ) );
+				resolvedTemplate = blockType?.template;
+				resolvedUpdatesSelection =
+					blockType?.templateInsertUpdatesSelection;
+			}
 
 			const currentInnerBlocks = getBlocks( clientId );
 			const hasAppliedTemplate = fastDeepEqual(
 				resolvedTemplate,
 				existingTemplateRef.current
 			);
-
-			// A block type template is applied when the block is inserted,
-			// so the inner blocks may already exist here. Reproduce the
-			// selection behavior of applying the template: move the
-			// selection to the first inner leaf block, once.
-			if (
-				template === undefined &&
-				resolvedTemplate &&
-				currentInnerBlocks.length !== 0 &&
-				! hasAppliedTemplate &&
-				templateInsertUpdatesSelection &&
-				isBlockSelected( clientId ) &&
-				isSameBlockList(
-					currentInnerBlocks,
-					synchronizeBlocksWithTemplate( [], resolvedTemplate )
-				)
-			) {
-				existingTemplateRef.current = resolvedTemplate;
-				let firstBlock = currentInnerBlocks[ 0 ];
-				while ( firstBlock.innerBlocks[ 0 ] ) {
-					firstBlock = firstBlock.innerBlocks[ 0 ];
-				}
-				selectBlock(
-					firstBlock.clientId,
-					getSelectedBlocksInitialCaretPosition()
-				);
-				return;
-			}
 
 			// Only synchronize innerBlocks with template if innerBlocks are empty
 			// or a locking "all" or "contentOnly" exists directly on the block.
@@ -149,7 +112,7 @@ export default function useInnerBlockTemplateSync(
 					clientId,
 					nextBlocks,
 					currentInnerBlocks.length === 0 &&
-						templateInsertUpdatesSelection &&
+						resolvedUpdatesSelection &&
 						nextBlocks.length !== 0 &&
 						isBlockSelected( clientId ),
 					// This ensures the "initialPosition" doesn't change when applying the template

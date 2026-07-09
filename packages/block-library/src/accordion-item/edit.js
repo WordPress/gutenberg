@@ -57,7 +57,6 @@ export default function Edit( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock: 'all',
 		directInsert: true,
-		templateInsertUpdatesSelection: true,
 	} );
 
 	return (

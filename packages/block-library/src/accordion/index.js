@@ -51,6 +51,7 @@ export const settings = {
 		],
 	},
 	template: TEMPLATE,
+	templateInsertUpdatesSelection: true,
 	edit,
 	save,
 };

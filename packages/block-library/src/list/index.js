@@ -48,6 +48,7 @@ const settings = {
 	},
 	transforms,
 	template: TEMPLATE,
+	templateInsertUpdatesSelection: true,
 	edit,
 	save,
 	deprecated,

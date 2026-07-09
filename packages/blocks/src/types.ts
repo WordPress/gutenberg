@@ -300,6 +300,11 @@ export interface BlockType<
 		[ string, Record< string, unknown >?, Array< unknown >? ]
 	>;
 	/**
+	 * Whether the selection should move into the first block created from
+	 * the template when it is inserted.
+	 */
+	templateInsertUpdatesSelection?: boolean;
+	/**
 	 * Context provided for available access by descendants of
 	 * blocks of this type, in the form of an object which maps
 	 * a context name to one of the block's own attributes.
