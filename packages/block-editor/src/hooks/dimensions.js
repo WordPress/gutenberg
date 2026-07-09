@@ -24,10 +24,10 @@ import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 import {
+	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
 	isDefaultBlockStyleState,
 	setStyleForState,
-	useBlockStyleState,
 } from './block-style-state';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
@@ -74,10 +74,15 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
-	const selectedState = useBlockStyleState();
-	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
-	const isEnabled = useHasDimensionsPanel( settings, selectedState );
+export function DimensionsPanel( {
+	clientId,
+	name,
+	setAttributes,
+	settings,
+	selectedStyleState = DEFAULT_BLOCK_STYLE_STATE,
+} ) {
+	const isStateSelected = ! isDefaultBlockStyleState( selectedStyleState );
+	const isEnabled = useHasDimensionsPanel( settings, selectedStyleState );
 	const style = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
@@ -91,12 +96,16 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	);
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const value = isStateSelected
-		? getStyleForState( style, selectedState )
+		? getStyleForState( style, selectedStyleState )
 		: style;
 	const onChange = isStateSelected
 		? ( newStyle ) => {
 				setAttributes( {
-					style: setStyleForState( style, selectedState, newStyle ),
+					style: setStyleForState(
+						style,
+						selectedStyleState,
+						newStyle
+					),
 				} );
 		  }
 		: ( newStyle ) => {
@@ -135,7 +144,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				value={ value }
 				onChange={ onChange }
 				defaultControls={ defaultControls }
-				styleState={ selectedState }
+				styleState={ selectedStyleState }
 				onVisualize={
 					isStateSelected ? undefined : setVisualizedProperty
 				}

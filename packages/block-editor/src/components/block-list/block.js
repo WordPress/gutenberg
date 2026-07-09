@@ -592,6 +592,7 @@ function BlockListBlockProvider( props ) {
 				isDragging,
 				__unstableHasActiveBlockOverlayActive,
 				getSelectedBlocksInitialCaretPosition,
+				getSelectedBlockStyleState,
 			} = unlock( select( blockEditorStore ) );
 			const blockWithoutAttributes =
 				getBlockWithoutAttributes( clientId );
@@ -669,6 +670,12 @@ function BlockListBlockProvider( props ) {
 			const sectionBlockClientId = _isSectionBlock( clientId )
 				? clientId
 				: getParentSectionBlock( clientId );
+			const mayDisplayControls =
+				_isSelected ||
+				( isFirstMultiSelectedBlock( clientId ) &&
+					getMultiSelectedBlockClientIds().every(
+						( id ) => getBlockName( id ) === blockName
+					) );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
 
@@ -698,12 +705,10 @@ function BlockListBlockProvider( props ) {
 				isEditingContentOnlySection:
 					getEditedContentOnlySection() === clientId,
 				blockEditingMode,
-				mayDisplayControls:
-					_isSelected ||
-					( isFirstMultiSelectedBlock( clientId ) &&
-						getMultiSelectedBlockClientIds().every(
-							( id ) => getBlockName( id ) === blockName
-						) ),
+				mayDisplayControls,
+				selectedStyleState: mayDisplayControls
+					? getSelectedBlockStyleState( clientId )
+					: undefined,
 				mayDisplayParentControls:
 					_hasBlockSupport(
 						getBlockName( clientId ),
@@ -822,6 +827,7 @@ function BlockListBlockProvider( props ) {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
+		selectedStyleState,
 	} = selectedProps;
 
 	const privateContext = {
@@ -862,6 +868,7 @@ function BlockListBlockProvider( props ) {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
+		selectedStyleState,
 	};
 
 	if (

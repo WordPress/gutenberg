@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import {
@@ -42,7 +42,6 @@ import {
 	useBlockSettings,
 } from './utils';
 import {
-	BlockStyleStateProvider,
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
 	hasViewportBlockStyleState,
@@ -53,6 +52,7 @@ import { buildScopedBlockSelector } from './state-utils';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useSettings } from '../components/use-settings';
+import { PrivateBlockContext } from '../components/block-list/private-block-context';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
@@ -769,25 +769,25 @@ function BlockStyleControls( {
 } ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
-	const { globalBlockStyles, selectedState, showStateOnCanvas } = useSelect(
+	const { globalBlockStyles, showStateOnCanvas } = useSelect(
 		( select ) => {
 			const blockEditorSelect = select( blockEditorStore );
-			const {
-				getSelectedBlockStyleState,
-				isSelectedBlockStyleStateShownOnCanvas,
-			} = unlock( blockEditorSelect );
+			const { isSelectedBlockStyleStateShownOnCanvas } =
+				unlock( blockEditorSelect );
 			const editorSettings = blockEditorSelect.getSettings();
 			return {
 				globalBlockStyles:
 					editorSettings?.[ globalStylesDataKey ]?.blocks?.[ name ],
-				selectedState: getSelectedBlockStyleState( clientId ),
 				showStateOnCanvas:
 					isSelectedBlockStyleStateShownOnCanvas( clientId ),
 			};
 		},
 		[ clientId, name ]
 	);
-	const isPseudoSelectorState = hasPseudoBlockStyleState( selectedState );
+	const { selectedStyleState = DEFAULT_BLOCK_STYLE_STATE } =
+		useContext( PrivateBlockContext );
+	const isPseudoSelectorState =
+		hasPseudoBlockStyleState( selectedStyleState );
 
 	// Inject state styles onto the editor canvas so the selected state is
 	// visible while editing. Scoped to this block instance via data-block so
@@ -800,11 +800,11 @@ function BlockStyleControls( {
 
 		const globalStateValue = getCanvasStateStyleValue(
 			globalBlockStyles,
-			selectedState
+			selectedStyleState
 		);
 		const instanceStateValue = getCanvasStateStyleValue(
 			style,
-			selectedState
+			selectedStyleState
 		);
 		let stateValue;
 
@@ -830,7 +830,7 @@ function BlockStyleControls( {
 		isPseudoSelectorState,
 		globalBlockStyles,
 		style,
-		selectedState,
+		selectedStyleState,
 		clientId,
 		name,
 	] );
@@ -855,16 +855,17 @@ function BlockStyleControls( {
 		name,
 		setAttributes,
 		settings: panelSettings,
+		selectedStyleState,
 	};
 
 	return (
-		<BlockStyleStateProvider value={ selectedState }>
+		<>
 			<ElementsEdit { ...passedProps } />
 			<BackgroundImagePanel { ...passedProps } />
 			<TypographyPanel { ...passedProps } />
 			<BorderPanel { ...passedProps } />
 			<DimensionsPanel { ...passedProps } />
-		</BlockStyleStateProvider>
+		</>
 	);
 }
 

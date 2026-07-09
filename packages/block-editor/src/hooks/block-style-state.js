@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { createContext, useContext } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import { cleanEmptyObject } from './utils';
@@ -15,14 +10,6 @@ export const DEFAULT_BLOCK_STYLE_STATE = {
 	viewport: DEFAULT_STATE_VALUE,
 	pseudo: DEFAULT_STATE_VALUE,
 };
-
-const BlockStyleStateContext = createContext( DEFAULT_BLOCK_STYLE_STATE );
-
-export const BlockStyleStateProvider = BlockStyleStateContext.Provider;
-
-export function useBlockStyleState() {
-	return useContext( BlockStyleStateContext );
-}
 
 /**
  * Returns true when a viewport style state is selected.

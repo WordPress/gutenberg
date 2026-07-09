@@ -31,10 +31,10 @@ import {
 } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
 import {
+	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
 	isDefaultBlockStyleState,
 	setStyleForState,
-	useBlockStyleState,
 } from './block-style-state';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
@@ -146,8 +146,13 @@ function BordersInspectorControl( { label, children, resetAllFilter } ) {
 	);
 }
 
-export function BorderPanel( { clientId, name, setAttributes, settings } ) {
-	const selectedState = useBlockStyleState();
+export function BorderPanel( {
+	clientId,
+	name,
+	setAttributes,
+	settings,
+	selectedStyleState = DEFAULT_BLOCK_STYLE_STATE,
+} ) {
 	const isEnabled = useHasBorderPanel( settings );
 	const { style, borderColor } = useSelect(
 		( select ) => {
@@ -162,19 +167,23 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId, isEnabled ]
 	);
 
-	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
+	const isStateSelected = ! isDefaultBlockStyleState( selectedStyleState );
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return getStyleForState( style, selectedState );
+			return getStyleForState( style, selectedStyleState );
 		}
 		return attributesToStyle( { style, borderColor } );
-	}, [ isStateSelected, selectedState, style, borderColor ] );
+	}, [ isStateSelected, selectedStyleState, style, borderColor ] );
 
 	const onChange = isStateSelected
 		? ( newStyle ) => {
 				setAttributes( {
-					style: setStyleForState( style, selectedState, newStyle ),
+					style: setStyleForState(
+						style,
+						selectedStyleState,
+						newStyle
+					),
 				} );
 		  }
 		: ( newStyle ) => {

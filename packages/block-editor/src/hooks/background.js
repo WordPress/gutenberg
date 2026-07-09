@@ -26,10 +26,10 @@ import {
 } from '../components/global-styles/background-panel';
 import { globalStylesDataKey } from '../store/private-keys';
 import {
+	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
 	isDefaultBlockStyleState,
 	setStyleForState,
-	useBlockStyleState,
 } from './block-style-state';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
@@ -173,12 +173,12 @@ export function BackgroundImagePanel( {
 	name,
 	setAttributes,
 	settings,
+	selectedStyleState = DEFAULT_BLOCK_STYLE_STATE,
 	// Allows rendering outside the `background` inspector group (e.g. section
 	// blocks direct-render this panel because their support fills are gated
 	// off by editing mode). Defaults to the slot-based wrapper.
 	asWrapper,
 } ) {
-	const selectedState = useBlockStyleState();
 	const { style, className, backgroundColor, gradient, inheritedValue } =
 		useSelect(
 			( select ) => {
@@ -208,7 +208,7 @@ export function BackgroundImagePanel( {
 		colorSupport && colorSupport.background !== false;
 	const hasColorGradientSupport = !! colorSupport?.gradients;
 
-	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
+	const isStateSelected = ! isDefaultBlockStyleState( selectedStyleState );
 
 	// Fold the backgroundColor / gradient attribute slugs back into the style
 	// object the panel consumes. When background.gradient is supported but not
@@ -265,7 +265,7 @@ export function BackgroundImagePanel( {
 	const onChange = ( newStyle ) => {
 		if ( isStateSelected ) {
 			setAttributes( {
-				style: setStyleForState( style, selectedState, newStyle ),
+				style: setStyleForState( style, selectedStyleState, newStyle ),
 			} );
 			return;
 		}
@@ -388,7 +388,7 @@ export function BackgroundImagePanel( {
 			defaultControls={ defaultControls }
 			value={
 				isStateSelected
-					? getStyleForState( style, selectedState )
+					? getStyleForState( style, selectedStyleState )
 					: styleValue
 			}
 			contrastWarning={ contrastWarning }

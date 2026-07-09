@@ -20,10 +20,11 @@ import {
 } from '../block-edit/context';
 import groups from './groups';
 import {
+	DEFAULT_BLOCK_STYLE_STATE,
 	scopeResetAllFilterToState,
-	useBlockStyleState,
 } from '../../hooks/block-style-state';
 import { ListViewContentFill } from './list-view-content-popover';
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
 const PATTERN_EDITING_GROUPS = [ 'content', 'list' ];
 
@@ -119,10 +120,11 @@ export default function InspectorControlsFill( {
 function RegisterResetAll( { resetAllFilter, children } ) {
 	const { registerResetAllFilter, deregisterResetAllFilter } =
 		useContext( ToolsPanelContext );
-	const selectedState = useBlockStyleState();
+	const { selectedStyleState = DEFAULT_BLOCK_STYLE_STATE } =
+		useContext( PrivateBlockContext );
 	const scopedResetAllFilter = useMemo(
-		() => scopeResetAllFilterToState( selectedState, resetAllFilter ),
-		[ resetAllFilter, selectedState ]
+		() => scopeResetAllFilterToState( selectedStyleState, resetAllFilter ),
+		[ resetAllFilter, selectedStyleState ]
 	);
 	useEffect( () => {
 		if (

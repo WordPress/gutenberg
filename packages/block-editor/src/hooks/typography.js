@@ -24,10 +24,10 @@ import { cleanEmptyObject } from './utils';
 import { extractPresetSlug } from '../utils/color-values';
 import { store as blockEditorStore } from '../store';
 import {
+	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
 	isDefaultBlockStyleState,
 	setStyleForState,
-	useBlockStyleState,
 } from './block-style-state';
 import useBlockColorContrastWarning from './contrast-checker';
 
@@ -143,12 +143,12 @@ export function TypographyPanel( {
 	name,
 	setAttributes,
 	settings,
+	selectedStyleState = DEFAULT_BLOCK_STYLE_STATE,
 	// Allows rendering outside the `typography` inspector group (e.g. section
 	// blocks direct-render this panel because their support fills are gated
 	// off by editing mode). Defaults to the slot-based wrapper.
 	asWrapper,
 } ) {
-	const selectedState = useBlockStyleState();
 	const isEnabled = useHasTypographyPanel( settings );
 
 	const { style, fontFamily, fontSize, fitText, textColor } = useSelect(
@@ -175,16 +175,16 @@ export function TypographyPanel( {
 		[ clientId, isEnabled ]
 	);
 
-	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
+	const isStateSelected = ! isDefaultBlockStyleState( selectedStyleState );
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return getStyleForState( style, selectedState );
+			return getStyleForState( style, selectedStyleState );
 		}
 		return attributesToStyle( { style, fontFamily, fontSize, textColor } );
 	}, [
 		isStateSelected,
-		selectedState,
+		selectedStyleState,
 		style,
 		fontSize,
 		fontFamily,
@@ -194,7 +194,11 @@ export function TypographyPanel( {
 	const onChange = isStateSelected
 		? ( newStyle ) => {
 				setAttributes( {
-					style: setStyleForState( style, selectedState, newStyle ),
+					style: setStyleForState(
+						style,
+						selectedStyleState,
+						newStyle
+					),
 				} );
 		  }
 		: ( newStyle ) => {

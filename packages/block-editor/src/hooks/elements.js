@@ -19,10 +19,10 @@ import { store as blockEditorStore } from '../store';
 import { COLOR_SUPPORT_KEY } from './color';
 import useBlockColorContrastWarning from './contrast-checker';
 import {
+	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
 	isDefaultBlockStyleState,
 	setStyleForState,
-	useBlockStyleState,
 } from './block-style-state';
 
 function ElementsInspectorControl( { children, resetAllFilter } ) {
@@ -52,11 +52,11 @@ export function ElementsEdit( {
 	name,
 	setAttributes,
 	settings,
+	selectedStyleState = DEFAULT_BLOCK_STYLE_STATE,
 	asWrapper,
 	label,
 	defaultControls,
 } ) {
-	const selectedState = useBlockStyleState();
 	const isEnabled = useHasColorPanel( settings );
 
 	const style = useSelect(
@@ -71,19 +71,23 @@ export function ElementsEdit( {
 		[ clientId, isEnabled ]
 	);
 
-	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
+	const isStateSelected = ! isDefaultBlockStyleState( selectedStyleState );
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return getStyleForState( style, selectedState );
+			return getStyleForState( style, selectedStyleState );
 		}
 		return style;
-	}, [ isStateSelected, selectedState, style ] );
+	}, [ isStateSelected, selectedStyleState, style ] );
 
 	const onChange = isStateSelected
 		? ( newStyle ) => {
 				setAttributes( {
-					style: setStyleForState( style, selectedState, newStyle ),
+					style: setStyleForState(
+						style,
+						selectedStyleState,
+						newStyle
+					),
 				} );
 		  }
 		: ( newStyle ) => {
