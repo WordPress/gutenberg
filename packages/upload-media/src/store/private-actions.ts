@@ -376,19 +376,17 @@ export function processItem( id: QueueItemId ) {
 
 		if ( ! operation ) {
 			/*
-			 * A finished `animated_video` sideload means the companion video
-			 * is now recorded on the attachment. Mark any user-requested GIF
-			 * conversion as converted so observers (e.g. the editor's prompt)
-			 * can react. This is a no-op for the automatic conversion during
-			 * upload, which creates no conversion record.
+			 * A finished conversion parent (see resolveGifConversion) means
+			 * its Finalize has recorded the companion video on the
+			 * attachment. Mark the conversion record as converted so
+			 * observers (e.g. the editor's prompt) can react. If the
+			 * transcode failed, the record was already dropped on
+			 * cancellation and this is a no-op.
 			 */
-			if (
-				item.additionalData?.image_size === 'animated_video' &&
-				item.additionalData?.post
-			) {
+			if ( item.gifConversionAttachmentId ) {
 				dispatch< UpdateGifConversionAction >( {
 					type: Type.UpdateGifConversion,
-					attachmentId: item.additionalData.post as number,
+					attachmentId: item.gifConversionAttachmentId,
 					status: 'converted',
 				} );
 			}
@@ -1521,27 +1519,53 @@ export function resolveGifConversion(
 			return;
 		}
 
-		dispatch< UpdateGifConversionAction >( {
-			type: Type.UpdateGifConversion,
-			attachmentId,
-			status: 'converting',
-		} );
-
 		const settings = select.getSettings();
 		const outputFormat =
 			settings.videoOutputFormat === 'video/webm' ? 'webm' : 'mp4';
 
 		/*
-		 * Mirrors the automatic companion sideload in generateThumbnails().
-		 * The original upload item has typically finished and left the queue
-		 * by now; its ID still serves as parentId because a truthy parentId
-		 * is what routes the Upload operation to the sideload endpoint, and
-		 * every parent lookup handles an absent parent gracefully.
+		 * The original upload item finished and left the queue long ago, but
+		 * a sideloaded companion only becomes part of the attachment once a
+		 * parent item's Finalize operation reports it via mediaFinalize()
+		 * (sideloads merely accumulate their result on their parent).
+		 *
+		 * So the user-requested transcode gets a bare parent item whose only
+		 * operation is Finalize. The existing queue machinery does the rest:
+		 * the transcode sideload (and the poster sibling it spawns on
+		 * success) accumulate on this parent, the Finalize gate waits for
+		 * both, and finalizing records the companion on the attachment.
+		 * Once this parent finishes, processItem() marks the conversion
+		 * record as converted (see gifConversionAttachmentId).
 		 */
+		const parentItemId = uuidv4();
+
+		dispatch< UpdateGifConversionAction >( {
+			type: Type.UpdateGifConversion,
+			attachmentId,
+			status: 'converting',
+			itemId: parentItemId,
+		} );
+
+		dispatch< AddAction >( {
+			type: Type.Add,
+			item: {
+				id: parentItemId,
+				sourceFile: conversion.file,
+				file: conversion.file,
+				attachment: { id: attachmentId },
+				status: ItemStatus.Processing,
+				additionalData: {},
+				operations: [ OperationType.Finalize ],
+				abortController: new AbortController(),
+				gifConversionAttachmentId: attachmentId,
+			},
+		} );
+
+		// Mirrors the automatic companion sideload in generateThumbnails().
 		dispatch.addSideloadItem( {
 			file: conversion.file,
 			batchId: uuidv4(),
-			parentId: conversion.itemId,
+			parentId: parentItemId,
 			additionalData: {
 				post: attachmentId,
 				image_size: 'animated_video',

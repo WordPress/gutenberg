@@ -352,6 +352,7 @@ function reducer(
 							? {
 									...conversion,
 									status: action.status,
+									itemId: action.itemId ?? conversion.itemId,
 							  }
 							: conversion
 				),

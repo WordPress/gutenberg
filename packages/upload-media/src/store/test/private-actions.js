@@ -1029,18 +1029,36 @@ describe( 'private actions', () => {
 		it( 'enqueues the companion transcode when the user converts', async () => {
 			const dispatchFn = await runResolve( 'video' );
 
+			/*
+			 * A bare parent item is queued whose Finalize operation records
+			 * the companion on the attachment once the transcode sideload
+			 * (and its poster sibling) complete.
+			 */
+			const addAction = dispatchFn.mock.calls
+				.map( ( call ) => call[ 0 ] )
+				.find( ( action ) => action?.type === Type.Add );
+			expect( addAction.item ).toEqual(
+				expect.objectContaining( {
+					attachment: { id: 55 },
+					operations: [ OperationType.Finalize ],
+					gifConversionAttachmentId: 55,
+				} )
+			);
+
+			// The record now points at that parent so cancellation cleanup
+			// and the converted notification can find it.
 			expect( dispatchFn ).toHaveBeenCalledWith( {
 				type: Type.UpdateGifConversion,
 				attachmentId: 55,
 				status: 'converting',
+				itemId: addAction.item.id,
 			} );
 
-			// Mirrors the automatic sideload from generateThumbnails: the
-			// original item ID routes the Upload to the sideload endpoint.
+			// Mirrors the automatic sideload from generateThumbnails.
 			expect( dispatchFn.addSideloadItem ).toHaveBeenCalledTimes( 1 );
 			const sideload = dispatchFn.addSideloadItem.mock.calls[ 0 ][ 0 ];
 			expect( sideload.file ).toBe( gif );
-			expect( sideload.parentId ).toBe( 'original-item' );
+			expect( sideload.parentId ).toBe( addAction.item.id );
 			expect( sideload.additionalData ).toEqual(
 				expect.objectContaining( {
 					post: 55,

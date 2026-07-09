@@ -29,8 +29,8 @@ const ASSETS_DIR = path.join( __dirname, '..', '..', '..', 'assets' );
 const ANIMATED_GIF_FIXTURE = '599x441_e2e_test_image_animated.gif';
 
 test.use( {
-	gifToVideoUtils: async ( { page }, use ) => {
-		await use( new GifToVideoUtils( { page } ) );
+	gifToVideoUtils: async ( { page, editor }, use ) => {
+		await use( new GifToVideoUtils( { page, editor } ) );
 	},
 } );
 
@@ -38,9 +38,10 @@ test.use( {
  * Shared utilities for the GIF-to-video e2e tests.
  */
 class GifToVideoUtils {
-	constructor( { page } ) {
+	constructor( { page, editor } ) {
 		/** @type {Page} */
 		this.page = page;
+		this.editor = editor;
 	}
 
 	/**
@@ -64,6 +65,55 @@ class GifToVideoUtils {
 	}
 
 	/**
+	 * Inserts an Image block and uploads the animated GIF fixture into it.
+	 * Waits for the editor to finish setting up first: an insert dispatched
+	 * during setup is wiped by the editor's initial blocks reset.
+	 */
+	async uploadAnimatedGif() {
+		await expect(
+			this.editor.canvas.getByRole( 'button', {
+				name: 'Add default block',
+			} )
+		).toBeVisible();
+
+		await this.editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = this.editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await this.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			ANIMATED_GIF_FIXTURE
+		);
+	}
+
+	/**
+	 * The conversion prompt dialog.
+	 *
+	 * @return {import('@playwright/test').Locator} Dialog locator.
+	 */
+	getPromptDialog() {
+		return this.page.getByRole( 'dialog', {
+			name: 'Convert animated GIF to video?',
+		} );
+	}
+
+	/**
+	 * Sets the animated GIF uploads preference directly.
+	 *
+	 * @param {string} value 'ask', 'gif', or 'video'.
+	 */
+	async setGifUploadsPreference( value ) {
+		await this.page.evaluate( ( preferenceValue ) => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/media', 'animatedGifUploads', preferenceValue );
+		}, value );
+	}
+
+	/**
 	 * Wait for the upload-media store queue to drain.
 	 *
 	 * @param {number} timeout Timeout in milliseconds.
@@ -77,6 +127,39 @@ class GifToVideoUtils {
 				return items.length === 0;
 			},
 			undefined,
+			{ timeout }
+		);
+	}
+
+	/**
+	 * Returns the current blocks as name/attributes pairs.
+	 */
+	async getBlocks() {
+		return this.page.evaluate( () =>
+			window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks()
+				.map( ( block ) => ( {
+					name: block.name,
+					attributes: block.attributes,
+				} ) )
+		);
+	}
+
+	/**
+	 * Waits until a block of the given name exists in the editor.
+	 *
+	 * @param {string} blockName Block name, e.g. 'core/video'.
+	 * @param {number} timeout   Timeout in milliseconds.
+	 */
+	async waitForBlock( blockName, timeout = 90000 ) {
+		await this.page.waitForFunction(
+			( name ) =>
+				window.wp.data
+					.select( 'core/block-editor' )
+					.getBlocks()
+					.some( ( block ) => block.name === name ),
+			blockName,
 			{ timeout }
 		);
 	}
@@ -144,57 +227,32 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 	test.beforeEach( async ( { admin, gifToVideoUtils } ) => {
 		await admin.createNewPost();
 		await gifToVideoUtils.skipIfGifConversionInactive( test );
+		// The prompt tests rely on the default 'ask' behavior; reset it in
+		// case a previous test remembered a choice.
+		await gifToVideoUtils.setGifUploadsPreference( 'ask' );
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'keeps the uploaded GIF as an Image block and offers a round-trip Video transform', async ( {
+	test( 'prompts on upload and converts to a video on request, with a round-trip transform back', async ( {
 		editor,
 		page,
 		gifToVideoUtils,
 		requestUtils,
 	} ) => {
-		// Wait for the editor to finish setting up the (empty) post before
-		// inserting: an insert dispatched during setup is wiped by the
-		// editor's initial blocks reset.
-		await expect(
-			editor.canvas.getByRole( 'button', { name: 'Add default block' } )
-		).toBeVisible();
+		await gifToVideoUtils.uploadAnimatedGif();
 
-		// The GIF uploads as a normal image attachment and a transcoded
-		// video companion is sideloaded into the attachment's
-		// `animated_video` meta. The block is NOT swapped automatically:
-		// converting is the author's explicit choice, offered as a block
-		// transform to the Video block's "GIF" variation.
-		await editor.insertBlock( { name: 'core/image' } );
+		// The upload is not blocked by the prompt: the GIF uploads as a
+		// plain image attachment while the dialog is open, and no companion
+		// video exists yet.
+		const dialog = gifToVideoUtils.getPromptDialog();
+		await expect( dialog ).toBeVisible( { timeout: 60_000 } );
 
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		await expect( imageBlock ).toBeVisible();
-
-		await gifToVideoUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' ),
-			ANIMATED_GIF_FIXTURE
-		);
-
-		// Drain the full queue (parent GIF upload + companion video
-		// sideload + TranscodeGif).
 		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
 
-		// The block stays an Image block pointing at the GIF; no automatic
-		// swap to a Video block happens.
-		const blocksAfterUpload = await page.evaluate( () =>
-			window.wp.data
-				.select( 'core/block-editor' )
-				.getBlocks()
-				.map( ( block ) => ( {
-					name: block.name,
-					attributes: block.attributes,
-				} ) )
-		);
+		const blocksAfterUpload = await gifToVideoUtils.getBlocks();
 		expect(
 			blocksAfterUpload.some( ( block ) => block.name === 'core/video' )
 		).toBe( false );
@@ -203,64 +261,32 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 			( block ) => block.name === 'core/image'
 		);
 		expect( uploadedImage.attributes.url ).toMatch( /\.gif(\?.*)?$/i );
-
-		// The underlying media is a GIF image attachment with a recorded
-		// companion video (basename only) in its metadata.
 		const attachmentId = uploadedImage.attributes.id;
 		expect( attachmentId ).toBeDefined();
 
-		// The companion is recorded in the attachment metadata slightly after
-		// the upload queue drains, so poll for it rather than asserting once.
-		let media;
-		await expect
-			.poll(
-				async () => {
-					media = await requestUtils.rest( {
-						method: 'GET',
-						path: `/wp/v2/media/${ attachmentId }`,
-					} );
-					return media.media_details?.animated_video;
-				},
-				{ timeout: 30_000 }
-			)
-			.toMatch( /\.(mp4|webm)$/i );
-
+		let media = await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ attachmentId }`,
+		} );
 		expect( media.mime_type ).toBe( 'image/gif' );
+		expect( media.media_details?.animated_video ).toBeUndefined();
 
-		// Select the Image block and transform it to a Video block through
-		// the block switcher. The transform only matches once the editor has
-		// the attachment record with the companion video.
-		await editor.canvas
-			.locator( 'role=document[name="Block: Image"i]' )
-			.click();
-		await gifToVideoUtils.waitForCompanionRecord( attachmentId );
+		// Converting is the steered default: the primary button holds focus,
+		// so Enter converts.
+		const convertButton = dialog.getByRole( 'button', {
+			name: 'Convert to video',
+		} );
+		await expect( convertButton ).toBeFocused();
+		await convertButton.click();
+		await expect( dialog ).toBeHidden();
 
-		await page
-			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Image', exact: true } )
-			.click();
-		await page
-			.getByRole( 'menu', { name: 'Image' } )
-			.getByRole( 'menuitem', { name: 'Video', exact: true } )
-			.click();
+		// The companion video is transcoded and sideloaded, and the block is
+		// swapped to the Video block's GIF variation.
+		await gifToVideoUtils.waitForBlock( 'core/video' );
 
-		// The block becomes a core/video block.
-		await page.waitForFunction( () =>
-			window.wp.data
-				.select( 'core/block-editor' )
-				.getBlocks()
-				.some( ( block ) => block.name === 'core/video' )
+		const videoBlock = ( await gifToVideoUtils.getBlocks() ).find(
+			( block ) => block.name === 'core/video'
 		);
-
-		const videoBlock = await page.evaluate( () =>
-			window.wp.data
-				.select( 'core/block-editor' )
-				.getBlocks()
-				.find( ( block ) => block.name === 'core/video' )
-		);
-
-		// It is the GIF variation: a muted, looping, autoplaying, inline
-		// video with no controls, sourced from the converted companion.
 		expect( videoBlock.attributes.controls ).toBe( false );
 		expect( videoBlock.attributes.loop ).toBe( true );
 		expect( videoBlock.attributes.autoplay ).toBe( true );
@@ -269,16 +295,21 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		expect( videoBlock.attributes.src ).toMatch( /\.(mp4|webm)(\?.*)?$/i );
 		expect( videoBlock.attributes.id ).toBe( attachmentId );
 
+		media = await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ attachmentId }`,
+		} );
+		expect( media.media_details.animated_video ).toMatch(
+			/\.(mp4|webm)$/i
+		);
+
 		// The converted block carries the GIF's intrinsic dimensions so the
-		// <video> has a stable aspect ratio from the first paint, matching
-		// the source GIF.
+		// <video> has a stable aspect ratio from the first paint.
 		expect( videoBlock.attributes.width ).toBe( media.media_details.width );
 		expect( videoBlock.attributes.height ).toBe(
 			media.media_details.height
 		);
 
-		// Those dimensions must reach the rendered <video> as the width/height
-		// attributes that give it a stable intrinsic size.
 		const renderedVideo = editor.canvas.locator(
 			'figure.wp-block-video video'
 		);
@@ -290,21 +321,17 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 			'height',
 			String( videoBlock.attributes.height )
 		);
-
-		// The <video> also needs an explicit (non-`auto`) aspect-ratio derived
-		// from those dimensions. The width/height attributes alone only yield
-		// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
-		// natural ratio while the poster/metadata load - during which the box
-		// height briefly blows up to tens of thousands of pixels before
-		// settling, reading as a duplicated image during the swap. An explicit
-		// ratio governs the height throughout the load and prevents that spike.
 		await expect( renderedVideo ).toHaveCSS(
 			'aspect-ratio',
 			`${ videoBlock.attributes.width } / ${ videoBlock.attributes.height }`
 		);
 
 		// The switcher on the converted block offers the way back: transform
-		// to an Image block showing the original GIF.
+		// to an Image block showing the original GIF. The block's accessible
+		// name reflects the active variation, so it reads "Block: GIF".
+		await editor.canvas
+			.getByRole( 'document', { name: /^Block: (GIF|Video)$/ } )
+			.click();
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: /^(GIF|Video)$/ } )
@@ -314,20 +341,129 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 			.getByRole( 'menuitem', { name: 'Image', exact: true } )
 			.click();
 
-		await page.waitForFunction( () =>
-			window.wp.data
-				.select( 'core/block-editor' )
-				.getBlocks()
-				.some( ( block ) => block.name === 'core/image' )
-		);
+		await gifToVideoUtils.waitForBlock( 'core/image', 10_000 );
 
-		const restoredImage = await page.evaluate( () =>
-			window.wp.data
-				.select( 'core/block-editor' )
-				.getBlocks()
-				.find( ( block ) => block.name === 'core/image' )
+		const restoredImage = ( await gifToVideoUtils.getBlocks() ).find(
+			( block ) => block.name === 'core/image'
 		);
 		expect( restoredImage.attributes.id ).toBe( attachmentId );
 		expect( restoredImage.attributes.url ).toMatch( /\.gif(\?.*)?$/i );
+
+		// And since the companion video is kept on the attachment, the block
+		// switcher still offers converting again.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Image"i]' )
+			.click();
+		await gifToVideoUtils.waitForCompanionRecord( attachmentId );
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Image', exact: true } )
+			.click();
+		await expect(
+			page
+				.getByRole( 'menu', { name: 'Image' } )
+				.getByRole( 'menuitem', { name: 'Video', exact: true } )
+		).toBeVisible();
+	} );
+
+	test( 'keeps the GIF and skips the transcode when declined', async ( {
+		gifToVideoUtils,
+		requestUtils,
+	} ) => {
+		await gifToVideoUtils.uploadAnimatedGif();
+
+		const dialog = gifToVideoUtils.getPromptDialog();
+		await expect( dialog ).toBeVisible( { timeout: 60_000 } );
+		await dialog.getByRole( 'button', { name: 'Keep as GIF' } ).click();
+		await expect( dialog ).toBeHidden();
+
+		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
+
+		// The block stays an Image block pointing at the GIF, and no
+		// companion video was transcoded: declining skips the conversion
+		// work entirely rather than hiding its result.
+		const blocks = await gifToVideoUtils.getBlocks();
+		expect( blocks.some( ( block ) => block.name === 'core/video' ) ).toBe(
+			false
+		);
+		const image = blocks.find( ( block ) => block.name === 'core/image' );
+		expect( image.attributes.url ).toMatch( /\.gif(\?.*)?$/i );
+
+		const media = await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ image.attributes.id }`,
+		} );
+		expect( media.mime_type ).toBe( 'image/gif' );
+		expect( media.media_details?.animated_video ).toBeUndefined();
+	} );
+
+	test( 'remembers the choice and stops prompting', async ( {
+		editor,
+		gifToVideoUtils,
+	} ) => {
+		await gifToVideoUtils.uploadAnimatedGif();
+
+		const dialog = gifToVideoUtils.getPromptDialog();
+		await expect( dialog ).toBeVisible( { timeout: 60_000 } );
+		await dialog
+			.getByRole( 'checkbox', { name: 'Remember my choice' } )
+			.check();
+		await dialog.getByRole( 'button', { name: 'Keep as GIF' } ).click();
+		await expect( dialog ).toBeHidden();
+
+		// The choice is persisted to the core/media preference.
+		const preference = await gifToVideoUtils.page.evaluate( () =>
+			window.wp.data
+				.select( 'core/preferences' )
+				.get( 'core/media', 'animatedGifUploads' )
+		);
+		expect( preference ).toBe( 'gif' );
+
+		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
+
+		// The next upload is not prompted: the GIF uploads as a plain image
+		// with no conversion offered.
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlocks = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await gifToVideoUtils.upload(
+			imageBlocks.last().locator( 'data-testid=form-file-upload-input' ),
+			ANIMATED_GIF_FIXTURE
+		);
+		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
+
+		await expect( gifToVideoUtils.getPromptDialog() ).toBeHidden();
+		const blocks = await gifToVideoUtils.getBlocks();
+		expect( blocks.some( ( block ) => block.name === 'core/video' ) ).toBe(
+			false
+		);
+		for ( const image of blocks.filter(
+			( block ) => block.name === 'core/image'
+		) ) {
+			expect( image.attributes.url ).toMatch( /\.gif(\?.*)?$/i );
+		}
+	} );
+
+	test( 'converts automatically when the preference is video', async ( {
+		gifToVideoUtils,
+	} ) => {
+		await gifToVideoUtils.setGifUploadsPreference( 'video' );
+		await gifToVideoUtils.uploadAnimatedGif();
+
+		// No prompt: the remembered choice resolves the conversion, and the
+		// block ends up as the Video block's GIF variation.
+		await gifToVideoUtils.waitForBlock( 'core/video' );
+		await expect( gifToVideoUtils.getPromptDialog() ).toBeHidden();
+
+		const videoBlock = ( await gifToVideoUtils.getBlocks() ).find(
+			( block ) => block.name === 'core/video'
+		);
+		expect( videoBlock.attributes.controls ).toBe( false );
+		expect( videoBlock.attributes.loop ).toBe( true );
+		expect( videoBlock.attributes.autoplay ).toBe( true );
+		expect( videoBlock.attributes.muted ).toBe( true );
+		expect( videoBlock.attributes.playsInline ).toBe( true );
+		expect( videoBlock.attributes.src ).toMatch( /\.(mp4|webm)(\?.*)?$/i );
 	} );
 } );

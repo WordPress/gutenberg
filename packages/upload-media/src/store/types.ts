@@ -57,6 +57,11 @@ export interface QueueItem {
 	abortController?: AbortController;
 	parentId?: QueueItemId;
 	subSizes?: SubSizeData[];
+	// Set on the bare parent item created by resolveGifConversion(): the
+	// attachment whose GifConversion record should be marked as converted
+	// once this item finishes (i.e. after its Finalize recorded the
+	// companion video on the attachment).
+	gifConversionAttachmentId?: number;
 }
 
 export interface State {
@@ -188,7 +193,13 @@ export type AddGifConversionAction = Action<
 >;
 export type UpdateGifConversionAction = Action<
 	Type.UpdateGifConversion,
-	{ attachmentId: number; status: GifConversion[ 'status' ] }
+	{
+		attachmentId: number;
+		status: GifConversion[ 'status' ];
+		// New owning queue item, e.g. the bare finalize parent created for
+		// a user-requested transcode.
+		itemId?: QueueItemId;
+	}
 >;
 export type RemoveGifConversionAction = Action<
 	Type.RemoveGifConversion,
