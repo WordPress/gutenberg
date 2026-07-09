@@ -2,15 +2,32 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Rename `--wpds-color-background-thumb-neutral-disabled` to `--wpds-color-background-thumb-neutral-weak-disabled` so the disabled token belongs to the existing neutral weak thumb family ([#79770](https://github.com/WordPress/gutenberg/pull/79770)).
+-   `ThemeProvider`: reject partially transparent and `transparent` seed colors. `color.primary` and `color.background` now only accept fully opaque seed colors ([#79773](https://github.com/WordPress/gutenberg/pull/79773)).
+
 ### Bug Fixes
 
 -   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
 
+### New Features
+
+-   Add `--wpds-color-background-thumb-brand-disabled` for parity with the existing brand thumb state tokens ([#79770](https://github.com/WordPress/gutenberg/pull/79770)).
+-   Add `--wpds-color-foreground-interactive-neutral-weak-active` for parity with the existing neutral weak foreground interactive state tokens ([#79770](https://github.com/WordPress/gutenberg/pull/79770)).
+
 ### Documentation
 
+-   Document design token accessibility responsibilities ([#79943](https://github.com/WordPress/gutenberg/pull/79943)).
 -   Document that `ThemeProvider` does not accept wrapper customization props ([#79763](https://github.com/WordPress/gutenberg/pull/79763)).
 -   Clarify the design token documentation entry points and keep the generated token guidance source internal ([#79829](https://github.com/WordPress/gutenberg/pull/79829)).
+-   Document intentional design token omissions in the design system tokens reference ([#79770](https://github.com/WordPress/gutenberg/pull/79770)).
 -   Clarify that `--wpds-color-stroke-focus` is a standalone exception to the normal color token naming pattern ([#79764](https://github.com/WordPress/gutenberg/pull/79764)).
+-   Document the design token naming grammar in the token reference ([#79769](https://github.com/WordPress/gutenberg/pull/79769)).
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
 ## 0.17.0 (2026-06-30)
 

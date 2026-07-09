@@ -60,15 +60,34 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 						: scrollLeft;
 
 				// Use SCROLL_EPSILON to handle subpixel rendering differences.
-				setOverflow( {
+				const next = {
 					first: scrollFromStart > SCROLL_EPSILON,
 					last: scrollFromStart < maxScroll - SCROLL_EPSILON,
 					isScrolling: scrollWidth > clientWidth,
-				} );
+				};
+				setOverflow( ( prev ) =>
+					prev.first === next.first &&
+					prev.last === next.last &&
+					prev.isScrolling === next.isScrolling
+						? prev
+						: next
+				);
 			};
 
 			const resizeObserver = new ResizeObserver( measureOverflow );
-			resizeObserver.observe( listEl );
+			const observeTabs = () => {
+				resizeObserver.disconnect();
+				resizeObserver.observe( listEl );
+				listEl
+					.querySelectorAll( '[role="tab"]' )
+					.forEach( ( tab ) => resizeObserver.observe( tab ) );
+			};
+
+			const mutationObserver = new MutationObserver( observeTabs );
+			mutationObserver.observe( listEl, {
+				childList: true,
+				subtree: true,
+			} );
 
 			let scrollTick = false;
 			const throttleMeasureOverflowOnScroll = () => {
@@ -86,7 +105,7 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 				{ passive: true }
 			);
 
-			// Initial check.
+			observeTabs();
 			measureOverflow();
 
 			return () => {
@@ -95,6 +114,7 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 					throttleMeasureOverflowOnScroll
 				);
 				resizeObserver.disconnect();
+				mutationObserver.disconnect();
 			};
 		}, [ listEl ] );
 

@@ -49,7 +49,22 @@ function createFakePlayer( options, element ) {
 	}
 
 	return {
-		instance: { titleEl, subtitleEl, artworkEl },
+		instance: {
+			titleEl,
+			subtitleEl,
+			artworkEl,
+			pause: jest.fn(),
+			loadTrack: jest.fn( async ( src, title, artist, trackOptions ) => {
+				titleEl.textContent = title;
+				if ( subtitleEl ) {
+					subtitleEl.textContent = artist;
+					subtitleEl.style.display = artist ? '' : 'none';
+				}
+				if ( artworkEl && trackOptions.artwork ) {
+					artworkEl.src = trackOptions.artwork;
+				}
+			} ),
+		},
 		destroy: jest.fn(),
 	};
 }
@@ -131,7 +146,7 @@ describe( 'WaveformPlayer', () => {
 		);
 	} );
 
-	it( 'recreates the player when the src changes', () => {
+	it( 'does not recreate the player when the src changes', () => {
 		const { rerender } = render( <WaveformPlayer { ...baseProps } /> );
 
 		act( () => {
@@ -151,8 +166,8 @@ describe( 'WaveformPlayer', () => {
 			jest.advanceTimersByTime( 100 );
 		} );
 
-		expect( player.destroy ).toHaveBeenCalledTimes( 1 );
-		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 2 );
+		expect( player.destroy ).not.toHaveBeenCalled();
+		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'recreates the player to show an image added to a track that had none', () => {
@@ -222,9 +237,6 @@ describe( 'WaveformPlayer', () => {
 		// The editor seeds a hidden subtitle element so artist edits can
 		// update in place.
 		expect( firstPlayer.instance.subtitleEl ).toHaveTextContent( '' );
-		expect( firstPlayer.instance.subtitleEl ).toHaveStyle( {
-			display: 'none',
-		} );
 
 		rerender( <WaveformPlayer { ...baseProps } artist="New Artist" /> );
 

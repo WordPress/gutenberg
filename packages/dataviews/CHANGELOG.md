@@ -15,6 +15,10 @@
 -   Expose the `richtext` control's `RichTextControl` assembly as a private API so other core packages can render a standalone rich text form field without a DataForm ([#78242](https://github.com/WordPress/gutenberg/pull/78242)).
 -   Update `@ariakit/react` to `0.4.32` ([#79860](https://github.com/WordPress/gutenberg/pull/79860)).
 
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
 ## 17.1.0 (2026-07-01)
 
 ## 17.0.0 (2026-06-24)
