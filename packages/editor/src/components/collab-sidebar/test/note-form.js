@@ -46,7 +46,7 @@ jest.mock( '@wordpress/ui', () => {
 } );
 
 /*
- * The form renders `RichTextControl` from `@wordpress/rich-text-control`,
+ * The form renders the `RichTextControl` assembly from `@wordpress/dataviews`,
  * whose import graph reaches the full rich-text/components machinery that
  * isn't relevant to the form's logic. Substitute a minimal contenteditable
  * stand-in so the test stays focused on the form's behavior.
@@ -84,9 +84,13 @@ const MockRichTextControl = ( {
 	);
 };
 
-jest.mock( '@wordpress/rich-text-control', () => ( {
+jest.mock( '@wordpress/dataviews', () => ( {
 	__esModule: true,
-	RichTextControl: MockRichTextControl,
+	privateApis: {},
+} ) );
+
+jest.mock( '../../../lock-unlock', () => ( {
+	unlock: () => ( { RichTextControl: MockRichTextControl } ),
 } ) );
 
 jest.mock( '@wordpress/dom', () => ( {

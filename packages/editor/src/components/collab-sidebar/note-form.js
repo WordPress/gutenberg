@@ -10,13 +10,21 @@ import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isKeyboardEvent } from '@wordpress/keycodes';
-import { RichTextControl } from '@wordpress/rich-text-control';
+import { privateApis as dataviewsPrivateApis } from '@wordpress/dataviews';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { sanitizeNoteContent } from './utils';
+
+/*
+ * The rich text form field is assembled in `@wordpress/dataviews` on top of the
+ * presentational `ContentEditableControl` shell in `@wordpress/components`; the
+ * notes sidebar is its second consumer.
+ */
+const { RichTextControl } = unlock( dataviewsPrivateApis );
 
 const ALLOWED_NOTE_FORMATS = [
 	'core/bold',
