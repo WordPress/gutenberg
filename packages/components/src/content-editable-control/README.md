@@ -6,21 +6,24 @@
 
 <p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-contenteditablecontrol--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
 
+A presentational `contentEditable` form control: a labeled editable element
+rendered with the chrome (`BaseControl` + label) shared by the other form
+controls in the package.
+
+Unlike the in-canvas `RichText` from `@wordpress/block-editor`, this control
+is intended for standalone form fields (DataForms, sidebar inputs, etc.).
+It is deliberately **presentational only** and has no `@wordpress/rich-text`
+dependency: the editable behavior (value, formatting, keyboard shortcuts)
+and any focus/selection tracking are owned by the consumer, which wires them
+through the forwarded ref and native event props (see the richtext DataForm
+control in `@wordpress/dataviews` for the canonical assembly).
+
 ## Props
 
 ### `className`
 
  - Type: `string`
  - Required: No
-
-### `children`
-
- - Type: `ReactNode`
- - Required: No
-
-Placeholder slot for the rich-text assembly (e.g. `FormatEdit` and its
-context providers), mounted only while the field has an active
-selection.
 
 ### `disabled`
 
@@ -29,23 +32,8 @@ selection.
  - Default: `false`
 
 Whether the field is non-editable. A disabled field is not
-`contentEditable` (so it is neither focusable nor editable), exposes
-`aria-disabled` to assistive technology, and does not mount `children`.
-
-### `defaultIsSelected`
-
- - Type: `boolean`
- - Required: No
- - Default: `false`
-
-The initial selection state for uncontrolled usage.
-
-### `disableLineBreaks`
-
- - Type: `boolean`
- - Required: No
-
-Whether line breaks are disabled. Drives `aria-multiline`.
+`contentEditable` (so it is neither focusable nor editable) and exposes
+`aria-disabled` to assistive technology.
 
 ### `hideLabelFromVision`
 
@@ -64,39 +52,12 @@ Additional description for the control.
 
 Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
 
-### `isSelected`
-
- - Type: `boolean`
- - Required: No
-
-The selection ("active") state of the field, for controlled usage.
-When omitted, the control manages its own selection state directly from
-the focus/blur transitions. Consumers whose format UI opens popovers
-must control this prop and implement their own blur handling, since
-only the consumer can tell whether the element receiving focus belongs
-to one of its popovers.
-
-### `id`
-
- - Type: `string`
- - Required: No
-
-Unique identifier for the control.
-
 ### `label`
 
  - Type: `string`
  - Required: Yes
 
 Label text for the control.
-
-### `onSelectedChange`
-
- - Type: `((isSelected: boolean) => void)`
- - Required: No
-
-Called when the field gains or loses an "active" selection, in both
-controlled and uncontrolled usage.
 
 ### `required`
 

@@ -235,7 +235,7 @@ describe( 'RichTextControl', () => {
 		} );
 	} );
 
-	it( 'merges a consumer-supplied className with the control class', () => {
+	it( 'applies a consumer-supplied className to the control wrapper', () => {
 		const { container } = render(
 			<RichTextControl
 				label="Styled"
@@ -245,11 +245,12 @@ describe( 'RichTextControl', () => {
 			/>
 		);
 
-		const textbox = getTextbox( container );
-		expect( textbox ).toHaveClass(
-			'wp-components-content-editable-control'
-		);
-		expect( textbox ).toHaveClass( 'my-custom-class' );
+		// The shell follows the components-package convention of putting the
+		// consumer's `className` on the outermost wrapper, not the editable.
+		expect(
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			container.querySelector( '.components-base-control' )
+		).toHaveClass( 'my-custom-class' );
 	} );
 
 	it( 'does not take focus on mount by default', () => {

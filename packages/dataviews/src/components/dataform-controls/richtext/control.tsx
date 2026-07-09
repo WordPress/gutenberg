@@ -32,11 +32,11 @@ import { unlock } from '../../../lock-unlock';
 import { getAllowedFormats } from './utils';
 import FormatEdit from './format-edit';
 
-// The presentational shell: `RichTextControl` owns the chrome (`BaseControl`
-// + label and the `contentEditable` element) and has no `@wordpress/rich-text`
-// dependency; the `Validated` wrapper adds the same required/validity
-// treatment the sibling text controls get. This module is the "assembly" that
-// injects the rich-text wiring into it.
+// The presentational shell: `ContentEditableControl` owns the chrome
+// (`BaseControl` + label and the `contentEditable` element) and has no
+// `@wordpress/rich-text` dependency; the `Validated` wrapper adds the same
+// required/validity treatment the sibling text controls get. This module is
+// the "assembly" that injects the rich-text wiring into it.
 const { ValidatedContentEditableControl: RichTextControlShell } = unlock(
 	componentsPrivateApis
 );
@@ -494,13 +494,17 @@ export default function RichTextControl( {
 				// The shell manages the editable content through the ref; the
 				// value only drives its hidden validity delegate.
 				value={ attrValue }
-				disableLineBreaks={ disableLineBreaks }
+				aria-multiline={ ! disableLineBreaks }
 				ref={ editableRef }
-				isSelected={ isSelected }
 				onFocus={ onEditableFocus }
 				onBlur={ onEditableBlur }
-			>
-				{ /* The shell mounts these only while the field is selected. */ }
+			/>
+			{ /*
+			 * The format assembly mounts only while the field is selected —
+			 * the shell is presentational and knows nothing about selection,
+			 * so this module owns both the state and the gating.
+			 */ }
+			{ isSelected && ! disabled && (
 				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
 					<InputEventContext.Provider value={ inputEvents }>
 						{ /*
@@ -521,7 +525,7 @@ export default function RichTextControl( {
 						/>
 					</InputEventContext.Provider>
 				</KeyboardShortcutContext.Provider>
-			</RichTextControlShell>
+			) }
 			<Popover.Slot ref={ popoverSlotRef } />
 		</SlotFillProvider>
 	);

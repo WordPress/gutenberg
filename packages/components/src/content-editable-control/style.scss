@@ -28,7 +28,7 @@
 
 	// Match the disabled treatment of native form controls (see the
 	// `&:disabled` rules in the textarea/input control styles).
-	&.is-disabled {
+	&[aria-disabled="true"] {
 		background: $gray-100;
 		border-color: $gray-300;
 		color: $gray-700;

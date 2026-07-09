@@ -8,28 +8,18 @@ import { render, screen, fireEvent } from '@testing-library/react';
  */
 import ContentEditableControl from '..';
 
-function getTextbox( container: HTMLElement ) {
-	return container.querySelector(
-		'.wp-components-content-editable-control'
-	) as HTMLDivElement | null;
-}
-
 // The presentational shell is deliberately decoupled from `@wordpress/rich-text`:
-// the editable behavior is injected by the consumer through the forwarded ref
-// and `children`. These tests exercise only the chrome the shell owns -- the label,
-// the `contentEditable` element, and the controlled focus/blur selection
-// heuristic -- with no rich-text wiring at all.
-describe( 'ContentEditableControl (presentational shell)', () => {
+// the editable behavior and any focus/selection tracking are owned by the
+// consumer, wired through the forwarded ref and native event props. These
+// tests exercise only the chrome the shell owns -- the label and the
+// `contentEditable` element -- with no rich-text wiring at all.
+describe( 'ContentEditableControl', () => {
 	it( 'renders a labeled contenteditable textbox', () => {
-		const { container } = render(
-			<ContentEditableControl label="Description" />
-		);
+		render( <ContentEditableControl label="Description" /> );
 
-		const textbox = getTextbox( container )!;
+		const textbox = screen.getByRole( 'textbox' );
 		const label = screen.getByText( 'Description' );
 
-		expect( textbox ).toBeInTheDocument();
-		expect( textbox ).toHaveAttribute( 'role', 'textbox' );
 		expect( textbox ).toHaveAttribute( 'contenteditable', 'true' );
 		// `BaseControl` wires the label's `for` to the control's `id`.
 		expect( label ).toHaveAttribute( 'for', textbox.id );
@@ -46,26 +36,43 @@ describe( 'ContentEditableControl (presentational shell)', () => {
 		expect( label ).toHaveClass( 'components-visually-hidden' );
 	} );
 
-	it( 'forwards `disableLineBreaks` to the textbox via `aria-multiline`', () => {
-		const { container, rerender } = render(
+	it( 'is multiline by default and accepts an `aria-multiline` override', () => {
+		const { rerender } = render(
 			<ContentEditableControl label="Single line" />
 		);
-		expect( getTextbox( container ) ).toHaveAttribute(
+		expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(
 			'aria-multiline',
 			'true'
 		);
 
 		rerender(
-			<ContentEditableControl label="Single line" disableLineBreaks />
+			<ContentEditableControl
+				label="Single line"
+				aria-multiline={ false }
+			/>
 		);
-		expect( getTextbox( container ) ).toHaveAttribute(
+		expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(
 			'aria-multiline',
 			'false'
 		);
 	} );
 
+	it( 'exposes `disabled` as a non-editable, aria-disabled textbox', () => {
+		render( <ContentEditableControl label="Note" disabled /> );
+
+		const textbox = screen.getByRole( 'textbox' );
+		expect( textbox ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( textbox ).toHaveAttribute( 'contenteditable', 'false' );
+	} );
+
+	it( 'exposes `required` via aria-required', () => {
+		render( <ContentEditableControl label="Note" required /> );
+
+		expect( screen.getByRole( 'textbox' ) ).toBeRequired();
+	} );
+
 	it( 'uses a consumer-supplied `id` for the textbox and label', () => {
-		const { container } = render(
+		render(
 			<ContentEditableControl
 				label="Custom id"
 				// eslint-disable-next-line no-restricted-syntax
@@ -73,15 +80,17 @@ describe( 'ContentEditableControl (presentational shell)', () => {
 			/>
 		);
 
-		const textbox = getTextbox( container )!;
-		expect( textbox ).toHaveAttribute( 'id', 'my-custom-id' );
+		expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(
+			'id',
+			'my-custom-id'
+		);
 		expect( screen.getByText( 'Custom id' ) ).toHaveAttribute(
 			'for',
 			'my-custom-id'
 		);
 	} );
 
-	it( 'merges a consumer-supplied className with the control class', () => {
+	it( 'applies a consumer-supplied className to the outermost wrapper', () => {
 		const { container } = render(
 			<ContentEditableControl
 				label="Styled"
@@ -89,15 +98,19 @@ describe( 'ContentEditableControl (presentational shell)', () => {
 			/>
 		);
 
-		const textbox = getTextbox( container )!;
-		expect( textbox ).toHaveClass(
-			'wp-components-content-editable-control'
+		// The package convention is to put the consumer's `className` on the
+		// outermost wrapper (the `BaseControl` root), not the editable.
+		expect(
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			container.querySelector( '.components-base-control' )
+		).toHaveClass( 'my-custom-class' );
+		expect( screen.getByRole( 'textbox' ) ).not.toHaveClass(
+			'my-custom-class'
 		);
-		expect( textbox ).toHaveClass( 'my-custom-class' );
 	} );
 
 	it( 'forwards additional native props to the textbox', () => {
-		const { container } = render(
+		render(
 			<ContentEditableControl
 				label="Note"
 				dir="rtl"
@@ -105,7 +118,7 @@ describe( 'ContentEditableControl (presentational shell)', () => {
 			/>
 		);
 
-		const textbox = getTextbox( container )!;
+		const textbox = screen.getByRole( 'textbox' );
 		expect( textbox ).toHaveAttribute( 'dir', 'rtl' );
 		expect( textbox ).toHaveAttribute( 'data-testid', 'my-textbox' );
 	} );
@@ -114,147 +127,27 @@ describe( 'ContentEditableControl (presentational shell)', () => {
 		// The rich-text wiring (the `useRichText` ref, event-listener refs,
 		// an anchor ref, …) is injected through this forwarded ref.
 		const ref = jest.fn();
-		const { container } = render(
-			<ContentEditableControl label="Note" ref={ ref } />
-		);
+		render( <ContentEditableControl label="Note" ref={ ref } /> );
 
-		expect( ref ).toHaveBeenCalledWith( getTextbox( container ) );
+		expect( ref ).toHaveBeenCalledWith( screen.getByRole( 'textbox' ) );
 	} );
 
-	describe( 'selection', () => {
-		// The shell derives selection directly from the focus/blur
-		// transitions, usable both controlled (`isSelected`) and uncontrolled.
-		// It deliberately has no knowledge of popovers: a consumer whose
-		// format UI opens popovers controls `isSelected` and implements its
-		// own blur handling (covered by the richtext DataForm control tests
-		// in `@wordpress/dataviews`).
-		it( 'mounts children only while selected (uncontrolled)', () => {
-			const { container } = render(
-				<ContentEditableControl label="Field">
-					<span data-testid="assembly" />
-				</ContentEditableControl>
-			);
-			const textbox = getTextbox( container )!;
+	it( 'calls consumer-supplied focus and blur handlers', () => {
+		const onFocus = jest.fn();
+		const onBlur = jest.fn();
+		render(
+			<ContentEditableControl
+				label="Field"
+				onFocus={ onFocus }
+				onBlur={ onBlur }
+			/>
+		);
+		const textbox = screen.getByRole( 'textbox' );
 
-			expect(
-				screen.queryByTestId( 'assembly' )
-			).not.toBeInTheDocument();
+		fireEvent.focus( textbox );
+		expect( onFocus ).toHaveBeenCalledTimes( 1 );
 
-			fireEvent.focus( textbox );
-			expect( screen.getByTestId( 'assembly' ) ).toBeInTheDocument();
-
-			fireEvent.blur( textbox );
-			expect(
-				screen.queryByTestId( 'assembly' )
-			).not.toBeInTheDocument();
-		} );
-
-		it( 'starts selected with `defaultIsSelected` (uncontrolled)', () => {
-			render(
-				<ContentEditableControl label="Field" defaultIsSelected>
-					<span data-testid="assembly" />
-				</ContentEditableControl>
-			);
-
-			expect( screen.getByTestId( 'assembly' ) ).toBeInTheDocument();
-		} );
-
-		it( 'defers to the `isSelected` prop when controlled', () => {
-			const onSelectedChange = jest.fn();
-			const { container, rerender } = render(
-				<ContentEditableControl
-					label="Field"
-					isSelected={ false }
-					onSelectedChange={ onSelectedChange }
-				>
-					<span data-testid="assembly" />
-				</ContentEditableControl>
-			);
-
-			// Controlled: the shell requests the change but does not apply
-			// it itself.
-			fireEvent.focus( getTextbox( container )! );
-			expect( onSelectedChange ).toHaveBeenCalledWith( true );
-			expect(
-				screen.queryByTestId( 'assembly' )
-			).not.toBeInTheDocument();
-
-			rerender(
-				<ContentEditableControl
-					label="Field"
-					isSelected
-					onSelectedChange={ onSelectedChange }
-				>
-					<span data-testid="assembly" />
-				</ContentEditableControl>
-			);
-			expect( screen.getByTestId( 'assembly' ) ).toBeInTheDocument();
-		} );
-
-		it( 'reports selection on focus', () => {
-			const onSelectedChange = jest.fn();
-			const { container } = render(
-				<ContentEditableControl
-					label="Field"
-					onSelectedChange={ onSelectedChange }
-				/>
-			);
-
-			fireEvent.focus( getTextbox( container )! );
-			expect( onSelectedChange ).toHaveBeenCalledWith( true );
-		} );
-
-		it( 'reports deselection on blur', () => {
-			const onSelectedChange = jest.fn();
-			const { container } = render(
-				<ContentEditableControl
-					label="Field"
-					onSelectedChange={ onSelectedChange }
-				/>
-			);
-			const textbox = getTextbox( container )!;
-
-			fireEvent.focus( textbox );
-			fireEvent.blur( textbox );
-
-			expect( onSelectedChange ).toHaveBeenLastCalledWith( false );
-		} );
-
-		it( 'leaves selection to the consumer when controlled without `onSelectedChange`', () => {
-			// A controlling consumer (e.g. the richtext DataForm control)
-			// keeps the field selected through blur, so a popover its format
-			// UI opened can claim focus without unmounting; the shell must
-			// not fight the controlled value.
-			const { container } = render(
-				<ContentEditableControl label="Field" isSelected>
-					<span data-testid="assembly" />
-				</ContentEditableControl>
-			);
-			const textbox = getTextbox( container )!;
-
-			fireEvent.focus( textbox );
-			fireEvent.blur( textbox );
-
-			expect( screen.getByTestId( 'assembly' ) ).toBeInTheDocument();
-		} );
-
-		it( 'calls consumer-supplied focus and blur handlers', () => {
-			const onFocus = jest.fn();
-			const onBlur = jest.fn();
-			const { container } = render(
-				<ContentEditableControl
-					label="Field"
-					onFocus={ onFocus }
-					onBlur={ onBlur }
-				/>
-			);
-			const textbox = getTextbox( container )!;
-
-			fireEvent.focus( textbox );
-			expect( onFocus ).toHaveBeenCalledTimes( 1 );
-
-			fireEvent.blur( textbox );
-			expect( onBlur ).toHaveBeenCalledTimes( 1 );
-		} );
+		fireEvent.blur( textbox );
+		expect( onBlur ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
