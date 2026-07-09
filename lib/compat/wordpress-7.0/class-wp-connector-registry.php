@@ -234,8 +234,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 					}
 					$connector['authentication']['setting_name'] = $args['authentication']['setting_name'];
 				} else {
-					$setting_suffix                              = $args['authentication']['method'];
-					$connector['authentication']['setting_name'] = str_replace( '-', '_', "connectors_{$connector['type']}_{$id}_{$setting_suffix}" );
+					$connector['authentication']['setting_name'] = str_replace( '-', '_', "connectors_{$connector['type']}_{$id}_{$args['authentication']['method']}" );
 				}
 
 				if ( isset( $args['authentication']['constant_name'] ) ) {
