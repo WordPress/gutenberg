@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the required Node.js version to `^20.19.0` or `>=22.13.0`. ([#80063](https://github.com/WordPress/gutenberg/pull/80063))
+
 ### New Features
 
 -   Add `Skeleton` component ([#79671](https://github.com/WordPress/gutenberg/pull/79671)).
