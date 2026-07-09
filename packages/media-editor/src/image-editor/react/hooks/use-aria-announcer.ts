@@ -13,11 +13,22 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import type { CropperState } from '../../core/types';
+import { getSourceRegion } from '../../core/source-region';
 
 /** Debounce delay for ARIA live announcements (ms). */
 const ARIA_DEBOUNCE_MS = 300;
 
-function buildFlipAnnouncement( state: CropperState ): string {
+function getFlipAnnouncement(
+	state: CropperState,
+	previousState: CropperState | null
+): string | undefined {
+	if (
+		! previousState ||
+		( previousState.flip.horizontal === state.flip.horizontal &&
+			previousState.flip.vertical === state.flip.vertical )
+	) {
+		return undefined;
+	}
 	const { horizontal, vertical } = state.flip;
 	if ( horizontal && vertical ) {
 		return __( 'Flipped horizontally and vertically' );
@@ -31,49 +42,117 @@ function buildFlipAnnouncement( state: CropperState ): string {
 	return __( 'Flip removed' );
 }
 
-// Build a human-readable announcement string from cropper state.
+function getRotationAnnouncement(
+	state: CropperState,
+	previousState: CropperState | null
+): string | undefined {
+	if (
+		previousState &&
+		Math.round( previousState.rotation ) === Math.round( state.rotation )
+	) {
+		return undefined;
+	}
+	// Announce the visual rotation — what the user perceives on screen. A
+	// single-axis flip mirrors the image, reversing the entire on-screen
+	// rotation relative to the stored field (the same S·R·S inversion the
+	// reducer applies), so negate the whole angle in that case.
+	const singleFlip = state.flip.horizontal !== state.flip.vertical;
+	const visualDir = singleFlip ? -1 : 1;
+	// Normalize to (-180, 180] so the sign indicates direction.
+	let visualRotation = ( Math.round( state.rotation ) * visualDir ) % 360;
+	if ( visualRotation > 180 ) {
+		visualRotation -= 360;
+	}
+	if ( visualRotation <= -180 ) {
+		visualRotation += 360;
+	}
+	if ( visualRotation === 0 ) {
+		return previousState ? __( 'Rotation 0 degrees' ) : undefined;
+	}
+	if ( visualRotation > 0 ) {
+		return sprintf(
+			/* translators: %d: rotation angle in degrees. */
+			__( 'Rotated %d degrees clockwise' ),
+			visualRotation
+		);
+	}
+	return sprintf(
+		/* translators: %d: rotation angle in degrees. */
+		__( 'Rotated %d degrees counterclockwise' ),
+		Math.abs( visualRotation )
+	);
+}
+
+function getCropAnnouncement(
+	state: CropperState,
+	previousState: CropperState | null
+): string | undefined {
+	if ( ! state.image ) {
+		return undefined;
+	}
+	const imageSize = {
+		width: state.image.naturalWidth,
+		height: state.image.naturalHeight,
+	};
+	const region = getSourceRegion( state, imageSize );
+	// Announce only when the crop's pixel dimensions change. Measuring both the
+	// previous and current crop rects under the current rotation and zoom keeps
+	// the comparison in the same pixel units we announce, and leaves a zoom-only
+	// change — which doesn't move the crop rect — silent.
+	if ( previousState?.image ) {
+		const previousRegion = getSourceRegion(
+			{ ...state, cropRect: previousState.cropRect },
+			imageSize
+		);
+		if (
+			Math.round( previousRegion.width ) === Math.round( region.width ) &&
+			Math.round( previousRegion.height ) === Math.round( region.height )
+		) {
+			return undefined;
+		}
+	}
+	return sprintf(
+		/* translators: 1: crop width in pixels, 2: crop height in pixels. */
+		__( 'Crop %1$d by %2$d pixels' ),
+		Math.round( region.width ),
+		Math.round( region.height )
+	);
+}
+
+function getZoomAnnouncement(
+	state: CropperState,
+	previousState: CropperState | null
+): string | undefined {
+	if (
+		previousState &&
+		Math.round( previousState.zoom * 100 ) ===
+			Math.round( state.zoom * 100 )
+	) {
+		return undefined;
+	}
+	return sprintf(
+		/* translators: %d: zoom level as a percentage. */
+		__( 'Zoom %d%%' ),
+		Math.round( state.zoom * 100 )
+	);
+}
+
 function buildAnnouncement(
 	state: CropperState,
 	previousState: CropperState | null
 ): string {
-	if (
-		previousState &&
-		( previousState.flip.horizontal !== state.flip.horizontal ||
-			previousState.flip.vertical !== state.flip.vertical )
-	) {
-		return buildFlipAnnouncement( state );
+	// Flip changes are announced alone.
+	const flip = getFlipAnnouncement( state, previousState );
+	if ( flip ) {
+		return flip;
 	}
 
-	const parts: string[] = [];
-	parts.push(
-		sprintf(
-			/* translators: %d: zoom level as a percentage. */
-			__( 'Zoom %d%%' ),
-			Math.round( state.zoom * 100 )
-		)
-	);
-	if ( state.rotation !== 0 ) {
-		parts.push(
-			sprintf(
-				/* translators: %d: rotation angle in degrees. */
-				__( 'Rotation %d degrees' ),
-				Math.round( state.rotation )
-			)
-		);
-	}
-	const cropW = Math.round( state.cropRect.width * 100 );
-	const cropH = Math.round( state.cropRect.height * 100 );
-	parts.push(
-		sprintf(
-			/* translators: 1: crop width as a percentage, 2: crop height as a percentage. */
-			__( 'Crop %1$d%% by %2$d%%' ),
-			cropW,
-			cropH
-		)
-	);
-	if ( state.flip.horizontal || state.flip.vertical ) {
-		parts.push( buildFlipAnnouncement( state ) );
-	}
+	const parts = [
+		getRotationAnnouncement( state, previousState ),
+		getZoomAnnouncement( state, previousState ),
+		getCropAnnouncement( state, previousState ),
+	].filter( ( part ): part is string => part !== undefined );
+
 	return parts.join( ', ' );
 }
 

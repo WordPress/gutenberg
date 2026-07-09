@@ -28,10 +28,10 @@ type WidgetAttributeControlsProps = {
 };
 
 /**
- * Normal-mode controls: the `relevance: 'high'` attributes inline, plus the
- * settings trigger that opens the full settings drawer when needed. Inline
- * controls appear only for the high-relevance fields; edits stage live and
- * auto-save on the dashboard's shared debounce.
+ * Normal-mode controls: the `relevance: 'high'` attributes on a prominent
+ * surface, plus a settings entry point when needed. Inline controls appear
+ * only for the high-relevance fields; edits stage live and auto-save on the
+ * dashboard's shared debounce.
  *
  * @param {WidgetAttributeControlsProps} props Component props.
  */
