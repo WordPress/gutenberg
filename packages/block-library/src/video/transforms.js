@@ -4,6 +4,15 @@
 import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 
+/**
+ * Internal dependencies
+ */
+import {
+	getCarriedGifConversionAttributes,
+	getConvertedGifAttachment,
+} from '../utils/gif-conversion';
+import { isGifVariation } from './variations';
+
 const transforms = {
 	from: [
 		{
@@ -97,6 +106,32 @@ const transforms = {
 					delete attributes.src;
 				}
 				return createBlock( 'core/video', attributes );
+			},
+		},
+	],
+	to: [
+		{
+			// Offer switching a GIF-behaving video created from an uploaded
+			// animated GIF back to an Image block showing the original GIF.
+			// The converted video keeps the GIF image attachment as its `id`,
+			// so an image mime type on the attachment is what distinguishes
+			// it from a regular video that merely loops and autoplays.
+			type: 'block',
+			blocks: [ 'core/image' ],
+			isMatch: ( attributes ) =>
+				isGifVariation( attributes ) &&
+				!! getConvertedGifAttachment( attributes.id ),
+			transform( attributes ) {
+				const { id, caption } = attributes;
+				const gif = getConvertedGifAttachment( id );
+
+				return createBlock( 'core/image', {
+					...getCarriedGifConversionAttributes( attributes ),
+					id,
+					url: gif.source_url,
+					alt: gif.alt_text || '',
+					caption,
+				} );
 			},
 		},
 	],

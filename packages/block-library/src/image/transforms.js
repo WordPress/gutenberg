@@ -4,6 +4,14 @@
 import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
 
+/**
+ * Internal dependencies
+ */
+import {
+	getAnimatedGifVideoCompanion,
+	getCarriedGifConversionAttributes,
+} from '../utils/gif-conversion';
+
 export function stripFirstImage( attributes, { shortcode } ) {
 	const { body } = document.implementation.createHTMLDocument( '' );
 
@@ -250,6 +258,45 @@ const transforms = {
 						return align.replace( 'align', '' );
 					},
 				},
+			},
+		},
+	],
+	to: [
+		{
+			// Offer converting an animated GIF into the Video block's "GIF"
+			// variation: a muted, looping, autoplaying video transcoded from
+			// the GIF and sideloaded next to it when it was uploaded. Only
+			// matches when that companion video exists, so ordinary images
+			// never see this transform.
+			type: 'block',
+			blocks: [ 'core/video' ],
+			isMatch: ( { id, url } ) =>
+				!! getAnimatedGifVideoCompanion( id, url ),
+			transform( attributes ) {
+				const { id, url, caption } = attributes;
+				const companion = getAnimatedGifVideoCompanion( id, url );
+
+				return createBlock( 'core/video', {
+					...getCarriedGifConversionAttributes( attributes ),
+					id,
+					src: companion.src,
+					poster: companion.poster,
+					caption,
+					controls: false,
+					loop: true,
+					autoplay: true,
+					muted: true,
+					playsInline: true,
+					/*
+					 * Carry the GIF's intrinsic dimensions so the <video>
+					 * keeps its aspect ratio from the first paint. Without
+					 * them the element collapses to the browser-default size
+					 * and then jumps once the poster/metadata load, which
+					 * shows up as a brief duplicated image during the swap.
+					 */
+					width: companion.width,
+					height: companion.height,
+				} );
 			},
 		},
 	],

@@ -23,7 +23,8 @@ import {
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { prependHTTPS } from '@wordpress/url';
@@ -42,7 +43,6 @@ import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
 import { isGifVariation } from './variations';
-import GifRestoreControl from './gif-restore-control';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -53,7 +53,6 @@ function VideoEdit( {
 	setAttributes,
 	insertBlocksAfter,
 	onReplace,
-	clientId,
 } ) {
 	const videoPlayer = useRef();
 	const { id, controls, poster, src, tracks, width, height } = attributes;
@@ -78,6 +77,26 @@ function VideoEdit( {
 		onChange: onSelectVideo,
 		onError: onUploadError,
 	} );
+
+	// A GIF-behaving video created from an uploaded animated GIF keeps the
+	// GIF image attachment as its `id`. Resolve that attachment record while
+	// the block is selected so the "back to Image" block transform (whose
+	// `isMatch` reads the record synchronously) can be offered in the block
+	// switcher.
+	useSelect(
+		( select ) => {
+			if ( isSingleSelected && isGif && id ) {
+				select( coreStore ).getEntityRecord(
+					'postType',
+					'attachment',
+					id,
+					{ context: 'view' }
+				);
+			}
+			return null;
+		},
+		[ isSingleSelected, isGif, id ]
+	);
 
 	useEffect( () => {
 		// Placeholder may be rendered.
@@ -225,12 +244,6 @@ function VideoEdit( {
 							variant="toolbar"
 						/>
 					</BlockControls>
-					{ isGif && (
-						<GifRestoreControl
-							attributes={ attributes }
-							clientId={ clientId }
-						/>
-					) }
 				</>
 			) }
 			<InspectorControls>
