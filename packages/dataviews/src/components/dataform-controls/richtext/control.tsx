@@ -14,6 +14,7 @@ import {
 } from '@wordpress/components';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
+	createPortal,
 	useEffect,
 	useInsertionEffect,
 	useMemo,
@@ -198,6 +199,21 @@ export default function RichTextControl( {
 	 * simply containment in that slot.
 	 */
 	const popoverSlotRef = useRef< HTMLDivElement | null >( null );
+	/*
+	 * Where the `Popover.Slot` portals to: the editable's `ownerDocument`
+	 * body. The slot must not render inline where the field sits — form
+	 * fields routinely live inside scroll containers (`overflow` ancestors
+	 * clip the popovers) and transformed ancestors (which re-root the
+	 * popovers' positioning). Portaling to the body mirrors where popovers
+	 * land by default when no slot is present, while keeping the slot inside
+	 * this field's `SlotFillProvider` (React context crosses portals) so the
+	 * containment-based focus tracking above keeps working.
+	 */
+	const [ popoverContainer, setPopoverContainer ] =
+		useState< HTMLElement | null >( null );
+	const popoverContainerRef = useRefEffect< HTMLElement >( ( element ) => {
+		setPopoverContainer( element.ownerDocument.body );
+	}, [] );
 	// When the editable blurs, defer flipping the selection off so a
 	// portal-rendered popover can claim focus without `FormatEdit` — and
 	// therefore the popover itself — unmounting underneath it.
@@ -473,6 +489,7 @@ export default function RichTextControl( {
 		eventListenersRef,
 		enterRef,
 		focusOnMountRef,
+		popoverContainerRef,
 	] );
 
 	return (
@@ -536,7 +553,11 @@ export default function RichTextControl( {
 					</InputEventContext.Provider>
 				</KeyboardShortcutContext.Provider>
 			) }
-			<Popover.Slot ref={ popoverSlotRef } />
+			{ popoverContainer &&
+				createPortal(
+					<Popover.Slot ref={ popoverSlotRef } />,
+					popoverContainer
+				) }
 		</SlotFillProvider>
 	);
 }
