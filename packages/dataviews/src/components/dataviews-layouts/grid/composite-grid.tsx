@@ -16,7 +16,6 @@ import {
 import { Stack, Tooltip } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { isAppleOS } from '@wordpress/keycodes';
 import {
 	useCallback,
 	useContext,
@@ -41,6 +40,7 @@ import type {
 	ViewGrid as ViewGridType,
 } from '../../../types';
 import type { SetSelection } from '../../../types/private';
+import type { SelectionGestureProps } from '../utils/use-selection-gestures';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
 const { Badge: WCBadge } = unlock( componentsPrivateApis );
 import { useGridColumns } from './preview-size-picker';
@@ -72,6 +72,7 @@ interface GridItemProps< Item > extends HTMLAttributes< HTMLDivElement > {
 	isItemClickable: ( item: Item ) => boolean;
 	item: Item;
 	actions: Action< Item >[];
+	getSelectionGestureProps: ( id: string ) => SelectionGestureProps;
 	titleField?: NormalizedField< Item >;
 	mediaField?: NormalizedField< Item >;
 	descriptionField?: NormalizedField< Item >;
@@ -97,6 +98,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 			getItemId,
 			item,
 			actions,
+			getSelectionGestureProps,
 			mediaField,
 			titleField,
 			descriptionField,
@@ -117,6 +119,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 		} = view;
 		const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 		const id = getItemId( item );
+		const gestureProps = getSelectionGestureProps( id );
 		const elementRef = useRef< HTMLDivElement | null >( null );
 
 		// Merge refs callback
@@ -184,22 +187,13 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 						'is-selected': hasBulkAction && isSelected,
 					}
 				) }
+				onMouseDown={ ( event ) => {
+					props.onMouseDown?.( event );
+					gestureProps.onMouseDown( event );
+				} }
 				onClickCapture={ ( event ) => {
 					props.onClickCapture?.( event );
-					if ( isAppleOS() ? event.metaKey : event.ctrlKey ) {
-						event.stopPropagation();
-						event.preventDefault();
-						if ( ! hasBulkAction ) {
-							return;
-						}
-						onChangeSelection(
-							isSelected
-								? selection.filter(
-										( itemId ) => id !== itemId
-								  )
-								: [ ...selection, id ]
-						);
-					}
+					gestureProps.onClickCapture( event );
 				} }
 			>
 				<ItemClickWrapper
@@ -358,6 +352,7 @@ interface CompositeGridProps< Item > {
 	) => ReactElement;
 	getItemId: ( item: Item ) => string;
 	actions: Action< Item >[];
+	getSelectionGestureProps: ( id: string ) => SelectionGestureProps;
 }
 
 export default function CompositeGrid< Item >( {
@@ -375,6 +370,7 @@ export default function CompositeGrid< Item >( {
 	renderItemLink,
 	getItemId,
 	actions,
+	getSelectionGestureProps,
 }: CompositeGridProps< Item > ) {
 	const { paginationInfo, resizeObserverRef } =
 		useContext( DataViewsContext );
@@ -497,6 +493,9 @@ export default function CompositeGrid< Item >( {
 											getItemId={ getItemId }
 											item={ item }
 											actions={ actions }
+											getSelectionGestureProps={
+												getSelectionGestureProps
+											}
 											mediaField={ mediaField }
 											titleField={ titleField }
 											descriptionField={
@@ -583,6 +582,9 @@ export default function CompositeGrid< Item >( {
 													getItemId={ getItemId }
 													item={ item }
 													actions={ actions }
+													getSelectionGestureProps={
+														getSelectionGestureProps
+													}
 													mediaField={ mediaField }
 													titleField={ titleField }
 													descriptionField={

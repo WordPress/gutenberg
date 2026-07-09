@@ -14,7 +14,9 @@ import { Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import type { ViewGridProps } from '../../../types';
+import { hasAPossibleBulkAction } from '../../dataviews-bulk-actions';
 import getDataByGroup from '../utils/get-data-by-group';
+import useSelectionGestures from '../utils/use-selection-gestures';
 import CompositeGrid from './composite-grid';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
@@ -40,6 +42,18 @@ function ViewGrid< Item >( {
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	// When grouping is enabled the rendered order is by group rather than the
+	// order of `data`; ranges follow what the user sees.
+	const orderedData = dataByGroup
+		? Array.from( dataByGroup.values() ).flat()
+		: data;
+	const { getSelectionGestureProps } = useSelectionGestures( {
+		selectableIds: orderedData
+			.filter( ( item ) => hasAPossibleBulkAction( actions, item ) )
+			.map( getItemId ),
+		selection,
+		onChangeSelection,
+	} );
 	if ( ! hasData ) {
 		return (
 			<div
@@ -66,6 +80,7 @@ function ViewGrid< Item >( {
 		renderItemLink,
 		getItemId,
 		actions,
+		getSelectionGestureProps,
 	};
 	return (
 		<>

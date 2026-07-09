@@ -14,6 +14,10 @@
 
 - DataForms: Add a `richtext` control, selectable via `Edit: 'richtext'` (or an `EditConfig` with `control: 'richtext'`). The control assembles `@wordpress/rich-text` into the presentational `ContentEditableControl` shell from `@wordpress/components`. [#78471](https://github.com/WordPress/gutenberg/pull/78471) [#79345](https://github.com/WordPress/gutenberg/pull/79345)
 
+### Enhancements
+
+- DataViews: Add Shift+Click range selection through a shared `useSelectionGestures` hook that layouts can adopt, wired up in the table and grid layouts.[#80046](https://github.com/WordPress/gutenberg/pull/80046)
+
 ### Bug Fix
 
 - DataViews: Stop the infinite-scroll list from jumping while pages load asynchronously. The scroll-anchor restoration no longer discards scrolling the user did during the load, and the footer's visibility no longer depends on the loading state, so it no longer mounts mid-load (resizing the scroll container). [#79546](https://github.com/WordPress/gutenberg/pull/79546)
