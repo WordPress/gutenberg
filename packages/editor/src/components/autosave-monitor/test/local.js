@@ -35,7 +35,7 @@ let state;
 function setState( overrides = {} ) {
 	state = {
 		editsReference: 1,
-		isSaveable: false,
+		isEmpty: false,
 		isDirty: false,
 		isAutosavingLocked: false,
 		supportsAutosave: true,
@@ -60,11 +60,10 @@ describe( 'LocalAutosaveMonitor', () => {
 				} ),
 				getCurrentPostId: () => 1,
 				isEditedPostNew: () => false,
-				isEditedPostSaveable: () => state.isSaveable,
+				isEditedPostEmpty: () => state.isEmpty,
 				isEditedPostDirty: () => state.isDirty,
 				isPostAutosavingLocked: () => state.isAutosavingLocked,
 				isAutosavingPost: () => state.isAutosaving,
-				isEditedPostAutosaveable: () => state.isAutosaveable,
 				didPostSaveRequestFail: () => false,
 				getEditedPostAttribute: ( attribute ) =>
 					state.editedPost[ attribute ],
@@ -93,7 +92,7 @@ describe( 'LocalAutosaveMonitor', () => {
 	} );
 
 	it( 'should save a local autosave on the timer tick', () => {
-		setState( { isSaveable: true, isDirty: true } );
+		setState( { isDirty: true } );
 		render( <LocalAutosaveMonitor /> );
 
 		jest.advanceTimersByTime( 15000 );
@@ -103,7 +102,7 @@ describe( 'LocalAutosaveMonitor', () => {
 	} );
 
 	it( 'should not save again until there are new edits', () => {
-		setState( { isSaveable: true, isDirty: true } );
+		setState( { isDirty: true } );
 		render( <LocalAutosaveMonitor /> );
 
 		jest.advanceTimersByTime( 15000 );
@@ -114,7 +113,7 @@ describe( 'LocalAutosaveMonitor', () => {
 		expect( autosave ).toHaveBeenCalledTimes( 1 );
 
 		// A new distinct edit triggers another local autosave.
-		setState( { isSaveable: true, isDirty: true, editsReference: 2 } );
+		setState( { isDirty: true, editsReference: 2 } );
 		jest.advanceTimersByTime( 15000 );
 		expect( autosave ).toHaveBeenCalledTimes( 2 );
 	} );
@@ -122,16 +121,19 @@ describe( 'LocalAutosaveMonitor', () => {
 	it.each( [
 		{
 			scenario: 'the post is not dirty',
-			overrides: { isSaveable: true, isDirty: false },
+			overrides: { isDirty: false },
 		},
 		{
 			scenario: 'the post has no saveable content',
-			overrides: { isSaveable: false, isDirty: true },
+			overrides: {
+				isDirty: true,
+				isEmpty: true,
+				editedPost: { title: '', content: '', excerpt: '' },
+			},
 		},
 		{
 			scenario: 'autosaving is locked',
 			overrides: {
-				isSaveable: true,
 				isDirty: true,
 				isAutosavingLocked: true,
 			},
@@ -139,7 +141,6 @@ describe( 'LocalAutosaveMonitor', () => {
 		{
 			scenario: 'the post type does not support autosaves',
 			overrides: {
-				isSaveable: true,
 				isDirty: true,
 				supportsAutosave: false,
 			},
@@ -165,7 +166,7 @@ describe( 'LocalAutosaveMonitor', () => {
 			expectedCalls: 1,
 		},
 	] )( 'should $name', ( { content, expectedCalls } ) => {
-		setState( { isSaveable: true, isDirty: true } );
+		setState( { isDirty: true } );
 		render( <LocalAutosaveMonitor /> );
 
 		window.sessionStorage.setItem(
@@ -179,34 +180,5 @@ describe( 'LocalAutosaveMonitor', () => {
 		jest.advanceTimersByTime( 15000 );
 
 		expect( autosave ).toHaveBeenCalledTimes( expectedCalls );
-	} );
-
-	// A local backup only writes to sessionStorage, so it must not be gated by
-	// remote (REST) save state.
-	describe( 'independence from the remote monitor', () => {
-		it( 'should save while a remote autosave is in flight', () => {
-			setState( { isSaveable: true, isDirty: true, isAutosaving: true } );
-			render( <LocalAutosaveMonitor /> );
-
-			jest.advanceTimersByTime( 15000 );
-
-			expect( autosave ).toHaveBeenCalledTimes( 1 );
-		} );
-
-		it( 'should save even when the post is not autosaveable against the server autosave', () => {
-			// `isEditedPostAutosaveable()` waits for the server autosave to
-			// load and compares edits against it — irrelevant to the local
-			// backup, so it must not be consulted.
-			setState( {
-				isSaveable: true,
-				isDirty: true,
-				isAutosaveable: false,
-			} );
-			render( <LocalAutosaveMonitor /> );
-
-			jest.advanceTimersByTime( 15000 );
-
-			expect( autosave ).toHaveBeenCalledTimes( 1 );
-		} );
 	} );
 } );

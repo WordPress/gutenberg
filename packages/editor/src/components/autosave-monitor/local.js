@@ -169,7 +169,7 @@ function LocalAutosaveMonitorInner() {
 	const {
 		getCurrentPostId,
 		isEditedPostNew,
-		isEditedPostSaveable,
+		isEditedPostEmpty,
 		isEditedPostDirty,
 		isPostAutosavingLocked,
 		getEditedPostAttribute,
@@ -190,9 +190,14 @@ function LocalAutosaveMonitorInner() {
 	const lastEditsReferenceRef = useRef();
 
 	useInterval( () => {
-		// Not `isEditedPostAutosaveable()`: a sessionStorage backup must not
-		// wait for or compare against the *server* autosave.
-		if ( ! isEditedPostSaveable() || isPostAutosavingLocked() ) {
+		// A sessionStorage backup only needs saveable content, checked inline
+		// because `isEditedPostSaveable()` short-circuits to false during any
+		// save, including a remote autosave, which must not block the backup.
+		const hasSaveableContent =
+			!! getEditedPostAttribute( 'title' ) ||
+			!! getEditedPostAttribute( 'excerpt' ) ||
+			! isEditedPostEmpty();
+		if ( ! hasSaveableContent || isPostAutosavingLocked() ) {
 			return;
 		}
 
