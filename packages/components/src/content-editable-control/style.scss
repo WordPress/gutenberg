@@ -2,7 +2,7 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-.wp-components-rich-text-control {
+.wp-components-content-editable-control {
 	width: 100%;
 	// Override input style margin in WP forms.css.
 	margin: 0;

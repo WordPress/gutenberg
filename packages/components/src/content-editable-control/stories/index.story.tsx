@@ -7,12 +7,12 @@ import { fn } from 'storybook/test';
 /**
  * Internal dependencies
  */
-import RichTextControl from '..';
+import ContentEditableControl from '..';
 
-const meta: Meta< typeof RichTextControl > = {
-	id: 'components-richtextcontrol',
-	title: 'Components/Selection & Input/Common/RichTextControl',
-	component: RichTextControl,
+const meta: Meta< typeof ContentEditableControl > = {
+	id: 'components-contenteditablecontrol',
+	title: 'Components/Selection & Input/Common/ContentEditableControl',
+	component: ContentEditableControl,
 	args: {
 		onSelectedChange: fn(),
 	},
@@ -34,7 +34,7 @@ const meta: Meta< typeof RichTextControl > = {
 };
 export default meta;
 
-type Story = StoryObj< typeof RichTextControl >;
+type Story = StoryObj< typeof ContentEditableControl >;
 
 export const Default: Story = {
 	args: {

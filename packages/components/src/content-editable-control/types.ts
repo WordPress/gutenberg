@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
  */
 import type { BaseControlProps } from '../base-control/types';
 
-export type RichTextControlProps = Pick<
+export type ContentEditableControlProps = Pick<
 	BaseControlProps,
 	'className' | 'hideLabelFromVision' | 'help'
 > & {

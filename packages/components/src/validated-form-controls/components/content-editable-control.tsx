@@ -8,21 +8,21 @@ import { forwardRef, useRef } from '@wordpress/element';
  */
 import { ControlWithError } from '../control-with-error';
 import type { ValidatedControlProps } from './types';
-import RichTextControl from '../../rich-text-control';
+import ContentEditableControl from '../../content-editable-control';
 
 /**
  * A `contentEditable` field does not participate in the Constraint Validation
  * API, so — like `ValidatedToggleGroupControl` — the validity state lives on a
  * visually hidden delegate input that mirrors whether the field has content.
  */
-const UnforwardedValidatedRichTextControl = (
+const UnforwardedValidatedContentEditableControl = (
 	{
 		required,
 		customValidity,
 		markWhenOptional,
 		value,
 		...restProps
-	}: React.ComponentProps< typeof RichTextControl > &
+	}: React.ComponentProps< typeof ContentEditableControl > &
 		ValidatedControlProps & {
 			/**
 			 * The field's current HTML value. Only used to drive the hidden
@@ -51,7 +51,7 @@ const UnforwardedValidatedRichTextControl = (
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
 			>
-				<RichTextControl
+				<ContentEditableControl
 					ref={ forwardedRef }
 					aria-invalid={
 						customValidity?.type === 'invalid' || undefined
@@ -73,7 +73,7 @@ const UnforwardedValidatedRichTextControl = (
 							'.components-validated-control__wrapper-with-error-delegate'
 						)
 						?.querySelector< HTMLElement >(
-							'.wp-rich-text-control'
+							'.wp-components-content-editable-control'
 						)
 						?.focus();
 				} }
@@ -82,7 +82,7 @@ const UnforwardedValidatedRichTextControl = (
 	);
 };
 
-export const ValidatedRichTextControl = forwardRef(
-	UnforwardedValidatedRichTextControl
+export const ValidatedContentEditableControl = forwardRef(
+	UnforwardedValidatedContentEditableControl
 );
-ValidatedRichTextControl.displayName = 'ValidatedRichTextControl';
+ValidatedContentEditableControl.displayName = 'ValidatedContentEditableControl';

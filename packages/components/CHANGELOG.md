@@ -50,7 +50,7 @@
 
 ### Internal
 
--   Add a private, presentational `RichTextControl`: a labeled `contentEditable` form field with the selection tracking format UI needs. The rich-text behavior is injected by the consumer (e.g. the DataViews `richtext` control), keeping the component free of any `@wordpress/rich-text` dependency ([#78471](https://github.com/WordPress/gutenberg/pull/78471)).
+-   Add a private, presentational `ContentEditableControl`: a labeled `contentEditable` form field. The rich-text behavior is injected by the consumer (e.g. the DataViews `richtext` control), keeping the component free of any `@wordpress/rich-text` dependency ([#78471](https://github.com/WordPress/gutenberg/pull/78471)).
 -   Enforce CSS Module class selector naming for component-library packages ([#79504](https://github.com/WordPress/gutenberg/pull/79504)).
 -   Update `@ariakit/react` to `0.4.32` ([#79860](https://github.com/WordPress/gutenberg/pull/79860)).
 -   `Flex`: Migrate styles from Emotion to SCSS Modules ([#79450](https://github.com/WordPress/gutenberg/pull/79450)).

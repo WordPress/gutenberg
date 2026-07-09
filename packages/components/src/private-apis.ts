@@ -24,18 +24,18 @@ import {
 	ValidatedNumberControl,
 	ValidatedSelectControl,
 	ValidatedRadioControl,
-	ValidatedRichTextControl,
+	ValidatedContentEditableControl,
 	ValidatedTextControl,
 	ValidatedTextareaControl,
 	ValidatedToggleControl,
 	ValidatedToggleGroupControl,
 } from './validated-form-controls';
 import { ValidatedFormTokenField } from './validated-form-controls/components/form-token-field';
-import RichTextControl from './rich-text-control';
+import ContentEditableControl from './content-editable-control';
 
 export const privateApis = {};
 lock( privateApis, {
-	RichTextControl,
+	ContentEditableControl,
 	__experimentalPopoverLegacyPositionToPlacement,
 	ComponentsContext,
 	Tabs,
@@ -55,7 +55,7 @@ lock( privateApis, {
 	ValidatedNumberControl,
 	ValidatedSelectControl,
 	ValidatedRadioControl,
-	ValidatedRichTextControl,
+	ValidatedContentEditableControl,
 	ValidatedTextControl,
 	ValidatedTextareaControl,
 	ValidatedToggleControl,

@@ -16,7 +16,7 @@ import BaseControl from '../base-control';
 import { useBaseControlProps } from '../base-control/hooks';
 import type { WordPressComponentProps } from '../context';
 import { useControlledValue } from '../utils/hooks';
-import type { RichTextControlProps } from './types';
+import type { ContentEditableControlProps } from './types';
 
 /**
  * A presentational rich text control: a labeled `contentEditable` form field
@@ -42,7 +42,7 @@ import type { RichTextControlProps } from './types';
  * @example
  * ```jsx
  * // The rich-text "assembly" lives in the consumer.
- * <RichTextControl
+ * <ContentEditableControl
  *     label="Caption"
  *     ref={ mergedRef }
  *     isSelected={ isSelected }
@@ -52,10 +52,10 @@ import type { RichTextControlProps } from './types';
  *     <KeyboardShortcutContext.Provider value={ shortcuts }>
  *         <FormatEdit … />
  *     </KeyboardShortcutContext.Provider>
- * </RichTextControl>
+ * </ContentEditableControl>
  * ```
  */
-function UnforwardedRichTextControl(
+function UnforwardedContentEditableControl(
 	{
 		label,
 		isSelected: isSelectedProp,
@@ -72,7 +72,7 @@ function UnforwardedRichTextControl(
 		onFocus,
 		onBlur,
 		...additionalProps
-	}: WordPressComponentProps< RichTextControlProps, 'div', false >,
+	}: WordPressComponentProps< ContentEditableControlProps, 'div', false >,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
 	// Selection ("active") state, usable both controlled (`isSelected`) and
@@ -97,9 +97,13 @@ function UnforwardedRichTextControl(
 			{ isSelected && ! disabled && children }
 			<BaseControl { ...baseControlProps }>
 				<div
-					className={ clsx( 'wp-rich-text-control', className, {
-						'is-disabled': disabled,
-					} ) }
+					className={ clsx(
+						'wp-components-content-editable-control',
+						className,
+						{
+							'is-disabled': disabled,
+						}
+					) }
 					role="textbox"
 					aria-multiline={ ! disableLineBreaks }
 					aria-label={ label }
@@ -126,6 +130,8 @@ function UnforwardedRichTextControl(
 	);
 }
 
-export const RichTextControl = forwardRef( UnforwardedRichTextControl );
+export const ContentEditableControl = forwardRef(
+	UnforwardedContentEditableControl
+);
 
-export default RichTextControl;
+export default ContentEditableControl;

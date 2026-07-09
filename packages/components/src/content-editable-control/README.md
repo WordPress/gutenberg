@@ -1,10 +1,10 @@
-# RichTextControl
+# ContentEditableControl
 
 <!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->
 
 🔒 This component is locked as a [private API](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-private-apis/). We do not yet recommend using this outside of the Gutenberg project.
 
-<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-richtextcontrol--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
+<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-contenteditablecontrol--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
 
 ## Props
 

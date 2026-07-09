@@ -6,11 +6,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import RichTextControl from '..';
+import ContentEditableControl from '..';
 
 function getTextbox( container: HTMLElement ) {
 	return container.querySelector(
-		'.wp-rich-text-control'
+		'.wp-components-content-editable-control'
 	) as HTMLDivElement | null;
 }
 
@@ -19,9 +19,11 @@ function getTextbox( container: HTMLElement ) {
 // and `children`. These tests exercise only the chrome the shell owns -- the label,
 // the `contentEditable` element, and the controlled focus/blur selection
 // heuristic -- with no rich-text wiring at all.
-describe( 'RichTextControl (presentational shell)', () => {
+describe( 'ContentEditableControl (presentational shell)', () => {
 	it( 'renders a labeled contenteditable textbox', () => {
-		const { container } = render( <RichTextControl label="Description" /> );
+		const { container } = render(
+			<ContentEditableControl label="Description" />
+		);
 
 		const textbox = getTextbox( container )!;
 		const label = screen.getByText( 'Description' );
@@ -38,7 +40,7 @@ describe( 'RichTextControl (presentational shell)', () => {
 	} );
 
 	it( 'visually hides the label when `hideLabelFromVision` is set', () => {
-		render( <RichTextControl label="Note" hideLabelFromVision /> );
+		render( <ContentEditableControl label="Note" hideLabelFromVision /> );
 
 		const label = screen.getByText( 'Note' );
 		expect( label ).toHaveClass( 'components-visually-hidden' );
@@ -46,14 +48,16 @@ describe( 'RichTextControl (presentational shell)', () => {
 
 	it( 'forwards `disableLineBreaks` to the textbox via `aria-multiline`', () => {
 		const { container, rerender } = render(
-			<RichTextControl label="Single line" />
+			<ContentEditableControl label="Single line" />
 		);
 		expect( getTextbox( container ) ).toHaveAttribute(
 			'aria-multiline',
 			'true'
 		);
 
-		rerender( <RichTextControl label="Single line" disableLineBreaks /> );
+		rerender(
+			<ContentEditableControl label="Single line" disableLineBreaks />
+		);
 		expect( getTextbox( container ) ).toHaveAttribute(
 			'aria-multiline',
 			'false'
@@ -62,7 +66,7 @@ describe( 'RichTextControl (presentational shell)', () => {
 
 	it( 'uses a consumer-supplied `id` for the textbox and label', () => {
 		const { container } = render(
-			<RichTextControl
+			<ContentEditableControl
 				label="Custom id"
 				// eslint-disable-next-line no-restricted-syntax
 				id="my-custom-id"
@@ -79,17 +83,26 @@ describe( 'RichTextControl (presentational shell)', () => {
 
 	it( 'merges a consumer-supplied className with the control class', () => {
 		const { container } = render(
-			<RichTextControl label="Styled" className="my-custom-class" />
+			<ContentEditableControl
+				label="Styled"
+				className="my-custom-class"
+			/>
 		);
 
 		const textbox = getTextbox( container )!;
-		expect( textbox ).toHaveClass( 'wp-rich-text-control' );
+		expect( textbox ).toHaveClass(
+			'wp-components-content-editable-control'
+		);
 		expect( textbox ).toHaveClass( 'my-custom-class' );
 	} );
 
 	it( 'forwards additional native props to the textbox', () => {
 		const { container } = render(
-			<RichTextControl label="Note" dir="rtl" data-testid="my-textbox" />
+			<ContentEditableControl
+				label="Note"
+				dir="rtl"
+				data-testid="my-textbox"
+			/>
 		);
 
 		const textbox = getTextbox( container )!;
@@ -102,7 +115,7 @@ describe( 'RichTextControl (presentational shell)', () => {
 		// an anchor ref, …) is injected through this forwarded ref.
 		const ref = jest.fn();
 		const { container } = render(
-			<RichTextControl label="Note" ref={ ref } />
+			<ContentEditableControl label="Note" ref={ ref } />
 		);
 
 		expect( ref ).toHaveBeenCalledWith( getTextbox( container ) );
@@ -117,9 +130,9 @@ describe( 'RichTextControl (presentational shell)', () => {
 		// in `@wordpress/dataviews`).
 		it( 'mounts children only while selected (uncontrolled)', () => {
 			const { container } = render(
-				<RichTextControl label="Field">
+				<ContentEditableControl label="Field">
 					<span data-testid="assembly" />
-				</RichTextControl>
+				</ContentEditableControl>
 			);
 			const textbox = getTextbox( container )!;
 
@@ -138,9 +151,9 @@ describe( 'RichTextControl (presentational shell)', () => {
 
 		it( 'starts selected with `defaultIsSelected` (uncontrolled)', () => {
 			render(
-				<RichTextControl label="Field" defaultIsSelected>
+				<ContentEditableControl label="Field" defaultIsSelected>
 					<span data-testid="assembly" />
-				</RichTextControl>
+				</ContentEditableControl>
 			);
 
 			expect( screen.getByTestId( 'assembly' ) ).toBeInTheDocument();
@@ -149,13 +162,13 @@ describe( 'RichTextControl (presentational shell)', () => {
 		it( 'defers to the `isSelected` prop when controlled', () => {
 			const onSelectedChange = jest.fn();
 			const { container, rerender } = render(
-				<RichTextControl
+				<ContentEditableControl
 					label="Field"
 					isSelected={ false }
 					onSelectedChange={ onSelectedChange }
 				>
 					<span data-testid="assembly" />
-				</RichTextControl>
+				</ContentEditableControl>
 			);
 
 			// Controlled: the shell requests the change but does not apply
@@ -167,13 +180,13 @@ describe( 'RichTextControl (presentational shell)', () => {
 			).not.toBeInTheDocument();
 
 			rerender(
-				<RichTextControl
+				<ContentEditableControl
 					label="Field"
 					isSelected
 					onSelectedChange={ onSelectedChange }
 				>
 					<span data-testid="assembly" />
-				</RichTextControl>
+				</ContentEditableControl>
 			);
 			expect( screen.getByTestId( 'assembly' ) ).toBeInTheDocument();
 		} );
@@ -181,7 +194,7 @@ describe( 'RichTextControl (presentational shell)', () => {
 		it( 'reports selection on focus', () => {
 			const onSelectedChange = jest.fn();
 			const { container } = render(
-				<RichTextControl
+				<ContentEditableControl
 					label="Field"
 					onSelectedChange={ onSelectedChange }
 				/>
@@ -194,7 +207,7 @@ describe( 'RichTextControl (presentational shell)', () => {
 		it( 'reports deselection on blur', () => {
 			const onSelectedChange = jest.fn();
 			const { container } = render(
-				<RichTextControl
+				<ContentEditableControl
 					label="Field"
 					onSelectedChange={ onSelectedChange }
 				/>
@@ -213,9 +226,9 @@ describe( 'RichTextControl (presentational shell)', () => {
 			// UI opened can claim focus without unmounting; the shell must
 			// not fight the controlled value.
 			const { container } = render(
-				<RichTextControl label="Field" isSelected>
+				<ContentEditableControl label="Field" isSelected>
 					<span data-testid="assembly" />
-				</RichTextControl>
+				</ContentEditableControl>
 			);
 			const textbox = getTextbox( container )!;
 
@@ -229,7 +242,7 @@ describe( 'RichTextControl (presentational shell)', () => {
 			const onFocus = jest.fn();
 			const onBlur = jest.fn();
 			const { container } = render(
-				<RichTextControl
+				<ContentEditableControl
 					label="Field"
 					onFocus={ onFocus }
 					onBlur={ onBlur }

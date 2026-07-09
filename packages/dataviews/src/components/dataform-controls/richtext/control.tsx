@@ -37,7 +37,7 @@ import FormatEdit from './format-edit';
 // dependency; the `Validated` wrapper adds the same required/validity
 // treatment the sibling text controls get. This module is the "assembly" that
 // injects the rich-text wiring into it.
-const { ValidatedRichTextControl: RichTextControlShell } = unlock(
+const { ValidatedContentEditableControl: RichTextControlShell } = unlock(
 	componentsPrivateApis
 );
 

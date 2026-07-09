@@ -36,7 +36,9 @@ function registerTestFormatType(
 }
 
 function getTextbox( container: HTMLElement ) {
-	return container.querySelector< HTMLElement >( '.wp-rich-text-control' )!;
+	return container.querySelector< HTMLElement >(
+		'.wp-components-content-editable-control'
+	)!;
 }
 
 /*
@@ -244,7 +246,9 @@ describe( 'RichTextControl', () => {
 		);
 
 		const textbox = getTextbox( container );
-		expect( textbox ).toHaveClass( 'wp-rich-text-control' );
+		expect( textbox ).toHaveClass(
+			'wp-components-content-editable-control'
+		);
 		expect( textbox ).toHaveClass( 'my-custom-class' );
 	} );
 

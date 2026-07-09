@@ -1608,6 +1608,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ContentEditableControl",
+		"slug": "content-editable-control",
+		"markdown_source": "../packages/components/src/content-editable-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "CustomSelectControl",
 		"slug": "custom-select-control",
 		"markdown_source": "../packages/components/src/custom-select-control/README.md",
@@ -1977,12 +1983,6 @@
 		"title": "ResponsiveWrapper",
 		"slug": "responsive-wrapper",
 		"markdown_source": "../packages/components/src/responsive-wrapper/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "RichTextControl",
-		"slug": "rich-text-control",
-		"markdown_source": "../packages/components/src/rich-text-control/README.md",
 		"parent": "components"
 	},
 	{
