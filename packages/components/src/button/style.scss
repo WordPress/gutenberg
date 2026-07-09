@@ -27,10 +27,6 @@
 	appearance: none;
 	background: none;
 
-	@media not ( prefers-reduced-motion ) {
-		transition: box-shadow 0.1s linear;
-	}
-
 	$button-padding-x: 12px;
 
 	height: $button-size;
@@ -331,6 +327,7 @@
 
 		&:not(.has-text) {
 			// Icon buttons are square.
+			justify-content: center;
 			min-width: $button-size;
 
 			&.is-next-40px-default-size {
