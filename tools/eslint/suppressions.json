@@ -1322,11 +1322,6 @@
 			"count": 2
 		}
 	},
-	"packages/editor/src/components/style-book/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/sync-connection-error-modal/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
