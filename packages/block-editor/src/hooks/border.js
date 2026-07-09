@@ -30,11 +30,8 @@ import {
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
-import {
-	getStyleForState,
-	isDefaultBlockStyleState,
-	setStyleForState,
-} from './block-style-state';
+import { getStyleForState, setStyleForState } from './block-style-state';
+import { hasStyleStateValue } from '../utils/style-states';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 export const SHADOW_SUPPORT_KEY = 'shadow';
@@ -166,7 +163,7 @@ export function BorderPanel( {
 		[ clientId, isEnabled ]
 	);
 
-	const isStateSelected = ! isDefaultBlockStyleState( selectedStyleState );
+	const isStateSelected = hasStyleStateValue( selectedStyleState );
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {

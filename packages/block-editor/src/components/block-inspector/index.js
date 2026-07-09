@@ -40,11 +40,6 @@ import { BlockStateBadges, BlockStatesControl } from '../../hooks/states';
 import ContentTab from '../inspector-controls-tabs/content-tab';
 import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
 import { unlock } from '../../lock-unlock';
-import {
-	hasPseudoBlockStyleState,
-	hasViewportBlockStyleState,
-	isDefaultBlockStyleState,
-} from '../../hooks/block-style-state';
 
 function StyleInspectorSlots( {
 	blockName,
@@ -95,11 +90,14 @@ function StyleInspectorSlots( {
 	);
 }
 
-function StyleStateInspectorSlots( { blockName, selectedBlockStyleState } ) {
+function StyleStateInspectorSlots( {
+	blockName,
+	hasSelectedViewportStyleState,
+	hasSelectedPseudoStyleState,
+} ) {
 	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 	const showLayoutControls =
-		hasViewportBlockStyleState( selectedBlockStyleState ) &&
-		! hasPseudoBlockStyleState( selectedBlockStyleState );
+		hasSelectedViewportStyleState && ! hasSelectedPseudoStyleState;
 	return (
 		<>
 			<InspectorControls.Slot
@@ -148,6 +146,8 @@ function BlockInspector() {
 		editedContentOnlySection,
 		blockEditingMode,
 		selectedBlockStyleState,
+		hasSelectedViewportStyleState,
+		hasSelectedPseudoStyleState,
 		showStateOnCanvas,
 		isResponsiveEditing,
 	} = useSelect( ( select ) => {
@@ -162,6 +162,8 @@ function BlockInspector() {
 			isWithinEditedContentOnlySection,
 			getBlockEditingMode,
 			getSelectedBlockStyleState,
+			hasSelectedViewportStyleState: _hasSelectedViewportStyleState,
+			hasSelectedPseudoStyleState: _hasSelectedPseudoStyleState,
 			isSelectedBlockStyleStateShownOnCanvas,
 			isResponsiveEditing: _isResponsiveEditing,
 		} = unlock( select( blockEditorStore ) );
@@ -185,6 +187,7 @@ function BlockInspector() {
 		const blockStyles =
 			_renderedBlockName && getBlockStyles( _renderedBlockName );
 		const _hasBlockStyles = blockStyles && blockStyles.length > 0;
+		const selectedStyleStateClientId = _renderedBlockClientId;
 
 		return {
 			selectedBlockCount: getSelectedBlockCount(),
@@ -197,10 +200,16 @@ function BlockInspector() {
 			editedContentOnlySection: getEditedContentOnlySection(),
 			blockEditingMode: getBlockEditingMode( _renderedBlockClientId ),
 			selectedBlockStyleState: getSelectedBlockStyleState(
-				_renderedBlockClientId
+				selectedStyleStateClientId
+			),
+			hasSelectedViewportStyleState: _hasSelectedViewportStyleState(
+				selectedStyleStateClientId
+			),
+			hasSelectedPseudoStyleState: _hasSelectedPseudoStyleState(
+				selectedStyleStateClientId
 			),
 			showStateOnCanvas: isSelectedBlockStyleStateShownOnCanvas(
-				_renderedBlockClientId
+				selectedStyleStateClientId
 			),
 			isResponsiveEditing: _isResponsiveEditing(),
 		};
@@ -264,9 +273,6 @@ function BlockInspector() {
 		useBlockInspectorAnimationSettings( blockType );
 
 	const hasSelectedBlocks = selectedBlockCount > 1;
-	const isBlockStyleStateSelected = ! isDefaultBlockStyleState(
-		selectedBlockStyleState
-	);
 
 	if ( hasSelectedBlocks && ! isSectionBlockInSelection ) {
 		return (
@@ -338,7 +344,8 @@ function BlockInspector() {
 				selectedBlockStyleState={ selectedBlockStyleState }
 				showStateOnCanvas={ showStateOnCanvas }
 				isResponsiveEditing={ isResponsiveEditing }
-				isBlockStyleStateSelected={ isBlockStyleStateSelected }
+				hasSelectedViewportStyleState={ hasSelectedViewportStyleState }
+				hasSelectedPseudoStyleState={ hasSelectedPseudoStyleState }
 			/>
 		</BlockInspectorSingleBlockWrapper>
 	);
@@ -394,14 +401,15 @@ const BlockInspectorSingleBlock = ( {
 	selectedBlockStyleState,
 	showStateOnCanvas,
 	isResponsiveEditing,
+	hasSelectedViewportStyleState,
+	hasSelectedPseudoStyleState,
 } ) => {
 	const listViewRef = useRef( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
-	const hasPseudoState = hasPseudoBlockStyleState( selectedBlockStyleState );
+	const hasPseudoState = hasSelectedPseudoStyleState;
 	const isEditingStyleState =
-		( hasViewportBlockStyleState( selectedBlockStyleState ) &&
-			isResponsiveEditing ) ||
-		hasPseudoBlockStyleState( selectedBlockStyleState );
+		( hasSelectedViewportStyleState && isResponsiveEditing ) ||
+		hasSelectedPseudoStyleState;
 	const hasParentChildBlockCards =
 		editedContentOnlySection &&
 		editedContentOnlySection !== renderedBlockClientId;
@@ -477,7 +485,10 @@ const BlockInspectorSingleBlock = ( {
 			{ isEditingStyleState && ! isSectionBlock && (
 				<StyleStateInspectorSlots
 					blockName={ blockName }
-					selectedBlockStyleState={ selectedBlockStyleState }
+					hasSelectedViewportStyleState={
+						hasSelectedViewportStyleState
+					}
+					hasSelectedPseudoStyleState={ hasSelectedPseudoStyleState }
 				/>
 			) }
 			{ ! isEditingStyleState && hasMultipleTabs && (

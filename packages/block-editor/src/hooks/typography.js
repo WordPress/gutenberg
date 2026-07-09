@@ -23,11 +23,8 @@ import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
 import { cleanEmptyObject } from './utils';
 import { extractPresetSlug } from '../utils/color-values';
 import { store as blockEditorStore } from '../store';
-import {
-	getStyleForState,
-	isDefaultBlockStyleState,
-	setStyleForState,
-} from './block-style-state';
+import { getStyleForState, setStyleForState } from './block-style-state';
+import { hasStyleStateValue } from '../utils/style-states';
 import useBlockColorContrastWarning from './contrast-checker';
 
 function omit( object, keys ) {
@@ -174,7 +171,7 @@ export function TypographyPanel( {
 		[ clientId, isEnabled ]
 	);
 
-	const isStateSelected = ! isDefaultBlockStyleState( selectedStyleState );
+	const isStateSelected = hasStyleStateValue( selectedStyleState );
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {

@@ -38,14 +38,8 @@ import { cleanEmptyObject, useBlockSettings, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 import { globalStylesDataKey } from '../store/private-keys';
 import { getVariationNameFromClass } from './block-style-variation';
-import {
-	DEFAULT_STATE_VALUE,
-	getStyleForState,
-	hasPseudoBlockStyleState,
-	hasViewportBlockStyleState,
-	isDefaultBlockStyleState,
-	setStyleForState,
-} from './block-style-state';
+import { getStyleForState, setStyleForState } from './block-style-state';
+import { DEFAULT_STATE_VALUE } from '../utils/style-states';
 
 const VARIATION_PREFIX = 'is-style-';
 
@@ -301,32 +295,46 @@ function LayoutPanelPure( {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
 	const { layout: layoutSettings } = settings;
-	const { themeSupportsLayout, activeBlockVariation, selectedState } =
-		useSelect(
-			( select ) => {
-				const blockEditorSelect = select( blockEditorStore );
-				const { getBlockAttributes, getSettings } = blockEditorSelect;
-				const { getSelectedBlockStyleState } =
-					unlock( blockEditorSelect );
-				return {
-					activeBlockVariation: select(
-						blocksStore
-					).getActiveBlockVariation(
-						blockName,
-						getBlockAttributes( clientId ) || {},
-						'block'
-					),
-					themeSupportsLayout: getSettings().supportsLayout,
-					selectedState: getSelectedBlockStyleState?.( clientId ),
-				};
-			},
-			[ blockName, clientId ]
-		);
+	const {
+		themeSupportsLayout,
+		activeBlockVariation,
+		selectedState,
+		hasSelectedViewportStyleState,
+		hasSelectedPseudoStyleState,
+		hasSelectedStyleState,
+	} = useSelect(
+		( select ) => {
+			const blockEditorSelect = select( blockEditorStore );
+			const { getBlockAttributes, getSettings } = blockEditorSelect;
+			const {
+				getSelectedBlockStyleState,
+				hasSelectedViewportStyleState: _hasSelectedViewportStyleState,
+				hasSelectedPseudoStyleState: _hasSelectedPseudoStyleState,
+				hasSelectedStyleState: _hasSelectedStyleState,
+			} = unlock( blockEditorSelect );
+			return {
+				activeBlockVariation: select(
+					blocksStore
+				).getActiveBlockVariation(
+					blockName,
+					getBlockAttributes( clientId ) || {},
+					'block'
+				),
+				themeSupportsLayout: getSettings().supportsLayout,
+				selectedState: getSelectedBlockStyleState?.( clientId ),
+				hasSelectedViewportStyleState:
+					_hasSelectedViewportStyleState( clientId ),
+				hasSelectedPseudoStyleState:
+					_hasSelectedPseudoStyleState( clientId ),
+				hasSelectedStyleState: _hasSelectedStyleState( clientId ),
+			};
+		},
+		[ blockName, clientId ]
+	);
 
 	const blockEditingMode = useBlockEditingMode();
 	const isViewportLayoutState =
-		hasViewportBlockStyleState( selectedState ) &&
-		! hasPseudoBlockStyleState( selectedState );
+		hasSelectedViewportStyleState && ! hasSelectedPseudoStyleState;
 	const resetLayoutFilter = useCallback(
 		( ...resetArgs ) => {
 			const attributes = resetArgs[ 0 ] || {};
@@ -455,9 +463,7 @@ function LayoutPanelPure( {
 		! usedLayout.type && ( contentSize || inherit );
 	const hasContentSizeOrLegacySettings = !! inherit || !! contentSize;
 	const showLayoutTypeSwitcher =
-		isDefaultBlockStyleState( selectedState ) &&
-		! inherit &&
-		allowSwitching;
+		! hasSelectedStyleState && ! inherit && allowSwitching;
 
 	const onChangeLayout = ( newLayout ) => {
 		if ( isViewportLayoutState ) {

@@ -23,11 +23,8 @@ import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import { cleanEmptyObject, shouldSkipSerialization } from './utils';
-import {
-	getStyleForState,
-	isDefaultBlockStyleState,
-	setStyleForState,
-} from './block-style-state';
+import { getStyleForState, setStyleForState } from './block-style-state';
+import { hasStyleStateValue } from '../utils/style-states';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -80,7 +77,7 @@ export function DimensionsPanel( {
 	settings,
 	selectedStyleState,
 } ) {
-	const isStateSelected = ! isDefaultBlockStyleState( selectedStyleState );
+	const isStateSelected = hasStyleStateValue( selectedStyleState );
 	const isEnabled = useHasDimensionsPanel( settings, selectedStyleState );
 	const style = useSelect(
 		( select ) => {

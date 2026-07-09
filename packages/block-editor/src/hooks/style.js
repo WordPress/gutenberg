@@ -41,12 +41,12 @@ import {
 	useStyleOverride,
 	useBlockSettings,
 } from './utils';
+import { getStyleForState } from './block-style-state';
 import {
 	DEFAULT_STATE_VALUE,
-	getStyleForState,
-	hasViewportBlockStyleState,
-	hasPseudoBlockStyleState,
-} from './block-style-state';
+	hasViewportStyleStateValue,
+	hasPseudoStyleStateValue,
+} from '../utils/style-states';
 import { VALID_BLOCK_PSEUDO_STATES } from './states';
 import { buildScopedBlockSelector } from './state-utils';
 import { scopeSelector } from '../components/global-styles/utils';
@@ -484,7 +484,7 @@ export function getResponsiveStateCSSRules(
  */
 export function getCanvasStateStyleValue( style, selectedState ) {
 	const stateValue = getStyleForState( style, selectedState );
-	if ( ! hasViewportBlockStyleState( selectedState ) ) {
+	if ( ! hasViewportStyleStateValue( selectedState ) ) {
 		return stateValue;
 	}
 
@@ -786,7 +786,7 @@ function BlockStyleControls( {
 	);
 	const { selectedStyleState } = useContext( PrivateBlockContext );
 	const isPseudoSelectorState =
-		hasPseudoBlockStyleState( selectedStyleState );
+		hasPseudoStyleStateValue( selectedStyleState );
 
 	// Inject state styles onto the editor canvas so the selected state is
 	// visible while editing. Scoped to this block instance via data-block so

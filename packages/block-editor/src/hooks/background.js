@@ -25,11 +25,8 @@ import {
 	hasBackgroundGradientValue,
 } from '../components/global-styles/background-panel';
 import { globalStylesDataKey } from '../store/private-keys';
-import {
-	getStyleForState,
-	isDefaultBlockStyleState,
-	setStyleForState,
-} from './block-style-state';
+import { getStyleForState, setStyleForState } from './block-style-state';
+import { hasStyleStateValue } from '../utils/style-states';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
@@ -207,7 +204,7 @@ export function BackgroundImagePanel( {
 		colorSupport && colorSupport.background !== false;
 	const hasColorGradientSupport = !! colorSupport?.gradients;
 
-	const isStateSelected = ! isDefaultBlockStyleState( selectedStyleState );
+	const isStateSelected = hasStyleStateValue( selectedStyleState );
 
 	// Fold the backgroundColor / gradient attribute slugs back into the style
 	// object the panel consumes. When background.gradient is supported but not

@@ -27,6 +27,8 @@ import {
 	getParentSectionBlock,
 	getSelectedBlockStyleState,
 	hasSelectedStyleState,
+	hasSelectedViewportStyleState,
+	hasSelectedPseudoStyleState,
 	isSelectedBlockStyleStateShownOnCanvas,
 	shouldRenderBlockListView,
 } from '../private-selectors';
@@ -319,6 +321,83 @@ describe( 'private selectors', () => {
 			};
 
 			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'hasSelectedViewportStyleState', () => {
+		it( 'returns false when no viewport state is selected', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedViewportStyleState( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'returns true when a viewport state is selected', () => {
+			const state = {
+				styleStateViewport: '@mobile',
+			};
+
+			expect( hasSelectedViewportStyleState( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns true when another block holds the selected pseudo state', () => {
+			const state = {
+				styleStateViewport: '@mobile',
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					value: { pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedViewportStyleState( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+	} );
+
+	describe( 'hasSelectedPseudoStyleState', () => {
+		it( 'returns false when no pseudo state is selected', () => {
+			const state = {
+				styleStateViewport: '@mobile',
+			};
+
+			expect( hasSelectedPseudoStyleState( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'returns true when a pseudo state is selected for the block', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedPseudoStyleState( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns false when another block holds the selected pseudo state', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					value: { pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedPseudoStyleState( state, 'client-1' ) ).toBe(
+				false
+			);
 		} );
 	} );
 

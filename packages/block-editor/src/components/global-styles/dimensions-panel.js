@@ -30,9 +30,9 @@ import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { setImmutably } from '../../utils/object';
 import {
-	hasPseudoBlockStyleState,
-	hasViewportBlockStyleState,
-} from '../../hooks/block-style-state';
+	hasStyleStateValue,
+	hasViewportStyleStateValue,
+} from '../../utils/style-states';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
@@ -90,13 +90,17 @@ function hasWidth( settings ) {
 
 function hasAspectRatio( settings, styleState ) {
 	return (
-		! hasPseudoBlockStyleState( styleState ) &&
+		( ! hasStyleStateValue( styleState ) ||
+			hasViewportStyleStateValue( styleState ) ) &&
 		settings?.dimensions?.aspectRatio
 	);
 }
 
 function hasChildLayout( settings, styleState ) {
-	if ( hasPseudoBlockStyleState( styleState ) ) {
+	if (
+		hasStyleStateValue( styleState ) &&
+		! hasViewportStyleStateValue( styleState )
+	) {
 		return false;
 	}
 
@@ -731,7 +735,7 @@ export default function DimensionsPanel( {
 					parentLayout={ settings?.parentLayout }
 					panelId={ panelId }
 					showGridSpanDefaults={
-						! hasViewportBlockStyleState( styleState )
+						! hasViewportStyleStateValue( styleState )
 					}
 					isShownByDefault={
 						defaultControls.childLayout ??

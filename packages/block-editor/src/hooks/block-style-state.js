@@ -3,46 +3,7 @@
  */
 import { cleanEmptyObject } from './utils';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
-
-export const DEFAULT_STATE_VALUE = 'default';
-
-/**
- * Returns true when a viewport style state is selected.
- *
- * @param {Object} selectedState Selected block style state.
- * @return {boolean} Whether a viewport state is selected.
- */
-export function hasViewportBlockStyleState( selectedState ) {
-	return (
-		!! selectedState?.viewport &&
-		selectedState.viewport !== DEFAULT_STATE_VALUE
-	);
-}
-
-/**
- * Returns true when a pseudo style state is selected.
- *
- * @param {Object} selectedState Selected block style state.
- * @return {boolean} Whether a pseudo state is selected.
- */
-export function hasPseudoBlockStyleState( selectedState ) {
-	return (
-		!! selectedState?.pseudo && selectedState.pseudo !== DEFAULT_STATE_VALUE
-	);
-}
-
-/**
- * Returns true when the default style state is selected.
- *
- * @param {Object} selectedState Selected block style state.
- * @return {boolean} Whether the default style state is selected.
- */
-export function isDefaultBlockStyleState( selectedState ) {
-	return (
-		! hasViewportBlockStyleState( selectedState ) &&
-		! hasPseudoBlockStyleState( selectedState )
-	);
-}
+import { DEFAULT_STATE_VALUE, hasStyleStateValue } from '../utils/style-states';
 
 /**
  * Returns the style object path for the selected block style state.
@@ -51,7 +12,7 @@ export function isDefaultBlockStyleState( selectedState ) {
  * @return {string[]} Object path for the selected state styles.
  */
 function getStyleStatePath( selectedState ) {
-	if ( isDefaultBlockStyleState( selectedState ) ) {
+	if ( ! hasStyleStateValue( selectedState ) ) {
 		return [];
 	}
 
@@ -77,7 +38,7 @@ export function setStyleForState( style, selectedState, newStyle ) {
 }
 
 export function scopeResetAllFilterToState( selectedState, resetAllFilter ) {
-	if ( ! resetAllFilter || isDefaultBlockStyleState( selectedState ) ) {
+	if ( ! resetAllFilter || ! hasStyleStateValue( selectedState ) ) {
 		return resetAllFilter;
 	}
 

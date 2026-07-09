@@ -31,6 +31,11 @@ import {
 	getGrammar,
 	mapUserPattern,
 } from './utils';
+import {
+	hasStyleStateValue,
+	hasViewportStyleStateValue,
+	hasPseudoStyleStateValue,
+} from '../utils/style-states';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 import {
@@ -1370,11 +1375,34 @@ export const getSelectedBlockStyleState = createSelector(
  * @return {boolean} Whether a non-default block style state is selected.
  */
 export function hasSelectedStyleState( state, clientId ) {
-	const selectedState = getSelectedBlockStyleState( state, clientId );
+	return hasStyleStateValue( getSelectedBlockStyleState( state, clientId ) );
+}
 
-	return (
-		selectedState.viewport !== DEFAULT_BLOCK_STYLE_STATE.viewport ||
-		selectedState.pseudo !== DEFAULT_BLOCK_STYLE_STATE.pseudo
+/**
+ * Returns whether a non-default viewport style state is selected for a block.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {boolean} Whether a viewport style state is selected.
+ */
+export function hasSelectedViewportStyleState( state, clientId ) {
+	return hasViewportStyleStateValue(
+		getSelectedBlockStyleState( state, clientId )
+	);
+}
+
+/**
+ * Returns whether a non-default pseudo style state is selected for a block.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {boolean} Whether a pseudo style state is selected.
+ */
+export function hasSelectedPseudoStyleState( state, clientId ) {
+	return hasPseudoStyleStateValue(
+		getSelectedBlockStyleState( state, clientId )
 	);
 }
 
