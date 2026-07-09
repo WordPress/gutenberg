@@ -149,6 +149,8 @@ Setting `isRoot` additionally hoists those overrides to the containing document'
 
 Use `isRoot` on the top-level provider for an application or page. It's also the recommended pattern for the topmost provider rendered into a separate document (iframe, popup window). The static design-tokens stylesheet still provides the default values; `isRoot` is only needed when you want a `<ThemeProvider>`'s overrides to reach the whole document.
 
+For root providers, dynamic `color` and `cursor` overrides are mirrored to `:root` at runtime. The `cornerRadius` preset is finite, so it is forwarded by the generated token stylesheet instead, using `:has()` selectors that match the root provider's `data-wpds-corner-radius` attribute. Keeping that preset in CSS avoids duplicating generated token values in JavaScript while still making the document root match the provider's roundedness.
+
 ### Across documents (iframes and other portals)
 
 When you render React content into a different document (typically an iframe), two things must be true for design tokens to work correctly in that document:
