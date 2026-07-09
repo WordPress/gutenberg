@@ -11,75 +11,96 @@ function escapeRegExp( str: string ) {
 	return str.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
 }
 
-function titleCase( str: string ) {
-	return str[ 0 ].toUpperCase() + str.slice( 1 );
-}
-
 type TokensMap = Record< string, Record< string, string > >;
 
-function pluralize( str: string ) {
-	if ( str.endsWith( 'y' ) ) {
-		return `${ str.slice( 0, -1 ) }ies`;
-	}
-
-	if ( str.endsWith( 's' ) ) {
-		return str;
-	}
-
-	return `${ str }s`;
-}
+const ROLE_GROUPS = [
+	{ title: 'Border radii', tokenIds: [ /^wpds-border\.radius\./ ] },
+	{ title: 'Border widths', tokenIds: [ /^wpds-border\.width\.(?!focus$)/ ] },
+	{
+		title: 'Focus indicators',
+		tokenIds: [
+			/^wpds-border\.width\.focus$/,
+			/^wpds-color\.stroke\.focus$/,
+		],
+	},
+	{
+		title: 'Surface backgrounds',
+		tokenIds: [ /^wpds-color\.background\.surface\./ ],
+	},
+	{
+		title: 'Interactive backgrounds',
+		tokenIds: [ /^wpds-color\.background\.interactive\./ ],
+	},
+	{
+		title: 'Track backgrounds',
+		tokenIds: [ /^wpds-color\.background\.track\./ ],
+	},
+	{
+		title: 'Thumb backgrounds',
+		tokenIds: [ /^wpds-color\.background\.thumb\./ ],
+	},
+	{
+		title: 'Content foregrounds',
+		tokenIds: [ /^wpds-color\.foreground\.content\./ ],
+	},
+	{
+		title: 'Interactive foregrounds',
+		tokenIds: [ /^wpds-color\.foreground\.interactive\./ ],
+	},
+	{
+		title: 'Surface strokes',
+		tokenIds: [ /^wpds-color\.stroke\.surface\./ ],
+	},
+	{
+		title: 'Interactive strokes',
+		tokenIds: [ /^wpds-color\.stroke\.interactive\./ ],
+	},
+	{ title: 'Control cursor', tokenIds: [ /^wpds-cursor\.control$/ ] },
+	{ title: 'Padding', tokenIds: [ /^wpds-dimension\.padding\./ ] },
+	{ title: 'Gaps', tokenIds: [ /^wpds-dimension\.gap\./ ] },
+	{ title: 'Element sizes', tokenIds: [ /^wpds-dimension\.size\./ ] },
+	{
+		title: 'Surface widths',
+		tokenIds: [ /^wpds-dimension\.surface-width\./ ],
+	},
+	{ title: 'Elevations', tokenIds: [ /^wpds-elevation\./ ] },
+	{ title: 'Animation durations', tokenIds: [ /^wpds-motion\.duration\./ ] },
+	{
+		title: 'Animation easing curves',
+		tokenIds: [ /^wpds-motion\.easing\./ ],
+	},
+	{
+		title: 'Font families',
+		tokenIds: [ /^wpds-typography\.font-family\./ ],
+	},
+	{ title: 'Font sizes', tokenIds: [ /^wpds-typography\.font-size\./ ] },
+	{ title: 'Line heights', tokenIds: [ /^wpds-typography\.line-height\./ ] },
+	{
+		title: 'Font weights',
+		tokenIds: [ /^wpds-typography\.font-weight\./ ],
+	},
+] as const;
 
 function getRoleGroup( tokenId: string ) {
-	const [ type, property, target ] = tokenId
-		.replace( /^wpds-/, '' )
-		.split( '.' );
+	const matchingGroups = ROLE_GROUPS.filter( ( { tokenIds } ) =>
+		tokenIds.some( ( pattern ) => pattern.test( tokenId ) )
+	);
 
-	if ( type === 'color' ) {
-		if ( property === 'stroke' && target === 'focus' ) {
-			return 'Focus indicators';
-		}
-
-		return `${ titleCase( target ) } ${ pluralize( property ) }`;
+	if ( matchingGroups.length === 0 ) {
+		throw new Error(
+			`@terrazzo/terrazzo-plugin-ds-tokens-docs: No token reference section matches ${ tokenId }. Add it to ROLE_GROUPS.`
+		);
 	}
 
-	if ( type === 'dimension' ) {
-		switch ( property ) {
-			case 'padding':
-				return 'Padding';
-			case 'gap':
-				return 'Gaps';
-			case 'surface-width':
-				return 'Surface widths';
-			case 'size':
-				return 'Element sizes';
-			default:
-				return titleCase( pluralize( property ) );
-		}
+	if ( matchingGroups.length > 1 ) {
+		throw new Error(
+			`@terrazzo/terrazzo-plugin-ds-tokens-docs: Multiple token reference sections match ${ tokenId }: ${ matchingGroups
+				.map( ( { title } ) => title )
+				.join( ', ' ) }.`
+		);
 	}
 
-	if ( type === 'border' ) {
-		if ( property === 'width' && target === 'focus' ) {
-			return 'Focus indicators';
-		}
-
-		return property === 'radius' ? 'Border radii' : 'Border widths';
-	}
-
-	if ( type === 'motion' ) {
-		return property === 'duration'
-			? 'Animation durations'
-			: 'Animation easing curves';
-	}
-
-	if ( type === 'typography' ) {
-		return titleCase( pluralize( property.replace( '-', ' ' ) ) );
-	}
-
-	if ( type === 'cursor' ) {
-		return 'Control cursor';
-	}
-
-	return titleCase( pluralize( type ) );
+	return matchingGroups[ 0 ].title;
 }
 
 export default function pluginDsTokenDocs( {
@@ -116,7 +137,7 @@ export default function pluginDsTokenDocs( {
 			function tokensToMdTable( tokens: TokensMap ) {
 				return Object.entries( tokens )
 					.map( ( [ group, tokensInGroup ] ) => [
-						`### ${ titleCase( group ) }`,
+						`### ${ group }`,
 						'',
 						'| Variable name | Description |',
 						'|---|---|',
