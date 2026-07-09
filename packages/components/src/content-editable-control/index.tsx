@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -15,6 +16,7 @@ import BaseControl from '../base-control';
 import { useBaseControlProps } from '../base-control/hooks';
 import type { WordPressComponentProps } from '../context';
 import type { ContentEditableControlProps } from './types';
+import styles from './style.module.scss';
 
 function UnforwardedContentEditableControl(
 	{
@@ -41,7 +43,13 @@ function UnforwardedContentEditableControl(
 	return (
 		<BaseControl { ...baseControlProps }>
 			<div
-				className="wp-components-content-editable-control"
+				// The stable class is a public styling hook for composers
+				// (e.g. the validated wrapper's error treatment); the module
+				// class carries the styles.
+				className={ clsx(
+					'wp-components-content-editable-control',
+					styles.editable
+				) }
 				role="textbox"
 				aria-multiline
 				aria-label={ label }
