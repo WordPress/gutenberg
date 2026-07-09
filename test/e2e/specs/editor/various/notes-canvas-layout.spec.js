@@ -113,6 +113,9 @@ test.describe( 'Notes canvas layout', () => {
 		editor,
 		page,
 	} ) => {
+		// Keep the canvas wide enough for the full-notes tier; narrower
+		// canvases collapse the panel to minimized pills.
+		await page.setViewportSize( { width: 1450, height: 800 } );
 		await editor.insertBlock( {
 			name: 'core/cover',
 			attributes: {
@@ -171,6 +174,9 @@ test.describe( 'Notes canvas layout', () => {
 		editor,
 		page,
 	} ) => {
+		// Keep the canvas wide enough for the full-notes tier; narrower
+		// canvases collapse the panel to minimized pills.
+		await page.setViewportSize( { width: 1450, height: 800 } );
 		await editor.insertBlock( {
 			name: 'core/cover',
 			attributes: {
@@ -327,7 +333,7 @@ test.describe( 'Notes canvas layout', () => {
 		// breakpoint - so only the canvas-width guard (not the viewport gate)
 		// governs the panel.
 		await editor.openDocumentSettingsSidebar();
-		await page.setViewportSize( { width: 1280, height: 800 } );
+		await page.setViewportSize( { width: 1450, height: 800 } );
 
 		// Wide canvas: full threads with the full reserved space.
 		await expect( notes ).toBeVisible();
@@ -336,7 +342,7 @@ test.describe( 'Notes canvas layout', () => {
 
 		// Mid-width canvas: threads collapse to minimized avatar pills and
 		// release most of the reserved space.
-		await page.setViewportSize( { width: 900, height: 800 } );
+		await page.setViewportSize( { width: 1060, height: 800 } );
 		await expect( overlay ).toHaveClass( /is-compact/ );
 		await expect( notes ).toBeVisible();
 		await expect.poll( getReservedWidth ).toBe( 82 );
@@ -363,6 +369,9 @@ test.describe( 'Notes canvas layout', () => {
 			attributes: { content: 'Paragraph with a note' },
 		} );
 		await addNote( page, editor, 'Display mode note' );
+		// Keep the canvas wide enough for the full-notes tier so the menu
+		// choice (not the canvas width) drives the presentation.
+		await page.setViewportSize( { width: 1450, height: 800 } );
 
 		const notes = page.getByRole( 'region', { name: 'Notes' } );
 		const overlay = page.locator( '.editor-collab-sidebar-overlay' );

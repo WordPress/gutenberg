@@ -550,6 +550,9 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
+			// Keep the canvas wide enough for the full-notes tier; minimized
+			// pills don't show the reply previews.
+			await page.setViewportSize( { width: 1450, height: 800 } );
 			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing block comments' },
