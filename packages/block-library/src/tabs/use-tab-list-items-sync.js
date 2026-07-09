@@ -24,9 +24,9 @@ export default function useTabListItemsSync( clientId ) {
 		useDispatch( blockEditorStore );
 
 	// The last emitted `tabs` and the panel order it was written against,
-	// used to tell a panel-only change apart from an external `tabs` change.
-	const lastPanelClientIdsRef = useRef( null );
+	// for remapping labels when the panel order changes.
 	const lastTabsRef = useRef( null );
+	const lastPanelClientIdsRef = useRef( null );
 
 	const { tabPanels, tabListClientId, currentTabs } = useSelect(
 		( select ) => {
@@ -62,9 +62,8 @@ export default function useTabListItemsSync( clientId ) {
 			( tabPanel ) => tabPanel.clientId
 		);
 
-		// Pick the panel order `currentTabs` corresponds to: the last emitted
-		// order for a panel-only change, or the current panels when `tabs` was
-		// changed externally (undo/redo, collaboration) and already matches them.
+		// If the store still holds our last output, only the panels changed, so
+		// map labels from the order we last wrote.
 		const tabsMatchLastEmitted =
 			lastTabsRef.current !== null &&
 			JSON.stringify( currentTabs ) ===
@@ -73,8 +72,7 @@ export default function useTabListItemsSync( clientId ) {
 			? lastPanelClientIdsRef.current
 			: currentPanelClientIds;
 
-		// Map each label back to the tab panel it belonged to, using that basis
-		// panel order.
+		// Map each label back to the tab panel it belonged to.
 		const labelsByClientId = new Map();
 		basisPanelClientIds.forEach( ( id, index ) => {
 			if ( index < currentTabs.length ) {
@@ -82,9 +80,7 @@ export default function useTabListItemsSync( clientId ) {
 			}
 		} );
 
-		// Rebuild `tabs` in the current tab panel order, carrying each panel's
-		// label along. A newly added panel has no stored label and gets a
-		// default.
+		// Rebuild tabs in the current tab panel order.
 		const newTabs = tabPanels.map( ( tabPanel ) => ( {
 			label: labelsByClientId.has( tabPanel.clientId )
 				? labelsByClientId.get( tabPanel.clientId )
@@ -92,7 +88,7 @@ export default function useTabListItemsSync( clientId ) {
 		} ) );
 
 		// Record what is being written and the order it is written in so the next
-		// run can both detect external `tabs` changes and remap labels.
+		// run can both detect tabs changes and remap labels.
 		lastPanelClientIdsRef.current = currentPanelClientIds;
 		lastTabsRef.current = newTabs;
 
