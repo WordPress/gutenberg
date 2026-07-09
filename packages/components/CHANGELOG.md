@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `ControlWithError`: Update validation error message to be announced by screen readers using `speak` instead of an inline `aria-live` region ([#79600](https://github.com/WordPress/gutenberg/pull/79600)).
+-   `ControlWithError`: Remove redundant inline aria-live region for validation error messages to prevent duplicate announcements. ([#79600](https://github.com/WordPress/gutenberg/pull/79600)).
 
 ### Breaking Changes
 
