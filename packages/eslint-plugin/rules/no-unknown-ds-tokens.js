@@ -1,5 +1,5 @@
-const { readFileSync } = require( 'fs' );
-const { dirname, join } = require( 'path' );
+const tokenListModule = require( '@wordpress/theme/design-tokens.js' );
+const tokenList = tokenListModule.default || tokenListModule;
 
 const {
 	DS_TOKEN_PREFIX,
@@ -8,41 +8,6 @@ const {
 	wpdsTokensRegex,
 } = require( '../utils/ds-token-utils' );
 
-function loadTokenList() {
-	const themePackageJsonPath = require.resolve(
-		'@wordpress/theme/package.json'
-	);
-	const themePackageJson = require( themePackageJsonPath );
-	const designTokensCssExport =
-		themePackageJson.exports?.[ './design-tokens.css' ];
-
-	if ( typeof designTokensCssExport !== 'string' ) {
-		throw new Error(
-			'@wordpress/eslint-plugin: Unable to resolve @wordpress/theme design tokens stylesheet.'
-		);
-	}
-
-	const designTokensCss = readFileSync(
-		join( dirname( themePackageJsonPath ), designTokensCssExport ),
-		'utf8'
-	);
-	const tokenMatches = designTokensCss.matchAll(
-		/--wpds-[a-z0-9-]+(?=\s*:)/g
-	);
-	const tokens = Array.from(
-		new Set( Array.from( tokenMatches, ( [ token ] ) => token ) )
-	);
-
-	if ( tokens.length === 0 ) {
-		throw new Error(
-			'@wordpress/eslint-plugin: Unable to load @wordpress/theme design tokens.'
-		);
-	}
-
-	return tokens;
-}
-
-const tokenList = loadTokenList();
 const knownTokens = new Set( tokenList );
 
 /**
