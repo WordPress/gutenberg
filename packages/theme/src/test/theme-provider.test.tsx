@@ -36,11 +36,57 @@ function getScopingProvider( element: Element ) {
 	return element.closest< HTMLElement >( '.theme-provider-root' )!;
 }
 
+function injectThemeProviderStyles() {
+	const style = document.createElement( 'style' );
+	style.textContent = readFileSync(
+		join( import.meta.dirname, '../style.module.css' ),
+		'utf8'
+	).replaceAll( '.root', '.theme-provider-root' );
+	document.head.appendChild( style );
+	return style;
+}
+
 describe( 'ThemeProvider', () => {
 	it( 'renders its children', () => {
 		render( <ThemeProvider>content</ThemeProvider> );
 
 		expect( screen.getByText( 'content' ) ).toBeInTheDocument();
+	} );
+
+	it( 'keeps its scoping wrapper styled as display contents and unfocusable', () => {
+		const style = injectThemeProviderStyles();
+
+		try {
+			render(
+				<>
+					<button>Before</button>
+					<ThemeProvider>
+						<button>Inside</button>
+					</ThemeProvider>
+					<button>After</button>
+				</>
+			);
+
+			const before = screen.getByRole( 'button', { name: 'Before' } );
+			const inside = screen.getByRole( 'button', { name: 'Inside' } );
+			const after = screen.getByRole( 'button', { name: 'After' } );
+			const provider = getScopingProvider( inside );
+
+			expect( getComputedStyle( provider ).display ).toBe( 'contents' );
+			expect( provider ).not.toHaveAttribute( 'tabindex' );
+
+			provider.focus();
+			expect( provider ).not.toHaveFocus();
+
+			before.focus();
+			expect( before ).toHaveFocus();
+			inside.focus();
+			expect( inside ).toHaveFocus();
+			after.focus();
+			expect( after ).toHaveFocus();
+		} finally {
+			style.remove();
+		}
 	} );
 
 	it( 'defines the color tokens from the seeds within its subtree', () => {
