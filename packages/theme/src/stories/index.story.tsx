@@ -47,6 +47,7 @@ const ColorTokenTable = ( { tokens }: { tokens: string[] } ) => {
 					} }
 				>
 					<span
+						aria-hidden="true"
 						style={ {
 							backgroundColor: `var(${ name })`,
 							border: '1px solid var(--wpds-color-stroke-surface-neutral)',
@@ -54,7 +55,6 @@ const ColorTokenTable = ( { tokens }: { tokens: string[] } ) => {
 							aspectRatio: '2/1',
 							display: 'block',
 						} }
-						aria-label={ name }
 					></span>
 					<code>{ name }</code>
 				</li>
