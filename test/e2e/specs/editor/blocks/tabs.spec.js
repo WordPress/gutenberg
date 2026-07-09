@@ -4,37 +4,36 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**
- * Inserts a tabs block with `length` tabs.
+ * Builds a tabs block from tab labels and their panel contents.
  *
- * @param {Object} editor The editor utils.
- * @param {number} length Number of tabs to insert.
+ * @param {string[]} labels Tab labels, in order.
+ * @param {string[]} panels Paragraph content for each tab panel, in order.
+ * @return {Object} The core/tabs block definition.
  */
-async function insertTabsBlock( editor, length ) {
-	await editor.insertBlock( {
+function createTabs( labels, panels ) {
+	return {
 		name: 'core/tabs',
 		innerBlocks: [
 			{
 				name: 'core/tab-list',
 				attributes: {
-					tabs: Array.from( { length }, ( _, index ) => ( {
-						label: `Tab ${ index + 1 }`,
-					} ) ),
+					tabs: labels.map( ( label ) => ( { label } ) ),
 				},
 			},
 			{
 				name: 'core/tab-panels',
-				innerBlocks: Array.from( { length }, ( _, index ) => ( {
+				innerBlocks: panels.map( ( content ) => ( {
 					name: 'core/tab-panel',
 					innerBlocks: [
 						{
 							name: 'core/paragraph',
-							attributes: { content: `Panel ${ index + 1 }` },
+							attributes: { content },
 						},
 					],
 				} ) ),
 			},
 		],
-	} );
+	};
 }
 
 test.describe( 'Tabs', () => {
@@ -58,7 +57,9 @@ test.describe( 'Tabs', () => {
 			page,
 			pageUtils,
 		} ) => {
-			await insertTabsBlock( editor, 2 );
+			await editor.insertBlock(
+				createTabs( [ 'Tab 1', 'Tab 2' ], [ 'Panel 1', 'Panel 2' ] )
+			);
 
 			const tab1 = editor.canvas.getByRole( 'tab', { name: 'Tab 1' } );
 			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
@@ -91,7 +92,9 @@ test.describe( 'Tabs', () => {
 			page,
 			pageUtils,
 		} ) => {
-			await insertTabsBlock( editor, 2 );
+			await editor.insertBlock(
+				createTabs( [ 'Tab 1', 'Tab 2' ], [ 'Panel 1', 'Panel 2' ] )
+			);
 
 			const tab1 = editor.canvas.getByRole( 'tab', { name: 'Tab 1' } );
 			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
@@ -123,7 +126,9 @@ test.describe( 'Tabs', () => {
 			editor,
 			pageUtils,
 		} ) => {
-			await insertTabsBlock( editor, 2 );
+			await editor.insertBlock(
+				createTabs( [ 'Tab 1', 'Tab 2' ], [ 'Panel 1', 'Panel 2' ] )
+			);
 
 			const tab1 = editor.canvas.getByRole( 'tab', { name: 'Tab 1' } );
 			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
@@ -157,7 +162,9 @@ test.describe( 'Tabs', () => {
 			page,
 			pageUtils,
 		} ) => {
-			await insertTabsBlock( editor, 2 );
+			await editor.insertBlock(
+				createTabs( [ 'Tab 1', 'Tab 2' ], [ 'Panel 1', 'Panel 2' ] )
+			);
 
 			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
 			await tab2.click();
@@ -201,7 +208,9 @@ test.describe( 'Tabs', () => {
 			page,
 			pageUtils,
 		} ) => {
-			await insertTabsBlock( editor, 2 );
+			await editor.insertBlock(
+				createTabs( [ 'Tab 1', 'Tab 2' ], [ 'Panel 1', 'Panel 2' ] )
+			);
 
 			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
 			await tab2.click();
@@ -231,7 +240,12 @@ test.describe( 'Tabs', () => {
 			editor,
 			pageUtils,
 		} ) => {
-			await insertTabsBlock( editor, 3 );
+			await editor.insertBlock(
+				createTabs(
+					[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+					[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+				)
+			);
 
 			// Click the second tab, then select its panel.
 			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
@@ -244,69 +258,38 @@ test.describe( 'Tabs', () => {
 			// Move the panel one position earlier.
 			await editor.clickBlockToolbarButton( 'Move up' );
 
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/tabs',
-					innerBlocks: [
-						{
-							name: 'core/tab-list',
-							attributes: {
-								tabs: [ 'Tab 2', 'Tab 1', 'Tab 3' ].map(
-									( label ) => ( { label } )
-								),
-							},
-						},
-						{
-							name: 'core/tab-panels',
-							innerBlocks: [
-								'Panel 2',
-								'Panel 1',
-								'Panel 3',
-							].map( ( content ) => ( {
-								name: 'core/tab-panel',
-								innerBlocks: [ { attributes: { content } } ],
-							} ) ),
-						},
-					],
-				},
-			] );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs(
+						[ 'Tab 2', 'Tab 1', 'Tab 3' ],
+						[ 'Panel 2', 'Panel 1', 'Panel 3' ]
+					),
+				] );
 
 			// Undo restores the original order.
 			await pageUtils.pressKeys( 'primary+z' );
 
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/tabs',
-					innerBlocks: [
-						{
-							name: 'core/tab-list',
-							attributes: {
-								tabs: [ 'Tab 1', 'Tab 2', 'Tab 3' ].map(
-									( label ) => ( { label } )
-								),
-							},
-						},
-						{
-							name: 'core/tab-panels',
-							innerBlocks: [
-								'Panel 1',
-								'Panel 2',
-								'Panel 3',
-							].map( ( content ) => ( {
-								name: 'core/tab-panel',
-								innerBlocks: [ { attributes: { content } } ],
-							} ) ),
-						},
-					],
-				},
-			] );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs(
+						[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+						[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+					),
+				] );
 		} );
 
 		test( 'keeps tab labels in sync when a panel is moved after', async ( {
 			editor,
 			pageUtils,
 		} ) => {
-			await insertTabsBlock( editor, 3 );
+			await editor.insertBlock(
+				createTabs(
+					[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+					[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+				)
+			);
 
 			// Click the second tab, then select its panel.
 			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
@@ -319,69 +302,38 @@ test.describe( 'Tabs', () => {
 			// Move the panel one position later.
 			await editor.clickBlockToolbarButton( 'Move down' );
 
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/tabs',
-					innerBlocks: [
-						{
-							name: 'core/tab-list',
-							attributes: {
-								tabs: [ 'Tab 1', 'Tab 3', 'Tab 2' ].map(
-									( label ) => ( { label } )
-								),
-							},
-						},
-						{
-							name: 'core/tab-panels',
-							innerBlocks: [
-								'Panel 1',
-								'Panel 3',
-								'Panel 2',
-							].map( ( content ) => ( {
-								name: 'core/tab-panel',
-								innerBlocks: [ { attributes: { content } } ],
-							} ) ),
-						},
-					],
-				},
-			] );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs(
+						[ 'Tab 1', 'Tab 3', 'Tab 2' ],
+						[ 'Panel 1', 'Panel 3', 'Panel 2' ]
+					),
+				] );
 
 			// Undo restores the original order.
 			await pageUtils.pressKeys( 'primary+z' );
 
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/tabs',
-					innerBlocks: [
-						{
-							name: 'core/tab-list',
-							attributes: {
-								tabs: [ 'Tab 1', 'Tab 2', 'Tab 3' ].map(
-									( label ) => ( { label } )
-								),
-							},
-						},
-						{
-							name: 'core/tab-panels',
-							innerBlocks: [
-								'Panel 1',
-								'Panel 2',
-								'Panel 3',
-							].map( ( content ) => ( {
-								name: 'core/tab-panel',
-								innerBlocks: [ { attributes: { content } } ],
-							} ) ),
-						},
-					],
-				},
-			] );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs(
+						[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+						[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+					),
+				] );
 		} );
 
 		test( 'keeps tab labels in sync when a panel is removed', async ( {
 			editor,
 			pageUtils,
 		} ) => {
-			await insertTabsBlock( editor, 3 );
+			await editor.insertBlock(
+				createTabs(
+					[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+					[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+				)
+			);
 
 			// Click the second tab, then select its panel.
 			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
@@ -394,69 +346,38 @@ test.describe( 'Tabs', () => {
 			// Remove the panel.
 			await editor.clickBlockOptionsMenuItem( 'Delete' );
 
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/tabs',
-					innerBlocks: [
-						{
-							name: 'core/tab-list',
-							attributes: {
-								tabs: [ 'Tab 1', 'Tab 3' ].map( ( label ) => ( {
-									label,
-								} ) ),
-							},
-						},
-						{
-							name: 'core/tab-panels',
-							innerBlocks: [ 'Panel 1', 'Panel 3' ].map(
-								( content ) => ( {
-									name: 'core/tab-panel',
-									innerBlocks: [
-										{ attributes: { content } },
-									],
-								} )
-							),
-						},
-					],
-				},
-			] );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs(
+						[ 'Tab 1', 'Tab 3' ],
+						[ 'Panel 1', 'Panel 3' ]
+					),
+				] );
 
 			// Undo restores the original order.
 			await pageUtils.pressKeys( 'primary+z' );
 
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/tabs',
-					innerBlocks: [
-						{
-							name: 'core/tab-list',
-							attributes: {
-								tabs: [ 'Tab 1', 'Tab 2', 'Tab 3' ].map(
-									( label ) => ( { label } )
-								),
-							},
-						},
-						{
-							name: 'core/tab-panels',
-							innerBlocks: [
-								'Panel 1',
-								'Panel 2',
-								'Panel 3',
-							].map( ( content ) => ( {
-								name: 'core/tab-panel',
-								innerBlocks: [ { attributes: { content } } ],
-							} ) ),
-						},
-					],
-				},
-			] );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs(
+						[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+						[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+					),
+				] );
 		} );
 
 		test( 'gives a duplicated panel a default label', async ( {
 			editor,
 			pageUtils,
 		} ) => {
-			await insertTabsBlock( editor, 3 );
+			await editor.insertBlock(
+				createTabs(
+					[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+					[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+				)
+			);
 
 			// Click the second tab, then select its panel.
 			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
@@ -469,66 +390,29 @@ test.describe( 'Tabs', () => {
 			await editor.clickBlockOptionsMenuItem( 'Duplicate' );
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/tabs',
-					innerBlocks: [
-						{
-							name: 'core/tab-list',
-							attributes: {
-								tabs: [
-									'Tab 1',
-									'Tab 2',
-									// The duplicated panel has no stored label, so it gets the default.
-									'Tab',
-									'Tab 3',
-								].map( ( label ) => ( { label } ) ),
-							},
-						},
-						{
-							name: 'core/tab-panels',
-							innerBlocks: [
-								'Panel 1',
-								'Panel 2',
-								'Panel 2',
-								'Panel 3',
-							].map( ( content ) => ( {
-								name: 'core/tab-panel',
-								innerBlocks: [ { attributes: { content } } ],
-							} ) ),
-						},
+				createTabs(
+					[
+						'Tab 1',
+						'Tab 2',
+						// The duplicated panel has no stored label, so it gets the default.
+						'Tab',
+						'Tab 3',
 					],
-				},
+					[ 'Panel 1', 'Panel 2', 'Panel 2', 'Panel 3' ]
+				),
 			] );
 
 			// Undo restores the original order.
 			await pageUtils.pressKeys( 'primary+z' );
 
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/tabs',
-					innerBlocks: [
-						{
-							name: 'core/tab-list',
-							attributes: {
-								tabs: [ 'Tab 1', 'Tab 2', 'Tab 3' ].map(
-									( label ) => ( { label } )
-								),
-							},
-						},
-						{
-							name: 'core/tab-panels',
-							innerBlocks: [
-								'Panel 1',
-								'Panel 2',
-								'Panel 3',
-							].map( ( content ) => ( {
-								name: 'core/tab-panel',
-								innerBlocks: [ { attributes: { content } } ],
-							} ) ),
-						},
-					],
-				},
-			] );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs(
+						[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+						[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+					),
+				] );
 		} );
 	} );
 
