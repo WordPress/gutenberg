@@ -51,15 +51,23 @@ export function NoteForm( { onSubmit, onCancel, note, labels, focusOnMount } ) {
 			return;
 		}
 		setIsSubmitting( true );
+		const submitted = inputComment;
 		try {
 			/*
 			 * The note actions resolve with the saved record on success and
 			 * `undefined` on failure (they surface their own error notice),
 			 * so only discard the draft once the save actually succeeded.
 			 */
-			const result = await onSubmit( inputComment );
+			const result = await onSubmit( submitted );
 			if ( result !== undefined ) {
-				setInputComment( '' );
+				/*
+				 * The field stays editable while the request is in flight, so
+				 * keep anything typed since; clearing unconditionally would
+				 * discard it.
+				 */
+				setInputComment( ( current ) =>
+					current === submitted ? '' : current
+				);
 			}
 		} catch {
 			// Keep the draft so the user can retry.
