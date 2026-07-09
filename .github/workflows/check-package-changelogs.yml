@@ -6,10 +6,22 @@ on:
         branches:
             - trunk
         paths:
+            - 'packages/admin-ui/**'
             - 'packages/components/**'
             - 'packages/dataviews/**'
-            - 'packages/ui/**'
+            - 'packages/fields/**'
+            - 'packages/grid/**'
+            - 'packages/icons/**'
+            - 'packages/interface/**'
+            - 'packages/private-apis/**'
+            - 'packages/style-runtime/**'
             - 'packages/theme/**'
+            - 'packages/ui/**'
+            - 'packages/undo-manager/**'
+            - 'packages/views/**'
+            - 'packages/widget-dashboard/**'
+            - 'packages/widget-primitives/**'
+            - 'packages/wp-build/**'
             - '!packages/*/src/**/stories/**'
             - '!packages/*/src/**/test/**'
 
@@ -27,10 +39,25 @@ jobs:
             fail-fast: false
             matrix:
                 package:
-                    - components
+                    # Bundled packages
+                    # Keep in sync with dependency-extraction-webpack-plugin
+                    - admin-ui
                     - dataviews
+                    - fields
+                    - grid
+                    - icons
+                    - interface
+                    - style-runtime
                     - ui
+                    - undo-manager
+                    - views
+                    # Other packages
                     - theme
+                    - components
+                    - private-apis
+                    - widget-dashboard
+                    - widget-primitives
+                    - wp-build
         steps:
             - name: 'Get PR commit count'
               env:

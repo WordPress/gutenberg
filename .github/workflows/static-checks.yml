@@ -100,7 +100,12 @@ jobs:
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}
-              run: npm run lint:css -- --formatter compact
+              # Stylelint has no separate prune flag. Run lint first so new violations fail,
+              # then `--suppress` to prune stale suppressions (same outcome as ESLint's
+              # `--prune-suppressions` + check-local-changes).
+              run: |
+                  npm run lint:css -- --formatter compact
+                  npm run lint:css:update-suppressions
 
             - name: Type checking
               run: npm run build
