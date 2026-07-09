@@ -17,7 +17,7 @@
 
 ### Documentation
 
--   Document design token accessibility responsibilities and browser support expectations ([#79943](https://github.com/WordPress/gutenberg/pull/79943)).
+-   Document design token accessibility responsibilities ([#79943](https://github.com/WordPress/gutenberg/pull/79943)).
 -   Document that `ThemeProvider` does not accept wrapper customization props ([#79763](https://github.com/WordPress/gutenberg/pull/79763)).
 -   Clarify the design token documentation entry points and keep the generated token guidance source internal ([#79829](https://github.com/WordPress/gutenberg/pull/79829)).
 -   Document intentional design token omissions in the design system tokens reference ([#79770](https://github.com/WordPress/gutenberg/pull/79770)).

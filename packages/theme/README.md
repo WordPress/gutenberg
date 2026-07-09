@@ -62,16 +62,26 @@ For the best development experience, we recommend configuring the [Stylelint rul
 
 If you reference `--wpds-*` tokens in CSS or JS/TS source, use the [build plugins](#build-plugins) to inject fallback values at build time so components render correctly even when the tokens stylesheet is not loaded. If you use `@wordpress/build`, these plugins are already enabled by default when `@wordpress/theme` is installed.
 
-### Accessibility and Browser Support
+### Accessibility
 
-The semantic color tokens are designed so the default foreground/background pairs used by the design system meet WCAG AA text contrast. Components still need to choose the correct semantic pair for the UI state they render, and must not rely on color alone to convey information.
+The semantic color tokens are designed so the default foreground/background pairs used by the design system meet [WCAG AA text contrast](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html). Components still need to choose the correct semantic pair for the UI state they render, and must not rely on color alone to convey information.
 
 Design tokens do not replace component-level accessibility handling:
 
 -   **Forced colors:** components are still responsible for `forced-colors` overrides where native high-contrast rendering would otherwise hide borders, icons, focus rings, or state indicators.
 -   **Reduced motion:** motion tokens provide shared durations and easing curves, but consuming components are still responsible for respecting `prefers-reduced-motion` for non-essential animations.
 
-The raw CSS tokens stylesheet targets modern evergreen browsers and may rely on modern CSS features such as `color-mix()`. For source processed by the provided build plugins, fallback values are injected at build time for configured CSS and JS/TS sources.
+For example, define non-essential transitions only when the user has not requested reduced motion:
+
+```css
+@media not ( prefers-reduced-motion ) {
+	.example {
+		transition-property: opacity;
+		transition-duration: var( --wpds-motion-duration-md );
+		transition-timing-function: var( --wpds-motion-easing-subtle );
+	}
+}
+```
 
 ## Theme Provider
 
