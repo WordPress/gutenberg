@@ -22,10 +22,7 @@ import { useBlockElement } from '../components/block-list/use-block-props/use-bl
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
 import { deviceTypeKey } from '../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
-import {
-	DEFAULT_BLOCK_STYLE_STATE,
-	getStyleForState,
-} from './block-style-state';
+import { DEFAULT_STATE_VALUE, getStyleForState } from './block-style-state';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
@@ -259,7 +256,7 @@ export function getResponsiveChildLayoutStyles( {
 		.map( ( [ viewport, mediaQuery ] ) => {
 			const viewportLayout = getStyleForState( style, {
 				viewport,
-				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+				pseudo: DEFAULT_STATE_VALUE,
 			} )?.layout;
 			if ( ! viewportLayout || ! Object.keys( viewportLayout ).length ) {
 				return '';

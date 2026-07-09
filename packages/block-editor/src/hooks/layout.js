@@ -39,7 +39,7 @@ import { unlock } from '../lock-unlock';
 import { globalStylesDataKey } from '../store/private-keys';
 import { getVariationNameFromClass } from './block-style-variation';
 import {
-	DEFAULT_BLOCK_STYLE_STATE,
+	DEFAULT_STATE_VALUE,
 	getStyleForState,
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
@@ -254,7 +254,7 @@ export function getResponsiveLayoutStyles( {
 		.map( ( [ viewport, mediaQuery ] ) => {
 			const viewportStyle = getStyleForState( attributes?.style, {
 				viewport,
-				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+				pseudo: DEFAULT_STATE_VALUE,
 			} );
 			const viewportLayout = getLayoutContainerValues(
 				viewportStyle?.layout
@@ -317,9 +317,7 @@ function LayoutPanelPure( {
 						'block'
 					),
 					themeSupportsLayout: getSettings().supportsLayout,
-					selectedState:
-						getSelectedBlockStyleState?.( clientId ) ??
-						DEFAULT_BLOCK_STYLE_STATE,
+					selectedState: getSelectedBlockStyleState?.( clientId ),
 				};
 			},
 			[ blockName, clientId ]

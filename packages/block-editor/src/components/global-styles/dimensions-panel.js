@@ -30,17 +30,13 @@ import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { setImmutably } from '../../utils/object';
 import {
-	DEFAULT_BLOCK_STYLE_STATE,
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
-export function useHasDimensionsPanel(
-	settings,
-	styleState = DEFAULT_BLOCK_STYLE_STATE
-) {
+export function useHasDimensionsPanel( settings, styleState ) {
 	return (
 		hasContentSize( settings ) ||
 		hasWideSize( settings ) ||
@@ -92,14 +88,14 @@ function hasWidth( settings ) {
 	return settings?.dimensions?.width;
 }
 
-function hasAspectRatio( settings, styleState = DEFAULT_BLOCK_STYLE_STATE ) {
+function hasAspectRatio( settings, styleState ) {
 	return (
 		! hasPseudoBlockStyleState( styleState ) &&
 		settings?.dimensions?.aspectRatio
 	);
 }
 
-function hasChildLayout( settings, styleState = DEFAULT_BLOCK_STYLE_STATE ) {
+function hasChildLayout( settings, styleState ) {
 	if ( hasPseudoBlockStyleState( styleState ) ) {
 		return false;
 	}
@@ -245,7 +241,7 @@ export default function DimensionsPanel( {
 	// Special case because the layout controls are not part of the dimensions panel
 	// in global styles but not in block inspector.
 	includeLayoutControls = false,
-	styleState = DEFAULT_BLOCK_STYLE_STATE,
+	styleState,
 } ) {
 	const { dimensions, spacing } = settings;
 

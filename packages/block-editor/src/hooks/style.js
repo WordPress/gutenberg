@@ -42,7 +42,7 @@ import {
 	useBlockSettings,
 } from './utils';
 import {
-	DEFAULT_BLOCK_STYLE_STATE,
+	DEFAULT_STATE_VALUE,
 	getStyleForState,
 	hasViewportBlockStyleState,
 	hasPseudoBlockStyleState,
@@ -429,7 +429,7 @@ export function getResponsiveStateCSSRules(
 		( [ viewport, mediaQuery ] ) => {
 			const viewportStyles = getStyleForState( style, {
 				viewport,
-				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+				pseudo: DEFAULT_STATE_VALUE,
 			} );
 			if ( ! viewportStyles ) {
 				return;
@@ -490,7 +490,7 @@ export function getCanvasStateStyleValue( style, selectedState ) {
 
 	const defaultViewportState = {
 		...selectedState,
-		viewport: DEFAULT_BLOCK_STYLE_STATE.viewport,
+		viewport: DEFAULT_STATE_VALUE,
 	};
 	const defaultViewportStateValue = getStyleForState(
 		style,

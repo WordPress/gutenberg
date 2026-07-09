@@ -4,12 +4,7 @@
 import { cleanEmptyObject } from './utils';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 
-const DEFAULT_STATE_VALUE = 'default';
-
-export const DEFAULT_BLOCK_STYLE_STATE = {
-	viewport: DEFAULT_STATE_VALUE,
-	pseudo: DEFAULT_STATE_VALUE,
-};
+export const DEFAULT_STATE_VALUE = 'default';
 
 /**
  * Returns true when a viewport style state is selected.
