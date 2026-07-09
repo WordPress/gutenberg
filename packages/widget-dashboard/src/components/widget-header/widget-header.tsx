@@ -66,7 +66,10 @@ export function WidgetHeader( {
 }: WidgetHeaderProps ): React.ReactNode {
 	return (
 		<Card.Header
-			className={ clsx( styles.widgetHeader, overlay && styles.overlay ) }
+			className={ clsx(
+				styles[ 'widget-header' ],
+				overlay && styles.overlay
+			) }
 		>
 			{ showIdentity && widgetType?.title && (
 				<Stack
