@@ -90,7 +90,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 *                                       or application-password credentials. When
 		 *                                       omitted, auto-generated as
 		 *                                       `connectors_{$type}_{$id}_api_key` for API
-		 *                                       keys and `connectors_{$type}_{$id}_credentials`
+		 *                                       keys and `connectors_{$type}_{$id}_application_password`
 		 *                                       for application passwords.
 		 *                                       Must be a non-empty string when provided.
 		 *         @type string $constant_name   Optional. PHP constant name for the API key
@@ -234,7 +234,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 					}
 					$connector['authentication']['setting_name'] = $args['authentication']['setting_name'];
 				} else {
-					$setting_suffix                              = 'api_key' === $args['authentication']['method'] ? 'api_key' : 'credentials';
+					$setting_suffix                              = $args['authentication']['method'];
 					$connector['authentication']['setting_name'] = str_replace( '-', '_', "connectors_{$connector['type']}_{$id}_{$setting_suffix}" );
 				}
 

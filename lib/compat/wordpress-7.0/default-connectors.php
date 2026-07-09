@@ -319,7 +319,7 @@ function _gutenberg_get_application_password_credentials( array $auth ): array {
 				sprintf(
 					/* translators: %s: Environment variable name. */
 					__( 'The %s environment variable must contain application password credentials in "username:password" format.', 'gutenberg' ),
-					$env_var_name
+					esc_html( $env_var_name )
 				),
 				'7.0.0'
 			);
@@ -342,7 +342,7 @@ function _gutenberg_get_application_password_credentials( array $auth ): array {
 				sprintf(
 					/* translators: %s: PHP constant name. */
 					__( 'The %s constant must contain application password credentials in "username:password" format.', 'gutenberg' ),
-					$constant_name
+					esc_html( $constant_name )
 				),
 				'7.0.0'
 			);
