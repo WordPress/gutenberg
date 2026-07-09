@@ -23,15 +23,9 @@ import {
 } from '../components/block-edit/context';
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
-import {
-	cleanEmptyObject,
-	getValueFromObjectPath,
-	setImmutably,
-} from '../utils/object';
+import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-
-export { cleanEmptyObject };
 
 export function transformStyles(
 	activeSupports,

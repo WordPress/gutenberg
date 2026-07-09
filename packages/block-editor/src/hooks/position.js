@@ -20,7 +20,8 @@ import { SelectControl } from '@wordpress/ui';
 import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
 import useBlockDisplayInformation from '../components/use-block-display-information';
-import { cleanEmptyObject, useStyleOverride } from './utils';
+import { useStyleOverride } from './utils';
+import { cleanEmptyObject } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 
 const POSITION_SUPPORT_KEY = 'position';

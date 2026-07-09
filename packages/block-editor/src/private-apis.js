@@ -15,7 +15,8 @@ import {
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
-import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
+import { usePrivateStyleOverride } from './hooks/utils';
+import { cleanEmptyObject } from './utils/object';
 import { getStyleForState, setStyleForState } from './utils/style-states';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';

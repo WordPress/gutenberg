@@ -30,7 +30,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
 import { store as blockEditorStore } from '../../store';
-import { cleanEmptyObject } from '../../hooks/utils';
+import { cleanEmptyObject } from '../../utils/object';
 import {
 	getBlockVisibilityViewportEntries,
 	getViewportCheckboxState,

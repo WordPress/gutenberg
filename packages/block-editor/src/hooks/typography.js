@@ -20,7 +20,7 @@ import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
 import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject } from '../utils/object';
 import { extractPresetSlug } from '../utils/color-values';
 import { store as blockEditorStore } from '../store';
 import {

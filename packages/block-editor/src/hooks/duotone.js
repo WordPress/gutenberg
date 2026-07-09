@@ -32,11 +32,8 @@ import {
 	getDuotoneUnsetStylesheet,
 } from '../components/duotone/utils';
 import { scopeSelector } from '../components/global-styles/utils';
-import {
-	cleanEmptyObject,
-	useBlockSettings,
-	usePrivateStyleOverride,
-} from './utils';
+import { useBlockSettings, usePrivateStyleOverride } from './utils';
+import { cleanEmptyObject } from '../utils/object';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';

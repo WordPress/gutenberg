@@ -24,7 +24,8 @@ import { useState } from '@wordpress/element';
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
-import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
+import { shouldSkipSerialization } from '../hooks/utils';
+import { cleanEmptyObject } from '../utils/object';
 import { LAYOUT_DEFINITIONS } from './definitions';
 
 const RANGE_CONTROL_MAX_VALUES = {

@@ -27,8 +27,7 @@ import SpacingSizesControl from '../spacing-sizes-control';
 import DimensionControl from '../dimension-control';
 import ChildLayoutControl from '../child-layout-control';
 import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
-import { cleanEmptyObject } from '../../hooks/utils';
-import { setImmutably } from '../../utils/object';
+import { cleanEmptyObject, setImmutably } from '../../utils/object';
 import {
 	hasStyleStateValue,
 	hasViewportStyleStateValue,

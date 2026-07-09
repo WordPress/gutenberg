@@ -27,7 +27,8 @@ import { useSettings } from '../components/use-settings';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { BlockControls, JustifyContentControl } from '../components';
-import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
+import { shouldSkipSerialization } from '../hooks/utils';
+import { cleanEmptyObject } from '../utils/object';
 import { LAYOUT_DEFINITIONS } from './definitions';
 
 const GLOBAL_CONTENT_SIZE = 'var(--wp--style--global--content-size, none)';

@@ -9,7 +9,7 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { cleanEmptyObject } from '../../hooks/utils';
+import { cleanEmptyObject } from '../../utils/object';
 import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
 
 export default function BlockSupportToolsPanel( { children, group, label } ) {

@@ -1,7 +1,35 @@
 /**
  * Internal dependencies
  */
-import { setImmutably } from '../object';
+import { cleanEmptyObject, setImmutably } from '../object';
+
+describe( 'cleanEmptyObject', () => {
+	it( 'removes nested keys', () => {
+		expect( cleanEmptyObject( { color: { text: undefined } } ) ).toEqual(
+			undefined
+		);
+	} );
+
+	it( 'removes partial nested keys', () => {
+		expect(
+			cleanEmptyObject( {
+				color: { text: undefined },
+				typography: { fontSize: '10px' },
+			} )
+		).toEqual( {
+			typography: { fontSize: '10px' },
+		} );
+	} );
+
+	it( 'does not remove falsy nested keys', () => {
+		expect( cleanEmptyObject( { color: { text: false } } ) ).not.toEqual(
+			undefined
+		);
+		expect( cleanEmptyObject( { color: { text: '' } } ) ).not.toEqual(
+			undefined
+		);
+	} );
+} );
 
 describe( 'setImmutably', () => {
 	describe( 'handling falsy values properly', () => {

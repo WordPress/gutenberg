@@ -22,7 +22,8 @@ import {
 import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-import { cleanEmptyObject, shouldSkipSerialization } from './utils';
+import { shouldSkipSerialization } from './utils';
+import { cleanEmptyObject } from '../utils/object';
 import {
 	getStyleForState,
 	hasStyleStateValue,

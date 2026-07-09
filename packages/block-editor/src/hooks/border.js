@@ -19,11 +19,8 @@ import { __ } from '@wordpress/i18n';
 import { getColorClassName } from '../components/colors';
 import InspectorControls from '../components/inspector-controls';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
-import {
-	cleanEmptyObject,
-	shouldSkipSerialization,
-	useBlockSettings,
-} from './utils';
+import { shouldSkipSerialization, useBlockSettings } from './utils';
+import { cleanEmptyObject } from '../utils/object';
 import {
 	useHasBorderPanel,
 	useHasBorderPanelControls,

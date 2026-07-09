@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject } from '../utils/object';
 import { extractPresetSlug } from '../utils/color-values';
 import { store as blockEditorStore } from '../store';
 import useBlockColorContrastWarning from './contrast-checker';

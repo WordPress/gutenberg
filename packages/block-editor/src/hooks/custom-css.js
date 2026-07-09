@@ -10,7 +10,8 @@ import InspectorControls from '../components/inspector-controls';
 import AdvancedPanel, {
 	validateCSS,
 } from '../components/global-styles/advanced-panel';
-import { cleanEmptyObject, useStyleOverride } from './utils';
+import { useStyleOverride } from './utils';
+import { cleanEmptyObject } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 
 // Stable reference for useInstanceId.

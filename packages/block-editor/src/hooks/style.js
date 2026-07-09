@@ -36,11 +36,11 @@ import {
 	isExplicitAspectRatio,
 } from './dimensions';
 import {
-	cleanEmptyObject,
 	shouldSkipSerialization,
 	useStyleOverride,
 	useBlockSettings,
 } from './utils';
+import { cleanEmptyObject } from '../utils/object';
 import {
 	DEFAULT_STATE_VALUE,
 	getStyleForState,

@@ -15,11 +15,8 @@ import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
  */
 import { AlignmentControl, BlockControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
-import {
-	cleanEmptyObject,
-	shouldSkipSerialization,
-	useBlockSettings,
-} from './utils';
+import { shouldSkipSerialization, useBlockSettings } from './utils';
+import { cleanEmptyObject } from '../utils/object';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 
 export const TEXT_ALIGN_SUPPORT_KEY = 'typography.textAlign';

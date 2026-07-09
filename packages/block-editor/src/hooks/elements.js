@@ -14,7 +14,7 @@ import {
 	useHasColorPanel,
 	default as StylesColorPanel,
 } from '../components/global-styles/color-panel';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { COLOR_SUPPORT_KEY } from './color';
 import useBlockColorContrastWarning from './contrast-checker';

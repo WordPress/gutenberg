@@ -19,7 +19,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { useBlockDisplayInformation } from '..';
 import isEmptyString from './is-empty-string';
-import { cleanEmptyObject } from '../../hooks/utils';
+import { cleanEmptyObject } from '../../utils/object';
 
 export default function BlockRenameModal( { clientId, onClose } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState();

@@ -35,7 +35,8 @@ import {
 	JustifyContentControl,
 	BlockVerticalAlignmentControl,
 } from '../components';
-import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
+import { shouldSkipSerialization } from '../hooks/utils';
+import { cleanEmptyObject } from '../utils/object';
 import { LAYOUT_DEFINITIONS } from './definitions';
 
 // Used with the default, horizontal flex orientation.

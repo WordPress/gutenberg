@@ -16,7 +16,7 @@ import InspectorControlsGroups from '../inspector-controls/groups';
 import { default as InspectorControls } from '../inspector-controls';
 import { store as blockEditorStore } from '../../store';
 import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
-import { cleanEmptyObject } from '../../hooks/utils';
+import { cleanEmptyObject } from '../../utils/object';
 
 const PositionControlsPanel = () => {
 	const { selectedClientIds, selectedBlocks, hasPositionAttribute } =
