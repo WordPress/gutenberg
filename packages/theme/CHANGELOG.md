@@ -18,6 +18,7 @@
 
 ### Documentation
 
+-   Add role-grouped generated tables to the design system tokens reference ([#80052](https://github.com/WordPress/gutenberg/pull/80052)).
 -   Document design token accessibility responsibilities ([#79943](https://github.com/WordPress/gutenberg/pull/79943)).
 -   Document that `ThemeProvider` does not accept wrapper customization props ([#79763](https://github.com/WordPress/gutenberg/pull/79763)).
 -   Clarify the design token documentation entry points and keep the generated token guidance source internal ([#79829](https://github.com/WordPress/gutenberg/pull/79829)).
