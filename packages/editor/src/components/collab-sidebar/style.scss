@@ -321,11 +321,50 @@ mark.wp-note {
 	isolation: isolate;
 }
 
+// Search field with the persistent skin-tone toggle beside it, so the
+// current tone is always visible while the picker is open.
 .editor-collab-sidebar-panel__picker-search {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs);
 	padding: var(--wpds-dimension-padding-sm);
 
 	.components-search-control {
+		flex: 1;
 		margin: 0;
+	}
+}
+
+.editor-collab-sidebar-panel__skin-tone-toggle {
+	flex-shrink: 0;
+	font-size: 18px;
+	justify-content: center;
+}
+
+.editor-collab-sidebar-panel__skin-tone-menu {
+	padding: var(--wpds-dimension-padding-sm);
+	font-family: var(--wpds-typography-font-family-body);
+}
+
+.editor-collab-sidebar-panel__skin-tone-heading {
+	padding-bottom: var(--wpds-dimension-padding-sm);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	font-size: var(--wpds-typography-font-size-xs);
+	font-weight: var(--wpds-typography-font-weight-medium);
+}
+
+.editor-collab-sidebar-panel__skin-tone-options {
+	display: flex;
+	gap: var(--wpds-dimension-gap-xs);
+}
+
+.editor-collab-sidebar-panel__skin-tone-option {
+	width: 32px;
+	font-size: 18px;
+	justify-content: center;
+
+	&[aria-selected="true"] {
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 	}
 }
 

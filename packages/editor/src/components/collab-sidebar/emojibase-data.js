@@ -252,6 +252,19 @@ function buildLabelMap( cacheKey, data ) {
 			normalizeHexcode( entry.hexcode ),
 			overrides?.[ entry.hexcode ] || entry.label
 		);
+		// Skin-tone variants are stored under their own hex keys when
+		// picked with a non-default skin tone preference, so index them
+		// too for reaction pill tooltips.
+		if ( Array.isArray( entry.skins ) ) {
+			for ( const skin of entry.skins ) {
+				if ( skin.hexcode && skin.label ) {
+					map.set(
+						normalizeHexcode( skin.hexcode ),
+						overrides?.[ skin.hexcode ] || skin.label
+					);
+				}
+			}
+		}
 	}
 	labelMapCache.set( cacheKey, map );
 	return map;

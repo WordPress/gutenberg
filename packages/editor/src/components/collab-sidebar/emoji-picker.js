@@ -4,12 +4,22 @@
 import { __, _x } from '@wordpress/i18n';
 import { Composite, SearchControl } from '@wordpress/components';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import { detectLocale, useEmojibaseData } from './emojibase-data';
+import SkinTonePicker, { applySkinTone } from './skin-tone-picker';
+
+/**
+ * Preference key (in the `core` scope) storing the user's default emoji
+ * skin tone: 0 (default yellow) through 5 (dark), matching Emojibase
+ * `tone` values.
+ */
+export const SKIN_TONE_PREFERENCE_KEY = 'emojiPickerSkinTone';
 
 const COLUMNS = 8;
 
@@ -119,6 +129,16 @@ export default function EmojiPicker( { onSelect } ) {
 	const viewportRef = useRef( null );
 	const searchRef = useRef( null );
 
+	const skinTone = useSelect(
+		( select ) =>
+			select( preferencesStore ).get(
+				'core',
+				SKIN_TONE_PREFERENCE_KEY
+			) ?? 0,
+		[]
+	);
+	const { set: setPreference } = useDispatch( preferencesStore );
+
 	// Focus the search field on mount. The picker is swapped into the
 	// add-reaction popover when the quick row's `+` option is clicked,
 	// and that option unmounts with the quick row — without this the
@@ -217,6 +237,12 @@ export default function EmojiPicker( { onSelect } ) {
 					placeholder={ __( 'Search emoji' ) }
 					label={ __( 'Search emoji' ) }
 				/>
+				<SkinTonePicker
+					value={ skinTone }
+					onChange={ ( tone ) =>
+						setPreference( 'core', SKIN_TONE_PREFERENCE_KEY, tone )
+					}
+				/>
 			</div>
 			<div
 				ref={ viewportRef }
@@ -266,19 +292,33 @@ export default function EmojiPicker( { onSelect } ) {
 										role="row"
 										className="editor-collab-sidebar-panel__picker-row"
 									>
-										{ row.map( ( emoji ) => (
-											<Composite.Item
-												key={ emoji.hexcode }
-												role="gridcell"
-												className="editor-collab-sidebar-panel__picker-emoji"
-												aria-label={ labelFor( emoji ) }
-												onClick={ () =>
-													onSelect( emoji.emoji )
-												}
-											>
-												{ emoji.emoji }
-											</Composite.Item>
-										) ) }
+										{ row.map( ( emoji ) => {
+											// Swap in the skin-tone variant
+											// for display and selection; the
+											// base record still drives search
+											// matching and the grid key.
+											const display = applySkinTone(
+												emoji,
+												skinTone
+											);
+											return (
+												<Composite.Item
+													key={ emoji.hexcode }
+													role="gridcell"
+													className="editor-collab-sidebar-panel__picker-emoji"
+													aria-label={ labelFor(
+														display
+													) }
+													onClick={ () =>
+														onSelect(
+															display.emoji
+														)
+													}
+												>
+													{ display.emoji }
+												</Composite.Item>
+											);
+										} ) }
 									</Composite.Row>
 								) ) }
 							</div>
