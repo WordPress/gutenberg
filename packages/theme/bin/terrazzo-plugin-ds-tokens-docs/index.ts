@@ -93,7 +93,6 @@ export default function pluginDsTokenDocs( {
 				return;
 			}
 
-			const semanticTokens: TokensMap = {};
 			const semanticTokensByRole: TokensMap = {};
 			// Re-use transformed tokens from the CSS plugin
 			for ( const token of getTransforms( {
@@ -107,18 +106,6 @@ export default function pluginDsTokenDocs( {
 					);
 					continue;
 				}
-
-				// Use the tokens filename (without .json) as the group name
-				const group =
-					token.token.source.loc
-						?.split( '/' )
-						.at( -1 )
-						?.split( '.json' )[ 0 ] ?? 'Miscellaneous';
-
-				// Group by category
-				semanticTokens[ group ] ??= {};
-				semanticTokens[ group ][ token.localID ] =
-					token.token.$description ?? 'N/A';
 
 				const roleGroup = getRoleGroup( token.token.id );
 				semanticTokensByRole[ roleGroup ] ??= {};
@@ -145,16 +132,11 @@ export default function pluginDsTokenDocs( {
 			const generatedTokenTables = [
 				GENERATED_SECTION_START,
 				'',
-				'## Semantic tokens by role',
+				'## Semantic tokens',
 				'',
-				'These generated tables group tokens by the purpose encoded in their semantic name. Start here when comparing related tokens for the same kind of UI element or CSS property.',
+				'These generated tables list every public semantic token, grouped by the purpose encoded in each token name. Use them to compare related tokens for the same kind of UI element or CSS property.',
 				'',
 				...tokensToMdTable( semanticTokensByRole ),
-				'## Complete semantic token reference',
-				'',
-				'These generated tables list every public semantic token by token type.',
-				'',
-				...tokensToMdTable( semanticTokens ),
 				GENERATED_SECTION_END,
 			].join( '\n' );
 
