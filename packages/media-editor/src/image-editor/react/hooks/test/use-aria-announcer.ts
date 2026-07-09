@@ -173,6 +173,76 @@ describe( 'useAriaAnnouncer', () => {
 		expect( result.current ).toBe( 'Rotated 90 degrees clockwise' );
 	} );
 
+	it( 'announces a 90° snap under a vertical flip in visual terms', () => {
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{
+				initialProps: {
+					state: makeState( {
+						flip: { horizontal: false, vertical: true },
+					} ),
+				},
+			}
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		rerender( {
+			state: makeState( {
+				rotation: 270,
+				flip: { horizontal: false, vertical: true },
+			} ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Rotated 90 degrees clockwise' );
+	} );
+
+	it( 'announces non-inverted rotation when both axes are flipped', () => {
+		// Two mirrors restore handedness (equivalent to a 180° rotation), so
+		// the visual direction matches the unflipped case, not the single-flip.
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{
+				initialProps: {
+					state: makeState( {
+						flip: { horizontal: true, vertical: true },
+					} ),
+				},
+			}
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		rerender( {
+			state: makeState( {
+				rotation: 270,
+				flip: { horizontal: true, vertical: true },
+			} ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Rotated 90 degrees counterclockwise' );
+	} );
+
+	it( 'announces multiple changes with rotation first', () => {
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{ initialProps: { state: makeState() } }
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		rerender( {
+			state: makeState( { rotation: 90, zoom: 1.5 } ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe(
+			'Rotated 90 degrees clockwise, Zoom 150%'
+		);
+	} );
+
 	it( 'announces rotation back to zero', () => {
 		const { result, rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
