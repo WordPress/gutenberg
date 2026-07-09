@@ -53,6 +53,14 @@
 
 .wp-block-icon__inserter-grid-icons-list-item-icon {
 	padding: $grid-unit-15;
+
+	// Fit any icon within 24x24. The viewBox preserves the aspect ratio, so
+	// non-square icons are scaled and centered without distortion.
+	svg {
+		display: block;
+		width: $icon-size;
+		height: $icon-size;
+	}
 }
 
 .wp-block-icon__inserter-grid-icons-list-item-title {

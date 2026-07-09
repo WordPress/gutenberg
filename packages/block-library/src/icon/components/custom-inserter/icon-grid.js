@@ -69,12 +69,7 @@ export default function IconGrid( { icons, onChange, value } ) {
 								__next40pxDefaultSize
 							>
 								<span className="wp-block-icon__inserter-grid-icons-list-item-icon">
-									<HtmlRenderer
-										html={ icon.content }
-										wrapperProps={ {
-											style: { width: '24px' },
-										} }
-									/>
+									<HtmlRenderer html={ icon.content } />
 								</span>
 								<span className="wp-block-icon__inserter-grid-icons-list-item-title">
 									{ icon.label }
