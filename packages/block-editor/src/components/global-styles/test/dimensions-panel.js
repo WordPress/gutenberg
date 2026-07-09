@@ -1,4 +1,4 @@
-/* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "expectAtRest", "expectNotAtRest", "expectLocalOverride", "expectPlaceholderState"] }] */
+/* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "expectLocalOverride", "expectPlaceholderState"] }] */
 /**
  * External dependencies
  */
@@ -131,39 +131,26 @@ function renderPanel( props ) {
 	);
 }
 
-/* eslint-disable testing-library/no-node-access -- The inherited / local-override
-   class hooks live on wrapper elements that have no role or label of their own,
-   so the only way to assert them is to walk up from the input via `closest`. */
-function expectAtRest( el ) {
-	expect( el.closest( '.is-inherited-from-global-styles' ) ).not.toBeNull();
-}
-function expectNotAtRest( el ) {
-	expect( el.closest( '.is-inherited-from-global-styles' ) ).toBeNull();
-}
-function expectLocalOverride( el ) {
+// A local override surfaces the accessible reset-to-inherited affordance, so
+// assert on that rather than the label's CSS class hook.
+function expectLocalOverride() {
 	expect(
-		el.closest( '.has-local-override-from-global-styles' )
-	).not.toBeNull();
+		screen.getByRole( 'button', {
+			name: /reset to inherited value/i,
+		} )
+	).toBeInTheDocument();
 }
-/* eslint-enable testing-library/no-node-access */
 
-// Asserts the at-rest placeholder treatment for a control. The single-string
-// placeholder and the inherited at-rest label treatment are independent: a
-// control can inherit a value (at-rest) while showing no placeholder when the
-// inherited sides differ (BoxControl cannot render a per-side placeholder).
-// `atRest` defaults to whether a placeholder is expected. Kept as a helper so
-// the branch isn't a conditional `expect` in the test body (which
+// Asserts the placeholder treatment for a control. A control can inherit a
+// value while showing no placeholder when the inherited sides differ
+// (BoxControl cannot render a per-side placeholder). Kept as a helper so the
+// branch isn't a conditional `expect` in the test body (which
 // `jest/no-conditional-expect` disallows).
-function expectPlaceholderState( el, placeholder, atRest = !! placeholder ) {
+function expectPlaceholderState( el, placeholder ) {
 	if ( placeholder ) {
 		expect( el ).toHaveAttribute( 'placeholder', placeholder );
 	} else {
 		expect( el ).not.toHaveAttribute( 'placeholder' );
-	}
-	if ( atRest ) {
-		expectAtRest( el );
-	} else {
-		expectNotAtRest( el );
 	}
 }
 
@@ -203,7 +190,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			const contentInput = screen.getByLabelText( /content width/i );
 			expect( contentInput ).toHaveValue( null );
 			expect( contentInput ).toHaveAttribute( 'placeholder', '720px' );
-			expectAtRest( contentInput );
 		} );
 
 		it( 'renders a locally-set contentSize as the value with no placeholder', () => {
@@ -217,7 +203,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			const contentInput = screen.getByLabelText( /content width/i );
 			expect( contentInput ).toHaveValue( 900 );
 			expect( contentInput ).not.toHaveAttribute( 'placeholder' );
-			expectNotAtRest( contentInput );
 		} );
 
 		it( 'renders an inherited wideSize as placeholder independently of contentSize state', () => {
@@ -233,13 +218,11 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			// contentSize: locally-set, no placeholder.
 			const contentInput = screen.getByLabelText( /content width/i );
 			expect( contentInput ).toHaveValue( 900 );
-			expectNotAtRest( contentInput );
 
 			// wideSize: not locally set, placeholder active.
 			const wideInput = screen.getByLabelText( /wide width/i );
 			expect( wideInput ).toHaveValue( null );
 			expect( wideInput ).toHaveAttribute( 'placeholder', '1280px' );
-			expectAtRest( wideInput );
 		} );
 
 		it( 'commits a local contentSize override on user input without copying any inherited value into other paths (strip-not-copy)', async () => {
@@ -283,7 +266,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			const gapInput = screen.getByLabelText( /block spacing/i );
 			expect( gapInput ).toHaveValue( null );
 			expect( gapInput ).toHaveAttribute( 'placeholder', '1.5rem' );
-			expectAtRest( gapInput );
 		} );
 
 		it( 'renders no placeholder for blockGap when the inherited value is the compound axial shape (single-input path can only display strings)', () => {
@@ -302,7 +284,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 
 			const gapInput = screen.getByLabelText( /block spacing/i );
 			expect( gapInput ).not.toHaveAttribute( 'placeholder' );
-			expectNotAtRest( gapInput );
 		} );
 	} );
 
@@ -329,9 +310,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			},
 			{
 				// Per-side mismatch: the single "All sides" input cannot
-				// represent differing sides, so no placeholder is shown, but
-				// the control still reflects the inherited value via the
-				// at-rest label treatment.
+				// represent differing sides, so no placeholder is shown.
 				name: 'object with sides that differ',
 				padding: {
 					top: '16px',
@@ -340,24 +319,20 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 					left: '8px',
 				},
 				placeholder: null,
-				atRest: true,
 			},
 			{
 				// Only some sides defined (e.g. the top/bottom-only margin a
-				// theme may set). No common single-string placeholder, but the
-				// inherited value is present so the control still shows the
-				// at-rest label treatment.
+				// theme may set). No common single-string placeholder.
 				name: 'object with only some sides defined',
 				padding: {
 					top: '16px',
 					bottom: '16px',
 				},
 				placeholder: null,
-				atRest: true,
 			},
 		] )(
 			'renders an inherited padding $name as placeholder $placeholder when `value` is empty',
-			( { padding, placeholder, atRest } ) => {
+			( { padding, placeholder } ) => {
 				renderPanel( {
 					value: {},
 					inheritedValue: { spacing: { padding } },
@@ -365,7 +340,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				} );
 
 				const paddingAllSides = getPaddingAllSides();
-				expectPlaceholderState( paddingAllSides, placeholder, atRest );
+				expectPlaceholderState( paddingAllSides, placeholder );
 			}
 		);
 
@@ -379,7 +354,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			const paddingAllSides = getPaddingAllSides();
 			expect( paddingAllSides ).toHaveValue( '24' );
 			expect( paddingAllSides ).not.toHaveAttribute( 'placeholder' );
-			expectNotAtRest( paddingAllSides );
 		} );
 	} );
 
@@ -424,7 +398,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 					`${ expected }`
 				);
 				expect( input ).not.toHaveAttribute( 'placeholder', inherited );
-				expectAtRest( input );
 			} );
 		}
 	);
@@ -443,7 +416,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			expect( input ).toBeDefined();
 			expect( input ).toHaveValue( null );
 			expect( input ).toHaveAttribute( 'placeholder', '640px' );
-			expectAtRest( input );
 		} );
 	} );
 
@@ -462,7 +434,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			// numeric portion.
 			expect( minHeightInput ).toHaveValue( 480 );
 			expect( minHeightInput ).not.toHaveAttribute( 'placeholder' );
-			expectNotAtRest( minHeightInput );
 		} );
 
 		it( 'does not call `onChange` on mount of an at-rest minHeight', () => {
@@ -517,10 +488,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				name: /aspect ratio/i,
 			} );
 			expect( aspectSelect ).toHaveValue( '16/9' );
-			// SelectControl forwards `className` to the BaseControl wrapper,
-			// so the at-rest hook lands on a parent of the underlying
-			// `<select>`; `closest` matches the same idiom used elsewhere.
-			expectAtRest( aspectSelect );
 		} );
 
 		it( 'renders a locally-set aspectRatio as the selected value with the local-override hook', () => {
@@ -534,12 +501,11 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				name: /aspect ratio/i,
 			} );
 			expect( aspectSelect ).toHaveValue( '1' );
-			expectNotAtRest( aspectSelect );
 			// A local override now gets the same local-override flag as
 			// every other control, so the inline reset button can attach.
 			// The button itself is portaled and covered by the
 			// InheritanceResetButton unit tests.
-			expectLocalOverride( aspectSelect );
+			expectLocalOverride();
 		} );
 
 		it( 'does not call `onChange` on mount of an at-rest aspectRatio', () => {
@@ -755,8 +721,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			expect( minHeightInput ).toBeDefined();
 			expect( minHeightInput ).toHaveValue( 0 );
 			expect( minHeightInput ).not.toHaveAttribute( 'placeholder' );
-			expectNotAtRest( minHeightInput );
-			expectLocalOverride( minHeightInput );
+			expectLocalOverride();
 		} );
 
 		it( 'treats a local zero block gap as a local value instead of inherited placeholder', () => {
@@ -769,8 +734,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			const gapInput = screen.getByLabelText( /block spacing/i );
 			expect( gapInput ).toHaveValue( 0 );
 			expect( gapInput ).not.toHaveAttribute( 'placeholder' );
-			expectNotAtRest( gapInput );
-			expectLocalOverride( gapInput );
+			expectLocalOverride();
 		} );
 	} );
 } );

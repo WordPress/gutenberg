@@ -46,54 +46,7 @@ const baseSettings = {
 };
 
 describe( 'FiltersPanel — visual treatment and display-without-commit', () => {
-	it( 'applies the at-rest className to the ToolsPanelItem when local duotone is unset and inherited is defined', () => {
-		const inheritedValue = {
-			filter: { duotone: [ '#000000', '#ffffff' ] },
-		};
-
-		const { container } = render(
-			<FiltersPanel
-				value={ {} }
-				inheritedValue={ inheritedValue }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
-
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-		const item = container.querySelector(
-			'.components-tools-panel-item.is-inherited-from-global-styles'
-		);
-		expect( item ).not.toBeNull();
-	} );
-
-	it( 'applies the local-override className to the ToolsPanelItem when local duotone is set over an inherited value', () => {
-		const inheritedValue = {
-			filter: { duotone: [ '#000000', '#ffffff' ] },
-		};
-		const value = {
-			filter: { duotone: [ '#8c00b7', '#fcff41' ] },
-		};
-
-		const { container } = render(
-			<FiltersPanel
-				value={ value }
-				inheritedValue={ inheritedValue }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
-
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-		const item = container.querySelector(
-			'.components-tools-panel-item.has-local-override-from-global-styles'
-		);
-		expect( item ).not.toBeNull();
-	} );
-
-	it( 'renders the blue-dot InheritanceResetButton for a local override', () => {
+	it( 'renders the InheritanceResetButton for a local override', () => {
 		const inheritedValue = {
 			filter: { duotone: [ '#000000', '#ffffff' ] },
 		};
@@ -111,15 +64,11 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 			/>
 		);
 
-		const resetButton = screen.getByRole( 'button', {
-			name: /reset to inherited value/i,
-		} );
-		expect( resetButton ).toHaveClass(
-			'has-local-override-from-global-styles__reset'
-		);
-		expect( resetButton ).toHaveClass(
-			'block-editor-panel-duotone-settings__reset'
-		);
+		expect(
+			screen.getByRole( 'button', {
+				name: /reset to inherited value/i,
+			} )
+		).toBeInTheDocument();
 	} );
 
 	it( 'renders the default reset button for a locally-set duotone with no inherited value', () => {

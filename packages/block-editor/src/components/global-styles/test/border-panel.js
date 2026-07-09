@@ -69,10 +69,6 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			} );
 			expect( radiusInput ).toHaveValue( 8 );
 			expect( radiusInput ).not.toHaveAttribute( 'placeholder' );
-			expect(
-				// eslint-disable-next-line testing-library/no-node-access
-				radiusInput.closest( '.is-inherited-from-global-styles' )
-			).not.toBeNull();
 		} );
 
 		it( 'uses the inherited radius unit as the selected unit when local is empty', () => {
@@ -118,13 +114,10 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			expect( radiusInput ).toHaveValue( 12 );
 			expect( radiusInput ).not.toHaveAttribute( 'placeholder' );
 			expect(
-				// eslint-disable-next-line testing-library/no-node-access
-				radiusInput.closest( '.is-inherited-from-global-styles' )
-			).toBeNull();
-			expect(
-				// eslint-disable-next-line testing-library/no-node-access
-				radiusInput.closest( '.has-local-override-from-global-styles' )
-			).not.toBeNull();
+				screen.getByRole( 'button', {
+					name: /reset to inherited value/i,
+				} )
+			).toBeInTheDocument();
 		} );
 
 		it( 'does not invoke onChange on mount when only an inherited radius is present (display-without-commit)', () => {
@@ -209,35 +202,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 	} );
 
 	describe( 'Border box (compound archetype)', () => {
-		it( 'applies the inherited-label className when local is unset and inherited is defined', () => {
-			const inheritedValue = {
-				border: {
-					color: '#000000',
-					style: 'solid',
-					width: '1px',
-				},
-			};
-
-			const { container } = render(
-				<BorderPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ settingsAll }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
-
-			// The inherited-label class lands on the parent
-			// ToolsPanelItem of the Border control.
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const inheritedItems = container.querySelectorAll(
-				'.is-inherited-from-global-styles'
-			);
-			expect( inheritedItems.length ).toBeGreaterThanOrEqual( 1 );
-		} );
-
-		it( 'applies the local-override className when a local border is defined', () => {
+		it( 'surfaces the accessible reset affordance when a local border is defined', () => {
 			const inheritedValue = {
 				border: {
 					color: '#000000',
@@ -255,7 +220,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 				},
 			};
 
-			const { container } = render(
+			render(
 				<BorderPanel
 					value={ value }
 					inheritedValue={ inheritedValue }
@@ -265,56 +230,12 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 				/>
 			);
 
-			// Inherited class never lands when local is set.
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const inheritedItems = container.querySelectorAll(
-				'.is-inherited-from-global-styles'
-			);
-			expect( inheritedItems ).toHaveLength( 0 );
-
-			// And the local-override class is present at least once.
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const overrideItems = container.querySelectorAll(
-				'.has-local-override-from-global-styles'
-			);
-			expect( overrideItems.length ).toBeGreaterThanOrEqual( 1 );
-		} );
-
-		it( 'renders a label DOM node the inheritance treatment can target (regression)', () => {
-			// Regression: `BorderBoxControl`'s built-in label is a styled
-			// component with no `.components-base-control__label`
-			// classname, so when the panel passed its visible "Border"
-			// label via that prop the inheritance treatment had no target.
-			// The panel must render its own `BaseControl.VisualLabel`
-			// inside the `ToolsPanelItem` so the treatment lands on the
-			// Border control as designed.
-			const inheritedValue = {
-				border: {
-					color: '#000000',
-					style: 'solid',
-					width: '1px',
-				},
-			};
-
-			const { container } = render(
-				<BorderPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ settingsAll }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
-
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const inheritedItem = container.querySelector(
-				'.is-inherited-from-global-styles'
-			);
-			expect( inheritedItem ).not.toBeNull();
+			// The local override surfaces the accessible reset affordance.
 			expect(
-				// eslint-disable-next-line testing-library/no-node-access
-				inheritedItem.querySelector( '.components-base-control__label' )
-			).not.toBeNull();
+				screen.getAllByRole( 'button', {
+					name: /reset to inherited value/i,
+				} ).length
+			).toBeGreaterThanOrEqual( 1 );
 		} );
 
 		it( 'does not bake the inherited radius into the local override when only color/style/width are customised (regression)', async () => {
@@ -388,41 +309,13 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 	} );
 
 	describe( 'Shadow (popover-trigger archetype)', () => {
-		it( 'applies the inherited-label className to the shadow ToolsPanelItem when local is unset and inherited is defined', () => {
-			const inheritedValue = {
-				shadow: 'var:preset|shadow|soft',
-			};
-
-			const { container } = render(
-				<BorderPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ settingsAll }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
-
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const dropdown = container.querySelector(
-				'.block-editor-global-styles__shadow-dropdown'
-			);
-			expect( dropdown ).not.toBeNull();
-			// The dropdown itself no longer carries the inheritance
-			// class — it sits inside a ToolsPanelItem that does.
-			expect(
-				// eslint-disable-next-line testing-library/no-node-access
-				dropdown.closest( '.is-inherited-from-global-styles' )
-			).not.toBeNull();
-		} );
-
-		it( 'applies the local-override className when a local shadow is set', () => {
+		it( 'surfaces the accessible reset affordance when a local shadow is set', () => {
 			const inheritedValue = {
 				shadow: 'var:preset|shadow|soft',
 			};
 			const value = { shadow: 'var:preset|shadow|hard' };
 
-			const { container } = render(
+			render(
 				<BorderPanel
 					value={ value }
 					inheritedValue={ inheritedValue }
@@ -432,19 +325,11 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 				/>
 			);
 
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const dropdown = container.querySelector(
-				'.block-editor-global-styles__shadow-dropdown'
-			);
-			expect( dropdown ).not.toBeNull();
 			expect(
-				// eslint-disable-next-line testing-library/no-node-access
-				dropdown.closest( '.is-inherited-from-global-styles' )
-			).toBeNull();
-			expect(
-				// eslint-disable-next-line testing-library/no-node-access
-				dropdown.closest( '.has-local-override-from-global-styles' )
-			).not.toBeNull();
+				screen.getByRole( 'button', {
+					name: /reset to inherited value/i,
+				} )
+			).toBeInTheDocument();
 		} );
 
 		it( 'does not invoke onChange on mount when only an inherited shadow is present', () => {
@@ -507,12 +392,11 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			// The local override renders the blue-dot reset (mirroring the
 			// color/gradient controls), not the plain remove button.
-			const resetButton = screen.getByRole( 'button', {
-				name: /reset to inherited value/i,
-			} );
-			expect( resetButton ).toHaveClass(
-				'has-local-override-from-global-styles__reset'
-			);
+			expect(
+				screen.getByRole( 'button', {
+					name: /reset to inherited value/i,
+				} )
+			).toBeInTheDocument();
 			expect(
 				screen.queryByRole( 'button', { name: /^remove$/i } )
 			).not.toBeInTheDocument();

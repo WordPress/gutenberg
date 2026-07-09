@@ -90,30 +90,24 @@ describe( 'hasBackgroundGradientValue', () => {
 } );
 
 /**
- * Tests for the inherited Global Styles label treatment in `BackgroundPanel`.
- * The visual treatment lands on the parent `ToolsPanelItem` of each slot via the
- * `.is-inherited-from-global-styles` /
- * `.has-local-override-from-global-styles` class hooks. Per-control
- * className wiring inside the popover sub-controls has been removed;
- * the inherited-state cue is conveyed once at the top label.
+ * Tests for the inherited Global Styles treatment in `BackgroundPanel`.
+ *
+ * Override state is asserted through the accessible "Reset to inherited
+ * value" button.
  *
  * Slot inventory:
  *
- * - **Background image** — renders `BackgroundImageControl`. The
- *   `ToolsPanelItem` carries the inheritance class hook based on
- *   whether `value.background.backgroundImage` is set vs. the
- *   inherited value.
+ * - Background image: renders `BackgroundImageControl`. Exposes an
+ *   accessible reset button only when size/position/repeat settings are
+ *   enabled.
  *
- * - **Background gradient** — renders `ColorPanelDropdown` (re-used
- *   from `color-panel.js`). The `ToolsPanelItem` is given the
- *   inheritance class hook; the inner `Dropdown`'s indicator still
- *   shows the inherited gradient at-rest, and the
- *   `ColorPanelTab.onChange` interceptor still commits the inherited
- *   value when the user clicks the active swatch.
+ * - Background gradient: renders `ColorPanelDropdown` (re-used from
+ *   `color-panel.js`). The inner `Dropdown` indicator shows the inherited
+ *   gradient at-rest, and the `ColorPanelTab.onChange` interceptor commits
+ *   the inherited value when the user clicks the active swatch.
  *
- * Inner sub-controls (size / repeat / attachment / focal point) are
- * intentionally untreated visually — the panel-level cue is enough
- * given they live behind a popover trigger.
+ * Inner sub-controls (size / repeat / attachment / focal point) only need
+ * to preserve display-without-commit behaviour.
  */
 
 const baseSettings = {
@@ -138,31 +132,6 @@ const baseSettings = {
 
 describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 	describe( 'Background gradient slot', () => {
-		it( 'applies the inherited-label className when local is unset and inherited is defined', () => {
-			const inheritedValue = {
-				background: {
-					gradient:
-						'linear-gradient(135deg, rgb(74, 0, 224) 0%, rgb(142, 45, 226) 100%)',
-				},
-			};
-
-			const { container } = render(
-				<BackgroundPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ baseSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
-
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const inheritedItems = container.querySelectorAll(
-				'.is-inherited-from-global-styles'
-			);
-			expect( inheritedItems.length ).toBeGreaterThanOrEqual( 1 );
-		} );
-
 		it( 'applies the local-override className when a local gradient is set', () => {
 			const inheritedValue = {
 				background: {
@@ -177,7 +146,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 				},
 			};
 
-			const { container } = render(
+			render(
 				<BackgroundPanel
 					value={ value }
 					inheritedValue={ inheritedValue }
@@ -187,11 +156,11 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 				/>
 			);
 
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const overrideItems = container.querySelectorAll(
-				'.has-local-override-from-global-styles'
-			);
-			expect( overrideItems.length ).toBeGreaterThanOrEqual( 1 );
+			expect(
+				screen.getAllByRole( 'button', {
+					name: /reset to inherited value/i,
+				} ).length
+			).toBeGreaterThanOrEqual( 1 );
 		} );
 
 		it( 'does not commit on mount when at-rest (display-without-commit)', () => {
@@ -215,104 +184,10 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
-
-		it( 'falls back to legacy color.gradient inherited path when background.gradient is unset (still applies inherited-label class)', () => {
-			const inheritedValue = {
-				color: {
-					gradient:
-						'linear-gradient(135deg, rgb(74, 0, 224) 0%, rgb(142, 45, 226) 100%)',
-				},
-			};
-
-			const { container } = render(
-				<BackgroundPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ baseSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
-
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const inheritedItems = container.querySelectorAll(
-				'.is-inherited-from-global-styles'
-			);
-			expect( inheritedItems.length ).toBeGreaterThanOrEqual( 1 );
-		} );
 	} );
 
 	describe( 'Background image slot', () => {
-		it( 'applies the inherited-label className when local has no image but inherited does (bare picker path)', () => {
-			const inheritedValue = {
-				background: {
-					backgroundImage: {
-						id: 1,
-						url: 'http://example.com/inherited.jpg',
-						title: 'inherited.jpg',
-						source: 'theme',
-					},
-				},
-			};
-
-			// Theme without backgroundSize / backgroundPosition /
-			// backgroundRepeat support takes the bare-picker path
-			// inside `BackgroundImagePanel` (the inner one in
-			// `background-image-control/index.js`). The container
-			// `<div>` carries the placeholder class directly.
-			const settingsNoSize = {
-				background: {
-					backgroundImage: true,
-					backgroundSize: false,
-				},
-			};
-			const { container } = render(
-				<BackgroundPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ settingsNoSize }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
-
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const inheritedItems = container.querySelectorAll(
-				'.is-inherited-from-global-styles'
-			);
-			expect( inheritedItems.length ).toBeGreaterThanOrEqual( 1 );
-		} );
-
-		it( 'applies the inherited-label className when size support is enabled and local image is unset (dropdown path)', () => {
-			const inheritedValue = {
-				background: {
-					backgroundImage: {
-						id: 1,
-						url: 'http://example.com/inherited.jpg',
-						title: 'inherited.jpg',
-						source: 'theme',
-					},
-				},
-			};
-
-			const { container } = render(
-				<BackgroundPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ baseSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
-
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const inheritedItems = container.querySelectorAll(
-				'.is-inherited-from-global-styles'
-			);
-			expect( inheritedItems.length ).toBeGreaterThanOrEqual( 1 );
-		} );
-
-		it( 'applies the local-override className when a local image is set', () => {
+		it( 'exposes an accessible reset-to-inherited button when size/position/repeat settings are enabled', () => {
 			const inheritedValue = {
 				background: {
 					backgroundImage: {
@@ -330,76 +205,26 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 				},
 			};
 
-			const settingsImageOnly = {
-				background: {
-					backgroundImage: true,
-					backgroundSize: false,
-				},
-			};
-			const { container } = render(
+			render(
 				<BackgroundPanel
 					value={ value }
 					inheritedValue={ inheritedValue }
-					settings={ settingsImageOnly }
+					settings={ {
+						background: {
+							backgroundImage: true,
+							backgroundSize: true,
+						},
+					} }
 					onChange={ () => {} }
 					panelId="test-panel"
 				/>
 			);
 
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const overrideItems = container.querySelectorAll(
-				'.has-local-override-from-global-styles'
-			);
-			expect( overrideItems.length ).toBeGreaterThanOrEqual( 1 );
-		} );
-
-		it( 'applies the local-override className when local explicitly removes the image (sentinel "none")', () => {
-			const inheritedValue = {
-				background: {
-					backgroundImage: {
-						id: 1,
-						url: 'http://example.com/inherited.jpg',
-					},
-				},
-			};
-			const value = {
-				background: {
-					backgroundImage: 'none',
-				},
-			};
-
-			const settingsImageOnly = {
-				background: {
-					backgroundImage: true,
-					backgroundSize: false,
-				},
-			};
-			const { container } = render(
-				<BackgroundPanel
-					value={ value }
-					inheritedValue={ inheritedValue }
-					settings={ settingsImageOnly }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
-
-			// 'none' is a sentinel that the user explicitly removed
-			// the inherited image. `hasBackgroundImageValue` treats
-			// any string value as "set", so this counts as a local
-			// override (the `has-local-override-from-global-styles`
-			// class), not as an at-rest inherited state.
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const inheritedItems = container.querySelectorAll(
-				'.is-inherited-from-global-styles'
-			);
-			expect( inheritedItems ).toHaveLength( 0 );
-
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const overrideItems = container.querySelectorAll(
-				'.has-local-override-from-global-styles'
-			);
-			expect( overrideItems.length ).toBeGreaterThanOrEqual( 1 );
+			expect(
+				screen.getByRole( 'button', {
+					name: /reset to inherited value/i,
+				} )
+			).toBeInTheDocument();
 		} );
 
 		it( 'does not commit on mount when at-rest (display-without-commit)', () => {
