@@ -10,7 +10,13 @@ import {
 /**
  * Internal dependencies
  */
-import { getValidTextAlignments, addAssignedTextAlign } from '../text-align';
+import {
+	getValidTextAlignments,
+	addAssignedTextAlign,
+	getTextAlignControlGroup,
+	getTextAlignStyleForState,
+	setTextAlignStyleForState,
+} from '../text-align';
 
 const noop = () => {};
 
@@ -59,6 +65,131 @@ describe( 'textAlign', () => {
 			expect(
 				getValidTextAlignments( [ 'left', 'right', 'justify' ] )
 			).toEqual( [ 'left', 'right' ] );
+		} );
+	} );
+
+	describe( 'getTextAlignStyleForState()', () => {
+		it( 'returns the default style when the default state is selected', () => {
+			const style = {
+				typography: {
+					textAlign: 'left',
+				},
+				'@mobile': {
+					typography: {
+						textAlign: 'right',
+					},
+				},
+			};
+
+			expect(
+				getTextAlignStyleForState( style, {
+					viewport: 'default',
+					pseudo: 'default',
+				} )
+			).toBe( style );
+		} );
+
+		it( 'returns the selected viewport style', () => {
+			expect(
+				getTextAlignStyleForState(
+					{
+						typography: {
+							textAlign: 'left',
+						},
+						'@mobile': {
+							typography: {
+								textAlign: 'right',
+							},
+						},
+					},
+					{
+						viewport: '@mobile',
+						pseudo: 'default',
+					}
+				)
+			).toEqual( {
+				typography: {
+					textAlign: 'right',
+				},
+			} );
+		} );
+	} );
+
+	describe( 'setTextAlignStyleForState()', () => {
+		it( 'updates the default style when the default state is selected', () => {
+			expect(
+				setTextAlignStyleForState(
+					{
+						typography: {
+							textAlign: 'left',
+						},
+					},
+					{
+						viewport: 'default',
+						pseudo: 'default',
+					},
+					'center'
+				)
+			).toEqual( {
+				typography: {
+					textAlign: 'center',
+				},
+			} );
+		} );
+
+		it( 'updates the selected viewport style without changing the default style', () => {
+			expect(
+				setTextAlignStyleForState(
+					{
+						typography: {
+							textAlign: 'left',
+						},
+					},
+					{
+						viewport: '@mobile',
+						pseudo: 'default',
+					},
+					'right'
+				)
+			).toEqual( {
+				typography: {
+					textAlign: 'left',
+				},
+				'@mobile': {
+					typography: {
+						textAlign: 'right',
+					},
+				},
+			} );
+		} );
+	} );
+
+	describe( 'getTextAlignControlGroup()', () => {
+		it( 'uses the regular block slot by default', () => {
+			expect(
+				getTextAlignControlGroup( false, {
+					viewport: 'default',
+					pseudo: 'default',
+				} )
+			).toBe( 'block' );
+		} );
+
+		it( 'uses the regular block slot when responsive editing has no viewport state', () => {
+			expect(
+				getTextAlignControlGroup( true, {
+					viewport: 'default',
+					pseudo: 'default',
+				} )
+			).toBe( 'block' );
+		} );
+
+		it( 'uses the style-state slot when responsive editing has a viewport state', () => {
+			expect(
+				getTextAlignControlGroup( true, {
+					viewport: '@mobile',
+					pseudo: 'default',
+				} )
+			).toBe( 'style-state' );
 		} );
 	} );
 
