@@ -16,6 +16,7 @@ import {
  * Store player state for each element.
  */
 const playerState = new WeakMap();
+const playlistPlayerState = new Map();
 
 const { state } = store(
 	'core/playlist',
@@ -30,6 +31,18 @@ const { state } = store(
 		actions: {
 			changeTrack() {
 				const context = getContext();
+				if ( context.currentId === context.trackId ) {
+					const player = playlistPlayerState.get(
+						context.playlistId
+					)?.instance;
+					if ( player?.isPlaying ) {
+						player.pause();
+					} else {
+						player?.play()?.catch( logPlayError );
+					}
+					return;
+				}
+
 				context.currentId = context.trackId;
 			},
 		},
@@ -81,6 +94,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 
 	// If a player already exists, load the new track without recreating.
 	if ( existing?.instance ) {
+		playlistPlayerState.set( context.playlistId, existing );
 		existing.instance
 			.loadTrack( track.url, track.title, track.artist, {
 				artwork: track.image,
@@ -134,9 +148,11 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 	} );
 
 	// Store state for cleanup, including instance for loadTrack reuse.
-	playerState.set( ref, {
+	const nextState = {
 		url: track.url,
 		instance: player.instance,
 		destroy: player.destroy,
-	} );
+	};
+	playerState.set( ref, nextState );
+	playlistPlayerState.set( context.playlistId, nextState );
 }
