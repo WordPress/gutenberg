@@ -16,7 +16,7 @@
 	// native form fields, so draw the text from the attribute instead.
 	[data-rich-text-placeholder]::after {
 		content: attr(data-rich-text-placeholder);
-		color: color-mix(in srgb, $gray-900, transparent 38%);
+		color: $components-color-dark-gray-placeholder;
 	}
 
 	min-height: $grid-unit-50;
