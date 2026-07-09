@@ -4,7 +4,7 @@
 import { Fragment, useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Stack } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -286,9 +286,12 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 									direction="row"
 									align="center"
 									justify="center"
+									gap="sm"
 									className="editor-collab-sidebar-panel__status-separator"
 								>
-									<p>{ __( 'Resolved' ) }</p>
+									<Text variant="heading-sm" render={ <p /> }>
+										{ __( 'Resolved' ) }
+									</Text>
 								</Stack>
 							) }
 							<NoteThread

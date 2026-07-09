@@ -129,18 +129,10 @@
 	&::before,
 	&::after {
 		content: "";
-		display: block;
-		width: 100%;
+		flex: 1;
 		height: 1px;
 		background-color: $gray-300;
-		flex: 1;
 	}
-}
-
-.editor-collab-sidebar-panel__status-separator p {
-	margin: 0;
-	padding: 0 $grid-unit-10;
-	font-weight: 600;
 }
 
 .editor-collab-sidebar-panel__more-reply-button {
