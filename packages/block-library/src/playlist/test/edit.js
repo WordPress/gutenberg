@@ -15,7 +15,7 @@ describe( 'Playlist block edit utilities', () => {
 				fileLength: '3:45',
 				image: {
 					src: 'https://example.com/cover.jpg',
-					alt: 'A bright abstract album cover',
+					alt: 'A bright abstract track image',
 				},
 			};
 
@@ -29,7 +29,7 @@ describe( 'Playlist block edit utilities', () => {
 				album: 'Great Album',
 				length: '3:45',
 				image: 'https://example.com/cover.jpg',
-				imageAlt: 'A bright abstract album cover',
+				imageAlt: 'A bright abstract track image',
 			} );
 		} );
 
@@ -70,7 +70,7 @@ describe( 'Playlist block edit utilities', () => {
 			expect( result.artist ).toBe( 'Media Details Artist' );
 		} );
 
-		it( 'should use "Unknown artist" when no artist is available', () => {
+		it( 'should use "Unknown creator" when no creator is available', () => {
 			const media = {
 				url: 'https://example.com/song.mp3',
 				title: 'My Song',
@@ -78,7 +78,7 @@ describe( 'Playlist block edit utilities', () => {
 
 			const result = getTrackAttributes( media );
 
-			expect( result.artist ).toBe( 'Unknown artist' );
+			expect( result.artist ).toBe( 'Unknown creator' );
 		} );
 
 		it( 'should use "Unknown album" when no album is available', () => {

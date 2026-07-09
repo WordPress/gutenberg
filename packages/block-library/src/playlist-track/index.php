@@ -51,7 +51,7 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 
 	if ( $length ) {
 		$html .= '<span class="wp-block-playlist-track__length">';
-		$html .= '<span class="screen-reader-text">' . esc_html__( 'Length:' ) . ' </span>';
+		$html .= '<span class="screen-reader-text">' . esc_html__( 'Duration:' ) . ' </span>';
 		$html .= esc_html( $length );
 		$html .= '</span>';
 	}

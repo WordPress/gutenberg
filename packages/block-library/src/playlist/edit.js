@@ -257,7 +257,7 @@ const PlaylistEdit = ( {
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
-						label={ __( 'Show Tracklist' ) }
+						label={ __( 'Show tracklist' ) }
 						isShownByDefault
 						hasValue={ () => showTracklist !== true }
 						onDeselect={ () =>
@@ -265,7 +265,7 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							label={ __( 'Show Tracklist' ) }
+							label={ __( 'Show tracklist' ) }
 							onChange={ toggleAttribute( 'showTracklist' ) }
 							checked={ showTracklist }
 						/>
@@ -273,7 +273,7 @@ const PlaylistEdit = ( {
 					{ showTracklist && (
 						<>
 							<ToolsPanelItem
-								label={ __( 'Show artist name in Tracklist' ) }
+								label={ __( 'Show creator name in tracklist' ) }
 								isShownByDefault
 								hasValue={ () => showArtists !== true }
 								onDeselect={ () =>
@@ -282,7 +282,7 @@ const PlaylistEdit = ( {
 							>
 								<ToggleControl
 									label={ __(
-										'Show artist name in Tracklist'
+										'Show creator name in tracklist'
 									) }
 									onChange={ toggleAttribute(
 										'showArtists'
@@ -291,7 +291,9 @@ const PlaylistEdit = ( {
 								/>
 							</ToolsPanelItem>
 							<ToolsPanelItem
-								label={ __( 'Show number in Tracklist' ) }
+								label={ __(
+									'Show track numbers in tracklist'
+								) }
 								isShownByDefault
 								hasValue={ () => showNumbers !== true }
 								onDeselect={ () =>
@@ -299,7 +301,9 @@ const PlaylistEdit = ( {
 								}
 							>
 								<ToggleControl
-									label={ __( 'Show number in Tracklist' ) }
+									label={ __(
+										'Show track numbers in tracklist'
+									) }
 									onChange={ toggleAttribute(
 										'showNumbers'
 									) }
@@ -307,7 +311,9 @@ const PlaylistEdit = ( {
 								/>
 							</ToolsPanelItem>
 							<ToolsPanelItem
-								label={ __( 'Show track length in Tracklist' ) }
+								label={ __(
+									'Show track duration in tracklist'
+								) }
 								isShownByDefault
 								hasValue={ () => showTrackLength !== true }
 								onDeselect={ () =>
@@ -316,7 +322,7 @@ const PlaylistEdit = ( {
 							>
 								<ToggleControl
 									label={ __(
-										'Show track length in Tracklist'
+										'Show track duration in tracklist'
 									) }
 									onChange={ toggleAttribute(
 										'showTrackLength'

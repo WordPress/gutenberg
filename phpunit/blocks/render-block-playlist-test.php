@@ -258,7 +258,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	 * @covers ::render_block_core_playlist
 	 * @covers ::render_block_core_playlist_track
 	 */
-	public function test_tracklist_renders_album_art_when_show_images_is_enabled() {
+	public function test_tracklist_renders_track_image_when_show_images_is_enabled() {
 		$markup = $this->build_playlist_markup(
 			array( 'showImages' => true ),
 			array(
@@ -267,7 +267,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 					'title'    => 'Song One',
 					'src'      => 'http://example.com/song1.mp3',
 					'image'    => 'http://example.com/image1.jpg',
-					'imageAlt' => 'A bright abstract album cover',
+					'imageAlt' => 'A bright abstract track image',
 				),
 			)
 		);
@@ -276,14 +276,14 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'class="wp-block-playlist-track__image"', $output );
 		$this->assertStringContainsString( 'src="http://example.com/image1.jpg"', $output );
-		$this->assertStringContainsString( 'alt="A bright abstract album cover"', $output );
+		$this->assertStringContainsString( 'alt="A bright abstract track image"', $output );
 	}
 
 	/**
 	 * @covers ::render_block_core_playlist
 	 * @covers ::render_block_core_playlist_track
 	 */
-	public function test_tracklist_does_not_render_album_art_when_show_images_is_disabled() {
+	public function test_tracklist_does_not_render_track_image_when_show_images_is_disabled() {
 		$markup = $this->build_playlist_markup(
 			array( 'showImages' => false ),
 			array(
@@ -317,16 +317,16 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	/**
 	 * @covers ::render_block_core_playlist
 	 */
-	public function test_aria_label_with_title_artist_and_album() {
+	public function test_aria_label_with_title_creator_and_album() {
 		$markup = $this->build_playlist_markup(
 			array(),
 			array(
 				array(
 					'id'     => 1,
-					'title'  => 'Song One',
-					'artist' => 'Artist One',
+					'title'  => 'Track One',
+					'artist' => 'Creator One',
 					'album'  => 'Album One',
-					'src'    => 'http://example.com/song1.mp3',
+					'src'    => 'http://example.com/track1.mp3',
 				),
 			)
 		);
@@ -338,7 +338,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 		$track    = $playlist['tracks']['track-0'];
 
 		$this->assertSame(
-			'Song One by Artist One from the album Album One',
+			'Track One by Creator One from the album Album One',
 			$track['ariaLabel']
 		);
 	}
