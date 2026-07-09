@@ -399,7 +399,16 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
 	// gap on the gallery.
 	$fallback_gap = 'var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )';
-	$gap_column   = block_core_gallery_get_column_gap_value( $style_attr['spacing']['blockGap'] ?? null, $fallback_gap );
+
+	$global_styles         = function_exists( 'wp_get_global_styles' ) ? wp_get_global_styles() : array();
+	$global_gallery_styles = $global_styles['blocks']['core/gallery'] ?? array();
+	$global_block_gap      = $global_gallery_styles['spacing']['blockGap'] ?? $global_styles['spacing']['blockGap'] ?? null;
+	$has_block_gap         = is_array( $style_attr['spacing'] ?? null ) && array_key_exists( 'blockGap', $style_attr['spacing'] );
+	// Prefer the block's own gap value, then Gallery global styles, then root global styles.
+	$block_gap  = $has_block_gap
+		? $style_attr['spacing']['blockGap']
+		: $global_block_gap;
+	$gap_column = block_core_gallery_get_column_gap_value( $block_gap, $fallback_gap );
 
 	// Set the CSS variable to the column value for Gallery's flex width calculations.
 	$gallery_styles = array(
@@ -422,8 +431,24 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	}
 
 	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
-		$viewport_style = $style_attr[ $breakpoint ] ?? null;
-		if ( ! is_array( $viewport_style ) || ! isset( $viewport_style['spacing']['blockGap'] ) ) {
+		$viewport_style                = $style_attr[ $breakpoint ] ?? null;
+		$has_viewport_block_gap        = is_array( $viewport_style ) &&
+			is_array( $viewport_style['spacing'] ?? null ) &&
+			array_key_exists( 'blockGap', $viewport_style['spacing'] );
+		$has_global_viewport_block_gap = is_array( $global_gallery_styles[ $breakpoint ]['spacing'] ?? null ) &&
+			array_key_exists( 'blockGap', $global_gallery_styles[ $breakpoint ]['spacing'] );
+
+		// Viewport-specific block values win. Global viewport values only apply
+		// when the block has no base gap, so they do not override an instance value.
+		if ( $has_viewport_block_gap ) {
+			$viewport_gap = $viewport_style['spacing']['blockGap'];
+		} elseif ( ! $has_block_gap && $has_global_viewport_block_gap ) {
+			$viewport_gap = $global_gallery_styles[ $breakpoint ]['spacing']['blockGap'];
+		} else {
+			continue;
+		}
+
+		if ( null === $viewport_gap ) {
 			continue;
 		}
 
@@ -431,7 +456,7 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 			'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
 			'declarations' => array(
 				'--wp--style--unstable-gallery-gap' => block_core_gallery_get_column_gap_value(
-					$viewport_style['spacing']['blockGap'],
+					$viewport_gap,
 					$fallback_gap
 				),
 			),
