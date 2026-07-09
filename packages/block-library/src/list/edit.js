@@ -43,7 +43,7 @@ const DEFAULT_BLOCK = {
  */
 function useMigrateOnLoad( attributes, clientId ) {
 	const registry = useRegistry();
-	const { updateBlockAttributes, replaceInnerBlocks } =
+	const { updateBlockAttributes, replaceInnerBlocks, selectBlock } =
 		useDispatch( blockEditorStore );
 
 	useEffect( () => {
@@ -61,9 +61,19 @@ function useMigrateOnLoad( attributes, clientId ) {
 			alternative: 'inner blocks',
 		} );
 
+		// The selection can be inside an inner block created from the block
+		// type template at insertion, which the migration replaces; restore
+		// the selection to the migrated block in that case.
+		const shouldReselectBlock = registry
+			.select( blockEditorStore )
+			.hasSelectedInnerBlock( clientId, true );
+
 		registry.batch( () => {
 			updateBlockAttributes( clientId, newAttributes );
 			replaceInnerBlocks( clientId, newInnerBlocks );
+			if ( shouldReselectBlock ) {
+				selectBlock( clientId );
+			}
 		} );
 	}, [ attributes.values ] );
 }
