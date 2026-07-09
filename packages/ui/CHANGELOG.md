@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   `Tabs`: Re-measure overflow when the list or its content changes size so the scroll fade stays in sync as labels/badges load or a web font reflows the tabs. ([#79856](https://github.com/WordPress/gutenberg/pull/79856))
 -   `IconButton`: Keep the inline padding override valid when reused in button length calculations ([#79722](https://github.com/WordPress/gutenberg/pull/79722)).
 -   `IconButton`: Restore the default tooltip delay on hover ([#79505](https://github.com/WordPress/gutenberg/pull/79505)).
 -   `Button`: Fix corner artifacts by using `background-clip: border-box` ([#79524](https://github.com/WordPress/gutenberg/pull/79524))
