@@ -9,7 +9,6 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { image as imageIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -44,26 +43,30 @@ export default function GifRestoreControl( { attributes, clientId } ) {
 	// The original GIF is the underlying image attachment. Only offer the
 	// restore when the media resolves to an image (an editor-converted GIF),
 	// not when a regular video has simply been set to loop/autoplay/mute.
-	const gif = useSelect(
+	const { gif, canRestoreToImage } = useSelect(
 		( select ) => {
-			if ( ! id ) {
-				return null;
-			}
-			const record = select( coreStore ).getEntityRecord(
-				'postType',
-				'attachment',
-				id,
-				{ context: 'view' }
-			);
-			if ( ! record?.mime_type?.startsWith( 'image/' ) ) {
-				return null;
-			}
-			return record;
+			const { getEntityRecord } = select( coreStore );
+			const { canInsertBlockType, getBlockRootClientId } =
+				select( blockEditorStore );
+
+			const record = id
+				? getEntityRecord( 'postType', 'attachment', id, {
+						context: 'view',
+				  } )
+				: null;
+
+			return {
+				gif: record?.mime_type?.startsWith( 'image/' ) ? record : null,
+				canRestoreToImage: canInsertBlockType(
+					'core/image',
+					getBlockRootClientId( clientId )
+				),
+			};
 		},
-		[ id ]
+		[ id, clientId ]
 	);
 
-	if ( ! gif?.source_url ) {
+	if ( ! gif?.source_url || ! canRestoreToImage ) {
 		return null;
 	}
 
@@ -83,7 +86,7 @@ export default function GifRestoreControl( { attributes, clientId } ) {
 	return (
 		<BlockControls group="other">
 			<ToolbarGroup>
-				<ToolbarButton icon={ imageIcon } onClick={ restoreToImage }>
+				<ToolbarButton onClick={ restoreToImage }>
 					{ __( 'Display as GIF' ) }
 				</ToolbarButton>
 			</ToolbarGroup>

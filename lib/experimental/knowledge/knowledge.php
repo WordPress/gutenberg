@@ -179,7 +179,7 @@ if ( ! function_exists( 'wp_knowledge_ensure_default_type_term' ) ) {
 			return;
 		}
 
-		if ( 0 === strpos( $post->post_name, 'guideline-' ) ) {
+		if ( str_starts_with( $post->post_name, 'guideline-' ) ) {
 			$term_id = wp_knowledge_get_or_create_type_term( 'guideline' );
 			if ( null !== $term_id ) {
 				wp_set_object_terms( $post_id, $term_id, 'wp_knowledge_type' );
@@ -337,7 +337,7 @@ if ( ! function_exists( 'wp_guideline_scope_from_slug' ) ) {
 	 * @return string|null Scope key, or null if not a registry scope.
 	 */
 	function wp_guideline_scope_from_slug( string $slug ): ?string {
-		if ( 0 !== strpos( $slug, 'guideline-' ) || 0 === strpos( $slug, 'guideline-block-' ) ) {
+		if ( ! str_starts_with( $slug, 'guideline-' ) || str_starts_with( $slug, 'guideline-block-' ) ) {
 			return null;
 		}
 
@@ -383,7 +383,7 @@ if ( ! function_exists( 'wp_knowledge_guard_guideline_row' ) ) {
 			}
 		}
 
-		if ( 0 !== strpos( (string) $slug, 'guideline-' ) ) {
+		if ( ! str_starts_with( (string) $slug, 'guideline-' ) ) {
 			return $prepared_post;
 		}
 
