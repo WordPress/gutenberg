@@ -22,8 +22,7 @@ import { useBlockElement } from '../components/block-list/use-block-props/use-bl
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
 import { deviceTypeKey } from '../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
-import { getStyleForState } from './block-style-state';
-import { DEFAULT_STATE_VALUE } from '../utils/style-states';
+import { DEFAULT_STATE_VALUE, getStyleForState } from '../utils/style-states';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 

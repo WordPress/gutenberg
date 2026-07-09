@@ -23,8 +23,11 @@ import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
 import { cleanEmptyObject } from './utils';
 import { extractPresetSlug } from '../utils/color-values';
 import { store as blockEditorStore } from '../store';
-import { getStyleForState, setStyleForState } from './block-style-state';
-import { hasStyleStateValue } from '../utils/style-states';
+import {
+	getStyleForState,
+	hasStyleStateValue,
+	setStyleForState,
+} from '../utils/style-states';
 import useBlockColorContrastWarning from './contrast-checker';
 
 function omit( object, keys ) {

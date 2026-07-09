@@ -30,8 +30,11 @@ import {
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
-import { getStyleForState, setStyleForState } from './block-style-state';
-import { hasStyleStateValue } from '../utils/style-states';
+import {
+	getStyleForState,
+	hasStyleStateValue,
+	setStyleForState,
+} from '../utils/style-states';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 export const SHADOW_SUPPORT_KEY = 'shadow';

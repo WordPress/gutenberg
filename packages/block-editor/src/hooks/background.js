@@ -25,8 +25,11 @@ import {
 	hasBackgroundGradientValue,
 } from '../components/global-styles/background-panel';
 import { globalStylesDataKey } from '../store/private-keys';
-import { getStyleForState, setStyleForState } from './block-style-state';
-import { hasStyleStateValue } from '../utils/style-states';
+import {
+	getStyleForState,
+	hasStyleStateValue,
+	setStyleForState,
+} from '../utils/style-states';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 

@@ -18,8 +18,11 @@ import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 import { COLOR_SUPPORT_KEY } from './color';
 import useBlockColorContrastWarning from './contrast-checker';
-import { getStyleForState, setStyleForState } from './block-style-state';
-import { hasStyleStateValue } from '../utils/style-states';
+import {
+	getStyleForState,
+	hasStyleStateValue,
+	setStyleForState,
+} from '../utils/style-states';
 
 function ElementsInspectorControl( { children, resetAllFilter } ) {
 	const attributesResetAllFilter = useCallback(

@@ -38,8 +38,11 @@ import { cleanEmptyObject, useBlockSettings, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 import { globalStylesDataKey } from '../store/private-keys';
 import { getVariationNameFromClass } from './block-style-variation';
-import { getStyleForState, setStyleForState } from './block-style-state';
-import { DEFAULT_STATE_VALUE } from '../utils/style-states';
+import {
+	DEFAULT_STATE_VALUE,
+	getStyleForState,
+	setStyleForState,
+} from '../utils/style-states';
 
 const VARIATION_PREFIX = 'is-style-';
 

@@ -19,7 +19,7 @@ import {
 	isInListViewBlockSupportTreeKey,
 } from '../block-edit/context';
 import groups from './groups';
-import { scopeResetAllFilterToState } from '../../hooks/block-style-state';
+import { scopeResetAllFilterToState } from '../../utils/style-states';
 import { ListViewContentFill } from './list-view-content-popover';
 import { PrivateBlockContext } from '../block-list/private-block-context';
 

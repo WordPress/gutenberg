@@ -41,9 +41,9 @@ import {
 	useStyleOverride,
 	useBlockSettings,
 } from './utils';
-import { getStyleForState } from './block-style-state';
 import {
 	DEFAULT_STATE_VALUE,
+	getStyleForState,
 	hasViewportStyleStateValue,
 	hasPseudoStyleStateValue,
 } from '../utils/style-states';

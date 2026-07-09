@@ -4,6 +4,29 @@ type ObjectPathKey = number | string;
 type ObjectPath = ObjectPathKey | ObjectPathKey[];
 
 /**
+ * Removed falsy values from nested object.
+ *
+ * @param object Input object.
+ * @return Object cleaned from falsy values.
+ */
+export function cleanEmptyObject< T >( object: T ): T | undefined {
+	if (
+		object === null ||
+		typeof object !== 'object' ||
+		Array.isArray( object )
+	) {
+		return object;
+	}
+
+	const cleanedNestedObjects = Object.entries( object )
+		.map( ( [ key, value ] ) => [ key, cleanEmptyObject( value ) ] )
+		.filter( ( [ , value ] ) => value !== undefined );
+	return ! cleanedNestedObjects.length
+		? undefined
+		: ( Object.fromEntries( cleanedNestedObjects ) as T );
+}
+
+/**
  * Immutably sets a value inside an object. Like `lodash#set`, but returning a
  * new object. Treats nullish initial values as empty objects. Clones any
  * nested objects. Supports arrays, too.
