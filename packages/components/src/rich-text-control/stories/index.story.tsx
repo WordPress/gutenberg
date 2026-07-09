@@ -19,9 +19,6 @@ const meta: Meta< typeof RichTextControl > = {
 	argTypes: {
 		children: { control: false },
 		isSelected: { control: false },
-		label: { control: { type: 'text' } },
-		hideLabelFromVision: { control: { type: 'boolean' } },
-		disableLineBreaks: { control: { type: 'boolean' } },
 	},
 	tags: [ 'status-private' ],
 	parameters: {

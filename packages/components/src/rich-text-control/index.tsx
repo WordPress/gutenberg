@@ -127,6 +127,5 @@ function UnforwardedRichTextControl(
 }
 
 export const RichTextControl = forwardRef( UnforwardedRichTextControl );
-RichTextControl.displayName = 'RichTextControl';
 
 export default RichTextControl;
