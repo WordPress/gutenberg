@@ -1,0 +1,28 @@
+.wp-block-playlist-tracklist,
+.wp-block-playlist__tracklist {
+	margin: 0;
+	padding-left: 0;
+	list-style: none;
+
+	&.wp-block-playlist__tracklist-is-hidden {
+		display: none;
+	}
+
+	&.wp-block-playlist__tracklist-artist-is-hidden {
+		// Hide the artist name, which is in the playlist-track block.
+		.wp-block-playlist-track__artist {
+			display: none;
+		}
+	}
+
+	&.wp-block-playlist__tracklist-length-is-hidden {
+		// Hide the track length, which is in the playlist-track block.
+		.wp-block-playlist-track__length {
+			display: none;
+		}
+	}
+
+	&.wp-block-playlist__tracklist-show-numbers {
+		counter-reset: playlist-track;
+	}
+}

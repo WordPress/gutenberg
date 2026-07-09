@@ -1,0 +1,50 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"__experimental": true,
+	"name": "core/playlist-player",
+	"title": "Playlist player",
+	"category": "media",
+	"parent": [ "core/playlist" ],
+	"description": "Playlist player.",
+	"keywords": [ "music", "sound" ],
+	"textdomain": "default",
+	"attributes": {
+		"waveformColor": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"color": {
+			"background": true,
+			"text": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"typography": {
+			"fontSize": true
+		},
+		"spacing": {
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"padding": true
+			}
+		},
+		"dimensions": {
+			"minHeight": true
+		}
+	},
+	"styles": [
+		{ "name": "bars", "label": "Bars", "isDefault": true },
+		{ "name": "mirror", "label": "Mirror" },
+		{ "name": "line", "label": "Line" },
+		{ "name": "blocks", "label": "Blocks" },
+		{ "name": "dots", "label": "Dots" },
+		{ "name": "seekbar", "label": "Seekbar" }
+	],
+	"style": "wp-block-playlist-player"
+}

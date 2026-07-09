@@ -15,16 +15,7 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	BlockControls,
-	InspectorControls,
-	InnerBlocks,
 } from '@wordpress/block-editor';
-import {
-	ToggleControl,
-	Disabled,
-	SelectControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
@@ -35,12 +26,15 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { Caption } from '../utils/caption';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { WaveformPlayer } from '../utils/waveform-player';
 import { PlaylistContext } from './context';
 import { getTrackAttributes } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+const ALLOWED_BLOCKS = [ 'core/playlist-player', 'core/playlist-tracklist' ];
+
+function getStyleVariationName( className ) {
+	return className?.match( /is-style-([\w-]+)/ )?.[ 1 ];
+}
 
 const PlaylistEdit = ( {
 	attributes,
@@ -49,36 +43,34 @@ const PlaylistEdit = ( {
 	insertBlocksAfter,
 	clientId,
 } ) => {
-	const {
-		order,
-		showTracklist,
-		showNumbers,
-		showImages,
-		showArtists,
-		showTrackLength,
-	} = attributes;
-
-	// Extract the waveform style from the block style variation class.
-	const waveformStyle =
-		attributes.className?.match( /is-style-([\w-]+)/ )?.[ 1 ] || 'bars';
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 	const [ currentTrackClientId, setCurrentTrackClientId ] = useState( null );
 
-	const { innerBlockTracks } = useSelect(
+	const { innerBlocks } = useSelect(
 		( select ) => {
 			const { getBlock: _getBlock } = select( blockEditorStore );
 			return {
-				innerBlockTracks: _getBlock( clientId )?.innerBlocks ?? [],
+				innerBlocks: _getBlock( clientId )?.innerBlocks ?? [],
 			};
 		},
 		[ clientId ]
 	);
+
+	const playerBlock = innerBlocks.find(
+		( block ) => block.name === 'core/playlist-player'
+	);
+	const tracklistBlock = innerBlocks.find(
+		( block ) => block.name === 'core/playlist-tracklist'
+	);
+	const directTrackBlocks = innerBlocks.filter(
+		( block ) => block.name === 'core/playlist-track'
+	);
+	const innerBlockTracks = tracklistBlock?.innerBlocks ?? directTrackBlocks;
 
 	// Create a list of tracks from the inner blocks,
 	// but skip blocks that do not have a source, such as the media placeholder.
@@ -99,6 +91,73 @@ const PlaylistEdit = ( {
 	);
 
 	useEffect( () => {
+		if ( innerBlocks.length === 0 ) {
+			return;
+		}
+
+		if ( playerBlock && tracklistBlock && directTrackBlocks.length === 0 ) {
+			return;
+		}
+
+		const trackBlocks = [
+			...( tracklistBlock?.innerBlocks ?? [] ),
+			...directTrackBlocks,
+		];
+
+		if ( trackBlocks.length === 0 ) {
+			return;
+		}
+
+		const playerAttributes =
+			playerBlock?.attributes ??
+			( attributes.className ? { className: attributes.className } : {} );
+		const tracklistAttributes = tracklistBlock?.attributes ?? {
+			order: attributes.order ?? 'asc',
+			showImages: attributes.showImages ?? true,
+			showArtists: attributes.showArtists ?? true,
+			showNumbers: attributes.showNumbers ?? true,
+			showTrackLength: attributes.showTrackLength ?? true,
+		};
+		const normalizedTracklistBlock = tracklistBlock
+			? {
+					...tracklistBlock,
+					innerBlocks: trackBlocks,
+			  }
+			: createBlock(
+					'core/playlist-tracklist',
+					tracklistAttributes,
+					trackBlocks
+			  );
+		const normalizedBlocks = [
+			playerBlock ??
+				createBlock( 'core/playlist-player', playerAttributes ),
+			normalizedTracklistBlock,
+		];
+		const normalizedCurrentTrack =
+			trackBlocks.find(
+				( block ) => block.clientId === currentTrackClientId
+			) ?? trackBlocks[ 0 ];
+
+		replaceInnerBlocks( clientId, normalizedBlocks, false );
+		setCurrentTrackClientId( normalizedCurrentTrack?.clientId ?? null );
+	}, [
+		attributes.className,
+		attributes.order,
+		attributes.showArtists,
+		attributes.showImages,
+		attributes.showNumbers,
+		attributes.showTrackLength,
+		clientId,
+		currentTrackClientId,
+		directTrackBlocks,
+		innerBlocks.length,
+		playerBlock,
+		replaceInnerBlocks,
+		setCurrentTrackClientId,
+		tracklistBlock,
+	] );
+
+	useEffect( () => {
 		if ( validTracks.length === 0 ) {
 			if ( currentTrackClientId !== null ) {
 				setCurrentTrackClientId( null );
@@ -114,11 +173,6 @@ const PlaylistEdit = ( {
 		}
 	}, [ currentTrackClientId, setCurrentTrackClientId, validTracks ] );
 
-	const playlistContext = useMemo(
-		() => ( { currentTrackClientId, setCurrentTrackClientId } ),
-		[ currentTrackClientId, setCurrentTrackClientId ]
-	);
-
 	const onSelectTracks = useCallback(
 		( media ) => {
 			if ( ! media ) {
@@ -131,14 +185,32 @@ const PlaylistEdit = ( {
 
 			const trackList = media.map( getTrackAttributes );
 
-			const newBlocks = trackList.map( ( track ) =>
+			const trackBlocks = trackList.map( ( track ) =>
 				createBlock( 'core/playlist-track', track )
 			);
-			setCurrentTrackClientId( newBlocks[ 0 ]?.clientId ?? null );
-			// Replace the inner blocks with the new tracks.
+			const newBlocks = [
+				createBlock(
+					'core/playlist-player',
+					playerBlock?.attributes ?? {}
+				),
+				createBlock(
+					'core/playlist-tracklist',
+					tracklistBlock?.attributes ?? {},
+					trackBlocks
+				),
+			];
+
+			setCurrentTrackClientId( trackBlocks[ 0 ]?.clientId ?? null );
+			// Replace the inner blocks with the new playlist structure.
 			replaceInnerBlocks( clientId, newBlocks );
 		},
-		[ replaceInnerBlocks, clientId, setCurrentTrackClientId ]
+		[
+			replaceInnerBlocks,
+			clientId,
+			playerBlock?.attributes,
+			setCurrentTrackClientId,
+			tracklistBlock?.attributes,
+		]
 	);
 
 	// Get current track data by finding the track with matching client ID.
@@ -157,49 +229,37 @@ const PlaylistEdit = ( {
 		}
 	}, [ currentTrackClientId, setCurrentTrackClientId, tracks ] );
 
-	const onChangeOrder = useCallback(
-		( trackOrder ) => {
-			const sortedBlocks = [ ...innerBlockTracks ].sort( ( a, b ) => {
-				const titleA = a.attributes.title || '';
-				const titleB = b.attributes.title || '';
-
-				if ( trackOrder === 'asc' ) {
-					return titleA.localeCompare( titleB );
-				}
-				return titleB.localeCompare( titleA );
-			} );
-			replaceInnerBlocks( clientId, sortedBlocks );
-			setCurrentTrackClientId( sortedBlocks[ 0 ]?.clientId ?? null );
-			setAttributes( {
-				order: trackOrder,
-			} );
-		},
-		[
-			clientId,
-			innerBlockTracks,
-			replaceInnerBlocks,
-			setAttributes,
+	const playlistContext = useMemo(
+		() => ( {
+			currentTrackClientId,
+			currentTrackData,
+			onTrackEnded,
 			setCurrentTrackClientId,
+			showImages:
+				tracklistBlock?.attributes?.showImages ??
+				attributes.showImages ??
+				true,
+			waveformStyle:
+				getStyleVariationName( playerBlock?.attributes?.className ) ??
+				getStyleVariationName( attributes.className ) ??
+				'bars',
+		} ),
+		[
+			attributes.className,
+			attributes.showImages,
+			currentTrackClientId,
+			currentTrackData,
+			onTrackEnded,
+			playerBlock?.attributes?.className,
+			setCurrentTrackClientId,
+			tracklistBlock?.attributes?.showImages,
 		]
 	);
 
-	function toggleAttribute( attribute ) {
-		return ( newValue ) => {
-			setAttributes( { [ attribute ]: newValue } );
-		};
-	}
-
-	const hasSelectedChild = useSelect(
-		( select ) =>
-			select( blockEditorStore ).hasSelectedInnerBlock( clientId ),
-		[ clientId ]
-	);
-
-	const hasAnySelected = isSelected || hasSelectedChild;
-
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		__experimentalAppenderTagName: 'li',
-		renderAppender: hasAnySelected && InnerBlocks.ButtonBlockAppender,
+	const { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+		renderAppender: false,
+		templateLock: 'all',
 	} );
 
 	if ( tracks.length === 0 ) {
@@ -241,157 +301,10 @@ const PlaylistEdit = ( {
 					onError={ onUploadError }
 				/>
 			</BlockControls>
-			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						setAttributes( {
-							showTracklist: true,
-							showArtists: true,
-							showNumbers: true,
-							showTrackLength: true,
-							showImages: true,
-							order: 'asc',
-						} );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					<ToolsPanelItem
-						label={ __( 'Show Tracklist' ) }
-						isShownByDefault
-						hasValue={ () => showTracklist !== true }
-						onDeselect={ () =>
-							setAttributes( { showTracklist: true } )
-						}
-					>
-						<ToggleControl
-							label={ __( 'Show Tracklist' ) }
-							onChange={ toggleAttribute( 'showTracklist' ) }
-							checked={ showTracklist }
-						/>
-					</ToolsPanelItem>
-					{ showTracklist && (
-						<>
-							<ToolsPanelItem
-								label={ __( 'Show artist name in Tracklist' ) }
-								isShownByDefault
-								hasValue={ () => showArtists !== true }
-								onDeselect={ () =>
-									setAttributes( { showArtists: true } )
-								}
-							>
-								<ToggleControl
-									label={ __(
-										'Show artist name in Tracklist'
-									) }
-									onChange={ toggleAttribute(
-										'showArtists'
-									) }
-									checked={ showArtists }
-								/>
-							</ToolsPanelItem>
-							<ToolsPanelItem
-								label={ __( 'Show number in Tracklist' ) }
-								isShownByDefault
-								hasValue={ () => showNumbers !== true }
-								onDeselect={ () =>
-									setAttributes( { showNumbers: true } )
-								}
-							>
-								<ToggleControl
-									label={ __( 'Show number in Tracklist' ) }
-									onChange={ toggleAttribute(
-										'showNumbers'
-									) }
-									checked={ showNumbers }
-								/>
-							</ToolsPanelItem>
-							<ToolsPanelItem
-								label={ __( 'Show track length in Tracklist' ) }
-								isShownByDefault
-								hasValue={ () => showTrackLength !== true }
-								onDeselect={ () =>
-									setAttributes( { showTrackLength: true } )
-								}
-							>
-								<ToggleControl
-									label={ __(
-										'Show track length in Tracklist'
-									) }
-									onChange={ toggleAttribute(
-										'showTrackLength'
-									) }
-									checked={ showTrackLength }
-								/>
-							</ToolsPanelItem>
-						</>
-					) }
-					<ToolsPanelItem
-						label={ __( 'Show images' ) }
-						isShownByDefault
-						hasValue={ () => showImages !== true }
-						onDeselect={ () =>
-							setAttributes( { showImages: true } )
-						}
-					>
-						<ToggleControl
-							label={ __( 'Show images' ) }
-							onChange={ toggleAttribute( 'showImages' ) }
-							checked={ showImages }
-						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						label={ __( 'Order' ) }
-						isShownByDefault
-						hasValue={ () => order !== 'asc' }
-						onDeselect={ () => setAttributes( { order: 'asc' } ) }
-					>
-						<SelectControl
-							label={ __( 'Order' ) }
-							value={ order }
-							options={ [
-								{ label: __( 'Descending' ), value: 'desc' },
-								{ label: __( 'Ascending' ), value: 'asc' },
-							] }
-							onChange={ ( value ) => onChangeOrder( value ) }
-						/>
-					</ToolsPanelItem>
-				</ToolsPanel>
-			</InspectorControls>
-			<figure { ...blockProps }>
-				<Disabled isDisabled={ ! isSelected }>
-					<WaveformPlayer
-						src={ currentTrackData?.src }
-						title={ currentTrackData?.title }
-						artist={ currentTrackData?.artist }
-						image={
-							showImages !== false
-								? currentTrackData?.image
-								: undefined
-						}
-						imageAlt={
-							showImages !== false
-								? currentTrackData?.imageAlt
-								: undefined
-						}
-						waveformStyle={ waveformStyle }
-						onEnded={ onTrackEnded }
-					/>
-				</Disabled>
-				{ showTracklist && (
-					<ol
-						className={ clsx( 'wp-block-playlist__tracklist', {
-							'wp-block-playlist__tracklist-show-numbers':
-								showNumbers,
-							'wp-block-playlist__tracklist-length-is-hidden':
-								! showTrackLength,
-						} ) }
-					>
-						<PlaylistContext.Provider value={ playlistContext }>
-							{ innerBlocksProps.children }
-						</PlaylistContext.Provider>
-					</ol>
-				) }
+			<figure { ...innerBlocksProps }>
+				<PlaylistContext.Provider value={ playlistContext }>
+					{ children }
+				</PlaylistContext.Provider>
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }

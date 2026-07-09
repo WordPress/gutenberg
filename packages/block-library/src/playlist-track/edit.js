@@ -13,6 +13,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -23,7 +24,7 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { Link } from '@wordpress/ui';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
@@ -38,6 +39,35 @@ import { useUploadMediaFromBlobURL } from '../utils/hooks';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const ALBUM_COVER_ALLOWED_MEDIA_TYPES = [ 'image' ];
+const SHARED_TRACK_STYLE_KEYS = [ 'spacing', 'dimensions' ];
+
+function getSharedTrackStyle( style = {} ) {
+	return SHARED_TRACK_STYLE_KEYS.reduce( ( sharedStyle, key ) => {
+		if ( style?.[ key ] !== undefined ) {
+			sharedStyle[ key ] = style[ key ];
+		}
+
+		return sharedStyle;
+	}, {} );
+}
+
+function getStyleWithSharedTrackStyle( style = {}, sharedStyle ) {
+	const updatedStyle = { ...style };
+
+	SHARED_TRACK_STYLE_KEYS.forEach( ( key ) => {
+		if ( sharedStyle[ key ] !== undefined ) {
+			updatedStyle[ key ] = sharedStyle[ key ];
+		} else {
+			delete updatedStyle[ key ];
+		}
+	} );
+
+	return Object.keys( updatedStyle ).length ? updatedStyle : undefined;
+}
+
+function getSharedTrackStyleSignature( style ) {
+	return JSON.stringify( getSharedTrackStyle( style ) );
+}
 
 const PlaylistTrackEdit = ( {
 	attributes,
@@ -56,6 +86,26 @@ const PlaylistTrackEdit = ( {
 	const { currentTrackClientId, setCurrentTrackClientId } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const siblingTracks = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, getBlocks } =
+				select( blockEditorStore );
+			const tracklistClientId = getBlockRootClientId( clientId );
+
+			return tracklistClientId
+				? getBlocks( tracklistClientId )
+						.filter(
+							( block ) => block.name === 'core/playlist-track'
+						)
+						.map( ( block ) => ( {
+							clientId: block.clientId,
+							style: block.attributes.style,
+						} ) )
+				: [];
+		},
+		[ clientId ]
+	);
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
@@ -69,6 +119,40 @@ const PlaylistTrackEdit = ( {
 		clientId,
 		currentTrackClientId,
 		setCurrentTrackClientId,
+	] );
+
+	useEffect( () => {
+		if ( ! isSelected ) {
+			return;
+		}
+
+		const sharedTrackStyle = getSharedTrackStyle( attributes.style );
+		const sharedTrackStyleSignature = getSharedTrackStyleSignature(
+			attributes.style
+		);
+
+		siblingTracks.forEach( ( siblingTrack ) => {
+			if (
+				siblingTrack.clientId === clientId ||
+				getSharedTrackStyleSignature( siblingTrack.style ) ===
+					sharedTrackStyleSignature
+			) {
+				return;
+			}
+
+			updateBlockAttributes( siblingTrack.clientId, {
+				style: getStyleWithSharedTrackStyle(
+					siblingTrack.style,
+					sharedTrackStyle
+				),
+			} );
+		} );
+	}, [
+		attributes.style,
+		clientId,
+		isSelected,
+		siblingTracks,
+		updateBlockAttributes,
 	] );
 
 	useUploadMediaFromBlobURL( {

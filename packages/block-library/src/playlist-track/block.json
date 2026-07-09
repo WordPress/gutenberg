@@ -5,7 +5,7 @@
 	"name": "core/playlist-track",
 	"title": "Playlist track",
 	"category": "media",
-	"parent": [ "core/playlist" ],
+	"parent": [ "core/playlist-tracklist" ],
 	"description": "Playlist track.",
 	"keywords": [ "music", "sound" ],
 	"textdomain": "default",
@@ -49,7 +49,18 @@
 		"interactivity": {
 			"clientNavigation": true
 		},
-		"reusable": false
+		"reusable": false,
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": true,
+				"padding": true
+			}
+		},
+		"dimensions": {
+			"minHeight": true
+		}
 	},
 	"style": "wp-block-playlist-track"
 }
