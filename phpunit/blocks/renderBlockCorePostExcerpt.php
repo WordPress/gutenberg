@@ -99,6 +99,55 @@ class Tests_Blocks_RenderBlockCorePostExcerpt extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Ensures a single space is added before the "more" link only when both
+	 * the excerpt and the more text are present, and that no trailing space
+	 * is left when the more text is empty.
+	 *
+	 * @covers ::gutenberg_render_block_core_post_excerpt
+	 */
+	public function test_should_add_space_before_more_text_only_when_excerpt_present() {
+		$GLOBALS['post'] = self::$post;
+
+		$block          = new stdClass();
+		$block->context = array( 'postId' => self::$post->ID );
+
+		// Excerpt + more text on the same line: a single space must separate them.
+		$attributes = array(
+			'moreText'          => 'Read More',
+			'showMoreOnNewLine' => false,
+			'excerptLength'     => 55,
+		);
+
+		$rendered = gutenberg_render_block_core_post_excerpt( $attributes, '', $block );
+
+		$this->assertStringContainsString(
+			'Post Expert content <a class="wp-block-post-excerpt__more-link"',
+			$rendered,
+			'Failed to assert that a single space separates the excerpt and the more link.'
+		);
+		$this->assertStringNotContainsString(
+			'Post Expert content  <a', // double space would be a regression
+			$rendered,
+			'Failed to assert that there is no double space before the more link.'
+		);
+
+		// Excerpt present but no more text: the excerpt must not end with a trailing space.
+		$attributes = array(
+			'moreText'          => '',
+			'showMoreOnNewLine' => false,
+			'excerptLength'     => 55,
+		);
+
+		$rendered = gutenberg_render_block_core_post_excerpt( $attributes, '', $block );
+
+		$this->assertStringContainsString(
+			'Post Expert content</p>',
+			$rendered,
+			'Failed to assert that no trailing space is added when the more text is empty.'
+		);
+	}
+
+	/**
 	 * Test gutenberg_render_block_core_post_excerpt() method.
 	 */
 	public function test_should_render_correct_excerpt() {
