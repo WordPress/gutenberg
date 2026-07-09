@@ -35,8 +35,8 @@ const EMPTY_ARRAY = [];
 
 function Edit( {
 	attributes,
-	setAttributes,
 	clientId,
+	setAttributes,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const { ariaLabel, tabs = EMPTY_ARRAY } = attributes;
@@ -46,26 +46,21 @@ function Edit( {
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { tabsList, tabsClientId, editorActiveTabIndex, activeTabIndex } =
+	const { tabsClientId, tabPanels, editorActiveTabIndex, activeTabIndex } =
 		useSelect(
 			( select ) => {
 				const { getBlockRootClientId, getBlockAttributes, getBlocks } =
 					select( blockEditorStore );
 
-				const _tabsClientId = getBlockRootClientId( clientId );
-				const tabsAttributes = _tabsClientId
-					? getBlockAttributes( _tabsClientId )
-					: undefined;
-
-				const tabPanelsBlock = _tabsClientId
-					? getBlocks( _tabsClientId ).find(
-							( block ) => block.name === 'core/tab-panels'
-					  )
-					: undefined;
+				const rootClientId = getBlockRootClientId( clientId );
+				const tabsAttributes = getBlockAttributes( rootClientId );
+				const tabPanelsBlock = getBlocks( rootClientId )?.find(
+					( block ) => block.name === 'core/tab-panels'
+				);
 
 				return {
-					tabsList: tabPanelsBlock?.innerBlocks ?? EMPTY_ARRAY,
-					tabsClientId: _tabsClientId,
+					tabsClientId: rootClientId,
+					tabPanels: tabPanelsBlock?.innerBlocks ?? EMPTY_ARRAY,
 					editorActiveTabIndex: tabsAttributes?.editorActiveTabIndex,
 					activeTabIndex: tabsAttributes?.activeTabIndex ?? 0,
 				};
@@ -109,14 +104,14 @@ function Edit( {
 	}
 
 	const menuRef = useRef();
-	const prevTabCountRef = useRef( tabsList.length );
+	const prevTabCountRef = useRef( tabPanels.length );
 
 	// When tabs are added or removed, focus the appropriate button.
 	useEffect( () => {
 		const prevCount = prevTabCountRef.current;
-		prevTabCountRef.current = tabsList.length;
+		prevTabCountRef.current = tabPanels.length;
 
-		if ( ! menuRef.current || tabsList.length === prevCount ) {
+		if ( ! menuRef.current || tabPanels.length === prevCount ) {
 			return;
 		}
 
@@ -144,7 +139,7 @@ function Edit( {
 		hasSelectedInnerBlock,
 		isBlockSelected,
 		tabsClientId,
-		tabsList.length,
+		tabPanels.length,
 	] );
 
 	const blockProps = useBlockProps( {
@@ -200,7 +195,7 @@ function Edit( {
 			</InspectorControls>
 			<TabToolbarControls tabsClientId={ tabsClientId } />
 			<div { ...blockProps }>
-				{ tabsList.map( ( tab, index ) => {
+				{ tabPanels.map( ( tab, index ) => {
 					const isActive = index === effectiveActiveIndex;
 					return (
 						<button
