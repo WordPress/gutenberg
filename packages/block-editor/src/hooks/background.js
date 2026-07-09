@@ -30,11 +30,7 @@ import {
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
-import {
-	InheritedValueProvider,
-	useInheritedValue,
-	useOwnVariation,
-} from '../components/global-styles/inherited-value-context';
+import { useInheritedValue } from '../components/global-styles/inherited-value-context';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
@@ -197,7 +193,8 @@ export function BackgroundImagePanel( {
 		[ clientId ]
 	);
 
-	const ownVariation = useOwnVariation( name, className );
+	const { value: inheritedValue, sources: inheritedSources } =
+		useInheritedValue( name, className, selectedState );
 
 	const backgroundGradientSupported = hasBackgroundSupport(
 		name,
@@ -381,37 +378,19 @@ export function BackgroundImagePanel( {
 	const Wrapper = asWrapper || BackgroundInspectorControl;
 
 	return (
-		<InheritedValueProvider
-			blockName={ name }
-			ownVariation={ ownVariation }
-			selectedState={ selectedState }
-		>
-			<BackgroundPanelWithInheritedValue
-				as={ Wrapper }
-				panelId={ clientId }
-				defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
-				settings={ updatedSettings }
-				onChange={ onChange }
-				defaultControls={ defaultControls }
-				value={
-					isStateSelected
-						? getStyleForState( style, selectedState )
-						: styleValue
-				}
-				contrastWarning={ contrastWarning }
-			/>
-		</InheritedValueProvider>
-	);
-}
-
-// Bridge component: reads the inherited value from context and hands it to
-// the panel. Kept below the Provider to satisfy React's rules of hooks.
-function BackgroundPanelWithInheritedValue( props ) {
-	const { value: inheritedValue, sources: inheritedSources } =
-		useInheritedValue();
-	return (
 		<StylesBackgroundPanel
-			{ ...props }
+			as={ Wrapper }
+			panelId={ clientId }
+			defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
+			settings={ updatedSettings }
+			onChange={ onChange }
+			defaultControls={ defaultControls }
+			value={
+				isStateSelected
+					? getStyleForState( style, selectedState )
+					: styleValue
+			}
+			contrastWarning={ contrastWarning }
 			inheritedValue={ inheritedValue }
 			inheritedSources={ inheritedSources }
 		/>

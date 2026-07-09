@@ -4,40 +4,31 @@
 import { render } from '@testing-library/react';
 
 /**
- * Tests the Provider wiring between inspector hook wrappers and shared
+ * Tests the wiring between inspector hook wrappers and shared
  * Global Styles panels.
  *
- * These tests cover two concerns:
- *
- *   1. The panel-level `useOwnVariation` hook correctly maps a block's
- *      `className` to a registered variation slug (or `null`).
- *   2. Each wrapper mounts `InheritedValueProvider` with the correct
- *      `blockName` + `ownVariation` props, and forwards the hook's
- *      return value to the shared panel via the `inheritedValue` prop.
- *
- * The full shared-panel render tree (ToolsPanel machinery,
- * `InspectorControls` slot-fill, data store, etc.) is intentionally
- * mocked out so each test exercises only the wiring contract.
+ * Each wrapper calls `useInheritedValue( blockName, className, selectedState )`
+ * and forwards the returned merged value to the shared panel via the
+ * `inheritedValue` prop. The full shared-panel render tree (ToolsPanel
+ * machinery, `InspectorControls` slot-fill, data store, etc.) is
+ * intentionally mocked out so each test exercises only the wiring contract.
  */
 
 // Jest hoists `jest.mock` factories; proxies for spies need to satisfy
 // the `/^mock/i` naming convention.
-const mockProviderRecorder = { calls: [] };
+const mockHookRecorder = { calls: [] };
 const mockPanelRecorder = { calls: [] };
 const mockInheritedReturn = { value: {} };
-const mockVariationReturn = { value: null };
 
 jest.mock( '../../components/global-styles/inherited-value-context', () => ( {
 	__esModule: true,
-	InheritedValueProvider: ( { blockName, ownVariation, children } ) => {
-		mockProviderRecorder.calls.push( { blockName, ownVariation } );
-		return children;
+	useInheritedValue: ( blockName, className, selectedState ) => {
+		mockHookRecorder.calls.push( { blockName, className, selectedState } );
+		return {
+			value: mockInheritedReturn.value,
+			sources: {},
+		};
 	},
-	useInheritedValue: () => ( {
-		value: mockInheritedReturn.value,
-		sources: {},
-	} ),
-	useOwnVariation: () => mockVariationReturn.value,
 } ) );
 
 jest.mock( '../../components/global-styles/typography-panel', () => ( {
@@ -179,10 +170,9 @@ jest.mock( '../../components/inspector-controls', () => ( {
 const mockUseSelectImpl = { fn: () => undefined };
 
 beforeEach( () => {
-	mockProviderRecorder.calls = [];
+	mockHookRecorder.calls = [];
 	mockPanelRecorder.calls = [];
 	mockInheritedReturn.value = {};
-	mockVariationReturn.value = null;
 	mockUseSelectImpl.fn = () => undefined;
 	const { useSelect } = require( '@wordpress/data' );
 	useSelect.mockImplementation( ( mapSelect ) => {
@@ -194,14 +184,15 @@ beforeEach( () => {
 	} );
 } );
 
-// Note: `useOwnVariation` is a thin `useSelect` wrapper around the
-// pure helper `getVariationNameFromClass`, which has direct coverage
-// in the existing `block-style-variation` module. The wrapper tests
-// below verify that each hook wrapper passes the hook's return value
-// through to `InheritedValueProvider` as `ownVariation`.
+// The `className` → variation-slug derivation now lives inside
+// `useInheritedValue` (mocked here) and has direct coverage in the
+// `inherited-value-context` and `block-style-variation` suites. These
+// tests verify that each hook wrapper calls `useInheritedValue` with the
+// block's name and forwards its return value to the shared panel via the
+// `inheritedValue` prop.
 
-describe( 'inspector hook wrappers thread inheritedValue through the Provider', () => {
-	test( 'TypographyPanel mounts the Provider with the block name and threads inheritedValue', () => {
+describe( 'inspector hook wrappers thread inheritedValue into the panel', () => {
+	test( 'TypographyPanel calls useInheritedValue with the block name and threads inheritedValue', () => {
 		// Imported inside the test so the `jest.mock` factories are
 		// applied before the wrapper's module graph is resolved.
 		const { TypographyPanel } = require( '../typography' );
@@ -225,10 +216,9 @@ describe( 'inspector hook wrappers thread inheritedValue through the Provider', 
 			/>
 		);
 
-		expect( mockProviderRecorder.calls ).toHaveLength( 1 );
-		expect( mockProviderRecorder.calls[ 0 ] ).toEqual( {
+		expect( mockHookRecorder.calls ).toHaveLength( 1 );
+		expect( mockHookRecorder.calls[ 0 ] ).toMatchObject( {
 			blockName: 'core/paragraph',
-			ownVariation: null,
 		} );
 		expect( mockPanelRecorder.calls ).toHaveLength( 1 );
 		const [ , props ] = mockPanelRecorder.calls[ 0 ];
@@ -242,7 +232,7 @@ describe( 'inspector hook wrappers thread inheritedValue through the Provider', 
 	// panel. The former `ColorEdit` wrapper no longer exists; top-level text
 	// and background color are wired through the Typography and Background
 	// wrappers and covered above/below.
-	test( 'ElementsEdit mounts the Provider for block-scoped Global Styles', () => {
+	test( 'ElementsEdit wires block-scoped Global Styles into the Color panel', () => {
 		const { ElementsEdit } = require( '../elements' );
 		mockUseSelectImpl.fn = () => ( {
 			style: undefined,
@@ -261,9 +251,8 @@ describe( 'inspector hook wrappers thread inheritedValue through the Provider', 
 			/>
 		);
 
-		expect( mockProviderRecorder.calls[ 0 ] ).toEqual( {
+		expect( mockHookRecorder.calls[ 0 ] ).toMatchObject( {
 			blockName: 'core/paragraph',
-			ownVariation: null,
 		} );
 		const [ , props ] = mockPanelRecorder.calls[ 0 ];
 		expect( props.inheritedValue ).toEqual( {
@@ -271,7 +260,7 @@ describe( 'inspector hook wrappers thread inheritedValue through the Provider', 
 		} );
 	} );
 
-	test( 'BorderPanel threads a border-scoped inheritedValue through the Provider', () => {
+	test( 'BorderPanel threads a border-scoped inheritedValue into the panel', () => {
 		const { BorderPanel } = require( '../border' );
 		mockUseSelectImpl.fn = () => ( {
 			style: undefined,
@@ -291,16 +280,15 @@ describe( 'inspector hook wrappers thread inheritedValue through the Provider', 
 			/>
 		);
 
-		expect( mockProviderRecorder.calls[ 0 ] ).toEqual( {
+		expect( mockHookRecorder.calls[ 0 ] ).toMatchObject( {
 			blockName: 'core/paragraph',
-			ownVariation: null,
 		} );
 		expect( mockPanelRecorder.calls[ 0 ][ 1 ].inheritedValue ).toEqual( {
 			border: { radius: '8px' },
 		} );
 	} );
 
-	test( 'DimensionsPanel threads spacing inheritedValue through the Provider', () => {
+	test( 'DimensionsPanel threads spacing inheritedValue into the panel', () => {
 		const { DimensionsPanel } = require( '../dimensions' );
 		mockUseSelectImpl.fn = () => ( {
 			value: undefined,
@@ -319,16 +307,15 @@ describe( 'inspector hook wrappers thread inheritedValue through the Provider', 
 			/>
 		);
 
-		expect( mockProviderRecorder.calls[ 0 ] ).toEqual( {
+		expect( mockHookRecorder.calls[ 0 ] ).toMatchObject( {
 			blockName: 'core/paragraph',
-			ownVariation: null,
 		} );
 		expect( mockPanelRecorder.calls[ 0 ][ 1 ].inheritedValue ).toEqual( {
 			spacing: { padding: { top: '32px' } },
 		} );
 	} );
 
-	test( 'BackgroundImagePanel replaces its pre-feature partial wiring with a full Provider payload', () => {
+	test( 'BackgroundImagePanel replaces its pre-feature partial wiring with a full inherited payload', () => {
 		const {
 			hasBlockSupport,
 			getBlockSupport,
@@ -359,16 +346,15 @@ describe( 'inspector hook wrappers thread inheritedValue through the Provider', 
 			/>
 		);
 
-		expect( mockProviderRecorder.calls[ 0 ] ).toEqual( {
+		expect( mockHookRecorder.calls[ 0 ] ).toMatchObject( {
 			blockName: 'core/cover',
-			ownVariation: null,
 		} );
 		expect( mockPanelRecorder.calls[ 0 ][ 1 ].inheritedValue ).toEqual( {
 			background: { backgroundImage: { url: 'themed.jpg' } },
 		} );
 	} );
 
-	test( 'variation class names propagate to the Provider as ownVariation', () => {
+	test( 'wrappers forward the block className to useInheritedValue', () => {
 		const { TypographyPanel } = require( '../typography' );
 		mockUseSelectImpl.fn = () => ( {
 			style: undefined,
@@ -377,7 +363,6 @@ describe( 'inspector hook wrappers thread inheritedValue through the Provider', 
 			fitText: undefined,
 			className: 'is-style-plain',
 		} );
-		mockVariationReturn.value = 'plain';
 		mockInheritedReturn.value = {};
 
 		render(
@@ -389,9 +374,9 @@ describe( 'inspector hook wrappers thread inheritedValue through the Provider', 
 			/>
 		);
 
-		expect( mockProviderRecorder.calls[ 0 ] ).toEqual( {
+		expect( mockHookRecorder.calls[ 0 ] ).toMatchObject( {
 			blockName: 'core/quote',
-			ownVariation: 'plain',
+			className: 'is-style-plain',
 		} );
 	} );
 

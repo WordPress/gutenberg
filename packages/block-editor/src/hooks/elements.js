@@ -14,11 +14,7 @@ import {
 	useHasColorPanel,
 	default as StylesColorPanel,
 } from '../components/global-styles/color-panel';
-import {
-	InheritedValueProvider,
-	useInheritedValue,
-	useOwnVariation,
-} from '../components/global-styles/inherited-value-context';
+import { useInheritedValue } from '../components/global-styles/inherited-value-context';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 import { COLOR_SUPPORT_KEY } from './color';
@@ -79,7 +75,11 @@ export function ElementsEdit( {
 		[ clientId, isEnabled ]
 	);
 
-	const ownVariation = useOwnVariation( name, className );
+	const { value: inheritedValue } = useInheritedValue(
+		name,
+		className,
+		selectedState
+	);
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
@@ -135,28 +135,16 @@ export function ElementsEdit( {
 	const Wrapper = asWrapper || ElementsInspectorControl;
 
 	return (
-		<InheritedValueProvider
-			blockName={ name }
-			ownVariation={ ownVariation }
-			selectedState={ selectedState }
-		>
-			<ElementsPanelWithInheritedValue
-				as={ Wrapper }
-				panelId={ clientId }
-				settings={ settings }
-				value={ value }
-				onChange={ onChange }
-				defaultControls={ defaultControls }
-				label={ label }
-				contrastWarning={ contrastWarning }
-			/>
-		</InheritedValueProvider>
+		<StylesColorPanel
+			as={ Wrapper }
+			panelId={ clientId }
+			settings={ settings }
+			value={ value }
+			onChange={ onChange }
+			defaultControls={ defaultControls }
+			label={ label }
+			contrastWarning={ contrastWarning }
+			inheritedValue={ inheritedValue }
+		/>
 	);
-}
-
-// Bridge component: reads the inherited value from context and hands it to
-// the panel. Kept below the Provider to satisfy React's rules of hooks.
-function ElementsPanelWithInheritedValue( props ) {
-	const { value: inheritedValue } = useInheritedValue();
-	return <StylesColorPanel { ...props } inheritedValue={ inheritedValue } />;
 }

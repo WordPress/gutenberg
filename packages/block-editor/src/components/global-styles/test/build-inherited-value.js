@@ -12,10 +12,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { buildInheritedValue, privateHelpers } from '../build-inherited-value';
-import {
-	InheritedValueProvider,
-	useInheritedValue,
-} from '../inherited-value-context';
+import { useInheritedValue } from '../inherited-value-context';
 
 import { globalStylesDataKey } from '../../../store/private-keys';
 const {
@@ -74,6 +71,12 @@ jest.mock( '@wordpress/blocks', () => ( {
 jest.mock( '../../../hooks/block-style-variation', () => ( {
 	getVariationStylesWithRefValues: ( gs, blockName, variation ) =>
 		gs?.styles?.blocks?.[ blockName ]?.variations?.[ variation ] ?? null,
+	// `useInheritedValue` derives the applied variation from the block's
+	// `className`; map `is-style-<slug>` to `<slug>` for these tests.
+	getVariationNameFromClass: ( className ) => {
+		const match = /is-style-([\w-]+)/.exec( className || '' );
+		return match ? match[ 1 ] : null;
+	},
 } ) );
 describe( 'buildInheritedValue – merged output', () => {
 	describe( 'internals', () => {
@@ -588,70 +591,58 @@ describe( 'buildInheritedValue – memoization', () => {
 	} );
 } );
 
-describe( 'useInheritedValue / InheritedValueProvider', () => {
+describe( 'useInheritedValue hook', () => {
 	beforeEach( () => {
 		useSelect.mockReset();
 	} );
 
-	function Probe() {
-		const v = useInheritedValue();
+	function Probe( { blockName, className, selectedState } ) {
+		const v = useInheritedValue( blockName, className, selectedState );
 		return <div data-testid="probe">{ JSON.stringify( v ) }</div>;
 	}
 
-	test( 'without Provider, hook returns empty value and sources', () => {
-		useSelect.mockReturnValue( null );
+	// The hook issues two `useSelect` reads: the merged Global Styles
+	// payload (block-editor store) and the block's registered styles
+	// (blocks store). Feed both from one stub.
+	function mockStores( rawGlobalStyles, blockStyles = [] ) {
+		useSelect.mockImplementation( ( mapSelect ) =>
+			mapSelect( () => ( {
+				// `globalStylesDataKey` holds the BARE merged styles tree
+				// in production (see `editor/src/components/provider/
+				// use-block-editor-settings.js:237`,
+				// `mergedGlobalStyles.styles`), not the wrapped
+				// `{ settings, styles }` envelope. The hook wraps the bare
+				// tree before passing to the builder.
+				getSettings: () => ( {
+					[ globalStylesDataKey ]: rawGlobalStyles,
+				} ),
+				getBlockStyles: () => blockStyles,
+			} ) )
+		);
+	}
+
+	test( 'returns empty value and sources when no block name is given', () => {
+		mockStores( { typography: { fontSize: '16px' } } );
 		render( <Probe /> );
 		expect( screen.getByTestId( 'probe' ) ).toHaveTextContent(
 			'{"value":{},"sources":{}}'
 		);
 	} );
 
-	test( 'Provider issues exactly one useSelect subscription per mount', () => {
-		// `globalStylesDataKey` holds the BARE merged styles tree in
-		// production (see `editor/src/components/provider/
-		// use-block-editor-settings.js:237`, `mergedGlobalStyles.styles`),
-		// not the wrapped `{ settings, styles }` envelope. The Provider
-		// wraps the bare tree before passing to the builder.
-		const rawGlobalStyles = {
-			typography: { fontSize: '16px' },
-			elements: { h2: { typography: { fontSize: '24px' } } },
-		};
-		useSelect.mockImplementation( ( mapSelect ) =>
-			mapSelect( () => ( {
-				getSettings: () => ( {
-					[ globalStylesDataKey ]: rawGlobalStyles,
-				} ),
-			} ) )
+	test( 'returns empty value and sources during hydration', () => {
+		mockStores( null );
+		render( <Probe blockName="core/heading" /> );
+		expect( screen.getByTestId( 'probe' ) ).toHaveTextContent(
+			'{"value":{},"sources":{}}'
 		);
-		// Two panels under one Provider: the useSelect inside the
-		// Provider runs once; the Probes consume context only.
-		render(
-			<InheritedValueProvider blockName="core/heading">
-				<Probe />
-				<Probe />
-			</InheritedValueProvider>
-		);
-		// One useSelect call from the Provider, none from the Probes.
-		expect( useSelect ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	test( 'hook reads the block element passthrough from context', () => {
-		const rawGlobalStyles = {
+	test( 'reads the block element passthrough from the merged payload', () => {
+		mockStores( {
 			typography: { fontSize: '16px' },
 			elements: { h2: { typography: { fontSize: '24px' } } },
-		};
-		useSelect.mockImplementation( ( mapSelect ) =>
-			mapSelect( () => ( {
-				getSettings: () => ( {
-					[ globalStylesDataKey ]: rawGlobalStyles,
-				} ),
-			} ) )
-		);
-		render(
-			<InheritedValueProvider blockName="core/heading">
-				<Probe />
-			</InheritedValueProvider>
-		);
+		} );
+		render( <Probe blockName="core/heading" /> );
 		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
 		// The h2 element styles are preserved under the nested
 		// `elements` passthrough, not folded up to the top level.
@@ -659,22 +650,6 @@ describe( 'useInheritedValue / InheritedValueProvider', () => {
 		expect(
 			parsed.sources[ 'elements.h2.typography.fontSize' ].layer
 		).toBe( 'root' );
-	} );
-
-	test( 'hook returns { value, sources } during hydration', () => {
-		useSelect.mockImplementation( ( mapSelect ) =>
-			mapSelect( () => ( {
-				getSettings: () => ( {} ),
-			} ) )
-		);
-		render(
-			<InheritedValueProvider blockName="core/heading">
-				<Probe />
-			</InheritedValueProvider>
-		);
-		expect( screen.getByTestId( 'probe' ) ).toHaveTextContent(
-			'{"value":{},"sources":{}}'
-		);
 	} );
 } );
 
@@ -688,7 +663,7 @@ describe( 'useInheritedValue / InheritedValueProvider', () => {
  * (`mergedGlobalStyles.styles`). It is NOT the wrapped
  * `{ settings, styles }` envelope.
  *
- * Pre-hot-fix, the Provider passed the bare tree directly to
+ * Pre-hot-fix, the hook passed the bare tree directly to
  * `buildInheritedValue`, which destructures `const { styles } =
  * globalStyles` and so saw `undefined` and early-returned `{}`. Every
  * panel got an empty `inheritedValue`; nothing surfaced in the
@@ -697,18 +672,18 @@ describe( 'useInheritedValue / InheritedValueProvider', () => {
  * encoding the wrong shape assumption.
  *
  * This suite uses fixtures that mirror the production producer's
- * output and asserts the Provider → builder pipeline yields a
+ * output and asserts the hook → builder pipeline yields a
  * non-empty `inheritedValue` end-to-end. A future regression on the
  * data-shape contract — at the producer, the wrapping step inside the
- * Provider, or the builder's destructure — surfaces here in CI.
+ * hook, or the builder's destructure — surfaces here in CI.
  */
-describe( 'Provider integration: production bare-tree shape', () => {
+describe( 'useInheritedValue – production bare-tree shape', () => {
 	beforeEach( () => {
 		useSelect.mockReset();
 	} );
 
-	function Probe() {
-		const { value } = useInheritedValue();
+	function Probe( { blockName, className } ) {
+		const { value } = useInheritedValue( blockName, className );
 		return <div data-testid="probe">{ JSON.stringify( value ) }</div>;
 	}
 
@@ -771,17 +746,14 @@ describe( 'Provider integration: production bare-tree shape', () => {
 				getSettings: () => ( {
 					[ globalStylesDataKey ]: rawGlobalStyles,
 				} ),
+				getBlockStyles: () => [],
 			} ) )
 		);
 		return render( ui );
 	}
 
 	test( 'root + block override merge yields non-empty payload at the panel boundary', () => {
-		mountWithFixture(
-			<InheritedValueProvider blockName="core/heading">
-				<Probe />
-			</InheritedValueProvider>
-		);
+		mountWithFixture( <Probe blockName="core/heading" /> );
 		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
 		expect( parsed ).toMatchObject( {
 			typography: {
@@ -794,11 +766,7 @@ describe( 'Provider integration: production bare-tree shape', () => {
 	} );
 
 	test( 'block element override is preserved under the elements passthrough', () => {
-		mountWithFixture(
-			<InheritedValueProvider blockName="core/heading">
-				<Probe />
-			</InheritedValueProvider>
-		);
+		mountWithFixture( <Probe blockName="core/heading" /> );
 		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
 		// Block-level h2 override stays nested under `elements.h2`.
 		expect( parsed.elements.h2.typography.fontSize ).toBe( '28px' );
@@ -809,9 +777,7 @@ describe( 'Provider integration: production bare-tree shape', () => {
 
 	test( 'variation override layers on top of block override', () => {
 		mountWithFixture(
-			<InheritedValueProvider blockName="core/quote" ownVariation="plain">
-				<Probe />
-			</InheritedValueProvider>
+			<Probe blockName="core/quote" className="is-style-plain" />
 		);
 		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
 		expect( parsed.border.width ).toBe( '0px' ); // variation wins
@@ -820,21 +786,13 @@ describe( 'Provider integration: production bare-tree shape', () => {
 	} );
 
 	test( '{ ref } envelope resolves against the bare tree at the leaf', () => {
-		mountWithFixture(
-			<InheritedValueProvider blockName="core/group">
-				<Probe />
-			</InheritedValueProvider>
-		);
+		mountWithFixture( <Probe blockName="core/group" /> );
 		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
 		expect( parsed.color.background ).toBe( '#ffffff' );
 	} );
 
 	test( 'block with no overrides still inherits root + element layers', () => {
-		mountWithFixture(
-			<InheritedValueProvider blockName="core/paragraph">
-				<Probe />
-			</InheritedValueProvider>
-		);
+		mountWithFixture( <Probe blockName="core/paragraph" /> );
 		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
 		expect( parsed.typography.lineHeight ).toBe( '1.6' );
 		// The root link element styles stay nested under `elements.link`.
@@ -856,12 +814,9 @@ describe( 'Provider integration: production bare-tree shape', () => {
 		// inherited values surface in the inspector. This case asserts
 		// the panel-readable keys are missing, which is what the panels
 		// actually consume.
-		mountWithFixture(
-			<InheritedValueProvider blockName="core/heading">
-				<Probe />
-			</InheritedValueProvider>,
-			{ styles: productionShapeFixture }
-		);
+		mountWithFixture( <Probe blockName="core/heading" />, {
+			styles: productionShapeFixture,
+		} );
 		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
 		expect( parsed.typography ).toBeUndefined();
 		expect( parsed.color ).toBeUndefined();

@@ -19,11 +19,7 @@ import {
 	DimensionsPanel as StylesDimensionsPanel,
 	useHasDimensionsPanel,
 } from '../components/global-styles';
-import {
-	InheritedValueProvider,
-	useInheritedValue,
-	useOwnVariation,
-} from '../components/global-styles/inherited-value-context';
+import { useInheritedValue } from '../components/global-styles/inherited-value-context';
 import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -99,7 +95,8 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId, isEnabled ]
 	);
 
-	const ownVariation = useOwnVariation( name, className );
+	const { value: inheritedValue, sources: inheritedSources } =
+		useInheritedValue( name, className, selectedState );
 
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const value = isStateSelected
@@ -140,24 +137,20 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 
 	return (
 		<>
-			<InheritedValueProvider
-				blockName={ name }
-				ownVariation={ ownVariation }
-				selectedState={ selectedState }
-			>
-				<DimensionsPanelWithInheritedValue
-					as={ DimensionsInspectorControl }
-					panelId={ clientId }
-					settings={ settings }
-					value={ value }
-					onChange={ onChange }
-					defaultControls={ defaultControls }
-					styleState={ selectedState }
-					onVisualize={
-						isStateSelected ? undefined : setVisualizedProperty
-					}
-				/>
-			</InheritedValueProvider>
+			<StylesDimensionsPanel
+				as={ DimensionsInspectorControl }
+				panelId={ clientId }
+				settings={ settings }
+				value={ value }
+				onChange={ onChange }
+				defaultControls={ defaultControls }
+				styleState={ selectedState }
+				onVisualize={
+					isStateSelected ? undefined : setVisualizedProperty
+				}
+				inheritedValue={ inheritedValue }
+				inheritedSources={ inheritedSources }
+			/>
 			{ ! isStateSelected &&
 				!! settings?.spacing?.padding &&
 				visualizedProperty === 'padding' && (
@@ -177,20 +170,6 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 					/>
 				) }
 		</>
-	);
-}
-
-// Bridge component: reads the inherited value from context and hands it to
-// the panel. Kept below the Provider to satisfy React's rules of hooks.
-function DimensionsPanelWithInheritedValue( props ) {
-	const { value: inheritedValue, sources: inheritedSources } =
-		useInheritedValue();
-	return (
-		<StylesDimensionsPanel
-			{ ...props }
-			inheritedValue={ inheritedValue }
-			inheritedSources={ inheritedSources }
-		/>
 	);
 }
 

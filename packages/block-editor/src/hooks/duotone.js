@@ -39,11 +39,7 @@ import {
 	usePrivateStyleOverride,
 } from './utils';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
-import {
-	InheritedValueProvider,
-	useInheritedValue,
-	useOwnVariation,
-} from '../components/global-styles/inherited-value-context';
+import { useInheritedValue } from '../components/global-styles/inherited-value-context';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import { store as blockEditorStore } from '../store';
@@ -118,7 +114,8 @@ function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 				: undefined,
 		[ clientId ]
 	);
-	const ownVariation = useOwnVariation( name, className );
+	const { value: inheritedValue, sources: inheritedSources } =
+		useInheritedValue( name, className );
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -153,28 +150,25 @@ function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 	return (
 		<>
 			<InspectorControls group="filter">
-				<InheritedValueProvider
-					blockName={ name }
-					ownVariation={ ownVariation }
-				>
-					<FiltersPanelWithInheritedValue
-						value={ {
-							filter: { duotone: duotonePresetOrColors },
-						} }
-						onChange={ ( newDuotone ) => {
-							const newStyle = {
-								...style,
-								color: {
-									...newDuotone?.filter,
-								},
-							};
-							setAttributes( {
-								style: cleanEmptyObject( newStyle ),
-							} );
-						} }
-						settings={ settings }
-					/>
-				</InheritedValueProvider>
+				<StylesFiltersPanel
+					value={ {
+						filter: { duotone: duotonePresetOrColors },
+					} }
+					onChange={ ( newDuotone ) => {
+						const newStyle = {
+							...style,
+							color: {
+								...newDuotone?.filter,
+							},
+						};
+						setAttributes( {
+							style: cleanEmptyObject( newStyle ),
+						} );
+					} }
+					settings={ settings }
+					inheritedValue={ inheritedValue }
+					inheritedSources={ inheritedSources }
+				/>
 			</InspectorControls>
 			<BlockControls group="block" __experimentalShareWithChildBlocks>
 				<DuotoneControl
@@ -204,20 +198,6 @@ function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 				/>
 			</BlockControls>
 		</>
-	);
-}
-
-// Bridge component: reads the inherited value from context and hands it to
-// the panel. Kept below the Provider to satisfy React's rules of hooks.
-function FiltersPanelWithInheritedValue( props ) {
-	const { value: inheritedValue, sources: inheritedSources } =
-		useInheritedValue();
-	return (
-		<StylesFiltersPanel
-			{ ...props }
-			inheritedValue={ inheritedValue }
-			inheritedSources={ inheritedSources }
-		/>
 	);
 }
 
