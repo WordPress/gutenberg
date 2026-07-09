@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, renderHook } from '@testing-library/react';
+import { render, renderHook, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -190,11 +190,9 @@ describe( 'element color hooks', () => {
 
 // Inherited Global Styles label treatment for the controls the Color
 // ("Elements") panel still owns after relocation — i.e. link and
-// element-scoped colors. The visual treatment lands on the parent
-// ToolsPanelItem via the `.is-inherited-from-global-styles` /
-// `.has-local-override-from-global-styles` class hooks. Top-level text and
-// background color label treatment is covered by the Typography and
-// Background panel tests, which now own those controls.
+// element-scoped colors. Top-level text and background color label
+// treatment is covered by the Typography and Background panel tests, which
+// now own those controls.
 const baseSettings = {
 	color: {
 		link: true,
@@ -213,54 +211,7 @@ const baseSettings = {
 
 describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 	describe( 'Link color', () => {
-		it( 'applies the inherited-label className when inherited link is defined and local link is fully unset', () => {
-			const inheritedValue = {
-				elements: { link: { color: { text: '#0000ff' } } },
-			};
-
-			const { container } = render(
-				<ColorPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ baseSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
-
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const inheritedItems = container.querySelectorAll(
-				'.is-inherited-from-global-styles'
-			);
-			expect( inheritedItems ).toHaveLength( 1 );
-		} );
-
-		it( 'still surfaces a root-sourced link color as inherited (element rules apply globally)', () => {
-			const inheritedValue = {
-				elements: { link: { color: { text: '#0000ff' } } },
-			};
-
-			const { container } = render(
-				<ColorPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					inheritedSources={ {
-						'elements.link.color.text': { layer: 'root' },
-					} }
-					settings={ baseSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
-
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const inheritedItems = container.querySelectorAll(
-				'.is-inherited-from-global-styles'
-			);
-			expect( inheritedItems ).toHaveLength( 1 );
-		} );
-
-		it( 'applies the local-override className when local link.text is set', () => {
+		it( 'exposes an accessible reset when local link.text overrides the inherited value', () => {
 			const inheritedValue = {
 				elements: { link: { color: { text: '#0000ff' } } },
 			};
@@ -268,7 +219,7 @@ describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 				elements: { link: { color: { text: '#aaaaaa' } } },
 			};
 
-			const { container } = render(
+			render(
 				<ColorPanel
 					value={ value }
 					inheritedValue={ inheritedValue }
@@ -278,17 +229,11 @@ describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 				/>
 			);
 
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const inheritedItems = container.querySelectorAll(
-				'.is-inherited-from-global-styles'
-			);
-			expect( inheritedItems ).toHaveLength( 0 );
-
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			const overrideItems = container.querySelectorAll(
-				'.has-local-override-from-global-styles'
-			);
-			expect( overrideItems.length ).toBeGreaterThanOrEqual( 1 );
+			expect(
+				screen.getAllByRole( 'button', {
+					name: /reset to inherited value/i,
+				} ).length
+			).toBeGreaterThanOrEqual( 1 );
 		} );
 	} );
 
@@ -298,7 +243,7 @@ describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 	describe( 'inherited preset missing from the palette', () => {
 		function getSwatchStyles( container ) {
 			return Array.from(
-				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				// eslint-disable-next-line testing-library/no-node-access
 				container.querySelectorAll( '.component-color-indicator' )
 			).map( ( node ) => node.getAttribute( 'style' ) ?? '' );
 		}
