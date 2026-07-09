@@ -19,6 +19,7 @@ import {
 	focusNoteThread,
 	getNoteIdsFromMetadata,
 	pickPrimaryNote,
+	selectNoteBlocks,
 } from './utils';
 import { useFloatingBoard, useNoteActions } from './hooks';
 import { AddNote } from './add-note';
@@ -33,7 +34,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		onDelete,
 	} = useNoteActions();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
-	const { selectBlock, toggleBlockSpotlight } = unlock(
+	const { selectBlock, multiSelect, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
@@ -42,9 +43,19 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			const {
 				getBlockAttributes,
 				getSelectedBlockClientId,
+				getMultiSelectedBlockClientIds,
 				getClientIdsWithDescendants,
 			} = select( blockEditorStore );
-			const clientId = getSelectedBlockClientId();
+			/*
+			 * Selecting a note that spans several blocks multi-selects them,
+			 * and `getSelectedBlockClientId` returns null for a multi-selection.
+			 * Fall back to the first block of the range, the note's anchor, so
+			 * the note stays in context instead of being deselected.
+			 */
+			const clientId =
+				getSelectedBlockClientId() ??
+				getMultiSelectedBlockClientIds()[ 0 ] ??
+				null;
 			return {
 				noteId: clientId
 					? getBlockAttributes( clientId )?.metadata?.noteId
@@ -121,8 +132,10 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			focusNoteThread( adjacentThread.id, sidebarRef.current );
 			if ( adjacentThread.blockClientId ) {
 				toggleBlockSpotlight( adjacentThread.blockClientId, true );
-				// Pass `null` as the second parameter to prevent focusing the block.
-				selectBlock( adjacentThread.blockClientId, null );
+				selectNoteBlocks( adjacentThread, {
+					selectBlock,
+					multiSelect,
+				} );
 			}
 		} else {
 			selectNote( undefined );
@@ -194,8 +207,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			// Expand thread.
 			selectNote( thread.id );
 			if ( !! thread.blockClientId ) {
-				// Pass `null` as the second parameter to prevent focusing the block.
-				selectBlock( thread.blockClientId, null );
+				selectNoteBlocks( thread, { selectBlock, multiSelect } );
 				toggleBlockSpotlight( thread.blockClientId, true );
 			}
 		} else if (

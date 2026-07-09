@@ -1601,6 +1601,49 @@ test.describe( 'Block Notes', () => {
 				} )
 			).toHaveText( [ 'Alpha block.', 'Beta block.' ] );
 		} );
+
+		test( 'keeps every spanned block lit when the note is selected', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Beta block.' },
+			} );
+			await addMultiBlockNote( { editor, page }, 2, 'Light them both' );
+
+			const blocks = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Light them both' } );
+
+			// The new note is focused and expanded; collapse it so that
+			// clicking it below runs a fresh selection.
+			await expect( thread ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			await thread.click();
+
+			// Selecting a note spotlights the canvas, dimming every block that
+			// isn't part of the selection.
+			await expect(
+				editor.canvas.locator( '.is-root-container' )
+			).toHaveClass( /is-focus-mode/ );
+
+			// The note spans both blocks, so both are selected and neither is
+			// dimmed - not just the anchor block.
+			await expect( blocks.nth( 0 ) ).toHaveClass( /is-multi-selected/ );
+			await expect( blocks.nth( 1 ) ).toHaveClass( /is-multi-selected/ );
+			await expect( blocks.nth( 0 ) ).toHaveCSS( 'opacity', '1' );
+			await expect( blocks.nth( 1 ) ).toHaveCSS( 'opacity', '1' );
+		} );
 	} );
 } );
 

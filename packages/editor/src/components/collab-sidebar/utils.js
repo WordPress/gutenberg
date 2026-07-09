@@ -515,6 +515,39 @@ export function pickPrimaryNote( threads ) {
 }
 
 /**
+ * Selects the block or blocks a note is anchored to.
+ *
+ * A note that spans several blocks is multi-selected so that every block it
+ * covers stays lit while the spotlight is on, rather than only the anchor.
+ * Selection never moves focus into the canvas: `selectBlock` and `multiSelect`
+ * both treat a `null` initial position as "don't focus".
+ *
+ * @param {Object}   thread              Root thread with `blockClientIds`.
+ * @param {Object}   actions             Block editor actions.
+ * @param {Function} actions.selectBlock
+ * @param {Function} actions.multiSelect
+ */
+export function selectNoteBlocks( thread, { selectBlock, multiSelect } ) {
+	const clientIds = thread?.blockClientIds?.length
+		? thread.blockClientIds
+		: [ thread?.blockClientId ].filter( Boolean );
+
+	if ( clientIds.length === 0 ) {
+		return;
+	}
+
+	selectBlock( clientIds[ 0 ], null );
+
+	if ( clientIds.length > 1 ) {
+		/*
+		 * `multiSelect` is a no-op when the blocks don't share a parent, in
+		 * which case the anchor selected above remains the selection.
+		 */
+		multiSelect( clientIds[ 0 ], clientIds[ clientIds.length - 1 ], null );
+	}
+}
+
+/**
  * Removes a note ID from the metadata.
  *
  * @param {Object} metadata Existing block metadata

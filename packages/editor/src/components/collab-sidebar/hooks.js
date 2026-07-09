@@ -75,23 +75,28 @@ export function useNoteThreads( postId ) {
 		// together. getNoteIdsFromMetadata returns numeric ids, matching the
 		// types returned by the comments REST endpoint.
 		const blocksWithNotes = {};
-		const clientIdByNoteId = new Map();
+		const clientIdsByNoteId = new Map();
 		for ( const clientId of clientIds ) {
 			const metadata = getBlockAttributes( clientId )?.metadata;
 			const noteIds = getNoteIdsFromMetadata( metadata );
 			if ( noteIds.length > 0 ) {
 				blocksWithNotes[ clientId ] = noteIds;
 				for ( const noteId of noteIds ) {
-					// First-wins: a multi-block note lists its id in every
-					// block it spans; clientIds are iterated in document order,
-					// so the anchor is the topmost block and the floating thread
-					// aligns to the start of the range.
-					if ( ! clientIdByNoteId.has( noteId ) ) {
-						clientIdByNoteId.set( noteId, clientId );
+					// A multi-block note lists its id in every block it spans.
+					// clientIds are iterated in document order, so the first
+					// entry is the anchor: the topmost block, which the floating
+					// thread aligns to.
+					const spanned = clientIdsByNoteId.get( noteId );
+					if ( spanned ) {
+						spanned.push( clientId );
+					} else {
+						clientIdsByNoteId.set( noteId, [ clientId ] );
 					}
 				}
 			}
 		}
+		const anchorOf = ( noteId ) =>
+			clientIdsByNoteId.get( noteId )?.[ 0 ] ?? null;
 
 		// Materialize threads; collect roots; replies linked in a second pass
 		// via unshift to invert order (matches prior reverse semantics).
@@ -101,10 +106,13 @@ export function useNoteThreads( postId ) {
 			const thread = {
 				...item,
 				reply: [],
-				blockClientId:
+				blockClientId: item.parent === 0 ? anchorOf( item.id ) : null,
+				// Every block the note spans, in document order. Single-block
+				// notes get a one-entry array.
+				blockClientIds:
 					item.parent === 0
-						? clientIdByNoteId.get( item.id ) ?? null
-						: null,
+						? clientIdsByNoteId.get( item.id ) ?? []
+						: [],
 			};
 			threadsById.set( item.id, thread );
 			if ( item.parent === 0 ) {
@@ -143,7 +151,7 @@ export function useNoteThreads( postId ) {
 					// A multi-block note is listed in several blocks' metadata;
 					// emit it once, at its anchor (topmost) block, so it isn't
 					// duplicated in the list.
-					if ( clientIdByNoteId.get( noteId ) !== clientId ) {
+					if ( anchorOf( noteId ) !== clientId ) {
 						return null;
 					}
 					return {

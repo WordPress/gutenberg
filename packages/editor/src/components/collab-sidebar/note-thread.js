@@ -30,6 +30,7 @@ import {
 	focusNoteThread,
 	getNoteExcerpt,
 	scrollNoteThreadIntoView,
+	selectNoteBlocks,
 } from './utils';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -47,9 +48,12 @@ export function NoteThread( {
 	onKeyDown,
 } ) {
 	const isFloating = !! floating;
-	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const {
+		toggleBlockHighlight,
+		selectBlock,
+		multiSelect,
+		toggleBlockSpotlight,
+	} = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const relatedBlockElement = useBlockElement( note.blockClientId );
 	const debouncedToggleBlockHighlight = useDebounce(
@@ -137,10 +141,7 @@ export function NoteThread( {
 		selectNote( note.id );
 		focusNoteThread( note.id, sidebarRef.current );
 		toggleBlockSpotlight( note.blockClientId, true );
-		if ( !! note.blockClientId ) {
-			// Pass `null` as the second parameter to prevent focusing the block.
-			selectBlock( note.blockClientId, null );
-		}
+		selectNoteBlocks( note, { selectBlock, multiSelect } );
 	};
 
 	const onDeselectNote = () => {
