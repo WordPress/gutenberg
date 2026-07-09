@@ -394,13 +394,6 @@ export const replaceBlocks =
 			}
 		}
 		const blocksWithTemplates = applyBlockTypeTemplates( blocks );
-		// Mirrors the selection reducer, which reassigns the selection when
-		// a selection endpoint is one of the replaced blocks.
-		const isReplacingSelection = select
-			.getSelectedBlockClientIds()
-			.some( ( selectedClientId ) =>
-				clientIds.includes( selectedClientId )
-			);
 		// We're batching these two actions because an extra `undo/redo` step can
 		// be created, based on whether we insert a default block or not.
 		registry.batch( () => {
@@ -413,23 +406,13 @@ export const replaceBlocks =
 				initialPosition,
 				meta,
 			} );
-			if ( isReplacingSelection ) {
-				// Mirrors which replacement block the reducer selects.
-				const selectedIndex =
-					blocksWithTemplates[ indexToSelect ] !== undefined
-						? indexToSelect
-						: blocksWithTemplates.length - 1;
-				const templateSelectionClientId = getTemplateSelectionClientId(
-					blocks[ selectedIndex ],
-					blocksWithTemplates[ selectedIndex ]
-				);
-				if ( templateSelectionClientId ) {
-					dispatch.selectBlock(
-						templateSelectionClientId,
-						initialPosition
-					);
-				}
-			}
+			selectBlockTypeTemplate(
+				select,
+				dispatch,
+				blocks,
+				blocksWithTemplates,
+				initialPosition
+			);
 			// To avoid a focus loss when removing the last block, assure there is
 			// always a default block if the last of the blocks have been removed.
 			dispatch.ensureDefaultBlock();
@@ -609,29 +592,46 @@ function applyBlockTypeTemplates( blocks ) {
 }
 
 /**
- * Returns the client ID to select in place of a block whose block type
- * template was just applied, when the block type opts in with
- * `templateInsertUpdatesSelection`: the first inner leaf block.
+ * Moves the selection into the first inner leaf block of a freshly
+ * scaffolded block, when the block ended up selected and its block type
+ * opts in with `templateInsertUpdatesSelection`. Expects the state to
+ * reflect the insertion, and applies the same selection a template
+ * insertion updates the selection to.
  *
- * @param {Object} originalBlock     Block object before templates were applied.
- * @param {Object} blockWithTemplate Block object after templates were applied.
- *
- * @return {?string} Client ID of the first inner leaf block, or null.
+ * @param {Function}  select              Store select function.
+ * @param {Function}  dispatch            Store dispatch function.
+ * @param {Object[]}  originalBlocks      Block objects before templates were applied.
+ * @param {Object[]}  blocksWithTemplates Block objects after templates were applied.
+ * @param {0|-1|null} initialPosition     Initial focus position.
  */
-function getTemplateSelectionClientId( originalBlock, blockWithTemplate ) {
-	if (
-		originalBlock === blockWithTemplate ||
-		originalBlock.innerBlocks?.length ||
-		! blockWithTemplate.innerBlocks.length ||
-		! getBlockType( blockWithTemplate.name )?.templateInsertUpdatesSelection
-	) {
-		return null;
+function selectBlockTypeTemplate(
+	select,
+	dispatch,
+	originalBlocks,
+	blocksWithTemplates,
+	initialPosition
+) {
+	const selectedClientId = select.getSelectedBlockClientId();
+	if ( ! selectedClientId ) {
+		return;
 	}
-	let block = blockWithTemplate;
+	const index = blocksWithTemplates.findIndex(
+		( block ) => block.clientId === selectedClientId
+	);
+	if (
+		index === -1 ||
+		blocksWithTemplates[ index ] === originalBlocks[ index ] ||
+		! blocksWithTemplates[ index ].innerBlocks.length ||
+		! getBlockType( blocksWithTemplates[ index ].name )
+			?.templateInsertUpdatesSelection
+	) {
+		return;
+	}
+	let block = blocksWithTemplates[ index ];
 	while ( block.innerBlocks[ 0 ] ) {
 		block = block.innerBlocks[ 0 ];
 	}
-	return block.clientId;
+	dispatch.selectBlock( block.clientId, initialPosition );
 }
 
 /**
@@ -696,19 +696,13 @@ export const insertBlocks =
 					initialPosition: updateSelection ? initialPosition : null,
 					meta,
 				} );
-				if ( updateSelection ) {
-					const templateSelectionClientId =
-						getTemplateSelectionClientId(
-							allowedBlocks[ 0 ],
-							blocksWithTemplates[ 0 ]
-						);
-					if ( templateSelectionClientId ) {
-						dispatch.selectBlock(
-							templateSelectionClientId,
-							initialPosition
-						);
-					}
-				}
+				selectBlockTypeTemplate(
+					select,
+					dispatch,
+					allowedBlocks,
+					blocksWithTemplates,
+					initialPosition
+				);
 			} );
 		}
 	};
