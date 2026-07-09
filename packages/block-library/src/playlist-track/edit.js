@@ -12,7 +12,7 @@ import {
 	useBlockProps,
 	BlockControls,
 	InspectorControls,
-	RichText,
+	PlainText,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -279,7 +279,7 @@ const PlaylistTrackEdit = ( {
 						/>
 					) }
 					<span className="wp-block-playlist-track__content">
-						<RichText
+						<PlainText
 							tagName="span"
 							className="wp-block-playlist-track__title"
 							value={ title }
@@ -289,9 +289,10 @@ const PlaylistTrackEdit = ( {
 							} }
 							allowedFormats={ [] }
 							withoutInteractiveFormatting
+							__experimentalVersion={ 2 }
 						/>
 						{ showArtists && (
-							<RichText
+							<PlainText
 								tagName="span"
 								className="wp-block-playlist-track__artist"
 								value={ artist }
@@ -301,6 +302,7 @@ const PlaylistTrackEdit = ( {
 								}
 								allowedFormats={ [] }
 								withoutInteractiveFormatting
+								__experimentalVersion={ 2 }
 							/>
 						) }
 					</span>
