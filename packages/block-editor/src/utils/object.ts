@@ -87,3 +87,120 @@ export function uniqByProperty< T extends AnyObject >(
 		return seen.has( value ) ? false : seen.add( value );
 	} );
 }
+
+/**
+ * Recursively determines the differences between two objects.
+ * Keys present in `original` but not in `updated` (or explicitly set to undefined) are mapped to `undefined`.
+ * Returns only the changed properties.
+ *
+ * @param original The original object.
+ * @param updated  The updated object.
+ * @return A new object containing only the differences, or undefined if no differences.
+ */
+export function getAttributesDiff(
+	original: AnyObject | undefined | null,
+	updated: AnyObject | undefined | null
+): AnyObject | undefined {
+	if ( original === updated ) {
+		return undefined;
+	}
+	if ( ! original && ! updated ) {
+		return undefined;
+	}
+	if ( ! original ) {
+		return updated as AnyObject;
+	}
+	if ( ! updated ) {
+		// If updated is explicitly set to empty/nullish but original had keys,
+		// we should return an object mapping original keys to undefined to delete them.
+		const diff: AnyObject = {};
+		for ( const key in original ) {
+			diff[ key ] = undefined;
+		}
+		return diff;
+	}
+
+	const diff: AnyObject = {};
+	let hasDiff = false;
+
+	// Check for new and updated keys
+	for ( const key in updated ) {
+		const originalValue = original[ key ];
+		const updatedValue = updated[ key ];
+
+		if ( originalValue === updatedValue ) {
+			continue;
+		}
+
+		if (
+			typeof originalValue === 'object' &&
+			originalValue !== null &&
+			! Array.isArray( originalValue ) &&
+			typeof updatedValue === 'object' &&
+			updatedValue !== null &&
+			! Array.isArray( updatedValue )
+		) {
+			const nestedDiff = getAttributesDiff(
+				originalValue as AnyObject,
+				updatedValue as AnyObject
+			);
+			if ( nestedDiff !== undefined ) {
+				diff[ key ] = nestedDiff;
+				hasDiff = true;
+			}
+		} else {
+			diff[ key ] = updatedValue;
+			hasDiff = true;
+		}
+	}
+
+	// Check for deleted keys
+	for ( const key in original ) {
+		if ( ! ( key in updated ) ) {
+			diff[ key ] = undefined;
+			hasDiff = true;
+		}
+	}
+
+	return hasDiff ? diff : undefined;
+}
+
+/**
+ * Recursively applies a difference object to an original object.
+ * Keys mapped to `undefined` in the diff are deleted from the result.
+ *
+ * @param original The original object.
+ * @param diff     The difference object to apply.
+ * @return A new object with the differences applied.
+ */
+export function applyAttributesDiff(
+	original: AnyObject | undefined | null,
+	diff: AnyObject | undefined | null
+): AnyObject {
+	if ( ! diff ) {
+		return original ? { ...original } : {};
+	}
+
+	const result = original ? { ...original } : {};
+
+	for ( const key in diff ) {
+		const diffValue = diff[ key ];
+
+		if ( diffValue === undefined ) {
+			delete result[ key ];
+		} else if (
+			typeof diffValue === 'object' &&
+			diffValue !== null &&
+			! Array.isArray( diffValue )
+		) {
+			result[ key ] = applyAttributesDiff(
+				result[ key ] as AnyObject,
+				diffValue as AnyObject
+			);
+		} else {
+			result[ key ] = diffValue;
+		}
+	}
+
+	return result;
+}
