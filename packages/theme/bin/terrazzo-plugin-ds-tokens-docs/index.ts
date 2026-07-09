@@ -13,61 +13,220 @@ function escapeRegExp( str: string ) {
 
 type TokensMap = Record< string, Record< string, string > >;
 
+type RoleGroup = {
+	id: string;
+	title: string;
+	tokenIds?: readonly RegExp[];
+	children?: readonly RoleGroup[];
+};
+
+type LeafRoleGroup = {
+	id: string;
+	title: string;
+	tokenIds: readonly RegExp[];
+	path: readonly string[];
+};
+
 const ROLE_GROUPS = [
 	{
-		title: 'Surface',
-		tokenIds: [
-			/^wpds-color\.(background|stroke)\.surface\./,
-			/^wpds-dimension\.surface-width\./,
+		id: 'color',
+		title: 'Color',
+		children: [
+			{
+				id: 'color-background',
+				title: 'Background',
+				children: [
+					{
+						id: 'color-background-surface',
+						title: 'Surface',
+						tokenIds: [ /^wpds-color\.background\.surface\./ ],
+					},
+					{
+						id: 'color-background-interactive',
+						title: 'Interactive',
+						tokenIds: [ /^wpds-color\.background\.interactive\./ ],
+					},
+					{
+						id: 'color-background-track',
+						title: 'Track',
+						tokenIds: [ /^wpds-color\.background\.track\./ ],
+					},
+					{
+						id: 'color-background-thumb',
+						title: 'Thumb',
+						tokenIds: [ /^wpds-color\.background\.thumb\./ ],
+					},
+				],
+			},
+			{
+				id: 'color-foreground',
+				title: 'Foreground',
+				children: [
+					{
+						id: 'color-foreground-content',
+						title: 'Content',
+						tokenIds: [ /^wpds-color\.foreground\.content\./ ],
+					},
+					{
+						id: 'color-foreground-interactive',
+						title: 'Interactive',
+						tokenIds: [ /^wpds-color\.foreground\.interactive\./ ],
+					},
+				],
+			},
+			{
+				id: 'color-stroke',
+				title: 'Stroke',
+				children: [
+					{
+						id: 'color-stroke-surface',
+						title: 'Surface',
+						tokenIds: [ /^wpds-color\.stroke\.surface\./ ],
+					},
+					{
+						id: 'color-stroke-interactive',
+						title: 'Interactive',
+						tokenIds: [ /^wpds-color\.stroke\.interactive\./ ],
+					},
+					{
+						id: 'color-stroke-focus',
+						title: 'Focus',
+						tokenIds: [ /^wpds-color\.stroke\.focus$/ ],
+					},
+				],
+			},
 		],
 	},
 	{
-		title: 'Interactive',
-		tokenIds: [
-			/^wpds-color\.(background|foreground|stroke)\.interactive\./,
+		id: 'dimension',
+		title: 'Dimension',
+		children: [
+			{
+				id: 'dimension-padding',
+				title: 'Padding',
+				tokenIds: [ /^wpds-dimension\.padding\./ ],
+			},
+			{
+				id: 'dimension-gap',
+				title: 'Gap',
+				tokenIds: [ /^wpds-dimension\.gap\./ ],
+			},
+			{
+				id: 'dimension-size',
+				title: 'Size (element size)',
+				tokenIds: [ /^wpds-dimension\.size\./ ],
+			},
+			{
+				id: 'dimension-surface-width',
+				title: 'Surface width',
+				tokenIds: [ /^wpds-dimension\.surface-width\./ ],
+			},
 		],
 	},
-	{ title: 'Content', tokenIds: [ /^wpds-color\.foreground\.content\./ ] },
-	{ title: 'Track', tokenIds: [ /^wpds-color\.background\.track\./ ] },
-	{ title: 'Thumb', tokenIds: [ /^wpds-color\.background\.thumb\./ ] },
 	{
-		title: 'Focus indicators',
-		tokenIds: [
-			/^wpds-border\.width\.focus$/,
-			/^wpds-color\.stroke\.focus$/,
+		id: 'border',
+		title: 'Border',
+		children: [
+			{
+				id: 'border-width',
+				title: 'Width',
+				tokenIds: [ /^wpds-border\.width\./ ],
+			},
+			{
+				id: 'border-radius',
+				title: 'Radius',
+				tokenIds: [ /^wpds-border\.radius\./ ],
+			},
 		],
 	},
-	{ title: 'Controls', tokenIds: [ /^wpds-cursor\.control$/ ] },
 	{
-		title: 'Spacing',
-		tokenIds: [ /^wpds-dimension\.(padding|gap)\./ ],
+		id: 'cursor',
+		title: 'Cursor',
+		tokenIds: [ /^wpds-cursor\./ ],
 	},
-	{ title: 'Element sizes', tokenIds: [ /^wpds-dimension\.size\./ ] },
 	{
-		title: 'Borders',
-		tokenIds: [
-			/^wpds-border\.radius\./,
-			/^wpds-border\.width\.(?!focus$)/,
-		],
+		id: 'elevation',
+		title: 'Elevation',
+		tokenIds: [ /^wpds-elevation\./ ],
 	},
-	{ title: 'Elevations', tokenIds: [ /^wpds-elevation\./ ] },
 	{
+		id: 'motion',
 		title: 'Motion',
-		tokenIds: [ /^wpds-motion\.(duration|easing)\./ ],
-	},
-	{
-		title: 'Typography',
-		tokenIds: [
-			/^wpds-typography\.font-family\./,
-			/^wpds-typography\.font-size\./,
-			/^wpds-typography\.font-weight\./,
-			/^wpds-typography\.line-height\./,
+		children: [
+			{
+				id: 'motion-duration',
+				title: 'Duration',
+				tokenIds: [ /^wpds-motion\.duration\./ ],
+			},
+			{
+				id: 'motion-easing',
+				title: 'Easing',
+				tokenIds: [ /^wpds-motion\.easing\./ ],
+			},
 		],
 	},
-] as const;
+	{
+		id: 'typography',
+		title: 'Typography',
+		children: [
+			{
+				id: 'typography-font-family',
+				title: 'Font family',
+				tokenIds: [ /^wpds-typography\.font-family\./ ],
+			},
+			{
+				id: 'typography-font-size',
+				title: 'Font size',
+				tokenIds: [ /^wpds-typography\.font-size\./ ],
+			},
+			{
+				id: 'typography-line-height',
+				title: 'Line height',
+				tokenIds: [ /^wpds-typography\.line-height\./ ],
+			},
+			{
+				id: 'typography-font-weight',
+				title: 'Font weight',
+				tokenIds: [ /^wpds-typography\.font-weight\./ ],
+			},
+		],
+	},
+] satisfies readonly RoleGroup[];
+
+function getLeafGroups(
+	groups: readonly RoleGroup[] = ROLE_GROUPS,
+	path: readonly string[] = []
+): LeafRoleGroup[] {
+	return groups.flatMap( ( group ) => {
+		const groupPath = [ ...path, group.title ];
+
+		if ( group.children ) {
+			return getLeafGroups( group.children, groupPath );
+		}
+
+		if ( ! group.tokenIds ) {
+			throw new Error(
+				`@terrazzo/terrazzo-plugin-ds-tokens-docs: Token reference section ${ groupPath.join(
+					' > '
+				) } must define either children or tokenIds.`
+			);
+		}
+
+		return [
+			{
+				id: group.id,
+				title: group.title,
+				tokenIds: group.tokenIds,
+				path: groupPath,
+			},
+		];
+	} );
+}
+
+const LEAF_GROUPS = getLeafGroups();
 
 function getRoleGroup( tokenId: string ) {
-	const matchingGroups = ROLE_GROUPS.filter( ( { tokenIds } ) =>
+	const matchingGroups = LEAF_GROUPS.filter( ( { tokenIds } ) =>
 		tokenIds.some( ( pattern ) => pattern.test( tokenId ) )
 	);
 
@@ -80,12 +239,12 @@ function getRoleGroup( tokenId: string ) {
 	if ( matchingGroups.length > 1 ) {
 		throw new Error(
 			`@terrazzo/terrazzo-plugin-ds-tokens-docs: Multiple token reference sections match ${ tokenId }: ${ matchingGroups
-				.map( ( { title } ) => title )
+				.map( ( { path } ) => path.join( ' > ' ) )
 				.join( ', ' ) }.`
 		);
 	}
 
-	return matchingGroups[ 0 ].title;
+	return matchingGroups[ 0 ].id;
 }
 
 export default function pluginDsTokenDocs( {
@@ -100,7 +259,7 @@ export default function pluginDsTokenDocs( {
 			}
 
 			const semanticTokensByGroup: TokensMap = Object.fromEntries(
-				ROLE_GROUPS.map( ( { title } ) => [ title, {} ] )
+				LEAF_GROUPS.map( ( { id } ) => [ id, {} ] )
 			);
 			// Re-use transformed tokens from the CSS plugin
 			for ( const token of getTransforms( {
@@ -120,16 +279,36 @@ export default function pluginDsTokenDocs( {
 					token.token.$description ?? 'N/A';
 			}
 
-			function tokensToMdTable( tokens: TokensMap ) {
-				return ROLE_GROUPS.flatMap( ( { title } ) => {
-					const tokensInGroup = tokens[ title ];
+			function tokensToMdSections(
+				groups: readonly RoleGroup[],
+				tokens: TokensMap,
+				headingLevel = 3
+			): string[] {
+				return groups.flatMap( ( group ) => {
+					const heading = `${ '#'.repeat( headingLevel ) } ${
+						group.title
+					}`;
+
+					if ( group.children ) {
+						return [
+							heading,
+							'',
+							...tokensToMdSections(
+								group.children,
+								tokens,
+								headingLevel + 1
+							),
+						];
+					}
+
+					const tokensInGroup = tokens[ group.id ];
 
 					if ( Object.keys( tokensInGroup ).length === 0 ) {
 						return [];
 					}
 
 					return [
-						`### ${ title }`,
+						heading,
 						'',
 						'| Variable name | Description |',
 						'|---|---|',
@@ -145,11 +324,15 @@ export default function pluginDsTokenDocs( {
 			const generatedTokenTables = [
 				GENERATED_SECTION_START,
 				'',
+				'<!-- markdownlint-disable MD024 -->',
+				'',
 				'## Semantic tokens',
 				'',
-				'These generated tables list every public semantic token, grouped by the element or token family encoded in each token name. Use them to compare related tokens for the same kind of UI element.',
+				'These generated tables list every public semantic token, grouped by the token family and role segments encoded in each token name.',
 				'',
-				...tokensToMdTable( semanticTokensByGroup ),
+				...tokensToMdSections( ROLE_GROUPS, semanticTokensByGroup ),
+				'<!-- markdownlint-enable MD024 -->',
+				'',
 				GENERATED_SECTION_END,
 			].join( '\n' );
 
