@@ -82,6 +82,7 @@ describe( 'reducer', () => {
 			expect( state ).toEqual( {
 				queueStatus: 'active',
 				blobUrls: {},
+				gifConversions: [],
 				settings: {
 					mediaUpload: expect.any( Function ),
 				},

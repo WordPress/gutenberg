@@ -64,6 +64,31 @@ export interface State {
 	queueStatus: QueueStatus;
 	blobUrls: Record< QueueItemId, string[] >;
 	settings: Settings;
+	// Optional for compatibility with partial states in tests; always
+	// present at runtime via the reducer's default state.
+	gifConversions?: GifConversion[];
+}
+
+/**
+ * An animated GIF upload whose conversion to a companion video is decided
+ * by the user rather than performed automatically (`gifConvert: 'prompt'`).
+ *
+ * Unlike queue items, these records outlive the upload: the GIF uploads as
+ * a plain image and the entry stays behind so a host application can prompt
+ * the user and trigger the conversion afterwards.
+ */
+export interface GifConversion {
+	// Attachment ID of the uploaded GIF image.
+	attachmentId: number;
+	// ID of the (typically already removed) upload queue item. Used as the
+	// parentId of a later transcode sideload and to correlate cancellations.
+	itemId: QueueItemId;
+	// The original animated GIF file, kept for a later transcode.
+	file: File;
+	// pending: awaiting the user's decision.
+	// converting: transcode sideload in flight.
+	// converted: companion video uploaded and recorded on the attachment.
+	status: 'pending' | 'converting' | 'converted';
 }
 
 export enum Type {
@@ -86,6 +111,9 @@ export enum Type {
 	UpdateProgress = 'UPDATE_PROGRESS',
 	AccumulateSubSize = 'ACCUMULATE_SUB_SIZE',
 	UpdateSettings = 'UPDATE_SETTINGS',
+	AddGifConversion = 'ADD_GIF_CONVERSION',
+	UpdateGifConversion = 'UPDATE_GIF_CONVERSION',
+	RemoveGifConversion = 'REMOVE_GIF_CONVERSION',
 }
 
 type Action< T = Type, Payload = Record< string, unknown > > = {
@@ -153,6 +181,18 @@ export type AccumulateSubSizeAction = Action<
 export type UpdateSettingsAction = Action<
 	Type.UpdateSettings,
 	{ settings: Partial< Settings > }
+>;
+export type AddGifConversionAction = Action<
+	Type.AddGifConversion,
+	{ conversion: GifConversion }
+>;
+export type UpdateGifConversionAction = Action<
+	Type.UpdateGifConversion,
+	{ attachmentId: number; status: GifConversion[ 'status' ] }
+>;
+export type RemoveGifConversionAction = Action<
+	Type.RemoveGifConversion,
+	{ attachmentId: number }
 >;
 
 interface UploadMediaArgs {
@@ -227,9 +267,11 @@ export interface Settings {
 		subSizes: SubSizeData[]
 	) => Promise< Partial< Attachment > | void >;
 	// Whether to convert animated GIFs to video (MP4/WebM) during upload.
-	// When enabled, animated GIFs are transcoded to video for smaller file sizes.
-	// Default is true.
-	gifConvert?: boolean;
+	// When true (the default), animated GIFs are transcoded to a companion
+	// video automatically during upload. When 'prompt', the GIF uploads as a
+	// plain image and a GifConversion record is kept so the host application
+	// can ask the user and trigger the conversion via resolveGifConversion().
+	gifConvert?: boolean | 'prompt';
 	// Output format for GIF-to-video conversion.
 	// Accepts 'video/mp4' or 'video/webm'. Default is 'video/mp4'.
 	videoOutputFormat?: 'video/mp4' | 'video/webm';

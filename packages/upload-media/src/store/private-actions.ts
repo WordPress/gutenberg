@@ -47,6 +47,7 @@ import {
 import type {
 	AccumulateSubSizeAction,
 	AddAction,
+	AddGifConversionAction,
 	AdditionalData,
 	AddOperationsAction,
 	Attachment,
@@ -67,10 +68,12 @@ import type {
 	QueueItemId,
 	ResumeQueueAction,
 	RevokeBlobUrlsAction,
+	RemoveGifConversionAction,
 	SideloadAdditionalData,
 	Settings,
 	State,
 	SubSizeData,
+	UpdateGifConversionAction,
 	UpdateProgressAction,
 	UpdateSettingsAction,
 } from './types';
@@ -372,6 +375,24 @@ export function processItem( id: QueueItemId ) {
 		*/
 
 		if ( ! operation ) {
+			/*
+			 * A finished `animated_video` sideload means the companion video
+			 * is now recorded on the attachment. Mark any user-requested GIF
+			 * conversion as converted so observers (e.g. the editor's prompt)
+			 * can react. This is a no-op for the automatic conversion during
+			 * upload, which creates no conversion record.
+			 */
+			if (
+				item.additionalData?.image_size === 'animated_video' &&
+				item.additionalData?.post
+			) {
+				dispatch< UpdateGifConversionAction >( {
+					type: Type.UpdateGifConversion,
+					attachmentId: item.additionalData.post as number,
+					status: 'converted',
+				} );
+			}
+
 			if (
 				parentId ||
 				( ! parentId && ! select.hasPendingItemsByParentId( id ) )
@@ -1465,6 +1486,98 @@ export function transcodeGifItem(
 }
 
 /**
+ * Resolves a GIF conversion that is pending a user decision
+ * (see the `gifConvert: 'prompt'` setting).
+ *
+ * With 'video', the kept original GIF is transcoded and sideloaded as the
+ * attachment's `animated_video` companion, exactly like the automatic
+ * conversion during upload. With 'gif', the record is discarded and the
+ * attachment stays a plain GIF image.
+ *
+ * @param attachmentId Attachment ID of the uploaded GIF.
+ * @param decision     'video' to convert, 'gif' to keep the GIF as is.
+ */
+export function resolveGifConversion(
+	attachmentId: number,
+	decision: 'video' | 'gif'
+) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const conversion = select
+			.getGifConversions()
+			.find(
+				( record ) =>
+					record.attachmentId === attachmentId &&
+					record.status === 'pending'
+			);
+		if ( ! conversion ) {
+			return;
+		}
+
+		if ( decision === 'gif' ) {
+			dispatch< RemoveGifConversionAction >( {
+				type: Type.RemoveGifConversion,
+				attachmentId,
+			} );
+			return;
+		}
+
+		dispatch< UpdateGifConversionAction >( {
+			type: Type.UpdateGifConversion,
+			attachmentId,
+			status: 'converting',
+		} );
+
+		const settings = select.getSettings();
+		const outputFormat =
+			settings.videoOutputFormat === 'video/webm' ? 'webm' : 'mp4';
+
+		/*
+		 * Mirrors the automatic companion sideload in generateThumbnails().
+		 * The original upload item has typically finished and left the queue
+		 * by now; its ID still serves as parentId because a truthy parentId
+		 * is what routes the Upload operation to the sideload endpoint, and
+		 * every parent lookup handles an absent parent gracefully.
+		 */
+		dispatch.addSideloadItem( {
+			file: conversion.file,
+			batchId: uuidv4(),
+			parentId: conversion.itemId,
+			additionalData: {
+				post: attachmentId,
+				image_size: 'animated_video',
+				convert_format: false,
+			},
+			operations: [
+				[
+					OperationType.TranscodeGif,
+					{
+						outputFormat,
+					} as OperationArgs[ OperationType.TranscodeGif ],
+				],
+				OperationType.Upload,
+			],
+		} );
+	};
+}
+
+/**
+ * Removes a GIF conversion record from the store.
+ *
+ * Used by observers once a converted record has been fully consumed
+ * (e.g. after the editor swapped the corresponding blocks).
+ *
+ * @param attachmentId Attachment ID of the uploaded GIF.
+ */
+export function removeGifConversion(
+	attachmentId: number
+): RemoveGifConversionAction {
+	return {
+		type: Type.RemoveGifConversion,
+		attachmentId,
+	};
+}
+
+/**
  * Adds thumbnail versions to the queue for sideloading.
  *
  * Also handles image rotation for images that need EXIF-based rotation
@@ -1515,35 +1628,55 @@ export function generateThumbnails( id: QueueItemId ) {
 		// parentId routes the result to the sideload endpoint, so no
 		// separate attachment is created.
 		if ( item.animatedGifFile && attachment.id ) {
-			const outputFormat =
-				settings.videoOutputFormat === 'video/webm' ? 'webm' : 'mp4';
+			if ( settings.gifConvert === 'prompt' ) {
+				/*
+				 * Prompt mode: don't convert automatically. Record the upload
+				 * so the host application (e.g. the editor) can ask the user
+				 * and trigger the transcode later via resolveGifConversion().
+				 * The GIF itself continues through the normal image pipeline.
+				 */
+				dispatch< AddGifConversionAction >( {
+					type: Type.AddGifConversion,
+					conversion: {
+						attachmentId: attachment.id,
+						itemId: item.id,
+						file: item.animatedGifFile,
+						status: 'pending',
+					},
+				} );
+			} else {
+				const outputFormat =
+					settings.videoOutputFormat === 'video/webm'
+						? 'webm'
+						: 'mp4';
 
-			dispatch.addSideloadItem( {
-				file: item.animatedGifFile,
-				batchId: uuidv4(),
-				parentId: item.id,
-				additionalData: {
-					post: attachment.id,
-					image_size: 'animated_video',
-					convert_format: false,
-				},
-				operations: [
-					[
-						OperationType.TranscodeGif,
-						{
-							outputFormat,
-						} as OperationArgs[ OperationType.TranscodeGif ],
+				dispatch.addSideloadItem( {
+					file: item.animatedGifFile,
+					batchId: uuidv4(),
+					parentId: item.id,
+					additionalData: {
+						post: attachment.id,
+						image_size: 'animated_video',
+						convert_format: false,
+					},
+					operations: [
+						[
+							OperationType.TranscodeGif,
+							{
+								outputFormat,
+							} as OperationArgs[ OperationType.TranscodeGif ],
+						],
+						OperationType.Upload,
 					],
-					OperationType.Upload,
-				],
-			} );
+				} );
 
-			/*
-			 * The static first-frame poster companion is sideloaded by the
-			 * TranscodeGif operation once the video conversion succeeds (see
-			 * transcodeGifItem), so a failed conversion leaves no orphaned
-			 * poster.
-			 */
+				/*
+				 * The static first-frame poster companion is sideloaded by
+				 * the TranscodeGif operation once the video conversion
+				 * succeeds (see transcodeGifItem), so a failed conversion
+				 * leaves no orphaned poster.
+				 */
+			}
 		}
 
 		// Check if image needs rotation.

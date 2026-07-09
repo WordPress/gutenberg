@@ -3,6 +3,7 @@
  */
 import {
 	type BatchId,
+	type GifConversion,
 	OperationType,
 	type QueueItem,
 	type QueueItemId,
@@ -18,6 +19,22 @@ import {
  */
 export function getAllItems( state: State ): QueueItem[] {
 	return state.queue;
+}
+
+/**
+ * Returns all GIF conversion records: animated GIF uploads awaiting a user
+ * decision, or whose user-requested transcode is in flight or finished.
+ *
+ * Only populated when the `gifConvert` setting is 'prompt'.
+ *
+ * @param state Upload state.
+ *
+ * @return GIF conversion records.
+ */
+const EMPTY_GIF_CONVERSIONS: GifConversion[] = [];
+
+export function getGifConversions( state: State ): GifConversion[] {
+	return state.gifConversions ?? EMPTY_GIF_CONVERSIONS;
 }
 
 /**

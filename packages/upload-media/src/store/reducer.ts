@@ -4,9 +4,11 @@
 import {
 	type AccumulateSubSizeAction,
 	type AddAction,
+	type AddGifConversionAction,
 	type AddOperationsAction,
 	type CacheBlobUrlAction,
 	type CancelAction,
+	type GifConversion,
 	ItemStatus,
 	type OperationFinishAction,
 	type OperationStartAction,
@@ -22,6 +24,8 @@ import {
 	type State,
 	Type,
 	type UnknownAction,
+	type UpdateGifConversionAction,
+	type RemoveGifConversionAction,
 	type UpdateProgressAction,
 	type UpdateSettingsAction,
 } from './types';
@@ -37,6 +41,7 @@ const DEFAULT_STATE: State = {
 	queue: [],
 	queueStatus: 'active',
 	blobUrls: {},
+	gifConversions: [],
 	settings: {
 		mediaUpload: noop,
 		maxConcurrentUploads: DEFAULT_MAX_CONCURRENT_UPLOADS,
@@ -63,6 +68,9 @@ type Action =
 	| RevokeBlobUrlsAction
 	| UpdateProgressAction
 	| UpdateSettingsAction
+	| AddGifConversionAction
+	| UpdateGifConversionAction
+	| RemoveGifConversionAction
 	| UnknownAction;
 
 function reducer(
@@ -118,7 +126,28 @@ function reducer(
 				queue: [ ...state.queue, action.item ],
 			};
 
-		case Type.Cancel:
+		case Type.Cancel: {
+			/*
+			 * A cancelled item invalidates related GIF conversion records:
+			 * either the original GIF upload failed (matched by itemId, e.g.
+			 * a total sub-size failure that deletes the attachment), or the
+			 * user-requested transcode sideload failed (matched by the
+			 * sideload's parentId, which is the original item's ID).
+			 */
+			const cancelledItem = state.queue.find(
+				( item ) => item.id === action.id
+			);
+			const isGifTranscode =
+				cancelledItem?.additionalData?.image_size === 'animated_video';
+			const gifConversions = ( state.gifConversions ?? [] ).filter(
+				( conversion ) =>
+					conversion.itemId !== action.id &&
+					! (
+						isGifTranscode &&
+						conversion.itemId === cancelledItem?.parentId
+					)
+			);
+
 			return {
 				...state,
 				queue: state.queue.map(
@@ -130,7 +159,9 @@ function reducer(
 							  }
 							: item
 				),
+				gifConversions,
 			};
+		}
 
 		case Type.RetryItem:
 			return {
@@ -302,6 +333,38 @@ function reducer(
 				},
 			};
 		}
+
+		case Type.AddGifConversion:
+			return {
+				...state,
+				gifConversions: [
+					...( state.gifConversions ?? [] ),
+					action.conversion,
+				],
+			};
+
+		case Type.UpdateGifConversion:
+			return {
+				...state,
+				gifConversions: ( state.gifConversions ?? [] ).map(
+					( conversion ): GifConversion =>
+						conversion.attachmentId === action.attachmentId
+							? {
+									...conversion,
+									status: action.status,
+							  }
+							: conversion
+				),
+			};
+
+		case Type.RemoveGifConversion:
+			return {
+				...state,
+				gifConversions: ( state.gifConversions ?? [] ).filter(
+					( conversion ) =>
+						conversion.attachmentId !== action.attachmentId
+				),
+			};
 	}
 
 	return state;
