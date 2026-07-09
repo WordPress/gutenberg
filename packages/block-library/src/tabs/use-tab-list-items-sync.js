@@ -46,15 +46,16 @@ export default function useTabListItemsSync( clientId ) {
 				tabPanels: tabPanelsBlock?.innerBlocks ?? EMPTY_ARRAY,
 				tabListClientId: _tabListClientId,
 				currentTabs: _tabListClientId
-					? getBlockAttributes( _tabListClientId )?.tabs
-					: null,
+					? getBlockAttributes( _tabListClientId )?.tabs ??
+					  EMPTY_ARRAY
+					: EMPTY_ARRAY,
 			};
 		},
 		[ clientId ]
 	);
 
 	useEffect( () => {
-		if ( ! tabListClientId || ! currentTabs ) {
+		if ( ! tabListClientId ) {
 			return;
 		}
 
