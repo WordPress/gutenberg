@@ -103,6 +103,107 @@ describe( 'useAriaAnnouncer', () => {
 		expect( result.current ).toBe( 'Crop 800 by 400 pixels' );
 	} );
 
+	it( 'announces a single-pixel crop change', () => {
+		const image = {
+			src: 'test.jpg',
+			naturalWidth: 2000,
+			naturalHeight: 1000,
+		};
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{
+				initialProps: {
+					state: makeState( {
+						image,
+						cropRect: { x: 0, y: 0, width: 0.5, height: 0.5 },
+					} ),
+				},
+			}
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		// 0.5 → 0.5005 of a 2000px-wide image is a one-pixel change (1000 →
+		// 1001), well under the old ~0.5% percentage threshold.
+		rerender( {
+			state: makeState( {
+				image,
+				cropRect: { x: 0, y: 0, width: 0.5005, height: 0.5 },
+			} ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Crop 1001 by 500 pixels' );
+	} );
+
+	it( 'does not announce the crop when only zoom changes', () => {
+		const image = {
+			src: 'test.jpg',
+			naturalWidth: 2000,
+			naturalHeight: 1000,
+		};
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{
+				initialProps: {
+					state: makeState( {
+						image,
+						cropRect: { x: 0, y: 0, width: 0.5, height: 0.5 },
+					} ),
+				},
+			}
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		rerender( {
+			state: makeState( {
+				image,
+				cropRect: { x: 0, y: 0, width: 0.5, height: 0.5 },
+				zoom: 1.5,
+			} ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Zoom 150%' );
+	} );
+
+	it( 'announces a single-pixel crop change on a rotated non-square image', () => {
+		// Portrait image rotated 90°: the announced width scales by the
+		// snap-rotation bbox (2000), not naturalWidth (800), so a one-pixel
+		// change is 0.0005 of the crop rect — below a naturalWidth-based guard.
+		const image = {
+			src: 'test.jpg',
+			naturalWidth: 800,
+			naturalHeight: 2000,
+		};
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{
+				initialProps: {
+					state: makeState( {
+						image,
+						rotation: 90,
+						cropRect: { x: 0, y: 0, width: 0.5, height: 0.5 },
+					} ),
+				},
+			}
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		rerender( {
+			state: makeState( {
+				image,
+				rotation: 90,
+				cropRect: { x: 0, y: 0, width: 0.5005, height: 0.5 },
+			} ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Crop 1001 by 400 pixels' );
+	} );
+
 	it( 'announces clockwise rotation with direction', () => {
 		const { result, rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),

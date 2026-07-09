@@ -87,22 +87,30 @@ function getCropAnnouncement(
 	state: CropperState,
 	previousState: CropperState | null
 ): string | undefined {
-	if (
-		previousState &&
-		Math.round( previousState.cropRect.width * 100 ) ===
-			Math.round( state.cropRect.width * 100 ) &&
-		Math.round( previousState.cropRect.height * 100 ) ===
-			Math.round( state.cropRect.height * 100 )
-	) {
-		return undefined;
-	}
 	if ( ! state.image ) {
 		return undefined;
 	}
-	const region = getSourceRegion( state, {
+	const imageSize = {
 		width: state.image.naturalWidth,
 		height: state.image.naturalHeight,
-	} );
+	};
+	const region = getSourceRegion( state, imageSize );
+	// Announce only when the crop's pixel dimensions change. Measuring both the
+	// previous and current crop rects under the current rotation and zoom keeps
+	// the comparison in the same pixel units we announce, and leaves a zoom-only
+	// change — which doesn't move the crop rect — silent.
+	if ( previousState?.image ) {
+		const previousRegion = getSourceRegion(
+			{ ...state, cropRect: previousState.cropRect },
+			imageSize
+		);
+		if (
+			Math.round( previousRegion.width ) === Math.round( region.width ) &&
+			Math.round( previousRegion.height ) === Math.round( region.height )
+		) {
+			return undefined;
+		}
+	}
 	return sprintf(
 		/* translators: 1: crop width in pixels, 2: crop height in pixels. */
 		__( 'Crop %1$d by %2$d pixels' ),
