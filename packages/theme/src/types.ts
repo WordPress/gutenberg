@@ -10,9 +10,10 @@ export interface ThemeProviderSettings {
 		/**
 		 * The primary seed color to use for the theme. Accepts a fully opaque
 		 * sRGB-parseable string: a hex value (e.g. `#3858e9`), an
-		 * `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Alpha
-		 * values, `transparent`, and other CSS color spaces (e.g. `hsl()`,
-		 * `oklch()`, `lab()`) are not accepted and throw an error.
+		 * `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`).
+		 * Non-opaque alpha values, `transparent`, and other CSS color spaces
+		 * (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and throw an
+		 * error.
 		 *
 		 * By default, it inherits from parent `ThemeProvider`,
 		 * and fallbacks to statically built CSS.
@@ -21,9 +22,10 @@ export interface ThemeProviderSettings {
 		/**
 		 * The background seed color to use for the theme. Accepts a fully
 		 * opaque sRGB-parseable string: a hex value (e.g. `#f8f8f8`), an
-		 * `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Alpha
-		 * values, `transparent`, and other CSS color spaces (e.g. `hsl()`,
-		 * `oklch()`, `lab()`) are not accepted and throw an error.
+		 * `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`).
+		 * Non-opaque alpha values, `transparent`, and other CSS color spaces
+		 * (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and throw an
+		 * error.
 		 *
 		 * By default, it inherits from parent `ThemeProvider`,
 		 * and fallbacks to statically built CSS.
