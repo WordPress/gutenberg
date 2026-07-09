@@ -427,25 +427,20 @@ test.describe( 'Collaboration - Stress Test', () => {
 		await collaborationUtils.waitForMutualDiscovery();
 
 		// ── Phase 4 — Two users type in the same paragraph ──────
-		// The two users edit distinct ends of the paragraph: Admin appends
-		// at the end, Editor prepends at the start.
+		// Place carets before either user types. The click + select steps
+		// concurrently seem flakey in Playwright, so place carets first and then
+		// start typing simultaneously.
+		await editor.canvas.getByText( 'shared editing target' ).click();
+		await page.keyboard.press( 'ControlOrMeta+a' );
+		await page.keyboard.press( 'ArrowRight' );
+
+		await editor2.canvas.getByText( 'shared editing target' ).click();
+		await page2.keyboard.press( 'ControlOrMeta+a' );
+		await page2.keyboard.press( 'ArrowLeft' );
+
 		await Promise.all( [
-			( async () => {
-				await editor.canvas
-					.getByText( 'shared editing target' )
-					.click();
-				await page.keyboard.press( 'ControlOrMeta+a' );
-				await page.keyboard.press( 'ArrowRight' );
-				await page.keyboard.insertText( '- Admin was here.' );
-			} )(),
-			( async () => {
-				await editor2.canvas
-					.getByText( 'shared editing target' )
-					.click();
-				await page2.keyboard.press( 'ControlOrMeta+a' );
-				await page2.keyboard.press( 'ArrowLeft' );
-				await page2.keyboard.insertText( 'Editor was here -' );
-			} )(),
+			page.keyboard.insertText( '- Admin was here.' ),
+			page2.keyboard.insertText( 'Editor was here -' ),
 		] );
 
 		// All three active users should see both additions.

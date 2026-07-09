@@ -26,6 +26,7 @@
 	},
 	"supports": {
 		"html": false,
+		"ariaLabel": true,
 		"visibility": false,
 		"lock": false,
 		"color": {
