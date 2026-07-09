@@ -3,7 +3,8 @@
 		"name": "core/post-content",
 		"isValid": true,
 		"attributes": {
-			"tagName": "div"
+			"tagName": "div",
+			"dropCap": false
 		},
 		"innerBlocks": []
 	}
