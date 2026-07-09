@@ -174,7 +174,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 					widget={ widget }
 					index={ index }
 					className={ clsx( styles.tile, {
-						[ styles.tileEditMode ]: editMode,
+						[ styles[ 'tile-edit-mode' ] ]: editMode,
 					} ) }
 					actionableArea={ actionableArea }
 					headerToolbar={ ! inSlot ? toolbar : undefined }
@@ -184,7 +184,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 
 		const renderDragPreview = useCallback(
 			( { children: clone }: DragPreviewRenderProps ) => (
-				<div className={ styles.dragPreview }>{ clone }</div>
+				<div className={ styles[ 'drag-preview' ] }>{ clone }</div>
 			),
 			[]
 		);
