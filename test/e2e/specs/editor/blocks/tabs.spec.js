@@ -253,7 +253,7 @@ test.describe( 'Tabs', () => {
 			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
 			await editor.selectBlocks(
 				editor.canvas
-					.getByRole( 'document', { name: 'Block: Tab Panel' } )
+					.locator( '[data-type="core/tab-panel"]' )
 					.filter( { hasText: 'Panel 2' } )
 			);
 
@@ -297,7 +297,7 @@ test.describe( 'Tabs', () => {
 			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
 			await editor.selectBlocks(
 				editor.canvas
-					.getByRole( 'document', { name: 'Block: Tab Panel' } )
+					.locator( '[data-type="core/tab-panel"]' )
 					.filter( { hasText: 'Panel 2' } )
 			);
 
@@ -341,7 +341,7 @@ test.describe( 'Tabs', () => {
 			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
 			await editor.selectBlocks(
 				editor.canvas
-					.getByRole( 'document', { name: 'Block: Tab Panel' } )
+					.locator( '[data-type="core/tab-panel"]' )
 					.filter( { hasText: 'Panel 2' } )
 			);
 
@@ -385,7 +385,7 @@ test.describe( 'Tabs', () => {
 			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
 			await editor.selectBlocks(
 				editor.canvas
-					.getByRole( 'document', { name: 'Block: Tab Panel' } )
+					.locator( '[data-type="core/tab-panel"]' )
 					.filter( { hasText: 'Panel 2' } )
 			);
 			// Duplicate the panel.
