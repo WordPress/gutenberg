@@ -212,15 +212,11 @@ const invalidateAttachedImagesQueries = ( postId, query = {} ) => {
 	] );
 };
 
-// A media modal opened anywhere in the editor (a canvas block, the featured
-// image panel, the "Attach images" button) attaches its uploads to the current
-// post and, on close, invalidates every cached attachment `getEntityRecords`
-// resolution. The inserter panel fetches imperatively into local state, so it
-// can't react to that on its own. This watches the exact resolution the visible
-// grid reads and calls `onChange` on the resolved -> unresolved edge — i.e. when
-// that cache is invalidated — so the panel can refetch. The args must match what
-// `coreMediaFetch` resolves byte-for-byte, since `invalidateResolution` keys on
-// deep argument equality.
+// The inserter panel fetches imperatively into local state, so it can't react to
+// attachment cache invalidation on its own. Calls `onChange` on the resolved ->
+// unresolved edge of the resolution the grid reads, i.e. when that cache is
+// invalidated. `args` must match what `coreMediaFetch` resolves byte-for-byte,
+// since `invalidateResolution` keys on deep argument equality.
 const subscribeToMediaInvalidation = ( args, onChange ) => {
 	const isResolved = () =>
 		select( coreStore ).hasFinishedResolution( 'getEntityRecords', args );
@@ -235,10 +231,9 @@ const subscribeToMediaInvalidation = ( args, onChange ) => {
 	}, coreStore );
 };
 
-// Builds a core-data-backed inserter media category from a single `getQuery`
-// mapper, so `fetch` and `subscribe` always agree on the resolution args (they
-// would otherwise drift). `coreMediaFetch` applies `getCoreMediaQuery`
-// internally, so `subscribe` mirrors that to watch the same resolution. External
+// Builds a core-data-backed category from a single `getQuery` mapper, so `fetch`
+// and `subscribe` can't drift apart on the resolution args. `coreMediaFetch`
+// applies `getCoreMediaQuery` internally, so `subscribe` mirrors it. External
 // sources (e.g. Openverse) don't use this and simply omit `subscribe`.
 const createCoreMediaCategory = ( { getQuery, ...category } ) => ( {
 	...category,
@@ -263,10 +258,9 @@ const createCoreMediaCategory = ( { getQuery, ...category } ) => ( {
  * and renders through the shared media panel. In addition to `fetch`, it exposes
  * optional `attach`/`detach`/`invalidate` capabilities that the shared panel
  * picks up to offer an "Attach images" button and a per-item "Detach from post"
- * action in the same dropdown Openverse uses for "Report image". It also
- * exposes an optional `subscribe` capability so the panel can refetch when the
- * attachment cache is invalidated externally (e.g. a media modal opened
- * elsewhere closing after an upload).
+ * action in the same dropdown Openverse uses for "Report image". It also exposes
+ * `subscribe`, so the panel can refetch when the attachment cache is invalidated
+ * elsewhere (e.g. a media modal closing after an upload).
  *
  * @param {number}      postId      The current post id.
  * @param {string|null} [typeLabel] The post type's singular label to use in copy (e.g. "Page"),
