@@ -13,7 +13,10 @@ describe( 'Playlist block edit utilities', () => {
 				artist: 'The Artist',
 				album: 'Great Album',
 				fileLength: '3:45',
-				image: { src: 'https://example.com/cover.jpg' },
+				image: {
+					src: 'https://example.com/cover.jpg',
+					alt: 'A bright abstract album cover',
+				},
 			};
 
 			const result = getTrackAttributes( media );
@@ -26,6 +29,7 @@ describe( 'Playlist block edit utilities', () => {
 				album: 'Great Album',
 				length: '3:45',
 				image: 'https://example.com/cover.jpg',
+				imageAlt: 'A bright abstract album cover',
 			} );
 		} );
 
@@ -38,6 +42,8 @@ describe( 'Playlist block edit utilities', () => {
 			const result = getTrackAttributes( media );
 
 			expect( result.id ).toBe( 'https://example.com/song.mp3' );
+			expect( result.image ).toBeUndefined();
+			expect( result.imageAlt ).toBeUndefined();
 		} );
 
 		it( 'should fall back to meta.artist when artist is not available', () => {
@@ -110,18 +116,23 @@ describe( 'Playlist block edit utilities', () => {
 			const result = getTrackAttributes( media );
 
 			expect( result.image ).toBe( '' );
+			expect( result.imageAlt ).toBe( '' );
 		} );
 
 		it( 'should include image URLs', () => {
 			const media = {
 				url: 'https://example.com/song.mp3',
 				title: 'My Song',
-				image: { src: 'https://example.com/cover.jpg' },
+				image: {
+					src: 'https://example.com/cover.jpg',
+					alt_text: 'A black and white portrait',
+				},
 			};
 
 			const result = getTrackAttributes( media );
 
 			expect( result.image ).toBe( 'https://example.com/cover.jpg' );
+			expect( result.imageAlt ).toBe( 'A black and white portrait' );
 		} );
 	} );
 } );

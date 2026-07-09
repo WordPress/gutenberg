@@ -641,7 +641,7 @@ describe( 'SyncManager', () => {
 			expect( stateMap.get( SAVED_BY_KEY ) ).toBeUndefined();
 		} );
 
-		it( 'applies local CRDT updates synchronously before processing remote record updates', async () => {
+		it( 'applies local CRDT updates synchronously before processing remote record updates when collaborating', async () => {
 			let capturedDoc: Y.Doc | null = null;
 			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
 				capturedDoc = ydoc;
@@ -691,6 +691,15 @@ describe( 'SyncManager', () => {
 
 			handlers.editRecord.mockClear();
 
+			// Simulate a remote peer so local updates are applied synchronously.
+			// (They are only deferred off the hot path when editing alone.)
+			const awareness = manager.getAwareness(
+				'post',
+				'123'
+			) as Awareness;
+			awareness.setLocalState( {} );
+			awareness.states.set( awareness.clientID + 1, {} );
+
 			manager.update(
 				'post',
 				'123',
@@ -715,6 +724,37 @@ describe( 'SyncManager', () => {
 			expect( handlers.editRecord ).toHaveBeenCalledWith( {
 				remoteField: 'Remote value',
 			} );
+		} );
+
+		it( 'defers local CRDT updates off the hot path when editing alone', async () => {
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			jest.clearAllMocks();
+
+			manager.update(
+				'post',
+				'123',
+				{ title: 'Updated Title' },
+				LOCAL_EDITOR_ORIGIN
+			);
+
+			// With no remote peers present, the update is deferred so nothing
+			// is applied synchronously on the typing hot path.
+			expect(
+				mockSyncConfig.applyChangesToCRDTDoc
+			).not.toHaveBeenCalled();
+
+			// It is applied on the next tick of the event loop.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalled();
 		} );
 
 		it( 'does not update when entity is not loaded', async () => {
