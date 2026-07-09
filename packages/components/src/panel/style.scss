@@ -99,7 +99,7 @@
 	height: auto;
 
 	&:focus {
-		outline-offset: calc(#{$border-width} - var(--wpds-border-width-focus));
+		outline-offset: calc(var(--wpds-border-width-focus) * -1);
 		border-radius: 0;
 	}
 
