@@ -205,7 +205,7 @@ This engine is one host implementation of `@wordpress/widget-primitives`. It map
 
 ### Identity and help
 
-When a widget type declares `help`, the tile chrome surfaces its `content` and optional `links` in a compact control beside the title. The note is identity, copied from the type, not interpreted.
+When a widget type declares `help`, the tile chrome surfaces its `content` and optional `links` in a infotip beside the title.
 
 ### Attribute editing
 

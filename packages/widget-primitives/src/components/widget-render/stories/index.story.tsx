@@ -527,8 +527,8 @@ Each attribute may carry a \`relevance\` hint (\`'high' | 'low'\`). The widget d
 
 **In this demo**
 
-- \`greeting\` is \`relevance: 'high'\`. The host promotes it to a **prominent surface** beside the title.
-- \`world\` has no hint (default \`'low'\`). It lives in the **settings surface** on the right.
+- \`world\` is \`relevance: 'high'\`. The host promotes it to a **prominent surface** beside the title.
+- \`greeting\` has no hint (default \`'low'\`). It lives in the **settings surface** on the right.
 
 **Takeaway**
 
