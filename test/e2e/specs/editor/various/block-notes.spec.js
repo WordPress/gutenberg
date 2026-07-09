@@ -1252,6 +1252,74 @@ test.describe( 'Block Notes', () => {
 			).toHaveCount( 0 );
 		} );
 
+		test( 'can set a default skin tone that applies to picked emoji', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Skin tone preference' },
+				comment: 'Pick a toned thumbs up',
+			} );
+
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await page.getByRole( 'button', { name: 'More emojis' } ).click();
+			await blockNoteUtils.waitForFullPicker();
+
+			// The persistent toggle next to the search field shows the
+			// current (default) tone.
+			await page
+				.getByRole( 'button', { name: 'Skin tone: Default skin tone' } )
+				.click();
+
+			// The flyout has an explicit heading and six swatches, with
+			// the default tone selected.
+			await expect(
+				page.getByText( 'Choose your default skin tone' )
+			).toBeVisible();
+			const swatches = page.getByRole( 'option' );
+			await expect( swatches ).toHaveCount( 6 );
+			await expect(
+				page.getByRole( 'option', { name: 'Default skin tone' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+
+			await page
+				.getByRole( 'option', { name: 'Dark skin tone', exact: true } )
+				.click();
+
+			// The toggle reflects the new tone and the flyout closes.
+			await expect(
+				page.getByRole( 'button', {
+					name: 'Skin tone: Dark skin tone',
+				} )
+			).toBeVisible();
+			await expect(
+				page.getByText( 'Choose your default skin tone' )
+			).toBeHidden();
+
+			// Tone-capable emoji in the grid now carry the chosen tone.
+			await page.getByPlaceholder( 'Search emoji' ).fill( 'thumbs up' );
+			await page
+				.getByRole( 'gridcell', {
+					name: 'thumbs up: dark skin tone',
+					exact: true,
+				} )
+				.click();
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reaction added.' } )
+			).toBeVisible();
+
+			// The stored reaction renders the toned emoji.
+			const reactionButton = page.locator(
+				'.editor-collab-sidebar-panel__reaction-button'
+			);
+			await expect( reactionButton ).toHaveCount( 1 );
+			await expect( reactionButton ).toContainText( '👍🏿' );
+		} );
+
 		test( 'reaction picker portals outside the collab sidebar', async ( {
 			page,
 			blockNoteUtils,
