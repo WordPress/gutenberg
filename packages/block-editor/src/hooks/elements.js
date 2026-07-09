@@ -19,7 +19,6 @@ import { store as blockEditorStore } from '../store';
 import { COLOR_SUPPORT_KEY } from './color';
 import useBlockColorContrastWarning from './contrast-checker';
 import {
-	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
 	isDefaultBlockStyleState,
 	setStyleForState,
@@ -52,7 +51,7 @@ export function ElementsEdit( {
 	name,
 	setAttributes,
 	settings,
-	selectedStyleState = DEFAULT_BLOCK_STYLE_STATE,
+	selectedStyleState,
 	asWrapper,
 	label,
 	defaultControls,

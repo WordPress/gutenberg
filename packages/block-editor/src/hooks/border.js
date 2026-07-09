@@ -31,7 +31,6 @@ import {
 } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
 import {
-	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
 	isDefaultBlockStyleState,
 	setStyleForState,
@@ -151,7 +150,7 @@ export function BorderPanel( {
 	name,
 	setAttributes,
 	settings,
-	selectedStyleState = DEFAULT_BLOCK_STYLE_STATE,
+	selectedStyleState,
 } ) {
 	const isEnabled = useHasBorderPanel( settings );
 	const { style, borderColor } = useSelect(

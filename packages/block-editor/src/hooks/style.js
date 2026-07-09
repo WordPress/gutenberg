@@ -784,8 +784,7 @@ function BlockStyleControls( {
 		},
 		[ clientId, name ]
 	);
-	const { selectedStyleState = DEFAULT_BLOCK_STYLE_STATE } =
-		useContext( PrivateBlockContext );
+	const { selectedStyleState } = useContext( PrivateBlockContext );
 	const isPseudoSelectorState =
 		hasPseudoBlockStyleState( selectedStyleState );
 

@@ -24,7 +24,6 @@ import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 import {
-	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
 	isDefaultBlockStyleState,
 	setStyleForState,
@@ -79,7 +78,7 @@ export function DimensionsPanel( {
 	name,
 	setAttributes,
 	settings,
-	selectedStyleState = DEFAULT_BLOCK_STYLE_STATE,
+	selectedStyleState,
 } ) {
 	const isStateSelected = ! isDefaultBlockStyleState( selectedStyleState );
 	const isEnabled = useHasDimensionsPanel( settings, selectedStyleState );

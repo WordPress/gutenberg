@@ -26,7 +26,6 @@ import {
 } from '../components/global-styles/background-panel';
 import { globalStylesDataKey } from '../store/private-keys';
 import {
-	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
 	isDefaultBlockStyleState,
 	setStyleForState,
@@ -173,7 +172,7 @@ export function BackgroundImagePanel( {
 	name,
 	setAttributes,
 	settings,
-	selectedStyleState = DEFAULT_BLOCK_STYLE_STATE,
+	selectedStyleState,
 	// Allows rendering outside the `background` inspector group (e.g. section
 	// blocks direct-render this panel because their support fills are gated
 	// off by editing mode). Defaults to the slot-based wrapper.

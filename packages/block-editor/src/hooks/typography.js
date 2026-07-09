@@ -24,7 +24,6 @@ import { cleanEmptyObject } from './utils';
 import { extractPresetSlug } from '../utils/color-values';
 import { store as blockEditorStore } from '../store';
 import {
-	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
 	isDefaultBlockStyleState,
 	setStyleForState,
@@ -143,7 +142,7 @@ export function TypographyPanel( {
 	name,
 	setAttributes,
 	settings,
-	selectedStyleState = DEFAULT_BLOCK_STYLE_STATE,
+	selectedStyleState,
 	// Allows rendering outside the `typography` inspector group (e.g. section
 	// blocks direct-render this panel because their support fills are gated
 	// off by editing mode). Defaults to the slot-based wrapper.

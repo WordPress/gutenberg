@@ -19,10 +19,7 @@ import {
 	isInListViewBlockSupportTreeKey,
 } from '../block-edit/context';
 import groups from './groups';
-import {
-	DEFAULT_BLOCK_STYLE_STATE,
-	scopeResetAllFilterToState,
-} from '../../hooks/block-style-state';
+import { scopeResetAllFilterToState } from '../../hooks/block-style-state';
 import { ListViewContentFill } from './list-view-content-popover';
 import { PrivateBlockContext } from '../block-list/private-block-context';
 
@@ -120,8 +117,7 @@ export default function InspectorControlsFill( {
 function RegisterResetAll( { resetAllFilter, children } ) {
 	const { registerResetAllFilter, deregisterResetAllFilter } =
 		useContext( ToolsPanelContext );
-	const { selectedStyleState = DEFAULT_BLOCK_STYLE_STATE } =
-		useContext( PrivateBlockContext );
+	const { selectedStyleState } = useContext( PrivateBlockContext );
 	const scopedResetAllFilter = useMemo(
 		() => scopeResetAllFilterToState( selectedStyleState, resetAllFilter ),
 		[ resetAllFilter, selectedStyleState ]
