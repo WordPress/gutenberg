@@ -13,6 +13,7 @@ import {
 	pushNpmReleaseGitMetadata,
 	runNpmPublishPreflight,
 	runNpmReleasePhase,
+	runPackageContentsValidation,
 	verifyRemotePackageTags,
 } from '../packages';
 
@@ -697,6 +698,33 @@ describe( 'publishVersionedPackagesToNpm', () => {
 	} );
 } );
 
+describe( 'runPackageContentsValidation', () => {
+	it( 'builds packages before running the package contents lint command', async () => {
+		const commandFn = jest.fn().mockResolvedValue();
+
+		await runPackageContentsValidation(
+			{ gitWorkingDirectoryPath: '/repo' },
+			{ commandFn }
+		);
+
+		expect( commandFn ).toHaveBeenCalledWith( 'npm run build', {
+			cwd: '/repo',
+			stdio: 'inherit',
+		} );
+		expect( commandFn ).toHaveBeenCalledWith(
+			'npm run lint:package-contents',
+			{
+				cwd: '/repo',
+				stdio: 'inherit',
+			}
+		);
+		expect( commandFn.mock.invocationCallOrder[ 0 ] ).toBeLessThan(
+			commandFn.mock.invocationCallOrder[ 1 ]
+		);
+		expect( console ).toHaveLogged();
+	} );
+} );
+
 describe( 'publishPackagesToNpm', () => {
 	const getConfig = ( releaseType ) => ( {
 		distTag: releaseType === 'next' ? 'next' : 'latest',
@@ -743,6 +771,7 @@ describe( 'publishPackagesToNpm', () => {
 					.mockResolvedValueOnce( 'after-sha' ),
 			};
 			const publishVersionedPackagesToNpmFn = jest.fn();
+			const runPackageContentsValidationFn = jest.fn();
 			const config = {
 				...getConfig( releaseType ),
 				distTag,
@@ -753,6 +782,7 @@ describe( 'publishPackagesToNpm', () => {
 				commandFn,
 				git,
 				publishVersionedPackagesToNpmFn,
+				runPackageContentsValidationFn,
 			} );
 
 			expect( commandFn ).toHaveBeenCalledWith( 'npm ci', {
@@ -774,6 +804,15 @@ describe( 'publishPackagesToNpm', () => {
 					command.includes( '--build-metadata' )
 				)
 			).toBe( false );
+			expect( runPackageContentsValidationFn ).toHaveBeenCalledWith(
+				{ gitWorkingDirectoryPath: '/repo' },
+				{ commandFn }
+			);
+			expect(
+				runPackageContentsValidationFn.mock.invocationCallOrder[ 0 ]
+			).toBeLessThan(
+				publishVersionedPackagesToNpmFn.mock.invocationCallOrder[ 0 ]
+			);
 			expect( publishVersionedPackagesToNpmFn ).toHaveBeenCalledWith( {
 				distTag,
 				gitWorkingDirectoryPath: '/repo',

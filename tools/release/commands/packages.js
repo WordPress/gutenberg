@@ -932,6 +932,32 @@ async function publishVersionedPackagesToNpm(
 }
 
 /**
+ * Validates package contents before publishing packages to npm.
+ *
+ * @param {Object}   options                         Options.
+ * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
+ * @param {Object}   deps                            Dependencies.
+ * @param {Function} deps.commandFn                  Command runner.
+ */
+async function runPackageContentsValidation(
+	{ gitWorkingDirectoryPath },
+	deps = {}
+) {
+	const { commandFn = command } = deps;
+	log( '>> Building packages for package contents validation.' );
+	await commandFn( 'npm run build', {
+		cwd: gitWorkingDirectoryPath,
+		stdio: 'inherit',
+	} );
+
+	log( '>> Validating package contents with npm pack dry-run checks.' );
+	await commandFn( 'npm run lint:package-contents', {
+		cwd: gitWorkingDirectoryPath,
+		stdio: 'inherit',
+	} );
+}
+
+/**
  * Publishes all changed packages to npm.
  *
  * @param {WPPackagesConfig} config Command config.
@@ -954,6 +980,7 @@ async function publishPackagesToNpm(
 		commandFn = command,
 		git = SimpleGit( gitWorkingDirectoryPath ),
 		publishVersionedPackagesToNpmFn = publishVersionedPackagesToNpm,
+		runPackageContentsValidationFn = runPackageContentsValidation,
 	} = deps;
 	log( '>> Installing npm packages.' );
 	await commandFn( 'npm ci', {
@@ -1002,6 +1029,11 @@ async function publishPackagesToNpm(
 			}
 		);
 	}
+
+	await runPackageContentsValidationFn(
+		{ gitWorkingDirectoryPath },
+		{ commandFn }
+	);
 
 	await publishVersionedPackagesToNpmFn( {
 		distTag,
@@ -1255,5 +1287,6 @@ module.exports = {
 	publishNpmNext,
 	runNpmPublishPreflight,
 	runNpmReleasePhase,
+	runPackageContentsValidation,
 	verifyRemotePackageTags,
 };
