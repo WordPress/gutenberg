@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import { setImmutably } from '../object';
+import {
+	setImmutably,
+	getAttributesDiff,
+	applyAttributesDiff,
+} from '../object';
 
 describe( 'setImmutably', () => {
 	describe( 'handling falsy values properly', () => {
@@ -176,6 +180,88 @@ describe( 'setImmutably', () => {
 			expect( result[ 0 ][ 0 ][ 0 ][ 1 ] ).not.toBe(
 				input[ 0 ][ 0 ][ 0 ][ 1 ]
 			);
+		} );
+	} );
+} );
+
+describe( 'getAttributesDiff', () => {
+	it( 'should return undefined if no differences', () => {
+		expect( getAttributesDiff( { a: 1 }, { a: 1 } ) ).toBeUndefined();
+	} );
+
+	it( 'should return diff for changed flat properties', () => {
+		expect( getAttributesDiff( { a: 1, b: 2 }, { a: 1, b: 3 } ) ).toEqual( {
+			b: 3,
+		} );
+	} );
+
+	it( 'should map deleted properties to undefined', () => {
+		expect( getAttributesDiff( { a: 1, b: 2 }, { a: 1 } ) ).toEqual( {
+			b: undefined,
+		} );
+	} );
+
+	it( 'should handle nested objects', () => {
+		const original = {
+			style: { color: { text: 'red' }, border: { radius: 5 } },
+		};
+		const updated = {
+			style: { color: { text: 'green' }, border: { radius: 5 } },
+		};
+		expect( getAttributesDiff( original, updated ) ).toEqual( {
+			style: { color: { text: 'green' } },
+		} );
+	} );
+
+	it( 'should return undefined for nested objects if no changes', () => {
+		const original = { style: { color: { text: 'red' } } };
+		const updated = { style: { color: { text: 'red' } } };
+		expect( getAttributesDiff( original, updated ) ).toBeUndefined();
+	} );
+} );
+
+describe( 'applyAttributesDiff', () => {
+	it( 'should return original if no diff', () => {
+		expect( applyAttributesDiff( { a: 1 }, undefined ) ).toEqual( {
+			a: 1,
+		} );
+	} );
+
+	it( 'should merge flat properties', () => {
+		expect( applyAttributesDiff( { a: 1, b: 2 }, { b: 3, c: 4 } ) ).toEqual(
+			{
+				a: 1,
+				b: 3,
+				c: 4,
+			}
+		);
+	} );
+
+	it( 'should delete properties mapped to undefined', () => {
+		expect(
+			applyAttributesDiff( { a: 1, b: 2 }, { b: undefined } )
+		).toEqual( {
+			a: 1,
+		} );
+	} );
+
+	it( 'should merge nested properties', () => {
+		const original = {
+			style: { color: { text: 'red', background: 'blue' } },
+		};
+		const diff = { style: { color: { text: 'green' } } };
+		expect( applyAttributesDiff( original, diff ) ).toEqual( {
+			style: { color: { text: 'green', background: 'blue' } },
+		} );
+	} );
+
+	it( 'should delete nested properties mapped to undefined', () => {
+		const original = {
+			style: { color: { text: 'red', background: 'blue' } },
+		};
+		const diff = { style: { color: { background: undefined } } };
+		expect( applyAttributesDiff( original, diff ) ).toEqual( {
+			style: { color: { text: 'red' } },
 		} );
 	} );
 } );
