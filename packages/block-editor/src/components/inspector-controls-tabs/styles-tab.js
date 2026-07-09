@@ -140,6 +140,7 @@ const StylesTab = ( {
 						label={ __( 'Background' ) }
 						className="background-block-support-panel__inner-wrapper"
 					/>
+					<InspectorControls.Slot group="styles" />
 					<InspectorControls.Slot group="filter" />
 					<InspectorControls.Slot
 						group="layout"
@@ -159,7 +160,6 @@ const StylesTab = ( {
 						className="elements-block-support-panel__inner-wrapper"
 					/>
 					<PositionControls />
-					<InspectorControls.Slot group="styles" />
 				</>
 			) }
 		</>

@@ -70,6 +70,7 @@ function StyleInspectorSlots( {
 				label={ __( 'Background' ) }
 				className="background-block-support-panel__inner-wrapper"
 			/>
+			<InspectorControls.Slot group="styles" />
 			<InspectorControls.Slot group="layout" label={ __( 'Layout' ) } />
 			<InspectorControls.Slot
 				group="dimensions"
@@ -82,7 +83,6 @@ function StyleInspectorSlots( {
 				className="elements-block-support-panel__inner-wrapper"
 			/>
 			{ showPositionControls && <PositionControls /> }
-			<InspectorControls.Slot group="styles" />
 			{ showBindingsControls && (
 				<InspectorControls.Slot group="bindings" />
 			) }
