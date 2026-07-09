@@ -23,6 +23,15 @@ Design tokens are named values that describe the visual purpose of a value. Rath
 
 The **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)** explains the naming pattern, how to choose a token, and the complete generated list of available design tokens.
 
+### Public Token Surfaces
+
+The public design token surfaces are:
+
+-   **CSS custom properties** in the `--wpds-*` namespace, delivered through `@wordpress/theme/design-tokens.css` and documented in the [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
+-   **Generated runtime token metadata** exposed through `@wordpress/theme/design-tokens.js`, for tooling that needs the list of valid public token names.
+
+The raw JSON files under `packages/theme/tokens/` are maintainer-facing source files. They intentionally include primitive tokens, internal generation data, semantic token definitions, and design-tool metadata in one place. They are not published, exported, or supported as a public API. Consumers should use the generated CSS custom properties and package exports instead of importing or depending on the token JSON structure.
+
 ### Using Design Tokens
 
 Design tokens are delivered as CSS custom properties (e.g. `var(--wpds-color-foreground-content-neutral)`). To use them, a stylesheet defining the token values must be loaded on the page.

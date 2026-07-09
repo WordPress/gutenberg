@@ -19,6 +19,8 @@ The design system follows the [Design Tokens Community Group (DTCG)](https://des
 
 Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. These files are the source of truth for the design system and are processed during the build step to generate CSS custom properties and other output formats in `/src/prebuilt`.
 
+The JSON files in this directory are internal maintainer inputs, not package exports. They intentionally mix primitive tokens, semantic token definitions, generation metadata, and design-tool metadata, so their structure can change when the build pipeline or design tooling needs it. Consumers should treat the generated `--wpds-*` CSS custom properties and the package's generated runtime token metadata as the public token surfaces.
+
 ## Token Naming
 
 Semantic tokens follow a consistent naming pattern that encodes the token's purpose. See the [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) for the naming pattern, the meaning of each segment (type, property, target, tone, emphasis, state), guidance on how to pick the right token, and the complete generated list of token names.
