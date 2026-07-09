@@ -6,7 +6,7 @@ For consumer-facing usage, start with the [`@wordpress/theme` package README](ht
 
 ## Structure
 
-The design system follows the [Design Tokens Community Group (DTCG)](https://design-tokens.github.io/community-group/format/) specification and organizes tokens into distinct types based on what kind of visual property they represent. Token definitions are stored as JSON files in the `/tokens` directory:
+The design system follows the [Design Tokens Format Module](https://www.designtokens.org/tr/2025.10/format/) report from the Design Tokens Community Group (DTCG) and organizes tokens into distinct types based on what kind of visual property they represent. Token definitions are stored as JSON files in the `/tokens` directory:
 
 | File              | Description                                                                                                                      |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
@@ -68,7 +68,7 @@ Someone using the design system should never see or concern themselves with eith
 
 ## Custom Extensions
 
-The design tokens use [the `$extensions` feature](https://www.designtokens.org/tr/drafts/format/#extensions-0) of the DTCG Tokens specification to add additional, optional support for proprietary data.
+The design tokens use [the `$extensions` feature](https://www.designtokens.org/tr/2025.10/format/#extensions-0) from the Design Tokens Format Module to add additional, optional support for proprietary data.
 
 ### Figma Support
 
