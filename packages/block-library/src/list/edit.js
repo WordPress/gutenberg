@@ -128,7 +128,6 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
 		templateLock: false,
-		templateInsertUpdatesSelection: true,
 		__experimentalCaptureToolbars: true,
 	} );
 	useMigrateOnLoad( attributes, clientId );

@@ -20,6 +20,7 @@ const TEMPLATE = [ [ 'core/accordion-heading' ], [ 'core/accordion-panel' ] ];
 export const settings = {
 	icon,
 	template: TEMPLATE,
+	templateInsertUpdatesSelection: true,
 	edit,
 	save,
 };

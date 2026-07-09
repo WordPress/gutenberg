@@ -60,7 +60,6 @@ export default function Edit( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		defaultBlock: ACCORDION_BLOCK,
 		directInsert: true,
-		templateInsertUpdatesSelection: true,
 	} );
 
 	const addAccordionItemBlock = () => {

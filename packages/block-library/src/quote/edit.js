@@ -80,7 +80,6 @@ export default function QuoteEdit( {
 		} ),
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateInsertUpdatesSelection: true,
 		__experimentalCaptureToolbars: true,
 		renderAppender: false,
 		allowedBlocks,

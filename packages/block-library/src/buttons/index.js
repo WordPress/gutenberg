@@ -43,6 +43,7 @@ export const settings = {
 	deprecated,
 	transforms,
 	template: TEMPLATE,
+	templateInsertUpdatesSelection: true,
 	edit,
 	save,
 };

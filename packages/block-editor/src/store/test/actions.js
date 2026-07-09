@@ -228,6 +228,7 @@ describe( 'actions', () => {
 			const select = {
 				getSettings: () => null,
 				getBlockRootClientId: () => null,
+				getSelectedBlockClientId: () => null,
 				canInsertBlockType: () => true,
 				getBlockCount: () => 1,
 			};
@@ -263,6 +264,7 @@ describe( 'actions', () => {
 			const select = {
 				getSettings: () => null,
 				getBlockRootClientId: () => null,
+				getSelectedBlockClientId: () => null,
 				canInsertBlockType: ( clientId ) => {
 					switch ( clientId ) {
 						case 'core/test-ribs':
@@ -295,6 +297,7 @@ describe( 'actions', () => {
 			const select = {
 				getSettings: () => null,
 				getBlockRootClientId: () => null,
+				getSelectedBlockClientId: () => null,
 				canInsertBlockType: () => true,
 				getBlockCount: () => 1,
 			};
@@ -333,6 +336,7 @@ describe( 'actions', () => {
 			const select = {
 				getSettings: () => null,
 				getBlockRootClientId: () => null,
+				getSelectedBlockClientId: () => null,
 				canInsertBlockType: () => true,
 				getBlockCount: () => 1,
 			};
@@ -379,7 +383,7 @@ describe( 'actions', () => {
 				index,
 				'testclientid',
 				true
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'INSERT_BLOCKS',
@@ -422,6 +426,7 @@ describe( 'actions', () => {
 			)( {
 				select,
 				dispatch,
+				registry: { batch: ( fn ) => fn() },
 			} );
 
 			expect( dispatch ).toHaveBeenCalledWith(
@@ -442,6 +447,41 @@ describe( 'actions', () => {
 						} ),
 					],
 				} )
+			);
+		} );
+
+		it( 'selects the first inner leaf block when the block type opts in', () => {
+			registerBlockType( 'core/test-container', {
+				...defaultBlockSettings,
+				template: [ [ 'core/test-item', { foo: 42 } ] ],
+				templateInsertUpdatesSelection: true,
+			} );
+			registerBlockType( 'core/test-item', defaultBlockSettings );
+
+			const containerBlock = createBlock( 'core/test-container' );
+			const select = {
+				getSettings: () => null,
+				canInsertBlockType: () => true,
+			};
+			const dispatch = jest.fn();
+			dispatch.selectBlock = jest.fn();
+
+			insertBlocks(
+				[ containerBlock ],
+				5,
+				'testrootid',
+				true,
+				0
+			)( {
+				select,
+				dispatch,
+				registry: { batch: ( fn ) => fn() },
+			} );
+
+			const insertedBlocks = dispatch.mock.calls[ 0 ][ 0 ].blocks;
+			expect( dispatch.selectBlock ).toHaveBeenCalledWith(
+				insertedBlocks[ 0 ].innerBlocks[ 0 ].clientId,
+				0
 			);
 		} );
 
@@ -469,6 +509,7 @@ describe( 'actions', () => {
 			)( {
 				select,
 				dispatch,
+				registry: { batch: ( fn ) => fn() },
 			} );
 
 			expect( dispatch ).toHaveBeenCalledWith(
@@ -515,7 +556,7 @@ describe( 'actions', () => {
 				5,
 				'testrootid',
 				false
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'INSERT_BLOCKS',
@@ -550,7 +591,7 @@ describe( 'actions', () => {
 				5,
 				'testrootid',
 				false
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -595,7 +636,7 @@ describe( 'actions', () => {
 				false,
 				0,
 				meta
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'INSERT_BLOCKS',
@@ -659,7 +700,7 @@ describe( 'actions', () => {
 				'ribs',
 				'ribs',
 				5
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -677,7 +718,7 @@ describe( 'actions', () => {
 				'ribs',
 				'chicken-ribs',
 				5
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'MOVE_BLOCKS_TO_POSITION',
@@ -701,7 +742,7 @@ describe( 'actions', () => {
 				'ribs',
 				'chicken-ribs',
 				5
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -719,7 +760,7 @@ describe( 'actions', () => {
 				'ribs',
 				'ribs',
 				5
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'MOVE_BLOCKS_TO_POSITION',
@@ -737,6 +778,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getBlockRootClientId: () => null,
+				getSelectedBlockClientId: () => null,
 				canRemoveBlocks: () => true,
 				getBlockRemovalRules: () => false,
 			};
@@ -762,6 +804,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getBlockRootClientId: () => null,
+				getSelectedBlockClientId: () => null,
 				canRemoveBlocks: () => true,
 				getBlockRemovalRules: () => false,
 			};
@@ -962,7 +1005,7 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch.selectBlock ).toHaveBeenCalledWith( 'chicken' );
 		} );
@@ -1016,7 +1059,7 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch.selectionChange ).toHaveBeenCalledWith(
 				blockA.clientId,
@@ -1087,7 +1130,7 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
 		} );
@@ -1167,7 +1210,7 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch.selectionChange ).toHaveBeenCalledWith(
 				blockA.clientId,
@@ -1243,7 +1286,7 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
 			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
@@ -1303,7 +1346,7 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 
 			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
 			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();

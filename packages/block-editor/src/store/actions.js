@@ -393,18 +393,39 @@ export const replaceBlocks =
 				return;
 			}
 		}
+		const blocksWithTemplates = applyBlockTypeTemplates( blocks );
+		const isReplacingSelection = clientIds.includes(
+			select.getSelectedBlockClientId()
+		);
 		// We're batching these two actions because an extra `undo/redo` step can
 		// be created, based on whether we insert a default block or not.
 		registry.batch( () => {
 			dispatch( {
 				type: 'REPLACE_BLOCKS',
 				clientIds,
-				blocks: applyBlockTypeTemplates( blocks ),
+				blocks: blocksWithTemplates,
 				time: Date.now(),
 				indexToSelect,
 				initialPosition,
 				meta,
 			} );
+			if ( isReplacingSelection ) {
+				// Mirrors which replacement block the reducer selects.
+				const selectedIndex =
+					blocksWithTemplates[ indexToSelect ] !== undefined
+						? indexToSelect
+						: blocksWithTemplates.length - 1;
+				const templateSelectionClientId = getTemplateSelectionClientId(
+					blocks[ selectedIndex ],
+					blocksWithTemplates[ selectedIndex ]
+				);
+				if ( templateSelectionClientId ) {
+					dispatch.selectBlock(
+						templateSelectionClientId,
+						initialPosition
+					);
+				}
+			}
 			// To avoid a focus loss when removing the last block, assure there is
 			// always a default block if the last of the blocks have been removed.
 			dispatch.ensureDefaultBlock();
@@ -584,6 +605,32 @@ function applyBlockTypeTemplates( blocks ) {
 }
 
 /**
+ * Returns the client ID to select in place of a block whose block type
+ * template was just applied, when the block type opts in with
+ * `templateInsertUpdatesSelection`: the first inner leaf block.
+ *
+ * @param {Object} originalBlock     Block object before templates were applied.
+ * @param {Object} blockWithTemplate Block object after templates were applied.
+ *
+ * @return {?string} Client ID of the first inner leaf block, or null.
+ */
+function getTemplateSelectionClientId( originalBlock, blockWithTemplate ) {
+	if (
+		originalBlock === blockWithTemplate ||
+		originalBlock.innerBlocks?.length ||
+		! blockWithTemplate.innerBlocks.length ||
+		! getBlockType( blockWithTemplate.name )?.templateInsertUpdatesSelection
+	) {
+		return null;
+	}
+	let block = blockWithTemplate;
+	while ( block.innerBlocks[ 0 ] ) {
+		block = block.innerBlocks[ 0 ];
+	}
+	return block.clientId;
+}
+
+/**
  * Action that inserts an array of blocks, optionally at a specific index respective a root block list.
  *
  * Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if
@@ -607,7 +654,7 @@ export const insertBlocks =
 		initialPosition = 0,
 		meta
 	) =>
-	( { select, dispatch } ) => {
+	( { select, dispatch, registry } ) => {
 		if ( initialPosition !== null && typeof initialPosition === 'object' ) {
 			meta = initialPosition;
 			initialPosition = 0;
@@ -632,15 +679,32 @@ export const insertBlocks =
 			}
 		}
 		if ( allowedBlocks.length ) {
-			dispatch( {
-				type: 'INSERT_BLOCKS',
-				blocks: applyBlockTypeTemplates( allowedBlocks ),
-				index,
-				rootClientId,
-				time: Date.now(),
-				updateSelection,
-				initialPosition: updateSelection ? initialPosition : null,
-				meta,
+			const blocksWithTemplates =
+				applyBlockTypeTemplates( allowedBlocks );
+			registry.batch( () => {
+				dispatch( {
+					type: 'INSERT_BLOCKS',
+					blocks: blocksWithTemplates,
+					index,
+					rootClientId,
+					time: Date.now(),
+					updateSelection,
+					initialPosition: updateSelection ? initialPosition : null,
+					meta,
+				} );
+				if ( updateSelection ) {
+					const templateSelectionClientId =
+						getTemplateSelectionClientId(
+							allowedBlocks[ 0 ],
+							blocksWithTemplates[ 0 ]
+						);
+					if ( templateSelectionClientId ) {
+						dispatch.selectBlock(
+							templateSelectionClientId,
+							initialPosition
+						);
+					}
+				}
 			} );
 		}
 	};
