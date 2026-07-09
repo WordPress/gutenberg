@@ -7,7 +7,9 @@
 	"keywords": [
 		"wordpress",
 		"gutenberg",
-		"components"
+		"design-system",
+		"design-tokens",
+		"theme"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/theme/README.md",
 	"repository": {
