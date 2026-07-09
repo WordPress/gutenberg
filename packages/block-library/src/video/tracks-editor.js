@@ -144,7 +144,6 @@ function SingleTrackEditor( {
 			</Grid>
 			<VStack spacing="4">
 				<SelectControl
-					__next40pxDefaultSize
 					className="block-library-video-tracks-editor__single-track-editor-kind-select"
 					options={ KIND_OPTIONS }
 					value={ kind }

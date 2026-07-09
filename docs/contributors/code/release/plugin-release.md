@@ -320,27 +320,31 @@ It's important to check that:
 
 -   the plugin from the directory works as expected
 -   the ZIP contents (see [Downloads](https://plugins.trac.wordpress.org/browser/gutenberg/)) looks correct (doesn't have anything obvious missing)
--   the [Gutenberg SVN repo](https://plugins.trac.wordpress.org/browser/gutenberg/) has two new commits (see [the log](https://plugins.trac.wordpress.org/browser/gutenberg/)):
-    -   the `trunk` folder should have "Committing version X.Y.Z"
-    -   there is a new `tags/X.Y.Z` folder with the same contents as `trunk` whose latest commit is "Tagging version X.Y.Z"
+-   the [Gutenberg SVN repo](https://plugins.trac.wordpress.org/browser/gutenberg/) has the expected `trunk` contents and a matching `tags/X.Y.Z` folder (see [the log](https://plugins.trac.wordpress.org/browser/gutenberg/))
 
-Most likely, the tag folder couldn't be created. This is a [known issue](https://github.com/WordPress/gutenberg/issues/55295) that [can be fixed manually](https://github.com/WordPress/gutenberg/issues/55295#issuecomment-1759292978).
+The current WordPress.org upload workflow replaces SVN `trunk`, copies that local `trunk` checkout to `tags/$VERSION`, then commits `trunk` and `tags/$VERSION` together. Before rerunning the workflow or any mutating SVN command, inspect the existing SVN state and avoid creating a second tag for the same version.
 
 Either substitute `SVN_USERNAME`, `SVN_PASSWORD`, and `VERSION` for the proper values or set them as global environment variables first:
 
 ```sh
-# CHECKOUT THE REPOSITORY
-svn checkout https://plugins.svn.wordpress.org/gutenberg/trunk --username "$SVN_USERNAME" --password "$SVN_PASSWORD" gutenberg-svn
+# CHECK WHETHER THE SVN TAG ALREADY EXISTS
+# A file listing means YES.
+# An error mentioning a "non-existent" path (W160013/E200009) means NO,
+# and means you can safely create the tag.
+svn list https://plugins.svn.wordpress.org/gutenberg/tags/$VERSION --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
 
-# MOVE TO THE LOCAL FOLDER
-cd gutenberg-svn
+# CHECK WHETHER SVN TRUNK ALREADY CONTAINS THE INTENDED RELEASE
+svn cat https://plugins.svn.wordpress.org/gutenberg/trunk/readme.txt | grep "Stable tag: $VERSION"
+svn cat https://plugins.svn.wordpress.org/gutenberg/trunk/gutenberg.php | grep "Version: $VERSION"
+```
 
-# IF YOU HAPPEN TO HAVE ALREADY THE REPO LOCALLY
-# AND DIDN'T CHECKOUT, MAKE SURE IT IS UPDATED
-svn up .
+Also confirm the matching GitHub release and `v$VERSION` tag still exist. If either is missing, stop and restore the GitHub release state before running SVN recovery commands; the SVN commands below only repair WordPress.org plugin repository state.
 
+If SVN `trunk` already contains the intended release but `tags/$VERSION` is missing, create the tag from the current SVN `trunk`:
+
+```sh
 # COPY CURRENT TRUNK INTO THE NEW TAGS FOLDER
-svn copy https://plugins.svn.wordpress.org/gutenberg/trunk https://plugins.svn.wordpress.org/gutenberg/tags/$VERSION -m 'Tagging version $VERSION' --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+svn copy https://plugins.svn.wordpress.org/gutenberg/trunk https://plugins.svn.wordpress.org/gutenberg/tags/$VERSION -m "Tagging version $VERSION" --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
 ```
 
 Ask around if you need help with any of this.
