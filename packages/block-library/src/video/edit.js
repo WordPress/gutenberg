@@ -23,8 +23,7 @@ import {
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { prependHTTPS } from '@wordpress/url';
@@ -77,26 +76,6 @@ function VideoEdit( {
 		onChange: onSelectVideo,
 		onError: onUploadError,
 	} );
-
-	// A GIF-behaving video created from an uploaded animated GIF keeps the
-	// GIF image attachment as its `id`. Resolve that attachment record while
-	// the block is selected so the "back to Image" block transform (whose
-	// `isMatch` reads the record synchronously) can be offered in the block
-	// switcher.
-	useSelect(
-		( select ) => {
-			if ( isSingleSelected && isGif && id ) {
-				select( coreStore ).getEntityRecord(
-					'postType',
-					'attachment',
-					id,
-					{ context: 'view' }
-				);
-			}
-			return null;
-		},
-		[ isSingleSelected, isGif, id ]
-	);
 
 	useEffect( () => {
 		// Placeholder may be rendered.

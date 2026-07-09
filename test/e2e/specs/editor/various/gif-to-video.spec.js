@@ -150,9 +150,10 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'keeps the uploaded GIF as an Image block and offers a round-trip Video transform', async ( {
+	test( 'keeps the uploaded GIF as an Image block and offers an opt-in Video transform', async ( {
 		editor,
 		page,
+		pageUtils,
 		gifToVideoUtils,
 		requestUtils,
 	} ) => {
@@ -303,22 +304,16 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 			`${ videoBlock.attributes.width } / ${ videoBlock.attributes.height }`
 		);
 
-		// The switcher on the converted block offers the way back: transform
-		// to an Image block showing the original GIF.
-		await page
-			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: /^(GIF|Video)$/ } )
-			.click();
-		await page
-			.getByRole( 'menu', { name: /^(GIF|Video)$/ } )
-			.getByRole( 'menuitem', { name: 'Image', exact: true } )
-			.click();
+		// There is deliberately no transform back to an Image block; undo is
+		// the way back. A single undo restores the Image block showing the
+		// original GIF.
+		await pageUtils.pressKeys( 'primary+z' );
 
 		await page.waitForFunction( () =>
 			window.wp.data
 				.select( 'core/block-editor' )
 				.getBlocks()
-				.some( ( block ) => block.name === 'core/image' )
+				.every( ( block ) => block.name !== 'core/video' )
 		);
 
 		const restoredImage = await page.evaluate( () =>
