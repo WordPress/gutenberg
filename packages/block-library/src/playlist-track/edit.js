@@ -59,13 +59,19 @@ const PlaylistTrackEdit = ( {
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
+	const hasTrackSource = !! src || !! temporaryURL;
 
 	useEffect( () => {
-		if ( isSelected && currentTrackClientId !== clientId ) {
+		if (
+			isSelected &&
+			hasTrackSource &&
+			currentTrackClientId !== clientId
+		) {
 			setCurrentTrackClientId( clientId );
 		}
 	}, [
 		isSelected,
+		hasTrackSource,
 		clientId,
 		currentTrackClientId,
 		setCurrentTrackClientId,
@@ -134,7 +140,7 @@ const PlaylistTrackEdit = ( {
 		imageButton.current.focus();
 	}
 
-	if ( ! src && ! temporaryURL ) {
+	if ( ! hasTrackSource ) {
 		return (
 			<div { ...blockProps }>
 				<MediaPlaceholder
