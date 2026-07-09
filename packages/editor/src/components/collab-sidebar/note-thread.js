@@ -226,10 +226,6 @@ export function NoteThread( {
 				variant="secondary"
 				size="compact"
 				onClick={ () => {
-					/*
-					 * The reply form is a RichTextControl (a `role="textbox"`
-					 * contenteditable), not a `<textarea>`.
-					 */
 					focusNoteThread(
 						note.id,
 						sidebarRef.current,
