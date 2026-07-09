@@ -22,13 +22,14 @@ jest.mock( '@wordpress/block-editor', () => ( {
 	MediaUpload: ( { render: renderMediaUpload } ) =>
 		renderMediaUpload( { open: jest.fn() } ),
 	MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
-	RichText: ( {
+	PlainText: ( {
 		allowedFormats,
 		onChange,
 		placeholder,
 		tagName: TagName = 'div',
 		value,
 		withoutInteractiveFormatting,
+		__experimentalVersion,
 		...props
 	} ) => <TagName { ...props }>{ value || placeholder }</TagName>,
 	useBlockProps: jest.fn( () => ( {} ) ),
