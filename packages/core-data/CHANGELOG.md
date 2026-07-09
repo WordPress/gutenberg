@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   RTC: Fix remote collaborator cursor drifting a few characters behind its real position after a peer pastes text containing HTML entities such as `&nbsp;`. `richTextOffsetToHtmlIndex` now maps offsets against the raw serialized HTML instead of a `toHTMLString( create() )` round-trip that re-encoded `&nbsp;` to a plain space ([#79711](https://github.com/WordPress/gutenberg/issues/79711)).
+
 ## 7.50.0 (2026-07-01)
 
 ## 7.49.0 (2026-06-24)
