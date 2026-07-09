@@ -29,11 +29,7 @@ import {
 	useHasBorderPanelControls,
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
-import {
-	InheritedValueProvider,
-	useInheritedValue,
-	useOwnVariation,
-} from '../components/global-styles/inherited-value-context';
+import { useInheritedValue } from '../components/global-styles/inherited-value-context';
 import { store as blockEditorStore } from '../store';
 import {
 	getStyleForState,
@@ -174,7 +170,8 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId, isEnabled ]
 	);
 
-	const ownVariation = useOwnVariation( name, className );
+	const { value: inheritedValue, sources: inheritedSources } =
+		useInheritedValue( name, className, selectedState );
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
@@ -211,31 +208,13 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 	};
 
 	return (
-		<InheritedValueProvider
-			blockName={ name }
-			ownVariation={ ownVariation }
-			selectedState={ selectedState }
-		>
-			<BorderPanelWithInheritedValue
-				as={ BordersInspectorControl }
-				panelId={ clientId }
-				settings={ settings }
-				value={ value }
-				onChange={ onChange }
-				defaultControls={ defaultControls }
-			/>
-		</InheritedValueProvider>
-	);
-}
-
-// Bridge component: reads the inherited value from context and hands it to
-// the panel. Kept below the Provider to satisfy React's rules of hooks.
-function BorderPanelWithInheritedValue( props ) {
-	const { value: inheritedValue, sources: inheritedSources } =
-		useInheritedValue();
-	return (
 		<StylesBorderPanel
-			{ ...props }
+			as={ BordersInspectorControl }
+			panelId={ clientId }
+			settings={ settings }
+			value={ value }
+			onChange={ onChange }
+			defaultControls={ defaultControls }
 			inheritedValue={ inheritedValue }
 			inheritedSources={ inheritedSources }
 		/>

@@ -14,11 +14,7 @@ import {
 	default as StylesTypographyPanel,
 	useHasTypographyPanel,
 } from '../components/global-styles/typography-panel';
-import {
-	InheritedValueProvider,
-	useInheritedValue,
-	useOwnVariation,
-} from '../components/global-styles/inherited-value-context';
+import { useInheritedValue } from '../components/global-styles/inherited-value-context';
 
 import { LINE_HEIGHT_SUPPORT_KEY } from './line-height';
 import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
@@ -186,7 +182,11 @@ export function TypographyPanel( {
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
-	const ownVariation = useOwnVariation( name, className );
+	const { value: inheritedValue } = useInheritedValue(
+		name,
+		className,
+		selectedState
+	);
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
@@ -261,30 +261,16 @@ export function TypographyPanel( {
 	const Wrapper = asWrapper || TypographyInspectorControl;
 
 	return (
-		<InheritedValueProvider
-			blockName={ name }
-			ownVariation={ ownVariation }
-			selectedState={ selectedState }
-		>
-			<TypographyPanelWithInheritedValue
-				as={ Wrapper }
-				panelId={ clientId }
-				settings={ settings }
-				value={ value }
-				onChange={ onChange }
-				defaultControls={ defaultControls }
-				contrastWarning={ contrastWarning }
-			/>
-		</InheritedValueProvider>
-	);
-}
-
-// Bridge component: reads the inherited value from context and hands it to
-// the panel. Kept below the Provider to satisfy React's rules of hooks.
-function TypographyPanelWithInheritedValue( props ) {
-	const { value: inheritedValue } = useInheritedValue();
-	return (
-		<StylesTypographyPanel { ...props } inheritedValue={ inheritedValue } />
+		<StylesTypographyPanel
+			as={ Wrapper }
+			panelId={ clientId }
+			settings={ settings }
+			value={ value }
+			onChange={ onChange }
+			defaultControls={ defaultControls }
+			contrastWarning={ contrastWarning }
+			inheritedValue={ inheritedValue }
+		/>
 	);
 }
 
