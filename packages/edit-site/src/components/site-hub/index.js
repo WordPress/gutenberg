@@ -77,8 +77,9 @@ export const SiteHubMobile = memo(
 		return (
 			<div className="edit-site-site-hub">
 				<Button
-					__next40pxDefaultSize
+					size="compact"
 					ref={ ref }
+					className="edit-site-site-hub__back-button"
 					icon={ isRTL() ? chevronRight : chevronLeft }
 					{ ...backButtonProps }
 				/>
