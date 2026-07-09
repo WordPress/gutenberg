@@ -1335,6 +1335,86 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should preserve other style attributes on selected blocks when updating a specific style property', async ( {
+		page,
+		editor,
+		pageUtils,
+		multiBlockSelectionUtils,
+	} ) => {
+		// Insert 3 paragraph blocks with different custom background colors
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'First',
+				style: { color: { background: '#ff0000' } },
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Second',
+				style: { color: { background: '#00ff00' } },
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Third',
+				style: { color: { background: '#0000ff' } },
+			},
+		} );
+
+		// Select all 3 blocks
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2, 3 ] );
+
+		// Open block settings sidebar
+		await editor.openDocumentSettingsSidebar();
+
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+
+		// Wait for the color picker to appear and click white
+		await page.getByRole( 'option', { name: 'White' } ).click();
+
+		// Check that the blocks have the white text color but kept their original backgrounds
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					textColor: 'white',
+					style: { color: { background: '#ff0000' } },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					textColor: 'white',
+					style: { color: { background: '#00ff00' } },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					textColor: 'white',
+					style: { color: { background: '#0000ff' } },
+				},
+			},
+		] );
+	} );
+
 	test.describe( 'shift+click multi-selection', () => {
 		test( 'should multi-select block with text selection and a block without text selection', async ( {
 			page,
