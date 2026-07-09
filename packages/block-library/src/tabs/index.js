@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { tabs as icon } from '@wordpress/icons';
 
 /**
@@ -35,11 +35,6 @@ export const settings = {
 					name: 'core/tab-panel',
 					attributes: {
 						anchor: `tab-${ index }`,
-						label: sprintf(
-							/** translators: %s: tab index number */
-							__( 'Tab %s' ),
-							index
-						),
 					},
 					innerBlocks: [
 						{

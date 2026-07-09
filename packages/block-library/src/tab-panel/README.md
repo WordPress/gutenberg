@@ -19,9 +19,7 @@ Content for a tab in a tabbed interface.
 
 _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
-|-----------|------|---------|-------------|
-| `label` | `string` | `""` | — |
+_This block has no custom attributes._
 
 ## Supports
 
@@ -48,16 +46,12 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 - `core/tabs-id`
 
-**Provides context:**
-
-- `core/tab-label` → attribute `label`
-
 ## Block Markup
 
 This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
 
 ```html
-<!-- wp:tab-panel {"label":""} -->
+<!-- wp:tab-panel -->
 <!-- Content... -->
 <!-- /wp:tab-panel -->
 ```

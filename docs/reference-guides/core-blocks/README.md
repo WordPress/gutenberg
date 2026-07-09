@@ -1018,7 +1018,6 @@ Content for a tab in a tabbed interface.
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tab-panels
 -	**Supports:** anchor, color (background, text), layout, spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~visibility~~
--	**Attributes:** label
 
 ## Tab Panels
 

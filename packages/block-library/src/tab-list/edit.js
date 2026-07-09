@@ -22,7 +22,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,32 +35,37 @@ const EMPTY_ARRAY = [];
 
 function Edit( {
 	attributes,
-	clientId,
 	setAttributes,
+	clientId,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
-	const { ariaLabel } = attributes;
+	const { ariaLabel, tabs = EMPTY_ARRAY } = attributes;
 
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { tabsClientId, tabPanels, editorActiveTabIndex, activeTabIndex } =
+	const { tabsList, tabsClientId, editorActiveTabIndex, activeTabIndex } =
 		useSelect(
 			( select ) => {
 				const { getBlockRootClientId, getBlockAttributes, getBlocks } =
 					select( blockEditorStore );
 
-				const rootClientId = getBlockRootClientId( clientId );
-				const tabsAttributes = getBlockAttributes( rootClientId );
-				const tabPanelsBlock = getBlocks( rootClientId )?.find(
-					( block ) => block.name === 'core/tab-panels'
-				);
+				const _tabsClientId = getBlockRootClientId( clientId );
+				const tabsAttributes = _tabsClientId
+					? getBlockAttributes( _tabsClientId )
+					: undefined;
+
+				const tabPanelsBlock = _tabsClientId
+					? getBlocks( _tabsClientId ).find(
+							( block ) => block.name === 'core/tab-panels'
+					  )
+					: undefined;
 
 				return {
-					tabsClientId: rootClientId,
-					tabPanels: tabPanelsBlock?.innerBlocks ?? EMPTY_ARRAY,
+					tabsList: tabPanelsBlock?.innerBlocks ?? EMPTY_ARRAY,
+					tabsClientId: _tabsClientId,
 					editorActiveTabIndex: tabsAttributes?.editorActiveTabIndex,
 					activeTabIndex: tabsAttributes?.activeTabIndex ?? 0,
 				};
@@ -78,14 +83,6 @@ function Edit( {
 	const { insertTab, removeTab } = useTabActions( tabsClientId );
 
 	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
-	const tabsList = useMemo(
-		() =>
-			tabPanels.map( ( tab ) => ( {
-				label: tab.attributes.label || '',
-				clientId: tab.clientId,
-			} ) ),
-		[ tabPanels ]
-	);
 
 	function selectTabPanel( tabIndex ) {
 		if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
@@ -103,10 +100,12 @@ function Edit( {
 	}
 
 	function handleLabelChange( tabIndex, newLabel ) {
-		const tab = tabsList[ tabIndex ];
-		if ( tab?.clientId ) {
-			updateBlockAttributes( tab.clientId, { label: newLabel } );
-		}
+		const newTabs = [ ...tabs ];
+		newTabs[ tabIndex ] = {
+			...newTabs[ tabIndex ],
+			label: newLabel,
+		};
+		setAttributes( { tabs: newTabs } );
 	}
 
 	const menuRef = useRef();
@@ -223,7 +222,7 @@ function Edit( {
 								tagName="span"
 								withoutInteractiveFormatting
 								placeholder={ __( 'Tab title' ) }
-								value={ tab.label }
+								value={ tabs[ index ]?.label ?? '' }
 								onChange={ ( newLabel ) =>
 									handleLabelChange( index, newLabel )
 								}
