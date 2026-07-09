@@ -52,8 +52,6 @@ npm install @wordpress/theme
 import '@wordpress/theme/design-tokens.css';
 ```
 
-The package's JavaScript entrypoints are ESM-only. Use `import` syntax from ESM or TypeScript configuration files; CommonJS `require()` is not supported.
-
 This stylesheet is universal and does not have a separate RTL version.
 
 If your application renders React content into additional documents (an iframe, a popup window, etc.), each of those documents needs the same stylesheet loaded in its own `<head>`. See [Across documents (iframes and other portals)](#across-documents-iframes-and-other-portals).
@@ -203,6 +201,8 @@ After the prebuild step, the package will be built into its final form via the r
 
 This package provides Stylelint plugins to help enforce consistent usage of design tokens. To use them, add the plugins to your Stylelint configuration:
 
+The Stylelint plugin subpath exports are ESM-only. Use `import` syntax from ESM or TypeScript configuration files when loading them directly.
+
 ```json
 {
 	"plugins": [
@@ -281,6 +281,8 @@ This rule reports an error when a `var()` call for a `--wpds-*` token includes a
 This package provides build plugins that inject fallback values into bare `var(--wpds-*)` references at build time. This ensures components render correctly even when a `ThemeProvider` or design tokens stylesheet is not present — for example, `var(--wpds-color-foreground-content-neutral)` becomes `var(--wpds-color-foreground-content-neutral, #1e1e1e)`.
 
 `@wordpress/build` already applies these plugins automatically when `@wordpress/theme` is installed. You only need to configure them manually for custom build setups.
+
+The build plugin subpath exports are ESM-only. Use `import` syntax from ESM or TypeScript configuration files.
 
 Three plugin variants are available, covering common build tool setups:
 

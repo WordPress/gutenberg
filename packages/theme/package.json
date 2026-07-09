@@ -24,21 +24,24 @@
 	},
 	"files": [
 		"src",
+		"build",
 		"build-module",
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
+	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.mjs"
+			"import": "./build-module/index.mjs",
+			"default": "./build/index.cjs"
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
 		"./design-tokens.js": {
 			"types": "./build-types/prebuilt/js/design-tokens.d.mts",
-			"import": "./build-module/prebuilt/js/design-tokens.mjs"
+			"import": "./build-module/prebuilt/js/design-tokens.mjs",
+			"default": "./build/prebuilt/js/design-tokens.cjs"
 		},
 		"./postcss-plugins/postcss-ds-token-fallbacks": {
 			"types": "./src/postcss-plugins/postcss-ds-token-fallbacks.d.mts",
@@ -126,9 +129,10 @@
 		"access": "public"
 	},
 	"scripts": {
+		"prelint:js": "npx esbuild src/prebuilt/js/design-tokens.mjs --format=cjs --outfile=build/prebuilt/js/design-tokens.cjs && node -e \"\"",
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
-		"build": "npm run build:tokens && npm run build:default-ramps",
+		"build": "npm run build:tokens && npm run build:default-ramps && npm run prelint:js",
 		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
 	}
 }

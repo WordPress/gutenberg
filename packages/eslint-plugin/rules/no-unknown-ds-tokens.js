@@ -1,5 +1,5 @@
-const { readFileSync } = require( 'fs' );
-const { dirname, join } = require( 'path' );
+const tokenListModule = require( '@wordpress/theme/design-tokens.js' );
+const tokenList = tokenListModule.default || tokenListModule;
 
 const {
 	DS_TOKEN_PREFIX,
@@ -8,32 +8,6 @@ const {
 	wpdsTokensRegex,
 } = require( '../utils/ds-token-utils' );
 
-function loadTokenList() {
-	const themePackageJson = require.resolve( '@wordpress/theme/package.json' );
-	const tokenListSource = readFileSync(
-		join(
-			dirname( themePackageJson ),
-			'src/prebuilt/js/design-tokens.mjs'
-		),
-		'utf8'
-	);
-
-	const tokenMatches = tokenListSource.matchAll(
-		/^\s*'(?<token>--wpds-[^']+)',?$/gm
-	);
-
-	const tokens = Array.from( tokenMatches, ( { groups } ) => groups.token );
-
-	if ( tokens.length === 0 ) {
-		throw new Error(
-			'@wordpress/eslint-plugin: Unable to load @wordpress/theme design tokens.'
-		);
-	}
-
-	return tokens;
-}
-
-const tokenList = loadTokenList();
 const knownTokens = new Set( tokenList );
 
 /**
