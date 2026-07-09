@@ -52,9 +52,7 @@ import { unlock } from '../lock-unlock';
 import { getDimensionResetAttributes } from '../utils/style-state';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const { isDefaultBlockStyleState, ResolutionTool } = unlock(
-	blockEditorPrivateApis
-);
+const { ResolutionTool } = unlock( blockEditorPrivateApis );
 
 const hasDimensionValue = ( value ) =>
 	value !== undefined && value !== null && value !== '';
@@ -143,13 +141,20 @@ export default function PostFeaturedImageEdit( {
 		return imageId;
 	}, [ storedFeaturedImage, useFirstImageFromPost, postContent ] );
 
-	const { media, postType, postPermalink, selectedStyleState } = useSelect(
+	const {
+		media,
+		postType,
+		postPermalink,
+		selectedStyleState,
+		hasSelectedStyleState,
+	} = useSelect(
 		( select ) => {
 			const { getEntityRecord, getPostType, getEditedEntityRecord } =
 				select( coreStore );
-			const { getSelectedBlockStyleState } = unlock(
-				select( blockEditorStore )
-			);
+			const {
+				getSelectedBlockStyleState,
+				hasSelectedStyleState: _hasSelectedStyleState,
+			} = unlock( select( blockEditorStore ) );
 			return {
 				media:
 					featuredImage &&
@@ -163,12 +168,11 @@ export default function PostFeaturedImageEdit( {
 					postId
 				)?.link,
 				selectedStyleState: getSelectedBlockStyleState( clientId ),
+				hasSelectedStyleState: _hasSelectedStyleState( clientId ),
 			};
 		},
 		[ clientId, featuredImage, postTypeSlug, postId ]
 	);
-	const hasSelectedStyleState =
-		! isDefaultBlockStyleState( selectedStyleState );
 
 	const mediaUrl =
 		media?.media_details?.sizes?.[ sizeSlug ]?.source_url ||
