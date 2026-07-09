@@ -18,6 +18,7 @@
 
 ### Documentation
 
+-   Document raw token JSON files as internal maintainer inputs ([#80048](https://github.com/WordPress/gutenberg/pull/80048)).
 -   Document design token accessibility responsibilities ([#79943](https://github.com/WordPress/gutenberg/pull/79943)).
 -   Document that `ThemeProvider` does not accept wrapper customization props ([#79763](https://github.com/WordPress/gutenberg/pull/79763)).
 -   Clarify the design token documentation entry points and keep the generated token guidance source internal ([#79829](https://github.com/WordPress/gutenberg/pull/79829)).
