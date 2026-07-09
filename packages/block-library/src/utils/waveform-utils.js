@@ -119,29 +119,44 @@ export function createWaveformContainer( {
  * @param {Element} container              - The generated player container.
  * @param {Object}  styles                 - The player styles.
  * @param {string}  styles.backgroundColor - The waveform area background color.
+ * @param {string}  styles.textColor       - The player text color.
+ * @param {string}  styles.playButtonColor - The play button color.
  */
 export function applyWaveformPlayerStyles(
 	container,
-	{ backgroundColor } = {}
+	{ backgroundColor, textColor, playButtonColor } = {}
 ) {
 	const waveformContainer = container.querySelector( '.waveform-container' );
-	if ( ! waveformContainer ) {
-		return;
+
+	if ( playButtonColor ) {
+		container.style.setProperty( '--wfp-button-color', playButtonColor );
+	} else {
+		container.style.removeProperty( '--wfp-button-color' );
 	}
 
-	if ( backgroundColor ) {
-		waveformContainer.style.backgroundColor = backgroundColor;
+	if ( textColor ) {
+		container.style.setProperty( '--wfp-text-color', textColor );
+		container.style.setProperty( '--wfp-text-secondary-color', textColor );
 	} else {
-		waveformContainer.style.removeProperty( 'background-color' );
+		container.style.removeProperty( '--wfp-text-color' );
+		container.style.removeProperty( '--wfp-text-secondary-color' );
+	}
+
+	if ( waveformContainer ) {
+		if ( backgroundColor ) {
+			waveformContainer.style.backgroundColor = backgroundColor;
+		} else {
+			waveformContainer.style.removeProperty( 'background-color' );
+		}
 	}
 }
 
 /**
  * Apply contrasting color to SVG icon paths for visibility.
- * The icons should contrast with the button background (which uses textColor).
+ * The icons should contrast with the button background.
  *
  * @param {Element} container   - The waveform container element.
- * @param {string}  buttonColor - The button background color (textColor).
+ * @param {string}  buttonColor - The button background color.
  */
 export function styleSvgIcons( container, buttonColor ) {
 	// Compute a contrasting color for the icons based on button brightness.
@@ -325,13 +340,17 @@ export function initWaveformPlayer(
 	if ( instance.artworkEl ) {
 		instance.artworkEl.alt = imageAlt || '';
 	}
-	applyWaveformPlayerStyles( container, { backgroundColor } );
+	applyWaveformPlayerStyles( container, {
+		backgroundColor,
+		textColor,
+		playButtonColor: waveformColorValue,
+	} );
 
 	// Set up event handlers.
 	let cleanupPlayButtonAccessibility;
 	const handlers = {
 		ready: () => {
-			styleSvgIcons( container, textColor );
+			styleSvgIcons( container, waveformColorValue || textColor );
 			if ( showPlayButtonArtwork ) {
 				setupPlayButtonArtwork( container, image );
 			}

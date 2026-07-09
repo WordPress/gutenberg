@@ -151,6 +151,31 @@ describe( 'Waveform utilities', () => {
 			} );
 		} );
 
+		it( 'applies the waveform player text color variables', () => {
+			const container = document.createElement( 'div' );
+
+			applyWaveformPlayerStyles( container, {
+				textColor: '#0000ff',
+			} );
+
+			expect( container ).toHaveStyle( {
+				'--wfp-text-color': '#0000ff',
+				'--wfp-text-secondary-color': '#0000ff',
+			} );
+		} );
+
+		it( 'applies the waveform player play button color variable', () => {
+			const container = document.createElement( 'div' );
+
+			applyWaveformPlayerStyles( container, {
+				playButtonColor: '#ff0000',
+			} );
+
+			expect( container ).toHaveStyle( {
+				'--wfp-button-color': '#ff0000',
+			} );
+		} );
+
 		it( 'removes the waveform background color when cleared', () => {
 			const container = document.createElement( 'div' );
 			const waveformContainer = document.createElement( 'div' );
@@ -162,6 +187,33 @@ describe( 'Waveform utilities', () => {
 
 			expect( waveformContainer ).not.toHaveStyle( {
 				backgroundColor: '#ffeeaa',
+			} );
+		} );
+
+		it( 'removes the waveform player text color variables when cleared', () => {
+			const container = document.createElement( 'div' );
+			container.style.setProperty( '--wfp-text-color', '#0000ff' );
+			container.style.setProperty(
+				'--wfp-text-secondary-color',
+				'#0000ff'
+			);
+
+			applyWaveformPlayerStyles( container );
+
+			expect( container ).not.toHaveStyle( {
+				'--wfp-text-color': '#0000ff',
+				'--wfp-text-secondary-color': '#0000ff',
+			} );
+		} );
+
+		it( 'removes the waveform player play button color variable when cleared', () => {
+			const container = document.createElement( 'div' );
+			container.style.setProperty( '--wfp-button-color', '#ff0000' );
+
+			applyWaveformPlayerStyles( container );
+
+			expect( container ).not.toHaveStyle( {
+				'--wfp-button-color': '#ff0000',
 			} );
 		} );
 	} );

@@ -367,7 +367,11 @@ describe( 'WaveformPlayer', () => {
 		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 1 );
 		expect( applyWaveformPlayerStyles ).toHaveBeenCalledWith(
 			player.container,
-			{ backgroundColor: '#aabbcc' }
+			{
+				backgroundColor: '#aabbcc',
+				playButtonColor: undefined,
+				textColor: undefined,
+			}
 		);
 	} );
 

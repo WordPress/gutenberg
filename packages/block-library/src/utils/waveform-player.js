@@ -126,9 +126,11 @@ export function WaveformPlayer( {
 		if ( playerRef.current?.container ) {
 			applyWaveformPlayerStyles( playerRef.current.container, {
 				backgroundColor,
+				textColor,
+				playButtonColor: color,
 			} );
 		}
-	}, [ backgroundColor ] );
+	}, [ backgroundColor, color, textColor ] );
 
 	const ref = useRefEffect(
 		( element ) => {

@@ -366,7 +366,7 @@ const PlaylistEdit = ( {
 		colorSettings.push(
 			{
 				colorValue: waveformColor,
-				label: __( 'Waveform' ),
+				label: __( 'Waveform + Play' ),
 				onColorChange: updateWaveformColor,
 				isShownByDefault: true,
 				clearable: true,
