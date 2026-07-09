@@ -227,8 +227,8 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				getBlockRootClientId: () => null,
-				getSelectedBlockClientIds: () => [],
 				canInsertBlockType: () => true,
 				getBlockCount: () => 1,
 			};
@@ -263,8 +263,8 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				getBlockRootClientId: () => null,
-				getSelectedBlockClientIds: () => [],
 				canInsertBlockType: ( clientId ) => {
 					switch ( clientId ) {
 						case 'core/test-ribs':
@@ -296,8 +296,8 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				getBlockRootClientId: () => null,
-				getSelectedBlockClientIds: () => [],
 				canInsertBlockType: () => true,
 				getBlockCount: () => 1,
 			};
@@ -335,8 +335,8 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				getBlockRootClientId: () => null,
-				getSelectedBlockClientIds: () => [],
 				canInsertBlockType: () => true,
 				getBlockCount: () => 1,
 			};
@@ -374,6 +374,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				canInsertBlockType: () => true,
 			};
 			const dispatch = jest.fn();
@@ -414,6 +415,7 @@ describe( 'actions', () => {
 			const containerBlock = createBlock( 'core/test-container' );
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				canInsertBlockType: () => true,
 			};
 			const dispatch = jest.fn();
@@ -461,6 +463,8 @@ describe( 'actions', () => {
 			const containerBlock = createBlock( 'core/test-container' );
 			const select = {
 				getSettings: () => null,
+				// The insertion selects the inserted block.
+				getSelectedBlockClientId: () => containerBlock.clientId,
 				canInsertBlockType: () => true,
 			};
 			const dispatch = jest.fn();
@@ -497,6 +501,7 @@ describe( 'actions', () => {
 			] );
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				canInsertBlockType: () => true,
 			};
 			const dispatch = jest.fn();
@@ -536,6 +541,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				canInsertBlockType: ( clientId ) => {
 					switch ( clientId ) {
 						case 'core/test-ribs':
@@ -582,6 +588,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				canInsertBlockType: () => false,
 			};
 			const dispatch = jest.fn();
@@ -614,6 +621,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getSettings: () => null,
+				getSelectedBlockClientId: () => null,
 				canInsertBlockType: ( clientId ) => {
 					switch ( clientId ) {
 						case 'core/test-ribs':
@@ -778,7 +786,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getBlockRootClientId: () => null,
-				getSelectedBlockClientIds: () => [],
+				getSelectedBlockClientId: () => null,
 				canRemoveBlocks: () => true,
 				getBlockRemovalRules: () => false,
 			};
@@ -804,7 +812,7 @@ describe( 'actions', () => {
 
 			const select = {
 				getBlockRootClientId: () => null,
-				getSelectedBlockClientIds: () => [],
+				getSelectedBlockClientId: () => null,
 				canRemoveBlocks: () => true,
 				getBlockRemovalRules: () => false,
 			};
