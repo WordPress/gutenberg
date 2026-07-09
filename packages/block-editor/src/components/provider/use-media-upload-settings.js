@@ -21,6 +21,7 @@ function useMediaUploadSettings( settings = {} ) {
 			allowedMimeTypes: settings.allowedMimeTypes,
 			allImageSizes: settings.allImageSizes,
 			bigImageSizeThreshold: settings.bigImageSizeThreshold,
+			gifConvert: settings.gifConvert,
 		} ),
 		[ settings ]
 	);

@@ -15,6 +15,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
+import AnimatedGifUploadsOption from './animated-gif-uploads';
 import EnablePanelOption from './enable-panel';
 import EnablePluginDocumentSettingPanelOption from './enable-plugin-document-setting-panel';
 import EnablePublishSidebarOption from './enable-publish-sidebar';
@@ -372,6 +373,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									) }
 									label={ __( 'Approval step' ) }
 								/>
+								<AnimatedGifUploadsOption />
 							</PreferencesModalSection>
 						</>
 					),

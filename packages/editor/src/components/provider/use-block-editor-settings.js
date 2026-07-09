@@ -138,6 +138,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		allImageSizes,
 		bigImageSizeThreshold,
 		allowRightClickOverrides,
+		animatedGifUploads,
 		blockTypes,
 		focusMode,
 		hasFixedToolbar,
@@ -217,6 +218,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					'core',
 					'allowRightClickOverrides'
 				),
+				animatedGifUploads: get( 'core/media', 'animatedGifUploads' ),
 				blockTypes: getBlockTypes(),
 				canUseUnfilteredHTML: getRawEntityRecord(
 					'postType',
@@ -397,6 +399,15 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				: undefined,
 			mediaFinalize: hasUploadPermissions ? mediaFinalize : undefined,
 			mediaDelete: hasUploadPermissions ? mediaDelete : undefined,
+			/*
+			 * Animated GIF uploads are decided by the user (see the
+			 * `core/media` `animatedGifUploads` preference): 'gif' disables
+			 * the conversion entirely, while 'ask' (the default) and 'video'
+			 * upload the GIF as a plain image and record a pending
+			 * conversion, which the editor's GifConversionPrompt either asks
+			 * about or, for 'video', resolves automatically.
+			 */
+			gifConvert: animatedGifUploads === 'gif' ? false : 'prompt',
 			__experimentalBlockPatterns: blockPatterns,
 			[ selectBlockPatternsKey ]: ( select ) => {
 				const { hasFinishedResolution, getBlockPatternsForPostType } =
@@ -466,6 +477,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		isRevisionsMode,
 		allowedBlockTypes,
 		allowRightClickOverrides,
+		animatedGifUploads,
 		focusMode,
 		forceDisableFocusMode,
 		hasFixedToolbar,

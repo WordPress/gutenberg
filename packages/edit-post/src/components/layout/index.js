@@ -72,7 +72,7 @@ import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initializat
 const { useCommandContext } = unlock( commandsPrivateApis );
 /** @type {{} & {useDrag: import('@use-gesture/react').useDrag}} */
 const { useDrag } = unlock( componentsPrivateApis );
-const { Editor, FullscreenMode, UploadProgressSnackbar } =
+const { Editor, FullscreenMode, UploadProgressSnackbar, GifConversionPrompt } =
 	unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 const DESIGN_POST_TYPES = [
@@ -623,6 +623,7 @@ function Layout( {
 							{ backButton }
 							<SnackbarNotices className="edit-post-layout__snackbar" />
 							<UploadProgressSnackbar />
+							<GifConversionPrompt />
 						</Editor>
 					</div>
 				</ErrorBoundary>

@@ -49,7 +49,8 @@ import SaveHub from '../save-hub';
 import SavePanel from '../save-panel';
 
 const { useLocation } = unlock( routerPrivateApis );
-const { useStyle, UploadProgressSnackbar } = unlock( editorPrivateApis );
+const { useStyle, UploadProgressSnackbar, GifConversionPrompt } =
+	unlock( editorPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 const CONTENT_COLOR = { background: '#ffffff' };
@@ -165,6 +166,7 @@ function Layout() {
 
 					<SnackbarNotices className="edit-site-layout__snackbar" />
 					<UploadProgressSnackbar />
+					<GifConversionPrompt />
 
 					{ isMobileViewport && hasMobileAreas && (
 						<div className="edit-site-layout__mobile">

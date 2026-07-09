@@ -83,6 +83,7 @@ export function initializeEditor( id, settings ) {
 		dispatch( preferencesStore ).setDefaults( 'core/media', {
 			requireApproval: true,
 			optimizeOnUpload: true,
+			animatedGifUploads: 'ask',
 		} );
 	}
 
