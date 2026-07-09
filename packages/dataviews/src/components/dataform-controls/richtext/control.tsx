@@ -498,8 +498,8 @@ export default function RichTextControl( {
 				markWhenOptional={ markWhenOptional }
 				customValidity={ customValidity }
 				// The shell manages the editable content through the ref; the
-				// value only drives its hidden validity delegate.
-				value={ attrValue }
+				// plain text only drives its hidden validity delegate.
+				value={ value.text }
 				aria-multiline={ ! disableLineBreaks }
 				ref={ editableRef }
 				onFocus={ onEditableFocus }

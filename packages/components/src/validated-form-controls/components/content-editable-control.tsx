@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
 
 /**
@@ -25,23 +26,18 @@ const UnforwardedValidatedContentEditableControl = (
 	}: React.ComponentProps< typeof ContentEditableControl > &
 		ValidatedControlProps & {
 			/**
-			 * The field's current HTML value. Only used to drive the hidden
-			 * validity delegate (e.g. `required`); the visible content is
-			 * managed by the consumer through the forwarded ref.
+			 * The field's current value as plain text, used only to drive the
+			 * hidden validity delegate (e.g. `required`). The visible content
+			 * is managed by the consumer through the forwarded ref, and any
+			 * markup-to-text transformation is the consumer's responsibility.
 			 */
 			value?: string;
 		},
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
-
-	/*
-	 * The delegate mirrors the field's plain text so `required` validation
-	 * reflects whether the field has content. Markup-only content (e.g. a
-	 * lone image object) reads as empty, which matches how a text-oriented
-	 * form field is expected to validate.
-	 */
-	const plainTextValue = value ? value.replace( /<[^>]*>/g, '' ).trim() : '';
+	const editableRef = useRef< HTMLDivElement >( null );
+	const mergedRefs = useMergeRefs( [ forwardedRef, editableRef ] );
 
 	return (
 		<div className="components-validated-control__wrapper-with-error-delegate">
@@ -50,9 +46,13 @@ const UnforwardedValidatedContentEditableControl = (
 				markWhenOptional={ markWhenOptional }
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
+				// The delegate holds the validity state, but the editable is
+				// what assistive technology interacts with, so the validity
+				// message should describe the editable.
+				getDescriptionTarget={ () => editableRef.current }
 			>
 				<ContentEditableControl
-					ref={ forwardedRef }
+					ref={ mergedRefs }
 					aria-invalid={
 						customValidity?.type === 'invalid' || undefined
 					}
@@ -64,17 +64,14 @@ const UnforwardedValidatedContentEditableControl = (
 				type="text"
 				ref={ validityTargetRef }
 				required={ required }
-				value={ plainTextValue }
+				// Whitespace-only content reads as empty, matching how a
+				// text-oriented form field is expected to validate `required`.
+				value={ value?.trim() ?? '' }
 				tabIndex={ -1 }
 				onChange={ () => {} }
 				onFocus={ ( e ) => {
-					e.target
-						.closest(
-							'.components-validated-control__wrapper-with-error-delegate'
-						)
-						?.querySelector< HTMLElement >(
-							'.wp-components-content-editable-control'
-						)
+					e.target.previousElementSibling
+						?.querySelector< HTMLElement >( '[role="textbox"]' )
 						?.focus();
 				} }
 			/>
