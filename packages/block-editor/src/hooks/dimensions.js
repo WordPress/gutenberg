@@ -95,8 +95,11 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId, isEnabled ]
 	);
 
-	const { value: inheritedValue, sources: inheritedSources } =
-		useInheritedValue( name, className, selectedState );
+	const { value: inheritedValue } = useInheritedValue(
+		name,
+		className,
+		selectedState
+	);
 
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const value = isStateSelected
@@ -149,7 +152,6 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 					isStateSelected ? undefined : setVisualizedProperty
 				}
 				inheritedValue={ inheritedValue }
-				inheritedSources={ inheritedSources }
 			/>
 			{ ! isStateSelected &&
 				!! settings?.spacing?.padding &&
