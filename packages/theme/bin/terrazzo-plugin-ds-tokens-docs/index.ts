@@ -11,10 +11,11 @@ function escapeRegExp( str: string ) {
 	return str.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
 }
 
-type TokenReference = {
-	name: string;
-	description: string;
-};
+function titleCase( str: string ) {
+	return str[ 0 ].toUpperCase() + str.slice( 1 );
+}
+
+type TokensMap = Record< string, Record< string, string > >;
 
 export default function pluginDsTokenDocs( {
 	filename = 'design-tokens.md',
@@ -27,7 +28,7 @@ export default function pluginDsTokenDocs( {
 				return;
 			}
 
-			const semanticTokens: TokenReference[] = [];
+			const semanticTokens: TokensMap = {};
 			// Re-use transformed tokens from the CSS plugin
 			for ( const token of getTransforms( {
 				format: FORMAT_ID,
@@ -41,31 +42,39 @@ export default function pluginDsTokenDocs( {
 					continue;
 				}
 
-				semanticTokens.push( {
-					name: token.localID,
-					description: token.token.$description ?? 'N/A',
-				} );
+				// Use the tokens filename (without .json) as the group name
+				const group =
+					token.token.source.loc
+						?.split( '/' )
+						.at( -1 )
+						?.split( '.json' )[ 0 ] ?? 'Miscellaneous';
+
+				// Group by category
+				semanticTokens[ group ] ??= {};
+				semanticTokens[ group ][ token.localID ] =
+					token.token.$description ?? 'N/A';
 			}
 
-			function tokensToMdTable( tokens: TokenReference[] ) {
-				return [
-					'| Variable name | Description |',
-					'|---|---|',
-					...tokens
-						.toSorted( ( a, b ) => a.name.localeCompare( b.name ) )
-						.map(
-							( { name, description } ) =>
+			function tokensToMdTable( tokens: TokensMap ) {
+				return Object.entries( tokens )
+					.map( ( [ group, tokensInGroup ] ) => [
+						`### ${ titleCase( group ) }`,
+						'',
+						'| Variable name | Description |',
+						'|---|---|',
+						...Object.entries( tokensInGroup ).map(
+							( [ name, description ] ) =>
 								`| \`${ name }\` | ${ description } |`
 						),
-				];
+						'',
+					] )
+					.flat( 2 );
 			}
 
 			const generatedTokenTables = [
 				GENERATED_SECTION_START,
 				'',
 				'## Semantic tokens',
-				'',
-				'This generated table lists every public semantic token, sorted by CSS custom property name so related tokens appear together.',
 				'',
 				...tokensToMdTable( semanticTokens ),
 				GENERATED_SECTION_END,
