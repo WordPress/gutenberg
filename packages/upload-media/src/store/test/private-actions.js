@@ -11,6 +11,7 @@ import {
 	getTranscodeImageOperation,
 	finalizeItem,
 	prepareItem,
+	resolveGifConversion,
 	transcodeGifItem,
 	detectUltraHdr,
 	removeItem,
@@ -959,6 +960,106 @@ describe( 'private actions', () => {
 
 			const dispatchFn = await runGenerate( { item, settings: {} } );
 
+			expect( dispatchFn.addSideloadItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'records a pending conversion instead of sideloading in prompt mode', async () => {
+			const gif = makeGif();
+			const item = {
+				id: 'g4',
+				sourceFile: gif,
+				file: gif,
+				animatedGifFile: gif,
+				attachment: { id: 55 },
+			};
+
+			const dispatchFn = await runGenerate( {
+				item,
+				settings: { gifConvert: 'prompt' },
+			} );
+
+			// No automatic transcode: the decision is left to the user.
+			expect( dispatchFn.addSideloadItem ).not.toHaveBeenCalled();
+			expect( dispatchFn ).toHaveBeenCalledWith( {
+				type: Type.AddGifConversion,
+				conversion: {
+					attachmentId: 55,
+					itemId: 'g4',
+					file: gif,
+					status: 'pending',
+				},
+			} );
+		} );
+	} );
+
+	describe( 'resolveGifConversion', () => {
+		const gif = new File( [ new Uint8Array( [ 0x47, 0x49 ] ) ], 'a.gif', {
+			type: 'image/gif',
+		} );
+		const conversion = {
+			attachmentId: 55,
+			itemId: 'original-item',
+			file: gif,
+			status: 'pending',
+		};
+
+		function runResolve( decision, conversions = [ conversion ] ) {
+			const dispatchFn = jest.fn();
+			dispatchFn.addSideloadItem = jest.fn();
+			const select = {
+				getGifConversions: () => conversions,
+				getSettings: () => ( { videoOutputFormat: 'video/mp4' } ),
+			};
+			const thunk = resolveGifConversion( 55, decision );
+			return thunk( { select, dispatch: dispatchFn } ).then(
+				() => dispatchFn
+			);
+		}
+
+		it( 'discards the record when the user keeps the GIF', async () => {
+			const dispatchFn = await runResolve( 'gif' );
+
+			expect( dispatchFn ).toHaveBeenCalledWith( {
+				type: Type.RemoveGifConversion,
+				attachmentId: 55,
+			} );
+			expect( dispatchFn.addSideloadItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'enqueues the companion transcode when the user converts', async () => {
+			const dispatchFn = await runResolve( 'video' );
+
+			expect( dispatchFn ).toHaveBeenCalledWith( {
+				type: Type.UpdateGifConversion,
+				attachmentId: 55,
+				status: 'converting',
+			} );
+
+			// Mirrors the automatic sideload from generateThumbnails: the
+			// original item ID routes the Upload to the sideload endpoint.
+			expect( dispatchFn.addSideloadItem ).toHaveBeenCalledTimes( 1 );
+			const sideload = dispatchFn.addSideloadItem.mock.calls[ 0 ][ 0 ];
+			expect( sideload.file ).toBe( gif );
+			expect( sideload.parentId ).toBe( 'original-item' );
+			expect( sideload.additionalData ).toEqual(
+				expect.objectContaining( {
+					post: 55,
+					image_size: 'animated_video',
+					convert_format: false,
+				} )
+			);
+			expect( sideload.operations ).toEqual( [
+				[ OperationType.TranscodeGif, { outputFormat: 'mp4' } ],
+				OperationType.Upload,
+			] );
+		} );
+
+		it( 'ignores attachments without a pending record', async () => {
+			const dispatchFn = await runResolve( 'video', [
+				{ ...conversion, status: 'converting' },
+			] );
+
+			expect( dispatchFn ).not.toHaveBeenCalled();
 			expect( dispatchFn.addSideloadItem ).not.toHaveBeenCalled();
 		} );
 	} );

@@ -3,6 +3,7 @@
  */
 import reducer from '../reducer';
 import {
+	type GifConversion,
 	ItemStatus,
 	OperationType,
 	type QueueItem,
@@ -641,6 +642,117 @@ describe( 'reducer', () => {
 			} );
 
 			expect( state.queue[ 0 ].progress ).toBe( 50 );
+		} );
+	} );
+
+	describe( 'GIF conversions', () => {
+		const conversion: GifConversion = {
+			attachmentId: 55,
+			itemId: 'original-item',
+			file: new File( [], 'a.gif', { type: 'image/gif' } ),
+			status: 'pending',
+		};
+
+		function buildState( extra: Partial< State > = {} ): State {
+			return {
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [],
+				gifConversions: [ conversion ],
+				...extra,
+			} as State;
+		}
+
+		it( 'adds, updates, and removes a conversion record', () => {
+			let state = reducer( buildState( { gifConversions: [] } ), {
+				type: Type.AddGifConversion,
+				conversion,
+			} );
+			expect( state.gifConversions ).toEqual( [ conversion ] );
+
+			state = reducer( state, {
+				type: Type.UpdateGifConversion,
+				attachmentId: 55,
+				status: 'converting',
+			} );
+			expect( state.gifConversions?.[ 0 ].status ).toBe( 'converting' );
+
+			state = reducer( state, {
+				type: Type.RemoveGifConversion,
+				attachmentId: 55,
+			} );
+			expect( state.gifConversions ).toEqual( [] );
+		} );
+
+		it( 'drops the record when the original upload is cancelled', () => {
+			const state = reducer(
+				buildState( {
+					queue: [
+						{
+							id: 'original-item',
+							status: ItemStatus.Processing,
+						} as QueueItem,
+					],
+				} ),
+				{
+					type: Type.Cancel,
+					id: 'original-item',
+					error: new Error(),
+				}
+			);
+
+			expect( state.gifConversions ).toEqual( [] );
+		} );
+
+		it( 'drops the record when the requested transcode sideload is cancelled', () => {
+			const state = reducer(
+				buildState( {
+					queue: [
+						{
+							id: 'transcode-sideload',
+							parentId: 'original-item',
+							status: ItemStatus.Processing,
+							additionalData: {
+								image_size: 'animated_video',
+							},
+						} as QueueItem,
+					],
+				} ),
+				{
+					type: Type.Cancel,
+					id: 'transcode-sideload',
+					error: new Error(),
+				}
+			);
+
+			expect( state.gifConversions ).toEqual( [] );
+		} );
+
+		it( 'keeps the record when an unrelated child sideload is cancelled', () => {
+			const state = reducer(
+				buildState( {
+					queue: [
+						{
+							id: 'thumbnail-sideload',
+							parentId: 'original-item',
+							status: ItemStatus.Processing,
+							additionalData: {
+								image_size: 'medium',
+							},
+						} as QueueItem,
+					],
+				} ),
+				{
+					type: Type.Cancel,
+					id: 'thumbnail-sideload',
+					error: new Error(),
+				}
+			);
+
+			expect( state.gifConversions ).toEqual( [ conversion ] );
 		} );
 	} );
 } );
