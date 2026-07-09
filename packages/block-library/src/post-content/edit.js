@@ -227,8 +227,12 @@ function Content( props ) {
 	);
 }
 
-function Placeholder( { layoutClassNames } ) {
-	const blockProps = useBlockProps( { className: layoutClassNames } );
+function Placeholder( { layoutClassNames, dropCap } ) {
+	const blockProps = useBlockProps( {
+		className: clsx( layoutClassNames, {
+			'has-drop-cap': dropCap,
+		} ),
+	} );
 	return (
 		<div { ...blockProps }>
 			<p>
@@ -348,7 +352,10 @@ export default function PostContentEdit( {
 						dropCap={ dropCap }
 					/>
 				) : (
-					<Placeholder layoutClassNames={ layoutClassNames } />
+					<Placeholder
+						layoutClassNames={ layoutClassNames }
+						dropCap={ dropCap }
+					/>
 				) }
 			</RecursionProvider>
 		</>
