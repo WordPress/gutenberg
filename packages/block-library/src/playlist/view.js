@@ -87,6 +87,9 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			} )
 			.then( () => {
 				existing.url = track.url;
+				if ( existing.instance.artworkEl ) {
+					existing.instance.artworkEl.alt = track.imageAlt || '';
+				}
 				// loadTrack() preserves the previous explicit seekLabel option.
 				updateSeekControlLabel(
 					existing.instance,
@@ -114,6 +117,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		title: track.title,
 		artist: track.artist,
 		image: track.image,
+		imageAlt: track.imageAlt,
 		autoPlay: shouldAutoPlay,
 		labels,
 		waveformStyle: context.waveformStyle,

@@ -13,29 +13,26 @@ import { initWaveformPlayer, updateSeekControlLabel } from './waveform-utils';
 const EMPTY_ARTIST_PLACEHOLDER = '\u00a0';
 
 /**
- * Update a live waveform player's metadata elements in place.
+ * Update the DOM of a WaveformPlayer element to reflect current props.
  *
- * The title element always exists, so the title is updated in place. The
- * subtitle element is seeded during editor player creation, so it can be
- * updated in place and hidden when the track has no artist. The artwork
- * element only exists when the track had an image when the player was created,
- * so its value is updated in place here; adding or removing an image (which
- * creates or tears down that element) is instead handled by recreating the
- * player, keyed on the `hasImage` dependency.
+ * The @arraypress/waveform-player library currently offers no public method to
+ * do this, hence the workaround. Context:
  *
- * The library's only metadata API is `loadTrack()`, which re-fetches and
- * re-decodes the audio and regenerates the waveform (resetting playback), so
- * it's unsuitable for live metadata edits. We instead write to the title,
- * subtitle, and artwork elements directly, which is what `loadTrack()` itself
- * does internally for these fields.
+ * - The title and subtitle elements are guaranteed to exist based on
+ *   `initWaveformPlayer` and implementation details of the library.
  *
- * @param {Object} instance        - The waveform player instance.
- * @param {Object} metadata        - The track metadata.
- * @param {string} metadata.title  - The track title.
- * @param {string} metadata.artist - The artist name.
- * @param {string} metadata.image  - The artwork image URL.
+ * - The image/artwork element may not exist if the track loaded upon init had
+ *   no defined artwork, but in these cases we create the entire WaveformPlayer
+ *   instance. See `hasImage`.
+ *
+ * @param {Object} instance          - The waveform player instance.
+ * @param {Object} metadata          - The track metadata.
+ * @param {string} metadata.title    - The track title.
+ * @param {string} metadata.artist   - The artist name.
+ * @param {string} metadata.image    - The artwork image URL.
+ * @param {string} metadata.imageAlt - The artwork image alt text.
  */
-function updatePlayerMetadata( instance, { title, artist, image } ) {
+function updatePlayerMetadata( instance, { title, artist, image, imageAlt } ) {
 	if ( instance.titleEl ) {
 		instance.titleEl.textContent = title ?? '';
 	}
@@ -46,6 +43,7 @@ function updatePlayerMetadata( instance, { title, artist, image } ) {
 	}
 	if ( instance.artworkEl && image ) {
 		instance.artworkEl.src = image;
+		instance.artworkEl.alt = imageAlt || '';
 	}
 }
 
@@ -60,6 +58,7 @@ function updatePlayerMetadata( instance, { title, artist, image } ) {
  * @param {string}   props.title         - The track title.
  * @param {string}   props.artist        - The artist name.
  * @param {string}   props.image         - The artwork image URL.
+ * @param {string}   props.imageAlt      - The artwork image alt text.
  * @param {string}   props.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
  * @param {Function} props.onEnded       - Callback when the track finishes playing.
  * @return {Element} The WaveformPlayer element.
@@ -69,6 +68,7 @@ export function WaveformPlayer( {
 	title,
 	artist,
 	image,
+	imageAlt,
 	waveformStyle,
 	onEnded,
 } ) {
@@ -78,32 +78,30 @@ export function WaveformPlayer( {
 	// and recreate the entire player on every re-render, making it disappear
 	// during editor resizes.
 	const onEndedEvent = useEvent( onEnded );
-	const metadataRef = useRef( { title, artist, image } );
+
+	// Ref for the WaveformPlayer instance
 	const playerRef = useRef();
 
-	// The artwork element only exists when an image was present when the
-	// player was created. Recreate the player when one is added or removed so
-	// that element is created or torn down; value changes to an existing
-	// element are applied in place below.
+	// Due to how WaveformPlayer is implemented, the artwork element within the
+	// player element only exists when an image was present when the player was
+	// created. Recreate the player when one is added or removed so that
+	// element is created or torn down.
 	const hasImage = !! image;
 
-	// Keep the freshest metadata available to init() (which runs on a
-	// deferred timeout) and update the live player in place when metadata
-	// changes. Updating in place avoids destroying and recreating the
-	// player, which would flash it on every keystroke while editing a
-	// track's title or artist.
-	useEffect( () => {
-		metadataRef.current = { title, artist, image };
+	// WaveformPlayer needs an audio source on init, but the source may change
+	// throughout its lifetime.
+	const hasSrc = !! src;
 
-		const instance = playerRef.current?.instance;
-		if ( instance ) {
-			updatePlayerMetadata( instance, { title, artist, image } );
-		}
-	}, [ title, artist, image ] );
+	// Combined props ref for `initWaveformPlayer`, which is called
+	// asynchronously after this component mounts.
+	const metadataRef = useRef( { src, title, artist, image, imageAlt } );
+	useEffect( () => {
+		metadataRef.current = { src, title, artist, image, imageAlt };
+	}, [ src, title, artist, image, imageAlt ] );
 
 	const ref = useRefEffect(
 		( element ) => {
-			if ( ! src ) {
+			if ( ! hasSrc ) {
 				return;
 			}
 
@@ -115,11 +113,13 @@ export function WaveformPlayer( {
 					return;
 				}
 				const player = initWaveformPlayer( element, {
-					src,
-					...metadataRef.current,
-					waveformStyle,
+					src: metadataRef.current.src,
+					title: metadataRef.current.title,
 					artist:
 						metadataRef.current.artist || EMPTY_ARTIST_PLACEHOLDER,
+					image: metadataRef.current.image,
+					imageAlt: metadataRef.current.imageAlt,
+					waveformStyle,
 					labels: {
 						seek: __( 'Seek' ),
 						/* translators: %1$s: current audio time, %2$s: total audio duration. */
@@ -131,7 +131,6 @@ export function WaveformPlayer( {
 					onEnded: () => onEndedEvent?.(),
 				} );
 				playerRef.current = player;
-				updatePlayerMetadata( player.instance, metadataRef.current );
 				const { destroy } = player;
 				playerDestroy = destroy;
 			}
@@ -152,8 +151,41 @@ export function WaveformPlayer( {
 				playerDestroy?.();
 			};
 		},
-		[ onEndedEvent, src, waveformStyle, hasImage ]
+		[ onEndedEvent, hasSrc, waveformStyle, hasImage ]
 	);
+
+	useEffect( () => {
+		if ( playerRef.current?.instance ) {
+			const instance = playerRef.current?.instance;
+			if ( instance ) {
+				updatePlayerMetadata( instance, {
+					title,
+					artist,
+					image,
+					imageAlt,
+				} );
+			}
+		}
+	}, [ title, artist, image, imageAlt ] );
+
+	useEffect( () => {
+		if ( src && playerRef.current?.instance ) {
+			const wasPlaying = playerRef.current.instance.isPlaying;
+			const promise = playerRef.current.instance.loadTrack(
+				src,
+				metadataRef.current.title,
+				metadataRef.current.artist,
+				{
+					artwork: metadataRef.current.image,
+				}
+			);
+			if ( ! wasPlaying ) {
+				promise.then( () => {
+					playerRef.current.instance.pause();
+				} );
+			}
+		}
+	}, [ src ] );
 
 	return <div ref={ ref } className="wp-block-playlist__waveform-player" />;
 }

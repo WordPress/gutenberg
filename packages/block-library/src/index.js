@@ -343,13 +343,23 @@ export const registerCoreBlocks = (
 				...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
 					apiVersion: 3,
 				} ),
+				// Always pass the postId context so the server-side render can
+				// reproduce the same output as the front end, while preserving
+				// any context declared in the block's PHP registration.
+				usesContext: Array.from(
+					new Set( [
+						...( bootstrappedBlockType?.usesContext ?? [] ),
+						'postId',
+					] )
+				),
 				// Inspector controls are rendered by the auto-register hook in block-editor
-				edit: function Edit( { attributes } ) {
+				edit: function Edit( { attributes, context } ) {
 					const disabledRef = useDisabled();
 					const blockProps = useBlockProps( { ref: disabledRef } );
 					const { content, status, error } = useServerSideRender( {
 						block: blockName,
 						attributes,
+						urlQueryArgs: { post_id: context?.postId },
 					} );
 
 					if ( status === 'loading' ) {

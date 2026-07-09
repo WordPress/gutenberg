@@ -108,7 +108,6 @@ export default function ImageSizeControl( {
 							onChange={ ( value ) =>
 								updateDimension( 'width', value )
 							}
-							size="__unstable-large"
 						/>
 						<NumberControl
 							label={ __( 'Height' ) }
@@ -117,7 +116,6 @@ export default function ImageSizeControl( {
 							onChange={ ( value ) =>
 								updateDimension( 'height', value )
 							}
-							size="__unstable-large"
 						/>
 					</HStack>
 					<ToggleGroupControl
