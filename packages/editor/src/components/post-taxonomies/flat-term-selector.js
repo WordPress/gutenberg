@@ -2,14 +2,10 @@
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { Fragment, useEffect, useMemo, useState } from '@wordpress/element';
-import {
-	FormTokenField,
-	withFilters,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { useEffect, useMemo, useState } from '@wordpress/element';
+import { FormTokenField, withFilters } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
@@ -57,37 +53,18 @@ const termNamesToIds = ( names, terms ) => {
 		.filter( ( id ) => id !== undefined );
 };
 
-const Wrapper = ( { children, __nextHasNoMarginBottom } ) =>
-	__nextHasNoMarginBottom ? (
-		<VStack spacing={ 4 }>{ children }</VStack>
-	) : (
-		<Fragment>{ children }</Fragment>
-	);
-
 /**
  * Renders a flat term selector component.
  *
- * @param {Object}  props                         The component props.
- * @param {string}  props.slug                    The slug of the taxonomy.
- * @param {boolean} props.__nextHasNoMarginBottom Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0. (The prop can be safely removed once this happens.)
+ * @param {Object} props      The component props.
+ * @param {string} props.slug The slug of the taxonomy.
  *
  * @return {React.ReactNode} The rendered flat term selector component.
  */
-export function FlatTermSelector( { slug, __nextHasNoMarginBottom } ) {
+export function FlatTermSelector( { slug } ) {
 	const [ values, setValues ] = useState( [] );
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );
-
-	if ( ! __nextHasNoMarginBottom ) {
-		deprecated(
-			'Bottom margin styles for wp.editor.PostTaxonomiesFlatTermSelector',
-			{
-				since: '6.7',
-				version: '7.0',
-				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
-			}
-		);
-	}
 
 	const {
 		terms,
@@ -279,7 +256,7 @@ export function FlatTermSelector( { slug, __nextHasNoMarginBottom } ) {
 
 	const newTermLabel =
 		taxonomy?.labels?.add_new_item ??
-		( slug === 'post_tag' ? __( 'Add new tag' ) : __( 'Add new Term' ) );
+		( slug === 'post_tag' ? __( 'Add Tag' ) : __( 'Add Term' ) );
 	const singularName =
 		taxonomy?.labels?.singular_name ??
 		( slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' ) );
@@ -300,9 +277,8 @@ export function FlatTermSelector( { slug, __nextHasNoMarginBottom } ) {
 	);
 
 	return (
-		<Wrapper __nextHasNoMarginBottom={ __nextHasNoMarginBottom }>
+		<Stack direction="column" gap="lg">
 			<FormTokenField
-				__next40pxDefaultSize
 				value={ values }
 				suggestions={ suggestions }
 				onChange={ onChange }
@@ -314,10 +290,9 @@ export function FlatTermSelector( { slug, __nextHasNoMarginBottom } ) {
 					removed: termRemovedLabel,
 					remove: removeTermLabel,
 				} }
-				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			/>
 			<MostUsedTerms taxonomy={ taxonomy } onSelect={ appendTerm } />
-		</Wrapper>
+		</Stack>
 	);
 }
 

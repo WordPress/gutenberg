@@ -25,21 +25,18 @@ export function useCardHeader(
 
 	const cx = useCx();
 
-	const classes = useMemo(
-		() =>
-			cx(
-				styles.Header,
-				styles.borderRadius,
-				styles.borderColor,
-				styles.cardPaddings[ size ],
-				isBorderless && styles.borderless,
-				isShady && styles.shady,
-				// This classname is added for legacy compatibility reasons.
-				'components-card__header',
-				className
-			),
-		[ className, cx, isBorderless, isShady, size ]
-	);
+	const classes = useMemo( () => {
+		return cx(
+			styles.getCardHeaderStyles( {
+				isBorderless,
+				isShady,
+				size,
+			} ),
+			// This classname is added for legacy compatibility reasons.
+			'components-card__header',
+			className
+		);
+	}, [ className, cx, isBorderless, isShady, size ] );
 
 	return {
 		...otherProps,

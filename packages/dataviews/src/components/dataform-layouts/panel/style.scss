@@ -1,0 +1,172 @@
+@use "@wordpress/base-styles/variables" as vars;
+@use "@wordpress/base-styles/z-index" as *;
+
+.dataforms-layouts-panel__field-trigger {
+	position: relative;
+	color: inherit;
+	display: flex;
+	width: 100%;
+	min-height: var(--wpds-dimension-size-sm);
+	cursor: var(--wpds-cursor-control);
+	align-items: flex-start;
+	border-radius: var(--wpds-border-radius-sm);
+	isolation: isolate;
+
+	&--label-side {
+		flex-direction: row;
+		gap: var(--wpds-dimension-gap-sm);
+	}
+
+	&--label-top {
+		display: grid;
+		grid-template-columns: 1fr auto;
+	}
+
+	&--label-none {
+		align-items: center;
+	}
+
+	&:not(.is-disabled):hover {
+		color: var(--wpds-color-foreground-interactive-brand);
+
+		.dataforms-layouts-panel__field-trigger-icon {
+			opacity: 1;
+		}
+
+		.dataforms-layouts-panel__field-label {
+			color: var(--wpds-color-foreground-interactive-brand);
+		}
+	}
+
+	&.is-disabled {
+		cursor: default;
+
+		.dataforms-layouts-panel__field-control {
+			color: var(--wpds-color-foreground-content-neutral-weak);
+			font-weight: var(--wpds-typography-font-weight-regular);
+		}
+	}
+}
+
+.dataforms-layouts-panel__field-trigger--edit-always
+.dataforms-layouts-panel__field-trigger-icon {
+	opacity: 1;
+	fill: currentColor;
+
+	&:hover,
+	&:focus-visible {
+		fill: var(--wpds-color-foreground-interactive-brand);
+	}
+}
+
+.dataforms-layouts-panel__field-trigger-icon {
+	padding: 0;
+	color: var(--wpds-color-foreground-interactive-brand);
+	flex: 0 0 auto;
+	opacity: 0;
+	border-radius: var(--wpds-border-radius-xs);
+
+	&:focus-visible {
+		opacity: 1;
+		outline:
+			var(--wpds-border-width-focus) solid
+			var(--wpds-color-stroke-focus);
+	}
+}
+
+.dataforms-layouts-panel__field-dropdown-anchor {
+	width: 100%;
+
+	.components-dropdown {
+		width: 100%;
+	}
+}
+
+.dataforms-layouts-panel__field-label {
+	width: 38%;
+	flex-shrink: 0;
+	min-height: var(--wpds-dimension-size-sm);
+	display: flex;
+	align-items: center;
+	line-height: var(--wpds-typography-line-height-sm);
+	hyphens: auto;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+
+	.components-base-control__label {
+		display: inline;
+		margin-bottom: 0;
+		line-height: inherit;
+	}
+
+	&.has-error {
+		color: var(--wpds-color-foreground-content-error-weak);
+	}
+}
+
+.dataforms-layouts-panel__field-label-error-content {
+	position: relative;
+	z-index: 1;
+	cursor: help;
+	color: var(--wpds-color-foreground-content-error-weak);
+	display: inline-flex;
+	flex-direction: row;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs);
+}
+
+.dataforms-layouts-panel__field-control {
+	flex-grow: 1;
+	min-width: 0;
+	min-height: var(--wpds-dimension-size-sm);
+	line-height: var(--wpds-typography-line-height-md);
+	display: flex;
+	align-items: center;
+	overflow: clip;
+	// padding-inline + negative margin-inline creates room within the
+	// clip boundary for focus rings of inner controls.
+	padding-inline: var(--wpds-border-width-focus);
+	margin-inline: calc(-1 * var(--wpds-border-width-focus));
+	word-break: break-word;
+	font-weight: var(--wpds-typography-font-weight-medium);
+
+	> * {
+		min-width: 0;
+	}
+}
+
+.dataforms-layouts-panel__field-trigger--label-top
+.dataforms-layouts-panel__field-label {
+	width: 100%;
+}
+
+.dataforms-layouts-panel__field-trigger--label-top
+.dataforms-layouts-panel__field-control {
+	grid-column: 1 / -1;
+}
+
+.dataforms-layouts-panel__field-trigger--label-top
+.dataforms-layouts-panel__field-trigger-icon {
+	grid-row: 1;
+	grid-column: 2;
+}
+
+.dataforms-layouts-panel__field-dropdown .components-popover__content {
+	min-width: 320px;
+	padding: var(--wpds-dimension-padding-lg);
+}
+
+.dataforms-layouts-panel__dropdown-header {
+	margin-bottom: var(--wpds-dimension-gap-lg);
+}
+
+.dataforms-layouts-panel__modal-footer {
+	margin-top: var(--wpds-dimension-gap-lg);
+}
+
+.components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown {
+	z-index: z-index(".components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown");
+}
+
+.dataforms-layouts-panel__summary-button:empty {
+	min-width: vars.$admin-sidebar-width;
+}

@@ -1,17 +1,16 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
-
-// !!
-// This list must be kept in sync with the same list in tools/webpack/packages.js
-// !!
 const BUNDLED_PACKAGES = [
+	'@wordpress/admin-ui',
 	'@wordpress/dataviews',
 	'@wordpress/dataviews/wp',
+	'@wordpress/fields',
+	'@wordpress/grid',
 	'@wordpress/icons',
 	'@wordpress/interface',
-	'@wordpress/sync',
+	'@wordpress/style-runtime',
+	'@wordpress/ui',
 	'@wordpress/undo-manager',
-	'@wordpress/upload-media',
-	'@wordpress/fields',
+	'@wordpress/views',
 ];
 
 /**
@@ -44,6 +43,7 @@ function defaultRequestToExternal( request ) {
 			return 'React';
 
 		case 'react-dom':
+		case 'react-dom/client':
 			return 'ReactDOM';
 
 		case 'react/jsx-runtime':
@@ -125,6 +125,9 @@ function defaultRequestToHandle( request ) {
 
 		case 'lodash-es':
 			return 'lodash';
+
+		case 'react-dom/client':
+			return 'react-dom';
 
 		case 'react/jsx-runtime':
 			return 'react-jsx-runtime';

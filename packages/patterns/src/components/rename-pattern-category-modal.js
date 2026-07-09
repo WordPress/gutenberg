@@ -1,13 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	Modal,
-	Button,
-	TextControl,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { Modal, Button, TextControl } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { useId, useRef, useState } from '@wordpress/element';
@@ -133,12 +128,10 @@ export default function RenamePatternCategoryModal( {
 			{ ...props }
 		>
 			<form onSubmit={ onSave }>
-				<VStack spacing="5">
-					<VStack spacing="2">
+				<Stack direction="column" gap="lg">
+					<Stack direction="column" gap="sm">
 						<TextControl
 							ref={ textControlRef }
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
 							label={ __( 'Name' ) }
 							value={ name }
 							onChange={ onChange }
@@ -153,8 +146,8 @@ export default function RenamePatternCategoryModal( {
 								{ validationMessage }
 							</span>
 						) }
-					</VStack>
-					<HStack justify="right">
+					</Stack>
+					<Stack gap="sm" justify="end">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
@@ -173,8 +166,8 @@ export default function RenamePatternCategoryModal( {
 						>
 							{ __( 'Save' ) }
 						</Button>
-					</HStack>
-				</VStack>
+					</Stack>
+				</Stack>
 			</form>
 		</Modal>
 	);

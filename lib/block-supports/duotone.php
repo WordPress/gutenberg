@@ -13,14 +13,6 @@ WP_Block_Supports::get_instance()->register(
 	)
 );
 
-// Set up metadata prior to rendering any blocks.
-if ( class_exists( 'WP_Duotone' ) ) {
-	remove_action( 'wp_loaded', array( 'WP_Duotone', 'set_global_styles_presets' ) );
-	remove_action( 'wp_loaded', array( 'WP_Duotone', 'set_global_style_block_names' ) );
-}
-add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_styles_presets' ), 10 );
-add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_style_block_names' ), 10 );
-
 // Add classnames to blocks using duotone support.
 if ( function_exists( 'wp_render_duotone_support' ) ) {
 	// Deprecated render function.
@@ -30,7 +22,7 @@ if ( class_exists( 'WP_Duotone' ) ) {
 	remove_filter( 'render_block', array( 'WP_Duotone', 'render_duotone_support' ) );
 	remove_filter( 'render_block_core/image', array( 'WP_Duotone', 'restore_image_outer_container' ) );
 }
-add_filter( 'render_block', array( 'WP_Duotone_Gutenberg', 'render_duotone_support' ), 10, 2 );
+add_filter( 'render_block', array( 'WP_Duotone_Gutenberg', 'render_duotone_support' ), 10, 3 );
 add_filter( 'render_block_core/image', array( 'WP_Duotone_Gutenberg', 'restore_image_outer_container' ), 10, 1 );
 
 // Enqueue styles.
@@ -69,7 +61,7 @@ add_filter( 'block_type_metadata_settings', array( 'WP_Duotone_Gutenberg', 'migr
  * Direct port of tinycolor's bound01 function, lightly simplified to maintain
  * consistency with tinycolor.
  *
- * @see https://github.com/bgrins/TinyColor
+ * @link https://github.com/bgrins/TinyColor
  *
  * @deprecated 6.3.0
  *
@@ -104,7 +96,7 @@ function gutenberg_tinycolor_bound01( $n, $max ) {
  * Direct port of tinycolor's boundAlpha function to maintain consistency with
  * how tinycolor works.
  *
- * @see https://github.com/bgrins/TinyColor
+ * @link https://github.com/bgrins/TinyColor
  *
  * @deprecated 6.3.0
  *
@@ -126,7 +118,7 @@ function gutenberg_tinycolor_bound_alpha( $n ) {
 /**
  * Round and convert values of an RGB object.
  *
- * @see https://github.com/bgrins/TinyColor
+ * @link https://github.com/bgrins/TinyColor
  *
  * @deprecated 6.3.0
  *
@@ -146,7 +138,7 @@ function gutenberg_tinycolor_rgb_to_rgb( $rgb_color ) {
 /**
  * Helper function for hsl to rgb conversion.
  *
- * @see https://github.com/bgrins/TinyColor
+ * @link https://github.com/bgrins/TinyColor
  *
  * @deprecated 6.3.0
  *
@@ -179,7 +171,7 @@ function gutenberg_tinycolor_hue_to_rgb( $p, $q, $t ) {
 /**
  * Convert an HSL object to an RGB object with converted and rounded values.
  *
- * @see https://github.com/bgrins/TinyColor
+ * @link https://github.com/bgrins/TinyColor
  *
  * @deprecated 6.3.0
  *
@@ -217,8 +209,8 @@ function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
  * Parses hex, hsl, and rgb CSS strings using the same regex as tinycolor v1.4.2
  * used in the JavaScript. Only colors output from react-color are implemented.
  *
- * @see https://github.com/bgrins/TinyColor
- * @see https://github.com/casesandberg/react-color/
+ * @link https://github.com/bgrins/TinyColor
+ * @link https://github.com/casesandberg/react-color/
  *
  * @deprecated 6.3.0
  *

@@ -9,20 +9,26 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
 import type { Options } from './use-entity-record';
 import type { Status } from './constants';
+import { getResolutionStatus } from './utils';
 import { unlock } from '../lock-unlock';
+import { getNormalizedCommaSeparable } from '../utils';
 
-interface EntityRecordsResolution< RecordType > {
-	/** The requested entity record */
+export interface EntityRecordsResolution< RecordType > {
+	/** The requested entity records */
 	records: RecordType[] | null;
 
 	/**
 	 * Is the record still being resolved?
 	 */
 	isResolving: boolean;
+
+	/**
+	 * Has the resolution started?
+	 */
+	hasStarted: boolean;
 
 	/**
 	 * Is the record resolved by now?
@@ -41,6 +47,16 @@ interface EntityRecordsResolution< RecordType > {
 	 * The total number of pages.
 	 */
 	totalPages: number | null;
+}
+
+export type WithPermissions< RecordType > = RecordType & {
+	permissions: { delete: boolean; update: boolean };
+};
+
+interface EntityRecordsWithPermissionsResolution< RecordType >
+	extends Omit< EntityRecordsResolution< RecordType >, 'records' > {
+	/** The requested entity records with permissions */
+	records: WithPermissions< RecordType >[] | null;
 }
 
 const EMPTY_ARRAY = [];
@@ -97,38 +113,41 @@ export default function useEntityRecords< RecordType >(
 	// if the values remain the same.
 	const queryAsString = addQueryArgs( '', queryArgs );
 
-	const { data: records, ...rest } = useQuerySelect(
-		( query ) => {
-			if ( ! options.enabled ) {
-				return {
-					// Avoiding returning a new reference on every execution.
-					data: EMPTY_ARRAY,
-				};
-			}
-			return query( coreStore ).getEntityRecords( kind, name, queryArgs );
-		},
-		[ kind, name, queryAsString, options.enabled ]
-	);
-
-	const { totalItems, totalPages } = useSelect(
+	const { records, totalItems, totalPages, ...rest } = useSelect(
 		( select ) => {
 			if ( ! options.enabled ) {
 				return {
+					// Avoiding returning a new reference on every execution.
+					records: EMPTY_ARRAY,
 					totalItems: null,
 					totalPages: null,
+					...getResolutionStatus(),
 				};
 			}
+
+			const storeSelectors = select( coreStore );
+			const resolutionStatus = storeSelectors.getResolutionState(
+				'getEntityRecords',
+				[ kind, name, queryArgs ]
+			)?.status;
+
 			return {
-				totalItems: select( coreStore ).getEntityRecordsTotalItems(
+				records: storeSelectors.getEntityRecords(
+					kind,
+					name,
+					queryArgs
+				) as RecordType[] | null,
+				totalItems: storeSelectors.getEntityRecordsTotalItems(
 					kind,
 					name,
 					queryArgs
 				),
-				totalPages: select( coreStore ).getEntityRecordsTotalPages(
+				totalPages: storeSelectors.getEntityRecordsTotalPages(
 					kind,
 					name,
 					queryArgs
 				),
+				...getResolutionStatus( resolutionStatus ),
 			};
 		},
 		[ kind, name, queryAsString, options.enabled ]
@@ -142,7 +161,7 @@ export default function useEntityRecords< RecordType >(
 	};
 }
 
-export function __experimentalUseEntityRecords(
+export function useDeprecatedEntityRecords(
 	kind: string,
 	name: string,
 	queryArgs: any,
@@ -160,7 +179,7 @@ export function useEntityRecordsWithPermissions< RecordType >(
 	name: string,
 	queryArgs: Record< string, unknown > = {},
 	options: Options = { enabled: true }
-): EntityRecordsResolution< RecordType > {
+): EntityRecordsWithPermissionsResolution< RecordType > {
 	const entityConfig = useSelect(
 		( select ) => select( coreStore ).getEntityConfig( kind, name ),
 		[ kind, name ]
@@ -168,7 +187,22 @@ export function useEntityRecordsWithPermissions< RecordType >(
 	const { records: data, ...ret } = useEntityRecords(
 		kind,
 		name,
-		queryArgs,
+		{
+			...queryArgs,
+			// If _fields is provided, we need to include _links in the request for permission caching to work.
+			...( queryArgs._fields
+				? {
+						_fields: [
+							...new Set( [
+								...( getNormalizedCommaSeparable(
+									queryArgs._fields
+								) || [] ),
+								'_links',
+							] ),
+						].join(),
+				  }
+				: {} ),
+		},
 		options
 	);
 	const ids = useMemo(

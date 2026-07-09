@@ -18,7 +18,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import EnablePanelOption from './enable-panel';
 import EnablePluginDocumentSettingPanelOption from './enable-plugin-document-setting-panel';
 import EnablePublishSidebarOption from './enable-publish-sidebar';
-import BlockVisibility from './block-visibility';
+import BlockVisibility from '../block-visibility';
 import PostTaxonomies from '../post-taxonomies';
 import PostFeaturedImageCheck from '../post-featured-image/check';
 import PostExcerptCheck from '../post-excerpt/check';
@@ -55,20 +55,25 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 
 function PreferencesModalContents( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const showBlockBreadcrumbsOption = useSelect(
+	const { showBlockBreadcrumbsOption, showCollaborationOptions } = useSelect(
 		( select ) => {
-			const { getEditorSettings } = select( editorStore );
+			const { getEditorSettings, isCollaborationEnabledForCurrentPost } =
+				unlock( select( editorStore ) );
 			const { get } = select( preferencesStore );
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
 			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
-			return (
-				! isDistractionFreeEnabled &&
-				isLargeViewport &&
-				isRichEditingEnabled
-			);
+			return {
+				showBlockBreadcrumbsOption:
+					! isDistractionFreeEnabled &&
+					isLargeViewport &&
+					isRichEditingEnabled,
+				showCollaborationOptions:
+					isCollaborationEnabledForCurrentPost(),
+			};
 		},
 		[ isLargeViewport ]
 	);
+
 	const { setIsListViewOpened, setIsInserterOpened } =
 		useDispatch( editorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
@@ -116,11 +121,53 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									scope="core"
 									featureName="enableChoosePatternModal"
 									help={ __(
-										'Shows starter patterns when creating a new page.'
+										'Pick from starter content when creating a new page.'
 									) }
 									label={ __( 'Show starter patterns' ) }
 								/>
+								{ showCollaborationOptions && (
+									<PreferenceToggleControl
+										scope="core"
+										featureName="showCollaborationCursor"
+										help={ __(
+											'Show your own avatar inside blocks during collaborative editing sessions.'
+										) }
+										label={ __( 'Show avatar in blocks' ) }
+									/>
+								) }
 							</PreferencesModalSection>
+							{ showCollaborationOptions && (
+								<PreferencesModalSection
+									title={ __(
+										'Collaboration notifications'
+									) }
+								>
+									<PreferenceToggleControl
+										scope="core"
+										featureName="showCollaborationJoinNotifications"
+										help={ __(
+											'Show notifications when collaborators join the post.'
+										) }
+										label={ __( 'Collaborator joined' ) }
+									/>
+									<PreferenceToggleControl
+										scope="core"
+										featureName="showCollaborationLeaveNotifications"
+										help={ __(
+											'Show notifications when collaborators leave the post.'
+										) }
+										label={ __( 'Collaborator left' ) }
+									/>
+									<PreferenceToggleControl
+										scope="core"
+										featureName="showCollaborationPostSaveNotifications"
+										help={ __(
+											'Show notifications when collaborators save, update, or publish the post.'
+										) }
+										label={ __( 'Post updated' ) }
+									/>
+								</PreferencesModalSection>
+							) }
 							<PreferencesModalSection
 								title={ __( 'Document settings' ) }
 								description={ __(
@@ -298,7 +345,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 						</>
 					),
 				},
-				window.__experimentalMediaProcessing && {
+				window.__clientSideMediaProcessing && {
 					name: 'media',
 					tabLabel: __( 'Media' ),
 					content: (
@@ -332,6 +379,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 			].filter( Boolean ),
 		[
 			showBlockBreadcrumbsOption,
+			showCollaborationOptions,
 			extraSections,
 			setIsInserterOpened,
 			setIsListViewOpened,

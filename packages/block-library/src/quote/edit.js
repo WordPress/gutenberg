@@ -16,7 +16,7 @@ import {
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { useDispatch, useRegistry } from '@wordpress/data';
-import { Platform, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { verse } from '@wordpress/icons';
 
@@ -25,8 +25,6 @@ import { verse } from '@wordpress/icons';
  */
 import { migrateToQuoteV2 } from './deprecated';
 import { Caption } from '../utils/caption';
-
-const isWebPlatform = Platform.OS === 'web';
 
 const TEMPLATE = [ [ 'core/paragraph', {} ] ];
 
@@ -72,10 +70,9 @@ export default function QuoteEdit( {
 	insertBlocksAfter,
 	clientId,
 	className,
-	style,
 	isSelected,
 } ) {
-	const { textAlign } = attributes;
+	const { textAlign, allowedBlocks } = attributes;
 
 	useMigrateOnLoad( attributes, clientId );
 
@@ -83,13 +80,13 @@ export default function QuoteEdit( {
 		className: clsx( className, {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
-		...( ! isWebPlatform && { style } ),
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 		templateInsertUpdatesSelection: true,
 		__experimentalCaptureToolbars: true,
 		renderAppender: false,
+		allowedBlocks,
 	} );
 
 	return (
@@ -106,12 +103,11 @@ export default function QuoteEdit( {
 				{ innerBlocksProps.children }
 				<Caption
 					attributeKey="citation"
-					tagName={ isWebPlatform ? 'cite' : 'p' }
-					style={ isWebPlatform && { display: 'block' } }
+					tagName="cite"
+					style={ { display: 'block' } }
 					isSelected={ isSelected }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					__unstableMobileNoFocusOnMount
 					icon={ verse }
 					label={ __( 'Quote citation' ) }
 					placeholder={
@@ -124,7 +120,6 @@ export default function QuoteEdit( {
 					excludeElementClassName
 					className="wp-block-quote__citation"
 					insertBlocksAfter={ insertBlocksAfter }
-					{ ...( ! isWebPlatform ? { textAlign } : {} ) }
 				/>
 			</BlockQuotation>
 		</>

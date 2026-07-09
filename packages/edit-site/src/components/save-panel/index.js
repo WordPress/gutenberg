@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { NavigableRegion } from '@wordpress/admin-ui';
 import { Button, Modal } from '@wordpress/components';
 import {
 	EntitiesSavedStates,
@@ -27,8 +28,7 @@ import { useActivateTheme } from '../../utils/use-activate-theme';
 import { useActualCurrentTheme } from '../../utils/use-actual-current-theme';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
-const { EntitiesSavedStatesExtensible, NavigableRegion } =
-	unlock( privateApis );
+const { EntitiesSavedStatesExtensible } = unlock( privateApis );
 const { useLocation } = unlock( routerPrivateApis );
 
 const EntitiesSavedStatesForPreview = ( {
@@ -37,11 +37,13 @@ const EntitiesSavedStatesForPreview = ( {
 	variant,
 } ) => {
 	const isDirtyProps = useEntitiesSavedStatesIsDirty();
-	let activateSaveLabel;
+	let activateSaveLabel, successNoticeContent;
 	if ( isDirtyProps.isDirty ) {
 		activateSaveLabel = __( 'Activate & Save' );
+		successNoticeContent = __( 'Theme activated and site updated.' );
 	} else {
 		activateSaveLabel = __( 'Activate' );
+		successNoticeContent = __( 'Theme activated.' );
 	}
 
 	const currentTheme = useActualCurrentTheme();
@@ -65,9 +67,8 @@ const EntitiesSavedStatesForPreview = ( {
 	);
 
 	const activateTheme = useActivateTheme();
-	const onSave = async ( values ) => {
+	const onSave = async () => {
 		await activateTheme();
-		return values;
 	};
 
 	return (
@@ -81,6 +82,7 @@ const EntitiesSavedStatesForPreview = ( {
 				saveLabel: activateSaveLabel,
 				renderDialog,
 				variant,
+				successNoticeContent,
 			} }
 		/>
 	);

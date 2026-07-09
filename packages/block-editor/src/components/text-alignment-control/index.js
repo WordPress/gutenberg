@@ -76,8 +76,6 @@ export default function TextAlignmentControl( {
 	return (
 		<ToggleGroupControl
 			isDeselectable
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
 			label={ __( 'Text alignment' ) }
 			className={ clsx(
 				'block-editor-text-alignment-control',

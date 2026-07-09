@@ -4,6 +4,11 @@
 import deepFreeze from 'deep-freeze';
 
 /**
+ * WordPress dependencies
+ */
+import { RichTextData } from '@wordpress/rich-text';
+
+/**
  * Internal dependencies
  */
 import {
@@ -16,11 +21,6 @@ import {
 	getCategories,
 	getActiveBlockVariation,
 } from '../selectors';
-
-/**
- * WordPress dependencies
- */
-import { RichTextData } from '@wordpress/rich-text';
 
 const keyBlocksByName = ( blocks ) =>
 	blocks.reduce(
@@ -821,6 +821,153 @@ describe( 'selectors', () => {
 						undefinedTestAttribute: 2345,
 					} )
 				).toEqual( variations[ 1 ] );
+			} );
+			it( 'should fall back to default variation if no other variation matches and scope is "block"', () => {
+				const variations = [
+					{
+						name: 'variation-1',
+						attributes: {
+							testAttribute: 1,
+						},
+						isDefault: true,
+					},
+					{
+						name: 'variation-2',
+						attributes: {
+							testAttribute: 2,
+						},
+						isActive: ( blockAttributes, variationAttributes ) => {
+							return (
+								blockAttributes.testAttribute ===
+								variationAttributes.testAttribute
+							);
+						},
+					},
+					{
+						name: 'variation-3',
+						attributes: {
+							firstTestAttribute: 3,
+						},
+						isActive: [ 'testAttribute' ],
+					},
+				];
+
+				const state =
+					createBlockVariationsStateWithTestBlockType( variations );
+
+				expect(
+					getActiveBlockVariation(
+						state,
+						blockName,
+						{
+							testAttribute: 55,
+						},
+						'block'
+					)
+				).toEqual( variations[ 0 ] );
+			} );
+			it( 'should return undefined if no variation matches, including the default one', () => {
+				const variations = [
+					{
+						name: 'variation-1',
+						attributes: {
+							testAttribute: 1,
+						},
+						isDefault: true,
+						isActive: [ 'testAttribute' ],
+					},
+					{
+						name: 'variation-2',
+						attributes: {
+							testAttribute: 2,
+						},
+						isActive: ( blockAttributes, variationAttributes ) => {
+							return (
+								blockAttributes.testAttribute ===
+								variationAttributes.testAttribute
+							);
+						},
+					},
+					{
+						name: 'variation-3',
+						attributes: {
+							firstTestAttribute: 3,
+						},
+						isActive: [ 'testAttribute' ],
+					},
+				];
+
+				const state =
+					createBlockVariationsStateWithTestBlockType( variations );
+
+				expect(
+					getActiveBlockVariation(
+						state,
+						blockName,
+						{
+							testAttribute: 55,
+						},
+						'block'
+					)
+				).toBeUndefined();
+			} );
+			describe( 'innerContent matching', () => {
+				const innerContentVariation = {
+					name: 'card',
+					innerContent: [ '<div class="card">', null, '</div>' ],
+				};
+				const state = createBlockVariationsStateWithTestBlockType( [
+					innerContentVariation,
+				] );
+
+				it( 'matches when the inner content is deeply equal', () => {
+					const result = getActiveBlockVariation(
+						state,
+						blockName,
+						{},
+						undefined,
+						[ '<div class="card">', null, '</div>' ]
+					);
+
+					expect( result ).toEqual( innerContentVariation );
+				} );
+
+				it( 'matches regardless of the inner blocks in the slots', () => {
+					// The inner blocks are not part of `innerContent` (the
+					// `null` marks their position), so editing them keeps the
+					// match.
+					const result = getActiveBlockVariation(
+						state,
+						blockName,
+						{},
+						undefined,
+						[ '<div class="card">', null, '</div>' ]
+					);
+
+					expect( result ).toEqual( innerContentVariation );
+				} );
+
+				it( 'does not match when the static markup differs', () => {
+					const result = getActiveBlockVariation(
+						state,
+						blockName,
+						{},
+						undefined,
+						[ '<section class="card">', null, '</section>' ]
+					);
+
+					expect( result ).toBeUndefined();
+				} );
+
+				it( 'does not match when no inner content is provided', () => {
+					const result = getActiveBlockVariation(
+						state,
+						blockName,
+						{}
+					);
+
+					expect( result ).toBeUndefined();
+				} );
 			} );
 		} );
 		describe( 'getDefaultBlockVariation', () => {

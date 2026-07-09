@@ -24,11 +24,14 @@ import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { useResizeObserver } from '@wordpress/compose';
+import { getProtocol, prependHTTPS } from '@wordpress/url';
+import { store as uploadStore } from '@wordpress/upload-media';
 
 /**
  * Internal dependencies
  */
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import { getCarriedGifConversionAttributes } from '../utils/gif-conversion-attributes';
 import Image from './image';
 import { isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
@@ -99,7 +102,6 @@ export function ImageEdit( {
 } ) {
 	const {
 		url = '',
-		alt,
 		caption,
 		id,
 		width,
@@ -127,11 +129,6 @@ export function ImageEdit( {
 
 	const isSmallContainer = placeholderWidth && placeholderWidth < 160;
 
-	const altRef = useRef();
-	useEffect( () => {
-		altRef.current = alt;
-	}, [ alt ] );
-
 	const captionRef = useRef();
 	useEffect( () => {
 		captionRef.current = caption;
@@ -146,8 +143,6 @@ export function ImageEdit( {
 			setAttributes( {
 				width: undefined,
 				height: undefined,
-				aspectRatio: undefined,
-				scale: undefined,
 			} );
 		}
 	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
@@ -163,12 +158,19 @@ export function ImageEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
+		setTemporaryURL();
 		setAttributes( {
 			src: undefined,
 			id: undefined,
 			url: undefined,
 			blob: undefined,
 		} );
+	}
+
+	function onFilesPreUpload( files ) {
+		if ( files.length === 1 ) {
+			setTemporaryURL( createBlobURL( files[ 0 ] ) );
+		}
 	}
 
 	function onSelectImagesList( images ) {
@@ -236,6 +238,57 @@ export function ImageEdit( {
 			return;
 		}
 
+		// Switch to a converted GIF video block when the selected media is
+		// an animated GIF whose sideloaded video companion is available.
+		// Triggering off the upload's onChange (rather than watching the
+		// attachment record) means already-saved image blocks are left
+		// alone on page load - the explicit "Display as video" toolbar
+		// button is the path for converting those. `animated_video` is
+		// only ever set on GIF image attachments, so its presence is a
+		// sufficient signal that this swap applies.
+		//
+		// A gallery only accepts `core/image` children, so the swap is
+		// skipped there; the converted video is still sideloaded and
+		// stored for use elsewhere.
+		const rootClientId = getBlockRootClientId( clientId );
+		const isInGallery =
+			!! rootClientId && getBlockName( rootClientId ) === 'core/gallery';
+		if (
+			! isInGallery &&
+			media.media_details?.animated_video &&
+			media.url
+		) {
+			const dir = media.url.slice( 0, media.url.lastIndexOf( '/' ) + 1 );
+			const poster = media.media_details.animated_video_poster;
+			__unstableMarkNextChangeAsNotPersistent();
+			replaceBlock(
+				clientId,
+				createBlock( 'core/video', {
+					...getCarriedGifConversionAttributes( attributes ),
+					id: media.id,
+					src: dir + media.media_details.animated_video,
+					poster: poster ? dir + poster : undefined,
+					caption: media.caption?.raw ?? media.caption,
+					controls: false,
+					loop: true,
+					autoplay: true,
+					muted: true,
+					playsInline: true,
+					/*
+					 * Carry the GIF's intrinsic dimensions so the <video> keeps
+					 * its aspect ratio from the first paint. Without them the
+					 * element collapses to the browser-default size and then
+					 * jumps once the poster/metadata load, which shows up as a
+					 * brief duplicated image during the swap.
+					 */
+					width: media.media_details.width,
+					height: media.media_details.height,
+				} )
+			);
+			setTemporaryURL();
+			return;
+		}
+
 		const { imageDefaultSize } = getSettings();
 
 		// Try to use the previous selected image size if its available
@@ -248,6 +301,18 @@ export function ImageEdit( {
 		}
 
 		let mediaAttributes = pickRelevantMediaFiles( media, newSize );
+
+		// Normalize newline characters in caption to <br />
+		// to preserve line breaks in both editor and frontend.
+		if (
+			typeof mediaAttributes.caption === 'string' &&
+			mediaAttributes.caption.includes( '\n' )
+		) {
+			mediaAttributes.caption = mediaAttributes.caption.replace(
+				/\n/g,
+				'<br>'
+			);
+		}
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
@@ -270,7 +335,6 @@ export function ImageEdit( {
 		if ( ! linkDestination ) {
 			// Use the WordPress option to determine the proper default.
 			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
-			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
 			switch (
 				window?.wp?.media?.view?.settings?.defaultProps?.link ||
 				LINK_DESTINATION_NONE
@@ -314,10 +378,14 @@ export function ImageEdit( {
 	}
 
 	function onSelectURL( newURL ) {
-		if ( newURL !== url ) {
+		// Handle URLs without protocol.
+		const normalizedNewURL = getProtocol( newURL )
+			? newURL
+			: prependHTTPS( newURL );
+		if ( normalizedNewURL !== url ) {
 			setAttributes( {
 				blob: undefined,
-				url: newURL,
+				url: normalizedNewURL,
 				id: undefined,
 				sizeSlug: getSettings().imageDefaultSize,
 			} );
@@ -334,6 +402,21 @@ export function ImageEdit( {
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;
+
+	const isSideloading = useSelect(
+		( select ) => {
+			if (
+				( ! window.__clientSideMediaProcessing &&
+					! window.__heicUploadSupport ) ||
+				! id
+			) {
+				return false;
+			}
+			return select( uploadStore ).isUploadingById( id );
+		},
+		[ id ]
+	);
+
 	const mediaPreview = !! url && (
 		<img
 			alt={ __( 'Edit image' ) }
@@ -347,7 +430,7 @@ export function ImageEdit( {
 	const shadowProps = getShadowClassesAndStyles( attributes );
 
 	const classes = clsx( className, {
-		'is-transient': !! temporaryURL,
+		'is-transient': !! temporaryURL || isSideloading,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
@@ -391,6 +474,11 @@ export function ImageEdit( {
 		},
 		[ context, isSingleSelected, metadata?.bindings?.url ]
 	);
+	// `height: 'auto'` is not a pinned dimension (it lets the height follow the
+	// aspect ratio, e.g. for an image pasted with both width and height). Treat
+	// it as absent so the placeholder box keeps its aspect ratio and pinned
+	// width instead of collapsing to a 100%×100% fill.
+	const pinnedHeight = height === 'auto' ? undefined : height;
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
@@ -413,11 +501,11 @@ export function ImageEdit( {
 				}
 				style={ {
 					aspectRatio:
-						! ( width && height ) && aspectRatio
+						! ( width && pinnedHeight ) && aspectRatio
 							? aspectRatio
 							: undefined,
-					width: height && aspectRatio ? '100%' : width,
-					height: width && aspectRatio ? '100%' : height,
+					width: pinnedHeight && aspectRatio ? '100%' : width,
+					height: width && aspectRatio ? '100%' : pinnedHeight,
 					objectFit: scale,
 					...borderProps.style,
 					...shadowProps.style,
@@ -438,6 +526,7 @@ export function ImageEdit( {
 			<figure { ...blockProps }>
 				<Image
 					temporaryURL={ temporaryURL }
+					isSideloading={ isSideloading }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					isSingleSelected={ isSingleSelected }
@@ -456,9 +545,9 @@ export function ImageEdit( {
 					icon={ <BlockIcon icon={ icon } /> }
 					onSelect={ onSelectImage }
 					onSelectURL={ onSelectURL }
+					onFilesPreUpload={ onFilesPreUpload }
 					onError={ onUploadError }
 					placeholder={ placeholder }
-					accept="image/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					handleUpload={ ( files ) => files.length === 1 }
 					value={ { id, src } }

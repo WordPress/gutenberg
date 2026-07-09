@@ -23,7 +23,6 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		isAdaptiveWidth,
 		label,
 		onChange,
-		size,
 		value: valueProp,
 		id: idProp,
 		setSelectedElement,
@@ -48,7 +47,9 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 	const { value, defaultValue } =
 		useComputeControlledOrUncontrolledValue( valueProp );
 
-	const [ selectedValue, setSelectedValue ] = useControlledValue( {
+	const [ selectedValue, setSelectedValue ] = useControlledValue<
+		typeof value
+	>( {
 		defaultValue,
 		value,
 		onChange,
@@ -61,7 +62,6 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 			setValue: setSelectedValue,
 			isBlock: ! isAdaptiveWidth,
 			isDeselectable: true,
-			size,
 			setSelectedElement,
 		} ),
 		[
@@ -69,7 +69,6 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 			selectedValue,
 			setSelectedValue,
 			isAdaptiveWidth,
-			size,
 			setSelectedElement,
 		]
 	);
@@ -81,6 +80,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 				{ ...otherProps }
 				ref={ forwardedRef }
 				role="group"
+				id={ baseId }
 			>
 				{ children }
 			</View>
@@ -91,3 +91,4 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 export const ToggleGroupControlAsButtonGroup = forwardRef(
 	UnforwardedToggleGroupControlAsButtonGroup
 );
+ToggleGroupControlAsButtonGroup.displayName = 'ToggleGroupControlAsButtonGroup';

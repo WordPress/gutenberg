@@ -2,6 +2,40 @@
 
 This repository uses [npm workspaces](https://docs.npmjs.com/cli/v10/using-npm/workspaces) to manage WordPress packages and [lerna](https://lerna.js.org/) to publish them with to [npm](https://www.npmjs.com/).
 
+## Package Guidelines
+
+Packages are the first layer of architecture and organization in Gutenberg. They exist to separate concerns, provide clarity, and establish a shared mental model across teams. To maintain good package hygiene, follow these guidelines when creating new packages or iterating on existing ones:
+
+1. **Each package should have a single, clear purpose.**
+
+    It should be immediately obvious why the package exists.
+
+2. **Every package must include a README.**
+
+    This is the first place contributors look to understand scope and usage.
+
+3. **Any prerequisites must be documented.**
+
+    Generic packages without prerequisites are better, but packages with some prerequisites are acceptable. Examples of prerequisites: API endpoints that must exist, authentication assumptions, environment dependencies. These should be clearly stated in the README.
+
+4. **Public APIs should have documentation.**
+
+    Either inline in the README or linked to external docs.
+
+5. **Avoid utility and kitchen-sink packages.**
+
+    They tend to grow without a coherent domain and become junk drawers.
+
+6. **Avoid broad, catch-all scopes.**
+
+    For example: "Reusable WordPress components" or "Utilities for different use cases." These create unclear ownership and encourage uncontrolled growth. Instead, define a specific domain or purpose.
+
+7. **Default to bundled packages (no globals, no modules) unless necessary.**
+
+    In Gutenberg, we should default to "bundled" packages unless there's a specific need for globals or modules. See the [@wordpress/build README](../wp-build/README.md) for more information on package configuration.
+
+For more information on the build system and package configuration, see the [@wordpress/build README](../wp-build/README.md).
+
 ## Creating a New Package
 
 When creating a new package, you need to provide at least the following. Packages bundled in Gutenberg or WordPress must include a `wpScript` and or `wpScriptModuleExports` field in their `package.json` file. See the details below.
@@ -31,7 +65,6 @@ When creating a new package, you need to provide at least the following. Package
     	},
     	"main": "build/index.js",
     	"module": "build-module/index.js",
-    	"react-native": "src/index",
     	// Include this line to include the package as a WordPress script.
     	"wpScript": true,
     	// Include this line to include the package as a WordPress script module.
@@ -72,6 +105,8 @@ When creating a new package, you need to provide at least the following. Package
 
     Both `wpScript` and `wpScriptModuleExports` may be included if the package exposes both a script and a script module. These fields are also essential when performing a license check for all their dependencies, because they trigger strict validation against compatibility with GPL v2. All remaining dependencies WordPress doesn't distribute but uses for development purposes can contain also a few other OSS compatible licenses.
 
+    For more details on package configuration options, see the [@wordpress/build README](../wp-build/README.md).
+
 1. `README.md` file containing at least:
     - Package name
     - Package description
@@ -91,6 +126,45 @@ When creating a new package, you need to provide at least the following. Package
     ```
 
 To ensure your package is recognized in npm workspaces, you should run `npm install` to update the package lock file.
+
+## When to Omit or Set `wpScript` to `false`
+
+By default, packages do not expose as WordPress scripts/modules (not accessible via the `wp` global). Only packages that should be directly available in WordPress should set `wpScript: true`.
+
+Omit `wpScript` (or explicitly set to `false`) for packages designed solely as dependencies for other packages:
+
+```json
+{
+	"wpScript": false
+}
+```
+
+**Examples of packages that should not expose to the `wp` global:**
+
+-   Utility packages used internally by other packages
+-   Shared logic or helpers without a direct WordPress use case
+-   Intermediate packages intended only as dependencies of other `@wordpress/*` packages
+
+When a package omits `wpScript` or sets it to `false`, it:
+
+-   Will not be exposed as a WordPress script (not available via the `wp` global)
+-   Can still be used as a dependency by other packages (via npm imports)
+-   Should still be published to npm to support backporting to WordPress core releases
+
+### Truly Private Packages
+
+In rare cases, if a package is only used internally within Gutenberg and should never be published to npm, mark it as private:
+
+```json
+{
+	"private": true,
+	"wpScript": false
+}
+```
+
+Private packages will be excluded from npm publication and should only be used for development-only utilities (such as build tools or internal development helpers). They should not be used as dependencies for other packages, as this could break the backporting process to WordPress core.
+
+Note: You can safely include the `publishConfig` field in private packages—it will be ignored by npm since the `private` flag takes precedence.
 
 ## Managing Dependencies
 
@@ -192,25 +266,50 @@ _Example:_
 
 ## Unreleased
 
-### Bug Fix
+### Bug Fixes
 
 -   Fixed an off-by-one error with the `sum` function.
 ```
 
+### Promoting a Pre-Release Package to Stable (1.0.0)
+
+The automated package publishing workflow will at most bump the minor version of a pre-release package (those having a version like `0.x.x`), even if it includes breaking changes. This is consistent with semantic versioning, where `0.x` versions are intended for initial development where the API may change frequently.
+
+When a package's API is considered stable and ready for production use, it should be promoted to version 1.0.0. This is done by adding a "Stable Release" section to the `CHANGELOG.md` file:
+
+_Example:_
+
+```md
+## Unreleased
+
+### Stable Release
+
+This package is now considered stable and production-ready. The API will follow semantic versioning from this point forward.
+
+### Breaking Changes
+
+-   Final API adjustments before 1.0.0 release.
+```
+
+The presence of the "Stable Release" heading will cause the automated release process to bump a pre-1.0 package to 1.0.0. The "Stable Release" heading should only be used for pre-1.0 packages, and from that point forward breaking changes will result in major version bumps as expected.
+
+### Changelog Subsections
+
 There are a number of common release subsections you can follow. Each is intended to align to a specific meaning in the context of the [Semantic Versioning (`semver`) specification](https://semver.org/) the project adheres to. It is important that you describe your changes accurately, since this is used in the packages release process to help determine the version of the next release.
 
--   "Breaking Changes" - A backwards-incompatible change which requires specific attention of the impacted developers to reconcile (requires a major version bump).
+-   "Breaking Changes" - A backwards-incompatible change which requires specific attention of the impacted developers to reconcile (requires a major version bump for stable packages).
 -   "New Features" - The addition of a new backwards-compatible function or feature to the existing public API (requires a minor version bump).
 -   "Enhancements" - Backwards-compatible improvements to existing functionality (requires a minor version bump).
 -   "Deprecations" - Deprecation notices. These do not impact the public interface or behavior of the module (requires a minor version bump).
 -   "Bug Fixes" - Resolutions to existing buggy behavior (requires a patch version bump).
 -   "Internal" - Changes which do not have an impact on the public interface or behavior of the module (requires a patch version bump).
+-   "Stable Release" - Marks a pre-1.0 package as stable and production-ready. This should only be used for packages currently published as a 0.x pre-release, to intentionally communicate that a package's API is now stable and ready for production use.
 
 While other section naming can be used when appropriate, it's important that are expressed clearly to avoid confusion for both the packages releaser and third-party consumers.
 
 When in doubt, refer to [Semantic Versioning specification](https://semver.org/).
 
-If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
+If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release/README.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
 
 ## TypeScript
 
@@ -301,4 +400,4 @@ Please consult the [side effects documentation](https://github.com/WordPress/gut
 
 ## Publishing to npm
 
-Publishing WordPress packages to npm is automated by synchronizing it with the bi-weekly Gutenberg plugin RC1 release. You can learn more about this process and other ways to publish new versions of npm packages in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release.md#packages-releases-to-npm-and-wordpress-core-updates).
+Publishing WordPress packages to npm is automated by synchronizing it with the bi-weekly Gutenberg plugin RC1 release. You can learn more about this process and other ways to publish new versions of npm packages in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release/README.md#packages-releases-to-npm-and-wordpress-core-updates).

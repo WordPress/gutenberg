@@ -155,12 +155,22 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 	);
 
 	$config = array(
-		'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-		'styles'  => array(
+		'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+		'settings' => array(
+			'spacing' => array(
+				'blockGap' => true,
+			),
+		),
+		'styles'   => array(
 			'elements' => $elements_data,
 			'blocks'   => $blocks_data,
 		),
 	);
+
+	// Ensure variation state styles know about any custom viewport breakpoints.
+	if ( isset( $theme_json['settings']['viewport'] ) ) {
+		$config['settings']['viewport'] = $theme_json['settings']['viewport'];
+	}
 
 	// Turn off filter that excludes block nodes. They are needed here for the variation's inner block types.
 	if ( ! is_admin() ) {

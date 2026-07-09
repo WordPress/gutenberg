@@ -38,7 +38,6 @@ function PasswordEdit( {
 			className="fields-controls__password"
 		>
 			<CheckboxControl
-				__nextHasNoMarginBottom
 				label={ __( 'Password protected' ) }
 				help={ __( 'Only visible to those who know the password' ) }
 				checked={ showPassword }
@@ -56,8 +55,6 @@ function PasswordEdit( {
 						value={ field.getValue( { item: data } ) || '' }
 						placeholder={ __( 'Use a secure password' ) }
 						type="text"
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						maxLength={ 255 }
 					/>
 				</div>

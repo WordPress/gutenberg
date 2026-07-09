@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ReactNode } from 'react';
 
 /**
@@ -16,12 +16,17 @@ import Button from '../../button';
 import ScrollLock from '..';
 
 const meta: Meta< typeof ScrollLock > = {
+	tags: [ 'manifest' ],
 	component: ScrollLock,
 	title: 'Components/Utilities/ScrollLock',
 	id: 'components-scrolllock',
 	parameters: {
 		controls: { hideNoControlsWarning: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -81,7 +86,11 @@ export const Default: StoryFn< typeof ScrollLock > = () => {
 						this &quot;scroll bleed&quot; from happening.
 					</div>
 					<ToggleContainer>
-						<Button variant="primary" onClick={ toggleLock }>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							onClick={ toggleLock }
+						>
 							Toggle Scroll Lock
 						</Button>
 						{ isScrollLocked && <ScrollLock /> }

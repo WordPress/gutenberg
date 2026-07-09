@@ -5,6 +5,9 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 
 const CONTENT = 'content';
 
+/**
+ * @type {WPBlockBindingsSource}
+ */
 export default {
 	name: 'core/pattern-overrides',
 	getValues( { select, clientId, context, bindings } ) {
@@ -23,7 +26,7 @@ export default {
 			// Check undefined because empty string is a valid value.
 			if ( overridableValue === undefined ) {
 				overridesValues[ attributeName ] =
-					currentBlockAttributes[ attributeName ];
+					currentBlockAttributes?.[ attributeName ];
 				continue;
 			} else {
 				overridesValues[ attributeName ] =

@@ -35,7 +35,7 @@ export type ToggleGroupControlOptionIconProps = Pick<
 	 * Icon displayed as the content of the option. Usually one of the icons from
 	 * the `@wordpress/icons` package, or a custom React `<svg>` icon.
 	 */
-	icon: JSX.Element;
+	icon: React.JSX.Element;
 	/**
 	 * The text to accessibly label the icon option. Will also be shown in a tooltip.
 	 */
@@ -72,7 +72,7 @@ export type WithToolTipProps = {
 
 export type ToggleGroupControlProps = Pick<
 	BaseControlProps,
-	'help' | '__nextHasNoMarginBottom'
+	'__nextHasNoMarginBottom' | 'help'
 > & {
 	/**
 	 * Label for the control.
@@ -119,13 +119,15 @@ export type ToggleGroupControlProps = Pick<
 	/**
 	 * The size variant of the control.
 	 *
-	 * @default 'default'
+	 * @deprecated This prop no longer has any effect.
+	 * @ignore
 	 */
 	size?: 'default' | '__unstable-large';
 	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
-	 * @default false
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
 	/**
@@ -142,7 +144,6 @@ export type ToggleGroupControlContextProps = {
 	isDeselectable?: boolean;
 	baseId: string;
 	isBlock: ToggleGroupControlProps[ 'isBlock' ];
-	size: ToggleGroupControlProps[ 'size' ];
 	value: ToggleGroupControlProps[ 'value' ];
 	setValue: ( newValue: string | number | undefined ) => void;
 	setSelectedElement: ( element: HTMLElement | undefined ) => void;
@@ -150,6 +151,6 @@ export type ToggleGroupControlContextProps = {
 
 export type ToggleGroupControlMainControlProps = Pick<
 	ToggleGroupControlProps,
-	'children' | 'isAdaptiveWidth' | 'label' | 'size' | 'onChange' | 'value'
+	'children' | 'isAdaptiveWidth' | 'label' | 'onChange' | 'value'
 > &
 	Pick< ToggleGroupControlContextProps, 'setSelectedElement' >;

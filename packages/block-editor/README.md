@@ -100,6 +100,14 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
+### BlockBindingsAttributeControl
+
+Internal dependencies
+
+### BlockBindingsSourceFieldsList
+
+Undocumented declaration.
+
 ### BlockBreadcrumb
 
 Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
@@ -279,7 +287,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element`: Block title.
+-   `React.JSX.Element`: Block title.
 
 ### BlockToolbar
 
@@ -384,6 +392,26 @@ _Returns_
 
 Undocumented declaration.
 
+### DimensionControl
+
+DimensionControl renders a linked unit control and range control for adjusting dimensions of a block.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/dimension-control/README.md>
+
+_Parameters_
+
+-   _props_ `Object`:
+-   _props.label_ `?string`: A label for the control.
+-   _props.onChange_ `( value: string ) => void`: Called when the dimension value changes.
+-   _props.value_ `string`: The current dimension value.
+-   _props.dimensionSizes_ `?Object`: Optional dimension size presets. Falls back to settings from the store.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
+
 ### FontSizePicker
 
 _Related_
@@ -477,6 +505,18 @@ _Parameters_
 _Returns_
 
 -   `string`: Mapping of the spacing preset to its equivalent custom value.
+
+### getDimensionsClassesAndStyles
+
+Provides the CSS class names and inline styles for a block's dimensions support attributes.
+
+_Parameters_
+
+-   _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+-   `Object`: Dimensions block support derived CSS classes & styles.
 
 ### getFontSize
 
@@ -592,6 +632,8 @@ _Returns_
 
 ### HeightControl
 
+> **Deprecated** Use DimensionControl instead.
+
 HeightControl renders a linked unit control and range control for adjusting the height of a block.
 
 _Related_
@@ -662,6 +704,43 @@ _Related_
 ### LinkControl
 
 Renders a link control. A link control is a controlled input which maintains a value associated with a link (HTML anchor element) and relevant settings for how that link is expected to behave.
+
+### Usage Patterns
+
+The component does not support a fully controlled implementation, but it does support an observable implementation.
+
+### Uncontrolled (default)
+
+The component manages its own search input state:
+
+```jsx
+<LinkControl value={ link } onChange={ setLink } />
+```
+
+### Observable
+
+Observe input changes without controlling the value:
+
+```jsx
+<LinkControl
+	value={ link }
+	onChange={ setLink }
+	onInputChange={ ( newValue ) => console.log( newValue ) }
+/>
+```
+
+### Uncontrolled with Initial Value
+
+Pre-populate the search input with a default value:
+
+```jsx
+<LinkControl
+	value={ link }
+	onChange={ setLink }
+	inputValue="wordpress"
+	onInputChange={ ( newValue ) => console.log( newValue ) }
+/>
+```
 
 _Parameters_
 
@@ -772,11 +851,11 @@ _Parameters_
 -   _props_ `Object`:
 -   _props.uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
 -   _props.blockName_ `string`: Optional block name.
--   _props.children_ `JSX.Element`: React children.
+-   _props.children_ `React.JSX.Element`: React children.
 
 _Returns_
 
--   `JSX.Element`: A React element.
+-   `React.JSX.Element`: A React element.
 
 ### RichText
 
@@ -849,7 +928,7 @@ _Related_
 
 ### ToolSelector
 
-Undocumented declaration.
+This component has been deprecated and no longer renders anything.
 
 ### transformStyles
 
@@ -858,12 +937,12 @@ Applies a series of CSS rule transforms to wrap selectors inside a given class a
 _Parameters_
 
 -   _styles_ `EditorStyle[]`: CSS rules.
--   _wrapperSelector_ `string`: Wrapper selector.
+-   _wrapperSelector_ Wrapper selector.
 -   _transformOptions_ `TransformOptions`: Additional options for style transformation.
 
 _Returns_
 
--   `Array`: converted rules.
+-   converted rules.
 
 ### Typewriter
 

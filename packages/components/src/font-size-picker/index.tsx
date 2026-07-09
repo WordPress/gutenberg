@@ -27,7 +27,6 @@ import { Container, Header, HeaderLabel, HeaderToggle } from './styles';
 import { Spacer } from '../spacer';
 import FontSizePickerSelect from './font-size-picker-select';
 import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
@@ -38,14 +37,13 @@ const UnforwardedFontSizePicker = (
 	ref: ForwardedRef< any >
 ) => {
 	const {
-		__next40pxDefaultSize = false,
 		fallbackFontSize,
 		fontSizes = [],
 		disableCustomFontSizes = false,
 		onChange,
-		size = 'default',
 		units: unitsProp = DEFAULT_UNITS,
 		value,
+		valueMode = 'literal',
 		withSlider = false,
 		withReset = true,
 	} = props;
@@ -59,14 +57,31 @@ const UnforwardedFontSizePicker = (
 		availableUnits: unitsProp,
 	} );
 
-	const selectedFontSize = fontSizes.find(
-		( fontSize ) => fontSize.size === value
-	);
+	const selectedFontSize = ( () => {
+		if ( ! value ) {
+			return undefined;
+		}
+
+		// If valueMode is 'slug', find by slug
+		if ( valueMode === 'slug' ) {
+			return fontSizes.find( ( fontSize ) => fontSize.slug === value );
+		}
+
+		// If valueMode is 'literal', find by size value
+		return fontSizes.find( ( fontSize ) => fontSize.size === value );
+	} )();
 	const isCustomValue = !! value && ! selectedFontSize;
 
 	// Initially request a custom picker if the value is not from the predef list.
 	const [ userRequestedCustom, setUserRequestedCustom ] =
 		useState( isCustomValue );
+
+	// Resolve the literal value to use in custom controls when operating in slug mode.
+	// When `valueMode` is 'slug', the `value` prop contains the slug of the
+	// selected preset. In that case, the custom input should reflect the preset's
+	// actual size value so it pre-populates correctly after clicking "Set custom size".
+	const resolvedValueForControls =
+		valueMode === 'slug' ? selectedFontSize?.size : value;
 
 	let currentPickerType;
 	if ( ! disableCustomFontSizes && userRequestedCustom ) {
@@ -88,21 +103,16 @@ const UnforwardedFontSizePicker = (
 	// operates in a legacy "unitless" mode where UnitControl can only be used
 	// to select px values and onChange() is always called with number values.
 	const hasUnits =
-		typeof value === 'string' || typeof fontSizes[ 0 ]?.size === 'string';
+		typeof resolvedValueForControls === 'string' ||
+		typeof fontSizes[ 0 ]?.size === 'string';
 
 	const [ valueQuantity, valueUnit ] = parseQuantityAndUnitFromRawValue(
-		value,
+		resolvedValueForControls,
 		units
 	);
 	const isValueUnitRelative =
 		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
 	const isDisabled = value === undefined;
-
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'FontSizePicker',
-		__next40pxDefaultSize,
-		size,
-	} );
 
 	return (
 		<Container
@@ -136,21 +146,17 @@ const UnforwardedFontSizePicker = (
 			<div>
 				{ currentPickerType === 'select' && (
 					<FontSizePickerSelect
-						__next40pxDefaultSize={ __next40pxDefaultSize }
 						fontSizes={ fontSizes }
 						value={ value }
+						valueMode={ valueMode }
 						disableCustomFontSizes={ disableCustomFontSizes }
-						size={ size }
-						onChange={ ( newValue ) => {
+						onChange={ ( newValue, selectedItem ) => {
 							if ( newValue === undefined ) {
-								onChange?.( undefined );
+								onChange?.( undefined, selectedItem );
 							} else {
 								onChange?.(
 									hasUnits ? newValue : Number( newValue ),
-									fontSizes.find(
-										( fontSize ) =>
-											fontSize.size === newValue
-									)
+									selectedItem
 								);
 							}
 						} }
@@ -161,18 +167,14 @@ const UnforwardedFontSizePicker = (
 					<FontSizePickerToggleGroup
 						fontSizes={ fontSizes }
 						value={ value }
-						__next40pxDefaultSize={ __next40pxDefaultSize }
-						size={ size }
-						onChange={ ( newValue ) => {
+						valueMode={ valueMode }
+						onChange={ ( newValue, selectedItem ) => {
 							if ( newValue === undefined ) {
-								onChange?.( undefined );
+								onChange?.( undefined, selectedItem );
 							} else {
 								onChange?.(
 									hasUnits ? newValue : Number( newValue ),
-									fontSizes.find(
-										( fontSize ) =>
-											fontSize.size === newValue
-									)
+									selectedItem
 								);
 							}
 						} }
@@ -182,16 +184,24 @@ const UnforwardedFontSizePicker = (
 					<Flex className="components-font-size-picker__custom-size-control">
 						<FlexItem isBlock>
 							<UnitControl
-								__next40pxDefaultSize={ __next40pxDefaultSize }
-								__shouldNotWarnDeprecated36pxSize
 								label={ __( 'Font size' ) }
 								labelPosition="top"
 								hideLabelFromVision
-								value={ value }
+								value={
+									hasUnits
+										? `${ valueQuantity ?? '' }${
+												valueUnit ?? ''
+										  }`
+										: resolvedValueForControls
+								}
 								onChange={ ( newValue ) => {
 									setUserRequestedCustom( true );
 
-									if ( newValue === undefined ) {
+									// Treat clearing the input (empty string) as a reset
+									if (
+										newValue === undefined ||
+										newValue === ''
+									) {
 										onChange?.( undefined );
 									} else {
 										onChange?.(
@@ -201,7 +211,6 @@ const UnforwardedFontSizePicker = (
 										);
 									}
 								} }
-								size={ size }
 								units={ hasUnits ? units : [] }
 								min={ 0 }
 							/>
@@ -210,11 +219,6 @@ const UnforwardedFontSizePicker = (
 							<FlexItem isBlock>
 								<Spacer marginX={ 2 } marginBottom={ 0 }>
 									<RangeControl
-										__nextHasNoMarginBottom
-										__next40pxDefaultSize={
-											__next40pxDefaultSize
-										}
-										__shouldNotWarnDeprecated36pxSize
 										className="components-font-size-picker__custom-input"
 										label={ __( 'Font size' ) }
 										hideLabelFromVision
@@ -252,12 +256,7 @@ const UnforwardedFontSizePicker = (
 									} }
 									variant="secondary"
 									__next40pxDefaultSize
-									size={
-										size === '__unstable-large' ||
-										props.__next40pxDefaultSize
-											? 'default'
-											: 'small'
-									}
+									size="default"
 								>
 									{ __( 'Reset' ) }
 								</Button>
@@ -271,5 +270,6 @@ const UnforwardedFontSizePicker = (
 };
 
 export const FontSizePicker = forwardRef( UnforwardedFontSizePicker );
+FontSizePicker.displayName = 'FontSizePicker';
 
 export default FontSizePicker;

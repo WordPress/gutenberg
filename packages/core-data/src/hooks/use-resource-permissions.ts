@@ -59,7 +59,7 @@ function useResourcePermissions< IdType = void >(
  *
  * @since 6.1.0 Introduced in WordPress core.
  *
- * @param    resource Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }`
+ * @param    resource Entity resource to check. Accepts entity object `{ kind: 'postType', name: 'attachment', id: 1 }`
  *                    or REST base as a string - `media`.
  * @param    id       Optional ID of the resource to check, e.g. 10. Note: This argument is discouraged
  *                    when using an entity object as a resource to check permissions and will be ignored.
@@ -145,15 +145,13 @@ function useResourcePermissions< IdType = void >(
 		( resolve ) => {
 			const hasId = isEntity ? !! resource.id : !! id;
 			const { canUser } = resolve( coreStore );
-			const create = canUser(
-				'create',
-				isEntity
-					? { kind: resource.kind, name: resource.name }
-					: resource
-			);
+			const collectionResource = isEntity
+				? { kind: resource.kind, name: resource.name }
+				: resource;
+			const create = canUser( 'create', collectionResource );
 
 			if ( ! hasId ) {
-				const read = canUser( 'read', resource );
+				const read = canUser( 'read', collectionResource );
 
 				const isResolving = create.isResolving || read.isResolving;
 				const hasResolved = create.hasResolved && read.hasResolved;
@@ -209,7 +207,7 @@ function useResourcePermissions< IdType = void >(
 
 export default useResourcePermissions;
 
-export function __experimentalUseResourcePermissions(
+export function useDeprecatedResourcePermissions(
 	resource: string,
 	id?: unknown
 ) {

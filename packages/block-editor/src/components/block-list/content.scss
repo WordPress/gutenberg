@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 // This remove the margins set here: https://github.com/WordPress/gutenberg/blob/17e5c2d870d84fb6de48dcd5bc3c38cd0c0fb0d0/packages/block-library/src/editor.scss#L56
 // It removes the margins around blocks when a BlockPreview is rendered in the block style selector
 .block-editor-block-styles .block-editor-block-list__block {
@@ -93,6 +98,30 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		}
 	}
 
+
+	// Hidden blocks.
+	// In order for the block toolbar to render correctly, blocks cannot be hidden.
+	// Instead, use styles to visually hide blocks.
+	.block-editor-block-list__block.is-block-hidden {
+		visibility: hidden;
+		overflow: hidden;
+		height: 0;
+		border: none !important;
+		padding: 0 !important;
+		opacity: 0;
+		margin-top: 0 !important;
+		margin-bottom: 0 !important;
+	}
+
+	&.is-layout-flex:not(.is-vertical) > .is-block-hidden {
+		width: 0;
+		height: auto;
+		align-self: stretch;
+		white-space: nowrap !important;
+		margin-left: 0 !important;
+		margin-right: 0 !important;
+	}
+
 	// Re-enable it on components inside.
 	[class^="components-"] {
 		user-select: text;
@@ -124,10 +153,6 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		}
 	}
 
-	.reusable-block-edit-panel * {
-		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");
-	}
-
 	/**
 	 * Notices
 	 */
@@ -138,12 +163,6 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	.components-with-notices-ui {
 		margin: 0 0 12px 0;
 		width: 100%;
-
-		.components-notice {
-			.components-notice__content {
-				font-size: $default-font-size;
-			}
-		}
 	}
 
 	// Warnings
@@ -162,45 +181,33 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		}
 	}
 
-	// Scrim overlay.
-	&.has-warning::after {
-		content: "";
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		background-color: rgba($white, 0.4);
-	}
-
-	// Avoid conflict with the multi-selection highlight color.
-	&.has-warning.is-multi-selected::after {
-		background-color: transparent;
-	}
-
-	// Reusable blocks parent border.
-	&.is-reusable.has-child-selected::after {
-		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
-	}
-
 	// Clear floats.
 	&[data-clear="true"] {
 		float: none;
 	}
+
+	&:not([draggable="true"]),
+	&:not([data-draggable="true"]) {
+		cursor: default;
+	}
+
+	&[draggable="true"],
+	&[data-draggable="true"] {
+		cursor: grab;
+	}
+
+	// Dragging multi selected blocks is not supported yet.
+	&.is-multi-selected {
+		cursor: default;
+	}
+
+	&[contenteditable],
+	[contenteditable] {
+		cursor: text;
+	}
 }
 
 .is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
-
-	&.is-selected,
-	&.is-hovered {
-		cursor: default;
-
-		&.rich-text,
-		.rich-text {
-			cursor: auto;
-		}
-	}
-
 	&.is-hovered:not(.is-selected),
 	&:not(.rich-text):not([contenteditable="true"]).is-selected {
 
@@ -288,8 +295,9 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	}
 }
 
-.is-focus-mode .block-editor-block-list__block.is-content-locked.has-child-selected,
-.is-focus-mode .block-editor-block-list__block.is-content-locked-temporarily-editing-as-blocks.has-child-selected {
+// When editing a content only section in focus mode, the entire section stays at full opacity,
+// the following overrides focus modes usual rule of only the selected block being at full opacity.
+.is-focus-mode .block-editor-block-list__block.is-editing-content-only-section.has-child-selected {
 	&,
 	& .block-editor-block-list__block {
 		opacity: 1;
@@ -372,31 +380,16 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	font-family: $editor-html-font;
 	font-size: $text-editor-font-size;
 	line-height: 1.5;
+	// HTML input is always LTR regardless of language.
+	/*rtl:ignore*/
+	direction: ltr;
+
 	@media not ( prefers-reduced-motion ) {
 		transition: padding 0.2s linear;
 	}
 
 	&:focus {
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-	}
-}
-
-
-/**
- * Warnings.
- */
-
-.block-editor-block-list__block .block-editor-warning {
-	z-index: z-index(".block-editor-warning");
-	position: relative;
-
-	&.block-editor-block-list__block-crash-warning {
-		// The block crash warning has no block preview underneath it.
-		// The lack of a preview combined with the negative margin that
-		// the warning normally has results in crashed blocks overlapping
-		// any blocks that come after them. Resetting the margin to `auto`
-		// solves this.
-		margin-bottom: auto;
 	}
 }
 
@@ -440,4 +433,16 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 // during drag.
 .is-dragging {
 	cursor: grabbing;
+}
+
+.is-preview-mode {
+	pointer-events: none;
+
+	.block-editor-block-list__block {
+		pointer-events: auto;
+
+		> *:not(.block-editor-block-list__block) {
+			pointer-events: none;
+		}
+	}
 }

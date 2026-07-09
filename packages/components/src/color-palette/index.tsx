@@ -50,16 +50,25 @@ function SinglePalette( {
 	colors,
 	onChange,
 	value,
+	selectedSlug,
 	...additionalProps
 }: SinglePaletteProps ) {
 	const colorOptions = useMemo( () => {
-		return colors.map( ( { color, name }, index ) => {
+		return colors.map( ( { color, name, slug }, index ) => {
 			const colordColor = colord( color );
-			const isSelected = value === color;
+			// When a non-empty selectedSlug is provided, selection is decided
+			// strictly by slug — entries without a slug or with a different slug
+			// are not selected, even when their color value matches `value`.
+			// This correctly handles mixed palettes where some entries have slugs
+			// and others don't. Fall back to color value matching otherwise
+			// (including when selectedSlug is an empty string).
+			const isSelected = selectedSlug
+				? slug === selectedSlug
+				: value === color;
 
 			return (
 				<CircularOptionPicker.Option
-					key={ `${ color }-${ index }` }
+					key={ slug ?? `${ color }-${ index }` }
 					isSelected={ isSelected }
 					selectedIconProps={
 						isSelected
@@ -79,12 +88,14 @@ function SinglePalette( {
 					}
 					style={ { backgroundColor: color, color } }
 					onClick={
-						isSelected ? clearColor : () => onChange( color, index )
+						isSelected
+							? clearColor
+							: () => onChange( color, index, slug )
 					}
 				/>
 			);
 		} );
-	}, [ colors, value, onChange, clearColor ] );
+	}, [ colors, value, selectedSlug, onChange, clearColor ] );
 
 	return (
 		<CircularOptionPicker.OptionGroup
@@ -101,6 +112,7 @@ function MultiplePalettes( {
 	colors,
 	onChange,
 	value,
+	selectedSlug,
 	headingLevel,
 }: MultiplePalettesProps ) {
 	const instanceId = useInstanceId( MultiplePalettes, 'color-palette' );
@@ -121,10 +133,11 @@ function MultiplePalettes( {
 						<SinglePalette
 							clearColor={ clearColor }
 							colors={ colorPalette }
-							onChange={ ( newColor ) =>
-								onChange( newColor, index )
+							onChange={ ( newColor, _colorIndex, slug ) =>
+								onChange( newColor, index, slug )
 							}
 							value={ value }
+							selectedSlug={ selectedSlug }
 							aria-labelledby={ id }
 						/>
 					</VStack>
@@ -185,6 +198,7 @@ function UnforwardedColorPalette(
 		enableAlpha = false,
 		onChange,
 		value,
+		selectedSlug,
 		__experimentalIsRenderedInSidebar = false,
 		headingLevel = 2,
 		'aria-label': ariaLabel,
@@ -208,9 +222,10 @@ function UnforwardedColorPalette(
 			extractColorNameFromCurrentValue(
 				value,
 				colors,
-				hasMultipleColorOrigins
+				hasMultipleColorOrigins,
+				selectedSlug
 			),
-		[ value, colors, hasMultipleColorOrigins ]
+		[ value, colors, hasMultipleColorOrigins, selectedSlug ]
 	);
 
 	const renderCustomColorPicker = () => (
@@ -241,6 +256,7 @@ function UnforwardedColorPalette(
 		clearColor,
 		onChange,
 		value,
+		selectedSlug,
 	};
 
 	const actions = !! clearable && (
@@ -259,6 +275,11 @@ function UnforwardedColorPalette(
 		ariaLabel,
 		ariaLabelledby
 	);
+
+	// If disableCustomColors is true and colors.length is 0, return null to avoid rendering an empty palette wrapper.
+	if ( disableCustomColors && colors.length === 0 && ! actions ) {
+		return null;
+	}
 
 	return (
 		<VStack spacing={ 3 } ref={ forwardedRef } { ...additionalProps }>
@@ -365,5 +386,6 @@ function UnforwardedColorPalette(
  * ```
  */
 export const ColorPalette = forwardRef( UnforwardedColorPalette );
+ColorPalette.displayName = 'ColorPalette';
 
 export default ColorPalette;

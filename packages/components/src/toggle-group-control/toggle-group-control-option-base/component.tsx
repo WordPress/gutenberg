@@ -63,11 +63,8 @@ function ToggleGroupControlOptionBase(
 		'ToggleGroupControlOptionBase'
 	);
 
-	const {
-		isBlock = false,
-		isDeselectable = false,
-		size = 'default',
-	} = toggleGroupControlContext;
+	const { isBlock = false, isDeselectable = false } =
+		toggleGroupControlContext;
 
 	const {
 		className,
@@ -92,11 +89,10 @@ function ToggleGroupControlOptionBase(
 					isDeselectable,
 					isIcon,
 					isPressed,
-					size,
 				} ),
 				className
 			),
-		[ cx, isDeselectable, isIcon, isPressed, size, className ]
+		[ cx, isDeselectable, isIcon, isPressed, className ]
 	);
 
 	const buttonOnClick = () => {
@@ -114,7 +110,7 @@ function ToggleGroupControlOptionBase(
 		ref: forwardedRef,
 	};
 
-	const labelRef = useRef< HTMLDivElement | null >( null );
+	const labelRef = useRef< HTMLDivElement >( null );
 	useLayoutEffect( () => {
 		if ( isPressed && labelRef.current ) {
 			toggleGroupControlContext.setSelectedElement( labelRef.current );

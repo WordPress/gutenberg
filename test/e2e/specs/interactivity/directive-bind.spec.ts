@@ -127,6 +127,18 @@ test.describe( 'data-wp-bind', () => {
 					 * contain after hydration.
 					 */
 					entityPropValue: any,
+					/**
+					 * Value that the attribute should contain after Preact
+					 * renders the same value. If omitted, the hydration value
+					 * is used.
+					 */
+					renderedAttributeValue?: any,
+					/**
+					 * Value that the HTMLElement instance property should
+					 * contain after Preact renders the same value. If omitted,
+					 * the hydration value is used.
+					 */
+					renderedEntityPropValue?: any,
 				]
 			>;
 		};
@@ -164,8 +176,8 @@ test.describe( 'data-wp-bind', () => {
 				values: {
 					false: [ null, 'false' ],
 					true: [ null, 'true' ],
-					null: [ null, '' ],
-					undef: [ null, '' ],
+					null: [ null, '', null, 'tacocat' ],
+					undef: [ null, '', null, 'tacocat' ],
 					emptyString: [ null, '' ],
 					anyString: [ null, 'any' ],
 					number: [ null, '10' ],
@@ -197,6 +209,22 @@ test.describe( 'data-wp-bind', () => {
 					number: [ '10', undefined ],
 				},
 			},
+			{
+				testid: 'popover',
+				name: 'popover',
+				values: {
+					false: [ null, null ],
+					true: [ '', 'auto' ],
+					null: [ null, null ],
+					undef: [ null, null ],
+					emptyString: [ '', 'auto' ],
+					anyString: [ 'any', 'manual' ],
+					number: [ '10', 'manual' ],
+					auto: [ 'auto', 'auto' ],
+					manual: [ 'manual', 'manual' ],
+					hint: [ 'hint', 'hint' ],
+				},
+			},
 		];
 
 		for ( const { testid, name, values } of matrix ) {
@@ -204,7 +232,12 @@ test.describe( 'data-wp-bind', () => {
 				page,
 			} ) => {
 				for ( const type in values ) {
-					const [ attrValue, propValue ] = values[ type ];
+					const [
+						attrValue,
+						propValue,
+						renderedAttrValue = attrValue,
+						renderedPropValue = propValue,
+					] = values[ type ];
 
 					const container = page.getByTestId( `hydrating ${ type }` );
 					const el = container.getByTestId( testid );
@@ -230,19 +263,12 @@ test.describe( 'data-wp-bind', () => {
 						propValue,
 					] );
 
-					// Only check the rendered value if the new value is not
-					// `undefined` and the attribute is neither `value` nor
-					// `disabled` because Preact doesn't update the attribute
-					// for those cases.
-					// See https://github.com/preactjs/preact/blob/099c38c6ef92055428afbc116d18a6b9e0c2ea2c/src/diff/index.js#L471-L494
-					if (
-						type === 'undef' &&
-						( name === 'value' || name === 'undefined' )
-					) {
-						return;
-					}
-
-					await toggle.click( { clickCount: 2 } );
+					await toggle.click();
+					await expect( toggle ).toHaveAttribute(
+						'data-toggle-count',
+						'1'
+					);
+					await toggle.click();
 
 					// Ensure values have been updated after toggling.
 					await expect( toggle ).toHaveAttribute(
@@ -250,7 +276,6 @@ test.describe( 'data-wp-bind', () => {
 						'2'
 					);
 
-					// Values should be the same as before.
 					const renderedAttr = await el.getAttribute( name );
 					const renderedProp = await el.evaluate(
 						( node, propName ) => ( node as any )[ propName ],
@@ -258,14 +283,23 @@ test.describe( 'data-wp-bind', () => {
 					);
 					expect( [ type, renderedAttr ] ).toEqual( [
 						type,
-						attrValue,
+						renderedAttrValue,
 					] );
 					expect( [ type, renderedProp ] ).toEqual( [
 						type,
-						propValue,
+						renderedPropValue,
 					] );
 				}
 			} );
 		}
+	} );
+
+	test( 'should ignore unique ids', async ( { page } ) => {
+		let element = page.getByTestId( 'without-unique-id' );
+		await expect( element ).toHaveAttribute( 'data-test' );
+
+		element = page.getByTestId( 'with-unique-id' );
+		await expect( element ).not.toHaveAttribute( 'data-test' );
+		await expect( element ).not.toHaveAttribute( 'data-test---unique-id' );
 	} );
 } );

@@ -64,7 +64,6 @@ const Overlay = ( {
 				panelId={ clientId }
 			>
 				<RangeControl
-					__nextHasNoMarginBottom
 					label={ __( 'Overlay opacity' ) }
 					value={ dimRatio }
 					onChange={ ( newDimRatio ) =>
@@ -76,7 +75,6 @@ const Overlay = ( {
 					max={ 100 }
 					step={ 10 }
 					required
-					__next40pxDefaultSize
 				/>
 			</ToolsPanelItem>
 		</>

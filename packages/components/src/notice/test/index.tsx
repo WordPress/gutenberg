@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -42,14 +43,14 @@ describe( 'Notice', () => {
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should not have is-dismissible class when isDismissible prop is false', () => {
-		const { container } = render(
+	it( 'should not render a dismiss control when isDismissible prop is false', () => {
+		render(
 			<Notice isDismissible={ false }>I cannot be dismissed!</Notice>
 		);
-		const wrapper = getNoticeWrapper( container );
 
-		expect( wrapper ).toHaveClass( 'components-notice' );
-		expect( wrapper ).not.toHaveClass( 'is-dismissible' );
+		expect(
+			screen.queryByRole( 'button', { name: 'Close' } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'should default to info status', () => {
@@ -118,6 +119,56 @@ describe( 'Notice', () => {
 			);
 
 			expect( speak ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
+
+	describe( 'actions', () => {
+		it( 'should render a disabled action button', () => {
+			render(
+				<Notice
+					actions={ [
+						{
+							label: 'Disabled action',
+							onClick: jest.fn(),
+							disabled: true,
+						},
+					] }
+				>
+					Notice with action
+				</Notice>
+			);
+
+			const button = screen.getByRole( 'button', {
+				name: 'Disabled action',
+			} );
+			// Button uses accessibleWhenDisabled, so it uses aria-disabled
+			expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
+		} );
+
+		it( 'should call onClick when action with url is clicked', async () => {
+			const user = userEvent.setup();
+			const onClick = jest.fn( ( e ) => e.preventDefault() );
+
+			render(
+				<Notice
+					actions={ [
+						{
+							label: 'Link with onClick',
+							url: 'https://example.com',
+							onClick,
+						},
+					] }
+				>
+					Notice with link and onClick
+				</Notice>
+			);
+
+			const link = screen.getByRole( 'link', {
+				name: 'Link with onClick',
+			} );
+			await user.click( link );
+
+			expect( onClick ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );

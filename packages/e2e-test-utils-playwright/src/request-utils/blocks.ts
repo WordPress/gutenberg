@@ -54,11 +54,5 @@ export async function createBlock(
 	this: RequestUtils,
 	payload: CreateBlockPayload
 ) {
-	const block = await this.rest( {
-		path: '/wp/v2/blocks',
-		method: 'POST',
-		data: { ...payload },
-	} );
-
-	return block;
+	return this.createRecord( 'blocks', { ...payload } );
 }

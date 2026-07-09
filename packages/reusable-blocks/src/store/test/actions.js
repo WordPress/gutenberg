@@ -13,6 +13,7 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { logged } from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -50,6 +51,7 @@ function createRegistryWithStores() {
 describe( 'Actions', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			title: 'Test block',
 			category: 'text',
 			save: () => null,
@@ -59,6 +61,7 @@ describe( 'Actions', () => {
 		} );
 
 		registerBlockType( 'core/block', {
+			apiVersion: 3,
 			title: 'Reusable block',
 			category: 'text',
 			save: () => null,
@@ -71,6 +74,13 @@ describe( 'Actions', () => {
 	afterAll( () => {
 		unregisterBlockType( 'core/test-block' );
 		unregisterBlockType( 'core/block' );
+	} );
+
+	afterEach( () => {
+		// Reset the deprecation cache so each test observes its own warning.
+		for ( const key in logged ) {
+			delete logged[ key ];
+		}
 	} );
 
 	describe( '__experimentalSetEditingReusableBlock', () => {
@@ -94,6 +104,8 @@ describe( 'Actions', () => {
 					.select( reusableBlocksStore )
 					.__experimentalIsEditingReusableBlock( 3 )
 			).toBe( false );
+
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -144,6 +156,8 @@ describe( 'Actions', () => {
 					.select( reusableBlocksStore )
 					.__experimentalIsEditingReusableBlock( newClientId )
 			).toBe( true );
+
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -194,6 +208,8 @@ describe( 'Actions', () => {
 			delete updatedBlocks[ 0 ].innerBlocks[ 0 ].clientId;
 			delete updatedBlocks[ 0 ].innerBlocks[ 1 ].clientId;
 			expect( updatedBlocks ).toMatchSnapshot();
+
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -266,6 +282,8 @@ describe( 'Actions', () => {
 			// Check if block instances were removed from the editor.
 			const blocksAfter = registry.select( blockEditorStore ).getBlocks();
 			expect( blocksAfter ).toHaveLength( 3 );
+
+			expect( console ).toHaveWarned();
 		} );
 	} );
 } );

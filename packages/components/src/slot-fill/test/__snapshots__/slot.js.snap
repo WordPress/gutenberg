@@ -42,16 +42,12 @@ exports[`Slot bubblesVirtually true should subsume another slot by the same name
   <div
     data-position="first"
   >
-    <div
-      class="emotion-0 emotion-1"
-    />
+    <div />
   </div>
   <div
     data-position="second"
   >
-    <div
-      class="emotion-0 emotion-1"
-    >
+    <div>
       Content
     </div>
   </div>
@@ -66,9 +62,7 @@ exports[`Slot bubblesVirtually true should subsume another slot by the same name
   <div
     data-position="second"
   >
-    <div
-      class="emotion-0 emotion-1"
-    >
+    <div>
       Content
     </div>
   </div>
@@ -83,6 +77,20 @@ exports[`Slot bubblesVirtually true should unmount two slots with the same name 
   <div
     data-position="second"
   />
+</div>
+`;
+
+exports[`Slot should not infinite loop with useSlotFills 1`] = `
+<div>
+  <div>
+    <div>
+      fills:
+      1
+    </div>
+    <div>
+      fill content
+    </div>
+  </div>
 </div>
 `;
 
@@ -193,9 +201,7 @@ exports[`Slot should render in expected order when fills unmounted 1`] = `
 exports[`Slot should warn without a Provider 1`] = `
 <div>
   <div>
-    <div
-      class="emotion-0 emotion-1"
-    />
+    <div />
   </div>
 </div>
 `;

@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { NavigableRegion, getAdminThemeColors } from '@wordpress/admin-ui';
 import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
@@ -18,27 +19,26 @@ import {
 	useResizeObserver,
 	usePrevious,
 } from '@wordpress/compose';
+import { focus } from '@wordpress/dom';
 import { __, sprintf } from '@wordpress/i18n';
-import { useState, useRef, useEffect } from '@wordpress/element';
-import { CommandMenu } from '@wordpress/commands';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useState, useRef, useEffect, useMemo } from '@wordpress/element';
 import {
-	EditorSnackbars,
 	UnsavedChangesWarning,
 	ErrorBoundary,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { ThemeProvider } from '@wordpress/theme';
 import { PluginArea } from '@wordpress/plugins';
-import { store as noticesStore } from '@wordpress/notices';
+import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
-import { default as SiteHub, SiteHubMobile } from '../site-hub';
+import { SiteHubMobile } from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import { unlock } from '../../lock-unlock';
 import SaveKeyboardShortcut from '../save-keyboard-shortcut';
@@ -48,19 +48,22 @@ import { SidebarContent, SidebarNavigationProvider } from '../sidebar';
 import SaveHub from '../save-hub';
 import SavePanel from '../save-panel';
 
-const { useCommands } = unlock( coreCommandsPrivateApis );
-const { useGlobalStyle } = unlock( blockEditorPrivateApis );
-const { NavigableRegion, GlobalStylesProvider } = unlock( editorPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
+const { useStyle, UploadProgressSnackbar } = unlock( editorPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
+const CONTENT_COLOR = { background: '#ffffff' };
 
 function Layout() {
 	const { query, name: routeKey, areas, widths } = useLocation();
-	const { canvas = 'view' } = query;
-	useCommands();
+	// Force canvas to 'view' on notfound route to show the error message and allow navigation.
+	const canvas = routeKey === 'notfound' ? 'view' : query?.canvas ?? 'view';
+	const showMobileSiteHub = !! areas.mobileContent;
+	const hasMobileAreas =
+		areas.mobileSidebar || areas.mobileContent || areas.preview;
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const toggleRef = useRef();
+	const mobileToggleRef = useRef();
+	const sidebarRegionRef = useRef();
 	const navigateRegionsProps = useNavigateRegions();
 	const disableMotion = useReducedMotion();
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
@@ -80,20 +83,24 @@ function Layout() {
 		};
 	} );
 
-	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
-	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
+	const backgroundColor = useStyle( 'color.background' );
+	const gradientValue = useStyle( 'color.gradient' );
 	const previousCanvaMode = usePrevious( canvas );
 	useEffect( () => {
 		if ( previousCanvaMode === 'edit' ) {
-			toggleRef.current?.focus();
+			const desktopToggle = sidebarRegionRef.current
+				? // We're typically expecting the `<DashboardBackButton />` component as the first tabbable element.
+				  focus.tabbable.find( sidebarRegionRef.current )[ 0 ]
+				: undefined;
+			( desktopToggle ?? mobileToggleRef.current )?.focus();
 		}
 		// Should not depend on the previous canvas mode value but the next.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ canvas ] );
 
 	return (
 		<>
 			<UnsavedChangesWarning />
-			<CommandMenu />
 			{ canvas === 'view' && <SaveKeyboardShortcut /> }
 			<div
 				{ ...navigateRegionsProps }
@@ -112,8 +119,9 @@ function Layout() {
 						The NavigableRegion must always be rendered and not use
 						`inert` otherwise `useNavigateRegions` will fail.
 					*/ }
-					{ ( ! isMobileViewport || ! areas.mobile ) && (
+					{ ( ! isMobileViewport || ! hasMobileAreas ) && (
 						<NavigableRegion
+							ref={ sidebarRegionRef }
 							ariaLabel={ __( 'Navigation' ) }
 							className="edit-site-layout__sidebar-region"
 						>
@@ -135,16 +143,11 @@ function Layout() {
 										} }
 										className="edit-site-layout__sidebar"
 									>
-										<SiteHub
-											ref={ toggleRef }
-											isTransparent={
-												isResizableFrameOversized
-											}
-										/>
 										<SidebarNavigationProvider>
 											<SidebarContent
 												shouldAnimate={
-													routeKey !== 'styles'
+													routeKey !== 'styles' &&
+													routeKey !== 'identity'
 												}
 												routeKey={ routeKey }
 											>
@@ -161,31 +164,59 @@ function Layout() {
 						</NavigableRegion>
 					) }
 
-					<EditorSnackbars />
+					<SnackbarNotices className="edit-site-layout__snackbar" />
+					<UploadProgressSnackbar />
 
-					{ isMobileViewport && areas.mobile && (
+					{ isMobileViewport && hasMobileAreas && (
 						<div className="edit-site-layout__mobile">
 							<SidebarNavigationProvider>
 								{ canvas !== 'edit' ? (
 									<>
-										<SiteHubMobile
-											ref={ toggleRef }
-											isTransparent={
-												isResizableFrameOversized
-											}
-										/>
-										<SidebarContent routeKey={ routeKey }>
-											<ErrorBoundary>
-												{ areas.mobile }
-											</ErrorBoundary>
-										</SidebarContent>
+										{ showMobileSiteHub && (
+											<SiteHubMobile
+												ref={ mobileToggleRef }
+											/>
+										) }
+										{ areas.mobileContent ? (
+											/*
+											 * ThemeProvider wraps SidebarContent (rather than
+											 * just the content) so the scroll wrapper it renders
+											 * inherits the content background tokens. See
+											 * `.edit-site-sidebar__screen-wrapper` in style.scss.
+											 */
+											<ThemeProvider
+												color={ CONTENT_COLOR }
+											>
+												<SidebarContent
+													routeKey={ routeKey }
+												>
+													<div className="edit-site-layout__mobile-content">
+														<ErrorBoundary>
+															{
+																areas.mobileContent
+															}
+														</ErrorBoundary>
+													</div>
+												</SidebarContent>
+											</ThemeProvider>
+										) : (
+											<SidebarContent
+												routeKey={ routeKey }
+											>
+												<ErrorBoundary>
+													{ areas.mobileSidebar }
+												</ErrorBoundary>
+											</SidebarContent>
+										) }
 										<SaveHub />
 										<SavePanel />
 									</>
 								) : (
-									<ErrorBoundary>
-										{ areas.mobile }
-									</ErrorBoundary>
+									<ThemeProvider color={ CONTENT_COLOR }>
+										<ErrorBoundary>
+											{ areas.preview }
+										</ErrorBoundary>
+									</ThemeProvider>
 								) }
 							</SidebarNavigationProvider>
 						</div>
@@ -200,7 +231,11 @@ function Layout() {
 									maxWidth: widths?.content,
 								} }
 							>
-								<ErrorBoundary>{ areas.content }</ErrorBoundary>
+								<ThemeProvider color={ CONTENT_COLOR }>
+									<ErrorBoundary>
+										{ areas.content }
+									</ErrorBoundary>
+								</ThemeProvider>
 							</div>
 						) }
 
@@ -211,7 +246,9 @@ function Layout() {
 								maxWidth: widths?.edit,
 							} }
 						>
-							<ErrorBoundary>{ areas.edit }</ErrorBoundary>
+							<ThemeProvider color={ CONTENT_COLOR }>
+								<ErrorBoundary>{ areas.edit }</ErrorBoundary>
+							</ThemeProvider>
 						</div>
 					) }
 
@@ -251,7 +288,11 @@ function Layout() {
 													backgroundColor,
 											} }
 										>
-											{ areas.preview }
+											<ThemeProvider
+												color={ CONTENT_COLOR }
+											>
+												{ areas.preview }
+											</ThemeProvider>
 										</ResizableFrame>
 									</ErrorBoundary>
 								</div>
@@ -265,6 +306,7 @@ function Layout() {
 }
 
 export default function LayoutWithGlobalStylesProvider( props ) {
+	const themeColors = useMemo( getAdminThemeColors, [] );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onPluginAreaError( name ) {
 		createErrorNotice(
@@ -280,11 +322,13 @@ export default function LayoutWithGlobalStylesProvider( props ) {
 
 	return (
 		<SlotFillProvider>
-			<GlobalStylesProvider>
+			<Tooltip.Provider>
 				{ /** This needs to be within the SlotFillProvider */ }
 				<PluginArea onError={ onPluginAreaError } />
-				<Layout { ...props } />
-			</GlobalStylesProvider>
+				<ThemeProvider color={ themeColors }>
+					<Layout { ...props } />
+				</ThemeProvider>
+			</Tooltip.Provider>
 		</SlotFillProvider>
 	);
 }

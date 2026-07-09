@@ -1,53 +1,39 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import {
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalHStack as HStack,
-	__experimentalZStack as ZStack,
-	__experimentalDropdownContentWrapper as DropdownContentWrapper,
-	ColorIndicator,
-	Flex,
-	FlexItem,
-	Dropdown,
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
-import { useCallback, useRef } from '@wordpress/element';
+import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
+import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import ColorGradientControl from '../colors-gradients/control';
-import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
-import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
+import ColorGradientDropdownItem from './color-gradient-dropdown-item';
+import {
+	useColorsPerOrigin,
+	useGradientsPerOrigin,
+	useColorGradientSettings,
+} from './hooks';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
-import { unlock } from '../../lock-unlock';
-import { reset as resetIcon } from '@wordpress/icons';
+import {
+	extractPresetSlug,
+	encodeColorValueWithPalette,
+} from '../../utils/color-values';
 
+// Despite the "ColorPanel" name, this gates only the element-level color
+// controls (link, heading, button, caption, h1–h6) — surfaced as the
+// "Elements" panel in the block inspector and the "Colors" screen in
+// Global Styles. Top-level text and background color moved to the
+// Typography and Background panels, so this returns false for blocks
+// whose only color support is text and/or background.
 export function useHasColorPanel( settings ) {
-	const hasTextPanel = useHasTextPanel( settings );
-	const hasBackgroundPanel = useHasBackgroundColorPanel( settings );
 	const hasLinkPanel = useHasLinkPanel( settings );
 	const hasHeadingPanel = useHasHeadingPanel( settings );
 	const hasButtonPanel = useHasButtonPanel( settings );
 	const hasCaptionPanel = useHasCaptionPanel( settings );
 
-	return (
-		hasTextPanel ||
-		hasBackgroundPanel ||
-		hasLinkPanel ||
-		hasHeadingPanel ||
-		hasButtonPanel ||
-		hasCaptionPanel
-	);
+	return hasLinkPanel || hasHeadingPanel || hasButtonPanel || hasCaptionPanel;
 }
 
 export function useHasTextPanel( settings ) {
@@ -110,12 +96,13 @@ export function useHasBackgroundColorPanel( settings ) {
 	);
 }
 
-function ColorToolsPanel( {
+export function ColorToolsPanel( {
 	resetAllFilter,
 	onChange,
 	value,
 	panelId,
 	children,
+	label,
 } ) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
@@ -125,7 +112,7 @@ function ColorToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ __( 'Elements' ) }
+			label={ label || __( 'Elements' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			hasInnerWrapper
@@ -143,177 +130,11 @@ function ColorToolsPanel( {
 }
 
 const DEFAULT_CONTROLS = {
-	text: true,
-	background: true,
 	link: true,
 	heading: true,
 	button: true,
 	caption: true,
 };
-
-const popoverProps = {
-	placement: 'left-start',
-	offset: 36,
-	shift: true,
-};
-
-const { Tabs } = unlock( componentsPrivateApis );
-
-const LabeledColorIndicators = ( { indicators, label } ) => (
-	<HStack justify="flex-start">
-		<ZStack isLayered={ false } offset={ -8 }>
-			{ indicators.map( ( indicator, index ) => (
-				<Flex key={ index } expanded={ false }>
-					<ColorIndicator colorValue={ indicator } />
-				</Flex>
-			) ) }
-		</ZStack>
-		<FlexItem className="block-editor-panel-color-gradient-settings__color-name">
-			{ label }
-		</FlexItem>
-	</HStack>
-);
-
-function ColorPanelTab( {
-	isGradient,
-	inheritedValue,
-	userValue,
-	setValue,
-	colorGradientControlSettings,
-} ) {
-	return (
-		<ColorGradientControl
-			{ ...colorGradientControlSettings }
-			showTitle={ false }
-			enableAlpha
-			__experimentalIsRenderedInSidebar
-			colorValue={ isGradient ? undefined : inheritedValue }
-			gradientValue={ isGradient ? inheritedValue : undefined }
-			onColorChange={ isGradient ? undefined : setValue }
-			onGradientChange={ isGradient ? setValue : undefined }
-			clearable={ inheritedValue === userValue }
-			headingLevel={ 3 }
-		/>
-	);
-}
-
-function ColorPanelDropdown( {
-	label,
-	hasValue,
-	resetValue,
-	isShownByDefault,
-	indicators,
-	tabs,
-	colorGradientControlSettings,
-	panelId,
-} ) {
-	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
-	const { key: firstTabKey, ...firstTab } = tabs[ 0 ] ?? {};
-	const colorGradientDropdownButtonRef = useRef( undefined );
-	return (
-		<ToolsPanelItem
-			className="block-editor-tools-panel-color-gradient-settings__item"
-			hasValue={ hasValue }
-			label={ label }
-			onDeselect={ resetValue }
-			isShownByDefault={ isShownByDefault }
-			panelId={ panelId }
-		>
-			<Dropdown
-				popoverProps={ popoverProps }
-				className="block-editor-tools-panel-color-gradient-settings__dropdown"
-				renderToggle={ ( { onToggle, isOpen } ) => {
-					const toggleProps = {
-						onClick: onToggle,
-						className: clsx(
-							'block-editor-panel-color-gradient-settings__dropdown',
-							{ 'is-open': isOpen }
-						),
-						'aria-expanded': isOpen,
-						ref: colorGradientDropdownButtonRef,
-					};
-
-					return (
-						<>
-							<Button { ...toggleProps } __next40pxDefaultSize>
-								<LabeledColorIndicators
-									indicators={ indicators }
-									label={ label }
-								/>
-							</Button>
-							{ hasValue() && (
-								<Button
-									__next40pxDefaultSize
-									label={ __( 'Reset' ) }
-									className="block-editor-panel-color-gradient-settings__reset"
-									size="small"
-									icon={ resetIcon }
-									onClick={ () => {
-										resetValue();
-										if ( isOpen ) {
-											onToggle();
-										}
-										// Return focus to parent button
-										colorGradientDropdownButtonRef.current?.focus();
-									} }
-								/>
-							) }
-						</>
-					);
-				} }
-				renderContent={ () => (
-					<DropdownContentWrapper paddingSize="none">
-						<div className="block-editor-panel-color-gradient-settings__dropdown-content">
-							{ tabs.length === 1 && (
-								<ColorPanelTab
-									key={ firstTabKey }
-									{ ...firstTab }
-									colorGradientControlSettings={
-										colorGradientControlSettings
-									}
-								/>
-							) }
-							{ tabs.length > 1 && (
-								<Tabs defaultTabId={ currentTab?.key }>
-									<Tabs.TabList>
-										{ tabs.map( ( tab ) => (
-											<Tabs.Tab
-												key={ tab.key }
-												tabId={ tab.key }
-											>
-												{ tab.label }
-											</Tabs.Tab>
-										) ) }
-									</Tabs.TabList>
-
-									{ tabs.map( ( tab ) => {
-										const { key: tabKey, ...restTabProps } =
-											tab;
-										return (
-											<Tabs.TabPanel
-												key={ tabKey }
-												tabId={ tabKey }
-												focusable={ false }
-											>
-												<ColorPanelTab
-													key={ tabKey }
-													{ ...restTabProps }
-													colorGradientControlSettings={
-														colorGradientControlSettings
-													}
-												/>
-											</Tabs.TabPanel>
-										);
-									} ) }
-								</Tabs>
-							) }
-						</div>
-					</DropdownContentWrapper>
-				) }
-			/>
-		</ToolsPanelItem>
-	);
-}
 
 export default function ColorPanel( {
 	as: Wrapper = ColorToolsPanel,
@@ -323,73 +144,21 @@ export default function ColorPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
+	label,
 	children,
+	contrastWarning,
 } ) {
-	const colors = useColorsPerOrigin( settings );
-	const gradients = useGradientsPerOrigin( settings );
-	const areCustomSolidsEnabled = settings?.color?.custom;
-	const areCustomGradientsEnabled = settings?.color?.customGradient;
-	const hasSolidColors = colors.length > 0 || areCustomSolidsEnabled;
-	const hasGradientColors = gradients.length > 0 || areCustomGradientsEnabled;
-	const decodeValue = ( rawValue ) =>
-		getValueFromVariable( { settings }, '', rawValue );
-	const encodeColorValue = ( colorValue ) => {
-		const allColors = colors.flatMap(
-			( { colors: originColors } ) => originColors
-		);
-		const colorObject = allColors.find(
-			( { color } ) => color === colorValue
-		);
-		return colorObject
-			? 'var:preset|color|' + colorObject.slug
-			: colorValue;
-	};
-	const encodeGradientValue = ( gradientValue ) => {
-		const allGradients = gradients.flatMap(
-			( { gradients: originGradients } ) => originGradients
-		);
-		const gradientObject = allGradients.find(
-			( { gradient } ) => gradient === gradientValue
-		);
-		return gradientObject
-			? 'var:preset|gradient|' + gradientObject.slug
-			: gradientValue;
-	};
-
-	// BackgroundColor
-	const showBackgroundPanel = useHasBackgroundColorPanel( settings );
-	const backgroundColor = decodeValue( inheritedValue?.color?.background );
-	const userBackgroundColor = decodeValue( value?.color?.background );
-	const gradient = decodeValue( inheritedValue?.color?.gradient );
-	const userGradient = decodeValue( value?.color?.gradient );
-	const hasBackground = () => !! userBackgroundColor || !! userGradient;
-	const setBackgroundColor = ( newColor ) => {
-		const newValue = setImmutably(
-			value,
-			[ 'color', 'background' ],
-			encodeColorValue( newColor )
-		);
-		newValue.color.gradient = undefined;
-		onChange( newValue );
-	};
-	const setGradient = ( newGradient ) => {
-		const newValue = setImmutably(
-			value,
-			[ 'color', 'gradient' ],
-			encodeGradientValue( newGradient )
-		);
-		newValue.color.background = undefined;
-		onChange( newValue );
-	};
-	const resetBackground = () => {
-		const newValue = setImmutably(
-			value,
-			[ 'color', 'background' ],
-			undefined
-		);
-		newValue.color.gradient = undefined;
-		onChange( newValue );
-	};
+	const {
+		colors,
+		gradients,
+		areCustomSolidsEnabled,
+		areCustomGradientsEnabled,
+		hasSolidColors,
+		hasGradientColors,
+		allColors,
+		decodeValue,
+		encodeGradientValue,
+	} = useColorGradientSettings( settings );
 
 	// Links
 	const showLinkPanel = useHasLinkPanel( settings );
@@ -397,12 +166,12 @@ export default function ColorPanel( {
 		inheritedValue?.elements?.link?.color?.text
 	);
 	const userLinkColor = decodeValue( value?.elements?.link?.color?.text );
-	const setLinkColor = ( newColor ) => {
+	const setLinkColor = ( newColor, newSlug ) => {
 		onChange(
 			setImmutably(
 				value,
 				[ 'elements', 'link', 'color', 'text' ],
-				encodeColorValue( newColor )
+				encodeColorValueWithPalette( allColors, newColor, newSlug )
 			)
 		);
 	};
@@ -412,12 +181,12 @@ export default function ColorPanel( {
 	const userHoverLinkColor = decodeValue(
 		value?.elements?.link?.[ ':hover' ]?.color?.text
 	);
-	const setHoverLinkColor = ( newColor ) => {
+	const setHoverLinkColor = ( newColor, newSlug ) => {
 		onChange(
 			setImmutably(
 				value,
 				[ 'elements', 'link', ':hover', 'color', 'text' ],
-				encodeColorValue( newColor )
+				encodeColorValueWithPalette( allColors, newColor, newSlug )
 			)
 		);
 	};
@@ -436,147 +205,91 @@ export default function ColorPanel( {
 		onChange( newValue );
 	};
 
-	// Text Color
-	const showTextPanel = useHasTextPanel( settings );
-	const textColor = decodeValue( inheritedValue?.color?.text );
-	const userTextColor = decodeValue( value?.color?.text );
-	const hasTextColor = () => !! userTextColor;
-	const setTextColor = ( newColor ) => {
-		let changedObject = setImmutably(
-			value,
-			[ 'color', 'text' ],
-			encodeColorValue( newColor )
-		);
-		if ( textColor === linkColor ) {
-			changedObject = setImmutably(
-				changedObject,
-				[ 'elements', 'link', 'color', 'text' ],
-				encodeColorValue( newColor )
-			);
-		}
-
-		onChange( changedObject );
-	};
-	const resetTextColor = () => setTextColor( undefined );
+	const showCaptionPanel = useHasCaptionPanel( settings );
+	const showButtonPanel = useHasButtonPanel( settings );
+	const showHeadingPanel = useHasHeadingPanel( settings );
 
 	// Elements
-	const elements = [
-		{
-			name: 'caption',
-			label: __( 'Captions' ),
-			showPanel: useHasCaptionPanel( settings ),
-		},
-		{
-			name: 'button',
-			label: __( 'Button' ),
-			showPanel: useHasButtonPanel( settings ),
-		},
-		{
-			name: 'heading',
-			label: __( 'Heading' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h1',
-			label: __( 'H1' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h2',
-			label: __( 'H2' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h3',
-			label: __( 'H3' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h4',
-			label: __( 'H4' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h5',
-			label: __( 'H5' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h6',
-			label: __( 'H6' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-	];
+	const elements = useMemo(
+		() => [
+			{
+				name: 'caption',
+				label: __( 'Captions' ),
+				showPanel: showCaptionPanel,
+			},
+			{
+				name: 'button',
+				label: __( 'Button' ),
+				showPanel: showButtonPanel,
+			},
+			{
+				name: 'heading',
+				label: __( 'Heading' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h1',
+				label: __( 'H1' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h2',
+				label: __( 'H2' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h3',
+				label: __( 'H3' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h4',
+				label: __( 'H4' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h5',
+				label: __( 'H5' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h6',
+				label: __( 'H6' ),
+				showPanel: showHeadingPanel,
+			},
+		],
+		[ showCaptionPanel, showButtonPanel, showHeadingPanel ]
+	);
 
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			color: undefined,
-			elements: {
-				...previousValue?.elements,
-				link: {
-					...previousValue?.elements?.link,
-					color: undefined,
-					':hover': {
+	const resetAllFilter = useCallback(
+		( previousValue ) => {
+			return {
+				...previousValue,
+				elements: {
+					...previousValue?.elements,
+					link: {
+						...previousValue?.elements?.link,
 						color: undefined,
-					},
-				},
-				...elements.reduce( ( acc, element ) => {
-					return {
-						...acc,
-						[ element.name ]: {
-							...previousValue?.elements?.[ element.name ],
+						':hover': {
 							color: undefined,
 						},
-					};
-				}, {} ),
-			},
-		};
-	}, [] );
+					},
+					...elements.reduce( ( acc, element ) => {
+						return {
+							...acc,
+							[ element.name ]: {
+								...previousValue?.elements?.[ element.name ],
+								color: undefined,
+							},
+						};
+					}, {} ),
+				},
+			};
+		},
+		[ elements ]
+	);
 
 	const items = [
-		showTextPanel && {
-			key: 'text',
-			label: __( 'Text' ),
-			hasValue: hasTextColor,
-			resetValue: resetTextColor,
-			isShownByDefault: defaultControls.text,
-			indicators: [ textColor ],
-			tabs: [
-				{
-					key: 'text',
-					label: __( 'Text' ),
-					inheritedValue: textColor,
-					setValue: setTextColor,
-					userValue: userTextColor,
-				},
-			],
-		},
-		showBackgroundPanel && {
-			key: 'background',
-			label: __( 'Background' ),
-			hasValue: hasBackground,
-			resetValue: resetBackground,
-			isShownByDefault: defaultControls.background,
-			indicators: [ gradient ?? backgroundColor ],
-			tabs: [
-				hasSolidColors && {
-					key: 'background',
-					label: __( 'Color' ),
-					inheritedValue: backgroundColor,
-					setValue: setBackgroundColor,
-					userValue: userBackgroundColor,
-				},
-				hasGradientColors && {
-					key: 'gradient',
-					label: __( 'Gradient' ),
-					inheritedValue: gradient,
-					setValue: setGradient,
-					userValue: userGradient,
-					isGradient: true,
-				},
-			].filter( Boolean ),
-		},
 		showLinkPanel && {
 			key: 'link',
 			label: __( 'Link' ),
@@ -584,11 +297,16 @@ export default function ColorPanel( {
 			resetValue: resetLink,
 			isShownByDefault: defaultControls.link,
 			indicators: [ linkColor, hoverLinkColor ],
+			contrastWarning,
 			tabs: [
 				{
 					key: 'link',
 					label: __( 'Default' ),
 					inheritedValue: linkColor,
+					inheritedSlug: extractPresetSlug(
+						inheritedValue?.elements?.link?.color?.text,
+						'color'
+					),
 					setValue: setLinkColor,
 					userValue: userLinkColor,
 				},
@@ -596,6 +314,11 @@ export default function ColorPanel( {
 					key: 'hover',
 					label: __( 'Hover' ),
 					inheritedValue: hoverLinkColor,
+					inheritedSlug: extractPresetSlug(
+						inheritedValue?.elements?.link?.[ ':hover' ]?.color
+							?.text,
+						'color'
+					),
 					setValue: setHoverLinkColor,
 					userValue: userHoverLinkColor,
 				},
@@ -603,7 +326,7 @@ export default function ColorPanel( {
 		},
 	].filter( Boolean );
 
-	elements.forEach( ( { name, label, showPanel } ) => {
+	elements.forEach( ( { name, label: elementLabel, showPanel } ) => {
 		if ( ! showPanel ) {
 			return;
 		}
@@ -643,20 +366,28 @@ export default function ColorPanel( {
 			onChange( newValue );
 		};
 
-		const setElementTextColor = ( newTextColor ) => {
+		const setElementTextColor = ( newTextColor, newSlug ) => {
 			onChange(
 				setImmutably(
 					value,
 					[ 'elements', name, 'color', 'text' ],
-					encodeColorValue( newTextColor )
+					encodeColorValueWithPalette(
+						allColors,
+						newTextColor,
+						newSlug
+					)
 				)
 			);
 		};
-		const setElementBackgroundColor = ( newBackgroundColor ) => {
+		const setElementBackgroundColor = ( newBackgroundColor, newSlug ) => {
 			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'background' ],
-				encodeColorValue( newBackgroundColor )
+				encodeColorValueWithPalette(
+					allColors,
+					newBackgroundColor,
+					newSlug
+				)
 			);
 			newValue.elements[ name ].color.gradient = undefined;
 			onChange( newValue );
@@ -670,42 +401,44 @@ export default function ColorPanel( {
 			newValue.elements[ name ].color.background = undefined;
 			onChange( newValue );
 		};
-		const supportsTextColor = true;
 		// Background color is not supported for `caption`
 		// as there isn't yet a way to set padding for the element.
 		const supportsBackground = name !== 'caption';
 
 		items.push( {
 			key: name,
-			label,
+			label: elementLabel,
 			hasValue: hasElement,
 			resetValue: resetElement,
 			isShownByDefault: defaultControls[ name ],
-			indicators:
-				supportsTextColor && supportsBackground
-					? [
-							elementTextColor,
-							elementGradient ?? elementBackgroundColor,
-					  ]
-					: [
-							supportsTextColor
-								? elementTextColor
-								: elementGradient ?? elementBackgroundColor,
-					  ],
+			indicators: supportsBackground
+				? [
+						elementTextColor,
+						elementGradient ?? elementBackgroundColor,
+				  ]
+				: [ elementTextColor ],
 			tabs: [
-				hasSolidColors &&
-					supportsTextColor && {
-						key: 'text',
-						label: __( 'Text' ),
-						inheritedValue: elementTextColor,
-						setValue: setElementTextColor,
-						userValue: elementTextUserColor,
-					},
+				hasSolidColors && {
+					key: 'text',
+					label: __( 'Text' ),
+					inheritedValue: elementTextColor,
+					inheritedSlug: extractPresetSlug(
+						inheritedValue?.elements?.[ name ]?.color?.text,
+						'color'
+					),
+					setValue: setElementTextColor,
+					userValue: elementTextUserColor,
+				},
 				hasSolidColors &&
 					supportsBackground && {
 						key: 'background',
 						label: __( 'Background' ),
 						inheritedValue: elementBackgroundColor,
+						inheritedSlug: extractPresetSlug(
+							inheritedValue?.elements?.[ name ]?.color
+								?.background,
+							'color'
+						),
 						setValue: setElementBackgroundColor,
 						userValue: elementBackgroundUserColor,
 					},
@@ -728,11 +461,12 @@ export default function ColorPanel( {
 			value={ value }
 			onChange={ onChange }
 			panelId={ panelId }
+			label={ label }
 		>
 			{ items.map( ( item ) => {
 				const { key, ...restItem } = item;
 				return (
-					<ColorPanelDropdown
+					<ColorGradientDropdownItem
 						key={ key }
 						{ ...restItem }
 						colorGradientControlSettings={ {

@@ -1,12 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Blocks raw handling pasteHandler apple 1`] = `"<strong>This is a </strong>title<br><br><br><strong>This is a <em>heading</em></strong><br><br><br>This is a <strong>paragraph</strong> with a <a href="https://w.org">link</a>.<br><br><br>A<br>Bulleted<br>Indented<br>List<br><br><br>One<br>Two<br>Three<br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br><br>An image:<br>"`;
+exports[`Blocks raw handling pasteHandler apple 1`] = `"<strong>This is a</strong> title<br><br><br><strong>This is a <em>heading</em></strong><br><br><br>This is a <strong>paragraph</strong> with a <a href="https://w.org">link</a>.<br><br><br>A<br>Bulleted<br>Indented<br>List<br><br><br>One<br>Two<br>Three<br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br><br>An image:<br>"`;
 
 exports[`Blocks raw handling pasteHandler classic 1`] = `"First paragraph<br><br>Second paragraph<br>Third paragraph<br>Fourth paragraph<br>Fifth paragraph<br>Sixth paragraph"`;
 
 exports[`Blocks raw handling pasteHandler evernote 1`] = `"This is a <em>paragraph</em>.<br><br><br>This is a <a href="https://w.org">link</a>.<br><br><br>An<br>Unordered<br>Indented<br>List<br><br><br>One<br>Two<br>Indented<br>Three<br><br><br><br><br><br><br>One<br>Two<br>Three<br>Four<br>Five<br>Six<br><img src="data:image/jpeg;base64,###">"`;
 
 exports[`Blocks raw handling pasteHandler google-docs 1`] = `"This is a <strong>title</strong><br><br>This is a <em>heading</em><br><br>Formatting test: <strong>bold</strong>, <em>italic</em>, <a href="https://w.org/">link</a>, <s>strikethrough</s>, <sup>superscript</sup>, <sub>subscript</sub>, <strong><em>nested</em></strong>.<br><br>A<br>Bulleted<br>Indented<br>List<br><br>One<br>Two<br>Three<br><br><br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br><br><br><br><br>An image:<br><br><img src="https://lh4.googleusercontent.com/ID" width="544" height="184"><br>"`;
+
+exports[`Blocks raw handling pasteHandler google-docs-link-spacing 1`] = `"This is a paragraph with a <a href="https://example.com/one">link in the middle</a> of the sentence, and it ends with <a href="https://example.com/two">another link</a> before the final words."`;
 
 exports[`Blocks raw handling pasteHandler google-docs-list-only 1`] = `"My first list item<br>A sub list item<br>A second sub list item<br>My second list item<br>My third list item"`;
 
@@ -20,6 +22,8 @@ exports[`Blocks raw handling pasteHandler google-docs-table-with-rowspan 1`] = `
 
 exports[`Blocks raw handling pasteHandler google-docs-with-comments 1`] = `"This is a <strong>title</strong><br><br>This is a <em>heading</em><br><br>Formatting test: <strong>bold</strong>, <em>italic</em>, <a href="https://w.org/">link</a>, <s>strikethrough</s>, <sup>superscript</sup>, <sub>subscript</sub>, <strong><em>nested</em></strong>.<br><br>A<br>Bulleted<br>Indented<br>List<br><br>One<br>Two<br>Three<br><br><br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br><br><br><br><br>An image:<br><br><img src="https://lh4.googleusercontent.com/ID" width="544" height="184"><br><br>"`;
 
+exports[`Blocks raw handling pasteHandler grok-markdown 1`] = `"Heading<br>This is a paragraph with <strong>bold text</strong> and <em>italic text</em>.<br>Subheading<br>Another paragraph with a <a href="https://example.com">link</a>."`;
+
 exports[`Blocks raw handling pasteHandler gutenberg 1`] = `"Test"`;
 
 exports[`Blocks raw handling pasteHandler iframe-embed 1`] = `""`;
@@ -32,7 +36,7 @@ exports[`Blocks raw handling pasteHandler ms-word 1`] = `"This is a title<br>&nb
 
 exports[`Blocks raw handling pasteHandler ms-word-list 1`] = `"<a>This is a headline?</a><br>This is a text:<br>One<br>Two<br>Three<br><a>Lorem Ipsum.</a><br>&nbsp;"`;
 
-exports[`Blocks raw handling pasteHandler ms-word-online 1`] = `"This is a <em>heading</em>&nbsp;<br>This is a <strong>paragraph </strong>with a <a href="https://w.org/" target="_blank" rel="noreferrer noopener">link</a>.&nbsp;<br>A&nbsp;<br>Bulleted&nbsp;<br>Indented&nbsp;<br>List&nbsp;<br>&nbsp;<br>One&nbsp;<br>Two&nbsp;<br>Three&nbsp;<br><br>One&nbsp;<br>Two&nbsp;<br>Three&nbsp;<br>1&nbsp;<br>2&nbsp;<br>3&nbsp;<br>I&nbsp;<br>II&nbsp;<br>III&nbsp;<br>&nbsp;<br>An image:&nbsp;<br><img src="data:image/jpeg;base64,###">&nbsp;"`;
+exports[`Blocks raw handling pasteHandler ms-word-online 1`] = `"This is a <em>heading</em>&nbsp;<br>This is a <strong>paragraph</strong> with a <a href="https://w.org/" target="_blank" rel="noopener">link</a>.&nbsp;<br>A&nbsp;<br>Bulleted&nbsp;<br>Indented&nbsp;<br>List&nbsp;<br>&nbsp;<br>One&nbsp;<br>Two&nbsp;<br>Three&nbsp;<br><br>One&nbsp;<br>Two&nbsp;<br>Three&nbsp;<br>1&nbsp;<br>2&nbsp;<br>3&nbsp;<br>I&nbsp;<br>II&nbsp;<br>III&nbsp;<br>&nbsp;<br>An image:&nbsp;<br><img src="data:image/jpeg;base64,###">&nbsp;"`;
 
 exports[`Blocks raw handling pasteHandler ms-word-styled 1`] = `"<br><strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit&nbsp;</strong><br><br><br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque aliquet hendrerit auctor. Nam lobortis, est vel lacinia tincidunt, purus tellus vehicula ex, nec pharetra justo dui sed lorem. Nam congue laoreet massa, quis varius est tincidunt ut."`;
 
@@ -72,9 +76,9 @@ exports[`Blocks raw handling pasteHandler should strip windows data 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Blocks raw handling pasteHandler slack-paragraphs 1`] = `"test with&nbsp;<a target="_blank" href="http://w.org/" rel="noreferrer noopener">link</a><br>a new line<br><br>a new paragraph<br>another new line<br><br>another paragraph"`;
+exports[`Blocks raw handling pasteHandler slack-paragraphs 1`] = `"test with&nbsp;<a target="_blank" href="http://w.org/" rel="noopener">link</a><br>a new line<br><br>a new paragraph<br>another new line<br><br>another paragraph"`;
 
-exports[`Blocks raw handling pasteHandler slack-quote 1`] = `"Test with&nbsp;<a target="_blank" href="http://w.org/" rel="noreferrer noopener">link</a>."`;
+exports[`Blocks raw handling pasteHandler slack-quote 1`] = `"Test with&nbsp;<a target="_blank" href="http://w.org/" rel="noopener">link</a>."`;
 
 exports[`Blocks raw handling pasteHandler two-images 1`] = `"<img src="http://localhost/wp-content/uploads/2018/01/Dec-08-2017-15-12-24-17-300x137.gif" alt="" width="300" height="137"> <img src="http://localhost/wp-content/uploads/2018/01/Dec-05-2017-17-52-09-9-300x248.gif" alt="" width="300" height="248">"`;
 
@@ -196,7 +200,7 @@ exports[`rawHandler should not strip any text-level elements 1`] = `
 `;
 
 exports[`rawHandler should preserve alignment 1`] = `
-"<!-- wp:paragraph {"align":"center"} -->
+"<!-- wp:paragraph {"style":{"typography":{"textAlign":"center"}}} -->
 <p class="has-text-align-center">center</p>
 <!-- /wp:paragraph -->"
 `;

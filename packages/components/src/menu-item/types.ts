@@ -27,7 +27,7 @@ export type MenuItemProps = Pick< ButtonAsButtonProps, 'isDestructive' > & {
 	 *
 	 * @default null
 	 */
-	icon?: JSX.Element | null;
+	icon?: React.JSX.Element | null;
 	/**
 	 * Determines where to display the provided `icon`.
 	 */

@@ -28,8 +28,7 @@ export const buttonView = ( {
 	isDeselectable,
 	isIcon,
 	isPressed,
-	size,
-}: Pick< ToggleGroupControlProps, 'isDeselectable' | 'size' > &
+}: Pick< ToggleGroupControlProps, 'isDeselectable' > &
 	Pick< ToggleGroupControlOptionBaseProps, 'isIcon' > & {
 		isPressed?: boolean;
 	} ) => css`
@@ -52,7 +51,6 @@ export const buttonView = ( {
 	text-align: center;
 	@media not ( prefers-reduced-motion ) {
 		transition:
-			background ${ CONFIG.transitionDurationFast } linear,
 			color ${ CONFIG.transitionDurationFast } linear,
 			font-weight 60ms linear;
 	}
@@ -64,36 +62,36 @@ export const buttonView = ( {
 		border: 0;
 	}
 
-	&[disabled] {
+	&[disabled],
+	&[aria-disabled='true'] {
 		opacity: 0.4;
 		cursor: default;
 	}
 
-	&:active {
-		background: ${ COLORS.ui.background };
+	&:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+		color: ${ COLORS.theme.foreground };
 	}
 
 	${ isDeselectable && deselectable }
-	${ isIcon && isIconStyles( { size } ) }
+	${ isIcon && isIconStyles }
 	${ isPressed && pressed }
 `;
 
 const pressed = css`
-	color: ${ COLORS.theme.foregroundInverted };
-
-	&:active {
-		background: transparent;
-	}
+	color: ${ COLORS.theme.foreground };
+	font-weight: ${ CONFIG.fontWeightMedium };
 `;
 
 const deselectable = css`
-	color: ${ COLORS.theme.foreground };
-
 	&:focus {
-		box-shadow:
-			inset 0 0 0 1px ${ COLORS.ui.background },
-			0 0 0 ${ CONFIG.borderWidthFocus } ${ COLORS.theme.accent };
-		outline: 2px solid transparent;
+		outline: ${ CONFIG.borderWidthFocus } solid ${ COLORS.ui.borderFocus };
+		outline-offset: 2px;
+
+		// Hide overlapping border
+		&[aria-pressed='false'] {
+			background: ${ COLORS.ui.background };
+			box-shadow: 0 0 0 2px ${ COLORS.ui.background };
+		}
 	}
 `;
 
@@ -103,19 +101,9 @@ export const ButtonContentView = styled.div`
 	line-height: 1;
 `;
 
-const isIconStyles = ( {
-	size = 'default',
-}: Pick< ToggleGroupControlProps, 'size' > ) => {
-	const iconButtonSizes = {
-		default: '30px',
-		'__unstable-large': '32px',
-	};
-
-	return css`
-		color: ${ COLORS.theme.foreground };
-		height: ${ iconButtonSizes[ size ] };
-		aspect-ratio: 1;
-		padding-left: 0;
-		padding-right: 0;
-	`;
-};
+const isIconStyles = css`
+	height: 38px;
+	aspect-ratio: 1;
+	padding-left: 0;
+	padding-right: 0;
+`;

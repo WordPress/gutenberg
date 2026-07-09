@@ -17,7 +17,6 @@ const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 export default function CommentsInspectorControls( {
 	attributes: { tagName },
 	setAttributes,
-	clientId,
 } ) {
 	return (
 		<InspectorControls>
@@ -27,7 +26,6 @@ export default function CommentsInspectorControls( {
 					onChange={ ( value ) =>
 						setAttributes( { tagName: value } )
 					}
-					clientId={ clientId }
 					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },
 						{ label: '<section>', value: 'section' },

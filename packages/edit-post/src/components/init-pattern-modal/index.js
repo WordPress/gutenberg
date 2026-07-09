@@ -6,95 +6,75 @@ import { __, _x } from '@wordpress/i18n';
 import {
 	Modal,
 	Button,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	ToggleControl,
 	TextControl,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 
 export default function InitPatternModal() {
 	const { editPost } = useDispatch( editorStore );
+	const { isCleanNewPost } = useSelect( editorStore );
 	const [ syncType, setSyncType ] = useState( undefined );
 	const [ title, setTitle ] = useState( '' );
+	const [ isModalOpen, setIsModalOpen ] = useState( () => isCleanNewPost() );
 
-	const { postType, isNewPost } = useSelect( ( select ) => {
-		const { getEditedPostAttribute, isCleanNewPost } =
-			select( editorStore );
-		return {
-			postType: getEditedPostAttribute( 'type' ),
-			isNewPost: isCleanNewPost(),
-		};
-	}, [] );
-	const [ isModalOpen, setIsModalOpen ] = useState(
-		() => isNewPost && postType === 'wp_block'
-	);
-
-	if ( postType !== 'wp_block' || ! isNewPost ) {
+	if ( ! isModalOpen ) {
 		return null;
 	}
 
 	return (
-		<>
-			{ isModalOpen && (
-				<Modal
-					title={ __( 'Create pattern' ) }
-					onRequestClose={ () => {
-						setIsModalOpen( false );
-					} }
-					overlayClassName="reusable-blocks-menu-items__convert-modal"
-				>
-					<form
-						onSubmit={ ( event ) => {
-							event.preventDefault();
-							setIsModalOpen( false );
-							editPost( {
-								title,
-								meta: {
-									wp_pattern_sync_status: syncType,
-								},
-							} );
+		<Modal
+			title={ __( 'Create pattern' ) }
+			onRequestClose={ () => {
+				setIsModalOpen( false );
+			} }
+			overlayClassName="patterns-create-modal"
+		>
+			<form
+				onSubmit={ ( event ) => {
+					event.preventDefault();
+					setIsModalOpen( false );
+					editPost( {
+						title,
+						meta: {
+							wp_pattern_sync_status: syncType,
+						},
+					} );
+				} }
+			>
+				<Stack direction="column" gap="lg">
+					<TextControl
+						label={ __( 'Name' ) }
+						value={ title }
+						onChange={ setTitle }
+						placeholder={ __( 'My pattern' ) }
+						className="patterns-create-modal__name-input"
+					/>
+					<ToggleControl
+						label={ _x( 'Synced', 'pattern (singular)' ) }
+						help={ __(
+							'Sync this pattern across multiple locations.'
+						) }
+						checked={ ! syncType }
+						onChange={ () => {
+							setSyncType( ! syncType ? 'unsynced' : undefined );
 						} }
-					>
-						<VStack spacing="5">
-							<TextControl
-								label={ __( 'Name' ) }
-								value={ title }
-								onChange={ setTitle }
-								placeholder={ __( 'My pattern' ) }
-								className="patterns-create-modal__name-input"
-								__nextHasNoMarginBottom
-								__next40pxDefaultSize
-							/>
-							<ToggleControl
-								__nextHasNoMarginBottom
-								label={ _x( 'Synced', 'pattern (singular)' ) }
-								help={ __(
-									'Sync this pattern across multiple locations.'
-								) }
-								checked={ ! syncType }
-								onChange={ () => {
-									setSyncType(
-										! syncType ? 'unsynced' : undefined
-									);
-								} }
-							/>
-							<HStack justify="right">
-								<Button
-									__next40pxDefaultSize
-									variant="primary"
-									type="submit"
-									disabled={ ! title }
-									accessibleWhenDisabled
-								>
-									{ __( 'Create' ) }
-								</Button>
-							</HStack>
-						</VStack>
-					</form>
-				</Modal>
-			) }
-		</>
+					/>
+					<Stack justify="end">
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							type="submit"
+							disabled={ ! title }
+							accessibleWhenDisabled
+						>
+							{ __( 'Create' ) }
+						</Button>
+					</Stack>
+				</Stack>
+			</form>
+		</Modal>
 	);
 }

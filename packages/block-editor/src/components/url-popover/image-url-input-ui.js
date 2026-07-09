@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useEffect, useState } from '@wordpress/element';
+import {
+	useRef,
+	useEffect,
+	useState,
+	createInterpolateElement,
+} from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import {
 	ToolbarButton,
@@ -12,6 +17,7 @@ import {
 	ToggleControl,
 	TextControl,
 	__experimentalVStack as VStack,
+	ExternalLink,
 } from '@wordpress/components';
 import {
 	Icon,
@@ -21,6 +27,7 @@ import {
 	fullscreen,
 	linkOff,
 } from '@wordpress/icons';
+import { prependHTTPS } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -31,7 +38,7 @@ const LINK_DESTINATION_NONE = 'none';
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
-const NEW_TAB_REL = [ 'noreferrer', 'noopener' ];
+const NEW_TAB_REL = [ 'noopener' ];
 
 const ImageURLInputUI = ( {
 	linkDestination,
@@ -149,7 +156,7 @@ const ImageURLInputUI = ( {
 					)?.linkDestination || LINK_DESTINATION_CUSTOM;
 
 				onChangeUrl( {
-					href: urlInput,
+					href: prependHTTPS( urlInput ),
 					linkDestination: selectedDestination,
 					lightbox: { enabled: false },
 				} );
@@ -221,21 +228,26 @@ const ImageURLInputUI = ( {
 	const advancedOptions = (
 		<VStack spacing="3">
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Open in new tab' ) }
 				onChange={ onSetNewTab }
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				label={ __( 'Link rel' ) }
+				label={ __( 'Link relation' ) }
 				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
+				help={ createInterpolateElement(
+					__(
+						'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+					),
+					{
+						a: (
+							<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+						),
+					}
+				) }
 			/>
 			<TextControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				label={ __( 'Link CSS class' ) }
 				value={ linkClass || '' }
 				onChange={ onSetLinkClass }

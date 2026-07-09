@@ -12,10 +12,10 @@ import {
 	getSpacingPresetCssVar,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
-import { View } from '@wordpress/primitives';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -346,9 +346,11 @@ const SpacerEdit = ( {
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
+	const blockEditingMode = useBlockEditingMode();
+
 	return (
 		<>
-			<View
+			<div
 				{ ...useBlockProps( {
 					style,
 					className: clsx( className, {
@@ -356,8 +358,9 @@ const SpacerEdit = ( {
 					} ),
 				} ) }
 			>
-				{ resizableBoxWithOrientation( inheritedOrientation ) }
-			</View>
+				{ blockEditingMode === 'default' &&
+					resizableBoxWithOrientation( inheritedOrientation ) }
+			</div>
 			{ ! isFlexLayout && (
 				<SpacerControls
 					setAttributes={ setAttributes }

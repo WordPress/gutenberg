@@ -49,8 +49,6 @@ export default function TextDecorationControl( {
 	return (
 		<ToggleGroupControl
 			isDeselectable
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
 			label={ __( 'Decoration' ) }
 			className={ clsx(
 				'block-editor-text-decoration-control',

@@ -10,11 +10,13 @@ import {
 	forwardRef,
 	useState,
 	useCallback,
+	useEffect,
 	useMemo,
 	useRef,
 	useLayoutEffect,
 } from '@wordpress/element';
-import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
+import { SearchControl, Popover } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput, useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
@@ -75,6 +77,8 @@ function InserterMenu(
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
 	const isLargeViewport = useViewportMatch( 'large' );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const maybeCloseInserter = isMobileViewport ? onClose : NOOP;
 
 	function getInitialTab() {
 		if ( __experimentalInitialTab ) {
@@ -114,6 +118,7 @@ function InserterMenu(
 				_rootClientId
 			);
 			onSelect( blocks );
+			maybeCloseInserter();
 
 			// Check for focus loss due to filtering blocks by selected block type
 			window.requestAnimationFrame( () => {
@@ -128,7 +133,7 @@ function InserterMenu(
 				}
 			} );
 		},
-		[ onInsertBlocks, onSelect, shouldFocusBlock ]
+		[ onInsertBlocks, maybeCloseInserter, onSelect, ref, shouldFocusBlock ]
 	);
 
 	const onInsertPattern = useCallback(
@@ -136,8 +141,9 @@ function InserterMenu(
 			onToggleInsertionPoint( false );
 			onInsertBlocks( blocks, { patternName }, ...args );
 			onSelect();
+			maybeCloseInserter();
 		},
-		[ onInsertBlocks, onSelect ]
+		[ onInsertBlocks, maybeCloseInserter, onSelect, onToggleInsertionPoint ]
 	);
 
 	const onHover = useCallback(
@@ -164,6 +170,30 @@ function InserterMenu(
 
 	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
 
+	const [ isScrolled, setIsScrolled ] = useState( false );
+	const blocksPanelRef = useRef( null );
+	const patternsPanelRef = useRef( null );
+	const mediaPanelRef = useRef( null );
+	useEffect( () => {
+		const handleScroll = ( event ) => {
+			setIsScrolled( event.currentTarget.scrollTop > 0 );
+		};
+		const panels = [
+			blocksPanelRef.current,
+			patternsPanelRef.current,
+			mediaPanelRef.current,
+		].filter( Boolean );
+		panels.forEach( ( panel ) =>
+			panel.addEventListener( 'scroll', handleScroll )
+		);
+
+		return () => {
+			panels.forEach( ( panel ) =>
+				panel.removeEventListener( 'scroll', handleScroll )
+			);
+		};
+	}, [] );
+
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
 			return null;
@@ -172,8 +202,9 @@ function InserterMenu(
 		return (
 			<>
 				<SearchControl
-					__nextHasNoMarginBottom
-					className="block-editor-inserter__search"
+					className={ clsx( 'block-editor-inserter__search', {
+						'is-scrolled': isScrolled,
+					} ) }
 					onChange={ ( value ) => {
 						if ( hoveredItem ) {
 							setHoveredItem( null );
@@ -216,6 +247,7 @@ function InserterMenu(
 		rootClientId,
 		__experimentalInsertionIndex,
 		isAppender,
+		isScrolled,
 	] );
 
 	const blocksTab = useMemo( () => {
@@ -232,7 +264,7 @@ function InserterMenu(
 				</div>
 				{ showInserterHelpPanel && (
 					<div className="block-editor-inserter__tips">
-						<VisuallyHidden as="h2">
+						<VisuallyHidden render={ <h2 /> }>
 							{ __( 'A tip for using the block editor' ) }
 						</VisuallyHidden>
 						<Tips />
@@ -340,6 +372,7 @@ function InserterMenu(
 						{
 							name: 'blocks',
 							title: __( 'Blocks' ),
+							panelRef: blocksPanelRef,
 							panel: (
 								<>
 									{ inserterSearch }
@@ -352,6 +385,7 @@ function InserterMenu(
 						{
 							name: 'patterns',
 							title: __( 'Patterns' ),
+							panelRef: patternsPanelRef,
 							panel: (
 								<>
 									{ inserterSearch }
@@ -364,6 +398,7 @@ function InserterMenu(
 						{
 							name: 'media',
 							title: __( 'Media' ),
+							panelRef: mediaPanelRef,
 							panel: (
 								<>
 									{ inserterSearch }

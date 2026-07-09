@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .wp-block-cover {
 	// Override default cover styles
 	// because we're not ready yet to show the cover block.
@@ -10,7 +12,8 @@
 		.components-placeholder {
 			&.is-large {
 				justify-content: flex-start;
-				z-index: z-index(".wp-block-cover.is-placeholder .components-placeholder.is-large");
+				// Lift the resizer UI above the surrounding placeholder content.
+				z-index: 1;
 			}
 		}
 
@@ -71,7 +74,6 @@
 		bottom: 0;
 		left: 0;
 	}
-
 }
 
 [data-align="left"] > .wp-block-cover,

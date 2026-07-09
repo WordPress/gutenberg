@@ -4,7 +4,7 @@
 
 <p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-basecontrol--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
 
-`BaseControl` is a component used to generate labels and help text for components handling user inputs.
+`BaseControl` is a low-level component used to generate labels and help text for components handling user inputs.
 
 ```jsx
 import { BaseControl, useBaseControlProps } from '@wordpress/components';
@@ -17,7 +17,7 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
 	const { baseControlProps, controlProps } = useBaseControlProps( baseProps );
 
 	return (
-		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
+		<BaseControl { ...baseControlProps }>
 			<textarea { ...controlProps }>
 			  { children }
 			</textarea>
@@ -28,17 +28,9 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
 
 ## Props
 
-### `__nextHasNoMarginBottom`
-
- - Type: `boolean`
- - Required: No
- - Default: `false`
-
-Start opting into the new margin-free styles that will become the default in a future version.
-
 ### `as`
 
- - Type: `"symbol" | "object" | "label" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | ... 516 more ... | ("view" & FunctionComponent<...>)`
+ - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | "canvas" | ... 516 more ... | ("view" & FunctionComponent<...>)`
  - Required: No
 
 The HTML element or React component to render the component as.
@@ -104,10 +96,7 @@ otherwise use if the `label` prop was passed.
 import { BaseControl } from '@wordpress/components';
 
 const MyBaseControl = () => (
-	<BaseControl
-		__nextHasNoMarginBottom
-		help="This button is already accessibly labeled."
-	>
+	<BaseControl help="This button is already accessibly labeled.">
 		<BaseControl.VisualLabel>Author</BaseControl.VisualLabel>
 		<Button>Select an author</Button>
 	</BaseControl>
@@ -118,7 +107,7 @@ const MyBaseControl = () => (
 
 ##### `as`
 
- - Type: `"symbol" | "object" | "label" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | ...`
+ - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
  - Required: No
 
 The HTML element or React component to render the component as.

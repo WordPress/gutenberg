@@ -1,4 +1,8 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .edit-site-patterns__delete-modal {
+	// TODO: Replace with a --wpds-dimension-surface-width-* token.
 	width: $modal-width-small;
 }
 
@@ -63,7 +67,7 @@
 
 .edit-site-page-patterns-dataviews {
 	.dataviews-view-grid__badge-fields {
-		.dataviews-view-grid__field-value:has(.edit-site-patterns__field-sync-status-fully) {
+		.dataviews-view-grid__field-value:has(.fields-field__pattern-sync-status-fully) {
 			background: rgba(var(--wp-block-synced-color--rgb), 0.04);
 			color: var(--wp-block-synced-color);
 		}
@@ -88,7 +92,7 @@
 		box-shadow: 0 0 0.5px 0.5px var(--wp-admin-theme-color);
 		box-sizing: border-box;
 		z-index: 1;
-		background-color: $white;
+		background-color: var(--wpds-color-background-surface-neutral-strong);
 		width: calc(100% + 2px); // Account for the border width of the token field.
 		left: -1px;
 		min-width: initial;
@@ -108,5 +112,23 @@
 	.edit-site-page-patterns-dataviews .edit-site-patterns__section-header {
 		padding-left: $grid-unit-30;
 		padding-right: $grid-unit-30;
+	}
+}
+
+// Show button text labels when preference is enabled.
+.show-icon-labels {
+	.edit-site-patterns__button.has-icon {
+		width: auto;
+		padding: 0 var(--wpds-dimension-padding-xs);
+
+		// Hide the button icons when labels are set to display...
+		svg {
+			display: none;
+		}
+		// ... and display labels.
+		&::after {
+			content: attr(aria-label);
+			font-size: var(--wpds-typography-font-size-sm);
+		}
 	}
 }

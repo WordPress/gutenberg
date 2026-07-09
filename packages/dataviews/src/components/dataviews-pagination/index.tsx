@@ -1,31 +1,38 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	__experimentalHStack as HStack,
-	SelectControl,
-} from '@wordpress/components';
+import { Button, SelectControl } from '@wordpress/components';
 import { createInterpolateElement, memo, useContext } from '@wordpress/element';
 import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import DataViewsContext from '../dataviews-context';
+import type { View } from '../../types';
 
-function DataViewsPagination() {
-	const {
-		view,
-		onChangeView,
-		paginationInfo: { totalItems = 0, totalPages },
-	} = useContext( DataViewsContext );
+export function hasPaginationControls(
+	view: View,
+	paginationInfo: { totalItems: number; totalPages: number }
+): boolean {
+	return (
+		! view.infiniteScrollEnabled &&
+		paginationInfo.totalItems > 0 &&
+		paginationInfo.totalPages > 1
+	);
+}
 
-	if ( ! totalItems || ! totalPages ) {
+export function DataViewsPagination() {
+	const { view, onChangeView, paginationInfo } =
+		useContext( DataViewsContext );
+
+	if ( ! hasPaginationControls( view, paginationInfo ) ) {
 		return null;
 	}
 
+	const { totalPages } = paginationInfo;
 	const currentPage = view.page ?? 1;
 	const pageSelectOptions = Array.from( Array( totalPages ) ).map(
 		( _, i ) => {
@@ -36,8 +43,8 @@ function DataViewsPagination() {
 				'aria-label':
 					currentPage === page
 						? sprintf(
-								// translators: Current page number in total number of pages
-								__( 'Page %1$s of %2$s' ),
+								// translators: 1: current page number. 2: total number of pages.
+								__( 'Page %1$d of %2$d' ),
 								currentPage,
 								totalPages
 						  )
@@ -47,82 +54,78 @@ function DataViewsPagination() {
 	);
 
 	return (
-		!! totalItems &&
-		totalPages !== 1 && (
-			<HStack
-				expanded={ false }
-				className="dataviews-pagination"
-				justify="end"
-				spacing={ 6 }
+		<Stack
+			direction="row"
+			className="dataviews-pagination"
+			justify="end"
+			align="center"
+			gap="xl"
+		>
+			<Stack
+				direction="row"
+				justify="flex-start"
+				align="center"
+				gap="xs"
+				className="dataviews-pagination__page-select"
 			>
-				<HStack
-					justify="flex-start"
-					expanded={ false }
-					spacing={ 1 }
-					className="dataviews-pagination__page-select"
-				>
-					{ createInterpolateElement(
-						sprintf(
-							// translators: 1: Current page number, 2: Total number of pages.
-							_x(
-								'<div>Page</div>%1$s<div>of %2$s</div>',
-								'paging'
-							),
-							'<CurrentPage />',
-							totalPages
+				{ createInterpolateElement(
+					sprintf(
+						// translators: 1: Current page number, 2: Total number of pages.
+						_x( '<div>Page</div>%1$s<div>of %2$d</div>', 'paging' ),
+						'<CurrentPage />',
+						totalPages
+					),
+					{
+						div: <div aria-hidden />,
+						// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
+						CurrentPage: (
+							<SelectControl
+								aria-label={ __( 'Current page' ) }
+								value={ currentPage.toString() }
+								options={ pageSelectOptions }
+								onChange={ ( newValue ) => {
+									onChangeView( {
+										...view,
+										page: +newValue,
+									} );
+								} }
+								size="small"
+								variant="minimal"
+							/>
 						),
-						{
-							div: <div aria-hidden />,
-							CurrentPage: (
-								<SelectControl
-									aria-label={ __( 'Current page' ) }
-									value={ currentPage.toString() }
-									options={ pageSelectOptions }
-									onChange={ ( newValue ) => {
-										onChangeView( {
-											...view,
-											page: +newValue,
-										} );
-									} }
-									size="small"
-									__nextHasNoMarginBottom
-									variant="minimal"
-								/>
-							),
-						}
-					) }
-				</HStack>
-				<HStack expanded={ false } spacing={ 1 }>
-					<Button
-						onClick={ () =>
-							onChangeView( {
-								...view,
-								page: currentPage - 1,
-							} )
-						}
-						disabled={ currentPage === 1 }
-						accessibleWhenDisabled
-						label={ __( 'Previous page' ) }
-						icon={ isRTL() ? next : previous }
-						showTooltip
-						size="compact"
-						tooltipPosition="top"
-					/>
-					<Button
-						onClick={ () =>
-							onChangeView( { ...view, page: currentPage + 1 } )
-						}
-						disabled={ currentPage >= totalPages }
-						accessibleWhenDisabled
-						label={ __( 'Next page' ) }
-						icon={ isRTL() ? previous : next }
-						showTooltip
-						size="compact"
-						tooltipPosition="top"
-					/>
-				</HStack>
-			</HStack>
-		)
+					}
+				) }
+			</Stack>
+			<Stack direction="row" gap="xs" align="center">
+				<Button
+					onClick={ () =>
+						onChangeView( {
+							...view,
+							page: currentPage - 1,
+						} )
+					}
+					disabled={ currentPage === 1 }
+					accessibleWhenDisabled
+					label={ __( 'Previous page' ) }
+					icon={ isRTL() ? next : previous }
+					showTooltip
+					size="compact"
+					tooltipPosition="top"
+				/>
+				<Button
+					onClick={ () =>
+						onChangeView( { ...view, page: currentPage + 1 } )
+					}
+					disabled={ currentPage >= totalPages }
+					accessibleWhenDisabled
+					label={ __( 'Next page' ) }
+					icon={ isRTL() ? previous : next }
+					showTooltip
+					size="compact"
+					tooltipPosition="top"
+				/>
+			</Stack>
+		</Stack>
 	);
 }
 

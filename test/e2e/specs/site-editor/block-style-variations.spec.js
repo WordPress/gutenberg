@@ -3,6 +3,30 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 const TEST_PAGE_TITLE = 'Test Page for Block Style Variations';
+
+async function selectBlockStyleVariation( page, variationName ) {
+	const editorSettings = page.getByRole( 'region', {
+		name: 'Editor settings',
+	} );
+	const stylesTab = editorSettings.getByRole( 'tab', { name: 'Styles' } );
+	const variationButton = editorSettings.getByRole( 'button', {
+		name: variationName,
+	} );
+
+	const visibleControl = await Promise.any( [
+		stylesTab.waitFor( { state: 'visible' } ).then( () => 'styles-tab' ),
+		variationButton
+			.waitFor( { state: 'visible' } )
+			.then( () => 'variation-button' ),
+	] );
+
+	if ( visibleControl === 'styles-tab' ) {
+		await stylesTab.click();
+	}
+
+	await variationButton.click();
+}
+
 test.use( {
 	siteEditorBlockStyleVariations: async ( { page, editor }, use ) => {
 		await use( new SiteEditorBlockStyleVariations( { page, editor } ) );
@@ -11,6 +35,7 @@ test.use( {
 
 test.describe( 'Block Style Variations', () => {
 	let stylesPostId;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme(
@@ -20,17 +45,28 @@ test.describe( 'Block Style Variations', () => {
 		stylesPostId = await requestUtils.getCurrentThemeGlobalStylesPostId();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.activateTheme( 'twentytwentyone' ),
-			requestUtils.deleteAllPages(),
-		] );
-	} );
-
 	test.beforeEach( async ( { requestUtils, admin } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllPages(),
 			admin.visitSiteEditor(),
+		] );
+	} );
+
+	test.afterEach( async ( { page } ) => {
+		await page.evaluate( async () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'post-only' );
+		}, [] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		// Reset the global styles saved by these tests so they don't leak
+		// into other specs that share this theme's global styles.
+		await requestUtils.resetThemeGlobalStyles();
+		await Promise.all( [
+			requestUtils.activateTheme( 'twentytwentyone' ),
+			requestUtils.deleteAllPages(),
 		] );
 	} );
 
@@ -53,10 +89,7 @@ test.describe( 'Block Style Variations', () => {
 		// Apply a block style to the parent Group block.
 		await editor.selectBlocks( firstGroup );
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Block Style Variation A' } )
-			.click();
+		await selectBlockStyleVariation( page, 'Block Style Variation A' );
 
 		// Check parent styles have variation A styles.
 		await expect( firstGroup ).toHaveCSS( 'border-style', 'dotted' );
@@ -70,10 +103,7 @@ test.describe( 'Block Style Variations', () => {
 
 		// Apply a block style to the nested child Group block.
 		await editor.selectBlocks( secondGroup );
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Block Style Variation B' } )
-			.click();
+		await selectBlockStyleVariation( page, 'Block Style Variation B' );
 
 		// Check nested child styles have variation B styles.
 		await expect( secondGroup ).toHaveCSS( 'border-style', 'dashed' );
@@ -85,10 +115,7 @@ test.describe( 'Block Style Variations', () => {
 
 		// Apply a block style to the nested grandchild Group block.
 		await editor.selectBlocks( thirdGroup );
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Block Style Variation A' } )
-			.click();
+		await selectBlockStyleVariation( page, 'Block Style Variation A' );
 
 		// Check that the child's inner block styles from variation B are overridden by the grandchild's block style variation A.
 		await expect( thirdGroup ).toHaveCSS( 'border-style', 'dotted' );
@@ -102,6 +129,12 @@ test.describe( 'Block Style Variations', () => {
 	} ) => {
 		await draftNewPage( page );
 		await addPageContent( editor, page );
+		// switch to template mode (access to global styles)
+		await page.evaluate( async () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'template-locked' );
+		}, [] );
 		const firstGroup = editor.canvas
 			.locator( '[data-type="core/group"]' )
 			.first();
@@ -115,17 +148,11 @@ test.describe( 'Block Style Variations', () => {
 		// Apply a block style to the parent Group block.
 		await editor.selectBlocks( firstGroup );
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Block Style Variation A' } )
-			.click();
+		await selectBlockStyleVariation( page, 'Block Style Variation A' );
 
 		// Apply a block style to the first, nested Group block.
 		await editor.selectBlocks( secondGroup );
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Block Style Variation B' } )
-			.click();
+		await selectBlockStyleVariation( page, 'Block Style Variation B' );
 
 		// Update user global styles with new block style variation values.
 		// First revision.

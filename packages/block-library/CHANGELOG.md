@@ -2,6 +2,97 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 10.1.0 (2026-07-01)
+
+## 10.0.0 (2026-06-24)
+
+### Breaking Changes
+
+-   Removed the `@wordpress/block-library/babel-plugin` export. It was an internal transform for stripping experimental blocks from WordPress core builds and is no longer used by Gutenberg's build process ([#79162](https://github.com/WordPress/gutenberg/pull/79162)).
+
+### New Features
+
+-   Gallery: add a dynamic mode that displays images resolved from a source (initially the images attached to the current post) instead of manually-added image blocks, with an editor preview, mode toggles, and server-side rendering. [#78796](https://github.com/WordPress/gutenberg/pull/78796).
+
+### Enhancements
+
+-   Image and Site Logo blocks: the Crop toolbar button now opens the Media Editor modal instead of an inline cropper. The previous inline experience is removed ([#78654](https://github.com/WordPress/gutenberg/pull/78654)).
+-   Search: Expose an HTML element selector in the Advanced inspector panel that can render the block in the semantic HTML `<search>` landmark element instead of `<form role="search">`. Defers to `add_theme_support( 'html5', array( 'search-element' ) )` when the per-block value is left at "Default".
+-   Icon Block: Insert with a default icon instead of an empty placeholder ([#79111](https://github.com/WordPress/gutenberg/pull/79111)).
+
+### Bug Fixes
+
+-   Image: external images inserted by URL are now sideloaded on the server when uploaded to the media library, so the upload works when the editor is cross-origin isolated ([#79409](https://github.com/WordPress/gutenberg/pull/79409)).
+
+## 9.48.1 (2026-06-16)
+
+## 9.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+-   Page List: derive `isNested` from a new `core/isInsideSubmenu` block context provided by Navigation Submenu, replacing the self-setting attribute pattern that was dirtying related entities ([#79015](https://github.com/WordPress/gutenberg/issues/79015)).
+
+## 9.47.0 (2026-05-27)
+
+### Internal
+
+-   Gallery editor: remove `Notice` positioning overrides that conflicted with the updated `Notice` layout ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+
+## 9.46.0 (2026-05-14)
+
+## 9.45.0 (2026-04-29)
+
+## 9.44.0 (2026-04-15)
+
+## 9.43.0 (2026-04-01)
+
+## 9.42.0 (2026-03-18)
+
+## 9.41.0 (2026-03-04)
+
+## 9.40.0 (2026-02-18)
+
+## 9.39.0 (2026-01-29)
+
+## 9.38.0 (2026-01-16)
+
+-   Post Date Block: Improve semantic HTML to add `<time>` inside link element.
+
+## 9.37.0 (2025-12-23)
+
+## 9.36.0 (2025-11-26)
+
+## 9.35.0 (2025-11-12)
+
+## 9.34.0 (2025-10-29)
+
+## 9.33.0 (2025-10-17)
+
+### Enhancements
+
+-   Enable the Query Loop "Force Page Reload" setting to be false when the Post Content block is used. ([#72160](https://github.com/WordPress/gutenberg/pull/72160))
+
+## 9.32.0 (2025-10-01)
+
+## 9.31.0 (2025-09-17)
+
+## 9.30.0 (2025-09-03)
+
+## 9.29.0 (2025-08-20)
+
+## 9.28.0 (2025-08-07)
+
+## 9.27.0 (2025-07-23)
+
+## 9.26.0 (2025-06-25)
+
+## 9.25.0 (2025-06-04)
+
 ## 9.24.0 (2025-05-22)
 
 ## 9.23.0 (2025-05-07)

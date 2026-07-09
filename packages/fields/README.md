@@ -36,8 +36,8 @@ A React component that renders a modal for creating a template part. The modal d
 
 _Parameters_
 
--   _props_ `Object`: The component props.
--   _props.modalTitle_ `{ modalTitle: string; } & CreateTemplatePartModalContentsProps[ 'modalTitle' ]`:
+-   _props_ `{ modalTitle?: string; } & CreateTemplatePartModalContentsProps`: The component props.
+-   _props.modalTitle_ `{ modalTitle?: string; } & CreateTemplatePartModalContentsProps[ 'modalTitle' ]`:
 
 ### dateField
 
@@ -46,6 +46,14 @@ Date field for BasePost.
 ### deletePost
 
 Delete action for Templates, Patterns and Template Parts.
+
+### descriptionField
+
+Description field for templates.
+
+### discussionField
+
+Discussion field for BasePost with custom render logic.
 
 ### duplicatePattern
 
@@ -59,13 +67,70 @@ Duplicate action for BasePost.
 
 Duplicate action for TemplatePart.
 
+### excerptField
+
+Excerpt field for BasePost.
+
 ### exportPattern
 
 Export action as JSON for Pattern.
 
 ### featuredImageField
 
-Featured Image field for BasePost.
+Featured Image field for BasePostWithEmbeddedFeaturedMedia.
+
+### formatField
+
+Format field for BasePost.
+
+### lastEditedDateField
+
+Last edited date field for BasePost.
+
+### MediaEdit
+
+A media edit control component that provides a media picker UI with upload functionality for selecting WordPress media attachments. Supports both the traditional WordPress media library and the experimental DataViews media modal.
+
+This component is intended to be used as the `Edit` property of a field definition when registering fields with `registerEntityField` from `@wordpress/editor`.
+
+_Usage_
+
+```tsx
+import { MediaEdit } from '@wordpress/fields';
+import type { DataFormControlProps } from '@wordpress/dataviews';
+
+const featuredImageField = {
+	id: 'featured_media',
+	type: 'media',
+	label: 'Featured Image',
+	Edit: ( props: DataFormControlProps< MyPostType > ) => (
+		<MediaEdit { ...props } allowedTypes={ [ 'image' ] } />
+	),
+};
+```
+
+_Parameters_
+
+-   _props_ `MediaEditProps<Item>`: - The component props.
+-   _props.data_ `Item`: - The item being edited.
+-   _props.field_ `Object`: - The field configuration with getValue and setValue methods.
+-   _props.onChange_ `Function`: - Callback function when the media selection changes.
+-   _props.allowedTypes_ `[string[]]`: - Array of allowed media types. Use `['*']` to allow all file types. Default `['image']`.
+-   _props.multiple_ `[boolean]`: - Whether to allow multiple media selections. Default `false`.
+-   _props.hideLabelFromVision_ `[boolean]`: - Whether the label should be hidden from vision.
+-   _props.isExpanded_ `[boolean]`: - Whether to render in an expanded form. Default `false`.
+
+_Returns_
+
+-   `React.JSX.Element`: The media edit control component.
+
+### MediaEditProps
+
+Undocumented declaration.
+
+### notesField
+
+Notes count field for post types that support editor.notes.
 
 ### orderField
 
@@ -83,6 +148,18 @@ Parent field for BasePost.
 
 Password field for BasePost.
 
+### Pattern
+
+Undocumented declaration.
+
+### patternDescriptionField
+
+Description field for patterns.
+
+### patternSyncStatusField
+
+Sync status field for patterns.
+
 ### patternTitleField
 
 Title for the pattern entity.
@@ -91,9 +168,33 @@ Title for the pattern entity.
 
 Delete action for PostWithPermissions.
 
+### pingStatusField
+
+Ping status field for BasePost.
+
+### postContentInfoField
+
+Post content information field for BasePost.
+
+### postsPageTitleField
+
+Title field for the posts page (the `page` assigned as `page_for_posts`).
+
+### postsPerPageField
+
+Posts per page field for the `root/site` entity.
+
 ### PostType
 
 Undocumented declaration.
+
+### readOnlyDescriptionField
+
+Read-only description field for theme-provided templates, which can't be edited. Shares the display config with `descriptionField` but renders as read-only and is only visible when a description exists.
+
+_Type_
+
+-   `Field< Template >`
 
 ### renamePost
 
@@ -111,6 +212,14 @@ Reset action for Template and TemplatePart.
 
 Restore action for PostWithPermissions.
 
+### scheduledDateField
+
+ScheduledDate Field.
+
+### siteDiscussionField
+
+Discussion field for the `root/site` entity.
+
 ### slugField
 
 Slug field for BasePost.
@@ -119,9 +228,29 @@ Slug field for BasePost.
 
 Status field for BasePost.
 
+### stickyField
+
+Sticky field for BasePost.
+
+### templateAuthorField
+
+Author field for templates.
+
+_Type_
+
+-   `Field< Template >`
+
 ### templateField
 
 Template field for BasePost.
+
+### templatePartAuthorField
+
+Author field for template parts.
+
+_Type_
+
+-   `Field< TemplatePart >`
 
 ### templateTitleField
 

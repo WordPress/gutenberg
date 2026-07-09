@@ -1,3 +1,10 @@
+@use "sass:math";
+@use "@wordpress/base-styles/animations" as *;
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-iframe__body {
 	position: relative;
 }
@@ -11,8 +18,8 @@
 	}
 
 	&.zoom-out-animation {
-		$scroll-top: var(--wp-block-editor-iframe-zoom-out-scroll-top, 0);
-		$scroll-top-next: var(--wp-block-editor-iframe-zoom-out-scroll-top-next, 0);
+		$scroll-top: var(--wp-block-editor-iframe-zoom-out-scroll-top, 0px);
+		$scroll-top-next: var(--wp-block-editor-iframe-zoom-out-scroll-top-next, 0px);
 		$overflow-behavior: var(--wp-block-editor-iframe-zoom-out-overflow-behavior, scroll);
 
 		position: fixed;
@@ -27,7 +34,7 @@
 
 	&.is-zoomed-out {
 		$scale: var(--wp-block-editor-iframe-zoom-out-scale, 1);
-		$frame-size: var(--wp-block-editor-iframe-zoom-out-frame-size, 0);
+		$frame-size: var(--wp-block-editor-iframe-zoom-out-frame-size, 0px);
 		$inner-height: var(--wp-block-editor-iframe-zoom-out-inner-height);
 		$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
 		$scale-container-width: var(--wp-block-editor-iframe-zoom-out-scale-container-width);
@@ -35,7 +42,7 @@
 		// Apply an X translation to center the scaled content within the available space.
 		transform: translateX(calc((#{$scale-container-width} - #{$container-width}) / 2 / #{$scale}));
 		scale: $scale;
-		background-color: $gray-300;
+		background-color: var(--wp-editor-canvas-background);
 
 		// Chrome seems to respect that transform scale shouldn't affect the layout size of the element,
 		// so we need to adjust the height of the content to match the scale by using negative margins.

@@ -3,7 +3,7 @@
 /**
  * Test the elements block support.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
@@ -89,6 +89,56 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a non-string `className` attribute does not cause a fatal
+	 * error and the block content is returned unmodified.
+	 *
+	 * Block attributes such as `className` are always expected to be strings,
+	 * however invalid stored data can result in other types being present. The
+	 * render filter should fail gracefully rather than passing an array to
+	 * `preg_match()`.
+	 *
+	 * @covers ::gutenberg_render_elements_class_name
+	 */
+	public function test_elements_block_support_class_with_non_string_class_name() {
+		$block = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'className' => array( '0', '1' ),
+			),
+		);
+
+		$block_content = "<p class=\"0 1\">Test</p>\n";
+
+		$this->assertSame(
+			$block_content,
+			gutenberg_render_elements_class_name( $block_content, $block ),
+			'Block content should be returned unchanged when className is not a string'
+		);
+	}
+
+	/**
+	 * Tests that a 'my-wp-elements-*' class name is skipped from processing.
+	 *
+	 * @covers ::gutenberg_render_elements_class_name
+	 */
+	public function test_elements_block_support_class_with_invalid_elements_prefix() {
+		$block = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'className' => 'my-wp-elements-foo',
+			),
+		);
+
+		$block_content = "<p>Test</p>\n";
+
+		$this->assertSame(
+			$block_content,
+			gutenberg_render_elements_class_name( $block_content, $block ),
+			'Block content should be returned unchanged when className lacks a class with the expected prefix'
+		);
+	}
+
+	/**
 	 * Data provider.
 	 *
 	 * @return array
@@ -99,6 +149,9 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 			'background' => '#fff',
 		);
 
+		// The `wp-elements-*` class suffix is an md5 hash on older WordPress and a
+		// sequential id (via `wp_unique_prefixed_id()`) on newer cores, so the
+		// patterns below accept either form to stay green across supported versions.
 		return array(
 			'button element styles with serialization skipped' => array(
 				'color_settings'  => array(
@@ -139,7 +192,7 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 					'button' => array( 'color' => $color_styles ),
 				),
 				'block_markup'    => '<p>Hello <a href="http://www.wordpress.org/">WordPress</a>!</p>',
-				'expected_markup' => '/^<p class="wp-elements-[a-f0-9]{32}">Hello <a href="http:\/\/www.wordpress.org\/">WordPress<\/a>!<\/p>$/',
+				'expected_markup' => '/^<p class="wp-elements-(?:[a-f0-9]{32}|[0-9]+)">Hello <a href="http:\/\/www.wordpress.org\/">WordPress<\/a>!<\/p>$/',
 			),
 			'link element styles apply class to wrapper'   => array(
 				'color_settings'  => array( 'link' => true ),
@@ -147,7 +200,7 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 					'link' => array( 'color' => $color_styles ),
 				),
 				'block_markup'    => '<p>Hello <a href="http://www.wordpress.org/">WordPress</a>!</p>',
-				'expected_markup' => '/^<p class="wp-elements-[a-f0-9]{32}">Hello <a href="http:\/\/www.wordpress.org\/">WordPress<\/a>!<\/p>$/',
+				'expected_markup' => '/^<p class="wp-elements-(?:[a-f0-9]{32}|[0-9]+)">Hello <a href="http:\/\/www.wordpress.org\/">WordPress<\/a>!<\/p>$/',
 			),
 			'heading element styles apply class to wrapper' => array(
 				'color_settings'  => array( 'heading' => true ),
@@ -155,7 +208,7 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 					'heading' => array( 'color' => $color_styles ),
 				),
 				'block_markup'    => '<p>Hello <a href="http://www.wordpress.org/">WordPress</a>!</p>',
-				'expected_markup' => '/^<p class="wp-elements-[a-f0-9]{32}">Hello <a href="http:\/\/www.wordpress.org\/">WordPress<\/a>!<\/p>$/',
+				'expected_markup' => '/^<p class="wp-elements-(?:[a-f0-9]{32}|[0-9]+)">Hello <a href="http:\/\/www.wordpress.org\/">WordPress<\/a>!<\/p>$/',
 			),
 			'element styles apply class to wrapper when it has other classes' => array(
 				'color_settings'  => array( 'link' => true ),
@@ -163,7 +216,7 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 					'link' => array( 'color' => $color_styles ),
 				),
 				'block_markup'    => '<p class="has-dark-gray-background-color has-background">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p>',
-				'expected_markup' => '/^<p class="has-dark-gray-background-color has-background wp-elements-[a-f0-9]{32}">Hello <a href="http:\/\/www.wordpress.org\/">WordPress<\/a>!<\/p>$/',
+				'expected_markup' => '/^<p class="has-dark-gray-background-color has-background wp-elements-(?:[a-f0-9]{32}|[0-9]+)">Hello <a href="http:\/\/www.wordpress.org\/">WordPress<\/a>!<\/p>$/',
 			),
 			'element styles apply class to wrapper when it has other attributes' => array(
 				'color_settings'  => array( 'link' => true ),
@@ -171,7 +224,7 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 					'link' => array( 'color' => $color_styles ),
 				),
 				'block_markup'    => '<p id="anchor">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p>',
-				'expected_markup' => '/^<p class="wp-elements-[a-f0-9]{32}" id="anchor">Hello <a href="http:\/\/www.wordpress.org\/">WordPress<\/a>!<\/p>$/',
+				'expected_markup' => '/^<p class="wp-elements-(?:[a-f0-9]{32}|[0-9]+)" id="anchor">Hello <a href="http:\/\/www.wordpress.org\/">WordPress<\/a>!<\/p>$/',
 			),
 		);
 	}
@@ -221,6 +274,9 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 		);
 		$color_css_rules = preg_quote( '{color:var(--wp--preset--color--vivid-red);background-color:#fff;}' );
 
+		// The `wp-elements-*` class suffix is an md5 hash on older WordPress and a
+		// sequential id (via `wp_unique_prefixed_id()`) on newer cores, so the
+		// patterns below accept either form to stay green across supported versions.
 		return array(
 			'button element styles are not applied if serialization is skipped' => array(
 				'color_settings'  => array(
@@ -268,7 +324,22 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 				'elements_styles' => array(
 					'button' => array( 'color' => $color_styles ),
 				),
-				'expected_styles' => '/^.wp-elements-[a-f0-9]{32} .wp-element-button, .wp-elements-[a-f0-9]{32} .wp-block-button__link' . $color_css_rules . '$/',
+				'expected_styles' => '/^.wp-elements-(?:[a-f0-9]{32}|[0-9]+) .wp-element-button, .wp-elements-(?:[a-f0-9]{32}|[0-9]+) .wp-block-button__link' . $color_css_rules . '$/',
+			),
+			'button hover styles are skipped without a hover selector' => array(
+				'color_settings'  => array( 'button' => true ),
+				'elements_styles' => array(
+					'button' => array(
+						'color'  => $color_styles,
+						':hover' => array( 'color' => $color_styles ),
+					),
+				),
+				/*
+				 * Only the base button rule should be emitted. The button element
+				 * type has no `hover_selector`, so the `:hover` object must be
+				 * ignored rather than triggering an undefined array key warning.
+				 */
+				'expected_styles' => '/^.wp-elements-(?:[a-f0-9]{32}|[0-9]+) .wp-element-button, .wp-elements-(?:[a-f0-9]{32}|[0-9]+) .wp-block-button__link' . $color_css_rules . '$/',
 			),
 			'link element styles are applied'            => array(
 				'color_settings'  => array( 'link' => true ),
@@ -280,15 +351,15 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_styles' => '/^.wp-elements-[a-f0-9]{32} a:where\(:not\(.wp-element-button\)\)' . $color_css_rules .
-					'.wp-elements-[a-f0-9]{32} a:where\(:not\(.wp-element-button\)\):hover' . $color_css_rules . '$/',
+				'expected_styles' => '/^.wp-elements-(?:[a-f0-9]{32}|[0-9]+) a:where\(:not\(.wp-element-button\)\)' . $color_css_rules .
+					'.wp-elements-(?:[a-f0-9]{32}|[0-9]+) a:where\(:not\(.wp-element-button\)\):hover' . $color_css_rules . '$/',
 			),
 			'generic heading element styles are applied' => array(
 				'color_settings'  => array( 'heading' => true ),
 				'elements_styles' => array(
 					'heading' => array( 'color' => $color_styles ),
 				),
-				'expected_styles' => '/^.wp-elements-[a-f0-9]{32} h1, .wp-elements-[a-f0-9]{32} h2, .wp-elements-[a-f0-9]{32} h3, .wp-elements-[a-f0-9]{32} h4, .wp-elements-[a-f0-9]{32} h5, .wp-elements-[a-f0-9]{32} h6' . $color_css_rules . '$/',
+				'expected_styles' => '/^.wp-elements-(?:[a-f0-9]{32}|[0-9]+) h1, .wp-elements-(?:[a-f0-9]{32}|[0-9]+) h2, .wp-elements-(?:[a-f0-9]{32}|[0-9]+) h3, .wp-elements-(?:[a-f0-9]{32}|[0-9]+) h4, .wp-elements-(?:[a-f0-9]{32}|[0-9]+) h5, .wp-elements-(?:[a-f0-9]{32}|[0-9]+) h6' . $color_css_rules . '$/',
 			),
 			'individual heading element styles are applied' => array(
 				'color_settings'  => array( 'heading' => true ),
@@ -300,12 +371,12 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 					'h5' => array( 'color' => $color_styles ),
 					'h6' => array( 'color' => $color_styles ),
 				),
-				'expected_styles' => '/^.wp-elements-[a-f0-9]{32} h1' . $color_css_rules .
-					'.wp-elements-[a-f0-9]{32} h2' . $color_css_rules .
-					'.wp-elements-[a-f0-9]{32} h3' . $color_css_rules .
-					'.wp-elements-[a-f0-9]{32} h4' . $color_css_rules .
-					'.wp-elements-[a-f0-9]{32} h5' . $color_css_rules .
-					'.wp-elements-[a-f0-9]{32} h6' . $color_css_rules . '$/',
+				'expected_styles' => '/^.wp-elements-(?:[a-f0-9]{32}|[0-9]+) h1' . $color_css_rules .
+					'.wp-elements-(?:[a-f0-9]{32}|[0-9]+) h2' . $color_css_rules .
+					'.wp-elements-(?:[a-f0-9]{32}|[0-9]+) h3' . $color_css_rules .
+					'.wp-elements-(?:[a-f0-9]{32}|[0-9]+) h4' . $color_css_rules .
+					'.wp-elements-(?:[a-f0-9]{32}|[0-9]+) h5' . $color_css_rules .
+					'.wp-elements-(?:[a-f0-9]{32}|[0-9]+) h6' . $color_css_rules . '$/',
 			),
 		);
 	}

@@ -39,7 +39,6 @@ const UnconnectedBorderControl = (
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
-		__next40pxDefaultSize = false,
 		colors,
 		disableCustomColors,
 		disableUnits,
@@ -57,7 +56,6 @@ const UnconnectedBorderControl = (
 		__unstablePopoverProps,
 		previousStyleSelection,
 		showDropdownHeader,
-		size,
 		sliderClassName,
 		value: border,
 		widthUnit,
@@ -75,8 +73,6 @@ const UnconnectedBorderControl = (
 			/>
 			<HStack spacing={ 4 } className={ innerWrapperClassName }>
 				<UnitControl
-					__next40pxDefaultSize={ __next40pxDefaultSize }
-					__shouldNotWarnDeprecated36pxSize
 					prefix={
 						<Spacer marginRight={ 1 } marginBottom={ 0 }>
 							<BorderControlDropdown
@@ -96,7 +92,6 @@ const UnconnectedBorderControl = (
 								__experimentalIsRenderedInSidebar={
 									__experimentalIsRenderedInSidebar
 								}
-								size={ size }
 							/>
 						</Spacer>
 					}
@@ -108,11 +103,9 @@ const UnconnectedBorderControl = (
 					placeholder={ placeholder }
 					disableUnits={ disableUnits }
 					__unstableInputWidth={ inputWidth }
-					size={ size }
 				/>
 				{ withSlider && (
 					<RangeControl
-						__nextHasNoMarginBottom
 						label={ __( 'Border width' ) }
 						hideLabelFromVision
 						className={ sliderClassName }
@@ -123,8 +116,6 @@ const UnconnectedBorderControl = (
 						step={ [ 'px', '%' ].includes( widthUnit ) ? 1 : 0.1 }
 						value={ widthValue || undefined }
 						withInputField={ false }
-						__next40pxDefaultSize={ __next40pxDefaultSize }
-						__shouldNotWarnDeprecated36pxSize
 					/>
 				) }
 			</HStack>
@@ -157,7 +148,6 @@ const UnconnectedBorderControl = (
  *
  * 	return (
  * 		<BorderControl
- * 			__next40pxDefaultSize
  * 			colors={ colors }
  * 			label={ __( 'Border' ) }
  * 			onChange={ onChange }

@@ -58,13 +58,7 @@ const getOptionSearchString = ( option: ComboboxControlOption ) =>
 	option.label.substring( 0, 11 );
 
 const ComboboxControl = ( props: ComboboxControlProps ) => {
-	return (
-		<_ComboboxControl
-			{ ...props }
-			__next40pxDefaultSize
-			__nextHasNoMarginBottom
-		/>
-	);
+	return <_ComboboxControl { ...props } />;
 };
 
 const ControlledComboboxControl = ( {
@@ -98,8 +92,8 @@ describe.each( [
 		render(
 			<Component options={ timezones } label={ defaultLabelText } />
 		);
-		const label = getLabel( defaultLabelText );
-		expect( label ).toBeVisible();
+		expect( getLabel( defaultLabelText ) ).toBeVisible();
+		expect( getInput( defaultLabelText ) ).toBeVisible();
 	} );
 
 	it( 'should render with hidden label', () => {
@@ -110,13 +104,7 @@ describe.each( [
 				hideLabelFromVision
 			/>
 		);
-		const label = getLabel( defaultLabelText );
-
-		expect( label ).toBeInTheDocument();
-		expect( label ).toHaveAttribute(
-			'data-wp-component',
-			'VisuallyHidden'
-		);
+		expect( getInput( defaultLabelText ) ).toBeVisible();
 	} );
 
 	it( 'should render with the correct options', async () => {
@@ -356,7 +344,7 @@ describe.each( [
 		expect( input ).toHaveValue( targetOption.label );
 	} );
 
-	it( 'should render with Reset button disabled', () => {
+	it( 'should not render Reset button when no value is set', () => {
 		render(
 			<Component
 				options={ timezones }
@@ -365,10 +353,23 @@ describe.each( [
 			/>
 		);
 
-		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+		const resetButton = screen.queryByRole( 'button', { name: 'Reset' } );
 
-		expect( resetButton ).toBeVisible();
-		expect( resetButton ).toBeDisabled();
+		expect( resetButton ).not.toBeInTheDocument();
+	} );
+
+	it( 'should not render Reset button when allowReset is false', () => {
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				allowReset={ false }
+			/>
+		);
+
+		const resetButton = screen.queryByRole( 'button', { name: 'Reset' } );
+
+		expect( resetButton ).not.toBeInTheDocument();
 	} );
 
 	it( 'should reset input when clicking the Reset button', async () => {
@@ -400,8 +401,8 @@ describe.each( [
 
 		await user.click( resetButton );
 
+		expect( resetButton ).not.toBeInTheDocument();
 		expect( input ).toHaveValue( '' );
-		expect( resetButton ).toBeDisabled();
 		expect( input ).toHaveFocus();
 	} );
 
@@ -439,9 +440,22 @@ describe.each( [
 		// Pressing Enter/Return resets the input.
 		await user.keyboard( '{Enter}' );
 
+		expect( resetButton ).not.toBeInTheDocument();
 		expect( input ).toHaveValue( '' );
-		expect( resetButton ).toBeDisabled();
 		expect( input ).toHaveFocus();
+	} );
+
+	it( 'should associate the `help` text with the combobox accessibly', () => {
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				help="Help text"
+			/>
+		);
+		expect( getInput( defaultLabelText ) ).toHaveAccessibleDescription(
+			'Help text'
+		);
 	} );
 
 	it( 'should reset input when pressing the Reset button with the Spacebar key', async () => {
@@ -478,8 +492,8 @@ describe.each( [
 		// Pressing Spacebar resets the input.
 		await user.keyboard( '[Space]' );
 
+		expect( resetButton ).not.toBeInTheDocument();
 		expect( input ).toHaveValue( '' );
-		expect( resetButton ).toBeDisabled();
 		expect( input ).toHaveFocus();
 	} );
 } );

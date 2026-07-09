@@ -10,13 +10,12 @@ import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
-import { BlockIcon } from '@wordpress/block-editor';
+import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
 import { chevronLeftSmall, chevronRightSmall, layout } from '@wordpress/icons';
-import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
 import { useRef, useEffect } from '@wordpress/element';
@@ -31,10 +30,13 @@ import { TEMPLATE_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import usePageTypeBadge from '../../utils/pageTypeBadge';
 import { getTemplateInfo } from '../../utils/get-template-info';
+import { getStylesCanvasTitle } from '../styles-canvas';
+import { unlock } from '../../lock-unlock';
+import useEditedSectionDetails from './useEditedSectionDetails';
 
 /** @typedef {import("@wordpress/components").IconType} IconType */
 
-const MotionButton = motion( Button );
+const MotionButton = motion.create( Button );
 
 /**
  * This component renders a navigation bar at the top of the editor. It displays the title of the current document,
@@ -45,15 +47,23 @@ const MotionButton = motion( Button );
  * ```jsx
  * <DocumentBar />
  * ```
+ *
  * @param {Object}   props       The component props.
- * @param {string}   props.title A title for the document, defaulting to the document or
- *                               template title currently being edited.
+ * @param {string}   props.title A title for the document, defaulting to the document or template title currently being edited.
  * @param {IconType} props.icon  An icon for the document, no default.
  *                               (A default icon indicating the document post type is no longer used.)
  *
  * @return {React.ReactNode} The rendered DocumentBar component.
  */
 export default function DocumentBar( props ) {
+	// Get action to lock the pattern design
+	const { stopEditingContentOnlySection } = unlock(
+		useDispatch( blockEditorStore )
+	);
+
+	// Get details about the currently edited content-only section
+	const unlockedPatternInfo = useEditedSectionDetails();
+
 	const {
 		postId,
 		postType,
@@ -63,6 +73,7 @@ export default function DocumentBar( props ) {
 		templateTitle,
 		onNavigateToPreviousEntityRecord,
 		isTemplatePreview,
+		stylesCanvasTitle,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostType,
@@ -94,6 +105,17 @@ export default function DocumentBar( props ) {
 		} );
 		const _postTypeLabel = getPostType( _postType )?.labels?.singular_name;
 
+		// Check if styles canvas is active and get its title
+		const { getStylesPath, getShowStylebook } = unlock(
+			select( editorStore )
+		);
+		const _stylesPath = getStylesPath();
+		const _showStylebook = getShowStylebook();
+		const _stylesCanvasTitle = getStylesCanvasTitle(
+			_stylesPath,
+			_showStylebook
+		);
+
 		return {
 			postId: _postId,
 			postType: _postType,
@@ -111,6 +133,7 @@ export default function DocumentBar( props ) {
 			onNavigateToPreviousEntityRecord:
 				getEditorSettings().onNavigateToPreviousEntityRecord,
 			isTemplatePreview: getRenderingMode() === 'template-locked',
+			stylesCanvasTitle: _stylesCanvasTitle,
 		};
 	}, [] );
 
@@ -118,10 +141,27 @@ export default function DocumentBar( props ) {
 	const isReducedMotion = useReducedMotion();
 
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
-	const hasBackButton = !! onNavigateToPreviousEntityRecord;
+	const hasBackButton =
+		!! onNavigateToPreviousEntityRecord || !! unlockedPatternInfo;
 	const entityTitle = isTemplate ? templateTitle : documentTitle;
-	const title = props.title || entityTitle;
+
+	// Use pattern info if a pattern block is unlocked, otherwise use document/entity info
+	const title =
+		unlockedPatternInfo?.patternTitle ||
+		props.title ||
+		stylesCanvasTitle ||
+		entityTitle;
 	const icon = props.icon;
+
+	// Determine the back button action
+	const handleBackClick = ( event ) => {
+		event.stopPropagation();
+		if ( unlockedPatternInfo ) {
+			stopEditingContentOnlySection();
+		} else if ( onNavigateToPreviousEntityRecord ) {
+			onNavigateToPreviousEntityRecord();
+		}
+	};
 
 	const pageTypeBadge = usePageTypeBadge( postId );
 
@@ -141,10 +181,7 @@ export default function DocumentBar( props ) {
 					<MotionButton
 						className="editor-document-bar__back"
 						icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
-						onClick={ ( event ) => {
-							event.stopPropagation();
-							onNavigateToPreviousEntityRecord();
-						} }
+						onClick={ handleBackClick }
 						size="compact"
 						initial={
 							mountedRef.current
@@ -161,14 +198,14 @@ export default function DocumentBar( props ) {
 					</MotionButton>
 				) }
 			</AnimatePresence>
-			{ ! isTemplate && isTemplatePreview && (
+			{ ! isTemplate && isTemplatePreview && ! hasBackButton && (
 				<BlockIcon
 					icon={ layout }
 					className="editor-document-bar__icon-layout"
 				/>
 			) }
 			{ isNotFound ? (
-				<Text>{ __( 'Document not found' ) }</Text>
+				<WCText>{ __( 'Document not found' ) }</WCText>
 			) : (
 				<Button
 					className="editor-document-bar__command"
@@ -198,18 +235,27 @@ export default function DocumentBar( props ) {
 						}
 					>
 						{ icon && <BlockIcon icon={ icon } /> }
-						<Text size="body" as="h1">
+						<WCText size="body" as="h1">
 							<span className="editor-document-bar__post-title">
 								{ title
 									? stripHTML( title )
 									: __( 'No title' ) }
 							</span>
-							{ pageTypeBadge && (
+							{ unlockedPatternInfo && (
+								<span className="editor-document-bar__post-type-label">
+									{ unlockedPatternInfo.type ===
+									'template-part'
+										? `· ${ __( 'Template Part' ) }`
+										: `· ${ __( 'Pattern' ) }` }
+								</span>
+							) }
+							{ ! unlockedPatternInfo && pageTypeBadge && (
 								<span className="editor-document-bar__post-type-label">
 									{ `· ${ pageTypeBadge }` }
 								</span>
 							) }
-							{ postTypeLabel &&
+							{ ! unlockedPatternInfo &&
+								postTypeLabel &&
 								! props.title &&
 								! pageTypeBadge && (
 									<span className="editor-document-bar__post-type-label">
@@ -218,11 +264,8 @@ export default function DocumentBar( props ) {
 										) }` }
 									</span>
 								) }
-						</Text>
+						</WCText>
 					</motion.div>
-					<span className="editor-document-bar__shortcut">
-						{ displayShortcut.primary( 'k' ) }
-					</span>
 				</Button>
 			) }
 		</div>

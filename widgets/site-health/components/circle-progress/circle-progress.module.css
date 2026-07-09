@@ -1,0 +1,41 @@
+.root {
+	flex-shrink: 0;
+	/* TODO: Replace with a --wpds-dimension-size-* token if 64px is added to the WPDS element size scale. */
+	width: 64px;
+	height: 64px;
+}
+
+.root.success {
+	--site-health-stroke: var(--wpds-color-stroke-surface-success);
+	--site-health-fg: var(--wpds-color-foreground-content-success);
+}
+
+.root.warning {
+	--site-health-stroke: var(--wpds-color-stroke-surface-warning);
+	--site-health-fg: var(--wpds-color-foreground-content-warning);
+}
+
+.root.error {
+	--site-health-stroke: var(--wpds-color-stroke-surface-error);
+	--site-health-fg: var(--wpds-color-foreground-content-error);
+}
+
+.root circle:first-child {
+	stroke: var(--wpds-color-background-track-neutral);
+	stroke-width: 12;
+}
+
+.root circle:last-of-type {
+	stroke: var(--site-health-stroke);
+	stroke-width: 12;
+	stroke-linecap: round;
+	transform: rotate(-90deg);
+	transform-origin: 50% 50%;
+	transition: stroke-dashoffset 0.5s ease;
+}
+
+.percentage {
+	fill: var(--site-health-fg);
+	font-size: 36px;
+	font-weight: var(--wpds-typography-font-weight-medium);
+}

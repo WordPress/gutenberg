@@ -42,6 +42,39 @@ onKeyDown( event ) {
 
 Keycode for ALT key.
 
+### ariaKeyShortcut
+
+An object that contains functions to get shortcuts in a format compatible with the [`aria-keyshortcuts` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts).
+
+**Note**: The provided shortcut character strings (ie. not the modifiers) should follow the values specified in the [UI Events KeyboardEvent key Values spec](https://www.w3.org/TR/uievents-key/) — for example, "Enter", "Tab", "ArrowRight", "PageDown", "Escape", "Plus", or "F1". The spacebar key should be represented with the "Space" string (an exception to the UI Events KeyboardEvent key Values spec).
+
+_Related_
+
+-   <https://www.w3.org/TR/wai-aria-1.2/#aria-keyshortcuts>
+-   <https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts>
+-   <https://www.w3.org/TR/uievents-key/>
+
+_Usage_
+
+```js
+// Assuming macOS:
+ariaKeyShortcut.primary( 'm' );
+// "Meta+M"
+
+ariaKeyShortcut.primaryAlt( 'm' );
+// "Meta+Alt+M"
+
+// Assuming Windows:
+ariaKeyShortcut.primary( 'm' );
+// "Control+M"
+
+ariaKeyShortcut.primaryAlt( 'm' );
+// "Control+Alt+M"
+
+ariaKeyShortcut.primaryShift( 'del' );
+// "Control+Shift+Delete"
+```
+
 ### BACKSPACE
 
 Keycode for BACKSPACE key.
@@ -70,9 +103,7 @@ displayShortcut.primary( 'm' );
 // "⌘M"
 ```
 
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to display shortcuts.
+Keyed map of functions to display shortcuts.
 
 ### displayShortcutList
 
@@ -86,9 +117,7 @@ displayShortcutList.primary( 'm' );
 // [ "⌘", "M" ]
 ```
 
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string[]>>`Keyed map of functions to shortcut sequences.
+Keyed map of functions to shortcut sequences.
 
 ### DOWN
 
@@ -120,7 +149,7 @@ Return true if platform is MacOS.
 
 _Parameters_
 
--   _\_window_ `Window?`: window object by default; used for DI testing.
+-   _\_window_ `Window`: window object by default; used for DI testing.
 
 _Returns_
 
@@ -138,9 +167,7 @@ isKeyboardEvent.primary( event, 'm' );
 // true
 ```
 
-_Type_
-
--   `WPModifierHandler<WPEventKeyHandler>`Keyed map of functions to match events.
+Keyed map of functions to match events.
 
 ### LEFT
 
@@ -152,7 +179,7 @@ Object that contains functions that return the available modifier depending on p
 
 _Type_
 
--   `WPModifierHandler< ( isApple: () => boolean ) => WPModifierPart[]>`
+-   `WPModifierHandler< WPModifier >`
 
 ### PAGEDOWN
 
@@ -166,19 +193,15 @@ Keycode for PAGEUP key.
 
 An object that contains functions to get raw shortcuts.
 
-These are intended for user with the KeyboardShortcuts.
+These are intended for use with the KeyboardShortcuts.
 
 _Usage_
 
 ```js
 // Assuming macOS:
 rawShortcut.primary( 'm' );
-// "meta+m""
+// "meta+m"
 ```
-
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to raw shortcuts.
 
 ### RIGHT
 
@@ -200,9 +223,7 @@ shortcutAriaLabel.primary( '.' );
 // "Command + Period"
 ```
 
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to shortcut ARIA labels.
+Keyed map of functions to shortcut ARIA labels.
 
 ### SPACE
 

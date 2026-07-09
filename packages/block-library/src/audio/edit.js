@@ -8,7 +8,6 @@ import clsx from 'clsx';
  */
 import { isBlobURL } from '@wordpress/blob';
 import {
-	Disabled,
 	SelectControl,
 	Spinner,
 	ToggleControl,
@@ -22,6 +21,7 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	useBlockProps,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
@@ -51,6 +51,8 @@ function AudioEdit( {
 } ) {
 	const { id, autoplay, loop, preload, src } = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+	const blockEditingMode = useBlockEditingMode();
+	const hasNonContentControls = blockEditingMode === 'default';
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -161,6 +163,7 @@ function AudioEdit( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 						onReset={ () => onSelectAudio( undefined ) }
+						variant="toolbar"
 					/>
 				</BlockControls>
 			) }
@@ -187,7 +190,6 @@ function AudioEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Autoplay' ) }
 							onChange={ toggleAttribute( 'autoplay' ) }
 							checked={ !! autoplay }
@@ -205,7 +207,6 @@ function AudioEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Loop' ) }
 							onChange={ toggleAttribute( 'loop' ) }
 							checked={ !! loop }
@@ -222,8 +223,6 @@ function AudioEdit( {
 						}
 					>
 						<SelectControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ _x(
 								'Preload',
 								'noun; Audio block parameter'
@@ -249,14 +248,11 @@ function AudioEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
-				{ /*
-				Disable the audio tag if the block is not selected
-				so the user clicking on it won't play the
-				file or change the position slider when the controls are enabled.
-				*/ }
-				<Disabled isDisabled={ ! isSingleSelected }>
-					<audio controls="controls" src={ src ?? temporaryURL } />
-				</Disabled>
+				<audio
+					controls="controls"
+					inert={ ! isSingleSelected ? 'true' : undefined }
+					src={ src ?? temporaryURL }
+				/>
 				{ !! temporaryURL && <Spinner /> }
 				<Caption
 					attributes={ attributes }
@@ -264,7 +260,9 @@ function AudioEdit( {
 					isSelected={ isSingleSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Audio caption text' ) }
-					showToolbarButton={ isSingleSelected }
+					showToolbarButton={
+						isSingleSelected && hasNonContentControls
+					}
 				/>
 			</figure>
 		</>

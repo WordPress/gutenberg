@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useEffect, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,7 +35,13 @@ function MediaTab( {
 			if ( ! media?.url ) {
 				return;
 			}
-			const [ block ] = getBlockAndPreviewFromMedia( media, media.type );
+			// When the experimental DataViews media modal is enabled,
+			// we need to extract the media type from mime_type (e.g., 'image/jpeg' -> 'image')
+			const mediaType =
+				window.__experimentalDataViewsMediaModal && media.mime_type
+					? media.mime_type.split( '/' )[ 0 ]
+					: media.type;
+			const [ block ] = getBlockAndPreviewFromMedia( media, mediaType );
 			onInsert( block );
 		},
 		[ onInsert ]
@@ -48,6 +54,21 @@ function MediaTab( {
 			} ) ),
 		[ mediaCategories ]
 	);
+	useEffect( () => {
+		if ( ! selectedCategory ) {
+			return;
+		}
+
+		const latestCategory = categories.find(
+			( category ) => category.name === selectedCategory.name
+		);
+
+		if ( latestCategory && latestCategory !== selectedCategory ) {
+			onSelectCategory( latestCategory );
+		} else if ( ! latestCategory ) {
+			onSelectCategory( null );
+		}
+	}, [ categories, onSelectCategory, selectedCategory ] );
 
 	if ( ! categories.length ) {
 		return <InserterNoResults />;
@@ -94,7 +115,10 @@ function MediaTab( {
 				</div>
 			) }
 			{ isMobile && (
-				<MobileTabNavigation categories={ categories }>
+				<MobileTabNavigation
+					categories={ categories }
+					screenClassName="block-editor-inserter__media-mobile-screen"
+				>
 					{ ( category ) => (
 						<MediaCategoryPanel
 							onInsert={ onInsert }

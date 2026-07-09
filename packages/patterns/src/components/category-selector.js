@@ -60,8 +60,6 @@ export default function CategorySelector( {
 			label={ __( 'Categories' ) }
 			tokenizeOnBlur
 			__experimentalExpandOnFocus
-			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 		/>
 	);
 }

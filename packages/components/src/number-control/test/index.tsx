@@ -17,7 +17,7 @@ import type { NumberControlProps } from '../types';
 
 const NumberControl = (
 	props: React.ComponentProps< typeof _NumberControl >
-) => <_NumberControl __next40pxDefaultSize { ...props } />;
+) => <_NumberControl { ...props } />;
 
 function StatefulNumberControl( props: NumberControlProps ) {
 	const [ value, setValue ] = useState( props.value );
@@ -47,7 +47,7 @@ describe( 'NumberControl', () => {
 			);
 
 			expect(
-				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				// eslint-disable-next-line testing-library/no-node-access
 				withoutClassName.querySelector( '.components-number-control' )
 			).not.toHaveClass( 'hello' );
 

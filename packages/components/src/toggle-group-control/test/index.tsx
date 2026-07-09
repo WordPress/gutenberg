@@ -15,7 +15,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
  */
 import Button from '../../button';
 import {
-	ToggleGroupControl as _ToggleGroupControl,
+	ToggleGroupControl,
 	ToggleGroupControlOption,
 	ToggleGroupControlOptionIcon,
 } from '../index';
@@ -27,15 +27,10 @@ const hoverOutside = async () => {
 	await hover( document.body, { clientX: 10, clientY: 10 } );
 };
 
-const ToggleGroupControl = ( props: ToggleGroupControlProps ) => {
-	return (
-		<_ToggleGroupControl
-			{ ...props }
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
-		/>
+const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
+	Array.from( element.classList ).filter( ( className ) =>
+		/^(css|emotion)-/.test( className )
 	);
-};
 
 const ControlledToggleGroupControl = ( {
 	value: valueProp,
@@ -359,6 +354,60 @@ describe.each( [
 		);
 	}
 
+	it( 'should render the label', () => {
+		render(
+			<Component label="Test Toggle Group Control">{ options }</Component>
+		);
+
+		expect( screen.getByText( 'Test Toggle Group Control' ) ).toBeVisible();
+	} );
+
+	it( 'should still label the control accessibly when hideLabelFromVision is true', () => {
+		render(
+			<Component label="Test Toggle Group Control" hideLabelFromVision>
+				{ options }
+			</Component>
+		);
+
+		expect(
+			screen.getByRole( 'radiogroup', {
+				name: 'Test Toggle Group Control',
+			} )
+		).toBeVisible();
+	} );
+
+	it( 'should accessibly associate the help text', () => {
+		render(
+			<Component label="Test Toggle Group Control" help="Help text">
+				{ options }
+			</Component>
+		);
+
+		expect(
+			screen.getByRole( 'radiogroup', {
+				description: 'Help text',
+			} )
+		).toBeVisible();
+	} );
+
+	it( 'should accessibly associate the help text when isDeselectable', () => {
+		render(
+			<Component
+				label="Test Toggle Group Control"
+				help="Help text"
+				isDeselectable
+			>
+				{ options }
+			</Component>
+		);
+
+		expect(
+			screen.getByRole( 'group', {
+				description: 'Help text',
+			} )
+		).toBeVisible();
+	} );
+
 	describe( 'isDeselectable', () => {
 		describe( 'isDeselectable = false', () => {
 			it( 'should not be deselectable', async () => {
@@ -586,4 +635,19 @@ describe.each( [
 			} );
 		} );
 	} );
+} );
+
+test( 'should compose block styles in a single generated class', () => {
+	render(
+		<ToggleGroupControl label="Test Toggle Group Control" isBlock>
+			{ options }
+		</ToggleGroupControl>
+	);
+
+	const control = screen.getByRole( 'radiogroup', {
+		name: 'Test Toggle Group Control',
+	} );
+
+	expect( getGeneratedEmotionClassNames( control ) ).toHaveLength( 1 );
+	expect( control ).toHaveStyle( { display: 'flex' } );
 } );

@@ -6,12 +6,10 @@ import {
 	SVG,
 	Popover,
 	Button,
-	ExternalLink,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	__experimentalNumberControl as NumberControl,
 	TextareaControl,
 } from '@wordpress/components';
+import { Link, Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { insertObject, useAnchor } from '@wordpress/rich-text';
@@ -25,6 +23,23 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
 const title = __( 'Inline image' );
+
+/**
+ * Extracts the image ID from the className attribute.
+ *
+ * @param {Object} activeObjectAttributes The attributes of the active object.
+ * @return {number|undefined} The extracted image ID or undefined if not found.
+ */
+function getCurrentImageId( activeObjectAttributes ) {
+	if ( ! activeObjectAttributes?.className ) {
+		return undefined;
+	}
+
+	const [ , id ] =
+		activeObjectAttributes.className.match( /wp-image-(\d+)/ ) ?? [];
+
+	return id ? parseInt( id, 10 ) : undefined;
+}
 
 export const image = {
 	name,
@@ -55,7 +70,6 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 
 	return (
 		<Popover
-			placement="bottom"
 			focusOnMount={ false }
 			anchor={ popoverAnchor }
 			className="block-editor-format-toolbar__image-popover"
@@ -84,9 +98,8 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 					event.preventDefault();
 				} }
 			>
-				<VStack spacing={ 4 }>
+				<Stack direction="column" gap="lg">
 					<NumberControl
-						__next40pxDefaultSize
 						label={ __( 'Width' ) }
 						value={ editedWidth }
 						min={ 1 }
@@ -96,14 +109,14 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 					/>
 					<TextareaControl
 						label={ __( 'Alternative text' ) }
-						__nextHasNoMarginBottom
 						value={ editedAlt }
 						onChange={ ( newAlt ) => {
 							setEditedAlt( newAlt );
 						} }
 						help={
 							<>
-								<ExternalLink
+								<Link
+									openInNewTab
 									href={
 										// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
 										__(
@@ -114,13 +127,13 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 									{ __(
 										'Describe the purpose of the image.'
 									) }
-								</ExternalLink>
+								</Link>
 								<br />
 								{ __( 'Leave empty if decorative.' ) }
 							</>
 						}
 					/>
-					<HStack justify="right">
+					<Stack justify="right">
 						<Button
 							disabled={ ! hasChanged }
 							accessibleWhenDisabled
@@ -130,8 +143,8 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 						>
 							{ __( 'Apply' ) }
 						</Button>
-					</HStack>
-				</VStack>
+					</Stack>
+				</Stack>
 			</form>
 		</Popover>
 	);
@@ -149,6 +162,7 @@ function Edit( {
 		<MediaUploadCheck>
 			<MediaUpload
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				value={ getCurrentImageId( activeObjectAttributes ) }
 				onSelect={ ( { id, url, alt, width: imgWidth } ) => {
 					onChange(
 						insertObject( value, {
@@ -176,7 +190,7 @@ function Edit( {
 								<Path d="M4 18.5h16V17H4v1.5zM16 13v1.5h4V13h-4zM5.1 15h7.8c.6 0 1.1-.5 1.1-1.1V6.1c0-.6-.5-1.1-1.1-1.1H5.1C4.5 5 4 5.5 4 6.1v7.8c0 .6.5 1.1 1.1 1.1zm.4-8.5h7V10l-1-1c-.3-.3-.8-.3-1 0l-1.6 1.5-1.2-.7c-.3-.2-.6-.2-.9 0l-1.3 1V6.5zm0 6.1l1.8-1.3 1.3.8c.3.2.7.2.9-.1l1.5-1.4 1.5 1.4v1.5h-7v-.9z" />
 							</SVG>
 						}
-						title={ title }
+						title={ isObjectActive ? __( 'Replace image' ) : title }
 						onClick={ open }
 						isActive={ isObjectActive }
 					/>

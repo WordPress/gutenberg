@@ -3,54 +3,79 @@
  */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import {
+	trash,
+	pages,
+	drafts,
+	published,
+	scheduled,
+	pending,
+	notAllowed,
+} from '@wordpress/icons';
+import { useViewConfig } from '@wordpress/views';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { useDefaultViews } from './default-views';
 import { unlock } from '../../lock-unlock';
-import DataViewItem from './dataview-item';
-import CustomDataViewsList from './custom-dataviews-list';
+import SidebarNavigationItem from '../sidebar-navigation-item';
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export default function DataViewsSidebarContent( { postType } ) {
+const VIEW_CONFIG_FIELDS = [ 'view_list' ];
+
+const SLUG_TO_ICON = {
+	all: pages,
+	published,
+	future: scheduled,
+	drafts,
+	pending,
+	private: notAllowed,
+	trash,
+};
+const defaultResolveIcon = ( view ) => {
+	return SLUG_TO_ICON[ view.slug ];
+};
+
+export default function DataViewsSidebarContent( {
+	postType,
+	resolveIcon = defaultResolveIcon,
+} ) {
 	const {
-		query: { activeView = 'all', isCustom = 'false' },
+		path,
+		query: { activeView = 'all' },
 	} = useLocation();
-	const defaultViews = useDefaultViews( { postType } );
+	const { view_list: viewList } = useViewConfig( {
+		kind: 'postType',
+		name: postType,
+		fields: VIEW_CONFIG_FIELDS,
+	} );
 	if ( ! postType ) {
 		return null;
 	}
-	const isCustomBoolean = isCustom === 'true';
 
 	return (
 		<>
 			<ItemGroup className="edit-site-sidebar-dataviews">
-				{ defaultViews.map( ( dataview ) => {
+				{ viewList?.map( ( view ) => {
+					const isActive = view.slug === activeView;
+					const slug = view.slug === 'all' ? undefined : view.slug;
+					const icon = resolveIcon( view );
 					return (
-						<DataViewItem
-							key={ dataview.slug }
-							slug={ dataview.slug }
-							title={ dataview.title }
-							icon={ dataview.icon }
-							type={ dataview.view.type }
-							isActive={
-								! isCustomBoolean &&
-								dataview.slug === activeView
-							}
-							isCustom={ false }
-						/>
+						<SidebarNavigationItem
+							key={ view.slug }
+							icon={ icon }
+							to={ addQueryArgs( path, {
+								activeView: slug,
+							} ) }
+							aria-current={ isActive ? 'true' : undefined }
+						>
+							{ view.title }
+						</SidebarNavigationItem>
 					);
 				} ) }
 			</ItemGroup>
-			{ window?.__experimentalCustomViews && (
-				<CustomDataViewsList
-					activeView={ activeView }
-					type={ postType }
-					isCustom
-				/>
-			) }
 		</>
 	);
 }

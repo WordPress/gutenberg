@@ -24,17 +24,30 @@ test.describe( 'WP Editor Meta Boxes', () => {
 			.locator( 'role=textbox[name="Add title"i]' )
 			.type( 'Hello Meta' );
 
-		// Switch tinymce to Text mode, first waiting for it to initialize
-		// because otherwise it will flip back to Visual mode once initialized.
-		await page.locator( '#test_tinymce_id_ifr' ).waitFor();
-		await page.locator( 'role=button[name="Code"i]' ).click();
+		// Open the meta box pane. The click isn’t in the center because that
+		// would hit the resize handle instead of the located element.
+		await page
+			.getByRole( 'button', { name: 'Meta Boxes' } )
+			.click( { position: { x: 0, y: 0 } } );
 
-		// Type something in the tinymce Text mode textarea.
+		// Switch to Visual mode and wait for TinyMCE to fully initialize.
+		// This ensures getSelection() won't return null when TinyMCE tries
+		// to restore cursor position during subsequent mode switches.
+		await page.locator( 'role=button[name="Visual"i]' ).click();
+		await page.waitForFunction(
+			() => window.tinyMCE?.get( 'test_tinymce_id' )?.initialized
+		);
+
+		// Switch to Code mode and type into the textarea.
+		await page.locator( 'role=button[name="Code"i]' ).click();
 		const metaBoxField = page.locator( '#test_tinymce_id' );
 		await metaBoxField.type( 'Typing in a metabox' );
 
-		// Switch tinymce back to Visual mode.
+		// Switch back to Visual mode and wait for re-initialization.
 		await page.locator( 'role=button[name="Visual"i]' ).click();
+		await page.waitForFunction(
+			() => window.tinyMCE?.get( 'test_tinymce_id' )?.initialized
+		);
 
 		await editor.publishPost();
 		await page.reload();

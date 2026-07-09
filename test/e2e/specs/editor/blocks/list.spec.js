@@ -233,9 +233,8 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
-			.click();
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '* ' );
 		await expect(
 			editor.canvas.locator( '[data-type="core/list"]' )
@@ -408,7 +407,9 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( 'two' );
-		await pageUtils.pressKeys( 'ArrowUp', { times: 4 } );
+		// Select all escalates: text → block → siblings → parent, repeat
+		// until the top-level list block is selected.
+		await pageUtils.pressKeys( 'primary+a', { times: 5 } );
 		await editor.transformBlockTo( 'core/paragraph' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -593,7 +594,6 @@ test.describe( 'List (@firefox)', () => {
 
 		// Move the caret in front of "1" in the first list item.
 		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Backspace' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -746,7 +746,7 @@ test.describe( 'List (@firefox)', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		await page.keyboard.type( '/list' );
-		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'option', { name: 'List', exact: true } ).click();
 		await page.keyboard.type( 'aaa' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
@@ -866,11 +866,7 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
-	test( 'should outdent with children', async ( {
-		editor,
-		page,
-		pageUtils,
-	} ) => {
+	test( 'should outdent with children', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
@@ -896,7 +892,7 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->`
 		);
 
-		await pageUtils.pressKeys( 'ArrowUp', { times: 3 } );
+		await page.keyboard.press( 'ArrowUp' );
 		await editor.clickBlockToolbarButton( 'Outdent' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -1083,7 +1079,6 @@ test.describe( 'List (@firefox)', () => {
 	test( 'should place the caret in the right place with nested list', async ( {
 		editor,
 		page,
-		pageUtils,
 	} ) => {
 		await editor.canvas
 			.locator( 'role=button[name="Add default block"i]' )
@@ -1091,7 +1086,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' a' );
-		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Enter' );
 		// The caret should land in the second item.
 		await page.keyboard.type( '2' );
@@ -1422,7 +1417,9 @@ test.describe( 'List (@firefox)', () => {
 		);
 
 		await page.getByRole( 'button', { name: 'List', exact: true } ).click();
-		await page.getByRole( 'menuitem', { name: 'Paragraph' } ).click();
+		await page
+			.getByRole( 'menuitem', { name: 'Paragraph', exact: true } )
+			.click();
 
 		expect( await editor.getEditedPostContent() )
 			.toBe( `<!-- wp:paragraph -->
@@ -1515,10 +1512,7 @@ test.describe( 'List (@firefox)', () => {
 		test( 'Backspace', async ( { editor, page } ) => {
 			await editor.insertBlock( start );
 
-			// Navigate to the start of the third item.
-			await page.keyboard.press( 'ArrowDown' );
-			await page.keyboard.press( 'ArrowDown' );
-			await page.keyboard.press( 'ArrowDown' );
+			// Navigate to the start of item "2".
 			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'ArrowDown' );
@@ -1534,9 +1528,6 @@ test.describe( 'List (@firefox)', () => {
 		test( 'Delete (forward)', async ( { editor, page } ) => {
 			await editor.insertBlock( start );
 
-			// Navigate to the end of the second item.
-			await page.keyboard.press( 'ArrowDown' );
-			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'ArrowRight' );
@@ -1548,6 +1539,421 @@ test.describe( 'List (@firefox)', () => {
 
 			await expect.poll( editor.getBlocks ).toMatchObject( end );
 		} );
+	} );
+
+	test.describe( 'should preserve a nested list when deleting a text selection across sibling list items', () => {
+		const start = {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: 'ab' },
+				},
+				{
+					name: 'core/list-item',
+					attributes: { content: 'cd' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									attributes: { content: 'test' },
+								},
+							],
+						},
+					],
+				},
+			],
+		};
+		const end = [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a‸d' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'test' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		];
+
+		for ( const key of [ 'Backspace', 'Delete' ] ) {
+			test( key, async ( { editor, page, pageUtils } ) => {
+				await editor.canvas
+					.locator( 'role=button[name="Add default block"i]' )
+					.click();
+				await page.keyboard.type( '* ab' );
+				await page.keyboard.press( 'Enter' );
+				await page.keyboard.type( 'cd' );
+				await page.keyboard.press( 'Enter' );
+				// Leading space at the start of an empty item triggers indent.
+				await page.keyboard.type( ' test' );
+
+				// Verify setup: sibling items "ab" and "cd", the latter with a
+				// nested "test" item; caret at the end of "test".
+				await page.keyboard.type( '‸' );
+				await expect.poll( editor.getBlocks ).toMatchObject( [
+					{
+						...start,
+						innerBlocks: [
+							start.innerBlocks[ 0 ],
+							{
+								...start.innerBlocks[ 1 ],
+								innerBlocks: [
+									{
+										name: 'core/list',
+										innerBlocks: [
+											{
+												name: 'core/list-item',
+												attributes: {
+													content: 'test‸',
+												},
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+				] );
+				await page.keyboard.press( 'Backspace' );
+
+				// Move up to the end of "cd" (the longer, more indented "test"
+				// line clamps the caret to the end of the shorter line above),
+				// then back one character to offset 1.
+				await page.keyboard.press( 'ArrowUp' );
+				await page.keyboard.press( 'ArrowLeft' );
+
+				// Extend the selection backward to offset 1 of "ab" (away from
+				// the nested list), then yield to an idle callback so the
+				// multi-block selection can catch up before deleting.
+				await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 3 } );
+				await page.evaluate(
+					() => new Promise( window.requestIdleCallback )
+				);
+
+				await page.keyboard.press( key );
+
+				await page.keyboard.type( '‸' );
+				await expect.poll( editor.getBlocks ).toMatchObject( end );
+			} );
+		}
+	} );
+
+	test.describe( 'should delete a nested list inside a text selection across sibling list items', () => {
+		// The nested "x" was inside the deleted range, so the merged item
+		// must have no inner blocks left.
+		const end = [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a‸d' },
+						innerBlocks: [],
+					},
+				],
+			},
+		];
+
+		for ( const key of [ 'Backspace', 'Delete' ] ) {
+			test( key, async ( { editor, page, pageUtils } ) => {
+				await editor.canvas
+					.locator( 'role=button[name="Add default block"i]' )
+					.click();
+				await page.keyboard.type( '* ab' );
+				await page.keyboard.press( 'Enter' );
+				// Leading space at the start of an empty item triggers indent.
+				await page.keyboard.type( ' x' );
+				// Enter on an empty nested item outdents back to the top level.
+				await page.keyboard.press( 'Enter' );
+				await page.keyboard.press( 'Enter' );
+				await page.keyboard.type( 'cd' );
+
+				// Verify setup: "ab" with a nested "x" item, then sibling
+				// "cd" at the top level; caret at the end of "cd".
+				await page.keyboard.type( '‸' );
+				await expect.poll( editor.getBlocks ).toMatchObject( [
+					{
+						name: 'core/list',
+						innerBlocks: [
+							{
+								name: 'core/list-item',
+								attributes: { content: 'ab' },
+								innerBlocks: [
+									{
+										name: 'core/list',
+										innerBlocks: [
+											{
+												name: 'core/list-item',
+												attributes: { content: 'x' },
+											},
+										],
+									},
+								],
+							},
+							{
+								name: 'core/list-item',
+								attributes: { content: 'cd‸' },
+							},
+						],
+					},
+				] );
+				await page.keyboard.press( 'Backspace' );
+
+				// Navigate to the middle of "ab" (offset 1). ArrowUp from
+				// the end of a longer/more-indented line below clamps the
+				// caret to the end of the shorter line above, so two
+				// ArrowUps land at the end of "ab"; ArrowLeft then puts
+				// the caret between "a" and "b".
+				await page.keyboard.press( 'ArrowUp' );
+				await page.keyboard.press( 'ArrowUp' );
+				await page.keyboard.press( 'ArrowLeft' );
+
+				// Extend the selection forward two lines into "cd", then
+				// yield to an idle callback so the multi-block selection
+				// can catch up before deleting.
+				await pageUtils.pressKeys( 'shift+ArrowDown', { times: 2 } );
+				await page.evaluate(
+					() => new Promise( window.requestIdleCallback )
+				);
+
+				await page.keyboard.press( key );
+
+				await page.keyboard.type( '‸' );
+				await expect.poll( editor.getBlocks ).toMatchObject( end );
+			} );
+		}
+	} );
+
+	test( 'should merge a following paragraph into the outermost list with Delete from a nested item (#77245)', async ( {
+		editor,
+		page,
+	} ) => {
+		const startingContent = [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'outer' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'inner' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'text' },
+			},
+		];
+		for ( const block of startingContent ) {
+			await editor.insertBlock( block );
+		}
+
+		// Place the cursor at the end of "inner" by stepping back from
+		// the start of the paragraph.
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		await page.keyboard.press( 'Delete' );
+
+		// The caret stays at the end of "inner" — Delete shouldn't
+		// move the cursor away from the block the user pressed it in.
+		await page.keyboard.type( '‸' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'outer' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'inner‸' },
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'text' },
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should merge a following sibling list into the outermost list with Delete from a nested item (#77245)', async ( {
+		editor,
+		page,
+	} ) => {
+		const startingContent = [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: '1' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: '2' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		];
+		for ( const block of startingContent ) {
+			await editor.insertBlock( block );
+		}
+
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowRight' );
+
+		// Verify the setup: caret lands at end of the first list's
+		// inner "b".
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b‸' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: '1' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: '2' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
+		await page.keyboard.press( 'Backspace' );
+
+		// Action under test.
+		await page.keyboard.press( 'Delete' );
+
+		// Caret stays at end of "b"; the second list's items are
+		// absorbed as outer-level siblings of "a".
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b‸' },
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: '1' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: '2' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
 	} );
 
 	test( 'should leave nested list intact when deleting the parent item', async ( {
@@ -1582,7 +1988,6 @@ test.describe( 'List (@firefox)', () => {
 
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
@@ -1608,5 +2013,145 @@ test.describe( 'List (@firefox)', () => {
 				],
 			},
 		] );
+	} );
+
+	test( 'should outdent list items when deleting an empty parent at the top', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: '' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									attributes: { content: 'a' },
+								},
+								{
+									name: 'core/list-item',
+									attributes: { content: 'b' },
+								},
+							],
+						},
+					],
+				},
+			],
+		} );
+
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{ name: 'core/list-item', attributes: { content: 'a' } },
+					{ name: 'core/list-item', attributes: { content: 'b' } },
+				],
+			},
+		] );
+	} );
+
+	test( 'should leave the rest of the list intact when merging into an empty list item', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: '1' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									attributes: { content: 'a' },
+								},
+								{
+									name: 'core/list-item',
+									attributes: { content: 'b' },
+								},
+							],
+						},
+					],
+				},
+			],
+		} );
+
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: '1' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'a' },
+									},
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should select the list wrapper with select all in empty list item', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/list' } );
+
+		// Verify the list item is selected after insertion.
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlock()?.name
+				)
+			)
+			.toBe( 'core/list-item' );
+
+		// The list item is empty. Press cmd+a to select all, then again to select the list block.
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+
+		// Verify the list block is selected using the block-editor store.
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlock()?.name
+				)
+			)
+			.toBe( 'core/list' );
 	} );
 } );

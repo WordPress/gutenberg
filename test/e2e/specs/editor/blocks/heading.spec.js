@@ -180,7 +180,11 @@ test.describe( 'Heading', () => {
 			.getByRole( 'region', {
 				name: 'Editor settings',
 			} )
-			.getByRole( 'button', { name: 'Text' } );
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } );
 
 		await textColor.click();
 		await page
@@ -214,7 +218,11 @@ test.describe( 'Heading', () => {
 			.getByRole( 'region', {
 				name: 'Editor settings',
 			} )
-			.getByRole( 'button', { name: 'Text', exact: true } );
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } );
 
 		await textColor.click();
 
@@ -265,8 +273,10 @@ test.describe( 'Heading', () => {
 				name: 'core/heading',
 				attributes: {
 					content: 'Heading',
-					textAlign: 'center',
 					level: 4,
+					style: {
+						typography: { textAlign: 'center' },
+					},
 				},
 			},
 		] );
@@ -298,8 +308,10 @@ test.describe( 'Heading', () => {
 				name: 'core/heading',
 				attributes: {
 					content: 'Paragraph',
-					textAlign: 'center',
 					level: 2,
+					style: {
+						typography: { textAlign: 'center' },
+					},
 				},
 			},
 		] );
@@ -333,7 +345,11 @@ test.describe( 'Heading', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'Heading',
-					align: 'center',
+					style: {
+						typography: {
+							textAlign: 'center',
+						},
+					},
 				},
 			},
 		] );
@@ -361,8 +377,8 @@ test.describe( 'Heading', () => {
 
 		await expect(
 			headingListViewItem,
-			'should show default block name if the content is empty'
-		).toHaveText( 'Heading' );
+			'should show variation name if the content is empty'
+		).toHaveText( 'Heading 2' );
 
 		await editor.canvas
 			.getByRole( 'document', {
@@ -408,20 +424,22 @@ test.describe( 'Heading', () => {
 				);
 			} );
 
-			test( 'should preserve the text align attribute', async ( {
+			test( 'should preserve the text align block support', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/paragraph',
 					attributes: {
-						align: 'right',
+						style: { typography: { textAlign: 'right' } },
 						content: 'initial content',
 					},
 				} );
 				await editor.transformBlockTo( 'core/heading' );
 				const headingBlock = ( await editor.getBlocks() )[ 0 ];
 				expect( headingBlock.name ).toBe( 'core/heading' );
-				expect( headingBlock.attributes.textAlign ).toBe( 'right' );
+				expect(
+					headingBlock.attributes.style.typography.textAlign
+				).toBe( 'right' );
 			} );
 
 			test( 'should preserve the metadata attribute', async ( {
@@ -503,14 +521,16 @@ test.describe( 'Heading', () => {
 				await editor.insertBlock( {
 					name: 'core/heading',
 					attributes: {
-						textAlign: 'right',
 						content: 'initial content',
+						style: { typography: { textAlign: 'right' } },
 					},
 				} );
 				await editor.transformBlockTo( 'core/paragraph' );
 				const paragraphBlock = ( await editor.getBlocks() )[ 0 ];
 				expect( paragraphBlock.name ).toBe( 'core/paragraph' );
-				expect( paragraphBlock.attributes.align ).toBe( 'right' );
+				expect(
+					paragraphBlock.attributes.style.typography.textAlign
+				).toBe( 'right' );
 			} );
 
 			test( 'should preserve the metadata attribute', async ( {

@@ -1,0 +1,150 @@
+/**
+ * WordPress dependencies
+ */
+import { Page } from '@wordpress/admin-ui';
+import { __ } from '@wordpress/i18n';
+import { useState, useMemo, useCallback } from '@wordpress/element';
+import { privateApis as corePrivateApis } from '@wordpress/core-data';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { addQueryArgs } from '@wordpress/url';
+import { useEvent } from '@wordpress/compose';
+import { useView, useViewConfig } from '@wordpress/views';
+
+/**
+ * Internal dependencies
+ */
+import AddNewTemplate from '../add-new-template-legacy';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import { unlock } from '../../lock-unlock';
+import { useEditPostAction } from '../dataviews-actions';
+import { previewField } from './fields';
+
+const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
+
+const VIEW_CONFIG_FIELDS = [ 'default_view', 'default_layouts', 'view_list' ];
+
+export default function PageTemplates() {
+	const { path, query } = useLocation();
+	const { activeView = 'all', postId } = query;
+	const [ selection, setSelection ] = useState( [ postId ] );
+
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+	} = useViewConfig( {
+		kind: 'postType',
+		name: TEMPLATE_POST_TYPE,
+		fields: VIEW_CONFIG_FIELDS,
+	} );
+	const activeViewOverrides = useMemo(
+		() => viewList?.find( ( v ) => v.slug === activeView )?.view ?? {},
+		[ viewList, activeView ]
+	);
+	const { view, updateView, isModified, resetToDefault } = useView( {
+		kind: 'postType',
+		name: TEMPLATE_POST_TYPE,
+		slug: 'default',
+		defaultView,
+		activeViewOverrides,
+		defaultLayouts,
+		queryParams: {
+			page: query.pageNumber,
+			search: query.search,
+		},
+		onChangeQueryParams: ( newQueryParams ) => {
+			history.navigate(
+				addQueryArgs( path, {
+					...query,
+					pageNumber: newQueryParams.page,
+					search: newQueryParams.search || undefined,
+				} )
+			);
+		},
+	} );
+
+	const { records, isResolving: isLoadingData } =
+		useEntityRecordsWithPermissions( 'postType', TEMPLATE_POST_TYPE, {
+			per_page: -1,
+		} );
+	const history = useHistory();
+	const onChangeSelection = useCallback(
+		( items ) => {
+			setSelection( items );
+			if ( view?.type === 'list' ) {
+				history.navigate(
+					addQueryArgs( path, {
+						postId: items.length === 1 ? items[ 0 ] : undefined,
+					} )
+				);
+			}
+		},
+		[ history, path, view?.type ]
+	);
+
+	const postFields = usePostFields( { postType: TEMPLATE_POST_TYPE } );
+	const fields = useMemo( () => {
+		return [ previewField, ...( postFields || [] ) ];
+	}, [ postFields ] );
+
+	const { data, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( records, view, fields );
+	}, [ records, view, fields ] );
+
+	const postTypeActions = usePostActions( {
+		postType: TEMPLATE_POST_TYPE,
+		context: 'list',
+	} );
+	const editAction = useEditPostAction();
+	const actions = useMemo(
+		() => [ editAction, ...postTypeActions ],
+		[ postTypeActions, editAction ]
+	);
+
+	const onChangeView = useEvent( ( newView ) => {
+		updateView( newView );
+		if ( newView.type !== view.type ) {
+			// Retrigger the routing areas resolution.
+			history.invalidate();
+		}
+	} );
+
+	return (
+		<Page
+			className="edit-site-page-templates"
+			title={ __( 'Templates' ) }
+			headingLevel={ 2 }
+			actions={ <AddNewTemplate /> }
+		>
+			<DataViews
+				key={ activeView }
+				paginationInfo={ paginationInfo }
+				fields={ fields }
+				actions={ actions }
+				data={ data }
+				isLoading={ isLoadingData }
+				view={ view }
+				onChangeView={ onChangeView }
+				onChangeSelection={ onChangeSelection }
+				isItemClickable={ () => true }
+				onClickItem={ ( { id } ) => {
+					history.navigate( `/wp_template/${ id }?canvas=edit` );
+				} }
+				selection={ selection }
+				defaultLayouts={ defaultLayouts }
+				onReset={
+					isModified
+						? () => {
+								resetToDefault();
+								history.invalidate();
+						  }
+						: false
+				}
+			/>
+		</Page>
+	);
+}

@@ -40,6 +40,19 @@ $ npx @wordpress/create-block@latest [options] [slug]
 
 When no `slug` is provided, the script will run in interactive mode and will start prompting for the input required (`slug`, title, namespace...) to scaffold the project.
 
+### `namespace`
+
+By default, blocks are created with the `create-block` namespace. You should specify your own unique namespace:
+
+```bash
+$ npx @wordpress/create-block@latest my-block --namespace=my-namespace
+```
+
+This creates `my-namespace/my-block` instead of `create-block/my-block`.
+
+If you've already created a block, update the namespace in:
+- `block.json` - the `name` property
+
 ### `slug`
 
 The use of `slug` is optional.
@@ -56,7 +69,7 @@ The rest of the configuration is set to all default values unless overridden wit
 
 ```bash
 -V, --version                output the version number
--t, --template <name>        project template type name; allowed values: "static" (default), "es5", the name of an external npm package, or the path to a local directory
+-t, --template <name>        project template type name; allowed values: "standard" (default), "es5", the name of an external npm package, or the path to a local directory
 --variant                    choose a block variant as defined by the template
 --no-plugin                  scaffold block files only
 --target-dir <directory>     the directory where the files will be scaffolded, defaults to the slug

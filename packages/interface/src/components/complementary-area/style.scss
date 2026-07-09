@@ -1,12 +1,12 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .interface-complementary-area {
 	background: $white;
 	color: $gray-900;
 	height: 100%;
 	overflow: auto;
-
-	@include break-small() {
-		-webkit-overflow-scrolling: touch;
-	}
 
 	@include break-medium() {
 		width: $sidebar-width;
@@ -16,13 +16,14 @@
 		border: none;
 		// Make a stacking context that keeps all descendents behind the sticky header
 		position: relative;
-		z-index: z-index(".interface-complementary-area .components-panel");
+		z-index: 0;
 	}
 
 	.components-panel__header {
 		position: sticky;
 		top: 0;
-		z-index: z-index(".interface-complementary-area .components-panel__header");
+		// Sit above the panel's scrolling content within the stacking context above.
+		z-index: 1;
 
 		&.editor-sidebar__panel-tabs {
 			top: 0;
@@ -35,7 +36,7 @@
 
 	h2 {
 		font-size: $default-font-size;
-		font-weight: 500;
+		font-weight: $font-weight-medium;
 		color: $gray-900;
 		margin-bottom: 1.5em;
 	}
@@ -44,7 +45,7 @@
 	h3 {
 		font-size: 11px;
 		text-transform: uppercase;
-		font-weight: 500;
+		font-weight: $font-weight-medium;
 		color: $gray-900;
 		margin-bottom: 1.5em;
 	}

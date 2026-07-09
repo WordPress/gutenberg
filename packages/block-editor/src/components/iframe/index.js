@@ -2,17 +2,12 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import { version as reactVersion } from 'react';
 
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	createPortal,
-	forwardRef,
-	useMemo,
-	useEffect,
-} from '@wordpress/element';
+import { useState, createPortal, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
@@ -21,7 +16,6 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
@@ -96,6 +90,57 @@ function useBubbleEvents( iframeDocument ) {
 	} );
 }
 
+const iframeSrcCache = new WeakMap();
+const iframeSrcCleanup = globalThis.FinalizationRegistry
+	? new globalThis.FinalizationRegistry( ( url ) =>
+			URL.revokeObjectURL( url )
+	  )
+	: undefined;
+
+function getIframeSrc( resolvedAssets ) {
+	let src = iframeSrcCache.get( resolvedAssets );
+	if ( src ) {
+		return src;
+	}
+
+	let body = '';
+	if ( reactVersion.split( '.' )[ 0 ] === '18' ) {
+		body =
+			'<body><script>document.currentScript.parentElement.remove()</script></body>';
+	}
+
+	// Correct doctype is required to enable rendering in standards mode.
+	// Also preload the styles to avoid a flash of unstyled content.
+	const html = `<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<base href="${ window.location.href }">
+		<style>
+			html{
+				height: auto !important;
+				min-height: 100%;
+			}
+			/* Lowest specificity to not override global styles */
+			:where(body) {
+				margin: 0;
+				/* Default background color in case zoom out mode background
+				colors the html element */
+				background-color: white;
+			}
+		</style>
+		${ resolvedAssets.styles ?? '' }
+		${ resolvedAssets.scripts ?? '' }
+	</head>
+	${ body }
+</html>`;
+
+	src = URL.createObjectURL( new Blob( [ html ], { type: 'text/html' } ) );
+	iframeSrcCache.set( resolvedAssets, src );
+	iframeSrcCleanup?.register( resolvedAssets, src );
+	return src;
+}
+
 function Iframe( {
 	contentRef,
 	children,
@@ -108,28 +153,45 @@ function Iframe( {
 	...props
 } ) {
 	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
+		const settings = select( blockEditorStore ).getSettings();
 		return {
 			resolvedAssets: settings.__unstableResolvedAssets,
 			isPreviewMode: settings.isPreviewMode,
 		};
 	}, [] );
-	const { styles = '', scripts = '' } = resolvedAssets;
-	/** @type {[Document, import('react').Dispatch<Document>]} */
+	/** @type {[Document, React.Dispatch<Document>]} */
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
-	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 
 	const setRef = useRefEffect( ( node ) => {
-		node._load = () => {
-			setIframeDocument( node.contentDocument );
-		};
 		let iFrameDocument;
 		// Prevent the default browser action for files dropped outside of dropzones.
 		function preventFileDropDefault( event ) {
 			event.preventDefault();
+		}
+		// Prevent clicks on link fragments from navigating away. Note that links
+		// inside `contenteditable` are already disabled by the browser, so
+		// this is for links in blocks outside of `contenteditable`.
+		function interceptLinkClicks( event ) {
+			if (
+				event.target.tagName === 'A' &&
+				event.target.getAttribute( 'href' )?.startsWith( '#' )
+			) {
+				event.preventDefault();
+				// Manually handle link fragment navigation within the iframe. The iframe's
+				// location is a blob URL, which can't be used to resolve relative links like
+				// `#hash`. The relative link would be resolved against the iframe's base URL
+				// or the parent frame's URL, causing the iframe to navigate to a completely
+				// different page. Setting the `location.hash` works because it really sets the
+				// blob URL's hash.
+				//
+				// Links with fragments are used for example with footnotes. Clicking on these
+				// links will scroll smoothly to the anchors in the editor canvas.
+				iFrameDocument.defaultView.location.hash = event.target
+					.getAttribute( 'href' )
+					.slice( 1 );
+			}
 		}
 
 		const { ownerDocument } = node;
@@ -150,10 +212,9 @@ function Iframe( {
 			const { contentDocument } = node;
 			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
+			setIframeDocument( contentDocument );
 
 			documentElement.classList.add( 'block-editor-iframe__html' );
-
-			clearerRef( documentElement );
 
 			contentDocument.dir = ownerDocument.dir;
 
@@ -185,28 +246,13 @@ function Iframe( {
 				preventFileDropDefault,
 				false
 			);
-			// Prevent clicks on links from navigating away. Note that links
-			// inside `contenteditable` are already disabled by the browser, so
-			// this is for links in blocks outside of `contenteditable`.
-			iFrameDocument.addEventListener( 'click', ( event ) => {
-				if ( event.target.tagName === 'A' ) {
-					event.preventDefault();
-
-					// Appending a hash to the current URL will not reload the
-					// page. This is useful for e.g. footnotes.
-					const href = event.target.getAttribute( 'href' );
-					if ( href?.startsWith( '#' ) ) {
-						iFrameDocument.defaultView.location.hash =
-							href.slice( 1 );
-					}
-				}
-			} );
+			iFrameDocument.addEventListener( 'click', interceptLinkClicks );
 		}
 
 		node.addEventListener( 'load', onLoad );
 
 		return () => {
-			delete node._load;
+			setIframeDocument( undefined );
 			node.removeEventListener( 'load', onLoad );
 			iFrameDocument?.removeEventListener(
 				'dragover',
@@ -216,6 +262,7 @@ function Iframe( {
 				'drop',
 				preventFileDropDefault
 			);
+			iFrameDocument?.removeEventListener( 'click', interceptLinkClicks );
 		};
 	}, [] );
 
@@ -231,52 +278,30 @@ function Iframe( {
 	} );
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
-	const bodyRef = useMergeRefs( [
+
+	const unguardedBodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
 		contentRef,
-		clearerRef,
 		writingFlowRef,
 		disabledRef,
 	] );
 
-	// Correct doctype is required to enable rendering in standards
-	// mode. Also preload the styles to avoid a flash of unstyled
-	// content.
-	const html = `<!doctype html>
-<html>
-	<head>
-		<meta charset="utf-8">
-		<base href="${ window.location.origin }">
-		<script>window.frameElement._load()</script>
-		<style>
-			html{
-				height: auto !important;
-				min-height: 100%;
+	// Attach the body ref only when the iframe document and window are available.
+	// When an iframe element is moved in the DOM, like when reordering a list,
+	// its `window` object is destroyed and recreated, and the `defaultView` field is
+	// briefly `null`. We need to guard for such calls of the ref callbacks.
+	const bodyRef = useRefEffect(
+		( node ) => {
+			if ( node.ownerDocument.defaultView ) {
+				unguardedBodyRef( node );
+				return () => unguardedBodyRef( null );
 			}
-			/* Lowest specificity to not override global styles */
-			:where(body) {
-				margin: 0;
-				/* Default background color in case zoom out mode background
-				colors the html element */
-				background-color: white;
-			}
-		</style>
-		${ styles }
-		${ scripts }
-	</head>
-	<body>
-		<script>document.currentScript.parentElement.remove()</script>
-	</body>
-</html>`;
+			return () => {};
+		},
+		[ unguardedBodyRef ]
+	);
 
-	const [ src, cleanup ] = useMemo( () => {
-		const _src = URL.createObjectURL(
-			new window.Blob( [ html ], { type: 'text/html' } )
-		);
-		return [ _src, () => URL.revokeObjectURL( _src ) ];
-	}, [ html ] );
-
-	useEffect( () => cleanup, [ cleanup ] );
+	const src = getIframeSrc( resolvedAssets );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
@@ -295,9 +320,6 @@ function Iframe( {
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
-				// Correct doctype is required to enable rendering in standards
-				// mode. Also preload the styles to avoid a flash of unstyled
-				// content.
 				src={ src }
 				title={ title }
 				onKeyDown={ ( event ) => {
@@ -333,9 +355,6 @@ function Iframe( {
 			>
 				{ iframeDocument &&
 					createPortal(
-						// We want to prevent React events from bubbling through the iframe
-						// we bubble these manually.
-						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 						<body
 							ref={ bodyRef }
 							className={ clsx(

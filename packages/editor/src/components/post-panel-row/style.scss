@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .editor-post-panel__row {
 	width: 100%;
 	min-height: $grid-unit-40;
@@ -14,6 +16,7 @@
 	padding: 6px 0; // Matches button to ensure alignment
 	line-height: $grid-unit-05 * 5;
 	hyphens: auto;
+	word-break: break-word;
 }
 
 .editor-post-panel__row-control {
@@ -30,6 +33,7 @@
 		text-wrap: pretty;
 		height: auto;
 		min-height: $button-size-compact;
+		font-weight: $font-weight-regular;
 	}
 
 	.components-dropdown {

@@ -8,9 +8,10 @@ import clsx from 'clsx';
  */
 import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
 import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
-import { Platform, useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -29,7 +30,12 @@ import {
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
-import { __ } from '@wordpress/i18n';
+import {
+	getStyleForState,
+	isDefaultBlockStyleState,
+	setStyleForState,
+	useBlockStyleState,
+} from './block-style-state';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 export const SHADOW_SUPPORT_KEY = 'shadow';
@@ -141,20 +147,39 @@ function BordersInspectorControl( { label, children, resetAllFilter } ) {
 }
 
 export function BorderPanel( { clientId, name, setAttributes, settings } ) {
+	const selectedState = useBlockStyleState();
 	const isEnabled = useHasBorderPanel( settings );
-	function selector( select ) {
-		const { style, borderColor } =
-			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-		return { style, borderColor };
-	}
-	const { style, borderColor } = useSelect( selector, [ clientId ] );
-	const value = useMemo( () => {
-		return attributesToStyle( { style, borderColor } );
-	}, [ style, borderColor ] );
+	const { style, borderColor } = useSelect(
+		( select ) => {
+			// Early return to avoid subscription when disabled
+			if ( ! isEnabled ) {
+				return {};
+			}
+			const { style: _style, borderColor: _borderColor } =
+				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			return { style: _style, borderColor: _borderColor };
+		},
+		[ clientId, isEnabled ]
+	);
 
-	const onChange = ( newStyle ) => {
-		setAttributes( styleToAttributes( newStyle ) );
-	};
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
+
+	const value = useMemo( () => {
+		if ( isStateSelected ) {
+			return getStyleForState( style, selectedState );
+		}
+		return attributesToStyle( { style, borderColor } );
+	}, [ isStateSelected, selectedState, style, borderColor ] );
+
+	const onChange = isStateSelected
+		? ( newStyle ) => {
+				setAttributes( {
+					style: setStyleForState( style, selectedState, newStyle ),
+				} );
+		  }
+		: ( newStyle ) => {
+				setAttributes( styleToAttributes( newStyle ) );
+		  };
 
 	if ( ! isEnabled ) {
 		return null;
@@ -192,10 +217,6 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
  * @return {boolean} Whether there is support.
  */
 export function hasBorderSupport( blockName, feature = 'any' ) {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const support = getBlockSupport( blockName, BORDER_SUPPORT_KEY );
 
 	if ( support === true ) {

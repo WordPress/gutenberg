@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/variables" as vars;
+@use "@wordpress/base-styles/mixins" as *;
+
 .dataviews-filters__button {
 	position: relative;
 }
@@ -18,12 +21,14 @@
 }
 
 .dataviews-filters__summary-popover {
-	font-size: $default-font-size;
-	line-height: $default-line-height;
+	font-size: var(--wpds-typography-font-size-md);
+	line-height: var(--wpds-typography-line-height-sm);
 
 	.components-popover__content {
-		width: 230px;
-		border-radius: $grid-unit-05;
+		width: 100%;
+		min-width: 230px;
+		max-width: 250px;
+		border-radius: var(--wpds-border-radius-md);
 	}
 
 	&.components-dropdown__content {
@@ -34,11 +39,12 @@
 }
 
 .dataviews-filters__summary-operators-container {
-	padding: $grid-unit-10 $grid-unit-10 0;
+	padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-lg);
 
-	&:has(+ .dataviews-filters__search-widget-listbox) {
-		border-bottom: 1px solid $gray-200;
-		padding-bottom: $grid-unit-10;
+	&:has(+ .dataviews-filters__search-widget-listbox),
+	&:has(+ .dataviews-filters__search-widget-no-elements),
+	&:has(+ .dataviews-filters__user-input-widget) {
+		border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral);
 	}
 
 	&:empty {
@@ -46,7 +52,18 @@
 	}
 
 	.dataviews-filters__summary-operators-filter-name {
-		color: $gray-700;
+		color: var(--wpds-color-foreground-content-neutral-weak);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		flex-shrink: 0; /* Prevents this element from shrinking */
+		max-width: calc(100% - 55px);
+	}
+
+	.dataviews-filters__summary-operators-filter-select {
+		width: 100%;
+		white-space: nowrap;
+		overflow: hidden;
 	}
 }
 
@@ -55,102 +72,109 @@
 	white-space: pre-wrap;
 
 	.dataviews-filters__summary-chip {
-		border-radius: $grid-unit-20;
-		border: $border-width solid transparent;
-		cursor: pointer;
-		padding: $grid-unit-05 $grid-unit-15;
-		min-height: $grid-unit-40;
-		background: $gray-100;
-		color: $gray-800;
+		border-radius: var(--wpds-border-radius-lg);
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
+		cursor: var(--wpds-cursor-control);
+		padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
+		min-height: var(--wpds-dimension-size-md);
+		color: var(--wpds-color-foreground-interactive-neutral);
 		position: relative;
 		display: flex;
 		align-items: center;
 		box-sizing: border-box;
 
-		&.has-reset {
-			padding-inline-end: $button-size-small + $grid-unit-05;
+		&.is-not-clickable {
+			cursor: default;
 		}
 
-		&:hover,
+		&.has-reset {
+			padding-inline-end: calc(var(--wpds-dimension-size-sm) + var(--wpds-dimension-padding-xs));
+		}
+
+		&:hover:not(&.is-not-clickable),
 		&:focus-visible,
 		&[aria-expanded="true"] {
-			background: $gray-200;
-			color: $gray-900;
+			color: var(--wpds-color-foreground-interactive-neutral);
+			border-color: var(--wpds-color-stroke-interactive-neutral-active);
+			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 		}
 
 		&.has-values {
-			color: var(--wp-admin-theme-color);
-			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			color: var(--wpds-color-foreground-interactive-brand);
+			background: var(--wpds-color-background-interactive-brand-weak);
+			border-color: var(--wpds-color-stroke-interactive-brand);
 
-			&:hover,
+			&:hover:not(&.is-not-clickable),
 			&[aria-expanded="true"] {
-				background: rgba(var(--wp-admin-theme-color--rgb), 0.12);
+				color: var(--wpds-color-foreground-interactive-brand-active);
+				background: var(--wpds-color-background-interactive-brand-weak-active);
+				border-color: var(--wpds-color-stroke-interactive-brand-active);
 			}
 		}
 
 		&:focus-visible {
 			outline: none;
 			box-shadow:
-				0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-admin-theme-color);
+				0 0 0 var(--wpds-border-width-focus)
+				var(--wpds-color-stroke-focus);
 		}
 
 		.dataviews-filters-__summary-filter-text-name {
-			font-weight: 500;
+			font-weight: var(--wpds-typography-font-weight-medium);
 		}
 	}
 
 	.dataviews-filters__summary-chip-remove {
-		width: $icon-size;
-		height: $icon-size;
-		border-radius: 50%;
+		width: var(--wpds-dimension-size-sm);
+		height: var(--wpds-dimension-size-sm);
+		border-radius: var(--wpds-border-radius-md);
 		border: 0;
 		padding: 0;
 		position: absolute;
-		right: $grid-unit-05;
+		right: var(--wpds-dimension-padding-xs);
 		top: 50%;
 		transform: translateY(-50%);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		background: transparent;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 
 		svg {
-			fill: $gray-700;
+			fill: var(--wpds-color-foreground-interactive-neutral);
 		}
 
 		&:hover,
 		&:focus {
-			background: $gray-200;
+			background: var(--wpds-color-background-interactive-neutral-weak-active);
 			svg {
-				fill: $gray-900;
+				fill: var(--wpds-color-foreground-interactive-neutral-active);
 			}
 		}
 
 		&.has-values {
 			svg {
-				fill: var(--wp-admin-theme-color);
+				fill: var(--wpds-color-foreground-interactive-brand);
 			}
 			&:hover {
-				background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+				background: var(--wpds-color-background-interactive-brand-weak-active);
 			}
 		}
 
 		&:focus-visible {
 			outline: none;
 			box-shadow:
-				0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-admin-theme-color);
+				0 0 0 var(--wpds-border-width-focus)
+				var(--wpds-color-stroke-focus);
 		}
 	}
 }
 
 .dataviews-filters__search-widget-filter-combobox-list {
-	max-height: $grid-unit * 23;
-	padding: $grid-unit-05;
+	max-height: 184px;
+	padding: var(--wpds-dimension-padding-xs);
 	overflow: auto;
-	border-top: 1px solid $gray-200;
+	border-top: 1px solid var(--wpds-color-stroke-surface-neutral);
 
 	.dataviews-filters__search-widget-filter-combobox-item-value {
 		[data-user-value] {
@@ -160,19 +184,20 @@
 }
 
 .dataviews-filters__search-widget-listbox {
-	padding: $grid-unit-05;
+	padding: var(--wpds-dimension-padding-xs);
 	overflow: auto;
 }
 
 .dataviews-filters__search-widget-listitem {
 	display: flex;
 	align-items: center;
-	gap: $grid-unit-10;
-	border-radius: $radius-small;
+	gap: var(--wpds-dimension-gap-md);
+	border-radius: var(--wpds-border-radius-sm);
 	box-sizing: border-box;
-	padding: $grid-unit-10 $grid-unit-15;
+	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
 	cursor: default;
-	margin-block-end: 2px;
+	min-height: var(--wpds-dimension-size-md);
+	@include body-medium();
 
 	&:last-child {
 		margin-block-end: 0;
@@ -181,66 +206,151 @@
 	&:hover,
 	&[data-active-item],
 	&:focus {
-		background-color: var(--wp-admin-theme-color);
-		color: $white;
+		background-color: var(--wpds-color-background-interactive-brand-weak-active);
 
-		.dataviews-filters__search-widget-listitem-check {
-			fill: $white;
+		.dataviews-filters__search-widget-listitem-single-selection {
+			border-color: var(--wpds-color-stroke-interactive-brand-active);
+			background: var(--wpds-color-background-surface-neutral-strong);
+			&.is-selected {
+				border-color: var(--wpds-color-stroke-interactive-brand-active);
+				background: var(--wpds-color-background-interactive-brand-strong-active);
+			}
 		}
 
-		.dataviews-filters__search-widget-listitem-description {
-			color: $white;
+		.dataviews-filters__search-widget-listitem-multi-selection {
+			border-color: var(--wpds-color-stroke-interactive-brand-active);
+			background: var(--wpds-color-background-surface-neutral-strong);
+
+			&.is-selected {
+				border-color: var(--wpds-color-stroke-interactive-brand-active);
+				background: var(--wpds-color-background-interactive-brand-strong-active);
+			}
 		}
 	}
 
-	.dataviews-filters__search-widget-listitem-check {
-		width: 24px;
-		height: 24px;
-		flex-shrink: 0;
+	.dataviews-filters__search-widget-listitem-value {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		min-width: 0;
 	}
 
 	.dataviews-filters__search-widget-listitem-description {
 		display: block;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		font-size: $helptext-font-size;
+		font-size: var(--wpds-typography-font-size-sm);
 		line-height: 16px;
-		color: $gray-700;
+		color: var(--wpds-color-foreground-content-neutral-weak);
+	}
+
+	.dataviews-filters__search-widget-listitem-single-selection {
+		@include radio-control;
+		margin: 0;
+		padding: 0;
+
+		&.is-selected {
+			background: var(--wpds-color-background-interactive-brand-strong);
+			border-color: var(--wpds-color-stroke-interactive-brand);
+
+			&::before {
+				content: "";
+				border-radius: 50%;
+				box-sizing: inherit;
+				width: vars.$radio-input-size-sm * 0.5;
+				height: vars.$radio-input-size-sm * 0.5;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				margin: 0;
+				background-color: var(--wpds-color-foreground-interactive-brand-strong);
+
+				// This border serves as a background color in Windows High Contrast mode.
+				border: 4px solid var(--wpds-color-foreground-interactive-brand-strong);
+
+				@include break-small() {
+					width: vars.$radio-input-size * 0.5;
+					height: vars.$radio-input-size * 0.5;
+				}
+			}
+		}
+	}
+
+	.dataviews-filters__search-widget-listitem-multi-selection {
+		--checkbox-size: 24px; // Width & height for small viewports.
+		flex-shrink: 0;
+
+		@include checkbox-control;
+		position: relative;
+		background: var(--wpds-color-background-interactive-neutral-weak);
+		color: var(--wpds-color-foreground-content-neutral);
+		margin: 0;
+		padding: 0;
+		width: var(--checkbox-size);
+		height: var(--checkbox-size);
+
+		@include break-small() {
+			--checkbox-size: 16px;
+		}
+
+		@media not (prefers-reduced-motion) {
+			transition: 0.1s border-color ease-in-out;
+		}
+
+		&.is-selected {
+			background: var(--wpds-color-background-interactive-brand-strong);
+			border-color: var(--wpds-color-stroke-interactive-brand);
+
+			svg {
+				--checkmark-size: var(--checkbox-size);
+
+				fill: var(--wpds-color-foreground-interactive-neutral-strong);
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%, -50%);
+				width: var(--checkmark-size);
+				height: var(--checkmark-size);
+
+				@include break-small() {
+					--checkmark-size: calc(var(--checkbox-size) + 4px);
+				}
+			}
+		}
 	}
 }
 
 .dataviews-filters__search-widget-filter-combobox__wrapper {
 	position: relative;
-	padding: $grid-unit-10;
+	padding: var(--wpds-dimension-padding-sm);
 
 	.dataviews-filters__search-widget-filter-combobox__input {
 		@include input-control;
 		display: block;
-		padding: 0 $grid-unit-40 0 $grid-unit-10;
-		background: $gray-100;
-		border: none;
+		padding: 0 var(--wpds-dimension-padding-sm) 0 var(--wpds-dimension-size-md);
 		width: 100%;
-		height: $grid-unit-40;
+		height: var(--wpds-dimension-size-md);
 
 		// Unset inherited values.
 		margin-left: 0;
 		margin-right: 0;
 
 		/* Fonts smaller than 16px causes mobile safari to zoom. */
-		font-size: $mobile-text-min-font-size;
+		font-size: vars.$mobile-text-min-font-size;
 		@include break-small {
-			font-size: $default-font-size;
+			font-size: var(--wpds-typography-font-size-md);
 		}
 
 		&:focus {
-			background: $white;
+			background: var(--wpds-color-background-surface-neutral-strong);
 			box-shadow:
-				inset 0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-admin-theme-color);
+				inset 0 0 0 var(--wpds-border-width-focus)
+				var(--wpds-color-stroke-focus);
 		}
 
 		&::placeholder {
-			color: $gray-700;
+			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
 		&::-webkit-search-decoration,
@@ -253,13 +363,17 @@
 
 	.dataviews-filters__search-widget-filter-combobox__icon {
 		position: absolute;
-		right: $grid-unit-15;
-		top: 50%;
-		transform: translateY(-50%);
+		inset-inline-start: var(--wpds-dimension-gap-md);
+		top: 0;
+		bottom: 0;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: $icon-size;
+		width: var(--wpds-dimension-size-sm);
+
+		&:dir(ltr) {
+			transform: scaleX(-1);
+		}
 	}
 }
 
@@ -273,19 +387,34 @@
 	top: 0;
 	right: 0;
 	transform: translate(50%, -50%);
-	background: var(--wp-admin-theme-color, #3858e9);
-	height: $grid-unit-20;
-	min-width: $grid-unit-20;
-	line-height: $grid-unit-20;
-	padding: 0 $grid-unit-05;
+	background: var(--wpds-color-background-interactive-brand-strong);
+	height: var(--wpds-dimension-size-2xs);
+	min-width: var(--wpds-dimension-size-2xs);
+	line-height: var(--wpds-typography-line-height-xs);
+	padding: 0 var(--wpds-dimension-padding-xs);
 	text-align: center;
-	border-radius: $grid-unit-10;
+	border-radius: var(--wpds-border-radius-lg);
 	font-size: 11px;
-	outline: var(--wp-admin-border-width-focus) solid $white;
-	color: $white;
+	outline: var(--wpds-border-width-focus) solid var(--wpds-color-background-surface-neutral-strong);
+	color: var(--wpds-color-foreground-interactive-neutral-strong);
 	box-sizing: border-box;
 }
 
 .dataviews-search {
 	width: fit-content;
+}
+
+.dataviews-filters__user-input-widget {
+	padding: var(--wpds-dimension-padding-lg);
+
+	.components-input-control__prefix {
+		padding-left: var(--wpds-dimension-padding-sm);
+	}
+}
+
+.dataviews-filters__search-widget-no-elements {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--wpds-dimension-padding-lg);
 }

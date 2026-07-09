@@ -19,27 +19,78 @@ import {
 	resetPost,
 	deletePost,
 	duplicateTemplatePart,
+	excerptField,
 	featuredImageField,
 	dateField,
 	parentField,
 	passwordField,
 	commentStatusField,
+	pingStatusField,
+	discussionField,
 	slugField,
 	statusField,
 	authorField,
+	templateAuthorField,
+	templatePartAuthorField,
 	titleField,
 	templateField,
 	templateTitleField,
 	pageTitleField,
 	patternTitleField,
+	patternDescriptionField,
+	patternSyncStatusField,
+	notesField,
+	scheduledDateField,
+	lastEditedDateField,
+	formatField,
+	postContentInfoField,
+	stickyField,
+	descriptionField,
+	readOnlyDescriptionField,
+	postsPerPageField,
+	siteDiscussionField,
+	postsPageTitleField,
 } from '@wordpress/fields';
+import {
+	altTextField,
+	attachedToField,
+	authorField as mediaAuthorField,
+	captionField,
+	dateAddedField,
+	descriptionField as mediaDescriptionField,
+	filenameField,
+	filesizeField,
+	mediaDimensionsField,
+	mimeTypeField,
+} from '@wordpress/media-fields';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
 import postPreviewField from '../fields/content-preview';
 import { unlock } from '../../lock-unlock';
+
+declare global {
+	interface Window {
+		__experimentalTemplateActivate?: boolean;
+	}
+}
+
+/**
+ * Check if a post type supports editor notes.
+ *
+ * @param supports The post type supports object.
+ * @return Whether editor notes are supported.
+ */
+function hasEditorNotesSupport( supports?: PostType[ 'supports' ] ): boolean {
+	const editor = supports?.editor;
+	if ( Array.isArray( editor ) ) {
+		return !! editor[ 0 ]?.notes;
+	}
+	return false;
+}
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -101,6 +152,31 @@ export function setIsReady( kind: string, name: string ) {
 	};
 }
 
+/*
+ * Media fields for the attachment post type.
+ *
+ * Field order follows a logical grouping:
+ * 1. Metadata fields in panels (date, author, file info)
+ * 2. Core editable fields (title, alt text, caption, description)
+ *
+ * Note: media_thumbnail is not included as it's shown in the canvas preview
+ */
+const ORDERED_MEDIA_FIELDS = [
+	// Metadata in panels (collapsed by default).
+	dateAddedField,
+	mediaAuthorField,
+	filenameField,
+	mimeTypeField,
+	filesizeField,
+	mediaDimensionsField,
+	attachedToField,
+	// Regular layout fields (always visible).
+	titleField,
+	altTextField,
+	captionField,
+	mediaDescriptionField,
+];
+
 export const registerPostTypeSchema =
 	( postType: string ) =>
 	async ( { registry }: { registry: any } ) => {
@@ -130,6 +206,33 @@ export const registerPostTypeSchema =
 		const currentTheme = await registry
 			.resolveSelect( coreStore )
 			.getCurrentTheme();
+		const { disablePostFormats } = registry
+			.select( editorStore )
+			.getEditorSettings();
+
+		let canDuplicate =
+			! [ 'wp_block', 'wp_template_part' ].includes(
+				postTypeConfig.slug
+			) &&
+			canCreate &&
+			duplicatePost;
+
+		// @ts-ignore
+		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
+			// Outside Gutenberg, disable duplication except for wp_template.
+			if ( 'wp_template' !== postTypeConfig.slug ) {
+				canDuplicate = undefined;
+			}
+		}
+
+		// When template activation experiment is disabled, templates cannot be duplicated.
+		// @ts-ignore
+		if (
+			postTypeConfig.slug === 'wp_template' &&
+			! window?.__experimentalTemplateActivate
+		) {
+			canDuplicate = undefined;
+		}
 
 		const actions = [
 			postTypeConfig.viewable ? viewPost : undefined,
@@ -137,13 +240,7 @@ export const registerPostTypeSchema =
 				? viewPostRevisions
 				: undefined,
 			// @ts-ignore
-			globalThis.IS_GUTENBERG_PLUGIN
-				? ! [ 'wp_template', 'wp_block', 'wp_template_part' ].includes(
-						postTypeConfig.slug
-				  ) &&
-				  canCreate &&
-				  duplicatePost
-				: undefined,
+			canDuplicate,
 			postTypeConfig.slug === 'wp_template_part' &&
 			canCreate &&
 			currentTheme?.is_block_theme
@@ -164,34 +261,81 @@ export const registerPostTypeSchema =
 			permanentlyDeletePost,
 		].filter( Boolean );
 
-		const fields = [
-			postTypeConfig.supports?.thumbnail &&
-				currentTheme?.theme_supports?.[ 'post-thumbnails' ] &&
-				featuredImageField,
-			postTypeConfig.supports?.author && authorField,
-			statusField,
-			dateField,
-			slugField,
-			postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
-			postTypeConfig.supports?.comments && commentStatusField,
-			templateField,
-			passwordField,
-			postTypeConfig.supports?.editor &&
-				postTypeConfig.viewable &&
-				postPreviewField,
-		].filter( Boolean );
-		if ( postTypeConfig.supports?.title ) {
-			let _titleField;
-			if ( postType === 'page' ) {
-				_titleField = pageTitleField;
-			} else if ( postType === 'wp_template' ) {
-				_titleField = templateTitleField;
-			} else if ( postType === 'wp_block' ) {
-				_titleField = patternTitleField;
-			} else {
-				_titleField = titleField;
+		// Handle attachment post type separately with media-specific fields
+		let fields;
+
+		if ( postType === ATTACHMENT_POST_TYPE ) {
+			fields = ORDERED_MEDIA_FIELDS;
+		} else {
+			const postTypeSlug = postTypeConfig.slug;
+			const isDesignPostType = DESIGN_POST_TYPES.includes( postTypeSlug );
+			const isPattern = postTypeSlug === 'wp_block';
+
+			fields = [
+				postTypeConfig.supports?.thumbnail &&
+					currentTheme?.theme_supports?.[ 'post-thumbnails' ] &&
+					featuredImageField,
+				! isDesignPostType &&
+					postTypeConfig.supports?.author &&
+					authorField,
+				postTypeSlug === 'wp_template' && templateAuthorField,
+				postTypeSlug === 'wp_template_part' && templatePartAuthorField,
+				! isDesignPostType && statusField,
+				! isDesignPostType && dateField,
+				! isDesignPostType && scheduledDateField,
+				lastEditedDateField,
+				! isDesignPostType && slugField,
+				! isDesignPostType &&
+					postTypeConfig.supports?.excerpt &&
+					excerptField,
+				isPattern &&
+					postTypeConfig.supports?.excerpt &&
+					patternDescriptionField,
+				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
+				postTypeConfig.supports?.comments && commentStatusField,
+				postTypeConfig.supports?.trackbacks && pingStatusField,
+				( postTypeConfig.supports?.comments ||
+					postTypeConfig.supports?.trackbacks ) &&
+					discussionField,
+				! isDesignPostType && templateField,
+				postTypeConfig.supports?.[ 'post-formats' ] &&
+					! disablePostFormats &&
+					formatField,
+				( ! isDesignPostType || isPattern ) &&
+					postTypeConfig.supports?.editor &&
+					postContentInfoField,
+				! isDesignPostType && passwordField,
+				postTypeSlug === 'post' && stickyField,
+				postTypeSlug === 'wp_template' && descriptionField,
+				postTypeSlug === 'wp_template' && readOnlyDescriptionField,
+				// The `home`/`index` template summary exposes a few fields that
+				// target other entities (`root/site` and the posts page).
+				// `DataFormPostSummary` overrides them to read/write the right
+				// entity and to control their visibility.
+				postTypeSlug === 'wp_template' && postsPageTitleField,
+				postTypeSlug === 'wp_template' && postsPerPageField,
+				postTypeSlug === 'wp_template' && siteDiscussionField,
+				postTypeConfig.supports?.editor &&
+					postTypeConfig.viewable &&
+					postPreviewField,
+				hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
+				isPattern && patternSyncStatusField,
+			].filter( Boolean );
+			if ( postTypeConfig.supports?.title ) {
+				let _titleField;
+				if ( postType === 'page' ) {
+					_titleField = pageTitleField;
+				} else if ( postType === 'wp_template' ) {
+					_titleField = templateTitleField;
+				} else if (
+					[ 'wp_block', 'wp_template_part' ].includes( postType )
+				) {
+					_titleField = patternTitleField;
+				} else {
+					_titleField = titleField;
+				}
+				fields.push( _titleField );
 			}
-			fields.push( _titleField );
 		}
 
 		registry.batch( () => {

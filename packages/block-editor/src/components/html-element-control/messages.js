@@ -7,11 +7,17 @@ import { __ } from '@wordpress/i18n';
  * Messages providing helpful descriptions for HTML elements.
  */
 export const htmlElementMessages = {
+	a: __(
+		'The <a> element should be used for links that navigate to a different page or to a different section within the same page.'
+	),
 	article: __(
 		'The <article> element should represent a self-contained, syndicatable portion of the document.'
 	),
 	aside: __(
 		"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
+	),
+	button: __(
+		'The <button> element should be used for interactive controls that perform an action on the current page, such as opening a modal or toggling content visibility.'
 	),
 	div: __(
 		'The <div> element should only be used if the block is a design element with no semantic meaning.'

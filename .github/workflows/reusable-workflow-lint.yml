@@ -17,13 +17,13 @@ jobs:
     # - Runs actionlint.
     actionlint:
         name: Run actionlint
-        runs-on: ubuntu-24.04
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         timeout-minutes: 5
         steps:
             - name: Checkout repository
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   persist-credentials: false
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
@@ -32,6 +32,6 @@ jobs:
             # See https://github.com/rhysd/actionlint.
             # Configuration file: .github/actionlint.yml
             - name: Run actionlint
-              uses: docker://rhysd/actionlint:1.7.7
+              uses: docker://rhysd/actionlint:1.7.11
               with:
                   args: '-color -verbose'

@@ -33,9 +33,21 @@ type Interesting =
  * iptc: Keep IPTC metadata.
  * icc: Keep ICC metadata.
  * other: Keep other metadata (e.g. PNG comments and some TIFF tags).
+ * gainmap: Keep gainmap metadata (UltraHDR JPEG).
  * all: Keep all metadata.
+ *
+ * Multiple values can be combined with `|`, e.g. `'icc|gainmap'`.
  */
-type ForeignKeep = 'none' | 'exif' | 'xmp' | 'iptc' | 'icc' | 'other' | 'all';
+type ForeignKeepValue =
+	| 'none'
+	| 'exif'
+	| 'xmp'
+	| 'iptc'
+	| 'icc'
+	| 'other'
+	| 'gainmap'
+	| 'all';
+type ForeignKeep = ForeignKeepValue | `${ ForeignKeepValue }|${ string }`;
 
 /**
  * The rendering intent.'absolute' is best for
@@ -123,6 +135,13 @@ export interface SaveOptions< T extends string > {
 	 * it is most relevant for AVIF, as it is slow by default.
 	 */
 	effort?: number;
+	/**
+	 * Number of bits per sample to write (e.g. 8, 10, or 12).
+	 *
+	 * Used for AVIF/HEIF to preserve high-bit-depth (HDR) images instead of
+	 * flattening them to 8-bit.
+	 */
+	bitdepth?: number;
 }
 
 export interface ThumbnailOptions {

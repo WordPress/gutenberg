@@ -3,29 +3,36 @@
 	"extends": "../../tsconfig.base.json",
 	"references": [
 		{ "path": "../a11y" },
-		{ "path": "../api-fetch" },
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blob" },
+		{ "path": "../blocks" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../data" },
+		{ "path": "../dataviews" },
 		{ "path": "../date" },
 		{ "path": "../deprecated" },
 		{ "path": "../dom" },
 		{ "path": "../element" },
 		{ "path": "../escape-html" },
+		{ "path": "../preferences" },
+		{ "path": "../global-styles-engine" },
 		{ "path": "../priority-queue" },
 		{ "path": "../private-apis" },
 		{ "path": "../hooks" },
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../image-cropper" },
+		{ "path": "../interactivity" },
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../keycodes" },
+		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../notices" },
 		{ "path": "../rich-text" },
 		{ "path": "../style-engine" },
 		{ "path": "../token-list" },
+		{ "path": "../ui" },
 		{ "path": "../url" },
 		{ "path": "../upload-media" },
 		{ "path": "../warning" },
@@ -34,6 +41,6 @@
 	// NOTE: This package is being progressively typed. You are encouraged to
 	// expand this array with files which can be type-checked. At some point in
 	// the future, this can be simplified to an `includes` of `src/**/*`.
-	"files": [ "src/components/block-context/index.js", "src/utils/dom.js" ],
-	"include": []
+	"files": [ "src/components/block-context/index.js" ],
+	"include": [ "src/utils/**/*.ts" ]
 }

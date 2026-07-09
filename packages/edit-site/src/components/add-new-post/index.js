@@ -66,7 +66,8 @@ export default function AddNewPostModal( { postType, onSave, onClose } ) {
 				sprintf(
 					// translators: %s: Title of the created post or template, e.g: "Hello world".
 					__( '"%s" successfully created.' ),
-					decodeEntities( newPage.title?.rendered || title )
+					decodeEntities( newPage.title?.rendered || title ) ||
+						__( '(no title)' )
 				),
 				{ type: 'snackbar' }
 			);
@@ -97,8 +98,6 @@ export default function AddNewPostModal( { postType, onSave, onClose } ) {
 			<form onSubmit={ createPost }>
 				<VStack spacing={ 4 }>
 					<TextControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Title' ) }
 						onChange={ setTitle }
 						placeholder={ __( 'No title' ) }

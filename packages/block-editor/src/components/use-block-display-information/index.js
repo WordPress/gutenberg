@@ -9,11 +9,13 @@ import {
 	__experimentalGetBlockLabel as getBlockLabel,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { symbol } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /** @typedef {import('@wordpress/blocks').WPIcon} WPIcon */
 
@@ -71,8 +73,13 @@ export default function useBlockDisplayInformation( clientId ) {
 			if ( ! clientId ) {
 				return null;
 			}
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
+			const blockEditorSelect = select( blockEditorStore );
+			const {
+				getBlockName,
+				getBlockAttributes,
+				getBlock,
+				__experimentalGetParsedPattern,
+			} = blockEditorSelect;
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const blockName = getBlockName( clientId );
@@ -81,7 +88,33 @@ export default function useBlockDisplayInformation( clientId ) {
 				return null;
 			}
 			const attributes = getBlockAttributes( clientId );
-			const match = getActiveBlockVariation( blockName, attributes );
+			const { isSectionBlock } = unlock( blockEditorSelect );
+
+			// Check if this block is a pattern
+			const patternName = attributes?.metadata?.patternName;
+
+			if ( patternName && isSectionBlock( clientId ) ) {
+				const pattern = __experimentalGetParsedPattern( patternName );
+				const positionLabel = getPositionTypeLabel( attributes );
+				return {
+					isSynced: false,
+					title: __( 'Pattern' ),
+					icon: symbol,
+					description:
+						pattern?.description || __( 'A block pattern.' ),
+					anchor: attributes?.anchor,
+					positionLabel,
+					positionType: attributes?.style?.position?.type,
+					name: pattern?.title || attributes?.metadata?.name,
+				};
+			}
+
+			const match = getActiveBlockVariation(
+				blockName,
+				attributes,
+				undefined,
+				getBlock?.( clientId )?.innerContent
+			);
 			const isSynced =
 				isReusableBlock( blockType ) || isTemplatePart( blockType );
 			const syncedTitle = isSynced

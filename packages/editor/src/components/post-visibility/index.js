@@ -82,8 +82,6 @@ export default function PostVisibility( { onClose } ) {
 						placeholder={ __( 'Use a secure password' ) }
 						type="text"
 						id={ `editor-post-visibility__password-input-${ instanceId }` }
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						maxLength={ 255 }
 					/>
 				) }

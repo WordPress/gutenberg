@@ -1,0 +1,38 @@
+[
+	{
+		"name": "core/form",
+		"isValid": true,
+		"attributes": {
+			"submissionMethod": "email",
+			"method": "post",
+			"anchor": "anchor",
+			"backgroundColor": "accent-1",
+			"textColor": "contrast",
+			"style": {
+				"elements": {
+					"link": {
+						"color": {
+							"text": "var:preset|color|contrast"
+						}
+					}
+				},
+				"spacing": {
+					"padding": {
+						"top": "var:preset|spacing|40",
+						"bottom": "var:preset|spacing|40",
+						"left": "var:preset|spacing|40",
+						"right": "var:preset|spacing|40"
+					},
+					"margin": {
+						"top": "var:preset|spacing|40",
+						"bottom": "var:preset|spacing|40",
+						"left": "var:preset|spacing|40",
+						"right": "var:preset|spacing|40"
+					}
+				}
+			},
+			"fontSize": "x-large"
+		},
+		"innerBlocks": []
+	}
+]

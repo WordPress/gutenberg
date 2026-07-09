@@ -3,11 +3,13 @@
 	"extends": "../../tsconfig.base.json",
 	"references": [
 		{ "path": "../a11y" },
+		{ "path": "../admin-ui" },
 		{ "path": "../api-fetch" },
 		{ "path": "../autop" },
 		{ "path": "../blob" },
 		{ "path": "../block-library" },
 		{ "path": "../block-editor" },
+		{ "path": "../blocks" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../core-data" },
@@ -20,6 +22,8 @@
 		{ "path": "../element" },
 		{ "path": "../escape-html" },
 		{ "path": "../fields" },
+		{ "path": "../global-styles-engine" },
+		{ "path": "../global-styles-ui" },
 		{ "path": "../hooks" },
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
@@ -29,25 +33,20 @@
 		{ "path": "../media-utils" },
 		{ "path": "../notices" },
 		{ "path": "../keycodes" },
+		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../plugins" },
+		{ "path": "../preferences" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
 		{ "path": "../router" },
 		{ "path": "../style-engine" },
+		{ "path": "../theme" },
+		{ "path": "../ui" },
 		{ "path": "../url" },
+		{ "path": "../viewport" },
+		{ "path": "../views" },
 		{ "path": "../wordcount" }
-	],
-	// NOTE: This package is being progressively typed. You are encouraged to
-	// expand this array with files which can be type-checked. At some point in
-	// the future, this can be simplified to an `includes` of `src/**/*`.
-	"files": [
-		"src/components/style-book/categories.ts",
-		"src/components/style-book/constants.ts",
-		"src/components/style-book/types.ts",
-		"src/components/style-book/color-examples.tsx",
-		"src/components/style-book/duotone-examples.tsx",
-		"src/components/style-book/examples.tsx"
 	],
 	"include": []
 }

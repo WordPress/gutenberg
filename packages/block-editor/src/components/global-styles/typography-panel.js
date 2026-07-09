@@ -6,9 +6,11 @@ import {
 	__experimentalNumberControl as NumberControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	Notice,
+	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo, useEffect } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,13 +22,22 @@ import LetterSpacingControl from '../letter-spacing-control';
 import TextAlignmentControl from '../text-alignment-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
+import TextIndentControl from '../text-indent-control';
 import WritingModeControl from '../writing-mode-control';
-import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
+import ColorGradientDropdownItem from './color-gradient-dropdown-item';
+import { useHasTextPanel } from './color-panel';
+import { useColorGradientSettings } from './hooks';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
+import {
+	extractPresetSlug,
+	encodeColorValueWithPalette,
+} from '../../utils/color-values';
 import {
 	getMergedFontFamiliesAndFontFamilyFaces,
 	findNearestStyleAndWeight,
 } from './typography-utils';
+import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -39,9 +50,11 @@ export function useHasTypographyPanel( settings ) {
 	const hasTextAlign = useHasTextAlignmentControl( settings );
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
+	const hasTextIndent = useHasTextIndentControl( settings );
 	const hasWritingMode = useHasWritingModeControl( settings );
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
+	const hasTextColor = useHasTextPanel( settings );
 
 	return (
 		hasFontFamily ||
@@ -52,8 +65,10 @@ export function useHasTypographyPanel( settings ) {
 		hasTextTransform ||
 		hasFontSize ||
 		hasTextDecoration ||
+		hasTextIndent ||
 		hasWritingMode ||
-		hasTextColumns
+		hasTextColumns ||
+		hasTextColor
 	);
 }
 
@@ -115,6 +130,10 @@ function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
 }
 
+function useHasTextIndentControl( settings ) {
+	return settings?.typography?.textIndent;
+}
+
 /**
  * Concatenate all the font sizes into a single list for the font size picker.
  *
@@ -132,7 +151,7 @@ function getMergedFontSizes( settings ) {
 	];
 }
 
-function TypographyToolsPanel( {
+export function TypographyToolsPanel( {
 	resetAllFilter,
 	onChange,
 	value,
@@ -150,6 +169,7 @@ function TypographyToolsPanel( {
 			label={ __( 'Typography' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			__experimentalFirstVisibleItemClass="first"
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
@@ -158,6 +178,7 @@ function TypographyToolsPanel( {
 }
 
 const DEFAULT_CONTROLS = {
+	textColor: true,
 	fontFamily: true,
 	fontSize: true,
 	fontAppearance: true,
@@ -166,6 +187,7 @@ const DEFAULT_CONTROLS = {
 	textAlign: true,
 	textTransform: true,
 	textDecoration: true,
+	textIndent: true,
 	writingMode: true,
 	textColumns: true,
 };
@@ -178,9 +200,48 @@ export default function TypographyPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
+	isGlobalStyles = false,
+	contrastWarning,
 } ) {
-	const decodeValue = ( rawValue ) =>
-		getValueFromVariable( { settings }, '', rawValue );
+	const { colors, allColors, areCustomSolidsEnabled, decodeValue } =
+		useColorGradientSettings( settings );
+
+	// Text color. Writes to `color.text` (unchanged storage path). The
+	// control is rendered here instead of the Color panel because text
+	// color is a typographic concern.
+	const hasTextColorEnabled = useHasTextPanel( settings );
+	const textColor = decodeValue( inheritedValue?.color?.text );
+	const userTextColor = decodeValue( value?.color?.text );
+	const hasTextColorValue = () => !! value?.color?.text;
+	const setTextColor = ( newColor, newSlug ) => {
+		const encoded = encodeColorValueWithPalette(
+			allColors,
+			newColor,
+			newSlug
+		);
+		let changedObject = setImmutably( value, [ 'color', 'text' ], encoded );
+		// Keep an in-sync link color following the text color (e.g. a
+		// Button's link color tracks its text color). Compare raw encoded
+		// references (e.g. `var:preset|color|slug`), not decoded hex values.
+		// Two palette entries can share the same hex but carry different
+		// slugs (e.g. `var:preset|color|dark-background` and
+		// `var:preset|color|dark-text` both resolving to `#000`); comparing
+		// decoded values would conflate them and incorrectly force the link
+		// color to follow the text color even when the user deliberately
+		// chose a different palette slot.
+		if (
+			inheritedValue?.color?.text ===
+			inheritedValue?.elements?.link?.color?.text
+		) {
+			changedObject = setImmutably(
+				changedObject,
+				[ 'elements', 'link', 'color', 'text' ],
+				encoded
+			);
+		}
+		onChange( changedObject );
+	};
+	const resetTextColor = () => setTextColor( undefined );
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
@@ -193,15 +254,57 @@ export default function TypographyPanel( {
 		const slug = fontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
 		)?.slug;
-		onChange(
-			setImmutably(
-				value,
-				[ 'typography', 'fontFamily' ],
-				slug
-					? `var:preset|font-family|${ slug }`
-					: newValue || undefined
-			)
+		let updatedValue = setImmutably(
+			value,
+			[ 'typography', 'fontFamily' ],
+			slug ? `var:preset|font-family|${ slug }` : newValue || undefined
 		);
+
+		// Check if current font style/weight are available in the new font family.
+		const newFontFamilyFaces =
+			fontFamilies?.find( ( { fontFamily: f } ) => f === newValue )
+				?.fontFace ?? [];
+		const { fontStyles, fontWeights } =
+			getFontStylesAndWeights( newFontFamilyFaces );
+		const hasFontStyle = fontStyles?.some(
+			( { value: fs } ) => fs === fontStyle
+		);
+		const hasFontWeight = fontWeights?.some(
+			( { value: fw } ) => fw?.toString() === fontWeight?.toString()
+		);
+
+		// Find the nearest available font style/weight if not available.
+		if ( ! hasFontStyle || ! hasFontWeight ) {
+			const { nearestFontStyle, nearestFontWeight } =
+				findNearestStyleAndWeight(
+					newFontFamilyFaces,
+					fontStyle,
+					fontWeight
+				);
+			if ( nearestFontStyle || nearestFontWeight ) {
+				// Update to the nearest available font style/weight in the new font family.
+				updatedValue = {
+					...updatedValue,
+					typography: {
+						...updatedValue?.typography,
+						fontStyle: nearestFontStyle || undefined,
+						fontWeight: nearestFontWeight || undefined,
+					},
+				};
+			} else if ( fontStyle || fontWeight ) {
+				// Reset if no available styles/weights found.
+				updatedValue = {
+					...updatedValue,
+					typography: {
+						...updatedValue?.typography,
+						fontStyle: undefined,
+						fontWeight: undefined,
+					},
+				};
+			}
+		}
+
+		onChange( updatedValue );
 	};
 	const hasFontFamily = () => !! value?.typography?.fontFamily;
 	const resetFontFamily = () => setFontFamily( undefined );
@@ -212,6 +315,30 @@ export default function TypographyPanel( {
 	const mergedFontSizes = getMergedFontSizes( settings );
 
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
+
+	// Extract the slug from the CSS custom property if it exists
+	const currentFontSizeSlug = ( () => {
+		const rawValue = inheritedValue?.typography?.fontSize;
+		if ( ! rawValue || typeof rawValue !== 'string' ) {
+			return undefined;
+		}
+
+		// Block supports use `var:preset` format.
+		if ( rawValue.startsWith( 'var:preset|font-size|' ) ) {
+			return rawValue.replace( 'var:preset|font-size|', '' );
+		}
+
+		// Global styles data uses `var(--wp--preset)` format.
+		const cssVarMatch = rawValue.match(
+			/^var\(--wp--preset--font-size--([^)]+)\)$/
+		);
+		if ( cssVarMatch ) {
+			return cssVarMatch[ 1 ];
+		}
+
+		return undefined;
+	} )();
+
 	const setFontSize = ( newValue, metadata ) => {
 		const actualValue = !! metadata?.slug
 			? `var:preset|font-size|${ metadata?.slug }`
@@ -235,11 +362,6 @@ export default function TypographyPanel( {
 	const hasFontWeights = settings?.typography?.fontWeight;
 	const fontStyle = decodeValue( inheritedValue?.typography?.fontStyle );
 	const fontWeight = decodeValue( inheritedValue?.typography?.fontWeight );
-	const { nearestFontStyle, nearestFontWeight } = findNearestStyleAndWeight(
-		fontFamilyFaces,
-		fontStyle,
-		fontWeight
-	);
 	const setFontAppearance = useCallback(
 		( { fontStyle: newFontStyle, fontWeight: newFontWeight } ) => {
 			// Only update the font style and weight if they have changed.
@@ -261,24 +383,6 @@ export default function TypographyPanel( {
 	const resetFontAppearance = useCallback( () => {
 		setFontAppearance( {} );
 	}, [ setFontAppearance ] );
-
-	// Check if previous font style and weight values are available in the new font family.
-	useEffect( () => {
-		if ( nearestFontStyle && nearestFontWeight ) {
-			setFontAppearance( {
-				fontStyle: nearestFontStyle,
-				fontWeight: nearestFontWeight,
-			} );
-		} else {
-			// Reset font appearance if there are no available styles or weights.
-			resetFontAppearance();
-		}
-	}, [
-		nearestFontStyle,
-		nearestFontWeight,
-		resetFontAppearance,
-		setFontAppearance,
-	] );
 
 	// Line Height
 	const hasLineHeightEnabled = useHasLineHeightControl( settings );
@@ -311,6 +415,48 @@ export default function TypographyPanel( {
 	};
 	const hasLetterSpacing = () => !! value?.typography?.letterSpacing;
 	const resetLetterSpacing = () => setLetterSpacing( undefined );
+
+	// Text Indent
+	const hasTextIndentControl = useHasTextIndentControl( settings );
+	const textIndent = decodeValue( inheritedValue?.typography?.textIndent );
+
+	// Get the setting value - can be 'subsequent' (default), 'all', or false.
+	// The setting determines which CSS selector is used for the text-indent style.
+	const textIndentSetting = settings?.typography?.textIndent ?? 'subsequent';
+	const isTextIndentAll = textIndentSetting === 'all';
+
+	const setTextIndentValue = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'textIndent' ],
+				newValue || undefined
+			)
+		);
+	};
+
+	const onToggleTextIndentAll = ( newValue ) => {
+		// Toggle between 'all' and 'subsequent' for the setting.
+		// Include the settings change so it can be handled atomically by the parent.
+		onChange( {
+			...value,
+			settings: {
+				typography: {
+					textIndent: newValue ? 'all' : 'subsequent',
+				},
+			},
+		} );
+	};
+
+	const hasTextIndent = () => !! value?.typography?.textIndent;
+	const resetTextIndent = () => {
+		onChange(
+			setImmutably( value, [ 'typography', 'textIndent' ], undefined )
+		);
+	};
+	const textIndentHelp = isTextIndentAll
+		? __( 'Indents the first line of all paragraphs.' )
+		: __( 'Indents the first line of each paragraph after the first one.' );
 
 	// Text Columns
 	const hasTextColumnsControl = useHasTextColumnsControl( settings );
@@ -392,12 +538,25 @@ export default function TypographyPanel( {
 	const hasTextAlign = () => !! value?.typography?.textAlign;
 	const resetTextAlign = () => setTextAlign( undefined );
 
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			typography: {},
-		};
-	}, [] );
+	const resetAllFilter = useCallback(
+		( previousValue ) => {
+			if ( ! hasTextColorEnabled ) {
+				return {
+					...previousValue,
+					typography: {},
+				};
+			}
+			return {
+				...previousValue,
+				typography: {},
+				color: {
+					...previousValue?.color,
+					text: undefined,
+				},
+			};
+		},
+		[ hasTextColorEnabled ]
+	);
 
 	return (
 		<Wrapper
@@ -406,6 +565,34 @@ export default function TypographyPanel( {
 			onChange={ onChange }
 			panelId={ panelId }
 		>
+			{ hasTextColorEnabled && (
+				<ColorGradientDropdownItem
+					label={ __( 'Color' ) }
+					hasValue={ hasTextColorValue }
+					resetValue={ resetTextColor }
+					isShownByDefault={ defaultControls.textColor }
+					indicators={ [ textColor ] }
+					contrastWarning={ contrastWarning }
+					tabs={ [
+						{
+							key: 'text',
+							label: __( 'Color' ),
+							inheritedValue: textColor,
+							inheritedSlug: extractPresetSlug(
+								inheritedValue?.color?.text,
+								'color'
+							),
+							setValue: setTextColor,
+							userValue: userTextColor,
+						},
+					] }
+					colorGradientControlSettings={ {
+						colors,
+						disableCustomColors: ! areCustomSolidsEnabled,
+					} }
+					panelId={ panelId }
+				/>
+			) }
 			{ hasFontFamilyEnabled && (
 				<ToolsPanelItem
 					label={ __( 'Font' ) }
@@ -418,8 +605,6 @@ export default function TypographyPanel( {
 						fontFamilies={ fontFamilies }
 						value={ fontFamily }
 						onChange={ setFontFamily }
-						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }
@@ -432,19 +617,18 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				>
 					<FontSizePicker
-						value={ fontSize }
+						value={ currentFontSizeSlug || fontSize }
+						valueMode={ currentFontSizeSlug ? 'slug' : 'literal' }
 						onChange={ setFontSize }
 						fontSizes={ mergedFontSizes }
 						disableCustomFontSizes={ disableCustomFontSizes }
 						withReset={ false }
 						withSlider
-						size="__unstable-large"
 					/>
 				</ToolsPanelItem>
 			) }
 			{ hasAppearanceControl && (
 				<ToolsPanelItem
-					className="single-column"
 					label={ appearanceControlLabel }
 					hasValue={ hasFontAppearance }
 					onDeselect={ resetFontAppearance }
@@ -460,7 +644,6 @@ export default function TypographyPanel( {
 						hasFontStyles={ hasFontStyles }
 						hasFontWeights={ hasFontWeights }
 						fontFamilyFaces={ fontFamilyFaces }
-						size="__unstable-large"
 					/>
 				</ToolsPanelItem>
 			) }
@@ -477,7 +660,6 @@ export default function TypographyPanel( {
 						__unstableInputWidth="auto"
 						value={ lineHeight }
 						onChange={ setLineHeight }
-						size="__unstable-large"
 					/>
 				</ToolsPanelItem>
 			) }
@@ -493,9 +675,33 @@ export default function TypographyPanel( {
 					<LetterSpacingControl
 						value={ letterSpacing }
 						onChange={ setLetterSpacing }
-						size="__unstable-large"
 						__unstableInputWidth="auto"
 					/>
+				</ToolsPanelItem>
+			) }
+			{ hasTextIndentControl && (
+				<ToolsPanelItem
+					label={ __( 'Line indent' ) }
+					hasValue={ hasTextIndent }
+					onDeselect={ resetTextIndent }
+					isShownByDefault={ defaultControls.textIndent }
+					panelId={ panelId }
+				>
+					<TextIndentControl
+						value={ textIndent }
+						onChange={ setTextIndentValue }
+						__unstableInputWidth="auto"
+						withSlider
+						hasBottomMargin={ isGlobalStyles }
+					/>
+					{ isGlobalStyles && (
+						<ToggleControl
+							label={ __( 'Indent all paragraphs' ) }
+							checked={ isTextIndentAll }
+							onChange={ onToggleTextIndentAll }
+							help={ textIndentHelp }
+						/>
+					) }
 				</ToolsPanelItem>
 			) }
 			{ hasTextColumnsControl && (
@@ -512,7 +718,6 @@ export default function TypographyPanel( {
 						max={ MAX_TEXT_COLUMNS }
 						min={ MIN_TEXT_COLUMNS }
 						onChange={ setTextColumns }
-						size="__unstable-large"
 						spinControls="custom"
 						value={ textColumns }
 						initialPosition={ 1 }
@@ -549,7 +754,6 @@ export default function TypographyPanel( {
 						value={ writingMode }
 						onChange={ setWritingMode }
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }
@@ -567,7 +771,6 @@ export default function TypographyPanel( {
 						showNone
 						isBlock
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }
@@ -582,9 +785,19 @@ export default function TypographyPanel( {
 					<TextAlignmentControl
 						value={ textAlign }
 						onChange={ setTextAlign }
+						options={ [ 'left', 'center', 'right', 'justify' ] }
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
+
+					{ textAlign === 'justify' && (
+						<div>
+							<Notice status="warning" isDismissible={ false }>
+								{ __(
+									'Justified text can reduce readability. For better accessibility, use left-aligned text instead.'
+								) }
+							</Notice>
+						</div>
+					) }
 				</ToolsPanelItem>
 			) }
 		</Wrapper>

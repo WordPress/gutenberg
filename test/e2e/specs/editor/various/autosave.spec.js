@@ -270,7 +270,9 @@ test.describe( 'Autosave', () => {
 
 		await expect(
 			page.locator( '.components-notice__content' )
-		).toContainText( 'Updating failed. You are probably offline.' );
+		).toContainText(
+			'Updating failed because you were offline. Please verify your connection and try again.'
+		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
 		).toBe( 1 );
@@ -291,7 +293,8 @@ test.describe( 'Autosave', () => {
 			name: 'Block: Paragraph',
 		} );
 		await paragraph.click();
-		await page.keyboard.type( ' after save' );
+		// Type slowly to ensure that autosave happens more than 1s after publish.
+		await page.keyboard.type( ' after save', { delay: 100 } );
 
 		// Trigger remote autosave.
 		await page.evaluate( () =>
@@ -324,21 +327,6 @@ test.describe( 'Autosave', () => {
 
 		await page.reload();
 		await page.waitForFunction( () => window?.wp?.data );
-
-		// FIXME: Occasionally, upon reload, there is no server-provided
-		// autosave value available, despite our having previously explicitly
-		// autosaved. The reasons for this are still unknown. Since this is
-		// unrelated to *local* autosave, until we can understand them, we'll
-		// drop this test's expectations if we don't have an autosave object
-		// available.
-		const stillHasRemoteAutosave = await page.evaluate(
-			() =>
-				window.wp.data.select( 'core/editor' ).getEditorSettings()
-					.autosave
-		);
-		if ( ! stillHasRemoteAutosave ) {
-			return;
-		}
 
 		// Only remote autosave notice should be applied.
 		await expect(

@@ -46,7 +46,8 @@ function render_block_core_rss( $attributes ) {
 	}
 
 	foreach ( $rss_items as $item ) {
-		$title = esc_html( trim( strip_tags( $item->get_title() ) ) );
+		$title = esc_html( trim( strip_tags( html_entity_decode( $item->get_title() ) ) ) );
+
 		if ( empty( $title ) ) {
 			$title = __( '(no title)' );
 		}
@@ -96,7 +97,7 @@ function render_block_core_rss( $attributes ) {
 			$excerpt = esc_attr( wp_trim_words( $excerpt, $attributes['excerptLength'], ' [&hellip;]' ) );
 
 			// Change existing [...] to [&hellip;].
-			if ( '[...]' === substr( $excerpt, -5 ) ) {
+			if ( str_ends_with( $excerpt, '[...]' ) ) {
 				$excerpt = substr( $excerpt, 0, -5 ) . '[&hellip;]';
 			}
 

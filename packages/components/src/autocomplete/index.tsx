@@ -1,19 +1,19 @@
 /**
- * External dependencies
- */
-import removeAccents from 'remove-accents';
-
-/**
  * WordPress dependencies
  */
 import {
 	renderToString,
 	useEffect,
-	useState,
-	useRef,
 	useMemo,
+	useReducer,
+	useRef,
 } from '@wordpress/element';
-import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
+import {
+	useInstanceId,
+	useMergeRefs,
+	useRefEffect,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
 import {
 	create,
 	slice,
@@ -27,25 +27,81 @@ import { isAppleOS } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { getAutoCompleterUI } from './autocompleter-ui';
-import { escapeRegExp } from '../utils/strings';
+import { AutocompleterUI } from './autocompleter-ui';
+import { getAutocompleteMatch } from './get-autocomplete-match';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import type {
+	AutocompleteAction,
 	AutocompleteProps,
-	AutocompleterUIProps,
+	AutocompleteState,
 	InsertOption,
 	KeyedOption,
 	OptionCompletion,
 	ReplaceOption,
 	UseAutocompleteProps,
-	WPCompleter,
 } from './types';
 import getNodeText from '../utils/get-node-text';
+import { unlock } from '../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 
 // Used for generating the instance ID
 const AUTOCOMPLETE_HOOK_REFERENCE = {};
+
+function getCompletionObject(
+	completion: OptionCompletion
+): InsertOption | ReplaceOption {
+	if (
+		completion !== null &&
+		typeof completion === 'object' &&
+		'action' in completion &&
+		completion.action !== undefined &&
+		'value' in completion &&
+		completion.value !== undefined
+	) {
+		return completion;
+	}
+	return {
+		action: 'insert-at-caret',
+		value: completion as React.ReactNode,
+	};
+}
+
+const initialState: AutocompleteState = {
+	selectedIndex: 0,
+	filteredOptions: EMPTY_FILTERED_OPTIONS,
+	filterValue: '',
+	autocompleter: null,
+};
+
+function autocompleteReducer(
+	state: AutocompleteState,
+	action: AutocompleteAction
+): AutocompleteState {
+	switch ( action.type ) {
+		case 'RESET':
+			return initialState;
+		case 'SELECT':
+			return { ...state, selectedIndex: action.index };
+		case 'OPTIONS':
+			return {
+				...state,
+				filteredOptions: action.options,
+				selectedIndex:
+					action.options.length === state.filteredOptions.length
+						? state.selectedIndex
+						: 0,
+			};
+		case 'MATCH':
+			return {
+				...state,
+				autocompleter: action.completer,
+				filterValue: action.query,
+			};
+	}
+}
 
 export function useAutocomplete( {
 	record,
@@ -55,25 +111,20 @@ export function useAutocomplete( {
 	contentRef,
 }: UseAutocompleteProps ) {
 	const instanceId = useInstanceId( AUTOCOMPLETE_HOOK_REFERENCE );
-	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
-
-	const [ filteredOptions, setFilteredOptions ] = useState<
-		Array< KeyedOption >
-	>( EMPTY_FILTERED_OPTIONS );
-	const [ filterValue, setFilterValue ] =
-		useState< AutocompleterUIProps[ 'filterValue' ] >( '' );
-	const [ autocompleter, setAutocompleter ] = useState< WPCompleter | null >(
-		null
-	);
-	const [ AutocompleterUI, setAutocompleterUI ] = useState<
-		( ( props: AutocompleterUIProps ) => JSX.Element | null ) | null
-	>( null );
+	const [ state, dispatch ] = useReducer( autocompleteReducer, initialState );
+	const { selectedIndex, filteredOptions, filterValue, autocompleter } =
+		state;
 
 	const backspacingRef = useRef( false );
+	const prevRecordTextRef = useRef( '' );
+	const lastCompletionRef = useRef< {
+		name: string;
+		value: string;
+	} | null >( null );
 
 	function insertCompletion( replacement: React.ReactNode ) {
 		if ( autocompleter === null ) {
-			return;
+			return '';
 		}
 		const end = record.start;
 		const start =
@@ -81,71 +132,62 @@ export function useAutocomplete( {
 		const toInsert = create( { html: renderToString( replacement ) } );
 
 		onChange( insert( record, toInsert, start, end ) );
+		return getTextContent( toInsert );
 	}
 
 	function select( option: KeyedOption ) {
-		const { getOptionCompletion } = autocompleter || {};
-
-		if ( option.isDisabled ) {
+		if ( option.isDisabled || ! autocompleter ) {
 			return;
 		}
 
-		if ( getOptionCompletion ) {
-			const completion = getOptionCompletion( option.value, filterValue );
+		const { getOptionCompletion } = autocompleter;
+		if ( ! getOptionCompletion ) {
+			dispatch( { type: 'RESET' } );
+			contentRef.current?.focus();
+			return;
+		}
 
-			const isCompletionObject = (
-				obj: OptionCompletion
-			): obj is InsertOption | ReplaceOption => {
-				return (
-					obj !== null &&
-					typeof obj === 'object' &&
-					'action' in obj &&
-					obj.action !== undefined &&
-					'value' in obj &&
-					obj.value !== undefined
+		const completionObject = getCompletionObject(
+			getOptionCompletion( option.value, filterValue )
+		);
+
+		if ( 'replace' === completionObject.action ) {
+			onReplace( [ completionObject.value ] );
+			// When replacing, the component will unmount, so don't reset
+			// state (below) on an unmounted component.
+			return;
+		}
+
+		if ( 'insert-at-caret' === completionObject.action ) {
+			const completionText = insertCompletion( completionObject.value );
+			// When the completion value starts with the trigger prefix
+			// (e.g. @username), the trigger stays in the text and would
+			// re-activate the autocompleter. Store the completed text so
+			// the effect can suppress the stale re-match.
+			if ( completionText.startsWith( autocompleter.triggerPrefix ) ) {
+				const afterPrefix = completionText.slice(
+					autocompleter.triggerPrefix.length
 				);
-			};
-
-			const completionObject = isCompletionObject( completion )
-				? completion
-				: ( {
-						action: 'insert-at-caret',
-						value: completion,
-				  } as InsertOption );
-
-			if ( 'replace' === completionObject.action ) {
-				onReplace( [ completionObject.value ] );
-				// When replacing, the component will unmount, so don't reset
-				// state (below) on an unmounted component.
-				return;
-			} else if ( 'insert-at-caret' === completionObject.action ) {
-				insertCompletion( completionObject.value );
+				if ( afterPrefix ) {
+					lastCompletionRef.current = {
+						name: autocompleter.name,
+						value: afterPrefix,
+					};
+				}
 			}
 		}
 
 		// Reset autocomplete state after insertion rather than before
 		// so insertion events don't cause the completion menu to redisplay.
-		reset();
+		dispatch( { type: 'RESET' } );
+
+		// Make sure that the content remains focused after making a selection
+		// and that the text cursor position is not lost.
+		contentRef.current?.focus();
 	}
 
-	function reset() {
-		setSelectedIndex( 0 );
-		setFilteredOptions( EMPTY_FILTERED_OPTIONS );
-		setFilterValue( '' );
-		setAutocompleter( null );
-		setAutocompleterUI( null );
-	}
-
-	/**
-	 * Load options for an autocompleter.
-	 *
-	 * @param {Array} options
-	 */
 	function onChangeOptions( options: Array< KeyedOption > ) {
-		setSelectedIndex(
-			options.length === filteredOptions.length ? selectedIndex : 0
-		);
-		setFilteredOptions( options );
+		dispatch( { type: 'OPTIONS', options } );
 	}
 
 	function handleKeyDown( event: KeyboardEvent ) {
@@ -163,12 +205,13 @@ export function useAutocomplete( {
 		}
 
 		switch ( event.key ) {
-			case 'ArrowUp': {
+			case 'ArrowUp':
+			case 'ArrowDown': {
+				const offset = event.key === 'ArrowUp' ? -1 : 1;
 				const newIndex =
-					( selectedIndex === 0
-						? filteredOptions.length
-						: selectedIndex ) - 1;
-				setSelectedIndex( newIndex );
+					( selectedIndex + offset + filteredOptions.length ) %
+					filteredOptions.length;
+				dispatch( { type: 'SELECT', index: newIndex } );
 				// See the related PR as to why this is necessary: https://github.com/WordPress/gutenberg/pull/54902.
 				if ( isAppleOS() ) {
 					speak(
@@ -179,21 +222,8 @@ export function useAutocomplete( {
 				break;
 			}
 
-			case 'ArrowDown': {
-				const newIndex = ( selectedIndex + 1 ) % filteredOptions.length;
-				setSelectedIndex( newIndex );
-				if ( isAppleOS() ) {
-					speak(
-						getNodeText( filteredOptions[ newIndex ].label ),
-						'assertive'
-					);
-				}
-				break;
-			}
-
 			case 'Escape':
-				setAutocompleter( null );
-				setAutocompleterUI( null );
+				dispatch( { type: 'RESET' } );
 				event.preventDefault();
 				break;
 
@@ -203,7 +233,7 @@ export function useAutocomplete( {
 
 			case 'ArrowLeft':
 			case 'ArrowRight':
-				reset();
+				dispatch( { type: 'RESET' } );
 				return;
 
 			default:
@@ -226,132 +256,58 @@ export function useAutocomplete( {
 	}, [ record ] );
 
 	useEffect( () => {
-		if ( ! textContent ) {
+		const isTextChange = record.text !== prevRecordTextRef.current;
+		prevRecordTextRef.current = record.text;
+
+		function getTextAfterSelection() {
+			return textContent
+				? getTextContent(
+						slice(
+							record,
+							undefined,
+							getTextContent( record ).length
+						)
+				  )
+				: '';
+		}
+
+		const match = getAutocompleteMatch( textContent, completers, {
+			matchCount: filteredOptions.length,
+			isBackspacing: backspacingRef.current,
+			getTextAfterSelection,
+			lastCompletion: lastCompletionRef.current,
+		} );
+
+		if ( ! match ) {
 			if ( autocompleter ) {
-				reset();
+				dispatch( { type: 'RESET' } );
 			}
 			return;
 		}
 
-		// Find the completer with the highest triggerPrefix index in the
-		// textContent.
-		const completer = completers.reduce< WPCompleter | null >(
-			( lastTrigger, currentCompleter ) => {
-				const triggerIndex = textContent.lastIndexOf(
-					currentCompleter.triggerPrefix
-				);
-				const lastTriggerIndex =
-					lastTrigger !== null
-						? textContent.lastIndexOf( lastTrigger.triggerPrefix )
-						: -1;
+		const { completer, filterValue: query } = match;
 
-				return triggerIndex > lastTriggerIndex
-					? currentCompleter
-					: lastTrigger;
-			},
-			null
-		);
-
-		if ( ! completer ) {
-			if ( autocompleter ) {
-				reset();
-			}
+		// Don't re-activate a dismissed autocompleter on cursor-only
+		// movement. `textContent` (text before cursor) changes with the
+		// caret, so the effect re-runs, but `record.text` does not.
+		// Complements the render-time `didUserInput` gate in
+		// `useAutocompleteProps` for callers using this hook directly.
+		if ( ! autocompleter && ! isTextChange ) {
 			return;
 		}
 
-		const { allowContext, triggerPrefix } = completer;
-		const triggerIndex = textContent.lastIndexOf( triggerPrefix );
-		const textWithoutTrigger = textContent.slice(
-			triggerIndex + triggerPrefix.length
-		);
-
-		const tooDistantFromTrigger = textWithoutTrigger.length > 50; // 50 chars seems to be a good limit.
-		// This is a final barrier to prevent the effect from completing with
-		// an extremely long string, which causes the editor to slow-down
-		// significantly. This could happen, for example, if `matchingWhileBackspacing`
-		// is true and one of the "words" end up being too long. If that's the case,
-		// it will be caught by this guard.
-		if ( tooDistantFromTrigger ) {
-			return;
-		}
-
-		const mismatch = filteredOptions.length === 0;
-		const wordsFromTrigger = textWithoutTrigger.split( /\s/ );
-		// We need to allow the effect to run when not backspacing and if there
-		// was a mismatch. i.e when typing a trigger + the match string or when
-		// clicking in an existing trigger word on the page. We do that if we
-		// detect that we have one word from trigger in the current textual context.
-		//
-		// Ex.: "Some text @a" <-- "@a" will be detected as the trigger word and
-		// allow the effect to run. It will run until there's a mismatch.
-		const hasOneTriggerWord = wordsFromTrigger.length === 1;
-		// This is used to allow the effect to run when backspacing and if
-		// "touching" a word that "belongs" to a trigger. We consider a "trigger
-		// word" any word up to the limit of 3 from the trigger character.
-		// Anything beyond that is ignored if there's a mismatch. This allows
-		// us to "escape" a mismatch when backspacing, but still imposing some
-		// sane limits.
-		//
-		// Ex: "Some text @marcelo sekkkk" <--- "kkkk" caused a mismatch, but
-		// if the user presses backspace here, it will show the completion popup again.
-		const matchingWhileBackspacing =
-			backspacingRef.current && wordsFromTrigger.length <= 3;
-
-		if ( mismatch && ! ( matchingWhileBackspacing || hasOneTriggerWord ) ) {
-			if ( autocompleter ) {
-				reset();
-			}
-			return;
-		}
-
-		const textAfterSelection = getTextContent(
-			slice( record, undefined, getTextContent( record ).length )
-		);
-
+		// Clear stale completion ref when the user types a new trigger
+		// for the same completer (the previous completion is no longer
+		// relevant). Must be after the cursor-only check so that mere
+		// cursor movement doesn't discard the suppression state.
 		if (
-			allowContext &&
-			! allowContext(
-				textContent.slice( 0, triggerIndex ),
-				textAfterSelection
-			)
+			lastCompletionRef.current &&
+			lastCompletionRef.current.name === completer.name
 		) {
-			if ( autocompleter ) {
-				reset();
-			}
-			return;
+			lastCompletionRef.current = null;
 		}
 
-		if (
-			/^\s/.test( textWithoutTrigger ) ||
-			/\s\s+$/.test( textWithoutTrigger )
-		) {
-			if ( autocompleter ) {
-				reset();
-			}
-			return;
-		}
-
-		if ( ! /[\u0000-\uFFFF]*$/.test( textWithoutTrigger ) ) {
-			if ( autocompleter ) {
-				reset();
-			}
-			return;
-		}
-
-		const safeTrigger = escapeRegExp( completer.triggerPrefix );
-		const text = removeAccents( textContent );
-		const match = text
-			.slice( text.lastIndexOf( completer.triggerPrefix ) )
-			.match( new RegExp( `${ safeTrigger }([\u0000-\uFFFF]*)$` ) );
-		const query = match && match[ 1 ];
-
-		setAutocompleter( completer );
-		setAutocompleterUI( () =>
-			completer !== autocompleter
-				? getAutoCompleterUI( completer )
-				: AutocompleterUI
-		);
-		setFilterValue( query === null ? '' : query );
+		dispatch( { type: 'MATCH', completer, query } );
 		// We want to avoid introducing unexpected side effects.
 		// See https://github.com/WordPress/gutenberg/pull/41820
 	}, [ textContent ] );
@@ -366,7 +322,7 @@ export function useAutocomplete( {
 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
 		: null;
 	const hasSelection = record.start !== undefined;
-	const showPopover = !! textContent && hasSelection && !! AutocompleterUI;
+	const showPopover = !! textContent && hasSelection && !! autocompleter;
 
 	return {
 		listBoxId,
@@ -374,6 +330,8 @@ export function useAutocomplete( {
 		onKeyDown: withIgnoreIMEEvents( handleKeyDown ),
 		popover: showPopover && (
 			<AutocompleterUI
+				key={ autocompleter.name + autocompleter.triggerPrefix }
+				autocompleter={ autocompleter }
 				className={ className }
 				filterValue={ filterValue }
 				instanceId={ instanceId }
@@ -381,30 +339,54 @@ export function useAutocomplete( {
 				selectedIndex={ selectedIndex }
 				onChangeOptions={ onChangeOptions }
 				onSelect={ select }
-				value={ record }
 				contentRef={ contentRef }
-				reset={ reset }
+				reset={ () => dispatch( { type: 'RESET' } ) }
 			/>
 		),
 	};
 }
 
-function useLastDifferentValue( value: UseAutocompleteProps[ 'record' ] ) {
-	const history = useRef< Set< typeof value > >( new Set() );
+/**
+ * Checks whether two records represent the same user-visible state
+ * (same text content and cursor position).
+ */
+function recordValuesMatch(
+	a: UseAutocompleteProps[ 'record' ],
+	b: UseAutocompleteProps[ 'record' ]
+) {
+	return a.text === b.text && a.start === b.start && a.end === b.end;
+}
 
-	history.current.add( value );
+/**
+ * Tracks the last record whose value differed from the current one.
+ * Used to determine whether the user has actually typed something
+ */
+export function useLastDifferentValue(
+	value: UseAutocompleteProps[ 'record' ]
+) {
+	const history = useRef< Array< typeof value > >( [] );
 
-	// Keep the history size to 2.
-	if ( history.current.size > 2 ) {
-		history.current.delete( Array.from( history.current )[ 0 ] );
+	const lastEntry = history.current[ history.current.length - 1 ];
+
+	// Only add to history if the value is meaningfully different from
+	// the most recent entry (analogous to Set.add being a no-op for
+	// duplicate references in the original implementation).
+	if ( ! lastEntry || ! recordValuesMatch( value, lastEntry ) ) {
+		history.current.push( value );
 	}
 
-	return Array.from( history.current )[ 0 ];
+	// Keep the history size to 2.
+	if ( history.current.length > 2 ) {
+		history.current.shift();
+	}
+
+	return history.current[ 0 ];
 }
 
 export function useAutocompleteProps( options: UseAutocompleteProps ) {
 	const ref = useRef< HTMLElement >( null );
-	const onKeyDownRef = useRef< ( event: KeyboardEvent ) => void >();
+	const onKeyDownRef =
+		useRef< ( event: KeyboardEvent ) => void >( undefined );
 	const { record } = options;
 	const previousRecord = useLastDifferentValue( record );
 	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
@@ -416,13 +398,23 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 	const mergedRefs = useMergeRefs( [
 		ref,
 		useRefEffect( ( element: HTMLElement ) => {
-			function _onKeyDown( event: KeyboardEvent ) {
-				onKeyDownRef.current?.( event );
+			function _onKeyDown( event: Event ) {
+				onKeyDownRef.current?.( event as KeyboardEvent );
 			}
-			element.addEventListener( 'keydown', _onKeyDown );
-			return () => {
-				element.removeEventListener( 'keydown', _onKeyDown );
-			};
+			// Capture phase. When the autocomplete popover is open,
+			// Up/Down/Enter/Escape must navigate the completion list —
+			// they shouldn't be consumed by ancestor handlers (e.g.
+			// block-editor's writing-flow) for block navigation, block
+			// splitting, or "move out of parent" actions. Those handlers
+			// fire at bubble phase and gate on `event.defaultPrevented`,
+			// so firing in capture lets us preventDefault first when the
+			// popover is active.
+			return subscribeDelegatedListener(
+				element,
+				'keydown',
+				_onKeyDown,
+				true
+			);
 		}, [] ),
 	] );
 

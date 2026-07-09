@@ -154,7 +154,11 @@
 						"docs/reference-guides/block-api/block-annotations.md": []
 					},
 					{
-						"docs/reference-guides/block-api/block-api-versions.md": []
+						"docs/reference-guides/block-api/block-api-versions/README.md": [
+							{
+								"docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md": []
+							}
+						]
 					},
 					{
 						"docs/reference-guides/block-api/block-attributes.md": []
@@ -190,7 +194,7 @@
 					}
 				]
 			},
-			{ "docs/reference-guides/core-blocks.md": [] },
+			{ "docs/reference-guides/core-blocks/README.md": "{{blocks}}" },
 			{
 				"docs/reference-guides/filters/README.md": [
 					{ "docs/reference-guides/filters/block-filters.md": [] },
@@ -213,13 +217,19 @@
 								"docs/reference-guides/interactivity-api/core-concepts/the-reactive-and-declarative-mindset.md": []
 							},
 							{
-								"docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md": []
+								"docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-derived-state-and-config.md": []
 							},
 							{
 								"docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md": []
 							},
 							{
 								"docs/reference-guides/interactivity-api/core-concepts/using-typescript.md": []
+							},
+							{
+								"docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md": []
+							},
+							{
+								"docs/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility.md": []
 							}
 						]
 					},
@@ -227,7 +237,7 @@
 						"docs/reference-guides/interactivity-api/iapi-quick-start-guide.md": []
 					},
 					{
-						"docs/reference-guides/interactivity-api/api-reference.md": []
+						"docs/reference-guides/interactivity-api/directives-and-store.md": []
 					},
 					{
 						"docs/reference-guides/interactivity-api/iapi-about.md": []
@@ -317,7 +327,6 @@
 						"docs/reference-guides/data/data-core-keyboard-shortcuts.md": []
 					},
 					{ "docs/reference-guides/data/data-core-notices.md": [] },
-					{ "docs/reference-guides/data/data-core-nux.md": [] },
 					{
 						"docs/reference-guides/data/data-core-preferences.md": []
 					},
@@ -345,7 +354,10 @@
 					{
 						"docs/explanations/architecture/full-site-editing-templates.md": []
 					},
-					{ "docs/explanations/architecture/styles.md": [] }
+					{ "docs/explanations/architecture/styles.md": [] },
+					{
+						"docs/explanations/architecture/dashboard-widgets.md": []
+					}
 				]
 			},
 			{
@@ -374,9 +386,6 @@
 							{
 								"docs/contributors/code/e2e/README.md": [
 									{
-										"docs/contributors/code/e2e/migration.md": []
-									},
-									{
 										"docs/contributors/code/e2e/overusing-snapshots.md": []
 									}
 								]
@@ -385,26 +394,17 @@
 					},
 					{ "docs/contributors/code/scripts.md": [] },
 					{ "docs/contributors/code/managing-packages.md": [] },
+					{ "docs/contributors/code/workspace-development.md": [] },
 					{
-						"docs/contributors/code/release.md": [
+						"docs/contributors/code/release/README.md": [
+							{
+								"docs/contributors/code/release/plugin-release.md": []
+							},
+							{
+								"docs/contributors/code/release/package-release-and-core-updates.md": []
+							},
 							{
 								"docs/contributors/code/auto-cherry-picking.md": []
-							}
-						]
-					},
-					{
-						"docs/contributors/code/react-native/README.md": [
-							{
-								"docs/contributors/code/react-native/getting-started-react-native.md": []
-							},
-							{
-								"docs/contributors/code/react-native/osx-setup-guide.md": []
-							},
-							{
-								"docs/contributors/code/react-native/integration-test-guide.md": []
-							},
-							{
-								"docs/contributors/code/react-native/internationalization-guide.md": []
 							}
 						]
 					},

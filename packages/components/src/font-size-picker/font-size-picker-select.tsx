@@ -2,16 +2,17 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import CustomSelectControl from '../custom-select-control';
 import type {
 	FontSizePickerSelectProps,
 	FontSizePickerSelectOption,
 } from './types';
-import { isSimpleCssValue } from './utils';
+import { generateFontSizeHint } from './utils';
+import { StyledCustomSelectControl } from './styles';
 
 const DEFAULT_OPTION: FontSizePickerSelectOption = {
 	key: 'default',
@@ -20,15 +21,12 @@ const DEFAULT_OPTION: FontSizePickerSelectOption = {
 };
 
 const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
-	const { __next40pxDefaultSize, fontSizes, value, size, onChange } = props;
+	const { fontSizes, value, valueMode = 'literal', onChange } = props;
 
 	const options: FontSizePickerSelectOption[] = [
 		DEFAULT_OPTION,
 		...fontSizes.map( ( fontSize ) => {
-			let hint;
-			if ( isSimpleCssValue( fontSize.size ) ) {
-				hint = String( fontSize.size );
-			}
+			const hint = generateFontSizeHint( fontSize );
 			return {
 				key: fontSize.slug,
 				name: fontSize.name || fontSize.slug,
@@ -38,13 +36,30 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 		} ),
 	];
 
-	const selectedOption =
-		options.find( ( option ) => option.value === value ) ?? DEFAULT_OPTION;
+	const selectedOption = useMemo( () => {
+		if ( value === undefined ) {
+			return DEFAULT_OPTION;
+		}
+
+		// If valueMode is 'slug', find by slug
+		if ( valueMode === 'slug' ) {
+			const optionBySlug = options.find(
+				( option ) => option.key === value
+			);
+			if ( optionBySlug ) {
+				return optionBySlug;
+			}
+		}
+
+		// If valueMode is 'literal', find by value (size)
+		return (
+			options.find( ( option ) => option.value === value ) ??
+			DEFAULT_OPTION
+		);
+	}, [ value, valueMode, options ] );
 
 	return (
-		<CustomSelectControl
-			__next40pxDefaultSize={ __next40pxDefaultSize }
-			__shouldNotWarnDeprecated36pxSize
+		<StyledCustomSelectControl
 			className="components-font-size-picker__select"
 			label={ __( 'Font size' ) }
 			hideLabelFromVision
@@ -61,9 +76,17 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 			}: {
 				selectedItem: FontSizePickerSelectOption;
 			} ) => {
-				onChange( selectedItem.value );
+				// Find the corresponding FontSize object
+				const matchingFontSize =
+					selectedItem.key === 'default'
+						? undefined
+						: fontSizes.find(
+								( fontSize ) =>
+									fontSize.slug === selectedItem.key
+						  );
+
+				onChange( selectedItem.value, matchingFontSize );
 			} }
-			size={ size }
 		/>
 	);
 };

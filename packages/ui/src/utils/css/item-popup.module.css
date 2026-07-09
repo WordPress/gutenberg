@@ -1,0 +1,151 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer utilities {
+		.popup {
+			composes: dropdown-motion from "./dropdown-motion.module.css";
+
+			--wp-ui-popup-padding: var(--wpds-dimension-padding-xs);
+
+			display: grid;
+			grid-template-rows: auto minmax(0, 1fr);
+			grid-template-areas: "header" "main";
+			max-height: min(var(--available-height), 480px, 60dvh);
+			min-width: var(--anchor-width);
+			max-width: var(--available-width);
+			border-radius: var(--wpds-border-radius-md);
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			box-shadow: var(--wpds-elevation-md);
+			background-color: var(--wpds-color-background-surface-neutral-strong);
+		}
+
+		.list {
+			display: grid;
+			grid-area: main;
+			grid-template-rows: minmax(0, 1fr) auto;
+			grid-template-areas: "scrollable" "footer";
+			font-family: var(--wpds-typography-font-family-body);
+			font-size: var(--wpds-typography-font-size-md);
+			line-height: var(--wpds-typography-line-height-sm);
+			color: var(--wpds-color-foreground-interactive-neutral);
+		}
+
+		.list-scrollable-container {
+			overflow-block: auto;
+			overscroll-behavior: contain;
+			grid-area: scrollable;
+			scroll-padding-block: var(--wp-ui-popup-padding);
+
+			&:not(:empty) {
+				padding-block: var(--wp-ui-popup-padding);
+			}
+		}
+
+		.list-footer {
+			grid-area: footer;
+			padding-block: var(--wp-ui-popup-padding);
+
+			.list-scrollable-container:not(:empty) + & {
+				border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			}
+		}
+
+		.group:not(:first-child) {
+			margin-block-start: var(--wpds-dimension-gap-sm);
+		}
+
+		.group-label {
+			display: flex;
+			align-items: center;
+			min-height: var(--wpds-dimension-size-md);
+			padding-inline: var(--wpds-dimension-padding-md);
+			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
+		.item {
+			--wp-ui-popup-item-height: var(--wpds-dimension-size-lg);
+			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-md);
+			--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
+
+			display: flex;
+			align-items: center;
+			justify-content: flex-start;
+			gap: var(--wpds-dimension-gap-xs);
+			min-height: var(--wp-ui-popup-item-height);
+			border-radius: var(--wpds-border-radius-sm);
+			user-select: none;
+			margin-inline: var(--wp-ui-popup-padding);
+			padding-block: var(--wp-ui-popup-item-padding-block);
+
+			/* Optically adjust the prefix icon to a more balanced position. */
+			padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - var(--wpds-dimension-padding-xs));
+			padding-inline-end: var(--wp-ui-popup-item-padding-inline);
+
+			&:not([data-disabled]) {
+				cursor: var(--wpds-cursor-control);
+			}
+
+			&.is-size-compact {
+				--wp-ui-popup-item-height: var(--wpds-dimension-size-md);
+				--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
+			}
+
+			&.is-size-small {
+				--wp-ui-popup-item-height: var(--wpds-dimension-size-sm);
+				--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
+				--wp-ui-popup-item-padding-block: 2px;
+			}
+
+			&:not([data-selected]) {
+				.item-indicator-icon {
+					opacity: 0;
+				}
+			}
+
+			&[data-highlighted]:not([aria-disabled="true"]) {
+				background-color: var(--wpds-color-background-interactive-brand-weak-active);
+				color: var(--wpds-color-foreground-interactive-neutral);
+				outline: none; /* Disable user agent focus ring */
+
+				@media ( forced-colors: active ) {
+					outline: 1px solid Highlight;
+				}
+			}
+
+			&[aria-disabled="true"] {
+				/* Background is brand-toned (see `[data-highlighted]` above); the
+				   foreground text stays neutral in every state. The disabled
+				   background currently resolves to transparent, but referencing the
+				   token keeps it in sync if its value ever changes. */
+				background-color: var(--wpds-color-background-interactive-brand-weak-disabled);
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+				@media ( forced-colors: active ) {
+					color: GrayText;
+				}
+			}
+		}
+
+		.item-icon {
+			flex-shrink: 0;
+		}
+
+		/* Only style when there is content, because otherwise the element would block clicks
+		on the .list beneath it (both share grid-area: main and overlap). */
+		.empty:not(:empty) {
+			--wp-ui-popup-empty-min-height: var(--wpds-dimension-size-lg);
+			--wp-ui-popup-empty-padding-inline: var(--wpds-dimension-padding-md);
+
+			grid-area: main;
+			display: flex;
+			align-items: center;
+			min-height: var(--wp-ui-popup-empty-min-height);
+			padding-inline: var(--wp-ui-popup-empty-padding-inline);
+			font-family: var(--wpds-typography-font-family-body);
+			font-size: var(--wpds-typography-font-size-md);
+			line-height: var(--wpds-typography-line-height-sm);
+			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
+	}
+}

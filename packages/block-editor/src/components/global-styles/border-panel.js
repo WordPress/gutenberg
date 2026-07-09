@@ -11,13 +11,14 @@ import {
 } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
-import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { useBorderPanelLabel } from '../../hooks/border';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
@@ -104,6 +105,7 @@ export default function BorderPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 } ) {
 	const colors = useColorsPerOrigin( settings );
+	const areCustomSolidsEnabled = settings?.color?.custom;
 	const decodeValue = useCallback(
 		( rawValue ) => getValueFromVariable( { settings }, '', rawValue ),
 		[ settings ]
@@ -145,7 +147,22 @@ export default function BorderPanel( {
 
 	// Border radius.
 	const showBorderRadius = useHasBorderRadiusControl( settings );
-	const borderRadiusValues = decodeValue( border?.radius );
+	const borderRadiusValues = useMemo( () => {
+		if ( typeof inheritedValue?.border?.radius !== 'object' ) {
+			return decodeValue( inheritedValue?.border?.radius );
+		}
+
+		return {
+			topLeft: decodeValue( inheritedValue?.border?.radius?.topLeft ),
+			topRight: decodeValue( inheritedValue?.border?.radius?.topRight ),
+			bottomLeft: decodeValue(
+				inheritedValue?.border?.radius?.bottomLeft
+			),
+			bottomRight: decodeValue(
+				inheritedValue?.border?.radius?.bottomRight
+			),
+		};
+	}, [ inheritedValue?.border?.radius, decodeValue ] );
 	const setBorderRadius = ( newBorderRadius ) =>
 		setBorder( { ...border, radius: newBorderRadius } );
 	const hasBorderRadius = () => {
@@ -254,6 +271,7 @@ export default function BorderPanel( {
 				>
 					<BorderBoxControl
 						colors={ colors }
+						disableCustomColors={ ! areCustomSolidsEnabled }
 						enableAlpha
 						enableStyle={ showBorderStyle }
 						onChange={ onBorderChange }
@@ -261,7 +279,6 @@ export default function BorderPanel( {
 						popoverPlacement="left-start"
 						value={ border }
 						__experimentalIsRenderedInSidebar
-						size="__unstable-large"
 						hideLabelFromVision={ ! hasShadowControl }
 						label={ __( 'Border' ) }
 					/>
@@ -276,6 +293,7 @@ export default function BorderPanel( {
 					panelId={ panelId }
 				>
 					<BorderRadiusControl
+						presets={ settings?.border?.radiusSizes }
 						values={ borderRadiusValues }
 						onChange={ ( newValue ) => {
 							setBorderRadius( newValue || undefined );

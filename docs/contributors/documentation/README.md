@@ -104,7 +104,7 @@ Use the full directory and filename from the Gutenberg repository, not the publi
 An example, the link to this page is: `/docs/contributors/documentation/README.md`
 
 <div class="callout callout-warning">
-<b>Note:</b> The usual link transformation is not applied to links in callouts. See below. 
+<b>Note:</b> The usual link transformation is not applied to links in callouts. See below.
 </div>
 
 ### Code examples
@@ -144,6 +144,7 @@ The recommended way to implement in markdown is to use the raw HTML and `callout
 
 The following classes are available: `info`, `tip`, `alert`, `warning`
 
+```html
 <div class="callout callout-tip">
 This is a **tip** callout.
 </div>
@@ -159,15 +160,15 @@ This is an **alert** callout.
 <div class="callout callout-warning">
 This is a **warning** callout.
 </div>
+```
 
-<div class="callout callout-warning">
-Note: In callout notices, links also need to be HTML `&lt;a href>&lt;/a>` notations. 
+Note: In callout notices, links also need to be HTML `<a href=""></a>` notations.
 The usual link transformation is not applied to links in callouts.
 For instance, to reach the Getting started > Create Block page, the URL in GitHub is
-https://developer.wordpress.org/docs/getting-started/devenv/get-started-with-create-block.md
-and will have to be hardcoded for the endpoint in the Block Editor Handbook as 
-<a href="https://developer.wordpress.org/block-editor/getting-started/create-block/">https://developer.wordpress.org/block-editor/getting-started/create-block/</a> to link correctly in the handbook. 
-</div>
+https://github.com/WordPress/gutenberg/blob/trunk/docs/getting-started/devenv/get-started-with-create-block.md/
+and will have to be hardcoded for the endpoint in the Block Editor Handbook as
+`<a href="https://developer.wordpress.org/block-editor/getting-started/create-block/">https://developer.wordpress.org/block-editor/getting-started/create-block/</a>`
+to link correctly in the handbook.
 ### Editor config
 
 You should configure your editor to use Prettier to auto-format markdown documents. See the [Getting Started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for complete details.
@@ -185,11 +186,33 @@ An example config for using Visual Studio Code and the Prettier extensions:
 Depending on where you are viewing this document, the brackets may show as double. The proper format is just a single bracket.
 </div>
 
+### Images
+
+Images displayed in the Block Editor Handbook must be hosted in the [developer.wordpress.org](https://developer.wordpress.org/) Media Library, not linked from GitHub.
+
+Images linked directly from GitHub (for example, URLs starting with `https://raw.githubusercontent.com`) are subject to rate limiting and can fail to load once the documentation is synced to the Block Editor Handbook. Hosting them in the Media Library avoids this.
+
+To add an image:
+
+1. Upload the image to the Media Library on developer.wordpress.org. This requires additional permissions—if you don't have access, ask in the `#docs` channel in [Make WordPress Slack](https://make.wordpress.org/chat) for assistance.
+2. Copy the URL of the uploaded image. It should look something like `https://developer.wordpress.org/files/2026/06/your-image.png`.
+3. Reference the image in markdown using that URL, with descriptive alt text.
+
+For example:
+
+```md
+![Descriptive alt text](https://developer.wordpress.org/files/2026/06/your-image.png)
+```
+
+<div class="callout callout-info">
+The Media Library does not accept SVG uploads. If an SVG is <strong>displayed</strong> in the handbook, upload a raster version (such as a PNG) to the Media Library and reference that. Only keep an SVG in the repository and link to it directly when it is meant to be <strong>downloaded</strong> (for example, a logo offered as a vector file)—a download link isn't fetched on every page render, so it isn't affected by the rate limiting.
+</div>
+
 ### Video embeds
 
 Videos in the Block Editor Handbook need to be hosted on the [WordPress YouTube channel](https://www.youtube.com/@WordPress) as unlisted videos. This process requires additional permissions. Reach out in the #marketing Slack channel for assistance.
 
-Once the video has been uploaded to YouTube, retrieve the video embed link. It should look something like this: 
+Once the video has been uploaded to YouTube, retrieve the video embed link. It should look something like this:
 
 ```
 https://www.youtube.com/embed/nrut8SfXA44?si=YxvmHmAoYx-BDCog

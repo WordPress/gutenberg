@@ -1,0 +1,14 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "test/react-18-compat-block",
+	"title": "React 18 Compat Block",
+	"category": "text",
+	"icon": "smiley",
+	"description": "",
+	"supports": {
+		"html": false
+	},
+	"textdomain": "react-18-compat-block",
+	"editorScript": "react-18-compat-block-editor"
+}

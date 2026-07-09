@@ -22,21 +22,12 @@ import { useCallback, useContext, useMemo } from '@wordpress/element';
 import BlockContext from '../block-context';
 import isURLLike from '../link-control/is-url-like';
 import {
-	canBindAttribute,
+	getBlockBindingsContext,
 	hasPatternOverridesDefaultBinding,
 	replacePatternOverridesDefaultBinding,
 } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
-
-/**
- * Default value used for blocks which do not define their own context needs,
- * used to guarantee that a block's `context` prop will always be an object. It
- * is assigned as a constant since it is always expected to be an empty object,
- * and in order to avoid unnecessary React reconciliations of a changing object.
- *
- * @type {{}}
- */
-const DEFAULT_BLOCK_CONTEXT = {};
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
 const Edit = ( props ) => {
 	const { name } = props;
@@ -66,43 +57,35 @@ const EditWithGeneratedProps = ( props ) => {
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources(),
 		[]
 	);
+	const { bindableAttributes } = useContext( PrivateBlockContext );
 
 	const { blockBindings, context, hasPatternOverrides } = useMemo( () => {
-		// Assign context values using the block type's declared context needs.
-		const computedContext = blockType?.usesContext
-			? Object.fromEntries(
-					Object.entries( blockContext ).filter( ( [ key ] ) =>
-						blockType.usesContext.includes( key )
-					)
-			  )
-			: DEFAULT_BLOCK_CONTEXT;
-		// Add context requested by Block Bindings sources.
-		if ( attributes?.metadata?.bindings ) {
-			Object.values( attributes?.metadata?.bindings || {} ).forEach(
-				( binding ) => {
-					registeredSources[ binding?.source ]?.usesContext?.forEach(
-						( key ) => {
-							computedContext[ key ] = blockContext[ key ];
-						}
-					);
-				}
-			);
-		}
 		return {
 			blockBindings: replacePatternOverridesDefaultBinding(
-				name,
-				attributes?.metadata?.bindings
+				attributes?.metadata?.bindings,
+				bindableAttributes
 			),
-			context: computedContext,
+			// Assign context values using the block type's declared context
+			// needs, plus the context requested by the block's bindings
+			// sources.
+			context: getBlockBindingsContext(
+				blockContext,
+				blockType?.usesContext,
+				attributes?.metadata?.bindings
+					? Object.values( attributes.metadata.bindings ).map(
+							( binding ) => registeredSources[ binding?.source ]
+					  )
+					: undefined
+			),
 			hasPatternOverrides: hasPatternOverridesDefaultBinding(
 				attributes?.metadata?.bindings
 			),
 		};
 	}, [
-		name,
 		blockType?.usesContext,
 		blockContext,
 		attributes?.metadata?.bindings,
+		bindableAttributes,
 		registeredSources,
 	] );
 
@@ -120,7 +103,10 @@ const EditWithGeneratedProps = ( props ) => {
 			) ) {
 				const { source: sourceName, args: sourceArgs } = binding;
 				const source = registeredSources[ sourceName ];
-				if ( ! source || ! canBindAttribute( name, attributeName ) ) {
+				if (
+					! source ||
+					! bindableAttributes?.includes( attributeName )
+				) {
 					continue;
 				}
 
@@ -172,10 +158,10 @@ const EditWithGeneratedProps = ( props ) => {
 		},
 		[
 			attributes,
+			bindableAttributes,
 			blockBindings,
 			clientId,
 			context,
-			name,
 			registeredSources,
 		]
 	);
@@ -197,7 +183,7 @@ const EditWithGeneratedProps = ( props ) => {
 				) ) {
 					if (
 						! blockBindings[ attributeName ] ||
-						! canBindAttribute( name, attributeName )
+						! bindableAttributes?.includes( attributeName )
 					) {
 						continue;
 					}
@@ -240,9 +226,8 @@ const EditWithGeneratedProps = ( props ) => {
 					! ( hasPatternOverrides && hasParentPattern ) &&
 					Object.keys( keptAttributes ).length
 				) {
-					// Don't update caption and href until they are supported.
+					// Don't update href until it is supported.
 					if ( hasPatternOverrides ) {
-						delete keptAttributes.caption;
 						delete keptAttributes.href;
 					}
 					setAttributes( keptAttributes );
@@ -250,13 +235,13 @@ const EditWithGeneratedProps = ( props ) => {
 			} );
 		},
 		[
+			bindableAttributes,
 			blockBindings,
 			clientId,
 			context,
 			hasPatternOverrides,
 			setAttributes,
 			registeredSources,
-			name,
 			registry,
 		]
 	);

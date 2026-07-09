@@ -2,86 +2,166 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useContext, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	BlockControls,
-	PlainText,
+	BlockIcon,
+	InspectorControls,
 	useBlockProps,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
+import { parse, serialize, getBlockContent } from '@wordpress/blocks';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import {
 	ToolbarButton,
-	Disabled,
 	ToolbarGroup,
-	VisuallyHidden,
+	Placeholder,
+	Button,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { useInstanceId } from '@wordpress/compose';
+import { code } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import Preview from './preview';
+import { unlock } from '../lock-unlock';
+import HTMLEditModal from './modal';
 
-export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
-	const [ isPreview, setIsPreview ] = useState();
-	const isDisabled = useContext( Disabled.Context );
+const { InnerContent } = unlock( blockEditorPrivateApis );
 
-	const instanceId = useInstanceId( HTMLEdit, 'html-edit-desc' );
-
-	const isPreviewMode = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings().isPreviewMode;
-	}, [] );
-
-	function switchToPreview() {
-		setIsPreview( true );
-	}
-
-	function switchToHTML() {
-		setIsPreview( false );
-	}
-
+export default function HTMLEdit( { clientId, attributes } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const registry = useRegistry();
+	const { updateBlock, replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const content = useSelect(
+		( select ) => {
+			const block = select( blockEditorStore ).getBlock( clientId );
+			return block ? getBlockContent( block ) : '';
+		},
+		[ clientId ]
+	);
 	const blockProps = useBlockProps( {
 		className: 'block-library-html__edit',
-		'aria-describedby': isPreview ? instanceId : undefined,
 	} );
+
+	// Re-parse the edited content: static HTML becomes the block's
+	// `innerContent` fragments and `<!-- wp:* -->` delimited segments become
+	// inner blocks mounted at their positions within the static markup.
+	const onUpdate = ( nextContent ) => {
+		if ( nextContent === content ) {
+			return;
+		}
+
+		const [ parsedBlock ] = parse(
+			`<!-- wp:html -->\n${ nextContent }\n<!-- /wp:html -->`
+		);
+		const nextInnerBlocks = parsedBlock?.innerBlocks ?? [];
+		const prevInnerBlocks = registry
+			.select( blockEditorStore )
+			.getBlocks( clientId );
+		// Keep the existing inner blocks, and thereby their client IDs and
+		// selection, when their markup is unchanged — e.g. when only the
+		// surrounding static HTML was edited.
+		const innerBlocksUnchanged =
+			prevInnerBlocks.length === nextInnerBlocks.length &&
+			prevInnerBlocks.every(
+				( block, index ) =>
+					serialize( block ) === serialize( nextInnerBlocks[ index ] )
+			);
+
+		registry.batch( () => {
+			updateBlock( clientId, {
+				innerContent:
+					parsedBlock?.innerContent ??
+					( nextContent ? [ nextContent ] : [] ),
+			} );
+			if ( ! innerBlocksUnchanged ) {
+				replaceInnerBlocks( clientId, nextInnerBlocks, false );
+			}
+		} );
+	};
+
+	// Migrate the deprecated `content` attribute. The block's markup now lives
+	// in its inner content, but a block created via `createBlock( 'core/html',
+	// { content } )` still arrives with a `content` attribute. As soon as it
+	// loads, move that markup into the block's inner content and clear the
+	// attribute.
+	useEffect( () => {
+		if ( ! attributes.content ) {
+			return;
+		}
+
+		deprecated( 'The content attribute on the Custom HTML block', {
+			since: '7.1',
+			alternative: 'inner content',
+		} );
+
+		updateBlock( clientId, {
+			attributes: { content: undefined },
+			innerContent: [ attributes.content ],
+		} );
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ attributes.content ] );
+
+	// Show placeholder when content is empty
+	if ( ! content?.trim() ) {
+		return (
+			<div { ...blockProps }>
+				<Placeholder
+					icon={ <BlockIcon icon={ code } /> }
+					label={ __( 'Custom HTML' ) }
+					instructions={ __(
+						'Add custom HTML code and preview how it looks.'
+					) }
+				>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ () => setIsModalOpen( true ) }
+					>
+						{ __( 'Edit HTML' ) }
+					</Button>
+				</Placeholder>
+				{ isModalOpen && (
+					<HTMLEditModal
+						onRequestClose={ () => setIsModalOpen( false ) }
+						content={ content }
+						onUpdate={ onUpdate }
+					/>
+				) }
+			</div>
+		);
+	}
 
 	return (
 		<div { ...blockProps }>
 			<BlockControls>
 				<ToolbarGroup>
-					<ToolbarButton
-						isPressed={ ! isPreview }
-						onClick={ switchToHTML }
-					>
-						HTML
-					</ToolbarButton>
-					<ToolbarButton
-						isPressed={ isPreview }
-						onClick={ switchToPreview }
-					>
-						{ __( 'Preview' ) }
+					<ToolbarButton onClick={ () => setIsModalOpen( true ) }>
+						{ __( 'Edit code' ) }
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
-			{ isPreview || isPreviewMode || isDisabled ? (
-				<>
-					<Preview
-						content={ attributes.content }
-						isSelected={ isSelected }
-					/>
-					<VisuallyHidden id={ instanceId }>
-						{ __(
-							'HTML preview is not yet fully accessible. Please switch screen reader to virtualized mode to navigate the below iFrame.'
-						) }
-					</VisuallyHidden>
-				</>
-			) : (
-				<PlainText
-					value={ attributes.content }
-					onChange={ ( content ) => setAttributes( { content } ) }
-					placeholder={ __( 'Write HTML…' ) }
-					aria-label={ __( 'HTML' ) }
+			<InspectorControls>
+				<VStack className="block-library-html__edit-code" expanded>
+					<Button
+						className="block-library-html__edit-code-button"
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ () => setIsModalOpen( true ) }
+					>
+						{ __( 'Edit code' ) }
+					</Button>
+				</VStack>
+			</InspectorControls>
+			<InnerContent clientId={ clientId } />
+			{ isModalOpen && (
+				<HTMLEditModal
+					onRequestClose={ () => setIsModalOpen( false ) }
+					content={ content }
+					onUpdate={ onUpdate }
 				/>
 			) }
 		</div>

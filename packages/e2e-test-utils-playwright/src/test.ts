@@ -1,10 +1,12 @@
+// Playwright fixtures use `use()` which is not a React hook.
+
 /**
  * External dependencies
  */
 import * as path from 'path';
 import { test as base, expect, chromium } from '@playwright/test';
 import type { ConsoleMessage } from '@playwright/test';
-import * as getPort from 'get-port';
+import getPort from 'get-port';
 
 /**
  * Internal dependencies
@@ -141,8 +143,27 @@ const test = base.extend<
 	editor: async ( { page }, use ) => {
 		await use( new Editor( { page } ) );
 	},
-	page: async ( { page }, use ) => {
+	page: async ( { page, baseURL }, use ) => {
 		page.on( 'console', observeConsoleLogging );
+
+		// Playwright resolves root-relative URLs against the origin only,
+		// dropping any subdirectory from `baseURL`. Resolve them against the
+		// full `baseURL` instead so tests work on subdirectory installs.
+		const originalGoto = page.goto.bind( page );
+		page.goto = ( url, options ) => {
+			if (
+				baseURL &&
+				typeof url === 'string' &&
+				url.startsWith( '/' ) &&
+				! url.startsWith( '//' )
+			) {
+				const normalizedBaseURL = baseURL.endsWith( '/' )
+					? baseURL
+					: `${ baseURL }/`;
+				url = new URL( url.slice( 1 ), normalizedBaseURL ).href;
+			}
+			return originalGoto( url, options );
+		};
 
 		await use( page );
 
@@ -153,7 +174,7 @@ const test = base.extend<
 			await page.evaluate( () => {
 				window.localStorage.clear();
 			} );
-		} catch ( error ) {
+		} catch {
 			// noop.
 		}
 

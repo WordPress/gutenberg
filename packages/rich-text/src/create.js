@@ -89,13 +89,24 @@ function toFormat( { tagName, attributes } ) {
 		delete unregisteredAttributes.contenteditable;
 	}
 
-	return {
+	// Omit empty attribute objects so that parsed formats have the same shape
+	// as manually applied formats (`{ type, attributes? }`), which is required
+	// for format equality checks.
+	const format = {
 		formatType,
 		type: formatType.name,
 		tagName,
-		attributes: registeredAttributes,
-		unregisteredAttributes,
 	};
+
+	if ( Object.keys( registeredAttributes ).length ) {
+		format.attributes = registeredAttributes;
+	}
+
+	if ( Object.keys( unregisteredAttributes ).length ) {
+		format.unregisteredAttributes = unregisteredAttributes;
+	}
+
+	return format;
 }
 
 /**
@@ -380,10 +391,17 @@ function filterRange( node, range, filter ) {
  *
  * @param {HTMLElement} element
  * @param {boolean}     isRoot
+ * @param {boolean}     hasPrecedingSpace
+ * @param {boolean}     hasTrailingSpace
  *
  * @return {HTMLElement} New element with collapsed whitespace.
  */
-function collapseWhiteSpace( element, isRoot = true ) {
+function collapseWhiteSpace(
+	element,
+	isRoot = true,
+	hasPrecedingSpace = false,
+	hasTrailingSpace = false
+) {
 	const clone = element.cloneNode( true );
 	clone.normalize();
 	Array.from( clone.childNodes ).forEach( ( node, i, nodes ) => {
@@ -398,19 +416,36 @@ function collapseWhiteSpace( element, isRoot = true ) {
 				newNodeValue = newNodeValue.replace( / {2,}/g, ' ' );
 			}
 
-			if ( i === 0 && newNodeValue.startsWith( ' ' ) ) {
+			if (
+				i === 0 &&
+				newNodeValue.startsWith( ' ' ) &&
+				( isRoot || hasPrecedingSpace )
+			) {
 				newNodeValue = newNodeValue.slice( 1 );
-			} else if (
-				isRoot &&
+			}
+			if (
 				i === nodes.length - 1 &&
-				newNodeValue.endsWith( ' ' )
+				newNodeValue.endsWith( ' ' ) &&
+				( isRoot || hasTrailingSpace )
 			) {
 				newNodeValue = newNodeValue.slice( 0, -1 );
 			}
 
 			node.nodeValue = newNodeValue;
 		} else if ( node.nodeType === node.ELEMENT_NODE ) {
-			collapseWhiteSpace( node, false );
+			const { previousSibling, nextSibling } = node;
+			const prevHasSpace = previousSibling?.textContent.endsWith( ' ' );
+			const nextHasSpace = nextSibling?.textContent.startsWith( ' ' );
+			node.replaceWith(
+				collapseWhiteSpace(
+					node,
+					false,
+					previousSibling
+						? prevHasSpace
+						: isRoot || hasPrecedingSpace,
+					nextSibling ? nextHasSpace : isRoot || hasTrailingSpace
+				)
+			);
 		}
 	} );
 	return clone;
@@ -587,7 +622,11 @@ function createFromElement( { element, range, isEditableTree } ) {
 
 		// Ignore any placeholders, but keep their content since the browser
 		// might insert text inside them when the editable element is flex.
-		if ( ! format || node.getAttribute( 'data-rich-text-placeholder' ) ) {
+		if (
+			! format ||
+			node.getAttribute( 'data-rich-text-placeholder' ) ||
+			node.getAttribute( 'data-rich-text-bogus' )
+		) {
 			mergePair( accumulator, value );
 		} else if ( value.text.length === 0 ) {
 			if ( format.attributes ) {

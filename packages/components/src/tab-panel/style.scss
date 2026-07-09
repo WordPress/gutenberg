@@ -1,7 +1,10 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .components-tab-panel__tabs {
 	display: flex;
 	align-items: stretch;
 	flex-direction: row;
+
 	&[aria-orientation="vertical"] {
 		flex-direction: column;
 	}
@@ -14,10 +17,20 @@
 	background: transparent;
 	border: none;
 	box-shadow: none;
-	cursor: pointer;
-	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+	cursor: var(--wpds-cursor-control);
+	padding: 3px var(--wpds-dimension-padding-lg); // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
-	font-weight: 500;
+	font-weight: var(--wpds-typography-font-weight-regular);
+	color: var(--wpds-color-foreground-interactive-neutral);
+
+	&:disabled,
+	&[aria-disabled="true"] {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+	}
+
+	&:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+	}
 
 	&:focus:not(:disabled) {
 		position: relative;
@@ -35,19 +48,19 @@
 		pointer-events: none;
 
 		// Draw the indicator.
-		background: $components-color-accent;
-		height: calc(0 * var(--wp-admin-border-width-focus));
+		background: var(--wpds-color-stroke-interactive-neutral-strong);
+		height: calc(0 * var(--wpds-border-width-focus));
 		border-radius: 0;
 
 		// Animation
 		@media not (prefers-reduced-motion) {
-			transition: all 0.1s linear;
+			transition: height 0.1s linear;
 		}
 	}
 
 	// Active.
 	&.is-active::after {
-		height: calc(1 * var(--wp-admin-border-width-focus));
+		height: calc(1 * var(--wpds-border-width-focus));
 
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
@@ -58,27 +71,38 @@
 	&::before {
 		content: "";
 		position: absolute;
-		top: $grid-unit-15;
-		right: $grid-unit-15;
-		bottom: $grid-unit-15;
-		left: $grid-unit-15;
+		inset: var(--wpds-dimension-padding-md);
 		pointer-events: none;
 
 		// Draw the indicator.
 		box-shadow: 0 0 0 0 transparent;
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 
 		// Animation
 		@media not (prefers-reduced-motion) {
-			transition: all 0.1s linear;
+			transition: box-shadow 0.1s linear;
 		}
 	}
 
 	&:focus-visible::before {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+		box-shadow:
+			0 0 0 var(--wpds-border-width-focus)
+			var(--wpds-color-stroke-focus);
 
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
+	}
+
+	.components-tab-panel__tabs[aria-orientation="vertical"] & {
+		border-radius: var(--wpds-border-radius-sm);
+
+		&::after {
+			display: none;
+		}
+
+		&.is-active {
+			background: var(--wpds-color-background-interactive-neutral-weak-active);
+		}
 	}
 }
 
@@ -89,7 +113,9 @@
 	}
 
 	&:focus-visible {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+		box-shadow:
+			0 0 0 var(--wpds-border-width-focus)
+			var(--wpds-color-stroke-focus);
 
 		// Windows high contrast mode.
 		outline: 2px solid transparent;

@@ -30,11 +30,42 @@ describe( 'isPlain', () => {
 		expect( isPlain( '<strong>test<br></strong>' ) ).toBe( false );
 		expect( isPlain( 'test<br-custom>test' ) ).toBe( false );
 	} );
+
+	it( 'should return true for single non-semantic wrapper elements with only text', () => {
+		expect( isPlain( '<span>test</span>' ) ).toBe( true );
+	} );
+
+	it( 'should return true for single wrapper with styled content but no semantic tags', () => {
+		expect( isPlain( '<span style="color: red;">test</span>' ) ).toBe(
+			true
+		);
+	} );
+
+	it( 'should return true for single wrapper with line breaks', () => {
+		expect( isPlain( '<span>test<br>test</span>' ) ).toBe( true );
+	} );
+
+	it( 'should return false for wrapper with semantic child elements', () => {
+		expect( isPlain( '<div><strong>test</strong></div>' ) ).toBe( false );
+		expect( isPlain( '<span><em>test</em></span>' ) ).toBe( false );
+		expect( isPlain( '<p>Some <a href="#">link</a></p>' ) ).toBe( false );
+	} );
+
+	it( 'should return false for multiple wrapper elements', () => {
+		expect( isPlain( '<span>test</span><span>test</span>' ) ).toBe( false );
+	} );
+
+	it( 'should return false for semantic wrapper elements', () => {
+		expect( isPlain( '<h1>test</h1>' ) ).toBe( false );
+		expect( isPlain( '<ul><li>test</li></ul>' ) ).toBe( false );
+		expect( isPlain( '<article>test</article>' ) ).toBe( false );
+	} );
 } );
 
 describe( 'getBlockContentSchema', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/paragraph', {
+			apiVersion: 3,
 			title: 'Paragraph',
 			supports: {
 				anchor: true,
@@ -128,7 +159,9 @@ describe( 'getBlockContentSchema', () => {
 						children: {
 							sub: {},
 							sup: {},
-							strong: {},
+							strong: {
+								classes: [ 'test-class' ],
+							},
 						},
 					},
 				},
@@ -146,7 +179,9 @@ describe( 'getBlockContentSchema', () => {
 		const output = {
 			pre: {
 				children: {
-					strong: {},
+					strong: {
+						classes: [ 'test-class' ],
+					},
 					em: {},
 					sub: {},
 					sup: {},
@@ -185,6 +220,159 @@ describe( 'getBlockContentSchema', () => {
 			pre: {
 				children: myContentSchema,
 				attributes: [ 'data-chicken', 'data-ribs' ],
+			},
+		};
+		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
+			output
+		);
+	} );
+
+	it( 'should handle proper merging of classes and attributes', () => {
+		const transforms = deepFreeze( [
+			{
+				blockName: 'my/preformatted',
+				type: 'raw',
+				schema: {
+					pre: {
+						attributes: [ 'data-one' ],
+						children: myContentSchema,
+						classes: [ 'class1' ],
+					},
+				},
+			},
+			{
+				blockName: 'core/preformatted',
+				type: 'raw',
+				schema: {
+					pre: {
+						attributes: [ 'data-two', 'class' ],
+						children: myContentSchema,
+						classes: [ 'my-class', 'another-class' ],
+					},
+				},
+			},
+		] );
+		const output = {
+			pre: {
+				children: myContentSchema,
+				attributes: [ 'data-one', 'data-two', 'class' ],
+				classes: [ 'class1', 'my-class', 'another-class' ],
+			},
+		};
+		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
+			output
+		);
+	} );
+
+	it( 'should handle proper merging of classes when first transform has no classes', () => {
+		const transforms = deepFreeze( [
+			{
+				blockName: 'my/preformatted',
+				type: 'raw',
+				schema: {
+					pre: {
+						attributes: [ 'data-one' ],
+						children: myContentSchema,
+					},
+				},
+			},
+			{
+				blockName: 'core/preformatted',
+				type: 'raw',
+				schema: {
+					pre: {
+						attributes: [ 'data-two', 'class' ],
+						children: myContentSchema,
+						classes: [ 'my-class', 'another-class' ],
+					},
+				},
+			},
+		] );
+		const output = {
+			pre: {
+				children: myContentSchema,
+				attributes: [ 'data-one', 'data-two', 'class' ],
+				classes: [ 'my-class', 'another-class' ],
+			},
+		};
+		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
+			output
+		);
+	} );
+
+	it( 'should handle proper merging of classes when second transform has no classes', () => {
+		const transforms = deepFreeze( [
+			{
+				blockName: 'my/preformatted',
+				type: 'raw',
+				schema: {
+					pre: {
+						attributes: [ 'data-one', 'class' ],
+						children: myContentSchema,
+						classes: [ 'my-class', 'another-class' ],
+					},
+				},
+			},
+			{
+				blockName: 'core/preformatted',
+				type: 'raw',
+				schema: {
+					pre: {
+						attributes: [ 'data-two' ],
+						children: myContentSchema,
+					},
+				},
+			},
+		] );
+		const output = {
+			pre: {
+				children: myContentSchema,
+				attributes: [ 'data-one', 'class', 'data-two' ],
+				classes: [ 'my-class', 'another-class' ],
+			},
+		};
+		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
+			output
+		);
+	} );
+
+	it( 'should handle merging of classes when both transforms have same classes', () => {
+		const transforms = deepFreeze( [
+			{
+				blockName: 'my/preformatted',
+				type: 'raw',
+				schema: {
+					pre: {
+						attributes: [ 'data-one', 'class' ],
+						children: myContentSchema,
+						classes: [ 'class1', 'my-class', 'another-class' ],
+					},
+				},
+			},
+			{
+				blockName: 'core/preformatted',
+				type: 'raw',
+				schema: {
+					pre: {
+						attributes: [ 'data-two', 'class' ],
+						children: myContentSchema,
+						classes: [ 'class2', 'my-class', 'another-class' ],
+					},
+				},
+			},
+		] );
+		const output = {
+			pre: {
+				children: myContentSchema,
+				attributes: [ 'data-one', 'class', 'data-two' ],
+				classes: [
+					'class1',
+					'my-class',
+					'another-class',
+					'class2',
+					'my-class',
+					'another-class',
+				],
 			},
 		};
 		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(

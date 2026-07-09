@@ -5,6 +5,7 @@
 const mergeConfigs = require( './merge-configs' );
 const addOrReplacePort = require( './add-or-replace-port' );
 const { ValidationError } = require( './validate-config' );
+const { resolveConfigPorts } = require( '../resolve-available-ports' );
 
 /**
  * @typedef {import('./parse-config').WPRootConfig} WPRootConfig
@@ -14,14 +15,26 @@ const { ValidationError } = require( './validate-config' );
 /**
  * Performs any additional post-processing on the config object.
  *
- * @param {WPEnvironmentConfig} config The config to process.
+ * @param {WPEnvironmentConfig} config               The config to process.
+ * @param {Object}              options              Options for post-processing.
+ * @param {Object}              options.portResolver An optional port resolver for automatic port selection.
  *
- * @return {WPEnvironmentConfig} The config after post-processing.
+ * @return {Promise<WPEnvironmentConfig>} The config after post-processing.
  */
-module.exports = function postProcessConfig( config ) {
+module.exports = async function postProcessConfig(
+	config,
+	{ portResolver } = {}
+) {
 	// Make sure that we're operating on a config object that has
 	// complete environment configs for convenience.
 	config = mergeRootToEnvironments( config );
+
+	// Resolve ports after merging (so environment ports are finalized)
+	// but before appending ports to URLs. This way appendPortToWPConfigs
+	// uses the resolved ports and we don't need to fix URLs afterward.
+	if ( portResolver ) {
+		config = await resolveConfigPorts( config, portResolver );
+	}
 
 	config = appendPortToWPConfigs( config );
 
@@ -39,25 +52,36 @@ module.exports = function postProcessConfig( config ) {
  * @return {WPRootConfig} The config object with the root options merged together with the environment-specific options.
  */
 function mergeRootToEnvironments( config ) {
+	const testsDisabled = config.testsEnvironment === false;
+
 	// Some root-level options need to be handled early because they have a special
 	// cascade behavior that would break the normal merge. After merging we then
 	// delete them to avoid that breakage and add them back before we return.
 	const removedRootOptions = {};
-	if (
-		config.port !== undefined &&
-		config.env.development.port === undefined
-	) {
-		removedRootOptions.port = config.port;
-		config.env.development.port = config.port;
-		delete config.port;
+
+	// When tests are disabled, the env key is ignored entirely since there
+	// is only one environment. All config should be at the root level.
+	if ( ! testsDisabled ) {
+		if (
+			config.port !== undefined &&
+			config.env.development.port === undefined
+		) {
+			removedRootOptions.port = config.port;
+			config.env.development.port = config.port;
+			delete config.port;
+		}
+		if (
+			config.testsPort !== undefined &&
+			config.env.tests.port === undefined
+		) {
+			removedRootOptions.testsPort = config.testsPort;
+			config.env.tests.port = config.testsPort;
+			delete config.testsPort;
+		}
 	}
-	if (
-		config.testsPort !== undefined &&
-		config.env.tests.port === undefined
-	) {
-		removedRootOptions.testsPort = config.testsPort;
-		config.env.tests.port = config.testsPort;
-		delete config.testsPort;
+	if ( config.autoPort !== undefined ) {
+		removedRootOptions.autoPort = config.autoPort;
+		delete config.autoPort;
 	}
 	if ( config.lifecycleScripts !== undefined ) {
 		removedRootOptions.lifecycleScripts = config.lifecycleScripts;
@@ -67,9 +91,15 @@ function mergeRootToEnvironments( config ) {
 	// Merge the root config and the environment configs together so that
 	// we can ignore the root config and have full environment configs.
 	for ( const env in config.env ) {
+		// Skip merging root options into the tests environment when it's disabled.
+		if ( env === 'tests' && testsDisabled ) {
+			continue;
+		}
 		config.env[ env ] = mergeConfigs(
 			deepCopyRootOptions( config ),
-			config.env[ env ]
+			// When tests are disabled, ignore env overrides — all config
+			// should be specified at the root level.
+			testsDisabled ? {} : config.env[ env ]
 		);
 	}
 
@@ -89,18 +119,25 @@ function mergeRootToEnvironments( config ) {
  * @return {WPRootConfig} The config after post-processing.
  */
 function appendPortToWPConfigs( config ) {
+	const testsDisabled = config.testsEnvironment === false;
 	const options = [ 'WP_TESTS_DOMAIN', 'WP_SITEURL', 'WP_HOME' ];
 
 	// We are only interested in editing the config options for environment-specific configs.
 	// If we made this change to the root config it would cause problems since they would
 	// be mapped to all environments even though the ports will be different.
 	for ( const env in config.env ) {
+		if ( env === 'tests' && testsDisabled ) {
+			continue;
+		}
 		// There's nothing to do without any wp-config options set.
 		if ( config.env[ env ].config === undefined ) {
 			continue;
 		}
 
-		if ( config.env[ env ].port === undefined ) {
+		if (
+			config.env[ env ].port === undefined ||
+			config.env[ env ].port === null
+		) {
 			continue;
 		}
 
@@ -128,6 +165,8 @@ function appendPortToWPConfigs( config ) {
  * @param {WPRootConfig} config The config to process.
  */
 function validatePortUniqueness( config ) {
+	const testsDisabled = config.testsEnvironment === false;
+
 	// We're going to build a map of the environments and their port
 	// so we can accommodate root-level config options more easily.
 	const environmentPorts = {};
@@ -135,10 +174,15 @@ function validatePortUniqueness( config ) {
 	// Add all of the environments to the map. This will
 	// overwrite any root-level options if necessary.
 	for ( const env in config.env ) {
-		if ( config.env[ env ].port === undefined ) {
-			throw new ValidationError(
-				`The "${ env }" environment has an invalid port.`
-			);
+		if ( env === 'tests' && testsDisabled ) {
+			continue;
+		}
+		if (
+			config.env[ env ].port === undefined ||
+			config.env[ env ].port === null
+		) {
+			// Null ports will be resolved later; skip validation.
+			continue;
 		}
 
 		environmentPorts[ env ] = config.env[ env ].port;

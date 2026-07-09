@@ -9,6 +9,7 @@ import {
 	Panel,
 	PanelBody,
 } from '@wordpress/components';
+import { useBlockProps } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -21,7 +22,6 @@ import useIsDraggingWithin from './use-is-dragging-within';
 
 export default function WidgetAreaEdit( {
 	clientId,
-	className,
 	attributes: { id, name },
 } ) {
 	const isOpen = useSelect(
@@ -54,36 +54,40 @@ export default function WidgetAreaEdit( {
 		}
 	}, [ isOpen, isDragging, isDraggingWithin, openedWhileDragging ] );
 
+	const blockProps = useBlockProps();
+
 	return (
-		<Panel className={ className } ref={ wrapper }>
-			<PanelBody
-				title={ name }
-				opened={ isOpen }
-				onToggle={ () => {
-					setIsWidgetAreaOpen( clientId, ! isOpen );
-				} }
-				scrollAfterOpen={ ! isDragging }
-			>
-				{ ( { opened } ) => (
-					// This is required to ensure LegacyWidget blocks are not
-					// unmounted when the panel is collapsed. Unmounting legacy
-					// widgets may have unintended consequences (e.g.  TinyMCE
-					// not being properly reinitialized)
-					<DisclosureContent
-						className="wp-block-widget-area__panel-body-content"
-						visible={ opened }
-					>
-						<EntityProvider
-							kind="root"
-							type="postType"
-							id={ `widget-area-${ id }` }
+		<div { ...blockProps }>
+			<Panel ref={ wrapper }>
+				<PanelBody
+					title={ name }
+					opened={ isOpen }
+					onToggle={ () => {
+						setIsWidgetAreaOpen( clientId, ! isOpen );
+					} }
+					scrollAfterOpen={ ! isDragging }
+				>
+					{ ( { opened } ) => (
+						// This is required to ensure LegacyWidget blocks are not
+						// unmounted when the panel is collapsed. Unmounting legacy
+						// widgets may have unintended consequences (e.g.  TinyMCE
+						// not being properly reinitialized)
+						<DisclosureContent
+							className="wp-block-widget-area__panel-body-content"
+							visible={ opened }
 						>
-							<WidgetAreaInnerBlocks id={ id } />
-						</EntityProvider>
-					</DisclosureContent>
-				) }
-			</PanelBody>
-		</Panel>
+							<EntityProvider
+								kind="root"
+								type="postType"
+								id={ `widget-area-${ id }` }
+							>
+								<WidgetAreaInnerBlocks id={ id } />
+							</EntityProvider>
+						</DisclosureContent>
+					) }
+				</PanelBody>
+			</Panel>
+		</div>
 	);
 }
 

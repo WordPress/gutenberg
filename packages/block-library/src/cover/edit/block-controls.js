@@ -11,12 +11,15 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { MenuItem, ToolbarButton } from '@wordpress/components';
+import { crop, link } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { ALLOWED_MEDIA_TYPES } from '../shared';
+import { ALLOWED_MEDIA_TYPES, EMBED_VIDEO_BACKGROUND_TYPE } from '../shared';
 import { unlock } from '../../lock-unlock';
+import EmbedVideoUrlInput from './embed-video-url-input';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -27,18 +30,32 @@ export default function CoverBlockControls( {
 	currentSettings,
 	toggleUseFeaturedImage,
 	onClearMedia,
+	onSelectEmbedUrl,
+	onEditMedia,
+	editMediaButtonRef,
+	showEditMediaButton,
+	blockEditingMode,
 } ) {
-	const { contentPosition, id, useFeaturedImage, minHeight, minHeightUnit } =
-		attributes;
+	const {
+		contentPosition,
+		id,
+		useFeaturedImage,
+		minHeight,
+		minHeightUnit,
+		backgroundType,
+	} = attributes;
 	const { hasInnerBlocks, url } = currentSettings;
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
 	const [ prevMinHeightUnit, setPrevMinHeightUnit ] =
 		useState( minHeightUnit );
+	const [ isEmbedUrlInputOpen, setIsEmbedUrlInputOpen ] = useState( false );
 	const isMinFullHeight =
 		minHeightUnit === 'vh' &&
 		minHeight === 100 &&
 		! attributes?.style?.dimensions?.aspectRatio;
+	const isContentOnlyMode = blockEditingMode === 'contentOnly';
+
 	const toggleMinFullHeight = () => {
 		if ( isMinFullHeight ) {
 			// If there aren't previous values, take the default ones.
@@ -75,36 +92,72 @@ export default function CoverBlockControls( {
 
 	return (
 		<>
-			<BlockControls group="block">
-				<BlockAlignmentMatrixControl
-					label={ __( 'Change content position' ) }
-					value={ contentPosition }
-					onChange={ ( nextPosition ) =>
-						setAttributes( {
-							contentPosition: nextPosition,
-						} )
-					}
-					isDisabled={ ! hasInnerBlocks }
-				/>
-				<FullHeightAlignmentControl
-					isActive={ isMinFullHeight }
-					onToggle={ toggleMinFullHeight }
-					isDisabled={ ! hasInnerBlocks }
-				/>
-			</BlockControls>
+			{ ! isContentOnlyMode && (
+				<BlockControls group="block">
+					<BlockAlignmentMatrixControl
+						label={ __( 'Change content position' ) }
+						value={ contentPosition }
+						onChange={ ( nextPosition ) =>
+							setAttributes( {
+								contentPosition: nextPosition,
+							} )
+						}
+						isDisabled={ ! hasInnerBlocks }
+					/>
+					<FullHeightAlignmentControl
+						isActive={ isMinFullHeight }
+						onToggle={ toggleMinFullHeight }
+						isDisabled={ ! hasInnerBlocks }
+					/>
+					{ showEditMediaButton && (
+						<ToolbarButton
+							ref={ editMediaButtonRef }
+							icon={ crop }
+							label={ __( 'Crop background image' ) }
+							onClick={ onEditMedia }
+							aria-haspopup="dialog"
+						/>
+					) }
+				</BlockControls>
+			) }
 			<BlockControls group="other">
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ url }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*,video/*"
 					onSelect={ onSelectMedia }
 					onToggleFeaturedImage={ toggleUseFeaturedImage }
 					useFeaturedImage={ useFeaturedImage }
 					name={ ! url ? __( 'Add media' ) : __( 'Replace' ) }
 					onReset={ onClearMedia }
-				/>
+					variant="toolbar"
+				>
+					{ ( { onClose } ) => (
+						<MenuItem
+							icon={ link }
+							onClick={ () => {
+								setIsEmbedUrlInputOpen( true );
+								onClose();
+							} }
+						>
+							{ __( 'Embed video from URL' ) }
+						</MenuItem>
+					) }
+				</MediaReplaceFlow>
 			</BlockControls>
+			{ isEmbedUrlInputOpen && (
+				<EmbedVideoUrlInput
+					onSubmit={ ( embedUrl ) => {
+						onSelectEmbedUrl( embedUrl );
+					} }
+					onClose={ () => setIsEmbedUrlInputOpen( false ) }
+					initialUrl={
+						backgroundType === EMBED_VIDEO_BACKGROUND_TYPE
+							? url
+							: ''
+					}
+				/>
+			) }
 		</>
 	);
 }

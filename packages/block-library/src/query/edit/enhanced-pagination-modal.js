@@ -8,6 +8,8 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -23,42 +25,35 @@ export default function EnhancedPaginationModal( {
 	setAttributes,
 } ) {
 	const [ isOpen, setOpen ] = useState( false );
-	const { hasBlocksFromPlugins, hasPostContentBlock, hasUnsupportedBlocks } =
-		useUnsupportedBlocks( clientId );
+	const hasUnsupportedBlocks = useUnsupportedBlocks( clientId );
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	useEffect( () => {
-		if (
-			enhancedPagination &&
-			hasUnsupportedBlocks &&
-			! window.__experimentalFullPageClientSideNavigation
-		) {
+		if ( enhancedPagination && hasUnsupportedBlocks ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { enhancedPagination: false } );
 			setOpen( true );
 		}
-	}, [ enhancedPagination, hasUnsupportedBlocks, setAttributes ] );
+	}, [
+		enhancedPagination,
+		hasUnsupportedBlocks,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	const closeModal = () => {
 		setOpen( false );
 	};
 
-	let notice = __(
-		'If you still want to prevent full page reloads, remove that block, then disable "Reload full page" again in the Query Block settings.'
-	);
-	if ( hasBlocksFromPlugins ) {
-		notice =
-			__(
-				'Currently, avoiding full page reloads is not possible when non-interactive or non-client Navigation compatible blocks from plugins are present inside the Query block.'
-			) +
-			' ' +
-			notice;
-	} else if ( hasPostContentBlock ) {
-		notice =
-			__(
-				'Currently, avoiding full page reloads is not possible when a Content block is present inside the Query block.'
-			) +
-			' ' +
-			notice;
-	}
+	const notice =
+		__(
+			'Currently, avoiding full page reloads is not possible when non-interactive or non-client Navigation compatible blocks from plugins are present inside the Query block.'
+		) +
+		' ' +
+		__(
+			'If you still want to prevent full page reloads, remove that block, then disable "Reload full page" again in the Query Block settings.'
+		);
 
 	return (
 		isOpen && (

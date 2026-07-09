@@ -7,14 +7,43 @@ import { parse as grammarParse } from '@wordpress/block-serialization-default-pa
 /**
  * Internal dependencies
  */
-import { selectBlockPatternsKey } from './private-keys';
+import {
+	selectBlockPatternsKey,
+	userPatternCategoriesSelectKey,
+} from './private-keys';
 import { unlock } from '../lock-unlock';
 import { STORE_NAME } from './constants';
-import { getSectionRootClientId } from './private-selectors';
+import {
+	getSectionRootClientId,
+	isSectionBlock,
+	getParentSectionBlock,
+} from './private-selectors';
+import { getBlockEditingMode } from './selectors';
+import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 
 export const isFiltered = Symbol( 'isFiltered' );
 const parsedPatternCache = new WeakMap();
 const grammarMapCache = new WeakMap();
+
+export function mapUserPattern(
+	userPattern,
+	__experimentalUserPatternCategories = []
+) {
+	return {
+		name: `core/block/${ userPattern.id }`,
+		id: userPattern.id,
+		type: INSERTER_PATTERN_TYPES.user,
+		title: userPattern.title?.raw,
+		categories: userPattern.wp_pattern_category?.map( ( catId ) => {
+			const category = __experimentalUserPatternCategories.find(
+				( { id } ) => id === catId
+			);
+			return category ? category.slug : catId;
+		} ),
+		content: userPattern.content?.raw,
+		syncStatus: userPattern.wp_pattern_sync_status,
+	};
+}
 
 function parsePattern( pattern ) {
 	const blocks = parse( pattern.content, {
@@ -102,7 +131,8 @@ export const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 export const getAllPatternsDependants = ( select ) => ( state ) => {
 	return [
 		state.settings.__experimentalBlockPatterns,
-		state.settings.__experimentalUserPatternCategories,
+		state.settings[ userPatternCategoriesSelectKey ]?.( select ) ??
+			state.settings.__experimentalUserPatternCategories,
 		state.settings.__experimentalReusableBlocks,
 		state.settings[ selectBlockPatternsKey ]?.( select ),
 		state.blockPatterns,
@@ -110,15 +140,16 @@ export const getAllPatternsDependants = ( select ) => ( state ) => {
 	];
 };
 
-export const getInsertBlockTypeDependants =
-	( select ) => ( state, rootClientId ) => {
-		return [
-			state.blockListSettings[ rootClientId ],
-			state.blocks.byClientId.get( rootClientId ),
-			state.settings.allowedBlockTypes,
-			state.settings.templateLock,
-			state.blockEditingModes,
-			select( STORE_NAME ).__unstableGetEditorMode( state ),
-			getSectionRootClientId( state ),
-		];
-	};
+export const getInsertBlockTypeDependants = () => ( state, rootClientId ) => {
+	return [
+		state.blockListSettings.get( rootClientId ),
+		state.blocks.byClientId.get( rootClientId ),
+		state.blocks.order.get( rootClientId || '' ),
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		getBlockEditingMode( state, rootClientId ),
+		getSectionRootClientId( state ),
+		isSectionBlock( state, rootClientId ),
+		getParentSectionBlock( state, rootClientId ),
+	];
+};

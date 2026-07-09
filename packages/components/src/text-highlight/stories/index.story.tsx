@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -9,6 +9,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 import TextHighlight from '..';
 
 const meta: Meta< typeof TextHighlight > = {
+	tags: [ 'manifest' ],
 	component: TextHighlight,
 	title: 'Components/Typography/TextHighlight',
 	id: 'components-texthighlight',
@@ -17,6 +18,10 @@ const meta: Meta< typeof TextHighlight > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

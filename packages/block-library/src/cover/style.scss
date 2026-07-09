@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .wp-block-cover-image,
 .wp-block-cover {
 	min-height: 430px;
@@ -178,6 +181,49 @@
 		border: none;
 		box-shadow: none;
 	}
+
+	.wp-block-cover__embed-background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+		max-width: none;
+		max-height: none;
+		outline: none;
+		border: none;
+		box-shadow: none;
+		pointer-events: none; // Prevent interaction with the iframe
+
+		.wp-block-embed__wrapper {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			height: 100%;
+		}
+
+		iframe,
+		.wp-block-embed__wrapper iframe {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 100vw;
+			height: 100vh;
+			min-width: 100%;
+			min-height: 100%;
+			transform: translate(-50%, -50%);
+			pointer-events: none; // Prevent interaction with the iframe
+		}
+	}
 }
 
 .wp-block-cover-image,
@@ -301,11 +347,18 @@ body:not(.editor-styles-wrapper) .wp-block-cover:not(
 )
 ) {
 	.wp-block-cover__video-background {
-		z-index: z-index(".wp-block-cover__video-background");
+		// Background media sits at the base of the stack.
+		z-index: 0;
+	}
+
+	.wp-block-cover__embed-background {
+		// Shares the same base layer as the video background.
+		z-index: 0;
 	}
 
 	.wp-block-cover__image-background {
-		z-index: z-index(".wp-block-cover__image-background");
+		// Background media sits at the base of the stack.
+		z-index: 0;
 	}
 
 	// The first selector is required for old Cover markup/
@@ -313,11 +366,13 @@ body:not(.editor-styles-wrapper) .wp-block-cover:not(
 	&.has-background-dim:not(.has-background-gradient)::before,
 	.wp-block-cover__background,
 	.wp-block-cover__gradient-background {
-		z-index: z-index(".wp-block-cover.has-background-dim::before");
+		// Sit above the video/image/embed background media.
+		z-index: 1;
 	}
 
 	.wp-block-cover__inner-container {
-		z-index: z-index(".wp-block-cover__inner-container");
+		// Lift the inner blocks above the background media and overlay.
+		z-index: 1;
 
 		// Reset the z-index to auto when the body has a modal open. So when the
 		// modal is inside the cover, it doesn't create a stacking context.

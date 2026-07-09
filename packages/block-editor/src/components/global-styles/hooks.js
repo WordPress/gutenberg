@@ -1,213 +1,16 @@
 /**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal/es6';
-
-/**
  * WordPress dependencies
  */
-import { useContext, useCallback, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, getPresetVariableFromValue } from './utils';
-import { getValueFromObjectPath, setImmutably } from '../../utils/object';
-import { GlobalStylesContext } from './context';
 import { unlock } from '../../lock-unlock';
-
-const EMPTY_CONFIG = { settings: {}, styles: {} };
-
-const VALID_SETTINGS = [
-	'appearanceTools',
-	'useRootPaddingAwareAlignments',
-	'background.backgroundImage',
-	'background.backgroundRepeat',
-	'background.backgroundSize',
-	'background.backgroundPosition',
-	'border.color',
-	'border.radius',
-	'border.style',
-	'border.width',
-	'shadow.presets',
-	'shadow.defaultPresets',
-	'color.background',
-	'color.button',
-	'color.caption',
-	'color.custom',
-	'color.customDuotone',
-	'color.customGradient',
-	'color.defaultDuotone',
-	'color.defaultGradients',
-	'color.defaultPalette',
-	'color.duotone',
-	'color.gradients',
-	'color.heading',
-	'color.link',
-	'color.palette',
-	'color.text',
-	'custom',
-	'dimensions.aspectRatio',
-	'dimensions.minHeight',
-	'layout.contentSize',
-	'layout.definitions',
-	'layout.wideSize',
-	'lightbox.enabled',
-	'lightbox.allowEditing',
-	'position.fixed',
-	'position.sticky',
-	'spacing.customSpacingSize',
-	'spacing.defaultSpacingSizes',
-	'spacing.spacingSizes',
-	'spacing.spacingScale',
-	'spacing.blockGap',
-	'spacing.margin',
-	'spacing.padding',
-	'spacing.units',
-	'typography.fluid',
-	'typography.customFontSize',
-	'typography.defaultFontSizes',
-	'typography.dropCap',
-	'typography.fontFamilies',
-	'typography.fontSizes',
-	'typography.fontStyle',
-	'typography.fontWeight',
-	'typography.letterSpacing',
-	'typography.lineHeight',
-	'typography.textAlign',
-	'typography.textColumns',
-	'typography.textDecoration',
-	'typography.textTransform',
-	'typography.writingMode',
-];
-
-export const useGlobalStylesReset = () => {
-	const { user, setUserConfig } = useContext( GlobalStylesContext );
-	const config = {
-		settings: user.settings,
-		styles: user.styles,
-	};
-	const canReset = !! config && ! fastDeepEqual( config, EMPTY_CONFIG );
-	return [
-		canReset,
-		useCallback( () => setUserConfig( EMPTY_CONFIG ), [ setUserConfig ] ),
-	];
-};
-
-export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
-	const { setUserConfig, ...configs } = useContext( GlobalStylesContext );
-	const appendedBlockPath = blockName ? '.blocks.' + blockName : '';
-	const appendedPropertyPath = propertyPath ? '.' + propertyPath : '';
-	const contextualPath = `settings${ appendedBlockPath }${ appendedPropertyPath }`;
-	const globalPath = `settings${ appendedPropertyPath }`;
-	const sourceKey = source === 'all' ? 'merged' : source;
-
-	const settingValue = useMemo( () => {
-		const configToUse = configs[ sourceKey ];
-		if ( ! configToUse ) {
-			throw 'Unsupported source';
-		}
-
-		if ( propertyPath ) {
-			return (
-				getValueFromObjectPath( configToUse, contextualPath ) ??
-				getValueFromObjectPath( configToUse, globalPath )
-			);
-		}
-
-		let result = {};
-		VALID_SETTINGS.forEach( ( setting ) => {
-			const value =
-				getValueFromObjectPath(
-					configToUse,
-					`settings${ appendedBlockPath }.${ setting }`
-				) ??
-				getValueFromObjectPath( configToUse, `settings.${ setting }` );
-			if ( value !== undefined ) {
-				result = setImmutably( result, setting.split( '.' ), value );
-			}
-		} );
-		return result;
-	}, [
-		configs,
-		sourceKey,
-		propertyPath,
-		contextualPath,
-		globalPath,
-		appendedBlockPath,
-	] );
-
-	const setSetting = ( newValue ) => {
-		setUserConfig( ( currentConfig ) =>
-			setImmutably( currentConfig, contextualPath.split( '.' ), newValue )
-		);
-	};
-	return [ settingValue, setSetting ];
-}
-
-export function useGlobalStyle(
-	path,
-	blockName,
-	source = 'all',
-	{ shouldDecodeEncode = true } = {}
-) {
-	const {
-		merged: mergedConfig,
-		base: baseConfig,
-		user: userConfig,
-		setUserConfig,
-	} = useContext( GlobalStylesContext );
-	const appendedPath = path ? '.' + path : '';
-	const finalPath = ! blockName
-		? `styles${ appendedPath }`
-		: `styles.blocks.${ blockName }${ appendedPath }`;
-
-	const setStyle = ( newValue ) => {
-		setUserConfig( ( currentConfig ) =>
-			setImmutably(
-				currentConfig,
-				finalPath.split( '.' ),
-				shouldDecodeEncode
-					? getPresetVariableFromValue(
-							mergedConfig.settings,
-							blockName,
-							path,
-							newValue
-					  )
-					: newValue
-			)
-		);
-	};
-
-	let rawResult, result;
-	switch ( source ) {
-		case 'all':
-			rawResult = getValueFromObjectPath( mergedConfig, finalPath );
-			result = shouldDecodeEncode
-				? getValueFromVariable( mergedConfig, blockName, rawResult )
-				: rawResult;
-			break;
-		case 'user':
-			rawResult = getValueFromObjectPath( userConfig, finalPath );
-			result = shouldDecodeEncode
-				? getValueFromVariable( mergedConfig, blockName, rawResult )
-				: rawResult;
-			break;
-		case 'base':
-			rawResult = getValueFromObjectPath( baseConfig, finalPath );
-			result = shouldDecodeEncode
-				? getValueFromVariable( baseConfig, blockName, rawResult )
-				: rawResult;
-			break;
-		default:
-			throw 'Unsupported source';
-	}
-
-	return [ result, setStyle ];
-}
 
 /**
  * React hook that overrides a global settings object with block and element specific settings.
@@ -279,7 +82,11 @@ export function useSettingsForBlockElement(
 		};
 
 		// Some blocks can enable background colors but disable gradients.
-		if ( ! supportedStyles.includes( 'background' ) ) {
+		// Preserve gradient settings when background.gradient is supported.
+		if (
+			! supportedStyles.includes( 'background' ) &&
+			! supportedStyles.includes( 'backgroundGradient' )
+		) {
 			updatedSettings.color.gradients = [];
 			updatedSettings.color.customGradient = false;
 		}
@@ -298,6 +105,7 @@ export function useSettingsForBlockElement(
 			'textAlign',
 			'textTransform',
 			'textDecoration',
+			'textIndent',
 			'writingMode',
 		].forEach( ( key ) => {
 			if ( ! supportedStyles.includes( key ) ) {
@@ -307,6 +115,15 @@ export function useSettingsForBlockElement(
 				};
 			}
 		} );
+
+		// Text indent needs explicit handling since it may not be in parent settings.
+		if ( supportedStyles.includes( 'textIndent' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				textIndent:
+					updatedSettings.typography?.textIndent ?? 'subsequent',
+			};
+		}
 
 		// The column-count style is named text column to reduce confusion with
 		// the columns block and manage expectations from the support.
@@ -350,14 +167,16 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		[ 'aspectRatio', 'minHeight' ].forEach( ( key ) => {
-			if ( ! supportedStyles.includes( key ) ) {
-				updatedSettings.dimensions = {
-					...updatedSettings.dimensions,
-					[ key ]: false,
-				};
+		[ 'aspectRatio', 'height', 'minHeight', 'minWidth', 'width' ].forEach(
+			( key ) => {
+				if ( ! supportedStyles.includes( key ) ) {
+					updatedSettings.dimensions = {
+						...updatedSettings.dimensions,
+						[ key ]: false,
+					};
+				}
 			}
-		} );
+		);
 
 		[ 'radius', 'color', 'style', 'width' ].forEach( ( key ) => {
 			if (
@@ -372,11 +191,15 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		[ 'backgroundImage', 'backgroundSize' ].forEach( ( key ) => {
-			if ( ! supportedStyles.includes( key ) ) {
+		[
+			[ 'backgroundImage', 'backgroundImage' ],
+			[ 'backgroundSize', 'backgroundSize' ],
+			[ 'backgroundGradient', 'gradient' ],
+		].forEach( ( [ styleKey, settingKey ] ) => {
+			if ( ! supportedStyles.includes( styleKey ) ) {
 				updatedSettings.background = {
 					...updatedSettings.background,
-					[ key ]: false,
+					[ settingKey ]: false,
 				};
 			}
 		} );
@@ -385,13 +208,8 @@ export function useSettingsForBlockElement(
 			? updatedSettings.shadow
 			: false;
 
-		// Text alignment is only available for blocks.
-		if ( element ) {
-			updatedSettings.typography.textAlign = false;
-		}
-
 		return updatedSettings;
-	}, [ parentSettings, supportedStyles, supports, element ] );
+	}, [ parentSettings, supportedStyles, supports ] );
 }
 
 export function useColorsPerOrigin( settings ) {
@@ -488,4 +306,48 @@ export function useGradientsPerOrigin( settings ) {
 		defaultGradients,
 		shouldDisplayDefaultGradients,
 	] );
+}
+
+/**
+ * Derives the color/gradient palette data and encode/decode helpers shared by
+ * the Color, Background, and Typography style panels, so the common preamble
+ * is defined once rather than repeated in each panel.
+ *
+ * @param {Object} settings Style settings object.
+ *
+ * @return {Object} Shared color/gradient palette data and helpers.
+ */
+export function useColorGradientSettings( settings ) {
+	const colors = useColorsPerOrigin( settings );
+	const gradients = useGradientsPerOrigin( settings );
+	const areCustomSolidsEnabled = settings?.color?.custom;
+	const areCustomGradientsEnabled = settings?.color?.customGradient;
+	const allColors = useMemo(
+		() => colors.flatMap( ( { colors: originColors } ) => originColors ),
+		[ colors ]
+	);
+	const decodeValue = ( rawValue ) =>
+		getValueFromVariable( { settings }, '', rawValue );
+	const encodeGradientValue = ( gradientValue ) => {
+		const allGradients = gradients.flatMap(
+			( { gradients: originGradients } ) => originGradients
+		);
+		const gradientObject = allGradients.find(
+			( { gradient } ) => gradient === gradientValue
+		);
+		return gradientObject
+			? 'var:preset|gradient|' + gradientObject.slug
+			: gradientValue;
+	};
+	return {
+		colors,
+		gradients,
+		allColors,
+		areCustomSolidsEnabled,
+		areCustomGradientsEnabled,
+		hasSolidColors: colors.length > 0 || areCustomSolidsEnabled,
+		hasGradientColors: gradients.length > 0 || areCustomGradientsEnabled,
+		decodeValue,
+		encodeGradientValue,
+	};
 }

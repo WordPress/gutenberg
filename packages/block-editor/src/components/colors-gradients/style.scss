@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/breakpoints" as *;
+
 // Must equal $color-palette-circle-size from:
 // @wordpress/components/src/circular-option-picker/style.scss
 $swatch-size: 28px;
@@ -10,6 +14,11 @@ $swatch-gap: 12px;
 }
 
 .block-editor-color-gradient-control__fieldset {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+
 	// Prevents the `fieldset` from growing beyond its parent's size
 	// in order to fit its content.
 	min-width: 0;
@@ -40,6 +49,11 @@ $swatch-gap: 12px;
 }
 
 .block-editor-panel-color-gradient-settings__dropdown-content {
+	// Set minimum height to prevent content from being squashed when
+	// the popover is triggered near the bottom of the page, and flip
+	// the position accordingly.
+	min-height: 160px;
+
 	.block-editor-color-gradient-control__panel {
 		$panelPadding: $grid-unit-20;
 
@@ -54,14 +68,23 @@ $swatch-gap: 12px;
 	background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 }
 
+// Space the in-popover contrast notice away from the color palette above it.
+.block-editor-panel-color-gradient-settings__contrast-notice {
+	margin-top: $grid-unit-20;
+}
+
 /**
 * The following styles replicate the separated border of the
 * `ItemGroup` component but allows for hidden items. This is because
 * to maintain the order of `ToolsPanel` controls, each `ToolsPanelItem`
 * must at least render a placeholder which would otherwise interfere
 * with the `:last-child` styles.
+*
+* Applied via the shared `block-editor-color-gradient-item` class on
+* color/gradient dropdown items across the Color, Background, and
+* Typography panels.
 */
-.block-editor-tools-panel-color-gradient-settings__item {
+.block-editor-color-gradient-item {
 	padding: 0;
 	max-width: 100%;
 	position: relative;
@@ -73,7 +96,6 @@ $swatch-gap: 12px;
 
 	// Identify the first visible instance as placeholder items will not have this class.
 	&:nth-child(1 of &) {
-		margin-top: $grid-unit-30;
 		border-top-left-radius: $radius-small;
 		border-top-right-radius: $radius-small;
 		border-top: 1px solid $gray-300;
@@ -113,6 +135,12 @@ $swatch-gap: 12px;
 		text-overflow: ellipsis;
 		max-width: calc(100% - ($button-size-next-default-40px + $grid-unit-05));
 	}
+
+	// Reserve extra space for the always-visible contrast warning icon,
+	// which sits alongside the hover-revealed reset button.
+	> button.has-contrast-warning .block-editor-panel-color-gradient-settings__color-name {
+		max-width: calc(100% - ($button-size-next-default-40px + $button-size-small + $grid-unit));
+	}
 }
 
 .block-editor-panel-color-gradient-settings__dropdown {
@@ -146,5 +174,28 @@ $swatch-gap: 12px;
 	@media (hover: none) {
 		// Show reset button on devices that do not support hover.
 		opacity: 1;
+	}
+
+	// While a contrast warning is in effect the warning icon occupies the
+	// far-right slot, so the reset button shifts left to sit beside it.
+	.block-editor-panel-color-gradient-settings__dropdown.has-contrast-warning + & {
+		right: $button-size-small + $grid-unit-05;
+	}
+}
+
+// Icon-only "Low contrast" warning shown to the right of the color
+// control toggle whenever the selection has insufficient contrast.
+// Unlike the reset button it stays visible without hover. It is not a
+// menu; activating it opens the color picker popover (where the full
+// warning notice lives), so it doubles as a shortcut to the fix. The
+// accessible name and hover/focus tooltip come from the button label.
+.block-editor-panel-color-gradient-settings__contrast-warning {
+	position: absolute;
+	right: 0;
+	top: $grid-unit;
+	margin: auto $grid-unit auto;
+
+	&.block-editor-panel-color-gradient-settings__contrast-warning {
+		border-radius: $radius-small;
 	}
 }

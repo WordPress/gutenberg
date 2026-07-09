@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import type { DataFormControlProps } from '@wordpress/dataviews';
+
 type PostStatus =
 	| 'publish'
 	| 'draft'
@@ -24,6 +29,7 @@ interface Links {
 }
 
 interface Author {
+	id: number;
 	name: string;
 	avatar_urls: Record< string, string >;
 }
@@ -48,17 +54,48 @@ export interface BasePost extends CommonPost {
 	ping_status?: 'open' | 'closed';
 	link?: string;
 	slug?: string;
+	sticky?: boolean;
 	permalink_template?: string;
 	date?: string;
 	modified?: string;
 	author?: number;
 }
 
+export interface BasePostWithEditedEntity extends Omit< BasePost, 'content' > {
+	content:
+		| BasePost[ 'content' ]
+		| ( ( record: BasePostWithEditedEntity ) => string );
+}
+
 export interface BasePostWithEmbeddedAuthor extends BasePost {
 	_embedded: EmbeddedAuthor;
 }
 
-export interface Template extends CommonPost {
+interface FeaturedMedia {
+	title: {
+		rendered: string;
+	};
+	source_url: string;
+	media_details: {
+		sizes: Record< string, { width: number; source_url: string } >;
+	};
+}
+
+interface EmbeddedFeaturedMedia {
+	'wp:featuredmedia': FeaturedMedia[];
+}
+
+export interface BasePostWithEmbeddedFeaturedMedia extends BasePost {
+	_embedded: EmbeddedFeaturedMedia;
+}
+
+interface TemplateAuthorFields {
+	author?: number;
+	author_text: string;
+	original_source?: 'theme' | 'plugin' | 'site' | 'user';
+}
+
+export interface Template extends CommonPost, TemplateAuthorFields {
 	type: 'wp_template';
 	is_custom: boolean;
 	source: string;
@@ -66,9 +103,10 @@ export interface Template extends CommonPost {
 	plugin?: string;
 	has_theme_file: boolean;
 	id: string;
+	description?: string;
 }
 
-export interface TemplatePart extends CommonPost {
+export interface TemplatePart extends CommonPost, TemplateAuthorFields {
 	type: 'wp_template_part';
 	source: string;
 	origin: string;
@@ -81,7 +119,18 @@ export interface TemplatePart extends CommonPost {
 export interface Pattern extends CommonPost {
 	slug: string;
 	title: { raw: string };
-	wp_pattern_sync_status: string;
+	excerpt?: string | { raw: string; rendered: string };
+	meta?: Record< string, any >;
+	wp_pattern_sync_status?: string;
+}
+
+export interface SiteSettings {
+	posts_per_page?: number;
+	default_comment_status?: string | null;
+}
+
+export interface PostsPage {
+	title?: { raw?: string } | string;
 }
 
 export type Post = Template | TemplatePart | Pattern | BasePost;
@@ -93,19 +142,52 @@ export type PostWithPermissions = Post & {
 	};
 };
 
+interface EditorSupport {
+	notes?: boolean;
+}
+
 export interface PostType {
 	slug: string;
 	viewable: boolean;
 	supports?: {
 		'page-attributes'?: boolean;
 		title?: boolean;
+		excerpt?: boolean;
 		revisions?: boolean;
 		author?: string;
 		thumbnail?: string;
 		comments?: string;
-		editor?: boolean;
+		editor?: boolean | [ EditorSupport ];
+		trackbacks?: boolean;
+		'post-formats'?: boolean;
 	};
 }
 
 // Will be unnecessary after typescript 5.0 upgrade.
 export type CoreDataError = { message?: string; code?: string };
+
+export interface MediaEditProps< Item >
+	extends Pick<
+		DataFormControlProps< Item >,
+		'data' | 'field' | 'onChange' | 'hideLabelFromVision' | 'validity'
+	> {
+	/**
+	 * Array of allowed media types (e.g., ['image', 'video']).
+	 * Use ['*'] to allow all file types.
+	 *
+	 * @default ['image']
+	 */
+	allowedTypes?: string[];
+	/**
+	 * Whether to allow multiple media selections.
+	 *
+	 * @default false
+	 */
+	multiple?: boolean;
+	/**
+	 * Whether to render in an expanded form.
+	 *
+	 * @default false
+	 */
+	isExpanded?: boolean;
+}

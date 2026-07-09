@@ -2,6 +2,72 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to 20.19.0 || 22.13.0, i.e. versions supporting require(esm) ([#79755](https://github.com/WordPress/gutenberg/pull/79755)).
+
+### Enhancements
+
+-   `length-zero-no-unit` rule now ignores custom properties and `var` functions, for better compatibility with usage inside `calc` functions. `calc` functions are already [exempt from the rule by default](https://stylelint.io/user-guide/rules/length-zero-no-unit/), and this change extends the same exemption to variables that may be used within `calc` functions, as [unitless zeros are not valid in CSS math functions](https://www.w3.org/TR/css-values-4/#calc-type-checking) ([#79786](https://github.com/WordPress/gutenberg/pull/79786)).
+-   Update `@stylistic/stylelint-plugin` to `^3.1.3` ([#79648](https://github.com/WordPress/gutenberg/pull/79648)).
+-   Convert configuration to ESM ([#79755](https://github.com/WordPress/gutenberg/pull/79755)).
+
+## 23.42.0 (2026-07-01)
+
+## 23.41.0 (2026-06-24)
+
+## 23.40.1 (2026-06-16)
+
+## 23.40.0 (2026-06-10)
+
+## 23.39.0 (2026-05-27)
+
+## 23.38.0 (2026-05-14)
+
+## 23.37.0 (2026-04-29)
+
+## 23.36.0 (2026-04-15)
+
+## 23.35.0 (2026-04-01)
+
+## 23.34.0 (2026-03-18)
+
+## 23.33.0 (2026-03-04)
+
+## 23.32.0 (2026-02-18)
+
+## 23.31.0 (2026-01-29)
+
+## 23.30.0 (2026-01-16)
+
+### New Features
+
+-   Added `plugin-wpds/no-unknown-ds-tokens` and `plugin-wpds/no-setting-wpds-custom-properties` rules from `@wordpress/theme` to catch design token misuse ([#74226](https://github.com/WordPress/gutenberg/pull/74226)).
+
+## 23.28.0 (2025-11-26)
+
+## 23.27.0 (2025-11-12)
+
+## 23.26.0 (2025-10-29)
+
+## 23.25.0 (2025-10-17)
+
+## 23.24.0 (2025-10-01)
+
+## 23.23.0 (2025-09-17)
+
+## 23.22.0 (2025-09-03)
+
+## 23.21.0 (2025-08-20)
+
+## 23.20.0 (2025-08-07)
+
+## 23.19.0 (2025-07-23)
+
+## 23.18.0 (2025-06-25)
+
+## 23.17.0 (2025-06-04)
+
 ## 23.16.0 (2025-05-22)
 
 ## 23.15.0 (2025-05-07)

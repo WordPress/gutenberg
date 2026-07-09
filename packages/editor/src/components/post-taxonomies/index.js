@@ -20,8 +20,7 @@ export function PostTaxonomies( { taxonomyWrapper = identity } ) {
 			postType: select( editorStore ).getCurrentPostType(),
 			taxonomies: select( coreStore ).getEntityRecords(
 				'root',
-				'taxonomy',
-				{ per_page: -1 }
+				'taxonomy'
 			),
 		};
 	}, [] );
@@ -36,17 +35,11 @@ export function PostTaxonomies( { taxonomyWrapper = identity } ) {
 		const TaxonomyComponent = taxonomy.hierarchical
 			? HierarchicalTermSelector
 			: FlatTermSelector;
-		const taxonomyComponentProps = {
-			slug: taxonomy.slug,
-			...( taxonomy.hierarchical
-				? {}
-				: { __nextHasNoMarginBottom: true } ),
-		};
 
 		return (
 			<Fragment key={ `taxonomy-${ taxonomy.slug }` }>
 				{ taxonomyWrapper(
-					<TaxonomyComponent { ...taxonomyComponentProps } />,
+					<TaxonomyComponent slug={ taxonomy.slug } />,
 					taxonomy
 				) }
 			</Fragment>

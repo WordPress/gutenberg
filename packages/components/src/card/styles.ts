@@ -7,6 +7,8 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { COLORS, CONFIG } from '../utils';
+import { getPaddingBySize } from './get-padding-by-size';
+import type { FooterProps, HeaderProps, Props } from './types';
 
 // Since the border for `Card` is rendered via the `box-shadow` property
 // (as opposed to the `border` property), the value of the border radius needs
@@ -94,26 +96,53 @@ export const rounded = css`
 	border-radius: ${ adjustedBorderRadius };
 `;
 
-const xSmallCardPadding = css`
-	padding: ${ CONFIG.cardPaddingXSmall };
-`;
-
-export const cardPaddings = {
-	large: css`
-		padding: ${ CONFIG.cardPaddingLarge };
-	`,
-	medium: css`
-		padding: ${ CONFIG.cardPaddingMedium };
-	`,
-	small: css`
-		padding: ${ CONFIG.cardPaddingSmall };
-	`,
-	xSmall: xSmallCardPadding,
-	// The `extraSmall` size is not officially documented, but the following styles
-	// are kept for legacy reasons to support older values of the `size` prop.
-	extraSmall: xSmallCardPadding,
-};
-
 export const shady = css`
 	background-color: ${ COLORS.ui.backgroundDisabled };
 `;
+
+export function getCardStyles( {
+	isBorderless,
+	isRounded,
+}: Pick< Props, 'isBorderless' | 'isRounded' > ) {
+	const cardStyles = css(
+		Card,
+		isBorderless && boxShadowless,
+		isRounded && rounded
+	);
+
+	return cardStyles;
+}
+
+export function getCardHeaderStyles( {
+	isBorderless,
+	isShady,
+	size,
+}: Pick< HeaderProps, 'isBorderless' | 'isShady' | 'size' > ) {
+	const headerStyles = css(
+		Header,
+		borderRadius,
+		borderColor,
+		getPaddingBySize( size ),
+		isBorderless && borderless,
+		isShady && shady
+	);
+
+	return headerStyles;
+}
+
+export function getCardFooterStyles( {
+	isBorderless,
+	isShady,
+	size,
+}: Pick< FooterProps, 'isBorderless' | 'isShady' | 'size' > ) {
+	const footerStyles = css(
+		Footer,
+		borderRadius,
+		borderColor,
+		getPaddingBySize( size ),
+		isBorderless && borderless,
+		isShady && shady
+	);
+
+	return footerStyles;
+}
