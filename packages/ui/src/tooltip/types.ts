@@ -9,10 +9,7 @@ export type PositionerProps = ComponentProps< typeof _Tooltip.Positioner >;
 
 export type RootProps = Pick< _Tooltip.Root.Props, 'disabled' | 'children' >;
 
-export type ProviderProps = Pick<
-	_Tooltip.Provider.Props,
-	'delay' | 'children'
->;
+export type ProviderProps = _Tooltip.Provider.Props;
 
 export interface TriggerProps extends ComponentProps< 'button' > {
 	/**

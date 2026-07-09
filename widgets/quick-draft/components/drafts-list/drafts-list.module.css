@@ -13,7 +13,7 @@
 	padding-block-start: var(--wpds-dimension-padding-md);
 	padding-block-end: var(--wpds-dimension-padding-md);
 	padding-inline-start: var(--wpds-dimension-padding-md);
-	border-top: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
 /* Featured-image cell; fills the list layout's media slot. */
@@ -31,8 +31,8 @@
 	width: 100%;
 	height: 100%;
 	border-radius: var(--wpds-border-radius-md);
-	background-color: var(--wpds-color-bg-surface-neutral-weak);
-	color: var(--wpds-color-fg-content-neutral-weak);
+	background-color: var(--wpds-color-background-surface-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 /* Title link on the left, delete control pushed to the right of the cell. */
@@ -49,5 +49,5 @@
 }
 
 .date {
-	color: var(--wpds-color-fg-content-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }

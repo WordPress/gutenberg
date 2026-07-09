@@ -251,18 +251,31 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
 	}
 
+	/**
+	 * @ticket 77243
+	 */
 	public function test_sync_permission_checked_per_room() {
 		wp_set_current_user( self::$editor_id );
 
-		// First room is allowed, second room is forbidden.
+		$forbidden_rooms = array(
+			'unknown/entity',
+			'postType/post:999999',
+		);
+
+		// First room is allowed, remaining rooms are forbidden.
 		$response = $this->dispatch_sync(
 			array(
 				$this->build_room( $this->get_post_room() ),
-				$this->build_room( 'unknown/entity' ),
+				$this->build_room( $forbidden_rooms[0] ),
+				$this->build_room( $forbidden_rooms[1] ),
 			)
 		);
 
 		$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
+		$data = $response->get_data();
+		$this->assertSame( $forbidden_rooms, $data['data']['rooms'] );
+		$this->assertStringContainsString( $forbidden_rooms[0], $data['message'] );
+		$this->assertStringContainsString( $forbidden_rooms[1], $data['message'] );
 	}
 
 	/**

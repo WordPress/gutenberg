@@ -252,6 +252,7 @@ export default function useBlockSync( {
 					cloneBlockWithMapping( block, idMappingRef.current )
 				);
 
+				__unstableMarkNextChangeAsNotPersistent();
 				setHasControlledInnerBlocks( clientId, true );
 
 				if ( subscribedRef.current ) {
@@ -278,12 +279,13 @@ export default function useBlockSync( {
 	// Clean up the changes made by setControlledBlocks() when the component
 	// containing useBlockSync() unmounts.
 	const unsetControlledBlocks = () => {
-		__unstableMarkNextChangeAsNotPersistent();
 		if ( clientId ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setHasControlledInnerBlocks( clientId, false );
 			__unstableMarkNextChangeAsNotPersistent();
 			replaceInnerBlocks( clientId, [] );
 		} else {
+			__unstableMarkNextChangeAsNotPersistent();
 			resetBlocks( [] );
 		}
 	};
@@ -342,6 +344,7 @@ export default function useBlockSync( {
 		const {
 			getSelectedBlocksInitialCaretPosition,
 			isLastBlockChangePersistent,
+			__unstableGetLastBlockChangeHistoryMode,
 			__unstableIsLastBlockChangeIgnored,
 			areInnerBlocksControlled,
 			getBlockParents,
@@ -349,6 +352,7 @@ export default function useBlockSync( {
 
 		let blocks = getBlocks( clientId );
 		let isPersistent = isLastBlockChangePersistent();
+		let blockHistoryMode = __unstableGetLastBlockChangeHistoryMode();
 		let previousAreBlocksDifferent = false;
 		let prevSelectionStart = getSelectionStart();
 		let prevSelectionEnd = getSelectionEnd();
@@ -367,6 +371,8 @@ export default function useBlockSync( {
 			}
 
 			const newIsPersistent = isLastBlockChangePersistent();
+			const newBlockHistoryMode =
+				__unstableGetLastBlockChangeHistoryMode();
 			const newBlocks = getBlocks( clientId );
 			const areBlocksDifferent = newBlocks !== blocks;
 			blocks = newBlocks;
@@ -377,6 +383,7 @@ export default function useBlockSync( {
 			) {
 				pendingChangesRef.current.incoming = null;
 				isPersistent = newIsPersistent;
+				blockHistoryMode = newBlockHistoryMode;
 				return;
 			}
 
@@ -409,6 +416,7 @@ export default function useBlockSync( {
 				registry.batch( () => {
 					if ( blocksChanged ) {
 						isPersistent = newIsPersistent;
+						blockHistoryMode = newBlockHistoryMode;
 
 						// For inner block controllers (clientId is set), restore external IDs
 						// before passing blocks to the parent.
@@ -438,9 +446,13 @@ export default function useBlockSync( {
 						const updateParent = isPersistent
 							? onChangeRef.current
 							: onInputRef.current;
-						updateParent( blocksForParent, {
+						const updateOptions = {
 							selection: selectionForParent,
-						} );
+						};
+						if ( blockHistoryMode === 'ignore' ) {
+							updateOptions.undoIgnore = true;
+						}
+						updateParent( blocksForParent, updateOptions );
 					}
 
 					if (

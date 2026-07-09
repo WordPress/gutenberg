@@ -10,8 +10,9 @@ extend( [ a11yPlugin ] );
 /**
  * WordPress dependencies
  */
-import { Icon as WCIcon, Tooltip as WCTooltip } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -114,7 +115,12 @@ function Avatar( {
 	);
 
 	if ( name && ( ! showBadge || label ) ) {
-		return <WCTooltip text={ name }>{ avatar }</WCTooltip>;
+		return (
+			<Tooltip.Root>
+				<Tooltip.Trigger render={ avatar } />
+				<Tooltip.Popup>{ name }</Tooltip.Popup>
+			</Tooltip.Root>
+		);
 	}
 
 	return avatar;

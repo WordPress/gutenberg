@@ -88,9 +88,16 @@ export default ( props ) => ( element ) => {
 		'keydown',
 		onKeyDown
 	);
-	element.addEventListener( 'keydown', onKeyDownDeprecated );
+	// Capture phase so this runs before ancestor (writing flow) bubble
+	// handlers, matching the timing of the previous raw element listener.
+	const unsubscribeKeyDownDeprecated = subscribeDelegatedListener(
+		element,
+		'keydown',
+		onKeyDownDeprecated,
+		true
+	);
 	return () => {
 		unsubscribeKeyDown();
-		element.removeEventListener( 'keydown', onKeyDownDeprecated );
+		unsubscribeKeyDownDeprecated();
 	};
 };

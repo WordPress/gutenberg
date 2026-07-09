@@ -54,6 +54,17 @@ describe( 'PostTypeSupportCheck', () => {
 		expect( container ).not.toHaveTextContent( 'Supported' );
 	} );
 
+	it( 'does not crash when the post type has no `supports` object', () => {
+		setupUseSelectMock( {} );
+		const { container } = render(
+			<PostTypeSupportCheck supportKeys="title">
+				Supported
+			</PostTypeSupportCheck>
+		);
+
+		expect( container ).not.toHaveTextContent( 'Supported' );
+	} );
+
 	it( 'renders its children when post type is known and supports', () => {
 		setupUseSelectMock( {
 			supports: {

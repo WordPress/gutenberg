@@ -7,6 +7,8 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
+import deprecated from '@wordpress/deprecated';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -19,23 +21,46 @@ import {
 import {
 	isBlockRegistered,
 	normalizeBlockType,
-	__experimentalSanitizeBlockAttributes,
+	sanitizeBlockAttributes,
 } from './utils';
 import type { Block, BlockType, BlockTransform } from '../types';
+
+type BlockTypeWithTransformMetadata = BlockType & {
+	variationName?: string;
+};
+
+type TemplateBlock = [
+	string,
+	Record< string, unknown >?,
+	Array< unknown >?,
+	Array< string | null >?,
+];
+
+const getBlockTypeWithTransformMetadata = (
+	blockType: BlockType,
+	transform: BlockTransform
+): BlockTypeWithTransformMetadata =>
+	transform.variationName
+		? { ...blockType, variationName: transform.variationName }
+		: blockType;
 
 /**
  * Returns a block object given its type and attributes.
  *
- * @param name        Block name.
- * @param attributes  Block attributes.
- * @param innerBlocks Nested blocks.
+ * @param name         Block name.
+ * @param attributes   Block attributes.
+ * @param innerBlocks  Nested blocks.
+ * @param innerContent Static HTML fragments interleaved with inner blocks,
+ *                     where `null` entries mark inner block positions. Only
+ *                     applies to the Custom HTML block.
  *
  * @return Block object.
  */
 export function createBlock(
 	name: string,
 	attributes: Record< string, unknown > = {},
-	innerBlocks: Block[] = []
+	innerBlocks: Block[] = [],
+	innerContent?: Array< string | null >
 ): Block {
 	if ( ! isBlockRegistered( name ) ) {
 		return createBlock( 'core/missing', {
@@ -45,22 +70,33 @@ export function createBlock(
 		} );
 	}
 
-	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
-		name,
-		attributes
-	);
+	const sanitizedAttributes = sanitizeBlockAttributes( name, attributes );
 
 	const clientId = uuid();
 
 	// Blocks are stored with a unique ID, the assigned type name, the block
 	// attributes, and their inner blocks.
-	return {
+	const block: Block = {
 		clientId,
 		name,
 		isValid: true,
 		attributes: sanitizedAttributes,
 		innerBlocks,
 	};
+
+	if ( innerContent ) {
+		// Static inner content is currently a Custom HTML block mechanism
+		// only; it isn't exposed as a block support.
+		if ( name === 'core/html' ) {
+			block.innerContent = innerContent;
+		} else {
+			warning(
+				`The innerContent argument passed to createBlock for the "${ name }" block was ignored. Only the Custom HTML block stores static inner content.`
+			);
+		}
+	}
+
+	return block;
 }
 
 /**
@@ -74,28 +110,26 @@ export function createBlock(
  * @return Array of Block objects.
  */
 export function createBlocksFromInnerBlocksTemplate(
-	innerBlocksOrTemplate: Array<
-		Block | [ string, Record< string, unknown >?, Array< unknown >? ]
-	> = []
+	innerBlocksOrTemplate: Array< Block | TemplateBlock > = []
 ): Block[] {
 	return innerBlocksOrTemplate.map( ( innerBlock ) => {
-		const innerBlockTemplate = Array.isArray( innerBlock )
+		const innerBlockTemplate: TemplateBlock = Array.isArray( innerBlock )
 			? innerBlock
 			: [
 					innerBlock.name,
 					innerBlock.attributes,
 					innerBlock.innerBlocks,
+					innerBlock.innerContent,
 			  ];
-		const [ name, attributes, innerBlocks = [] ] = innerBlockTemplate;
+		const [ name, attributes, innerBlocks = [], innerContent ] =
+			innerBlockTemplate;
 		return createBlock(
 			name as string,
 			attributes as Record< string, unknown >,
 			createBlocksFromInnerBlocksTemplate(
-				innerBlocks as Array<
-					| Block
-					| [ string, Record< string, unknown >?, Array< unknown >? ]
-				>
-			)
+				innerBlocks as Array< Block | TemplateBlock >
+			),
+			innerContent
 		);
 	} );
 }
@@ -110,7 +144,7 @@ export function createBlocksFromInnerBlocksTemplate(
  *
  * @return A cloned block.
  */
-export function __experimentalCloneSanitizedBlock(
+export function cloneSanitizedBlock(
 	block: Block,
 	mergeAttributes: Record< string, unknown > = {},
 	newInnerBlocks?: Block[]
@@ -127,7 +161,7 @@ export function __experimentalCloneSanitizedBlock(
 
 	const clientId = uuid();
 
-	const sanitizedAttributes = __experimentalSanitizeBlockAttributes( name, {
+	const sanitizedAttributes = sanitizeBlockAttributes( name, {
 		...block.attributes,
 		...mergeAttributes,
 	} );
@@ -139,9 +173,22 @@ export function __experimentalCloneSanitizedBlock(
 		innerBlocks:
 			newInnerBlocks ||
 			block.innerBlocks.map( ( innerBlock ) =>
-				__experimentalCloneSanitizedBlock( innerBlock )
+				cloneSanitizedBlock( innerBlock )
 			),
 	};
+}
+
+export function __experimentalCloneSanitizedBlock(
+	block: Block,
+	mergeAttributes: Record< string, unknown > = {},
+	newInnerBlocks?: Block[]
+): Block {
+	deprecated( '__experimentalCloneSanitizedBlock', {
+		since: '7.1',
+		alternative: 'cloneSanitizedBlock',
+	} );
+
+	return cloneSanitizedBlock( block, mergeAttributes, newInnerBlocks );
 }
 
 /**
@@ -260,24 +307,24 @@ const isPossibleTransformForSource = (
  */
 const getBlockTypesForPossibleFromTransforms = (
 	blocks: Block[]
-): BlockType[] => {
+): BlockTypeWithTransformMetadata[] => {
 	if ( ! blocks.length ) {
 		return [];
 	}
 
 	const allBlockTypes = getBlockTypes();
 
-	// filter all blocks to find those with a 'from' transform.
-	const blockTypesWithPossibleFromTransforms = allBlockTypes.filter(
+	// Filter all blocks to find those with a 'from' transform.
+	const blockTypesWithPossibleFromTransforms = allBlockTypes.flatMap(
 		( blockType ) => {
 			const fromTransforms = getBlockTransforms( 'from', blockType.name );
-			return !! findTransform( fromTransforms, ( transform ) => {
-				return isPossibleTransformForSource(
-					transform,
-					'from',
-					blocks
+			return fromTransforms
+				.filter( ( transform ) =>
+					isPossibleTransformForSource( transform, 'from', blocks )
+				)
+				.map( ( transform ) =>
+					getBlockTypeWithTransformMetadata( blockType, transform )
 				);
-			} );
 		}
 	);
 
@@ -294,7 +341,7 @@ const getBlockTypesForPossibleFromTransforms = (
  */
 const getBlockTypesForPossibleToTransforms = (
 	blocks: Block[]
-): BlockType[] => {
+): BlockTypeWithTransformMetadata[] => {
 	if ( ! blocks.length ) {
 		return [];
 	}
@@ -312,16 +359,20 @@ const getBlockTypesForPossibleToTransforms = (
 		);
 	} );
 
-	// Build a list of block names using the possible 'to' transforms.
-	const blockNames = possibleTransforms
-		.map( ( transformation ) => transformation.blocks )
-		.flat();
-
 	// Map block names to block types.
-	return blockNames
-		.filter( ( name ): name is string => !! name )
-		.map( getBlockType )
-		.filter( ( bt ): bt is BlockType => !! bt );
+	return possibleTransforms
+		.flatMap( ( transformation ) => {
+			return ( transformation.blocks || [] ).map( ( name ) => {
+				const transformedBlockType = getBlockType( name );
+				return transformedBlockType
+					? getBlockTypeWithTransformMetadata(
+							transformedBlockType,
+							transformation
+					  )
+					: undefined;
+			} );
+		} )
+		.filter( ( bt ): bt is BlockTypeWithTransformMetadata => !! bt );
 };
 
 /**
@@ -363,7 +414,7 @@ export const isContainerGroupBlock = ( name: string ): boolean =>
  */
 export function getPossibleBlockTransformations(
 	blocks: Block[]
-): BlockType[] {
+): BlockTypeWithTransformMetadata[] {
 	if ( ! blocks.length ) {
 		return [];
 	}
@@ -373,12 +424,24 @@ export function getPossibleBlockTransformations(
 	const blockTypesForToTransforms =
 		getBlockTypesForPossibleToTransforms( blocks );
 
-	return [
-		...new Set( [
-			...blockTypesForFromTransforms,
-			...blockTypesForToTransforms,
-		] ),
-	];
+	const blockTypesByNameAndVariation = new Map<
+		string,
+		BlockTypeWithTransformMetadata
+	>();
+
+	for ( const blockType of [
+		...blockTypesForFromTransforms,
+		...blockTypesForToTransforms,
+	] ) {
+		const key = blockType.variationName
+			? `${ blockType.name }/${ blockType.variationName }`
+			: blockType.name;
+		if ( ! blockTypesByNameAndVariation.has( key ) ) {
+			blockTypesByNameAndVariation.set( key, blockType );
+		}
+	}
+
+	return [ ...blockTypesByNameAndVariation.values() ];
 }
 
 /**
@@ -511,14 +574,16 @@ function maybeCheckTransformIsMatch(
 /**
  * Switch one or more blocks into one or more blocks of the new block type.
  *
- * @param blocks Blocks array or block object.
- * @param name   Block name.
+ * @param blocks        Blocks array or block object.
+ * @param name          Block name.
+ * @param variationName Optional target block variation name.
  *
  * @return Array of blocks or null.
  */
 export function switchToBlockType(
 	blocks: Block[] | Block,
-	name: string
+	name: string,
+	variationName?: string
 ): Block[] | null {
 	const blocksArray = Array.isArray( blocks ) ? blocks : [ blocks ];
 	const isMultiBlock = blocksArray.length > 1;
@@ -529,12 +594,15 @@ export function switchToBlockType(
 	// transformation.
 	const transformationsFrom = getBlockTransforms( 'from', name );
 	const transformationsTo = getBlockTransforms( 'to', sourceName );
+	const isMatchingVariation = ( t: BlockTransform ) =>
+		variationName ? t.variationName === variationName : ! t.variationName;
 
 	const transformation =
 		findTransform(
 			transformationsTo,
 			( t ) =>
 				t.type === 'block' &&
+				isMatchingVariation( t ) &&
 				( isWildcardBlockTransform( t ) ||
 					t.blocks!.indexOf( name ) !== -1 ) &&
 				( ! isMultiBlock || !! t.isMultiBlock ) &&
@@ -544,6 +612,7 @@ export function switchToBlockType(
 			transformationsFrom,
 			( t ) =>
 				t.type === 'block' &&
+				isMatchingVariation( t ) &&
 				( isWildcardBlockTransform( t ) ||
 					t.blocks!.indexOf( sourceName ) !== -1 ) &&
 				( ! isMultiBlock || !! t.isMultiBlock ) &&
@@ -650,6 +719,7 @@ type BlockExample = {
 		attributes?: Record< string, unknown >;
 		innerBlocks?: BlockExample[ 'innerBlocks' ];
 	} >;
+	innerContent?: Array< string | null >;
 };
 
 export const getBlockFromExample = (
@@ -661,5 +731,6 @@ export const getBlockFromExample = (
 		example.attributes,
 		( example.innerBlocks ?? [] ).map( ( innerBlock ) =>
 			getBlockFromExample( innerBlock.name, innerBlock )
-		)
+		),
+		example.innerContent
 	);

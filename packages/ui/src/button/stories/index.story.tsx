@@ -1,6 +1,6 @@
 import { Fragment } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { cog } from '@wordpress/icons';
+import { wordpress } from '@wordpress/icons';
 import { Button } from '../index';
 
 const meta: Meta< typeof Button > = {
@@ -96,7 +96,7 @@ export const AllTonesAndVariants: Story = {
 			style={ {
 				display: 'grid',
 				gridTemplateColumns: 'max-content repeat(2, max-content)',
-				color: 'var(--wpds-color-fg-content-neutral)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
 			} }
 		>
 			<div></div>
@@ -158,7 +158,7 @@ export const WithIcon: Story = {
 		...Default.args,
 		children: (
 			<>
-				<Button.Icon icon={ cog } />
+				<Button.Icon icon={ wordpress } />
 				Button
 			</>
 		),

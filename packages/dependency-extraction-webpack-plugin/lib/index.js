@@ -296,12 +296,24 @@ class DependencyExtractionWebpackPlugin {
 
 			/**
 			 * @param {webpack.Module} m
+			 * @param {boolean}        [fromAsyncChunk] Module was found in an
+			 *                                          async chunk of the entry.
 			 */
-			const processModule = ( m ) => {
+			const processModule = ( m, fromAsyncChunk ) => {
 				const { userRequest } = m;
 				if ( this.externalizedDeps.has( userRequest ) ) {
 					if ( this.useModules ) {
+						// A static occurrence (in the entry chunk) wins.
+						if (
+							fromAsyncChunk &&
+							chunkStaticDeps.has( m.request )
+						) {
+							return;
+						}
+						// Externals in an async chunk are reached via a dynamic
+						// import by definition.
 						const isStatic =
+							! fromAsyncChunk &&
 							DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
 								compilation,
 								m
@@ -318,16 +330,49 @@ class DependencyExtractionWebpackPlugin {
 				}
 			};
 
-			// Search for externalized modules in all chunks.
-			for ( const chunkModule of compilation.chunkGraph.getChunkModulesIterable(
-				chunk
-			) ) {
-				processModule( chunkModule );
-				// Loop through submodules of ConcatenatedModule.
-				if ( chunkModule.modules ) {
-					for ( const concatModule of chunkModule.modules ) {
-						processModule( concatModule );
+			/**
+			 * @param {webpack.Chunk} searchChunk
+			 * @param {boolean}       [fromAsyncChunk]
+			 */
+			const processChunkModules = ( searchChunk, fromAsyncChunk ) => {
+				for ( const chunkModule of compilation.chunkGraph.getChunkModulesIterable(
+					searchChunk
+				) ) {
+					processModule( chunkModule, fromAsyncChunk );
+					// Loop through submodules of ConcatenatedModule.
+					if ( chunkModule.modules ) {
+						for ( const concatModule of chunkModule.modules ) {
+							processModule( concatModule, fromAsyncChunk );
+						}
 					}
+				}
+			};
+
+			processChunkModules( chunk );
+
+			/*
+			 * Also search the entry's async chunks: webpack can code-split a
+			 * dynamically imported external into its own chunk.
+			 */
+			for ( const group of chunk.groupsIterable ) {
+				if (
+					typeof group.getEntrypointChunk !== 'function' ||
+					group.getEntrypointChunk() !== chunk
+				) {
+					continue;
+				}
+				const seenGroups = new Set();
+				const groupQueue = [ ...group.getChildren() ];
+				while ( groupQueue.length ) {
+					const childGroup = groupQueue.pop();
+					if ( seenGroups.has( childGroup ) ) {
+						continue;
+					}
+					seenGroups.add( childGroup );
+					for ( const asyncChunk of childGroup.chunks ) {
+						processChunkModules( asyncChunk, true );
+					}
+					groupQueue.push( ...childGroup.getChildren() );
 				}
 			}
 

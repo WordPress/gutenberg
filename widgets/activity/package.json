@@ -13,6 +13,9 @@
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/ui": "file:../../packages/ui",
-		"react": "18.3.1"
+		"@wordpress/widget-primitives": "file:../../packages/widget-primitives"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.27"
 	}
 }

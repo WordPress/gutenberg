@@ -11,12 +11,12 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 	 * Internal class representing a widget type.
 	 *
 	 * Holds the metadata for a widget discovered by the build pipeline. Stored
-	 * inside `WP_Widget_Type_Registry` once registered, and consumed by surface
+	 * inside `WP_Widget_Type_Registry` once registered, and consumed by host
 	 * code that needs to enumerate or look up widget types.
 	 *
 	 * The shape is intentionally minimal: identity (`name`) plus the
 	 * script-module handles the build pipeline produced for the widget.
-	 * Placement and surface concerns (which page or sidebar uses the widget)
+	 * Placement and host concerns (which page or sidebar uses the widget)
 	 * live with the consumer, not on the type definition.
 	 */
 	#[AllowDynamicProperties]
@@ -66,6 +66,57 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		 * @var string|null
 		 */
 		public $presentation = null;
+
+		/**
+		 * Widget types are grouped into categories to help users browse and
+		 * discover them. Static and declarative; not a user-editable attribute.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var string|null
+		 */
+		public $category = null;
+
+		/**
+		 * Human-readable title that names the widget type. Translated
+		 * at registration time using the widget's text domain.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var string|null
+		 */
+		public $title = null;
+
+		/**
+		 * Human-readable description of what the widget type does.
+		 * Translated at registration time using the widget's text domain.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var string|null
+		 */
+		public $description = null;
+
+		/**
+		 * Contextual help note: `content` plus optional `links`.
+		 * Translated at registration time using the widget's text domain.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var array|null
+		 */
+		public $help = null;
+
+		/**
+		 * Alternative terms used to match the widget type when searching,
+		 * e.g. "calendar" for an events widget. Translated at registration
+		 * time using the widget's text domain.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var string[]|null
+		 */
+		public $keywords = null;
 
 		/**
 		 * Constructor.

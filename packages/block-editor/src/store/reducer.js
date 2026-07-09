@@ -419,18 +419,20 @@ const withBlockTree =
  */
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
-	let markNextChangeAsNotPersistent = false;
+	let nextHistoryMode;
 
 	return ( state, action ) => {
 		const nextState = reducer( state, action );
 
-		const wasMarkedAsNotPersistent = markNextChangeAsNotPersistent;
-		markNextChangeAsNotPersistent =
-			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
+		const pendingHistoryMode = nextHistoryMode;
+		nextHistoryMode =
+			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT'
+				? action.history ?? 'merge'
+				: undefined;
 
 		const isExplicitPersistentChange =
 			action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' ||
-			wasMarkedAsNotPersistent;
+			pendingHistoryMode;
 
 		// Defer to previous state value (or default) unless changing or
 		// explicitly marking as persistent.
@@ -442,7 +444,7 @@ function withPersistentBlockChange( reducer ) {
 		}
 
 		const isPersistentChange = isExplicitPersistentChange
-			? ! wasMarkedAsNotPersistent
+			? ! pendingHistoryMode
 			: ! isUpdatingSameBlockAttribute( action, lastAction );
 
 		// In comparing against the previous action, consider only those which
@@ -450,7 +452,17 @@ function withPersistentBlockChange( reducer ) {
 		// have resulted in a changed state.
 		lastAction = action;
 
-		return { ...nextState, isPersistentChange };
+		if ( pendingHistoryMode === 'ignore' ) {
+			return {
+				...nextState,
+				isPersistentChange,
+				lastBlockChangeHistoryMode: 'ignore',
+			};
+		}
+
+		const { lastBlockChangeHistoryMode, ...blockChange } = nextState;
+
+		return { ...blockChange, isPersistentChange };
 	};
 }
 
@@ -2300,7 +2312,6 @@ export function selectedBlockStyleState( state = undefined, action ) {
 				clientId: action.clientId,
 				showStateOnCanvas,
 				value: {
-					viewport: 'default',
 					pseudo: 'default',
 					...previousValue,
 					...action.value,
@@ -2320,7 +2331,6 @@ export function selectedBlockStyleState( state = undefined, action ) {
 				clientId: action.clientId,
 				showStateOnCanvas: action.value,
 				value: {
-					viewport: 'default',
 					pseudo: 'default',
 					...previousValue,
 				},
@@ -2378,6 +2388,41 @@ export function selectedBlockStyleState( state = undefined, action ) {
 	return state;
 }
 
+/**
+ * Reducer holding the globally selected viewport style state. When set to a
+ * value other than 'default', block style edits in the inspector are applied to
+ * that viewport. Driven by the editor's device preview (Responsive editing).
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function styleStateViewport( state = 'default', action ) {
+	if ( action.type === 'SET_STYLE_STATE_VIEWPORT' ) {
+		return action.viewport ?? 'default';
+	}
+
+	return state;
+}
+
+/**
+ * Reducer for whether Responsive editing is enabled. When enabled, the device
+ * preview also drives which viewport block style edits are applied to.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isResponsiveEditing( state = false, action ) {
+	if ( action.type === 'SET_RESPONSIVE_EDITING' ) {
+		return action.enabled;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2414,6 +2459,8 @@ const combinedReducers = combineReducers( {
 	listViewContentPanelOpen,
 	requestedInspectorTab,
 	selectedBlockStyleState,
+	styleStateViewport,
+	isResponsiveEditing,
 } );
 
 /**

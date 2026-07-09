@@ -17,7 +17,7 @@ import type { MediaItem } from '../../types';
 
 describe( 'FileNameView', () => {
 	describe( 'filename rendering', () => {
-		it( 'renders short filename without a tooltip anchor or tabindex', () => {
+		it( 'renders short filename without a tooltip anchor', () => {
 			const item: Partial< MediaItem > = {
 				source_url: 'https://example.com/uploads/12345678901.jpg', // exactly 15 chars
 			};
@@ -31,7 +31,6 @@ describe( 'FileNameView', () => {
 
 			const rendered = screen.getByText( '12345678901.jpg' );
 			expect( rendered ).toHaveClass( 'dataviews-media-field__filename' );
-			expect( rendered ).not.toHaveAttribute( 'tabindex' );
 		} );
 
 		it( 'renders long filename inside a Tooltip and exposes the full name in the DOM', () => {
@@ -53,26 +52,6 @@ describe( 'FileNameView', () => {
 			// complete name, and the Tooltip exposes it on mouse hover.
 			const rendered = screen.getByText( longFilename );
 			expect( rendered ).toHaveClass( 'dataviews-media-field__filename' );
-		} );
-
-		it( 'does not add a tab stop for truncated filenames', () => {
-			const longFilename =
-				'very-long-filename-that-exceeds-fifteen-characters.jpg';
-			const item: Partial< MediaItem > = {
-				source_url: `https://example.com/uploads/${ longFilename }`,
-			};
-
-			render(
-				<FileNameView
-					item={ item as MediaItem }
-					field={ filenameField as NormalizedField< MediaItem > }
-				/>
-			);
-
-			expect( screen.getByText( longFilename ) ).toHaveAttribute(
-				'tabindex',
-				'-1'
-			);
 		} );
 	} );
 

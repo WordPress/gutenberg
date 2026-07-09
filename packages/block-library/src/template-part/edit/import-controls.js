@@ -147,7 +147,6 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 						options={ options }
 						onChange={ ( value ) => setSelectedSidebar( value ) }
 						disabled={ ! options.length }
-						__next40pxDefaultSize
 					/>
 				</FlexBlock>
 				<FlexItem
