@@ -21,10 +21,14 @@ import { unlock } from '../../../lock-unlock';
  * @param {InserterMediaRequest} query      The query args to use for the request.
  * @param {any}                  refreshKey Optional value that, when changed, forces
  *                                          a refetch (e.g. after attaching/detaching).
- * @return {InserterMediaItem[]} The media results.
+ * @return {{ mediaList: InserterMediaItem[], isLoading: boolean, totalItems: number|undefined, totalPages: number|undefined }} The media results and paging totals.
  */
 export function useMediaResults( category, query = {}, refreshKey ) {
 	const [ mediaList, setMediaList ] = useState();
+	// A source can return totals for server-side pagination (as
+	// `{ mediaList, totalItems, totalPages }`) or a plain array (no pager). When
+	// no totals are provided, these stay `undefined` and the panel hides the pager.
+	const [ totals, setTotals ] = useState( {} );
 	const [ isLoading, setIsLoading ] = useState( false );
 	// We need to keep track of the last request made because
 	// multiple request can be fired without knowing the order
@@ -36,6 +40,7 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 	const lastRequestRef = useRef();
 	const lastQueryKeyRef = useRef();
 	const lastFetchRef = useRef();
+	const lastSourceRef = useRef();
 	useEffect( () => {
 		( async () => {
 			const key = JSON.stringify( {
@@ -56,11 +61,35 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 			) {
 				setMediaList( [] );
 			}
+			// Reset paging totals only when the source (category or its `fetch`)
+			// changes, so switching to an array-returning source doesn't leave a
+			// stale pager showing. A mere page change keeps the previous totals,
+			// which is what holds the footer mounted while the next page loads.
+			if (
+				lastSourceRef.current !== category.name ||
+				lastFetchRef.current !== category.fetch
+			) {
+				setTotals( {} );
+			}
 			lastQueryKeyRef.current = key;
 			lastFetchRef.current = category.fetch;
-			const _media = await category.fetch?.( query );
+			lastSourceRef.current = category.name;
+			const _result = await category.fetch?.( query );
+			// A source may return either a plain array or an object carrying
+			// pagination totals. Normalize both to a media list plus optional
+			// totals so results and totals update together.
+			const _media = Array.isArray( _result )
+				? _result
+				: _result?.mediaList;
+			const _totals = Array.isArray( _result )
+				? {}
+				: {
+						totalItems: _result?.totalItems,
+						totalPages: _result?.totalPages,
+				  };
 			if ( request === lastRequestRef.current ) {
 				setMediaList( _media );
+				setTotals( _totals );
 				setIsLoading( false );
 			}
 		} )();
@@ -70,7 +99,12 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 		...Object.values( query ),
 		refreshKey,
 	] );
-	return { mediaList, isLoading };
+	return {
+		mediaList,
+		isLoading,
+		totalItems: totals.totalItems,
+		totalPages: totals.totalPages,
+	};
 }
 
 /**
@@ -144,9 +178,14 @@ export function useMediaCategories( rootClientId ) {
 						}
 						let results = [];
 						try {
-							results = await category.fetch( {
+							const result = await category.fetch( {
 								per_page: 1,
 							} );
+							// `fetch` may return a plain array or a
+							// `{ mediaList, ... }` object (paginated sources).
+							results = Array.isArray( result )
+								? result
+								: result?.mediaList ?? [];
 						} catch {
 							// If the request fails, we shallow the error and just don't show
 							// the category, in order to not break the media tab.
