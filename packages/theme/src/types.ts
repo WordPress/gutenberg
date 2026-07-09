@@ -80,6 +80,9 @@ export interface ThemeProviderProps extends ThemeProviderSettings {
 	 * consume the right background color, or that overlays rendered inside a
 	 * portal can inherit the correct color scheme.
 	 *
+	 * Render at most one root provider per document. Multiple root providers
+	 * that share the same document are unsupported.
+	 *
 	 * @default false
 	 */
 	isRoot?: boolean;
