@@ -3,6 +3,24 @@ import { getContrast } from '../color-ramps/lib/color-utils';
 import { useThemeProviderStyles } from '../use-theme-provider-styles';
 
 const MINIMUM_TEXT_CONTRAST = 4.5;
+const CUSTOM_PRIMARY = '#0057b8';
+const CUSTOM_BACKGROUND = '#f6f3ef';
+
+const THEME_PROVIDER_STYLE_CASES = [
+	{
+		name: 'default seed colors',
+		settings: undefined,
+	},
+	{
+		name: 'custom seed colors',
+		settings: {
+			color: {
+				primary: CUSTOM_PRIMARY,
+				background: CUSTOM_BACKGROUND,
+			},
+		},
+	},
+] as const;
 
 const CONTRAST_PAIRS = [
 	{
@@ -99,20 +117,25 @@ function readToken(
 }
 
 describe( 'semantic color contrast', () => {
-	it( 'keeps critical foreground/background pairs above WCAG AA text contrast', () => {
-		const { result } = renderHook( () => useThemeProviderStyles() );
-		const styles = result.current.themeProviderStyles as Record<
-			string,
-			string | number | undefined
-		>;
+	it.each( THEME_PROVIDER_STYLE_CASES )(
+		'keeps critical foreground/background pairs above WCAG AA text contrast with $name',
+		( { settings } ) => {
+			const { result } = renderHook( () =>
+				useThemeProviderStyles( settings )
+			);
+			const styles = result.current.themeProviderStyles as Record<
+				string,
+				string | number | undefined
+			>;
 
-		CONTRAST_PAIRS.forEach( ( { foreground, background } ) => {
-			const foregroundValue = readToken( styles, foreground );
-			const backgroundValue = readToken( styles, background );
+			CONTRAST_PAIRS.forEach( ( { foreground, background } ) => {
+				const foregroundValue = readToken( styles, foreground );
+				const backgroundValue = readToken( styles, background );
 
-			expect(
-				getContrast( foregroundValue, backgroundValue )
-			).toBeGreaterThanOrEqual( MINIMUM_TEXT_CONTRAST );
-		} );
-	} );
+				expect(
+					getContrast( foregroundValue, backgroundValue )
+				).toBeGreaterThanOrEqual( MINIMUM_TEXT_CONTRAST );
+			} );
+		}
+	);
 } );
