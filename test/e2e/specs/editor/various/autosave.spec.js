@@ -205,6 +205,43 @@ test.describe( 'Autosave', () => {
 		).toBe( 1 );
 	} );
 
+	test( 'should create local autosave if remote autosave fails', async ( {
+		editor,
+		context,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+
+		// New, unsaved edits with no local backup yet.
+		await page.keyboard.type( ' after save' );
+
+		// Fail the remote autosave.
+		await context.setOffline( true );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+
+		// Shorten the interval so the local monitor's timer fires quickly.
+		await page.evaluate( () =>
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.updateEditorSettings( { localAutosaveInterval: 1 } )
+		);
+
+		await expect
+			.poll( () => page.evaluate( () => window.sessionStorage.length ) )
+			.toBeGreaterThanOrEqual( 1 );
+	} );
+
 	test( 'should clear local autosave after successful save', async ( {
 		page,
 		pageUtils,
