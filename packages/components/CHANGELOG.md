@@ -47,6 +47,7 @@
 -   `Divider`: Restore lower-specificity border styles so custom border colors can override the default divider color. ([#79534](https://github.com/WordPress/gutenberg/pull/79534))
 -   `Button`: Fix the focus ring for buttons rendered as links ([#79837](https://github.com/WordPress/gutenberg/pull/79837)).
 -   `BorderBoxControl`: Fix the unlink button positioning by restoring the linked control's right-hand margin, which was overridden by `BorderControl`'s base `margin: 0` after `View` stopped rendering styles through Emotion ([#79967](https://github.com/WordPress/gutenberg/pull/79967)).
+-   `Panel`: Fix the body toggle focus style ([#80064](https://github.com/WordPress/gutenberg/pull/80064)).
 
 ### Internal
 
