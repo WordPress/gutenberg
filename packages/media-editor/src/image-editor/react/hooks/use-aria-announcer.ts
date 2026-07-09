@@ -52,17 +52,14 @@ function getRotationAnnouncement(
 	) {
 		return undefined;
 	}
-	// Announce the visual rotation offset — the same value the fine-rotation
-	// slider shows. The offset is relative to the nearest 90° cardinal and
-	// accounts for single-axis flip inverting the visual direction.
-	const baseAngle = ( Math.round( state.rotation / 90 ) * 90 ) % 360;
+	// Announce the visual rotation — what the user perceives on screen. A
+	// single-axis flip mirrors the image, reversing the entire on-screen
+	// rotation relative to the stored field (the same S·R·S inversion the
+	// reducer applies), so negate the whole angle in that case.
 	const singleFlip = state.flip.horizontal !== state.flip.vertical;
 	const visualDir = singleFlip ? -1 : 1;
-	const offset = Math.round(
-		( state.rotation - Math.round( state.rotation / 90 ) * 90 ) * visualDir
-	);
 	// Normalize to (-180, 180] so the sign indicates direction.
-	let visualRotation = ( baseAngle + offset ) % 360;
+	let visualRotation = ( Math.round( state.rotation ) * visualDir ) % 360;
 	if ( visualRotation > 180 ) {
 		visualRotation -= 360;
 	}

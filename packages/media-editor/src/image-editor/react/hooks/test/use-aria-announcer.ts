@@ -145,6 +145,34 @@ describe( 'useAriaAnnouncer', () => {
 		expect( result.current ).toBe( 'Rotated 10 degrees counterclockwise' );
 	} );
 
+	it( 'announces a 90° snap under a single flip in visual terms', () => {
+		const { result, rerender } = renderHook(
+			( { state } ) => useAriaAnnouncer( state ),
+			{
+				initialProps: {
+					state: makeState( {
+						flip: { horizontal: true, vertical: false },
+					} ),
+				},
+			}
+		);
+
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		// Flip horizontal, then rotate 90° clockwise: the reducer negates the
+		// visual direction for the field, so it stores 270 (normalized -90).
+		// Visually the user rotated 90° clockwise, so that's what we announce.
+		rerender( {
+			state: makeState( {
+				rotation: 270,
+				flip: { horizontal: true, vertical: false },
+			} ),
+		} );
+		act( () => jest.advanceTimersByTime( 300 ) );
+
+		expect( result.current ).toBe( 'Rotated 90 degrees clockwise' );
+	} );
+
 	it( 'announces rotation back to zero', () => {
 		const { result, rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
