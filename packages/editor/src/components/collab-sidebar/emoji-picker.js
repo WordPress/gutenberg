@@ -11,7 +11,12 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
-import { detectLocale, useEmojibaseData } from './emojibase-data';
+import {
+	detectLocale,
+	normalizeHexcode,
+	useEmojibaseData,
+} from './emojibase-data';
+import { useFrequentEmojis } from './frequent-emojis';
 import SkinTonePicker, { applySkinTone } from './skin-tone-picker';
 
 /**
@@ -129,6 +134,7 @@ export default function EmojiPicker( { onSelect } ) {
 	const viewportRef = useRef( null );
 	const searchRef = useRef( null );
 
+	const { frequentKeys, recordUse } = useFrequentEmojis();
 	const skinTone = useSelect(
 		( select ) =>
 			select( preferencesStore ).get(
@@ -204,6 +210,31 @@ export default function EmojiPicker( { onSelect } ) {
 		[ visibleGroups ]
 	);
 
+	// Index base records by their normalized hex key so the stored
+	// frequently-used keys can be resolved back to full emoji records.
+	const recordByHexKey = useMemo( () => {
+		const map = new Map();
+		for ( const entry of data || [] ) {
+			if ( typeof entry.group === 'number' ) {
+				map.set( normalizeHexcode( entry.hexcode ), entry );
+			}
+		}
+		return map;
+	}, [ data ] );
+
+	// The "Frequently used" section only shows while browsing; during a
+	// search it would just duplicate hits from the category results.
+	const frequentRows = useMemo( () => {
+		if ( query.trim() ) {
+			return [];
+		}
+		return chunkRows(
+			frequentKeys
+				.map( ( key ) => recordByHexKey.get( key ) )
+				.filter( Boolean )
+		);
+	}, [ frequentKeys, recordByHexKey, query ] );
+
 	// Announce result counts during search so screen readers stay in sync
 	// with the visible grid as the user types.
 	useEffect( () => {
@@ -226,6 +257,44 @@ export default function EmojiPicker( { onSelect } ) {
 	if ( ! baseUrl ) {
 		return null;
 	}
+
+	/**
+	 * Render one grid row of emoji, applying the user's skin tone
+	 * preference and recording usage on selection. Shared between the
+	 * "Frequently used" section and the category sections.
+	 *
+	 * @param {Array}  row    Emoji records for the row.
+	 * @param {string} rowKey React key for the row.
+	 * @return {JSX.Element} The rendered row.
+	 */
+	const renderRow = ( row, rowKey ) => (
+		<Composite.Row
+			key={ rowKey }
+			role="row"
+			className="editor-collab-sidebar-panel__picker-row"
+		>
+			{ row.map( ( emoji ) => {
+				// Swap in the skin-tone variant for display and
+				// selection; the base record still drives search
+				// matching, usage tracking, and the grid key.
+				const display = applySkinTone( emoji, skinTone );
+				return (
+					<Composite.Item
+						key={ emoji.hexcode }
+						role="gridcell"
+						className="editor-collab-sidebar-panel__picker-emoji"
+						aria-label={ labelFor( display ) }
+						onClick={ () => {
+							recordUse( normalizeHexcode( emoji.hexcode ) );
+							onSelect( display.emoji );
+						} }
+					>
+						{ display.emoji }
+					</Composite.Item>
+				);
+			} ) }
+		</Composite.Row>
+	);
 
 	return (
 		<div className="editor-collab-sidebar-panel__picker">
@@ -278,6 +347,19 @@ export default function EmojiPicker( { onSelect } ) {
 						aria-label={ _x( 'Emoji', 'emoji picker grid label' ) }
 						className="editor-collab-sidebar-panel__picker-list"
 					>
+						{ frequentRows.length > 0 && (
+							<div>
+								<div
+									className="editor-collab-sidebar-panel__picker-category"
+									role="presentation"
+								>
+									{ __( 'Frequently used' ) }
+								</div>
+								{ frequentRows.map( ( row, rowIndex ) =>
+									renderRow( row, `frequent-${ rowIndex }` )
+								) }
+							</div>
+						) }
 						{ visibleGroups.map( ( group ) => (
 							<div key={ group.key }>
 								<div
@@ -286,41 +368,12 @@ export default function EmojiPicker( { onSelect } ) {
 								>
 									{ groupLabelByKey.get( group.key ) || '' }
 								</div>
-								{ group.rows.map( ( row, rowIndex ) => (
-									<Composite.Row
-										key={ `${ group.key }-${ rowIndex }` }
-										role="row"
-										className="editor-collab-sidebar-panel__picker-row"
-									>
-										{ row.map( ( emoji ) => {
-											// Swap in the skin-tone variant
-											// for display and selection; the
-											// base record still drives search
-											// matching and the grid key.
-											const display = applySkinTone(
-												emoji,
-												skinTone
-											);
-											return (
-												<Composite.Item
-													key={ emoji.hexcode }
-													role="gridcell"
-													className="editor-collab-sidebar-panel__picker-emoji"
-													aria-label={ labelFor(
-														display
-													) }
-													onClick={ () =>
-														onSelect(
-															display.emoji
-														)
-													}
-												>
-													{ display.emoji }
-												</Composite.Item>
-											);
-										} ) }
-									</Composite.Row>
-								) ) }
+								{ group.rows.map( ( row, rowIndex ) =>
+									renderRow(
+										row,
+										`${ group.key }-${ rowIndex }`
+									)
+								) }
 							</div>
 						) ) }
 					</Composite>

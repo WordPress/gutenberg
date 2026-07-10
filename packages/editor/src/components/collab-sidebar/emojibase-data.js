@@ -215,7 +215,7 @@ export function useEmojibaseData( baseUrl, locale ) {
  * @param {string} hexcode Emojibase hexcode.
  * @return {string} Normalized hex key.
  */
-function normalizeHexcode( hexcode ) {
+export function normalizeHexcode( hexcode ) {
 	return hexcode
 		.split( '-' )
 		.filter( ( part ) => part.toLowerCase() !== 'fe0f' )

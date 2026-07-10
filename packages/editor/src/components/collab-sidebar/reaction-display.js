@@ -30,6 +30,7 @@ const smileyIcon = (
  * Internal dependencies
  */
 import ReactionEmojiPicker, {
+	emojiToHexKey,
 	emojiToStorageKey,
 	hexKeyToEmoji,
 	buildEmojiBySlugMap,
@@ -39,6 +40,7 @@ import {
 	loadEmojibaseData,
 	useEmojiLabel,
 } from './emojibase-data';
+import { useFrequentEmojis } from './frequent-emojis';
 
 /**
  * Lazy-load the full emoji picker. Its bundle is only fetched when a
@@ -339,6 +341,7 @@ export function AddReactionButton( {
 	onToggleReaction,
 } ) {
 	const [ isFullPicker, setIsFullPicker ] = useState( false );
+	const { recordUse } = useFrequentEmojis();
 	const hasFullPicker =
 		typeof window !== 'undefined' && !! window.gutenbergEmojibaseUrl;
 
@@ -400,7 +403,15 @@ export function AddReactionButton( {
 
 				return (
 					<ReactionEmojiPicker
-						onSelect={ pickReaction }
+						onSelect={ ( slug ) => {
+							// Count the pick toward the full picker's
+							// "Frequently used" section. (The full picker
+							// records its own picks.)
+							recordUse(
+								emojiToHexKey( emojiBySlug.get( slug )?.emoji )
+							);
+							pickReaction( slug );
+						} }
 						onMore={
 							hasFullPicker
 								? () => setIsFullPicker( true )
