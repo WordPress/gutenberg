@@ -115,6 +115,7 @@ const {
 	getMediaSelectKey,
 	isIsolatedEditorKey,
 	deviceTypeKey,
+	setDeviceTypeKey,
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
@@ -302,7 +303,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
-	const { undo, setIsInserterOpened } = useDispatch( editorStore );
+	const editorDispatch = useDispatch( editorStore );
+	const { undo, setIsInserterOpened } = editorDispatch;
+	const { setDeviceType } = unlock( editorDispatch );
 	const { editMediaEntity } = unlock( useDispatch( coreStore ) );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { openMediaEditorModal } = useDispatch( mediaEditorStore );
@@ -454,6 +457,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				renderingMode === 'template-locked' ||
 				settings.disableContentOnlyForTemplateParts,
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
+			[ setDeviceTypeKey ]: setDeviceType,
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
 		};
 
@@ -491,6 +495,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		editMediaEntity,
 		openMediaEditorModal,
 		deviceType,
+		setDeviceType,
 		allImageSizes,
 		bigImageSizeThreshold,
 		isNavigationOverlayContext,
