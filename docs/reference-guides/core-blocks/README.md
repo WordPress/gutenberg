@@ -969,6 +969,70 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** isLink, level, levelOptions, linkTarget
 
+## Slide
+
+A single slide within a slider.
+
+-	**Name:** [core/slide](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slide/)
+-	**Experimental:** true
+-	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
+-	**Parent:** core/slider-track
+-	**Supports:** anchor, color (background, gradients, text), shadow, spacing (padding, ~~margin~~), ~~html~~, ~~reusable~~
+
+## Slider
+
+Display content in a scrolling slider.
+
+-	**Name:** [core/slider](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slider/)
+-	**Experimental:** true
+-	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
+-	**Allowed Blocks:** core/slider-pagination
+-	**Supports:** align, ariaLabel, color (background, gradients, ~~text~~), interactivity, layout (allowOrientation, default, ~~allowJustification~~), spacing (margin, padding), ~~html~~
+-	**Attributes:** loop, slidesToShow
+
+## Slider Pagination
+
+Container for slider controls and indicators.
+
+-	**Name:** [core/slider-pagination](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slider-pagination/)
+-	**Experimental:** true
+-	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
+-	**Ancestor:** core/slider
+-	**Allowed Blocks:** core/slider-pagination-button, core/slider-pagination-indicator
+-	**Supports:** color (background, text), layout (default), spacing (blockGap, margin, padding), ~~anchor~~, ~~html~~, ~~reusable~~
+-	**Attributes:** arrowIcon, indicatorStyle, navigationButtonType
+
+## Slider Pagination Button
+
+Navigation button for a slider.
+
+-	**Name:** [core/slider-pagination-button](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slider-pagination-button/)
+-	**Experimental:** true
+-	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
+-	**Ancestor:** core/slider-pagination
+-	**Supports:** color (background, text), shadow, spacing (margin, padding), typography (fontSize), ~~anchor~~, ~~html~~, ~~reusable~~
+-	**Attributes:** type
+
+## Slider Pagination Indicator
+
+Dot indicators showing the current slide position.
+
+-	**Name:** [core/slider-pagination-indicator](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slider-pagination-indicator/)
+-	**Experimental:** true
+-	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
+-	**Ancestor:** core/slider-pagination
+-	**Supports:** color (text, ~~background~~), spacing (margin), ~~anchor~~, ~~html~~, ~~reusable~~
+
+## Slides
+
+Container for slides in a slider.
+
+-	**Name:** [core/slider-track](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slider-track/)
+-	**Experimental:** true
+-	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
+-	**Allowed Blocks:** core/slide
+-	**Supports:** listView, ~~anchor~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~reusable~~, ~~visibility~~
+
 ## Social Icon
 
 Display an icon linking to a social profile or site.

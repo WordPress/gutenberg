@@ -18,6 +18,12 @@
 - [Submenu](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-submenu/) — `core/navigation-submenu`: Add a submenu to your navigation.
 - [Page Break](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-nextpage/) — `core/nextpage`: Separate your content into a multi-page experience.
 - [Separator](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-separator/) — `core/separator`: Create a break between ideas or sections with a horizontal separator.
+- [Slide](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slide/) — `core/slide`: A single slide within a slider.
+- [Slider](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slider/) — `core/slider`: Display content in a scrolling slider.
+- [Slider Pagination](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slider-pagination/) — `core/slider-pagination`: Container for slider controls and indicators.
+- [Slider Pagination Button](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slider-pagination-button/) — `core/slider-pagination-button`: Navigation button for a slider.
+- [Slider Pagination Indicator](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slider-pagination-indicator/) — `core/slider-pagination-indicator`: Dot indicators showing the current slide position.
+- [Slides](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slider-track/) — `core/slider-track`: Container for slides in a slider.
 - [Spacer](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-spacer/) — `core/spacer`: Add white space between blocks and customize its height.
 - [Tab List](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-list/) — `core/tab-list`: Display the tab buttons for a tabbed interface.
 - [Tab Panel](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panel/) — `core/tab-panel`: Content for a tab in a tabbed interface.
