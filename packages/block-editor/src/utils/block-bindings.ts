@@ -1,6 +1,10 @@
 type Binding = { source?: string };
 type Bindings = Record< string, Binding >;
 type BlockBindingsSource = { usesContext?: readonly string[] };
+type InnerBlocksBinding = {
+	source: string;
+	args?: Record< string, unknown >;
+};
 
 const DEFAULT_ATTRIBUTE = '__default';
 const PATTERN_OVERRIDES_SOURCE = 'core/pattern-overrides';
@@ -52,6 +56,37 @@ export function getBlockBindingsContext(
 	// A stable empty object avoids re-renders for consumers that compare the
 	// context by reference.
 	return context ?? EMPTY_CONTEXT;
+}
+
+/**
+ * Reserved binding key for a block's structural InnerBlocks area.
+ */
+export const INNER_BLOCKS_BINDING_KEY = 'innerBlocks';
+
+/**
+ * Gets a usable structural binding descriptor from block attributes.
+ *
+ * `core/html` owns several interleaved editable areas rather than one ordinary
+ * InnerBlocks area, so it is excluded until it has a separate contract.
+ *
+ * @param attributes Block attributes.
+ * @param blockName  Block name.
+ * @return Structural binding descriptor, if present.
+ */
+export function getInnerBlocksBinding(
+	attributes: Record< string, any > | undefined,
+	blockName: string | undefined
+): InnerBlocksBinding | undefined {
+	if ( blockName === 'core/html' ) {
+		return undefined;
+	}
+
+	const binding =
+		attributes?.metadata?.bindings?.[ INNER_BLOCKS_BINDING_KEY ];
+
+	return typeof binding?.source === 'string' && binding.source !== ''
+		? binding
+		: undefined;
 }
 
 /**

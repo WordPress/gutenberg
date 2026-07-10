@@ -14,9 +14,12 @@ describe( 'pattern-overrides bindings', () => {
 		},
 	};
 
-	const makeSelect = ( attributes ) => () => ( {
-		getBlockAttributes: () => attributes,
-	} );
+	const makeSelect =
+		( attributes, settings = {} ) =>
+		() => ( {
+			getBlockAttributes: () => attributes,
+			getSettings: () => settings,
+		} );
 
 	describe( 'getValues', () => {
 		it( 'returns the current attribute value when there is no override', () => {
@@ -60,6 +63,44 @@ describe( 'pattern-overrides bindings', () => {
 					},
 				} )
 			).not.toThrow();
+		} );
+
+		it( 'keeps an empty structural override as an intentional value', () => {
+			const values = patternOverridesBindings.getValues( {
+				select: makeSelect( blockAttributes, {
+					blockBindingsInnerBlocks: true,
+				} ),
+				clientId: 'block-1',
+				context: {
+					'pattern/overrides': {
+						'Editable Paragraph': { innerBlocks: '' },
+					},
+				},
+				bindings: {
+					innerBlocks: { source: 'core/pattern-overrides' },
+				},
+			} );
+
+			expect( values ).toEqual( { innerBlocks: '' } );
+		} );
+
+		it( 'returns structural absence instead of looking for an attribute fallback', () => {
+			const values = patternOverridesBindings.getValues( {
+				select: makeSelect(
+					{
+						...blockAttributes,
+						innerBlocks: 'not structural children',
+					},
+					{ blockBindingsInnerBlocks: true }
+				),
+				clientId: 'block-1',
+				context: {},
+				bindings: {
+					innerBlocks: { source: 'core/pattern-overrides' },
+				},
+			} );
+
+			expect( values ).toEqual( { innerBlocks: undefined } );
 		} );
 	} );
 } );

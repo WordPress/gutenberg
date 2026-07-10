@@ -3,9 +3,58 @@
  */
 import {
 	getBlockBindingsContext,
+	getInnerBlocksBinding,
 	hasPatternOverridesDefaultBinding,
 	replacePatternOverridesDefaultBinding,
 } from '../block-bindings';
+
+describe( 'getInnerBlocksBinding', () => {
+	it( 'returns a structural binding from any registered-source descriptor', () => {
+		expect(
+			getInnerBlocksBinding(
+				{
+					metadata: {
+						bindings: {
+							innerBlocks: {
+								source: 'test/source',
+								args: { key: 'value' },
+							},
+						},
+					},
+				},
+				'test/container'
+			)
+		).toEqual( {
+			source: 'test/source',
+			args: { key: 'value' },
+		} );
+	} );
+
+	it( 'ignores missing or malformed descriptors', () => {
+		expect( getInnerBlocksBinding( {}, 'core/group' ) ).toBeUndefined();
+		expect(
+			getInnerBlocksBinding(
+				{ metadata: { bindings: { innerBlocks: { source: '' } } } },
+				'core/group'
+			)
+		).toBeUndefined();
+	} );
+
+	it( 'excludes core/html until it has a single-area contract', () => {
+		expect(
+			getInnerBlocksBinding(
+				{
+					metadata: {
+						bindings: {
+							innerBlocks: { source: 'test/source' },
+						},
+					},
+				},
+				'core/html'
+			)
+		).toBeUndefined();
+	} );
+} );
 
 describe( 'hasPatternOverridesDefaultBinding', () => {
 	it( 'returns true when the `__default` binding targets pattern overrides', () => {

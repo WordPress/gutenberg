@@ -7,13 +7,14 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useMergeRefs } from '@wordpress/compose';
-import { forwardRef, useMemo, memo } from '@wordpress/element';
+import { forwardRef, useMemo, useState, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	getBlockSupport,
 	store as blocksStore,
 	__unstableGetInnerBlocksProps as getInnerBlocksProps,
 } from '@wordpress/blocks';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -23,6 +24,7 @@ import DefaultBlockAppender from './default-block-appender';
 import useNestedSettingsUpdate from './use-nested-settings-update';
 import useInnerBlockTemplateSync from './use-inner-block-template-sync';
 import useBlockContext from './use-block-context';
+import { useBoundInnerBlocksProps } from './use-bound-inner-blocks';
 import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
@@ -30,6 +32,7 @@ import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
 import { unlock } from '../../lock-unlock';
+import { getInnerBlocksBinding } from '../../utils/block-bindings';
 
 const EMPTY_OBJECT = {};
 
@@ -156,6 +159,30 @@ function ControlledInnerBlocks( props ) {
 	return <UncontrolledInnerBlocks { ...props } />;
 }
 
+function BoundInnerBlocks( { binding, ...props } ) {
+	const boundInnerBlocksProps = useBoundInnerBlocksProps(
+		props.clientId,
+		binding,
+		props.blockType
+	);
+	const innerBlocksProps = {
+		...props,
+		...boundInnerBlocksProps,
+	};
+	const InnerBlocks = hasControlledInnerBlocks( innerBlocksProps )
+		? ControlledInnerBlocks
+		: UncontrolledInnerBlocks;
+
+	return <InnerBlocks { ...innerBlocksProps } />;
+}
+
+function hasControlledInnerBlocks( innerBlocksProps ) {
+	return (
+		innerBlocksProps.value !== undefined &&
+		innerBlocksProps.onChange !== undefined
+	);
+}
+
 const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
 	const innerBlocksProps = useInnerBlocksProps( { ref }, props );
 	return (
@@ -195,6 +222,8 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		( select ) => {
 			const {
 				getBlockName,
+				getBlockAttributes,
+				getSettings,
 				isZoomOut,
 				getTemplateLock,
 				getBlockRootClientId,
@@ -220,6 +249,12 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			const blockEditingMode = getBlockEditingMode( clientId );
 			const parentClientId = getBlockRootClientId( clientId );
 			const [ defaultLayout ] = getBlockSettings( clientId, 'layout' );
+			const innerBlocksBinding = getSettings().blockBindingsInnerBlocks
+				? getInnerBlocksBinding(
+						getBlockAttributes( clientId ),
+						blockName
+				  )
+				: undefined;
 
 			let _isDropZoneDisabled = blockEditingMode === 'disabled';
 
@@ -243,6 +278,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				parentClientId,
 				isDropZoneDisabled: _isDropZoneDisabled,
 				defaultLayout,
+				innerBlocksBinding,
 			};
 		},
 		[ clientId ]
@@ -255,6 +291,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		parentClientId,
 		isDropZoneDisabled,
 		defaultLayout,
+		innerBlocksBinding,
 	} = selected;
 
 	const blockDropZoneRef = useBlockDropZone( {
@@ -282,10 +319,43 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		defaultLayout,
 		...options,
 	};
-	const InnerBlocks =
-		innerBlocksProps.value && innerBlocksProps.onChange
-			? ControlledInnerBlocks
-			: UncontrolledInnerBlocks;
+	const InnerBlocks = hasControlledInnerBlocks( innerBlocksProps )
+		? ControlledInnerBlocks
+		: UncontrolledInnerBlocks;
+	const hasCallerControlledProps =
+		options.value !== undefined ||
+		options.onChange !== undefined ||
+		options.onInput !== undefined;
+	if ( innerBlocksBinding && hasCallerControlledProps ) {
+		warning(
+			`The "innerBlocks" block binding to source "${ innerBlocksBinding.source }" is ignored because the block's inner blocks are already controlled through caller-supplied value/onChange props.`
+		);
+	}
+	const bindingApplies = !! innerBlocksBinding && ! hasCallerControlledProps;
+	const [ wasBound, setWasBound ] = useState( bindingApplies );
+	if ( bindingApplies && ! wasBound ) {
+		setWasBound( true );
+	}
+
+	let children;
+	if ( ! clientId ) {
+		children = <BlockListItems { ...options } />;
+	} else if (
+		! hasCallerControlledProps &&
+		( innerBlocksBinding || wasBound )
+	) {
+		children = (
+			<BoundInnerBlocks
+				{ ...innerBlocksProps }
+				clientId={ clientId }
+				binding={ innerBlocksBinding }
+			/>
+		);
+	} else {
+		children = (
+			<InnerBlocks { ...innerBlocksProps } clientId={ clientId } />
+		);
+	}
 
 	return {
 		...props,
@@ -295,11 +365,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			'block-editor-block-list__layout',
 			__unstableDisableLayoutClassNames ? '' : layoutClassNames
 		),
-		children: clientId ? (
-			<InnerBlocks { ...innerBlocksProps } clientId={ clientId } />
-		) : (
-			<BlockListItems { ...options } />
-		),
+		children,
 	};
 }
 
