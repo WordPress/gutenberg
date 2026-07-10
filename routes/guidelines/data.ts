@@ -110,12 +110,17 @@ export function useGuidelineData(): GuidelineData {
 	);
 
 	const slugs = useMemo( () => {
+		// Per-block rows only exist while the Blocks scope is registered. When a
+		// plugin removes it, drop the block slugs so we stop querying those rows.
+		const hasBlocksScope = scopes.some( ( s ) => s.slug === BLOCKS_SCOPE );
 		const list = [
 			// The Blocks scope has no single row; its per-block rows are added below.
 			...scopes
 				.filter( ( s ) => s.slug !== BLOCKS_SCOPE )
 				.map( ( s ) => scopeSlug( s.slug ) ),
-			...contentBlocks.map( ( b ) => blockSlug( b.name ) ),
+			...( hasBlocksScope
+				? contentBlocks.map( ( b ) => blockSlug( b.name ) )
+				: [] ),
 		];
 		return list.length > 0 ? list : [ NO_MATCH_SLUG ];
 	}, [ scopes, contentBlocks ] );
