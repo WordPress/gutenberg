@@ -18,7 +18,7 @@ const EMPTY_ARTIST_PLACEHOLDER = '\u00a0';
  * The @arraypress/waveform-player library currently offers no public method to
  * do this, hence the workaround. Context:
  *
- * - The title and subtitle elements are guaranteed to exist based on
+ * - The title and artist elements are guaranteed to exist based on
  *   `initWaveformPlayer` and implementation details of the library.
  *
  * - The image/artwork element may not exist if the track loaded upon init had
@@ -37,9 +37,9 @@ function updatePlayerMetadata( instance, { title, artist, image, imageAlt } ) {
 		instance.titleEl.textContent = title ?? '';
 	}
 	updateSeekControlLabel( instance, title || __( 'Seek' ) );
-	if ( instance.subtitleEl ) {
-		instance.subtitleEl.textContent = artist ?? '';
-		instance.subtitleEl.style.display = artist ? '' : 'none';
+	if ( instance.artistEl ) {
+		instance.artistEl.textContent = artist ?? '';
+		instance.artistEl.style.display = artist ? '' : 'none';
 	}
 	if ( instance.artworkEl && image ) {
 		instance.artworkEl.src = image;
