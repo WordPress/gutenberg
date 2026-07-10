@@ -207,6 +207,7 @@
 	&[data-active-item],
 	&:focus {
 		background-color: var(--wpds-color-background-interactive-brand-weak-active);
+		color: var(--wpds-color-foreground-content-neutral);
 
 		.dataviews-filters__search-widget-listitem-single-selection {
 			border-color: var(--wpds-color-stroke-interactive-brand-active);
