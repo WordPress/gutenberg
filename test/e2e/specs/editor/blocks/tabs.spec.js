@@ -251,6 +251,7 @@ test.describe( 'Tabs', () => {
 			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
 			await editor.selectBlocks(
 				editor.canvas
+					.getByRole( 'document', { name: 'Block: Tab Panels' } )
 					.getByRole( 'document', { name: 'Block: Tab Panel' } )
 					.filter( { hasText: 'Panel 2' } )
 			);
@@ -295,6 +296,7 @@ test.describe( 'Tabs', () => {
 			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
 			await editor.selectBlocks(
 				editor.canvas
+					.getByRole( 'document', { name: 'Block: Tab Panels' } )
 					.getByRole( 'document', { name: 'Block: Tab Panel' } )
 					.filter( { hasText: 'Panel 2' } )
 			);
@@ -339,6 +341,7 @@ test.describe( 'Tabs', () => {
 			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
 			await editor.selectBlocks(
 				editor.canvas
+					.getByRole( 'document', { name: 'Block: Tab Panels' } )
 					.getByRole( 'document', { name: 'Block: Tab Panel' } )
 					.filter( { hasText: 'Panel 2' } )
 			);
@@ -383,6 +386,7 @@ test.describe( 'Tabs', () => {
 			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
 			await editor.selectBlocks(
 				editor.canvas
+					.getByRole( 'document', { name: 'Block: Tab Panels' } )
 					.getByRole( 'document', { name: 'Block: Tab Panel' } )
 					.filter( { hasText: 'Panel 2' } )
 			);
