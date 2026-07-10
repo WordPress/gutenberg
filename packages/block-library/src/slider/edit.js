@@ -124,7 +124,6 @@ function SliderEdit( { attributes, setAttributes, clientId } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Slider settings' ) }>
 					<RangeControl
-						__next40pxDefaultSize
 						label={ __( 'Slides to show' ) }
 						help={ __(
 							'Number of slides visible at the same time.'
