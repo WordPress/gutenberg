@@ -19,59 +19,50 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": "^20.19.0 || >=22.13.0",
+		"npm": ">=10.2.3"
 	},
 	"files": [
 		"src",
-		"build",
 		"build-module",
 		"build-types",
 		"*.md"
 	],
-	"main": "build/index.cjs",
+	"type": "module",
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.mjs",
-			"default": "./build/index.cjs"
+			"default": "./build-module/index.mjs"
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
 		"./design-tokens.js": {
-			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
-			"import": "./build-module/prebuilt/js/design-tokens.mjs",
-			"default": "./build/prebuilt/js/design-tokens.cjs"
+			"types": "./build-types/prebuilt/js/design-tokens.d.mts",
+			"default": "./src/prebuilt/js/design-tokens.mjs"
 		},
 		"./postcss-plugins/postcss-ds-token-fallbacks": {
 			"types": "./src/postcss-plugins/postcss-ds-token-fallbacks.d.mts",
-			"import": "./src/postcss-plugins/postcss-ds-token-fallbacks.mjs",
 			"default": "./src/postcss-plugins/postcss-ds-token-fallbacks.mjs"
 		},
 		"./esbuild-plugins/esbuild-ds-token-fallbacks": {
 			"types": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.d.mts",
-			"import": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.mjs",
 			"default": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.mjs"
 		},
 		"./vite-plugins/vite-ds-token-fallbacks": {
 			"types": "./src/vite-plugins/vite-ds-token-fallbacks.d.mts",
-			"import": "./src/vite-plugins/vite-ds-token-fallbacks.mjs",
 			"default": "./src/vite-plugins/vite-ds-token-fallbacks.mjs"
 		},
 		"./stylelint-plugins/no-unknown-ds-tokens": {
-			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.ts",
-			"import": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs",
-			"default": "./build/stylelint-plugins/no-unknown-ds-tokens.cjs"
+			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.mts",
+			"default": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs"
 		},
 		"./stylelint-plugins/no-setting-wpds-custom-properties": {
-			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.ts",
-			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs",
-			"default": "./build/stylelint-plugins/no-setting-wpds-custom-properties.cjs"
+			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts",
+			"default": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs"
 		},
 		"./stylelint-plugins/no-token-fallback-values": {
-			"types": "./build-types/stylelint-plugins/no-token-fallback-values.d.ts",
-			"import": "./src/stylelint-plugins/no-token-fallback-values.mjs",
-			"default": "./build/stylelint-plugins/no-token-fallback-values.cjs"
+			"types": "./build-types/stylelint-plugins/no-token-fallback-values.d.mts",
+			"default": "./src/stylelint-plugins/no-token-fallback-values.mjs"
 		},
 		"./package.json": "./package.json"
 	},
@@ -135,10 +126,9 @@
 		"access": "public"
 	},
 	"scripts": {
-		"prelint:js": "npx esbuild src/prebuilt/js/design-tokens.mjs --format=cjs --outfile=build/prebuilt/js/design-tokens.cjs && node -e \"\"",
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
-		"build": "npm run build:tokens && npm run build:default-ramps && npm run prelint:js",
+		"build": "npm run build:tokens && npm run build:default-ramps",
 		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
 	}
 }

@@ -18,6 +18,16 @@ and any focus/selection tracking are owned by the consumer, which wires them
 through the forwarded ref and native event props (see the richtext DataForm
 control in `@wordpress/dataviews` for the canonical assembly).
 
+```jsx
+// The rich-text "assembly" lives in the consumer.
+<ContentEditableControl
+    label="Caption"
+    ref={ mergedRef }
+    onFocus={ onEditableFocus }
+    onBlur={ onEditableBlur }
+/>
+```
+
 ## Props
 
 ### `className`

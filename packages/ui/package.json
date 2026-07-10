@@ -19,7 +19,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.10.0",
+		"node": "^20.19.0 || >=22.13.0",
 		"npm": ">=10.2.3"
 	},
 	"files": [
