@@ -200,8 +200,8 @@ function Edit( {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
-			<TabToolbarControls tabsClientId={ tabsClientId } />
 			<TabMovers tabsClientId={ tabsClientId } />
+			<TabToolbarControls tabsClientId={ tabsClientId } />
 			<div { ...blockProps }>
 				{ tabsList.map( ( tab, index ) => {
 					const isActive = index === effectiveActiveIndex;

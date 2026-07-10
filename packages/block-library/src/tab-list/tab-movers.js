@@ -6,7 +6,7 @@ import {
 	BlockControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 
@@ -50,25 +50,23 @@ export default function TabMovers( { tabsClientId } ) {
 	);
 
 	return (
-		<BlockControls group="other">
-			<ToolbarGroup>
-				<ToolbarButton
-					className="wp-block-tab-list__mover-button"
-					icon={ isRTL() ? chevronRight : chevronLeft }
-					label={ __( 'Move tab left' ) }
-					onClick={ () => moveTab( -1 ) }
-					disabled={ activeIndex <= 0 }
-					accessibleWhenDisabled
-				/>
-				<ToolbarButton
-					className="wp-block-tab-list__mover-button"
-					icon={ isRTL() ? chevronLeft : chevronRight }
-					label={ __( 'Move tab right' ) }
-					onClick={ () => moveTab( 1 ) }
-					disabled={ activeIndex >= tabCount - 1 }
-					accessibleWhenDisabled
-				/>
-			</ToolbarGroup>
+		<BlockControls group="parent">
+			<ToolbarButton
+				className="wp-block-tab-list__mover-button"
+				icon={ isRTL() ? chevronRight : chevronLeft }
+				label={ __( 'Move tab left' ) }
+				onClick={ () => moveTab( -1 ) }
+				disabled={ activeIndex <= 0 }
+				accessibleWhenDisabled
+			/>
+			<ToolbarButton
+				className="wp-block-tab-list__mover-button"
+				icon={ isRTL() ? chevronLeft : chevronRight }
+				label={ __( 'Move tab right' ) }
+				onClick={ () => moveTab( 1 ) }
+				disabled={ activeIndex >= tabCount - 1 }
+				accessibleWhenDisabled
+			/>
 		</BlockControls>
 	);
 }
