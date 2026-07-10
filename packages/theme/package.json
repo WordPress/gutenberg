@@ -142,7 +142,7 @@
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps",
 		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss",
-		"prevalidate:package-contents": "npm run build:package-types",
+		"prepack": "npm run build:package-types",
 		"validate:package-contents": "node ../../tools/validation/validate-package-contents.mjs . --attw-profile esm-only --attw-exclude-entrypoint ./design-tokens.css"
 	}
 }
