@@ -14,6 +14,8 @@
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
+- `ValidatedDateControl`: Update validation error message to be announced by screen readers using `speak` instead of an inline `aria-live` region ([#79600](https://github.com/WordPress/gutenberg/pull/79600))
+
 ## 17.1.0 (2026-07-01)
 
 ## 17.0.0 (2026-06-24)

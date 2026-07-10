@@ -229,7 +229,6 @@ function UnforwardedNumberControl(
 			value={ valueProp }
 			__unstableStateReducer={ numberControlStateReducer }
 			size={ size }
-			__next40pxDefaultSize
 			suffix={
 				spinControls === 'custom' ? (
 					<>

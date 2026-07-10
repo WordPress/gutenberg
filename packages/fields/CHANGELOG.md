@@ -6,6 +6,8 @@
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
+-   `MediaEdit`: Update validation error message to be announced by screen readers. ([#79600](https://github.com/WordPress/gutenberg/pull/79600))
+
 ## 0.42.0 (2026-07-01)
 
 ## 0.41.0 (2026-06-24)
