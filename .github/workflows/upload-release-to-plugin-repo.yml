@@ -94,7 +94,7 @@ jobs:
             - name: Compute major version
               id: compute_major_version
               env:
-                  VERSION: ${{ github.event.release.name }}
+                  VERSION: ${{ github.event.release.tag_name }}
               run: |
                   IFS='.' read -r -a VERSION_ARRAY <<< "${VERSION#v}"
                   MAJOR_VERSION="${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
