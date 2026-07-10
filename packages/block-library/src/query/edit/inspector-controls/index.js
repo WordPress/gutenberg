@@ -331,7 +331,7 @@ export default function QueryInspectorControls( props ) {
 					) }
 				</ToolsPanel>
 			) }
-			{ ! inherit && showDisplayPanel && (
+			{ showDisplayPanel && (
 				<ToolsPanel
 					className="block-library-query-toolspanel__display"
 					label={ __( 'Display' ) }
@@ -343,33 +343,42 @@ export default function QueryInspectorControls( props ) {
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
-					<ToolsPanelItem
-						label={ __( 'Items per page' ) }
-						hasValue={ () => perPage > 0 }
-					>
-						<PerPageControl
-							perPage={ perPage }
-							offset={ offset }
-							onChange={ setQuery }
-						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						label={ __( 'Offset' ) }
-						hasValue={ () => offset > 0 }
-						onDeselect={ () => setQuery( { offset: 0 } ) }
-					>
-						<OffsetControl
-							offset={ offset }
-							onChange={ setQuery }
-						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						label={ __( 'Max pages to show' ) }
-						hasValue={ () => pages > 0 }
-						onDeselect={ () => setQuery( { pages: 0 } ) }
-					>
-						<PagesControl pages={ pages } onChange={ setQuery } />
-					</ToolsPanelItem>
+					{ showPostCountControl && (
+						<ToolsPanelItem
+							label={ __( 'Items per page' ) }
+							hasValue={ () => perPage > 0 }
+						>
+							<PerPageControl
+								perPage={ perPage }
+								offset={ offset }
+								onChange={ setQuery }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ ! inherit && showOffSetControl && (
+						<ToolsPanelItem
+							label={ __( 'Offset' ) }
+							hasValue={ () => offset > 0 }
+							onDeselect={ () => setQuery( { offset: 0 } ) }
+						>
+							<OffsetControl
+								offset={ offset }
+								onChange={ setQuery }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ ! inherit && showPagesControl && (
+						<ToolsPanelItem
+							label={ __( 'Max pages to show' ) }
+							hasValue={ () => pages > 0 }
+							onDeselect={ () => setQuery( { pages: 0 } ) }
+						>
+							<PagesControl
+								pages={ pages }
+								onChange={ setQuery }
+							/>
+						</ToolsPanelItem>
+					) }
 				</ToolsPanel>
 			) }
 			{ ! inherit && showFiltersPanel && (
