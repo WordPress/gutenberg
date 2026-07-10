@@ -30,7 +30,7 @@ collab-sidebar/
 ├── hooks.js                        useNoteThreads, useNoteActions, useFloatingBoard
 ├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
 ├── board-store.js                  createBoardStore - ResizeObserver + ref registry for floating layout
-├── constants.js                    sidebar identifier strings
+├── constants.js                    sidebar identifier, panel width, canvas-width threshold
 ├── style.scss
 └── test/
     └── utils.js
@@ -60,7 +60,7 @@ NotesSidebarContainer (index.js)         - gates on post type support
 
 `Notes` is reused for both surfaces. The only visual difference is driven by `isFloating` (whether to layer threads over the canvas or stack them in a panel).
 
-`FloatingNotes` renders through a `FloatingNotesSlot` placed by `VisualEditor` inside `.editor-visual-editor`, and reserves matching space inside the canvas document (`padding-inline-end` on its root, injected with `useStyleOverride`) so content never flows under the panel. Because the space lives inside the canvas, it keeps the canvas background and leaves the canvas scrollbar at the window edge. The reserved width follows the presentation (full panel or minimized pills), and is released entirely when the canvas is too narrow for the panel.
+`FloatingNotes` renders through a `FloatingNotesSlot` placed by `VisualEditor` inside `.editor-visual-editor`, and reserves matching space inside the canvas document (`padding-inline-end` on its root, injected with `useStyleOverride`) so content never flows under the panel. Because the space lives inside the canvas, it keeps the canvas background and leaves the canvas scrollbar at the window edge. A thin vertical divider (10% `currentColor`, spanning the visible canvas) sits just inside the reserved space, separating it from the content column. The reserved width follows the presentation (full panel or minimized pills), and is released entirely when the canvas is too narrow for the panel.
 
 ## Floating board
 

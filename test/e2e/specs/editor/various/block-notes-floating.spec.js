@@ -170,6 +170,60 @@ test.describe( 'Block Notes: floating panel', () => {
 		expect( hitsCover ).toBe( false );
 	} );
 
+	test( 'a thin divider marks the boundary of the reserved notes space', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph with a note' },
+		} );
+		await addNote( page, editor, 'Divider note' );
+
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Notes' } )
+				.getByRole( 'treeitem', { name: 'Note: Divider note' } )
+		).toBeVisible();
+
+		// The divider is a `:root::after` pseudo-element inside the canvas
+		// (the body's overflow clip would cut a body-attached line short),
+		// pinned a small gap inside the reserved space so clipped full-bleed
+		// content never touches it. Its color derives from `currentColor`.
+		const divider = await editor.canvas
+			.locator( 'body' )
+			.evaluate( ( body ) => {
+				const view = body.ownerDocument.defaultView;
+				const root = body.ownerDocument.documentElement;
+				const style = view.getComputedStyle( root, '::after' );
+				const reservedWidth = parseFloat(
+					view.getComputedStyle( root ).paddingInlineEnd
+				);
+				return {
+					position: style.position,
+					insetInlineEnd: parseFloat( style.insetInlineEnd ),
+					width: parseFloat( style.width ),
+					height: parseFloat( style.height ),
+					background: style.backgroundColor,
+					reservedWidth,
+					viewportHeight: view.innerHeight,
+				};
+			} );
+
+		expect( divider.position ).toBe( 'fixed' );
+		expect( divider.width ).toBe( 1 );
+		// The divider sits inside the reserved space, leaving a gap from the
+		// content clipped at the boundary.
+		expect( divider.insetInlineEnd ).toBeLessThan( divider.reservedWidth );
+		expect( divider.insetInlineEnd ).toBeGreaterThanOrEqual(
+			divider.reservedWidth - 16
+		);
+		// Spans the visible canvas top to bottom.
+		expect( divider.height ).toBe( divider.viewportHeight );
+		// Semi-transparent, derived from the canvas text color.
+		expect( divider.background ).toMatch( /rgba\(|color\(|color-mix\(/ );
+	} );
+
 	test( 'floating note is centered in the space reserved beside full-width content', async ( {
 		editor,
 		page,
