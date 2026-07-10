@@ -338,11 +338,12 @@ describe( 'Waveform utilities', () => {
 			);
 
 			expect( playBtn ).toHaveClass( 'has-artwork' );
-			expect(
-				playBtn.style.getPropertyValue(
-					'--wp-block-playlist-play-button-artwork'
-				)
-			).toBe( 'url("https://example.com/cover.jpg")' );
+			expect( playBtn ).toHaveStyle( {
+				backgroundImage:
+					'linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url("https://example.com/cover.jpg")',
+				backgroundPosition: 'center',
+				backgroundSize: 'cover',
+			} );
 			expect( artworkEl.parentElement ).toBe( container );
 		} );
 
@@ -357,11 +358,10 @@ describe( 'Waveform utilities', () => {
 				'https://example.com/cover "quoted".jpg'
 			);
 
-			expect(
-				playBtn.style.getPropertyValue(
-					'--wp-block-playlist-play-button-artwork'
-				)
-			).toBe( 'url("https://example.com/cover \\"quoted\\".jpg")' );
+			expect( playBtn ).toHaveStyle( {
+				backgroundImage:
+					'linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url("https://example.com/cover \\"quoted\\".jpg")',
+			} );
 		} );
 
 		it( 'should not modify play button icon paths', () => {
@@ -416,31 +416,30 @@ describe( 'Waveform utilities', () => {
 				)
 			).not.toThrow();
 			expect( playBtn ).toHaveClass( 'has-artwork' );
-			expect(
-				playBtn.style.getPropertyValue(
-					'--wp-block-playlist-play-button-artwork'
-				)
-			).toBe( 'url("https://example.com/cover.jpg")' );
+			expect( playBtn ).toHaveStyle( {
+				backgroundImage:
+					'linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url("https://example.com/cover.jpg")',
+			} );
 		} );
 
 		it( 'should clear button artwork when artwork URL is empty', () => {
 			const container = document.createElement( 'div' );
 			const playBtn = document.createElement( 'button' );
 			playBtn.className = 'waveform-btn has-artwork';
-			playBtn.style.setProperty(
-				'--wp-block-playlist-play-button-artwork',
-				'url("https://example.com/cover.jpg")'
-			);
+			playBtn.style.backgroundImage =
+				'url("https://example.com/cover.jpg")';
+			playBtn.style.backgroundPosition = 'center';
+			playBtn.style.backgroundSize = 'cover';
 			container.appendChild( playBtn );
 
 			setupPlayButtonArtwork( container, '' );
 
 			expect( playBtn ).not.toHaveClass( 'has-artwork' );
-			expect(
-				playBtn.style.getPropertyValue(
-					'--wp-block-playlist-play-button-artwork'
-				)
-			).toBe( '' );
+			expect( playBtn ).toHaveStyle( {
+				backgroundImage: '',
+				backgroundPosition: '',
+				backgroundSize: '',
+			} );
 		} );
 	} );
 

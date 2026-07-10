@@ -197,17 +197,19 @@ export function setupPlayButtonArtwork( container, artworkUrl ) {
 
 	if ( ! artworkUrl ) {
 		playBtn.classList.remove( 'has-artwork' );
-		playBtn.style.removeProperty(
-			'--wp-block-playlist-play-button-artwork'
-		);
+		playBtn.style.removeProperty( 'background-image' );
+		playBtn.style.removeProperty( 'background-position' );
+		playBtn.style.removeProperty( 'background-size' );
 		return;
 	}
 
 	playBtn.classList.add( 'has-artwork' );
-	playBtn.style.setProperty(
-		'--wp-block-playlist-play-button-artwork',
-		`url(${ JSON.stringify( artworkUrl ) })`
-	);
+	playBtn.style.backgroundImage = [
+		'linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35))',
+		`url(${ JSON.stringify( artworkUrl ) })`,
+	].join( ', ' );
+	playBtn.style.backgroundPosition = 'center';
+	playBtn.style.backgroundSize = 'cover';
 }
 
 /**

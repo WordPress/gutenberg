@@ -34,13 +34,6 @@ $waveform-player-height: 100px;
 		}
 
 		&.has-artwork {
-			overflow: hidden;
-			background-color: #000;
-			background-image:
-				linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-				var(--wp-block-playlist-play-button-artwork);
-			background-position: center;
-			background-size: cover;
 			color: #fff;
 
 			svg {
