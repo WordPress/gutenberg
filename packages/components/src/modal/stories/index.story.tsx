@@ -85,10 +85,7 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
 						anim id est laborum.
 					</p>
 
-					<InputControl
-						__next40pxDefaultSize
-						style={ { marginBottom: '20px' } }
-					/>
+					<InputControl style={ { marginBottom: '20px' } } />
 
 					<Button
 						__next40pxDefaultSize

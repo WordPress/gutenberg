@@ -29,6 +29,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `showArtists` | `boolean` | `true` | — |
 | `showNumbers` | `boolean` | `true` | — |
 | `showTrackLength` | `boolean` | `true` | — |
+| `waveformStyle` | `string` | `"bars"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `bars`, `mirror`, `line`, `blocks`, `dots`, `seekbar` |
 | `caption` | `string` | — | — |
 
 ## Supports
@@ -44,6 +45,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`
+- [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
 
 ## Context
 
@@ -52,26 +55,14 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 **Provides context:**
 
 - `showArtists` → attribute `showArtists`
-
-## Block Styles
-
-_Defined via the [`styles`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/) property in block.json._
-
-| Style Name | Label | Default |
-|------------|-------|---------|
-| `bars` | Bars | Yes |
-| `mirror` | Mirror | No |
-| `line` | Line | No |
-| `blocks` | Blocks | No |
-| `dots` | Dots | No |
-| `seekbar` | Seekbar | No |
+- `showImages` → attribute `showImages`
 
 ## Block Markup
 
 This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
 
 ```html
-<!-- wp:playlist {"type":"audio","order":"asc","showTracklist":true,"showImages":true,"showArtists":true,"showNumbers":true,"showTrackLength":true} -->
+<!-- wp:playlist {"type":"audio","order":"asc","showTracklist":true,"showImages":true,"showArtists":true,"showNumbers":true,"showTrackLength":true,"waveformStyle":"bars"} -->
 <!-- Content... -->
 <!-- /wp:playlist -->
 ```
