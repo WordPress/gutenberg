@@ -115,7 +115,7 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'avatar_src', $response['wp-check-locked-posts'][ $key ] );
 	}
 
-	public function test_row_actions_remove_quick_edit_only_for_own_fresh_lock() {
+	public function test_row_actions_keep_quick_edit_in_markup_for_all_lock_states() {
 		$post = get_post( self::$post_id );
 
 		$filtered = gutenberg_post_list_collaboration_row_actions( $this->quick_edit_actions(), $post );
@@ -127,9 +127,11 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 		$filtered = gutenberg_post_list_collaboration_row_actions( $this->quick_edit_actions(), $post );
 		$this->assertArrayHasKey( 'inline hide-if-no-js', $filtered, "Another user's lock is left to core." );
 
+		// Keep the action in the markup so heartbeat can reveal it again when
+		// the current user's lock expires. Core CSS hides it while .wp-locked.
 		$this->set_edit_lock( self::$admin_id );
 		$filtered = gutenberg_post_list_collaboration_row_actions( $this->quick_edit_actions(), $post );
-		$this->assertArrayNotHasKey( 'inline hide-if-no-js', $filtered, "Quick Edit should be removed for the current user's own fresh lock." );
+		$this->assertArrayHasKey( 'inline hide-if-no-js', $filtered, 'Quick Edit should remain available for heartbeat to restore after the lock expires.' );
 	}
 
 	public function test_inline_save_guard_is_registered_on_core_quick_edit_ajax_hook() {

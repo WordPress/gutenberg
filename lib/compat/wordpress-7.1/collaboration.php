@@ -597,16 +597,6 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 		return $actions;
 	}
 
-	/*
-	 * Core hides Quick Edit on locked rows with CSS, but only marks rows
-	 * locked by other users. Remove the action server-side when the current
-	 * user holds the lock, i.e. has the post open in the editor themselves.
-	 */
-	$lock_user = gutenberg_get_active_edit_lock_user( $post->ID );
-	if ( $lock_user && get_current_user_id() === $lock_user ) {
-		unset( $actions['inline hide-if-no-js'] );
-	}
-
 	$title = _draft_or_post_title( $post->ID );
 
 	/*
