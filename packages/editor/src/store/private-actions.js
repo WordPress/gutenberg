@@ -597,13 +597,19 @@ export function setCanvasWidth( width ) {
 			width,
 		} );
 
+		const blockEditorSelect = unlock( registry.select( blockEditorStore ) );
+
 		// While Responsive editing is enabled, the canvas width also drives the
 		// viewport style state, whether changed via the device preview or by
 		// manually resizing the canvas.
-		if (
-			unlock( registry.select( blockEditorStore ) ).isResponsiveEditing()
-		) {
-			const deviceType = getDeviceTypeByCanvasWidth( width );
+		if ( blockEditorSelect.isResponsiveEditing() ) {
+			const viewportSettings =
+				blockEditorSelect.getSettings().__experimentalFeatures
+					?.viewport;
+			const deviceType = getDeviceTypeByCanvasWidth(
+				width,
+				viewportSettings
+			);
 			unlock(
 				registry.dispatch( blockEditorStore )
 			).setStyleStateViewport(
@@ -740,6 +746,13 @@ export const restoreRevision =
 
 		// Save the post to persist the restored revision.
 		await dispatch.savePost();
+		if ( select.didPostSaveRequestFail() ) {
+			return;
+		}
+
+		// The saved post is now newer than any autosave, so the
+		// autosave notice is stale.
+		registry.dispatch( noticesStore ).removeNotice( 'autosave-exists' );
 
 		// Show success notice.
 		registry.dispatch( noticesStore ).createSuccessNotice(

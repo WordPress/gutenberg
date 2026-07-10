@@ -26,13 +26,13 @@
  * Larger box = hit target; small `::after` = visual only (still uses
  * logical borders so RTL needs no mirroring).
  */
-.handleCorner {
+.handle-corner {
 	width: var(--wpds-dimension-size-sm);
 	height: var(--wpds-dimension-size-sm);
 	cursor: nwse-resize;
 }
 
-.handleCorner::after {
+.handle-corner::after {
 	content: "";
 	position: absolute;
 	bottom: var(--widget-resize-handle-visual-inset);
@@ -54,13 +54,13 @@
 	transform-origin: 100% 100%;
 }
 
-[dir="rtl"] .handleCorner::after {
+[dir="rtl"] .handle-corner::after {
 	transform-origin: 0% 100%;
 }
 
-.handleCorner.resizing::after,
-.handleCorner:hover::after,
-.handleCorner:focus-visible::after {
+.handle-corner.resizing::after,
+.handle-corner:hover::after,
+.handle-corner:focus-visible::after {
 	transform: scale(var(--widget-resize-handle-hover-scale));
 	border-block-end:
 		var(--wpds-border-width-sm) solid
@@ -70,7 +70,7 @@
 		var(--wpds-color-foreground-interactive-brand-active);
 }
 
-.handleHorizontal {
+.handle-horizontal {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -82,7 +82,7 @@
 }
 
 @media not ( prefers-reduced-motion ) {
-	.handleCorner::after {
+	.handle-corner::after {
 		transition:
 			transform var(--wpds-motion-duration-xs)
 			var(--wpds-motion-easing-balanced),
@@ -92,7 +92,7 @@
 			var(--wpds-motion-easing-balanced);
 	}
 
-	.handleHorizontal::after {
+	.handle-horizontal::after {
 		transition:
 			transform var(--wpds-motion-duration-xs)
 			var(--wpds-motion-easing-balanced),
@@ -101,7 +101,7 @@
 	}
 }
 
-.handleHorizontal::after {
+.handle-horizontal::after {
 	content: "";
 	width: var(--wpds-border-width-sm);
 	height: var(--wpds-dimension-size-3xs);
@@ -110,26 +110,26 @@
 	transform-origin: 50% 100%;
 }
 
-.handleHorizontal.resizing::after,
-.handleHorizontal:hover::after,
-.handleHorizontal:focus-visible::after {
+.handle-horizontal.resizing::after,
+.handle-horizontal:hover::after,
+.handle-horizontal:focus-visible::after {
 	transform: scale(var(--widget-resize-handle-hover-scale));
 	background-color: var(--wpds-color-foreground-interactive-brand-active);
 }
 
 @media (forced-colors: active) {
-	.handleCorner::after,
-	.handleCorner.resizing::after,
-	.handleCorner:hover::after,
-	.handleCorner:focus-visible::after {
+	.handle-corner::after,
+	.handle-corner.resizing::after,
+	.handle-corner:hover::after,
+	.handle-corner:focus-visible::after {
 		border-block-end-color: Highlight;
 		border-inline-end-color: Highlight;
 	}
 
-	.handleHorizontal::after,
-	.handleHorizontal.resizing::after,
-	.handleHorizontal:hover::after,
-	.handleHorizontal:focus-visible::after {
+	.handle-horizontal::after,
+	.handle-horizontal.resizing::after,
+	.handle-horizontal:hover::after,
+	.handle-horizontal:focus-visible::after {
 		background-color: Highlight;
 	}
 }

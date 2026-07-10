@@ -31,7 +31,6 @@ import { store as uploadStore } from '@wordpress/upload-media';
  * Internal dependencies
  */
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
-import { getCarriedGifConversionAttributes } from '../utils/gif-conversion-attributes';
 import Image from './image';
 import { isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
@@ -235,57 +234,6 @@ export function ImageEdit( {
 
 		if ( isBlobURL( media.url ) ) {
 			setTemporaryURL( media.url );
-			return;
-		}
-
-		// Switch to a converted GIF video block when the selected media is
-		// an animated GIF whose sideloaded video companion is available.
-		// Triggering off the upload's onChange (rather than watching the
-		// attachment record) means already-saved image blocks are left
-		// alone on page load - the explicit "Display as video" toolbar
-		// button is the path for converting those. `animated_video` is
-		// only ever set on GIF image attachments, so its presence is a
-		// sufficient signal that this swap applies.
-		//
-		// A gallery only accepts `core/image` children, so the swap is
-		// skipped there; the converted video is still sideloaded and
-		// stored for use elsewhere.
-		const rootClientId = getBlockRootClientId( clientId );
-		const isInGallery =
-			!! rootClientId && getBlockName( rootClientId ) === 'core/gallery';
-		if (
-			! isInGallery &&
-			media.media_details?.animated_video &&
-			media.url
-		) {
-			const dir = media.url.slice( 0, media.url.lastIndexOf( '/' ) + 1 );
-			const poster = media.media_details.animated_video_poster;
-			__unstableMarkNextChangeAsNotPersistent();
-			replaceBlock(
-				clientId,
-				createBlock( 'core/video', {
-					...getCarriedGifConversionAttributes( attributes ),
-					id: media.id,
-					src: dir + media.media_details.animated_video,
-					poster: poster ? dir + poster : undefined,
-					caption: media.caption?.raw ?? media.caption,
-					controls: false,
-					loop: true,
-					autoplay: true,
-					muted: true,
-					playsInline: true,
-					/*
-					 * Carry the GIF's intrinsic dimensions so the <video> keeps
-					 * its aspect ratio from the first paint. Without them the
-					 * element collapses to the browser-default size and then
-					 * jumps once the poster/metadata load, which shows up as a
-					 * brief duplicated image during the swap.
-					 */
-					width: media.media_details.width,
-					height: media.media_details.height,
-				} )
-			);
-			setTemporaryURL();
 			return;
 		}
 

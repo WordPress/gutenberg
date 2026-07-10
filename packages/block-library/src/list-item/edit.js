@@ -83,7 +83,7 @@ export default function ListItemEdit( {
 		renderAppender: false,
 		__unstableDisableDropZone: true,
 	} );
-	const useEnterRef = useEnter( { content, clientId } );
+	const useEnterRef = useEnter( clientId );
 	const useSpaceRef = useSpace( clientId );
 	const onMerge = useMerge( clientId, mergeBlocks );
 	return (

@@ -20,6 +20,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$playlist_id     = wp_unique_id( 'playlist-' );
 	$playlist_tracks = array();
 	$tracks_data     = array();
+	$show_images     = $attributes['showImages'] ?? true;
 
 	// Parse inner blocks to extract track data.
 	// This approach avoids duplicating track data in the HTML output.
@@ -40,12 +41,13 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				$artist     = $track_attributes['artist'] ?? '';
 				$album      = $track_attributes['album'] ?? '';
 				$image      = $track_attributes['image'] ?? '';
+				$image_alt  = $track_attributes['imageAlt'] ?? '';
 				$url        = $track_attributes['src'] ?? '';
 				$aria_label = $title;
 
 				if ( $title && $artist && $album ) {
 					$aria_label = sprintf(
-						/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
+						/* translators: %1$s: track title, %2$s: artist name, %3$s: album name. */
 						_x( '%1$s by %2$s from the album %3$s', 'track title, artist name, album name' ),
 						$title,
 						$artist,
@@ -61,7 +63,8 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					'title'     => wp_strip_all_tags( $title ),
 					'artist'    => wp_strip_all_tags( $artist ),
 					'album'     => wp_strip_all_tags( $album ),
-					'image'     => esc_url( $image ),
+					'image'     => $show_images ? esc_url( $image ) : '',
+					'imageAlt'  => $show_images ? wp_strip_all_tags( $image_alt ) : '',
 					'ariaLabel' => wp_strip_all_tags( $aria_label ),
 				);
 			}
@@ -114,11 +117,8 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$processor = new WP_HTML_Tag_Processor( $content );
 	$processor->next_tag( 'figure' );
 	$processor->set_attribute( 'data-wp-interactive', 'core/playlist' );
-	// Extract the waveform style from the block style variation class.
-	$waveform_style = 'bars';
-	if ( ! empty( $attributes['className'] ) && preg_match( '/is-style-([\w-]+)/', $attributes['className'], $matches ) ) {
-		$waveform_style = $matches[1];
-	}
+
+	$waveform_style = $attributes['waveformStyle'] ?? 'bars';
 
 	$processor->set_attribute(
 		'data-wp-context',

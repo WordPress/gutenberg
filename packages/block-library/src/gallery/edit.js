@@ -66,7 +66,7 @@ import {
 import useImageSizes from './use-image-sizes';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
-import GapStyles from './gap-styles';
+import GalleryGapCustomProperties from './gap-styles';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
 import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
@@ -941,8 +941,8 @@ export default function GalleryEdit( props ) {
 						/>
 					</BlockControls>
 				) }
-				<GapStyles
-					blockGap={ attributes.style?.spacing?.blockGap }
+				<GalleryGapCustomProperties
+					style={ attributes.style }
 					clientId={ clientId }
 				/>
 			</>

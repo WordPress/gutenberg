@@ -56,9 +56,10 @@ export default {
 		'var(--wp-admin-theme-color, #3858e9)',
 	'--wpds-color-background-thumb-brand-active':
 		'var(--wp-admin-theme-color, #3858e9)',
-	'--wpds-color-background-thumb-neutral-disabled': '#dbdbdb',
+	'--wpds-color-background-thumb-brand-disabled': '#dbdbdb',
 	'--wpds-color-background-thumb-neutral-weak': '#8d8d8d',
 	'--wpds-color-background-thumb-neutral-weak-active': '#6e6e6e',
+	'--wpds-color-background-thumb-neutral-weak-disabled': '#dbdbdb',
 	'--wpds-color-background-track-neutral': '#dbdbdb',
 	'--wpds-color-background-track-neutral-weak': '#f0f0f0',
 	'--wpds-color-foreground-content-caution': '#281d00',
@@ -94,6 +95,7 @@ export default {
 	'--wpds-color-foreground-interactive-neutral-strong-active': '#f0f0f0',
 	'--wpds-color-foreground-interactive-neutral-strong-disabled': '#8d8d8d',
 	'--wpds-color-foreground-interactive-neutral-weak': '#707070',
+	'--wpds-color-foreground-interactive-neutral-weak-active': '#1e1e1e',
 	'--wpds-color-foreground-interactive-neutral-weak-disabled': '#8d8d8d',
 	'--wpds-color-stroke-focus': 'var(--wp-admin-theme-color, #3858e9)',
 	'--wpds-color-stroke-interactive-brand':

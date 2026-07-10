@@ -54,11 +54,6 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `core/tabs-list`
 - `core/tabs-id`
 
-**Provides context:**
-
-- `core/tabs-activeTabIndex` → attribute `activeTabIndex`
-- `core/tabs-editorActiveTabIndex` → attribute `editorActiveTabIndex`
-
 ## Block Markup
 
 This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.

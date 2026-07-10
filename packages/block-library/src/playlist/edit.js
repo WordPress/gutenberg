@@ -41,6 +41,15 @@ import { PlaylistContext } from './context';
 import { getTrackAttributes } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+const DEFAULT_WAVEFORM_STYLE = 'bars';
+const WAVEFORM_STYLE_OPTIONS = [
+	{ label: __( 'Bars' ), value: 'bars' },
+	{ label: __( 'Mirror' ), value: 'mirror' },
+	{ label: __( 'Line' ), value: 'line' },
+	{ label: __( 'Blocks' ), value: 'blocks' },
+	{ label: __( 'Dots' ), value: 'dots' },
+	{ label: __( 'Seekbar' ), value: 'seekbar' },
+];
 
 const PlaylistEdit = ( {
 	attributes,
@@ -56,12 +65,11 @@ const PlaylistEdit = ( {
 		showImages,
 		showArtists,
 		showTrackLength,
+		waveformStyle = DEFAULT_WAVEFORM_STYLE,
 	} = attributes;
 
-	// Extract the waveform style from the block style variation class.
-	const waveformStyle =
-		attributes.className?.match( /is-style-([\w-]+)/ )?.[ 1 ] || 'bars';
 	const blockProps = useBlockProps();
+	const waveformPanelId = `${ clientId }-waveform`;
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -189,6 +197,18 @@ const PlaylistEdit = ( {
 		};
 	}
 
+	const onChangeWaveformStyle = useCallback(
+		( newWaveformStyle ) => {
+			setAttributes( {
+				waveformStyle:
+					newWaveformStyle === DEFAULT_WAVEFORM_STYLE
+						? undefined
+						: newWaveformStyle,
+			} );
+		},
+		[ setAttributes ]
+	);
+
 	const hasSelectedChild = useSelect(
 		( select ) =>
 			select( blockEditorStore ).hasSelectedInnerBlock( clientId ),
@@ -257,7 +277,7 @@ const PlaylistEdit = ( {
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
-						label={ __( 'Show Tracklist' ) }
+						label={ __( 'Show tracklist' ) }
 						isShownByDefault
 						hasValue={ () => showTracklist !== true }
 						onDeselect={ () =>
@@ -265,7 +285,7 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							label={ __( 'Show Tracklist' ) }
+							label={ __( 'Show tracklist' ) }
 							onChange={ toggleAttribute( 'showTracklist' ) }
 							checked={ showTracklist }
 						/>
@@ -273,7 +293,7 @@ const PlaylistEdit = ( {
 					{ showTracklist && (
 						<>
 							<ToolsPanelItem
-								label={ __( 'Show artist name in Tracklist' ) }
+								label={ __( 'Show artist name in tracklist' ) }
 								isShownByDefault
 								hasValue={ () => showArtists !== true }
 								onDeselect={ () =>
@@ -282,7 +302,7 @@ const PlaylistEdit = ( {
 							>
 								<ToggleControl
 									label={ __(
-										'Show artist name in Tracklist'
+										'Show artist name in tracklist'
 									) }
 									onChange={ toggleAttribute(
 										'showArtists'
@@ -291,7 +311,9 @@ const PlaylistEdit = ( {
 								/>
 							</ToolsPanelItem>
 							<ToolsPanelItem
-								label={ __( 'Show number in Tracklist' ) }
+								label={ __(
+									'Show track numbers in tracklist'
+								) }
 								isShownByDefault
 								hasValue={ () => showNumbers !== true }
 								onDeselect={ () =>
@@ -299,7 +321,9 @@ const PlaylistEdit = ( {
 								}
 							>
 								<ToggleControl
-									label={ __( 'Show number in Tracklist' ) }
+									label={ __(
+										'Show track numbers in tracklist'
+									) }
 									onChange={ toggleAttribute(
 										'showNumbers'
 									) }
@@ -307,7 +331,9 @@ const PlaylistEdit = ( {
 								/>
 							</ToolsPanelItem>
 							<ToolsPanelItem
-								label={ __( 'Show track length in Tracklist' ) }
+								label={ __(
+									'Show track duration in tracklist'
+								) }
 								isShownByDefault
 								hasValue={ () => showTrackLength !== true }
 								onDeselect={ () =>
@@ -316,7 +342,7 @@ const PlaylistEdit = ( {
 							>
 								<ToggleControl
 									label={ __(
-										'Show track length in Tracklist'
+										'Show track duration in tracklist'
 									) }
 									onChange={ toggleAttribute(
 										'showTrackLength'
@@ -358,13 +384,53 @@ const PlaylistEdit = ( {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
+			<InspectorControls group="styles">
+				<ToolsPanel
+					label={ __( 'Waveform' ) }
+					resetAll={ () => {
+						setAttributes( {
+							waveformStyle: undefined,
+						} );
+					} }
+					panelId={ waveformPanelId }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						label={ __( 'Shape' ) }
+						isShownByDefault
+						hasValue={ () =>
+							waveformStyle !== DEFAULT_WAVEFORM_STYLE
+						}
+						onDeselect={ () =>
+							onChangeWaveformStyle( DEFAULT_WAVEFORM_STYLE )
+						}
+						panelId={ waveformPanelId }
+					>
+						<SelectControl
+							label={ __( 'Shape' ) }
+							value={ waveformStyle }
+							options={ WAVEFORM_STYLE_OPTIONS }
+							onChange={ onChangeWaveformStyle }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</InspectorControls>
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
 					<WaveformPlayer
 						src={ currentTrackData?.src }
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
-						image={ currentTrackData?.image }
+						image={
+							showImages !== false
+								? currentTrackData?.image
+								: undefined
+						}
+						imageAlt={
+							showImages !== false
+								? currentTrackData?.imageAlt
+								: undefined
+						}
 						waveformStyle={ waveformStyle }
 						onEnded={ onTrackEnded }
 					/>
