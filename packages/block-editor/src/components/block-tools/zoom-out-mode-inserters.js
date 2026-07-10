@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 
 /**
@@ -9,22 +9,24 @@ import { useEffect, useState } from '@wordpress/element';
  */
 import BlockPopoverInbetween from '../block-popover/inbetween';
 import ZoomOutModeInserterButton from './zoom-out-mode-inserter-button';
+import PatternsExplorerModal from '../inserter/block-patterns-explorer';
+import { allPatternsCategory } from '../inserter/block-patterns-tab/utils';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 function ZoomOutModeInserters() {
 	const [ isReady, setIsReady ] = useState( false );
+	const [ isPatternsExplorerOpen, setIsPatternsExplorerOpen ] =
+		useState( false );
 	const {
 		hasSelection,
 		blockOrder,
-		setInserterIsOpened,
 		sectionRootClientId,
 		selectedBlockClientId,
 		blockInsertionPoint,
 		insertionPointVisible,
 	} = useSelect( ( select ) => {
 		const {
-			getSettings,
 			getBlockOrder,
 			getSelectionStart,
 			getSelectedBlockClientId,
@@ -39,16 +41,11 @@ function ZoomOutModeInserters() {
 			hasSelection: !! getSelectionStart().clientId,
 			blockOrder: getBlockOrder( root ),
 			sectionRootClientId: root,
-			setInserterIsOpened:
-				getSettings().__experimentalSetIsInserterOpened,
 			selectedBlockClientId: getSelectedBlockClientId(),
 			blockInsertionPoint: getBlockInsertionPoint(),
 			insertionPointVisible: isBlockInsertionPointVisible(),
 		};
 	}, [] );
-
-	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-	const { showInsertionPoint } = unlock( useDispatch( blockEditorStore ) );
 
 	// Defer the initial rendering to avoid the jumps due to the animation.
 	useEffect( () => {
@@ -83,24 +80,24 @@ function ZoomOutModeInserters() {
 	}
 
 	return (
-		<BlockPopoverInbetween
-			previousClientId={ previousClientId }
-			nextClientId={ nextClientId }
-		>
-			<ZoomOutModeInserterButton
-				onClick={ () => {
-					setInserterIsOpened( {
-						rootClientId: sectionRootClientId,
-						insertionIndex,
-						tab: 'patterns',
-						category: 'all',
-					} );
-					showInsertionPoint( sectionRootClientId, insertionIndex, {
-						operation: 'insert',
-					} );
-				} }
-			/>
-		</BlockPopoverInbetween>
+		<>
+			<BlockPopoverInbetween
+				previousClientId={ previousClientId }
+				nextClientId={ nextClientId }
+			>
+				<ZoomOutModeInserterButton
+					onClick={ () => setIsPatternsExplorerOpen( true ) }
+				/>
+			</BlockPopoverInbetween>
+			{ isPatternsExplorerOpen && (
+				<PatternsExplorerModal
+					initialCategory={ allPatternsCategory }
+					rootClientId={ sectionRootClientId }
+					insertionIndex={ insertionIndex }
+					onModalClose={ () => setIsPatternsExplorerOpen( false ) }
+				/>
+			) }
+		</>
 	);
 }
 

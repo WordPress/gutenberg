@@ -53,12 +53,14 @@ function PatternList( {
 	selectedCategory,
 	patternCategories,
 	rootClientId,
+	insertionIndex,
 	onModalClose,
 } ) {
 	const container = useRef();
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		rootClientId,
+		insertionIndex,
 		shouldFocusBlock: true,
 	} );
 	const [ patterns, , onClickPattern ] = usePatternsState(
