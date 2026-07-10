@@ -765,9 +765,9 @@ export function prepareItem( id: QueueItemId ) {
 		// a companion file of this same attachment after upload (see
 		// generateThumbnails) — like the HEIC original — not as a separate
 		// media library attachment. It is recorded in attachment metadata; the
-		// editor then switches the block to the Video block's GIF variation
-		// playing that companion (see
-		// packages/block-library/src/image/animated-gif-converter.js).
+		// editor offers switching the block to the Video block's GIF variation
+		// playing that companion via a block transform (see
+		// packages/block-library/src/image/transforms.js).
 		if (
 			file.type === 'image/gif' &&
 			settings.gifConvert !== false &&

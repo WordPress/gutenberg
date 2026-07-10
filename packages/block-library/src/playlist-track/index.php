@@ -29,7 +29,7 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 
 	$artist = $attributes['artist'] ?? '';
 	$image  = $attributes['image'] ?? '';
-	$alt    = empty( $attributes['imageAlt'] ) ? '' : wp_strip_all_tags( $attributes['imageAlt'] );
+	$alt    = $attributes['imageAlt'] ?? '';
 	$length = $attributes['length'] ?? '';
 	$title  = isset( $attributes['title'] ) && ! empty( $attributes['title'] ) ? $attributes['title'] : __( 'Unknown title' );
 
@@ -42,16 +42,16 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 
 	$html .= '<span class="wp-block-playlist-track__content">';
 	if ( $title ) {
-		$html .= '<span class="wp-block-playlist-track__title">' . wp_kses_post( $title ) . '</span>';
+		$html .= '<span class="wp-block-playlist-track__title">' . esc_html( $title ) . '</span>';
 	}
 	if ( $artist ) {
-		$html .= '<span class="wp-block-playlist-track__artist">' . wp_kses_post( $artist ) . '</span>';
+		$html .= '<span class="wp-block-playlist-track__artist">' . esc_html( $artist ) . '</span>';
 	}
 	$html .= '</span>';
 
 	if ( $length ) {
 		$html .= '<span class="wp-block-playlist-track__length">';
-		$html .= '<span class="screen-reader-text">' . esc_html__( 'Length:' ) . ' </span>';
+		$html .= '<span class="screen-reader-text">' . esc_html__( 'Duration:' ) . ' </span>';
 		$html .= esc_html( $length );
 		$html .= '</span>';
 	}

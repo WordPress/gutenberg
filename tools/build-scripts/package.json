@@ -24,7 +24,7 @@
 		"@babel/parser": "^7.28.6",
 		"@babel/traverse": "^7.25.7",
 		"@emotion/babel-plugin": "^11.13.5",
-		"@typescript/native-preview": "^7.0.0-dev.20260423.1",
+		"@typescript/native": "npm:typescript@^7.0.2",
 		"@wordpress/babel-preset-default": "file:../../packages/babel-preset-default",
 		"@wordpress/build": "file:../../packages/wp-build",
 		"@wordpress/react-19": "file:../react-19",
