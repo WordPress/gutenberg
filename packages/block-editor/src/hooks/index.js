@@ -39,6 +39,7 @@ import listView from './list-view';
 import './block-renaming';
 import './grid-visualizer';
 import AutoRegisterControls from './auto-inspector-controls';
+import './style-classes';
 
 createBlockEditFilter(
 	[

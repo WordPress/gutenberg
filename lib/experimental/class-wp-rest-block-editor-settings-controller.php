@@ -181,6 +181,12 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 						'context'     => array( 'mobile' ),
 					),
 
+					'__experimentalStyleClassesEnabled' => array(
+						'description' => __( 'List of style properties explicitly enabled for semantic CSS class generation.', 'gutenberg' ),
+						'type'        => 'array',
+						'context'     => array( 'edit', 'view' ),
+					),
+
 					'alignWide'                        => array(
 						'description' => __( 'Enable/Disable Wide/Full Alignments.', 'gutenberg' ),
 						'type'        => 'boolean',
