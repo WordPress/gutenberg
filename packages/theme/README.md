@@ -64,9 +64,7 @@ If your application renders React content into additional documents (an iframe, 
 
 ### Developer Tools
 
-For the best development experience, we recommend configuring the [Stylelint rules](#stylelint-plugins) provided by this package. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
-
-If you reference `--wpds-*` tokens in CSS or JS/TS source, use the [build plugins](#build-plugins) to inject fallback values at build time so components render correctly even when the tokens stylesheet is not loaded. If you use `@wordpress/build`, these plugins are already enabled by default when `@wordpress/theme` is installed.
+Use the [Stylelint plugins](#stylelint-plugins) to validate token usage and the [build plugins](#build-plugins) to inject generated fallback values. `@wordpress/build` enables the build plugins automatically when `@wordpress/theme` is installed.
 
 ### Accessibility
 
@@ -215,7 +213,15 @@ After the prebuild step, the package will be built into its final form via the r
 
 ## Stylelint Plugins
 
-This package provides Stylelint plugins to help enforce consistent usage of design tokens. To use them, add the plugins to your Stylelint configuration:
+These rules validate design token usage in CSS:
+
+| Rule                                            | Reports                                                   |
+| ----------------------------------------------- | --------------------------------------------------------- |
+| `plugin-wpds/no-unknown-ds-tokens`              | References to unknown `--wpds-*` tokens                   |
+| `plugin-wpds/no-setting-wpds-custom-properties` | Definitions or overrides in the `--wpds-*` namespace      |
+| `plugin-wpds/no-token-fallback-values`          | Manual fallbacks that can drift from the generated values |
+
+Enable them in your Stylelint configuration:
 
 ```json
 {
@@ -232,71 +238,11 @@ This package provides Stylelint plugins to help enforce consistent usage of desi
 }
 ```
 
-### `plugin-wpds/no-unknown-ds-tokens`
-
-This rule reports an error when a CSS value references a `--wpds-*` custom property that is not a valid design token. This helps catch typos and ensures that only valid design tokens are used.
-
-```css
-/* ✗ Error: '--wpds-unknown-token' is not a valid Design System token */
-.example {
-	color: var( --wpds-unknown-token );
-}
-
-/* ✓ OK */
-.example {
-	color: var( --wpds-color-foreground-content-neutral );
-}
-```
-
-### `plugin-wpds/no-setting-wpds-custom-properties`
-
-This rule reports an error when a CSS declaration sets (defines) a custom property in the `--wpds-*` namespace. The design system tokens should only be consumed, not defined or overridden in consuming code.
-
-```css
-/* ✗ Error: Do not set CSS custom properties using the Design System tokens namespace */
-.example {
-	--wpds-my-token: red;
-}
-
-/* ✗ Error: Overriding existing tokens is also not allowed */
-.example {
-	--wpds-color-foreground-content-neutral: red;
-}
-
-/* ✓ OK */
-.example {
-	--my-custom-token: red;
-}
-```
-
-### `plugin-wpds/no-token-fallback-values`
-
-This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. In CSS processed by the [build plugins](#build-plugins), fallback values are injected automatically, so manual fallbacks in `var(--wpds-*)` references are redundant and can drift out of sync with the token definitions.
-
-```css
-/* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-foreground-content-neutral' */
-.example {
-	color: var( --wpds-color-foreground-content-neutral, #1e1e1e );
-}
-
-/* ✓ OK */
-.example {
-	color: var( --wpds-color-foreground-content-neutral );
-}
-
-/* ✓ OK: Non-wpds custom properties are not checked */
-.example {
-	color: var( --my-custom-color, red );
-}
-```
-
 ## Build Plugins
 
-This package provides build plugins that inject fallback values into bare `var(--wpds-*)` references at build time. This ensures components render correctly even when a `ThemeProvider` or design tokens stylesheet is not present — for example, `var(--wpds-color-foreground-content-neutral)` becomes `var(--wpds-color-foreground-content-neutral, #1e1e1e)`.
+The build plugins inject generated fallbacks into bare `var(--wpds-*)` references so components still render when the design tokens stylesheet is unavailable. For example, `var(--wpds-color-foreground-content-neutral)` becomes `var(--wpds-color-foreground-content-neutral, #1e1e1e)`.
 
 `@wordpress/build` already applies these plugins automatically when `@wordpress/theme` is installed. You only need to configure them manually for custom build setups.
-
-Three plugin variants are available, covering common build tool setups:
 
 | Export                                                        | Tool    | Scope |
 | ------------------------------------------------------------- | ------- | ----- |
@@ -304,17 +250,9 @@ Three plugin variants are available, covering common build tool setups:
 | `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks` | esbuild | JS/TS |
 | `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`       | Vite    | JS/TS |
 
-All three plugins skip transformation when the source does not contain a `--wpds-` reference.
+Existing fallbacks and non-`--wpds-*` properties are unchanged. An unknown token in a bare reference fails the build.
 
-### Transform boundaries and errors
-
-The plugins transform bare `var(--wpds-*)` calls, including calls with whitespace such as `var( --wpds-color-foreground-content-neutral )`. Calls that already include a fallback are left unchanged, and non-`--wpds-*` custom properties are ignored.
-
-The PostCSS plugin transforms declaration values in any stylesheet processed by PostCSS, including plain CSS and CSS modules. It does not transform token references in CSS comments.
-
-The esbuild and Vite plugins transform JavaScript and TypeScript source files with `.js`, `.jsx`, `.ts`, `.tsx`, `.mjs`, `.mts`, `.cjs`, and `.cts` extensions, except files in `node_modules`. They transform matching source text in template literals, quoted strings, and comments.
-
-If a transformed bare `var()` call references an unknown `--wpds-*` token, the plugin stops the build with an `Unknown design token` error. This also applies to matching references in JavaScript or TypeScript comments and strings; remove example references to unknown tokens or use a known token name.
+PostCSS transforms declaration values in plain CSS and CSS modules, but not comments. The esbuild and Vite plugins transform `.js`, `.jsx`, `.ts`, `.tsx`, `.mjs`, `.mts`, `.cjs`, and `.cts` files outside `node_modules`; their source-text transform includes strings, template literals, and comments.
 
 ### PostCSS
 
