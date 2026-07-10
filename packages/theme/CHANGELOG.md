@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Stable Release
+
+This package is now considered stable and production-ready. The API will follow semantic versioning from this point forward.
+
 ### Breaking Changes
 
 -   Remove the `--wpds-elevation-*` design tokens while the complete elevation model is still being defined ([#80099](https://github.com/WordPress/gutenberg/pull/80099)).
