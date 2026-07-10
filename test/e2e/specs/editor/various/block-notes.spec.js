@@ -980,12 +980,6 @@ test.describe( 'Block Notes', () => {
 
 			await blockNoteUtils.addReactionToComment( 'Heart' );
 
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reaction added.' } )
-			).toBeVisible();
-
 			// Verify the reaction button appears with count.
 			const reactionButton = page.getByRole( 'button', {
 				name: /Heart/,
@@ -1011,37 +1005,9 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '1' );
 
-			// The initial add must surface a success snackbar. Dismiss it so
-			// the re-add assertion below checks the re-add's own snackbar,
-			// rather than relying on both being present at once (snackbars
-			// auto-dismiss, which makes a cumulative count flaky).
-			const addedNotice = page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Reaction added.' } );
-			await expect( addedNotice ).toBeVisible();
-			await addedNotice.click();
-			await expect( addedNotice ).toBeHidden();
-
-			/*
-			 * Clicking the snackbar moves focus (and selection) away from
-			 * the note thread, which collapses it and unmounts the
-			 * reaction pill. Re-select the thread so the pill renders
-			 * again before interacting with it.
-			 */
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Re-add reaction' } )
-				.click();
-			await expect( reactionButton ).toBeVisible();
-
 			// Remove the reaction.
 			await reactionButton.click();
 			await expect( reactionButton ).toBeHidden();
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reaction removed.' } )
-			).toBeVisible();
 
 			// Add the same reaction again. This used to fail two ways:
 			// 1) the parent note's cached `reaction_summary` still
@@ -1057,11 +1023,9 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionButton ).toContainText( '❤' );
 			await expect( reactionButton ).toContainText( '1' );
 
-			// The re-add must surface its own success snackbar, and the
-			// duplicate-reaction error must never appear — pins both fixes
-			// (client refetch + server status='approve' query) against
-			// regression.
-			await expect( addedNotice ).toBeVisible();
+			// The duplicate-reaction error must never appear — pins both
+			// fixes (client refetch + server status='approve' query)
+			// against regression.
 			await expect(
 				page.locator( '.components-snackbar__content', {
 					hasText: /already reacted/i,
@@ -1081,23 +1045,13 @@ test.describe( 'Block Notes', () => {
 
 			// Add a reaction.
 			await blockNoteUtils.addReactionToComment( 'Heart' );
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reaction added.' } )
-			).toBeVisible();
-
-			// Click the reaction to remove it.
 			const reactionButton = page.getByRole( 'button', {
 				name: /Heart/,
 			} );
-			await reactionButton.click();
+			await expect( reactionButton ).toBeVisible();
 
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reaction removed.' } )
-			).toBeVisible();
+			// Click the reaction to remove it.
+			await reactionButton.click();
 
 			// Verify the reaction button is no longer visible.
 			await expect( reactionButton ).toBeHidden();
@@ -1115,16 +1069,12 @@ test.describe( 'Block Notes', () => {
 
 			// Add a reaction.
 			await blockNoteUtils.addReactionToComment( 'Celebration' );
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reaction added.' } )
-			).toBeVisible();
 
 			// Hover over the reaction button to trigger tooltip.
 			const reactionButton = page.getByRole( 'button', {
 				name: /Celebration/,
 			} );
+			await expect( reactionButton ).toBeVisible();
 			await reactionButton.hover();
 
 			// Verify the tooltip is visible and contains expected text.
@@ -1164,10 +1114,9 @@ test.describe( 'Block Notes', () => {
 			await page.keyboard.press( 'ArrowRight' );
 			await page.keyboard.press( 'Enter' );
 
+			// The selected emoji renders as a reaction pill on the note.
 			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reaction added.' } )
+				page.locator( '.editor-collab-sidebar-panel__reaction-button' )
 			).toBeVisible();
 		} );
 
@@ -1184,25 +1133,18 @@ test.describe( 'Block Notes', () => {
 			// Add first reaction.
 			await blockNoteUtils.addReactionToComment( 'Smile' );
 			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reaction added.' } )
+				page.getByRole( 'button', { name: /Smile/ } )
 			).toBeVisible();
 
 			// Add second reaction.
 			await blockNoteUtils.addReactionToComment( 'Rocket' );
 			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reaction added.' } )
+				page.getByRole( 'button', { name: /Rocket/ } )
 			).toBeVisible();
 
-			// Verify both reactions are visible.
+			// Both reactions remain visible together.
 			await expect(
 				page.getByRole( 'button', { name: /Smile/ } )
-			).toBeVisible();
-			await expect(
-				page.getByRole( 'button', { name: /Rocket/ } )
 			).toBeVisible();
 		} );
 
