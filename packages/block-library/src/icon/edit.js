@@ -28,6 +28,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	getDimensionsClassesAndStyles as useDimensionsProps,
+	IconPickerModal,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { SVG, Rect, Path } from '@wordpress/primitives';
@@ -39,7 +40,6 @@ import { store as coreDataStore } from '@wordpress/core-data';
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
-import { CustomInserterModal } from './components';
 
 const IconPlaceholder = ( { className, style } ) => (
 	<SVG
@@ -257,11 +257,14 @@ export function Edit( { attributes, setAttributes } ) {
 				) }
 			</div>
 			{ isInserterOpen && (
-				<CustomInserterModal
+				<IconPickerModal
 					icons={ allIcons }
-					setInserterOpen={ setInserterOpen }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
+					value={ icon }
+					onSelect={ ( name ) => {
+						setAttributes( { icon: name } );
+						setInserterOpen( false );
+					} }
+					onRequestClose={ () => setInserterOpen( false ) }
 				/>
 			) }
 		</>

@@ -10,26 +10,22 @@ import { useDebounce } from '@wordpress/compose';
  * Internal dependencies
  */
 import IconGrid from './icon-grid';
-import { normalizeSearchInput } from '../../../utils/search-patterns';
+import normalizeSearchInput from '../../utils/normalize-search-input';
 
-export default function CustomInserterModal( {
+export default function IconPickerModal( {
 	icons = [],
-	setInserterOpen,
-	attributes,
-	setAttributes,
+	value,
+	onChange,
+	onClose,
+	title = __( 'Icon library' ),
 } ) {
 	const [ searchInput, setSearchInput ] = useState( '' );
 
 	const debouncedSetSearchInput = useDebounce( setSearchInput, 300 );
 
-	const setIcon = useCallback(
-		( name ) => {
-			setAttributes( {
-				icon: name,
-			} );
-			setInserterOpen( false );
-		},
-		[ setAttributes, setInserterOpen ]
+	const handleSelect = useCallback(
+		( name ) => onSelect?.( name ),
+		[ onSelect ]
 	);
 
 	const filteredIcons = useMemo( () => {
@@ -50,13 +46,13 @@ export default function CustomInserterModal( {
 
 	return (
 		<Modal
-			className="wp-block-icon__inserter-modal"
-			title={ __( 'Icon library' ) }
-			onRequestClose={ () => setInserterOpen( false ) }
+			className="block-editor-icon-picker-modal"
+			title={ title }
+			onRequestClose={ onRequestClose }
 			isFullScreen
 		>
-			<div className="wp-block-icon__inserter">
-				<div className="wp-block-icon__inserter-header">
+			<div className="block-editor-icon-picker-modal__inserter">
+				<div className="block-editor-icon-picker-modal__header">
 					<SearchControl
 						value={ searchInput }
 						onChange={ debouncedSetSearchInput }
@@ -64,8 +60,8 @@ export default function CustomInserterModal( {
 				</div>
 				<IconGrid
 					icons={ filteredIcons }
-					onChange={ setIcon }
-					attributes={ attributes }
+					onSelect={ handleSelect }
+					value={ value }
 				/>
 			</div>
 		</Modal>

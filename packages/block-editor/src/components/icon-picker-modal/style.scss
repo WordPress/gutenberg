@@ -1,0 +1,52 @@
+@use "@wordpress/base-styles/variables" as *;
+
+// Styles for the icon picker modal UI.
+// Use block-editor-prefixed classnames to keep styles scoped to the package.
+
+.block-editor-icon-picker-modal__inserter {
+	padding: 0 $grid-unit-30;
+	margin: 0 (-1 * $grid-unit-30);
+}
+
+.block-editor-icon-picker-modal__header {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: $grid-unit-20;
+}
+
+.block-editor-icon-picker-modal__grid-icons-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.block-editor-icon-picker-modal__grid-no-results {
+	display: flex;
+	justify-content: center;
+}
+
+.block-editor-icon-picker-modal__grid-icons-list-item {
+	display: flex;
+	flex-direction: column;
+	height: auto !important;
+}
+
+.block-editor-icon-picker-modal__grid-icons-list-item-icon {
+	padding: $grid-unit-15;
+}
+
+// Ensure the injected SVG renders consistently (the old HtmlRenderer applied
+// width directly to the root SVG element).
+.block-editor-icon-picker-modal__grid-icons-list-item-svg svg {
+	display: block;
+	width: 24px;
+	height: 24px;
+}
+
+.block-editor-icon-picker-modal__grid-icons-list-item-title {
+	font-size: $font-size-small;
+	padding: $grid-unit-05 $grid-unit-05 $grid-unit-10;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
