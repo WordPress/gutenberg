@@ -18,8 +18,30 @@ function postKey( postId, isPostNew ) {
 	}`;
 }
 
+/**
+ * Returns the parsed session backup of a given post as `title`, `content`,
+ * and `excerpt` edits, or null when there is no usable backup.
+ *
+ * @param {string}  postId    Post ID.
+ * @param {boolean} isPostNew Whether post new.
+ *
+ * @return {Object|null} Backed-up post edits, if any.
+ */
 export function localAutosaveGet( postId, isPostNew ) {
-	return window.sessionStorage.getItem( postKey( postId, isPostNew ) );
+	const backup = window.sessionStorage.getItem(
+		postKey( postId, isPostNew )
+	);
+	if ( ! backup ) {
+		return null;
+	}
+
+	try {
+		const { post_title: title, content, excerpt } = JSON.parse( backup );
+		return { title, content, excerpt };
+	} catch {
+		// Not usable if it can't be parsed.
+		return null;
+	}
 }
 
 export function localAutosaveSet( postId, isPostNew, title, content, excerpt ) {

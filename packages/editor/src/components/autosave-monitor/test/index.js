@@ -33,11 +33,15 @@ function setState( overrides = {} ) {
 		isAutosaveable: false,
 		isAutosaving: false,
 		autosaveInterval: 10,
+		existingAutosave: undefined,
+		supportsAutosave: true,
 		...overrides,
 	};
 }
 
 describe( 'AutosaveMonitor', () => {
+	let createWarningNotice;
+
 	beforeEach( () => {
 		setState();
 		// `useSelect( store )` (static mode) returns bound selectors; the
@@ -47,11 +51,16 @@ describe( 'AutosaveMonitor', () => {
 		useSelect.mockImplementation( ( mapSelectOrStore ) => {
 			const selectors = {
 				getReferenceByDistinctEdits: () => state.editsReference,
+				getEditedPostAttribute: () => 'post',
+				getPostType: () => ( {
+					supports: { autosave: state.supportsAutosave },
+				} ),
 				isEditedPostDirty: () => state.isDirty,
 				isEditedPostAutosaveable: () => state.isAutosaveable,
 				isAutosavingPost: () => state.isAutosaving,
 				getEditorSettings: () => ( {
 					autosaveInterval: state.autosaveInterval,
+					autosave: state.existingAutosave,
 				} ),
 			};
 			if ( typeof mapSelectOrStore === 'function' ) {
@@ -59,7 +68,11 @@ describe( 'AutosaveMonitor', () => {
 			}
 			return selectors;
 		} );
-		useDispatch.mockReturnValue( { autosave: jest.fn() } );
+		createWarningNotice = jest.fn();
+		useDispatch.mockReturnValue( {
+			autosave: jest.fn(),
+			createWarningNotice,
+		} );
 		setInterval.mockClear();
 		clearInterval.mockClear();
 	} );
@@ -74,6 +87,13 @@ describe( 'AutosaveMonitor', () => {
 		render( <AutosaveMonitor /> );
 
 		expect( setInterval ).toHaveBeenCalled();
+	} );
+
+	it( 'should not start the autosave timer when the post type does not support autosaves', () => {
+		setState( { supportsAutosave: false } );
+		render( <AutosaveMonitor /> );
+
+		expect( setInterval ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should clear the autosave timer after being unmounted', () => {
@@ -126,19 +146,22 @@ describe( 'AutosaveMonitor', () => {
 		expect( autosave ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'should not autosave when the post is not dirty', () => {
+	it.each( [
+		{
+			scenario: 'the post is not dirty',
+			overrides: { isDirty: false, isAutosaveable: true },
+		},
+		{
+			scenario: 'an autosave is already in progress',
+			overrides: {
+				isDirty: true,
+				isAutosaveable: true,
+				isAutosaving: true,
+			},
+		},
+	] )( 'should not autosave when $scenario', ( { overrides } ) => {
 		const autosave = jest.fn();
-		setState( { isDirty: false, isAutosaveable: true } );
-		render( <AutosaveMonitor autosave={ autosave } interval={ 5 } /> );
-
-		jest.advanceTimersByTime( 5000 );
-
-		expect( autosave ).not.toHaveBeenCalled();
-	} );
-
-	it( 'should not autosave while an autosave is already in progress', () => {
-		const autosave = jest.fn();
-		setState( { isDirty: true, isAutosaveable: true, isAutosaving: true } );
+		setState( overrides );
 		render( <AutosaveMonitor autosave={ autosave } interval={ 5 } /> );
 
 		jest.advanceTimersByTime( 5000 );
@@ -197,6 +220,28 @@ describe( 'AutosaveMonitor', () => {
 		setState( { isDirty: true, isAutosaveable: true, editsReference: 2 } );
 		jest.advanceTimersByTime( 5000 );
 		expect( autosave ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should warn about a more recent server autosave on mount', () => {
+		setState( { existingAutosave: { editLink: 'autosave-edit-link' } } );
+		render( <AutosaveMonitor /> );
+
+		expect( createWarningNotice ).toHaveBeenCalledTimes( 1 );
+		expect( createWarningNotice ).toHaveBeenCalledWith(
+			expect.any( String ),
+			expect.objectContaining( {
+				id: 'autosave-exists',
+				actions: [
+					expect.objectContaining( { url: 'autosave-edit-link' } ),
+				],
+			} )
+		);
+	} );
+
+	it( 'should not warn when there is no more recent server autosave', () => {
+		render( <AutosaveMonitor /> );
+
+		expect( createWarningNotice ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should fall back to the editor store autosave action', () => {

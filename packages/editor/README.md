@@ -130,7 +130,7 @@ Example:
 
 Monitors the changes made to the edited post and triggers autosave if necessary.
 
-The post is checked every `interval` seconds and autosaved when there is something new to save.
+The post is checked every `interval` seconds and autosaved when there is something new to save. Renders nothing when the post type doesn't support autosaves.
 
 _Usage_
 
@@ -461,7 +461,7 @@ Monitors local autosaves of a post in the editor. It uses several hooks and func
 -   `useAutosaveNotice` hook: Manages the creation of a notice prompting the user to restore a local autosave, if one exists.
 -   `useAutosavePurge` hook: Ejects a local autosave after a successful save occurs.
 -   `hasSessionStorageSupport` function: Checks if the current environment supports browser sessionStorage.
--   `LocalAutosaveMonitor` component: Uses the `AutosaveMonitor` component to perform autosaves at a specified interval.
+-   `LocalAutosaveMonitor` component: Saves a sessionStorage backup of the post at the `localAutosaveInterval`.
 
 The module also checks for sessionStorage support and conditionally exports the `LocalAutosaveMonitor` component based on that.
 
