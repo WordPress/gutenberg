@@ -61,14 +61,6 @@ function render_block_core_calendar( $attributes ) {
 		$border_block_styles['color'] = "var:preset|color|{$attributes['borderColor']}";
 	}
 
-	// Generate color styles and classes.
-	$styles        = wp_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
-	$inline_styles = $styles['css'] ?? '';
-	$classnames    = $styles['classnames'] ?? '';
-	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
-		$classnames .= ' has-link-color';
-	}
-
 	// Generate border styles and classes
 	$border_engine  = wp_style_engine_get_styles( array( 'border' => $border_block_styles ), array( 'convert_vars_to_classnames' => true ) );
 	$border_styles  = $border_engine['css'] ?? '';
@@ -95,16 +87,16 @@ function render_block_core_calendar( $attributes ) {
 				$processor->add_class( $classnames );
 			}
 
-			if ( isset( $border_block_styles['radius'] ) ) {
-				$radius_value   = is_array( $border_block_styles['radius'] ) ? implode( ' ', $border_block_styles['radius'] ) : $border_block_styles['radius'];
-				$existing_style = $processor->get_attribute( 'style' ) ?? '';
-				$radius_css     = sprintf( 'border-radius: %s; overflow: hidden; border-collapse: separate;', esc_attr( $radius_value ) );
-				$processor->set_attribute( 'style', trim( $existing_style . ';' . $radius_css, ';' ) );
-			}
 		}
 
 		// Add border classes and inline styles to all table header th and data td cells.
 		if ( 'TH' === $tag_name || 'TD' === $tag_name ) {
+			$is_empty_calendar_cell = 'TD' === $tag_name && $processor->has_class( 'pad' );
+
+			if ( $is_empty_calendar_cell ) {
+				continue;
+			}
+
 			if ( ! empty( $border_classes ) ) {
 				$processor->add_class( $border_classes );
 			}
@@ -114,10 +106,6 @@ function render_block_core_calendar( $attributes ) {
 
 			if ( ! empty( $border_styles ) ) {
 				$combined_style .= ';' . trim( $border_styles, ';' );
-			}
-
-			if ( str_contains( $combined_style, 'border-' ) && ! str_contains( $combined_style, 'border-style' ) ) {
-				$combined_style .= ';border-style:solid';
 			}
 
 			if ( ! empty( $combined_style ) ) {

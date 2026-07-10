@@ -51,5 +51,8 @@
 			"clientNavigation": true
 		}
 	},
-	"style": "wp-block-calendar"
+	"style": "wp-block-calendar",
+	"selectors": {
+		"border": ".wp-block-calendar th, .wp-block-calendar td"
+	}
 }
