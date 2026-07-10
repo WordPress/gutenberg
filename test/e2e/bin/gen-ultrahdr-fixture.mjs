@@ -8,12 +8,28 @@
  * Synthesizes a small UltraHDR JPEG (ISO 21496-1 gain map) using wasm-vips's
  * encoder so we don't need to vendor a binary asset from a third-party source.
  *
- * Run manually (not part of CI). `wasm-vips` resolves through the workspace
- * via `@wordpress/vips`; console output is the script's user interface.
+ * Run manually (not part of CI). Console output is the script's user interface.
  */
-/* eslint-disable import/no-extraneous-dependencies */
-import Vips from 'wasm-vips';
 import fs from 'node:fs';
+import path from 'node:path';
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
+
+// `wasm-vips` is a dependency of `@wordpress/vips` and is installed under that
+// package's `node_modules` (it no longer hoists to the repo root as of 0.0.18),
+// so resolve it from there, mirroring test/performance/specs/media-processing.
+const require = createRequire(
+	path.join(
+		path.dirname( fileURLToPath( import.meta.url ) ),
+		'..',
+		'..',
+		'..',
+		'packages',
+		'vips',
+		'index.js'
+	)
+);
+const Vips = require( 'wasm-vips' );
 
 const out = process.argv[ 2 ];
 if ( ! out ) {
@@ -73,4 +89,3 @@ try {
 	console.error( vips.error || vips.Error?.message || '(no extra detail)' );
 	process.exit( 1 );
 }
-/* eslint-enable import/no-extraneous-dependencies */

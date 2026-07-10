@@ -28,13 +28,11 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import {
-	BLOCK_VISIBILITY_VIEWPORT_ENTRIES,
-	BLOCK_VISIBILITY_VIEWPORTS,
-} from './constants';
+import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
 import {
+	getBlockVisibilityViewportEntries,
 	getViewportCheckboxState,
 	getHideEverywhereCheckboxState,
 } from './utils';
@@ -74,6 +72,16 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 			'core/editor/toggle-list-view'
 		);
 	}, [] );
+	const viewportSettings = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().__experimentalFeatures
+				?.viewport,
+		[]
+	);
+	const viewportEntries = useMemo(
+		() => getBlockVisibilityViewportEntries( viewportSettings ),
+		[ viewportSettings ]
+	);
 
 	const initialViewportValues = useMemo( () => {
 		if ( blocks?.length === 0 ) {
@@ -85,7 +93,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 
 		const viewportValues = {};
 
-		BLOCK_VISIBILITY_VIEWPORT_ENTRIES.forEach( ( [ , { key } ] ) => {
+		viewportEntries.forEach( ( [ , { key } ] ) => {
 			viewportValues[ key ] = getViewportCheckboxState( blocks, key );
 		} );
 
@@ -93,7 +101,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 			hideEverywhere: getHideEverywhereCheckboxState( blocks ),
 			viewportChecked: viewportValues,
 		};
-	}, [ blocks ] );
+	}, [ blocks, viewportEntries ] );
 
 	const [ viewportChecked, setViewportChecked ] = useState(
 		initialViewportValues?.viewportChecked ?? {}
@@ -149,12 +157,17 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 		if ( hideEverywhere !== initialViewportValues.hideEverywhere ) {
 			return true;
 		}
-		return BLOCK_VISIBILITY_VIEWPORT_ENTRIES.some(
+		return viewportEntries.some(
 			( [ , { key } ] ) =>
 				viewportChecked[ key ] !==
 				initialViewportValues.viewportChecked[ key ]
 		);
-	}, [ hideEverywhere, viewportChecked, initialViewportValues ] );
+	}, [
+		hideEverywhere,
+		viewportChecked,
+		initialViewportValues,
+		viewportEntries,
+	] );
 
 	const hasIndeterminateValues = useMemo( () => {
 		if ( hideEverywhere === null ) {
@@ -171,7 +184,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 			const newVisibility = hideEverywhere
 				? false
 				: {
-						viewport: BLOCK_VISIBILITY_VIEWPORT_ENTRIES.reduce(
+						viewport: viewportEntries.reduce(
 							( acc, [ , { key } ] ) => {
 								if ( viewportChecked[ key ] ) {
 									// Values are inverted to hide the block on the selected viewport.
@@ -215,6 +228,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 			noticeMessage,
 			onClose,
 			updateBlockAttributes,
+			viewportEntries,
 			viewportChecked,
 		]
 	);
@@ -258,7 +272,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 							/>
 							{ hideEverywhere !== true && (
 								<ul className="block-editor-block-visibility-modal__sub-options">
-									{ BLOCK_VISIBILITY_VIEWPORT_ENTRIES.map(
+									{ viewportEntries.map(
 										( [ , { label, icon, key } ] ) => (
 											<li
 												key={ key }

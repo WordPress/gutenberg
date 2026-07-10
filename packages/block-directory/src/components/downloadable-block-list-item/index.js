@@ -12,7 +12,6 @@ import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { VisuallyHidden, Tooltip } from '@wordpress/ui';
 
 /**

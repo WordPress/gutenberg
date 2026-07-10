@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import {
+	useCallback,
 	useEffect,
 	useLayoutEffect,
 	useMemo,
@@ -24,6 +25,7 @@ import {
 	__experimentalUseGradient,
 	store as blockEditorStore,
 	useBlockEditingMode,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -55,6 +57,9 @@ import {
 } from './color-utils';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 import { getBackgroundEmbedHtml } from '../embed-video-utils';
+import { unlock } from '../../lock-unlock';
+
+const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -123,6 +128,11 @@ function CoverEdit( {
 		postId
 	);
 	const { getSettings } = useSelect( blockEditorStore );
+	const openMediaEditorModal = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()[ openMediaEditorModalKey ],
+		[]
+	);
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -490,6 +500,7 @@ function CoverEdit( {
 	);
 
 	const mediaElement = useRef();
+	const editMediaButtonRef = useRef();
 	const currentSettings = {
 		isVideoBackground,
 		isImageBackground,
@@ -499,6 +510,78 @@ function CoverEdit( {
 		isImgElement,
 		overlayColor,
 	};
+
+	const openCoverMediaEditorModal = useCallback( () => {
+		if ( ! id || ! openMediaEditorModal ) {
+			return;
+		}
+
+		openMediaEditorModal( {
+			id,
+			onClose: () => {
+				editMediaButtonRef.current?.focus();
+			},
+			onUpdate: async ( { id: newId, url: newUrl } ) => {
+				if ( typeof newId !== 'number' ) {
+					return;
+				}
+
+				const nextAttributes = {
+					id: newId,
+					backgroundType: IMAGE_BACKGROUND_TYPE,
+					...( newUrl ? { url: newUrl } : {} ),
+					...( newId !== id
+						? { sizeSlug: DEFAULT_MEDIA_SIZE_SLUG }
+						: {} ),
+				};
+
+				if ( newUrl ) {
+					const averageBackgroundColor =
+						await getMediaColor( newUrl );
+
+					// Read latest values after await to avoid stale closures.
+					const {
+						attributes: currentAttrs,
+						overlayColor: currentOverlay,
+					} = propsRef.current;
+
+					let newOverlayColor = currentOverlay.color;
+					if ( ! currentAttrs.isUserOverlayColor ) {
+						newOverlayColor = averageBackgroundColor;
+						setOverlayColor( newOverlayColor );
+
+						// Make undo revert the next setAttributes and the previous setOverlayColor.
+						__unstableMarkNextChangeAsNotPersistent();
+					}
+
+					nextAttributes.isDark = compositeIsDark(
+						currentAttrs.dimRatio,
+						newOverlayColor,
+						averageBackgroundColor
+					);
+					nextAttributes.isUserOverlayColor =
+						currentAttrs.isUserOverlayColor || false;
+				}
+
+				setAttributes( nextAttributes );
+			},
+		} );
+	}, [
+		id,
+		openMediaEditorModal,
+		setAttributes,
+		setOverlayColor,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
+
+	const showEditMediaButton =
+		hasNonContentControls &&
+		! useFeaturedImage &&
+		isImageBackground &&
+		!! id &&
+		!! url &&
+		! isUploadingMedia &&
+		!! openMediaEditorModal;
 
 	const toggleUseFeaturedImage = async () => {
 		const newUseFeaturedImage = ! useFeaturedImage;
@@ -556,6 +639,9 @@ function CoverEdit( {
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			onClearMedia={ onClearMedia }
 			blockEditingMode={ blockEditingMode }
+			onEditMedia={ openCoverMediaEditorModal }
+			editMediaButtonRef={ editMediaButtonRef }
+			showEditMediaButton={ showEditMediaButton }
 		/>
 	);
 

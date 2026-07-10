@@ -4,7 +4,17 @@
 
 ### Enhancements
 
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 2.50.0 (2026-07-01)
+
+## 2.49.0 (2026-06-24)
+
+### Enhancements
+
 -   Export the `Style`, `StyleOptions`, and `GeneratedCSSRule` TypeScript types so that consumers of the public API can type their usage of `compileCSS` and `getCSSRules`.
+
+## 2.48.1 (2026-06-16)
 
 ## 2.48.0 (2026-06-10)
 

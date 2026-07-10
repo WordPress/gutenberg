@@ -131,6 +131,8 @@ export type SurfaceStrokeColor =
 	| 'info-strong'
 	| 'warning'
 	| 'warning-strong'
+	| 'caution'
+	| 'caution-strong'
 	| 'error'
 	| 'error-strong';
 
@@ -165,14 +167,19 @@ export type ForegroundColor =
 	| 'neutral-strong'
 	| 'neutral-strong-active'
 	| 'neutral-strong-disabled'
+	| 'neutral-weak-active'
 	| 'neutral-weak-disabled'
 	| 'brand'
 	| 'brand-active'
+	| 'brand-disabled'
 	| 'brand-strong'
 	| 'brand-strong-active'
+	| 'brand-strong-disabled'
 	| 'error-active'
+	| 'error-disabled'
 	| 'error-strong'
-	| 'error-strong-active';
+	| 'error-strong-active'
+	| 'error-strong-disabled';
 
 /**
  * Font family variants.

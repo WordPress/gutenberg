@@ -45,10 +45,6 @@
 				}
 			}
 		},
-		"base": {
-			"$value": "{wpds-dimension.primitive.space.10}",
-			"$description": "Base dimension unit"
-		},
 		"padding": {
 			"xs": {
 				"$value": "{wpds-dimension.primitive.space.10}",

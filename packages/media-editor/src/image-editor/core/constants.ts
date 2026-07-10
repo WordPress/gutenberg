@@ -28,7 +28,7 @@ export const MAX_ZOOM = 10;
  * enough to allow tight crops (favicons, icons). Adjust here to tune the
  * floor globally.
  */
-export const MIN_CROP_PIXELS = 24;
+export const MIN_CROP_PIXELS = 16;
 
 /**
  * Minimum on-screen crop rect dimension in CSS pixels. The source-pixel
@@ -55,6 +55,13 @@ export const SETTLE_TARGET_CANVAS_FILL = 0.8;
  * Prevents a near-degenerate crop from magnifying the scene without limit.
  */
 export const MAX_VIEW_SCALE = 8;
+
+/**
+ * CSS pixels per source pixel required before resize handles snap the selected
+ * source region to whole-pixel edges. Below 1:1, a source pixel is sub-pixel on
+ * screen, so snapping would feel notchy without a visible pixel boundary.
+ */
+export const PIXEL_SNAP_DISPLAY_SCALE = 1;
 
 /**
  * Wheel zoom sensitivity. A deltaY of 100 changes zoom by 0.25.

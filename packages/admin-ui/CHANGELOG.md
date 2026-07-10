@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 2.5.0 (2026-07-01)
+
+## 2.4.0 (2026-06-24)
+
+### Internal
+
+-   Migrate off the removed `var(--wpds-dimension-base)` primitive token, adopting `--wpds-dimension-size-*` tokens ([#79254](https://github.com/WordPress/gutenberg/pull/79254)).
+
+## 2.3.1 (2026-06-16)
+
 ## 2.3.0 (2026-06-10)
 
 ### Code Quality

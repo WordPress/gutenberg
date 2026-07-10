@@ -116,10 +116,11 @@
 			z-index: var(--wp-ui-popover-z-index, initial);
 			/* TODO: Replace with a WPDS overlay/scrim token when one exists. */
 			background-color: rgba(0, 0, 0, 0.15);
-			opacity: 0;
+			opacity: 1;
 
-			&[data-open]:not([data-starting-style]):not([data-ending-style]) {
-				opacity: 1;
+			&[data-starting-style],
+			&[data-ending-style] {
+				opacity: 0;
 			}
 
 			@media not (prefers-reduced-motion) {

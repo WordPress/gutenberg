@@ -34,8 +34,10 @@ import { getGapCSSValue } from '../utils/gap';
 import { setBackgroundStyleDefaults } from '../utils/background';
 import { LAYOUT_DEFINITIONS } from '../utils/layout';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
+import { getResponsiveMediaQueries } from '../utils/viewport';
 import { getSetting } from '../settings/get-setting';
 import type { GlobalStylesConfig, GlobalStylesStyles } from '../types';
+import { normalizeStyleStateAliases } from '../style-state-back-compat';
 
 // =============================================================================
 // LOCAL TYPE DEFINITIONS
@@ -225,15 +227,6 @@ const VALID_ELEMENT_PSEUDO_SELECTORS: Record< string, string[] > = {
 		':focus-visible',
 		':active',
 	],
-};
-
-/**
- * Responsive breakpoint state keys and their corresponding CSS media queries.
- * Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS.
- */
-const RESPONSIVE_BREAKPOINTS: Record< string, string > = {
-	mobile: '@media (width <= 480px)',
-	tablet: '@media (480px < width <= 782px)',
 };
 
 /**
@@ -912,13 +905,21 @@ const STYLE_KEYS = [
 	'background',
 ];
 
-function pickStyleKeys( treeToPickFrom: any ): any {
-	return pickStyleAndPseudoKeys( treeToPickFrom );
+function pickStyleKeys(
+	treeToPickFrom: any,
+	responsiveMediaQueries: Record< string, string >
+): any {
+	return pickStyleAndPseudoKeys(
+		treeToPickFrom,
+		undefined,
+		responsiveMediaQueries
+	);
 }
 
 function pickStyleAndPseudoKeys(
 	treeToPickFrom: any,
-	blockName?: string
+	blockName: string | undefined,
+	responsiveMediaQueries: Record< string, string >
 ): any {
 	if ( ! treeToPickFrom ) {
 		return {};
@@ -932,7 +933,7 @@ function pickStyleAndPseudoKeys(
 		( [ key ] ) =>
 			STYLE_KEYS.includes( key ) ||
 			allowedPseudoSelectors.includes( key ) ||
-			RESPONSIVE_BREAKPOINTS[ key ]
+			responsiveMediaQueries[ key ]
 	);
 	// clone the style objects so that `getFeatureDeclarations` can remove consumed keys from it
 	const clonedEntries = pickedEntries.map( ( [ key, style ] ) => [
@@ -1000,14 +1001,22 @@ function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
  * Breakpoint nodes render feature-level, base, and pseudo declarations through
  * the normal node renderer.
  *
- * @param node Style node that may contain configured responsive state styles.
+ * @param node                   Style node that may contain configured responsive state styles.
+ * @param responsiveMediaQueries Media queries keyed by responsive state name.
  * @return Responsive style nodes in configured breakpoint order.
  */
-function getResponsiveStyleNodes( node: StylesNode ): StylesNode[] {
+function getResponsiveStyleNodes(
+	node: StylesNode,
+	responsiveMediaQueries: Record< string, string >
+): StylesNode[] {
 	const {
 		styles,
 		selector,
+		fallbackGapValue,
 		featureSelectors,
+		hasLayoutSupport,
+		layoutHasBlockGapSupport,
+		layoutSelector,
 		name,
 		elementName,
 		isStyleVariation,
@@ -1018,7 +1027,7 @@ function getResponsiveStyleNodes( node: StylesNode ): StylesNode[] {
 		return [];
 	}
 
-	return Object.entries( RESPONSIVE_BREAKPOINTS ).flatMap(
+	return Object.entries( responsiveMediaQueries ).flatMap(
 		( [ breakpointKey, mediaQuery ] ) => {
 			const breakpointStyles = styles?.[ breakpointKey ];
 			if ( ! breakpointStyles || typeof breakpointStyles !== 'object' ) {
@@ -1034,10 +1043,14 @@ function getResponsiveStyleNodes( node: StylesNode ): StylesNode[] {
 						featureSelectors && typeof featureSelectors !== 'string'
 							? featureSelectors
 							: undefined,
+					fallbackGapValue,
+					hasLayoutSupport,
 					name,
 					elementName,
 					isStyleVariation,
 					variationName,
+					layoutSelector,
+					layoutHasBlockGapSupport,
 				},
 			];
 		}
@@ -1054,8 +1067,10 @@ export const getNodesWithStyles = (
 		return nodes;
 	}
 
+	const responsiveMediaQueries = getResponsiveMediaQueries( tree );
+
 	// Top-level.
-	const styles = pickStyleKeys( tree.styles );
+	const styles = pickStyleKeys( tree.styles, responsiveMediaQueries );
 	if ( styles ) {
 		nodes.push( {
 			styles,
@@ -1084,7 +1099,11 @@ export const getNodesWithStyles = (
 	// Iterate over blocks: they can have styles & elements.
 	Object.entries( tree.styles?.blocks ?? {} ).forEach(
 		( [ blockName, node ] ) => {
-			const blockStyles = pickStyleAndPseudoKeys( node, blockName );
+			const blockStyles = pickStyleAndPseudoKeys(
+				node,
+				blockName,
+				responsiveMediaQueries
+			);
 			const typedNode = node as BlockNode;
 
 			// Store variation child nodes so they can be inserted after the block's own elements.
@@ -1097,7 +1116,8 @@ export const getNodesWithStyles = (
 						const typedVariation = variation as BlockVariation;
 						const variationStyles = pickStyleAndPseudoKeys(
 							typedVariation,
-							blockName
+							blockName,
+							responsiveMediaQueries
 						);
 						if ( typedVariation?.css ) {
 							variationStyles.css = typedVariation.css;
@@ -1192,7 +1212,8 @@ export const getNodesWithStyles = (
 								const variationBlockStyleNodes =
 									pickStyleAndPseudoKeys(
 										variationBlockStyles,
-										variationBlockName
+										variationBlockName,
+										responsiveMediaQueries
 									);
 
 								if ( variationBlockStyles?.css ) {
@@ -1699,10 +1720,18 @@ export const transformToStyles = (
 		variationStyles: false,
 		...styleOptions,
 	};
-	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
-	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
-	const useRootPaddingAlign = tree?.settings?.useRootPaddingAwareAlignments;
-	const { contentSize, wideSize } = tree?.settings?.layout || {};
+	const normalizedTree = normalizeStyleStateAliases( tree );
+	const nodesWithStyles = getNodesWithStyles(
+		normalizedTree,
+		blockSelectors
+	);
+	const nodesWithSettings = getNodesWithSettings(
+		normalizedTree,
+		blockSelectors
+	);
+	const useRootPaddingAlign =
+		normalizedTree?.settings?.useRootPaddingAwareAlignments;
+	const { contentSize, wideSize } = normalizedTree?.settings?.layout || {};
 	const hasBodyStyles =
 		options.marginReset || options.rootPadding || options.layoutStyles;
 
@@ -1748,12 +1777,16 @@ export const transformToStyles = (
 	}
 
 	if ( options.blockStyles ) {
+		const responsiveMediaQueries = getResponsiveMediaQueries( tree );
 		nodesWithStyles.forEach( ( node ) => {
 			if ( node.isStyleVariation && ! options.variationStyles ) {
 				return;
 			}
 
-			const responsiveNodes = getResponsiveStyleNodes( node );
+			const responsiveNodes = getResponsiveStyleNodes(
+				node,
+				responsiveMediaQueries
+			);
 			// Match PHP node order: base, responsive base, pseudo, responsive pseudo.
 			[
 				node,
@@ -1762,7 +1795,7 @@ export const transformToStyles = (
 				...responsiveNodes.flatMap( getPseudoStyleNodes ),
 			].forEach( ( expandedNode ) => {
 				ruleset += renderStylesNode( expandedNode, {
-					tree,
+					tree: normalizedTree,
 					useRootPaddingAlign,
 					disableLayoutStyles,
 					hasBlockGapSupport,
@@ -1789,7 +1822,8 @@ export const transformToStyles = (
 	if ( options.blockGap && hasBlockGapSupport ) {
 		// Use fallback of `0.5em` just in case, however if there is blockGap support, there should nearly always be a real value.
 		const gapValue =
-			getGapCSSValue( tree?.styles?.spacing?.blockGap ) || '0.5em';
+			getGapCSSValue( normalizedTree?.styles?.spacing?.blockGap ) ||
+			'0.5em';
 		ruleset =
 			ruleset +
 			`:root :where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; margin-block-end: 0; }`;

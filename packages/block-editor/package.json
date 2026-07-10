@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "15.21.0",
+	"version": "15.23.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,7 +39,7 @@
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
-		"./build-style/": "./build-style/"
+		"./build-style/*": "./build-style/*"
 	},
 	"wpScript": true,
 	"wpScriptModuleExports": {
@@ -60,7 +60,6 @@
 	],
 	"dependencies": {
 		"@react-spring/web": "^9.4.5",
-		"@types/react": "^18.3.27",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
@@ -118,11 +117,20 @@
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1",
-		"deep-freeze": "^0.0.1"
+		"@types/postcss-prefix-selector": "^1.16.3",
+		"@wordpress/block-library": "file:../block-library",
+		"deep-freeze": "^0.0.1",
+		"storybook": "^10.4.3"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

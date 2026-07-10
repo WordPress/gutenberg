@@ -109,7 +109,6 @@ export default function ScaleTool( {
 				help={ scaleHelp[ displayValue ] }
 				value={ displayValue }
 				onChange={ onChange }
-				size="__unstable-large"
 			>
 				{ options.map( ( option ) => (
 					<ToggleGroupControlOption

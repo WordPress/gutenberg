@@ -181,7 +181,7 @@
 			vertical-align: top;
 		}
 		.dataviews-view-table__cell-content-wrapper {
-			min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+			min-height: var(--wpds-dimension-size-md);
 			display: flex;
 			align-items: center;
 			white-space: nowrap;
@@ -276,8 +276,8 @@
 
 .dataviews-column-primary__media {
 	max-width: 60px;
-	min-width: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
-	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+	min-width: var(--wpds-dimension-size-md);
+	min-height: var(--wpds-dimension-size-md);
 	overflow: hidden;
 	position: relative;
 	flex-shrink: 0;
@@ -285,8 +285,8 @@
 	border-radius: var(--wpds-border-radius-md);
 
 	img {
-		width: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
-		height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+		width: var(--wpds-dimension-size-md);
+		height: var(--wpds-dimension-size-md);
 		object-fit: cover;
 	}
 
