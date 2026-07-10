@@ -215,12 +215,6 @@ After the prebuild step, the package will be built into its final form via the r
 
 These rules validate design token usage in CSS:
 
-| Rule                                            | Reports                                                   |
-| ----------------------------------------------- | --------------------------------------------------------- |
-| `plugin-wpds/no-unknown-ds-tokens`              | References to unknown `--wpds-*` tokens                   |
-| `plugin-wpds/no-setting-wpds-custom-properties` | Definitions or overrides in the `--wpds-*` namespace      |
-| `plugin-wpds/no-token-fallback-values`          | Manual fallbacks that can drift from the generated values |
-
 Enable them in your Stylelint configuration:
 
 ```json
@@ -237,6 +231,18 @@ Enable them in your Stylelint configuration:
 	}
 }
 ```
+
+### `plugin-wpds/no-unknown-ds-tokens`
+
+Reports references to unknown `--wpds-*` tokens.
+
+### `plugin-wpds/no-setting-wpds-custom-properties`
+
+Reports definitions or overrides in the `--wpds-*` namespace.
+
+### `plugin-wpds/no-token-fallback-values`
+
+Reports manual fallbacks that can drift from the generated values.
 
 ## Build Plugins
 
