@@ -87,7 +87,7 @@ export default function StateControl( {
 	const icon = showText ? chevronDown : moreVertical;
 	const toggleProps = showText
 		? { size: 'compact', variant: 'tertiary', iconPosition: 'right' }
-		: { size: 'compact', variant: 'tertiary' };
+		: { size: 'small', variant: 'tertiary' };
 
 	return (
 		<Stack
