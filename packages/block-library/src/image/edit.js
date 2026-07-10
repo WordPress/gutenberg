@@ -155,6 +155,18 @@ export function ImageEdit( {
 	} = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 
+	const isInGallery = useSelect(
+		( select ) => {
+			const { getBlockRootClientId: getRoot, getBlockName: getName } =
+				select( blockEditorStore );
+			const rootClientId = getRoot( clientId );
+			return (
+				!! rootClientId && getName( rootClientId ) === 'core/gallery'
+			);
+		},
+		[ clientId ]
+	);
+
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
@@ -251,10 +263,10 @@ export function ImageEdit( {
 		// skipped there; the converted video is still sideloaded and
 		// stored for use elsewhere.
 		const rootClientId = getBlockRootClientId( clientId );
-		const isInGallery =
+		const isGifDropRootGallery =
 			!! rootClientId && getBlockName( rootClientId ) === 'core/gallery';
 		if (
-			! isInGallery &&
+			! isGifDropRootGallery &&
 			media.media_details?.animated_video &&
 			media.url
 		) {
@@ -437,6 +449,7 @@ export function ImageEdit( {
 			!! borderProps.className ||
 			( borderProps.style &&
 				Object.keys( borderProps.style ).length > 0 ),
+		'is-in-gallery': isInGallery,
 	} );
 
 	const blockProps = useBlockProps( {
@@ -540,6 +553,7 @@ export function ImageEdit( {
 					blockEditingMode={ blockEditingMode }
 					parentLayoutType={ layoutType }
 					maxContentWidth={ maxContentWidth }
+					isInGallery={ isInGallery }
 				/>
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }

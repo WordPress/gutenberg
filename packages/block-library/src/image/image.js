@@ -285,6 +285,7 @@ export default function Image( {
 	blockEditingMode,
 	parentLayoutType,
 	maxContentWidth,
+	isInGallery,
 } ) {
 	const {
 		url = '',
@@ -1058,6 +1059,19 @@ export default function Image( {
 				} }
 			>
 				{ dimensionsControl }
+				{ ! showDimensionsControls && isInGallery && (
+					<ToolsPanelItem
+						label={ __( 'Dimensions' ) }
+						hasValue={ () => false }
+						isShownByDefault
+					>
+						<p className="wp-block-image__gallery-dimensions-notice">
+							{ __(
+								'This image is part of a Gallery, so its dimensions follow the Gallery’s Resolution and Aspect ratio settings.'
+							) }
+						</p>
+					</ToolsPanelItem>
+				) }
 				{ ! hasSelectedStyleState && url && scale && (
 					<ToolsPanelItem
 						label={ __( 'Focal point' ) }

@@ -959,6 +959,7 @@ export default function GalleryEdit( props ) {
 					{ ...props }
 					isContentLocked={ isContentLocked }
 					images={ images }
+					hasSingleImagePlaceholder={ images.length === 1 }
 					blockProps={ innerBlocksProps }
 					insertBlocksAfter={ insertBlocksAfter }
 					multiGallerySelection={ multiGallerySelection }

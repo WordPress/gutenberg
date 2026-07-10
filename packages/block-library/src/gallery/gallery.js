@@ -23,6 +23,7 @@ export default function Gallery( props ) {
 		__unstableLayoutClassNames: layoutClassNames,
 		isContentLocked,
 		multiGallerySelection,
+		hasSingleImagePlaceholder,
 	} = props;
 
 	const { align, columns, imageCrop } = attributes;
@@ -39,10 +40,17 @@ export default function Gallery( props ) {
 					[ `columns-${ columns }` ]: columns !== undefined,
 					[ `columns-default` ]: columns === undefined,
 					'is-cropped': imageCrop,
+					'has-single-image-placeholder': hasSingleImagePlaceholder,
 				}
 			) }
 		>
 			{ blockProps.children }
+			{ hasSingleImagePlaceholder && (
+				<div
+					className="wp-block-gallery__single-image-placeholder"
+					aria-hidden="true"
+				/>
+			) }
 			<Caption
 				attributes={ attributes }
 				setAttributes={ setAttributes }

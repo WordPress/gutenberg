@@ -175,3 +175,15 @@ figure.wp-block-image:not(.wp-block) {
 	width: 250px;
 }
 
+.wp-block-image.is-in-gallery.is-selected,
+.wp-block-image.is-in-gallery.is-hovered {
+	outline: $border-width dashed $gray-600;
+	outline-offset: 2px;
+}
+
+.wp-block-image__gallery-dimensions-notice {
+	color: $gray-700;
+	font-size: 12px;
+	font-style: italic;
+	margin: 0;
+}
