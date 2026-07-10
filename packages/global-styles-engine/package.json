@@ -45,6 +45,7 @@
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/data": "file:../data",
 		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-engine": "file:../style-engine",
 		"colord": "^2.9.3",
 		"deepmerge": "^4.3.1",

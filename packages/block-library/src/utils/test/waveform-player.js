@@ -37,6 +37,7 @@ function createFakePlayer( options, element ) {
 	if ( options.image ) {
 		artworkEl = document.createElement( 'img' );
 		artworkEl.src = options.image;
+		artworkEl.alt = options.imageAlt || '';
 	}
 
 	element.append( titleEl );
@@ -72,6 +73,7 @@ describe( 'WaveformPlayer', () => {
 		title: 'Original Title',
 		artist: 'Original Artist',
 		image: 'https://example.com/cover.jpg',
+		imageAlt: 'A bright abstract album cover',
 		onEnded: () => {},
 	};
 
@@ -90,6 +92,7 @@ describe( 'WaveformPlayer', () => {
 				title: 'Original Title',
 				artist: 'Original Artist',
 				image: 'https://example.com/cover.jpg',
+				imageAlt: 'A bright abstract album cover',
 			} )
 		);
 	} );
@@ -109,6 +112,7 @@ describe( 'WaveformPlayer', () => {
 				title="New Title"
 				artist="New Artist"
 				image="https://example.com/new.jpg"
+				imageAlt="A black and white portrait"
 			/>
 		);
 
@@ -120,6 +124,10 @@ describe( 'WaveformPlayer', () => {
 		expect( player.instance.artworkEl ).toHaveAttribute(
 			'src',
 			'https://example.com/new.jpg'
+		);
+		expect( player.instance.artworkEl ).toHaveAttribute(
+			'alt',
+			'A black and white portrait'
 		);
 	} );
 

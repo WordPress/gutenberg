@@ -60,17 +60,16 @@ jest.mock( '@wordpress/blocks', () => ( {
  * whether the attachment record was requested.
  *
  * @param {Object}   options                 Options.
- * @param {string}   [options.rootBlockName] Block name of the block's root (e.g. 'core/gallery').
+ * @param {boolean}  [options.canInsert]     Whether a `core/video` block can be inserted in the parent.
  * @param {Function} options.getEntityRecord Spy used for getEntityRecord.
  * @return {Function} A select() implementation.
  */
-function makeSelect( { rootBlockName = undefined, getEntityRecord } ) {
+function makeSelect( { canInsert = true, getEntityRecord } ) {
 	return ( storeName ) => {
 		if ( storeName === 'core/block-editor' ) {
 			return {
-				getBlockRootClientId: () =>
-					rootBlockName ? 'root-client-id' : undefined,
-				getBlockName: () => rootBlockName,
+				getBlockRootClientId: () => undefined,
+				canInsertBlockType: () => canInsert,
 			};
 		}
 		// core-data store.
@@ -180,14 +179,14 @@ describe( 'AnimatedGifConvertControl', () => {
 		expect( container ).toBeEmptyDOMElement();
 	} );
 
-	it( 'hides the control inside a gallery without fetching', () => {
+	it( 'hides the control when a video block cannot be inserted in the parent (e.g. a gallery) without fetching', () => {
 		const { container } = renderControl( {
 			attributes: {
 				id: 7,
 				url: 'https://example.com/wp-content/uploads/cat.gif',
 			},
 			select: makeSelect( {
-				rootBlockName: 'core/gallery',
+				canInsert: false,
 				getEntityRecord,
 			} ),
 		} );

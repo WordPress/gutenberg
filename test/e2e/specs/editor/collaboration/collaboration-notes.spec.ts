@@ -18,20 +18,9 @@ import { test, expect } from './fixtures';
 async function openAllNotesSidebar( targetPage: Page ) {
 	const notesButton = targetPage
 		.getByRole( 'region', { name: 'Editor top bar' } )
-		.getByRole( 'button', { name: 'Notes', exact: true } );
+		.getByRole( 'button', { name: 'All notes', exact: true } );
 	await expect( notesButton ).toBeVisible( { timeout: 10000 } );
 	await notesButton.click();
-	await targetPage
-		.getByRole( 'menuitemradio', { name: 'Show all notes', exact: true } )
-		.click();
-	// The dropdown stays open after selecting a choice; close it so it
-	// doesn't overlap subsequent interactions.
-	const menu = targetPage.getByRole( 'menu', {
-		name: 'Notes display options',
-	} );
-	if ( await menu.isVisible() ) {
-		await targetPage.keyboard.press( 'Escape' );
-	}
 }
 
 test.describe( 'Collaboration - Notes Sync', () => {
