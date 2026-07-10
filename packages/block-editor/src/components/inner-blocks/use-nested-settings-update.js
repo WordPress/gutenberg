@@ -16,6 +16,27 @@ import { getLayoutType } from '../../layouts';
 
 const pendingSettingsUpdates = new WeakMap();
 
+/**
+ * Immediately applies the pending block list settings update for the given
+ * block, if there is one, instead of waiting for the batched microtask flush.
+ * The flushed entry is removed from the pending batch; updates for other
+ * blocks stay queued for the regularly scheduled flush.
+ *
+ * @param {Object} registry Data registry.
+ * @param {string} clientId The block whose pending settings should be applied.
+ */
+export function flushPendingNestedSettingsUpdate( registry, clientId ) {
+	const pendingUpdates = pendingSettingsUpdates.get( registry );
+	const settings = pendingUpdates?.[ clientId ];
+	if ( settings === undefined ) {
+		return;
+	}
+	delete pendingUpdates[ clientId ];
+	registry
+		.dispatch( blockEditorStore )
+		.updateBlockListSettings( clientId, settings );
+}
+
 // Creates a memoizing caching function that remembers the last value and keeps returning it
 // as long as the new values are shallowly equal. Helps keep dependencies stable.
 function createShallowMemo() {

@@ -19,7 +19,7 @@ import {
 	formatOutdentRTL,
 } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
-import { useCallback, useEffect } from '@wordpress/element';
+import { useCallback, useLayoutEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -47,7 +47,7 @@ function useMigrateOnLoad( attributes, clientId ) {
 	const { updateBlockAttributes, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		// As soon as the block is loaded, migrate it to the new version.
 
 		if ( ! attributes.values ) {
@@ -67,6 +67,19 @@ function useMigrateOnLoad( attributes, clientId ) {
 			replaceInnerBlocks( clientId, newInnerBlocks );
 		} );
 	}, [ attributes.values ] );
+}
+
+/**
+ * Rendered before the inner blocks children so that the migration effect runs
+ * before the inner block template sync, which then skips inserting the template.
+ *
+ * @param {Object} props            Component props.
+ * @param {Object} props.attributes Block attributes.
+ * @param {string} props.clientId   Block client ID.
+ */
+function MigrateOnLoad( { attributes, clientId } ) {
+	useMigrateOnLoad( attributes, clientId );
+	return null;
 }
 
 function useOutdentList( clientId ) {
@@ -133,7 +146,6 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 		templateInsertUpdatesSelection: true,
 		__experimentalCaptureToolbars: true,
 	} );
-	useMigrateOnLoad( attributes, clientId );
 
 	const controls = (
 		<BlockControls group="block">
@@ -166,7 +178,13 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 				reversed={ reversed }
 				start={ start }
 				{ ...innerBlocksProps }
-			/>
+			>
+				<MigrateOnLoad
+					attributes={ attributes }
+					clientId={ clientId }
+				/>
+				{ innerBlocksProps.children }
+			</TagName>
 			{ controls }
 			{ ordered && (
 				<OrderedListSettings

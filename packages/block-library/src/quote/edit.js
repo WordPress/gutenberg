@@ -16,7 +16,7 @@ import {
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { useDispatch, useRegistry } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useLayoutEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { verse } from '@wordpress/icons';
 
@@ -40,7 +40,7 @@ const useMigrateOnLoad = ( attributes, clientId ) => {
 	const registry = useRegistry();
 	const { updateBlockAttributes, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
-	useEffect( () => {
+	useLayoutEffect( () => {
 		// As soon as the block is loaded, migrate it to the new version.
 
 		if ( ! attributes.value ) {
@@ -64,6 +64,19 @@ const useMigrateOnLoad = ( attributes, clientId ) => {
 	}, [ attributes.value ] );
 };
 
+/**
+ * Rendered before the inner blocks children so that the migration effect runs
+ * before the inner block template sync, which then skips inserting the template.
+ *
+ * @param {Object} props            Component props.
+ * @param {Object} props.attributes Block attributes.
+ * @param {string} props.clientId   Block client ID.
+ */
+function MigrateOnLoad( { attributes, clientId } ) {
+	useMigrateOnLoad( attributes, clientId );
+	return null;
+}
+
 export default function QuoteEdit( {
 	attributes,
 	setAttributes,
@@ -73,8 +86,6 @@ export default function QuoteEdit( {
 	isSelected,
 } ) {
 	const { textAlign, allowedBlocks } = attributes;
-
-	useMigrateOnLoad( attributes, clientId );
 
 	const blockProps = useBlockProps( {
 		className: clsx( className, {
@@ -100,6 +111,10 @@ export default function QuoteEdit( {
 				/>
 			</BlockControls>
 			<BlockQuotation { ...innerBlocksProps }>
+				<MigrateOnLoad
+					attributes={ attributes }
+					clientId={ clientId }
+				/>
 				{ innerBlocksProps.children }
 				<Caption
 					attributeKey="citation"
