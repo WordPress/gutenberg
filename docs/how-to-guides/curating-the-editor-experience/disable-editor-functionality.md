@@ -80,7 +80,21 @@ function example_restrict_cover_video_providers( $args, $block_type ) {
 add_filter( 'register_block_type_args', 'example_restrict_cover_video_providers', 10, 2 );
 ```
 
-To disable video embeds entirely, set the default to an empty array.
+To disable video embeds entirely, either `unset` the attribute's default or set it to an empty array. The example below removes it for every Cover block.
+
+```php
+function example_disable_cover_video_embeds( $args, $block_type ) {
+
+	if ( 'core/cover' !== $block_type ) {
+		return $args;
+	}
+
+	unset( $args['attributes']['allowedVideoProviders']['default'] );
+
+	return $args;
+}
+add_filter( 'register_block_type_args', 'example_disable_cover_video_embeds', 10, 2 );
+```
 
 ## Disable the Pattern Directory
 

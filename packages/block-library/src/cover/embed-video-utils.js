@@ -28,7 +28,7 @@ const DEFAULT_VIDEO_PROVIDERS = [
  */
 export function getAllowedVideoProviders( allowedVideoProviders ) {
 	if ( ! Array.isArray( allowedVideoProviders ) ) {
-		return DEFAULT_VIDEO_PROVIDERS;
+		return [];
 	}
 
 	return DEFAULT_VIDEO_PROVIDERS.filter( ( provider ) =>
