@@ -64,7 +64,7 @@ const defaultAttributes = {
 	album: 'Great Album',
 	artist: 'The Artist',
 	image: 'https://example.com/cover.jpg',
-	imageAlt: 'A bright abstract album cover',
+	imageAlt: 'A bright abstract track image',
 	length: '3:45',
 	title: 'Song One',
 };
@@ -107,7 +107,7 @@ describe( 'PlaylistTrackEdit', () => {
 		} );
 	} );
 
-	it( 'allows the album cover alternative text to be edited', () => {
+	it( 'allows the track image alternative text to be edited', () => {
 		const { setAttributes } = renderEdit();
 
 		expect(
@@ -131,7 +131,7 @@ describe( 'PlaylistTrackEdit', () => {
 		} );
 	} );
 
-	it( 'does not show the alternative text control without an album cover image', () => {
+	it( 'does not show the alternative text control without a track image', () => {
 		renderEdit( {
 			attributes: {
 				image: undefined,

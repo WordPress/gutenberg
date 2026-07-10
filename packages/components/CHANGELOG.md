@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ControlWithError`: Remove redundant inline aria-live region for validation error messages to prevent duplicate announcements. ([#79600](https://github.com/WordPress/gutenberg/pull/79600)).
+
 ### Breaking Changes
 
 -   `ExternalLink`: No longer sets the `rel` attribute by default. Consumers relying on the previous behavior should pass `rel` explicitly ([#79743](https://github.com/WordPress/gutenberg/pull/79743)).

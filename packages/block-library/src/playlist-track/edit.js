@@ -33,11 +33,11 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
  * Internal dependencies
  */
 import { PlaylistContext } from '../playlist/context';
-import { getAlbumCoverAttributes } from '../playlist/utils';
+import { getTrackAttributes, getTrackImageAttributes } from '../playlist/utils';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
-const ALBUM_COVER_ALLOWED_MEDIA_TYPES = [ 'image' ];
+const TRACK_IMAGE_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const PlaylistTrackEdit = ( {
 	attributes,
@@ -110,30 +110,16 @@ const PlaylistTrackEdit = ( {
 
 		setAttributes( {
 			blob: undefined,
-			id: media.id,
-			src: media.url,
-			artist:
-				media.artist ||
-				media?.meta?.artist ||
-				media?.media_details?.artist ||
-				__( 'Unknown artist' ),
-			album:
-				media.album ||
-				media?.meta?.album ||
-				media?.media_details?.album ||
-				__( 'Unknown album' ),
-			...getAlbumCoverAttributes( media?.image ),
-			length: media?.fileLength || media?.media_details?.length_formatted,
-			title: media.title,
+			...getTrackAttributes( media ),
 		} );
 		setTemporaryURL();
 	}
 
-	function onSelectAlbumCoverImage( coverImage ) {
-		setAttributes( getAlbumCoverAttributes( coverImage ) );
+	function onSelectTrackImage( trackImage ) {
+		setAttributes( getTrackImageAttributes( trackImage ) );
 	}
 
-	function onRemoveAlbumCoverImage() {
+	function onRemoveTrackImage() {
 		setAttributes( { image: undefined, imageAlt: undefined } );
 
 		// Move focus back to the Media Upload button.
@@ -200,22 +186,22 @@ const PlaylistTrackEdit = ( {
 					<MediaUploadCheck>
 						<BaseControl>
 							<BaseControl.VisualLabel>
-								{ __( 'Album cover image' ) }
+								{ __( 'Track image' ) }
 							</BaseControl.VisualLabel>
 							<div className="editor-video-poster-control">
 								{ !! image && (
 									<img
 										src={ image }
 										alt={ __(
-											'Preview of the album cover image'
+											'Preview of the track image'
 										) }
 									/>
 								) }
 								<MediaUpload
 									title={ __( 'Select image' ) }
-									onSelect={ onSelectAlbumCoverImage }
+									onSelect={ onSelectTrackImage }
 									allowedTypes={
-										ALBUM_COVER_ALLOWED_MEDIA_TYPES
+										TRACK_IMAGE_ALLOWED_MEDIA_TYPES
 									}
 									render={ ( { open } ) => (
 										<Button
@@ -233,7 +219,7 @@ const PlaylistTrackEdit = ( {
 								{ !! image && (
 									<Button
 										__next40pxDefaultSize
-										onClick={ onRemoveAlbumCoverImage }
+										onClick={ onRemoveTrackImage }
 										variant="tertiary"
 									>
 										{ __( 'Remove' ) }
@@ -314,8 +300,8 @@ const PlaylistTrackEdit = ( {
 						{ length && (
 							<span className="screen-reader-text">
 								{
-									/* translators: %s: Visually hidden label for the track length (screen reader text). */
-									__( 'Length:' )
+									/* translators: Visually hidden label for the track duration (screen reader text). */
+									__( 'Duration:' )
 								}
 							</span>
 						) }

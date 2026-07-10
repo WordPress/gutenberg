@@ -47,7 +47,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 
 				if ( $title && $artist && $album ) {
 					$aria_label = sprintf(
-						/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
+						/* translators: %1$s: track title, %2$s: artist name, %3$s: album name. */
 						_x( '%1$s by %2$s from the album %3$s', 'track title, artist name, album name' ),
 						$title,
 						$artist,
