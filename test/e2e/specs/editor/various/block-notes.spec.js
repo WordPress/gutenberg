@@ -1202,6 +1202,116 @@ test.describe( 'Block Notes', () => {
 			// stays selected and the trigger stays mounted.
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 		} );
+
+		test.describe( 'Filtered emoji list', () => {
+			test.beforeAll( async ( { requestUtils } ) => {
+				await requestUtils.activatePlugin(
+					'gutenberg-test-note-reaction-emojis'
+				);
+			} );
+
+			test.afterAll( async ( { requestUtils } ) => {
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-note-reaction-emojis'
+				);
+			} );
+
+			test( 'picker offers emojis added via the gutenberg_note_reaction_emojis filter', async ( {
+				page,
+				blockNoteUtils,
+			} ) => {
+				await blockNoteUtils.addBlockWithNote( {
+					type: 'core/paragraph',
+					attributes: { content: 'Testing filtered emojis' },
+					comment: 'Filtered emojis',
+				} );
+
+				await page
+					.getByRole( 'button', { name: 'Add reaction' } )
+					.click();
+				const emojiPicker = page.locator(
+					'.editor-collab-sidebar-panel__emoji-picker'
+				);
+				await expect( emojiPicker ).toBeVisible();
+
+				// The 5 defaults plus the 20 filter-added entries.
+				await expect( emojiPicker.getByRole( 'option' ) ).toHaveCount(
+					25
+				);
+				await expect(
+					emojiPicker.getByRole( 'option', { name: 'Heart' } )
+				).toBeVisible();
+				await expect(
+					emojiPicker.getByRole( 'option', { name: 'Thumbs up' } )
+				).toBeVisible();
+			} );
+
+			test( 'can react with a filter-added emoji', async ( {
+				page,
+				blockNoteUtils,
+			} ) => {
+				await blockNoteUtils.addBlockWithNote( {
+					type: 'core/paragraph',
+					attributes: { content: 'Testing filtered reaction' },
+					comment: 'Filtered reaction',
+				} );
+
+				// Exercises the whole path: the picker offers the custom
+				// entry, the REST API accepts its slug, and the pill
+				// resolves the slug back to the filtered emoji and label.
+				await blockNoteUtils.addReactionToComment( 'Unicorn' );
+
+				const reactionButton = page.getByRole( 'button', {
+					name: /Unicorn/,
+				} );
+				await expect( reactionButton ).toBeVisible();
+				await expect( reactionButton ).toContainText( '🦄' );
+				await expect( reactionButton ).toContainText( '1' );
+			} );
+
+			test( 'picker stays usable with many emojis', async ( {
+				page,
+				blockNoteUtils,
+			} ) => {
+				await blockNoteUtils.addBlockWithNote( {
+					type: 'core/paragraph',
+					attributes: { content: 'Testing large emoji set' },
+					comment: 'Large emoji set',
+				} );
+
+				await page
+					.getByRole( 'button', { name: 'Add reaction' } )
+					.click();
+				const emojiPicker = page.locator(
+					'.editor-collab-sidebar-panel__emoji-picker'
+				);
+				await expect( emojiPicker ).toBeVisible();
+
+				// The listbox wraps instead of growing unbounded, so the
+				// popover stays within the viewport.
+				const viewport = page.viewportSize();
+				const box = await emojiPicker.boundingBox();
+				expect( box.width ).toBeLessThan( viewport.width / 2 );
+				expect( box.x ).toBeGreaterThanOrEqual( 0 );
+				expect( box.x + box.width ).toBeLessThanOrEqual(
+					viewport.width
+				);
+
+				// The last filter-added entry is reachable (scrolls into
+				// view if needed) and selectable.
+				const lastOption = emojiPicker.getByRole( 'option', {
+					name: 'Trophy',
+				} );
+				await lastOption.scrollIntoViewIfNeeded();
+				await lastOption.click();
+
+				const reactionButton = page.getByRole( 'button', {
+					name: /Trophy/,
+				} );
+				await expect( reactionButton ).toBeVisible();
+				await expect( reactionButton ).toContainText( '🏆' );
+			} );
+		} );
 	} );
 
 	test.describe( 'Multiple notes per block', () => {
