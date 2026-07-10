@@ -167,6 +167,51 @@ test.describe( 'Block Notes: floating panel', () => {
 		expect( hitsCover ).toBe( false );
 	} );
 
+	test( 'a thin divider marks the boundary of the reserved notes space', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph with a note' },
+		} );
+		await addNote( page, editor, 'Divider note' );
+
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Notes' } )
+				.getByRole( 'treeitem', { name: 'Note: Divider note' } )
+		).toBeVisible();
+
+		// The divider is a `body::after` pseudo-element inside the canvas,
+		// pinned at the inner edge of the reserved padding. Its color derives
+		// from `currentColor` so it adapts to the theme's text color.
+		const divider = await editor.canvas
+			.locator( 'body' )
+			.evaluate( ( body ) => {
+				const view = body.ownerDocument.defaultView;
+				const style = view.getComputedStyle( body, '::after' );
+				const reservedWidth = parseFloat(
+					view.getComputedStyle( body.ownerDocument.documentElement )
+						.paddingInlineEnd
+				);
+				return {
+					position: style.position,
+					insetInlineEnd: parseFloat( style.insetInlineEnd ),
+					borderWidth: parseFloat( style.borderInlineStartWidth ),
+					borderColor: style.borderInlineStartColor,
+					reservedWidth,
+				};
+			} );
+
+		expect( divider.position ).toBe( 'fixed' );
+		expect( divider.borderWidth ).toBe( 1 );
+		// The divider sits exactly at the boundary of the reserved space.
+		expect( divider.insetInlineEnd ).toBe( divider.reservedWidth );
+		// Semi-transparent, derived from the canvas text color.
+		expect( divider.borderColor ).toMatch( /rgba\(|color\(|color-mix\(/ );
+	} );
+
 	test( 'floating note is centered in the space reserved beside full-width content', async ( {
 		editor,
 		page,

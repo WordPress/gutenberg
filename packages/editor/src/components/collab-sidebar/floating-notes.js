@@ -129,17 +129,26 @@ export function FloatingNotes( { notes, sidebarRef } ) {
 	// it keeps the canvas background color and leaves the scrollbar at the
 	// window edge. `overflow-x: clip` on the body stops full-bleed content
 	// (e.g. `alignfull`, which escapes root padding with negative margins or
-	// viewport units) from rendering under the reserved space. Injected with
-	// `useStyleOverride` so it reaches the iframed canvas (and is scoped to
-	// `.editor-styles-wrapper` for non-iframed canvases); logical properties
-	// keep it on the correct physical side in RTL. No space is reserved in
-	// the device preview: padding inside the simulated canvas would distort
-	// the previewed layout, and the notes float over the backdrop instead.
+	// viewport units) from rendering under the reserved space. A thin divider
+	// (`body::after`) marks the boundary between the content column and the
+	// reserved space, per the design mockups; drawn at 10% `currentColor` so
+	// it picks up the theme's text color and stays visible on dark themes.
+	// Injected with `useStyleOverride` so it reaches the iframed canvas (and
+	// is scoped to `.editor-styles-wrapper` for non-iframed canvases);
+	// logical properties keep it on the correct physical side in RTL. No
+	// space is reserved in the device preview: padding inside the simulated
+	// canvas would distort the previewed layout, and the notes float over
+	// the backdrop instead.
 	useStyleOverride( {
 		id: 'core-note-reserved-space',
 		css:
 			hasRoom && ! isDevicePreview
-				? `:root{padding-inline-end:${ NOTES_PANEL_WIDTH }px}body{overflow-x:clip}`
+				? `:root{padding-inline-end:${ NOTES_PANEL_WIDTH }px}` +
+				  `body{overflow-x:clip}` +
+				  `body::after{content:"";position:fixed;top:0;bottom:0;` +
+				  `inset-inline-end:${ NOTES_PANEL_WIDTH }px;` +
+				  `border-inline-start:1px solid color-mix(in srgb, currentColor 10%, transparent);` +
+				  `pointer-events:none}`
 				: '',
 	} );
 
