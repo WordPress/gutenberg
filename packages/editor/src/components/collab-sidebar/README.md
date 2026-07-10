@@ -28,7 +28,7 @@ collab-sidebar/
 ├── hooks.js                        useNoteThreads, useNoteActions, useFloatingBoard
 ├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
 ├── board-store.js                  createBoardStore - ResizeObserver + ref registry for floating layout
-├── constants.js                    sidebar identifier strings
+├── constants.js                    sidebar identifier, panel width, canvas-width threshold
 ├── style.scss
 └── test/
     └── utils.js
@@ -58,7 +58,9 @@ NotesSidebarContainer (index.js)         - gates on post type support
 
 `Notes` is reused for both surfaces. The only visual difference is driven by `isFloating` (whether to layer threads over the canvas or stack them in a panel).
 
-`FloatingNotes` renders through a `FloatingNotesSlot` placed by `VisualEditor` inside `.editor-visual-editor`, and reserves matching space inside the canvas document (`padding-right` on its `html` element) so content never flows under the panel. Because the space lives inside the canvas, it keeps the canvas background and leaves the canvas scrollbar at the window edge.
+`FloatingNotes` renders through a `FloatingNotesSlot` placed by `VisualEditor` inside `.editor-visual-editor`, and reserves matching space inside the canvas document (`padding-inline-end` on its root, injected with `useStyleOverride` so it reaches the iframed canvas) so content never flows under the panel. Because the space lives inside the canvas, it keeps the canvas background and leaves the canvas scrollbar at the window edge.
+
+The canvas is freely resizable, so a wide viewport can still hold a narrow canvas. Below `MIN_CANVAS_WIDTH_FOR_FLOATING_NOTES` the reserved space would crowd out the content column, so the reservation is released and the panel hides; the "All notes" sidebar remains the surface. In the device preview no space is reserved - padding inside the simulated canvas would distort the previewed layout - so the notes float over the backdrop beside it and size to the editor container rather than the canvas.
 
 ## Floating board
 
