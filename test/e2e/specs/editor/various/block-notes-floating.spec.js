@@ -8,7 +8,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  * rather than as a layout-occupying sidebar. See #73917 and the design
  * discussion in #66377 / #77484.
  */
-test.describe( 'Notes canvas layout', () => {
+test.describe( 'Block Notes: floating panel', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
