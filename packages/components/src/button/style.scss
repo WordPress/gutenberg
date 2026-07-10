@@ -12,7 +12,7 @@
  */
 
 .components-button {
-	&:focus:not(:active) {
+	&:focus {
 		@include mixins.outset-ring__focus();
 	}
 
