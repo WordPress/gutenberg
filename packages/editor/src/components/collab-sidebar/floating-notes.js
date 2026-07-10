@@ -20,6 +20,12 @@ import {
 export const { Slot: FloatingNotesSlot, Fill: FloatingNotesFill } =
 	createSlotFill( Symbol( 'EditorFloatingNotes' ) );
 
+// The boundary divider sits this far inside the reserved space, so content
+// clipped at the boundary (e.g. full-bleed blocks) keeps a visible gap from
+// the line.
+const DIVIDER_GAP = 8;
+const DIVIDER_WIDTH = 1;
+
 /**
  * Measures the width of the editor canvas and of the surrounding editor
  * container, and keeps the floating notes overlay aligned with the visible
@@ -130,11 +136,15 @@ export function FloatingNotes( { notes, sidebarRef } ) {
 	// window edge. `overflow-x: clip` on the body stops full-bleed content
 	// (e.g. `alignfull`, which escapes root padding with negative margins or
 	// viewport units) from rendering under the reserved space. A thin divider
-	// (`body::after`) marks the boundary between the content column and the
+	// (`:root::after`) marks the boundary between the content column and the
 	// reserved space, per the design mockups; drawn at 10% `currentColor` so
-	// it picks up the theme's text color and stays visible on dark themes.
-	// Injected with `useStyleOverride` so it reaches the iframed canvas (and
-	// is scoped to `.editor-styles-wrapper` for non-iframed canvases);
+	// it picks up the canvas text color. It hangs off the root, not the body:
+	// the body's overflow clip constrains even fixed-position pseudo-elements,
+	// cutting the line short. Fixed positioning keeps it spanning the visible
+	// canvas top to bottom at every scroll position, and the inset leaves a
+	// gap so full-bleed content clipped at the boundary never touches the
+	// line. Injected with `useStyleOverride` so it reaches the iframed canvas
+	// (and is scoped to `.editor-styles-wrapper` for non-iframed canvases);
 	// logical properties keep it on the correct physical side in RTL. No
 	// space is reserved in the device preview: padding inside the simulated
 	// canvas would distort the previewed layout, and the notes float over
@@ -145,9 +155,12 @@ export function FloatingNotes( { notes, sidebarRef } ) {
 			hasRoom && ! isDevicePreview
 				? `:root{padding-inline-end:${ NOTES_PANEL_WIDTH }px}` +
 				  `body{overflow-x:clip}` +
-				  `body::after{content:"";position:fixed;top:0;bottom:0;` +
-				  `inset-inline-end:${ NOTES_PANEL_WIDTH }px;` +
-				  `border-inline-start:1px solid color-mix(in srgb, currentColor 10%, transparent);` +
+				  `:root::after{content:"";position:fixed;top:0;bottom:0;` +
+				  `inset-inline-end:${
+						NOTES_PANEL_WIDTH - DIVIDER_GAP - DIVIDER_WIDTH
+				  }px;` +
+				  `width:${ DIVIDER_WIDTH }px;` +
+				  `background:color-mix(in srgb, currentColor 10%, transparent);` +
 				  `pointer-events:none}`
 				: '',
 	} );
