@@ -291,17 +291,6 @@ export function getResponsiveLayoutStyles( {
 		.join( '' );
 }
 
-export function getLayoutToolbarControlGroup(
-	isResponsiveEditing,
-	selectedState
-) {
-	return isResponsiveEditing &&
-		hasViewportBlockStyleState( selectedState ) &&
-		! hasPseudoBlockStyleState( selectedState )
-		? 'style-state'
-		: 'block';
-}
-
 function LayoutPanelPure( {
 	layout,
 	style,
@@ -591,10 +580,13 @@ function LayoutPanelPure( {
 					layout={ usedLayout }
 					onChange={ onChangeLayout }
 					layoutBlockSupport={ layoutBlockSupport }
-					controlsGroup={ getLayoutToolbarControlGroup(
-						isResponsiveEditing,
-						selectedState
-					) }
+					controlsGroup={
+						isResponsiveEditing &&
+						hasViewportBlockStyleState( selectedState ) &&
+						! hasPseudoBlockStyleState( selectedState )
+							? 'style-state'
+							: 'block'
+					}
 					name={ blockName }
 					clientId={ clientId }
 				/>

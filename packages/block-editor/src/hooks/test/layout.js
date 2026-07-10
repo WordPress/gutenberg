@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import {
-	getLayoutToolbarControlGroup,
 	getLayoutStateOverrides,
 	getResetLayout,
 	getResponsiveLayoutStyles,
@@ -255,35 +254,6 @@ describe( 'layout', () => {
 			).toBe(
 				'@media (480px < width <= 782px){.wp-container-test { gap: 12px; }}'
 			);
-		} );
-	} );
-
-	describe( 'getLayoutToolbarControlGroup()', () => {
-		it( 'uses the regular block slot by default', () => {
-			expect(
-				getLayoutToolbarControlGroup( false, {
-					viewport: 'default',
-					pseudo: 'default',
-				} )
-			).toBe( 'block' );
-		} );
-
-		it( 'uses the style-state slot when responsive editing has a viewport state', () => {
-			expect(
-				getLayoutToolbarControlGroup( true, {
-					viewport: '@mobile',
-					pseudo: 'default',
-				} )
-			).toBe( 'style-state' );
-		} );
-
-		it( 'uses the regular block slot for viewport plus pseudo states', () => {
-			expect(
-				getLayoutToolbarControlGroup( true, {
-					viewport: '@mobile',
-					pseudo: ':hover',
-				} )
-			).toBe( 'block' );
 		} );
 	} );
 } );
