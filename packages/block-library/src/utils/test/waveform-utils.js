@@ -8,6 +8,7 @@ import '@testing-library/jest-dom';
  */
 import {
 	createWaveformContainer,
+	getWaveformColors,
 	styleSvgIcons,
 	setupPlayButtonAccessibility,
 	updateSeekControlLabel,
@@ -23,6 +24,29 @@ const basePlayerData = {
 };
 
 describe( 'Waveform utilities', () => {
+	describe( 'getWaveformColors', () => {
+		afterEach( () => {
+			document.body.innerHTML = '';
+		} );
+
+		it( 'uses a custom waveform color when provided', () => {
+			const element = document.createElement( 'div' );
+			element.style.color = 'rgb(10, 20, 30)';
+			element.style.setProperty(
+				'--wp--playlist-player--waveform-color',
+				'#ff0000'
+			);
+			document.body.appendChild( element );
+
+			expect( getWaveformColors( element ) ).toEqual( {
+				textColor: 'rgb(10, 20, 30)',
+				waveformColor: 'rgba(255, 0, 0, 0.3)',
+				progressColor: '#ff0000',
+				buttonColor: '#ff0000',
+			} );
+		} );
+	} );
+
 	describe( 'createWaveformContainer', () => {
 		it( 'should create a container with required data attributes', () => {
 			const container = createWaveformContainer( basePlayerData );

@@ -1,0 +1,66 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"__experimental": true,
+	"name": "core/playlist-tracklist",
+	"title": "Playlist tracklist",
+	"category": "media",
+	"parent": [ "core/playlist" ],
+	"description": "Playlist tracklist.",
+	"keywords": [ "music", "sound" ],
+	"textdomain": "default",
+	"allowedBlocks": [ "core/playlist-track" ],
+	"attributes": {
+		"order": {
+			"type": "string",
+			"default": "asc"
+		},
+		"showImages": {
+			"type": "boolean",
+			"default": true
+		},
+		"showArtists": {
+			"type": "boolean",
+			"default": true
+		},
+		"showNumbers": {
+			"type": "boolean",
+			"default": true
+		},
+		"showTrackLength": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"providesContext": {
+		"showArtists": "showArtists",
+		"showImages": "showImages"
+	},
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"color": {
+			"background": true,
+			"text": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"typography": {
+			"fontSize": true
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": true,
+				"padding": true
+			}
+		},
+		"dimensions": {
+			"minHeight": true
+		}
+	},
+	"style": "wp-block-playlist-tracklist"
+}

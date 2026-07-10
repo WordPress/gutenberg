@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -31,11 +31,13 @@ jest.mock( '@wordpress/block-editor', () => ( {
 		withoutInteractiveFormatting,
 		...props
 	} ) => <TagName { ...props }>{ value || placeholder }</TagName>,
+	store: 'core/block-editor',
 	useBlockProps: jest.fn( () => ( {} ) ),
 } ) );
 
 jest.mock( '@wordpress/data', () => ( {
 	useDispatch: jest.fn(),
+	useSelect: jest.fn(),
 	combineReducers: jest.fn( ( reducers ) => ( state = {}, action ) => {
 		const newState = {};
 		Object.keys( reducers ).forEach( ( key ) => {
@@ -68,6 +70,8 @@ const defaultAttributes = {
 	title: 'Song One',
 };
 
+const updateBlockAttributes = jest.fn();
+
 function renderEdit( props = {} ) {
 	const setAttributes = jest.fn();
 
@@ -84,7 +88,7 @@ function renderEdit( props = {} ) {
 				...props.context,
 			} }
 			clientId="playlist-track-client-id"
-			isSelected={ false }
+			isSelected={ props.isSelected ?? false }
 		/>
 	);
 
@@ -93,9 +97,13 @@ function renderEdit( props = {} ) {
 
 describe( 'PlaylistTrackEdit', () => {
 	beforeEach( () => {
-		useDispatch.mockReturnValue( {
-			createErrorNotice: jest.fn(),
-		} );
+		updateBlockAttributes.mockClear();
+		useDispatch.mockImplementation( ( store ) =>
+			store === 'core/block-editor'
+				? { updateBlockAttributes }
+				: { createErrorNotice: jest.fn() }
+		);
+		useSelect.mockReturnValue( [] );
 	} );
 
 	it( 'allows the album cover alternative text to be edited', () => {
@@ -133,5 +141,55 @@ describe( 'PlaylistTrackEdit', () => {
 		expect(
 			screen.queryByLabelText( 'Alternative text' )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'syncs selected track spacing and dimensions to sibling tracks', async () => {
+		const sharedStyle = {
+			spacing: {
+				padding: {
+					top: '1rem',
+					bottom: '1rem',
+				},
+				margin: {
+					top: '0.5rem',
+				},
+			},
+			dimensions: {
+				minHeight: '80px',
+			},
+		};
+
+		useSelect.mockReturnValue( [
+			{
+				clientId: 'playlist-track-client-id',
+				style: sharedStyle,
+			},
+			{
+				clientId: 'sibling-track-client-id',
+				style: {
+					spacing: {
+						padding: {
+							top: '0.25rem',
+						},
+					},
+				},
+			},
+		] );
+
+		renderEdit( {
+			attributes: {
+				style: sharedStyle,
+			},
+			isSelected: true,
+		} );
+
+		await waitFor( () =>
+			expect( updateBlockAttributes ).toHaveBeenCalledWith(
+				'sibling-track-client-id',
+				{
+					style: sharedStyle,
+				}
+			)
+		);
 	} );
 } );

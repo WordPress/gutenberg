@@ -33,11 +33,21 @@ function getComputedStyle( element ) {
  * @return {Object} Object containing textColor, waveformColor, progressColor.
  */
 export function getWaveformColors( element ) {
-	const textColor = getComputedStyle( element ).color;
-	const waveformColor = colord( textColor ).alpha( 0.3 ).toRgbString();
-	const progressColor = colord( textColor ).alpha( 0.6 ).toRgbString();
+	const styles = getComputedStyle( element );
+	const textColor = styles.color;
+	const customWaveformColor = styles
+		.getPropertyValue( '--wp--playlist-player--waveform-color' )
+		.trim();
+	const waveformBaseColor = customWaveformColor || textColor;
+	const waveformColor = colord( waveformBaseColor )
+		.alpha( 0.3 )
+		.toRgbString();
+	const progressColor = customWaveformColor
+		? waveformBaseColor
+		: colord( waveformBaseColor ).alpha( 0.6 ).toRgbString();
+	const buttonColor = customWaveformColor || textColor;
 
-	return { textColor, waveformColor, progressColor };
+	return { textColor, waveformColor, progressColor, buttonColor };
 }
 
 /**
@@ -233,7 +243,7 @@ export function initWaveformPlayer(
 	}
 ) {
 	// Get colors from computed styles.
-	const { textColor, waveformColor, progressColor } =
+	const { waveformColor, progressColor, buttonColor } =
 		getWaveformColors( element );
 
 	// Create the waveform container.
@@ -244,7 +254,7 @@ export function initWaveformPlayer(
 		artwork: image,
 		waveformColor,
 		progressColor,
-		buttonColor: textColor,
+		buttonColor,
 		seekLabel: title || labels?.seek,
 		seekValueText: labels?.seekValueText,
 		waveformStyle,
