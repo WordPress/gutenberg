@@ -36,9 +36,7 @@ function registerTestFormatType(
 }
 
 function getTextbox( container: HTMLElement ) {
-	return container.querySelector< HTMLElement >(
-		'.wp-components-content-editable-control'
-	)!;
+	return container.querySelector< HTMLElement >( '[role="textbox"]' )!;
 }
 
 /*

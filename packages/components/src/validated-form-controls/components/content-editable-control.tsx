@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useMergeRefs } from '@wordpress/compose';
@@ -22,6 +27,7 @@ const UnforwardedValidatedContentEditableControl = (
 		customValidity,
 		markWhenOptional,
 		value,
+		className,
 		...restProps
 	}: React.ComponentProps< typeof ContentEditableControl > &
 		ValidatedControlProps & {
@@ -53,6 +59,10 @@ const UnforwardedValidatedContentEditableControl = (
 			>
 				<ContentEditableControl
 					ref={ mergedRefs }
+					className={ clsx(
+						'components-validated-control__content-editable',
+						className
+					) }
 					aria-invalid={
 						customValidity?.type === 'invalid' || undefined
 					}
