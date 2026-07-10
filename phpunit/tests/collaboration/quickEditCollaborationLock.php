@@ -78,6 +78,21 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 		$this->assertSame( self::$admin_id, gutenberg_get_active_edit_lock_user( self::$post_id ), 'A fresh lock should return its holder.' );
 	}
 
+	public function test_deleted_user_lock_is_treated_as_inactive() {
+		$deleted_user_id = self::factory()->user->create();
+		wp_delete_user( $deleted_user_id );
+		$this->set_edit_lock( $deleted_user_id );
+
+		$this->assertSame( 0, gutenberg_get_active_edit_lock_user( self::$post_id ), 'A lock from a deleted user should be inactive.' );
+
+		$this->prime_inline_save_request();
+		$before = $this->shutdown_callback_count();
+
+		gutenberg_block_quick_edit_for_active_lock();
+
+		$this->assertGreaterThan( $before, $this->shutdown_callback_count(), 'Quick Edit should proceed and schedule lock cleanup.' );
+	}
+
 	public function test_heartbeat_marks_only_fresh_own_locks() {
 		$key  = 'post-' . self::$post_id;
 		$data = array( 'wp-check-locked-posts' => array( $key ) );

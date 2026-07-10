@@ -258,11 +258,11 @@ if ( ! function_exists( 'gutenberg_get_active_edit_lock_user' ) ) {
 		$time = (int) $lock[0];
 		$user = isset( $lock[1] ) ? (int) $lock[1] : (int) get_post_meta( $post_id, '_edit_last', true );
 
-		if ( ! $time || ! $user ) {
+		if ( ! $time || ! $user || ! get_userdata( $user ) ) {
 			return 0;
 		}
 
-		/** This filter is documented in wp-admin/includes/post.php */
+		/** This filter is documented in wp-admin/includes/ajax-actions.php */
 		$time_window = apply_filters( 'wp_check_post_lock_window', 150 );
 
 		if ( $time > time() - $time_window ) {
