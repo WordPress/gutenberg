@@ -1496,9 +1496,9 @@ test.describe( 'Block Notes', () => {
 					name: /^(Hide|Minimize|Expand) notes/,
 				} )
 			).toHaveText( [
-				/^Hide notes/,
-				/^Minimize notes/,
 				/^Expand notes/,
+				/^Minimize notes/,
+				/^Hide notes/,
 			] );
 			// The floating notes are visible by default, so "Expand notes" is
 			// the selected choice. The accessible name includes the keyboard

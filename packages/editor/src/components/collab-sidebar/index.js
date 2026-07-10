@@ -270,9 +270,9 @@ function NotesSidebar( { postId } ) {
 							<MenuItemsChoice
 								choices={ [
 									{
-										value: 'hide',
-										label: __( 'Hide notes' ),
-										shortcut: notesShortcuts.hide,
+										value: 'show',
+										label: __( 'Expand notes' ),
+										shortcut: notesShortcuts.show,
 									},
 									{
 										value: 'minimize',
@@ -280,9 +280,9 @@ function NotesSidebar( { postId } ) {
 										shortcut: notesShortcuts.minimize,
 									},
 									{
-										value: 'show',
-										label: __( 'Expand notes' ),
-										shortcut: notesShortcuts.show,
+										value: 'hide',
+										label: __( 'Hide notes' ),
+										shortcut: notesShortcuts.hide,
 									},
 								] }
 								value={ notesDisplayMode }
