@@ -86,7 +86,6 @@ function render_block_core_calendar( $attributes ) {
 			if ( ! empty( $classnames ) ) {
 				$processor->add_class( $classnames );
 			}
-
 		}
 
 		// Add border classes and inline styles to all table header th and data td cells.
