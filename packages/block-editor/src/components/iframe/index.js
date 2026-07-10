@@ -322,6 +322,7 @@ function Iframe( {
 				tabIndex={ tabIndex }
 				src={ src }
 				title={ title }
+				role="application"
 				onKeyDown={ ( event ) => {
 					if ( props.onKeyDown ) {
 						props.onKeyDown( event );
