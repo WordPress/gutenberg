@@ -35,10 +35,11 @@ function block_core_table_of_contents_add_aria_label( $attributes, $content ) {
  *
  * @param array $block     Parsed heading block.
  * @param int   $max_level Maximum heading level to include.
+ * @param array $context   Heading resolution context.
  *
  * @return array|null Heading data, or null when the heading should be skipped.
  */
-function block_core_table_of_contents_get_heading_from_block( $block, $max_level ) {
+function block_core_table_of_contents_get_heading_from_block( $block, $max_level, $context = array() ) {
 	if ( ! is_array( $block ) ) {
 		return null;
 	}
@@ -75,34 +76,59 @@ function block_core_table_of_contents_get_heading_from_block( $block, $max_level
 	return array(
 		'content' => $content,
 		'level'   => $level,
-		'link'    => '' !== $id ? '#' . $id : '',
+		'link'    => block_core_table_of_contents_get_heading_link( $id, $context ),
 	);
+}
+
+/**
+ * Gets the link for a heading.
+ *
+ * @param string $id      Heading id.
+ * @param array  $context Heading resolution context.
+ *
+ * @return string Heading link.
+ */
+function block_core_table_of_contents_get_heading_link( $id, $context = array() ) {
+	if ( '' === $id ) {
+		return '';
+	}
+
+	if ( empty( $context['is_paginated'] ) || empty( $context['permalink'] ) ) {
+		return '#' . $id;
+	}
+
+	$page      = isset( $context['current_page'] ) ? max( 1, (int) $context['current_page'] ) : 1;
+	$permalink = remove_query_arg( 'page', $context['permalink'] );
+
+	if ( 1 < $page ) {
+		$permalink = add_query_arg( 'page', $page, $permalink );
+	}
+
+	return $permalink . '#' . $id;
 }
 
 /**
  * Gets the post content for a synced pattern block.
  *
  * @param array $attributes Synced pattern block attributes.
- * @param array $seen       Already visited block references.
  *
  * @return string The synced pattern content.
  */
-function block_core_table_of_contents_get_synced_pattern_content( $attributes, &$seen ) {
+function block_core_table_of_contents_get_synced_pattern_content( $attributes ) {
 	if ( empty( $attributes['ref'] ) ) {
 		return '';
 	}
 
-	$ref = (int) $attributes['ref'];
-	if ( isset( $seen['core/block'][ $ref ] ) ) {
-		return '';
-	}
-
+	$ref     = (int) $attributes['ref'];
 	$pattern = get_post( $ref );
-	if ( ! $pattern || 'wp_block' !== $pattern->post_type ) {
+	if (
+		! $pattern ||
+		'wp_block' !== $pattern->post_type ||
+		'publish' !== $pattern->post_status ||
+		! empty( $pattern->post_password )
+	) {
 		return '';
 	}
-
-	$seen['core/block'][ $ref ] = true;
 
 	return $pattern->post_content;
 }
@@ -111,32 +137,100 @@ function block_core_table_of_contents_get_synced_pattern_content( $attributes, &
  * Gets the content for a template part block.
  *
  * @param array $attributes Template part block attributes.
- * @param array $seen       Already visited template part references.
  *
- * @return string The template part content.
+ * @return string Template part id.
  */
-function block_core_table_of_contents_get_template_part_content( $attributes, &$seen ) {
+function block_core_table_of_contents_get_template_part_id( $attributes ) {
 	if ( empty( $attributes['slug'] ) ) {
 		return '';
 	}
 
-	$theme       = empty( $attributes['theme'] )
+	$theme = empty( $attributes['theme'] )
 		? get_stylesheet()
 		: $attributes['theme'];
-	$template_id = $theme . '//' . $attributes['slug'];
 
-	if ( isset( $seen['core/template-part'][ $template_id ] ) ) {
+	return $theme . '//' . $attributes['slug'];
+}
+
+/**
+ * Gets the content for a template part block.
+ *
+ * @param array $attributes Template part block attributes.
+ *
+ * @return string The template part content.
+ */
+function block_core_table_of_contents_get_template_part_content( $attributes ) {
+	if ( empty( $attributes['slug'] ) ) {
 		return '';
 	}
 
-	$template_part = get_block_template( $template_id, 'wp_template_part' );
-	if ( ! $template_part || empty( $template_part->content ) ) {
+	$theme = empty( $attributes['theme'] )
+		? get_stylesheet()
+		: $attributes['theme'];
+
+	if ( get_stylesheet() !== $theme ) {
 		return '';
 	}
 
-	$seen['core/template-part'][ $template_id ] = true;
+	$template_part_query = new WP_Query(
+		array(
+			'post_type'           => 'wp_template_part',
+			'post_status'         => 'publish',
+			'post_name__in'       => array( $attributes['slug'] ),
+			'tax_query'           => array(
+				array(
+					'taxonomy' => 'wp_theme',
+					'field'    => 'name',
+					'terms'    => $theme,
+				),
+			),
+			'posts_per_page'      => 1,
+			'no_found_rows'       => true,
+			'lazy_load_term_meta' => false,
+		)
+	);
+	$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
+	if ( $template_part_post ) {
+		return $template_part_post->post_content;
+	}
 
-	return $template_part->content;
+	if (
+		! function_exists( 'get_block_file_template' ) ||
+		0 !== validate_file( $attributes['slug'] )
+	) {
+		return '';
+	}
+
+	$template_part = get_block_file_template(
+		block_core_table_of_contents_get_template_part_id( $attributes ),
+		'wp_template_part'
+	);
+	if ( isset( $template_part->content ) ) {
+		return $template_part->content;
+	}
+
+	return '';
+}
+
+/**
+ * Normalizes raw page break comments so the block processor can see them.
+ *
+ * @param string $content Serialized block content.
+ *
+ * @return string Content with page breaks wrapped as nextpage blocks.
+ */
+function block_core_table_of_contents_normalize_nextpage_blocks( $content ) {
+	$content = preg_replace(
+		'/<!--\s+wp:(?:core\/)?nextpage\s+-->\s*<!--nextpage-->\s*<!--\s+\/wp:(?:core\/)?nextpage\s+-->/',
+		'<!--nextpage-->',
+		$content
+	);
+
+	return str_replace(
+		'<!--nextpage-->',
+		'<!-- wp:nextpage --><!--nextpage--><!-- /wp:nextpage -->',
+		$content
+	);
 }
 
 /**
@@ -145,10 +239,11 @@ function block_core_table_of_contents_get_template_part_content( $attributes, &$
  * @param string $content   Block content to scan.
  * @param int    $max_level Maximum heading level to include.
  * @param array  $seen      Already visited references.
+ * @param array  $context   Heading resolution context.
  *
  * @return array Heading data.
  */
-function block_core_table_of_contents_get_headings_from_content( $content, $max_level = 0, $seen = array() ) {
+function block_core_table_of_contents_get_headings_from_content( $content, $max_level = 0, $seen = array(), $context = array() ) {
 	if ( ! class_exists( 'WP_Block_Processor' ) || '' === trim( $content ) ) {
 		return array();
 	}
@@ -160,15 +255,66 @@ function block_core_table_of_contents_get_headings_from_content( $content, $max_
 		$seen['core/template-part'] = array();
 	}
 
+	$context = wp_parse_args(
+		$context,
+		array(
+			'current_page'              => 1,
+			'is_paginated'              => false !== strpos( $content, '<!--nextpage-->' ),
+			'only_include_current_page' => false,
+			'permalink'                 => '',
+			'target_page'               => 1,
+		)
+	);
+	$context = array(
+		'current_page'              => max( 1, (int) $context['current_page'] ),
+		'is_paginated'              => ! empty( $context['is_paginated'] ),
+		'only_include_current_page' => ! empty( $context['only_include_current_page'] ),
+		'permalink'                 => $context['permalink'],
+		'target_page'               => max( 1, (int) $context['target_page'] ),
+	);
+
+	return block_core_table_of_contents_collect_headings_from_content( $content, $max_level, $seen, $context );
+}
+
+/**
+ * Collects heading data from block content.
+ *
+ * @param string $content   Block content to scan.
+ * @param int    $max_level Maximum heading level to include.
+ * @param array  $seen      Already visited references.
+ * @param array  $context   Heading resolution context.
+ *
+ * @return array Heading data.
+ */
+function block_core_table_of_contents_collect_headings_from_content( $content, $max_level, &$seen, &$context ) {
+	if ( '' === trim( $content ) ) {
+		return array();
+	}
+
+	$content   = block_core_table_of_contents_normalize_nextpage_blocks( $content );
 	$headings  = array();
 	$processor = new WP_Block_Processor( $content );
 
 	while ( $processor->next_block() ) {
 		$block_type = $processor->get_block_type();
 
+		if ( 'core/nextpage' === $block_type ) {
+			++$context['current_page'];
+			continue;
+		}
+
+		$include_current_page = (
+			empty( $context['only_include_current_page'] ) ||
+			$context['current_page'] === $context['target_page']
+		);
+
 		if ( 'core/heading' === $block_type ) {
+			if ( ! $include_current_page ) {
+				continue;
+			}
+
 			$block   = $processor->extract_full_block_and_advance();
-			$heading = block_core_table_of_contents_get_heading_from_block( $block, $max_level );
+			$heading = block_core_table_of_contents_get_heading_from_block( $block, $max_level, $context );
 
 			if ( $heading ) {
 				$headings[] = $heading;
@@ -178,28 +324,66 @@ function block_core_table_of_contents_get_headings_from_content( $content, $max_
 		}
 
 		if ( 'core/block' === $block_type ) {
+			if ( ! $include_current_page ) {
+				continue;
+			}
+
 			$attributes = $processor->allocate_and_return_parsed_attributes() ?? array();
-			$headings   = array_merge(
+			$ref        = empty( $attributes['ref'] ) ? 0 : (int) $attributes['ref'];
+			if ( ! $ref || isset( $seen['core/block'][ $ref ] ) ) {
+				continue;
+			}
+
+			$referenced_content = block_core_table_of_contents_get_synced_pattern_content( $attributes );
+			if ( '' === $referenced_content ) {
+				continue;
+			}
+
+			$seen['core/block'][ $ref ] = true;
+			$referenced_context         = $context;
+
+			$headings = array_merge(
 				$headings,
-				block_core_table_of_contents_get_headings_from_content(
-					block_core_table_of_contents_get_synced_pattern_content( $attributes, $seen ),
+				block_core_table_of_contents_collect_headings_from_content(
+					$referenced_content,
 					$max_level,
-					$seen
+					$seen,
+					$referenced_context
 				)
 			);
+			unset( $seen['core/block'][ $ref ] );
 			continue;
 		}
 
 		if ( 'core/template-part' === $block_type ) {
-			$attributes = $processor->allocate_and_return_parsed_attributes() ?? array();
-			$headings   = array_merge(
+			if ( ! $include_current_page ) {
+				continue;
+			}
+
+			$attributes  = $processor->allocate_and_return_parsed_attributes() ?? array();
+			$template_id = block_core_table_of_contents_get_template_part_id( $attributes );
+			if ( '' === $template_id || isset( $seen['core/template-part'][ $template_id ] ) ) {
+				continue;
+			}
+
+			$referenced_content = block_core_table_of_contents_get_template_part_content( $attributes );
+			if ( '' === $referenced_content ) {
+				continue;
+			}
+
+			$seen['core/template-part'][ $template_id ] = true;
+			$referenced_context                         = $context;
+
+			$headings = array_merge(
 				$headings,
-				block_core_table_of_contents_get_headings_from_content(
-					block_core_table_of_contents_get_template_part_content( $attributes, $seen ),
+				block_core_table_of_contents_collect_headings_from_content(
+					$referenced_content,
 					$max_level,
-					$seen
+					$seen,
+					$referenced_context
 				)
 			);
+			unset( $seen['core/template-part'][ $template_id ] );
 		}
 	}
 
@@ -221,9 +405,77 @@ function block_core_table_of_contents_current_template_has_post_content() {
 		return false;
 	}
 
-	$processor = new WP_Block_Processor( $_wp_current_template_content );
+	$seen = array(
+		'core/template-part' => array(),
+	);
 
-	return $processor->next_block( 'core/post-content' );
+	return block_core_table_of_contents_template_content_has_post_content( $_wp_current_template_content, $seen );
+}
+
+/**
+ * Checks whether template content contains a Post Content block.
+ *
+ * @param string $content Template content to scan.
+ * @param array  $seen    Already visited template part references.
+ *
+ * @return bool Whether the content contains a Post Content block.
+ */
+function block_core_table_of_contents_template_content_has_post_content( $content, &$seen ) {
+	if ( '' === trim( $content ) ) {
+		return false;
+	}
+
+	$processor = new WP_Block_Processor( $content );
+
+	while ( $processor->next_block() ) {
+		$block_type = $processor->get_block_type();
+
+		if ( 'core/post-content' === $block_type ) {
+			return true;
+		}
+
+		if ( 'core/template-part' !== $block_type ) {
+			continue;
+		}
+
+		$attributes  = $processor->allocate_and_return_parsed_attributes() ?? array();
+		$template_id = block_core_table_of_contents_get_template_part_id( $attributes );
+
+		if ( '' === $template_id || isset( $seen['core/template-part'][ $template_id ] ) ) {
+			continue;
+		}
+
+		$template_part_content = block_core_table_of_contents_get_template_part_content( $attributes );
+		if ( '' === $template_part_content ) {
+			continue;
+		}
+
+		$seen['core/template-part'][ $template_id ] = true;
+		$has_post_content                           = block_core_table_of_contents_template_content_has_post_content( $template_part_content, $seen );
+		unset( $seen['core/template-part'][ $template_id ] );
+
+		if ( $has_post_content ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Gets the current page number for paginated post content.
+ *
+ * @return int Current page number.
+ */
+function block_core_table_of_contents_get_current_page_number() {
+	global $page;
+
+	$current_page = (int) get_query_var( 'page' );
+	if ( ! $current_page && isset( $page ) ) {
+		$current_page = (int) $page;
+	}
+
+	return max( 1, $current_page );
 }
 
 /**
@@ -348,8 +600,17 @@ function block_core_table_of_contents_render( $attributes, $content ) {
 		return '';
 	}
 
-	$max_level = isset( $attributes['maxLevel'] ) ? (int) $attributes['maxLevel'] : 0;
-	$headings  = block_core_table_of_contents_get_headings_from_content( $post->post_content, $max_level );
+	$max_level    = isset( $attributes['maxLevel'] ) ? (int) $attributes['maxLevel'] : 0;
+	$current_page = block_core_table_of_contents_get_current_page_number();
+	$seen         = array();
+	$context      = array(
+		'current_page'              => 1,
+		'is_paginated'              => false !== strpos( $post->post_content, '<!--nextpage-->' ),
+		'only_include_current_page' => ! empty( $attributes['onlyIncludeCurrentPage'] ),
+		'permalink'                 => get_permalink( $post ),
+		'target_page'               => $current_page,
+	);
+	$headings     = block_core_table_of_contents_get_headings_from_content( $post->post_content, $max_level, $seen, $context );
 
 	if ( empty( $headings ) ) {
 		return '';

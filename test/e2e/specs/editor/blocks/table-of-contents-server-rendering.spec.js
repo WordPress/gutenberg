@@ -460,87 +460,87 @@ test.describe( 'Table of Contents server rendering', () => {
 		).toHaveCount( 0 );
 	} );
 
-	test.fixme(
-		'renders only current-page headings when placed in paginated post content and onlyIncludeCurrentPage is true',
-		async ( { page, requestUtils } ) => {
-			const post = await requestUtils.createPost( {
-				title: 'TOC paginated post content',
-				status: 'publish',
-				content: [
-					headingBlock( {
-						anchor: 'page-one-heading',
-						content: 'Page one heading',
-						level: 2,
-					} ),
-					'<!--nextpage-->',
-					tableOfContentsBlock( {
-						onlyIncludeCurrentPage: true,
-					} ),
-					headingBlock( {
-						anchor: 'page-two-heading',
-						content: 'Page two heading',
-						level: 2,
-					} ),
-				].join( '\n' ),
-			} );
+	test( 'renders only current-page headings when placed in paginated post content and onlyIncludeCurrentPage is true', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'TOC paginated post content',
+			status: 'publish',
+			content: [
+				headingBlock( {
+					anchor: 'page-one-heading',
+					content: 'Page one heading',
+					level: 2,
+				} ),
+				'<!--nextpage-->',
+				tableOfContentsBlock( {
+					onlyIncludeCurrentPage: true,
+				} ),
+				headingBlock( {
+					anchor: 'page-two-heading',
+					content: 'Page two heading',
+					level: 2,
+				} ),
+			].join( '\n' ),
+		} );
 
-			await page.goto( `/?p=${ post.id }&page=2` );
+		await page.goto( `/?p=${ post.id }&page=2` );
 
-			const tableOfContents = getTableOfContents( page );
-			await expect(
-				tableOfContents.getByRole( 'link', {
-					name: 'Page two heading',
-				} )
-			).toHaveAttribute( 'href', '#page-two-heading' );
-			await expect(
-				tableOfContents.getByText( 'Page one heading' )
-			).toHaveCount( 0 );
-		}
-	);
+		const tableOfContents = getTableOfContents( page );
+		await expect(
+			tableOfContents.getByRole( 'link', {
+				name: 'Page two heading',
+			} )
+		).toHaveAttribute( 'href', /[?&]page=2#page-two-heading$/ );
+		await expect(
+			tableOfContents.getByText( 'Page one heading' )
+		).toHaveCount( 0 );
+	} );
 
-	test.fixme(
-		'renders only current-page headings when placed in a Template and onlyIncludeCurrentPage is true',
-		async ( { page, requestUtils } ) => {
-			await requestUtils.createTemplate( 'wp_template', {
-				slug: 'singular',
-				title: 'Single Posts',
-				content: [
-					tableOfContentsBlock( {
-						onlyIncludeCurrentPage: true,
-					} ),
-					'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
-				].join( '\n' ),
-			} );
+	test( 'renders only current-page headings when placed in a Template and onlyIncludeCurrentPage is true', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.createTemplate( 'wp_template', {
+			slug: 'singular',
+			title: 'Single Posts',
+			content: [
+				tableOfContentsBlock( {
+					onlyIncludeCurrentPage: true,
+				} ),
+				'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
+			].join( '\n' ),
+		} );
 
-			const post = await requestUtils.createPost( {
-				title: 'TOC paginated template',
-				status: 'publish',
-				content: [
-					headingBlock( {
-						anchor: 'page-one-heading',
-						content: 'Page one heading',
-						level: 2,
-					} ),
-					'<!--nextpage-->',
-					headingBlock( {
-						anchor: 'page-two-heading',
-						content: 'Page two heading',
-						level: 2,
-					} ),
-				].join( '\n' ),
-			} );
+		const post = await requestUtils.createPost( {
+			title: 'TOC paginated template',
+			status: 'publish',
+			content: [
+				headingBlock( {
+					anchor: 'page-one-heading',
+					content: 'Page one heading',
+					level: 2,
+				} ),
+				'<!--nextpage-->',
+				headingBlock( {
+					anchor: 'page-two-heading',
+					content: 'Page two heading',
+					level: 2,
+				} ),
+			].join( '\n' ),
+		} );
 
-			await page.goto( `/?p=${ post.id }&page=2` );
+		await page.goto( `/?p=${ post.id }&page=2` );
 
-			const tableOfContents = getTableOfContents( page );
-			await expect(
-				tableOfContents.getByRole( 'link', {
-					name: 'Page two heading',
-				} )
-			).toHaveAttribute( 'href', '#page-two-heading' );
-			await expect(
-				tableOfContents.getByText( 'Page one heading' )
-			).toHaveCount( 0 );
-		}
-	);
+		const tableOfContents = getTableOfContents( page );
+		await expect(
+			tableOfContents.getByRole( 'link', {
+				name: 'Page two heading',
+			} )
+		).toHaveAttribute( 'href', /[?&]page=2#page-two-heading$/ );
+		await expect(
+			tableOfContents.getByText( 'Page one heading' )
+		).toHaveCount( 0 );
+	} );
 } );
