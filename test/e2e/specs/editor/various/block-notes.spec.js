@@ -1252,6 +1252,82 @@ test.describe( 'Block Notes', () => {
 			).toHaveCount( 0 );
 		} );
 
+		test( 'full picker shows a Frequently used section that learns from picks', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Frequently used emoji' },
+				comment: 'Learn frequent picks',
+			} );
+
+			// Clear any usage persisted by earlier tests or runs so the
+			// seeded state is deterministic.
+			await page.evaluate( () =>
+				window.wp.data
+					.dispatch( 'core/preferences' )
+					.set( 'core', 'emojiPickerFrequentEmojis', [] )
+			);
+
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await page.getByRole( 'button', { name: 'More emojis' } ).click();
+			await blockNoteUtils.waitForFullPicker();
+
+			// The section leads the grid, seeded with the curated
+			// reaction set (the red heart carries the "Heart" label
+			// override), so it has content before any recorded picks.
+			const frequentSection = page
+				.locator( '.editor-collab-sidebar-panel__picker-list > div' )
+				.filter( { hasText: 'Frequently used' } )
+				.first();
+			await expect(
+				page
+					.locator( '.editor-collab-sidebar-panel__picker-category' )
+					.first()
+			).toHaveText( 'Frequently used' );
+			await expect(
+				frequentSection.getByRole( 'gridcell', {
+					name: 'Heart',
+					exact: true,
+				} )
+			).toBeVisible();
+			// An emoji no other test picks is not in the section yet.
+			await expect(
+				frequentSection.getByRole( 'gridcell', {
+					name: 'avocado',
+					exact: true,
+				} )
+			).toBeHidden();
+
+			// While searching, the section is hidden so it doesn't
+			// duplicate hits from the category results.
+			await page.getByPlaceholder( 'Search emoji' ).fill( 'avocado' );
+			await expect( page.getByText( 'Frequently used' ) ).toBeHidden();
+
+			// Pick it…
+			await page
+				.getByRole( 'gridcell', { name: 'avocado', exact: true } )
+				.click();
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reaction added.' } )
+			).toBeVisible();
+
+			// …and on reopening the picker, the recorded pick has joined
+			// the Frequently used section.
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await page.getByRole( 'button', { name: 'More emojis' } ).click();
+			await blockNoteUtils.waitForFullPicker();
+			await expect(
+				frequentSection.getByRole( 'gridcell', {
+					name: 'avocado',
+					exact: true,
+				} )
+			).toBeVisible();
+		} );
+
 		test( 'can set a default skin tone that applies to picked emoji', async ( {
 			page,
 			blockNoteUtils,
@@ -1424,14 +1500,22 @@ test.describe( 'Block Notes', () => {
 			const picker = page.locator(
 				'.editor-collab-sidebar-panel__picker'
 			);
-			const lastEmojiInFirstRow = page
+			// Measure a full 8-emoji row: the first row on screen is the
+			// "Frequently used" section, which may hold fewer emoji and
+			// legitimately end short of the right edge.
+			const lastEmojiInFullRow = page
 				.locator( '.editor-collab-sidebar-panel__picker-row' )
+				.filter( {
+					has: page.locator(
+						'.editor-collab-sidebar-panel__picker-emoji:nth-child(8)'
+					),
+				} )
 				.first()
 				.locator( '.editor-collab-sidebar-panel__picker-emoji' )
 				.last();
 
 			const pickerBox = await picker.boundingBox();
-			const emojiBox = await lastEmojiInFirstRow.boundingBox();
+			const emojiBox = await lastEmojiInFullRow.boundingBox();
 			const horizontalSlack =
 				pickerBox.x + pickerBox.width - ( emojiBox.x + emojiBox.width );
 
