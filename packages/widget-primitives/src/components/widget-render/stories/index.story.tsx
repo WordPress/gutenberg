@@ -22,6 +22,7 @@ import { Card, Icon, Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import { WidgetRender } from '..';
+import { resolveFields } from '../../../field-types';
 import type {
 	WidgetAttributeField,
 	WidgetRenderProps,
@@ -387,8 +388,10 @@ function WidgetWithRelevance() {
 	} );
 
 	const titleId = useId();
+	// Hosts receive attributes already resolved by `useWidgetTypes`; the
+	// story bypasses the hook, so it resolves them itself.
 	const allFields = useMemo(
-		() => demoWidgetTypeWithRelevance.attributes ?? [],
+		() => resolveFields( demoWidgetTypeWithRelevance.attributes ?? [] ),
 		[]
 	);
 

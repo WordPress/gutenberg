@@ -9,6 +9,16 @@ export { WidgetRender } from './components/widget-render';
 export { useWidgetTypes } from './hooks';
 
 /**
+ * Field types
+ */
+export {
+	getFieldType,
+	registerFieldType,
+	resolveFields,
+	unregisterFieldType,
+} from './field-types';
+
+/**
  * Types
  */
 export type {
@@ -20,3 +30,9 @@ export type {
 	ResolveWidgetModule,
 	WidgetModuleRecord,
 } from './types';
+
+export type {
+	FieldTypeDefinition,
+	RegisteredFieldTypeName,
+	ResolvableField,
+} from './field-types';
