@@ -15,13 +15,18 @@ import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
+let mockMediaPlaceholderProps;
+
 jest.mock( '@wordpress/block-editor', () => ( {
 	BlockControls: ( { children, group = 'default' } ) => (
 		<div data-testid={ `block-controls-${ group }` }>{ children }</div>
 	),
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
-	MediaPlaceholder: () => <div />,
+	MediaPlaceholder: ( props ) => {
+		mockMediaPlaceholderProps = props;
+		return <div />;
+	},
 	MediaReplaceFlow: ( { name, onSelect } ) => (
 		<button onClick={ () => onSelect( {} ) }>{ name }</button>
 	),
@@ -36,6 +41,7 @@ jest.mock( '@wordpress/block-editor', () => ( {
 		__experimentalVersion,
 		...props
 	} ) => <TagName { ...props }>{ value || placeholder }</TagName>,
+	store: 'core/block-editor',
 	useBlockProps: jest.fn( () => ( {} ) ),
 } ) );
 
@@ -107,9 +113,14 @@ function renderEdit( props = {} ) {
 }
 
 describe( 'PlaylistTrackEdit', () => {
+	let replaceBlocks;
+
 	beforeEach( () => {
+		mockMediaPlaceholderProps = undefined;
+		replaceBlocks = jest.fn();
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
+			replaceBlocks,
 		} );
 		useUploadMediaFromBlobURL.mockClear();
 	} );
@@ -214,5 +225,52 @@ describe( 'PlaylistTrackEdit', () => {
 				{ name: 'Add' }
 			)
 		).toBeInTheDocument();
+	} );
+
+	it( 'replaces an empty track placeholder with multiple selected tracks', () => {
+		renderEdit( {
+			attributes: {
+				id: undefined,
+				src: undefined,
+				title: undefined,
+			},
+		} );
+
+		expect( mockMediaPlaceholderProps.multiple ).toBe( true );
+
+		mockMediaPlaceholderProps.onSelect( [
+			{
+				id: 2,
+				source_url: 'https://example.com/first.mp3',
+				title: { raw: 'First &amp; Track' },
+			},
+			{
+				id: 3,
+				url: 'https://example.com/second.mp3',
+				title: 'Second Track',
+			},
+		] );
+
+		expect( replaceBlocks ).toHaveBeenCalledWith(
+			'playlist-track-client-id',
+			[
+				expect.objectContaining( {
+					name: 'core/playlist-track',
+					attributes: expect.objectContaining( {
+						id: 2,
+						src: 'https://example.com/first.mp3',
+						title: 'First & Track',
+					} ),
+				} ),
+				expect.objectContaining( {
+					name: 'core/playlist-track',
+					attributes: expect.objectContaining( {
+						id: 3,
+						src: 'https://example.com/second.mp3',
+						title: 'Second Track',
+					} ),
+				} ),
+			]
+		);
 	} );
 } );

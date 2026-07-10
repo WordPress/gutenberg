@@ -4,6 +4,7 @@
 import { isBlobURL } from '@wordpress/blob';
 import { useContext, useEffect, useRef, useState } from '@wordpress/element';
 import {
+	store as blockEditorStore,
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	MediaUpload,
@@ -28,6 +29,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -56,6 +58,7 @@ const PlaylistTrackEdit = ( {
 	const { currentTrackClientId, setCurrentTrackClientId, addTracks } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { replaceBlocks } = useDispatch( blockEditorStore );
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
@@ -85,10 +88,28 @@ const PlaylistTrackEdit = ( {
 	} );
 
 	function onSelectTrack( media ) {
-		if ( ! media || ! media.url ) {
+		if ( Array.isArray( media ) ) {
+			const newBlocks = media
+				.map( getTrackAttributes )
+				.filter( ( track ) => track.src )
+				.map( ( track ) =>
+					createBlock( 'core/playlist-track', track )
+				);
+
+			if ( newBlocks.length > 0 ) {
+				replaceBlocks( clientId, newBlocks );
+				setCurrentTrackClientId( newBlocks[ 0 ].clientId );
+			}
+			return;
+		}
+
+		const mediaUrl = media?.url ?? media?.source_url;
+
+		if ( ! media || ! mediaUrl ) {
 			// In this case there was an error and we should continue in the editing state
 			// previous attributes should be removed because they may be temporary blob urls.
 			setAttributes( {
+				src: undefined,
 				blob: undefined,
 				id: undefined,
 				artist: undefined,
@@ -103,8 +124,8 @@ const PlaylistTrackEdit = ( {
 			return;
 		}
 
-		if ( isBlobURL( media.url ) ) {
-			setTemporaryURL( media.url );
+		if ( isBlobURL( mediaUrl ) ) {
+			setTemporaryURL( mediaUrl );
 			return;
 		}
 
@@ -139,6 +160,7 @@ const PlaylistTrackEdit = ( {
 					} }
 					onSelect={ onSelectTrack }
 					accept="audio/*"
+					multiple
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
 					onError={ onUploadError }

@@ -1,18 +1,148 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { MediaPlaceholder } from '../';
 
-jest.mock( '../../media-upload/check', () => () => null );
-jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {} ) );
+let mockDropZoneProps;
+
+jest.mock( '@wordpress/components', () => ( {
+	...jest.requireActual( '@wordpress/components' ),
+	DropZone: ( props ) => {
+		mockDropZoneProps = props;
+		return null;
+	},
+} ) );
+
+jest.mock( '../../media-upload', () => () => null );
+jest.mock(
+	'../../media-upload/check',
+	() =>
+		( { children } ) =>
+			children
+);
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 
 describe( 'MediaPlaceholder', () => {
+	let mediaUpload;
+
+	beforeEach( () => {
+		mockDropZoneProps = undefined;
+		mediaUpload = jest.fn();
+		useSelect.mockReturnValue( {
+			mediaUpload,
+			allowedMimeTypes: {},
+		} );
+	} );
+
 	it( 'renders successfully when allowedTypes property is not specified', () => {
 		expect( () => render( <MediaPlaceholder multiple /> ) ).not.toThrow();
+	} );
+
+	it( 'selects all uploaded media when multiple upload callbacks are received individually', () => {
+		const onSelect = jest.fn();
+		const fileList = [
+			new File( [ 'audio' ], 'first.mp3', { type: 'audio/mpeg' } ),
+			new File( [ 'audio' ], 'second.mp3', { type: 'audio/mpeg' } ),
+		];
+		const firstTrack = {
+			id: 1,
+			url: 'https://example.com/first.mp3',
+		};
+		const secondTrack = {
+			id: 2,
+			url: 'https://example.com/second.mp3',
+		};
+
+		render(
+			<MediaPlaceholder
+				allowedTypes={ [ 'audio' ] }
+				multiple
+				onSelect={ onSelect }
+			/>
+		);
+
+		act( () => {
+			mockDropZoneProps.onFilesDrop( fileList );
+		} );
+
+		const { onFileChange } = mediaUpload.mock.calls[ 0 ][ 0 ];
+
+		act( () => {
+			onFileChange( [ firstTrack ] );
+		} );
+
+		expect( onSelect ).not.toHaveBeenCalled();
+
+		act( () => {
+			onFileChange( [ secondTrack ] );
+		} );
+
+		expect( onSelect ).toHaveBeenCalledTimes( 1 );
+		expect( onSelect ).toHaveBeenCalledWith( [ firstTrack, secondTrack ] );
+	} );
+
+	it( 'waits for final media before selecting multiple uploads', () => {
+		const onSelect = jest.fn();
+		const fileList = [
+			new File( [ 'audio' ], 'first.mp3', { type: 'audio/mpeg' } ),
+			new File( [ 'audio' ], 'second.mp3', { type: 'audio/mpeg' } ),
+		];
+		const firstTrack = {
+			id: 1,
+			url: 'https://example.com/first.mp3',
+		};
+		const secondTrack = {
+			id: 2,
+			url: 'https://example.com/second.mp3',
+		};
+		const firstBlob = {
+			url: 'blob:https://example.com/first',
+		};
+		const secondBlob = {
+			url: 'blob:https://example.com/second',
+		};
+
+		render(
+			<MediaPlaceholder
+				allowedTypes={ [ 'audio' ] }
+				multiple
+				onSelect={ onSelect }
+			/>
+		);
+
+		act( () => {
+			mockDropZoneProps.onFilesDrop( fileList );
+		} );
+
+		const { onFileChange } = mediaUpload.mock.calls[ 0 ][ 0 ];
+
+		act( () => {
+			onFileChange( [ firstBlob, secondBlob ] );
+		} );
+
+		expect( onSelect ).not.toHaveBeenCalled();
+
+		act( () => {
+			onFileChange( [ firstTrack, secondBlob ] );
+		} );
+
+		expect( onSelect ).not.toHaveBeenCalled();
+
+		act( () => {
+			onFileChange( [ firstTrack, secondTrack ] );
+		} );
+
+		expect( onSelect ).toHaveBeenCalledTimes( 1 );
+		expect( onSelect ).toHaveBeenCalledWith( [ firstTrack, secondTrack ] );
 	} );
 } );
