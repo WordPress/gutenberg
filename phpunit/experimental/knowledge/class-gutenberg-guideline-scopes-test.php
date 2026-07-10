@@ -79,7 +79,7 @@ class Gutenberg_Guideline_Scopes_Test extends WP_UnitTestCase {
 			'registry scope'   => array( 'guideline-site', 'site' ),
 			'another scope'    => array( 'guideline-images', 'images' ),
 			'blocks scope'     => array( 'guideline-blocks', 'blocks' ),
-			'block row'        => array( 'guideline-block-core-paragraph', 'blocks' ),
+			'block row'        => array( 'guideline-block-core_paragraph', 'blocks' ),
 			'empty block name' => array( 'guideline-block-', null ),
 			'unknown scope'    => array( 'guideline-nope', null ),
 			'bare prefix'      => array( 'guideline-', null ),
@@ -103,7 +103,7 @@ class Gutenberg_Guideline_Scopes_Test extends WP_UnitTestCase {
 	 * Per-block rows resolve to the blocks scope only while it is registered.
 	 */
 	public function test_block_row_scope_requires_blocks_scope() {
-		$this->assertSame( 'blocks', wp_guideline_scope_from_slug( 'guideline-block-core-paragraph' ) );
+		$this->assertSame( 'blocks', wp_guideline_scope_from_slug( 'guideline-block-core_paragraph' ) );
 
 		add_filter(
 			'wp_guideline_scopes',
@@ -113,6 +113,6 @@ class Gutenberg_Guideline_Scopes_Test extends WP_UnitTestCase {
 			}
 		);
 
-		$this->assertNull( wp_guideline_scope_from_slug( 'guideline-block-core-paragraph' ) );
+		$this->assertNull( wp_guideline_scope_from_slug( 'guideline-block-core_paragraph' ) );
 	}
 }

@@ -151,7 +151,7 @@ class Gutenberg_Guideline_Reservation_Test extends WP_Test_REST_TestCase {
 
 		$response = $this->create_row(
 			array(
-				'slug'    => 'guideline-block-core-paragraph',
+				'slug'    => 'guideline-block-core_paragraph',
 				'title'   => 'core/paragraph',
 				'content' => 'Keep paragraphs short.',
 				'status'  => 'publish',
