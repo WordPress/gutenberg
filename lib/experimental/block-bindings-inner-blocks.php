@@ -95,6 +95,10 @@ function gutenberg_block_bindings_rebuild_inner_content( $inner_content, $block_
  * @return array Context visible to the binding source.
  */
 function gutenberg_block_bindings_get_inner_blocks_context( $block_instance, $parent_block ) {
+	if ( ! property_exists( WP_Block::class, 'available_context' ) ) {
+		return is_array( $parent_block->context ) ? $parent_block->context : array();
+	}
+
 	static $read_available_context = null;
 
 	if ( null === $read_available_context ) {
@@ -108,7 +112,9 @@ function gutenberg_block_bindings_get_inner_blocks_context( $block_instance, $pa
 	}
 
 	$context = $read_available_context( $block_instance );
-	return is_array( $context ) ? $context : $parent_block->context;
+	return is_array( $context )
+		? $context
+		: ( is_array( $parent_block->context ) ? $parent_block->context : array() );
 }
 
 /**
