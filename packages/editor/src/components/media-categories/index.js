@@ -133,7 +133,7 @@ const coreMediaFetch = async ( query = {} ) => {
 	// Use the same final query for the records fetch and the totals selectors so
 	// their cached query key matches and the totals resolve to this exact request.
 	const finalQuery = getCoreMediaQuery( query );
-	const mediaItems = await resolveSelect( coreStore ).getEntityRecords(
+	const records = await resolveSelect( coreStore ).getEntityRecords(
 		'postType',
 		'attachment',
 		finalQuery
@@ -152,12 +152,12 @@ const coreMediaFetch = async ( query = {} ) => {
 		finalQuery
 	);
 	return {
-		mediaList: mediaItems.map( ( mediaItem ) => ( {
-			...mediaItem,
-			alt: mediaItem.alt_text,
-			url: mediaItem.source_url,
-			previewUrl: mediaItem.media_details?.sizes?.medium?.source_url,
-			caption: mediaItem.caption?.raw,
+		mediaItems: records.map( ( record ) => ( {
+			...record,
+			alt: record.alt_text,
+			url: record.source_url,
+			previewUrl: record.media_details?.sizes?.medium?.source_url,
+			caption: record.caption?.raw,
 		} ) ),
 		totalItems,
 		totalPages,
@@ -390,7 +390,7 @@ const inserterMediaCategories = [
 			// This external source returns a plain array, so it renders without a
 			// pager (the shared panel treats a non-object result as a single
 			// page). To paginate it later, return the same
-			// `{ mediaList, totalItems, totalPages }` shape the core sources use,
+			// `{ mediaItems, totalItems, totalPages }` shape the core sources use,
 			// mapping `jsonResponse.result_count` -> `totalItems` and
 			// `jsonResponse.page_count` -> `totalPages` (Openverse already accepts
 			// a `page` query arg, which passes straight through above).

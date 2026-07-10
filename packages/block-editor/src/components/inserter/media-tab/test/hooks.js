@@ -92,7 +92,7 @@ describe( 'useMediaResults', () => {
 		const category = {
 			name: 'images',
 			fetch: jest.fn( async () => ( {
-				mediaList: [ { id: 1 } ],
+				mediaItems: [ { id: 1 } ],
 				totalItems: 42,
 				totalPages: 3,
 			} ) ),

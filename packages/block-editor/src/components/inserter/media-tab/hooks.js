@@ -12,6 +12,27 @@ import { unlock } from '../../../lock-unlock';
 
 /** @typedef {import('../../../store/actions').InserterMediaRequest} InserterMediaRequest */
 /** @typedef {import('../../../store/actions').InserterMediaItem} InserterMediaItem */
+/** @typedef {import('../../../store/actions').InserterMediaResponse} InserterMediaResponse */
+
+/**
+ * Normalizes the result of a media category's `fetch`, which may be either a
+ * plain array of media items or an `InserterMediaResponse` carrying pagination
+ * totals. Sources that don't report totals leave them `undefined`, which is how
+ * the panel knows to hide the pager.
+ *
+ * @param {InserterMediaItem[]|InserterMediaResponse|undefined} result The raw `fetch` result.
+ * @return {{ mediaItems: InserterMediaItem[], totalItems: number|undefined, totalPages: number|undefined }} The normalized result.
+ */
+function normalizeFetchResult( result ) {
+	if ( Array.isArray( result ) ) {
+		return { mediaItems: result };
+	}
+	return {
+		mediaItems: result?.mediaItems ?? [],
+		totalItems: result?.totalItems,
+		totalPages: result?.totalPages,
+	};
+}
 
 /**
  * Fetches media items based on the provided category.
@@ -25,9 +46,6 @@ import { unlock } from '../../../lock-unlock';
  */
 export function useMediaResults( category, query = {}, refreshKey ) {
 	const [ mediaList, setMediaList ] = useState();
-	// A source can return totals for server-side pagination (as
-	// `{ mediaList, totalItems, totalPages }`) or a plain array (no pager). When
-	// no totals are provided, these stay `undefined` and the panel hides the pager.
 	const [ totals, setTotals ] = useState( {} );
 	const [ isLoading, setIsLoading ] = useState( false );
 	// We need to keep track of the last request made because
@@ -74,22 +92,13 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 			lastQueryKeyRef.current = key;
 			lastFetchRef.current = category.fetch;
 			lastSourceRef.current = category.name;
-			const _result = await category.fetch?.( query );
-			// A source may return either a plain array or an object carrying
-			// pagination totals. Normalize both to a media list plus optional
-			// totals so results and totals update together.
-			const _media = Array.isArray( _result )
-				? _result
-				: _result?.mediaList;
-			const _totals = Array.isArray( _result )
-				? {}
-				: {
-						totalItems: _result?.totalItems,
-						totalPages: _result?.totalPages,
-				  };
+			const { mediaItems, totalItems, totalPages } = normalizeFetchResult(
+				await category.fetch?.( query )
+			);
 			if ( request === lastRequestRef.current ) {
-				setMediaList( _media );
-				setTotals( _totals );
+				// Set together so the grid and the pager never disagree.
+				setMediaList( mediaItems );
+				setTotals( { totalItems, totalPages } );
 				setIsLoading( false );
 			}
 		} )();
@@ -178,14 +187,10 @@ export function useMediaCategories( rootClientId ) {
 						}
 						let results = [];
 						try {
-							const result = await category.fetch( {
-								per_page: 1,
-							} );
-							// `fetch` may return a plain array or a
-							// `{ mediaList, ... }` object (paginated sources).
-							results = Array.isArray( result )
-								? result
-								: result?.mediaList ?? [];
+							const { mediaItems } = normalizeFetchResult(
+								await category.fetch( { per_page: 1 } )
+							);
+							results = mediaItems;
 						} catch {
 							// If the request fails, we shallow the error and just don't show
 							// the category, in order to not break the media tab.

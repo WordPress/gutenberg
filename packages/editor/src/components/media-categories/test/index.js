@@ -91,7 +91,7 @@ describe( 'getInserterMediaCategories', () => {
 			expectedQuery
 		);
 		expect( results ).toEqual( {
-			mediaList: [
+			mediaItems: [
 				expect.objectContaining( {
 					id: 10,
 					url: 'https://example.com/image.jpg',
