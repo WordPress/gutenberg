@@ -80,7 +80,6 @@ export default function useMergeRefs< T >(
 	refs: Ref< T >[]
 ): RefCallback< T > {
 	const elementRef = useRef< T | null >( null );
-	const isAttachedRef = useRef( false );
 	// The refs that are attached to the element: set when the element
 	// attaches, and kept in sync when a changed ref is swapped on render.
 	const attachedRefsRef = useRef< Ref< T >[] >( [] );
@@ -103,7 +102,9 @@ export default function useMergeRefs< T >(
 	// during this commit, the ref callback has already been called with the
 	// current refs, which compare equal here.
 	useLayoutEffect( () => {
-		if ( isAttachedRef.current === false ) {
+		const element = elementRef.current;
+
+		if ( element === null ) {
 			return;
 		}
 
@@ -111,10 +112,7 @@ export default function useMergeRefs< T >(
 			const attachedRef = attachedRefsRef.current[ index ];
 			if ( ref !== attachedRef ) {
 				detachRef( attachedRef, index, cleanupsRef.current );
-				cleanupsRef.current[ index ] = assignRef(
-					ref,
-					elementRef.current as T
-				);
+				cleanupsRef.current[ index ] = assignRef( ref, element );
 			}
 		} );
 
@@ -127,7 +125,6 @@ export default function useMergeRefs< T >(
 		// Update the element so it can be used when calling ref callbacks on a
 		// dependency change.
 		elementRef.current = value;
-		isAttachedRef.current = value !== null;
 
 		// When an element changes, the current ref callback should be called
 		// with the new element and the attached one with `null`.
