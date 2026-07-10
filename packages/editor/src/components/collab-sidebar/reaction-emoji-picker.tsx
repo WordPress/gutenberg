@@ -5,11 +5,24 @@ import { __, _x } from '@wordpress/i18n';
 import { Button, Composite } from '@wordpress/components';
 
 /**
+ * A single curated reaction emoji.
+ */
+export interface CuratedEmoji {
+	emoji: string;
+	label: string;
+	value: string;
+}
+
+interface ReactionEmojiPickerProps {
+	onSelect: ( slug: string ) => void;
+}
+
+/**
  * Curated emoji set for reactions.
  * The `value` slug is used as the storage key in the database to avoid
  * potential encoding issues with emoji characters.
  */
-export const REACTION_EMOJIS = [
+export const REACTION_EMOJIS: CuratedEmoji[] = [
 	{ emoji: '❤️', label: _x( 'Heart', 'emoji reaction' ), value: 'heart' },
 	{
 		emoji: '🎉',
@@ -32,21 +45,25 @@ export const REACTION_EMOJIS = [
 /**
  * Build a Map keyed by slug for O(1) emoji and label lookups.
  *
- * @param {Array} emojis The emoji list to index.
- * @return {Map} Map from slug to `{ emoji, label, value }` entry.
+ * @param emojis The emoji list to index.
+ * @return Map from slug to `{ emoji, label, value }` entry.
  */
-export function buildEmojiBySlugMap( emojis = REACTION_EMOJIS ) {
+export function buildEmojiBySlugMap(
+	emojis: CuratedEmoji[] = REACTION_EMOJIS
+): Map< string, CuratedEmoji > {
 	return new Map( emojis.map( ( entry ) => [ entry.value, entry ] ) );
 }
 
 /**
  * A row of curated emoji buttons.
  *
- * @param {Object}   props          Component props.
- * @param {Function} props.onSelect Called with the chosen slug when the
- *                                  user picks a curated emoji.
+ * @param props          Component props.
+ * @param props.onSelect Called with the chosen slug when the user picks a
+ *                       curated emoji.
  */
-export default function ReactionEmojiPicker( { onSelect } ) {
+export default function ReactionEmojiPicker( {
+	onSelect,
+}: ReactionEmojiPickerProps ) {
 	return (
 		<Composite
 			role="listbox"
