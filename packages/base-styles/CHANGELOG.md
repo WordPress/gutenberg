@@ -2,12 +2,9 @@
 
 ## Unreleased
 
-### Breaking Changes
-
--   Rename `$font-weight-medium` to `$font-weight-semibold` and update its value from `499` to `600` ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
-
 ### Enhancements
 
+-   Add `$font-weight-semibold` (`600`) while retaining `$font-weight-medium` (`499`) for backwards compatibility ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Add `outset-ring__focus` mixin for outline-based focus rings using `--wpds-*` design tokens ([#78698](https://github.com/WordPress/gutenberg/pull/78698), [#80082](https://github.com/WordPress/gutenberg/pull/80082)).
 
 ## 10.2.0 (2026-07-01)
