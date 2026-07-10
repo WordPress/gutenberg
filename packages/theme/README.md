@@ -304,7 +304,17 @@ Three plugin variants are available, covering common build tool setups:
 | `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks` | esbuild | JS/TS |
 | `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`       | Vite    | JS/TS |
 
-All three plugins skip files that don't contain `--wpds-` references, so there is zero overhead on unrelated modules.
+All three plugins skip transformation when the source does not contain a `--wpds-` reference.
+
+### Transform boundaries and errors
+
+The plugins transform bare `var(--wpds-*)` calls, including calls with whitespace such as `var( --wpds-color-foreground-content-neutral )`. Calls that already include a fallback are left unchanged, and non-`--wpds-*` custom properties are ignored.
+
+The PostCSS plugin transforms declaration values in any stylesheet processed by PostCSS, including plain CSS and CSS modules. It does not transform token references in CSS comments.
+
+The esbuild and Vite plugins transform JavaScript and TypeScript source files with `.js`, `.jsx`, `.ts`, `.tsx`, `.mjs`, `.mts`, `.cjs`, and `.cts` extensions, except files in `node_modules`. They transform matching source text in template literals, quoted strings, and comments.
+
+If a transformed bare `var()` call references an unknown `--wpds-*` token, the plugin stops the build with an `Unknown design token` error. This also applies to matching references in JavaScript or TypeScript comments and strings; remove example references to unknown tokens or use a known token name.
 
 ### PostCSS
 
