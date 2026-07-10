@@ -16,6 +16,14 @@ describe( 'Link', () => {
 		expect( ref.current ).toBeInstanceOf( HTMLAnchorElement );
 	} );
 
+	it( 'applies focus ring styles', () => {
+		render( <Link href="/">Home</Link> );
+
+		expect( screen.getByRole( 'link', { name: 'Home' } ) ).toHaveClass(
+			'style-outset-ring-focus'
+		);
+	} );
+
 	it( 'calls onClick when clicked (often used for analytics tracking)', async () => {
 		const user = userEvent.setup();
 		const onClick = jest.fn(
