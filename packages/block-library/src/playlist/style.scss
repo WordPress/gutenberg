@@ -19,6 +19,7 @@ $waveform-player-height: 100px;
 
 	// WaveformPlayer button styling.
 	.waveform-btn {
+		border: 0;
 		border-radius: 0;
 		border-end-start-radius: 0.125rem;
 		border-start-start-radius: 0.125rem;
@@ -30,6 +31,11 @@ $waveform-player-height: 100px;
 
 		&:hover:not(:disabled) {
 			transform: none;
+		}
+
+		&:focus-visible {
+			outline: none;
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) var(--wp-admin-theme-color, currentColor);
 		}
 
 		&.has-artwork {
@@ -49,6 +55,15 @@ $waveform-player-height: 100px;
 				position: relative;
 				z-index: 2;
 				filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+			}
+
+			&:focus-visible::after {
+				content: "";
+				position: absolute;
+				inset: 0;
+				z-index: 3;
+				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) var(--wp-admin-theme-color, #fff);
+				pointer-events: none;
 			}
 		}
 	}
