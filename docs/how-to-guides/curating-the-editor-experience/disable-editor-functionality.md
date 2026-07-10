@@ -63,10 +63,16 @@ function example_restrict_cover_video_providers( $args, $block_type ) {
 		return $args;
 	}
 
-	$providers = $args['attributes']['allowedVideoProviders']['default'];
+	if ( ! isset( $args['attributes']['allowedVideoProviders']['default'] ) ) {
+		return $args;
+	}
 
+	// Remove YouTube.
 	$args['attributes']['allowedVideoProviders']['default'] = array_values(
-		array_diff( $providers, [ 'youtube' ] )
+		array_diff(
+			$args['attributes']['allowedVideoProviders']['default'],
+			[ 'youtube' ]
+		)
 	);
 
 	return $args;
