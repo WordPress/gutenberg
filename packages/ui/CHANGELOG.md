@@ -41,6 +41,7 @@
 
 ### Internal
 
+-   Add `displayName` to compound component subcomponents so React DevTools and Storybook source snippets show public names like `Card.Root` instead of internal export names ([#80132](https://github.com/WordPress/gutenberg/pull/80132)).
 -   Add an explicit return type to an internal overlay focus helper so the published type definitions stay self-contained ([#79684](https://github.com/WordPress/gutenberg/pull/79684)).
 -   Enforce CSS Module class selector naming for component-library packages ([#79504](https://github.com/WordPress/gutenberg/pull/79504)).
 -   Update `@base-ui/react` from `1.5.0` to [`1.6.0`](https://github.com/mui/base-ui/releases/tag/v1.6.0) ([#79408](https://github.com/WordPress/gutenberg/pull/79408)).
