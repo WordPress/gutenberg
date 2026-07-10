@@ -165,12 +165,11 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const onPause = () => setIsPlaying( false );
 	player.container.addEventListener( 'waveformplayer:play', onPlay );
 	player.container.addEventListener( 'waveformplayer:pause', onPause );
+	player.container.addEventListener( 'waveformplayer:ended', onPause );
 	const destroy = () => {
 		player.container.removeEventListener( 'waveformplayer:play', onPlay );
-		player.container.removeEventListener(
-			'waveformplayer:pause',
-			onPause
-		);
+		player.container.removeEventListener( 'waveformplayer:pause', onPause );
+		player.container.removeEventListener( 'waveformplayer:ended', onPause );
 		player.destroy();
 	};
 
