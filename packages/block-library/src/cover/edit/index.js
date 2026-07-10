@@ -20,7 +20,6 @@ import {
 	withColors,
 	ColorPalette,
 	useBlockProps,
-	useSettings,
 	useInnerBlocksProps,
 	__experimentalUseGradient,
 	store as blockEditorStore,
@@ -60,23 +59,6 @@ import { getBackgroundEmbedHtml } from '../embed-video-utils';
 import { unlock } from '../../lock-unlock';
 
 const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
-
-function getInnerBlocksTemplate( attributes ) {
-	return [
-		[
-			'core/paragraph',
-			{
-				style: {
-					typography: {
-						textAlign: 'center',
-					},
-				},
-				placeholder: __( 'Write title…' ),
-				...attributes,
-			},
-		],
-	];
-}
 
 /**
  * Is the URL a temporary blob URL? A blob URL is one that is used temporarily while
@@ -298,6 +280,13 @@ function CoverEdit( {
 			isDark: newIsDark,
 			isUserOverlayColor: currentAttrs.isUserOverlayColor || false,
 		} );
+
+		// The upload flow calls this handler twice, first with a temporary
+		// blob URL, so check the up-to-date URL rather than relying on the
+		// placeholder state captured when the upload started.
+		if ( currentAttrs.url === undefined ) {
+			selectFirstInnerBlock();
+		}
 	};
 
 	const onClearMedia = () => {
@@ -349,6 +338,10 @@ function CoverEdit( {
 			isUserOverlayColor: true,
 			isDark: newIsDark,
 		} );
+
+		if ( newOverlayColor ) {
+			selectFirstInnerBlock();
+		}
 	};
 
 	const onUpdateDimRatio = async ( newDimRatio ) => {
@@ -390,6 +383,8 @@ function CoverEdit( {
 			isRepeated: undefined,
 			useFeaturedImage: undefined,
 		} );
+
+		selectFirstInnerBlock();
 	};
 
 	// Fetch embed preview for embed videos
@@ -467,32 +462,48 @@ function CoverEdit( {
 
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
 
-	const hasInnerBlocks = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlock( clientId ).innerBlocks.length >
-			0,
+	const { hasInnerBlocks, hasInnerContent } = useSelect(
+		( select ) => {
+			const { innerBlocks } =
+				select( blockEditorStore ).getBlock( clientId );
+			return {
+				hasInnerBlocks: innerBlocks.length > 0,
+				// The single empty paragraph scaffolded from the block type
+				// template at insertion does not count as content, so the
+				// background placeholder still shows for new covers.
+				hasInnerContent:
+					innerBlocks.length > 1 ||
+					( innerBlocks.length === 1 &&
+						( innerBlocks[ 0 ].name !== 'core/paragraph' ||
+							!! innerBlocks[ 0 ].attributes.content?.length ) ),
+			};
+		},
 		[ clientId ]
 	);
 
+	const isPlaceholder =
+		! useFeaturedImage && ! hasInnerContent && ! hasBackground;
+
+	// Setting a background dismisses the placeholder and reveals the
+	// paragraph scaffolded from the block type template at insertion. Select
+	// it so the user can start typing the title right away.
+	const { getBlockOrder } = useSelect( blockEditorStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
+	const selectFirstInnerBlock = () => {
+		const firstInnerBlockClientId = getBlockOrder( clientId )[ 0 ];
+		if ( isPlaceholder && firstInnerBlockClientId ) {
+			selectBlock( firstInnerBlockClientId );
+		}
+	};
+
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
-
-	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
-	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
-	const hasFontSizes = fontSizes?.length > 0;
-	const innerBlocksTemplate = getInnerBlocksTemplate( {
-		fontSize: hasFontSizes ? 'large' : undefined,
-	} );
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-cover__inner-container',
 		},
 		{
-			// Avoid template sync when the `templateLock` value is `all` or `contentOnly`.
-			// See: https://github.com/WordPress/gutenberg/pull/45632
-			template: ! hasInnerBlocks ? innerBlocksTemplate : undefined,
-			templateInsertUpdatesSelection: true,
 			allowedBlocks,
 			templateLock,
 			dropZoneElement: ref.current,
@@ -627,6 +638,10 @@ function CoverEdit( {
 				: undefined,
 			isDark: newIsDark,
 		} );
+
+		if ( newUseFeaturedImage ) {
+			selectFirstInnerBlock();
+		}
 	};
 
 	const blockControls = (
@@ -682,7 +697,7 @@ function CoverEdit( {
 		width,
 	};
 
-	if ( ! useFeaturedImage && ! hasInnerBlocks && ! hasBackground ) {
+	if ( isPlaceholder ) {
 		return (
 			<>
 				{ blockControls }

@@ -53,6 +53,20 @@ export const settings = {
 			},
 		],
 	},
+	template: [
+		[
+			'core/paragraph',
+			{
+				style: {
+					typography: {
+						textAlign: 'center',
+					},
+				},
+				placeholder: __( 'Write title…' ),
+				fontSize: 'large',
+			},
+		],
+	],
 	transforms,
 	save,
 	edit,

@@ -300,10 +300,12 @@ test.describe( 'Cover', () => {
 			imageBlock.getByTestId( 'form-file-upload-input' )
 		);
 
+		// Wait for the upload to finish (a blob URL is used while it is in
+		// flight) so the transform copies the final image URL.
 		await expect(
 			editor.canvas
 				.getByRole( 'document', { name: 'Block: Image' } )
-				.locator( 'img' )
+				.locator( 'img[src^="http"]' )
 		).toBeVisible();
 
 		await editor.transformBlockTo( 'core/cover' );

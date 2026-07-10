@@ -142,6 +142,30 @@ describe( 'Cover block', () => {
 			);
 		} );
 
+		test( 'shows placeholder again if the background is removed and there is no content', async () => {
+			await setup();
+			await userEvent.click(
+				screen.getByRole( 'button', {
+					name: 'White',
+				} )
+			);
+			await selectBlock( 'Block: Cover' );
+			await openStylesTabIfAvailable();
+			await userEvent.click( screen.getByText( 'Overlay' ) );
+			// Clicking the active color option removes the overlay color,
+			// leaving the block without a background and without content.
+			await userEvent.click(
+				screen.getByRole( 'option', {
+					name: 'White',
+				} )
+			);
+			expect(
+				within( screen.getByLabelText( 'Block: Cover' ) ).getByText(
+					'To edit this block, you need permission to upload media.'
+				)
+			).toBeInTheDocument();
+		} );
+
 		test( 'can have the title edited', async () => {
 			await setup();
 
@@ -469,6 +493,13 @@ describe( 'Cover block', () => {
 			await userEvent.click( colorPicker );
 			const coverBlock = screen.getByLabelText( 'Block: Cover' );
 			expect( coverBlock ).toHaveClass( 'is-light' );
+			// Add content so the block does not return to the placeholder
+			// when the background is removed.
+			const title = screen.getByLabelText( 'Empty block;', {
+				exact: false,
+			} );
+			await userEvent.click( title );
+			await userEvent.keyboard( 'abc' );
 			await selectBlock( 'Block: Cover' );
 			await openStylesTabIfAvailable();
 			await userEvent.click( screen.getByText( 'Overlay' ) );
