@@ -164,6 +164,37 @@ export const WithCustomZIndex: StoryObj< typeof Tooltip.Root > = {
 };
 
 /**
+ * The `--wp-ui-tooltip-background-color` and `--wp-ui-tooltip-color` CSS
+ * variables control the tooltip popup's surface and text colors. Override them
+ * either globally on `:root` or `body`, or per instance by passing a
+ * `Tooltip.Portal` with a `style` or `className` to `Tooltip.Popup`'s `portal`
+ * prop. The variables cascade from the portal wrapper to the popup rendered
+ * inside it.
+ */
+export const WithCustomColors: StoryObj< typeof Tooltip.Root > = {
+	name: 'With Custom Colors',
+	args: {
+		children: (
+			<>
+				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
+				<Tooltip.Popup
+					portal={
+						<Tooltip.Portal
+							style={ {
+								'--wp-ui-tooltip-background-color': '#fff',
+								'--wp-ui-tooltip-color': '#1e1e1e',
+							} }
+						/>
+					}
+				>
+					Save
+				</Tooltip.Popup>
+			</>
+		),
+	},
+};
+
+/**
  * Use `Tooltip.Provider` to control the delay before tooltips appear.
  * This is useful when you have multiple tooltips and want them to share
  * the same delay configuration.
