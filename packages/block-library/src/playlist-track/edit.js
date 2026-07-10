@@ -287,8 +287,6 @@ const PlaylistTrackEdit = ( {
 							onChange={ ( value ) => {
 								setAttributes( { title: value } );
 							} }
-							allowedFormats={ [] }
-							withoutInteractiveFormatting
 							__experimentalVersion={ 2 }
 						/>
 						{ showArtists && (
@@ -300,8 +298,6 @@ const PlaylistTrackEdit = ( {
 								onChange={ ( value ) =>
 									setAttributes( { artist: value } )
 								}
-								allowedFormats={ [] }
-								withoutInteractiveFormatting
 								__experimentalVersion={ 2 }
 							/>
 						) }
