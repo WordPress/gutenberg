@@ -16,6 +16,7 @@ class Tests_Blocks_Render_Table_Of_Contents extends WP_UnitTestCase {
 
 	public function tear_down() {
 		unset( $GLOBALS['_wp_current_template_content'] );
+		unset( $GLOBALS['page'] );
 		wp_reset_postdata();
 		parent::tear_down();
 	}
