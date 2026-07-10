@@ -42,18 +42,6 @@ import { deviceTypeKey } from '../../store/private-keys';
 import BlockToolbarIcon from './block-toolbar-icon';
 import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 
-export function getBlockToolbarSlotVisibility( {
-	isZoomOut,
-	isEditingResponsiveStyleState,
-} ) {
-	const showSlots = ! isZoomOut && ! isEditingResponsiveStyleState;
-
-	return {
-		showSlots,
-		showStyleStateSlot: ! isZoomOut && isEditingResponsiveStyleState,
-	};
-}
-
 /**
  * Renders the block toolbar.
  *
@@ -156,10 +144,6 @@ export function PrivateBlockToolbar( {
 			hasViewportBlockStyleState(
 				getSelectedBlockStyleState( selectedBlockClientId )
 			);
-		const slotVisibility = getBlockToolbarSlotVisibility( {
-			isZoomOut: _isZoomOut,
-			isEditingResponsiveStyleState: _isEditingResponsiveStyleState,
-		} );
 
 		return {
 			blockClientId: selectedBlockClientId,
@@ -183,7 +167,8 @@ export function PrivateBlockToolbar( {
 			isSectionContainer: _isSectionBlock,
 			hasContentOnlyLocking: _hasTemplateLock,
 			showShuffleButton: _isZoomOut,
-			...slotVisibility,
+			showSlots: ! _isZoomOut && ! _isEditingResponsiveStyleState,
+			showStyleStateSlot: ! _isZoomOut && _isEditingResponsiveStyleState,
 			showGroupButtons: ! _isZoomOut,
 			showLockButtons: ! _isZoomOut,
 			showBlockVisibilityButton: ! _isZoomOut,
