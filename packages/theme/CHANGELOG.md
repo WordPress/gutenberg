@@ -20,6 +20,7 @@
 ### Documentation
 
 -   Clarify what `@wordpress/theme` provides, when consumers need to load `design-tokens.css`, the `ThemeProvider` contract including root provider usage, and the legacy compatibility boundary ([#79961](https://github.com/WordPress/gutenberg/pull/79961)).
+-   Document build plugin behavior and add parity coverage for PostCSS, esbuild, and Vite ([#80088](https://github.com/WordPress/gutenberg/pull/80088)).
 -   Document design token accessibility responsibilities ([#79943](https://github.com/WordPress/gutenberg/pull/79943)).
 -   Document that `ThemeProvider` does not accept wrapper customization props ([#79763](https://github.com/WordPress/gutenberg/pull/79763)).
 -   Clarify the design token documentation entry points and keep the generated token guidance source internal ([#79829](https://github.com/WordPress/gutenberg/pull/79829)).
