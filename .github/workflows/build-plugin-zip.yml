@@ -121,10 +121,13 @@ jobs:
                   RELEASE_BRANCH="release/${NEW_VERSION_ARRAY[0]}.${NEW_VERSION_ARRAY[1]}"
                   echo "release_branch=${RELEASE_BRANCH}" >> "$GITHUB_OUTPUT"
 
-            - name: Configure git user name and email
-              run: |
-                  git config user.name "Gutenberg Repository Automation"
-                  git config user.email gutenberg@wordpress.org
+            - name: Configure Git user name
+              run: git config user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
+
+            - name: Configure Git user email
+              env:
+                  APP_USER_ID: ${{ vars.APP_USER_ID }}
+              run: git config user.email "${APP_USER_ID}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
 
             - name: Create and switch to release branch
               if: |
@@ -297,7 +300,7 @@ jobs:
               run: tar -czf ${{ runner.temp }}/gutenberg.tar.gz . && mv ${{ runner.temp }}/gutenberg.tar.gz .
 
             - name: Login to GitHub Container Registry
-              uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+              uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
               with:
                   registry: ghcr.io
                   username: ${{ github.actor }}
@@ -376,10 +379,13 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: true
 
-            - name: Configure git user name and email
-              run: |
-                  git config user.name "Gutenberg Repository Automation"
-                  git config user.email gutenberg@wordpress.org
+            - name: Configure Git user name
+              run: git config user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
+
+            - name: Configure Git user email
+              env:
+                  APP_USER_ID: ${{ vars.APP_USER_ID }}
+              run: git config user.email "${APP_USER_ID}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
 
             - name: Revert version bump commit on release branch
               if: |

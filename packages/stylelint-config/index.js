@@ -8,6 +8,7 @@ export default {
 	plugins: [
 		'@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens',
 		'@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties',
+		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
 	],
 	rules: {
 		'at-rule-empty-line-before': [
@@ -78,6 +79,7 @@ export default {
 		'selector-type-case': 'lower',
 		'value-keyword-case': 'lower',
 		'plugin-wpds/no-setting-wpds-custom-properties': true,
+		'plugin-wpds/no-token-fallback-values': true,
 		'plugin-wpds/no-unknown-ds-tokens': true,
 
 		/* Disable new rules from stylelint-config-recommended 7 > 14 */

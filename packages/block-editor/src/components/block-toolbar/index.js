@@ -40,6 +40,7 @@ import EditSectionButton from './edit-section-button';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
 import BlockToolbarIcon from './block-toolbar-icon';
+import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 
 /**
  * Renders the block toolbar.
@@ -95,6 +96,8 @@ export function PrivateBlockToolbar( {
 			isZoomOut,
 			isSectionBlock,
 			isBlockHiddenAtViewport,
+			getSelectedBlockStyleState,
+			isResponsiveEditing,
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -135,6 +138,11 @@ export function PrivateBlockToolbar( {
 			selectedBlockClientIds.every( ( id ) =>
 				isBlockHiddenAtViewport( id, _currentDeviceType )
 			);
+		const _isEditingResponsiveStyleState =
+			isResponsiveEditing() &&
+			hasViewportBlockStyleState(
+				getSelectedBlockStyleState( selectedBlockClientId )
+			);
 
 		return {
 			blockClientId: selectedBlockClientId,
@@ -158,7 +166,7 @@ export function PrivateBlockToolbar( {
 			isSectionContainer: _isSectionBlock,
 			hasContentOnlyLocking: _hasTemplateLock,
 			showShuffleButton: _isZoomOut,
-			showSlots: ! _isZoomOut,
+			showSlots: ! _isZoomOut && ! _isEditingResponsiveStyleState,
 			showGroupButtons: ! _isZoomOut,
 			showLockButtons: ! _isZoomOut,
 			showBlockVisibilityButton: ! _isZoomOut,

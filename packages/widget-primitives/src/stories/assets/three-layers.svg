@@ -14,7 +14,8 @@
   <!-- Row 1: Identity -->
   <rect x="44" y="58" width="304" height="74" rx="9" fill="#e2ecfd" stroke="#2f54a5" stroke-width="1.5"/>
   <text x="64" y="88" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#1e3a8a">Identity</text>
-  <text x="64" y="111" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" fill="#2f54a5">name · title · icon · category</text>
+  <text x="64" y="108" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#2f54a5">name · title · description · help</text>
+  <text x="64" y="122" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#2f54a5">icon · category · keywords</text>
   <line x1="352" y1="95" x2="556" y2="95" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
   <text x="454" y="86" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12.5" font-weight="700" fill="#1e3a8a">copied</text>
   <rect x="560" y="58" width="256" height="74" rx="9" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.4"/>

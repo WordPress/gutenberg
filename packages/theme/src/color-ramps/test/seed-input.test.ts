@@ -5,15 +5,18 @@ import { BG_RAMP_CONFIG } from '../lib/ramp-configs';
 
 const ACCEPTED_SEEDS = [
 	'#3858e9',
-	'#3858e94d',
+	'#3858e9ff',
 	'rgb(56,88,233)',
-	'rgb(56 88 233 / 0.3)',
-	'rgba(56,88,233,0.3)',
+	'rgb(56 88 233 / 1)',
+	'rgba(56,88,233,1)',
 	'blue',
-	'transparent',
 ];
 
 const REJECTED_SEEDS = [
+	'#3858e94d',
+	'rgb(56 88 233 / 0.3)',
+	'rgba(56,88,233,0.3)',
+	'transparent',
 	'oklch(0.7 0.15 250)',
 	'hsl(230 80% 56%)',
 	'lab(50% 40 59)',
