@@ -277,7 +277,7 @@ describe( 'layout', () => {
 			).toBe( 'style-state' );
 		} );
 
-		it( 'uses the regular block slot for pseudo states', () => {
+		it( 'uses the regular block slot for viewport plus pseudo states', () => {
 			expect(
 				getLayoutToolbarControlGroup( true, {
 					viewport: '@mobile',
