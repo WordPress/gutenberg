@@ -213,9 +213,7 @@ After the prebuild step, the package will be built into its final form via the r
 
 ## Stylelint Plugins
 
-These rules validate design token usage in CSS:
-
-Enable them in your Stylelint configuration:
+These rules validate design token usage in CSS. Enable them in your Stylelint configuration:
 
 ```json
 {
@@ -256,9 +254,7 @@ The build plugins inject generated fallbacks into bare `var(--wpds-*)` reference
 | `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks` | esbuild | JS/TS |
 | `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`       | Vite    | JS/TS |
 
-Existing fallbacks and non-`--wpds-*` properties are unchanged. An unknown token in a bare reference fails the build.
-
-PostCSS transforms declaration values in plain CSS and CSS modules, but not comments. The esbuild and Vite plugins transform `.js`, `.jsx`, `.ts`, `.tsx`, `.mjs`, `.mts`, `.cjs`, and `.cts` files outside `node_modules`; their source-text transform includes strings, template literals, and comments.
+Existing fallbacks are unchanged. An unknown token in a bare reference fails the build.
 
 ### PostCSS
 
