@@ -6,6 +6,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { ThemeProvider } from '../theme-provider';
 
 // Give the wrapper a stable class so tests can locate it and read its
@@ -36,14 +37,21 @@ function getScopingProvider( element: Element ) {
 	return element.closest< HTMLElement >( '.theme-provider-root' )!;
 }
 
-function injectThemeProviderStyles() {
+async function withInjectedThemeProviderStyles(
+	callback: () => void | Promise< void >
+) {
 	const style = document.createElement( 'style' );
 	style.textContent = readFileSync(
 		join( import.meta.dirname, '../style.module.css' ),
 		'utf8'
 	).replaceAll( '.root', '.theme-provider-root' );
 	document.head.appendChild( style );
-	return style;
+
+	try {
+		await callback();
+	} finally {
+		style.remove();
+	}
 }
 
 describe( 'ThemeProvider', () => {
@@ -53,10 +61,10 @@ describe( 'ThemeProvider', () => {
 		expect( screen.getByText( 'content' ) ).toBeInTheDocument();
 	} );
 
-	it( 'keeps its scoping wrapper styled as display contents and unfocusable', () => {
-		const style = injectThemeProviderStyles();
+	it( 'keeps its scoping wrapper styled as display contents and unfocusable', async () => {
+		const user = userEvent.setup();
 
-		try {
+		await withInjectedThemeProviderStyles( async () => {
 			render(
 				<>
 					<button>Before</button>
@@ -78,15 +86,17 @@ describe( 'ThemeProvider', () => {
 			provider.focus();
 			expect( provider ).not.toHaveFocus();
 
-			before.focus();
+			await user.tab();
 			expect( before ).toHaveFocus();
-			inside.focus();
+			await user.tab();
 			expect( inside ).toHaveFocus();
-			after.focus();
+			await user.tab();
 			expect( after ).toHaveFocus();
-		} finally {
-			style.remove();
-		}
+			await user.tab( { shift: true } );
+			expect( inside ).toHaveFocus();
+			await user.tab( { shift: true } );
+			expect( before ).toHaveFocus();
+		} );
 	} );
 
 	it( 'defines the color tokens from the seeds within its subtree', () => {
