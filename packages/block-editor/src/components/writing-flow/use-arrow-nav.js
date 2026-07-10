@@ -11,7 +11,7 @@ import {
 	isRTL,
 	isFormElement,
 } from '@wordpress/dom';
-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import { UP, DOWN, LEFT, RIGHT, HOME, END } from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
@@ -165,6 +165,8 @@ export function getClosestTabbable(
 
 export default function useArrowNav() {
 	const {
+		getBlockOrder,
+		getSelectedBlockClientId,
 		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
 		getSettings,
@@ -200,6 +202,26 @@ export default function useArrowNav() {
 
 			const { keyCode, target, shiftKey, ctrlKey, altKey, metaKey } =
 				event;
+
+			// Handle document-level navigation (Cmd+Up/Down on Mac,
+			// Ctrl+Home/End on Windows).
+			if (
+				( metaKey && ( keyCode === UP || keyCode === DOWN ) ) ||
+				( ctrlKey && ( keyCode === HOME || keyCode === END ) )
+			) {
+				const blockClientIds = getBlockOrder();
+				if ( blockClientIds.length ) {
+					const isReverse = keyCode === UP || keyCode === HOME;
+					const targetClientId = isReverse
+						? blockClientIds[ 0 ]
+						: blockClientIds[ blockClientIds.length - 1 ];
+					if ( getSelectedBlockClientId() !== targetClientId ) {
+						event.preventDefault();
+						selectBlock( targetClientId, isReverse ? 0 : -1 );
+					}
+				}
+				return;
+			}
 			const isUp = keyCode === UP;
 			const isDown = keyCode === DOWN;
 			const isLeft = keyCode === LEFT;
