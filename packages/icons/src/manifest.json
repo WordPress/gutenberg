@@ -1424,6 +1424,11 @@
 		"filePath": "library/shipping.svg"
 	},
 	{
+		"slug": "sites",
+		"label": "Sites",
+		"filePath": "library/sites.svg"
+	},
+	{
 		"slug": "shortcode",
 		"label": "Shortcode",
 		"filePath": "library/shortcode.svg"
