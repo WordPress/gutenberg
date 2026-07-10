@@ -360,6 +360,68 @@ test.describe( 'Notes canvas layout', () => {
 		await expect.poll( getReservedWidth ).toBe( 82 );
 	} );
 
+	test( 'floating notes do not react to the device preview', async ( {
+		editor,
+		page,
+	} ) => {
+		// Keep the canvas wide enough for the full-notes tier.
+		await page.setViewportSize( { width: 1450, height: 800 } );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph with a note' },
+		} );
+		await addNote( page, editor, 'Device preview note' );
+
+		const notes = page.getByRole( 'region', { name: 'Notes' } );
+		const overlay = page.locator( '.editor-collab-sidebar-overlay' );
+		const setDevice = async ( device ) => {
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'View', exact: true } )
+				.click();
+			await page.getByRole( 'menuitemradio', { name: device } ).click();
+			// The View menu stays open after choosing a device; close it so
+			// the next interaction starts from a closed menu.
+			await page.keyboard.press( 'Escape' );
+		};
+
+		// Reads the reserved padding applied to the canvas root.
+		const getReservedWidth = () =>
+			editor.canvas.locator( 'body' ).evaluate( ( body ) => {
+				const root = body.ownerDocument.documentElement;
+				return (
+					parseFloat(
+						body.ownerDocument.defaultView.getComputedStyle( root )
+							.paddingInlineEnd
+					) || 0
+				);
+			} );
+
+		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
+		await expect.poll( getReservedWidth ).toBe( 280 );
+
+		// The device preview simulates a device width; the notes are editor
+		// chrome, so they must neither collapse to the simulated width nor
+		// reserve space inside the previewed canvas (which would distort the
+		// simulation).
+		await setDevice( 'Tablet' );
+		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
+		await expect.poll( getReservedWidth ).toBe( 0 );
+
+		await setDevice( 'Mobile' );
+		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
+		await expect.poll( getReservedWidth ).toBe( 0 );
+
+		// Back to Desktop, the canvas reservation returns.
+		await setDevice( 'Desktop' );
+		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
+		await expect.poll( getReservedWidth ).toBe( 280 );
+	} );
+
 	test( 'notes display modes are switched from the Options menu', async ( {
 		editor,
 		page,

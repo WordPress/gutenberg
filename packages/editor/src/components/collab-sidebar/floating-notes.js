@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { createSlotFill } from '@wordpress/components';
 import { useStyleOverride } from '@wordpress/block-editor';
@@ -15,6 +16,7 @@ import { useStyleOverride } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { Notes } from './notes';
+import { store as editorStore } from '../../store';
 import {
 	NOTES_PANEL_WIDTH,
 	NOTES_PANEL_COMPACT_WIDTH,
@@ -26,15 +28,19 @@ export const { Slot: FloatingNotesSlot, Fill: FloatingNotesFill } =
 	createSlotFill( Symbol( 'EditorFloatingNotes' ) );
 
 /**
- * Measures the width of the editor canvas, and keeps the floating notes
- * overlay aligned with the visible canvas edge by insetting it by the canvas
- * scrollbar width (a runtime measurement CSS can't read).
+ * Measures the width of the editor canvas and of the surrounding editor
+ * container, and keeps the floating notes overlay aligned with the visible
+ * canvas edge by insetting it by the canvas scrollbar width (a runtime
+ * measurement CSS can't read).
  *
  * @param {Object} overlayRef Ref to the floating notes overlay element.
- * @return {number} The current canvas width, in pixels.
+ * @return {Object} The current canvas and editor widths, in pixels.
  */
-function useCanvasWidth( overlayRef ) {
-	const [ canvasWidth, setCanvasWidth ] = useState( Infinity );
+function useCanvasWidths( overlayRef ) {
+	const [ widths, setWidths ] = useState( {
+		canvasWidth: Infinity,
+		editorWidth: Infinity,
+	} );
 
 	useEffect( () => {
 		const overlay = overlayRef.current;
@@ -51,12 +57,14 @@ function useCanvasWidth( overlayRef ) {
 			const root = iframe?.contentDocument?.documentElement;
 			// Canvas width is the iframe viewport minus its scrollbar; fall
 			// back to the styles wrapper when the canvas is not iframed.
-			setCanvasWidth(
-				root?.clientWidth ??
+			setWidths( {
+				canvasWidth:
+					root?.clientWidth ??
 					editor?.querySelector( '.editor-styles-wrapper' )
 						?.clientWidth ??
-					Infinity
-			);
+					Infinity,
+				editorWidth: editor?.clientWidth ?? Infinity,
+			} );
 
 			// The canvas scrollbar stays at the window edge, but the reserved
 			// space ends where the scrollbar begins. Inset the overlay by the
@@ -75,12 +83,20 @@ function useCanvasWidth( overlayRef ) {
 			sync();
 			// The scrollbar appears and disappears as the canvas content grows
 			// and shrinks, and the body reflows when the canvas is resized;
-			// keep the measurements aligned when either happens.
+			// keep the measurements aligned when either happens. The editor
+			// container is observed too: in the device preview the iframe
+			// keeps a fixed simulated width, so only the container reflects
+			// editor resizes.
 			resizeObserver?.disconnect();
-			const body = iframe?.contentDocument?.body;
-			if ( body && window.ResizeObserver ) {
+			if ( window.ResizeObserver ) {
 				resizeObserver = new window.ResizeObserver( sync );
-				resizeObserver.observe( body );
+				const body = iframe?.contentDocument?.body;
+				if ( body ) {
+					resizeObserver.observe( body );
+				}
+				if ( editor ) {
+					resizeObserver.observe( editor );
+				}
 			}
 		};
 
@@ -96,19 +112,27 @@ function useCanvasWidth( overlayRef ) {
 		};
 	}, [ overlayRef ] );
 
-	return canvasWidth;
+	return widths;
 }
 
 export function FloatingNotes( { notes, sidebarRef, isCompact = false } ) {
 	const overlayRef = useRef( null );
+	const isDevicePreview = useSelect(
+		( select ) => select( editorStore ).getDeviceType() !== 'Desktop',
+		[]
+	);
 	// The panel yields progressively as the canvas narrows (the canvas is
 	// freely resizable, so a wide viewport can still hold a narrow canvas):
 	// full threads collapse to the minimized avatar pills first, and even the
-	// pills hide when the canvas can't spare their reserved space.
-	const canvasWidth = useCanvasWidth( overlayRef );
-	const hasRoom = canvasWidth >= MIN_CANVAS_WIDTH_FOR_FLOATING_NOTES;
+	// pills hide when the canvas can't spare their reserved space. In the
+	// device preview the canvas width is a simulated device width; the notes
+	// are editor chrome floating over the backdrop beside the previewed
+	// canvas, so they size to the editor container instead.
+	const { canvasWidth, editorWidth } = useCanvasWidths( overlayRef );
+	const availableWidth = isDevicePreview ? editorWidth : canvasWidth;
+	const hasRoom = availableWidth >= MIN_CANVAS_WIDTH_FOR_FLOATING_NOTES;
 	const showCompact =
-		isCompact || canvasWidth < MIN_CANVAS_WIDTH_FOR_FULL_NOTES;
+		isCompact || availableWidth < MIN_CANVAS_WIDTH_FOR_FULL_NOTES;
 	// Minimized threads collapse to an avatar pill, so reserve less canvas.
 	// The overlay itself keeps the full width so a selected thread still
 	// expands to a readable size (overlapping the canvas content).
@@ -124,12 +148,15 @@ export function FloatingNotes( { notes, sidebarRef, isCompact = false } ) {
 	// viewport units) from rendering under the reserved space. Injected with
 	// `useStyleOverride` so it reaches the iframed canvas (and is scoped to
 	// `.editor-styles-wrapper` for non-iframed canvases); logical properties
-	// keep it on the correct physical side in RTL.
+	// keep it on the correct physical side in RTL. No space is reserved in
+	// the device preview: padding inside the simulated canvas would distort
+	// the previewed layout, and the notes float over the backdrop instead.
 	useStyleOverride( {
 		id: 'core-note-reserved-space',
-		css: hasRoom
-			? `:root{padding-inline-end:${ reservedWidth }px}body{overflow-x:clip}`
-			: '',
+		css:
+			hasRoom && ! isDevicePreview
+				? `:root{padding-inline-end:${ reservedWidth }px}body{overflow-x:clip}`
+				: '',
 	} );
 
 	return (
