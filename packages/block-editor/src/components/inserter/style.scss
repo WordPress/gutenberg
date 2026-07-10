@@ -518,24 +518,14 @@ $block-inserter-tabs-height: 44px;
 		flex-grow: 1;
 	}
 
-	// Groups the pager and the attach button beneath the grid. Owning their
-	// shared spacing here keeps them from spanning the full width and gives the
-	// breathing room above (matching what the attach button had on its own).
 	.block-editor-inserter__media-panel-footer {
-		display: flex;
-		flex-direction: column;
-		// `flex-shrink: 0` keeps the footer at its natural height as a flex child
-		// rather than collapsing to make room for the scrolling grid above.
+		// Keeps the footer at its natural height rather than collapsing to make
+		// room for the scrolling grid above.
 		flex-shrink: 0;
-		// Natural vertical spacing between the pager and the attach button.
-		gap: $grid-unit-10;
-		// Breathing room above and below, mirroring the attach button's former
-		// top/bottom margins.
 		padding-top: $grid-unit-20;
 		padding-bottom: $grid-unit-20;
 		@include break-medium() {
-			// Align with the search field and grid gutters instead of running
-			// edge to edge.
+			// Align with the search field and grid gutters.
 			padding-left: $grid-unit-30;
 			padding-right: $grid-unit-30;
 		}

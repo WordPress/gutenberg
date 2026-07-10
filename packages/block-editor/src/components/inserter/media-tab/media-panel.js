@@ -19,6 +19,7 @@ import { useDebouncedInput, usePrevious } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { getScrollContainer } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -316,9 +317,12 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 			{ hasFooter && (
 				// A single footer wrapper owns the top and horizontal breathing
 				// room, so the pager and attach button don't span the full width
-				// and sit clear of the grid above. They stack as siblings with a
-				// natural gap between them (see styles).
-				<div className={ `${ baseCssClass }-footer` }>
+				// and sit clear of the grid above (see styles).
+				<Stack
+					direction="column"
+					gap="sm"
+					className={ `${ baseCssClass }-footer` }
+				>
 					{ showPagination && (
 						// Reuse the Patterns tab pager (presentational only); only
 						// rendered for multi-page sources (see `showPagination`).
@@ -334,7 +338,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 						// adjacent column.
 						<AttachImagesButton onSelect={ handleAttach } />
 					) }
-				</div>
+				</Stack>
 			) }
 			{ mediaPendingDetach && (
 				// A plain `Modal` (not `ConfirmDialog`) so we can pass
