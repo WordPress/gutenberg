@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useBlockProps } from '@wordpress/block-editor';
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import {
 	chevronLeft,
 	chevronRight,
@@ -35,7 +35,7 @@ function Edit( { attributes, context } ) {
 
 	let buttonInner;
 	if ( navigationButtonType === 'icon' ) {
-		buttonInner = <Icon icon={ icon } />;
+		buttonInner = <WCIcon icon={ icon } />;
 	} else if ( navigationButtonType === 'text' ) {
 		buttonInner = (
 			<span className="wp-block-slider-pagination-button__text">
@@ -45,7 +45,7 @@ function Edit( { attributes, context } ) {
 	} else if ( isPrevious ) {
 		buttonInner = (
 			<>
-				<Icon icon={ icon } />
+				<WCIcon icon={ icon } />
 				<span className="wp-block-slider-pagination-button__text">
 					{ buttonText }
 				</span>
@@ -57,7 +57,7 @@ function Edit( { attributes, context } ) {
 				<span className="wp-block-slider-pagination-button__text">
 					{ buttonText }
 				</span>
-				<Icon icon={ icon } />
+				<WCIcon icon={ icon } />
 			</>
 		);
 	}
