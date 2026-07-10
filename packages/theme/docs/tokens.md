@@ -40,7 +40,6 @@ Other token families use shorter forms when a segment would be redundant:
 | Border                  | `--wpds-border-<property>-<size-or-target>`                      | `--wpds-border-radius-sm`                                 |
 | Typography              | `--wpds-typography-<property>-<role-or-size>`                    | `--wpds-typography-font-size-md`                          |
 | Motion                  | `--wpds-motion-<property>-<scale-or-intent>`                     | `--wpds-motion-easing-balanced`                           |
-| Elevation               | `--wpds-elevation-<size>`                                        | `--wpds-elevation-sm`                                     |
 | Cursor                  | `--wpds-cursor-<target>`                                         | `--wpds-cursor-control`                                   |
 
 ### Type
@@ -53,7 +52,6 @@ Indicates what kind of value the token represents, usually mapping to a [Design 
 | `dimension`  | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
 | `border`     | Border properties like radius and width                                        |
 | `cursor`     | Cursor values for interactive affordances                                      |
-| `elevation`  | Shadow definitions for layering and depth                                      |
 | `motion`     | Animation durations and easing curves                                          |
 | `typography` | Typography properties like font family, font size, and line-height             |
 
@@ -335,15 +333,6 @@ The semantic token set is role-based, not a complete matrix of every property, t
 | `--wpds-dimension-surface-width-lg`  | Large surface width                                                      |
 | `--wpds-dimension-surface-width-xl`  | Extra large surface width                                                |
 | `--wpds-dimension-surface-width-2xl` | 2x extra large surface width                                             |
-
-### Elevation
-
-| Variable name         | Description                                                                                                                       |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `--wpds-elevation-xs` | For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame.     |
-| `--wpds-elevation-sm` | For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar. |
-| `--wpds-elevation-md` | For components that offer additional actions. Example: Menus, Command Palette                                                     |
-| `--wpds-elevation-lg` | For components that confirm decisions or handle necessary interruptions. Example: Modals.                                         |
 
 ### Motion
 

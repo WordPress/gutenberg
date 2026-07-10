@@ -129,8 +129,8 @@ test.describe( 'Guidelines', () => {
 	} ) => {
 		await visitGuidelinesPage( page, admin );
 
-		// Sections come from the wp_guideline_scopes registry plus the Blocks
-		// section the client injects.
+		// Sections come from the wp_guideline_scopes registry, including the
+		// Blocks scope the client renders as the per-block section.
 		await expect( getSectionCard( page, 'Site' ) ).toBeVisible();
 		await expect( getSectionCard( page, 'Copy' ) ).toBeVisible();
 		await expect( getSectionCard( page, 'Images' ) ).toBeVisible();
@@ -385,5 +385,48 @@ test.describe( 'Guidelines', () => {
 		await expect(
 			copyCard.getByRole( 'textbox', { name: 'Copy guidelines' } )
 		).toHaveValue( copyText );
+	} );
+
+	test.describe( 'with the scopes registry filtered by a plugin', () => {
+		// A plugin that filters wp_guideline_scopes: it adds a custom scope and
+		// removes the built-in `blocks` scope. Sections are registry-driven, so
+		// the page must grow the custom section and drop the Blocks section.
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-guidelines-scopes-filter'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-guidelines-scopes-filter'
+			);
+		} );
+
+		test( 'renders a custom scope and hides the removed Blocks section', async ( {
+			page,
+			admin,
+		} ) => {
+			await visitGuidelinesPage( page, admin );
+
+			// The built-in sections still render.
+			await expect( getSectionCard( page, 'Site' ) ).toBeVisible();
+			await expect( getSectionCard( page, 'Additional' ) ).toBeVisible();
+
+			// The plugin's custom scope renders as a normal single-field section.
+			const customCard = getSectionCard( page, 'E2E Custom' );
+			await expect( customCard ).toBeVisible();
+			await customCard
+				.getByRole( 'button', { name: 'E2E Custom', exact: true } )
+				.click();
+			await expect(
+				customCard.getByRole( 'textbox', {
+					name: 'E2E Custom guidelines',
+				} )
+			).toBeVisible();
+
+			// The Blocks section is gone: no card, no per-block UI.
+			await expect( getSectionCard( page, 'Blocks' ) ).toHaveCount( 0 );
+		} );
 	} );
 } );

@@ -26,6 +26,9 @@
 
 	// Make sure the focus style is drawn on top of the current item background.
 	&:focus-visible {
+		// TODO: remove once the <Item> component has migrated to the WPDS focus color token.
+		--wp-components-color-accent: var(--wpds-color-stroke-focus);
+
 		transform: translateZ(0);
 	}
 

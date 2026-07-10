@@ -46,7 +46,7 @@ export default function CustomInserterModal( { onClose, value, onChange } ) {
 				return { icons: null, hasResolvedIcons: false };
 			}
 			const query =
-				collectionSlug === '' ? {} : { namespace: collectionSlug };
+				collectionSlug === '' ? {} : { collection: collectionSlug };
 			const { getEntityRecords, hasFinishedResolution } =
 				select( coreDataStore );
 			return {
