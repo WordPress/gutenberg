@@ -168,10 +168,15 @@ function block_core_table_of_contents_get_template_part_content( $attributes ) {
 		? get_stylesheet()
 		: $attributes['theme'];
 
+	// Match `core/template-part` front-end rendering: template parts from
+	// another theme are unavailable on the current front end.
 	if ( get_stylesheet() !== $theme ) {
 		return '';
 	}
 
+	// Match `render_block_core_template_part()`: a published database
+	// template part is the customized source of truth and takes precedence
+	// over the theme file.
 	$template_part_query = new WP_Query(
 		array(
 			'post_type'           => 'wp_template_part',
@@ -201,6 +206,8 @@ function block_core_table_of_contents_get_template_part_content( $attributes ) {
 		return '';
 	}
 
+	// If there is no customized database template part, fall back to the
+	// active theme's file-based template part, as `core/template-part` does.
 	$template_part = get_block_file_template(
 		block_core_table_of_contents_get_template_part_id( $attributes ),
 		'wp_template_part'
