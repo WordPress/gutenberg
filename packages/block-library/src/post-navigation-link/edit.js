@@ -145,7 +145,6 @@ export default function PostNavigationLinkEdit( {
 						onDeselect={ () => setAttributes( { arrow: 'none' } ) }
 					>
 						<ToggleGroupControl
-							__next40pxDefaultSize
 							label={ __( 'Arrow' ) }
 							value={ arrow }
 							onChange={ ( value ) => {
@@ -183,7 +182,6 @@ export default function PostNavigationLinkEdit( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<SelectControl
-					__next40pxDefaultSize
 					label={ __( 'Filter by taxonomy' ) }
 					value={ taxonomy }
 					options={ getTaxonomyOptions() }

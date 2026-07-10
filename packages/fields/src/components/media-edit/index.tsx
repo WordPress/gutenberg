@@ -40,7 +40,6 @@ import {
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { VisuallyHidden, Tooltip } from '@wordpress/ui';
 import {
 	MediaUpload,
@@ -641,7 +640,9 @@ export default function MediaEdit< Item >( {
 	// reorders (same IDs), we fall back to the cached list to avoid a visual
 	// flash in compact mode. For replacements/uploads (new IDs not in cache),
 	// we let attachments be null as normal.
-	const stableAttachmentsRef = useRef< Attachment< 'view' >[] >( null );
+	const stableAttachmentsRef = useRef< Attachment< 'view' >[] | null >(
+		null
+	);
 	if ( attachments !== null ) {
 		stableAttachmentsRef.current = attachments;
 	}

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useRef, useCallback, useLayoutEffect } from '@wordpress/element';
-import type { Ref, RefCallback } from 'react';
+import type { MutableRefObject, Ref, RefCallback } from 'react';
 
 // Returns a cleanup function if the ref callback returned one (React 19 ref
 // callback cleanup pattern), otherwise `undefined`. Object refs never have a
@@ -12,7 +12,7 @@ function assignRef< T >( ref: Ref< T >, value: T ): ( () => void ) | undefined {
 		const returned = ref( value );
 		return typeof returned === 'function' ? returned : undefined;
 	} else if ( ref && ref.hasOwnProperty( 'current' ) ) {
-		ref.current = value;
+		( ref as MutableRefObject< T > ).current = value;
 	}
 	return undefined;
 }

@@ -155,13 +155,13 @@ if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 }
 ```
 
-The public interface of such APIs is not yet finalized. Aside from references within the code, they APIs should neither be documented nor mentioned in any CHANGELOG. They should effectively be considered to not exist from an external perspective. In most cases, they should only be exposed to satisfy requirements between packages maintained in this repository.
+The public interface of such APIs is not yet finalized. Aside from references within the code, these APIs should neither be documented nor mentioned in any CHANGELOG. They should effectively be considered to not exist from an external perspective. In most cases, they should only be exposed to satisfy requirements between packages maintained in this repository.
 
 While a plugin-only API may often stabilize into a publicly-available API, there is no guarantee that it will.
 
 #### Private APIs
 
-Each `@wordpress` package wanting to privately access or expose a private APIs can
+Each `@wordpress` package wanting to privately access or expose private APIs can
 do so by opting-in to `@wordpress/private-apis`:
 
 ```js
@@ -407,7 +407,7 @@ export function MyComponent() {
 
 WordPress extenders cannot update the private block settings on their own. The `updateSettings()` actions of the `@wordpress/block-editor` store will filter out all the settings that are **not** a part of the public API. The only way to actually store them is via the private action `__experimentalUpdateSettings()`.
 
-To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/actions.js](/packages/block-editor/src/store/actions.js):
+To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/private-actions.js](/packages/block-editor/src/store/private-actions.js):
 
 ```js
 const privateSettings = [

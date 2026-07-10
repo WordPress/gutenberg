@@ -9,8 +9,13 @@ import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
-import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
+import {
+	createBlock,
+	store as blocksStore,
+	__experimentalGetBlockLabel as getBlockLabel,
+} from '@wordpress/blocks';
+import { forwardRef } from '@wordpress/element';
 import { plus } from '@wordpress/icons';
 
 /**
@@ -21,16 +26,18 @@ import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
 import { getAppenderLabel } from './get-appender-label';
 
-function InserterToggle( {
-	onToggle,
-	disabled,
-	isOpen,
-	blockTitle,
-	hasSingleBlockType,
-	appenderLabel,
-	toggleProps = {},
-	ref,
-} ) {
+const UnforwardedInserterToggle = (
+	{
+		onToggle,
+		disabled,
+		isOpen,
+		blockTitle,
+		hasSingleBlockType,
+		appenderLabel,
+		toggleProps = {},
+	},
+	ref
+) => {
 	const {
 		as: Wrapper = Button,
 		label: labelProp,
@@ -78,26 +85,30 @@ function InserterToggle( {
 			{ ...rest }
 		/>
 	);
-}
+};
 
-function Inserter( {
-	clientId,
-	rootClientId,
-	disabled,
-	isAppender,
-	position,
-	selectBlockOnInsert,
-	shouldDirectInsert = true,
-	showInserterHelpPanel,
-	// This prop is experimental to give some time for the quick inserter to mature
-	// Feel free to make them stable after a few releases.
-	__experimentalIsQuick: isQuick,
-	onSelectOrClose,
-	onToggle,
-	renderToggle: renderToggleProp,
-	toggleProps,
-	ref,
-} ) {
+const InserterToggle = forwardRef( UnforwardedInserterToggle );
+
+const UnforwardedInserter = (
+	{
+		clientId,
+		rootClientId,
+		disabled,
+		isAppender,
+		position,
+		selectBlockOnInsert,
+		shouldDirectInsert = true,
+		showInserterHelpPanel,
+		// This prop is experimental to give some time for the quick inserter to mature
+		// Feel free to make them stable after a few releases.
+		__experimentalIsQuick: isQuick,
+		onSelectOrClose,
+		onToggle,
+		renderToggle: renderToggleProp,
+		toggleProps,
+	},
+	ref
+) => {
 	const {
 		hasItems,
 		hasSingleBlockType,
@@ -149,7 +160,6 @@ function Inserter( {
 			const defaultBlockType = directInsertBlock
 				? getBlockType( directInsertBlock.name )
 				: null;
-
 			return {
 				hasItems: hasInserterItems( _targetRootClientId ),
 				hasSingleBlockType: _hasSingleBlockType,
@@ -166,8 +176,16 @@ function Inserter( {
 		[ rootClientId, clientId, shouldDirectInsert ]
 	);
 
-	const registry = useRegistry();
 	const { insertBlock } = useDispatch( blockEditorStore );
+	const {
+		getBlock,
+		getBlockIndex,
+		getBlockOrder,
+		getBlockRootClientId,
+		getBlockSelectionEnd,
+		getPreviousBlockClientId,
+	} = useSelect( blockEditorStore );
+	const { getActiveBlockVariation, getBlockType } = useSelect( blocksStore );
 
 	// The global inserter (no isAppender, no rootClientId, no clientId) should
 	// always render, even with no items.
@@ -182,9 +200,6 @@ function Inserter( {
 			if ( ! attributesToCopy?.length ) {
 				return {};
 			}
-
-			const { getBlock, getPreviousBlockClientId } =
-				registry.select( blockEditorStore );
 
 			// Find the adjacent block of the same type whose attributes
 			// should be copied: previous sibling when inserting next to
@@ -218,13 +233,6 @@ function Inserter( {
 		}
 
 		function getInsertionIndex() {
-			const {
-				getBlockIndex,
-				getBlockSelectionEnd,
-				getBlockOrder,
-				getBlockRootClientId,
-			} = registry.select( blockEditorStore );
-
 			// If the clientId is defined, we insert at the position of the block.
 			if ( clientId ) {
 				return getBlockIndex( clientId );
@@ -265,12 +273,29 @@ function Inserter( {
 
 		onSelectOrClose?.( newBlock );
 
-		const message = sprintf(
-			// translators: %s: the name of the block that has been added
-			__( '%s block added' ),
-			allowedBlockType.title
-		);
-		speak( message );
+		const blockTypeToInsert = getBlockType( blockName );
+		let blockLabelToInsert;
+		if ( blockTypeToInsert ) {
+			blockLabelToInsert = getBlockLabel(
+				blockTypeToInsert,
+				newBlock.attributes
+			);
+
+			if ( blockLabelToInsert === blockTypeToInsert.title ) {
+				blockLabelToInsert =
+					getActiveBlockVariation( blockName, newBlock.attributes )
+						?.title || blockLabelToInsert;
+			}
+		}
+
+		if ( blockLabelToInsert ) {
+			const message = sprintf(
+				// translators: %s: the name of the block that has been added
+				__( '%s block added' ),
+				blockLabelToInsert
+			);
+			speak( message );
+		}
 	}
 
 	function renderToggle( { onToggle: dropdownOnToggle, isOpen } ) {
@@ -349,6 +374,8 @@ function Inserter( {
 			onClose={ onSelectOrClose }
 		/>
 	);
-}
+};
+
+const Inserter = forwardRef( UnforwardedInserter );
 
 export default Inserter;

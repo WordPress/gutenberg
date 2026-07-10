@@ -29,6 +29,7 @@ import GlobalStylesUIWrapper from './components/global-styles';
 import { StyleBookPreview } from './components/style-book';
 import { useGlobalStyles, useStyle } from './components/global-styles/hooks';
 import { GlobalStylesActionMenu } from './components/global-styles/menu';
+import UploadProgressSnackbar from './components/upload-progress-snackbar';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -48,6 +49,7 @@ lock( privateApis, {
 	ToolsMoreMenuGroup,
 	ViewMoreMenuGroup,
 	ResizableEditor,
+	UploadProgressSnackbar,
 	registerCoreBlockBindingsSources,
 	getTemplateInfo,
 	// Global Styles

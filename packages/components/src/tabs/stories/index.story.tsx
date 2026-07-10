@@ -16,6 +16,7 @@ const meta: Meta< typeof Tabs > = {
 		'Tabs.TabList': Tabs.TabList,
 		'Tabs.Tab': Tabs.Tab,
 		'Tabs.TabPanel': Tabs.TabPanel,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.Context': Tabs.Context,
 	},
 	tags: [ 'status-private' ],

@@ -181,7 +181,6 @@ export function SocialLinksEdit( props ) {
 						}
 					>
 						<SelectControl
-							__next40pxDefaultSize
 							label={ __( 'Icon size' ) }
 							onChange={ ( newSize ) => {
 								setAttributes( {

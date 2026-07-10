@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { memo } from '@wordpress/element';
+import { forwardRef, memo } from '@wordpress/element';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -59,14 +60,25 @@ const withSelect = (
 ) =>
 	createHigherOrderComponent(
 		( WrappedComponent ) =>
-			memo( function WithSelect( ownProps: Record< string, unknown > ) {
-				const mapSelect = (
-					select: SelectFunction,
-					registry: DataRegistry
-				) => mapSelectToProps( select, ownProps, registry );
-				const mergeProps = useSelect( mapSelect );
-				return <WrappedComponent { ...ownProps } { ...mergeProps } />;
-			} ),
+			memo(
+				forwardRef( function WithSelect(
+					ownProps: Record< string, unknown >,
+					ref: ForwardedRef< unknown >
+				) {
+					const mapSelect = (
+						select: SelectFunction,
+						registry: DataRegistry
+					) => mapSelectToProps( select, ownProps, registry );
+					const mergeProps = useSelect( mapSelect );
+					return (
+						<WrappedComponent
+							ref={ ref }
+							{ ...ownProps }
+							{ ...mergeProps }
+						/>
+					);
+				} )
+			),
 		'withSelect'
 	);
 

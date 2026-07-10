@@ -72,7 +72,7 @@ function Navigation() {
 			navigationKey={ navigationKey }
 			onNavigate={ handleNavigate }
 			content={
-				<>
+				<div role="list">
 					{ items.map( ( item: MenuItem ) => {
 						if ( item.parent_type === 'dropdown' ) {
 							return (
@@ -117,7 +117,7 @@ function Navigation() {
 							</NavigationItem>
 						);
 					} ) }
-				</>
+				</div>
 			}
 		/>
 	);

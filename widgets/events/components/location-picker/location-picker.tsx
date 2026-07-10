@@ -23,19 +23,50 @@ type LocationOption = {
 	value: string;
 };
 
-export function LocationPicker( {
-	hidden,
-	onSubmit,
-	showCancel,
-	onCancel,
-	seedInput = '',
-}: {
-	hidden: boolean;
-	onSubmit: ( location: string ) => void;
-	showCancel: boolean;
-	onCancel: () => void;
+const SEARCH_DEBOUNCE_MS = 500;
+
+type LocationPickerProps = {
+	/**
+	 * The initial input value.
+	 */
 	seedInput?: string;
-} ) {
+	/**
+	 * Whether to hide the label from vision.
+	 */
+	hideLabelFromVision?: boolean;
+
+	/**
+	 * Show the input's help text. Defaults to true.
+	 */
+	showDescription?: boolean;
+
+	/**
+	 * Controls Select button visibility.
+	 */
+	selectButton?: boolean;
+
+	/**
+	 * Called when the user submits via the Select button.
+	 */
+	onSubmit?: ( location: string ) => void;
+
+	/**
+	 * Called when the staged location changes through a deliberate action: an
+	 * autocomplete selection, geolocation, or clearing the field. Never fires
+	 * for intermediate typing, so the saved value is always a real choice. Used
+	 * when `selectButton` is false.
+	 */
+	onChange?: ( location: string ) => void;
+};
+
+export function LocationPicker( {
+	onSubmit = () => {},
+	seedInput = '',
+	hideLabelFromVision = true,
+	showDescription = true,
+	selectButton = true,
+	onChange,
+}: LocationPickerProps ) {
 	const locationInputId = useId();
 	const [ locationInput, setLocationInput ] = useState( seedInput );
 	const [ locationOptions, setLocationOptions ] = useState<
@@ -44,10 +75,10 @@ export function LocationPicker( {
 	const [ isLocatingCity, setIsLocatingCity ] = useState( false );
 
 	useEffect( () => {
-		if ( showCancel && seedInput ) {
+		if ( ! selectButton || seedInput ) {
 			setLocationInput( seedInput );
 		}
-	}, [ showCancel, seedInput ] );
+	}, [ selectButton, seedInput ] );
 
 	const fillCityFromGeolocation = async () => {
 		if ( ! navigator.geolocation || isLocatingCity ) {
@@ -87,6 +118,10 @@ export function LocationPicker( {
 
 			if ( city ) {
 				setLocationInput( city );
+				// Geolocation is a confirmed choice, so stage it.
+				if ( ! selectButton ) {
+					onChange?.( city );
+				}
 			}
 		} catch {
 			// No-op: keep manual location entry as fallback.
@@ -164,7 +199,7 @@ export function LocationPicker( {
 				}
 				setLocationOptions( [] );
 			}
-		}, 200 );
+		}, SEARCH_DEBOUNCE_MS );
 
 		return () => {
 			clearTimeout( timeoutId );
@@ -172,80 +207,91 @@ export function LocationPicker( {
 		};
 	}, [ locationInput ] );
 
-	if ( hidden ) {
-		return null;
-	}
-
 	return (
-		<div className={ styles.locationPicker }>
-			<form
-				onSubmit={ ( e ) => {
-					e.preventDefault();
+		<form
+			onSubmit={ ( e ) => {
+				e.preventDefault();
+				if ( selectButton ) {
 					onSubmit( locationInput );
-				} }
-			>
-				<Stack direction="row" align="start" wrap="wrap" gap="sm">
-					<Autocomplete.Root
-						items={ locationOptions }
-						value={ locationInput }
-						onValueChange={ setLocationInput }
-					>
-						<Autocomplete.Input
-							id={ locationInputId }
-							className={ styles.locationInput }
-							render={
-								<InputControl
-									autoComplete="off"
-									label={ __( 'City' ) }
-									hideLabelFromVision
-									size="compact"
-									description={ __(
-										'Select a city to view upcoming events.'
-									) }
-									onValueChange={ () => {} }
-									suffix={
-										<InputLayout.Slot padding="minimal">
-											<Autocomplete.Clear />
-											<IconButton
-												icon={ mapMarker }
-												label={ __(
-													'Use current location'
-												) }
-												onClick={
-													fillCityFromGeolocation
-												}
-												disabled={ isLocatingCity }
-												size="small"
-												variant="minimal"
-											/>
-										</InputLayout.Slot>
-									}
-								/>
-							}
-							placeholder={ __( 'City, like Tokyo…' ) }
-						/>
-						{ locationOptions.length > 0 && (
-							<Autocomplete.Popup>
-								<Autocomplete.List>
-									<Autocomplete.ListBody>
-										<Autocomplete.Collection>
-											{ ( item: {
-												id: string;
-												value: string;
-											} ) => (
-												<Autocomplete.Item
-													key={ item.id }
-													value={ item }
-												>
-													{ item.value }
-												</Autocomplete.Item>
+				}
+			} }
+		>
+			<Stack direction="row" align="start" wrap="wrap" gap="sm">
+				<Autocomplete.Root
+					items={ locationOptions }
+					value={ locationInput }
+					onValueChange={ ( value, eventDetails ) => {
+						setLocationInput( value );
+						// Stage only deliberate changes: pressing an item or
+						// clearing the field, never intermediate typing, so the
+						// saved value is always a real choice.
+						const isDeliberate =
+							eventDetails.reason === 'item-press' ||
+							eventDetails.reason === 'clear-press';
+						if ( ! selectButton && isDeliberate ) {
+							onChange?.( value );
+						}
+					} }
+				>
+					<Autocomplete.Input
+						id={ locationInputId }
+						className={ styles.locationInput }
+						render={
+							<InputControl
+								autoComplete="off"
+								label={ __( 'City' ) }
+								hideLabelFromVision={ hideLabelFromVision }
+								size="compact"
+								description={
+									showDescription
+										? __(
+												'Select a city to view upcoming events.'
+										  )
+										: undefined
+								}
+								onValueChange={ () => {} }
+								suffix={
+									<InputLayout.Slot padding="minimal">
+										<Autocomplete.Clear />
+										<IconButton
+											icon={ mapMarker }
+											label={ __(
+												'Use current location'
 											) }
-										</Autocomplete.Collection>
-									</Autocomplete.ListBody>
-								</Autocomplete.List>
-							</Autocomplete.Popup>
-						) }
-					</Autocomplete.Root>
+											onClick={ fillCityFromGeolocation }
+											disabled={ isLocatingCity }
+											size="small"
+											variant="minimal"
+										/>
+									</InputLayout.Slot>
+								}
+							/>
+						}
+						placeholder={ __( 'Select city…' ) }
+					/>
+					{ locationOptions.length > 0 && (
+						<Autocomplete.Popup>
+							<Autocomplete.List>
+								<Autocomplete.ListBody>
+									<Autocomplete.Collection>
+										{ ( item: {
+											id: string;
+											value: string;
+										} ) => (
+											<Autocomplete.Item
+												key={ item.id }
+												value={ item }
+											>
+												{ item.value }
+											</Autocomplete.Item>
+										) }
+									</Autocomplete.Collection>
+								</Autocomplete.ListBody>
+							</Autocomplete.List>
+						</Autocomplete.Popup>
+					) }
+				</Autocomplete.Root>
+				{ selectButton && (
 					<Button
 						variant="outline"
 						size="compact"
@@ -254,18 +300,8 @@ export function LocationPicker( {
 					>
 						{ __( 'Select' ) }
 					</Button>
-					{ showCancel && (
-						<Button
-							size="compact"
-							tone="neutral"
-							variant="minimal"
-							onClick={ onCancel }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-					) }
-				</Stack>
-			</form>
-		</div>
+				) }
+			</Stack>
+		</form>
 	);
 }

@@ -53,6 +53,7 @@ const {
 	updateBlockListSettings,
 	updateSettings,
 	validateBlocksToTemplate,
+	__unstableMarkNextChangeAsNotPersistent,
 	registerInserterMediaCategory,
 	setBlockEditingMode,
 	unsetBlockEditingMode,
@@ -810,6 +811,26 @@ describe( 'actions', () => {
 				time: expect.any( Number ),
 				updateSelection: true,
 				initialPosition: 0,
+			} );
+		} );
+	} );
+
+	describe( '__unstableMarkNextChangeAsNotPersistent', () => {
+		it( 'should use merge history by default', () => {
+			expect( __unstableMarkNextChangeAsNotPersistent() ).toEqual( {
+				type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+				history: 'merge',
+			} );
+		} );
+
+		it( 'should allow ignoring history for the next change', () => {
+			expect(
+				__unstableMarkNextChangeAsNotPersistent( {
+					history: 'ignore',
+				} )
+			).toEqual( {
+				type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+				history: 'ignore',
 			} );
 		} );
 	} );

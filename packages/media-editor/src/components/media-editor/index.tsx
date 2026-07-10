@@ -6,16 +6,14 @@ import {
 	Flex,
 	Spinner,
 	__experimentalConfirmDialog as ConfirmDialog,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Tabs } from '@wordpress/ui';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	createPortal,
 	useCallback,
-	useContext,
 	useEffect,
 	useMemo,
 	useRef,
@@ -37,11 +35,7 @@ import {
 	// No type declarations available for @wordpress/interface.
 	// @ts-expect-error
 } from '@wordpress/interface';
-import type {
-	JSX,
-	KeyboardEvent as ReactKeyboardEvent,
-	ReactNode,
-} from 'react';
+import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -51,10 +45,9 @@ import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
 import MediaEditorCanvas from '../media-editor-canvas';
 import MediaEditorFineRotation from '../media-editor-fine-rotation';
-import MediaEditorTransformControls from '../media-editor-transform-controls';
+import MediaEditorImageControls from '../media-editor-image-controls';
 import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
-import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { MediaEditorStateProvider, useMediaEditor } from '../../state';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
@@ -76,8 +69,6 @@ const ATTACHMENT_EMBED_QUERY = { _embed: 'author,wp:attached-to' } as const;
 
 const PLACEMENT_CONTROL_IDLE_MS = 300;
 
-const { Tabs } = unlock( componentsPrivateApis );
-
 interface EditorTab {
 	id: string;
 	title: string;
@@ -90,15 +81,14 @@ export interface MediaEditorFrameProps {
 	footerActions: ReactNode;
 	/**
 	 * Footer layout selector. Frames apply this to the footer container
-	 * as a modifier class.
+	 * as a modifier class. Tracks the sidebar-collapse breakpoint (`medium`).
 	 *
-	 * - `wide`   — single row: History | Ruler | Transform | Cancel/Save.
-	 * - `medium` — two rows: ruler on top; History | Transform | Cancel/Save
-	 *              beneath.
-	 * - `narrow` — three rows: ruler; transform (centered); History |
-	 *              Cancel/Save.
+	 * - `wide`   — sidebar is a column; footer is a single row of History |
+	 *              Cancel/Save (transform controls live in the Crop panel).
+	 * - `narrow` — sidebar collapsed; transform controls sit above a
+	 *              History | Cancel/Save row.
 	 */
-	footerLayout: 'wide' | 'medium' | 'narrow';
+	footerLayout: 'wide' | 'narrow';
 	onRequestClose: () => void;
 	onKeyDown: ( event: ReactKeyboardEvent< HTMLElement > ) => void;
 	shouldCloseOnClickOutside: boolean;
@@ -121,7 +111,10 @@ export interface MediaEditorProps {
 }
 
 function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
-	const tabsContextValue = useContext( Tabs.Context );
+	// The tab list and panels must share one `<Tabs.Root>`, but they render in
+	// separate `ComplementaryArea` regions (header vs body). A non-virtual Slot
+	// reconciles both inline at the Slot, so the `Root` is lifted to wrap this
+	// Fill and that Slot together — see `MediaEditorContent`.
 	return (
 		<ComplementaryArea
 			scope="media-editor"
@@ -132,29 +125,22 @@ function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
 			className="media-editor__sidebar"
 			panelClassName="media-editor__sidebar-panel"
 			headerClassName="media-editor__sidebar-header"
+			closeLabel={ __( 'Close media panel' ) }
 			header={
-				<Tabs.Context.Provider value={ tabsContextValue }>
-					<Tabs.TabList>
-						{ tabs.map( ( tab ) => (
-							<Tabs.Tab key={ tab.id } tabId={ tab.id }>
-								{ tab.title }
-							</Tabs.Tab>
-						) ) }
-					</Tabs.TabList>
-				</Tabs.Context.Provider>
+				<Tabs.List variant="minimal">
+					{ tabs.map( ( tab ) => (
+						<Tabs.Tab key={ tab.id } value={ tab.id }>
+							{ tab.title }
+						</Tabs.Tab>
+					) ) }
+				</Tabs.List>
 			}
 		>
-			<Tabs.Context.Provider value={ tabsContextValue }>
-				{ tabs.map( ( tab ) => (
-					<Tabs.TabPanel
-						key={ tab.id }
-						tabId={ tab.id }
-						focusable={ false }
-					>
-						{ tab.panel }
-					</Tabs.TabPanel>
-				) ) }
-			</Tabs.Context.Provider>
+			{ tabs.map( ( tab ) => (
+				<Tabs.Panel key={ tab.id } value={ tab.id } tabIndex={ -1 }>
+					{ tab.panel }
+				</Tabs.Panel>
+			) ) }
 		</ComplementaryArea>
 	);
 }
@@ -253,6 +239,15 @@ function HistoryActions( {
 		>
 			<Button
 				size="compact"
+				variant="tertiary"
+				disabled={ ! isDirty }
+				accessibleWhenDisabled
+				onClick={ handleReset }
+			>
+				{ __( 'Reset' ) }
+			</Button>
+			<Button
+				size="compact"
 				icon={ undo }
 				label={ __( 'Undo' ) }
 				showTooltip
@@ -275,15 +270,6 @@ function HistoryActions( {
 				accessibleWhenDisabled
 				onClick={ handleRedo }
 			/>
-			<Button
-				size="compact"
-				variant="tertiary"
-				disabled={ ! isDirty }
-				accessibleWhenDisabled
-				onClick={ handleReset }
-			>
-				{ __( 'Reset' ) }
-			</Button>
 		</Flex>
 	);
 }
@@ -347,19 +333,15 @@ function MediaEditorContent( {
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
 	const cropper = useMediaEditor();
-	// Three footer layouts, picked from the viewport so DOM order matches
-	// visual order in all three (no `order` reshuffling needed):
-	//   wide   (≥ xlarge): single row.
-	//   medium (≥ medium): ruler on top; rest beneath.
-	//   narrow (< medium): ruler, then transform centered, then history/save.
-	const isWideViewport = useViewportMatch( 'xlarge' );
-	const isMediumViewport = useViewportMatch( 'medium' );
-	let footerLayout: 'wide' | 'medium' | 'narrow' = 'narrow';
-	if ( isWideViewport ) {
-		footerLayout = 'wide';
-	} else if ( isMediumViewport ) {
-		footerLayout = 'medium';
-	}
+	// The sidebar is a side column from the `small` breakpoint up and collapses
+	// to an overlay below it — mirroring InterfaceSkeleton's behaviour, shifted
+	// from `medium` to `small` (see the matching CSS overrides in style.scss).
+	// Track that single breakpoint: in "panel mode" (≥ small) the
+	// rotate/flip/zoom controls live in the Crop panel and the footer is just
+	// History + Cancel/Save; below it the controls drop into the footer. (The
+	// fine-rotation ruler always sits under the canvas.)
+	const isPanelLayout = useViewportMatch( 'small' );
+	const footerLayout: 'wide' | 'narrow' = isPanelLayout ? 'wide' : 'narrow';
 
 	const { media, hasEdits } = useSelect(
 		( select ) => {
@@ -404,9 +386,8 @@ function MediaEditorContent( {
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
 		useState( false );
-	const placementControlTimerRef = useRef<
-		ReturnType< typeof setTimeout > | undefined
-	>( undefined );
+	const placementControlTimerRef =
+		useRef< ReturnType< typeof setTimeout > >();
 
 	const signalPlacementControlInteraction = useCallback( () => {
 		setIsPlacementActive( true );
@@ -494,10 +475,8 @@ function MediaEditorContent( {
 						<MediaEditorCropPanel
 							aspectRatioValue={ aspectRatioValue }
 							onAspectRatioChange={ setAspectRatioValue }
-							onPlacementControlInteraction={
-								signalPlacementControlInteraction
-							}
 							aspectRatioOptions={ aspectRatioOptions }
+							showTransformControls={ isPanelLayout }
 						/>
 					</Stack>
 				),
@@ -509,8 +488,15 @@ function MediaEditorContent( {
 		aspectRatioValue,
 		setAspectRatioValue,
 		aspectRatioOptions,
-		signalPlacementControlInteraction,
+		isPanelLayout,
 	] );
+
+	// Control the active tab from state here so the selection survives the
+	// sidebar closing (which unmounts the `ComplementaryArea` Fill and its
+	// tabs). Fall back to the first tab until one is picked, so images open on
+	// Crop.
+	const [ selectedTabId, setSelectedTabId ] = useState< string >();
+	const activeTabId = selectedTabId ?? tabs[ 0 ]?.id;
 
 	const handleChange = ( updates: Partial< Media > ) => {
 		editEntityRecord( 'postType', 'attachment', id, updates );
@@ -580,32 +566,44 @@ function MediaEditorContent( {
 		/>
 	);
 
+	const ruler = isImage ? (
+		<MediaEditorFineRotation
+			onPlacementControlInteraction={ signalPlacementControlInteraction }
+		/>
+	) : null;
+
 	const children = (
 		<MediaEditorProvider
 			value={ media ?? undefined }
 			onChange={ handleChange }
 			settings={ { fields } }
 		>
-			<div className="media-editor">
-				{ ! media ? (
+			{ ! media ? (
+				<div className="media-editor">
 					<div className="media-editor__loading">
 						<Spinner />
 					</div>
-				) : (
-					<>
-						<Tabs>
-							<MediaEditorSidebar tabs={ tabs } />
-						</Tabs>
-						<InterfaceSkeleton
-							className="media-editor__skeleton"
-							labels={ {
-								body: isImage
-									? __( 'Image editor' )
-									: __( 'Media preview' ),
-								sidebar: __( 'Media details' ),
-							} }
-							content={
-								<div className="media-editor__canvas">
+				</div>
+			) : (
+				<Tabs.Root
+					className="media-editor"
+					value={ activeTabId }
+					onValueChange={ ( value ) =>
+						setSelectedTabId( value as string )
+					}
+				>
+					<MediaEditorSidebar tabs={ tabs } />
+					<InterfaceSkeleton
+						className="media-editor__skeleton"
+						labels={ {
+							body: isImage
+								? __( 'Image editor' )
+								: __( 'Media preview' ),
+							sidebar: __( 'Media details' ),
+						} }
+						content={
+							<div className="media-editor__content">
+								<div className="media-editor__canvas-area">
 									{ isImage ? (
 										<MediaEditorCanvas
 											focusOnMount
@@ -623,14 +621,19 @@ function MediaEditorContent( {
 										<MediaPreview />
 									) }
 								</div>
-							}
-							sidebar={
-								<ComplementaryArea.Slot scope="media-editor" />
-							}
-						/>
-					</>
-				) }
-			</div>
+								{ isImage && (
+									<div className="media-editor__canvas-toolbar">
+										{ ruler }
+									</div>
+								) }
+							</div>
+						}
+						sidebar={
+							<ComplementaryArea.Slot scope="media-editor" />
+						}
+					/>
+				</Tabs.Root>
+			) }
 			<ConfirmDialog
 				isOpen={ isDiscardDialogOpen }
 				confirmButtonText={ __( 'Discard' ) }
@@ -657,12 +660,12 @@ function MediaEditorContent( {
 			onReset={ resetCropOptions }
 		/>
 	) : null;
-	const ruler = isImage ? (
-		<MediaEditorFineRotation
-			onPlacementControlInteraction={ signalPlacementControlInteraction }
+	const imageControls = isImage ? (
+		<MediaEditorImageControls
+			showAspectRatioControl
+			aspectRatioPresets={ aspectRatioPresets }
 		/>
 	) : null;
-	const transform = isImage ? <MediaEditorTransformControls /> : null;
 	const actions = (
 		<FooterActions
 			isSaving={ isSaving }
@@ -673,40 +676,25 @@ function MediaEditorContent( {
 		/>
 	);
 
-	// One JSX tree per layout. DOM order matches visual order in all three.
-	// `.media-editor-modal__footer-toolbar` (wide only) groups ruler +
-	// transform with the centered cluster and divider that the wide layout
-	// has always had.
+	// The fine-rotation ruler always lives under the canvas (in
+	// `media-editor__content`), never the footer, so it stays constrained to
+	// the canvas column at every viewport. One JSX tree per layout; DOM order
+	// matches visual order.
 	let footerActions: ReactNode;
 	if ( footerLayout === 'wide' ) {
+		// Sidebar is a column: image controls live in the Crop panel, so
+		// the footer is just History + Cancel/Save.
 		footerActions = (
 			<>
 				{ history }
-				{ isImage && (
-					<div className="media-editor-modal__footer-toolbar">
-						{ ruler }
-						{ transform }
-					</div>
-				) }
 				{ actions }
 			</>
 		);
-	} else if ( footerLayout === 'medium' ) {
-		footerActions = (
-			<>
-				{ ruler }
-				<div className="media-editor-modal__footer-row">
-					{ history }
-					{ transform }
-					{ actions }
-				</div>
-			</>
-		);
 	} else {
+		// Sidebar collapsed: the image controls drop into the footer.
 		footerActions = (
 			<>
-				{ ruler }
-				{ transform }
+				{ imageControls }
 				<div className="media-editor-modal__footer-row">
 					{ history }
 					{ actions }

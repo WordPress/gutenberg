@@ -785,13 +785,95 @@ test.describe( 'insert media from inserter', () => {
 
 		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
-		await page.getByRole( 'tab', { name: 'Images' } ).click();
+		// `exact` so this matches only the "Images" source and not the new
+		// "Attached images" source, which also contains "Images".
+		await page.getByRole( 'tab', { name: 'Images', exact: true } ).click();
 		await page.getByLabel( uploadedMedia.title.raw ).click();
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:image {"id":${ uploadedMedia.id }} -->
 <figure class="wp-block-image"><img src="${ uploadedMedia.source_url }" alt="${ uploadedMedia.alt_text }" class="wp-image-${ uploadedMedia.id }"/></figure>
 <!-- /wp:image -->`
 		);
+	} );
+} );
+
+test.describe( 'Attached images media category', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deleteAllMedia(),
+			requestUtils.deleteAllPosts(),
+		] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deleteAllMedia(),
+			requestUtils.deleteAllPosts(),
+		] );
+	} );
+
+	test( 'lists images attached to the current post and empties after detaching', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Attached images test',
+			status: 'draft',
+		} );
+		const media = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+		// Re-parent the uploaded image to the post so it appears in the
+		// "Attached images" source, which filters by the attachment's parent.
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/media/${ media.id }`,
+			data: { post: post.id },
+		} );
+
+		await admin.editPost( post.id );
+
+		await page.getByLabel( 'Block Inserter' ).click();
+		await page.getByRole( 'tab', { name: 'Media' } ).click();
+		await page.getByRole( 'tab', { name: 'Attached images' } ).click();
+
+		const mediaPanel = page.locator(
+			'.block-editor-inserter__media-panel'
+		);
+		const attachedImage = mediaPanel.getByRole( 'option', {
+			name: media.title.raw,
+		} );
+		await expect( attachedImage ).toBeVisible();
+
+		// The per-item options button is only revealed once the item is
+		// hovered, matching how a user reaches the detach action.
+		await attachedImage.hover();
+		await mediaPanel.getByRole( 'button', { name: 'Options' } ).click();
+		await page
+			.getByRole( 'menuitem', { name: 'Detach from post' } )
+			.click();
+
+		// Detaching is confirmed in a modal before it takes effect.
+		await page
+			.getByRole( 'dialog', { name: 'Detach image' } )
+			.getByRole( 'button', { name: 'Detach' } )
+			.click();
+
+		// Scope to the snackbar so this doesn't also match the visually hidden
+		// `aria-live` region that mirrors the notice text for screen readers.
+		await expect(
+			page
+				.locator( '.components-snackbar__content' )
+				.filter( { hasText: 'Image detached from' } )
+		).toBeVisible();
+
+		// With its only attachment removed, the source falls back to its empty
+		// state rather than dropping out of the tab list.
+		await expect( attachedImage ).toBeHidden();
+		await expect(
+			page.getByText( 'No images attached to this post.' )
+		).toBeVisible();
 	} );
 } );
 

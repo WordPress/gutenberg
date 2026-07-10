@@ -6,13 +6,13 @@ import { render, screen } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { Component, Suspense } from '@wordpress/element';
 import {
 	createRegistry,
 	createReduxStore,
 	useSuspenseSelect,
 	RegistryProvider,
 } from '@wordpress/data';
+import { Component, Suspense } from '@wordpress/element';
 
 function createRegistryWithStore() {
 	const initialState = {
@@ -110,12 +110,10 @@ describe( 'useSuspenseSelect', () => {
 		render( <App /> );
 		await screen.findByLabelText( 'loaded' );
 
-		// Verify there were 4 attempts to render:
-		// - initial render with `getToken` not being resolved and suspending, rendering fallback;
-		// - second render for sibling prerendering which collects all other suspending promises early;
-		// - third render after `getToken` is resolved and `getData` suspends;
-		// - final fourth render after all data got loaded.
-		expect( attempts ).toBe( 4 );
+		// Verify there were 3 attempts to render. Suspended twice because of
+		// `getToken` and `getData` selectors not being resolved, and then finally
+		// rendered after all data got loaded.
+		expect( attempts ).toBe( 3 );
 		expect( renders ).toBe( 1 );
 	} );
 
@@ -231,23 +229,7 @@ describe( 'useSuspenseSelect', () => {
 		const slowLabel = await screen.findByLabelText( 'slow loaded' );
 		expect( slowLabel ).toHaveTextContent( 'slow' );
 
-		// Verify the number of renders. The reasoning behind is subtle but not that complicated:
-		// - initial render where both `FastUI` and `SlowUI` suspend and fallbacks are rendered;
-		// - second (async) render for sibling prerendering that tries to collect all suspending promises.
-		//   Both `FastUI` and `SlowUI` suspend again but this time the result is not committed, its purpose
-		//   was just to collect suspending promises.
-		// - `FastUI` renders for third time after its suspended promise is resolved. However, this render
-		//   is _not_ committed because of "suspense fallback throttling". The render is delayed/throttled for 300ms
-		//   so that the user doesn't see too many and too fast UI flashes. The fallback continues to be rendered.
-		// - `SlowUI` suspended promise is resolved and a third render is triggered. However, as the `FastUI` render
-		//   is not yet committed, a _fourth_ render is triggered, to make sure that we'll be committing the most
-		//   up-to-date state of the `FastUI` component.
-		//
-		// The above explains why there are 4 renders of `FastUI` and 3 renders of `SlowUI`. The non-obvious part
-		// is explained by a combination of two React features:
-		// - sibling prerendering that triggers an extra rerender after one component suspends;
-		// - fallback throttling that delays commit by 300ms and triggers an extra rerender.
-		expect( FastUI ).toHaveBeenCalledTimes( 4 );
-		expect( SlowUI ).toHaveBeenCalledTimes( 3 );
+		expect( FastUI ).toHaveBeenCalledTimes( 2 );
+		expect( SlowUI ).toHaveBeenCalledTimes( 2 );
 	} );
 } );
