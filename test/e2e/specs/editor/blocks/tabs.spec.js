@@ -54,7 +54,6 @@ test.describe( 'Tabs', () => {
 
 		test( 'activates the next tab when the caret moves into its label with the right arrow key', async ( {
 			editor,
-			page,
 			pageUtils,
 		} ) => {
 			await editor.insertBlock(
@@ -70,8 +69,9 @@ test.describe( 'Tabs', () => {
 			await expect( editor.canvas.getByText( 'Panel 1' ) ).toBeVisible();
 			await expect( editor.canvas.getByText( 'Panel 2' ) ).toBeHidden();
 
-			await page.keyboard.press( 'End' );
-			await page.keyboard.press( 'ArrowRight' );
+			// Select all text, then arrow right twice to move the caret into the next tab
+			await pageUtils.pressKeys( 'primary+a' );
+			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 
 			await expect( tab1 ).toHaveAttribute( 'aria-selected', 'false' );
 			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
@@ -89,7 +89,6 @@ test.describe( 'Tabs', () => {
 
 		test( 'activates the previous tab when the caret moves into its label with the left arrow key', async ( {
 			editor,
-			page,
 			pageUtils,
 		} ) => {
 			await editor.insertBlock(
@@ -105,8 +104,9 @@ test.describe( 'Tabs', () => {
 			await expect( editor.canvas.getByText( 'Panel 1' ) ).toBeHidden();
 			await expect( editor.canvas.getByText( 'Panel 2' ) ).toBeVisible();
 
-			await page.keyboard.press( 'Home' );
-			await page.keyboard.press( 'ArrowLeft' );
+			// Select all text, then arrow right twice to move the caret into the next tab
+			await pageUtils.pressKeys( 'primary+a' );
+			await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
 
 			await expect( tab1 ).toHaveAttribute( 'aria-selected', 'true' );
 			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'false' );
@@ -170,7 +170,9 @@ test.describe( 'Tabs', () => {
 			await tab2.click();
 			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
 
-			await page.keyboard.press( 'End' );
+			// Select all text, then arrow right twice to move the caret into the next tab
+			await pageUtils.pressKeys( 'primary+a' );
+			await pageUtils.pressKeys( 'ArrowRight' );
 			await page.keyboard.press( 'Enter' );
 
 			const tabs = editor.canvas.getByRole( 'tab' );
