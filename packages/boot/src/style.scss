@@ -1,8 +1,6 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-@import "@wordpress/theme/design-tokens.css";
-
 .boot-layout-container .boot-layout {
 	// On mobile the main content area has to scroll, otherwise you can invoke
 	// the overscroll bounce on the non-scrolling container, for a bad experience.
