@@ -63,10 +63,7 @@ describe( 'Waveform utilities', () => {
 			} );
 
 			expect( container ).toHaveAttribute( 'data-title', 'My Song' );
-			expect( container ).toHaveAttribute(
-				'data-artist',
-				'The Artist'
-			);
+			expect( container ).toHaveAttribute( 'data-artist', 'The Artist' );
 			expect( container ).toHaveAttribute(
 				'data-artwork',
 				'https://example.com/cover.jpg'
