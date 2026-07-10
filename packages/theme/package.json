@@ -24,7 +24,7 @@
 	},
 	"files": [
 		"build-module",
-		"build-package-types/index.d.ts",
+		"build-types/index.d.ts",
 		"build-types/prebuilt/js/design-tokens.d.mts",
 		"build-types/stylelint-plugins/*.d.mts",
 		"src/*-plugins/**",
@@ -40,7 +40,7 @@
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
-			"types": "./build-package-types/index.d.ts",
+			"types": "./build-types/index.d.ts",
 			"default": "./build-module/index.mjs"
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
@@ -75,7 +75,7 @@
 		"./package.json": "./package.json"
 	},
 	"wpScript": true,
-	"types": "build-package-types/index.d.ts",
+	"types": "build-types/index.d.ts",
 	"sideEffects": [
 		"src/prebuilt/css/design-tokens.css"
 	],
@@ -137,7 +137,7 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build:package-types": "rimraf build-package-types && node bin/bundle-package-types/index.mjs",
+		"build:package-types": "node bin/bundle-package-types/index.mjs",
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps",

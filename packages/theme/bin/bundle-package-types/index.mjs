@@ -1,12 +1,12 @@
-import { access, mkdir } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { access, rename, rm } from 'node:fs/promises';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { rollup } from 'rollup';
 import { dts } from 'rollup-plugin-dts';
 
 const packageRoot = fileURLToPath( new URL( '../..', import.meta.url ) );
 const inputPath = join( packageRoot, 'build-types/index.d.ts' );
-const outputPath = join( packageRoot, 'build-package-types/index.d.ts' );
+const outputPath = join( packageRoot, 'build-types/index.bundled.d.ts' );
 
 try {
 	await access( inputPath );
@@ -15,8 +15,6 @@ try {
 		'@wordpress/theme: Missing build-types/index.d.ts. Run `npm run build` from the repository root first.'
 	);
 }
-
-await mkdir( dirname( outputPath ), { recursive: true } );
 
 const bundle = await rollup( {
 	input: inputPath,
@@ -32,6 +30,11 @@ try {
 		file: outputPath,
 		format: 'es',
 	} );
+	await rename( outputPath, inputPath );
 } finally {
-	await bundle.close();
+	try {
+		await bundle.close();
+	} finally {
+		await rm( outputPath, { force: true } );
+	}
 }
