@@ -70,7 +70,7 @@ describe( 'Playlist block edit utilities', () => {
 			expect( result.artist ).toBe( 'Media Details Artist' );
 		} );
 
-		it( 'should use "Unknown creator" when no creator is available', () => {
+		it( 'should use "Unknown artist" when no artist is available', () => {
 			const media = {
 				url: 'https://example.com/song.mp3',
 				title: 'My Song',
@@ -78,7 +78,7 @@ describe( 'Playlist block edit utilities', () => {
 
 			const result = getTrackAttributes( media );
 
-			expect( result.artist ).toBe( 'Unknown creator' );
+			expect( result.artist ).toBe( 'Unknown artist' );
 		} );
 
 		it( 'should use "Unknown album" when no album is available', () => {

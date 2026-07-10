@@ -157,7 +157,7 @@ const PlaylistTrackEdit = ( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
-						label={ __( 'Creator' ) }
+						label={ __( 'Artist' ) }
 						value={ artist ? stripHTML( artist ) : '' }
 						onChange={ ( artistValue ) => {
 							setAttributes( { artist: artistValue } );
@@ -281,7 +281,7 @@ const PlaylistTrackEdit = ( {
 								tagName="span"
 								className="wp-block-playlist-track__artist"
 								value={ artist }
-								placeholder={ __( 'Add creator' ) }
+								placeholder={ __( 'Add artist' ) }
 								onChange={ ( value ) =>
 									setAttributes( { artist: value } )
 								}

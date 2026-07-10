@@ -42,7 +42,7 @@ export function getTrackAttributes( media ) {
 			media.artist ||
 			media?.meta?.artist ||
 			media?.media_details?.artist ||
-			__( 'Unknown creator' ),
+			__( 'Unknown artist' ),
 		album:
 			media.album ||
 			media?.meta?.album ||

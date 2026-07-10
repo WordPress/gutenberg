@@ -317,14 +317,14 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	/**
 	 * @covers ::render_block_core_playlist
 	 */
-	public function test_aria_label_with_title_creator_and_album() {
+	public function test_aria_label_with_title_artist_and_album() {
 		$markup = $this->build_playlist_markup(
 			array(),
 			array(
 				array(
 					'id'     => 1,
 					'title'  => 'Track One',
-					'artist' => 'Creator One',
+					'artist' => 'Artist One',
 					'album'  => 'Album One',
 					'src'    => 'http://example.com/track1.mp3',
 				),
@@ -338,7 +338,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 		$track    = $playlist['tracks']['track-0'];
 
 		$this->assertSame(
-			'Track One by Creator One from the album Album One',
+			'Track One by Artist One from the album Album One',
 			$track['ariaLabel']
 		);
 	}

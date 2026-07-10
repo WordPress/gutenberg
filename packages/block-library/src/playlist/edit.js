@@ -273,7 +273,7 @@ const PlaylistEdit = ( {
 					{ showTracklist && (
 						<>
 							<ToolsPanelItem
-								label={ __( 'Show creator name in tracklist' ) }
+								label={ __( 'Show artist name in tracklist' ) }
 								isShownByDefault
 								hasValue={ () => showArtists !== true }
 								onDeselect={ () =>
@@ -282,7 +282,7 @@ const PlaylistEdit = ( {
 							>
 								<ToggleControl
 									label={ __(
-										'Show creator name in tracklist'
+										'Show artist name in tracklist'
 									) }
 									onChange={ toggleAttribute(
 										'showArtists'
