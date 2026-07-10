@@ -236,17 +236,14 @@ if ( ! function_exists( 'wp_is_post_type_collaboration_disabled' ) ) {
 
 if ( ! function_exists( 'gutenberg_get_active_edit_lock_user' ) ) {
 	/**
-	 * Returns the user ID holding a fresh edit lock on a post, including
-	 * the current user.
+	 * Returns the user ID recorded in a fresh edit lock.
 	 *
-	 * Unlike wp_check_post_lock(), this does not exclude the current user,
-	 * so it can detect that the current user has the post open in the
-	 * editor themselves (e.g. in another tab).
+	 * Unlike wp_check_post_lock(), this includes locks owned by the current user.
 	 *
 	 * @since 7.1.0
 	 *
 	 * @param int $post_id Post ID.
-	 * @return int User ID holding a fresh lock, or 0 if there is none.
+	 * @return int User ID from a fresh lock, or 0 if none exists.
 	 */
 	function gutenberg_get_active_edit_lock_user( $post_id ) {
 		$lock = get_post_meta( $post_id, '_edit_lock', true );
@@ -344,10 +341,7 @@ function gutenberg_post_list_collaboration_ui() {
 	// heartbeat API can fire from any admin page.
 	add_filter( 'heartbeat_received', 'gutenberg_filter_locked_posts_heartbeat_for_rtc', 20, 2 );
 
-	// Reject Quick Edit saves while the post is open in an editor session.
-	// Registered globally since Quick Edit saves go through admin-ajax.php.
-	// Core fires "wp_ajax_{$_POST['action']}" and Quick Edit posts
-	// action=inline-save, so the hook name uses a hyphen.
+	// Register globally because Quick Edit submits `action=inline-save` through admin-ajax.php.
 	add_action( 'wp_ajax_inline-save', 'gutenberg_block_quick_edit_for_active_lock', 0 );
 
 	// CSS, JS, and row action overrides only apply on the posts list page.
@@ -363,19 +357,12 @@ function gutenberg_post_list_collaboration_ui() {
 add_action( 'admin_init', 'gutenberg_post_list_collaboration_ui' );
 
 /**
- * Filters the heartbeat response to remove user-specific lock information
- * and to mark the current user's own actively edited posts as locked,
- * when real-time collaboration is enabled.
+ * Removes user-specific details from post lock heartbeat responses and adds
+ * fresh locks owned by the current user when collaboration is enabled.
  *
- * WordPress core's wp_check_locked_posts() runs at priority 10 and populates
- * the 'wp-check-locked-posts' key with user name, avatar, and text. This
- * filter runs at priority 20 to replace that data with a generic message,
- * preventing user-specific lock info from reaching the client.
- *
- * Core also excludes posts locked by the current user, so a lock holder
- * never sees their own rows as locked. This filter adds those rows back so
- * Quick Edit is also disabled for the lock holder while they have the post
- * open in the editor (see gh-79640).
+ * Core populates other-user lock data at priority 10 and excludes locks owned
+ * by the current user. This filter runs at priority 20 to replace those details
+ * with generic text and add the current user's own locks.
  *
  * @param array $response The heartbeat response.
  * @param array $data     The data sent by the client.
@@ -420,15 +407,12 @@ function gutenberg_filter_locked_posts_heartbeat_for_rtc( $response, $data = arr
 
 if ( ! function_exists( 'gutenberg_block_quick_edit_for_active_lock' ) ) {
 	/**
-	 * Rejects Quick Edit saves while the current user has the post open in
-	 * the editor, when real-time collaboration is enabled.
+	 * Rejects Quick Edit while the current user holds a fresh edit lock.
 	 *
-	 * Runs before core's wp_ajax_inline_save() handler. Core already rejects
-	 * saves when another user holds the edit lock, but never when the current
-	 * user does, allowing Quick Edit changes that silently diverge from the
-	 * user's own open editor session. Hiding the Quick Edit action is not
-	 * enough on its own: a posts list loaded before the session started can
-	 * still submit the form.
+	 * Core handles locks owned by other users but excludes the current user's
+	 * locks. Rejecting them prevents Quick Edit changes from diverging from the
+	 * editing session. The server check also covers post lists loaded before the
+	 * lock was created.
 	 *
 	 * @since 7.1.0
 	 */
@@ -448,9 +432,8 @@ if ( ! function_exists( 'gutenberg_block_quick_edit_for_active_lock' ) ) {
 		$lock_user = gutenberg_get_active_edit_lock_user( $post_id );
 		if ( ! $lock_user ) {
 			/*
-			 * The save will proceed. Core's handler refreshes the edit lock
-			 * during the save; clear it afterwards so this guard does not
-			 * reject the user's next Quick Edit of the same post.
+			 * Core creates a lock during inline save. Remove it on shutdown so
+			 * a later Quick Edit is not mistaken for an active editor session.
 			 */
 			add_action(
 				'shutdown',
@@ -462,7 +445,7 @@ if ( ! function_exists( 'gutenberg_block_quick_edit_for_active_lock' ) ) {
 		}
 
 		if ( get_current_user_id() !== $lock_user ) {
-			// Another user's lock — core rejects that save itself.
+			// Core handles locks owned by another user.
 			return;
 		}
 
@@ -472,19 +455,13 @@ if ( ! function_exists( 'gutenberg_block_quick_edit_for_active_lock' ) ) {
 
 if ( ! function_exists( 'gutenberg_release_own_edit_lock' ) ) {
 	/**
-	 * Deletes a post's edit lock if the current user holds it and it is
-	 * still fresh.
+	 * Deletes a fresh edit lock owned by the current user.
 	 *
-	 * Core's inline-save handler refreshes the edit lock as part of the
-	 * save. With collaboration enabled that lock would make
-	 * gutenberg_block_quick_edit_for_active_lock() reject a follow-up
-	 * Quick Edit for the lock window even though no editor session exists.
-	 * An open editor session re-establishes its own lock via heartbeat.
+	 * Core creates a lock during inline save. Without an editor session, that
+	 * lock would block the next Quick Edit until it expires.
 	 *
-	 * In the unlikely case that the user opens the post in the editor while
-	 * the Quick Edit request is still in flight, the editor's own lock could
-	 * be deleted here instead; the editor re-establishes it on its next
-	 * heartbeat tick.
+	 * If an editor opens before shutdown, its new lock may also be deleted;
+	 * the editor restores it on the next heartbeat.
 	 *
 	 * @since 7.1.0
 	 *
@@ -502,10 +479,10 @@ if ( ! function_exists( 'gutenberg_release_own_edit_lock' ) ) {
  * Outputs CSS to hide the post lock icon and user avatar in the post list
  * when real-time collaboration is enabled.
  *
- * Also re-enables checkboxes that WordPress core hides for
- * locked posts, since collaborative editing means the post is not exclusively
- * locked. Toggles "Edit" / "Join" action link text via the
- * `.wp-collaborative-editing` class that the heartbeat already manages.
+ * Also re-enables checkboxes that WordPress core hides for locked posts, since
+ * collaborative editing means the post is not exclusively locked. It toggles
+ * "Edit" / "Join" action link text using the `.wp-locked` class managed by
+ * heartbeat.
  */
 function gutenberg_post_list_collaboration_styles() {
 	?>
@@ -579,10 +556,9 @@ function gutenberg_filter_locked_post_text_for_rtc( $translation, $text, $domain
  * Filters post row actions to render both "Edit" and "Join" link text
  * when real-time collaboration is enabled.
  *
- * Both labels are always present in the markup; CSS toggles visibility
- * based on the `.wp-collaborative-editing` class the heartbeat manages.
- * This ensures the link text updates when the lock state changes without
- * requiring a page reload.
+ * Both labels are always present in the markup; CSS toggles visibility using
+ * the `.wp-locked` class managed by heartbeat. This updates the link text when
+ * the lock state changes without requiring a page reload.
  *
  * @param string[] $actions An array of row action links.
  * @param WP_Post  $post    The post object.
@@ -610,8 +586,7 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 	 * font-size rule
 	 *     .row-actions span   { font-size: 0;  }
 	 *     .row-actions span a { font-size: 13px; }
-	 * still reaches it — that's the fix for the original "Edit invisible
-	 * at 0px on mobile" regression. CSS in
+	 * still reaches the visible label. CSS in
 	 * gutenberg_post_list_collaboration_styles() flips visibility on the
 	 * outer spans based on the row's `wp-locked` class, which core's
 	 * inline-edit-post.js maintains in response to heartbeat ticks.

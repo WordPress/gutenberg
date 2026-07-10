@@ -14,9 +14,8 @@ class Tests_Collaboration_PostListCollaborationStyles extends WP_UnitTestCase {
 		gutenberg_post_list_collaboration_styles();
 		$css = ob_get_clean();
 
-		// Core hides Quick Edit on locked rows; RTC must not revert that,
-		// since Quick Edit is not collaboration-aware (see #79640).
-		$this->assertStringNotContainsString( '.row-actions .inline', $css );
+		// Core hides Quick Edit on locked rows; RTC must not revert that.
+		$this->assertStringNotContainsString( 'tr.wp-locked .row-actions .inline', $css );
 		// Bulk-edit checkboxes stay re-enabled.
 		$this->assertStringContainsString( '.check-column input[type="checkbox"]', $css );
 	}

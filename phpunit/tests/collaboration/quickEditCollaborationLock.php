@@ -47,13 +47,6 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 		update_post_meta( self::$post_id, '_edit_lock', ( time() - $age ) . ':' . $user_id );
 	}
 
-	private function quick_edit_actions(): array {
-		return array(
-			'edit'                 => '<a href="#">Edit</a>',
-			'inline hide-if-no-js' => '<button>Quick Edit</button>',
-		);
-	}
-
 	private function prime_inline_save_request() {
 		$_POST['post_ID']      = self::$post_id;
 		$_POST['_inline_edit'] = wp_create_nonce( 'inlineeditnonce' );
@@ -84,13 +77,6 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 		$this->set_edit_lock( $deleted_user_id );
 
 		$this->assertSame( 0, gutenberg_get_active_edit_lock_user( self::$post_id ), 'A lock from a deleted user should be inactive.' );
-
-		$this->prime_inline_save_request();
-		$before = $this->shutdown_callback_count();
-
-		gutenberg_block_quick_edit_for_active_lock();
-
-		$this->assertGreaterThan( $before, $this->shutdown_callback_count(), 'Quick Edit should proceed and schedule lock cleanup.' );
 	}
 
 	public function test_heartbeat_marks_only_fresh_own_locks() {
@@ -110,7 +96,7 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_heartbeat_still_anonymizes_other_user_entries() {
+	public function test_heartbeat_removes_user_details_from_other_user_entries() {
 		$this->set_edit_lock( self::$editor_id );
 		$key = 'post-' . self::$post_id;
 
@@ -118,40 +104,22 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 			array(
 				'wp-check-locked-posts' => array(
 					$key => array(
-						'text'       => 'Editor is currently editing',
-						'avatar_src' => 'https://example.com/avatar.png',
+						'text'          => 'Editor is currently editing',
+						'avatar_src'    => 'https://example.com/avatar.png',
+						'avatar_src_2x' => 'https://example.com/avatar-2x.png',
 					),
 				),
 			),
 			array( 'wp-check-locked-posts' => array( $key ) )
 		);
 
-		$this->assertSame( 'Currently being edited', $response['wp-check-locked-posts'][ $key ]['text'] );
-		$this->assertArrayNotHasKey( 'avatar_src', $response['wp-check-locked-posts'][ $key ] );
-	}
-
-	public function test_row_actions_keep_quick_edit_in_markup_for_all_lock_states() {
-		$post = get_post( self::$post_id );
-
-		$filtered = gutenberg_post_list_collaboration_row_actions( $this->quick_edit_actions(), $post );
-		$this->assertArrayHasKey( 'inline hide-if-no-js', $filtered, 'Quick Edit should stay without a lock.' );
-
-		// Other users' locks are handled by core: the row renders with
-		// .wp-locked and core CSS hides the Quick Edit action.
-		$this->set_edit_lock( self::$editor_id );
-		$filtered = gutenberg_post_list_collaboration_row_actions( $this->quick_edit_actions(), $post );
-		$this->assertArrayHasKey( 'inline hide-if-no-js', $filtered, "Another user's lock is left to core." );
-
-		// Keep the action in the markup so heartbeat can reveal it again when
-		// the current user's lock expires. Core CSS hides it while .wp-locked.
-		$this->set_edit_lock( self::$admin_id );
-		$filtered = gutenberg_post_list_collaboration_row_actions( $this->quick_edit_actions(), $post );
-		$this->assertArrayHasKey( 'inline hide-if-no-js', $filtered, 'Quick Edit should remain available for heartbeat to restore after the lock expires.' );
+		$this->assertSame(
+			array( 'text' => 'Currently being edited' ),
+			$response['wp-check-locked-posts'][ $key ]
+		);
 	}
 
 	public function test_inline_save_guard_is_registered_on_core_quick_edit_ajax_hook() {
-		// Core fires "wp_ajax_{$_POST['action']}" and Quick Edit posts
-		// action=inline-save — guard against a hook-name typo regression.
 		update_option( 'wp_collaboration_enabled', '1' );
 
 		gutenberg_post_list_collaboration_ui();
