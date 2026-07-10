@@ -45,5 +45,6 @@
 	},
 	"usesContext": [ "core/tabs-list", "core/tabs-id" ],
 	"style": "wp-block-tabs",
+	"editorStyle": "wp-block-tabs-editor",
 	"viewScriptModule": "@wordpress/block-library/tabs/view"
 }

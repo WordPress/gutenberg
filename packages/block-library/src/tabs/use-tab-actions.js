@@ -21,6 +21,7 @@ export default function useTabActions( tabsClientId ) {
 	const {
 		insertBlock,
 		removeBlock,
+		moveBlocksToPosition,
 		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
@@ -98,5 +99,36 @@ export default function useTabActions( tabsClientId ) {
 		removeBlock( target.clientId, false );
 	};
 
-	return { insertTab, removeTab };
+	// Move the active tab one position left or right by reordering the
+	// underlying tab-panel. The tab-list labels follow their panel
+	// automatically via useTabListItemsSync.
+	const moveTab = ( direction ) => {
+		const { tabPanelsClientId, tabPanelBlocks, activeIndex } =
+			getTabsState();
+		if ( ! tabPanelsClientId ) {
+			return;
+		}
+
+		const toIndex = activeIndex + direction;
+		const target = tabPanelBlocks[ activeIndex ];
+		if ( ! target || toIndex < 0 || toIndex >= tabPanelBlocks.length ) {
+			return;
+		}
+
+		// Reorder the tab-panel, then keep the moved tab active.
+		registry.batch( () => {
+			moveBlocksToPosition(
+				[ target.clientId ],
+				tabPanelsClientId,
+				tabPanelsClientId,
+				toIndex
+			);
+			__unstableMarkNextChangeAsNotPersistent();
+			updateBlockAttributes( tabsClientId, {
+				editorActiveTabIndex: toIndex,
+			} );
+		} );
+	};
+
+	return { insertTab, removeTab, moveTab };
 }

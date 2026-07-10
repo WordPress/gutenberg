@@ -1,0 +1,8 @@
+@use "@wordpress/base-styles/mixins" as *;
+
+.wp-block-tabs__mover-button {
+	@include break-small() {
+		width: 24px;
+		min-width: 0 !important;
+	}
+}
