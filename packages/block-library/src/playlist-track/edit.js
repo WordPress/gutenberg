@@ -315,9 +315,7 @@ const PlaylistTrackEdit = ( {
 						) }
 						{ length }
 					</span>
-					<span className="screen-reader-text">
-						{ __( 'Select to play this track' ) }
-					</span>
+					<span className="screen-reader-text">{ __( 'Play' ) }</span>
 				</button>
 			</li>
 		</>

@@ -132,8 +132,8 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				'isPlaying'        => false,
 				'tracks'           => $playlist_tracks,
 				'waveformStyle'    => $waveform_style,
-				'labelPauseTrack'  => __( 'Pause this track' ),
-				'labelSelectTrack' => __( 'Select to play this track' ),
+				'labelPauseTrack'  => __( 'Pause' ),
+				'labelSelectTrack' => __( 'Play' ),
 			)
 		)
 	);
