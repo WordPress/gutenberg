@@ -96,7 +96,9 @@ const PlaylistEdit = ( {
 		backgroundGradient,
 		style,
 		waveformColor,
+		waveformGradient,
 		waveformBackgroundColor,
+		waveformBackgroundGradient,
 	} = attributes;
 
 	const colorProps = useColorProps( getColorSupportAttributes( attributes ) );
@@ -138,6 +140,10 @@ const PlaylistEdit = ( {
 		getGradientValueBySlug( gradients, backgroundGradient ) ||
 		style?.background?.gradient ||
 		style?.color?.gradient;
+	const waveformGradientValue = waveformGradient;
+	const waveformBackgroundGradientValue = waveformBackgroundGradient;
+	let waveformColorGradientChange;
+	let waveformBackgroundColorGradientChange;
 	let backgroundColorGradientChange;
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
@@ -276,14 +282,68 @@ const PlaylistEdit = ( {
 	);
 
 	function updateWaveformColor( colorValue ) {
+		const isSettingColor = colorValue !== undefined;
+		if ( ! isSettingColor && waveformColorGradientChange === 'gradient' ) {
+			waveformColorGradientChange = undefined;
+			return;
+		}
+
+		waveformColorGradientChange = 'color';
+
 		setAttributes( {
 			waveformColor: colorValue,
+			waveformGradient: undefined,
+		} );
+	}
+
+	function updateWaveformGradient( gradientValue ) {
+		const isSettingGradient = gradientValue !== undefined;
+		if ( ! isSettingGradient && waveformColorGradientChange === 'color' ) {
+			waveformColorGradientChange = undefined;
+			return;
+		}
+
+		waveformColorGradientChange = 'gradient';
+
+		setAttributes( {
+			waveformGradient: gradientValue,
+			waveformColor: undefined,
 		} );
 	}
 
 	function updateWaveformBackgroundColor( colorValue ) {
+		const isSettingColor = colorValue !== undefined;
+		if (
+			! isSettingColor &&
+			waveformBackgroundColorGradientChange === 'gradient'
+		) {
+			waveformBackgroundColorGradientChange = undefined;
+			return;
+		}
+
+		waveformBackgroundColorGradientChange = 'color';
+
 		setAttributes( {
 			waveformBackgroundColor: colorValue,
+			waveformBackgroundGradient: undefined,
+		} );
+	}
+
+	function updateWaveformBackgroundGradient( gradientValue ) {
+		const isSettingGradient = gradientValue !== undefined;
+		if (
+			! isSettingGradient &&
+			waveformBackgroundColorGradientChange === 'color'
+		) {
+			waveformBackgroundColorGradientChange = undefined;
+			return;
+		}
+
+		waveformBackgroundColorGradientChange = 'gradient';
+
+		setAttributes( {
+			waveformBackgroundGradient: gradientValue,
+			waveformBackgroundColor: undefined,
 		} );
 	}
 
@@ -362,46 +422,63 @@ const PlaylistEdit = ( {
 	const hasAnySelected = isSelected || hasSelectedChild;
 
 	const colorSettings = [];
-	if ( hasColors ) {
+	if ( hasColors || hasGradients ) {
 		colorSettings.push(
 			{
-				colorValue: waveformColor,
+				colorValue: hasColors ? waveformColor : undefined,
+				gradientValue: hasGradients ? waveformGradientValue : undefined,
 				label: __( 'Waveform + Play' ),
-				onColorChange: updateWaveformColor,
+				onColorChange: hasColors ? updateWaveformColor : undefined,
+				onGradientChange: hasGradients
+					? updateWaveformGradient
+					: undefined,
 				isShownByDefault: true,
 				clearable: true,
 				enableAlpha: true,
 				resetAllFilter: () => ( {
 					waveformColor: undefined,
+					waveformGradient: undefined,
 				} ),
 			},
 			{
-				colorValue: waveformBackgroundColor,
+				colorValue: hasColors ? waveformBackgroundColor : undefined,
+				gradientValue: hasGradients
+					? waveformBackgroundGradientValue
+					: undefined,
 				label: __( 'Waveform background' ),
-				onColorChange: updateWaveformBackgroundColor,
+				onColorChange: hasColors
+					? updateWaveformBackgroundColor
+					: undefined,
+				onGradientChange: hasGradients
+					? updateWaveformBackgroundGradient
+					: undefined,
 				isShownByDefault: true,
 				clearable: true,
 				enableAlpha: true,
 				resetAllFilter: () => ( {
 					waveformBackgroundColor: undefined,
-				} ),
-			},
-			{
-				colorValue: textColorValue,
-				colorSlug: textColor,
-				label: __( 'Text' ),
-				onColorChange: updateTextColor,
-				isShownByDefault: true,
-				clearable: true,
-				enableAlpha: true,
-				resetAllFilter: ( newAttributes ) => ( {
-					textColor: undefined,
-					style: getStyleWithValues( newAttributes.style, {
-						text: undefined,
-					} ),
+					waveformBackgroundGradient: undefined,
 				} ),
 			}
 		);
+	}
+
+	if ( hasColors ) {
+		colorSettings.push( {
+			colorValue: textColorValue,
+			colorSlug: textColor,
+			label: __( 'Text' ),
+			onColorChange: updateTextColor,
+			isShownByDefault: true,
+			clearable: true,
+			enableAlpha: true,
+			resetAllFilter: ( newAttributes ) => ( {
+				textColor: undefined,
+				style: getStyleWithValues( newAttributes.style, {
+					text: undefined,
+				} ),
+			} ),
+		} );
 	}
 
 	if ( hasColors || hasGradients ) {
@@ -669,7 +746,9 @@ const PlaylistEdit = ( {
 						imageAlt={ currentTrackData?.imageAlt }
 						waveformStyle={ waveformStyle }
 						color={ waveformColor }
+						gradient={ waveformGradientValue }
 						backgroundColor={ waveformBackgroundColor }
+						backgroundGradient={ waveformBackgroundGradientValue }
 						textColor={ textColorValue }
 						onEnded={ onTrackEnded }
 						showPlayButtonArtwork={ showPlayButtonArtwork === true }

@@ -59,7 +59,13 @@
 		"waveformColor": {
 			"type": "string"
 		},
+		"waveformGradient": {
+			"type": "string"
+		},
 		"waveformBackgroundColor": {
+			"type": "string"
+		},
+		"waveformBackgroundGradient": {
 			"type": "string"
 		},
 		"caption": {

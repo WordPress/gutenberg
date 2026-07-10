@@ -26,46 +26,238 @@ function getComputedStyle( element ) {
 	return element.ownerDocument.defaultView.getComputedStyle( element );
 }
 
+function getTopLevelGradientParts( gradientValue ) {
+	const match = gradientValue?.trim().match( /^[\w-]+-gradient\((.*)\)$/i );
+	if ( ! match ) {
+		return [];
+	}
+
+	const parts = [];
+	let depth = 0;
+	let current = '';
+
+	for ( const character of match[ 1 ] ) {
+		if ( character === '(' ) {
+			++depth;
+		} else if ( character === ')' ) {
+			--depth;
+		}
+
+		if ( character === ',' && depth === 0 ) {
+			parts.push( current.trim() );
+			current = '';
+			continue;
+		}
+
+		current += character;
+	}
+
+	if ( current.trim() ) {
+		parts.push( current.trim() );
+	}
+
+	return parts;
+}
+
+function getLeadingColorFunction( value ) {
+	const match = value.match( /^([\w-]+)\(/ );
+	if ( ! match ) {
+		return;
+	}
+
+	const supportedFunctions = [
+		'color',
+		'color-mix',
+		'hsl',
+		'hsla',
+		'hwb',
+		'lab',
+		'lch',
+		'oklab',
+		'oklch',
+		'rgb',
+		'rgba',
+		'var',
+	];
+	if ( ! supportedFunctions.includes( match[ 1 ].toLowerCase() ) ) {
+		return;
+	}
+
+	let depth = 0;
+	let foundOpeningParenthesis = false;
+	for ( let index = 0; index < value.length; index++ ) {
+		const character = value[ index ];
+		if ( character === '(' ) {
+			foundOpeningParenthesis = true;
+			++depth;
+		} else if ( character === ')' ) {
+			--depth;
+		}
+
+		if ( foundOpeningParenthesis && depth === 0 ) {
+			return value.slice( 0, index + 1 );
+		}
+	}
+}
+
+function getColorStopValue( gradientPart ) {
+	const colorFunction = getLeadingColorFunction( gradientPart );
+	if ( colorFunction ) {
+		return colorFunction;
+	}
+
+	const [ possibleColor ] = gradientPart.split( /\s+/ );
+	if ( colord( possibleColor ).isValid() ) {
+		return possibleColor;
+	}
+}
+
+function getWaveformGradientDirection( gradientValue ) {
+	const parts = getTopLevelGradientParts( gradientValue );
+	const direction = parts[ 0 ];
+	const angleMatch = direction?.match( /^(-?\d+(?:\.\d+)?)deg$/i );
+	if ( angleMatch ) {
+		const angle = ( ( Number( angleMatch[ 1 ] ) % 360 ) + 360 ) % 360;
+		if ( angle === 90 || angle === 270 ) {
+			return 'horizontal';
+		}
+		if ( angle === 0 || angle === 180 ) {
+			return 'vertical';
+		}
+		return 'diagonal';
+	}
+
+	if ( ! direction?.startsWith( 'to ' ) ) {
+		return undefined;
+	}
+
+	const sideOrCorner = direction.toLowerCase().replace( /^to\s+/, '' );
+	const hasHorizontalSide =
+		sideOrCorner.includes( 'left' ) || sideOrCorner.includes( 'right' );
+	const hasVerticalSide =
+		sideOrCorner.includes( 'top' ) || sideOrCorner.includes( 'bottom' );
+
+	if ( hasHorizontalSide && hasVerticalSide ) {
+		return 'diagonal';
+	}
+	if ( hasHorizontalSide ) {
+		return 'horizontal';
+	}
+	if ( hasVerticalSide ) {
+		return 'vertical';
+	}
+}
+
+function resolveColorValue( element, colorValue ) {
+	if ( ! colorValue || colord( colorValue ).isValid() ) {
+		return colorValue;
+	}
+
+	const colorResolver = element.ownerDocument.createElement( 'span' );
+	colorResolver.style.color = colorValue;
+	if ( ! colorResolver.style.color ) {
+		return colorValue;
+	}
+	element.appendChild( colorResolver );
+
+	const resolvedColor = getComputedStyle( colorResolver ).color;
+	colorResolver.remove();
+
+	return resolvedColor && colord( resolvedColor ).isValid()
+		? resolvedColor
+		: colorValue;
+}
+
+function getResolvedGradientStops( element, gradientValue ) {
+	const stops = getWaveformGradientStops( gradientValue )
+		?.map( ( colorValue ) => resolveColorValue( element, colorValue ) )
+		.filter( ( colorValue ) => colord( colorValue ).isValid() );
+
+	return stops?.length > 1 ? stops : undefined;
+}
+
+function applyAlpha( colorValue, alpha ) {
+	if ( Array.isArray( colorValue ) ) {
+		return colorValue.map( ( color ) =>
+			colord( color ).alpha( alpha ).toRgbString()
+		);
+	}
+	return colord( colorValue ).alpha( alpha ).toRgbString();
+}
+
+function getRepresentativeColor( colorValue ) {
+	if ( Array.isArray( colorValue ) ) {
+		return colorValue[ colorValue.length - 1 ];
+	}
+	return colorValue;
+}
+
+export function getWaveformGradientStops( gradientValue ) {
+	const stops = getTopLevelGradientParts( gradientValue )
+		.map( getColorStopValue )
+		.filter( Boolean );
+
+	return stops.length > 1 ? stops : undefined;
+}
+
+function serializeColorValue( colorValue ) {
+	return Array.isArray( colorValue )
+		? JSON.stringify( colorValue )
+		: colorValue;
+}
+
 /**
  * Get all colors needed for the waveform player based on the element's styles.
  *
- * @param {Element} element            - The element to derive colors from.
- * @param {string}  waveformColorValue - The base waveform color value to use.
- * @param {string}  textColorValue     - The text color value to use.
+ * @param {Element} element               - The element to derive colors from.
+ * @param {string}  waveformColorValue    - The base waveform color value to use.
+ * @param {string}  textColorValue        - The text color value to use.
+ * @param {string}  waveformGradientValue - The waveform gradient value to use.
  * @return {Object} Object containing textColor, waveformColor, progressColor.
  */
 export function getWaveformColors(
 	element,
 	waveformColorValue,
-	textColorValue
+	textColorValue,
+	waveformGradientValue
 ) {
 	const textColor = textColorValue || getComputedStyle( element ).color;
-	const waveformBaseColor = waveformColorValue || textColor;
-	const waveformColor = colord( waveformBaseColor )
-		.alpha( 0.3 )
-		.toRgbString();
-	const progressColor = colord( waveformBaseColor )
-		.alpha( 0.6 )
-		.toRgbString();
+	const waveformGradientStops = getResolvedGradientStops(
+		element,
+		waveformGradientValue
+	);
+	const waveformBaseColor =
+		waveformGradientStops || waveformColorValue || textColor;
+	const waveformColor = applyAlpha( waveformBaseColor, 0.3 );
+	const progressColor = applyAlpha( waveformBaseColor, 0.6 );
+	const waveformGradient = waveformGradientStops
+		? getWaveformGradientDirection( waveformGradientValue )
+		: undefined;
 
-	return { textColor, waveformColor, progressColor };
+	return {
+		textColor,
+		waveformColor,
+		progressColor,
+		...( waveformGradient && { waveformGradient } ),
+	};
 }
 
 /**
  * Create a waveform container element with the specified attributes.
  *
- * @param {Object} options               - The options for the container.
- * @param {string} options.url           - The audio URL.
- * @param {string} options.title         - The track title.
- * @param {string} options.artist        - The track artist.
- * @param {string} options.artwork       - The track image URL.
- * @param {string} options.waveformColor - The waveform bar color.
- * @param {string} options.progressColor - The progress indicator color.
- * @param {string} options.buttonColor   - The play button color.
- * @param {string} options.seekLabel     - Accessible label for the seek control.
- * @param {string} options.seekValueText - Accessible value-text template for the seek control (e.g. '%1$s of %2$s').
- * @param {number} options.height        - The waveform height in pixels.
- * @param {string} options.waveformStyle - The visualization style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {Object} options                  - The options for the container.
+ * @param {string} options.url              - The audio URL.
+ * @param {string} options.title            - The track title.
+ * @param {string} options.artist           - The track artist.
+ * @param {string} options.artwork          - The track image URL.
+ * @param {string} options.waveformColor    - The waveform bar color.
+ * @param {string} options.progressColor    - The progress indicator color.
+ * @param {string} options.waveformGradient - The waveform gradient direction.
+ * @param {string} options.buttonColor      - The play button color.
+ * @param {string} options.seekLabel        - Accessible label for the seek control.
+ * @param {string} options.seekValueText    - Accessible value-text template for the seek control (e.g. '%1$s of %2$s').
+ * @param {number} options.height           - The waveform height in pixels.
+ * @param {string} options.waveformStyle    - The visualization style (bars, mirror, line, blocks, dots, seekbar).
  * @return {Element} The configured container element.
  */
 export function createWaveformContainer( {
@@ -75,6 +267,7 @@ export function createWaveformContainer( {
 	artwork,
 	waveformColor,
 	progressColor,
+	waveformGradient,
 	buttonColor,
 	seekLabel,
 	seekValueText,
@@ -86,8 +279,17 @@ export function createWaveformContainer( {
 	container.setAttribute( 'data-url', url );
 	container.setAttribute( 'data-height', String( height ) );
 	container.setAttribute( 'data-waveform-style', waveformStyle );
-	container.setAttribute( 'data-waveform-color', waveformColor );
-	container.setAttribute( 'data-progress-color', progressColor );
+	container.setAttribute(
+		'data-waveform-color',
+		serializeColorValue( waveformColor )
+	);
+	container.setAttribute(
+		'data-progress-color',
+		serializeColorValue( progressColor )
+	);
+	if ( waveformGradient ) {
+		container.setAttribute( 'data-waveform-gradient', waveformGradient );
+	}
 	container.setAttribute( 'data-button-color', buttonColor );
 	container.setAttribute(
 		'data-seek-label',
@@ -116,17 +318,26 @@ export function createWaveformContainer( {
 /**
  * Apply custom styles to a generated waveform player.
  *
- * @param {Element} container              - The generated player container.
- * @param {Object}  styles                 - The player styles.
- * @param {string}  styles.backgroundColor - The waveform area background color.
- * @param {string}  styles.textColor       - The player text color.
- * @param {string}  styles.playButtonColor - The play button color.
+ * @param {Element} container                 - The generated player container.
+ * @param {Object}  styles                    - The player styles.
+ * @param {string}  styles.backgroundColor    - The waveform area background color.
+ * @param {string}  styles.backgroundGradient - The waveform area background gradient.
+ * @param {string}  styles.textColor          - The player text color.
+ * @param {string}  styles.playButtonColor    - The play button color.
+ * @param {string}  styles.playButtonGradient - The play button gradient.
  */
 export function applyWaveformPlayerStyles(
 	container,
-	{ backgroundColor, textColor, playButtonColor } = {}
+	{
+		backgroundColor,
+		backgroundGradient,
+		textColor,
+		playButtonColor,
+		playButtonGradient,
+	} = {}
 ) {
 	const waveformContainer = container.querySelector( '.waveform-container' );
+	const playButton = container.querySelector( '.waveform-btn' );
 
 	if ( playButtonColor ) {
 		container.style.setProperty( '--wfp-button-color', playButtonColor );
@@ -142,10 +353,22 @@ export function applyWaveformPlayerStyles(
 		container.style.removeProperty( '--wfp-text-secondary-color' );
 	}
 
+	if ( playButton ) {
+		if ( playButtonGradient ) {
+			playButton.style.background = playButtonGradient;
+		} else {
+			playButton.style.removeProperty( 'background' );
+		}
+	}
+
 	if ( waveformContainer ) {
-		if ( backgroundColor ) {
+		if ( backgroundGradient ) {
+			waveformContainer.style.background = backgroundGradient;
+		} else if ( backgroundColor ) {
+			waveformContainer.style.removeProperty( 'background' );
 			waveformContainer.style.backgroundColor = backgroundColor;
 		} else {
+			waveformContainer.style.removeProperty( 'background' );
 			waveformContainer.style.removeProperty( 'background-color' );
 		}
 	}
@@ -282,8 +505,10 @@ export function logPlayError( error ) {
  * @param {string}   options.image                 - The track image URL.
  * @param {string}   options.imageAlt              - The track image alt text.
  * @param {string}   options.waveformColor         - The waveform color.
+ * @param {string}   options.waveformGradient      - The waveform gradient.
  * @param {string}   options.textColor             - The player text color.
  * @param {string}   options.backgroundColor       - The player background color.
+ * @param {string}   options.backgroundGradient    - The player background gradient.
  * @param {boolean}  options.autoPlay              - Whether to auto-play when ready.
  * @param {Function} options.onEnded               - Callback when track ends.
  * @param {Object}   options.labels                - Translated button labels.
@@ -300,8 +525,10 @@ export function initWaveformPlayer(
 		image,
 		imageAlt,
 		waveformColor: waveformColorValue,
+		waveformGradient: waveformGradientValue,
 		textColor: textColorValue,
 		backgroundColor,
+		backgroundGradient,
 		autoPlay,
 		onEnded,
 		labels,
@@ -312,10 +539,19 @@ export function initWaveformPlayer(
 	const playerArtwork = showPlayButtonArtwork ? undefined : image;
 
 	// Get colors from computed styles.
-	const { textColor, waveformColor, progressColor } = getWaveformColors(
+	const { textColor, waveformColor, progressColor, waveformGradient } =
+		getWaveformColors(
+			element,
+			waveformColorValue,
+			textColorValue,
+			waveformGradientValue
+		);
+	const waveformGradientStops = getResolvedGradientStops(
 		element,
-		waveformColorValue,
-		textColorValue
+		waveformGradientValue
+	);
+	const waveformButtonColor = getRepresentativeColor(
+		waveformGradientStops || waveformColorValue
 	);
 
 	// Create the waveform container.
@@ -326,6 +562,7 @@ export function initWaveformPlayer(
 		artwork: playerArtwork,
 		waveformColor,
 		progressColor,
+		waveformGradient,
 		buttonColor: textColor,
 		seekLabel: title || labels?.seek,
 		seekValueText: labels?.seekValueText,
@@ -342,15 +579,17 @@ export function initWaveformPlayer(
 	}
 	applyWaveformPlayerStyles( container, {
 		backgroundColor,
+		backgroundGradient,
 		textColor,
-		playButtonColor: waveformColorValue,
+		playButtonColor: waveformButtonColor,
+		playButtonGradient: waveformGradientValue,
 	} );
 
 	// Set up event handlers.
 	let cleanupPlayButtonAccessibility;
 	const handlers = {
 		ready: () => {
-			styleSvgIcons( container, waveformColorValue || textColor );
+			styleSvgIcons( container, waveformButtonColor || textColor );
 			if ( showPlayButtonArtwork ) {
 				setupPlayButtonArtwork( container, image );
 			}

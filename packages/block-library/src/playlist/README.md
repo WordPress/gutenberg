@@ -35,7 +35,9 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `backgroundColor` | `string` | — | — |
 | `backgroundGradient` | `string` | — | — |
 | `waveformColor` | `string` | — | — |
+| `waveformGradient` | `string` | — | — |
 | `waveformBackgroundColor` | `string` | — | — |
+| `waveformBackgroundGradient` | `string` | — | — |
 | `caption` | `string` | — | — |
 
 ## Supports

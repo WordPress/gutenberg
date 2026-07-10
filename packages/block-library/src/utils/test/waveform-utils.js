@@ -10,6 +10,7 @@ import {
 	applyWaveformPlayerStyles,
 	createWaveformContainer,
 	getWaveformColors,
+	getWaveformGradientStops,
 	styleSvgIcons,
 	setupPlayButtonAccessibility,
 	setupPlayButtonArtwork,
@@ -103,6 +104,34 @@ describe( 'Waveform utilities', () => {
 
 			expect( container ).toHaveAttribute( 'data-height', '150' );
 		} );
+
+		it( 'serializes gradient color arrays and direction attributes', () => {
+			const container = createWaveformContainer( {
+				...basePlayerData,
+				waveformColor: [
+					'rgba(255, 0, 0, 0.3)',
+					'rgba(0, 0, 255, 0.3)',
+				],
+				progressColor: [
+					'rgba(255, 0, 0, 0.6)',
+					'rgba(0, 0, 255, 0.6)',
+				],
+				waveformGradient: 'horizontal',
+			} );
+
+			expect( container ).toHaveAttribute(
+				'data-waveform-color',
+				'["rgba(255, 0, 0, 0.3)","rgba(0, 0, 255, 0.3)"]'
+			);
+			expect( container ).toHaveAttribute(
+				'data-progress-color',
+				'["rgba(255, 0, 0, 0.6)","rgba(0, 0, 255, 0.6)"]'
+			);
+			expect( container ).toHaveAttribute(
+				'data-waveform-gradient',
+				'horizontal'
+			);
+		} );
 	} );
 
 	describe( 'getWaveformColors', () => {
@@ -133,6 +162,61 @@ describe( 'Waveform utilities', () => {
 				progressColor: 'rgba(255, 0, 0, 0.6)',
 			} );
 		} );
+
+		it( 'uses gradient stops when a waveform gradient is provided', () => {
+			const element = document.createElement( 'div' );
+
+			const colors = getWaveformColors(
+				element,
+				undefined,
+				'#0000ff',
+				'linear-gradient(90deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)'
+			);
+
+			expect( colors ).toEqual( {
+				textColor: '#0000ff',
+				waveformColor: [
+					'rgba(255, 0, 0, 0.3)',
+					'rgba(0, 0, 255, 0.3)',
+				],
+				progressColor: [
+					'rgba(255, 0, 0, 0.6)',
+					'rgba(0, 0, 255, 0.6)',
+				],
+				waveformGradient: 'horizontal',
+			} );
+		} );
+
+		it( 'maps CSS gradient side-or-corner directions for waveform gradients', () => {
+			const element = document.createElement( 'div' );
+
+			expect(
+				getWaveformColors(
+					element,
+					undefined,
+					'#0000ff',
+					'linear-gradient(to right,rgb(255,0,0) 0%,rgb(0,0,255) 100%)'
+				).waveformGradient
+			).toBe( 'horizontal' );
+			expect(
+				getWaveformColors(
+					element,
+					undefined,
+					'#0000ff',
+					'linear-gradient(to bottom right,rgb(255,0,0) 0%,rgb(0,0,255) 100%)'
+				).waveformGradient
+			).toBe( 'diagonal' );
+		} );
+	} );
+
+	describe( 'getWaveformGradientStops', () => {
+		it( 'extracts color stops from a CSS gradient value', () => {
+			expect(
+				getWaveformGradientStops(
+					'linear-gradient(135deg,rgb(255,0,0) 0%,rgba(0,0,255,0.8) 100%)'
+				)
+			).toEqual( [ 'rgb(255,0,0)', 'rgba(0,0,255,0.8)' ] );
+		} );
 	} );
 
 	describe( 'applyWaveformPlayerStyles', () => {
@@ -148,6 +232,22 @@ describe( 'Waveform utilities', () => {
 
 			expect( waveformContainer ).toHaveStyle( {
 				backgroundColor: '#ffeeaa',
+			} );
+		} );
+
+		it( 'applies the waveform background gradient', () => {
+			const container = document.createElement( 'div' );
+			const waveformContainer = document.createElement( 'div' );
+			waveformContainer.className = 'waveform-container';
+			container.appendChild( waveformContainer );
+
+			applyWaveformPlayerStyles( container, {
+				backgroundGradient:
+					'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)',
+			} );
+
+			expect( waveformContainer ).toHaveStyle( {
+				background: 'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)',
 			} );
 		} );
 
@@ -173,6 +273,22 @@ describe( 'Waveform utilities', () => {
 
 			expect( container ).toHaveStyle( {
 				'--wfp-button-color': '#ff0000',
+			} );
+		} );
+
+		it( 'applies the waveform player play button gradient', () => {
+			const container = document.createElement( 'div' );
+			const playButton = document.createElement( 'button' );
+			playButton.className = 'waveform-btn';
+			container.appendChild( playButton );
+
+			applyWaveformPlayerStyles( container, {
+				playButtonGradient:
+					'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)',
+			} );
+
+			expect( playButton ).toHaveStyle( {
+				background: 'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)',
 			} );
 		} );
 
