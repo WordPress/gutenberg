@@ -287,18 +287,6 @@
 	--wpds-dimension-surface-width-xl: 720px;
 	/* 2x extra large surface width */
 	--wpds-dimension-surface-width-2xl: 960px;
-	/* For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame. */
-	--wpds-elevation-xs: 0px 1px 1px 0px #00000008, 0px 1px 2px 0px #00000005,
-		0px 3px 3px 0px #00000005, 0px 4px 4px 0px #00000003;
-	/* For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar. */
-	--wpds-elevation-sm: 0px 1px 2px 0px #0000000d, 0px 2px 3px 0px #0000000a,
-		0px 6px 6px 0px #00000008, 0px 8px 8px 0px #00000005;
-	/* For components that offer additional actions. Example: Menus, Command Palette */
-	--wpds-elevation-md: 0px 2px 3px 0px #0000000d, 0px 4px 5px 0px #0000000a,
-		0px 12px 12px 0px #00000008, 0px 16px 16px 0px #00000005;
-	/* For components that confirm decisions or handle necessary interruptions. Example: Modals. */
-	--wpds-elevation-lg: 0px 5px 15px 0px #00000014, 0px 15px 27px 0px #00000012,
-		0px 30px 36px 0px #0000000a, 0px 50px 43px 0px #00000005;
 	/* Micro-delays and transition offsets */
 	--wpds-motion-duration-xs: 50ms;
 	/* Micro-interactions like focus rings and state changes */

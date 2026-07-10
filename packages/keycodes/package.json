@@ -46,7 +46,7 @@
 		"@wordpress/i18n": "file:../i18n"
 	},
 	"peerDependencies": {
-		"@types/react": "^18.3.27"
+		"@types/react": "^18 || ^19"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {

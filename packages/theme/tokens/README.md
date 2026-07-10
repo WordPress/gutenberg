@@ -6,7 +6,7 @@ For consumer-facing usage, start with the [`@wordpress/theme` package README](ht
 
 ## Structure
 
-The design system follows the [Design Tokens Community Group (DTCG)](https://design-tokens.github.io/community-group/format/) specification and organizes tokens into distinct types based on what kind of visual property they represent. Token definitions are stored as JSON files in the `/tokens` directory:
+The design system follows the [Design Tokens Format Module](https://www.designtokens.org/tr/2025.10/format/) report from the Design Tokens Community Group (DTCG) and organizes tokens into distinct types based on what kind of visual property they represent. Token definitions are stored as JSON files in the `/tokens` directory:
 
 | File              | Description                                                                                                                      |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
@@ -14,8 +14,8 @@ The design system follows the [Design Tokens Community Group (DTCG)](https://des
 | `dimension.json`  | Spacing scale and semantic spacing tokens for padding, margins, and sizing                                                       |
 | `typography.json` | Font family stacks, font sizes, and line heights                                                                                 |
 | `border.json`     | Border radius and width values                                                                                                   |
-| `elevation.json`  | Shadow definitions for creating depth and layering                                                                               |
 | `motion.json`     | Animation durations and easing curves                                                                                            |
+| `cursor.json`     | Cursor values for interactive controls                                                                                           |
 
 Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. These files are the source of truth for the design system and are processed during the build step to generate CSS custom properties and other output formats in `/src/prebuilt`.
 
@@ -68,7 +68,7 @@ Someone using the design system should never see or concern themselves with eith
 
 ## Custom Extensions
 
-The design tokens use [the `$extensions` feature](https://www.designtokens.org/tr/drafts/format/#extensions-0) of the DTCG Tokens specification to add additional, optional support for proprietary data.
+The design tokens use [the `$extensions` feature](https://www.designtokens.org/tr/2025.10/format/#extensions-0) from the Design Tokens Format Module to add additional, optional support for proprietary data.
 
 ### Figma Support
 
