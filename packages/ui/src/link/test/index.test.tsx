@@ -16,11 +16,11 @@ describe( 'Link', () => {
 		expect( ref.current ).toBeInstanceOf( HTMLAnchorElement );
 	} );
 
-	it( 'applies focus ring styles', () => {
+	it( 'applies focus ring styles except while active', () => {
 		render( <Link href="/">Home</Link> );
 
 		expect( screen.getByRole( 'link', { name: 'Home' } ) ).toHaveClass(
-			'style-outset-ring-focus'
+			'style-outset-ring-focus-except-active'
 		);
 	} );
 

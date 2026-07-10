@@ -41,10 +41,7 @@ describe( 'LinkButton', () => {
 
 		const link = screen.getByRole( 'link', { name: 'Go to example' } );
 
-		expect( link ).toHaveClass( 'style-outset-ring-focus' );
-		expect( link ).not.toHaveClass(
-			'style-outset-ring-focus-except-active'
-		);
+		expect( link ).toHaveClass( 'style-outset-ring-focus-except-active' );
 	} );
 
 	describe( 'openInNewTab', () => {
