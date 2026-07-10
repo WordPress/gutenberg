@@ -151,8 +151,9 @@
 
 // The ContentEditableControl shell provides its own base styling (border, focus
 // ring, padding). Scope the few multi-line and inline-format tweaks the note
-// form needs to the editable element as rendered inside the note form.
-.editor-collab-sidebar-panel__note-form .wp-components-content-editable-control {
+// form needs to the editable element as rendered inside the note form. The
+// shell exposes no stable class name, so target the editable by its role.
+.editor-collab-sidebar-panel__note-form [role="textbox"] {
 	line-height: 20px;
 	max-height: calc(20px * 20 + 18px); // 20 rows + vertical padding.
 	overflow-y: auto;
