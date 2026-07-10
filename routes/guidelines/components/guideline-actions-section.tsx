@@ -126,7 +126,11 @@ export default function GuidelineActionsSection( {
 
 	return (
 		<VStack spacing={ 4 } className="guidelines__actions">
-			<Heading level={ 3 } size={ 15 } weight={ 500 }>
+			<Heading
+				level={ 3 }
+				size={ 15 }
+				weight="var(--wpds-typography-font-weight-semibold)"
+			>
 				{ __( 'Actions' ) }
 			</Heading>
 			<input

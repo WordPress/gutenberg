@@ -1,13 +1,13 @@
 /**
- * Internal dependencies
- */
-import type { TruncateProps } from '../truncate/types';
-
-/**
  * External dependencies
  */
 import type { CSSProperties } from 'react';
 import type { FindAllArgs } from 'highlight-words-core';
+
+/**
+ * Internal dependencies
+ */
+import type { TruncateProps } from '../truncate/types';
 
 export type TextSize =
 	| 'body'
@@ -18,8 +18,6 @@ export type TextSize =
 	| 'title';
 
 type TextVariant = 'muted';
-
-type TextWeight = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
 
 export interface Props extends TruncateProps {
 	/**
@@ -100,7 +98,7 @@ export interface Props extends TruncateProps {
 	 *
 	 * @default 'normal'
 	 */
-	weight?: CSSProperties[ 'fontWeight' ] | TextWeight;
+	weight?: CSSProperties[ 'fontWeight' ];
 	/**
 	 * Adjusts letter-spacing of the text.
 	 */

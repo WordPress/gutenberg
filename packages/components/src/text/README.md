@@ -240,6 +240,6 @@ function Example() {
 
 ### weight
 
-**Type**: `CSSProperties['fontWeight']`,`TextWeight`
+**Type**: `CSSProperties['fontWeight']`
 
 Adjusts font-weight of the text.

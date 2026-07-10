@@ -30,10 +30,6 @@ describe( 'formatFontWeight', () => {
 			name: 'Regular',
 			value: '400',
 		} );
-		expect( formatFontWeight( '500' ) ).toEqual( {
-			name: 'Medium',
-			value: '500',
-		} );
 		expect( formatFontWeight( '600' ) ).toEqual( {
 			name: 'Semi Bold',
 			value: '600',

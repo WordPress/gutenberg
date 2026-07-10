@@ -10,7 +10,7 @@ function getNumericFontWeight( value: string ): number {
 		case 'bold':
 			return 700;
 		case 'bolder':
-			return 500;
+			return 600;
 		case 'lighter':
 			return 300;
 		default:
