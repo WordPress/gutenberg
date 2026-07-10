@@ -11,6 +11,10 @@
 		"tagName": {
 			"type": "string",
 			"default": "div"
+		},
+		"dropCap": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"example": {
