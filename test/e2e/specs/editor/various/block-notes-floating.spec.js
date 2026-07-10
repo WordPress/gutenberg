@@ -343,4 +343,60 @@ test.describe( 'Block Notes: floating panel', () => {
 		await expect( notes ).toBeVisible();
 		expect( await getReservedWidth() ).toBeGreaterThan( 0 );
 	} );
+
+	test( 'floating notes do not react to the device preview', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.setViewportSize( { width: 1450, height: 800 } );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph with a note' },
+		} );
+		await addNote( page, editor, 'Device preview note' );
+
+		const notes = page.getByRole( 'region', { name: 'Notes' } );
+		const setDevice = async ( device ) => {
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'View', exact: true } )
+				.click();
+			await page.getByRole( 'menuitemradio', { name: device } ).click();
+			// The View menu stays open after choosing a device; close it so
+			// the next interaction starts from a closed menu.
+			await page.keyboard.press( 'Escape' );
+		};
+
+		// Reads the reserved padding applied to the canvas root.
+		const getReservedWidth = () =>
+			editor.canvas.locator( 'body' ).evaluate( ( body ) => {
+				const root = body.ownerDocument.documentElement;
+				return (
+					parseFloat(
+						body.ownerDocument.defaultView.getComputedStyle( root )
+							.paddingInlineEnd
+					) || 0
+				);
+			} );
+
+		await expect( notes ).toBeVisible();
+		await expect.poll( getReservedWidth ).toBe( 280 );
+
+		// The device preview simulates a device width; the notes are editor
+		// chrome, so they must neither hide at the simulated width nor
+		// reserve space inside the previewed canvas (which would distort the
+		// simulation).
+		await setDevice( 'Tablet' );
+		await expect( notes ).toBeVisible();
+		await expect.poll( getReservedWidth ).toBe( 0 );
+
+		await setDevice( 'Mobile' );
+		await expect( notes ).toBeVisible();
+		await expect.poll( getReservedWidth ).toBe( 0 );
+
+		// Back to Desktop, the canvas reservation returns.
+		await setDevice( 'Desktop' );
+		await expect( notes ).toBeVisible();
+		await expect.poll( getReservedWidth ).toBe( 280 );
+	} );
 } );
