@@ -4,11 +4,7 @@
 
 ### Enhancements
 
--   Add `outset-ring__focus` mixin for outline-based focus rings using `--wpds-*` design tokens ([#78698](https://github.com/WordPress/gutenberg/pull/78698)).
-
-### Bug Fixes
-
--   `outset-ring__focus`: Show no focus ring while the element is pressed — the outline is now scoped to `:not(:active)`, and the reset of the WordPress core `a:focus` ring covers the whole duration of focus, including the pressed state ([#80082](https://github.com/WordPress/gutenberg/pull/80082)).
+-   Add `outset-ring__focus` mixin for outline-based focus rings using `--wpds-*` design tokens ([#78698](https://github.com/WordPress/gutenberg/pull/78698), [#80082](https://github.com/WordPress/gutenberg/pull/80082)).
 
 ## 10.2.0 (2026-07-01)
 

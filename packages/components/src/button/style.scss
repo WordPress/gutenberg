@@ -12,7 +12,12 @@
  */
 
 .components-button {
-	&:focus {
+	// Defend against a conflicting focus ring from WordPress common.css on `a:focus`.
+	&:focus:is(a) {
+		box-shadow: none;
+	}
+
+	&:focus:not(:active) {
 		@include mixins.outset-ring__focus();
 	}
 
