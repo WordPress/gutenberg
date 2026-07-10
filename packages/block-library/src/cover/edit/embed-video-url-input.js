@@ -4,11 +4,11 @@
 import { useState } from '@wordpress/element';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
-	__experimentalVStack as VStack,
 	TextControl,
 	Notice,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -19,6 +19,7 @@ export default function EmbedVideoUrlInput( {
 	onSubmit,
 	onClose,
 	initialUrl = '',
+	allowedVideoProviders,
 } ) {
 	const [ url, setUrl ] = useState( initialUrl );
 	const [ error, setError ] = useState( '' );
@@ -29,7 +30,7 @@ export default function EmbedVideoUrlInput( {
 			return;
 		}
 
-		if ( ! isValidVideoEmbedUrl( url ) ) {
+		if ( ! isValidVideoEmbedUrl( url, allowedVideoProviders ) ) {
 			setError(
 				__(
 					'This URL is not supported. Please enter a valid video link from a supported provider.'
@@ -50,7 +51,7 @@ export default function EmbedVideoUrlInput( {
 			confirmButtonText={ __( 'Add video' ) }
 			size="medium"
 		>
-			<VStack spacing={ 4 }>
+			<Stack direction="column" gap="lg">
 				{ error && (
 					<Notice status="error" isDismissible={ false }>
 						{ error }
@@ -71,7 +72,7 @@ export default function EmbedVideoUrlInput( {
 						'Add a background video to the cover block that will autoplay in a loop.'
 					) }
 				/>
-			</VStack>
+			</Stack>
 		</ConfirmDialog>
 	);
 }

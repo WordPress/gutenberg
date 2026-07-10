@@ -36,6 +36,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `tagName` | `string` | `"div"` | — |
 | `sizeSlug` | `string` | — | — |
 | `poster` | `string` | — | [Source](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `video`. [HTML attr](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `poster` |
+| `allowedVideoProviders` | `array` | `["youtube","vimeo","videopress","animoto","tiktok","wordpress-tv"]` | — |
 
 ## Supports
 

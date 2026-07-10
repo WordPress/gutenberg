@@ -37,6 +37,45 @@ function example_modify_heading_levels_globally( $args, $block_type ) {
 add_filter( 'register_block_type_args', 'example_modify_heading_levels_globally', 10, 2 );
 ```
 
+## Restrict Cover block video embed providers
+
+The Cover block can use a background video embedded from a URL. The `allowedVideoProviders` attribute controls which providers are offered when embedding a video. It accepts an array of provider slugs and defaults to all supported providers: `youtube`, `vimeo`, `videopress`, `animoto`, `tiktok`, and `wordpress-tv`.
+
+This attribute can only _remove_ providers from the supported list, never add new ones. If no providers remain allowed, the "Embed video from URL" option is hidden entirely.
+
+You can apply this attribute directly in the block markup. For example, the following markup allows only YouTube and Vimeo.
+
+```html
+<!-- wp:cover {"allowedVideoProviders":["youtube","vimeo"]} -->
+<div class="wp-block-cover">
+	<span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim"></span>
+	<div class="wp-block-cover__inner-container"></div>
+</div>
+<!-- /wp:cover -->
+```
+
+You can also use [block filters](/docs/reference-guides/filters/block-filters.md) to set the default value globally. The example below removes YouTube from every Cover block while keeping the other providers.
+
+```php
+function example_restrict_cover_video_providers( $args, $block_type ) {
+
+	if ( 'core/cover' !== $block_type ) {
+		return $args;
+	}
+
+	$providers = $args['attributes']['allowedVideoProviders']['default'];
+
+	$args['attributes']['allowedVideoProviders']['default'] = array_values(
+		array_diff( $providers, [ 'youtube' ] )
+	);
+
+	return $args;
+}
+add_filter( 'register_block_type_args', 'example_restrict_cover_video_providers', 10, 2 );
+```
+
+To disable video embeds entirely, set the default to an empty array.
+
 ## Disable the Pattern Directory
 
 To fully remove patterns bundled with WordPress core from being accessed in the Inserter, the following can be added to your `functions.php` file:
