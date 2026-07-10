@@ -9,6 +9,8 @@ A theming package that's part of the WordPress Design System. It has two parts:
 -   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more.
 -   **Theme System**: A flexible theming provider for consistent theming across applications.
 
+This package is not a WordPress block theme, site theme, or `theme.json` API. It provides the WordPress Design System's design tokens and React theming primitives for JavaScript packages and applications.
+
 ## Documentation
 
 This README is the entry point for package consumers. It covers how to load design tokens, use `ThemeProvider`, and configure the package's development tooling.
@@ -38,11 +40,13 @@ The design system splits token delivery into two complementary layers:
 
 #### Within WordPress
 
-Stylesheets are managed on your behalf in a WordPress context, so you don't need to worry about loading them yourself. The design tokens stylesheet is enqueued automatically on every admin page and inside the block editor's content iframe.
+Stylesheets are managed on your behalf in standard WordPress admin and editor screens. WordPress registers the design tokens stylesheet as the `wp-theme` style handle and loads it where WordPress admin and editor packages already depend on the shared base styles. This includes the admin page and the block editor's content iframe.
+
+If your plugin renders a separate app shell, iframe, popup window, or package bundle outside those WordPress-managed style dependencies, enqueue the `wp-theme` stylesheet in that document instead of bundling `@wordpress/theme/design-tokens.css` into your plugin. See the [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify stylesheet dependencies.
 
 #### Outside WordPress
 
-Outside of WordPress, you will need to install and load the design tokens stylesheet to support the full range of theming capabilities:
+Outside of WordPress, install and load the design tokens stylesheet to support the full range of theming capabilities:
 
 ```sh
 npm install @wordpress/theme
@@ -51,6 +55,8 @@ npm install @wordpress/theme
 ```js
 import '@wordpress/theme/design-tokens.css';
 ```
+
+The package's JavaScript entrypoints are ESM-only and require Node.js `^20.19.0` or `>=22.13.0`. Use `import` syntax from ESM or TypeScript configuration files.
 
 This stylesheet is universal and does not have a separate RTL version.
 
@@ -61,6 +67,27 @@ If your application renders React content into additional documents (an iframe, 
 For the best development experience, we recommend configuring the [Stylelint rules](#stylelint-plugins) provided by this package. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
 
 If you reference `--wpds-*` tokens in CSS or JS/TS source, use the [build plugins](#build-plugins) to inject fallback values at build time so components render correctly even when the tokens stylesheet is not loaded. If you use `@wordpress/build`, these plugins are already enabled by default when `@wordpress/theme` is installed.
+
+### Accessibility
+
+The semantic color tokens are designed so the default foreground/background pairs used by the design system meet [WCAG AA text contrast](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html). Components still need to choose the correct semantic pair for the UI state they render, and must not rely on color alone to convey information.
+
+Design tokens do not replace component-level accessibility handling:
+
+-   **Forced colors:** components are still responsible for `forced-colors` overrides where native high-contrast rendering would otherwise hide borders, icons, focus rings, or state indicators.
+-   **Reduced motion:** motion tokens provide shared durations and easing curves, but consuming components are still responsible for respecting `prefers-reduced-motion` for non-essential animations.
+
+For example, define non-essential transitions only when the user has not requested reduced motion:
+
+```css
+@media not ( prefers-reduced-motion ) {
+	.example {
+		transition-property: opacity;
+		transition-duration: var( --wpds-motion-duration-md );
+		transition-timing-function: var( --wpds-motion-easing-subtle );
+	}
+}
+```
 
 ## Theme Provider
 
@@ -83,7 +110,7 @@ The `color` prop accepts an object with the following optional properties:
 -   `primary`: The primary/accent seed color (default: `'#3858e9'`).
 -   `background`: The background seed color (default: `'#f8f8f8'`).
 
-Both properties accept an sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
+Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
 
 The `cursor` prop accepts an object with the following optional properties:
 
@@ -126,7 +153,11 @@ Setting `isRoot` additionally hoists those overrides to the containing document'
 </ThemeProvider>
 ```
 
-Use `isRoot` on the top-level provider for an application or page. It's also the recommended pattern for the topmost provider rendered into a separate document (iframe, popup window). The static design-tokens stylesheet still provides the default values; `isRoot` is only needed when you want a `<ThemeProvider>`'s overrides to reach the whole document.
+Use `isRoot` on the top-level provider for an application or page. It's also the recommended pattern for the topmost provider rendered into a separate document (iframe, popup window).
+
+Render at most one root provider per document. Multiple `isRoot` providers that share the same document are unsupported because each one would try to define the document-level token values. Nested and sibling providers can still be used normally when `isRoot` is omitted, and separate documents can each have their own root provider.
+
+The static design-tokens stylesheet still provides the default values; `isRoot` is only needed when you want a `<ThemeProvider>`'s overrides to reach the whole document.
 
 ### Across documents (iframes and other portals)
 
@@ -136,7 +167,7 @@ When you render React content into a different document (typically an iframe), t
 
     Inside WordPress, this is enqueued automatically for both the admin page and the block editor's content iframe.
 
-    For custom iframes, the consumer is responsible for loading it — either by importing `@wordpress/theme/design-tokens.css` from a stylesheet that the iframe already loads, or by injecting the CSS string directly.
+    For custom iframes, the consumer is responsible for loading it in the iframe document. Within WordPress, enqueue the `wp-theme` stylesheet for that document. Outside WordPress, import `@wordpress/theme/design-tokens.css` from a stylesheet that the iframe already loads, or inject the CSS string directly.
 
 2.  **Dynamically injected component styles are routed to the iframe document.** Some `@wordpress/components` styles are injected into the document at runtime rather than shipped as static CSS — for example Emotion-based styles, and styles from CSS modules built with `@wordpress/build`. `StyleProvider` tells that machinery which document's `<head>` to inject into. Wrap the iframe subtree in `<StyleProvider document={ iframeDocument }>`.
 
@@ -160,6 +191,12 @@ function IframeContent( { iframeDocument, children } ) {
 ```
 
 The static stylesheet inside the iframe provides every default; `<ThemeProvider isRoot>` adds (or omits) overrides on top, exactly like in the main document.
+
+### Legacy compatibility
+
+The public token surface is the semantic `--wpds-*` custom properties documented in the [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
+
+`@wordpress/theme` may also maintain legacy compatibility aliases for existing WordPress admin and `@wordpress/components` internals. Those aliases are transitional implementation details, including the `--wp-components-*` namespace, and are not a supported API for consumers. New code should use semantic `--wpds-*` design tokens instead.
 
 ### Building
 

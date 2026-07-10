@@ -167,6 +167,7 @@ export type ForegroundColor =
 	| 'neutral-strong'
 	| 'neutral-strong-active'
 	| 'neutral-strong-disabled'
+	| 'neutral-weak-active'
 	| 'neutral-weak-disabled'
 	| 'brand'
 	| 'brand-active'

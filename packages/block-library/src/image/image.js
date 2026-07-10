@@ -69,7 +69,6 @@ import {
 	getStyleStateKey,
 } from '../utils/style-state';
 import { useOpenImageMediaEditorModal } from './use-open-image-media-editor-modal';
-import AnimatedGifConvertControl from './animated-gif-convert-control';
 import {
 	MIN_SIZE,
 	ALLOWED_MEDIA_TYPES,
@@ -870,10 +869,6 @@ export default function Image( {
 					variant="toolbar"
 				/>
 			</BlockControls>
-			<AnimatedGifConvertControl
-				attributes={ attributes }
-				clientId={ clientId }
-			/>
 		</>
 	);
 

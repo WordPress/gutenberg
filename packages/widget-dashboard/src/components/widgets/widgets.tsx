@@ -137,7 +137,8 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			const isFullBleed = widgetType?.presentation === 'full-bleed';
 
 			// The active mode's controls: layout while customizing, the
-			// attribute controls (high-relevance fields plus the gear)
+			// attribute controls (high-relevance fields on the prominent
+			// surface, plus a settings entry point when needed)
 			// otherwise.
 			let controls: React.ReactNode;
 			if ( editMode ) {

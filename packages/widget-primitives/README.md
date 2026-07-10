@@ -58,7 +58,8 @@ the hook in its loading state: `widgetTypes` is empty and
     primitive as is.
 -   `WidgetAttributeField< Item >`: authoring helper. It is a DataViews
     `Field` whose `id` is narrowed to the keys of the widget's attribute
-    object.
+    object, with an optional `relevance` hint (`'high' | 'low'`) marking
+    attributes a host may promote to a prominent surface.
 
 ## Architecture
 
