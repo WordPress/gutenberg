@@ -347,7 +347,9 @@ if ( ! function_exists( 'wp_guideline_scope_from_slug' ) ) {
 	 * Resolve the scope that owns a guideline row slug.
 	 *
 	 * Returns the scope key for a `guideline-{scope}` slug that matches a
-	 * registered scope. Per-block rows (`guideline-block-*`) belong to the
+	 * registered scope. A registered scope key always wins, so a scope keyed
+	 * like `block-foo` resolves to itself rather than the blocks scope. Any
+	 * other `guideline-block-*` slug is a per-block row that belongs to the
 	 * `blocks` scope while it is registered. Returns null for the bare
 	 * `guideline-block-` slug and for any unknown scope.
 	 *
@@ -362,15 +364,23 @@ if ( ! function_exists( 'wp_guideline_scope_from_slug' ) ) {
 		}
 
 		$scopes = wp_guideline_scopes();
+		$scope  = substr( $slug, strlen( 'guideline-' ) );
 
-		// Per-block rows belong to the blocks scope while it is registered.
+		// A slug that matches a registered scope key is that scope. Checking this
+		// first lets a scope keyed like `block-foo` win over the per-block
+		// namespace below, instead of being swallowed by the blocks scope.
+		if ( isset( $scopes[ $scope ] ) ) {
+			return $scope;
+		}
+
+		// Otherwise a `guideline-block-<name>` row is a per-block row that belongs
+		// to the blocks scope while it is registered. A real block name never
+		// equals a registered scope key, so the check above stays safe.
 		if ( str_starts_with( $slug, 'guideline-block-' ) && strlen( $slug ) > strlen( 'guideline-block-' ) ) {
 			return isset( $scopes['blocks'] ) ? 'blocks' : null;
 		}
 
-		$scope = substr( $slug, strlen( 'guideline-' ) );
-
-		return isset( $scopes[ $scope ] ) ? $scope : null;
+		return null;
 	}
 }
 
