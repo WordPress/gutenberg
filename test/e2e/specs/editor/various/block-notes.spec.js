@@ -1501,11 +1501,11 @@ test.describe( 'Block Notes', () => {
 				/^Expand notes/,
 			] );
 			// The floating notes are visible by default, so "Expand notes" is
-			// the selected choice.
+			// the selected choice. The accessible name includes the keyboard
+			// shortcut, so match on the label prefix.
 			await expect(
 				menu.getByRole( 'menuitemradio', {
-					name: 'Expand notes',
-					exact: true,
+					name: /^Expand notes/,
 				} )
 			).toHaveAttribute( 'aria-checked', 'true' );
 			await page.keyboard.press( 'Escape' );
