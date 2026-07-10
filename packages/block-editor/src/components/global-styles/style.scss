@@ -23,7 +23,7 @@
 	text-align: right;
 }
 
-.block-editor-global-styles-state-control:has(.has-text) {
+.block-editor-global-styles-state-control:has(.show-text) {
 	// Ensure alignment with block heading.
 	margin-top: -$grid-unit-05;
 }
