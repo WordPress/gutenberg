@@ -10,6 +10,18 @@ import { Root } from './root';
 import { Title } from './title';
 import { Trigger } from './trigger';
 
+Action.displayName = 'Dialog.Action';
+CloseIcon.displayName = 'Dialog.CloseIcon';
+Content.displayName = 'Dialog.Content';
+Description.displayName = 'Dialog.Description';
+Footer.displayName = 'Dialog.Footer';
+Header.displayName = 'Dialog.Header';
+Popup.displayName = 'Dialog.Popup';
+Portal.displayName = 'Dialog.Portal';
+Root.displayName = 'Dialog.Root';
+Title.displayName = 'Dialog.Title';
+Trigger.displayName = 'Dialog.Trigger';
+
 export {
 	Action,
 	CloseIcon,
