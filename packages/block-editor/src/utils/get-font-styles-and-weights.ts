@@ -43,6 +43,10 @@ const FONT_WEIGHTS = [
 		value: '400',
 	},
 	{
+		name: _x( 'Medium', 'font weight' ),
+		value: '500',
+	},
+	{
 		name: _x( 'Semi Bold', 'font weight' ),
 		value: '600',
 	},
@@ -96,10 +100,6 @@ export function getFontStylesAndWeights(
 
 			// Create font weight options for available variable weights.
 			for ( let i = startValue; i <= endValue; i++ ) {
-				// Skip the retired medium step in favor of semibold.
-				if ( i === 5 ) {
-					continue;
-				}
 				const fontWeightValue = `${ i.toString() }00`;
 				if (
 					! fontWeights.some(

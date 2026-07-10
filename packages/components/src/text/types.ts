@@ -19,6 +19,8 @@ export type TextSize =
 
 type TextVariant = 'muted';
 
+type TextWeight = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
+
 export interface Props extends TruncateProps {
 	/**
 	 * Adjusts the text alignment.
@@ -98,7 +100,7 @@ export interface Props extends TruncateProps {
 	 *
 	 * @default 'normal'
 	 */
-	weight?: CSSProperties[ 'fontWeight' ];
+	weight?: CSSProperties[ 'fontWeight' ] | TextWeight;
 	/**
 	 * Adjusts letter-spacing of the text.
 	 */

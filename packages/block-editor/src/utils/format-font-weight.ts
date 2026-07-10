@@ -45,6 +45,9 @@ export function formatFontWeight(
 		case '300':
 			name = _x( 'Light', 'font weight' );
 			break;
+		case '500':
+			name = _x( 'Medium', 'font weight' );
+			break;
 		case '600':
 			name = _x( 'Semi Bold', 'font weight' );
 			break;

@@ -122,7 +122,7 @@ describe( 'rendererPath', () => {
 					typography: {
 						fontSize: '10px',
 						fontStyle: 'normal',
-						fontWeight: '600',
+						fontWeight: '500',
 						letterSpacing: '10px',
 						lineHeight: '1',
 						textDecoration: 'line-through',

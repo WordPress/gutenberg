@@ -27,7 +27,7 @@
  * toggleFont({ slug: 'roboto' }, { fontWeight: '400', fontStyle: 'normal' }, customFonts);
  * // This will remove the specified face from 'roboto' in customFonts
  *
- * toggleFont({ slug: 'roboto' }, { fontWeight: '600', fontStyle: 'normal' }, customFonts);
+ * toggleFont({ slug: 'roboto' }, { fontWeight: '500', fontStyle: 'normal' }, customFonts);
  * // This will add the specified face to 'roboto' in customFonts
  */
 /**

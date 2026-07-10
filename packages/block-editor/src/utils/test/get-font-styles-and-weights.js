@@ -34,6 +34,10 @@ describe( 'getFontStylesAndWeights', () => {
 					value: '400',
 				},
 				{
+					name: 'Medium',
+					value: '500',
+				},
+				{
 					name: 'Semi Bold',
 					value: '600',
 				},
@@ -85,6 +89,14 @@ describe( 'getFontStylesAndWeights', () => {
 					style: {
 						fontStyle: 'normal',
 						fontWeight: '400',
+					},
+				},
+				{
+					key: 'normal-500',
+					name: 'Medium',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '500',
 					},
 				},
 				{
@@ -160,6 +172,14 @@ describe( 'getFontStylesAndWeights', () => {
 					},
 				},
 				{
+					key: 'italic-500',
+					name: 'Medium Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '500',
+					},
+				},
+				{
 					key: 'italic-600',
 					name: 'Semi Bold Italic',
 					style: {
@@ -232,6 +252,10 @@ describe( 'getFontStylesAndWeights', () => {
 					value: '400',
 				},
 				{
+					name: 'Medium',
+					value: '500',
+				},
+				{
 					name: 'Semi Bold',
 					value: '600',
 				},
@@ -247,6 +271,14 @@ describe( 'getFontStylesAndWeights', () => {
 					style: {
 						fontStyle: 'normal',
 						fontWeight: '400',
+					},
+				},
+				{
+					key: 'normal-500',
+					name: 'Medium',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '500',
 					},
 				},
 				{
@@ -271,6 +303,14 @@ describe( 'getFontStylesAndWeights', () => {
 					style: {
 						fontStyle: 'italic',
 						fontWeight: '400',
+					},
+				},
+				{
+					key: 'italic-500',
+					name: 'Medium Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '500',
 					},
 				},
 				{

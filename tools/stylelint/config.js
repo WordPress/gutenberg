@@ -28,16 +28,12 @@ module.exports = {
 					'/--wp-components-color-/',
 					'/\\$font-weight-medium/',
 				],
-				'font-weight': [ '500', '600' ],
 				cursor: [ 'pointer' ],
 			},
 			{
 				message: ( property, value ) => {
 					if ( value.includes( '$font-weight-medium' ) ) {
 						return 'Use `$font-weight-semibold` instead. `$font-weight-medium` is kept for backwards compatibility only.';
-					}
-					if ( property === 'font-weight' ) {
-						return 'Use the semibold design token or `$font-weight-semibold` instead of a literal 500 or 600 font weight.';
 					}
 					if ( property === 'cursor' ) {
 						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
