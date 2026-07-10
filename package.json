@@ -68,7 +68,7 @@
 		"@playwright/test": "^1.61.1",
 		"@types/react": "^18.3.27",
 		"@types/react-dom": "^18.3.1",
-		"@typescript/native-preview": "^7.0.0-dev.20260423.1",
+		"@typescript/native": "npm:typescript@^7.0.2",
 		"@wordpress/env": "file:./packages/env",
 		"@wordpress/eslint-tools": "file:./tools/eslint",
 		"@wordpress/release-tools": "file:./tools/release",
@@ -83,7 +83,7 @@
 		"patch-package": "^8.0.0",
 		"rimraf": "^5.0.10",
 		"syncpack": "^15.3.1",
-		"typescript": "^6.0.2",
+		"typescript": "npm:@typescript/typescript6@^6.0.2",
 		"wait-on": "^8.0.1"
 	},
 	"overrides": {
@@ -92,7 +92,7 @@
 	"scripts": {
 		"build": "npm run --workspace @wordpress/build-scripts build:all --",
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
-		"clean:package-types": "tsgo --build --clean && rimraf --glob \"./packages/*/build-types\"",
+		"clean:package-types": "tsc --build --clean && rimraf --glob \"./packages/*/build-types\"",
 		"clean:packages": "rimraf --glob \"./packages/*/{build,build-module,build-wp,build-style}\" \"./build\"",
 		"dev": "npm run --workspace @wordpress/build-scripts dev --",
 		"distclean": "git clean --force -d -X",
