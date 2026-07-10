@@ -207,6 +207,26 @@ function block_core_table_of_contents_get_headings_from_content( $content, $max_
 }
 
 /**
+ * Checks whether the current block template contains a Post Content block.
+ *
+ * @return bool Whether the current block template contains a Post Content block.
+ */
+function block_core_table_of_contents_current_template_has_post_content() {
+	global $_wp_current_template_content;
+
+	if (
+		! class_exists( 'WP_Block_Processor' ) ||
+		empty( $_wp_current_template_content )
+	) {
+		return false;
+	}
+
+	$processor = new WP_Block_Processor( $_wp_current_template_content );
+
+	return $processor->next_block( 'core/post-content' );
+}
+
+/**
  * Converts a flat list of headings to a nested list.
  *
  * @param array $headings Flat heading data.
@@ -312,8 +332,15 @@ function block_core_table_of_contents_build_list_items( $nested_headings, $list_
 function block_core_table_of_contents_render( $attributes, $content ) {
 	global $wp_current_filter;
 
-	if ( ! in_array( 'the_content', $wp_current_filter, true ) ) {
-		return block_core_table_of_contents_add_aria_label( $attributes, $content );
+	$is_rendering_post_content = in_array( 'the_content', $wp_current_filter, true );
+
+	if ( ! $is_rendering_post_content ) {
+		if (
+			! is_singular() ||
+			! block_core_table_of_contents_current_template_has_post_content()
+		) {
+			return '';
+		}
 	}
 
 	$post = get_post();

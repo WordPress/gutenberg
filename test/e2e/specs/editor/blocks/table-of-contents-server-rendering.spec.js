@@ -32,11 +32,19 @@ ${ content }
 };
 
 test.describe( 'Table of Contents server rendering', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+	} );
+
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllPosts();
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'renders the table from current post headings on the front end', async ( {
@@ -163,7 +171,7 @@ test.describe( 'Table of Contents server rendering', () => {
 			content: [
 				tableOfContentsBlock(),
 				`<!-- wp:block {"ref":${ syncedPattern.id }} /-->`,
-				'<!-- wp:template-part {"slug":"toc-template-part","theme":"emptytheme"} /-->',
+				'<!-- wp:template-part {"slug":"toc-template-part"} /-->',
 			].join( '\n' ),
 		} );
 
@@ -192,6 +200,136 @@ test.describe( 'Table of Contents server rendering', () => {
 		).toHaveAttribute( 'href', '#template-part-heading' );
 		await expect(
 			tableOfContents.getByText( 'Outside post content' )
+		).toHaveCount( 0 );
+	} );
+
+	test( 'renders template-placed table from current post headings on the front end', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.createTemplate( 'wp_template', {
+			slug: 'singular',
+			title: 'Single Posts',
+			content: [
+				headingBlock( {
+					anchor: 'template-heading',
+					content: 'Template heading',
+					level: 2,
+				} ),
+				tableOfContentsBlock( {
+					ariaLabel: 'Template contents',
+				} ),
+				'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
+			].join( '\n' ),
+		} );
+
+		const post = await requestUtils.createPost( {
+			title: 'TOC in template rendering',
+			status: 'publish',
+			content: [
+				headingBlock( {
+					anchor: 'post-heading',
+					content: 'Post heading',
+					level: 2,
+				} ),
+				headingBlock( {
+					anchor: 'post-subheading',
+					content: 'Post subheading',
+					level: 3,
+				} ),
+			].join( '\n' ),
+		} );
+
+		await page.goto( `/?p=${ post.id }` );
+
+		const tableOfContents = page.locator(
+			'nav.wp-block-table-of-contents'
+		);
+		await expect( tableOfContents ).toHaveAttribute(
+			'aria-label',
+			'Template contents'
+		);
+		await expect(
+			tableOfContents.locator( '.wp-block-table-of-contents__entry' )
+		).toHaveText( [ 'Post heading', 'Post subheading' ] );
+		await expect(
+			tableOfContents.getByRole( 'link', { name: 'Post heading' } )
+		).toHaveAttribute( 'href', '#post-heading' );
+		await expect(
+			tableOfContents.getByRole( 'link', { name: 'Post subheading' } )
+		).toHaveAttribute( 'href', '#post-subheading' );
+		await expect(
+			tableOfContents.getByText( 'Template heading' )
+		).toHaveCount( 0 );
+	} );
+
+	test( 'does not render a template-placed table on singular views when the template has no post content', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.createTemplate( 'wp_template', {
+			slug: 'singular',
+			title: 'Single Posts',
+			content: [
+				tableOfContentsBlock(
+					{
+						ariaLabel: 'Template contents',
+					},
+					'<nav class="wp-block-table-of-contents"><ol><li><a class="wp-block-table-of-contents__entry" href="#stale-heading">Stale heading</a></li></ol></nav>'
+				),
+				headingBlock( {
+					anchor: 'template-heading',
+					content: 'Template heading',
+					level: 2,
+				} ),
+			].join( '\n' ),
+		} );
+
+		const post = await requestUtils.createPost( {
+			title: 'TOC in template without post content',
+			status: 'publish',
+			content: headingBlock( {
+				anchor: 'post-heading',
+				content: 'Post heading',
+				level: 2,
+			} ),
+		} );
+
+		await page.goto( `/?p=${ post.id }` );
+
+		await expect(
+			page.locator( 'nav.wp-block-table-of-contents' )
+		).toHaveCount( 0 );
+		await expect( page.getByText( 'Template heading' ) ).toBeVisible();
+		await expect( page.getByText( 'Post heading' ) ).toHaveCount( 0 );
+	} );
+
+	test( 'does not render a template-placed table when the template has no post content', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.createTemplate( 'wp_template', {
+			slug: '404',
+			title: '404',
+			content: [
+				tableOfContentsBlock(
+					{
+						ariaLabel: 'Missing page contents',
+					},
+					'<nav class="wp-block-table-of-contents"><ol><li><a class="wp-block-table-of-contents__entry" href="#stale-heading">Stale heading</a></li></ol></nav>'
+				),
+				headingBlock( {
+					anchor: 'missing-page-heading',
+					content: 'Missing page heading',
+					level: 2,
+				} ),
+			].join( '\n' ),
+		} );
+
+		await page.goto( '/missing-table-of-contents-page/' );
+
+		await expect(
+			page.locator( 'nav.wp-block-table-of-contents' )
 		).toHaveCount( 0 );
 	} );
 
