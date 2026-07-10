@@ -50,7 +50,17 @@ if ( ! packagePath || extraPositionals.length ) {
 const packageRoot = resolve( process.cwd(), packagePath );
 const require = createRequire( import.meta.url );
 const attwPackagePath = require.resolve( '@arethetypeswrong/cli/package.json' );
-const attwCliPath = join( dirname( attwPackagePath ), 'dist/index.js' );
+const attwPackageJson = JSON.parse( readFileSync( attwPackagePath, 'utf8' ) );
+const attwBin =
+	typeof attwPackageJson.bin === 'string'
+		? attwPackageJson.bin
+		: attwPackageJson.bin?.attw;
+
+if ( ! attwBin ) {
+	throw new Error( '@arethetypeswrong/cli does not declare an attw binary.' );
+}
+
+const attwCliPath = resolve( dirname( attwPackagePath ), attwBin );
 
 const attwOptions = {
 	profile: parsedArgs.values[ 'attw-profile' ] ?? 'strict',
@@ -129,156 +139,171 @@ const packArgs = [
 	'--json',
 ];
 
+/**
+ * @param {string} packDirectory Temporary package archive directory.
+ * @return {number} Process exit code.
+ */
+function validatePackedPackage( packDirectory ) {
+	packArgs.push( '--pack-destination', packDirectory );
+
+	const packResult = spawnSync( packCommand, packArgs, {
+		cwd: packageRoot,
+		encoding: 'utf8',
+		env,
+		shell: ! npmExecPath && process.platform === 'win32',
+	} );
+
+	if ( packResult.error ) {
+		throw packResult.error;
+	}
+
+	if ( packResult.status !== 0 ) {
+		process.stderr.write( packResult.stdout ?? '' );
+		process.stderr.write( packResult.stderr ?? '' );
+		return packResult.status ?? 1;
+	}
+
+	/** @type {Array<{ filename: string, files: Array<{ path: string }> }>} */
+	const packs = JSON.parse( packResult.stdout );
+	const [ pack ] = packs;
+	const packedPaths = pack.files.map( ( { path } ) => path );
+	const packedPathSet = new Set( packedPaths );
+	const tarballPath = join( packDirectory, pack.filename );
+
+	const disallowedPaths = packedPaths.filter( ( path ) =>
+		disallowedPathPatterns.some( ( pattern ) => pattern.test( path ) )
+	);
+	const packageExports = getPackageExportsMap();
+	const missingAttwExcludedEntryPoints =
+		attwOptions.excludedEntryPoints.filter(
+			( entryPoint ) =>
+				! packageExports ||
+				! Object.hasOwn( packageExports, entryPoint )
+		);
+	// attw does not model non-JavaScript entry points like CSS. Keep explicit
+	// exclusions honest by checking only the package targets skipped by attw.
+	const missingAttwExcludedTargetPaths = attwOptions.excludedEntryPoints
+		.flatMap( ( entryPoint ) => {
+			if ( ! packageExports ) {
+				return [];
+			}
+
+			const exportValue = packageExports[ entryPoint ];
+
+			return getExportTargets( exportValue )
+				.filter( ( target ) => target.startsWith( './' ) )
+				.map( normalizePackagePath );
+		} )
+		.filter( ( path ) => ! packedPathSet.has( path ) );
+
+	const attwArgs = [
+		attwCliPath,
+		tarballPath,
+		'--format',
+		'table',
+		'--no-color',
+		'--no-emoji',
+		'--no-summary',
+		'--profile',
+		attwOptions.profile,
+	];
+
+	if ( attwOptions.excludedEntryPoints.length ) {
+		attwArgs.push(
+			'--exclude-entrypoints',
+			...attwOptions.excludedEntryPoints
+		);
+	}
+
+	if ( attwOptions.ignoredRules.length ) {
+		attwArgs.push( '--ignore-rules', ...attwOptions.ignoredRules );
+	}
+
+	const attwResult = spawnSync( process.execPath, attwArgs, {
+		cwd: packageRoot,
+		encoding: 'utf8',
+	} );
+
+	if ( attwResult.error ) {
+		throw attwResult.error;
+	}
+
+	if (
+		packedPaths.length === 0 ||
+		disallowedPaths.length ||
+		missingAttwExcludedEntryPoints.length ||
+		missingAttwExcludedTargetPaths.length
+	) {
+		if ( packedPaths.length === 0 ) {
+			console.error( 'The package tarball does not include any files.' );
+		}
+
+		if ( disallowedPaths.length ) {
+			console.error(
+				[
+					'The package tarball includes disallowed files:',
+					...disallowedPaths.map( ( path ) => `- ${ path }` ),
+				].join( '\n' )
+			);
+		}
+
+		if ( missingAttwExcludedTargetPaths.length ) {
+			console.error(
+				[
+					'The package tarball is missing targets for entry points excluded from attw:',
+					...missingAttwExcludedTargetPaths.map(
+						( path ) => `- ${ path }`
+					),
+				].join( '\n' )
+			);
+		}
+
+		if ( missingAttwExcludedEntryPoints.length ) {
+			console.error(
+				[
+					'The package exports do not include entry points excluded from attw:',
+					...missingAttwExcludedEntryPoints.map(
+						( entryPoint ) => `- ${ entryPoint }`
+					),
+				].join( '\n' )
+			);
+		}
+	}
+
+	if ( attwResult.status !== 0 ) {
+		process.stderr.write( attwResult.stdout ?? '' );
+		process.stderr.write( attwResult.stderr ?? '' );
+	}
+
+	if (
+		packedPaths.length === 0 ||
+		disallowedPaths.length ||
+		missingAttwExcludedEntryPoints.length ||
+		missingAttwExcludedTargetPaths.length ||
+		attwResult.status !== 0
+	) {
+		return attwResult.status || 1;
+	}
+
+	console.log(
+		`Validated ${ packedPaths.length } packed files for ${
+			packageJson.name ?? packageRoot
+		}.`
+	);
+	return 0;
+}
+
 const packDirectory = mkdtempSync(
 	join( tmpdir(), 'wordpress-package-contents-' )
 );
+let exitCode;
 
-packArgs.push( '--pack-destination', packDirectory );
-
-const packResult = spawnSync( packCommand, packArgs, {
-	cwd: packageRoot,
-	encoding: 'utf8',
-	env,
-	shell: ! npmExecPath && process.platform === 'win32',
-} );
-
-if ( packResult.error ) {
+try {
+	exitCode = validatePackedPackage( packDirectory );
+} finally {
 	rmSync( packDirectory, { force: true, recursive: true } );
-	throw packResult.error;
 }
 
-if ( packResult.status !== 0 ) {
-	process.stderr.write( packResult.stdout ?? '' );
-	process.stderr.write( packResult.stderr ?? '' );
-	rmSync( packDirectory, { force: true, recursive: true } );
-	process.exit( packResult.status ?? 1 );
+if ( exitCode !== 0 ) {
+	process.exit( exitCode );
 }
-
-/** @type {Array<{ filename: string, files: Array<{ path: string }> }>} */
-const packs = JSON.parse( packResult.stdout );
-const [ pack ] = packs;
-const packedPaths = pack.files.map( ( { path } ) => path );
-const packedPathSet = new Set( packedPaths );
-const tarballPath = join( packDirectory, pack.filename );
-
-const disallowedPaths = packedPaths.filter( ( path ) =>
-	disallowedPathPatterns.some( ( pattern ) => pattern.test( path ) )
-);
-const packageExports = getPackageExportsMap();
-const missingAttwExcludedEntryPoints = attwOptions.excludedEntryPoints.filter(
-	( entryPoint ) =>
-		! packageExports || ! Object.hasOwn( packageExports, entryPoint )
-);
-// attw does not model non-JavaScript entry points like CSS. Keep explicit
-// exclusions honest by checking only the package targets skipped by attw.
-const missingAttwExcludedTargetPaths = attwOptions.excludedEntryPoints
-	.flatMap( ( entryPoint ) => {
-		if ( ! packageExports ) {
-			return [];
-		}
-
-		const exportValue = packageExports[ entryPoint ];
-
-		return getExportTargets( exportValue )
-			.filter( ( target ) => target.startsWith( './' ) )
-			.map( normalizePackagePath );
-	} )
-	.filter( ( path ) => ! packedPathSet.has( path ) );
-
-const attwArgs = [
-	attwCliPath,
-	tarballPath,
-	'--format',
-	'table',
-	'--no-color',
-	'--no-emoji',
-	'--no-summary',
-	'--profile',
-	attwOptions.profile,
-];
-
-if ( attwOptions.excludedEntryPoints.length ) {
-	attwArgs.push(
-		'--exclude-entrypoints',
-		...attwOptions.excludedEntryPoints
-	);
-}
-
-if ( attwOptions.ignoredRules.length ) {
-	attwArgs.push( '--ignore-rules', ...attwOptions.ignoredRules );
-}
-
-const attwResult = spawnSync( process.execPath, attwArgs, {
-	cwd: packageRoot,
-	encoding: 'utf8',
-} );
-
-if ( attwResult.error ) {
-	rmSync( packDirectory, { force: true, recursive: true } );
-	throw attwResult.error;
-}
-
-if (
-	packedPaths.length === 0 ||
-	disallowedPaths.length ||
-	missingAttwExcludedEntryPoints.length ||
-	missingAttwExcludedTargetPaths.length
-) {
-	if ( packedPaths.length === 0 ) {
-		console.error( 'The package tarball does not include any files.' );
-	}
-
-	if ( disallowedPaths.length ) {
-		console.error(
-			[
-				'The package tarball includes disallowed files:',
-				...disallowedPaths.map( ( path ) => `- ${ path }` ),
-			].join( '\n' )
-		);
-	}
-
-	if ( missingAttwExcludedTargetPaths.length ) {
-		console.error(
-			[
-				'The package tarball is missing targets for entry points excluded from attw:',
-				...missingAttwExcludedTargetPaths.map(
-					( path ) => `- ${ path }`
-				),
-			].join( '\n' )
-		);
-	}
-
-	if ( missingAttwExcludedEntryPoints.length ) {
-		console.error(
-			[
-				'The package exports do not include entry points excluded from attw:',
-				...missingAttwExcludedEntryPoints.map(
-					( entryPoint ) => `- ${ entryPoint }`
-				),
-			].join( '\n' )
-		);
-	}
-}
-
-if ( attwResult.status !== 0 ) {
-	process.stderr.write( attwResult.stdout ?? '' );
-	process.stderr.write( attwResult.stderr ?? '' );
-}
-
-rmSync( packDirectory, { force: true, recursive: true } );
-
-if (
-	packedPaths.length === 0 ||
-	disallowedPaths.length ||
-	missingAttwExcludedEntryPoints.length ||
-	missingAttwExcludedTargetPaths.length ||
-	attwResult.status !== 0
-) {
-	process.exit( attwResult.status || 1 );
-}
-
-console.log(
-	`Validated ${ packedPaths.length } packed files for ${
-		packageJson.name ?? packageRoot
-	}.`
-);
