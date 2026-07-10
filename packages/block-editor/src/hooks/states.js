@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
 
@@ -14,7 +14,6 @@ import StateControlBadges from '../components/global-styles/state-control-badges
 import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
 import { useSettings } from '../components/use-settings';
 import { store as blockEditorStore } from '../store';
-import { setDeviceTypeKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
@@ -112,14 +111,8 @@ export function BlockStatesControl( { name, value, onChange } ) {
  * @return {Element|null} Badges component, or null if there is nothing to show.
  */
 export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
-	const { resetZoomLevel, setResponsiveEditing, setStyleStateViewport } =
-		unlock( useDispatch( blockEditorStore ) );
-	const setDeviceType = useSelect(
-		( select ) =>
-			unlock( select( blockEditorStore ) ).getSettings()[
-				setDeviceTypeKey
-			],
-		[]
+	const { setResponsiveEditing, setStyleStateViewport } = unlock(
+		useDispatch( blockEditorStore )
 	);
 	const pseudoStateOptions = useMemo(
 		() => getPseudoStateOptions( name ),
@@ -146,8 +139,6 @@ export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
 			onClearViewport={ () => {
 				setResponsiveEditing( false );
 				setStyleStateViewport( DEFAULT_STATE_VALUE );
-				setDeviceType?.( 'Desktop' );
-				resetZoomLevel();
 			} }
 		/>
 	);
