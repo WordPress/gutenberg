@@ -13,7 +13,7 @@ import {
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 } from '../../store/private-keys';
-import { buildInheritedValue } from './build-inherited-value';
+import { resolveStyles } from './build-inherited-value';
 import { getVariationNameFromClass } from '../../hooks/block-style-variation';
 
 /**
@@ -75,7 +75,7 @@ function useOwnVariation( blockName, className ) {
  *
  * It reads the merged Global Styles payload and the block's applied variation,
  * then folds the Root ‹ Block-type ‹ applied-variation cascade (resolving
- * `{ ref }` envelopes and theme-file pointers) in the pure `buildInheritedValue`
+ * `{ ref }` envelopes and theme-file pointers) in the pure `resolveStyles`
  * builder. All store access lives here; the panels stay presentational.
  *
  * Before the `globalStylesDataKey` payload settles (hydration) or when
@@ -87,7 +87,7 @@ function useOwnVariation( blockName, className ) {
  * @param {?Object} [selectedState] Selected block style state (`{ viewport, pseudo }`), or null for the default state.
  * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map.
  */
-export function useInheritedValue(
+export function useResolvedStyles(
 	blockName,
 	className,
 	selectedState = null
@@ -99,7 +99,7 @@ export function useInheritedValue(
 		if ( ! blockName ) {
 			return { value: {}, sources: {} };
 		}
-		return buildInheritedValue( {
+		return resolveStyles( {
 			blockName,
 			ownVariation,
 			globalStyles,
