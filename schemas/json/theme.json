@@ -17,6 +17,18 @@
 			},
 			"additionalProperties": false
 		},
+		"spacingSideValue": {
+			"description": "Spacing side value. Unitless numeric string values (for example, \"0\" or \"9\") are not allowed.",
+			"oneOf": [
+				{
+					"type": "string",
+					"not": {
+						"pattern": "^\\s*[+-]?(?:\\d+\\.?\\d*|\\.\\d+)(?:[eE][+-]?\\d+)?\\s*$"
+					}
+				},
+				{ "$ref": "#/definitions/refComplete" }
+			]
+		},
 		"settingsAppearanceToolsProperties": {
 			"type": "object",
 			"properties": {
@@ -1714,31 +1726,19 @@
 							"properties": {
 								"top": {
 									"description": "Sets the `margin-top` CSS property.",
-									"oneOf": [
-										{ "type": "string" },
-										{ "$ref": "#/definitions/refComplete" }
-									]
+									"$ref": "#/definitions/spacingSideValue"
 								},
 								"right": {
 									"description": "Sets the `margin-right` CSS property.",
-									"oneOf": [
-										{ "type": "string" },
-										{ "$ref": "#/definitions/refComplete" }
-									]
+									"$ref": "#/definitions/spacingSideValue"
 								},
 								"bottom": {
 									"description": "Sets the `margin-bottom` CSS property.",
-									"oneOf": [
-										{ "type": "string" },
-										{ "$ref": "#/definitions/refComplete" }
-									]
+									"$ref": "#/definitions/spacingSideValue"
 								},
 								"left": {
 									"description": "Sets the `margin-left` CSS property.",
-									"oneOf": [
-										{ "type": "string" },
-										{ "$ref": "#/definitions/refComplete" }
-									]
+									"$ref": "#/definitions/spacingSideValue"
 								}
 							},
 							"additionalProperties": false
@@ -1749,31 +1749,19 @@
 							"properties": {
 								"top": {
 									"description": "Sets the `padding-top` CSS property.",
-									"oneOf": [
-										{ "type": "string" },
-										{ "$ref": "#/definitions/refComplete" }
-									]
+									"$ref": "#/definitions/spacingSideValue"
 								},
 								"right": {
 									"description": "Sets the `padding-right` CSS property.",
-									"oneOf": [
-										{ "type": "string" },
-										{ "$ref": "#/definitions/refComplete" }
-									]
+									"$ref": "#/definitions/spacingSideValue"
 								},
 								"bottom": {
 									"description": "Sets the `padding-bottom` CSS property.",
-									"oneOf": [
-										{ "type": "string" },
-										{ "$ref": "#/definitions/refComplete" }
-									]
+									"$ref": "#/definitions/spacingSideValue"
 								},
 								"left": {
 									"description": "Sets the `padding-left` CSS property.",
-									"oneOf": [
-										{ "type": "string" },
-										{ "$ref": "#/definitions/refComplete" }
-									]
+									"$ref": "#/definitions/spacingSideValue"
 								}
 							},
 							"additionalProperties": false
