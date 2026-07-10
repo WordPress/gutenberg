@@ -373,7 +373,7 @@ _Returns_
 
 ### EntitiesSavedStates
 
-Undocumented declaration.
+Re-exported from `@wordpress/admin-ui` (see that package’s documentation for props and usage).
 
 ### ErrorBoundary
 
