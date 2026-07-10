@@ -6,7 +6,7 @@
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 -   Add Playlist icon. ([#80168](https://github.com/WordPress/gutenberg/pull/80168)).
-
+-   Add new "sites" icon. ([#80094](https://github.com/WordPress/gutenberg/pull/80094)).
 
 ## 15.1.0 (2026-07-01)
 
