@@ -134,7 +134,6 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 					if ( showPlayButtonArtwork ) {
 						setupPlayButtonArtwork(
 							existing.container,
-							existing.instance,
 							track.image
 						);
 					}

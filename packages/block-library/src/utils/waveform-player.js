@@ -40,16 +40,7 @@ function updatePlayerMetadata( instance, { title, artist, image, imageAlt } ) {
 		instance.syncArtwork( image || null, imageAlt || '' );
 	} else if ( instance.artworkEl && image ) {
 		instance.artworkEl.src = image;
-		if (
-			instance.artworkEl.classList.contains(
-				'wp-block-playlist__play-button-artwork'
-			)
-		) {
-			instance.artworkEl.alt = '';
-			instance.artworkEl.setAttribute( 'aria-hidden', 'true' );
-		} else {
-			instance.artworkEl.alt = imageAlt || '';
-		}
+		instance.artworkEl.alt = imageAlt || '';
 	}
 }
 

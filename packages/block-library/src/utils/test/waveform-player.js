@@ -36,9 +36,6 @@ function createFakePlayer( options, element ) {
 		artworkEl = document.createElement( 'img' );
 		artworkEl.src = options.image;
 		artworkEl.alt = options.imageAlt || '';
-		if ( options.showPlayButtonArtwork ) {
-			artworkEl.className = 'wp-block-playlist__play-button-artwork';
-		}
 	}
 
 	element.append( titleEl );
@@ -155,7 +152,7 @@ describe( 'WaveformPlayer', () => {
 		);
 	} );
 
-	it( 'keeps play button artwork decorative when metadata updates', () => {
+	it( 'keeps artwork metadata accessible when play button artwork is enabled', () => {
 		const { rerender } = render(
 			<WaveformPlayer { ...baseProps } showPlayButtonArtwork />
 		);
@@ -179,10 +176,9 @@ describe( 'WaveformPlayer', () => {
 			'src',
 			'https://example.com/new.jpg'
 		);
-		expect( player.instance.artworkEl ).toHaveAttribute( 'alt', '' );
 		expect( player.instance.artworkEl ).toHaveAttribute(
-			'aria-hidden',
-			'true'
+			'alt',
+			'A black and white portrait'
 		);
 	} );
 

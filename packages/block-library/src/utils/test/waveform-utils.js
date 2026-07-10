@@ -324,7 +324,7 @@ describe( 'Waveform utilities', () => {
 	} );
 
 	describe( 'setupPlayButtonArtwork', () => {
-		it( 'should move artwork into the play button', () => {
+		it( 'should set artwork as the play button background', () => {
 			const container = document.createElement( 'div' );
 			const playBtn = document.createElement( 'button' );
 			playBtn.className = 'waveform-btn';
@@ -334,20 +334,37 @@ describe( 'Waveform utilities', () => {
 
 			setupPlayButtonArtwork(
 				container,
-				{ artworkEl },
 				'https://example.com/cover.jpg'
 			);
 
 			expect( playBtn ).toHaveClass( 'has-artwork' );
-			expect( artworkEl ).toHaveClass(
-				'wp-block-playlist__play-button-artwork'
-			);
-			expect( artworkEl ).toHaveAttribute( 'aria-hidden', 'true' );
-			expect( artworkEl ).toHaveAttribute( 'alt', '' );
-			expect( playBtn.firstChild ).toBe( artworkEl );
+			expect(
+				playBtn.style.getPropertyValue(
+					'--wp-block-playlist-play-button-artwork'
+				)
+			).toBe( 'url("https://example.com/cover.jpg")' );
+			expect( artworkEl.parentElement ).toBe( container );
 		} );
 
-		it( 'should force play button icon paths to white', () => {
+		it( 'should escape artwork URLs for CSS usage', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			setupPlayButtonArtwork(
+				container,
+				'https://example.com/cover "quoted".jpg'
+			);
+
+			expect(
+				playBtn.style.getPropertyValue(
+					'--wp-block-playlist-play-button-artwork'
+				)
+			).toBe( 'url("https://example.com/cover \\"quoted\\".jpg")' );
+		} );
+
+		it( 'should not modify play button icon paths', () => {
 			const container = document.createElement( 'div' );
 			const playBtn = document.createElement( 'button' );
 			playBtn.className = 'waveform-btn';
@@ -366,11 +383,10 @@ describe( 'Waveform utilities', () => {
 
 			setupPlayButtonArtwork(
 				container,
-				{ artworkEl },
 				'https://example.com/cover.jpg'
 			);
 
-			expect( path ).toHaveStyle( { fill: '#ffffff' } );
+			expect( path ).not.toHaveStyle( { fill: '#ffffff' } );
 		} );
 
 		it( 'should do nothing when play button is missing', () => {
@@ -381,14 +397,13 @@ describe( 'Waveform utilities', () => {
 			expect( () =>
 				setupPlayButtonArtwork(
 					container,
-					{ artworkEl },
 					'https://example.com/cover.jpg'
 				)
 			).not.toThrow();
 			expect( artworkEl.parentElement ).toBe( container );
 		} );
 
-		it( 'should create button artwork when artwork element is missing', () => {
+		it( 'should set button artwork when artwork element is missing', () => {
 			const container = document.createElement( 'div' );
 			const playBtn = document.createElement( 'button' );
 			playBtn.className = 'waveform-btn';
@@ -397,35 +412,35 @@ describe( 'Waveform utilities', () => {
 			expect( () =>
 				setupPlayButtonArtwork(
 					container,
-					{},
 					'https://example.com/cover.jpg'
 				)
 			).not.toThrow();
 			expect( playBtn ).toHaveClass( 'has-artwork' );
 			expect(
-				playBtn.querySelector(
-					'.wp-block-playlist__play-button-artwork'
+				playBtn.style.getPropertyValue(
+					'--wp-block-playlist-play-button-artwork'
 				)
-			).toHaveAttribute( 'src', 'https://example.com/cover.jpg' );
+			).toBe( 'url("https://example.com/cover.jpg")' );
 		} );
 
-		it( 'should remove existing button artwork when artwork URL is empty', () => {
+		it( 'should clear button artwork when artwork URL is empty', () => {
 			const container = document.createElement( 'div' );
 			const playBtn = document.createElement( 'button' );
 			playBtn.className = 'waveform-btn has-artwork';
-			const artworkEl = document.createElement( 'img' );
-			artworkEl.className = 'wp-block-playlist__play-button-artwork';
-			playBtn.appendChild( artworkEl );
+			playBtn.style.setProperty(
+				'--wp-block-playlist-play-button-artwork',
+				'url("https://example.com/cover.jpg")'
+			);
 			container.appendChild( playBtn );
 
-			setupPlayButtonArtwork( container, { artworkEl }, '' );
+			setupPlayButtonArtwork( container, '' );
 
 			expect( playBtn ).not.toHaveClass( 'has-artwork' );
 			expect(
-				playBtn.querySelector(
-					'.wp-block-playlist__play-button-artwork'
+				playBtn.style.getPropertyValue(
+					'--wp-block-playlist-play-button-artwork'
 				)
-			).toBeNull();
+			).toBe( '' );
 		} );
 	} );
 
