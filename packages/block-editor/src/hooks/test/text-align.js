@@ -14,8 +14,6 @@ import {
 	getValidTextAlignments,
 	addAssignedTextAlign,
 	getTextAlignControlGroup,
-	getTextAlignStyleForState,
-	setTextAlignStyleForState,
 } from '../text-align';
 
 const noop = () => {};
@@ -65,102 +63,6 @@ describe( 'textAlign', () => {
 			expect(
 				getValidTextAlignments( [ 'left', 'right', 'justify' ] )
 			).toEqual( [ 'left', 'right' ] );
-		} );
-	} );
-
-	describe( 'getTextAlignStyleForState()', () => {
-		it( 'returns the default style when the default state is selected', () => {
-			const style = {
-				typography: {
-					textAlign: 'left',
-				},
-				'@mobile': {
-					typography: {
-						textAlign: 'right',
-					},
-				},
-			};
-
-			expect(
-				getTextAlignStyleForState( style, {
-					viewport: 'default',
-					pseudo: 'default',
-				} )
-			).toBe( style );
-		} );
-
-		it( 'returns the selected viewport style', () => {
-			expect(
-				getTextAlignStyleForState(
-					{
-						typography: {
-							textAlign: 'left',
-						},
-						'@mobile': {
-							typography: {
-								textAlign: 'right',
-							},
-						},
-					},
-					{
-						viewport: '@mobile',
-						pseudo: 'default',
-					}
-				)
-			).toEqual( {
-				typography: {
-					textAlign: 'right',
-				},
-			} );
-		} );
-	} );
-
-	describe( 'setTextAlignStyleForState()', () => {
-		it( 'updates the default style when the default state is selected', () => {
-			expect(
-				setTextAlignStyleForState(
-					{
-						typography: {
-							textAlign: 'left',
-						},
-					},
-					{
-						viewport: 'default',
-						pseudo: 'default',
-					},
-					'center'
-				)
-			).toEqual( {
-				typography: {
-					textAlign: 'center',
-				},
-			} );
-		} );
-
-		it( 'updates the selected viewport style without changing the default style', () => {
-			expect(
-				setTextAlignStyleForState(
-					{
-						typography: {
-							textAlign: 'left',
-						},
-					},
-					{
-						viewport: '@mobile',
-						pseudo: 'default',
-					},
-					'right'
-				)
-			).toEqual( {
-				typography: {
-					textAlign: 'left',
-				},
-				'@mobile': {
-					typography: {
-						textAlign: 'right',
-					},
-				},
-			} );
 		} );
 	} );
 

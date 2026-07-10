@@ -19,14 +19,9 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
 import {
 	getStyleForState,
 	hasViewportBlockStyleState,
-	isDefaultBlockStyleState,
 	setStyleForState,
 } from './block-style-state';
-import {
-	cleanEmptyObject,
-	shouldSkipSerialization,
-	useBlockSettings,
-} from './utils';
+import { shouldSkipSerialization, useBlockSettings } from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -73,34 +68,6 @@ export function getValidTextAlignments( blockTextAlign ) {
 	return blockTextAlign === true ? VALID_TEXT_ALIGNMENTS : NO_TEXT_ALIGNMENTS;
 }
 
-export function getTextAlignStyleForState( style, selectedState ) {
-	if ( isDefaultBlockStyleState( selectedState ) ) {
-		return style;
-	}
-	return getStyleForState( style, selectedState );
-}
-
-export function setTextAlignStyleForState(
-	style,
-	selectedState,
-	newTextAlignValue
-) {
-	const stateStyle = getTextAlignStyleForState( style, selectedState );
-	const newStateStyle = {
-		...stateStyle,
-		typography: {
-			...stateStyle?.typography,
-			textAlign: newTextAlignValue,
-		},
-	};
-
-	if ( isDefaultBlockStyleState( selectedState ) ) {
-		return cleanEmptyObject( newStateStyle );
-	}
-
-	return setStyleForState( style, selectedState, newStateStyle );
-}
-
 export function getTextAlignControlGroup( isResponsiveEditing, selectedState ) {
 	return isResponsiveEditing && hasViewportBlockStyleState( selectedState )
 		? 'style-state'
@@ -144,19 +111,23 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 	const textAlignmentControls = TEXT_ALIGNMENT_OPTIONS.filter( ( control ) =>
 		validTextAlignments.includes( control.align )
 	);
-	const stateStyle = getTextAlignStyleForState( style, selectedState );
+	const stateStyle = getStyleForState( style, selectedState );
 	const controlsGroup = getTextAlignControlGroup(
 		isResponsiveEditing,
 		selectedState
 	);
 
 	const onChange = ( newTextAlignValue ) => {
+		const newStateStyle = {
+			...stateStyle,
+			typography: {
+				...stateStyle?.typography,
+				textAlign: newTextAlignValue,
+			},
+		};
+
 		setAttributes( {
-			style: setTextAlignStyleForState(
-				style,
-				selectedState,
-				newTextAlignValue
-			),
+			style: setStyleForState( style, selectedState, newStateStyle ),
 		} );
 	};
 
