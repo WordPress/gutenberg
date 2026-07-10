@@ -310,6 +310,11 @@ function DataViews< Item >( {
 	);
 }
 
+/**
+ * `DataViews` renders a dataset using configurable layouts (table, grid, list)
+ * with built-in search, filtering, sorting, pagination, and actions. Use it to
+ * display and manage a collection of records.
+ */
 // Populate the DataViews sub components
 const DataViewsSubComponents = DataViews as typeof DataViews & {
 	BulkActionToolbar: typeof BulkActionsFooter;

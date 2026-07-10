@@ -87,7 +87,6 @@ export default function PostsPerPage() {
 						<NumberControl
 							placeholder={ 0 }
 							value={ postsPerPage }
-							size="__unstable-large"
 							spinControls="custom"
 							step="1"
 							min="1"

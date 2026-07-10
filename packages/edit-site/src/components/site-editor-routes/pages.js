@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __ } from '@wordpress/i18n';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -17,8 +16,6 @@ import DataViewsSidebarContent from '../sidebar-dataviews';
 import PostList from '../post-list';
 import { unlock } from '../../lock-unlock';
 import { isThemeDataLoaded } from './utils';
-
-const { useLocation } = unlock( routerPrivateApis );
 
 async function isListView( query ) {
 	const { activeView = 'all' } = query;
@@ -38,13 +35,6 @@ async function isListView( query ) {
 		activeViewOverrides: viewEntry?.view ?? {},
 	} );
 	return view.type === 'list';
-}
-
-function MobilePagesView() {
-	const { query = {} } = useLocation();
-	const { canvas = 'view' } = query;
-
-	return canvas === 'edit' ? <Editor /> : <PostList postType="page" />;
 }
 
 export const pagesRoute = {
@@ -77,15 +67,17 @@ export const pagesRoute = {
 			const isList = await isListView( query );
 			return isList ? <Editor /> : undefined;
 		},
-		mobile( { siteData } ) {
+		mobileSidebar( { siteData } ) {
 			if ( ! isThemeDataLoaded( siteData ) ) {
 				return <></>;
 			}
-			return siteData.currentTheme.is_block_theme ? (
-				<MobilePagesView />
-			) : (
+			return siteData.currentTheme.is_block_theme ? undefined : (
 				<SidebarNavigationScreenUnsupported />
 			);
+		},
+		mobileContent( { siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			return isBlockTheme ? <PostList postType="page" /> : undefined;
 		},
 	},
 	widths: {

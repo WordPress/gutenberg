@@ -28,7 +28,7 @@ export const homeRoute = {
 				<Editor isHomeRoute />
 			) : undefined;
 		},
-		mobile( { siteData } ) {
+		mobileSidebar( { siteData } ) {
 			if ( ! isThemeDataLoaded( siteData ) ) {
 				return <></>;
 			}

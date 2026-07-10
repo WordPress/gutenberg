@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { RefObject, ReactNode } from 'react';
+import type { MutableRefObject, ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -25,7 +25,7 @@ type SnackbarOnlyProps = {
 	/**
 	 * A ref to the list that contains the snackbar.
 	 */
-	listRef?: RefObject< HTMLDivElement | null >;
+	listRef?: MutableRefObject< HTMLDivElement | null >;
 };
 
 export type SnackbarProps = Pick<

@@ -41,6 +41,8 @@ const GUTENBERG_DASHBOARD_NAME = 'gutenberg_dashboard';
  * The JS side stays oblivious: a default and a user-saved layout
  * look identical at the preferences-store boundary.
  *
+ * @global wpdb $wpdb WordPress database abstraction object.
+ *
  * @param mixed  $value    The pre-fetched value, or null to let the
  *                         meta API resolve normally.
  * @param int    $user_id  User ID.
@@ -65,9 +67,7 @@ function gutenberg_inject_dashboard_default_layout( $value, $user_id, $meta_key 
 		$base = array();
 	}
 
-	$committed = isset( $base[ GUTENBERG_DASHBOARD_LAYOUT_SCOPE ][ GUTENBERG_DASHBOARD_LAYOUT_KEY ] )
-		? $base[ GUTENBERG_DASHBOARD_LAYOUT_SCOPE ][ GUTENBERG_DASHBOARD_LAYOUT_KEY ]
-		: array();
+	$committed = $base[ GUTENBERG_DASHBOARD_LAYOUT_SCOPE ][ GUTENBERG_DASHBOARD_LAYOUT_KEY ] ?? array();
 
 	if ( ! empty( $committed ) ) {
 		return $value;

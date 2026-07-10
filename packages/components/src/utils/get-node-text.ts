@@ -12,13 +12,7 @@ const getNodeText = ( node: React.ReactNode ): string => {
 				return node.map( getNodeText ).join( '' );
 			}
 			if ( 'props' in node ) {
-				return getNodeText(
-					(
-						node as React.ReactElement<
-							React.PropsWithChildren< unknown >
-						>
-					 ).props.children
-				);
+				return getNodeText( node.props.children );
 			}
 			return '';
 		}

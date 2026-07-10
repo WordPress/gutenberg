@@ -186,6 +186,10 @@ export function createSyncManager( debug = false ): SyncManager {
 			persistCRDTDoc: debugWrap( handlers.persistCRDTDoc ),
 			refetchRecord: debugWrap( handlers.refetchRecord ),
 			restoreUndoMeta: debugWrap( handlers.restoreUndoMeta ),
+
+			onUndoStackChange: handlers.onUndoStackChange
+				? debugWrap( handlers.onUndoStackChange )
+				: undefined,
 		};
 
 		const ydoc = createYjsDoc( { objectType } );
@@ -244,10 +248,11 @@ export function createSyncManager( debug = false ): SyncManager {
 			event.keysChanged.forEach( ( key ) => {
 				switch ( key ) {
 					case SAVED_AT_KEY:
-						const newValue = stateMap.get( SAVED_AT_KEY );
-						if ( 'number' === typeof newValue && newValue > now ) {
-							// Another peer has saved the record. Refetch it so that we have
-							// a correct understanding of our own unsaved edits.
+						const savedAt = stateMap.get( SAVED_AT_KEY );
+						if ( 'number' === typeof savedAt && savedAt > now ) {
+							// Another peer saved the entity. Refetch the
+							// record so this cache sees server-side save
+							// mutations.
 							log( 'loadEntity', 'refetching record', entityId );
 							void handlers.refetchRecord().catch( () => {} );
 						}
@@ -261,10 +266,11 @@ export function createSyncManager( debug = false ): SyncManager {
 			undoManager = createUndoManager();
 		}
 
-		const { addUndoMeta, restoreUndoMeta } = handlers;
+		const { addUndoMeta, onUndoStackChange, restoreUndoMeta } = handlers;
 		undoManager.addToScope( recordMap, {
 			addUndoMeta,
 			restoreUndoMeta,
+			onUndoStackChange,
 		} );
 
 		// Declare with let before using it in unload closure.
@@ -395,7 +401,8 @@ export function createSyncManager( debug = false ): SyncManager {
 					case SAVED_AT_KEY:
 						const newValue = stateMap.get( SAVED_AT_KEY );
 						if ( 'number' === typeof newValue && newValue > now ) {
-							// Another peer has mutated the collection. Refetch it so that we
+							// Another peer has performed a user-facing save that
+							// may affect the collection. Refetch it so that we
 							// obtain the updated records.
 							void handlers.refetchRecords().catch( () => {} );
 						}
@@ -471,7 +478,9 @@ export function createSyncManager( debug = false ): SyncManager {
 		const entityId = getEntityId( objectType, objectId );
 		log( 'unloadEntity', 'unloading', entityId );
 		entityStates.get( entityId )?.unload();
-		updateCRDTDoc( objectType, null, {}, origin, { isSave: true } );
+		updateCRDTDoc( objectType, null, {}, origin, {
+			isSave: true,
+		} );
 	}
 
 	/**
@@ -484,6 +493,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			entityState.unload();
 		}
 		entityStates.clear();
+		undoManager = undefined;
 
 		for ( const [ , collectionState ] of [ ...collectionStates ] ) {
 			collectionState.unload();
@@ -495,13 +505,13 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * Get the awareness instance for the given object type and object ID, if supported.
 	 *
 	 * @template {Awareness} State
-	 * @param {ObjectType} objectType Object type.
-	 * @param {ObjectID}   objectId   Object ID.
+	 * @param {ObjectType}    objectType Object type.
+	 * @param {ObjectID|null} objectId   Object ID.
 	 * @return {State | undefined} The awareness instance, or undefined if not supported.
 	 */
 	function getAwareness< State extends Awareness >(
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID | null
 	): State | undefined {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
@@ -625,7 +635,7 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * @param {Partial< ObjectData >}    changes                Updates to make.
 	 * @param {string}                   origin                 The source of change.
 	 * @param {SyncManagerUpdateOptions} options                Optional flags for the update.
-	 * @param {boolean}                  options.isSave         Whether this update is part of a save operation. Defaults to false.
+	 * @param {boolean}                  options.isSave         Whether this update represents a user-facing entity save.
 	 * @param {boolean}                  options.isNewUndoLevel Whether to create a new undo level for this change. Defaults to false.
 	 */
 	function updateCRDTDoc(
@@ -669,6 +679,27 @@ export function createSyncManager( debug = false ): SyncManager {
 				markEntityAsSaved( collectionState.ydoc );
 			}, origin );
 		}
+	}
+
+	// Deferred variant of `updateCRDTDoc`; keeps work off the typing hot path.
+	const deferUpdateCRDTDoc = yieldToEventLoop( updateCRDTDoc );
+
+	// Apply local changes to the CRDT doc — synchronously when a remote peer is
+	// present so the change lands before a remote update can race it (#78756),
+	// otherwise deferred off the typing hot path (#79964).
+	function updateOrDefer(
+		objectType: ObjectType,
+		objectId: ObjectID | null,
+		changes: Partial< ObjectData >,
+		origin: string,
+		options: SyncManagerUpdateOptions = {}
+	): void {
+		// `getStates()` counts the local client, so > 1 means a remote peer.
+		const hasRemotePeers =
+			( getAwareness( objectType, objectId )?.getStates().size ?? 0 ) > 1;
+
+		const update = hasRemotePeers ? updateCRDTDoc : deferUpdateCRDTDoc;
+		update( objectType, objectId, changes, origin, options );
 	}
 
 	/**
@@ -728,9 +759,9 @@ export function createSyncManager( debug = false ): SyncManager {
 			return null;
 		}
 
-		// Y.Doc updates are deferred via yieldToEventLoop. Await a promise that
-		// resolves on the next tick of the event loop so pending updates are flushed
-		// before we serialize the document.
+		// Local updates may be deferred via yieldToEventLoop when editing alone.
+		// Await a promise that resolves on the next tick of the event loop so
+		// pending updates are flushed before we serialize the document.
 		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		return serializeCrdtDoc( entityState.ydoc );
@@ -754,6 +785,6 @@ export function createSyncManager( debug = false ): SyncManager {
 		},
 		unload: debugWrap( unloadEntity ),
 		unloadAll: debugWrap( unloadAll ),
-		update: debugWrap( yieldToEventLoop( updateCRDTDoc ) ),
+		update: debugWrap( updateOrDefer ),
 	};
 }

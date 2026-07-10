@@ -46,24 +46,12 @@ const meta = {
 				defaultValue: { summary: '60px' },
 			},
 		},
-		__next40pxDefaultSize: {
-			control: 'boolean',
-			description:
-				'Start opting into the larger default height that will become the default size in a future version.',
-			table: {
-				type: { summary: 'boolean' },
-				defaultValue: { summary: 'false' },
-			},
-		},
 	},
 };
 
 export default meta;
 
 export const Default = {
-	args: {
-		__next40pxDefaultSize: true,
-	},
 	render: function Template( { onChange, ...args } ) {
 		const [ value, setValue ] = useState( '' );
 		return (

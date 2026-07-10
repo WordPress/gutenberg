@@ -563,7 +563,6 @@ function TableEdit( {
 						onSubmit={ onCreateTable }
 					>
 						<TextControl
-							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Column count' ) }
 							value={ initialColumnCount }
@@ -572,7 +571,6 @@ function TableEdit( {
 							className="blocks-table__placeholder-input"
 						/>
 						<TextControl
-							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Row count' ) }
 							value={ initialRowCount }

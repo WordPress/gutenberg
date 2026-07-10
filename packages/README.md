@@ -65,7 +65,6 @@ When creating a new package, you need to provide at least the following. Package
     	},
     	"main": "build/index.js",
     	"module": "build-module/index.js",
-    	"react-native": "src/index",
     	// Include this line to include the package as a WordPress script.
     	"wpScript": true,
     	// Include this line to include the package as a WordPress script module.

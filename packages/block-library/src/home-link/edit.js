@@ -108,7 +108,6 @@ export default function HomeEdit( { attributes, setAttributes, context } ) {
 						isShownByDefault
 					>
 						<TextControl
-							__next40pxDefaultSize
 							label={ __( 'Text' ) }
 							value={ label ? stripHTML( label ) : '' }
 							onChange={ ( labelValue ) => {

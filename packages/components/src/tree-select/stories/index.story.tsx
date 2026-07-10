@@ -45,7 +45,6 @@ const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
 
 	return (
 		<TreeSelect
-			__next40pxDefaultSize
 			{ ...props }
 			onChange={ setSelection }
 			selectedId={ selection }
@@ -55,7 +54,6 @@ const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
 
 export const Default = TreeSelectWithState.bind( {} );
 Default.args = {
-	__next40pxDefaultSize: true,
 	label: 'Label Text',
 	noOptionLabel: 'No parent page',
 	help: 'Help text to explain the select control.',

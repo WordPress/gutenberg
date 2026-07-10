@@ -129,14 +129,9 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		// Ensure the active element is the rich text element.
+		// Ensure the active element is the rich text element. The listener
+		// stays subscribed but no-ops for instances that aren't focused.
 		if ( ownerDocument.activeElement !== element ) {
-			// If it is not, we can stop listening for selection changes. We
-			// resume listening when the element is focused.
-			ownerDocument.removeEventListener(
-				'selectionchange',
-				handleSelectionChange
-			);
 			return;
 		}
 
@@ -195,13 +190,9 @@ export default ( props ) => ( element ) => {
 
 	function onCompositionStart() {
 		isComposing = true;
-		// Do not update the selection when characters are being composed as
-		// this rerenders the component and might destroy internal browser
-		// editing state.
-		ownerDocument.removeEventListener(
-			'selectionchange',
-			handleSelectionChange
-		);
+		// `handleSelectionChange` returns early while composing, so the
+		// selection is not updated as characters are composed (which rerenders
+		// the component and might destroy internal browser editing state).
 		// Remove the placeholder. Since the rich text value doesn't update
 		// during composition, the placeholder doesn't get removed. There's no
 		// need to re-add it, when the value is updated on compositionend it
@@ -214,11 +205,6 @@ export default ( props ) => ( element ) => {
 		// Ensure the value is up-to-date for browsers that don't emit a final
 		// input event after composition.
 		onInput( { inputType: 'insertText' } );
-		// Tracking selection changes can be resumed.
-		ownerDocument.addEventListener(
-			'selectionchange',
-			handleSelectionChange
-		);
 	}
 
 	function onFocus( event ) {
@@ -269,11 +255,6 @@ export default ( props ) => ( element ) => {
 		// we need to manually trigger it. The selection is also not available
 		// yet in this call stack.
 		window.queueMicrotask( handleSelectionChange );
-
-		ownerDocument.addEventListener(
-			'selectionchange',
-			handleSelectionChange
-		);
 	}
 
 	// `input` and `compositionend` must run before block-editor's
@@ -302,11 +283,21 @@ export default ( props ) => ( element ) => {
 		'focusin',
 		onFocus
 	);
+	// Permanently subscribed rather than added on focus and removed on blur:
+	// `handleSelectionChange` checks whether the element is focused itself,
+	// and the shared underlying delegated listener keeps the number of native
+	// listeners constant.
+	const unsubscribeSelectionChange = subscribeDelegatedListener(
+		ownerDocument,
+		'selectionchange',
+		handleSelectionChange
+	);
 
 	return () => {
 		unsubscribeInput();
 		unsubscribeCompositionStart();
 		unsubscribeCompositionEnd();
 		unsubscribeFocus();
+		unsubscribeSelectionChange();
 	};
 };

@@ -80,6 +80,12 @@ $rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 
 .rotation-ruler__ticks {
 	position: absolute;
+	// The tick offset is applied as a JS-set inline `transform: translateX()`
+	// (see rotation-ruler/index.tsx), which rtlcss can't mirror. If rtlcss
+	// flipped this `left` to `right`, the anchor and the transform would
+	// disagree and the ticks would render off-screen in RTL. Keep it `left`
+	// so the two stay in sync; the strip is a symmetric number line anyway.
+	/*rtl:ignore*/
 	left: 50%;
 	top: 0;
 	display: block;
@@ -118,8 +124,9 @@ $rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 // pointer while the SVG behind it transitions smoothly. The label box
 // is sized to the number alone — the unit is positioned absolutely so
 // it does not influence centering — and a fixed-width ::before
-// pseudo-element provides the white-fading-to-transparent mask that
-// occludes the static labels directly behind.
+// pseudo-element provides the grey-fading-to-transparent mask (matching
+// the canvas/ruler surface) that occludes the static labels directly
+// behind.
 .rotation-ruler__active-label {
 	position: absolute;
 	top: 0;
@@ -140,7 +147,7 @@ $rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 		width: 60px;
 		height: 100%;
 		transform: translateX(-50%);
-		background: linear-gradient(to right, transparent 0, $white 12px, $white calc(100% - 12px), transparent 100%);
+		background: linear-gradient(to right, transparent 0, $gray-200 12px, $gray-200 calc(100% - 12px), transparent 100%);
 	}
 }
 

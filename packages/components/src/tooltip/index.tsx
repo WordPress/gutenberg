@@ -93,13 +93,7 @@ function UnforwardedTooltip(
 	// `aria-label`
 	// See: https://github.com/WordPress/gutenberg/pull/64066
 	// See: https://github.com/WordPress/gutenberg/pull/65989
-	function addDescribedById( el: React.ReactElement ) {
-		const element = el as React.ReactElement<
-			Pick<
-				React.HTMLAttributes< Element >,
-				'aria-describedby' | 'aria-label'
-			>
-		>;
+	function addDescribedById( element: React.ReactElement ) {
 		return describedById &&
 			mounted &&
 			element.props[ 'aria-describedby' ] === undefined &&

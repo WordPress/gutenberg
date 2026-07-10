@@ -1,5 +1,6 @@
 import {
 	ColorSpace,
+	parse,
 	to,
 	toGamut,
 	serialize,
@@ -8,6 +9,8 @@ import {
 	OKLCH,
 	type PlainColorObject,
 } from 'colorjs.io/fn';
+
+const ALLOWED_SEED_COLOR_SPACES = [ sRGB ];
 
 /**
  * Get string representation of a color.
@@ -33,6 +36,49 @@ export function getContrast(
 ): number {
 	ColorSpace.register( sRGB );
 	return contrastWCAG21( colorA, colorB );
+}
+
+/**
+ * Assert that a seed-color string is sRGB-parseable and fully opaque (hex,
+ * `rgb()`/`rgba()`, or a CSS named color), throwing otherwise.
+ *
+ * Rejection is deterministic regardless of which `ColorSpace`s are globally
+ * registered: `clampToGamut` registers `OKLCH`, which would otherwise make
+ * `oklch()` strings parse, but their space id is `oklch` (not `srgb`) so they
+ * are still rejected.
+ *
+ * @param seed The seed-color string to validate.
+ * @throws If `seed` is not an sRGB-parseable, fully opaque string.
+ */
+export function assertValidSeedColor( seed: string ): void {
+	ALLOWED_SEED_COLOR_SPACES.forEach( ( space ) =>
+		ColorSpace.register( space )
+	);
+
+	let parsedColor: ReturnType< typeof parse >;
+	try {
+		parsedColor = parse( seed );
+	} catch {
+		throw new Error(
+			`Unsupported seed color "${ seed }": expected a fully opaque hex value, an \`rgb()\`/\`rgba()\` string, or a CSS named color.`
+		);
+	}
+
+	const { alpha = 1, spaceId } = parsedColor;
+
+	if (
+		! ALLOWED_SEED_COLOR_SPACES.some( ( space ) => space.id === spaceId )
+	) {
+		throw new Error(
+			`Unsupported seed color "${ seed }": expected a fully opaque hex value, an \`rgb()\`/\`rgba()\` string, or a CSS named color, but received a \`${ spaceId }\` color.`
+		);
+	}
+
+	if ( alpha !== 1 ) {
+		throw new Error(
+			`Unsupported seed color "${ seed }": expected a fully opaque color.`
+		);
+	}
 }
 
 /**

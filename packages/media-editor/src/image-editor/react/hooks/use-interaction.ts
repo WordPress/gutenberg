@@ -108,9 +108,8 @@ export function useInteraction(
 	const [ isZooming, setIsZooming ] = useState( false );
 	const [ isGestureActive, setIsGestureActive ] = useState( false );
 	const [ isKeyboardPanning, setIsKeyboardPanning ] = useState( false );
-	const keyboardInteractionTimerRef = useRef<
-		ReturnType< typeof setTimeout > | undefined
-	>( undefined );
+	const keyboardInteractionTimerRef =
+		useRef< ReturnType< typeof setTimeout > >();
 	// Tracks whether a keyboard gesture (pan or zoom) is currently active so
 	// onGestureStart is only fired once per gesture, not on every key repeat.
 	const isKeyboardGestureActiveRef = useRef( false );

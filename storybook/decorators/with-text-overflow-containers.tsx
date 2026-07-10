@@ -7,7 +7,7 @@ const DEFAULT_HEIGHT = 60;
 const labelStyles: CSSProperties = {
 	fontSize: 'var(--wpds-typography-font-size-xs)',
 	fontWeight: 'var(--wpds-typography-font-weight-medium)',
-	color: 'var(--wpds-color-fg-content-neutral-weak)',
+	color: 'var(--wpds-color-foreground-content-neutral-weak)',
 	textTransform: 'uppercase',
 	marginBlockEnd: 'var(--wpds-dimension-gap-xs)',
 };
@@ -15,7 +15,7 @@ const labelStyles: CSSProperties = {
 const cssStyles: CSSProperties = {
 	fontSize: 'var(--wpds-typography-font-size-xs)',
 	fontFamily: 'monospace',
-	color: 'var(--wpds-color-fg-content-neutral-weak)',
+	color: 'var(--wpds-color-foreground-content-neutral-weak)',
 	marginBlockEnd: 'var(--wpds-dimension-gap-sm)',
 };
 

@@ -47,7 +47,6 @@ function CustomClassNameControlsPure( { className, setAttributes } ) {
 	return (
 		<InspectorControls group="advanced">
 			<TextControl
-				__next40pxDefaultSize
 				autoComplete="off"
 				label={ __( 'Additional CSS class(es)' ) }
 				value={ className || '' }
