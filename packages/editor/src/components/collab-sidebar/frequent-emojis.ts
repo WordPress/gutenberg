@@ -11,6 +11,15 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { REACTION_EMOJIS, emojiToHexKey } from './reaction-emoji-picker';
 
 /**
+ * A recorded frequently-used emoji: its normalized hex key and how many
+ * times the user has picked it.
+ */
+export interface FrequentEmojiEntry {
+	key: string;
+	count: number;
+}
+
+/**
  * Preference key (in the `core` scope) storing the user's frequently
  * used emoji as an ordered array of `{ key, count }` entries, where
  * `key` is the normalized hex key of the base (untoned) emoji and
@@ -41,18 +50,18 @@ export const DEFAULT_FREQUENT_EMOJI_KEYS = REACTION_EMOJIS.map( ( entry ) =>
  * Drop malformed entries from a stored preference value so a corrupt
  * or legacy value can never break the picker.
  *
- * @param {*} entries The raw preference value.
- * @return {Array<{ key: string, count: number }>} Sanitized entries.
+ * @param entries The raw preference value.
+ * @return Sanitized entries.
  */
-function sanitizeEntries( entries ) {
+function sanitizeEntries( entries: unknown ): FrequentEmojiEntry[] {
 	if ( ! Array.isArray( entries ) ) {
 		return [];
 	}
 	return entries.filter(
-		( entry ) =>
-			entry &&
+		( entry ): entry is FrequentEmojiEntry =>
+			!! entry &&
 			typeof entry.key === 'string' &&
-			entry.key &&
+			!! entry.key &&
 			typeof entry.count === 'number' &&
 			Number.isFinite( entry.count ) &&
 			entry.count > 0
@@ -67,11 +76,14 @@ function sanitizeEntries( entries ) {
  * one just recorded — is discarded, so a newly picked emoji always
  * makes it into the list.
  *
- * @param {Array}  entries Current `{ key, count }` entries.
- * @param {string} key     Normalized hex key of the picked emoji.
- * @return {Array} The updated entries.
+ * @param entries Current `{ key, count }` entries.
+ * @param key     Normalized hex key of the picked emoji.
+ * @return The updated entries.
  */
-export function recordEmojiUse( entries, key ) {
+export function recordEmojiUse(
+	entries: unknown,
+	key: string
+): FrequentEmojiEntry[] {
 	const list = sanitizeEntries( entries );
 	if ( ! key || typeof key !== 'string' ) {
 		return list;
@@ -98,10 +110,10 @@ export function recordEmojiUse( entries, key ) {
  * padded with the curated default reactions the user hasn't recorded
  * yet, capped at `MAX_FREQUENT_EMOJIS`.
  *
- * @param {Array} entries Stored `{ key, count }` entries.
- * @return {string[]} Ordered hex keys.
+ * @param entries Stored `{ key, count }` entries.
+ * @return Ordered hex keys.
  */
-export function getFrequentEmojiKeys( entries ) {
+export function getFrequentEmojiKeys( entries: unknown ): string[] {
 	const keys = sanitizeEntries( entries ).map( ( entry ) => entry.key );
 	const seen = new Set( keys );
 	for ( const key of DEFAULT_FREQUENT_EMOJI_KEYS ) {
@@ -119,10 +131,12 @@ export function getFrequentEmojiKeys( entries ) {
  * preferences store (`core` scope), the same channel as the skin tone
  * preference, so it follows the user across sessions and browsers.
  *
- * @return {{ frequentKeys: string[], recordUse: Function }} The
- *   display-ready hex keys and the usage recorder.
+ * @return The display-ready hex keys and the usage recorder.
  */
-export function useFrequentEmojis() {
+export function useFrequentEmojis(): {
+	frequentKeys: string[];
+	recordUse: ( key: string ) => void;
+} {
 	const registry = useRegistry();
 	const frequentKeys = useSelect(
 		( select ) =>
@@ -135,7 +149,7 @@ export function useFrequentEmojis() {
 		[]
 	);
 	const recordUse = useCallback(
-		( key ) => {
+		( key: string ) => {
 			// Read the latest stored value at call time so back-to-back
 			// picks never clobber each other through a stale closure.
 			const entries = registry

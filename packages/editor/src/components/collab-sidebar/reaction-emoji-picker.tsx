@@ -6,11 +6,26 @@ import { Button, Composite } from '@wordpress/components';
 import { plus as plusIcon } from '@wordpress/icons';
 
 /**
+ * A single curated reaction emoji.
+ */
+export interface CuratedEmoji {
+	emoji: string;
+	label: string;
+	value: string;
+}
+
+interface ReactionEmojiPickerProps {
+	onSelect: ( slug: string ) => void;
+	onMore?: () => void;
+	onMoreHover?: () => void;
+}
+
+/**
  * Curated emoji set for reactions.
  * The `value` slug is used as the storage key in the database to avoid
  * potential encoding issues with emoji characters.
  */
-export const REACTION_EMOJIS = [
+export const REACTION_EMOJIS: CuratedEmoji[] = [
 	{ emoji: '❤️', label: _x( 'Heart', 'emoji reaction' ), value: 'heart' },
 	{
 		emoji: '🎉',
@@ -43,25 +58,25 @@ const HEX_KEY_RE = /^[0-9a-f]{2,6}(-[0-9a-f]{2,6})*$/;
  * stripping variation selector U+FE0F so visually equivalent
  * presentations collapse to the same key.
  *
- * @param {string} emoji The emoji character.
- * @return {string} Lowercase hex codepoints joined by `-`.
+ * @param emoji The emoji character.
+ * @return Lowercase hex codepoints joined by `-`.
  */
-export function emojiToHexKey( emoji ) {
+export function emojiToHexKey( emoji: string ): string {
 	if ( typeof emoji !== 'string' || ! emoji ) {
 		return '';
 	}
 	return Array.from( emoji.replace( /️/g, '' ) )
-		.map( ( c ) => c.codePointAt( 0 ).toString( 16 ) )
+		.map( ( c ) => ( c.codePointAt( 0 ) as number ).toString( 16 ) )
 		.join( '-' );
 }
 
 /**
  * Convert a hex-codepoint sequence back to its emoji character.
  *
- * @param {string} hexKey Lowercase hex codepoints joined by `-`.
- * @return {string} The emoji character, or the input on parse failure.
+ * @param hexKey Lowercase hex codepoints joined by `-`.
+ * @return The emoji character, or the input on parse failure.
  */
-export function hexKeyToEmoji( hexKey ) {
+export function hexKeyToEmoji( hexKey: string ): string {
 	if ( typeof hexKey !== 'string' || ! HEX_KEY_RE.test( hexKey ) ) {
 		return hexKey;
 	}
@@ -79,11 +94,14 @@ export function hexKeyToEmoji( hexKey ) {
  * a curated reaction (after stripping VS-16) returns its slug, otherwise
  * returns the hex-codepoint key.
  *
- * @param {string} emoji  The emoji character.
- * @param {Array}  emojis Curated emoji list to match against.
- * @return {string} The storage key (slug or hex codepoints).
+ * @param emoji  The emoji character.
+ * @param emojis Curated emoji list to match against.
+ * @return The storage key (slug or hex codepoints).
  */
-export function emojiToStorageKey( emoji, emojis = REACTION_EMOJIS ) {
+export function emojiToStorageKey(
+	emoji: string,
+	emojis: CuratedEmoji[] = REACTION_EMOJIS
+): string {
 	const hex = emojiToHexKey( emoji );
 	const curated = emojis.find( ( r ) => emojiToHexKey( r.emoji ) === hex );
 	return curated ? curated.value : hex;
@@ -92,10 +110,12 @@ export function emojiToStorageKey( emoji, emojis = REACTION_EMOJIS ) {
 /**
  * Build a Map keyed by slug for O(1) emoji and label lookups.
  *
- * @param {Array} emojis The emoji list to index.
- * @return {Map} Map from slug to `{ emoji, label, value }` entry.
+ * @param emojis The emoji list to index.
+ * @return Map from slug to `{ emoji, label, value }` entry.
  */
-export function buildEmojiBySlugMap( emojis = REACTION_EMOJIS ) {
+export function buildEmojiBySlugMap(
+	emojis: CuratedEmoji[] = REACTION_EMOJIS
+): Map< string, CuratedEmoji > {
 	return new Map( emojis.map( ( entry ) => [ entry.value, entry ] ) );
 }
 
@@ -105,21 +125,19 @@ export function buildEmojiBySlugMap( emojis = REACTION_EMOJIS ) {
  * is a plain button rendered after the listbox (not inside it) so the
  * listbox only contains selectable options.
  *
- * @param {Object}   props             Component props.
- * @param {Function} props.onSelect    Called with the chosen slug when the
- *                                     user picks a curated emoji.
- * @param {Function} props.onMore      When provided, renders the trailing
- *                                     `+` button and is called when it is
- *                                     clicked.
- * @param {Function} props.onMoreHover Called when the `+` button is
- *                                     hovered or focused (used to prefetch
- *                                     the full picker).
+ * @param props             Component props.
+ * @param props.onSelect    Called with the chosen slug when the user picks a
+ *                          curated emoji.
+ * @param props.onMore      When provided, renders the trailing `+` button and
+ *                          is called when it is clicked.
+ * @param props.onMoreHover Called when the `+` button is hovered or focused
+ *                          (used to prefetch the full picker).
  */
 export default function ReactionEmojiPicker( {
 	onSelect,
 	onMore,
 	onMoreHover,
-} ) {
+}: ReactionEmojiPickerProps ) {
 	return (
 		<div className="editor-collab-sidebar-panel__emoji-picker-row">
 			<Composite

@@ -6,6 +6,25 @@ import { Button, Composite, Dropdown } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
+ * Internal dependencies
+ */
+import type { EmojibaseEntry, EmojibaseSkin } from './emojibase-data';
+
+/**
+ * A selectable skin tone swatch.
+ */
+interface SkinToneOption {
+	tone: number;
+	emoji: string;
+	label: string;
+}
+
+interface SkinTonePickerProps {
+	value: number;
+	onChange: ( tone: number ) => void;
+}
+
+/**
  * The six selectable skin tones, in display order. Tone `0` is the
  * default (yellow) presentation — the emoji's base form — and sits
  * leftmost so the default is an explicit, selectable option rather
@@ -15,7 +34,7 @@ import { useInstanceId } from '@wordpress/compose';
  * Every swatch renders the same exemplar emoji (the raised hand) so
  * the only difference between options is the tone itself.
  */
-export const SKIN_TONES = [
+export const SKIN_TONES: SkinToneOption[] = [
 	{ tone: 0, emoji: '✋', label: __( 'Default skin tone' ) },
 	{ tone: 1, emoji: '✋🏻', label: __( 'Light skin tone' ) },
 	{ tone: 2, emoji: '✋🏼', label: __( 'Medium-light skin tone' ) },
@@ -32,11 +51,14 @@ export const SKIN_TONES = [
  * (whose `tone` is an array and can't be produced by a single-tone
  * preference).
  *
- * @param {Object} entry Emojibase emoji record.
- * @param {number} tone  Selected tone, 0 (default) through 5.
- * @return {Object} The record to render: a skin variant or the base entry.
+ * @param entry Emojibase emoji record.
+ * @param tone  Selected tone, 0 (default) through 5.
+ * @return The record to render: a skin variant or the base entry.
  */
-export function applySkinTone( entry, tone ) {
+export function applySkinTone(
+	entry: EmojibaseEntry,
+	tone: number
+): EmojibaseEntry | EmojibaseSkin {
 	if ( ! tone || ! Array.isArray( entry.skins ) ) {
 		return entry;
 	}
@@ -49,11 +71,14 @@ export function applySkinTone( entry, tone ) {
  * flyout of six exemplar swatches under an explicit heading. Selecting
  * a swatch calls `onChange` with the tone number and closes the flyout.
  *
- * @param {Object}   props          Component props.
- * @param {number}   props.value    The selected tone, 0–5.
- * @param {Function} props.onChange Called with the newly selected tone.
+ * @param props          Component props.
+ * @param props.value    The selected tone, 0–5.
+ * @param props.onChange Called with the newly selected tone.
  */
-export default function SkinTonePicker( { value, onChange } ) {
+export default function SkinTonePicker( {
+	value,
+	onChange,
+}: SkinTonePickerProps ) {
 	const headingId = useInstanceId(
 		SkinTonePicker,
 		'editor-collab-sidebar-panel__skin-tone-heading'

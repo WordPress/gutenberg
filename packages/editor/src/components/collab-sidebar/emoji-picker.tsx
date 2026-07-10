@@ -16,8 +16,21 @@ import {
 	normalizeHexcode,
 	useEmojibaseData,
 } from './emojibase-data';
+import type { EmojibaseEntry } from './emojibase-data';
 import { useFrequentEmojis } from './frequent-emojis';
 import SkinTonePicker, { applySkinTone } from './skin-tone-picker';
+
+/**
+ * A category bucket of emoji records keyed by its Emojibase `group`.
+ */
+interface EmojiGroup {
+	key: number;
+	emojis: EmojibaseEntry[];
+}
+
+interface EmojiPickerProps {
+	onSelect: ( emoji: string ) => void;
+}
 
 /**
  * Preference key (in the `core` scope) storing the user's default emoji
@@ -33,11 +46,11 @@ const COLUMNS = 8;
  * Emojibase's natural ordering (which follows Unicode CLDR). Entries
  * with no `group` (e.g. component code points) are skipped.
  *
- * @param {Array} data Emoji records from `data.json`.
- * @return {Array<{ key: number, emojis: Array }>} Ordered category buckets.
+ * @param data Emoji records from `data.json`.
+ * @return Ordered category buckets.
  */
-export function groupEmojis( data ) {
-	const buckets = new Map();
+export function groupEmojis( data: EmojibaseEntry[] ): EmojiGroup[] {
+	const buckets = new Map< number, EmojibaseEntry[] >();
 	for ( const entry of data ) {
 		if ( typeof entry.group !== 'number' ) {
 			continue;
@@ -45,7 +58,7 @@ export function groupEmojis( data ) {
 		if ( ! buckets.has( entry.group ) ) {
 			buckets.set( entry.group, [] );
 		}
-		buckets.get( entry.group ).push( entry );
+		buckets.get( entry.group )!.push( entry );
 	}
 	return Array.from( buckets.entries() )
 		.sort( ( a, b ) => a[ 0 ] - b[ 0 ] )
@@ -57,11 +70,11 @@ export function groupEmojis( data ) {
  * keeps a stable column count even as the visible list shrinks during
  * search.
  *
- * @param {Array} emojis Emoji records.
- * @return {Array<Array>} Rows of up to `COLUMNS` emoji each.
+ * @param emojis Emoji records.
+ * @return Rows of up to `COLUMNS` emoji each.
  */
-export function chunkRows( emojis ) {
-	const rows = [];
+export function chunkRows( emojis: EmojibaseEntry[] ): EmojibaseEntry[][] {
+	const rows: EmojibaseEntry[][] = [];
 	for ( let i = 0; i < emojis.length; i += COLUMNS ) {
 		rows.push( emojis.slice( i, i + COLUMNS ) );
 	}
@@ -74,12 +87,16 @@ export function chunkRows( emojis ) {
  * searching for an overridden label still get the expected hit.
  * Returns the unfiltered list when the query is empty.
  *
- * @param {Array}       emojis    Emoji records.
- * @param {string}      query     Search query.
- * @param {Object|null} overrides Map of `hexcode => translated label`.
- * @return {Array} Matching emoji records.
+ * @param emojis    Emoji records.
+ * @param query     Search query.
+ * @param overrides Map of `hexcode => translated label`.
+ * @return Matching emoji records.
  */
-export function searchEmojis( emojis, query, overrides ) {
+export function searchEmojis(
+	emojis: EmojibaseEntry[],
+	query: string,
+	overrides: Record< string, string > | null
+): EmojibaseEntry[] {
 	const trimmed = query.trim().toLowerCase();
 	if ( ! trimmed ) {
 		return emojis;
@@ -115,12 +132,14 @@ export function searchEmojis( emojis, query, overrides ) {
  * same-origin from `window.gutenbergEmojibaseUrl`; UI chrome strings
  * go through `@wordpress/i18n` so GlotPress can translate them.
  *
- * @param {Object}   props          Component props.
- * @param {Function} props.onSelect Called with the selected emoji character.
+ * @param props          Component props.
+ * @param props.onSelect Called with the selected emoji character.
  */
-export default function EmojiPicker( { onSelect } ) {
+export default function EmojiPicker( { onSelect }: EmojiPickerProps ) {
 	const baseUrl =
-		typeof window !== 'undefined' ? window.gutenbergEmojibaseUrl : null;
+		typeof window !== 'undefined'
+			? window.gutenbergEmojibaseUrl ?? null
+			: null;
 	const labelOverrides =
 		typeof window !== 'undefined' && window.gutenbergEmojiLabelOverrides
 			? window.gutenbergEmojiLabelOverrides
@@ -131,8 +150,8 @@ export default function EmojiPicker( { onSelect } ) {
 		locale
 	);
 	const [ query, setQuery ] = useState( '' );
-	const viewportRef = useRef( null );
-	const searchRef = useRef( null );
+	const viewportRef = useRef< HTMLDivElement >( null );
+	const searchRef = useRef< HTMLInputElement >( null );
 
 	const { frequentKeys, recordUse } = useFrequentEmojis();
 	const skinTone = useSelect(
@@ -158,10 +177,10 @@ export default function EmojiPicker( { onSelect } ) {
 	 * server-supplied override (typically a `__()`-translated string for
 	 * locales Emojibase doesn't cover) over the Emojibase data label.
 	 *
-	 * @param {Object} entry Emojibase emoji record.
-	 * @return {string} The label to render and use as the accessible name.
+	 * @param entry Emojibase emoji record.
+	 * @return The label to render and use as the accessible name.
 	 */
-	const labelFor = ( entry ) =>
+	const labelFor = ( entry: EmojibaseEntry ): string =>
 		labelOverrides?.[ entry.hexcode ] || entry.label || '';
 
 	const groups = useMemo(
@@ -170,7 +189,7 @@ export default function EmojiPicker( { onSelect } ) {
 	);
 
 	const groupLabelByKey = useMemo( () => {
-		const map = new Map();
+		const map = new Map< number, string >();
 		if ( messages?.groups ) {
 			for ( const g of messages.groups ) {
 				map.set( g.order, g.message );
@@ -213,7 +232,7 @@ export default function EmojiPicker( { onSelect } ) {
 	// Index base records by their normalized hex key so the stored
 	// frequently-used keys can be resolved back to full emoji records.
 	const recordByHexKey = useMemo( () => {
-		const map = new Map();
+		const map = new Map< string, EmojibaseEntry >();
 		for ( const entry of data || [] ) {
 			if ( typeof entry.group === 'number' ) {
 				map.set( normalizeHexcode( entry.hexcode ), entry );
@@ -231,7 +250,9 @@ export default function EmojiPicker( { onSelect } ) {
 		return chunkRows(
 			frequentKeys
 				.map( ( key ) => recordByHexKey.get( key ) )
-				.filter( Boolean )
+				.filter( ( entry ): entry is EmojibaseEntry =>
+					Boolean( entry )
+				)
 		);
 	}, [ frequentKeys, recordByHexKey, query ] );
 
@@ -263,11 +284,11 @@ export default function EmojiPicker( { onSelect } ) {
 	 * preference and recording usage on selection. Shared between the
 	 * "Frequently used" section and the category sections.
 	 *
-	 * @param {Array}  row    Emoji records for the row.
-	 * @param {string} rowKey React key for the row.
-	 * @return {JSX.Element} The rendered row.
+	 * @param row    Emoji records for the row.
+	 * @param rowKey React key for the row.
+	 * @return The rendered row.
 	 */
-	const renderRow = ( row, rowKey ) => (
+	const renderRow = ( row: EmojibaseEntry[], rowKey: string ) => (
 		<Composite.Row
 			key={ rowKey }
 			role="row"
