@@ -13,7 +13,7 @@
 
 @mixin _text-heading() {
 	font-family: variables.$font-family-headings;
-	font-weight: variables.$font-weight-medium;
+	font-weight: variables.$font-weight-semibold;
 }
 
 @mixin _text-body() {

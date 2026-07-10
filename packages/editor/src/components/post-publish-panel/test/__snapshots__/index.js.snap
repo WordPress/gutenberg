@@ -19,7 +19,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
 
 .emotion-4 {
   font-size: 11px;
-  font-weight: 499;
+  font-weight: 600;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
@@ -223,7 +223,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
 
 .emotion-4 {
   font-size: 11px;
-  font-weight: 499;
+  font-weight: 600;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;

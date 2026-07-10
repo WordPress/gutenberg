@@ -101,9 +101,9 @@
 				"$value": 400,
 				"$description": "Regular font weight for body text"
 			},
-			"medium": {
-				"$value": 500,
-				"$description": "Medium font weight for emphasis and headings"
+			"semibold": {
+				"$value": 600,
+				"$description": "Semibold font weight for emphasis and headings"
 			},
 			"$extensions": {
 				"com.figma.scopes": [ "FONT_WEIGHT" ]

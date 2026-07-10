@@ -18,7 +18,7 @@ const Indicator = styled.div`
 	background: #e0e0e0;
 	text-transform: uppercase;
 	font-size: 11px;
-	font-weight: 500;
+	font-weight: 600;
 	color: #757575;
 	margin-top: 24px;
 `;

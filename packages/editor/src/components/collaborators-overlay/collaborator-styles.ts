@@ -40,8 +40,8 @@ export const FONT_SIZE_X_SMALL = '11px';
 // _font.scss — $font-size-medium
 export const FONT_SIZE_MEDIUM = '13px';
 
-// _font.scss — $font-weight-medium
-export const FONT_WEIGHT_MEDIUM = '499';
+// _variables.scss — $font-weight-semibold
+export const FONT_WEIGHT_SEMIBOLD = '600';
 
 // _font.scss — $font-line-height-small
 export const FONT_LINE_HEIGHT_SMALL = '20px';
