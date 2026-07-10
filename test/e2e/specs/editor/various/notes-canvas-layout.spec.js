@@ -449,21 +449,21 @@ test.describe( 'Notes canvas layout', () => {
 		// Minimized: threads collapse to avatar pills.
 		await openOptionsMenu();
 		await page
-			.getByRole( 'menuitemradio', { name: 'Minimized notes' } )
+			.getByRole( 'menuitemradio', { name: 'Minimize notes' } )
 			.click();
 		await expect( overlay ).toHaveClass( /is-compact/ );
 		await expect( notes ).toBeVisible();
 
 		// Hidden: the floating panel disappears from the canvas.
 		await openOptionsMenu();
-		await page
-			.getByRole( 'menuitemradio', { name: 'Hidden notes' } )
-			.click();
+		await page.getByRole( 'menuitemradio', { name: 'Hide notes' } ).click();
 		await expect( notes ).toBeHidden();
 
 		// Full: the complete threads return.
 		await openOptionsMenu();
-		await page.getByRole( 'menuitemradio', { name: 'Full notes' } ).click();
+		await page
+			.getByRole( 'menuitemradio', { name: 'Expand notes' } )
+			.click();
 		await expect( notes ).toBeVisible();
 		await expect( overlay ).not.toHaveClass( /is-compact/ );
 	} );

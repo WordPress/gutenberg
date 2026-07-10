@@ -17,7 +17,7 @@ import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
  * Internal dependencies
  */
 import PluginSidebar from '../plugin-sidebar';
-import ViewMoreMenuGroup from '../more-menu/view-more-menu-group';
+import NotesMoreMenuGroup from '../more-menu/notes-more-menu-group';
 import { ALL_NOTES_SIDEBAR } from './constants';
 import { Notes } from './notes';
 import { FloatingNotes, FloatingNotesFill } from './floating-notes';
@@ -201,22 +201,22 @@ function NotesSidebar( { postId } ) {
 				}
 			/>
 			{ showNotesDisplayOptions && (
-				<ViewMoreMenuGroup>
+				<NotesMoreMenuGroup>
 					{ ( { onClose } ) => (
 						<MenuGroup label={ __( 'Notes' ) }>
 							<MenuItemsChoice
 								choices={ [
 									{
 										value: 'full',
-										label: __( 'Full notes' ),
+										label: __( 'Expand notes' ),
 									},
 									{
 										value: 'minimized',
-										label: __( 'Minimized notes' ),
+										label: __( 'Minimize notes' ),
 									},
 									{
 										value: 'hidden',
-										label: __( 'Hidden notes' ),
+										label: __( 'Hide notes' ),
 									},
 								] }
 								value={ notesDisplayMode }
@@ -233,7 +233,7 @@ function NotesSidebar( { postId } ) {
 							/>
 						</MenuGroup>
 					) }
-				</ViewMoreMenuGroup>
+				</NotesMoreMenuGroup>
 			) }
 			{ showAllNotesSidebar && (
 				<PluginSidebar
