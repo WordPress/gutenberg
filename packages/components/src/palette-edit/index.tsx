@@ -511,7 +511,13 @@ export function PaletteEdit( {
 													} }
 													className="components-palette-edit__menu-button"
 												>
-													{ __( 'Show details' ) }
+													{ isGradient
+														? __(
+																'Manage gradients'
+														  )
+														: __(
+																'Manage colors'
+														  ) }
 												</Button>
 											) }
 											{ ! canOnlyChangeValues && (
