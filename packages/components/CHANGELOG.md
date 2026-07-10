@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ControlWithError`: Remove redundant inline aria-live region for validation error messages to prevent duplicate announcements. ([#79600](https://github.com/WordPress/gutenberg/pull/79600)).
+
 ### Breaking Changes
 
 -   `ExternalLink`: No longer sets the `rel` attribute by default. Consumers relying on the previous behavior should pass `rel` explicitly ([#79743](https://github.com/WordPress/gutenberg/pull/79743)).
@@ -20,6 +24,7 @@
     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
     -   `FormFileUpload` ([#79655](https://github.com/WordPress/gutenberg/pull/79655))
     -   `FormTokenField` ([#79720](https://github.com/WordPress/gutenberg/pull/79720))
+    -   `InputControl` ([#79962](https://github.com/WordPress/gutenberg/pull/79962))
     -   `RangeControl` ([#79590](https://github.com/WordPress/gutenberg/pull/79590))
     -   `Radio` ([#79657](https://github.com/WordPress/gutenberg/pull/79657))
     -   `SelectControl` ([#79797](https://github.com/WordPress/gutenberg/pull/79797))
@@ -48,6 +53,7 @@
 -   `Divider`: Restore lower-specificity border styles so custom border colors can override the default divider color. ([#79534](https://github.com/WordPress/gutenberg/pull/79534))
 -   `Button`: Fix the focus ring for buttons rendered as links ([#79837](https://github.com/WordPress/gutenberg/pull/79837)).
 -   `BorderBoxControl`: Fix the unlink button positioning by restoring the linked control's right-hand margin, which was overridden by `BorderControl`'s base `margin: 0` after `View` stopped rendering styles through Emotion ([#79967](https://github.com/WordPress/gutenberg/pull/79967)).
+-   `Panel`: Fix the body toggle focus style ([#80064](https://github.com/WordPress/gutenberg/pull/80064)).
 
 ### Internal
 
