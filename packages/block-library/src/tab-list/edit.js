@@ -28,6 +28,7 @@ import { useEffect, useMemo, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import TabToolbarControls from '../tabs/tab-toolbar-controls';
+import TabMovers from './tab-movers';
 import useTabActions from '../tabs/use-tab-actions';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
@@ -200,6 +201,7 @@ function Edit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<TabToolbarControls tabsClientId={ tabsClientId } />
+			<TabMovers tabsClientId={ tabsClientId } />
 			<div { ...blockProps }>
 				{ tabsList.map( ( tab, index ) => {
 					const isActive = index === effectiveActiveIndex;
