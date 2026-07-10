@@ -4,11 +4,11 @@ import { Meta, Typeset } from '@storybook/addon-docs/blocks';
  
 export const typography = {
 	type: {
-		primary: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
+		primary: '-apple-system,system-ui,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
 	},
 	weight: {
 		regular: '400',
-		medium: '500',
+		semibold: '600',
 	},
 	size: {
 		s1: 11,
@@ -50,7 +50,7 @@ They are defined as SASS mixins and can be used like so:
 		Number(typography.size.s2),
 		Number(typography.size.s1),
 	]}
-	fontWeight={typography.weight.medium}
+	fontWeight={typography.weight.semibold}
 	sampleText={SampleTextHeading}
 	fontFamily={typography.type.primary}
 />
@@ -65,23 +65,23 @@ They are defined as SASS mixins and can be used like so:
 	<tbody>
 		<tr>
 			<td>heading-2x-large</td>
-			<td>`$font-family-headings`, `font-weight-medium`, `font-size-2x-large`, `line-height-2x-large`</td>
+			<td>`$font-family-headings`, `font-weight-semibold`, `font-size-2x-large`, `line-height-2x-large`</td>
 		</tr>
 		<tr>
 			<td>heading-x-large</td>
-			<td>`$font-family-headings`, `font-weight-medium`, `font-size-x-large`, `line-height-medium`</td>
+			<td>`$font-family-headings`, `font-weight-semibold`, `font-size-x-large`, `line-height-medium`</td>
 		</tr>
 		<tr>
 			<td>heading-large</td>
-			<td>`$font-family-headings`, `font-weight-medium`, `font-size-large`, `line-height-small`</td>
+			<td>`$font-family-headings`, `font-weight-semibold`, `font-size-large`, `line-height-small`</td>
 		</tr>
 		<tr>
 			<td>heading-medium</td>
-			<td>`$font-family-headings`, `font-weight-medium`, `font-size-medium`, `line-height-small`</td>
+			<td>`$font-family-headings`, `font-weight-semibold`, `font-size-medium`, `line-height-small`</td>
 		</tr>
 		<tr>
 			<td>heading-small</td>
-			<td>`$font-family-headings`, `font-weight-medium`, `font-size-x-small`, `line-height-x-small`</td>
+			<td>`$font-family-headings`, `font-weight-semibold`, `font-size-x-small`, `line-height-x-small`</td>
 		</tr>
 	</tbody>
 </table>
@@ -162,8 +162,8 @@ $font-weight-semibold: 600;
 ### Families
 
 ```css
-$font-family-headings: -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-$font-family-body: -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+$font-family-headings: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+$font-family-body: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 $font-family-mono: Menlo, Consolas, monaco, monospace;
 ```
 

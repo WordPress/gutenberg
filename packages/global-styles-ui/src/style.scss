@@ -87,7 +87,7 @@
 
 .global-styles-ui-section-title {
 	color: colors.$gray-800;
-	font-weight: 600;
+	font-weight: variables.$font-weight-semibold;
 	line-height: 1.2;
 	padding: 16px 16px 0;
 	margin: 0;

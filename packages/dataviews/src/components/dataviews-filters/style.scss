@@ -178,7 +178,7 @@
 
 	.dataviews-filters__search-widget-filter-combobox-item-value {
 		[data-user-value] {
-			font-weight: 600;
+			font-weight: vars.$font-weight-semibold;
 		}
 	}
 }

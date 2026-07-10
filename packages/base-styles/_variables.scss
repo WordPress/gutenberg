@@ -12,7 +12,11 @@
  * Fonts & basic variables.
  */
 
-$default-font: -apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,"Helvetica Neue", sans-serif; // Todo: deprecate in favor of $family variables
+$font-family-headings: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+$font-family-body: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+$font-family-mono: Menlo, Consolas, monaco, monospace;
+
+$default-font: $font-family-body; // Todo: deprecate in favor of $family variables
 $default-line-height: 1.4; // Todo: deprecate in favor of $line-height tokens
 
 /**
@@ -39,11 +43,6 @@ $font-line-height-2x-large: 40px;
 $font-weight-regular: 400;
 $font-weight-medium: 499; // Kept for backwards compatibility. Do not use in new styles.
 $font-weight-semibold: 600;
-
-// Families
-$font-family-headings: -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-$font-family-body: -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-$font-family-mono: Menlo, Consolas, monaco, monospace;
 
 /**
  * Grid System.
