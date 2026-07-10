@@ -45,23 +45,43 @@ const getViewSiteCommand = () =>
 
 export function useAdminNavigationCommands( menuCommands ) {
 	const commands = useMemo( () => {
-		return ( menuCommands ?? [] ).map( ( menuCommand ) => {
-			const label = sprintf(
-				/* translators: %s: menu label */
-				__( 'Go to: %s' ),
-				menuCommand.label
-			);
-			return {
-				name: menuCommand.name,
-				label,
-				searchLabel: label,
-				category: 'view',
-				callback: ( { close } ) => {
-					document.location = menuCommand.url;
-					close();
-				},
-			};
-		} );
+		return ( menuCommands ?? [] )
+			.filter( ( menuCommand ) => {
+				try {
+					const currentUrl = new URL( window.location.href );
+					const commandUrl = new URL(
+						menuCommand.url,
+						window.location.href
+					);
+
+					if (
+						currentUrl.pathname === commandUrl.pathname &&
+						currentUrl.search === commandUrl.search
+					) {
+						return false;
+					}
+				} catch {
+					// Ignore invalid URLs and let them render.
+				}
+				return true;
+			} )
+			.map( ( menuCommand ) => {
+				const label = sprintf(
+					/* translators: %s: menu label */
+					__( 'Go to: %s' ),
+					menuCommand.label
+				);
+				return {
+					name: menuCommand.name,
+					label,
+					searchLabel: label,
+					category: 'view',
+					callback: ( { close } ) => {
+						document.location = menuCommand.url;
+						close();
+					},
+				};
+			} );
 	}, [ menuCommands ] );
 	useCommands( commands );
 

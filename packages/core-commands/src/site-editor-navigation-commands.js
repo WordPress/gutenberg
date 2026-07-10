@@ -91,6 +91,46 @@ function isInSiteEditor() {
 	);
 }
 
+// Helper to determine if a target command path matches the current site editor view.
+function isSameSiteEditorPath( targetPath, targetParams = {} ) {
+	if ( ! isInSiteEditor() ) {
+		return false;
+	}
+
+	const searchParams = new URLSearchParams( window.location.search );
+	const currentPath =
+		searchParams.get( 'path' ) || searchParams.get( 'p' ) || '/';
+
+	const queryStr = new URLSearchParams( targetParams ).toString();
+	const fullTargetPath = targetPath + ( queryStr ? '?' + queryStr : '' );
+	const mappedTargetPath = mapRoute( fullTargetPath );
+
+	if ( currentPath !== targetPath && currentPath !== mappedTargetPath ) {
+		return false;
+	}
+
+	if ( currentPath === mappedTargetPath && mappedTargetPath !== targetPath ) {
+		return true;
+	}
+
+	for ( const [ key, value ] of Object.entries( targetParams ) ) {
+		if ( searchParams.get( key ) !== value ) {
+			return false;
+		}
+	}
+
+	if (
+		targetPath === '/pattern' &&
+		Object.keys( targetParams ).length === 0
+	) {
+		if ( searchParams.has( 'postType' ) ) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 const getNavigationCommandLoaderPerPostType = ( postType ) =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
@@ -144,58 +184,68 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 		);
 
 		const commands = useMemo( () => {
-			return ( records ?? [] ).map( ( record ) => {
-				const command = {
-					name: postType + '-' + record.id,
-					searchLabel: record.title?.rendered + ' ' + record.id,
-					label: record.title?.rendered
-						? decodeEntities( record.title?.rendered )
-						: __( '(no title)' ),
-					icon: icons[ postType ],
-					category: 'edit',
-				};
+			return ( records ?? [] )
+				.filter(
+					( record ) =>
+						! isSameSiteEditorPath(
+							`/${ postType }/${ record.id }`
+						)
+				)
+				.map( ( record ) => {
+					const command = {
+						name: postType + '-' + record.id,
+						searchLabel: record.title?.rendered + ' ' + record.id,
+						label: record.title?.rendered
+							? decodeEntities( record.title?.rendered )
+							: __( '(no title)' ),
+						icon: icons[ postType ],
+						category: 'edit',
+					};
 
-				if (
-					! canCreateTemplate ||
-					postType === 'post' ||
-					( postType === 'page' && ! isBlockBasedTheme )
-				) {
+					if (
+						! canCreateTemplate ||
+						postType === 'post' ||
+						( postType === 'page' && ! isBlockBasedTheme )
+					) {
+						return {
+							...command,
+							callback: ( { close } ) => {
+								const args = {
+									post: record.id,
+									action: 'edit',
+								};
+								const targetUrl = addQueryArgs(
+									'post.php',
+									args
+								);
+								document.location = targetUrl;
+								close();
+							},
+						};
+					}
+
+					const isSiteEditor = isInSiteEditor();
+
 					return {
 						...command,
 						callback: ( { close } ) => {
-							const args = {
-								post: record.id,
-								action: 'edit',
-							};
-							const targetUrl = addQueryArgs( 'post.php', args );
-							document.location = targetUrl;
+							if ( isSiteEditor ) {
+								history.navigate(
+									`/${ postType }/${ record.id }?canvas=edit`
+								);
+							} else {
+								document.location = addQueryArgs(
+									getSiteEditorPage(),
+									{
+										p: `/${ postType }/${ record.id }`,
+										canvas: 'edit',
+									}
+								);
+							}
 							close();
 						},
 					};
-				}
-
-				const isSiteEditor = isInSiteEditor();
-
-				return {
-					...command,
-					callback: ( { close } ) => {
-						if ( isSiteEditor ) {
-							history.navigate(
-								`/${ postType }/${ record.id }?canvas=edit`
-							);
-						} else {
-							document.location = addQueryArgs(
-								getSiteEditorPage(),
-								{
-									p: `/${ postType }/${ record.id }`,
-									canvas: 'edit',
-								}
-							);
-						}
-						close();
-					},
-				};
-			} );
+				} );
 		}, [ canCreateTemplate, records, isBlockBasedTheme, history ] );
 
 		return {
@@ -253,38 +303,50 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 			);
 			const result = [];
 			result.push(
-				...orderedRecords.map( ( record ) => {
-					return {
-						name: templateType + '-' + record.id,
-						searchLabel: record.title?.rendered + ' ' + record.id,
-						label: record.title?.rendered
-							? record.title?.rendered
-							: __( '(no title)' ),
-						icon: icons[ templateType ],
-						category: 'edit',
-						callback: ( { close } ) => {
-							if ( isSiteEditor ) {
-								history.navigate(
-									`/${ templateType }/${ record.id }?canvas=edit`
-								);
-							} else {
-								document.location = addQueryArgs(
-									getSiteEditorPage(),
-									{
-										p: `/${ templateType }/${ record.id }`,
-										canvas: 'edit',
-									}
-								);
-							}
-							close();
-						},
-					};
-				} )
+				...orderedRecords
+					.filter(
+						( record ) =>
+							! isSameSiteEditorPath(
+								`/${ templateType }/${ record.id }`
+							)
+					)
+					.map( ( record ) => {
+						return {
+							name: templateType + '-' + record.id,
+							searchLabel:
+								record.title?.rendered + ' ' + record.id,
+							label: record.title?.rendered
+								? record.title?.rendered
+								: __( '(no title)' ),
+							icon: icons[ templateType ],
+							category: 'edit',
+							callback: ( { close } ) => {
+								if ( isSiteEditor ) {
+									history.navigate(
+										`/${ templateType }/${ record.id }?canvas=edit`
+									);
+								} else {
+									document.location = addQueryArgs(
+										getSiteEditorPage(),
+										{
+											p: `/${ templateType }/${ record.id }`,
+											canvas: 'edit',
+										}
+									);
+								}
+								close();
+							},
+						};
+					} )
 			);
 
 			if (
 				orderedRecords?.length > 0 &&
-				templateType === 'wp_template_part'
+				templateType === 'wp_template_part' &&
+				! isSameSiteEditorPath( '/pattern', {
+					postType: 'wp_template_part',
+					categoryId: 'all-parts',
+				} )
 			) {
 				result.push( {
 					name: 'core/edit-site/open-template-parts',
@@ -344,69 +406,75 @@ const getSiteEditorBasicNavigationCommands = () =>
 			const result = [];
 
 			if ( canCreateTemplate && isBlockBasedTheme ) {
-				// Go to Styles command
-				result.push( {
-					name: 'core/edit-site/open-styles',
-					label: __( 'Go to: Styles' ),
-					icon: styles,
-					category: 'view',
-					callback: ( { close } ) => {
-						if ( isSiteEditor ) {
-							history.navigate( '/styles' );
-						} else {
-							document.location = addQueryArgs(
-								getSiteEditorPage(),
-								{
-									p: '/styles',
-								}
-							);
-						}
-						close();
-					},
-				} );
+				if ( ! isSameSiteEditorPath( '/styles' ) ) {
+					// Go to Styles command
+					result.push( {
+						name: 'core/edit-site/open-styles',
+						label: __( 'Go to: Styles' ),
+						icon: styles,
+						category: 'view',
+						callback: ( { close } ) => {
+							if ( isSiteEditor ) {
+								history.navigate( '/styles' );
+							} else {
+								document.location = addQueryArgs(
+									getSiteEditorPage(),
+									{
+										p: '/styles',
+									}
+								);
+							}
+							close();
+						},
+					} );
+				}
 
-				result.push( {
-					name: 'core/edit-site/open-navigation',
-					label: __( 'Go to: Navigation' ),
-					icon: navigation,
-					category: 'view',
-					callback: ( { close } ) => {
-						if ( isSiteEditor ) {
-							history.navigate( '/navigation' );
-						} else {
-							document.location = addQueryArgs(
-								getSiteEditorPage(),
-								{
-									p: '/navigation',
-								}
-							);
-						}
-						close();
-					},
-				} );
+				if ( ! isSameSiteEditorPath( '/navigation' ) ) {
+					result.push( {
+						name: 'core/edit-site/open-navigation',
+						label: __( 'Go to: Navigation' ),
+						icon: navigation,
+						category: 'view',
+						callback: ( { close } ) => {
+							if ( isSiteEditor ) {
+								history.navigate( '/navigation' );
+							} else {
+								document.location = addQueryArgs(
+									getSiteEditorPage(),
+									{
+										p: '/navigation',
+									}
+								);
+							}
+							close();
+						},
+					} );
+				}
 
-				result.push( {
-					name: 'core/edit-site/open-templates',
-					label: __( 'Go to: Templates' ),
-					icon: layout,
-					category: 'view',
-					callback: ( { close } ) => {
-						if ( isSiteEditor ) {
-							history.navigate( mapRoute( '/template' ) );
-						} else {
-							document.location = addQueryArgs(
-								getSiteEditorPage(),
-								{
-									p: mapRoute( '/template' ),
-								}
-							);
-						}
-						close();
-					},
-				} );
+				if ( ! isSameSiteEditorPath( '/template' ) ) {
+					result.push( {
+						name: 'core/edit-site/open-templates',
+						label: __( 'Go to: Templates' ),
+						icon: layout,
+						category: 'view',
+						callback: ( { close } ) => {
+							if ( isSiteEditor ) {
+								history.navigate( mapRoute( '/template' ) );
+							} else {
+								document.location = addQueryArgs(
+									getSiteEditorPage(),
+									{
+										p: mapRoute( '/template' ),
+									}
+								);
+							}
+							close();
+						},
+					} );
+				}
 			}
 
-			if ( canCreatePatterns ) {
+			if ( canCreatePatterns && ! isSameSiteEditorPath( '/pattern' ) ) {
 				result.push( {
 					name: 'core/edit-site/open-patterns',
 					label: __( 'Go to: Patterns' ),
@@ -472,7 +540,11 @@ const getGlobalStylesOpenCssCommands = () =>
 		}, [] );
 
 		const commands = useMemo( () => {
-			if ( ! canEditCSS || ! isBlockBasedTheme ) {
+			if (
+				! canEditCSS ||
+				! isBlockBasedTheme ||
+				isSameSiteEditorPath( '/styles', { section: '/css' } )
+			) {
 				return [];
 			}
 
