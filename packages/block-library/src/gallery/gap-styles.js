@@ -58,12 +58,12 @@ export default function GalleryGapCustomProperties( { style, clientId } ) {
 	const globalGalleryStyles =
 		globalStyles?.blocks?.[ GALLERY_BLOCK_NAME ] || {};
 	const styleBlockGap = getBlockGapValue( style );
-	const globalBlockGap =
-		globalGalleryStyles?.spacing?.blockGap ??
-		globalStyles?.spacing?.blockGap;
-	// Prefer the block's own gap value, then Gallery global styles, then root global styles.
+	const globalGalleryBlockGap =
+		globalGalleryStyles?.spacing?.blockGap ?? FALLBACK_VALUE;
+	// Prefer the block's own gap value, then Gallery global styles. Missing
+	// values fall back to the Gallery blockGap default.
 	const blockGap =
-		styleBlockGap === undefined ? globalBlockGap : styleBlockGap;
+		styleBlockGap === undefined ? globalGalleryBlockGap : styleBlockGap;
 	let gap = getGalleryGapCustomPropertyStyle( selector, blockGap );
 
 	Object.entries( getResponsiveMediaQueries( viewportSettings ) ).forEach(
@@ -71,8 +71,8 @@ export default function GalleryGapCustomProperties( { style, clientId } ) {
 			const styleViewportBlockGap = getBlockGapValue(
 				style?.[ viewport ]
 			);
-			// Viewport-specific block values win. Global viewport values only apply
-			// when the block has no base gap, so they do not override an instance value.
+			// Viewport-specific block values win. Gallery global viewport values
+			// only apply when the block has no base gap, so they do not override an instance value.
 			const globalViewportBlockGap =
 				styleBlockGap === undefined
 					? globalGalleryStyles?.[ viewport ]?.spacing?.blockGap

@@ -307,6 +307,8 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
  * @return string The content of the block being rendered.
  */
 function block_core_gallery_render( $attributes, $content, $block ) {
+	static $global_styles = null;
+
 	// In dynamic mode the gallery's images are resolved at render time instead of
 	// being authored as inner blocks, so `save.js` persists at most the
 	// gallery-level caption — a bare `<figcaption>`, or nothing when there is no
@@ -400,14 +402,18 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	// gap on the gallery.
 	$fallback_gap = 'var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )';
 
-	$global_styles         = function_exists( 'wp_get_global_styles' ) ? wp_get_global_styles() : array();
+	if ( null === $global_styles ) {
+		$global_styles = function_exists( 'wp_get_global_styles' ) ? wp_get_global_styles() : array();
+	}
+
 	$global_gallery_styles = $global_styles['blocks']['core/gallery'] ?? array();
-	$global_block_gap      = $global_gallery_styles['spacing']['blockGap'] ?? $global_styles['spacing']['blockGap'] ?? null;
+	$global_gallery_gap    = $global_gallery_styles['spacing']['blockGap'] ?? $fallback_gap;
 	$has_block_gap         = is_array( $style_attr['spacing'] ?? null ) && array_key_exists( 'blockGap', $style_attr['spacing'] );
-	// Prefer the block's own gap value, then Gallery global styles, then root global styles.
+	// Prefer the block's own gap value, then Gallery global styles. Missing
+	// values fall back to the Gallery blockGap default.
 	$block_gap  = $has_block_gap
 		? $style_attr['spacing']['blockGap']
-		: $global_block_gap;
+		: $global_gallery_gap;
 	$gap_column = block_core_gallery_get_column_gap_value( $block_gap, $fallback_gap );
 
 	// Set the CSS variable to the column value for Gallery's flex width calculations.
@@ -438,8 +444,8 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 		$has_global_viewport_block_gap = is_array( $global_gallery_styles[ $breakpoint ]['spacing'] ?? null ) &&
 			array_key_exists( 'blockGap', $global_gallery_styles[ $breakpoint ]['spacing'] );
 
-		// Viewport-specific block values win. Global viewport values only apply
-		// when the block has no base gap, so they do not override an instance value.
+		// Viewport-specific block values win. Gallery global viewport values
+		// only apply when the block has no base gap, so they do not override an instance value.
 		if ( $has_viewport_block_gap ) {
 			$viewport_gap = $viewport_style['spacing']['blockGap'];
 		} elseif ( ! $has_block_gap && $has_global_viewport_block_gap ) {
