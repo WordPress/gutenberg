@@ -338,9 +338,16 @@ export function applyWaveformPlayerStyles(
 ) {
 	const waveformContainer = container.querySelector( '.waveform-container' );
 	const playButton = container.querySelector( '.waveform-btn' );
+	const playButtonBaseColor = getRepresentativeColor(
+		getResolvedGradientStops( container, playButtonGradient ) ||
+			playButtonColor
+	);
 
-	if ( playButtonColor ) {
-		container.style.setProperty( '--wfp-button-color', playButtonColor );
+	if ( playButtonBaseColor ) {
+		container.style.setProperty(
+			'--wfp-button-color',
+			playButtonBaseColor
+		);
 	} else {
 		container.style.removeProperty( '--wfp-button-color' );
 	}

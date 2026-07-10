@@ -290,6 +290,9 @@ describe( 'Waveform utilities', () => {
 			expect( playButton ).toHaveStyle( {
 				background: 'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)',
 			} );
+			expect( container ).toHaveStyle( {
+				'--wfp-button-color': '#0000ff',
+			} );
 		} );
 
 		it( 'removes the waveform background color when cleared', () => {
