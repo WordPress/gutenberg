@@ -20,7 +20,6 @@ export function SliderPaginationNavigationButtonTypeControls( {
 } ) {
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			label={ __( 'Type' ) }
 			value={ value }
 			onChange={ onChange }
@@ -37,7 +36,6 @@ export function SliderPaginationNavigationButtonTypeControls( {
 export function SliderPaginationArrowControls( { value, onChange } ) {
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			label={ __( 'Button icon' ) }
 			value={ value }
 			onChange={ onChange }
@@ -61,7 +59,6 @@ export function SliderPaginationArrowControls( { value, onChange } ) {
 export function SliderPaginationIndicatorControls( { value, onChange } ) {
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			label={ __( 'Indicator icon' ) }
 			value={ value }
 			onChange={ onChange }
