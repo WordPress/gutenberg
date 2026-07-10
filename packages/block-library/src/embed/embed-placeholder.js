@@ -31,7 +31,6 @@ export default function EmbedPlaceholder( {
 		>
 			<form onSubmit={ onSubmit }>
 				<InputControl
-					__next40pxDefaultSize
 					type="url"
 					value={ value || '' }
 					className="wp-block-embed__placeholder-input"

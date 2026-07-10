@@ -16,6 +16,7 @@ The design system follows the [Design Tokens Format Module](https://www.designto
 | `border.json`     | Border radius and width values                                                                                                   |
 | `elevation.json`  | Shadow definitions for creating depth and layering                                                                               |
 | `motion.json`     | Animation durations and easing curves                                                                                            |
+| `cursor.json`     | Cursor values for interactive controls                                                                                           |
 
 Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. These files are the source of truth for the design system and are processed during the build step to generate CSS custom properties and other output formats in `/src/prebuilt`.
 
