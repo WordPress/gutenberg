@@ -357,14 +357,14 @@ if ( ! function_exists( 'wp_guideline_scope_from_slug' ) ) {
 	 * @return string|null Scope key, or null if the slug is not a registered scope.
 	 */
 	function wp_guideline_scope_from_slug( string $slug ): ?string {
-		if ( 0 !== strpos( $slug, 'guideline-' ) ) {
+		if ( ! str_starts_with( $slug, 'guideline-' ) ) {
 			return null;
 		}
 
 		$scopes = wp_guideline_scopes();
 
 		// Per-block rows belong to the blocks scope while it is registered.
-		if ( 0 === strpos( $slug, 'guideline-block-' ) && strlen( $slug ) > strlen( 'guideline-block-' ) ) {
+		if ( str_starts_with( $slug, 'guideline-block-' ) && strlen( $slug ) > strlen( 'guideline-block-' ) ) {
 			return isset( $scopes['blocks'] ) ? 'blocks' : null;
 		}
 
