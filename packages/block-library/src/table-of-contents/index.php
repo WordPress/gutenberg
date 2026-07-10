@@ -220,6 +220,61 @@ function block_core_table_of_contents_get_template_part_content( $attributes ) {
 }
 
 /**
+ * Gets referenced block content that can contribute headings.
+ *
+ * @param string $block_type Block type name.
+ * @param array  $attributes Parsed block attributes.
+ * @param array  $seen       Already visited references.
+ *
+ * @return array|null Reference data, or null when the reference should be skipped.
+ */
+function block_core_table_of_contents_get_referenced_block_content( $block_type, $attributes, $seen ) {
+	$seen = block_core_table_of_contents_normalize_seen_references( $seen );
+
+	if ( 'core/block' === $block_type ) {
+		$ref = empty( $attributes['ref'] ) ? 0 : (int) $attributes['ref'];
+		if ( ! $ref || isset( $seen['core/block'][ $ref ] ) ) {
+			return null;
+		}
+
+		$content = block_core_table_of_contents_get_synced_pattern_content( $attributes );
+		// Unavailable references render no front-end content, so they cannot
+		// contribute headings.
+		if ( '' === $content ) {
+			return null;
+		}
+
+		return array(
+			'content' => $content,
+			'id'      => $ref,
+			'type'    => 'core/block',
+		);
+	}
+
+	if ( 'core/template-part' === $block_type ) {
+		$template_id = block_core_table_of_contents_get_template_part_id( $attributes );
+		if ( '' === $template_id || isset( $seen['core/template-part'][ $template_id ] ) ) {
+			return null;
+		}
+
+		$content = block_core_table_of_contents_get_template_part_content( $attributes );
+		// Unavailable references render no front-end content, so they cannot
+		// contribute headings.
+		if ( '' === $content ) {
+			return null;
+		}
+
+		return array(
+			'content' => $content,
+			'id'      => $template_id,
+			'type'    => 'core/template-part',
+		);
+	}
+
+	return null;
+}
+
+/**
  * Normalizes raw page break comments so the block processor can see them.
  *
  * @param string $content Serialized block content.
@@ -241,6 +296,53 @@ function block_core_table_of_contents_normalize_nextpage_blocks( $content ) {
 }
 
 /**
+ * Normalizes already visited reference tracking.
+ *
+ * @param array $seen Already visited references.
+ *
+ * @return array Normalized visited references.
+ */
+function block_core_table_of_contents_normalize_seen_references( $seen = array() ) {
+	if ( ! isset( $seen['core/block'] ) ) {
+		$seen['core/block'] = array();
+	}
+	if ( ! isset( $seen['core/template-part'] ) ) {
+		$seen['core/template-part'] = array();
+	}
+
+	return $seen;
+}
+
+/**
+ * Normalizes heading resolution context.
+ *
+ * @param string $content Serialized block content.
+ * @param array  $context Heading resolution context.
+ *
+ * @return array Normalized heading resolution context.
+ */
+function block_core_table_of_contents_normalize_heading_context( $content, $context = array() ) {
+	$context = wp_parse_args(
+		$context,
+		array(
+			'current_page'              => 1,
+			'is_paginated'              => false !== strpos( $content, '<!--nextpage-->' ),
+			'only_include_current_page' => false,
+			'permalink'                 => '',
+			'target_page'               => 1,
+		)
+	);
+
+	return array(
+		'current_page'              => max( 1, (int) $context['current_page'] ),
+		'is_paginated'              => ! empty( $context['is_paginated'] ),
+		'only_include_current_page' => ! empty( $context['only_include_current_page'] ),
+		'permalink'                 => $context['permalink'],
+		'target_page'               => max( 1, (int) $context['target_page'] ),
+	);
+}
+
+/**
  * Collects heading data from block content.
  *
  * @param string $content   Block content to scan.
@@ -255,30 +357,8 @@ function block_core_table_of_contents_get_headings_from_content( $content, $max_
 		return array();
 	}
 
-	if ( ! isset( $seen['core/block'] ) ) {
-		$seen['core/block'] = array();
-	}
-	if ( ! isset( $seen['core/template-part'] ) ) {
-		$seen['core/template-part'] = array();
-	}
-
-	$context = wp_parse_args(
-		$context,
-		array(
-			'current_page'              => 1,
-			'is_paginated'              => false !== strpos( $content, '<!--nextpage-->' ),
-			'only_include_current_page' => false,
-			'permalink'                 => '',
-			'target_page'               => 1,
-		)
-	);
-	$context = array(
-		'current_page'              => max( 1, (int) $context['current_page'] ),
-		'is_paginated'              => ! empty( $context['is_paginated'] ),
-		'only_include_current_page' => ! empty( $context['only_include_current_page'] ),
-		'permalink'                 => $context['permalink'],
-		'target_page'               => max( 1, (int) $context['target_page'] ),
-	);
+	$seen    = block_core_table_of_contents_normalize_seen_references( $seen );
+	$context = block_core_table_of_contents_normalize_heading_context( $content, $context );
 
 	return block_core_table_of_contents_collect_headings_from_content( $content, $max_level, $seen, $context );
 }
@@ -293,7 +373,7 @@ function block_core_table_of_contents_get_headings_from_content( $content, $max_
  *
  * @return array Heading data.
  */
-function block_core_table_of_contents_collect_headings_from_content( $content, $max_level, &$seen, &$context ) {
+function block_core_table_of_contents_collect_headings_from_content( $content, $max_level, $seen, $context ) {
 	if ( '' === trim( $content ) ) {
 		return array();
 	}
@@ -330,67 +410,33 @@ function block_core_table_of_contents_collect_headings_from_content( $content, $
 			continue;
 		}
 
-		if ( 'core/block' === $block_type ) {
+		if ( 'core/block' === $block_type || 'core/template-part' === $block_type ) {
 			if ( ! $include_current_page ) {
 				continue;
 			}
 
 			$attributes = $processor->allocate_and_return_parsed_attributes() ?? array();
-			$ref        = empty( $attributes['ref'] ) ? 0 : (int) $attributes['ref'];
-			if ( ! $ref || isset( $seen['core/block'][ $ref ] ) ) {
+			$reference  = block_core_table_of_contents_get_referenced_block_content( $block_type, $attributes, $seen );
+			if ( ! $reference ) {
 				continue;
 			}
 
-			$referenced_content = block_core_table_of_contents_get_synced_pattern_content( $attributes );
-			if ( '' === $referenced_content ) {
-				continue;
-			}
+			$referenced_seen = $seen;
+			// Track visited references per path to stop cycles without hiding
+			// repeated sibling references.
+			$referenced_seen[ $reference['type'] ][ $reference['id'] ] = true;
 
-			$seen['core/block'][ $ref ] = true;
-			$referenced_context         = $context;
-
+			// Keep referenced-content page breaks from advancing pagination
+			// state in the parent content.
 			$headings = array_merge(
 				$headings,
 				block_core_table_of_contents_collect_headings_from_content(
-					$referenced_content,
+					$reference['content'],
 					$max_level,
-					$seen,
-					$referenced_context
+					$referenced_seen,
+					$context
 				)
 			);
-			unset( $seen['core/block'][ $ref ] );
-			continue;
-		}
-
-		if ( 'core/template-part' === $block_type ) {
-			if ( ! $include_current_page ) {
-				continue;
-			}
-
-			$attributes  = $processor->allocate_and_return_parsed_attributes() ?? array();
-			$template_id = block_core_table_of_contents_get_template_part_id( $attributes );
-			if ( '' === $template_id || isset( $seen['core/template-part'][ $template_id ] ) ) {
-				continue;
-			}
-
-			$referenced_content = block_core_table_of_contents_get_template_part_content( $attributes );
-			if ( '' === $referenced_content ) {
-				continue;
-			}
-
-			$seen['core/template-part'][ $template_id ] = true;
-			$referenced_context                         = $context;
-
-			$headings = array_merge(
-				$headings,
-				block_core_table_of_contents_collect_headings_from_content(
-					$referenced_content,
-					$max_level,
-					$seen,
-					$referenced_context
-				)
-			);
-			unset( $seen['core/template-part'][ $template_id ] );
 		}
 	}
 
@@ -412,11 +458,10 @@ function block_core_table_of_contents_current_template_has_post_content() {
 		return false;
 	}
 
-	$seen = array(
-		'core/template-part' => array(),
+	return block_core_table_of_contents_template_content_has_post_content(
+		$_wp_current_template_content,
+		block_core_table_of_contents_normalize_seen_references()
 	);
-
-	return block_core_table_of_contents_template_content_has_post_content( $_wp_current_template_content, $seen );
 }
 
 /**
@@ -427,7 +472,7 @@ function block_core_table_of_contents_current_template_has_post_content() {
  *
  * @return bool Whether the content contains a Post Content block.
  */
-function block_core_table_of_contents_template_content_has_post_content( $content, &$seen ) {
+function block_core_table_of_contents_template_content_has_post_content( $content, $seen ) {
 	if ( '' === trim( $content ) ) {
 		return false;
 	}
@@ -445,21 +490,19 @@ function block_core_table_of_contents_template_content_has_post_content( $conten
 			continue;
 		}
 
-		$attributes  = $processor->allocate_and_return_parsed_attributes() ?? array();
-		$template_id = block_core_table_of_contents_get_template_part_id( $attributes );
-
-		if ( '' === $template_id || isset( $seen['core/template-part'][ $template_id ] ) ) {
+		$attributes = $processor->allocate_and_return_parsed_attributes() ?? array();
+		$reference  = block_core_table_of_contents_get_referenced_block_content( $block_type, $attributes, $seen );
+		if ( ! $reference ) {
 			continue;
 		}
 
-		$template_part_content = block_core_table_of_contents_get_template_part_content( $attributes );
-		if ( '' === $template_part_content ) {
-			continue;
-		}
-
-		$seen['core/template-part'][ $template_id ] = true;
-		$has_post_content                           = block_core_table_of_contents_template_content_has_post_content( $template_part_content, $seen );
-		unset( $seen['core/template-part'][ $template_id ] );
+		$referenced_seen = $seen;
+		// Track visited template parts per path so nested template cycles halt safely.
+		$referenced_seen[ $reference['type'] ][ $reference['id'] ] = true;
+		$has_post_content = block_core_table_of_contents_template_content_has_post_content(
+			$reference['content'],
+			$referenced_seen
+		);
 
 		if ( $has_post_content ) {
 			return true;
@@ -467,6 +510,24 @@ function block_core_table_of_contents_template_content_has_post_content( $conten
 	}
 
 	return false;
+}
+
+/**
+ * Checks whether the table of contents block should render in the current context.
+ *
+ * @return bool Whether the block should render.
+ */
+function block_core_table_of_contents_should_render() {
+	global $wp_current_filter;
+
+	if ( in_array( 'the_content', $wp_current_filter, true ) ) {
+		return true;
+	}
+
+	return (
+		is_singular() &&
+		block_core_table_of_contents_current_template_has_post_content()
+	);
 }
 
 /**
@@ -589,17 +650,8 @@ function block_core_table_of_contents_build_list_items( $nested_headings, $list_
  * @return string The content of the block being rendered.
  */
 function block_core_table_of_contents_render( $attributes, $content ) {
-	global $wp_current_filter;
-
-	$is_rendering_post_content = in_array( 'the_content', $wp_current_filter, true );
-
-	if ( ! $is_rendering_post_content ) {
-		if (
-			! is_singular() ||
-			! block_core_table_of_contents_current_template_has_post_content()
-		) {
-			return '';
-		}
+	if ( ! block_core_table_of_contents_should_render() ) {
+		return '';
 	}
 
 	$post = get_post();
@@ -607,17 +659,16 @@ function block_core_table_of_contents_render( $attributes, $content ) {
 		return '';
 	}
 
-	$max_level    = isset( $attributes['maxLevel'] ) ? (int) $attributes['maxLevel'] : 0;
-	$current_page = block_core_table_of_contents_get_current_page_number();
-	$seen         = array();
-	$context      = array(
-		'current_page'              => 1,
-		'is_paginated'              => false !== strpos( $post->post_content, '<!--nextpage-->' ),
-		'only_include_current_page' => ! empty( $attributes['onlyIncludeCurrentPage'] ),
-		'permalink'                 => get_permalink( $post ),
-		'target_page'               => $current_page,
+	$max_level = isset( $attributes['maxLevel'] ) ? (int) $attributes['maxLevel'] : 0;
+	$context   = block_core_table_of_contents_normalize_heading_context(
+		$post->post_content,
+		array(
+			'only_include_current_page' => ! empty( $attributes['onlyIncludeCurrentPage'] ),
+			'permalink'                 => get_permalink( $post ),
+			'target_page'               => block_core_table_of_contents_get_current_page_number(),
+		)
 	);
-	$headings     = block_core_table_of_contents_get_headings_from_content( $post->post_content, $max_level, $seen, $context );
+	$headings  = block_core_table_of_contents_get_headings_from_content( $post->post_content, $max_level, array(), $context );
 
 	if ( empty( $headings ) ) {
 		return '';
