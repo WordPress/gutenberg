@@ -1,7 +1,11 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
-import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
 
 /**
@@ -22,6 +26,7 @@ const UnforwardedValidatedContentEditableControl = (
 		customValidity,
 		markWhenOptional,
 		value,
+		className,
 		...restProps
 	}: React.ComponentProps< typeof ContentEditableControl > &
 		ValidatedControlProps & {
@@ -36,8 +41,6 @@ const UnforwardedValidatedContentEditableControl = (
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
-	const editableRef = useRef< HTMLDivElement >( null );
-	const mergedRefs = useMergeRefs( [ forwardedRef, editableRef ] );
 
 	return (
 		<div className="components-validated-control__wrapper-with-error-delegate">
@@ -46,13 +49,13 @@ const UnforwardedValidatedContentEditableControl = (
 				markWhenOptional={ markWhenOptional }
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
-				// The delegate holds the validity state, but the editable is
-				// what assistive technology interacts with, so the validity
-				// message should describe the editable.
-				getDescriptionTarget={ () => editableRef.current }
 			>
 				<ContentEditableControl
-					ref={ mergedRefs }
+					ref={ forwardedRef }
+					className={ clsx(
+						'components-validated-control__content-editable',
+						className
+					) }
 					aria-invalid={
 						customValidity?.type === 'invalid' || undefined
 					}

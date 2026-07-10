@@ -45,8 +45,9 @@
 		border-color: $alert-red;
 	}
 
-	// For ValidatedContentEditableControl
-	&:has(input:invalid[data-validity-visible]) .wp-components-content-editable-control {
+	// For ContentEditableControl
+	&:has(input:invalid[data-validity-visible])
+	.components-validated-control__content-editable [role="textbox"] {
 		--wp-components-color-accent: #{$alert-red};
 		border-color: $alert-red;
 	}

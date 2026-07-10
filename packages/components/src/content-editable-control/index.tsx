@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -43,13 +42,7 @@ function UnforwardedContentEditableControl(
 	return (
 		<BaseControl { ...baseControlProps }>
 			<div
-				// The stable class is a public styling hook for composers
-				// (e.g. the validated wrapper's error treatment); the module
-				// class carries the styles.
-				className={ clsx(
-					'wp-components-content-editable-control',
-					styles.editable
-				) }
+				className={ styles.editable }
 				role="textbox"
 				aria-multiline
 				aria-label={ label }
@@ -81,7 +74,6 @@ function UnforwardedContentEditableControl(
  * through the forwarded ref and native event props (see the richtext DataForm
  * control in `@wordpress/dataviews` for the canonical assembly).
  *
- * @example
  * ```jsx
  * // The rich-text "assembly" lives in the consumer.
  * <ContentEditableControl

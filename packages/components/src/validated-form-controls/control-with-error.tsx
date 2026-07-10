@@ -66,7 +66,6 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		markWhenOptional,
 		customValidity,
 		getValidityTarget,
-		getDescriptionTarget,
 		children,
 	}: {
 		/**
@@ -82,13 +81,6 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		 * A function that returns the actual element on which the validity data should be applied.
 		 */
 		getValidityTarget: () => ValidityTarget | null | undefined;
-		/**
-		 * A function that returns the element that should be described by the
-		 * validity message, when it is not the validity target itself — e.g.
-		 * when validity lives on a hidden delegate input while a different
-		 * element is the one exposed to assistive technology.
-		 */
-		getDescriptionTarget?: () => Element | null | undefined;
 		/**
 		 * The control component to apply validation to.
 		 *
@@ -282,7 +274,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 	// merge with any value the child control sets internally (e.g. from a
 	// `help` prop), rather than competing with it at the props level.
 	useEffect( () => {
-		const target = getDescriptionTarget?.() ?? getValidityTarget();
+		const target = getValidityTarget();
 		if ( ! target ) {
 			return;
 		}
@@ -306,7 +298,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		setDescribedBy( target, !! visibleMessage );
 
 		return () => setDescribedBy( target, false );
-	}, [ visibleMessage, messageId, getValidityTarget, getDescriptionTarget ] );
+	}, [ visibleMessage, messageId, getValidityTarget ] );
 
 	return (
 		<div className={ className } ref={ forwardedRef } onBlur={ onBlur }>
@@ -318,7 +310,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 				),
 				required,
 			} ) }
-			<div aria-live="polite">{ visibleMessage }</div>
+			{ visibleMessage }
 		</div>
 	);
 }
