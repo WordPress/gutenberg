@@ -145,6 +145,44 @@ class Tests_Blocks_RenderBlockCorePostExcerpt extends WP_UnitTestCase {
 			$rendered,
 			'Failed to assert that no trailing space is added when the more text is empty.'
 		);
+
+		// Force an empty excerpt to cover the scenarios where the post has no excerpt.
+		$force_empty_excerpt = static function () {
+			return '';
+		};
+		add_filter( 'get_the_excerpt', $force_empty_excerpt );
+
+		// Empty excerpt + more text: no leading space must precede the more link.
+		$attributes = array(
+			'moreText'          => 'Read More',
+			'showMoreOnNewLine' => false,
+			'excerptLength'     => 55,
+		);
+
+		$rendered = gutenberg_render_block_core_post_excerpt( $attributes, '', $block );
+
+		$this->assertStringContainsString(
+			'wp-block-post-excerpt__excerpt"><a class="wp-block-post-excerpt__more-link"',
+			$rendered,
+			'Failed to assert that no leading space precedes the more link when the excerpt is empty.'
+		);
+
+		// Empty excerpt + no more text: the paragraph must simply be closed.
+		$attributes = array(
+			'moreText'          => '',
+			'showMoreOnNewLine' => false,
+			'excerptLength'     => 55,
+		);
+
+		$rendered = gutenberg_render_block_core_post_excerpt( $attributes, '', $block );
+
+		$this->assertStringContainsString(
+			'<p class="wp-block-post-excerpt__excerpt"></p>',
+			$rendered,
+			'Failed to assert that an empty excerpt with no more text renders an empty paragraph.'
+		);
+
+		remove_filter( 'get_the_excerpt', $force_empty_excerpt );
 	}
 
 	/**
