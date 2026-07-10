@@ -37,17 +37,15 @@ type Story = StoryObj< typeof AlertDialog.Root >;
  * is blocked.
  */
 export const Default: Story = {
-	args: {
-		children: (
-			<>
-				<AlertDialog.Trigger>Move to trash</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					title="Move to trash?"
-					description="This post will be moved to trash. You can restore it later."
-				/>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<AlertDialog.Root>
+			<AlertDialog.Trigger>Move to trash</AlertDialog.Trigger>
+			<AlertDialog.Popup
+				title="Move to trash?"
+				description="This post will be moved to trash. You can restore it later."
+			/>
+		</AlertDialog.Root>
+	),
 };
 
 /**
@@ -55,38 +53,34 @@ export const Default: Story = {
  * The confirm button uses error/danger coloring.
  */
 export const Irreversible: Story = {
-	args: {
-		children: (
-			<>
-				<AlertDialog.Trigger>Delete permanently</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					intent="irreversible"
-					title="Delete permanently?"
-					description="This action cannot be undone. All data will be lost."
-					confirmButtonText="Delete permanently"
-				/>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<AlertDialog.Root>
+			<AlertDialog.Trigger>Delete permanently</AlertDialog.Trigger>
+			<AlertDialog.Popup
+				intent="irreversible"
+				title="Delete permanently?"
+				description="This action cannot be undone. All data will be lost."
+				confirmButtonText="Delete permanently"
+			/>
+		</AlertDialog.Root>
+	),
 };
 
 /**
  * Example with custom button labels for both confirm and cancel buttons.
  */
 export const CustomLabels: Story = {
-	args: {
-		children: (
-			<>
-				<AlertDialog.Trigger>Send feedback</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					title="Send feedback?"
-					description="Your feedback helps us improve. Would you like to send it now?"
-					confirmButtonText="Send feedback"
-					cancelButtonText="Not now"
-				/>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<AlertDialog.Root>
+			<AlertDialog.Trigger>Send feedback</AlertDialog.Trigger>
+			<AlertDialog.Popup
+				title="Send feedback?"
+				description="Your feedback helps us improve. Would you like to send it now?"
+				confirmButtonText="Send feedback"
+				cancelButtonText="Not now"
+			/>
+		</AlertDialog.Root>
+	),
 };
 
 /**
@@ -95,29 +89,27 @@ export const CustomLabels: Story = {
  * accessibility (`aria-describedby`); `children` adds supplementary detail.
  */
 export const WithCustomContent: Story = {
-	args: {
-		children: (
-			<>
-				<AlertDialog.Trigger>Remove pages</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					title="Remove 3 pages?"
-					description="These pages will be moved to trash."
-					confirmButtonText="Delete pages"
+	render: ( {} ) => (
+		<AlertDialog.Root>
+			<AlertDialog.Trigger>Remove pages</AlertDialog.Trigger>
+			<AlertDialog.Popup
+				title="Remove 3 pages?"
+				description="These pages will be moved to trash."
+				confirmButtonText="Delete pages"
+			>
+				<ul
+					style={ {
+						margin: 'var(--wpds-dimension-gap-sm) 0 0',
+						paddingInlineStart: 'var(--wpds-dimension-gap-lg)',
+					} }
 				>
-					<ul
-						style={ {
-							margin: 'var(--wpds-dimension-gap-sm) 0 0',
-							paddingInlineStart: 'var(--wpds-dimension-gap-lg)',
-						} }
-					>
-						<Text render={ <li /> }>About us</Text>
-						<Text render={ <li /> }>Contact</Text>
-						<Text render={ <li /> }>Privacy policy</Text>
-					</ul>
-				</AlertDialog.Popup>
-			</>
-		),
-	},
+					<Text render={ <li /> }>About us</Text>
+					<Text render={ <li /> }>Contact</Text>
+					<Text render={ <li /> }>Privacy policy</Text>
+				</ul>
+			</AlertDialog.Popup>
+		</AlertDialog.Root>
+	),
 };
 
 /**
@@ -139,22 +131,20 @@ export const WithCustomContent: Story = {
  */
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
-	args: {
-		children: (
-			<>
-				<AlertDialog.Trigger>Move to trash</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					title="Move to trash?"
-					description="This post will be moved to trash. You can restore it later."
-					portal={
-						<AlertDialog.Portal
-							style={ { '--wp-ui-dialog-z-index': '9999' } }
-						/>
-					}
-				/>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<AlertDialog.Root>
+			<AlertDialog.Trigger>Move to trash</AlertDialog.Trigger>
+			<AlertDialog.Popup
+				title="Move to trash?"
+				description="This post will be moved to trash. You can restore it later."
+				portal={
+					<AlertDialog.Portal
+						style={ { '--wp-ui-dialog-z-index': '9999' } }
+					/>
+				}
+			/>
+		</AlertDialog.Root>
+	),
 };
 
 const menuPopupStyles: React.CSSProperties = {
@@ -188,7 +178,7 @@ const menuItemStyles: React.CSSProperties = {
  * component (not ready yet).
  */
 export const MenuTrigger: Story = {
-	render: () => {
+	render: ( {} ) => {
 		const [ menuOpen, setMenuOpen ] = useState( false );
 		return (
 			<>
@@ -397,9 +387,11 @@ function ScrollableContent() {
  * independently.
  */
 export const Scrollable: Story = {
-	args: {
-		children: <ScrollableContent />,
-	},
+	render: ( {} ) => (
+		<AlertDialog.Root>
+			<ScrollableContent />
+		</AlertDialog.Root>
+	),
 };
 
 /**

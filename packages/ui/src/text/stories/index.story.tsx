@@ -29,7 +29,7 @@ export const Default: Story = {
  * Use the `render` prop to render a heading element with the appropriate level.
  */
 export const AllVariants: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<Stack
 			direction="column"
 			gap="lg"
@@ -60,7 +60,7 @@ export const AllVariants: Story = {
 };
 
 export const WithRenderProp: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<Stack direction="column" gap="md">
 			<Text variant="heading-2xl" render={ <h1 /> }>
 				Page Title

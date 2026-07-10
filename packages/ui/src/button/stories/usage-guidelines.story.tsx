@@ -26,7 +26,7 @@ type Story = StoryObj;
  * `<button>` and support loading and pressed states.
  */
 export const UseButtonForActions: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<Tooltip.Provider delay={ 0 }>
 			<Stack direction="row" gap="sm" wrap="wrap" align="center">
 				<Button type="submit">Save changes</Button>
@@ -49,7 +49,7 @@ export const UseButtonForActions: Story = {
  * the user is going more clearly than a button-shaped control.
  */
 export const UseLinkForInlineNavigation: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<Text variant="body-md" render={ <p /> }>
 			{ createInterpolateElement(
 				'Read the <DocumentationLink /> for more details, or <ExternalLink />.',
@@ -78,7 +78,7 @@ export const UseLinkForInlineNavigation: Story = {
  * styling set clearer expectations than a button-shaped control.
  */
 export const UseLinkButtonForNavigation: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<Stack direction="column" gap="md">
 			<Text variant="body-md" render={ <p /> }>
 				Standalone navigation calls to action can use `LinkButton` when

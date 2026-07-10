@@ -52,29 +52,29 @@ type Story = StoryObj< typeof Autocomplete.Root >;
 export const Default: Story = {
 	args: {
 		items: URLS,
-		children: (
-			<>
-				<Autocomplete.Input placeholder="Enter a URL" type="url" />
-				<Autocomplete.Popup>
-					<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
-					<Autocomplete.List>
-						<Autocomplete.ListBody>
-							<Autocomplete.Collection>
-								{ ( item: FixtureItem ) => (
-									<Autocomplete.Item
-										key={ item.id }
-										value={ item }
-									>
-										{ item.value }
-									</Autocomplete.Item>
-								) }
-							</Autocomplete.Collection>
-						</Autocomplete.ListBody>
-					</Autocomplete.List>
-				</Autocomplete.Popup>
-			</>
-		),
 	},
+	render: ( { items = URLS } ) => (
+		<Autocomplete.Root items={ items }>
+			<Autocomplete.Input placeholder="Enter a URL" type="url" />
+			<Autocomplete.Popup>
+				<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( item: FixtureItem ) => (
+								<Autocomplete.Item
+									key={ item.id }
+									value={ item }
+								>
+									{ item.value }
+								</Autocomplete.Item>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>
+		</Autocomplete.Root>
+	),
 };
 
 /**
@@ -226,55 +226,55 @@ export const Inline: Story = {
 export const WithSearchIconAndClearButton: Story = {
 	args: {
 		items: URLS,
-		children: (
-			<>
-				<Autocomplete.InputGroup>
-					<Autocomplete.Input
-						placeholder="Search URLs"
-						type="url"
-						render={
-							<Input
-								prefix={
-									<InputLayout.Slot padding="minimal">
-										<Icon icon={ search } />
-									</InputLayout.Slot>
-								}
-								suffix={
-									<InputLayout.Slot padding="minimal">
-										<Autocomplete.Clear />
-									</InputLayout.Slot>
-								}
-							/>
-						}
-					/>
-				</Autocomplete.InputGroup>
-				<Autocomplete.Popup>
-					<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
-					<Autocomplete.List>
-						<Autocomplete.ListBody>
-							<Autocomplete.Collection>
-								{ ( item: FixtureItem ) => (
-									<Autocomplete.Item
-										key={ item.id }
-										value={ item }
-									>
-										{ item.value }
-									</Autocomplete.Item>
-								) }
-							</Autocomplete.Collection>
-						</Autocomplete.ListBody>
-					</Autocomplete.List>
-				</Autocomplete.Popup>
-			</>
-		),
 	},
+	render: ( { items = URLS } ) => (
+		<Autocomplete.Root items={ items }>
+			<Autocomplete.InputGroup>
+				<Autocomplete.Input
+					placeholder="Search URLs"
+					type="url"
+					render={
+						<Input
+							prefix={
+								<InputLayout.Slot padding="minimal">
+									<Icon icon={ search } />
+								</InputLayout.Slot>
+							}
+							suffix={
+								<InputLayout.Slot padding="minimal">
+									<Autocomplete.Clear />
+								</InputLayout.Slot>
+							}
+						/>
+					}
+				/>
+			</Autocomplete.InputGroup>
+			<Autocomplete.Popup>
+				<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( item: FixtureItem ) => (
+								<Autocomplete.Item
+									key={ item.id }
+									value={ item }
+								>
+									{ item.value }
+								</Autocomplete.Item>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>
+		</Autocomplete.Root>
+	),
 };
 
 /**
  * Experimental: Textarea with inline autocomplete triggered by `@`.
  */
 export const TextareaInlineAutocomplete: Story = {
-	render: function Template() {
+	render: function Template( {} ) {
 		const textareaRef = useRef< HTMLTextAreaElement >( null );
 		const [ value, setValue ] = useState( '' );
 		const [ open, setOpen ] = useState( false );
@@ -424,34 +424,34 @@ export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
 	args: {
 		items: URLS,
-		children: (
-			<>
-				<Autocomplete.Input placeholder="Enter a URL" type="url" />
-				<Autocomplete.Popup
-					portal={
-						<Autocomplete.Portal
-							style={ { '--wp-ui-autocomplete-z-index': '9999' } }
-						/>
-					}
-				>
-					<Autocomplete.List>
-						<Autocomplete.ListBody>
-							<Autocomplete.Collection>
-								{ ( item: FixtureItem ) => (
-									<Autocomplete.Item
-										key={ item.id }
-										value={ item }
-									>
-										{ item.value }
-									</Autocomplete.Item>
-								) }
-							</Autocomplete.Collection>
-						</Autocomplete.ListBody>
-					</Autocomplete.List>
-				</Autocomplete.Popup>
-			</>
-		),
 	},
+	render: ( { items = URLS } ) => (
+		<Autocomplete.Root items={ items }>
+			<Autocomplete.Input placeholder="Enter a URL" type="url" />
+			<Autocomplete.Popup
+				portal={
+					<Autocomplete.Portal
+						style={ { '--wp-ui-autocomplete-z-index': '9999' } }
+					/>
+				}
+			>
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( item: FixtureItem ) => (
+								<Autocomplete.Item
+									key={ item.id }
+									value={ item }
+								>
+									{ item.value }
+								</Autocomplete.Item>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>
+		</Autocomplete.Root>
+	),
 };
 
 /**
@@ -461,39 +461,39 @@ export const WithCustomZIndex: Story = {
 export const Grouped: Story = {
 	args: {
 		items: GROUPED_COMMANDS,
-		children: (
-			<>
-				<Autocomplete.Input placeholder="Type a command" />
-				<Autocomplete.Popup>
-					<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
-					<Autocomplete.List>
-						<Autocomplete.ListBody>
-							<Autocomplete.Collection>
-								{ ( group: FixtureGroup ) => (
-									<Autocomplete.Group
-										key={ group.label }
-										items={ group.items }
-									>
-										<Autocomplete.GroupLabel>
-											{ group.label }
-										</Autocomplete.GroupLabel>
-										<Autocomplete.Collection>
-											{ ( item: FixtureItem ) => (
-												<Autocomplete.Item
-													key={ item.id }
-													value={ item }
-												>
-													{ item.value }
-												</Autocomplete.Item>
-											) }
-										</Autocomplete.Collection>
-									</Autocomplete.Group>
-								) }
-							</Autocomplete.Collection>
-						</Autocomplete.ListBody>
-					</Autocomplete.List>
-				</Autocomplete.Popup>
-			</>
-		),
 	},
+	render: ( { items = GROUPED_COMMANDS } ) => (
+		<Autocomplete.Root items={ items }>
+			<Autocomplete.Input placeholder="Type a command" />
+			<Autocomplete.Popup>
+				<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( group: FixtureGroup ) => (
+								<Autocomplete.Group
+									key={ group.label }
+									items={ group.items }
+								>
+									<Autocomplete.GroupLabel>
+										{ group.label }
+									</Autocomplete.GroupLabel>
+									<Autocomplete.Collection>
+										{ ( item: FixtureItem ) => (
+											<Autocomplete.Item
+												key={ item.id }
+												value={ item }
+											>
+												{ item.value }
+											</Autocomplete.Item>
+										) }
+									</Autocomplete.Collection>
+								</Autocomplete.Group>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>
+		</Autocomplete.Root>
+	),
 };

@@ -154,15 +154,12 @@ export const AllTonesAndVariants: Story = {
 
 export const WithIcon: Story = {
 	...Default,
-	args: {
-		...Default.args,
-		children: (
-			<>
-				<Button.Icon icon={ wordpress } />
-				Button
-			</>
-		),
-	},
+	render: ( { children: _children, ...args } ) => (
+		<Button { ...args }>
+			<Button.Icon icon={ wordpress } />
+			Button
+		</Button>
+	),
 };
 
 export const Loading: Story = {

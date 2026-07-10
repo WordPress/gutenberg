@@ -22,45 +22,37 @@ export default meta;
 type Story = StoryObj< typeof Collapsible.Root >;
 
 export const Default: Story = {
-	args: {
-		children: (
-			<>
-				<Collapsible.Trigger>Toggle</Collapsible.Trigger>
-				<Collapsible.Panel>
-					<p>Collapsible content here.</p>
-				</Collapsible.Panel>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Collapsible.Root>
+			<Collapsible.Trigger>Toggle</Collapsible.Trigger>
+			<Collapsible.Panel>
+				<p>Collapsible content here.</p>
+			</Collapsible.Panel>
+		</Collapsible.Root>
+	),
 };
 
 export const DefaultOpen: Story = {
 	argTypes: { open: { control: false } },
-	args: {
-		defaultOpen: true,
-		children: (
-			<>
-				<Collapsible.Trigger>Toggle</Collapsible.Trigger>
-				<Collapsible.Panel>
-					<p>This panel is open by default.</p>
-				</Collapsible.Panel>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Collapsible.Root defaultOpen>
+			<Collapsible.Trigger>Toggle</Collapsible.Trigger>
+			<Collapsible.Panel>
+				<p>This panel is open by default.</p>
+			</Collapsible.Panel>
+		</Collapsible.Root>
+	),
 };
 
 export const Disabled: Story = {
-	args: {
-		disabled: true,
-		children: (
-			<>
-				<Collapsible.Trigger>Toggle (disabled)</Collapsible.Trigger>
-				<Collapsible.Panel>
-					<p>This content cannot be toggled.</p>
-				</Collapsible.Panel>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Collapsible.Root disabled>
+			<Collapsible.Trigger>Toggle (disabled)</Collapsible.Trigger>
+			<Collapsible.Panel>
+				<p>This content cannot be toggled.</p>
+			</Collapsible.Panel>
+		</Collapsible.Root>
+	),
 };
 
 /**
@@ -71,27 +63,25 @@ export const Disabled: Story = {
  * match — improving discoverability without sacrificing the collapsed layout.
  */
 export const HiddenUntilFound: Story = {
-	render: function HiddenUntilFound() {
-		return (
-			<div>
-				<p>
-					Use the browser&apos;s find-in-page (Ctrl/Cmd+F) to search
-					for &quot;hidden treasure&quot;. The collapsed panel will
-					automatically expand to reveal the match.
-				</p>
-				<Collapsible.Root>
-					<Collapsible.Trigger>Expand to reveal</Collapsible.Trigger>
-					<Collapsible.Panel hiddenUntilFound>
-						<p>
-							This is the hidden treasure that can be found via
-							the browser&apos;s built-in page search even while
-							the panel is collapsed.
-						</p>
-					</Collapsible.Panel>
-				</Collapsible.Root>
-			</div>
-		);
-	},
+	render: ( {} ) => (
+		<div>
+			<p>
+				Use the browser&apos;s find-in-page (Ctrl/Cmd+F) to search for
+				&quot;hidden treasure&quot;. The collapsed panel will
+				automatically expand to reveal the match.
+			</p>
+			<Collapsible.Root>
+				<Collapsible.Trigger>Expand to reveal</Collapsible.Trigger>
+				<Collapsible.Panel hiddenUntilFound>
+					<p>
+						This is the hidden treasure that can be found via the
+						browser&apos;s built-in page search even while the panel
+						is collapsed.
+					</p>
+				</Collapsible.Panel>
+			</Collapsible.Root>
+		</div>
+	),
 };
 
 export const Controlled: Story = {
@@ -99,7 +89,7 @@ export const Controlled: Story = {
 		open: { control: false },
 		defaultOpen: { control: false },
 	},
-	render: function Controlled() {
+	render: function Controlled( {} ) {
 		const [ open, setOpen ] = useState( false );
 		return (
 			<Collapsible.Root open={ open } onOpenChange={ setOpen }>

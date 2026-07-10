@@ -175,21 +175,25 @@ export const WithCustomTriggerAndItems: Story = {
 		label: 'Label',
 		description: 'This is the description.',
 		triggerContent: ( item ) => <User user={ item } />,
-		children: (
-			<>
-				{ userOptions.map( ( item ) => (
-					<SelectControl.Item
-						key={ item.value }
-						value={ item }
-						label={ item.label }
-					>
-						<User user={ item } />
-					</SelectControl.Item>
-				) ) }
-			</>
-		),
 		defaultValue: userOptions[ 0 ],
 	},
+	render: ( { items = userOptions, triggerContent, ...args } ) => (
+		<SelectControl
+			{ ...args }
+			items={ items }
+			triggerContent={ triggerContent }
+		>
+			{ items.map( ( item ) => (
+				<SelectControl.Item
+					key={ item.value }
+					value={ item }
+					label={ item.label }
+				>
+					<User user={ item } />
+				</SelectControl.Item>
+			) ) }
+		</SelectControl>
+	),
 };
 
 /**
@@ -202,19 +206,19 @@ export const WithCustomTriggerAndItems: Story = {
 export const WithItemsArrayAndPartialCustomization: Story = {
 	args: {
 		...Default.args,
-		children: (
-			<>
-				{ Default.args?.items?.map( ( item ) => (
-					<SelectControl.Item
-						key={ item.value ?? 'null' }
-						value={ item }
-						label={ item.label }
-						disabled={ item.disabled }
-					>
-						✨ { item.label }
-					</SelectControl.Item>
-				) ) }
-			</>
-		),
 	},
+	render: ( { items = defaultItems, ...args } ) => (
+		<SelectControl { ...args } items={ items }>
+			{ items.map( ( item ) => (
+				<SelectControl.Item
+					key={ item.value ?? 'null' }
+					value={ item }
+					label={ item.label }
+					disabled={ item.disabled }
+				>
+					✨ { item.label }
+				</SelectControl.Item>
+			) ) }
+		</SelectControl>
+	),
 };

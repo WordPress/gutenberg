@@ -50,26 +50,22 @@ type Story = StoryObj< typeof CollapsibleCard.Root >;
  * A collapsible card that is open by default.
  */
 export const Default: Story = {
-	args: {
-		children: (
-			<>
-				<CollapsibleCard.Header>
-					<Card.Title>
-						Collapsible card (closed by default)
-					</Card.Title>
-				</CollapsibleCard.Header>
-				<CollapsibleCard.Content>
-					<Text>
-						This is the collapsible content area. It can contain any
-						elements, just like a regular Card.Content.
-					</Text>
-					<Text>
-						When collapsed, only the header and chevron are visible.
-					</Text>
-				</CollapsibleCard.Content>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<CollapsibleCard.Root>
+			<CollapsibleCard.Header>
+				<Card.Title>Collapsible card (closed by default)</Card.Title>
+			</CollapsibleCard.Header>
+			<CollapsibleCard.Content>
+				<Text>
+					This is the collapsible content area. It can contain any
+					elements, just like a regular Card.Content.
+				</Text>
+				<Text>
+					When collapsed, only the header and chevron are visible.
+				</Text>
+			</CollapsibleCard.Content>
+		</CollapsibleCard.Root>
+	),
 };
 
 /**
@@ -79,40 +75,32 @@ export const InitiallyOpened: Story = {
 	// `defaultOpen` (uncontrolled) and `open` (controlled) should not be
 	// used together — disable the `open` control to avoid confusion.
 	argTypes: { open: { control: false } },
-	args: {
-		...Default.args,
-		defaultOpen: true,
-		children: (
-			<>
-				<CollapsibleCard.Header>
-					<Card.Title>Collapsed by default</Card.Title>
-				</CollapsibleCard.Header>
-				<CollapsibleCard.Content>
-					<Text>This content was hidden until you expanded it.</Text>
-				</CollapsibleCard.Content>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<CollapsibleCard.Root defaultOpen>
+			<CollapsibleCard.Header>
+				<Card.Title>Collapsed by default</Card.Title>
+			</CollapsibleCard.Header>
+			<CollapsibleCard.Content>
+				<Text>This content was hidden until you expanded it.</Text>
+			</CollapsibleCard.Content>
+		</CollapsibleCard.Root>
+	),
 };
 
 /**
  * A disabled collapsible card cannot be toggled by the user.
  */
 export const Disabled: Story = {
-	args: {
-		...Default.args,
-		disabled: true,
-		children: (
-			<>
-				<CollapsibleCard.Header>
-					<Card.Title>Disabled card</Card.Title>
-				</CollapsibleCard.Header>
-				<CollapsibleCard.Content>
-					<Text>The header is not interactive when disabled.</Text>
-				</CollapsibleCard.Content>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<CollapsibleCard.Root disabled>
+			<CollapsibleCard.Header>
+				<Card.Title>Disabled card</Card.Title>
+			</CollapsibleCard.Header>
+			<CollapsibleCard.Content>
+				<Text>The header is not interactive when disabled.</Text>
+			</CollapsibleCard.Content>
+		</CollapsibleCard.Root>
+	),
 };
 
 /**
@@ -121,7 +109,7 @@ export const Disabled: Story = {
  */
 export const Stacked: Story = {
 	parameters: { controls: { disable: true } },
-	render: () => (
+	render: ( {} ) => (
 		<div
 			style={ {
 				display: 'flex',
@@ -175,7 +163,7 @@ export const Stacked: Story = {
  */
 export const WithHeadingElement: Story = {
 	parameters: { controls: { disable: true } },
-	render: () => (
+	render: ( {} ) => (
 		<div
 			style={ {
 				display: 'flex',
@@ -275,7 +263,6 @@ export const ComparedToCard: Story = {
 	// used together — disable the `open` control to avoid confusion.
 	argTypes: { open: { control: false } },
 	args: {
-		...Default.args,
 		defaultOpen: true,
 	},
 	render: ( { open, defaultOpen, onOpenChange, disabled, ...restArgs } ) => (
@@ -325,27 +312,24 @@ export const ComparedToCard: Story = {
  */
 export const FullBleedCoverWithHeader: Story = {
 	argTypes: { open: { control: false } },
-	args: {
-		defaultOpen: true,
-		children: (
-			<>
-				<CollapsibleCard.Header>
-					<Card.Title>Card title</Card.Title>
-				</CollapsibleCard.Header>
-				<CollapsibleCard.Content>
-					<Card.FullBleed>
-						<div
-							style={ {
-								height: 180,
-								background:
-									'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-							} }
-						/>
-					</Card.FullBleed>
-				</CollapsibleCard.Content>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<CollapsibleCard.Root defaultOpen>
+			<CollapsibleCard.Header>
+				<Card.Title>Card title</Card.Title>
+			</CollapsibleCard.Header>
+			<CollapsibleCard.Content>
+				<Card.FullBleed>
+					<div
+						style={ {
+							height: 180,
+							background:
+								'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+						} }
+					/>
+				</Card.FullBleed>
+			</CollapsibleCard.Content>
+		</CollapsibleCard.Root>
+	),
 };
 
 /**
@@ -355,28 +339,25 @@ export const FullBleedCoverWithHeader: Story = {
  */
 export const WithFullBleed: Story = {
 	argTypes: { open: { control: false } },
-	args: {
-		defaultOpen: true,
-		children: (
-			<>
-				<CollapsibleCard.Header>
-					<Card.Title>Featured image</Card.Title>
-				</CollapsibleCard.Header>
-				<CollapsibleCard.Content
-					render={ <Stack direction="column" gap="lg" /> }
-				>
-					<Card.FullBleed>
-						<div
-							style={ {
-								height: 160,
-								background:
-									'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-							} }
-						/>
-					</Card.FullBleed>
-					<Text>Content below the full-bleed area.</Text>
-				</CollapsibleCard.Content>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<CollapsibleCard.Root defaultOpen>
+			<CollapsibleCard.Header>
+				<Card.Title>Featured image</Card.Title>
+			</CollapsibleCard.Header>
+			<CollapsibleCard.Content
+				render={ <Stack direction="column" gap="lg" /> }
+			>
+				<Card.FullBleed>
+					<div
+						style={ {
+							height: 160,
+							background:
+								'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+						} }
+					/>
+				</Card.FullBleed>
+				<Text>Content below the full-bleed area.</Text>
+			</CollapsibleCard.Content>
+		</CollapsibleCard.Root>
+	),
 };

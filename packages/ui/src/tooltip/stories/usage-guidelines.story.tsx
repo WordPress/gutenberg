@@ -27,7 +27,7 @@ type Story = StoryObj;
  * must have its own accessible name via `aria-label`.
  */
 export const RecommendedUsage: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<Tooltip.Provider delay={ 0 }>
 			<div style={ { display: 'flex', gap: '0.25rem' } }>
 				<Tooltip.Root>
@@ -61,7 +61,7 @@ export const RecommendedUsage: Story = {
  * to touch and screen reader users.
  */
 export const InfotipWithPopover: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<div
 			style={ {
 				display: 'flex',
@@ -109,7 +109,7 @@ export const InfotipWithPopover: Story = {
  * making it the easiest way to provide a tooltip for icon-only actions.
  */
 export const IconButtonWithTooltip: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<div style={ { display: 'flex', gap: '0.25rem' } }>
 			<IconButton icon={ formatBold } label="Bold" size="compact" />
 			<IconButton icon={ formatItalic } label="Italic" size="compact" />

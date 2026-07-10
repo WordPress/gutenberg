@@ -36,29 +36,22 @@ export default meta;
 type Story = StoryObj< typeof Popover.Root >;
 
 export const Default: Story = {
-	argTypes: {
-		children: { control: { type: 'text' } },
-	},
-	args: {
-		children: (
-			<>
-				<Popover.Trigger>Open Popover</Popover.Trigger>
-				<Popover.Popup>
-					<Popover.Arrow />
-					<Popover.Title
-						style={ {
-							marginBottom: 'var(--wpds-dimension-gap-xs)',
-						} }
-					>
-						Popover title
-					</Popover.Title>
-					<Popover.Description>
-						Popover description
-					</Popover.Description>
-				</Popover.Popup>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Popover.Root>
+			<Popover.Trigger>Open Popover</Popover.Trigger>
+			<Popover.Popup>
+				<Popover.Arrow />
+				<Popover.Title
+					style={ {
+						marginBottom: 'var(--wpds-dimension-gap-xs)',
+					} }
+				>
+					Popover title
+				</Popover.Title>
+				<Popover.Description>Popover description</Popover.Description>
+			</Popover.Popup>
+		</Popover.Root>
+	),
 };
 
 /**
@@ -66,25 +59,21 @@ export const Default: Story = {
  * from the popup content when an arrow indicator is not desired.
  */
 export const NoArrow: Story = {
-	args: {
-		children: (
-			<>
-				<Popover.Trigger>Open Popover</Popover.Trigger>
-				<Popover.Popup>
-					<Popover.Title
-						style={ {
-							marginBottom: 'var(--wpds-dimension-gap-xs)',
-						} }
-					>
-						Popover title
-					</Popover.Title>
-					<Popover.Description>
-						Popover description
-					</Popover.Description>
-				</Popover.Popup>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Popover.Root>
+			<Popover.Trigger>Open Popover</Popover.Trigger>
+			<Popover.Popup>
+				<Popover.Title
+					style={ {
+						marginBottom: 'var(--wpds-dimension-gap-xs)',
+					} }
+				>
+					Popover title
+				</Popover.Title>
+				<Popover.Description>Popover description</Popover.Description>
+			</Popover.Popup>
+		</Popover.Root>
+	),
 };
 
 /**
@@ -95,7 +84,7 @@ export const NoArrow: Story = {
  */
 export const Positioning: Story = {
 	parameters: { controls: { disable: true } },
-	render: function Render() {
+	render: function Render( {} ) {
 		const sides = [ 'top', 'right', 'bottom', 'left' ] as const;
 		const aligns = [ 'start', 'center', 'end' ] as const;
 
@@ -150,41 +139,39 @@ export const Positioning: Story = {
  * close action — matching the Dialog close-icon pattern.
  */
 export const WithCloseButton: Story = {
-	args: {
-		children: (
-			<>
-				<Popover.Trigger>Settings</Popover.Trigger>
-				<Popover.Popup>
-					<Popover.Arrow />
-					<div
-						style={ {
-							display: 'flex',
-							justifyContent: 'space-between',
-							alignItems: 'center',
-							marginBottom: 'var(--wpds-dimension-gap-sm)',
-						} }
-					>
-						<Popover.Title>Settings</Popover.Title>
-						<Popover.Close
-							render={
-								<IconButton
-									variant="minimal"
-									size="compact"
-									tone="neutral"
-									icon={ close }
-									label="Close"
-								/>
-							}
-						/>
-					</div>
-					<Popover.Description>
-						Configure your notification preferences and display
-						settings.
-					</Popover.Description>
-				</Popover.Popup>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Popover.Root>
+			<Popover.Trigger>Settings</Popover.Trigger>
+			<Popover.Popup>
+				<Popover.Arrow />
+				<div
+					style={ {
+						display: 'flex',
+						justifyContent: 'space-between',
+						alignItems: 'center',
+						marginBottom: 'var(--wpds-dimension-gap-sm)',
+					} }
+				>
+					<Popover.Title>Settings</Popover.Title>
+					<Popover.Close
+						render={
+							<IconButton
+								variant="minimal"
+								size="compact"
+								tone="neutral"
+								icon={ close }
+								label="Close"
+							/>
+						}
+					/>
+				</div>
+				<Popover.Description>
+					Configure your notification preferences and display
+					settings.
+				</Popover.Description>
+			</Popover.Popup>
+		</Popover.Root>
+	),
 };
 
 /**
@@ -201,27 +188,7 @@ export const Controlled: Story = {
 		onOpenChange: { control: false },
 		defaultOpen: { control: false },
 	},
-	args: {
-		children: (
-			<>
-				<Popover.Trigger>Toggle Popover</Popover.Trigger>
-				<Popover.Popup>
-					<Popover.Arrow />
-					<Popover.Title
-						style={ {
-							marginBottom: 'var(--wpds-dimension-gap-xs)',
-						} }
-					>
-						Controlled Popover
-					</Popover.Title>
-					<Popover.Description>
-						This popover is controlled by external state.
-					</Popover.Description>
-				</Popover.Popup>
-			</>
-		),
-	},
-	render: function Render( args ) {
+	render: function Render( {} ) {
 		const [ isOpen, setIsOpen ] = useState( false );
 		const checkboxId = useId();
 		const checkboxRef = useRef< HTMLInputElement >( null );
@@ -236,7 +203,6 @@ export const Controlled: Story = {
 				} }
 			>
 				<Popover.Root
-					{ ...args }
 					open={ isOpen }
 					onOpenChange={ ( nextOpen, eventDetails ) => {
 						if (
@@ -256,7 +222,22 @@ export const Controlled: Story = {
 
 						setIsOpen( nextOpen );
 					} }
-				/>
+				>
+					<Popover.Trigger>Toggle Popover</Popover.Trigger>
+					<Popover.Popup>
+						<Popover.Arrow />
+						<Popover.Title
+							style={ {
+								marginBottom: 'var(--wpds-dimension-gap-xs)',
+							} }
+						>
+							Controlled Popover
+						</Popover.Title>
+						<Popover.Description>
+							This popover is controlled by external state.
+						</Popover.Description>
+					</Popover.Popup>
+				</Popover.Root>
 
 				<label htmlFor={ checkboxId } ref={ labelRef }>
 					<input
@@ -288,86 +269,83 @@ export const Controlled: Story = {
  */
 export const Modal: Story = {
 	argTypes: { modal: { control: false } },
-	args: {
-		modal: true,
-		children: (
-			<>
-				<Popover.Trigger>Edit Settings</Popover.Trigger>
-				<Popover.Popup backdrop>
-					<Popover.Arrow />
-					<Popover.Title
-						style={ {
-							marginBottom: 'var(--wpds-dimension-gap-xs)',
-						} }
-					>
-						Settings
-					</Popover.Title>
-					<form
+	render: ( {} ) => (
+		<Popover.Root modal>
+			<Popover.Trigger>Edit Settings</Popover.Trigger>
+			<Popover.Popup backdrop>
+				<Popover.Arrow />
+				<Popover.Title
+					style={ {
+						marginBottom: 'var(--wpds-dimension-gap-xs)',
+					} }
+				>
+					Settings
+				</Popover.Title>
+				<form
+					style={ {
+						display: 'flex',
+						flexDirection: 'column',
+						gap: 'var(--wpds-dimension-gap-sm)',
+						marginTop: 'var(--wpds-dimension-gap-sm)',
+					} }
+					onSubmit={ ( e ) => e.preventDefault() }
+				>
+					<label
+						htmlFor="popover-test-name-id"
 						style={ {
 							display: 'flex',
 							flexDirection: 'column',
-							gap: 'var(--wpds-dimension-gap-sm)',
-							marginTop: 'var(--wpds-dimension-gap-sm)',
+							gap: 'var(--wpds-dimension-gap-xs)',
+							fontSize: 'inherit',
 						} }
-						onSubmit={ ( e ) => e.preventDefault() }
 					>
-						<label
-							htmlFor="popover-test-name-id"
+						Name
+						<input
+							// eslint-disable-next-line no-restricted-syntax
+							id="popover-test-name-id"
+							type="text"
+							placeholder="Enter your name"
+						/>
+					</label>
+					<label
+						htmlFor="popover-test-email-id"
+						style={ {
+							display: 'flex',
+							flexDirection: 'column',
+							gap: 'var(--wpds-dimension-gap-xs)',
+							fontSize: 'inherit',
+						} }
+					>
+						Email
+						<input
+							// eslint-disable-next-line no-restricted-syntax
+							id="popover-test-email-id"
+							type="email"
+							placeholder="Enter your email"
+						/>
+					</label>
+					<div
+						style={ {
+							display: 'flex',
+							justifyContent: 'flex-end',
+							gap: 'var(--wpds-dimension-gap-sm)',
+							marginTop: 'var(--wpds-dimension-gap-xs)',
+						} }
+					>
+						<Popover.Close
 							style={ {
-								display: 'flex',
-								flexDirection: 'column',
-								gap: 'var(--wpds-dimension-gap-xs)',
-								fontSize: 'inherit',
+								all: 'unset',
+								cursor: 'pointer',
 							} }
 						>
-							Name
-							<input
-								// eslint-disable-next-line no-restricted-syntax
-								id="popover-test-name-id"
-								type="text"
-								placeholder="Enter your name"
-							/>
-						</label>
-						<label
-							htmlFor="popover-test-email-id"
-							style={ {
-								display: 'flex',
-								flexDirection: 'column',
-								gap: 'var(--wpds-dimension-gap-xs)',
-								fontSize: 'inherit',
-							} }
-						>
-							Email
-							<input
-								// eslint-disable-next-line no-restricted-syntax
-								id="popover-test-email-id"
-								type="email"
-								placeholder="Enter your email"
-							/>
-						</label>
-						<div
-							style={ {
-								display: 'flex',
-								justifyContent: 'flex-end',
-								gap: 'var(--wpds-dimension-gap-sm)',
-								marginTop: 'var(--wpds-dimension-gap-xs)',
-							} }
-						>
-							<Popover.Close
-								style={ {
-									all: 'unset',
-									cursor: 'pointer',
-								} }
-							>
-								Cancel
-							</Popover.Close>
-							<button type="submit">Save</button>
-						</div>
-					</form>
-				</Popover.Popup>
-			</>
-		),
-	},
+							Cancel
+						</Popover.Close>
+						<button type="submit">Save</button>
+					</div>
+				</form>
+			</Popover.Popup>
+		</Popover.Root>
+	),
 };
 
 /**
@@ -375,26 +353,24 @@ export const Modal: Story = {
  * making it a blank positioning container for fully custom content.
  */
 export const Unstyled: Story = {
-	args: {
-		children: (
-			<>
-				<Popover.Trigger>Open Unstyled</Popover.Trigger>
-				<Popover.Popup variant="unstyled">
-					<Popover.Title
-						style={ {
-							marginBottom: 'var(--wpds-dimension-gap-xs)',
-						} }
-					>
-						Custom Styled
-					</Popover.Title>
-					<Popover.Description>
-						This popup has no default styling — the consumer
-						controls all visual appearance.
-					</Popover.Description>
-				</Popover.Popup>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Popover.Root>
+			<Popover.Trigger>Open Unstyled</Popover.Trigger>
+			<Popover.Popup variant="unstyled">
+				<Popover.Title
+					style={ {
+						marginBottom: 'var(--wpds-dimension-gap-xs)',
+					} }
+				>
+					Custom Styled
+				</Popover.Title>
+				<Popover.Description>
+					This popup has no default styling — the consumer controls
+					all visual appearance.
+				</Popover.Description>
+			</Popover.Popup>
+		</Popover.Root>
+	),
 };
 
 /**
@@ -406,15 +382,14 @@ export const Unstyled: Story = {
  * the trigger element in place.
  */
 export const OverlayPlacement: Story = {
-	args: { defaultOpen: true },
 	argTypes: { defaultOpen: { control: false } },
-	render: function Render( { children: _children, ...args } ) {
+	render: function Render( {} ) {
 		const [ popupRef, popupSize ] = useMeasure< HTMLDivElement >();
 		const [ triggerRef, triggerSize ] = useMeasure< HTMLButtonElement >();
 
 		return (
 			<div style={ { padding: '4rem', textAlign: 'center' } }>
-				<Popover.Root { ...args }>
+				<Popover.Root defaultOpen>
 					<Popover.Trigger ref={ triggerRef }>
 						Trigger (covered by popover)
 					</Popover.Trigger>
@@ -470,7 +445,7 @@ export const OverlayPlacement: Story = {
  */
 export const Inline: Story = {
 	parameters: { controls: { disable: true } },
-	render: function Render() {
+	render: function Render( {} ) {
 		const inlineContainerRef = useRef< HTMLSpanElement >( null );
 
 		return (
@@ -522,7 +497,7 @@ export const Inline: Story = {
  */
 export const CollisionAvoidance: Story = {
 	parameters: { controls: { disable: true } },
-	render: function Render() {
+	render: function Render( {} ) {
 		const [ boundary, setBoundary ] = useState< HTMLElement | null >(
 			null
 		);
@@ -614,9 +589,8 @@ export const CollisionAvoidance: Story = {
  * position across document boundaries.
  */
 export const CrossIframe: Story = {
-	args: { defaultOpen: true },
 	argTypes: { defaultOpen: { control: false } },
-	render: function Render( { children: _children, ...args } ) {
+	render: function Render( {} ) {
 		const portalContainerRef = useRef< HTMLDivElement >( null );
 		const [ iframeBoundary, setIframeBoundary ] =
 			useState< HTMLIFrameElement | null >( null );
@@ -646,7 +620,7 @@ export const CrossIframe: Story = {
 								marginInline: 'auto',
 							} }
 						>
-							<Popover.Root { ...args }>
+							<Popover.Root defaultOpen>
 								<Popover.Trigger
 									style={ {
 										padding: 8,
@@ -714,34 +688,32 @@ export const CrossIframe: Story = {
  */
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
-	args: {
-		children: (
-			<>
-				<Popover.Trigger>Open Popover</Popover.Trigger>
-				<Popover.Popup
-					portal={
-						<Popover.Portal
-							style={ { '--wp-ui-popover-z-index': '9999' } }
-						/>
-					}
+	render: ( {} ) => (
+		<Popover.Root>
+			<Popover.Trigger>Open Popover</Popover.Trigger>
+			<Popover.Popup
+				portal={
+					<Popover.Portal
+						style={ { '--wp-ui-popover-z-index': '9999' } }
+					/>
+				}
+			>
+				<Popover.Arrow />
+				<Popover.Title
+					style={ {
+						marginBottom: 'var(--wpds-dimension-gap-xs)',
+					} }
 				>
-					<Popover.Arrow />
-					<Popover.Title
-						style={ {
-							marginBottom: 'var(--wpds-dimension-gap-xs)',
-						} }
-					>
-						Custom z-index
-					</Popover.Title>
-					<Popover.Description>
-						This popover renders at `z-index: 9999` via the
-						`--wp-ui-popover-z-index` CSS custom property, set on
-						`Popover.Portal` through the `portal` prop.
-					</Popover.Description>
-				</Popover.Popup>
-			</>
-		),
-	},
+					Custom z-index
+				</Popover.Title>
+				<Popover.Description>
+					This popover renders at `z-index: 9999` via the
+					`--wp-ui-popover-z-index` CSS custom property, set on
+					`Popover.Portal` through the `portal` prop.
+				</Popover.Description>
+			</Popover.Popup>
+		</Popover.Root>
+	),
 };
 
 /**
@@ -760,7 +732,7 @@ export const WithCustomZIndex: Story = {
  */
 export const Anchor: Story = {
 	parameters: { controls: { disable: true } },
-	render: function Render() {
+	render: function Render( {} ) {
 		const [ elementAnchor, setElementAnchor ] =
 			useState< HTMLElement | null >( null );
 		const refAnchor = useRef< HTMLDivElement >( null );
@@ -909,33 +881,31 @@ export const Anchor: Story = {
  * becomes widespread.
  */
 export const ToolbarVariant: Story = {
-	args: {
-		children: (
-			<>
-				<Popover.Trigger>Open Toolbar</Popover.Trigger>
-				<Popover.Popup
-					variant="unstyled"
-					style={ {
-						display: 'flex',
-						gap: 'var(--wpds-dimension-gap-xs)',
-						padding: '4px 8px',
-						border: '1px solid #1e1e1e',
-						borderRadius: 2,
-						background: '#fff',
-						fontSize: 13,
-					} }
-				>
-					<VisuallyHidden render={ <Popover.Title /> }>
-						Formatting
-					</VisuallyHidden>
-					<button type="button">B</button>
-					<button type="button">I</button>
-					<button type="button">U</button>
-					<button type="button">Link</button>
-				</Popover.Popup>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Popover.Root>
+			<Popover.Trigger>Open Toolbar</Popover.Trigger>
+			<Popover.Popup
+				variant="unstyled"
+				style={ {
+					display: 'flex',
+					gap: 'var(--wpds-dimension-gap-xs)',
+					padding: '4px 8px',
+					border: '1px solid #1e1e1e',
+					borderRadius: 2,
+					background: '#fff',
+					fontSize: 13,
+				} }
+			>
+				<VisuallyHidden render={ <Popover.Title /> }>
+					Formatting
+				</VisuallyHidden>
+				<button type="button">B</button>
+				<button type="button">I</button>
+				<button type="button">U</button>
+				<button type="button">Link</button>
+			</Popover.Popup>
+		</Popover.Root>
+	),
 };
 
 /**
@@ -951,9 +921,8 @@ export const ToolbarVariant: Story = {
  */
 export const ViewportConstrainedSize: Story = {
 	name: 'Viewport-Constrained Size',
-	args: { defaultOpen: true },
 	argTypes: { defaultOpen: { control: false } },
-	render: function Render( { children: _children, ...args } ) {
+	render: function Render( {} ) {
 		return (
 			<div
 				style={ {
@@ -963,7 +932,7 @@ export const ViewportConstrainedSize: Story = {
 					padding: '60px 2rem',
 				} }
 			>
-				<Popover.Root { ...args }>
+				<Popover.Root defaultOpen>
 					<Popover.Trigger>Show Content</Popover.Trigger>
 					<Popover.Popup
 						positioner={ <Popover.Positioner side="bottom" /> }
@@ -1016,7 +985,7 @@ export const ViewportConstrainedSize: Story = {
 export const OnOpenChangeDetails: Story = {
 	name: 'onOpenChange Details',
 	parameters: { controls: { disable: true } },
-	render: function Render() {
+	render: function Render( {} ) {
 		const [ log, setLog ] = useState< string[] >( [] );
 
 		return (
@@ -1077,7 +1046,7 @@ export const OnOpenChangeDetails: Story = {
  */
 export const InitialFocus: Story = {
 	parameters: { controls: { disable: true } },
-	render: function Render() {
+	render: function Render( {} ) {
 		const emailRef = useRef< HTMLInputElement >( null );
 		const nameId = useId();
 		const emailId = useId();
@@ -1159,13 +1128,10 @@ export const InitialFocus: Story = {
  */
 export const TrapFocus: Story = {
 	argTypes: { modal: { control: false } },
-	args: {
-		modal: 'trap-focus' as const,
-	},
-	render: function Render( args ) {
+	render: function Render( {} ) {
 		return (
 			<div style={ { display: 'flex', gap: '2rem' } }>
-				<Popover.Root { ...args }>
+				<Popover.Root modal="trap-focus">
 					<Popover.Trigger>Open</Popover.Trigger>
 					<Popover.Popup>
 						<Popover.Arrow />
@@ -1217,9 +1183,9 @@ export const TrapFocus: Story = {
  */
 export const HoverTrigger: Story = {
 	parameters: { controls: { disable: true } },
-	render: function Render( args ) {
+	render: function Render( {} ) {
 		return (
-			<Popover.Root { ...args }>
+			<Popover.Root>
 				<Popover.Trigger openOnHover delay={ 200 } closeDelay={ 150 }>
 					Hover me
 				</Popover.Trigger>
@@ -1254,7 +1220,7 @@ export const HoverTrigger: Story = {
  */
 export const Infotip: Story = {
 	parameters: { controls: { disable: true } },
-	render: function Render( args ) {
+	render: function Render( {} ) {
 		return (
 			<div
 				style={ {
@@ -1264,7 +1230,7 @@ export const Infotip: Story = {
 				} }
 			>
 				<span>Label</span>
-				<Popover.Root { ...args }>
+				<Popover.Root>
 					<Popover.Trigger
 						openOnHover
 						delay={ 200 }

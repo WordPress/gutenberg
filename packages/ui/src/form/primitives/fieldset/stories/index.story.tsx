@@ -23,22 +23,20 @@ export default meta;
 type Story = StoryObj< typeof Fieldset.Root >;
 
 export const Default: Story = {
-	args: {
-		children: (
-			<>
-				<Fieldset.Legend>Legend</Fieldset.Legend>
-				{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
-					// eslint-disable-next-line jsx-a11y/label-has-associated-control
-					<label key={ fruit }>
-						<input type="checkbox" /> { fruit }
-					</label>
-				) ) }
-				<Fieldset.Description>
-					This is a description for the entire fieldset.
-				</Fieldset.Description>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Fieldset.Root>
+			<Fieldset.Legend>Legend</Fieldset.Legend>
+			{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
+				// eslint-disable-next-line jsx-a11y/label-has-associated-control
+				<label key={ fruit }>
+					<input type="checkbox" /> { fruit }
+				</label>
+			) ) }
+			<Fieldset.Description>
+				This is a description for the entire fieldset.
+			</Fieldset.Description>
+		</Fieldset.Root>
+	),
 };
 
 /**
@@ -46,19 +44,17 @@ export const Default: Story = {
  * hidden but remains accessible to screen readers.
  */
 export const HiddenLegend: Story = {
-	args: {
-		children: (
-			<>
-				<Fieldset.Legend hideFromVision>Legend</Fieldset.Legend>
-				{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
-					// eslint-disable-next-line jsx-a11y/label-has-associated-control
-					<label key={ fruit }>
-						<input type="checkbox" /> { fruit }
-					</label>
-				) ) }
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Fieldset.Root>
+			<Fieldset.Legend hideFromVision>Legend</Fieldset.Legend>
+			{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
+				// eslint-disable-next-line jsx-a11y/label-has-associated-control
+				<label key={ fruit }>
+					<input type="checkbox" /> { fruit }
+				</label>
+			) ) }
+		</Fieldset.Root>
+	),
 };
 
 /**
@@ -72,18 +68,16 @@ export const HiddenLegend: Story = {
  * so the readout is not unnecessarily verbose for screen reader users.
  */
 export const WithDetails: Story = {
-	args: {
-		children: (
-			<>
-				<Fieldset.Legend>Legend</Fieldset.Legend>
-				{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
-					// eslint-disable-next-line jsx-a11y/label-has-associated-control
-					<label key={ fruit }>
-						<input type="checkbox" /> { fruit }
-					</label>
-				) ) }
-				<Fieldset.Details>{ DETAILS_EXAMPLE }</Fieldset.Details>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Fieldset.Root>
+			<Fieldset.Legend>Legend</Fieldset.Legend>
+			{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
+				// eslint-disable-next-line jsx-a11y/label-has-associated-control
+				<label key={ fruit }>
+					<input type="checkbox" /> { fruit }
+				</label>
+			) ) }
+			<Fieldset.Details>{ DETAILS_EXAMPLE }</Fieldset.Details>
+		</Fieldset.Root>
+	),
 };

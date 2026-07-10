@@ -25,7 +25,7 @@ export default meta;
 type Story = StoryObj< typeof Badge >;
 
 export const AllIntents: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<>
 			<Badge intent="high">high</Badge>
 			<Badge intent="medium">medium</Badge>
@@ -39,7 +39,7 @@ export const AllIntents: Story = {
 };
 
 export const High: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<>
 			<Badge intent="high">Payment declined</Badge>
 			<Badge intent="high">Security issue</Badge>
@@ -48,7 +48,7 @@ export const High: Story = {
 };
 
 export const Medium: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<>
 			<Badge intent="medium">Approval required</Badge>
 			<Badge intent="medium">Review needed</Badge>
@@ -57,7 +57,7 @@ export const Medium: Story = {
 };
 
 export const Low: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<>
 			<Badge intent="low">Pending</Badge>
 			<Badge intent="low">Queued</Badge>
@@ -66,7 +66,7 @@ export const Low: Story = {
 };
 
 export const Informational: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<>
 			<Badge intent="informational">Scheduled</Badge>
 			<Badge intent="informational">Beta</Badge>
@@ -75,7 +75,7 @@ export const Informational: Story = {
 };
 
 export const Draft: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<>
 			<Badge intent="draft">Draft</Badge>
 			<Badge intent="draft">Unpublished</Badge>
@@ -84,7 +84,7 @@ export const Draft: Story = {
 };
 
 export const Stable: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<>
 			<Badge intent="stable">Healthy</Badge>
 			<Badge intent="stable">Active</Badge>
@@ -93,7 +93,7 @@ export const Stable: Story = {
 };
 
 export const None: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<>
 			<Badge intent="none">Inactive</Badge>
 			<Badge intent="none">Expired</Badge>
@@ -102,7 +102,7 @@ export const None: Story = {
 };
 
 export const CommentStatus: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<>
 			<Badge intent="none">Approved</Badge>
 			<Badge intent="medium">Approval required</Badge>
@@ -111,7 +111,7 @@ export const CommentStatus: Story = {
 };
 
 export const PageStatus: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<>
 			<Badge intent="none">Published</Badge>
 			<Badge intent="low">Pending</Badge>
@@ -123,7 +123,7 @@ export const PageStatus: Story = {
 };
 
 export const PluginStatus: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<>
 			<Badge intent="stable">Active</Badge>
 			<Badge intent="none">Inactive</Badge>
@@ -132,7 +132,7 @@ export const PluginStatus: Story = {
 };
 
 export const TextOnlyBadges: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<>
 			<Badge intent="stable">Active</Badge>
 			<Badge intent="medium">Review needed</Badge>
@@ -142,7 +142,7 @@ export const TextOnlyBadges: Story = {
 };
 
 export const WithAdjacentContentIcon: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<Stack direction="column" gap="sm">
 			<Stack direction="row" gap="sm" align="center">
 				<Icon icon={ page } size={ 24 } />
@@ -159,7 +159,7 @@ export const WithAdjacentContentIcon: Story = {
 };
 
 export const IncorrectBadgeWithIcon: Story = {
-	render: () => (
+	render: ( {} ) => (
 		<>
 			{ /* @ts-expect-error Demonstrating incorrect Badge usage with icon children. */ }
 			<Badge intent="stable">

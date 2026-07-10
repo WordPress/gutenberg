@@ -27,18 +27,18 @@ const DemoBox = ( { variant }: { variant?: 'lg' } ) => (
 type Story = StoryObj< typeof Stack >;
 
 export const Default: Story = {
+	render: ( { gap } ) => (
+		<Stack gap={ gap }>
+			<DemoBox />
+			<DemoBox variant="lg" />
+			<DemoBox />
+			<DemoBox />
+			<DemoBox variant="lg" />
+			<DemoBox />
+		</Stack>
+	),
 	args: {
 		gap: 'md',
-		children: (
-			<>
-				<DemoBox />
-				<DemoBox variant="lg" />
-				<DemoBox />
-				<DemoBox />
-				<DemoBox variant="lg" />
-				<DemoBox />
-			</>
-		),
 	},
 	argTypes: {
 		align: {
@@ -89,25 +89,25 @@ export const Default: Story = {
 };
 
 export const Nested: Story = {
-	...Default,
+	render: ( { gap, align, justify } ) => (
+		<Stack gap={ gap } align={ align } justify={ justify }>
+			<DemoBox variant="lg" />
+			<Stack gap="lg">
+				<DemoBox />
+				<DemoBox />
+			</Stack>
+			<DemoBox variant="lg" />
+			<Stack direction="column">
+				<DemoBox />
+				<DemoBox />
+			</Stack>
+			<DemoBox variant="lg" />
+		</Stack>
+	),
 	args: {
-		...Default.args,
+		gap: 'md',
 		align: 'center',
 		justify: 'center',
-		children: (
-			<>
-				<DemoBox variant="lg" />
-				<Stack gap="lg">
-					<DemoBox />
-					<DemoBox />
-				</Stack>
-				<DemoBox variant="lg" />
-				<Stack direction="column">
-					<DemoBox />
-					<DemoBox />
-				</Stack>
-				<DemoBox variant="lg" />
-			</>
-		),
 	},
+	argTypes: Default.argTypes,
 };

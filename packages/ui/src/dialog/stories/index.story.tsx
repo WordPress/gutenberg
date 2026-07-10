@@ -43,29 +43,27 @@ type Story = StoryObj< typeof Dialog.Root >;
  * what happens when clicking the close icon.
  */
 export const _Default: Story = {
-	args: {
-		children: (
-			<>
-				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-				<Dialog.Popup>
-					<Dialog.Header>
-						<Dialog.Title>Welcome</Dialog.Title>
-						<Dialog.CloseIcon />
-					</Dialog.Header>
-					<Dialog.Content>
-						<Dialog.Description>
-							This dialog demonstrates best practices for
-							informational dialogs. It includes a close icon
-							because dismissing it is safe and expected.
-						</Dialog.Description>
-					</Dialog.Content>
-					<Dialog.Footer>
-						<Dialog.Action>Got it</Dialog.Action>
-					</Dialog.Footer>
-				</Dialog.Popup>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Dialog.Root>
+			<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+			<Dialog.Popup>
+				<Dialog.Header>
+					<Dialog.Title>Welcome</Dialog.Title>
+					<Dialog.CloseIcon />
+				</Dialog.Header>
+				<Dialog.Content>
+					<Dialog.Description>
+						This dialog demonstrates best practices for
+						informational dialogs. It includes a close icon because
+						dismissing it is safe and expected.
+					</Dialog.Description>
+				</Dialog.Content>
+				<Dialog.Footer>
+					<Dialog.Action>Got it</Dialog.Action>
+				</Dialog.Footer>
+			</Dialog.Popup>
+		</Dialog.Root>
+	),
 };
 
 const ALL_SIZES = [ 'small', 'medium', 'large', 'stretch', 'full' ] as const;
@@ -135,9 +133,11 @@ function SizePlaygroundContent() {
 }
 
 export const AllSizes: Story = {
-	args: {
-		children: <SizePlaygroundContent />,
-	},
+	render: ( {} ) => (
+		<Dialog.Root>
+			<SizePlaygroundContent />
+		</Dialog.Root>
+	),
 };
 
 /**
@@ -158,35 +158,33 @@ export const AllSizes: Story = {
  */
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
-	args: {
-		children: (
-			<>
-				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-				<Dialog.Popup
-					portal={
-						<Dialog.Portal
-							style={ { '--wp-ui-dialog-z-index': '9999' } }
-						/>
-					}
-				>
-					<Dialog.Header>
-						<Dialog.Title>Custom z-index</Dialog.Title>
-						<Dialog.CloseIcon />
-					</Dialog.Header>
-					<Dialog.Content>
-						<Dialog.Description>
-							The backdrop and popup render at `z-index: 9999` via
-							the `--wp-ui-dialog-z-index` CSS custom property,
-							set on `Dialog.Portal` through the `portal` prop.
-						</Dialog.Description>
-					</Dialog.Content>
-					<Dialog.Footer>
-						<Dialog.Action>Got it</Dialog.Action>
-					</Dialog.Footer>
-				</Dialog.Popup>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Dialog.Root>
+			<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+			<Dialog.Popup
+				portal={
+					<Dialog.Portal
+						style={ { '--wp-ui-dialog-z-index': '9999' } }
+					/>
+				}
+			>
+				<Dialog.Header>
+					<Dialog.Title>Custom z-index</Dialog.Title>
+					<Dialog.CloseIcon />
+				</Dialog.Header>
+				<Dialog.Content>
+					<Dialog.Description>
+						The backdrop and popup render at `z-index: 9999` via the
+						`--wp-ui-dialog-z-index` CSS custom property, set on
+						`Dialog.Portal` through the `portal` prop.
+					</Dialog.Description>
+				</Dialog.Content>
+				<Dialog.Footer>
+					<Dialog.Action>Got it</Dialog.Action>
+				</Dialog.Footer>
+			</Dialog.Popup>
+		</Dialog.Root>
+	),
 };
 
 function StickyToggle( {
@@ -307,9 +305,11 @@ function ScrollableContent() {
  * dialog and stay in sync.
  */
 export const Scrollable: Story = {
-	args: {
-		children: <ScrollableContent />,
-	},
+	render: ( {} ) => (
+		<Dialog.Root>
+			<ScrollableContent />
+		</Dialog.Root>
+	),
 };
 
 /**
@@ -320,29 +320,26 @@ export const Scrollable: Story = {
  * keeps its `<h2>` element while being visually hidden.
  */
 export const WithVisuallyHiddenTitle: Story = {
-	args: {
-		children: (
-			<>
-				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-				<Dialog.Popup>
-					<Dialog.Header>
-						<VisuallyHidden render={ <Dialog.Title /> }>
-							Accessible dialog heading
-						</VisuallyHidden>
-						<Dialog.CloseIcon />
-					</Dialog.Header>
-					<Dialog.Content>
-						<p style={ { margin: 0 } }>
-							This dialog has a visually hidden title. Inspect the
-							DOM or use a screen reader to verify the heading is
-							present.
-						</p>
-					</Dialog.Content>
-					<Dialog.Footer>
-						<Dialog.Action>Got it</Dialog.Action>
-					</Dialog.Footer>
-				</Dialog.Popup>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Dialog.Root>
+			<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+			<Dialog.Popup>
+				<Dialog.Header>
+					<VisuallyHidden render={ <Dialog.Title /> }>
+						Accessible dialog heading
+					</VisuallyHidden>
+					<Dialog.CloseIcon />
+				</Dialog.Header>
+				<Dialog.Content>
+					<p style={ { margin: 0 } }>
+						This dialog has a visually hidden title. Inspect the DOM
+						or use a screen reader to verify the heading is present.
+					</p>
+				</Dialog.Content>
+				<Dialog.Footer>
+					<Dialog.Action>Got it</Dialog.Action>
+				</Dialog.Footer>
+			</Dialog.Popup>
+		</Dialog.Root>
+	),
 };

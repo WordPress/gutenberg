@@ -42,27 +42,25 @@ type Story = StoryObj< typeof Drawer.Root >;
  * experiment with `swipeDirection` and `modal`.
  */
 export const _Default: Story = {
-	args: {
-		children: (
-			<>
-				<Drawer.Trigger>Open Drawer</Drawer.Trigger>
-				<Drawer.Popup>
-					<Drawer.Header>
-						<Drawer.Title>Navigation</Drawer.Title>
-						<Drawer.CloseIcon />
-					</Drawer.Header>
-					<Drawer.Content>
-						<Drawer.Description>
-							Browse through the available sections below.
-						</Drawer.Description>
-					</Drawer.Content>
-					<Drawer.Footer>
-						<Drawer.Action>Done</Drawer.Action>
-					</Drawer.Footer>
-				</Drawer.Popup>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Drawer.Root>
+			<Drawer.Trigger>Open Drawer</Drawer.Trigger>
+			<Drawer.Popup>
+				<Drawer.Header>
+					<Drawer.Title>Navigation</Drawer.Title>
+					<Drawer.CloseIcon />
+				</Drawer.Header>
+				<Drawer.Content>
+					<Drawer.Description>
+						Browse through the available sections below.
+					</Drawer.Description>
+				</Drawer.Content>
+				<Drawer.Footer>
+					<Drawer.Action>Done</Drawer.Action>
+				</Drawer.Footer>
+			</Drawer.Popup>
+		</Drawer.Root>
+	),
 };
 
 const directions = [
@@ -128,13 +126,6 @@ export const Controlled: Story = {
 		const [ open, setOpen ] = useState( false );
 		return (
 			<Drawer.Root { ...args } open={ open } onOpenChange={ setOpen }>
-				{ args.children }
-			</Drawer.Root>
-		);
-	},
-	args: {
-		children: (
-			<>
 				<Drawer.Trigger>Open Controlled Drawer</Drawer.Trigger>
 				<Drawer.Popup>
 					<Drawer.Header>
@@ -151,8 +142,8 @@ export const Controlled: Story = {
 						<Drawer.Action>Close</Drawer.Action>
 					</Drawer.Footer>
 				</Drawer.Popup>
-			</>
-		),
+			</Drawer.Root>
+		);
 	},
 	argTypes: {
 		open: { control: false },
@@ -167,33 +158,26 @@ export const Controlled: Story = {
  * Users can interact with content behind the drawer while it is open.
  */
 export const NonModal: Story = {
-	args: {
-		swipeDirection: 'right',
-		modal: false,
-		children: (
-			<>
-				<Drawer.Trigger>Open Non-Modal Drawer</Drawer.Trigger>
-				<Drawer.Popup>
-					<Drawer.Header>
-						<Drawer.Title>Non-Modal</Drawer.Title>
-						<Drawer.CloseIcon />
-					</Drawer.Header>
-					<Drawer.Content>
-						<Drawer.Description>
-							This drawer does not trap focus and allows
-							interaction with the rest of the page while open.
-						</Drawer.Description>
-					</Drawer.Content>
-					<Drawer.Footer>
-						<Drawer.Action>Close</Drawer.Action>
-					</Drawer.Footer>
-				</Drawer.Popup>
-			</>
-		),
-	},
-	render: function NonModalRender( args ) {
-		return <Drawer.Root { ...args }>{ args.children }</Drawer.Root>;
-	},
+	render: ( {} ) => (
+		<Drawer.Root swipeDirection="right" modal={ false }>
+			<Drawer.Trigger>Open Non-Modal Drawer</Drawer.Trigger>
+			<Drawer.Popup>
+				<Drawer.Header>
+					<Drawer.Title>Non-Modal</Drawer.Title>
+					<Drawer.CloseIcon />
+				</Drawer.Header>
+				<Drawer.Content>
+					<Drawer.Description>
+						This drawer does not trap focus and allows interaction
+						with the rest of the page while open.
+					</Drawer.Description>
+				</Drawer.Content>
+				<Drawer.Footer>
+					<Drawer.Action>Close</Drawer.Action>
+				</Drawer.Footer>
+			</Drawer.Popup>
+		</Drawer.Root>
+	),
 };
 
 const ALL_SIZES: NonNullable<
@@ -285,36 +269,34 @@ function DirectionSelector( {
  */
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
-	args: {
-		children: (
-			<>
-				<Drawer.Trigger>Open Drawer</Drawer.Trigger>
-				<Drawer.Popup
-					portal={
-						<Drawer.Portal
-							style={ { '--wp-ui-drawer-z-index': '9999' } }
-						/>
-					}
-				>
-					<Drawer.Header>
-						<Drawer.Title>Custom z-index</Drawer.Title>
-						<Drawer.CloseIcon />
-					</Drawer.Header>
-					<Drawer.Content>
-						<Drawer.Description>
-							The backdrop, viewport, and popup render at
-							`z-index: 9999` via the `--wp-ui-drawer-z-index` CSS
-							custom property, set on `Drawer.Portal` through the
-							`portal` prop.
-						</Drawer.Description>
-					</Drawer.Content>
-					<Drawer.Footer>
-						<Drawer.Action>Got it</Drawer.Action>
-					</Drawer.Footer>
-				</Drawer.Popup>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Drawer.Root>
+			<Drawer.Trigger>Open Drawer</Drawer.Trigger>
+			<Drawer.Popup
+				portal={
+					<Drawer.Portal
+						style={ { '--wp-ui-drawer-z-index': '9999' } }
+					/>
+				}
+			>
+				<Drawer.Header>
+					<Drawer.Title>Custom z-index</Drawer.Title>
+					<Drawer.CloseIcon />
+				</Drawer.Header>
+				<Drawer.Content>
+					<Drawer.Description>
+						The backdrop, viewport, and popup render at `z-index:
+						9999` via the `--wp-ui-drawer-z-index` CSS custom
+						property, set on `Drawer.Portal` through the `portal`
+						prop.
+					</Drawer.Description>
+				</Drawer.Content>
+				<Drawer.Footer>
+					<Drawer.Action>Got it</Drawer.Action>
+				</Drawer.Footer>
+			</Drawer.Popup>
+		</Drawer.Root>
+	),
 };
 
 /**

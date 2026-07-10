@@ -135,15 +135,12 @@ export const AllTonesAndVariants: Story = {
 
 export const WithIcon: Story = {
 	...Default,
-	args: {
-		...Default.args,
-		children: (
-			<>
-				<LinkButton.Icon icon={ wordpress } />
-				Link button
-			</>
-		),
-	},
+	render: ( { children: _children, ...args } ) => (
+		<LinkButton { ...args }>
+			<LinkButton.Icon icon={ wordpress } />
+			Link button
+		</LinkButton>
+	),
 };
 
 export const OpenInNewTab: Story = {

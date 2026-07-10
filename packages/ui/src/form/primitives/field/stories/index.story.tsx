@@ -29,19 +29,15 @@ export default meta;
  * you can simply place your control in the `render` prop of `Field.Control`.
  */
 export const Default: StoryObj< typeof Field.Root > = {
-	args: {
-		children: (
-			<>
-				<Field.Label>Label</Field.Label>
-				<Field.Control
-					render={ <input type="text" placeholder="Placeholder" /> }
-				/>
-				<Field.Description>
-					The accessible description.
-				</Field.Description>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Field.Root>
+			<Field.Label>Label</Field.Label>
+			<Field.Control
+				render={ <input type="text" placeholder="Placeholder" /> }
+			/>
+			<Field.Description>The accessible description.</Field.Description>
+		</Field.Root>
+	),
 };
 
 const MyNonRefForwardingControl = (
@@ -113,16 +109,14 @@ export const UsingAriaLabelledby: StoryObj< typeof Field.Root > = {
  * hidden but remains accessible to screen readers.
  */
 export const HiddenLabel: StoryObj< typeof Field.Root > = {
-	args: {
-		children: (
-			<>
-				<Field.Label hideFromVision>Label</Field.Label>
-				<Field.Control
-					render={ <input type="text" placeholder="Placeholder" /> }
-				/>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Field.Root>
+			<Field.Label hideFromVision>Label</Field.Label>
+			<Field.Control
+				render={ <input type="text" placeholder="Placeholder" /> }
+			/>
+		</Field.Root>
+	),
 };
 
 /**
@@ -136,15 +130,13 @@ export const HiddenLabel: StoryObj< typeof Field.Root > = {
  * so the readout is not unnecessarily verbose for screen reader users.
  */
 export const WithDetails: StoryObj< typeof Field.Root > = {
-	args: {
-		children: (
-			<>
-				<Field.Label>Label</Field.Label>
-				<Field.Control
-					render={ <input type="text" placeholder="Placeholder" /> }
-				/>
-				<Field.Details>{ DETAILS_EXAMPLE }</Field.Details>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Field.Root>
+			<Field.Label>Label</Field.Label>
+			<Field.Control
+				render={ <input type="text" placeholder="Placeholder" /> }
+			/>
+			<Field.Details>{ DETAILS_EXAMPLE }</Field.Details>
+		</Field.Root>
+	),
 };

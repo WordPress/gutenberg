@@ -24,14 +24,12 @@ const meta: Meta< typeof Tooltip.Root > = {
 export default meta;
 
 export const Default: StoryObj< typeof Tooltip.Root > = {
-	args: {
-		children: (
-			<>
-				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
-				<Tooltip.Popup>Save</Tooltip.Popup>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Tooltip.Root>
+			<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
+			<Tooltip.Popup>Save</Tooltip.Popup>
+		</Tooltip.Root>
+	),
 };
 
 /**
@@ -40,11 +38,15 @@ export const Default: StoryObj< typeof Tooltip.Root > = {
  * component conditionally (which could cause reconciliation issues).
  */
 export const Disabled: StoryObj< typeof Tooltip.Root > = {
-	...Default,
 	args: {
-		...Default.args,
 		disabled: true,
 	},
+	render: ( { disabled } ) => (
+		<Tooltip.Root disabled={ disabled }>
+			<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
+			<Tooltip.Popup>Save</Tooltip.Popup>
+		</Tooltip.Root>
+	),
 };
 
 /**
@@ -55,7 +57,7 @@ export const Disabled: StoryObj< typeof Tooltip.Root > = {
  * (`side="top"`, `align="center"`, `sideOffset={ 4 }`).
  */
 export const Positioning: StoryObj< typeof Tooltip.Root > = {
-	render: () => (
+	render: ( {} ) => (
 		<div
 			style={ {
 				display: 'flex',
@@ -107,24 +109,22 @@ export const Positioning: StoryObj< typeof Tooltip.Root > = {
  * more — for fine-grained placement.
  */
 export const WithCustomPositioner: StoryObj< typeof Tooltip.Root > = {
-	args: {
-		children: (
-			<>
-				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
-				<Tooltip.Popup
-					positioner={
-						<Tooltip.Positioner
-							side="right"
-							align="start"
-							sideOffset={ 16 }
-						/>
-					}
-				>
-					Save
-				</Tooltip.Popup>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Tooltip.Root>
+			<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
+			<Tooltip.Popup
+				positioner={
+					<Tooltip.Positioner
+						side="right"
+						align="start"
+						sideOffset={ 16 }
+					/>
+				}
+			>
+				Save
+			</Tooltip.Popup>
+		</Tooltip.Root>
+	),
 };
 
 /**
@@ -145,22 +145,20 @@ export const WithCustomPositioner: StoryObj< typeof Tooltip.Root > = {
  */
 export const WithCustomZIndex: StoryObj< typeof Tooltip.Root > = {
 	name: 'With Custom z-index',
-	args: {
-		children: (
-			<>
-				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
-				<Tooltip.Popup
-					portal={
-						<Tooltip.Portal
-							style={ { '--wp-ui-tooltip-z-index': '9999' } }
-						/>
-					}
-				>
-					Save
-				</Tooltip.Popup>
-			</>
-		),
-	},
+	render: ( {} ) => (
+		<Tooltip.Root>
+			<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
+			<Tooltip.Popup
+				portal={
+					<Tooltip.Portal
+						style={ { '--wp-ui-tooltip-z-index': '9999' } }
+					/>
+				}
+			>
+				Save
+			</Tooltip.Popup>
+		</Tooltip.Root>
+	),
 };
 
 /**
@@ -169,7 +167,7 @@ export const WithCustomZIndex: StoryObj< typeof Tooltip.Root > = {
  * the same delay configuration.
  */
 export const WithProvider: StoryObj< typeof Tooltip.Root > = {
-	render: () => (
+	render: ( {} ) => (
 		<Tooltip.Provider delay={ 0 }>
 			<div style={ { display: 'flex', gap: '1rem' } }>
 				<Tooltip.Root>
