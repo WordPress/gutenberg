@@ -81,9 +81,7 @@
 		"lint-staged": "^16.4.0",
 		"npm-run-all": "^4.1.5",
 		"patch-package": "^8.0.0",
-		"rimraf": "^5.0.10",
 		"syncpack": "^15.3.1",
-		"typescript": "npm:@typescript/typescript6@^6.0.2",
 		"wait-on": "^8.0.1"
 	},
 	"overrides": {
@@ -92,8 +90,8 @@
 	"scripts": {
 		"build": "npm run --workspace @wordpress/build-scripts build:all --",
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
-		"clean:package-types": "tsc --build --clean && rimraf --glob \"./packages/*/build-types\"",
-		"clean:packages": "rimraf --glob \"./packages/*/{build,build-module,build-wp,build-style}\" \"./build\"",
+		"clean:package-types": "npm run --workspace @wordpress/build-scripts clean:package-types --",
+		"clean:packages": "npm run --workspace @wordpress/build-scripts clean:packages --",
 		"dev": "npm run --workspace @wordpress/build-scripts dev --",
 		"distclean": "git clean --force -d -X",
 		"docs:api-ref": "npm run --workspace @wordpress/docs-tools docs:api-ref --",
@@ -105,7 +103,7 @@
 		"docs:gen": "npm run --workspace @wordpress/docs-tools docs:gen --",
 		"docs:theme-ref": "npm run --workspace @wordpress/docs-tools docs:theme-ref --",
 		"env": "wp-env",
-		"fixtures:clean": "rimraf --glob \"test/integration/fixtures/blocks/*.{json,serialized.html}\"",
+		"fixtures:clean": "npm run --workspace @wordpress/integration-tests fixtures:clean --",
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test:unit -- test/integration/full-content/ && npm run format test/integration/fixtures/blocks/*.json",
 		"fixtures:regenerate": "npm-run-all fixtures:clean fixtures:generate",
 		"format": "wp-scripts format",
@@ -182,11 +180,7 @@
 		"packages/*",
 		"routes/*",
 		"storybook",
-		"test/e2e",
-		"test/integration",
-		"test/performance",
-		"test/storybook-playwright",
-		"test/unit",
+		"test/*",
 		"tools/*",
 		"widgets/*"
 	]
