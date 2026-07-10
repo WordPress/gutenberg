@@ -147,3 +147,5 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 		);
 	}
 );
+
+List.displayName = 'Tabs.List';

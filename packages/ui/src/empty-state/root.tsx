@@ -21,3 +21,5 @@ export const Root = forwardRef< HTMLDivElement, EmptyStateRootProps >(
 		return element;
 	}
 );
+
+Root.displayName = 'EmptyState.Root';

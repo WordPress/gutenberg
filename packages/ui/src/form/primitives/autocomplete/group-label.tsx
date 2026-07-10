@@ -23,3 +23,5 @@ export const GroupLabel = forwardRef<
 		</Text>
 	);
 } );
+
+GroupLabel.displayName = 'Autocomplete.GroupLabel';

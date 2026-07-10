@@ -15,23 +15,6 @@ import { Root } from './root';
 import { Trigger } from './trigger';
 import { Value } from './value';
 
-Chips.displayName = 'Combobox.Chips';
-ChipWithRemove.displayName = 'Combobox.ChipWithRemove';
-Clear.displayName = 'Combobox.Clear';
-Collection.displayName = 'Combobox.Collection';
-Empty.displayName = 'Combobox.Empty';
-Input.displayName = 'Combobox.Input';
-Item.displayName = 'Combobox.Item';
-List.displayName = 'Combobox.List';
-ListBody.displayName = 'Combobox.ListBody';
-ListFooter.displayName = 'Combobox.ListFooter';
-Portal.displayName = 'Combobox.Portal';
-Positioner.displayName = 'Combobox.Positioner';
-Popup.displayName = 'Combobox.Popup';
-Root.displayName = 'Combobox.Root';
-Trigger.displayName = 'Combobox.Trigger';
-Value.displayName = 'Combobox.Value';
-
 export {
 	Chips,
 	ChipWithRemove,

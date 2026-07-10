@@ -15,3 +15,5 @@ import type { SelectRootProps } from './types';
 export function Root< Value = unknown >( props: SelectRootProps< Value > ) {
 	return <_Select.Root< Value, false > { ...props } />;
 }
+
+Root.displayName = 'Select.Root';

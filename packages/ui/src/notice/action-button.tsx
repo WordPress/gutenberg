@@ -34,3 +34,5 @@ export const ActionButton = forwardRef< HTMLButtonElement, ActionButtonProps >(
 		);
 	}
 );
+
+ActionButton.displayName = 'Notice.ActionButton';

@@ -30,4 +30,6 @@ const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
 	}
 );
 
+CloseIcon.displayName = 'Dialog.CloseIcon';
+
 export { CloseIcon };

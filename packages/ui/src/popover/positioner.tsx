@@ -39,4 +39,6 @@ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 	}
 );
 
+Positioner.displayName = 'Popover.Positioner';
+
 export { Positioner };

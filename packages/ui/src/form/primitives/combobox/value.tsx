@@ -4,3 +4,5 @@ import type { ComboboxValueProps } from './types';
 export function Value( props: ComboboxValueProps ) {
 	return <_Combobox.Value { ...props } />;
 }
+
+Value.displayName = 'Combobox.Value';

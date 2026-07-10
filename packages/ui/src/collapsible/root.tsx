@@ -13,3 +13,5 @@ export const Root = forwardRef< HTMLDivElement, RootProps >(
 		return <_Collapsible.Root ref={ forwardedRef } { ...props } />;
 	}
 );
+
+Root.displayName = 'Collapsible.Root';

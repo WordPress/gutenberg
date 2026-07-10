@@ -31,4 +31,6 @@ const Header = forwardRef< HTMLElement, HeaderProps >( function DrawerHeader(
 	return element;
 } );
 
+Header.displayName = 'Drawer.Header';
+
 export { Header };

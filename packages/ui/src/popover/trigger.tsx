@@ -14,4 +14,6 @@ const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
 	}
 );
 
+Trigger.displayName = 'Popover.Trigger';
+
 export { Trigger };

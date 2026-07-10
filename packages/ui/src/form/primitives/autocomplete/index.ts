@@ -14,22 +14,6 @@ import { Positioner } from './positioner';
 import { Root } from './root';
 import { Value } from './value';
 
-Clear.displayName = 'Autocomplete.Clear';
-Collection.displayName = 'Autocomplete.Collection';
-Empty.displayName = 'Autocomplete.Empty';
-Group.displayName = 'Autocomplete.Group';
-GroupLabel.displayName = 'Autocomplete.GroupLabel';
-InputGroup.displayName = 'Autocomplete.InputGroup';
-Input.displayName = 'Autocomplete.Input';
-Item.displayName = 'Autocomplete.Item';
-List.displayName = 'Autocomplete.List';
-ListBody.displayName = 'Autocomplete.ListBody';
-Popup.displayName = 'Autocomplete.Popup';
-Portal.displayName = 'Autocomplete.Portal';
-Positioner.displayName = 'Autocomplete.Positioner';
-Root.displayName = 'Autocomplete.Root';
-Value.displayName = 'Autocomplete.Value';
-
 export {
 	Clear,
 	Collection,

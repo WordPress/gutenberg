@@ -32,3 +32,5 @@ export const Clear = forwardRef< HTMLButtonElement, ComboboxClearProps >(
 		);
 	}
 );
+
+Clear.displayName = 'Combobox.Clear';

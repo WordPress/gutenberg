@@ -29,3 +29,5 @@ export const Description = forwardRef<
 		</Text>
 	);
 } );
+
+Description.displayName = 'EmptyState.Description';

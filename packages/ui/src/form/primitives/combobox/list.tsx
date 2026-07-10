@@ -15,3 +15,5 @@ export const List = forwardRef< HTMLDivElement, ComboboxListProps >(
 		);
 	}
 );
+
+List.displayName = 'Combobox.List';

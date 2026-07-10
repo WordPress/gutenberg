@@ -44,4 +44,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 	return renderSlotWithChildren( portal, <Portal />, positionedPopup );
 } );
 
+Popup.displayName = 'Tooltip.Popup';
+
 export { Popup };

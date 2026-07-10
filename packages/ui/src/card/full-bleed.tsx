@@ -42,3 +42,5 @@ export const FullBleed = forwardRef< HTMLDivElement, FullBleedProps >(
 		return element;
 	}
 );
+
+FullBleed.displayName = 'Card.FullBleed';

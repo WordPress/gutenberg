@@ -26,4 +26,6 @@ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 	}
 );
 
+Positioner.displayName = 'Autocomplete.Positioner';
+
 export { Positioner };

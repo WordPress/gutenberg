@@ -24,4 +24,6 @@ const Description = forwardRef< HTMLParagraphElement, DescriptionProps >(
 	}
 );
 
+Description.displayName = 'Dialog.Description';
+
 export { Description };

@@ -31,4 +31,6 @@ const Footer = forwardRef< HTMLElement, FooterProps >( function DialogFooter(
 	return element;
 } );
 
+Footer.displayName = 'Dialog.Footer';
+
 export { Footer };

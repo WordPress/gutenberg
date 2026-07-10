@@ -9,3 +9,5 @@ import type { AutocompleteRootProps } from './types';
 export function Root( props: AutocompleteRootProps ) {
 	return <_Autocomplete.Root { ...props } />;
 }
+
+Root.displayName = 'Autocomplete.Root';

@@ -27,3 +27,5 @@ export const Title = forwardRef< HTMLHeadingElement, EmptyStateTitleProps >(
 		);
 	}
 );
+
+Title.displayName = 'EmptyState.Title';

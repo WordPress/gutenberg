@@ -38,4 +38,6 @@ function Root( {
 	);
 }
 
+Root.displayName = 'Drawer.Root';
+
 export { Root };

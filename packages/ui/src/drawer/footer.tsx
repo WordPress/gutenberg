@@ -31,4 +31,6 @@ const Footer = forwardRef< HTMLElement, FooterProps >( function DrawerFooter(
 	return element;
 } );
 
+Footer.displayName = 'Drawer.Footer';
+
 export { Footer };

@@ -11,3 +11,5 @@ export function Collection( {
 		</_Autocomplete.Collection>
 	);
 }
+
+Collection.displayName = 'Autocomplete.Collection';

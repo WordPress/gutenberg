@@ -19,3 +19,5 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 		return element;
 	}
 );
+
+Header.displayName = 'Card.Header';

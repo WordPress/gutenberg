@@ -35,3 +35,5 @@ export const Root = forwardRef< HTMLDivElement, RootProps >(
 		);
 	}
 );
+
+Root.displayName = 'CollapsibleCard.Root';

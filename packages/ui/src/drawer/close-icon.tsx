@@ -30,4 +30,6 @@ const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
 	}
 );
 
+CloseIcon.displayName = 'Drawer.CloseIcon';
+
 export { CloseIcon };

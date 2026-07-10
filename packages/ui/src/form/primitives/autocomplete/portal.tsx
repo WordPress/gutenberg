@@ -19,4 +19,6 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >(
 	}
 );
 
+Portal.displayName = 'Autocomplete.Portal';
+
 export { Portal };

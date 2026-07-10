@@ -48,3 +48,5 @@ export const ChipWithRemove = forwardRef<
 		</_Combobox.Chip>
 	);
 } );
+
+ChipWithRemove.displayName = 'Combobox.ChipWithRemove';

@@ -31,3 +31,5 @@ export const Root = forwardRef< HTMLDivElement, FieldRootProps >( function Root(
 		/>
 	);
 } );
+
+Root.displayName = 'Field.Root';

@@ -22,3 +22,5 @@ export const Title = forwardRef< HTMLDivElement, TitleProps >(
 		);
 	}
 );
+
+Title.displayName = 'Card.Title';

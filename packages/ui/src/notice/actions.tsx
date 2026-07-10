@@ -23,3 +23,5 @@ export const Actions = forwardRef< HTMLDivElement, ActionsProps >(
 		return element;
 	}
 );
+
+Actions.displayName = 'Notice.Actions';

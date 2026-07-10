@@ -50,4 +50,6 @@ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
 	}
 );
 
+Title.displayName = 'Dialog.Title';
+
 export { Title };

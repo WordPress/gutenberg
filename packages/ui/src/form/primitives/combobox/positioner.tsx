@@ -26,4 +26,6 @@ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 	}
 );
 
+Positioner.displayName = 'Combobox.Positioner';
+
 export { Positioner };

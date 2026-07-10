@@ -30,3 +30,5 @@ export const Tab = forwardRef< HTMLButtonElement, TabProps >( function Tab(
 		</_Tabs.Tab>
 	);
 } );
+
+Tab.displayName = 'Tabs.Tab';

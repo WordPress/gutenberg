@@ -50,4 +50,6 @@ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
 	}
 );
 
+Title.displayName = 'Drawer.Title';
+
 export { Title };

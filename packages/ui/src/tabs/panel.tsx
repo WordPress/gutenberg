@@ -29,3 +29,5 @@ export const Panel = forwardRef< HTMLDivElement, TabPanelProps >(
 		);
 	}
 );
+
+Panel.displayName = 'Tabs.Panel';

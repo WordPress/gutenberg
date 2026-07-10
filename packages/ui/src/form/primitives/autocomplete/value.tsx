@@ -4,3 +4,5 @@ import type { AutocompleteValueProps } from './types';
 export function Value( props: AutocompleteValueProps ) {
 	return <_Autocomplete.Value { ...props } />;
 }
+
+Value.displayName = 'Autocomplete.Value';

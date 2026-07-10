@@ -223,4 +223,6 @@ function Root( {
 	);
 }
 
+Root.displayName = 'AlertDialog.Root';
+
 export { Root };

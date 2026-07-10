@@ -22,3 +22,5 @@ export const Visual = forwardRef< HTMLDivElement, EmptyStateVisualProps >(
 		return element;
 	}
 );
+
+Visual.displayName = 'EmptyState.Visual';

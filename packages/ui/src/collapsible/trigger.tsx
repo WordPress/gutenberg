@@ -13,3 +13,5 @@ export const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
 		return <_Collapsible.Trigger ref={ forwardedRef } { ...props } />;
 	}
 );
+
+Trigger.displayName = 'Collapsible.Trigger';

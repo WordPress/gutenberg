@@ -29,3 +29,5 @@ export const Popup = forwardRef< HTMLDivElement, ComboboxPopupProps >(
 		return renderSlotWithChildren( portal, <Portal />, positionedPopup );
 	}
 );
+
+Popup.displayName = 'Combobox.Popup';

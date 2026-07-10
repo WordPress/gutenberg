@@ -22,3 +22,5 @@ export const Actions = forwardRef< HTMLDivElement, EmptyStateActionsProps >(
 		return element;
 	}
 );
+
+Actions.displayName = 'EmptyState.Actions';

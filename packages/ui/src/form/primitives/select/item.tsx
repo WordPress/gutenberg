@@ -37,3 +37,5 @@ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
 		);
 	}
 );
+
+Item.displayName = 'Select.Item';

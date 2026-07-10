@@ -21,4 +21,6 @@ const Close = forwardRef< HTMLButtonElement, CloseProps >(
 	}
 );
 
+Close.displayName = 'Popover.Close';
+
 export { Close };

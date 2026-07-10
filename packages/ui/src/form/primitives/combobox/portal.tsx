@@ -21,4 +21,6 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >(
 	}
 );
 
+Portal.displayName = 'Combobox.Portal';
+
 export { Portal };

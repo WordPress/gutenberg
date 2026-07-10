@@ -8,16 +8,6 @@ import { Root } from './root';
 import { Title } from './title';
 import { Trigger } from './trigger';
 
-Arrow.displayName = 'Popover.Arrow';
-Close.displayName = 'Popover.Close';
-Description.displayName = 'Popover.Description';
-Popup.displayName = 'Popover.Popup';
-Portal.displayName = 'Popover.Portal';
-Positioner.displayName = 'Popover.Positioner';
-Root.displayName = 'Popover.Root';
-Title.displayName = 'Popover.Title';
-Trigger.displayName = 'Popover.Trigger';
-
 export {
 	Arrow,
 	Close,

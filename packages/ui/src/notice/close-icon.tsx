@@ -28,3 +28,5 @@ export const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
 		);
 	}
 );
+
+CloseIcon.displayName = 'Notice.CloseIcon';

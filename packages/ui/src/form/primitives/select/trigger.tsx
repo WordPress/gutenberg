@@ -59,3 +59,5 @@ export const Trigger = forwardRef< HTMLButtonElement, SelectTriggerProps >(
 		);
 	}
 );
+
+Trigger.displayName = 'Select.Trigger';
