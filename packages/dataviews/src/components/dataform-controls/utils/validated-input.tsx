@@ -42,6 +42,10 @@ export default function ValidatedText< Item >( {
 }: DataFormValidatedTextControlProps< Item > ) {
 	const { label, placeholder, description, getValue, setValue, isValid } =
 		field;
+	const isBound =
+		field.id in
+		( ( data as { metadata?: { bindings?: object } } )?.metadata
+			?.bindings || {} );
 	const value = getValue( { item: data } );
 	const disabled = field.isDisabled( { item: data, field } );
 
@@ -58,6 +62,7 @@ export default function ValidatedText< Item >( {
 
 	return (
 		<ValidatedInputControl
+			className={ isBound ? 'is-connected' : undefined }
 			required={ !! isValid.required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }

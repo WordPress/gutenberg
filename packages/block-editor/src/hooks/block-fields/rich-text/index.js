@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { BaseControl, useBaseControlProps } from '@wordpress/components';
@@ -26,6 +31,7 @@ export default function RichTextControl( {
 	config = {},
 } ) {
 	const registry = useRegistry();
+	const isBound = field.id in ( data?.metadata?.bindings || {} );
 	const attrValue = field.getValue( { item: data } );
 	const fieldConfig = field.config || {};
 	const { clientId } = config;
@@ -98,7 +104,10 @@ export default function RichTextControl( {
 			) }
 			<BaseControl { ...baseControlProps }>
 				<div
-					className="block-editor-content-only-controls__rich-text"
+					className={ clsx(
+						'block-editor-content-only-controls__rich-text',
+						{ 'is-connected': isBound }
+					) }
 					role="textbox"
 					aria-multiline={ ! fieldConfig?.disableLineBreaks }
 					ref={ useMergeRefs( [
