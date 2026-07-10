@@ -11,8 +11,8 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { buildInheritedValue, privateHelpers } from '../build-inherited-value';
-import { useInheritedValue } from '../inherited-value-context';
+import { resolveStyles, privateHelpers } from '../build-inherited-value';
+import { useResolvedStyles } from '../inherited-value-context';
 
 import { globalStylesDataKey } from '../../../store/private-keys';
 const {
@@ -71,14 +71,14 @@ jest.mock( '@wordpress/blocks', () => ( {
 jest.mock( '../../../hooks/block-style-variation', () => ( {
 	getVariationStylesWithRefValues: ( gs, blockName, variation ) =>
 		gs?.styles?.blocks?.[ blockName ]?.variations?.[ variation ] ?? null,
-	// `useInheritedValue` derives the applied variation from the block's
+	// `useResolvedStyles` derives the applied variation from the block's
 	// `className`; map `is-style-<slug>` to `<slug>` for these tests.
 	getVariationNameFromClass: ( className ) => {
 		const match = /is-style-([\w-]+)/.exec( className || '' );
 		return match ? match[ 1 ] : null;
 	},
 } ) );
-describe( 'buildInheritedValue – merged output', () => {
+describe( 'resolveStyles – merged output', () => {
 	describe( 'internals', () => {
 		test( 'isExplicitEmpty drops "", null, {} only', () => {
 			expect( isExplicitEmpty( '' ) ).toBe( true );
@@ -180,7 +180,7 @@ describe( 'buildInheritedValue – merged output', () => {
 		};
 
 		test( 'root only (layer 1)', () => {
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/paragraph',
 				globalStyles: gs,
 			} );
@@ -189,7 +189,7 @@ describe( 'buildInheritedValue – merged output', () => {
 		} );
 
 		test( 'block-default (layer 3) overrides element + root', () => {
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/heading',
 				globalStyles: gs,
 			} );
@@ -198,7 +198,7 @@ describe( 'buildInheritedValue – merged output', () => {
 		} );
 
 		test( 'own-variation (layer 4b) wins', () => {
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/heading',
 				ownVariation: 'plain',
 				globalStyles: gs,
@@ -229,7 +229,7 @@ describe( 'buildInheritedValue – merged output', () => {
 		};
 
 		test( 'no selectedState behaves as the default state (base value)', () => {
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/button',
 				globalStyles: gs,
 			} );
@@ -237,7 +237,7 @@ describe( 'buildInheritedValue – merged output', () => {
 		} );
 
 		test( 'explicit default selectedState is identical to base', () => {
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/button',
 				globalStyles: gs,
 				selectedState: DEFAULT_STATE,
@@ -246,7 +246,7 @@ describe( 'buildInheritedValue – merged output', () => {
 		} );
 
 		test( 'pseudo state layers the block `:hover` slice over base', () => {
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/button',
 				globalStyles: gs,
 				selectedState: HOVER_STATE,
@@ -256,7 +256,7 @@ describe( 'buildInheritedValue – merged output', () => {
 		} );
 
 		test( 'base-only leaves still inherit under a selected state (CSS cascade)', () => {
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/button',
 				globalStyles: gs,
 				selectedState: HOVER_STATE,
@@ -266,7 +266,7 @@ describe( 'buildInheritedValue – merged output', () => {
 		} );
 
 		test( 'responsive state with no Global Styles slice falls back to base', () => {
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/button',
 				globalStyles: gs,
 				selectedState: MOBILE_STATE,
@@ -291,7 +291,7 @@ describe( 'buildInheritedValue – merged output', () => {
 					},
 				},
 			};
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/button',
 				globalStyles: responsiveGs,
 				selectedState: MOBILE_STATE,
@@ -304,7 +304,7 @@ describe( 'buildInheritedValue – merged output', () => {
 		} );
 
 		test( 'source map attributes a state-won leaf to its originating layer', () => {
-			const { value, sources } = buildInheritedValue( {
+			const { value, sources } = resolveStyles( {
 				blockName: 'core/button',
 				globalStyles: gs,
 				selectedState: HOVER_STATE,
@@ -314,12 +314,12 @@ describe( 'buildInheritedValue – merged output', () => {
 		} );
 
 		test( 'memoized variant keys distinct states separately', () => {
-			const { value: base } = buildInheritedValue( {
+			const { value: base } = resolveStyles( {
 				blockName: 'core/button',
 				globalStyles: gs,
 				selectedState: DEFAULT_STATE,
 			} );
-			const { value: hover } = buildInheritedValue( {
+			const { value: hover } = resolveStyles( {
 				blockName: 'core/button',
 				globalStyles: gs,
 				selectedState: HOVER_STATE,
@@ -341,7 +341,7 @@ describe( 'buildInheritedValue – merged output', () => {
 					},
 				},
 			};
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/heading',
 				globalStyles: gs,
 			} );
@@ -358,7 +358,7 @@ describe( 'buildInheritedValue – merged output', () => {
 					},
 				},
 			};
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/group',
 				globalStyles: gs,
 			} );
@@ -369,13 +369,13 @@ describe( 'buildInheritedValue – merged output', () => {
 	describe( 'hydration + edge cases', () => {
 		test( 'falsy globalStyles returns {}', () => {
 			expect(
-				buildInheritedValue( {
+				resolveStyles( {
 					blockName: 'core/heading',
 					globalStyles: null,
 				} ).value
 			).toEqual( {} );
 			expect(
-				buildInheritedValue( {
+				resolveStyles( {
 					blockName: 'core/heading',
 					globalStyles: {},
 				} ).value
@@ -384,7 +384,7 @@ describe( 'buildInheritedValue – merged output', () => {
 
 		test( 'missing blockName returns {}', () => {
 			expect(
-				buildInheritedValue( {
+				resolveStyles( {
 					globalStyles: {
 						styles: { typography: { fontSize: '16px' } },
 					},
@@ -394,7 +394,7 @@ describe( 'buildInheritedValue – merged output', () => {
 
 		test( 'unknown block still inherits from root', () => {
 			const gs = { styles: { typography: { fontSize: '16px' } } };
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/does-not-exist',
 				globalStyles: gs,
 			} );
@@ -409,7 +409,7 @@ describe( 'buildInheritedValue – merged output', () => {
 					color: { text: 'var:preset|color|vivid-red' },
 				},
 			};
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/paragraph',
 				globalStyles: gs,
 			} );
@@ -422,7 +422,7 @@ describe( 'buildInheritedValue – merged output', () => {
 					color: { text: 'var(--wp--preset--color--vivid-red)' },
 				},
 			};
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/paragraph',
 				globalStyles: gs,
 			} );
@@ -443,7 +443,7 @@ describe( 'buildInheritedValue – merged output', () => {
 					css: ':root { --x: 1; }',
 				},
 			};
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/heading',
 				globalStyles: gs,
 			} );
@@ -460,7 +460,7 @@ describe( 'buildInheritedValue – merged output', () => {
 					},
 				},
 			};
-			const { value: out } = buildInheritedValue( {
+			const { value: out } = resolveStyles( {
 				blockName: 'core/paragraph',
 				globalStyles: gs,
 			} );
@@ -499,7 +499,7 @@ describe( 'buildInheritedValue – merged output', () => {
 		};
 
 		test( 'returns value and source map from the same merge', () => {
-			const { value, sources } = buildInheritedValue( {
+			const { value, sources } = resolveStyles( {
 				blockName: 'core/heading',
 				ownVariation: 'plain',
 				globalStyles: gs,
@@ -516,7 +516,7 @@ describe( 'buildInheritedValue – merged output', () => {
 		} );
 
 		test( 'records preserved element sub-tree source paths', () => {
-			const { sources } = buildInheritedValue( {
+			const { sources } = resolveStyles( {
 				blockName: 'core/paragraph',
 				globalStyles: gs,
 			} );
@@ -528,14 +528,14 @@ describe( 'buildInheritedValue – merged output', () => {
 	} );
 } );
 
-describe( 'buildInheritedValue – memoization', () => {
+describe( 'resolveStyles – memoization', () => {
 	test( 'returns the same inheritance object identity for identical keys', () => {
 		const gs = { styles: { typography: { fontSize: '16px' } } };
-		const a = buildInheritedValue( {
+		const a = resolveStyles( {
 			blockName: 'core/paragraph',
 			globalStyles: gs,
 		} );
-		const b = buildInheritedValue( {
+		const b = resolveStyles( {
 			blockName: 'core/paragraph',
 			globalStyles: gs,
 		} );
@@ -553,11 +553,11 @@ describe( 'buildInheritedValue – memoization', () => {
 				},
 			},
 		};
-		const { value: a } = buildInheritedValue( {
+		const { value: a } = resolveStyles( {
 			blockName: 'core/paragraph',
 			globalStyles: gs,
 		} );
-		const { value: b } = buildInheritedValue( {
+		const { value: b } = resolveStyles( {
 			blockName: 'core/heading',
 			globalStyles: gs,
 		} );
@@ -569,11 +569,11 @@ describe( 'buildInheritedValue – memoization', () => {
 	test( 'different globalStyles reference → re-computed', () => {
 		const gs1 = { styles: { typography: { fontSize: '16px' } } };
 		const gs2 = { styles: { typography: { fontSize: '18px' } } };
-		const { value: a } = buildInheritedValue( {
+		const { value: a } = resolveStyles( {
 			blockName: 'core/paragraph',
 			globalStyles: gs1,
 		} );
-		const { value: b } = buildInheritedValue( {
+		const { value: b } = resolveStyles( {
 			blockName: 'core/paragraph',
 			globalStyles: gs2,
 		} );
@@ -583,7 +583,7 @@ describe( 'buildInheritedValue – memoization', () => {
 	} );
 
 	test( 'falsy globalStyles delegates to the pure builder', () => {
-		const { value: a } = buildInheritedValue( {
+		const { value: a } = resolveStyles( {
 			blockName: 'core/paragraph',
 			globalStyles: null,
 		} );
@@ -591,13 +591,13 @@ describe( 'buildInheritedValue – memoization', () => {
 	} );
 } );
 
-describe( 'useInheritedValue hook', () => {
+describe( 'useResolvedStyles hook', () => {
 	beforeEach( () => {
 		useSelect.mockReset();
 	} );
 
 	function Probe( { blockName, className, selectedState } ) {
-		const v = useInheritedValue( blockName, className, selectedState );
+		const v = useResolvedStyles( blockName, className, selectedState );
 		return <div data-testid="probe">{ JSON.stringify( v ) }</div>;
 	}
 
@@ -664,7 +664,7 @@ describe( 'useInheritedValue hook', () => {
  * `{ settings, styles }` envelope.
  *
  * Pre-hot-fix, the hook passed the bare tree directly to
- * `buildInheritedValue`, which destructures `const { styles } =
+ * `resolveStyles`, which destructures `const { styles } =
  * globalStyles` and so saw `undefined` and early-returned `{}`. Every
  * panel got an empty `inheritedValue`; nothing surfaced in the
  * inspector. None of the original suites caught it because their
@@ -677,13 +677,13 @@ describe( 'useInheritedValue hook', () => {
  * data-shape contract — at the producer, the wrapping step inside the
  * hook, or the builder's destructure — surfaces here in CI.
  */
-describe( 'useInheritedValue – production bare-tree shape', () => {
+describe( 'useResolvedStyles – production bare-tree shape', () => {
 	beforeEach( () => {
 		useSelect.mockReset();
 	} );
 
 	function Probe( { blockName, className } ) {
-		const { value } = useInheritedValue( blockName, className );
+		const { value } = useResolvedStyles( blockName, className );
 		return <div data-testid="probe">{ JSON.stringify( value ) }</div>;
 	}
 
@@ -823,11 +823,11 @@ describe( 'useInheritedValue – production bare-tree shape', () => {
 	} );
 } );
 
-describe( 'buildInheritedValue – non-cascading root drop', () => {
+describe( 'resolveStyles – non-cascading root drop', () => {
 	// Each call builds against a fresh `globalStyles` object so the
 	// identity-keyed memo never returns a cross-test cache hit.
 	const build = ( styles, extra = {} ) =>
-		buildInheritedValue( {
+		resolveStyles( {
 			blockName: 'core/paragraph',
 			globalStyles: { styles },
 			...extra,
@@ -896,7 +896,7 @@ describe( 'buildInheritedValue – non-cascading root drop', () => {
 	} );
 
 	test( 'resolves a theme-file background image url via _links', () => {
-		const { value } = buildInheritedValue( {
+		const { value } = resolveStyles( {
 			blockName: 'core/paragraph',
 			globalStyles: {
 				styles: {

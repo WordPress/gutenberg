@@ -39,7 +39,7 @@ import {
 	usePrivateStyleOverride,
 } from './utils';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
-import { useInheritedValue } from '../components/global-styles/inherited-value-context';
+import { useResolvedStyles } from '../components/global-styles/inherited-value-context';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import { store as blockEditorStore } from '../store';
@@ -114,7 +114,7 @@ function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 				: undefined,
 		[ clientId ]
 	);
-	const { value: inheritedValue } = useInheritedValue( name, className );
+	const { value: inheritedValue } = useResolvedStyles( name, className );
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',

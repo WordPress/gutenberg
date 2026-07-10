@@ -13,12 +13,7 @@ import { getVariationStylesWithRefValues } from '../../hooks/block-style-variati
 // module's dependency chain so it stays pure and easy to test.
 const DEFAULT_STATE_VALUE = 'default';
 
-/**
- * Whether the selected block style state is the default (no pseudo/viewport).
- *
- * @param {?Object} selectedState Selected block style state.
- * @return {boolean} Whether the default state is selected.
- */
+// Whether the selected block style state is the default (no pseudo/viewport).
 function isDefaultBlockStyleState( selectedState ) {
 	const viewport = selectedState?.viewport;
 	const pseudo = selectedState?.pseudo;
@@ -28,14 +23,9 @@ function isDefaultBlockStyleState( selectedState ) {
 	);
 }
 
-/**
- * Resolve the object path for the selected block style state. Mirrors
- * `getStyleForState` in `hooks/block-style-state.js`: `[ viewport, pseudo ]`
- * with default segments removed.
- *
- * @param {?Object} selectedState Selected block style state.
- * @return {string[]} Object path for the state styles.
- */
+// Object path for the selected state's styles: `[ viewport, pseudo ]` with
+// default segments removed. Mirrors `getStyleForState` in
+// `hooks/block-style-state.js`.
 function getStyleStatePath( selectedState ) {
 	if ( isDefaultBlockStyleState( selectedState ) ) {
 		return [];
@@ -45,14 +35,8 @@ function getStyleStatePath( selectedState ) {
 	);
 }
 
-/**
- * Return the state-scoped sub-style for the selected state, or the style
- * itself for the default state.
- *
- * @param {?Object} style         Style object.
- * @param {?Object} selectedState Selected block style state.
- * @return {*} State-scoped style value.
- */
+// State-scoped sub-style for the selected state, or the style itself for the
+// default state.
 function getStyleForState( style, selectedState ) {
 	const path = getStyleStatePath( selectedState );
 	if ( ! path.length ) {
@@ -61,22 +45,15 @@ function getStyleForState( style, selectedState ) {
 	return getValueFromObjectPath( style, path );
 }
 
-/**
- * Keys on a `styles.*` layer that describe tree structure rather than the
- * block's own leaf contributions. They are excluded from the per-layer
- * pick pass before the merge.
- */
+// Keys on a `styles.*` layer that describe tree structure rather than the
+// block's own leaf contributions; excluded from the per-layer pick pass.
 const TREE_STRUCTURAL_KEYS = new Set( [ 'blocks', 'variations', 'css' ] );
 
-/**
- * Empty inheritance data returned before Global Styles payloads settle.
- */
+// Empty inheritance data returned before Global Styles payloads settle.
 const EMPTY_INHERITANCE = Object.freeze( { value: {}, sources: {} } );
 
-/**
- * Source descriptors for each Global Styles inheritance layer. `layer`
- * identifies which layer supplied a leaf and drives inherited-value detection.
- */
+// Source descriptors per inheritance layer. `layer` identifies which layer
+// supplied a leaf and drives inherited-value detection.
 const SOURCE_DESCRIPTORS = {
 	root: { layer: 'root' },
 	block: { layer: 'block' },
@@ -91,8 +68,6 @@ function createSourceDescriptor( type ) {
 	return { ...descriptor };
 }
 
-// Pair a layer's style object with the source metadata for all of its leaves.
-// Returns null when either side is empty.
 function createContribution( styles, source ) {
 	if ( ! styles || ! source ) {
 		return null;
@@ -100,19 +75,11 @@ function createContribution( styles, source ) {
 	return { styles, source };
 }
 
-// Build a dot-path key for a style leaf.
 function getPathKey( path ) {
 	return path.join( '.' );
 }
 
-/**
- * Clone source metadata before storing it so source map entries can safely
- * diverge as paths differ.
- *
- * @param {Object} source Source descriptor.
- * @param {Array}  path   Leaf path.
- * @return {Object} Stored source descriptor.
- */
+// Clone the descriptor so source-map entries can diverge as paths differ.
 function getSourceForPath( source, path ) {
 	return {
 		...source,
@@ -120,54 +87,42 @@ function getSourceForPath( source, path ) {
 	};
 }
 
-/**
- * Explicit-empty values do not contribute at their layer, allowing
- * lower-precedence layers to surface instead.
- *
- * `0`, `'0'`, `false`, and `NaN` remain valid user-facing values.
- *
- * @param {*} v
- * @return {boolean} Whether the value should be dropped from the merge.
- */
-function isExplicitEmpty( v ) {
-	if ( v === '' || v === null ) {
+// Explicit-empty values do not contribute at their layer, allowing
+// lower-precedence layers to surface instead. `0`, `'0'`, `false`, and `NaN`
+// remain valid user-facing values.
+function isExplicitEmpty( value ) {
+	if ( value === '' || value === null ) {
 		return true;
 	}
 	if (
-		typeof v === 'object' &&
-		! Array.isArray( v ) &&
-		Object.keys( v ).length === 0
+		typeof value === 'object' &&
+		! Array.isArray( value ) &&
+		Object.keys( value ).length === 0
 	) {
 		return true;
 	}
 	return false;
 }
 
-/**
- * Check whether a value is a `{ ref: '...' }` reference envelope.
- *
- * @param {*} v
- * @return {boolean} Whether `v` is a `{ ref: string }` envelope.
- */
-function isRefObject( v ) {
+function isRefObject( value ) {
 	return (
-		v !== null &&
-		typeof v === 'object' &&
-		! Array.isArray( v ) &&
-		typeof v.ref === 'string'
+		value !== null &&
+		typeof value === 'object' &&
+		! Array.isArray( value ) &&
+		typeof value.ref === 'string'
 	);
 }
 
 /**
- * Pick the root-scope contribution from a single `styles` layer: plain
- * leaves and sub-trees that are not tree-structural and not the
- * `elements` sub-tree itself. The `elements` sub-tree IS preserved as a
- * passthrough on the final payload so panels that read e.g.
- * `inheritedValue.elements.link.color.text` keep working.
+ * Pick the root-scope contribution from a single `styles` layer: plain leaves
+ * and sub-trees that are not tree-structural and not the `elements` sub-tree
+ * itself. The `elements` sub-tree IS preserved as a passthrough on the final
+ * payload so panels that read e.g. `inheritedValue.elements.link.color.text`
+ * keep working.
  *
- * Does not recurse or clone; the returned contribution references the
- * original layer's sub-objects. The deep-merge step copies them into a
- * fresh tree and resolves `{ ref }` envelopes inline as it goes.
+ * Does not recurse or clone; the returned contribution references the original
+ * layer's sub-objects. The deep-merge step copies them into a fresh tree and
+ * resolves `{ ref }` envelopes inline as it goes.
  *
  * @param {Object} layer Raw styles layer.
  * @return {Object|null} Root-scope contribution, or `null` when the layer is empty.
@@ -196,15 +151,15 @@ function pickLayerRootContribution( layer ) {
 }
 
 /**
- * Deep-merge `source` into `target` with the following rules:
+ * Deep-merge `source` into `target`:
  * - Plain objects recurse.
- * - `{ ref }` envelopes encountered at source are resolved against
- *   `globalStyles` and merged in place of the envelope.
+ * - `{ ref }` envelopes at source are resolved against `globalStyles` and
+ *   merged in place of the envelope.
  * - Arrays, primitives, and null replace wholesale.
- * - Explicit-empty source leaves (`''`, `null`, `{}`) are dropped — the
- *   target's existing value is preserved.
+ * - Explicit-empty source leaves (`''`, `null`, `{}`) are dropped, preserving
+ *   the target's existing value.
  *
- * Mutates and returns `target`. Does not mutate `source`.
+ * Mutates and returns `target`; does not mutate `source`.
  *
  * @param {Object} target
  * @param {Object} source
@@ -226,26 +181,29 @@ function deepMergeDroppingEmpties(
 		return target;
 	}
 	for ( const key of Object.keys( source ) ) {
-		let sVal = source[ key ];
-		if ( isExplicitEmpty( sVal ) ) {
+		let sourceValue = source[ key ];
+		if ( isExplicitEmpty( sourceValue ) ) {
 			continue;
 		}
-		if ( isRefObject( sVal ) ) {
-			if ( sVal.ref.trim() === '' ) {
+		if ( isRefObject( sourceValue ) ) {
+			if ( sourceValue.ref.trim() === '' ) {
 				continue;
 			}
-			const resolved = getValueFromObjectPath( globalStyles, sVal.ref );
+			const resolved = getValueFromObjectPath(
+				globalStyles,
+				sourceValue.ref
+			);
 			if ( resolved === undefined || resolved === null ) {
 				continue;
 			}
-			sVal = resolved;
+			sourceValue = resolved;
 		}
 		const nextPath = [ ...path, key ];
 		if (
-			sVal !== null &&
-			typeof sVal === 'object' &&
-			! Array.isArray( sVal ) &&
-			! isRefObject( sVal )
+			sourceValue !== null &&
+			typeof sourceValue === 'object' &&
+			! Array.isArray( sourceValue ) &&
+			! isRefObject( sourceValue )
 		) {
 			const existing =
 				target[ key ] &&
@@ -255,14 +213,14 @@ function deepMergeDroppingEmpties(
 					: {};
 			target[ key ] = deepMergeDroppingEmpties(
 				{ ...existing },
-				sVal,
+				sourceValue,
 				globalStyles,
 				sourceMetadata,
 				sources,
 				nextPath
 			);
 		} else {
-			target[ key ] = sVal;
+			target[ key ] = sourceValue;
 			if ( sourceMetadata && sources ) {
 				sources[ getPathKey( nextPath ) ] = getSourceForPath(
 					sourceMetadata,
@@ -274,14 +232,8 @@ function deepMergeDroppingEmpties(
 	return target;
 }
 
-/**
- * Resolve the state-scoped slice of a layer-shaped object for the selected
- * block style state, guarding against nullish inputs.
- *
- * @param {?Object} layerObject   Layer-shaped object (root- or element-scope).
- * @param {Object}  selectedState Selected block style state.
- * @return {Object|null} The state slice, or `null`.
- */
+// State-scoped slice of a layer-shaped object for the selected state,
+// guarding against nullish inputs.
 function getStateSlice( layerObject, selectedState ) {
 	if ( ! layerObject ) {
 		return null;
@@ -312,14 +264,9 @@ const NON_CASCADING_ROOT_PREFIXES = [
 	'filter',
 ];
 
-/**
- * Whether a leaf dot-path is a non-cascading property (see
- * `NON_CASCADING_ROOT_PREFIXES`). The `elements.*` passthrough is exempt: its
- * values are emitted onto their own global selectors and do reach the block.
- *
- * @param {string} pathKey Leaf dot-path (e.g. `background.backgroundImage`).
- * @return {boolean} Whether the path is a non-cascading property.
- */
+// Whether a leaf dot-path is a non-cascading property (see
+// `NON_CASCADING_ROOT_PREFIXES`). The `elements.*` passthrough is exempt: its
+// values are emitted onto their own global selectors and do reach the block.
 function isNonCascadingRootPath( pathKey ) {
 	if ( pathKey.startsWith( 'elements.' ) ) {
 		return false;
@@ -329,39 +276,29 @@ function isNonCascadingRootPath( pathKey ) {
 	);
 }
 
-/**
- * Delete a leaf at `pathSegments` from `obj`, pruning any parent objects left
- * empty by the removal.
- *
- * @param {Object}   obj          Object to mutate.
- * @param {string[]} pathSegments Leaf path segments.
- */
-function deleteAtPath( obj, pathSegments ) {
-	if ( ! obj || typeof obj !== 'object' ) {
+// Delete a leaf at `pathSegments` from `target`, pruning any parent objects
+// left empty by the removal.
+function deleteAtPath( target, pathSegments ) {
+	if ( ! target || typeof target !== 'object' ) {
 		return;
 	}
 	const [ head, ...rest ] = pathSegments;
 	if ( rest.length === 0 ) {
-		delete obj[ head ];
+		delete target[ head ];
 		return;
 	}
-	const child = obj[ head ];
+	const child = target[ head ];
 	if ( child && typeof child === 'object' ) {
 		deleteAtPath( child, rest );
 		if ( Object.keys( child ).length === 0 ) {
-			delete obj[ head ];
+			delete target[ head ];
 		}
 	}
 }
 
-/**
- * Drop root-sourced non-cascading leaves from the merged value and its source
- * map together, so an inspector control never surfaces a root value that does
- * not actually reach the block. See `NON_CASCADING_ROOT_PREFIXES`.
- *
- * @param {Object} value   Merged inherited value (mutated).
- * @param {Object} sources Source map keyed by dot-path (mutated).
- */
+// Drop root-sourced non-cascading leaves from the merged value and its source
+// map together, so an inspector control never surfaces a root value that does
+// not actually reach the block. See `NON_CASCADING_ROOT_PREFIXES`.
 function dropNonCascadingRootLeaves( value, sources ) {
 	for ( const pathKey of Object.keys( sources ) ) {
 		if (
@@ -374,19 +311,11 @@ function dropNonCascadingRootLeaves( value, sources ) {
 	}
 }
 
-/**
- * Resolve the inherited `background.backgroundImage` against the Global Styles
- * tree and its theme-file links, so consumers receive a final image value and
- * do not need their own store read. `{ ref }` envelopes are already resolved
- * during the merge; this additionally resolves theme-file `.url` paths.
- *
- * The merge produces a fresh `backgroundImage` object, so resolving in place
- * does not mutate the Global Styles store data.
- *
- * @param {Object}  value        Merged inherited value (mutated).
- * @param {?Object} globalStyles Wrapped Global Styles payload (`{ styles }`).
- * @param {?Object} links        Theme-file links (`settings[ globalStylesLinksDataKey ]`).
- */
+// Resolve the inherited `background.backgroundImage` against the Global Styles
+// tree and its theme-file links, so consumers receive a final image value.
+// `{ ref }` envelopes are already resolved during the merge; this additionally
+// resolves theme-file `.url` paths. The merge produces a fresh
+// `backgroundImage` object, so resolving in place does not mutate store data.
 function resolveThemeFileBackgroundImage( value, globalStyles, links ) {
 	const image = value?.background?.backgroundImage;
 	if ( ! image ) {
@@ -404,7 +333,7 @@ function resolveThemeFileBackgroundImage( value, globalStyles, links ) {
 /**
  * Internal, uncached merge. Computes the merged Global Styles payload and a
  * source map describing which Global Styles layer supplied each winning leaf.
- * `buildInheritedValue` is the public, memoized entry point.
+ * `resolveStyles` is the public, memoized entry point.
  *
  * @param {Object}  args
  * @param {string}  args.blockName       Block name (e.g. `core/heading`).
@@ -414,7 +343,7 @@ function resolveThemeFileBackgroundImage( value, globalStyles, links ) {
  * @param {?Object} [args._links]        Theme-file links (`settings[ globalStylesLinksDataKey ]`), used to resolve theme-file pointers.
  * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map.
  */
-function computeInheritedValue( {
+function computeResolvedStyles( {
 	blockName,
 	ownVariation = null,
 	globalStyles,
@@ -441,10 +370,10 @@ function computeInheritedValue( {
 		  ) ?? null
 		: null;
 
-	// Layers are ordered from low to high precedence: root defaults, the
-	// block's own defaults, then the active block style variation. Each
-	// layer's `elements` sub-tree is preserved as a passthrough so panels
-	// can read element styles (e.g. `inheritedValue.elements.link`).
+	// Layers ordered low to high precedence: root defaults, the block's own
+	// defaults, then the active block style variation. Each layer's `elements`
+	// sub-tree is preserved as a passthrough so panels can read element styles
+	// (e.g. `inheritedValue.elements.link`).
 	const contributions = [
 		createContribution(
 			pickLayerRootContribution( root ),
@@ -464,14 +393,11 @@ function computeInheritedValue( {
 			: null,
 	];
 
-	// When a non-default block style state (pseudo and/or responsive
-	// viewport) is selected, layer the state-scoped slice of each Global
-	// Styles layer on top of the base contributions. This mirrors the CSS
-	// cascade: a block's `:hover` / responsive styles inherit from its base
-	// styles, so the inherited placeholder for a selected state is the base
-	// inherited value with any state-specific Global Styles values layered
-	// over it. State slices are appended after all base layers, preserving
-	// the same low-to-high scope ordering, so state values win over base.
+	// For a non-default state (pseudo and/or viewport), layer each layer's
+	// state-scoped slice on top of the base contributions, mirroring the CSS
+	// cascade: a block's `:hover`/responsive styles inherit from its base
+	// styles. State slices are appended after all base layers, preserving the
+	// same low-to-high scope ordering, so state values win over base.
 	if ( selectedState && ! isDefaultBlockStyleState( selectedState ) ) {
 		contributions.push(
 			createContribution(
@@ -507,9 +433,9 @@ function computeInheritedValue( {
 
 	const sources = {};
 	const value = filteredContributions.reduce(
-		( acc, contribution ) =>
+		( mergedValue, contribution ) =>
 			deepMergeDroppingEmpties(
-				acc,
+				mergedValue,
 				contribution.styles,
 				globalStyles,
 				contribution.source,
@@ -527,31 +453,27 @@ function computeInheritedValue( {
 	return { value, sources };
 }
 
-/**
- * Shared memo for `buildInheritedValue`, keyed by Global
- * Styles object identity and a `(blockName, ownVariation)` composite.
- *
- * @type {WeakMap<object, Map<string, Object>>}
- */
+// Shared memo for `resolveStyles`, keyed by Global Styles object identity and
+// a `(blockName, ownVariation, selectedState)` composite.
 const memo = new WeakMap();
 
 /**
  * Public entry point. Builds the merged Global Styles payload and source map
- * for a block (see `computeInheritedValue` for the argument shape), memoized by
+ * for a block (see `computeResolvedStyles` for the argument shape), memoized by
  * Global Styles object identity and a composite of the remaining arguments.
  *
  * @param {Object} args
  * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map; may be a cache hit.
  */
-export function buildInheritedValue( args ) {
-	const gs = args?.globalStyles;
-	if ( ! gs || typeof gs !== 'object' ) {
-		return computeInheritedValue( args );
+export function resolveStyles( args ) {
+	const globalStyles = args?.globalStyles;
+	if ( ! globalStyles || typeof globalStyles !== 'object' ) {
+		return computeResolvedStyles( args );
 	}
-	let inner = memo.get( gs );
+	let inner = memo.get( globalStyles );
 	if ( ! inner ) {
 		inner = new Map();
-		memo.set( gs, inner );
+		memo.set( globalStyles, inner );
 	}
 	const selectedStateKey = args.selectedState
 		? `${ args.selectedState.viewport ?? '' }:${
@@ -567,7 +489,7 @@ export function buildInheritedValue( args ) {
 	if ( inner.has( key ) ) {
 		return inner.get( key );
 	}
-	const result = computeInheritedValue( args );
+	const result = computeResolvedStyles( args );
 	inner.set( key, result );
 	return result;
 }

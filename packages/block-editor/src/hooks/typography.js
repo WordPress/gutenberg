@@ -14,7 +14,7 @@ import {
 	default as StylesTypographyPanel,
 	useHasTypographyPanel,
 } from '../components/global-styles/typography-panel';
-import { useInheritedValue } from '../components/global-styles/inherited-value-context';
+import { useResolvedStyles } from '../components/global-styles/inherited-value-context';
 
 import { LINE_HEIGHT_SUPPORT_KEY } from './line-height';
 import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
@@ -182,7 +182,7 @@ export function TypographyPanel( {
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
-	const { value: inheritedValue } = useInheritedValue(
+	const { value: inheritedValue } = useResolvedStyles(
 		name,
 		className,
 		selectedState

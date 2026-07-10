@@ -579,7 +579,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			'does not render the at-rest placeholder cue when inheritedValue.typography.lineHeight is explicit-empty (%p)',
 			( emptyValue ) => {
 				// Note on `{}` empty-object: the builder
-				// (`buildInheritedValue` →
+				// (`resolveStyles` →
 				// `pickLayerRootContribution`) drops `{}` at the
 				// layer-merge stage, so the panel never receives a
 				// `{}` leaf in production (asserted at the helper
