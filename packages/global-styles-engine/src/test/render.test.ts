@@ -1040,6 +1040,47 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'handles responsive block gap styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							'@mobile': {
+								spacing: {
+									blockGap: '24px',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					hasLayoutSupport: true,
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				true,
+				false,
+				false,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toContain( '@media (width <= 480px)' );
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-flow) > * { margin-block-start: 24px; margin-block-end: 0; }'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-flex) { gap: 24px; }'
+			);
+		} );
+
 		it( 'handles legacy responsive block styles', () => {
 			const tree = {
 				styles: {
@@ -1076,6 +1117,147 @@ describe( 'global styles renderer', () => {
 
 			expect( result ).toEqual(
 				':root :where(.wp-block-button){color: red;}@media (width <= 480px){:root :where(.wp-block-button){color: blue;}}'
+			);
+		} );
+
+		it( 'uses custom viewport breakpoints for responsive block styles', () => {
+			const tree = {
+				settings: {
+					viewport: {
+						mobile: '640px',
+						tablet: '960px',
+					},
+				},
+				styles: {
+					blocks: {
+						'core/button': {
+							'@mobile': {
+								color: {
+									text: 'blue',
+								},
+							},
+							'@tablet': {
+								color: {
+									text: 'green',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 640px){:root :where(.wp-block-button){color: blue;}}@media (640px < width <= 960px){:root :where(.wp-block-button){color: green;}}'
+			);
+		} );
+
+		it( 'omits tablet responsive styles when the tablet breakpoint is not larger than mobile', () => {
+			const tree = {
+				settings: {
+					viewport: {
+						mobile: '960px',
+						tablet: '640px',
+					},
+				},
+				styles: {
+					blocks: {
+						'core/button': {
+							'@mobile': {
+								color: {
+									text: 'blue',
+								},
+							},
+							'@tablet': {
+								color: {
+									text: 'green',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 960px){:root :where(.wp-block-button){color: blue;}}'
+			);
+		} );
+
+		it( 'uses a single max-width tablet query when only the tablet breakpoint is valid', () => {
+			const tree = {
+				settings: {
+					viewport: {
+						mobile: '100%',
+						tablet: '64rem',
+					},
+				},
+				styles: {
+					blocks: {
+						'core/button': {
+							'@mobile': {
+								color: {
+									text: 'blue',
+								},
+							},
+							'@tablet': {
+								color: {
+									text: 'green',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 64rem){:root :where(.wp-block-button){color: green;}}'
 			);
 		} );
 

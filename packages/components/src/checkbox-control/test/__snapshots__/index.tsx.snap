@@ -5,7 +5,7 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -13,14 +13,29 @@
+@@ -14,14 +14,29 @@
           <span
             class="components-checkbox-control__input-container"
           >

@@ -33,8 +33,8 @@
 	"peerDependencies": {
 		"jest": ">=29",
 		"puppeteer-core": ">=23",
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"publishConfig": {
 		"access": "public"

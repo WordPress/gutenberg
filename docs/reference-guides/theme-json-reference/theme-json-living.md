@@ -207,6 +207,17 @@ Settings related to typography.
 
 ---
 
+### viewport
+
+Viewport breakpoint settings used for responsive block styles and block visibility. Invalid breakpoint values are ignored. If only one valid breakpoint is declared, it remains keyed by its configured viewport and uses a single max-width query. If neither breakpoint is valid, the default breakpoints are used. If `mobile` is greater than or equal to `tablet`, only the `mobile` breakpoint is used.
+
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| mobile | Maximum viewport width for mobile styles. | `string` | `"480px"` |
+| tablet | Maximum viewport width for tablet styles. Tablet styles apply above the mobile width and up to this width when both breakpoints are configured, or up to this width when tablet is the only valid breakpoint. | `string` | `"782px"` |
+
+---
+
 ### custom
 
 Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.

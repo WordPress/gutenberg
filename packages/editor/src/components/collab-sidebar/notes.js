@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { Fragment, useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Stack } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -238,6 +238,18 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		}
 	};
 
+	// In the "All notes" view, find where the resolved notes begin so a
+	// "Resolved" divider can be rendered above them. Resolved notes (status
+	// 'approved' with a still-present block) always sort after the active
+	// ones, so the first match marks the boundary. The floating view only
+	// lists unresolved notes, so it needs no divider.
+	const firstResolvedIndex = isFloating
+		? -1
+		: threads.findIndex(
+				( thread ) =>
+					thread.status === 'approved' && !! thread.blockClientId
+		  );
+
 	return (
 		<Stack
 			className="editor-collab-sidebar-panel"
@@ -267,32 +279,46 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 							sidebarRef={ sidebarRef }
 						/>
 					) }
-					{ threads.map( ( thread ) => (
-						<NoteThread
-							key={ thread.id }
-							note={ thread }
-							onAddReply={ onAddReply }
-							onDeleteNote={ handleDelete }
-							onEditNote={ onEditNote }
-							isSelected={ selectedNote === thread.id }
-							sidebarRef={ sidebarRef }
-							floating={
-								isFloating
-									? {
-											y: notePositions[ thread.id ],
-											registerThread,
-											unregisterThread,
-									  }
-									: undefined
-							}
-							onKeyDown={ ( event ) =>
-								navigate(
-									event,
-									thread,
-									selectedNote === thread.id
-								)
-							}
-						/>
+					{ threads.map( ( thread, index ) => (
+						<Fragment key={ thread.id }>
+							{ index === firstResolvedIndex && (
+								<Stack
+									direction="row"
+									align="center"
+									justify="center"
+									gap="sm"
+									className="editor-collab-sidebar-panel__status-separator"
+								>
+									<Text variant="heading-sm" render={ <p /> }>
+										{ __( 'Resolved' ) }
+									</Text>
+								</Stack>
+							) }
+							<NoteThread
+								note={ thread }
+								onAddReply={ onAddReply }
+								onDeleteNote={ handleDelete }
+								onEditNote={ onEditNote }
+								isSelected={ selectedNote === thread.id }
+								sidebarRef={ sidebarRef }
+								floating={
+									isFloating
+										? {
+												y: notePositions[ thread.id ],
+												registerThread,
+												unregisterThread,
+										  }
+										: undefined
+								}
+								onKeyDown={ ( event ) =>
+									navigate(
+										event,
+										thread,
+										selectedNote === thread.id
+									)
+								}
+							/>
+						</Fragment>
 					) ) }
 				</>
 			) }

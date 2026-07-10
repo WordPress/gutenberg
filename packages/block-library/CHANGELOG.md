@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
 ### Bug Fixes
 
 -   Synced Pattern (`core/block`): Cap the number of pattern expansions per top-level render to prevent memory exhaustion when a pattern references others in a dense, repeated, or "diamond" graph that expands exponentially. A new `block_core_block_render_budget` filter controls the limit (default 10000; return -1 to remove it).

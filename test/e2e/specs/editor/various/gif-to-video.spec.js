@@ -82,6 +82,28 @@ class GifToVideoUtils {
 	}
 
 	/**
+	 * Wait for the editor's core-data copy of the attachment record to carry
+	 * the sideloaded companion video. The block transform to the Video block
+	 * matches synchronously against this record, so the "Video" entry only
+	 * appears in the block switcher once it has resolved.
+	 *
+	 * @param {number} attachmentId Attachment ID.
+	 * @param {number} timeout      Timeout in milliseconds.
+	 */
+	async waitForCompanionRecord( attachmentId, timeout = 30000 ) {
+		await this.page.waitForFunction(
+			( id ) =>
+				!! window.wp.data
+					.select( 'core' )
+					.getEntityRecord( 'postType', 'attachment', id, {
+						context: 'view',
+					} )?.media_details?.animated_video,
+			attachmentId,
+			{ timeout }
+		);
+	}
+
+	/**
 	 * Skip this test if the GIF-to-video path is not active.
 	 *
 	 * The conversion requires:
@@ -128,17 +150,25 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'switches an uploaded GIF to the video GIF variation', async ( {
+	test( 'keeps the uploaded GIF as an Image block and offers an opt-in Video transform', async ( {
 		editor,
 		page,
+		pageUtils,
 		gifToVideoUtils,
 		requestUtils,
 	} ) => {
-		// The GIF uploads as a normal image attachment and the transcoded
-		// video is sideloaded as that attachment's `animated_video` meta.
-		// Once the companion is available, the editor switches the Image
-		// block to the Video block's "GIF" variation playing that video,
-		// so it renders as a native <video> with no render-time PHP.
+		// Wait for the editor to finish setting up the (empty) post before
+		// inserting: an insert dispatched during setup is wiped by the
+		// editor's initial blocks reset.
+		await expect(
+			editor.canvas.getByRole( 'button', { name: 'Add default block' } )
+		).toBeVisible();
+
+		// The GIF uploads as a normal image attachment and a transcoded
+		// video companion is sideloaded into the attachment's
+		// `animated_video` meta. The block is NOT swapped automatically:
+		// converting is the author's explicit choice, offered as a block
+		// transform to the Video block's "GIF" variation.
 		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = editor.canvas.locator(
@@ -152,19 +182,75 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		);
 
 		// Drain the full queue (parent GIF upload + companion video
-		// sideload + TranscodeGif). On success the attachment record is
-		// invalidated, the block refetches it and the converter runs.
+		// sideload + TranscodeGif).
 		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
 
+		// The block stays an Image block pointing at the GIF; no automatic
+		// swap to a Video block happens.
+		const blocksAfterUpload = await page.evaluate( () =>
+			window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks()
+				.map( ( block ) => ( {
+					name: block.name,
+					attributes: block.attributes,
+				} ) )
+		);
+		expect(
+			blocksAfterUpload.some( ( block ) => block.name === 'core/video' )
+		).toBe( false );
+
+		const uploadedImage = blocksAfterUpload.find(
+			( block ) => block.name === 'core/image'
+		);
+		expect( uploadedImage.attributes.url ).toMatch( /\.gif(\?.*)?$/i );
+
+		// The underlying media is a GIF image attachment with a recorded
+		// companion video (basename only) in its metadata.
+		const attachmentId = uploadedImage.attributes.id;
+		expect( attachmentId ).toBeDefined();
+
+		// The companion is recorded in the attachment metadata slightly after
+		// the upload queue drains, so poll for it rather than asserting once.
+		let media;
+		await expect
+			.poll(
+				async () => {
+					media = await requestUtils.rest( {
+						method: 'GET',
+						path: `/wp/v2/media/${ attachmentId }`,
+					} );
+					return media.media_details?.animated_video;
+				},
+				{ timeout: 30_000 }
+			)
+			.toMatch( /\.(mp4|webm)$/i );
+
+		expect( media.mime_type ).toBe( 'image/gif' );
+
+		// Select the Image block and transform it to a Video block through
+		// the block switcher. The transform only matches once the editor has
+		// the attachment record with the companion video.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Image"i]' )
+			.click();
+		await gifToVideoUtils.waitForCompanionRecord( attachmentId );
+
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Image', exact: true } )
+			.click();
+		await page
+			.getByRole( 'menu', { name: 'Image' } )
+			.getByRole( 'menuitem', { name: 'Video', exact: true } )
+			.click();
+
 		// The block becomes a core/video block.
-		await page.waitForFunction(
-			() =>
-				window.wp.data
-					.select( 'core/block-editor' )
-					.getBlocks()
-					.some( ( block ) => block.name === 'core/video' ),
-			undefined,
-			{ timeout: 30_000 }
+		await page.waitForFunction( () =>
+			window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks()
+				.some( ( block ) => block.name === 'core/video' )
 		);
 
 		const videoBlock = await page.evaluate( () =>
@@ -182,11 +268,15 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		expect( videoBlock.attributes.muted ).toBe( true );
 		expect( videoBlock.attributes.playsInline ).toBe( true );
 		expect( videoBlock.attributes.src ).toMatch( /\.(mp4|webm)(\?.*)?$/i );
+		expect( videoBlock.attributes.id ).toBe( attachmentId );
 
 		// The converted block carries the GIF's intrinsic dimensions so the
-		// <video> has a stable aspect ratio from the first paint.
-		expect( videoBlock.attributes.width ).toBeGreaterThan( 0 );
-		expect( videoBlock.attributes.height ).toBeGreaterThan( 0 );
+		// <video> has a stable aspect ratio from the first paint, matching
+		// the source GIF.
+		expect( videoBlock.attributes.width ).toBe( media.media_details.width );
+		expect( videoBlock.attributes.height ).toBe(
+			media.media_details.height
+		);
 
 		// Those dimensions must reach the rendered <video> as the width/height
 		// attributes that give it a stable intrinsic size.
@@ -214,27 +304,25 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 			`${ videoBlock.attributes.width } / ${ videoBlock.attributes.height }`
 		);
 
-		// The underlying media is still the GIF image with a recorded
-		// companion video (basename only) in its metadata.
-		const attachmentId = videoBlock.attributes.id;
-		expect( attachmentId ).toBeDefined();
+		// There is deliberately no transform back to an Image block; undo is
+		// the way back. A single undo restores the Image block showing the
+		// original GIF.
+		await pageUtils.pressKeys( 'primary+z' );
 
-		const media = await requestUtils.rest( {
-			method: 'GET',
-			path: `/wp/v2/media/${ attachmentId }`,
-		} );
-
-		expect( media.mime_type ).toBe( 'image/gif' );
-		expect( media.media_details ).toBeDefined();
-		expect( typeof media.media_details.animated_video ).toBe( 'string' );
-		expect( media.media_details.animated_video ).toMatch(
-			/\.(mp4|webm)$/i
+		await page.waitForFunction( () =>
+			window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks()
+				.every( ( block ) => block.name !== 'core/video' )
 		);
 
-		// The block's dimensions come straight from the source GIF.
-		expect( videoBlock.attributes.width ).toBe( media.media_details.width );
-		expect( videoBlock.attributes.height ).toBe(
-			media.media_details.height
+		const restoredImage = await page.evaluate( () =>
+			window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks()
+				.find( ( block ) => block.name === 'core/image' )
 		);
+		expect( restoredImage.attributes.id ).toBe( attachmentId );
+		expect( restoredImage.attributes.url ).toMatch( /\.gif(\?.*)?$/i );
 	} );
 } );
