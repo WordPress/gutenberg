@@ -218,6 +218,10 @@ test.describe( 'Block Notes', () => {
 				exact: true,
 			} );
 			await expect( newNoteTextbox ).toBeVisible();
+			await expect( newNoteTextbox ).not.toHaveAttribute(
+				'aria-placeholder',
+				/./
+			);
 			await expect(
 				newNoteTextbox.locator( '[data-rich-text-placeholder]' )
 			).toHaveCount( 0 );
@@ -227,6 +231,15 @@ test.describe( 'Block Notes', () => {
 				name: 'Reply to',
 			} );
 			await expect( replyTextbox ).toBeVisible();
+			// The visually hidden label still provides the descriptive
+			// accessible name; only the visible placeholder is gone.
+			await expect( replyTextbox ).toHaveAccessibleName(
+				/^Reply to note \d+ by admin$/
+			);
+			await expect( replyTextbox ).not.toHaveAttribute(
+				'aria-placeholder',
+				/./
+			);
 			await expect(
 				replyTextbox.locator( '[data-rich-text-placeholder]' )
 			).toHaveCount( 0 );
