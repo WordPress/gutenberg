@@ -27,6 +27,16 @@ const { state } = store(
 				const { currentId, trackId } = getContext();
 				return currentId === trackId;
 			},
+			get isCurrentTrackPlaying() {
+				const { currentId, isPlaying, trackId } = getContext();
+				return currentId === trackId && !! isPlaying;
+			},
+			get trackButtonActionLabel() {
+				const { labelPauseTrack, labelSelectTrack } = getContext();
+				return state.isCurrentTrackPlaying
+					? labelPauseTrack
+					: labelSelectTrack;
+			},
 		},
 		actions: {
 			changeTrack() {
@@ -36,6 +46,7 @@ const { state } = store(
 						context.playlistId
 					)?.instance;
 					if ( player?.isPlaying ) {
+						context.isPlaying = false;
 						player.pause();
 					} else {
 						player?.play()?.catch( logPlayError );
@@ -43,6 +54,7 @@ const { state } = store(
 					return;
 				}
 
+				context.isPlaying = false;
 				context.currentId = context.trackId;
 			},
 		},
@@ -146,12 +158,27 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			}
 		},
 	} );
+	const setIsPlaying = ( isPlaying ) => {
+		context.isPlaying = isPlaying;
+	};
+	const onPlay = () => setIsPlaying( true );
+	const onPause = () => setIsPlaying( false );
+	player.container.addEventListener( 'waveformplayer:play', onPlay );
+	player.container.addEventListener( 'waveformplayer:pause', onPause );
+	const destroy = () => {
+		player.container.removeEventListener( 'waveformplayer:play', onPlay );
+		player.container.removeEventListener(
+			'waveformplayer:pause',
+			onPause
+		);
+		player.destroy();
+	};
 
 	// Store state for cleanup, including instance for loadTrack reuse.
 	const nextState = {
 		url: track.url,
 		instance: player.instance,
-		destroy: player.destroy,
+		destroy,
 	};
 	playerState.set( ref, nextState );
 	playlistPlayerState.set( context.playlistId, nextState );
