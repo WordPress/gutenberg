@@ -44,7 +44,6 @@ export default function CodeEdit( {
 							'Enter a language slug, e.g., php, javascript, python.'
 						) }
 						autoComplete="off"
-						__next40pxDefaultSize
 					/>
 				</PanelBody>
 			</InspectorControls>
