@@ -32,6 +32,8 @@ import useRefEffect from '../use-ref-effect';
  */
 export default function useDisabled( {
 	isDisabled: isDisabledProp = false,
+}: {
+	isDisabled?: boolean;
 } = {} ) {
 	return useRefEffect(
 		( node ) => {
@@ -51,8 +53,8 @@ export default function useDisabled( {
 					if ( ! ( child instanceof defaultView.HTMLElement ) ) {
 						return;
 					}
-					if ( ! child.hasAttribute( 'inert' ) ) {
-						child.setAttribute( 'inert', '' );
+					if ( ! child.getAttribute( 'inert' ) ) {
+						child.setAttribute( 'inert', 'true' );
 						updates.push( () => {
 							child.removeAttribute( 'inert' );
 						} );

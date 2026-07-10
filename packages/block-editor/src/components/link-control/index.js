@@ -677,7 +677,6 @@ function LinkControl( {
 								value={ internalControlValue?.title }
 								onChange={ setInternalTextInputValue }
 								onKeyDown={ handleSubmitWithEnter }
-								__next40pxDefaultSize
 							/>
 						) }
 						<LinkControlSearchInput

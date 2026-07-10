@@ -360,7 +360,7 @@ async function runPerformanceTests( branches, options ) {
 
 	logAtIndent( 2, 'Installing dependencies and building' );
 	await runShellScript(
-		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npx playwright install chromium --with-deps"`,
+		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npm run build --workspace @wordpress/e2e-test-utils-playwright && npx playwright install chromium --with-deps"`,
 		testRunnerDir
 	);
 

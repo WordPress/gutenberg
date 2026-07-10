@@ -199,7 +199,7 @@ const UnforwardedPopover = (
 		} );
 	}
 
-	const arrowRef = useRef< HTMLElement >( null );
+	const arrowRef = useRef< HTMLElement | null >( null );
 
 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
 		useState< HTMLSpanElement | null >( null );

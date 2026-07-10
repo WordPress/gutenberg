@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import { Icon, lockSmall } from '@wordpress/icons';
 // @ts-ignore
 import { privateApis as patternPrivateApis } from '@wordpress/patterns';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 
 /**

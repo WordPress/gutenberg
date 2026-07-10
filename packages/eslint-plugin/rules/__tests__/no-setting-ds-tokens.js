@@ -18,7 +18,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			code: `<div style={ { '--my-custom-prop': 'value' } } />`,
 		},
 		{
-			code: `<div style={ { color: 'var(--wpds-color-fg-content-neutral)' } } />`,
+			code: `<div style={ { color: 'var(--wpds-color-foreground-content-neutral)' } } />`,
 		},
 		{
 			code: `<div style={ { '--other-prefix-token': '10px' } } />`,
@@ -30,10 +30,10 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			code: `const styles = { '--my-custom-prop': 'value' };`,
 		},
 		{
-			code: `const styles = { color: 'var(--wpds-color-fg-content-neutral)' };`,
+			code: `const styles = { color: 'var(--wpds-color-foreground-content-neutral)' };`,
 		},
 		{
-			code: `const { '--wpds-color-fg-content-neutral': neutralColor } = styles;`,
+			code: `const { '--wpds-color-foreground-content-neutral': neutralColor } = styles;`,
 		},
 		{
 			code: `const css = '--my-custom-prop: red;';`,
@@ -50,7 +50,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 	],
 	invalid: [
 		{
-			code: `<div style={ { '--wpds-color-fg-content-neutral': 'red' } } />`,
+			code: `<div style={ { '--wpds-color-foreground-content-neutral': 'red' } } />`,
 			errors: [
 				{
 					messageId: 'disallowedSet',
@@ -66,7 +66,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			],
 		},
 		{
-			code: `const styles = { '--wpds-color-fg-content-neutral': 'red' };`,
+			code: `const styles = { '--wpds-color-foreground-content-neutral': 'red' };`,
 			errors: [
 				{
 					messageId: 'disallowedSet',
@@ -82,7 +82,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			],
 		},
 		{
-			code: `const config = { inner: { '--wpds-color-fg-content-neutral': 'red' } };`,
+			code: `const config = { inner: { '--wpds-color-foreground-content-neutral': 'red' } };`,
 			errors: [
 				{
 					messageId: 'disallowedSet',
@@ -90,7 +90,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			],
 		},
 		{
-			code: `const css = '--wpds-color-fg-content-neutral: red;';`,
+			code: `const css = '--wpds-color-foreground-content-neutral: red;';`,
 			errors: [
 				{
 					messageId: 'disallowedSet',
@@ -98,7 +98,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			],
 		},
 		{
-			code: 'const css = `--wpds-color-fg-content-neutral: red;`;',
+			code: 'const css = `--wpds-color-foreground-content-neutral: red;`;',
 			errors: [
 				{
 					messageId: 'disallowedSet',
@@ -106,7 +106,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			],
 		},
 		{
-			code: 'const css = `--wpds-color-fg-content-neutral: ${ value };`;',
+			code: 'const css = `--wpds-color-foreground-content-neutral: ${ value };`;',
 			errors: [
 				{
 					messageId: 'disallowedSet',

@@ -8,12 +8,6 @@ import { defineConfig, type PlaywrightTestConfig } from '@playwright/test';
  */
 import baseConfig from './playwright.config';
 
-if ( process.env.CI && process.env.GUTENBERG_RTC_TEST_WS_ALLOW_CI !== '1' ) {
-	throw new Error(
-		'RTC WebSocket e2e tests are local-only. They are intentionally disabled in CI.'
-	);
-}
-
 const wsPort = process.env.GUTENBERG_RTC_TEST_WS_PORT || '18991';
 process.env.GUTENBERG_RTC_TEST_WS_PORT = wsPort;
 process.env.GUTENBERG_RTC_TEST_WS_PROVIDER = '1';
@@ -38,6 +32,9 @@ if ( Array.isArray( baseConfig.testIgnore ) ) {
 } else if ( baseConfig.testIgnore ) {
 	baseTestIgnore.push( baseConfig.testIgnore );
 }
+const testIgnore = baseTestIgnore.filter(
+	( ignore ) => ignore !== '**/specs/editor/collaboration/websocket-only/**'
+);
 
 const config = defineConfig( {
 	...baseConfig,
@@ -48,10 +45,7 @@ const config = defineConfig( {
 	// errors that surface via the polling pipeline) live under
 	// `http-only/` and are excluded here.
 	testMatch: '**/specs/editor/collaboration/**/collaboration-*.spec.ts',
-	testIgnore: [
-		...baseTestIgnore,
-		'**/specs/editor/collaboration/http-only/**',
-	],
+	testIgnore: [ ...testIgnore, '**/specs/editor/collaboration/http-only/**' ],
 	webServer: [
 		...baseWebServer,
 		{

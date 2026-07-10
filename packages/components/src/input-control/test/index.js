@@ -18,13 +18,7 @@ const getInput = () => screen.getByTestId( 'input' );
 
 describe( 'InputControl', () => {
 	const InputControl = ( props ) => {
-		return (
-			<BaseInputControl
-				{ ...props }
-				__next40pxDefaultSize
-				data-testid="input"
-			/>
-		);
+		return <BaseInputControl { ...props } data-testid="input" />;
 	};
 
 	describe( 'Basic rendering', () => {

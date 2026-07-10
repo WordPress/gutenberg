@@ -5,6 +5,8 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 
 ### Features
 
+- [Mobile] - GutenbergDemo app: Enable Hermes. ([54151](https://github.com/WordPress/gutenberg/pull/54151))
+
 #### Block Editor
 - Adds 'nofollow' setting to Button block. ([54110](https://github.com/WordPress/gutenberg/pull/54110))
 
@@ -13,6 +15,8 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 
 
 ### Enhancements
+
+- [RNMobile] Set native extension to media upload constant file. ([54928](https://github.com/WordPress/gutenberg/pull/54928))
 
 #### Components
 - Adding label/description to \`BlockEditor/DuotoneControl\`. ([54473](https://github.com/WordPress/gutenberg/pull/54473))
@@ -58,6 +62,8 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 - Fix the ShortcutProvider usage. ([54851](https://github.com/WordPress/gutenberg/pull/54851))
 - Fix warning when a template calls a template area twice. ([54861](https://github.com/WordPress/gutenberg/pull/54861))
 - Revert "Fix warning when a template calls a template area twice". ([54926](https://github.com/WordPress/gutenberg/pull/54926))
+- [RNMobile] HTML mode: Add dark mode color to post title. ([54927](https://github.com/WordPress/gutenberg/pull/54927))
+- [RNMobile] Limit inner blocks nesting depth to avoid call stack size exceeded crash. ([54382](https://github.com/WordPress/gutenberg/pull/54382))
 
 #### Block Library
 - All Nav block items to break long titles. ([54866](https://github.com/WordPress/gutenberg/pull/54866))
@@ -73,6 +79,8 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 - Search block: Allow space for input field only when form expanded. ([54846](https://github.com/WordPress/gutenberg/pull/54846))
 - Search block: Update alignment and icon button width. ([54773](https://github.com/WordPress/gutenberg/pull/54773))
 - Update pattern import menu item. ([54782](https://github.com/WordPress/gutenberg/pull/54782))
+- [RNMobile] Cover block: Avoid exception when adding media after setting the overlay color. ([54825](https://github.com/WordPress/gutenberg/pull/54825))
+- fix: Prevent crash from invalid media URLs. ([54834](https://github.com/WordPress/gutenberg/pull/54834))
 
 #### Site Editor
 - Avoid same key warnings in template parts area listings. ([54863](https://github.com/WordPress/gutenberg/pull/54863))
@@ -175,6 +183,7 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 - Post Title block should use esc_url(). ([53981](https://github.com/WordPress/gutenberg/pull/53981))
 - Rich text: Use getPasteEventData. ([55048](https://github.com/WordPress/gutenberg/pull/55048))
 - Writing flow: Absorb clipboard handler. ([55006](https://github.com/WordPress/gutenberg/pull/55006))
+- [RNMobile] Add optional chaining to \`reusableBlock.title\` and \`reusableBlock.content\`. ([54792](https://github.com/WordPress/gutenberg/pull/54792))
 
 #### Block Library
 - Footnotes: Avoid regexes in entity provider. ([54505](https://github.com/WordPress/gutenberg/pull/54505))
@@ -229,15 +238,19 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 - Migrate 'iframed masonry block' tests to Playwright. ([55016](https://github.com/WordPress/gutenberg/pull/55016))
 - Migrate 'iframed multiple block stylesheets' tests to Playwright. ([55003](https://github.com/WordPress/gutenberg/pull/55003))
 - Migrate keyboard-navigable-blocks end-to-end tests from puppeteer to playwright. ([54944](https://github.com/WordPress/gutenberg/pull/54944))
+- Mobile - Add support visual test themes. ([54376](https://github.com/WordPress/gutenberg/pull/54376))
 - Scripts: Properly use CommonJS for default Playwright configuration. ([54988](https://github.com/WordPress/gutenberg/pull/54988))
 - Try fixing the flaky 'Toolbar roving tabindex' end-to-end test. ([54785](https://github.com/WordPress/gutenberg/pull/54785))
 - end-to-end Tests: Revert temporary fixes. ([54865](https://github.com/WordPress/gutenberg/pull/54865))
 - end-to-end Utils: Allow overriding username/password. ([53267](https://github.com/WordPress/gutenberg/pull/53267))
+- test: End-to-end tests require supported iOS version. ([54760](https://github.com/WordPress/gutenberg/pull/54760))
 
 #### Build Tooling
 - Add some @types packages as proper dependencies. ([50231](https://github.com/WordPress/gutenberg/pull/50231))
+- Mobile Release v1.105.0. ([54898](https://github.com/WordPress/gutenberg/pull/54898))
 - Update the default JSX pragma to React instead of @wordpress/element. ([54494](https://github.com/WordPress/gutenberg/pull/54494))
 - Upgrade wp-prettier to v3.0.3 (final). ([54775](https://github.com/WordPress/gutenberg/pull/54775))
+- [RNMobile] Upgrade \`compileSdkVersion\` to 34 (Android). ([54437](https://github.com/WordPress/gutenberg/pull/54437))
 
 
 ### Security
@@ -249,6 +262,7 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 ### Various
 
 - (chore) Revert the 16.7 RC2 release in order to release it again due to wrong changelog. ([54744](https://github.com/WordPress/gutenberg/pull/54744))
+- [RNMobile] Update mobile iOS Ruby version to from 2.7.4 to 3.2.2. ([54897](https://github.com/WordPress/gutenberg/pull/54897))
 
 #### Design Tools
 - Background image block support: Add tests, adjust injection logic slightly. ([54489](https://github.com/WordPress/gutenberg/pull/54489))

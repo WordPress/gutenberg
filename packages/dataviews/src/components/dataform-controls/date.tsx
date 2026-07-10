@@ -435,7 +435,6 @@ function CalendarDateControl< Item >( {
 
 					{ /* Manual date input */ }
 					<InputControl
-						__next40pxDefaultSize
 						ref={ validityTargetRef }
 						type="date"
 						label={ __( 'Date' ) }
@@ -673,7 +672,6 @@ function CalendarDateRangeControl< Item >( {
 						className="dataviews-controls__date-range-inputs"
 					>
 						<InputControl
-							__next40pxDefaultSize
 							ref={ fromInputRef }
 							type="date"
 							label={ __( 'From' ) }
@@ -688,7 +686,6 @@ function CalendarDateRangeControl< Item >( {
 							max={ maxConstraint }
 						/>
 						<InputControl
-							__next40pxDefaultSize
 							ref={ toInputRef }
 							type="date"
 							label={ __( 'To' ) }

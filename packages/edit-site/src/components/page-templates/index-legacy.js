@@ -19,11 +19,13 @@ import AddNewTemplate from '../add-new-template-legacy';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
-import { authorField, descriptionField, previewField } from './fields';
+import { previewField } from './fields';
 
-const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
+
+const VIEW_CONFIG_FIELDS = [ 'default_view', 'default_layouts', 'view_list' ];
 
 export default function PageTemplates() {
 	const { path, query } = useLocation();
@@ -37,6 +39,7 @@ export default function PageTemplates() {
 	} = useViewConfig( {
 		kind: 'postType',
 		name: TEMPLATE_POST_TYPE,
+		fields: VIEW_CONFIG_FIELDS,
 	} );
 	const activeViewOverrides = useMemo(
 		() => viewList?.find( ( v ) => v.slug === activeView )?.view ?? {},
@@ -83,32 +86,10 @@ export default function PageTemplates() {
 		[ history, path, view?.type ]
 	);
 
-	const authors = useMemo( () => {
-		if ( ! records ) {
-			return [];
-		}
-		const authorsSet = new Set();
-		records.forEach( ( template ) => {
-			authorsSet.add( template.author_text );
-		} );
-		return Array.from( authorsSet ).map( ( author ) => ( {
-			value: author,
-			label: author,
-		} ) );
-	}, [ records ] );
-
-	const fields = useMemo(
-		() => [
-			previewField,
-			templateTitleField,
-			descriptionField,
-			{
-				...authorField,
-				elements: authors,
-			},
-		],
-		[ authors ]
-	);
+	const postFields = usePostFields( { postType: TEMPLATE_POST_TYPE } );
+	const fields = useMemo( () => {
+		return [ previewField, ...( postFields || [] ) ];
+	}, [ postFields ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );

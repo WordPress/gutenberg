@@ -1,12 +1,31 @@
 /**
+ * WordPress dependencies
+ */
+import {
+	RichTextData,
+	create,
+	applyFormat,
+	registerFormatType,
+	unregisterFormatType,
+	store as richTextStore,
+} from '@wordpress/rich-text';
+import { select } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import {
+	findNoteRange,
+	findNoteInBlock,
+	applyNoteFormat,
+	removeNoteFormat,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
 	calculateNotePositions,
 	pickPrimaryNote,
+	BLOCK_LEVEL_NOTE_START,
+	getInlineMarkerStart,
 } from '../utils';
 
 function makeRect( top ) {
@@ -525,5 +544,457 @@ describe( 'calculateNotePositions', () => {
 		// 3 (downward):  (184 + 50) - 200 + 20 = 54 → 254
 		// 1 (upward):    184 - 200 - 50 - 20 = -86 → 114
 		expect( positions ).toEqual( { 1: 114, 2: 184, 3: 254 } );
+	} );
+} );
+
+describe( 'findNoteRange', () => {
+	const FORMAT_NAME = 'core/note';
+
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, {
+				title: 'Note',
+				tagName: 'span',
+				className: 'wp-note',
+				attributes: { 'data-id': 'data-id' },
+				edit: () => null,
+			} );
+		}
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
+	} );
+
+	it( 'returns null for null/undefined input', () => {
+		expect( findNoteRange( null, 7 ) ).toBeNull();
+		expect( findNoteRange( undefined, 7 ) ).toBeNull();
+	} );
+
+	it( 'returns null when no marker is present', () => {
+		const value = RichTextData.fromHTMLString( 'hello world' );
+		expect( findNoteRange( value, 7 ) ).toBeNull();
+	} );
+
+	it( 'returns range for a marker matching the note id (RichTextData)', () => {
+		const value = RichTextData.fromHTMLString(
+			'hello <span class="wp-note" data-id="7">marked</span> world'
+		);
+		expect( findNoteRange( value, 7 ) ).toEqual( {
+			start: 6,
+			end: 12,
+		} );
+	} );
+
+	it( 'returns range for a marker matching the note id (string)', () => {
+		const html =
+			'hello <span class="wp-note" data-id="7">marked</span> world';
+		expect( findNoteRange( html, 7 ) ).toEqual( { start: 6, end: 12 } );
+	} );
+
+	it( 'returns null when the marker id does not match', () => {
+		const value = RichTextData.fromHTMLString(
+			'<span class="wp-note" data-id="3">x</span>'
+		);
+		expect( findNoteRange( value, 7 ) ).toBeNull();
+	} );
+
+	it( 'coerces ids to strings so numeric vs string ids match', () => {
+		const value = RichTextData.fromHTMLString(
+			'<span class="wp-note" data-id="7">x</span>'
+		);
+		expect( findNoteRange( value, '7' ) ).toEqual( { start: 0, end: 1 } );
+	} );
+
+	it( 'returns null when noteId itself is null/undefined', () => {
+		const value = RichTextData.fromHTMLString(
+			'<span class="wp-note" data-id="7">x</span>'
+		);
+		expect( findNoteRange( value, null ) ).toBeNull();
+		expect( findNoteRange( value, undefined ) ).toBeNull();
+	} );
+} );
+
+describe( 'findNoteInBlock', () => {
+	const FORMAT_NAME = 'core/note';
+
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, {
+				title: 'Note',
+				tagName: 'span',
+				className: 'wp-note',
+				attributes: { 'data-id': 'data-id' },
+				edit: () => null,
+			} );
+		}
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
+	} );
+
+	it( 'returns null when attributes are null/undefined', () => {
+		expect( findNoteInBlock( null, 7 ) ).toBeNull();
+		expect( findNoteInBlock( undefined, 7 ) ).toBeNull();
+	} );
+
+	it( 'returns null when no attribute carries a matching marker', () => {
+		const attributes = {
+			content: RichTextData.fromHTMLString( 'hello world' ),
+			align: 'left',
+		};
+		expect( findNoteInBlock( attributes, 7 ) ).toBeNull();
+	} );
+
+	it( 'returns the attribute key and range of the matching marker', () => {
+		const attributes = {
+			content: RichTextData.fromHTMLString(
+				'hello <span class="wp-note" data-id="7">marked</span> world'
+			),
+		};
+		expect( findNoteInBlock( attributes, 7 ) ).toEqual( {
+			attributeKey: 'content',
+			start: 6,
+			end: 12,
+		} );
+	} );
+
+	it( 'discovers the marker in a non-primary rich-text attribute', () => {
+		const attributes = {
+			content: RichTextData.fromHTMLString( 'no marker here' ),
+			caption: RichTextData.fromHTMLString(
+				'<span class="wp-note" data-id="9">cap</span>'
+			),
+		};
+		expect( findNoteInBlock( attributes, 9 ) ).toEqual( {
+			attributeKey: 'caption',
+			start: 0,
+			end: 3,
+		} );
+	} );
+
+	it( 'ignores non-rich-text attribute values without throwing', () => {
+		const attributes = {
+			level: 2,
+			anchor: '',
+			content: RichTextData.fromHTMLString(
+				'<span class="wp-note" data-id="3">x</span>'
+			),
+		};
+		expect( findNoteInBlock( attributes, 3 ) ).toEqual( {
+			attributeKey: 'content',
+			start: 0,
+			end: 1,
+		} );
+	} );
+
+	it( 'coerces ids to strings so numeric vs string ids match', () => {
+		const attributes = {
+			content: RichTextData.fromHTMLString(
+				'<span class="wp-note" data-id="7">x</span>'
+			),
+		};
+		expect( findNoteInBlock( attributes, '7' ) ).toEqual( {
+			attributeKey: 'content',
+			start: 0,
+			end: 1,
+		} );
+	} );
+} );
+
+describe( 'applyNoteFormat', () => {
+	const FORMAT_NAME = 'core/note';
+
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, {
+				title: 'Note',
+				tagName: 'mark',
+				className: 'wp-note',
+				attributes: { 'data-id': 'data-id' },
+				edit: () => null,
+			} );
+		}
+		if ( ! select( richTextStore ).getFormatType( 'core/bold' ) ) {
+			registerFormatType( 'core/bold', {
+				title: 'Bold',
+				tagName: 'strong',
+				className: null,
+				edit: () => null,
+			} );
+		}
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
+		if ( select( richTextStore ).getFormatType( 'core/bold' ) ) {
+			unregisterFormatType( 'core/bold' );
+		}
+	} );
+
+	const note = ( id ) => ( {
+		type: FORMAT_NAME,
+		attributes: { 'data-id': String( id ) },
+	} );
+
+	// Apply a sequence of [ id, start, end ] notes, then round-trip through HTML
+	// to a normalised value (matching how wrapInlineNote stores the result).
+	const applyAll = ( html, ops ) => {
+		let record = create( { html } );
+		for ( const [ id, start, end ] of ops ) {
+			record = applyNoteFormat( record, note( id ), start, end );
+		}
+		return RichTextData.fromHTMLString(
+			new RichTextData( record ).toHTMLString()
+		);
+	};
+
+	it( 'adds a single marker over plain text', () => {
+		const value = applyAll( 'the quick brown fox', [ [ 7, 4, 9 ] ] );
+		expect( value.toHTMLString() ).toBe(
+			'the <mark data-id="7" class="wp-note">quick</mark> brown fox'
+		);
+	} );
+
+	it( 'nests a contained note inside its parent (outer applied first)', () => {
+		const value = applyAll( 'the quick brown fox jumps over', [
+			[ 2, 0, 29 ],
+			[ 1, 16, 22 ],
+		] );
+		expect( value.toHTMLString() ).toBe(
+			'<mark data-id="2" class="wp-note">the quick brown <mark data-id="1" class="wp-note">fox ju</mark>mps ove</mark>r'
+		);
+	} );
+
+	it( 'nests the same regardless of application order (inner applied first)', () => {
+		const value = applyAll( 'the quick brown fox jumps over', [
+			[ 1, 16, 22 ],
+			[ 2, 0, 29 ],
+		] );
+		expect( value.toHTMLString() ).toBe(
+			'<mark data-id="2" class="wp-note">the quick brown <mark data-id="1" class="wp-note">fox ju</mark>mps ove</mark>r'
+		);
+	} );
+
+	it( 'keeps both notes when a larger note covers an existing one (no clobber)', () => {
+		const value = applyAll( 'the quick brown fox jumps over', [
+			[ 1, 16, 22 ],
+			[ 2, 0, 29 ],
+		] );
+		expect( findNoteRange( value, 1 ) ).toEqual( { start: 16, end: 22 } );
+		expect( findNoteRange( value, 2 ) ).toEqual( { start: 0, end: 29 } );
+	} );
+
+	it( 'preserves both full ranges across a partial (crossing) overlap', () => {
+		const value = applyAll( 'the quick brown fox jumps over', [
+			[ 1, 0, 18 ],
+			[ 2, 10, 30 ],
+		] );
+		expect( findNoteRange( value, 1 ) ).toEqual( { start: 0, end: 18 } );
+		expect( findNoteRange( value, 2 ) ).toEqual( { start: 10, end: 30 } );
+	} );
+
+	it( 'keeps disjoint notes separate', () => {
+		const value = applyAll( 'the quick brown fox jumps over', [
+			[ 1, 0, 9 ],
+			[ 2, 16, 25 ],
+		] );
+		expect( value.toHTMLString() ).toBe(
+			'<mark data-id="1" class="wp-note">the quick</mark> brown <mark data-id="2" class="wp-note">fox jumps</mark> over'
+		);
+	} );
+
+	it( 'preserves the note range when wrapping already-formatted text', () => {
+		let record = create( { html: 'the quick brown fox jumps over' } );
+		record = applyFormat( record, { type: 'core/bold' }, 4, 9 );
+		record = applyNoteFormat( record, note( 1 ), 0, 18 );
+		const value = RichTextData.fromHTMLString(
+			new RichTextData( record ).toHTMLString()
+		);
+		expect( findNoteRange( value, 1 ) ).toEqual( { start: 0, end: 18 } );
+	} );
+} );
+
+describe( 'getInlineMarkerStart', () => {
+	// `findNoteInBlock` (which getInlineMarkerStart delegates to) walks rich-text
+	// values and needs the `core/note` format registered to recognize the marker
+	// elements the tests construct below.
+	const FORMAT_NAME = 'core/note';
+
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, {
+				title: 'Note',
+				tagName: 'mark',
+				className: 'wp-note',
+				attributes: { 'data-id': 'data-id' },
+				edit: () => null,
+			} );
+		}
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
+	} );
+
+	it( 'returns the block-level sentinel when the block carries no marker for the note', () => {
+		const attributes = {
+			content: RichTextData.fromHTMLString( 'hello world' ),
+		};
+		const thread = { id: 1 };
+		expect( getInlineMarkerStart( thread, attributes ) ).toBe(
+			BLOCK_LEVEL_NOTE_START
+		);
+	} );
+
+	it( 'returns the marker start offset when the block carries a matching marker', () => {
+		const attributes = {
+			content: RichTextData.fromHTMLString(
+				'hello <mark class="wp-note" data-id="7">marked</mark> world'
+			),
+		};
+		expect( getInlineMarkerStart( { id: 7 }, attributes ) ).toBe( 6 );
+	} );
+
+	it( 'discovers the marker in a non-primary rich-text attribute', () => {
+		const attributes = {
+			content: RichTextData.fromHTMLString( 'no marker here' ),
+			caption: RichTextData.fromHTMLString(
+				'xx <mark class="wp-note" data-id="7">y</mark>'
+			),
+		};
+		expect( getInlineMarkerStart( { id: 7 }, attributes ) ).toBe( 3 );
+	} );
+
+	it( 'returns the block-level sentinel when block attributes are empty', () => {
+		expect( getInlineMarkerStart( { id: 7 }, {} ) ).toBe(
+			BLOCK_LEVEL_NOTE_START
+		);
+	} );
+
+	it( 'returns the block-level sentinel when block attributes are null', () => {
+		expect( getInlineMarkerStart( { id: 7 }, null ) ).toBe(
+			BLOCK_LEVEL_NOTE_START
+		);
+	} );
+
+	it( 'is order-stable when used as a sort key: block-level first, then by start offset, then by id', () => {
+		const attributes = {
+			content: RichTextData.fromHTMLString(
+				'a <mark class="wp-note" data-id="2">x</mark> b <mark class="wp-note" data-id="3">y</mark> c <mark class="wp-note" data-id="1">z</mark>'
+			),
+		};
+		const threads = [
+			// Block-level note (no marker) — should sort first.
+			{ id: 99 },
+			// Inline notes — should sort by marker offset, then id.
+			{ id: 1 },
+			{ id: 2 },
+			{ id: 3 },
+		];
+		const sorted = [ ...threads ].sort( ( a, b ) => {
+			const aStart = getInlineMarkerStart( a, attributes );
+			const bStart = getInlineMarkerStart( b, attributes );
+			if ( aStart !== bStart ) {
+				return aStart - bStart;
+			}
+			return a.id - b.id;
+		} );
+		expect( sorted.map( ( t ) => t.id ) ).toEqual( [ 99, 2, 3, 1 ] );
+	} );
+} );
+
+describe( 'removeNoteFormat', () => {
+	// `create`/`findNoteRange` parse marker elements through the registered
+	// `core/note` format, so register it for the fixtures below.
+	const FORMAT_NAME = 'core/note';
+
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, {
+				title: 'Note',
+				tagName: 'mark',
+				className: 'wp-note',
+				attributes: { 'data-id': 'data-id' },
+				edit: () => null,
+			} );
+		}
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
+	} );
+
+	it( 'returns null when the value is not rich text', () => {
+		expect( removeNoteFormat( 'plain string', 1 ) ).toBeNull();
+		expect( removeNoteFormat( undefined, 1 ) ).toBeNull();
+	} );
+
+	it( 'returns null when no marker matches the note id', () => {
+		const value = RichTextData.fromHTMLString(
+			'the <mark class="wp-note" data-id="2">quick</mark> brown fox'
+		);
+		expect( removeNoteFormat( value, 1 ) ).toBeNull();
+	} );
+
+	it( 'removes the marker while leaving the text intact', () => {
+		const value = RichTextData.fromHTMLString(
+			'the <mark class="wp-note" data-id="7">quick</mark> brown fox'
+		);
+		expect( removeNoteFormat( value, 7 ).toHTMLString() ).toBe(
+			'the quick brown fox'
+		);
+	} );
+
+	it( 'removes only the targeted note, leaving a co-located note intact', () => {
+		// Note 2 wraps the whole string; note 1 nests inside it.
+		const value = RichTextData.fromHTMLString(
+			'<mark data-id="2" class="wp-note">the quick brown <mark data-id="1" class="wp-note">fox ju</mark>mps ove</mark>r'
+		);
+		const result = removeNoteFormat( value, 1 );
+		expect( findNoteRange( result, 1 ) ).toBeNull();
+		expect( findNoteRange( result, 2 ) ).toEqual( { start: 0, end: 29 } );
+	} );
+
+	it( 'matches numeric and string note ids', () => {
+		const html = 'a <mark class="wp-note" data-id="5">b</mark> c';
+		expect(
+			removeNoteFormat(
+				RichTextData.fromHTMLString( html ),
+				5
+			).toHTMLString()
+		).toBe( 'a b c' );
+		expect(
+			removeNoteFormat(
+				RichTextData.fromHTMLString( html ),
+				'5'
+			).toHTMLString()
+		).toBe( 'a b c' );
 	} );
 } );

@@ -52,10 +52,10 @@ const imageSchema = {
 	},
 };
 
-// Read a pixel dimension from an `<img>` HTML attribute and normalise it to
-// the `<value>px` form the Image block stores in its `width` / `height`
-// attributes. Non-integer values (e.g. `50%`) are dropped because the block
-// attribute round-trips through inline styles that expect pixel units.
+// Normalise an `<img>` pixel dimension attribute to the `<value>px` form the
+// Image block stores in its `width`/`height` attributes. Non-integer values
+// (e.g. `50%`) are dropped because the attribute round-trips through inline
+// styles that expect pixel units.
 function parsePixelDimension( value ) {
 	return value && /^\d+$/.test( value ) ? `${ value }px` : undefined;
 }
@@ -114,14 +114,39 @@ const transforms = {
 					anchorElement && anchorElement.className
 						? anchorElement.className
 						: undefined;
-				// Preserve explicit pixel dimensions set on the source `<img>`
-				// (e.g. legacy "Add Media" output: `<img width="77" height="77">`).
-				const width = parsePixelDimension(
+				// Pin only one dimension and let the other follow the aspect
+				// ratio via `auto`. Pinning both as fixed pixels stretches the
+				// image when a theme caps the width while the height stays
+				// fixed. So width sources use `height: 'auto'`; height-only
+				// sources use `width: 'auto'`.
+				const widthValue = parsePixelDimension(
 					img.getAttribute( 'width' )
 				);
-				const height = parsePixelDimension(
+				const heightValue = parsePixelDimension(
 					img.getAttribute( 'height' )
 				);
+				// When both dimensions are declared, preserve the source's
+				// shape via `aspectRatio` (mirroring the resize handle). CSS
+				// `aspect-ratio` needs no fixed dimensions, so the image keeps
+				// its proportions even when the `src` can't resolve to natural
+				// dimensions (e.g. an empty or blob `src`) — without it the
+				// `height: 'auto'` would collapse to `0`.
+				// `parseInt` is `NaN` for an absent dimension and `0` for a
+				// zero one (both falsy), so a bogus ratio is never stored.
+				const widthNumber = parseInt( widthValue, 10 );
+				const heightNumber = parseInt( heightValue, 10 );
+				const aspectRatio =
+					widthNumber && heightNumber
+						? String( widthNumber / heightNumber )
+						: undefined;
+				// A height-only source declares a single dimension, so it can't
+				// carry an aspect ratio: `width: 'auto'` is capped by
+				// `max-width: 100%` while the fixed height can still stretch a
+				// wide source. This is a known edge case (a panoramic image
+				// pinned by height only) left unsolved here.
+				const width =
+					widthValue || ( heightValue ? 'auto' : undefined );
+				const height = widthValue ? 'auto' : heightValue;
 				const attributes = getBlockAttributes(
 					'core/image',
 					node.outerHTML,
@@ -135,6 +160,7 @@ const transforms = {
 						anchor,
 						width,
 						height,
+						aspectRatio,
 					}
 				);
 

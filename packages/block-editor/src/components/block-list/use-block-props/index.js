@@ -105,6 +105,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		canMove,
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 	} = useContext( PrivateBlockContext );
 
 	const defaultViewRef = useRefEffect( ( element ) => {
@@ -153,6 +154,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const { isBlockCurrentlyHidden } = useBlockVisibility( {
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 		view: defaultViewRef.current,
 	} );
 
@@ -185,7 +187,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
-		inert: isSubtreeDisabled ? true : undefined,
+		inert: isSubtreeDisabled ? 'true' : undefined,
 		className: clsx(
 			'block-editor-block-list__block',
 			{

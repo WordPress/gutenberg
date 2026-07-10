@@ -3,6 +3,11 @@ export interface FixtureItem {
 	value: string;
 }
 
+export interface FixtureGroup {
+	label: string;
+	items: FixtureItem[];
+}
+
 export const COMMANDS: FixtureItem[] = [
 	{ id: 'c1', value: 'Add new page' },
 	{ id: 'c2', value: 'Add new post' },
@@ -12,6 +17,32 @@ export const COMMANDS: FixtureItem[] = [
 	{ id: 'c6', value: 'Manage users' },
 	{ id: 'c7', value: 'Open settings' },
 	{ id: 'c8', value: 'Toggle dark mode' },
+];
+
+export const GROUPED_COMMANDS: FixtureGroup[] = [
+	{
+		label: 'Content',
+		items: [
+			{ id: 'g1', value: 'Add new page' },
+			{ id: 'g2', value: 'Add new post' },
+			{ id: 'g3', value: 'Edit site' },
+		],
+	},
+	{
+		label: 'Management',
+		items: [
+			{ id: 'g4', value: 'Manage plugins' },
+			{ id: 'g5', value: 'Manage users' },
+			{ id: 'g6', value: 'Open settings' },
+		],
+	},
+	{
+		label: 'Appearance',
+		items: [
+			{ id: 'g7', value: 'Toggle dark mode' },
+			{ id: 'g8', value: 'View site' },
+		],
+	},
 ];
 
 export const USERS: FixtureItem[] = [

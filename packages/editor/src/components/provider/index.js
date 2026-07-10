@@ -36,6 +36,7 @@ import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
 import { useRevisionBlocks } from './use-revision-blocks';
 import useCommands from '../commands';
 import useUploadSaveLock from './use-upload-save-lock';
+import useNetworkReconnect from './use-network-reconnect';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
@@ -379,7 +380,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		}, [ post.type, post.id, setEditedPost, removeNotice ] );
 
 		// Synchronize the editor settings as they change.
-		useEffect( () => {
+		// Do it as a layout effect so that rendered UI with outdated settings is not painted.
+		useLayoutEffect( () => {
 			updateEditorSettings( settings );
 		}, [ settings, updateEditorSettings ] );
 
@@ -402,6 +404,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 		// Lock post saving when media uploads are in progress (experimental feature).
 		useUploadSaveLock();
+
+		// Pause/resume media upload queue on network disconnect/reconnect.
+		useNetworkReconnect();
 
 		if ( ! isReady || ! mode ) {
 			return null;

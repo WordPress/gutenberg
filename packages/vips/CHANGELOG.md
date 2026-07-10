@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+## 2.3.0 (2026-07-01)
+
+## 2.2.0 (2026-06-24)
+
+### Enhancements
+
+- Bump `wasm-vips` to `^0.0.18`, adding native decoding of 10- and 12-bit (high bit depth) AVIF images ([#79179](https://github.com/WordPress/gutenberg/pull/79179)).
+- Preserve the bit depth of high-bit-depth (10/12-bit) AVIF images through `resizeImage`, `compressImage`, and `convertImageFormat` so HDR sub-sizes are no longer flattened to 8-bit.
+
+## 2.1.1 (2026-06-16)
+
+## 2.1.0 (2026-06-10)
+
+### New Features
+
+- Add `getUltraHdrInfo` for probing UltraHDR (ISO 21496-1 gain map) JPEGs ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
+- Preserve UltraHDR gain maps through `resizeImage`: libvips's `uhdrload`/`uhdrsave` priority is leveraged automatically, the save path keeps `icc|gainmap` metadata, and positional crop now also crops the attached gain map ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
+- Bump `wasm-vips` to `^0.0.17` for native UltraHDR support ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
+
 ## 2.0.0 (2026-05-27)
 
 ### Breaking Changes

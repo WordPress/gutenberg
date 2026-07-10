@@ -42,20 +42,6 @@ describe( 'getNormalizedTitle', () => {
 		[ 'adds period', 'Fixes a bug', 'Fixes a bug.' ],
 		[ 'keeps period', 'Fixes a bug.', 'Fixes a bug.' ],
 		[
-			'omits mobile by title',
-			'[RNMoBILe] Address mobile concern',
-			undefined,
-		],
-		[
-			'omits mobile by issue',
-			'Address mobile concern',
-			undefined,
-			{
-				...DEFAULT_ISSUE,
-				labels: [ { name: 'Mobile App - i.e. Android or iOS' } ],
-			},
-		],
-		[
 			'avoids reword of joined terms',
 			'e2e-tests: Improve test stability',
 			'e2e-tests: Improve test stability.',

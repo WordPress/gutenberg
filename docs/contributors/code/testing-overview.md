@@ -480,30 +480,6 @@ In that case, you might see test failures and `TypeError` reported by Jest in th
 
 Running `npm run test:unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
 
-## Native mobile testing
-
-Part of the unit-tests suite is a set of Jest tests run exercise native-mobile codepaths, developed in React Native. Since those tests run on Node, they can be launched locally on your development machine without the need for specific native Android or iOS dev tools or SDKs. It also means that they can be debugged using typical dev tools. Read on for instructions how to debug.
-
-### Debugging the native mobile unit tests
-
-To locally run the tests in debug mode, follow these steps:
-
-0. Make sure you have ran `npm ci` to install all the packages
-1. Run `npm run test:native:debug` inside the Gutenberg root folder, on the CLI. Node is now waiting for the debugger to connect.
-2. Open `chrome://inspect` in Chrome
-3. Under the "Remote Target" section, look for a `../../node_modules/.bin/jest` target and click on the "inspect" link. That will open a new window with the Chrome DevTools debugger attached to the process and stopped at the beginning of the `jest.js` file. Alternatively, if the targets are not visible, click on the `Open dedicated DevTools for Node` link in the same page.
-4. You can place breakpoints or `debugger;` statements throughout the code, including the tests code, to stop and inspect
-5. Click on the "Play" button to resume execution
-6. Enjoy debugging the native mobile unit tests!
-
-### Native mobile end-to-end tests
-
-Contributors to Gutenberg will note that PRs include continuous integration E2E tests running the native mobile E2E tests on Android and iOS. For troubleshooting failed tests, check our guide on [native mobile tests in continuous integration](/docs/contributors/code/react-native/integration-test-guide.md). More information on running these tests locally can be found in [here](/packages/react-native-editor/__device-tests__/README.md).
-
-### Native mobile integration tests
-
-There is an ongoing effort to add integration tests to the native mobile project using the [`react-native-testing-library`](https://testing-library.com/docs/react-native-testing-library/intro/) library. A guide to writing integration tests can be found [here](/docs/contributors/code/react-native/integration-test-guide.md).
-
 ## End-to-end testing
 
 End-to-end tests use [Playwright](https://playwright.dev/) as the testing framework. See the dedicated [End-to-End Testing guide](/docs/contributors/code/e2e/README.md) for best practices and detailed instructions.

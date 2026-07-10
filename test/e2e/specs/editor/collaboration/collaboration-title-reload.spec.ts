@@ -110,7 +110,6 @@ test( 'reloading after a synced title edit keeps both users on the same title', 
 	await collaborationUtils.waitForMutualDiscovery( { timeout: 30000 } );
 
 	const state = await collaborationUtils.waitForConvergence( {
-		includeCrdtDocument: true,
 		timeout: 30000,
 	} );
 

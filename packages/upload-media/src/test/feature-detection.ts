@@ -6,6 +6,7 @@ import {
 	isClientSideMediaSupported,
 	isHeicCanvasSupported,
 	clearFeatureDetectionCache,
+	exceedsClientProcessingMemory,
 } from '../feature-detection';
 
 describe( 'feature-detection', () => {
@@ -363,6 +364,65 @@ describe( 'feature-detection', () => {
 
 			const result2 = detectClientSideMediaSupport();
 			expect( result2.supported ).toBe( false );
+		} );
+	} );
+
+	describe( 'exceedsClientProcessingMemory', () => {
+		it( 'allows typical images', () => {
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 4000,
+					height: 3000,
+					interlaced: false,
+				} )
+			).toBe( false );
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 4000,
+					height: 3000,
+					interlaced: true,
+				} )
+			).toBe( false );
+		} );
+
+		it( 'gates the reported interlaced flower.jpg (20000x11857)', () => {
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 20000,
+					height: 11857,
+					interlaced: true,
+				} )
+			).toBe( true );
+		} );
+
+		it( 'applies a tighter budget to interlaced images', () => {
+			// ~150 MP: over the ~0.5 GiB interlaced budget but under the
+			// ~0.9 GiB baseline budget.
+			const dimensions = { width: 15000, height: 10000 };
+
+			expect(
+				exceedsClientProcessingMemory( {
+					...dimensions,
+					interlaced: true,
+				} )
+			).toBe( true );
+			expect(
+				exceedsClientProcessingMemory( {
+					...dimensions,
+					interlaced: false,
+				} )
+			).toBe( false );
+		} );
+
+		it( 'gates extremely large baseline images', () => {
+			// ~300 MP exceeds even the generous baseline budget.
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 20000,
+					height: 15000,
+					interlaced: false,
+				} )
+			).toBe( true );
 		} );
 	} );
 } );
