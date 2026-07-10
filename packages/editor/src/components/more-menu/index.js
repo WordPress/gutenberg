@@ -18,6 +18,7 @@ import { VisuallyHidden } from '@wordpress/ui';
  */
 import CopyContentMenuItem from './copy-content-menu-item';
 import ModeSwitcher from '../mode-switcher';
+import NotesMoreMenuGroup from './notes-more-menu-group';
 import ToolsMoreMenuGroup from './tools-more-menu-group';
 import ViewMoreMenuGroup from './view-more-menu-group';
 import { store as editorStore } from '../../store';
@@ -106,6 +107,7 @@ export default function MoreMenu( { disabled = false } ) {
 							/>
 							<ViewMoreMenuGroup.Slot fillProps={ { onClose } } />
 						</MenuGroup>
+						<NotesMoreMenuGroup.Slot fillProps={ { onClose } } />
 						<ModeSwitcher />
 						<ActionItem.Slot
 							name="core/plugin-more-menu"
