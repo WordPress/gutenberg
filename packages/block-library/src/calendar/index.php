@@ -20,6 +20,9 @@
 function render_block_core_calendar( $attributes ) {
 	global $monthnum, $year;
 
+	$inline_styles = '';
+	$classnames    = '';
+
 	// Calendar shouldn't be rendered
 	// when there are no published posts on the site.
 	if ( ! block_core_calendar_has_published_posts() ) {
