@@ -3,17 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItemsChoice,
-} from '@wordpress/components';
+import { MenuGroup, MenuItemsChoice } from '@wordpress/components';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as interfaceStore, PinnedItems } from '@wordpress/interface';
+import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
 
@@ -21,6 +17,7 @@ import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
  * Internal dependencies
  */
 import PluginSidebar from '../plugin-sidebar';
+import ViewMoreMenuGroup from '../more-menu/view-more-menu-group';
 import {
 	ALL_NOTES_SIDEBAR,
 	FLOATING_NOTES_SIDEBAR,
@@ -184,13 +181,6 @@ function NotesSidebar( { postId } ) {
 			: [];
 	const currentThread = pickPrimaryNote( currentThreads );
 
-	let notesDropdownValue = 'show';
-	if ( isAllNotesSidebarActive ) {
-		notesDropdownValue = 'show-all';
-	} else if ( notesDisplayMode === 'hide' ) {
-		notesDropdownValue = 'hide';
-	}
-
 	if ( isDistractionFree ) {
 		return <AddNoteMenuItem isDistractionFree />;
 	}
@@ -213,60 +203,37 @@ function NotesSidebar( { postId } ) {
 				}
 			/>
 			{ showAllNotesSidebar && (
-				<PinnedItems scope="core">
-					<DropdownMenu
-						icon={ commentIcon }
-						label={ __( 'Notes' ) }
-						menuProps={ {
-							'aria-label': __( 'Notes display options' ),
-						} }
-						toggleProps={ {
-							size: 'compact',
-						} }
-					>
-						{ () => (
-							<MenuGroup>
-								<MenuItemsChoice
-									choices={ [
-										{
-											value: 'show',
-											label: __( 'Show notes' ),
-										},
-										{
-											value: 'show-all',
-											label: __( 'Show all notes' ),
-										},
-										{
-											value: 'hide',
-											label: __( 'Hide notes' ),
-										},
-									] }
-									value={ notesDropdownValue }
-									onSelect={ ( value ) => {
-										if ( value === 'show-all' ) {
-											enableComplementaryArea(
-												'core',
-												ALL_NOTES_SIDEBAR
-											);
-											setNotesDisplayMode( 'show' );
-										} else {
-											if ( isAllNotesSidebarActive ) {
-												disableComplementaryArea(
-													'core'
-												);
-											}
-											setNotesDisplayMode( value );
-										}
-									} }
-								/>
-							</MenuGroup>
-						) }
-					</DropdownMenu>
-				</PinnedItems>
+				<ViewMoreMenuGroup>
+					{ ( { onClose } ) => (
+						<MenuGroup label={ __( 'Notes' ) }>
+							<MenuItemsChoice
+								choices={ [
+									{
+										value: 'show',
+										label: __( 'Show notes' ),
+									},
+									{
+										value: 'hide',
+										label: __( 'Hide notes' ),
+									},
+								] }
+								value={ notesDisplayMode }
+								onSelect={ ( value ) => {
+									// Close the "All notes" sidebar so the
+									// chosen mode is visible on the canvas.
+									if ( isAllNotesSidebarActive ) {
+										disableComplementaryArea( 'core' );
+									}
+									setNotesDisplayMode( value );
+									onClose();
+								} }
+							/>
+						</MenuGroup>
+					) }
+				</ViewMoreMenuGroup>
 			) }
 			{ showAllNotesSidebar && notesDisplayMode !== 'hide' && (
 				<PluginSidebar
-					isPinnable={ ! isLargeViewport }
 					identifier={ ALL_NOTES_SIDEBAR }
 					name={ ALL_NOTES_SIDEBAR }
 					title={ __( 'All notes' ) }
