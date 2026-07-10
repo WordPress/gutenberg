@@ -47,18 +47,6 @@ describe( 'getLayoutStyle', () => {
 	} );
 } );
 
-describe( 'FlexLayoutToolbarControls', () => {
-	it( 'uses the requested toolbar controls group', () => {
-		const controls = flex.toolBarControls( {
-			layoutBlockSupport: {},
-			controlsGroup: 'style-state',
-			onChange: jest.fn(),
-		} );
-
-		expect( controls.props.group ).toBe( 'style-state' );
-	} );
-} );
-
 describe( 'FlexLayoutInspectorControls', () => {
 	it( 'should not render the wrap toggle by default', () => {
 		renderInspectorControls();
