@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import type { ThemeProviderProps } from './types';
+import type { ThemeProviderProps } from './types.js';
 
 /**
  * @deprecated Private `@wordpress/theme` APIs will be removed in WordPress 7.3.
@@ -16,4 +16,4 @@ export declare const ThemeProvider: (
 	props: ThemeProviderProps
 ) => ReactElement;
 
-export type * from './prebuilt/ts/token-types';
+export type * from './prebuilt/ts/token-types.js';

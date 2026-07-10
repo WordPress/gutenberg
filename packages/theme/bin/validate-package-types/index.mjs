@@ -9,6 +9,14 @@ const rootEntryPath = join( packageRoot, 'src/index.ts' );
 const packageTypesPath = join( packageRoot, 'src/package-types.ts' );
 
 /**
+ * @param {string} moduleSpecifier Relative module specifier.
+ * @return {string} Module specifier without a JavaScript extension.
+ */
+function normalizeModuleSpecifier( moduleSpecifier ) {
+	return moduleSpecifier.replace( /\.[cm]?js$/, '' );
+}
+
+/**
  * @param {string} filePath Source file path.
  * @return {{ names: Set<string>, stars: Set<string> }} Exported names and
  * star export sources.
@@ -36,7 +44,7 @@ function getExportSurface( filePath ) {
 
 			if ( ! node.exportClause ) {
 				if ( moduleSpecifier ) {
-					stars.add( moduleSpecifier );
+					stars.add( normalizeModuleSpecifier( moduleSpecifier ) );
 				}
 				continue;
 			}
