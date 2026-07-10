@@ -10,6 +10,7 @@ import {
 	useLayoutEffect,
 	useMemo,
 	useRef,
+	useState,
 } from '@wordpress/element';
 
 /**
@@ -74,6 +75,16 @@ export function useBoundInnerBlocksProps( clientId, binding, blockType ) {
 			),
 		[ blockContext, resolvedBlockType, source ]
 	);
+	const hasCurrentFallbackSlot = useSelect(
+		( select ) => {
+			if ( ! clientId ) {
+				return false;
+			}
+			return select( blockEditorStore ).getBlocks( clientId ).length > 0;
+		},
+		[ clientId ]
+	);
+	const [ hasFallbackSlot ] = useState( hasCurrentFallbackSlot );
 	const serialized = useSelect(
 		( select ) => {
 			if ( ! source?.getValues ) {
@@ -91,7 +102,10 @@ export function useBoundInnerBlocksProps( clientId, binding, blockType ) {
 		[ source, context, clientId, args ]
 	);
 	const value = useMemo( () => {
-		if ( serialized === undefined ) {
+		if (
+			serialized === undefined ||
+			( serialized !== '' && ! hasFallbackSlot )
+		) {
 			return undefined;
 		}
 		if ( appliedRef.current.serialized === serialized ) {
@@ -100,7 +114,7 @@ export function useBoundInnerBlocksProps( clientId, binding, blockType ) {
 		const blocks = serialized === '' ? EMPTY_ARRAY : parse( serialized );
 		appliedRef.current = { serialized, blocks };
 		return blocks;
-	}, [ serialized ] );
+	}, [ serialized, hasFallbackSlot ] );
 
 	const writeBack = useCallback(
 		( blocks, persistent ) => {

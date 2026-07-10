@@ -129,6 +129,26 @@ describe( 'useBoundInnerBlocksProps', () => {
 		expect( result.current ).toBeUndefined();
 	} );
 
+	it( 'fails closed for a nonempty source without fallback children', () => {
+		registerBlockBindingsSource( {
+			name: SOURCE_NAME,
+			label: 'Test source',
+			getValues: () => ( { innerBlocks: PARAGRAPH_MARKUP } ),
+			setValues: () => {},
+		} );
+		const binding = { source: SOURCE_NAME };
+		const block = createBlock( 'test/inner-host', {
+			metadata: { bindings: { innerBlocks: binding } },
+		} );
+		act( () => {
+			dispatch( blockEditorStore ).resetBlocks( [ block ] );
+		} );
+
+		const { result } = renderBoundHook( block.clientId, binding );
+
+		expect( result.current ).toBeUndefined();
+	} );
+
 	it( 'writes serialized edits back to the source', () => {
 		const setValues = jest.fn();
 		registerBlockBindingsSource( {
@@ -139,13 +159,13 @@ describe( 'useBoundInnerBlocksProps', () => {
 		} );
 		const binding = { source: SOURCE_NAME };
 		const clientId = setupHost( binding );
+		const { result } = renderBoundHook( clientId, binding );
 		act( () => {
 			dispatch( blockEditorStore ).setHasControlledInnerBlocks(
 				clientId,
 				true
 			);
 		} );
-		const { result } = renderBoundHook( clientId, binding );
 		const editedBlocks = [
 			createBlock( 'core/paragraph', { content: 'Edited paragraph' } ),
 		];
