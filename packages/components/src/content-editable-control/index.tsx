@@ -81,7 +81,6 @@ function UnforwardedContentEditableControl(
  * through the forwarded ref and native event props (see the richtext DataForm
  * control in `@wordpress/dataviews` for the canonical assembly).
  *
- * @example
  * ```jsx
  * // The rich-text "assembly" lives in the consumer.
  * <ContentEditableControl
