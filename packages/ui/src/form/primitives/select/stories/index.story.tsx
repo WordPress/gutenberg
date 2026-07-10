@@ -23,49 +23,79 @@ export default meta;
 
 type Story = StoryObj< typeof Select.Root >;
 
-const defaultItems = Array.from( { length: 6 }, ( _, index ) => ( {
-	value: `item-${ index + 1 }`,
-	label: `Item ${ index + 1 }`,
-} ) );
+type SelectStoryItem = {
+	value: string | null;
+	label: string;
+	disabled?: boolean;
+};
+
+type SelectStoryArgs = {
+	items?: readonly SelectStoryItem[];
+	defaultValue?: SelectStoryItem | string | null;
+	disabled?: boolean;
+};
+
+function resolveItems(
+	items: unknown,
+	fallback: readonly SelectStoryItem[]
+): SelectStoryItem[] {
+	return Array.isArray( items )
+		? ( items as SelectStoryItem[] )
+		: [ ...fallback ];
+}
+
+const defaultItems: SelectStoryItem[] = Array.from(
+	{ length: 6 },
+	( _, index ) => ( {
+		value: `item-${ index + 1 }`,
+		label: `Item ${ index + 1 }`,
+	} )
+);
 
 export const Default: Story = {
 	args: {
 		items: defaultItems,
 	},
-	render: ( { items = defaultItems } ) => (
-		<Select.Root items={ items }>
-			<Select.Trigger />
-			<Select.Popup>
-				{ items.map( ( item ) => (
-					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
-					</Select.Item>
-				) ) }
-			</Select.Popup>
-		</Select.Root>
-	),
+	render: ( args ) => {
+		const items = resolveItems( args.items, defaultItems );
+		return (
+			<Select.Root items={ items }>
+				<Select.Trigger />
+				<Select.Popup>
+					{ items.map( ( item ) => (
+						<Select.Item key={ item.value } value={ item }>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</Select.Root>
+		);
+	},
 };
 
 export const Compact: Story = {
 	args: {
 		...Default.args,
 	},
-	render: ( { items = defaultItems } ) => (
-		<Select.Root items={ items }>
-			<Select.Trigger size="compact" />
-			<Select.Popup>
-				{ items.map( ( item ) => (
-					<Select.Item
-						key={ item.value }
-						value={ item }
-						size="compact"
-					>
-						{ item.label }
-					</Select.Item>
-				) ) }
-			</Select.Popup>
-		</Select.Root>
-	),
+	render: ( args ) => {
+		const items = resolveItems( args.items, defaultItems );
+		return (
+			<Select.Root items={ items }>
+				<Select.Trigger size="compact" />
+				<Select.Popup>
+					{ items.map( ( item ) => (
+						<Select.Item
+							key={ item.value }
+							value={ item }
+							size="compact"
+						>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</Select.Root>
+		);
+	},
 };
 
 /**
@@ -106,21 +136,24 @@ export const WithCustomPlaceholder: Story = {
 	args: {
 		items: defaultItems,
 	},
-	render: ( { items = defaultItems } ) => (
-		<Select.Root items={ items }>
-			<Select.Trigger placeholder="Choose an item" />
-			<Select.Popup>
-				{ items.map( ( item ) => (
-					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
-					</Select.Item>
-				) ) }
-			</Select.Popup>
-		</Select.Root>
-	),
+	render: ( args ) => {
+		const items = resolveItems( args.items, defaultItems );
+		return (
+			<Select.Root items={ items }>
+				<Select.Trigger placeholder="Choose an item" />
+				<Select.Popup>
+					{ items.map( ( item ) => (
+						<Select.Item key={ item.value } value={ item }>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</Select.Root>
+		);
+	},
 };
 
-const nullValueOptionItems = [
+const nullValueOptionItems: SelectStoryItem[] = [
 	{ value: null, label: 'Select theme' },
 	{ value: 'system', label: 'System default' },
 	{ value: 'light', label: 'Light' },
@@ -136,21 +169,24 @@ export const WithNullValueOption: Story = {
 	args: {
 		items: nullValueOptionItems,
 	},
-	render: ( { items = nullValueOptionItems } ) => (
-		<Select.Root items={ items }>
-			<Select.Trigger />
-			<Select.Popup>
-				{ items.map( ( item ) => (
-					<Select.Item
-						key={ item.value ?? 'null' }
-						value={ item.value }
-					>
-						{ item.label }
-					</Select.Item>
-				) ) }
-			</Select.Popup>
-		</Select.Root>
-	),
+	render: ( args ) => {
+		const items = resolveItems( args.items, nullValueOptionItems );
+		return (
+			<Select.Root items={ items }>
+				<Select.Trigger />
+				<Select.Popup>
+					{ items.map( ( item ) => (
+						<Select.Item
+							key={ item.value ?? 'null' }
+							value={ item.value }
+						>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</Select.Root>
+		);
+	},
 };
 
 /**
@@ -163,24 +199,27 @@ export const Labeling: Story = {
 	args: {
 		...Default.args,
 	},
-	render: ( { items = defaultItems } ) => (
-		<Select.Root items={ items }>
-			<Select.Trigger aria-label="User role" />
-			<Select.Popup>
-				{ items.map( ( item ) => (
-					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
-					</Select.Item>
-				) ) }
-			</Select.Popup>
-		</Select.Root>
-	),
+	render: ( args ) => {
+		const items = resolveItems( args.items, defaultItems );
+		return (
+			<Select.Root items={ items }>
+				<Select.Trigger aria-label="User role" />
+				<Select.Popup>
+					{ items.map( ( item ) => (
+						<Select.Item key={ item.value } value={ item }>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</Select.Root>
+		);
+	},
 };
 
 const longItemValue =
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
 
-const overflowItems = [
+const overflowItems: SelectStoryItem[] = [
 	{
 		value: 'long-item',
 		label: longItemValue,
@@ -196,18 +235,22 @@ export const WithOverflow: Story = {
 		items: overflowItems,
 		defaultValue: overflowItems[ 0 ],
 	},
-	render: ( { items = overflowItems, defaultValue } ) => (
-		<Select.Root items={ items } defaultValue={ defaultValue }>
-			<Select.Trigger />
-			<Select.Popup>
-				{ items.map( ( item ) => (
-					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
-					</Select.Item>
-				) ) }
-			</Select.Popup>
-		</Select.Root>
-	),
+	render: ( args ) => {
+		const { defaultValue } = args as SelectStoryArgs;
+		const items = resolveItems( args.items, overflowItems );
+		return (
+			<Select.Root items={ items } defaultValue={ defaultValue }>
+				<Select.Trigger />
+				<Select.Popup>
+					{ items.map( ( item ) => (
+						<Select.Item key={ item.value } value={ item }>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</Select.Root>
+		);
+	},
 };
 
 export const Disabled: Story = {
@@ -216,25 +259,29 @@ export const Disabled: Story = {
 		defaultValue: defaultItems[ 0 ],
 		disabled: true,
 	},
-	render: ( { items = defaultItems, defaultValue, disabled } ) => (
-		<Select.Root
-			items={ items }
-			defaultValue={ defaultValue }
-			disabled={ disabled }
-		>
-			<Select.Trigger />
-			<Select.Popup>
-				{ items.map( ( item ) => (
-					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
-					</Select.Item>
-				) ) }
-			</Select.Popup>
-		</Select.Root>
-	),
+	render: ( args ) => {
+		const { defaultValue, disabled } = args as SelectStoryArgs;
+		const items = resolveItems( args.items, defaultItems );
+		return (
+			<Select.Root
+				items={ items }
+				defaultValue={ defaultValue }
+				disabled={ disabled }
+			>
+				<Select.Trigger />
+				<Select.Popup>
+					{ items.map( ( item ) => (
+						<Select.Item key={ item.value } value={ item }>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</Select.Root>
+		);
+	},
 };
 
-const disabledItemItems = [
+const disabledItemItems: SelectStoryItem[] = [
 	{
 		value: 'item-1',
 		label: 'Item 1',
@@ -251,25 +298,29 @@ export const WithDisabledItem: Story = {
 		items: disabledItemItems,
 		defaultValue: disabledItemItems[ 0 ],
 	},
-	render: ( { items = disabledItemItems, defaultValue } ) => (
-		<Select.Root items={ items } defaultValue={ defaultValue }>
-			<Select.Trigger />
-			<Select.Popup>
-				{ items.map( ( item ) => (
-					<Select.Item
-						key={ item.value }
-						value={ item }
-						disabled={ item.disabled }
-					>
-						{ item.label }
-					</Select.Item>
-				) ) }
-			</Select.Popup>
-		</Select.Root>
-	),
+	render: ( args ) => {
+		const { defaultValue } = args as SelectStoryArgs;
+		const items = resolveItems( args.items, disabledItemItems );
+		return (
+			<Select.Root items={ items } defaultValue={ defaultValue }>
+				<Select.Trigger />
+				<Select.Popup>
+					{ items.map( ( item ) => (
+						<Select.Item
+							key={ item.value }
+							value={ item }
+							disabled={ item.disabled }
+						>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</Select.Root>
+		);
+	},
 };
 
-const customOptions = [
+const customOptions: SelectStoryItem[] = [
 	{
 		value: 'user-1',
 		label: 'User 1 (Admin)',
@@ -289,38 +340,42 @@ export const WithCustomTriggerAndItem: Story = {
 		items: customOptions,
 		defaultValue: customOptions[ 0 ],
 	},
-	render: ( { items = customOptions, defaultValue } ) => (
-		<Select.Root items={ items } defaultValue={ defaultValue }>
-			<Select.Trigger>
-				{ ( item ) => (
-					<span
-						style={ {
-							display: 'flex',
-							alignItems: 'center',
-							gap: 8,
-						} }
-					>
-						<img
-							src={ `https://gravatar.com/avatar/?d=initials&name=${ item.value }` }
-							alt=""
-							width="20"
+	render: ( args ) => {
+		const { defaultValue } = args as SelectStoryArgs;
+		const items = resolveItems( args.items, customOptions );
+		return (
+			<Select.Root items={ items } defaultValue={ defaultValue }>
+				<Select.Trigger>
+					{ ( item ) => (
+						<span
 							style={ {
-								borderRadius: '50%',
+								display: 'flex',
+								alignItems: 'center',
+								gap: 8,
 							} }
-						/>
-						{ item.label }
-					</span>
-				) }
-			</Select.Trigger>
-			<Select.Popup>
-				{ items.map( ( item ) => (
-					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
-					</Select.Item>
-				) ) }
-			</Select.Popup>
-		</Select.Root>
-	),
+						>
+							<img
+								src={ `https://gravatar.com/avatar/?d=initials&name=${ item.value }` }
+								alt=""
+								width="20"
+								style={ {
+									borderRadius: '50%',
+								} }
+							/>
+							{ item.label }
+						</span>
+					) }
+				</Select.Trigger>
+				<Select.Popup>
+					{ items.map( ( item ) => (
+						<Select.Item key={ item.value } value={ item }>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</Select.Root>
+		);
+	},
 };
 
 /**
@@ -344,22 +399,25 @@ export const WithCustomZIndex: Story = {
 	args: {
 		...Default.args,
 	},
-	render: ( { items = defaultItems } ) => (
-		<Select.Root items={ items }>
-			<Select.Trigger />
-			<Select.Popup
-				portal={
-					<Select.Portal
-						style={ { '--wp-ui-select-z-index': '9999' } }
-					/>
-				}
-			>
-				{ items.map( ( item ) => (
-					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
-					</Select.Item>
-				) ) }
-			</Select.Popup>
-		</Select.Root>
-	),
+	render: ( args ) => {
+		const items = resolveItems( args.items, defaultItems );
+		return (
+			<Select.Root items={ items }>
+				<Select.Trigger />
+				<Select.Popup
+					portal={
+						<Select.Portal
+							style={ { '--wp-ui-select-z-index': '9999' } }
+						/>
+					}
+				>
+					{ items.map( ( item ) => (
+						<Select.Item key={ item.value } value={ item }>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</Select.Root>
+		);
+	},
 };

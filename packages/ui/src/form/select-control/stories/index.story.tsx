@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { SelectControl } from '../';
+import type { SelectItem } from '../types';
 import {
 	WITH_DETAILS_DESCRIPTION,
 	DETAILS_EXAMPLE,
@@ -20,7 +21,7 @@ export default meta;
 
 type Story = StoryObj< typeof SelectControl >;
 
-const defaultItems = [
+const defaultItems: SelectItem[] = [
 	{
 		value: '1',
 		label: 'Item 1',
@@ -52,7 +53,7 @@ export const WithCustomPlaceholder: Story = {
 	},
 };
 
-const nullValueOptionItems = [
+const nullValueOptionItems: SelectItem[] = [
 	{
 		value: null,
 		label: 'Select theme',
@@ -102,7 +103,7 @@ export const WithDetails: Story = {
 	},
 };
 
-const disabledOptionItems = [
+const disabledOptionItems: SelectItem[] = [
 	{
 		value: '1',
 		label: 'Item 1',
@@ -123,7 +124,7 @@ export const WithDisabledOption: Story = {
 	},
 };
 
-const userOptions: React.ComponentProps< typeof SelectControl >[ 'items' ] = [
+const userOptions: SelectItem[] = [
 	{
 		value: '1',
 		label: 'User 1 (Admin)',
