@@ -224,6 +224,96 @@ test.describe( 'Block Notes', () => {
 		).toBeVisible();
 	} );
 
+	test( 'shows a "Resolved" divider between active and resolved notes', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		// First block: this note stays active and unresolved.
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Stays active.' },
+			comment: 'Active note.',
+		} );
+		// Second block: this note will be resolved.
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Resolve me.' },
+			comment: 'Note to resolve.',
+		} );
+		// Third block: its note is orphaned when the block is deleted.
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Orphan me.' },
+			comment: 'Note losing its block.',
+		} );
+
+		await blockNoteUtils.openBlockNoteSidebar();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const separator = sidebar.locator(
+			'.editor-collab-sidebar-panel__status-separator'
+		);
+
+		// No resolved notes yet, so the divider is absent.
+		await expect( separator ).toBeHidden();
+
+		// Resolve the second note.
+		const resolvedThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Note to resolve.',
+		} );
+		await resolvedThread.click();
+		await expect( resolvedThread ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note marked as resolved.' } )
+		).toBeVisible();
+
+		// The divider now labels the resolved section.
+		await expect( separator ).toBeVisible();
+		await expect( separator ).toHaveText( 'Resolved' );
+
+		// Delete the second block via the store, orphaning its note. Clicking
+		// the block in the canvas is unreliable here because the selected
+		// note's block toolbar popover overlaps it.
+		const orphanBlock = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Orphan me.' } );
+		const orphanClientId = await orphanBlock.getAttribute( 'data-block' );
+		await page.evaluate(
+			( clientId ) =>
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.removeBlock( clientId ),
+			orphanClientId
+		);
+
+		// The orphaned note persists and is flagged as detached, rather than
+		// being auto-deleted or moved into the resolved section.
+		await expect(
+			sidebar.getByRole( 'treeitem', {
+				name: 'Original block deleted. Note: Note losing its block.',
+			} )
+		).toBeVisible();
+
+		// Rows render in DOM order: unresolved notes first, then orphaned ones,
+		// both above the divider, with the resolved note below it.
+		await expect(
+			sidebar.locator( '.editor-collab-sidebar-panel > *' )
+		).toContainText( [
+			'Active note.',
+			'Note losing its block.',
+			'Resolved',
+			'Note to resolve.',
+		] );
+	} );
+
 	test( 'selecting a block or note marks it as an active', async ( {
 		editor,
 		page,

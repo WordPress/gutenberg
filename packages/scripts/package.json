@@ -100,8 +100,8 @@
 	"peerDependencies": {
 		"@playwright/test": ">=1",
 		"@wordpress/env": ">=10.0.0",
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"peerDependenciesMeta": {
 		"@playwright/test": {
