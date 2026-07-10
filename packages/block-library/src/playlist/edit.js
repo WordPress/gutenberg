@@ -427,7 +427,7 @@ const PlaylistEdit = ( {
 			{
 				colorValue: hasColors ? waveformColor : undefined,
 				gradientValue: hasGradients ? waveformGradientValue : undefined,
-				label: __( 'Waveform + Play' ),
+				label: __( 'Waveform & Play button' ),
 				onColorChange: hasColors ? updateWaveformColor : undefined,
 				onGradientChange: hasGradients
 					? updateWaveformGradient
