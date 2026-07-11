@@ -13,11 +13,18 @@ import { useSelect } from '@wordpress/data';
  */
 import UploadProgressSnackbar from '../';
 import { addFiles, advance, reset } from '../tracker';
+import { useIsGifConversionPromptVisible } from '../../gif-conversion-prompt';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
 	const mock = jest.fn();
 	return mock;
 } );
+
+// The GIF conversion prompt reads from stores this test does not set up;
+// its visibility is an input to the snackbar, so it is mocked directly.
+jest.mock( '../../gif-conversion-prompt', () => ( {
+	useIsGifConversionPromptVisible: jest.fn( () => false ),
+} ) );
 
 const mockCreateNotice = jest.fn();
 const mockRemoveNotice = jest.fn();
@@ -64,6 +71,18 @@ describe( 'UploadProgressSnackbar', () => {
 		mockQueue( [] );
 		render( <UploadProgressSnackbar /> );
 		expect( mockCreateNotice ).not.toHaveBeenCalled();
+	} );
+
+	it( 'suppresses the notice while the GIF conversion prompt is open', () => {
+		useIsGifConversionPromptVisible.mockReturnValue( true );
+		mockQueue( [ makeItem( '1', 'animated.gif' ) ] );
+		render( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).not.toHaveBeenCalled();
+		// An already-visible notice is retracted.
+		expect( mockRemoveNotice ).toHaveBeenCalledWith( 'upload-progress' );
+
+		useIsGifConversionPromptVisible.mockReturnValue( false );
 	} );
 
 	it( 'creates a notice with the filename when a single CSM upload is in progress', () => {

@@ -14,6 +14,7 @@ import { check } from '@wordpress/icons';
  * Internal dependencies
  */
 import { useTracker } from './tracker';
+import { useIsGifConversionPromptVisible } from '../gif-conversion-prompt';
 
 const NOTICE_ID = 'upload-progress';
 
@@ -110,6 +111,13 @@ export default function UploadProgressSnackbar() {
 
 	const { createNotice, removeNotice } = useDispatch( noticesStore );
 
+	// While the GIF conversion prompt is open the snackbar stays hidden:
+	// the prompt should be the single point of attention during the drop
+	// action, and it already implies the upload is underway. Audible
+	// announcements are kept so screen reader users still hear about the
+	// upload itself.
+	const isPromptVisible = useIsGifConversionPromptVisible();
+
 	// Track whether the user has dismissed the notice. If so, don't re-create
 	// it until the current batch finishes and a new one starts.
 	const dismissedRef = useRef( false );
@@ -144,7 +152,7 @@ export default function UploadProgressSnackbar() {
 		} else if ( ! isUploading && wasUploadingRef.current ) {
 			speak( __( 'Media upload complete' ), 'polite' );
 
-			if ( ! dismissedRef.current ) {
+			if ( ! dismissedRef.current && ! isPromptVisible ) {
 				createNotice( 'info', __( 'Upload complete' ), {
 					id: NOTICE_ID,
 					type: 'snackbar',
@@ -170,6 +178,14 @@ export default function UploadProgressSnackbar() {
 		wasUploadingRef.current = isUploading;
 
 		if ( ! isUploading || dismissedRef.current ) {
+			return;
+		}
+
+		// Suppress (and retract) the progress notice while the prompt is
+		// open; it reappears if uploads are still running once the prompt
+		// is answered.
+		if ( isPromptVisible ) {
+			removeNotice( NOTICE_ID );
 			return;
 		}
 
@@ -210,7 +226,15 @@ export default function UploadProgressSnackbar() {
 				dismissedRef.current = true;
 			},
 		} );
-	}, [ remaining, peak, csmOriginals, tracker, createNotice, removeNotice ] );
+	}, [
+		remaining,
+		peak,
+		csmOriginals,
+		tracker,
+		createNotice,
+		removeNotice,
+		isPromptVisible,
+	] );
 
 	return null;
 }
