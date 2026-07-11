@@ -11,6 +11,7 @@
 		]
 	},
 	"references": [
+		{ "path": "../a11y" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../data" },

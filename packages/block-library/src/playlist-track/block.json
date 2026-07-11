@@ -9,7 +9,7 @@
 	"description": "Playlist track.",
 	"keywords": [ "music", "sound" ],
 	"textdomain": "default",
-	"usesContext": [ "showArtists" ],
+	"usesContext": [ "showArtists", "showImages" ],
 	"attributes": {
 		"blob": {
 			"type": "string",
@@ -32,6 +32,9 @@
 			"type": "string"
 		},
 		"image": {
+			"type": "string"
+		},
+		"imageAlt": {
 			"type": "string"
 		},
 		"length": {

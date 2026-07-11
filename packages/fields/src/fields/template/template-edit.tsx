@@ -61,7 +61,6 @@ function ClassicTemplateEdit( {
 	);
 	return (
 		<SelectControl
-			__next40pxDefaultSize
 			label={ __( 'Template' ) }
 			hideLabelFromVision
 			value={ value }
@@ -126,7 +125,6 @@ function BlockThemeTemplateEdit( {
 	}, [ templates, defaultTemplateLabel ] );
 	return (
 		<SelectControl
-			__next40pxDefaultSize
 			label={ __( 'Template' ) }
 			hideLabelFromVision
 			value={ value }

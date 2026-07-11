@@ -9,6 +9,7 @@
 
 ### Enhancements
 
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 -   `WidgetAttributeField`: add optional `relevance` hint (`'high' | 'low'`)
     marking attributes a host may promote to a prominent surface.
 -   `WidgetModuleRecord`: add optional `category`, overlaid onto the
@@ -16,6 +17,17 @@
 -   `WidgetModuleRecord`: add optional `title`, `description`, and
     `keywords`, overlaid onto the metadata module's values. Lets a host
     supply metadata translated server-side.
+-   `WidgetTypeMetadata`: add optional `help`, a declarative contextual
+    note (`content` plus optional `links`) for compact surfaces such as
+    tooltips. Also carried by `WidgetModuleRecord`, overlaid onto the
+    metadata module's value.
+
+### Documentation
+
+-   Add a widget anatomy doc and lighten the widget system doc.
+-   Document the `relevance` hint and `help` note across anatomy, authoring,
+    and architecture docs; add an attribute-relevance diagram.
+-   Add a `WithRelevance` Storybook story for attribute relevance hints.
 
 ## 0.2.0 (2026-07-01)
 

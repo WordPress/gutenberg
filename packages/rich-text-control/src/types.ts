@@ -6,7 +6,7 @@ import type { MutableRefObject } from 'react';
 /*
  * Format types register their keyboard shortcut and input event callbacks
  * into these Sets via the contexts the control provides (see
- * `keyboardShortcutContext` / `inputEventContext` in `@wordpress/rich-text`).
+ * `KeyboardShortcutContext` / `InputEventContext` in `@wordpress/rich-text`).
  * The control dispatches them from its own element event listeners.
  */
 export type EventListenersProps = {

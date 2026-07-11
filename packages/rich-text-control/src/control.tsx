@@ -39,12 +39,12 @@ import shortcutsListener from './event-listeners/shortcuts';
 import inputEventsListener from './event-listeners/input-events';
 import type { EventListenersProps } from './types';
 
-// `keyboardShortcutContext` / `inputEventContext` are the same context objects
+// `KeyboardShortcutContext` / `InputEventContext` are the same context objects
 // that `@wordpress/block-editor`'s `RichTextShortcut` / `RichTextInputEvent`
 // read. Format types render those components, so providing these contexts here
 // (below) is what wires their keyboard shortcuts and input events to this
 // field even though the control lives outside `@wordpress/block-editor`.
-const { useRichText, keyboardShortcutContext, inputEventContext } =
+const { useRichText, KeyboardShortcutContext, InputEventContext } =
 	unlock( richTextPrivateApis );
 
 // The completer shape isn't exported from `@wordpress/components`, so derive
@@ -465,10 +465,10 @@ export default function RichTextControl( {
 		<>
 			<SlotFillProvider>
 				{ isSelected && (
-					<keyboardShortcutContext.Provider
+					<KeyboardShortcutContext.Provider
 						value={ keyboardShortcuts }
 					>
-						<inputEventContext.Provider value={ inputEvents }>
+						<InputEventContext.Provider value={ inputEvents }>
 							<FormatEdit
 								value={ value }
 								onChange={ onRichTextChange }
@@ -477,8 +477,8 @@ export default function RichTextControl( {
 								forwardedRef={ anchorRef }
 								isVisible={ false }
 							/>
-						</inputEventContext.Provider>
-					</keyboardShortcutContext.Provider>
+						</InputEventContext.Provider>
+					</KeyboardShortcutContext.Provider>
 				) }
 				{ popoverSlotContainer &&
 					createPortal(

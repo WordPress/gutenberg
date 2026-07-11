@@ -16,7 +16,7 @@ import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { decodeEntities } from '@wordpress/html-entities';
-import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
+import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -205,39 +205,31 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 						<BackButton>
 							{ ( { length } ) =>
 								length <= 1 && (
-									<div className="edit-site-editor__view-mode-toggle">
-										<Button
-											__next40pxDefaultSize
-											label={ __( 'Open Navigation' ) }
-											showTooltip
-											tooltipPosition="middle right"
-											onClick={ () => {
-												resetZoomLevel();
-												setCurrentRevisionId( null );
-												history.navigate(
-													getNavigationPath(
-														location,
-														postWithTemplate
-															? context.postType
-															: postType
-													),
-													{
-														transition:
-															'canvas-mode-view-transition',
-													}
-												);
-											} }
-										/>
-										<div className="edit-site-editor__back-icon">
-											<Icon
-												icon={
-													isRTL()
-														? chevronRight
-														: chevronLeft
+									<Button
+										size="compact"
+										label={ __( 'Open Navigation' ) }
+										showTooltip
+										tooltipPosition="middle right"
+										onClick={ () => {
+											resetZoomLevel();
+											setCurrentRevisionId( null );
+											history.navigate(
+												getNavigationPath(
+													location,
+													postWithTemplate
+														? context.postType
+														: postType
+												),
+												{
+													transition:
+														'canvas-mode-view-transition',
 												}
-											/>
-										</div>
-									</div>
+											);
+										} }
+										icon={
+											isRTL() ? chevronRight : chevronLeft
+										}
+									/>
 								)
 							}
 						</BackButton>

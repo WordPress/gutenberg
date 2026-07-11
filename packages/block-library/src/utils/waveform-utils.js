@@ -14,6 +14,7 @@ import WaveformPlayerLib from '@arraypress/waveform-player';
  * Note: DEFAULT_WAVEFORM_HEIGHT should match $waveform-player-height in style.scss.
  */
 const DEFAULT_WAVEFORM_HEIGHT = 100;
+const DEFAULT_SEEK_LABEL = 'Seek';
 
 /**
  * Get computed style for an element, using ownerDocument for iframe compatibility.
@@ -50,6 +51,8 @@ export function getWaveformColors( element ) {
  * @param {string} options.waveformColor - The waveform bar color.
  * @param {string} options.progressColor - The progress indicator color.
  * @param {string} options.buttonColor   - The play button color.
+ * @param {string} options.seekLabel     - Accessible label for the seek control.
+ * @param {string} options.seekValueText - Accessible value-text template for the seek control (e.g. '%1$s of %2$s').
  * @param {number} options.height        - The waveform height in pixels.
  * @param {string} options.waveformStyle - The visualization style (bars, mirror, line, blocks, dots, seekbar).
  * @return {Element} The configured container element.
@@ -62,6 +65,8 @@ export function createWaveformContainer( {
 	waveformColor,
 	progressColor,
 	buttonColor,
+	seekLabel,
+	seekValueText,
 	height = DEFAULT_WAVEFORM_HEIGHT,
 	waveformStyle = 'bars',
 } ) {
@@ -73,13 +78,23 @@ export function createWaveformContainer( {
 	container.setAttribute( 'data-waveform-color', waveformColor );
 	container.setAttribute( 'data-progress-color', progressColor );
 	container.setAttribute( 'data-button-color', buttonColor );
+	container.setAttribute(
+		'data-seek-label',
+		getSeekControlLabel( seekLabel )
+	);
+	// The library formats the current time and duration and interpolates them
+	// into this translated template for the seek slider's aria-valuetext.
+	if ( seekValueText ) {
+		container.setAttribute( 'data-seek-value-text', seekValueText );
+	}
 	container.setAttribute( 'data-text-color', buttonColor );
 	container.setAttribute( 'data-text-secondary-color', buttonColor );
+
 	if ( title ) {
 		container.setAttribute( 'data-title', title );
 	}
 	if ( artist ) {
-		container.setAttribute( 'data-subtitle', artist );
+		container.setAttribute( 'data-artist', artist );
 	}
 	if ( artwork ) {
 		container.setAttribute( 'data-artwork', artwork );
@@ -139,6 +154,36 @@ export function setupPlayButtonAccessibility(
 }
 
 /**
+ * Get the accessible label for the waveform seek control.
+ *
+ * @param {string} label - Accessible label for the seek control.
+ * @return {string} The provided label or translated fallback.
+ */
+function getSeekControlLabel( label ) {
+	return label || DEFAULT_SEEK_LABEL;
+}
+
+/**
+ * Update the waveform seek control label.
+ *
+ * @param {Object} instance - The WaveformPlayer instance.
+ * @param {string} label    - Accessible label for the seek control.
+ */
+export function updateSeekControlLabel( instance, label ) {
+	const seekLabel = getSeekControlLabel( label );
+	instance.options.seekLabel = seekLabel;
+	instance.applySeekLabel?.( seekLabel );
+
+	const seekControl = instance?.container?.querySelector(
+		'.waveform-container'
+	);
+
+	if ( seekControl ) {
+		seekControl.setAttribute( 'aria-label', seekLabel );
+	}
+}
+
+/**
  * Log play errors, filtering out expected AbortError.
  *
  * @param {Error} error - The error from play().
@@ -166,6 +211,7 @@ export function logPlayError( error ) {
  * @param {string}   options.title         - The track title.
  * @param {string}   options.artist        - The artist name.
  * @param {string}   options.image         - The artwork image URL.
+ * @param {string}   options.imageAlt      - The artwork image alt text.
  * @param {boolean}  options.autoPlay      - Whether to auto-play when ready.
  * @param {Function} options.onEnded       - Callback when track ends.
  * @param {Object}   options.labels        - Translated button labels.
@@ -174,7 +220,17 @@ export function logPlayError( error ) {
  */
 export function initWaveformPlayer(
 	element,
-	{ src, title, artist, image, autoPlay, onEnded, labels, waveformStyle }
+	{
+		src,
+		title,
+		artist,
+		image,
+		imageAlt,
+		autoPlay,
+		onEnded,
+		labels,
+		waveformStyle,
+	}
 ) {
 	// Get colors from computed styles.
 	const { textColor, waveformColor, progressColor } =
@@ -189,19 +245,26 @@ export function initWaveformPlayer(
 		waveformColor,
 		progressColor,
 		buttonColor: textColor,
+		seekLabel: title || labels?.seek,
+		seekValueText: labels?.seekValueText,
 		waveformStyle,
 	} );
 	element.appendChild( container );
 
-	// Initialize the WaveformPlayer library.
+	// Initialize the WaveformPlayer library. The library reads the translated
+	// seek label and value-text templates from the container's data attributes
+	// and owns the seek slider's accessible label and value text.
 	const instance = new WaveformPlayerLib( container );
+	if ( instance.artworkEl ) {
+		instance.artworkEl.alt = imageAlt || '';
+	}
 
 	// Set up event handlers.
-	let cleanupAccessibility;
+	let cleanupPlayButtonAccessibility;
 	const handlers = {
 		ready: () => {
 			styleSvgIcons( container, textColor );
-			cleanupAccessibility = setupPlayButtonAccessibility(
+			cleanupPlayButtonAccessibility = setupPlayButtonAccessibility(
 				container,
 				labels
 			);
@@ -220,7 +283,7 @@ export function initWaveformPlayer(
 		instance,
 		container,
 		destroy: () => {
-			cleanupAccessibility?.();
+			cleanupPlayButtonAccessibility?.();
 			container.removeEventListener(
 				'waveformplayer:ready',
 				handlers.ready
