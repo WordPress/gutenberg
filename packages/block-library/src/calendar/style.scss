@@ -2,9 +2,18 @@
 
 .wp-block-calendar {
 	text-align: center;
+
 	table {
 		width: 100%;
 		border-collapse: collapse;
+
+		&.has-background th {
+			background-color: inherit;
+		}
+
+		&.has-text-color th {
+			color: inherit;
+		}
 	}
 
 	th,
@@ -23,6 +32,10 @@
 
 	.has-border-color {
 		border-style: solid;
+	}
+
+	:where(table:not(.has-text-color)) {
+		color: #40464d;
 	}
 }
 
