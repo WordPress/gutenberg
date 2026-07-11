@@ -1,10 +1,50 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`props should render as another element 1`] = `
+exports[`props should ignore legacy css prop styles (array) 1`] = `
 <div>
   <p
-    class="css-1ragr82-PolymorphicDiv emotion-0"
+    data-testid="custom-css-array-view"
   >
+    <span />
+  </p>
+</div>
+`;
+
+exports[`props should ignore legacy css prop styles (object) 1`] = `
+<div>
+  <p
+    data-testid="custom-css-object-view"
+  >
+    <span />
+  </p>
+</div>
+`;
+
+exports[`props should ignore legacy css prop styles (string) 1`] = `
+<div>
+  <p
+    data-testid="custom-css-string-view"
+  >
+    <span />
+  </p>
+</div>
+`;
+
+exports[`props should render as a custom component 1`] = `
+<div>
+  <section
+    class="custom-class"
+    data-custom-component="true"
+    data-testid="custom-view"
+  >
+    <span />
+  </section>
+</div>
+`;
+
+exports[`props should render as another element 1`] = `
+<div>
+  <p>
     <span />
   </p>
 </div>
@@ -12,40 +52,8 @@ exports[`props should render as another element 1`] = `
 
 exports[`props should render correctly 1`] = `
 <div>
-  <div
-    class="css-1ragr82-PolymorphicDiv emotion-0"
-  >
+  <div>
     <span />
   </div>
-</div>
-`;
-
-exports[`props should render with custom styles (Array) 1`] = `
-<div>
-  <p
-    class="css-1ragr82-PolymorphicDiv emotion-0"
-  >
-    <span />
-  </p>
-</div>
-`;
-
-exports[`props should render with custom styles (object) 1`] = `
-<div>
-  <p
-    class="css-1ragr82-PolymorphicDiv emotion-0"
-  >
-    <span />
-  </p>
-</div>
-`;
-
-exports[`props should render with custom styles (string) 1`] = `
-<div>
-  <p
-    class="css-1ragr82-PolymorphicDiv emotion-0"
-  >
-    <span />
-  </p>
 </div>
 `;

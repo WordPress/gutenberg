@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 15.1.0 (2026-07-01)
+
+## 15.0.0 (2026-06-24)
+
+### Breaking Changes
+
+-   Update all icons to render with `currentColor` by default. Consumers that style icons by setting inherited `fill` on a wrapper should set `color` instead, or pass `style={ { color: ... } }` to the icon. ([#79320](https://github.com/WordPress/gutenberg/pull/79320))
+
 ## 14.0.1 (2026-06-16)
 
 ## 14.0.0 (2026-06-10)

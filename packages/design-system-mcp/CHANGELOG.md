@@ -4,6 +4,14 @@
 
 ### Bug Fixes
 
+-   Fix error caused by changes in upstream package APIs prerelease version ([#80061](https://github.com/WordPress/gutenberg/pull/80061)).
+
+## 0.7.0 (2026-07-01)
+
+## 0.6.0 (2026-06-24)
+
+### Bug Fixes
+
 -   Remove implicit dependency on `storybook` in TypeScript types ([#79132](https://github.com/WordPress/gutenberg/pull/79132)).
 
 ## 0.5.1 (2026-06-16)

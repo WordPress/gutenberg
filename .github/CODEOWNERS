@@ -45,6 +45,7 @@
 /packages/edit-widgets                          @draganescu @adamziel @kevin940726
 /packages/customize-widgets
 /packages/widgets
+/packages/widget-primitives                     @retrofox
 
 # Full Site Editing
 /packages/edit-site
@@ -55,6 +56,7 @@
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra @manzoorwanijk
 /tools                                          @manzoorwanijk
+/tools/eslint/suppressions.json
 /packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @ntwb @nerrad @ajitbohra
@@ -90,6 +92,8 @@
 /packages/dataviews                             @oandregal @gigitux @ntsekouras
 /packages/theme                                 @WordPress/gutenberg-components
 /packages/ui                                    @WordPress/gutenberg-components
+/packages/widget-dashboard                      @retrofox
+/packages/grid                                  @retrofox
 
 # Utilities
 /packages/a11y
@@ -127,6 +131,10 @@
 
 # wp-env
 /packages/env                                   @t-hamano
+
+# Widget Dashboard
+/routes/dashboard                               @retrofox
+/lib/experimental/dashboard-widgets             @retrofox
 
 # PHP
 /lib                                            @spacedmonkey

@@ -277,19 +277,17 @@ export function renderingMode( state = 'post-only', action ) {
 }
 
 /**
- * Reducer returning the editing canvas device type.
+ * Reducer for the canvas width.
  *
- * @param {Object} state  Current state.
+ * @param {number} state  Current state.
  * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
+ * @return {number} Updated state.
  */
-export function deviceType( state = 'Desktop', action ) {
+export function canvasWidth( state = undefined, action ) {
 	switch ( action.type ) {
-		case 'SET_DEVICE_TYPE':
-			return action.deviceType;
+		case 'SET_CANVAS_WIDTH':
+			return action.width;
 	}
-
 	return state;
 }
 
@@ -500,7 +498,7 @@ export default combineReducers( {
 	editorSettings,
 	postAutosavingLock,
 	renderingMode,
-	deviceType,
+	canvasWidth,
 	removedPanels,
 	blockInserterPanel,
 	inserterSidebarToggleRef,

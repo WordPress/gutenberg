@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.50.0 (2026-07-01)
+
+## 1.49.0 (2026-06-24)
+
 ### Enhancements
 
 -   Added `RequestUtils.resetThemeGlobalStyles()` to reset the current theme's user global styles to an empty config for test isolation.
