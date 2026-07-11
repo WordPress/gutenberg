@@ -20,9 +20,10 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		const { value, onMerge, onRemove } = props.current;
+		const { getValue, onMerge, onRemove } = props.current;
 
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
+			const value = getValue();
 			const { start, end, text } = value;
 			const isReverse = keyCode === BACKSPACE;
 			const hasActiveFormats =

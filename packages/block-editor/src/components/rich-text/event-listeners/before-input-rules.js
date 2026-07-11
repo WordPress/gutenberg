@@ -25,12 +25,14 @@ const wrapSelectionSettings = [ '`', '"', "'", '“”', '‘’' ];
 export default ( props ) => ( element ) => {
 	function onInput( event ) {
 		const { inputType, data } = event;
-		const { value, onChange, registry } = props.current;
+		const { getValue, onChange, registry } = props.current;
 
 		// Only run the rules when inserting text.
 		if ( inputType !== 'insertText' ) {
 			return;
 		}
+
+		const value = getValue();
 
 		if ( isCollapsed( value ) ) {
 			return;

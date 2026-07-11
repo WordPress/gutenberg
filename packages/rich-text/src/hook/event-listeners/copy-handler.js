@@ -16,16 +16,17 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
 	function onCopy( event ) {
-		const { record } = props.current;
+		const { getValue } = props.current;
 		const { ownerDocument } = element;
+		const value = getValue();
 		if (
-			isCollapsed( record.current ) ||
+			isCollapsed( value ) ||
 			! element.contains( ownerDocument.activeElement )
 		) {
 			return;
 		}
 
-		const selectedRecord = slice( record.current );
+		const selectedRecord = slice( value );
 		const plainText = getTextContent( selectedRecord );
 		const html = toHTMLString( { value: selectedRecord } );
 		event.clipboardData.setData( 'text/plain', plainText );

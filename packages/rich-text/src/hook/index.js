@@ -13,6 +13,7 @@ import { create, RichTextData } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { removeFormat } from '../remove-format';
+import { getActiveFormats } from '../get-active-formats';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useEventListeners } from './event-listeners';
@@ -65,6 +66,92 @@ function useRichTextBase( {
 	// Internal values are updated synchronously, unlike props and state.
 	const _valueRef = useRef( value );
 	const recordRef = useRef();
+
+	// Caches the value derived by `getValue`, keyed by the DOM selection and
+	// the record it was derived from. Any record change creates a new record
+	// object, so the record reference doubles as the cache invalidation for
+	// everything but the DOM selection itself.
+	const derivedValueCacheRef = useRef( {} );
+	// The value as of right before an input: set by a `beforeinput` listener
+	// and consumed by input handling, which computes the changed range from
+	// the offsets before the input, so they cannot be read after the fact.
+	const preInputValueRef = useRef();
+	// Owned by the input event listeners; read here so no selection is read
+	// while the user is composing text.
+	const isComposingRef = useRef( false );
+
+	/**
+	 * Returns the current value: the record, with its selection derived from
+	 * the DOM selection when the element owns it. The native
+	 * `selectionchange` event is asynchronous and coalesced, so the record's
+	 * offsets may be behind the DOM selection when read; the fresh offsets
+	 * are derived on demand instead. The record itself is not modified:
+	 * record and store synchronization stays on the `selectionchange` event
+	 * and on value changes, as before.
+	 */
+	function getValue() {
+		const element = ref.current;
+		const record = recordRef.current;
+
+		if ( ! element || isComposingRef.current ) {
+			return record;
+		}
+
+		if (
+			element.contentEditable !== 'true' ||
+			element.ownerDocument.activeElement !== element
+		) {
+			return record;
+		}
+
+		const { anchorNode, anchorOffset, focusNode, focusOffset } =
+			element.ownerDocument.defaultView.getSelection();
+		const cache = derivedValueCacheRef.current;
+
+		if (
+			cache.record === record &&
+			cache.anchorNode === anchorNode &&
+			cache.anchorOffset === anchorOffset &&
+			cache.focusNode === focusNode &&
+			cache.focusOffset === focusOffset
+		) {
+			return cache.value;
+		}
+
+		const { start, end, text } = createRecord();
+		let derivedValue = record;
+
+		// A text mismatch is reconciled by input handling; equal offsets
+		// need no derivation.
+		if (
+			text === record.text &&
+			( start !== record.start || end !== record.end )
+		) {
+			derivedValue = {
+				...record,
+				start,
+				end,
+				// _newActiveFormats may be set on arrow key navigation to
+				// control the right boundary position. If undefined,
+				// getActiveFormats will give the active formats according to
+				// the browser.
+				activeFormats: record._newActiveFormats,
+				_newActiveFormats: undefined,
+			};
+			derivedValue.activeFormats = getActiveFormats( derivedValue, [] );
+		}
+
+		derivedValueCacheRef.current = {
+			record,
+			anchorNode,
+			anchorOffset,
+			focusNode,
+			focusOffset,
+			value: derivedValue,
+		};
+
+		return derivedValue;
+	}
 
 	function setRecordFromProps() {
 		const activeFormats = recordRef.current?.activeFormats;
@@ -216,6 +303,9 @@ function useRichTextBase( {
 			isSelected,
 			onSelectionChange,
 			forceRender,
+			getValue,
+			preInputValueRef,
+			isComposingRef,
 		} ),
 		useRefEffect( () => {
 			applyFromProps();
@@ -225,12 +315,13 @@ function useRichTextBase( {
 
 	return {
 		value: recordRef.current,
-		// A function to get the most recent value so event handlers in
-		// useRichText implementations have access to it. For example when
-		// listening to input events, we internally update the state, but this
-		// state is not yet available to the input event handler because React
-		// may re-render asynchronously.
-		getValue: () => recordRef.current,
+		// A function to get the current value, so event handlers in
+		// useRichText implementations have access to it. The value rendered
+		// by React may be behind: internal updates happen synchronously while
+		// React re-renders asynchronously, and the record's selection is only
+		// as recent as the last (asynchronous) `selectionchange` event, so
+		// the selection is derived from the DOM on every call.
+		getValue,
 		onChange: handleChange,
 		ref: mergedRefs,
 	};

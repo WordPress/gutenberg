@@ -41,7 +41,7 @@ export default ( props ) => ( element ) => {
 		}
 
 		const {
-			value,
+			getValue,
 			onChange,
 			disableLineBreaks,
 			onSplitAtEnd,
@@ -51,6 +51,7 @@ export default ( props ) => ( element ) => {
 
 		event.preventDefault();
 
+		const value = getValue();
 		const { text, start, end } = value;
 
 		if ( event.shiftKey ) {

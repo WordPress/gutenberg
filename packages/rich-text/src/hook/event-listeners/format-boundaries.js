@@ -29,15 +29,16 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		const { record, applyRecord, forceRender } = props.current;
+		const { record, applyRecord, forceRender, getValue } = props.current;
+		const value = getValue();
 		const {
 			text,
 			formats,
 			start,
 			end,
 			activeFormats: currentActiveFormats = [],
-		} = record.current;
-		const collapsed = isCollapsed( record.current );
+		} = value;
+		const collapsed = isCollapsed( value );
 		const { defaultView } = element.ownerDocument;
 		// To do: ideally, we should look at visual position instead.
 		const { direction } = defaultView.getComputedStyle( element );
@@ -90,6 +91,11 @@ export default ( props ) => ( element ) => {
 		const origin = isReverse ? formatsAfter : formatsBefore;
 		const source = isIncreasing ? destination : origin;
 		const newActiveFormats = source.slice( 0, newActiveFormatsLength );
+		// Only the active formats change: base the new record on the current
+		// record, not the value derived from the DOM selection. Writing
+		// derived offsets here would hide a pending selection change from
+		// the `selectionchange` handler, which would then never dispatch it
+		// to the store.
 		const newValue = {
 			...record.current,
 			activeFormats: newActiveFormats,

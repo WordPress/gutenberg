@@ -23,7 +23,7 @@ export default ( props ) => ( element ) => {
 		const {
 			disableFormats,
 			onChange,
-			value,
+			getValue,
 			formatTypes,
 			tagName,
 			onReplace,
@@ -42,6 +42,8 @@ export default ( props ) => ( element ) => {
 		if ( event.defaultPrevented ) {
 			return;
 		}
+
+		const value = getValue();
 
 		const { plainText, html } = getPasteEventData( event );
 

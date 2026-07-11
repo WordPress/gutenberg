@@ -63,14 +63,12 @@ export default ( props ) => ( element ) => {
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
 
-	let isComposing = false;
-
 	function onInput( event ) {
 		// Do not trigger a change if characters are being composed. Browsers
 		// will usually emit a final `input` event when the characters are
 		// composed. As of December 2019, Safari doesn't support
 		// nativeEvent.isComposing.
-		if ( isComposing ) {
+		if ( props.current.isComposingRef.current ) {
 			return;
 		}
 
@@ -80,8 +78,19 @@ export default ( props ) => ( element ) => {
 			inputType = event.inputType;
 		}
 
-		const { record, applyRecord, createRecord, handleChange } =
-			props.current;
+		const {
+			record,
+			applyRecord,
+			createRecord,
+			handleChange,
+			preInputValueRef,
+		} = props.current;
+
+		// The value as of right before this input, pinned by the
+		// `beforeinput` listener. The record itself may be a `selectionchange`
+		// event behind: the native event is asynchronous.
+		const preInputValue = preInputValueRef.current ?? record.current;
+		preInputValueRef.current = undefined;
 
 		// The browser formatted something or tried to insert HTML. Overwrite
 		// it. It will be handled later by the format library if needed.
@@ -95,13 +104,13 @@ export default ( props ) => ( element ) => {
 		}
 
 		const currentValue = createRecord();
-		const { start, activeFormats: oldActiveFormats = [] } = record.current;
+		const { start, activeFormats: oldActiveFormats = [] } = preInputValue;
 
 		// When a non-collapsed selection is deleted (not replaced with new
 		// text), the old active formats refer to the deleted content and
 		// should not be carried forward.
 		const clearFormats =
-			! isCollapsed( record.current ) && currentValue.start <= start;
+			! isCollapsed( preInputValue ) && currentValue.start <= start;
 
 		// Update the formats between the last and new caret position.
 		const change = updateFormats( {
@@ -137,7 +146,7 @@ export default ( props ) => ( element ) => {
 
 		// In case of a keyboard event, ignore selection changes during
 		// composition.
-		if ( isComposing ) {
+		if ( props.current.isComposingRef.current ) {
 			return;
 		}
 
@@ -189,7 +198,7 @@ export default ( props ) => ( element ) => {
 	}
 
 	function onCompositionStart() {
-		isComposing = true;
+		props.current.isComposingRef.current = true;
 		// `handleSelectionChange` returns early while composing, so the
 		// selection is not updated as characters are composed (which rerenders
 		// the component and might destroy internal browser editing state).
@@ -201,7 +210,7 @@ export default ( props ) => ( element ) => {
 	}
 
 	function onCompositionEnd() {
-		isComposing = false;
+		props.current.isComposingRef.current = false;
 		// Ensure the value is up-to-date for browsers that don't emit a final
 		// input event after composition.
 		onInput( { inputType: 'insertText' } );
@@ -267,6 +276,16 @@ export default ( props ) => ( element ) => {
 		onInput,
 		true
 	);
+	// Pin the value before the browser mutates the DOM for `onInput`, which
+	// needs the offsets from before the input.
+	const unsubscribeBeforeInput = subscribeDelegatedListener(
+		element,
+		'beforeinput',
+		() => {
+			props.current.preInputValueRef.current = props.current.getValue();
+		},
+		true
+	);
 	const unsubscribeCompositionStart = subscribeDelegatedListener(
 		element,
 		'compositionstart',
@@ -295,6 +314,7 @@ export default ( props ) => ( element ) => {
 
 	return () => {
 		unsubscribeInput();
+		unsubscribeBeforeInput();
 		unsubscribeCompositionStart();
 		unsubscribeCompositionEnd();
 		unsubscribeFocus();
