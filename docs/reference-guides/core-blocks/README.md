@@ -129,7 +129,7 @@ A calendar of your site’s posts.
 
 -	**Name:** [core/calendar](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-calendar/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** align, anchor, color (background, link, text), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, anchor, color (background, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** month, year
 
 ## Terms List
