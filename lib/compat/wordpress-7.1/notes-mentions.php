@@ -260,8 +260,15 @@ if ( ! function_exists( 'gutenberg_notify_note_mentions' ) ) {
 				continue;
 			}
 
-			// Only notify users who can actually read the note's post.
-			if ( $post && ! user_can( $user_id, 'read_post', $post->ID ) ) {
+			/*
+			 * Only notify users who can actually read the note. Notes are
+			 * internal: core's WP_REST_Comments_Controller::check_read_permission()
+			 * only exposes a note to its author or to users who can edit it, so
+			 * the email audience is held to the same bar. A plain read_post
+			 * check would leak note content to e.g. subscribers on a public
+			 * post, who cannot see the note in the editor.
+			 */
+			if ( ! user_can( $user_id, 'edit_comment', $comment->comment_ID ) ) {
 				continue;
 			}
 

@@ -178,6 +178,29 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$this->assertNotContains( $author_email, $this->sent_to );
 	}
 
+	public function test_mentioned_user_without_note_access_is_not_emailed() {
+		$subscriber_id = self::factory()->user->create( array( 'role' => 'subscriber' ) );
+
+		$mention = sprintf(
+			'<a class="wp-note-mention" data-user-id="%d" href="#">@Subscriber</a>',
+			$subscriber_id
+		);
+		$note    = $this->insert_note( "Ping $mention", self::$commenter_id );
+
+		gutenberg_notify_note_mentions( $note );
+
+		// Notes are only readable by users who can edit them; a subscriber
+		// cannot, so emailing them would leak content they cannot see.
+		$subscriber_email = get_userdata( $subscriber_id )->user_email;
+		$this->assertNotContains( $subscriber_email, $this->sent_to );
+
+		// They are still recorded as a follower in case their role changes.
+		$this->assertContains(
+			$subscriber_id,
+			gutenberg_get_note_followers( $note->comment_ID )
+		);
+	}
+
 	public function test_followers_are_notified_of_replies() {
 		$mention = sprintf(
 			'<a class="wp-note-mention" data-user-id="%d" href="#">@Mentioned</a>',
