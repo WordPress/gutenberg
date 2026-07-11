@@ -118,6 +118,36 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_mention_markup_survives_kses_for_authors() {
+		$author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$post_id   = self::factory()->post->create( array( 'post_author' => $author_id ) );
+
+		// Authors lack unfiltered_html, so comment kses filters their content.
+		wp_set_current_user( $author_id );
+		$this->assertFalse( current_user_can( 'unfiltered_html' ) );
+
+		$mention = sprintf(
+			'<a class="wp-note-mention" data-user-id="%d" href="http://example.com/">@Mentioned</a>',
+			self::$mentioned_id
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->set_param( 'post', $post_id );
+		$request->set_param( 'type', 'note' );
+		$request->set_param( 'content', "Ping $mention" );
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		// The mention attributes must survive the comment kses pass or the
+		// mention is silently dropped from parsing and notifications.
+		$comment = get_comment( $response->get_data()['id'] );
+		$this->assertSame(
+			array( self::$mentioned_id ),
+			gutenberg_get_note_mentioned_user_ids( $comment->comment_content )
+		);
+	}
+
 	public function test_thread_root_is_parent_for_replies() {
 		$root  = $this->insert_note( 'Top level', self::$commenter_id );
 		$reply = $this->insert_note( 'A reply', self::$commenter_id, $root->comment_ID );

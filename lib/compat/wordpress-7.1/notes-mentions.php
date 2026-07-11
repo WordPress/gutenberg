@@ -49,6 +49,103 @@ if ( ! function_exists( 'gutenberg_get_note_mentioned_user_ids' ) ) {
 	}
 }
 
+if ( ! function_exists( 'gutenberg_note_mention_allowed_html' ) ) {
+	/**
+	 * Adds the mention attributes to the comment kses allowlist.
+	 *
+	 * For users without `unfiltered_html`, comment content passes through
+	 * `wp_filter_kses()` with the default comment allowlist, which only permits
+	 * `href` and `title` on `<a>`. That strips the `class` and `data-user-id`
+	 * attributes mentions are stored with, silently breaking mention parsing
+	 * for authors and contributors (and everyone but super admins on
+	 * multisite). This filter is only installed while a REST request is saving
+	 * a note, so ordinary comments keep the default allowlist.
+	 *
+	 * @param array[] $tags    Allowed HTML tags and attributes.
+	 * @param string  $context Kses context name.
+	 * @return array[] Filtered tags.
+	 */
+	function gutenberg_note_mention_allowed_html( $tags, $context ) {
+		if ( 'pre_comment_content' === $context && isset( $tags['a'] ) && is_array( $tags['a'] ) ) {
+			$tags['a']['class']        = true;
+			$tags['a']['data-user-id'] = true;
+		}
+		return $tags;
+	}
+}
+
+if ( ! function_exists( 'gutenberg_rest_request_saves_note' ) ) {
+	/**
+	 * Determines whether a REST request creates or updates a note.
+	 *
+	 * @param WP_REST_Request $request The matched REST request.
+	 * @return bool Whether the request writes a note comment.
+	 */
+	function gutenberg_rest_request_saves_note( WP_REST_Request $request ): bool {
+		if ( ! in_array( $request->get_method(), array( 'POST', 'PUT', 'PATCH' ), true ) ) {
+			return false;
+		}
+
+		if ( ! str_starts_with( $request->get_route(), '/wp/v2/comments' ) ) {
+			return false;
+		}
+
+		if ( 'note' === $request->get_param( 'type' ) ) {
+			return true;
+		}
+
+		// Updates usually omit `type`; look at the targeted comment instead.
+		$comment_id = (int) $request->get_param( 'id' );
+		if ( $comment_id > 0 ) {
+			$existing = get_comment( $comment_id );
+			return $existing && 'note' === $existing->comment_type;
+		}
+
+		return false;
+	}
+}
+
+if ( ! function_exists( 'gutenberg_note_mentions_before_rest_callbacks' ) ) {
+	/**
+	 * Installs the mention kses allowance while a REST request saves a note.
+	 *
+	 * `rest_request_before_callbacks` runs after routing, so on updates the
+	 * targeted comment is known, and before the endpoint filters comment
+	 * content through kses. The paired `rest_request_after_callbacks` handler
+	 * removes the allowance again so other comment writes in the same request
+	 * lifecycle (e.g. batch requests) keep the default allowlist.
+	 *
+	 * @param mixed           $response Result to send; untouched here.
+	 * @param array|callable  $handler  Route handler (unused).
+	 * @param WP_REST_Request $request  The matched request.
+	 * @return mixed Untouched $response.
+	 */
+	function gutenberg_note_mentions_before_rest_callbacks( $response, $handler, $request ) {
+		unset( $handler );
+
+		if ( $request instanceof WP_REST_Request && gutenberg_rest_request_saves_note( $request ) ) {
+			add_filter( 'wp_kses_allowed_html', 'gutenberg_note_mention_allowed_html', 10, 2 );
+		}
+
+		return $response;
+	}
+	add_filter( 'rest_request_before_callbacks', 'gutenberg_note_mentions_before_rest_callbacks', 10, 3 );
+}
+
+if ( ! function_exists( 'gutenberg_note_mentions_after_rest_callbacks' ) ) {
+	/**
+	 * Removes the mention kses allowance after a REST request completes.
+	 *
+	 * @param mixed $response Result to send; untouched here.
+	 * @return mixed Untouched $response.
+	 */
+	function gutenberg_note_mentions_after_rest_callbacks( $response ) {
+		remove_filter( 'wp_kses_allowed_html', 'gutenberg_note_mention_allowed_html', 10 );
+		return $response;
+	}
+	add_filter( 'rest_request_after_callbacks', 'gutenberg_note_mentions_after_rest_callbacks' );
+}
+
 if ( ! function_exists( 'gutenberg_get_note_thread_root_id' ) ) {
 	/**
 	 * Returns the ID of the top-level note that anchors a thread.
