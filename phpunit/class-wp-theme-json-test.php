@@ -1733,7 +1733,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$base_styles   = ':root{--wp--preset--color--green: green;}';
-		$block_styles  = ':root :where(.wp-block-calendar){color: green;font-size: 3em;}';
+		$block_styles  = ':root :where(.wp-block-calendar){font-size: 3em;}:root :where(.wp-block-calendar table){color: green;}';
 		$preset_styles = '.has-green-color{color: var(--wp--preset--color--green) !important;}.has-green-background-color{background-color: var(--wp--preset--color--green) !important;}.has-green-border-color{border-color: var(--wp--preset--color--green) !important;}';
 		$expected      = $base_styles . $block_styles . $preset_styles;
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles', 'presets', 'variables' ), null, array( 'skip_root_layout_styles' => true ) ) );
