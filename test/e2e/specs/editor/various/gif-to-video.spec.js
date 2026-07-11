@@ -236,9 +236,10 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'prompts on upload and converts to a video on request, with a round-trip transform back', async ( {
+	test( 'prompts on upload and converts to a video on request, with undo as the way back', async ( {
 		editor,
 		page,
+		pageUtils,
 		gifToVideoUtils,
 		requestUtils,
 	} ) => {
@@ -339,22 +340,17 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 			`${ videoBlock.attributes.width } / ${ videoBlock.attributes.height }`
 		);
 
-		// The switcher on the converted block offers the way back: transform
-		// to an Image block showing the original GIF. The block's accessible
-		// name reflects the active variation, so it reads "Block: GIF".
-		await editor.canvas
-			.getByRole( 'document', { name: /^Block: (GIF|Video)$/ } )
-			.click();
-		await page
-			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: /^(GIF|Video)$/ } )
-			.click();
-		await page
-			.getByRole( 'menu', { name: /^(GIF|Video)$/ } )
-			.getByRole( 'menuitem', { name: 'Image', exact: true } )
-			.click();
+		// There is deliberately no transform back to an Image block; undo is
+		// the way back. A single undo reverts the swap and restores the
+		// Image block showing the original GIF.
+		await pageUtils.pressKeys( 'primary+z' );
 
 		await gifToVideoUtils.waitForBlock( 'core/image', 10_000 );
+		expect(
+			( await gifToVideoUtils.getBlocks() ).every(
+				( block ) => block.name !== 'core/video'
+			)
+		).toBe( true );
 
 		const restoredImage = ( await gifToVideoUtils.getBlocks() ).find(
 			( block ) => block.name === 'core/image'

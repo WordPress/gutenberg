@@ -24,7 +24,7 @@
   <rect x="308" y="86" width="372" height="210" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
 
   <!-- chrome header -->
-  <rect x="310" y="88" width="368" height="48" rx="8" fill="#f1f5f9"/>
+  <path d="M 318 88 H 670 Q 678 88 678 96 V 137 H 310 V 96 Q 310 88 318 88 Z" fill="#f1f5f9"/>
   <line x1="308" y1="137" x2="680" y2="137" stroke="#e2e8f0" stroke-width="1"/>
   <rect x="328" y="100" width="24" height="24" rx="5" fill="#2f54a5"/>
   <text x="364" y="117" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#334155">Site Health</text>
