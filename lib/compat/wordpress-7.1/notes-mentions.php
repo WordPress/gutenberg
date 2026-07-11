@@ -297,8 +297,9 @@ if ( ! function_exists( 'gutenberg_send_note_notification' ) ) {
 	 * @param WP_Comment  $comment       The note that triggered the notification.
 	 * @param WP_Post|null $post         The post the note belongs to.
 	 * @param bool        $was_mentioned Whether the recipient was mentioned in this note.
+	 * @return bool Whether the email was accepted for delivery by wp_mail().
 	 */
-	function gutenberg_send_note_notification( WP_User $user, WP_Comment $comment, ?WP_Post $post, bool $was_mentioned ): void {
+	function gutenberg_send_note_notification( WP_User $user, WP_Comment $comment, ?WP_Post $post, bool $was_mentioned ): bool {
 		$blogname    = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
 		$post_title  = $post ? wp_specialchars_decode( get_the_title( $post ), ENT_QUOTES ) : '';
 		$author_name = $comment->comment_author ? $comment->comment_author : __( 'Someone', 'gutenberg' );
