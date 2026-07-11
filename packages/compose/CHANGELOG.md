@@ -6,6 +6,10 @@
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
+### Bug Fixes
+
+-   `useMergeRefs`: Apply ref changes when the element attached outside a render of the calling component (e.g. a merged ref passed to a child that mounts the element in its own commit); previously the first ref change after such an attachment was skipped, leaving stale callbacks on the element ([#80133](https://github.com/WordPress/gutenberg/pull/80133)).
+
 ## 8.3.0 (2026-07-01)
 
 ## 8.2.0 (2026-06-24)
