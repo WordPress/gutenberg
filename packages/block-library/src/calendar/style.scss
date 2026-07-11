@@ -26,12 +26,6 @@
 	}
 }
 
-:where(.wp-block-calendar table th),
-:where(.wp-block-calendar table td) {
-	background: inherit;
-	color: inherit;
-}
-
 // Keep the hard-coded header background color for backward compatibility.
 :where(.wp-block-calendar table:not(.has-background) th) {
 	background: $gray-300;
