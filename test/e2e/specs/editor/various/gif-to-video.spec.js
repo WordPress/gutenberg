@@ -250,7 +250,20 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		const dialog = gifToVideoUtils.getPromptDialog();
 		await expect( dialog ).toBeVisible( { timeout: 60_000 } );
 
+		// While the prompt is open it is the single point of attention: the
+		// upload progress snackbar is suppressed.
+		await expect(
+			page.locator( '.components-snackbar', { hasText: /Uploading/ } )
+		).toBeHidden();
+
 		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
+
+		// Also suppressed once the upload finishes behind the open prompt.
+		await expect(
+			page.locator( '.components-snackbar', {
+				hasText: 'Upload complete',
+			} )
+		).toBeHidden();
 
 		const blocksAfterUpload = await gifToVideoUtils.getBlocks();
 		expect(
