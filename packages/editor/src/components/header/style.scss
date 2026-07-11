@@ -89,8 +89,6 @@
 	align-items: center;
 	// To enable shrinking and truncating of child text, apply an explicit min-width.
 	min-width: 0;
-	// Clip the box while leaving room for focus rings.
-	clip-path: inset(-2px);
 	// At less than mobile the header’s `gap` is zero so margins are added to create a smaller
 	// gap around the center’s contents.
 	@media (max-width: #{$break-mobile - 1}) {
@@ -100,10 +98,6 @@
 		> :last-child {
 			margin-inline-end: $grid-unit;
 		}
-	}
-
-	.editor-revisions-header & {
-		clip-path: none;
 	}
 }
 

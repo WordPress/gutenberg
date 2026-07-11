@@ -1863,7 +1863,7 @@ test.describe( 'Navigation block', () => {
 
 				// Verify validation error is shown
 				await expect(
-					page.getByText( 'Please enter a valid URL.' )
+					linkPopover.getByText( 'Please enter a valid URL.' )
 				).toBeVisible();
 			} );
 
@@ -1884,7 +1884,7 @@ test.describe( 'Navigation block', () => {
 
 				// Verify validation error is gone now
 				await expect(
-					page.getByText( 'Please enter a valid URL.' )
+					linkPopover.getByText( 'Please enter a valid URL.' )
 				).toBeHidden();
 
 				await expect( linkInput ).toHaveValue(

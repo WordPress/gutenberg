@@ -22,7 +22,11 @@ import { Card, Icon, Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import { WidgetRender } from '..';
-import type { WidgetRenderProps, WidgetType } from '../../../types';
+import type {
+	WidgetAttributeField,
+	WidgetRenderProps,
+	WidgetType,
+} from '../../../types';
 
 /*
  * Stories run without WordPress, so both halves are declared inline: the
@@ -349,6 +353,186 @@ Chrome belongs to the host: the widget describes itself through metadata, and ea
 In this story the chrome is a \`Card\`: its header reads the type's metadata (\`icon\`, \`title\`) and the card body frames the widget render.
 
 The diagonal stripes mark the chrome's area; the solid panel inside is the widget render. The widget renders no header of its own; another host could place the same metadata elsewhere, or skip it.
+`,
+			},
+		},
+	},
+};
+
+const demoWidgetTypeWithRelevance: WidgetType< DemoAttributes > = {
+	...demoWidgetType,
+	attributes: [
+		{
+			id: 'greeting',
+			label: 'Greeting',
+			type: 'text',
+			isValid: { required: true },
+		},
+		{
+			id: 'world',
+			label: 'World',
+			type: 'text',
+			elements: WORLDS.map( ( { value, label } ) => ( {
+				value,
+				label,
+			} ) ),
+			relevance: 'high',
+		},
+	] satisfies WidgetAttributeField< DemoAttributes >[],
+};
+
+function WidgetWithRelevance() {
+	const [ attributes, setAttributes ] = useState< DemoAttributes >( {
+		...demoWidgetTypeWithRelevance.example?.attributes,
+	} );
+
+	const titleId = useId();
+	const allFields = useMemo(
+		() => demoWidgetTypeWithRelevance.attributes ?? [],
+		[]
+	);
+
+	const prominentFields = useMemo(
+		() =>
+			allFields.filter(
+				( field ) => field.relevance === 'high'
+			) as Field< DemoAttributes >[],
+		[ allFields ]
+	);
+
+	const hasSettingsSurface = allFields.some(
+		( field ) => field.relevance !== 'high'
+	);
+
+	const prominentForm = useMemo< Form >(
+		() => ( {
+			layout: { type: 'row', alignment: 'center' },
+			fields: prominentFields.map( ( field ) => ( {
+				id: field.id,
+				layout: { type: 'regular', labelPosition: 'none' },
+			} ) ),
+		} ),
+		[ prominentFields ]
+	);
+
+	const settingsForm = useMemo< Form >(
+		() => ( {
+			layout: { type: 'regular', labelPosition: 'top' },
+			fields: allFields.map( ( field ) => field.id ),
+		} ),
+		[ allFields ]
+	);
+
+	const applyEdits = ( edits: Partial< DemoAttributes > ) =>
+		setAttributes( ( prev ) => ( { ...prev, ...edits } ) );
+
+	return (
+		<div
+			style={ {
+				alignItems: 'start',
+				display: 'grid',
+				gap: 'var(--wpds-dimension-gap-xl)',
+				gridTemplateColumns: hasSettingsSurface ? '2fr 1fr' : '1fr',
+				maxWidth: 960,
+			} }
+		>
+			<Card.Root
+				render={ <section /> }
+				aria-labelledby={ titleId }
+				style={ {
+					background: `repeating-linear-gradient(
+						45deg,
+						var(--wpds-color-background-surface-neutral),
+						var(--wpds-color-background-surface-neutral) 8px,
+						var(--wpds-color-background-surface-neutral-weak) 8px,
+						var(--wpds-color-background-surface-neutral-weak) 16px
+					)`,
+				} }
+			>
+				<Card.Header>
+					<Stack direction="row" align="center" gap="sm">
+						{ demoWidgetTypeWithRelevance.icon && (
+							<span aria-hidden="true">
+								<Icon
+									icon={ demoWidgetTypeWithRelevance.icon }
+								/>
+							</span>
+						) }
+						<Card.Title
+							id={ titleId }
+							render={ <h3 /> }
+							style={ { flexGrow: 1 } }
+						>
+							{ demoWidgetTypeWithRelevance.title }
+						</Card.Title>
+
+						{ prominentFields.length > 0 && (
+							<DataForm< DemoAttributes >
+								data={ attributes }
+								fields={ prominentFields }
+								form={ prominentForm }
+								onChange={ applyEdits }
+							/>
+						) }
+					</Stack>
+				</Card.Header>
+				<Card.Content>
+					<Suspense fallback={ null }>
+						<WidgetRender< DemoAttributes >
+							widgetType={ demoWidgetTypeWithRelevance }
+							attributes={ attributes }
+							setAttributes={ applyEdits }
+							resolveWidgetModule={ resolveDemoModule }
+						/>
+					</Suspense>
+				</Card.Content>
+			</Card.Root>
+
+			{ hasSettingsSurface && (
+				<aside
+					aria-label="Settings surface"
+					style={ {
+						border: '1px solid var(--wpds-color-stroke-surface-neutral)',
+						borderRadius: 'var(--wpds-border-radius-md)',
+						padding: 'var(--wpds-dimension-padding-lg)',
+					} }
+				>
+					<strong
+						style={ {
+							display: 'block',
+							marginBottom: 'var(--wpds-dimension-gap-sm)',
+						} }
+					>
+						Settings surface
+					</strong>
+					<DataForm< DemoAttributes >
+						data={ attributes }
+						fields={ allFields }
+						form={ settingsForm }
+						onChange={ applyEdits }
+					/>
+				</aside>
+			) }
+		</div>
+	);
+}
+
+export const WithRelevance: StoryObj = {
+	render: () => <WidgetWithRelevance />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+Each attribute may carry a \`relevance\` hint (\`'high' | 'low'\`). The widget declares importance; the host chooses the surface. When absent, treat the hint as \`'low'\`.
+
+**In this demo**
+
+- \`world\` is \`relevance: 'high'\`. The host promotes it to a **prominent surface** beside the title.
+- \`greeting\` has no hint (default \`'low'\`). It lives in the **settings surface** on the right.
+
+**Takeaway**
+
+When every attribute is \`'high'\`, a host need not expose a second settings surface. Another host could fold everything into one panel and still honor the contract.
 `,
 			},
 		},

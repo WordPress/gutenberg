@@ -10,13 +10,13 @@ import {
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-// @ts-expect-error - No type declarations available for @wordpress/block-editor
-// prettier-ignore
-import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
-// @ts-expect-error - No type declarations available for @wordpress/interface
 import { store as interfaceStore } from '@wordpress/interface';
 import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
 
@@ -194,13 +194,15 @@ export function useNoteThreads( postId: number | undefined ) {
 			}
 		}
 
-		// Orphans: root threads without a linked block. They only need to come last.
+		// Orphans: root threads without a linked block. They stay with the
+		// active notes (above the "Resolved" separator) since they may still
+		// need attention even though their associated block is gone.
 		const orphans = rootThreads.filter(
 			( thread ) => ! thread.blockClientId
 		);
 
 		return {
-			notes: [ ...unresolved, ...resolved, ...orphans ],
+			notes: [ ...unresolved, ...orphans, ...resolved ],
 			unresolvedNotes: unresolved,
 		};
 	}, [ clientIds, threads, getBlockAttributes ] );
@@ -670,7 +672,12 @@ export function useFloatingBoard( {
 	>( {} );
 	const [ store ] = useState( createBoardStore );
 
-	const heights = useSyncExternalStore( store.subscribe, store.getSnapshot );
+	// The board store's snapshot is a heights map keyed by thread id; its JS
+	// inference only sees an empty object literal.
+	const heights = useSyncExternalStore(
+		store.subscribe,
+		store.getSnapshot
+	) as Record< string, number >;
 
 	// Notes are positioned in canvas content-space; CSS inherits
 	// `--canvas-scroll` to translate each thread in sync with the canvas.

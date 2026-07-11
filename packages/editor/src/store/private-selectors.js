@@ -393,6 +393,7 @@ export function buildRevisionsPageQuery( revisionKey, page ) {
 				'date',
 				'modified',
 				'author',
+				'slug',
 				'meta',
 				'title.raw',
 				'excerpt.raw',

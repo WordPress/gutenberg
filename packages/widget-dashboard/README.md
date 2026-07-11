@@ -199,6 +199,25 @@ The exported kit for handling them:
 />
 ```
 
+## How this host translates the contract
+
+This engine is one host implementation of `@wordpress/widget-primitives`. It maps contract fields to host-owned UI as follows.
+
+### Identity and help
+
+When a widget type declares `help`, the tile chrome surfaces its `content` and optional `links` in a infotip beside the title.
+
+### Attribute editing
+
+Hosts build settings UI from the declarative `attributes` schema. This host splits editing across two surfaces:
+
+- **Prominent surface**: fields marked `relevance: 'high'` render inline in the tile chrome, for quick in-context edits.
+- **Settings surface**: the full schema is available through a dedicated settings UI. When some attributes are not promoted to the prominent surface, a settings entry point exposes the rest; fields already promoted may still appear there.
+
+When every attribute is `'high'`, no separate settings entry point is shown. A second surface would only repeat what the prominent surface already exposes.
+
+Edits on either surface stage through the engine's internal layer and reach `onLayoutChange` on commit.
+
 ## Authoring widgets
 
 Widget render modules receive only what they need to render and edit:
