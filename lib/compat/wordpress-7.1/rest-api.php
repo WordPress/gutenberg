@@ -85,6 +85,9 @@ add_filter( 'register_post_type_args', 'gutenberg_override_attachments_rest_cont
  * Only overrides when autosave_rest_controller_class is not explicitly set,
  * i.e. when WP_REST_Autosaves_Controller would be used by default. Post types
  * with their own specialized autosave controller (e.g. templates) are left alone.
+ *
+ * @param array $args Array of arguments for registering a post type.
+ * @return array Modified array of arguments.
  */
 function gutenberg_override_autosaves_rest_controller( $args ) {
 	if ( empty( $args['autosave_rest_controller_class'] ) ) {

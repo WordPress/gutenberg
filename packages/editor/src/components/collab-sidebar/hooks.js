@@ -154,13 +154,15 @@ export function useNoteThreads( postId ) {
 			}
 		}
 
-		// Orphans: root threads without a linked block. They only need to come last.
+		// Orphans: root threads without a linked block. They stay with the
+		// active notes (above the "Resolved" separator) since they may still
+		// need attention even though their associated block is gone.
 		const orphans = rootThreads.filter(
 			( thread ) => ! thread.blockClientId
 		);
 
 		return {
-			notes: [ ...unresolved, ...resolved, ...orphans ],
+			notes: [ ...unresolved, ...orphans, ...resolved ],
 			unresolvedNotes: unresolved,
 		};
 	}, [ clientIds, threads, getBlockAttributes ] );

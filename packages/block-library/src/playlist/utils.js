@@ -4,12 +4,12 @@
 import { __ } from '@wordpress/i18n';
 
 /**
- * Transform media library image data into album cover attributes.
+ * Transform media library image data into track image attributes.
  *
  * @param {Object} image - Image object from the media library.
- * @return {Object} Album cover attributes for the playlist-track block.
+ * @return {Object} Track image attributes for the playlist-track block.
  */
-export function getAlbumCoverAttributes( image ) {
+export function getTrackImageAttributes( image ) {
 	const imageSrc = image?.src ?? image?.url;
 
 	// Prevent using the default media attachment icon as the track image.
@@ -49,6 +49,6 @@ export function getTrackAttributes( media ) {
 			media?.media_details?.album ||
 			__( 'Unknown album' ),
 		length: media?.fileLength || media?.media_details?.length_formatted,
-		...getAlbumCoverAttributes( media?.image ),
+		...getTrackImageAttributes( media?.image ),
 	};
 }
