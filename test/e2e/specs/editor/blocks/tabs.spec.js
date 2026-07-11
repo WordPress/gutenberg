@@ -216,9 +216,11 @@ test.describe( 'Tabs', () => {
 			// The tab and its panel are reordered together.
 			await expect
 				.poll( async () =>
-					( await editor.getBlocks() )[ 0 ].innerBlocks[
-						1
-					].innerBlocks.map( ( panel ) => panel.attributes.label )
+					(
+						await editor.getBlocks()
+					)[ 0 ].innerBlocks[ 1 ].innerBlocks.map(
+						( panel ) => panel.attributes.label
+					)
 				)
 				.toEqual( [ 'Tab 2', 'Tab 1' ] );
 			await expect( editor.canvas.getByRole( 'tab' ) ).toHaveText( [
@@ -248,9 +250,11 @@ test.describe( 'Tabs', () => {
 
 			await expect
 				.poll( async () =>
-					( await editor.getBlocks() )[ 0 ].innerBlocks[
-						1
-					].innerBlocks.map( ( panel ) => panel.attributes.label )
+					(
+						await editor.getBlocks()
+					)[ 0 ].innerBlocks[ 1 ].innerBlocks.map(
+						( panel ) => panel.attributes.label
+					)
 				)
 				.toEqual( [ 'Tab 2', 'Tab 1' ] );
 			await expect( editor.canvas.getByRole( 'tab' ) ).toHaveText( [
