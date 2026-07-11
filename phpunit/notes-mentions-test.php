@@ -285,7 +285,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 			$ids[] = $extra_id;
 			return array_values( array_diff( $ids, array( self::$mentioned_id ) ) );
 		};
-		add_filter( 'note_notification_recipients', $filter );
+		add_filter( 'wp_note_notification_recipients', $filter );
 
 		$mention = sprintf(
 			'<a class="wp-note-mention" data-user-id="%d" href="#">@Mentioned</a>',
@@ -293,8 +293,6 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		);
 		$note    = $this->insert_note( "Ping $mention", self::$commenter_id );
 		gutenberg_notify_note_mentions( $note );
-
-		remove_filter( 'note_notification_recipients', $filter );
 
 		$this->assertContains( get_userdata( $extra_id )->user_email, $this->sent_to );
 		$this->assertNotContains( get_userdata( self::$mentioned_id )->user_email, $this->sent_to );

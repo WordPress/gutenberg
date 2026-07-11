@@ -3,12 +3,13 @@
  * Mention and follower notifications for notes (block comments).
  *
  * Note content can carry `@` mentions, stored as
- * `<a class="wp-note-mention" data-user-id="…">@Name</a>` (see
- * notes-rich-text.php). When a note is created through the REST API this file
- * parses those mentions out of the saved content and emails the mentioned
- * users, in addition to maintaining a per-thread "followers" list so that
- * people who start, reply to, or are mentioned in a thread are notified of
- * later activity on it.
+ * `<a class="wp-note-mention" data-user-id="…">@Name</a>` (the markup contract
+ * lives in the `core/note-mention` format, see
+ * packages/editor/src/components/collab-sidebar/mention-format.js). When a
+ * note is created through the REST API this file parses those mentions out of
+ * the saved content and emails the mentioned users, in addition to maintaining
+ * a per-thread "followers" list so that people who start, reply to, or are
+ * mentioned in a thread are notified of later activity on it.
  *
  * WordPress core already notifies the post author of every note via
  * `wp_new_comment_via_rest_notify_postauthor()` on `rest_insert_comment`. This
@@ -38,7 +39,14 @@ if ( ! function_exists( 'gutenberg_get_note_mentioned_user_ids' ) ) {
 
 		$user_ids  = array();
 		$processor = new WP_HTML_Tag_Processor( $content );
-		while ( $processor->next_tag( array( 'tag_name' => 'A', 'class_name' => 'wp-note-mention' ) ) ) {
+		while (
+			$processor->next_tag(
+				array(
+					'tag_name'   => 'A',
+					'class_name' => 'wp-note-mention',
+				)
+			)
+		) {
 			$user_id = (int) $processor->get_attribute( 'data-user-id' );
 			if ( $user_id > 0 ) {
 				$user_ids[] = $user_id;
@@ -325,7 +333,7 @@ if ( ! function_exists( 'gutenberg_notify_note_mentions' ) ) {
 		 * @param WP_Comment $comment       The note that was inserted.
 		 * @param int        $root_id       The thread's top-level note ID.
 		 */
-		$recipient_ids = apply_filters( 'note_notification_recipients', $recipient_ids, $comment, $root_id );
+		$recipient_ids = apply_filters( 'wp_note_notification_recipients', $recipient_ids, $comment, $root_id );
 
 		/*
 		 * The recipient set is bounded and small (one note's mentions plus that
@@ -440,7 +448,7 @@ if ( ! function_exists( 'gutenberg_send_note_notification' ) ) {
 		 * @param WP_Comment $comment       The note.
 		 * @param bool       $was_mentioned Whether the recipient was mentioned.
 		 */
-		$subject = apply_filters( 'note_notification_subject', $subject, $user, $comment, $was_mentioned );
+		$subject = apply_filters( 'wp_note_notification_subject', $subject, $user, $comment, $was_mentioned );
 
 		/**
 		 * Filters the note notification email body.
@@ -452,7 +460,7 @@ if ( ! function_exists( 'gutenberg_send_note_notification' ) ) {
 		 * @param WP_Comment $comment       The note.
 		 * @param bool       $was_mentioned Whether the recipient was mentioned.
 		 */
-		$body = apply_filters( 'note_notification_text', $body, $user, $comment, $was_mentioned );
+		$body = apply_filters( 'wp_note_notification_text', $body, $user, $comment, $was_mentioned );
 
 		return wp_mail( $user->user_email, wp_specialchars_decode( $subject ), $body );
 	}
