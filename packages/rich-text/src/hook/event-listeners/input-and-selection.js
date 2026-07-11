@@ -207,56 +207,6 @@ export default ( props ) => ( element ) => {
 		onInput( { inputType: 'insertText' } );
 	}
 
-	function onFocus( event ) {
-		// `focusin` bubbles from focusable descendants too — only act
-		// when focus lands on the editable itself.
-		if ( event.target !== element ) {
-			return;
-		}
-
-		// `contentEditable` can be false even on a tabindex'd element
-		// (e.g. a paragraph with a locked block binding). When that's the
-		// case the rich text isn't actually being edited and shouldn't
-		// claim selection — block-editor's `use-focus-handler.js` will
-		// dispatch `selectionChange(clientId)` to keep `attributeKey`
-		// unset for the wrapper-level focus.
-		if ( element.contentEditable !== 'true' ) {
-			return;
-		}
-
-		const { record, isSelected, onSelectionChange, applyRecord } =
-			props.current;
-
-		// When the whole editor is editable, let writing flow handle
-		// selection.
-		if ( element.parentElement.closest( '[contenteditable="true"]' ) ) {
-			return;
-		}
-
-		if ( ! isSelected ) {
-			// We know for certain that on focus, the old selection is invalid.
-			// It will be recalculated on the next mouseup, keyup, or touchend
-			// event.
-			const index = undefined;
-
-			record.current = {
-				...record.current,
-				start: index,
-				end: index,
-				activeFormats: EMPTY_ACTIVE_FORMATS,
-			};
-		} else {
-			applyRecord( record.current, { domOnly: true } );
-		}
-
-		onSelectionChange( record.current.start, record.current.end );
-
-		// There is no selection change event when the element is focused, so
-		// we need to manually trigger it. The selection is also not available
-		// yet in this call stack.
-		window.queueMicrotask( handleSelectionChange );
-	}
-
 	// `input` and `compositionend` must run before block-editor's
 	// `input-rules.js` element-level listeners, which call `getValue()`
 	// reading `record.current` updated by our `onInput`. Use capture phase
@@ -278,11 +228,6 @@ export default ( props ) => ( element ) => {
 		onCompositionEnd,
 		true
 	);
-	const unsubscribeFocus = subscribeDelegatedListener(
-		element,
-		'focusin',
-		onFocus
-	);
 	// Permanently subscribed rather than added on focus and removed on blur:
 	// `handleSelectionChange` checks whether the element is focused itself,
 	// and the shared underlying delegated listener keeps the number of native
@@ -297,7 +242,6 @@ export default ( props ) => ( element ) => {
 		unsubscribeInput();
 		unsubscribeCompositionStart();
 		unsubscribeCompositionEnd();
-		unsubscribeFocus();
 		unsubscribeSelectionChange();
 	};
 };
