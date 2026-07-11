@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -14,6 +19,8 @@ import { Notes } from './notes';
 import { store as editorStore } from '../../store';
 import {
 	NOTES_PANEL_WIDTH,
+	NOTES_PANEL_COMPACT_WIDTH,
+	MIN_CANVAS_WIDTH_FOR_FULL_NOTES,
 	MIN_CANVAS_WIDTH_FOR_FLOATING_NOTES,
 } from './constants';
 
@@ -114,21 +121,30 @@ function useCanvasWidths( overlayRef ) {
 	return widths;
 }
 
-export function FloatingNotes( { notes, sidebarRef } ) {
+export function FloatingNotes( { notes, sidebarRef, isCompact = false } ) {
 	const overlayRef = useRef( null );
 	const isDevicePreview = useSelect(
 		( select ) => select( editorStore ).getDeviceType() !== 'Desktop',
 		[]
 	);
-	// The panel yields when the canvas is too narrow to spare its reserved
-	// space (the canvas is freely resizable, so a wide viewport can still
-	// hold a narrow canvas). In the device preview the canvas width is a
-	// simulated device width; the notes are editor chrome floating over the
-	// backdrop beside the previewed canvas, so they size to the editor
-	// container instead.
+	// The panel yields progressively as the canvas narrows (the canvas is
+	// freely resizable, so a wide viewport can still hold a narrow canvas):
+	// full threads collapse to the minimized avatar pills first, and even the
+	// pills hide when the canvas can't spare their reserved space. In the
+	// device preview the canvas width is a simulated device width; the notes
+	// are editor chrome floating over the backdrop beside the previewed
+	// canvas, so they size to the editor container instead.
 	const { canvasWidth, editorWidth } = useCanvasWidths( overlayRef );
 	const availableWidth = isDevicePreview ? editorWidth : canvasWidth;
 	const hasRoom = availableWidth >= MIN_CANVAS_WIDTH_FOR_FLOATING_NOTES;
+	const showCompact =
+		isCompact || availableWidth < MIN_CANVAS_WIDTH_FOR_FULL_NOTES;
+	// Minimized threads collapse to an avatar pill, so reserve less canvas.
+	// The overlay itself keeps the full width so a selected thread still
+	// expands to a readable size (overlapping the canvas content).
+	const reservedWidth = showCompact
+		? NOTES_PANEL_COMPACT_WIDTH
+		: NOTES_PANEL_WIDTH;
 
 	// Reserve matching space at the inline end of the canvas so content never
 	// flows under the panel. The padding lives inside the canvas document, so
@@ -153,11 +169,11 @@ export function FloatingNotes( { notes, sidebarRef } ) {
 		id: 'core-note-reserved-space',
 		css:
 			hasRoom && ! isDevicePreview
-				? `:root{padding-inline-end:${ NOTES_PANEL_WIDTH }px}` +
+				? `:root{padding-inline-end:${ reservedWidth }px}` +
 				  `body{overflow-x:clip}` +
 				  `:root::after{content:"";position:fixed;top:0;bottom:0;` +
 				  `inset-inline-end:${
-						NOTES_PANEL_WIDTH - DIVIDER_GAP - DIVIDER_WIDTH
+						reservedWidth - DIVIDER_GAP - DIVIDER_WIDTH
 				  }px;` +
 				  `width:${ DIVIDER_WIDTH }px;` +
 				  `background:color-mix(in srgb, currentColor 10%, transparent);` +
@@ -170,7 +186,9 @@ export function FloatingNotes( { notes, sidebarRef } ) {
 			ref={ overlayRef }
 			role="region"
 			aria-label={ __( 'Notes' ) }
-			className="editor-collab-sidebar-overlay"
+			className={ clsx( 'editor-collab-sidebar-overlay', {
+				'is-compact': showCompact,
+			} ) }
 			// Keep the overlay mounted while the canvas is too narrow so its
 			// observer keeps measuring, but hide it so the notes don't sit on
 			// top of the content.
@@ -179,7 +197,12 @@ export function FloatingNotes( { notes, sidebarRef } ) {
 				display: hasRoom ? undefined : 'none',
 			} }
 		>
-			<Notes notes={ notes } sidebarRef={ sidebarRef } isFloating />
+			<Notes
+				notes={ notes }
+				sidebarRef={ sidebarRef }
+				isFloating
+				isCompact={ showCompact }
+			/>
 		</div>
 	);
 }

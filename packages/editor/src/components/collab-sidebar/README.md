@@ -5,7 +5,7 @@ The Notes sidebar (a.k.a. collab sidebar) lets users attach threaded notes to in
 - **All notes** - a full sidebar (opened from the editor's More menu) listing every note thread on the current post.
 - **Floating notes** - on larger viewports, unresolved notes float next to their associated blocks, overlaying space reserved at the right edge of the canvas, positioned to track scroll and avoid overlap. The floating notes are part of the canvas surface: they occupy no sidebar, so they can coexist with the Settings sidebar and leave notices and the canvas scrollbar at the full editor width.
 
-The floating notes can be hidden (and restored) from a "Notes" group in the editor's Options (ellipsis) menu; the "All notes" sidebar remains available throughout.
+The floating notes render full threads, minimized avatar pills, or nothing; the mode is chosen from a "Notes" group in the editor's Options (ellipsis) menu, and also adapts automatically to the canvas width: full threads collapse to minimized pills when the canvas gets too narrow to fit them next to a readable content column, and even the pills yield when the canvas can't spare their reserved space (the "All notes" sidebar remains available throughout).
 
 Notes are stored as WordPress comments (`type: 'note'`) attached to the post. A block references its thread via `metadata.noteId` on block attributes. Each thread has a top-level note plus replies; threads can be resolved (stored as status `approved`) or reopened.
 
@@ -60,9 +60,7 @@ NotesSidebarContainer (index.js)         - gates on post type support
 
 `Notes` is reused for both surfaces. The only visual difference is driven by `isFloating` (whether to layer threads over the canvas or stack them in a panel).
 
-`FloatingNotes` renders through a `FloatingNotesSlot` placed by `VisualEditor` inside `.editor-visual-editor`, and reserves matching space inside the canvas document (`padding-inline-end` on its root, injected with `useStyleOverride` so it reaches the iframed canvas) so content never flows under the panel. Because the space lives inside the canvas, it keeps the canvas background and leaves the canvas scrollbar at the window edge. A thin vertical divider (10% `currentColor`, spanning the visible canvas) sits just inside the reserved space, separating it from the content column.
-
-The canvas is freely resizable, so a wide viewport can still hold a narrow canvas. Below `MIN_CANVAS_WIDTH_FOR_FLOATING_NOTES` the reserved space would crowd out the content column, so the reservation is released and the panel hides; the "All notes" sidebar remains the surface. In the device preview no space is reserved - padding inside the simulated canvas would distort the previewed layout - so the notes float over the backdrop beside it and size to the editor container rather than the canvas.
+`FloatingNotes` renders through a `FloatingNotesSlot` placed by `VisualEditor` inside `.editor-visual-editor`, and reserves matching space inside the canvas document (`padding-inline-end` on its root, injected with `useStyleOverride`) so content never flows under the panel. Because the space lives inside the canvas, it keeps the canvas background and leaves the canvas scrollbar at the window edge. A thin vertical divider (10% `currentColor`, spanning the visible canvas) sits just inside the reserved space, separating it from the content column. The reserved width follows the presentation (full panel or minimized pills), and is released entirely when the canvas is too narrow for the panel.
 
 ## Floating board
 

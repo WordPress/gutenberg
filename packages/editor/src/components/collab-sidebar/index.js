@@ -48,7 +48,8 @@ function NotesSidebar( { postId } ) {
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const sidebarRef = useRef( null );
-	// How the floating notes render in the canvas: 'full' or 'hidden'.
+	// How the floating notes render in the canvas: 'full', 'minimized'
+	// (author avatars only), or 'hidden'.
 	const [ notesDisplayMode, setNotesDisplayMode ] = useState( 'full' );
 
 	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
@@ -210,6 +211,10 @@ function NotesSidebar( { postId } ) {
 										label: __( 'Expand notes' ),
 									},
 									{
+										value: 'minimized',
+										label: __( 'Minimize notes' ),
+									},
+									{
 										value: 'hidden',
 										label: __( 'Hide notes' ),
 									},
@@ -251,6 +256,7 @@ function NotesSidebar( { postId } ) {
 					<FloatingNotes
 						notes={ unresolvedNotes }
 						sidebarRef={ sidebarRef }
+						isCompact={ notesDisplayMode === 'minimized' }
 					/>
 				</FloatingNotesFill>
 			) }
