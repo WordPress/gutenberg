@@ -41,7 +41,6 @@
 			}
 		},
 		"__experimentalBorder": {
-			"radius": true,
 			"color": true,
 			"width": true,
 			"style": true,
