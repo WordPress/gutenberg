@@ -27,7 +27,7 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 
@@ -43,12 +43,12 @@ import { getTrackAttributes } from './utils';
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const DEFAULT_WAVEFORM_STYLE = 'bars';
 const WAVEFORM_STYLE_OPTIONS = [
-	{ label: __( 'Bars' ), value: 'bars' },
-	{ label: __( 'Mirror' ), value: 'mirror' },
-	{ label: __( 'Line' ), value: 'line' },
-	{ label: __( 'Blocks' ), value: 'blocks' },
-	{ label: __( 'Dots' ), value: 'dots' },
-	{ label: __( 'Seekbar' ), value: 'seekbar' },
+	{ label: _x( 'Bars', 'waveform style option' ), value: 'bars' },
+	{ label: _x( 'Mirror', 'waveform style option' ), value: 'mirror' },
+	{ label: _x( 'Line', 'waveform style option' ), value: 'line' },
+	{ label: _x( 'Blocks', 'waveform style option' ), value: 'blocks' },
+	{ label: _x( 'Dots', 'waveform style option' ), value: 'dots' },
+	{ label: _x( 'Seekbar', 'waveform style option' ), value: 'seekbar' },
 ];
 
 const PlaylistEdit = ( {
@@ -277,7 +277,7 @@ const PlaylistEdit = ( {
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
-						label={ __( 'Show Tracklist' ) }
+						label={ __( 'Show tracklist' ) }
 						isShownByDefault
 						hasValue={ () => showTracklist !== true }
 						onDeselect={ () =>
@@ -285,7 +285,7 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							label={ __( 'Show Tracklist' ) }
+							label={ __( 'Show tracklist' ) }
 							onChange={ toggleAttribute( 'showTracklist' ) }
 							checked={ showTracklist }
 						/>
@@ -293,7 +293,7 @@ const PlaylistEdit = ( {
 					{ showTracklist && (
 						<>
 							<ToolsPanelItem
-								label={ __( 'Show artist name in Tracklist' ) }
+								label={ __( 'Show artist name in tracklist' ) }
 								isShownByDefault
 								hasValue={ () => showArtists !== true }
 								onDeselect={ () =>
@@ -302,7 +302,7 @@ const PlaylistEdit = ( {
 							>
 								<ToggleControl
 									label={ __(
-										'Show artist name in Tracklist'
+										'Show artist name in tracklist'
 									) }
 									onChange={ toggleAttribute(
 										'showArtists'
@@ -311,7 +311,9 @@ const PlaylistEdit = ( {
 								/>
 							</ToolsPanelItem>
 							<ToolsPanelItem
-								label={ __( 'Show number in Tracklist' ) }
+								label={ __(
+									'Show track numbers in tracklist'
+								) }
 								isShownByDefault
 								hasValue={ () => showNumbers !== true }
 								onDeselect={ () =>
@@ -319,7 +321,9 @@ const PlaylistEdit = ( {
 								}
 							>
 								<ToggleControl
-									label={ __( 'Show number in Tracklist' ) }
+									label={ __(
+										'Show track numbers in tracklist'
+									) }
 									onChange={ toggleAttribute(
 										'showNumbers'
 									) }
@@ -327,7 +331,9 @@ const PlaylistEdit = ( {
 								/>
 							</ToolsPanelItem>
 							<ToolsPanelItem
-								label={ __( 'Show track length in Tracklist' ) }
+								label={ __(
+									'Show track duration in tracklist'
+								) }
 								isShownByDefault
 								hasValue={ () => showTrackLength !== true }
 								onDeselect={ () =>
@@ -336,7 +342,7 @@ const PlaylistEdit = ( {
 							>
 								<ToggleControl
 									label={ __(
-										'Show track length in Tracklist'
+										'Show track duration in tracklist'
 									) }
 									onChange={ toggleAttribute(
 										'showTrackLength'

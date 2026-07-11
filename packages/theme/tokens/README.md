@@ -14,7 +14,6 @@ The design system follows the [Design Tokens Format Module](https://www.designto
 | `dimension.json`  | Spacing scale and semantic spacing tokens for padding, margins, and sizing                                                       |
 | `typography.json` | Font family stacks, font sizes, and line heights                                                                                 |
 | `border.json`     | Border radius and width values                                                                                                   |
-| `elevation.json`  | Shadow definitions for creating depth and layering                                                                               |
 | `motion.json`     | Animation durations and easing curves                                                                                            |
 | `cursor.json`     | Cursor values for interactive controls                                                                                           |
 

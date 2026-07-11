@@ -47,7 +47,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 
 				if ( $title && $artist && $album ) {
 					$aria_label = sprintf(
-						/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
+						/* translators: %1$s: track title, %2$s: artist name, %3$s: album name. */
 						_x( '%1$s by %2$s from the album %3$s', 'track title, artist name, album name' ),
 						$title,
 						$artist,
@@ -124,10 +124,13 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 		'data-wp-context',
 		wp_json_encode(
 			array(
-				'playlistId'    => $playlist_id,
-				'currentId'     => $playlist_tracks[0],
-				'tracks'        => $playlist_tracks,
-				'waveformStyle' => $waveform_style,
+				'playlistId'       => $playlist_id,
+				'currentId'        => $playlist_tracks[0],
+				'isPlaying'        => false,
+				'tracks'           => $playlist_tracks,
+				'waveformStyle'    => $waveform_style,
+				'labelPauseTrack'  => __( 'Pause' ),
+				'labelSelectTrack' => __( 'Play' ),
 			)
 		)
 	);
