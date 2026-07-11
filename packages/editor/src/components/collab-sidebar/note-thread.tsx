@@ -20,10 +20,9 @@ import { useDebounce } from '@wordpress/compose';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies

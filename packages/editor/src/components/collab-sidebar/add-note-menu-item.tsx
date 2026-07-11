@@ -3,10 +3,9 @@
  */
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { privateApis as blockEditorPrivateApis, store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';

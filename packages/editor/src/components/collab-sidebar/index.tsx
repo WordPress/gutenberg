@@ -7,7 +7,9 @@ import { useEffect, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { store as blockEditorStore } from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/interface
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';

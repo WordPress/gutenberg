@@ -10,10 +10,9 @@ import { Fragment, useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Stack, Text } from '@wordpress/ui';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies

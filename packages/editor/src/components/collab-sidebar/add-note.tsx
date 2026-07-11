@@ -9,10 +9,9 @@ import type { FocusEvent, MutableRefObject } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies

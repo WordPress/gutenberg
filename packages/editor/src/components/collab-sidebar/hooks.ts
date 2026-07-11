@@ -10,13 +10,13 @@ import {
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
+// @ts-expect-error - No type declarations available for @wordpress/interface
 import { store as interfaceStore } from '@wordpress/interface';
 import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
 
