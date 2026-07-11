@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
 	useState,
@@ -414,6 +415,14 @@ export function useNoteActions() {
 						updateBlockAttributes
 					);
 				}
+
+				// The note visibly updates in place, so there is no snackbar,
+				// but screen reader users still need the confirmation.
+				speak(
+					status === 'approved'
+						? __( 'Note marked as resolved.' )
+						: __( 'Note reopened.' )
+				);
 			} else {
 				const updateData = {
 					id,
