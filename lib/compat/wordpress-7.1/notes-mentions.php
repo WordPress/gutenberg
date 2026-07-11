@@ -28,28 +28,24 @@ if ( ! function_exists( 'gutenberg_get_note_mentioned_user_ids' ) ) {
 	 * mentions so that ordinary links cannot be used to address notifications.
 	 *
 	 * @param string $content Note (comment) content, as stored.
-	 * @return int[] Unique, positive mentioned user IDs, in first-seen order.
+	 * @return list<int> Unique, positive mentioned user IDs.
+	 * @phpstan-return list<positive-int>
 	 */
-	function gutenberg_get_note_mentioned_user_ids( $content ) {
+	function gutenberg_get_note_mentioned_user_ids( $content ): array {
 		if ( ! is_string( $content ) || '' === $content ) {
 			return array();
 		}
 
 		$user_ids  = array();
 		$processor = new WP_HTML_Tag_Processor( $content );
-		while ( $processor->next_tag( 'A' ) ) {
-			$class = $processor->get_attribute( 'class' );
-			if ( ! is_string( $class ) || ! in_array( 'wp-note-mention', preg_split( '/\s+/', trim( $class ) ), true ) ) {
-				continue;
-			}
-
+		while ( $processor->next_tag( array( 'tag_name' => 'A', 'class_name' => 'wp-note-mention' ) ) ) {
 			$user_id = (int) $processor->get_attribute( 'data-user-id' );
-			if ( $user_id > 0 && ! in_array( $user_id, $user_ids, true ) ) {
+			if ( $user_id > 0 ) {
 				$user_ids[] = $user_id;
 			}
 		}
 
-		return $user_ids;
+		return array_values( array_unique( $user_ids, SORT_NUMERIC ) );
 	}
 }
 
@@ -64,7 +60,7 @@ if ( ! function_exists( 'gutenberg_get_note_thread_root_id' ) ) {
 	 * @param WP_Comment $comment A note comment.
 	 * @return int The top-level note ID for the thread.
 	 */
-	function gutenberg_get_note_thread_root_id( $comment ) {
+	function gutenberg_get_note_thread_root_id( WP_Comment $comment ): int {
 		$parent = (int) $comment->comment_parent;
 		return $parent > 0 ? $parent : (int) $comment->comment_ID;
 	}
@@ -75,7 +71,7 @@ if ( ! function_exists( 'gutenberg_get_note_followers' ) ) {
 	 * Returns the user IDs following a note thread.
 	 *
 	 * @param int $root_id Top-level note ID.
-	 * @return int[] Follower user IDs.
+	 * @return list<int> Follower user IDs.
 	 */
 	function gutenberg_get_note_followers( $root_id ) {
 		$followers = get_comment_meta( $root_id, '_wp_note_followers', true );
@@ -83,7 +79,7 @@ if ( ! function_exists( 'gutenberg_get_note_followers' ) ) {
 			return array();
 		}
 
-		return array_values( array_unique( array_map( 'intval', $followers ) ) );
+		return array_values( array_unique( array_map( 'intval', $followers ), SORT_NUMERIC ) );
 	}
 }
 
@@ -93,18 +89,20 @@ if ( ! function_exists( 'gutenberg_add_note_followers' ) ) {
 	 *
 	 * @param int   $root_id  Top-level note ID.
 	 * @param int[] $user_ids User IDs to subscribe to the thread.
-	 * @return int[] The updated follower list.
+	 * @return list<int> The updated follower list.
+	 * @phpstan-return list<positive-int>
 	 */
-	function gutenberg_add_note_followers( $root_id, $user_ids ) {
+	function gutenberg_add_note_followers( int $root_id, array $user_ids ): array {
 		$followers = gutenberg_get_note_followers( $root_id );
 		$updated   = $followers;
 
 		foreach ( $user_ids as $user_id ) {
 			$user_id = (int) $user_id;
-			if ( $user_id > 0 && ! in_array( $user_id, $updated, true ) ) {
+			if ( $user_id > 0 ) {
 				$updated[] = $user_id;
 			}
 		}
+		$updated = array_values( array_unique( $updated, SORT_NUMERIC ) );
 
 		if ( $updated !== $followers ) {
 			update_comment_meta( $root_id, '_wp_note_followers', $updated );
@@ -125,9 +123,9 @@ if ( ! function_exists( 'gutenberg_remove_note_followers' ) ) {
 	 *
 	 * @param int   $root_id  Top-level note ID.
 	 * @param int[] $user_ids User IDs to unsubscribe from the thread.
-	 * @return int[] The updated follower list.
+	 * @return list<int> The updated follower list.
 	 */
-	function gutenberg_remove_note_followers( $root_id, $user_ids ) {
+	function gutenberg_remove_note_followers( int $root_id, array $user_ids ): array {
 		$followers = gutenberg_get_note_followers( $root_id );
 		$remove    = array_map( 'intval', (array) $user_ids );
 		$updated   = array_values( array_diff( $followers, $remove ) );
@@ -152,7 +150,7 @@ if ( ! function_exists( 'gutenberg_register_note_followers_meta' ) ) {
 	 * users who can moderate comments and editable by users who can edit the
 	 * note, so a follower management UI can read and update it.
 	 */
-	function gutenberg_register_note_followers_meta() {
+	function gutenberg_register_note_followers_meta(): void {
 		register_meta(
 			'comment',
 			'_wp_note_followers',
@@ -192,9 +190,8 @@ if ( ! function_exists( 'gutenberg_notify_note_mentions' ) ) {
 	 * @param WP_Comment $comment  The note that was just inserted.
 	 * @param mixed      $request  The REST request (unused).
 	 * @param bool       $creating Whether this is a create (true) or update (false).
-	 * @return void
 	 */
-	function gutenberg_notify_note_mentions( $comment, $request = null, $creating = true ) {
+	function gutenberg_notify_note_mentions( WP_Comment $comment, $request = null, bool $creating = true ): void {
 		unset( $request );
 
 		if ( ! $creating ) {
@@ -236,8 +233,6 @@ if ( ! function_exists( 'gutenberg_notify_note_mentions' ) ) {
 		 */
 		$recipient_ids = apply_filters( 'note_notification_recipients', $recipient_ids, $comment, $root_id );
 
-		$mentioned_lookup = array_flip( $mentioned );
-
 		/*
 		 * The recipient set is bounded and small (one note's mentions plus that
 		 * thread's followers), so emails are sent synchronously here. Pausing
@@ -270,7 +265,7 @@ if ( ! function_exists( 'gutenberg_notify_note_mentions' ) ) {
 				continue;
 			}
 
-			$was_mentioned = isset( $mentioned_lookup[ $user_id ] );
+			$was_mentioned = in_array( $user_id, $mentioned, true );
 			gutenberg_send_note_notification( $user, $comment, $post, $was_mentioned );
 		}
 
@@ -302,9 +297,8 @@ if ( ! function_exists( 'gutenberg_send_note_notification' ) ) {
 	 * @param WP_Comment  $comment       The note that triggered the notification.
 	 * @param WP_Post|null $post         The post the note belongs to.
 	 * @param bool        $was_mentioned Whether the recipient was mentioned in this note.
-	 * @return void
 	 */
-	function gutenberg_send_note_notification( $user, $comment, $post, $was_mentioned ) {
+	function gutenberg_send_note_notification( WP_User $user, WP_Comment $comment, ?WP_Post $post, bool $was_mentioned ): void {
 		$blogname    = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
 		$post_title  = $post ? wp_specialchars_decode( get_the_title( $post ), ENT_QUOTES ) : '';
 		$author_name = $comment->comment_author ? $comment->comment_author : __( 'Someone', 'gutenberg' );
@@ -358,6 +352,6 @@ if ( ! function_exists( 'gutenberg_send_note_notification' ) ) {
 		 */
 		$body = apply_filters( 'note_notification_text', $body, $user, $comment, $was_mentioned );
 
-		wp_mail( $user->user_email, wp_specialchars_decode( $subject ), $body );
+		return wp_mail( $user->user_email, wp_specialchars_decode( $subject ), $body );
 	}
 }

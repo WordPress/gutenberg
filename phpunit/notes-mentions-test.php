@@ -62,11 +62,6 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		add_filter( 'pre_wp_mail', array( $this, 'capture_mail' ), 10, 2 );
 	}
 
-	public function tear_down() {
-		remove_filter( 'pre_wp_mail', array( $this, 'capture_mail' ), 10 );
-		parent::tear_down();
-	}
-
 	/**
 	 * Records wp_mail() recipients and short-circuits delivery.
 	 *
