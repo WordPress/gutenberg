@@ -788,8 +788,9 @@ function gutenberg_register_entity_view_config_filters() {
 		$wp_callback = "_wp_get_entity_view_config_post_type_{$post_type}";
 		$gb_callback = "_gutenberg_get_entity_view_config_post_type_{$post_type}";
 
-		if ( has_filter( $hook, $wp_callback ) ) {
-			remove_filter( $hook, $wp_callback );
+		$filter_priority = has_filter( $hook, $wp_callback );
+		if ( false !== $filter_priority ) {
+			remove_filter( $hook, $wp_callback, $filter_priority );
 		}
 		add_filter( $hook, $gb_callback, 10, 1 );
 	}
