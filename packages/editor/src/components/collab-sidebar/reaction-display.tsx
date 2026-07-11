@@ -10,7 +10,13 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import { Button, Dropdown } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { SVG, Path } from '@wordpress/primitives';
-import { useState, useCallback, lazy, Suspense } from '@wordpress/element';
+import {
+	useState,
+	useCallback,
+	useMemo,
+	lazy,
+	Suspense,
+} from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -39,6 +45,7 @@ import ReactionEmojiPicker, {
 	emojiToStorageKey,
 	hexKeyToEmoji,
 	buildEmojiBySlugMap,
+	useReactionEmojis,
 } from './reaction-emoji-picker';
 import {
 	detectLocale,
@@ -90,9 +97,6 @@ function prefetchFullPicker(): void {
 		);
 	}
 }
-
-// The curated emoji set is static, so index it once at module load.
-const emojiBySlug = buildEmojiBySlugMap();
 
 // `Dropdown`'s popover is rendered in a portal anchored to <body>,
 // so it escapes the `overflow: hidden` chain on the collab sidebar
@@ -342,6 +346,13 @@ export default function ReactionDisplay( {
 	reactions,
 	onToggleReaction,
 }: ReactionDisplayProps ) {
+	// The list is filterable server-side (and static per page load),
+	// so index it once per list identity.
+	const emojis = useReactionEmojis();
+	const emojiBySlug = useMemo(
+		() => buildEmojiBySlugMap( emojis ),
+		[ emojis ]
+	);
 	const reactedSlugs = getReactedSlugs( reactions );
 
 	if ( reactedSlugs.length === 0 ) {
@@ -401,6 +412,11 @@ export function AddReactionButton( {
 }: AddReactionButtonProps ) {
 	const [ isFullPicker, setIsFullPicker ] = useState( false );
 	const { recordUse } = useFrequentEmojis();
+	const emojis = useReactionEmojis();
+	const emojiBySlug = useMemo(
+		() => buildEmojiBySlugMap( emojis ),
+		[ emojis ]
+	);
 	const hasFullPicker =
 		typeof window !== 'undefined' && !! window.gutenbergEmojibaseUrl;
 

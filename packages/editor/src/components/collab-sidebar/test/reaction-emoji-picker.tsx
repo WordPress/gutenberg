@@ -1,8 +1,14 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+import { dispatch } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -88,5 +94,49 @@ describe( 'ReactionEmojiPicker', () => {
 		);
 
 		expect( onMore ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	describe( 'settings-provided emoji list', () => {
+		afterEach( () => {
+			// The picker may still be mounted when the settings reset
+			// lands, so the resulting re-render must be act()-wrapped.
+			act( () => {
+				dispatch( blockEditorStore ).updateSettings( {
+					noteReactionEmojis: undefined,
+				} );
+			} );
+		} );
+
+		it( 'renders the list from editor settings when present', () => {
+			dispatch( blockEditorStore ).updateSettings( {
+				noteReactionEmojis: [
+					...REACTION_EMOJIS,
+					{ emoji: '👍', label: 'Thumbs up', value: 'thumbs-up' },
+				],
+			} );
+			render( <ReactionEmojiPicker onSelect={ () => {} } /> );
+
+			expect( screen.getAllByRole( 'option' ) ).toHaveLength(
+				REACTION_EMOJIS.length + 1
+			);
+			expect(
+				screen.getByRole( 'option', { name: 'Thumbs up' } )
+			).toBeVisible();
+		} );
+
+		it( 'drops malformed entries and falls back to defaults when none survive', () => {
+			dispatch( blockEditorStore ).updateSettings( {
+				noteReactionEmojis: [
+					null,
+					{ emoji: '👍' },
+					{ label: 'No emoji', value: 'no-emoji' },
+				],
+			} );
+			render( <ReactionEmojiPicker onSelect={ () => {} } /> );
+
+			expect( screen.getAllByRole( 'option' ) ).toHaveLength(
+				REACTION_EMOJIS.length
+			);
+		} );
 	} );
 } );

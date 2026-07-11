@@ -273,6 +273,14 @@ mark.wp-note {
 
 .editor-collab-sidebar-panel__emoji-picker {
 	display: flex;
+	// The emoji list is filterable server-side, so it can grow well
+	// beyond the 5 defaults. Wrap into rows of 8 (32px compact
+	// buttons) and scroll past 6 rows instead of letting the popover
+	// grow unbounded.
+	flex-wrap: wrap;
+	max-width: 8 * 32px;
+	max-height: 6 * 32px;
+	overflow-y: auto;
 }
 
 .editor-collab-sidebar-panel__emoji-option {

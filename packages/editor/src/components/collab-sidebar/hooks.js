@@ -533,11 +533,6 @@ export function useNoteActions( reactionsMap = {} ) {
 						{ force: true },
 						{ throwOnError: true }
 					);
-
-					createNotice( 'snackbar', __( 'Reaction removed.' ), {
-						type: 'snackbar',
-						isDismissible: true,
-					} );
 				} else {
 					// Add a new reaction as a comment record.
 					await saveEntityRecord(
@@ -552,11 +547,6 @@ export function useNoteActions( reactionsMap = {} ) {
 						},
 						{ throwOnError: true }
 					);
-
-					createNotice( 'snackbar', __( 'Reaction added.' ), {
-						type: 'snackbar',
-						isDismissible: true,
-					} );
 				}
 
 				// `reaction_summary` is computed server-side and
@@ -585,7 +575,6 @@ export function useNoteActions( reactionsMap = {} ) {
 			deleteEntityRecord,
 			saveEntityRecord,
 			getCurrentPostId,
-			createNotice,
 			receiveEntityRecords,
 		]
 	);

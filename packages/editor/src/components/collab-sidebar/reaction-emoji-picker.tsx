@@ -4,6 +4,8 @@
 import { __, _x } from '@wordpress/i18n';
 import { Button, Composite } from '@wordpress/components';
 import { plus as plusIcon } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * A single curated reaction emoji.
@@ -108,6 +110,33 @@ export function emojiToStorageKey(
 }
 
 /**
+ * Returns the reaction emoji list from block editor settings, falling
+ * back to the curated defaults. The server injects the list via the
+ * `gutenberg_note_reaction_emojis` PHP filter, so the picker offers the
+ * same set the REST API accepts. Malformed entries are dropped.
+ *
+ * @return The emoji list to offer in the picker.
+ */
+export function useReactionEmojis(): CuratedEmoji[] {
+	return useSelect( ( select ) => {
+		const settings: Record< string, unknown > =
+			select( blockEditorStore ).getSettings();
+		const emojis = settings.noteReactionEmojis;
+		if ( ! Array.isArray( emojis ) ) {
+			return REACTION_EMOJIS;
+		}
+		const valid = emojis.filter(
+			( entry ): entry is CuratedEmoji =>
+				!! entry &&
+				typeof entry.emoji === 'string' &&
+				typeof entry.label === 'string' &&
+				typeof entry.value === 'string'
+		);
+		return valid.length ? valid : REACTION_EMOJIS;
+	}, [] );
+}
+
+/**
  * Build a Map keyed by slug for O(1) emoji and label lookups.
  *
  * @param emojis The emoji list to index.
@@ -138,6 +167,8 @@ export default function ReactionEmojiPicker( {
 	onMore,
 	onMoreHover,
 }: ReactionEmojiPickerProps ) {
+	const emojis = useReactionEmojis();
+
 	return (
 		<div className="editor-collab-sidebar-panel__emoji-picker-row">
 			<Composite
@@ -146,7 +177,7 @@ export default function ReactionEmojiPicker( {
 				aria-label={ __( 'Select an emoji reaction' ) }
 				className="editor-collab-sidebar-panel__emoji-picker"
 			>
-				{ REACTION_EMOJIS.map( ( { emoji, label, value } ) => (
+				{ emojis.map( ( { emoji, label, value } ) => (
 					<Composite.Item
 						key={ value }
 						render={
