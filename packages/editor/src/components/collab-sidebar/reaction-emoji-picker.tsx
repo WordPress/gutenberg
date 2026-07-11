@@ -5,6 +5,7 @@ import { __, _x } from '@wordpress/i18n';
 import { Button, Composite } from '@wordpress/components';
 import { plus as plusIcon } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**

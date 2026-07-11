@@ -303,9 +303,17 @@ mark.wp-note {
 // surface around it.
 .editor-collab-sidebar-panel__picker-popover {
 	.components-popover__content {
+		// Local elevation token; the shared `--wpds-elevation-md` was removed
+		// in #80099, which migrated call sites to component-local tokens.
+		--_wp-editor-picker-elevation-md:
+			0 2px 3px rgba(0, 0, 0, 0.05),
+			0 4px 5px rgba(0, 0, 0, 0.04),
+			0 12px 12px rgba(0, 0, 0, 0.03),
+			0 16px 16px rgba(0, 0, 0, 0.02);
+
 		padding: 0;
 		border-radius: var(--wpds-border-radius-md);
-		box-shadow: var(--wpds-elevation-md);
+		box-shadow: var(--_wp-editor-picker-elevation-md);
 		background-color: var(--wpds-color-background-surface-neutral-weak);
 	}
 }
