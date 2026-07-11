@@ -47,7 +47,7 @@
 		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0"
+		"react": "^18 || ^19"
 	},
 	"publishConfig": {
 		"access": "public"

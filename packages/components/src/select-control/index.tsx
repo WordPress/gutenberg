@@ -113,7 +113,6 @@ function UnforwardedSelectControl< V extends string >(
 					variant === 'minimal' ? 'auto' : undefined
 				}
 				variant={ variant }
-				__next40pxDefaultSize
 			>
 				<Select
 					{ ...restProps }
