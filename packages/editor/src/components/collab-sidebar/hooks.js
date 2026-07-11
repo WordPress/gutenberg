@@ -423,9 +423,6 @@ export function useNoteActions() {
 					throwOnError: true,
 				} );
 
-				// Resolving or reopening a note visibly updates the note in
-				// place, so those actions don't need a snackbar; only surface
-				// one when a note's content is edited.
 				createNotice( 'snackbar', __( 'Note updated.' ), {
 					type: 'snackbar',
 					isDismissible: true,
