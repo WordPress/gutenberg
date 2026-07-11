@@ -9,7 +9,7 @@ exports[`flags warnings with invalid css (wpds fallbacks) snapshot matches warni
     "line": 3,
     "rule": "plugin-wpds/no-token-fallback-values",
     "severity": "error",
-    "text": "Do not add a fallback value for Design System token '--wpds-color-foreground-content-neutral'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
+    "text": "Do not add a fallback value for Design System token '--wpds-color-foreground-content-neutral'. Fallbacks should be injected automatically at build time (see @wordpress/theme package README). (plugin-wpds/no-token-fallback-values)",
   },
   {
     "column": 20,
@@ -18,7 +18,7 @@ exports[`flags warnings with invalid css (wpds fallbacks) snapshot matches warni
     "line": 4,
     "rule": "plugin-wpds/no-token-fallback-values",
     "severity": "error",
-    "text": "Do not add a fallback value for Design System token '--wpds-color-background-surface-neutral-weak'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
+    "text": "Do not add a fallback value for Design System token '--wpds-color-background-surface-neutral-weak'. Fallbacks should be injected automatically at build time (see @wordpress/theme package README). (plugin-wpds/no-token-fallback-values)",
   },
   {
     "column": 17,
@@ -27,7 +27,7 @@ exports[`flags warnings with invalid css (wpds fallbacks) snapshot matches warni
     "line": 5,
     "rule": "plugin-wpds/no-token-fallback-values",
     "severity": "error",
-    "text": "Do not add a fallback value for Design System token '--wpds-border-radius-sm'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
+    "text": "Do not add a fallback value for Design System token '--wpds-border-radius-sm'. Fallbacks should be injected automatically at build time (see @wordpress/theme package README). (plugin-wpds/no-token-fallback-values)",
   },
   {
     "column": 11,
@@ -36,7 +36,7 @@ exports[`flags warnings with invalid css (wpds fallbacks) snapshot matches warni
     "line": 10,
     "rule": "plugin-wpds/no-token-fallback-values",
     "severity": "error",
-    "text": "Do not add a fallback value for Design System token '--wpds-border-width-focus'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
+    "text": "Do not add a fallback value for Design System token '--wpds-border-width-focus'. Fallbacks should be injected automatically at build time (see @wordpress/theme package README). (plugin-wpds/no-token-fallback-values)",
   },
   {
     "column": 53,
@@ -45,7 +45,7 @@ exports[`flags warnings with invalid css (wpds fallbacks) snapshot matches warni
     "line": 10,
     "rule": "plugin-wpds/no-token-fallback-values",
     "severity": "error",
-    "text": "Do not add a fallback value for Design System token '--wpds-color-stroke-focus'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
+    "text": "Do not add a fallback value for Design System token '--wpds-color-stroke-focus'. Fallbacks should be injected automatically at build time (see @wordpress/theme package README). (plugin-wpds/no-token-fallback-values)",
   },
   {
     "column": 32,
@@ -54,7 +54,7 @@ exports[`flags warnings with invalid css (wpds fallbacks) snapshot matches warni
     "line": 15,
     "rule": "plugin-wpds/no-token-fallback-values",
     "severity": "error",
-    "text": "Do not add a fallback value for Design System token '--wpds-color-foreground-content-neutral'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
+    "text": "Do not add a fallback value for Design System token '--wpds-color-foreground-content-neutral'. Fallbacks should be injected automatically at build time (see @wordpress/theme package README). (plugin-wpds/no-token-fallback-values)",
   },
 ]
 `;

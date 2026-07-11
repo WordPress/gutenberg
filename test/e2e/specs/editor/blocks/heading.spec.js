@@ -180,7 +180,11 @@ test.describe( 'Heading', () => {
 			.getByRole( 'region', {
 				name: 'Editor settings',
 			} )
-			.getByRole( 'button', { name: 'Text' } );
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } );
 
 		await textColor.click();
 		await page
@@ -214,7 +218,11 @@ test.describe( 'Heading', () => {
 			.getByRole( 'region', {
 				name: 'Editor settings',
 			} )
-			.getByRole( 'button', { name: 'Text', exact: true } );
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } );
 
 		await textColor.click();
 

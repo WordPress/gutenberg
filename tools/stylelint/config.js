@@ -8,6 +8,7 @@ module.exports = {
 		'stylelint-plugin-logical-css',
 		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
 	],
+	reportNeedlessDisables: true,
 	rules: {
 		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,
@@ -46,7 +47,13 @@ module.exports = {
 			},
 		],
 		'rule-empty-line-before': null,
-		'selector-class-pattern': null,
+		'selector-class-pattern': [
+			'^[a-z][a-z0-9]*(?:(?:__|--|-)[a-z0-9]+)*$',
+			{
+				message:
+					'Selector should use lowercase class segments separated with hyphens, double hyphens, or double underscores (selector-class-pattern)',
+			},
+		],
 		'value-keyword-case': null,
 		'scss/operator-no-unspaced': null,
 		'scss/selector-no-redundant-nesting-selector': null,

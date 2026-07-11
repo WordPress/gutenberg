@@ -15,7 +15,9 @@
 }
 
 // Include reset CSS for the customizer.
+// stylelint-disable selector-class-pattern -- WordPress Customizer control class names use underscores by convention.
 .customize-control-sidebar_block_editor,
 .customize-widgets-layout__inspector {
 	@include reset;
 }
+// stylelint-enable selector-class-pattern

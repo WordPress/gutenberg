@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`design token fallback build plugin parity keeps esbuild and Vite source-text transforms aligned 1`] = `
+"// Source text is transformed consistently: var(--wpds-border-radius-sm, 2px).
+export const templateStyles = \`color: var(--wpds-color-foreground-content-neutral, #1e1e1e);\`;
+export const doubleQuotedStyles =
+	"gap: var(--wpds-dimension-gap-sm, 8px); content: 'fixture';";
+export const singleQuotedStyles = 'radius: var(--wpds-border-radius-sm, 2px);';
+export const manualFallback = 'radius: var(--wpds-border-radius-sm, 99px);';
+"
+`;
+
+exports[`design token fallback build plugin parity transforms supported CSS in styles.css 1`] = `
+"/* Token references in CSS comments are not transformed: var(--wpds-border-radius-sm). */
+.fixture {
+	color: var(--wpds-color-foreground-content-neutral, #1e1e1e);
+	content: "var(--wpds-border-radius-sm, 2px)";
+}
+"
+`;
+
+exports[`design token fallback build plugin parity transforms supported CSS in styles.module.css 1`] = `
+".fixture {
+	gap: var(--wpds-dimension-gap-sm, 8px);
+}
+"
+`;

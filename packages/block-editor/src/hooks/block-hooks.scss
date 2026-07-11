@@ -2,6 +2,7 @@
 @use "@wordpress/base-styles/colors" as *;
 
 .block-editor-hooks__block-hooks {
+
 	/**
 	 * Un-reverse the flex direction for the toggle's label.
 	 */
@@ -14,4 +15,18 @@
 		font-size: $helptext-font-size;
 		margin-bottom: $grid-unit-20;
 	}
+}
+
+.block-editor-hooks__position-control-item {
+
+	/**
+	 * Try to make items match the width of the anchor, subtract any margin on
+	 * items to calculate the correct inner width.
+	 */
+	max-inline-size: max(calc(var(--anchor-width) - (2 * var(--wp-ui-popup-padding))), 223px);
+}
+
+.block-editor-hooks__position-control-item-hint {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	margin-block-start: $grid-unit-05;
 }

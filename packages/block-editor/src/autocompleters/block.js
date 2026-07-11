@@ -125,8 +125,14 @@ function createBlockCompleter() {
 			return ! ( /\S/.test( before ) || /\S/.test( after ) );
 		},
 		getOptionCompletion( inserterItem ) {
-			const { name, initialAttributes, innerBlocks, syncStatus, blocks } =
-				inserterItem;
+			const {
+				name,
+				initialAttributes,
+				innerBlocks,
+				innerContent,
+				syncStatus,
+				blocks,
+			} = inserterItem;
 
 			return {
 				action: 'replace',
@@ -140,7 +146,8 @@ function createBlockCompleter() {
 								initialAttributes,
 								createBlocksFromInnerBlocksTemplate(
 									innerBlocks
-								)
+								),
+								innerContent
 						  ),
 			};
 		},

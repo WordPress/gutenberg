@@ -29,6 +29,7 @@ import { getPostRawValue } from './reducer';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
 import { unlock } from '../lock-unlock';
 import { getTemplateInfo } from '../utils/get-template-info';
+import { getDeviceTypeByCanvasWidth } from '../utils/device-type';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -1348,11 +1349,15 @@ export function getRenderingMode( state ) {
  */
 export const getDeviceType = createRegistrySelector(
 	( select ) => ( state ) => {
-		const isZoomOut = unlock( select( blockEditorStore ) ).isZoomOut();
+		const blockEditorSelect = unlock( select( blockEditorStore ) );
+		const isZoomOut = blockEditorSelect.isZoomOut();
 		if ( isZoomOut ) {
 			return 'Desktop';
 		}
-		return state.deviceType;
+		const canvasWidth = state.canvasWidth;
+		const viewportSettings =
+			blockEditorSelect.getSettings().__experimentalFeatures?.viewport;
+		return getDeviceTypeByCanvasWidth( canvasWidth, viewportSettings );
 	}
 );
 

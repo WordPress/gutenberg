@@ -74,20 +74,12 @@ export function Edit( { attributes, setAttributes } ) {
 	const borderProps = useBorderProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
 
-	const { selectedIcon, allIcons = [] } = useSelect(
+	const selectedIcon = useSelect(
 		( select ) => {
-			const { getEntityRecord, getEntityRecords } =
-				select( coreDataStore );
-			return {
-				selectedIcon: icon
-					? getEntityRecord( 'root', 'icon', icon )
-					: null,
-				allIcons: isInserterOpen
-					? getEntityRecords( 'root', 'icon' )
-					: undefined,
-			};
+			const { getEntityRecord } = select( coreDataStore );
+			return icon ? getEntityRecord( 'root', 'icon', icon ) : null;
 		},
-		[ isInserterOpen, icon ]
+		[ icon ]
 	);
 
 	const iconToDisplay = selectedIcon?.content || '';
@@ -169,7 +161,6 @@ export function Edit( { attributes, setAttributes } ) {
 								help={ __(
 									'Briefly describe the icon to help screen reader users. Leave blank for decorative icons.'
 								) }
-								__next40pxDefaultSize
 							/>
 						) }
 					</DropdownMenu>
@@ -207,7 +198,6 @@ export function Edit( { attributes, setAttributes } ) {
 							onChange={ ( value ) =>
 								setAttributes( { ariaLabel: value } )
 							}
-							__next40pxDefaultSize
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
@@ -260,10 +250,12 @@ export function Edit( { attributes, setAttributes } ) {
 			</div>
 			{ isInserterOpen && (
 				<CustomInserterModal
-					icons={ allIcons }
-					setInserterOpen={ setInserterOpen }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
+					onClose={ () => setInserterOpen( false ) }
+					value={ attributes.icon }
+					onChange={ ( name ) => {
+						setAttributes( { icon: name } );
+						setInserterOpen( false );
+					} }
 				/>
 			) }
 		</>

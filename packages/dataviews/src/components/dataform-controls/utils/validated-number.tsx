@@ -65,7 +65,6 @@ function BetweenControls( {
 					value={ min }
 					max={ max ? Number( max ) - step : undefined }
 					onChange={ onChangeMin }
-					__next40pxDefaultSize
 					hideLabelFromVision={ hideLabelFromVision }
 					step={ step }
 				/>
@@ -74,7 +73,6 @@ function BetweenControls( {
 					value={ max }
 					min={ min ? Number( min ) + step : undefined }
 					onChange={ onChangeMax }
-					__next40pxDefaultSize
 					hideLabelFromVision={ hideLabelFromVision }
 					step={ step }
 				/>
@@ -157,7 +155,6 @@ export default function ValidatedNumber< Item >( {
 			help={ description }
 			value={ value }
 			onChange={ onChangeControl }
-			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
 			step={ step }
 			min={ isValid.min ? isValid.min.constraint : undefined }

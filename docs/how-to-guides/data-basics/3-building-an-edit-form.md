@@ -2,7 +2,7 @@
 
 This part is about adding an *Edit* feature to our app. Here's a glimpse of what we're going to build:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-finished.png)
+![](https://developer.wordpress.org/files/2026/06/form-finished.png)
 
 ### Step 1: Add an _Edit_ button
 
@@ -51,7 +51,7 @@ function PagesList( { hasResolved, pages } ) {
 
 The only change in `PagesList` is the additional column labeled _Actions_:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/edit-button.png)
+![](https://developer.wordpress.org/files/2026/06/edit-button.png)
 
 ### Step 2: Display an _Edit_ form
 
@@ -63,7 +63,6 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
-				__next40pxDefaultSize
 				value=''
 				label='Page title:'
 			/>
@@ -113,7 +112,7 @@ function PageEditButton({ pageId }) {
 
 When you click the *Edit* button now, you should see the following modal:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-scaffold.png)
+![](https://developer.wordpress.org/files/2026/06/form-scaffold.png)
 
 Great! We now have a basic user interface to work with.
 
@@ -140,7 +139,6 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
-				__next40pxDefaultSize
 				label='Page title:'
 				value={ page.title.rendered }
 			/>
@@ -152,7 +150,7 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 
 Now it should look like this:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-populated.png)
+![](https://developer.wordpress.org/files/2026/06/form-populated.png)
 
 ### Step 4: Making the Page title field editable
 
@@ -166,7 +164,6 @@ function VanillaReactForm({ initialTitle }) {
 	const [title, setTitle] = useState( initialTitle );
 	return (
 		<TextControl
-			__next40pxDefaultSize
 			value={ title }
 			onChange={ setTitle }
 		/>
@@ -236,7 +233,6 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
-				__next40pxDefaultSize
 				label="Page title:"
 				value={ page.title }
 				onChange={ handleChange }
@@ -258,7 +254,7 @@ We added an `onChange` handler to keep track of edits via the `editEntityRecord`
 
 This is what it looks like now:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-editable.png)
+![](https://developer.wordpress.org/files/2026/06/form-editable.png)
 
 ### Step 5: Saving the form data
 
@@ -388,7 +384,7 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 
 Once you refresh the page, open the form, change the title, and hit save, you should see the following error message:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-error.png)
+![](https://developer.wordpress.org/files/2026/06/form-error.png)
 
 Fantastic! We can now **restore the previous version of `handleChange`** and move on to the next step.
 
@@ -449,8 +445,8 @@ Also, interrupting a *save* in progress is not supported by `@wordpress/data` so
 
 Here's what it looks like in action:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-inactive.png)
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-spinner.png)
+![](https://developer.wordpress.org/files/2026/06/form-inactive.png)
+![](https://developer.wordpress.org/files/2026/06/form-spinner.png)
 
 ### Wiring it all together
 
@@ -505,7 +501,6 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
-				__next40pxDefaultSize
 				label="Page title:"
 				value={ page.title }
 				onChange={ handleChange }

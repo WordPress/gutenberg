@@ -124,15 +124,14 @@
 	}
 }
 
-.editor-collab-sidebar-panel__more-reply-separator {
+.editor-collab-sidebar-panel__more-reply-separator,
+.editor-collab-sidebar-panel__status-separator {
 	&::before,
 	&::after {
 		content: "";
-		display: block;
-		width: 100%;
+		flex: 1;
 		height: 1px;
 		background-color: $gray-300;
-		flex: 1;
 	}
 }
 
@@ -217,4 +216,13 @@
 			font-size: $helptext-font-size;
 		}
 	}
+}
+
+// Inline-note highlight applied to the `core/note` marker (`mark.wp-note`).
+// Each marker is tinted by `<NoteHighlightStyles>` using the note author's
+// color from `AVATAR_BORDER_COLORS`; this base rule only provides shared
+// layout/transition properties.
+mark.wp-note {
+	border-radius: 1px;
+	transition: background-color 0.1s ease-in-out;
 }

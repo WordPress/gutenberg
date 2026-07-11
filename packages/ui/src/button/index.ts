@@ -5,6 +5,9 @@ ButtonIcon.displayName = 'Button.Icon';
 
 /**
  * A versatile button component with multiple variants, tones, and sizes.
+ *
+ * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
+ * for when to use `Button`, `IconButton`, `Link`, or `LinkButton`.
  */
 export const Button = Object.assign( _Button, {
 	/**

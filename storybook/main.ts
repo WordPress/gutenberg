@@ -13,13 +13,8 @@ import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fall
 const { NODE_ENV = 'development' } = process.env;
 
 const stories = [
-	// Smoke tests ensure that the stories are rendered without any errors, but
-	// we don't need to test everything:
-	// - `.mdx` documentation is generally plain text and unlikely to break.
-	// - Playground stories are complex renderings of many components, which is
-	//   both slow and redundant with individual component stories.
-	NODE_ENV === 'test' ? '' : './stories/playground/**/*.story.@(jsx|tsx)',
-	NODE_ENV === 'test' ? '' : './stories/**/*.mdx',
+	'./stories/playground/**/*.story.@(jsx|tsx)',
+	'./stories/**/*.mdx',
 	'./stories/design-system/**/*.story.@(ts|tsx)',
 	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
@@ -41,7 +36,7 @@ const stories = [
 	'../packages/ui/src/**/stories/*.mdx',
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/admin-ui/src/**/stories/*.story.@(ts|tsx)',
-].filter( Boolean );
+];
 
 const config: StorybookConfig = {
 	core: {
