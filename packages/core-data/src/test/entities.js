@@ -554,6 +554,95 @@ describe( 'prePersistPostType', () => {
 		} );
 	} );
 
+	it( 'treats the auto-draft title placeholder as unchanged on the first collaborative save', async () => {
+		const snapshot = {
+			serializedDoc: 'local-doc',
+			isCurrent: jest.fn( () => true ),
+		};
+		const syncManager = {
+			createPersistedCRDTSnapshot: jest
+				.fn()
+				.mockResolvedValue( snapshot ),
+		};
+		apiFetch.mockResolvedValue( {
+			id: 123,
+			status: 'auto-draft',
+			title: { raw: 'Auto Draft' },
+			content: { raw: '' },
+			meta: {
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: '',
+			},
+		} );
+		setSyncManagerMock( syncManager );
+		window._wpCollaborationEnabled = true;
+
+		await expect(
+			prePersistPostType(
+				{
+					id: 123,
+					status: 'auto-draft',
+					title: '',
+					content: { raw: '' },
+					meta: {
+						[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: '',
+					},
+				},
+				{ content: 'local content' },
+				'page',
+				false,
+				'/wp/v2/pages'
+			)
+		).resolves.toEqual( {
+			status: 'draft',
+			title: '',
+			meta: {
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'local-doc',
+			},
+		} );
+		expect( snapshot.isCurrent ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'still rejects a meaningful title added to an auto-draft by another window', async () => {
+		const syncManager = {
+			createPersistedCRDTSnapshot: jest.fn().mockResolvedValue( {
+				serializedDoc: 'local-doc',
+				isCurrent: () => true,
+			} ),
+		};
+		apiFetch.mockResolvedValue( {
+			id: 123,
+			status: 'auto-draft',
+			title: { raw: 'Meaningful title' },
+			content: { raw: '' },
+			meta: {
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: '',
+			},
+		} );
+		setSyncManagerMock( syncManager );
+		window._wpCollaborationEnabled = true;
+
+		await expect(
+			prePersistPostType(
+				{
+					id: 123,
+					status: 'auto-draft',
+					title: '',
+					content: { raw: '' },
+					meta: {
+						[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: '',
+					},
+				},
+				{ content: 'local content' },
+				'page',
+				false,
+				'/wp/v2/pages'
+			)
+		).rejects.toMatchObject( {
+			code: 'core_data_stale_save_conflict',
+			data: { conflictingFields: [ 'title' ] },
+		} );
+	} );
+
 	it( 'stores auto-draft defaults in the validated CRDT candidate before committing it', async () => {
 		const content = pageContent( [ 'Initial content' ] );
 		const snapshot = {

@@ -38,9 +38,23 @@ function getRawPostValue( value ) {
 }
 
 function getComparablePostValue( record, key ) {
-	return POST_RAW_ATTRIBUTES.includes( key )
+	const value = POST_RAW_ATTRIBUTES.includes( key )
 		? getRawPostValue( record?.[ key ] )
 		: record?.[ key ];
+
+	// Core data normalizes the auto-draft title placeholder to an empty string,
+	// while a direct REST freshness check returns the literal "Auto Draft".
+	// Treat only that placeholder as equivalent so the first collaborative save
+	// is not mistaken for a concurrent title edit.
+	if (
+		key === 'title' &&
+		record?.status === 'auto-draft' &&
+		value === 'Auto Draft'
+	) {
+		return '';
+	}
+
+	return value;
 }
 
 function getChangedMetaKeys( baseMeta, nextMeta, candidateKeys ) {
