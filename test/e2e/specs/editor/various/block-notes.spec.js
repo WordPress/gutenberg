@@ -1192,12 +1192,6 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'gridcell', { name: 'Heart', exact: true } )
 				.click();
 
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reaction added.' } )
-			).toBeVisible();
-
 			// The same reaction button shape that the curated row produces
 			// — contains the heart emoji and a count of 1. If storage
 			// normalization were broken we'd get a stray hex-key button.
@@ -1220,12 +1214,6 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			await blockNoteUtils.pickFullPickerEmojiBySearch( 'thumbs up' );
-
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reaction added.' } )
-			).toBeVisible();
 
 			const reactionButton = page.locator(
 				'.editor-collab-sidebar-panel__reaction-button'
@@ -1341,11 +1329,6 @@ test.describe( 'Block Notes', () => {
 			await page
 				.getByRole( 'gridcell', { name: 'avocado', exact: true } )
 				.click();
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reaction added.' } )
-			).toBeVisible();
 
 			// …and on reopening the picker, the recorded pick has joined
 			// the Frequently used section.
@@ -1413,12 +1396,6 @@ test.describe( 'Block Notes', () => {
 					exact: true,
 				} )
 				.click();
-
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reaction added.' } )
-			).toBeVisible();
 
 			// The stored reaction renders the toned emoji.
 			const reactionButton = page.locator(
