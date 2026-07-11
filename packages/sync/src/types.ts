@@ -157,6 +157,8 @@ export interface SyncConfig {
 		editedRecord: ObjectData
 	) => ObjectData;
 	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
+	normalizeCRDTDoc?: ( ydoc: Y.Doc ) => void;
+	shouldInvalidateSnapshot?: ( changes: Partial< ObjectData > ) => boolean;
 	shouldSync?: (
 		objectType: ObjectType,
 		objectId: ObjectID | null
@@ -164,20 +166,36 @@ export interface SyncConfig {
 	supportsPersistence?: boolean;
 }
 
+export interface RebasedCRDTCandidate {
+	record: ObjectData;
+	serializedDoc: string;
+	commit: () => Promise< boolean >;
+}
+
+export interface PersistedCRDTSnapshot {
+	serializedDoc: string;
+	isCurrent: () => boolean;
+}
+
 export interface SyncManager {
-	applyPersistedCRDTDoc: (
+	createPersistedCRDTSnapshot: (
+		objectType: ObjectType,
+		objectId: ObjectID
+	) => Promise< PersistedCRDTSnapshot | null >;
+	createRebasedPersistedCRDTDoc: (
 		objectType: ObjectType,
 		objectId: ObjectID,
-		record: ObjectData
-	) => Promise< boolean >;
+		record: ObjectData,
+		localSnapshot: PersistedCRDTSnapshot,
+		requiredFields?: string[],
+		requireSharedHistory?: boolean,
+		sharedHistoryFields?: string[],
+		candidateChanges?: Partial< ObjectData >
+	) => Promise< RebasedCRDTCandidate | null >;
 	createPersistedCRDTDoc: (
 		objectType: ObjectType,
 		objectId: ObjectID
 	) => Promise< string | null >;
-	getCRDTRecordData: (
-		objectType: ObjectType,
-		objectId: ObjectID
-	) => ObjectData | undefined;
 	getAwareness: < State extends Awareness >(
 		objectType: ObjectType,
 		objectId: ObjectID | null

@@ -318,6 +318,28 @@ export function applyPostChangesToCRDTDoc(
 }
 
 /**
+ * Ensure the post content stored in a CRDT document matches its authoritative
+ * block tree before the document is attached to a REST save.
+ *
+ * @param ydoc CRDT document to normalize.
+ */
+export function normalizePostCRDTDoc( ydoc: CRDTDoc ): void {
+	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
+	const blocks = ymap.get( 'blocks' );
+	if ( ! ( blocks instanceof Y.Array ) ) {
+		return;
+	}
+
+	const rawContent = __unstableSerializeAndClean( blocks.toJSON() ).trim();
+	const content = ymap.get( 'content' );
+	if ( content instanceof Y.Text ) {
+		mergeRichTextUpdate( content, rawContent );
+	} else {
+		ymap.set( 'content', new Y.Text( rawContent ) );
+	}
+}
+
+/**
  * Derive blocks from a raw content string and merge them into the post's
  * blocks Y.Array. Used when a caller dispatches a change with `blocks:
  * undefined` alongside new content,  most notably the Code Editor's

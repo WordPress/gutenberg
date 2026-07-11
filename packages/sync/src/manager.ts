@@ -26,8 +26,10 @@ import type {
 	ObjectID,
 	ObjectData,
 	ObjectType,
+	PersistedCRDTSnapshot,
 	ProviderCreator,
 	ProviderCreatorResult,
+	RebasedCRDTCandidate,
 	RecordHandlers,
 	SyncConfig,
 	SyncManager,
@@ -43,6 +45,8 @@ import {
 	serializeCrdtDoc,
 } from './utils';
 
+const VALIDATED_REBASE_ORIGIN = Symbol( 'validated-rebase' );
+
 interface CollectionState {
 	awareness?: Awareness;
 	handlers: CollectionHandlers;
@@ -56,17 +60,10 @@ interface EntityState {
 	handlers: RecordHandlers;
 	objectId: ObjectID;
 	objectType: ObjectType;
+	revision: number;
 	syncConfig: SyncConfig;
 	unload: () => void;
 	ydoc: CRDTDoc;
-}
-
-function areUint8ArraysEqual( a: Uint8Array, b: Uint8Array ): boolean {
-	if ( a.length !== b.length ) {
-		return false;
-	}
-
-	return a.every( ( value, index ) => value === b[ index ] );
 }
 
 /**
@@ -93,6 +90,10 @@ export function createSyncManager( debug = false ): SyncManager {
 	const debugWrap = debug ? logPerformanceTiming : passThru;
 	const collectionStates: Map< ObjectType, CollectionState > = new Map();
 	const entityStates: Map< EntityID, EntityState > = new Map();
+	const persistedSnapshots = new WeakMap<
+		PersistedCRDTSnapshot,
+		EntityState
+	>();
 
 	/**
 	 * A "sync-aware" undo manager for all synced entities. It is lazily created
@@ -236,12 +237,14 @@ export function createSyncManager( debug = false ): SyncManager {
 			transaction: Y.Transaction
 		): void => {
 			if (
-				transaction.local &&
-				! ( transaction.origin instanceof Y.UndoManager )
+				transaction.origin === VALIDATED_REBASE_ORIGIN ||
+				( transaction.local &&
+					! ( transaction.origin instanceof Y.UndoManager ) )
 			) {
 				return;
 			}
 
+			entityState.revision++;
 			void internal.updateEntityRecord( objectType, objectId );
 		};
 
@@ -249,10 +252,12 @@ export function createSyncManager( debug = false ): SyncManager {
 			event: Y.YMapEvent< unknown >,
 			transaction: Y.Transaction
 		) => {
-			if ( transaction.local ) {
+			if (
+				transaction.local ||
+				transaction.origin === VALIDATED_REBASE_ORIGIN
+			) {
 				return;
 			}
-
 			event.keysChanged.forEach( ( key ) => {
 				switch ( key ) {
 					case SAVED_AT_KEY:
@@ -290,6 +295,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			handlers,
 			objectId,
 			objectType,
+			revision: 0,
 			syncConfig,
 			unload,
 			ydoc,
@@ -702,6 +708,17 @@ export function createSyncManager( debug = false ): SyncManager {
 		origin: string,
 		options: SyncManagerUpdateOptions = {}
 	): void {
+		const entityState = entityStates.get(
+			getEntityId( objectType, objectId )
+		);
+		if (
+			entityState &&
+			( entityState.syncConfig.shouldInvalidateSnapshot?.( changes ) ??
+				Object.keys( changes ).length > 0 )
+		) {
+			entityState.revision++;
+		}
+
 		// `getStates()` counts the local client, so > 1 means a remote peer.
 		const hasRemotePeers =
 			( getAwareness( objectType, objectId )?.getStates().size ?? 0 ) > 1;
@@ -775,44 +792,299 @@ export function createSyncManager( debug = false ): SyncManager {
 		return serializeCrdtDoc( entityState.ydoc );
 	}
 
-	async function applyPersistedCRDTDoc(
-		objectType: ObjectType,
-		objectId: ObjectID,
-		record: ObjectData
-	): Promise< boolean > {
-		const entityId = getEntityId( objectType, objectId );
-		const entityState = entityStates.get( entityId );
-		const previousStateVector = entityState?.ydoc
-			? Y.encodeStateVector( entityState.ydoc )
-			: null;
-
-		internal.applyPersistedCrdtDoc( objectType, objectId, record );
-
-		// Applying a persisted document can schedule local store updates. Yield so
-		// callers that immediately inspect the document see the completed merge.
-		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
-
-		const nextStateVector = entityState?.ydoc
-			? Y.encodeStateVector( entityState.ydoc )
-			: null;
-
-		return !! (
-			previousStateVector &&
-			nextStateVector &&
-			! areUint8ArraysEqual( previousStateVector, nextStateVector )
-		);
-	}
-
-	function getCRDTRecordData(
+	async function createPersistedCRDTSnapshot(
 		objectType: ObjectType,
 		objectId: ObjectID
-	): ObjectData | undefined {
+	): Promise< PersistedCRDTSnapshot | null > {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
-		return entityState?.ydoc.getMap( CRDT_RECORD_MAP_KEY ).toJSON() as
-			| ObjectData
-			| undefined;
+		if ( ! entityState?.ydoc ) {
+			return null;
+		}
+		const revisionAtCall = entityState.revision;
+
+		// Local updates may be deferred via yieldToEventLoop when editing alone.
+		// Await a promise that resolves on the next tick of the event loop so
+		// pending updates are flushed before we serialize the document.
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		if ( entityStates.get( entityId ) !== entityState ) {
+			return null;
+		}
+		if ( entityState.revision !== revisionAtCall ) {
+			throw new Error(
+				'Local record changed while creating its CRDT snapshot.'
+			);
+		}
+
+		const revision = revisionAtCall;
+		const snapshot = {
+			serializedDoc: serializeCrdtDoc( entityState.ydoc ),
+			isCurrent: () =>
+				entityStates.get( entityId ) === entityState &&
+				entityState.revision === revision,
+		};
+		persistedSnapshots.set( snapshot, entityState );
+		return snapshot;
+	}
+
+	async function createRebasedPersistedCRDTDoc(
+		objectType: ObjectType,
+		objectId: ObjectID,
+		record: ObjectData,
+		localSnapshot: PersistedCRDTSnapshot,
+		requiredFields: string[] = [],
+		requireSharedHistory = false,
+		sharedHistoryFields: string[] = [],
+		candidateChanges: Partial< ObjectData > = {}
+	): Promise< RebasedCRDTCandidate | null > {
+		const entityId = getEntityId( objectType, objectId );
+		const entityState = entityStates.get( entityId );
+		if ( ! entityState ) {
+			return null;
+		}
+		if ( persistedSnapshots.get( localSnapshot ) !== entityState ) {
+			throw new Error(
+				'Local CRDT snapshot does not belong to this entity.'
+			);
+		}
+		const localSnapshotDoc = deserializeCrdtDoc(
+			localSnapshot.serializedDoc
+		);
+		if ( ! localSnapshotDoc ) {
+			throw new Error( 'Invalid local CRDT document.' );
+		}
+
+		const serialized =
+			entityState.syncConfig.getPersistedCRDTDoc?.( record );
+		if ( ! serialized ) {
+			localSnapshotDoc.destroy();
+			return null;
+		}
+
+		const persistedDoc = deserializeCrdtDoc( serialized );
+
+		// The normal load path repairs missing, invalid, or stale persisted
+		// documents by applying the REST record to the live document and scheduling
+		// persistence. That is unsafe during a save-time rebase because it can
+		// replace or persist unsaved local changes before the save is accepted.
+		if ( ! persistedDoc ) {
+			localSnapshotDoc.destroy();
+			throw new Error( 'Invalid persisted CRDT document.' );
+		}
+
+		try {
+			// Flush any locally queued update. The snapshot's synchronous revision
+			// guard also catches an edit whose deferred CRDT write has not run yet.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			if ( ! localSnapshot.isCurrent() ) {
+				throw new Error(
+					'Local record changed while checking the latest record.'
+				);
+			}
+
+			const liveDoc = entityState.ydoc;
+			const localSnapshotUpdate =
+				Y.encodeStateAsUpdateV2( localSnapshotDoc );
+
+			const localRecordMap =
+				localSnapshotDoc.getMap( CRDT_RECORD_MAP_KEY );
+			const persistedRecordMap =
+				persistedDoc.getMap( CRDT_RECORD_MAP_KEY );
+			const missingRequiredFields = requiredFields.filter( ( key ) => {
+				if ( key === 'content' ) {
+					const localBlocks = localRecordMap.get( 'blocks' );
+					if ( localBlocks instanceof Y.Array ) {
+						return ! (
+							persistedRecordMap.get( 'blocks' ) instanceof
+							Y.Array
+						);
+					}
+
+					return (
+						! persistedRecordMap.has( 'content' ) &&
+						! persistedRecordMap.has( 'blocks' )
+					);
+				}
+
+				if ( key.startsWith( 'meta.' ) ) {
+					const meta = persistedRecordMap.get( 'meta' );
+					return (
+						! ( meta instanceof Y.Map ) ||
+						! meta.has( key.slice( 'meta.'.length ) )
+					);
+				}
+
+				return ! persistedRecordMap.has( key );
+			} );
+			if ( missingRequiredFields.length ) {
+				throw new Error(
+					`Persisted CRDT document is missing required fields: ${ missingRequiredFields.join(
+						', '
+					) }.`
+				);
+			}
+
+			if ( requireSharedHistory ) {
+				const localState = Y.decodeStateVector(
+					Y.encodeStateVector( localSnapshotDoc )
+				);
+				const persistedState = Y.decodeStateVector(
+					Y.encodeStateVector( persistedDoc )
+				);
+				const hasSharedHistory = [ ...persistedState ].some(
+					( [ clientId, clock ] ) =>
+						clock > 0 && ( localState.get( clientId ) ?? 0 ) > 0
+				);
+				if ( ! hasSharedHistory ) {
+					throw new Error(
+						'Persisted CRDT document does not share history with the local document.'
+					);
+				}
+
+				const getSharedTypeId = (
+					recordMap: Y.Map< unknown >,
+					field: string
+				) => {
+					const value =
+						field === 'content' &&
+						recordMap.get( 'blocks' ) instanceof Y.Array
+							? recordMap.get( 'blocks' )
+							: recordMap.get( field );
+					try {
+						return Y.createRelativePositionFromTypeIndex(
+							value as Y.AbstractType< any >,
+							0
+						).type;
+					} catch {
+						return null;
+					}
+				};
+				const fieldsWithoutSharedRoots = sharedHistoryFields.filter(
+					( field ) => {
+						const localTypeId = getSharedTypeId(
+							localRecordMap,
+							field
+						);
+						const persistedTypeId = getSharedTypeId(
+							persistedRecordMap,
+							field
+						);
+						return (
+							! localTypeId ||
+							! persistedTypeId ||
+							! Y.compareIDs( localTypeId, persistedTypeId )
+						);
+					}
+				);
+				if ( fieldsWithoutSharedRoots.length ) {
+					throw new Error(
+						`Persisted CRDT fields do not share roots with the local document: ${ fieldsWithoutSharedRoots.join(
+							', '
+						) }.`
+					);
+				}
+			}
+
+			const invalidatedKeys = Object.keys(
+				entityState.syncConfig.getChangesFromCRDTDoc(
+					persistedDoc,
+					record
+				)
+			);
+			if ( invalidatedKeys.length ) {
+				const changes = invalidatedKeys.reduce(
+					( acc, key ) =>
+						Object.assign( acc, {
+							[ key ]: record[ key ],
+						} ),
+					{}
+				);
+
+				// Repair a temporary candidate, not the live document or server. Its
+				// update is merged below with unsaved local operations, and is only
+				// persisted if the enclosing entity save succeeds.
+				persistedDoc.transact( () => {
+					entityState.syncConfig.applyChangesToCRDTDoc(
+						persistedDoc,
+						changes
+					);
+				}, LOCAL_SYNC_MANAGER_ORIGIN );
+			}
+
+			const candidateDoc = createYjsDoc();
+			try {
+				Y.applyUpdateV2( candidateDoc, localSnapshotUpdate );
+				Y.applyUpdateV2(
+					candidateDoc,
+					Y.encodeStateAsUpdateV2( persistedDoc )
+				);
+				if ( Object.keys( candidateChanges ).length ) {
+					candidateDoc.transact( () => {
+						entityState.syncConfig.applyChangesToCRDTDoc(
+							candidateDoc,
+							candidateChanges
+						);
+					}, LOCAL_SYNC_MANAGER_ORIGIN );
+				}
+				if ( entityState.syncConfig.normalizeCRDTDoc ) {
+					candidateDoc.transact( () => {
+						entityState.syncConfig.normalizeCRDTDoc?.(
+							candidateDoc
+						);
+					}, LOCAL_SYNC_MANAGER_ORIGIN );
+				}
+
+				const candidateUpdate = Y.encodeStateAsUpdateV2( candidateDoc );
+				let hasCommitted = false;
+				return {
+					record: candidateDoc
+						.getMap( CRDT_RECORD_MAP_KEY )
+						.toJSON() as ObjectData,
+					serializedDoc: serializeCrdtDoc( candidateDoc ),
+					commit: async () => {
+						const editedRecord =
+							await entityState.handlers.getEditedRecord();
+
+						// Do not apply a candidate to a document that was unloaded and
+						// recreated while the REST freshness check was in flight.
+						if (
+							entityStates.get( entityId ) !== entityState ||
+							entityState.ydoc !== liveDoc
+						) {
+							return false;
+						}
+						if ( hasCommitted ) {
+							return true;
+						}
+						if ( ! localSnapshot.isCurrent() ) {
+							return false;
+						}
+
+						Y.applyUpdateV2(
+							liveDoc,
+							candidateUpdate.slice(),
+							VALIDATED_REBASE_ORIGIN
+						);
+						hasCommitted = true;
+						const changes =
+							entityState.syncConfig.getChangesFromCRDTDoc(
+								liveDoc,
+								editedRecord
+							);
+						if ( Object.keys( changes ).length ) {
+							entityState.handlers.editRecord( changes );
+						}
+						return true;
+					},
+				};
+			} finally {
+				candidateDoc.destroy();
+			}
+		} finally {
+			persistedDoc.destroy();
+			localSnapshotDoc.destroy();
+		}
 	}
 
 	// Collect internal functions so that they can be wrapped before calling.
@@ -823,9 +1095,11 @@ export function createSyncManager( debug = false ): SyncManager {
 
 	// Wrap and return the public API.
 	return {
-		applyPersistedCRDTDoc: debugWrap( applyPersistedCRDTDoc ),
+		createPersistedCRDTSnapshot: debugWrap( createPersistedCRDTSnapshot ),
+		createRebasedPersistedCRDTDoc: debugWrap(
+			createRebasedPersistedCRDTDoc
+		),
 		createPersistedCRDTDoc: debugWrap( createPersistedCRDTDoc ),
-		getCRDTRecordData: debugWrap( getCRDTRecordData ),
 		getAwareness,
 		load: debugWrap( loadEntity ),
 		loadCollection: debugWrap( loadCollection ),

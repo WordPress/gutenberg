@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { BrowserContext, Page, Request } from '@playwright/test';
+import type { BrowserContext, Page, Request, Route } from '@playwright/test';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,7 @@ import type {
 /**
  * Internal dependencies
  */
-import { test, expect } from './fixtures';
+import { test, expect } from '../fixtures';
 
 const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
 const ADMIN_USER = process.env.WP_USERNAME || 'admin';
@@ -32,35 +32,37 @@ type SyncEvidence = {
 	rooms: Set< string >;
 };
 
-type SaveTraceEntry = {
-	label: string;
-	method: string;
-	requestPostData: string;
-	requestAt: string;
-	responseContentRaw?: string;
-	responseAt?: string;
-	responseStatus?: number;
-	url: string;
-};
-
 type SaveSummary = {
 	label: string;
+	requestParagraphs: string[];
+	requestHasInitial: boolean;
 	requestHasA: boolean;
 	requestHasB: boolean;
+	requestHasC: boolean;
+	responseParagraphs: string[];
+	responseHasInitial: boolean;
 	responseHasA: boolean;
 	responseHasB: boolean;
-	responseStatus?: number;
+	responseHasC: boolean;
+	responseStatus: number;
 };
 
 type ScenarioResult = {
 	attempt: number;
+	afterBSaveDirty: boolean;
+	afterBSaveHadA: boolean;
+	afterBSaveHadB: boolean;
 	beforeBSaveHadA: boolean;
 	bSave?: SaveSummary;
+	followUpSave?: SaveSummary;
 	finalContent: string;
+	finalParagraphs: string[];
 	finalHasA: boolean;
 	finalHasB: boolean;
+	finalHasC: boolean;
 	markerA: string;
 	markerB: string;
+	markerC: string;
 	postId: number;
 	room: string;
 	rtc: {
@@ -89,6 +91,13 @@ function rawField( field?: RestField ): string {
 	return typeof field === 'string'
 		? field
 		: field.raw ?? field.rendered ?? '';
+}
+
+function paragraphContents( content: string ) {
+	return Array.from(
+		content.matchAll( /<p(?:\s[^>]*)?>(.*?)<\/p>/gs ),
+		( match ) => match[ 1 ]
+	);
 }
 
 function sleep( ms: number ) {
@@ -120,96 +129,65 @@ function syncObserver( page: Page ): SyncEvidence {
 }
 
 function isPostSaveRequest( request: Request, postId: number ) {
-	const url = request.url();
+	const url = new URL( request.url() );
 	const method = request.method();
+	const expectedRoute = `/wp/v2/posts/${ postId }`;
+	const pathname = url.pathname.replace( /\/$/, '' );
+	const restRoute = url.searchParams
+		.get( 'rest_route' )
+		?.replace( /\/$/, '' );
+
 	return (
 		( method === 'POST' || method === 'PUT' ) &&
-		( url.includes( `/wp/v2/posts/${ postId }` ) ||
-			url.includes( `rest_route=%2Fwp%2Fv2%2Fposts%2F${ postId }` ) )
+		( pathname.endsWith( `/wp-json${ expectedRoute }` ) ||
+			restRoute === expectedRoute )
 	);
 }
 
-function attachSaveTrace( page: Page, label: string, postId: number ) {
-	const entries: SaveTraceEntry[] = [];
-
-	page.on( 'request', ( request ) => {
-		if ( ! isPostSaveRequest( request, postId ) ) {
-			return;
-		}
-		entries.push( {
-			label,
-			method: request.method(),
-			requestPostData: request.postData() ?? '',
-			requestAt: new Date().toISOString(),
-			url: request.url(),
-		} );
-	} );
-
-	page.on( 'response', async ( response ) => {
-		const request = response.request();
-		if ( ! isPostSaveRequest( request, postId ) ) {
-			return;
-		}
-		const entry = entries
-			.slice()
-			.reverse()
-			.find(
-				( item ) =>
-					item.url === request.url() &&
-					item.method === request.method() &&
-					item.responseStatus === undefined
-			);
-		if ( ! entry ) {
-			return;
-		}
-		entry.responseStatus = response.status();
-		entry.responseAt = new Date().toISOString();
-		try {
-			const body = await response.json();
-			entry.responseContentRaw = body?.content?.raw ?? '';
-		} catch {
-			entry.responseContentRaw = '';
-		}
-	} );
-
-	return entries;
-}
-
-function requestContent( entry: SaveTraceEntry ) {
+function requestContent( request: Request ) {
+	const postData = request.postData() ?? '';
 	try {
-		return String( JSON.parse( entry.requestPostData )?.content ?? '' );
+		return String( JSON.parse( postData )?.content ?? '' );
 	} catch {}
-	return new URLSearchParams( entry.requestPostData ).get( 'content' ) ?? '';
+	return new URLSearchParams( postData ).get( 'content' ) ?? '';
 }
 
-function summarizeSave(
-	entries: SaveTraceEntry[],
-	markerA: string,
-	markerB: string,
-	label: string
-): SaveSummary | undefined {
-	const candidates = entries
-		.filter( ( entry ) => entry.label === label )
-		.map( ( entry ) => {
-			const requestBody = requestContent( entry );
-			const responseBody = String( entry.responseContentRaw ?? '' );
-			return {
-				label,
-				requestHasA: requestBody.includes( markerA ),
-				requestHasB: requestBody.includes( markerB ),
-				responseHasA: responseBody.includes( markerA ),
-				responseHasB: responseBody.includes( markerB ),
-				responseStatus: entry.responseStatus,
-			};
-		} );
+async function holdSyncRequests( page: Page ) {
+	let releaseGate = () => {};
+	let hasInterceptedRequest = false;
+	const gate = new Promise< void >( ( resolve ) => {
+		releaseGate = resolve;
+	} );
+	const matchesSyncRequest = ( url: URL ) => {
+		const decodedUrl = decodeURIComponent( url.href );
+		return (
+			decodedUrl.includes( '/wp-json/wp-sync/v1/updates' ) ||
+			decodedUrl.includes( 'rest_route=/wp-sync/v1/updates' )
+		);
+	};
+	const handler = async ( route: Route ) => {
+		hasInterceptedRequest = true;
+		await gate;
+		await route.continue();
+	};
 
-	return (
-		candidates
-			.slice()
-			.reverse()
-			.find( ( entry ) => entry.requestHasA || entry.requestHasB ) ??
-		candidates.at( -1 )
-	);
+	await page.route( matchesSyncRequest, handler );
+	let released = false;
+
+	return {
+		release: () => {
+			if ( released ) {
+				return;
+			}
+			released = true;
+			releaseGate();
+		},
+		waitUntilBlocked: async () => {
+			await expect
+				.poll( () => hasInterceptedRequest, { timeout: 35000 } )
+				.toBe( true );
+		},
+	};
 }
 
 async function waitForEditorReady( page: Page, postId: number ) {
@@ -267,6 +245,11 @@ async function openSameAdminEditor( admin: Admin, postId: number ) {
 		await page.waitForURL( '**/wp-admin/**' );
 
 		await page.goto( `/wp-admin/post.php?post=${ postId }&action=edit` );
+		await page.waitForFunction(
+			() => ( window as any ).wp?.data && ( window as any ).wp?.blocks,
+			undefined,
+			{ timeout: 30000 }
+		);
 		await page.evaluate( () => {
 			( window as any ).wp.data
 				.dispatch( 'core/preferences' )
@@ -375,7 +358,39 @@ async function appendParagraphWithKeyboard( page: Page, marker: string ) {
 	);
 }
 
-async function saveDraftWithToolbar( page: Page ) {
+async function appendParagraphProgrammatically( page: Page, marker: string ) {
+	await page.evaluate( ( content ) => {
+		const block = ( window as any ).wp.blocks.createBlock(
+			'core/paragraph',
+			{
+				content,
+			}
+		);
+		( window as any ).wp.data
+			.dispatch( 'core/block-editor' )
+			.insertBlocks( block );
+	}, marker );
+	await page.waitForFunction(
+		( expected ) =>
+			String(
+				( window as any ).wp.data
+					.select( 'core/editor' )
+					.getEditedPostContent()
+			).includes( expected ),
+		marker,
+		{ timeout: 7000 }
+	);
+}
+
+async function saveDraftWithToolbar(
+	page: Page,
+	postId: number,
+	label: string,
+	initialText: string,
+	markerA: string,
+	markerB: string,
+	markerC: string
+): Promise< SaveSummary > {
 	const button = page
 		.getByRole( 'region', { name: 'Editor top bar' } )
 		.getByRole( 'button', { name: /^Save draft$/ } );
@@ -388,13 +403,38 @@ async function saveDraftWithToolbar( page: Page ) {
 		undefined,
 		{ timeout: 30000 }
 	);
+	const responsePromise = page.waitForResponse(
+		( response ) => isPostSaveRequest( response.request(), postId ),
+		{ timeout: 30000 }
+	);
 	await button.click();
+	const response = await responsePromise;
+	let responseContent = '';
+	try {
+		responseContent = rawField( ( await response.json() )?.content );
+	} catch {}
 	await page.waitForFunction(
 		() =>
 			! ( window as any ).wp.data.select( 'core/editor' ).isSavingPost(),
 		undefined,
 		{ timeout: 30000 }
 	);
+
+	const sentContent = requestContent( response.request() );
+	return {
+		label,
+		requestParagraphs: paragraphContents( sentContent ),
+		requestHasInitial: sentContent.includes( initialText ),
+		requestHasA: sentContent.includes( markerA ),
+		requestHasB: sentContent.includes( markerB ),
+		requestHasC: sentContent.includes( markerC ),
+		responseParagraphs: paragraphContents( responseContent ),
+		responseHasInitial: responseContent.includes( initialText ),
+		responseHasA: responseContent.includes( markerA ),
+		responseHasB: responseContent.includes( markerB ),
+		responseHasC: responseContent.includes( markerC ),
+		responseStatus: response.status(),
+	};
 }
 
 async function editorHasText( page: Page, marker: string ) {
@@ -466,15 +506,18 @@ async function runSameAccountScenario( {
 } ): Promise< ScenarioResult > {
 	const markerA = `rtc-a-${ Date.now() }-${ attempt }`;
 	const markerB = `rtc-b-${ Date.now() }-${ attempt }`;
+	const markerC = `rtc-c-${ Date.now() }-${ attempt }`;
+	const initialText = 'Initial body.';
 	const post = await requestUtils.createPost( {
 		title: `Same-account stale save ${ Date.now() }`,
 		status: 'draft',
 		date_gmt: new Date().toISOString(),
-		content: paragraphMarkup( 'Initial body.' ),
+		content: paragraphMarkup( initialText ),
 	} );
 	const postId = post.id;
 	const room = `postType/post:${ postId }`;
 	let secondaryContext: BrowserContext | undefined;
+	let releaseSecondarySync: ( () => void ) | undefined;
 
 	try {
 		await openPrimaryEditor( admin, editor, page, postId );
@@ -484,8 +527,6 @@ async function runSameAccountScenario( {
 
 		const syncA = syncObserver( page );
 		const syncB = syncObserver( pageB );
-		const saveTraceA = attachSaveTrace( page, 'A', postId );
-		const saveTraceB = attachSaveTrace( pageB, 'B', postId );
 
 		await waitForMutualDiscovery( page, pageB );
 		await Promise.all( [
@@ -493,25 +534,45 @@ async function runSameAccountScenario( {
 			waitForSyncRoom( syncB, room, 'Window B' ),
 		] );
 		const rtc = await collectRtcEvidence( page );
+		const secondarySyncGate = await holdSyncRequests( pageB );
+		releaseSecondarySync = secondarySyncGate.release;
+		// Polling is sequential. Intercepting the next request proves any request
+		// that started before the route was installed has already completed.
+		await secondarySyncGate.waitUntilBlocked();
 
 		await appendParagraphWithKeyboard( page, markerA );
-		await saveDraftWithToolbar( page );
+		await saveDraftWithToolbar(
+			page,
+			postId,
+			'A',
+			initialText,
+			markerA,
+			markerB,
+			markerC
+		);
 		await waitForServerText( requestUtils, postId, markerA );
 
 		if ( delayBeforeBSaveMs > 0 ) {
 			await sleep( delayBeforeBSaveMs );
 		}
 
+		await appendParagraphWithKeyboard( pageB, markerB );
 		const beforeBSaveHadA = await editorHasText( pageB, markerA );
 		if ( requireStaleBeforeBSave && beforeBSaveHadA ) {
 			return {
 				attempt,
+				afterBSaveDirty: false,
+				afterBSaveHadA: false,
+				afterBSaveHadB: false,
 				beforeBSaveHadA,
 				finalContent: '',
+				finalParagraphs: [],
 				finalHasA: false,
 				finalHasB: false,
+				finalHasC: false,
 				markerA,
 				markerB,
+				markerC,
 				postId,
 				room,
 				rtc,
@@ -527,21 +588,71 @@ async function runSameAccountScenario( {
 			};
 		}
 
-		await appendParagraphWithKeyboard( pageB, markerB );
-		await saveDraftWithToolbar( pageB );
-		await waitForServerText( requestUtils, postId, markerB );
-
-		const finalContent = await getPersistedContent( requestUtils, postId );
-		const combinedTrace = [ ...saveTraceA, ...saveTraceB ];
-		return {
-			attempt,
-			beforeBSaveHadA,
-			bSave: summarizeSave( combinedTrace, markerA, markerB, 'B' ),
-			finalContent,
-			finalHasA: finalContent.includes( markerA ),
-			finalHasB: finalContent.includes( markerB ),
+		const bSave = await saveDraftWithToolbar(
+			pageB,
+			postId,
+			'B',
+			initialText,
 			markerA,
 			markerB,
+			markerC
+		);
+		await waitForServerText( requestUtils, postId, markerB );
+		await expect
+			.poll( () => editorHasText( pageB, markerA ), { timeout: 10000 } )
+			.toBe( true );
+		await expect
+			.poll(
+				() =>
+					pageB.evaluate( () =>
+						( window as any ).wp.data
+							.select( 'core/editor' )
+							.isEditedPostDirty()
+					),
+				{ timeout: 10000 }
+			)
+			.toBe( false );
+		const afterBSaveHadA = await editorHasText( pageB, markerA );
+		const afterBSaveHadB = await editorHasText( pageB, markerB );
+		const afterBSaveDirty = await pageB.evaluate( () =>
+			( window as any ).wp.data
+				.select( 'core/editor' )
+				.isEditedPostDirty()
+		);
+
+		// Save once more before polling is released. This proves the accepted
+		// candidate became B's live editor state, not only a one-off REST payload.
+		await appendParagraphProgrammatically( pageB, markerC );
+		const followUpSave = await saveDraftWithToolbar(
+			pageB,
+			postId,
+			'B follow-up',
+			initialText,
+			markerA,
+			markerB,
+			markerC
+		);
+		await waitForServerText( requestUtils, postId, markerC );
+
+		const finalContent = await getPersistedContent( requestUtils, postId );
+		releaseSecondarySync();
+		releaseSecondarySync = undefined;
+		return {
+			attempt,
+			afterBSaveDirty,
+			afterBSaveHadA,
+			afterBSaveHadB,
+			beforeBSaveHadA,
+			bSave,
+			followUpSave,
+			finalContent,
+			finalParagraphs: paragraphContents( finalContent ),
+			finalHasA: finalContent.includes( markerA ),
+			finalHasB: finalContent.includes( markerB ),
+			finalHasC: finalContent.includes( markerC ),
+			markerA,
+			markerB,
+			markerC,
 			postId,
 			room,
 			rtc,
@@ -556,6 +667,7 @@ async function runSameAccountScenario( {
 			},
 		};
 	} finally {
+		releaseSecondarySync?.();
 		await secondaryContext?.close();
 	}
 }
@@ -616,8 +728,53 @@ test.describe( 'Collaboration - same-user stale content overwrite', () => {
 		expect( result.syncA.rooms ).toContain( result.room );
 		expect( result.syncB.rooms ).toContain( result.room );
 		expect( result.beforeBSaveHadA ).toBe( false );
+		expect( result.afterBSaveHadA ).toBe( true );
+		expect( result.afterBSaveHadB ).toBe( true );
+		expect( result.afterBSaveDirty ).toBe( false );
+		expect( result.bSave?.requestHasInitial ).toBe( true );
+		expect( result.bSave?.requestHasA ).toBe( true );
 		expect( result.bSave?.requestHasB ).toBe( true );
+		expect( result.bSave?.responseStatus ).toBe( 200 );
+		expect( result.bSave?.responseHasInitial ).toBe( true );
+		expect( result.bSave?.responseHasA ).toBe( true );
+		expect( result.bSave?.responseHasB ).toBe( true );
+		expect( result.followUpSave?.requestHasInitial ).toBe( true );
+		expect( result.followUpSave?.requestHasA ).toBe( true );
+		expect( result.followUpSave?.requestHasB ).toBe( true );
+		expect( result.followUpSave?.requestHasC ).toBe( true );
+		expect( result.followUpSave?.responseStatus ).toBe( 200 );
+		expect( result.followUpSave?.responseHasInitial ).toBe( true );
+		expect( result.followUpSave?.responseHasA ).toBe( true );
+		expect( result.followUpSave?.responseHasB ).toBe( true );
+		expect( result.followUpSave?.responseHasC ).toBe( true );
+		expect( result.finalContent ).toContain( 'Initial body.' );
 		expect( result.finalHasA ).toBe( true );
 		expect( result.finalHasB ).toBe( true );
+		expect( result.finalHasC ).toBe( true );
+
+		const expectedParagraphs = [
+			'Initial body.',
+			result.markerA,
+			result.markerB,
+		].sort();
+		const expectedFollowUpParagraphs = [
+			...expectedParagraphs,
+			result.markerC,
+		].sort();
+		expect(
+			[ ...( result.bSave?.requestParagraphs ?? [] ) ].sort()
+		).toEqual( expectedParagraphs );
+		expect(
+			[ ...( result.bSave?.responseParagraphs ?? [] ) ].sort()
+		).toEqual( expectedParagraphs );
+		expect(
+			[ ...( result.followUpSave?.requestParagraphs ?? [] ) ].sort()
+		).toEqual( expectedFollowUpParagraphs );
+		expect(
+			[ ...( result.followUpSave?.responseParagraphs ?? [] ) ].sort()
+		).toEqual( expectedFollowUpParagraphs );
+		expect( [ ...result.finalParagraphs ].sort() ).toEqual(
+			expectedFollowUpParagraphs
+		);
 	} );
 } );

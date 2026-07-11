@@ -58,7 +58,7 @@ jest.mock( '@wordpress/blocks', () => {
 /**
  * WordPress dependencies
  */
-import { parse } from '@wordpress/blocks';
+import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 
 /**
@@ -70,6 +70,7 @@ import {
 	defaultCollectionSyncConfig,
 	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
+	normalizePostCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 	type PostChanges,
 	type YPostRecord,
@@ -333,6 +334,32 @@ describe( 'crdt', () => {
 			expect( ( map.get( 'blocks' ) as YBlocks ).toJSON() ).toEqual(
 				changes.blocks
 			);
+		} );
+
+		it( 'derives serialized content from blocks when both are supplied', () => {
+			const changes = {
+				blocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Current block content' },
+						innerBlocks: [],
+					},
+				],
+				content: 'stale serialized content',
+			} as PostChanges;
+
+			applyPostChangesToCRDTDoc( doc, changes, defaultSyncedProperties );
+
+			const content = map.get( 'content' );
+			expect( content ).toBeInstanceOf( Y.Text );
+			expect( content?.toString() ).toBe( 'serialized:1' );
+			expect( __unstableSerializeAndClean ).toHaveBeenLastCalledWith( [
+				expect.objectContaining( {
+					attributes: expect.objectContaining( {
+						content: 'Current block content',
+					} ),
+				} ),
+			] );
 		} );
 
 		it( 'initializes blocks as Y.Array when not present', () => {
@@ -619,6 +646,21 @@ describe( 'crdt', () => {
 			expect( map.get( 'categories' ) ).toEqual( [ 1, 2, 3 ] );
 			expect( map.get( 'genre' ) ).toEqual( [ 10, 20 ] );
 			expect( map.get( 'tags' ) ).toEqual( [ 4, 5 ] );
+		} );
+	} );
+
+	describe( 'normalizePostCRDTDoc', () => {
+		it( 'makes serialized content match the authoritative block tree', () => {
+			const map = getRootMap< YPostRecord >( doc, CRDT_RECORD_MAP_KEY );
+			addBlockToDoc( map, 'block-1', 'Block content' );
+			map.set( 'content', new Y.Text( 'mangled content' ) );
+
+			normalizePostCRDTDoc( doc );
+
+			expect( map.get( 'content' )?.toString() ).toBe( 'serialized:1' );
+			expect( __unstableSerializeAndClean ).toHaveBeenCalledWith(
+				expect.any( Array )
+			);
 		} );
 	} );
 

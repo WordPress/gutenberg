@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { capitalCase, pascalCase } from 'change-case';
+import fastDeepEqual from 'fast-deep-equal';
 
 /**
  * WordPress dependencies
@@ -21,12 +22,14 @@ import {
 	defaultCollectionSyncConfig,
 	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
+	normalizePostCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
-const POST_TYPES_WITH_STALE_SAVE_PROTECTION = new Set( [ 'post', 'page' ] );
+const POST_STALE_SAVE_ATTRIBUTES = [ ...POST_RAW_ATTRIBUTES, 'status' ];
+const STALE_SAVE_CONFLICT_CODE = 'core_data_stale_save_conflict';
 
 function getRawPostValue( value ) {
 	return value && typeof value === 'object' && 'raw' in value
@@ -34,8 +37,24 @@ function getRawPostValue( value ) {
 		: value;
 }
 
-function getSerializedBlockValue( block ) {
-	return __unstableSerializeAndClean( [ block ] ).trim();
+function getComparablePostValue( record, key ) {
+	return POST_RAW_ATTRIBUTES.includes( key )
+		? getRawPostValue( record?.[ key ] )
+		: record?.[ key ];
+}
+
+function getChangedMetaKeys( baseMeta, nextMeta, candidateKeys ) {
+	const base = baseMeta && typeof baseMeta === 'object' ? baseMeta : {};
+	const next = nextMeta && typeof nextMeta === 'object' ? nextMeta : {};
+	const keys = candidateKeys ?? [
+		...new Set( [ ...Object.keys( base ), ...Object.keys( next ) ] ),
+	];
+
+	return keys.filter(
+		( key ) =>
+			key !== POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE &&
+			! fastDeepEqual( base[ key ], next[ key ] )
+	);
 }
 
 function getSerializedCRDTBlockContent( crdtRecord ) {
@@ -55,115 +74,55 @@ function getCRDTRawPostValue( crdtRecord, key ) {
 	return getRawPostValue( crdtRecord?.[ key ] );
 }
 
-function areSerializedBlocksEqualAt( blocksA, blocksB, index ) {
-	return (
-		blocksA[ index ]?.name === blocksB[ index ]?.name &&
-		getSerializedBlockValue( blocksA[ index ] ) ===
-			getSerializedBlockValue( blocksB[ index ] )
-	);
+function getComparableCRDTPostValue( crdtRecord, key ) {
+	return POST_RAW_ATTRIBUTES.includes( key )
+		? getCRDTRawPostValue( crdtRecord, key )
+		: crdtRecord?.[ key ];
 }
 
-function mergeStaleSerializedBlockContent(
-	baseContent,
-	latestContent,
-	localContent
+function createStaleSaveConflictError( conflictingFields ) {
+	const error = new Error(
+		__(
+			'This post was not saved because it contains changes that conflict with a newer version. Review the latest changes and try again.'
+		)
+	);
+	error.code = STALE_SAVE_CONFLICT_CODE;
+	error.data = { conflictingFields };
+	return error;
+}
+
+function getAutoDraftSaveDefaults(
+	persistedRecord,
+	latestRecord,
+	edits,
+	isTemplate
 ) {
+	const defaults = {};
 	if (
-		typeof baseContent !== 'string' ||
-		typeof latestContent !== 'string' ||
-		typeof localContent !== 'string'
+		isTemplate ||
+		persistedRecord?.status !== 'auto-draft' ||
+		latestRecord?.status !== 'auto-draft'
 	) {
-		return;
+		return defaults;
 	}
 
-	const baseBlocks = parse( baseContent );
-	const latestBlocks = parse( latestContent );
-	const localBlocks = parse( localContent );
+	// Saving an auto-draft should create a draft by default, but a stale window
+	// must not revert a post that another window already published.
+	if ( ! edits.status ) {
+		defaults.status = 'draft';
+	}
 
+	// Fix the auto-draft default title only while the latest record still has
+	// that placeholder. Do not blank a title saved by another window.
 	if (
-		! baseBlocks.length ||
-		! latestBlocks.length ||
-		! localBlocks.length
+		( ! edits.title || edits.title === 'Auto Draft' ) &&
+		( ! getRawPostValue( latestRecord?.title ) ||
+			getRawPostValue( latestRecord?.title ) === 'Auto Draft' )
 	) {
-		return;
+		defaults.title = '';
 	}
 
-	if (
-		latestBlocks.length > localBlocks.length &&
-		baseBlocks.length === latestBlocks.length
-	) {
-		for ( let index = 0; index < localBlocks.length; index++ ) {
-			if ( localBlocks[ index ].name !== latestBlocks[ index ].name ) {
-				return;
-			}
-		}
-
-		return __unstableSerializeAndClean( [
-			...localBlocks,
-			...latestBlocks.slice( localBlocks.length ),
-		] );
-	}
-
-	if (
-		baseBlocks.length < latestBlocks.length &&
-		baseBlocks.length < localBlocks.length
-	) {
-		for ( let index = 0; index < baseBlocks.length; index++ ) {
-			if (
-				! areSerializedBlocksEqualAt(
-					baseBlocks,
-					latestBlocks,
-					index
-				) ||
-				! areSerializedBlocksEqualAt( baseBlocks, localBlocks, index )
-			) {
-				return;
-			}
-		}
-
-		return __unstableSerializeAndClean( [
-			...localBlocks,
-			...latestBlocks.slice( baseBlocks.length ),
-		] );
-	}
-
-	if (
-		baseBlocks.length !== latestBlocks.length ||
-		baseBlocks.length !== localBlocks.length
-	) {
-		return;
-	}
-
-	const mergedBlocks = [];
-
-	for ( let index = 0; index < baseBlocks.length; index++ ) {
-		const baseBlock = baseBlocks[ index ];
-		const latestBlock = latestBlocks[ index ];
-		const localBlock = localBlocks[ index ];
-
-		if (
-			baseBlock.name !== latestBlock.name ||
-			baseBlock.name !== localBlock.name
-		) {
-			return;
-		}
-
-		const baseValue = getSerializedBlockValue( baseBlock );
-		const latestValue = getSerializedBlockValue( latestBlock );
-		const localValue = getSerializedBlockValue( localBlock );
-
-		if ( localValue === latestValue ) {
-			mergedBlocks.push( localBlock );
-		} else if ( localValue === baseValue ) {
-			mergedBlocks.push( latestBlock );
-		} else if ( latestValue === baseValue ) {
-			mergedBlocks.push( localBlock );
-		} else {
-			return;
-		}
-	}
-
-	return __unstableSerializeAndClean( mergedBlocks );
+	return defaults;
 }
 
 const blocksTransientEdits = {
@@ -425,11 +384,12 @@ export const additionalEntityConfigLoaders = [
 /**
  * Apply extra edits before persisting a post type.
  *
- * @param {Object}  persistedRecord Already persisted Post
- * @param {Object}  edits           Edits.
- * @param {string}  name            Post type name.
- * @param {boolean} isTemplate      Whether the post type is a template.
- * @param {string}  baseURL         REST base URL for the post type.
+ * @param {Object}      persistedRecord  Already persisted Post
+ * @param {Object}      edits            Edits.
+ * @param {string}      name             Post type name.
+ * @param {boolean}     isTemplate       Whether the post type is a template.
+ * @param {string}      baseURL          REST base URL for the post type.
+ * @param {Set<string>} syncedProperties Properties represented in the CRDT document.
  * @return {Promise< Object >} Updated edits.
  */
 export const prePersistPostType = async (
@@ -437,112 +397,290 @@ export const prePersistPostType = async (
 	edits,
 	name,
 	isTemplate,
-	baseURL
+	baseURL,
+	syncedProperties = new Set( POST_STALE_SAVE_ATTRIBUTES )
 ) => {
 	const newEdits = {};
 	const objectType = `postType/${ name }`;
 	const objectId = persistedRecord?.id;
 	let syncManager;
+	let localCRDTSnapshot;
 	let serializedDoc;
 	let hasSerializedDoc = false;
-	const editedSavedFields = POST_RAW_ATTRIBUTES.filter(
+	let latestRecord;
+	let rebasedCRDTRecord;
+	let commitRebasedCRDTDoc;
+	let autoDraftSaveDefaults;
+	let didAttemptProtectedSerialization = false;
+	const comparableSavedFields = [
+		...new Set( [ ...POST_STALE_SAVE_ATTRIBUTES, ...syncedProperties ] ),
+	].filter( ( key ) => ! [ 'blocks', 'meta', 'selection' ].includes( key ) );
+	const editedSavedFields = comparableSavedFields.filter(
 		( key ) => key in edits
 	);
 	const locallyChangedSavedFields = editedSavedFields.filter(
 		( key ) =>
-			getRawPostValue( edits[ key ] ) !==
-			getRawPostValue( persistedRecord?.[ key ] )
+			! fastDeepEqual(
+				getComparablePostValue( edits, key ),
+				getComparablePostValue( persistedRecord, key )
+			)
 	);
 	const locallyChangedSavedFieldSet = new Set( locallyChangedSavedFields );
-
-	if ( ! isTemplate && persistedRecord?.status === 'auto-draft' ) {
-		// Saving an auto-draft should create a draft by default.
-		if ( ! edits.status && ! newEdits.status ) {
-			newEdits.status = 'draft';
-		}
-
-		// Fix the auto-draft default title.
-		if (
-			( ! edits.title || edits.title === 'Auto Draft' ) &&
-			! newEdits.title &&
-			( ! persistedRecord?.title ||
-				persistedRecord?.title === 'Auto Draft' )
-		) {
-			newEdits.title = '';
-		}
-	}
+	const freshnessResolvedSavedFieldSet = new Set();
+	const locallyChangedMetaKeys =
+		edits.meta && typeof edits.meta === 'object'
+			? getChangedMetaKeys(
+					persistedRecord?.meta,
+					edits.meta,
+					Object.keys( edits.meta )
+			  )
+			: [];
 
 	if (
 		window._wpCollaborationEnabled &&
-		POST_TYPES_WITH_STALE_SAVE_PROTECTION.has( name ) &&
+		! isTemplate &&
+		! (
+			Array.isArray( window._wpCollaborationDisabledPostTypes ) &&
+			window._wpCollaborationDisabledPostTypes.includes( name )
+		) &&
 		baseURL &&
-		objectId &&
-		editedSavedFields.length
+		objectId
 	) {
 		try {
 			syncManager = getSyncManager();
-			serializedDoc = await syncManager?.createPersistedCRDTDoc(
+			didAttemptProtectedSerialization = true;
+			localCRDTSnapshot = await syncManager?.createPersistedCRDTSnapshot(
 				objectType,
 				objectId
 			);
+			serializedDoc = localCRDTSnapshot?.serializedDoc;
 			hasSerializedDoc = !! serializedDoc;
-			const latestRecord = await apiFetch( {
-				path: addQueryArgs( `${ baseURL }/${ objectId }`, {
-					context: 'edit',
-				} ),
-			} );
-			const serverChangedSavedFields = editedSavedFields.filter(
-				( key ) =>
-					getRawPostValue( latestRecord?.[ key ] ) !==
-					getRawPostValue( persistedRecord?.[ key ] )
+
+			// A persisted CRDT document can be stale even when this save only
+			// changes status or meta. Check every save that would write a document,
+			// as well as saves that directly edit a raw post field.
+			if (
+				! hasSerializedDoc &&
+				! editedSavedFields.length &&
+				! locallyChangedMetaKeys.length &&
+				persistedRecord?.status !== 'auto-draft'
+			) {
+				latestRecord = undefined;
+			} else {
+				latestRecord = await apiFetch( {
+					path: addQueryArgs( `${ baseURL }/${ objectId }`, {
+						context: 'edit',
+					} ),
+				} );
+			}
+			autoDraftSaveDefaults = getAutoDraftSaveDefaults(
+				persistedRecord,
+				latestRecord ?? persistedRecord,
+				edits,
+				isTemplate
 			);
+			Object.assign( newEdits, autoDraftSaveDefaults );
+			if ( localCRDTSnapshot && ! localCRDTSnapshot.isCurrent() ) {
+				throw new Error(
+					'Local record changed while checking the latest record.'
+				);
+			}
+
+			const serverChangedSavedFields = latestRecord
+				? comparableSavedFields.filter(
+						( key ) =>
+							key in latestRecord &&
+							! fastDeepEqual(
+								getComparablePostValue( latestRecord, key ),
+								getComparablePostValue( persistedRecord, key )
+							)
+				  )
+				: [];
+			const serverChangedSavedFieldSet = new Set(
+				serverChangedSavedFields
+			);
+			const serverChangedMetaKeys = latestRecord
+				? getChangedMetaKeys( persistedRecord?.meta, latestRecord.meta )
+				: [];
+			const serverChangedMetaKeySet = new Set( serverChangedMetaKeys );
+			const conflictingMetaKeys = locallyChangedMetaKeys.filter(
+				( key ) =>
+					serverChangedMetaKeySet.has( key ) &&
+					! fastDeepEqual(
+						edits.meta?.[ key ],
+						latestRecord?.meta?.[ key ]
+					)
+			);
+			if ( conflictingMetaKeys.length ) {
+				throw createStaleSaveConflictError(
+					conflictingMetaKeys.map( ( key ) => `meta.${ key }` )
+				);
+			}
+
 			for ( const key of serverChangedSavedFields ) {
 				if (
 					! locallyChangedSavedFieldSet.has( key ) &&
+					key in edits &&
 					key in ( latestRecord ?? {} )
 				) {
-					newEdits[ key ] = getRawPostValue( latestRecord[ key ] );
+					newEdits[ key ] = getComparablePostValue(
+						latestRecord,
+						key
+					);
 				}
+			}
+
+			const preApplyConflictingSavedFields =
+				locallyChangedSavedFields.filter(
+					( key ) =>
+						! POST_RAW_ATTRIBUTES.includes( key ) &&
+						serverChangedSavedFieldSet.has( key ) &&
+						! fastDeepEqual(
+							getComparablePostValue( edits, key ),
+							getComparablePostValue( latestRecord, key )
+						)
+				);
+			if ( preApplyConflictingSavedFields.length ) {
+				throw createStaleSaveConflictError(
+					preApplyConflictingSavedFields
+				);
 			}
 
 			const hasLatestPersistedCRDTDoc = Boolean(
 				latestRecord?.meta?.[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]
 			);
-			const shouldApplyLatestCRDTDoc =
-				serverChangedSavedFields.length > 0;
-			const didApplyLatestCRDTDoc = shouldApplyLatestCRDTDoc
-				? ( await syncManager?.applyPersistedCRDTDoc?.(
+			const requiredCRDTFields = [
+				...new Set( [
+					...( latestRecord && 'content' in latestRecord
+						? [ 'content' ]
+						: [] ),
+					...locallyChangedSavedFields.filter( ( key ) =>
+						POST_RAW_ATTRIBUTES.includes( key )
+					),
+					...serverChangedSavedFields,
+					...serverChangedMetaKeys.map( ( key ) => `meta.${ key }` ),
+				] ),
+			];
+			const sharedCRDTHistoryFields = [
+				...new Set( [
+					...( latestRecord && 'content' in latestRecord
+						? [ 'content' ]
+						: [] ),
+					...locallyChangedSavedFields.filter( ( key ) =>
+						POST_RAW_ATTRIBUTES.includes( key )
+					),
+					...serverChangedSavedFields.filter( ( key ) =>
+						POST_RAW_ATTRIBUTES.includes( key )
+					),
+					...( locallyChangedMetaKeys.length ||
+					serverChangedMetaKeys.length
+						? [ 'meta' ]
+						: [] ),
+				] ),
+			];
+			const rebasedCRDTDoc = hasLatestPersistedCRDTDoc
+				? ( await syncManager?.createRebasedPersistedCRDTDoc?.(
 						objectType,
 						objectId,
-						latestRecord
-				  ) ) ?? false
-				: false;
-
-			if (
-				didApplyLatestCRDTDoc ||
-				( hasLatestPersistedCRDTDoc && serverChangedSavedFields.length )
-			) {
-				serializedDoc = await syncManager?.createPersistedCRDTDoc(
-					objectType,
-					objectId
+						latestRecord,
+						localCRDTSnapshot,
+						requiredCRDTFields,
+						true,
+						sharedCRDTHistoryFields,
+						autoDraftSaveDefaults
+				  ) ) ?? null
+				: null;
+			if ( hasLatestPersistedCRDTDoc && ! rebasedCRDTDoc ) {
+				throw new Error(
+					'Could not create a rebased persisted CRDT document.'
 				);
-				hasSerializedDoc = !! serializedDoc;
+			}
 
-				if (
-					hasLatestPersistedCRDTDoc &&
-					locallyChangedSavedFields.length
-				) {
-					const crdtRecord = syncManager?.getCRDTRecordData?.(
-						objectType,
-						objectId
+			if ( rebasedCRDTDoc ) {
+				if ( typeof rebasedCRDTDoc.commit !== 'function' ) {
+					throw new Error(
+						'Rebased CRDT document cannot be applied to the editor.'
 					);
+				}
+				commitRebasedCRDTDoc = rebasedCRDTDoc.commit;
+				serializedDoc = rebasedCRDTDoc.serializedDoc;
+				hasSerializedDoc = !! serializedDoc;
+				if ( ! hasSerializedDoc ) {
+					throw new Error(
+						'Could not serialize the rebased CRDT document.'
+					);
+				}
+
+				rebasedCRDTRecord = rebasedCRDTDoc.record;
+				const unrepresentedSavedFields = [
+					...new Set( [
+						...locallyChangedSavedFields,
+						...serverChangedSavedFields,
+						...Object.keys( autoDraftSaveDefaults ),
+					] ),
+				].filter( ( key ) => {
+					const isConcurrentRawMerge =
+						POST_RAW_ATTRIBUTES.includes( key ) &&
+						locallyChangedSavedFieldSet.has( key ) &&
+						serverChangedSavedFieldSet.has( key ) &&
+						! fastDeepEqual(
+							getComparablePostValue( edits, key ),
+							getComparablePostValue( latestRecord, key )
+						);
+					if ( isConcurrentRawMerge ) {
+						return false;
+					}
+
+					let expectedValue = getComparablePostValue(
+						latestRecord,
+						key
+					);
+					if ( key in autoDraftSaveDefaults ) {
+						expectedValue = autoDraftSaveDefaults[ key ];
+					} else if ( locallyChangedSavedFieldSet.has( key ) ) {
+						expectedValue = getComparablePostValue( edits, key );
+					}
+					return ! fastDeepEqual(
+						getComparableCRDTPostValue( rebasedCRDTRecord, key ),
+						expectedValue
+					);
+				} );
+				const unreconciledMetaKeys = serverChangedMetaKeys.filter(
+					( key ) =>
+						! locallyChangedMetaKeys.includes( key ) &&
+						! fastDeepEqual(
+							rebasedCRDTRecord?.meta?.[ key ],
+							latestRecord?.meta?.[ key ]
+						)
+				);
+				const unrepresentedLocalMetaKeys =
+					locallyChangedMetaKeys.filter(
+						( key ) =>
+							! fastDeepEqual(
+								rebasedCRDTRecord?.meta?.[ key ],
+								edits.meta?.[ key ]
+							)
+					);
+				if (
+					unrepresentedSavedFields.length ||
+					unreconciledMetaKeys.length ||
+					unrepresentedLocalMetaKeys.length
+				) {
+					throw new Error(
+						'Rebased CRDT document does not represent all saved changes.'
+					);
+				}
+
+				if ( locallyChangedSavedFields.length ) {
+					const crdtRecord = rebasedCRDTRecord;
 
 					for ( const key of locallyChangedSavedFields ) {
 						const hasCRDTValue =
-							key === 'content'
+							POST_RAW_ATTRIBUTES.includes( key ) &&
+							( key === 'content'
 								? key in ( crdtRecord ?? {} ) ||
 								  Array.isArray( crdtRecord?.blocks )
-								: key in ( crdtRecord ?? {} );
+								: key in ( crdtRecord ?? {} ) );
 
 						if ( hasCRDTValue ) {
 							const crdtValue = getCRDTRawPostValue(
@@ -551,10 +689,15 @@ export const prePersistPostType = async (
 							);
 
 							if (
+								serverChangedSavedFieldSet.has( key ) &&
+								crdtValue !== undefined &&
 								crdtValue !==
-								getRawPostValue( latestRecord?.[ key ] )
+									getRawPostValue( latestRecord?.[ key ] ) &&
+								crdtValue !==
+									getComparablePostValue( edits, key )
 							) {
 								newEdits[ key ] = crdtValue;
+								freshnessResolvedSavedFieldSet.add( key );
 							}
 						}
 					}
@@ -562,26 +705,81 @@ export const prePersistPostType = async (
 			}
 
 			if (
-				locallyChangedSavedFieldSet.has( 'content' ) &&
-				! ( 'content' in newEdits )
+				hasSerializedDoc &&
+				! hasLatestPersistedCRDTDoc &&
+				( serverChangedSavedFields.length ||
+					serverChangedMetaKeys.length )
 			) {
-				const mergedContent = mergeStaleSerializedBlockContent(
-					getRawPostValue( persistedRecord?.content ),
-					getRawPostValue( latestRecord?.content ),
-					getRawPostValue( edits.content )
-				);
+				// Without a current server CRDT document, any serialized fallback
+				// would pair merged HTML with a different CRDT snapshot. Refuse the
+				// save instead of persisting inconsistent state.
+				throw createStaleSaveConflictError( [
+					...serverChangedSavedFields,
+					...serverChangedMetaKeys.map( ( key ) => `meta.${ key }` ),
+				] );
+			}
 
-				if (
-					mergedContent !== undefined &&
-					mergedContent !== getRawPostValue( edits.content )
-				) {
-					newEdits.content = mergedContent;
+			const conflictingSavedFields = locallyChangedSavedFields.filter(
+				( key ) =>
+					serverChangedSavedFieldSet.has( key ) &&
+					! fastDeepEqual(
+						getComparablePostValue( edits, key ),
+						getComparablePostValue( latestRecord, key )
+					) &&
+					! freshnessResolvedSavedFieldSet.has( key )
+			);
+			if ( conflictingSavedFields.length ) {
+				throw createStaleSaveConflictError( conflictingSavedFields );
+			}
+		} catch ( error ) {
+			if ( error?.code === STALE_SAVE_CONFLICT_CODE ) {
+				throw error;
+			}
+
+			const freshnessError = new Error(
+				__(
+					'This post was not saved because its latest version could not be checked. Try again.'
+				)
+			);
+			freshnessError.code = 'core_data_stale_save_check_failed';
+			freshnessError.cause = error;
+			throw freshnessError;
+		}
+	}
+
+	if ( ! autoDraftSaveDefaults ) {
+		autoDraftSaveDefaults = getAutoDraftSaveDefaults(
+			persistedRecord,
+			latestRecord ?? persistedRecord,
+			edits,
+			isTemplate
+		);
+		Object.assign( newEdits, autoDraftSaveDefaults );
+	}
+
+	if ( latestRecord && edits.meta && typeof edits.meta === 'object' ) {
+		const reconciledMeta = { ...( latestRecord.meta ?? {} ) };
+		const allowedMetaKeys = new Set( [
+			...Object.keys( latestRecord.meta ?? {} ),
+			...locallyChangedMetaKeys,
+		] );
+		for ( const key of locallyChangedMetaKeys ) {
+			reconciledMeta[ key ] = edits.meta[ key ];
+		}
+		if (
+			rebasedCRDTRecord?.meta &&
+			typeof rebasedCRDTRecord.meta === 'object'
+		) {
+			for ( const [ key, value ] of Object.entries(
+				rebasedCRDTRecord.meta
+			) ) {
+				if ( allowedMetaKeys.has( key ) ) {
+					reconciledMeta[ key ] = value;
 				}
 			}
-		} catch {
-			// A failed freshness check should not block saving. The request itself
-			// will still surface any real save errors to the editor.
 		}
+		delete reconciledMeta[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ];
+		newEdits.meta = reconciledMeta;
 	}
 
 	// Add meta for the persisted CRDT document during real post saves so the
@@ -589,7 +787,7 @@ export const prePersistPostType = async (
 	// want a post save to fail but a CRDT update to succeed or vice versa.
 	// CRDT repair uses /wp-sync/v1/save to avoid post-save side effects.
 	if ( persistedRecord ) {
-		if ( ! hasSerializedDoc ) {
+		if ( ! hasSerializedDoc && ! didAttemptProtectedSerialization ) {
 			serializedDoc = await (
 				syncManager ?? getSyncManager()
 			)?.createPersistedCRDTDoc( objectType, objectId );
@@ -598,8 +796,28 @@ export const prePersistPostType = async (
 		if ( serializedDoc ) {
 			newEdits.meta = {
 				...edits.meta,
+				...newEdits.meta,
 				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serializedDoc,
 			};
+		}
+	}
+
+	if ( commitRebasedCRDTDoc ) {
+		try {
+			if ( ! ( await commitRebasedCRDTDoc() ) ) {
+				throw new Error(
+					'Could not apply the rebased CRDT document to the editor.'
+				);
+			}
+		} catch ( error ) {
+			const freshnessError = new Error(
+				__(
+					'This post was not saved because its latest version could not be checked. Try again.'
+				)
+			);
+			freshnessError.code = 'core_data_stale_save_check_failed';
+			freshnessError.cause = error;
+			throw freshnessError;
 		}
 	}
 
@@ -672,7 +890,8 @@ async function loadPostTypeEntities() {
 					edits,
 					name,
 					isTemplate,
-					`/${ namespace }/${ postType.rest_base }`
+					`/${ namespace }/${ postType.rest_base }`,
+					syncedProperties
 				),
 			__unstable_rest_base: postType.rest_base,
 			supportsPagination: true,
@@ -747,6 +966,9 @@ async function loadPostTypeEntities() {
 					null
 				);
 			},
+			normalizeCRDTDoc: normalizePostCRDTDoc,
+			shouldInvalidateSnapshot: ( changes ) =>
+				Object.keys( changes ).some( ( key ) => key !== 'selection' ),
 			shouldSync: () =>
 				! (
 					Array.isArray( window._wpCollaborationDisabledPostTypes ) &&

@@ -229,9 +229,36 @@ function entity( entityConfig ) {
 							if ( ! edits ) {
 								continue;
 							}
-
 							const nextEdits = Object.keys( edits ).reduce(
 								( acc, key ) => {
+									const editsAtRequest =
+										action.editsAtRequest;
+									const editChangedDuringRequest =
+										editsAtRequest &&
+										( ! Object.prototype.hasOwnProperty.call(
+											editsAtRequest,
+											key
+										) ||
+											! fastDeepEqual(
+												edits[ key ],
+												editsAtRequest[ key ]
+											) );
+									if ( editChangedDuringRequest ) {
+										acc[ key ] = edits[ key ];
+										return acc;
+									}
+
+									const isAcceptedRequestEdit =
+										editsAtRequest &&
+										action.persistedEdits &&
+										Object.prototype.hasOwnProperty.call(
+											editsAtRequest,
+											key
+										) &&
+										Object.prototype.hasOwnProperty.call(
+											action.persistedEdits,
+											key
+										);
 									// If the edited value is still different to the persisted value,
 									// keep the edited value in edits.
 									if (
@@ -248,7 +275,8 @@ function entity( entityConfig ) {
 											! fastDeepEqual(
 												edits[ key ],
 												action.persistedEdits[ key ]
-											) )
+											) ) &&
+										! isAcceptedRequestEdit
 									) {
 										acc[ key ] = edits[ key ];
 									}
