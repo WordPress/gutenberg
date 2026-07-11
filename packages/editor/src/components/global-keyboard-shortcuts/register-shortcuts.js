@@ -120,46 +120,6 @@ function EditorKeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
-			name: 'core/editor/hide-notes',
-			category: 'global',
-			description: __( 'Hide notes.' ),
-			keyCombination: {
-				modifier: 'access',
-				character: 'j',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'core/editor/minimize-notes',
-			category: 'global',
-			description: __( 'Minimize notes.' ),
-			keyCombination: {
-				modifier: 'access',
-				character: 'i',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'core/editor/expand-notes',
-			category: 'global',
-			description: __( 'Expand notes.' ),
-			keyCombination: {
-				modifier: 'access',
-				character: 'e',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'core/editor/show-all-notes',
-			category: 'global',
-			description: __( 'Show all notes.' ),
-			keyCombination: {
-				modifier: 'access',
-				character: 'a',
-			},
-		} );
-
-		registerShortcut( {
 			name: 'core/editor/next-region',
 			category: 'global',
 			description: __( 'Navigate to the next part of the editor.' ),

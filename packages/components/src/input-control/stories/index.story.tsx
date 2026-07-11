@@ -50,14 +50,13 @@ const meta: Meta< typeof InputControl > = {
 export default meta;
 
 const Template: StoryFn< typeof InputControl > = ( args ) => (
-	<InputControl __next40pxDefaultSize { ...args } />
+	<InputControl { ...args } />
 );
 
 export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Value',
 	placeholder: 'Placeholder',
-	__next40pxDefaultSize: true,
 };
 
 export const WithHelpText = Template.bind( {} );
@@ -128,7 +127,6 @@ export const ShowPassword: StoryFn< typeof InputControl > = ( args ) => {
 	const [ visible, setVisible ] = useState( false );
 	return (
 		<InputControl
-			__next40pxDefaultSize
 			type={ visible ? 'text' : 'password' }
 			suffix={
 				<InputControlSuffixWrapper variant="control">

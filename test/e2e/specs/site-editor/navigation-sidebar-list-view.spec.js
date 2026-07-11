@@ -168,11 +168,15 @@ class LinkControl {
 
 		await this.page.keyboard.type( searchTerm, { delay: 50 } );
 
-		await expect(
-			this.page.getByRole( 'listbox', { name: 'Search results' } )
-		).toBeVisible();
+		const searchResults = this.page.getByRole( 'listbox', {
+			name: 'Search results',
+		} );
+		await expect( searchResults ).toBeVisible();
 
-		await this.page.keyboard.press( 'ArrowDown' );
-		await this.page.keyboard.press( 'Enter' );
+		// Click the matching result directly rather than pressing ArrowDown +
+		// Enter. The search is debounced, so the top result can still be a
+		// stale suggestion when the list first appears, and Enter would
+		// select it.
+		await searchResults.getByRole( 'option', { name: searchTerm } ).click();
 	}
 }

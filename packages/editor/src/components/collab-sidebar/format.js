@@ -3,15 +3,16 @@
  */
 import { __ } from '@wordpress/i18n';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { comment as commentIcon } from '@wordpress/icons';
 import { isCollapsed } from '@wordpress/rich-text';
 import { store as interfaceStore } from '@wordpress/interface';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { ALL_NOTES_SIDEBAR, FLOATING_NOTES_SIDEBAR } from './constants';
+import { ALL_NOTES_SIDEBAR } from './constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -29,9 +30,7 @@ export const noteFormat = {
 
 function NoteFormatEdit( { value, isActive, activeAttributes } ) {
 	const dispatch = useDispatch();
-	// Static selector getter: the active area is only read when the button is
-	// clicked, so there's no need to subscribe and re-render on its changes.
-	const { getActiveComplementaryArea } = useSelect( interfaceStore );
+	const isLargeViewport = useViewportMatch( 'medium' );
 
 	// Toolbar button only relevant on an active selection or when standing on
 	// an existing inline note marker.
@@ -40,17 +39,13 @@ function NoteFormatEdit( { value, isActive, activeAttributes } ) {
 	}
 
 	const onClick = () => {
-		// Bias the floating sidebar when no fixed sidebar is mounted; the
-		// floating panel is the default placement and avoids a layout shift.
-		const currentArea = getActiveComplementaryArea( 'core' );
-		const targetSidebar =
-			currentArea === ALL_NOTES_SIDEBAR
-				? ALL_NOTES_SIDEBAR
-				: FLOATING_NOTES_SIDEBAR;
-		if ( currentArea !== targetSidebar ) {
+		// On small viewports the "All notes" sidebar is the only notes
+		// surface; on large viewports the floating notes panel shows
+		// automatically once a note is selected.
+		if ( ! isLargeViewport ) {
 			dispatch( interfaceStore ).enableComplementaryArea(
 				'core',
-				targetSidebar
+				ALL_NOTES_SIDEBAR
 			);
 		}
 

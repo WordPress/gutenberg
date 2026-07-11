@@ -2,17 +2,22 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-.interface-interface-skeleton__sidebar:has(.editor-collab-sidebar) {
-	box-shadow: none;
-
-	.interface-complementary-area-header {
-		display: none;
-	}
-}
-
-.editor-collab-sidebar {
-	height: 100%;
+// Floating notes overlay the space reserved at the inline-end edge of the
+// canvas (see `useReservedCanvasSpace`). The overlay itself must not
+// intercept pointer events aimed at the canvas; individual note threads
+// restore them.
+.editor-collab-sidebar-overlay {
+	position: absolute;
+	top: 0;
+	inset-inline-end: 0;
+	bottom: 0;
 	overflow: hidden;
+	pointer-events: none;
+	z-index: 1;
+
+	.editor-collab-sidebar-panel__thread {
+		pointer-events: auto;
+	}
 }
 
 .editor-collab-sidebar-panel {
@@ -57,12 +62,15 @@
 		overflow-y: auto;
 	}
 
-	// Minimized threads collapse to an avatar pill anchored to the right
-	// edge, revealing the author name and time on hover or focus.
+	// Minimized threads collapse to an avatar pill anchored to the inline-end
+	// edge, revealing the author name and time on hover or focus. A selected
+	// thread drops `is-compact` and expands back to the full thread.
 	&.is-compact {
-		left: auto;
-		width: fit-content;
-		padding: $grid-unit-10;
+		&.is-floating {
+			left: auto;
+			width: fit-content;
+			padding: $grid-unit-10;
+		}
 
 		.editor-collab-sidebar-panel__user-meta {
 			white-space: nowrap;
@@ -142,15 +150,14 @@
 	}
 }
 
-.editor-collab-sidebar-panel__more-reply-separator {
+.editor-collab-sidebar-panel__more-reply-separator,
+.editor-collab-sidebar-panel__status-separator {
 	&::before,
 	&::after {
 		content: "";
-		display: block;
-		width: 100%;
+		flex: 1;
 		height: 1px;
 		background-color: $gray-300;
-		flex: 1;
 	}
 }
 

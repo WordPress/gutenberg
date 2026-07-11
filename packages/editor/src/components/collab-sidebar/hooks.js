@@ -9,7 +9,7 @@ import {
 	useSyncExternalStore,
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
-import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -17,14 +17,12 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
-import { store as interfaceStore } from '@wordpress/interface';
 import { RichTextData, create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import { NOTE_FORMAT_NAME } from './format';
@@ -154,13 +152,15 @@ export function useNoteThreads( postId ) {
 			}
 		}
 
-		// Orphans: root threads without a linked block. They only need to come last.
+		// Orphans: root threads without a linked block. They stay with the
+		// active notes (above the "Resolved" separator) since they may still
+		// need attention even though their associated block is gone.
 		const orphans = rootThreads.filter(
 			( thread ) => ! thread.blockClientId
 		);
 
 		return {
-			notes: [ ...unresolved, ...resolved, ...orphans ],
+			notes: [ ...unresolved, ...orphans, ...resolved ],
 			unresolvedNotes: unresolved,
 		};
 	}, [ clientIds, threads, getBlockAttributes ] );
@@ -492,41 +492,6 @@ export function useNoteActions() {
 	};
 
 	return { onCreate, onEdit, onDelete };
-}
-
-export function useEnableFloatingSidebar( enabled = false ) {
-	const registry = useRegistry();
-	useEffect( () => {
-		if ( ! enabled ) {
-			return;
-		}
-
-		const { getActiveComplementaryArea } =
-			registry.select( interfaceStore );
-		const { disableComplementaryArea, enableComplementaryArea } =
-			registry.dispatch( interfaceStore );
-
-		const maybeEnable = () => {
-			// Return `null` to indicate the user hid the complementary area.
-			if ( getActiveComplementaryArea( 'core' ) === null ) {
-				enableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
-			}
-		};
-
-		// Check immediately so re-activating the hook (e.g. unhiding notes)
-		// restores the floating sidebar without waiting for a store change.
-		maybeEnable();
-		const unsubscribe = registry.subscribe( maybeEnable );
-
-		return () => {
-			unsubscribe();
-			if (
-				getActiveComplementaryArea( 'core' ) === FLOATING_NOTES_SIDEBAR
-			) {
-				disableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
-			}
-		};
-	}, [ enabled, registry ] );
 }
 
 export function useFloatingBoard( {

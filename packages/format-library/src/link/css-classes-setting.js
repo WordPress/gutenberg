@@ -77,7 +77,6 @@ const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
 								'Separate multiple classes with spaces.'
 							) }
 							__unstableInputWidth="100%"
-							__next40pxDefaultSize
 						/>
 					</div>
 				) }
