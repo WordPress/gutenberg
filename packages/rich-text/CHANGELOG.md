@@ -6,6 +6,10 @@
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
+### Bug Fixes
+
+-   `useRichText`: `getValue()` now synchronizes the value's selection with the DOM selection instead of returning offsets from the last `selectionchange` event, which is asynchronous, so a handler could act one selection change behind the DOM (e.g. splitting or inserting at a stale caret position) ([#80134](https://github.com/WordPress/gutenberg/pull/80134)).
+
 ## 7.50.0 (2026-07-01)
 
 ## 7.49.0 (2026-06-24)
