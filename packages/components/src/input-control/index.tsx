@@ -19,8 +19,6 @@ import type { InputControlProps } from './types';
 import { space } from '../utils/space';
 import { useDraft } from './utils';
 import BaseControl from '../base-control';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const noop = () => {};
 
@@ -36,8 +34,10 @@ export function UnforwardedInputControl(
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
-		__next40pxDefaultSize,
-		__shouldNotWarnDeprecated36pxSize,
+		// Prevent passing legacy props to internal components.
+		__next40pxDefaultSize: _next40pxDefaultSize,
+		__next36pxDefaultSize: _next36pxDefaultSize,
+		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		__unstableStateReducer: stateReducer = ( state ) => state,
 		__unstableInputWidth,
 		className,
@@ -57,7 +57,7 @@ export function UnforwardedInputControl(
 		suffix,
 		value,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp< InputControlProps >( props );
+	} = props;
 
 	const id = useUniqueId( idProp );
 	const classes = clsx( 'components-input-control', className );
@@ -70,17 +70,9 @@ export function UnforwardedInputControl(
 
 	const helpProp = !! help ? { 'aria-describedby': `${ id }__help` } : {};
 
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'InputControl',
-		__next40pxDefaultSize,
-		size,
-		__shouldNotWarnDeprecated36pxSize,
-	} );
-
 	return (
 		<BaseControl className={ classes } help={ help } id={ id }>
 			<InputBase
-				__next40pxDefaultSize={ __next40pxDefaultSize }
 				__unstableInputWidth={ __unstableInputWidth }
 				disabled={ disabled }
 				gap={ 3 }
@@ -97,7 +89,6 @@ export function UnforwardedInputControl(
 				<InputField
 					{ ...restProps }
 					{ ...helpProp }
-					__next40pxDefaultSize={ __next40pxDefaultSize }
 					className="components-input-control__input"
 					disabled={ disabled }
 					id={ id }
@@ -129,7 +120,6 @@ export function UnforwardedInputControl(
  *
  *   return (
  *  	<InputControl
- * 			__next40pxDefaultSize
  *  		value={ value }
  *  		onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
  *  	/>
@@ -138,6 +128,5 @@ export function UnforwardedInputControl(
  * ```
  */
 export const InputControl = forwardRef( UnforwardedInputControl );
-InputControl.displayName = 'InputControl';
 
 export default InputControl;

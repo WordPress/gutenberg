@@ -400,7 +400,7 @@ Display multiple images in a rich gallery.
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Allowed Blocks:** core/image
 -	**Supports:** align, anchor, color (background, gradients, ~~text~~), interactivity (clientNavigation), layout (default, ~~allowEditing~~, ~~allowInheriting~~, ~~allowSwitching~~), listView, spacing (blockGap, margin, padding), units (em, px, rem, vh, vw), ~~html~~
--	**Attributes:** allowResize, aspectRatio, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, navigationButtonType, randomOrder, shortCodeTransforms, sizeSlug
+-	**Attributes:** allowResize, aspectRatio, caption, columns, dynamicContent, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, navigationButtonType, randomOrder, shortCodeTransforms, sizeSlug
 
 ## Group
 
@@ -636,8 +636,8 @@ Embed a simple playlist.
 -	**Experimental:** true
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Allowed Blocks:** core/playlist-track
--	**Supports:** align, anchor, color (background, gradients, link, text), interactivity, spacing (margin, padding)
--	**Attributes:** caption, order, showArtists, showImages, showNumbers, showTrackLength, showTracklist, type
+-	**Supports:** align, anchor, color (background, gradients, link, text), interactivity, spacing (margin, padding), typography (fontSize)
+-	**Attributes:** caption, order, showArtists, showImages, showNumbers, showTrackLength, showTracklist, type, waveformStyle
 
 ## Playlist track
 
@@ -648,7 +648,7 @@ Playlist track.
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Parent:** core/playlist
 -	**Supports:** interactivity (clientNavigation), ~~html~~, ~~reusable~~
--	**Attributes:** album, artist, blob, id, image, length, src, title, type
+-	**Attributes:** album, artist, blob, id, image, imageAlt, length, src, title, type
 
 ## Author (deprecated)
 
@@ -1006,7 +1006,7 @@ Display the tab buttons for a tabbed interface.
 -	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tabs
--	**Supports:** color (background, text), layout (default, ~~allowOrientation~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
+-	**Supports:** ariaLabel, color (background, text), layout (default, ~~allowOrientation~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
 -	**Attributes:** tabs
 
 ## Tab Panel
@@ -1138,7 +1138,7 @@ Insert poetry. Use special spacing formats. Or quote song lyrics.
 
 -	**Name:** [core/verse](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-verse/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** anchor, background (backgroundImage, backgroundSize), color (background, gradients, link, text), dimensions (minHeight), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign)
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), dimensions (minHeight), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign)
 -	**Attributes:** content
 
 ## Video

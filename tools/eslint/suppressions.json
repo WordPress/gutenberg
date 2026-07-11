@@ -303,14 +303,6 @@
 			"count": 2
 		}
 	},
-	"packages/block-library/src/button/edit.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/columns/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -353,11 +345,6 @@
 	},
 	"packages/block-library/src/image/image.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/list-item/hooks/use-enter.js": {
-		"react-hooks/refs": {
 			"count": 1
 		}
 	},
@@ -510,11 +497,6 @@
 	"packages/block-library/src/video/tracks-editor.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		}
-	},
-	"packages/boot/src/components/canvas/back-button.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
 		}
 	},
 	"packages/boot/src/components/navigation/drilldown-item/index.tsx": {
@@ -719,21 +701,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/flex/flex-item/hook.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/flex/flex/hook.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/flex/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts": {
 		"no-restricted-imports": {
 			"count": 2
@@ -862,11 +829,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/spacer/hook.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/spinner/styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
@@ -893,11 +855,6 @@
 		}
 	},
 	"packages/components/src/textarea-control/styles/textarea-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
-	"packages/components/src/theme/styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
 		}
@@ -1187,11 +1144,6 @@
 			"count": 3
 		}
 	},
-	"packages/edit-site/src/components/site-hub/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/edit-widgets/src/components/layout/index.js": {
 		"react-hooks/refs": {
 			"count": 3
@@ -1363,11 +1315,6 @@
 	"packages/editor/src/components/site-discussion/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		}
-	},
-	"packages/editor/src/components/style-book/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/editor/src/components/sync-connection-error-modal/index.tsx": {
