@@ -5,6 +5,8 @@ The Notes sidebar (a.k.a. collab sidebar) lets users attach threaded notes to in
 - **All notes** - a full sidebar (opened from the editor's More menu) listing every note thread on the current post.
 - **Floating notes** - on larger viewports, unresolved notes float next to their associated blocks, overlaying space reserved at the right edge of the canvas, positioned to track scroll and avoid overlap. The floating notes are part of the canvas surface: they occupy no sidebar, so they can coexist with the Settings sidebar and leave notices and the canvas scrollbar at the full editor width.
 
+The floating notes can be hidden (and restored) from a "Notes" group in the editor's Options (ellipsis) menu; the "All notes" sidebar remains available throughout.
+
 Notes are stored as WordPress comments (`type: 'note'`) attached to the post. A block references its thread via `metadata.noteId` on block attributes. Each thread has a top-level note plus replies; threads can be resolved (stored as status `approved`) or reopened.
 
 ## File structure

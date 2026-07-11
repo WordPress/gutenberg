@@ -453,4 +453,36 @@ test.describe( 'Block Notes: floating panel', () => {
 		await expect( notes ).toBeVisible();
 		await expect.poll( getReservedWidth ).toBe( 280 );
 	} );
+
+	test( 'notes display modes are switched from the Options menu', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph with a note' },
+		} );
+		await addNote( page, editor, 'Display mode note' );
+
+		const notes = page.getByRole( 'region', { name: 'Notes' } );
+		const openOptionsMenu = () =>
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+
+		await expect( notes ).toBeVisible();
+
+		// Hidden: the floating panel disappears from the canvas.
+		await openOptionsMenu();
+		await page.getByRole( 'menuitemradio', { name: 'Hide notes' } ).click();
+		await expect( notes ).toBeHidden();
+
+		// Full: the complete threads return.
+		await openOptionsMenu();
+		await page
+			.getByRole( 'menuitemradio', { name: 'Expand notes' } )
+			.click();
+		await expect( notes ).toBeVisible();
+	} );
 } );
