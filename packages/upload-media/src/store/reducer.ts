@@ -129,22 +129,32 @@ function reducer(
 		case Type.Cancel: {
 			/*
 			 * A cancelled item invalidates related GIF conversion records:
-			 * either the original GIF upload failed (matched by itemId, e.g.
-			 * a total sub-size failure that deletes the attachment), or the
-			 * user-requested transcode sideload failed (matched by the
-			 * sideload's parentId, which is the original item's ID).
+			 * the original GIF upload failed (matched by itemId, e.g. a
+			 * total sub-size failure that deletes the attachment), the bare
+			 * finalize parent of a post-upload conversion failed (matched by
+			 * its gifConversionItemId), or the transcode sideload failed
+			 * (matched through its parent, which is either the original item
+			 * or such a bare finalize parent).
 			 */
 			const cancelledItem = state.queue.find(
 				( item ) => item.id === action.id
 			);
 			const isGifTranscode =
 				cancelledItem?.additionalData?.image_size === 'animated_video';
+			const transcodeParent = isGifTranscode
+				? state.queue.find(
+						( item ) => item.id === cancelledItem?.parentId
+				  )
+				: undefined;
 			const gifConversions = ( state.gifConversions ?? [] ).filter(
 				( conversion ) =>
 					conversion.itemId !== action.id &&
+					conversion.itemId !== cancelledItem?.gifConversionItemId &&
 					! (
 						isGifTranscode &&
-						conversion.itemId === cancelledItem?.parentId
+						( conversion.itemId === cancelledItem?.parentId ||
+							conversion.itemId ===
+								transcodeParent?.gifConversionItemId )
 					)
 			);
 
@@ -348,11 +358,13 @@ function reducer(
 				...state,
 				gifConversions: ( state.gifConversions ?? [] ).map(
 					( conversion ): GifConversion =>
-						conversion.attachmentId === action.attachmentId
+						conversion.itemId === action.itemId
 							? {
 									...conversion,
-									status: action.status,
-									itemId: action.itemId ?? conversion.itemId,
+									status: action.status ?? conversion.status,
+									attachmentId:
+										action.attachmentId ??
+										conversion.attachmentId,
 							  }
 							: conversion
 				),
@@ -362,8 +374,7 @@ function reducer(
 			return {
 				...state,
 				gifConversions: ( state.gifConversions ?? [] ).filter(
-					( conversion ) =>
-						conversion.attachmentId !== action.attachmentId
+					( conversion ) => conversion.itemId !== action.itemId
 				),
 			};
 	}

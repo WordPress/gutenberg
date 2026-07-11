@@ -57,11 +57,13 @@ export interface QueueItem {
 	abortController?: AbortController;
 	parentId?: QueueItemId;
 	subSizes?: SubSizeData[];
-	// Set on the bare parent item created by resolveGifConversion(): the
-	// attachment whose GifConversion record should be marked as converted
-	// once this item finishes (i.e. after its Finalize recorded the
-	// companion video on the attachment).
-	gifConversionAttachmentId?: number;
+	// Set on the item whose Finalize records the companion video on the
+	// attachment: the original upload item itself when the user converts
+	// while it is still uploading, or the bare parent item created by
+	// resolveGifConversion() for post-upload conversions. Holds the key
+	// (original upload item ID) of the GifConversion record to mark as
+	// converted once this item finishes.
+	gifConversionItemId?: QueueItemId;
 }
 
 export interface State {
@@ -83,17 +85,21 @@ export interface State {
  * the user and trigger the conversion afterwards.
  */
 export interface GifConversion {
-	// Attachment ID of the uploaded GIF image.
-	attachmentId: number;
-	// ID of the (typically already removed) upload queue item. Used as the
-	// parentId of a later transcode sideload and to correlate cancellations.
+	// ID of the original upload queue item. Records are created before the
+	// upload (so the prompt can appear immediately on drop) and this is
+	// their stable key; it is also used to correlate cancellations.
 	itemId: QueueItemId;
+	// Attachment ID of the uploaded GIF image. Unset until the upload
+	// completes; required for a post-upload transcode.
+	attachmentId?: number;
 	// The original animated GIF file, kept for a later transcode.
 	file: File;
 	// pending: awaiting the user's decision.
+	// accepted: user chose to convert while the upload was still running;
+	//           the transcode starts once the attachment exists.
 	// converting: transcode sideload in flight.
 	// converted: companion video uploaded and recorded on the attachment.
-	status: 'pending' | 'converting' | 'converted';
+	status: 'pending' | 'accepted' | 'converting' | 'converted';
 }
 
 export enum Type {
@@ -194,16 +200,15 @@ export type AddGifConversionAction = Action<
 export type UpdateGifConversionAction = Action<
 	Type.UpdateGifConversion,
 	{
-		attachmentId: number;
-		status: GifConversion[ 'status' ];
-		// New owning queue item, e.g. the bare finalize parent created for
-		// a user-requested transcode.
-		itemId?: QueueItemId;
+		itemId: QueueItemId;
+		status?: GifConversion[ 'status' ];
+		// Set once the upload completed and the attachment exists.
+		attachmentId?: number;
 	}
 >;
 export type RemoveGifConversionAction = Action<
 	Type.RemoveGifConversion,
-	{ attachmentId: number }
+	{ itemId: QueueItemId }
 >;
 
 interface UploadMediaArgs {

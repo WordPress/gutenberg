@@ -14,7 +14,7 @@ import { switchToBlockType } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, _n } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as uploadStore } from '@wordpress/upload-media';
 
@@ -95,15 +95,43 @@ async function swapImageBlocksToVideo( registry, attachmentId ) {
 }
 
 /**
- * Asks the user whether an uploaded animated GIF should be converted to a
+ * Whether the GIF conversion prompt is currently shown: there are animated
+ * GIF uploads awaiting a decision and no remembered preference resolves
+ * them automatically.
+ *
+ * Shared with the upload progress snackbar, which stays hidden while the
+ * prompt is open so the prompt is the single point of attention.
+ *
+ * @return {boolean} Whether the prompt is visible.
+ */
+export function useIsGifConversionPromptVisible() {
+	return useSelect( ( select ) => {
+		const preference =
+			select( preferencesStore ).get(
+				'core/media',
+				'animatedGifUploads'
+			) ?? 'ask';
+		if ( preference !== 'ask' ) {
+			return false;
+		}
+		return unlock( select( uploadStore ) )
+			.getGifConversions()
+			.some( ( conversion ) => conversion.status === 'pending' );
+	}, [] );
+}
+
+/**
+ * Asks the user whether a dropped animated GIF should be converted to a
  * video (the Video block's GIF variation) or stay a GIF.
  *
- * Uploads themselves are never blocked: the GIF uploads as a plain image
- * while this prompt is open, and the answer only decides whether a companion
- * video is transcoded and the block swapped. The answer can be remembered in
- * the `core/media` `animatedGifUploads` preference, in which case the prompt
- * no longer appears: 'video' converts every animated GIF automatically,
- * 'gif' keeps them all as GIFs.
+ * The prompt appears as soon as the file is identified as a conversion
+ * candidate — before the upload finishes — so it reads as part of the drop
+ * action. Uploads themselves are never blocked: the GIF uploads as a plain
+ * image in the background while this prompt is open, and the answer only
+ * decides whether a companion video is transcoded and the block swapped.
+ * The answer can be remembered in the `core/media` `animatedGifUploads`
+ * preference, in which case the prompt no longer appears: 'video' converts
+ * every animated GIF automatically, 'gif' keeps them all as GIFs.
  */
 export default function GifConversionPrompt() {
 	const registry = useRegistry();
@@ -121,7 +149,7 @@ export default function GifConversionPrompt() {
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const [ rememberChoice, setRememberChoice ] = useState( false );
 	const convertButtonRef = useRef();
-	// Attachment IDs whose block swap is already running, so a re-render
+	// Conversion records whose block swap is already running, so a re-render
 	// while the async swap is in flight doesn't start a second one.
 	const swappingRef = useRef( new Set() );
 
@@ -148,8 +176,8 @@ export default function GifConversionPrompt() {
 		const { resolveGifConversion } = unlock(
 			registry.dispatch( uploadStore )
 		);
-		for ( const { attachmentId } of pending ) {
-			resolveGifConversion( attachmentId, 'video' );
+		for ( const { itemId } of pending ) {
+			resolveGifConversion( itemId, 'video' );
 		}
 	}, [ preference, pending, registry ] );
 
@@ -162,14 +190,14 @@ export default function GifConversionPrompt() {
 		const { removeGifConversion } = unlock(
 			registry.dispatch( uploadStore )
 		);
-		for ( const { attachmentId } of converted ) {
-			if ( swappingRef.current.has( attachmentId ) ) {
+		for ( const { itemId, attachmentId } of converted ) {
+			if ( swappingRef.current.has( itemId ) ) {
 				continue;
 			}
-			swappingRef.current.add( attachmentId );
+			swappingRef.current.add( itemId );
 			swapImageBlocksToVideo( registry, attachmentId ).finally( () => {
-				swappingRef.current.delete( attachmentId );
-				removeGifConversion( attachmentId );
+				swappingRef.current.delete( itemId );
+				removeGifConversion( itemId );
 			} );
 		}
 	}, [ converted, registry ] );
@@ -193,8 +221,8 @@ export default function GifConversionPrompt() {
 		const { resolveGifConversion } = unlock(
 			registry.dispatch( uploadStore )
 		);
-		for ( const { attachmentId } of pending ) {
-			resolveGifConversion( attachmentId, decision );
+		for ( const { itemId } of pending ) {
+			resolveGifConversion( itemId, decision );
 		}
 		if ( remember ) {
 			setPreference( 'core/media', 'animatedGifUploads', decision );
@@ -212,22 +240,16 @@ export default function GifConversionPrompt() {
 			// Closing the dialog keeps the GIF for this upload only,
 			// without remembering anything.
 			onRequestClose={ () => resolveAll( 'gif', false ) }
-			size="medium"
+			size="small"
 			focusOnMount={ false }
 		>
 			<Stack direction="column" gap="lg">
 				<p>
-					{ count === 1
-						? __(
-								'The GIF you uploaded is animated. Videos are much smaller and use less power than animated GIFs, and look the same. The original GIF is kept in your Media Library either way.'
-						  )
-						: sprintf(
-								/* translators: %d: number of uploaded animated GIFs. */
-								__(
-									'The %d GIFs you uploaded are animated. Videos are much smaller and use less power than animated GIFs, and look the same. The original GIFs are kept in your Media Library either way.'
-								),
-								count
-						  ) }
+					{ _n(
+						'Videos are much smaller and use less power, and look the same. The original GIF is kept in your Media Library either way.',
+						'Videos are much smaller and use less power, and look the same. The original GIFs are kept in your Media Library either way.',
+						count
+					) }
 				</p>
 				<CheckboxControl
 					label={ __( 'Remember my choice' ) }

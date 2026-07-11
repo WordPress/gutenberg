@@ -647,7 +647,6 @@ describe( 'reducer', () => {
 
 	describe( 'GIF conversions', () => {
 		const conversion: GifConversion = {
-			attachmentId: 55,
 			itemId: 'original-item',
 			file: new File( [], 'a.gif', { type: 'image/gif' } ),
 			status: 'pending',
@@ -675,14 +674,24 @@ describe( 'reducer', () => {
 
 			state = reducer( state, {
 				type: Type.UpdateGifConversion,
+				itemId: 'original-item',
 				attachmentId: 55,
+			} );
+			// A partial update merges: the status is untouched.
+			expect( state.gifConversions?.[ 0 ].attachmentId ).toBe( 55 );
+			expect( state.gifConversions?.[ 0 ].status ).toBe( 'pending' );
+
+			state = reducer( state, {
+				type: Type.UpdateGifConversion,
+				itemId: 'original-item',
 				status: 'converting',
 			} );
 			expect( state.gifConversions?.[ 0 ].status ).toBe( 'converting' );
+			expect( state.gifConversions?.[ 0 ].attachmentId ).toBe( 55 );
 
 			state = reducer( state, {
 				type: Type.RemoveGifConversion,
-				attachmentId: 55,
+				itemId: 'original-item',
 			} );
 			expect( state.gifConversions ).toEqual( [] );
 		} );
@@ -714,6 +723,56 @@ describe( 'reducer', () => {
 						{
 							id: 'transcode-sideload',
 							parentId: 'original-item',
+							status: ItemStatus.Processing,
+							additionalData: {
+								image_size: 'animated_video',
+							},
+						} as QueueItem,
+					],
+				} ),
+				{
+					type: Type.Cancel,
+					id: 'transcode-sideload',
+					error: new Error(),
+				}
+			);
+
+			expect( state.gifConversions ).toEqual( [] );
+		} );
+
+		it( 'drops the record when the post-upload finalize parent is cancelled', () => {
+			const state = reducer(
+				buildState( {
+					queue: [
+						{
+							id: 'finalize-parent',
+							gifConversionItemId: 'original-item',
+							status: ItemStatus.Processing,
+						} as QueueItem,
+					],
+				} ),
+				{
+					type: Type.Cancel,
+					id: 'finalize-parent',
+					error: new Error(),
+				}
+			);
+
+			expect( state.gifConversions ).toEqual( [] );
+		} );
+
+		it( 'drops the record when the post-upload transcode sideload is cancelled', () => {
+			const state = reducer(
+				buildState( {
+					queue: [
+						{
+							id: 'finalize-parent',
+							gifConversionItemId: 'original-item',
+							status: ItemStatus.Processing,
+						} as QueueItem,
+						{
+							id: 'transcode-sideload',
+							parentId: 'finalize-parent',
 							status: ItemStatus.Processing,
 							additionalData: {
 								image_size: 'animated_video',

@@ -376,17 +376,18 @@ export function processItem( id: QueueItemId ) {
 
 		if ( ! operation ) {
 			/*
-			 * A finished conversion parent (see resolveGifConversion) means
-			 * its Finalize has recorded the companion video on the
-			 * attachment. Mark the conversion record as converted so
-			 * observers (e.g. the editor's prompt) can react. If the
-			 * transcode failed, the record was already dropped on
-			 * cancellation and this is a no-op.
+			 * A finished conversion parent (the original upload item for a
+			 * mid-upload acceptance, or the bare parent created by
+			 * resolveGifConversion) means its Finalize has recorded the
+			 * companion video on the attachment. Mark the conversion record
+			 * as converted so observers (e.g. the editor's prompt) can
+			 * react. If the transcode failed, the record was already
+			 * dropped on cancellation and this is a no-op.
 			 */
-			if ( item.gifConversionAttachmentId ) {
+			if ( item.gifConversionItemId ) {
 				dispatch< UpdateGifConversionAction >( {
 					type: Type.UpdateGifConversion,
-					attachmentId: item.gifConversionAttachmentId,
+					itemId: item.gifConversionItemId,
 					status: 'converted',
 				} );
 			}
@@ -832,6 +833,25 @@ export function prepareItem( id: QueueItemId ) {
 						id,
 						operations,
 					} );
+
+					/*
+					 * Prompt mode: record the conversion candidate right
+					 * away — before the upload — so the host application
+					 * (e.g. the editor) can prompt the user immediately on
+					 * drop while the upload continues in the background.
+					 * There is no attachment ID yet; it is filled in by
+					 * generateThumbnails() once the upload completes.
+					 */
+					if ( settings.gifConvert === 'prompt' ) {
+						dispatch< AddGifConversionAction >( {
+							type: Type.AddGifConversion,
+							conversion: {
+								itemId: id,
+								file: item.file,
+								status: 'pending',
+							},
+						} );
+					}
 
 					// Keep the original GIF so generateThumbnails can
 					// transcode and sideload it once the attachment exists.
@@ -1492,11 +1512,16 @@ export function transcodeGifItem(
  * conversion during upload. With 'gif', the record is discarded and the
  * attachment stays a plain GIF image.
  *
- * @param attachmentId Attachment ID of the uploaded GIF.
- * @param decision     'video' to convert, 'gif' to keep the GIF as is.
+ * The prompt appears while the GIF is still uploading, so an answer may
+ * arrive before the attachment exists: converting then just marks the
+ * record as accepted and generateThumbnails() runs the transcode as part
+ * of the still-pending upload.
+ *
+ * @param itemId   ID of the original upload queue item (the record's key).
+ * @param decision 'video' to convert, 'gif' to keep the GIF as is.
  */
 export function resolveGifConversion(
-	attachmentId: number,
+	itemId: QueueItemId,
 	decision: 'video' | 'gif'
 ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
@@ -1504,8 +1529,7 @@ export function resolveGifConversion(
 			.getGifConversions()
 			.find(
 				( record ) =>
-					record.attachmentId === attachmentId &&
-					record.status === 'pending'
+					record.itemId === itemId && record.status === 'pending'
 			);
 		if ( ! conversion ) {
 			return;
@@ -1514,11 +1538,23 @@ export function resolveGifConversion(
 		if ( decision === 'gif' ) {
 			dispatch< RemoveGifConversionAction >( {
 				type: Type.RemoveGifConversion,
-				attachmentId,
+				itemId,
 			} );
 			return;
 		}
 
+		if ( ! conversion.attachmentId ) {
+			// The GIF is still uploading: generateThumbnails() picks the
+			// accepted record up once the attachment exists.
+			dispatch< UpdateGifConversionAction >( {
+				type: Type.UpdateGifConversion,
+				itemId,
+				status: 'accepted',
+			} );
+			return;
+		}
+
+		const attachmentId = conversion.attachmentId;
 		const settings = select.getSettings();
 		const outputFormat =
 			settings.videoOutputFormat === 'video/webm' ? 'webm' : 'mp4';
@@ -1535,15 +1571,14 @@ export function resolveGifConversion(
 		 * success) accumulate on this parent, the Finalize gate waits for
 		 * both, and finalizing records the companion on the attachment.
 		 * Once this parent finishes, processItem() marks the conversion
-		 * record as converted (see gifConversionAttachmentId).
+		 * record as converted (see gifConversionItemId).
 		 */
 		const parentItemId = uuidv4();
 
 		dispatch< UpdateGifConversionAction >( {
 			type: Type.UpdateGifConversion,
-			attachmentId,
+			itemId,
 			status: 'converting',
-			itemId: parentItemId,
 		} );
 
 		dispatch< AddAction >( {
@@ -1557,7 +1592,7 @@ export function resolveGifConversion(
 				additionalData: {},
 				operations: [ OperationType.Finalize ],
 				abortController: new AbortController(),
-				gifConversionAttachmentId: attachmentId,
+				gifConversionItemId: itemId,
 			},
 		} );
 
@@ -1590,14 +1625,14 @@ export function resolveGifConversion(
  * Used by observers once a converted record has been fully consumed
  * (e.g. after the editor swapped the corresponding blocks).
  *
- * @param attachmentId Attachment ID of the uploaded GIF.
+ * @param itemId ID of the original upload queue item (the record's key).
  */
 export function removeGifConversion(
-	attachmentId: number
+	itemId: QueueItemId
 ): RemoveGifConversionAction {
 	return {
 		type: Type.RemoveGifConversion,
-		attachmentId,
+		itemId,
 	};
 }
 
@@ -1622,6 +1657,10 @@ export function generateThumbnails( id: QueueItemId ) {
 		}
 		const attachment = item.attachment;
 		const settings = select.getSettings();
+
+		// Set when a user-accepted GIF conversion is sideloaded below, and
+		// stamped onto this item via the finishOperation() at the end.
+		let gifConversionItemId: QueueItemId | undefined;
 
 		// HEIC/HEIF: preserve the original file under a dedicated metadata
 		// key so it never collides with `original_image`, which the scaled
@@ -1652,23 +1691,58 @@ export function generateThumbnails( id: QueueItemId ) {
 		// parentId routes the result to the sideload endpoint, so no
 		// separate attachment is created.
 		if ( item.animatedGifFile && attachment.id ) {
-			if ( settings.gifConvert === 'prompt' ) {
-				/*
-				 * Prompt mode: don't convert automatically. Record the upload
-				 * so the host application (e.g. the editor) can ask the user
-				 * and trigger the transcode later via resolveGifConversion().
-				 * The GIF itself continues through the normal image pipeline.
-				 */
-				dispatch< AddGifConversionAction >( {
-					type: Type.AddGifConversion,
-					conversion: {
-						attachmentId: attachment.id,
+			/*
+			 * In prompt mode the conversion record was created back in
+			 * prepareItem() so the user could be asked while the upload ran.
+			 * By now the user may already have answered: an absent record
+			 * means they kept the GIF, 'accepted' means they chose to
+			 * convert, and 'pending' means the prompt is still open.
+			 */
+			const conversion =
+				settings.gifConvert === 'prompt'
+					? select
+							.getGifConversions()
+							.find( ( record ) => record.itemId === item.id )
+					: undefined;
+
+			const shouldConvertNow =
+				settings.gifConvert !== 'prompt' ||
+				conversion?.status === 'accepted';
+
+			if ( ! shouldConvertNow ) {
+				if ( conversion ) {
+					/*
+					 * Still awaiting the user's answer: record the attachment
+					 * ID so a post-upload answer can transcode against it
+					 * (see resolveGifConversion). The GIF itself continues
+					 * through the normal image pipeline.
+					 */
+					dispatch< UpdateGifConversionAction >( {
+						type: Type.UpdateGifConversion,
 						itemId: item.id,
-						file: item.animatedGifFile,
-						status: 'pending',
-					},
-				} );
+						attachmentId: attachment.id,
+					} );
+				}
 			} else {
+				if ( conversion ) {
+					/*
+					 * The user accepted while the upload was still running:
+					 * the transcode rides along as a regular companion
+					 * sideload of this still-pending item, whose own
+					 * Finalize records it on the attachment — no separate
+					 * finalize parent needed. gifConversionItemId (stamped
+					 * via finishOperation below) makes processItem mark the
+					 * record as converted once that happens.
+					 */
+					dispatch< UpdateGifConversionAction >( {
+						type: Type.UpdateGifConversion,
+						itemId: item.id,
+						attachmentId: attachment.id,
+						status: 'converting',
+					} );
+					gifConversionItemId = item.id;
+				}
+
 				const outputFormat =
 					settings.videoOutputFormat === 'video/webm'
 						? 'webm'
@@ -1949,7 +2023,10 @@ export function generateThumbnails( id: QueueItemId ) {
 			}
 		}
 
-		dispatch.finishOperation( id, {} );
+		dispatch.finishOperation(
+			id,
+			gifConversionItemId ? { gifConversionItemId } : {}
+		);
 	};
 }
 

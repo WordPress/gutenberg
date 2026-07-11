@@ -502,7 +502,7 @@ describe( 'private actions', () => {
 			);
 		}
 
-		async function runPrepareItem() {
+		async function runPrepareItem( settings = {} ) {
 			const file = createGifFile();
 			const item = {
 				id: 'gif-id',
@@ -511,7 +511,9 @@ describe( 'private actions', () => {
 			};
 
 			let dispatchedOperations;
+			const dispatchedActions = [];
 			const dispatch = ( action ) => {
+				dispatchedActions.push( action );
 				if ( action?.type === 'ADD_OPERATIONS' ) {
 					dispatchedOperations = action.operations;
 				}
@@ -521,13 +523,18 @@ describe( 'private actions', () => {
 
 			const select = {
 				getItem: () => item,
-				getSettings: () => ( {} ),
+				getSettings: () => settings,
 			};
 
 			const thunk = prepareItem( 'gif-id' );
 			await thunk( { select, dispatch } );
 
-			return { operations: dispatchedOperations, dispatch, item };
+			return {
+				operations: dispatchedOperations,
+				actions: dispatchedActions,
+				dispatch,
+				item,
+			};
 		}
 
 		beforeEach( () => {
@@ -563,6 +570,35 @@ describe( 'private actions', () => {
 			expect( dispatch.finishOperation ).toHaveBeenCalledWith( 'gif-id', {
 				animatedGifFile: item.file,
 			} );
+		} );
+
+		it( 'records a pending conversion before the upload in prompt mode', async () => {
+			// The prompt fires immediately on drop: the record exists
+			// before any upload, without an attachment ID yet.
+			const { actions, item } = await runPrepareItem( {
+				gifConvert: 'prompt',
+			} );
+
+			expect( actions ).toContainEqual( {
+				type: Type.AddGifConversion,
+				conversion: {
+					itemId: 'gif-id',
+					file: item.file,
+					status: 'pending',
+				},
+			} );
+		} );
+
+		it( 'does not record a conversion in prompt mode for a transparent GIF', async () => {
+			vipsHasTransparency.mockResolvedValue( true );
+
+			const { actions } = await runPrepareItem( {
+				gifConvert: 'prompt',
+			} );
+
+			expect( actions ).not.toContainEqual(
+				expect.objectContaining( { type: Type.AddGifConversion } )
+			);
 		} );
 
 		it( 'does not stash animatedGifFile when WebCodecs is unavailable', async () => {
@@ -867,13 +903,14 @@ describe( 'private actions', () => {
 	} );
 
 	describe( 'generateThumbnails (animated GIF video sideload)', () => {
-		function runGenerate( { item, settings } ) {
+		function runGenerate( { item, settings, conversions = [] } ) {
 			const dispatchFn = jest.fn();
 			dispatchFn.finishOperation = jest.fn();
 			dispatchFn.addSideloadItem = jest.fn();
 			const select = {
 				getItem: () => item,
 				getSettings: () => settings,
+				getGifConversions: () => conversions,
 			};
 			const thunk = generateThumbnails( item.id );
 			return thunk( { select, dispatch: dispatchFn } ).then(
@@ -963,7 +1000,7 @@ describe( 'private actions', () => {
 			expect( dispatchFn.addSideloadItem ).not.toHaveBeenCalled();
 		} );
 
-		it( 'records a pending conversion instead of sideloading in prompt mode', async () => {
+		it( 'stamps the attachment ID on a still-pending prompt record', async () => {
 			const gif = makeGif();
 			const item = {
 				id: 'g4',
@@ -976,19 +1013,85 @@ describe( 'private actions', () => {
 			const dispatchFn = await runGenerate( {
 				item,
 				settings: { gifConvert: 'prompt' },
+				conversions: [ { itemId: 'g4', file: gif, status: 'pending' } ],
 			} );
 
-			// No automatic transcode: the decision is left to the user.
+			// No automatic transcode: the decision is left to the user. The
+			// record (created pre-upload by prepareItem) just learns its
+			// attachment ID so a later answer can transcode against it.
 			expect( dispatchFn.addSideloadItem ).not.toHaveBeenCalled();
 			expect( dispatchFn ).toHaveBeenCalledWith( {
-				type: Type.AddGifConversion,
-				conversion: {
-					attachmentId: 55,
-					itemId: 'g4',
-					file: gif,
-					status: 'pending',
-				},
+				type: Type.UpdateGifConversion,
+				itemId: 'g4',
+				attachmentId: 55,
 			} );
+		} );
+
+		it( 'transcodes within the running upload when the user accepted mid-upload', async () => {
+			const gif = makeGif();
+			const item = {
+				id: 'g5',
+				sourceFile: gif,
+				file: gif,
+				animatedGifFile: gif,
+				attachment: { id: 56 },
+			};
+
+			const dispatchFn = await runGenerate( {
+				item,
+				settings: { gifConvert: 'prompt' },
+				conversions: [
+					{ itemId: 'g5', file: gif, status: 'accepted' },
+				],
+			} );
+
+			// The companion rides along as a sideload of the still-pending
+			// upload item, exactly like the automatic mode.
+			expect( dispatchFn ).toHaveBeenCalledWith( {
+				type: Type.UpdateGifConversion,
+				itemId: 'g5',
+				attachmentId: 56,
+				status: 'converting',
+			} );
+			expect( dispatchFn.addSideloadItem ).toHaveBeenCalledTimes( 1 );
+			const sideload = dispatchFn.addSideloadItem.mock.calls[ 0 ][ 0 ];
+			expect( sideload.parentId ).toBe( 'g5' );
+			expect( sideload.additionalData ).toEqual(
+				expect.objectContaining( {
+					post: 56,
+					image_size: 'animated_video',
+				} )
+			);
+
+			// The item is stamped so processItem marks the record as
+			// converted once this item's Finalize completes.
+			expect( dispatchFn.finishOperation ).toHaveBeenCalledWith( 'g5', {
+				gifConversionItemId: 'g5',
+			} );
+		} );
+
+		it( 'does nothing in prompt mode when the record is gone (user kept the GIF)', async () => {
+			const gif = makeGif();
+			const item = {
+				id: 'g6',
+				sourceFile: gif,
+				file: gif,
+				animatedGifFile: gif,
+				attachment: { id: 57 },
+			};
+
+			const dispatchFn = await runGenerate( {
+				item,
+				settings: { gifConvert: 'prompt' },
+				conversions: [],
+			} );
+
+			expect( dispatchFn.addSideloadItem ).not.toHaveBeenCalled();
+			expect( dispatchFn ).not.toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: Type.UpdateGifConversion,
+				} )
+			);
 		} );
 	} );
 
@@ -997,8 +1100,8 @@ describe( 'private actions', () => {
 			type: 'image/gif',
 		} );
 		const conversion = {
-			attachmentId: 55,
 			itemId: 'original-item',
+			attachmentId: 55,
 			file: gif,
 			status: 'pending',
 		};
@@ -1010,7 +1113,7 @@ describe( 'private actions', () => {
 				getGifConversions: () => conversions,
 				getSettings: () => ( { videoOutputFormat: 'video/mp4' } ),
 			};
-			const thunk = resolveGifConversion( 55, decision );
+			const thunk = resolveGifConversion( 'original-item', decision );
 			return thunk( { select, dispatch: dispatchFn } ).then(
 				() => dispatchFn
 			);
@@ -1021,9 +1124,29 @@ describe( 'private actions', () => {
 
 			expect( dispatchFn ).toHaveBeenCalledWith( {
 				type: Type.RemoveGifConversion,
-				attachmentId: 55,
+				itemId: 'original-item',
 			} );
 			expect( dispatchFn.addSideloadItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'marks the record as accepted when converting before the upload finished', async () => {
+			// No attachmentId yet: the GIF is still uploading. The
+			// transcode is deferred to generateThumbnails().
+			const dispatchFn = await runResolve( 'video', [
+				{ ...conversion, attachmentId: undefined },
+			] );
+
+			expect( dispatchFn ).toHaveBeenCalledWith( {
+				type: Type.UpdateGifConversion,
+				itemId: 'original-item',
+				status: 'accepted',
+			} );
+			expect( dispatchFn.addSideloadItem ).not.toHaveBeenCalled();
+			expect(
+				dispatchFn.mock.calls
+					.map( ( call ) => call[ 0 ] )
+					.find( ( action ) => action?.type === Type.Add )
+			).toBeUndefined();
 		} );
 
 		it( 'enqueues the companion transcode when the user converts', async () => {
@@ -1041,17 +1164,14 @@ describe( 'private actions', () => {
 				expect.objectContaining( {
 					attachment: { id: 55 },
 					operations: [ OperationType.Finalize ],
-					gifConversionAttachmentId: 55,
+					gifConversionItemId: 'original-item',
 				} )
 			);
 
-			// The record now points at that parent so cancellation cleanup
-			// and the converted notification can find it.
 			expect( dispatchFn ).toHaveBeenCalledWith( {
 				type: Type.UpdateGifConversion,
-				attachmentId: 55,
+				itemId: 'original-item',
 				status: 'converting',
-				itemId: addAction.item.id,
 			} );
 
 			// Mirrors the automatic sideload from generateThumbnails.
