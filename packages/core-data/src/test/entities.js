@@ -1274,6 +1274,38 @@ describe( 'prePersistPostType', () => {
 		expect( syncManager.applyPersistedCRDTDoc ).not.toHaveBeenCalled();
 	} );
 
+	it.each( [ 'offline_error', 'fetch_error' ] )(
+		'preserves the %s from a failed freshness request',
+		async ( code ) => {
+			const networkError = {
+				code,
+				message: 'network unavailable',
+			};
+			const syncManager = {
+				createPersistedCRDTDoc: jest
+					.fn()
+					.mockResolvedValue( 'local-doc' ),
+			};
+			apiFetch.mockRejectedValue( networkError );
+			setSyncManagerMock( syncManager );
+			window._wpCollaborationEnabled = true;
+
+			await expect(
+				prePersistPostType(
+					{
+						id: 123,
+						status: 'publish',
+						content: { raw: pageContent( [ 'Alpha' ] ) },
+					},
+					{ content: pageContent( [ 'local edit' ] ) },
+					'page',
+					false,
+					'/wp/v2/pages'
+				)
+			).rejects.toBe( networkError );
+		}
+	);
+
 	it( 'does not run stale-save protection for a collaboration-disabled post type', async () => {
 		const syncManager = {
 			createPersistedCRDTDoc: jest.fn().mockResolvedValue( null ),

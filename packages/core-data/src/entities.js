@@ -746,7 +746,11 @@ export const prePersistPostType = async (
 				throw createStaleSaveConflictError( conflictingSavedFields );
 			}
 		} catch ( error ) {
-			if ( error?.code === STALE_SAVE_CONFLICT_CODE ) {
+			if (
+				error?.code === STALE_SAVE_CONFLICT_CODE ||
+				error?.code === 'offline_error' ||
+				error?.code === 'fetch_error'
+			) {
 				throw error;
 			}
 
