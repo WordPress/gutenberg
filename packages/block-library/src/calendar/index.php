@@ -58,16 +58,24 @@ function render_block_core_calendar( $attributes ) {
 	$custom_background_color          = $attributes['style']['color']['background'] ?? null;
 	$color_block_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
 
+	// Generate color styles and classes.
+	$styles        = wp_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
+	$inline_styles = $styles['css'] ?? '';
+	$classnames    = empty( $styles['classnames'] ) ? array() : explode( ' ', $styles['classnames'] );
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classnames[] = 'has-link-color';
+	}
+
 	$border_block_styles = $attributes['style']['border'] ?? array();
 
 	if ( isset( $attributes['borderColor'] ) ) {
 		$border_block_styles['color'] = "var:preset|color|{$attributes['borderColor']}";
 	}
 
-	// Generate border styles and classes
+	// Generate border styles and classes.
 	$border_engine  = wp_style_engine_get_styles( array( 'border' => $border_block_styles ), array( 'convert_vars_to_classnames' => true ) );
 	$border_styles  = $border_engine['css'] ?? '';
-	$border_classes = $border_engine['classnames'] ?? '';
+	$border_classes = empty( $border_engine['classnames'] ) ? array() : explode( ' ', $border_engine['classnames'] );
 	$calendar       = get_calendar( true, false );
 
 	// Fallback to ensure the calendar renders if get_calendar returns false or empty.
@@ -80,14 +88,16 @@ function render_block_core_calendar( $attributes ) {
 	while ( $processor->next_tag() ) {
 		$tag_name = $processor->get_tag();
 
-		// Modify the main table attributes.
+		// Apply color classes and styles to the main table.
 		if ( 'TABLE' === $tag_name ) {
 			if ( ! empty( $inline_styles ) ) {
 				$processor->set_attribute( 'style', $inline_styles );
 			}
 
-			if ( ! empty( $classnames ) ) {
-				$processor->add_class( $classnames );
+			foreach ( $classnames as $classname ) {
+				if ( ! empty( $classname ) ) {
+					$processor->add_class( $classname );
+				}
 			}
 		}
 
@@ -99,8 +109,10 @@ function render_block_core_calendar( $attributes ) {
 				continue;
 			}
 
-			if ( ! empty( $border_classes ) ) {
-				$processor->add_class( $border_classes );
+			foreach ( $border_classes as $border_class ) {
+				if ( ! empty( $border_class ) ) {
+					$processor->add_class( $border_class );
+				}
 			}
 
 			$current_style  = $processor->get_attribute( 'style' ) ?? '';
