@@ -39,8 +39,11 @@ test.describe( 'Block Notes', () => {
 
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
 		await expect( form ).toBeFocused();
-		// Hide the notes sidebars via the Options menu.
-		await blockNoteUtils.selectNotesDisplayOption( 'Hide notes' );
+		// Close the pinned notes sidebar.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'All notes', exact: true } )
+			.click();
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
 		await expect( form ).toBeFocused();
 	} );
@@ -58,11 +61,11 @@ test.describe( 'Block Notes', () => {
 			} )
 			.fill( 'A test comment' );
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
 		const thread = page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'treeitem', {
 				name: 'Note: A test comment',
 			} );
@@ -85,7 +88,7 @@ test.describe( 'Block Notes', () => {
 
 		await commentForm.fill( 'Test reply' );
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'button', { name: 'Reply', exact: true } )
 			.click();
 		await expect( commentText ).toHaveText( 'Test reply' );
@@ -108,7 +111,7 @@ test.describe( 'Block Notes', () => {
 			.first()
 			.fill( 'Test comment after edit.' );
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'button', { name: 'Update', exact: true } )
 			.click();
 
@@ -221,6 +224,96 @@ test.describe( 'Block Notes', () => {
 		).toBeVisible();
 	} );
 
+	test( 'shows a "Resolved" divider between active and resolved notes', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		// First block: this note stays active and unresolved.
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Stays active.' },
+			comment: 'Active note.',
+		} );
+		// Second block: this note will be resolved.
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Resolve me.' },
+			comment: 'Note to resolve.',
+		} );
+		// Third block: its note is orphaned when the block is deleted.
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Orphan me.' },
+			comment: 'Note losing its block.',
+		} );
+
+		await blockNoteUtils.openBlockNoteSidebar();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const separator = sidebar.locator(
+			'.editor-collab-sidebar-panel__status-separator'
+		);
+
+		// No resolved notes yet, so the divider is absent.
+		await expect( separator ).toBeHidden();
+
+		// Resolve the second note.
+		const resolvedThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Note to resolve.',
+		} );
+		await resolvedThread.click();
+		await expect( resolvedThread ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note marked as resolved.' } )
+		).toBeVisible();
+
+		// The divider now labels the resolved section.
+		await expect( separator ).toBeVisible();
+		await expect( separator ).toHaveText( 'Resolved' );
+
+		// Delete the second block via the store, orphaning its note. Clicking
+		// the block in the canvas is unreliable here because the selected
+		// note's block toolbar popover overlaps it.
+		const orphanBlock = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Orphan me.' } );
+		const orphanClientId = await orphanBlock.getAttribute( 'data-block' );
+		await page.evaluate(
+			( clientId ) =>
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.removeBlock( clientId ),
+			orphanClientId
+		);
+
+		// The orphaned note persists and is flagged as detached, rather than
+		// being auto-deleted or moved into the resolved section.
+		await expect(
+			sidebar.getByRole( 'treeitem', {
+				name: 'Original block deleted. Note: Note losing its block.',
+			} )
+		).toBeVisible();
+
+		// Rows render in DOM order: unresolved notes first, then orphaned ones,
+		// both above the divider, with the resolved note below it.
+		await expect(
+			sidebar.locator( '.editor-collab-sidebar-panel > *' )
+		).toContainText( [
+			'Active note.',
+			'Note losing its block.',
+			'Resolved',
+			'Note to resolve.',
+		] );
+	} );
+
 	test( 'selecting a block or note marks it as an active', async ( {
 		editor,
 		page,
@@ -245,7 +338,7 @@ test.describe( 'Block Notes', () => {
 
 		const threadsContainer = page
 			.getByRole( 'region', {
-				name: 'Editor settings',
+				name: 'Notes',
 			} )
 			.getByRole( 'tree' );
 		const threads = threadsContainer.getByRole( 'treeitem' );
@@ -306,7 +399,7 @@ test.describe( 'Block Notes', () => {
 
 					const thread = page
 						.getByRole( 'region', {
-							name: 'Editor settings',
+							name: 'Notes',
 						} )
 						.getByRole( 'treeitem', {
 							name: 'Note: Test comment',
@@ -353,14 +446,14 @@ test.describe( 'Block Notes', () => {
 
 			const firstThread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: One',
 				} );
 			const secondThread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Two',
@@ -396,14 +489,14 @@ test.describe( 'Block Notes', () => {
 
 			const firstThread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: One',
 				} );
 			const lastThread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Three',
@@ -429,7 +522,7 @@ test.describe( 'Block Notes', () => {
 
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment escape',
@@ -455,7 +548,7 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: Sticky collapse note',
 				} );
@@ -483,7 +576,7 @@ test.describe( 'Block Notes', () => {
 
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
@@ -508,7 +601,7 @@ test.describe( 'Block Notes', () => {
 
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
@@ -533,7 +626,7 @@ test.describe( 'Block Notes', () => {
 
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem' )
 				.first();
@@ -554,7 +647,7 @@ test.describe( 'Block Notes', () => {
 			} );
 			const replyForm = page.getByRole( 'textbox', { name: 'Reply to' } );
 			const replyButton = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Reply', exact: true } );
 
 			await replyForm.fill( 'First reply' );
@@ -576,7 +669,7 @@ test.describe( 'Block Notes', () => {
 
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
@@ -610,17 +703,17 @@ test.describe( 'Block Notes', () => {
 				comment: 'Third block comment',
 			} );
 			const firstThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: First block comment',
 				} );
 			const secondThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: Second block comment',
 				} );
 			const thirdThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: Third block comment',
 				} );
@@ -683,7 +776,7 @@ test.describe( 'Block Notes', () => {
 			} );
 			await commentForm.fill( 'Test reply' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Reply', exact: true } )
 				.click();
 			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete', 1 );
@@ -692,7 +785,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'button', { name: 'Delete' } )
 				.click();
 			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
 				} );
@@ -711,7 +804,7 @@ test.describe( 'Block Notes', () => {
 			} );
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
@@ -743,7 +836,7 @@ test.describe( 'Block Notes', () => {
 			} );
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
@@ -782,14 +875,14 @@ test.describe( 'Block Notes', () => {
 			// Test focus on action button when note editing is cancelled.
 			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Edit' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Cancel' } )
 				.first()
 				.click();
 
 			await expect(
 				page
-					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'region', { name: 'Notes' } )
 					.getByRole( 'button', { name: 'Actions' } )
 			).toBeFocused();
 
@@ -800,13 +893,13 @@ test.describe( 'Block Notes', () => {
 				.first()
 				.fill( 'Test comment after edit.' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Update' } )
 				.click();
 
 			await expect(
 				page
-					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'region', { name: 'Notes' } )
 					.getByRole( 'button', { name: 'Actions' } )
 			).toBeFocused();
 		} );
@@ -826,7 +919,7 @@ test.describe( 'Block Notes', () => {
 				exact: true,
 			} );
 			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: A test comment',
 				} );
@@ -861,7 +954,7 @@ test.describe( 'Block Notes', () => {
 				exact: true,
 			} );
 			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: A test comment',
 				} );
@@ -896,12 +989,12 @@ test.describe( 'Block Notes', () => {
 			await expect( newNoteForm ).toBeFocused();
 			await newNoteForm.fill( 'Second note on block' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
 			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
+				name: 'Notes',
 			} );
 			await expect(
 				settings.getByRole( 'treeitem', {
@@ -936,7 +1029,7 @@ test.describe( 'Block Notes', () => {
 
 			// Both notes should be visible.
 			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
+				name: 'Notes',
 			} );
 			await expect(
 				settings.getByRole( 'treeitem', { name: 'Note: Note to keep' } )
@@ -996,7 +1089,7 @@ test.describe( 'Block Notes', () => {
 			await blockNoteUtils.addNote( 'Note B' );
 
 			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
+				name: 'Notes',
 			} );
 
 			// Resolve Note A.
@@ -1039,7 +1132,7 @@ test.describe( 'Block Notes', () => {
 			await blockNoteUtils.addNote( 'Second note' );
 
 			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
+				name: 'Notes',
 			} );
 
 			// Resolve the first note.
@@ -1135,7 +1228,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Color me' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1204,7 +1297,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Survive the toggle' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1249,7 +1342,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Anchored to text' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1258,7 +1351,7 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 
 			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', { name: 'Note: Anchored to text' } );
 			await expect( thread ).toBeVisible();
 
@@ -1301,7 +1394,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Remove my marker on delete' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1346,7 +1439,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Resolve removes my marker' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1404,7 +1497,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Just this word' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1439,7 +1532,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Pick me' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1466,128 +1559,11 @@ test.describe( 'Block Notes', () => {
 			// Selecting the note from the sidebar promotes its marker to the
 			// stronger active alpha (≈0x80/255) via the selected-note rule.
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', { name: 'Note: Pick me' } )
 				.click();
 
 			await expect.poll( alphaOf ).toBeGreaterThan( 0.4 );
-		} );
-	} );
-
-	test.describe( 'Notes visibility toggle', () => {
-		test( 'shows the display options with the current state selected', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Toggle menu block' },
-				comment: 'Toggle menu note',
-			} );
-
-			await page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Options' } )
-				.click();
-
-			const menu = page.getByRole( 'menu', { name: 'Options' } );
-			await expect(
-				menu.getByRole( 'menuitemradio', {
-					name: /^(Show|Hide) notes$/,
-				} )
-			).toHaveText( [ 'Show notes', 'Hide notes' ] );
-			// The floating notes are visible by default, so "Show notes" is
-			// the selected choice.
-			await expect(
-				menu.getByRole( 'menuitemradio', {
-					name: 'Show notes',
-					exact: true,
-				} )
-			).toHaveAttribute( 'aria-checked', 'true' );
-			await page.keyboard.press( 'Escape' );
-		} );
-
-		test( 'can hide and show notes', async ( { page, blockNoteUtils } ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Hide and show' },
-				comment: 'Now you see me',
-			} );
-
-			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Now you see me' } );
-			await expect( thread ).toBeVisible();
-
-			await blockNoteUtils.selectNotesDisplayOption( 'Hide notes' );
-			await expect( thread ).toBeHidden();
-
-			await blockNoteUtils.selectNotesDisplayOption( 'Show notes' );
-			await expect( thread ).toBeVisible();
-		} );
-
-		test( 'opens and closes the All notes sidebar from the pinned toggle', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Sidebar block' },
-				comment: 'Sidebar note',
-			} );
-
-			const allNotesToggle = page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'All notes', exact: true } );
-			await allNotesToggle.click();
-			const closeButton = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Close Notes' } );
-			await expect( closeButton ).toBeVisible();
-
-			// The pinned toggle reflects the open sidebar.
-			await expect( allNotesToggle ).toHaveAttribute(
-				'aria-pressed',
-				'true'
-			);
-
-			// Hiding notes closes the All notes sidebar too.
-			await blockNoteUtils.selectNotesDisplayOption( 'Hide notes' );
-			await expect( closeButton ).toBeHidden();
-			await expect(
-				page
-					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'treeitem', { name: 'Note: Sidebar note' } )
-			).toBeHidden();
-		} );
-
-		test( 'adding a note while hidden makes notes visible again', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'First block' },
-				comment: 'Existing note',
-			} );
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Second block' },
-			} );
-
-			await blockNoteUtils.selectNotesDisplayOption( 'Hide notes' );
-			const existingThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Existing note' } );
-			await expect( existingThread ).toBeHidden();
-
-			// Adding a note from the block options menu unhides notes.
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
-			await expect(
-				page.getByRole( 'textbox', { name: 'New note', exact: true } )
-			).toBeFocused();
-			await expect( existingThread ).toBeVisible();
 		} );
 	} );
 } );
@@ -1604,25 +1580,22 @@ class BlockNoteUtils {
 	}
 
 	async openBlockNoteSidebar() {
-		const closeButton = this.#page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Close Notes' } );
-
-		if ( ! ( await closeButton.isVisible() ) ) {
-			await this.#page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'All notes', exact: true } )
-				.click();
-			await closeButton.waitFor();
-		}
-	}
-
-	async selectNotesDisplayOption( option ) {
-		await this.#page
+		const toggleButton = this.#page
 			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Options' } )
-			.click();
-		await this.#page.getByRole( 'menuitemradio', { name: option } ).click();
+			.getByRole( 'button', { name: 'All notes', exact: true } );
+
+		const isClosed =
+			( await toggleButton.getAttribute( 'aria-expanded' ) ) === 'false';
+
+		if ( isClosed ) {
+			await toggleButton.click();
+			await this.#page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Close Notes' } )
+				.waitFor();
+		}
+
+		return toggleButton;
 	}
 
 	async addBlockWithNote( { type, attributes = {}, comment } ) {
@@ -1645,20 +1618,20 @@ class BlockNoteUtils {
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
 			.fill( content );
 		await this.#page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: /^Notes$|^Editor settings$/ } )
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
 		// Wait for the new thread to appear before returning.
 		await expect(
 			this.#page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: /^Notes$|^Editor settings$/ } )
 				.getByRole( 'treeitem', { name: `Note: ${ content }` } )
 		).toBeVisible();
 	}
 
 	async clickBlockNoteActionMenuItem( actionName, index = 0 ) {
 		await this.#page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: /^Notes$|^Editor settings$/ } )
 			.getByRole( 'button', { name: 'Actions' } )
 			.nth( index )
 			.click();

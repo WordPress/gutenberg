@@ -3,8 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { MenuGroup, MenuItemsChoice } from '@wordpress/components';
 import { useEffect, useRef, useState } from '@wordpress/element';
+import { MenuGroup, MenuItemsChoice } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -18,18 +18,14 @@ import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
  */
 import PluginSidebar from '../plugin-sidebar';
 import NotesMoreMenuGroup from '../more-menu/notes-more-menu-group';
-import {
-	ALL_NOTES_SIDEBAR,
-	FLOATING_NOTES_SIDEBAR,
-	SIDEBARS,
-} from './constants';
+import { ALL_NOTES_SIDEBAR } from './constants';
 import { Notes } from './notes';
+import { FloatingNotes, FloatingNotesFill } from './floating-notes';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
-import { useGlobalStyles } from '../global-styles';
-import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
+import { useNoteThreads } from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import { NOTE_FORMAT_NAME, noteFormat } from './format';
 import PostTypeSupportCheck from '../post-type-support-check';
@@ -52,30 +48,23 @@ function NotesSidebar( { postId } ) {
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const sidebarRef = useRef( null );
-	const [ notesDisplayMode, setNotesDisplayMode ] = useState( 'show' );
+	// How the floating notes render in the canvas: 'full' or 'hidden'.
+	const [ notesDisplayMode, setNotesDisplayMode ] = useState( 'full' );
 
-	const { clientId, noteId, isClassicBlock, isAllNotesSidebarActive } =
-		useSelect( ( select ) => {
-			const {
-				getBlockAttributes,
-				getSelectedBlockClientId,
-				getBlockName,
-			} = select( blockEditorStore );
-			const _clientId = getSelectedBlockClientId();
-			return {
-				clientId: _clientId,
-				noteId: _clientId
-					? getBlockAttributes( _clientId )?.metadata?.noteId
-					: null,
-				isClassicBlock: _clientId
-					? getBlockName( _clientId ) === 'core/freeform'
-					: false,
-				isAllNotesSidebarActive:
-					select( interfaceStore ).getActiveComplementaryArea(
-						'core'
-					) === ALL_NOTES_SIDEBAR,
-			};
-		}, [] );
+	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
+			select( blockEditorStore );
+		const _clientId = getSelectedBlockClientId();
+		return {
+			clientId: _clientId,
+			noteId: _clientId
+				? getBlockAttributes( _clientId )?.metadata?.noteId
+				: null,
+			isClassicBlock: _clientId
+				? getBlockName( _clientId ) === 'core/freeform'
+				: false,
+		};
+	}, [] );
 
 	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 	const { isDistractionFree } = useSelect( ( select ) => {
@@ -91,15 +80,29 @@ function NotesSidebar( { postId } ) {
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
 
-	// Only enable the floating sidebar for large viewports.
-	const showFloatingSidebar = isLargeViewport;
-	// Fallback to "All notes" sidebar on smaller viewports.
-	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
-	useEnableFloatingSidebar(
-		showFloatingSidebar &&
-			notesDisplayMode !== 'hide' &&
-			( unresolvedNotes.length > 0 || selectedNoteId !== undefined )
+	const isAllNotesSidebarOpen = useSelect(
+		( select ) =>
+			select( interfaceStore ).getActiveComplementaryArea( 'core' ) ===
+			ALL_NOTES_SIDEBAR,
+		[]
 	);
+
+	// Only show the floating notes for large viewports.
+	const showFloatingNotes = isLargeViewport;
+	// Fallback to "All notes" sidebar on smaller viewports.
+	const showAllNotesSidebar = notes.length > 0 || ! showFloatingNotes;
+	// The floating notes are part of the canvas surface: they don't occupy
+	// a sidebar and can coexist with the Settings sidebar. They yield to
+	// the "All notes" sidebar, which lists the same threads.
+	const hasVisibleFloatingNotes =
+		showFloatingNotes &&
+		notesDisplayMode !== 'hidden' &&
+		( unresolvedNotes.length > 0 || selectedNoteId !== undefined ) &&
+		! isAllNotesSidebarOpen;
+	// The display-mode choices live in the editor's Options (ellipsis) menu;
+	// they only apply where the floating notes can render.
+	const showNotesDisplayOptions =
+		showFloatingNotes && unresolvedNotes.length > 0;
 
 	async function focusNote( {
 		targetClientId,
@@ -110,24 +113,22 @@ function NotesSidebar( { postId } ) {
 			return;
 		}
 
-		// Focusing a note always makes notes visible again.
-		if ( notesDisplayMode === 'hide' ) {
-			setNotesDisplayMode( 'show' );
+		// Acting on a note always brings the floating notes back into view.
+		if ( notesDisplayMode === 'hidden' ) {
+			setNotesDisplayMode( 'full' );
 		}
 
-		const prevArea = await getActiveComplementaryArea( 'core' );
-		if ( isApproved ) {
+		// Approved (resolved) notes only appear in the "All notes" sidebar.
+		// On small viewports it is also the only notes surface; on large
+		// viewports the floating notes show automatically once a note is
+		// selected, so no sidebar needs to be opened.
+		if ( isApproved || ! showFloatingNotes ) {
 			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
-		} else if ( ! SIDEBARS.includes( prevArea ) || ! showAllNotesSidebar ) {
-			enableComplementaryArea(
-				'core',
-				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
-			);
 		}
 
 		const currentArea = await getActiveComplementaryArea( 'core' );
-		// Bail out if the current active area is not one of note sidebars.
-		if ( ! SIDEBARS.includes( currentArea ) ) {
+		// Bail out when no notes surface will be visible.
+		if ( currentArea !== ALL_NOTES_SIDEBAR && ! showFloatingNotes ) {
 			return;
 		}
 
@@ -170,10 +171,6 @@ function NotesSidebar( { postId } ) {
 		}
 	);
 
-	// Get the global styles to set the background color of the sidebar.
-	const { merged: GlobalStyles } = useGlobalStyles();
-	const backgroundColor = GlobalStyles?.styles?.color?.background;
-
 	// Surface one thread for the avatar indicator.
 	const currentThreads =
 		blockNoteIds.length > 0
@@ -202,26 +199,27 @@ function NotesSidebar( { postId } ) {
 					addNewNoteForBlock( menuClientId )
 				}
 			/>
-			{ showAllNotesSidebar && (
+			{ showNotesDisplayOptions && (
 				<NotesMoreMenuGroup>
 					{ ( { onClose } ) => (
 						<MenuGroup label={ __( 'Notes' ) }>
 							<MenuItemsChoice
 								choices={ [
 									{
-										value: 'show',
-										label: __( 'Show notes' ),
+										value: 'full',
+										label: __( 'Expand notes' ),
 									},
 									{
-										value: 'hide',
+										value: 'hidden',
 										label: __( 'Hide notes' ),
 									},
 								] }
 								value={ notesDisplayMode }
 								onSelect={ ( value ) => {
 									// Close the "All notes" sidebar so the
-									// chosen mode is visible on the canvas.
-									if ( isAllNotesSidebarActive ) {
+									// chosen floating mode is visible on the
+									// canvas.
+									if ( isAllNotesSidebarOpen ) {
 										disableComplementaryArea( 'core' );
 									}
 									setNotesDisplayMode( value );
@@ -232,7 +230,7 @@ function NotesSidebar( { postId } ) {
 					) }
 				</NotesMoreMenuGroup>
 			) }
-			{ showAllNotesSidebar && notesDisplayMode !== 'hide' && (
+			{ showAllNotesSidebar && (
 				<PluginSidebar
 					identifier={ ALL_NOTES_SIDEBAR }
 					name={ ALL_NOTES_SIDEBAR }
@@ -248,22 +246,13 @@ function NotesSidebar( { postId } ) {
 					<Notes notes={ notes } sidebarRef={ sidebarRef } />
 				</PluginSidebar>
 			) }
-			{ isLargeViewport && notesDisplayMode !== 'hide' && (
-				<PluginSidebar
-					isPinnable={ false }
-					header={ false }
-					identifier={ FLOATING_NOTES_SIDEBAR }
-					className="editor-collab-sidebar"
-					headerClassName="editor-collab-sidebar__header"
-					backgroundColor={ backgroundColor }
-				>
-					<Notes
+			{ hasVisibleFloatingNotes && (
+				<FloatingNotesFill>
+					<FloatingNotes
 						notes={ unresolvedNotes }
 						sidebarRef={ sidebarRef }
-						styles={ { backgroundColor } }
-						isFloating
 					/>
-				</PluginSidebar>
+				</FloatingNotesFill>
 			) }
 		</>
 	);

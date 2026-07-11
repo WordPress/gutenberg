@@ -29,6 +29,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 import ResizableEditor from '../resizable-editor';
+import { FloatingNotesSlot } from '../collab-sidebar/floating-notes';
 import useSelectNearestEditableBlock from './use-select-nearest-editable-block';
 import {
 	NAVIGATION_POST_TYPE,
@@ -93,7 +94,6 @@ function checkForPostContentAtRootLevel( blocks ) {
 function VisualEditor( {
 	// Ideally as we unify post and site editors, we won't need these props.
 	autoFocus,
-	disableIframe = false,
 	iframeProps,
 	contentRef,
 	className,
@@ -403,14 +403,13 @@ function VisualEditor( {
 					// Horizontal padding leaves room for the resize handles
 					// that appear on the left/right of a resizable canvas.
 					'has-horizontal-padding': isFocusedEntity || enableResizing,
-					'is-iframed': ! disableIframe,
 				}
 			) }
 		>
 			<SyncConnectionErrorModal />
 			<ResizableEditor enableResizing={ enableResizing } height="100%">
 				<BlockCanvas
-					shouldIframe={ ! disableIframe }
+					shouldIframe
 					contentRef={ contentRef }
 					styles={ iframeStyles }
 					height="100%"
@@ -456,8 +455,8 @@ function VisualEditor( {
 							contentEditable={ false }
 							ref={ observeTypingRef }
 							style={ {
-								// This is using inline styles
-								// so it's applied for both iframed and non iframed editors.
+								// This is using inline styles so it's applied
+								// within the editor iframe.
 								marginTop: '4rem',
 							} }
 						>
@@ -484,11 +483,10 @@ function VisualEditor( {
 							) }
 							layout={ blockListLayout }
 							dropZoneElement={
-								// When iframed, pass in the html element of the iframe to
-								// ensure the drop zone extends to the edges of the iframe.
-								disableIframe
-									? localRef.current
-									: localRef.current?.parentNode
+								// Pass in the html element of the iframe to
+								// ensure the drop zone extends to the edges of
+								// the iframe.
+								localRef.current?.parentNode
 							}
 							__unstableDisableDropZone={
 								// In template preview mode, disable drop zones at the root of the template.
@@ -505,6 +503,7 @@ function VisualEditor( {
 					</RecursionProvider>
 				</BlockCanvas>
 			</ResizableEditor>
+			<FloatingNotesSlot />
 		</div>
 	);
 }
