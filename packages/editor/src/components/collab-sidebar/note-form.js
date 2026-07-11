@@ -21,6 +21,15 @@ import { isKeyboardEvent } from '@wordpress/keycodes';
  */
 import { sanitizeNoteContent } from './utils';
 
+/**
+ * Form for writing a note, a reply, or an edit to an existing note.
+ *
+ * @param {Object}   props
+ * @param {Function} props.onSubmit Called with the input value on submit.
+ * @param {Function} props.onCancel Called when the form is dismissed.
+ * @param {Object}   [props.note]   Existing note when editing; omitted for new notes and replies.
+ * @param {Object}   [props.labels] Optional `input`/`submit` label overrides.
+ */
 export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 	const [ inputComment, setInputComment ] = useState(
 		note?.content?.raw ?? ''

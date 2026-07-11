@@ -1,13 +1,17 @@
 /**
+ * External dependencies
+ */
+import type { FocusEvent, MutableRefObject } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -15,13 +19,22 @@ import {
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
+import type { FloatingPosition } from './floating-container';
 import { focusNoteThread } from './utils';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function AddNote( { onSubmit, sidebarRef, floating } ) {
+export function AddNote( {
+	onSubmit,
+	sidebarRef,
+	floating,
+}: {
+	onSubmit: ( note: { content: string; parent?: number } ) => Promise< any >;
+	sidebarRef: MutableRefObject< HTMLElement | null >;
+	floating?: FloatingPosition;
+} ) {
 	const { clientId } = useSelect( ( select ) => {
 		const { getSelectedBlockClientId } = select( blockEditorStore );
 		return {
@@ -62,7 +75,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 			style={
 				floating ? { opacity: ! floating.y ? 0 : undefined } : undefined
 			}
-			onBlur={ ( event ) => {
+			onBlur={ ( event: FocusEvent< HTMLElement > ) => {
 				// Don't deselect notes when the browser window/tab loses focus.
 				if ( ! document.hasFocus() ) {
 					return;
@@ -92,7 +105,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 		>
 			<NoteCard>
 				<NoteForm
-					onSubmit={ async ( inputComment ) => {
+					onSubmit={ async ( inputComment: string ) => {
 						isSubmittingRef.current = true;
 						const { id } = await onSubmit( {
 							content: inputComment,

@@ -2,6 +2,13 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import type {
+	FocusEvent,
+	KeyboardEvent,
+	MouseEvent,
+	MutableRefObject,
+	SyntheticEvent,
+} from 'react';
 
 /**
  * WordPress dependencies
@@ -13,10 +20,9 @@ import { useDebounce } from '@wordpress/compose';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -32,10 +38,25 @@ import {
 	scrollNoteThreadIntoView,
 	selectNoteBlocks,
 } from './utils';
+import type { Thread } from './utils';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
+
+/**
+ * Floating-board handle for a thread: the computed top offset and the board
+ * registration callbacks.
+ */
+interface NoteThreadFloating {
+	y?: number;
+	registerThread?: (
+		id: number | string,
+		blockEl: HTMLElement | null,
+		floatingEl: HTMLElement | null
+	) => void;
+	unregisterThread?: ( id: number | string ) => void;
+}
 
 export function NoteThread( {
 	note,
@@ -46,6 +67,22 @@ export function NoteThread( {
 	sidebarRef,
 	floating,
 	onKeyDown,
+}: {
+	note: Thread;
+	onEditNote: ( edit: {
+		id: number;
+		content?: string;
+		status?: string;
+	} ) => void;
+	onAddReply: ( reply: {
+		content: string;
+		parent?: number;
+	} ) => Promise< any >;
+	onDeleteNote: ( note: Thread ) => void;
+	isSelected: boolean;
+	sidebarRef: MutableRefObject< HTMLElement | null >;
+	floating?: NoteThreadFloating;
+	onKeyDown: ( event: KeyboardEvent< HTMLElement > ) => void;
 } ) {
 	const isFloating = !! floating;
 	const {
@@ -60,7 +97,7 @@ export function NoteThread( {
 		toggleBlockHighlight,
 		50
 	);
-	const floatingRef = useRef( null );
+	const floatingRef = useRef< HTMLElement | null >( null );
 	const isKeyboardTabbingRef = useRef( false );
 
 	const registerThread = floating?.registerThread;
@@ -97,7 +134,7 @@ export function NoteThread( {
 		toggleBlockHighlight( note.blockClientId, true );
 	};
 
-	const onBlur = ( event ) => {
+	const onBlur = ( event: FocusEvent< HTMLElement > ) => {
 		// Don't deselect notes when the browser window/tab loses focus.
 		if ( ! document.hasFocus() ) {
 			return;
@@ -150,7 +187,7 @@ export function NoteThread( {
 	};
 
 	const handleResolve = () => {
-		onEditNote( { id: note.id, status: 'approved' } );
+		onEditNote( { id: note.id as number, status: 'approved' } );
 		onDeselectNote();
 		if ( isFloating ) {
 			relatedBlockElement?.focus();
@@ -165,7 +202,7 @@ export function NoteThread( {
 	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
 
 	const noteExcerpt = getNoteExcerpt(
-		stripHTML( note.content?.rendered ),
+		stripHTML( note.content?.rendered ?? '' ),
 		10
 	);
 	const ariaLabel = !! note.blockClientId
@@ -205,12 +242,12 @@ export function NoteThread( {
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onFocus }
 			onBlur={ onBlur }
-			onKeyUp={ ( event ) => {
+			onKeyUp={ ( event: KeyboardEvent< HTMLElement > ) => {
 				if ( event.key === 'Tab' ) {
 					isKeyboardTabbingRef.current = false;
 				}
 			} }
-			onKeyDown={ ( event ) => {
+			onKeyDown={ ( event: KeyboardEvent< HTMLElement > ) => {
 				if ( event.key === 'Tab' ) {
 					isKeyboardTabbingRef.current = true;
 				} else {
@@ -266,7 +303,7 @@ export function NoteThread( {
 						size="compact"
 						variant="tertiary"
 						className="editor-collab-sidebar-panel__more-reply-button"
-						onClick={ ( event ) => {
+						onClick={ ( event: MouseEvent< HTMLElement > ) => {
 							event.stopPropagation();
 							onSelectNote();
 						} }
@@ -278,7 +315,7 @@ export function NoteThread( {
 								'%s more replies',
 								restReplies.length
 							),
-							restReplies.length
+							String( restReplies.length )
 						) }
 					</Button>
 				</Stack>
@@ -295,11 +332,11 @@ export function NoteThread( {
 			{ isSelected && (
 				<NoteCard role="treeitem">
 					<NoteForm
-						onSubmit={ ( inputComment ) => {
+						onSubmit={ ( inputComment: string ) => {
 							if ( 'approved' === note.status ) {
 								// For reopening, include the content in the reopen action.
 								onEditNote( {
-									id: note.id,
+									id: note.id as number,
 									status: 'hold',
 									content: inputComment,
 								} );
@@ -307,11 +344,11 @@ export function NoteThread( {
 								// For regular replies, add as separate comment.
 								onAddReply( {
 									content: inputComment,
-									parent: note.id,
+									parent: note.id as number,
 								} );
 							}
 						} }
-						onCancel={ ( event ) => {
+						onCancel={ ( event: SyntheticEvent ) => {
 							// Prevent the parent onClick from being triggered.
 							event.stopPropagation();
 							onDeselectNote();
@@ -325,8 +362,8 @@ export function NoteThread( {
 							input: sprintf(
 								// translators: %1$s: note identifier, %2$s: author name
 								__( 'Reply to note %1$s by %2$s' ),
-								note.id,
-								note.author_name
+								String( note.id ),
+								note.author_name ?? ''
 							),
 						} }
 					/>
@@ -337,7 +374,7 @@ export function NoteThread( {
 					className="editor-collab-sidebar-panel__skip-to-block"
 					variant="secondary"
 					size="compact"
-					onClick={ ( event ) => {
+					onClick={ ( event: MouseEvent< HTMLElement > ) => {
 						event.stopPropagation();
 						relatedBlockElement?.focus();
 					} }

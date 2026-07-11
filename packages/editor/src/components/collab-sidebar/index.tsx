@@ -7,7 +7,9 @@ import { useEffect, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { store as blockEditorStore } from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/interface
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
@@ -33,12 +35,15 @@ import {
 	pickPrimaryNote,
 	readMultiBlockSelection,
 } from './utils';
+import type { Thread } from './utils';
 import { NOTE_FORMAT_NAME, noteFormat } from './format';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
-function NotesSidebar( { postId } ) {
+function NotesSidebar( { postId }: { postId: number } ) {
 	useEffect( () => {
+		// @ts-expect-error noteFormat is an untyped JS settings object; the
+		// WPFormat type requires fields the runtime treats as optional.
 		registerFormatType( NOTE_FORMAT_NAME, noteFormat );
 		return () => {
 			unregisterFormatType( NOTE_FORMAT_NAME );
@@ -58,7 +63,7 @@ function NotesSidebar( { postId } ) {
 	// selection keys it needs.
 	const blockEditorSelectors = useSelect( blockEditorStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const sidebarRef = useRef( null );
+	const sidebarRef = useRef< HTMLElement | null >( null );
 
 	const { clientId, noteId, isClassicBlock, hasMultiSelection } = useSelect(
 		( select ) => {
@@ -110,6 +115,10 @@ function NotesSidebar( { postId } ) {
 		targetClientId,
 		noteId: targetNoteId,
 		isApproved,
+	}: {
+		targetClientId?: string | null;
+		noteId?: number | 'new';
+		isApproved?: boolean;
 	} ) {
 		if ( ! targetClientId ) {
 			return;
@@ -138,7 +147,7 @@ function NotesSidebar( { postId } ) {
 		selectNote( targetNoteId, { focus: true } );
 	}
 
-	function openNoteForBlock( targetClientId ) {
+	function openNoteForBlock( targetClientId: string ) {
 		// A block can carry multiple threads; surface the most relevant.
 		const blockThreads = notes.filter(
 			( thread ) => thread.blockClientId === targetClientId
@@ -151,7 +160,7 @@ function NotesSidebar( { postId } ) {
 		} );
 	}
 
-	function addNewNoteForBlock( targetClientId ) {
+	function addNewNoteForBlock( targetClientId: string ) {
 		return focusNote( {
 			targetClientId,
 			noteId: 'new',
@@ -196,7 +205,7 @@ function NotesSidebar( { postId } ) {
 
 	useShortcut(
 		'core/editor/new-note',
-		( event ) => {
+		( event: KeyboardEvent ) => {
 			event.preventDefault();
 			// Mirror the "Add note" menu, which targets the whole selection when
 			// more than one block is selected and the current block otherwise.
@@ -215,13 +224,15 @@ function NotesSidebar( { postId } ) {
 	);
 
 	// Get the global styles to set the background color of the sidebar.
-	const { merged: GlobalStyles } = useGlobalStyles();
+	const { merged: GlobalStyles } = useGlobalStyles() as Record< string, any >;
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
 
 	// Surface one thread for the avatar indicator.
-	const currentThreads =
+	const currentThreads: Thread[] =
 		blockNoteIds.length > 0
-			? notes.filter( ( thread ) => blockNoteIds.includes( thread.id ) )
+			? notes.filter( ( thread ) =>
+					blockNoteIds.includes( thread.id as number )
+			  )
 			: [];
 	const currentThread = pickPrimaryNote( currentThreads );
 
@@ -249,6 +260,7 @@ function NotesSidebar( { postId } ) {
 			/>
 			{ showAllNotesSidebar && (
 				<PluginSidebar
+					// @ts-expect-error PluginSidebar's documented props don't cover the pass-through props it forwards to ComplementaryArea.
 					identifier={ ALL_NOTES_SIDEBAR }
 					name={ ALL_NOTES_SIDEBAR }
 					title={ __( 'All notes' ) }
@@ -266,6 +278,7 @@ function NotesSidebar( { postId } ) {
 			{ isLargeViewport && (
 				<PluginSidebar
 					isPinnable={ false }
+					// @ts-expect-error PluginSidebar's documented props don't cover the pass-through props it forwards to ComplementaryArea.
 					header={ false }
 					identifier={ FLOATING_NOTES_SIDEBAR }
 					className="editor-collab-sidebar"

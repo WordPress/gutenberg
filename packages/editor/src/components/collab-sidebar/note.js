@@ -57,6 +57,17 @@ function NoteActionsMenu( { items, buttonRef } ) {
 	);
 }
 
+/**
+ * A single note (root note or reply) within a thread.
+ *
+ * @param {Object}   props
+ * @param {Object}   props.note         The note comment record.
+ * @param {Object}   [props.parentNote] Root note when rendering a reply.
+ * @param {boolean}  props.isSelected   Whether the thread is expanded.
+ * @param {Function} props.onEditNote   Persists content edits and status changes.
+ * @param {Function} props.onDeleteNote Deletes the note.
+ * @param {Function} [props.onResolve]  Resolves the thread (root notes only).
+ */
 export function Note( {
 	note,
 	parentNote,

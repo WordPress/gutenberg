@@ -10,15 +10,20 @@ import {
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
+// @ts-expect-error - No type declarations available for @wordpress/interface
 import { store as interfaceStore } from '@wordpress/interface';
-import { RichTextData, create } from '@wordpress/rich-text';
+import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
+
+/**
+ * External dependencies
+ */
+import type { MutableRefObject } from 'react';
 
 /**
  * Internal dependencies
@@ -39,10 +44,16 @@ import {
 	removeNoteFormat,
 	removeNoteIdFromMetadata,
 } from './utils';
+import type {
+	BlockAttributes,
+	NoteSegment,
+	NoteSelectionPoint,
+	Thread,
+} from './utils';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
-export function useNoteThreads( postId ) {
+export function useNoteThreads( postId: number | undefined ) {
 	const queryArgs = {
 		post: postId,
 		type: 'note',
@@ -50,7 +61,7 @@ export function useNoteThreads( postId ) {
 		per_page: -1,
 	};
 
-	const { records: threads } = useEntityRecords(
+	const { records: threads } = useEntityRecords< Thread >(
 		'root',
 		'comment',
 		queryArgs,
@@ -74,8 +85,8 @@ export function useNoteThreads( postId ) {
 		// Single pass over clientIds builds the forward map and reverse lookup
 		// together. getNoteIdsFromMetadata returns numeric ids, matching the
 		// types returned by the comments REST endpoint.
-		const blocksWithNotes = {};
-		const clientIdsByNoteId = new Map();
+		const blocksWithNotes: Record< string, number[] > = {};
+		const clientIdsByNoteId = new Map< number | 'new', string[] >();
 		for ( const clientId of clientIds ) {
 			const metadata = getBlockAttributes( clientId )?.metadata;
 			const noteIds = getNoteIdsFromMetadata( metadata );
@@ -95,15 +106,15 @@ export function useNoteThreads( postId ) {
 				}
 			}
 		}
-		const anchorOf = ( noteId ) =>
+		const anchorOf = ( noteId: number | 'new' ) =>
 			clientIdsByNoteId.get( noteId )?.[ 0 ] ?? null;
 
 		// Materialize threads; collect roots; replies linked in a second pass
 		// via unshift to invert order (matches prior reverse semantics).
-		const threadsById = new Map();
-		const rootThreads = [];
+		const threadsById = new Map< number | 'new', Thread >();
+		const rootThreads: Thread[] = [];
 		for ( const item of threads ) {
-			const thread = {
+			const thread: Thread = {
 				...item,
 				reply: [],
 				blockClientId: item.parent === 0 ? anchorOf( item.id ) : null,
@@ -120,10 +131,13 @@ export function useNoteThreads( postId ) {
 			}
 		}
 		for ( const item of threads ) {
-			if ( item.parent !== 0 ) {
-				threadsById
-					.get( item.parent )
-					?.reply.unshift( threadsById.get( item.id ) );
+			if ( ! item.parent ) {
+				continue;
+			}
+			const child = threadsById.get( item.id );
+			const parentThread = threadsById.get( item.parent );
+			if ( child && parentThread ) {
+				parentThread.reply?.unshift( child );
 			}
 		}
 
@@ -136,8 +150,8 @@ export function useNoteThreads( postId ) {
 		// marker start offset. Ties (rare; two markers at the same offset)
 		// fall back to creation order via thread id. Blocks themselves are
 		// already iterated in document order above.
-		const unresolved = [];
-		const resolved = [];
+		const unresolved: Thread[] = [];
+		const resolved: Thread[] = [];
 		for ( const [ clientId, noteIds ] of Object.entries(
 			blocksWithNotes
 		) ) {
@@ -159,12 +173,17 @@ export function useNoteThreads( postId ) {
 						start: getInlineMarkerStart( thread, attributes ),
 					};
 				} )
-				.filter( Boolean )
+				.filter(
+					( entry ): entry is { thread: Thread; start: number } =>
+						entry !== null
+				)
 				.sort( ( a, b ) => {
 					if ( a.start !== b.start ) {
 						return a.start - b.start;
 					}
-					return a.thread.id - b.thread.id;
+					return (
+						( a.thread.id as number ) - ( b.thread.id as number )
+					);
 				} );
 			for ( const { thread } of orderedThreads ) {
 				if ( thread.status === 'hold' ) {
@@ -197,15 +216,19 @@ export function useNoteThreads( postId ) {
  * normalized anchor data when a non-collapsed selection sits inside a single
  * rich-text attribute. Returns null for block-level or collapsed selections.
  *
- * @param {Function} getSelectionStart Block-editor selector.
- * @param {Function} getSelectionEnd   Block-editor selector.
- * @return {?Object} { clientId, attributeKey, start, end } or null.
+ * @param getSelectionStart Block-editor selector.
+ * @param getSelectionEnd   Block-editor selector.
+ * @return Normalized segment (clientId, attributeKey, start, end) or null.
  */
-function readInlineSelection( getSelectionStart, getSelectionEnd ) {
+function readInlineSelection(
+	getSelectionStart: () => NoteSelectionPoint | undefined,
+	getSelectionEnd: () => NoteSelectionPoint | undefined
+): NoteSegment | null {
 	const start = getSelectionStart();
 	const end = getSelectionEnd();
 	if (
 		! start?.clientId ||
+		! end?.clientId ||
 		start.clientId !== end.clientId ||
 		! start.attributeKey ||
 		start.offset === undefined ||
@@ -232,13 +255,18 @@ function readInlineSelection( getSelectionStart, getSelectionEnd ) {
  * RichTextData ready to write back into block attributes, or null when the
  * incoming value isn't a rich-text instance (legacy/string attributes).
  *
- * @param {*}      value Existing block attribute value.
- * @param {number} id    New note id to embed as `data-id`.
- * @param {number} start Range start offset.
- * @param {number} end   Range end offset.
- * @return {?RichTextData} Wrapped value or null when the attribute isn't rich text.
+ * @param value Existing block attribute value.
+ * @param id    New note id to embed as `data-id`.
+ * @param start Range start offset.
+ * @param end   Range end offset.
+ * @return Wrapped value or null when the attribute isn't rich text.
  */
-function wrapInlineNote( value, id, start, end ) {
+function wrapInlineNote(
+	value: unknown,
+	id: number,
+	start: number,
+	end: number
+): RichTextData | null {
 	if ( ! ( value instanceof RichTextData ) ) {
 		return null;
 	}
@@ -250,9 +278,7 @@ function wrapInlineNote( value, id, start, end ) {
 	);
 	// Round-trip through HTML to normalise format references (applyNoteFormat
 	// leaves them un-normalised) so the stored value matches a fresh reload.
-	return RichTextData.fromHTMLString(
-		new RichTextData( record ).toHTMLString()
-	);
+	return RichTextData.fromHTMLString( toHTMLString( { value: record } ) );
 }
 
 /**
@@ -262,16 +288,21 @@ function wrapInlineNote( value, id, start, end ) {
  * all. No-op for block-level notes (those carry no marker). Used by the resolve
  * path, which only knows the note id; the delete path strips markers inline.
  *
- * @param {number}   noteId                      Note id whose markers to remove.
- * @param {Function} getClientIdsWithDescendants Block-editor selector.
- * @param {Function} getBlockAttributes          Block-editor selector.
- * @param {Function} updateBlockAttributes       Block-editor action.
+ * @param noteId                      Note id whose markers to remove.
+ * @param getClientIdsWithDescendants Block-editor selector.
+ * @param getBlockAttributes          Block-editor selector.
+ * @param updateBlockAttributes       Block-editor action.
  */
 function clearInlineNoteMarker(
-	noteId,
-	getClientIdsWithDescendants,
-	getBlockAttributes,
-	updateBlockAttributes
+	noteId: number,
+	getClientIdsWithDescendants: () => string[],
+	getBlockAttributes: (
+		clientId: string
+	) => BlockAttributes | null | undefined,
+	updateBlockAttributes: (
+		clientId: string,
+		attributes: BlockAttributes
+	) => void
 ) {
 	for ( const clientId of getClientIdsWithDescendants() ) {
 		const attributes = getBlockAttributes( clientId );
@@ -280,7 +311,7 @@ function clearInlineNoteMarker(
 			continue;
 		}
 		const next = removeNoteFormat(
-			attributes[ found.attributeKey ],
+			attributes?.[ found.attributeKey ],
 			noteId
 		);
 		if ( next ) {
@@ -304,10 +335,14 @@ export function useNoteActions() {
 	} = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	const onError = ( error ) => {
+	const onError = ( error: unknown ) => {
+		const { message, code } = ( error ?? {} ) as {
+			message?: string;
+			code?: string;
+		};
 		const errorMessage =
-			error.message && error.code !== 'unknown_error'
-				? decodeEntities( error.message )
+			message && code !== 'unknown_error'
+				? decodeEntities( message )
 				: __( 'An error occurred while performing an update.' );
 		createNotice( 'error', errorMessage, {
 			type: 'snackbar',
@@ -320,7 +355,7 @@ export function useNoteActions() {
 	// both - the selected block as a block-level anchor. Read *before* the async
 	// save because focus (and the stored selection) can shift during the
 	// round-trip; each text segment's marker is the note's only durable anchor.
-	const readNoteSegments = () => {
+	const readNoteSegments = (): NoteSegment[] => {
 		const inline = readInlineSelection(
 			getSelectionStart,
 			getSelectionEnd
@@ -343,7 +378,13 @@ export function useNoteActions() {
 			: [];
 	};
 
-	const onCreate = async ( { content, parent } ) => {
+	const onCreate = async ( {
+		content,
+		parent,
+	}: {
+		content: string;
+		parent?: number;
+	} ) => {
 		try {
 			// Prefer segments captured at trigger time (multi-block notes,
 			// whose cross-block selection collapses once the form is focused);
@@ -353,7 +394,9 @@ export function useNoteActions() {
 						registry.select( editorStore )
 				  ).getPendingNoteSegments()
 				: null;
-			const segments = ! parent ? captured ?? readNoteSegments() : [];
+			const segments: NoteSegment[] = ! parent
+				? captured ?? readNoteSegments()
+				: [];
 			// Consume the stashed segments so a later single-block or inline note
 			// can't inherit this note's cross-block anchor.
 			if ( ! parent && captured ) {
@@ -387,7 +430,7 @@ export function useNoteActions() {
 						continue;
 					}
 					const attributes = getBlockAttributes( clientId );
-					const newAttributes = {
+					const newAttributes: BlockAttributes = {
 						metadata: cleanEmptyObject(
 							addNoteIdToMetadata(
 								attributes?.metadata,
@@ -399,7 +442,7 @@ export function useNoteActions() {
 					// Text segments also carry the marker so the anchor survives
 					// later edits; edge/interior blocks with no range stay
 					// block-level (metadata only).
-					if ( attributeKey ) {
+					if ( attributeKey && start !== null && end !== null ) {
 						const wrapped = wrapInlineNote(
 							attributes?.[ attributeKey ],
 							savedRecord.id,
@@ -416,6 +459,8 @@ export function useNoteActions() {
 			}
 
 			createNotice(
+				// @ts-expect-error The notices types don't cover the custom
+				// 'snackbar' status used here.
 				'snackbar',
 				parent ? __( 'Reply added.' ) : __( 'Note added.' ),
 				{
@@ -429,9 +474,17 @@ export function useNoteActions() {
 		}
 	};
 
-	const onEdit = async ( { id, content, status } ) => {
+	const onEdit = async ( {
+		id,
+		content,
+		status,
+	}: {
+		id: number;
+		content?: string;
+		status?: string;
+	} ) => {
 		const messageType = status ? status : 'updated';
-		const messages = {
+		const messages: Record< string, string > = {
 			approved: __( 'Note marked as resolved.' ),
 			hold: __( 'Note reopened.' ),
 			updated: __( 'Note updated.' ),
@@ -493,6 +546,8 @@ export function useNoteActions() {
 			}
 
 			createNotice(
+				// @ts-expect-error The notices types don't cover the custom
+				// 'snackbar' status used here.
 				'snackbar',
 				messages[ messageType ] ?? __( 'Note updated.' ),
 				{
@@ -505,9 +560,12 @@ export function useNoteActions() {
 		}
 	};
 
-	const onDelete = async ( note ) => {
+	const onDelete = async ( note: Thread ) => {
+		// A saved note's id is always numeric; the 'new' placeholder never
+		// reaches the delete path.
+		const noteId = note.id as number;
 		try {
-			await deleteEntityRecord( 'root', 'comment', note.id, undefined, {
+			await deleteEntityRecord( 'root', 'comment', noteId, undefined, {
 				throwOnError: true,
 			} );
 
@@ -521,24 +579,24 @@ export function useNoteActions() {
 					const attributes = getBlockAttributes( clientId );
 					const hasMetadataId = getNoteIdsFromMetadata(
 						attributes?.metadata
-					).includes( note.id );
-					const found = findNoteInBlock( attributes, note.id );
+					).includes( noteId );
+					const found = findNoteInBlock( attributes, noteId );
 					if ( ! hasMetadataId && ! found ) {
 						continue;
 					}
-					const newAttributes = {};
+					const newAttributes: BlockAttributes = {};
 					if ( hasMetadataId ) {
 						newAttributes.metadata = cleanEmptyObject(
 							removeNoteIdFromMetadata(
 								attributes?.metadata,
-								note.id
+								noteId
 							)
 						);
 					}
 					if ( found ) {
 						const next = removeNoteFormat(
-							attributes[ found.attributeKey ],
-							note.id
+							attributes?.[ found.attributeKey ],
+							noteId
 						);
 						if ( next ) {
 							newAttributes[ found.attributeKey ] = next;
@@ -548,10 +606,16 @@ export function useNoteActions() {
 				}
 			}
 
-			createNotice( 'snackbar', __( 'Note deleted.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
+			createNotice(
+				// @ts-expect-error The notices types don't cover the custom
+				// 'snackbar' status used here.
+				'snackbar',
+				__( 'Note deleted.' ),
+				{
+					type: 'snackbar',
+					isDismissible: true,
+				}
+			);
 		} catch ( error ) {
 			onError( error );
 		}
@@ -584,7 +648,7 @@ export function useEnableFloatingSidebar( enabled = false ) {
 			if (
 				getActiveComplementaryArea( 'core' ) === FLOATING_NOTES_SIDEBAR
 			) {
-				disableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
+				disableComplementaryArea( 'core' );
 			}
 		};
 	}, [ enabled, registry ] );
@@ -595,8 +659,15 @@ export function useFloatingBoard( {
 	selectedNoteId,
 	isFloating,
 	sidebarRef,
+}: {
+	threads: Thread[];
+	selectedNoteId?: number | string;
+	isFloating?: boolean;
+	sidebarRef?: MutableRefObject< HTMLElement | null >;
 } ) {
-	const [ notePositions, setNotePositions ] = useState( {} );
+	const [ notePositions, setNotePositions ] = useState<
+		Record< string, number >
+	>( {} );
 	const [ store ] = useState( createBoardStore );
 
 	const heights = useSyncExternalStore( store.subscribe, store.getSnapshot );

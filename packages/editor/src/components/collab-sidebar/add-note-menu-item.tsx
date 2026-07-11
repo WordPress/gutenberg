@@ -3,10 +3,9 @@
  */
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { privateApis as blockEditorPrivateApis, store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -18,7 +17,15 @@ import { unlock } from '../../lock-unlock';
 
 const { NoteIconSlotFill } = unlock( blockEditorPrivateApis );
 
-function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
+function NoteMenuItem( {
+	clientId,
+	onClick,
+	isDistractionFree,
+}: {
+	clientId?: string;
+	onClick?: () => void;
+	isDistractionFree?: boolean;
+} ) {
 	const block = useSelect(
 		( select ) => {
 			return select( blockEditorStore ).getBlock( clientId );
@@ -56,7 +63,7 @@ function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
 			aria-haspopup="dialog"
 			disabled={ isDisabled }
 			info={ infoText }
-			shortcut={ shortcut }
+			shortcut={ shortcut ?? undefined }
 		>
 			{ __( 'Add note' ) }
 		</MenuItem>
@@ -69,12 +76,18 @@ function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
  * that opens the form for the whole range. It shows the same new-note shortcut,
  * which also targets the selection when several blocks are selected.
  *
- * @param {Object}   props
- * @param {Function} props.onClick           Opens the new-note form for the selection.
- * @param {boolean}  props.isDistractionFree Whether distraction-free mode is on.
- * @return {Element} The menu item.
+ * @param props
+ * @param props.onClick           Opens the new-note form for the selection.
+ * @param props.isDistractionFree Whether distraction-free mode is on.
+ * @return The menu item.
  */
-function SelectionNoteMenuItem( { onClick, isDistractionFree } ) {
+function SelectionNoteMenuItem( {
+	onClick,
+	isDistractionFree,
+}: {
+	onClick?: () => void;
+	isDistractionFree?: boolean;
+} ) {
 	const shortcut = useSelect(
 		( select ) =>
 			select( keyboardShortcutsStore ).getShortcutRepresentation(
@@ -93,7 +106,7 @@ function SelectionNoteMenuItem( { onClick, isDistractionFree } ) {
 					? __( 'Notes are disabled in distraction free mode.' )
 					: undefined
 			}
-			shortcut={ shortcut }
+			shortcut={ shortcut ?? undefined }
 		>
 			{ __( 'Add note' ) }
 		</MenuItem>
@@ -104,15 +117,27 @@ export function AddNoteMenuItem( {
 	onClick,
 	onClickSelection,
 	isDistractionFree,
+}: {
+	onClick?: ( clientId: string ) => void;
+	onClickSelection?: () => void;
+	isDistractionFree?: boolean;
 } ) {
 	return (
 		<NoteIconSlotFill.Fill>
-			{ ( { clientId, count, onClose } ) =>
+			{ ( {
+				clientId,
+				count,
+				onClose,
+			}: {
+				clientId: string;
+				count: number;
+				onClose: () => void;
+			} ) =>
 				count > 1 ? (
 					<SelectionNoteMenuItem
 						isDistractionFree={ isDistractionFree }
 						onClick={ () => {
-							onClickSelection();
+							onClickSelection?.();
 							onClose();
 						} }
 					/>
@@ -121,7 +146,7 @@ export function AddNoteMenuItem( {
 						clientId={ clientId }
 						isDistractionFree={ isDistractionFree }
 						onClick={ () => {
-							onClick( clientId );
+							onClick?.( clientId );
 							onClose();
 						} }
 					/>

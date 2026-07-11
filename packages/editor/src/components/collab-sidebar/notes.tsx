@@ -1,14 +1,18 @@
 /**
+ * External dependencies
+ */
+import type { CSSProperties, KeyboardEvent, MutableRefObject } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Stack } from '@wordpress/ui';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -21,13 +25,24 @@ import {
 	pickPrimaryNote,
 	selectNoteBlocks,
 } from './utils';
+import type { Thread } from './utils';
 import { useFloatingBoard, useNoteActions } from './hooks';
 import { AddNote } from './add-note';
 import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
+export function Notes( {
+	notes,
+	sidebarRef,
+	isFloating = false,
+	styles,
+}: {
+	notes: Thread[];
+	sidebarRef: MutableRefObject< HTMLElement | null >;
+	isFloating?: boolean;
+	styles?: CSSProperties;
+} ) {
 	const {
 		onCreate: onAddReply,
 		onEdit: onEditNote,
@@ -85,13 +100,13 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		if ( ! isFloating || selectedNote !== 'new' ) {
 			return notes;
 		}
-		const newNoteThread = {
+		const newNoteThread: Thread = {
 			id: 'new',
 			blockClientId: selectedBlockClientId,
 			content: { rendered: '' },
 		};
-		const out = [];
-		orderedBlockIds.forEach( ( blockId ) => {
+		const out: Thread[] = [];
+		orderedBlockIds.forEach( ( blockId: string ) => {
 			// Blocks can carry multiple notes — surface them all.
 			const threadsForBlock = notes.filter(
 				( t ) => t.blockClientId === blockId
@@ -112,7 +127,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		orderedBlockIds,
 	] );
 
-	const handleDelete = async ( note ) => {
+	const handleDelete = async ( note: Thread ) => {
 		const currentIndex = threads.findIndex( ( t ) => t.id === note.id );
 		const nextThread = threads[ currentIndex + 1 ];
 		const prevThread = threads[ currentIndex - 1 ];
@@ -150,7 +165,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 	const targetNoteId = useMemo( () => {
 		const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 		const blockThreads = notes.filter( ( t ) =>
-			blockNoteIds.includes( t.id )
+			blockNoteIds.includes( t.id as number )
 		);
 		return pickPrimaryNote( blockThreads )?.id;
 	}, [ noteId, notes ] );
@@ -191,7 +206,11 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 
-	const navigate = ( event, thread, isSelected ) => {
+	const navigate = (
+		event: KeyboardEvent< HTMLElement >,
+		thread: Thread,
+		isSelected: boolean
+	) => {
 		if ( event.defaultPrevented ) {
 			return;
 		}
@@ -258,7 +277,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			direction="column"
 			gap="md"
 			justify="flex-start"
-			ref={ ( node ) => {
+			ref={ ( node: HTMLElement | null ) => {
 				// Sometimes previous sidebar unmounts after the new one mounts.
 				// This ensures we always have the latest reference.
 				if ( node ) {

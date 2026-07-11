@@ -1081,7 +1081,7 @@ test.describe( 'Block Notes', () => {
 
 	test.describe( 'Inline notes', () => {
 		// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
-		// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
+		// collab-sidebar/utils.ts. Duplicated so the test fails loudly if the
 		// palette is changed without updating the e2e expectation.
 		const AVATAR_BORDER_COLORS = [
 			'#C36EFF',

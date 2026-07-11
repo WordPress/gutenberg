@@ -2,15 +2,83 @@
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
-import { create, RichTextData } from '@wordpress/rich-text';
+import { create, RichTextData, toHTMLString } from '@wordpress/rich-text';
+import type { RichTextValue } from '@wordpress/rich-text';
+
+/**
+ * Block attributes, keyed by attribute name.
+ */
+export type BlockAttributes = Record< string, any >;
+
+/**
+ * A note comment record, as returned by the comments REST endpoint and
+ * materialized by `useNoteThreads` (replies and block anchors attached).
+ * The pending new-note placeholder uses the `'new'` id.
+ */
+export interface Thread {
+	id: number | 'new';
+	parent?: number;
+	status?: string;
+	content?: { rendered?: string; raw?: string };
+	author?: number;
+	author_name?: string;
+	blockClientId?: string | null;
+	blockClientIds?: string[];
+	reply?: Thread[];
+	[ key: string ]: any;
+}
+
+/**
+ * A block-editor selection endpoint, as returned by `getSelectionStart` /
+ * `getSelectionEnd`.
+ */
+export interface NoteSelectionPoint {
+	clientId?: string;
+	attributeKey?: string;
+	offset?: number;
+}
+
+/**
+ * One block's share of a note anchor: the attribute and character range a
+ * `core/note` marker should cover, or a block-level anchor when
+ * `attributeKey` is null.
+ */
+export interface NoteSegment {
+	clientId: string;
+	attributeKey: string | null;
+	start: number | null;
+	end: number | null;
+}
+
+/**
+ * The block-editor selectors `readMultiBlockSelection` reads.
+ */
+export interface MultiBlockSelectionSelectors {
+	getSelectionStart: () => NoteSelectionPoint | undefined;
+	getSelectionEnd: () => NoteSelectionPoint | undefined;
+	getSelectedBlockClientIds: () => string[];
+	getBlockAttributes: (
+		clientId: string
+	) => BlockAttributes | null | undefined;
+}
+
+/**
+ * A rich-text format entry for a `core/note` marker. The rich-text package
+ * doesn't export its format type, and its declared shape omits the
+ * `attributes` bag the runtime carries.
+ */
+export type NoteMarkerFormat = {
+	type: string;
+	attributes?: Record< string, string >;
+};
 
 /**
  * Sanitizes a note string by trimming leading and trailing whitespace.
  *
- * @param {string} str - The note string to sanitize.
- * @return {string} - The sanitized note string.
+ * @param str The note string to sanitize.
+ * @return The sanitized note string.
  */
-export function sanitizeNoteContent( str ) {
+export function sanitizeNoteContent( str: string ): string {
 	return str.trim();
 }
 
@@ -38,21 +106,24 @@ const AVATAR_BORDER_COLORS = [
  * Always returns a 6-digit `#RRGGBB` hex string; callers (e.g. the highlight
  * styles) rely on this format to append alpha suffixes.
  *
- * @param {number} userId - The user ID.
- * @return {string} - The border color as a `#RRGGBB` hex string.
+ * @param userId The user ID.
+ * @return The border color as a `#RRGGBB` hex string.
  */
-export function getAvatarBorderColor( userId ) {
+export function getAvatarBorderColor( userId: number ): string {
 	return AVATAR_BORDER_COLORS[ userId % AVATAR_BORDER_COLORS.length ];
 }
 
 /**
  * Generates a note excerpt from text based on word count type and length.
  *
- * @param {string} text          - The note text to generate excerpt from.
- * @param {number} excerptLength - The maximum length for the note excerpt.
- * @return {string} - The generated note excerpt.
+ * @param text          The note text to generate excerpt from.
+ * @param excerptLength The maximum length for the note excerpt.
+ * @return The generated note excerpt.
  */
-export function getNoteExcerpt( text, excerptLength = 10 ) {
+export function getNoteExcerpt(
+	text: string | null | undefined,
+	excerptLength: number = 10
+): string {
 	if ( ! text ) {
 		return '';
 	}
@@ -99,13 +170,15 @@ export function getNoteExcerpt( text, excerptLength = 10 ) {
  * preserving insertion order. Handles both scalar (legacy, possibly
  * string-typed) and array (new) values.
  *
- * @param {Object} metadata Block metadata object
- * @return {number[]} Array of note IDs (may be empty)
+ * @param metadata Block metadata object
+ * @return Array of note IDs (may be empty)
  */
-export function getNoteIdsFromMetadata( metadata ) {
+export function getNoteIdsFromMetadata(
+	metadata: BlockAttributes | null | undefined
+): number[] {
 	const noteId = metadata?.noteId;
 	const raw = Array.isArray( noteId ) ? noteId : [ noteId ];
-	const ids = new Set();
+	const ids = new Set< number >();
 	for ( const value of raw ) {
 		const id = Number( value );
 		if ( Number.isFinite( id ) && id > 0 ) {
@@ -119,15 +192,18 @@ export function getNoteIdsFromMetadata( metadata ) {
  * Adds a note ID to the metadata.
  * Converts scalar to array if needed, otherwise appends.
  *
- * @param {Object} metadata Existing block metadata
- * @param {number} noteId   Note ID to add
- * @return {Object} Updated metadata object
+ * @param metadata Existing block metadata
+ * @param noteId   Note ID to add
+ * @return Updated metadata object
  */
-export function addNoteIdToMetadata( metadata, noteId ) {
+export function addNoteIdToMetadata(
+	metadata: BlockAttributes | null | undefined,
+	noteId: number | string
+): BlockAttributes {
 	const ids = new Set( getNoteIdsFromMetadata( metadata ) );
 	const id = Number( noteId );
 	if ( ids.has( id ) ) {
-		return metadata;
+		return metadata as BlockAttributes;
 	}
 	ids.add( id );
 	return { ...metadata, noteId: [ ...ids ] };
@@ -140,11 +216,14 @@ const NOTE_FORMAT_TYPE = 'core/note';
  * return its character range. Used to derive an inline note's anchor from
  * the in-content marker (resilient to edits) rather than stale offset meta.
  *
- * @param {*}             value  Block attribute value (RichTextData, string, or other).
- * @param {number|string} noteId Note id to search for.
- * @return {?{start: number, end: number}} Range or null when no marker is found.
+ * @param value  Block attribute value (RichTextData, string, or other).
+ * @param noteId Note id to search for.
+ * @return Range or null when no marker is found.
  */
-export function findNoteRange( value, noteId ) {
+export function findNoteRange(
+	value: unknown,
+	noteId: number | string | null | undefined
+): { start: number; end: number } | null {
 	if ( noteId === undefined || noteId === null ) {
 		return null;
 	}
@@ -162,7 +241,9 @@ export function findNoteRange( value, noteId ) {
 	const formats = record.formats;
 	let start = -1;
 	for ( let i = 0; i < formats.length; i++ ) {
-		const stack = formats[ i ];
+		// Format runs are stored sparsely: unformatted positions hold
+		// `undefined` even though the declared type doesn't say so.
+		const stack = formats[ i ] as NoteMarkerFormat[] | undefined;
 		const hit = stack?.find(
 			( f ) =>
 				f.type === NOTE_FORMAT_TYPE &&
@@ -190,11 +271,14 @@ export function findNoteRange( value, noteId ) {
  * the block, and the attribute that holds it is discovered here rather than
  * stored separately. Returns the matching attribute key and the marker range.
  *
- * @param {?Object}       attributes Block attributes, or null/undefined when unloaded.
- * @param {number|string} noteId     Note id to search for.
- * @return {?{attributeKey: string, start: number, end: number}} Anchor or null when no marker is found.
+ * @param attributes Block attributes, or null/undefined when unloaded.
+ * @param noteId     Note id to search for.
+ * @return Anchor or null when no marker is found.
  */
-export function findNoteInBlock( attributes, noteId ) {
+export function findNoteInBlock(
+	attributes: BlockAttributes | null | undefined,
+	noteId: number | string | null | undefined
+): { attributeKey: string; start: number; end: number } | null {
 	if ( ! attributes ) {
 		return null;
 	}
@@ -219,11 +303,14 @@ export const BLOCK_LEVEL_NOTE_START = -1;
  * marker carries its id; block-level notes (no marker) sort first within their
  * block via a sentinel.
  *
- * @param {Object}  thread     Materialized thread record (with `.id`).
- * @param {?Object} attributes Block attributes for the thread's block.
- * @return {number} Marker start offset, or `BLOCK_LEVEL_NOTE_START` when there is no inline anchor.
+ * @param thread     Materialized thread record (with `.id`).
+ * @param attributes Block attributes for the thread's block.
+ * @return Marker start offset, or `BLOCK_LEVEL_NOTE_START` when there is no inline anchor.
  */
-export function getInlineMarkerStart( thread, attributes ) {
+export function getInlineMarkerStart(
+	thread: { id?: number | string } | null | undefined,
+	attributes: BlockAttributes | null | undefined
+): number {
 	const found = findNoteInBlock( attributes, thread?.id );
 	return found ? found.start : BLOCK_LEVEL_NOTE_START;
 }
@@ -236,10 +323,12 @@ export function getInlineMarkerStart( thread, attributes ) {
  * `wrapInlineNote` can actually mark. Used to locate the attribute to mark on an
  * interior block that a multi-block note selection fully covers.
  *
- * @param {?Object} attributes Block attributes.
- * @return {?string} Attribute key, or null when the block has no rich-text field.
+ * @param attributes Block attributes.
+ * @return Attribute key, or null when the block has no rich-text field.
  */
-export function findRichTextAttributeKey( attributes ) {
+export function findRichTextAttributeKey(
+	attributes: BlockAttributes | null | undefined
+): string | null {
 	if ( ! attributes ) {
 		return null;
 	}
@@ -255,10 +344,10 @@ export function findRichTextAttributeKey( attributes ) {
  * Character length of a rich-text attribute value (RichTextData or HTML string),
  * i.e. the number of markable positions. Returns 0 for non-text values.
  *
- * @param {*} value Block attribute value.
- * @return {number} Text length.
+ * @param value Block attribute value.
+ * @return Text length.
  */
-function getAttributeTextLength( value ) {
+function getAttributeTextLength( value: unknown ): number {
 	let html = null;
 	if ( value instanceof RichTextData ) {
 		html = value.toHTMLString();
@@ -290,19 +379,19 @@ function getAttributeTextLength( value ) {
  * those via `readInlineSelection`) and for selections spanning different roots
  * (`getSelectedBlockClientIds` is empty across roots).
  *
- * @param {Object}   selectors
- * @param {Function} selectors.getSelectionStart         Block-editor selector.
- * @param {Function} selectors.getSelectionEnd           Block-editor selector.
- * @param {Function} selectors.getSelectedBlockClientIds Ordered client ids in the selection.
- * @param {Function} selectors.getBlockAttributes        Block-editor selector.
- * @return {?Array<{clientId: string, attributeKey: ?string, start: ?number, end: ?number}>} Ordered segments or null.
+ * @param selectors                           Block-editor selectors.
+ * @param selectors.getSelectionStart         Block-editor selector.
+ * @param selectors.getSelectionEnd           Block-editor selector.
+ * @param selectors.getSelectedBlockClientIds Ordered client ids in the selection.
+ * @param selectors.getBlockAttributes        Block-editor selector.
+ * @return Ordered segments or null.
  */
 export function readMultiBlockSelection( {
 	getSelectionStart,
 	getSelectionEnd,
 	getSelectedBlockClientIds,
 	getBlockAttributes,
-} ) {
+}: MultiBlockSelectionSelectors ): NoteSegment[] | null {
 	const start = getSelectionStart();
 	const end = getSelectionEnd();
 	if (
@@ -324,14 +413,14 @@ export function readMultiBlockSelection( {
 	const head = start.clientId === firstId ? start : end;
 	const tail = start.clientId === firstId ? end : start;
 
-	const segments = [];
+	const segments: NoteSegment[] = [];
 	for ( let i = 0; i < clientIds.length; i++ ) {
 		const clientId = clientIds[ i ];
 		const isFirst = i === 0;
 		const isLast = i === clientIds.length - 1;
 		const attributes = getBlockAttributes( clientId );
 
-		let attributeKey;
+		let attributeKey: string | null | undefined;
 		if ( isFirst && head.attributeKey ) {
 			attributeKey = head.attributeKey;
 		} else if ( isLast && tail.attributeKey ) {
@@ -389,24 +478,35 @@ export function readMultiBlockSelection( {
  * its full range. The returned record is not normalised; callers should
  * round-trip it (e.g. through `RichTextData`) before storing.
  *
- * @param {Object} record A rich-text record (`{ text, formats, … }`).
- * @param {Object} format The `core/note` format to add (`{ type, attributes }`).
- * @param {number} start  Range start (inclusive).
- * @param {number} end    Range end (exclusive).
- * @return {Object} A new record with the note applied.
+ * @param record A rich-text record (`{ text, formats, … }`).
+ * @param format The `core/note` format to add (`{ type, attributes }`).
+ * @param start  Range start (inclusive).
+ * @param end    Range end (exclusive).
+ * @return A new record with the note applied.
  */
-export function applyNoteFormat( record, format, start, end ) {
+export function applyNoteFormat(
+	record: RichTextValue,
+	format: NoteMarkerFormat,
+	start: number,
+	end: number
+): RichTextValue {
 	const formats = record.formats.slice();
 	for ( let i = start; i < end; i++ ) {
-		const stack = formats[ i ] ? formats[ i ].slice() : [];
+		// Format runs are stored sparsely: unformatted positions hold
+		// `undefined` even though the declared type doesn't say so.
+		const stack =
+			( formats[ i ] as NoteMarkerFormat[] | undefined )?.slice() ?? [];
 		stack.push( format );
 		formats[ i ] = stack;
 	}
 
 	// Measure each note's full span so containment can order the markers.
-	const spans = new Map();
+	const spans = new Map<
+		string | undefined,
+		{ start: number; end: number }
+	>();
 	for ( let i = 0; i < formats.length; i++ ) {
-		const stack = formats[ i ];
+		const stack = formats[ i ] as NoteMarkerFormat[] | undefined;
 		if ( ! stack ) {
 			continue;
 		}
@@ -423,7 +523,7 @@ export function applyNoteFormat( record, format, start, end ) {
 			}
 		}
 	}
-	const sizeOf = ( id ) => {
+	const sizeOf = ( id: string | undefined ) => {
 		const span = spans.get( id );
 		return span ? span.end - span.start : 0;
 	};
@@ -432,7 +532,7 @@ export function applyNoteFormat( record, format, start, end ) {
 	// than splitting an outer note around an inner one. Notes sort ahead of
 	// other formats so a note wraps the formatted text it spans.
 	for ( let i = 0; i < formats.length; i++ ) {
-		const stack = formats[ i ];
+		const stack = formats[ i ] as NoteMarkerFormat[] | undefined;
 		if ( ! stack || stack.length < 2 ) {
 			continue;
 		}
@@ -463,39 +563,46 @@ export function applyNoteFormat( record, format, start, end ) {
  * would wipe co-located notes; this filters by `data-id` to drop only the target
  * marker.
  *
- * @param {*}             value  Block attribute value (RichTextData or other).
- * @param {number|string} noteId Note id whose marker should be removed.
- * @return {?RichTextData} A new value with the marker removed, or null when the
- *                         attribute isn't rich text or carries no such marker.
+ * @param value  Block attribute value (RichTextData or other).
+ * @param noteId Note id whose marker should be removed.
+ * @return A new value with the marker removed, or null when the
+ *         attribute isn't rich text or carries no such marker.
  */
-export function removeNoteFormat( value, noteId ) {
+export function removeNoteFormat(
+	value: unknown,
+	noteId: number | string
+): RichTextData | null {
 	if ( ! ( value instanceof RichTextData ) ) {
 		return null;
 	}
 	const target = String( noteId );
 	const record = create( { html: value.toHTMLString() } );
 	let changed = false;
-	const formats = record.formats.map( ( stack ) => {
-		if ( ! stack ) {
-			return stack;
+	// Format runs are stored sparsely (`undefined` at unformatted positions)
+	// even though the declared type doesn't say so; preserve the holes.
+	const formats = record.formats.map(
+		( stack: NoteMarkerFormat[] | undefined ) => {
+			if ( ! stack ) {
+				return stack;
+			}
+			const filtered = stack.filter(
+				( format ) =>
+					! (
+						format.type === NOTE_FORMAT_TYPE &&
+						format.attributes?.[ 'data-id' ] === target
+					)
+			);
+			if ( filtered.length === stack.length ) {
+				return stack;
+			}
+			changed = true;
+			return filtered.length ? filtered : undefined;
 		}
-		const filtered = stack.filter(
-			( format ) =>
-				! (
-					format.type === NOTE_FORMAT_TYPE &&
-					format.attributes?.[ 'data-id' ] === target
-				)
-		);
-		if ( filtered.length === stack.length ) {
-			return stack;
-		}
-		changed = true;
-		return filtered.length ? filtered : undefined;
-	} );
+	) as RichTextValue[ 'formats' ];
 	// Round-trip through HTML so the stored value matches a fresh reload.
 	return changed
 		? RichTextData.fromHTMLString(
-				new RichTextData( { ...record, formats } ).toHTMLString()
+				toHTMLString( { value: { ...record, formats } } )
 		  )
 		: null;
 }
@@ -503,10 +610,10 @@ export function removeNoteFormat( value, noteId ) {
 /**
  * Picks the most relevant thread from a list: first unresolved, else first.
  *
- * @param {Array} threads Ordered list of thread objects.
- * @return {Object|null} Selected thread or null when the list is empty.
+ * @param threads Ordered list of thread objects.
+ * @return Selected thread or null when the list is empty.
  */
-export function pickPrimaryNote( threads ) {
+export function pickPrimaryNote( threads: Thread[] ): Thread | null {
 	return (
 		threads.find( ( thread ) => thread.status === 'hold' ) ??
 		threads[ 0 ] ??
@@ -522,15 +629,30 @@ export function pickPrimaryNote( threads ) {
  * Selection never moves focus into the canvas: `selectBlock` and `multiSelect`
  * both treat a `null` initial position as "don't focus".
  *
- * @param {Object}   thread              Root thread with `blockClientIds`.
- * @param {Object}   actions             Block editor actions.
- * @param {Function} actions.selectBlock
- * @param {Function} actions.multiSelect
+ * @param thread              Root thread with `blockClientIds`.
+ * @param actions             Block editor actions.
+ * @param actions.selectBlock
+ * @param actions.multiSelect
  */
-export function selectNoteBlocks( thread, { selectBlock, multiSelect } ) {
+export function selectNoteBlocks(
+	thread: Thread,
+	{
+		selectBlock,
+		multiSelect,
+	}: {
+		selectBlock: ( clientId: string, initialPosition?: unknown ) => void;
+		multiSelect: (
+			start: string,
+			end: string,
+			initialPosition?: unknown
+		) => void;
+	}
+) {
 	const clientIds = thread?.blockClientIds?.length
 		? thread.blockClientIds
-		: [ thread?.blockClientId ].filter( Boolean );
+		: [ thread?.blockClientId ].filter(
+				( id ): id is string => typeof id === 'string'
+		  );
 
 	if ( clientIds.length === 0 ) {
 		return;
@@ -550,11 +672,14 @@ export function selectNoteBlocks( thread, { selectBlock, multiSelect } ) {
 /**
  * Removes a note ID from the metadata.
  *
- * @param {Object} metadata Existing block metadata
- * @param {number} noteId   Note ID to remove
- * @return {Object} Updated metadata object
+ * @param metadata Existing block metadata
+ * @param noteId   Note ID to remove
+ * @return Updated metadata object
  */
-export function removeNoteIdFromMetadata( metadata, noteId ) {
+export function removeNoteIdFromMetadata(
+	metadata: BlockAttributes | null | undefined,
+	noteId: number | string
+): BlockAttributes {
 	const ids = new Set( getNoteIdsFromMetadata( metadata ) );
 	ids.delete( Number( noteId ) );
 	return {
@@ -568,13 +693,13 @@ export function removeNoteIdFromMetadata( metadata, noteId ) {
  * editor's content coordinate space. Adjusts positions to prevent overlapping
  * by pushing threads above the selected one upward and threads below it downward.
  *
- * @param {Object}                  params
- * @param {Array}                   params.threads        Ordered list of thread objects.
- * @param {string|number|undefined} params.selectedNoteId ID of the currently selected thread.
- * @param {Object<string,DOMRect>}  params.blockRects     Pre-read bounding rects keyed by thread ID.
- * @param {Object<string,number>}   params.heights        Rendered heights keyed by thread ID.
- * @param {number}                  params.scrollTop      Current scroll offset of the editor content.
- * @return {{ positions: Object<string,number> }} Computed top positions.
+ * @param params
+ * @param params.threads        Ordered list of thread objects.
+ * @param params.selectedNoteId ID of the currently selected thread.
+ * @param params.blockRects     Pre-read bounding rects keyed by thread ID.
+ * @param params.heights        Rendered heights keyed by thread ID.
+ * @param params.scrollTop      Current scroll offset of the editor content.
+ * @return Computed top positions.
  */
 export function calculateNotePositions( {
 	threads,
@@ -582,8 +707,14 @@ export function calculateNotePositions( {
 	blockRects,
 	heights,
 	scrollTop = 0,
-} ) {
-	const offsets = {};
+}: {
+	threads: Thread[];
+	selectedNoteId?: number | string;
+	blockRects: Record< string, Pick< DOMRect, 'top' > >;
+	heights: Record< string, number >;
+	scrollTop?: number;
+} ): { positions: Record< string, number > } {
+	const offsets: Record< string, number > = {};
 
 	const anchorIndex = Math.max(
 		0,
@@ -658,7 +789,7 @@ export function calculateNotePositions( {
 
 	// blockRect.top + scrollTop is the block's absolute y within the editor's
 	// scroll content; CSS translates each thread by -scrollTop at render time.
-	const positions = {};
+	const positions: Record< string, number > = {};
 	for ( const thread of threads ) {
 		const blockRect = blockRects[ thread.id ];
 		if ( blockRect && offsets[ thread.id ] !== undefined ) {
@@ -674,12 +805,16 @@ export function calculateNotePositions( {
  * Resolve the DOM element for a note thread once it's mounted,
  * or `null` if not found within 3 seconds.
  *
- * @param {string}       noteId             Note thread ID.
- * @param {?HTMLElement} container          Container to search within.
- * @param {string}       additionalSelector Optional descendant selector.
- * @return {Promise<HTMLElement|null>} Resolved element, or `null` on timeout.
+ * @param noteId             Note thread ID.
+ * @param container          Container to search within.
+ * @param additionalSelector Optional descendant selector.
+ * @return Resolved element, or `null` on timeout.
  */
-function findNoteThread( noteId, container, additionalSelector ) {
+function findNoteThread(
+	noteId: number | string | undefined,
+	container: HTMLElement | null | undefined,
+	additionalSelector?: string
+): Promise< HTMLElement | null > {
 	if ( ! container ) {
 		return Promise.resolve( null );
 	}
@@ -695,23 +830,26 @@ function findNoteThread( noteId, container, additionalSelector ) {
 
 	return new Promise( ( resolve ) => {
 		if ( container.querySelector( selector ) ) {
-			return resolve( container.querySelector( selector ) );
+			return resolve(
+				container.querySelector< HTMLElement >( selector )
+			);
 		}
 
-		let timer = null;
+		// `0` is a safe placeholder id: `clearTimeout` ignores unknown ids.
+		let timer = 0;
 		// Wait for the element to be added to the DOM.
 		const observer = new window.MutationObserver( () => {
 			if ( container.querySelector( selector ) ) {
 				clearTimeout( timer );
 				observer.disconnect();
-				resolve( container.querySelector( selector ) );
+				resolve( container.querySelector< HTMLElement >( selector ) );
 			}
 		} );
 
 		observer.observe( container, { childList: true, subtree: true } );
 
 		// Stop trying after 3 seconds.
-		timer = setTimeout( () => {
+		timer = window.setTimeout( () => {
 			observer.disconnect();
 			resolve( null );
 		}, 3000 );
@@ -721,11 +859,15 @@ function findNoteThread( noteId, container, additionalSelector ) {
 /**
  * Focus a note thread (or a descendant) and scroll it into view.
  *
- * @param {string}       noteId             Note thread ID.
- * @param {?HTMLElement} container          Container to search within.
- * @param {string}       additionalSelector Optional descendant selector.
+ * @param noteId             Note thread ID.
+ * @param container          Container to search within.
+ * @param additionalSelector Optional descendant selector.
  */
-export function focusNoteThread( noteId, container, additionalSelector ) {
+export function focusNoteThread(
+	noteId: number | string | undefined,
+	container: HTMLElement | null | undefined,
+	additionalSelector?: string
+) {
 	return findNoteThread( noteId, container, additionalSelector ).then(
 		( element ) => {
 			if ( ! element ) {
@@ -740,10 +882,13 @@ export function focusNoteThread( noteId, container, additionalSelector ) {
 /**
  * Scroll a note thread into view without changing focus.
  *
- * @param {string}       noteId    Note thread ID.
- * @param {?HTMLElement} container Container to search within.
+ * @param noteId    Note thread ID.
+ * @param container Container to search within.
  */
-export function scrollNoteThreadIntoView( noteId, container ) {
+export function scrollNoteThreadIntoView(
+	noteId: number | string | undefined,
+	container: HTMLElement | null | undefined
+) {
 	return findNoteThread( noteId, container ).then( ( element ) => {
 		element?.scrollIntoView( { block: 'nearest' } );
 	} );

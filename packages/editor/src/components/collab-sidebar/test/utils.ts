@@ -30,7 +30,7 @@ import {
 	getInlineMarkerStart,
 } from '../utils';
 
-function makeRect( top ) {
+function makeRect( top: number ) {
 	return { top };
 }
 
@@ -750,14 +750,17 @@ describe( 'applyNoteFormat', () => {
 		}
 	} );
 
-	const note = ( id ) => ( {
+	const note = ( id: number | string ) => ( {
 		type: FORMAT_NAME,
 		attributes: { 'data-id': String( id ) },
 	} );
 
 	// Apply a sequence of [ id, start, end ] notes, then round-trip through HTML
 	// to a normalised value (matching how wrapInlineNote stores the result).
-	const applyAll = ( html, ops ) => {
+	const applyAll = (
+		html: string,
+		ops: Array< [ number, number, number ] >
+	) => {
 		let record = create( { html } );
 		for ( const [ id, start, end ] of ops ) {
 			record = applyNoteFormat( record, note( id ), start, end );
@@ -969,7 +972,7 @@ describe( 'removeNoteFormat', () => {
 		const value = RichTextData.fromHTMLString(
 			'the <mark class="wp-note" data-id="7">quick</mark> brown fox'
 		);
-		expect( removeNoteFormat( value, 7 ).toHTMLString() ).toBe(
+		expect( removeNoteFormat( value, 7 )?.toHTMLString() ).toBe(
 			'the quick brown fox'
 		);
 	} );
@@ -990,13 +993,13 @@ describe( 'removeNoteFormat', () => {
 			removeNoteFormat(
 				RichTextData.fromHTMLString( html ),
 				5
-			).toHTMLString()
+			)?.toHTMLString()
 		).toBe( 'a b c' );
 		expect(
 			removeNoteFormat(
 				RichTextData.fromHTMLString( html ),
 				'5'
-			).toHTMLString()
+			)?.toHTMLString()
 		).toBe( 'a b c' );
 	} );
 } );
@@ -1025,8 +1028,20 @@ describe( 'readMultiBlockSelection', () => {
 	// Build a selectors bag from a per-block spec:
 	// blocks: [ { clientId, content } ] in document order,
 	// start/end: { clientId, attributeKey, offset }.
-	function makeSelectors( { blocks, start, end } ) {
-		const attributesByClientId = {};
+	function makeSelectors( {
+		blocks,
+		start,
+		end,
+	}: {
+		blocks: Array< {
+			clientId: string;
+			content?: string;
+			attributes?: Record< string, any >;
+		} >;
+		start: { clientId: string; attributeKey: string; offset: number };
+		end: { clientId: string; attributeKey: string; offset: number };
+	} ) {
+		const attributesByClientId: Record< string, any > = {};
 		for ( const block of blocks ) {
 			attributesByClientId[ block.clientId ] = block.attributes ?? {
 				content: RichTextData.fromHTMLString( block.content ),
@@ -1037,7 +1052,7 @@ describe( 'readMultiBlockSelection', () => {
 			getSelectionEnd: () => end,
 			getSelectedBlockClientIds: () =>
 				blocks.map( ( block ) => block.clientId ),
-			getBlockAttributes: ( clientId ) =>
+			getBlockAttributes: ( clientId: string ) =>
 				attributesByClientId[ clientId ],
 		};
 	}
@@ -1064,7 +1079,7 @@ describe( 'readMultiBlockSelection', () => {
 				offset: 2,
 			} ),
 			// Empty across roots.
-			getSelectedBlockClientIds: () => [],
+			getSelectedBlockClientIds: (): string[] => [],
 			getBlockAttributes: () => ( {} ),
 		};
 		expect( readMultiBlockSelection( selectors ) ).toBe( null );
