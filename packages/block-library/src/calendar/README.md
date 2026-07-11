@@ -27,6 +27,9 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
+- [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - `margin`: `true`
+  - `padding`: `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
@@ -38,6 +41,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
 - **border**: `.wp-block-calendar th, .wp-block-calendar td`
+- **color**:
+  - text: `.wp-block-calendar table`
 
 ## Block Markup
 

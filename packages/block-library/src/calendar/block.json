@@ -21,12 +21,11 @@
 		"html": false,
 		"color": {
 			"link": true,
-			"__experimentalSkipSerialization": [ "text", "background" ],
+			"__experimentalSkipSerialization": [ "text" ],
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
-			},
-			"__experimentalSelector": "table, th"
+			}
 		},
 		"spacing": {
 			"margin": true,
@@ -60,6 +59,9 @@
 	},
 	"style": "wp-block-calendar",
 	"selectors": {
-		"border": ".wp-block-calendar th, .wp-block-calendar td"
+		"border": ".wp-block-calendar th, .wp-block-calendar td",
+		"color": {
+			"text": ".wp-block-calendar table"
+		}
 	}
 }

@@ -20,9 +20,6 @@
 function render_block_core_calendar( $attributes ) {
 	global $monthnum, $year;
 
-	$inline_styles = '';
-	$classnames    = '';
-
 	// Calendar shouldn't be rendered
 	// when there are no published posts on the site.
 	if ( ! block_core_calendar_has_published_posts() ) {
@@ -46,19 +43,14 @@ function render_block_core_calendar( $attributes ) {
 		}
 	}
 
+	// Text color is applied to the table. Background is serialized onto the
+	// wrapper via block supports so padding sits inside the colored area.
 	$color_block_styles = array();
 
-	// Text color.
 	$preset_text_color          = array_key_exists( 'textColor', $attributes ) ? "var:preset|color|{$attributes['textColor']}" : null;
 	$custom_text_color          = $attributes['style']['color']['text'] ?? null;
 	$color_block_styles['text'] = $preset_text_color ? $preset_text_color : $custom_text_color;
 
-	// Background Color.
-	$preset_background_color          = array_key_exists( 'backgroundColor', $attributes ) ? "var:preset|color|{$attributes['backgroundColor']}" : null;
-	$custom_background_color          = $attributes['style']['color']['background'] ?? null;
-	$color_block_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
-
-	// Generate color styles and classes.
 	$styles        = wp_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
 	$inline_styles = $styles['css'] ?? '';
 	$classnames    = empty( $styles['classnames'] ) ? array() : explode( ' ', $styles['classnames'] );
@@ -88,7 +80,7 @@ function render_block_core_calendar( $attributes ) {
 	while ( $processor->next_tag() ) {
 		$tag_name = $processor->get_tag();
 
-		// Apply color classes and styles to the main table.
+		// Apply text color classes and styles to the main table.
 		if ( 'TABLE' === $tag_name ) {
 			if ( ! empty( $inline_styles ) ) {
 				$processor->set_attribute( 'style', $inline_styles );

@@ -16,6 +16,18 @@
 		}
 	}
 
+	// Background is applied to the wrapper so padding sits inside the color.
+	// Inherit onto the table so the grid and caption share that fill.
+	&.has-background {
+		table {
+			background-color: inherit;
+		}
+
+		th {
+			background-color: transparent;
+		}
+	}
+
 	th,
 	td:not(.pad) {
 		padding: 0.25em;
@@ -40,6 +52,6 @@
 }
 
 // Keep the hard-coded header background color for backward compatibility.
-:where(.wp-block-calendar table:not(.has-background) th) {
+:where(.wp-block-calendar:not(.has-background) table:not(.has-background) th) {
 	background: $gray-300;
 }
