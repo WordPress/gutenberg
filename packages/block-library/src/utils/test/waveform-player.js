@@ -26,12 +26,12 @@ jest.mock( '../waveform-utils', () => ( {
 function createFakePlayer( options, element ) {
 	const titleEl = document.createElement( 'span' );
 	titleEl.textContent = options.title ?? '';
-	// The subtitle and artwork elements only exist when the track had an
+	// The artist and artwork elements only exist when the track had an
 	// artist/image when the player was created, mirroring the library markup.
-	let subtitleEl = null;
+	let artistEl = null;
 	if ( options.artist ) {
-		subtitleEl = document.createElement( 'span' );
-		subtitleEl.textContent = options.artist;
+		artistEl = document.createElement( 'span' );
+		artistEl.textContent = options.artist;
 	}
 	let artworkEl = null;
 	if ( options.image ) {
@@ -41,8 +41,8 @@ function createFakePlayer( options, element ) {
 	}
 
 	element.append( titleEl );
-	if ( subtitleEl ) {
-		element.append( subtitleEl );
+	if ( artistEl ) {
+		element.append( artistEl );
 	}
 	if ( artworkEl ) {
 		element.append( artworkEl );
@@ -51,14 +51,14 @@ function createFakePlayer( options, element ) {
 	return {
 		instance: {
 			titleEl,
-			subtitleEl,
+			artistEl,
 			artworkEl,
 			pause: jest.fn(),
 			loadTrack: jest.fn( async ( src, title, artist, trackOptions ) => {
 				titleEl.textContent = title;
-				if ( subtitleEl ) {
-					subtitleEl.textContent = artist;
-					subtitleEl.style.display = artist ? '' : 'none';
+				if ( artistEl ) {
+					artistEl.textContent = artist;
+					artistEl.style.display = artist ? '' : 'none';
 				}
 				if ( artworkEl && trackOptions.artwork ) {
 					artworkEl.src = trackOptions.artwork;
@@ -135,7 +135,7 @@ describe( 'WaveformPlayer', () => {
 		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 1 );
 		expect( player.destroy ).not.toHaveBeenCalled();
 		expect( player.instance.titleEl ).toHaveTextContent( 'New Title' );
-		expect( player.instance.subtitleEl ).toHaveTextContent( 'New Artist' );
+		expect( player.instance.artistEl ).toHaveTextContent( 'New Artist' );
 		expect( player.instance.artworkEl ).toHaveAttribute(
 			'src',
 			'https://example.com/new.jpg'
@@ -234,18 +234,18 @@ describe( 'WaveformPlayer', () => {
 		} );
 
 		const firstPlayer = initWaveformPlayer.mock.results[ 0 ].value;
-		// The editor seeds a hidden subtitle element so artist edits can
+		// The editor seeds a hidden artist element so artist edits can
 		// update in place.
-		expect( firstPlayer.instance.subtitleEl ).toHaveTextContent( '' );
+		expect( firstPlayer.instance.artistEl ).toHaveTextContent( '' );
 
 		rerender( <WaveformPlayer { ...baseProps } artist="New Artist" /> );
 
 		expect( firstPlayer.destroy ).not.toHaveBeenCalled();
 		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 1 );
-		expect( firstPlayer.instance.subtitleEl ).toHaveTextContent(
+		expect( firstPlayer.instance.artistEl ).toHaveTextContent(
 			'New Artist'
 		);
-		expect( firstPlayer.instance.subtitleEl ).not.toHaveStyle( {
+		expect( firstPlayer.instance.artistEl ).not.toHaveStyle( {
 			display: 'none',
 		} );
 	} );
@@ -263,8 +263,8 @@ describe( 'WaveformPlayer', () => {
 
 		expect( player.destroy ).not.toHaveBeenCalled();
 		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 1 );
-		expect( player.instance.subtitleEl ).toHaveTextContent( '' );
-		expect( player.instance.subtitleEl ).toHaveStyle( {
+		expect( player.instance.artistEl ).toHaveTextContent( '' );
+		expect( player.instance.artistEl ).toHaveStyle( {
 			display: 'none',
 		} );
 	} );

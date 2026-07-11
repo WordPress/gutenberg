@@ -15,7 +15,7 @@ describe( 'Playlist block edit utilities', () => {
 				fileLength: '3:45',
 				image: {
 					src: 'https://example.com/cover.jpg',
-					alt: 'A bright abstract album cover',
+					alt: 'A bright abstract track image',
 				},
 			};
 
@@ -29,7 +29,7 @@ describe( 'Playlist block edit utilities', () => {
 				album: 'Great Album',
 				length: '3:45',
 				image: 'https://example.com/cover.jpg',
-				imageAlt: 'A bright abstract album cover',
+				imageAlt: 'A bright abstract track image',
 			} );
 		} );
 

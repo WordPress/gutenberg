@@ -13,7 +13,7 @@ const meta: Meta< typeof Icon > = {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'When rendering SVGs, use `Icon` from `@wordpress/ui` instead.',
+			notes: 'When rendering SVGs, use [`Icon`](?path=/docs/design-system-components-icon--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };

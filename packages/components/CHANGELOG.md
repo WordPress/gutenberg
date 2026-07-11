@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ControlWithError`: Remove redundant inline aria-live region for validation error messages to prevent duplicate announcements. ([#79600](https://github.com/WordPress/gutenberg/pull/79600)).
+
 ### Breaking Changes
 
 -   `ExternalLink`: No longer sets the `rel` attribute by default. Consumers relying on the previous behavior should pass `rel` explicitly ([#79743](https://github.com/WordPress/gutenberg/pull/79743)).
@@ -38,6 +42,7 @@
     -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
     -   `ToggleGroupControl` ([#79656](https://github.com/WordPress/gutenberg/pull/79656))
+-   `Button`: Render the secondary variant's border with a real `border` instead of `box-shadow` ([#79982](https://github.com/WordPress/gutenberg/pull/79982)).
 
 ### Documentation
 
