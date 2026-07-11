@@ -167,16 +167,27 @@ if ( ! function_exists( 'gutenberg_get_note_followers' ) ) {
 	/**
 	 * Returns the user IDs following a note thread.
 	 *
+	 * Followers are stored as one meta row per user so that concurrent
+	 * replies can subscribe users independently, without the lost updates a
+	 * read-modify-write of a single array value would allow.
+	 *
 	 * @param int $root_id Top-level note ID.
 	 * @return list<int> Follower user IDs.
 	 */
 	function gutenberg_get_note_followers( $root_id ) {
-		$followers = get_comment_meta( $root_id, '_wp_note_followers', true );
+		$followers = get_comment_meta( $root_id, '_wp_note_followers' );
 		if ( ! is_array( $followers ) ) {
 			return array();
 		}
 
-		return array_values( array_unique( array_map( 'intval', $followers ), SORT_NUMERIC ) );
+		$followers = array_filter(
+			array_map( 'intval', $followers ),
+			static function ( $user_id ) {
+				return $user_id > 0;
+			}
+		);
+
+		return array_values( array_unique( $followers, SORT_NUMERIC ) );
 	}
 }
 
@@ -191,21 +202,16 @@ if ( ! function_exists( 'gutenberg_add_note_followers' ) ) {
 	 */
 	function gutenberg_add_note_followers( int $root_id, array $user_ids ): array {
 		$followers = gutenberg_get_note_followers( $root_id );
-		$updated   = $followers;
 
 		foreach ( $user_ids as $user_id ) {
 			$user_id = (int) $user_id;
-			if ( $user_id > 0 ) {
-				$updated[] = $user_id;
+			if ( $user_id > 0 && ! in_array( $user_id, $followers, true ) ) {
+				add_comment_meta( $root_id, '_wp_note_followers', $user_id );
+				$followers[] = $user_id;
 			}
 		}
-		$updated = array_values( array_unique( $updated, SORT_NUMERIC ) );
 
-		if ( $updated !== $followers ) {
-			update_comment_meta( $root_id, '_wp_note_followers', $updated );
-		}
-
-		return $updated;
+		return $followers;
 	}
 }
 
@@ -223,19 +229,13 @@ if ( ! function_exists( 'gutenberg_remove_note_followers' ) ) {
 	 * @return list<int> The updated follower list.
 	 */
 	function gutenberg_remove_note_followers( int $root_id, array $user_ids ): array {
-		$followers = gutenberg_get_note_followers( $root_id );
-		$remove    = array_map( 'intval', (array) $user_ids );
-		$updated   = array_values( array_diff( $followers, $remove ) );
-
-		if ( $updated !== $followers ) {
-			if ( $updated ) {
-				update_comment_meta( $root_id, '_wp_note_followers', $updated );
-			} else {
-				delete_comment_meta( $root_id, '_wp_note_followers' );
+		foreach ( array_map( 'intval', (array) $user_ids ) as $user_id ) {
+			if ( $user_id > 0 ) {
+				delete_comment_meta( $root_id, '_wp_note_followers', $user_id );
 			}
 		}
 
-		return $updated;
+		return gutenberg_get_note_followers( $root_id );
 	}
 }
 
@@ -252,14 +252,11 @@ if ( ! function_exists( 'gutenberg_register_note_followers_meta' ) ) {
 			'comment',
 			'_wp_note_followers',
 			array(
-				'type'          => 'array',
+				'type'          => 'integer',
 				'description'   => __( 'User IDs following the note thread.', 'gutenberg' ),
-				'single'        => true,
+				'single'        => false,
 				'show_in_rest'  => array(
-					'schema' => array(
-						'type'  => 'array',
-						'items' => array( 'type' => 'integer' ),
-					),
+					'schema' => array( 'type' => 'integer' ),
 				),
 				'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
 					return current_user_can( 'edit_comment', $object_id );
