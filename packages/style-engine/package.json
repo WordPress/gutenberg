@@ -67,7 +67,7 @@
 		"change-case": "^4.1.2"
 	},
 	"peerDependencies": {
-		"@types/react": "^18.3.27"
+		"@types/react": "^18 || ^19"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {

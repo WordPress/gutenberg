@@ -6,9 +6,17 @@
 
 -   Add an "Attachments" source to the block inserter's Media tab, listing images attached to the current post with the ability to attach and detach them ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
 
+### Enhancements
+
+-   The "View the autosave" notice now opens the autosave in the visual revisions view with its changes highlighted, instead of the classic revisions screen. It falls back to the classic screen when visual revisions are disabled ([#79947](https://github.com/WordPress/gutenberg/pull/79947)).
+
 ### Bug Fixes
 
 -   External images are now sideloaded on the server when uploaded to the media library, via a new `mediaSideloadFromUrl` block editor setting, so the upload works when the editor is cross-origin isolated (e.g. with client-side media processing enabled) ([#79409](https://github.com/WordPress/gutenberg/pull/79409)).
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
 ## 14.50.0 (2026-07-01)
 
