@@ -20,6 +20,7 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { getBlockClientId } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
+import { getCollapsedSelectionPayload } from './utils';
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
@@ -171,7 +172,7 @@ export default function useArrowNav() {
 		hasMultiSelection,
 		__unstableIsFullySelected,
 	} = useSelect( blockEditorStore );
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, selectionChange } = useDispatch( blockEditorStore );
 	return useRefEffect( ( node ) => {
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
@@ -189,6 +190,39 @@ export default function useArrowNav() {
 				node
 			);
 			return closestTabbable && getBlockClientId( closestTabbable );
+		}
+
+		/**
+		 * Synchronizes the store selection with the caret that was just
+		 * placed in another block, like the focus event used to. The store
+		 * would otherwise only learn about the crossing from the
+		 * asynchronous `selectionchange` event, and anything consuming the
+		 * store selection (or a value rendered from it) before that event
+		 * is processed acts on the block the caret came from.
+		 *
+		 * @param {HTMLElement} destination The element the caret was placed
+		 *                                  in.
+		 */
+		function syncCrossBlockSelection( destination ) {
+			const selection = node.ownerDocument.defaultView.getSelection();
+
+			if ( ! selection.rangeCount ) {
+				return;
+			}
+
+			// The placement may not produce a text selection (e.g. a
+			// focusable block without text): the selection still points at
+			// where the caret came from, and focus handling selects the
+			// destination block instead.
+			if ( ! destination.contains( selection.anchorNode ) ) {
+				return;
+			}
+
+			const payload = getCollapsedSelectionPayload( selection );
+
+			if ( payload ) {
+				selectionChange( payload );
+			}
 		}
 
 		function onKeyDown( event ) {
@@ -302,6 +336,7 @@ export default function useArrowNav() {
 						altKey ? ! isReverse : isReverse,
 						altKey ? undefined : verticalRect
 					);
+					syncCrossBlockSelection( closestTabbable );
 					event.preventDefault();
 				}
 			} else if (
@@ -316,6 +351,9 @@ export default function useArrowNav() {
 					node
 				);
 				placeCaretAtHorizontalEdge( closestTabbable, isReverse );
+				if ( closestTabbable ) {
+					syncCrossBlockSelection( closestTabbable );
+				}
 				event.preventDefault();
 			}
 		}
