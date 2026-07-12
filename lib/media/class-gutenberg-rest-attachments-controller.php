@@ -8,10 +8,11 @@
 /**
  * REST API controller for media attachments.
  *
- * Extends the core attachments controller to add client-side media processing
- * functionality including sideload support and sub-size generation control.
+ * Extends the 7.1 compat attachments controller (multi-media-type filtering,
+ * EXIF-aware edits) to add client-side media processing functionality
+ * including sideload support and sub-size generation control.
  */
-class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controller {
+class Gutenberg_REST_Attachments_Controller extends Gutenberg_REST_Attachments_Controller_7_1 {
 	/**
 	 * Image size token for the source-format original preserved alongside a
 	 * client-generated derivative (e.g. the HEIC file kept next to its JPEG).

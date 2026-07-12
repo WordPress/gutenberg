@@ -55,6 +55,8 @@ add_filter( 'upload_mimes', 'gutenberg_add_heic_upload_mimes' );
  */
 function gutenberg_filter_attachment_post_type_args( array $args, string $post_type ): array {
 	if ( 'attachment' === $post_type ) {
+		// Parent class of the controller below.
+		require_once __DIR__ . '/../compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php';
 		require_once __DIR__ . '/class-gutenberg-rest-attachments-controller.php';
 
 		$args['rest_controller_class'] = Gutenberg_REST_Attachments_Controller::class;

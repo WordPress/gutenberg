@@ -94,6 +94,78 @@ class Gutenberg_REST_Attachments_Controller_7_1 extends WP_REST_Attachments_Cont
 	}
 
 	/**
+	 * Applies edits to a media item and creates a new attachment record.
+	 *
+	 * Unlike core (as of 7.1), uprights the image before applying the
+	 * requested edits. Core edits the file from
+	 * `wp_get_original_image_path()`, whose EXIF orientation may still be
+	 * unapplied: client-side uploads deliberately preserve the tag, and
+	 * server-side uploads only bake the rotation into the scaled copy,
+	 * never the original. Clients build the edit modifiers against the
+	 * oriented preview (browsers apply the tag at render), so editing the
+	 * raw pixels lands rotations and crops in the wrong frame — e.g.
+	 * rotating an EXIF-oriented iPhone photo appears to do nothing.
+	 *
+	 * PLUGIN-ONLY SCAFFOLDING: in core, the entire fix is one line inside
+	 * this method, after the editor is created —
+	 * `$image_editor->maybe_exif_rotate();`. A plugin cannot reach that
+	 * local variable, so it swaps the editor classes for subclasses that
+	 * upright on load instead. Remove this override and both
+	 * `Gutenberg_EXIF_Orienting_Image_Editor_*` classes once the core
+	 * change ships.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
+	 */
+	public function edit_media_item( $request ) {
+		add_filter( 'wp_image_editors', array( __CLASS__, '_use_exif_orienting_image_editors' ) );
+
+		$response = parent::edit_media_item( $request );
+
+		remove_filter( 'wp_image_editors', array( __CLASS__, '_use_exif_orienting_image_editors' ) );
+
+		return $response;
+	}
+
+	/**
+	 * Swaps the default image editors for EXIF-orienting subclasses.
+	 *
+	 * Mapped per class (rather than prepended) so a site's filtered editor
+	 * preference order is preserved.
+	 *
+	 * Only public because the hook system must be able to call it; it is
+	 * plugin-only scaffolding (see `edit_media_item()`), not an API.
+	 *
+	 * @since 7.1.0
+	 * @access private
+	 *
+	 * @param string[] $editors Image editor class names.
+	 * @return string[] Image editor class names.
+	 */
+	public static function _use_exif_orienting_image_editors( $editors ) {
+		// The parent editor classes are loaded lazily by core immediately
+		// before this filter fires (see `_wp_image_editor_choose()`), so the
+		// subclasses must not be required any earlier than this.
+		require_once __DIR__ . '/class-gutenberg-exif-orienting-image-editor-imagick.php';
+		require_once __DIR__ . '/class-gutenberg-exif-orienting-image-editor-gd.php';
+
+		$replacements = array(
+			'WP_Image_Editor_Imagick' => 'Gutenberg_EXIF_Orienting_Image_Editor_Imagick',
+			'WP_Image_Editor_GD'      => 'Gutenberg_EXIF_Orienting_Image_Editor_GD',
+		);
+
+		foreach ( $editors as $index => $editor ) {
+			if ( isset( $replacements[ $editor ] ) ) {
+				$editors[ $index ] = $replacements[ $editor ];
+			}
+		}
+
+		return $editors;
+	}
+
+	/**
 	 * Retrieves the query params for collections of attachments.
 	 *
 	 * @since 4.7.0
