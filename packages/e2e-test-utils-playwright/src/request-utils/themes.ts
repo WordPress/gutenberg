@@ -10,24 +10,25 @@ async function activateTheme(
 	this: RequestUtils,
 	themeSlug: string
 ): Promise< void > {
-	const maxAttempts = 3;
+	const maxAttempts = 5;
+	const baseDelay = 1000;
 
 	for ( let attempt = 1; attempt <= maxAttempts; attempt++ ) {
 		try {
 			await activateThemeOnce.call( this, themeSlug );
+			await verifyThemeActive.call( this, themeSlug );
 			return;
 		} catch ( error ) {
 			const message =
 				error instanceof Error ? error.message : String( error );
-			const isTransient = /socket hang up|ECONNRESET/i.test( message );
+			const isTransient = /socket hang up|ECONNRESET|ETIMEDOUT|5\d{2}|ERR_HTTP|timeout|ENOTFOUND/i.test( message );
 
 			if ( ! isTransient || attempt === maxAttempts ) {
 				throw error;
 			}
 
-			await new Promise( ( resolve ) =>
-				setTimeout( resolve, 500 * attempt )
-			);
+			const delay = baseDelay * Math.pow( 2, attempt - 1 ) + Math.random() * 500;
+			await new Promise( ( resolve ) => setTimeout( resolve, delay ) );
 		}
 	}
 }
@@ -74,6 +75,41 @@ async function activateThemeOnce(
 	response = await this.request.get( activateLink );
 
 	await response.dispose();
+}
+
+async function verifyThemeActive(
+	this: RequestUtils,
+	themeSlug: string
+): Promise< void > {
+	type ThemeItem = {
+		stylesheet: string;
+		status: string;
+	};
+
+	const themes = await this.rest< ThemeItem[] >( {
+		path: '/wp/v2/themes',
+	} );
+
+	if ( ! themes || ! themes.length ) {
+		throw new Error( 'Failed to fetch themes via REST API' );
+	}
+
+	const activeTheme = themes.find( ( { status } ) => status === 'active' );
+
+	if ( ! activeTheme ) {
+		throw new Error( 'No active theme found' );
+	}
+
+	// The stylesheet may include a folder path, so check both exact match and partial match
+	const isActive =
+		activeTheme.stylesheet === themeSlug ||
+		activeTheme.stylesheet.endsWith( `/${ themeSlug }` );
+
+	if ( ! isActive ) {
+		throw new Error(
+			`Theme verification failed. Expected: ${ themeSlug }, Got: ${ activeTheme.stylesheet }`
+		);
+	}
 }
 
 // https://developer.wordpress.org/rest-api/reference/themes/#definition
