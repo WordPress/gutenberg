@@ -45,14 +45,11 @@ export function useEventListeners( props ) {
 
 	return useRefEffect(
 		( element ) => {
-			if ( ! props.isSelected ) {
-				return;
-			}
 			const cleanups = refEffects.map( ( effect ) => effect( element ) );
 			return () => {
 				cleanups.forEach( ( cleanup ) => cleanup() );
 			};
 		},
-		[ refEffects, props.isSelected ]
+		[ refEffects ]
 	);
 }

@@ -412,7 +412,6 @@ export function RichTextWrapper(
 						onReplace,
 						selectionChange,
 						onSelectionChange,
-						isSelected,
 						disableFormats,
 						value,
 						tagName,
