@@ -133,6 +133,10 @@ if ( ! function_exists( 'gutenberg_note_mentions_before_rest_callbacks' ) ) {
 	 * @param mixed[]|callable $handler  Route handler (unused).
 	 * @param WP_REST_Request  $request  The matched request.
 	 * @return mixed Untouched $response.
+	 *
+	 * @template T
+	 * @phpstan-param T $response
+	 * @phpstan-return T
 	 */
 	function gutenberg_note_mentions_before_rest_callbacks( $response, $handler, WP_REST_Request $request ) {
 		unset( $handler );
@@ -152,6 +156,10 @@ if ( ! function_exists( 'gutenberg_note_mentions_after_rest_callbacks' ) ) {
 	 *
 	 * @param mixed $response Result to send; untouched here.
 	 * @return mixed Untouched $response.
+	 *
+	 * @template T
+	 * @phpstan-param T $response
+	 * @phpstan-return T
 	 */
 	function gutenberg_note_mentions_after_rest_callbacks( $response ) {
 		remove_filter( 'wp_kses_allowed_html', 'gutenberg_note_mention_allowed_html', 10 );
