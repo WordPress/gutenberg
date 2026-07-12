@@ -89,7 +89,6 @@ function UnforwardedSearchControl(
 
 	return (
 		<StyledInputControl
-			__next40pxDefaultSize
 			id={ instanceId }
 			hideLabelFromVision={ hideLabelFromVision }
 			label={ label }

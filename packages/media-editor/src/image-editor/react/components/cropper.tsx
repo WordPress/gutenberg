@@ -276,8 +276,9 @@ function CropperInner(
 		onStateChange?.( state );
 	}, [ state, onStateChange ] );
 
-	// ARIA live region: announce significant state changes for screen readers.
-	const ariaMessage = useAriaAnnouncer( state );
+	// ARIA announcements: announce significant state changes for screen readers
+	// via the centralized @wordpress/a11y speak() API called inside the hook.
+	useAriaAnnouncer( state );
 
 	// Compute fitted image dimensions and visual bounds from camera math.
 	const naturalWidth = state.image?.naturalWidth ?? 0;
@@ -1106,16 +1107,6 @@ function CropperInner(
 							outputHeight={ outputSize.height }
 						/>
 					) }
-				</div>
-
-				{ /* ARIA live region for screen reader announcements */ }
-				<div
-					aria-live="polite"
-					aria-atomic="true"
-					className="wp-media-editor-image-editor__aria-live"
-					style={ VISUALLY_HIDDEN_STYLE }
-				>
-					{ ariaMessage }
 				</div>
 			</div>
 		</div>

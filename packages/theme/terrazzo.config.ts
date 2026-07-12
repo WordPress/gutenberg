@@ -14,7 +14,6 @@ const config: Config = {
 		'./tokens/color.json',
 		'./tokens/cursor.json',
 		'./tokens/dimension.json',
-		'./tokens/elevation.json',
 		'./tokens/motion.json',
 		'./tokens/typography.json',
 	],

@@ -139,8 +139,16 @@ export async function canvasConvertToJpeg(
 					}
 				}
 
-				// Apply ISOBMFF irot rotation if present.
-				const outputCanvas = applyRotation( canvas, heicData.rotation );
+				// Apply orientation: the native ISOBMFF `irot` transform when
+				// present, otherwise the EXIF orientation tag (libheif applies
+				// the former but ignores the latter for HEIF-family inputs).
+				const outputCanvas =
+					heicData.rotation !== 0
+						? applyRotation( canvas, heicData.rotation )
+						: applyExifOrientation(
+								canvas,
+								heicData.exifOrientation
+						  );
 
 				const jpegBlob = await outputCanvas.convertToBlob( {
 					type: 'image/jpeg',
@@ -197,6 +205,63 @@ function applyRotation(
 	ctx.drawImage( source, -source.width / 2, -source.height / 2 );
 
 	return rotated;
+}
+
+/**
+ * Apply an EXIF orientation (1-8) to a canvas.
+ *
+ * Returns the original canvas for orientation 1, or a new OffscreenCanvas with
+ * the rotation/flip applied. Orientations 5-8 swap width and height.
+ *
+ * @param source      Source canvas with the decoded image.
+ * @param orientation EXIF orientation value (1-8).
+ * @return Canvas with the orientation applied.
+ */
+function applyExifOrientation(
+	source: OffscreenCanvas,
+	orientation: number
+): OffscreenCanvas {
+	if ( orientation <= 1 || orientation > 8 ) {
+		return source;
+	}
+
+	const { width: sw, height: sh } = source;
+	const swap = orientation >= 5;
+	const out = new OffscreenCanvas( swap ? sh : sw, swap ? sw : sh );
+	const ctx = out.getContext( '2d' );
+	if ( ! ctx ) {
+		return source;
+	}
+
+	// Affine transforms map EXIF orientation to the upright image. The e/f
+	// translation terms use the source width/height. See the EXIF spec tag
+	// 0x0112 and the standard orientation matrix.
+	switch ( orientation ) {
+		case 2: // Flip horizontal.
+			ctx.transform( -1, 0, 0, 1, sw, 0 );
+			break;
+		case 3: // Rotate 180°.
+			ctx.transform( -1, 0, 0, -1, sw, sh );
+			break;
+		case 4: // Flip vertical.
+			ctx.transform( 1, 0, 0, -1, 0, sh );
+			break;
+		case 5: // Transpose.
+			ctx.transform( 0, 1, 1, 0, 0, 0 );
+			break;
+		case 6: // Rotate 90° CW.
+			ctx.transform( 0, 1, -1, 0, sh, 0 );
+			break;
+		case 7: // Transverse.
+			ctx.transform( 0, -1, -1, 0, sh, sw );
+			break;
+		case 8: // Rotate 90° CCW.
+			ctx.transform( 0, -1, 1, 0, 0, sw );
+			break;
+	}
+
+	ctx.drawImage( source, 0, 0 );
+	return out;
 }
 
 /**

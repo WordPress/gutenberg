@@ -2,16 +2,24 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the required Node.js version to `^20.19.0` or `>=22.13.0`. ([#80063](https://github.com/WordPress/gutenberg/pull/80063))
+
 ### New Features
 
+-   Add `Checkbox` form primitive ([#80039](https://github.com/WordPress/gutenberg/pull/80039)).
 -   Add `Skeleton` component ([#79671](https://github.com/WordPress/gutenberg/pull/79671)).
 
 ### Enhancements
 
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 -   Add `LinkButton` component ([#78944](https://github.com/WordPress/gutenberg/pull/78944)).
 
 ### Bug Fixes
 
+-   `Link`: Restore the focus ring removed when `LinkButton` was added. ([#80091](https://github.com/WordPress/gutenberg/pull/80091))
+-   `Tabs`: Re-measure overflow when the list or its content changes size so the scroll fade stays in sync as labels/badges load or a web font reflows the tabs. ([#79856](https://github.com/WordPress/gutenberg/pull/79856))
 -   `IconButton`: Keep the inline padding override valid when reused in button length calculations ([#79722](https://github.com/WordPress/gutenberg/pull/79722)).
 -   `IconButton`: Restore the default tooltip delay on hover ([#79505](https://github.com/WordPress/gutenberg/pull/79505)).
 -   `Button`: Fix corner artifacts by using `background-clip: border-box` ([#79524](https://github.com/WordPress/gutenberg/pull/79524))
