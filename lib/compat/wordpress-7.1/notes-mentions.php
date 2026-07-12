@@ -251,6 +251,7 @@ if ( ! function_exists( 'gutenberg_remove_note_followers' ) ) {
 	 * @param int   $root_id  Top-level note ID.
 	 * @param int[] $user_ids User IDs to unsubscribe from the thread.
 	 * @return list<int> The updated follower list.
+	 * @phpstan-return list<positive-int>
 	 */
 	function gutenberg_remove_note_followers( int $root_id, array $user_ids ): array {
 		$user_ids = array_map( fn ( $user_id ) => (int) $user_id, $user_ids );
