@@ -4,8 +4,5 @@ export {
 	resolveFields,
 	unregisterFieldType,
 } from './field-types';
-export type {
-	FieldTypeDefinition,
-	RegisteredFieldTypeName,
-	ResolvableField,
-} from './field-types';
+
+export type { FieldTypeDefinition, ResolvableField } from './field-types';

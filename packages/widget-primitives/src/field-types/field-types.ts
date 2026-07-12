@@ -1,12 +1,15 @@
 /**
  * Field type registry.
  *
- * Names reusable DataViews field types. A registered field type bundles
- * per-field behavior (`Edit`, `render`, validation, formatting) under a
- * namespaced name; `resolveFields` translates any field referencing a
- * registered name into the plain per-field `Field` props DataViews
- * already understands. DataViews itself is never patched: names it does
- * not know degrade exactly as they do in core.
+ * This registry contains reusable DataViews field types identified
+ * by unique names.
+ *
+ * Each registered field type defines specific behavior for individual
+ * fields, including editing, rendering, validation, and formatting under
+ * a namespaced identifier.
+ *
+ * The `resolveFields` function converts any reference to a registered name
+ * into the standard per-field `Field` properties that DataViews recognizes.
  */
 
 /**
@@ -14,20 +17,15 @@
  */
 import type { Field, FieldTypeName } from '@wordpress/dataviews';
 
-/**
- * Namespaced identifier for a registered field type, structured as
- * `<namespace>/<name>`. Both segments are lowercase, kebab-case. The
- * mandatory namespace keeps registered names disjoint from DataViews'
- * own plain type names (`text`, `media`, ...).
- */
 export type RegisteredFieldTypeName = `${ string }/${ string }`;
 
 const FIELD_TYPE_NAME_PATTERN = /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/;
 
 /**
  * The per-field `Field` props a field type may provide as defaults.
- * Every prop translates verbatim to the resolved field, so the registry
- * never outgrows the public DataViews field API.
+ *
+ * Every prop translates verbatim to the resolved field,
+ * so the registry never outgrows the public DataViews field API.
  */
 type FieldTypeDefaults< Item > = Pick<
 	Field< Item >,
@@ -43,10 +41,10 @@ type FieldTypeDefaults< Item > = Pick<
 >;
 
 /**
- * A named, reusable field type: per-field behavior defaults plus an
- * optional `baseType` naming the DataViews type whose built-in defaults
- * (sort, operators, validation semantics) the resolved field inherits
- * for anything not provided here.
+ * A named, reusable field type: per-field behavior defaults plus
+ * an optional `baseType` that names the DataViews type whose
+ * built-in defaults (sort, operators, validation semantics)
+ * the resolved field inherits for anything not provided here.
  */
 export interface FieldTypeDefinition< Item = unknown >
 	extends FieldTypeDefaults< Item > {
@@ -68,7 +66,9 @@ export type ResolvableField< Item = unknown > = Omit<
 const fieldTypes = new Map< string, FieldTypeDefinition< any > >();
 
 /**
- * Registers a field type. First registration wins: a name that is
+ * Registers a field type.
+ *
+ * First registration wins: a name that is
  * already registered, or is not a valid namespaced name, is ignored.
  *
  * @param fieldType Field type definition to register.
@@ -91,7 +91,7 @@ export function registerFieldType< Item = unknown >(
 /**
  * Unregisters a field type.
  *
- * @param name Registered field type name.
+ * @param {RegisteredFieldTypeName} name Registered field type name.
  * @return The removed definition, or `undefined` if it was not registered.
  */
 export function unregisterFieldType(
@@ -99,29 +99,32 @@ export function unregisterFieldType(
 ): FieldTypeDefinition | undefined {
 	const fieldType = fieldTypes.get( name );
 	fieldTypes.delete( name );
+
 	return fieldType;
 }
 
 /**
  * Returns a registered field type definition.
  *
- * @param name Field type name to look up.
+ * @param {RegisteredFieldTypeName} name Field type name to look up.
  * @return The definition, or `undefined` if not registered.
  */
-export function getFieldType( name: string ): FieldTypeDefinition | undefined {
+export function getFieldType(
+	name: RegisteredFieldTypeName
+): FieldTypeDefinition | undefined {
 	return fieldTypes.get( name );
 }
 
 /**
- * Resolves fields that reference registered field types into plain
- * DataViews fields: the registered defaults spread under the field's
- * own props (the field wins), `type` becomes the definition's
- * `baseType`, and `isValid` merges rule by rule. Fields whose `type` is
- * not registered pass through untouched, preserving DataViews' own
- * types and its unknown-type behavior.
+ * Converts fields referencing registered field types into
+ * plain DataViews fields: default settings are merged into the field's
+ * own properties (giving the field precedence), `type` is updated to
+ * the `baseType` from the definition, and `isValid` is combined rule by rule.
  *
- * @param fields Fields to resolve.
- * @return Fields with registered types translated to per-field props.
+ * Fields with an unregistered `type` remain unchanged, maintaining DataViews' original types and handling of unknown types.
+ *
+ * @param fields - The fields to be resolved.
+ * @return Fields with registered types converted into specific properties per field.
  */
 export function resolveFields< F extends ResolvableField< any > >(
 	fields: F[]
