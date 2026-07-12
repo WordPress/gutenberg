@@ -287,9 +287,7 @@ if ( ! function_exists( 'gutenberg_register_note_followers_meta' ) ) {
 						'minimum' => 1,
 					),
 				),
-				'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
-					return current_user_can( 'edit_comment', $object_id );
-				},
+				'auth_callback' => static fn ( $allowed, $meta_key, $object_id ) => current_user_can( 'edit_comment', $object_id ),
 			)
 		);
 	}
