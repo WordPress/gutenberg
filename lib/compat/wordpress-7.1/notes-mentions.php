@@ -33,7 +33,7 @@ if ( ! function_exists( 'gutenberg_get_note_mentioned_user_ids' ) ) {
 	 * @phpstan-return list<positive-int>
 	 */
 	function gutenberg_get_note_mentioned_user_ids( $content ): array {
-		if ( ! is_string( $content ) || '' === $content ) {
+		if ( ! is_string( $content ) || ! str_contains( $content, '<a' ) ) {
 			return array();
 		}
 
