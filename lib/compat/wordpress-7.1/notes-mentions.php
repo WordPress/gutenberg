@@ -129,9 +129,9 @@ if ( ! function_exists( 'gutenberg_note_mentions_before_rest_callbacks' ) ) {
 	 * removes the allowance again so other comment writes in the same request
 	 * lifecycle (e.g. batch requests) keep the default allowlist.
 	 *
-	 * @param mixed           $response Result to send; untouched here.
-	 * @param array|callable  $handler  Route handler (unused).
-	 * @param WP_REST_Request $request  The matched request.
+	 * @param mixed            $response Result to send; untouched here.
+	 * @param mixed[]|callable $handler  Route handler (unused).
+	 * @param WP_REST_Request  $request  The matched request.
 	 * @return mixed Untouched $response.
 	 */
 	function gutenberg_note_mentions_before_rest_callbacks( $response, $handler, $request ) {
