@@ -134,10 +134,10 @@ if ( ! function_exists( 'gutenberg_note_mentions_before_rest_callbacks' ) ) {
 	 * @param WP_REST_Request  $request  The matched request.
 	 * @return mixed Untouched $response.
 	 */
-	function gutenberg_note_mentions_before_rest_callbacks( $response, $handler, $request ) {
+	function gutenberg_note_mentions_before_rest_callbacks( $response, $handler, WP_REST_Request $request ) {
 		unset( $handler );
 
-		if ( $request instanceof WP_REST_Request && gutenberg_rest_request_saves_note( $request ) ) {
+		if ( gutenberg_rest_request_saves_note( $request ) ) {
 			add_filter( 'wp_kses_allowed_html', 'gutenberg_note_mention_allowed_html', 10, 2 );
 		}
 
