@@ -10,32 +10,6 @@ async function activateTheme(
 	this: RequestUtils,
 	themeSlug: string
 ): Promise< void > {
-	const maxAttempts = 3;
-
-	for ( let attempt = 1; attempt <= maxAttempts; attempt++ ) {
-		try {
-			await activateThemeOnce.call( this, themeSlug );
-			return;
-		} catch ( error ) {
-			const message =
-				error instanceof Error ? error.message : String( error );
-			const isTransient = /socket hang up|ECONNRESET/i.test( message );
-
-			if ( ! isTransient || attempt === maxAttempts ) {
-				throw error;
-			}
-
-			await new Promise( ( resolve ) =>
-				setTimeout( resolve, 500 * attempt )
-			);
-		}
-	}
-}
-
-async function activateThemeOnce(
-	this: RequestUtils,
-	themeSlug: string
-): Promise< void > {
 	let response = await this.request.get( THEMES_URL );
 	const html = await response.text();
 	const optionalFolder = '([a-z0-9-]+%2F)?';
