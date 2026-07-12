@@ -122,6 +122,20 @@ class Tests_Block_Bindings_InnerBlocks extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'Fallback', $result );
 	}
 
+	public function test_empty_string_removes_fallback_children_from_a_nested_dynamic_host() {
+		self::$value = '';
+		$bound       = $this->block_markup( 'test/inner-host', $this->fallback_paragraph() );
+		$parsed      = parse_blocks(
+			'<!-- wp:test/context-provider -->' .
+			$bound .
+			'<!-- /wp:test/context-provider -->'
+		);
+		$result      = render_block( $parsed[0] );
+
+		$this->assertStringContainsString( 'class="inner-host"', $result );
+		$this->assertStringNotContainsString( 'Fallback', $result );
+	}
+
 	public function test_static_host_keeps_its_wrapper() {
 		self::$value = $this->sourced_paragraph();
 		$markup      = $this->block_markup(
