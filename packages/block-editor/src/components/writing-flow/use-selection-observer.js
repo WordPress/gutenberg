@@ -11,6 +11,7 @@ import { isSelectionForward } from '@wordpress/dom';
  */
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
+import { getCollapsedSelectionPayload, getRichTextElement } from './utils';
 
 /**
  * Extract the selection start node from the selection. When the anchor node is
@@ -104,12 +105,6 @@ function setContentEditableWrapper( node, value ) {
 	}
 }
 
-function getRichTextElement( node ) {
-	const element =
-		node.nodeType === node.ELEMENT_NODE ? node : node.parentElement;
-	return element?.closest( '[data-wp-block-attribute-key]' );
-}
-
 /**
  * Sets a multi-selection based on the native selection across blocks.
  */
@@ -171,6 +166,26 @@ export default function useSelectionObserver() {
 								? startNode
 								: startNode.parentElement;
 						element = element?.closest( '[contenteditable]' );
+
+						// Moving focus into the element does not fire a
+						// `selectionchange` event (the selection is already
+						// inside it), so nothing else will dispatch the
+						// observed selection to the store. Dispatch it before
+						// moving focus so the focus handler finds the block
+						// already selected.
+						const payload =
+							getCollapsedSelectionPayload( selection );
+
+						if ( payload ) {
+							selectionChange( payload );
+						} else {
+							const clientId = getBlockClientId( startNode );
+
+							if ( clientId ) {
+								selectBlock( clientId );
+							}
+						}
+
 						element?.focus();
 					}
 					return;
