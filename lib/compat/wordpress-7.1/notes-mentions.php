@@ -195,7 +195,10 @@ if ( ! function_exists( 'gutenberg_get_note_followers' ) ) {
 		}
 
 		$followers = array_filter(
-			array_map( 'intval', $followers ),
+			array_map(
+				fn ( $user_id ) => (int) $user_id,
+				$followers
+			),
 			static function ( $user_id ) {
 				return $user_id > 0;
 			}
