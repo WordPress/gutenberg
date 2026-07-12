@@ -11,7 +11,10 @@ import { isSelectionForward } from '@wordpress/dom';
  */
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
-import { getCollapsedSelectionPayload, getRichTextElement } from './utils';
+import {
+	getCollapsedSelectionPayload,
+	getRichTextElement,
+} from '../../utils/dom-selection';
 
 /**
  * Extract the selection start node from the selection. When the anchor node is

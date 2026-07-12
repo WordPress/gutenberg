@@ -20,7 +20,8 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
-import { getCollapsedSelectionPayload, setClipboardBlocks } from './utils';
+import { setClipboardBlocks } from './utils';
+import { getCollapsedSelectionPayload } from '../../utils/dom-selection';
 import { getPasteEventData } from '../../utils/pasting';
 
 export default function useClipboardHandler() {

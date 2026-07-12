@@ -20,7 +20,7 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { getBlockClientId } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
-import { getCollapsedSelectionPayload } from './utils';
+import { getCollapsedSelectionPayload } from '../../utils/dom-selection';
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard

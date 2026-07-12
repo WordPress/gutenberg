@@ -8,12 +8,13 @@ import {
 	isTextField,
 	placeCaretAtHorizontalEdge,
 } from '@wordpress/dom';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { isInsideRootBlock } from '../../../utils/dom';
+import { getCollapsedSelectionPayload } from '../../../utils/dom-selection';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -32,6 +33,7 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 	const { isBlockSelected, isMultiSelecting, isZoomOut } = unlock(
 		useSelect( blockEditorStore )
 	);
+	const { selectionChange } = useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
@@ -88,6 +90,21 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 			}
 		}
 		placeCaretAtHorizontalEdge( target, isReverse );
+
+		// Dispatch the placed selection, like the focus event used to. The
+		// store would otherwise only receive the offsets from the
+		// asynchronous `selectionchange` event, which the next input event
+		// can beat: handlers acting before then (e.g. Enter right after a
+		// split) read an offset-less selection.
+		const selection = ownerDocument.defaultView.getSelection();
+
+		if ( selection.rangeCount && target.contains( selection.anchorNode ) ) {
+			const payload = getCollapsedSelectionPayload( selection );
+
+			if ( payload ) {
+				selectionChange( payload );
+			}
+		}
 	}, [ initialPosition, clientId ] );
 
 	return ref;

@@ -60,6 +60,20 @@ export function useFocusHandler( clientId ) {
 					return;
 				}
 
+				// For editable targets, the caret is inside the target, so
+				// select the block without requesting initial caret
+				// placement (`null` also clears a pending placement from an
+				// earlier action). Placing the caret at the block start would
+				// move focus even when it arrives transiently, for example
+				// when React restores focus after a commit while a selection
+				// update for another block is still in flight. The
+				// `selectionchange` listeners refine the selection to offset
+				// level.
+				if ( event.target.isContentEditable ) {
+					selectBlock( clientId, null );
+					return;
+				}
+
 				selectBlock( clientId );
 			}
 
