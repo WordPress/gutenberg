@@ -195,9 +195,11 @@ if ( ! function_exists( 'gutenberg_get_note_followers' ) ) {
 	 *
 	 * @param int $root_id Top-level note ID.
 	 * @return list<int> Follower user IDs.
+	 * @phpstan-param int|numeric-string $root_id
 	 * @phpstan-return list<positive-int>
 	 */
-	function gutenberg_get_note_followers( int $root_id ): array {
+	function gutenberg_get_note_followers( $root_id ): array {
+		$root_id   = (int) $root_id;
 		$followers = get_comment_meta( $root_id, '_wp_note_followers' );
 		if ( ! is_array( $followers ) ) {
 			return array();
@@ -222,9 +224,12 @@ if ( ! function_exists( 'gutenberg_add_note_followers' ) ) {
 	 * @param int   $root_id  Top-level note ID.
 	 * @param int[] $user_ids User IDs to subscribe to the thread.
 	 * @return list<int> The updated follower list.
+	 * @phpstan-param int|numeric-string $root_id
+	 * @phpstan-param array<int|numeric-string> $user_ids
 	 * @phpstan-return list<positive-int>
 	 */
-	function gutenberg_add_note_followers( int $root_id, array $user_ids ): array {
+	function gutenberg_add_note_followers( $root_id, array $user_ids ): array {
+		$root_id   = (int) $root_id;
 		$followers = gutenberg_get_note_followers( $root_id );
 
 		foreach ( $user_ids as $user_id ) {
@@ -248,12 +253,13 @@ if ( ! function_exists( 'gutenberg_remove_note_followers' ) ) {
 	 * meta is removed alongside the comment, and deleting a top-level note also
 	 * removes its replies), so this only needs to handle explicit unsubscribes.
 	 *
-	 * @param int   $root_id  Top-level note ID.
-	 * @param int[] $user_ids User IDs to unsubscribe from the thread.
+	 * @param int|numeric-string        $root_id  Top-level note ID.
+	 * @param array<int|numeric-string> $user_ids User IDs to unsubscribe from the thread.
 	 * @return list<int> The updated follower list.
 	 * @phpstan-return list<positive-int>
 	 */
-	function gutenberg_remove_note_followers( int $root_id, array $user_ids ): array {
+	function gutenberg_remove_note_followers( $root_id, array $user_ids ): array {
+		$root_id  = (int) $root_id;
 		$user_ids = array_map( fn ( $user_id ) => (int) $user_id, $user_ids );
 		foreach ( $user_ids as $user_id ) {
 			if ( $user_id > 0 ) {
