@@ -10,12 +10,13 @@ import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isKeyboardEvent } from '@wordpress/keycodes';
-import { RichTextControl } from '@wordpress/rich-text-control';
+import { privateApis as dataviewsPrivateApis } from '@wordpress/dataviews';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { sanitizeNoteContent } from './utils';
 import noteMentionCompleter from './note-mention-completer';
 import {
@@ -26,6 +27,13 @@ import {
 // Register the mention format so the `@` completer's inserted links keep their
 // `data-user-id` through rich text round-trips. Idempotent.
 registerNoteMentionFormat();
+
+/*
+ * The rich text form field is assembled in `@wordpress/dataviews` on top of the
+ * presentational `ContentEditableControl` shell in `@wordpress/components`; the
+ * notes sidebar is its second consumer.
+ */
+const { RichTextControl } = unlock( dataviewsPrivateApis );
 
 const ALLOWED_NOTE_FORMATS = [
 	'core/bold',
@@ -55,15 +63,23 @@ export function NoteForm( { onSubmit, onCancel, note, labels, focusOnMount } ) {
 			return;
 		}
 		setIsSubmitting( true );
+		const submitted = inputComment;
 		try {
 			/*
 			 * The note actions resolve with the saved record on success and
 			 * `undefined` on failure (they surface their own error notice),
 			 * so only discard the draft once the save actually succeeded.
 			 */
-			const result = await onSubmit( inputComment );
+			const result = await onSubmit( submitted );
 			if ( result !== undefined ) {
-				setInputComment( '' );
+				/*
+				 * The field stays editable while the request is in flight, so
+				 * keep anything typed since; clearing unconditionally would
+				 * discard it.
+				 */
+				setInputComment( ( current ) =>
+					current === submitted ? '' : current
+				);
 			}
 		} catch {
 			// Keep the draft so the user can retry.
@@ -113,7 +129,6 @@ export function NoteForm( { onSubmit, onCancel, note, labels, focusOnMount } ) {
 				onChange={ setInputComment }
 				allowedFormats={ ALLOWED_NOTE_FORMATS }
 				completers={ NOTE_COMPLETERS }
-				placeholder={ labels?.input ?? __( 'Note' ) }
 			/>
 			<Stack
 				direction="row"

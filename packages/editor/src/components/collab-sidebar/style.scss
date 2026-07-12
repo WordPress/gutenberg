@@ -148,22 +148,16 @@
 	font-style: italic;
 }
 
-// RichTextControl provides its own base styling (border, focus ring, padding).
-// Scope the few multi-line and inline-format tweaks the note form needs to the
-// control as rendered inside the note form.
-.editor-collab-sidebar-panel__note-form .wp-rich-text-control {
+// The ContentEditableControl shell provides its own base styling (border, focus
+// ring, padding). Scope the few multi-line and inline-format tweaks the note
+// form needs to the editable element as rendered inside the note form. The
+// shell exposes no stable class name, so target the editable by its role.
+.editor-collab-sidebar-panel__note-form [role="textbox"] {
 	line-height: 20px;
 	max-height: calc(20px * 20 + 18px); // 20 rows + vertical padding.
 	overflow-y: auto;
 	white-space: pre-wrap;
 	word-wrap: break-word;
-
-	// The placeholder is a child `<span data-rich-text-placeholder>` whose
-	// text the package stylesheet draws via `::after`; only the color needs
-	// overriding here.
-	[data-rich-text-placeholder]::after {
-		color: $gray-700;
-	}
 
 	// Inline formats inherit the surrounding text styles but keep
 	// their semantic emphasis (RichText renders <strong>, <em>, etc.).
@@ -241,6 +235,15 @@
 	}
 }
 
+// Inline-note highlight applied to the `core/note` marker (`mark.wp-note`).
+// Each marker is tinted by `<NoteHighlightStyles>` using the note author's
+// color from `AVATAR_BORDER_COLORS`; this base rule only provides shared
+// layout/transition properties.
+mark.wp-note {
+	border-radius: 1px;
+	transition: background-color 0.1s ease-in-out;
+}
+
 // Mention chips, both in the note input and the rendered note content.
 .wp-note-mention {
 	display: inline;
@@ -257,13 +260,4 @@
 		background: color-mix(in srgb, var(--wp-admin-theme-color) 22%, transparent);
 		color: var(--wp-admin-theme-color);
 	}
-}
-
-// Inline-note highlight applied to the `core/note` marker (`mark.wp-note`).
-// Each marker is tinted by `<NoteHighlightStyles>` using the note author's
-// color from `AVATAR_BORDER_COLORS`; this base rule only provides shared
-// layout/transition properties.
-mark.wp-note {
-	border-radius: 1px;
-	transition: background-color 0.1s ease-in-out;
 }

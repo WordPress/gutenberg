@@ -38,7 +38,6 @@
 		{ "path": "../preferences" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
-		{ "path": "../rich-text-control" },
 		{ "path": "../server-side-render" },
 		{ "path": "../ui" },
 		{ "path": "../url" },

@@ -149,6 +149,102 @@ test.describe( 'Block Notes', () => {
 			await expect( textbox ).toBeVisible();
 		} );
 
+		test( 'Cmd+K opens an unclipped link popover in the reply form', async ( {
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Reply link host' },
+				comment: 'Reply link note',
+			} );
+			const replyTextbox = page.getByRole( 'textbox', {
+				name: 'Reply to',
+			} );
+			await replyTextbox.click();
+			await page.keyboard.type( 'visit example' );
+			await pageUtils.pressKeys( 'primary+a' );
+			await pageUtils.pressKeys( 'primary+k' );
+
+			/*
+			 * The link popover portals out of the note card. Focus moving
+			 * into it must not deselect the thread (which would unmount the
+			 * reply form and the popover with it), and the popover must not
+			 * be clipped by the note card's overflow: it has to lie fully
+			 * within the viewport.
+			 */
+			const linkInput = page.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+			await expect(
+				linkInput,
+				'Inline link search input should be visible'
+			).toBeVisible();
+			await expect( replyTextbox ).toBeVisible();
+
+			const inputBox = await linkInput.boundingBox();
+			const viewport = page.viewportSize();
+			expect( inputBox.x ).toBeGreaterThanOrEqual( 0 );
+			expect( inputBox.x + inputBox.width ).toBeLessThanOrEqual(
+				viewport.width
+			);
+
+			// Escape closes the popover and keeps the reply form intact.
+			await page.keyboard.press( 'Escape' );
+			await expect( linkInput ).toBeHidden();
+			await expect( replyTextbox ).toBeVisible();
+		} );
+
+		test( 'does not render the hidden field label as a placeholder', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			/*
+			 * The note forms label their fields with a visually hidden
+			 * label ("New note" / "Reply to note N by author") and render
+			 * no placeholder; the rich text placeholder element only
+			 * mounts when a placeholder is passed, so its presence means
+			 * the hidden label leaked into the visible field.
+			 */
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Placeholder host' },
+			} );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			const newNoteTextbox = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			await expect( newNoteTextbox ).toBeVisible();
+			await expect( newNoteTextbox ).not.toHaveAttribute(
+				'aria-placeholder',
+				/./
+			);
+			await expect(
+				newNoteTextbox.locator( '[data-rich-text-placeholder]' )
+			).toHaveCount( 0 );
+
+			await blockNoteUtils.addNote( 'Placeholder note' );
+			const replyTextbox = page.getByRole( 'textbox', {
+				name: 'Reply to',
+			} );
+			await expect( replyTextbox ).toBeVisible();
+			// The visually hidden label still provides the descriptive
+			// accessible name; only the visible placeholder is gone.
+			await expect( replyTextbox ).toHaveAccessibleName(
+				/^Reply to note \d+ by admin$/
+			);
+			await expect( replyTextbox ).not.toHaveAttribute(
+				'aria-placeholder',
+				/./
+			);
+			await expect(
+				replyTextbox.locator( '[data-rich-text-placeholder]' )
+			).toHaveCount( 0 );
+		} );
+
 		test( 'backtick wrapping applies core/code inline format', async ( {
 			editor,
 			page,

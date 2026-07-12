@@ -92,3 +92,35 @@ function gutenberg_strip_inline_note_markers( $block_content ) {
 	return $processor->get_updated_html();
 }
 add_filter( 'render_block', 'gutenberg_strip_inline_note_markers' );
+
+/**
+ * Allows note mention markup in comment content for users without `unfiltered_html`.
+ *
+ * The notes `@` mention completer stores a mention as
+ * `<a class="wp-note-mention" data-user-id="N" href="…">@Name</a>`. The default
+ * comment kses allowlist only keeps `href` and `title` on links, so for users
+ * without `unfiltered_html` the attributes that make a mention a mention (the
+ * chip class and the mentioned user's ID) would be stripped on save. Allow them
+ * in the comment-content context so saved mentions survive sanitization; both
+ * attributes are inert markup (`data-*` carries data only and `class` has no
+ * behavior of its own).
+ *
+ * @param array|string $allowed The allowed tags structure for the context.
+ * @param string       $context The kses context.
+ * @return array|string Modified allowed tags structure.
+ */
+function gutenberg_notes_allow_mention_attributes( $allowed, $context ) {
+	if ( 'pre_comment_content' !== $context || ! is_array( $allowed ) ) {
+		return $allowed;
+	}
+
+	if ( ! isset( $allowed['a'] ) || ! is_array( $allowed['a'] ) ) {
+		$allowed['a'] = array();
+	}
+
+	$allowed['a']['class']        = true;
+	$allowed['a']['data-user-id'] = true;
+
+	return $allowed;
+}
+add_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes', 10, 2 );
