@@ -31,7 +31,7 @@
   <rect x="58" y="252" width="180" height="40" rx="5" fill="#ffffff" stroke="#b07020" stroke-width="1.2"/>
   <text x="70" y="268" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" fill="#855317">location</text>
   <text x="70" y="283" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" font-weight="700" fill="#b07020">type: 'core/location'</text>
-  <text x="58" y="304" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#94a3b8">no Edit import, no code</text>
+  <text x="58" y="304" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#94a3b8">pure data · widget.json-ready</text>
 
   <!-- Attributes arrow -->
   <line x1="260" y1="252" x2="332" y2="252" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-ftp)"/>
