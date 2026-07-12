@@ -76,7 +76,10 @@ if ( ! function_exists( 'gutenberg_note_mention_allowed_html' ) ) {
 	 * @phpstan-param array<non-empty-string, array<non-empty-string, bool>> $tags
 	 * @return array<non-empty-string, array<non-empty-string, bool>>
 	 */
-	function gutenberg_note_mention_allowed_html( $tags, $context ) {
+	function gutenberg_note_mention_allowed_html( $tags, string $context ): array {
+		if ( ! is_array( $tags ) ) {
+			$tags = array();
+		}
 		if ( 'pre_comment_content' === $context && isset( $tags['a'] ) && is_array( $tags['a'] ) ) {
 			$tags['a']['class']        = true;
 			$tags['a']['data-user-id'] = true;
