@@ -9,7 +9,8 @@
 -   Field type registry: `registerFieldType` names a reusable field type
     (`baseType` plus per-field defaults such as `Edit` and validation),
     and `useWidgetTypes` resolves attributes referencing registered names
-    into plain DataViews `Field` props.
+    into plain DataViews `Field` props. Public surface: `registerFieldType`
+    and the `FieldTypeDefinition` type ([#80148](https://github.com/WordPress/gutenberg/pull/80148)).
 
 ### Enhancements
 
@@ -32,6 +33,9 @@
 -   Document the `relevance` hint and `help` note across anatomy, authoring,
     and architecture docs; add an attribute-relevance diagram.
 -   Add a `WithRelevance` Storybook story for attribute relevance hints.
+-   Add a Field Types doc with a pipeline diagram, and a `WithFieldType`
+    Storybook story registering and consuming a field type by name
+    ([#80148](https://github.com/WordPress/gutenberg/pull/80148)).
 
 ## 0.2.0 (2026-07-01)
 
