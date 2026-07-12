@@ -808,54 +808,70 @@ test.describe( 'Client-side media processing', () => {
 		await page.unroute( '**/wp/v2/media**' );
 	} );
 
-	test( 'optimizes a previously uploaded image into a new attachment', async ( {
-		editor,
-		page,
-		mediaProcessingUtils,
-		requestUtils,
-	} ) => {
-		const original = await mediaProcessingUtils.uploadImageAndGetMedia(
+	test.describe( 'optimize existing media (experiment)', () => {
+		// The Optimize panel is gated behind the "Optimize existing media"
+		// experiment; enable it for these tests only.
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.setGutenbergExperiments( [
+				'gutenberg-optimize-existing-media',
+			] );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.setGutenbergExperiments( [] );
+		} );
+
+		test( 'optimizes a previously uploaded image into a new attachment', async ( {
 			editor,
+			page,
+			mediaProcessingUtils,
 			requestUtils,
-			'1024x768_e2e_test_image_size.jpeg'
-		);
-		const originalId = original.id;
-		const originalSize = original.media_details?.filesize;
+		} ) => {
+			const original = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				'1024x768_e2e_test_image_size.jpeg'
+			);
+			const originalId = original.id;
+			const originalSize = original.media_details?.filesize;
 
-		// Open the block inspector, expand the Optimize panel, and run it.
-		// The image block inspector defaults to the Content tab; the
-		// Optimize panel lives on the Settings tab.
-		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'tab', { name: 'Settings' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Optimize', exact: true } )
-			.click();
-		await page.getByRole( 'button', { name: 'Optimize image' } ).click();
+			// Open the block inspector, expand the Optimize panel, and run it.
+			// The image block inspector defaults to the Content tab; the
+			// Optimize panel lives on the Settings tab.
+			await editor.openDocumentSettingsSidebar();
+			await page.getByRole( 'tab', { name: 'Settings' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Optimize', exact: true } )
+				.click();
+			await page
+				.getByRole( 'button', { name: 'Optimize image' } )
+				.click();
 
-		// The success snackbar confirms the optimization completed.
-		await expect(
-			page
-				.locator( '.components-snackbar' )
-				.filter( { hasText: /image optimized/i } )
-		).toBeVisible( { timeout: 60_000 } );
+			// The success snackbar confirms the optimization completed.
+			await expect(
+				page
+					.locator( '.components-snackbar' )
+					.filter( { hasText: /image optimized/i } )
+			).toBeVisible( { timeout: 60_000 } );
 
-		await mediaProcessingUtils.waitForUploadQueueEmpty();
+			await mediaProcessingUtils.waitForUploadQueueEmpty();
 
-		// The block now points at a new, optimized attachment.
-		const newId = await mediaProcessingUtils.getSelectedBlockImageId();
-		expect( newId ).toBeDefined();
-		expect( newId ).not.toBe( originalId );
+			// The block now points at a new, optimized attachment.
+			const newId = await mediaProcessingUtils.getSelectedBlockImageId();
+			expect( newId ).toBeDefined();
+			expect( newId ).not.toBe( originalId );
 
-		const optimized = await mediaProcessingUtils.getMediaDetails(
-			requestUtils,
-			newId
-		);
-		expect( optimized.mime_type ).toBe( 'image/jpeg' );
-		expect( optimized.source_url ).toContain( '-optimized' );
+			const optimized = await mediaProcessingUtils.getMediaDetails(
+				requestUtils,
+				newId
+			);
+			expect( optimized.mime_type ).toBe( 'image/jpeg' );
+			expect( optimized.source_url ).toContain( '-optimized' );
 
-		// Re-encoding at the default quality should not grow the file.
-		expect( optimized.media_details.filesize ).toBeLessThanOrEqual(
-			originalSize
-		);
+			// Re-encoding at the default quality should not grow the file.
+			expect( optimized.media_details.filesize ).toBeLessThanOrEqual(
+				originalSize
+			);
+		} );
 	} );
 } );

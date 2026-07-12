@@ -20,11 +20,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Whether the client-side optimization control should be available.
  *
- * @return {boolean} True when client-side media processing is enabled and supported.
+ * @return {boolean} True when the "Optimize existing media" experiment is on
+ *                   and client-side media processing is enabled and supported.
  */
 function isOptimizationAvailable() {
 	return (
 		typeof window !== 'undefined' &&
+		Boolean( window.__experimentalOptimizeExistingMedia ) &&
 		Boolean( window.__clientSideMediaProcessing ) &&
 		isClientSideMediaSupported()
 	);
