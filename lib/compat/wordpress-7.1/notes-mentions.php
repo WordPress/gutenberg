@@ -208,9 +208,7 @@ if ( ! function_exists( 'gutenberg_get_note_followers' ) ) {
 				fn ( $user_id ) => (int) $user_id,
 				$followers
 			),
-			static function ( $user_id ) {
-				return $user_id > 0;
-			}
+			fn ( $user_id ) => $user_id > 0,
 		);
 
 		return array_values( array_unique( $followers, SORT_NUMERIC ) );
