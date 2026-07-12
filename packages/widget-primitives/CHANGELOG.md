@@ -7,10 +7,9 @@
 -   `WidgetAttributeField< Item >`: authoring helper narrowing a DataViews
     `Field.id` to the widget's attribute keys.
 -   Field type registry: `registerFieldType` names a reusable field type
-    (`baseType` plus per-field defaults such as `Edit` and validation);
-    `resolveFields` translates attributes referencing registered names
-    into plain DataViews `Field` props, and `useWidgetTypes` applies it
-    to every widget's attribute schema.
+    (`baseType` plus per-field defaults such as `Edit` and validation),
+    and `useWidgetTypes` resolves attributes referencing registered names
+    into plain DataViews `Field` props.
 
 ### Enhancements
 

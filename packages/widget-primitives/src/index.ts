@@ -11,12 +11,7 @@ export { useWidgetTypes } from './hooks';
 /**
  * Field types
  */
-export {
-	getFieldType,
-	registerFieldType,
-	resolveFields,
-	unregisterFieldType,
-} from './field-types';
+export { registerFieldType } from './field-types';
 
 /**
  * Types
@@ -31,8 +26,4 @@ export type {
 	WidgetModuleRecord,
 } from './types';
 
-export type {
-	FieldTypeDefinition,
-	RegisteredFieldTypeName,
-	ResolvableField,
-} from './field-types';
+export type { FieldTypeDefinition } from './field-types';
