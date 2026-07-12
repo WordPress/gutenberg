@@ -13,6 +13,10 @@ function gutenberg_block_editor_preload_paths_7_1( $paths, $context ) {
 		return $paths;
 	}
 
+	if ( ! wp_is_block_theme() ) {
+		return $paths;
+	}
+
 	$template_slugs = array();
 	$front_page     = null;
 	if ( ! empty( $context->post ) && 'page' === $context->post->post_type ) {
