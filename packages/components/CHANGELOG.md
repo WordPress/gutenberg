@@ -42,6 +42,7 @@
     -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
     -   `ToggleGroupControl` ([#79656](https://github.com/WordPress/gutenberg/pull/79656))
+-   `Button`: Render the secondary variant's border with a real `border` instead of `box-shadow` ([#79982](https://github.com/WordPress/gutenberg/pull/79982)).
 
 ### Documentation
 
