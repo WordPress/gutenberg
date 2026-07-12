@@ -253,7 +253,8 @@ if ( ! function_exists( 'gutenberg_remove_note_followers' ) ) {
 	 * @return list<int> The updated follower list.
 	 */
 	function gutenberg_remove_note_followers( int $root_id, array $user_ids ): array {
-		foreach ( array_map( 'intval', (array) $user_ids ) as $user_id ) {
+		$user_ids = array_map( fn ( $user_id ) => (int) $user_id, $user_ids );
+		foreach ( $user_ids as $user_id ) {
 			if ( $user_id > 0 ) {
 				delete_comment_meta( $root_id, '_wp_note_followers', $user_id );
 			}
