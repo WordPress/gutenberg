@@ -282,7 +282,10 @@ if ( ! function_exists( 'gutenberg_register_note_followers_meta' ) ) {
 				'description'   => __( 'User IDs following the note thread.', 'gutenberg' ),
 				'single'        => false,
 				'show_in_rest'  => array(
-					'schema' => array( 'type' => 'integer' ),
+					'schema' => array(
+						'type'    => 'integer',
+						'minimum' => 1,
+					),
 				),
 				'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
 					return current_user_can( 'edit_comment', $object_id );
