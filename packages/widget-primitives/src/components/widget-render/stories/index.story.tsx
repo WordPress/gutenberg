@@ -16,7 +16,10 @@ import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { DataFormControlProps, Field, Form } from '@wordpress/dataviews';
 import { Suspense, useId, useMemo, useState } from '@wordpress/element';
 import { globe, starFilled } from '@wordpress/icons';
-import { Card, Icon, Stack } from '@wordpress/ui';
+// `IconButton` is not on the recommended list yet.
+/* eslint-disable @wordpress/use-recommended-components */
+import { Card, Icon, IconButton, Stack } from '@wordpress/ui';
+/* eslint-enable @wordpress/use-recommended-components */
 
 /**
  * Internal dependencies
@@ -554,29 +557,25 @@ function RatingEdit< Item >( {
 	const value = Number( field.getValue( { item: data } ) ?? 0 );
 
 	return (
-		<Stack direction="row" align="center" gap="xs">
+		<Stack direction="row" align="center">
 			{ [ 1, 2, 3, 4, 5 ].map( ( star ) => (
-				<button
+				<IconButton
 					key={ star }
-					type="button"
-					aria-label={ `Rate ${ star } of 5` }
-					aria-pressed={ star <= value }
+					label={ `Rate ${ star } of 5` }
+					icon={ starFilled }
+					variant="unstyled"
 					onClick={ () =>
 						onChange(
 							field.setValue( { item: data, value: star } )
 						)
 					}
 					style={ {
-						background: 'none',
-						border: 'none',
 						cursor: 'pointer',
-						fontSize: '1em',
+						fontSize: '1.5em',
 						opacity: star <= value ? 1 : 0.25,
 						padding: 0,
 					} }
-				>
-					⭐
-				</button>
+				/>
 			) ) }
 		</Stack>
 	);
