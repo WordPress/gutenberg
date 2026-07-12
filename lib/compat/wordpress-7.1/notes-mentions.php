@@ -321,7 +321,7 @@ if ( ! function_exists( 'gutenberg_notify_note_mentions' ) ) {
 			return;
 		}
 
-		if ( ! $comment instanceof WP_Comment || 'note' !== $comment->comment_type ) {
+		if ( 'note' !== $comment->comment_type ) {
 			return;
 		}
 
