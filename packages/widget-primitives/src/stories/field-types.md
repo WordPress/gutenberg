@@ -14,7 +14,7 @@ A `Field` describes one attribute of one widget: its `id`, its label, its `relev
 
 ## Registering
 
-The consuming application owns the vocabulary. It registers each type once, before anything renders; the dashboard does it in its page init module.
+The consuming application owns the vocabulary. It registers each type once, before anything renders.
 
 ```ts
 registerFieldType( {
