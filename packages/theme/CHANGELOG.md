@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   Remove the `--wpds-elevation-*` design tokens while the complete elevation model is still being defined ([#80099](https://github.com/WordPress/gutenberg/pull/80099)).
 -   Make the package ESM-only by removing the published CommonJS entrypoints and requiring Node.js `^20.19.0` or `>=22.13.0`. ([#80063](https://github.com/WordPress/gutenberg/pull/80063))
 -   Rename `--wpds-color-background-thumb-neutral-disabled` to `--wpds-color-background-thumb-neutral-weak-disabled` so the disabled token belongs to the existing neutral weak thumb family ([#79770](https://github.com/WordPress/gutenberg/pull/79770)).
 -   `ThemeProvider`: reject partially transparent and `transparent` seed colors. `color.primary` and `color.background` now only accept fully opaque seed colors ([#79773](https://github.com/WordPress/gutenberg/pull/79773)).
@@ -20,6 +21,7 @@
 ### Documentation
 
 -   Clarify what `@wordpress/theme` provides, when consumers need to load `design-tokens.css`, the `ThemeProvider` contract including root provider usage, and the legacy compatibility boundary ([#79961](https://github.com/WordPress/gutenberg/pull/79961)).
+-   Document build plugin behavior and add parity coverage for PostCSS, esbuild, and Vite ([#80088](https://github.com/WordPress/gutenberg/pull/80088)).
 -   Document design token accessibility responsibilities ([#79943](https://github.com/WordPress/gutenberg/pull/79943)).
 -   Document that `ThemeProvider` does not accept wrapper customization props ([#79763](https://github.com/WordPress/gutenberg/pull/79763)).
 -   Clarify the design token documentation entry points and keep the generated token guidance source internal ([#79829](https://github.com/WordPress/gutenberg/pull/79829)).
@@ -29,7 +31,12 @@
 
 ### Enhancements
 
+-   Improve the `plugin-wpds/no-token-fallback-values` Stylelint rule message to point developers to the `@wordpress/theme` README for fallback setup guidance ([#79768](https://github.com/WordPress/gutenberg/pull/79768)).
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+### Internal
+
+-   Add regression test coverage for the `ThemeProvider` wrapper's `display: contents` focus behavior ([#80056](https://github.com/WordPress/gutenberg/pull/80056)).
 
 ## 0.17.0 (2026-06-30)
 

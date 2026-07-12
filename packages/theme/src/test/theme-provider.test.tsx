@@ -6,6 +6,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { ThemeProvider } from '../theme-provider';
 
 // Give the wrapper a stable class so tests can locate it and read its
@@ -36,11 +37,66 @@ function getScopingProvider( element: Element ) {
 	return element.closest< HTMLElement >( '.theme-provider-root' )!;
 }
 
+async function withInjectedThemeProviderStyles(
+	callback: () => void | Promise< void >
+) {
+	const style = document.createElement( 'style' );
+	style.textContent = readFileSync(
+		join( import.meta.dirname, '../style.module.css' ),
+		'utf8'
+	).replaceAll( '.root', '.theme-provider-root' );
+	document.head.appendChild( style );
+
+	try {
+		await callback();
+	} finally {
+		style.remove();
+	}
+}
+
 describe( 'ThemeProvider', () => {
 	it( 'renders its children', () => {
 		render( <ThemeProvider>content</ThemeProvider> );
 
 		expect( screen.getByText( 'content' ) ).toBeInTheDocument();
+	} );
+
+	it( 'keeps its scoping wrapper styled as display contents and unfocusable', async () => {
+		const user = userEvent.setup();
+
+		await withInjectedThemeProviderStyles( async () => {
+			render(
+				<>
+					<button>Before</button>
+					<ThemeProvider>
+						<button>Inside</button>
+					</ThemeProvider>
+					<button>After</button>
+				</>
+			);
+
+			const before = screen.getByRole( 'button', { name: 'Before' } );
+			const inside = screen.getByRole( 'button', { name: 'Inside' } );
+			const after = screen.getByRole( 'button', { name: 'After' } );
+			const provider = getScopingProvider( inside );
+
+			expect( getComputedStyle( provider ).display ).toBe( 'contents' );
+			expect( provider ).not.toHaveAttribute( 'tabindex' );
+
+			provider.focus();
+			expect( provider ).not.toHaveFocus();
+
+			await user.tab();
+			expect( before ).toHaveFocus();
+			await user.tab();
+			expect( inside ).toHaveFocus();
+			await user.tab();
+			expect( after ).toHaveFocus();
+			await user.tab( { shift: true } );
+			expect( inside ).toHaveFocus();
+			await user.tab( { shift: true } );
+			expect( before ).toHaveFocus();
+		} );
 	} );
 
 	it( 'defines the color tokens from the seeds within its subtree', () => {
