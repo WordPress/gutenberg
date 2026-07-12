@@ -107,6 +107,9 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		return $comment;
 	}
 
+	/**
+	 * @covers ::gutenberg_get_note_mentioned_user_ids
+	 */
 	public function test_parses_mentioned_user_ids(): void {
 		$content = '<p>Hi <a class="wp-note-mention" data-user-id="5" href="#">@Jane</a> and '
 			. '<a class="wp-note-mention" data-user-id="9" href="#">@Bob</a>.</p>';
@@ -117,6 +120,9 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @covers ::gutenberg_get_note_mentioned_user_ids
+	 */
 	public function test_ignores_plain_links_and_deduplicates(): void {
 		$content = '<p><a href="https://example.com" data-user-id="7">not a mention</a> '
 			. '<a class="wp-note-mention" data-user-id="5" href="#">@Jane</a> '
@@ -128,6 +134,12 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @covers ::gutenberg_note_mention_allowed_html
+	 * @covers ::gutenberg_note_mentions_before_rest_callbacks
+	 * @covers ::gutenberg_note_mentions_after_rest_callbacks
+	 * @covers ::gutenberg_rest_request_saves_note
+	 */
 	public function test_mention_markup_survives_kses_for_authors(): void {
 		$author  = self::create_user( 'author' );
 		$post_id = self::factory()->post->create( array( 'post_author' => $author->ID ) );
@@ -163,6 +175,9 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @covers ::gutenberg_get_note_thread_root_id
+	 */
 	public function test_thread_root_is_parent_for_replies(): void {
 		$root  = $this->insert_note( 'Top level', self::$commenter->ID );
 		$reply = $this->insert_note( 'A reply', self::$commenter->ID, $root->comment_ID );
@@ -177,6 +192,12 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @covers ::gutenberg_notify_note_mentions
+	 * @covers ::gutenberg_send_note_notification
+	 * @covers ::gutenberg_add_note_followers
+	 * @covers ::gutenberg_get_note_followers
+	 */
 	public function test_mentioned_user_is_emailed_and_subscribed(): void {
 		$mention = sprintf(
 			'<a class="wp-note-mention" data-user-id="%d" href="#">@Mentioned</a>',
@@ -194,6 +215,9 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$this->assertContains( self::$commenter->ID, $followers );
 	}
 
+	/**
+	 * @covers ::gutenberg_notify_note_mentions
+	 */
 	public function test_author_is_not_notified_about_their_own_note(): void {
 		$self_mention = sprintf(
 			'<a class="wp-note-mention" data-user-id="%d" href="#">@Me</a>',
@@ -206,6 +230,9 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$this->assertNotContains( self::$commenter->user_email, $this->sent_to );
 	}
 
+	/**
+	 * @covers ::gutenberg_notify_note_mentions
+	 */
 	public function test_post_author_is_left_to_core(): void {
 		$mention = sprintf(
 			'<a class="wp-note-mention" data-user-id="%d" href="#">@Author</a>',
@@ -220,6 +247,10 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$this->assertNotContains( self::$post_author->user_email, $this->sent_to );
 	}
 
+	/**
+	 * @covers ::gutenberg_notify_note_mentions
+	 * @covers ::gutenberg_get_note_followers
+	 */
 	public function test_mentioned_user_without_note_access_is_not_emailed(): void {
 		$subscriber_user = self::create_user( 'subscriber' );
 
@@ -243,6 +274,10 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @covers ::gutenberg_notify_note_mentions
+	 * @covers ::gutenberg_get_note_thread_root_id
+	 */
 	public function test_followers_are_notified_of_replies(): void {
 		$mention = sprintf(
 			'<a class="wp-note-mention" data-user-id="%d" href="#">@Mentioned</a>',
@@ -261,6 +296,9 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$this->assertContains( self::$mentioned->user_email, $this->sent_to );
 	}
 
+	/**
+	 * @covers ::gutenberg_notify_note_mentions
+	 */
 	public function test_no_notifications_when_disabled(): void {
 		update_option( 'wp_notes_notify', 0 );
 
@@ -276,6 +314,9 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		update_option( 'wp_notes_notify', 1 );
 	}
 
+	/**
+	 * @covers ::gutenberg_notify_note_mentions
+	 */
 	public function test_editing_a_note_does_not_renotify(): void {
 		$mention = sprintf(
 			'<a class="wp-note-mention" data-user-id="%d" href="#">@Mentioned</a>',
@@ -289,6 +330,9 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$this->assertEmpty( $this->sent_to );
 	}
 
+	/**
+	 * @covers ::gutenberg_notify_note_mentions
+	 */
 	public function test_recipients_filter_can_add_and_remove(): void {
 		$extra_user = self::create_user( 'editor' );
 
@@ -310,6 +354,11 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$this->assertNotContains( self::$mentioned->user_email, $this->sent_to );
 	}
 
+	/**
+	 * @covers ::gutenberg_add_note_followers
+	 * @covers ::gutenberg_remove_note_followers
+	 * @covers ::gutenberg_get_note_followers
+	 */
 	public function test_followers_can_be_removed(): void {
 		$note = $this->insert_note( 'Top level', self::$commenter->ID );
 		gutenberg_add_note_followers(
@@ -333,6 +382,9 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$this->assertSame( '', get_comment_meta( $note->comment_ID, '_wp_note_followers', true ) );
 	}
 
+	/**
+	 * @covers ::gutenberg_register_note_followers_meta
+	 */
 	public function test_followers_meta_is_registered_for_rest(): void {
 		gutenberg_register_note_followers_meta();
 
