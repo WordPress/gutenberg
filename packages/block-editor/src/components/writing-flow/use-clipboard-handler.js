@@ -20,7 +20,7 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
-import { setClipboardBlocks } from './utils';
+import { getCollapsedSelectionPayload, setClipboardBlocks } from './utils';
 import { getPasteEventData } from '../../utils/pasting';
 
 export default function useClipboardHandler() {
@@ -28,6 +28,7 @@ export default function useClipboardHandler() {
 	const {
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
+		getSelectionStart,
 		hasMultiSelection,
 		getSettings,
 		getBlockName,
@@ -42,6 +43,7 @@ export default function useClipboardHandler() {
 		flashBlock,
 		removeBlocks,
 		replaceBlocks,
+		selectionChange,
 		__unstableDeleteSelection,
 		__unstableExpandSelection,
 		__unstableSplitSelection,
@@ -53,6 +55,37 @@ export default function useClipboardHandler() {
 			if ( event.defaultPrevented ) {
 				// This was likely already handled in rich-text/use-paste-handler.js.
 				return;
+			}
+
+			// This handler acts on the store selection, which may not have
+			// received the current caret position yet: the native
+			// `selectionchange` event that dispatches it is asynchronous, so
+			// it can still be pending when the clipboard event arrives, for
+			// example right after an arrow key moved the caret into another
+			// block. Synchronize the store selection first. Only trust the
+			// native selection when it agrees with focus: for a selected
+			// block without text selection (e.g. an image), the native
+			// selection may still point at a previously edited block.
+			const selection = node.ownerDocument.defaultView.getSelection();
+			if (
+				selection.rangeCount &&
+				selection.isCollapsed &&
+				node.contains( selection.anchorNode ) &&
+				node.ownerDocument.activeElement?.contains(
+					selection.anchorNode
+				)
+			) {
+				const payload = getCollapsedSelectionPayload( selection );
+				const { clientId, attributeKey, offset } = payload?.start ?? {};
+				const start = getSelectionStart();
+				if (
+					payload &&
+					( start.clientId !== clientId ||
+						start.attributeKey !== attributeKey ||
+						start.offset !== offset )
+				) {
+					selectionChange( payload );
+				}
 			}
 
 			const selectedBlockClientIds = getSelectedBlockClientIds();
