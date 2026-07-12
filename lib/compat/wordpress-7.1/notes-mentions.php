@@ -32,8 +32,8 @@ if ( ! function_exists( 'gutenberg_get_note_mentioned_user_ids' ) ) {
 	 * @return list<int> Unique, positive mentioned user IDs.
 	 * @phpstan-return list<positive-int>
 	 */
-	function gutenberg_get_note_mentioned_user_ids( $content ): array {
-		if ( ! is_string( $content ) || ! str_contains( $content, '<a' ) ) {
+	function gutenberg_get_note_mentioned_user_ids( string $content ): array {
+		if ( ! str_contains( $content, '<a' ) ) {
 			return array();
 		}
 
