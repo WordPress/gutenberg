@@ -427,10 +427,10 @@ if ( ! function_exists( 'gutenberg_send_note_notification' ) ) {
 	/**
 	 * Sends a single note notification email.
 	 *
-	 * @param WP_User     $user          The recipient.
-	 * @param WP_Comment  $comment       The note that triggered the notification.
-	 * @param WP_Post|null $post         The post the note belongs to.
-	 * @param bool        $was_mentioned Whether the recipient was mentioned in this note.
+	 * @param WP_User      $user          The recipient.
+	 * @param WP_Comment   $comment       The note that triggered the notification.
+	 * @param WP_Post|null $post          The post the note belongs to.
+	 * @param bool         $was_mentioned Whether the recipient was mentioned in this note.
 	 * @return bool Whether the email was accepted for delivery by wp_mail().
 	 */
 	function gutenberg_send_note_notification( WP_User $user, WP_Comment $comment, ?WP_Post $post, bool $was_mentioned ): bool {
