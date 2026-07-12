@@ -75,11 +75,18 @@ function gutenberg_block_bindings_rebuild_inner_content( $inner_content, $block_
 		}
 	}
 
-	return array_merge(
+	$rebuilt_inner_content = array_merge(
 		array_slice( $inner_content, 0, $first_placeholder ),
 		array_fill( 0, $block_count, null ),
 		array_slice( $inner_content, $last_placeholder + 1 )
 	);
+
+	/*
+	 * WP_Block refreshes its existing inner content only when the replacement
+	 * array is non-empty. An empty static chunk renders nothing while ensuring
+	 * a nested bound block drops its already-constructed fallback children.
+	 */
+	return empty( $rebuilt_inner_content ) ? array( '' ) : $rebuilt_inner_content;
 }
 
 /**
