@@ -34,10 +34,11 @@ const TEXT_DECORATIONS = [
 /**
  * Control to facilitate text decoration selections.
  *
- * @param {Object}   props           Component props.
- * @param {string}   props.value     Currently selected text decoration.
- * @param {Function} props.onChange  Handles change in text decoration selection.
- * @param {string}   props.className Additional class name to apply.
+ * @param {Object}   props              Component props.
+ * @param {string}   props.value        Currently selected text decoration.
+ * @param {Function} props.onChange     Handles change in text decoration selection.
+ * @param {string}   props.className    Additional class name to apply.
+ * @param {string}   props.labelTooltip Tooltip text shown on the control label.
  *
  * @return {Element} Text decoration control.
  */
@@ -45,11 +46,13 @@ export default function TextDecorationControl( {
 	value,
 	onChange,
 	className,
+	labelTooltip,
 } ) {
 	return (
 		<ToggleGroupControl
 			isDeselectable
 			label={ __( 'Decoration' ) }
+			labelTooltip={ labelTooltip }
 			className={ clsx(
 				'block-editor-text-decoration-control',
 				className

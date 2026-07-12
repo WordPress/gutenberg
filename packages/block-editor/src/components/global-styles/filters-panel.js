@@ -32,6 +32,8 @@ import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import {
 	getInheritanceProps,
+	getInheritanceTooltipTextByPath,
+	InheritanceLabelTooltip,
 	InheritanceToolsPanelItem,
 	InheritanceResetButton,
 } from './inheritance';
@@ -107,7 +109,7 @@ const popoverProps = {
 	headerTitle: __( 'Duotone' ),
 };
 
-const LabeledColorIndicator = ( { indicator, label } ) => (
+const LabeledColorIndicator = ( { indicator, label, labelTooltip } ) => (
 	<HStack justify="flex-start">
 		<ZStack isLayered={ false } offset={ -8 }>
 			<Flex expanded={ false }>
@@ -122,12 +124,14 @@ const LabeledColorIndicator = ( { indicator, label } ) => (
 			className="block-editor-panel-duotone-settings__label"
 			title={ label }
 		>
-			{ label }
+			<InheritanceLabelTooltip labelTooltip={ labelTooltip }>
+				{ label }
+			</InheritanceLabelTooltip>
 		</FlexItem>
 	</HStack>
 );
 
-const renderToggle = ( duotone, resetConfig ) =>
+const renderToggle = ( duotone, resetConfig, labelTooltip ) =>
 	function Toggle( { onToggle, isOpen } ) {
 		const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
 		const duotoneButtonRef = useRef( undefined );
@@ -157,6 +161,7 @@ const renderToggle = ( duotone, resetConfig ) =>
 					<LabeledColorIndicator
 						indicator={ duotone }
 						label={ __( 'Duotone' ) }
+						labelTooltip={ labelTooltip }
 					/>
 				</Button>
 				{ hasLocalValue &&
@@ -183,6 +188,7 @@ export default function FiltersPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedSources,
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -190,10 +196,8 @@ export default function FiltersPanel( {
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
-	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>
-		showInheritanceLabelIndicators
-			? getInheritanceProps( isInherited, hasLocalOverride, className )
-			: {};
+	const tooltipText = ( path ) =>
+		getInheritanceTooltipTextByPath( inheritedSources, path );
 
 	// Duotone
 	const hasDuotoneEnabled = useHasDuotoneControl( settings );
@@ -241,6 +245,11 @@ export default function FiltersPanel( {
 		showInheritanceLabelIndicators &&
 		hasDuotone() &&
 		inheritedDuotone !== undefined;
+	const duotoneInheritance = getInheritanceProps(
+		showInheritanceLabelIndicators,
+		isDuotonePlaceholder,
+		hasDuotoneLocalOverride
+	);
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -261,11 +270,7 @@ export default function FiltersPanel( {
 		>
 			{ hasDuotoneEnabled && (
 				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isDuotonePlaceholder,
-						localDuotone !== undefined &&
-							inheritedDuotone !== undefined
-					) }
+					{ ...duotoneInheritance }
 					label={ __( 'Duotone' ) }
 					hasValue={ hasDuotone }
 					onDeselect={ resetDuotone }
@@ -278,11 +283,17 @@ export default function FiltersPanel( {
 					<Dropdown
 						popoverProps={ popoverProps }
 						className="block-editor-global-styles-filters-panel__dropdown"
-						renderToggle={ renderToggle( duotone, {
-							hasLocalValue: hasDuotone(),
-							hasLocalOverride: hasDuotoneLocalOverride,
-							onReset: resetDuotone,
-						} ) }
+						renderToggle={ renderToggle(
+							duotone,
+							{
+								hasLocalValue: hasDuotone(),
+								hasLocalOverride: hasDuotoneLocalOverride,
+								onReset: resetDuotone,
+							},
+							duotoneInheritance.isInherited
+								? tooltipText( 'filter.duotone' )
+								: undefined
+						) }
 						renderContent={ () => (
 							<DropdownContentWrapper paddingSize="small">
 								<MenuGroup label={ __( 'Duotone' ) }>

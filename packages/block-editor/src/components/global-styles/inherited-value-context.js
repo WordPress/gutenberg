@@ -17,26 +17,36 @@ import { resolveStyles } from './build-inherited-value';
 import { getVariationNameFromClass } from '../../hooks/block-style-variation';
 
 /**
- * Internal hook that reads the Global Styles payload and returns the wrapped
- * `{ styles }` shape the builder and ref-resolver helpers expect, along with
- * the theme-file `_links` map used to resolve theme-file pointers (e.g.
- * background images).
+ * Internal hook that reads the Global Styles payload and the block's
+ * registered styles, and returns the wrapped `{ styles }` shape the builder
+ * and ref-resolver helpers expect, along with the theme-file `_links` map used
+ * to resolve theme-file pointers (e.g. background images) and the block's
+ * registered styles (used for variation titles in breadcrumb tooltips).
  *
- * @return {{ globalStyles: ?Object, links: ?Object }} Wrapped Global Styles payload and links map.
+ * @param {?string} blockName Selected block name (e.g. `core/heading`).
+ * @return {{ globalStyles: ?Object, links: ?Object, blockStyles: Array }} Wrapped Global Styles payload, links map, and block styles.
  */
-function useRawGlobalStyles() {
-	const { rawGlobalStylesData, links } = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		return {
-			rawGlobalStylesData: settings[ globalStylesDataKey ] ?? null,
-			links: settings[ globalStylesLinksDataKey ] ?? null,
-		};
-	}, [] );
+function useRawGlobalStyles( blockName ) {
+	const { rawGlobalStylesData, links, blockStyles } = useSelect(
+		( select ) => {
+			const settings = select( blockEditorStore ).getSettings();
+			const blockStylesSelector = select( blocksStore ).getBlockStyles;
+			return {
+				rawGlobalStylesData: settings[ globalStylesDataKey ] ?? null,
+				links: settings[ globalStylesLinksDataKey ] ?? null,
+				blockStyles:
+					blockName && blockStylesSelector
+						? blockStylesSelector( blockName )
+						: [],
+			};
+		},
+		[ blockName ]
+	);
 	const globalStyles = useMemo(
 		() => ( rawGlobalStylesData ? { styles: rawGlobalStylesData } : null ),
 		[ rawGlobalStylesData ]
 	);
-	return { globalStyles, links };
+	return { globalStyles, links, blockStyles };
 }
 
 /**
@@ -93,7 +103,8 @@ export function useResolvedStyles(
 	selectedState = null
 ) {
 	const ownVariation = useOwnVariation( blockName, className );
-	const { globalStyles, links } = useRawGlobalStyles();
+	const { globalStyles, links, blockStyles } =
+		useRawGlobalStyles( blockName );
 
 	return useMemo( () => {
 		if ( ! blockName ) {
@@ -103,8 +114,16 @@ export function useResolvedStyles(
 			blockName,
 			ownVariation,
 			globalStyles,
+			blockStyles,
 			selectedState,
 			_links: links,
 		} );
-	}, [ blockName, ownVariation, globalStyles, selectedState, links ] );
+	}, [
+		blockName,
+		ownVariation,
+		globalStyles,
+		blockStyles,
+		selectedState,
+		links,
+	] );
 }

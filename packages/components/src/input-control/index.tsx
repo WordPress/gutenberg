@@ -48,6 +48,7 @@ export function UnforwardedInputControl(
 		isPressEnterToChange = false,
 		label,
 		labelPosition = 'top',
+		labelTooltip,
 		onChange = noop,
 		onValidate = noop,
 		onKeyDown = noop,
@@ -89,6 +90,7 @@ export function UnforwardedInputControl(
 				justify="left"
 				label={ label }
 				labelPosition={ labelPosition }
+				labelTooltip={ labelTooltip }
 				prefix={ prefix }
 				size={ size }
 				style={ style }

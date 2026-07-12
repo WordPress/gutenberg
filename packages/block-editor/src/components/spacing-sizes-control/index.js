@@ -79,6 +79,7 @@ export default function SpacingSizesControl( {
 	sides = ALL_SIDES,
 	useSelect,
 	values,
+	labelTooltip,
 } ) {
 	const spacingSizes = useSpacingSizes();
 	const inputValues = values || DEFAULT_VALUES;
@@ -144,6 +145,7 @@ export default function SpacingSizesControl( {
 				<BaseControl.VisualLabel
 					as="legend"
 					className="spacing-sizes-control__label"
+					labelTooltip={ labelTooltip }
 				>
 					{ label }
 				</BaseControl.VisualLabel>

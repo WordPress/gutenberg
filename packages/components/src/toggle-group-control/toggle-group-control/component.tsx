@@ -39,6 +39,7 @@ function UnconnectedToggleGroupControl(
 		isDeselectable = false,
 		id,
 		label,
+		labelTooltip,
 		hideLabelFromVision = false,
 		help,
 		onChange,
@@ -51,6 +52,7 @@ function UnconnectedToggleGroupControl(
 		id,
 		help,
 		label,
+		labelTooltip,
 		hideLabelFromVision,
 	} );
 

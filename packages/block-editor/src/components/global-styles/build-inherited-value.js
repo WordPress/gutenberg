@@ -52,20 +52,61 @@ const TREE_STRUCTURAL_KEYS = new Set( [ 'blocks', 'variations', 'css' ] );
 // Empty inheritance data returned before Global Styles payloads settle.
 const EMPTY_INHERITANCE = Object.freeze( { value: {}, sources: {} } );
 
-// Source descriptors per inheritance layer. `layer` identifies which layer
-// supplied a leaf and drives inherited-value detection.
-const SOURCE_DESCRIPTORS = {
-	root: { layer: 'root' },
-	block: { layer: 'block' },
-	blockVariation: { layer: 'blockVariation' },
+// Breadcrumb part identifiers for each Global Styles inheritance layer.
+const SOURCE_BREADCRUMB_PARTS = {
+	styles: 'styles',
+	elements: 'elements',
+	blocks: 'blocks',
+	blockName: 'blockName',
+	variations: 'variations',
+	variationName: 'variationName',
 };
 
-function createSourceDescriptor( type ) {
+// Source descriptors per inheritance layer. `layer` identifies which layer
+// supplied a leaf and drives inherited-value detection; `breadcrumb` describes
+// the Global Styles path surfaced in the inspector label tooltip.
+const SOURCE_DESCRIPTORS = {
+	root: {
+		breadcrumb: [ SOURCE_BREADCRUMB_PARTS.styles ],
+		layer: 'root',
+	},
+	block: {
+		breadcrumb: [
+			SOURCE_BREADCRUMB_PARTS.styles,
+			SOURCE_BREADCRUMB_PARTS.blocks,
+			SOURCE_BREADCRUMB_PARTS.blockName,
+		],
+		layer: 'block',
+	},
+	blockVariation: {
+		breadcrumb: [
+			SOURCE_BREADCRUMB_PARTS.styles,
+			SOURCE_BREADCRUMB_PARTS.blocks,
+			SOURCE_BREADCRUMB_PARTS.blockName,
+			SOURCE_BREADCRUMB_PARTS.variations,
+			SOURCE_BREADCRUMB_PARTS.variationName,
+		],
+		layer: 'blockVariation',
+	},
+};
+
+function createSourceDescriptor(
+	type,
+	{ blockName, variation, blockStyles } = {}
+) {
 	const descriptor = SOURCE_DESCRIPTORS[ type ];
 	if ( ! descriptor ) {
 		return null;
 	}
-	return { ...descriptor };
+	return {
+		...descriptor,
+		breadcrumb: [ ...descriptor.breadcrumb ],
+		blockName: blockName ?? null,
+		variation: variation ?? null,
+		variationTitle:
+			blockStyles?.find( ( style ) => style.name === variation )?.label ??
+			null,
+	};
 }
 
 function createContribution( styles, source ) {
@@ -81,8 +122,14 @@ function getPathKey( path ) {
 
 // Clone the descriptor so source-map entries can diverge as paths differ.
 function getSourceForPath( source, path ) {
+	const breadcrumb = [ ...source.breadcrumb ];
+	const [ maybeElementsKey, maybeElement ] = path;
+	if ( maybeElementsKey === 'elements' && maybeElement ) {
+		breadcrumb.push( SOURCE_BREADCRUMB_PARTS.elements, maybeElement );
+	}
 	return {
 		...source,
+		breadcrumb,
 		path: [ ...path ],
 	};
 }
@@ -339,6 +386,7 @@ function resolveThemeFileBackgroundImage( value, globalStyles, links ) {
  * @param {string}  args.blockName       Block name (e.g. `core/heading`).
  * @param {?string} [args.ownVariation]  Active block style variation slug, or null.
  * @param {Object}  [args.globalStyles]  The `settings[ globalStylesDataKey ]` payload.
+ * @param {Array}   [args.blockStyles]   Registered styles for the block type (for variation titles).
  * @param {?Object} [args.selectedState] Selected block style state, or null for the default state.
  * @param {?Object} [args._links]        Theme-file links (`settings[ globalStylesLinksDataKey ]`), used to resolve theme-file pointers.
  * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map.
@@ -347,6 +395,7 @@ function computeResolvedStyles( {
 	blockName,
 	ownVariation = null,
 	globalStyles,
+	blockStyles = [],
 	selectedState = null,
 	_links = null,
 } = {} ) {
@@ -382,13 +431,17 @@ function computeResolvedStyles( {
 		block
 			? createContribution(
 					pickLayerRootContribution( block ),
-					createSourceDescriptor( 'block' )
+					createSourceDescriptor( 'block', { blockName } )
 			  )
 			: null,
 		variation
 			? createContribution(
 					pickLayerRootContribution( variation ),
-					createSourceDescriptor( 'blockVariation' )
+					createSourceDescriptor( 'blockVariation', {
+						blockName,
+						variation: ownVariation,
+						blockStyles,
+					} )
 			  )
 			: null,
 	];
@@ -411,7 +464,7 @@ function computeResolvedStyles( {
 						pickLayerRootContribution(
 							getStateSlice( block, selectedState )
 						),
-						createSourceDescriptor( 'block' )
+						createSourceDescriptor( 'block', { blockName } )
 				  )
 				: null,
 			variation
@@ -419,7 +472,11 @@ function computeResolvedStyles( {
 						pickLayerRootContribution(
 							getStateSlice( variation, selectedState )
 						),
-						createSourceDescriptor( 'blockVariation' )
+						createSourceDescriptor( 'blockVariation', {
+							blockName,
+							variation: ownVariation,
+							blockStyles,
+						} )
 				  )
 				: null
 		);
@@ -454,7 +511,7 @@ function computeResolvedStyles( {
 }
 
 // Shared memo for `resolveStyles`, keyed by Global Styles object identity and
-// a `(blockName, ownVariation, selectedState)` composite.
+// a `(blockName, ownVariation, blockStyles, selectedState)` composite.
 const memo = new WeakMap();
 
 /**
@@ -475,6 +532,9 @@ export function resolveStyles( args ) {
 		inner = new Map();
 		memo.set( globalStyles, inner );
 	}
+	const blockStylesKey = ( args.blockStyles || [] )
+		.map( ( { name, label } ) => `${ name }:${ label }` )
+		.join( ',' );
 	const selectedStateKey = args.selectedState
 		? `${ args.selectedState.viewport ?? '' }:${
 				args.selectedState.pseudo ?? ''
@@ -484,6 +544,8 @@ export function resolveStyles( args ) {
 		( args.blockName || '' ) +
 		'\u0001' +
 		( args.ownVariation || '' ) +
+		'\u0001' +
+		blockStylesKey +
 		'\u0001' +
 		selectedStateKey;
 	if ( inner.has( key ) ) {

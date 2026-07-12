@@ -95,6 +95,7 @@ function CustomSelect(
 		children,
 		hideLabelFromVision = false,
 		label,
+		labelTooltip,
 		size,
 		store,
 		className,
@@ -125,7 +126,10 @@ function CustomSelect(
 						<VisuallyHidden />
 					) : (
 						// @ts-expect-error `children` are passed via the render prop
-						<BaseControl.VisualLabel as="div" />
+						<BaseControl.VisualLabel
+							as="div"
+							labelTooltip={ labelTooltip }
+						/>
 					)
 				}
 			>

@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { VisuallyHidden } from '../visually-hidden';
+import { LabelWithTooltip } from '../utils/label-with-tooltip';
 import {
 	Label as BaseLabel,
 	LabelWrapper,
@@ -13,6 +14,7 @@ export default function Label( {
 	children,
 	hideLabelFromVision,
 	htmlFor,
+	labelTooltip,
 	...props
 }: WordPressComponentProps< InputControlLabelProps, 'label', false > ) {
 	if ( ! children ) {
@@ -30,7 +32,9 @@ export default function Label( {
 	return (
 		<LabelWrapper>
 			<BaseLabel htmlFor={ htmlFor } { ...props }>
-				{ children }
+				<LabelWithTooltip labelTooltip={ labelTooltip }>
+					{ children }
+				</LabelWithTooltip>
 			</BaseLabel>
 		</LabelWrapper>
 	);

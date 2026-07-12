@@ -11,36 +11,130 @@ import {
 	Icon as WCIcon,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { Tooltip } from '@wordpress/ui';
+import { getBlockType } from '@wordpress/blocks';
 import { reset as resetIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
+const INHERITANCE_TOOLTIP_LINE_SEPARATOR = '\n';
+
+const BREADCRUMB_LABELS = {
+	styles: __( 'Styles' ),
+	elements: __( 'Elements' ),
+	blocks: __( 'Blocks' ),
+	variations: __( 'Variations' ),
+};
+
+function getBlockTitle( blockName ) {
+	return getBlockType( blockName )?.title ?? blockName;
+}
+
+function getVariationTitle( variation, blockStyles, variationTitle ) {
+	return (
+		variationTitle ??
+		blockStyles?.find( ( style ) => style.name === variation )?.label ??
+		variation
+	);
+}
+
+function getTranslatedBreadcrumb( source, blockStyles ) {
+	const breadcrumb = source?.breadcrumb;
+	const parts = breadcrumb
+		.map( ( part ) => {
+			if ( part === 'blockName' ) {
+				return getBlockTitle( source.blockName );
+			}
+			if ( part === 'variationName' ) {
+				return getVariationTitle(
+					source.variation,
+					blockStyles,
+					source.variationTitle
+				);
+			}
+			return BREADCRUMB_LABELS[ part ] ?? part;
+		} )
+		.filter( Boolean );
+	return parts.join( ' > ' );
+}
+
 /**
- * Returns props to spread onto a wrapping `<InheritanceToolsPanelItem>`
- * so its descendant label picks up the inherited-from-Global-Styles
- * visual treatment.
+ * Formats a source entry into user-facing tooltip text.
  *
- * When `isInherited` is true without a local override, the descendant
- * label text receives the inherited-from-Global-Styles treatment
- * (dotted underline). No dot is shown.
+ * @param {?Object} source      Source metadata.
+ * @param {Array}   blockStyles Registered styles for the block type.
+ * @return {string|undefined} Tooltip text, or undefined when no source exists.
+ */
+function getInheritanceTooltipText( source, blockStyles ) {
+	const breadcrumb = source?.breadcrumb;
+	if ( ! Array.isArray( breadcrumb ) || breadcrumb.length === 0 ) {
+		return undefined;
+	}
+	return [
+		__( 'Default inherited from:' ),
+		getTranslatedBreadcrumb( source, blockStyles ),
+	].join( INHERITANCE_TOOLTIP_LINE_SEPARATOR );
+}
+
+/**
+ * Formats a source entry from a source map path.
  *
- * When `hasLocalOverride` is true, a small reset dot is rendered as a
- * sibling of the control exposing a "Reset to inherited value" action.
+ * @param {?Object} sources     Source metadata keyed by dot path.
+ * @param {string}  path        Dot path.
+ * @param {Array}   blockStyles Registered styles for the block type.
+ * @return {string|undefined} Tooltip text, or undefined when no source exists.
+ */
+export function getInheritanceTooltipTextByPath( sources, path, blockStyles ) {
+	return getInheritanceTooltipText( sources?.[ path ], blockStyles );
+}
+
+/**
+ * Formats a tooltip for a compound control. A shared source is used only when
+ * all contributing paths resolve to the same breadcrumb; mixed sources receive
+ * a conservative summary.
  *
- * The two states are mutually exclusive at the source. If both are passed,
- * only the local-override class is returned.
+ * @param {?Object} sources     Source metadata keyed by dot path.
+ * @param {Array}   paths       Dot paths to inspect.
+ * @param {Array}   blockStyles Registered styles for the block type.
+ * @return {string|undefined} Tooltip text, or undefined when no source exists.
+ */
+export function getCommonInheritanceTooltipText( sources, paths, blockStyles ) {
+	const sourceEntries = paths
+		.map( ( path ) => sources?.[ path ] )
+		.filter( Boolean );
+	if ( sourceEntries.length === 0 ) {
+		return undefined;
+	}
+	const firstBreadcrumb = sourceEntries[ 0 ].breadcrumb?.join( ' > ' );
+	const hasCommonBreadcrumb = sourceEntries.every(
+		( source ) => source.breadcrumb?.join( ' > ' ) === firstBreadcrumb
+	);
+	if ( hasCommonBreadcrumb ) {
+		return getInheritanceTooltipText( sourceEntries[ 0 ], blockStyles );
+	}
+	return __( 'Default inherited from multiple Styles sources' );
+}
+
+/**
+ * Returns props to spread onto a wrapping `<InheritanceToolsPanelItem>` so its
+ * descendant label picks up the inherited-from-Global-Styles visual treatment.
  *
- * Returned object shape allows direct spread:
+ * When `isInherited` is true without a local override, the descendant label
+ * text gets the inherited-from-Global-Styles treatment (dotted underline). When
+ * `hasLocalOverride` is true, a reset dot is rendered next to the control. The
+ * two are mutually exclusive; if both are passed, only the override wins.
  *
- *     <InheritanceToolsPanelItem
- *         { ...getInheritanceProps( isInherited, hasLocalOverride ) }
- *         label={ __( 'Line height' ) }
- *         …
- *     >
+ * `showIndicators` gates the whole feature: when false (outside the inspector)
+ * neither the treatment nor the override state is applied, but any
+ * `baseClassName` still passes through so layout classes survive. The returned
+ * `isInherited` is likewise false, so callers can gate the breadcrumb tooltip
+ * on it and it can't drift from the label treatment.
  *
+ * @param {boolean}             showIndicators   Whether inheritance indicators
+ *                                               are enabled for the panel.
  * @param {boolean}             isInherited      Control is inheriting at rest.
- * @param {boolean}             hasLocalOverride Local override is set AND
- *                                               there is an inherited value
- *                                               being overridden.
+ * @param {boolean}             hasLocalOverride Local override is set AND there
+ *                                               is an inherited value being
+ *                                               overridden.
  * @param {string|Array|Object} [baseClassName]  Optional className(s) to fold
  *                                               into the returned `className`.
  *
@@ -48,19 +142,22 @@ import { __ } from '@wordpress/i18n';
  *                                  `InheritanceToolsPanelItem`.
  */
 export function getInheritanceProps(
+	showIndicators,
 	isInherited,
 	hasLocalOverride,
 	baseClassName
 ) {
-	const inheritedOnly = !! isInherited && ! hasLocalOverride;
+	const inheritedOnly =
+		showIndicators && !! isInherited && ! hasLocalOverride;
+	const hasOverride = showIndicators && !! hasLocalOverride;
 	const className = clsx( baseClassName, {
 		'is-inherited-from-global-styles': inheritedOnly,
-		'has-local-override-from-global-styles': !! hasLocalOverride,
+		'has-local-override-from-global-styles': hasOverride,
 	} );
 	return {
 		...( className ? { className } : {} ),
 		isInherited: inheritedOnly,
-		hasLocalOverride: !! hasLocalOverride,
+		hasLocalOverride: hasOverride,
 	};
 }
 
@@ -118,13 +215,62 @@ export function InheritanceResetButton( { onResetToInherited, className } ) {
 }
 
 /**
+ * Wraps label content in the inherited-from breadcrumb tooltip using the
+ * `@wordpress/ui` `Tooltip` — the same primitive the native `labelTooltip` prop
+ * renders through (see `LabelWithTooltip` in `@wordpress/components`), so both
+ * tooltip paths look and behave identically.
+ *
+ * For controls whose label is not rendered by a `BaseControl`/`InputControl`
+ * (color name, background image title, duotone), the native `labelTooltip`
+ * prop can't reach the label text, so it is wrapped directly here instead. When
+ * `labelTooltip` is falsy the children are returned unwrapped.
+ *
+ * @param {Object}                    props
+ * @param {?string}                   props.labelTooltip Breadcrumb tooltip text.
+ * @param {import('react').ReactNode} props.children     Label content to wrap.
+ *
+ * @return {import('react').ReactNode} Wrapped (or bare) label content.
+ */
+export function InheritanceLabelTooltip( { labelTooltip, children } ) {
+	if ( ! labelTooltip ) {
+		return children;
+	}
+	return (
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					<span className="global-styles-inheritance-tooltip-anchor">
+						{ children }
+					</span>
+				}
+			/>
+			<Tooltip.Popup className="global-styles-inheritance-tooltip-content">
+				{ labelTooltip
+					.split( INHERITANCE_TOOLTIP_LINE_SEPARATOR )
+					.map( ( line, index ) => (
+						<span
+							key={ index }
+							className="global-styles-inheritance-tooltip-content__line"
+						>
+							{ line }
+						</span>
+					) ) }
+			</Tooltip.Popup>
+		</Tooltip.Root>
+	);
+}
+
+/**
  * A `ToolsPanelItem` that reflects whether its control's value is inherited
  * from Global Styles or locally overridden. The two states are mutually
  * exclusive.
  *
  * - Inherited: the control label receives the inherited-from-Global-Styles
  *   treatment (dotted underline) via the `is-inherited-from-global-styles`
- *   class applied through `getInheritanceProps`. No dot is shown.
+ *   class applied through `getInheritanceProps`. The breadcrumb tooltip
+ *   pointing at the originating Global Styles source is rendered by the
+ *   control itself via its native `labelTooltip` prop, which the panels pass
+ *   in directly — this item is not involved in the tooltip. No dot is shown.
  * - Local override: a reset dot is rendered as a plain sibling of the control
  *   at the item's inline-end — never nested in the label — exposing the same
  *   one-click reset the `ToolsPanel` options menu performs via `onDeselect`.
@@ -135,7 +281,7 @@ export function InheritanceResetButton( { onResetToInherited, className } ) {
  *
  * @param {Object}                    props
  * @param {?string}                   props.className                         Item className.
- * @param {boolean}                   props.isInherited                       Value is inherited at rest. Accepted so the `getInheritanceProps` spread does not leak onto the underlying `ToolsPanelItem`; the inherited treatment is applied via `className`.
+ * @param {boolean}                   props.isInherited                       Value is inherited at rest. Applies the label treatment via `className` (through `getInheritanceProps`).
  * @param {boolean}                   props.hasLocalOverride                  Local override is set.
  * @param {import('react').ReactNode} props.label                             Control label.
  * @param {?Function}                 props.onDeselect                        Reset handler.
@@ -147,10 +293,10 @@ export function InheritanceResetButton( { onResetToInherited, className } ) {
  */
 export function InheritanceToolsPanelItem( {
 	className,
-	// Destructured (and unused) so the `getInheritanceProps` spread does not
-	// leak `isInherited` onto the underlying `ToolsPanelItem`. The inherited
-	// treatment is applied purely via `className`
-	// (`is-inherited-from-global-styles`).
+	// `isInherited`/`hasLocalOverride` are consumed here, not forwarded onto
+	// `ToolsPanelItem`: the label treatment and reset dot are driven entirely
+	// by `className` and `hasLocalOverride`, so passing them through would leak
+	// unknown attributes onto the DOM.
 	isInherited,
 	hasLocalOverride,
 	label,

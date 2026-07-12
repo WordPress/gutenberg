@@ -71,6 +71,11 @@ export type BoxControlProps = Pick< UnitControlProps, 'units' > &
 		 */
 		label?: string;
 		/**
+		 * If provided, the visible heading label is wrapped in a `Tooltip`
+		 * showing this text.
+		 */
+		labelTooltip?: string;
+		/**
 		 * A callback function when an input value changes.
 		 */
 		onChange: ( next: BoxControlValue ) => void;

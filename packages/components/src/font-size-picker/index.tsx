@@ -40,6 +40,7 @@ const UnforwardedFontSizePicker = (
 		fallbackFontSize,
 		fontSizes = [],
 		disableCustomFontSizes = false,
+		labelTooltip,
 		onChange,
 		units: unitsProp = DEFAULT_UNITS,
 		value,
@@ -123,7 +124,7 @@ const UnforwardedFontSizePicker = (
 		>
 			<Spacer>
 				<Header className="components-font-size-picker__header">
-					<HeaderLabel id={ labelId }>
+					<HeaderLabel id={ labelId } labelTooltip={ labelTooltip }>
 						{ __( 'Font size' ) }
 					</HeaderLabel>
 					{ ! disableCustomFontSizes && (

@@ -76,6 +76,7 @@ export default function DimensionControl( {
 	placeholder,
 	className,
 	dimensionSizes: dimensionSizesProp,
+	labelTooltip,
 } ) {
 	const [ dimensionSizesFromSettings, availableUnits ] = useSettings(
 		'dimensions.dimensionSizes',
@@ -158,7 +159,7 @@ export default function DimensionControl( {
 		<fieldset
 			className={ clsx( 'block-editor-dimension-control', className ) }
 		>
-			<BaseControl.VisualLabel as="legend">
+			<BaseControl.VisualLabel as="legend" labelTooltip={ labelTooltip }>
 				{ label }
 			</BaseControl.VisualLabel>
 			<PresetInputControl

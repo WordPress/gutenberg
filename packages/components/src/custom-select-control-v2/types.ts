@@ -77,6 +77,11 @@ export type _CustomSelectProps = CustomSelectButtonProps & {
 	 * Accessible label for the control.
 	 */
 	label: string;
+	/**
+	 * A tooltip to show when hovering/focusing the label text. When provided,
+	 * the label text is wrapped in a `Tooltip`.
+	 */
+	labelTooltip?: string;
 };
 
 export type CustomSelectProps = _CustomSelectProps & CustomSelectSize;

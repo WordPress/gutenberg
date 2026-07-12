@@ -30,6 +30,11 @@ export type BaseControlProps = {
 	 */
 	label?: ReactNode;
 	/**
+	 * If provided, the visible label text is wrapped in a `Tooltip` showing this
+	 * text. Only applies when the label is visible (i.e. not `hideLabelFromVision`).
+	 */
+	labelTooltip?: string;
+	/**
 	 * If true, the label will only be visible to screen readers.
 	 *
 	 * @default false
@@ -47,4 +52,8 @@ export type BaseControlVisualLabelProps = {
 	 * The content to be displayed within the `BaseControl.VisualLabel`.
 	 */
 	children: ReactNode;
+	/**
+	 * If provided, the label content is wrapped in a `Tooltip` showing this text.
+	 */
+	labelTooltip?: string;
 };

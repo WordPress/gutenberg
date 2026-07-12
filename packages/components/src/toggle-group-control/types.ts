@@ -79,6 +79,11 @@ export type ToggleGroupControlProps = Pick<
 	 */
 	label: string;
 	/**
+	 * If provided, the visible label text is wrapped in a `Tooltip` showing this
+	 * text.
+	 */
+	labelTooltip?: string;
+	/**
 	 * If true, the label will only be visible to screen readers.
 	 *
 	 * @default false

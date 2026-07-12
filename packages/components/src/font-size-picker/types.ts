@@ -17,6 +17,11 @@ export type FontSizePickerProps = {
 	 */
 	fontSizes?: FontSize[];
 	/**
+	 * If provided, the visible "Font size" label is wrapped in a `Tooltip`
+	 * showing this text.
+	 */
+	labelTooltip?: string;
+	/**
 	 * A function that receives the new font size value.
 	 * If onChange is called without any parameter, it should reset the value,
 	 * attending to what reset means in that context, e.g., set the font size to

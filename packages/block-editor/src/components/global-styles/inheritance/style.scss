@@ -30,6 +30,25 @@
 	}
 }
 
+// The tooltip trigger wraps the visible label text inline, so the breadcrumb
+// tooltip is scoped to the label without wrapping the full control or
+// intercepting nested control tooltips. `.components-control-label__tooltip-anchor`
+// is rendered by the components `labelTooltip` prop (most controls);
+// `.global-styles-inheritance-tooltip-anchor` is rendered by
+// `InheritanceLabelTooltip` for the color, background image, and duotone labels
+// that are not produced by a `BaseControl`/`InputControl`.
+.components-control-label__tooltip-anchor,
+.global-styles-inheritance-tooltip-anchor {
+	// A transparent inline wrapper around the existing label text; inherit the
+	// label's own layout so truncation and the dotted treatment are unaffected.
+	display: inline;
+}
+
+// Breadcrumb tooltip content: render each line on its own row.
+.global-styles-inheritance-tooltip-content__line {
+	display: block;
+}
+
 // Local-override reset dot — a sibling of the control positioned at the item's
 // inline-end.
 .has-local-override-from-global-styles {

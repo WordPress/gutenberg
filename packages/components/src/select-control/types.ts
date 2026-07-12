@@ -16,6 +16,7 @@ type SelectControlBaseProps< V extends string > = Pick<
 	| 'disabled'
 	| 'hideLabelFromVision'
 	| 'label'
+	| 'labelTooltip'
 	| 'labelPosition'
 	| 'prefix'
 	| 'size'

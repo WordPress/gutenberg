@@ -67,6 +67,7 @@ function BoxControl( {
 	inputProps = defaultInputProps,
 	onChange = noop,
 	label = __( 'Box Control' ),
+	labelTooltip,
 	values: valuesProp,
 	units,
 	sides,
@@ -153,7 +154,10 @@ function BoxControl( {
 			role="group"
 			aria-labelledby={ headingId }
 		>
-			<BaseControl.VisualLabel id={ headingId }>
+			<BaseControl.VisualLabel
+				id={ headingId }
+				labelTooltip={ labelTooltip }
+			>
 				{ label }
 			</BaseControl.VisualLabel>
 			{ isLinked && (

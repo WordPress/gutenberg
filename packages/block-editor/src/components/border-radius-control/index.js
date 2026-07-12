@@ -164,19 +164,22 @@ function createCornerUnitChangeHandler(
 /**
  * Control to display border radius options.
  *
- * @param {Object}        props               Component props.
- * @param {Function}      props.onChange      Callback to handle onChange.
- * @param {Object}        props.values        Border radius values.
- * @param {Object}        props.presets       Border radius presets.
- * @param {string}        [props.className]   Optional class name applied to the
- *                                            wrapping fieldset.
+ * @param {Object}        props                Component props.
+ * @param {Function}      props.onChange       Callback to handle onChange.
+ * @param {Object}        props.values         Border radius values.
+ * @param {Object}        props.presets        Border radius presets.
+ * @param {string}        [props.className]    Optional class name applied to the
+ *                                             wrapping fieldset.
  * @param {string|Object} [props.placeholder]
- *                                            Either a single placeholder string
- *                                            (linked mode) or an object with
- *                                            per-corner keys (`topLeft`,
- *                                            `topRight`, `bottomLeft`,
- *                                            `bottomRight`) to display as the
- *                                            placeholder on each unlinked input.
+ *                                             Either a single placeholder string
+ *                                             (linked mode) or an object with
+ *                                             per-corner keys (`topLeft`,
+ *                                             `topRight`, `bottomLeft`,
+ *                                             `bottomRight`) to display as the
+ *                                             placeholder on each unlinked input.
+ * @param {string}        [props.labelTooltip]
+ *                                             Tooltip text shown on the control
+ *                                             label.
  *
  * @return {Element}              Custom border radius control.
  */
@@ -186,6 +189,7 @@ export default function BorderRadiusControl( {
 	presets,
 	className,
 	placeholder,
+	labelTooltip,
 } ) {
 	const [ isLinked, setIsLinked ] = useState(
 		! hasDefinedValues( values ) || ! hasMixedValues( values )
@@ -234,7 +238,10 @@ export default function BorderRadiusControl( {
 			className={ clsx( 'components-border-radius-control', className ) }
 		>
 			<HStack className="components-border-radius-control__header">
-				<BaseControl.VisualLabel as="legend">
+				<BaseControl.VisualLabel
+					as="legend"
+					labelTooltip={ labelTooltip }
+				>
 					{ __( 'Radius' ) }
 				</BaseControl.VisualLabel>
 				<LinkedButton onClick={ toggleLinked } isLinked={ isLinked } />

@@ -57,6 +57,7 @@ function UnforwardedSelectControl< V extends string >(
 		hideLabelFromVision,
 		id: idProp,
 		label,
+		labelTooltip,
 		multiple = false,
 		onChange,
 		options = [],
@@ -103,6 +104,7 @@ function UnforwardedSelectControl< V extends string >(
 				id={ id }
 				isBorderless={ variant === 'minimal' }
 				label={ label }
+				labelTooltip={ labelTooltip }
 				size={ size }
 				suffix={
 					suffix || ( ! multiple && <SelectControlChevronDown /> )

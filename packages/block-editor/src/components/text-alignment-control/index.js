@@ -47,11 +47,12 @@ const DEFAULT_OPTIONS = [ 'left', 'center', 'right' ];
 /**
  * Control to facilitate text alignment selections.
  *
- * @param {Object}   props           Component props.
- * @param {string}   props.className Class name to add to the control.
- * @param {string}   props.value     Currently selected text alignment.
- * @param {Function} props.onChange  Handles change in text alignment selection.
- * @param {string[]} props.options   Array of text alignment options to display.
+ * @param {Object}   props              Component props.
+ * @param {string}   props.className    Class name to add to the control.
+ * @param {string}   props.value        Currently selected text alignment.
+ * @param {Function} props.onChange     Handles change in text alignment selection.
+ * @param {string[]} props.options      Array of text alignment options to display.
+ * @param {string}   props.labelTooltip Tooltip text shown on the control label.
  *
  * @return {Element} Text alignment control.
  */
@@ -60,6 +61,7 @@ export default function TextAlignmentControl( {
 	value,
 	onChange,
 	options = DEFAULT_OPTIONS,
+	labelTooltip,
 } ) {
 	const validOptions = useMemo(
 		() =>
@@ -77,6 +79,7 @@ export default function TextAlignmentControl( {
 		<ToggleGroupControl
 			isDeselectable
 			label={ __( 'Text alignment' ) }
+			labelTooltip={ labelTooltip }
 			className={ clsx(
 				'block-editor-text-alignment-control',
 				className

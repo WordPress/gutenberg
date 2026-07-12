@@ -31,6 +31,7 @@ import { useSettings } from '../../components/use-settings';
  * @param {string}                  props.help                 Help text to display below the control.
  * @param {string}                  props.className            Class name to add to the inner UnitControl.
  * @param {string}                  props.placeholder          Placeholder for the inner UnitControl.
+ * @param {string}                  props.labelTooltip         Tooltip text shown on the control label.
  *
  * @return {Element} Text indent control.
  */
@@ -43,6 +44,7 @@ export default function TextIndentControl( {
 	help,
 	className,
 	placeholder,
+	labelTooltip,
 	...otherProps
 } ) {
 	const [ availableUnits ] = useSettings( 'spacing.units' );
@@ -72,6 +74,7 @@ export default function TextIndentControl( {
 			<UnitControl
 				{ ...otherProps }
 				label={ __( 'Line indent' ) }
+				labelTooltip={ labelTooltip }
 				value={ value }
 				__unstableInputWidth={ __unstableInputWidth }
 				units={ units }
@@ -85,7 +88,7 @@ export default function TextIndentControl( {
 
 	return (
 		<View style={ hasBottomMargin ? { marginBottom: 12 } : undefined }>
-			<BaseControl.VisualLabel>
+			<BaseControl.VisualLabel labelTooltip={ labelTooltip }>
 				{ __( 'Line indent' ) }
 			</BaseControl.VisualLabel>
 			<Flex>

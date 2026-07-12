@@ -29,18 +29,25 @@ const WRITING_MODES = [
 /**
  * Control to facilitate writing mode selections.
  *
- * @param {Object}   props           Component props.
- * @param {string}   props.className Class name to add to the control.
- * @param {string}   props.value     Currently selected writing mode.
- * @param {Function} props.onChange  Handles change in the writing mode selection.
+ * @param {Object}   props              Component props.
+ * @param {string}   props.className    Class name to add to the control.
+ * @param {string}   props.value        Currently selected writing mode.
+ * @param {Function} props.onChange     Handles change in the writing mode selection.
+ * @param {string}   props.labelTooltip Tooltip text shown on the control label.
  *
  * @return {Element} Writing Mode control.
  */
-export default function WritingModeControl( { className, value, onChange } ) {
+export default function WritingModeControl( {
+	className,
+	value,
+	onChange,
+	labelTooltip,
+} ) {
 	return (
 		<ToggleGroupControl
 			isDeselectable
 			label={ __( 'Orientation' ) }
+			labelTooltip={ labelTooltip }
 			className={ clsx( 'block-editor-writing-mode-control', className ) }
 			value={ value }
 			onChange={ ( newValue ) => {

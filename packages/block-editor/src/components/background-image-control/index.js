@@ -39,7 +39,10 @@ import { getResolvedValue } from '@wordpress/global-styles-engine';
  * Internal dependencies
  */
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
-import { InheritanceResetButton } from '../global-styles/inheritance';
+import {
+	InheritanceLabelTooltip,
+	InheritanceResetButton,
+} from '../global-styles/inheritance';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
@@ -135,6 +138,7 @@ function InspectorImagePreviewItem( {
 	toggleProps = {},
 	filename,
 	label,
+	labelTooltip,
 	onToggleCallback = noop,
 } ) {
 	const { isOpen, ...restToggleProps } = toggleProps;
@@ -157,12 +161,14 @@ function InspectorImagePreviewItem( {
 					} }
 				/>
 				<FlexBlock>
-					<Truncate
-						numberOfLines={ 1 }
-						className="block-editor-global-styles-background-panel__inspector-media-replace-title"
-					>
-						{ label }
-					</Truncate>
+					<InheritanceLabelTooltip labelTooltip={ labelTooltip }>
+						<Truncate
+							numberOfLines={ 1 }
+							className="block-editor-global-styles-background-panel__inspector-media-replace-title"
+						>
+							{ label }
+						</Truncate>
+					</InheritanceLabelTooltip>
 					<VisuallyHidden render={ <span /> }>
 						{ imgUrl
 							? sprintf(
@@ -191,6 +197,7 @@ function BackgroundControlsPanel( {
 	filename,
 	url: imgUrl,
 	children,
+	labelTooltip,
 	onToggle: onToggleCallback = noop,
 	hasImageValue,
 	onReset,
@@ -223,6 +230,7 @@ function BackgroundControlsPanel( {
 							imgUrl={ imgUrl }
 							filename={ filename }
 							label={ imgLabel }
+							labelTooltip={ labelTooltip }
 							toggleProps={ toggleProps }
 							as="button"
 							onToggleCallback={ onToggleCallback }
@@ -291,6 +299,7 @@ function BackgroundImageControls( {
 	displayInPanel,
 	defaultValues,
 	containerRef,
+	labelTooltip,
 } ) {
 	const [ isUploading, setIsUploading ] = useState( false );
 	const { getSettings } = useSelect( blockEditorStore );
@@ -413,6 +422,7 @@ function BackgroundImageControls( {
 						imgUrl={ url }
 						filename={ title }
 						label={ imgLabel }
+						labelTooltip={ labelTooltip }
 					/>
 				}
 				renderToggle={ ( props ) => (
@@ -666,6 +676,7 @@ export default function BackgroundImagePanel( {
 	settings,
 	defaultValues = {},
 	showInheritanceLabelIndicators = true,
+	labelTooltip,
 } ) {
 	/*
 	 * Resolve inherited `ref` pointers for background controls.
@@ -752,6 +763,7 @@ export default function BackgroundImagePanel( {
 					label={ title }
 					filename={ title }
 					url={ url }
+					labelTooltip={ labelTooltip }
 					onToggle={ setIsDropDownOpen }
 					hasImageValue={ hasImageValue }
 					hasLocalOverride={ hasLocalOverride }
@@ -786,6 +798,7 @@ export default function BackgroundImagePanel( {
 					style={ value }
 					inheritedValue={ resolvedInheritedValue }
 					defaultValues={ defaultValues }
+					labelTooltip={ labelTooltip }
 					onResetImage={ () => {
 						setIsDropDownOpen( false );
 						resetBackground();

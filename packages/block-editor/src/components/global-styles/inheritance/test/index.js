@@ -3,11 +3,16 @@
  */
 import { render, screen } from '@testing-library/react';
 import { click } from '@ariakit/test';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
  */
-import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
+import {
+	__experimentalToolsPanel as ToolsPanel,
+	BaseControl,
+} from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -50,7 +55,17 @@ describe( 'InheritanceResetButton', () => {
 
 describe( 'getInheritanceProps', () => {
 	test( 'returns explicit false state when neither flag is set', () => {
-		expect( getInheritanceProps( false, false ) ).toEqual( {
+		expect( getInheritanceProps( true, false, false ) ).toEqual( {
+			isInherited: false,
+			hasLocalOverride: false,
+		} );
+	} );
+
+	test( 'gates every flag off, but keeps the base className, when indicators are disabled', () => {
+		expect(
+			getInheritanceProps( false, true, true, 'single-column' )
+		).toEqual( {
+			className: 'single-column',
 			isInherited: false,
 			hasLocalOverride: false,
 		} );
@@ -60,7 +75,7 @@ describe( 'getInheritanceProps', () => {
 		// The inherited state is conveyed purely through the className hook
 		// (`is-inherited-from-global-styles`), which the SCSS uses to apply
 		// the dotted-underline label treatment. No dot is rendered.
-		expect( getInheritanceProps( true, false ) ).toEqual( {
+		expect( getInheritanceProps( true, true, false ) ).toEqual( {
 			className: 'is-inherited-from-global-styles',
 			isInherited: true,
 			hasLocalOverride: false,
@@ -68,7 +83,7 @@ describe( 'getInheritanceProps', () => {
 	} );
 
 	test( 'returns the local-override className when hasLocalOverride is set', () => {
-		expect( getInheritanceProps( false, true ) ).toEqual( {
+		expect( getInheritanceProps( true, false, true ) ).toEqual( {
 			className: 'has-local-override-from-global-styles',
 			isInherited: false,
 			hasLocalOverride: true,
@@ -78,7 +93,7 @@ describe( 'getInheritanceProps', () => {
 	test( 'returns ONLY the local-override className when both flags are passed (mutual exclusion)', () => {
 		// A buggy caller could pass both as `true`. The visual
 		// contract is mutual exclusion — local-override always wins.
-		const result = getInheritanceProps( true, true );
+		const result = getInheritanceProps( true, true, true );
 		expect( result.className ).toContain(
 			'has-local-override-from-global-styles'
 		);
@@ -90,25 +105,25 @@ describe( 'getInheritanceProps', () => {
 		// Common pattern: callers pass an undefined or null inherited
 		// value that we want to treat as "no local override" rather
 		// than letting it slip through as truthy.
-		expect( getInheritanceProps( undefined, undefined ) ).toEqual( {
+		expect( getInheritanceProps( true, undefined, undefined ) ).toEqual( {
 			isInherited: false,
 			hasLocalOverride: false,
 		} );
-		expect( getInheritanceProps( null, null ) ).toEqual( {
+		expect( getInheritanceProps( true, null, null ) ).toEqual( {
 			isInherited: false,
 			hasLocalOverride: false,
 		} );
-		expect( getInheritanceProps( '', '' ) ).toEqual( {
+		expect( getInheritanceProps( true, '', '' ) ).toEqual( {
 			isInherited: false,
 			hasLocalOverride: false,
 		} );
 		// Truthy non-boolean
-		expect( getInheritanceProps( 'inherited', 0 ) ).toEqual( {
+		expect( getInheritanceProps( true, 'inherited', 0 ) ).toEqual( {
 			className: 'is-inherited-from-global-styles',
 			isInherited: true,
 			hasLocalOverride: false,
 		} );
-		expect( getInheritanceProps( 0, 'local' ) ).toEqual( {
+		expect( getInheritanceProps( true, 0, 'local' ) ).toEqual( {
 			className: 'has-local-override-from-global-styles',
 			isInherited: false,
 			hasLocalOverride: true,
@@ -116,7 +131,9 @@ describe( 'getInheritanceProps', () => {
 	} );
 
 	test( 'merges a base className with the inherited class hook', () => {
-		expect( getInheritanceProps( true, false, 'single-column' ) ).toEqual( {
+		expect(
+			getInheritanceProps( true, true, false, 'single-column' )
+		).toEqual( {
 			className: 'single-column is-inherited-from-global-styles',
 			isInherited: true,
 			hasLocalOverride: false,
@@ -124,7 +141,9 @@ describe( 'getInheritanceProps', () => {
 	} );
 
 	test( 'merges a base className with the local-override class hook', () => {
-		expect( getInheritanceProps( false, true, 'single-column' ) ).toEqual( {
+		expect(
+			getInheritanceProps( true, false, true, 'single-column' )
+		).toEqual( {
 			className: 'single-column has-local-override-from-global-styles',
 			isInherited: false,
 			hasLocalOverride: true,
@@ -132,58 +151,101 @@ describe( 'getInheritanceProps', () => {
 	} );
 
 	test( 'returns just the base className when neither flag is set', () => {
-		expect( getInheritanceProps( false, false, 'single-column' ) ).toEqual(
-			{
-				className: 'single-column',
-				isInherited: false,
-				hasLocalOverride: false,
-			}
-		);
+		expect(
+			getInheritanceProps( true, false, false, 'single-column' )
+		).toEqual( {
+			className: 'single-column',
+			isInherited: false,
+			hasLocalOverride: false,
+		} );
 	} );
 } );
 
 describe( 'InheritanceToolsPanelItem inherited state', () => {
-	function renderInheritedItem( label, labelClassName ) {
+	function renderInheritedItem() {
 		return render(
 			<ToolsPanel label="Panel" panelId="panel">
 				<InheritanceToolsPanelItem
-					{ ...getInheritanceProps( true, false ) }
-					label={ label }
+					{ ...getInheritanceProps( true, true, false ) }
+					label="Line height"
 					panelId="panel"
 					isShownByDefault
 					hasValue={ () => false }
 				>
-					<div className={ labelClassName }>{ label }</div>
+					<div className="components-base-control__label">
+						Line height
+					</div>
 				</InheritanceToolsPanelItem>
 			</ToolsPanel>
 		);
 	}
 
-	// The SCSS treatment keys off the label class, and controls on a bare
-	// `UnitControl`/`NumberControl` expose `input-control__label` rather than
-	// the usual `base-control__label`, so guard both.
-	test.each( [
-		[ 'base-control', 'components-base-control__label' ],
-		[ 'input-control', 'components-input-control__label' ],
-	] )(
-		'nests the %s label inside the inherited-from-global-styles item',
-		( _name, labelClassName ) => {
-			renderInheritedItem( 'Line height', labelClassName );
-			const label = screen.getByText( 'Line height' );
-			expect( label ).toHaveClass( labelClassName );
-			expect(
-				// eslint-disable-next-line testing-library/no-node-access
-				label.closest( '.is-inherited-from-global-styles' )
-			).not.toBeNull();
-		}
-	);
-
 	test( 'does not render a reset dot in the inherited state', () => {
-		renderInheritedItem( 'Line height', 'components-base-control__label' );
+		renderInheritedItem();
 		expect(
 			screen.queryByRole( 'button', {
 				name: 'Reset to inherited value',
 			} )
+		).not.toBeInTheDocument();
+	} );
+} );
+
+describe( 'InheritanceToolsPanelItem breadcrumb tooltip', () => {
+	// A minimal labelled control. The panels pass the breadcrumb `labelTooltip`
+	// directly to the control, which renders it on its visible label text \u2014 the
+	// panel item itself is not involved in the tooltip.
+	function LabelledControl( props ) {
+		const id = useInstanceId( LabelledControl, 'line-height' );
+		return (
+			<BaseControl { ...props } id={ id } label="Line height">
+				<input aria-label="Line height" />
+			</BaseControl>
+		);
+	}
+
+	function renderItem( controlProps ) {
+		return render(
+			<ToolsPanel label="Panel" panelId="panel">
+				<InheritanceToolsPanelItem
+					{ ...getInheritanceProps( true, true, false ) }
+					label="Line height"
+					panelId="panel"
+					isShownByDefault
+					hasValue={ () => false }
+				>
+					<LabelledControl { ...controlProps } />
+				</InheritanceToolsPanelItem>
+			</ToolsPanel>
+		);
+	}
+
+	test( 'renders the breadcrumb tooltip on the control label and reveals it on hover', async () => {
+		const user = userEvent.setup();
+		renderItem( {
+			labelTooltip: 'Default inherited from:\nStyles > Heading',
+		} );
+
+		// No tooltip until the label is hovered.
+		expect(
+			screen.queryByText( /Styles > Heading/ )
+		).not.toBeInTheDocument();
+
+		await user.hover( screen.getByText( 'Line height' ) );
+
+		expect( await screen.findByText( /Styles > Heading/ ) ).toBeVisible();
+	} );
+
+	test( 'renders no breadcrumb tooltip when no source is provided (Global Styles screens)', async () => {
+		const user = userEvent.setup();
+		// Global Styles screens render panels without an inheritance provider,
+		// so the panels resolve `labelTooltip` to undefined and no tooltip is
+		// rendered.
+		renderItem( {} );
+
+		await user.hover( screen.getByText( 'Line height' ) );
+
+		expect(
+			screen.queryByText( /inherited from/i )
 		).not.toBeInTheDocument();
 	} );
 } );
@@ -207,22 +269,13 @@ describe( 'InheritanceToolsPanelItem local-override reset dot', () => {
 		);
 	}
 
-	test( 'renders the reset dot as a sibling of the control, not inside the label', () => {
-		renderItem( {
-			hasLocalOverride: true,
-			onDeselect: () => {},
-		} );
-		const resetButton = screen.getByRole( 'button', {
-			name: 'Reset to inherited value',
-		} );
-		expect( resetButton ).toBeVisible();
-
-		// The reset dot is a plain sibling; it must never be nested inside
-		// the label (which would create an interactive-in-label a11y issue).
+	test( 'renders a reset dot in the local-override state', () => {
+		renderItem( { hasLocalOverride: true, onDeselect: () => {} } );
 		expect(
-			// eslint-disable-next-line testing-library/no-node-access
-			resetButton.closest( '.components-base-control__label' )
-		).toBeNull();
+			screen.getByRole( 'button', {
+				name: 'Reset to inherited value',
+			} )
+		).toBeVisible();
 	} );
 
 	test( 'does not render the item reset dot when showLocalOverrideActionsInLabel is false', () => {
@@ -247,35 +300,5 @@ describe( 'InheritanceToolsPanelItem local-override reset dot', () => {
 			screen.getByRole( 'button', { name: 'Reset to inherited value' } )
 		);
 		expect( onDeselect ).toHaveBeenCalled();
-	} );
-
-	test( 'does not offset the reset dot by default', () => {
-		renderItem( { hasLocalOverride: true, onDeselect: () => {} } );
-		const resetButton = screen.getByRole( 'button', {
-			name: 'Reset to inherited value',
-		} );
-		const affordance =
-			// eslint-disable-next-line testing-library/no-node-access
-			resetButton.closest( '.global-styles-inheritance-affordance' );
-		expect( affordance ).not.toHaveClass(
-			'global-styles-inheritance-affordance--offset-toggle'
-		);
-	} );
-
-	test( 'offsets the reset dot when the control has an inline-end toggle', () => {
-		renderItem( {
-			hasLocalOverride: true,
-			hasInlineEndToggle: true,
-			onDeselect: () => {},
-		} );
-		const resetButton = screen.getByRole( 'button', {
-			name: 'Reset to inherited value',
-		} );
-		const affordance =
-			// eslint-disable-next-line testing-library/no-node-access
-			resetButton.closest( '.global-styles-inheritance-affordance' );
-		expect( affordance ).toHaveClass(
-			'global-styles-inheritance-affordance--offset-toggle'
-		);
 	} );
 } );

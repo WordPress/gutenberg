@@ -28,6 +28,8 @@ import ColorGradientControl from '../colors-gradients/control';
 import { unlock } from '../../lock-unlock';
 import {
 	getInheritanceProps,
+	getCommonInheritanceTooltipText,
+	InheritanceLabelTooltip,
 	InheritanceResetButton,
 	InheritanceToolsPanelItem,
 } from './inheritance';
@@ -113,7 +115,7 @@ const popoverProps = {
 	shift: true,
 };
 
-const LabeledColorIndicators = ( { indicators, label } ) => (
+const LabeledColorIndicators = ( { indicators, label, labelTooltip } ) => (
 	<HStack justify="flex-start">
 		<ZStack isLayered={ false } offset={ -8 }>
 			{ indicators.map( ( indicator, index ) => (
@@ -123,7 +125,9 @@ const LabeledColorIndicators = ( { indicators, label } ) => (
 			) ) }
 		</ZStack>
 		<FlexItem className="block-editor-panel-color-gradient-settings__color-name">
-			{ label }
+			<InheritanceLabelTooltip labelTooltip={ labelTooltip }>
+				{ label }
+			</InheritanceLabelTooltip>
 		</FlexItem>
 	</HStack>
 );
@@ -208,6 +212,7 @@ export default function ColorGradientDropdownItem( {
 	isPlaceholder = false,
 	hasInheritedValue = false,
 	showInheritanceLabelIndicators = true,
+	inheritedSources = {},
 } ) {
 	const colorGradientDropdownButtonRef = useRef( undefined );
 	const itemClassName = clsx( 'block-editor-color-gradient-item', className );
@@ -216,9 +221,19 @@ export default function ColorGradientDropdownItem( {
 	// actions and the override label indicator.
 	const hasLocalOverride =
 		showInheritanceLabelIndicators && hasValue() && hasInheritedValue;
-	const inheritanceProps = showInheritanceLabelIndicators
-		? getInheritanceProps( isPlaceholder, hasLocalOverride, itemClassName )
-		: { className: itemClassName };
+	const tabSourcePaths = tabs.flatMap( ( tab ) => tab.sourcePaths ?? [] );
+	const inheritanceProps = getInheritanceProps(
+		showInheritanceLabelIndicators,
+		isPlaceholder,
+		hasLocalOverride,
+		itemClassName
+	);
+	// The label lives inside the dropdown toggle rather than a `BaseControl`
+	// label, so it is wrapped directly with `InheritanceLabelTooltip` instead of
+	// via the native `labelTooltip` prop.
+	const labelTooltip = inheritanceProps.isInherited
+		? getCommonInheritanceTooltipText( inheritedSources, tabSourcePaths )
+		: undefined;
 	return (
 		<InheritanceToolsPanelItem
 			{ ...inheritanceProps }
@@ -252,6 +267,7 @@ export default function ColorGradientDropdownItem( {
 								<LabeledColorIndicators
 									indicators={ indicators }
 									label={ label }
+									labelTooltip={ labelTooltip }
 								/>
 							</Button>
 							{ hasValue() &&

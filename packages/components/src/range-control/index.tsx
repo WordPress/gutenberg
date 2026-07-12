@@ -81,6 +81,7 @@ function UnforwardedRangeControl(
 		initialPosition,
 		isShiftStepEnabled = true,
 		label,
+		labelTooltip,
 		marks = false,
 		max = 100,
 		min = 0,
@@ -235,6 +236,7 @@ function UnforwardedRangeControl(
 		<BaseControl
 			className={ classes }
 			label={ label }
+			labelTooltip={ labelTooltip }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ `${ id }` }
 			help={ help }

@@ -13,6 +13,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { VisuallyHidden } from '../visually-hidden';
+import { LabelWithTooltip } from '../utils/label-with-tooltip';
 import type { BaseControlProps, BaseControlVisualLabelProps } from './types';
 import {
 	Wrapper,
@@ -32,6 +33,7 @@ const UnconnectedBaseControl = (
 	const {
 		id,
 		label,
+		labelTooltip,
 		hideLabelFromVision = false,
 		help,
 		className,
@@ -52,7 +54,9 @@ const UnconnectedBaseControl = (
 							className="components-base-control__label"
 							htmlFor={ id }
 						>
-							{ label }
+							<LabelWithTooltip labelTooltip={ labelTooltip }>
+								{ label }
+							</LabelWithTooltip>
 						</StyledLabel>
 					) ) }
 				{ label &&
@@ -60,7 +64,9 @@ const UnconnectedBaseControl = (
 					( hideLabelFromVision ? (
 						<VisuallyHidden as="label">{ label }</VisuallyHidden>
 					) : (
-						<VisualLabel>{ label }</VisualLabel>
+						<VisualLabel labelTooltip={ labelTooltip }>
+							{ label }
+						</VisualLabel>
 					) ) }
 				{ children }
 			</StyledField>
@@ -80,7 +86,7 @@ const UnforwardedVisualLabel = (
 	props: WordPressComponentProps< BaseControlVisualLabelProps, 'span' >,
 	ref: ForwardedRef< any >
 ) => {
-	const { className, children, ...restProps } = props;
+	const { className, children, labelTooltip, ...restProps } = props;
 
 	return (
 		<StyledVisualLabel
@@ -88,7 +94,9 @@ const UnforwardedVisualLabel = (
 			{ ...restProps }
 			className={ clsx( 'components-base-control__label', className ) }
 		>
-			{ children }
+			<LabelWithTooltip labelTooltip={ labelTooltip }>
+				{ children }
+			</LabelWithTooltip>
 		</StyledVisualLabel>
 	);
 };

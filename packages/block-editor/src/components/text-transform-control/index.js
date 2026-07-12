@@ -44,18 +44,25 @@ const TEXT_TRANSFORMS = [
 /**
  * Control to facilitate text transform selections.
  *
- * @param {Object}   props           Component props.
- * @param {string}   props.className Class name to add to the control.
- * @param {string}   props.value     Currently selected text transform.
- * @param {Function} props.onChange  Handles change in text transform selection.
+ * @param {Object}   props              Component props.
+ * @param {string}   props.className    Class name to add to the control.
+ * @param {string}   props.value        Currently selected text transform.
+ * @param {Function} props.onChange     Handles change in text transform selection.
+ * @param {string}   props.labelTooltip Tooltip text shown on the control label.
  *
  * @return {Element} Text transform control.
  */
-export default function TextTransformControl( { className, value, onChange } ) {
+export default function TextTransformControl( {
+	className,
+	value,
+	onChange,
+	labelTooltip,
+} ) {
 	return (
 		<ToggleGroupControl
 			isDeselectable
 			label={ __( 'Letter case' ) }
+			labelTooltip={ labelTooltip }
 			className={ clsx(
 				'block-editor-text-transform-control',
 				className

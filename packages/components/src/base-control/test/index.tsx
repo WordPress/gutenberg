@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -49,5 +50,45 @@ describe( 'BaseControl', () => {
 			// eslint-disable-next-line testing-library/no-node-access
 			help.closest( `#${ textarea.getAttribute( 'aria-describedby' ) }` )
 		).toBeVisible();
+	} );
+
+	describe( 'labelTooltip', () => {
+		it( 'should wrap the label text in a tooltip and reveal it on hover', async () => {
+			const user = userEvent.setup();
+			render(
+				<MyBaseControl
+					label="Text"
+					labelTooltip="Inherited from Styles"
+				/>
+			);
+
+			// No tooltip until the label is hovered.
+			expect(
+				screen.queryByText( 'Inherited from Styles' )
+			).not.toBeInTheDocument();
+
+			await user.hover( screen.getByText( 'Text' ) );
+
+			expect(
+				await screen.findByText( 'Inherited from Styles' )
+			).toBeVisible();
+		} );
+
+		it( 'should wrap a VisualLabel in a tooltip and reveal it on hover', async () => {
+			const user = userEvent.setup();
+			render(
+				<BaseControl>
+					<BaseControl.VisualLabel labelTooltip="Inherited from Styles">
+						Text
+					</BaseControl.VisualLabel>
+				</BaseControl>
+			);
+
+			await user.hover( screen.getByText( 'Text' ) );
+
+			expect(
+				await screen.findByText( 'Inherited from Styles' )
+			).toBeVisible();
+		} );
 	} );
 } );

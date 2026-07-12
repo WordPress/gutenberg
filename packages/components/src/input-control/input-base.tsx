@@ -73,6 +73,7 @@ function InputBase(
 		id: idProp,
 		isBorderless = false,
 		label,
+		labelTooltip,
 		prefix,
 		size = 'default',
 		suffix,
@@ -104,6 +105,7 @@ function InputBase(
 				className="components-input-control__label"
 				hideLabelFromVision={ hideLabelFromVision }
 				labelPosition={ labelPosition }
+				labelTooltip={ labelTooltip }
 				htmlFor={ id }
 			>
 				{ label }

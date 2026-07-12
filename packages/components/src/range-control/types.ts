@@ -135,6 +135,11 @@ export type RangeControlProps = Pick<
 		 */
 		label?: string;
 		/**
+		 * If provided, the visible label text is wrapped in a `Tooltip` showing
+		 * this text.
+		 */
+		labelTooltip?: string;
+		/**
 		 * Callback for when `RangeControl` input loses focus.
 		 *
 		 * @default () => void

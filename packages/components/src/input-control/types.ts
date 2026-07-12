@@ -178,6 +178,11 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 */
 	label?: ReactNode;
 	/**
+	 * If provided, the visible label text is wrapped in a `Tooltip` showing this
+	 * text. Only applies when the label is visible (i.e. not `hideLabelFromVision`).
+	 */
+	labelTooltip?: string;
+	/**
 	 * Whether to hide the border when not focused.
 	 *
 	 * @default false
@@ -215,6 +220,7 @@ export interface InputControlLabelProps {
 	children: ReactNode;
 	hideLabelFromVision?: BaseProps[ 'hideLabelFromVision' ];
 	labelPosition?: BaseProps[ 'labelPosition' ];
+	labelTooltip?: string;
 	size?: BaseProps[ 'size' ];
 }
 

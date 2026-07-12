@@ -52,6 +52,11 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	 */
 	label: string;
 	/**
+	 * A tooltip to show when hovering/focusing the label text. When provided,
+	 * the label text is wrapped in a `Tooltip`.
+	 */
+	labelTooltip?: string;
+	/**
 	 * Function called with the control's internal state changes. The `selectedItem`
 	 * property contains the next selected item.
 	 */
