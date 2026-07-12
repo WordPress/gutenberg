@@ -1734,6 +1734,55 @@ test.describe( 'Block Notes', () => {
 			await expect( blocks.nth( 0 ) ).toHaveCSS( 'opacity', '1' );
 			await expect( blocks.nth( 1 ) ).toHaveCSS( 'opacity', '1' );
 		} );
+
+		test( 'keeps every spanned block lit for a note spanning three blocks', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Beta block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Gamma block.' },
+			} );
+			await addMultiBlockNote( { editor, page }, 3, 'Light all three' );
+
+			const blocks = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Light all three' } );
+
+			// The new note is focused and expanded; collapse it so that
+			// clicking it below runs a fresh selection.
+			await expect( thread ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			await thread.click();
+
+			// Selecting a note spotlights the canvas, dimming every block that
+			// isn't part of the selection.
+			await expect(
+				editor.canvas.locator( '.is-root-container' )
+			).toHaveClass( /is-focus-mode/ );
+
+			// The note spans all three blocks, so the whole range - including
+			// the interior block - is selected and stays lit.
+			await expect( blocks.nth( 0 ) ).toHaveClass( /is-multi-selected/ );
+			await expect( blocks.nth( 1 ) ).toHaveClass( /is-multi-selected/ );
+			await expect( blocks.nth( 2 ) ).toHaveClass( /is-multi-selected/ );
+			await expect( blocks.nth( 0 ) ).toHaveCSS( 'opacity', '1' );
+			await expect( blocks.nth( 1 ) ).toHaveCSS( 'opacity', '1' );
+			await expect( blocks.nth( 2 ) ).toHaveCSS( 'opacity', '1' );
+		} );
 	} );
 } );
 
