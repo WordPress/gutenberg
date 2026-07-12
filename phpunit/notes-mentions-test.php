@@ -8,54 +8,52 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 
 	/**
 	 * Post the notes are attached to.
-	 *
-	 * @var int
 	 */
-	private static $post_id;
+	private static int $post_id;
 
 	/**
 	 * Author of the post (notified by core, not by the mention path).
-	 *
-	 * @var int
 	 */
-	private static $post_author_id;
+	private static int $post_author_id;
 
 	/**
 	 * A user who writes notes.
-	 *
-	 * @var int
 	 */
-	private static $commenter_id;
+	private static int $commenter_id;
 
 	/**
 	 * A user who gets mentioned.
-	 *
-	 * @var int
 	 */
-	private static $mentioned_id;
+	private static int $mentioned_id;
 
 	/**
 	 * Captured wp_mail() recipients for the current test.
 	 *
 	 * @var string[]
 	 */
-	private $sent_to = array();
+	private array $sent_to = array();
 
 	/**
 	 * Sets up shared fixtures.
 	 *
 	 * @param WP_UnitTest_Factory $factory Factory instance.
 	 */
-	public static function wpSetUpBeforeClass( $factory ) {
-		self::$post_author_id = $factory->user->create( array( 'role' => 'editor' ) );
-		self::$commenter_id   = $factory->user->create( array( 'role' => 'editor' ) );
-		self::$mentioned_id   = $factory->user->create( array( 'role' => 'editor' ) );
-		self::$post_id        = $factory->post->create(
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ): void {
+		$throw_if_not_int = static function ( $id ): int {
+			if ( ! is_int( $id ) ) {
+				throw new Exception( 'Expected integer' );
+			}
+			return $id;
+		};
+		self::$post_author_id = $throw_if_not_int( $factory->user->create( array( 'role' => 'editor' ) ) );
+		self::$commenter_id   = $throw_if_not_int( $factory->user->create( array( 'role' => 'editor' ) ) );
+		self::$mentioned_id   = $throw_if_not_int( $factory->user->create( array( 'role' => 'editor' ) ) );
+		self::$post_id        = $throw_if_not_int( $factory->post->create(
 			array( 'post_author' => self::$post_author_id )
-		);
+		) );
 	}
 
-	public function set_up() {
+	public function set_up(): void {
 		parent::set_up();
 		$this->sent_to = array();
 		// Short-circuit wp_mail() and record who would have been emailed.
@@ -65,11 +63,11 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	/**
 	 * Records wp_mail() recipients and short-circuits delivery.
 	 *
-	 * @param null  $short_circuit Short-circuit value.
-	 * @param array $atts          wp_mail() arguments.
+	 * @param null                       $short_circuit Short-circuit value.
+	 * @param array{ to: string[], ... } $atts          wp_mail() arguments.
 	 * @return bool Always true to indicate a "sent" message.
 	 */
-	public function capture_mail( $short_circuit, $atts ) {
+	public function capture_mail( $short_circuit, $atts ): bool {
 		foreach ( (array) $atts['to'] as $to ) {
 			$this->sent_to[] = $to;
 		}
@@ -79,12 +77,12 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	/**
 	 * Builds a note comment for the shared post.
 	 *
-	 * @param string $content Note content.
-	 * @param int    $user_id Author user ID.
-	 * @param int    $parent_id Parent note ID (0 for a top-level note).
+	 * @param string             $content   Note content.
+	 * @param int|numeric-string $user_id   Author user ID.
+	 * @param int|numeric-string $parent_id Parent note ID (0 for a top-level note).
 	 * @return WP_Comment The inserted note.
 	 */
-	private function insert_note( $content, $user_id, $parent_id = 0 ) {
+	private function insert_note( string $content, $user_id, $parent_id = 0 ): WP_Comment {
 		$comment_id = self::factory()->comment->create(
 			array(
 				'comment_post_ID' => self::$post_id,
@@ -94,10 +92,13 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 				'user_id'         => $user_id,
 			)
 		);
-		return get_comment( $comment_id );
+		assert( is_int( $comment_id ) );
+		$comment = get_comment( $comment_id );
+		assert( $comment instanceof WP_Comment );
+		return $comment;
 	}
 
-	public function test_parses_mentioned_user_ids() {
+	public function test_parses_mentioned_user_ids(): void {
 		$content = '<p>Hi <a class="wp-note-mention" data-user-id="5" href="#">@Jane</a> and '
 			. '<a class="wp-note-mention" data-user-id="9" href="#">@Bob</a>.</p>';
 
@@ -107,7 +108,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_ignores_plain_links_and_deduplicates() {
+	public function test_ignores_plain_links_and_deduplicates(): void {
 		$content = '<p><a href="https://example.com" data-user-id="7">not a mention</a> '
 			. '<a class="wp-note-mention" data-user-id="5" href="#">@Jane</a> '
 			. '<a class="wp-note-mention" data-user-id="5" href="#">@Jane again</a></p>';
@@ -118,9 +119,11 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_mention_markup_survives_kses_for_authors() {
+	public function test_mention_markup_survives_kses_for_authors(): void {
 		$author_id = self::factory()->user->create( array( 'role' => 'author' ) );
-		$post_id   = self::factory()->post->create( array( 'post_author' => $author_id ) );
+		$this->assertIsInt( $author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => $author_id ) );
+		$this->assertIsInt( $post_id );
 
 		// Authors lack unfiltered_html, so comment kses filters their content.
 		wp_set_current_user( $author_id );
@@ -138,17 +141,21 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertSame( 201, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertIsArray( $data );
+		$this->assertArrayHasKey( 'id', $data );
 
 		// The mention attributes must survive the comment kses pass or the
 		// mention is silently dropped from parsing and notifications.
-		$comment = get_comment( $response->get_data()['id'] );
+		$comment = get_comment( (int) $data['id'] );
+		$this->assertInstanceOf( WP_Comment::class, $comment );
 		$this->assertSame(
 			array( self::$mentioned_id ),
 			gutenberg_get_note_mentioned_user_ids( $comment->comment_content )
 		);
 	}
 
-	public function test_thread_root_is_parent_for_replies() {
+	public function test_thread_root_is_parent_for_replies(): void {
 		$root  = $this->insert_note( 'Top level', self::$commenter_id );
 		$reply = $this->insert_note( 'A reply', self::$commenter_id, $root->comment_ID );
 
@@ -162,7 +169,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_mentioned_user_is_emailed_and_subscribed() {
+	public function test_mentioned_user_is_emailed_and_subscribed(): void {
 		$mention = sprintf(
 			'<a class="wp-note-mention" data-user-id="%d" href="#">@Mentioned</a>',
 			self::$mentioned_id
@@ -171,8 +178,9 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 
 		gutenberg_notify_note_mentions( $note );
 
-		$mentioned_email = get_userdata( self::$mentioned_id )->user_email;
-		$this->assertContains( $mentioned_email, $this->sent_to );
+		$mentioned_user = get_userdata( self::$mentioned_id );
+		$this->assertInstanceOf( WP_User::class, $mentioned_user );
+		$this->assertContains( $mentioned_user->user_email, $this->sent_to );
 
 		// The mentioned user and the note author both follow the thread now.
 		$followers = gutenberg_get_note_followers( $note->comment_ID );
@@ -180,7 +188,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$this->assertContains( self::$commenter_id, $followers );
 	}
 
-	public function test_author_is_not_notified_about_their_own_note() {
+	public function test_author_is_not_notified_about_their_own_note(): void {
 		$self_mention = sprintf(
 			'<a class="wp-note-mention" data-user-id="%d" href="#">@Me</a>',
 			self::$commenter_id
@@ -189,11 +197,13 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 
 		gutenberg_notify_note_mentions( $note );
 
-		$author_email = get_userdata( self::$commenter_id )->user_email;
+		$commenter_user = get_userdata( self::$commenter_id );
+		$this->assertInstanceOf( WP_User::class, $commenter_user );
+		$author_email = $commenter_user->user_email;
 		$this->assertNotContains( $author_email, $this->sent_to );
 	}
 
-	public function test_post_author_is_left_to_core() {
+	public function test_post_author_is_left_to_core(): void {
 		$mention = sprintf(
 			'<a class="wp-note-mention" data-user-id="%d" href="#">@Author</a>',
 			self::$post_author_id
@@ -204,16 +214,19 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 
 		// Core notifies the post author of every note; the mention path must
 		// not also email them or they would receive a duplicate.
-		$author_email = get_userdata( self::$post_author_id )->user_email;
+		$author_user = get_userdata( self::$post_author_id );
+		$this->assertInstanceOf( WP_User::class, $author_user );
+		$author_email = $author_user->user_email;
 		$this->assertNotContains( $author_email, $this->sent_to );
 	}
 
-	public function test_mentioned_user_without_note_access_is_not_emailed() {
-		$subscriber_id = self::factory()->user->create( array( 'role' => 'subscriber' ) );
+	public function test_mentioned_user_without_note_access_is_not_emailed(): void {
+		$subscriber_user = self::factory()->user->create_and_get( array( 'role' => 'subscriber' ) );
+		$this->assertInstanceOf( WP_User::class, $subscriber_user );
 
 		$mention = sprintf(
 			'<a class="wp-note-mention" data-user-id="%d" href="#">@Subscriber</a>',
-			$subscriber_id
+			$subscriber_user->ID
 		);
 		$note    = $this->insert_note( "Ping $mention", self::$commenter_id );
 
@@ -221,17 +234,17 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 
 		// Notes are only readable by users who can edit them; a subscriber
 		// cannot, so emailing them would leak content they cannot see.
-		$subscriber_email = get_userdata( $subscriber_id )->user_email;
+		$subscriber_email = $subscriber_user->user_email;
 		$this->assertNotContains( $subscriber_email, $this->sent_to );
 
 		// They are still recorded as a follower in case their role changes.
 		$this->assertContains(
-			$subscriber_id,
+			$subscriber_user->ID,
 			gutenberg_get_note_followers( $note->comment_ID )
 		);
 	}
 
-	public function test_followers_are_notified_of_replies() {
+	public function test_followers_are_notified_of_replies(): void {
 		$mention = sprintf(
 			'<a class="wp-note-mention" data-user-id="%d" href="#">@Mentioned</a>',
 			self::$mentioned_id
@@ -243,14 +256,17 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		// notified even though they are not mentioned in the reply itself.
 		$this->sent_to = array();
 		$replier_id    = self::factory()->user->create( array( 'role' => 'editor' ) );
-		$reply         = $this->insert_note( 'Following up', $replier_id, $root->comment_ID );
+		$this->assertIsInt( $replier_id );
+		$reply = $this->insert_note( 'Following up', $replier_id, $root->comment_ID );
 		gutenberg_notify_note_mentions( $reply );
 
-		$mentioned_email = get_userdata( self::$mentioned_id )->user_email;
+		$mentioned_user = get_userdata( self::$mentioned_id );
+		$this->assertInstanceOf( WP_User::class, $mentioned_user );
+		$mentioned_email = $mentioned_user->user_email;
 		$this->assertContains( $mentioned_email, $this->sent_to );
 	}
 
-	public function test_no_notifications_when_disabled() {
+	public function test_no_notifications_when_disabled(): void {
 		update_option( 'wp_notes_notify', 0 );
 
 		$mention = sprintf(
@@ -265,7 +281,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		update_option( 'wp_notes_notify', 1 );
 	}
 
-	public function test_editing_a_note_does_not_renotify() {
+	public function test_editing_a_note_does_not_renotify(): void {
 		$mention = sprintf(
 			'<a class="wp-note-mention" data-user-id="%d" href="#">@Mentioned</a>',
 			self::$mentioned_id
@@ -278,11 +294,13 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$this->assertEmpty( $this->sent_to );
 	}
 
-	public function test_recipients_filter_can_add_and_remove() {
-		$extra_id = self::factory()->user->create( array( 'role' => 'editor' ) );
+	public function test_recipients_filter_can_add_and_remove(): void {
+		$extra_user = self::factory()->user->create_and_get( array( 'role' => 'editor' ) );
+		$this->assertInstanceOf( WP_User::class, $extra_user );
 
-		$filter = function ( $ids ) use ( $extra_id ) {
-			$ids[] = $extra_id;
+		$filter = function ( array $ids ) use ( $extra_user ) {
+			/** @var int[] $ids */
+			$ids[] = $extra_user->ID;
 			return array_values( array_diff( $ids, array( self::$mentioned_id ) ) );
 		};
 		add_filter( 'wp_note_notification_recipients', $filter );
@@ -294,11 +312,13 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$note    = $this->insert_note( "Ping $mention", self::$commenter_id );
 		gutenberg_notify_note_mentions( $note );
 
-		$this->assertContains( get_userdata( $extra_id )->user_email, $this->sent_to );
-		$this->assertNotContains( get_userdata( self::$mentioned_id )->user_email, $this->sent_to );
+		$this->assertContains( $extra_user->user_email, $this->sent_to );
+		$mentioned_user = get_userdata( self::$mentioned_id );
+		$this->assertInstanceOf( WP_User::class, $mentioned_user );
+		$this->assertNotContains( $mentioned_user->user_email, $this->sent_to );
 	}
 
-	public function test_followers_can_be_removed() {
+	public function test_followers_can_be_removed(): void {
 		$note = $this->insert_note( 'Top level', self::$commenter_id );
 		gutenberg_add_note_followers(
 			$note->comment_ID,
@@ -321,7 +341,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$this->assertSame( '', get_comment_meta( $note->comment_ID, '_wp_note_followers', true ) );
 	}
 
-	public function test_followers_meta_is_registered_for_rest() {
+	public function test_followers_meta_is_registered_for_rest(): void {
 		gutenberg_register_note_followers_meta();
 
 		$registered = get_registered_meta_keys( 'comment' );
