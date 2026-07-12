@@ -72,6 +72,9 @@ if ( ! function_exists( 'gutenberg_note_mention_allowed_html' ) ) {
 	 * @param array[] $tags    Allowed HTML tags and attributes.
 	 * @param string  $context Kses context name.
 	 * @return array[] Filtered tags.
+	 *
+	 * @phpstan-param array<non-empty-string, array<non-empty-string, bool>> $tags
+	 * @return array<non-empty-string, array<non-empty-string, bool>>
 	 */
 	function gutenberg_note_mention_allowed_html( $tags, $context ) {
 		if ( 'pre_comment_content' === $context && isset( $tags['a'] ) && is_array( $tags['a'] ) ) {
