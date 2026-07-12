@@ -114,6 +114,8 @@ export default ( props ) => ( element ) => {
 		handleChange( change );
 	}
 
+	let selectionSnapshot;
+
 	/**
 	 * Syncs the selection to local state. A callback for the `selectionchange`
 	 * event.
@@ -140,6 +142,14 @@ export default ( props ) => ( element ) => {
 		if ( isComposing ) {
 			return;
 		}
+
+		const selection = defaultView.getSelection();
+		selectionSnapshot = {
+			anchorNode: selection.anchorNode,
+			anchorOffset: selection.anchorOffset,
+			focusNode: selection.focusNode,
+			focusOffset: selection.focusOffset,
+		};
 
 		const { start, end, text } = createRecord();
 		const oldRecord = record.current;
@@ -186,6 +196,35 @@ export default ( props ) => ( element ) => {
 		record.current = newValue;
 		applyRecord( newValue, { domOnly: true } );
 		onSelectionChange( start, end );
+	}
+
+	/**
+	 * The native `selectionchange` event is asynchronous and coalesced: the
+	 * record and the store selection can be one selection behind the DOM when
+	 * an event that acts on them arrives, regardless of how the selection got
+	 * there. Synchronize before any other handler runs (capture phase on the
+	 * document), so anything consuming the record, the store selection, or a
+	 * value rendered from them acts on the current selection. The snapshot
+	 * comparison skips the work when the selection was already processed.
+	 */
+	function ensureSelectionSync() {
+		if ( ownerDocument.activeElement !== element ) {
+			return;
+		}
+
+		const selection = defaultView.getSelection();
+
+		if (
+			selectionSnapshot &&
+			selectionSnapshot.anchorNode === selection.anchorNode &&
+			selectionSnapshot.anchorOffset === selection.anchorOffset &&
+			selectionSnapshot.focusNode === selection.focusNode &&
+			selectionSnapshot.focusOffset === selection.focusOffset
+		) {
+			return;
+		}
+
+		handleSelectionChange();
 	}
 
 	function onCompositionStart() {
@@ -245,6 +284,9 @@ export default ( props ) => ( element ) => {
 				end: index,
 				activeFormats: EMPTY_ACTIVE_FORMATS,
 			};
+			// The record no longer reflects the selection, so a matching
+			// snapshot must not skip synchronization.
+			selectionSnapshot = undefined;
 		} else {
 			applyRecord( record.current, { domOnly: true } );
 		}
@@ -292,6 +334,22 @@ export default ( props ) => ( element ) => {
 		'selectionchange',
 		handleSelectionChange
 	);
+	// The events that act on the record or the store selection. Capture phase
+	// on the document runs before element- and window-level handlers.
+	const unsubscribeEnsureSelectionSync = [
+		'keydown',
+		'beforeinput',
+		'copy',
+		'cut',
+		'paste',
+	].map( ( eventType ) =>
+		subscribeDelegatedListener(
+			ownerDocument,
+			eventType,
+			ensureSelectionSync,
+			true
+		)
+	);
 
 	return () => {
 		unsubscribeInput();
@@ -299,5 +357,8 @@ export default ( props ) => ( element ) => {
 		unsubscribeCompositionEnd();
 		unsubscribeFocus();
 		unsubscribeSelectionChange();
+		unsubscribeEnsureSelectionSync.forEach( ( unsubscribe ) =>
+			unsubscribe()
+		);
 	};
 };
