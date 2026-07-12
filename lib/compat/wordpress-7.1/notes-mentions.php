@@ -259,9 +259,9 @@ if ( ! function_exists( 'gutenberg_remove_note_followers' ) ) {
 	 * @phpstan-return list<positive-int>
 	 */
 	function gutenberg_remove_note_followers( $root_id, array $user_ids ): array {
-		$root_id  = (int) $root_id;
-		$user_ids = array_map( fn ( $user_id ) => (int) $user_id, $user_ids );
+		$root_id = (int) $root_id;
 		foreach ( $user_ids as $user_id ) {
+			$user_id = (int) $user_id;
 			if ( $user_id > 0 ) {
 				delete_comment_meta( $root_id, '_wp_note_followers', $user_id );
 			}
