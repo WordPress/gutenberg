@@ -123,7 +123,6 @@ function NonDefaultControls( { format, onChange } ) {
 	return (
 		<VStack>
 			<CustomSelectControl
-				__next40pxDefaultSize
 				label={ __( 'Choose a format' ) }
 				options={ [ ...suggestedOptions, customOption ] }
 				value={
@@ -144,7 +143,6 @@ function NonDefaultControls( { format, onChange } ) {
 			/>
 			{ isCustom && (
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Custom format' ) }
 					hideLabelFromVision
 					help={ createInterpolateElement(

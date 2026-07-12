@@ -1,0 +1,53 @@
+.surface {
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+	color: var(--wpds-color-foreground-content-neutral);
+	position: relative;
+}
+
+.border-bottom {
+	border-bottom: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+}
+
+.border-left {
+	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Surface exposes physical border props. */
+	border-left: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+}
+
+.border-right {
+	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Surface exposes physical border props. */
+	border-right: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+}
+
+.border-top {
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+}
+
+.secondary {
+	background: var(--wpds-color-background-surface-neutral-weak);
+}
+
+.dotted {
+	background:
+		linear-gradient(90deg, var(--wpds-color-background-surface-neutral-strong)
+		var(--wp-components-surface-background-size-dotted), transparent 1%)
+		center,
+		linear-gradient(var(--wpds-color-background-surface-neutral-strong)
+		var(--wp-components-surface-background-size-dotted), transparent 1%)
+		center,
+		var(--wpds-color-stroke-surface-neutral);
+	background-size:
+		var(--wp-components-surface-background-size)
+		var(--wp-components-surface-background-size);
+}
+
+.grid {
+	background: var(--wpds-color-background-surface-neutral-strong);
+	background-image:
+		linear-gradient(var(--wpds-color-stroke-surface-neutral-weak)
+		var(--wpds-border-width-xs), transparent var(--wpds-border-width-xs)),
+		linear-gradient(90deg, var(--wpds-color-stroke-surface-neutral-weak)
+		var(--wpds-border-width-xs), transparent var(--wpds-border-width-xs));
+	background-size:
+		var(--wp-components-surface-background-size)
+		var(--wp-components-surface-background-size);
+}

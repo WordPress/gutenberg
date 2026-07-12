@@ -22,6 +22,17 @@ import { SidebarNavigationContext } from '../sidebar';
 const { useHistory, useLink, useLocation } = unlock( routerPrivateApis );
 
 export default function SidebarNavigationItem( {
+	isHidden = false,
+	...props
+} ) {
+	if ( isHidden ) {
+		return null;
+	}
+
+	return <SidebarNavigationItemContent { ...props } />;
+}
+
+function SidebarNavigationItemContent( {
 	className,
 	icon,
 	withChevron = false,

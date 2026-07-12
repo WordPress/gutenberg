@@ -1608,6 +1608,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ContentEditableControl",
+		"slug": "content-editable-control",
+		"markdown_source": "../packages/components/src/content-editable-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "CustomSelectControl",
 		"slug": "custom-select-control",
 		"markdown_source": "../packages/components/src/custom-select-control/README.md",
@@ -2871,6 +2877,12 @@
 		"title": "@wordpress/url",
 		"slug": "packages-url",
 		"markdown_source": "../packages/url/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/video-conversion",
+		"slug": "packages-video-conversion",
+		"markdown_source": "../packages/video-conversion/README.md",
 		"parent": "packages"
 	},
 	{

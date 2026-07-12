@@ -23,52 +23,46 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 	return (
 		<ItemGroup className="edit-site-sidebar-navigation-screen-main">
-			{ isBlockBasedTheme && (
-				<>
-					<SidebarNavigationItem
-						to="/identity"
-						uid="identity-navigation-item"
-						icon={ siteLogo }
-						activeOnRouteName="identity"
-					>
-						{ _x( 'Identity', 'site identity' ) }
-					</SidebarNavigationItem>
-					<SidebarNavigationItem
-						to="/styles"
-						uid="global-styles-navigation-item"
-						icon={ styles }
-						activeOnRouteName="styles"
-					>
-						{ __( 'Styles' ) }
-					</SidebarNavigationItem>
-					<SidebarNavigationItem
-						uid="page-navigation-item"
-						to="/page"
-						withChevron
-						icon={ page }
-					>
-						{ __( 'Pages' ) }
-					</SidebarNavigationItem>
-					<SidebarNavigationItem
-						uid="navigation-navigation-item"
-						to="/navigation"
-						withChevron
-						icon={ navigation }
-					>
-						{ __( 'Navigation' ) }
-					</SidebarNavigationItem>
-				</>
-			) }
-			{ ! isBlockBasedTheme && (
-				<SidebarNavigationItem
-					uid="stylebook-navigation-item"
-					to="/stylebook"
-					withChevron
-					icon={ styles }
-				>
-					{ __( 'Styles' ) }
-				</SidebarNavigationItem>
-			) }
+			<SidebarNavigationItem
+				to="/identity"
+				uid="identity-navigation-item"
+				icon={ siteLogo }
+				activeOnRouteName="identity"
+				isHidden={ ! isBlockBasedTheme }
+			>
+				{ _x( 'Identity', 'site identity' ) }
+			</SidebarNavigationItem>
+			<SidebarNavigationItem
+				to={ isBlockBasedTheme ? '/styles' : '/stylebook' }
+				uid={
+					isBlockBasedTheme
+						? 'global-styles-navigation-item'
+						: 'stylebook-navigation-item'
+				}
+				icon={ styles }
+				activeOnRouteName={ isBlockBasedTheme ? 'styles' : undefined }
+				withChevron={ ! isBlockBasedTheme }
+			>
+				{ __( 'Styles' ) }
+			</SidebarNavigationItem>
+			<SidebarNavigationItem
+				uid="page-navigation-item"
+				to="/page"
+				withChevron
+				icon={ page }
+				isHidden={ ! isBlockBasedTheme }
+			>
+				{ __( 'Pages' ) }
+			</SidebarNavigationItem>
+			<SidebarNavigationItem
+				uid="navigation-navigation-item"
+				to="/navigation"
+				withChevron
+				icon={ navigation }
+				isHidden={ ! isBlockBasedTheme }
+			>
+				{ __( 'Navigation' ) }
+			</SidebarNavigationItem>
 			<SidebarNavigationItem
 				uid="patterns-navigation-item"
 				to="/pattern"
@@ -77,16 +71,15 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 			>
 				{ __( 'Patterns' ) }
 			</SidebarNavigationItem>
-			{ isBlockBasedTheme && (
-				<SidebarNavigationItem
-					uid="template-navigation-item"
-					to="/template"
-					withChevron
-					icon={ layout }
-				>
-					{ __( 'Templates' ) }
-				</SidebarNavigationItem>
-			) }
+			<SidebarNavigationItem
+				uid="template-navigation-item"
+				to="/template"
+				withChevron
+				icon={ layout }
+				isHidden={ ! isBlockBasedTheme }
+			>
+				{ __( 'Templates' ) }
+			</SidebarNavigationItem>
 		</ItemGroup>
 	);
 }

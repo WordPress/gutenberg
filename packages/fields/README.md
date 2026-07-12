@@ -152,6 +152,14 @@ Password field for BasePost.
 
 Undocumented declaration.
 
+### patternDescriptionField
+
+Description field for patterns.
+
+### patternSyncStatusField
+
+Sync status field for patterns.
+
 ### patternTitleField
 
 Title for the pattern entity.
@@ -224,9 +232,25 @@ Status field for BasePost.
 
 Sticky field for BasePost.
 
+### templateAuthorField
+
+Author field for templates.
+
+_Type_
+
+-   `Field< Template >`
+
 ### templateField
 
 Template field for BasePost.
+
+### templatePartAuthorField
+
+Author field for template parts.
+
+_Type_
+
+-   `Field< TemplatePart >`
 
 ### templateTitleField
 

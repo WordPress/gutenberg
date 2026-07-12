@@ -12,6 +12,16 @@
 	}
 }
 
+// The "Edit code" button in the inspector renders inside the tabs panel, so
+// it needs spacing on all sides, including against the tab list above it.
+.block-library-html__edit-code {
+	margin: $grid-unit-20;
+
+	.block-library-html__edit-code-button {
+		justify-content: center;
+	}
+}
+
 // Modal styles
 .block-library-html__modal {
 

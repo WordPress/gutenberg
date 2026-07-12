@@ -28,6 +28,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 _Defined via the [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) property in block.json._
 
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`ariaLabel`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#arialabel): `true`
 - [`visibility`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 - [`lock`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#lock): `false`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
@@ -36,7 +37,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
 - [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout):
-  - [`default`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex"}`
+  - [`default`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex","flexWrap":"nowrap"}`
   - [`allowVerticalAlignment`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowverticalalignment): `false`
   - [`allowOrientation`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-alloworientation): `false`
   - [`allowWrap`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowwrap): `false`

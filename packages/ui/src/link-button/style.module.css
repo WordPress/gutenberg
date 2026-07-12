@@ -1,0 +1,19 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer compositions {
+		.link-button {
+			/* Bridge `Button` foreground tokens into the unlayered `.a` global CSS defense. */
+			--_gcd-a-color: var(--wp-ui-button-foreground-color);
+			--_gcd-a-border-radius: var(--wpds-border-radius-sm);
+
+			&:visited {
+				--_gcd-a-color: var(--wp-ui-button-foreground-color);
+			}
+
+			&:is(:hover, :active, :focus) {
+				--_gcd-a-color: var(--wp-ui-button-foreground-color-active);
+			}
+		}
+	}
+}

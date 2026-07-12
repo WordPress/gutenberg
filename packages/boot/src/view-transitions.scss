@@ -22,15 +22,6 @@
 		view-transition-name: boot--canvas-sidebar;
 	}
 
-	.boot-layout.has-full-canvas
-	.boot-layout__canvas
-	.boot-site-icon-link,
-	.boot-layout:not(.has-full-canvas)
-	.boot-site-hub
-	.boot-site-icon-link {
-		view-transition-name: boot--site-icon-link;
-	}
-
 	// Default (non-Safari) view transition names
 	.boot-layout__stage {
 		view-transition-name: boot--stage;
@@ -76,15 +67,6 @@
 ::view-transition-group(boot-safari--canvas),
 ::view-transition-group(boot--canvas) {
 	z-index: 1;
-}
-
-::view-transition-group(boot--site-icon-link) {
-	z-index: 2;
-}
-
-::view-transition-new(boot--site-icon-link),
-::view-transition-old(boot--site-icon-link) {
-	animation: none;
 }
 
 // Safari-specific pseudo-element styles with width: auto fix

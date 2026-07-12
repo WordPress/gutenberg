@@ -2312,7 +2312,6 @@ export function selectedBlockStyleState( state = undefined, action ) {
 				clientId: action.clientId,
 				showStateOnCanvas,
 				value: {
-					viewport: 'default',
 					pseudo: 'default',
 					...previousValue,
 					...action.value,
@@ -2332,7 +2331,6 @@ export function selectedBlockStyleState( state = undefined, action ) {
 				clientId: action.clientId,
 				showStateOnCanvas: action.value,
 				value: {
-					viewport: 'default',
 					pseudo: 'default',
 					...previousValue,
 				},
@@ -2390,6 +2388,41 @@ export function selectedBlockStyleState( state = undefined, action ) {
 	return state;
 }
 
+/**
+ * Reducer holding the globally selected viewport style state. When set to a
+ * value other than 'default', block style edits in the inspector are applied to
+ * that viewport. Driven by the editor's device preview (Responsive editing).
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function styleStateViewport( state = 'default', action ) {
+	if ( action.type === 'SET_STYLE_STATE_VIEWPORT' ) {
+		return action.viewport ?? 'default';
+	}
+
+	return state;
+}
+
+/**
+ * Reducer for whether Responsive editing is enabled. When enabled, the device
+ * preview also drives which viewport block style edits are applied to.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isResponsiveEditing( state = false, action ) {
+	if ( action.type === 'SET_RESPONSIVE_EDITING' ) {
+		return action.enabled;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2426,6 +2459,8 @@ const combinedReducers = combineReducers( {
 	listViewContentPanelOpen,
 	requestedInspectorTab,
 	selectedBlockStyleState,
+	styleStateViewport,
+	isResponsiveEditing,
 } );
 
 /**
