@@ -196,7 +196,7 @@ if ( ! function_exists( 'gutenberg_get_note_followers' ) ) {
 	 * @param int $root_id Top-level note ID.
 	 * @return list<int> Follower user IDs.
 	 */
-	function gutenberg_get_note_followers( $root_id ) {
+	function gutenberg_get_note_followers( int $root_id ): array {
 		$followers = get_comment_meta( $root_id, '_wp_note_followers' );
 		if ( ! is_array( $followers ) ) {
 			return array();
