@@ -13,6 +13,7 @@
 ### Internal
 
 -   Expose the `richtext` control's `RichTextControl` assembly as a private API so other core packages can render a standalone rich text form field without a DataForm ([#78242](https://github.com/WordPress/gutenberg/pull/78242)).
+-   Add an optional `completers` prop to the private `RichTextControl` assembly, wiring `@wordpress/components`' autocomplete to the field (e.g. for `@` mentions) ([#79604](https://github.com/WordPress/gutenberg/pull/79604)).
 -   Update `@ariakit/react` to `0.4.32` ([#79860](https://github.com/WordPress/gutenberg/pull/79860)).
 
 ### Enhancements

@@ -18,6 +18,15 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
  */
 import { unlock } from '../../lock-unlock';
 import { sanitizeNoteContent } from './utils';
+import noteMentionCompleter from './note-mention-completer';
+import {
+	registerNoteMentionFormat,
+	MENTION_FORMAT_NAME,
+} from './mention-format';
+
+// Register the mention format so the `@` completer's inserted links keep their
+// `data-user-id` through rich text round-trips. Idempotent.
+registerNoteMentionFormat();
 
 /*
  * The rich text form field is assembled in `@wordpress/dataviews` on top of the
@@ -31,7 +40,10 @@ const ALLOWED_NOTE_FORMATS = [
 	'core/italic',
 	'core/link',
 	'core/code',
+	MENTION_FORMAT_NAME,
 ];
+
+const NOTE_COMPLETERS = [ noteMentionCompleter ];
 
 export function NoteForm( { onSubmit, onCancel, note, labels, focusOnMount } ) {
 	const [ inputComment, setInputComment ] = useState(
@@ -116,6 +128,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels, focusOnMount } ) {
 				value={ inputComment }
 				onChange={ setInputComment }
 				allowedFormats={ ALLOWED_NOTE_FORMATS }
+				completers={ NOTE_COMPLETERS }
 			/>
 			<Stack
 				direction="row"
