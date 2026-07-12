@@ -411,6 +411,7 @@ export function RichTextWrapper(
 						formatTypes,
 						onReplace,
 						selectionChange,
+						onSelectionChange,
 						isSelected,
 						disableFormats,
 						value,

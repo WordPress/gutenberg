@@ -20,9 +20,11 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		const { value, onMerge, onRemove } = props.current;
+		const { getValue, onMerge, onRemove, onSelectionChange } =
+			props.current;
 
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
+			const value = getValue();
 			const { start, end, text } = value;
 			const isReverse = keyCode === BACKSPACE;
 			const hasActiveFormats =
@@ -39,6 +41,11 @@ export default ( props ) => ( element ) => {
 			}
 
 			if ( onMerge ) {
+				// `mergeBlocks` restores the caret from the store selection,
+				// which may not have received the current selection yet: the
+				// native `selectionchange` event is asynchronous. The merge
+				// consumes the selection, so synchronize it first.
+				onSelectionChange( start, end );
 				onMerge( ! isReverse );
 			}
 
