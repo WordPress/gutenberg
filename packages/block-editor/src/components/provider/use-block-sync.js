@@ -10,6 +10,7 @@ import { cloneBlock } from '@wordpress/blocks';
  */
 import { store as blockEditorStore } from '../../store';
 import { SelectionContext } from './selection-context';
+import { unlock } from '../../lock-unlock';
 
 const noop = () => {};
 
@@ -158,8 +159,14 @@ export default function useBlockSync( {
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
+	const { setControllerExternalClientIds } = unlock(
+		registry.dispatch( blockEditorStore )
+	);
 	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
 		registry.select( blockEditorStore );
+	const { getExternalClientId } = unlock(
+		registry.select( blockEditorStore )
+	);
 
 	const pendingChangesRef = useRef( { incoming: null, outgoing: [] } );
 	const subscribedRef = useRef( false );
@@ -206,24 +213,20 @@ export default function useBlockSync( {
 			// controllers synced from the same entity (e.g. two Navigation
 			// blocks using the same menu) map the same external IDs, so both
 			// consider the selection theirs and the last one to sync would
-			// steal it. The store's current selection breaks the tie: it
-			// holds an internal (per-controller) clone ID. If that block is
-			// alive and is not one of our own clones, another controller owns
-			// the user's selection and we must leave it alone. If it is one
-			// of our removed clones (getBlockName returns null right after we
-			// replaced our blocks), restoring it onto the fresh clones is our
-			// job. The root controller never skips: it doesn't clone, so a
-			// selection surviving its reset is always its own (and skipping
-			// would break caret restoration on undo/redo).
+			// steal it. To break the tie, check whether the selection is
+			// already in place: every controller registers in the store
+			// which external block each of its clones was made from, so if
+			// the currently selected block is a copy of the same external
+			// block this selection targets — whichever controller made the
+			// copy — there is nothing left to restore. The root controller
+			// never skips: it doesn't clone, so its blocks have no
+			// registered external IDs to compare.
 			if ( clientId ) {
 				const currentClientId = getSelectionStart()?.clientId;
-				const isSelectionElsewhere =
+				if (
 					currentClientId &&
-					! idMappingRef.current.internalToExternal.has(
-						currentClientId
-					) &&
-					!! getBlockName( currentClientId );
-				if ( isSelectionElsewhere ) {
+					getExternalClientId( currentClientId ) === startClientId
+				) {
 					return;
 				}
 			}
@@ -286,6 +289,15 @@ export default function useBlockSync( {
 				__unstableMarkNextChangeAsNotPersistent();
 				replaceInnerBlocks( clientId, storeBlocks );
 
+				// Publish a snapshot of the clone mapping so that other
+				// controllers can recognise this controller's clones when
+				// deciding whether to restore a selection (see
+				// restoreSelection).
+				setControllerExternalClientIds(
+					clientId,
+					new Map( idMappingRef.current.internalToExternal )
+				);
+
 				// Invalidate the applied-selection ref so that
 				// restoreSelection() at the end of the
 				// controlledBlocks effect re-applies with the
@@ -309,6 +321,7 @@ export default function useBlockSync( {
 			setHasControlledInnerBlocks( clientId, false );
 			__unstableMarkNextChangeAsNotPersistent();
 			replaceInnerBlocks( clientId, [] );
+			setControllerExternalClientIds( clientId, null );
 		} else {
 			__unstableMarkNextChangeAsNotPersistent();
 			resetBlocks( [] );

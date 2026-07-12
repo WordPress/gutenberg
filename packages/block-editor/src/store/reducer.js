@@ -2423,6 +2423,40 @@ export function isResponsiveEditing( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer tracking, per inner block controller, which external (original)
+ * client ID each of its internal (cloned) blocks was made from. Controllers
+ * synced from the same entity (e.g. two Navigation blocks using the same
+ * menu) share external IDs but keep private clone mappings; publishing the
+ * mapping here lets one controller recognise that the current selection
+ * already points at a copy of a given external block, whichever controller
+ * made the copy.
+ *
+ * The state is a Map of controller client ID → Map of internal → external
+ * client IDs.
+ *
+ * @param {Map}    state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Map} Updated state.
+ */
+export function externalClientIds( state = new Map(), action ) {
+	if ( action.type === 'SET_CONTROLLER_EXTERNAL_CLIENT_IDS' ) {
+		if ( ! action.internalToExternal && ! state.has( action.clientId ) ) {
+			return state;
+		}
+		const nextState = new Map( state );
+		if ( action.internalToExternal ) {
+			nextState.set( action.clientId, action.internalToExternal );
+		} else {
+			nextState.delete( action.clientId );
+		}
+		return nextState;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2461,6 +2495,7 @@ const combinedReducers = combineReducers( {
 	selectedBlockStyleState,
 	styleStateViewport,
 	isResponsiveEditing,
+	externalClientIds,
 } );
 
 /**

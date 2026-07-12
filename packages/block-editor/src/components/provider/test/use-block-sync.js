@@ -815,6 +815,74 @@ describe( 'useBlockSync hook', () => {
 			);
 		} );
 
+		it( 'restores the entity selection into a controller even while another block is selected (undo jump-in)', () => {
+			let registry;
+			const setRegistry = ( reg ) => {
+				registry = reg;
+			};
+			// Holds the entity-level selection, unset until the user selects.
+			const contextSelection = { current: undefined };
+			const getSelection = () => contextSelection.current;
+			const otherEntityBlocks = [
+				{
+					name: 'test/test-block',
+					clientId: 'other-1',
+					innerBlocks: [],
+					attributes: { foo: 1 },
+				},
+			];
+			const renderControllers = ( value ) => (
+				<SelectionTestWrapper
+					setRegistry={ setRegistry }
+					getSelection={ getSelection }
+				>
+					<Controller
+						clientId="nav-a"
+						value={ sharedEntityBlocks }
+						onChange={ jest.fn() }
+						onInput={ jest.fn() }
+					/>
+					<Controller
+						clientId="other"
+						value={ value }
+						onChange={ jest.fn() }
+						onInput={ jest.fn() }
+					/>
+				</SelectionTestWrapper>
+			);
+
+			const { rerender } = render(
+				renderControllers( otherEntityBlocks )
+			);
+
+			// The user is working inside the first controller…
+			const cloneA = registry
+				.select( blockEditorStore )
+				.getBlocks( 'nav-a' )[ 0 ];
+			registry
+				.dispatch( blockEditorStore )
+				.selectBlock( cloneA.clientId );
+
+			// …when the other controller's entity comes back with a
+			// selection targeting its own content (e.g. undoing an edit
+			// made inside it). The selection targets a different external
+			// block than the one currently selected, so it must be applied.
+			contextSelection.current = {
+				selectionStart: { clientId: 'other-1' },
+				selectionEnd: { clientId: 'other-1' },
+			};
+			rerender(
+				renderControllers( [
+					{ ...otherEntityBlocks[ 0 ], attributes: { foo: 2 } },
+				] )
+			);
+
+			const { getSelectionStart, getBlockParents } =
+				registry.select( blockEditorStore );
+			const selectedClientId = getSelectionStart().clientId;
+			expect( getBlockParents( selectedClientId ) ).toContain( 'other' );
+		} );
+
 		it( 'restores the entity selection when the root controller resets blocks (undo/redo)', () => {
 			let registry;
 			const setRegistry = ( reg ) => {

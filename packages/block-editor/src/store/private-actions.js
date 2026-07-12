@@ -589,3 +589,23 @@ export function setResponsiveEditing( enabled ) {
 		enabled,
 	};
 }
+
+/**
+ * Registers which external (original) client ID each of an inner block
+ * controller's internal (cloned) blocks was made from, so that other
+ * controllers can recognise copies of the same external block. Pass null
+ * to remove the controller's registration (e.g. on unmount).
+ *
+ * @param {string}   clientId           The controller block's client ID.
+ * @param {Map|null} internalToExternal Map of internal → external client IDs,
+ *                                      or null to unregister.
+ *
+ * @return {Object} Action object.
+ */
+export function setControllerExternalClientIds( clientId, internalToExternal ) {
+	return {
+		type: 'SET_CONTROLLER_EXTERNAL_CLIENT_IDS',
+		clientId,
+		internalToExternal,
+	};
+}

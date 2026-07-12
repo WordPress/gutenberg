@@ -1373,3 +1373,23 @@ export function isSelectedBlockStyleStateShownOnCanvas( state, clientId ) {
 
 	return state.selectedBlockStyleState.showStateOnCanvas ?? true;
 }
+
+/**
+ * Returns the external (original) client ID that the given internal (cloned)
+ * block was made from, if any inner block controller has registered it.
+ * Returns undefined for blocks that are not controller-made copies (e.g.
+ * root-level blocks).
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The internal block client ID.
+ *
+ * @return {string|undefined} The external client ID, if known.
+ */
+export function getExternalClientId( state, clientId ) {
+	for ( const internalToExternal of state.externalClientIds.values() ) {
+		const externalClientId = internalToExternal.get( clientId );
+		if ( externalClientId !== undefined ) {
+			return externalClientId;
+		}
+	}
+}
