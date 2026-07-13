@@ -45,6 +45,7 @@ export function NoteThread( {
 	sidebarRef,
 	floating,
 	onKeyDown,
+	viewedNotes,
 } ) {
 	const isFloating = !! floating;
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
@@ -63,10 +64,27 @@ export function NoteThread( {
 
 	useEffect( () => () => clearTimeout( blurDeselectTimeoutRef.current ), [] );
 
+	const allReplies = note?.reply || [];
+	const lastReply =
+		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
+	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
+
+	// Flat list of every id in this thread — top-level note  all replies.
+	const allNoteIds = [ note.id, ...allReplies.map( ( reply ) => reply.id ) ];
+	const isThreadUnread =
+		!! viewedNotes &&
+		// A thread is unread only if it has notes by other users that are not viewed.
+		allNoteIds.some( ( id, index ) =>
+			viewedNotes.isNoteUnread(
+				id,
+				index === 0 ? note.author : allReplies[ index - 1 ].author
+			)
+		);
+
 	const registerThread = floating?.registerThread;
 	const unregisterThread = floating?.unregisterThread;
 
-	// Register block + floating elements with the board.
+	// Register block  floating elements with the board.
 	// The board's ResizeObserver and autoUpdate track changes automatically.
 	useEffect( () => {
 		const floatingEl = floatingRef.current;
@@ -170,6 +188,7 @@ export function NoteThread( {
 			// Pass `null` as the second parameter to prevent focusing the block.
 			selectBlock( note.blockClientId, null );
 		}
+		viewedNotes?.markNotesViewed( allNoteIds );
 	};
 
 	const onDeselectNote = () => {
@@ -180,6 +199,7 @@ export function NoteThread( {
 	const handleResolve = () => {
 		onEditNote( { id: note.id, status: 'approved' } );
 		onDeselectNote();
+		viewedNotes?.markNotesViewed( allNoteIds );
 		if ( isFloating ) {
 			relatedBlockElement?.focus();
 		} else {
@@ -187,16 +207,12 @@ export function NoteThread( {
 		}
 	};
 
-	const allReplies = note?.reply || [];
-	const lastReply =
-		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
-	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
-
 	const noteExcerpt = getNoteExcerpt(
 		stripHTML( note.content?.rendered ),
 		10
 	);
-	const ariaLabel = !! note.blockClientId
+
+	const baseAriaLabel = !! note.blockClientId
 		? sprintf(
 				// translators: %s: note excerpt
 				__( 'Note: %s' ),
@@ -207,6 +223,14 @@ export function NoteThread( {
 				__( 'Original block deleted. Note: %s' ),
 				noteExcerpt
 		  );
+
+	const ariaLabel = isThreadUnread
+		? sprintf(
+				// translators: %s: base note label
+				__( '%s (unread replies)' ),
+				baseAriaLabel
+		  )
+		: baseAriaLabel;
 
 	if ( isFloating && note.id === 'new' ) {
 		return (
@@ -275,6 +299,9 @@ export function NoteThread( {
 				onEditNote={ onEditNote }
 				onDeleteNote={ onDeleteNote }
 				onResolve={ handleResolve }
+				isUnread={
+					viewedNotes?.isNoteUnread( note.id, note.author ) ?? false
+				}
 			/>
 			{ isSelected &&
 				allReplies.map( ( reply ) => (
@@ -285,6 +312,12 @@ export function NoteThread( {
 						isSelected={ isSelected }
 						onEditNote={ onEditNote }
 						onDeleteNote={ onDeleteNote }
+						isUnread={
+							viewedNotes?.isNoteUnread(
+								reply.id,
+								reply.author
+							) ?? false
+						}
 					/>
 				) ) }
 			{ ! isSelected && restReplies.length > 0 && (
@@ -322,12 +355,19 @@ export function NoteThread( {
 					isSelected={ false }
 					onEditNote={ onEditNote }
 					onDeleteNote={ onDeleteNote }
+					isUnread={
+						viewedNotes?.isNoteUnread(
+							lastReply.id,
+							lastReply.author
+						) ?? false
+					}
 				/>
 			) }
 			{ isSelected && (
 				<NoteCard role="treeitem">
 					<NoteForm
 						onSubmit={ ( inputComment ) => {
+							viewedNotes?.markNotesViewed( allNoteIds );
 							if ( 'approved' === note.status ) {
 								// For reopening, include the content in the reopen action.
 								return onEditNote( {

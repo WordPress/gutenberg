@@ -9,10 +9,23 @@ import { Stack } from '@wordpress/ui';
  */
 import { NoteByline } from './note-byline';
 
-export function NoteCard( { note, actions, className, children, ...props } ) {
+export function NoteCard( {
+	note,
+	actions,
+	isUnread = false,
+	className,
+	children,
+	...props
+} ) {
 	return (
 		<Stack direction="column" gap="sm" className={ className } { ...props }>
 			<Stack direction="row" align="center" justify="flex-start" gap="md">
+				{ isUnread && (
+					<span
+						className="editor-collab-sidebar-panel__unread-dot"
+						aria-hidden="true"
+					/>
+				) }
 				<NoteByline
 					avatar={ note?.author_avatar_urls?.[ 48 ] }
 					name={ note?.author_name }

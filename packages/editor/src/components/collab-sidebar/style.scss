@@ -264,3 +264,13 @@ mark.wp-note {
 .editor-collab-sidebar-panel__mention-suggestion .editor-autocompleters__user-avatar {
 	border-radius: $radius-round;
 }
+
+.editor-collab-sidebar-panel__unread-dot {
+	display: inline-block;
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	background: var(--wp-admin-theme-color, #3858e9);
+	flex-shrink: 0;
+	margin-left: -10px;
+}

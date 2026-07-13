@@ -32,6 +32,7 @@ import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import { NOTE_FORMAT_NAME, noteFormat } from './format';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
+import { useViewedNotes } from './hooks/use-viewed-notes';
 
 function NotesSidebar( { postId } ) {
 	useEffect( () => {
@@ -78,6 +79,7 @@ function NotesSidebar( { postId } ) {
 	);
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
+	const viewedNotes = useViewedNotes( postId );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
@@ -197,7 +199,11 @@ function NotesSidebar( { postId } ) {
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
-					<Notes notes={ notes } sidebarRef={ sidebarRef } />
+					<Notes
+						notes={ notes }
+						sidebarRef={ sidebarRef }
+						viewedNotes={ viewedNotes }
+					/>
 				</PluginSidebar>
 			) }
 			{ isLargeViewport && (
@@ -213,6 +219,7 @@ function NotesSidebar( { postId } ) {
 						notes={ unresolvedNotes }
 						sidebarRef={ sidebarRef }
 						styles={ { backgroundColor } }
+						viewedNotes={ viewedNotes }
 						isFloating
 					/>
 				</PluginSidebar>
