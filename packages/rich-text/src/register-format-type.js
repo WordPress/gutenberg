@@ -9,17 +9,24 @@ import { store as richTextStore } from './store';
 /**
  * @typedef {Object} WPFormat
  *
- * @property {string}        name        A string identifying the format. Must be
- *                                       unique across all registered formats.
- * @property {string}        tagName     The HTML tag this format will wrap the
- *                                       selection with.
- * @property {boolean}       interactive Whether format makes content interactive or not.
- * @property {boolean}       object      Whether the format represents an object (e.g., `img`, `br`),
- *                                       an object cannot contain other format types.
- * @property {string | null} [className] A class to match the format.
- * @property {string}        title       Name of the format.
- * @property {Function}      edit        Should return a component for the user to
- *                                       interact with the new registered format.
+ * @property {string}                 [name]       A string identifying the format. Must be
+ *                                                 unique across all registered formats.
+ *                                                 `registerFormatType` fills it in from
+ *                                                 its first argument.
+ * @property {string}                 tagName      The HTML tag this format will wrap the
+ *                                                 selection with.
+ * @property {boolean}                interactive  Whether format makes content interactive or not.
+ * @property {boolean}                [object]     Whether the format represents an object (e.g., `img`, `br`),
+ *                                                 an object cannot contain other format types.
+ * @property {string | null}          [className]  A class to match the format.
+ * @property {string}                 title        Name of the format.
+ * @property {Object<string, string>} [attributes] Maps keys on the format's
+ *                                                 value to HTML attributes of the tag,
+ *                                                 e.g. `{ url: 'href' }`, so those
+ *                                                 attributes survive edit and serialize
+ *                                                 round-trips.
+ * @property {Function}               [edit]       Should return a component for the user to
+ *                                                 interact with the new registered format.
  */
 
 /**

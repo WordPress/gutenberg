@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { renderHook } from '@testing-library/react';
+import type { ReactElement } from 'react';
 
 /**
  * WordPress dependencies
@@ -24,6 +25,8 @@ jest.mock( '@wordpress/core-data', () => ( {
 	store: 'core',
 } ) );
 
+const mockedUseSelect = jest.mocked( useSelect );
+
 describe( 'noteMentionCompleter', () => {
 	it( 'is an `@`-triggered completer', () => {
 		expect( noteMentionCompleter.triggerPrefix ).toBe( '@' );
@@ -40,7 +43,7 @@ describe( 'noteMentionCompleter', () => {
 
 			expect( completion.action ).toBe( 'insert-at-caret' );
 
-			const anchor = completion.value;
+			const anchor = completion.value as ReactElement;
 			expect( anchor.type ).toBe( 'a' );
 			expect( anchor.props.className ).toBe( 'wp-note-mention' );
 			expect( anchor.props[ 'data-user-id' ] ).toBe( 5 );
@@ -58,17 +61,17 @@ describe( 'noteMentionCompleter', () => {
 	} );
 
 	describe( 'useItems', () => {
-		let getUsers;
+		let getUsers: jest.Mock;
 
 		beforeEach( () => {
 			getUsers = jest.fn( () => [] );
-			useSelect.mockImplementation( ( mapSelect ) =>
+			mockedUseSelect.mockImplementation( ( mapSelect: any ) =>
 				mapSelect( () => ( { getUsers } ) )
 			);
 		} );
 
 		afterEach( () => {
-			useSelect.mockReset();
+			mockedUseSelect.mockReset();
 		} );
 
 		it( 'queries all site users by default', () => {
@@ -85,7 +88,10 @@ describe( 'noteMentionCompleter', () => {
 			addFilter(
 				'editor.notes.mentionUserQuery',
 				'test/narrow',
-				( query ) => ( { ...query, who: 'authors' } )
+				( query: Record< string, unknown > ) => ( {
+					...query,
+					who: 'authors',
+				} )
 			);
 
 			renderHook( () => noteMentionCompleter.useItems( 'jane' ) );

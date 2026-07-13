@@ -16,8 +16,6 @@ const STORE_NAME = 'core/rich-text';
  * Store definition for the rich-text namespace.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
- *
- * @type {Object}
  */
 export const store = createReduxStore( STORE_NAME, {
 	reducer,

@@ -12,6 +12,15 @@ import { applyFilters } from '@wordpress/hooks';
 import { getUserLabel } from '../autocompleters/user';
 
 /**
+ * The subset of the REST users response the completion consumes.
+ */
+type MentionableUser = {
+	id: number;
+	name: string;
+	link: string;
+};
+
+/**
  * A user mention completer for notes.
  *
  * Mirrors the editor's `@` user completer but inserts a link carrying the
@@ -19,15 +28,13 @@ import { getUserLabel } from '../autocompleters/user';
  * and, in a follow-up, resolved to a notification recipient. The user query is
  * filterable so integrators can narrow the mentionable audience (e.g. to
  * editors or contributors).
- *
- * @type {Object}
  */
 const noteMentionCompleter = {
 	name: 'note-mentions',
 	className: 'editor-autocompleters__user',
 	triggerPrefix: '@',
 
-	useItems( filterValue ) {
+	useItems( filterValue: string ) {
 		const users = useSelect(
 			( select ) => {
 				/**
@@ -48,7 +55,7 @@ const noteMentionCompleter = {
 						per_page: 10,
 					},
 					filterValue
-				);
+				) as Record< string, unknown >;
 
 				return select( coreStore ).getUsers( query );
 			},
@@ -67,12 +74,12 @@ const noteMentionCompleter = {
 			[ users ]
 		);
 
-		return [ options ];
+		return [ options ] as const;
 	},
 
-	getOptionCompletion( user ) {
+	getOptionCompletion( user: MentionableUser ) {
 		return {
-			action: 'insert-at-caret',
+			action: 'insert-at-caret' as const,
 			value: (
 				<a
 					className="wp-note-mention"
