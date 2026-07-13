@@ -78,17 +78,17 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that _gutenberg_apply_content_filters() works.
+	 * Test that _wp_apply_content_filters() works.
 	 *
-	 * @covers ::_gutenberg_apply_content_filters
+	 * @covers ::_wp_apply_content_filters
 	 */
-	public function test_gutenberg_apply_content_filters_works() {
+	public function test_wp_apply_content_filters_works() {
 		// Check if the function exists.
-		$this->assertTrue( function_exists( '_gutenberg_apply_content_filters' ), '_gutenberg_apply_content_filters function should exist' );
+		$this->assertTrue( function_exists( '_wp_apply_content_filters' ), '_wp_apply_content_filters function should exist' );
 
 		// Test with paragraph block.
 		$content = '<!-- wp:paragraph --><p>Test paragraph</p><!-- /wp:paragraph -->';
-		$output  = _gutenberg_apply_content_filters( $content, 'test-context' );
+		$output  = _wp_apply_content_filters( $content, 'test-context' );
 
 		// Block comments should be removed.
 		$this->assertStringNotContainsString( '<!-- wp:paragraph -->', $output, 'Block comments should be removed' );
@@ -127,7 +127,7 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 			$attachment_id_2
 		);
 
-		// Apply the same filters that _gutenberg_apply_content_filters does.
+		// Apply the same filters that _wp_apply_content_filters does.
 		$processed_content = shortcode_unautop( $gallery_content );
 		$processed_content = do_shortcode( $processed_content );
 		$gallery_output    = do_blocks( $processed_content );

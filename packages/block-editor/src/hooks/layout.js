@@ -301,29 +301,34 @@ function LayoutPanelPure( {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
 	const { layout: layoutSettings } = settings;
-	const { themeSupportsLayout, activeBlockVariation, selectedState } =
-		useSelect(
-			( select ) => {
-				const blockEditorSelect = select( blockEditorStore );
-				const { getBlockAttributes, getSettings } = blockEditorSelect;
-				const { getSelectedBlockStyleState } =
-					unlock( blockEditorSelect );
-				return {
-					activeBlockVariation: select(
-						blocksStore
-					).getActiveBlockVariation(
-						blockName,
-						getBlockAttributes( clientId ) || {},
-						'block'
-					),
-					themeSupportsLayout: getSettings().supportsLayout,
-					selectedState:
-						getSelectedBlockStyleState?.( clientId ) ??
-						DEFAULT_BLOCK_STYLE_STATE,
-				};
-			},
-			[ blockName, clientId ]
-		);
+	const {
+		themeSupportsLayout,
+		activeBlockVariation,
+		selectedState,
+		isResponsiveEditing,
+	} = useSelect(
+		( select ) => {
+			const blockEditorSelect = select( blockEditorStore );
+			const { getBlockAttributes, getSettings } = blockEditorSelect;
+			const {
+				getSelectedBlockStyleState,
+				isResponsiveEditing: getIsResponsiveEditing,
+			} = unlock( blockEditorSelect );
+			return {
+				activeBlockVariation: select(
+					blocksStore
+				).getActiveBlockVariation(
+					blockName,
+					getBlockAttributes( clientId ) || {},
+					'block'
+				),
+				themeSupportsLayout: getSettings().supportsLayout,
+				selectedState: getSelectedBlockStyleState( clientId ),
+				isResponsiveEditing: getIsResponsiveEditing(),
+			};
+		},
+		[ blockName, clientId ]
+	);
 
 	const blockEditingMode = useBlockEditingMode();
 	const isViewportLayoutState =
@@ -573,6 +578,13 @@ function LayoutPanelPure( {
 					layout={ usedLayout }
 					onChange={ onChangeLayout }
 					layoutBlockSupport={ layoutBlockSupport }
+					controlsGroup={
+						isResponsiveEditing &&
+						hasViewportBlockStyleState( selectedState ) &&
+						! hasPseudoBlockStyleState( selectedState )
+							? 'style-state'
+							: 'block'
+					}
 					name={ blockName }
 					clientId={ clientId }
 				/>

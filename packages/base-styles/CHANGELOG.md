@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add `outset-ring__focus` mixin for outline-based focus rings using `--wpds-*` design tokens ([#78698](https://github.com/WordPress/gutenberg/pull/78698)).
+-   Add `outset-ring__focus` mixin for outline-based focus rings using `--wpds-*` design tokens ([#78698](https://github.com/WordPress/gutenberg/pull/78698), [#80082](https://github.com/WordPress/gutenberg/pull/80082)).
 
 ## 10.2.0 (2026-07-01)
 

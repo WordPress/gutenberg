@@ -27,6 +27,10 @@ const {
 } = require( './common' );
 const pluginConfig = require( '../config' );
 
+const NPM_RELEASE_GIT_PUSH_ATTEMPTS = 3;
+// Keep tag pushes small enough that GitHub ruleset validation handles each phase predictably.
+const NPM_RELEASE_TAG_PUSH_BATCH_SIZE = 25;
+
 /**
  * Release type names.
  *
@@ -339,34 +343,550 @@ async function runPushGitChangesStep( {
 }
 
 /**
+ * Returns package metadata for public packages that Lerna tagged at HEAD.
+ *
+ * @param {string}   gitWorkingDirectoryPath Git working directory path.
+ * @param {Object}   deps                    Dependencies.
+ * @param {Object}   deps.git                Git client.
+ * @param {Function} deps.globFn             Glob function.
+ * @param {Function} deps.readJSON           JSON reader.
+ *
+ * @return {Promise<Array<{ name: string, version: string, tagName: string }>>} Package metadata.
+ */
+async function getNpmReleasePackages( gitWorkingDirectoryPath, deps = {} ) {
+	const {
+		git = SimpleGit( gitWorkingDirectoryPath ),
+		globFn = glob,
+		readJSON = readJSONFile,
+	} = deps;
+	const localTagsAtHead = new Set(
+		( await git.raw( 'tag', '--points-at', 'HEAD' ) )
+			.split( '\n' )
+			.filter( Boolean )
+	);
+
+	const packageJSONPaths = await globFn(
+		path.resolve( gitWorkingDirectoryPath, 'packages/*/package.json' )
+	);
+
+	return packageJSONPaths
+		.map( ( packageJSONPath ) => {
+			const {
+				name,
+				private: isPrivate,
+				version,
+			} = readJSON( packageJSONPath );
+			return {
+				isPrivate,
+				name,
+				tagName: `${ name }@${ version }`,
+				version,
+			};
+		} )
+		.filter(
+			( { isPrivate, tagName } ) =>
+				isPrivate !== true && localTagsAtHead.has( tagName )
+		)
+		.map( ( { name, tagName, version } ) => ( {
+			name,
+			tagName,
+			version,
+		} ) )
+		.sort( ( a, b ) => a.tagName.localeCompare( b.tagName ) );
+}
+
+/**
+ * Returns a fully qualified tag refspec.
+ *
+ * @param {string} tagName Tag name.
+ *
+ * @return {string} Tag refspec.
+ */
+function getTagRefspec( tagName ) {
+	return `refs/tags/${ tagName }:refs/tags/${ tagName }`;
+}
+
+/**
+ * Splits an array into chunks.
+ *
+ * @param {Array}  items     Items to chunk.
+ * @param {number} chunkSize Chunk size.
+ *
+ * @return {Array[]} Chunks.
+ */
+function chunk( items, chunkSize ) {
+	const chunks = [];
+	for ( let index = 0; index < items.length; index += chunkSize ) {
+		chunks.push( items.slice( index, index + chunkSize ) );
+	}
+	return chunks;
+}
+
+/**
+ * Formats one or more tag push commands.
+ *
+ * @param {string[]} tagNames Tag names.
+ *
+ * @return {string[]} Git push commands.
+ */
+function getTagPushCommands( tagNames ) {
+	return chunk( tagNames, NPM_RELEASE_TAG_PUSH_BATCH_SIZE ).map(
+		( tagNameChunk ) =>
+			[
+				'git push origin \\',
+				...tagNameChunk.map(
+					( tagName, index ) =>
+						`  "${ getTagRefspec( tagName ) }"${
+							index === tagNameChunk.length - 1 ? '' : ' \\'
+						}`
+				),
+			].join( '\n' )
+	);
+}
+
+/**
+ * Formats recovery commands for release Git metadata.
+ *
+ * @param {Object}   options                  Options.
+ * @param {string}   options.npmReleaseBranch Npm release branch.
+ * @param {string[]} options.packageTags      Package tag names.
+ * @param {string}   options.publishCommit    Publish commit SHA.
+ *
+ * @return {string} Recovery commands.
+ */
+function getNpmReleaseGitRecoveryCommands( {
+	npmReleaseBranch,
+	packageTags,
+	publishCommit,
+} ) {
+	return [
+		'Push and verify the release branch:',
+		`git push origin "${ publishCommit }:refs/heads/${ npmReleaseBranch }"`,
+		`git ls-remote --heads origin "refs/heads/${ npmReleaseBranch }"`,
+		...( packageTags.length
+			? [
+					'',
+					'Push the package tags:',
+					...getTagPushCommands( packageTags ),
+					'',
+					'Verify the package tags:',
+					...packageTags.map(
+						( tagName ) =>
+							`git ls-remote --tags origin "refs/tags/${ tagName }" "refs/tags/${ tagName }^{}"`
+					),
+			  ]
+			: [] ),
+	].join( '\n' );
+}
+
+/**
+ * Runs a release metadata push phase with retry.
+ *
+ * @param {string}   label     Phase label.
+ * @param {Function} task      Task to retry.
+ * @param {Object}   deps      Dependencies.
+ * @param {Function} deps.wait Wait function.
+ */
+async function runNpmReleaseGitPushPhase( label, task, deps = {} ) {
+	const {
+		wait = ( delay ) =>
+			new Promise( ( resolve ) => setTimeout( resolve, delay ) ),
+	} = deps;
+	for ( let attempt = 1; ; attempt++ ) {
+		try {
+			await task();
+			return;
+		} catch ( err ) {
+			if ( attempt >= NPM_RELEASE_GIT_PUSH_ATTEMPTS ) {
+				throw err;
+			}
+			log(
+				`>> ${ label } failed (attempt ${ attempt }/${ NPM_RELEASE_GIT_PUSH_ATTEMPTS }): ${
+					err.message
+				}, retrying in ${ attempt * 5 }s...`
+			);
+			await wait( attempt * 5000 );
+		}
+	}
+}
+
+/**
+ * Gets the remote SHA for a branch.
+ *
+ * @param {string} gitWorkingDirectoryPath Git working directory path.
+ * @param {string} branchName              Branch name.
+ * @param {Object} deps                    Dependencies.
+ * @param {Object} deps.git                Git client.
+ *
+ * @return {Promise<?string>} Remote branch SHA.
+ */
+async function getRemoteBranchSha(
+	gitWorkingDirectoryPath,
+	branchName,
+	deps = {}
+) {
+	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const branchRef = `refs/heads/${ branchName }`;
+	const output = await git.raw( 'ls-remote', '--heads', 'origin', branchRef );
+	const matchingLine = output
+		.trim()
+		.split( '\n' )
+		.find( ( line ) => line.split( /\s+/ )[ 1 ] === branchRef );
+	const [ sha ] = ( matchingLine || '' ).split( /\s+/ );
+	return sha || null;
+}
+
+/**
+ * Gets the peeled remote SHA for each tag.
+ *
+ * @param {string}   gitWorkingDirectoryPath Git working directory path.
+ * @param {string[]} tagNames                Tag names.
+ * @param {Object}   deps                    Dependencies.
+ * @param {Object}   deps.git                Git client.
+ *
+ * @return {Promise<Map<string, string>>} Remote tag SHAs.
+ */
+async function getRemoteTagShas(
+	gitWorkingDirectoryPath,
+	tagNames,
+	{ git = SimpleGit( gitWorkingDirectoryPath ) } = {}
+) {
+	if ( tagNames.length === 0 ) {
+		return new Map();
+	}
+
+	const output = await git.raw(
+		'ls-remote',
+		'--tags',
+		'origin',
+		...tagNames.flatMap( ( tagName ) => [
+			`refs/tags/${ tagName }`,
+			`refs/tags/${ tagName }^{}`,
+		] )
+	);
+	const remoteTagShas = new Map();
+	output
+		.trim()
+		.split( '\n' )
+		.filter( Boolean )
+		.forEach( ( line ) => {
+			const [ sha, ref = '' ] = line.split( /\s+/ );
+			const match = ref.match( /^refs\/tags\/(.+?)(\^\{\})?$/ );
+			if ( match ) {
+				const [ , tagName, isPeeled ] = match;
+				if ( isPeeled || ! remoteTagShas.has( tagName ) ) {
+					remoteTagShas.set( tagName, sha );
+				}
+			}
+		} );
+	return remoteTagShas;
+}
+
+/**
+ * Verifies that a remote branch points to the expected SHA.
+ *
+ * @param {Object}   options                         Options.
+ * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
+ * @param {string}   options.npmReleaseBranch        Npm release branch.
+ * @param {string}   options.publishCommit           Expected commit SHA.
+ * @param {Object}   deps                            Dependencies.
+ * @param {Function} deps.getRemoteBranchShaFn       Gets the remote branch SHA.
+ */
+async function verifyRemoteNpmReleaseBranch(
+	{ gitWorkingDirectoryPath, npmReleaseBranch, publishCommit },
+	deps = {}
+) {
+	const { getRemoteBranchShaFn = getRemoteBranchSha } = deps;
+	const remoteSha = await getRemoteBranchShaFn(
+		gitWorkingDirectoryPath,
+		npmReleaseBranch
+	);
+	if ( remoteSha !== publishCommit ) {
+		throw new Error(
+			`Expected origin/${ npmReleaseBranch } to point to ${ publishCommit }, got ${
+				remoteSha || 'nothing'
+			}.`
+		);
+	}
+}
+
+/**
+ * Verifies that remote tags peel to the expected SHA.
+ *
+ * @param {Object}   options                         Options.
+ * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
+ * @param {string[]} options.packageTags             Package tag names.
+ * @param {string}   options.publishCommit           Expected commit SHA.
+ * @param {Object}   deps                            Dependencies.
+ * @param {Function} deps.getRemoteTagShasFn         Gets remote tag SHAs.
+ */
+async function verifyRemotePackageTags(
+	{ gitWorkingDirectoryPath, packageTags, publishCommit },
+	deps = {}
+) {
+	const { getRemoteTagShasFn = getRemoteTagShas } = deps;
+	const mismatches = [];
+	const remoteTagShas = await getRemoteTagShasFn(
+		gitWorkingDirectoryPath,
+		packageTags
+	);
+	for ( const tagName of packageTags ) {
+		const remoteSha = remoteTagShas.get( tagName );
+		if ( remoteSha !== publishCommit ) {
+			mismatches.push(
+				`${ tagName }: expected ${ publishCommit }, got ${
+					remoteSha || 'nothing'
+				}`
+			);
+		}
+	}
+	if ( mismatches.length ) {
+		throw new Error(
+			`Package tag verification failed:\n${ mismatches.join( '\n' ) }`
+		);
+	}
+}
+
+/**
+ * Checks whether an npm command failed because the target package version is absent.
+ *
+ * @param {Error} error Command error.
+ *
+ * @return {boolean} Whether the package version is absent.
+ */
+function isNpmPackageVersionMissing( error ) {
+	const output = `${ error.stdout || '' }\n${ error.stderr || '' }`;
+	return output.includes( 'E404' );
+}
+
+/**
+ * Runs a pragmatic npm preflight before publishing.
+ *
+ * @param {Object}   options                         Options.
+ * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
+ * @param {Array}    options.releasePackages         Packages to publish.
+ * @param {Object}   deps                            Dependencies.
+ * @param {Function} deps.commandFn                  Command runner.
+ */
+async function runNpmPublishPreflight(
+	{ gitWorkingDirectoryPath, releasePackages },
+	deps = {}
+) {
+	const { commandFn = command } = deps;
+	log( '>> Checking npm package access.' );
+	await commandFn( 'npm access list packages @wordpress --json', {
+		cwd: gitWorkingDirectoryPath,
+		stdio: 'pipe',
+	} );
+
+	log( '>> Verifying target package versions are not already published.' );
+	// TODO: Consider bounded concurrency here if this preflight becomes too slow.
+	// Keep the first hardening pass sequential so registry errors stay easy to read.
+	for ( const { name, version } of releasePackages ) {
+		try {
+			await commandFn( `npm view ${ name }@${ version } version --json`, {
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'pipe',
+			} );
+		} catch ( error ) {
+			if ( isNpmPackageVersionMissing( error ) ) {
+				continue;
+			}
+			throw error;
+		}
+		throw new Error(
+			`${ name }@${ version } already exists in the npm registry.`
+		);
+	}
+}
+
+/**
+ * Pushes and verifies Git metadata for an npm release.
+ *
+ * @param {Object}   options                             Options.
+ * @param {string}   options.gitWorkingDirectoryPath     Git working directory path.
+ * @param {string}   options.npmReleaseBranch            Npm release branch.
+ * @param {string[]} options.packageTags                 Package tag names.
+ * @param {string}   options.publishCommit               Publish commit SHA.
+ * @param {Object}   deps                                Dependencies.
+ * @param {Object}   deps.git                            Git client.
+ * @param {Function} deps.runPhase                       Runs a retryable phase.
+ * @param {Function} deps.verifyRemoteNpmReleaseBranchFn Verifies the remote branch.
+ * @param {Function} deps.verifyRemotePackageTagsFn      Verifies remote package tags.
+ */
+async function pushNpmReleaseGitMetadata(
+	{ gitWorkingDirectoryPath, npmReleaseBranch, packageTags, publishCommit },
+	deps = {}
+) {
+	const {
+		git = SimpleGit( gitWorkingDirectoryPath ),
+		runPhase = runNpmReleaseGitPushPhase,
+		verifyRemoteNpmReleaseBranchFn = verifyRemoteNpmReleaseBranch,
+		verifyRemotePackageTagsFn = verifyRemotePackageTags,
+	} = deps;
+	try {
+		await runPhase( 'Release branch push', async () => {
+			log( '>> Pushing release branch to remote.' );
+			await git.raw(
+				'push',
+				'origin',
+				`${ publishCommit }:refs/heads/${ npmReleaseBranch }`
+			);
+		} );
+		await runPhase( 'Release branch verification', async () =>
+			verifyRemoteNpmReleaseBranchFn( {
+				gitWorkingDirectoryPath,
+				npmReleaseBranch,
+				publishCommit,
+			} )
+		);
+
+		if ( packageTags.length ) {
+			for ( const packageTagChunk of chunk(
+				packageTags,
+				NPM_RELEASE_TAG_PUSH_BATCH_SIZE
+			) ) {
+				await runPhase( 'Package tag push', async () => {
+					log( '>> Pushing package tags to remote.' );
+					await git.raw(
+						'push',
+						'origin',
+						...packageTagChunk.map( getTagRefspec )
+					);
+				} );
+			}
+			await runPhase( 'Package tag verification', async () =>
+				verifyRemotePackageTagsFn( {
+					gitWorkingDirectoryPath,
+					packageTags,
+					publishCommit,
+				} )
+			);
+		}
+	} catch ( error ) {
+		log(
+			'>> npm publication completed, but Git metadata did not finish. Use these recovery commands after checking the remote state:\n\n' +
+				getNpmReleaseGitRecoveryCommands( {
+					npmReleaseBranch,
+					packageTags,
+					publishCommit,
+				} )
+		);
+		throw error;
+	}
+}
+
+/**
+ * Publishes locally versioned packages, then pushes and verifies Git metadata.
+ *
+ * @param {Object}   options                          Options.
+ * @param {string}   options.distTag                  The dist-tag used for npm publishing.
+ * @param {string}   options.gitWorkingDirectoryPath  Git working directory path.
+ * @param {string}   options.noVerifyAccessFlag       Lerna no-verify-access flag.
+ * @param {string}   options.npmReleaseBranch         Npm release branch.
+ * @param {string}   options.yesFlag                  Lerna yes flag.
+ * @param {Object}   deps                             Dependencies.
+ * @param {Function} deps.commandFn                   Command runner.
+ * @param {Object}   deps.git                         Git client.
+ * @param {Function} deps.getNpmReleasePackagesFn     Gets release package metadata.
+ * @param {Function} deps.pushNpmReleaseGitMetadataFn Pushes Git metadata.
+ * @param {Function} deps.runNpmPublishPreflightFn    Runs npm preflight.
+ */
+async function publishVersionedPackagesToNpm(
+	{
+		distTag,
+		gitWorkingDirectoryPath,
+		noVerifyAccessFlag,
+		npmReleaseBranch,
+		yesFlag,
+	},
+	deps = {}
+) {
+	const {
+		commandFn = command,
+		git = SimpleGit( gitWorkingDirectoryPath ),
+		getNpmReleasePackagesFn = getNpmReleasePackages,
+		pushNpmReleaseGitMetadataFn = pushNpmReleaseGitMetadata,
+		runNpmPublishPreflightFn = runNpmPublishPreflight,
+	} = deps;
+	const releasePackages = await getNpmReleasePackagesFn(
+		gitWorkingDirectoryPath
+	);
+	await runNpmPublishPreflightFn( {
+		gitWorkingDirectoryPath,
+		releasePackages,
+	} );
+
+	log( '>> Publishing modified packages to npm.' );
+	try {
+		await commandFn(
+			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'inherit',
+			}
+		);
+	} catch {
+		log(
+			'>> Trying to finish failed publishing of modified npm packages.'
+		);
+		// A failed Lerna publish can leave temporary `gitHead` manifest changes.
+		// Reset to the version commit so `from-package` sees a clean tree on retry.
+		await git.reset( 'hard' );
+		await commandFn(
+			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'inherit',
+			}
+		);
+	}
+
+	const publishCommit = await git.revparse( [ 'HEAD' ] );
+	await pushNpmReleaseGitMetadataFn( {
+		gitWorkingDirectoryPath,
+		npmReleaseBranch,
+		packageTags: releasePackages.map( ( { tagName } ) => tagName ),
+		publishCommit,
+	} );
+}
+
+/**
  * Publishes all changed packages to npm.
  *
  * @param {WPPackagesConfig} config Command config.
+ * @param {Object}           deps   Dependencies.
  *
  * @return {?string} The optional commit's hash when packages published to npm.
  */
-async function publishPackagesToNpm( {
-	distTag,
-	gitWorkingDirectoryPath,
-	interactive,
-	minimumVersionBump,
-	npmReleaseBranch,
-	releaseType,
-} ) {
+async function publishPackagesToNpm(
+	{
+		distTag,
+		gitWorkingDirectoryPath,
+		interactive,
+		minimumVersionBump,
+		npmReleaseBranch,
+		releaseType,
+	},
+	deps = {}
+) {
+	const {
+		commandFn = command,
+		git = SimpleGit( gitWorkingDirectoryPath ),
+		publishVersionedPackagesToNpmFn = publishVersionedPackagesToNpm,
+	} = deps;
 	log( '>> Installing npm packages.' );
-	await command( 'npm ci', {
+	await commandFn( 'npm ci', {
 		cwd: gitWorkingDirectoryPath,
 	} );
 
 	log( '>> Current npm user:' );
-	await command( 'npm whoami', {
+	await commandFn( 'npm whoami', {
 		cwd: gitWorkingDirectoryPath,
 		stdio: 'inherit',
 	} );
 
-	const beforeCommitHash = await SimpleGit(
-		gitWorkingDirectoryPath
-	).revparse( [ '--short', 'HEAD' ] );
+	const beforeCommitHash = await git.revparse( [ '--short', 'HEAD' ] );
 
 	// Timestamp is the current time in `YYYYMMDDHHMM` format.
 	const timestamp = new Date()
@@ -376,122 +896,42 @@ async function publishPackagesToNpm( {
 
 	const yesFlag = interactive ? '' : '--yes';
 	const noVerifyAccessFlag = interactive ? '' : '--no-verify-access';
+	// Keep version commits and package tags local until npm publishing succeeds,
+	// then push and verify Git metadata explicitly.
 	if ( releaseType === 'next' ) {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
 		);
 
-		await command(
-			`npx lerna version pre${ minimumVersionBump } --preid next.v.${ timestamp } --build-metadata ${ beforeCommitHash } --no-private ${ yesFlag }`,
+		await commandFn(
+			`npx lerna version pre${ minimumVersionBump } --preid next.v.${ timestamp } --build-metadata ${ beforeCommitHash } --no-private --no-push ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
 			}
 		);
-
-		log( '>> Publishing modified packages to npm.' );
-		await command(
-			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
-			{
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'inherit',
-			}
-		);
-	} else if ( [ 'bugfix', 'wp' ].includes( releaseType ) ) {
-		log( '>> Publishing modified packages to npm.' );
-		try {
-			await command(
-				`npx lerna publish ${ minimumVersionBump } --dist-tag ${ distTag } --no-private ${ yesFlag } ${ noVerifyAccessFlag }`,
-				{
-					cwd: gitWorkingDirectoryPath,
-					stdio: 'inherit',
-				}
-			);
-		} catch {
-			log(
-				'>> Trying to finish failed publishing of modified npm packages.'
-			);
-			await SimpleGit( gitWorkingDirectoryPath ).reset( 'hard' );
-			await command(
-				`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
-				{
-					cwd: gitWorkingDirectoryPath,
-					stdio: 'inherit',
-				}
-			);
-		}
 	} else {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
 		);
-		// --no-push keeps the version commit and package tags local until
-		// `lerna publish` succeeds, so a failed retry can re-version
-		// without hitting "tag '@wordpress/<pkg>@<version>' already exists"
-		// on origin.
-		await command(
+		await commandFn(
 			`npx lerna version ${ minimumVersionBump } --no-private --no-push ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
 			}
 		);
-
-		log( '>> Publishing modified packages to npm.' );
-		try {
-			await command(
-				`npx lerna publish from-package ${ yesFlag } ${ noVerifyAccessFlag }`,
-				{
-					cwd: gitWorkingDirectoryPath,
-					stdio: 'inherit',
-				}
-			);
-		} catch {
-			log(
-				'>> Trying to finish failed publishing of modified npm packages.'
-			);
-			await SimpleGit( gitWorkingDirectoryPath ).reset( 'hard' );
-			await command(
-				`npx lerna publish from-package ${ yesFlag } ${ noVerifyAccessFlag }`,
-				{
-					cwd: gitWorkingDirectoryPath,
-					stdio: 'inherit',
-				}
-			);
-		}
-
-		// Retry the push so a transient network/auth blip between a successful
-		// publish and a failed push doesn't leave npm-published versions
-		// without their tags on origin. The push is idempotent: tags already
-		// present on origin (same SHA) are a no-op.
-		log( '>> Pushing version commit and tags to remote.' );
-		const maxPushAttempts = 3;
-		for ( let attempt = 1; ; attempt++ ) {
-			try {
-				await SimpleGit( gitWorkingDirectoryPath ).push(
-					'origin',
-					npmReleaseBranch,
-					[ '--follow-tags' ]
-				);
-				break;
-			} catch ( err ) {
-				if ( attempt >= maxPushAttempts ) {
-					throw err;
-				}
-				log(
-					`>> Push failed (attempt ${ attempt }/${ maxPushAttempts }): ${
-						err.message
-					}, retrying in ${ attempt * 5 }s…`
-				);
-				await new Promise( ( resolve ) =>
-					setTimeout( resolve, attempt * 5000 )
-				);
-			}
-		}
 	}
 
-	const afterCommitHash = await SimpleGit( gitWorkingDirectoryPath ).revparse(
-		[ '--short', 'HEAD' ]
-	);
+	await publishVersionedPackagesToNpmFn( {
+		distTag,
+		gitWorkingDirectoryPath,
+		noVerifyAccessFlag,
+		npmReleaseBranch,
+		yesFlag,
+	} );
+
+	const afterCommitHash = await git.revparse( [ '--short', 'HEAD' ] );
 	if ( afterCommitHash === beforeCommitHash ) {
 		return;
 	}
@@ -720,8 +1160,20 @@ async function publishNpmNext( options ) {
 }
 
 module.exports = {
+	getNpmReleasePackages,
+	getNpmReleaseGitRecoveryCommands,
+	getRemoteBranchSha,
+	getRemoteTagShas,
+	getTagPushCommands,
+	getTagRefspec,
+	publishPackagesToNpm,
+	publishVersionedPackagesToNpm,
+	pushNpmReleaseGitMetadata,
 	publishNpmGutenbergPlugin,
 	publishNpmBugfixLatest,
 	publishNpmBugfixWordPressCore,
 	publishNpmNext,
+	runNpmPublishPreflight,
+	runNpmReleaseGitPushPhase,
+	verifyRemotePackageTags,
 };
