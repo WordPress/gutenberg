@@ -13,12 +13,14 @@ on:
                 description: 'rc or stable?'
                 required: true
 
-# Cancels all previous workflow runs for pull requests that have not completed.
+# Cancels previous non-release workflow runs that have not completed.
+# Workflow-dispatched release runs must not cancel an in-flight run after it may have
+# pushed version bump commits.
 concurrency:
-    # The concurrency group contains the workflow name and the branch name for pull requests
-    # or the commit hash for any other events.
-    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
-    cancel-in-progress: true
+    # The concurrency group contains a shared release group for dispatches,
+    # the branch name for pull requests, or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && 'release' || ( github.event_name == 'pull_request' && github.head_ref || github.sha ) }}
+    cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -53,11 +55,31 @@ jobs:
                     echo "next_stable_branch=release/${LATEST_STABLE_MAJOR}.$((LATEST_STABLE_MINOR + 1))" >> "$GITHUB_OUTPUT"
                   fi
 
+    preflight-release-token:
+        name: Preflight release token
+        runs-on: 'ubuntu-24.04'
+        environment: 'GitHub Releases'
+        permissions: {}
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+
+        steps:
+            # Request the same elevated permissions as create-release so invalid
+            # credentials or unavailable requested permissions fail before version
+            # bump commits are pushed.
+            - name: Generate application token
+              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+              id: app-token
+              with:
+                  client-id: ${{ vars.APP_CLIENT_ID }}
+                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
+                  permission-contents: write
+                  permission-workflows: write
+
     bump-version:
         name: Bump version
         runs-on: 'ubuntu-24.04'
         environment: 'GitHub Releases'
-        needs: compute-stable-branches
+        needs: [compute-stable-branches, preflight-release-token]
         if: |
             github.event_name == 'workflow_dispatch' && (
               (
@@ -197,8 +219,14 @@ jobs:
         if: |
             always() && (
               github.event_name == 'pull_request' ||
-              github.event_name == 'workflow_dispatch' ||
-              github.repository == 'WordPress/gutenberg'
+              (
+                github.event_name == 'workflow_dispatch' &&
+                needs.bump-version.result == 'success'
+              ) ||
+              (
+                github.event_name != 'workflow_dispatch' &&
+                github.repository == 'WordPress/gutenberg'
+              )
             )
         strategy:
             matrix:
@@ -422,6 +450,7 @@ jobs:
         needs: [bump-version, build]
         runs-on: 'ubuntu-24.04'
         environment: 'GitHub Releases'
+        if: ${{ needs.bump-version.outputs.new_version }}
 
         steps:
             - name: Generate application token
