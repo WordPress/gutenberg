@@ -667,19 +667,15 @@ export const setRevisionPage =
 	};
 
 /**
- * Enter revisions mode at the requested revision and find the revisions
- * page that contains it. If the revision belongs to another post, exit
- * revisions mode and show a notice.
- *
- * Used to open a revision from a shared URL (`revision` query arg).
+ * Open a revision from a shared URL and select the page that contains it.
  *
  * @param {number} revisionId The revision ID to open.
  */
 export const openRevision =
 	( revisionId ) =>
 	async ( { dispatch, select, registry } ) => {
-		// Enter revisions mode right away; the canvas and slider show
-		// loading states until we know which page holds the revision.
+		// Set the revision before loading its page so the canvas and slider
+		// can show loading states.
 		dispatch.setCurrentRevisionId( revisionId );
 
 		const postType = select.getCurrentPostType();
@@ -689,10 +685,8 @@ export const openRevision =
 			.getEntityConfig( 'postType', postType );
 		const revisionKey = entityConfig?.revisionKey || 'id';
 
-		// Fetch just the revision ids in one request (`per_page: -1`
-		// skips pagination) to validate the revision and find its position.
-		// The ordering must match `buildRevisionsPageQuery` so the
-		// position maps to the page the slider fetches.
+		// Fetch all IDs in the slider's order so the revision's index points
+		// to the right page.
 		const revisions = await registry
 			.resolveSelect( coreStore )
 			.getRevisions( 'postType', postType, postId, {
@@ -703,14 +697,13 @@ export const openRevision =
 				_fields: revisionKey,
 			} );
 
-		// The user selected another revision or exited while fetching.
+		// Ignore stale results if the user navigated during the request.
 		if ( select.getCurrentRevisionId() !== revisionId ) {
 			return;
 		}
 
-		// core-data swallows request errors, so a missing collection
-		// means the request failed, not that the post has no revisions.
-		// Keep the selection; a reload can retry the deep link.
+		// core-data swallows request errors, so a missing result means the
+		// request failed. Keep the selection so a reload can try again.
 		if ( ! revisions ) {
 			registry
 				.dispatch( noticesStore )
@@ -729,9 +722,8 @@ export const openRevision =
 			( revision ) => revision[ revisionKey ] === revisionId
 		);
 		if ( index === -1 ) {
-			// Autosaves still resolve individually when the collection
-			// omits them (e.g. with `WP_POST_REVISIONS` disabled), so
-			// check the single endpoint before declaring the ID invalid.
+			// With `WP_POST_REVISIONS` disabled, autosaves are missing from
+			// this collection but still resolve through the individual endpoint.
 			const revision = await registry
 				.resolveSelect( coreStore )
 				.getRevision( 'postType', postType, postId, revisionId, {
@@ -756,8 +748,8 @@ export const openRevision =
 
 		const page = Math.floor( index / select.getRevisionsPerPage() ) + 1;
 		if ( page !== select.getRevisionPage() ) {
-			// Not the `setRevisionPage` thunk, which would re-select
-			// the newest revision of the page.
+			// `setRevisionPage()` would replace the deep-linked revision with
+			// the newest revision on the page.
 			dispatch( { type: 'SET_REVISION_PAGE', page } );
 		}
 	};

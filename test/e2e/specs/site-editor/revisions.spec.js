@@ -22,8 +22,7 @@ test.describe( 'Site editor revisions shareable URLs', () => {
 		page,
 		requestUtils,
 	} ) => {
-		// Revisions are only created on updates, so update the page twice
-		// to get two revisions with distinct content.
+		// Creating a page does not create a revision, so update it twice.
 		const post = await requestUtils.rest( {
 			method: 'POST',
 			path: '/wp/v2/pages',
@@ -51,15 +50,15 @@ test.describe( 'Site editor revisions shareable URLs', () => {
 			},
 		} );
 
-		// The REST API returns revisions newest first.
+		// The REST API returns revisions newest first, so the oldest is last.
 		const revisions = await requestUtils.rest( {
 			path: `/wp/v2/pages/${ post.id }/revisions`,
 		} );
 		const oldestRevisionId = revisions[ revisions.length - 1 ].id;
 		const newestRevisionId = revisions[ 0 ].id;
 
-		// Visit once without the arg so the editor can save the welcome
-		// guide preference before the deep link.
+		// `visitSiteEditor()` dismisses the welcome guide before opening the
+		// revision URL directly.
 		await admin.visitSiteEditor();
 		await admin.visitAdminPage(
 			'site-editor.php',
@@ -68,7 +67,6 @@ test.describe( 'Site editor revisions shareable URLs', () => {
 			) }&canvas=edit&revision=${ oldestRevisionId }`
 		);
 
-		// The revisions screen is active at the linked revision.
 		await expect(
 			page.getByRole( 'button', { name: 'Restore' } )
 		).toBeVisible();
@@ -76,15 +74,14 @@ test.describe( 'Site editor revisions shareable URLs', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		).toHaveText( 'First revision' );
 
-		// Moving to another revision updates the URL (writes are debounced).
 		const slider = page.getByRole( 'slider', { name: 'Revision' } );
 		await slider.focus();
 		await page.keyboard.press( 'End' );
+		// Poll because URL writes are debounced.
 		await expect
 			.poll( () => new URL( page.url() ).searchParams.get( 'revision' ) )
 			.toBe( String( newestRevisionId ) );
 
-		// Exiting revisions mode removes the arg but stays in edit mode.
 		await page.getByRole( 'button', { name: 'Exit' } ).click();
 		await expect
 			.poll( () => new URL( page.url() ).searchParams.get( 'revision' ) )

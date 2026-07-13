@@ -15,20 +15,10 @@ import { unlock } from '../../lock-unlock';
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 /**
- * Wait this long before writing a burst of URL changes (slider drags,
- * held arrow keys) as one update. If a change arrives after a pause,
- * write it right away. Safari throws when the History API is called
- * more than 100 times per 30 seconds.
+ * Safari throws after more than 100 History API calls in 30 seconds.
  */
 const URL_WRITE_DEBOUNCE_MS = 300;
 
-/**
- * Keep the `revision` query arg in sync with revisions mode. On load,
- * open the revision from the URL. After that, write the current revision
- * back to the URL so the address bar stays shareable.
- *
- * @param {boolean} enabled Whether the sync is active (edit mode only).
- */
 export default function useRevisionsURLSync( enabled ) {
 	const location = useLocation();
 	const history = useHistory();
@@ -55,9 +45,8 @@ export default function useRevisionsURLSync( enabled ) {
 		openRevision( revision );
 	}, [ enabled, postId, location.query.revision, openRevision ] );
 
-	// Null until the first sync, so the first write always waits for the
-	// trailing timeout. That gives a deep-linked revision time to land in
-	// the store before the URL is rewritten.
+	// On deep links, delay the first write so `openRevision()` can update
+	// the store first.
 	const lastURLWriteTimeRef = useRef( null );
 
 	useEffect( () => {
@@ -74,10 +63,8 @@ export default function useRevisionsURLSync( enabled ) {
 			return;
 		}
 		const write = async () => {
-			// The route match resolves asynchronously, so `location` can
-			// lag behind the address bar right after a navigation, and a
-			// write based on it would undo that navigation. Skip while
-			// they disagree; the effect re-runs once the match resolves.
+			// Route matching can lag behind the address bar. Writing the stale
+			// match back would undo the navigation.
 			const addressBarArg =
 				new URLSearchParams( window.location.search ).get(
 					'revision'
@@ -86,16 +73,16 @@ export default function useRevisionsURLSync( enabled ) {
 				return;
 			}
 			lastURLWriteTimeRef.current = Date.now();
-			// `location.path` already includes the current query args;
-			// passing undefined removes the arg.
+			// Passing `undefined` removes `revision` without dropping the other
+			// query args.
 			try {
 				await history.navigate(
 					addQueryArgs( location.path, { revision: revisionArg } ),
 					{ replace: true }
 				);
 			} catch {
-				// The browser rate-limited the write. The next change
-				// will try again.
+				// Leave the URL unchanged. The effect can try again on the next
+				// state change.
 			}
 		};
 		if (

@@ -371,8 +371,6 @@ test.describe( 'Post revisions with classic meta boxes', () => {
 			`post=${ post.id }&action=edit&revision=${ oldestRevisionId }`
 		);
 
-		// Active classic meta boxes disable visual revisions, so this
-		// deep link should end up on the classic screen.
 		await expect( page ).toHaveURL(
 			new RegExp( `revision\\.php\\?revision=${ oldestRevisionId }` )
 		);
@@ -399,8 +397,6 @@ test.describe( 'Post revisions with classic meta boxes', () => {
 			`post=${ post.id }&action=edit&revision=99999999`
 		);
 
-		// An invalid ID must not bounce to a revision.php error page;
-		// the editor loads and explains what happened.
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
@@ -670,8 +666,7 @@ test.describe( 'Post revisions shareable URLs', () => {
 		page,
 		requestUtils,
 	} ) => {
-		// Revisions are only created on updates, so update the post twice
-		// to get two revisions with distinct content.
+		// Creating a post does not create a revision, so update it twice.
 		const post = await requestUtils.rest( {
 			method: 'POST',
 			path: '/wp/v2/posts',
@@ -699,22 +694,21 @@ test.describe( 'Post revisions shareable URLs', () => {
 			},
 		} );
 
-		// The REST API returns revisions newest first.
+		// The REST API returns revisions newest first, so the oldest is last.
 		const revisions = await requestUtils.rest( {
 			path: `/wp/v2/posts/${ post.id }/revisions`,
 		} );
 		const oldestRevisionId = revisions[ revisions.length - 1 ].id;
 		const newestRevisionId = revisions[ 0 ].id;
 
-		// Visit once without the arg so the editor can save preferences
-		// like the welcome guide and fullscreen mode before the deep link.
+		// `editPost()` dismisses the welcome guide and turns off fullscreen
+		// mode before opening the revision URL directly.
 		await admin.editPost( post.id );
 		await admin.visitAdminPage(
 			'post.php',
 			`post=${ post.id }&action=edit&revision=${ oldestRevisionId }`
 		);
 
-		// The revisions screen is active at the linked revision.
 		await expect(
 			page.getByRole( 'button', { name: 'Restore' } )
 		).toBeVisible();
@@ -722,15 +716,14 @@ test.describe( 'Post revisions shareable URLs', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		).toHaveText( 'First revision' );
 
-		// Moving to another revision updates the URL (writes are debounced).
 		const slider = page.getByRole( 'slider', { name: 'Revision' } );
 		await slider.focus();
 		await page.keyboard.press( 'End' );
+		// Poll because URL writes are debounced.
 		await expect
 			.poll( () => new URL( page.url() ).searchParams.get( 'revision' ) )
 			.toBe( String( newestRevisionId ) );
 
-		// Exiting revisions mode removes the arg.
 		await page.getByRole( 'button', { name: 'Exit' } ).click();
 		await expect
 			.poll( () => new URL( page.url() ).searchParams.get( 'revision' ) )
@@ -765,7 +758,6 @@ test.describe( 'Post revisions shareable URLs', () => {
 				.filter( { hasText: 'Invalid revision ID.' } )
 		).toBeVisible();
 
-		// The normal editor is back, and the arg is gone from the URL.
 		await expect(
 			page.getByRole( 'button', { name: 'Restore' } )
 		).toBeHidden();

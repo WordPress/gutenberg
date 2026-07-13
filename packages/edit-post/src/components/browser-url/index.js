@@ -12,10 +12,7 @@ import { store as editorStore } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
 
 /**
- * Wait this long before writing a burst of URL changes (slider drags,
- * held arrow keys) as one update. If a change arrives after a pause,
- * write it right away. Safari throws when the History API is called
- * more than 100 times per 30 seconds.
+ * Safari throws after more than 100 History API calls in 30 seconds.
  */
 const URL_WRITE_DEBOUNCE_MS = 300;
 
@@ -36,8 +33,7 @@ export function getPostEditURL( postId, revisionId ) {
 }
 
 export default function BrowserURL() {
-	// Read once during the first render, before the URL sync below
-	// rewrites the address bar.
+	// Read the initial revision once, before URL sync can overwrite it.
 	const [ initialRevisionId ] = useState( () => {
 		const revision = Number(
 			getQueryArg( window.location.href, 'revision' )
@@ -61,9 +57,8 @@ export default function BrowserURL() {
 		return {
 			postId: id,
 			postStatus: status,
-			// In template mode the URL points at the template, and
-			// `post.php` refuses to open templates (their `show_ui` is
-			// false), so a revision arg would make a dead link.
+			// `post.php` rejects templates because `show_ui` is false. Adding
+			// their revision ID to this URL would create a dead link.
 			currentRevisionId: isTemplate ? null : getCurrentRevisionId(),
 		};
 	}, [] );
@@ -78,15 +73,11 @@ export default function BrowserURL() {
 			return;
 		}
 		hasHandledInitialRevisionRef.current = true;
-		// Deep-linked revisions open in the visual editor. When classic
-		// meta boxes are active, meta box initialization redirects to the
-		// classic revision.php screen instead.
 		openRevision( initialRevisionId );
 	}, [ initialRevisionId, postId, openRevision ] );
 
-	// Null until the first sync, so the first write always waits for the
-	// trailing timeout. That gives a deep-linked revision time to land in
-	// the store before the URL is rewritten.
+	// On deep links, delay the first write so `openRevision()` can update
+	// the store first.
 	const lastURLWriteTimeRef = useRef( null );
 
 	useEffect( () => {
@@ -106,8 +97,8 @@ export default function BrowserURL() {
 					url
 				);
 			} catch {
-				// The browser rate-limited the write. The next change
-				// will try again.
+				// Leave the URL unchanged. The effect can try again on the next
+				// state change.
 			}
 		};
 		if (

@@ -25,7 +25,6 @@ function setupUseSelectMock( { postId, postStatus, currentRevisionId } ) {
 	} );
 }
 
-// URL writes are debounced; run the pending timeout.
 function flushURLWrites() {
 	act( () => jest.runAllTimers() );
 }
@@ -161,7 +160,6 @@ describe( 'BrowserURL', () => {
 		const { rerender } = render( <BrowserURL /> );
 		flushURLWrites();
 
-		// Let the quiet period elapse, then change the revision.
 		act( () => jest.advanceTimersByTime( 301 ) );
 		setupUseSelectMock( {
 			postId: 1,
@@ -171,7 +169,6 @@ describe( 'BrowserURL', () => {
 		replaceStateSpy.mockReset();
 
 		rerender( <BrowserURL /> );
-		// The write happens synchronously, so there is nothing to flush.
 		expect( replaceStateSpy ).toHaveBeenCalledWith(
 			{ id: 1 },
 			'Post 1',

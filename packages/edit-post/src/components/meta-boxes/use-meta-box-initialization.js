@@ -68,12 +68,9 @@ export const useMetaBoxInitialization = ( enabled ) => {
 			if ( hasActiveMetaBoxes ) {
 				updateEditorSettings( { disableVisualRevisions: true } );
 
-				// The flag arrives after the editor is ready, so revisions
-				// mode may already be active (a deep link, or a click
-				// that beat the flag). Send those to the classic screen,
-				// but only for revisions of this post: an unvalidated
-				// redirect would take invalid deep links to a wp_die
-				// instead of the in-editor invalid-revision notice.
+				// Revision mode can open before this flag arrives. `revision.php`
+				// calls `wp_die()` for invalid IDs, so only redirect if the revision
+				// belongs to this post and is still selected after the request.
 				const revisionId = unlock(
 					registry.select( editorStore )
 				).getCurrentRevisionId();
