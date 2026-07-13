@@ -120,6 +120,7 @@
 		"lint:js:fix": "npm run lint:js -- --fix",
 		"lint:js:prune-suppressions": "npm run lint:js -- --prune-suppressions",
 		"lint:lockfile": "npm run --workspace @wordpress/validation-tools validate-package-lock --",
+		"lint:package-contents": "npm run --if-present --workspaces lint:package-contents",
 		"lint:tsconfig": "npm run --workspace @wordpress/validation-tools validate-tsconfig --",
 		"lint:md:docs": "wp-scripts lint-md-docs",
 		"prelint:php": "npm run other:update-packages:php",

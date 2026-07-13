@@ -4,7 +4,8 @@
 
 ### Enhancements
 
--   Make the Playlist and Playlist Track blocks stable.
+-   Make the Playlist and Playlist Track blocks stable ([#80203](https://github.com/WordPress/gutenberg/pull/80203)).
+-   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
 ## 10.1.0 (2026-07-01)

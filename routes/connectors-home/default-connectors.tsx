@@ -101,7 +101,7 @@ const ConnectedBadge = () => (
 			padding: '4px 12px',
 			borderRadius: '2px',
 			fontSize: '13px',
-			fontWeight: 500,
+			fontWeight: 'var(--wpds-typography-font-weight-emphasis)',
 			whiteSpace: 'nowrap',
 		} }
 	>

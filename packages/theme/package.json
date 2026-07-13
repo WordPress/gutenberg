@@ -23,10 +23,16 @@
 		"npm": ">=10.2.3"
 	},
 	"files": [
-		"src",
 		"build-module",
 		"build-types",
-		"*.md"
+		"src/*-plugins/**",
+		"src/prebuilt/css",
+		"src/prebuilt/js",
+		"*.md",
+		"!build-types/**/*.d.mts.map",
+		"!build-types/**/*.d.ts.map",
+		"!**/stories/**",
+		"!**/test/**"
 	],
 	"type": "module",
 	"module": "build-module/index.mjs",
@@ -67,7 +73,6 @@
 		"./package.json": "./package.json"
 	},
 	"wpScript": true,
-	"types": "build-types",
 	"sideEffects": [
 		"src/prebuilt/css/design-tokens.css"
 	],
@@ -91,6 +96,7 @@
 		"@testing-library/user-event": "^14.6.1",
 		"@types/jest": "^29.5.14",
 		"@types/node": "^20.19.39",
+		"@wordpress/validation-tools": "file:../../tools/validation",
 		"esbuild": "^0.27.2",
 		"esbuild-esm-loader": "^0.3.3",
 		"prettier": "npm:wp-prettier@^3.0.3",
@@ -130,6 +136,7 @@
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps",
+		"lint:package-contents": "wp-validate-package-contents .",
 		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
 	}
 }

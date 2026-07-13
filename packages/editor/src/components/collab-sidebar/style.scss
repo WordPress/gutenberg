@@ -136,11 +136,11 @@
 }
 
 .editor-collab-sidebar-panel__more-reply-button {
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 .editor-collab-sidebar-panel__deleted-block-notice {
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	color: $gray-700;
 }
 
@@ -217,7 +217,7 @@
 }
 
 .editor-note-indicator__overflow {
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 .show-icon-labels {
