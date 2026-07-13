@@ -33,7 +33,7 @@ module.exports = {
 			{
 				message: ( property, value ) => {
 					if ( value.includes( '$font-weight-medium' ) ) {
-						return 'Use `$font-weight-semibold` instead. `$font-weight-medium` is kept for backwards compatibility only.';
+						return '`$font-weight-medium` is kept for backwards compatibility only. Use `$font-weight-regular` or `$font-weight-semibold` based on the intended emphasis.';
 					}
 					if ( property === 'cursor' ) {
 						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
