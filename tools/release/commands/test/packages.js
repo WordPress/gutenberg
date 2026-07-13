@@ -2,19 +2,107 @@
  * Internal dependencies
  */
 import {
+	finalizePreparedNpmRelease,
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
 	getRemoteBranchSha,
 	getRemoteTagShas,
 	getTagPushCommands,
 	getTagRefspec,
+	prepareNpmRelease,
 	publishPackagesToNpm,
 	publishVersionedPackagesToNpm,
 	pushNpmReleaseGitMetadata,
 	runNpmPublishPreflight,
 	runNpmReleasePhase,
+	runPackagesRelease,
 	verifyRemotePackageTags,
 } from '../packages';
+
+describe( 'prepareNpmRelease', () => {
+	it( 'prepares the release branch and returns finalization state', async () => {
+		const config = {
+			gitWorkingDirectoryPath: '/repo',
+			releaseType: 'latest',
+		};
+		const runNpmReleaseBranchSyncStepFn = jest.fn();
+
+		await expect(
+			prepareNpmRelease( config, {
+				findPluginReleaseBranchNameFn: jest
+					.fn()
+					.mockResolvedValue( 'release/23.5' ),
+				runNpmReleaseBranchSyncStepFn,
+				updatePackagesFn: jest
+					.fn()
+					.mockResolvedValue( 'changelog-sha' ),
+			} )
+		).resolves.toEqual( {
+			changelogCommit: 'changelog-sha',
+			pluginReleaseBranch: 'release/23.5',
+		} );
+		expect( runNpmReleaseBranchSyncStepFn ).toHaveBeenCalledWith(
+			'release/23.5',
+			config
+		);
+	} );
+} );
+
+describe( 'finalizePreparedNpmRelease', () => {
+	it( 'backports the prepared commits to stable branches', async () => {
+		const config = { releaseType: 'latest' };
+		const backportCommitsToBranchFn = jest.fn();
+		const commits = [ 'changelog-sha', 'publish-sha' ];
+
+		await finalizePreparedNpmRelease(
+			config,
+			{
+				changelogCommit: commits[ 0 ],
+				pluginReleaseBranch: 'release/23.5',
+				publishCommit: commits[ 1 ],
+			},
+			{ backportCommitsToBranchFn }
+		);
+
+		expect( backportCommitsToBranchFn ).toHaveBeenCalledWith(
+			'trunk',
+			commits,
+			config
+		);
+		expect( backportCommitsToBranchFn ).toHaveBeenCalledWith(
+			'release/23.5',
+			commits,
+			config
+		);
+	} );
+} );
+
+describe( 'runPackagesRelease', () => {
+	it( 'runs the release lifecycle in order', async () => {
+		const config = {
+			gitWorkingDirectoryPath: '/repo',
+			interactive: false,
+		};
+		const releaseState = { changelogCommit: 'changelog-sha' };
+		const prepareNpmReleaseFn = jest.fn().mockResolvedValue( releaseState );
+		const publishPreparedPackagesToNpmFn = jest
+			.fn()
+			.mockResolvedValue( 'publish-sha' );
+		const finalizePreparedNpmReleaseFn = jest.fn();
+
+		await runPackagesRelease( config, [], {
+			finalizePreparedNpmReleaseFn,
+			prepareNpmReleaseFn,
+			publishPreparedPackagesToNpmFn,
+		} );
+
+		expect( finalizePreparedNpmReleaseFn ).toHaveBeenCalledWith( config, {
+			changelogCommit: 'changelog-sha',
+			publishCommit: 'publish-sha',
+		} );
+		expect( console ).toHaveLogged();
+	} );
+} );
 
 describe( 'getNpmReleasePackages', () => {
 	it( 'returns public packages tagged at HEAD', async () => {
