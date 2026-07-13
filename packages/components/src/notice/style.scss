@@ -60,6 +60,19 @@
 	margin-top: var(--wpds-dimension-gap-sm);
 }
 
+// The legacy `--wp-admin-theme-color` accent is a fixed value that does not
+// adapt to the theme background. On the tinted, dark surfaces used in a dark
+// theme, link/secondary/tertiary actions therefore fall below the minimum
+// contrast ratio. Redirect the accent to the theme-aware brand foreground
+// token for those variants — matching the outline/minimal treatment in the
+// `@wordpress/ui` Button. Primary actions keep the accent as their fill, so
+// they are intentionally excluded.
+.components-notice__action:not(.is-primary) {
+	--wp-components-color-accent: var(--wpds-color-foreground-interactive-brand);
+	--wp-components-color-accent-darker-10: var(--wpds-color-foreground-interactive-brand-active);
+	--wp-components-color-accent-darker-20: var(--wpds-color-foreground-interactive-brand-active);
+}
+
 .components-notice__dismiss {
 	grid-column: 2;
 	grid-row: 1;
