@@ -237,113 +237,107 @@ test.describe( 'Tabs', () => {
 			await expect( tabs ).toHaveCount( 2 );
 		} );
 
-		// FIXME: Undoing a move restores the block order and the active tab,
-		// but the moved panel is only re-selected in the store and never
-		// regains DOM focus.
-		test.fixme(
-			'keeps tab labels in sync when a panel is moved before',
-			async ( { editor, pageUtils } ) => {
-				await editor.insertBlock(
+		test( 'keeps tab labels in sync when a panel is moved before', async ( {
+			editor,
+			pageUtils,
+		} ) => {
+			await editor.insertBlock(
+				createTabs(
+					[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+					[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+				)
+			);
+
+			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
+			const panel2 = editor.canvas
+				.getByRole( 'document', { name: 'Block: Tab Panels' } )
+				.getByRole( 'document', { name: 'Block: Tab Panel' } )
+				.filter( { hasText: 'Panel 2' } );
+
+			// Click the second tab, then select its panel.
+			await tab2.click();
+			await editor.selectBlocks( panel2 );
+
+			// Move the panel one position earlier.
+			await editor.clickBlockToolbarButton( 'Move up' );
+
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs(
+						[ 'Tab 2', 'Tab 1', 'Tab 3' ],
+						[ 'Panel 2', 'Panel 1', 'Panel 3' ]
+					),
+				] );
+
+			// Undo restores the original order, along with the active tab and
+			// the focused panel.
+			await pageUtils.pressKeys( 'primary+z' );
+
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
 					createTabs(
 						[ 'Tab 1', 'Tab 2', 'Tab 3' ],
 						[ 'Panel 1', 'Panel 2', 'Panel 3' ]
-					)
-				);
+					),
+				] );
+			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
+			// FIXME: The moved panel is re-selected in the store, but never
+			// regains DOM focus.
+			// await expect( panel2 ).toBeFocused();
+		} );
 
-				const tab2 = editor.canvas.getByRole( 'tab', {
-					name: 'Tab 2',
-				} );
-				const panel2 = editor.canvas
-					.getByRole( 'document', { name: 'Block: Tab Panels' } )
-					.getByRole( 'document', { name: 'Block: Tab Panel' } )
-					.filter( { hasText: 'Panel 2' } );
+		test( 'keeps tab labels in sync when a panel is moved after', async ( {
+			editor,
+			pageUtils,
+		} ) => {
+			await editor.insertBlock(
+				createTabs(
+					[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+					[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+				)
+			);
 
-				// Click the second tab, then select its panel.
-				await tab2.click();
-				await editor.selectBlocks( panel2 );
+			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
+			const panel2 = editor.canvas
+				.getByRole( 'document', { name: 'Block: Tab Panels' } )
+				.getByRole( 'document', { name: 'Block: Tab Panel' } )
+				.filter( { hasText: 'Panel 2' } );
 
-				// Move the panel one position earlier.
-				await editor.clickBlockToolbarButton( 'Move up' );
+			// Click the second tab, then select its panel.
+			await tab2.click();
+			await editor.selectBlocks( panel2 );
 
-				await expect
-					.poll( editor.getBlocks )
-					.toMatchObject( [
-						createTabs(
-							[ 'Tab 2', 'Tab 1', 'Tab 3' ],
-							[ 'Panel 2', 'Panel 1', 'Panel 3' ]
-						),
-					] );
+			// Move the panel one position later.
+			await editor.clickBlockToolbarButton( 'Move down' );
 
-				// Undo restores the original order, along with the active tab and
-				// the focused panel.
-				await pageUtils.pressKeys( 'primary+z' );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs(
+						[ 'Tab 1', 'Tab 3', 'Tab 2' ],
+						[ 'Panel 1', 'Panel 3', 'Panel 2' ]
+					),
+				] );
 
-				await expect
-					.poll( editor.getBlocks )
-					.toMatchObject( [
-						createTabs(
-							[ 'Tab 1', 'Tab 2', 'Tab 3' ],
-							[ 'Panel 1', 'Panel 2', 'Panel 3' ]
-						),
-					] );
-				await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
-				await expect( panel2 ).toBeFocused();
-			}
-		);
+			// Undo restores the original order, along with the active tab and
+			// the focused panel.
+			await pageUtils.pressKeys( 'primary+z' );
 
-		// FIXME: Undoing a move restores the block order and the active tab,
-		// but the moved panel is only re-selected in the store and never
-		// regains DOM focus.
-		test.fixme(
-			'keeps tab labels in sync when a panel is moved after',
-			async ( { editor, pageUtils } ) => {
-				await editor.insertBlock(
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
 					createTabs(
 						[ 'Tab 1', 'Tab 2', 'Tab 3' ],
 						[ 'Panel 1', 'Panel 2', 'Panel 3' ]
-					)
-				);
-
-				const tab2 = editor.canvas.getByRole( 'tab', {
-					name: 'Tab 2',
-				} );
-				const panel2 = editor.canvas
-					.getByRole( 'document', { name: 'Block: Tab Panels' } )
-					.getByRole( 'document', { name: 'Block: Tab Panel' } )
-					.filter( { hasText: 'Panel 2' } );
-
-				// Click the second tab, then select its panel.
-				await tab2.click();
-				await editor.selectBlocks( panel2 );
-
-				// Move the panel one position later.
-				await editor.clickBlockToolbarButton( 'Move down' );
-
-				await expect
-					.poll( editor.getBlocks )
-					.toMatchObject( [
-						createTabs(
-							[ 'Tab 1', 'Tab 3', 'Tab 2' ],
-							[ 'Panel 1', 'Panel 3', 'Panel 2' ]
-						),
-					] );
-
-				// Undo restores the original order, along with the active tab and
-				// the focused panel.
-				await pageUtils.pressKeys( 'primary+z' );
-
-				await expect
-					.poll( editor.getBlocks )
-					.toMatchObject( [
-						createTabs(
-							[ 'Tab 1', 'Tab 2', 'Tab 3' ],
-							[ 'Panel 1', 'Panel 2', 'Panel 3' ]
-						),
-					] );
-				await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
-				await expect( panel2 ).toBeFocused();
-			}
-		);
+					),
+				] );
+			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
+			// FIXME: The moved panel is re-selected in the store, but never
+			// regains DOM focus.
+			// await expect( panel2 ).toBeFocused();
+		} );
 
 		test( 'keeps tab labels in sync when a panel is removed', async ( {
 			editor,
