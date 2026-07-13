@@ -178,9 +178,11 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '`a`' );
+		// Wait until the backtick transformation is recorded as an automatic change.
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '`a`' },

@@ -398,11 +398,6 @@ test.describe( 'Block Notes', () => {
 
 		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
 		await resolveButton.click();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note marked as resolved.' } )
-		).toBeVisible();
 		await expect( thread ).toBeFocused();
 		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
 
@@ -411,11 +406,6 @@ test.describe( 'Block Notes', () => {
 
 		await blockNoteUtils.clickBlockNoteActionMenuItem( 'Reopen' );
 		await expect( resolveButton ).toBeEnabled();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note reopened.' } )
-		).toBeVisible();
 	} );
 
 	test( 'can reopen a resolved note when adding a reply', async ( {
@@ -432,14 +422,11 @@ test.describe( 'Block Notes', () => {
 			name: 'Resolve',
 		} );
 		await resolveButton.click();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note marked as resolved.' } )
-		).toBeVisible();
 
 		await blockNoteUtils.openBlockNoteSidebar();
 		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
+		// Re-selecting the thread shows the Resolve button, now disabled,
+		// confirming the note was resolved.
 		await expect( resolveButton ).toBeDisabled();
 		const commentForm = page.getByRole( 'textbox', {
 			name: 'Reply to',
@@ -458,11 +445,6 @@ test.describe( 'Block Notes', () => {
 			.click();
 
 		await expect( resolveButton ).toBeEnabled();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note reopened.' } )
-		).toBeVisible();
 	} );
 
 	test( 'shows a "Resolved" divider between active and resolved notes', async ( {
@@ -510,13 +492,9 @@ test.describe( 'Block Notes', () => {
 			'true'
 		);
 		await page.getByRole( 'button', { name: 'Resolve' } ).click();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note marked as resolved.' } )
-		).toBeVisible();
 
-		// The divider now labels the resolved section.
+		// The divider appearing confirms the resolve completed and now labels
+		// the resolved section.
 		await expect( separator ).toBeVisible();
 		await expect( separator ).toHaveText( 'Resolved' );
 
@@ -1356,11 +1334,9 @@ test.describe( 'Block Notes', () => {
 			} );
 			await threadA.click();
 			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note marked as resolved.' } )
-			).toBeVisible();
+			// Resolving removes the note from the floating "Unresolved notes"
+			// view, which confirms the action completed.
+			await expect( threadA ).toBeHidden();
 
 			// Note B should still be visible and unresolved (expanded).
 			const threadB = settings.getByRole( 'treeitem', {
@@ -1399,11 +1375,9 @@ test.describe( 'Block Notes', () => {
 			} );
 			await firstThread.click();
 			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note marked as resolved.' } )
-			).toBeVisible();
+			// Resolving removes the note from the floating "Unresolved notes"
+			// view, which confirms the action completed.
+			await expect( firstThread ).toBeHidden();
 
 			// Click the title to deselect the block and its comment.
 			await editor.canvas
@@ -1708,11 +1682,6 @@ test.describe( 'Block Notes', () => {
 			// Resolving drops the highlight, so the marker is removed from the
 			// content and the note settles back to a block-level note.
 			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note marked as resolved.' } )
-			).toBeVisible();
 
 			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
 				0

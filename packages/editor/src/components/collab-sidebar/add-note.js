@@ -153,7 +153,6 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 					} }
 					onCancel={ unselectNote }
 					labels={ { input: __( 'New note' ) } }
-					focusOnMount
 				/>
 			</NoteCard>
 		</FloatingContainer>
