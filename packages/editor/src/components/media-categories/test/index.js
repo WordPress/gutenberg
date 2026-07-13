@@ -55,6 +55,12 @@ describe( 'getInserterMediaCategories', () => {
 			},
 		] );
 		resolveSelect.mockReturnValue( { getEntityRecords } );
+		const getEntityRecordsTotalItems = jest.fn().mockReturnValue( 1 );
+		const getEntityRecordsTotalPages = jest.fn().mockReturnValue( 1 );
+		select.mockReturnValue( {
+			getEntityRecordsTotalItems,
+			getEntityRecordsTotalPages,
+		} );
 
 		const [ attachedImagesCategory ] = getInserterMediaCategories(
 			42,
@@ -62,25 +68,41 @@ describe( 'getInserterMediaCategories', () => {
 		);
 		const results = await attachedImagesCategory.fetch( { per_page: 20 } );
 
+		const expectedQuery = {
+			per_page: 20,
+			media_type: 'image',
+			parent: 42,
+			orderBy: 'date',
+		};
 		expect( getEntityRecords ).toHaveBeenCalledWith(
 			'postType',
 			'attachment',
-			{
-				per_page: 20,
-				media_type: 'image',
-				parent: 42,
-				orderBy: 'date',
-			}
+			expectedQuery
 		);
-		expect( results ).toEqual( [
-			expect.objectContaining( {
-				id: 10,
-				url: 'https://example.com/image.jpg',
-				previewUrl: 'https://example.com/image-medium.jpg',
-				alt: 'Alt text',
-				caption: 'Caption',
-			} ),
-		] );
+		// Totals are read with the same final query so their cache key matches.
+		expect( getEntityRecordsTotalItems ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			expectedQuery
+		);
+		expect( getEntityRecordsTotalPages ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			expectedQuery
+		);
+		expect( results ).toEqual( {
+			mediaItems: [
+				expect.objectContaining( {
+					id: 10,
+					url: 'https://example.com/image.jpg',
+					previewUrl: 'https://example.com/image-medium.jpg',
+					alt: 'Alt text',
+					caption: 'Caption',
+				} ),
+			],
+			totalItems: 1,
+			totalPages: 1,
+		} );
 	} );
 
 	it( 'attaches and detaches attachment records', async () => {

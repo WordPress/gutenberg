@@ -1,5 +1,26 @@
 == Changelog ==
 
+= 23.5.2 =
+
+## Changelog
+
+### Enhancements
+
+#### Block Library
+
+- Classic block: Remove migration notice and restore inserter availability. ([80164](https://github.com/WordPress/gutenberg/pull/80164))
+
+### Code Quality
+
+- Icons: Make WP_Icons_Registry::register() public. ([80139](https://github.com/WordPress/gutenberg/pull/80139))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@Mamaduka @t-hamano @tyxla 
+
+
 = 23.5.1 =
 
 

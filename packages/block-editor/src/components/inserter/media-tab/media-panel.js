@@ -8,10 +8,18 @@ import clsx from 'clsx';
  */
 import { Button, Modal, Spinner, SearchControl } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
-import { useDebouncedInput } from '@wordpress/compose';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { useDebouncedInput, usePrevious } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
+import { getScrollContainer } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -21,8 +29,9 @@ import MediaUpload from '../../media-upload';
 import MediaUploadCheck from '../../media-upload/check';
 import { useMediaResults, useDelayedLoading } from './hooks';
 import InserterNoResults from '../no-results';
+import BlockPatternsPaging from '../../block-patterns-paging';
 
-const INITIAL_MEDIA_ITEMS_PER_PAGE = 10;
+const MEDIA_ITEMS_PER_PAGE = 20;
 
 // The attach flow is image-only, so the picker is constrained to images.
 const ATTACH_ALLOWED_TYPES = [ 'image' ];
@@ -68,22 +77,42 @@ function AttachImagesButton( { onSelect } ) {
 
 export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();
+	const [ page, setPage ] = useState( 1 );
+	// The desktop panel persists across category switches (it's driven by the
+	// selected category, not remounted), so reset paging whenever the source
+	// category or the search term changes. Adjusting state during render (rather
+	// than in an effect) keeps the query on page 1 for the very next fetch,
+	// avoiding a wasted request for the previous page. Mirrors `usePatternsPaging`.
+	const previousCategory = usePrevious( category.name );
+	const previousSearch = usePrevious( debouncedSearch );
+	if (
+		( previousCategory !== category.name ||
+			previousSearch !== debouncedSearch ) &&
+		page !== 1
+	) {
+		setPage( 1 );
+	}
 	const query = useMemo(
 		() => ( {
-			per_page: !! debouncedSearch ? 20 : INITIAL_MEDIA_ITEMS_PER_PAGE,
+			per_page: MEDIA_ITEMS_PER_PAGE,
+			page,
 			search: debouncedSearch,
 		} ),
-		[ debouncedSearch ]
+		[ page, debouncedSearch ]
 	);
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
-	const { mediaList, isLoading } = useMediaResults(
+	const { mediaList, isLoading, totalItems, totalPages } = useMediaResults(
 		category,
 		query,
 		refreshKey
 	);
-	const { createErrorNotice, createSuccessNotice, createWarningNotice } =
-		useDispatch( noticesStore );
-
+	const numPages = totalPages || 1;
+	// If the current set shrinks below the active page (e.g. detaching images
+	// empties the last page), clamp back into range so the grid isn't left blank
+	// on a page that no longer exists.
+	if ( typeof totalPages === 'number' && page > numPages ) {
+		setPage( numPages );
+	}
 	// Private to core's media categories, these capabilities act on WordPress
 	// attachments:
 	// - `attach`/`detach`/`invalidate` manage the images attached to this post.
@@ -96,6 +125,25 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const attach = supportsAttachments ? category.attach : undefined;
 	const detach = supportsAttachments ? category.detach : undefined;
 	const subscribe = supportsAttachments ? category.subscribe : undefined;
+
+	// Only show the pager for multi-page sources. Gating on the page count (not
+	// `mediaList.length`) keeps the footer mounted while paging, since the count
+	// persists across the fetch. It also skips the shared component's stray
+	// single-page item count, which reads oddly here.
+	const showPagination = numPages > 1;
+	// The footer holds the pager and/or the attach button; it exists when either
+	// is present so it can own their shared top/horizontal breathing room.
+	const hasFooter = showPagination || !! attach;
+	const scrollContainerRef = useRef();
+	const changePage = useCallback( ( nextPage ) => {
+		const scrollContainer = getScrollContainer(
+			scrollContainerRef.current
+		);
+		scrollContainer?.scrollTo( 0, 0 );
+		setPage( nextPage );
+	}, [] );
+	const { createErrorNotice, createSuccessNotice, createWarningNotice } =
+		useDispatch( noticesStore );
 
 	// Dim (rather than blank) the populated grid while a refetch is in flight,
 	// but only once it has run long enough to be worth signalling — quick
@@ -217,10 +265,11 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const searchLabel = category.labels.search_items || __( 'Search' );
 	return (
 		<div
+			ref={ scrollContainerRef }
 			className={ clsx( baseCssClass, {
-				// The attach footer supplies the breathing room beneath the
-				// grid, so the list drops its own bottom padding (see styles).
-				'has-attach-footer': !! attach,
+				// The footer supplies the breathing room beneath the grid, so the
+				// list drops its own bottom padding (see styles).
+				'has-footer': hasFooter,
 			} ) }
 		>
 			<SearchControl
@@ -265,10 +314,31 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					/>
 				</div>
 			) }
-			{ attach && (
-				// Pinned to the bottom of the panel as a fixed footer so it lines
-				// up with the "Open Media Library" button in the adjacent column.
-				<AttachImagesButton onSelect={ handleAttach } />
+			{ hasFooter && (
+				// A single footer wrapper owns the top and horizontal breathing
+				// room, so the pager and attach button don't span the full width
+				// and sit clear of the grid above (see styles).
+				<Stack
+					direction="column"
+					gap="sm"
+					className={ `${ baseCssClass }-footer` }
+				>
+					{ showPagination && (
+						// Reuse the Patterns tab pager (presentational only); only
+						// rendered for multi-page sources (see `showPagination`).
+						<BlockPatternsPaging
+							currentPage={ page }
+							numPages={ numPages }
+							changePage={ changePage }
+							totalItems={ totalItems }
+						/>
+					) }
+					{ attach && (
+						// Lines up with the "Open Media Library" button in the
+						// adjacent column.
+						<AttachImagesButton onSelect={ handleAttach } />
+					) }
+				</Stack>
 			) }
 			{ mediaPendingDetach && (
 				// A plain `Modal` (not `ConfirmDialog`) so we can pass

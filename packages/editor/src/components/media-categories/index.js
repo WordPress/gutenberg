@@ -130,18 +130,38 @@ const getCoreMediaQuery = ( query = {} ) => ( {
 } );
 
 const coreMediaFetch = async ( query = {} ) => {
-	const mediaItems = await resolveSelect( coreStore ).getEntityRecords(
+	// Use the same final query for the records fetch and the totals selectors so
+	// their cached query key matches and the totals resolve to this exact request.
+	const finalQuery = getCoreMediaQuery( query );
+	const records = await resolveSelect( coreStore ).getEntityRecords(
 		'postType',
 		'attachment',
-		getCoreMediaQuery( query )
+		finalQuery
 	);
-	return mediaItems.map( ( mediaItem ) => ( {
-		...mediaItem,
-		alt: mediaItem.alt_text,
-		url: mediaItem.source_url,
-		previewUrl: mediaItem.media_details?.sizes?.medium?.source_url,
-		caption: mediaItem.caption?.raw,
-	} ) );
+	// Totals are read synchronously after resolution — the `getEntityRecords`
+	// resolver captures them from the `X-WP-Total` / `X-WP-TotalPages` response
+	// headers, and `resolveSelect().getEntityRecords()` only returns the records.
+	const totalItems = select( coreStore ).getEntityRecordsTotalItems(
+		'postType',
+		'attachment',
+		finalQuery
+	);
+	const totalPages = select( coreStore ).getEntityRecordsTotalPages(
+		'postType',
+		'attachment',
+		finalQuery
+	);
+	return {
+		mediaItems: records.map( ( record ) => ( {
+			...record,
+			alt: record.alt_text,
+			url: record.source_url,
+			previewUrl: record.media_details?.sizes?.medium?.source_url,
+			caption: record.caption?.raw,
+		} ) ),
+		totalItems,
+		totalPages,
+	};
 };
 
 const getAttachedImagesQuery = ( postId, query = {} ) => ( {
@@ -367,6 +387,13 @@ const inserterMediaCategories = [
 			} );
 			const jsonResponse = await response.json();
 			const results = jsonResponse.results;
+			// This external source returns a plain array, so it renders without a
+			// pager (the shared panel treats a non-object result as a single
+			// page). To paginate it later, return the same
+			// `{ mediaItems, totalItems, totalPages }` shape the core sources use,
+			// mapping `jsonResponse.result_count` -> `totalItems` and
+			// `jsonResponse.page_count` -> `totalPages` (Openverse already accepts
+			// a `page` query arg, which passes straight through above).
 			return results.map( ( result ) => ( {
 				...result,
 				// This is a temp solution for better titles, until Openverse API
