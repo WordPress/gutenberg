@@ -9,6 +9,7 @@ on:
 permissions: {}
 
 jobs:
+    # Confirm that the run's context contains a valid Git reference.
     validate-github-ref:
         name: Validate github.ref
         runs-on: 'ubuntu-24.04'
@@ -22,19 +23,16 @@ jobs:
                   fi
                   echo "github.ref is valid: ${{ github.ref }}"
 
+    # Evaluates whether trunk should be updated.
+    #
+    # Only final releases should be published to wordpress.org, so release candidates are skipped.
     compute-should-update-trunk:
         name: Decide if trunk or tag
         runs-on: 'ubuntu-24.04'
-        permissions: {}
         needs: validate-github-ref
-        # Skip this job if the release is a release candidate. This will in turn skip
-        # the upload jobs, which are only relevant for non-RC releases.
-        # We first check if the release is a prerelease, and then if the ref contains
-        # the string "rc". The latter is fallback in case the deployer accidentally
-        # unchecks the "This is a pre-release" checkbox in the release UI.
+        permissions: {}
         if: |
             !github.event.release.prerelease && !contains(github.ref, 'rc')
-
         outputs:
             should_update_trunk: ${{ steps.compute_should_update_trunk.outputs.should_update_trunk }}
 
@@ -81,32 +79,37 @@ jobs:
                   echo "Should update trunk: $shouldUpdateTrunk"
                   echo "should_update_trunk=$shouldUpdateTrunk" >> "$GITHUB_OUTPUT"
 
-    get-release-branch:
-        name: Get release branch name
+    # Determine the major version being released.
+    #
+    # This value is used for branch and tag names in both Git and SVN.
+    compute-major-version:
+        name: Compute major version
         runs-on: 'ubuntu-24.04'
         permissions: {}
         needs: validate-github-ref
         outputs:
-            release_branch: ${{ steps.get_release_branch.outputs.release_branch }}
+            major_version: ${{ steps.compute_major_version.outputs.major_version }}
 
         steps:
-            - name: Compute release branch name
-              id: get_release_branch
+            - name: Compute major version
+              id: compute_major_version
               env:
-                  TAG: ${{ github.event.release.tag_name }}
+                  VERSION: ${{ github.event.release.tag_name }}
               run: |
-                  IFS='.' read -r -a VERSION_ARRAY <<< "${TAG#v}"
-                  RELEASE_BRANCH="release/${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
-                  echo "release_branch=${RELEASE_BRANCH}" >> "$GITHUB_OUTPUT"
+                  IFS='.' read -r -a VERSION_ARRAY <<< "${VERSION#v}"
+                  MAJOR_VERSION="${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
+                  echo "Major version: ${MAJOR_VERSION}"
+                  echo "major_version=${MAJOR_VERSION}" >> "$GITHUB_OUTPUT"
 
+    # Update the changelog
     update-changelog:
         name: Update Changelog on ${{ matrix.branch }} branch
         runs-on: 'ubuntu-24.04'
-        permissions:
-            contents: write
+        needs: compute-major-version
         if: |
             github.event.release.assets[0]
-        needs: get-release-branch
+        permissions:
+            contents: write
         env:
             TAG: ${{ github.event.release.tag_name }}
         strategy:
@@ -114,7 +117,7 @@ jobs:
                 include:
                     - branch: trunk
                       label: trunk
-                    - branch: ${{ needs.get-release-branch.outputs.release_branch }}
+                    - branch: release/${{ needs.compute-major-version.outputs.major_version }}
                       label: release
 
         steps:
@@ -178,129 +181,202 @@ jobs:
                   name: changelog ${{ matrix.label }}
                   path: ./changelog.txt
 
-    upload:
-        name: Publish as trunk (and tag)
+    # Determine which targets receive the release.
+    #
+    # Version branches are always updated, but trunk is only updated when the release is
+    # newer than the version currently published.
+    #
+    # Building the matrix here allows trunk to be skipped when an old version is being published without
+    # excessive conditional checks.
+    compute-commit-targets:
+        name: Compute commit targets
         runs-on: 'ubuntu-24.04'
         permissions: {}
+        needs: compute-should-update-trunk
+        outputs:
+            targets: ${{ steps.compute_commit_targets.outputs.targets }}
+
+        steps:
+            - name: Compute commit targets
+              id: compute_commit_targets
+              env:
+                  SHOULD_UPDATE_TRUNK: ${{ needs.compute-should-update-trunk.outputs.should_update_trunk }}
+              run: |
+                  if [ "$SHOULD_UPDATE_TRUNK" = "true" ]; then
+                    echo 'targets=["branch","trunk"]' >> "$GITHUB_OUTPUT"
+                  else
+                    echo 'targets=["branch"]' >> "$GITHUB_OUTPUT"
+                  fi
+
+    # Commit changes to the wordpress.org plugin directory.
+    #
+    # A matrix is used for this job, but `max-parallel` is set to `1` so only one write attempt is made at a time.
+    commit-changes:
+        name: Publish to ${{ matrix.target }}
+        runs-on: 'ubuntu-24.04'
         environment: wp.org plugin
-        needs: [compute-should-update-trunk, update-changelog]
+        needs: [compute-commit-targets, compute-major-version, update-changelog]
         if: |
-            needs.compute-should-update-trunk.outputs.should_update_trunk == 'true' && github.event.release.assets[0]
+            github.event.release.assets[0]
+        permissions: {}
         env:
-            PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
-            STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
+            PLUGIN_REPO_URL: ${{ vars.WP_ORG_PLUGIN_REPO_URL }}
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
             VERSION: ${{ github.event.release.name }}
+            SVN_PATH: ${{ matrix.target == 'trunk' && 'trunk' || format( 'branches/{0}', needs.compute-major-version.outputs.major_version ) }}
+        strategy:
+            fail-fast: false
+            max-parallel: 1
+            matrix:
+                target: ${{ fromJSON(needs.compute-commit-targets.outputs.targets) }}
 
         steps:
             - name: Install Subversion
-              run: |
-                  sudo apt-get update -y && sudo apt-get install -y subversion
+              run: sudo apt-get update -y && sudo apt-get install -y subversion
 
-            - name: Check out Gutenberg trunk from WP.org plugin repo
+            # Branches will not exist for the first release in a series (X.Y.0).
+            #
+            # By creating an empty branch first, the remaining logic in the job can be the same.
+            - name: Ensure SVN branch exists
+              if: matrix.target == 'branch'
               run: |
-                  svn checkout "$PLUGIN_REPO_URL/trunk" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
-                  svn checkout "$PLUGIN_REPO_URL/tags" --depth=immediates --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+                  svn_error_file="$(mktemp)"
+                  if svn list "$PLUGIN_REPO_URL/$SVN_PATH" \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --non-interactive --no-auth-cache \
+                    --config-option=servers:global:http-timeout=600 >/dev/null 2>"$svn_error_file"; then
+                    echo "SVN branch $SVN_PATH already exists."
+                  else
+                    if grep -Eq 'E160013|W160013|E200009|non-existent' "$svn_error_file"; then
+                      echo "Creating SVN branch $SVN_PATH."
+                      svn mkdir --parents "$PLUGIN_REPO_URL/$SVN_PATH" \
+                        -m "Creating branch $SVN_PATH" \
+                        --no-auth-cache --non-interactive \
+                        --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                        --config-option=servers:global:http-timeout=600
+                    else
+                      cat "$svn_error_file" >&2
+                      rm -f "$svn_error_file"
+                      exit 1
+                    fi
+                  fi
+                  rm -f "$svn_error_file"
+
+            - name: Check out target from WP.org plugin repo
+              run: |
+                  svn checkout "$PLUGIN_REPO_URL/$SVN_PATH" svn \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --non-interactive --no-auth-cache \
+                    --config-option=servers:global:http-timeout=600
 
             - name: Delete everything
-              working-directory: ./trunk
+              working-directory: ./svn
               run: find . -maxdepth 1 -not -name ".svn" -not -name "." -not -name ".." -exec rm -rf {} +
 
-            - name: Download and unzip Gutenberg plugin asset into trunk folder
+            - name: Download and unzip Gutenberg plugin asset
               env:
                   PLUGIN_URL: ${{ github.event.release.assets[0].browser_download_url }}
               run: |
                   curl -L -o gutenberg.zip "$PLUGIN_URL"
-                  unzip gutenberg.zip -d trunk
+                  unzip gutenberg.zip -d svn
                   rm gutenberg.zip
 
             - name: Replace the stable tag placeholder with the new version
               env:
                   STABLE_TAG_PLACEHOLDER: 'Stable tag: V\.V\.V'
               run: |
-                  sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" ./trunk/readme.txt
+                  sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" ./svn/readme.txt
 
             - name: Download Changelog Artifact
               uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
                   name: changelog trunk
-                  path: trunk
+                  path: svn
 
-            - name: Check if SVN tag already exists
-              id: check_svn_tag
+            - name: Add new files
+              working-directory: ./svn
+              run: svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
+
+            - name: Remove deleted files
+              working-directory: ./svn
+              run: svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
+
+            - name: Check for changes
+              id: svn_diff
+              working-directory: ./svn
               run: |
-                  svn_error_file="$(mktemp)"
-                  if svn list "$PLUGIN_REPO_URL/tags/$VERSION" \
-                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
-                    --non-interactive --no-auth-cache >/dev/null 2>"$svn_error_file"; then
-                    echo "::warning::SVN tag tags/$VERSION already exists. Skipping release commit to avoid E150002."
-                    echo "exists=true" >> "$GITHUB_OUTPUT"
+                  if [ -n "$(svn status -q)" ]; then
+                    echo "has_changes=true" >> "$GITHUB_OUTPUT"
                   else
-                    svn_status=$?
-                    # WP.org SVN may report a missing tag as W160013 followed by E200009.
-                    if grep -Eq 'E160013|W160013|E200009|non-existent' "$svn_error_file"; then
-                      echo "exists=false" >> "$GITHUB_OUTPUT"
-                    else
-                      cat "$svn_error_file" >&2
-                      rm -f "$svn_error_file"
-                      exit "$svn_status"
-                    fi
+                    echo "has_changes=false" >> "$GITHUB_OUTPUT"
                   fi
-                  rm -f "$svn_error_file"
 
-            - name: Commit the release
-              if: steps.check_svn_tag.outputs.exists != 'true'
-              working-directory: ./trunk
+            - name: Commit changes
+              if: steps.svn_diff.outputs.has_changes == 'true'
+              working-directory: ./svn
               run: |
-                  svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
-                  svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
-                  svn cp . "../tags/$VERSION"
-                  svn commit . "../tags/$VERSION" \
-                   -m "Releasing version $VERSION" \
-                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                  svn commit -m "Releasing version $VERSION to $SVN_PATH" \
+                   --no-auth-cache --non-interactive --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
                    --config-option=servers:global:http-timeout=600
 
-    upload-tag:
-        name: Publish as tag
+            - name: Verify stable version
+              run: |
+                  committed_version="$(
+                    svn cat "$PLUGIN_REPO_URL/$SVN_PATH/readme.txt" \
+                    --no-auth-cache --non-interactive \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --config-option=servers:global:http-timeout=600 \
+                    | grep -i '^Stable tag:' | head -n 1 | sed 's/^Stable tag:[[:space:]]*//' | tr -d '[:space:]'
+                  )"
+
+                  if [ "$committed_version" = "$VERSION" ]; then
+                    echo "Verified: Stable tag in $SVN_PATH is $committed_version."
+                  else
+                    echo "::error::Version mismatch: expected Stable tag in $SVN_PATH of '$VERSION'. Found '$committed_version'."
+                    exit 1
+                  fi
+
+            - name: Verify plugin version
+              run: |
+                  plugin_version="$(
+                    svn cat "$PLUGIN_REPO_URL/$SVN_PATH/gutenberg.php" \
+                    --no-auth-cache --non-interactive \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --config-option=servers:global:http-timeout=600 \
+                    | grep -iE '^[[:space:]*]*Version:' | head -n 1 \
+                    | sed -E 's/^[[:space:]*]*Version:[[:space:]]*//I' | tr -d '[:space:]'
+                  )"
+
+                  if [ "$plugin_version" = "$VERSION" ]; then
+                    echo "Verified: Plugin version in $SVN_PATH is $plugin_version."
+                  else
+                    echo "::error::Version mismatch: expected plugin version in $SVN_PATH of '$VERSION'. Found '$plugin_version'."
+                    exit 1
+                  fi
+
+    # Create a tag in the wordpress.org plugin directory SVN repository.
+    #
+    # The tag is created from trunk when a new latest version is published. Otherwise, the tag is created from the
+    # corresponding release branch.
+    tag-release:
+        name: Tag the release
         runs-on: 'ubuntu-24.04'
         permissions: {}
         environment: wp.org plugin
-        needs: [compute-should-update-trunk, update-changelog]
+        needs:
+            [compute-should-update-trunk, compute-major-version, commit-changes]
         if: |
-            needs.compute-should-update-trunk.outputs.should_update_trunk == 'false' && github.event.release.assets[0]
+            github.event.release.assets[0]
         env:
-            PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
-            STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
+            PLUGIN_REPO_URL: ${{ vars.WP_ORG_PLUGIN_REPO_URL }}
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
             VERSION: ${{ github.event.release.name }}
-
+            SVN_PATH: ${{ needs.compute-should-update-trunk.outputs.should_update_trunk == 'true' && 'trunk' || format( 'branches/{0}', needs.compute-major-version.outputs.major_version ) }}
         steps:
             - name: Install Subversion
-              run: |
-                  sudo apt-get update -y && sudo apt-get install -y subversion
-
-            - name: Download and unzip Gutenberg plugin asset into tags folder
-              env:
-                  PLUGIN_URL: ${{ github.event.release.assets[0].browser_download_url }}
-              run: |
-                  # do the magic here
-                  curl -L -o gutenberg.zip "$PLUGIN_URL"
-                  unzip gutenberg.zip -d "$VERSION"
-                  rm gutenberg.zip
-
-            - name: Replace the stable tag placeholder with the existing stable tag on the SVN repository
-              env:
-                  STABLE_TAG_PLACEHOLDER: 'Stable tag: V\.V\.V'
-              run: |
-                  sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" "$VERSION/readme.txt"
-
-            - name: Download Changelog Artifact
-              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-              with:
-                  name: changelog trunk
-                  path: ${{ github.event.release.name }}
+              run: sudo apt-get update -y && sudo apt-get install -y subversion
 
             - name: Check if SVN tag already exists
               id: check_svn_tag
@@ -308,8 +384,9 @@ jobs:
                   svn_error_file="$(mktemp)"
                   if svn list "$PLUGIN_REPO_URL/tags/$VERSION" \
                     --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
-                    --non-interactive --no-auth-cache >/dev/null 2>"$svn_error_file"; then
-                    echo "::warning::SVN tag tags/$VERSION already exists. Skipping import to avoid E150002."
+                    --non-interactive --no-auth-cache \
+                    --config-option=servers:global:http-timeout=600 >/dev/null 2>"$svn_error_file"; then
+                    echo "::warning::SVN tag tags/$VERSION already exists. It will be removed and recreated from $SVN_PATH."
                     echo "exists=true" >> "$GITHUB_OUTPUT"
                   else
                     svn_status=$?
@@ -324,9 +401,21 @@ jobs:
                   fi
                   rm -f "$svn_error_file"
 
-            - name: Add the new version directory and commit changes to the SVN repository
-              if: steps.check_svn_tag.outputs.exists != 'true'
+            - name: Remove the existing tag
+              if: steps.check_svn_tag.outputs.exists == 'true'
               run: |
-                  svn import "$VERSION" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Committing version $VERSION" \
-                  --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
-                  --config-option=servers:global:http-timeout=300
+                  svn rm "$PLUGIN_REPO_URL/tags/$VERSION" \
+                    -m "Removing tag $VERSION to recreate it from $SVN_PATH" \
+                    --no-auth-cache --non-interactive \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --config-option=servers:global:http-timeout=600
+
+            - name: Tag the new version
+              run: |
+                  # A cheap server-side copy from the branch, which the upload job guarantees
+                  # exists and holds this release's content.
+                  svn cp "$PLUGIN_REPO_URL/$SVN_PATH" "$PLUGIN_REPO_URL/tags/$VERSION" \
+                    -m "Tagging version $VERSION" \
+                    --no-auth-cache --non-interactive \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --config-option=servers:global:http-timeout=600
