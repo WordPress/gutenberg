@@ -80,10 +80,11 @@ if [ "$IS_WORDPRESS_CORE" = "true" ]; then
 	status "Pruning non-public icons for WordPress Core... ✂️"
 	(
   	cd packages/icons/src
-  	comm -13 \
+  	non_public_icons=$(comm -13 \
   		<(jq -r "map(select(.public) | .filePath)[]" manifest.json | sort) \
-  		<(ls library/*.svg) |
-  		xargs rm
+  		<(ls library/*.svg))
+  	echo "$non_public_icons" | sed 's|^|  Deleting packages/icons/src/|'
+  	echo "$non_public_icons" | xargs rm
   )
 fi
 
@@ -103,6 +104,7 @@ zip --recurse-paths --no-dir-entries \
 	README.md
 
 status "Restoring non-public icons... 🔁"
+git diff --name-only --diff-filter=D -- packages/icons/src | sed 's|^|  Restoring |'
 git restore packages/icons/src
 
 success "Done. You've built Gutenberg! 🎉 "
