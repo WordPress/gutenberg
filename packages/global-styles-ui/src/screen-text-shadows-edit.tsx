@@ -241,7 +241,6 @@ export default function ScreenTextShadowsEdit() {
 						} }
 					>
 						<InputControl
-							__next40pxDefaultSize
 							autoComplete="off"
 							label={ __( 'Name' ) }
 							placeholder={ __( 'Text shadow name' ) }
