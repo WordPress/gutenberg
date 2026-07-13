@@ -27,16 +27,6 @@ export function useFocusHandler( clientId ) {
 
 	return useRefEffect(
 		( node ) => {
-			let isShiftMouseDown = false;
-
-			function onMouseDown( event ) {
-				isShiftMouseDown = event.shiftKey;
-			}
-
-			function onMouseUp() {
-				isShiftMouseDown = false;
-			}
-
 			/**
 			 * Marks the block as selected when focused and not already
 			 * selected. This specifically handles the case where block does not
@@ -46,22 +36,6 @@ export function useFocusHandler( clientId ) {
 			 * @param {FocusEvent} event Focus event.
 			 */
 			function onFocus( event ) {
-				// When the whole editor is editable and a shift+click gesture
-				// is in progress, let writing flow handle (multi) selection.
-				// Without the shift key, focus within an editable wrapper
-				// still expresses the intent to select the block.
-				if (
-					isShiftMouseDown &&
-					node.parentElement.closest( '[contenteditable="true"]' )
-				) {
-					// Consume the gesture flag here too: the mouseup that
-					// normally clears it is not guaranteed, e.g. when the
-					// pointer is released outside the document. A stale flag
-					// must not suppress a later, unrelated focus.
-					isShiftMouseDown = false;
-					return;
-				}
-
 				// Check synchronously because a non-selected block might be
 				// getting data through `useSelect` asynchronously.
 				if ( isBlockSelected( clientId ) ) {
@@ -78,30 +52,23 @@ export function useFocusHandler( clientId ) {
 					return;
 				}
 
+				// For editable targets, select without initial caret
+				// placement: the caret is inside the target. Placement would
+				// move it, and would collapse a native selection in the
+				// making, e.g. a shift+click extending the selection across
+				// blocks while the wrapper is the editing host. The observer
+				// builds the multi-selection from the anchor it recorded at
+				// mousedown, so this dispatch overwriting the store anchor
+				// is harmless.
+				if ( event.target.isContentEditable ) {
+					selectBlock( clientId, null );
+					return;
+				}
+
 				selectBlock( clientId );
 			}
 
-			const unsubscribeFocus = subscribeDelegatedListener(
-				node,
-				'focusin',
-				onFocus
-			);
-			const unsubscribeMouseDown = subscribeDelegatedListener(
-				node,
-				'mousedown',
-				onMouseDown
-			);
-			const unsubscribeMouseUp = subscribeDelegatedListener(
-				node.ownerDocument,
-				'mouseup',
-				onMouseUp
-			);
-
-			return () => {
-				unsubscribeFocus();
-				unsubscribeMouseDown();
-				unsubscribeMouseUp();
-			};
+			return subscribeDelegatedListener( node, 'focusin', onFocus );
 		},
 		[ isBlockSelected, selectBlock ]
 	);
