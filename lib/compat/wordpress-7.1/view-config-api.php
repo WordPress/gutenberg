@@ -788,10 +788,17 @@ function gutenberg_register_entity_view_config_filters() {
 		$wp_callback = "_wp_get_entity_view_config_post_type_{$post_type}";
 		$gb_callback = "_gutenberg_get_entity_view_config_post_type_{$post_type}";
 
-		if ( has_filter( $hook, $wp_callback ) ) {
-			remove_filter( $hook, $wp_callback );
+		// has_filter() returns the priority the callback was registered at.
+		$wp_priority = has_filter( $hook, $wp_callback );
+		if ( false !== $wp_priority ) {
+			remove_filter( $hook, $wp_callback, $wp_priority );
 		}
-		add_filter( $hook, $gb_callback, 10, 1 );
+		if ( function_exists( $gb_callback ) ) {
+			// Base definitions run before the default priority, so third-party
+			// callbacks registered at the default compose on top of them
+			// regardless of registration order.
+			add_filter( $hook, $gb_callback, 5, 1 );
+		}
 	}
 }
 add_action( 'init', 'gutenberg_register_entity_view_config_filters' );

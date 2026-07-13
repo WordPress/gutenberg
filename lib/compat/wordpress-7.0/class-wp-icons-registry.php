@@ -90,7 +90,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 * }
 		 * @return bool True if the icon was registered with success and false otherwise.
 		 */
-		protected function register( $icon_name, $icon_properties ) {
+		public function register( $icon_name, $icon_properties ) {
 			if ( ! isset( $icon_name ) || ! is_string( $icon_name ) ) {
 				_doing_it_wrong(
 					__METHOD__,
