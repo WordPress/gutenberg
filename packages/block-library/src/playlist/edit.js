@@ -19,7 +19,6 @@ import {
 	InnerBlocks,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
-	getColorObjectByAttributeValues,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -70,8 +69,6 @@ const PlaylistEdit = ( {
 		showArtists,
 		showTrackLength,
 		waveformStyle = DEFAULT_WAVEFORM_STYLE,
-		textColor,
-		style,
 		waveformColor,
 		waveformGradient,
 		waveformBackgroundColor,
@@ -102,11 +99,6 @@ const PlaylistEdit = ( {
 		colors.length > 0 || ! colorGradientSettings.disableCustomColors;
 	const hasGradients =
 		gradients.length > 0 || ! colorGradientSettings.disableCustomGradients;
-	const textColorValue = getColorObjectByAttributeValues(
-		colors,
-		textColor,
-		style?.color?.text
-	).color;
 	const waveformGradientValue = waveformGradient;
 	const waveformBackgroundGradientValue = waveformBackgroundGradient;
 	let waveformColorGradientChange;
@@ -605,7 +597,6 @@ const PlaylistEdit = ( {
 						gradient={ waveformGradientValue }
 						backgroundColor={ waveformBackgroundColor }
 						backgroundGradient={ waveformBackgroundGradientValue }
-						textColor={ textColorValue }
 						onEnded={ onTrackEnded }
 						showPlayButtonArtwork={ showPlayButtonArtwork === true }
 					/>
