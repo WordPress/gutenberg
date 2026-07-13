@@ -83,25 +83,28 @@ test( 'passes for a package with clean packed contents', () => {
 	);
 } );
 
-test( 'fails when packed contents include test files', () => {
-	const packageRoot = createPackage( {
-		files: {
-			'index.js': "export const value = 'ok';\n",
-			'index.test.js': "import './index.js';\n",
-		},
-		packageJson: {
-			files: [ 'index.js', 'index.test.js' ],
-			exports: './index.js',
-		},
-	} );
+test.each( [ 'index.test.js', 'index.story.js' ] )(
+	'fails when packed contents include %s',
+	( disallowedPath ) => {
+		const packageRoot = createPackage( {
+			files: {
+				'index.js': "export const value = 'ok';\n",
+				[ disallowedPath ]: "import './index.js';\n",
+			},
+			packageJson: {
+				files: [ 'index.js', disallowedPath ],
+				exports: './index.js',
+			},
+		} );
 
-	const result = runValidator( packageRoot );
+		const result = runValidator( packageRoot );
 
-	expect( result.status ).not.toBe( 0 );
-	expect( result.stderr ).toMatch(
-		/The package tarball includes disallowed files:\n- index\.test\.js/
-	);
-} );
+		expect( result.status ).not.toBe( 0 );
+		expect( result.stderr ).toContain(
+			`The package tarball includes disallowed files:\n- ${ disallowedPath }`
+		);
+	}
+);
 
 test( 'fails when an exported target is missing from the package', () => {
 	const packageRoot = createPackage( {

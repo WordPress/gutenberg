@@ -56,7 +56,7 @@ const packedPathSet = new Set( packedPaths );
 const disallowedPathPatterns = [
 	/(^|\/)(__fixtures__|__snapshots__|__tests__|fixtures|stories|test|tests)(\/|$)/,
 	/(^|\/)[^/]+\.(spec|test)\.[^/]+$/,
-	/(^|\/)[^/]+\.stories?\.[^/]+$/,
+	/(^|\/)[^/]+\.stor(?:y|ies)\.[^/]+$/,
 ];
 const disallowedPaths = packedPaths.filter( ( path ) =>
 	disallowedPathPatterns.some( ( pattern ) => pattern.test( path ) )

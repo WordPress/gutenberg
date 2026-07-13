@@ -39,6 +39,7 @@
 		"!**/tests/**",
 		"!**/*.spec.*",
 		"!**/*.test.*",
+		"!**/*.story.*",
 		"!**/*.stories.*"
 	],
 	"type": "module",
