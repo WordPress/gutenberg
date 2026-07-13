@@ -243,8 +243,7 @@ function CoverEdit( {
 		if ( ! currentAttrs.isUserOverlayColor ) {
 			newOverlayColor = averageBackgroundColor;
 			setOverlayColor( newOverlayColor );
-
-			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			// Fold next attribute change into the same undo level as the setOverlayColor above.
 			__unstableMarkNextChangeAsNotPersistent();
 		}
 
@@ -302,11 +301,13 @@ function CoverEdit( {
 
 	const onClearMedia = () => {
 		let newOverlayColor = overlayColor.color;
-		if ( ! isUserOverlayColor ) {
+
+		// Skip for embeds, which never auto-assign an overlay color; otherwise
+		// the non-persistent flag lands on the media reset itself (unsaveable).
+		if ( ! isUserOverlayColor && overlayColor.color ) {
 			newOverlayColor = DEFAULT_OVERLAY_COLOR;
 			setOverlayColor( undefined );
-
-			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			// Fold next attribute change into the same undo level as the setOverlayColor above.
 			__unstableMarkNextChangeAsNotPersistent();
 		}
 
@@ -341,8 +342,7 @@ function CoverEdit( {
 		);
 
 		setOverlayColor( newOverlayColor );
-
-		// Make undo revert the next setAttributes and the previous setOverlayColor.
+		// Fold next attribute change into the same undo level as the setOverlayColor above.
 		__unstableMarkNextChangeAsNotPersistent();
 
 		setAttributes( {
@@ -549,8 +549,7 @@ function CoverEdit( {
 					if ( ! currentAttrs.isUserOverlayColor ) {
 						newOverlayColor = averageBackgroundColor;
 						setOverlayColor( newOverlayColor );
-
-						// Make undo revert the next setAttributes and the previous setOverlayColor.
+						// Fold next attribute change into the same undo level as the setOverlayColor above.
 						__unstableMarkNextChangeAsNotPersistent();
 					}
 
@@ -604,8 +603,7 @@ function CoverEdit( {
 			} else {
 				setOverlayColor( undefined );
 			}
-
-			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			// Fold next attribute change into the same undo level as the setOverlayColor above.
 			__unstableMarkNextChangeAsNotPersistent();
 		}
 
