@@ -43,6 +43,7 @@
 		"build-module/store/index.mjs"
 	],
 	"dependencies": {
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",

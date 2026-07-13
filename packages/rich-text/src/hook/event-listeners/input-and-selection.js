@@ -114,9 +114,12 @@ export default ( props ) => ( element ) => {
 		handleChange( change );
 	}
 
+	let selectionSnapshot;
+
 	/**
 	 * Syncs the selection to local state. A callback for the `selectionchange`
-	 * event.
+	 * event, and for the capture phase of events that consume the selection,
+	 * which run before `selectionchange` is delivered.
 	 */
 	function handleSelectionChange() {
 		const { record, applyRecord, createRecord, onSelectionChange } =
@@ -141,8 +144,38 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
+		const selection = defaultView.getSelection();
+
+		// Skip selections that have already been processed into the current
+		// record, such as the `selectionchange` event for a selection that
+		// was synchronized on capture of a consuming event, or coalesced
+		// duplicates. The offsets the processing produced are compared to
+		// the record too: the record's selection may be rewritten from
+		// (possibly stale) props on render without the DOM selection moving,
+		// in which case the selection must be processed again.
+		if (
+			selectionSnapshot &&
+			selectionSnapshot.anchorNode === selection.anchorNode &&
+			selectionSnapshot.anchorOffset === selection.anchorOffset &&
+			selectionSnapshot.focusNode === selection.focusNode &&
+			selectionSnapshot.focusOffset === selection.focusOffset &&
+			selectionSnapshot.processedStart === record.current.start &&
+			selectionSnapshot.processedEnd === record.current.end
+		) {
+			return;
+		}
+
 		const { start, end, text } = createRecord();
 		const oldRecord = record.current;
+
+		selectionSnapshot = {
+			anchorNode: selection.anchorNode,
+			anchorOffset: selection.anchorOffset,
+			focusNode: selection.focusNode,
+			focusOffset: selection.focusOffset,
+			processedStart: start,
+			processedEnd: end,
+		};
 
 		// Fallback mechanism for IE11, which doesn't support the input event.
 		// Any input results in a selection change.
@@ -245,6 +278,9 @@ export default ( props ) => ( element ) => {
 				end: index,
 				activeFormats: EMPTY_ACTIVE_FORMATS,
 			};
+			// The record no longer reflects the selection, so a matching
+			// snapshot must not skip synchronization.
+			selectionSnapshot = undefined;
 		} else {
 			applyRecord( record.current, { domOnly: true } );
 		}
@@ -292,6 +328,27 @@ export default ( props ) => ( element ) => {
 		'selectionchange',
 		handleSelectionChange
 	);
+	// The native `selectionchange` event is asynchronous and coalesced: the
+	// record and the store selection can be one selection behind the DOM when
+	// an event that acts on them arrives, regardless of how the selection got
+	// there. Synchronize on capture of the events that consume the record,
+	// the store selection, or a value rendered from them, before any other
+	// handler runs. The snapshot comparison in `handleSelectionChange` skips
+	// selections that have already been processed.
+	const unsubscribeEnsureSelectionSync = [
+		'keydown',
+		'beforeinput',
+		'copy',
+		'cut',
+		'paste',
+	].map( ( eventType ) =>
+		subscribeDelegatedListener(
+			ownerDocument,
+			eventType,
+			handleSelectionChange,
+			true
+		)
+	);
 
 	return () => {
 		unsubscribeInput();
@@ -299,5 +356,8 @@ export default ( props ) => ( element ) => {
 		unsubscribeCompositionEnd();
 		unsubscribeFocus();
 		unsubscribeSelectionChange();
+		unsubscribeEnsureSelectionSync.forEach( ( unsubscribe ) =>
+			unsubscribe()
+		);
 	};
 };

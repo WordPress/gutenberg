@@ -3,7 +3,6 @@ import { forwardRef } from '@wordpress/element';
 import { Link } from '../link';
 import { type LinkButtonProps } from './types';
 import buttonStyles from '../button/style.module.css';
-import focusStyles from '../utils/css/focus.module.css';
 import styles from './style.module.css';
 
 /**
@@ -31,7 +30,6 @@ export const LinkButton = forwardRef< HTMLAnchorElement, LinkButtonProps >(
 				variant="unstyled"
 				className={ clsx(
 					styles[ 'link-button' ],
-					focusStyles[ 'outset-ring--focus-except-active' ],
 					variant !== 'unstyled' && buttonStyles.button,
 					buttonStyles[ `is-${ tone }` ],
 					buttonStyles[ `is-${ variant }` ],

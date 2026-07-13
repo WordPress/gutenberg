@@ -31,7 +31,7 @@
 		"access": "public"
 	},
 	"scripts": {
-		"test:performance": "wp-scripts test-playwright --config playwright.config.ts",
-		"test:performance:debug": "wp-scripts test-playwright --config playwright.config.ts --debug"
+		"test:performance": "wp-scripts test-e2e --config playwright.config.ts",
+		"test:performance:debug": "wp-scripts test-e2e --config playwright.config.ts --debug"
 	}
 }
