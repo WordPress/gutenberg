@@ -1,13 +1,15 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { dispatch } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -310,6 +312,86 @@ describe( 'AddReactionButton', () => {
 
 		expect( onToggleReaction ).toHaveBeenCalledTimes( 1 );
 		expect( onToggleReaction ).toHaveBeenCalledWith( 'rocket' );
+	} );
+
+	it( 'stores a filter-provided emoji under its slug from both picker paths', async () => {
+		// A site filter adds 👍 with the slug `thumbs-up`. Picking it from
+		// the curated quick row and from the full searchable picker must
+		// both store `thumbs-up`, not the raw hex key `1f44d`, so the two
+		// paths aggregate into a single reaction_summary bucket.
+		window.gutenbergEmojibaseUrl = 'https://example.test/emojibase';
+		const originalFetch = global.fetch;
+		global.fetch = jest.fn( ( url ) =>
+			Promise.resolve( {
+				ok: true,
+				json: () =>
+					Promise.resolve(
+						String( url ).includes( 'data.json' )
+							? [
+									{
+										hexcode: '1F44D',
+										emoji: '👍',
+										label: 'thumbs up',
+										group: 0,
+									},
+							  ]
+							: { groups: [ { order: 0, message: 'Smileys' } ] }
+					),
+			} )
+		);
+		dispatch( blockEditorStore ).updateSettings( {
+			noteReactionEmojis: [
+				{ emoji: '👍', label: 'Thumbs up', value: 'thumbs-up' },
+			],
+		} );
+
+		try {
+			const user = userEvent.setup();
+			const onToggleReaction = jest.fn();
+			render(
+				<AddReactionButton
+					noteId={ uniqueNoteId }
+					onToggleReaction={ onToggleReaction }
+				/>
+			);
+
+			// Path 1: the curated quick row.
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add reaction' } )
+			);
+			await user.click(
+				await screen.findByRole( 'option', { name: 'Thumbs up' } )
+			);
+			expect( onToggleReaction ).toHaveBeenLastCalledWith( 'thumbs-up' );
+
+			// Path 2: the full searchable picker.
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add reaction' } )
+			);
+			await user.click(
+				await screen.findByRole( 'button', { name: 'More emojis' } )
+			);
+			// The quick-row pick above also recorded 👍 as frequently
+			// used, so the grid shows it twice (Frequently used + its
+			// category); either cell exercises the same selection path.
+			await user.click(
+				(
+					await screen.findAllByRole( 'gridcell', {
+						name: 'thumbs up',
+					} )
+				)[ 0 ]
+			);
+			expect( onToggleReaction ).toHaveBeenLastCalledWith( 'thumbs-up' );
+			expect( onToggleReaction ).toHaveBeenCalledTimes( 2 );
+		} finally {
+			global.fetch = originalFetch;
+			delete window.gutenbergEmojibaseUrl;
+			act( () => {
+				dispatch( blockEditorStore ).updateSettings( {
+					noteReactionEmojis: undefined,
+				} );
+			} );
+		}
 	} );
 
 	it( 'stays focusable but inert when disabled', async () => {

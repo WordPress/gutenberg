@@ -469,7 +469,14 @@ export function AddReactionButton( {
 						>
 							<FullEmojiPicker
 								onSelect={ ( emoji ) =>
-									pickReaction( emojiToStorageKey( emoji ) )
+									// Match against the filtered curated
+									// list, not just the defaults, so a
+									// filter-provided emoji picked here
+									// stores under the same slug as the
+									// quick row.
+									pickReaction(
+										emojiToStorageKey( emoji, emojis )
+									)
 								}
 							/>
 						</Suspense>
