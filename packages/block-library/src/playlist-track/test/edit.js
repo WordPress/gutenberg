@@ -20,7 +20,9 @@ jest.mock( '@wordpress/block-editor', () => ( {
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
 	MediaPlaceholder: () => <div />,
-	MediaReplaceFlow: () => <div />,
+	MediaReplaceFlow: ( { name, onSelect } ) => (
+		<button onClick={ () => onSelect( {} ) }>{ name }</button>
+	),
 	MediaUpload: ( { render: renderMediaUpload } ) =>
 		renderMediaUpload( { open: jest.fn() } ),
 	MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
@@ -72,12 +74,14 @@ const defaultAttributes = {
 function renderEdit( props = {} ) {
 	const setAttributes = jest.fn();
 	const setCurrentTrackClientId = props.setCurrentTrackClientId || jest.fn();
+	const addTracks = props.addTracks;
 
 	render(
 		<PlaylistContext.Provider
 			value={ {
 				currentTrackClientId: props.currentTrackClientId ?? null,
 				setCurrentTrackClientId,
+				addTracks,
 			} }
 		>
 			<PlaylistTrackEdit
@@ -182,5 +186,14 @@ describe( 'PlaylistTrackEdit', () => {
 				url: 'blob:https://example.com/temporary-track',
 			} )
 		);
+	} );
+
+	it( 'allows tracks to be added from the track toolbar', () => {
+		const addTracks = jest.fn();
+		renderEdit( { addTracks } );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Add' } ) );
+
+		expect( addTracks ).toHaveBeenCalledWith( {} );
 	} );
 } );

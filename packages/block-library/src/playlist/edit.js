@@ -175,11 +175,6 @@ const PlaylistEdit = ( {
 		}
 	}, [ currentTrackClientId, setCurrentTrackClientId, validTracks ] );
 
-	const playlistContext = useMemo(
-		() => ( { currentTrackClientId, setCurrentTrackClientId } ),
-		[ currentTrackClientId, setCurrentTrackClientId ]
-	);
-
 	const createTrackBlocks = useCallback(
 		( media ) => {
 			if ( ! media ) {
@@ -277,6 +272,15 @@ const PlaylistEdit = ( {
 			setCurrentTrackClientId,
 			validTracks,
 		]
+	);
+
+	const playlistContext = useMemo(
+		() => ( {
+			currentTrackClientId,
+			setCurrentTrackClientId,
+			addTracks: onAddTracks,
+		} ),
+		[ currentTrackClientId, onAddTracks, setCurrentTrackClientId ]
 	);
 
 	// Get current track data by finding the track with matching client ID.
