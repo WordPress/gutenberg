@@ -333,6 +333,69 @@ test.describe( 'Table of Contents', () => {
 	} );
 
 	test.describe( 'Reading and navigating', () => {
+		// Desired behavior: the front-of-site ToC should render from the current post headings even when content changes outside the editor; trunk only reflects headings captured when the block was last updated in the editor.
+		test.fixme(
+			'front-of-site table of contents reflects updated post headings',
+			async ( { admin, editor, page, requestUtils } ) => {
+				await admin.createNewPost();
+				await editor.setContent(
+					postContentWithTocAndHeadings( [
+						{
+							content: 'Original section',
+							anchor: 'original-section',
+						},
+					] )
+				);
+
+				const postId = await editor.publishPost();
+				await openPostOnFrontend( page, postId );
+
+				await expect(
+					page
+						.getByRole( 'navigation', {
+							name: 'Table of Contents',
+						} )
+						.getByRole( 'link', { name: 'Original section' } )
+				).toBeVisible();
+
+				// Update the post content without opening the editor so the reader view must reflect the current post headings.
+				await updatePostContent(
+					requestUtils,
+					postId,
+					postContentWithTocAndHeadings( [
+						{
+							content: 'Updated section',
+							anchor: 'updated-section',
+						},
+					] )
+				);
+
+				await openPostOnFrontend( page, postId );
+
+				const tableOfContents = page.getByRole( 'navigation', {
+					name: 'Table of Contents',
+				} );
+				await expect(
+					tableOfContents.getByRole( 'link', {
+						name: 'Updated section',
+					} )
+				).toBeVisible();
+				await expect(
+					tableOfContents.getByRole( 'link', {
+						name: 'Original section',
+					} )
+				).toHaveCount( 0 );
+
+				await tableOfContents
+					.getByRole( 'link', { name: 'Updated section' } )
+					.click();
+				await expect( page ).toHaveURL( /#updated-section$/ );
+				await expect(
+					page.locator( '#updated-section' )
+				).toBeInViewport();
+			}
+		);
+
 		test( 'clicking a table of contents item on the front of site scrolls to the matching section', async ( {
 			page,
 			requestUtils,
