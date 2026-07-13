@@ -253,7 +253,7 @@ mark.wp-note {
 	border-radius: $radius-small;
 	background: color-mix(in srgb, var(--wp-admin-theme-color) 12%, transparent);
 	color: var(--wp-admin-theme-color);
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	white-space: nowrap;
 	text-decoration: none;
 }
