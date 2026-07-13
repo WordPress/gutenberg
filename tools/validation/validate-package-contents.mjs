@@ -3,13 +3,41 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join, posix, resolve, win32 } from 'node:path';
 import { parseArgs } from 'node:util';
 
 const usage =
 	'Usage: node tools/validation/validate-package-contents.mjs <package-directory> [--disallow-path <path>]';
 let packagePath;
 let configuredDisallowedPath;
+
+/**
+ * Normalize a relative package path to npm's POSIX tarball path format.
+ *
+ * @param {string} path Package path.
+ * @return {string} Normalized package path.
+ */
+function normalizeDisallowedPath( path ) {
+	const pathWithPosixSeparators = path.replaceAll( '\\', '/' );
+
+	if (
+		posix.isAbsolute( pathWithPosixSeparators ) ||
+		win32.isAbsolute( path ) ||
+		pathWithPosixSeparators.split( '/' ).includes( '..' )
+	) {
+		throw new Error();
+	}
+
+	const normalizedPath = posix
+		.normalize( pathWithPosixSeparators )
+		.replace( /\/+$/, '' );
+
+	if ( normalizedPath === '.' ) {
+		throw new Error();
+	}
+
+	return normalizedPath;
+}
 
 try {
 	const { positionals, values } = parseArgs( {
@@ -26,7 +54,9 @@ try {
 	}
 
 	[ packagePath ] = positionals;
-	configuredDisallowedPath = values[ 'disallow-path' ];
+	configuredDisallowedPath = values[ 'disallow-path' ]
+		? normalizeDisallowedPath( values[ 'disallow-path' ] )
+		: undefined;
 } catch {
 	console.error( usage );
 	process.exit( 1 );

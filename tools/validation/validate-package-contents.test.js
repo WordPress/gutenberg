@@ -110,24 +110,71 @@ test.each( [ 'index.test.js', 'index.story.js' ] )(
 	}
 );
 
-test( 'fails when packed contents include a configured disallowed path', () => {
+test.each( [ 'src', './src', 'src/' ] )(
+	'fails when packed contents include configured disallowed path %s',
+	( disallowedPath ) => {
+		const packageRoot = createPackage( {
+			files: {
+				'src/index.js': "export const value = 'ok';\n",
+			},
+			packageJson: {
+				files: [ 'src' ],
+				exports: './src/index.js',
+			},
+		} );
+
+		const result = runValidator( packageRoot, [
+			'--disallow-path',
+			disallowedPath,
+		] );
+
+		expect( result.status ).not.toBe( 0 );
+		expect( result.stderr ).toContain(
+			'The package tarball includes disallowed files:\n- src/index.js'
+		);
+	}
+);
+
+test( 'does not overmatch a similarly named path', () => {
 	const packageRoot = createPackage( {
 		files: {
-			'src/index.js': "export const value = 'ok';\n",
+			'src-other/index.js': "export const value = 'ok';\n",
 		},
 		packageJson: {
-			files: [ 'src' ],
-			exports: './src/index.js',
+			files: [ 'src-other' ],
+			exports: './src-other/index.js',
 		},
 	} );
 
 	const result = runValidator( packageRoot, [ '--disallow-path', 'src' ] );
 
-	expect( result.status ).not.toBe( 0 );
-	expect( result.stderr ).toContain(
-		'The package tarball includes disallowed files:\n- src/index.js'
-	);
+	expect( result.status ).toBe( 0 );
 } );
+
+test.each( [ '/src', '../src', 'src/../other', 'C:\\src' ] )(
+	'rejects unsafe disallowed path %s',
+	( disallowedPath ) => {
+		const packageRoot = createPackage( {
+			files: {
+				'index.js': "export const value = 'ok';\n",
+			},
+			packageJson: {
+				files: [ 'index.js' ],
+				exports: './index.js',
+			},
+		} );
+
+		const result = runValidator( packageRoot, [
+			'--disallow-path',
+			disallowedPath,
+		] );
+
+		expect( result.status ).not.toBe( 0 );
+		expect( result.stderr ).toContain(
+			'Usage: node tools/validation/validate-package-contents.mjs'
+		);
+	}
+);
 
 test( 'fails when an exported target is missing from the package', () => {
 	const packageRoot = createPackage( {
