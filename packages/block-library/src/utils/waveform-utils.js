@@ -588,8 +588,12 @@ export function initWaveformPlayer(
 		backgroundColor,
 		backgroundGradient,
 		textColor,
-		playButtonColor: waveformButtonColor,
-		playButtonGradient: waveformGradientValue,
+		playButtonColor: showPlayButtonArtwork
+			? undefined
+			: waveformButtonColor,
+		playButtonGradient: showPlayButtonArtwork
+			? undefined
+			: waveformGradientValue,
 	} );
 
 	// Set up event handlers.

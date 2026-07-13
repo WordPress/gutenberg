@@ -144,11 +144,20 @@ export function WaveformPlayer( {
 				backgroundColor,
 				backgroundGradient,
 				textColor,
-				playButtonColor: color,
-				playButtonGradient: gradient,
+				playButtonColor: showPlayButtonArtwork ? undefined : color,
+				playButtonGradient: showPlayButtonArtwork
+					? undefined
+					: gradient,
 			} );
 		}
-	}, [ backgroundColor, backgroundGradient, color, gradient, textColor ] );
+	}, [
+		backgroundColor,
+		backgroundGradient,
+		color,
+		gradient,
+		showPlayButtonArtwork,
+		textColor,
+	] );
 
 	const ref = useRefEffect(
 		( element ) => {
@@ -207,16 +216,16 @@ export function WaveformPlayer( {
 				playerDestroy?.();
 			};
 		},
-			[
-				onEndedEvent,
-				hasSrc,
-				waveformStyle,
-				color,
-				gradient,
-				textColor,
-				showPlayButtonArtwork,
-			]
-		);
+		[
+			onEndedEvent,
+			hasSrc,
+			waveformStyle,
+			color,
+			gradient,
+			textColor,
+			showPlayButtonArtwork,
+		]
+	);
 
 	useEffect( () => {
 		if ( playerRef.current?.instance ) {
