@@ -231,38 +231,13 @@ export function useTypewriter() {
 			return lastEditableNode === getActiveEditableElement();
 		}
 
-		/**
-		 * Calls the given listener for events targeting the node's
-		 * subtree, or a focused editing host containing the node, which
-		 * key events target instead of the node (`editableRoot`).
-		 *
-		 * @param {Function} listener Event listener.
-		 */
-		function withOwnedEvents( listener ) {
-			return ( event ) => {
-				const { target } = event;
-				if (
-					node.contains( target ) ||
-					( target.isContentEditable && target.contains( node ) )
-				) {
-					listener( event );
-				}
-			};
-		}
-
-		const onOwnedKeyDown = withOwnedEvents( onKeyDown );
-		const onOwnedKeyUp = withOwnedEvents( maintainCaretPosition );
-
 		// When the user scrolls or resizes, the scroll position should be
 		// reset.
 		defaultView.addEventListener( 'scroll', onScrollResize, true );
 		defaultView.addEventListener( 'resize', onScrollResize, true );
 
-		// Attached to the document: when a focused editing host containing
-		// the node holds the selection, key events target the host, an
-		// ancestor of the node, so they never reach a node-bound listener.
-		ownerDocument.addEventListener( 'keydown', onOwnedKeyDown );
-		ownerDocument.addEventListener( 'keyup', onOwnedKeyUp );
+		node.addEventListener( 'keydown', onKeyDown );
+		node.addEventListener( 'keyup', maintainCaretPosition );
 		node.addEventListener( 'mousedown', addSelectionChangeListener );
 		node.addEventListener( 'touchstart', addSelectionChangeListener );
 
@@ -270,8 +245,8 @@ export function useTypewriter() {
 			defaultView.removeEventListener( 'scroll', onScrollResize, true );
 			defaultView.removeEventListener( 'resize', onScrollResize, true );
 
-			ownerDocument.removeEventListener( 'keydown', onOwnedKeyDown );
-			ownerDocument.removeEventListener( 'keyup', onOwnedKeyUp );
+			node.removeEventListener( 'keydown', onKeyDown );
+			node.removeEventListener( 'keyup', maintainCaretPosition );
 			node.removeEventListener( 'mousedown', addSelectionChangeListener );
 			node.removeEventListener(
 				'touchstart',
