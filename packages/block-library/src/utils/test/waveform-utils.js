@@ -19,7 +19,6 @@ import {
 	getPlaylistPlaybackAction,
 	replayWaveformPlayerTrack,
 	setupPlaylistMetadata,
-	setupPlaylistControls,
 } from '../waveform-utils';
 
 // Base player data used across tests
@@ -615,131 +614,6 @@ describe( 'Waveform utilities', () => {
 				nextId: 'a',
 				playedIds: [ 'a', 'b' ],
 			} );
-		} );
-	} );
-
-	describe( 'setupPlaylistControls', () => {
-		const createContainer = () => {
-			const container = document.createElement( 'div' );
-			document.body.appendChild( container );
-			return container;
-		};
-
-		afterEach( () => {
-			document.body.innerHTML = '';
-		} );
-
-		it( 'sets aria-pressed on shuffle and repeat to match initial state', () => {
-			const container = createContainer();
-			setupPlaylistControls( container, {}, true, 'none' );
-
-			expect(
-				container.querySelector( '[aria-label="Shuffle"]' )
-			).toHaveAttribute( 'aria-pressed', 'true' );
-			expect(
-				container.querySelector( '[aria-label="Repeat off"]' )
-			).toHaveAttribute( 'aria-pressed', 'false' );
-			expect(
-				container.querySelector( '[aria-label="Repeat off"]' )
-			).toHaveAttribute( 'data-repeat-mode', 'none' );
-		} );
-
-		it( 'does not put aria-pressed on the prev/next action buttons', () => {
-			const container = createContainer();
-			setupPlaylistControls( container, {} );
-
-			expect(
-				container.querySelector( '[aria-label="Previous track"]' )
-			).not.toHaveAttribute( 'aria-pressed' );
-			expect(
-				container.querySelector( '[aria-label="Next track"]' )
-			).not.toHaveAttribute( 'aria-pressed' );
-		} );
-
-		it( 'groups action buttons before toggle buttons', () => {
-			const container = createContainer();
-			setupPlaylistControls( container, {} );
-
-			expect(
-				[
-					...container.querySelectorAll(
-						'.wp-block-playlist__control-btn'
-					),
-				].map( ( button ) => button.getAttribute( 'aria-label' ) )
-			).toEqual( [
-				'Previous track',
-				'Next track',
-				'Repeat off',
-				'Shuffle',
-			] );
-			expect(
-				container.querySelectorAll(
-					'.wp-block-playlist__controls-group'
-				)
-			).toHaveLength( 2 );
-		} );
-
-		it( 'toggles aria-pressed on shuffle click without using an is-active class', () => {
-			const container = createContainer();
-			const onShuffleToggle = jest.fn();
-			setupPlaylistControls( container, { onShuffleToggle } );
-
-			const shuffleBtn = container.querySelector(
-				'[aria-label="Shuffle"]'
-			);
-			expect( shuffleBtn ).toHaveAttribute( 'aria-pressed', 'false' );
-
-			shuffleBtn.click();
-			expect( shuffleBtn ).toHaveAttribute( 'aria-pressed', 'true' );
-			expect( onShuffleToggle ).toHaveBeenCalledTimes( 1 );
-
-			shuffleBtn.click();
-			expect( shuffleBtn ).toHaveAttribute( 'aria-pressed', 'false' );
-			expect( onShuffleToggle ).toHaveBeenCalledTimes( 2 );
-
-			// aria-pressed is the single source of truth; no is-active class.
-			expect( shuffleBtn ).not.toHaveClass( 'is-active' );
-		} );
-
-		it( 'cycles the repeat button through playlist, current-track, and off states', () => {
-			const container = createContainer();
-			const onRepeatToggle = jest.fn();
-			setupPlaylistControls( container, { onRepeatToggle } );
-
-			const repeatBtn = container.querySelector(
-				'[data-repeat-mode="none"]'
-			);
-			expect( repeatBtn ).toHaveAttribute( 'aria-label', 'Repeat off' );
-			expect( repeatBtn ).toHaveAttribute( 'aria-pressed', 'false' );
-			const repeatAllIcon = repeatBtn.innerHTML;
-
-			repeatBtn.click();
-			expect( repeatBtn ).toHaveAttribute(
-				'aria-label',
-				'Repeat playlist'
-			);
-			expect( repeatBtn ).toHaveAttribute( 'aria-pressed', 'true' );
-			expect( repeatBtn ).toHaveAttribute( 'data-repeat-mode', 'all' );
-			expect( repeatBtn.innerHTML ).toBe( repeatAllIcon );
-			expect( onRepeatToggle ).toHaveBeenLastCalledWith( 'all' );
-
-			repeatBtn.click();
-			expect( repeatBtn ).toHaveAttribute(
-				'aria-label',
-				'Repeat current track'
-			);
-			expect( repeatBtn ).toHaveAttribute( 'aria-pressed', 'true' );
-			expect( repeatBtn ).toHaveAttribute( 'data-repeat-mode', 'one' );
-			expect( repeatBtn.innerHTML ).not.toBe( repeatAllIcon );
-			expect( onRepeatToggle ).toHaveBeenLastCalledWith( 'one' );
-
-			repeatBtn.click();
-			expect( repeatBtn ).toHaveAttribute( 'aria-label', 'Repeat off' );
-			expect( repeatBtn ).toHaveAttribute( 'aria-pressed', 'false' );
-			expect( repeatBtn ).toHaveAttribute( 'data-repeat-mode', 'none' );
-			expect( repeatBtn.innerHTML ).toBe( repeatAllIcon );
-			expect( onRepeatToggle ).toHaveBeenLastCalledWith( 'none' );
-			expect( onRepeatToggle ).toHaveBeenCalledTimes( 3 );
 		} );
 	} );
 

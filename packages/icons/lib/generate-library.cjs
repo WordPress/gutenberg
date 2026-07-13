@@ -26,13 +26,6 @@ const { validateCollection } = require( './validate-collection.cjs' );
 const execFileAsync = promisify( execFile );
 
 const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
-const STRING_EXPORT_SVG_FILES = [
-	'next.svg',
-	'previous.svg',
-	'repeat.svg',
-	'repeat-all.svg',
-	'shuffle.svg',
-];
 
 /**
  * List of SVG attributes whose names need to be converted from kebab-case
@@ -124,7 +117,6 @@ async function main() {
 	await ensureSvgFilesTracked();
 	await cleanup();
 	await generateTsxFiles();
-	await generateStringExports();
 	await generateIndex();
 	await validateCollection();
 }
@@ -239,38 +231,6 @@ async function generateIndex() {
 	await writeFile( path.join( ICON_LIBRARY_DIR, 'index.ts' ), indexTemplate );
 }
 
-function svgFileToIdentifier( file ) {
-	return path
-		.basename( file, '.svg' )
-		.replace( /-([0-9A-Za-z])/g, ( _, c ) => c.toUpperCase() )
-		.replace( /Ltr\b/, 'LTR' )
-		.replace( /Rtl\b/, 'RTL' )
-		.replace( /Ne\b/, 'NE' );
-}
-
-function svgStringToTemplateLiteral( svgContent ) {
-	return svgContent.trim().replace( /`/g, '\\`' ).replace( /\$\{/g, '\\${' );
-}
-
-async function generateStringExports() {
-	const exports = await Promise.all(
-		STRING_EXPORT_SVG_FILES.map( async ( svgFile ) => {
-			const identifier = svgFileToIdentifier( svgFile );
-			const svgPath = path.join( ICON_LIBRARY_DIR, svgFile );
-			const svgContent = svgStringToTemplateLiteral(
-				await readFile( svgPath, 'utf8' )
-			);
-
-			return `export const ${ identifier }String = \`${ svgContent }\`;`;
-		} )
-	);
-
-	await writeFile(
-		path.join( ICON_LIBRARY_DIR, 'strings.ts' ),
-		exports.join( '\n' ) + '\n'
-	);
-}
-
 // "Transform" to TSX by interpolating the SVG source into a simple TS module
 // with a single default export.
 //
@@ -365,5 +325,4 @@ if ( module === require.main ) {
 
 module.exports = {
 	generateTsxFiles,
-	generateStringExports,
 };

@@ -6,7 +6,13 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	MediaPlaceholder,
@@ -28,7 +34,14 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, _x } from '@wordpress/i18n';
-import { playlist as icon } from '@wordpress/icons';
+import {
+	playlist as icon,
+	repeat,
+	repeatAll,
+	shuffle,
+	skipBack,
+	skipForward,
+} from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -39,6 +52,7 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { WaveformPlayer } from '../utils/waveform-player';
 import { PlaylistContext } from './context';
 import {
+	getNextRepeatMode,
 	getPlaylistPlaybackAction,
 	getPlayedTracksAfterTrackSelection,
 	replayWaveformPlayerTrack,
@@ -55,6 +69,83 @@ const WAVEFORM_STYLE_OPTIONS = [
 	{ label: _x( 'Dots', 'waveform style option' ), value: 'dots' },
 	{ label: _x( 'Seekbar', 'waveform style option' ), value: 'seekbar' },
 ];
+
+function PlaylistControlIcon( { icon: controlIcon } ) {
+	return (
+		<span className="wp-block-playlist__control-icon" aria-hidden="true">
+			{ controlIcon }
+		</span>
+	);
+}
+
+function PlaylistPlaybackControls( {
+	isShuffled,
+	repeatMode,
+	onPrev,
+	onNext,
+	onShuffleToggle,
+	onRepeatToggle,
+} ) {
+	let repeatLabel = __( 'Repeat off' );
+	let repeatIcon = repeatAll;
+
+	if ( repeatMode === 'all' ) {
+		repeatLabel = __( 'Repeat playlist' );
+	} else if ( repeatMode === 'one' ) {
+		repeatLabel = __( 'Repeat current track' );
+		repeatIcon = repeat;
+	}
+
+	return (
+		<div className="wp-block-playlist__controls">
+			<div className="wp-block-playlist__controls-group">
+				<button
+					type="button"
+					className="wp-block-playlist__control-btn"
+					aria-label={ __( 'Previous track' ) }
+					title={ __( 'Previous track' ) }
+					onClick={ onPrev }
+				>
+					<PlaylistControlIcon icon={ skipBack } />
+				</button>
+				<button
+					type="button"
+					className="wp-block-playlist__control-btn"
+					aria-label={ __( 'Next track' ) }
+					title={ __( 'Next track' ) }
+					onClick={ onNext }
+				>
+					<PlaylistControlIcon icon={ skipForward } />
+				</button>
+			</div>
+			<div className="wp-block-playlist__controls-group">
+				<button
+					type="button"
+					className="wp-block-playlist__control-btn"
+					aria-pressed={ repeatMode !== 'none' }
+					aria-label={ repeatLabel }
+					title={ repeatLabel }
+					data-repeat-mode={ repeatMode }
+					onClick={ () =>
+						onRepeatToggle( getNextRepeatMode( repeatMode ) )
+					}
+				>
+					<PlaylistControlIcon icon={ repeatIcon } />
+				</button>
+				<button
+					type="button"
+					className="wp-block-playlist__control-btn"
+					aria-pressed={ isShuffled }
+					aria-label={ __( 'Shuffle' ) }
+					title={ __( 'Shuffle' ) }
+					onClick={ onShuffleToggle }
+				>
+					<PlaylistControlIcon icon={ shuffle } />
+				</button>
+			</div>
+		</div>
+	);
+}
 
 const PlaylistEdit = ( {
 	attributes,
@@ -76,6 +167,7 @@ const PlaylistEdit = ( {
 
 	const [ isShuffled, setIsShuffled ] = useState( false );
 	const [ repeatMode, setRepeatMode ] = useState( 'none' );
+	const playerInstanceRef = useRef();
 	// Track IDs already played in the current shuffle cycle, so no track
 	// repeats until every other track has played once.
 	const [ playedTracks, setPlayedTracks ] = useState( [] );
@@ -222,31 +314,32 @@ const PlaylistEdit = ( {
 		}
 	}, [ currentTrackClientId, selectTrackClientId, tracks ] );
 
-	const onNext = useCallback(
-		( playerInstance ) => {
-			const { action, nextId, playedIds } = getPlaylistPlaybackAction(
-				tracks.map( ( track ) => track.clientId ),
-				currentTrackClientId,
-				{ repeatMode, isShuffled, playedTracks, isUserInitiated: true }
-			);
-			setPlayedTracks( playedIds );
-			if ( action === 'repeat' ) {
-				replayWaveformPlayerTrack( playerInstance );
-				return;
-			}
-			if ( nextId ) {
-				setCurrentTrackClientId( nextId );
-			}
-		},
-		[
+	const onNext = useCallback( () => {
+		const { action, nextId, playedIds } = getPlaylistPlaybackAction(
+			tracks.map( ( track ) => track.clientId ),
 			currentTrackClientId,
-			isShuffled,
-			playedTracks,
-			repeatMode,
-			setCurrentTrackClientId,
-			tracks,
-		]
-	);
+			{ repeatMode, isShuffled, playedTracks, isUserInitiated: true }
+		);
+		setPlayedTracks( playedIds );
+		if ( action === 'repeat' ) {
+			replayWaveformPlayerTrack( playerInstanceRef.current );
+			return;
+		}
+		if ( nextId ) {
+			setCurrentTrackClientId( nextId );
+		}
+	}, [
+		currentTrackClientId,
+		isShuffled,
+		playedTracks,
+		repeatMode,
+		setCurrentTrackClientId,
+		tracks,
+	] );
+
+	const onPlayerChange = useCallback( ( playerInstance ) => {
+		playerInstanceRef.current = playerInstance;
+	}, [] );
 
 	const onShuffleToggle = useCallback( () => {
 		setIsShuffled( ( prev ) => ! prev );
@@ -525,30 +618,41 @@ const PlaylistEdit = ( {
 			</InspectorControls>
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
-					<WaveformPlayer
-						src={ currentTrackData?.src }
-						title={ currentTrackData?.title }
-						artist={ currentTrackData?.artist }
-						image={
-							showImages !== false
-								? currentTrackData?.image
-								: undefined
-						}
-						imageAlt={
-							showImages !== false
-								? currentTrackData?.imageAlt
-								: undefined
-						}
-						waveformStyle={ waveformStyle }
-						onEnded={ onTrackEnded }
-						onPrev={ onPrev }
-						onNext={ onNext }
-						onShuffleToggle={ onShuffleToggle }
-						onRepeatToggle={ onRepeatToggle }
-						isShuffled={ isShuffled }
-						repeatMode={ repeatMode }
-						showControls={ showPlaybackControls !== false }
-					/>
+					<div
+						className={ clsx( 'wp-block-playlist__player', {
+							'has-playlist-controls':
+								showPlaybackControls !== false,
+						} ) }
+					>
+						<WaveformPlayer
+							src={ currentTrackData?.src }
+							title={ currentTrackData?.title }
+							artist={ currentTrackData?.artist }
+							image={
+								showImages !== false
+									? currentTrackData?.image
+									: undefined
+							}
+							imageAlt={
+								showImages !== false
+									? currentTrackData?.imageAlt
+									: undefined
+							}
+							waveformStyle={ waveformStyle }
+							onEnded={ onTrackEnded }
+							onPlayerChange={ onPlayerChange }
+						/>
+						{ showPlaybackControls !== false && (
+							<PlaylistPlaybackControls
+								isShuffled={ isShuffled }
+								repeatMode={ repeatMode }
+								onPrev={ onPrev }
+								onNext={ onNext }
+								onShuffleToggle={ onShuffleToggle }
+								onRepeatToggle={ onRepeatToggle }
+							/>
+						) }
+					</div>
 				</Disabled>
 				{ showTracklist && (
 					<ol

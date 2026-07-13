@@ -108,24 +108,49 @@ describe( 'WaveformPlayer', () => {
 				artist: 'Original Artist',
 				image: 'https://example.com/cover.jpg',
 				imageAlt: 'A bright abstract album cover',
-				showControls: true,
 			} )
 		);
 	} );
 
-	it( 'passes through hidden playlist controls', () => {
-		render( <WaveformPlayer { ...baseProps } showControls={ false } /> );
+	it( 'reports the player instance and clears it on cleanup', () => {
+		const onPlayerChange = jest.fn();
+		const { unmount } = render(
+			<WaveformPlayer
+				{ ...baseProps }
+				onPlayerChange={ onPlayerChange }
+			/>
+		);
 
 		act( () => {
 			jest.advanceTimersByTime( 100 );
 		} );
 
-		expect( initWaveformPlayer ).toHaveBeenCalledWith(
-			expect.anything(),
-			expect.objectContaining( {
-				showControls: false,
-			} )
+		const player = initWaveformPlayer.mock.results[ 0 ].value;
+		expect( onPlayerChange ).toHaveBeenCalledWith( player.instance );
+
+		unmount();
+
+		expect( onPlayerChange ).toHaveBeenLastCalledWith( undefined );
+		expect( player.destroy ).toHaveBeenCalled();
+	} );
+
+	it( 'does not recreate the player when the instance callback changes', () => {
+		const { rerender } = render(
+			<WaveformPlayer { ...baseProps } onPlayerChange={ () => {} } />
 		);
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		const player = initWaveformPlayer.mock.results[ 0 ].value;
+
+		rerender(
+			<WaveformPlayer { ...baseProps } onPlayerChange={ () => {} } />
+		);
+
+		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 1 );
+		expect( player.destroy ).not.toHaveBeenCalled();
 	} );
 
 	it( 'updates metadata on the live player without recreating it', () => {
@@ -160,20 +185,6 @@ describe( 'WaveformPlayer', () => {
 			'alt',
 			'A black and white portrait'
 		);
-	} );
-
-	it( 'passes the player instance through next callbacks', () => {
-		const onNext = jest.fn();
-		render( <WaveformPlayer { ...baseProps } onNext={ onNext } /> );
-
-		act( () => {
-			jest.advanceTimersByTime( 100 );
-		} );
-
-		const playerInstance = { id: 'player' };
-		initWaveformPlayer.mock.calls[ 0 ][ 1 ].onNext( playerInstance );
-
-		expect( onNext ).toHaveBeenCalledWith( playerInstance );
 	} );
 
 	it( 'recreates the player when the src changes', () => {

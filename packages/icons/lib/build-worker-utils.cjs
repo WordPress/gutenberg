@@ -8,10 +8,7 @@ const execFile = promisify( require( 'child_process' ).execFile );
 /**
  * Internal dependencies
  */
-const {
-	generateStringExports,
-	generateTsxFiles,
-} = require( './generate-library' );
+const { generateTsxFiles } = require( './generate-library' );
 
 const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
 
@@ -46,7 +43,6 @@ ${ FgRed }	npm run dev${ Reset }
 	}
 
 	await generateTsxFiles( [ path.basename( file ) ] );
-	await generateStringExports();
 	return true;
 }
 

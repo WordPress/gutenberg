@@ -3,12 +3,17 @@
 // Waveform player dimensions.
 $waveform-player-height: 120px;
 $playlist-control-size: 24px;
+$playlist-control-offset: 8px;
 
 .wp-block-playlist {
+	.wp-block-playlist__player {
+		position: relative;
+		margin: var( --wp--preset--spacing--20, 0.625em ) 0;
+	}
+
 	// Main waveform player container.
 	.wp-block-playlist__waveform-player {
 		width: 100%;
-		margin: var( --wp--preset--spacing--20, 0.625em ) 0;
 		position: relative;
 	}
 
@@ -73,11 +78,21 @@ $playlist-control-size: 24px;
 		align-items: flex-start;
 		// Span the play button width and separate action/toggle groups.
 		flex: 0 0 $waveform-player-height;
+		width: $waveform-player-height;
 		justify-content: space-between;
 		margin-block-start: max(
 			0px,
 			calc( ( 1.5em - $playlist-control-size ) / 2 + 2px )
 		);
+	}
+
+	.wp-block-playlist__player > .wp-block-playlist__controls {
+		position: absolute;
+		inset-block-start: calc(
+			$waveform-player-height + $playlist-control-offset
+		);
+		inset-inline-start: 0;
+		margin-block-start: 0;
 	}
 
 	.wp-block-playlist__controls-group {
@@ -142,6 +157,11 @@ $playlist-control-size: 24px;
 		}
 	}
 
+	.wp-block-playlist__player.has-playlist-controls
+		.wp-block-playlist__metadata {
+		margin-inline-start: calc( $waveform-player-height + 12px );
+	}
+
 	// Override WaveformPlayer's inline text colors to inherit from the block.
 	.wp-block-playlist__metadata {
 		display: flex;
@@ -149,7 +169,6 @@ $playlist-control-size: 24px;
 		align-items: center;
 		justify-content: center;
 		gap: 8px;
-		// Keep the track name from sitting too close to the controls.
 		margin-inline-start: 12px;
 		min-width: 0;
 

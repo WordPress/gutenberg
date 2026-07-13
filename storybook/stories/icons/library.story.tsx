@@ -17,7 +17,6 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToggleControl,
 } from '@wordpress/components';
-import { isValidElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,14 +24,7 @@ import { isValidElement } from '@wordpress/element';
 import * as iconsPackage from '@wordpress/icons';
 import manifest from '../../../packages/icons/src/manifest.json';
 
-const { Icon, ...availableIconExports } = iconsPackage;
-
-const availableIcons: Record< string, ReactElement > = Object.fromEntries(
-	Object.entries( availableIconExports ).filter(
-		( entry ): entry is [ string, ReactElement ] =>
-			isValidElement( entry[ 1 ] )
-	)
-);
+const { Icon, ...availableIcons } = iconsPackage;
 
 const keywords: Partial< Record< string, string[] > > = {
 	archive: [ 'folder' ],

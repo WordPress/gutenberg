@@ -10,17 +10,6 @@ import { colord } from 'colord';
 import WaveformPlayerLib from '@arraypress/waveform-player';
 
 /**
- * WordPress dependencies
- */
-import {
-	nextString,
-	previousString,
-	repeatAllString,
-	repeatString,
-	shuffleString,
-} from '@wordpress/icons';
-
-/**
  * Configuration constants.
  * Note: DEFAULT_WAVEFORM_HEIGHT should match $waveform-player-height in style.scss.
  */
@@ -434,6 +423,12 @@ function applyPlayerColors(
 		'--wp-playlist-active-icon-color',
 		colord( textColor ).isDark() ? '#ffffff' : '#000000'
 	);
+	container
+		.closest( '.wp-block-playlist' )
+		?.style.setProperty(
+			'--wp-playlist-active-icon-color',
+			colord( textColor ).isDark() ? '#ffffff' : '#000000'
+		);
 
 	const playBtn = container.querySelector( '.waveform-btn' );
 	if ( playBtn ) {
@@ -444,21 +439,6 @@ function applyPlayerColors(
 
 	instance.drawWaveform();
 }
-
-// These icons are decorative; the parent control button carries the accessible
-// label.
-function decorativeIconString( icon ) {
-	return icon.replace(
-		'<svg ',
-		'<svg aria-hidden="true" focusable="false" '
-	);
-}
-
-const ICON_PREV = decorativeIconString( previousString );
-const ICON_NEXT = decorativeIconString( nextString );
-const ICON_SHUFFLE = decorativeIconString( shuffleString );
-const ICON_REPEAT_ALL = decorativeIconString( repeatAllString );
-const ICON_REPEAT_ONE = decorativeIconString( repeatString );
 
 /**
  * Get or create the row displayed below the waveform.
@@ -574,178 +554,22 @@ export function setupPlaylistMetadata( container, instance ) {
 }
 
 /**
- * Create playlist control buttons (prev/next, repeat/shuffle) and insert
- * them into the waveform player container.
- *
- * @param {Element}  container                 - The waveform player container.
- * @param {Object}   callbacks                 - Button click callbacks.
- * @param {Function} callbacks.onPrev          - Called when previous is clicked.
- * @param {Function} callbacks.onNext          - Called when next is clicked.
- * @param {Function} callbacks.onShuffleToggle - Called when shuffle is toggled.
- * @param {Function} callbacks.onRepeatToggle  - Called when repeat is toggled.
- * @param {boolean}  isShuffled                - Initial shuffle state.
- * @param {string}   repeatMode                - Initial repeat mode.
- * @param {Object}   labels                    - Translated control labels.
- * @param {string}   labels.previous           - Label for the previous-track button.
- * @param {string}   labels.next               - Label for the next-track button.
- * @param {string}   labels.shuffle            - Label for the shuffle button.
- * @param {string}   labels.repeatOff          - Label for repeat-off state.
- * @param {string}   labels.repeatAll          - Label for repeat playlist state.
- * @param {string}   labels.repeatOne          - Label for repeat current track state.
- * @return {Object} Object with a cleanup function.
- */
-export function setupPlaylistControls(
-	container,
-	{ onPrev, onNext, onShuffleToggle, onRepeatToggle },
-	isShuffled = false,
-	repeatMode = REPEAT_MODE_NONE,
-	{
-		previous: previousLabel = 'Previous track',
-		next: nextLabel = 'Next track',
-		shuffle: shuffleLabel = 'Shuffle',
-		repeatOff: repeatOffLabel = 'Repeat off',
-		repeatAll: repeatAllLabel = 'Repeat playlist',
-		repeatOne: repeatOneLabel = 'Repeat current track',
-	} = {}
-) {
-	const doc = container.ownerDocument;
-	let currentRepeatMode = normalizeRepeatMode( repeatMode );
-	const getRepeatLabel = ( mode ) => {
-		if ( mode === REPEAT_MODE_ONE ) {
-			return repeatOneLabel;
-		}
-		if ( mode === REPEAT_MODE_ALL ) {
-			return repeatAllLabel;
-		}
-		return repeatOffLabel;
-	};
-	const controlsDiv = doc.createElement( 'div' );
-	controlsDiv.className = 'wp-block-playlist__controls';
-	const actionGroup = doc.createElement( 'div' );
-	actionGroup.className = 'wp-block-playlist__controls-group';
-	const toggleGroup = doc.createElement( 'div' );
-	toggleGroup.className = 'wp-block-playlist__controls-group';
-
-	const prevBtn = doc.createElement( 'button' );
-	prevBtn.type = 'button';
-	prevBtn.className = 'wp-block-playlist__control-btn';
-	prevBtn.setAttribute( 'aria-label', previousLabel );
-	prevBtn.setAttribute( 'title', previousLabel );
-	prevBtn.innerHTML = ICON_PREV;
-
-	// Shuffle and repeat carry aria-pressed for their on/off state. Repeat
-	// also carries data-repeat-mode because it has two pressed modes.
-	// Prev/next are momentary actions and get no aria-pressed.
-	const shuffleBtn = doc.createElement( 'button' );
-	shuffleBtn.type = 'button';
-	shuffleBtn.className = 'wp-block-playlist__control-btn';
-	shuffleBtn.setAttribute( 'aria-label', shuffleLabel );
-	shuffleBtn.setAttribute( 'title', shuffleLabel );
-	shuffleBtn.setAttribute( 'aria-pressed', String( isShuffled ) );
-	shuffleBtn.innerHTML = ICON_SHUFFLE;
-
-	const repeatBtn = doc.createElement( 'button' );
-	repeatBtn.type = 'button';
-	repeatBtn.className = 'wp-block-playlist__control-btn';
-	const updateRepeatButton = ( mode ) => {
-		currentRepeatMode = normalizeRepeatMode( mode );
-		const label = getRepeatLabel( currentRepeatMode );
-		repeatBtn.innerHTML =
-			currentRepeatMode === REPEAT_MODE_ONE
-				? ICON_REPEAT_ONE
-				: ICON_REPEAT_ALL;
-		repeatBtn.dataset.repeatMode = currentRepeatMode;
-		repeatBtn.setAttribute(
-			'aria-pressed',
-			String( currentRepeatMode !== REPEAT_MODE_NONE )
-		);
-		repeatBtn.setAttribute( 'aria-label', label );
-		repeatBtn.setAttribute( 'title', label );
-	};
-	updateRepeatButton( currentRepeatMode );
-
-	const nextBtn = doc.createElement( 'button' );
-	nextBtn.type = 'button';
-	nextBtn.className = 'wp-block-playlist__control-btn';
-	nextBtn.setAttribute( 'aria-label', nextLabel );
-	nextBtn.setAttribute( 'title', nextLabel );
-	nextBtn.innerHTML = ICON_NEXT;
-
-	actionGroup.appendChild( prevBtn );
-	actionGroup.appendChild( nextBtn );
-	toggleGroup.appendChild( repeatBtn );
-	toggleGroup.appendChild( shuffleBtn );
-	controlsDiv.appendChild( actionGroup );
-	controlsDiv.appendChild( toggleGroup );
-
-	// The library's container has tabindex="0" and focuses itself on click,
-	// which would steal keyboard focus from these controls. Stop the click
-	// from bubbling to it so focus stays on the button that was activated.
-	const onPrevClick = ( event ) => {
-		event.stopPropagation();
-		onPrev?.();
-	};
-	const onShuffleClick = ( event ) => {
-		event.stopPropagation();
-		const pressed = shuffleBtn.getAttribute( 'aria-pressed' ) !== 'true';
-		shuffleBtn.setAttribute( 'aria-pressed', String( pressed ) );
-		onShuffleToggle?.();
-	};
-	const onRepeatClick = ( event ) => {
-		event.stopPropagation();
-		const nextMode = getNextRepeatMode( repeatBtn.dataset.repeatMode );
-		updateRepeatButton( nextMode );
-		onRepeatToggle?.( nextMode );
-	};
-	const onNextClick = ( event ) => {
-		event.stopPropagation();
-		onNext?.();
-	};
-
-	prevBtn.addEventListener( 'click', onPrevClick );
-	shuffleBtn.addEventListener( 'click', onShuffleClick );
-	repeatBtn.addEventListener( 'click', onRepeatClick );
-	nextBtn.addEventListener( 'click', onNextClick );
-
-	const footerDiv = getPlaylistFooter( container );
-	footerDiv.prepend( controlsDiv );
-
-	return {
-		cleanup: () => {
-			prevBtn.removeEventListener( 'click', onPrevClick );
-			shuffleBtn.removeEventListener( 'click', onShuffleClick );
-			repeatBtn.removeEventListener( 'click', onRepeatClick );
-			nextBtn.removeEventListener( 'click', onNextClick );
-			controlsDiv.remove();
-			removeEmptyPlaylistFooter( footerDiv );
-		},
-	};
-}
-
-/**
  * Initialize a WaveformPlayer instance on an element.
  *
  * This is the shared core logic used by both the React component (editor)
  * and the Interactivity API (frontend).
  *
- * @param {Element}  element                 - The container element (must be in DOM).
- * @param {Object}   options                 - Configuration options.
- * @param {string}   options.src             - The audio file URL.
- * @param {string}   options.title           - The track title.
- * @param {string}   options.artist          - The artist name.
- * @param {string}   options.image           - The artwork image URL.
- * @param {string}   options.imageAlt        - The artwork image alt text.
- * @param {boolean}  options.autoPlay        - Whether to auto-play when ready.
- * @param {Function} options.onEnded         - Callback when track ends.
- * @param {Object}   options.labels          - Translated button labels.
- * @param {string}   options.waveformStyle   - Waveform style (bars, mirror, line, blocks, dots, seekbar).
- * @param {Function} options.onPrev          - Callback for previous track; receives the player instance.
- * @param {Function} options.onNext          - Callback for next track; receives the player instance.
- * @param {Function} options.onShuffleToggle - Callback for shuffle toggle.
- * @param {Function} options.onRepeatToggle  - Callback for repeat toggle.
- * @param {boolean}  options.isShuffled      - Initial shuffle state.
- * @param {string}   options.repeatMode      - Initial repeat mode.
- * @param {boolean}  options.showControls    - Whether to show playlist controls.
+ * @param {Element}  element               - The container element (must be in DOM).
+ * @param {Object}   options               - Configuration options.
+ * @param {string}   options.src           - The audio file URL.
+ * @param {string}   options.title         - The track title.
+ * @param {string}   options.artist        - The artist name.
+ * @param {string}   options.image         - The artwork image URL.
+ * @param {string}   options.imageAlt      - The artwork image alt text.
+ * @param {boolean}  options.autoPlay      - Whether to auto-play when ready.
+ * @param {Function} options.onEnded       - Callback when track ends.
+ * @param {Object}   options.labels        - Translated button labels.
+ * @param {string}   options.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
  * @return {Object} Object with instance, container, and destroy function.
  */
 export function initWaveformPlayer(
@@ -760,13 +584,6 @@ export function initWaveformPlayer(
 		onEnded,
 		labels,
 		waveformStyle,
-		onPrev,
-		onNext,
-		onShuffleToggle,
-		onRepeatToggle,
-		isShuffled,
-		repeatMode,
-		showControls = true,
 	}
 ) {
 	// Get colors from computed styles.
@@ -798,7 +615,6 @@ export function initWaveformPlayer(
 
 	// Set up event handlers.
 	let cleanupAccessibility;
-	let cleanupControls;
 	let cleanupMetadata;
 	let endedTimeoutId;
 	const handlers = {
@@ -813,26 +629,6 @@ export function initWaveformPlayer(
 				container,
 				labels
 			);
-
-			// Set up playlist controls if callbacks are provided.
-			if (
-				showControls &&
-				( onPrev || onNext || onShuffleToggle || onRepeatToggle )
-			) {
-				const controls = setupPlaylistControls(
-					container,
-					{
-						onPrev: () => onPrev?.( instance ),
-						onNext: () => onNext?.( instance ),
-						onShuffleToggle,
-						onRepeatToggle,
-					},
-					isShuffled,
-					repeatMode,
-					labels
-				);
-				cleanupControls = controls.cleanup;
-			}
 
 			if ( autoPlay ) {
 				instance.play()?.catch( logPlayError );
@@ -861,7 +657,6 @@ export function initWaveformPlayer(
 		container,
 		destroy: () => {
 			cleanupAccessibility?.();
-			cleanupControls?.();
 			cleanupMetadata?.();
 			if ( endedTimeoutId !== undefined ) {
 				container.ownerDocument.defaultView.clearTimeout(

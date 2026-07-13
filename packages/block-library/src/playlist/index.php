@@ -21,6 +21,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$playlist_tracks = array();
 	$tracks_data     = array();
 	$show_images     = $attributes['showImages'] ?? true;
+	$show_controls   = $attributes['showPlaybackControls'] ?? true;
 
 	// Parse inner blocks to extract track data.
 	// This approach avoids duplicating track data in the HTML output.
@@ -90,7 +91,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 		)
 	);
 
-	// Add waveform player container with translated button labels.
+	// Add waveform player and playlist control containers with translated labels.
 	$label_play  = esc_attr__( 'Play' );
 	$label_pause = esc_attr__( 'Pause' );
 	$label_seek  = esc_attr__( 'Seek' );
@@ -105,21 +106,26 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$label_repeat_off = esc_attr__( 'Repeat off' );
 	$label_repeat_all = esc_attr__( 'Repeat playlist' );
 	$label_repeat_one = esc_attr__( 'Repeat current track' );
-	$html             = '<div class="wp-block-playlist__waveform-player"
+	$player_class     = $show_controls ? 'wp-block-playlist__player has-playlist-controls' : 'wp-block-playlist__player';
+	$player_html      = '<div class="wp-block-playlist__waveform-player"
 			data-wp-watch="callbacks.initWaveformPlayer"
 			data-label-play="' . $label_play . '"
 			data-label-pause="' . $label_pause . '"
 			data-label-seek="' . $label_seek . '"
 			data-label-seek-value="' . $label_seek_value . '"
+		></div>';
+	$controls_html    = $show_controls ? '<div class="wp-block-playlist__controls"
+			data-wp-watch="callbacks.initPlaylistControls"
 			data-label-previous="' . $label_previous . '"
 			data-label-next="' . $label_next . '"
 			data-label-shuffle="' . $label_shuffle . '"
 			data-label-repeat-off="' . $label_repeat_off . '"
 			data-label-repeat-all="' . $label_repeat_all . '"
 			data-label-repeat-one="' . $label_repeat_one . '"
-		></div>';
+		></div>' : '';
+	$html             = '<div class="' . $player_class . '">' . $player_html . $controls_html . '</div>';
 
-	// Add the waveform player container inside the figure.
+	// Add the waveform player wrapper inside the figure.
 	$figure = null;
 	preg_match( '/<figure[^>]*>/', $content, $figure );
 	if ( ! empty( $figure[0] ) ) {
@@ -143,7 +149,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				'isShuffled'            => false,
 				'repeatMode'            => 'none',
 				'playedTracks'          => array(),
-				'showPlaybackControls'  => $attributes['showPlaybackControls'] ?? true,
+				'showPlaybackControls'  => $show_controls,
 				'labelPauseTrack'       => __( 'Pause' ),
 				'labelSelectTrack'      => __( 'Play' ),
 			)

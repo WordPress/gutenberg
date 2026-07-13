@@ -50,24 +50,18 @@ function updatePlayerMetadata( instance, { title, artist, image, imageAlt } ) {
 /**
  * A reusable WaveformPlayer component for the block editor.
  *
- * Renders an audio waveform with play/pause and prev/shuffle/repeat/next
- * controls. Automatically inherits colors from the parent block's text color.
+ * Renders an audio waveform with play/pause. Automatically inherits colors
+ * from the parent block's text color.
  *
- * @param {Object}   props                 - Component props.
- * @param {string}   props.src             - The audio file URL.
- * @param {string}   props.title           - The track title.
- * @param {string}   props.artist          - The artist name.
- * @param {string}   props.image           - The artwork image URL.
- * @param {string}   props.imageAlt        - The artwork image alt text.
- * @param {string}   props.waveformStyle   - Waveform style (bars, mirror, etc).
- * @param {Function} props.onEnded         - Callback when the track finishes playing.
- * @param {Function} props.onPrev          - Callback for previous track.
- * @param {Function} props.onNext          - Callback for next track; receives the player instance.
- * @param {Function} props.onShuffleToggle - Callback for shuffle toggle.
- * @param {Function} props.onRepeatToggle  - Callback for repeat toggle.
- * @param {boolean}  props.isShuffled      - Whether shuffle is active.
- * @param {string}   props.repeatMode      - Current repeat mode.
- * @param {boolean}  props.showControls    - Whether to show playlist controls.
+ * @param {Object}   props                - Component props.
+ * @param {string}   props.src            - The audio file URL.
+ * @param {string}   props.title          - The track title.
+ * @param {string}   props.artist         - The artist name.
+ * @param {string}   props.image          - The artwork image URL.
+ * @param {string}   props.imageAlt       - The artwork image alt text.
+ * @param {string}   props.waveformStyle  - Waveform style (bars, mirror, etc).
+ * @param {Function} props.onEnded        - Callback when the track finishes playing.
+ * @param {Function} props.onPlayerChange - Callback when the live player instance changes.
  * @return {Element} The WaveformPlayer element.
  */
 export function WaveformPlayer( {
@@ -78,13 +72,7 @@ export function WaveformPlayer( {
 	imageAlt,
 	waveformStyle,
 	onEnded,
-	onPrev,
-	onNext,
-	onShuffleToggle,
-	onRepeatToggle,
-	isShuffled,
-	repeatMode,
-	showControls = true,
+	onPlayerChange,
 } ) {
 	// Store onEnded in a stable callback so it doesn't need to be a useRefEffect dependency.
 	// The callback changes reference on every render (its dependency chain
@@ -92,6 +80,9 @@ export function WaveformPlayer( {
 	// and recreate the entire player on every re-render, making it disappear
 	// during editor resizes.
 	const onEndedEvent = useEvent( onEnded );
+	const onPlayerChangeEvent = useEvent( ( playerInstance ) =>
+		onPlayerChange?.( playerInstance )
+	);
 	const metadataRef = useRef( { title, artist, image, imageAlt } );
 	const playerRef = useRef();
 
@@ -118,21 +109,6 @@ export function WaveformPlayer( {
 			} );
 		}
 	}, [ title, artist, image, imageAlt ] );
-
-	// Wrap callbacks and state reads in stable event handlers so the player
-	// isn't recreated when they change, while always seeing the latest value.
-	const onPrevEvent = useEvent( ( playerInstance ) =>
-		onPrev?.( playerInstance )
-	);
-	const onNextEvent = useEvent( ( playerInstance ) =>
-		onNext?.( playerInstance )
-	);
-	const onShuffleToggleEvent = useEvent( () => onShuffleToggle?.() );
-	const onRepeatToggleEvent = useEvent( ( nextMode ) =>
-		onRepeatToggle?.( nextMode )
-	);
-	const getIsShuffled = useEvent( () => isShuffled );
-	const getRepeatMode = useEvent( () => repeatMode );
 
 	const ref = useRefEffect(
 		( element ) => {
@@ -162,24 +138,12 @@ export function WaveformPlayer( {
 							'%1$s of %2$s',
 							'audio current time of total duration'
 						),
-						previous: __( 'Previous track' ),
-						next: __( 'Next track' ),
-						shuffle: __( 'Shuffle' ),
-						repeatOff: __( 'Repeat off' ),
-						repeatAll: __( 'Repeat playlist' ),
-						repeatOne: __( 'Repeat current track' ),
 					},
 					artist: metadata.artist || EMPTY_ARTIST_PLACEHOLDER,
 					onEnded: onEndedEvent,
-					onPrev: onPrevEvent,
-					onNext: onNextEvent,
-					onShuffleToggle: onShuffleToggleEvent,
-					onRepeatToggle: onRepeatToggleEvent,
-					isShuffled: getIsShuffled(),
-					repeatMode: getRepeatMode(),
-					showControls,
 				} );
 				playerRef.current = player;
+				onPlayerChangeEvent?.( player.instance );
 				updatePlayerMetadata( player.instance, metadata );
 				const { destroy } = player;
 				playerDestroy = destroy;
@@ -198,22 +162,11 @@ export function WaveformPlayer( {
 				cancelled = true;
 				clearTimeout( timeoutId );
 				playerRef.current = undefined;
+				onPlayerChangeEvent?.( undefined );
 				playerDestroy?.();
 			};
 		},
-		[
-			onEndedEvent,
-			onPrevEvent,
-			onNextEvent,
-			onShuffleToggleEvent,
-			onRepeatToggleEvent,
-			getIsShuffled,
-			getRepeatMode,
-			src,
-			waveformStyle,
-			hasImage,
-			showControls,
-		]
+		[ onEndedEvent, onPlayerChangeEvent, src, waveformStyle, hasImage ]
 	);
 
 	return (
