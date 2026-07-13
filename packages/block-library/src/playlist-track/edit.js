@@ -78,7 +78,7 @@ const PlaylistTrackEdit = ( {
 	] );
 
 	useUploadMediaFromBlobURL( {
-		src: temporaryURL,
+		url: temporaryURL,
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectTrack,
 		onError: onUploadError,

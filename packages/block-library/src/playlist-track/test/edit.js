@@ -13,6 +13,7 @@ import { useDispatch } from '@wordpress/data';
  */
 import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
+import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 jest.mock( '@wordpress/block-editor', () => ( {
 	BlockControls: ( { children } ) => <div>{ children }</div>,
@@ -104,6 +105,7 @@ describe( 'PlaylistTrackEdit', () => {
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
 		} );
+		useUploadMediaFromBlobURL.mockClear();
 	} );
 
 	it( 'allows the track image alternative text to be edited', () => {
@@ -165,5 +167,20 @@ describe( 'PlaylistTrackEdit', () => {
 		} );
 
 		expect( setCurrentTrackClientId ).not.toHaveBeenCalled();
+	} );
+
+	it( 'uploads temporary blob tracks', () => {
+		renderEdit( {
+			attributes: {
+				blob: 'blob:https://example.com/temporary-track',
+				src: undefined,
+			},
+		} );
+
+		expect( useUploadMediaFromBlobURL ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: 'blob:https://example.com/temporary-track',
+			} )
+		);
 	} );
 } );

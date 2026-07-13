@@ -31,6 +31,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __, _x } from '@wordpress/i18n';
 import { playlist as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
+import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -42,7 +43,10 @@ import { PlaylistContext } from './context';
 import { getTrackAttributes } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+const AUDIO_FILE_EXTENSION =
+	/\.(aac|aif|aiff|flac|m4a|m4b|mp3|oga|ogg|opus|wav|weba)$/i;
 const DEFAULT_WAVEFORM_STYLE = 'bars';
+const FILE_LIST_OBJECT_NAME = '[object FileList]';
 const WAVEFORM_STYLE_OPTIONS = [
 	{ label: _x( 'Bars', 'waveform style option' ), value: 'bars' },
 	{ label: _x( 'Mirror', 'waveform style option' ), value: 'mirror' },
@@ -51,6 +55,23 @@ const WAVEFORM_STYLE_OPTIONS = [
 	{ label: _x( 'Dots', 'waveform style option' ), value: 'dots' },
 	{ label: _x( 'Seekbar', 'waveform style option' ), value: 'seekbar' },
 ];
+
+function isFile( value ) {
+	return (
+		Object.prototype.toString.call( value ) === '[object File]' ||
+		( typeof File !== 'undefined' && value instanceof File )
+	);
+}
+
+function isAudioFile( file ) {
+	return file.type
+		? file.type.startsWith( 'audio/' )
+		: AUDIO_FILE_EXTENSION.test( file.name );
+}
+
+function getTrackIdentifier( track ) {
+	return track.id ?? track.src ?? track.blob;
+}
 
 const PlaylistEdit = ( {
 	attributes,
@@ -102,9 +123,12 @@ const PlaylistEdit = ( {
 	const waveformBackgroundGradientValue = waveformBackgroundGradient;
 	let waveformColorGradientChange;
 	let waveformBackgroundColorGradientChange;
-	function onUploadError( message ) {
-		createErrorNotice( message, { type: 'snackbar' } );
-	}
+	const onUploadError = useCallback(
+		( message ) => {
+			createErrorNotice( message, { type: 'snackbar' } );
+		},
+		[ createErrorNotice ]
+	);
 	const [ currentTrackClientId, setCurrentTrackClientId ] = useState( null );
 
 	const { innerBlockTracks } = useSelect(
@@ -156,18 +180,55 @@ const PlaylistEdit = ( {
 		[ currentTrackClientId, setCurrentTrackClientId ]
 	);
 
-	const createTrackBlocks = useCallback( ( media ) => {
-		if ( ! media ) {
-			return [];
-		}
+	const createTrackBlocks = useCallback(
+		( media ) => {
+			if ( ! media ) {
+				return [];
+			}
 
-		const mediaItems = Array.isArray( media ) ? media : [ media ];
+			let mediaItems = [ media ];
+			if (
+				Object.prototype.toString.call( media ) ===
+				FILE_LIST_OBJECT_NAME
+			) {
+				mediaItems = Array.from( media );
+			} else if ( Array.isArray( media ) ) {
+				mediaItems = media;
+			}
+			let hasInvalidFile = false;
 
-		return mediaItems
-			.map( getTrackAttributes )
-			.filter( ( track ) => !! track.src )
-			.map( ( track ) => createBlock( 'core/playlist-track', track ) );
-	}, [] );
+			const blocks = mediaItems
+				.map( ( mediaItem ) => {
+					if ( isFile( mediaItem ) ) {
+						if ( ! isAudioFile( mediaItem ) ) {
+							hasInvalidFile = true;
+							return null;
+						}
+
+						return createBlock( 'core/playlist-track', {
+							blob: createBlobURL( mediaItem ),
+							title: mediaItem.name,
+						} );
+					}
+
+					const track = getTrackAttributes( mediaItem );
+
+					return track.src
+						? createBlock( 'core/playlist-track', track )
+						: null;
+				} )
+				.filter( Boolean );
+
+			if ( hasInvalidFile ) {
+				onUploadError(
+					__( 'Only audio files can be added to a playlist.' )
+				);
+			}
+
+			return blocks;
+		},
+		[ onUploadError ]
+	);
 
 	const onSelectTracks = useCallback(
 		( media ) => {
@@ -191,10 +252,13 @@ const PlaylistEdit = ( {
 	const onAddTracks = useCallback(
 		( media ) => {
 			const existingIds = new Set(
-				validTracks.map( ( block ) => block.attributes.id )
+				validTracks
+					.map( ( block ) => getTrackIdentifier( block.attributes ) )
+					.filter( Boolean )
 			);
 			const newBlocks = createTrackBlocks( media ).filter(
-				( block ) => ! existingIds.has( block.attributes.id )
+				( block ) =>
+					! existingIds.has( getTrackIdentifier( block.attributes ) )
 			);
 			if ( newBlocks.length === 0 ) {
 				return;
@@ -405,6 +469,7 @@ const PlaylistEdit = ( {
 					onSelect={ onSelectTracks }
 					accept="audio/*"
 					multiple
+					handleUpload={ false }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
 				/>
@@ -420,6 +485,7 @@ const PlaylistEdit = ( {
 					onSelect={ onSelectTracks }
 					accept="audio/*"
 					multiple
+					handleUpload={ false }
 					mediaIds={ tracks
 						.filter( ( track ) => track.id )
 						.map( ( track ) => track.id ) }
@@ -431,6 +497,7 @@ const PlaylistEdit = ( {
 					onSelect={ onAddTracks }
 					accept="audio/*"
 					multiple
+					handleUpload={ false }
 					mediaIds={ tracks
 						.filter( ( track ) => track.id )
 						.map( ( track ) => track.id ) }
@@ -624,6 +691,15 @@ const PlaylistEdit = ( {
 				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
+				<MediaPlaceholder
+					onSelect={ onAddTracks }
+					accept="audio/*"
+					multiple
+					handleUpload={ false }
+					disableMediaButtons
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					onError={ onUploadError }
+				/>
 				<Disabled isDisabled={ ! isSelected }>
 					<WaveformPlayer
 						src={ currentTrackData?.src }
