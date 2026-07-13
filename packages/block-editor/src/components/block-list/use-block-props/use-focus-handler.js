@@ -22,7 +22,12 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
  * @param {string} clientId Block client ID.
  */
 export function useFocusHandler( clientId ) {
-	const { isBlockSelected } = useSelect( blockEditorStore );
+	const {
+		isBlockSelected,
+		isBlockMultiSelected,
+		getBlockParents,
+		getSelectedBlockClientId,
+	} = useSelect( blockEditorStore );
 	const { selectBlock, selectionChange } = useDispatch( blockEditorStore );
 
 	return useRefEffect(
@@ -43,6 +48,29 @@ export function useFocusHandler( clientId ) {
 					if ( ! event.target.isContentEditable ) {
 						selectionChange( clientId );
 					}
+					return;
+				}
+
+				// Focus landing on an ancestor of the selected block must
+				// not steal the selection from its descendant. When a
+				// shift+click extends the selection within a container, the
+				// browser focuses the common editable ancestor of the range,
+				// e.g. a group block; selecting it would re-render mid
+				// gesture and destroy the native selection being made.
+				if (
+					getBlockParents( getSelectedBlockClientId() ).includes(
+						clientId
+					)
+				) {
+					return;
+				}
+
+				// A block that is part of the current multi-selection must
+				// not collapse it. Focus can land on the clicked block after
+				// the multi-selection was built: the focus event of a
+				// shift+click is not ordered consistently against its
+				// mouseup across browsers.
+				if ( isBlockMultiSelected( clientId ) ) {
 					return;
 				}
 
