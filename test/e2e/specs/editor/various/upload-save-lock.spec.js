@@ -42,6 +42,40 @@ async function createTempImage() {
 	return tmpFileName;
 }
 
+/**
+ * Whether the client-side media processing pipeline is the active upload path.
+ *
+ * The hard save lock only applies to the legacy (server-side) upload path;
+ * under CSM the durable upload queue makes saving mid-upload safe and keeps
+ * the save buttons available.
+ *
+ * @param {import('@playwright/test').Page} page Playwright page.
+ * @return {Promise<boolean>} True when CSM handles uploads.
+ */
+async function isClientSideMediaActive( page ) {
+	return await page.evaluate( () => {
+		if ( ! window.__clientSideMediaProcessing ) {
+			return false;
+		}
+		if (
+			window.wp?.uploadMedia &&
+			typeof window.wp.uploadMedia.isClientSideMediaSupported ===
+				'function'
+		) {
+			return window.wp.uploadMedia.isClientSideMediaSupported();
+		}
+		return (
+			window.crossOriginIsolated === true &&
+			typeof SharedArrayBuffer !== 'undefined' &&
+			typeof WebAssembly !== 'undefined' &&
+			typeof Worker !== 'undefined'
+		);
+	} );
+}
+
+const LEGACY_LOCK_SKIP_REASON =
+	'The durable upload queue keeps saving available during CSM uploads; the hard lock only applies to the legacy upload path.';
+
 test.describe( 'Upload save lock', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
@@ -59,10 +93,90 @@ test.describe( 'Upload save lock', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
+	test( 'keeps Save draft available during an upload when the durable queue is active', async ( {
+		editor,
+		page,
+	} ) => {
+		test.skip(
+			! ( await isClientSideMediaActive( page ) ),
+			'Requires client-side media processing'
+		);
+
+		const saveDraftButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save draft' } );
+
+		await expect( saveDraftButton ).toBeEnabled();
+
+		// Hold the upload request so the upload stays in flight.
+		let resolveUpload;
+		const uploadPromise = new Promise( ( resolve ) => {
+			resolveUpload = resolve;
+		} );
+		await page.route( isMediaURL, async ( route ) => {
+			if ( route.request().method() !== 'POST' ) {
+				return route.fallback();
+			}
+			await uploadPromise;
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		const tmpFile = await createTempImage();
+		await imageBlock
+			.locator( 'data-testid=form-file-upload-input' )
+			.setInputFiles( tmpFile );
+
+		// The upload is in flight...
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data.select( 'core/upload-media' ).getItems()
+							.length
+				)
+			)
+			.toBeGreaterThan( 0 );
+
+		// ...yet saving stays unlocked and available.
+		expect(
+			await page.evaluate( () =>
+				window.wp.data.select( 'core/editor' ).isPostSavingLocked()
+			)
+		).toBe( false );
+		await expect( saveDraftButton ).toBeEnabled();
+
+		// Saving mid-upload serializes the durable uploadId marker so the
+		// upload can be reconnected to the block after a reload.
+		await editor.saveDraft();
+		const savedContent = await page.evaluate(
+			() =>
+				window.wp.data.select( 'core/editor' ).getCurrentPost().content
+		);
+		expect( savedContent ).toContain( '"uploadId":' );
+
+		// Clean up: let the upload complete.
+		resolveUpload();
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+	} );
+
 	test( 'should disable Save draft button during a single image upload', async ( {
 		editor,
 		page,
 	} ) => {
+		test.skip(
+			await isClientSideMediaActive( page ),
+			LEGACY_LOCK_SKIP_REASON
+		);
+
 		const saveDraftButton = page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Save draft' } );
@@ -128,6 +242,11 @@ test.describe( 'Upload save lock', () => {
 		editor,
 		page,
 	} ) => {
+		test.skip(
+			await isClientSideMediaActive( page ),
+			LEGACY_LOCK_SKIP_REASON
+		);
+
 		const saveDraftButton = page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Save draft' } );
@@ -199,6 +318,11 @@ test.describe( 'Upload save lock', () => {
 		editor,
 		page,
 	} ) => {
+		test.skip(
+			await isClientSideMediaActive( page ),
+			LEGACY_LOCK_SKIP_REASON
+		);
+
 		const publishButton = page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Publish', exact: true } );
@@ -265,6 +389,11 @@ test.describe( 'Upload save lock', () => {
 		page,
 		pageUtils,
 	} ) => {
+		test.skip(
+			await isClientSideMediaActive( page ),
+			LEGACY_LOCK_SKIP_REASON
+		);
+
 		// Save the post first so we can detect that Ctrl+S doesn't save during upload.
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
@@ -339,6 +468,11 @@ test.describe( 'Upload save lock', () => {
 		editor,
 		page,
 	} ) => {
+		test.skip(
+			await isClientSideMediaActive( page ),
+			LEGACY_LOCK_SKIP_REASON
+		);
+
 		const saveDraftButton = page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Save draft' } );
