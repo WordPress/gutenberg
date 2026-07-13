@@ -56,7 +56,7 @@ function PosterGrid( { items }: { items: typeof data } ) {
 								margin: '0 0 4px',
 								fontSize: '18px',
 								fontWeight:
-									'var(--wpds-typography-font-weight-semibold)',
+									'var(--wpds-typography-font-weight-emphasis)',
 								textShadow: '0 1px 2px rgba(0,0,0,0.5)',
 							} }
 						>

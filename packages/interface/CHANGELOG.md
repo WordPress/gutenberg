@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `ComplementaryArea`: Use the semibold font-weight variable for headings ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   `ComplementaryArea`: Use the emphasis font-weight token for headings ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 

@@ -60,7 +60,7 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 								padding: '8px 4px',
 								fontSize: 11,
 								fontWeight:
-									'var(--wpds-typography-font-weight-semibold)',
+									'var(--wpds-typography-font-weight-emphasis)',
 								color: ramps[ 0 ].ramp.fgSurface4,
 							} }
 						>
@@ -98,7 +98,7 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 											width: '100%',
 											fontSize: 8,
 											fontWeight:
-												'var(--wpds-typography-font-weight-semibold)',
+												'var(--wpds-typography-font-weight-emphasis)',
 											color:
 												tokenName === 'surface2'
 													? ramp.fgSurface4

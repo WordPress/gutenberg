@@ -16,7 +16,7 @@ export function useHeading(
 		level = 2,
 		color = COLORS.theme.foreground,
 		isBlock = true,
-		weight = CONFIG.fontWeightSemibold as React.CSSProperties[ 'fontWeight' ],
+		weight = CONFIG.fontWeightEmphasis as React.CSSProperties[ 'fontWeight' ],
 		...otherProps
 	} = useContextSystem( props, 'Heading' );
 

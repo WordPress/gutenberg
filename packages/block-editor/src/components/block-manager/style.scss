@@ -21,7 +21,7 @@
 	z-index: 1;
 
 	.components-checkbox-control__label {
-		font-weight: $font-weight-semibold;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 	}
 }
 

@@ -40,8 +40,9 @@ export const FONT_SIZE_X_SMALL = '11px';
 // _font.scss — $font-size-medium
 export const FONT_SIZE_MEDIUM = '13px';
 
-// _variables.scss — $font-weight-semibold
-export const FONT_WEIGHT_SEMIBOLD = '600';
+// @wordpress/theme — --wpds-typography-font-weight-emphasis
+export const FONT_WEIGHT_EMPHASIS =
+	'var(--wpds-typography-font-weight-emphasis)';
 
 // _font.scss — $font-line-height-small
 export const FONT_LINE_HEIGHT_SMALL = '20px';

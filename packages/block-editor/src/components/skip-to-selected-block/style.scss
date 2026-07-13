@@ -1,4 +1,3 @@
-@use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/z-index" as *;
 
 .block-editor-skip-to-selected-block {
@@ -7,7 +6,7 @@
 
 	&:focus {
 		font-size: 14px;
-		font-weight: $font-weight-semibold;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		background: #f1f1f1;
 		z-index: z-index(".skip-to-selected-block");
 	}

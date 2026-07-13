@@ -34,7 +34,7 @@ export const GroupLabel = forwardRef<
 					upperCase
 					variant="muted"
 					size="11px"
-					weight={ CONFIG.fontWeightSemibold }
+					weight={ CONFIG.fontWeightEmphasis }
 					lineHeight="16px"
 				/>
 			}

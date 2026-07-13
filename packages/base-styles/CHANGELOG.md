@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add `$font-weight-semibold` while retaining `$font-weight-medium` for backwards compatibility, and align the legacy font-family variables with the `@wordpress/theme` typography tokens ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Retain `$font-weight-regular` and `$font-weight-medium` for backwards compatibility while migrating repository styles to the semantic `@wordpress/theme` font-weight tokens, and align the legacy font-family variables with the theme typography tokens ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Add `outset-ring__focus` mixin for outline-based focus rings using `--wpds-*` design tokens ([#78698](https://github.com/WordPress/gutenberg/pull/78698), [#80082](https://github.com/WordPress/gutenberg/pull/80082)).
 
 ## 10.2.0 (2026-07-01)
