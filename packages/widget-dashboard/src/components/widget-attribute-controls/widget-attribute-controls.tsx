@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useCallback, useMemo } from '@wordpress/element';
+import { Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
@@ -37,14 +38,15 @@ type WidgetAttributeControlsProps = {
 
 /**
  * Normal-mode controls: the `relevance: 'high'` attributes on a prominent
- * surface, plus a settings entry point when needed. Inline controls appear
- * only for the high-relevance fields; edits stage live and auto-save on the
- * dashboard's shared debounce.
+ * surface, plus a settings entry point when needed.
  *
- * The inline presentation holds only while it fits the header. When its
- * natural width exceeds the space the header can grant, the fields collapse
- * behind the settings trigger, whose dropdown holds them as a form; the
- * inline controls stay mounted, hidden and inert, so the fit keeps being
+ * Inline controls appear only for the high-relevance fields; edits stage live
+ * and auto-save on the dashboard's shared debounce.
+ *
+ * The inline presentation holds only while it fits the header.
+ * When its natural width exceeds the space the header can grant, the fields
+ * collapse behind the settings trigger, whose dropdown holds them as a form;
+ * the inline controls stay mounted, hidden and inert, so the fit keeps being
  * measured and the presentation can expand back.
  *
  * @param {WidgetAttributeControlsProps} props Component props.
@@ -105,7 +107,10 @@ export function WidgetAttributeControls( {
 
 	return (
 		<>
-			<div
+			<Stack
+				direction="row"
+				align="center"
+				gap="xs"
 				ref={ measureRef }
 				className={ clsx(
 					styles[ 'inline-controls' ],
@@ -127,7 +132,7 @@ export function WidgetAttributeControls( {
 					widget={ widget }
 					widgetType={ widgetType }
 				/>
-			</div>
+			</Stack>
 
 			{ collapsed && (
 				<AttributeControlsDropdown

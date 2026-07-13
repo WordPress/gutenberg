@@ -1,7 +1,4 @@
 .inline-controls {
-	display: flex;
-	align-items: center;
-	gap: var(--wpds-dimension-gap-xs);
 	flex-shrink: 0;
 }
 
