@@ -31,8 +31,8 @@ interface WidgetSettingsToggle {
 /**
  * Shared open/close logic for an instance's settings surface. The surface is
  * mounted once at the dashboard root and reacts to the `uuid` written into
- * the UI context; any control (the gear trigger, the More dropdown entry)
- * drives it through this hook.
+ * the UI context; any control (the gear trigger, the settings dropdown
+ * entry) drives it through this hook.
  *
  * @param {DashboardWidget< unknown >} widget The instance whose settings surface the control drives.
  */

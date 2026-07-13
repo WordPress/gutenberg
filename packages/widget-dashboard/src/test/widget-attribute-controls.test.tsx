@@ -106,18 +106,24 @@ describe( 'WidgetAttributeControls fit', () => {
 	} );
 
 	it( 'keeps the inline controls while the header fits', async () => {
+		const user = userEvent.setup();
 		render( <Harness /> );
 		await screen.findByTestId( 'metric' );
 
-		expect(
+		// While everything fits, the gear opens the drawer directly.
+		await user.click(
 			screen.getByRole( 'button', { name: 'Widget settings' } )
+		);
+
+		expect(
+			await screen.findByRole( 'dialog', { name: 'Snapshot settings' } )
 		).toBeInTheDocument();
 		expect(
-			screen.queryByRole( 'button', { name: 'More options' } )
+			screen.queryByRole( 'dialog', { name: 'Widget settings' } )
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'collapses into the More dropdown when space runs out', async () => {
+	it( 'collapses behind the settings trigger when space runs out', async () => {
 		mockedUseInlineControlsFit.mockReturnValue( {
 			measureRef: () => {},
 			collapsed: true,
@@ -127,11 +133,11 @@ describe( 'WidgetAttributeControls fit', () => {
 		await screen.findByTestId( 'metric' );
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'More options' } )
+			screen.getByRole( 'button', { name: 'Widget settings' } )
 		);
 
 		const dialog = await screen.findByRole( 'dialog', {
-			name: 'Widget options',
+			name: 'Widget settings',
 		} );
 
 		// The high-relevance fields render as a labeled form…
@@ -157,10 +163,10 @@ describe( 'WidgetAttributeControls fit', () => {
 		await screen.findByTestId( 'metric' );
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'More options' } )
+			screen.getByRole( 'button', { name: 'Widget settings' } )
 		);
 		const dialog = await screen.findByRole( 'dialog', {
-			name: 'Widget options',
+			name: 'Widget settings',
 		} );
 
 		await user.selectOptions(
@@ -171,7 +177,7 @@ describe( 'WidgetAttributeControls fit', () => {
 		expect( screen.getByTestId( 'metric' ) ).toHaveTextContent( 'orders' );
 	} );
 
-	it( 'reaches the settings surface from the More dropdown', async () => {
+	it( 'reaches the settings surface from the dropdown', async () => {
 		mockedUseInlineControlsFit.mockReturnValue( {
 			measureRef: () => {},
 			collapsed: true,
@@ -181,10 +187,10 @@ describe( 'WidgetAttributeControls fit', () => {
 		await screen.findByTestId( 'metric' );
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'More options' } )
+			screen.getByRole( 'button', { name: 'Widget settings' } )
 		);
 		const dialog = await screen.findByRole( 'dialog', {
-			name: 'Widget options',
+			name: 'Widget settings',
 		} );
 
 		await user.click(
@@ -197,7 +203,7 @@ describe( 'WidgetAttributeControls fit', () => {
 
 		await waitFor( () =>
 			expect(
-				screen.queryByRole( 'dialog', { name: 'Widget options' } )
+				screen.queryByRole( 'dialog', { name: 'Widget settings' } )
 			).not.toBeInTheDocument()
 		);
 	} );

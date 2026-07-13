@@ -19,9 +19,9 @@
     containers do not clip the widget chrome outline ([#79990](https://github.com/WordPress/gutenberg/pull/79990)).
 -   Widget settings: swap the per-tile trigger icon from the overflow
     kebab to the settings gear.
--   Widget toolbar: collapse the inline attribute controls and the settings
-    trigger into a single More dropdown when the tile header lacks room for
-    them.
+-   Widget toolbar: when the tile header lacks room for the inline attribute
+    controls, they collapse behind the settings trigger, whose dropdown holds
+    the promoted fields and a More settings entry point.
 
 ### Internal
 

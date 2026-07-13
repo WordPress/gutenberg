@@ -16,7 +16,7 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetSettingsTrigger } from '../widget-settings';
-import { MoreControlsDropdown } from './more-controls-dropdown';
+import { AttributeControlsDropdown } from './attribute-controls-dropdown';
 import { useInlineControlsFit } from './use-inline-controls-fit';
 import styles from './widget-attribute-controls.module.css';
 import type { DashboardWidget } from '../../types';
@@ -42,10 +42,10 @@ type WidgetAttributeControlsProps = {
  * dashboard's shared debounce.
  *
  * The inline presentation holds only while it fits the header. When its
- * natural width exceeds the space the header can grant, everything (the
- * inline fields and the settings trigger) collapses into a single More
- * dropdown; the inline controls stay mounted, hidden and inert, so the fit
- * keeps being measured and the presentation can expand back.
+ * natural width exceeds the space the header can grant, the fields collapse
+ * behind the settings trigger, whose dropdown holds them as a form; the
+ * inline controls stay mounted, hidden and inert, so the fit keeps being
+ * measured and the presentation can expand back.
  *
  * @param {WidgetAttributeControlsProps} props Component props.
  */
@@ -111,6 +111,7 @@ export function WidgetAttributeControls( {
 					styles[ 'inline-controls' ],
 					collapsed && styles[ 'is-collapsed' ]
 				) }
+				aria-hidden={ collapsed || undefined }
 				{ ...( collapsed ? { inert: 'true' } : {} ) }
 			>
 				{ fields.length > 0 && (
@@ -129,7 +130,7 @@ export function WidgetAttributeControls( {
 			</div>
 
 			{ collapsed && (
-				<MoreControlsDropdown
+				<AttributeControlsDropdown
 					widget={ widget }
 					widgetType={ widgetType }
 					fields={ fields }

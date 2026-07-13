@@ -5,7 +5,7 @@ import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { moreVertical } from '@wordpress/icons';
+import { settings } from '@wordpress/icons';
 /* eslint-disable @wordpress/use-recommended-components -- Dashboard is still experimental. */
 import {
 	Button,
@@ -26,7 +26,7 @@ import type { DashboardWidget } from '../../types';
 
 type WidgetAttributes = Record< string, unknown >;
 
-export interface MoreControlsDropdownProps {
+export interface AttributeControlsDropdownProps {
 	/**
 	 * The instance whose attributes these controls edit.
 	 */
@@ -54,19 +54,20 @@ export interface MoreControlsDropdownProps {
 }
 
 /**
- * Collapsed presentation of the attribute controls: a single More trigger
- * whose popover holds the high-relevance fields as a form and, when other
- * attributes exist, a More settings entry point to the settings surface.
+ * Collapsed presentation of the attribute controls: the settings trigger
+ * stays as the tile's single entry point, and its popover holds the
+ * high-relevance fields as a form plus, when other attributes exist, a More
+ * settings entry point to the settings surface.
  *
- * @param {MoreControlsDropdownProps} props Component props.
+ * @param {AttributeControlsDropdownProps} props Component props.
  */
-export function MoreControlsDropdown( {
+export function AttributeControlsDropdown( {
 	widget,
 	widgetType,
 	fields,
 	data,
 	onChange,
-}: MoreControlsDropdownProps ): React.ReactNode {
+}: AttributeControlsDropdownProps ): React.ReactNode {
 	const [ open, setOpen ] = useState( false );
 	const { open: openSettings } = useWidgetSettingsToggle( widget );
 
@@ -87,8 +88,8 @@ export function MoreControlsDropdown( {
 			<Popover.Trigger
 				render={
 					<IconButton
-						icon={ moreVertical }
-						label={ __( 'More options' ) }
+						icon={ settings }
+						label={ __( 'Widget settings' ) }
 						variant="minimal"
 						tone="neutral"
 						size="compact"
@@ -97,11 +98,11 @@ export function MoreControlsDropdown( {
 			/>
 
 			<Popover.Popup
-				className={ styles[ 'more-popup' ] }
+				className={ styles[ 'dropdown-popup' ] }
 				positioner={ <Popover.Positioner side="bottom" align="end" /> }
 			>
 				<VisuallyHidden render={ <Popover.Title /> }>
-					{ __( 'Widget options' ) }
+					{ __( 'Widget settings' ) }
 				</VisuallyHidden>
 
 				<Stack direction="column" align="stretch" gap="lg">
@@ -124,6 +125,7 @@ export function MoreControlsDropdown( {
 								openSettings();
 							} }
 						>
+							<Button.Icon icon={ settings } />
 							{ __( 'More settings' ) }
 						</Button>
 					) }
