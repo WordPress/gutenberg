@@ -102,4 +102,7 @@ zip --recurse-paths --no-dir-entries \
 	changelog.txt \
 	README.md
 
+status "Restoring non-public icons... 🔁"
+git restore packages/icons/src
+
 success "Done. You've built Gutenberg! 🎉 "
