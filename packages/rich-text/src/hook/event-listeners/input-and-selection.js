@@ -146,28 +146,36 @@ export default ( props ) => ( element ) => {
 
 		const selection = defaultView.getSelection();
 
-		// Skip selections that have already been processed, such as the
-		// `selectionchange` event for a selection that was synchronized on
-		// capture of a consuming event, or coalesced duplicates.
+		// Skip selections that have already been processed into the current
+		// record, such as the `selectionchange` event for a selection that
+		// was synchronized on capture of a consuming event, or coalesced
+		// duplicates. The offsets the processing produced are compared to
+		// the record too: the record's selection may be rewritten from
+		// (possibly stale) props on render without the DOM selection moving,
+		// in which case the selection must be processed again.
 		if (
 			selectionSnapshot &&
 			selectionSnapshot.anchorNode === selection.anchorNode &&
 			selectionSnapshot.anchorOffset === selection.anchorOffset &&
 			selectionSnapshot.focusNode === selection.focusNode &&
-			selectionSnapshot.focusOffset === selection.focusOffset
+			selectionSnapshot.focusOffset === selection.focusOffset &&
+			selectionSnapshot.processedStart === record.current.start &&
+			selectionSnapshot.processedEnd === record.current.end
 		) {
 			return;
 		}
+
+		const { start, end, text } = createRecord();
+		const oldRecord = record.current;
 
 		selectionSnapshot = {
 			anchorNode: selection.anchorNode,
 			anchorOffset: selection.anchorOffset,
 			focusNode: selection.focusNode,
 			focusOffset: selection.focusOffset,
+			processedStart: start,
+			processedEnd: end,
 		};
-
-		const { start, end, text } = createRecord();
-		const oldRecord = record.current;
 
 		// Fallback mechanism for IE11, which doesn't support the input event.
 		// Any input results in a selection change.
