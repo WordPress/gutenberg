@@ -660,16 +660,38 @@ function isNpmPackageVersionMissing( error ) {
 }
 
 /**
+ * Parses npm JSON command output.
+ *
+ * @param {string} output      Command stdout.
+ * @param {string} description Output description for error messages.
+ *
+ * @return {*} Parsed JSON output.
+ */
+function parseNpmJsonOutput( output, description ) {
+	try {
+		return JSON.parse( output );
+	} catch {
+		throw new Error(
+			`Unable to parse npm registry ${ description }: ${ output }`
+		);
+	}
+}
+
+/**
  * Runs a pragmatic npm preflight before publishing.
  *
  * @param {Object}   options                         Options.
+ * @param {string}   options.distTag                 The dist-tag used for npm publishing.
  * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
+ * @param {string}   options.publishCommit           Release commit SHA.
  * @param {Array}    options.releasePackages         Packages to publish.
  * @param {Object}   deps                            Dependencies.
  * @param {Function} deps.commandFn                  Command runner.
+ *
+ * @return {Promise<string[]>} Correctly published package names.
  */
 async function runNpmPublishPreflight(
-	{ gitWorkingDirectoryPath, releasePackages },
+	{ distTag, gitWorkingDirectoryPath, publishCommit, releasePackages },
 	deps = {}
 ) {
 	const { commandFn = command } = deps;
@@ -679,25 +701,77 @@ async function runNpmPublishPreflight(
 		stdio: 'pipe',
 	} );
 
-	log( '>> Verifying target package versions are not already published.' );
+	log( '>> Verifying target package versions and dist-tags.' );
+	const publishedPackageNames = [];
 	// TODO: Consider bounded concurrency here if this preflight becomes too slow.
 	// Keep the first hardening pass sequential so registry errors stay easy to read.
 	for ( const { name, version } of releasePackages ) {
+		let registryVersion;
 		try {
-			await commandFn( `npm view ${ name }@${ version } version --json`, {
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'pipe',
-			} );
+			const { stdout } = await commandFn(
+				`npm view ${ name }@${ version } version --json`,
+				{
+					cwd: gitWorkingDirectoryPath,
+					stdio: 'pipe',
+				}
+			);
+			registryVersion = parseNpmJsonOutput(
+				stdout,
+				`${ name }@${ version } version`
+			);
 		} catch ( error ) {
 			if ( isNpmPackageVersionMissing( error ) ) {
 				continue;
 			}
 			throw error;
 		}
-		throw new Error(
-			`${ name }@${ version } already exists in the npm registry.`
+
+		if ( registryVersion !== version ) {
+			throw new Error(
+				`Expected npm registry lookup for ${ name }@${ version } to return version ${ version }, got ${ registryVersion }.`
+			);
+		}
+
+		const { stdout: gitHeadOutput } = await commandFn(
+			`npm view ${ name }@${ version } gitHead --json`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'pipe',
+			}
 		);
+		const registryGitHead = parseNpmJsonOutput(
+			gitHeadOutput,
+			`${ name }@${ version } gitHead`
+		);
+		if ( registryGitHead !== publishCommit ) {
+			throw new Error(
+				`${ name }@${ version } exists in the npm registry with gitHead ${
+					registryGitHead || 'nothing'
+				}, expected ${ publishCommit }.`
+			);
+		}
+
+		const { stdout: distTagsOutput } = await commandFn(
+			`npm view ${ name } dist-tags --json`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'pipe',
+			}
+		);
+		const distTags = parseNpmJsonOutput(
+			distTagsOutput,
+			`${ name } dist-tags`
+		);
+		if ( distTags[ distTag ] !== version ) {
+			throw new Error(
+				`${ name }@${ version } exists in the npm registry, but dist-tag "${ distTag }" points to ${
+					distTags[ distTag ] || 'nothing'
+				}.`
+			);
+		}
+		publishedPackageNames.push( name );
 	}
+	return publishedPackageNames;
 }
 
 /**
@@ -812,20 +886,30 @@ async function publishVersionedPackagesToNpm(
 	const releasePackages = await getNpmReleasePackagesFn(
 		gitWorkingDirectoryPath
 	);
-	await runNpmPublishPreflightFn( {
-		gitWorkingDirectoryPath,
-		releasePackages,
-	} );
+	const publishCommit = await git.revparse( [ 'HEAD' ] );
+	const publishCommand = `npx lerna publish from-package --dist-tag ${ distTag } --git-head ${ publishCommit } ${ yesFlag } ${ noVerifyAccessFlag }`;
+	const getPublishedPackageNames = () =>
+		runNpmPublishPreflightFn( {
+			distTag,
+			gitWorkingDirectoryPath,
+			publishCommit,
+			releasePackages,
+		} );
+	const publishRemainingPackages = async ( publishedPackageNames ) => {
+		if ( publishedPackageNames.length === releasePackages.length ) {
+			log( '>> All target package versions are already published.' );
+			return;
+		}
+		log( '>> Publishing modified packages to npm.' );
+		await commandFn( publishCommand, {
+			cwd: gitWorkingDirectoryPath,
+			stdio: 'inherit',
+		} );
+	};
 
-	log( '>> Publishing modified packages to npm.' );
+	const publishedPackageNames = await getPublishedPackageNames();
 	try {
-		await commandFn(
-			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
-			{
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'inherit',
-			}
-		);
+		await publishRemainingPackages( publishedPackageNames );
 	} catch {
 		log(
 			'>> Trying to finish failed publishing of modified npm packages.'
@@ -833,16 +917,9 @@ async function publishVersionedPackagesToNpm(
 		// A failed Lerna publish can leave temporary `gitHead` manifest changes.
 		// Reset to the version commit so `from-package` sees a clean tree on retry.
 		await git.reset( 'hard' );
-		await commandFn(
-			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
-			{
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'inherit',
-			}
-		);
+		await publishRemainingPackages( await getPublishedPackageNames() );
 	}
 
-	const publishCommit = await git.revparse( [ 'HEAD' ] );
 	await pushNpmReleaseGitMetadataFn( {
 		gitWorkingDirectoryPath,
 		npmReleaseBranch,
@@ -904,7 +981,7 @@ async function publishPackagesToNpm(
 		);
 
 		await commandFn(
-			`npx lerna version pre${ minimumVersionBump } --preid next.v.${ timestamp } --build-metadata ${ beforeCommitHash } --no-private --no-push ${ yesFlag }`,
+			`npx lerna version pre${ minimumVersionBump } --preid next.v.${ timestamp } --no-private --no-push ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
