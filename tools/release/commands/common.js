@@ -5,25 +5,24 @@ const semver = require( 'semver' );
 const SimpleGit = require( 'simple-git' );
 
 /**
- * Internal dependencies
- */
-const { readJSONFile } = require( '../lib/utils' );
-
-/**
  * Finds the name of the current plugin release branch based on the version in
- * the package.json file and the latest `trunk` branch in `git`.
+ * the package.json file at the latest `trunk` commit in `git`.
  *
  * @param {string} gitWorkingDirectoryPath Path to the project's working directory.
+ * @param {Object} deps                    Dependencies.
+ * @param {Object} deps.git                Git client.
  *
  * @return {string} Name of the plugin release branch.
  */
-async function findPluginReleaseBranchName( gitWorkingDirectoryPath ) {
-	await SimpleGit( gitWorkingDirectoryPath )
-		.fetch( 'origin', 'trunk' )
-		.checkout( 'trunk' );
-
-	const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
-	const mainPackageJson = readJSONFile( packageJsonPath );
+async function findPluginReleaseBranchName(
+	gitWorkingDirectoryPath,
+	deps = {}
+) {
+	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	await git.fetch( 'origin', 'trunk' );
+	const mainPackageJson = JSON.parse(
+		await git.show( 'FETCH_HEAD:package.json' )
+	);
 	const mainParsedVersion = semver.parse( mainPackageJson.version );
 
 	return 'release/' + mainParsedVersion.major + '.' + mainParsedVersion.minor;

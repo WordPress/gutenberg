@@ -1,7 +1,26 @@
 /**
  * Internal dependencies
  */
-import { calculateVersionBumpFromChangelog } from '../common';
+import {
+	calculateVersionBumpFromChangelog,
+	findPluginReleaseBranchName,
+} from '../common';
+
+describe( 'findPluginReleaseBranchName', () => {
+	it( 'reads the version from the fetched trunk commit without changing branches', async () => {
+		const git = {
+			fetch: jest.fn().mockResolvedValue(),
+			show: jest.fn().mockResolvedValue( '{ "version": "18.7.0" }' ),
+		};
+
+		await expect(
+			findPluginReleaseBranchName( '/repo', { git } )
+		).resolves.toBe( 'release/18.7' );
+
+		expect( git.fetch ).toHaveBeenCalledWith( 'origin', 'trunk' );
+		expect( git.show ).toHaveBeenCalledWith( 'FETCH_HEAD:package.json' );
+	} );
+} );
 
 describe( 'calculateVersionBumpFromChangelog', () => {
 	it( 'should return null when no lines provided', () => {
