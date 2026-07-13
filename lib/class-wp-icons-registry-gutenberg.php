@@ -241,6 +241,15 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
  * registry.
  */
 function gutenberg_override_wp_icons_registry() {
+	/*
+	 * The plugin registers the `core/` icons from its own manifest, so core's
+	 * registration would only re-register the same names on this registry.
+	 */
+	$wp_priority = has_action( 'init', '_wp_register_default_icons' );
+	if ( false !== $wp_priority ) {
+		remove_action( 'init', '_wp_register_default_icons', $wp_priority );
+	}
+
 	$reflection = new ReflectionClass( WP_Icons_Registry::class );
 	$property   = $reflection->getProperty( 'instance' );
 	/*
