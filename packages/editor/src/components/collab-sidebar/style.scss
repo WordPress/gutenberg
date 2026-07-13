@@ -56,7 +56,13 @@
 		max-height: calc(100dvh - var(--wp-admin--admin-bar--height, 0px) - #{$header-height + $grid-unit-80});
 		overflow-y: auto;
 	}
+
+	.editor-collab-sidebar-panel__user-name,
+	.editor-collab-sidebar-panel__user-time {
+		color: $gray-800;
+	}
 }
+
 
 .editor-collab-sidebar-panel__user-name {
 	font-size: 12px;
@@ -141,7 +147,7 @@
 
 .editor-collab-sidebar-panel__deleted-block-notice {
 	font-weight: $font-weight-medium;
-	color: $gray-700;
+	color: $gray-800;
 }
 
 .editor-collab-sidebar-panel__resolution-text {
