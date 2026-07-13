@@ -169,6 +169,6 @@ export default [
 	'--wpds-typography-line-height-lg',
 	'--wpds-typography-line-height-xl',
 	'--wpds-typography-line-height-2xl',
-	'--wpds-typography-font-weight-regular',
-	'--wpds-typography-font-weight-medium',
+	'--wpds-typography-font-weight-default',
+	'--wpds-typography-font-weight-emphasis',
 ];
