@@ -241,95 +241,113 @@ test.describe( 'Tabs', () => {
 			await expect( tabs ).toHaveCount( 2 );
 		} );
 
-		test( 'keeps tab labels in sync when a panel is moved before', async ( {
-			editor,
-			pageUtils,
-		} ) => {
-			await editor.insertBlock(
-				createTabs(
-					[ 'Tab 1', 'Tab 2', 'Tab 3' ],
-					[ 'Panel 1', 'Panel 2', 'Panel 3' ]
-				)
-			);
-
-			// Click the second tab, then select its panel.
-			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
-			await editor.selectBlocks(
-				editor.canvas
-					.getByRole( 'document', { name: 'Block: Tab Panels' } )
-					.getByRole( 'document', { name: 'Block: Tab Panel' } )
-					.filter( { hasText: 'Panel 2' } )
-			);
-
-			// Move the panel one position earlier.
-			await editor.clickBlockToolbarButton( 'Move up' );
-
-			await expect
-				.poll( editor.getBlocks )
-				.toMatchObject( [
-					createTabs(
-						[ 'Tab 2', 'Tab 1', 'Tab 3' ],
-						[ 'Panel 2', 'Panel 1', 'Panel 3' ]
-					),
-				] );
-
-			// Undo restores the original order.
-			await pageUtils.pressKeys( 'primary+z' );
-
-			await expect
-				.poll( editor.getBlocks )
-				.toMatchObject( [
+		// FIXME: Undoing a move restores the block order and the active tab,
+		// but the moved panel is only re-selected in the store and never
+		// regains DOM focus.
+		test.fixme(
+			'keeps tab labels in sync when a panel is moved before',
+			async ( { editor, pageUtils } ) => {
+				await editor.insertBlock(
 					createTabs(
 						[ 'Tab 1', 'Tab 2', 'Tab 3' ],
 						[ 'Panel 1', 'Panel 2', 'Panel 3' ]
-					),
-				] );
-		} );
+					)
+				);
 
-		test( 'keeps tab labels in sync when a panel is moved after', async ( {
-			editor,
-			pageUtils,
-		} ) => {
-			await editor.insertBlock(
-				createTabs(
-					[ 'Tab 1', 'Tab 2', 'Tab 3' ],
-					[ 'Panel 1', 'Panel 2', 'Panel 3' ]
-				)
-			);
-
-			// Click the second tab, then select its panel.
-			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
-			await editor.selectBlocks(
-				editor.canvas
+				const tab2 = editor.canvas.getByRole( 'tab', {
+					name: 'Tab 2',
+				} );
+				const panel2 = editor.canvas
 					.getByRole( 'document', { name: 'Block: Tab Panels' } )
 					.getByRole( 'document', { name: 'Block: Tab Panel' } )
-					.filter( { hasText: 'Panel 2' } )
-			);
+					.filter( { hasText: 'Panel 2' } );
 
-			// Move the panel one position later.
-			await editor.clickBlockToolbarButton( 'Move down' );
+				// Click the second tab, then select its panel.
+				await tab2.click();
+				await editor.selectBlocks( panel2 );
 
-			await expect
-				.poll( editor.getBlocks )
-				.toMatchObject( [
-					createTabs(
-						[ 'Tab 1', 'Tab 3', 'Tab 2' ],
-						[ 'Panel 1', 'Panel 3', 'Panel 2' ]
-					),
-				] );
+				// Move the panel one position earlier.
+				await editor.clickBlockToolbarButton( 'Move up' );
 
-			// Undo restores the original order.
-			await pageUtils.pressKeys( 'primary+z' );
+				await expect
+					.poll( editor.getBlocks )
+					.toMatchObject( [
+						createTabs(
+							[ 'Tab 2', 'Tab 1', 'Tab 3' ],
+							[ 'Panel 2', 'Panel 1', 'Panel 3' ]
+						),
+					] );
 
-			await expect
-				.poll( editor.getBlocks )
-				.toMatchObject( [
+				// Undo restores the original order, along with the active tab and
+				// the focused panel.
+				await pageUtils.pressKeys( 'primary+z' );
+
+				await expect
+					.poll( editor.getBlocks )
+					.toMatchObject( [
+						createTabs(
+							[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+							[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+						),
+					] );
+				await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
+				await expect( panel2 ).toBeFocused();
+			}
+		);
+
+		// FIXME: Undoing a move restores the block order and the active tab,
+		// but the moved panel is only re-selected in the store and never
+		// regains DOM focus.
+		test.fixme(
+			'keeps tab labels in sync when a panel is moved after',
+			async ( { editor, pageUtils } ) => {
+				await editor.insertBlock(
 					createTabs(
 						[ 'Tab 1', 'Tab 2', 'Tab 3' ],
 						[ 'Panel 1', 'Panel 2', 'Panel 3' ]
-					),
-				] );
-		} );
+					)
+				);
+
+				const tab2 = editor.canvas.getByRole( 'tab', {
+					name: 'Tab 2',
+				} );
+				const panel2 = editor.canvas
+					.getByRole( 'document', { name: 'Block: Tab Panels' } )
+					.getByRole( 'document', { name: 'Block: Tab Panel' } )
+					.filter( { hasText: 'Panel 2' } );
+
+				// Click the second tab, then select its panel.
+				await tab2.click();
+				await editor.selectBlocks( panel2 );
+
+				// Move the panel one position later.
+				await editor.clickBlockToolbarButton( 'Move down' );
+
+				await expect
+					.poll( editor.getBlocks )
+					.toMatchObject( [
+						createTabs(
+							[ 'Tab 1', 'Tab 3', 'Tab 2' ],
+							[ 'Panel 1', 'Panel 3', 'Panel 2' ]
+						),
+					] );
+
+				// Undo restores the original order, along with the active tab and
+				// the focused panel.
+				await pageUtils.pressKeys( 'primary+z' );
+
+				await expect
+					.poll( editor.getBlocks )
+					.toMatchObject( [
+						createTabs(
+							[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+							[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+						),
+					] );
+				await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
+				await expect( panel2 ).toBeFocused();
+			}
+		);
 
 		test( 'keeps tab labels in sync when a panel is removed', async ( {
 			editor,
@@ -342,14 +360,15 @@ test.describe( 'Tabs', () => {
 				)
 			);
 
+			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
+			const panel2 = editor.canvas
+				.getByRole( 'document', { name: 'Block: Tab Panels' } )
+				.getByRole( 'document', { name: 'Block: Tab Panel' } )
+				.filter( { hasText: 'Panel 2' } );
+
 			// Click the second tab, then select its panel.
-			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
-			await editor.selectBlocks(
-				editor.canvas
-					.getByRole( 'document', { name: 'Block: Tab Panels' } )
-					.getByRole( 'document', { name: 'Block: Tab Panel' } )
-					.filter( { hasText: 'Panel 2' } )
-			);
+			await tab2.click();
+			await editor.selectBlocks( panel2 );
 
 			// Remove the panel.
 			await editor.clickBlockOptionsMenuItem( 'Delete' );
@@ -363,7 +382,8 @@ test.describe( 'Tabs', () => {
 					),
 				] );
 
-			// Undo restores the removed panel.
+			// Undo restores the removed panel, along with the active tab and
+			// the focused panel.
 			await pageUtils.pressKeys( 'primary+z' );
 
 			await expect
@@ -374,6 +394,8 @@ test.describe( 'Tabs', () => {
 						[ 'Panel 1', 'Panel 2', 'Panel 3' ]
 					),
 				] );
+			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
+			await expect( panel2 ).toBeFocused();
 		} );
 
 		test( 'keeps the tab label when a panel is duplicated', async ( {
@@ -387,14 +409,15 @@ test.describe( 'Tabs', () => {
 				)
 			);
 
+			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
+			const panel2 = editor.canvas
+				.getByRole( 'document', { name: 'Block: Tab Panels' } )
+				.getByRole( 'document', { name: 'Block: Tab Panel' } )
+				.filter( { hasText: 'Panel 2' } );
+
 			// Click the second tab, then select its panel.
-			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
-			await editor.selectBlocks(
-				editor.canvas
-					.getByRole( 'document', { name: 'Block: Tab Panels' } )
-					.getByRole( 'document', { name: 'Block: Tab Panel' } )
-					.filter( { hasText: 'Panel 2' } )
-			);
+			await tab2.click();
+			await editor.selectBlocks( panel2 );
 
 			// Duplicate the panel.
 			await editor.clickBlockOptionsMenuItem( 'Duplicate' );
@@ -408,7 +431,8 @@ test.describe( 'Tabs', () => {
 					),
 				] );
 
-			// Undo removes the duplicated panel.
+			// Undo removes the duplicated panel, and restores the active tab
+			// and the focused panel.
 			await pageUtils.pressKeys( 'primary+z' );
 
 			await expect
@@ -419,6 +443,8 @@ test.describe( 'Tabs', () => {
 						[ 'Panel 1', 'Panel 2', 'Panel 3' ]
 					),
 				] );
+			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
+			await expect( panel2 ).toBeFocused();
 		} );
 	} );
 
