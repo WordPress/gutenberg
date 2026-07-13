@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Align the generated single-page admin font-family stack with the `@wordpress/theme` body token ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Widgets: carry the optional metadata fields from `widget.json` into
     the generated PHP registry: `title`, `description`, `category`,
     `keywords`, `textdomain`, and the `help` note, so hosts can translate

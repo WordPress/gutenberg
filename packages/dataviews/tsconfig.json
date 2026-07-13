@@ -24,12 +24,13 @@
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
+		{ "path": "../rich-text" },
 		{ "path": "../theme" },
 		{ "path": "../ui" },
 		{ "path": "../url" },
 		{ "path": "../warning" }
 	],
-	"files": [ "global.d.ts" ],
+	"files": [ "global.d.ts", "modules.d.ts" ],
 	"exclude": [
 		"src/**/stories/**/*.jsx", // only exclude js files, tsx files should be checked
 		"src/**/test/**/*.js" // only exclude js files, ts{x} files should be checked

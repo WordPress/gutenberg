@@ -189,7 +189,7 @@ export function Notes( {
 			focusNoteThread(
 				selectedNote,
 				sidebarRef.current,
-				selectedNote === 'new' ? 'textarea' : undefined
+				selectedNote === 'new' ? '[role="textbox"]' : undefined
 			);
 			// Clear focus flag to avoid re-triggering.
 			selectNote( selectedNote );

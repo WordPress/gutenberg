@@ -150,7 +150,7 @@ function render_block_core_template_part( $attributes ) {
 	}
 
 	// Run through the actions that are typically taken on the_content.
-	$content = _gutenberg_apply_content_filters( $content, "template_part_{$area}", $seen_ids, $template_part_id );
+	$content = _wp_apply_content_filters( $content, "template_part_{$area}", $seen_ids, $template_part_id );
 
 	if ( empty( $attributes['tagName'] ) || tag_escape( $attributes['tagName'] ) !== $attributes['tagName'] ) {
 		$area_tag = 'div';

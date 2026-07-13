@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
 	useState,
@@ -82,9 +83,11 @@ export function useNoteThreads( postId: number | undefined ) {
 			return { notes: [], unresolvedNotes: [] };
 		}
 
-		// Single pass over clientIds builds the forward map and reverse lookup
-		// together. getNoteIdsFromMetadata returns numeric ids, matching the
-		// types returned by the comments REST endpoint.
+		/*
+		 * Single pass over clientIds builds the forward map and reverse lookup
+		 * together. getNoteIdsFromMetadata returns numeric ids, matching the
+		 * types returned by the comments REST endpoint.
+		 */
 		const blocksWithNotes: Record< string, number[] > = {};
 		const clientIdsByNoteId = new Map< number | 'new', string[] >();
 		for ( const clientId of clientIds ) {
@@ -420,11 +423,15 @@ export function useNoteActions() {
 				{ throwOnError: true }
 			);
 
-			// Anchor a top-level note to every block it spans: add the id to each
-			// block's metadata and, where the segment covers text, wrap that text
-			// in a shared core/note marker. Read-modify-write on metadata is racy
-			// under concurrent edits (later write wins, dropping the other id):
-			// https://github.com/WordPress/gutenberg/issues/74751.
+			/*
+			 * Anchor a top-level note to every block it spans: add the id to
+			 * each block's metadata and, where the segment covers text, wrap
+			 * that text in a shared core/note marker. Read-modify-write on
+			 * metadata is racy under concurrent edits: two near-simultaneous
+			 * adds against the same base will each write a 2-element array and
+			 * the later write wins, dropping the other id. Tracking issue:
+			 * https://github.com/WordPress/gutenberg/issues/74751.
+			 */
 			if ( ! parent && savedRecord?.id ) {
 				for ( const segment of segments ) {
 					const { clientId, attributeKey, start, end } = segment;
@@ -485,13 +492,6 @@ export function useNoteActions() {
 		content?: string;
 		status?: string;
 	} ) => {
-		const messageType = status ? status : 'updated';
-		const messages: Record< string, string > = {
-			approved: __( 'Note marked as resolved.' ),
-			hold: __( 'Note reopened.' ),
-			updated: __( 'Note updated.' ),
-		};
-
 		try {
 			// For resolution or reopen actions, create a new note with metadata.
 			if ( status === 'approved' || status === 'hold' ) {
@@ -535,6 +535,14 @@ export function useNoteActions() {
 						updateBlockAttributes
 					);
 				}
+
+				// The note visibly updates in place, so there is no snackbar,
+				// but screen reader users still need the confirmation.
+				speak(
+					status === 'approved'
+						? __( 'Note marked as resolved.' )
+						: __( 'Note reopened.' )
+				);
 			} else {
 				const updateData = {
 					id,
@@ -545,18 +553,18 @@ export function useNoteActions() {
 				await saveEntityRecord( 'root', 'comment', updateData, {
 					throwOnError: true,
 				} );
-			}
 
-			createNotice(
-				// @ts-expect-error The notices types don't cover the custom
-				// 'snackbar' status used here.
-				'snackbar',
-				messages[ messageType ] ?? __( 'Note updated.' ),
-				{
-					type: 'snackbar',
-					isDismissible: true,
-				}
-			);
+				createNotice(
+					// @ts-expect-error The notices types don't cover the
+					// custom 'snackbar' status used here.
+					'snackbar',
+					__( 'Note updated.' ),
+					{
+						type: 'snackbar',
+						isDismissible: true,
+					}
+				);
+			}
 		} catch ( error ) {
 			onError( error );
 		}
