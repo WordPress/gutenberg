@@ -29,6 +29,8 @@
     toggle it from the gear button.
 -   Restructure the tile chrome: extract `WidgetHeader` and `WidgetFrame`,
     and move widget and layout controls into toolbar chips.
+-   Add a Storybook story reproducing the tile header with multiple
+    high-relevance inline attribute controls.
 
 ## 0.2.0 (2026-07-01)
 
