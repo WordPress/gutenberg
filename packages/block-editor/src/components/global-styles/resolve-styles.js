@@ -160,12 +160,18 @@ function pickLayerRootContribution( layer ) {
 	return Object.keys( contribution ).length === 0 ? null : contribution;
 }
 
+// Object valued leaves that are a single atomic definition and must not be
+// deep-merged. Used to mirror the `backgroundImage` exception in the Global
+// Styles engine's `mergeGlobalStyles`.
+const ATOMIC_OBJECT_KEYS = new Set( [ 'backgroundImage' ] );
+
 /**
  * Deep-merge `source` into `target`:
  * - Plain objects recurse.
  * - `{ ref }` envelopes at source are resolved against `globalStyles` and
  *   merged in place of the envelope.
- * - Arrays, primitives, and null replace wholesale.
+ * - Arrays, primitives, null, and atomic-object leaves (`ATOMIC_OBJECT_KEYS`)
+ *   replace wholesale.
  * - Explicit-empty source leaves (`''`, `null`, `{}`) are dropped, preserving
  *   the target's existing value.
  *
@@ -210,6 +216,7 @@ function deepMergeDroppingEmpties(
 		}
 		const nextPath = [ ...path, key ];
 		if (
+			! ATOMIC_OBJECT_KEYS.has( key ) &&
 			sourceValue !== null &&
 			typeof sourceValue === 'object' &&
 			! Array.isArray( sourceValue ) &&
@@ -230,7 +237,13 @@ function deepMergeDroppingEmpties(
 				nextPath
 			);
 		} else {
-			target[ key ] = sourceValue;
+			target[ key ] =
+				ATOMIC_OBJECT_KEYS.has( key ) &&
+				sourceValue !== null &&
+				typeof sourceValue === 'object' &&
+				! Array.isArray( sourceValue )
+					? { ...sourceValue }
+					: sourceValue;
 			if ( sourceMetadata && sources ) {
 				sources[ getPathKey( nextPath ) ] = getSourceForPath(
 					sourceMetadata,

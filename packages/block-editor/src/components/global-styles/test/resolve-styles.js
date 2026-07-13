@@ -151,6 +151,62 @@ describe( 'resolveStyles – merged output', () => {
 				typography: { fontSize: '32px', lineHeight: '1.2' },
 			} );
 		} );
+
+		test( 'deepMergeDroppingEmpties replaces backgroundImage wholesale (no key mixing)', () => {
+			const out = deepMergeDroppingEmpties(
+				{
+					background: {
+						backgroundImage: {
+							id: 5,
+							url: 'theme.jpg',
+							source: 'file',
+							title: 'Theme',
+						},
+						backgroundSize: 'cover',
+					},
+				},
+				{
+					background: {
+						backgroundImage: { url: 'custom.jpg' },
+					},
+				},
+				{}
+			);
+			expect( out.background.backgroundImage ).toEqual( {
+				url: 'custom.jpg',
+			} );
+			expect( out.background.backgroundSize ).toBe( 'cover' );
+		} );
+
+		test( 'deepMergeDroppingEmpties clones backgroundImage rather than referencing the source', () => {
+			const source = {
+				background: { backgroundImage: { url: 'custom.jpg' } },
+			};
+			const out = deepMergeDroppingEmpties( {}, source, {} );
+			expect( out.background.backgroundImage ).toEqual( {
+				url: 'custom.jpg',
+			} );
+			expect( out.background.backgroundImage ).not.toBe(
+				source.background.backgroundImage
+			);
+		} );
+
+		test( 'deepMergeDroppingEmpties records a single source entry for backgroundImage', () => {
+			const sources = {};
+			deepMergeDroppingEmpties(
+				{},
+				{ background: { backgroundImage: { id: 1, url: 'a.jpg' } } },
+				{},
+				{ layer: 'block' },
+				sources
+			);
+			expect( sources[ 'background.backgroundImage' ]?.layer ).toBe(
+				'block'
+			);
+			expect(
+				sources[ 'background.backgroundImage.url' ]
+			).toBeUndefined();
+		} );
 	} );
 
 	describe( 'layer precedence', () => {
