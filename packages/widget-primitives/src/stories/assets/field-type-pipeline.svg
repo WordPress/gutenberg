@@ -17,7 +17,7 @@
   <text x="470" y="90" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#1d6b5a">application registry</text>
   <text x="470" y="105" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#3c5a52">registered once, before render</text>
   <rect x="354" y="114" width="232" height="28" rx="5" fill="#ffffff" stroke="#1d6b5a" stroke-width="1.2"/>
-  <text x="470" y="132" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#1d6b5a">core/location → { baseType, Edit }</text>
+  <text x="470" y="132" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#1d6b5a">location → { baseType, Edit }</text>
 
   <!-- Lookup arrow -->
   <line x1="470" y1="156" x2="470" y2="190" stroke="#1d6b5a" stroke-width="1.5" marker-end="url(#arrow-ftp-green)"/>
@@ -30,7 +30,7 @@
   <text x="58" y="241" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#855317" opacity="0.8">references by name</text>
   <rect x="58" y="252" width="180" height="40" rx="5" fill="#ffffff" stroke="#b07020" stroke-width="1.2"/>
   <text x="70" y="268" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" fill="#855317">location</text>
-  <text x="70" y="283" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" font-weight="700" fill="#b07020">type: 'core/location'</text>
+  <text x="70" y="283" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" font-weight="700" fill="#b07020">type: 'location'</text>
   <text x="58" y="304" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#94a3b8">pure data · widget.json-ready</text>
 
   <!-- Attributes arrow -->
@@ -43,7 +43,7 @@
   <text x="470" y="224" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">resolveFields()</text>
   <text x="470" y="240" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#64748b">inside useWidgetTypes:</text>
   <text x="470" y="253" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#64748b">the only point that recognizes the name</text>
-  <text x="372" y="278" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#855317">in   type: 'core/location'</text>
+  <text x="372" y="278" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#855317">in   type: 'location'</text>
   <text x="372" y="296" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" font-weight="700" fill="#1d6b5a">out  type: 'text' + Edit control</text>
 
   <!-- DataForm arrow -->

@@ -29,14 +29,20 @@ describe( 'registerFieldType', () => {
 		expect( getFieldType( 'test/rating' ) ).toBe( rating );
 	} );
 
-	it( 'ignores names without a namespace', () => {
-		const plain = {
-			...rating,
-			name: 'rating' as `${ string }/${ string }`,
-		};
+	it( 'registers plain names', () => {
+		const plain = { ...rating, name: 'rating' };
 
-		expect( registerFieldType( plain ) ).toBeUndefined();
-		expect( getFieldType( 'rating' ) ).toBeUndefined();
+		expect( registerFieldType( plain ) ).toBe( plain );
+		expect( getFieldType( 'rating' ) ).toBe( plain );
+
+		unregisterFieldType( 'rating' );
+	} );
+
+	it( 'ignores invalid names', () => {
+		const invalid = { ...rating, name: 'Not-Valid' };
+
+		expect( registerFieldType( invalid ) ).toBeUndefined();
+		expect( getFieldType( 'Not-Valid' ) ).toBeUndefined();
 	} );
 
 	it( 'keeps the first registration on duplicate names', () => {
@@ -95,6 +101,15 @@ describe( 'resolveFields', () => {
 		} );
 		expect( resolved ).not.toHaveProperty( 'name' );
 		expect( resolved ).not.toHaveProperty( 'baseType' );
+	} );
+
+	it( 'resolves plain registered names', () => {
+		registerFieldType( { ...rating, name: 'rating' } );
+		const field: ResolvableField = { id: 'score', type: 'rating' };
+
+		expect( resolveFields( [ field ] )[ 0 ].type ).toBe( 'integer' );
+
+		unregisterFieldType( 'rating' );
 	} );
 
 	it( 'lets the field props win over the definition defaults', () => {

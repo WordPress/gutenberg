@@ -546,7 +546,7 @@ When every attribute is \`'high'\`, a host need not expose a second settings sur
 };
 
 /*
- * Edit control for the `demo/rating` field type. Registered once below;
+ * Edit control for the `rating` field type. Registered once below;
  * widgets then reference the type by name, never this component.
  */
 function RatingEdit< Item >( {
@@ -584,7 +584,7 @@ function RatingEdit< Item >( {
 // The application registers the vocabulary once, before anything renders.
 // First registration wins, so Storybook hot reloads are harmless.
 registerFieldType( {
-	name: 'demo/rating',
+	name: 'rating',
 	baseType: 'integer',
 	Edit: RatingEdit,
 } );
@@ -618,7 +618,7 @@ function RatedWidget( { attributes }: WidgetRenderProps< RatedAttributes > ) {
 }
 
 /*
- * The declarative payoff: the attribute references `demo/rating` by name.
+ * The declarative payoff: the attribute references `rating` by name.
  * No Edit import, no component, pure data.
  */
 const ratedWidgetType: WidgetType< RatedAttributes > = {
@@ -631,7 +631,7 @@ const ratedWidgetType: WidgetType< RatedAttributes > = {
 	attributes: [
 		{
 			id: 'rating',
-			type: 'demo/rating',
+			type: 'rating',
 			label: 'Rating',
 			relevance: 'high',
 		},
@@ -737,8 +737,8 @@ export const WithFieldType: StoryObj = {
 				story: `
 The attribute references a **field type** by name instead of carrying a control:
 
-1. The application registers \`demo/rating\` once (\`registerFieldType\`), binding the name to \`baseType: 'integer'\` plus a star-rating \`Edit\` control.
-2. The widget declares \`{ id: 'rating', type: 'demo/rating', relevance: 'high' }\`. Pure data: no imports, no components.
+1. The application registers \`rating\` once (\`registerFieldType\`), binding the name to \`baseType: 'integer'\` plus a star-rating \`Edit\` control.
+2. The widget declares \`{ id: 'rating', type: 'rating', relevance: 'high' }\`. Pure data: no imports, no components.
 3. The host resolves the schema (hosts get this through \`useWidgetTypes\`; the story calls the resolver itself) and promotes the field to the prominent surface, where the registered control renders.
 
 An unregistered name would degrade silently, exactly like an unknown type in DataViews. See the **Field Types** doc for the full pipeline.

@@ -16,7 +16,7 @@ export default {
 	attributes: [
 		{
 			id: 'location',
-			type: 'core/location',
+			type: 'location',
 			label: __( 'Event location' ),
 			description: __( 'City or region for nearby events.' ),
 			relevance: 'high',

@@ -18,13 +18,13 @@ The consuming application owns the vocabulary. It registers each type once, befo
 
 ```ts
 registerFieldType( {
-	name: 'core/location',
+	name: 'location',
 	baseType: 'text',
 	Edit: LocationControl,
 } );
 ```
 
-`name` is namespaced, so it can never collide with DataViews' own plain type names. `baseType` names the DataViews type whose built-in behavior (sort, operators, validation semantics) the resolved field inherits; the definition supplies only what differs. First registration wins.
+`name` is any lowercase identifier, plain (`location`) or namespaced (`acme/location`). Resolution is registry-first, so a registered name wins over a DataViews built-in of the same name; prefer names that don't mirror the built-in list. `baseType` names the DataViews type whose built-in behavior (sort, operators, validation semantics) the resolved field inherits; the definition supplies only what differs. First registration wins.
 
 ## Referencing
 
@@ -33,7 +33,7 @@ The widget declares the name and nothing else:
 ```ts
 {
 	id: 'location',
-	type: 'core/location',
+	type: 'location',
 	label: __( 'Event location' ),
 	relevance: 'high',
 }

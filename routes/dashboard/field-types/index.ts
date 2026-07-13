@@ -12,11 +12,11 @@ import { LocationControl } from './location-control';
 /*
  * The field type vocabulary the dashboard page provides beyond DataViews'
  * built-in types. Widgets reference these by name, e.g.
- * `type: 'core/location'`.
+ * `type: 'location'`.
  */
 const FIELD_TYPES: FieldTypeDefinition[] = [
 	{
-		name: 'core/location',
+		name: 'location',
 		baseType: 'text',
 		Edit: LocationControl,
 	},

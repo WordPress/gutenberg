@@ -5,8 +5,7 @@
  * by unique names.
  *
  * Each registered field type defines specific behavior for individual
- * fields, including editing, rendering, validation, and formatting under
- * a namespaced identifier.
+ * fields, including editing, rendering, validation, and formatting.
  *
  * The `resolveFields` function converts any reference to a registered name
  * into the standard per-field `Field` properties that DataViews recognizes.
@@ -17,9 +16,14 @@
  */
 import type { Field, FieldTypeName } from '@wordpress/dataviews';
 
-export type RegisteredFieldTypeName = `${ string }/${ string }`;
+/**
+ * Any lowercase name, plain (`location`) or namespaced (`acme/rating`).
+ * The `string & {}` form keeps DataViews' native names as IDE
+ * suggestions when unioned with `FieldTypeName`.
+ */
+export type RegisteredFieldTypeName = string & {};
 
-const FIELD_TYPE_NAME_PATTERN = /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/;
+const FIELD_TYPE_NAME_PATTERN = /^[a-z][a-z0-9-]*(\/[a-z][a-z0-9-]*)?$/;
 
 /**
  * The per-field `Field` props a field type may provide as defaults.
@@ -69,7 +73,7 @@ const fieldTypes = new Map< string, FieldTypeDefinition< any > >();
  * Registers a field type.
  *
  * First registration wins: a name that is
- * already registered, or is not a valid namespaced name, is ignored.
+ * already registered, or is not a valid name, is ignored.
  *
  * @param fieldType Field type definition to register.
  * @return The registered definition, or `undefined` when ignored.

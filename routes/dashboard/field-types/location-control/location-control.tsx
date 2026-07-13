@@ -10,7 +10,7 @@ import { useCallback } from '@wordpress/element';
 import { LocationPicker } from '../location-picker';
 
 /*
- * DataForm Edit control for the `core/location` field type: a city search
+ * DataForm Edit control for the `location` field type: a city search
  * with autocomplete and geolocation, wired to the field's
  * getValue/setValue pair.
  */
