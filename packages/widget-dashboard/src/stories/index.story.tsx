@@ -238,7 +238,7 @@ function GoalProgressWidget( {
 	);
 }
 
-// Two attributes, both promoted: nothing is left for the settings drawer.
+// Two attributes, both promoted: nothing is left for the settings surface.
 const GOAL_FIELDS: WidgetAttributeField< GoalAttributes >[] = [
 	{
 		id: 'metric',
@@ -354,13 +354,13 @@ In normal mode the dashboard promotes every \`relevance: 'high'\` attribute into
 
 Two demo types exercise that policy:
 
-- \`demo/traffic-snapshot\` declares three attributes: \`metric\` and \`period\` are \`relevance: 'high'\`, and \`label\` stays on the settings drawer.
-- \`demo/goal-progress\` declares two attributes, both \`relevance: 'high'\`: with nothing left for the drawer, the inline presentation shows no settings entry point.
+- \`demo/traffic-snapshot\` declares three attributes: \`metric\` and \`period\` are \`relevance: 'high'\`, and \`label\` stays on the settings surface.
+- \`demo/goal-progress\` declares two attributes, both \`relevance: 'high'\`: with nothing left for the settings surface, the inline presentation shows no settings entry point.
 
 Their tiles compare the header presentations:
 
 - The two-column tile fits the identity and both inline controls, so they stay in the header.
-- The one-column tiles do not: the chrome collapses everything behind the settings trigger, whose dropdown holds the promoted fields as a form. The snapshot's dropdown adds a More settings shortcut to the drawer; the goal's dropdown holds only the fields.
+- The one-column tiles do not: the chrome collapses everything behind the settings trigger, whose dropdown holds the promoted fields as a form. The snapshot's dropdown adds a More settings entry point to the settings surface; the goal's dropdown holds only the fields.
 
 The widget only declares relevance; the fit is measured by the chrome, so the same declaration adapts to any tile width. Resize the canvas to watch the headers switch presentations.
 `,

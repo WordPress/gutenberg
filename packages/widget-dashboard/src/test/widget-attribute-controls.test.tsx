@@ -110,7 +110,8 @@ describe( 'WidgetAttributeControls fit', () => {
 		render( <Harness /> );
 		await screen.findByTestId( 'metric' );
 
-		// While everything fits, the gear opens the drawer directly.
+		// While everything fits, the settings trigger opens the settings
+		// surface directly.
 		await user.click(
 			screen.getByRole( 'button', { name: 'Widget settings' } )
 		);
