@@ -268,3 +268,26 @@ export function getResumableItems( state: State ): QueueItem[] {
 		( item ) => item.status === ItemStatus.PendingResume
 	);
 }
+
+/**
+ * Returns the item awaiting a resume decision that carries the given durable
+ * upload marker, if any.
+ *
+ * Unlike getItemByUploadId this ignores live (in-flight) items, whose
+ * callbacks are already attached; only loaded-from-storage items need a block
+ * to re-register its callbacks.
+ *
+ * @param state    Upload state.
+ * @param uploadId Durable marker written into block attributes.
+ * @return The matching PendingResume item, or undefined.
+ */
+export function getResumableItemByUploadId(
+	state: State,
+	uploadId: string
+): QueueItem | undefined {
+	return state.queue.find(
+		( item ) =>
+			item.status === ItemStatus.PendingResume &&
+			item.uploadId === uploadId
+	);
+}

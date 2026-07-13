@@ -158,10 +158,25 @@ export function useToolsPanelDropdownMenuProps() {
 export function useResumeUploadFromMarker( { uploadId, onChange, onError } ) {
 	const registry = useRegistry();
 
+	// Keep the latest callbacks in a ref so registration happens exactly once
+	// per item while the store still calls the current handlers. Registering
+	// on every callback identity change would loop: dispatching
+	// registerItemCallbacks replaces the queue item, which would re-trigger
+	// an effect depending on it.
+	const latestCallbacksRef = useRef( { onChange, onError } );
+	useLayoutEffect( () => {
+		latestCallbacksRef.current = { onChange, onError };
+	} );
+	const registeredItemIdRef = useRef();
+
+	// Only PendingResume (loaded-from-storage) items need the block to
+	// re-register callbacks; live uploads already carry them.
 	const item = useSelect(
 		( select ) =>
 			uploadId
-				? unlock( select( uploadStore ) ).getItemByUploadId( uploadId )
+				? unlock( select( uploadStore ) ).getResumableItemByUploadId(
+						uploadId
+				  )
 				: undefined,
 		[ uploadId ]
 	);
@@ -170,6 +185,10 @@ export function useResumeUploadFromMarker( { uploadId, onChange, onError } ) {
 		if ( ! uploadId || ! item ) {
 			return;
 		}
+		if ( registeredItemIdRef.current === item.id ) {
+			return;
+		}
+		registeredItemIdRef.current = item.id;
 		// Only onChange and onError are registered here. The store fires onChange
 		// with the final attachment (which the block's onSelectImage uses to swap
 		// in the real URL and clear the marker) before onSuccess, so onSuccess is
@@ -177,11 +196,13 @@ export function useResumeUploadFromMarker( { uploadId, onChange, onError } ) {
 		unlock( registry.dispatch( uploadStore ) ).registerItemCallbacks(
 			uploadId,
 			{
-				onChange: ( attachments ) => onChange?.( attachments?.[ 0 ] ),
-				onError,
+				onChange: ( attachments ) =>
+					latestCallbacksRef.current.onChange?.( attachments?.[ 0 ] ),
+				onError: ( error ) =>
+					latestCallbacksRef.current.onError?.( error ),
 			}
 		);
-	}, [ uploadId, item, onChange, onError, registry ] );
+	}, [ uploadId, item, registry ] );
 
 	return item?.attachment?.url;
 }
