@@ -95,6 +95,7 @@
 		"memize": "^2.1.0"
 	},
 	"devDependencies": {
+		"@arethetypeswrong/cli": "^0.18.4",
 		"@storybook/react-vite": "^10.4.3",
 		"@terrazzo/parser": "^2.4.0",
 		"@terrazzo/plugin-css": "^2.4.0",
@@ -144,6 +145,7 @@
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps",
+		"lint:package-contents": "node ../../tools/validation/validate-package-contents.mjs . && attw --pack . --profile esm-only --exclude-entrypoints ./design-tokens.css --format table --no-color --no-emoji --no-summary",
 		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
 	}
 }

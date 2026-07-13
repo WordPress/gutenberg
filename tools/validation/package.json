@@ -21,7 +21,6 @@
 	},
 	"type": "module",
 	"devDependencies": {
-		"@arethetypeswrong/cli": "^0.18.4",
 		"@mawesome/dependency-audit": "^0.4.5",
 		"@wordpress/create-block": "file:../../packages/create-block",
 		"@wordpress/scripts": "file:../../packages/scripts",
@@ -41,8 +40,6 @@
 		"check-root-dependencies": "node ./check-root-dependencies.mjs",
 		"test-create-block": "node ./test-create-block.mjs",
 		"test-package-contents": "wp-scripts test-unit-js ./validate-package-contents.test.js",
-		"validate-package-contents": "node ./validate-package-contents.mjs",
-		"validate-package-types": "attw --pack",
 		"validate-package-lock": "node ./validate-package-lock.cjs",
 		"validate-tsconfig": "node ./validate-tsconfig.mjs"
 	}
