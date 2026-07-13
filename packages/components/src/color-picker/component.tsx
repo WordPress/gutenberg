@@ -124,23 +124,25 @@ const UnconnectedColorPicker = (
 	// throttles its onChange callbacks using requestAnimationFrame.
 
 	const handleHSLAChange = useCallback(
-	    ( nextHSLA: HslaColor ) => {
-	        setInternalHSLA( ( prev ) => {
-	            const isPositionalDrag =
-	                nextHSLA.s !== prev.s || nextHSLA.l !== prev.l;
-	            const stabilizedHSLA = isPositionalDrag
-	                ? mergeHSLA( nextHSLA, prev )
-	                : nextHSLA;
-	            const previousHex = lastProducedHexRef.current;
-	            const nextHex = colord( stabilizedHSLA ).toHex();
-	            if ( nextHex !== previousHex ) {
-	                lastProducedHexRef.current = nextHex;
-	                setColor( nextHex );
-	            }
-	            return stabilizedHSLA;
-	        } );
-	    },
-	    [ setColor ]
+		( nextHSLA: HslaColor ) => {
+			setInternalHSLA( ( prev ) => {
+				const isPositionalDrag =
+					nextHSLA.s !== prev.s || nextHSLA.l !== prev.l;
+				const stabilizedHSLA = isPositionalDrag
+					? mergeHSLA( nextHSLA, prev )
+					: nextHSLA;
+				const previousHex = lastProducedHexRef.current;
+				const nextHex = colord( stabilizedHSLA ).toHex();
+
+				if ( nextHex !== previousHex ) {
+					lastProducedHexRef.current = nextHex;
+					setColor( nextHex );
+				}
+
+				return stabilizedHSLA;
+			} );
+		},
+		[ setColor ]
 	);
 
 	// Handler for components that provide Colord values (RGB, Hex inputs).
