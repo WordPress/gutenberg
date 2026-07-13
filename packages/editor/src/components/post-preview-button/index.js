@@ -2,11 +2,12 @@
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
-import { Button, Path, SVG } from '@wordpress/components';
+import { Button, MenuItem, Path, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
+import { external } from '@wordpress/icons';
 import { VisuallyHidden } from '@wordpress/ui';
 
 /**
@@ -166,28 +167,7 @@ async function writeInterstitialIntoPreviewWindow( previewWindow ) {
 	}
 }
 
-/**
- * Renders a button that opens a new window or tab for the preview,
- * writes the interstitial message to this window, and then navigates
- * to the actual preview link. The button is not rendered if the post
- * is not viewable and disabled if the post is not saveable.
- *
- * @param {Object}   props                     The component props.
- * @param {string}   props.className           The class name for the button.
- * @param {string}   props.textContent         The text content for the button.
- * @param {boolean}  props.forceIsAutosaveable Whether to force autosave.
- * @param {string}   props.role                The role attribute for the button.
- * @param {Function} props.onPreview           The callback function for preview event.
- *
- * @return {React.ReactNode} The rendered button component.
- */
-export default function PostPreviewButton( {
-	className,
-	textContent,
-	forceIsAutosaveable,
-	role,
-	onPreview,
-} ) {
+function usePostPreviewProps( { forceIsAutosaveable, onPreview } ) {
 	const { postId, currentPostLink, previewLink, isSaveable, isViewable } =
 		useSelect( ( select ) => {
 			const editor = select( editorStore );
@@ -248,17 +228,79 @@ export default function PostPreviewButton( {
 	// just link to the post's URL.
 	const href = previewLink || currentPostLink;
 
+	return {
+		href,
+		target: targetId,
+		accessibleWhenDisabled: true,
+		disabled: ! isSaveable,
+		onClick: openPreviewWindow,
+	};
+}
+
+/**
+ * Renders the post preview action as a menu item.
+ *
+ * @param {Object}   props                     The component props.
+ * @param {boolean}  props.forceIsAutosaveable Whether to force autosave.
+ * @param {Function} props.onPreview           The callback function for the preview event.
+ *
+ * @return {React.ReactNode} The rendered menu item.
+ */
+export function PostPreviewMenuItem( { forceIsAutosaveable, onPreview } ) {
+	const previewProps = usePostPreviewProps( {
+		forceIsAutosaveable,
+		onPreview,
+	} );
+
+	if ( ! previewProps ) {
+		return null;
+	}
+
+	return (
+		<MenuItem icon={ external } { ...previewProps }>
+			{ __( 'Preview in new tab' ) }
+		</MenuItem>
+	);
+}
+
+/**
+ * Renders a button that opens a new window or tab for the preview,
+ * writes the interstitial message to this window, and then navigates
+ * to the actual preview link. The button is not rendered if the post
+ * is not viewable and disabled if the post is not saveable.
+ *
+ * @param {Object}   props                     The component props.
+ * @param {string}   props.className           The class name for the button.
+ * @param {string}   props.textContent         The text content for the button.
+ * @param {boolean}  props.forceIsAutosaveable Whether to force autosave.
+ * @param {string}   props.role                The role attribute for the button.
+ * @param {Function} props.onPreview           The callback function for preview event.
+ *
+ * @return {React.ReactNode} The rendered button component.
+ */
+export default function PostPreviewButton( {
+	className,
+	textContent,
+	forceIsAutosaveable,
+	role,
+	onPreview,
+} ) {
+	const previewProps = usePostPreviewProps( {
+		forceIsAutosaveable,
+		onPreview,
+	} );
+
+	if ( ! previewProps ) {
+		return null;
+	}
+
 	return (
 		<Button
 			variant={ ! className ? 'tertiary' : undefined }
 			className={ className || 'editor-post-preview' }
-			href={ href }
-			target={ targetId }
-			accessibleWhenDisabled
-			disabled={ ! isSaveable }
-			onClick={ openPreviewWindow }
 			role={ role }
 			size="compact"
+			{ ...previewProps }
 		>
 			{ textContent || (
 				<>

@@ -12,7 +12,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import PostPreviewButton from '..';
+import PostPreviewButton, { PostPreviewMenuItem } from '..';
 
 jest.useRealTimers();
 
@@ -137,6 +137,16 @@ describe( 'PostPreviewButton', () => {
 		expect(
 			within( button ).getByText( '(opens in a new tab)' )
 		).toBeInTheDocument();
+	} );
+
+	it( 'should render the menu variant with the shared menu item pattern.', () => {
+		mockUseSelect();
+
+		render( <PostPreviewMenuItem /> );
+
+		expect(
+			screen.getByRole( 'menuitem', { name: 'Preview in new tab' } )
+		).toHaveClass( 'components-menu-item__button' );
 	} );
 
 	it( 'should be accessibly disabled if post is not saveable.', () => {
