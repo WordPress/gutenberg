@@ -15,7 +15,7 @@ jest.mock( '@wordpress/ui', () => {
 		...actual,
 		Tooltip: {
 			Root: ( { children } ) => <>{ children }</>,
-			Trigger: ( { render: trigger } ) => trigger,
+			Trigger: ( { children } ) => children,
 			Popup: ( { children } ) => <span role="tooltip">{ children }</span>,
 		},
 	};
@@ -35,11 +35,11 @@ describe( 'StateControlBadges', () => {
 
 		expect( screen.getByText( 'Tablet' ) ).toBeVisible();
 		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent(
-			'Style changes apply only to the Tablet viewport.'
+			'Style changes apply to the Tablet viewport.'
 		);
 	} );
 
-	it( 'does not add a tooltip to pseudo state badges', () => {
+	it( 'explains pseudo state badges with a tooltip', () => {
 		render(
 			<StateControlBadges
 				pseudoStates={ pseudoStates }
@@ -48,6 +48,8 @@ describe( 'StateControlBadges', () => {
 		);
 
 		expect( screen.getByText( 'Hover' ) ).toBeVisible();
-		expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
+		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent(
+			'Style changes apply to the Hover state.'
+		);
 	} );
 } );
