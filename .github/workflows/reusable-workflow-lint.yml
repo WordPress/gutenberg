@@ -15,7 +15,7 @@ jobs:
     # `run:` script checking, glob syntax validation, and more.
     actionlint:
         name: Run actionlint
-        runs-on: ubuntu-24.04
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         timeout-minutes: 5
@@ -39,7 +39,7 @@ jobs:
     # dangerous triggers, credential leaks, and sophisticated security vulnerabilities.
     zizmor:
         name: Zizmor
-        runs-on: ubuntu-24.04
+        runs-on: 'ubuntu-24.04'
         permissions:
             security-events: write
             actions: read
