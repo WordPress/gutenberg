@@ -10,20 +10,11 @@ import { __, _x } from '@wordpress/i18n';
  */
 import { initWaveformPlayer, updateSeekControlLabel } from './waveform-utils';
 
-const EMPTY_ARTIST_PLACEHOLDER = '\u00a0';
-
 /**
- * Update the DOM of a WaveformPlayer element to reflect current props.
+ * Update the metadata of a WaveformPlayer element to reflect current props.
  *
- * The @arraypress/waveform-player library currently offers no public method to
- * do this, hence the workaround. Context:
- *
- * - The title and artist elements are guaranteed to exist based on
- *   `initWaveformPlayer` and implementation details of the library.
- *
- * - The image/artwork element may not exist if the track loaded upon init had
- *   no defined artwork, but in these cases we create the entire WaveformPlayer
- *   instance. See `hasImage`.
+ * `loadTrack()` owns full track swaps, but it also resets the audio element.
+ * This keeps same-source metadata edits lightweight in the editor.
  *
  * @param {Object} instance          - The waveform player instance.
  * @param {Object} metadata          - The track metadata.
@@ -37,11 +28,17 @@ function updatePlayerMetadata( instance, { title, artist, image, imageAlt } ) {
 		instance.titleEl.textContent = title ?? '';
 	}
 	updateSeekControlLabel( instance, title || __( 'Seek' ) );
-	if ( instance.artistEl ) {
+
+	if ( typeof instance.syncArtist === 'function' ) {
+		instance.syncArtist( artist || '' );
+	} else if ( instance.artistEl ) {
 		instance.artistEl.textContent = artist ?? '';
 		instance.artistEl.style.display = artist ? '' : 'none';
 	}
-	if ( instance.artworkEl && image ) {
+
+	if ( typeof instance.syncArtwork === 'function' ) {
+		instance.syncArtwork( image || null, imageAlt || '' );
+	} else if ( instance.artworkEl && image ) {
 		instance.artworkEl.src = image;
 		instance.artworkEl.alt = imageAlt || '';
 	}
@@ -82,12 +79,6 @@ export function WaveformPlayer( {
 	// Ref for the WaveformPlayer instance
 	const playerRef = useRef();
 
-	// Due to how WaveformPlayer is implemented, the artwork element within the
-	// player element only exists when an image was present when the player was
-	// created. Recreate the player when one is added or removed so that
-	// element is created or torn down.
-	const hasImage = !! image;
-
 	// WaveformPlayer needs an audio source on init, but the source may change
 	// throughout its lifetime.
 	const hasSrc = !! src;
@@ -115,8 +106,7 @@ export function WaveformPlayer( {
 				const player = initWaveformPlayer( element, {
 					src: metadataRef.current.src,
 					title: metadataRef.current.title,
-					artist:
-						metadataRef.current.artist || EMPTY_ARTIST_PLACEHOLDER,
+					artist: metadataRef.current.artist,
 					image: metadataRef.current.image,
 					imageAlt: metadataRef.current.imageAlt,
 					waveformStyle,
@@ -151,7 +141,7 @@ export function WaveformPlayer( {
 				playerDestroy?.();
 			};
 		},
-		[ onEndedEvent, hasSrc, waveformStyle, hasImage ]
+		[ onEndedEvent, hasSrc, waveformStyle ]
 	);
 
 	useEffect( () => {
@@ -177,6 +167,7 @@ export function WaveformPlayer( {
 				metadataRef.current.artist,
 				{
 					artwork: metadataRef.current.image,
+					artworkAlt: metadataRef.current.imageAlt,
 				}
 			);
 			if ( ! wasPlaying ) {
