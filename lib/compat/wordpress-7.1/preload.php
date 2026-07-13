@@ -83,47 +83,26 @@ function gutenberg_block_editor_preload_paths_7_1( $paths, $context ) {
 
 		$template_part_ids = array();
 		$has_query         = false;
+		$walk_blocks       = static function ( array $blocks ) use ( &$walk_blocks, &$template_part_ids, &$has_query ) {
+			foreach ( $blocks as $block ) {
+				if ( 'core/template-part' === ( $block['blockName'] ?? '' ) && ! empty( $block['attrs']['slug'] ) ) {
+					$theme               = ! empty( $block['attrs']['theme'] ) ? $block['attrs']['theme'] : get_stylesheet();
+					$template_part_ids[] = $theme . '//' . $block['attrs']['slug'];
+				}
+
+				if ( 'core/query' === ( $block['blockName'] ?? '' ) ) {
+					$has_query = true;
+				}
+
+				if ( ! empty( $block['innerBlocks'] ) ) {
+					$walk_blocks( $block['innerBlocks'] );
+				}
+			}
+		};
 
 		if ( ! empty( $templates ) && ! empty( $templates[0]->content ) ) {
 			$blocks = gutenberg_resolve_pattern_blocks( parse_blocks( $templates[0]->content ) );
-			if ( class_exists( 'WP_Block_Processor' ) ) {
-				$processor = new WP_Block_Processor( serialize_blocks( $blocks ) );
-				while ( $processor->next_block() ) {
-					if ( $processor->is_block_type( 'core/query' ) ) {
-						$has_query = true;
-					}
-
-					if ( ! $processor->is_block_type( 'core/template-part' ) ) {
-						continue;
-					}
-
-					$attrs = $processor->allocate_and_return_parsed_attributes();
-					if ( ! is_array( $attrs ) || empty( $attrs['slug'] ) ) {
-						continue;
-					}
-
-					$theme               = ! empty( $attrs['theme'] ) ? $attrs['theme'] : get_stylesheet();
-					$template_part_ids[] = $theme . '//' . $attrs['slug'];
-				}
-			} else {
-				$walk_blocks = static function ( array $blocks_to_walk ) use ( &$walk_blocks, &$template_part_ids, &$has_query ) {
-					foreach ( $blocks_to_walk as $block ) {
-						if ( 'core/template-part' === ( $block['blockName'] ?? '' ) && ! empty( $block['attrs']['slug'] ) ) {
-							$theme               = ! empty( $block['attrs']['theme'] ) ? $block['attrs']['theme'] : get_stylesheet();
-							$template_part_ids[] = $theme . '//' . $block['attrs']['slug'];
-						}
-
-						if ( 'core/query' === ( $block['blockName'] ?? '' ) ) {
-							$has_query = true;
-						}
-
-						if ( ! empty( $block['innerBlocks'] ) ) {
-							$walk_blocks( $block['innerBlocks'] );
-						}
-					}
-				};
-				$walk_blocks( $blocks );
-			}
+			$walk_blocks( $blocks );
 		}
 
 		foreach ( array_unique( $template_part_ids ) as $template_part_id ) {
