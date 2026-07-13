@@ -110,9 +110,11 @@ async function run( args = process.argv, commandLine = program ) {
 	try {
 		await commandLine.parseAsync( args );
 	} catch ( error ) {
-		console.error(
-			error instanceof Error ? error.message : String( error )
-		);
+		let errorMessage = String( error );
+		if ( error instanceof Error ) {
+			errorMessage = process.env.DEBUG ? error.stack : error.message;
+		}
+		console.error( errorMessage );
 		process.exitCode = 1;
 	}
 }
