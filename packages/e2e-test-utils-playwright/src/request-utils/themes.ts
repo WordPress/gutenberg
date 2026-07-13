@@ -21,13 +21,17 @@ async function activateTheme(
 		} catch ( error ) {
 			const message =
 				error instanceof Error ? error.message : String( error );
-			const isTransient = /socket hang up|ECONNRESET|ETIMEDOUT|5\d{2}|ERR_HTTP|timeout|ENOTFOUND/i.test( message );
+			const isTransient =
+				/socket hang up|ECONNRESET|ETIMEDOUT|5\d{2}|ERR_HTTP|timeout|ENOTFOUND/i.test(
+					message
+				);
 
 			if ( ! isTransient || attempt === maxAttempts ) {
 				throw error;
 			}
 
-			const delay = baseDelay * Math.pow( 2, attempt - 1 ) + Math.random() * 500;
+			const delay =
+				baseDelay * Math.pow( 2, attempt - 1 ) + Math.random() * 500;
 			await new Promise( ( resolve ) => setTimeout( resolve, delay ) );
 		}
 	}
