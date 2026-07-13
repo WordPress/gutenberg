@@ -29,6 +29,7 @@ import useClipboardHandler from './use-clipboard-handler';
 import { store as blockEditorStore } from '../../store';
 
 export function useWritingFlow() {
+	useEditableRoot();
 	const [ before, ref, after ] = useTabNav();
 	const hasMultiSelection = useSelect(
 		( select ) => select( blockEditorStore ).hasMultiSelection(),
@@ -41,7 +42,6 @@ export function useWritingFlow() {
 			ref,
 			useClipboardHandler(),
 			useInput(),
-			useEditableRoot(),
 			useHomeEnd(),
 			useDragSelection(),
 			useSelectionObserver(),

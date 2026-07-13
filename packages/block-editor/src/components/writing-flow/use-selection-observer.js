@@ -228,9 +228,25 @@ export default function useSelectionObserver() {
 							getBlockRootClientId( collapsedClientId )
 						).length > 1
 					) {
-						setContentEditableWrapper( node, true );
+						// The editing host is the block's direct block list
+						// parent (see use-editable-root.js).
+						const blockElement =
+							startNode.nodeType === startNode.ELEMENT_NODE
+								? startNode.closest( '[data-block]' )
+								: startNode.parentElement.closest(
+										'[data-block]'
+								  );
+						const host = blockElement?.parentElement;
 
-						// While the wrapper is editable it must hold focus: a
+						if ( ! host ) {
+							return;
+						}
+
+						if ( host.contentEditable !== 'true' ) {
+							host.setAttribute( 'contenteditable', 'true' );
+						}
+
+						// While the host is editable it must hold focus: a
 						// nested editable element cannot retain it (the first
 						// DOM mutation moves focus to the host, inconsistently
 						// across browsers). Don't steal focus from UI elements
@@ -239,13 +255,13 @@ export default function useSelectionObserver() {
 						// selection syncs it to the store itself.
 						const { activeElement } = ownerDocument;
 						if (
-							activeElement !== node &&
+							activeElement !== host &&
 							activeElement?.isContentEditable &&
-							node.contains( activeElement ) &&
+							host.contains( activeElement ) &&
 							getBlockClientId( activeElement ) ===
 								collapsedClientId
 						) {
-							node.focus();
+							host.focus();
 						}
 						return;
 					}

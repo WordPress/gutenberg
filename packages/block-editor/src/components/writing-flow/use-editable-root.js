@@ -3,13 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useRegistry, useSelect } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useEffect } from '@wordpress/element';
 import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
@@ -69,101 +70,94 @@ export function useHasEditableRoot() {
  */
 export default function useEditableRoot() {
 	const registry = useRegistry();
-	const isZoomOut = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).isZoomOut(),
-		[]
-	);
+	const { selectedClientId, isZoomOut } = useSelect( ( select ) => {
+		return {
+			selectedClientId:
+				select( blockEditorStore ).getSelectedBlockClientId(),
+			isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
+		};
+	}, [] );
 	const enabled = useHasEditableRoot() && ! isZoomOut;
+	const blockElement = useBlockElement( enabled ? selectedClientId : null );
+	// The editing host is the block's direct block list parent: the native
+	// selection can extend across sibling blocks, while everything outside
+	// the list (e.g. the post title) stays non-editable.
+	const host = blockElement?.parentElement;
 
-	return useRefEffect(
-		( node ) => {
-			if ( ! enabled ) {
-				return;
-			}
+	useEffect( () => {
+		if ( ! enabled || ! host ) {
+			return;
+		}
 
-			const {
-				getSelectedBlockClientId,
-				hasMultiSelection,
-				isMultiSelecting,
-			} = registry.select( blockEditorStore );
+		host.setAttribute( 'contenteditable', 'true' );
 
-			node.setAttribute( 'contenteditable', 'true' );
+		// Abort in environments without contentEditable support (JSDOM):
+		// without editing host semantics the host must not claim to be one.
+		if ( ! host.isContentEditable ) {
+			host.removeAttribute( 'contenteditable' );
+			return;
+		}
 
-			// Abort in environments without contentEditable support (JSDOM):
-			// without editing host semantics the wrapper must not claim to
-			// be one.
-			if ( ! node.isContentEditable ) {
-				node.removeAttribute( 'contenteditable' );
-				return;
-			}
+		const { getSelectedBlockClientId } =
+			registry.select( blockEditorStore );
 
-			// Expose the host as a named multiline textbox so it has a role
-			// and accessible name once it takes focus. The label is generic
-			// because the host can span several blocks.
-			node.setAttribute( 'role', 'textbox' );
-			node.setAttribute( 'aria-multiline', 'true' );
-			node.setAttribute( 'aria-label', __( 'Editor canvas' ) );
+		// Expose the host as a named multiline textbox so it has a role and
+		// accessible name once it takes focus. The label is generic because
+		// the host can span several blocks.
+		host.setAttribute( 'role', 'textbox' );
+		host.setAttribute( 'aria-multiline', 'true' );
+		host.setAttribute( 'aria-label', __( 'Block list' ) );
 
-			// Move focus from the block's editable element to the wrapper,
-			// but only when an editable element belonging to the selected
-			// block has focus. Never steal focus from other regions (e.g.
-			// List View), UI elements (e.g. buttons), or other editables
-			// within the wrapper (e.g. the post title). The selection is
-			// preserved. If the selection is still outside the focused
-			// element, a mousedown just focused it and the browser has not
-			// placed the caret yet; moving focus now would cancel the
-			// pending caret placement. The selection observer moves focus
-			// once the selection lands.
-			const { activeElement } = node.ownerDocument;
-			const selection = node.ownerDocument.defaultView.getSelection();
-			if (
-				activeElement !== node &&
-				activeElement?.isContentEditable &&
-				node.contains( activeElement ) &&
-				getBlockClientId( activeElement ) ===
-					getSelectedBlockClientId() &&
-				selection.anchorNode &&
-				activeElement.contains( selection.anchorNode )
-			) {
-				node.focus();
-			}
+		// Move focus from the block's editable element to the host, but
+		// only when an editable element belonging to the selected block has
+		// focus. Never steal focus from other regions (e.g. List View), UI
+		// elements (e.g. buttons), or editables outside the host (e.g. the
+		// post title). The selection is preserved. If the selection is
+		// still outside the focused element, a mousedown just focused it
+		// and the browser has not placed the caret yet; moving focus now
+		// would cancel the pending caret placement. The selection observer
+		// moves focus once the selection lands.
+		const { activeElement } = host.ownerDocument;
+		const selection = host.ownerDocument.defaultView.getSelection();
+		if (
+			activeElement !== host &&
+			activeElement?.isContentEditable &&
+			host.contains( activeElement ) &&
+			getBlockClientId( activeElement ) === getSelectedBlockClientId() &&
+			selection.anchorNode &&
+			activeElement.contains( selection.anchorNode )
+		) {
+			host.focus();
+		}
 
-			return () => {
-				node.removeAttribute( 'role' );
-				node.removeAttribute( 'aria-multiline' );
-				node.removeAttribute( 'aria-label' );
+		return () => {
+			host.removeAttribute( 'role' );
+			host.removeAttribute( 'aria-multiline' );
+			host.removeAttribute( 'aria-label' );
+			// Remove the attribute rather than setting it to false: an
+			// explicit false on a block list container would fence the
+			// native selection when the multi-selection machinery makes the
+			// whole canvas editable.
+			host.removeAttribute( 'contenteditable' );
 
-				// A multi-selection owns the wrapper as its editing host
-				// now; the selection observer disables it when the
-				// selection collapses.
-				if ( hasMultiSelection() || isMultiSelecting() ) {
-					return;
+			// If the host held focus, return focus to the editable element
+			// containing the selection, which is focusable again now that
+			// the host is gone. Only do so if that element belongs to the
+			// selected block: when the selection moved to another block
+			// through the store, the stale DOM selection must not reclaim
+			// block selection through its focus handler.
+			if ( host.ownerDocument.activeElement === host ) {
+				const editable = getSelectionEditableElement(
+					host.ownerDocument.defaultView.getSelection(),
+					host
+				);
+				if (
+					editable &&
+					getBlockClientId( editable ) === getSelectedBlockClientId()
+				) {
+					editable.focus();
 				}
-
-				node.setAttribute( 'contenteditable', 'false' );
-
-				// If the wrapper held focus, return focus to the editable
-				// element containing the selection, which is focusable
-				// again now that the wrapper is no longer an editing host.
-				// Only do so if that element belongs to the selected block:
-				// when the selection moved to another block through the
-				// store, the stale DOM selection must not reclaim block
-				// selection through its focus handler.
-				if ( node.ownerDocument.activeElement === node ) {
-					const editable = getSelectionEditableElement(
-						node.ownerDocument.defaultView.getSelection(),
-						node
-					);
-					if (
-						editable &&
-						getBlockClientId( editable ) ===
-							getSelectedBlockClientId()
-					) {
-						editable.focus();
-					}
-				}
-			};
-		},
-		[ enabled, registry ]
-	);
+			}
+		};
+	}, [ enabled, host, registry ] );
 }

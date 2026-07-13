@@ -207,16 +207,16 @@ export default function useArrowNav() {
 			}
 
 			const { keyCode, shiftKey, ctrlKey, altKey, metaKey } = event;
-			// When the wrapper is contentEditable and holds focus (the
-			// selected block supports `editableRoot`), the event targets the
-			// wrapper; resolve the editable element containing the selection.
+			// When an editing host holds focus (the selected block supports
+			// `editableRoot`), the event targets the host; resolve the
+			// editable element containing the selection. For an event
+			// targeting the editable element itself, the helper returns
+			// nothing (the closest editable is the target).
 			const target =
-				( event.target === node &&
-					getSelectionEditableElement(
-						node.ownerDocument.defaultView.getSelection(),
-						node
-					) ) ||
-				event.target;
+				getSelectionEditableElement(
+					node.ownerDocument.defaultView.getSelection(),
+					event.target
+				) || event.target;
 			const isUp = keyCode === UP;
 			const isDown = keyCode === DOWN;
 			const isLeft = keyCode === LEFT;
