@@ -329,6 +329,107 @@ describe( 'resolveStyles – merged output', () => {
 		} );
 	} );
 
+	describe( 'element-based blocks fold root element styles', () => {
+		const HOVER_STATE = { viewport: 'default', pseudo: ':hover' };
+
+		test( 'core/button picks up root `elements.button` color and typography', () => {
+			const gs = {
+				styles: {
+					elements: {
+						button: {
+							color: { text: '#fff', background: '#0073aa' },
+							typography: { fontSize: '18px' },
+							border: { radius: '4px' },
+						},
+					},
+				},
+			};
+			const { value, sources } = resolveStyles( {
+				blockName: 'core/button',
+				globalStyles: gs,
+			} );
+			// Element styles surface as the block's own inherited values, so
+			// the Typography/Background/Border controls reflect the canvas.
+			expect( value.color.text ).toBe( '#fff' );
+			expect( value.color.background ).toBe( '#0073aa' );
+			expect( value.typography.fontSize ).toBe( '18px' );
+			expect( value.border.radius ).toBe( '4px' );
+			// Attributed to the element layer, and NOT dropped as a
+			// non-cascading root leaf (background/border cascade to the block
+			// via the element selector).
+			expect( sources[ 'color.background' ]?.layer ).toBe( 'element' );
+			expect( sources[ 'border.radius' ]?.layer ).toBe( 'element' );
+		} );
+
+		test( 'block-type styles override root element styles', () => {
+			const gs = {
+				styles: {
+					elements: {
+						button: { color: { text: 'elementText' } },
+					},
+					blocks: {
+						'core/button': { color: { text: 'blockText' } },
+					},
+				},
+			};
+			const { value, sources } = resolveStyles( {
+				blockName: 'core/button',
+				globalStyles: gs,
+			} );
+			expect( value.color.text ).toBe( 'blockText' );
+			expect( sources[ 'color.text' ]?.layer ).toBe( 'block' );
+		} );
+
+		test( 'core/heading picks up root `elements.heading` styles', () => {
+			const gs = {
+				styles: {
+					elements: {
+						heading: { typography: { fontWeight: '700' } },
+					},
+				},
+			};
+			const { value } = resolveStyles( {
+				blockName: 'core/heading',
+				globalStyles: gs,
+			} );
+			expect( value.typography.fontWeight ).toBe( '700' );
+		} );
+
+		test( 'non element-based blocks ignore root element styles', () => {
+			const gs = {
+				styles: {
+					elements: {
+						button: { color: { text: 'elementText' } },
+					},
+				},
+			};
+			const { value } = resolveStyles( {
+				blockName: 'core/paragraph',
+				globalStyles: gs,
+			} );
+			expect( value.color?.text ).toBeUndefined();
+		} );
+
+		test( 'element `:hover` slice layers over the base under a pseudo state', () => {
+			const gs = {
+				styles: {
+					elements: {
+						button: {
+							color: { background: 'elementBase' },
+							':hover': { color: { background: 'elementHover' } },
+						},
+					},
+				},
+			};
+			const { value } = resolveStyles( {
+				blockName: 'core/button',
+				globalStyles: gs,
+				selectedState: HOVER_STATE,
+			} );
+			expect( value.color.background ).toBe( 'elementHover' );
+		} );
+	} );
+
 	describe( 'explicit-empty normalization', () => {
 		test( 'empty leaf at block layer lets root win', () => {
 			const gs = {

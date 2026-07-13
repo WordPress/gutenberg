@@ -56,8 +56,18 @@ const EMPTY_INHERITANCE = Object.freeze( { value: {}, sources: {} } );
 // supplied a leaf and drives inherited-value detection.
 const SOURCE_DESCRIPTORS = {
 	root: { layer: 'root' },
+	element: { layer: 'element' },
 	block: { layer: 'block' },
 	blockVariation: { layer: 'blockVariation' },
+};
+
+// Blocks whose canvas rendering is effected by a Global Styles *element*
+// selector (e.g. `.wp-element-button`, `h1`–`h6`) rather than the block's own
+// class. For these, the matching root-level `styles.elements[ element ]` layer
+// styles the block on the canvas, so it must be folded into the block's.
+const BLOCK_TO_ROOT_ELEMENT = {
+	'core/button': 'button',
+	'core/heading': 'heading',
 };
 
 function createSourceDescriptor( type ) {
@@ -361,6 +371,13 @@ function computeResolvedStyles( {
 
 	const root = styles;
 	const block = styles.blocks?.[ blockName ] ?? null;
+	// For element-based blocks (e.g. `core/button`), the root-level element
+	// styles paint the block on the canvas, so fold them in as a layer just
+	// above the root defaults but below the block's own styles.
+	const rootElement = BLOCK_TO_ROOT_ELEMENT[ blockName ] ?? null;
+	const element = rootElement
+		? styles.elements?.[ rootElement ] ?? null
+		: null;
 	// Variation layer is pre-resolved for refs via the production helper.
 	const variation = ownVariation
 		? getVariationStylesWithRefValues(
@@ -370,7 +387,8 @@ function computeResolvedStyles( {
 		  ) ?? null
 		: null;
 
-	// Layers ordered low to high precedence: root defaults, the block's own
+	// Layers ordered low to high precedence: root defaults, the matching
+	// root-level element styles (for element-based blocks), the block's own
 	// defaults, then the active block style variation. Each layer's `elements`
 	// sub-tree is preserved as a passthrough so panels can read element styles
 	// (e.g. `inheritedValue.elements.link`).
@@ -379,6 +397,12 @@ function computeResolvedStyles( {
 			pickLayerRootContribution( root ),
 			createSourceDescriptor( 'root' )
 		),
+		element
+			? createContribution(
+					pickLayerRootContribution( element ),
+					createSourceDescriptor( 'element' )
+			  )
+			: null,
 		block
 			? createContribution(
 					pickLayerRootContribution( block ),
@@ -406,6 +430,14 @@ function computeResolvedStyles( {
 				),
 				createSourceDescriptor( 'root' )
 			),
+			element
+				? createContribution(
+						pickLayerRootContribution(
+							getStateSlice( element, selectedState )
+						),
+						createSourceDescriptor( 'element' )
+				  )
+				: null,
 			block
 				? createContribution(
 						pickLayerRootContribution(
