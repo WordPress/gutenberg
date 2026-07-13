@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -40,41 +39,15 @@ describe( 'StateControlBadges', () => {
 		);
 	} );
 
-	it( 'allows a viewport badge to be cleared', async () => {
-		const user = userEvent.setup();
-		const onClearViewport = jest.fn();
-
-		render(
-			<StateControlBadges
-				viewportStates={ viewportStates }
-				viewportValue="@tablet"
-				onClearViewport={ onClearViewport }
-			/>
-		);
-
-		await user.click(
-			screen.getByRole( 'button', {
-				name: 'Stop editing Tablet viewport',
-			} )
-		);
-
-		expect( onClearViewport ).toHaveBeenCalledTimes( 1 );
-	} );
-
-	it( 'does not add viewport clearing controls to pseudo state badges', () => {
+	it( 'does not add a tooltip to pseudo state badges', () => {
 		render(
 			<StateControlBadges
 				pseudoStates={ pseudoStates }
 				pseudoStateValue=":hover"
-				onClearViewport={ jest.fn() }
 			/>
 		);
 
 		expect( screen.getByText( 'Hover' ) ).toBeVisible();
-		expect(
-			screen.queryByRole( 'button', {
-				name: 'Stop editing Hover viewport',
-			} )
-		).not.toBeInTheDocument();
+		expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
 	} );
 } );

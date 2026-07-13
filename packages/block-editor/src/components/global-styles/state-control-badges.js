@@ -1,12 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { closeSmall } from '@wordpress/icons';
 import { Stack, Tooltip } from '@wordpress/ui';
 
 /**
@@ -21,7 +17,6 @@ export default function StateControlBadges( {
 	pseudoStates = [],
 	viewportValue = 'default',
 	pseudoStateValue = 'default',
-	onClearViewport,
 	className = 'block-editor-global-styles-state-control__badges',
 } ) {
 	const activeStates = [];
@@ -33,20 +28,12 @@ export default function StateControlBadges( {
 	);
 
 	if ( selectedViewport ) {
-		const tooltipText = sprintf(
-			/* translators: %s: viewport name, e.g. "Tablet". */
-			__( 'Style changes apply only to the %s viewport.' ),
-			selectedViewport.label
-		);
-
 		activeStates.push( {
 			key: `viewport-${ selectedViewport.value }`,
 			label: selectedViewport.label,
-			tooltipText,
-			onClear: onClearViewport,
-			clearLabel: sprintf(
+			tooltipText: sprintf(
 				/* translators: %s: viewport name, e.g. "Tablet". */
-				__( 'Stop editing %s viewport' ),
+				__( 'Style changes apply only to the %s viewport.' ),
 				selectedViewport.label
 			),
 		} );
@@ -70,33 +57,23 @@ export default function StateControlBadges( {
 			{ activeStates.map( ( state ) => {
 				const badge = (
 					<WCBadge
-						key={ state.key }
-						className={
-							state.onClear
-								? 'block-editor-global-styles-state-control__badge has-action'
-								: 'block-editor-global-styles-state-control__badge'
-						}
+						className="block-editor-global-styles-state-control__badge"
 						intent="info"
 					>
-						<span className="block-editor-global-styles-state-control__badge-content">
-							{ state.label }
-							{ state.onClear && (
-								<Button
-									className="block-editor-global-styles-state-control__badge-dismiss"
-									icon={ closeSmall }
-									iconSize={ 20 }
-									label={ state.clearLabel }
-									onClick={ state.onClear }
-									showTooltip={ false }
-									size="small"
-								/>
-							) }
-						</span>
+						{ state.label }
 					</WCBadge>
 				);
 
 				if ( ! state.tooltipText ) {
-					return badge;
+					return (
+						<WCBadge
+							key={ state.key }
+							className="block-editor-global-styles-state-control__badge"
+							intent="info"
+						>
+							{ state.label }
+						</WCBadge>
+					);
 				}
 
 				return (

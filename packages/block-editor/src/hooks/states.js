@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
 
@@ -13,7 +12,6 @@ import StateControl from '../components/global-styles/state-control';
 import StateControlBadges from '../components/global-styles/state-control-badges';
 import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
 import { useSettings } from '../components/use-settings';
-import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
@@ -111,9 +109,6 @@ export function BlockStatesControl( { name, value, onChange } ) {
  * @return {Element|null} Badges component, or null if there is nothing to show.
  */
 export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
-	const { setResponsiveEditing, setStyleStateViewport } = unlock(
-		useDispatch( blockEditorStore )
-	);
 	const pseudoStateOptions = useMemo(
 		() => getPseudoStateOptions( name ),
 		[ name ]
@@ -136,10 +131,6 @@ export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
 			pseudoStates={ pseudoStateOptions }
 			viewportValue={ value?.viewport ?? DEFAULT_STATE_VALUE }
 			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }
-			onClearViewport={ () => {
-				setResponsiveEditing( false );
-				setStyleStateViewport( DEFAULT_STATE_VALUE );
-			} }
 		/>
 	);
 }

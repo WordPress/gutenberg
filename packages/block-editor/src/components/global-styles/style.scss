@@ -32,39 +32,9 @@
 	min-height: $grid-unit-30;
 }
 
-.block-editor-global-styles-state-control__badge.has-action {
-	padding-inline-end: $grid-unit-05;
-
-	.components-badge__flex-wrapper,
-	.components-badge__content {
-		align-items: center;
-		display: inline-flex;
-		overflow: visible;
-	}
-
-	.components-badge__icon {
-		align-self: center;
-	}
-}
-
 .block-editor-global-styles-state-control__badge-tooltip-trigger {
 	display: inline-flex;
 	max-width: 100%;
-}
-
-.block-editor-global-styles-state-control__badge-content {
-	display: inline-flex;
-	align-items: center;
-	gap: 2px;
-}
-
-.block-editor-global-styles-state-control__badge-dismiss.components-button {
-	align-self: center;
-	width: $grid-unit-30;
-	height: $grid-unit-30;
-	min-width: $grid-unit-30;
-	padding: 0;
-	color: currentColor;
 }
 
 .block-editor-global-styles-filters-panel__dropdown,
