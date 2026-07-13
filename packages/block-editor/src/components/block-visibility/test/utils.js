@@ -2,11 +2,22 @@
  * Internal dependencies
  */
 import {
+	getBlockVisibilityViewportEntries,
 	getViewportCheckboxState,
 	getHideEverywhereCheckboxState,
 } from '../utils';
 
 describe( 'block-visibility utils', () => {
+	describe( 'getBlockVisibilityViewportEntries', () => {
+		it( 'returns the configured viewport for a single breakpoint', () => {
+			expect(
+				getBlockVisibilityViewportEntries( { tablet: '64rem' } ).map(
+					( [ key ] ) => key
+				)
+			).toEqual( [ 'desktop', 'tablet' ] );
+		} );
+	} );
+
 	describe( 'getViewportCheckboxState', () => {
 		it( 'should return false for empty or invalid input', () => {
 			expect( getViewportCheckboxState( [], 'mobile' ) ).toBe( false );

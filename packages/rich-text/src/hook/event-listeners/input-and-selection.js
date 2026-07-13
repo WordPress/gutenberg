@@ -114,9 +114,12 @@ export default ( props ) => ( element ) => {
 		handleChange( change );
 	}
 
+	let selectionSnapshot;
+
 	/**
 	 * Syncs the selection to local state. A callback for the `selectionchange`
-	 * event.
+	 * event, and for the capture phase of events that consume the selection,
+	 * which run before `selectionchange` is delivered.
 	 */
 	function handleSelectionChange() {
 		const { record, applyRecord, createRecord, onSelectionChange } =
@@ -129,14 +132,9 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		// Ensure the active element is the rich text element.
+		// Ensure the active element is the rich text element. The listener
+		// stays subscribed but no-ops for instances that aren't focused.
 		if ( ownerDocument.activeElement !== element ) {
-			// If it is not, we can stop listening for selection changes. We
-			// resume listening when the element is focused.
-			ownerDocument.removeEventListener(
-				'selectionchange',
-				handleSelectionChange
-			);
 			return;
 		}
 
@@ -146,8 +144,38 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
+		const selection = defaultView.getSelection();
+
+		// Skip selections that have already been processed into the current
+		// record, such as the `selectionchange` event for a selection that
+		// was synchronized on capture of a consuming event, or coalesced
+		// duplicates. The offsets the processing produced are compared to
+		// the record too: the record's selection may be rewritten from
+		// (possibly stale) props on render without the DOM selection moving,
+		// in which case the selection must be processed again.
+		if (
+			selectionSnapshot &&
+			selectionSnapshot.anchorNode === selection.anchorNode &&
+			selectionSnapshot.anchorOffset === selection.anchorOffset &&
+			selectionSnapshot.focusNode === selection.focusNode &&
+			selectionSnapshot.focusOffset === selection.focusOffset &&
+			selectionSnapshot.processedStart === record.current.start &&
+			selectionSnapshot.processedEnd === record.current.end
+		) {
+			return;
+		}
+
 		const { start, end, text } = createRecord();
 		const oldRecord = record.current;
+
+		selectionSnapshot = {
+			anchorNode: selection.anchorNode,
+			anchorOffset: selection.anchorOffset,
+			focusNode: selection.focusNode,
+			focusOffset: selection.focusOffset,
+			processedStart: start,
+			processedEnd: end,
+		};
 
 		// Fallback mechanism for IE11, which doesn't support the input event.
 		// Any input results in a selection change.
@@ -195,13 +223,9 @@ export default ( props ) => ( element ) => {
 
 	function onCompositionStart() {
 		isComposing = true;
-		// Do not update the selection when characters are being composed as
-		// this rerenders the component and might destroy internal browser
-		// editing state.
-		ownerDocument.removeEventListener(
-			'selectionchange',
-			handleSelectionChange
-		);
+		// `handleSelectionChange` returns early while composing, so the
+		// selection is not updated as characters are composed (which rerenders
+		// the component and might destroy internal browser editing state).
 		// Remove the placeholder. Since the rich text value doesn't update
 		// during composition, the placeholder doesn't get removed. There's no
 		// need to re-add it, when the value is updated on compositionend it
@@ -214,11 +238,6 @@ export default ( props ) => ( element ) => {
 		// Ensure the value is up-to-date for browsers that don't emit a final
 		// input event after composition.
 		onInput( { inputType: 'insertText' } );
-		// Tracking selection changes can be resumed.
-		ownerDocument.addEventListener(
-			'selectionchange',
-			handleSelectionChange
-		);
 	}
 
 	function onFocus( event ) {
@@ -259,6 +278,9 @@ export default ( props ) => ( element ) => {
 				end: index,
 				activeFormats: EMPTY_ACTIVE_FORMATS,
 			};
+			// The record no longer reflects the selection, so a matching
+			// snapshot must not skip synchronization.
+			selectionSnapshot = undefined;
 		} else {
 			applyRecord( record.current, { domOnly: true } );
 		}
@@ -269,11 +291,6 @@ export default ( props ) => ( element ) => {
 		// we need to manually trigger it. The selection is also not available
 		// yet in this call stack.
 		window.queueMicrotask( handleSelectionChange );
-
-		ownerDocument.addEventListener(
-			'selectionchange',
-			handleSelectionChange
-		);
 	}
 
 	// `input` and `compositionend` must run before block-editor's
@@ -302,11 +319,45 @@ export default ( props ) => ( element ) => {
 		'focusin',
 		onFocus
 	);
+	// Permanently subscribed rather than added on focus and removed on blur:
+	// `handleSelectionChange` checks whether the element is focused itself,
+	// and the shared underlying delegated listener keeps the number of native
+	// listeners constant.
+	const unsubscribeSelectionChange = subscribeDelegatedListener(
+		ownerDocument,
+		'selectionchange',
+		handleSelectionChange
+	);
+	// The native `selectionchange` event is asynchronous and coalesced: the
+	// record and the store selection can be one selection behind the DOM when
+	// an event that acts on them arrives, regardless of how the selection got
+	// there. Synchronize on capture of the events that consume the record,
+	// the store selection, or a value rendered from them, before any other
+	// handler runs. The snapshot comparison in `handleSelectionChange` skips
+	// selections that have already been processed.
+	const unsubscribeEnsureSelectionSync = [
+		'keydown',
+		'beforeinput',
+		'copy',
+		'cut',
+		'paste',
+	].map( ( eventType ) =>
+		subscribeDelegatedListener(
+			ownerDocument,
+			eventType,
+			handleSelectionChange,
+			true
+		)
+	);
 
 	return () => {
 		unsubscribeInput();
 		unsubscribeCompositionStart();
 		unsubscribeCompositionEnd();
 		unsubscribeFocus();
+		unsubscribeSelectionChange();
+		unsubscribeEnsureSelectionSync.forEach( ( unsubscribe ) =>
+			unsubscribe()
+		);
 	};
 };

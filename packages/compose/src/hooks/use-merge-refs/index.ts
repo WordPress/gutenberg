@@ -80,9 +80,9 @@ export default function useMergeRefs< T >(
 	refs: Ref< T >[]
 ): RefCallback< T > {
 	const elementRef = useRef< T | null >( null );
-	const isAttachedRef = useRef( false );
-	const didElementChangeRef = useRef( false );
-	const previousRefsRef = useRef< Ref< T >[] >( [] );
+	// The refs that are attached to the element: set when the element
+	// attaches, and kept in sync when a changed ref is swapped on render.
+	const attachedRefsRef = useRef< Ref< T >[] >( [] );
 	const currentRefsRef = useRef( refs );
 	// Position-indexed cleanups returned by inner ref callbacks. A slot is
 	// `undefined` when the ref at that position did not return a cleanup (or
@@ -93,34 +93,31 @@ export default function useMergeRefs< T >(
 	// always has access to the current refs.
 	currentRefsRef.current = refs;
 
-	// If any of the refs change, call the previous ref with `null` and the new
-	// ref with the node, except when the element changes in the same cycle, in
-	// which case the ref callbacks will already have been called.
+	// If any of the refs change, call the attached ref with `null` and the
+	// new ref with the node. Comparing against the refs that are attached to
+	// the element, rather than the previous render's refs, also covers an
+	// element that attaches outside a render of this component (a merged ref
+	// passed to a child that mounts the element in its own commit): the
+	// change is still detected on the next render. When the element attached
+	// during this commit, the ref callback has already been called with the
+	// current refs, which compare equal here.
 	useLayoutEffect( () => {
-		if (
-			didElementChangeRef.current === false &&
-			isAttachedRef.current === true
-		) {
-			refs.forEach( ( ref, index ) => {
-				const previousRef = previousRefsRef.current[ index ];
-				if ( ref !== previousRef ) {
-					detachRef( previousRef, index, cleanupsRef.current );
-					cleanupsRef.current[ index ] = assignRef(
-						ref,
-						elementRef.current as T
-					);
-				}
-			} );
+		const element = elementRef.current;
+
+		if ( element === null ) {
+			return;
 		}
 
-		previousRefsRef.current = refs;
-	}, refs );
+		refs.forEach( ( ref, index ) => {
+			const attachedRef = attachedRefsRef.current[ index ];
+			if ( ref !== attachedRef ) {
+				detachRef( attachedRef, index, cleanupsRef.current );
+				cleanupsRef.current[ index ] = assignRef( ref, element );
+			}
+		} );
 
-	// No dependencies, must be reset after every render so ref callbacks are
-	// correctly called after a ref change.
-	useLayoutEffect( () => {
-		didElementChangeRef.current = false;
-	} );
+		attachedRefsRef.current = refs;
+	}, refs );
 
 	// There should be no dependencies so that `callback` is only called when
 	// the node changes.
@@ -129,17 +126,16 @@ export default function useMergeRefs< T >(
 		// dependency change.
 		elementRef.current = value;
 
-		didElementChangeRef.current = true;
-		isAttachedRef.current = value !== null;
-
 		// When an element changes, the current ref callback should be called
-		// with the new element and the previous one with `null`.
+		// with the new element and the attached one with `null`.
 		if ( value === null ) {
-			previousRefsRef.current.forEach( ( ref, index ) => {
+			attachedRefsRef.current.forEach( ( ref, index ) => {
 				detachRef( ref, index, cleanupsRef.current );
 			} );
+			attachedRefsRef.current = [];
 		} else {
-			currentRefsRef.current.forEach( ( ref, index ) => {
+			attachedRefsRef.current = currentRefsRef.current;
+			attachedRefsRef.current.forEach( ( ref, index ) => {
 				cleanupsRef.current[ index ] = assignRef( ref, value );
 			} );
 		}

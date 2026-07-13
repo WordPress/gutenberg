@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -16,11 +17,14 @@ import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 import { AlignmentControl, BlockControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import {
-	cleanEmptyObject,
-	shouldSkipSerialization,
-	useBlockSettings,
-} from './utils';
+	getStyleForState,
+	hasViewportBlockStyleState,
+	setStyleForState,
+} from './block-style-state';
+import { shouldSkipSerialization, useBlockSettings } from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
+import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
 
 export const TEXT_ALIGN_SUPPORT_KEY = 'typography.textAlign';
 
@@ -64,7 +68,14 @@ export function getValidTextAlignments( blockTextAlign ) {
 	return blockTextAlign === true ? VALID_TEXT_ALIGNMENTS : NO_TEXT_ALIGNMENTS;
 }
 
+export function getTextAlignControlGroup( isResponsiveEditing, selectedState ) {
+	return isResponsiveEditing && hasViewportBlockStyleState( selectedState )
+		? 'style-state'
+		: 'block';
+}
+
 function BlockEditTextAlignmentToolbarControlsPure( {
+	clientId,
 	style,
 	name: blockName,
 	setAttributes,
@@ -72,6 +83,19 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 	const settings = useBlockSettings( blockName );
 	const hasTextAlignControl = settings?.typography?.textAlign;
 	const blockEditingMode = useBlockEditingMode();
+	const { selectedState, isResponsiveEditing } = useSelect(
+		( select ) => {
+			const {
+				getSelectedBlockStyleState,
+				isResponsiveEditing: getIsResponsiveEditing,
+			} = unlock( select( blockEditorStore ) );
+			return {
+				selectedState: getSelectedBlockStyleState( clientId ),
+				isResponsiveEditing: getIsResponsiveEditing(),
+			};
+		},
+		[ clientId ]
+	);
 
 	if ( ! hasTextAlignControl || blockEditingMode !== 'default' ) {
 		return null;
@@ -87,23 +111,30 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 	const textAlignmentControls = TEXT_ALIGNMENT_OPTIONS.filter( ( control ) =>
 		validTextAlignments.includes( control.align )
 	);
+	const stateStyle = getStyleForState( style, selectedState );
+	const controlsGroup = getTextAlignControlGroup(
+		isResponsiveEditing,
+		selectedState
+	);
 
 	const onChange = ( newTextAlignValue ) => {
-		const newStyle = {
-			...style,
+		const newStateStyle = {
+			...stateStyle,
 			typography: {
-				...style?.typography,
+				...stateStyle?.typography,
 				textAlign: newTextAlignValue,
 			},
 		};
 
-		setAttributes( { style: cleanEmptyObject( newStyle ) } );
+		setAttributes( {
+			style: setStyleForState( style, selectedState, newStateStyle ),
+		} );
 	};
 
 	return (
-		<BlockControls group="block">
+		<BlockControls group={ controlsGroup }>
 			<AlignmentControl
-				value={ style?.typography?.textAlign }
+				value={ stateStyle?.typography?.textAlign }
 				onChange={ onChange }
 				alignmentControls={ textAlignmentControls }
 			/>

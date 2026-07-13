@@ -955,19 +955,22 @@ function gutenberg_unique_id_from_values( array $data, string $prefix = '' ): st
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	static $global_styles = null;
 
-	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$style_attr            = gutenberg_resolve_style_state_aliases(
+	$block_type               = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$block_supports_layout    = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$style_attr               = gutenberg_resolve_style_state_aliases(
 		$block['attrs']['style'] ?? array(),
 		$block['blockName']
 	);
+	$global_settings          = gutenberg_get_global_settings();
+	$viewport_settings        = $global_settings['viewport'] ?? null;
+	$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $viewport_settings );
 	// If there is any value in style -> layout, the block has a child layout.
 	$child_layout = $style_attr['layout'] ?? null;
 
 	// Collect responsive viewport child layout overrides so that a block with
 	// only responsive child layout (no base child layout) is still processed.
 	$viewport_child_layouts = array();
-	foreach ( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS as $breakpoint => $media_query ) {
+	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
 		$viewport_child = gutenberg_get_layout_child_values( $style_attr[ $breakpoint ]['layout'] ?? null );
 		if ( ! empty( $viewport_child ) ) {
 			$viewport_child_layouts[ $breakpoint ] = array(
@@ -1077,7 +1080,6 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$global_settings = gutenberg_get_global_settings();
 	$fallback_layout = $block_type->supports['layout']['default'] ?? array();
 	if ( empty( $fallback_layout ) ) {
 		$fallback_layout = $block_type->supports['__experimentalLayout']['default'] ?? array();
@@ -1189,7 +1191,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$block_spacing,
 		);
 
-		foreach ( array_keys( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+		foreach ( array_keys( $responsive_media_queries ) as $breakpoint ) {
 			$viewport_style = $style_attr[ $breakpoint ] ?? null;
 			if ( ! is_array( $viewport_style ) ) {
 				continue;
@@ -1235,7 +1237,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		 * Emit responsive container layout styles using the same $container_class
 		 * selector as the base layout so they target the inner block wrapper.
 		 */
-		foreach ( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS as $breakpoint => $media_query ) {
+		foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
 			$viewport_style = $style_attr[ $breakpoint ] ?? null;
 			if ( ! is_array( $viewport_style ) ) {
 				continue;

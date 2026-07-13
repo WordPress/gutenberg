@@ -47,7 +47,7 @@ function gutenberg_site_editor_enable_admin_bar() {
 
 	$admin_color = get_user_option( 'admin_color' );
 	if ( empty( $admin_color ) ) {
-		$admin_color = 'fresh';
+		$admin_color = 'modern';
 	}
 	$admin_color_class = 'admin-color-' . sanitize_html_class( $admin_color );
 
@@ -76,6 +76,16 @@ function gutenberg_site_editor_enable_admin_bar() {
 	right: 0;
 	bottom: 0;
 	height: calc(100vh - var(--wp-admin--admin-bar--height, 0)) !important;
+}
+
+@media (min-width: 782px) {
+	body:has(.editor-editor-interface.is-distraction-free) {
+		--wp-admin--admin-bar--height: 0px;
+	}
+
+	body:has(.editor-editor-interface.is-distraction-free) #wpadminbar {
+		display: none;
+	}
 }
 CSS;
 

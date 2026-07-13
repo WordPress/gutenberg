@@ -32,7 +32,7 @@ const meta: Meta< typeof Heading > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use `Text` from `@wordpress/ui` instead, with the `render` prop set to the heading level element and the variant set to the visual heading size (e.g. `<Text render={ <h1 /> } variant="heading-2xl">`).',
+			notes: 'Use [`Text`](?path=/docs/design-system-components-text--docs) from `@wordpress/ui` instead, with the `render` prop set to the heading level element and the variant set to the visual heading size (e.g. `<Text render={ <h1 /> } variant="heading-2xl">`).',
 		},
 	},
 };

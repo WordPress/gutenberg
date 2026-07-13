@@ -26,27 +26,6 @@ export type DragProps = Parameters< Parameters< typeof useDrag >[ 0 ] >[ 0 ];
 export type Size = 'default' | 'small' | 'compact' | '__unstable-large';
 
 interface BaseProps {
-	/**
-	 * Deprecated. Use `__next40pxDefaultSize` instead.
-	 *
-	 * @default false
-	 * @deprecated
-	 * @ignore
-	 */
-	__next36pxDefaultSize?: boolean;
-	/**
-	 * Start opting into the larger default height that will become the default size in a future version.
-	 *
-	 * @default false
-	 */
-	__next40pxDefaultSize?: boolean;
-	/**
-	 * Do not throw a warning for the deprecated 36px default size.
-	 * For internal components of other components that already throw the warning.
-	 *
-	 * @ignore
-	 */
-	__shouldNotWarnDeprecated36pxSize?: boolean;
 	__unstableInputWidth?: CSSProperties[ 'width' ];
 	/**
 	 * If true, the label will only be visible to screen readers.
@@ -73,8 +52,7 @@ export type InputChangeCallback< P = {} > = (
 	extra: { event: SyntheticEvent } & P
 ) => void;
 
-export interface InputFieldProps
-	extends Omit< BaseProps, '__next36pxDefaultSize' > {
+export interface InputFieldProps extends BaseProps {
 	/**
 	 * Determines the drag axis.
 	 *
@@ -208,6 +186,26 @@ export interface InputControlProps
 			| 'paddingInlineStart'
 			| 'paddingInlineEnd'
 		> {
+	/**
+	 * Deprecated. Use `__next40pxDefaultSize` instead.
+	 *
+	 * @default false
+	 * @deprecated
+	 * @ignore
+	 */
+	__next36pxDefaultSize?: boolean;
+	/**
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
+	 */
+	__next40pxDefaultSize?: boolean;
+	/**
+	 * Do not throw a warning for the deprecated 36px default size.
+	 * For internal components of other components that already throw the warning.
+	 *
+	 * @ignore
+	 */
+	__shouldNotWarnDeprecated36pxSize?: boolean;
 	__unstableStateReducer?: InputFieldProps[ 'stateReducer' ];
 }
 
@@ -229,12 +227,6 @@ export type PrefixSuffixWrapperProps = {
 	 * @ignore
 	 */
 	size?: BaseProps[ 'size' ];
-	/**
-	 * Internal prop used to control the padding size of the wrapper.
-	 *
-	 * @ignore
-	 */
-	__next40pxDefaultSize?: BaseProps[ '__next40pxDefaultSize' ];
 	/**
 	 * Adjust the wrapper based on the prefix or suffix content.
 	 *
