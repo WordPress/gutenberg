@@ -63,10 +63,7 @@ describe( 'Waveform utilities', () => {
 			} );
 
 			expect( container ).toHaveAttribute( 'data-title', 'My Song' );
-			expect( container ).toHaveAttribute(
-				'data-subtitle',
-				'The Artist'
-			);
+			expect( container ).toHaveAttribute( 'data-artist', 'The Artist' );
 			expect( container ).toHaveAttribute(
 				'data-artwork',
 				'https://example.com/cover.jpg'
@@ -90,7 +87,7 @@ describe( 'Waveform utilities', () => {
 			const container = createWaveformContainer( basePlayerData );
 
 			expect( container ).not.toHaveAttribute( 'data-title' );
-			expect( container ).not.toHaveAttribute( 'data-subtitle' );
+			expect( container ).not.toHaveAttribute( 'data-artist' );
 			expect( container ).not.toHaveAttribute( 'data-artwork' );
 			expect( container ).not.toHaveAttribute( 'data-seek-value-text' );
 		} );

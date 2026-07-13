@@ -688,6 +688,31 @@ test.describe( 'Client-side media processing', () => {
 		}
 	);
 
+	test( 'rotates AVIF sub-sizes from EXIF-only orientation', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		// This AVIF carries its 90° CW orientation in an EXIF tag rather than
+		// a native `irot` transform. The server cannot read EXIF from AVIF, so
+		// the orientation is detected on the client and applied to the
+		// generated sub-sizes.
+		// See https://github.com/WordPress/gutenberg/issues/79383.
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'1024x768_e2e_test_image_rotated_exif.avif'
+		);
+
+		expect( media.mime_type ).toBe( 'image/avif' );
+
+		// The medium sub-size must be portrait (taller than wide) once the
+		// EXIF orientation is applied; before the fix it stayed landscape.
+		const medium = media.media_details.sizes.medium;
+		expect( medium ).toBeDefined();
+		expect( medium.height ).toBeGreaterThan( medium.width );
+	} );
+
 	test( 'recovers from a transient upload failure via automatic retry', async ( {
 		page,
 		editor,

@@ -87,13 +87,10 @@
 .components-panel__body-toggle.components-button {
 	position: relative;
 	padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
-	outline: none;
 	width: 100%;
 	font-weight: $font-weight-medium;
 	text-align: left;
 	color: $gray-900;
-	border: none;
-	box-shadow: none;
 
 	@media not (prefers-reduced-motion) {
 		transition: 0.1s background ease-in-out;
@@ -102,7 +99,7 @@
 	height: auto;
 
 	&:focus {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+		outline-offset: calc(var(--wpds-border-width-focus) * -1);
 		border-radius: 0;
 	}
 

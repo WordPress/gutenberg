@@ -16,7 +16,7 @@ import SidebarGlobalStyles from '../sidebar-global-styles';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { StyleBookPreview } = unlock( editorPrivateApis );
 
-function StylesPreviewArea() {
+function StylesPreviewArea( { siteData } ) {
 	const { path, query } = useLocation();
 	const history = useHistory();
 	const isStylebook = query.preview === 'stylebook';
@@ -36,6 +36,7 @@ function StylesPreviewArea() {
 			<StyleBookPreview
 				path={ section }
 				onPathChange={ onChangeSection }
+				settings={ siteData.editorSettings }
 			/>
 		);
 	}
@@ -49,7 +50,9 @@ export const stylesRoute = {
 	areas: {
 		content: <SidebarGlobalStyles />,
 		sidebar: <SidebarNavigationScreenGlobalStyles backPath="/" />,
-		preview: <StylesPreviewArea />,
+		preview: ( { siteData } ) => (
+			<StylesPreviewArea siteData={ siteData } />
+		),
 		mobileContent: <SidebarGlobalStyles />,
 	},
 	widths: {
