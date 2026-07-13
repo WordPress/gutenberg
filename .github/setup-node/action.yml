@@ -14,7 +14,11 @@ runs:
               node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
               check-latest: true
-              cache: npm
+              # Caching for npm dependencies is automatically enabled when package.json contains devEngines.packageManager field set to npm
+              # cache: npm
+              cache-dependency-path: |
+                  package-lock.json
+                  patches/**
 
         - name: Get Node.js and npm version
           id: node-version
@@ -26,7 +30,16 @@ runs:
           id: cache-node_modules
           uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
           with:
-              path: '**/node_modules'
+              # List workspace node_modules explicitly to support all kinds of layouts - hoisted and isolated.
+              # A '**/node_modules' glob follows the isolated layout's symlinks and stalls the cache step.
+              path: |
+                  node_modules
+                  packages/*/node_modules
+                  routes/*/node_modules
+                  storybook/node_modules
+                  test/*/node_modules
+                  tools/*/node_modules
+                  widgets/*/node_modules
               key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
 
         - name: Install npm dependencies
