@@ -22,9 +22,9 @@ add_filter( 'block_editor_settings_all', 'gutenberg_block_bindings_inner_blocks_
 /**
  * Gets a usable structural binding descriptor.
  *
- * The experiment accepts any registered source on a block with one ordinary
- * InnerBlocks area. `core/html` has a separate multi-area editor component and
- * is not such a host.
+ * The experiment is private to pattern overrides on Core blocks with one
+ * ordinary InnerBlocks area. `core/html` has a separate multi-area editor
+ * component and is not such a host.
  *
  * @since 7.2.0
  *
@@ -32,12 +32,13 @@ add_filter( 'block_editor_settings_all', 'gutenberg_block_bindings_inner_blocks_
  * @return array|null Binding descriptor, or null.
  */
 function gutenberg_block_bindings_get_inner_blocks_binding( $parsed_block ) {
-	if ( 'core/html' === ( $parsed_block['blockName'] ?? null ) ) {
+	$block_name = $parsed_block['blockName'] ?? null;
+	if ( ! is_string( $block_name ) || 0 !== strpos( $block_name, 'core/' ) || 'core/html' === $block_name ) {
 		return null;
 	}
 
 	$binding = $parsed_block['attrs']['metadata']['bindings']['innerBlocks'] ?? null;
-	if ( ! is_array( $binding ) || ! isset( $binding['source'] ) || ! is_string( $binding['source'] ) || '' === $binding['source'] ) {
+	if ( ! is_array( $binding ) || 'core/pattern-overrides' !== ( $binding['source'] ?? null ) ) {
 		return null;
 	}
 
