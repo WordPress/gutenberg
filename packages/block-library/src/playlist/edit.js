@@ -16,7 +16,6 @@ import {
 	useInnerBlocksProps,
 	BlockControls,
 	InspectorControls,
-	InnerBlocks,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
@@ -77,7 +76,7 @@ const PlaylistEdit = ( {
 
 	const blockProps = useBlockProps();
 	const waveformPanelId = `${ clientId }-waveform`;
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks, selectBlock } = useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
@@ -157,26 +156,63 @@ const PlaylistEdit = ( {
 		[ currentTrackClientId, setCurrentTrackClientId ]
 	);
 
+	const createTrackBlocks = useCallback( ( media ) => {
+		if ( ! media ) {
+			return [];
+		}
+
+		const mediaItems = Array.isArray( media ) ? media : [ media ];
+
+		return mediaItems
+			.map( getTrackAttributes )
+			.filter( ( track ) => !! track.src )
+			.map( ( track ) => createBlock( 'core/playlist-track', track ) );
+	}, [] );
+
 	const onSelectTracks = useCallback(
 		( media ) => {
-			if ( ! media ) {
+			const newBlocks = createTrackBlocks( media );
+			if ( newBlocks.length === 0 ) {
 				return;
 			}
 
-			if ( ! Array.isArray( media ) ) {
-				media = [ media ];
-			}
-
-			const trackList = media.map( getTrackAttributes );
-
-			const newBlocks = trackList.map( ( track ) =>
-				createBlock( 'core/playlist-track', track )
-			);
 			setCurrentTrackClientId( newBlocks[ 0 ]?.clientId ?? null );
 			// Replace the inner blocks with the new tracks.
 			replaceInnerBlocks( clientId, newBlocks );
 		},
-		[ replaceInnerBlocks, clientId, setCurrentTrackClientId ]
+		[
+			clientId,
+			createTrackBlocks,
+			replaceInnerBlocks,
+			setCurrentTrackClientId,
+		]
+	);
+
+	const onAddTracks = useCallback(
+		( media ) => {
+			const existingIds = new Set(
+				validTracks.map( ( block ) => block.attributes.id )
+			);
+			const newBlocks = createTrackBlocks( media ).filter(
+				( block ) => ! existingIds.has( block.attributes.id )
+			);
+			if ( newBlocks.length === 0 ) {
+				return;
+			}
+
+			const nextBlocks = [ ...validTracks, ...newBlocks ];
+			setCurrentTrackClientId( newBlocks[ 0 ].clientId );
+			replaceInnerBlocks( clientId, nextBlocks );
+			selectBlock( newBlocks[ 0 ].clientId );
+		},
+		[
+			clientId,
+			createTrackBlocks,
+			replaceInnerBlocks,
+			selectBlock,
+			setCurrentTrackClientId,
+			validTracks,
+		]
 	);
 
 	// Get current track data by finding the track with matching client ID.
@@ -305,14 +341,6 @@ const PlaylistEdit = ( {
 		} );
 	}
 
-	const hasSelectedChild = useSelect(
-		( select ) =>
-			select( blockEditorStore ).hasSelectedInnerBlock( clientId ),
-		[ clientId ]
-	);
-
-	const hasAnySelected = isSelected || hasSelectedChild;
-
 	const colorSettings = [];
 	if ( hasColors || hasGradients ) {
 		colorSettings.push(
@@ -357,7 +385,7 @@ const PlaylistEdit = ( {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		__experimentalAppenderTagName: 'li',
-		renderAppender: hasAnySelected && InnerBlocks.ButtonBlockAppender,
+		renderAppender: false,
 	} );
 
 	if ( tracks.length === 0 ) {
@@ -390,6 +418,17 @@ const PlaylistEdit = ( {
 				<MediaReplaceFlow
 					name={ __( 'Edit' ) }
 					onSelect={ onSelectTracks }
+					accept="audio/*"
+					multiple
+					mediaIds={ tracks
+						.filter( ( track ) => track.id )
+						.map( ( track ) => track.id ) }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					onError={ onUploadError }
+				/>
+				<MediaReplaceFlow
+					name={ __( 'Add' ) }
+					onSelect={ onAddTracks }
 					accept="audio/*"
 					multiple
 					mediaIds={ tracks
