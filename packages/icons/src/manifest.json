@@ -1136,6 +1136,11 @@
 		"filePath": "library/play.svg"
 	},
 	{
+		"slug": "playlist",
+		"label": "Playlist",
+		"filePath": "library/playlist.svg"
+	},
+	{
 		"slug": "plus",
 		"label": "Plus",
 		"filePath": "library/plus.svg",

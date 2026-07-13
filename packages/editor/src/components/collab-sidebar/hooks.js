@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
 	useState,
@@ -154,13 +155,15 @@ export function useNoteThreads( postId ) {
 			}
 		}
 
-		// Orphans: root threads without a linked block. They only need to come last.
+		// Orphans: root threads without a linked block. They stay with the
+		// active notes (above the "Resolved" separator) since they may still
+		// need attention even though their associated block is gone.
 		const orphans = rootThreads.filter(
 			( thread ) => ! thread.blockClientId
 		);
 
 		return {
-			notes: [ ...unresolved, ...resolved, ...orphans ],
+			notes: [ ...unresolved, ...orphans, ...resolved ],
 			unresolvedNotes: unresolved,
 		};
 	}, [ clientIds, threads, getBlockAttributes ] );
@@ -369,13 +372,6 @@ export function useNoteActions() {
 	};
 
 	const onEdit = async ( { id, content, status } ) => {
-		const messageType = status ? status : 'updated';
-		const messages = {
-			approved: __( 'Note marked as resolved.' ),
-			hold: __( 'Note reopened.' ),
-			updated: __( 'Note updated.' ),
-		};
-
 		try {
 			// For resolution or reopen actions, create a new note with metadata.
 			if ( status === 'approved' || status === 'hold' ) {
@@ -419,6 +415,14 @@ export function useNoteActions() {
 						updateBlockAttributes
 					);
 				}
+
+				// The note visibly updates in place, so there is no snackbar,
+				// but screen reader users still need the confirmation.
+				speak(
+					status === 'approved'
+						? __( 'Note marked as resolved.' )
+						: __( 'Note reopened.' )
+				);
 			} else {
 				const updateData = {
 					id,
@@ -429,16 +433,12 @@ export function useNoteActions() {
 				await saveEntityRecord( 'root', 'comment', updateData, {
 					throwOnError: true,
 				} );
-			}
 
-			createNotice(
-				'snackbar',
-				messages[ messageType ] ?? __( 'Note updated.' ),
-				{
+				createNotice( 'snackbar', __( 'Note updated.' ), {
 					type: 'snackbar',
 					isDismissible: true,
-				}
-			);
+				} );
+			}
 		} catch ( error ) {
 			onError( error );
 		}

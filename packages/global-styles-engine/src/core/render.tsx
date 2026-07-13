@@ -1012,7 +1012,11 @@ function getResponsiveStyleNodes(
 	const {
 		styles,
 		selector,
+		fallbackGapValue,
 		featureSelectors,
+		hasLayoutSupport,
+		layoutHasBlockGapSupport,
+		layoutSelector,
 		name,
 		elementName,
 		isStyleVariation,
@@ -1039,10 +1043,14 @@ function getResponsiveStyleNodes(
 						featureSelectors && typeof featureSelectors !== 'string'
 							? featureSelectors
 							: undefined,
+					fallbackGapValue,
+					hasLayoutSupport,
 					name,
 					elementName,
 					isStyleVariation,
 					variationName,
+					layoutSelector,
+					layoutHasBlockGapSupport,
 				},
 			];
 		}

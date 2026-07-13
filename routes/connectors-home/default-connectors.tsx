@@ -7,6 +7,7 @@ import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
 	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
+	__experimentalApplicationPasswordConnectorSettings as ApplicationPasswordConnectorSettings,
 	privateApis as connectorsPrivateApis,
 	type ConnectorConfig,
 	type ConnectorRenderProps,
@@ -19,7 +20,7 @@ import { unlock } from '@wordpress/routes-lock-unlock';
 /**
  * Internal dependencies
  */
-import { useConnectorPlugin } from './use-connector-plugin';
+import { useConnectorPlugin, type PluginStatus } from './use-connector-plugin';
 import {
 	OpenAILogo,
 	ClaudeLogo,
@@ -123,6 +124,66 @@ const PluginDirectoryLink = ( { slug }: { slug: string } ) => (
 
 const UnavailableActionBadge = () => <Badge>{ __( 'Not available' ) }</Badge>;
 
+interface ConnectorActionAreaProps {
+	isConnected: boolean;
+	showUnavailableBadge: boolean;
+	pluginSlug?: string;
+	isExpanded: boolean;
+	isBusy: boolean;
+	pluginStatus: PluginStatus;
+	actionButtonRef: {
+		current: HTMLButtonElement | null;
+	};
+	handleButtonClick: () => void;
+	getButtonLabel: () => string;
+}
+
+function ConnectorActionArea( {
+	isConnected,
+	showUnavailableBadge,
+	pluginSlug,
+	isExpanded,
+	isBusy,
+	pluginStatus,
+	actionButtonRef,
+	handleButtonClick,
+	getButtonLabel,
+}: ConnectorActionAreaProps ) {
+	return (
+		<HStack spacing={ 3 } expanded={ false }>
+			{ isConnected && <ConnectedBadge /> }
+			{ showUnavailableBadge &&
+				( pluginSlug ? (
+					<PluginDirectoryLink slug={ pluginSlug } />
+				) : (
+					<UnavailableActionBadge />
+				) ) }
+			{ ! showUnavailableBadge && (
+				<Button
+					ref={ actionButtonRef }
+					variant={
+						isExpanded || isConnected ? 'tertiary' : 'secondary'
+					}
+					size="compact"
+					onClick={ handleButtonClick }
+					disabled={ pluginStatus === 'checking' || isBusy }
+					isBusy={ isBusy }
+					accessibleWhenDisabled
+				>
+					{ getButtonLabel() }
+				</Button>
+			) }
+		</HStack>
+	);
+}
+
+function getPluginSlug( pluginFile?: string ) {
+	const pluginBasename = pluginFile?.replace( /\.php$/, '' );
+	return pluginBasename?.includes( '/' )
+		? pluginBasename.split( '/' )[ 0 ]
+		: pluginBasename;
+}
+
 function ApiKeyConnector( {
 	name,
 	description,
@@ -134,19 +195,7 @@ function ApiKeyConnector( {
 		authentication?.method === 'api_key' ? authentication : undefined;
 	const settingName = auth?.settingName ?? '';
 	const helpUrl = auth?.credentialsUrl ?? undefined;
-	const pluginFile = plugin?.file?.replace( /\.php$/, '' );
-	const pluginSlug = pluginFile?.includes( '/' )
-		? pluginFile.split( '/' )[ 0 ]
-		: pluginFile;
-
-	let helpLabel: string | undefined;
-	try {
-		if ( helpUrl ) {
-			helpLabel = new URL( helpUrl ).hostname;
-		}
-	} catch {
-		// Invalid URL — leave helpLabel undefined.
-	}
+	const pluginSlug = getPluginSlug( plugin?.file );
 
 	const {
 		pluginStatus,
@@ -157,6 +206,7 @@ function ApiKeyConnector( {
 		isBusy,
 		isConnected,
 		currentApiKey,
+		hasResolvedSettings,
 		keySource,
 		handleButtonClick,
 		getButtonLabel,
@@ -176,7 +226,6 @@ function ApiKeyConnector( {
 	const showUnavailableBadge =
 		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
 		( pluginStatus === 'inactive' && canActivatePlugins === false );
-	const showActionButton = ! showUnavailableBadge;
 
 	const actionButtonRef = useRef< HTMLButtonElement >( null );
 
@@ -189,61 +238,148 @@ function ApiKeyConnector( {
 			name={ name }
 			description={ description }
 			actionArea={
-				<HStack spacing={ 3 } expanded={ false }>
-					{ isConnected && <ConnectedBadge /> }
-					{ showUnavailableBadge &&
-						( pluginSlug ? (
-							<PluginDirectoryLink slug={ pluginSlug } />
-						) : (
-							<UnavailableActionBadge />
-						) ) }
-					{ showActionButton && (
-						<Button
-							ref={ actionButtonRef }
-							variant={
-								isExpanded || isConnected
-									? 'tertiary'
-									: 'secondary'
-							}
-							size="compact"
-							onClick={ handleButtonClick }
-							disabled={ pluginStatus === 'checking' || isBusy }
-							isBusy={ isBusy }
-							accessibleWhenDisabled
-						>
-							{ getButtonLabel() }
-						</Button>
-					) }
-				</HStack>
+				<ConnectorActionArea
+					isConnected={ isConnected }
+					showUnavailableBadge={ showUnavailableBadge }
+					pluginSlug={ pluginSlug }
+					isExpanded={ isExpanded }
+					isBusy={ isBusy }
+					pluginStatus={ pluginStatus }
+					actionButtonRef={ actionButtonRef }
+					handleButtonClick={ handleButtonClick }
+					getButtonLabel={ getButtonLabel }
+				/>
 			}
 		>
-			{ isExpanded && pluginStatus === 'active' && (
-				<DefaultConnectorSettings
-					key={ isConnected ? 'connected' : 'setup' }
-					initialValue={
-						isExternallyConfigured
-							? '••••••••••••••••'
-							: currentApiKey
-					}
-					helpUrl={ helpUrl }
-					helpLabel={ helpLabel }
-					readOnly={ isConnected || isExternallyConfigured }
-					keySource={ keySource }
-					onRemove={
-						isExternallyConfigured
-							? undefined
-							: async () => {
-									await removeApiKey();
-									actionButtonRef.current?.focus();
-							  }
-					}
-					onSave={ async ( apiKey: string ) => {
-						await saveApiKey( apiKey );
-						setIsExpanded( false );
-						actionButtonRef.current?.focus();
-					} }
+			{ isExpanded &&
+				pluginStatus === 'active' &&
+				hasResolvedSettings && (
+					<DefaultConnectorSettings
+						key={ isConnected ? 'connected' : 'setup' }
+						initialValue={
+							isExternallyConfigured
+								? '••••••••••••••••'
+								: currentApiKey
+						}
+						helpUrl={ helpUrl }
+						readOnly={ isConnected || isExternallyConfigured }
+						keySource={ keySource }
+						onRemove={
+							isExternallyConfigured
+								? undefined
+								: async () => {
+										await removeApiKey();
+										actionButtonRef.current?.focus();
+								  }
+						}
+						onSave={ async ( apiKey: string ) => {
+							await saveApiKey( apiKey );
+							setIsExpanded( false );
+							actionButtonRef.current?.focus();
+						} }
+					/>
+				) }
+		</ConnectorItem>
+	);
+}
+
+function ApplicationPasswordConnector( {
+	name,
+	description,
+	logo,
+	authentication,
+	plugin,
+}: ConnectorRenderProps ) {
+	const auth =
+		authentication?.method === 'application_password'
+			? authentication
+			: undefined;
+	const settingName = auth?.settingName ?? '';
+	const helpUrl = auth?.credentialsUrl ?? undefined;
+	const pluginSlug = getPluginSlug( plugin?.file );
+
+	const {
+		pluginStatus,
+		canInstallPlugins,
+		canActivatePlugins,
+		isExpanded,
+		setIsExpanded,
+		isBusy,
+		isConnected,
+		currentUsername,
+		hasResolvedSettings,
+		keySource,
+		handleButtonClick,
+		getButtonLabel,
+		saveCredentials,
+		removeCredentials,
+	} = useConnectorPlugin( {
+		file: plugin?.file,
+		settingName,
+		connectorName: name,
+		isInstalled: plugin?.isInstalled,
+		isActivated: plugin?.isActivated,
+		keySource: auth?.keySource,
+		initialIsConnected: auth?.isConnected,
+	} );
+	const isExternallyConfigured =
+		keySource === 'env' || keySource === 'constant';
+
+	const actionButtonRef = useRef< HTMLButtonElement >( null );
+	const showUnavailableBadge =
+		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
+		( pluginStatus === 'inactive' && canActivatePlugins === false );
+
+	return (
+		<ConnectorItem
+			className={
+				pluginSlug ? `connector-item--${ pluginSlug }` : undefined
+			}
+			logo={ logo }
+			name={ name }
+			description={ description }
+			actionArea={
+				<ConnectorActionArea
+					isConnected={ isConnected }
+					showUnavailableBadge={ showUnavailableBadge }
+					pluginSlug={ pluginSlug }
+					isExpanded={ isExpanded }
+					isBusy={ isBusy }
+					pluginStatus={ pluginStatus }
+					actionButtonRef={ actionButtonRef }
+					handleButtonClick={ handleButtonClick }
+					getButtonLabel={ getButtonLabel }
 				/>
-			) }
+			}
+		>
+			{ isExpanded &&
+				pluginStatus === 'active' &&
+				hasResolvedSettings && (
+					<ApplicationPasswordConnectorSettings
+						key={ isConnected ? 'connected' : 'setup' }
+						initialUsername={
+							isExternallyConfigured
+								? '••••••••••••••••'
+								: currentUsername
+						}
+						helpUrl={ helpUrl }
+						readOnly={ isConnected || isExternallyConfigured }
+						keySource={ keySource }
+						onRemove={
+							isExternallyConfigured
+								? undefined
+								: async () => {
+										await removeCredentials();
+										actionButtonRef.current?.focus();
+								  }
+						}
+						onSave={ async ( credentials ) => {
+							await saveCredentials( credentials );
+							setIsExpanded( false );
+							actionButtonRef.current?.focus();
+						} }
+					/>
+				) }
 		</ConnectorItem>
 	);
 }
@@ -281,6 +417,11 @@ export function registerDefaultConnectors() {
 		);
 		if ( authentication.method === 'api_key' && ! existing?.render ) {
 			args.render = ApiKeyConnector;
+		} else if (
+			authentication.method === 'application_password' &&
+			! existing?.render
+		) {
+			args.render = ApplicationPasswordConnector;
 		}
 
 		registerConnector( connectorName, args );
