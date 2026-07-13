@@ -57,6 +57,7 @@ export default function StateControlBadges( {
 			{ activeStates.map( ( state ) => {
 				const badge = (
 					<WCBadge
+						key={ state.key }
 						className="block-editor-global-styles-state-control__badge"
 						intent="info"
 					>
@@ -65,15 +66,7 @@ export default function StateControlBadges( {
 				);
 
 				if ( ! state.tooltipText ) {
-					return (
-						<WCBadge
-							key={ state.key }
-							className="block-editor-global-styles-state-control__badge"
-							intent="info"
-						>
-							{ state.label }
-						</WCBadge>
-					);
+					return badge;
 				}
 
 				return (
