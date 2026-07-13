@@ -74,15 +74,6 @@ jobs:
                   permission-contents: write
                   permission-workflows: write
 
-            - name: Validate GitHub release token
-              env:
-                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
-              run: |
-                  if ! gh api "repos/${GITHUB_REPOSITORY}" > /dev/null; then
-                    echo "::error::Could not validate the GitHub App release token for ${GITHUB_REPOSITORY}. Check that the GitHub Releases environment exposes APP_CLIENT_ID and APP_PRIVATE_KEY, and that the installed app has contents: write and workflows: write permissions for this repository."
-                    exit 1
-                  fi
-
     bump-version:
         name: Bump version
         runs-on: 'ubuntu-24.04'

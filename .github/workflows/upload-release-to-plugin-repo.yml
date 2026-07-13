@@ -46,52 +46,42 @@ jobs:
 
             - name: Confirm release assets exist
               env:
-                  RELEASE_ASSETS: ${{ toJson(github.event.release.assets) }}
+                  RELEASE_ASSETS: ${{ toJson( github.event.release.assets ) }}
               run: |
-                  if [[ -z "$RELEASE_ASSETS" || "$RELEASE_ASSETS" == "null" ]]; then
-                    echo "::error::Expected release assets payload to include gutenberg.zip, but it was empty."
-                    exit 1
-                  fi
-
-                  asset_count="$(jq 'if type == "array" then length else -1 end' <<< "$RELEASE_ASSETS")"
-                  if [[ "$asset_count" == "-1" ]]; then
-                    echo "::error::Expected release assets payload to be an array."
-                    exit 1
-                  fi
-
+                  asset_count="$(jq 'length' <<< "$RELEASE_ASSETS")"
                   if [[ "$asset_count" -eq 0 ]]; then
-                    echo "::error::Expected release assets payload to include gutenberg.zip, but it was empty."
+                    echo "::error::No assets are attached to the release."
                     exit 1
                   fi
 
             - name: Confirm Gutenberg plugin asset exists
               env:
-                  RELEASE_ASSETS: ${{ toJson(github.event.release.assets) }}
+                  RELEASE_ASSETS: ${{ toJson( github.event.release.assets ) }}
               run: |
                   asset_count="$(jq --arg name 'gutenberg.zip' '[.[] | select(.name == $name)] | length' <<< "$RELEASE_ASSETS")"
                   if [[ "$asset_count" -eq 0 ]]; then
-                    echo "::error::Expected one release asset named gutenberg.zip, but none was found."
+                    echo "::error::The gutenberg.zip asset is missing from the release."
                     exit 1
                   fi
 
-            - name: Confirm Gutenberg plugin asset is not duplicated
+            - name: Confirm a single Gutenberg plugin asset exists
               env:
-                  RELEASE_ASSETS: ${{ toJson(github.event.release.assets) }}
+                  RELEASE_ASSETS: ${{ toJson( github.event.release.assets ) }}
               run: |
                   asset_count="$(jq --arg name 'gutenberg.zip' '[.[] | select(.name == $name)] | length' <<< "$RELEASE_ASSETS")"
                   if [[ "$asset_count" -gt 1 ]]; then
-                    echo "::error::Expected one release asset named gutenberg.zip, but found $asset_count."
+                    echo "::error::More than one gutenberg.zip asset is attached to the release."
                     exit 1
                   fi
 
             - name: Select Gutenberg plugin asset
               id: get_plugin_asset
               env:
-                  RELEASE_ASSETS: ${{ toJson(github.event.release.assets) }}
+                  RELEASE_ASSETS: ${{ toJson( github.event.release.assets ) }}
               run: |
                   plugin_asset_url="$(jq -r --arg name 'gutenberg.zip' '.[] | select(.name == $name) | .browser_download_url // empty' <<< "$RELEASE_ASSETS")"
                   if [[ -z "$plugin_asset_url" ]]; then
-                    echo "::error::Release asset gutenberg.zip is missing browser_download_url."
+                    echo "::error::The gutenberg.zip release asset is missing a download URL."
                     exit 1
                   fi
 
