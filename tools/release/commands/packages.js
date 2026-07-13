@@ -922,6 +922,22 @@ async function publishVersionedPackagesToNpm(
 		await publishRemainingPackages( await getPublishedPackageNames() );
 	}
 
+	// Lerna treats publish conflicts as successful "already published" results,
+	// so verify registry identity again before attaching Git metadata.
+	const finalPublishedPackageNames = new Set(
+		await getPublishedPackageNames()
+	);
+	const unpublishedPackageVersions = releasePackages
+		.filter( ( { name } ) => ! finalPublishedPackageNames.has( name ) )
+		.map( ( { name, version } ) => `${ name }@${ version }` );
+	if ( unpublishedPackageVersions.length ) {
+		throw new Error(
+			`npm publication verification failed for ${ unpublishedPackageVersions.join(
+				', '
+			) }.`
+		);
+	}
+
 	await pushNpmReleaseGitMetadataFn( {
 		gitWorkingDirectoryPath,
 		npmReleaseBranch,
