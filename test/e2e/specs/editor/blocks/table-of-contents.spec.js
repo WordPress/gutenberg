@@ -24,6 +24,10 @@ ${ content }
 <!-- /wp:html -->`;
 }
 
+// This helper mirrors the current static saved ToC markup so reader-focused
+// tests can exercise frontend interactions without opening the editor. If the
+// block becomes dynamically rendered on the front of site, update these fixtures
+// to avoid depending on saved ToC markup.
 function tableOfContentsBlock( { headings, ordered = true } ) {
 	const attributes = { headings };
 	if ( ! ordered ) {
