@@ -656,6 +656,28 @@ describe( 'reducer', () => {
 			expect( state.queue ).toHaveLength( 1 );
 			expect( state.queue[ 0 ].id ).toBe( 'p1' );
 		} );
+
+		it( 'skips items already present in the queue', () => {
+			const existing = {
+				id: 'p1',
+				status: ItemStatus.Processing,
+			} as any;
+			const initial = {
+				...reducer( undefined, { type: Type.Unknown } as any ),
+				queue: [ existing ],
+			};
+			const state = reducer( initial, {
+				type: Type.LoadPersisted,
+				items: [
+					{ id: 'p1', status: ItemStatus.PendingResume } as any,
+					{ id: 'p2', status: ItemStatus.PendingResume } as any,
+				],
+			} as any );
+			expect( state.queue ).toHaveLength( 2 );
+			// The existing item keeps its current state.
+			expect( state.queue[ 0 ] ).toBe( existing );
+			expect( state.queue[ 1 ].id ).toBe( 'p2' );
+		} );
 	} );
 
 	describe( 'RegisterCallbacks', () => {

@@ -308,9 +308,19 @@ function reducer(
 		}
 
 		case Type.LoadPersisted: {
+			// Guard against double-loading (e.g. a re-mounted provider):
+			// items already in the queue keep their current state.
+			const existingIds = new Set(
+				state.queue.map( ( item ) => item.id )
+			);
 			return {
 				...state,
-				queue: [ ...state.queue, ...action.items ],
+				queue: [
+					...state.queue,
+					...action.items.filter(
+						( item ) => ! existingIds.has( item.id )
+					),
+				],
 			};
 		}
 
