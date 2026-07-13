@@ -150,13 +150,22 @@ export default function useSelectionObserver() {
 			const { defaultView } = ownerDocument;
 
 			let isTripleClick = false;
+			let shiftClickAnchor;
 
 			function onMouseDown( event ) {
 				isTripleClick = event.detail === 3;
+				// Remember the selection anchor when a shift+click starts:
+				// the click focuses the target block, whose focus handler
+				// selects it, overwriting the anchor in the store before the
+				// multi-selection is built from it on mouseup.
+				shiftClickAnchor = event.shiftKey
+					? getBlockSelectionStart()
+					: undefined;
 			}
 
 			function onKeyDown() {
 				isTripleClick = false;
+				shiftClickAnchor = undefined;
 			}
 
 			function onSelectionChange( event ) {
@@ -263,7 +272,8 @@ export default function useSelectionObserver() {
 				// we need to check if in an element that doesn't support
 				// text selection has been clicked.
 				if ( isClickShift ) {
-					const selectedClientId = getBlockSelectionStart();
+					const selectedClientId =
+						shiftClickAnchor ?? getBlockSelectionStart();
 					const clickedClientId = getBlockClientId( event.target );
 					// `endClientId` is not defined if we end the selection by clicking a non-selectable block.
 					// We need to check if there was already a selection with a non-selectable focusNode.
