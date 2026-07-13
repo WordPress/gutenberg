@@ -13,11 +13,11 @@ export const MENTION_FORMAT_NAME = 'core/note-mention';
 /**
  * Registers the note mention format (idempotent).
  *
- * Mentions are stored as links carrying the mentioned user's ID, e.g.
- * `<a class="wp-note-mention" data-user-id="5" href="…">@Jane</a>`. A dedicated
- * format type, rather than the built-in `core/link`, is required so rich text
- * preserves the `data-user-id` attribute through edit and serialize
- * round-trips (`core/link` drops unknown attributes).
+ * Mentions are stored as spans carrying the mentioned user's ID, e.g.
+ * `<span class="wp-note-mention" data-user-id="5">@Jane</span>` — a mention
+ * marks a person rather than offering navigation, so it is deliberately not
+ * a link. A dedicated format type is required so rich text preserves the
+ * `data-user-id` attribute through edit and serialize round-trips.
  */
 export function registerNoteMentionFormat() {
 	if ( select( richTextStore ).getFormatType( MENTION_FORMAT_NAME ) ) {
@@ -26,12 +26,11 @@ export function registerNoteMentionFormat() {
 
 	registerFormatType( MENTION_FORMAT_NAME, {
 		title: __( 'Mention' ),
-		tagName: 'a',
+		tagName: 'span',
 		className: 'wp-note-mention',
-		interactive: true,
+		interactive: false,
 		attributes: {
 			id: 'data-user-id',
-			url: 'href',
 		},
 	} );
 }

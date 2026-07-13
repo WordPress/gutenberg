@@ -97,13 +97,13 @@ add_filter( 'render_block', 'gutenberg_strip_inline_note_markers' );
  * Allows note mention markup in comment content for users without `unfiltered_html`.
  *
  * The notes `@` mention completer stores a mention as
- * `<a class="wp-note-mention" data-user-id="N" href="…">@Name</a>`. The default
- * comment kses allowlist only keeps `href` and `title` on links, so for users
- * without `unfiltered_html` the attributes that make a mention a mention (the
- * chip class and the mentioned user's ID) would be stripped on save. Allow them
- * in the comment-content context so saved mentions survive sanitization; both
- * attributes are inert markup (`data-*` carries data only and `class` has no
- * behavior of its own).
+ * `<span class="wp-note-mention" data-user-id="N">@Name</span>`. The default
+ * comment kses allowlist does not include `span` at all, so for users without
+ * `unfiltered_html` the mention markup would be stripped on save. Allow the
+ * tag with the attributes that make a mention a mention (the chip class and
+ * the mentioned user's ID) in the comment-content context; the markup is
+ * inert (`span` has no behavior, `data-*` carries data only and `class` has
+ * no behavior of its own).
  *
  * @param array|string $allowed The allowed tags structure for the context.
  * @param string       $context The kses context.
@@ -114,12 +114,12 @@ function gutenberg_notes_allow_mention_attributes( $allowed, $context ) {
 		return $allowed;
 	}
 
-	if ( ! isset( $allowed['a'] ) || ! is_array( $allowed['a'] ) ) {
-		$allowed['a'] = array();
+	if ( ! isset( $allowed['span'] ) || ! is_array( $allowed['span'] ) ) {
+		$allowed['span'] = array();
 	}
 
-	$allowed['a']['class']        = true;
-	$allowed['a']['data-user-id'] = true;
+	$allowed['span']['class']        = true;
+	$allowed['span']['data-user-id'] = true;
 
 	return $allowed;
 }

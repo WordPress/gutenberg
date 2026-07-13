@@ -17,32 +17,38 @@ import { getUserLabel } from '../autocompleters/user';
 type MentionableUser = {
 	id: number;
 	name: string;
-	link: string;
 };
 
 /**
  * A user mention completer for notes.
  *
- * Mirrors the editor's `@` user completer but inserts a link carrying the
+ * Mirrors the editor's `@` user completer but inserts a span carrying the
  * mentioned user's ID (`data-user-id`) so the mention can be styled as a chip
- * and, in a follow-up, resolved to a notification recipient. The user query is
- * filterable so integrators can narrow the mentionable audience (e.g. to
- * editors or contributors).
+ * and, in a follow-up, resolved to a notification recipient. A mention marks
+ * a person, it isn't a navigation affordance, so it is deliberately not a
+ * link. The user query is filterable so integrators can narrow the
+ * mentionable audience (e.g. to editors or contributors).
  */
 const noteMentionCompleter = {
 	name: 'note-mentions',
-	className: 'editor-autocompleters__user',
+	className:
+		'editor-autocompleters__user editor-collab-sidebar-panel__mention-suggestion',
 	triggerPrefix: '@',
 
 	useItems( filterValue: string ) {
 		const users = useSelect(
 			( select ) => {
+				// Suggesting the note's own author to themselves is noise;
+				// leave the current user out of the default query.
+				const currentUserId = select( coreStore ).getCurrentUser()?.id;
+
 				/**
 				 * Filters the query used to fetch mentionable users in notes.
 				 *
-				 * Defaults to all site users. Return a modified query to narrow
-				 * the audience, e.g. `{ ...query, roles: [ 'editor' ] }` (in
-				 * `edit` context) or `{ ...query, who: 'authors' }`.
+				 * Defaults to all site users except the current one. Return a
+				 * modified query to change the audience, e.g.
+				 * `{ ...query, roles: [ 'editor' ] }` (in `edit` context) or
+				 * `{ ...query, who: 'authors' }`.
 				 *
 				 * @param {Object} query       The `getUsers` query arguments.
 				 * @param {string} filterValue The current mention search text.
@@ -53,6 +59,9 @@ const noteMentionCompleter = {
 						context: 'view',
 						search: encodeURIComponent( filterValue ),
 						per_page: 10,
+						...( currentUserId
+							? { exclude: [ currentUserId ] }
+							: {} ),
 					},
 					filterValue
 				) as Record< string, unknown >;
@@ -81,13 +90,9 @@ const noteMentionCompleter = {
 		return {
 			action: 'insert-at-caret' as const,
 			value: (
-				<a
-					className="wp-note-mention"
-					data-user-id={ user.id }
-					href={ user.link }
-				>
+				<span className="wp-note-mention" data-user-id={ user.id }>
 					{ '@' + user.name }
-				</a>
+				</span>
 			),
 		};
 	},

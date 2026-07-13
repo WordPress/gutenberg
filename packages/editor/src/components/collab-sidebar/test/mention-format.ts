@@ -15,7 +15,8 @@ import {
 	MENTION_FORMAT_NAME,
 } from '../mention-format';
 
-const getFormatType = ( name ) => select( richTextStore ).getFormatType( name );
+const getFormatType = ( name: string ) =>
+	select( richTextStore ).getFormatType( name );
 
 describe( 'registerNoteMentionFormat', () => {
 	afterEach( () => {
@@ -24,15 +25,15 @@ describe( 'registerNoteMentionFormat', () => {
 		}
 	} );
 
-	it( 'registers an anchor-based mention format that preserves data-user-id', () => {
+	it( 'registers a span-based mention format that preserves data-user-id', () => {
 		registerNoteMentionFormat();
 
 		const format = getFormatType( MENTION_FORMAT_NAME );
 		expect( format ).toMatchObject( {
 			name: MENTION_FORMAT_NAME,
-			tagName: 'a',
+			tagName: 'span',
 			className: 'wp-note-mention',
-			attributes: { id: 'data-user-id', url: 'href' },
+			attributes: { id: 'data-user-id' },
 		} );
 	} );
 

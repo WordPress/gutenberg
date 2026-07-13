@@ -33,40 +33,38 @@ describe( 'noteMentionCompleter', () => {
 	} );
 
 	describe( 'getOptionCompletion', () => {
-		it( 'inserts a mention link carrying the user id', () => {
+		it( 'inserts a non-link mention span carrying the user id', () => {
 			const completion = noteMentionCompleter.getOptionCompletion( {
 				id: 5,
 				name: 'Jane Doe',
-				slug: 'jane',
-				link: 'https://example.com/author/jane',
 			} );
 
 			expect( completion.action ).toBe( 'insert-at-caret' );
 
-			const anchor = completion.value as ReactElement;
-			expect( anchor.type ).toBe( 'a' );
-			expect( anchor.props.className ).toBe( 'wp-note-mention' );
-			expect( anchor.props[ 'data-user-id' ] ).toBe( 5 );
-			expect( anchor.props.href ).toBe(
-				'https://example.com/author/jane'
-			);
+			const mention = completion.value as ReactElement;
+			// A mention marks a person; it must not be a navigation link.
+			expect( mention.type ).toBe( 'span' );
+			expect( mention.props.className ).toBe( 'wp-note-mention' );
+			expect( mention.props[ 'data-user-id' ] ).toBe( 5 );
 			/*
-			 * `anchor` is the React element returned by the completer, not a
+			 * `mention` is the React element returned by the completer, not a
 			 * rendered DOM node, so inspecting its `children` prop is the
 			 * intended assertion rather than DOM traversal.
 			 */
 			// eslint-disable-next-line testing-library/no-node-access
-			expect( anchor.props.children ).toBe( '@Jane Doe' );
+			expect( mention.props.children ).toBe( '@Jane Doe' );
 		} );
 	} );
 
 	describe( 'useItems', () => {
 		let getUsers: jest.Mock;
+		let getCurrentUser: jest.Mock;
 
 		beforeEach( () => {
 			getUsers = jest.fn( () => [] );
+			getCurrentUser = jest.fn( () => ( { id: 99 } ) );
 			mockedUseSelect.mockImplementation( ( mapSelect: any ) =>
-				mapSelect( () => ( { getUsers } ) )
+				mapSelect( () => ( { getUsers, getCurrentUser } ) )
 			);
 		} );
 
@@ -74,7 +72,20 @@ describe( 'noteMentionCompleter', () => {
 			mockedUseSelect.mockReset();
 		} );
 
-		it( 'queries all site users by default', () => {
+		it( 'queries site users, leaving out the current user', () => {
+			renderHook( () => noteMentionCompleter.useItems( 'jane' ) );
+
+			expect( getUsers ).toHaveBeenCalledWith( {
+				context: 'view',
+				search: 'jane',
+				per_page: 10,
+				exclude: [ 99 ],
+			} );
+		} );
+
+		it( 'omits the exclusion while the current user is unknown', () => {
+			getCurrentUser.mockReturnValue( undefined );
+
 			renderHook( () => noteMentionCompleter.useItems( 'jane' ) );
 
 			expect( getUsers ).toHaveBeenCalledWith( {
@@ -84,7 +95,7 @@ describe( 'noteMentionCompleter', () => {
 			} );
 		} );
 
-		it( 'lets integrators narrow the query via the filter', () => {
+		it( 'lets integrators change the query via the filter', () => {
 			addFilter(
 				'editor.notes.mentionUserQuery',
 				'test/narrow',
