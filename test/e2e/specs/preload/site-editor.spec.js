@@ -48,11 +48,9 @@ test.describe( 'Preload', () => {
 		// `POST /wp/v2/users/me` (preferences persistence) occasionally
 		// fires twice within the captured window; the duplicate count
 		// isn't stable across runs, so this assertion deduplicates.
-		// To do: these should all be removed or preloaded.
+		// To do: the remaining requests should be removed or preloaded.
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
-				'GET /wp/v2/posts?context=edit&offset=0&order=desc&orderby=date&per_page=10&ignore_sticky=false',
-				'GET /wp/v2/template-parts/emptytheme//header?context=edit',
 				'OPTIONS /wp/v2/settings',
 				'POST /wp/v2/users/me',
 			].sort()
