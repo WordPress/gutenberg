@@ -20,13 +20,17 @@ test.describe( 'Tabs', () => {
 			await editor.insertBlock( {
 				name: 'core/tabs',
 				innerBlocks: [
-					{ name: 'core/tab-list' },
+					{
+						name: 'core/tab-list',
+						attributes: {
+							tabs: [ { label: 'Tab 1' }, { label: 'Tab 2' } ],
+						},
+					},
 					{
 						name: 'core/tab-panels',
 						innerBlocks: [
 							{
 								name: 'core/tab-panel',
-								attributes: { label: 'Tab 1' },
 								innerBlocks: [
 									{
 										name: 'core/paragraph',
@@ -36,7 +40,6 @@ test.describe( 'Tabs', () => {
 							},
 							{
 								name: 'core/tab-panel',
-								attributes: { label: 'Tab 2' },
 								innerBlocks: [
 									{
 										name: 'core/paragraph',
