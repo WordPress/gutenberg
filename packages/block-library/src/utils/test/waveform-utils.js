@@ -339,8 +339,7 @@ describe( 'Waveform utilities', () => {
 
 			expect( playBtn ).toHaveClass( 'has-artwork' );
 			expect( playBtn ).toHaveStyle( {
-				backgroundImage:
-					'linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url("https://example.com/cover.jpg")',
+				backgroundImage: 'url("https://example.com/cover.jpg")',
 				backgroundPosition: 'center',
 				backgroundSize: 'cover',
 			} );
@@ -360,7 +359,7 @@ describe( 'Waveform utilities', () => {
 
 			expect( playBtn ).toHaveStyle( {
 				backgroundImage:
-					'linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url("https://example.com/cover \\"quoted\\".jpg")',
+					'url("https://example.com/cover \\"quoted\\".jpg")',
 			} );
 		} );
 
@@ -417,8 +416,7 @@ describe( 'Waveform utilities', () => {
 			).not.toThrow();
 			expect( playBtn ).toHaveClass( 'has-artwork' );
 			expect( playBtn ).toHaveStyle( {
-				backgroundImage:
-					'linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url("https://example.com/cover.jpg")',
+				backgroundImage: 'url("https://example.com/cover.jpg")',
 			} );
 		} );
 

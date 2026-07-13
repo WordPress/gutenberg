@@ -204,10 +204,7 @@ export function setupPlayButtonArtwork( container, artworkUrl ) {
 	}
 
 	playBtn.classList.add( 'has-artwork' );
-	playBtn.style.backgroundImage = [
-		'linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35))',
-		`url(${ JSON.stringify( artworkUrl ) })`,
-	].join( ', ' );
+	playBtn.style.backgroundImage = `url(${ JSON.stringify( artworkUrl ) })`;
 	playBtn.style.backgroundPosition = 'center';
 	playBtn.style.backgroundSize = 'cover';
 }

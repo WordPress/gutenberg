@@ -33,6 +33,11 @@ $waveform-player-height: 100px;
 			transform: none;
 		}
 
+		svg {
+			width: 3rem;
+			height: 3rem;
+		}
+
 		&.has-artwork {
 			color: #fff;
 
