@@ -624,18 +624,22 @@ async function bundlePackage( packageName, options = {} ) {
 			globalName,
 		};
 
-		// Wrap the bundle in an IIFE so the `'use strict'` directive esbuild emits for the
-		// (strict) ES module output stays at the function level. Left at the top of the
-		// file it is a *file-level* directive, which — because load-scripts.php
-		// concatenates raw file contents — forces strict mode onto any sloppy-mode script
-		// bundled after it, throwing on e.g. implicit globals. Wrapping confines the
-		// directive to this bundle. See https://core.trac.wordpress.org/ticket/65515.
+		/*
+		 * Wrap the bundle in an IIFE so the `'use strict'` directive esbuild emits for the
+		 * (strict) ES module output stays at the function level. Left at the top of the
+		 * file it is a *file-level* directive, which — because load-scripts.php
+		 * concatenates raw file contents — forces strict mode onto any sloppy-mode script
+		 * bundled after it, throwing on e.g. implicit globals. Wrapping confines the
+		 * directive to this bundle. See https://core.trac.wordpress.org/ticket/65515.
+		 */
 		baseConfig.banner = { js: '(function() {' };
 
-		// esbuild's `globalName` assigns onto a locally-declared `var` root (using a
-		// `window.…` global name would emit `var window`, shadowing the real global), so
-		// that assignment is trapped inside the wrapper. Re-expose it on the real global
-		// object in the footer, then close the IIFE.
+		/*
+		 * esbuild's `globalName` assigns onto a locally-declared `var` root (using a
+		 * `window.…` global name would emit `var window`, shadowing the real global), so
+		 * that assignment is trapped inside the wrapper. Re-expose it on the real global
+		 * object in the footer, then close the IIFE.
+		 */
 		let footerJs = '';
 		if ( shouldExposeGlobal ) {
 			const globalMember = camelCase( packageName );
