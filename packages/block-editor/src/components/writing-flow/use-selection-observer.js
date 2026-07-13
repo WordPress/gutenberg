@@ -344,41 +344,47 @@ export default function useSelectionObserver() {
 								range,
 								__unstableIsEditableTree: true,
 							} );
-							const attributeKey =
-								richTextElement.dataset.wpBlockAttributeKey;
-							// Clamp the offsets to the element. A forward selection
-							// can overshoot past the rich text (e.g. a triple
-							// click extends into the next block at offset 0),
-							// leaving `end` undefined; that means the selection
-							// reaches through the end of this element's content.
-							const startOffset = richTextData.start ?? 0;
-							const endOffset =
-								richTextData.end ?? richTextData.text.length;
-							const selectionStart = getSelectionStart();
-							const selectionEnd = getSelectionEnd();
-
-							if (
-								selectionStart.clientId === startClientId &&
-								selectionEnd.clientId === startClientId &&
-								selectionStart.attributeKey === attributeKey &&
-								selectionStart.offset === startOffset &&
-								selectionEnd.offset === endOffset
-							) {
-								return;
-							}
-
-							selectionChange( {
+							const selectionUpdate = {
 								start: {
 									clientId: startClientId,
-									attributeKey,
-									offset: startOffset,
+									attributeKey:
+										richTextElement.dataset
+											.wpBlockAttributeKey,
+									offset: richTextData.start ?? 0,
 								},
 								end: {
 									clientId: startClientId,
-									attributeKey,
-									offset: endOffset,
+									attributeKey:
+										richTextElement.dataset
+											.wpBlockAttributeKey,
+									// Clamp the end offset to the element. A
+									// forward selection can overshoot past the
+									// rich text (e.g. a triple click extends
+									// into the next block at offset 0), leaving
+									// `end` undefined; that means the selection
+									// reaches through the end of this element's
+									// content.
+									offset:
+										richTextData.end ??
+										richTextData.text.length,
 								},
-							} );
+							};
+							const { start, end } = selectionUpdate;
+							const selectionStart = getSelectionStart();
+							const selectionEnd = getSelectionEnd();
+
+							// Skip the dispatch when the store already holds
+							// the same selection.
+							if (
+								selectionStart.clientId !== start.clientId ||
+								selectionEnd.clientId !== end.clientId ||
+								selectionStart.attributeKey !==
+									start.attributeKey ||
+								selectionStart.offset !== start.offset ||
+								selectionEnd.offset !== end.offset
+							) {
+								selectionChange( selectionUpdate );
+							}
 						} else {
 							selectBlock( startClientId );
 						}
