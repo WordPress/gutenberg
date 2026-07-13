@@ -193,6 +193,116 @@ test.describe( 'Collaboration - Undo/Redo', () => {
 			] );
 	} );
 
+	test( 'Content in CRDT doc stays in sync when blocks are cleared', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Content CRDT Sync Test',
+			status: 'draft',
+			date_gmt: new Date().toISOString(),
+		} );
+		await collaborationUtils.openCollaborativeSession( post.id );
+
+		const { page2, editor2 } = collaborationUtils;
+
+		// User A inserts a block. Block insertion triggers onChange
+		// (a persistent edit) which passes content as a function.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Important work' },
+		} );
+
+		// Wait for User B to see the block.
+		await expect
+			.poll( () => editor2.getBlocks(), { timeout: 5000 } )
+			.toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Important work' },
+				},
+			] );
+
+		// Clear blocks on User B via editEntityRecord, simulating what
+		// the Code Editor does (post-text-editor sets blocks: undefined
+		// when the user edits HTML directly). The receiver-injected
+		// content closure captured the synced blocks, so getEditedPostContent
+		// should still return the right HTML even with blocks cleared.
+		await page2.evaluate( () => {
+			const postId = ( window as any ).wp.data
+				.select( 'core/editor' )
+				.getCurrentPostId();
+			( window as any ).wp.data
+				.dispatch( 'core' )
+				.editEntityRecord( 'postType', 'post', postId, {
+					blocks: undefined,
+				} );
+		} );
+
+		await expect
+			.poll(
+				() =>
+					page2.evaluate( () =>
+						( window as any ).wp.data
+							.select( 'core/editor' )
+							.getEditedPostContent()
+					),
+				{ timeout: 5000 }
+			)
+			.toContain( 'Important work' );
+	} );
+
+	test( 'Post is marked dirty on both collaborators after User A inserts a block', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Dirty State Test',
+			content:
+				'<!-- wp:paragraph --><p>Initial</p><!-- /wp:paragraph -->',
+			status: 'draft',
+			date_gmt: new Date().toISOString(),
+		} );
+		await collaborationUtils.openCollaborativeSession( post.id );
+
+		const { page2 } = collaborationUtils;
+
+		// Both users should start with a clean (non-dirty) state.
+		await expect
+			.poll(
+				() =>
+					page2.evaluate( () =>
+						( window as any ).wp.data
+							.select( 'core/editor' )
+							.isEditedPostDirty()
+					),
+				{ timeout: 5000 }
+			)
+			.toBe( false );
+
+		// User A inserts a new block.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'New content from A' },
+		} );
+
+		// User B should see the post as dirty after sync, because
+		// the content field was updated in the CRDT doc.
+		await expect
+			.poll(
+				() =>
+					page2.evaluate( () =>
+						( window as any ).wp.data
+							.select( 'core/editor' )
+							.isEditedPostDirty()
+					),
+				{ timeout: 5000 }
+			)
+			.toBe( true );
+	} );
+
 	test( 'Undo restores the post selection when another synced entity is loaded', async ( {
 		collaborationUtils,
 		requestUtils,

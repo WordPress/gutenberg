@@ -24,7 +24,7 @@ export default function PostViewLink() {
 			return {
 				permalink: select( editorStore ).getPermalink(),
 				isPublished: select( editorStore ).isCurrentPostPublished(),
-				label: postType?.labels.view_item,
+				label: postType?.labels?.view_item,
 				hasLoaded: !! postType,
 				showIconLabels: get( 'core', 'showIconLabels' ),
 			};

@@ -20,7 +20,8 @@
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../keycodes" },
-		{ "path": "../private-apis" }
+		{ "path": "../private-apis" },
+		{ "path": "../ui" }
 	],
 	"include": [ "src/**/*" ],
 	"exclude": [ "src/font-library/lib/**/*" ]

@@ -1,20 +1,19 @@
 /**
  * WordPress dependencies
  */
-import {
-	Tooltip,
-	__experimentalTruncate as Truncate,
-} from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { getFilename } from '@wordpress/url';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
+import { Tooltip } from '@wordpress/ui';
+
 /**
  * Internal dependencies
  */
 import type { MediaItem } from '../types';
 
-// Hard-coded truncate length to match the available area in the media sidebar.
-// Longer file names will be truncated and wrapped in a tooltip showing the full name.
+// Proxy threshold for "long enough that the cell will visually truncate" —
+// used to decide whether to wrap the filename in a Tooltip showing the full
+// name on hover. Visual truncation itself is handled in CSS.
 const TRUNCATE_LENGTH = 15;
 
 export default function FileNameView( {
@@ -29,13 +28,28 @@ export default function FileNameView( {
 		return '';
 	}
 
-	return fileName.length > TRUNCATE_LENGTH ? (
-		<Tooltip text={ fileName }>
-			<Truncate limit={ TRUNCATE_LENGTH } ellipsizeMode="tail">
+	if ( fileName.length <= TRUNCATE_LENGTH ) {
+		return (
+			<span className="dataviews-media-field__filename">
 				{ fileName }
-			</Truncate>
-		</Tooltip>
-	) : (
-		<>{ fileName }</>
+			</span>
+		);
+	}
+
+	// The full filename is always in the DOM, so assistive tech gets it
+	// regardless. The Tooltip aids mouse users where the cell visually clips
+	// (DataViews layouts); in a non-truncating context like the DataForm the
+	// name wraps in full, making it redundant but harmless.
+	return (
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					<span className="dataviews-media-field__filename">
+						{ fileName }
+					</span>
+				}
+			/>
+			<Tooltip.Popup>{ fileName }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }

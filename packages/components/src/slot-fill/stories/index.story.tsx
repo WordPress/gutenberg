@@ -28,7 +28,7 @@ const meta: Meta< typeof Slot > = {
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

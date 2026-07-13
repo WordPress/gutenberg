@@ -7,7 +7,7 @@ import {
 	useLayoutEffect,
 	useMemo,
 } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	EntityProvider,
@@ -22,13 +22,13 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { createBlock } from '@wordpress/blocks';
+import { getQueryArg } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
-import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
@@ -37,6 +37,7 @@ import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
 import { useRevisionBlocks } from './use-revision-blocks';
 import useCommands from '../commands';
 import useUploadSaveLock from './use-upload-save-lock';
+import useNetworkReconnect from './use-network-reconnect';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
@@ -309,8 +310,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setCurrentTemplateId,
 			setEditedPost,
 			setRenderingMode,
+			setCurrentRevisionId,
 		} = unlock( useDispatch( editorStore ) );
 		const { editEntityRecord } = useDispatch( coreStore );
+		const registry = useRegistry();
 
 		const onChangeSelection = useCallback(
 			( newSelection ) => {
@@ -335,8 +338,19 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			}
 
 			updatePostLock( settings.postLock );
-			setupEditor( post, initialEdits, settings.template );
+			// `setupEditor` may already have been dispatched by the
+			// editor's pre-mount kickoff (see edit-post's
+			// `initializeEditor`). Skip the redundant dispatch — it
+			// would otherwise re-parse + reset blocks for new posts.
+			if ( ! registry.select( editorStore ).__unstableIsEditorReady() ) {
+				setupEditor( post, initialEdits, settings.template );
+			}
 			if ( settings.autosave ) {
+				// The only place core exposes the autosave ID is the edit
+				// link, always `revision.php?revision=<autosave ID>`.
+				const autosaveId = Number(
+					getQueryArg( settings.autosave.editLink, 'revision' )
+				);
 				createWarningNotice(
 					__(
 						'There is an autosave of this post that is more recent than the version below.'
@@ -346,7 +360,28 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						actions: [
 							{
 								label: __( 'View the autosave' ),
-								url: settings.autosave.editLink,
+								...( autosaveId
+									? {
+											onClick: () => {
+												// `disableVisualRevisions`
+												// is only set after mount,
+												// so read it at click time.
+												const {
+													disableVisualRevisions,
+												} = registry
+													.select( editorStore )
+													.getEditorSettings();
+												if ( disableVisualRevisions ) {
+													window.location.href =
+														settings.autosave.editLink;
+													return;
+												}
+												setCurrentRevisionId(
+													autosaveId
+												);
+											},
+									  }
+									: { url: settings.autosave.editLink } ),
 							},
 						],
 					}
@@ -373,7 +408,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		}, [ post.type, post.id, setEditedPost, removeNotice ] );
 
 		// Synchronize the editor settings as they change.
-		useEffect( () => {
+		// Do it as a layout effect so that rendered UI with outdated settings is not painted.
+		useLayoutEffect( () => {
 			updateEditorSettings( settings );
 		}, [ settings, updateEditorSettings ] );
 
@@ -397,33 +433,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Lock post saving when media uploads are in progress (experimental feature).
 		useUploadSaveLock();
 
+		// Pause/resume media upload queue on network disconnect/reconnect.
+		useNetworkReconnect();
+
 		if ( ! isReady || ! mode ) {
 			return null;
-		}
-
-		const isAttachment =
-			post.type === ATTACHMENT_POST_TYPE &&
-			window?.__experimentalMediaEditor;
-
-		// Early return for attachments - no block editor needed
-		if ( isAttachment ) {
-			return (
-				<EntityProvider kind="root" type="site">
-					<EntityProvider
-						kind="postType"
-						type={ post.type }
-						id={ post.id }
-					>
-						{ children }
-						{ ! settings.isPreviewMode && (
-							<>
-								<EditorKeyboardShortcuts />
-								<KeyboardShortcutHelpModal />
-							</>
-						) }
-					</EntityProvider>
-				</EntityProvider>
-			);
 		}
 
 		return (
@@ -466,9 +480,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									<StartTemplateOptions />
 									<PatternRenameModal />
 									<PatternDuplicateModal />
-									{ window?.__experimentalMediaEditorModal && (
-										<MediaEditorModalMount />
-									) }
+									<MediaEditorModalMount />
 								</>
 							) }
 						</BlockEditorProviderComponent>

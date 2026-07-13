@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo } from '@wordpress/element';
+import { Fragment, useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Stack } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -15,7 +15,11 @@ import {
  */
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
-import { focusNoteThread } from './utils';
+import {
+	focusNoteThread,
+	getNoteIdsFromMetadata,
+	pickPrimaryNote,
+} from './utils';
 import { useFloatingBoard, useNoteActions } from './hooks';
 import { AddNote } from './add-note';
 import { store as editorStore } from '../../store';
@@ -33,7 +37,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		useDispatch( blockEditorStore )
 	);
 
-	const { blockNoteId, selectedBlockClientId, orderedBlockIds } = useSelect(
+	const { noteId, selectedBlockClientId, orderedBlockIds } = useSelect(
 		( select ) => {
 			const {
 				getBlockAttributes,
@@ -42,7 +46,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			} = select( blockEditorStore );
 			const clientId = getSelectedBlockClientId();
 			return {
-				blockNoteId: clientId
+				noteId: clientId
 					? getBlockAttributes( clientId )?.metadata?.noteId
 					: null,
 				selectedBlockClientId: clientId,
@@ -77,15 +81,15 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		};
 		const out = [];
 		orderedBlockIds.forEach( ( blockId ) => {
+			// Blocks can carry multiple notes — surface them all.
+			const threadsForBlock = notes.filter(
+				( t ) => t.blockClientId === blockId
+			);
+			out.push( ...threadsForBlock );
 			if ( blockId === selectedBlockClientId ) {
+				// Place the new note placeholder after the block's existing
+				// threads so the form appears alongside them.
 				out.push( newNoteThread );
-			} else {
-				const threadForBlock = notes.find(
-					( t ) => t.blockClientId === blockId
-				);
-				if ( threadForBlock ) {
-					out.push( threadForBlock );
-				}
 			}
 		} );
 		return out;
@@ -128,10 +132,28 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		}
 	};
 
-	// Auto-select the related note thread when a block is selected.
+	// Pick the most relevant thread for the selected block. Derived outside
+	// the effect so the effect body stays minimal.
+	const targetNoteId = useMemo( () => {
+		const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
+		const blockThreads = notes.filter( ( t ) =>
+			blockNoteIds.includes( t.id )
+		);
+		return pickPrimaryNote( blockThreads )?.id;
+	}, [ noteId, notes ] );
+
+	// Sync the selected note to the new block's primary thread when the
+	// block context changes. The ref tracks the previous block id so the
+	// effect only fires on block transitions, leaving in-block note changes
+	// (Escape, Cancel, "new" form) alone.
+	const prevBlockIdRef = useRef( selectedBlockClientId );
 	useEffect( () => {
-		selectNote( blockNoteId ?? undefined );
-	}, [ blockNoteId, selectNote ] );
+		if ( prevBlockIdRef.current === selectedBlockClientId ) {
+			return;
+		}
+		prevBlockIdRef.current = selectedBlockClientId;
+		selectNote( targetNoteId );
+	}, [ selectedBlockClientId, targetNoteId, selectNote ] );
 
 	// Focus the selected note when requested.
 	useEffect( () => {
@@ -216,6 +238,18 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		}
 	};
 
+	// In the "All notes" view, find where the resolved notes begin so a
+	// "Resolved" divider can be rendered above them. Resolved notes (status
+	// 'approved' with a still-present block) always sort after the active
+	// ones, so the first match marks the boundary. The floating view only
+	// lists unresolved notes, so it needs no divider.
+	const firstResolvedIndex = isFloating
+		? -1
+		: threads.findIndex(
+				( thread ) =>
+					thread.status === 'approved' && !! thread.blockClientId
+		  );
+
 	return (
 		<Stack
 			className="editor-collab-sidebar-panel"
@@ -245,32 +279,46 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 							sidebarRef={ sidebarRef }
 						/>
 					) }
-					{ threads.map( ( thread ) => (
-						<NoteThread
-							key={ thread.id }
-							note={ thread }
-							onAddReply={ onAddReply }
-							onDeleteNote={ handleDelete }
-							onEditNote={ onEditNote }
-							isSelected={ selectedNote === thread.id }
-							sidebarRef={ sidebarRef }
-							floating={
-								isFloating
-									? {
-											y: notePositions[ thread.id ],
-											registerThread,
-											unregisterThread,
-									  }
-									: undefined
-							}
-							onKeyDown={ ( event ) =>
-								navigate(
-									event,
-									thread,
-									selectedNote === thread.id
-								)
-							}
-						/>
+					{ threads.map( ( thread, index ) => (
+						<Fragment key={ thread.id }>
+							{ index === firstResolvedIndex && (
+								<Stack
+									direction="row"
+									align="center"
+									justify="center"
+									gap="sm"
+									className="editor-collab-sidebar-panel__status-separator"
+								>
+									<Text variant="heading-sm" render={ <p /> }>
+										{ __( 'Resolved' ) }
+									</Text>
+								</Stack>
+							) }
+							<NoteThread
+								note={ thread }
+								onAddReply={ onAddReply }
+								onDeleteNote={ handleDelete }
+								onEditNote={ onEditNote }
+								isSelected={ selectedNote === thread.id }
+								sidebarRef={ sidebarRef }
+								floating={
+									isFloating
+										? {
+												y: notePositions[ thread.id ],
+												registerThread,
+												unregisterThread,
+										  }
+										: undefined
+								}
+								onKeyDown={ ( event ) =>
+									navigate(
+										event,
+										thread,
+										selectedNote === thread.id
+									)
+								}
+							/>
+						</Fragment>
 					) ) }
 				</>
 			) }

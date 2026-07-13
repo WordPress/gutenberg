@@ -196,6 +196,29 @@ test.describe( 'Image', () => {
 
 	test( 'should drag and drop files into media placeholder', async ( {
 		editor,
+		imageBlockUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+
+		await imageBlock.drop( {
+			files: [ imageBlockUtils.TEST_IMAGE_FILE_PATH ],
+		} );
+
+		// Wait for upload to complete (includes client-side media processing time).
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+	} );
+
+	test( 'allows rotating an image using the media editor modal', async ( {
+		editor,
 		page,
 		imageBlockUtils,
 	} ) => {
@@ -208,213 +231,44 @@ test.describe( 'Image', () => {
 			name: 'This image has an empty alt attribute',
 		} );
 
-		const tmpInput = await page.evaluateHandle( () => {
-			const input = document.createElement( 'input' );
-			input.type = 'file';
-			return input;
+		await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		// Wait for upload to complete (includes client-side media processing time).
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
 		} );
-
-		await imageBlockUtils.upload( tmpInput );
-
-		const paragraphRect = await imageBlock.boundingBox();
-		const pX = paragraphRect.x + paragraphRect.width / 2;
-		const pY = paragraphRect.y + paragraphRect.height / 3;
-
-		await imageBlock.evaluate(
-			( element, [ input, clientX, clientY ] ) => {
-				const dataTransfer = new window.DataTransfer();
-				dataTransfer.items.add( input.files[ 0 ] );
-				const event = new window.DragEvent( 'drop', {
-					bubbles: true,
-					clientX,
-					clientY,
-					dataTransfer,
-				} );
-				element.dispatchEvent( event );
+		const [
+			{
+				attributes: { id: initialId, url: initialUrl },
 			},
-			[ tmpInput, pX, pY ]
-		);
+		] = await editor.getBlocks();
 
-		// Wait for upload to complete (includes client-side media processing time).
-		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
-			timeout: 30_000,
-		} );
-	} );
-
-	test( 'allows zooming using the crop tools', async ( {
-		editor,
-		page,
-		pageUtils,
-		imageBlockUtils,
-	} ) => {
-		// Insert the block, upload a file and crop.
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-
-		await imageBlockUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' )
-		);
-
-		// Wait for upload to complete (includes client-side media processing time).
-		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
-			timeout: 30_000,
-		} );
-
-		// Assert that the image is initially unscaled and unedited.
-		const initialImageSrc = await image.getAttribute( 'src' );
-		await expect
-			.poll( () => image.boundingBox() )
-			.toMatchObject( {
-				height: 10,
-				width: 10,
-			} );
-
-		// Zoom in to twice the amount using the zoom input.
+		// Open the media editor modal from the block toolbar.
 		await editor.clickBlockToolbarButton( 'Crop' );
-		await editor.clickBlockToolbarButton( 'Zoom' );
-		await expect(
-			page.locator( 'role=slider[name="Zoom"i]' )
-		).toBeFocused();
+		const modal = page.locator( 'role=dialog[name="Edit media"i]' );
+		await expect( modal ).toBeVisible();
 
-		await pageUtils.pressKeys( 'Tab' );
-		await expect(
-			page.locator( 'role=spinbutton[name="Zoom"i]' )
-		).toBeFocused();
+		// Rotate and save.
+		await modal
+			.locator( 'role=button[name="Rotate 90° clockwise"i]' )
+			.click();
+		await modal.locator( 'role=button[name="Save"i]' ).click();
 
-		await pageUtils.pressKeys( 'primary+a' );
-		await page.keyboard.type( '200' );
-		await page.keyboard.press( 'Escape' );
-		await editor.clickBlockToolbarButton( 'Apply' );
-
-		// Wait for the cropping tools to disappear.
-		await expect(
-			page.locator( 'role=button[name="Save"i]' )
-		).toBeHidden();
-
-		// Assert that the image is edited.
-		await expect( image ).not.toHaveAttribute( 'src', initialImageSrc );
-		const updatedImageSrc = await image.getAttribute( 'src' );
-
-		await expect
-			.poll( () => image.boundingBox() )
-			.toMatchObject( {
-				height: 5,
-				width: 5,
-			} );
-
-		expect(
-			await imageBlockUtils.getImageBuffer( updatedImageSrc )
-		).toMatchSnapshot();
-	} );
-
-	test( 'allows changing aspect ratio using the crop tools', async ( {
-		editor,
-		page,
-		imageBlockUtils,
-	} ) => {
-		// Insert the block, upload a file and crop.
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-
-		await imageBlockUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' )
-		);
-
-		// Wait for upload to complete (includes client-side media processing time).
-		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
-			timeout: 30_000,
-		} );
-
-		// Assert that the image is initially unscaled and unedited.
-		const initialImageSrc = await image.getAttribute( 'src' );
-		await expect
-			.poll( () => image.boundingBox() )
-			.toMatchObject( {
-				height: 10,
-				width: 10,
-			} );
-
-		// Zoom in to twice the amount using the zoom input.
-		await editor.clickBlockToolbarButton( 'Crop' );
-		await editor.clickBlockToolbarButton( 'Aspect Ratio' );
-		await page.click(
-			'role=menu[name="Aspect Ratio"i] >> role=menuitemradio[name="Wide - 16:9"i]'
-		);
-		await editor.clickBlockToolbarButton( 'Apply' );
-
-		// Wait for the cropping tools to disappear.
-		await expect(
-			page.locator( 'role=button[name="Save"i]' )
-		).toBeHidden();
-
-		// Assert that the image is edited.
-		await expect( image ).not.toHaveAttribute( 'src', initialImageSrc );
-		const updatedImageSrc = await image.getAttribute( 'src' );
-
-		await expect
-			.poll( () => image.boundingBox() )
-			.toMatchObject( {
-				height: 6,
-				width: 10,
-			} );
-
-		expect(
-			await imageBlockUtils.getImageBuffer( updatedImageSrc )
-		).toMatchSnapshot();
-	} );
-
-	test( 'allows rotating using the crop tools', async ( {
-		editor,
-		page,
-		imageBlockUtils,
-	} ) => {
-		// Insert the block, upload a file and crop.
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-
-		await imageBlockUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' )
-		);
-
-		// Wait for upload to complete (includes client-side media processing time).
-		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
-			timeout: 30_000,
-		} );
-
-		// Rotate the image.
-		await editor.clickBlockToolbarButton( 'Crop' );
-		await editor.clickBlockToolbarButton( 'Rotate' );
-		await editor.clickBlockToolbarButton( 'Apply' );
-
-		// Wait for the cropping tools to disappear.
-		await expect(
-			page.locator( 'role=button[name="Save"i]' )
-		).toBeHidden();
-
-		// Assert that the image is edited.
-		const updatedImageSrc = await image.getAttribute( 'src' );
-
-		expect(
-			await imageBlockUtils.getImageBuffer( updatedImageSrc )
-		).toMatchSnapshot();
+		// Modal closes and the block now points at a child attachment whose
+		// URL matches the rendered <img>. The `/edit` endpoint creates a new
+		// attachment rather than mutating the original, so id must change.
+		await expect( modal ).toBeHidden();
+		await expect( image ).not.toHaveAttribute( 'src', initialUrl );
+		const [
+			{
+				attributes: { id, url },
+			},
+		] = await editor.getBlocks();
+		expect( id ).not.toBe( initialId );
+		expect( url ).not.toBe( initialUrl );
+		await expect( image ).toHaveAttribute( 'src', url );
 	} );
 
 	test( 'should undo without broken temporary state', async ( {
@@ -770,26 +624,83 @@ test.describe( 'Image', () => {
 		await expect( urlInput ).toHaveValue( 'https://example.com' );
 	} );
 
-	test( 'should upload external image to media library', async ( {
+	test( 'should upload external image to media library only when the toolbar button is clicked', async ( {
 		editor,
+		page,
+		requestUtils,
 	} ) => {
-		await editor.insertBlock( {
-			name: 'core/image',
-			attributes: {
-				url: 'https://cldup.com/cXyG__fTLN.jpg',
-			},
+		/*
+		 * Track attachment creation requests so the test can prove that
+		 * inserting an external URL does not sideload anything on its own.
+		 */
+		const mediaPostRequests = [];
+		page.on( 'request', ( request ) => {
+			if (
+				request.method() === 'POST' &&
+				request.url().includes( '/wp/v2/media' )
+			) {
+				mediaPostRequests.push( request.url() );
+			}
 		} );
 
-		await editor.clickBlockToolbarButton( 'Upload to Media Library' );
-
-		await expect(
-			editor.canvas
-				.locator( 'role=document[name="Block: Image"i]' )
-				.locator( 'img[src^="http"]' )
-		).toHaveAttribute(
-			'src',
-			expect.stringMatching( /\/wp-content\/uploads\// )
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
 		);
+		await expect( imageBlock ).toBeVisible();
+
+		await imageBlock
+			.getByRole( 'button' )
+			.filter( { hasText: 'Insert from URL' } )
+			.click();
+
+		const form = page.locator(
+			'form.block-editor-media-placeholder__url-input-form'
+		);
+		const imgUrl = 'https://cldup.com/cXyG__fTLN.jpg';
+		await form.getByLabel( 'URL' ).fill( imgUrl );
+		await form.getByRole( 'button', { name: 'Apply' } ).click();
+
+		// The image is inserted with its external URL, nothing is uploaded.
+		const image = imageBlock.locator( 'role=img' );
+		await expect( image ).toHaveAttribute( 'src', imgUrl );
+
+		// The toolbar offers to upload the external image to the library.
+		await editor.showBlockToolbar();
+		const uploadButton = page.getByRole( 'button', {
+			name: 'Upload to Media Library',
+		} );
+		await expect( uploadButton ).toBeVisible();
+
+		// Inserting from URL must not have triggered any upload by itself.
+		expect( mediaPostRequests ).toHaveLength( 0 );
+		expect(
+			await requestUtils.rest( { path: '/wp/v2/media' } )
+		).toHaveLength( 0 );
+
+		await uploadButton.click();
+
+		// The server sideloads the URL and the block switches to the local
+		// library copy of the image.
+		await expect( image ).toHaveAttribute(
+			'src',
+			/\/wp-content\/uploads\//,
+			{ timeout: 30_000 }
+		);
+		await expect(
+			page
+				.locator( '.components-snackbar__content' )
+				.filter( { hasText: 'Image uploaded.' } )
+		).toBeVisible();
+
+		// The button goes away once the image is in the library.
+		await editor.showBlockToolbar();
+		await expect( uploadButton ).toBeHidden();
+
+		// Exactly one attachment was created, by the button click.
+		expect(
+			await requestUtils.rest( { path: '/wp/v2/media' } )
+		).toHaveLength( 1 );
 	} );
 
 	test( 'should upload through prepublish panel', async ( {
@@ -810,7 +721,9 @@ test.describe( 'Image', () => {
 			.getByRole( 'button', { name: 'Upload', exact: true } )
 			.click();
 
-		await expect( page.locator( '.components-spinner' ) ).toHaveCount( 0 );
+		await expect(
+			page.locator( '.editor-post-publish-panel .components-spinner' )
+		).toHaveCount( 0 );
 		await expect(
 			editor.canvas
 				.locator( 'role=document[name="Block: Image"i]' )

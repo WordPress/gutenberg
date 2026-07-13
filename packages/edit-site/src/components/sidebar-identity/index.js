@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
@@ -74,7 +74,11 @@ export default function SidebarIdentity() {
 	};
 
 	return (
-		<Page title={ __( 'Identity' ) } headingLevel={ 2 } hasPadding>
+		<Page
+			title={ _x( 'Identity', 'site identity' ) }
+			headingLevel={ 2 }
+			hasPadding
+		>
 			<DataForm
 				data={ data }
 				fields={ fields }

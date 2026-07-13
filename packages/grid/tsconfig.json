@@ -4,5 +4,9 @@
 	"compilerOptions": {
 		"types": [ "jest", "style-imports" ]
 	},
-	"references": [ { "path": "../compose" }, { "path": "../element" } ]
+	"references": [
+		{ "path": "../compose" },
+		{ "path": "../element" },
+		{ "path": "../style-runtime" }
+	]
 }

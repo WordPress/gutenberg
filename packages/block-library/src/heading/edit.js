@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, Platform } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	RichText,
@@ -64,7 +64,14 @@ function HeadingEdit( props ) {
 
 		// Remove anchor map when block unmounts.
 		return () => setAnchor( clientId, null );
-	}, [ anchor, content, clientId, canGenerateAnchors ] );
+	}, [
+		anchor,
+		content,
+		clientId,
+		canGenerateAnchors,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	const onContentChange = ( value ) => {
 		const newAttrs = { content: value };
@@ -80,20 +87,17 @@ function HeadingEdit( props ) {
 	};
 
 	return (
-		<>
-			<RichText
-				identifier="content"
-				tagName={ tagName }
-				value={ content }
-				onChange={ onContentChange }
-				onMerge={ mergeBlocks }
-				onReplace={ onReplace }
-				onRemove={ () => onReplace( [] ) }
-				placeholder={ placeholder || __( 'Heading' ) }
-				{ ...( Platform.isNative && { deleteEnter: true } ) } // setup RichText on native mobile to delete the "Enter" key as it's handled by the JS/RN side
-				{ ...blockProps }
-			/>
-		</>
+		<RichText
+			identifier="content"
+			tagName={ tagName }
+			value={ content }
+			onChange={ onContentChange }
+			onMerge={ mergeBlocks }
+			onReplace={ onReplace }
+			onRemove={ () => onReplace( [] ) }
+			placeholder={ placeholder || __( 'Heading' ) }
+			{ ...blockProps }
+		/>
 	);
 }
 

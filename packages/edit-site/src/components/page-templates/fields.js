@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	Icon,
+	Icon as WCIcon,
 	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -138,7 +138,7 @@ function AuthorField( { item } ) {
 			) }
 			{ ! imageUrl && (
 				<div className="fields-controls__author-icon">
-					<Icon icon={ icon } />
+					<WCIcon icon={ icon } />
 				</div>
 			) }
 			<span className="fields-controls__author-name">{ text }</span>

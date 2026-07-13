@@ -6,7 +6,7 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useRef, useEffect, useCallback } from '@wordpress/element';
+import { forwardRef, useRef, useEffect } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
 
@@ -29,6 +29,21 @@ function cycleValue( value: number, total: number, offset: number ) {
 	return nextValue;
 }
 
+function getFocusableContext(
+	container: HTMLElement,
+	target: Element,
+	tabbableOnly: boolean
+) {
+	const finder = tabbableOnly ? focus.tabbable : focus.focusable;
+	const focusables = finder.find( container );
+
+	const index = focusables.indexOf( target as HTMLElement );
+	if ( index > -1 ) {
+		return { index, target, focusables };
+	}
+	return null;
+}
+
 function UnforwardedNavigableContainer(
 	{
 		children,
@@ -43,33 +58,6 @@ function UnforwardedNavigableContainer(
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const containerRef = useRef< HTMLDivElement | null >( null );
-
-	const getFocusableIndex = useCallback(
-		( focusables: Element[], target: Element ) => {
-			return focusables.indexOf( target );
-		},
-		[]
-	);
-
-	const getFocusableContext = useCallback(
-		( target: Element ) => {
-			if ( ! containerRef.current ) {
-				return null;
-			}
-
-			const finder = onlyBrowserTabstops
-				? focus.tabbable
-				: focus.focusable;
-			const focusables = finder.find( containerRef.current );
-
-			const index = getFocusableIndex( focusables, target );
-			if ( index > -1 && target ) {
-				return { index, target, focusables };
-			}
-			return null;
-		},
-		[ onlyBrowserTabstops, getFocusableIndex ]
-	);
 
 	useEffect( () => {
 		const container = containerRef.current;
@@ -114,7 +102,11 @@ function UnforwardedNavigableContainer(
 				return;
 			}
 
-			const context = getFocusableContext( activeElement );
+			const context = getFocusableContext(
+				container!,
+				activeElement,
+				!! onlyBrowserTabstops
+			);
 			if ( ! context ) {
 				return;
 			}
@@ -151,7 +143,7 @@ function UnforwardedNavigableContainer(
 		stopNavigationEvents,
 		cycle,
 		onNavigate,
-		getFocusableContext,
+		onlyBrowserTabstops,
 	] );
 
 	const mergedRef = useMergeRefs( [ containerRef, ref ] );

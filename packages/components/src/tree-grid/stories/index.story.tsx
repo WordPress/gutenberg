@@ -33,7 +33,7 @@ const meta: Meta< typeof TreeGrid > = {
 	parameters: {
 		controls: { expanded: true },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},
@@ -124,7 +124,6 @@ const Rows = ( {
 										label="Description"
 										hideLabelFromVision
 										placeholder="Description"
-										__next40pxDefaultSize
 										{ ...props }
 									/>
 								) }
@@ -135,7 +134,6 @@ const Rows = ( {
 										label="Notes"
 										hideLabelFromVision
 										placeholder="Notes"
-										__next40pxDefaultSize
 										{ ...props }
 									/>
 								) }

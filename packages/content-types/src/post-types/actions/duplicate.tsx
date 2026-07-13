@@ -20,13 +20,11 @@ import { Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import {
-	pluralLabelField,
-	singularLabelField,
-	useSlugField,
-} from '../fields/general';
+import { useSlugField } from '../fields/general';
+import { pluralLabelField, singularLabelField } from '../../utils/fields';
 import { serializeForSave } from '../utils';
-import type { CoreDataError, PostTypeFormData } from '../types';
+import type { PostTypeFormData } from '../types';
+import type { CoreDataError } from '../../types';
 import { POST_TYPE_ENTITY } from '../../constants';
 
 const SLUG_MAX_LENGTH = 20;
@@ -72,8 +70,13 @@ function DuplicatePostTypeModal( {
 	const [ isDuplicating, setIsDuplicating ] = useState( false );
 	const slugField = useSlugField( undefined, data.slug );
 
-	const fields = useMemo< Field< PostTypeFormData >[] >(
-		() => [ pluralLabelField, singularLabelField, slugField ],
+	const fields = useMemo(
+		() =>
+			[
+				pluralLabelField,
+				singularLabelField,
+				slugField,
+			] as Field< PostTypeFormData >[],
 		[ slugField ]
 	);
 

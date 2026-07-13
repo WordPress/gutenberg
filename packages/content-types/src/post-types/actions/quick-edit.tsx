@@ -23,16 +23,19 @@ import {
 	defaultForm,
 	hasArchiveField,
 	hierarchicalField,
-	pluralLabelField,
 	publicField,
-	singularLabelField,
-	statusField,
 	useSlugField,
 	useTaxonomiesField,
 } from '../fields';
+import {
+	pluralLabelField,
+	singularLabelField,
+	statusField,
+} from '../../utils/fields';
 import type { PostTypeFormData } from '../types';
 import { serializeForSave } from '../utils';
-import { POST_TYPE_ENTITY } from '../../constants';
+import { useMaybeInvalidateContentTypeCache } from '../../utils/use-maybe-invalidate-content-type-cache';
+import { POST_TYPE_ENTITY, TAXONOMY_ENTITY } from '../../constants';
 
 function QuickEditPostTypeModal( {
 	items,
@@ -47,17 +50,18 @@ function QuickEditPostTypeModal( {
 	const slugField = useSlugField( item.slug, data.slug );
 	const taxonomiesField = useTaxonomiesField();
 
-	const fields = useMemo< Field< PostTypeFormData >[] >(
-		() => [
-			pluralLabelField,
-			singularLabelField,
-			slugField,
-			taxonomiesField,
-			publicField,
-			hierarchicalField,
-			hasArchiveField,
-			statusField,
-		],
+	const fields = useMemo(
+		() =>
+			[
+				pluralLabelField,
+				singularLabelField,
+				slugField,
+				taxonomiesField,
+				publicField,
+				hierarchicalField,
+				hasArchiveField,
+				statusField,
+			] as Field< PostTypeFormData >[],
 		[ slugField, taxonomiesField ]
 	);
 
@@ -65,6 +69,7 @@ function QuickEditPostTypeModal( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
+	const maybeInvalidateCache = useMaybeInvalidateContentTypeCache();
 
 	async function onSave() {
 		if ( isSaving || ! isValid ) {
@@ -86,6 +91,11 @@ function QuickEditPostTypeModal( {
 				),
 				{ type: 'snackbar' }
 			);
+			maybeInvalidateCache(
+				item.config.taxonomies,
+				data.config.taxonomies,
+				TAXONOMY_ENTITY
+			);
 			closeModal?.();
 		} catch ( error: any ) {
 			createErrorNotice(
@@ -100,7 +110,12 @@ function QuickEditPostTypeModal( {
 	}
 
 	return (
-		<>
+		<form
+			onSubmit={ ( event ) => {
+				event.preventDefault();
+				onSave();
+			} }
+		>
 			<Stack
 				className="dataviews-action-modal__quick-edit-post-type-header"
 				direction="row"
@@ -146,15 +161,15 @@ function QuickEditPostTypeModal( {
 				<Button
 					__next40pxDefaultSize
 					variant="primary"
+					type="submit"
 					isBusy={ isSaving }
-					disabled={ isSaving }
+					disabled={ isSaving || ! isValid }
 					accessibleWhenDisabled
-					onClick={ onSave }
 				>
 					{ __( 'Done' ) }
 				</Button>
 			</Stack>
-		</>
+		</form>
 	);
 }
 

@@ -7,9 +7,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalInputControl as InputControl,
 	CheckboxControl,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { VisuallyHidden } from '@wordpress/ui';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * CSSClassesSettingComponent
@@ -58,7 +57,7 @@ const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
 			<VisuallyHidden render={ <legend /> }>
 				{ setting.title }
 			</VisuallyHidden>
-			<VStack spacing={ 3 }>
+			<Stack direction="column" gap="md">
 				<CheckboxControl
 					label={ setting.title }
 					onChange={ handleCheckboxChange }
@@ -78,11 +77,10 @@ const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
 								'Separate multiple classes with spaces.'
 							) }
 							__unstableInputWidth="100%"
-							__next40pxDefaultSize
 						/>
 					</div>
 				) }
-			</VStack>
+			</Stack>
 		</fieldset>
 	);
 };

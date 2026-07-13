@@ -5,37 +5,37 @@ of converting the block.
 
 A button is present on both blocks to then select one or the other.
 
-#### Props
+## Props
 
-##### block
+### block
 
 The original object to compare against
 
 -   Type: `Object`
 -   Required: Yes
 
-##### convertor
+### convertor
 
 A function that returns a new, converted, block when supplied an existing block. The conversion may fix or alter the block in a way that helps with an invalid block.
 
 -   Type: `func`
 -   Required: Yes
 
-##### convertButtonText
+### convertButtonText
 
 Text to show in the convert button
 
 -   Type: `string`
 -   Required: Yes
 
-##### onKeep
+### onKeep
 
 Callback when the original block is required
 
 -   Type: `func`
 -   Required: Yes
 
-##### onConvert
+### onConvert
 
 Callback when the converted block is required.
 

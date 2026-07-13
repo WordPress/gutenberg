@@ -33,9 +33,7 @@ import {
 	StyledHelp,
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const identity = ( value: string ) => value;
 
@@ -78,17 +76,10 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalExpandOnFocus = false,
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo,
-		__next40pxDefaultSize = false,
 		__experimentalAutoSelectFirstMatch = false,
 		tokenizeOnBlur = false,
 		help,
-	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >( props );
-
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'FormTokenField',
-		size: undefined,
-		__next40pxDefaultSize,
-	} );
+	} = props;
 
 	const defaultHelp = tokenizeOnSpace
 		? __( 'Separate with commas, spaces, or the Enter key.' )
@@ -253,7 +244,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 				break;
 			case 'Space':
 				if ( tokenizeOnSpace ) {
-					preventDefault = addCurrentToken();
+					preventDefault = addCurrentToken( {
+						preventDefaultOnFailedValidation: false,
+					} );
 				}
 				break;
 			case 'Escape':
@@ -320,7 +313,65 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		const tokenValue = items[ items.length - 1 ] || '';
 
 		if ( items.length > 1 ) {
-			addNewTokens( items.slice( 0, -1 ) );
+			const tokensToProcess = items.slice( 0, -1 );
+
+			// Pre-check: would any segment be rejected by
+			// `__experimentalValidateInput`? Empties and duplicates of the
+			// current selection are intentional skips, not failures.
+			const willFailValidation = ( segment: string ) => {
+				const transformed = saveTransform( segment );
+				return (
+					!! transformed &&
+					! valueContainsToken( transformed ) &&
+					! __experimentalValidateInput( transformed )
+				);
+			};
+			const hasFailures = tokensToProcess.some( willFailValidation );
+
+			// When there are failures, also commit the trailing in-progress
+			// segment so the user is left with only the items that need
+			// fixing, instead of mixing the trailing segment with the failed
+			// ones (which would block tokenization on Enter or comma).
+			const addedTokens = addNewTokens(
+				hasFailures ? items : tokensToProcess
+			);
+
+			if ( hasFailures ) {
+				// Derive rejected segments from `addedTokens` so this stays
+				// in sync with `addNewTokens`'s filter chain.
+				const rejected = items.filter( ( token ) => {
+					const transformed = saveTransform( token );
+					if ( ! transformed ) {
+						return false;
+					}
+					if ( addedTokens.has( transformed ) ) {
+						return false;
+					}
+					if ( valueContainsToken( transformed ) ) {
+						return false;
+					}
+					return ! __experimentalValidateInput( transformed );
+				} );
+
+				// Reuse the separator the user actually used (the last one
+				// in `text`) so we don't rewrite their input: comma-separated
+				// paste under `tokenizeOnSpace` stays comma-separated, and
+				// typed space under `tokenizeOnSpace` stays a space. Falls
+				// back to the mode-appropriate separator only when no
+				// separator characters are present in `text`.
+				const usedSeparators = text.match( /[ ,\t]/g );
+				const separatorChar =
+					usedSeparators?.[ usedSeparators.length - 1 ] ??
+					( tokenizeOnSpace ? ' ' : ',' );
+				// Preserve a trailing separator when the input ended with
+				// one, so the user can keep typing past a failed-validation
+				// space without their separator disappearing.
+				const trailing = tokenValue === '' ? separatorChar : '';
+				const remaining = rejected.join( separatorChar ) + trailing;
+				setIncompleteTokenValue( remaining );
+				onInputChange( remaining );
+				return;
+			}
 		}
 		setIncompleteTokenValue( tokenValue );
 		onInputChange( tokenValue );
@@ -417,7 +468,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			addNewToken( incompleteTokenValue );
 		}
 
-		return true; // PreventDefault.
+		// Comma is always a separator (typed in onKeyPress, never as input).
+		// Pasted commas go through onInputChangeHandler, which validates.
+		return true;
 	}
 
 	function moveInputToIndex( index: number ) {
@@ -454,7 +507,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 	}
 
-	function addCurrentToken() {
+	function addCurrentToken( {
+		preventDefaultOnFailedValidation = true,
+	} = {} ) {
 		let preventDefault = false;
 		const selectedSuggestion = getSelectedSuggestion();
 
@@ -462,20 +517,22 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			addNewToken( selectedSuggestion );
 			preventDefault = true;
 		} else if ( inputHasValidValue() ) {
-			addNewToken( incompleteTokenValue );
-			preventDefault = true;
+			const passedValidation = addNewToken( incompleteTokenValue );
+			preventDefault =
+				passedValidation || preventDefaultOnFailedValidation;
 		}
 
 		return preventDefault;
 	}
 
-	function addNewTokens( tokens: string[] ) {
+	function addNewTokens( tokens: string[] ): Set< string > {
 		const tokensToAdd = [
 			...new Set(
 				tokens
 					.map( saveTransform )
 					.filter( Boolean )
 					.filter( ( token ) => ! valueContainsToken( token ) )
+					.filter( ( token ) => __experimentalValidateInput( token ) )
 			),
 		];
 
@@ -484,12 +541,20 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			newValue.splice( getIndexOfInput(), 0, ...tokensToAdd );
 			onChange( newValue );
 		}
+
+		return new Set( tokensToAdd );
 	}
 
+	/**
+	 * Validates and adds `token`. Returns `true` if validation passed,
+	 * `false` if it was rejected by `__experimentalValidateInput`. A `true`
+	 * return does not guarantee the token was added: `addNewTokens` may
+	 * still drop it as a duplicate or after `saveTransform` returns empty.
+	 */
 	function addNewToken( token: string ) {
 		if ( ! __experimentalValidateInput( token ) ) {
 			speak( messages.__experimentalInvalid, 'assertive' );
-			return;
+			return false;
 		}
 		addNewTokens( [ token ] );
 		speak( messages.added, 'assertive' );
@@ -502,6 +567,8 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		if ( isActive && ! tokenizeOnBlur ) {
 			focus();
 		}
+
+		return true;
 	}
 
 	function deleteToken( token: string | TokenItem ) {
@@ -764,8 +831,6 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					align="center"
 					gap={ 1 }
 					wrap
-					__next40pxDefaultSize={ __next40pxDefaultSize }
-					hasTokens={ !! value.length }
 				>
 					{ renderTokensAndInput() }
 				</TokensAndInputWrapperFlex>

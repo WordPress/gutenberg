@@ -197,11 +197,6 @@ export function AiPluginCallout() {
 		return null;
 	}
 
-	// Not installed and no permissions to install.
-	if ( pluginStatus === 'not-installed' && canInstallPlugins === false ) {
-		return null;
-	}
-
 	// Installed but can't activate (no manage permissions).
 	if ( pluginStatus === 'inactive' && canManagePlugins === false ) {
 		return null;
@@ -215,6 +210,8 @@ export function AiPluginCallout() {
 		( ! initialHasConnectedProvider || justActivated );
 	const showInstallActivate =
 		pluginStatus === 'not-installed' || pluginStatus === 'inactive';
+	const hideButtons =
+		pluginStatus === 'not-installed' && canInstallPlugins === false;
 
 	const getMessage = () => {
 		if ( isJustConnected ) {
@@ -262,29 +259,30 @@ export function AiPluginCallout() {
 						a: <ExternalLink href={ AI_PLUGIN_URL } />,
 					} ) }
 				</p>
-				{ showInstallActivate ? (
-					<Button
-						variant="primary"
-						size="compact"
-						isBusy={ isBusy }
-						disabled={ getPrimaryButtonProps().disabled }
-						accessibleWhenDisabled
-						onClick={ getPrimaryButtonProps().onClick }
-					>
-						{ getPrimaryButtonProps().label }
-					</Button>
-				) : (
-					<Button
-						ref={ actionButtonRef }
-						variant="secondary"
-						size="compact"
-						href={ addQueryArgs( 'options-general.php', {
-							page: AI_PLUGIN_PAGE_SLUG,
-						} ) }
-					>
-						{ __( 'Control features in the AI plugin' ) }
-					</Button>
-				) }
+				{ ! hideButtons &&
+					( showInstallActivate ? (
+						<Button
+							variant="primary"
+							size="compact"
+							isBusy={ isBusy }
+							disabled={ getPrimaryButtonProps().disabled }
+							accessibleWhenDisabled
+							onClick={ getPrimaryButtonProps().onClick }
+						>
+							{ getPrimaryButtonProps().label }
+						</Button>
+					) : (
+						<Button
+							ref={ actionButtonRef }
+							variant="secondary"
+							size="compact"
+							href={ addQueryArgs( 'options-general.php', {
+								page: AI_PLUGIN_PAGE_SLUG,
+							} ) }
+						>
+							{ __( 'Control features in the AI plugin' ) }
+						</Button>
+					) ) }
 			</div>
 			<WpLogoDecoration />
 		</div>

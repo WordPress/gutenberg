@@ -422,6 +422,11 @@ export function ImageEdit( {
 		},
 		[ context, isSingleSelected, metadata?.bindings?.url ]
 	);
+	// `height: 'auto'` is not a pinned dimension (it lets the height follow the
+	// aspect ratio, e.g. for an image pasted with both width and height). Treat
+	// it as absent so the placeholder box keeps its aspect ratio and pinned
+	// width instead of collapsing to a 100%×100% fill.
+	const pinnedHeight = height === 'auto' ? undefined : height;
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
@@ -444,11 +449,11 @@ export function ImageEdit( {
 				}
 				style={ {
 					aspectRatio:
-						! ( width && height ) && aspectRatio
+						! ( width && pinnedHeight ) && aspectRatio
 							? aspectRatio
 							: undefined,
-					width: height && aspectRatio ? '100%' : width,
-					height: width && aspectRatio ? '100%' : height,
+					width: pinnedHeight && aspectRatio ? '100%' : width,
+					height: width && aspectRatio ? '100%' : pinnedHeight,
 					objectFit: scale,
 					...borderProps.style,
 					...shadowProps.style,

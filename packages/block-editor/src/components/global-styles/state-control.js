@@ -1,22 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { check, chevronDown } from '@wordpress/icons';
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import { check, chevronDown, moreVertical } from '@wordpress/icons';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 /**
  * State control for managing viewport and pseudo-state styles.
@@ -29,6 +17,8 @@ const { Badge: WCBadge } = unlock( componentsPrivateApis );
  * @param {string}   props.pseudoStateValue    Currently selected pseudo state value.
  * @param {Function} props.onChangeViewport    Callback when viewport selection changes.
  * @param {Function} props.onChangePseudoState Callback when pseudo state selection changes.
+ * @param {boolean}  props.showText            Whether to show text label on the toggle. Default true.
+ * @param {Object}   props.popoverProps        Popover props for the dropdown menu.
  * @return {Element|null} State control component.
  */
 export default function StateControl( {
@@ -38,6 +28,8 @@ export default function StateControl( {
 	pseudoStateValue = 'default',
 	onChangeViewport,
 	onChangePseudoState,
+	showText = true,
+	popoverProps = {},
 } ) {
 	if ( ! viewportStates.length && ! pseudoStates.length ) {
 		return null;
@@ -89,6 +81,14 @@ export default function StateControl( {
 		}
 	}
 
+	const currentStateLabel = activeStates.length
+		? activeStates.map( ( state ) => state.label ).join( ', ' )
+		: __( 'Default' );
+	const icon = showText ? chevronDown : moreVertical;
+	const toggleProps = showText
+		? { size: 'compact', variant: 'tertiary', iconPosition: 'right' }
+		: { size: 'compact', variant: 'tertiary' };
+
 	return (
 		<Stack
 			direction="column"
@@ -97,17 +97,22 @@ export default function StateControl( {
 			className="block-editor-global-styles-state-control"
 		>
 			<DropdownMenu
-				icon={ chevronDown }
-				label={ triggerLabel }
+				icon={ icon }
+				label={
+					showText
+						? triggerLabel
+						: sprintf(
+								/* translators: %s: Current state (e.g. "Hover", "Focus") */
+								__( 'State: %s' ),
+								currentStateLabel
+						  )
+				}
 				popoverProps={ {
 					placement: 'right-start',
+					...popoverProps,
 				} }
-				text={ triggerLabel }
-				toggleProps={ {
-					size: 'compact',
-					variant: 'tertiary',
-					iconPosition: 'right',
-				} }
+				text={ showText ? triggerLabel : undefined }
+				toggleProps={ toggleProps }
 			>
 				{ ( { onClose } ) => (
 					<>
@@ -160,19 +165,6 @@ export default function StateControl( {
 					</>
 				) }
 			</DropdownMenu>
-			<Stack
-				className="block-editor-global-styles-state-control__badges"
-				direction="row"
-				justify="flex-start"
-				gap="xs"
-				wrap="wrap"
-			>
-				{ activeStates.map( ( activeState ) => (
-					<WCBadge key={ activeState.key } intent="info">
-						{ activeState.label }
-					</WCBadge>
-				) ) }
-			</Stack>
 		</Stack>
 	);
 }

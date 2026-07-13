@@ -5,13 +5,19 @@ const meta: Meta< typeof Stack > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Stack',
 	component: Stack,
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 
 const DemoBox = ( { variant }: { variant?: 'lg' } ) => (
 	<div
 		style={ {
-			backgroundColor: 'var(--wpds-color-bg-surface-brand)',
+			backgroundColor: 'var(--wpds-color-background-surface-brand)',
 			width: variant === 'lg' ? '150px' : '100px',
 			height: variant === 'lg' ? '150px' : '100px',
 		} }

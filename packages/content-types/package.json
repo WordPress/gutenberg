@@ -34,6 +34,7 @@
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../admin-ui",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
@@ -42,11 +43,22 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/route": "file:../route",
 		"@wordpress/ui": "file:../ui",
-		"@wordpress/url": "file:../url"
+		"@wordpress/url": "file:../url",
+		"@wordpress/views": "file:../views"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

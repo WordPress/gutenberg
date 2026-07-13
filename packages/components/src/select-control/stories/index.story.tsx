@@ -34,9 +34,9 @@ const meta: Meta< typeof SelectControl > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `SelectControl` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };
@@ -48,7 +48,6 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
 	if ( props.multiple ) {
 		return (
 			<SelectControl
-				__next40pxDefaultSize
 				{ ...props }
 				multiple
 				value={ selection }
@@ -62,7 +61,6 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
 
 	return (
 		<SelectControl
-			__next40pxDefaultSize
 			{ ...props }
 			multiple={ false }
 			value={ selection?.[ 0 ] }
@@ -76,7 +74,6 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
 
 export const Default = SelectControlWithState.bind( {} );
 Default.args = {
-	__next40pxDefaultSize: true,
 	label: 'Label',
 	options: [
 		{ value: '', label: 'Select an Option', disabled: true },
@@ -98,7 +95,6 @@ WithLabelAndHelpText.args = {
  */
 export const WithCustomChildren = SelectControlWithState.bind( {} );
 WithCustomChildren.args = {
-	__next40pxDefaultSize: true,
 	label: 'Label',
 	children: (
 		<>

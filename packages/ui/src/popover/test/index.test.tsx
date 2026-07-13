@@ -450,6 +450,8 @@ describe( 'Popover', () => {
 			expect(
 				await screen.findByText( 'Unstyled content' )
 			).toBeVisible();
+			const unstyledPopup = unstyledRef.current;
+			expect( unstyledPopup ).not.toBeNull();
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Open styled' } )
@@ -458,7 +460,7 @@ describe( 'Popover', () => {
 
 			const styledClasses = Array.from( styledPopup.classList );
 			for ( const cls of styledClasses ) {
-				expect( unstyledRef.current! ).not.toHaveClass( cls );
+				expect( unstyledPopup! ).not.toHaveClass( cls );
 			}
 		} );
 	} );
@@ -528,6 +530,35 @@ describe( 'Popover', () => {
 		} );
 	} );
 
+	describe( 'positioner', () => {
+		it( 'should render the custom positioner element wrapping the popup content', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup
+						positioner={
+							<Popover.Positioner data-testid="custom-positioner" />
+						}
+					>
+						<Popover.Title>Title</Popover.Title>
+						Positioner slot content
+					</Popover.Popup>
+				</Popover.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			const content = await screen.findByText(
+				'Positioner slot content'
+			);
+			const positioner = screen.getByTestId( 'custom-positioner' );
+
+			expect( positioner ).toContainElement( content );
+		} );
+	} );
+
 	describe( 'anchor', () => {
 		it( 'should render the popup when an anchor element is provided without a trigger', async () => {
 			function AnchorTest() {
@@ -539,7 +570,13 @@ describe( 'Popover', () => {
 							Anchor element
 						</div>
 						<Popover.Root defaultOpen>
-							<Popover.Popup anchor={ anchorEl ?? undefined }>
+							<Popover.Popup
+								positioner={
+									<Popover.Positioner
+										anchor={ anchorEl ?? undefined }
+									/>
+								}
+							>
 								<Popover.Title>Title</Popover.Title>
 								Anchored content
 							</Popover.Popup>

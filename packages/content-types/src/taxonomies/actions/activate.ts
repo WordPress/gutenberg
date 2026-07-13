@@ -6,11 +6,14 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { createStatusAction } from './utils';
+import { createStatusAction } from '../../utils/actions';
+import { TAXONOMY_ENTITY } from '../../constants';
+import type { TaxonomyFormData } from '../types';
 
-const activateAction = createStatusAction( {
+const activateAction = createStatusAction< TaxonomyFormData >( {
 	id: 'activate',
 	label: __( 'Activate' ),
+	entity: TAXONOMY_ENTITY,
 	targetStatus: 'publish',
 	messages: {
 		successSingle: __( 'Taxonomy activated.' ),

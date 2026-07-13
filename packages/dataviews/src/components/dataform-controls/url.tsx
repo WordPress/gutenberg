@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	Icon,
+	Icon as WCIcon,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
 import { link } from '@wordpress/icons';
@@ -33,7 +33,7 @@ export default function Url< Item >( {
 				type: 'url',
 				prefix: (
 					<InputControlPrefixWrapper variant="icon">
-						<Icon icon={ link } />
+						<WCIcon icon={ link } />
 					</InputControlPrefixWrapper>
 				),
 			} }

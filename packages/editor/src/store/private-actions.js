@@ -17,6 +17,11 @@ import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
  */
 import isTemplateRevertable from './utils/is-template-revertable';
 import { buildRevisionsPageQuery } from './private-selectors';
+import {
+	getDeviceTypeByCanvasWidth,
+	VIEWPORT_STATE_BY_DEVICE_TYPE,
+} from '../utils/device-type';
+import { unlock } from '../lock-unlock';
 export * from '../dataviews/store/private-actions';
 
 /**
@@ -204,9 +209,13 @@ export const saveDirtyEntities =
 		registry
 			.dispatch( blockEditorStore )
 			.__unstableMarkLastChangeAsPersistent();
+
 		Promise.all( pendingSavedRecords )
-			.then( ( values ) => {
-				return onSave ? onSave( values ) : values;
+			.then( async ( values ) => {
+				if ( onSave ) {
+					await onSave();
+				}
+				return values;
 			} )
 			.then( ( values ) => {
 				if (
@@ -577,6 +586,40 @@ export function resetStylesNavigation() {
 }
 
 /**
+ * Set the width of the canvas.
+ *
+ * @param {number} width The width of the canvas in pixels.
+ */
+export function setCanvasWidth( width ) {
+	return ( { dispatch, registry } ) => {
+		dispatch( {
+			type: 'SET_CANVAS_WIDTH',
+			width,
+		} );
+
+		const blockEditorSelect = unlock( registry.select( blockEditorStore ) );
+
+		// While Responsive editing is enabled, the canvas width also drives the
+		// viewport style state, whether changed via the device preview or by
+		// manually resizing the canvas.
+		if ( blockEditorSelect.isResponsiveEditing() ) {
+			const viewportSettings =
+				blockEditorSelect.getSettings().__experimentalFeatures
+					?.viewport;
+			const deviceType = getDeviceTypeByCanvasWidth(
+				width,
+				viewportSettings
+			);
+			unlock(
+				registry.dispatch( blockEditorStore )
+			).setStyleStateViewport(
+				VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
+			);
+		}
+	};
+}
+
+/**
  * Set the current revision ID for revisions preview mode.
  * Pass a revision ID to enter revisions mode, or null to exit.
  *
@@ -703,6 +746,13 @@ export const restoreRevision =
 
 		// Save the post to persist the restored revision.
 		await dispatch.savePost();
+		if ( select.didPostSaveRequestFail() ) {
+			return;
+		}
+
+		// The saved post is now newer than any autosave, so the
+		// autosave notice is stale.
+		registry.dispatch( noticesStore ).removeNotice( 'autosave-exists' );
 
 		// Show success notice.
 		registry.dispatch( noticesStore ).createSuccessNotice(

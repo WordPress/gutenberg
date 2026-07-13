@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { Platform } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
@@ -56,9 +55,7 @@ export function __experimentalUpdateSettings(
 
 	let cleanSettings = incomingSettings;
 
-	// There are no plugins in the mobile apps, so there is no
-	// need to strip the experimental settings:
-	if ( stripExperimentalSettings && Platform.OS === 'web' ) {
+	if ( stripExperimentalSettings ) {
 		cleanSettings = {};
 		for ( const key in incomingSettings ) {
 			if ( ! privateSettings.includes( key ) ) {
@@ -527,5 +524,68 @@ export function requestInspectorTab( tabName, options = {} ) {
 export function clearRequestedInspectorTab() {
 	return {
 		type: 'CLEAR_REQUESTED_INSPECTOR_TAB',
+	};
+}
+
+/**
+ * Sets the selected style state for a block's style controls.
+ *
+ * @param {string} clientId The block client ID.
+ * @param {Object} value    The selected state value.
+ *
+ * @return {Object} Action object.
+ */
+export function setSelectedBlockStyleState( clientId, value ) {
+	return {
+		type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+		clientId,
+		value,
+	};
+}
+
+/**
+ * Sets whether the selected style state is shown on the canvas.
+ *
+ * @param {string}  clientId The block client ID.
+ * @param {boolean} value    Whether to show the selected state on the canvas.
+ *
+ * @return {Object} Action object.
+ */
+export function setSelectedBlockStyleStateCanvasPreview( clientId, value ) {
+	return {
+		type: 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW',
+		clientId,
+		value,
+	};
+}
+
+/**
+ * Sets the globally selected viewport style state. When set to a value other
+ * than 'default', block style edits in the inspector apply to that viewport.
+ * Driven by the editor's device preview while Responsive editing is enabled.
+ *
+ * @param {string} viewport The selected viewport state (e.g. 'default', 'tablet', 'mobile').
+ *
+ * @return {Object} Action object.
+ */
+export function setStyleStateViewport( viewport ) {
+	return {
+		type: 'SET_STYLE_STATE_VIEWPORT',
+		viewport,
+	};
+}
+
+/**
+ * Sets whether Responsive editing is enabled. When enabled, the device preview
+ * also drives which viewport block style edits are applied to. Session-only.
+ *
+ * @param {boolean} enabled Whether Responsive editing is enabled.
+ *
+ * @return {Object} Action object.
+ */
+export function setResponsiveEditing( enabled ) {
+	return {
+		type: 'SET_RESPONSIVE_EDITING',
+		enabled,
 	};
 }

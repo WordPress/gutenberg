@@ -243,7 +243,6 @@ function TaxonomyItem( {
 				displayTransform={ decodeEntities }
 				onChange={ onTermsChange }
 				help=""
-				__next40pxDefaultSize
 			/>
 		</div>
 	);

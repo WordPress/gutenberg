@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 2.5.0 (2026-07-01)
+
+## 2.4.0 (2026-06-24)
+
+### Internal
+
+-   Migrate off the removed `var(--wpds-dimension-base)` primitive token, adopting `--wpds-dimension-size-*` tokens ([#79254](https://github.com/WordPress/gutenberg/pull/79254)).
+
+## 2.3.1 (2026-06-16)
+
+## 2.3.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Internal
+
+-   Add `getAdminThemeColors`, which returns the primary and background colors of the active WordPress admin color scheme (for seeding a `ThemeProvider`) ([#78397](https://github.com/WordPress/gutenberg/pull/78397)).
+
+## 2.2.0 (2026-05-27)
+
+## 2.1.0 (2026-05-14)
+
+### Bug Fixes
+
+-   `Page`: Fix nested landmark in header. [#78001](https://github.com/WordPress/gutenberg/pull/78001)
+
 ## 2.0.0 (2026-04-29)
 
 ### Enhancements

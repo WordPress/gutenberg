@@ -16,6 +16,11 @@ import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
 import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
+import {
+	getStyleForState,
+	isDefaultBlockStyleState,
+	setStyleForState,
+} from './hooks/block-style-state';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import BlockManager from './components/block-manager';
@@ -40,6 +45,7 @@ import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	userPatternCategoriesSelectKey,
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 	sectionRootClientIdKey,
@@ -50,6 +56,7 @@ import {
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
+	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
@@ -71,6 +78,7 @@ import { LinkPicker } from './components/link-picker';
 import useRemoteUrlData from './components/link-control/use-rich-url-data';
 import { PrivateBlockContext } from './components/block-list/private-block-context';
 import useListViewPanelState from './components/use-list-view-panel-state';
+import InnerContent from './components/inner-content';
 import {
 	isHashLink,
 	isRelativePath,
@@ -96,6 +104,9 @@ lock( privateApis, {
 	InspectorControlsLastItem,
 	useHasBlockToolbar,
 	cleanEmptyObject,
+	getStyleForState,
+	isDefaultBlockStyleState,
+	setStyleForState,
 	usePrivateStyleOverride,
 	BlockQuickNavigation,
 	LayoutStyle,
@@ -118,6 +129,7 @@ lock( privateApis, {
 	PrivateRichText,
 	PrivateInserterLibrary,
 	reusableBlocksSelectKey,
+	userPatternCategoriesSelectKey,
 	PrivateBlockPopover,
 	PrivatePublishDateTimePicker,
 	useSpacingSizes,
@@ -134,6 +146,7 @@ lock( privateApis, {
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
+	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
 	useBlockElement,
 	useBlockElementRef,
@@ -143,4 +156,5 @@ lock( privateApis, {
 	useListViewPanelState,
 	isHashLink,
 	isRelativePath,
+	InnerContent,
 } );

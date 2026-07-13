@@ -73,6 +73,7 @@ function gutenberg_register_user_post_type_cpt() {
 			'has_archive'           => false,
 			'rewrite'               => false,
 			'query_var'             => false,
+			'_builtin'              => true, /* internal use only. don't use this when registering your own post type. */
 		)
 	);
 }
@@ -303,4 +304,6 @@ function gutenberg_register_user_defined_post_types() {
 		register_post_type( $slug, $args );
 	}
 }
+// Priority 20 — must run before gutenberg_register_user_defined_taxonomies() (priority 25)
+// so user CPT slugs exist when register_taxonomy() records the object_type association.
 add_action( 'init', 'gutenberg_register_user_defined_post_types', 20 );

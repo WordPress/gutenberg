@@ -3,7 +3,7 @@
  */
 import {
 	Button,
-	Icon,
+	Icon as WCIcon,
 	__experimentalGrid as Grid,
 	Popover,
 } from '@wordpress/components';
@@ -104,7 +104,7 @@ export default function Link( { data, field, onChange } ) {
 				>
 					{ url && (
 						<>
-							<Icon icon={ link } size={ 24 } />
+							<WCIcon icon={ link } size={ 24 } />
 							<span className="block-editor-content-only-controls__link-title">
 								{ url }
 							</span>
@@ -112,7 +112,7 @@ export default function Link( { data, field, onChange } ) {
 					) }
 					{ ! url && (
 						<>
-							<Icon
+							<WCIcon
 								icon={ link }
 								size={ 24 }
 								style={ { opacity: 0.3 } }

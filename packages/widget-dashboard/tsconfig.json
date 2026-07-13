@@ -1,0 +1,24 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"types": [ "jest", "style-imports" ],
+		"checkJs": false
+	},
+	"references": [
+		{ "path": "../components" },
+		{ "path": "../compose" },
+		{ "path": "../data" },
+		{ "path": "../dataviews" },
+		{ "path": "../element" },
+		{ "path": "../grid" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../primitives" },
+		{ "path": "../private-apis" },
+		{ "path": "../style-runtime" },
+		{ "path": "../ui" },
+		{ "path": "../viewport" },
+		{ "path": "../widget-primitives" }
+	]
+}

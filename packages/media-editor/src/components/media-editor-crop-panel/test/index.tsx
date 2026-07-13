@@ -8,102 +8,79 @@ import { fireEvent, render, screen } from '@testing-library/react';
  */
 import MediaEditorCropPanel from '..';
 import type { MediaEditorCropPanelProps } from '..';
-import { CropperProvider } from '../../../image-editor';
+import { MediaEditorStateProvider } from '../../../state';
+import type { CropperState } from '../../../image-editor';
 
 function setupCropPanel(
-	overrides: Partial< MediaEditorCropPanelProps > = {}
+	overrides: Partial< MediaEditorCropPanelProps > = {},
+	initialCropperState?: Partial< CropperState >
 ) {
 	const props: MediaEditorCropPanelProps = {
 		aspectRatioValue: '1',
 		onAspectRatioChange: jest.fn(),
-		freeformCrop: false,
-		onFreeformChange: jest.fn(),
+		aspectRatioOptions: [
+			{ label: 'Free', value: 0 },
+			{ label: 'Original', value: -1 },
+			{ label: 'Square', value: 1 },
+		],
 		...overrides,
 	};
 
 	render(
-		<CropperProvider>
+		<MediaEditorStateProvider initialCropperState={ initialCropperState }>
 			<MediaEditorCropPanel { ...props } />
-		</CropperProvider>
+		</MediaEditorStateProvider>
 	);
 
 	return props;
 }
 
-function expectElementBefore( first: HTMLElement, second: HTMLElement ) {
-	expect( first.compareDocumentPosition( second ) ).toBe(
-		Node.DOCUMENT_POSITION_FOLLOWING
-	);
-}
-
 describe( 'MediaEditorCropPanel', () => {
-	it( 'renders crop shape controls before zoom controls', () => {
+	it( 'passes selected aspect ratio changes to the caller', () => {
+		const controls = setupCropPanel( {
+			aspectRatioValue: '1',
+		} );
+
+		fireEvent.change( screen.getByLabelText( 'Aspect ratio' ), {
+			target: { value: '0' },
+		} );
+
+		expect( controls.onAspectRatioChange ).toHaveBeenCalled();
+		expect(
+			( controls.onAspectRatioChange as jest.Mock ).mock.calls[ 0 ][ 0 ]
+		).toBe( '0' );
+	} );
+
+	it( 'omits the image controls by default', () => {
 		setupCropPanel();
 
-		const aspectRatio = screen.getByLabelText( 'Aspect ratio' );
-		const resizeCropArea = screen.getByLabelText( 'Resize crop area' );
-		const zoom = screen.getByRole( 'slider', { name: 'Zoom' } );
+		expect( screen.queryByText( 'Rotate' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'Flip' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'Zoom' ) ).not.toBeInTheDocument();
+	} );
 
+	it( 'renders rotate, flip and zoom controls when showTransformControls is set', () => {
+		setupCropPanel( { showTransformControls: true } );
+
+		expect( screen.getByText( 'Rotate' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Flip' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Zoom' ) ).toBeInTheDocument();
 		expect(
-			screen.getByText( 'Show handles to adjust the crop box.' )
+			screen.getByRole( 'button', { name: 'Rotate 90° clockwise' } )
 		).toBeInTheDocument();
-		expectElementBefore( aspectRatio, resizeCropArea );
-		expectElementBefore( resizeCropArea, zoom );
+		expect(
+			screen.getByRole( 'button', { name: 'Zoom in' } )
+		).toBeInTheDocument();
 	} );
 
-	it( 'turns freeform crop on when Free is selected while handles are off', () => {
-		const controls = setupCropPanel( {
-			aspectRatioValue: '1',
-			freeformCrop: false,
-		} );
+	it( 'renders the image controls above the aspect-ratio selector', () => {
+		setupCropPanel( { showTransformControls: true } );
 
-		fireEvent.change( screen.getByLabelText( 'Aspect ratio' ), {
-			target: { value: '0' },
-		} );
+		const rotate = screen.getByText( 'Rotate' );
+		const aspectRatio = screen.getByLabelText( 'Aspect ratio' );
 
-		expect( controls.onAspectRatioChange ).toHaveBeenCalledWith( '0' );
-		expect( controls.onFreeformChange ).toHaveBeenCalledWith( true );
-	} );
-
-	it( 'does not change freeform crop when a fixed ratio is selected', () => {
-		const controls = setupCropPanel( {
-			aspectRatioValue: '0',
-			freeformCrop: false,
-		} );
-
-		fireEvent.change( screen.getByLabelText( 'Aspect ratio' ), {
-			target: { value: '1' },
-		} );
-
-		expect( controls.onAspectRatioChange ).toHaveBeenCalledWith( '1' );
-		expect( controls.onFreeformChange ).not.toHaveBeenCalled();
-	} );
-
-	it( 'does not call onFreeformChange when Free is selected and handles are already on', () => {
-		const controls = setupCropPanel( {
-			aspectRatioValue: '1',
-			freeformCrop: true,
-		} );
-
-		fireEvent.change( screen.getByLabelText( 'Aspect ratio' ), {
-			target: { value: '0' },
-		} );
-
-		expect( controls.onAspectRatioChange ).toHaveBeenCalledWith( '0' );
-		expect( controls.onFreeformChange ).not.toHaveBeenCalled();
-	} );
-
-	it( 'does not call onFreeformChange when a fixed ratio is selected and handles are on', () => {
-		const controls = setupCropPanel( {
-			aspectRatioValue: '0',
-			freeformCrop: true,
-		} );
-
-		fireEvent.change( screen.getByLabelText( 'Aspect ratio' ), {
-			target: { value: '1' },
-		} );
-
-		expect( controls.onAspectRatioChange ).toHaveBeenCalledWith( '1' );
-		expect( controls.onFreeformChange ).not.toHaveBeenCalled();
+		expect( rotate.compareDocumentPosition( aspectRatio ) ).toBe(
+			Node.DOCUMENT_POSITION_FOLLOWING
+		);
 	} );
 } );

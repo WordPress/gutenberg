@@ -36,6 +36,7 @@ Renders notice lists for notices with type `default`:
 _Props_
 
 -   `children: ReactNode` (optional): Additional content rendered in the dismissible notice list.
+-   `className: string` (optional): Extra class name added to the inline notices wrapper.
 -   `pinnedNoticesClassName: string` (optional): Extra class name added to the pinned list.
 -   `dismissibleNoticesClassName: string` (optional): Extra class name added to the dismissible list.
 -   `context: string` (optional): Notice context to read and remove notices from. Defaults to `default`.

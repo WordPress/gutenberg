@@ -24,7 +24,7 @@ export const notFoundRoute = {
 	path: '*',
 	areas: {
 		sidebar: <SidebarNavigationScreenMain />,
-		mobile: (
+		mobileSidebar: (
 			<SidebarNavigationScreenMain
 				customDescription={ <NotFoundError /> }
 			/>

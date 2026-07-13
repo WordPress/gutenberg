@@ -4,7 +4,7 @@
 import {
 	ToolbarButton,
 	ToolbarGroup,
-	Icon,
+	Icon as WCIcon,
 	Path,
 	SVG,
 } from '@wordpress/components';
@@ -98,7 +98,7 @@ function SwitchSectionStyle( { clientId } ) {
 				onClick={ handleStyleSwitch }
 				label={ __( 'Shuffle styles' ) }
 			>
-				<Icon
+				<WCIcon
 					icon={ styleIcon }
 					style={ {
 						fill: activeStyleBackground || 'transparent',

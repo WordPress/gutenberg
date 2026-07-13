@@ -21,7 +21,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import type { StateDefinition } from './utils';
 import { unlock } from './lock-unlock';
 
-const { StateControl } = unlock( blockEditorPrivateApis );
+const { StateControl, StateControlBadges } = unlock( blockEditorPrivateApis );
 
 interface ScreenHeaderProps {
 	title: string;
@@ -67,16 +67,30 @@ export function ScreenHeader( {
 									>
 										{ title }
 									</Heading>
-									<StateControl
-										viewportStates={ viewportStates }
-										pseudoStates={ pseudoStates }
-										viewportValue={ selectedViewport }
-										pseudoStateValue={ selectedPseudoState }
-										onChangeViewport={ onChangeViewport }
-										onChangePseudoState={
-											onChangePseudoState
-										}
-									/>
+									<VStack spacing={ 2 } alignment="right">
+										<StateControl
+											viewportStates={ viewportStates }
+											pseudoStates={ pseudoStates }
+											viewportValue={ selectedViewport }
+											pseudoStateValue={
+												selectedPseudoState
+											}
+											onChangeViewport={
+												onChangeViewport
+											}
+											onChangePseudoState={
+												onChangePseudoState
+											}
+										/>
+										<StateControlBadges
+											viewportStates={ viewportStates }
+											pseudoStates={ pseudoStates }
+											viewportValue={ selectedViewport }
+											pseudoStateValue={
+												selectedPseudoState
+											}
+										/>
+									</VStack>
 								</HStack>
 							</Spacer>
 						</HStack>

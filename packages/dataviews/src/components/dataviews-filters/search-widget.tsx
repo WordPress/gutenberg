@@ -12,7 +12,7 @@ import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo, useDeferredValue } from '@wordpress/element';
-import { Icon, Composite, Spinner } from '@wordpress/components';
+import { Icon as WCIcon, Composite, Spinner } from '@wordpress/components';
 import { search, check } from '@wordpress/icons';
 import { VisuallyHidden } from '@wordpress/ui';
 
@@ -68,7 +68,7 @@ const MultiSelectionOption = ( { selected }: { selected: boolean } ) => {
 				{ 'is-selected': selected }
 			) }
 		>
-			{ selected && <Icon icon={ check } /> }
+			{ selected && <WCIcon icon={ check } /> }
 		</span>
 	);
 };
@@ -272,7 +272,7 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 					className="dataviews-filters__search-widget-filter-combobox__input"
 				/>
 				<div className="dataviews-filters__search-widget-filter-combobox__icon">
-					<Icon icon={ search } />
+					<WCIcon icon={ search } />
 				</div>
 			</div>
 			<Ariakit.ComboboxList

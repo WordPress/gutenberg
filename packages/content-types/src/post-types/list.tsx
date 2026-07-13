@@ -2,11 +2,12 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { DataViews, type View } from '@wordpress/dataviews';
+import { DataViews, type Field, type View } from '@wordpress/dataviews';
 import { useEntityRecords } from '@wordpress/core-data';
-import { useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useNavigate } from '@wordpress/route';
+import { useNavigate, useSearch } from '@wordpress/route';
+import { useView } from '@wordpress/views';
 
 /**
  * Internal dependencies
@@ -15,16 +16,17 @@ import activateAction from './actions/activate';
 import deactivateAction from './actions/deactivate';
 import deletePostTypeAction from './actions/delete';
 import duplicatePostTypeAction from './actions/duplicate';
+import viewPostsAction from './actions/view-posts';
 import {
+	countField,
 	hasArchiveField,
 	hierarchicalField,
 	publicField,
-	statusField,
 	supportsField,
-	titleField,
 	useSlugField,
 	useTaxonomiesField,
 } from './fields';
+import { statusField, titleField } from '../utils/fields';
 import type { PostTypeFormData, PostTypeRecord } from './types';
 import { toFormData } from './utils';
 import { useEditPostTypeAction } from './actions/edit';
@@ -39,20 +41,45 @@ const DEFAULT_VIEW: View = {
 	type: 'table',
 	perPage: 20,
 	page: 1,
-	fields: [ 'taxonomies', 'status', 'public', 'hierarchical' ],
+	fields: [ 'taxonomies', 'count', 'status' ],
 	titleField: 'title',
-	layout: {},
+	layout: {
+		styles: {
+			taxonomies: { minWidth: 230 },
+			supports: { minWidth: 230 },
+		},
+	},
 };
 
 export function PostTypesList() {
 	const navigate = useNavigate();
-	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
+	const searchParams = useSearch( { from: POST_TYPES_PATH } );
+	const handleQueryParamsChange = useCallback(
+		( params: { page?: number; search?: string } ) => {
+			navigate( {
+				search: {
+					...searchParams,
+					...params,
+				},
+			} );
+		},
+		[ searchParams, navigate ]
+	);
+	const { view, updateView, isModified, resetToDefault } = useView( {
+		kind: 'postType',
+		name: POST_TYPE_ENTITY,
+		slug: 'default',
+		defaultView: DEFAULT_VIEW,
+		queryParams: searchParams,
+		onChangeQueryParams: handleQueryParamsChange,
+	} );
 	const editAction = useEditPostTypeAction();
 	const postTypeActions = useMemo(
 		() => [
 			editAction,
 			quickEditPostTypeAction,
 			duplicatePostTypeAction,
+			viewPostsAction,
 			activateAction,
 			deactivateAction,
 			deletePostTypeAction,
@@ -62,16 +89,18 @@ export function PostTypesList() {
 	const slugField = useSlugField();
 	const taxonomiesField = useTaxonomiesField();
 	const fields = useMemo(
-		() => [
-			titleField,
-			taxonomiesField,
-			statusField,
-			publicField,
-			slugField,
-			hierarchicalField,
-			hasArchiveField,
-			supportsField,
-		],
+		() =>
+			[
+				titleField,
+				taxonomiesField,
+				countField,
+				statusField,
+				publicField,
+				slugField,
+				hierarchicalField,
+				hasArchiveField,
+				supportsField,
+			] as Field< PostTypeFormData >[],
 		[ slugField, taxonomiesField ]
 	);
 	const queryArgs = useMemo( () => {
@@ -111,7 +140,8 @@ export function PostTypesList() {
 			fields={ fields }
 			actions={ postTypeActions }
 			view={ view }
-			onChangeView={ setView }
+			onChangeView={ updateView }
+			onReset={ isModified ? resetToDefault : false }
 			isLoading={ isResolving || ! hasResolved }
 			paginationInfo={ paginationInfo }
 			defaultLayouts={ defaultLayouts }

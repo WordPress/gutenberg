@@ -10,6 +10,7 @@ const meta: Meta< typeof Dialog.Root > = {
 	component: Dialog.Root,
 	subcomponents: {
 		'Dialog.Trigger': Dialog.Trigger,
+		'Dialog.Portal': Dialog.Portal,
 		'Dialog.Popup': Dialog.Popup,
 		'Dialog.Header': Dialog.Header,
 		'Dialog.Title': Dialog.Title,
@@ -23,6 +24,13 @@ const meta: Meta< typeof Dialog.Root > = {
 		modal: {
 			control: 'inline-radio',
 			options: [ true, false, 'trap-focus' ],
+		},
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
