@@ -9,6 +9,11 @@ $waveform-player-height: 100px;
 		width: 100%;
 		margin: var(--wp--preset--spacing--20, 0.625em) 0;
 		position: relative;
+
+		&:focus-visible {
+			outline: revert;
+			outline-offset: revert;
+		}
 	}
 
 	// Set the waveform track height and remove gap between button and waveform.
@@ -59,6 +64,12 @@ $waveform-player-height: 100px;
 
 	.waveform-track.waveform-align-bottom .waveform-btn {
 		margin-bottom: 0;
+	}
+
+	.waveform-btn:focus-visible,
+	.waveform-container:focus-visible {
+		outline: revert;
+		outline-offset: revert;
 	}
 
 	.waveform-artist {
