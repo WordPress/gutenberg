@@ -271,37 +271,32 @@ export function PrivateBlockToolbar( {
 						<SwitchSectionStyle clientId={ blockClientIds[ 0 ] } />
 					) }
 				{ ! areSelectedBlocksHiddenOnViewport &&
-					shouldShowVisualToolbar &&
-					( showSlots || showStyleStateSlot ) && (
+					shouldShowVisualToolbar && (
 						<>
 							{ ! isSectionContainer && (
 								<>
 									{ showSlots && (
-										<BlockControls.Slot
-											group="parent"
-											className="block-editor-block-toolbar__slot"
-										/>
-									) }
-									{ showSlots && (
-										<BlockControls.Slot
-											group="block"
-											className="block-editor-block-toolbar__slot"
-										/>
-									) }
-									{ showStyleStateSlot && (
-										<BlockControls.Slot
-											group="style-state"
-											className="block-editor-block-toolbar__slot"
-										/>
-									) }
-									{ showSlots && (
 										<>
+											<BlockControls.Slot
+												group="parent"
+												className="block-editor-block-toolbar__slot"
+											/>
+											<BlockControls.Slot
+												group="block"
+												className="block-editor-block-toolbar__slot"
+											/>
 											<BlockControls.Slot className="block-editor-block-toolbar__slot" />
 											<BlockControls.Slot
 												group="inline"
 												className="block-editor-block-toolbar__slot"
 											/>
 										</>
+									) }
+									{ showStyleStateSlot && (
+										<BlockControls.Slot
+											group="style-state"
+											className="block-editor-block-toolbar__slot"
+										/>
 									) }
 								</>
 							) }
