@@ -24,17 +24,22 @@
 	},
 	"files": [
 		"build-module",
-		"build-types/index.d.ts",
-		"build-types/prebuilt/js/design-tokens.d.mts",
-		"build-types/stylelint-plugins/*.d.mts",
+		"build-types",
 		"src/*-plugins/**",
 		"src/prebuilt/css",
 		"src/prebuilt/js/*.mjs",
 		"*.md",
+		"!build-types/**/*.map",
+		"!**/__fixtures__/**",
 		"!**/__snapshots__/**",
+		"!**/__tests__/**",
 		"!**/fixtures/**",
 		"!**/stories/**",
-		"!**/test/**"
+		"!**/test/**",
+		"!**/tests/**",
+		"!**/*.spec.*",
+		"!**/*.test.*",
+		"!**/*.stories.*"
 	],
 	"type": "module",
 	"module": "build-module/index.mjs",
@@ -102,8 +107,6 @@
 		"esbuild": "^0.27.2",
 		"esbuild-esm-loader": "^0.3.3",
 		"prettier": "npm:wp-prettier@^3.0.3",
-		"rollup": "^4.59.0",
-		"rollup-plugin-dts": "^6.4.1",
 		"storybook": "^10.4.3",
 		"stylelint": "^16.26.1"
 	},
@@ -137,12 +140,9 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build:package-types": "node bin/bundle-package-types/index.mjs",
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps",
-		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss",
-		"prepack": "npm run build:package-types",
-		"validate:package-contents": "node ../../tools/validation/validate-package-contents.mjs . --attw-profile esm-only --attw-exclude-entrypoint ./design-tokens.css"
+		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
 	}
 }

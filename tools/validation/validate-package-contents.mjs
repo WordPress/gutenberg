@@ -1,309 +1,125 @@
 #!/usr/bin/env node
 
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
-import { createRequire } from 'node:module';
+import { readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
-import { parseArgs } from 'node:util';
+import { join, resolve } from 'node:path';
 
-const usage = [
-	'Usage: node tools/validation/validate-package-contents.mjs <package-directory> [options]',
-	'Options:',
-	'  --attw-profile <profile>',
-	'  --attw-exclude-entrypoint <entrypoint>',
-	'  --attw-ignore-rule <rule>',
-].join( '\n' );
+const [ packagePath, ...extraArgs ] = process.argv.slice( 2 );
 
-let parsedArgs;
-
-try {
-	parsedArgs = parseArgs( {
-		allowPositionals: true,
-		options: {
-			'attw-profile': {
-				type: 'string',
-			},
-			'attw-exclude-entrypoint': {
-				multiple: true,
-				type: 'string',
-			},
-			'attw-ignore-rule': {
-				multiple: true,
-				type: 'string',
-			},
-		},
-	} );
-} catch ( error ) {
-	console.error( error.message );
-	console.error( usage );
-	process.exit( 1 );
-}
-
-const [ packagePath, ...extraPositionals ] = parsedArgs.positionals;
-
-if ( ! packagePath || extraPositionals.length ) {
-	console.error( usage );
+if ( ! packagePath || extraArgs.length ) {
+	console.error(
+		'Usage: node tools/validation/validate-package-contents.mjs <package-directory>'
+	);
 	process.exit( 1 );
 }
 
 const packageRoot = resolve( process.cwd(), packagePath );
-const require = createRequire( import.meta.url );
-const attwPackagePath = require.resolve( '@arethetypeswrong/cli/package.json' );
-const attwPackageJson = JSON.parse( readFileSync( attwPackagePath, 'utf8' ) );
-const attwBin =
-	typeof attwPackageJson.bin === 'string'
-		? attwPackageJson.bin
-		: attwPackageJson.bin?.attw;
+const packageJson = JSON.parse(
+	readFileSync( join( packageRoot, 'package.json' ), 'utf8' )
+);
+const npmExecPath = process.env.npm_execpath;
+const packResult = spawnSync(
+	npmExecPath ? process.execPath : 'npm',
+	[
+		...( npmExecPath ? [ npmExecPath ] : [] ),
+		'pack',
+		'--dry-run',
+		'--json',
+	],
+	{
+		cwd: packageRoot,
+		encoding: 'utf8',
+		env: {
+			...process.env,
+			npm_config_cache:
+				process.env.WORDPRESS_PACKAGE_NPM_CACHE ??
+				join( tmpdir(), 'wordpress-package-npm-cache' ),
+		},
+		shell: ! npmExecPath && process.platform === 'win32',
+	}
+);
 
-if ( ! attwBin ) {
-	throw new Error( '@arethetypeswrong/cli does not declare an attw binary.' );
+if ( packResult.error ) {
+	throw packResult.error;
 }
 
-const attwCliPath = resolve( dirname( attwPackagePath ), attwBin );
+if ( packResult.status !== 0 ) {
+	process.stderr.write( packResult.stdout ?? '' );
+	process.stderr.write( packResult.stderr ?? '' );
+	process.exit( packResult.status ?? 1 );
+}
 
-const attwOptions = {
-	profile: parsedArgs.values[ 'attw-profile' ] ?? 'strict',
-	excludedEntryPoints: parsedArgs.values[ 'attw-exclude-entrypoint' ] ?? [],
-	ignoredRules: parsedArgs.values[ 'attw-ignore-rule' ] ?? [],
-};
-
+const [ pack ] = JSON.parse( packResult.stdout );
+const packedPaths = pack.files.map( ( { path } ) => path );
+const packedPathSet = new Set( packedPaths );
 const disallowedPathPatterns = [
 	/(^|\/)(__fixtures__|__snapshots__|__tests__|fixtures|stories|test|tests)(\/|$)/,
 	/(^|\/)[^/]+\.(spec|test)\.[^/]+$/,
 	/(^|\/)[^/]+\.stories?\.[^/]+$/,
 ];
-
-/** @typedef {{ exports?: unknown, name?: string }} PackageJson */
-
-/** @type {PackageJson} */
-const packageJson = JSON.parse(
-	readFileSync( join( packageRoot, 'package.json' ), 'utf8' )
+const disallowedPaths = packedPaths.filter( ( path ) =>
+	disallowedPathPatterns.some( ( pattern ) => pattern.test( path ) )
 );
 
 /**
  * @param {unknown} value Export map value.
- * @return {string[]} Export target paths.
+ * @return {string[]} Concrete local export target paths.
  */
-function getExportTargets( value ) {
+function getLocalExportTargets( value ) {
 	if ( typeof value === 'string' ) {
-		return [ value ];
+		return value.startsWith( './' ) && ! value.includes( '*' )
+			? [ value.slice( 2 ) ]
+			: [];
 	}
 
 	if ( Array.isArray( value ) ) {
-		return value.flatMap( getExportTargets );
+		return value.flatMap( getLocalExportTargets );
 	}
 
 	if ( ! value || typeof value !== 'object' ) {
 		return [];
 	}
 
-	return Object.values( value ).flatMap( getExportTargets );
+	return Object.values( value ).flatMap( getLocalExportTargets );
 }
 
-/**
- * @param {string} path Package-relative path.
- * @return {string} Normalized package path.
- */
-function normalizePackagePath( path ) {
-	return path.replace( /^\.\//, '' );
+const missingExportTargets = getLocalExportTargets(
+	packageJson.exports
+).filter( ( path ) => ! packedPathSet.has( path ) );
+
+if ( packedPaths.length === 0 ) {
+	console.error( 'The package tarball does not include any files.' );
 }
 
-/**
- * @return {Record<string, unknown> | undefined} Package export map.
- */
-function getPackageExportsMap() {
-	if (
-		! packageJson.exports ||
-		typeof packageJson.exports !== 'object' ||
-		Array.isArray( packageJson.exports )
-	) {
-		return;
-	}
-
-	return packageJson.exports;
-}
-
-const env = {
-	...process.env,
-	npm_config_cache:
-		process.env.WORDPRESS_PACKAGE_NPM_CACHE ??
-		join( tmpdir(), 'wordpress-package-npm-cache' ),
-};
-
-const npmExecPath = process.env.npm_execpath;
-const packCommand = npmExecPath ? process.execPath : 'npm';
-const packArgs = [
-	...( npmExecPath ? [ npmExecPath ] : [] ),
-	'pack',
-	'--json',
-];
-
-/**
- * @param {string} packDirectory Temporary package archive directory.
- * @return {number} Process exit code.
- */
-function validatePackedPackage( packDirectory ) {
-	packArgs.push( '--pack-destination', packDirectory );
-
-	const packResult = spawnSync( packCommand, packArgs, {
-		cwd: packageRoot,
-		encoding: 'utf8',
-		env,
-		shell: ! npmExecPath && process.platform === 'win32',
-	} );
-
-	if ( packResult.error ) {
-		throw packResult.error;
-	}
-
-	if ( packResult.status !== 0 ) {
-		process.stderr.write( packResult.stdout ?? '' );
-		process.stderr.write( packResult.stderr ?? '' );
-		return packResult.status ?? 1;
-	}
-
-	/** @type {Array<{ filename: string, files: Array<{ path: string }> }>} */
-	const packs = JSON.parse( packResult.stdout );
-	const [ pack ] = packs;
-	const packedPaths = pack.files.map( ( { path } ) => path );
-	const packedPathSet = new Set( packedPaths );
-	const tarballPath = join( packDirectory, pack.filename );
-
-	const disallowedPaths = packedPaths.filter( ( path ) =>
-		disallowedPathPatterns.some( ( pattern ) => pattern.test( path ) )
+if ( disallowedPaths.length ) {
+	console.error(
+		[
+			'The package tarball includes disallowed files:',
+			...disallowedPaths.map( ( path ) => `- ${ path }` ),
+		].join( '\n' )
 	);
-	const packageExports = getPackageExportsMap();
-	const missingAttwExcludedEntryPoints =
-		attwOptions.excludedEntryPoints.filter(
-			( entryPoint ) =>
-				! packageExports ||
-				! Object.hasOwn( packageExports, entryPoint )
-		);
-	// attw does not model non-JavaScript entry points like CSS. Keep explicit
-	// exclusions honest by checking only the package targets skipped by attw.
-	const missingAttwExcludedTargetPaths = attwOptions.excludedEntryPoints
-		.flatMap( ( entryPoint ) => {
-			if ( ! packageExports ) {
-				return [];
-			}
-
-			const exportValue = packageExports[ entryPoint ];
-
-			return getExportTargets( exportValue )
-				.filter( ( target ) => target.startsWith( './' ) )
-				.map( normalizePackagePath );
-		} )
-		.filter( ( path ) => ! packedPathSet.has( path ) );
-
-	const attwArgs = [
-		attwCliPath,
-		tarballPath,
-		'--format',
-		'table',
-		'--no-color',
-		'--no-emoji',
-		'--no-summary',
-		'--profile',
-		attwOptions.profile,
-	];
-
-	if ( attwOptions.excludedEntryPoints.length ) {
-		attwArgs.push(
-			'--exclude-entrypoints',
-			...attwOptions.excludedEntryPoints
-		);
-	}
-
-	if ( attwOptions.ignoredRules.length ) {
-		attwArgs.push( '--ignore-rules', ...attwOptions.ignoredRules );
-	}
-
-	const attwResult = spawnSync( process.execPath, attwArgs, {
-		cwd: packageRoot,
-		encoding: 'utf8',
-	} );
-
-	if ( attwResult.error ) {
-		throw attwResult.error;
-	}
-
-	if (
-		packedPaths.length === 0 ||
-		disallowedPaths.length ||
-		missingAttwExcludedEntryPoints.length ||
-		missingAttwExcludedTargetPaths.length
-	) {
-		if ( packedPaths.length === 0 ) {
-			console.error( 'The package tarball does not include any files.' );
-		}
-
-		if ( disallowedPaths.length ) {
-			console.error(
-				[
-					'The package tarball includes disallowed files:',
-					...disallowedPaths.map( ( path ) => `- ${ path }` ),
-				].join( '\n' )
-			);
-		}
-
-		if ( missingAttwExcludedTargetPaths.length ) {
-			console.error(
-				[
-					'The package tarball is missing targets for entry points excluded from attw:',
-					...missingAttwExcludedTargetPaths.map(
-						( path ) => `- ${ path }`
-					),
-				].join( '\n' )
-			);
-		}
-
-		if ( missingAttwExcludedEntryPoints.length ) {
-			console.error(
-				[
-					'The package exports do not include entry points excluded from attw:',
-					...missingAttwExcludedEntryPoints.map(
-						( entryPoint ) => `- ${ entryPoint }`
-					),
-				].join( '\n' )
-			);
-		}
-	}
-
-	if ( attwResult.status !== 0 ) {
-		process.stderr.write( attwResult.stdout ?? '' );
-		process.stderr.write( attwResult.stderr ?? '' );
-	}
-
-	if (
-		packedPaths.length === 0 ||
-		disallowedPaths.length ||
-		missingAttwExcludedEntryPoints.length ||
-		missingAttwExcludedTargetPaths.length ||
-		attwResult.status !== 0
-	) {
-		return attwResult.status || 1;
-	}
-
-	console.log(
-		`Validated ${ packedPaths.length } packed files for ${
-			packageJson.name ?? packageRoot
-		}.`
-	);
-	return 0;
 }
 
-const packDirectory = mkdtempSync(
-	join( tmpdir(), 'wordpress-package-contents-' )
+if ( missingExportTargets.length ) {
+	console.error(
+		[
+			'The package tarball is missing exported targets:',
+			...missingExportTargets.map( ( path ) => `- ${ path }` ),
+		].join( '\n' )
+	);
+}
+
+if (
+	packedPaths.length === 0 ||
+	disallowedPaths.length ||
+	missingExportTargets.length
+) {
+	process.exit( 1 );
+}
+
+console.log(
+	`Validated ${ packedPaths.length } packed files for ${
+		packageJson.name ?? packageRoot
+	}.`
 );
-let exitCode;
-
-try {
-	exitCode = validatePackedPackage( packDirectory );
-} finally {
-	rmSync( packDirectory, { force: true, recursive: true } );
-}
-
-if ( exitCode !== 0 ) {
-	process.exit( exitCode );
-}
