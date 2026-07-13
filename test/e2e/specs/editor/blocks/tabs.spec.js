@@ -239,6 +239,7 @@ test.describe( 'Tabs', () => {
 
 		test( 'keeps tab labels in sync when a panel is moved before', async ( {
 			editor,
+			page,
 			pageUtils,
 		} ) => {
 			await editor.insertBlock(
@@ -270,8 +271,7 @@ test.describe( 'Tabs', () => {
 					),
 				] );
 
-			// Undo restores the original order, along with the active tab and
-			// the focused panel.
+			// Undo restores the original order and the active tab.
 			await pageUtils.pressKeys( 'primary+z' );
 
 			await expect
@@ -283,13 +283,16 @@ test.describe( 'Tabs', () => {
 					),
 				] );
 			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
-			// FIXME: The moved panel is re-selected in the store, but never
-			// regains DOM focus.
-			// await expect( panel2 ).toBeFocused();
+
+			// The focus stays on the mover button.
+			await expect(
+				page.getByRole( 'button', { name: 'Move up' } )
+			).toBeFocused();
 		} );
 
 		test( 'keeps tab labels in sync when a panel is moved after', async ( {
 			editor,
+			page,
 			pageUtils,
 		} ) => {
 			await editor.insertBlock(
@@ -321,8 +324,7 @@ test.describe( 'Tabs', () => {
 					),
 				] );
 
-			// Undo restores the original order, along with the active tab and
-			// the focused panel.
+			// Undo restores the original order and the active tab.
 			await pageUtils.pressKeys( 'primary+z' );
 
 			await expect
@@ -334,9 +336,11 @@ test.describe( 'Tabs', () => {
 					),
 				] );
 			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
-			// FIXME: The moved panel is re-selected in the store, but never
-			// regains DOM focus.
-			// await expect( panel2 ).toBeFocused();
+
+			// The focus stays on the mover button.
+			await expect(
+				page.getByRole( 'button', { name: 'Move down' } )
+			).toBeFocused();
 		} );
 
 		test( 'keeps tab labels in sync when a panel is removed', async ( {
@@ -372,8 +376,7 @@ test.describe( 'Tabs', () => {
 					),
 				] );
 
-			// Undo restores the removed panel, along with the active tab and
-			// the focused panel.
+			// Undo restores the removed panel and the active tab.
 			await pageUtils.pressKeys( 'primary+z' );
 
 			await expect
@@ -385,6 +388,8 @@ test.describe( 'Tabs', () => {
 					),
 				] );
 			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
+
+			// The restored panel regains the focus.
 			await expect( panel2 ).toBeFocused();
 		} );
 
@@ -421,8 +426,7 @@ test.describe( 'Tabs', () => {
 					),
 				] );
 
-			// Undo removes the duplicated panel, and restores the active tab
-			// and the focused panel.
+			// Undo removes the duplicated panel and restores the active tab.
 			await pageUtils.pressKeys( 'primary+z' );
 
 			await expect
@@ -434,6 +438,8 @@ test.describe( 'Tabs', () => {
 					),
 				] );
 			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
+
+			// The original panel regains the focus.
 			await expect( panel2 ).toBeFocused();
 		} );
 	} );
