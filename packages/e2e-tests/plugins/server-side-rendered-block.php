@@ -174,5 +174,45 @@ add_action(
 				),
 			)
 		);
+
+		register_block_type(
+			'test/php-only-synced-block',
+			array(
+				'title'       => 'Synced PHP-only block (pattern overrides)',
+				'icon'        => 'update',
+				'category'    => 'widgets',
+				'description' => 'The registration owns the pattern: only the bound Title is editable per instance, and plugin updates to the rest propagate to existing content.',
+				'keywords'    => array( 'pattern', 'autotest' ),
+				'supports'    => array(
+					'autoRegister' => true,
+				),
+				'pattern'     => '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group">'
+					. '<!-- wp:heading {"metadata":{"name":"Title","bindings":{"__default":{"source":"core/pattern-overrides"}}}} --><h2 class="wp-block-heading">Synced title</h2><!-- /wp:heading -->'
+					. '<!-- wp:paragraph --><p>Owned by the plugin: shipped with v1.</p><!-- /wp:paragraph -->'
+					. '</div><!-- /wp:group -->',
+			)
+		);
+
+		// Displaying the expected `_doing_it_wrong()` notice would corrupt REST
+		// responses. The PHPUnit test covers the notice.
+		add_filter( 'doing_it_wrong_trigger_error', '__return_false' );
+		register_block_type(
+			'test/php-only-pattern-with-callback',
+			array(
+				'title'           => 'Pattern block with ignored callback',
+				'icon'            => 'warning',
+				'category'        => 'widgets',
+				'description'     => 'Registers both a pattern and a render_callback; the pattern wins and the callback output must never appear.',
+				'keywords'        => array( 'pattern', 'autotest' ),
+				'supports'        => array(
+					'autoRegister' => true,
+				),
+				'pattern'         => '<!-- wp:paragraph --><p>Pattern content wins.</p><!-- /wp:paragraph -->',
+				'render_callback' => static function () {
+					return '<p>CALLBACK SHOULD NOT RENDER</p>';
+				},
+			)
+		);
+		remove_filter( 'doing_it_wrong_trigger_error', '__return_false' );
 	}
 );

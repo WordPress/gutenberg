@@ -333,3 +333,113 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		} );
 	} );
 } );
+
+test.describe( 'PHP-only pattern blocks', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-server-side-rendered-block'
+		);
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-pattern-blocks',
+		] );
+	} );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-server-side-rendered-block'
+		);
+		await requestUtils.setGutenbergExperiments( [] );
+	} );
+
+	test( 'a pattern without bindings is not editable', async ( {
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'test/php-only-pattern-with-callback',
+		} );
+
+		const paragraph = editor.canvas.getByText( 'Pattern content wins.' );
+		await expect( paragraph ).toBeVisible();
+		await expect( paragraph ).not.toHaveAttribute(
+			'contenteditable',
+			'true'
+		);
+
+		expect( await editor.getEditedPostContent() ).toBe(
+			'<!-- wp:test/php-only-pattern-with-callback /-->'
+		);
+	} );
+
+	test( 'synced: only bound fields are editable and instances save just their overrides', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'test/php-only-synced-block' } );
+
+		const heading = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading',
+		} );
+		await expect( heading ).toBeVisible();
+		await heading.click();
+		await page.keyboard.press( 'ControlOrMeta+a' );
+		await page.keyboard.type( 'My own title' );
+
+		const paragraph = editor.canvas.getByText( 'Owned by the plugin' );
+		await expect( paragraph ).not.toHaveAttribute(
+			'contenteditable',
+			'true'
+		);
+
+		const content = await editor.getEditedPostContent();
+		expect( content ).toContain( '"Title":{"content":"My own title"}' );
+		expect( content ).not.toContain( 'wp-block-heading' );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		const wrapper = page.locator( '.wp-block-test-php-only-synced-block' );
+		await expect( wrapper.getByText( 'My own title' ) ).toBeVisible();
+		await expect(
+			wrapper.getByText( 'Owned by the plugin: shipped with v1.' )
+		).toBeVisible();
+	} );
+
+	test( 'a pattern replaces server rendering: the render_callback is ignored', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'test/php-only-pattern-with-callback',
+		} );
+
+		await expect(
+			editor.canvas.getByText( 'Pattern content wins.' )
+		).toBeVisible();
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		await expect( page.getByText( 'Pattern content wins.' ) ).toBeVisible();
+		await expect(
+			page.getByText( 'CALLBACK SHOULD NOT RENDER' )
+		).toBeHidden();
+	} );
+
+	test( 'ignores saved inner content: the registration owns the structure', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Pattern block instance',
+			content:
+				'<!-- wp:test/php-only-pattern-with-callback --><p>INJECTED-MARKER</p><!-- /wp:test/php-only-pattern-with-callback -->',
+			status: 'publish',
+		} );
+
+		await page.goto( `/?p=${ post.id }` );
+		await expect( page.getByText( 'Pattern content wins.' ) ).toBeVisible();
+		await expect( page.getByText( 'INJECTED-MARKER' ) ).toBeHidden();
+	} );
+} );
