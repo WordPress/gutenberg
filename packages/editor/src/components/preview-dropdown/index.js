@@ -136,7 +136,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			label: __( 'Desktop' ),
 			icon: desktop,
 			info: isResponsiveEditing
-				? __( 'Edit across all breakpoints.' )
+				? __( 'Style all viewports.' )
 				: __( 'Preview desktop viewport.' ),
 		},
 		...( hasTabletViewport
@@ -146,7 +146,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 						label: __( 'Tablet' ),
 						icon: tablet,
 						info: isResponsiveEditing
-							? __( 'Make tablet exclusive style changes.' )
+							? __( 'Style tablet only.' )
 							: __( 'Preview tablet viewport.' ),
 					},
 			  ]
@@ -158,7 +158,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 						label: __( 'Mobile' ),
 						icon: mobile,
 						info: isResponsiveEditing
-							? __( 'Make mobile exclusive style changes.' )
+							? __( 'Style mobile only.' )
 							: __( 'Preview mobile viewport.' ),
 					},
 			  ]
@@ -194,7 +194,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							role="menuitemcheckbox"
 							onClick={ handleResponsiveEditingChange }
 							info={ __(
-								'Style changes apply only to the current viewport.'
+								'Style changes apply only to the selected viewport.'
 							) }
 						>
 							{ __( 'Responsive editing' ) }

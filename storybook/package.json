@@ -65,6 +65,7 @@
 		"storybook": "^10.4.3",
 		"storybook-addon-tag-badges": "^3.0.4",
 		"terser": "^5.37.0",
+		"typescript": "npm:@typescript/typescript6@^6.0.2",
 		"vite": "^7.3.2"
 	},
 	"publishConfig": {
