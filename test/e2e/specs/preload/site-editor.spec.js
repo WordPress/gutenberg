@@ -50,10 +50,7 @@ test.describe( 'Preload', () => {
 		// isn't stable across runs, so this assertion deduplicates.
 		// To do: the remaining requests should be removed or preloaded.
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
-			[
-				'OPTIONS /wp/v2/settings',
-				'POST /wp/v2/users/me',
-			].sort()
+			[ 'OPTIONS /wp/v2/settings', 'POST /wp/v2/users/me' ].sort()
 		);
 	} );
 
