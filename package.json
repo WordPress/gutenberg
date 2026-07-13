@@ -18,6 +18,16 @@
 		"node": ">=20.19.0",
 		"npm": ">=10.2.3"
 	},
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": ">=20.19.0"
+		},
+		"packageManager": {
+			"name": "npm",
+			"version": ">=10.2.3"
+		}
+	},
 	"wpPlugin": {
 		"name": "gutenberg",
 		"scriptGlobal": "wp",
