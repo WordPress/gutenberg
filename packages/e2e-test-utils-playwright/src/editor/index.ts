@@ -18,7 +18,7 @@ import { getEditedPostContent } from './get-edited-post-content';
 import { insertBlock } from './insert-block';
 import { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 import { openPreviewPage } from './preview';
-import { ownsSelection } from './owns-selection';
+import { ownsSelection, getFocusOwnerLabel } from './owns-selection';
 import { publishPost } from './publish-post';
 import { saveDraft } from './save-draft';
 import { selectBlocks } from './select-blocks';
@@ -68,6 +68,9 @@ export class Editor {
 		openDocumentSettingsSidebar.bind( this );
 	/** @borrows openPreviewPage as this.openPreviewPage */
 	openPreviewPage: typeof openPreviewPage = openPreviewPage.bind( this );
+	/** @borrows getFocusOwnerLabel as this.getFocusOwnerLabel */
+	getFocusOwnerLabel: typeof getFocusOwnerLabel =
+		getFocusOwnerLabel.bind( this );
 	/** @borrows ownsSelection as this.ownsSelection */
 	ownsSelection: typeof ownsSelection = ownsSelection.bind( this );
 	/** @borrows publishPost as this.publishPost */
