@@ -243,7 +243,7 @@ export function RichTextWrapper(
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;
 
-	const { hasEditableRoot } = useHasEditableRoot();
+	const hasEditableRoot = useHasEditableRoot();
 	const hasDefaultEditingMode = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getBlockEditingMode( clientId ) ===
