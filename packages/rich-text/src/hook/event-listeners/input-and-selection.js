@@ -326,30 +326,6 @@ export default ( props ) => ( element ) => {
 		onInput,
 		true
 	);
-	// The native `selectionchange` event is asynchronous and coalesced: the
-	// record and the store selection can be one selection behind the DOM when
-	// an event that acts on them arrives, regardless of how the selection got
-	// there. When a focused editing host owns the element's selection, there
-	// are not even focus events to catch up on entry, and handlers that act
-	// on the selected block only attach once the store selects it.
-	// Synchronize on capture of the events that consume the record, the store
-	// selection, or a value rendered from them, before any other handler
-	// runs. The snapshot comparison in `handleSelectionChange` skips
-	// selections that have already been processed.
-	const unsubscribeEnsureSelectionSync = [
-		'keydown',
-		'beforeinput',
-		'copy',
-		'cut',
-		'paste',
-	].map( ( eventType ) =>
-		subscribeDelegatedListener(
-			ownerDocument,
-			eventType,
-			handleSelectionChange,
-			true
-		)
-	);
 	const unsubscribeCompositionStart = subscribeOwnedListener(
 		element,
 		'compositionstart',
@@ -378,7 +354,10 @@ export default ( props ) => ( element ) => {
 	// The native `selectionchange` event is asynchronous and coalesced: the
 	// record and the store selection can be one selection behind the DOM when
 	// an event that acts on them arrives, regardless of how the selection got
-	// there. Synchronize on capture of the events that consume the record,
+	// there. When a focused editing host owns the element's selection, there
+	// are not even focus events to catch up on entry, and handlers that act
+	// on the selected block only attach once the store selects it.
+	// Synchronize on capture of the events that consume the record,
 	// the store selection, or a value rendered from them, before any other
 	// handler runs. The snapshot comparison in `handleSelectionChange` skips
 	// selections that have already been processed.
@@ -399,9 +378,6 @@ export default ( props ) => ( element ) => {
 
 	return () => {
 		unsubscribeInput();
-		unsubscribeEnsureSelectionSync.forEach( ( unsubscribe ) =>
-			unsubscribe()
-		);
 		unsubscribeCompositionStart();
 		unsubscribeCompositionEnd();
 		unsubscribeFocus();
