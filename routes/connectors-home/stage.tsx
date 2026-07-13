@@ -130,11 +130,7 @@ function ConnectorsPage() {
 						style={ { maxWidth: 480 } }
 					>
 						<VStack alignment="center" spacing={ 2 }>
-							<Heading
-								level={ 2 }
-								size={ 15 }
-								weight="var(--wpds-typography-font-weight-semibold)"
-							>
+							<Heading level={ 2 } size={ 15 }>
 								{ __( 'No connectors yet' ) }
 							</Heading>
 							<WCText size={ 12 }>
