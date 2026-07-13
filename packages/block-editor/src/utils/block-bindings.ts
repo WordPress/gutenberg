@@ -66,6 +66,11 @@ export function getBlockBindingsContext(
 export const INNER_BLOCKS_BINDING_KEY = 'innerBlocks';
 
 /**
+ * Private block-list setting that marks an editable pattern-overrides area.
+ */
+export const BOUND_INNER_BLOCKS_SETTINGS_KEY = 'boundInnerBlocks';
+
+/**
  * Gets a usable structural binding descriptor from block attributes.
  *
  * The private experiment is restricted to pattern overrides on Core blocks.

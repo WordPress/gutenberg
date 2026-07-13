@@ -29,12 +29,18 @@ const EMPTY_ARRAY = [];
 /**
  * Resolves controlled InnerBlocks props from a structural binding.
  *
- * @param {string}           clientId  Host block client ID.
- * @param {Object|undefined} binding   Structural binding descriptor.
- * @param {Object}           blockType Host block type.
+ * @param {string}           clientId                  Host block client ID.
+ * @param {Object|undefined} binding                   Structural binding descriptor.
+ * @param {Object}           blockType                 Host block type.
+ * @param {boolean}          isPatternOverrideInstance Whether the host belongs to one synced-pattern instance.
  * @return {Object|undefined} Controlled inner-block props.
  */
-export function useBoundInnerBlocksProps( clientId, binding, blockType ) {
+export function useBoundInnerBlocksProps(
+	clientId,
+	binding,
+	blockType,
+	isPatternOverrideInstance = false
+) {
 	const registry = useRegistry();
 	const blockContext = useContext( BlockContext );
 	const appliedRef = useRef( { serialized: undefined, blocks: undefined } );
@@ -80,16 +86,20 @@ export function useBoundInnerBlocksProps( clientId, binding, blockType ) {
 			),
 		[ blockContext, resolvedBlockType, source ]
 	);
-	const hasCurrentFallbackSlot = useSelect(
+	const currentFallbackBlocks = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
-				return false;
+				return EMPTY_ARRAY;
 			}
-			return select( blockEditorStore ).getBlocks( clientId ).length > 0;
+			return select( blockEditorStore ).getBlocks( clientId );
 		},
 		[ clientId ]
 	);
-	const [ hasFallbackSlot ] = useState( hasCurrentFallbackSlot );
+	// Keep the pattern entity's original children separate from the controlled
+	// instance tree. This lets absence render the fallback while the first edit
+	// creates an override, and lets Reset restore the original fallback.
+	const [ fallbackBlocks ] = useState( () => [ ...currentFallbackBlocks ] );
+	const hasFallbackSlot = fallbackBlocks.length > 0;
 	const serialized = useSelect(
 		( select ) => {
 			if ( ! source?.getValues ) {
@@ -107,10 +117,12 @@ export function useBoundInnerBlocksProps( clientId, binding, blockType ) {
 		[ source, context, clientId, args ]
 	);
 	const value = useMemo( () => {
-		if (
-			serialized === undefined ||
-			( serialized !== '' && ! hasFallbackSlot )
-		) {
+		if ( serialized === undefined ) {
+			return isPatternOverrideInstance && hasFallbackSlot
+				? fallbackBlocks
+				: undefined;
+		}
+		if ( serialized !== '' && ! hasFallbackSlot ) {
 			return undefined;
 		}
 		if ( appliedRef.current.serialized === serialized ) {
@@ -119,7 +131,12 @@ export function useBoundInnerBlocksProps( clientId, binding, blockType ) {
 		const blocks = serialized === '' ? EMPTY_ARRAY : parse( serialized );
 		appliedRef.current = { serialized, blocks };
 		return blocks;
-	}, [ serialized, hasFallbackSlot ] );
+	}, [
+		serialized,
+		hasFallbackSlot,
+		fallbackBlocks,
+		isPatternOverrideInstance,
+	] );
 
 	const writeBack = useCallback(
 		( blocks, persistent ) => {
@@ -181,6 +198,82 @@ export function useBoundInnerBlocksProps( clientId, binding, blockType ) {
 				: undefined,
 		[ source, value, onChange, onInput ]
 	);
+	const editableClientIds = useSelect(
+		( select ) => {
+			if ( ! boundProps || ! clientId || ! isPatternOverrideInstance ) {
+				return EMPTY_ARRAY;
+			}
+
+			const blockEditor = select( blockEditorStore );
+			if ( unlock( blockEditor ).isZoomOut() ) {
+				return EMPTY_ARRAY;
+			}
+
+			return blockEditor
+				.getClientIdsOfDescendants( clientId )
+				.filter(
+					( id ) =>
+						blockEditor.getBlockName( id ) !== 'core/block' &&
+						blockEditor.getBlockParentsByBlockName(
+							id,
+							'core/block',
+							true
+						).length === 1
+				);
+		},
+		[ boundProps, clientId, isPatternOverrideInstance ]
+	);
+	const editingModeOwnershipRef = useRef( new Map() );
+	useLayoutEffect( () => {
+		const blockEditorSelect = registry.select( blockEditorStore );
+		const { getExplicitBlockEditingMode } = unlock( blockEditorSelect );
+		const { setBlockEditingMode, unsetBlockEditingMode } =
+			registry.dispatch( blockEditorStore );
+		const ownedModes = editingModeOwnershipRef.current;
+		const desiredClientIds = new Set( editableClientIds );
+
+		registry.batch( () => {
+			ownedModes.forEach( ( appliedMode, id ) => {
+				if ( getExplicitBlockEditingMode( id ) !== appliedMode ) {
+					ownedModes.delete( id );
+					return;
+				}
+				if ( desiredClientIds.has( id ) ) {
+					return;
+				}
+				unsetBlockEditingMode( id );
+				ownedModes.delete( id );
+			} );
+
+			desiredClientIds.forEach( ( id ) => {
+				if (
+					ownedModes.has( id ) ||
+					getExplicitBlockEditingMode( id ) !== undefined
+				) {
+					return;
+				}
+				setBlockEditingMode( id, 'default' );
+				ownedModes.set( id, 'default' );
+			} );
+		} );
+	}, [ editableClientIds, registry ] );
+	useLayoutEffect( () => {
+		const ownedModes = editingModeOwnershipRef.current;
+		return () => {
+			const blockEditorSelect = registry.select( blockEditorStore );
+			const { getExplicitBlockEditingMode } = unlock( blockEditorSelect );
+			const { unsetBlockEditingMode } =
+				registry.dispatch( blockEditorStore );
+			registry.batch( () => {
+				ownedModes.forEach( ( appliedMode, id ) => {
+					if ( getExplicitBlockEditingMode( id ) === appliedMode ) {
+						unsetBlockEditingMode( id );
+					}
+				} );
+				ownedModes.clear();
+			} );
+		};
+	}, [ registry ] );
 
 	const wasControlledRef = useRef( false );
 	const wasControlledLayoutRef = useRef( false );

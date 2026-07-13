@@ -83,6 +83,7 @@ import {
 	isHashLink,
 	isRelativePath,
 } from './components/link-control/is-url-like';
+import { getInnerBlocksBinding } from './utils/block-bindings';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -157,4 +158,5 @@ lock( privateApis, {
 	isHashLink,
 	isRelativePath,
 	InnerContent,
+	getInnerBlocksBinding,
 } );

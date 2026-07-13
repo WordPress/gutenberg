@@ -35,8 +35,17 @@ function SyncedInnerBlocks( props ) {
 	return null;
 }
 
-function BoundInnerBlocksController( { clientId, binding } ) {
-	const props = useBoundInnerBlocksProps( clientId, binding );
+function BoundInnerBlocksController( {
+	clientId,
+	binding,
+	isPatternOverrideInstance = false,
+} ) {
+	const props = useBoundInnerBlocksProps(
+		clientId,
+		binding,
+		undefined,
+		isPatternOverrideInstance
+	);
 	return props ? (
 		<SyncedInnerBlocks clientId={ clientId } { ...props } />
 	) : null;
@@ -108,11 +117,16 @@ describe( 'useBoundInnerBlocksProps', () => {
 		return view;
 	}
 
-	function renderBoundController( clientId, binding ) {
+	function renderBoundController(
+		clientId,
+		binding,
+		isPatternOverrideInstance = false
+	) {
 		const view = render(
 			<BoundInnerBlocksController
 				clientId={ clientId }
 				binding={ binding }
+				isPatternOverrideInstance={ isPatternOverrideInstance }
 			/>
 		);
 		mountedHooks.push( view );
@@ -166,6 +180,80 @@ describe( 'useBoundInnerBlocksProps', () => {
 		const { result } = renderBoundHook( clientId, binding );
 
 		expect( result.current ).toBeUndefined();
+	} );
+
+	it( 'creates the first pattern override from fallback children', async () => {
+		const setValues = jest.fn();
+		registerBlockBindingsSource( {
+			name: SOURCE_NAME,
+			label: 'Test source',
+			getValues: () => ( { innerBlocks: undefined } ),
+			setValues,
+		} );
+		const binding = { source: SOURCE_NAME };
+		const clientId = setupHost( binding );
+		renderBoundController( clientId, binding, true );
+
+		await waitFor( () =>
+			expect(
+				select( blockEditorStore ).areInnerBlocksControlled( clientId )
+			).toBe( true )
+		);
+		const [ child ] = select( blockEditorStore ).getBlocks( clientId );
+		expect( child.attributes.content ).toBe( 'Fallback paragraph' );
+
+		act( () => {
+			dispatch( blockEditorStore ).updateBlockAttributes(
+				child.clientId,
+				{
+					content: 'First override',
+				}
+			);
+		} );
+
+		await waitFor( () => expect( setValues ).toHaveBeenCalled() );
+		expect(
+			setValues.mock.calls.at( -1 )[ 0 ].bindings.innerBlocks.newValue
+		).toContain( 'First override' );
+	} );
+
+	it( 'resets an existing pattern override to fallback without releasing control', async () => {
+		let sourceValue = PARAGRAPH_MARKUP;
+		registerBlockBindingsSource( {
+			name: SOURCE_NAME,
+			label: 'Test source',
+			getValues: () => ( { innerBlocks: sourceValue } ),
+			setValues: () => {},
+		} );
+		const binding = { source: SOURCE_NAME };
+		const clientId = setupHost( binding );
+		const view = renderBoundController( clientId, binding, true );
+
+		await waitFor( () =>
+			expect(
+				select( blockEditorStore ).getBlocks( clientId )[ 0 ]
+					?.attributes.content
+			).toBe( 'Bound paragraph' )
+		);
+
+		sourceValue = undefined;
+		view.rerender(
+			<BoundInnerBlocksController
+				clientId={ clientId }
+				binding={ { ...binding, args: { revision: 1 } } }
+				isPatternOverrideInstance
+			/>
+		);
+
+		await waitFor( () =>
+			expect(
+				select( blockEditorStore ).getBlocks( clientId )[ 0 ]
+					?.attributes.content
+			).toBe( 'Fallback paragraph' )
+		);
+		expect(
+			select( blockEditorStore ).areInnerBlocksControlled( clientId )
+		).toBe( true );
 	} );
 
 	it.each( [ null, 1, [], {} ] )(

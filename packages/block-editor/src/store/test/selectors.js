@@ -21,6 +21,7 @@ import * as selectors from '../selectors';
 import { store } from '../';
 import { lock } from '../../lock-unlock';
 import { sectionRootClientIdKey } from '../private-keys';
+import { BOUND_INNER_BLOCKS_SETTINGS_KEY } from '../../utils/block-bindings';
 
 const {
 	getBlockName,
@@ -2693,6 +2694,76 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'canInsertBlockType', () => {
+		it( 'allows structural editing inside a live plugin-gated bound area', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'pattern', { name: 'core/block' } ],
+						[ 'container', { name: 'core/test-block-a' } ],
+						[ 'child', { name: 'core/test-block-b' } ],
+					] ),
+					attributes: new Map( [
+						[ 'pattern', {} ],
+						[ 'container', {} ],
+						[ 'child', {} ],
+					] ),
+					parents: new Map( [
+						[ 'pattern', '' ],
+						[ 'container', 'pattern' ],
+						[ 'child', 'container' ],
+					] ),
+					order: new Map( [
+						[ '', [ 'pattern' ] ],
+						[ 'pattern', [ 'container' ] ],
+						[ 'container', [ 'child' ] ],
+					] ),
+					blockEditingModes: new Map( [
+						[ 'container', 'contentOnly' ],
+					] ),
+				},
+				blockListSettings: new Map( [
+					[ 'pattern', {} ],
+					[
+						'container',
+						{
+							[ BOUND_INNER_BLOCKS_SETTINGS_KEY ]:
+								'core/pattern-overrides',
+						},
+					],
+				] ),
+				settings: {
+					blockBindingsInnerBlocks: true,
+					[ sectionRootClientIdKey ]: '',
+				},
+				derivedBlockEditingModes: new Map( [
+					[ 'container', 'contentOnly' ],
+				] ),
+			};
+
+			expect(
+				canInsertBlockType( state, 'core/test-block-a', 'container' )
+			).toBe( true );
+			expect( canRemoveBlock( state, 'child' ) ).toBe( true );
+			expect( canMoveBlock( state, 'child' ) ).toBe( true );
+
+			const coreState = {
+				...state,
+				settings: {
+					...state.settings,
+					blockBindingsInnerBlocks: false,
+				},
+			};
+			expect(
+				canInsertBlockType(
+					coreState,
+					'core/test-block-a',
+					'container'
+				)
+			).toBe( false );
+			expect( canRemoveBlock( coreState, 'child' ) ).toBe( false );
+			expect( canMoveBlock( coreState, 'child' ) ).toBe( false );
+		} );
+
 		it( 'should deny blocks that are not registered', () => {
 			const state = {
 				blocks: {

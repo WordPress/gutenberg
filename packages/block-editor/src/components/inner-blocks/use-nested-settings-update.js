@@ -11,6 +11,7 @@ import { isShallowEqual } from '@wordpress/is-shallow-equal';
  */
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
+import { BOUND_INNER_BLOCKS_SETTINGS_KEY } from '../../utils/block-bindings';
 
 /** @typedef {import('../../selectors').WPDirectInsertBlock } WPDirectInsertBlock */
 
@@ -60,6 +61,7 @@ function useShallowMemo( value ) {
  * @param {string}               orientation                The direction in which the block
  *                                                          should face.
  * @param {Object}               layout                     The layout object for the block container.
+ * @param {string|false}         boundInnerBlocks           Editable structural binding source, or false.
  */
 export default function useNestedSettingsUpdate(
 	clientId,
@@ -73,7 +75,8 @@ export default function useNestedSettingsUpdate(
 	templateLock,
 	captureToolbars,
 	orientation,
-	layout
+	layout,
+	boundInnerBlocks
 ) {
 	// Instead of adding a useSelect mapping here, please add to the useSelect
 	// mapping in InnerBlocks! Every subscription impacts performance.
@@ -106,6 +109,10 @@ export default function useNestedSettingsUpdate(
 		// are defined.
 		if ( captureToolbars !== undefined ) {
 			newSettings.__experimentalCaptureToolbars = captureToolbars;
+		}
+
+		if ( boundInnerBlocks !== undefined ) {
+			newSettings[ BOUND_INNER_BLOCKS_SETTINGS_KEY ] = boundInnerBlocks;
 		}
 
 		// Orientation depends on layout,
@@ -184,6 +191,7 @@ export default function useNestedSettingsUpdate(
 		captureToolbars,
 		orientation,
 		layout,
+		boundInnerBlocks,
 		registry,
 	] );
 }

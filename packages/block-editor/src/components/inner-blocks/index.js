@@ -78,6 +78,7 @@ function UncontrolledInnerBlocks( props ) {
 		blockType,
 		parentLock,
 		defaultLayout,
+		boundInnerBlocks,
 	} = props;
 
 	useNestedSettingsUpdate(
@@ -92,7 +93,8 @@ function UncontrolledInnerBlocks( props ) {
 		templateLock,
 		captureToolbars,
 		orientation,
-		layout
+		layout,
+		boundInnerBlocks
 	);
 
 	useInnerBlockTemplateSync(
@@ -159,15 +161,48 @@ function ControlledInnerBlocks( props ) {
 	return <UncontrolledInnerBlocks { ...props } />;
 }
 
+function useEditablePatternOverrideSource( clientId, binding ) {
+	const sourceName = binding?.source;
+	return useSelect(
+		( select ) => {
+			if ( ! clientId || sourceName !== 'core/pattern-overrides' ) {
+				return undefined;
+			}
+
+			const blockEditor = select( blockEditorStore );
+			const attributes = blockEditor.getBlockAttributes( clientId );
+			const blockName = attributes?.metadata?.name;
+			const patternParents = blockEditor.getBlockParentsByBlockName(
+				clientId,
+				'core/block',
+				true
+			);
+
+			return typeof blockName === 'string' &&
+				blockName !== '' &&
+				patternParents.length === 1
+				? sourceName
+				: undefined;
+		},
+		[ clientId, sourceName ]
+	);
+}
+
 function BoundInnerBlocks( { binding, ...props } ) {
+	const editablePatternOverrideSource = useEditablePatternOverrideSource(
+		props.clientId,
+		binding
+	);
 	const boundInnerBlocksProps = useBoundInnerBlocksProps(
 		props.clientId,
 		binding,
-		props.blockType
+		props.blockType,
+		!! editablePatternOverrideSource
 	);
 	const innerBlocksProps = {
 		...props,
 		...boundInnerBlocksProps,
+		boundInnerBlocks: editablePatternOverrideSource ?? false,
 	};
 	const InnerBlocks = hasControlledInnerBlocks( innerBlocksProps )
 		? ControlledInnerBlocks
@@ -318,6 +353,8 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		parentLock,
 		defaultLayout,
 		...options,
+		// This marker is owned by BoundInnerBlocks and is never caller-controlled.
+		boundInnerBlocks: undefined,
 	};
 	const InnerBlocks = hasControlledInnerBlocks( innerBlocksProps )
 		? ControlledInnerBlocks
@@ -336,14 +373,13 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	if ( bindingApplies && ! wasBound ) {
 		setWasBound( true );
 	}
+	const shouldUseBoundInnerBlocks =
+		! hasCallerControlledProps && ( innerBlocksBinding || wasBound );
 
 	let children;
 	if ( ! clientId ) {
 		children = <BlockListItems { ...options } />;
-	} else if (
-		! hasCallerControlledProps &&
-		( innerBlocksBinding || wasBound )
-	) {
+	} else if ( shouldUseBoundInnerBlocks ) {
 		children = (
 			<BoundInnerBlocks
 				{ ...innerBlocksProps }
