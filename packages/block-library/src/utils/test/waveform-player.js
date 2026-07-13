@@ -8,10 +8,11 @@ import { act, render } from '@testing-library/react';
  * Internal dependencies
  */
 import { WaveformPlayer } from '../waveform-player';
-import { initWaveformPlayer } from '../waveform-utils';
+import { initWaveformPlayer, setupPlayButtonArtwork } from '../waveform-utils';
 
 jest.mock( '../waveform-utils', () => ( {
 	initWaveformPlayer: jest.fn(),
+	setupPlayButtonArtwork: jest.fn(),
 	updateSeekControlLabel: jest.fn(),
 } ) );
 
@@ -89,6 +90,7 @@ function createFakePlayer( options, element ) {
 
 	return {
 		instance,
+		container: element,
 		destroy: jest.fn(),
 	};
 }
@@ -105,6 +107,7 @@ describe( 'WaveformPlayer', () => {
 		jest.runOnlyPendingTimers();
 		jest.useRealTimers();
 		initWaveformPlayer.mockReset();
+		setupPlayButtonArtwork.mockReset();
 	} );
 
 	const baseProps = {
@@ -179,6 +182,31 @@ describe( 'WaveformPlayer', () => {
 		expect( player.instance.artworkEl ).toHaveAttribute(
 			'alt',
 			'A black and white portrait'
+		);
+	} );
+
+	it( 'updates play button artwork when artwork metadata changes', () => {
+		const { rerender } = render(
+			<WaveformPlayer { ...baseProps } showPlayButtonArtwork />
+		);
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		const player = initWaveformPlayer.mock.results[ 0 ].value;
+
+		rerender(
+			<WaveformPlayer
+				{ ...baseProps }
+				image="https://example.com/new.jpg"
+				showPlayButtonArtwork
+			/>
+		);
+
+		expect( setupPlayButtonArtwork ).toHaveBeenCalledWith(
+			player.container,
+			'https://example.com/new.jpg'
 		);
 	} );
 

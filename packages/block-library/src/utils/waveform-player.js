@@ -8,7 +8,11 @@ import { __, _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { initWaveformPlayer, updateSeekControlLabel } from './waveform-utils';
+import {
+	initWaveformPlayer,
+	setupPlayButtonArtwork,
+	updateSeekControlLabel,
+} from './waveform-utils';
 
 /**
  * Update the metadata of a WaveformPlayer element to reflect current props.
@@ -16,14 +20,21 @@ import { initWaveformPlayer, updateSeekControlLabel } from './waveform-utils';
  * `loadTrack()` owns full track swaps, but it also resets the audio element.
  * This keeps same-source metadata edits lightweight in the editor.
  *
- * @param {Object} instance          - The waveform player instance.
- * @param {Object} metadata          - The track metadata.
- * @param {string} metadata.title    - The track title.
- * @param {string} metadata.artist   - The artist name.
- * @param {string} metadata.image    - The artwork image URL.
- * @param {string} metadata.imageAlt - The artwork image alt text.
+ * @param {Object}  player                - The waveform player.
+ * @param {Object}  metadata              - The track metadata.
+ * @param {string}  metadata.title        - The track title.
+ * @param {string}  metadata.artist       - The artist name.
+ * @param {string}  metadata.image        - The artwork image URL.
+ * @param {string}  metadata.imageAlt     - The artwork image alt text.
+ * @param {boolean} showPlayButtonArtwork - Whether to show artwork on the play button.
  */
-function updatePlayerMetadata( instance, { title, artist, image, imageAlt } ) {
+function updatePlayerMetadata(
+	player,
+	{ title, artist, image, imageAlt },
+	showPlayButtonArtwork
+) {
+	const { instance, container } = player;
+
 	if ( instance.titleEl ) {
 		instance.titleEl.textContent = title ?? '';
 	}
@@ -41,6 +52,9 @@ function updatePlayerMetadata( instance, { title, artist, image, imageAlt } ) {
 	} else if ( instance.artworkEl && image ) {
 		instance.artworkEl.src = image;
 		instance.artworkEl.alt = imageAlt || '';
+	}
+	if ( showPlayButtonArtwork ) {
+		setupPlayButtonArtwork( container, image );
 	}
 }
 
@@ -149,17 +163,21 @@ export function WaveformPlayer( {
 
 	useEffect( () => {
 		if ( playerRef.current?.instance ) {
-			const instance = playerRef.current?.instance;
-			if ( instance ) {
-				updatePlayerMetadata( instance, {
-					title,
-					artist,
-					image,
-					imageAlt,
-				} );
+			const player = playerRef.current;
+			if ( player ) {
+				updatePlayerMetadata(
+					player,
+					{
+						title,
+						artist,
+						image,
+						imageAlt,
+					},
+					showPlayButtonArtwork
+				);
 			}
 		}
-	}, [ title, artist, image, imageAlt ] );
+	}, [ title, artist, image, imageAlt, showPlayButtonArtwork ] );
 
 	useEffect( () => {
 		if ( src && playerRef.current?.instance ) {
@@ -173,13 +191,19 @@ export function WaveformPlayer( {
 					artworkAlt: metadataRef.current.imageAlt,
 				}
 			);
-			if ( ! wasPlaying ) {
-				promise.then( () => {
-					playerRef.current.instance.pause();
-				} );
-			}
+			promise.then( () => {
+				if ( showPlayButtonArtwork && playerRef.current?.container ) {
+					setupPlayButtonArtwork(
+						playerRef.current.container,
+						metadataRef.current.image
+					);
+				}
+				if ( ! wasPlaying ) {
+					playerRef.current?.instance.pause();
+				}
+			} );
 		}
-	}, [ src ] );
+	}, [ src, showPlayButtonArtwork ] );
 
 	return <div ref={ ref } className="wp-block-playlist__waveform-player" />;
 }
