@@ -136,7 +136,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			label: __( 'Desktop' ),
 			icon: desktop,
 			info: isResponsiveEditing
-				? __( 'Edit all viewports.' )
+				? __( 'Style all viewports.' )
 				: __( 'Preview desktop viewport.' ),
 		},
 		...( hasTabletViewport
@@ -146,7 +146,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 						label: __( 'Tablet' ),
 						icon: tablet,
 						info: isResponsiveEditing
-							? __( 'Edit tablet only.' )
+							? __( 'Style tablet only.' )
 							: __( 'Preview tablet viewport.' ),
 					},
 			  ]
@@ -158,7 +158,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 						label: __( 'Mobile' ),
 						icon: mobile,
 						info: isResponsiveEditing
-							? __( 'Edit mobile only.' )
+							? __( 'Style mobile only.' )
 							: __( 'Preview mobile viewport.' ),
 					},
 			  ]
