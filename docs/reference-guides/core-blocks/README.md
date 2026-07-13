@@ -969,6 +969,27 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** isLink, level, levelOptions, linkTarget
 
+## Slide
+
+A single slide inside Slider.
+
+-	**Name:** [core/slide](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slide/)
+-	**Experimental:** true
+-	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
+-	**Parent:** core/slider
+-	**Supports:** anchor, color (background, text), layout, renaming, spacing (padding), ~~html~~, ~~reusable~~
+
+## Slider
+
+Display content in a carousel.
+
+-	**Name:** [core/slider](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slider/)
+-	**Experimental:** true
+-	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
+-	**Allowed Blocks:** core/slide
+-	**Supports:** align (full, wide), anchor, color (background, text), interactivity, renaming, spacing (blockGap, margin, padding), ~~html~~
+-	**Attributes:** editorActiveSlideIndex, peekAmount, peekUnit
+
 ## Social Icon
 
 Display an icon linking to a social profile or site.

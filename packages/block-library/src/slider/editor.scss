@@ -1,0 +1,68 @@
+@use "./shared.scss" as *;
+
+.wp-block-slider__viewport {
+	overflow: hidden;
+	overscroll-behavior-x: contain;
+	scroll-behavior: auto;
+	scroll-snap-type: none;
+}
+
+.wp-block-slider__track,
+.wp-block-slider__track.block-editor-block-list__layout {
+	position: relative;
+	display: block;
+	overflow: hidden;
+	inline-size: 100%;
+}
+
+.wp-block-slider__track .wp-block-slide {
+	scroll-margin-inline-start: 0;
+	scroll-snap-align: none;
+}
+
+.wp-block-slider__track .wp-block-slide.is-editor-active-slide {
+	position: relative;
+	z-index: 1;
+	inline-size: var(--slider-slide-size);
+	margin-inline: var(--slider-edge-space);
+}
+
+.wp-block-slider__track
+.wp-block-slide.is-editor-active-slide.is-editor-first-slide.is-editor-last-slide {
+	inline-size: 100%;
+	margin-inline: 0;
+}
+
+.wp-block-slider__track .wp-block-slide.is-editor-previous-slide,
+.wp-block-slider__track .wp-block-slide.is-editor-next-slide {
+	position: absolute;
+	inset-block: 0;
+	z-index: 0;
+	inline-size: var(--slider-slide-size);
+	overflow: hidden;
+	pointer-events: none;
+	user-select: none;
+}
+
+.wp-block-slider__track .wp-block-slide.is-editor-previous-slide {
+	inset-inline-start: calc(var(--slider-edge-space) - var(--slider-slide-size) - var(--slider-gap));
+}
+
+.wp-block-slider__track .wp-block-slide.is-editor-next-slide {
+	inset-inline-start:
+		calc(var(--slider-edge-space) + var(--slider-slide-size) +
+		var(--slider-gap));
+}
+
+.wp-block-slider__controls {
+	pointer-events: none;
+}
+
+.wp-block-slider__arrow {
+	cursor: default;
+	transition: none;
+}
+
+.wp-block-slider__dot {
+	transition: none;
+}

@@ -1110,6 +1110,18 @@
 		"parent": "core-blocks-theme"
 	},
 	{
+		"title": "Slide",
+		"slug": "core-block-slide",
+		"markdown_source": "../packages/block-library/src/slide/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Slider",
+		"slug": "core-block-slider",
+		"markdown_source": "../packages/block-library/src/slider/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
 		"title": "Social Icon",
 		"slug": "core-block-social-link",
 		"markdown_source": "../packages/block-library/src/social-link/README.md",
