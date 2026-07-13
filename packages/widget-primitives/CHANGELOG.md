@@ -6,9 +6,10 @@
 
 -   `WidgetAttributeField< Item >`: authoring helper narrowing a DataViews
     `Field.id` to the widget's attribute keys.
--   Field type registry: `registerFieldType` names a reusable field type;
-    `useWidgetTypes` resolves attributes referencing registered names into
-    plain DataViews `Field` props ([#80148](https://github.com/WordPress/gutenberg/pull/80148)).
+-   Field type registry: `registerFieldType` names a reusable field type,
+    plain (`location`) or namespaced (`acme/rating`); `useWidgetTypes`
+    resolves attributes referencing registered names into plain DataViews
+    `Field` props ([#80148](https://github.com/WordPress/gutenberg/pull/80148)).
 
 ### Enhancements
 
