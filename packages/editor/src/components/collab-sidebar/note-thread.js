@@ -11,7 +11,7 @@ import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { useDebounce } from '@wordpress/compose';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	store as blockEditorStore,
@@ -51,6 +51,7 @@ export function NoteThread( {
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const registry = useRegistry();
 	const relatedBlockElement = useBlockElement( note.blockClientId );
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
@@ -140,7 +141,20 @@ export function NoteThread( {
 		clearTimeout( blurDeselectTimeoutRef.current );
 		blurDeselectTimeoutRef.current = setTimeout( () => {
 			toggleBlockHighlight( note.blockClientId, false );
-			onDeselectNote();
+
+			/*
+			 * Selection may have moved while the deselect was pending: clicking
+			 * a noted block in the canvas blurs this thread and then selects
+			 * the block's own thread (asynchronously, via focusNote()). Only
+			 * clear the selection if this thread still owns it, or the pending
+			 * deselect would wipe out the newly selected thread.
+			 */
+			const selectedNoteId = unlock(
+				registry.select( editorStore )
+			).getSelectedNote();
+			if ( selectedNoteId === note.id ) {
+				onDeselectNote();
+			}
 		}, 0 );
 	};
 
