@@ -911,19 +911,20 @@ export default function TypographyPanel( {
 				>
 					<LineHeightControl
 						__unstableInputWidth="auto"
-						// Local-then-inherited: render the inherited value as
-						// the control's value at rest so the numeric stepper
-						// increments from the inherited base (e.g. 1.7 → 1.8,
-						// not the default 1.5). It is only written to local on
-						// user change. Matches the ToggleGroup/FontSize controls
-						// rather than the native-placeholder pattern.
 						value={ localLineHeight ?? inheritedLineHeight }
 						onChange={ setLineHeight }
-						placeholder={
-							isLineHeightPlaceholder
-								? getNumericPlaceholder( inheritedLineHeight )
-								: undefined
-						}
+						// Only override the placeholder when there is an
+						// inherited value to surface. Passing `undefined` would
+						// clobber `LineHeightControl`'s own `BASE_DEFAULT_VALUE`
+						// (1.5) placeholder.
+						{ ...( isLineHeightPlaceholder
+							? {
+									placeholder:
+										getNumericPlaceholder(
+											inheritedLineHeight
+										),
+							  }
+							: {} ) }
 					/>
 				</InheritanceToolsPanelItem>
 			) }
