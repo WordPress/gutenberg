@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { act, renderHook } from '@testing-library/react';
+import { act, render, renderHook, waitFor } from '@testing-library/react';
 
 /**
  * WordPress dependencies
  */
-import { dispatch } from '@wordpress/data';
+import { dispatch, select } from '@wordpress/data';
 import { RawHTML } from '@wordpress/element';
 import {
 	__unstableGetInnerBlocksProps as getInnerBlocksProps,
@@ -24,10 +24,23 @@ import {
 import { store as blockEditorStore } from '../../../store';
 import { useBoundInnerBlocksProps } from '../use-bound-inner-blocks';
 import { BlockContextProvider } from '../../block-context';
+import useBlockSync from '../../provider/use-block-sync';
 
 const SOURCE_NAME = 'test/inner-blocks';
 const PARAGRAPH_MARKUP =
 	'<!-- wp:paragraph --><p>Bound paragraph</p><!-- /wp:paragraph -->';
+
+function SyncedInnerBlocks( props ) {
+	useBlockSync( props );
+	return null;
+}
+
+function BoundInnerBlocksController( { clientId, binding } ) {
+	const props = useBoundInnerBlocksProps( clientId, binding );
+	return props ? (
+		<SyncedInnerBlocks clientId={ clientId } { ...props } />
+	) : null;
+}
 
 describe( 'useBoundInnerBlocksProps', () => {
 	let mountedHooks;
@@ -95,6 +108,17 @@ describe( 'useBoundInnerBlocksProps', () => {
 		return view;
 	}
 
+	function renderBoundController( clientId, binding ) {
+		const view = render(
+			<BoundInnerBlocksController
+				clientId={ clientId }
+				binding={ binding }
+			/>
+		);
+		mountedHooks.push( view );
+		return view;
+	}
+
 	it( 'parses a serialized value from a registered source', () => {
 		registerBlockBindingsSource( {
 			name: SOURCE_NAME,
@@ -114,6 +138,21 @@ describe( 'useBoundInnerBlocksProps', () => {
 		);
 	} );
 
+	it( 'treats an empty string as an intentionally empty controlled area', () => {
+		registerBlockBindingsSource( {
+			name: SOURCE_NAME,
+			label: 'Test source',
+			getValues: () => ( { innerBlocks: '' } ),
+			setValues: () => {},
+		} );
+		const binding = { source: SOURCE_NAME };
+		const clientId = setupHost( binding );
+
+		const { result } = renderBoundHook( clientId, binding );
+
+		expect( result.current.value ).toEqual( [] );
+	} );
+
 	it( 'returns undefined when the source value is absent', () => {
 		registerBlockBindingsSource( {
 			name: SOURCE_NAME,
@@ -127,6 +166,46 @@ describe( 'useBoundInnerBlocksProps', () => {
 		const { result } = renderBoundHook( clientId, binding );
 
 		expect( result.current ).toBeUndefined();
+	} );
+
+	it.each( [ null, 1, [], {} ] )(
+		'treats a non-string source value as absent: %p',
+		( sourceValue ) => {
+			registerBlockBindingsSource( {
+				name: SOURCE_NAME,
+				label: 'Test source',
+				getValues: () => ( { innerBlocks: sourceValue } ),
+				setValues: () => {},
+			} );
+			const binding = { source: SOURCE_NAME };
+			const clientId = setupHost( binding );
+
+			const { result } = renderBoundHook( clientId, binding );
+
+			expect( result.current ).toBeUndefined();
+		}
+	);
+
+	it( 'normalizes malformed source arguments to absence', () => {
+		const getValues = jest.fn( () => ( {
+			innerBlocks: PARAGRAPH_MARKUP,
+		} ) );
+		registerBlockBindingsSource( {
+			name: SOURCE_NAME,
+			label: 'Test source',
+			getValues,
+			setValues: () => {},
+		} );
+		const binding = { source: SOURCE_NAME, args: 'not-an-object' };
+		const clientId = setupHost( binding );
+
+		renderBoundHook( clientId, binding );
+
+		expect( getValues ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				bindings: { innerBlocks: { args: undefined } },
+			} )
+		);
 	} );
 
 	it( 'fails closed for a nonempty source without fallback children', () => {
@@ -183,6 +262,163 @@ describe( 'useBoundInnerBlocksProps', () => {
 					} ),
 				},
 			} )
+		);
+	} );
+
+	it( 'drops writes after the host no longer owns controlled inner blocks', () => {
+		const setValues = jest.fn();
+		registerBlockBindingsSource( {
+			name: SOURCE_NAME,
+			label: 'Test source',
+			getValues: () => ( { innerBlocks: PARAGRAPH_MARKUP } ),
+			setValues,
+		} );
+		const binding = { source: SOURCE_NAME };
+		const clientId = setupHost( binding );
+		const { result } = renderBoundHook( clientId, binding );
+
+		act( () => {
+			result.current.onChange( [
+				createBlock( 'core/paragraph', { content: 'Stale edit' } ),
+			] );
+		} );
+
+		expect( setValues ).not.toHaveBeenCalled();
+	} );
+
+	it( 'marks block-editor source writes as non-persistent only for input', () => {
+		const markNextChange = jest.spyOn(
+			dispatch( blockEditorStore ),
+			'__unstableMarkNextChangeAsNotPersistent'
+		);
+		registerBlockBindingsSource( {
+			name: SOURCE_NAME,
+			label: 'Test source',
+			getValues: () => ( { innerBlocks: PARAGRAPH_MARKUP } ),
+			setValues: ( { dispatch: sourceDispatch } ) => {
+				sourceDispatch( blockEditorStore );
+			},
+		} );
+		const binding = { source: SOURCE_NAME };
+		const clientId = setupHost( binding );
+		const { result } = renderBoundHook( clientId, binding );
+		act( () => {
+			dispatch( blockEditorStore ).setHasControlledInnerBlocks(
+				clientId,
+				true
+			);
+		} );
+		const editedBlocks = [
+			createBlock( 'core/paragraph', { content: 'Edited paragraph' } ),
+		];
+
+		act( () => {
+			result.current.onInput( editedBlocks );
+		} );
+		expect( markNextChange ).toHaveBeenCalledTimes( 1 );
+
+		markNextChange.mockClear();
+		act( () => {
+			result.current.onChange( editedBlocks );
+		} );
+		expect( markNextChange ).not.toHaveBeenCalled();
+		markNextChange.mockRestore();
+	} );
+
+	it( 'keeps the same edited block mounted when the source echoes typing', async () => {
+		let sourceValue = PARAGRAPH_MARKUP;
+		const setValues = jest.fn( ( { bindings } ) => {
+			sourceValue = bindings.innerBlocks.newValue;
+		} );
+		registerBlockBindingsSource( {
+			name: SOURCE_NAME,
+			label: 'Test source',
+			getValues: () => ( { innerBlocks: sourceValue } ),
+			setValues,
+		} );
+		const binding = { source: SOURCE_NAME };
+		const clientId = setupHost( binding );
+		const view = renderBoundController( clientId, binding );
+		await waitFor( () =>
+			expect(
+				select( blockEditorStore ).getBlocks( clientId )[ 0 ]
+					?.attributes.content
+			).toBe( 'Bound paragraph' )
+		);
+		const initialChild =
+			select( blockEditorStore ).getBlocks( clientId )[ 0 ];
+
+		act( () => {
+			dispatch(
+				blockEditorStore
+			).__unstableMarkNextChangeAsNotPersistent();
+			dispatch( blockEditorStore ).updateBlockAttributes(
+				initialChild.clientId,
+				{ content: 'Typed paragraph' }
+			);
+		} );
+		view.rerender(
+			<BoundInnerBlocksController
+				clientId={ clientId }
+				binding={ { ...binding, args: { revision: 1 } } }
+			/>
+		);
+		await waitFor( () =>
+			expect(
+				select( blockEditorStore ).getBlocks( clientId )[ 0 ]
+					?.attributes.content
+			).toBe( 'Typed paragraph' )
+		);
+
+		const echoedChild =
+			select( blockEditorStore ).getBlocks( clientId )[ 0 ];
+		expect( setValues ).toHaveBeenCalled();
+		expect( sourceValue ).toContain( 'Typed paragraph' );
+		expect( echoedChild.clientId ).toBe( initialChild.clientId );
+		expect( echoedChild.attributes.content ).toBe( 'Typed paragraph' );
+	} );
+
+	it( 'keeps the current children when control is released', async () => {
+		registerBlockBindingsSource( {
+			name: SOURCE_NAME,
+			label: 'Test source',
+			getValues: () => ( { innerBlocks: PARAGRAPH_MARKUP } ),
+			setValues: () => {},
+		} );
+		const binding = { source: SOURCE_NAME };
+		const clientId = setupHost( binding );
+		const view = renderBoundController( clientId, binding );
+		await waitFor( () =>
+			expect(
+				select( blockEditorStore ).getBlocks( clientId )[ 0 ]
+					?.attributes.content
+			).toBe( 'Bound paragraph' )
+		);
+
+		expect(
+			select( blockEditorStore ).getBlocks( clientId )[ 0 ].attributes
+				.content
+		).toBe( 'Bound paragraph' );
+
+		view.rerender(
+			<BoundInnerBlocksController
+				clientId={ clientId }
+				binding={ undefined }
+			/>
+		);
+		await waitFor( () =>
+			expect(
+				select( blockEditorStore ).areInnerBlocksControlled( clientId )
+			).toBe( false )
+		);
+
+		const restoredBlocks = select( blockEditorStore ).getBlocks( clientId );
+		expect(
+			select( blockEditorStore ).areInnerBlocksControlled( clientId )
+		).toBe( false );
+		expect( restoredBlocks ).toHaveLength( 1 );
+		expect( restoredBlocks[ 0 ].attributes.content ).toBe(
+			'Bound paragraph'
 		);
 	} );
 

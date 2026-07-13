@@ -9,23 +9,23 @@ import {
 } from '../block-bindings';
 
 describe( 'getInnerBlocksBinding', () => {
-	it( 'returns a structural binding from any registered-source descriptor', () => {
+	it( 'returns a pattern-overrides structural binding on a Core host', () => {
 		expect(
 			getInnerBlocksBinding(
 				{
 					metadata: {
 						bindings: {
 							innerBlocks: {
-								source: 'test/source',
+								source: 'core/pattern-overrides',
 								args: { key: 'value' },
 							},
 						},
 					},
 				},
-				'test/container'
+				'core/group'
 			)
 		).toEqual( {
-			source: 'test/source',
+			source: 'core/pattern-overrides',
 			args: { key: 'value' },
 		} );
 	} );
@@ -46,11 +46,29 @@ describe( 'getInnerBlocksBinding', () => {
 				{
 					metadata: {
 						bindings: {
-							innerBlocks: { source: 'test/source' },
+							innerBlocks: {
+								source: 'core/pattern-overrides',
+							},
 						},
 					},
 				},
 				'core/html'
+			)
+		).toBeUndefined();
+	} );
+
+	it.each( [
+		[ 'a custom source', 'core/group', 'test/source' ],
+		[ 'a custom host', 'test/container', 'core/pattern-overrides' ],
+	] )( 'excludes %s', ( _description, blockName, source ) => {
+		expect(
+			getInnerBlocksBinding(
+				{
+					metadata: {
+						bindings: { innerBlocks: { source } },
+					},
+				},
+				blockName
 			)
 		).toBeUndefined();
 	} );

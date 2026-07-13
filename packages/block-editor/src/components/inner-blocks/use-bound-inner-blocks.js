@@ -43,7 +43,12 @@ export function useBoundInnerBlocksProps( clientId, binding, blockType ) {
 		typeof binding?.source === 'string' && binding.source !== ''
 			? binding.source
 			: undefined;
-	const args = sourceName ? binding?.args : undefined;
+	const args =
+		sourceName &&
+		binding?.args !== null &&
+		typeof binding?.args === 'object'
+			? binding.args
+			: undefined;
 	const source = useSelect(
 		( select ) =>
 			sourceName

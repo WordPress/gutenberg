@@ -59,13 +59,16 @@ export function getBlockBindingsContext(
 }
 
 /**
- * Reserved binding key for a block's structural InnerBlocks area.
+ * Reserved binding key for a block's structural InnerBlocks area. Its value is
+ * serialized block markup; `undefined`/`null` falls back to the block's own
+ * inner blocks and `''` represents an intentionally empty area.
  */
 export const INNER_BLOCKS_BINDING_KEY = 'innerBlocks';
 
 /**
  * Gets a usable structural binding descriptor from block attributes.
  *
+ * The private experiment is restricted to pattern overrides on Core blocks.
  * `core/html` owns several interleaved editable areas rather than one ordinary
  * InnerBlocks area, so it is excluded until it has a separate contract.
  *
@@ -77,16 +80,14 @@ export function getInnerBlocksBinding(
 	attributes: Record< string, any > | undefined,
 	blockName: string | undefined
 ): InnerBlocksBinding | undefined {
-	if ( blockName === 'core/html' ) {
+	if ( ! blockName?.startsWith( 'core/' ) || blockName === 'core/html' ) {
 		return undefined;
 	}
 
 	const binding =
 		attributes?.metadata?.bindings?.[ INNER_BLOCKS_BINDING_KEY ];
 
-	return typeof binding?.source === 'string' && binding.source !== ''
-		? binding
-		: undefined;
+	return binding?.source === PATTERN_OVERRIDES_SOURCE ? binding : undefined;
 }
 
 /**
