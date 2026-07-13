@@ -30,6 +30,7 @@
 		"execa": "^4.0.2",
 		"fast-glob": "^3.2.7",
 		"node-fetch": "^2.7.0",
+		"node-jq": "^6.3.1",
 		"rimraf": "^5.0.10",
 		"semver": "^7.5.4",
 		"simple-git": "^3.24.0",

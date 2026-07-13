@@ -78,7 +78,13 @@ npm run build -- --skip-types
 # builds keep the full library.
 if [ "$IS_WORDPRESS_CORE" = "true" ]; then
 	status "Pruning non-public icons for WordPress Core... ✂️"
-	node packages/icons/lib/prune-non-public-icons.cjs
+	(
+  	cd packages/icons/src
+  	comm -13 \
+  		<(jq -r "map(select(.public) | .filePath)[]" manifest.json | sort) \
+  		<(ls library/*.svg) |
+  		xargs rm
+  )
 fi
 
 # Generate the plugin zip file.
