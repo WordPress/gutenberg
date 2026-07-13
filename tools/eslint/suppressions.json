@@ -308,11 +308,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/cover/edit/embed-video-url-input.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/cover/edit/index.js": {
 		"react-hooks/refs": {
 			"count": 2
