@@ -598,9 +598,13 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 				const lineHeightInput = screen.getByLabelText( /line height/i );
 				expect( lineHeightInput ).toHaveValue( null );
-				// The native `placeholder` attribute is not set
-				// because the inherited leaf is explicit-empty.
-				expect( lineHeightInput ).not.toHaveAttribute( 'placeholder' );
+				// The explicit-empty inherited leaf is not surfaced as an
+				// inherited placeholder; `LineHeightControl` falls back to its
+				// own `BASE_DEFAULT_VALUE` (1.5) default placeholder instead.
+				expect( lineHeightInput ).toHaveAttribute(
+					'placeholder',
+					'1.5'
+				);
 			}
 		);
 	} );
@@ -630,7 +634,10 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 		const lineHeightInput = screen.getByLabelText( /line height/i );
 		expect( lineHeightInput ).toHaveValue( 0 );
-		expect( lineHeightInput ).not.toHaveAttribute( 'placeholder' );
+		// The inherited line height ('2') must not leak in as a placeholder;
+		// `LineHeightControl`'s own default (1.5) may remain, but the value is
+		// the local zero override.
+		expect( lineHeightInput ).not.toHaveAttribute( 'placeholder', '2' );
 
 		const columnsInput = screen.getByLabelText( /columns/i );
 		expect( columnsInput ).toHaveValue( 0 );

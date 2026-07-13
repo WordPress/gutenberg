@@ -179,7 +179,7 @@ const getPaddingSliders = () =>
 
 describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 	describe( 'layout content width', () => {
-		it( 'renders an inherited contentSize as placeholder when `value` is empty', () => {
+		it( 'renders an inherited contentSize as the control value when `value` is empty', () => {
 			renderPanel( {
 				value: {},
 				inheritedValue: { layout: { contentSize: '720px' } },
@@ -188,8 +188,15 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			} );
 
 			const contentInput = screen.getByLabelText( /content width/i );
-			expect( contentInput ).toHaveValue( null );
-			expect( contentInput ).toHaveAttribute( 'placeholder', '720px' );
+			// The inherited value is rendered as the control value (so the
+			// unit parses from it) and marked at-rest, with only the numeric
+			// portion echoed as the placeholder; the raw unit must not leak in.
+			expect( contentInput ).toHaveValue( 720 );
+			expect( contentInput ).toHaveAttribute( 'placeholder', '720' );
+			expect( contentInput ).not.toHaveAttribute(
+				'placeholder',
+				'720px'
+			);
 		} );
 
 		it( 'renders a locally-set contentSize as the value with no placeholder', () => {
@@ -205,7 +212,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			expect( contentInput ).not.toHaveAttribute( 'placeholder' );
 		} );
 
-		it( 'renders an inherited wideSize as placeholder independently of contentSize state', () => {
+		it( 'renders an inherited wideSize as the control value independently of contentSize state', () => {
 			renderPanel( {
 				value: { layout: { contentSize: '900px' } },
 				inheritedValue: {
@@ -219,10 +226,11 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			const contentInput = screen.getByLabelText( /content width/i );
 			expect( contentInput ).toHaveValue( 900 );
 
-			// wideSize: not locally set, placeholder active.
+			// wideSize: not locally set, rendered as the at-rest control value.
 			const wideInput = screen.getByLabelText( /wide width/i );
-			expect( wideInput ).toHaveValue( null );
-			expect( wideInput ).toHaveAttribute( 'placeholder', '1280px' );
+			expect( wideInput ).toHaveValue( 1280 );
+			expect( wideInput ).toHaveAttribute( 'placeholder', '1280' );
+			expect( wideInput ).not.toHaveAttribute( 'placeholder', '1280px' );
 		} );
 
 		it( 'commits a local contentSize override on user input without copying any inherited value into other paths (strip-not-copy)', async () => {
