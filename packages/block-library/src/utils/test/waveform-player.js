@@ -8,10 +8,11 @@ import { act, render } from '@testing-library/react';
  * Internal dependencies
  */
 import { WaveformPlayer } from '../waveform-player';
-import { initWaveformPlayer } from '../waveform-utils';
+import { initWaveformPlayer, setupPlayButtonArtwork } from '../waveform-utils';
 
 jest.mock( '../waveform-utils', () => ( {
 	initWaveformPlayer: jest.fn(),
+	setupPlayButtonArtwork: jest.fn(),
 	updateSeekControlLabel: jest.fn(),
 } ) );
 
@@ -26,13 +27,15 @@ jest.mock( '../waveform-utils', () => ( {
 function createFakePlayer( options, element ) {
 	const titleEl = document.createElement( 'span' );
 	titleEl.textContent = options.title ?? '';
-	let artistEl;
+	// The artist and artwork elements only exist when the track had an
+	// artist/player artwork when the player was created, mirroring the library markup.
+	let artistEl = null;
 	if ( options.artist ) {
 		artistEl = document.createElement( 'span' );
 		artistEl.textContent = options.artist;
 	}
-	let artworkEl;
-	if ( options.image ) {
+	let artworkEl = null;
+	if ( options.image && ! options.showPlayButtonArtwork ) {
 		artworkEl = document.createElement( 'img' );
 		artworkEl.src = options.image;
 		artworkEl.alt = options.imageAlt || '';
@@ -89,6 +92,7 @@ function createFakePlayer( options, element ) {
 
 	return {
 		instance,
+		container: element,
 		destroy: jest.fn(),
 	};
 }
@@ -105,6 +109,7 @@ describe( 'WaveformPlayer', () => {
 		jest.runOnlyPendingTimers();
 		jest.useRealTimers();
 		initWaveformPlayer.mockReset();
+		setupPlayButtonArtwork.mockReset();
 	} );
 
 	const baseProps = {
@@ -112,7 +117,7 @@ describe( 'WaveformPlayer', () => {
 		title: 'Original Title',
 		artist: 'Original Artist',
 		image: 'https://example.com/cover.jpg',
-		imageAlt: 'A bright abstract album cover',
+		imageAlt: 'A bright abstract track image',
 		onEnded: () => {},
 	};
 
@@ -131,9 +136,63 @@ describe( 'WaveformPlayer', () => {
 				title: 'Original Title',
 				artist: 'Original Artist',
 				image: 'https://example.com/cover.jpg',
-				imageAlt: 'A bright abstract album cover',
+				imageAlt: 'A bright abstract track image',
+				showPlayButtonArtwork: false,
 			} )
 		);
+	} );
+
+	it( 'passes the play button artwork option to the shared player', () => {
+		render( <WaveformPlayer { ...baseProps } showPlayButtonArtwork /> );
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		expect( initWaveformPlayer ).toHaveBeenCalledWith(
+			expect.anything(),
+			expect.objectContaining( {
+				showPlayButtonArtwork: true,
+			} )
+		);
+	} );
+
+	it( 'omits separate player artwork when play button artwork is enabled', () => {
+		render( <WaveformPlayer { ...baseProps } showPlayButtonArtwork /> );
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		const player = initWaveformPlayer.mock.results[ 0 ].value;
+
+		expect( player.instance.artworkEl ).toBeNull();
+	} );
+
+	it( 'updates play button artwork when artwork metadata changes', () => {
+		const { rerender } = render(
+			<WaveformPlayer { ...baseProps } showPlayButtonArtwork />
+		);
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		const player = initWaveformPlayer.mock.results[ 0 ].value;
+
+		rerender(
+			<WaveformPlayer
+				{ ...baseProps }
+				image="https://example.com/new.jpg"
+				showPlayButtonArtwork
+			/>
+		);
+
+		expect( setupPlayButtonArtwork ).toHaveBeenCalledWith(
+			player.container,
+			'https://example.com/new.jpg'
+		);
+		expect( player.instance.artworkEl ).toBeNull();
 	} );
 
 	it( 'updates metadata on the live player without recreating it', () => {
@@ -198,9 +257,38 @@ describe( 'WaveformPlayer', () => {
 			'Original Artist',
 			{
 				artwork: 'https://example.com/cover.jpg',
-				artworkAlt: 'A bright abstract album cover',
+				artworkAlt: 'A bright abstract track image',
 			}
 		);
+	} );
+
+	it( 'recreates the player when play button artwork is toggled', () => {
+		const { rerender } = render(
+			<WaveformPlayer { ...baseProps } showPlayButtonArtwork={ false } />
+		);
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		const player = initWaveformPlayer.mock.results[ 0 ].value;
+
+		rerender( <WaveformPlayer { ...baseProps } showPlayButtonArtwork /> );
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		expect( player.destroy ).toHaveBeenCalledTimes( 1 );
+		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 2 );
+		expect( initWaveformPlayer.mock.calls[ 1 ][ 1 ] ).toEqual(
+			expect.objectContaining( {
+				showPlayButtonArtwork: true,
+			} )
+		);
+		expect(
+			initWaveformPlayer.mock.results[ 1 ].value.instance.artworkEl
+		).toBeNull();
 	} );
 
 	it( 'updates the player in place to show an image added to a track that had none', () => {

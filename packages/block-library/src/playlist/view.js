@@ -9,6 +9,7 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
 import {
 	initWaveformPlayer,
 	logPlayError,
+	setupPlayButtonArtwork,
 	updateSeekControlLabel,
 } from '../utils/waveform-utils';
 
@@ -103,28 +104,47 @@ const { state } = store(
  */
 function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const existing = playerState.get( ref );
+	const showPlayButtonArtwork = context.showPlayButtonArtwork === true;
+	const playerArtwork = showPlayButtonArtwork ? '' : track.image;
 
 	// If a player already exists, load the new track without recreating.
 	if ( existing?.instance ) {
-		playlistPlayerState.set( context.playlistId, existing );
-		existing.instance
-			.loadTrack( track.url, track.title, track.artist, {
-				artwork: track.image,
-				artworkAlt: track.imageAlt,
-			} )
-			.then( () => {
-				existing.url = track.url;
-				// loadTrack() preserves the previous explicit seekLabel option.
-				updateSeekControlLabel(
-					existing.instance,
-					track.title || ref.dataset.labelSeek
-				);
-				if ( shouldAutoPlay ) {
-					existing.instance.play()?.catch( logPlayError );
-				}
-			} )
-			.catch( logPlayError );
-		return;
+		const shouldRecreatePlayer =
+			!! existing.instance.artworkEl !== !! playerArtwork;
+
+		if ( shouldRecreatePlayer ) {
+			existing.destroy?.();
+			playerState.delete( ref );
+		} else {
+			playlistPlayerState.set( context.playlistId, existing );
+			existing.instance
+				.loadTrack( track.url, track.title, track.artist, {
+					artwork: playerArtwork,
+					artworkAlt: playerArtwork ? track.imageAlt : '',
+				} )
+				.then( () => {
+					existing.url = track.url;
+					if ( existing.instance.artworkEl ) {
+						existing.instance.artworkEl.alt = track.imageAlt || '';
+					}
+					// loadTrack() preserves the previous explicit seekLabel option.
+					updateSeekControlLabel(
+						existing.instance,
+						track.title || ref.dataset.labelSeek
+					);
+					if ( showPlayButtonArtwork ) {
+						setupPlayButtonArtwork(
+							existing.container,
+							track.image
+						);
+					}
+					if ( shouldAutoPlay ) {
+						existing.instance.play()?.catch( logPlayError );
+					}
+				} )
+				.catch( logPlayError );
+			return;
+		}
 	}
 
 	// Read translated labels from server-rendered data attributes.
@@ -145,6 +165,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		autoPlay: shouldAutoPlay,
 		labels,
 		waveformStyle: context.waveformStyle,
+		showPlayButtonArtwork,
 		onEnded: () => {
 			// Advance to next track (autoPlay handles playback).
 			const currentIndex = context.tracks.findIndex(
@@ -175,6 +196,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const nextState = {
 		url: track.url,
 		instance: player.instance,
+		container: player.container,
 		destroy,
 	};
 	playerState.set( ref, nextState );

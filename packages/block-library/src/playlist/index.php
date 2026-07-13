@@ -17,10 +17,10 @@
  * @return string Returns the Playlist.
  */
 function render_block_core_playlist( $attributes, $content, $block ) {
-	$playlist_id     = wp_unique_id( 'playlist-' );
-	$playlist_tracks = array();
-	$tracks_data     = array();
-	$show_images     = $attributes['showImages'] ?? true;
+	$playlist_id              = wp_unique_id( 'playlist-' );
+	$playlist_tracks          = array();
+	$tracks_data              = array();
+	$show_play_button_artwork = ! empty( $attributes['showPlayButtonArtwork'] );
 
 	// Parse inner blocks to extract track data.
 	// This approach avoids duplicating track data in the HTML output.
@@ -63,8 +63,8 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					'title'     => wp_strip_all_tags( $title ),
 					'artist'    => wp_strip_all_tags( $artist ),
 					'album'     => wp_strip_all_tags( $album ),
-					'image'     => $show_images ? esc_url( $image ) : '',
-					'imageAlt'  => $show_images ? wp_strip_all_tags( $image_alt ) : '',
+					'image'     => esc_url( $image ),
+					'imageAlt'  => wp_strip_all_tags( $image_alt ),
 					'ariaLabel' => wp_strip_all_tags( $aria_label ),
 				);
 			}
@@ -124,13 +124,14 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 		'data-wp-context',
 		wp_json_encode(
 			array(
-				'playlistId'       => $playlist_id,
-				'currentId'        => $playlist_tracks[0],
-				'isPlaying'        => false,
-				'tracks'           => $playlist_tracks,
-				'waveformStyle'    => $waveform_style,
-				'labelPauseTrack'  => __( 'Pause' ),
-				'labelSelectTrack' => __( 'Play' ),
+				'playlistId'            => $playlist_id,
+				'currentId'             => $playlist_tracks[0],
+				'isPlaying'             => false,
+				'tracks'                => $playlist_tracks,
+				'waveformStyle'         => $waveform_style,
+				'showPlayButtonArtwork' => $show_play_button_artwork,
+				'labelPauseTrack'       => __( 'Pause' ),
+				'labelSelectTrack'      => __( 'Play' ),
 			)
 		)
 	);

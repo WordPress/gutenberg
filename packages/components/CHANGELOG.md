@@ -35,6 +35,7 @@
 
 ### Enhancements
 
+-   Update emphasized labels and controls from the legacy medium weight to the emphasis font-weight token, and align the default font-family stack with the `@wordpress/theme` body token ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 -   `Button`: Align focus rings with the design system ([#78646](https://github.com/WordPress/gutenberg/pull/78646)).
 -   The `size` prop no longer has any effect and can be safely removed from the following:

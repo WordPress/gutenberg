@@ -252,6 +252,70 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 
 	/**
 	 * @covers ::render_block_core_playlist
+	 */
+	public function test_track_image_remains_in_interactivity_state_when_tracklist_images_are_disabled() {
+		$markup = $this->build_playlist_markup(
+			array(
+				'showImages'            => false,
+				'showPlayButtonArtwork' => false,
+			),
+			array(
+				array(
+					'id'       => 1,
+					'title'    => 'Song One',
+					'src'      => 'http://example.com/song1.mp3',
+					'image'    => 'http://example.com/image1.jpg',
+					'imageAlt' => 'A bright abstract track image',
+				),
+			)
+		);
+
+		do_blocks( $markup );
+
+		$state    = wp_interactivity_state( 'core/playlist' );
+		$playlist = reset( $state['playlists'] );
+		$track    = $playlist['tracks']['track-0'];
+
+		$this->assertSame( 'http://example.com/image1.jpg', $track['image'] );
+		$this->assertSame( 'A bright abstract track image', $track['imageAlt'] );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 */
+	public function test_track_image_is_available_for_play_button_artwork_when_images_are_disabled() {
+		$markup = $this->build_playlist_markup(
+			array(
+				'showImages'            => false,
+				'showPlayButtonArtwork' => true,
+			),
+			array(
+				array(
+					'id'       => 1,
+					'title'    => 'Song One',
+					'src'      => 'http://example.com/song1.mp3',
+					'image'    => 'http://example.com/image1.jpg',
+					'imageAlt' => 'A bright abstract track image',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+		$p      = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( 'figure' );
+		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
+
+		$state    = wp_interactivity_state( 'core/playlist' );
+		$playlist = reset( $state['playlists'] );
+		$track    = $playlist['tracks']['track-0'];
+
+		$this->assertTrue( $context['showPlayButtonArtwork'] );
+		$this->assertSame( 'http://example.com/image1.jpg', $track['image'] );
+		$this->assertSame( 'A bright abstract track image', $track['imageAlt'] );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
 	 * @covers ::render_block_core_playlist_track
 	 */
 	public function test_tracklist_renders_track_image_when_show_images_is_enabled() {

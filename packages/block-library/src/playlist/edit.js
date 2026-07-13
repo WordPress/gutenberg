@@ -63,6 +63,7 @@ const PlaylistEdit = ( {
 		showTracklist,
 		showNumbers,
 		showImages,
+		showPlayButtonArtwork,
 		showArtists,
 		showTrackLength,
 		waveformStyle = DEFAULT_WAVEFORM_STYLE,
@@ -271,6 +272,7 @@ const PlaylistEdit = ( {
 							showNumbers: true,
 							showTrackLength: true,
 							showImages: true,
+							showPlayButtonArtwork: false,
 							order: 'asc',
 						} );
 					} }
@@ -353,7 +355,7 @@ const PlaylistEdit = ( {
 						</>
 					) }
 					<ToolsPanelItem
-						label={ __( 'Show images' ) }
+						label={ __( 'Show tracklist images' ) }
 						isShownByDefault
 						hasValue={ () => showImages !== true }
 						onDeselect={ () =>
@@ -361,9 +363,25 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							label={ __( 'Show images' ) }
+							label={ __( 'Show tracklist images' ) }
 							onChange={ toggleAttribute( 'showImages' ) }
 							checked={ showImages }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Show track image on play button' ) }
+						isShownByDefault
+						hasValue={ () => showPlayButtonArtwork === true }
+						onDeselect={ () =>
+							setAttributes( { showPlayButtonArtwork: false } )
+						}
+					>
+						<ToggleControl
+							label={ __( 'Show track image on play button' ) }
+							onChange={ toggleAttribute(
+								'showPlayButtonArtwork'
+							) }
+							checked={ showPlayButtonArtwork === true }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
@@ -421,18 +439,11 @@ const PlaylistEdit = ( {
 						src={ currentTrackData?.src }
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
-						image={
-							showImages !== false
-								? currentTrackData?.image
-								: undefined
-						}
-						imageAlt={
-							showImages !== false
-								? currentTrackData?.imageAlt
-								: undefined
-						}
+						image={ currentTrackData?.image }
+						imageAlt={ currentTrackData?.imageAlt }
 						waveformStyle={ waveformStyle }
 						onEnded={ onTrackEnded }
+						showPlayButtonArtwork={ showPlayButtonArtwork === true }
 					/>
 				</Disabled>
 				{ showTracklist && (

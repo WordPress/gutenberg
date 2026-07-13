@@ -47,7 +47,7 @@ export function getWaveformColors( element ) {
  * @param {string} options.url           - The audio URL.
  * @param {string} options.title         - The track title.
  * @param {string} options.artist        - The track artist.
- * @param {string} options.artwork       - The album artwork URL.
+ * @param {string} options.artwork       - The track image URL.
  * @param {string} options.waveformColor - The waveform bar color.
  * @param {string} options.progressColor - The progress indicator color.
  * @param {string} options.buttonColor   - The play button color.
@@ -184,6 +184,26 @@ export function updateSeekControlLabel( instance, label ) {
 }
 
 /**
+ * Show the current artwork as the play button background.
+ *
+ * @param {Element} container  - The waveform player container element.
+ * @param {string}  artworkUrl - The track image URL.
+ */
+export function setupPlayButtonArtwork( container, artworkUrl ) {
+	if ( ! artworkUrl ) {
+		container.classList.remove( 'has-play-button-artwork' );
+		container.style.removeProperty( '--wp--playlist--play-button-artwork' );
+		return;
+	}
+
+	container.classList.add( 'has-play-button-artwork' );
+	container.style.setProperty(
+		'--wp--playlist--play-button-artwork',
+		`url(${ JSON.stringify( artworkUrl ) })`
+	);
+}
+
+/**
  * Log play errors, filtering out expected AbortError.
  *
  * @param {Error} error - The error from play().
@@ -205,17 +225,18 @@ export function logPlayError( error ) {
  * This is the shared core logic used by both the React component (editor)
  * and the Interactivity API (frontend).
  *
- * @param {Element}  element               - The container element (must be in DOM).
- * @param {Object}   options               - Configuration options.
- * @param {string}   options.src           - The audio file URL.
- * @param {string}   options.title         - The track title.
- * @param {string}   options.artist        - The artist name.
- * @param {string}   options.image         - The artwork image URL.
- * @param {string}   options.imageAlt      - The artwork image alt text.
- * @param {boolean}  options.autoPlay      - Whether to auto-play when ready.
- * @param {Function} options.onEnded       - Callback when track ends.
- * @param {Object}   options.labels        - Translated button labels.
- * @param {string}   options.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {Element}  element                       - The container element (must be in DOM).
+ * @param {Object}   options                       - Configuration options.
+ * @param {string}   options.src                   - The audio file URL.
+ * @param {string}   options.title                 - The track title.
+ * @param {string}   options.artist                - The artist name.
+ * @param {string}   options.image                 - The track image URL.
+ * @param {string}   options.imageAlt              - The track image alt text.
+ * @param {boolean}  options.autoPlay              - Whether to auto-play when ready.
+ * @param {Function} options.onEnded               - Callback when track ends.
+ * @param {Object}   options.labels                - Translated button labels.
+ * @param {string}   options.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {boolean}  options.showPlayButtonArtwork - Whether to show artwork on the play button.
  * @return {Object} Object with instance, container, and destroy function.
  */
 export function initWaveformPlayer(
@@ -230,8 +251,11 @@ export function initWaveformPlayer(
 		onEnded,
 		labels,
 		waveformStyle,
+		showPlayButtonArtwork = false,
 	}
 ) {
+	const playerArtwork = showPlayButtonArtwork ? undefined : image;
+
 	// Get colors from computed styles.
 	const { textColor, waveformColor, progressColor } =
 		getWaveformColors( element );
@@ -241,7 +265,7 @@ export function initWaveformPlayer(
 		url: src,
 		title,
 		artist,
-		artwork: image,
+		artwork: playerArtwork,
 		waveformColor,
 		progressColor,
 		buttonColor: textColor,
@@ -264,6 +288,9 @@ export function initWaveformPlayer(
 	const handlers = {
 		ready: () => {
 			styleSvgIcons( container, textColor );
+			if ( showPlayButtonArtwork ) {
+				setupPlayButtonArtwork( container, image );
+			}
 			cleanupPlayButtonAccessibility = setupPlayButtonAccessibility(
 				container,
 				labels

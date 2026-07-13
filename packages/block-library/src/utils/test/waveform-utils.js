@@ -10,6 +10,7 @@ import {
 	createWaveformContainer,
 	styleSvgIcons,
 	setupPlayButtonAccessibility,
+	setupPlayButtonArtwork,
 	updateSeekControlLabel,
 	logPlayError,
 } from '../waveform-utils';
@@ -319,6 +320,129 @@ describe( 'Waveform utilities', () => {
 			expect( () =>
 				setupPlayButtonAccessibility( container )
 			).not.toThrow();
+		} );
+	} );
+
+	describe( 'setupPlayButtonArtwork', () => {
+		it( 'should set artwork as the play button background', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			const artworkEl = document.createElement( 'img' );
+			artworkEl.src = 'https://example.com/cover.jpg';
+			container.append( playBtn, artworkEl );
+
+			setupPlayButtonArtwork(
+				container,
+				'https://example.com/cover.jpg'
+			);
+
+			expect( container ).toHaveClass( 'has-play-button-artwork' );
+			expect(
+				container.style.getPropertyValue(
+					'--wp--playlist--play-button-artwork'
+				)
+			).toBe( 'url("https://example.com/cover.jpg")' );
+			expect( artworkEl.parentElement ).toBe( container );
+		} );
+
+		it( 'should escape artwork URLs for CSS usage', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			setupPlayButtonArtwork(
+				container,
+				'https://example.com/cover "quoted".jpg'
+			);
+
+			expect(
+				container.style.getPropertyValue(
+					'--wp--playlist--play-button-artwork'
+				)
+			).toBe( 'url("https://example.com/cover \\"quoted\\".jpg")' );
+		} );
+
+		it( 'should not modify play button icon paths', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			const svg = document.createElementNS(
+				'http://www.w3.org/2000/svg',
+				'svg'
+			);
+			const path = document.createElementNS(
+				'http://www.w3.org/2000/svg',
+				'path'
+			);
+			const artworkEl = document.createElement( 'img' );
+			svg.appendChild( path );
+			playBtn.appendChild( svg );
+			container.append( playBtn, artworkEl );
+
+			setupPlayButtonArtwork(
+				container,
+				'https://example.com/cover.jpg'
+			);
+
+			expect( path ).not.toHaveStyle( { fill: '#ffffff' } );
+		} );
+
+		it( 'should set artwork state when play button is missing', () => {
+			const container = document.createElement( 'div' );
+			const artworkEl = document.createElement( 'img' );
+			container.appendChild( artworkEl );
+
+			expect( () => {
+				setupPlayButtonArtwork(
+					container,
+					'https://example.com/cover.jpg'
+				);
+			} ).not.toThrow();
+			expect( container ).toHaveClass( 'has-play-button-artwork' );
+			expect( artworkEl.parentElement ).toBe( container );
+		} );
+
+		it( 'should set button artwork when artwork element is missing', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			expect( () => {
+				setupPlayButtonArtwork(
+					container,
+					'https://example.com/cover.jpg'
+				);
+			} ).not.toThrow();
+			expect( container ).toHaveClass( 'has-play-button-artwork' );
+			expect(
+				container.style.getPropertyValue(
+					'--wp--playlist--play-button-artwork'
+				)
+			).toBe( 'url("https://example.com/cover.jpg")' );
+		} );
+
+		it( 'should clear button artwork when artwork URL is empty', () => {
+			const container = document.createElement( 'div' );
+			container.className = 'has-play-button-artwork';
+			container.style.setProperty(
+				'--wp--playlist--play-button-artwork',
+				'url("https://example.com/cover.jpg")'
+			);
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			setupPlayButtonArtwork( container, '' );
+
+			expect( container ).not.toHaveClass( 'has-play-button-artwork' );
+			expect(
+				container.style.getPropertyValue(
+					'--wp--playlist--play-button-artwork'
+				)
+			).toBe( '' );
 		} );
 	} );
 
