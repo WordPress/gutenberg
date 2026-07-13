@@ -126,6 +126,7 @@ require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/icons.php';
 require __DIR__ . '/compat/wordpress-7.1/meta-box-rtc-compat.php';
+require __DIR__ . '/compat/wordpress-7.1/pattern-blocks.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
