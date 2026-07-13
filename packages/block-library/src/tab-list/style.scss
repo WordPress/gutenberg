@@ -1,3 +1,7 @@
+.wp-block-tab-list {
+	overflow-x: auto;
+}
+
 :where(.wp-block-tab-list button) {
 	box-sizing: border-box;
 	color: inherit;
@@ -26,6 +30,9 @@
 	letter-spacing: inherit;
 	text-transform: inherit;
 	text-align: inherit;
+
+	// Ensure keyboard-focused tabs scroll into view within the tab list.
+	scroll-margin: 24px;
 
 	&[aria-selected="true"]::before {
 		content: "";
