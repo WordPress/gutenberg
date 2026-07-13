@@ -55,7 +55,6 @@ test.describe( 'Tabs', () => {
 
 		test( 'activates the next tab when the caret moves into its label with the right arrow key', async ( {
 			editor,
-			page,
 			pageUtils,
 		} ) => {
 			await editor.insertBlock(
@@ -71,8 +70,10 @@ test.describe( 'Tabs', () => {
 			await expect( editor.canvas.getByText( 'Panel 1' ) ).toBeVisible();
 			await expect( editor.canvas.getByText( 'Panel 2' ) ).toBeHidden();
 
-			await page.keyboard.press( 'End' );
-			await page.keyboard.press( 'ArrowRight' );
+			// Select all text, then arrow right twice to move the caret into the
+			// next tab.
+			await pageUtils.pressKeys( 'primary+a' );
+			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 
 			await expect( tab1 ).toHaveAttribute( 'aria-selected', 'false' );
 			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
@@ -90,7 +91,6 @@ test.describe( 'Tabs', () => {
 
 		test( 'activates the previous tab when the caret moves into its label with the left arrow key', async ( {
 			editor,
-			page,
 			pageUtils,
 		} ) => {
 			await editor.insertBlock(
@@ -106,8 +106,10 @@ test.describe( 'Tabs', () => {
 			await expect( editor.canvas.getByText( 'Panel 1' ) ).toBeHidden();
 			await expect( editor.canvas.getByText( 'Panel 2' ) ).toBeVisible();
 
-			await page.keyboard.press( 'Home' );
-			await page.keyboard.press( 'ArrowLeft' );
+			// Select all text, then arrow left twice to move the caret into the
+			// previous tab.
+			await pageUtils.pressKeys( 'primary+a' );
+			await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
 
 			await expect( tab1 ).toHaveAttribute( 'aria-selected', 'true' );
 			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'false' );
@@ -171,7 +173,10 @@ test.describe( 'Tabs', () => {
 			await tab2.click();
 			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
 
-			await page.keyboard.press( 'End' );
+			// Select all text, then arrow right to move the caret to the end of
+			// the label.
+			await pageUtils.pressKeys( 'primary+a' );
+			await pageUtils.pressKeys( 'ArrowRight' );
 			await page.keyboard.press( 'Enter' );
 
 			const tabs = editor.canvas.getByRole( 'tab' );
@@ -202,6 +207,13 @@ test.describe( 'Tabs', () => {
 			// The tab insertion is persistent, so undo removes the new tab
 			await pageUtils.pressKeys( 'primary+z' );
 			await expect( tabs ).toHaveCount( 2 );
+
+			// FIXME: Undo should activate the tab the new one was inserted from
+			// and focus its label, but the tab is left inactive and unfocused.
+			// await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
+			// await expect(
+			// 	tab2.locator( '[contenteditable="true"]' )
+			// ).toBeFocused();
 		} );
 
 		test( 'removes the tab and activates the previous one when pressing Delete on an empty tab label', async ( {
@@ -235,6 +247,17 @@ test.describe( 'Tabs', () => {
 			// The tab removal is persistent, so undo brings the tab back.
 			await pageUtils.pressKeys( 'primary+z' );
 			await expect( tabs ).toHaveCount( 2 );
+
+			// FIXME: Undo should activate the restored tab and focus its label,
+			// but the tab is left inactive and unfocused.
+			// const restoredTab = tabs.nth( 1 );
+			// await expect( restoredTab ).toHaveAttribute(
+			// 	'aria-selected',
+			// 	'true'
+			// );
+			// await expect(
+			// 	restoredTab.locator( '[contenteditable="true"]' )
+			// ).toBeFocused();
 		} );
 
 		test( 'keeps tab labels in sync when a panel is moved before', async ( {
