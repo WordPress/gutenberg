@@ -283,6 +283,12 @@ mark.wp-note {
 	overflow-y: auto;
 }
 
+// Emoji targets (quick row, skin-tone swatches, full-picker grid cells)
+// are 32px squares: an intentional compact density matching peer emoji
+// pickers (GitHub, Slack) and the editor's compact button size. This
+// clears the WCAG 2.2 AA 24px minimum (2.5.8) but not the AAA 44px
+// target of 2.5.5 (Enhanced) — at 44px an 8-column grid would exceed
+// the sidebar-anchored popover's practical width.
 .editor-collab-sidebar-panel__emoji-option {
 	width: 32px;
 	font-size: 18px;
@@ -296,25 +302,14 @@ mark.wp-note {
 //
 // `contentClassName` from `Dropdown` lands on the outer
 // `.components-popover` wrapper. The inner `.components-popover__content`
-// is where the visible surface and Dropdown's default 8px padding live —
-// override that here with a higher-specificity selector so the picker
-// can manage its own internal padding (search margin, viewport
-// padding-inline, list padding-bottom) without an extra ring of empty
-// surface around it.
+// is where Dropdown's default 8px padding lives — zero it out here so
+// the picker can manage its own internal padding (search margin,
+// viewport padding-inline, list padding-bottom) without an extra ring
+// of empty surface around it. Surface, radius, and elevation are the
+// popover defaults so the picker matches every other editor popover.
 .editor-collab-sidebar-panel__picker-popover {
 	.components-popover__content {
-		// Local elevation token; the shared `--wpds-elevation-md` was removed
-		// in #80099, which migrated call sites to component-local tokens.
-		--_wp-editor-picker-elevation-md:
-			0 2px 3px rgba(0, 0, 0, 0.05),
-			0 4px 5px rgba(0, 0, 0, 0.04),
-			0 12px 12px rgba(0, 0, 0, 0.03),
-			0 16px 16px rgba(0, 0, 0, 0.02);
-
 		padding: 0;
-		border-radius: var(--wpds-border-radius-md);
-		box-shadow: var(--_wp-editor-picker-elevation-md);
-		background-color: var(--wpds-color-background-surface-neutral-weak);
 	}
 }
 
@@ -352,6 +347,11 @@ mark.wp-note {
 
 .editor-collab-sidebar-panel__skin-tone-toggle {
 	flex-shrink: 0;
+	// A fixed 32px square so the toggle matches the compact icon-button
+	// footprint (and the 32px emoji grid cells) instead of growing with
+	// its emoji text content.
+	width: $grid-unit-40;
+	padding: 0;
 	font-size: 18px;
 	justify-content: center;
 }
@@ -408,7 +408,9 @@ mark.wp-note {
 	position: sticky;
 	top: 0;
 	padding: var(--wpds-dimension-padding-sm);
-	background-color: var(--wpds-color-background-surface-neutral-weak);
+	// Match the popover's default surface so rows scrolling underneath
+	// stay hidden.
+	background-color: $white;
 	color: var(--wpds-color-foreground-content-neutral-weak);
 	font-size: var(--wpds-typography-font-size-xs);
 	font-weight: var(--wpds-typography-font-weight-medium);
@@ -438,15 +440,17 @@ mark.wp-note {
 	cursor: var(--wpds-cursor-control);
 	font-size: 18px;
 	line-height: 1;
+	// Keep the focused cell clear of the sticky category header (and
+	// give the focus ring breathing room at the bottom edge) when
+	// keyboard navigation scrolls it into view.
+	scroll-margin-block: $grid-unit-40 $grid-unit-05;
 
 	&[data-active-item] {
 		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 	}
 
 	&:focus-visible {
-		outline:
-			var(--wpds-border-width-focus) solid
-			var(--wpds-color-stroke-focus);
-		outline-offset: -1px;
+		// Standard component focus ring.
+		@include outset-ring__focus();
 	}
 }
