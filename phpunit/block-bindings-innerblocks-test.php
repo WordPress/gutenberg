@@ -14,6 +14,19 @@ class Tests_Block_Bindings_InnerBlocks extends WP_UnitTestCase {
 	private $original_source;
 
 	public static function wpSetUpBeforeClass() {
+		/*
+		 * Core-namespaced fixtures satisfy the private binding gate without
+		 * invoking unrelated block supports such as core/group's layout cache.
+		 */
+		register_block_type(
+			'core/test-inner-host',
+			array(
+				'render_callback' => static function ( $attributes, $content ) {
+					return '<div class="inner-host">' . $content . '</div>';
+				},
+			)
+		);
+		register_block_type( 'core/test-static-inner-host', array() );
 		register_block_type(
 			'test/context-provider',
 			array(
@@ -33,6 +46,8 @@ class Tests_Block_Bindings_InnerBlocks extends WP_UnitTestCase {
 	}
 
 	public static function wpTearDownAfterClass() {
+		unregister_block_type( 'core/test-inner-host' );
+		unregister_block_type( 'core/test-static-inner-host' );
 		unregister_block_type( 'test/context-provider' );
 	}
 
@@ -72,13 +87,12 @@ class Tests_Block_Bindings_InnerBlocks extends WP_UnitTestCase {
 		parent::tear_down();
 	}
 
-	private function block_markup( $children, $attributes = array() ) {
+	private function block_markup( $name, $children, $attributes = array() ) {
 		$attributes['metadata']['bindings']['innerBlocks'] = array( 'source' => self::SOURCE_NAME );
 
-		return '<!-- wp:group ' . wp_json_encode( $attributes ) . ' -->' .
-			'<div class="wp-block-group">' .
+		return '<!-- wp:' . $name . ' ' . wp_json_encode( $attributes ) . ' -->' .
 			$children .
-			'</div><!-- /wp:group -->';
+			'<!-- /wp:' . $name . ' -->';
 	}
 
 	private function fallback_paragraph( $content = 'Fallback' ) {
@@ -90,7 +104,7 @@ class Tests_Block_Bindings_InnerBlocks extends WP_UnitTestCase {
 	}
 
 	public function test_binding_gate_accepts_pattern_overrides_on_a_core_host() {
-		$parsed = parse_blocks( $this->block_markup( $this->fallback_paragraph() ) );
+		$parsed = parse_blocks( $this->block_markup( 'group', $this->fallback_paragraph() ) );
 
 		$this->assertSame(
 			array( 'source' => self::SOURCE_NAME ),
@@ -126,7 +140,7 @@ class Tests_Block_Bindings_InnerBlocks extends WP_UnitTestCase {
 
 	public function test_registered_source_replaces_fallback_children() {
 		self::$value = $this->sourced_paragraph();
-		$parsed      = parse_blocks( $this->block_markup( $this->fallback_paragraph() ) );
+		$parsed      = parse_blocks( $this->block_markup( 'test-inner-host', $this->fallback_paragraph() ) );
 		$result      = render_block( $parsed[0] );
 
 		$this->assertStringContainsString( 'Sourced', $result );
@@ -138,7 +152,7 @@ class Tests_Block_Bindings_InnerBlocks extends WP_UnitTestCase {
 	 */
 	public function test_absent_or_invalid_values_preserve_fallback_children( $value ) {
 		self::$value = $value;
-		$parsed      = parse_blocks( $this->block_markup( $this->fallback_paragraph() ) );
+		$parsed      = parse_blocks( $this->block_markup( 'test-inner-host', $this->fallback_paragraph() ) );
 		$result      = render_block( $parsed[0] );
 
 		$this->assertStringContainsString( 'Fallback', $result );
@@ -154,16 +168,16 @@ class Tests_Block_Bindings_InnerBlocks extends WP_UnitTestCase {
 
 	public function test_empty_string_intentionally_removes_fallback_children() {
 		self::$value = '';
-		$parsed      = parse_blocks( $this->block_markup( $this->fallback_paragraph() ) );
+		$parsed      = parse_blocks( $this->block_markup( 'test-inner-host', $this->fallback_paragraph() ) );
 		$result      = render_block( $parsed[0] );
 
-		$this->assertStringContainsString( 'class="wp-block-group"', $result );
+		$this->assertStringContainsString( 'class="inner-host"', $result );
 		$this->assertStringNotContainsString( 'Fallback', $result );
 	}
 
 	public function test_empty_string_removes_fallback_children_from_a_nested_host() {
 		self::$value = '';
-		$bound       = $this->block_markup( $this->fallback_paragraph() );
+		$bound       = $this->block_markup( 'test-inner-host', $this->fallback_paragraph() );
 		$parsed      = parse_blocks(
 			'<!-- wp:test/context-provider -->' .
 			$bound .
@@ -171,24 +185,27 @@ class Tests_Block_Bindings_InnerBlocks extends WP_UnitTestCase {
 		);
 		$result      = render_block( $parsed[0] );
 
-		$this->assertStringContainsString( 'class="wp-block-group"', $result );
+		$this->assertStringContainsString( 'class="inner-host"', $result );
 		$this->assertStringNotContainsString( 'Fallback', $result );
 	}
 
 	public function test_static_host_keeps_its_wrapper() {
 		self::$value = $this->sourced_paragraph();
-		$markup      = $this->block_markup( $this->fallback_paragraph() );
+		$markup      = $this->block_markup(
+			'test-static-inner-host',
+			'<section class="static-wrapper">' . $this->fallback_paragraph() . '</section>'
+		);
 		$parsed      = parse_blocks( $markup );
 		$result      = render_block( $parsed[0] );
 
-		$this->assertStringContainsString( '<div class="wp-block-group">', $result );
+		$this->assertStringContainsString( '<section class="static-wrapper">', $result );
 		$this->assertStringContainsString( 'Sourced', $result );
 		$this->assertStringNotContainsString( 'Fallback', $result );
 	}
 
 	public function test_nested_source_receives_context_from_a_provider() {
 		self::$value = $this->sourced_paragraph();
-		$bound       = $this->block_markup( $this->fallback_paragraph() );
+		$bound       = $this->block_markup( 'test-inner-host', $this->fallback_paragraph() );
 		$parsed      = parse_blocks(
 			'<!-- wp:test/context-provider {"provided":"from-provider"} -->' .
 			$bound .
@@ -204,7 +221,7 @@ class Tests_Block_Bindings_InnerBlocks extends WP_UnitTestCase {
 		self::$value = $this->sourced_paragraph();
 		$calls       = 0;
 		$filter      = static function ( $context, $parsed_block ) use ( &$calls ) {
-			if ( 'core/group' !== ( $parsed_block['blockName'] ?? null ) ) {
+			if ( 'core/test-inner-host' !== ( $parsed_block['blockName'] ?? null ) ) {
 				return $context;
 			}
 
@@ -215,7 +232,7 @@ class Tests_Block_Bindings_InnerBlocks extends WP_UnitTestCase {
 		add_filter( 'render_block_context', $filter, 10, 3 );
 
 		try {
-			$parsed = parse_blocks( $this->block_markup( $this->fallback_paragraph() ) );
+			$parsed = parse_blocks( $this->block_markup( 'test-inner-host', $this->fallback_paragraph() ) );
 			render_block( $parsed[0] );
 		} finally {
 			remove_filter( 'render_block_context', $filter, 10 );
@@ -227,11 +244,11 @@ class Tests_Block_Bindings_InnerBlocks extends WP_UnitTestCase {
 
 	public function test_nonempty_value_fails_closed_without_a_parsed_slot() {
 		self::$value = $this->sourced_paragraph();
-		$markup      = $this->block_markup( '' );
+		$markup      = $this->block_markup( 'test-static-inner-host', '<section class="static-wrapper"></section>' );
 		$parsed      = parse_blocks( $markup );
 		$result      = render_block( $parsed[0] );
 
-		$this->assertStringContainsString( 'class="wp-block-group"', $result );
+		$this->assertStringContainsString( '<section class="static-wrapper"></section>', $result );
 		$this->assertStringNotContainsString( 'Sourced', $result );
 	}
 }
