@@ -4,7 +4,11 @@
 
 ### Enhancements
 
-- Allow `@wordpress/global-styles-engine` to opt in to private APIs. ([#79104](https://github.com/WordPress/gutenberg/pull/79104))
+-   Allow `@wordpress/global-styles-engine` to opt in to private APIs ([#79104](https://github.com/WordPress/gutenberg/pull/79104)).
+
+### Code Quality
+
+-   Remove `@wordpress/theme` and `@wordpress/ui` from private API usage, as they no longer use private APIs ([#80215](https://github.com/WordPress/gutenberg/pull/80215)).
 
 ## 1.50.0 (2026-07-01)
 
@@ -16,7 +20,7 @@
 
 ### Enhancements
 
-- Allow `@wordpress/storybook` to opt in to private APIs. ([#78814](https://github.com/WordPress/gutenberg/pull/78814))
+-   Allow `@wordpress/storybook` to opt in to private APIs ([#78814](https://github.com/WordPress/gutenberg/pull/78814)).
 
 ## 1.47.0 (2026-05-27)
 
