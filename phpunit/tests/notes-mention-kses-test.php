@@ -2,7 +2,7 @@
 /**
  * Tests that the note mention kses allowance is scoped to `note` comments.
  *
- * The `<span class="wp-note-mention user-N">` markup must survive
+ * The `<a class="wp-note-mention user-N" href="…">` markup must survive
  * sanitization when a note is written by a user without `unfiltered_html`,
  * while the sanitization of every other comment type - which reaches back to
  * anonymous front-end comments - stays byte-identical to core's defaults.
@@ -11,13 +11,20 @@
  */
 class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 
-	const MENTION_CONTENT  = 'Hi <span class="wp-note-mention user-2">@admin</span>!';
-	const STRIPPED_CONTENT = 'Hi @admin!';
+	/*
+	 * The mention href is external to the test site so that core's
+	 * wp_rel_ugc() 'pre_comment_content' filter - which applies to notes like
+	 * any other comment - deterministically appends `rel="nofollow ugc"`
+	 * regardless of the test environment's home URL.
+	 */
+	const MENTION_CONTENT  = 'Hi <a class="wp-note-mention user-2" href="https://example.com/author/admin/">@admin</a>!';
+	const MENTION_FILTERED = 'Hi <a class="wp-note-mention user-2" href="https://example.com/author/admin/" rel="nofollow ugc">@admin</a>!';
+	const STRIPPED_CONTENT = 'Hi <a href="https://example.com/author/admin/" rel="nofollow ugc">@admin</a>!';
 
 	public function test_mention_markup_survives_note_content_filtering() {
 		$filtered = $this->filter_comment_with_kses( 'note' );
 
-		$this->assertSame( self::MENTION_CONTENT, wp_unslash( $filtered['comment_content'] ) );
+		$this->assertSame( self::MENTION_FILTERED, wp_unslash( $filtered['comment_content'] ) );
 	}
 
 	public function test_mention_markup_stripped_from_regular_comment_content() {
@@ -26,16 +33,16 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 		$this->assertSame( self::STRIPPED_CONTENT, wp_unslash( $filtered['comment_content'] ) );
 	}
 
-	public function test_only_class_is_allowed_on_note_spans() {
+	public function test_only_default_link_attributes_and_class_are_allowed_on_note_links() {
 		$filtered = $this->filter_comment_with_kses(
 			'note',
-			'Hi <span class="wp-note-mention user-2" data-user-id="2" onclick="alert(1)" style="color:red">@admin</span>!'
+			'Hi <a class="wp-note-mention user-2" href="https://example.com/author/admin/" data-user-id="2" onclick="alert(1)" style="color:red">@admin</a>!'
 		);
 
 		$this->assertSame(
-			self::MENTION_CONTENT,
+			self::MENTION_FILTERED,
 			wp_unslash( $filtered['comment_content'] ),
-			'Attributes beyond `class` should be stripped from note spans.'
+			'Attributes beyond `class` and the default link attributes should be stripped from note links.'
 		);
 	}
 
@@ -124,7 +131,7 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 		remove_filter( 'pre_comment_content', 'wp_filter_kses' );
 
 		$this->assertIsInt( $comment_id );
-		$this->assertSame( self::MENTION_CONTENT, get_comment( $comment_id )->comment_content );
+		$this->assertSame( self::MENTION_FILTERED, get_comment( $comment_id )->comment_content );
 	}
 
 	/**

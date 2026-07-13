@@ -97,10 +97,12 @@ add_filter( 'render_block', 'gutenberg_strip_inline_note_markers' );
  * Allows note mention markup in the content of `note` comments for users
  * without `unfiltered_html`.
  *
- * The notes `@` mention completer stores a mention as
- * `<span class="wp-note-mention user-N">@Name</span>`. The default comment
- * kses allowlist does not include `span` at all, so for users without
- * `unfiltered_html` the mention markup would be stripped on save.
+ * The notes `@` mention completer stores a mention as a link to the mentioned
+ * user's author page carrying the user's ID in a class:
+ * `<a class="wp-note-mention user-N" href="…">@Name</a>`. The default comment
+ * kses allowlist includes `a` but only its `href` and `title` attributes, so
+ * for users without `unfiltered_html` the mention classes would be stripped
+ * on save.
  *
  * This callback is deliberately not attached globally: `class` attributes are
  * CSS and JavaScript selector hooks, so allowing them in every comment would
@@ -120,11 +122,11 @@ function gutenberg_notes_allow_mention_attributes( $allowed, $context ) {
 		return $allowed;
 	}
 
-	if ( ! isset( $allowed['span'] ) || ! is_array( $allowed['span'] ) ) {
-		$allowed['span'] = array();
+	if ( ! isset( $allowed['a'] ) || ! is_array( $allowed['a'] ) ) {
+		$allowed['a'] = array();
 	}
 
-	$allowed['span']['class'] = true;
+	$allowed['a']['class'] = true;
 
 	return $allowed;
 }

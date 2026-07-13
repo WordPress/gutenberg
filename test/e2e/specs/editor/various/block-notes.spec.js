@@ -302,16 +302,9 @@ test.describe( 'Block Notes', () => {
 			await textbox.click();
 			await page.keyboard.type( 'Ping @' );
 
-			/*
-			 * The suggestions offer other users but never the note's own
-			 * author (the logged-in admin).
-			 */
 			await expect(
 				page.getByRole( 'option', { name: 'Mentionable Teammate' } )
 			).toBeVisible();
-			await expect(
-				page.getByRole( 'option', { name: 'admin' } )
-			).toBeHidden();
 
 			// Narrow the suggestions and pick the teammate.
 			await page.keyboard.type( 'Menti' );
@@ -321,15 +314,17 @@ test.describe( 'Block Notes', () => {
 			await page.keyboard.press( 'Enter' );
 
 			/*
-			 * The completer inserts the mention as a chip: a span whose
-			 * `user-N` class carries the mentioned user's ID.
+			 * The completer inserts the mention as a chip: a link to the
+			 * user's author page whose `user-N` class carries the mentioned
+			 * user's ID.
 			 */
 			const mentionClasses = new RegExp(
 				`^wp-note-mention user-${ mentionedUserId }$`
 			);
-			const draftChip = textbox.locator( 'span.wp-note-mention' );
+			const draftChip = textbox.locator( 'a.wp-note-mention' );
 			await expect( draftChip ).toHaveText( '@Mentionable Teammate' );
 			await expect( draftChip ).toHaveClass( mentionClasses );
+			await expect( draftChip ).toHaveAttribute( 'href', /author/ );
 
 			await page.keyboard.type( 'please review' );
 			await page
@@ -345,7 +340,7 @@ test.describe( 'Block Notes', () => {
 			const savedChip = page
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'treeitem' )
-				.locator( 'span.wp-note-mention' );
+				.locator( 'a.wp-note-mention' );
 			await expect( savedChip ).toHaveText( '@Mentionable Teammate' );
 			await expect( savedChip ).toHaveClass( mentionClasses );
 		} );

@@ -16,16 +16,17 @@ import { getUserLabel } from '../autocompleters/user';
 type MentionableUser = {
 	id: number;
 	name: string;
+	link: string;
 };
 
 /**
  * A user mention completer for notes.
  *
- * Mirrors the editor's `@` user completer but inserts a span carrying the
- * mentioned user's ID in a `user-N` class so the mention can be styled as a
- * chip and, in a follow-up, resolved to a notification recipient. A mention
- * marks a person, it isn't a navigation affordance, so it is deliberately not
- * a link.
+ * Mirrors the editor's `@` user completer but inserts the mention as a link
+ * to the user's author page, carrying the mentioned user's ID in a `user-N`
+ * class so the mention can be styled as a chip and, in a follow-up, resolved
+ * to a notification recipient. A plain `core/link` format handles the anchor,
+ * so no dedicated mention format is needed.
  */
 const noteMentionCompleter = {
 	name: 'note-mentions',
@@ -36,15 +37,10 @@ const noteMentionCompleter = {
 	useItems( filterValue: string ) {
 		const users = useSelect(
 			( select ) => {
-				// Suggesting the note's own author to themselves is noise;
-				// leave the current user out of the query.
-				const currentUserId = select( coreStore ).getCurrentUser()?.id;
-
-				return select( coreStore ).getUsers( {
+				const { getUsers } = select( coreStore );
+				return getUsers( {
 					context: 'view',
 					search: encodeURIComponent( filterValue ),
-					per_page: 10,
-					...( currentUserId ? { exclude: [ currentUserId ] } : {} ),
 				} );
 			},
 			[ filterValue ]
@@ -69,9 +65,12 @@ const noteMentionCompleter = {
 		return {
 			action: 'insert-at-caret' as const,
 			value: (
-				<span className={ `wp-note-mention user-${ user.id }` }>
+				<a
+					className={ `wp-note-mention user-${ user.id }` }
+					href={ user.link }
+				>
 					{ '@' + user.name }
-				</span>
+				</a>
 			),
 		};
 	},

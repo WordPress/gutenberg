@@ -19,14 +19,6 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { unlock } from '../../lock-unlock';
 import { sanitizeNoteContent } from './utils';
 import noteMentionCompleter from './note-mention-completer';
-import {
-	registerNoteMentionFormat,
-	MENTION_FORMAT_NAME,
-} from './mention-format';
-
-// Register the mention format so the `@` completer's inserted spans keep
-// their `user-N` class through rich text round-trips. Idempotent.
-registerNoteMentionFormat();
 
 /*
  * The rich text form field is assembled in `@wordpress/dataviews` on top of the
@@ -35,12 +27,16 @@ registerNoteMentionFormat();
  */
 const { RichTextControl } = unlock( dataviewsPrivateApis );
 
+/*
+ * `core/link` also carries `@` mentions: the completer inserts a mention as a
+ * link to the user's author page with a `wp-note-mention user-N` class, which
+ * rich text preserves as an unregistered attribute of the link format.
+ */
 const ALLOWED_NOTE_FORMATS = [
 	'core/bold',
 	'core/italic',
 	'core/link',
 	'core/code',
-	MENTION_FORMAT_NAME,
 ];
 
 const NOTE_COMPLETERS = [ noteMentionCompleter ];

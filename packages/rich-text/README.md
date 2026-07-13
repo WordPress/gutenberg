@@ -415,6 +415,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
 
+_Type_
+
+-   `Object`
+
 ### toggleFormat
 
 Toggles a format object to a Rich Text value at the current selection.
