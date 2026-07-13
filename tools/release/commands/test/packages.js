@@ -394,7 +394,7 @@ describe( 'publishVersionedPackagesToNpm', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'retries from-package without resetting local version metadata', async () => {
+	it( 'resets temporary manifest changes before retrying from-package', async () => {
 		const commandFn = jest
 			.fn()
 			.mockRejectedValueOnce( new Error( 'partial publish' ) )
@@ -426,7 +426,13 @@ describe( 'publishVersionedPackagesToNpm', () => {
 		);
 
 		expect( commandFn ).toHaveBeenCalledTimes( 2 );
-		expect( git.reset ).not.toHaveBeenCalled();
+		expect( git.reset ).toHaveBeenCalledWith( 'hard' );
+		expect( commandFn.mock.invocationCallOrder[ 0 ] ).toBeLessThan(
+			git.reset.mock.invocationCallOrder[ 0 ]
+		);
+		expect( git.reset.mock.invocationCallOrder[ 0 ] ).toBeLessThan(
+			commandFn.mock.invocationCallOrder[ 1 ]
+		);
 		expect( console ).toHaveLogged();
 	} );
 } );

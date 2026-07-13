@@ -830,6 +830,9 @@ async function publishVersionedPackagesToNpm(
 		log(
 			'>> Trying to finish failed publishing of modified npm packages.'
 		);
+		// A failed Lerna publish can leave temporary `gitHead` manifest changes.
+		// Reset to the version commit so `from-package` sees a clean tree on retry.
+		await git.reset( 'hard' );
 		await commandFn(
 			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
 			{
