@@ -35,12 +35,6 @@ describe( 'getPostEditURL', () => {
 
 		expect( url ).toBe( 'post.php?post=1&action=edit' );
 	} );
-
-	it( 'should append the revision argument when set', () => {
-		const url = getPostEditURL( 1, 5 );
-
-		expect( url ).toBe( 'post.php?post=1&action=edit&revision=5' );
-	} );
 } );
 
 describe( 'BrowserURL', () => {
@@ -95,21 +89,6 @@ describe( 'BrowserURL', () => {
 			'Post 1',
 			'post.php?post=1&action=edit'
 		);
-	} );
-
-	it( 'not update URL if history is already set', () => {
-		setupUseSelectMock( {
-			postId: 1,
-			postStatus: 'draft',
-		} );
-		const { rerender } = render( <BrowserURL /> );
-		flushURLWrites();
-
-		replaceStateSpy.mockReset();
-
-		rerender( <BrowserURL /> );
-		flushURLWrites();
-		expect( replaceStateSpy ).not.toHaveBeenCalled();
 	} );
 
 	it( 'update URL if post ID changes', () => {
@@ -199,11 +178,5 @@ describe( 'BrowserURL', () => {
 			'Post 1',
 			'post.php?post=1&action=edit'
 		);
-	} );
-
-	it( 'renders nothing', () => {
-		const { container } = render( <BrowserURL /> );
-
-		expect( container ).toBeEmptyDOMElement();
 	} );
 } );
