@@ -8,7 +8,10 @@ import { createRegistry } from '@wordpress/data';
  */
 import { store as uploadStore } from '../';
 import { unlock } from '../../lock-unlock';
-import { persistItem } from '../utils/persistence';
+import {
+	persistItem,
+	getAllItems as getAllPersistedItems,
+} from '../utils/persistence';
 import { buildIndexedDBMock } from '../utils/test/fixtures/build-idb-mock';
 import { ItemStatus, OperationType } from '../types';
 
@@ -114,6 +117,38 @@ describe( 'resume orchestration', () => {
 		expect(
 			unlock( registry.select( uploadStore ) ).getAllItems()
 		).toHaveLength( 0 );
+	} );
+
+	it( 'discard keeps the persisted record of an in-flight upload', async () => {
+		const registry = setup();
+		const file = new File( [ 'x' ], 'a.jpg', { type: 'image/jpeg' } );
+		// A record from a previous session, loaded as PendingResume.
+		await persistItem( {
+			id: 'p1',
+			uploadId: 'u1',
+			file,
+			sourceFile: file,
+			additionalData: {},
+			status: ItemStatus.Processing,
+			operations: [ OperationType.Upload ],
+			persistedAt: Date.now(),
+		} );
+		await unlock( registry.dispatch( uploadStore ) ).loadPersistedQueue();
+		await flush();
+
+		// A new upload starts in this session (queue is paused, so it stays
+		// in flight) and persists its own record.
+		await unlock( registry.dispatch( uploadStore ) ).addItem( { file } );
+		await flush();
+
+		await unlock(
+			registry.dispatch( uploadStore )
+		).discardPersistedQueue();
+		await flush();
+
+		const remaining = await getAllPersistedItems();
+		expect( remaining ).toHaveLength( 1 );
+		expect( remaining[ 0 ].id ).not.toBe( 'p1' );
 	} );
 
 	it( 'resumePersistedQueue flips PendingResume items to Processing', async () => {

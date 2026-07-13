@@ -86,7 +86,6 @@ import {
 	deleteItem,
 	toPersistedRecord,
 	pruneStale,
-	clearAll,
 	isPersistenceAvailable,
 } from './utils/persistence';
 
@@ -2109,8 +2108,11 @@ export function resumePersistedQueue() {
 }
 
 /**
- * Discards all loaded items and clears durable storage. Called when the user
+ * Discards all loaded items and their persisted records. Called when the user
  * declines to resume.
+ *
+ * Records are deleted per item (via removeItem) rather than wholesale, so the
+ * persisted record of an upload that is currently in flight is left intact.
  */
 export function discardPersistedQueue() {
 	return async ( { select, dispatch }: ThunkArgs ) => {
@@ -2119,6 +2121,5 @@ export function discardPersistedQueue() {
 			dispatch.revokeBlobUrls( item.id );
 			dispatch.removeItem( item.id );
 		}
-		await clearAll();
 	};
 }
