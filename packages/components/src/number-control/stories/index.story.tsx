@@ -32,7 +32,7 @@ const meta: Meta< typeof NumberControl > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `InputControl` with `type="number"` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`InputControl`](?path=/docs/design-system-components-form-inputcontrol--docs) with `type="number"` in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };

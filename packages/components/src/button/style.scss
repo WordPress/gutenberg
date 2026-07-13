@@ -22,7 +22,6 @@
 	font-size: $default-font-size;
 	font-weight: $font-weight-medium;
 	margin: 0;
-	border: 0;
 	cursor: var(--wpds-cursor-control);
 	appearance: none;
 	background: none;
@@ -32,6 +31,9 @@
 	padding: 4px 12px; // Allows 32px min-height.
 	border-radius: $radius-small;
 	color: $components-color-foreground;
+	// Every variant reserves a 1px border (transparent by default) so the box
+	// size stays identical whether or not a variant paints a visible border.
+	border: $border-width solid transparent;
 
 	&.is-next-40px-default-size {
 		height: $button-size-next-default-40px;
@@ -88,10 +90,6 @@
 			);
 			/* stylelint-enable */
 		}
-
-		@media (forced-colors: active) {
-			outline: 1px solid ButtonBorder;
-		}
 	}
 
 	/**
@@ -100,20 +98,12 @@
 
 	&.is-secondary,
 	&.is-tertiary {
-		&:active:not(:disabled) {
-			box-shadow: none;
-		}
-
 		&:disabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
 			color: $gray-600;
 			background: transparent;
 			transform: none;
-		}
-
-		@media (forced-colors: active) {
-			outline: 1px solid ButtonBorder;
 		}
 	}
 
@@ -123,36 +113,33 @@
 
 	&.is-secondary {
 		@media not ( prefers-reduced-motion ) {
-			transition: box-shadow 0.1s linear;
+			transition: border-color 0.1s linear;
 		}
 
-		box-shadow:
-			inset 0 0 0 $border-width $components-color-accent,
-			0 0 0 currentColor;
+		border-color: $components-color-accent;
 		white-space: nowrap;
 		color: $components-color-accent;
 		background: transparent;
 
+		&:active:not(:disabled) {
+			// Hide the border while pressed, keeping its width to avoid a size shift.
+			border-color: transparent;
+		}
+
 		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
-			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-20;
+			border-color: $components-color-accent-darker-20;
 			color: $components-color-accent-darker-20;
 			background: color-mix(in srgb, $components-color-accent 4%, transparent);
 		}
 
 		&:focus:not(:active) {
-			// Restore the visual border that the outset-ring__focus mixin resets.
-			box-shadow: inset 0 0 0 $border-width $components-color-accent, 0 0 0 currentColor;
+			border-color: $components-color-accent;
 		}
 
 		&:disabled:not(:focus),
 		&[aria-disabled="true"]:not(:focus),
 		&[aria-disabled="true"]:hover:not(:focus) {
-			box-shadow: inset 0 0 0 $border-width var(--wpds-color-stroke-interactive-neutral-disabled);
-		}
-
-		@media (forced-colors: active) {
-			// Inset box-shadow borders are not reliable in forced-colors mode.
-			box-shadow: none;
+			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 		}
 	}
 
@@ -225,7 +212,6 @@
 	&.is-link {
 		margin: 0;
 		padding: 0;
-		box-shadow: none;
 		border: 0;
 		border-radius: 0;
 		background: none;
@@ -334,6 +320,15 @@
 			&.has-icon-right {
 				padding-right: $grid-unit-10;
 				padding-left: $grid-unit-15;
+			}
+		}
+
+		// Offset the reserved 1px border so it doesn't widen the square
+		// icon button.
+		&:not(.has-text) {
+			svg,
+			.dashicon {
+				margin-inline: -$border-width;
 			}
 		}
 	}
