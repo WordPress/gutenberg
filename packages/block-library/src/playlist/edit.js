@@ -562,6 +562,16 @@ const PlaylistEdit = ( {
 					panelId={ waveformPanelId }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
+					{ colorSettings.length > 0 && (
+						<div className="wp-block-playlist__waveform-color-controls">
+							<ColorGradientSettingsDropdown
+								__experimentalIsRenderedInSidebar
+								settings={ colorSettings }
+								panelId={ waveformPanelId }
+								{ ...colorGradientSettings }
+							/>
+						</div>
+					) }
 					<ToolsPanelItem
 						label={ __( 'Shape' ) }
 						isShownByDefault
@@ -580,16 +590,6 @@ const PlaylistEdit = ( {
 							onChange={ onChangeWaveformStyle }
 						/>
 					</ToolsPanelItem>
-					{ colorSettings.length > 0 && (
-						<div className="wp-block-playlist__waveform-color-controls">
-							<ColorGradientSettingsDropdown
-								__experimentalIsRenderedInSidebar
-								settings={ colorSettings }
-								panelId={ waveformPanelId }
-								{ ...colorGradientSettings }
-							/>
-						</div>
-					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
