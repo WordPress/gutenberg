@@ -168,6 +168,55 @@ function createControlButton( doc, label, iconName ) {
 }
 
 /**
+ * Select the previous playlist track.
+ *
+ * @param {Object} context - The Interactivity API context.
+ */
+function selectPreviousTrack( context ) {
+	const currentIndex = context.tracks.findIndex(
+		( uniqueId ) => uniqueId === context.currentId
+	);
+	const prevTrack =
+		context.tracks[ currentIndex - 1 ] ||
+		context.tracks[ context.tracks.length - 1 ];
+	if ( prevTrack ) {
+		context.currentId = prevTrack;
+		context.playedTracks = getPlayedTracksAfterTrackSelection(
+			prevTrack,
+			context.isShuffled
+		);
+	}
+}
+
+/**
+ * Advance the playlist according to shuffle and repeat state.
+ *
+ * @param {Object}  context         - The Interactivity API context.
+ * @param {boolean} isUserInitiated - Whether this action came from a skip control.
+ * @param {Object}  playerInstance  - The waveform player instance.
+ */
+function selectNextTrack( context, isUserInitiated, playerInstance ) {
+	const { action, nextId, playedIds } = getPlaylistPlaybackAction(
+		context.tracks,
+		context.currentId,
+		{
+			repeatMode: context.repeatMode,
+			isShuffled: context.isShuffled,
+			playedTracks: context.playedTracks,
+			isUserInitiated,
+		}
+	);
+	context.playedTracks = playedIds;
+	if ( action === 'repeat' ) {
+		replayWaveformPlayerTrack( playerInstance );
+		return;
+	}
+	if ( nextId ) {
+		context.currentId = nextId;
+	}
+}
+
+/**
  * Set up playlist controls rendered outside the waveform player.
  *
  * @param {Element} controlsElement - The controls host element.
@@ -239,41 +288,9 @@ function setupPlaylistControls( controlsElement, context ) {
 	toggleGroup.append( repeatBtn, shuffleBtn );
 	controlsElement.append( actionGroup, toggleGroup );
 
-	const onPrevClick = () => {
-		const currentIndex = context.tracks.findIndex(
-			( uniqueId ) => uniqueId === context.currentId
-		);
-		const prevTrack =
-			context.tracks[ currentIndex - 1 ] ||
-			context.tracks[ context.tracks.length - 1 ];
-		if ( prevTrack ) {
-			context.currentId = prevTrack;
-			context.playedTracks = getPlayedTracksAfterTrackSelection(
-				prevTrack,
-				context.isShuffled
-			);
-		}
-	};
-	const onNextClick = () => {
-		const { action, nextId, playedIds } = getPlaylistPlaybackAction(
-			context.tracks,
-			context.currentId,
-			{
-				repeatMode: context.repeatMode,
-				isShuffled: context.isShuffled,
-				playedTracks: context.playedTracks,
-				isUserInitiated: true,
-			}
-		);
-		context.playedTracks = playedIds;
-		if ( action === 'repeat' ) {
-			replayWaveformPlayerTrack( getPlayerInstance() );
-			return;
-		}
-		if ( nextId ) {
-			context.currentId = nextId;
-		}
-	};
+	const onPrevClick = () => selectPreviousTrack( context );
+	const onNextClick = () =>
+		selectNextTrack( context, true, getPlayerInstance() );
 	const onRepeatClick = () => {
 		const nextMode = getNextRepeatMode( repeatBtn.dataset.repeatMode );
 		context.repeatMode = nextMode;
@@ -357,24 +374,11 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		labels,
 		waveformStyle: context.waveformStyle,
 		onEnded: () => {
-			const { action, nextId, playedIds } = getPlaylistPlaybackAction(
-				context.tracks,
-				context.currentId,
-				{
-					repeatMode: context.repeatMode,
-					isShuffled: context.isShuffled,
-					playedTracks: context.playedTracks,
-				}
-			);
-			context.playedTracks = playedIds;
-			if ( action === 'repeat' ) {
-				replayWaveformPlayerTrack( player.instance );
-				return;
-			}
-			if ( nextId ) {
-				context.currentId = nextId;
-			}
+			selectNextTrack( context, false, player.instance );
 		},
+		onNextTrack: ( playerInstance ) =>
+			selectNextTrack( context, true, playerInstance ),
+		onPreviousTrack: () => selectPreviousTrack( context ),
 	} );
 	const setIsPlaying = ( isPlaying ) => {
 		context.isPlaying = isPlaying;

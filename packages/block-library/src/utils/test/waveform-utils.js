@@ -2,6 +2,28 @@
  * External dependencies
  */
 import '@testing-library/jest-dom';
+import WaveformPlayerLib from '@arraypress/waveform-player';
+
+jest.mock( '@arraypress/waveform-player', () =>
+	jest.fn().mockImplementation( ( container, options = {} ) => {
+		const titleEl = global.document.createElement( 'span' );
+		const subtitleEl = global.document.createElement( 'span' );
+		const artworkEl = global.document.createElement( 'img' );
+		container.append( titleEl, subtitleEl, artworkEl );
+
+		return {
+			container,
+			options,
+			titleEl,
+			subtitleEl,
+			artworkEl,
+			play: jest.fn().mockReturnValue( Promise.resolve() ),
+			destroy: jest.fn(),
+			drawWaveform: jest.fn(),
+			applySeekLabel: jest.fn(),
+		};
+	} )
+);
 
 /**
  * Internal dependencies
@@ -19,6 +41,7 @@ import {
 	getPlaylistPlaybackAction,
 	replayWaveformPlayerTrack,
 	setupPlaylistMetadata,
+	initWaveformPlayer,
 } from '../waveform-utils';
 
 // Base player data used across tests
@@ -30,6 +53,11 @@ const basePlayerData = {
 };
 
 describe( 'Waveform utilities', () => {
+	afterEach( () => {
+		WaveformPlayerLib.mockClear();
+		document.body.innerHTML = '';
+	} );
+
 	describe( 'createWaveformContainer', () => {
 		it( 'should create a container with required data attributes', () => {
 			const container = createWaveformContainer( basePlayerData );
@@ -66,7 +94,9 @@ describe( 'Waveform utilities', () => {
 				title: 'My Song',
 				artist: 'The Artist',
 				artwork: 'https://example.com/cover.jpg',
+				artworkAlt: 'Album art',
 				seekLabel: 'My Song',
+				playLabel: 'Play',
 			} );
 
 			expect( container ).toHaveAttribute( 'data-title', 'My Song' );
@@ -75,7 +105,15 @@ describe( 'Waveform utilities', () => {
 				'data-artwork',
 				'https://example.com/cover.jpg'
 			);
+			expect( container ).toHaveAttribute(
+				'data-artwork-alt',
+				'Album art'
+			);
 			expect( container ).toHaveAttribute( 'data-seek-label', 'My Song' );
+			expect( container ).toHaveAttribute(
+				'data-play-pause-label',
+				'Play'
+			);
 		} );
 
 		it( 'should set the seek value-text template when provided', () => {
@@ -682,6 +720,51 @@ describe( 'Waveform utilities', () => {
 			expect( time ).toHaveTextContent( '0:01/4:00' );
 			expect( metadataText ).toContainElement( subtitle );
 			expect( container.querySelector( '.waveform-info' ) ).toBeNull();
+		} );
+	} );
+
+	describe( 'initWaveformPlayer', () => {
+		it( 'passes supported player API options to the waveform library', () => {
+			const element = document.createElement( 'div' );
+			document.body.appendChild( element );
+			const onEnded = jest.fn();
+			const onNextTrack = jest.fn();
+			const onPreviousTrack = jest.fn();
+
+			initWaveformPlayer( element, {
+				src: 'https://example.com/song.mp3',
+				title: 'My Song',
+				artist: 'The Artist',
+				image: 'https://example.com/cover.jpg',
+				imageAlt: 'Album art',
+				labels: {
+					play: 'Play',
+					seek: 'Seek',
+					seekValueText: '%1$s of %2$s',
+				},
+				waveformStyle: 'bars',
+				onEnded,
+				onNextTrack,
+				onPreviousTrack,
+			} );
+
+			expect( WaveformPlayerLib ).toHaveBeenCalledWith(
+				expect.any( global.HTMLDivElement ),
+				expect.objectContaining( {
+					url: 'https://example.com/song.mp3',
+					title: 'My Song',
+					artist: 'The Artist',
+					artwork: 'https://example.com/cover.jpg',
+					artworkAlt: 'Album art',
+					waveformStyle: 'bars',
+					seekLabel: 'My Song',
+					seekValueText: '%1$s of %2$s',
+					playPauseLabel: 'Play',
+					onEnd: onEnded,
+					onNextTrack,
+					onPreviousTrack,
+				} )
+			);
 		} );
 	} );
 
