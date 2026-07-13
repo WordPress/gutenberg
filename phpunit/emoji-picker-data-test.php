@@ -54,6 +54,40 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Malformed UTF-8 must return an empty string rather than emitting a
+	 * garbage hex key. The decoder is byte-level and does not depend on
+	 * the `mbstring` extension.
+	 *
+	 * @covers ::gutenberg_emoji_to_hexcode
+	 */
+	public function test_gutenberg_emoji_to_hexcode_rejects_invalid_utf8() {
+		// Lone continuation byte.
+		$this->assertSame( '', gutenberg_emoji_to_hexcode( "\x80" ) );
+		// Lead byte with missing continuation bytes.
+		$this->assertSame( '', gutenberg_emoji_to_hexcode( "\xF0\x9F" ) );
+		// Truncated 4-byte sequence followed by ASCII.
+		$this->assertSame( '', gutenberg_emoji_to_hexcode( "\xF0\x9F\x98a" ) );
+		// Invalid lead byte (0xF8 starts a 5-byte form, never valid UTF-8).
+		$this->assertSame( '', gutenberg_emoji_to_hexcode( "\xF8\x88\x80\x80\x80" ) );
+	}
+
+	/**
+	 * Code points across the 1-4 byte UTF-8 ranges decode correctly.
+	 *
+	 * @covers ::gutenberg_emoji_to_hexcode
+	 */
+	public function test_gutenberg_emoji_to_hexcode_covers_all_byte_lengths() {
+		// 1 byte: U+0023 (#), part of keycap sequences.
+		$this->assertSame( '23', gutenberg_emoji_to_hexcode( '#' ) );
+		// 2 bytes: U+00A9 (©).
+		$this->assertSame( 'A9', gutenberg_emoji_to_hexcode( "\u{00A9}" ) );
+		// 3 bytes: U+2764 (❤).
+		$this->assertSame( '2764', gutenberg_emoji_to_hexcode( "\u{2764}" ) );
+		// 4 bytes: U+1F600 (😀) — asserted in the basic test as well.
+		$this->assertSame( '1F600', gutenberg_emoji_to_hexcode( "\u{1F600}" ) );
+	}
+
+	/**
 	 * The default override map seeds the curated reaction emojis so the
 	 * full picker shows the same translated label as the curated row.
 	 *

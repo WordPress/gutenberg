@@ -33,6 +33,11 @@ add_action( 'init', 'gutenberg_emojibase_data_register_inline_script' );
  * (U+FE0F) so qualified and unqualified presentations collapse to the
  * same key, matching Emojibase's own normalization.
  *
+ * Decodes UTF-8 byte-by-byte rather than via `mb_ord()`: the `mbstring`
+ * extension is recommended but not required by WordPress, and the
+ * WordPress compatibility layer does not polyfill `mb_ord()` on all
+ * supported versions. Returns an empty string for invalid UTF-8.
+ *
  * @since 7.1.0
  *
  * @param string $emoji Emoji character.
@@ -42,11 +47,32 @@ function gutenberg_emoji_to_hexcode( $emoji ) {
 	if ( ! is_string( $emoji ) || '' === $emoji ) {
 		return '';
 	}
-	$length = mb_strlen( $emoji, 'UTF-8' );
+	$length = strlen( $emoji );
 	$parts  = array();
-	for ( $i = 0; $i < $length; $i++ ) {
-		$char      = mb_substr( $emoji, $i, 1, 'UTF-8' );
-		$codepoint = mb_ord( $char, 'UTF-8' );
+	for ( $i = 0; $i < $length; ) {
+		$byte = ord( $emoji[ $i ] );
+		if ( $byte < 0x80 ) {
+			$codepoint = $byte;
+			$size      = 1;
+		} elseif ( 0xC0 === ( $byte & 0xE0 ) ) {
+			$codepoint = $byte & 0x1F;
+			$size      = 2;
+		} elseif ( 0xE0 === ( $byte & 0xF0 ) ) {
+			$codepoint = $byte & 0x0F;
+			$size      = 3;
+		} elseif ( 0xF0 === ( $byte & 0xF8 ) ) {
+			$codepoint = $byte & 0x07;
+			$size      = 4;
+		} else {
+			return '';
+		}
+		for ( $j = 1; $j < $size; $j++ ) {
+			if ( $i + $j >= $length || 0x80 !== ( ord( $emoji[ $i + $j ] ) & 0xC0 ) ) {
+				return '';
+			}
+			$codepoint = ( $codepoint << 6 ) | ( ord( $emoji[ $i + $j ] ) & 0x3F );
+		}
+		$i += $size;
 		// Skip Variation Selector-16 so qualified `❤️` (2764 FE0F)
 		// matches Emojibase's unqualified `2764` entry.
 		if ( 0xFE0F === $codepoint ) {
