@@ -209,7 +209,11 @@ function deepMergeDroppingEmpties(
 				globalStyles,
 				sourceValue.ref
 			);
-			if ( resolved === undefined || resolved === null ) {
+			if (
+				resolved === undefined ||
+				resolved === null ||
+				isRefObject( resolved )
+			) {
 				continue;
 			}
 			sourceValue = resolved;

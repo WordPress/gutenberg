@@ -141,6 +141,20 @@ describe( 'resolveStyles – merged output', () => {
 			expect( out ).toEqual( { color: { text: '#000' } } );
 		} );
 
+		test( 'deepMergeDroppingEmpties skips refs that resolve to another ref', () => {
+			const gs = {
+				styles: {
+					color: { text: { ref: 'styles.color.other' } },
+				},
+			};
+			const out = deepMergeDroppingEmpties(
+				{ color: { text: '#000' } },
+				{ color: { text: { ref: 'styles.color.text' } } },
+				gs
+			);
+			expect( out ).toEqual( { color: { text: '#000' } } );
+		} );
+
 		test( 'deepMergeDroppingEmpties drops explicit-empty source leaves', () => {
 			const out = deepMergeDroppingEmpties(
 				{ typography: { fontSize: '32px', lineHeight: '1.2' } },
