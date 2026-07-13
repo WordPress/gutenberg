@@ -1,11 +1,9 @@
-/**
- * data-wp-text — Text content binding.
- */
 import { directive, isDefaultDirectiveSuffix } from '../hooks';
 import { warn } from '../utils';
 import { PENDING_GETTER } from '../proxies/state';
 import { warnUniqueIdNotSupported } from './utils/warnings';
 
+// data-wp-text — Text content binding.
 directive( 'text', ( { directives: { text }, element, evaluate } ) => {
 	const entries = text.filter( isDefaultDirectiveSuffix );
 	// Doesn't do anything if there are no default entries.

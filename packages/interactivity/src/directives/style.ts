@@ -1,6 +1,3 @@
-/**
- * data-wp-style -- Dynamic style property binding.
- */
 import { type RefObject } from 'preact';
 import { directive, isNonDefaultDirectiveSuffix } from '../hooks';
 import { useInit } from '../utils';
@@ -44,6 +41,7 @@ const cssStringToObject = (
 	return tree[ 0 ];
 };
 
+// data-wp-style--[style-property] Dynamic style binding.
 directive( 'style', ( { directives: { style }, element, evaluate } ) => {
 	style.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
 		if ( entry.uniqueId ) {
@@ -72,8 +70,8 @@ directive( 'style', ( { directives: { style }, element, evaluate } ) => {
 
 		useInit( () => {
 			/*
-			 * This seems necessary because Preact doesn't change the  styles on
-			 * the hydration, so we have to do it manually. It doesn't  need deps
+			 * This seems necessary because Preact doesn't change the styles on
+			 * the hydration, so we have to do it manually. It doesn't need deps
 			 * because it only needs to do it the first time.
 			 */
 			if ( ! result ) {

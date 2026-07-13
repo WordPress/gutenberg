@@ -1,12 +1,10 @@
-/**
- * data-wp-bind--[attribute] binding.
- */
 import { type RefObject } from 'preact';
 import { directive, isNonDefaultDirectiveSuffix } from '../hooks';
 import { useInit } from '../utils';
 import { PENDING_GETTER } from '../proxies/state';
 import { warnUniqueIdNotSupported } from './utils/warnings';
 
+// data-wp-bind--[attribute] binding.
 directive( 'bind', ( { directives: { bind }, element, evaluate } ) => {
 	bind.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
 		if ( entry.uniqueId ) {

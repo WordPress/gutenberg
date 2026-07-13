@@ -1,11 +1,9 @@
-/**
- * data-wp-ignore (deprecated) — Preserve inner HTML.
- */
 import { h as createElement } from 'preact';
 import { useMemo } from 'preact/hooks';
 import { directive } from '../hooks';
 import { warn } from '../utils';
 
+// data-wp-ignore (deprecated) — Preserve inner HTML.
 directive(
 	'ignore',
 	( {
@@ -23,7 +21,8 @@ directive(
 		}
 
 		// Preserve the initial inner HTML
-		const cached = useMemo( () => innerHTML, [ innerHTML ] );
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		const cached = useMemo( () => innerHTML, [] );
 		return createElement( Type, {
 			dangerouslySetInnerHTML: { __html: cached },
 			...rest,

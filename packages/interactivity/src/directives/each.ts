@@ -1,6 +1,3 @@
-/**
- * data-wp-each and data-wp-each-child — Template iteration.
- */
 import { h as createElement, type VNode } from 'preact';
 import { useContext, useRef } from 'preact/hooks';
 import {

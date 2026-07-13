@@ -1,7 +1,3 @@
-/**
- * data-wp-on, data-wp-on-async, data-wp-on-window, data-wp-on-document
- * — Event listener directives.
- */
 import { useInit, splitTask, warn } from '../utils';
 import {
 	directive,
@@ -16,7 +12,18 @@ import {
 
 /**
  * Wraps event object to warn about access of synchronous properties and methods.
- * @param event
+ *
+ * For all store actions attached to an event listener the event object is proxied via this function, unless the action
+ * uses the `withSyncEvent()` utility to indicate that it requires synchronous access to the event object.
+ *
+ * At the moment, the proxied event only emits warnings when synchronous properties or methods are being accessed. In
+ * the future this will be changed and result in an error. The current temporary behavior allows implementers to update
+ * their relevant actions to use `withSyncEvent()`.
+ *
+ * For additional context, see https://github.com/WordPress/gutenberg/issues/64944.
+ *
+ * @param event Event object.
+ * @return Proxied event object.
  */
 function wrapEventAsync( event: Event ) {
 	const handler = {

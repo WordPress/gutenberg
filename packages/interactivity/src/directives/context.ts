@@ -1,12 +1,10 @@
-/**
- * data-wp-context---[unique-id] — Local state scoping with DOM inheritance.
- */
 import { createElement } from 'preact';
 import { useContext, useRef } from 'preact/hooks';
 import { directive, isDefaultDirectiveSuffix } from '../hooks';
 import { warn, isPlainObject, deepClone } from '../utils';
 import { proxifyState, proxifyContext, deepMerge } from '../proxies';
 
+// data-wp-context---[unique-id] — Local state scoping with DOM inheritance.
 directive(
 	'context',
 	( {

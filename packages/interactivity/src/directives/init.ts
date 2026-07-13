@@ -1,10 +1,8 @@
-/**
- * data-wp-init---[unique-id] — Run expression on first render.
- */
 import { directive } from '../hooks';
 import { useInit } from '../utils';
 import { warnUniqueIdWithTwoHyphens } from './utils/warnings';
 
+// data-wp-init---[unique-id] — Run expression on first render.
 directive( 'init', ( { directives: { init }, evaluate } ) => {
 	init.forEach( ( entry ) => {
 		if ( globalThis.SCRIPT_DEBUG ) {

@@ -1,12 +1,9 @@
-/**
- * data-wp-class--[classname] Dynamic class binding.
- */
 import { type RefObject } from 'preact';
 import { directive, isNonDefaultDirectiveSuffix } from '../hooks';
 import { useInit } from '../utils';
 import { PENDING_GETTER } from '../proxies/state';
 
-// data-wp-class--[classname]
+// data-wp-class--[classname] Dynamic class binding.
 directive(
 	'class',
 	( { directives: { class: classNames }, element, evaluate } ) => {

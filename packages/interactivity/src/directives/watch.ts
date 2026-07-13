@@ -1,10 +1,8 @@
-/**
- * data-wp-watch---[unique-id] — Reactive effect.
- */
 import { directive } from '../hooks';
 import { useWatch } from '../utils';
 import { warnUniqueIdWithTwoHyphens } from './utils/warnings';
 
+// data-wp-watch---[unique-id] — Reactive effect.
 directive( 'watch', ( { directives: { watch }, evaluate } ) => {
 	watch.forEach( ( entry ) => {
 		if ( globalThis.SCRIPT_DEBUG ) {

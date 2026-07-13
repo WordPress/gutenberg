@@ -1,6 +1,3 @@
-/**
- * data-wp-router-region — Router region management.
- */
 import { cloneElement, type VNode } from 'preact';
 import { useLayoutEffect } from 'preact/hooks';
 import { signal, type Signal } from '@preact/signals';
@@ -23,6 +20,7 @@ export const routerRegions = new Map<
 	Signal< VNode | null | undefined >
 >();
 
+// data-wp-router-region — Router region management.
 directive(
 	'router-region',
 	( { directives: { 'router-region': routerRegion } } ) => {

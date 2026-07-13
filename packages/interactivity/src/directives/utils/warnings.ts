@@ -1,8 +1,6 @@
-/**
- * Warning helper functions shared across directives.
- */
 import { warn } from '../../utils';
 
+// Warns about the deprecated two-hyphen unique ID syntax.
 export const warnUniqueIdWithTwoHyphens = (
 	prefix: string,
 	suffix: string,
@@ -19,6 +17,7 @@ export const warnUniqueIdWithTwoHyphens = (
 	}
 };
 
+// Warns that unique IDs are not supported for a given directive.
 export const warnUniqueIdNotSupported = (
 	prefix: string,
 	uniqueId: string
@@ -30,6 +29,8 @@ export const warnUniqueIdNotSupported = (
 	}
 };
 
+// Warns about a deprecated async directive name and suggests the replacement.
+// `withSyncEvent()` should be used for synchronous event access.
 export const warnWithSyncEvent = (
 	wrongPrefix: string,
 	rightPrefix: string
