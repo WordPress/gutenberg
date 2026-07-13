@@ -19,7 +19,7 @@ import type {
 	CustomSelectStore,
 	CustomSelectButtonProps,
 	CustomSelectButtonSize,
-	_CustomSelectInternalProps,
+	CustomSelectInternalProps,
 	_CustomSelectProps,
 } from './types';
 import InputBase from '../input-control/input-base';
@@ -85,8 +85,8 @@ const CustomSelectButton = ( {
 	);
 };
 
-function _CustomSelect(
-	props: _CustomSelectInternalProps &
+function CustomSelect(
+	props: CustomSelectInternalProps &
 		_CustomSelectProps &
 		CustomSelectStore &
 		CustomSelectButtonSize
@@ -131,11 +131,7 @@ function _CustomSelect(
 			>
 				{ label }
 			</Ariakit.SelectLabel>
-			<InputBase
-				__next40pxDefaultSize
-				size={ size }
-				suffix={ <SelectControlChevronDown /> }
-			>
+			<InputBase size={ size } suffix={ <SelectControlChevronDown /> }>
 				<CustomSelectButton
 					{ ...restProps }
 					size={ size }
@@ -161,4 +157,4 @@ function _CustomSelect(
 	);
 }
 
-export default _CustomSelect;
+export default CustomSelect;

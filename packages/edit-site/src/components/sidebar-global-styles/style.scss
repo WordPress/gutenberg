@@ -1,4 +1,3 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 .edit-site-styles {
@@ -17,15 +16,37 @@
 		padding-right: 0;
 
 		.global-styles-ui-sidebar__navigator-screen {
-			padding-top: $grid-unit-15;
-			padding-left: $grid-unit-15;
-			padding-right: $grid-unit-15;
-			padding-bottom: $grid-unit-15;
+			padding: $grid-unit-15;
 			outline: none;
+
+			.global-styles-ui-color-palette__tablist-container {
+				margin-inline: -$grid-unit-15;
+				width: calc(100% + #{$grid-unit-15 * 2});
+				padding-inline: $grid-unit-15;
+			}
 		}
 	}
 	.edit-site-sidebar-button {
-		color: $gray-900;
+		color: var(--wpds-color-foreground-interactive-neutral);
 	}
 }
 
+// Show button text labels when preference is enabled.
+.show-icon-labels {
+	.edit-site-styles__header-actions {
+		.components-button.has-icon {
+			width: auto;
+			padding: 0 var(--wpds-dimension-padding-xs);
+
+			// Hide the button icons when labels are set to display...
+			svg {
+				display: none;
+			}
+			// ... and display labels.
+			&::after {
+				content: attr(aria-label);
+				font-size: var(--wpds-typography-font-size-sm);
+			}
+		}
+	}
+}

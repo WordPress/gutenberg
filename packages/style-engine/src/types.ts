@@ -20,6 +20,12 @@ export interface BorderIndividualStyles< T extends BoxEdge > {
 	width?: CSSProperties[ `border${ Capitalize< T > }Width` ];
 }
 
+/**
+ * A style object — for example a block's `attributes.style` or the top-level
+ * styles in `theme.json`. Groups visual style properties such as color,
+ * typography, spacing, dimensions, borders, backgrounds and element styles,
+ * and is the input `compileCSS` and `getCSSRules` turn into CSS.
+ */
 export interface Style {
 	background?: {
 		backgroundImage?:
@@ -28,6 +34,7 @@ export interface Style {
 		backgroundPosition?: CSSProperties[ 'backgroundPosition' ];
 		backgroundRepeat?: CSSProperties[ 'backgroundRepeat' ];
 		backgroundSize?: CSSProperties[ 'backgroundSize' ];
+		gradient?: CSSProperties[ 'backgroundImage' ];
 	};
 	border?: {
 		color?: CSSProperties[ 'borderColor' ];
@@ -50,6 +57,8 @@ export interface Style {
 		aspectRatio?: CSSProperties[ 'aspectRatio' ];
 		height?: CSSProperties[ 'height' ];
 		minHeight?: CSSProperties[ 'minHeight' ];
+		minWidth?: CSSProperties[ 'minWidth' ];
+		objectFit?: CSSProperties[ 'objectFit' ];
 		width?: CSSProperties[ 'width' ];
 	};
 	spacing?: {
@@ -65,6 +74,7 @@ export interface Style {
 		lineHeight?: CSSProperties[ 'lineHeight' ];
 		textColumns?: CSSProperties[ 'columnCount' ];
 		textDecoration?: CSSProperties[ 'textDecoration' ];
+		textShadow?: CSSProperties[ 'textShadow' ];
 		textTransform?: CSSProperties[ 'textTransform' ];
 		writingMode?: CSSProperties[ 'writingMode' ];
 	};
@@ -87,6 +97,10 @@ export interface CssRulesKeys {
 	individual: string;
 }
 
+/**
+ * Options that adjust how styles are generated — notably the CSS `selector` to
+ * scope the output to. With no selector, declarations are returned inline.
+ */
 export interface StyleOptions {
 	/**
 	 * CSS selector for the generated style.
@@ -94,6 +108,11 @@ export interface StyleOptions {
 	selector?: string;
 }
 
+/**
+ * A single generated CSS rule: an optional `selector`, the `value`, and the
+ * `key` in React/JS style-attribute format (e.g. `paddingTop` rather than
+ * `padding-top`).
+ */
 export interface GeneratedCSSRule {
 	selector?: string;
 	value: string | unknown;

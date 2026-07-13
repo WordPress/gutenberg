@@ -54,10 +54,17 @@ export interface BasePost extends CommonPost {
 	ping_status?: 'open' | 'closed';
 	link?: string;
 	slug?: string;
+	sticky?: boolean;
 	permalink_template?: string;
 	date?: string;
 	modified?: string;
 	author?: number;
+}
+
+export interface BasePostWithEditedEntity extends Omit< BasePost, 'content' > {
+	content:
+		| BasePost[ 'content' ]
+		| ( ( record: BasePostWithEditedEntity ) => string );
 }
 
 export interface BasePostWithEmbeddedAuthor extends BasePost {
@@ -82,7 +89,13 @@ export interface BasePostWithEmbeddedFeaturedMedia extends BasePost {
 	_embedded: EmbeddedFeaturedMedia;
 }
 
-export interface Template extends CommonPost {
+interface TemplateAuthorFields {
+	author?: number;
+	author_text: string;
+	original_source?: 'theme' | 'plugin' | 'site' | 'user';
+}
+
+export interface Template extends CommonPost, TemplateAuthorFields {
 	type: 'wp_template';
 	is_custom: boolean;
 	source: string;
@@ -90,9 +103,10 @@ export interface Template extends CommonPost {
 	plugin?: string;
 	has_theme_file: boolean;
 	id: string;
+	description?: string;
 }
 
-export interface TemplatePart extends CommonPost {
+export interface TemplatePart extends CommonPost, TemplateAuthorFields {
 	type: 'wp_template_part';
 	source: string;
 	origin: string;
@@ -105,7 +119,18 @@ export interface TemplatePart extends CommonPost {
 export interface Pattern extends CommonPost {
 	slug: string;
 	title: { raw: string };
-	wp_pattern_sync_status: string;
+	excerpt?: string | { raw: string; rendered: string };
+	meta?: Record< string, any >;
+	wp_pattern_sync_status?: string;
+}
+
+export interface SiteSettings {
+	posts_per_page?: number;
+	default_comment_status?: string | null;
+}
+
+export interface PostsPage {
+	title?: { raw?: string } | string;
 }
 
 export type Post = Template | TemplatePart | Pattern | BasePost;
@@ -127,6 +152,7 @@ export interface PostType {
 	supports?: {
 		'page-attributes'?: boolean;
 		title?: boolean;
+		excerpt?: boolean;
 		revisions?: boolean;
 		author?: string;
 		thumbnail?: string;
@@ -147,6 +173,7 @@ export interface MediaEditProps< Item >
 	> {
 	/**
 	 * Array of allowed media types (e.g., ['image', 'video']).
+	 * Use ['*'] to allow all file types.
 	 *
 	 * @default ['image']
 	 */

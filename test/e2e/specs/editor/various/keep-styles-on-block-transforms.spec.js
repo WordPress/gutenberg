@@ -17,8 +17,19 @@ test.describe( 'Keep styles on block transforms', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '## Heading' );
-		await page.click( 'role=button[name="Text"i]' );
-		await page.click( 'role=option[name="Luminous vivid orange"i]' );
+
+		// Text color now lives in the Typography panel.
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page
+			.getByRole( 'option', { name: 'Luminous vivid orange' } )
+			.click();
 
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )

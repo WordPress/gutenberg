@@ -16,17 +16,21 @@ _This package assumes that your code will run in an ES2015+ environment. If you'
 
 ## Usage
 
-This package is designed to be loaded as a script module on WordPress admin pages. When loaded, it automatically:
+This package is designed to be loaded as a script module on WordPress admin pages. It exposes an `initialize()` function that, on first call:
 
-1. Fetches all ability categories from `/wp-abilities/v1/categories`
-2. Registers them with `@wordpress/abilities`
-3. Fetches all abilities from `/wp-abilities/v1/abilities`
-4. Registers them with a `callback` that handles execution via REST API
+1. Fetches all ability categories from `/wp-abilities/v1/categories` and registers them with `@wordpress/abilities`
+2. Fetches all abilities from `/wp-abilities/v1/abilities` and registers them with a `callback` that handles execution via REST API
 
-Simply import the package to initialize the WordPress abilities:
+Initialization is lazy: importing the package does not trigger network requests. Call `initialize()` from the feature that needs abilities — for example, when the workflow palette opens. Repeated calls return the same in-flight or resolved promise, so the requests fire at most once.
 
 ```js
-import '@wordpress/core-abilities';
+import { initialize } from '@wordpress/core-abilities';
+import { getAbilities, executeAbility } from '@wordpress/abilities';
+
+await initialize();
+
+console.log( getAbilities() );
+console.log( await executeAbility( 'core/get-site-info' ) );
 ```
 
 ## Contributing to this package

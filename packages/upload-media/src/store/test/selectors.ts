@@ -10,10 +10,12 @@ import {
 import {
 	getActiveUploadCount,
 	getActiveImageProcessingCount,
+	getActiveVideoProcessingCount,
 	getFailedItems,
 	getItemProgress,
 	getPendingUploads,
 	getPendingImageProcessing,
+	getPendingVideoProcessing,
 	hasPendingItemsByParentId,
 } from '../private-selectors';
 import {
@@ -371,6 +373,47 @@ describe( 'selectors', () => {
 			expect( getItemProgress( state, '1' ) ).toBe( 50 );
 			expect( getItemProgress( state, '2' ) ).toBe( 75 );
 			expect( getItemProgress( state, '999' ) ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'removed selectors', () => {
+		it( 'isUploadingToPost is no longer exported', () => {
+			const privateSelectors = require( '../private-selectors' );
+			expect( privateSelectors.isUploadingToPost ).toBeUndefined();
+		} );
+
+		it( 'getPausedUploadForPost is no longer exported', () => {
+			const privateSelectors = require( '../private-selectors' );
+			expect( privateSelectors.getPausedUploadForPost ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'video processing selectors', () => {
+		it( 'getActiveVideoProcessingCount counts items transcoding a GIF', () => {
+			const state = {
+				queue: [
+					{ currentOperation: OperationType.TranscodeGif },
+					{ currentOperation: OperationType.Upload },
+					{ currentOperation: OperationType.TranscodeGif },
+				],
+			} as never;
+			expect( getActiveVideoProcessingCount( state ) ).toBe( 2 );
+		} );
+
+		it( 'getPendingVideoProcessing returns items whose next op is TranscodeGif', () => {
+			const state = {
+				queue: [
+					{
+						operations: [ OperationType.TranscodeGif ],
+						currentOperation: undefined,
+					},
+					{
+						operations: [ OperationType.Upload ],
+						currentOperation: undefined,
+					},
+				],
+			} as never;
+			expect( getPendingVideoProcessing( state ) ).toHaveLength( 1 );
 		} );
 	} );
 

@@ -17,11 +17,6 @@ test.describe( 'Pages View Persistence', () => {
 		} );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-		await requestUtils.deleteAllPages();
-	} );
-
 	test.beforeEach( async ( { admin, page } ) => {
 		await admin.visitSiteEditor();
 		await page.getByRole( 'button', { name: 'Pages' } ).click();
@@ -36,6 +31,11 @@ test.describe( 'Pages View Persistence', () => {
 			await page.getByRole( 'button', { name: 'Reset view' } ).click();
 			await expect( modifiedIndicator ).toBeHidden();
 		}
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deleteAllPages();
 	} );
 
 	test( 'persists table layout across all tabs with unified view persistence', async ( {

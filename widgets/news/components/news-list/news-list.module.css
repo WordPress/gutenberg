@@ -1,0 +1,28 @@
+.root {
+	flex: 1;
+	min-width: 0;
+	min-height: 0;
+	overflow: auto;
+}
+
+.feedIcon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	border-radius: var(--wpds-border-radius-md);
+	background-color: var(--wpds-color-background-track-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.titleLink {
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.meta {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}

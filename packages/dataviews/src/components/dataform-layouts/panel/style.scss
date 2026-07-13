@@ -1,5 +1,4 @@
-@use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as vars;
 @use "@wordpress/base-styles/z-index" as *;
 
 .dataforms-layouts-panel__field-trigger {
@@ -7,15 +6,15 @@
 	color: inherit;
 	display: flex;
 	width: 100%;
-	min-height: $grid-unit-30;
-	cursor: pointer;
+	min-height: var(--wpds-dimension-size-sm);
+	cursor: var(--wpds-cursor-control);
 	align-items: flex-start;
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 	isolation: isolate;
 
 	&--label-side {
 		flex-direction: row;
-		gap: var(--wpds-dimension-gap-md);
+		gap: var(--wpds-dimension-gap-sm);
 	}
 
 	&--label-top {
@@ -28,14 +27,14 @@
 	}
 
 	&:not(.is-disabled):hover {
-		color: var(--wp-admin-theme-color);
+		color: var(--wpds-color-foreground-interactive-brand);
 
 		.dataforms-layouts-panel__field-trigger-icon {
 			opacity: 1;
 		}
 
 		.dataforms-layouts-panel__field-label {
-			color: var(--wp-admin-theme-color);
+			color: var(--wpds-color-foreground-interactive-brand);
 		}
 	}
 
@@ -43,8 +42,8 @@
 		cursor: default;
 
 		.dataforms-layouts-panel__field-control {
-			color: $gray-700;
-			font-weight: var(--wpds-font-weight-regular);
+			color: var(--wpds-color-foreground-content-neutral-weak);
+			font-weight: var(--wpds-typography-font-weight-regular);
 		}
 	}
 }
@@ -56,13 +55,13 @@
 
 	&:hover,
 	&:focus-visible {
-		fill: var(--wp-admin-theme-color);
+		fill: var(--wpds-color-foreground-interactive-brand);
 	}
 }
 
 .dataforms-layouts-panel__field-trigger-icon {
 	padding: 0;
-	color: var(--wp-admin-theme-color);
+	color: var(--wpds-color-foreground-interactive-brand);
 	flex: 0 0 auto;
 	opacity: 0;
 	border-radius: var(--wpds-border-radius-xs);
@@ -71,7 +70,7 @@
 		opacity: 1;
 		outline:
 			var(--wpds-border-width-focus) solid
-			var(--wp-admin-theme-color);
+			var(--wpds-color-stroke-focus);
 	}
 }
 
@@ -86,13 +85,12 @@
 .dataforms-layouts-panel__field-label {
 	width: 38%;
 	flex-shrink: 0;
-	min-height: $grid-unit-30;
+	min-height: var(--wpds-dimension-size-sm);
 	display: flex;
 	align-items: center;
-	line-height: $grid-unit-05 * 5;
+	line-height: var(--wpds-typography-line-height-sm);
 	hyphens: auto;
-	color: $gray-700;
-	text-transform: capitalize;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 
 	.components-base-control__label {
 		display: inline;
@@ -101,7 +99,7 @@
 	}
 
 	&.has-error {
-		color: $alert-red;
+		color: var(--wpds-color-foreground-content-error-weak);
 	}
 }
 
@@ -109,26 +107,27 @@
 	position: relative;
 	z-index: 1;
 	cursor: help;
-	fill: $alert-red;
+	color: var(--wpds-color-foreground-content-error-weak);
 	display: inline-flex;
 	flex-direction: row;
 	align-items: center;
-	gap: $grid-unit-05;
-	svg {
-		fill: currentColor;
-	}
+	gap: var(--wpds-dimension-gap-xs);
 }
 
 .dataforms-layouts-panel__field-control {
 	flex-grow: 1;
 	min-width: 0;
-	min-height: $grid-unit-30;
-	line-height: var(--wpds-font-line-height-md);
+	min-height: var(--wpds-dimension-size-sm);
+	line-height: var(--wpds-typography-line-height-md);
 	display: flex;
 	align-items: center;
-	overflow: hidden;
+	overflow: clip;
+	// padding-inline + negative margin-inline creates room within the
+	// clip boundary for focus rings of inner controls.
+	padding-inline: var(--wpds-border-width-focus);
+	margin-inline: calc(-1 * var(--wpds-border-width-focus));
 	word-break: break-word;
-	font-weight: var(--wpds-font-weight-medium);
+	font-weight: var(--wpds-typography-font-weight-medium);
 
 	> * {
 		min-width: 0;
@@ -152,18 +151,22 @@
 }
 
 .dataforms-layouts-panel__field-dropdown .components-popover__content {
-	min-width: 256px;
-	padding: $grid-unit-20;
+	min-width: 320px;
+	padding: var(--wpds-dimension-padding-lg);
 }
 
 .dataforms-layouts-panel__dropdown-header {
-	margin-bottom: $grid-unit-20;
+	margin-bottom: var(--wpds-dimension-gap-lg);
 }
 
 .dataforms-layouts-panel__modal-footer {
-	margin-top: $grid-unit-20;
+	margin-top: var(--wpds-dimension-gap-lg);
 }
 
 .components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown {
 	z-index: z-index(".components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown");
+}
+
+.dataforms-layouts-panel__summary-button:empty {
+	min-width: vars.$admin-sidebar-width;
 }

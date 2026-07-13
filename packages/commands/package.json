@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/commands",
-	"version": "1.41.0",
+	"version": "1.50.0",
 	"description": "Handles the commands menu.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -41,7 +41,6 @@
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"dependencies": {
 		"@wordpress/base-styles": "file:../base-styles",
@@ -51,14 +50,15 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
+		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/warning": "file:../warning",
 		"clsx": "^2.1.1",
 		"cmdk": "^1.0.0"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"publishConfig": {
 		"access": "public"

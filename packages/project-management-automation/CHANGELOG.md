@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   First-time contributor label: detect prior contributions made under a GitHub noreply email so those contributors are no longer mislabeled as first-time contributors ([#79987](https://github.com/WordPress/gutenberg/pull/79987)).
+
+## 2.50.0 (2026-07-01)
+
+## 2.49.0 (2026-06-24)
+
+## 2.48.1 (2026-06-16)
+
+## 2.48.0 (2026-06-10)
+
+## 2.47.0 (2026-05-27)
+
+## 2.46.0 (2026-05-14)
+
+## 2.45.0 (2026-04-29)
+
+## 2.44.0 (2026-04-15)
+
+## 2.43.0 (2026-04-01)
+
+## 2.42.0 (2026-03-18)
+
 ## 2.41.0 (2026-03-04)
 
 ## 2.40.0 (2026-02-18)

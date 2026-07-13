@@ -4,6 +4,7 @@
 
 @use "sass:color";
 @use "sass:math";
+@use "./internal/wpds-token-fallbacks" as wpds;
 @use "./variables";
 @use "./colors";
 @use "./breakpoints";
@@ -177,6 +178,24 @@
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
 	outline-offset: 2px;
+}
+
+
+/**
+ * Standard focus rings for the WordPress Design System.
+ *
+ * Apply `outset-ring__focus` inside the relevant pseudo-class at the call site,
+ * e.g. `&:focus { @include outset-ring__focus(); }`.
+ */
+
+@mixin outset-ring__focus() {
+	outline: wpds.var("--wpds-border-width-focus") solid wpds.var("--wpds-color-stroke-focus");
+	outline-offset: wpds.var("--wpds-border-width-focus");
+
+	// Defend against a conflicting focus ring from WordPress common.css on `a:focus`.
+	&:is(a) {
+		box-shadow: none;
+	}
 }
 
 
@@ -534,7 +553,7 @@
 
 @mixin wordpress-admin-schemes() {
 	body.admin-color-light {
-		@include admin-scheme(#0085ba);
+		@include admin-scheme(#007cba);
 	}
 
 	body.admin-color-modern {
@@ -542,27 +561,27 @@
 	}
 
 	body.admin-color-blue {
-		@include admin-scheme(#096484);
+		@include admin-scheme(#437aa8);
 	}
 
 	body.admin-color-coffee {
-		@include admin-scheme(#46403c);
+		@include admin-scheme(#916745);
 	}
 
 	body.admin-color-ectoplasm {
-		@include admin-scheme(#523f6d);
+		@include admin-scheme(#646c3e);
 	}
 
 	body.admin-color-midnight {
-		@include admin-scheme(#e14d43);
+		@include admin-scheme(#cf4339);
 	}
 
 	body.admin-color-ocean {
-		@include admin-scheme(#627c83);
+		@include admin-scheme(#567958);
 	}
 
 	body.admin-color-sunrise {
-		@include admin-scheme(#dd823b);
+		@include admin-scheme(#ad631e);
 	}
 }
 
@@ -682,6 +701,18 @@
 		color: colors.$white;
 		background: var(--wp-admin-theme-color);
 	}
+
+	svg {
+		@media not (prefers-reduced-motion) {
+			transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+		}
+	}
+
+	&.is-pressed {
+		svg {
+			transform: rotate(45deg);
+		}
+	}
 }
 
 @mixin selected-block-outline($widthRatio: 1) {
@@ -689,7 +720,7 @@
 	outline-style: solid;
 	outline-width: calc(#{$widthRatio} * (var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
 	outline-offset: calc(#{$widthRatio} * ((-1 * var(--wp-admin-border-width-focus) ) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
-	box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus, #{variables.$border-width-focus-fallback}) + #{variables.$border-width}) colors.$white, 0 0 0 variables.$border-width colors.$white, variables.$elevation-x-small;
+	box-shadow: inset 0 0 0 calc((#{$widthRatio} * (var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1))) + 0.5px) rgba(colors.$white, 0.7);
 }
 
 @mixin selected-block-focus($widthRatio: 1) {

@@ -223,7 +223,7 @@ test.describe( 'Buttons', () => {
 						attributes: {
 							text: 'WordPress',
 							url: 'https://www.wordpress.org/',
-							rel: 'noreferrer noopener',
+							rel: 'noopener',
 							linkTarget: '_blank',
 						},
 					},
@@ -257,8 +257,206 @@ test.describe( 'Buttons', () => {
 						attributes: {
 							text: 'WordPress',
 							url: 'https://www.wordpress.org/',
-							rel: 'noreferrer noopener nofollow',
+							rel: 'noopener nofollow',
 							linkTarget: '_blank',
+						},
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'can apply named colors', async ( { editor, page } ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'Content' );
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page.click( 'role=option[name="Cyan bluish gray"i]' );
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page.click( 'role=option[name="Vivid red"i]' );
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:buttons -->
+<div class=\"wp-block-buttons\"><!-- wp:button {\"backgroundColor\":\"vivid-red\",\"textColor\":\"cyan-bluish-gray\",\"style\":{\"elements\":{\"link\":{\"color\":{\"text\":\"var:preset|color|cyan-bluish-gray\"}}}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-cyan-bluish-gray-color has-vivid-red-background-color has-text-color has-background has-link-color wp-element-button\">Content</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+		);
+	} );
+
+	test( 'can apply custom colors', async ( { editor, page } ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'Content' );
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page.click( 'role=button[name="Custom color picker"i]' );
+		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
+
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page.click( 'role=button[name="Custom color picker"i]' );
+		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:buttons -->
+<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"color\":{\"text\":\"#ff0000\",\"background\":\"#00ff00\"},\"elements\":{\"link\":{\"color\":{\"text\":\"#ff0000\"}}}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-text-color has-background has-link-color wp-element-button\" style=\"color:#ff0000;background-color:#00ff00\">Content</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+		);
+	} );
+
+	test( 'can apply named gradient background color', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'Content' );
+		await editor.openDocumentSettingsSidebar();
+
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Gradient', exact: true } )
+			.click();
+		await page.click( 'role=option[name="Gradient: Purple to yellow"i]' );
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:buttons -->
+<div class=\"wp-block-buttons\"><!-- wp:button {\"gradient\":\"purple-to-yellow\"} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-purple-to-yellow-gradient-background has-background wp-element-button\">Content</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+		);
+	} );
+
+	test( 'can apply custom gradient background color', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'Content' );
+		await editor.openDocumentSettingsSidebar();
+
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Gradient', exact: true } )
+			.click();
+		await page.click(
+			'role=button[name=/^Gradient control point at position 0% with color code/]'
+		);
+		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
+		await page.keyboard.press( 'Escape' );
+		await page.click(
+			'role=button[name=/^Gradient control point at position 100% with color code/]'
+		);
+		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:buttons -->
+<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"color\":{\"gradient\":\"linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,255,0) 100%)\"}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-background wp-element-button\" style=\"background:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,255,0) 100%)\">Content</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+		);
+	} );
+
+	test( 'copies attributes when inserting a sibling via the appender', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'Content' );
+		await editor.openDocumentSettingsSidebar();
+
+		// Apply named colors to the first button. Text and background color
+		// controls now live in the Typography and Background panels.
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page.getByRole( 'option', { name: 'Cyan bluish gray' } ).click();
+		await settings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page.getByRole( 'option', { name: 'Vivid red' } ).click();
+
+		// Select the parent Buttons block so the appender is visible.
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Buttons' } )
+		);
+
+		// Insert a sibling via the appender; should auto-insert a button.
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add button' } )
+			.click();
+
+		// The new button should inherit color attributes from its sibling.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Content',
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
+						},
+					},
+					{
+						name: 'core/button',
+						attributes: {
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
 						},
 					},
 				],
@@ -271,12 +469,12 @@ test.describe( 'Buttons', () => {
 			await requestUtils.activateTheme( 'emptytheme' );
 		} );
 
-		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.activateTheme( 'twentytwentyone' );
-		} );
-
 		test.beforeEach( async ( { admin } ) => {
 			await admin.createNewPost();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyone' );
 		} );
 
 		test( 'can resize width', async ( { editor, page } ) => {
@@ -337,117 +535,6 @@ test.describe( 'Buttons', () => {
 <!-- /wp:buttons -->`
 			);
 		} );
-	} );
-
-	test( 'can apply named colors', async ( { editor, page } ) => {
-		await editor.insertBlock( { name: 'core/buttons' } );
-		await page.keyboard.type( 'Content' );
-		await editor.openDocumentSettingsSidebar();
-
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
-		);
-		await page.click( 'role=option[name="Cyan bluish gray"i]' );
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
-		);
-		await page.click( 'role=option[name="Vivid red"i]' );
-
-		// Check the content.
-		const content = await editor.getEditedPostContent();
-		expect( content ).toBe(
-			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"backgroundColor\":\"vivid-red\",\"textColor\":\"cyan-bluish-gray\",\"style\":{\"elements\":{\"link\":{\"color\":{\"text\":\"var:preset|color|cyan-bluish-gray\"}}}}} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-cyan-bluish-gray-color has-vivid-red-background-color has-text-color has-background has-link-color wp-element-button\">Content</a></div>
-<!-- /wp:button --></div>
-<!-- /wp:buttons -->`
-		);
-	} );
-
-	test( 'can apply custom colors', async ( { editor, page } ) => {
-		await editor.insertBlock( { name: 'core/buttons' } );
-		await page.keyboard.type( 'Content' );
-		await editor.openDocumentSettingsSidebar();
-
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
-		);
-		await page.click( 'role=button[name="Custom color picker"i]' );
-		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
-
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
-		);
-		await page.click( 'role=button[name="Custom color picker"i]' );
-		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
-
-		// Check the content.
-		const content = await editor.getEditedPostContent();
-		expect( content ).toBe(
-			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"color\":{\"text\":\"#ff0000\",\"background\":\"#00ff00\"},\"elements\":{\"link\":{\"color\":{\"text\":\"#ff0000\"}}}}} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-text-color has-background has-link-color wp-element-button\" style=\"color:#ff0000;background-color:#00ff00\">Content</a></div>
-<!-- /wp:button --></div>
-<!-- /wp:buttons -->`
-		);
-	} );
-
-	test( 'can apply named gradient background color', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( { name: 'core/buttons' } );
-		await page.keyboard.type( 'Content' );
-		await editor.openDocumentSettingsSidebar();
-
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
-		);
-		await page.click( 'role=tab[name="Gradient"i]' );
-		await page.click( 'role=option[name="Gradient: Purple to yellow"i]' );
-
-		// Check the content.
-		const content = await editor.getEditedPostContent();
-		expect( content ).toBe(
-			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"gradient\":\"purple-to-yellow\"} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-purple-to-yellow-gradient-background has-background wp-element-button\">Content</a></div>
-<!-- /wp:button --></div>
-<!-- /wp:buttons -->`
-		);
-	} );
-
-	test( 'can apply custom gradient background color', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( { name: 'core/buttons' } );
-		await page.keyboard.type( 'Content' );
-		await editor.openDocumentSettingsSidebar();
-
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
-		);
-		await page.click( 'role=tab[name="Gradient"i]' );
-		await page.click(
-			'role=button[name=/^Gradient control point at position 0% with color code/]'
-		);
-		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
-		await page.keyboard.press( 'Escape' );
-		await page.click(
-			'role=button[name=/^Gradient control point at position 100% with color code/]'
-		);
-		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
-
-		// Check the content.
-		const content = await editor.getEditedPostContent();
-		expect( content ).toBe(
-			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"color\":{\"gradient\":\"linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,255,0) 100%)\"}}} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-background wp-element-button\" style=\"background:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,255,0) 100%)\">Content</a></div>
-<!-- /wp:button --></div>
-<!-- /wp:buttons -->`
-		);
 	} );
 
 	test.describe( 'Block transforms', () => {

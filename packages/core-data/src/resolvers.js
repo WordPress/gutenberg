@@ -25,9 +25,11 @@ import {
 	RECEIVE_INTERMEDIATE_RESULTS,
 	isNumericID,
 	normalizeQueryForResolution,
+	saveCRDTDoc,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
+import { parsedBlocksCache, getCacheKey } from './parsed-blocks-cache';
 
 /**
  * Requests authors from the REST API.
@@ -180,8 +182,25 @@ export const getEntityRecord =
 							transientConfig.read( recordWithTransients );
 					} );
 
+				// Share the parsed blocks with `useEntityBlockEditor` so the
+				// editor doesn't re-parse the same `content` string.
+				if (
+					recordWithTransients.blocks &&
+					typeof recordWithTransients.content?.raw === 'string'
+				) {
+					parsedBlocksCache.set( getCacheKey( kind, name, key ), {
+						content: recordWithTransients.content.raw,
+						blocks: recordWithTransients.blocks,
+					} );
+				}
+
+				const syncManager =
+					select?.isCollaborationSupported?.() === false
+						? undefined
+						: getSyncManager();
+
 				// Load the entity record for syncing. Do not await promise.
-				void getSyncManager()?.load(
+				void syncManager?.load(
 					entityConfig.syncConfig,
 					objectType,
 					objectId,
@@ -237,9 +256,15 @@ export const getEntityRecord =
 						// persistence. As we add support for syncing additional entity,
 						// we'll need to revisit where persisted CRDT documents are stored.
 						persistCRDTDoc: () => {
-							resolveSelect
+							if (
+								! entityConfig.syncConfig?.supportsPersistence
+							) {
+								return;
+							}
+
+							return resolveSelect
 								.getEditedEntityRecord( kind, name, key )
-								.then( ( editedRecord ) => {
+								.then( async ( editedRecord ) => {
 									// Don't persist the CRDT document if the record is still an
 									// auto-draft or if the entity does not support meta.
 									const { meta, status } = editedRecord;
@@ -247,13 +272,14 @@ export const getEntityRecord =
 										return;
 									}
 
-									// Trigger a save to persist the CRDT document. The entity's
-									// pre-persist hooks will create the persisted CRDT document
-									// and apply it to the record's meta.
-									dispatch.saveEntityRecord(
-										kind,
-										name,
-										editedRecord
+									const entityIdKey =
+										entityConfig.key || DEFAULT_ENTITY_KEY;
+									const entityId =
+										editedRecord[ entityIdKey ];
+
+									await saveCRDTDoc(
+										`${ kind }/${ name }`,
+										entityId
 									);
 								} );
 						},
@@ -267,6 +293,11 @@ export const getEntityRecord =
 									selectionHistory
 								);
 							}
+						},
+						onUndoStackChange: ( undoState ) => {
+							dispatch.__unstableNotifySyncUndoManagerChange(
+								undoState
+							);
 						},
 						restoreUndoMeta: ( ydoc, meta ) => {
 							const selectionHistory =
@@ -578,7 +609,7 @@ export const getEntityRecords =
 
 				dispatch.__unstableReleaseStoreLock( lock );
 			} );
-		} catch ( e ) {
+		} catch {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
 	};
@@ -635,7 +666,7 @@ export const getEmbedPreview =
 				path: addQueryArgs( '/oembed/1.0/proxy', { url } ),
 			} );
 			dispatch.receiveEmbedPreview( url, embedProxyResponse );
-		} catch ( error ) {
+		} catch {
 			// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
 			dispatch.receiveEmbedPreview( url, false );
 		}
@@ -706,7 +737,7 @@ export const canUser =
 				method: 'OPTIONS',
 				parse: false,
 			} );
-		} catch ( error ) {
+		} catch {
 			// Do nothing if our OPTIONS request comes back with an API error (4xx or
 			// 5xx). The previously determined isAllowed value will remain in the store.
 			return;
@@ -991,11 +1022,12 @@ export const getDefaultTemplateId =
 		const id = window?.__experimentalTemplateActivate
 			? template?.wp_id || template?.id
 			: template?.id;
-		// Endpoint may return an empty object if no template is found.
-		if ( id ) {
-			template.id = id;
-			registry.batch( () => {
-				dispatch.receiveDefaultTemplateId( query, id );
+
+		registry.batch( () => {
+			dispatch.receiveDefaultTemplateId( query, id || '' );
+			// Endpoint may return an empty object if no template is found.
+			if ( id ) {
+				template.id = id;
 				dispatch.receiveEntityRecords(
 					'postType',
 					template.type,
@@ -1007,15 +1039,19 @@ export const getDefaultTemplateId =
 					template.type,
 					id,
 				] );
-			} );
-		}
+			}
+		} );
 	};
 
 getDefaultTemplateId.shouldInvalidate = ( action ) => {
+	// Only invalidate on real saves; `persistedEdits` is absent on
+	// initial fetches so the kickoff's own site read doesn't wipe
+	// the just-resolved template id.
 	return (
 		action.type === 'RECEIVE_ITEMS' &&
 		action.kind === 'root' &&
-		action.name === 'site'
+		action.name === 'site' &&
+		!! action.persistedEdits
 	);
 };
 
@@ -1076,7 +1112,7 @@ export const getRevisions =
 				entityConfig.supportsPagination && query.per_page !== -1;
 			try {
 				response = await apiFetch( { path, parse: ! isPaginated } );
-			} catch ( error ) {
+			} catch {
 				// Do nothing if our request comes back with an API error.
 				return;
 			}
@@ -1219,7 +1255,7 @@ export const getRevision =
 			let record;
 			try {
 				record = await apiFetch( { path } );
-			} catch ( error ) {
+			} catch {
 				// Do nothing if our request comes back with an API error.
 				return;
 			}
@@ -1256,7 +1292,7 @@ export const getRegisteredPostMeta =
 				path: `${ restNamespace }/${ restBase }/?context=edit`,
 				method: 'OPTIONS',
 			} );
-		} catch ( error ) {
+		} catch {
 			// Do nothing if the request comes back with an API error.
 			return;
 		}
@@ -1319,4 +1355,29 @@ export const getEditorAssets =
 			path: '/wp-block-editor/v1/assets',
 		} );
 		dispatch.receiveEditorAssets( assets );
+	};
+
+/**
+ * Requests view config for a given entity type from the REST API.
+ *
+ * @param {string}    kind           Entity kind.
+ * @param {string}    name           Entity name.
+ * @param {?Object}   options        Optional options.
+ * @param {?string[]} options.fields Optional subset of top-level config
+ *                                   properties to request, mapped to the REST
+ *                                   API `_fields` parameter. When omitted, the
+ *                                   full config is requested.
+ */
+export const getViewConfig =
+	( kind, name, options = {} ) =>
+	async ( { dispatch } ) => {
+		const query = { kind, name };
+		const fields = getNormalizedCommaSeparable( options.fields );
+		if ( fields?.length ) {
+			query._fields = fields.join( ',' );
+		}
+		const config = await apiFetch( {
+			path: addQueryArgs( '/wp/v2/view-config', query ),
+		} );
+		dispatch.receiveViewConfig( kind, name, config );
 	};

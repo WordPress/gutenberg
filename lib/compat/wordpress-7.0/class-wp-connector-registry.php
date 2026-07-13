@@ -17,16 +17,19 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 	 *
 	 * @phpstan-type Connector array{
 	 *     name: non-empty-string,
-	 *     description: non-empty-string,
+	 *     description: string,
 	 *     logo_url?: non-empty-string,
-	 *     type: 'ai_provider',
+	 *     type: non-empty-string,
 	 *     authentication: array{
-	 *         method: 'api_key'|'none',
+	 *         method: 'api_key'|'application_password'|'none',
 	 *         credentials_url?: non-empty-string,
-	 *         setting_name?: non-empty-string
+	 *         setting_name?: non-empty-string,
+	 *         constant_name?: non-empty-string,
+	 *         env_var_name?: non-empty-string
 	 *     },
-	 *     plugin?: array{
-	 *         slug: non-empty-string
+	 *     plugin: array{
+	 *         file?: non-empty-string,
+	 *         is_active: callable(): bool
 	 *     }
 	 * }
 	 */
@@ -53,40 +56,90 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		/**
 		 * Registers a new connector.
 		 *
+		 * Validates the provided arguments and stores the connector in the registry.
+		 * For connectors with `api_key` or `application_password` authentication, a
+		 * `setting_name` can be provided explicitly. When omitted, setting names are
+		 * automatically generated using the pattern `connectors_{$type}_{$id}_{$method}`,
+		 * with hyphens in the type and ID normalized to underscores. These setting
+		 * names are used for Settings API registration and REST API exposure.
+		 *
+		 * Registering a connector with an ID that is already registered will trigger a
+		 * `_doing_it_wrong()` notice and return `null`. To override an existing connector,
+		 * call `unregister()` first.
+		 *
 		 * @since 7.0.0
 		 *
-		 * @param string $id   The unique connector identifier. Must contain only lowercase
-		 *                     alphanumeric characters and underscores.
+		 * @see WP_Connector_Registry::unregister()
+		 *
+		 * @param string $id   The unique connector identifier. Must match the pattern
+		 *                     `/^[a-z0-9_-]+$/` (lowercase alphanumeric, hyphens, and underscores only).
 		 * @param array  $args {
 		 *     An associative array of arguments for the connector.
 		 *
 		 *     @type string $name           Required. The connector's display name.
 		 *     @type string $description    Optional. The connector's description. Default empty string.
 		 *     @type string $logo_url       Optional. URL to the connector's logo image.
-		 *     @type string $type           Required. The connector type. Currently, only 'ai_provider' is supported.
+		 *     @type string $type           Required. The connector type, e.g. 'ai_provider'.
 		 *     @type array  $authentication {
 		 *         Required. Authentication configuration.
 		 *
-		 *         @type string      $method          Required. The authentication method: 'api_key' or 'none'.
-		 *         @type string|null $credentials_url Optional. URL where users can obtain API credentials.
+		 *         @type string $method          Required. The authentication method: 'api_key',
+		 *                                       'application_password', or 'none'.
+		 *         @type string $credentials_url Optional. URL where users can obtain API credentials.
+		 *         @type string $setting_name    Optional. The setting name for the API key
+		 *                                       or application-password credentials. When
+		 *                                       omitted, auto-generated as
+		 *                                       `connectors_{$type}_{$id}_api_key` for API
+		 *                                       keys and `connectors_{$type}_{$id}_application_password`
+		 *                                       for application passwords.
+		 *                                       Must be a non-empty string when provided.
+		 *         @type string $constant_name   Optional. PHP constant name for the API key
+		 *                                       (e.g. 'ANTHROPIC_API_KEY') or for application-password
+		 *                                       credentials in `username:password` format. Only checked
+		 *                                       when provided.
+		 *         @type string $env_var_name    Optional. Environment variable name for the API key
+		 *                                       (e.g. 'ANTHROPIC_API_KEY') or for application-password
+		 *                                       credentials in `username:password` format. Only checked
+		 *                                       when provided.
 		 *     }
 		 *     @type array  $plugin         {
 		 *         Optional. Plugin data for install/activate UI.
 		 *
-		 *         @type string $slug The WordPress.org plugin slug.
+		 *         @type string   $file      Optional. The plugin's main file path relative to the
+		 *                                   plugins directory (e.g. 'my-plugin/my-plugin.php' or
+		 *                                   'hello.php').
+		 *         @type callable $is_active Optional callback to determine whether the plugin
+		 *                                   is active. Receives no arguments and must return bool.
+		 *                                   Defaults to `__return_true`.
 		 *     }
 		 * }
 		 * @return array|null The registered connector data on success, null on failure.
 		 *
-		 * @phpstan-param Connector $args
+		 * @phpstan-param array{
+		 *     name: non-empty-string,
+		 *     description?: string,
+		 *     logo_url?: non-empty-string,
+		 *     type: non-empty-string,
+		 *     authentication: array{
+		 *         method: 'api_key'|'application_password'|'none',
+		 *         credentials_url?: non-empty-string,
+		 *         setting_name?: non-empty-string,
+		 *         constant_name?: non-empty-string,
+		 *         env_var_name?: non-empty-string
+		 *     },
+		 *     plugin?: array{
+		 *         file?: non-empty-string,
+		 *         is_active?: callable(): bool
+		 *     }
+		 * } $args
 		 * @phpstan-return Connector|null
 		 */
 		public function register( string $id, array $args ): ?array {
-			if ( ! preg_match( '/^[a-z0-9_]+$/', $id ) ) {
+			if ( ! preg_match( '/^[a-z0-9_-]+$/', $id ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					__(
-						'Connector ID must contain only lowercase alphanumeric characters and underscores.'
+						'Connector ID must contain only lowercase alphanumeric characters, hyphens, and underscores.'
 					),
 					'7.0.0'
 				);
@@ -134,13 +187,18 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				return null;
 			}
 
-			if ( empty( $args['authentication']['method'] ) || ! in_array( $args['authentication']['method'], array( 'api_key', 'none' ), true ) ) {
+			if ( empty( $args['authentication']['method'] ) || ! in_array( $args['authentication']['method'], array( 'api_key', 'application_password', 'none' ), true ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					/* translators: %s: Connector ID. */
-					sprintf( __( 'Connector "%s" authentication method must be "api_key" or "none".' ), esc_html( $id ) ),
+					sprintf( __( 'Connector "%s" authentication method must be "api_key", "application_password", or "none".' ), esc_html( $id ) ),
 					'7.0.0'
 				);
+				return null;
+			}
+
+			if ( 'ai_provider' === $args['type'] && ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
+				// No need for a doing_it_wrong as AI support is disabled intentionally.
 				return null;
 			}
 
@@ -157,15 +215,78 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				$connector['logo_url'] = $args['logo_url'];
 			}
 
-			if ( 'api_key' === $args['authentication']['method'] ) {
+			$requires_credentials = in_array( $args['authentication']['method'], array( 'api_key', 'application_password' ), true );
+
+			if ( $requires_credentials ) {
 				if ( ! empty( $args['authentication']['credentials_url'] ) && is_string( $args['authentication']['credentials_url'] ) ) {
 					$connector['authentication']['credentials_url'] = $args['authentication']['credentials_url'];
 				}
-				$connector['authentication']['setting_name'] = "connectors_ai_{$id}_api_key";
+
+				if ( isset( $args['authentication']['setting_name'] ) ) {
+					if ( ! is_string( $args['authentication']['setting_name'] ) || '' === $args['authentication']['setting_name'] ) {
+						_doing_it_wrong(
+							__METHOD__,
+							/* translators: %s: Connector ID. */
+							sprintf( __( 'Connector "%s" authentication setting_name must be a non-empty string.' ), esc_html( $id ) ),
+							'7.0.0'
+						);
+						return null;
+					}
+					$connector['authentication']['setting_name'] = $args['authentication']['setting_name'];
+				} else {
+					$connector['authentication']['setting_name'] = str_replace( '-', '_', "connectors_{$connector['type']}_{$id}_{$args['authentication']['method']}" );
+				}
+
+				if ( isset( $args['authentication']['constant_name'] ) ) {
+					if ( ! is_string( $args['authentication']['constant_name'] ) || '' === $args['authentication']['constant_name'] ) {
+						_doing_it_wrong(
+							__METHOD__,
+							/* translators: %s: Connector ID. */
+							sprintf( __( 'Connector "%s" authentication constant_name must be a non-empty string.' ), esc_html( $id ) ),
+							'7.0.0'
+						);
+						return null;
+					}
+					$connector['authentication']['constant_name'] = $args['authentication']['constant_name'];
+				}
+				if ( isset( $args['authentication']['env_var_name'] ) ) {
+					if ( ! is_string( $args['authentication']['env_var_name'] ) || '' === $args['authentication']['env_var_name'] ) {
+						_doing_it_wrong(
+							__METHOD__,
+							/* translators: %s: Connector ID. */
+							sprintf( __( 'Connector "%s" authentication env_var_name must be a non-empty string.' ), esc_html( $id ) ),
+							'7.0.0'
+						);
+						return null;
+					}
+					$connector['authentication']['env_var_name'] = $args['authentication']['env_var_name'];
+				}
 			}
 
+			$connector['plugin'] = array();
+
 			if ( ! empty( $args['plugin'] ) && is_array( $args['plugin'] ) ) {
-				$connector['plugin'] = $args['plugin'];
+				if ( ! empty( $args['plugin']['file'] ) ) {
+					$connector['plugin']['file'] = $args['plugin']['file'];
+				}
+
+				if ( isset( $args['plugin']['is_active'] ) ) {
+					if ( ! is_callable( $args['plugin']['is_active'] ) ) {
+						_doing_it_wrong(
+							__METHOD__,
+							/* translators: %s: Connector ID. */
+							sprintf( __( 'Connector "%s" plugin is_active must be callable.' ), esc_html( $id ) ),
+							'7.0.0'
+						);
+						return null;
+					}
+
+					$connector['plugin']['is_active'] = $args['plugin']['is_active'];
+				}
+			}
+
+			if ( ! isset( $connector['plugin']['is_active'] ) ) {
+				$connector['plugin']['is_active'] = '__return_true';
 			}
 
 			$this->registered_connectors[ $id ] = $connector;

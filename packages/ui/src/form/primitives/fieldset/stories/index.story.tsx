@@ -1,13 +1,21 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Fieldset } from '../../../..';
+import * as Fieldset from '../';
+import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Fieldset.Root > = {
 	title: 'Design System/Components/Form/Primitives/Fieldset',
 	component: Fieldset.Root,
 	subcomponents: {
-		Legend: Fieldset.Legend,
-		Description: Fieldset.Description,
-		Details: Fieldset.Details,
+		'Fieldset.Legend': Fieldset.Legend,
+		'Fieldset.Description': Fieldset.Description,
+		'Fieldset.Details': Fieldset.Details,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;
@@ -74,13 +82,7 @@ export const WithDetails: Story = {
 						<input type="checkbox" /> { fruit }
 					</label>
 				) ) }
-				<Fieldset.Details>
-					Details can include{ ' ' }
-					<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
-						links to more information
-					</a>{ ' ' }
-					and other semantic elements.
-				</Fieldset.Details>
+				<Fieldset.Details>{ DETAILS_EXAMPLE }</Fieldset.Details>
 			</>
 		),
 	},

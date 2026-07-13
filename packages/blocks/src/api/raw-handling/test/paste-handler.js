@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { pasteHandler } from '@wordpress/blocks';
+import { pasteHandler, serialize } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
+import { init as initAndRegisterImageBlock } from '../../../../../block-library/src/image';
 import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';
 import { init as initAndRegisterVideoBlock } from '../../../../../block-library/src/video';
 
@@ -263,6 +264,35 @@ describe( 'pasteHandler', () => {
 		} );
 	} );
 
+	it( 'preserves <img> wrapped in <a> when source is plain text only', () => {
+		const result = pasteHandler( {
+			HTML: '',
+			plainText:
+				'<a href="https://example.com/"><img src="https://example.com/img.png" alt="x"/></a>',
+			mode: 'INLINE',
+			tagName: 'p',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result ).toBe(
+			'<a href="https://example.com/"><img src="https://example.com/img.png" alt="x"></a>'
+		);
+	} );
+
+	it( 'preserves <img> wrapped in <a> when source is HTML', () => {
+		const result = pasteHandler( {
+			HTML: '<a href="https://example.com/"><img src="https://example.com/img.png" alt="x"/></a>',
+			plainText: '',
+			mode: 'INLINE',
+			tagName: 'p',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result ).toBe(
+			'<a href="https://example.com/"><img src="https://example.com/img.png" alt="x"></a>'
+		);
+	} );
+
 	it( 'can handle a video', () => {
 		const [ result ] = pasteHandler( {
 			HTML: '<video controls src="https://example.com/media.mp4" autoplay loop muted controls playsinline preload="auto" poster="https://example.com/media.jpg"></video>',
@@ -286,5 +316,142 @@ describe( 'pasteHandler', () => {
 		} );
 		expect( result.name ).toEqual( 'core/video' );
 		expect( result.isValid ).toBeTruthy();
+	} );
+} );
+
+describe( 'pasteHandler — core/image', () => {
+	beforeAll( () => {
+		initAndRegisterImageBlock();
+	} );
+
+	it( 'pins the width and lets the height follow the aspect ratio for a bare <img>', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<img src="https://example.com/i.jpg" width="77" height="77" />',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		expect( result.attributes.url ).toBe( 'https://example.com/i.jpg' );
+		expect( result.attributes.width ).toBe( '77px' );
+		// Height is pinned to `auto` rather than the literal pixel value so the
+		// image scales proportionally when the content width constrains it.
+		expect( result.attributes.height ).toBe( 'auto' );
+		expect( result.attributes.aspectRatio ).toBe( '1' );
+		// The serialized style must keep `height:auto` plus the declared
+		// aspect ratio so a capped width never stretches the image.
+		const serialized = serialize( result );
+		expect( serialized ).toContain( 'width:77px' );
+		expect( serialized ).toContain( 'height:auto' );
+		expect( serialized ).toContain( 'aspect-ratio:1' );
+	} );
+
+	it( 'pins the width and lets the height follow the aspect ratio for an <img> inside a <figure>', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<figure><img src="https://example.com/i.jpg" width="120" height="80" /></figure>',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		expect( result.attributes.width ).toBe( '120px' );
+		expect( result.attributes.height ).toBe( 'auto' );
+		expect( result.attributes.aspectRatio ).toBe( '1.5' );
+	} );
+
+	it( 'pins the width, sets the aspect ratio, and lifts the anchor for an anchor-wrapped <img> (e.g. a Flickr embed)', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<a data-flickr-embed="true" href="https://www.flickr.com/photos/x/123/"><img src="https://live.staticflickr.com/65535/123_b.jpg" width="1024" height="683" alt="pexels" /></a>',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		expect( result.attributes.url ).toBe(
+			'https://live.staticflickr.com/65535/123_b.jpg'
+		);
+		expect( result.attributes.width ).toBe( '1024px' );
+		expect( result.attributes.height ).toBe( 'auto' );
+		expect( result.attributes.aspectRatio ).toBe( String( 1024 / 683 ) );
+		expect( result.attributes.linkDestination ).toBe( 'custom' );
+		expect( result.attributes.href ).toBe(
+			'https://www.flickr.com/photos/x/123/'
+		);
+		const serialized = serialize( result );
+		expect( serialized ).toContain( 'width:1024px' );
+		expect( serialized ).toContain( 'height:auto' );
+		expect( serialized ).toContain( `aspect-ratio:${ 1024 / 683 }` );
+	} );
+
+	it( 'pins the width and lets the height follow when only a width is present', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<img src="https://example.com/i.jpg" width="120" />',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		expect( result.attributes.width ).toBe( '120px' );
+		expect( result.attributes.height ).toBe( 'auto' );
+		// A single declared dimension can't carry an aspect ratio.
+		expect( result.attributes.aspectRatio ).toBeUndefined();
+	} );
+
+	it( 'pins the height and lets the width follow when only a height is present', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<img src="https://example.com/i.jpg" height="80" />',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		// A height-only source keeps its height; the width follows via `auto`.
+		expect( result.attributes.width ).toBe( 'auto' );
+		expect( result.attributes.height ).toBe( '80px' );
+		expect( result.attributes.aspectRatio ).toBeUndefined();
+	} );
+
+	it( 'omits the aspect ratio when a dimension is zero', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<img src="https://example.com/i.jpg" width="100" height="0" />',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		// A zero dimension would divide to `Infinity`/`NaN`, so no ratio is set.
+		expect( result.attributes.aspectRatio ).toBeUndefined();
+	} );
+
+	it( 'drops non-pixel width/height (e.g. percentages)', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<img src="https://example.com/i.jpg" width="50%" height="auto" />',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		expect( result.attributes.width ).toBeUndefined();
+		expect( result.attributes.height ).toBeUndefined();
+	} );
+
+	it( 'leaves width/height unset when not present on the source', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<img src="https://example.com/i.jpg" />',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		expect( result.attributes.width ).toBeUndefined();
+		expect( result.attributes.height ).toBeUndefined();
 	} );
 } );

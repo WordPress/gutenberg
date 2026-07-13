@@ -6,9 +6,9 @@ import { createContext, useContext, memo, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Card, CardBody } from '../../../card';
-import { View } from '../../../view';
-import { Text } from '../../../text';
+import { Card, CardBody } from '../../card';
+import { View } from '../../view';
+import { Text } from '../../text';
 import { ContextSystemProvider } from '../index';
 
 const SomeContext = createContext();

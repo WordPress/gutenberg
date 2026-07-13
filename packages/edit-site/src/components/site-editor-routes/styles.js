@@ -16,18 +16,7 @@ import SidebarGlobalStyles from '../sidebar-global-styles';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { StyleBookPreview } = unlock( editorPrivateApis );
 
-function MobileGlobalStylesUI() {
-	const { query = {} } = useLocation();
-	const { canvas } = query;
-
-	if ( canvas === 'edit' ) {
-		return <Editor />;
-	}
-
-	return <SidebarGlobalStyles />;
-}
-
-function StylesPreviewArea() {
+function StylesPreviewArea( { siteData } ) {
 	const { path, query } = useLocation();
 	const history = useHistory();
 	const isStylebook = query.preview === 'stylebook';
@@ -47,6 +36,7 @@ function StylesPreviewArea() {
 			<StyleBookPreview
 				path={ section }
 				onPathChange={ onChangeSection }
+				settings={ siteData.editorSettings }
 			/>
 		);
 	}
@@ -60,8 +50,10 @@ export const stylesRoute = {
 	areas: {
 		content: <SidebarGlobalStyles />,
 		sidebar: <SidebarNavigationScreenGlobalStyles backPath="/" />,
-		preview: <StylesPreviewArea />,
-		mobile: <MobileGlobalStylesUI />,
+		preview: ( { siteData } ) => (
+			<StylesPreviewArea siteData={ siteData } />
+		),
+		mobileContent: <SidebarGlobalStyles />,
 	},
 	widths: {
 		content: 380,

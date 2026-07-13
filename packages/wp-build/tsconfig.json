@@ -4,7 +4,6 @@
 	"compilerOptions": {
 		"module": "node16",
 		"moduleResolution": "node16",
-		"esModuleInterop": true,
 		"target": "es2021",
 		"lib": [ "es2021", "ES2020.string" ],
 		"rootDir": ".",
@@ -18,11 +17,14 @@
 		"noEmit": true,
 		"outDir": ".cache"
 	},
+	"references": [ { "path": "../style-runtime" } ],
 	"include": [ "." ],
 	"exclude": [
 		// Excluded to maintain consistency with bin/tsconfig.json
 		// where packages/build.mjs was also excluded
 		"lib/build.mjs",
-		"lib/worker-build.mjs"
+		"lib/worker-build.mjs",
+		// Test files run via Jest; they are not part of the type-check.
+		"lib/test"
 	]
 }

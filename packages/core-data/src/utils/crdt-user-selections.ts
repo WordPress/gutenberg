@@ -12,18 +12,22 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { CRDT_RECORD_MAP_KEY } from '../sync';
 import type { YPostRecord } from './crdt';
 import type { YBlock, YBlocks } from './crdt-blocks';
-import { getRootMap } from './crdt-utils';
-import type { SelectionDirection } from '../types';
 import {
-	type AbsoluteBlockIndexPath,
-	type WPBlockSelection,
-	type SelectionState,
-	type SelectionNone,
-	type SelectionCursor,
-	type SelectionInOneBlock,
-	type SelectionInMultipleBlocks,
-	type SelectionWholeBlock,
-	type CursorPosition,
+	asRichTextOffset,
+	getRootMap,
+	getYTextByAttributeKey,
+	richTextOffsetToHtmlIndex,
+} from './crdt-utils';
+import type {
+	AbsoluteBlockIndexPath,
+	WPBlockSelection,
+	SelectionState,
+	SelectionNone,
+	SelectionCursor,
+	SelectionInOneBlock,
+	SelectionInMultipleBlocks,
+	SelectionWholeBlock,
+	CursorPosition,
 } from '../types';
 
 /**
@@ -35,6 +39,16 @@ export enum SelectionType {
 	SelectionInOneBlock = 'selection-in-one-block',
 	SelectionInMultipleBlocks = 'selection-in-multiple-blocks',
 	WholeBlock = 'whole-block',
+}
+
+/**
+ * The direction of a text selection, indicating where the caret sits.
+ */
+export enum SelectionDirection {
+	/** The caret is at the end of the selection (default / left-to-right). */
+	Forward = 'f',
+	/** The caret is at the start of the selection (right-to-left). */
+	Backward = 'b',
 }
 
 /**
@@ -169,7 +183,9 @@ function getCursorPosition(
 	}
 
 	const attributes = block.get( 'attributes' );
-	const currentYText = attributes?.get( selection.attributeKey );
+	const currentYText = attributes
+		? getYTextByAttributeKey( attributes, selection.attributeKey )
+		: null;
 
 	// If the attribute is not a Y.Text, return null.
 	if ( ! ( currentYText instanceof Y.Text ) ) {
@@ -178,12 +194,16 @@ function getCursorPosition(
 
 	const relativePosition = Y.createRelativePositionFromTypeIndex(
 		currentYText,
-		selection.offset
+		richTextOffsetToHtmlIndex(
+			currentYText.toString(),
+			asRichTextOffset( selection.offset )
+		)
 	);
 
 	return {
 		relativePosition,
 		absoluteOffset: selection.offset,
+		attributeKey: selection.attributeKey,
 	};
 }
 

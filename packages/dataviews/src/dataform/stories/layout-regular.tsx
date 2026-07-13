@@ -2,6 +2,10 @@
  * WordPress dependencies
  */
 import { useMemo, useState } from '@wordpress/element';
+// Registers the core format types (bold, italic, link, …) as a side effect so
+// the `richtext` control's keyboard shortcuts (⌘B / ⌘I / ⌘K) and the inline
+// link popover can be exercised in the story.
+import '@wordpress/format-library';
 
 /**
  * Internal dependencies
@@ -34,6 +38,7 @@ type SamplePost = {
 	comment_status?: string;
 	ping_status?: boolean;
 	longDescription?: string;
+	summary?: string;
 	origin?: string;
 	destination?: string;
 	flight_status?: string;
@@ -55,11 +60,16 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'date',
 		label: 'Date',
+		type: 'date',
+	},
+	{
+		id: 'datetime',
+		label: 'DateTime',
 		type: 'datetime',
 	},
 	{
 		id: 'birthdate',
-		label: 'Date as options',
+		label: 'DateTime as options',
 		type: 'datetime',
 		elements: [
 			{ value: '', label: 'Select a date' },
@@ -126,11 +136,11 @@ const fields: Field< SamplePost >[] = [
 		id: 'can_comment',
 		label: 'Allow people to leave a comment',
 		type: 'boolean',
-		Edit: 'checkbox',
+		Edit: 'toggle',
 	},
 	{
 		id: 'filesize',
-		label: 'File Size',
+		label: 'File size',
 		type: 'integer',
 		readOnly: true,
 	},
@@ -177,7 +187,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'longDescription',
-		label: 'Long Description',
+		label: 'Long description',
 		type: 'text',
 		Edit: {
 			control: 'textarea',
@@ -185,8 +195,23 @@ const fields: Field< SamplePost >[] = [
 		},
 	},
 	{
+		id: 'summary',
+		label: 'Summary',
+		type: 'text',
+		placeholder: 'Add a summary — try ⌘B, ⌘I, ⌘K or `code`',
+		Edit: {
+			control: 'richtext',
+			allowedFormats: [
+				'core/bold',
+				'core/italic',
+				'core/link',
+				'core/code',
+			],
+		},
+	},
+	{
 		id: 'comment_status',
-		label: 'Comment Status',
+		label: 'Comment status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
@@ -196,7 +221,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'ping_status',
-		label: 'Allow Pings/Trackbacks',
+		label: 'Allow pings/trackbacks',
 		type: 'boolean',
 	},
 	{
@@ -230,7 +255,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'flight_status',
-		label: 'Flight Status',
+		label: 'Flight status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
@@ -312,8 +337,10 @@ const getLayoutFromStoryArgs = ( {
 
 const LayoutRegularComponent = ( {
 	labelPosition,
+	disabled = false,
 }: {
 	labelPosition: 'default' | 'top' | 'side' | 'none';
+	disabled?: boolean;
 } ) => {
 	const [ post, setPost ] = useState( {
 		title: 'Hello, World!',
@@ -322,7 +349,8 @@ const LayoutRegularComponent = ( {
 		status: 'draft',
 		reviewer: 'fulano',
 		email: 'hello@wordpress.org',
-		date: '2021-01-01T12:00:00',
+		date: '2021-01-01',
+		datetime: '2021-01-01T12:00:00',
 		birthdate: '1950-02-23T12:00:00',
 		sticky: false,
 		can_comment: false,
@@ -330,7 +358,21 @@ const LayoutRegularComponent = ( {
 		dimensions: '1920x1080',
 		tags: [ 'photography' ],
 		description: 'This is a sample description.',
+		summary:
+			'A <strong>bold</strong> summary with <em>emphasis</em> and <code>code</code>.',
 	} );
+
+	// Make fields disabled when control is set to disabled.
+	const _fields: Field< SamplePost >[] = useMemo( () => {
+		if ( ! disabled ) {
+			return fields;
+		}
+
+		return fields.map( ( field ) => ( {
+			...field,
+			isDisabled: true,
+		} ) );
+	}, [ disabled ] );
 
 	const form: Form = useMemo(
 		() => ( {
@@ -342,19 +384,21 @@ const LayoutRegularComponent = ( {
 				'title',
 				'order',
 				'sticky',
+				'can_comment',
 				'author',
 				'status',
 				'reviewer',
 				'email',
 				'password',
 				'date',
+				'datetime',
 				'birthdate',
-				'can_comment',
 				'filesize',
 				'dimensions',
 				'tags',
 				'description',
 				'longDescription',
+				'summary',
 			],
 		} ),
 		[ labelPosition ]
@@ -363,7 +407,7 @@ const LayoutRegularComponent = ( {
 	return (
 		<DataForm< SamplePost >
 			data={ post }
-			fields={ fields }
+			fields={ _fields }
 			form={ form }
 			onChange={ ( edits ) =>
 				setPost( ( prev ) => ( {

@@ -7,14 +7,12 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import {
-	Card,
-	CardBody,
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	Button,
 } from '@wordpress/components';
 import { __, _n } from '@wordpress/i18n';
-import { Stack } from '@wordpress/ui';
+import { Card, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -52,10 +50,10 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 						</Stack>
 					</Stack>
 					<DataViews.FiltersToggled />
-					<Card variant="secondary">
-						<CardBody>
+					<Card.Root>
+						<Card.Content>
 							<Stack direction="column" gap="sm">
-								<Text size={ 18 } as="p">
+								<WCText size={ 18 } as="p">
 									{ createInterpolateElement(
 										_n(
 											'<PlanetsNumber /> planet',
@@ -70,9 +68,9 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 											),
 										}
 									) }
-								</Text>
+								</WCText>
 
-								<Text size={ 18 } as="p">
+								<WCText size={ 18 } as="p">
 									{ createInterpolateElement(
 										_n(
 											'<SatellitesNumber /> moon',
@@ -85,12 +83,12 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 											),
 										}
 									) }
-								</Text>
+								</WCText>
 							</Stack>
-						</CardBody>
-					</Card>
-					<Card style={ { width: '100%' } }>
-						<CardBody>
+						</Card.Content>
+					</Card.Root>
+					<Card.Root style={ { width: '100%' } }>
+						<Card.Content>
 							<Stack
 								direction="row"
 								justify="space-between"
@@ -100,8 +98,8 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 								<DataViews.BulkActionToolbar />
 								<DataViews.Pagination />
 							</Stack>
-						</CardBody>
-					</Card>
+						</Card.Content>
+					</Card.Root>
 				</Stack>
 			</div>
 			<DataViews.Layout className="free-composition-dataviews-layout" />
@@ -161,8 +159,8 @@ export const FreeCompositionComponent = () => {
 			actions={ actions }
 			onChangeView={ setView }
 			defaultLayouts={ {
-				table: {},
-				grid: {},
+				table: true,
+				grid: true,
 			} }
 			empty={
 				<Stack
@@ -172,11 +170,13 @@ export const FreeCompositionComponent = () => {
 					align="center"
 					className="free-composition-dataviews-empty"
 				>
-					<Text size={ 18 } as="p">
+					<WCText size={ 18 } as="p">
 						No planets
-					</Text>
-					<Text variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</Text>
-					<Button variant="secondary">Create new planet</Button>
+					</WCText>
+					<WCText variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</WCText>
+					<Button variant="secondary" __next40pxDefaultSize>
+						Create new planet
+					</Button>
 				</Stack>
 			}
 		>

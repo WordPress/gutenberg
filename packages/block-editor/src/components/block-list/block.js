@@ -23,7 +23,7 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, useRefEffect } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 
 /**
@@ -622,6 +622,7 @@ function BlockListBlockProvider( props ) {
 			const blockVisibility = attributes?.metadata?.blockVisibility;
 			const deviceType =
 				settings?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
+			const viewportSettings = settings?.__experimentalFeatures?.viewport;
 
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const isMultiSelected = isBlockMultiSelected( clientId );
@@ -645,6 +646,7 @@ function BlockListBlockProvider( props ) {
 				bindableAttributes,
 				blockVisibility,
 				deviceType,
+				viewportSettings,
 				isMultiSelected,
 				blockEditingMode,
 				isEditingDisabled: blockEditingMode === 'disabled',
@@ -736,15 +738,26 @@ function BlockListBlockProvider( props ) {
 					: false,
 				blockVisibility,
 				deviceType,
+				viewportSettings,
 			};
 		},
 		[ clientId, rootClientId ]
 	);
 
+	const defaultViewRef = useRefEffect( ( element ) => {
+		if ( element ) {
+			const { ownerDocument } = element;
+			const { defaultView } = ownerDocument;
+			defaultViewRef.current = defaultView;
+		}
+	}, [] );
+
 	// Use block visibility hook with data from existing useSelect to avoid extra subscription
 	const { isBlockCurrentlyHidden } = useBlockVisibility( {
 		blockVisibility: selectedProps?.blockVisibility,
 		deviceType: selectedProps?.deviceType,
+		viewportSettings: selectedProps?.viewportSettings,
+		view: defaultViewRef.current,
 	} );
 
 	// Users of the editor.BlockListBlock filter used to be able to
@@ -808,6 +821,7 @@ function BlockListBlockProvider( props ) {
 		bindableAttributes,
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 	} = selectedProps;
 
 	const privateContext = {
@@ -847,6 +861,7 @@ function BlockListBlockProvider( props ) {
 		bindableAttributes,
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 	};
 
 	if (

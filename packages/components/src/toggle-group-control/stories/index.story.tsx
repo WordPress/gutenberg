@@ -33,12 +33,12 @@ const meta: Meta< typeof ToggleGroupControl > = {
 		onChange: { action: 'onChange' },
 		value: { control: false },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Will be superseded by `ToggleGroupControl` in `@wordpress/ui`, but continue using for now.',
 		},
@@ -55,7 +55,6 @@ const Template: StoryFn< typeof ToggleGroupControl > = ( {
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			{ ...props }
 			onChange={ ( ...changeArgs ) => {
 				setValue( ...changeArgs );
@@ -90,6 +89,7 @@ Default.args = {
 		{ value: 'right', label: 'Right' },
 		{ value: 'justify', label: 'Justify' },
 	].map( mapPropsToOptionComponent ),
+	help: 'Help text to describe the control.',
 	isBlock: true,
 	label: 'Label',
 };

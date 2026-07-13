@@ -1,0 +1,53 @@
+/*
+ * Fills the pane the widget hands the list and scrolls internally, so a long
+ * list never pushes the fixed-height tile.
+ */
+.root {
+	flex: 1;
+	min-width: 0;
+	min-height: 0;
+	overflow: auto;
+}
+
+.titleHeader {
+	padding-block-start: var(--wpds-dimension-padding-md);
+	padding-block-end: var(--wpds-dimension-padding-md);
+	padding-inline-start: var(--wpds-dimension-padding-md);
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+/* Featured-image cell; fills the list layout's media slot. */
+.thumbImage {
+	width: 100%;
+	height: 100%;
+	border-radius: var(--wpds-border-radius-md);
+	object-fit: cover;
+}
+
+.thumbPlaceholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	border-radius: var(--wpds-border-radius-md);
+	background-color: var(--wpds-color-background-surface-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+/* Title link on the left, delete control pushed to the right of the cell. */
+.titleRow {
+	width: 100%;
+	min-width: 0;
+}
+
+.titleLink {
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.date {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}

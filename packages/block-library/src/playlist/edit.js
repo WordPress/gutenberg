@@ -2,12 +2,11 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	MediaPlaceholder,
@@ -28,7 +27,7 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 
@@ -38,9 +37,19 @@ import { createBlock } from '@wordpress/blocks';
 import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { WaveformPlayer } from '../utils/waveform-player';
+import { PlaylistContext } from './context';
 import { getTrackAttributes } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+const DEFAULT_WAVEFORM_STYLE = 'bars';
+const WAVEFORM_STYLE_OPTIONS = [
+	{ label: _x( 'Bars', 'waveform style option' ), value: 'bars' },
+	{ label: _x( 'Mirror', 'waveform style option' ), value: 'mirror' },
+	{ label: _x( 'Line', 'waveform style option' ), value: 'line' },
+	{ label: _x( 'Blocks', 'waveform style option' ), value: 'blocks' },
+	{ label: _x( 'Dots', 'waveform style option' ), value: 'dots' },
+	{ label: _x( 'Seekbar', 'waveform style option' ), value: 'seekbar' },
+];
 
 const PlaylistEdit = ( {
 	attributes,
@@ -55,17 +64,19 @@ const PlaylistEdit = ( {
 		showNumbers,
 		showImages,
 		showArtists,
-		currentTrack,
+		showTrackLength,
+		waveformStyle = DEFAULT_WAVEFORM_STYLE,
 	} = attributes;
+
 	const blockProps = useBlockProps();
-	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const waveformPanelId = `${ clientId }-waveform`;
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const [ currentTrackClientId, setCurrentTrackClientId ] = useState( null );
 
 	const { innerBlockTracks } = useSelect(
 		( select ) => {
@@ -77,61 +88,44 @@ const PlaylistEdit = ( {
 		[ clientId ]
 	);
 
-	// Ensure that each inner block has a unique ID,
-	// even if a track is duplicated.
-	useEffect( () => {
-		const seen = new Set();
-		let hasDuplicates = false;
-		const updatedBlocks = innerBlockTracks.map( ( block ) => {
-			if ( seen.has( block.attributes.uniqueId ) ) {
-				hasDuplicates = true;
-				return {
-					...block,
-					attributes: {
-						...block.attributes,
-						uniqueId: uuid(),
-					},
-				};
-			}
-			seen.add( block.attributes.uniqueId );
-			return block;
-		} );
-		if ( hasDuplicates ) {
-			replaceInnerBlocks( clientId, updatedBlocks );
-		}
-	}, [ innerBlockTracks, clientId, replaceInnerBlocks ] );
-
 	// Create a list of tracks from the inner blocks,
-	// but skip blocks that do not have a uniqueId attribute, such as the media placeholder.
-	const validTracks = innerBlockTracks.filter(
-		( block ) => !! block.attributes.uniqueId
+	// but skip blocks that do not have a source, such as the media placeholder.
+	const validTracks = useMemo(
+		() =>
+			innerBlockTracks.filter(
+				( block ) => !! block.attributes.src || !! block.attributes.blob
+			),
+		[ innerBlockTracks ]
 	);
-	const tracks = validTracks.map( ( block ) => block.attributes );
-	const firstTrackId = validTracks[ 0 ]?.attributes?.uniqueId;
+	const tracks = useMemo(
+		() =>
+			validTracks.map( ( block ) => ( {
+				...block.attributes,
+				clientId: block.clientId,
+			} ) ),
+		[ validTracks ]
+	);
 
-	// updateBlockAttributes is used to force updating the parent playlist block
-	// when the currentTrack changes. Using setAttributes directly does not update
-	// the currentTrack when multiple tracks are moved at the same time.
 	useEffect( () => {
-		if ( tracks.length === 0 ) {
-			// If there are no tracks but currentTrack is set, set it to null.
-			if ( currentTrack !== null ) {
-				updateBlockAttributes( clientId, { currentTrack: null } );
+		if ( validTracks.length === 0 ) {
+			if ( currentTrackClientId !== null ) {
+				setCurrentTrackClientId( null );
 			}
-		} else if (
-			// If the currentTrack is not the first track, update it to the first track.
-			firstTrackId &&
-			firstTrackId !== currentTrack
-		) {
-			updateBlockAttributes( clientId, { currentTrack: firstTrackId } );
+			return;
 		}
-	}, [
-		tracks,
-		currentTrack,
-		firstTrackId,
-		clientId,
-		updateBlockAttributes,
-	] );
+
+		const currentTrackExists = validTracks.some(
+			( block ) => block.clientId === currentTrackClientId
+		);
+		if ( ! currentTrackExists ) {
+			setCurrentTrackClientId( validTracks[ 0 ].clientId );
+		}
+	}, [ currentTrackClientId, setCurrentTrackClientId, validTracks ] );
+
+	const playlistContext = useMemo(
+		() => ( { currentTrackClientId, setCurrentTrackClientId } ),
+		[ currentTrackClientId, setCurrentTrackClientId ]
+	);
 
 	const onSelectTracks = useCallback(
 		( media ) => {
@@ -144,41 +138,32 @@ const PlaylistEdit = ( {
 			}
 
 			const trackList = media.map( getTrackAttributes );
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				currentTrack:
-					trackList.length > 0 ? trackList[ 0 ].uniqueId : null,
-			} );
 
 			const newBlocks = trackList.map( ( track ) =>
 				createBlock( 'core/playlist-track', track )
 			);
+			setCurrentTrackClientId( newBlocks[ 0 ]?.clientId ?? null );
 			// Replace the inner blocks with the new tracks.
 			replaceInnerBlocks( clientId, newBlocks );
 		},
-		[
-			__unstableMarkNextChangeAsNotPersistent,
-			setAttributes,
-			replaceInnerBlocks,
-			clientId,
-		]
+		[ replaceInnerBlocks, clientId, setCurrentTrackClientId ]
 	);
 
-	// Get current track data by finding the track with matching uniqueId.
-	const currentTrackData = tracks.find(
-		( track ) => track.uniqueId === currentTrack
-	);
+	// Get current track data by finding the track with matching client ID.
+	const currentTrackData =
+		tracks.find( ( track ) => track.clientId === currentTrackClientId ) ??
+		tracks[ 0 ];
 
 	// Handle track end - advance to next track or loop to first.
 	const onTrackEnded = useCallback( () => {
 		const currentIndex = tracks.findIndex(
-			( track ) => track.uniqueId === currentTrack
+			( track ) => track.clientId === currentTrackClientId
 		);
 		const nextTrack = tracks[ currentIndex + 1 ] || tracks[ 0 ];
-		if ( nextTrack?.uniqueId ) {
-			setAttributes( { currentTrack: nextTrack.uniqueId } );
+		if ( nextTrack?.clientId ) {
+			setCurrentTrackClientId( nextTrack.clientId );
 		}
-	}, [ currentTrack, tracks, setAttributes ] );
+	}, [ currentTrackClientId, setCurrentTrackClientId, tracks ] );
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
@@ -191,22 +176,18 @@ const PlaylistEdit = ( {
 				}
 				return titleB.localeCompare( titleA );
 			} );
-			const firstUniqueId = sortedBlocks[ 0 ]?.attributes?.uniqueId;
 			replaceInnerBlocks( clientId, sortedBlocks );
+			setCurrentTrackClientId( sortedBlocks[ 0 ]?.clientId ?? null );
 			setAttributes( {
 				order: trackOrder,
-				currentTrack:
-					firstUniqueId && firstUniqueId !== currentTrack
-						? firstUniqueId
-						: currentTrack,
 			} );
 		},
 		[
 			clientId,
-			currentTrack,
 			innerBlockTracks,
 			replaceInnerBlocks,
 			setAttributes,
+			setCurrentTrackClientId,
 		]
 	);
 
@@ -215,6 +196,18 @@ const PlaylistEdit = ( {
 			setAttributes( { [ attribute ]: newValue } );
 		};
 	}
+
+	const onChangeWaveformStyle = useCallback(
+		( newWaveformStyle ) => {
+			setAttributes( {
+				waveformStyle:
+					newWaveformStyle === DEFAULT_WAVEFORM_STYLE
+						? undefined
+						: newWaveformStyle,
+			} );
+		},
+		[ setAttributes ]
+	);
 
 	const hasSelectedChild = useSelect(
 		( select ) =>
@@ -276,6 +269,7 @@ const PlaylistEdit = ( {
 							showTracklist: true,
 							showArtists: true,
 							showNumbers: true,
+							showTrackLength: true,
 							showImages: true,
 							order: 'asc',
 						} );
@@ -283,7 +277,7 @@ const PlaylistEdit = ( {
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
-						label={ __( 'Show Tracklist' ) }
+						label={ __( 'Show tracklist' ) }
 						isShownByDefault
 						hasValue={ () => showTracklist !== true }
 						onDeselect={ () =>
@@ -291,7 +285,7 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							label={ __( 'Show Tracklist' ) }
+							label={ __( 'Show tracklist' ) }
 							onChange={ toggleAttribute( 'showTracklist' ) }
 							checked={ showTracklist }
 						/>
@@ -299,7 +293,7 @@ const PlaylistEdit = ( {
 					{ showTracklist && (
 						<>
 							<ToolsPanelItem
-								label={ __( 'Show artist name in Tracklist' ) }
+								label={ __( 'Show artist name in tracklist' ) }
 								isShownByDefault
 								hasValue={ () => showArtists !== true }
 								onDeselect={ () =>
@@ -308,7 +302,7 @@ const PlaylistEdit = ( {
 							>
 								<ToggleControl
 									label={ __(
-										'Show artist name in Tracklist'
+										'Show artist name in tracklist'
 									) }
 									onChange={ toggleAttribute(
 										'showArtists'
@@ -317,7 +311,9 @@ const PlaylistEdit = ( {
 								/>
 							</ToolsPanelItem>
 							<ToolsPanelItem
-								label={ __( 'Show number in Tracklist' ) }
+								label={ __(
+									'Show track numbers in tracklist'
+								) }
 								isShownByDefault
 								hasValue={ () => showNumbers !== true }
 								onDeselect={ () =>
@@ -325,11 +321,33 @@ const PlaylistEdit = ( {
 								}
 							>
 								<ToggleControl
-									label={ __( 'Show number in Tracklist' ) }
+									label={ __(
+										'Show track numbers in tracklist'
+									) }
 									onChange={ toggleAttribute(
 										'showNumbers'
 									) }
 									checked={ showNumbers }
+								/>
+							</ToolsPanelItem>
+							<ToolsPanelItem
+								label={ __(
+									'Show track duration in tracklist'
+								) }
+								isShownByDefault
+								hasValue={ () => showTrackLength !== true }
+								onDeselect={ () =>
+									setAttributes( { showTrackLength: true } )
+								}
+							>
+								<ToggleControl
+									label={ __(
+										'Show track duration in tracklist'
+									) }
+									onChange={ toggleAttribute(
+										'showTrackLength'
+									) }
+									checked={ showTrackLength }
 								/>
 							</ToolsPanelItem>
 						</>
@@ -355,7 +373,6 @@ const PlaylistEdit = ( {
 						onDeselect={ () => setAttributes( { order: 'asc' } ) }
 					>
 						<SelectControl
-							__next40pxDefaultSize
 							label={ __( 'Order' ) }
 							value={ order }
 							options={ [
@@ -367,13 +384,54 @@ const PlaylistEdit = ( {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
+			<InspectorControls group="styles">
+				<ToolsPanel
+					label={ __( 'Waveform' ) }
+					resetAll={ () => {
+						setAttributes( {
+							waveformStyle: undefined,
+						} );
+					} }
+					panelId={ waveformPanelId }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						label={ __( 'Shape' ) }
+						isShownByDefault
+						hasValue={ () =>
+							waveformStyle !== DEFAULT_WAVEFORM_STYLE
+						}
+						onDeselect={ () =>
+							onChangeWaveformStyle( DEFAULT_WAVEFORM_STYLE )
+						}
+						panelId={ waveformPanelId }
+					>
+						<SelectControl
+							label={ __( 'Shape' ) }
+							value={ waveformStyle }
+							options={ WAVEFORM_STYLE_OPTIONS }
+							onChange={ onChangeWaveformStyle }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</InspectorControls>
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
 					<WaveformPlayer
 						src={ currentTrackData?.src }
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
-						image={ currentTrackData?.image }
+						image={
+							showImages !== false
+								? currentTrackData?.image
+								: undefined
+						}
+						imageAlt={
+							showImages !== false
+								? currentTrackData?.imageAlt
+								: undefined
+						}
+						waveformStyle={ waveformStyle }
 						onEnded={ onTrackEnded }
 					/>
 				</Disabled>
@@ -382,9 +440,13 @@ const PlaylistEdit = ( {
 						className={ clsx( 'wp-block-playlist__tracklist', {
 							'wp-block-playlist__tracklist-show-numbers':
 								showNumbers,
+							'wp-block-playlist__tracklist-length-is-hidden':
+								! showTrackLength,
 						} ) }
 					>
-						{ innerBlocksProps.children }
+						<PlaylistContext.Provider value={ playlistContext }>
+							{ innerBlocksProps.children }
+						</PlaylistContext.Provider>
 					</ol>
 				) }
 				<Caption

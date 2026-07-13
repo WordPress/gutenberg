@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { RampStepConfig, RampConfig, RampDirection } from './types';
 import type { TaperChromaOptions } from './taper-chroma';
 
@@ -142,7 +139,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 		contrast: {
 			reference: 'stroke3',
 			followDirection: 'opposite',
-			target: 2.6,
+			target: 2.9,
 		},
 		taperChromaOptions: STROKE_TAPER_CHROMA,
 	},

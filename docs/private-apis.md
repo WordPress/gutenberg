@@ -96,7 +96,6 @@ Private exports:
 - `normalizeString`
 - `PrivateListView`
 - `ResizableBoxPopover`
-- `BlockInfo`
 - `useHasBlockToolbar`
 - `cleanEmptyObject`
 - `BlockQuickNavigation`
@@ -122,11 +121,11 @@ Private exports:
 - `PrivatePublishDateTimePicker`: version of public `PublishDateTimePicker` that has two extra props: `isCompact` and `showPopoverHeaderActions`.
 - `useSpacingSizes`
 - `useBlockDisplayTitle`
-- `__unstableBlockStyleVariationOverridesWithConfig`
+- `BlockStyleVariationOverridesWithConfig`
 - `setBackgroundStyleDefaults`
 - `sectionRootClientIdKey`
-- `__unstableCommentIconFill`
-- `__unstableCommentIconToolbarFill`
+- `NoteIconSlotFill`
+- `NoteIconToolbarSlotFill`
 
 ### `core/block-editor` store
 

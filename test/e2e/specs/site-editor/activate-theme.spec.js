@@ -8,9 +8,11 @@ test.describe( 'Activate theme', () => {
 		await admin.visitAdminPage( 'themes.php' );
 		await page.getByLabel( 'Live Preview Emptytheme' ).click();
 	} );
+
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
+
 	test( 'activate block theme when live previewing from sidebar save button', async ( {
 		admin,
 		page,
@@ -27,19 +29,20 @@ test.describe( 'Activate theme', () => {
 		await admin.visitAdminPage( 'themes.php' );
 		await expect( page.getByLabel( 'Customize Emptytheme' ) ).toBeVisible();
 	} );
+
 	test( 'activate block theme when live previewing in edit mode', async ( {
 		editor,
 		admin,
 		page,
 	} ) => {
-		// Wait for the loading to complete.
-		await expect( page.locator( '.edit-site-canvas-loader' ) ).toHaveCount(
-			0
-		);
-		// Disable welcome guide to prevent onboarding modal from appearing.
+		// Wait for the Site Editor to load before interacting with the page.
+		await expect(
+			page.getByRole( 'button', { name: 'Activate Emptytheme' } )
+		).toBeVisible();
 		await editor.setPreferences( 'core/edit-site', {
 			welcomeGuide: false,
 		} );
+
 		await editor.canvas.locator( 'body' ).click();
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )

@@ -372,7 +372,7 @@ export const phpTester = ( name, filename ) =>
 								'"attrs":{}'
 							)
 						);
-					} catch ( e ) {
+					} catch {
 						throw new Error(
 							'failed to parse JSON:\n' + process.stdout
 						);

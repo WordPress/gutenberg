@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/reusable-blocks",
-	"version": "5.41.0",
+	"version": "5.50.0",
 	"description": "Reusable blocks utilities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,7 +39,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"sideEffects": [
 		"src/index.js",
@@ -56,6 +55,7 @@
 		"@wordpress/components": "file:../components",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
+		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
@@ -63,9 +63,13 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url"
 	},
+	"devDependencies": {
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/preferences": "file:../preferences"
+	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"publishConfig": {
 		"access": "public"

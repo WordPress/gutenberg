@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -27,6 +22,12 @@ test.describe( 'Page List', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
+	test.beforeEach( async ( { admin, page } ) => {
+		// Go to the pages page, as it has the list layout enabled by default.
+		await admin.visitSiteEditor();
+		await page.getByRole( 'button', { name: 'Pages' } ).click();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		// Go back to the default theme.
 		await Promise.all( [
@@ -34,12 +35,6 @@ test.describe( 'Page List', () => {
 			requestUtils.deleteAllPages(),
 			requestUtils.deleteAllMedia(),
 		] );
-	} );
-
-	test.beforeEach( async ( { admin, page } ) => {
-		// Go to the pages page, as it has the list layout enabled by default.
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
 	} );
 
 	test( 'Persists filter/search when switching layout', async ( {
@@ -74,10 +69,8 @@ test.describe( 'Page List', () => {
 					} );
 					await placeholder.click();
 					const mediaLibrary = page.getByRole( 'dialog' );
-					const TEST_IMAGE_FILE_PATH = path.resolve(
-						__dirname,
-						'../../assets/10x10_e2e_test_image_z9T8jK.png'
-					);
+					const TEST_IMAGE_FILE_PATH =
+						'./assets/10x10_e2e_test_image_z9T8jK.png';
 
 					const fileChooserPromise =
 						page.waitForEvent( 'filechooser' );
@@ -370,6 +363,10 @@ test.describe( 'Page List', () => {
 			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
 		} );
 
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllUsers();
+		} );
+
 		Object.entries( fields ).forEach(
 			( [
 				key,
@@ -480,10 +477,6 @@ test.describe( 'Page List', () => {
 		// 		await expect( status ).toBeVisible();
 		// 	}
 		// } );
-
-		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.deleteAllUsers();
-		} );
 	} );
 
 	test.describe( 'Quick Edit Date Timezone Consistency', () => {

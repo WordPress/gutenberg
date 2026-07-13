@@ -5,6 +5,7 @@ import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -81,7 +82,11 @@ export function useSettingsForBlockElement(
 		};
 
 		// Some blocks can enable background colors but disable gradients.
-		if ( ! supportedStyles.includes( 'background' ) ) {
+		// Preserve gradient settings when background.gradient is supported.
+		if (
+			! supportedStyles.includes( 'background' ) &&
+			! supportedStyles.includes( 'backgroundGradient' )
+		) {
 			updatedSettings.color.gradients = [];
 			updatedSettings.color.customGradient = false;
 		}
@@ -162,14 +167,16 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		[ 'aspectRatio', 'height', 'minHeight', 'width' ].forEach( ( key ) => {
-			if ( ! supportedStyles.includes( key ) ) {
-				updatedSettings.dimensions = {
-					...updatedSettings.dimensions,
-					[ key ]: false,
-				};
+		[ 'aspectRatio', 'height', 'minHeight', 'minWidth', 'width' ].forEach(
+			( key ) => {
+				if ( ! supportedStyles.includes( key ) ) {
+					updatedSettings.dimensions = {
+						...updatedSettings.dimensions,
+						[ key ]: false,
+					};
+				}
 			}
-		} );
+		);
 
 		[ 'radius', 'color', 'style', 'width' ].forEach( ( key ) => {
 			if (
@@ -184,11 +191,15 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		[ 'backgroundImage', 'backgroundSize' ].forEach( ( key ) => {
-			if ( ! supportedStyles.includes( key ) ) {
+		[
+			[ 'backgroundImage', 'backgroundImage' ],
+			[ 'backgroundSize', 'backgroundSize' ],
+			[ 'backgroundGradient', 'gradient' ],
+		].forEach( ( [ styleKey, settingKey ] ) => {
+			if ( ! supportedStyles.includes( styleKey ) ) {
 				updatedSettings.background = {
 					...updatedSettings.background,
-					[ key ]: false,
+					[ settingKey ]: false,
 				};
 			}
 		} );
@@ -295,4 +306,48 @@ export function useGradientsPerOrigin( settings ) {
 		defaultGradients,
 		shouldDisplayDefaultGradients,
 	] );
+}
+
+/**
+ * Derives the color/gradient palette data and encode/decode helpers shared by
+ * the Color, Background, and Typography style panels, so the common preamble
+ * is defined once rather than repeated in each panel.
+ *
+ * @param {Object} settings Style settings object.
+ *
+ * @return {Object} Shared color/gradient palette data and helpers.
+ */
+export function useColorGradientSettings( settings ) {
+	const colors = useColorsPerOrigin( settings );
+	const gradients = useGradientsPerOrigin( settings );
+	const areCustomSolidsEnabled = settings?.color?.custom;
+	const areCustomGradientsEnabled = settings?.color?.customGradient;
+	const allColors = useMemo(
+		() => colors.flatMap( ( { colors: originColors } ) => originColors ),
+		[ colors ]
+	);
+	const decodeValue = ( rawValue ) =>
+		getValueFromVariable( { settings }, '', rawValue );
+	const encodeGradientValue = ( gradientValue ) => {
+		const allGradients = gradients.flatMap(
+			( { gradients: originGradients } ) => originGradients
+		);
+		const gradientObject = allGradients.find(
+			( { gradient } ) => gradient === gradientValue
+		);
+		return gradientObject
+			? 'var:preset|gradient|' + gradientObject.slug
+			: gradientValue;
+	};
+	return {
+		colors,
+		gradients,
+		allColors,
+		areCustomSolidsEnabled,
+		areCustomGradientsEnabled,
+		hasSolidColors: colors.length > 0 || areCustomSolidsEnabled,
+		hasGradientColors: gradients.length > 0 || areCustomGradientsEnabled,
+		decodeValue,
+		encodeGradientValue,
+	};
 }

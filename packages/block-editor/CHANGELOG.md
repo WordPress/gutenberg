@@ -2,6 +2,94 @@
 
 ## Unreleased
 
+### Internal
+
+-   Extract a shared `getBlockBindingsContext` helper for assembling the context handed to block-bindings sources; only entries present in the surrounding block context are copied ([#79855](https://github.com/WordPress/gutenberg/pull/79855)).
+
+### Bug Fixes
+
+-   Writing flow: Only pull a forward selection ending at the next element's offset 0 back into the previous block for triple clicks, and clamp the dispatched selection end offset to the rich text content length so an overshooting selection no longer collapses to its start ([#80126](https://github.com/WordPress/gutenberg/pull/80126)).
+-   `ListView`: Use the DS focus color token for the row focus ring so it adapts to themed surfaces such as the site editor navigation sidebar, and remove the duplicate focus ring on the row's Options (three-dot) button, which already draws the standard `Button` focus ring. ([#80087](https://github.com/WordPress/gutenberg/pull/80087)).
+-   `DimensionControl`: Include component styles in the block editor stylesheet so the fieldset reset is applied in Storybook and other contexts without WordPress core styles ([#79916](https://github.com/WordPress/gutenberg/pull/79916)).
+-   `InnerContent`: Render the selected inner block synchronously so its rich text selection stays current while typing; otherwise a stale selection offset could place a typed character at the wrong position in editable static inner blocks ([#79726](https://github.com/WordPress/gutenberg/pull/79726)).
+-   `useTypingObserver`: Capture the window reference at mount and reuse it during cleanup so the ref cleanup no longer reads `node.ownerDocument.defaultView` (which is `null` once the iframe-hosted editor has been detached from its window) and throws, which was also leaking the `removeEventListener` calls that follow it ([#78772](https://github.com/WordPress/gutenberg/pull/78772)).
+
+### Breaking Changes
+
+-   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
+    -   `FontAppearanceControl` ([#79635](https://github.com/WordPress/gutenberg/pull/79635)).
+    -   `FontFamilyControl` ([#79593](https://github.com/WordPress/gutenberg/pull/79593)).
+    -   `LetterSpacingControl` ([#79533](https://github.com/WordPress/gutenberg/pull/79533)).
+    -   `LineHeightControl` ([#79589](https://github.com/WordPress/gutenberg/pull/79589)).
+
+### Deprecations
+
+-   Soft-deprecate the `__experimentalImageEditor` component. The Media Editor modal is now the default crop experience for core blocks ([#78654](https://github.com/WordPress/gutenberg/pull/78654)).
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+-   Inserter media categories support an optional `emptyMessage`, shown in place of the generic "No results found" notice, that also keeps a source listed when it has no items. The media panel additionally renders attach/detach affordances for attached images ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
+
+## 15.23.0 (2026-07-01)
+
+## 15.22.0 (2026-06-24)
+
+### Enhancements
+
+-   Grid: Add a "Fill available space" option to the grid layout that switches the auto-placement keyword from `auto-fill` to `auto-fit`, so columns stretch to fill the row instead of leaving empty tracks. ([#79356](https://github.com/WordPress/gutenberg/pull/79356))
+-   List View: a block that supports `listView` is now excluded from the List View when it has no inner blocks and disallows insertion (`allowedBlocks` is `[]` or `false`), since there is nothing to show, rearrange, or add. ([#78932](https://github.com/WordPress/gutenberg/pull/78932))
+
+## 15.21.1 (2026-06-16)
+
+## 15.21.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Documentation
+
+-   Fix documentation typos and grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
+### Internal
+
+-   `ListView`: Compute the block visibility label once in `ListViewBlock` and pass it down to `ListViewBlockSelectButton`, removing a duplicated `useSelect`/`getBlockVisibilityLabel` call and clarifying that the label is exposed to assistive technology through the row's `aria-describedby` ([#78640](https://github.com/WordPress/gutenberg/pull/78640)).
+-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+
+## 15.20.0 (2026-05-27)
+
+### Bug Fixes
+
+-   `ColorPanel`: Theme CSS custom-property gradients are now decoded to their preset slug and persisted as a `gradient` block attribute rather than as a raw `style.color.gradient` value ([#78328](https://github.com/WordPress/gutenberg/pull/78328)).
+
+### Internal
+
+-   Remove legacy `Notice` overrides in block placeholder notices and media replace flow error UI ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+-   Updated `diff` dependency from `^4.0.2` to `^8.0.3` ([#77992](https://github.com/WordPress/gutenberg/pull/77992)).
+
+## 15.19.0 (2026-05-14)
+
+### Enhancements
+
+-   `BlockManager`: Add stacking context isolation to category list ([#77759](https://github.com/WordPress/gutenberg/pull/77759)).
+
+### Bug Fixes
+
+-   `ColorPanel`: Fix incorrect color selection and text↔link sync with duplicate-value palette entries. Slug-based selection is now threaded through the color panel so that two palette entries sharing the same hex value but different slugs are treated as distinct choices. The text↔link sync condition now compares raw stored references instead of decoded hex values; the previous decoded comparison incorrectly conflated entries that shared a hex value ([#78048](https://github.com/WordPress/gutenberg/pull/78048)).
+
+## 15.18.0 (2026-04-29)
+
+### Enhancements
+
+-   Use `--wpds-cursor-control` for interactive cursor styling and replace all instances ([#77354](https://github.com/WordPress/gutenberg/pull/77354)).
+
+## 15.17.0 (2026-04-15)
+
+## 15.16.0 (2026-04-01)
+
+## 15.15.0 (2026-03-18)
+
 ## 15.14.0 (2026-03-04)
 
 ## 15.13.0 (2026-02-18)

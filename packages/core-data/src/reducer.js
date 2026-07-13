@@ -13,7 +13,7 @@ import { createUndoManager } from '@wordpress/undo-manager';
 /**
  * Internal dependencies
  */
-import { ifMatchingAction, replaceAction } from './utils';
+import { clearUnchangedEdits, ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { ConnectionErrorCode } from './sync';
@@ -150,19 +150,23 @@ const withMultiEntityRecordEdits = ( reducer ) => ( state, action ) => {
 
 		let newState = state;
 		record.forEach( ( { id: { kind, name, recordId }, changes } ) => {
+			const persistedRecord =
+				state?.queriedData?.items?.default?.[ recordId ];
+			const edits = Object.fromEntries(
+				Object.entries( changes ).map( ( [ key, value ] ) => [
+					key,
+					action.type === 'UNDO' ? value.from : value.to,
+				] )
+			);
+
 			newState = reducer( newState, {
 				type: 'EDIT_ENTITY_RECORD',
 				kind,
 				name,
 				recordId,
-				edits: Object.entries( changes ).reduce(
-					( acc, [ key, value ] ) => {
-						acc[ key ] =
-							action.type === 'UNDO' ? value.from : value.to;
-						return acc;
-					},
-					{}
-				),
+				// Clear edits matching the persisted record so the entity is
+				// no longer dirty after undoing back to its saved state.
+				edits: clearUnchangedEdits( edits, persistedRecord ),
 			} );
 		} );
 		return newState;
@@ -460,6 +464,22 @@ export function undoManager( state = createUndoManager() ) {
 	return state;
 }
 
+// Stores a snapshot of the sync undo manager's undo/redo availability so
+// core-data selectors can react to undo stack changes.
+export function syncUndoManagerState(
+	state = { hasRedo: false, hasUndo: false },
+	action
+) {
+	switch ( action.type ) {
+		case 'SYNC_UNDO_MANAGER_CHANGE':
+			return {
+				hasRedo: action.hasRedo,
+				hasUndo: action.hasUndo,
+			};
+	}
+	return state;
+}
+
 export function editsReference( state = {}, action ) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
@@ -721,6 +741,32 @@ export function collaborationSupported( state = true, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing view configs, keyed by `kind/name`.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function viewConfigs( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_VIEW_CONFIG': {
+			const key = `${ action.kind }/${ action.name }`;
+			// Merge so a partial (`_fields`) response doesn't clobber
+			// properties already received for the same entity.
+			return {
+				...state,
+				[ key ]: {
+					...state[ key ],
+					...action.config,
+				},
+			};
+		}
+	}
+	return state;
+}
+
 export default combineReducers( {
 	users,
 	currentTheme,
@@ -731,6 +777,7 @@ export default combineReducers( {
 	themeGlobalStyleRevisions,
 	entities,
 	editsReference,
+	syncUndoManagerState,
 	undoManager,
 	embedPreviews,
 	userPermissions,
@@ -745,4 +792,5 @@ export default combineReducers( {
 	editorAssets,
 	syncConnectionStatuses,
 	collaborationSupported,
+	viewConfigs,
 } );

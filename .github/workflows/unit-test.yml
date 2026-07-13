@@ -29,6 +29,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
+            id-token: write
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
@@ -45,7 +46,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -55,10 +56,6 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
-            - name: Determine the number of CPU cores
-              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
-              id: cpu-cores
-
             - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
@@ -67,12 +64,15 @@ jobs:
 
             - name: Running the tests
               env:
-                  MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
                   SHARD: ${{ matrix.shard }}
+                  # Record the Node.js major as a custom flakiness environment
+                  # dimension so flakiness.io keeps a separate history per Node
+                  # version in the matrix.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
                   npm run test:unit -- \
                     --ci \
-                    --maxWorkers="$MAXWORKERS" \
+                    --maxWorkers="$(nproc)" \
                     --shard="$SHARD" \
                     --cacheDirectory="$HOME/.jest-cache"
 
@@ -81,6 +81,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
+            id-token: write
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
@@ -96,7 +97,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -106,10 +107,6 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
-            - name: Determine the number of CPU cores
-              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
-              id: cpu-cores
-
             - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
@@ -118,8 +115,11 @@ jobs:
 
             - name: Run the date tests
               env:
-                  MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
-              run: npm run test:unit:date -- --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"
+                  # Record the Node.js major as a custom flakiness environment
+                  # dimension so flakiness.io keeps a separate history per Node
+                  # version in the matrix.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
+              run: npm run test:unit:date -- --ci --maxWorkers="$(nproc)" --cacheDirectory="$HOME/.jest-cache"
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
@@ -154,7 +154,7 @@ jobs:
         permissions:
             contents: read
         steps:
-            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -166,7 +166,7 @@ jobs:
               run: npm run build -- --skip-types
 
             - name: Upload built JavaScript assets
-              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
                   name: build-assets
                   path: |
@@ -184,17 +184,21 @@ jobs:
             fail-fast: true
             matrix:
                 event: ['${{ github.event_name }}']
-                php: ['7.4', '8.0', '8.1', '8.2', '8.3']
+                php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5']
                 multisite: [false, true]
                 wordpress: ['', 'previous major version']
                 exclude:
-                    # On PRs: Only test PHP 7.4 and 8.3, single-site, latest WP
+                    # On PRs: Only test PHP 7.4 and 8.5, single-site, latest WP
                     - event: 'pull_request'
                       php: '8.0'
                     - event: 'pull_request'
                       php: '8.1'
                     - event: 'pull_request'
                       php: '8.2'
+                    - event: 'pull_request'
+                      php: '8.3'
+                    - event: 'pull_request'
+                      php: '8.4'
                     - event: 'pull_request'
                       multisite: true
                     - event: 'pull_request'
@@ -206,6 +210,10 @@ jobs:
                       wordpress: 'previous major version'
                     - php: '8.2'
                       wordpress: 'previous major version'
+                    - php: '8.3'
+                      wordpress: 'previous major version'
+                    - php: '8.4'
+                      wordpress: 'previous major version'
 
         env:
             WP_ENV_PHP_VERSION: ${{ matrix.php }}
@@ -213,7 +221,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -229,7 +237,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -318,13 +326,13 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
               with:
                   php-version: '7.4'
                   coverage: none
@@ -337,7 +345,7 @@ jobs:
               run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> "$GITHUB_OUTPUT"
 
             - name: Cache PHPCS scan cache
-              uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+              uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
                   path: .cache/phpcs.json
                   key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}

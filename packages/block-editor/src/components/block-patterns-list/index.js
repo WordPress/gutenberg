@@ -10,10 +10,9 @@ import { cloneBlock } from '@wordpress/blocks';
 import { useEffect, useState, forwardRef, useMemo } from '@wordpress/element';
 import {
 	Composite,
-	VisuallyHidden,
-	Tooltip,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { VisuallyHidden, Text, Tooltip } from '@wordpress/ui';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon, symbol } from '@wordpress/icons';
@@ -28,7 +27,12 @@ import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
 
 const WithToolTip = ( { showTooltip, title, children } ) => {
 	if ( showTooltip ) {
-		return <Tooltip text={ title }>{ children }</Tooltip>;
+		return (
+			<Tooltip.Root>
+				<Tooltip.Trigger render={ children } />
+				<Tooltip.Popup>{ title }</Tooltip.Popup>
+			</Tooltip.Root>
+		);
 	}
 	return <>{ children }</>;
 };
@@ -154,9 +158,13 @@ function BlockPattern( {
 											/>
 										</div>
 									) }
-									<div className="block-editor-block-patterns-list__item-title">
+									<Text
+										render={ <div /> }
+										className="block-editor-block-patterns-list__item-title"
+										variant="body-sm"
+									>
 										{ pattern.title }
-									</div>
+									</Text>
 								</HStack>
 							) }
 
@@ -186,8 +194,8 @@ function BlockPatternsList(
 		onHover,
 		onClickPattern,
 		orientation,
-		label = __( 'Block patterns' ),
 		category,
+		label = __( 'Patterns' ),
 		showTitlesAsTooltip,
 		pagingProps,
 	},

@@ -17,12 +17,11 @@ coverage
 # Directories/files that may appear in your environment
 *.log
 yarn.lock
-results
 /artifacts
 /test/e2e/artifacts
+/test/e2e/flakiness-report
 /perf-envs
 /composer.lock
-/ts-traces
 
 # The /.cache folder is needed for phpcs to cache results between runs, while other .cache folders must be ignored
 # It is not possible to re-include a file if a parent directory of that file is excluded
@@ -56,7 +55,6 @@ test/storybook-playwright/specs/*-snapshots/**
 test/gutenberg-test-themes/twentytwentyone
 test/gutenberg-test-themes/twentytwentythree
 test/gutenberg-test-themes/twentytwentyfour
-packages/react-native-editor/src/setup-local.js
 
 # Files related to applying patches
 *.rej

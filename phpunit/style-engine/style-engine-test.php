@@ -165,7 +165,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'inline_valid_dimensions_style'                => array(
+			'inline_valid_dimensions_min_height_style'     => array(
 				'block_styles'    => array(
 					'dimensions' => array(
 						'minHeight' => '50vh',
@@ -176,6 +176,36 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'css'          => 'min-height:50vh;',
 					'declarations' => array(
 						'min-height' => '50vh',
+					),
+				),
+			),
+
+			'inline_valid_dimensions_min_width_style'      => array(
+				'block_styles'    => array(
+					'dimensions' => array(
+						'minWidth' => '25vw',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'min-width:25vw;',
+					'declarations' => array(
+						'min-width' => '25vw',
+					),
+				),
+			),
+
+			'inline_valid_dimensions_width_style'          => array(
+				'block_styles'    => array(
+					'dimensions' => array(
+						'width' => '50%',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'width:50%;',
+					'declarations' => array(
+						'width' => '50%',
 					),
 				),
 			),
@@ -503,6 +533,57 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'inline_background_gradient_only'              => array(
+				'block_styles'    => array(
+					'background' => array(
+						'gradient' => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%);',
+					'declarations' => array(
+						'background-image' => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+					),
+					'classnames'   => 'has-background',
+				),
+			),
+
+			'inline_background_gradient_with_preset_slug'  => array(
+				'block_styles'    => array(
+					'background' => array(
+						'gradient' => 'var:preset|gradient|vivid-cyan-blue',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'background-image:var(--wp--preset--gradient--vivid-cyan-blue);',
+					'declarations' => array(
+						'background-image' => 'var(--wp--preset--gradient--vivid-cyan-blue)',
+					),
+					'classnames'   => 'has-background',
+				),
+			),
+
+			'inline_background_gradient_and_image_combined' => array(
+				'block_styles'    => array(
+					'background' => array(
+						'backgroundImage' => array(
+							'url' => 'https://example.com/image.jpg',
+						),
+						'gradient'        => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => "background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%), url('https://example.com/image.jpg');",
+					'declarations' => array(
+						'background-image' => "linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%), url('https://example.com/image.jpg')",
+					),
+					'classnames'   => 'has-background',
+				),
+			),
+
 			'inline_background_image_url_with_background_size' => array(
 				'block_styles'    => array(
 					'background' => array(
@@ -737,6 +818,32 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
 		$this->assertSame( ".wp-duotone-ffffff-000000-1{filter:url('#wp-duotone-ffffff-000000-1') !important;}", $compiled_stylesheet );
+	}
+
+	/**
+	 * Tests returning a generated stylesheet with important declarations.
+	 *
+	 * @covers ::wp_style_engine_get_stylesheet_from_css_rules
+	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
+	 */
+	public function test_should_return_stylesheet_with_important_declarations() {
+		$declarations = new WP_Style_Engine_CSS_Declarations_Gutenberg();
+		$declarations->add_declaration(
+			'background-image',
+			'linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%)',
+			array(
+				'important' => true,
+			)
+		);
+		$css_rules = array(
+			array(
+				'selector'     => '.responsive-state',
+				'declarations' => $declarations,
+			),
+		);
+
+		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
+		$this->assertSame( '.responsive-state{background-image:linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%) !important;}', $compiled_stylesheet );
 	}
 
 	/**

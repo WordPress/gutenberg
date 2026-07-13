@@ -13,7 +13,6 @@ import {
 	useCallback,
 	useMemo,
 	forwardRef,
-	createContext,
 	useContext,
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
@@ -41,45 +40,19 @@ import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
 
-const { useRichText } = unlock( richTextPrivateApis );
-
-export const keyboardShortcutContext = createContext();
-keyboardShortcutContext.displayName = 'keyboardShortcutContext';
-
-export const inputEventContext = createContext();
-inputEventContext.displayName = 'inputEventContext';
+// `RichTextShortcut` and `RichTextInputEvent` now live in
+// `@wordpress/rich-text` so they share the shortcut and input-event contexts
+// with standalone rich text fields. Re-exported below for back-compat (e.g.
+// `@wordpress/format-library` imports them from `@wordpress/block-editor`).
+const {
+	useRichText,
+	KeyboardShortcutContext,
+	InputEventContext,
+	RichTextShortcut,
+	RichTextInputEvent,
+} = unlock( richTextPrivateApis );
 
 const instanceIdKey = Symbol( 'instanceId' );
-
-/**
- * Removes props used for the native version of RichText so that they are not
- * passed to the DOM element and log warnings.
- *
- * @param {Object} props Props to filter.
- *
- * @return {Object} Filtered props.
- */
-function removeNativeProps( props ) {
-	const {
-		__unstableMobileNoFocusOnMount,
-		deleteEnter,
-		placeholderTextColor,
-		textAlign,
-		selectionColor,
-		tagsToEliminate,
-		disableEditingMenu,
-		fontSize,
-		fontFamily,
-		fontWeight,
-		fontStyle,
-		minWidth,
-		maxWidth,
-		disableSuggestions,
-		disableAutocorrection,
-		...restProps
-	} = props;
-	return restProps;
-}
 
 export function RichTextWrapper(
 	{
@@ -113,8 +86,6 @@ export function RichTextWrapper(
 	},
 	forwardedRef
 ) {
-	props = removeNativeProps( props );
-
 	if ( onSplit ) {
 		deprecated( 'wp.blockEditor.RichText onSplit prop', {
 			since: '6.4',
@@ -386,8 +357,8 @@ export function RichTextWrapper(
 	return (
 		<>
 			{ isSelected && (
-				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
-					<inputEventContext.Provider value={ inputEvents }>
+				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
+					<InputEventContext.Provider value={ inputEvents }>
 						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
 							{ children &&
 								children( { value, onChange, onFocus } ) }
@@ -400,8 +371,8 @@ export function RichTextWrapper(
 								forwardedRef={ anchorRef }
 							/>
 						</Popover.__unstableSlotNameProvider>
-					</inputEventContext.Provider>
-				</keyboardShortcutContext.Provider>
+					</InputEventContext.Provider>
+				</KeyboardShortcutContext.Provider>
 			) }
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
@@ -532,7 +503,7 @@ const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
 			__unstableAllowPrefixTransformations,
 			readOnly,
 			...contentProps
-		} = removeNativeProps( props );
+		} = props;
 		return (
 			<Tag
 				ref={ ref }
@@ -553,6 +524,6 @@ PublicForwardedRichTextContainer.isEmpty = ( value ) => {
 };
 
 export default PublicForwardedRichTextContainer;
-export { RichTextShortcut } from './shortcut';
+export { RichTextShortcut };
 export { RichTextToolbarButton } from './toolbar-button';
-export { __unstableRichTextInputEvent } from './input-event';
+export { RichTextInputEvent as __unstableRichTextInputEvent };

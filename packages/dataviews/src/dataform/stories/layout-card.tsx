@@ -11,7 +11,7 @@ import DataForm from '../index';
 import type { Field, Form } from '../../types';
 import { unlock } from '../../lock-unlock';
 
-const { Badge } = unlock( privateApis );
+const { Badge: WCBadge } = unlock( privateApis );
 
 const LayoutCardComponent = ( {
 	withHeader,
@@ -44,7 +44,7 @@ const LayoutCardComponent = ( {
 	const customerFields: Field< Customer >[] = [
 		{
 			id: 'name',
-			label: 'Customer Name',
+			label: 'Customer name',
 			type: 'text',
 		},
 		{
@@ -70,17 +70,17 @@ const LayoutCardComponent = ( {
 		},
 		{
 			id: 'shippingAddress',
-			label: 'Shipping Address',
+			label: 'Shipping address',
 			type: 'text',
 		},
 		{
 			id: 'billingAddress',
-			label: 'Billing Address',
+			label: 'Billing address',
 			type: 'text',
 		},
 		{
 			id: 'displayPayments',
-			label: 'Display Payments?',
+			label: 'Display payments?',
 			type: 'boolean',
 		},
 		{
@@ -112,10 +112,10 @@ const LayoutCardComponent = ( {
 		},
 		{
 			id: 'dueDate',
-			label: 'Due Date',
+			label: 'Due date',
 			type: 'text',
 			render: ( { item } ) => {
-				return <Badge>Due on: { item.dueDate }</Badge>;
+				return <WCBadge>Due on: { item.dueDate }</WCBadge>;
 			},
 		},
 		{
@@ -123,7 +123,7 @@ const LayoutCardComponent = ( {
 			type: 'text',
 			readOnly: true,
 			render: ( { item } ) => {
-				return <Badge>{ item.plan }</Badge>;
+				return <WCBadge>{ item.plan }</WCBadge>;
 			},
 		},
 	];

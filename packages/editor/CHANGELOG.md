@@ -2,6 +2,78 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add an "Attachments" source to the block inserter's Media tab, listing images attached to the current post with the ability to attach and detach them ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
+
+### Enhancements
+
+-   Notes: Remove the snackbar notice shown when a note is resolved or reopened, as the note's appearance already updates in place to reflect the change. The result is still announced to screen readers ([#80017](https://github.com/WordPress/gutenberg/pull/80017)).
+-   The "View the autosave" notice now opens the autosave in the visual revisions view with its changes highlighted, instead of the classic revisions screen. It falls back to the classic screen when visual revisions are disabled ([#79947](https://github.com/WordPress/gutenberg/pull/79947)).
+
+### Bug Fixes
+
+-   External images are now sideloaded on the server when uploaded to the media library, via a new `mediaSideloadFromUrl` block editor setting, so the upload works when the editor is cross-origin isolated (e.g. with client-side media processing enabled) ([#79409](https://github.com/WordPress/gutenberg/pull/79409)).
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 14.50.0 (2026-07-01)
+
+## 14.49.0 (2026-06-24)
+
+## 14.48.1 (2026-06-16)
+
+## 14.48.0 (2026-06-10)
+
+### New Features
+
+-   Added `UploadProgressSnackbar` component that shows a persistent snackbar with upload progress while media uploads are in progress. The snackbar shows a spinner during uploads and a checkmark briefly when all uploads complete.
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Documentation
+
+-   Fix documentation grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
+### Internal
+
+-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+
+## 14.47.0 (2026-05-27)
+
+### Enhancements
+
+-   Editor: Add padding around inline notices in the editor content area and distraction-free header.
+-   Editor: Pause the client-side media upload queue while the browser is offline and resume it automatically when connectivity returns ([#76765](https://github.com/WordPress/gutenberg/pull/76765)).
+-   The Media Editor modal is now mounted unconditionally and the `openMediaEditorModal` setting is always provided to the block editor. Previously both were gated behind the `gutenberg-media-editor-modal` experiment, which has been removed.
+
+### Bug Fixes
+
+-   `mediaFinalize` now returns the post-finalize attachment (transformed from the REST response), so the upload-media queue can refresh the in-flight attachment URL. Required for the front-end `srcset` to render on client-side-media uploads that exceeded the big-image threshold.
+-   Template actions panel: Fix the keyboard activation of the "Change template" preview so it only opens the swap modal on <kbd>Enter</kbd> / <kbd>Space</kbd> ([#78641](https://github.com/WordPress/gutenberg/pull/78641)).
+
+### Internal
+
+-   Updated `diff` dependency from `^4.0.2` to `^8.0.3` ([#77992](https://github.com/WordPress/gutenberg/pull/77992)).
+
+## 14.46.0 (2026-05-14)
+
+### Internal
+
+-   Update `date-fns` dependency to `v4.1.0` ([#78057](https://github.com/WordPress/gutenberg/pull/78057)).
+
+## 14.45.0 (2026-04-29)
+
+## 14.44.0 (2026-04-15)
+
+## 14.43.0 (2026-04-01)
+
+## 14.42.0 (2026-03-18)
+
 ### Bug Fixes
 
 -   Fixed avatar contrast ring not displaying over loaded images by using a `::after` pseudo-element instead of an inset `box-shadow`.
