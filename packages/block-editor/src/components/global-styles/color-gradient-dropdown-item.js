@@ -163,7 +163,11 @@ function ColorGradientTab( {
 			enableAlpha
 			__experimentalIsRenderedInSidebar
 			colorValue={ isGradient ? undefined : displayed }
-			colorSlug={ isGradient ? undefined : inheritedSlug }
+			colorSlug={
+				isGradient || userValue !== undefined
+					? undefined
+					: inheritedSlug
+			}
 			gradientValue={ isGradient ? displayed : undefined }
 			onColorChange={ isGradient ? undefined : onChange }
 			onGradientChange={ isGradient ? onChange : undefined }
