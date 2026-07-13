@@ -198,19 +198,15 @@ function MultipleHighRelevanceAttributesStory() {
 		useState< DashboardWidget[] >( INITIAL_LAYOUT );
 
 	return (
-		// 1200px keeps the container resolver at four columns, so the
-		// one-column tile stays at its narrowest realistic width (~280px).
-		<div style={ { width: 1200 } }>
-			<WidgetDashboard
-				widgetTypes={ [ trafficSnapshotWidgetType ] }
-				layout={ layout }
-				onLayoutChange={ setLayout }
-				resolveWidgetModule={ resolveDemoModule }
-				gridSettings={ { model: 'grid', rowHeight: 200 } }
-			>
-				<WidgetDashboard.Widgets />
-			</WidgetDashboard>
-		</div>
+		<WidgetDashboard
+			widgetTypes={ [ trafficSnapshotWidgetType ] }
+			layout={ layout }
+			onLayoutChange={ setLayout }
+			resolveWidgetModule={ resolveDemoModule }
+			gridSettings={ { model: 'grid', rowHeight: 200 } }
+		>
+			<WidgetDashboard.Widgets />
+		</WidgetDashboard>
 	);
 }
 
@@ -226,10 +222,10 @@ The demo type declares three attributes: \`metric\` and \`period\` are \`relevan
 
 The same type is placed on two tiles:
 
-- The two-column tile fits the identity and both inline controls.
-- The one-column tile does not: the identity is the only region allowed to shrink, so the title collapses first and the controls can still overflow the header.
+- The two-column tile fits the identity and both inline controls, so they stay in the header.
+- The one-column tile does not: the chrome collapses the inline controls and the settings entry point into a single More dropdown, holding the promoted fields as a form and a More settings shortcut to the drawer.
 
-The promotion is unconditional while the header has a hard width budget. This story is the reproduction baseline for a fit or overflow policy in the tile chrome.
+The widget only declares relevance; the fit is measured by the chrome, so the same declaration adapts to any tile width. Resize the canvas to watch the header switch presentations.
 `,
 			},
 		},

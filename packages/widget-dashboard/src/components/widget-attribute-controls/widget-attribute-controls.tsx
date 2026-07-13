@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { DataForm } from '@wordpress/dataviews';
@@ -11,6 +16,9 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetSettingsTrigger } from '../widget-settings';
+import { MoreControlsDropdown } from './more-controls-dropdown';
+import { useInlineControlsFit } from './use-inline-controls-fit';
+import styles from './widget-attribute-controls.module.css';
 import type { DashboardWidget } from '../../types';
 
 type WidgetAttributes = Record< string, unknown >;
@@ -33,6 +41,12 @@ type WidgetAttributeControlsProps = {
  * only for the high-relevance fields; edits stage live and auto-save on the
  * dashboard's shared debounce.
  *
+ * The inline presentation holds only while it fits the header. When its
+ * natural width exceeds the space the header can grant, everything (the
+ * inline fields and the settings trigger) collapses into a single More
+ * dropdown; the inline controls stay mounted, hidden and inert, so the fit
+ * keeps being measured and the presentation can expand back.
+ *
  * @param {WidgetAttributeControlsProps} props Component props.
  */
 export function WidgetAttributeControls( {
@@ -41,6 +55,7 @@ export function WidgetAttributeControls( {
 }: WidgetAttributeControlsProps ): React.ReactNode {
 	const { layout, onLayoutChange, scheduleAutoSave } =
 		useDashboardInternalContext();
+	const { measureRef, collapsed } = useInlineControlsFit();
 
 	const fields = useMemo< Field< WidgetAttributes >[] >(
 		() =>
@@ -90,19 +105,38 @@ export function WidgetAttributeControls( {
 
 	return (
 		<>
-			{ fields.length > 0 && (
-				<DataForm< WidgetAttributes >
-					data={ data }
+			<div
+				ref={ measureRef }
+				className={ clsx(
+					styles[ 'inline-controls' ],
+					collapsed && styles[ 'is-collapsed' ]
+				) }
+				{ ...( collapsed ? { inert: 'true' } : {} ) }
+			>
+				{ fields.length > 0 && (
+					<DataForm< WidgetAttributes >
+						data={ data }
+						fields={ fields }
+						form={ form }
+						onChange={ handleChange }
+					/>
+				) }
+
+				<WidgetSettingsTrigger
+					widget={ widget }
+					widgetType={ widgetType }
+				/>
+			</div>
+
+			{ collapsed && (
+				<MoreControlsDropdown
+					widget={ widget }
+					widgetType={ widgetType }
 					fields={ fields }
-					form={ form }
+					data={ data }
 					onChange={ handleChange }
 				/>
 			) }
-
-			<WidgetSettingsTrigger
-				widget={ widget }
-				widgetType={ widgetType }
-			/>
 		</>
 	);
 }
