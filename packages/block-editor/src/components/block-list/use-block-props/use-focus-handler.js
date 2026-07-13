@@ -54,6 +54,11 @@ export function useFocusHandler( clientId ) {
 					isShiftMouseDown &&
 					node.parentElement.closest( '[contenteditable="true"]' )
 				) {
+					// Consume the gesture flag here too: the mouseup that
+					// normally clears it is not guaranteed, e.g. when the
+					// pointer is released outside the document. A stale flag
+					// must not suppress a later, unrelated focus.
+					isShiftMouseDown = false;
 					return;
 				}
 
