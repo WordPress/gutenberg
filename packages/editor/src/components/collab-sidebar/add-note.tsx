@@ -120,7 +120,7 @@ export function AddNote( {
 				 * the next frame where focus actually settled and dismiss only
 				 * when it has truly left the form.
 				 */
-				container.ownerDocument.defaultView.requestAnimationFrame(
+				container.ownerDocument.defaultView?.requestAnimationFrame(
 					() => {
 						/*
 						 * A submit may have started between the blur and this
