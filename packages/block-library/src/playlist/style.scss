@@ -37,8 +37,13 @@ $waveform-player-height: 100px;
 			width: 3rem;
 			height: 3rem;
 		}
+	}
 
-		&.has-artwork {
+	.waveform-player.has-play-button-artwork {
+		.waveform-btn {
+			background-image: var(--wp--playlist--play-button-artwork);
+			background-position: center;
+			background-size: cover;
 			color: #fff;
 
 			svg {

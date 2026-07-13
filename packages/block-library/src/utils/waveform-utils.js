@@ -190,23 +190,17 @@ export function updateSeekControlLabel( instance, label ) {
  * @param {string}  artworkUrl - The album artwork URL.
  */
 export function setupPlayButtonArtwork( container, artworkUrl ) {
-	const playBtn = container.querySelector( '.waveform-btn' );
-	if ( ! playBtn ) {
-		return;
-	}
-
 	if ( ! artworkUrl ) {
-		playBtn.classList.remove( 'has-artwork' );
-		playBtn.style.removeProperty( 'background-image' );
-		playBtn.style.removeProperty( 'background-position' );
-		playBtn.style.removeProperty( 'background-size' );
+		container.classList.remove( 'has-play-button-artwork' );
+		container.style.removeProperty( '--wp--playlist--play-button-artwork' );
 		return;
 	}
 
-	playBtn.classList.add( 'has-artwork' );
-	playBtn.style.backgroundImage = `url(${ JSON.stringify( artworkUrl ) })`;
-	playBtn.style.backgroundPosition = 'center';
-	playBtn.style.backgroundSize = 'cover';
+	container.classList.add( 'has-play-button-artwork' );
+	container.style.setProperty(
+		'--wp--playlist--play-button-artwork',
+		`url(${ JSON.stringify( artworkUrl ) })`
+	);
 }
 
 /**
