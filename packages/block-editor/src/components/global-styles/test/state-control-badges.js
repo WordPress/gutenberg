@@ -15,7 +15,7 @@ jest.mock( '@wordpress/ui', () => {
 		...actual,
 		Tooltip: {
 			Root: ( { children } ) => <>{ children }</>,
-			Trigger: ( { children } ) => children,
+			Trigger: ( { render: trigger } ) => trigger,
 			Popup: ( { children } ) => <span role="tooltip">{ children }</span>,
 		},
 	};
