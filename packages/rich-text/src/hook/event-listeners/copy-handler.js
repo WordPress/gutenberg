@@ -9,6 +9,7 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { toHTMLString } from '../../to-html-string';
 import { isCollapsed } from '../../is-collapsed';
 import { slice } from '../../slice';
+import { remove } from '../../remove';
 import { getTextContent } from '../../get-text-content';
 import { unlock } from '../../lock-unlock';
 
@@ -16,7 +17,7 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
 	function onCopy( event ) {
-		const { record } = props.current;
+		const { record, handleChange } = props.current;
 		const { ownerDocument } = element;
 		if (
 			isCollapsed( record.current ) ||
@@ -34,7 +35,11 @@ export default ( props ) => ( element ) => {
 		event.preventDefault();
 
 		if ( event.type === 'cut' ) {
-			ownerDocument.execCommand( 'delete' );
+			// Remove the selection through the record rather than the
+			// deprecated `execCommand( 'delete' )`. The record is
+			// synchronized on capture of the `cut` event, and `handleChange`
+			// processes the removal like any input.
+			handleChange( remove( record.current ) );
 		}
 	}
 

@@ -104,13 +104,11 @@ export function NoteThread( {
 		const isNoteFocused = event.relatedTarget?.closest(
 			'.editor-collab-sidebar-panel__thread'
 		);
-		const isDialogFocused =
-			event.relatedTarget?.closest( '[role="dialog"]' );
-		// Popovers anchored from inside the note (e.g. the emoji
-		// reaction pickers) portal their content to <body>, so focus
-		// moving into them looks like focus leaving the thread.
-		const isPopoverFocused = event.relatedTarget?.closest(
-			'.components-popover'
+		// Keep the note open when focus moves into a dialog (e.g. delete
+		// confirmation) or popover (e.g. Cmd+K link UI, emoji reaction
+		// pickers) that portals out of the thread.
+		const isDialogOrPopoverFocused = event.relatedTarget?.closest(
+			'[role="dialog"], .components-popover'
 		);
 		const isTabbing = isKeyboardTabbingRef.current;
 
@@ -118,14 +116,7 @@ export function NoteThread( {
 		if ( isNoteFocused && ! isTabbing ) {
 			return;
 		}
-		// When deleting a note, a dialog appears, but the note should not be collapsed.
-		if ( isDialogFocused ) {
-			return;
-		}
-		// When opening a popover from inside the note, the popover
-		// content is portaled outside the thread DOM but the note
-		// should remain selected for the trigger to stay rendered.
-		if ( isPopoverFocused ) {
+		if ( isDialogOrPopoverFocused ) {
 			return;
 		}
 		// When tabbing, do nothing if the focus is within the current note.
@@ -240,7 +231,11 @@ export function NoteThread( {
 				variant="secondary"
 				size="compact"
 				onClick={ () => {
-					focusNoteThread( note.id, sidebarRef.current, 'textarea' );
+					focusNoteThread(
+						note.id,
+						sidebarRef.current,
+						'[role="textbox"]'
+					);
 				} }
 			>
 				{ __( 'Add new reply' ) }
@@ -317,18 +312,17 @@ export function NoteThread( {
 						onSubmit={ ( inputComment ) => {
 							if ( 'approved' === note.status ) {
 								// For reopening, include the content in the reopen action.
-								onEditNote( {
+								return onEditNote( {
 									id: note.id,
 									status: 'hold',
 									content: inputComment,
 								} );
-							} else {
-								// For regular replies, add as separate comment.
-								onAddReply( {
-									content: inputComment,
-									parent: note.id,
-								} );
 							}
+							// For regular replies, add as separate comment.
+							return onAddReply( {
+								content: inputComment,
+								parent: note.id,
+							} );
 						} }
 						onCancel={ ( event ) => {
 							// Prevent the parent onClick from being triggered.

@@ -23,6 +23,7 @@
 ### Bug Fix
 
 -   `uploadItem` no longer dispatches `finishOperation` twice when both `onFileChange` and `onSuccess` fire for the same attachment ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+-   Apply EXIF orientation to AVIF/HEIF sub-sizes when the orientation is stored in an EXIF tag rather than a native `irot` transform, which neither the server nor libvips auto-rotates ([#79384](https://github.com/WordPress/gutenberg/pull/79384)).
 
 ## 0.33.1 (2026-06-16)
 
