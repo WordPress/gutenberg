@@ -24,8 +24,8 @@ import {
 	MENTION_FORMAT_NAME,
 } from './mention-format';
 
-// Register the mention format so the `@` completer's inserted links keep their
-// `data-user-id` through rich text round-trips. Idempotent.
+// Register the mention format so the `@` completer's inserted spans keep
+// their `user-N` class through rich text round-trips. Idempotent.
 registerNoteMentionFormat();
 
 /*

@@ -4,7 +4,6 @@
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -23,11 +22,10 @@ type MentionableUser = {
  * A user mention completer for notes.
  *
  * Mirrors the editor's `@` user completer but inserts a span carrying the
- * mentioned user's ID (`data-user-id`) so the mention can be styled as a chip
- * and, in a follow-up, resolved to a notification recipient. A mention marks
- * a person, it isn't a navigation affordance, so it is deliberately not a
- * link. The user query is filterable so integrators can narrow the
- * mentionable audience (e.g. to editors or contributors).
+ * mentioned user's ID in a `user-N` class so the mention can be styled as a
+ * chip and, in a follow-up, resolved to a notification recipient. A mention
+ * marks a person, it isn't a navigation affordance, so it is deliberately not
+ * a link.
  */
 const noteMentionCompleter = {
 	name: 'note-mentions',
@@ -39,34 +37,15 @@ const noteMentionCompleter = {
 		const users = useSelect(
 			( select ) => {
 				// Suggesting the note's own author to themselves is noise;
-				// leave the current user out of the default query.
+				// leave the current user out of the query.
 				const currentUserId = select( coreStore ).getCurrentUser()?.id;
 
-				/**
-				 * Filters the query used to fetch mentionable users in notes.
-				 *
-				 * Defaults to all site users except the current one. Return a
-				 * modified query to change the audience, e.g.
-				 * `{ ...query, roles: [ 'editor' ] }` (in `edit` context) or
-				 * `{ ...query, who: 'authors' }`.
-				 *
-				 * @param {Object} query       The `getUsers` query arguments.
-				 * @param {string} filterValue The current mention search text.
-				 */
-				const query = applyFilters(
-					'editor.notes.mentionUserQuery',
-					{
-						context: 'view',
-						search: encodeURIComponent( filterValue ),
-						per_page: 10,
-						...( currentUserId
-							? { exclude: [ currentUserId ] }
-							: {} ),
-					},
-					filterValue
-				) as Record< string, unknown >;
-
-				return select( coreStore ).getUsers( query );
+				return select( coreStore ).getUsers( {
+					context: 'view',
+					search: encodeURIComponent( filterValue ),
+					per_page: 10,
+					...( currentUserId ? { exclude: [ currentUserId ] } : {} ),
+				} );
 			},
 			[ filterValue ]
 		);
@@ -90,7 +69,7 @@ const noteMentionCompleter = {
 		return {
 			action: 'insert-at-caret' as const,
 			value: (
-				<span className="wp-note-mention" data-user-id={ user.id }>
+				<span className={ `wp-note-mention user-${ user.id }` }>
 					{ '@' + user.name }
 				</span>
 			),

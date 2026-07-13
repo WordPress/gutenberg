@@ -98,14 +98,14 @@ add_filter( 'render_block', 'gutenberg_strip_inline_note_markers' );
  * without `unfiltered_html`.
  *
  * The notes `@` mention completer stores a mention as
- * `<span class="wp-note-mention" data-user-id="N">@Name</span>`. The default
- * comment kses allowlist does not include `span` at all, so for users without
+ * `<span class="wp-note-mention user-N">@Name</span>`. The default comment
+ * kses allowlist does not include `span` at all, so for users without
  * `unfiltered_html` the mention markup would be stripped on save.
  *
- * This callback is deliberately not attached globally: `class` and `data-*`
- * attributes are CSS and JavaScript selector hooks, so allowing them in every
- * comment would extend what regular (including anonymous) commenters can
- * publish. Instead gutenberg_notes_arm_mention_kses() attaches it only while
+ * This callback is deliberately not attached globally: `class` attributes are
+ * CSS and JavaScript selector hooks, so allowing them in every comment would
+ * extend what regular (including anonymous) commenters can publish. Instead
+ * gutenberg_notes_arm_mention_kses() attaches it only while
  * a `note` comment is being filtered and detaches it right after, so the
  * sanitization of other comment types is unchanged. Notes can only be written
  * by logged-in users who can edit the post, and are never rendered on the
@@ -124,8 +124,7 @@ function gutenberg_notes_allow_mention_attributes( $allowed, $context ) {
 		$allowed['span'] = array();
 	}
 
-	$allowed['span']['class']        = true;
-	$allowed['span']['data-user-id'] = true;
+	$allowed['span']['class'] = true;
 
 	return $allowed;
 }

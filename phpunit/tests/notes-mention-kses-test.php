@@ -2,7 +2,7 @@
 /**
  * Tests that the note mention kses allowance is scoped to `note` comments.
  *
- * The `<span class="wp-note-mention" data-user-id="N">` markup must survive
+ * The `<span class="wp-note-mention user-N">` markup must survive
  * sanitization when a note is written by a user without `unfiltered_html`,
  * while the sanitization of every other comment type - which reaches back to
  * anonymous front-end comments - stays byte-identical to core's defaults.
@@ -11,7 +11,7 @@
  */
 class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 
-	const MENTION_CONTENT  = 'Hi <span class="wp-note-mention" data-user-id="2">@admin</span>!';
+	const MENTION_CONTENT  = 'Hi <span class="wp-note-mention user-2">@admin</span>!';
 	const STRIPPED_CONTENT = 'Hi @admin!';
 
 	public function test_mention_markup_survives_note_content_filtering() {
@@ -24,6 +24,19 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 		$filtered = $this->filter_comment_with_kses( 'comment' );
 
 		$this->assertSame( self::STRIPPED_CONTENT, wp_unslash( $filtered['comment_content'] ) );
+	}
+
+	public function test_only_class_is_allowed_on_note_spans() {
+		$filtered = $this->filter_comment_with_kses(
+			'note',
+			'Hi <span class="wp-note-mention user-2" data-user-id="2" onclick="alert(1)" style="color:red">@admin</span>!'
+		);
+
+		$this->assertSame(
+			self::MENTION_CONTENT,
+			wp_unslash( $filtered['comment_content'] ),
+			'Attributes beyond `class` should be stripped from note spans.'
+		);
 	}
 
 	public function test_mention_allowance_does_not_leak_after_note_filtering() {
@@ -122,12 +135,13 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 	 * it is for users without `unfiltered_html`.
 	 *
 	 * @param string $comment_type The comment type to filter.
+	 * @param string $content      Optional. The comment content to filter.
 	 * @return array The filtered, still-slashed commentdata.
 	 */
-	private function filter_comment_with_kses( $comment_type ) {
+	private function filter_comment_with_kses( $comment_type, $content = self::MENTION_CONTENT ) {
 		add_filter( 'pre_comment_content', 'wp_filter_kses' );
 
-		$commentdata = apply_filters( 'preprocess_comment', wp_slash( $this->get_commentdata( $comment_type ) ) );
+		$commentdata = apply_filters( 'preprocess_comment', wp_slash( $this->get_commentdata( $comment_type, $content ) ) );
 		$filtered    = wp_filter_comment( $commentdata );
 
 		remove_filter( 'pre_comment_content', 'wp_filter_kses' );
@@ -139,11 +153,12 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 	 * Builds a commentdata array containing every field wp_filter_comment() reads.
 	 *
 	 * @param string $comment_type The comment type.
+	 * @param string $content      Optional. The comment content.
 	 * @return array The commentdata.
 	 */
-	private function get_commentdata( $comment_type ) {
+	private function get_commentdata( $comment_type, $content = self::MENTION_CONTENT ) {
 		return array(
-			'comment_content'      => self::MENTION_CONTENT,
+			'comment_content'      => $content,
 			'comment_type'         => $comment_type,
 			'comment_author'       => 'Note Author',
 			'comment_author_IP'    => '127.0.0.1',
