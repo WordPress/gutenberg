@@ -33,7 +33,7 @@ export default function StateControlBadges( {
 			label: selectedViewport.label,
 			tooltipText: sprintf(
 				/* translators: %s: viewport name, e.g. "Tablet". */
-				__( 'Style changes apply only to the %s viewport.' ),
+				__( 'Style changes apply to the %s viewport.' ),
 				selectedViewport.label
 			),
 		} );
@@ -43,6 +43,11 @@ export default function StateControlBadges( {
 		activeStates.push( {
 			key: `pseudo-${ selectedPseudoState.value }`,
 			label: selectedPseudoState.label,
+			tooltipText: sprintf(
+				/* translators: %s: pseudo state name, e.g. "Hover". */
+				__( 'Style changes apply to the %s state.' ),
+				selectedPseudoState.label
+			),
 		} );
 	}
 
