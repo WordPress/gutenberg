@@ -151,12 +151,18 @@ async function dev() {
 				'@wordpress/validation-tools',
 				'--silent',
 			] ).catch( () => {
-				throw new Error( 'Run `npm install` to update.' );
+				throw new Error(
+					'Run `npm install` to update, or set GUTENBERG_CHECK_INSTALLED_DEPS=NEVER to skip this check.'
+				);
 			} );
 		}
 
 		console.log( '\n🧹 Cleaning packages...' );
-		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
+		await exec(
+			'node',
+			[ path.join( __dirname, 'clean.mjs' ), '--packages' ],
+			{ silent: true }
+		);
 
 		console.log( '\n📦 Building workspaces...' );
 		await exec(
