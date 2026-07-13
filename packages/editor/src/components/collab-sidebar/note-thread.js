@@ -102,16 +102,11 @@ export function NoteThread( {
 		const isNoteFocused = event.relatedTarget?.closest(
 			'.editor-collab-sidebar-panel__thread'
 		);
-		const isDialogFocused =
-			event.relatedTarget?.closest( '[role="dialog"]' );
-		/*
-		 * Format popovers (e.g. the Cmd+K link UI) portal out of the thread,
-		 * so focus moving into one reports a related target inside
-		 * `.components-popover` rather than the thread; keep the note open,
-		 * mirroring the new-note form in `add-note.js`.
-		 */
-		const isPopoverFocused = event.relatedTarget?.closest(
-			'.components-popover'
+		// Keep the note open when focus moves into a dialog (e.g. delete
+		// confirmation) or format popover (e.g. Cmd+K link UI) that portals
+		// out of the thread.
+		const isDialogOrPopoverFocused = event.relatedTarget?.closest(
+			'[role="dialog"], .components-popover'
 		);
 		const isTabbing = isKeyboardTabbingRef.current;
 
@@ -119,11 +114,7 @@ export function NoteThread( {
 		if ( isNoteFocused && ! isTabbing ) {
 			return;
 		}
-		// When deleting a note, a dialog appears, but the note should not be collapsed.
-		if ( isDialogFocused ) {
-			return;
-		}
-		if ( isPopoverFocused ) {
+		if ( isDialogOrPopoverFocused ) {
 			return;
 		}
 		// When tabbing, do nothing if the focus is within the current note.
