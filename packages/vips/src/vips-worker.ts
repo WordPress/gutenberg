@@ -52,12 +52,14 @@ function getWorkerAPI(): Remote< WorkerAPI > {
 /**
  * Converts an image to a different format using vips in a worker.
  *
- * @param id         Item ID.
- * @param buffer     Original file buffer.
- * @param inputType  Input mime type.
- * @param outputType Output mime type.
- * @param quality    Desired quality.
- * @param interlaced Whether to use interlaced/progressive mode.
+ * @param id          Item ID.
+ * @param buffer      Original file buffer.
+ * @param inputType   Input mime type.
+ * @param outputType  Output mime type.
+ * @param quality     Desired quality.
+ * @param interlaced  Whether to use interlaced/progressive mode.
+ * @param stripMeta   Whether to strip metadata (except color profiles).
+ * @param maxBitdepth Maximum output bit depth.
  * @return Converted file buffer.
  */
 export async function vipsConvertImageFormat(
@@ -66,7 +68,9 @@ export async function vipsConvertImageFormat(
 	inputType: string,
 	outputType: string,
 	quality = 0.82,
-	interlaced = false
+	interlaced = false,
+	stripMeta = true,
+	maxBitdepth = 16
 ): Promise< ArrayBuffer | ArrayBufferLike > {
 	const api = getWorkerAPI();
 	return api.convertImageFormat(
@@ -75,18 +79,22 @@ export async function vipsConvertImageFormat(
 		inputType,
 		outputType,
 		quality,
-		interlaced
+		interlaced,
+		stripMeta,
+		maxBitdepth
 	);
 }
 
 /**
  * Compresses an existing image using vips in a worker.
  *
- * @param id         Item ID.
- * @param buffer     Original file buffer.
- * @param type       Mime type.
- * @param quality    Desired quality.
- * @param interlaced Whether to use interlaced/progressive mode.
+ * @param id          Item ID.
+ * @param buffer      Original file buffer.
+ * @param type        Mime type.
+ * @param quality     Desired quality.
+ * @param interlaced  Whether to use interlaced/progressive mode.
+ * @param stripMeta   Whether to strip metadata (except color profiles).
+ * @param maxBitdepth Maximum output bit depth.
  * @return Compressed file buffer.
  */
 export async function vipsCompressImage(
@@ -94,10 +102,20 @@ export async function vipsCompressImage(
 	buffer: ArrayBuffer,
 	type: string,
 	quality = 0.82,
-	interlaced = false
+	interlaced = false,
+	stripMeta = true,
+	maxBitdepth = 16
 ): Promise< ArrayBuffer | ArrayBufferLike > {
 	const api = getWorkerAPI();
-	return api.compressImage( id, buffer, type, quality, interlaced );
+	return api.compressImage(
+		id,
+		buffer,
+		type,
+		quality,
+		interlaced,
+		stripMeta,
+		maxBitdepth
+	);
 }
 
 /**
@@ -106,12 +124,14 @@ export async function vipsCompressImage(
  * UltraHDR JPEGs are auto-detected by libvips and their gain map is
  * preserved through the resize.
  *
- * @param id        Item ID.
- * @param buffer    Original file buffer.
- * @param type      Mime type.
- * @param resize    Resize options.
- * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
- * @param quality   Desired quality (0-1). Defaults to 0.82.
+ * @param id          Item ID.
+ * @param buffer      Original file buffer.
+ * @param type        Mime type.
+ * @param resize      Resize options.
+ * @param smartCrop   Whether to use smart cropping (i.e. saliency-aware).
+ * @param quality     Desired quality (0-1). Defaults to 0.82.
+ * @param stripMeta   Whether to strip metadata (except color profiles).
+ * @param maxBitdepth Maximum output bit depth.
  * @return Processed file data plus the old and new dimensions.
  */
 export async function vipsResizeImage(
@@ -120,7 +140,9 @@ export async function vipsResizeImage(
 	type: string,
 	resize: ImageSizeCrop,
 	smartCrop = false,
-	quality = 0.82
+	quality = 0.82,
+	stripMeta = true,
+	maxBitdepth = 16
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -129,7 +151,16 @@ export async function vipsResizeImage(
 	originalHeight: number;
 } > {
 	const api = getWorkerAPI();
-	return api.resizeImage( id, buffer, type, resize, smartCrop, quality );
+	return api.resizeImage(
+		id,
+		buffer,
+		type,
+		resize,
+		smartCrop,
+		quality,
+		stripMeta,
+		maxBitdepth
+	);
 }
 
 /**
