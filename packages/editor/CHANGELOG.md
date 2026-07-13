@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+-   Render the "Preview in new tab" action with the shared menu item pattern so its typography matches sibling menu items ([#80195](https://github.com/WordPress/gutenberg/pull/80195)).
 -   External images are now sideloaded on the server when uploaded to the media library, via a new `mediaSideloadFromUrl` block editor setting, so the upload works when the editor is cross-origin isolated (e.g. with client-side media processing enabled) ([#79409](https://github.com/WordPress/gutenberg/pull/79409)).
 
 ### Enhancements
