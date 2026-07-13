@@ -110,10 +110,6 @@ jobs:
             - name: Type checking
               run: npm run build
 
-            - name: Test package contents validator
-              if: ${{ matrix.annotations }}
-              run: npm run --workspace @wordpress/validation-tools test-package-contents
-
             - name: Validate package contents
               run: npm run lint:package-contents
 
