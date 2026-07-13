@@ -820,4 +820,4 @@ To run Zizmor for all workflow files (note the trailing period):
 zizmor .
 ```
 
-**Note:** A workflow run failure will not occur when issues are detected by Zizmor. Instead, the generated report is submitted to GitHub Code Scanning and surfaced through a status check. Some locally reported issues may be ignored based on the repository's configured Code Scanning settings.
+**Note:** A workflow run failure will not occur when issues are detected by Zizmor. Instead, the generated report is submitted to GitHub Code Scanning and surfaced through a status check and inline annotations contextually within a pull request. Some locally reported issues may be ignored based on the repository's configured Code Scanning settings.
