@@ -331,11 +331,6 @@ $block-inserter-tabs-height: 44px;
 	// see https://github.com/WordPress/gutenberg/issues/24529.
 	max-width: 100%;
 
-	// Match menu item typography while preserving the inserter's listbox behavior.
-	.components-button.block-editor-block-types-list__item {
-		font-weight: $font-weight-regular;
-	}
-
 	@include break-medium {
 		width: $block-quick-inserter-width;
 	}

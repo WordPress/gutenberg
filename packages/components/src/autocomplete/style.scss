@@ -12,6 +12,7 @@
 	min-height: $button-size;
 	text-align: left;
 	width: 100%;
+	font-weight: $font-weight-regular;
 
 	&:focus:not(:disabled) {
 		@include block-toolbar-button-style__focus();
