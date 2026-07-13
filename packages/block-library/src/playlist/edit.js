@@ -355,7 +355,7 @@ const PlaylistEdit = ( {
 						</>
 					) }
 					<ToolsPanelItem
-						label={ __( 'Show images' ) }
+						label={ __( 'Show tracklist images' ) }
 						isShownByDefault
 						hasValue={ () => showImages !== true }
 						onDeselect={ () =>
@@ -363,7 +363,7 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							label={ __( 'Show images' ) }
+							label={ __( 'Show tracklist images' ) }
 							onChange={ toggleAttribute( 'showImages' ) }
 							checked={ showImages }
 						/>
@@ -439,22 +439,11 @@ const PlaylistEdit = ( {
 						src={ currentTrackData?.src }
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
-						image={
-							showImages !== false
-								? currentTrackData?.image
-								: undefined
-						}
-						imageAlt={
-							showImages !== false
-								? currentTrackData?.imageAlt
-								: undefined
-						}
+						image={ currentTrackData?.image }
+						imageAlt={ currentTrackData?.imageAlt }
 						waveformStyle={ waveformStyle }
 						onEnded={ onTrackEnded }
-						showPlayButtonArtwork={
-							showImages !== false &&
-							showPlayButtonArtwork === true
-						}
+						showPlayButtonArtwork={ showPlayButtonArtwork === true }
 					/>
 				</Disabled>
 				{ showTracklist && (

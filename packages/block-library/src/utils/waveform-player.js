@@ -34,6 +34,7 @@ function updatePlayerMetadata(
 	showPlayButtonArtwork
 ) {
 	const { instance, container } = player;
+	const playerArtwork = showPlayButtonArtwork ? undefined : image;
 
 	if ( instance.titleEl ) {
 		instance.titleEl.textContent = title ?? '';
@@ -48,9 +49,12 @@ function updatePlayerMetadata(
 	}
 
 	if ( typeof instance.syncArtwork === 'function' ) {
-		instance.syncArtwork( image || null, imageAlt || '' );
-	} else if ( instance.artworkEl && image ) {
-		instance.artworkEl.src = image;
+		instance.syncArtwork(
+			playerArtwork || null,
+			playerArtwork ? imageAlt || '' : ''
+		);
+	} else if ( instance.artworkEl && playerArtwork ) {
+		instance.artworkEl.src = playerArtwork;
 		instance.artworkEl.alt = imageAlt || '';
 	}
 	if ( showPlayButtonArtwork ) {
@@ -187,8 +191,12 @@ export function WaveformPlayer( {
 				metadataRef.current.title,
 				metadataRef.current.artist,
 				{
-					artwork: metadataRef.current.image,
-					artworkAlt: metadataRef.current.imageAlt,
+					artwork: showPlayButtonArtwork
+						? undefined
+						: metadataRef.current.image,
+					artworkAlt: showPlayButtonArtwork
+						? ''
+						: metadataRef.current.imageAlt,
 				}
 			);
 			promise.then( () => {

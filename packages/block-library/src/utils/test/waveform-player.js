@@ -27,13 +27,15 @@ jest.mock( '../waveform-utils', () => ( {
 function createFakePlayer( options, element ) {
 	const titleEl = document.createElement( 'span' );
 	titleEl.textContent = options.title ?? '';
-	let artistEl;
+	// The artist and artwork elements only exist when the track had an
+	// artist/player artwork when the player was created, mirroring the library markup.
+	let artistEl = null;
 	if ( options.artist ) {
 		artistEl = document.createElement( 'span' );
 		artistEl.textContent = options.artist;
 	}
-	let artworkEl;
-	if ( options.image ) {
+	let artworkEl = null;
+	if ( options.image && ! options.showPlayButtonArtwork ) {
 		artworkEl = document.createElement( 'img' );
 		artworkEl.src = options.image;
 		artworkEl.alt = options.imageAlt || '';
@@ -155,10 +157,8 @@ describe( 'WaveformPlayer', () => {
 		);
 	} );
 
-	it( 'keeps artwork metadata accessible when play button artwork is enabled', () => {
-		const { rerender } = render(
-			<WaveformPlayer { ...baseProps } showPlayButtonArtwork />
-		);
+	it( 'omits separate player artwork when play button artwork is enabled', () => {
+		render( <WaveformPlayer { ...baseProps } showPlayButtonArtwork /> );
 
 		act( () => {
 			jest.advanceTimersByTime( 100 );
@@ -166,23 +166,7 @@ describe( 'WaveformPlayer', () => {
 
 		const player = initWaveformPlayer.mock.results[ 0 ].value;
 
-		rerender(
-			<WaveformPlayer
-				{ ...baseProps }
-				image="https://example.com/new.jpg"
-				imageAlt="A black and white portrait"
-				showPlayButtonArtwork
-			/>
-		);
-
-		expect( player.instance.artworkEl ).toHaveAttribute(
-			'src',
-			'https://example.com/new.jpg'
-		);
-		expect( player.instance.artworkEl ).toHaveAttribute(
-			'alt',
-			'A black and white portrait'
-		);
+		expect( player.instance.artworkEl ).toBeNull();
 	} );
 
 	it( 'updates play button artwork when artwork metadata changes', () => {
@@ -208,6 +192,7 @@ describe( 'WaveformPlayer', () => {
 			player.container,
 			'https://example.com/new.jpg'
 		);
+		expect( player.instance.artworkEl ).toBeNull();
 	} );
 
 	it( 'updates metadata on the live player without recreating it', () => {
@@ -301,6 +286,9 @@ describe( 'WaveformPlayer', () => {
 				showPlayButtonArtwork: true,
 			} )
 		);
+		expect(
+			initWaveformPlayer.mock.results[ 1 ].value.instance.artworkEl
+		).toBeNull();
 	} );
 
 	it( 'updates the player in place to show an image added to a track that had none', () => {

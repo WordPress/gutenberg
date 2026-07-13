@@ -105,11 +105,12 @@ const { state } = store(
 function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const existing = playerState.get( ref );
 	const showPlayButtonArtwork = context.showPlayButtonArtwork === true;
+	const playerArtwork = showPlayButtonArtwork ? '' : track.image;
 
 	// If a player already exists, load the new track without recreating.
 	if ( existing?.instance ) {
 		const shouldRecreatePlayer =
-			!! existing.instance.artworkEl !== !! track.image;
+			!! existing.instance.artworkEl !== !! playerArtwork;
 
 		if ( shouldRecreatePlayer ) {
 			existing.destroy?.();
@@ -118,8 +119,8 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			playlistPlayerState.set( context.playlistId, existing );
 			existing.instance
 				.loadTrack( track.url, track.title, track.artist, {
-					artwork: track.image,
-					artworkAlt: track.imageAlt,
+					artwork: playerArtwork,
+					artworkAlt: playerArtwork ? track.imageAlt : '',
 				} )
 				.then( () => {
 					existing.url = track.url;

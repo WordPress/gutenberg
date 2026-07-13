@@ -254,6 +254,8 @@ export function initWaveformPlayer(
 		showPlayButtonArtwork = false,
 	}
 ) {
+	const playerArtwork = showPlayButtonArtwork ? undefined : image;
+
 	// Get colors from computed styles.
 	const { textColor, waveformColor, progressColor } =
 		getWaveformColors( element );
@@ -263,7 +265,7 @@ export function initWaveformPlayer(
 		url: src,
 		title,
 		artist,
-		artwork: image,
+		artwork: playerArtwork,
 		waveformColor,
 		progressColor,
 		buttonColor: textColor,

@@ -20,8 +20,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$playlist_id              = wp_unique_id( 'playlist-' );
 	$playlist_tracks          = array();
 	$tracks_data              = array();
-	$show_images              = $attributes['showImages'] ?? true;
-	$show_play_button_artwork = ! empty( $attributes['showPlayButtonArtwork'] ) && $show_images;
+	$show_play_button_artwork = ! empty( $attributes['showPlayButtonArtwork'] );
 
 	// Parse inner blocks to extract track data.
 	// This approach avoids duplicating track data in the HTML output.
@@ -64,8 +63,8 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					'title'     => wp_strip_all_tags( $title ),
 					'artist'    => wp_strip_all_tags( $artist ),
 					'album'     => wp_strip_all_tags( $album ),
-					'image'     => $show_images ? esc_url( $image ) : '',
-					'imageAlt'  => $show_images ? wp_strip_all_tags( $image_alt ) : '',
+					'image'     => esc_url( $image ),
+					'imageAlt'  => wp_strip_all_tags( $image_alt ),
 					'ariaLabel' => wp_strip_all_tags( $aria_label ),
 				);
 			}
