@@ -40,7 +40,7 @@
 
 ### Code Quality
 
--   Clean the npm package publish surface and add package contents and type/export validation for tests, stories, fixtures, snapshots, test/story declaration output, and packaged type resolution ([#79552](https://github.com/WordPress/gutenberg/pull/79552)).
+-   Clean the npm package publish surface, correct ESM declaration export paths, and validate packed test/story artifacts and local export targets ([#79552](https://github.com/WordPress/gutenberg/pull/79552)).
 
 ## 0.17.0 (2026-06-30)
 

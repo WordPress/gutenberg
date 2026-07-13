@@ -1,9 +1,0 @@
-{
-	"profile": "esm-only",
-	"excludeEntrypoints": [ "./design-tokens.css" ],
-	"ignoreRules": [ "internal-resolution-error" ],
-	"format": "table",
-	"color": false,
-	"emoji": false,
-	"summary": false
-}
