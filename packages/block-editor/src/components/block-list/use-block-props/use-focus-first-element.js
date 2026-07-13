@@ -57,25 +57,31 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 			return;
 		}
 
-		// Do not move the caret when a focused editing host contains the
-		// block (the block supports `editableRoot`) and the selection is
-		// already inside the block, unless an edge position is explicitly
-		// requested while the block's rich text doesn't own the selection
-		// (the store selection carries no offsets for the block): the
-		// in-block selection is then left over from a previous state (e.g.
-		// after removing the focused block in between).
+		// While a focused editing host contains the block (the block
+		// supports `editableRoot`), the caret can already be inside the
+		// block even though the block element itself does not hold focus,
+		// and must not be moved.
 		const { activeElement } = ownerDocument;
 		if (
 			activeElement?.isContentEditable &&
 			activeElement.contains( ref.current )
 		) {
-			const { clientId: selectionClientId, offset } = getSelectionStart();
 			const selection = ownerDocument.defaultView.getSelection();
+			const caretIsInBlock =
+				!! selection.anchorNode &&
+				ref.current.contains( selection.anchorNode );
+			// The store carries offsets for the block only when its rich
+			// text placed or synchronized the caret. Without them, an
+			// in-block DOM selection is left over from a previous state
+			// (e.g. the focused block was just removed), and an explicitly
+			// requested edge position (initialPosition -1) wins over it.
+			const { clientId: selectionClientId, offset } = getSelectionStart();
+			const caretIsSynced =
+				offset !== undefined && selectionClientId === clientId;
+
 			if (
-				selection.anchorNode &&
-				ref.current.contains( selection.anchorNode ) &&
-				( initialPosition === 0 ||
-					( offset !== undefined && selectionClientId === clientId ) )
+				caretIsInBlock &&
+				( initialPosition === 0 || caretIsSynced )
 			) {
 				return;
 			}
