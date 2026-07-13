@@ -37,8 +37,15 @@ $waveform-player-height: 100px;
 		margin-bottom: 0;
 	}
 
-	.waveform-subtitle {
+	.waveform-artist {
 		opacity: 0.7;
+	}
+
+	.waveform-info,
+	.waveform-artist,
+	.waveform-title,
+	.waveform-time {
+		font-size: inherit;
 	}
 
 	.wp-block-playlist__tracklist {

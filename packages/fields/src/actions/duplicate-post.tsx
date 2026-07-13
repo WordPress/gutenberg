@@ -153,7 +153,6 @@ const duplicatePost: Action< BasePost > = {
 						</div>
 					) }
 					<InputControl
-						__next40pxDefaultSize
 						label={ __( 'Title' ) }
 						placeholder={ __( 'No title' ) }
 						value={ getItemTitle( item ) }
