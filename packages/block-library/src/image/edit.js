@@ -160,6 +160,19 @@ export function ImageEdit( {
 
 	const registry = useRegistry();
 	const { createErrorNotice } = useDispatch( noticesStore );
+
+	function setUploadIdAttribute( uploadId ) {
+		/*
+		 * The marker write must not create its own undo level; otherwise
+		 * undoing a finished upload would restore the marker instead of the
+		 * pristine block.
+		 */
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( { uploadId } );
+	}
+
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 		setTemporaryURL();
@@ -246,15 +259,15 @@ export function ImageEdit( {
 			 * A placeholder-initiated upload bypasses
 			 * useUploadMediaFromBlobURL, so no durable marker was written.
 			 * Adopt the queue item's marker so the upload can be reconnected
-			 * to this block after a reload.
+			 * to this block after a reload. Overwrites a stale marker (e.g.
+			 * left behind by undoing a previous upload) so the block always
+			 * points at its current upload.
 			 */
-			if ( ! attributes.uploadId ) {
-				const item = unlock(
-					registry.select( uploadStore )
-				).getItemByPreviewUrl( media.url );
-				if ( item?.uploadId ) {
-					setAttributes( { uploadId: item.uploadId } );
-				}
+			const item = unlock(
+				registry.select( uploadStore )
+			).getItemByPreviewUrl( media.url );
+			if ( item?.uploadId && item.uploadId !== attributes.uploadId ) {
+				setUploadIdAttribute( item.uploadId );
 			}
 			return;
 		}
@@ -371,7 +384,7 @@ export function ImageEdit( {
 		onChange: onSelectImage,
 		onError: onUploadError,
 		uploadId: attributes.uploadId,
-		onUploadStart: ( uploadId ) => setAttributes( { uploadId } ),
+		onUploadStart: setUploadIdAttribute,
 	} );
 
 	const resumePreviewURL = useResumeUploadFromMarker( {

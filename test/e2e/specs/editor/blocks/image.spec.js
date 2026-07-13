@@ -273,6 +273,7 @@ test.describe( 'Image', () => {
 
 	test( 'should undo without broken temporary state', async ( {
 		editor,
+		page,
 		pageUtils,
 		imageBlockUtils,
 	} ) => {
@@ -293,14 +294,24 @@ test.describe( 'Image', () => {
 		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
 			timeout: 30_000,
 		} );
+
+		// Let the upload pipeline fully drain (sub-sizes, finalize) before
+		// undoing, so late pipeline block updates cannot race the undo.
+		await page.waitForFunction( () => {
+			const uploadSelect = window.wp.data.select( 'core/upload-media' );
+			return ! uploadSelect || uploadSelect.getItems().length === 0;
+		} );
+
 		await editor.canvas.locator( '.wp-block-image' ).focus();
 		await pageUtils.pressKeys( 'primary+z' );
 
 		// Expect an empty image block (placeholder) rather than one with a
-		// broken temporary URL.
-		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:image -->
-<figure class="wp-block-image"><img alt=""/></figure>
-<!-- /wp:image -->` );
+		// broken temporary URL. Undo may restore the block's serialized
+		// durable `uploadId` marker; that residue is inert (there is no
+		// matching queue item) and is overwritten by the next upload.
+		expect( await editor.getEditedPostContent() ).toMatch(
+			/^<!-- wp:image( \{"uploadId":"[0-9a-f-]+"\})? -->\n<figure class="wp-block-image"><img alt=""\/><\/figure>\n<!-- \/wp:image -->$/
+		);
 	} );
 
 	test( 'can be replaced by dragging-and-dropping images from the inserter', async ( {

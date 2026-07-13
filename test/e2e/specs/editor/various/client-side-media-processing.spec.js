@@ -910,12 +910,20 @@ test.describe( 'Client-side media processing', () => {
 		// survives the reload.
 		await editor.saveDraft();
 
-		// Remove the hanging route BEFORE reload so the resumed upload's POST
-		// reaches the real server and can succeed.
-		await page.unroute( '**/wp/v2/media**' );
+		// The queue item must be durably persisted before simulating the crash.
+		await expect
+			.poll( () => mediaProcessingUtils.countPersistedUploads() )
+			.toBeGreaterThan( 0 );
 
-		// Reload; the persisted queue should be detected on page load.
+		// Reload with the hanging route still armed: the reload aborts the
+		// held request so the upload cannot complete (and delete its
+		// persisted record) in the dying page. Unrouting first would release
+		// the held request to the server and lose that race.
 		await page.reload();
+
+		// Now drop the route so the resumed upload's POST reaches the real
+		// server and can succeed.
+		await page.unroute( '**/wp/v2/media**' );
 
 		// The resume notice must appear; click Resume to re-trigger the upload.
 		const resumeButton = page.getByRole( 'button', { name: /resume/i } );
@@ -1003,12 +1011,16 @@ test.describe( 'Client-side media processing', () => {
 		// Save the draft so the in-progress block survives reload.
 		await editor.saveDraft();
 
-		// Remove the hanging route before reload (discard needs no successful
-		// upload, but clearing it keeps teardown clean).
-		await page.unroute( '**/wp/v2/media**' );
+		// The queue item must be durably persisted before simulating the crash.
+		await expect
+			.poll( () => mediaProcessingUtils.countPersistedUploads() )
+			.toBeGreaterThan( 0 );
 
-		// Reload; the durable queue detects the interrupted upload.
+		// Reload with the hanging route still armed so the held request is
+		// aborted rather than released to the server (which would complete
+		// the upload and delete its persisted record before the reload).
 		await page.reload();
+		await page.unroute( '**/wp/v2/media**' );
 
 		// Click Discard to dismiss the resume prompt.
 		const discardButton = page.getByRole( 'button', { name: /discard/i } );
@@ -1087,9 +1099,15 @@ test.describe( 'Client-side media processing', () => {
 
 		await editor.saveDraft();
 
-		await page.unroute( '**/wp/v2/media**' );
+		// The queue item must be durably persisted before simulating the crash.
+		await expect
+			.poll( () => mediaProcessingUtils.countPersistedUploads() )
+			.toBeGreaterThan( 0 );
 
+		// Reload with the hanging route still armed (see the single-image
+		// resume test), then drop it so the resumed POST can succeed.
 		await page.reload();
+		await page.unroute( '**/wp/v2/media**' );
 
 		const resumeButton = page.getByRole( 'button', { name: /resume/i } );
 		await expect( resumeButton ).toBeVisible( { timeout: 15_000 } );
