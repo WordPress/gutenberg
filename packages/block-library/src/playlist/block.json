@@ -38,12 +38,18 @@
 			"type": "boolean",
 			"default": true
 		},
+		"waveformStyle": {
+			"type": "string",
+			"enum": [ "bars", "mirror", "line", "blocks", "dots", "seekbar" ],
+			"default": "bars"
+		},
 		"caption": {
 			"type": "string"
 		}
 	},
 	"providesContext": {
-		"showArtists": "showArtists"
+		"showArtists": "showArtists",
+		"showImages": "showImages"
 	},
 	"supports": {
 		"anchor": true,
@@ -70,16 +76,14 @@
 		"spacing": {
 			"margin": true,
 			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		}
 	},
-	"styles": [
-		{ "name": "bars", "label": "Bars", "isDefault": true },
-		{ "name": "mirror", "label": "Mirror" },
-		{ "name": "line", "label": "Line" },
-		{ "name": "blocks", "label": "Blocks" },
-		{ "name": "dots", "label": "Dots" },
-		{ "name": "seekbar", "label": "Seekbar" }
-	],
 	"editorStyle": "wp-block-playlist-editor",
 	"style": "wp-block-playlist"
 }

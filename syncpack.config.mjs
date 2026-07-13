@@ -40,6 +40,13 @@ export default {
 	],
 	semverGroups: [
 		{
+			label: 'Prerelease dependencies (e.g. alpha or beta) should be pinned to exact versions to avoid auto-upgrades that can include breaking changes. Remove entries once the dependency reaches a stable release.',
+			dependencies: [ '@modelcontextprotocol/server' ],
+			packages: [ '**' ],
+			dependencyTypes: [ 'prod', 'dev' ],
+			range: '',
+		},
+		{
 			label: 'All dependencies must use caret ranges.',
 			packages: [ '**' ],
 			dependencyTypes: [ 'prod', 'dev' ],

@@ -174,7 +174,7 @@ async function dev() {
 		if ( ! skipTypes ) {
 			console.log( '\n📘 Building TypeScript types...\n' );
 			const tsStartTime = Date.now();
-			await exec( 'tsgo', [ '--build' ] ).catch( () => {
+			await exec( 'tsc', [ '--build' ] ).catch( () => {
 				console.error(
 					'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
 				);
@@ -213,7 +213,7 @@ async function dev() {
 		// Start TypeScript watch (unless types are skipped).
 		const tscWatch = skipTypes
 			? null
-			: execAsync( 'tsgo', [
+			: execAsync( 'tsc', [
 					'--build',
 					'--watch',
 					'--preserveWatchOutput',

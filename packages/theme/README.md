@@ -9,15 +9,21 @@ A theming package that's part of the WordPress Design System. It has two parts:
 -   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more.
 -   **Theme System**: A flexible theming provider for consistent theming across applications.
 
+This package is not a WordPress block theme, site theme, or `theme.json` API. It provides the WordPress Design System's design tokens and React theming primitives for JavaScript packages and applications.
+
+## Documentation
+
+This README is the entry point for package consumers. It covers how to load design tokens, use `ThemeProvider`, and configure the package's development tooling.
+
+-   To use design tokens and `ThemeProvider`, start here.
+-   To pick the right design token or browse every available token, see the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
+-   To edit token source files, see the [Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
+
 ## Design Tokens
 
-Design tokens are the visual design atoms of a design system. They are named entities that store visual design attributes like colors, spacing, typography, and shadows. They serve as a single source of truth that bridges design and development, ensuring consistency across platforms and making it easy to maintain and evolve the visual language of an application.
+Design tokens are named values that describe the visual purpose of a value. Rather than hardcoding values like `#3858e9` or `16px`, use semantic custom properties like `--wpds-color-background-interactive-brand-strong` or `--wpds-dimension-padding-2xl`.
 
-Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-background-interactive-brand-strong` or `--wpds-dimension-padding-2xl` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
-
-The **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)** contains a complete reference of all available design tokens including colors, spacing, typography, and more.
-
-The **[Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md)** describes how design tokens are implemented in the design system.
+The **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)** explains the naming pattern, how to choose a token, and the complete generated list of available design tokens.
 
 ### Using Design Tokens
 
@@ -34,13 +40,15 @@ The design system splits token delivery into two complementary layers:
 
 #### Within WordPress
 
-Stylesheets are managed on your behalf in a WordPress context, so you don't need to worry about loading them yourself. The design tokens stylesheet is enqueued automatically on every admin page and inside the block editor's content iframe.
+Stylesheets are managed on your behalf in standard WordPress admin and editor screens. WordPress registers the design tokens stylesheet as the `wp-theme` style handle and loads it where WordPress admin and editor packages already depend on the shared base styles. This includes the admin page and the block editor's content iframe.
+
+If your plugin renders a separate app shell, iframe, popup window, or package bundle outside those WordPress-managed style dependencies, enqueue the `wp-theme` stylesheet in that document instead of bundling `@wordpress/theme/design-tokens.css` into your plugin. See the [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify stylesheet dependencies.
 
 #### Outside WordPress
 
-Outside of WordPress, you will need to install and load the design tokens stylesheet to support the full range of theming capabilities:
+Outside of WordPress, install and load the design tokens stylesheet to support the full range of theming capabilities:
 
-```
+```sh
 npm install @wordpress/theme
 ```
 
@@ -48,15 +56,36 @@ npm install @wordpress/theme
 import '@wordpress/theme/design-tokens.css';
 ```
 
+The package's JavaScript entrypoints are ESM-only and require Node.js `^20.19.0` or `>=22.13.0`. Use `import` syntax from ESM or TypeScript configuration files.
+
 This stylesheet is universal and does not have a separate RTL version.
 
 If your application renders React content into additional documents (an iframe, a popup window, etc.), each of those documents needs the same stylesheet loaded in its own `<head>`. See [Across documents (iframes and other portals)](#across-documents-iframes-and-other-portals).
 
 ### Developer Tools
 
-For the best development experience, we recommend configuring the [Stylelint rules](#stylelint-plugins) provided by this package. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
+Use the [Stylelint plugins](#stylelint-plugins) to validate token usage and the [build plugins](#build-plugins) to inject generated fallback values. `@wordpress/build` enables the build plugins automatically when `@wordpress/theme` is installed.
 
-If you reference `--wpds-*` tokens in CSS or JS/TS source, use the [build plugins](#build-plugins) to inject fallback values at build time so components render correctly even when the tokens stylesheet is not loaded. If you use `@wordpress/build`, these plugins are already enabled by default when `@wordpress/theme` is installed.
+### Accessibility
+
+The semantic color tokens are designed so the default foreground/background pairs used by the design system meet [WCAG AA text contrast](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html). Components still need to choose the correct semantic pair for the UI state they render, and must not rely on color alone to convey information.
+
+Design tokens do not replace component-level accessibility handling:
+
+-   **Forced colors:** components are still responsible for `forced-colors` overrides where native high-contrast rendering would otherwise hide borders, icons, focus rings, or state indicators.
+-   **Reduced motion:** motion tokens provide shared durations and easing curves, but consuming components are still responsible for respecting `prefers-reduced-motion` for non-essential animations.
+
+For example, define non-essential transitions only when the user has not requested reduced motion:
+
+```css
+@media not ( prefers-reduced-motion ) {
+	.example {
+		transition-property: opacity;
+		transition-duration: var( --wpds-motion-duration-md );
+		transition-timing-function: var( --wpds-motion-easing-subtle );
+	}
+}
+```
 
 ## Theme Provider
 
@@ -79,7 +108,7 @@ The `color` prop accepts an object with the following optional properties:
 -   `primary`: The primary/accent seed color (default: `'#3858e9'`).
 -   `background`: The background seed color (default: `'#f8f8f8'`).
 
-Both properties accept an sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
+Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
 
 The `cursor` prop accepts an object with the following optional properties:
 
@@ -88,6 +117,8 @@ The `cursor` prop accepts an object with the following optional properties:
 The `cornerRadius` prop sets the overall roundness preset for the theme subtree. Accepts `'none'` (square corners), `'subtle'`, `'moderate'`, or `'pronounced'` (most rounded) (default: `'subtle'`). This scales the primitive `--wpds-border-radius-*` tokens for the provider subtree. The preset sets the overall amount of roundness, not an individual border-radius token size.
 
 When the `color`, `cursor`, or `cornerRadius` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
+
+`ThemeProvider` does not accept wrapper customization props such as `className`, `style`, `as`, `render`, or `ref`.
 
 ### Nesting Providers
 
@@ -120,7 +151,11 @@ Setting `isRoot` additionally hoists those overrides to the containing document'
 </ThemeProvider>
 ```
 
-Use `isRoot` on the top-level provider for an application or page. It's also the recommended pattern for the topmost provider rendered into a separate document (iframe, popup window). The static design-tokens stylesheet still provides the default values; `isRoot` is only needed when you want a `<ThemeProvider>`'s overrides to reach the whole document.
+Use `isRoot` on the top-level provider for an application or page. It's also the recommended pattern for the topmost provider rendered into a separate document (iframe, popup window).
+
+Render at most one root provider per document. Multiple `isRoot` providers that share the same document are unsupported because each one would try to define the document-level token values. Nested and sibling providers can still be used normally when `isRoot` is omitted, and separate documents can each have their own root provider.
+
+The static design-tokens stylesheet still provides the default values; `isRoot` is only needed when you want a `<ThemeProvider>`'s overrides to reach the whole document.
 
 ### Across documents (iframes and other portals)
 
@@ -130,7 +165,7 @@ When you render React content into a different document (typically an iframe), t
 
     Inside WordPress, this is enqueued automatically for both the admin page and the block editor's content iframe.
 
-    For custom iframes, the consumer is responsible for loading it — either by importing `@wordpress/theme/design-tokens.css` from a stylesheet that the iframe already loads, or by injecting the CSS string directly.
+    For custom iframes, the consumer is responsible for loading it in the iframe document. Within WordPress, enqueue the `wp-theme` stylesheet for that document. Outside WordPress, import `@wordpress/theme/design-tokens.css` from a stylesheet that the iframe already loads, or inject the CSS string directly.
 
 2.  **Dynamically injected component styles are routed to the iframe document.** Some `@wordpress/components` styles are injected into the document at runtime rather than shipped as static CSS — for example Emotion-based styles, and styles from CSS modules built with `@wordpress/build`. `StyleProvider` tells that machinery which document's `<head>` to inject into. Wrap the iframe subtree in `<StyleProvider document={ iframeDocument }>`.
 
@@ -155,6 +190,12 @@ function IframeContent( { iframeDocument, children } ) {
 
 The static stylesheet inside the iframe provides every default; `<ThemeProvider isRoot>` adds (or omits) overrides on top, exactly like in the main document.
 
+### Legacy compatibility
+
+The public token surface is the semantic `--wpds-*` custom properties documented in the [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
+
+`@wordpress/theme` may also maintain legacy compatibility aliases for existing WordPress admin and `@wordpress/components` internals. Those aliases are transitional implementation details, including the `--wp-components-*` namespace, and are not a supported API for consumers. New code should use semantic `--wpds-*` design tokens instead.
+
 ### Building
 
 This package is built in two steps. When `npm run build` is run at the root of the repo, it will first run the "prebuild" step of this package, which is defined in the `build` script of this package's package.json.
@@ -172,7 +213,7 @@ After the prebuild step, the package will be built into its final form via the r
 
 ## Stylelint Plugins
 
-This package provides Stylelint plugins to help enforce consistent usage of design tokens. To use them, add the plugins to your Stylelint configuration:
+These rules validate design token usage in CSS. Enable them in your Stylelint configuration:
 
 ```json
 {
@@ -191,69 +232,21 @@ This package provides Stylelint plugins to help enforce consistent usage of desi
 
 ### `plugin-wpds/no-unknown-ds-tokens`
 
-This rule reports an error when a CSS value references a `--wpds-*` custom property that is not a valid design token. This helps catch typos and ensures that only valid design tokens are used.
-
-```css
-/* ✗ Error: '--wpds-unknown-token' is not a valid Design System token */
-.example {
-	color: var( --wpds-unknown-token );
-}
-
-/* ✓ OK */
-.example {
-	color: var( --wpds-color-foreground-content-neutral );
-}
-```
+Reports references to unknown `--wpds-*` tokens.
 
 ### `plugin-wpds/no-setting-wpds-custom-properties`
 
-This rule reports an error when a CSS declaration sets (defines) a custom property in the `--wpds-*` namespace. The design system tokens should only be consumed, not defined or overridden in consuming code.
-
-```css
-/* ✗ Error: Do not set CSS custom properties using the Design System tokens namespace */
-.example {
-	--wpds-my-token: red;
-}
-
-/* ✗ Error: Overriding existing tokens is also not allowed */
-.example {
-	--wpds-color-foreground-content-neutral: red;
-}
-
-/* ✓ OK */
-.example {
-	--my-custom-token: red;
-}
-```
+Reports definitions or overrides in the `--wpds-*` namespace.
 
 ### `plugin-wpds/no-token-fallback-values`
 
-This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. In CSS processed by the [build plugins](#build-plugins), fallback values are injected automatically, so manual fallbacks in `var(--wpds-*)` references are redundant and can drift out of sync with the token definitions.
-
-```css
-/* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-foreground-content-neutral' */
-.example {
-	color: var( --wpds-color-foreground-content-neutral, #1e1e1e );
-}
-
-/* ✓ OK */
-.example {
-	color: var( --wpds-color-foreground-content-neutral );
-}
-
-/* ✓ OK: Non-wpds custom properties are not checked */
-.example {
-	color: var( --my-custom-color, red );
-}
-```
+Reports manual fallbacks that can drift from the generated values.
 
 ## Build Plugins
 
-This package provides build plugins that inject fallback values into bare `var(--wpds-*)` references at build time. This ensures components render correctly even when a `ThemeProvider` or design tokens stylesheet is not present — for example, `var(--wpds-color-foreground-content-neutral)` becomes `var(--wpds-color-foreground-content-neutral, #1e1e1e)`.
+The build plugins inject generated fallbacks into bare `var(--wpds-*)` references so components still render when the design tokens stylesheet is unavailable. For example, `var(--wpds-color-foreground-content-neutral)` becomes `var(--wpds-color-foreground-content-neutral, #1e1e1e)`.
 
 `@wordpress/build` already applies these plugins automatically when `@wordpress/theme` is installed. You only need to configure them manually for custom build setups.
-
-Three plugin variants are available, covering common build tool setups:
 
 | Export                                                        | Tool    | Scope |
 | ------------------------------------------------------------- | ------- | ----- |
@@ -261,7 +254,7 @@ Three plugin variants are available, covering common build tool setups:
 | `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks` | esbuild | JS/TS |
 | `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`       | Vite    | JS/TS |
 
-All three plugins skip files that don't contain `--wpds-` references, so there is zero overhead on unrelated modules.
+Existing fallbacks are unchanged. An unknown token in a bare reference fails the build.
 
 ### PostCSS
 

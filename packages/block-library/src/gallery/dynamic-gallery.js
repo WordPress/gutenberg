@@ -63,7 +63,6 @@ const ORDER_OPTIONS = [
 function OrderControl( { orderby, order, onChange } ) {
 	return (
 		<SelectControl
-			__next40pxDefaultSize
 			label={ __( 'Order by' ) }
 			value={ `${ orderby }/${ order }` }
 			options={ ORDER_OPTIONS }
