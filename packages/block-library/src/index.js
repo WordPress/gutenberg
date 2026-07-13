@@ -208,6 +208,10 @@ const getAllBlocks = () => {
 		socialLinks,
 		spacer,
 		table,
+		tabs,
+		tabList,
+		tabPanels,
+		tabPanel,
 		tagCloud,
 		textColumns,
 		verse,
@@ -281,10 +285,6 @@ const getAllBlocks = () => {
 	}
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( tabList );
-		blocks.push( tabs );
-		blocks.push( tabPanel );
-		blocks.push( tabPanels );
 		blocks.push( playlist );
 		blocks.push( playlistTrack );
 	}

@@ -1003,7 +1003,6 @@ Add white space between blocks and customize its height.
 Display the tab buttons for a tabbed interface.
 
 -	**Name:** [core/tab-list](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-list/)
--	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tabs
 -	**Supports:** ariaLabel, color (background, text), layout (default, ~~allowOrientation~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
@@ -1014,7 +1013,6 @@ Display the tab buttons for a tabbed interface.
 Content for a tab in a tabbed interface.
 
 -	**Name:** [core/tab-panel](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panel/)
--	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tab-panels
 -	**Supports:** anchor, color (background, text), layout, spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~visibility~~
@@ -1025,7 +1023,6 @@ Content for a tab in a tabbed interface.
 Container for tab panel content in a tabbed interface.
 
 -	**Name:** [core/tab-panels](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panels/)
--	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tabs
 -	**Allowed Blocks:** core/tab-panel
@@ -1055,7 +1052,6 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 Display content in a tabbed interface to help users navigate detailed content with ease.
 
 -	**Name:** [core/tabs](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs/)
--	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Allowed Blocks:** core/tab-list, core/tab-panels
 -	**Supports:** align, anchor, color (background, text), interactivity, layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize), ~~html~~
