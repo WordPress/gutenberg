@@ -6,10 +6,22 @@ on:
         branches:
             - trunk
         paths:
+            - 'packages/admin-ui/**'
             - 'packages/components/**'
             - 'packages/dataviews/**'
-            - 'packages/ui/**'
+            - 'packages/fields/**'
+            - 'packages/grid/**'
+            - 'packages/icons/**'
+            - 'packages/interface/**'
+            - 'packages/private-apis/**'
+            - 'packages/style-runtime/**'
             - 'packages/theme/**'
+            - 'packages/ui/**'
+            - 'packages/undo-manager/**'
+            - 'packages/views/**'
+            - 'packages/widget-dashboard/**'
+            - 'packages/widget-primitives/**'
+            - 'packages/wp-build/**'
             - '!packages/*/src/**/stories/**'
             - '!packages/*/src/**/test/**'
 
@@ -27,17 +39,32 @@ jobs:
             fail-fast: false
             matrix:
                 package:
-                    - components
+                    # Bundled packages
+                    # Keep in sync with dependency-extraction-webpack-plugin
+                    - admin-ui
                     - dataviews
+                    - fields
+                    - grid
+                    - icons
+                    - interface
+                    - style-runtime
                     - ui
+                    - undo-manager
+                    - views
+                    # Other packages
                     - theme
+                    - components
+                    - private-apis
+                    - widget-dashboard
+                    - widget-primitives
+                    - wp-build
         steps:
             - name: 'Get PR commit count'
               env:
                   PR_COUNT: ${{ github.event.pull_request.commits }}
               run: echo "PR_COMMIT_COUNT=$(( PR_COUNT + 1 ))" >> "${GITHUB_ENV}"
             - name: Checkout code
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   ref: ${{ github.event.pull_request.head.ref }}
                   repository: ${{ github.event.pull_request.head.repo.full_name }}

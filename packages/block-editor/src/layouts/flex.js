@@ -240,6 +240,7 @@ export default {
 		layout = {},
 		onChange,
 		layoutBlockSupport,
+		controlsGroup = 'block',
 	} ) {
 		const { allowVerticalAlignment = true, allowJustification = true } =
 			layoutBlockSupport;
@@ -249,7 +250,10 @@ export default {
 		}
 
 		return (
-			<BlockControls group="block" __experimentalShareWithChildBlocks>
+			<BlockControls
+				group={ controlsGroup }
+				__experimentalShareWithChildBlocks
+			>
 				{ allowJustification && (
 					<FlexLayoutJustifyContentControl
 						layout={ layout }
@@ -437,7 +441,6 @@ function FlexLayoutVerticalAlignmentControl( {
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			label={ __( 'Alignment' ) }
 			onChange={ onVerticalAlignmentChange }
 			value={ verticalAlignment }
@@ -524,7 +527,6 @@ function FlexLayoutJustifyContentControl( {
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			label={ __( 'Justification' ) }
 			value={ justifyContent }
 			onChange={ onJustificationChange }
@@ -568,7 +570,6 @@ function OrientationControl( { layout, onChange } ) {
 	} = layout;
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			className="block-editor-hooks__flex-layout-orientation-controls"
 			label={ __( 'Orientation' ) }
 			value={ orientation }

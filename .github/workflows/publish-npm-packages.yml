@@ -17,12 +17,12 @@ on:
                 description: 'WordPress major version (`wp` only)'
                 type: string
 
-# Cancels all previous workflow runs for pull requests that have not completed.
+# Prevents overlapping package releases without canceling an in-progress release.
 concurrency:
-    # The concurrency group contains the workflow name and the branch name for pull requests
-    # or the commit hash for any other events.
-    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
-    cancel-in-progress: true
+    # Scope package release dispatches by target npm release branch.
+    # `latest` and `bugfix` both target wp/latest and must serialize.
+    group: ${{ github.workflow }}-wp-${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version || github.event.inputs.release_type == 'development' && 'next' || 'latest' }}
+    cancel-in-progress: false
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -38,7 +38,7 @@ jobs:
         steps:
             - name: Checkout (for CLI)
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   path: cli
                   ref: trunk
@@ -47,7 +47,7 @@ jobs:
 
             - name: Checkout (for publishing)
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.
@@ -58,7 +58,7 @@ jobs:
 
             - name: Checkout (for publishing WP major version)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   path: publish
                   ref: wp/${{ github.event.inputs.wp_version }}

@@ -1136,6 +1136,11 @@
 		"filePath": "library/play.svg"
 	},
 	{
+		"slug": "playlist",
+		"label": "Playlist",
+		"filePath": "library/playlist.svg"
+	},
+	{
 		"slug": "plus",
 		"label": "Plus",
 		"filePath": "library/plus.svg",
@@ -1315,6 +1320,11 @@
 		"slug": "repeat",
 		"label": "Repeat",
 		"filePath": "library/repeat.svg"
+	},
+	{
+		"slug": "repeat-all",
+		"label": "Repeat All",
+		"filePath": "library/repeat-all.svg"
 	},
 	{
 		"slug": "replay",

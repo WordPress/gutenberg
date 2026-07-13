@@ -4,7 +4,7 @@
 
 @use "sass:color";
 @use "sass:math";
-@use "@wordpress/theme/utils" as wpds;
+@use "./internal/wpds-token-fallbacks" as wpds;
 @use "./variables";
 @use "./colors";
 @use "./breakpoints";
@@ -191,6 +191,11 @@
 @mixin outset-ring__focus() {
 	outline: wpds.var("--wpds-border-width-focus") solid wpds.var("--wpds-color-stroke-focus");
 	outline-offset: wpds.var("--wpds-border-width-focus");
+
+	// Defend against a conflicting focus ring from WordPress common.css on `a:focus`.
+	&:is(a) {
+		box-shadow: none;
+	}
 }
 
 

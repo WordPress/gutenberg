@@ -143,7 +143,6 @@ export default function BlockGuidelineModal( {
 					/>
 				) : (
 					<ComboboxControl
-						__next40pxDefaultSize
 						label={ __( 'Block' ) }
 						options={ availableBlockOptions }
 						value={ selectedBlock }

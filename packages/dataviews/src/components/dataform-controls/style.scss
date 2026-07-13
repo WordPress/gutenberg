@@ -1,3 +1,14 @@
+.dataviews-controls__richtext {
+	// The rich-text hook renders the placeholder as a child
+	// `<span data-rich-text-placeholder>`; `::placeholder` only applies to
+	// native form fields, so draw the text from the attribute instead. The
+	// alpha matches the components placeholder treatment.
+	[data-rich-text-placeholder]::after {
+		content: attr(data-rich-text-placeholder);
+		color: color-mix(in srgb, currentColor, transparent 38%);
+	}
+}
+
 .dataviews-controls__datetime {
 	border: none;
 	padding: 0;
