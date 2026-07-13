@@ -802,7 +802,7 @@ If you prefer to install PHPCS locally, you should use `composer`. [Install `com
 
 GitHub Actions workflows operate in a privileged software supply chain environment, therefore all workflow files must adhere to a high degree of quality and security standards.
 
-All YAML workflow files within the `.github/workflows` directory are statically scanned when modified using [Actionlint](https://github.com/rhysd/actionlint) and [Zizmor](https://github.com/zizmorcore/zizmor). It's recommended that you install both of these tools locally using a package manager to run prior to submitting changes to workflow files.
+These files are statically scanned when modified using [Actionlint](https://github.com/rhysd/actionlint) and [Zizmor](https://github.com/zizmorcore/zizmor). Actionlint scans the YAML workflow files within the `.github/workflows` directory, while Zizmor additionally scans any action file (`action.yml`) located anywhere in the repository. It's recommended that you install both of these tools locally using a package manager to run prior to submitting changes to workflow or action files.
 
 - [GitHub Actions Workflow Standards for WordPress](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/github-actions/)
 - [Actionlint installations instructions](https://github.com/rhysd/actionlint/blob/main/docs/install.md)
