@@ -63,6 +63,14 @@ if [ -z "$NO_CHECKS" ]; then
 			exit 1
 		fi
 	fi
+
+	# WordPress Core builds prune non-public icons using jq, which is expected to be
+	# present on the system running this script.
+	if [ "$IS_WORDPRESS_CORE" = "true" ] && ! command -v jq > /dev/null 2>&1; then
+		error "ERROR: jq is required to build for WordPress Core but was not found. 🫥
+		Install jq (https://jqlang.org/) and try again."
+		exit 1
+	fi
 fi
 
 # Run the build.
