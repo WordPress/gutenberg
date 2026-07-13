@@ -116,6 +116,28 @@ add_filter( 'image_save_progressive', function ( $interlaced, $mime_type ) {
 }, 10, 2 );
 ```
 
+### Metadata stripping
+
+The `image_strip_meta` filter controls whether metadata is stripped from generated images. By default, generated sub-sizes keep only color profiles (and, for UltraHDR, gain maps), matching server-side behavior. Returning `false` keeps all metadata (EXIF, XMP, IPTC) on generated images:
+
+```php
+// Keep all metadata on generated sub-sizes.
+add_filter( 'image_strip_meta', '__return_false' );
+```
+
+### Maximum bit depth
+
+The `image_max_bit_depth` filter caps the bit depth of generated images. By default, high-bit-depth AVIF sources (10- or 12-bit, common for HDR photos) keep their bit depth in generated sub-sizes; a lower cap reduces file size at the cost of dynamic range:
+
+```php
+// Cap generated images at 8 bits per channel.
+add_filter( 'image_max_bit_depth', function () {
+	return 8;
+} );
+```
+
+The client snaps the cap to the depths the AVIF encoder supports (8, 10, or 12 bits).
+
 ## Supported file formats
 
 Client-side processing handles the following MIME types in the WASM/vips pipeline: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/avif`. Files outside this set fall through to one of two paths depending on type:
@@ -205,6 +227,28 @@ When client-side processing is active, the `wp_generate_attachment_metadata` fil
 This double-fire pattern is the same one WordPress uses for big-image uploads on the server, where sub-size generation is deferred and triggers a second `'update'` pass. Plugins that already work with big-image uploads accommodate it without changes.
 
 If the finalize request fails, the error is logged but the upload still succeeds — finalization is best-effort so that a plugin failure does not block the user's upload.
+
+### Which hooks fire during a client-side upload
+
+A client-side upload reaches the server as a series of REST requests, each firing the standard hooks (a complete audit across all supported image types is in [#80210](https://github.com/WordPress/gutenberg/issues/80210)):
+
+1.  **Create** (`POST /wp/v2/media`): the usual upload surface fires — `wp_handle_upload_prefilter`, `wp_check_filetype_and_ext`, `wp_handle_upload`, `add_attachment`, `rest_insert_attachment` / `rest_after_insert_attachment`, `wp_read_image_metadata`, and `wp_generate_attachment_metadata` (context `'create'`).
+2.  **Sideload** (`POST /wp/v2/media/{id}/sideload`, once per generated file): `wp_handle_upload_prefilter` and `wp_handle_upload` fire for every client-generated sub-size, with the final file path. A plugin that needs to see each generated file (offloaders, optimizers) gets exactly one `wp_handle_upload` call per file. Companion files (the HEIC original, the animated GIF's video and poster) go through the same endpoint and fire the same hooks.
+3.  **Finalize** (`POST /wp/v2/media/{id}/finalize`): `wp_generate_attachment_metadata` (context `'update'`) fires with the complete `sizes` array — the "everything is done" signal.
+
+### Hooks that no longer apply
+
+Because decoding, scaling, and encoding happen in the browser, no server-side `WP_Image_Editor` is instantiated, and three hooks never fire on the client path:
+
+-   **`wp_image_editors`** — there is no server-side editor to swap out. If your site depends on a custom image editor implementation, disable client-side processing with the `wp_client_side_media_processing_enabled` filter.
+-   **`image_make_intermediate_size`** — use the per-sideload `wp_handle_upload` firing (above) to see each generated file, and the finalize pass for the complete metadata.
+-   **`image_memory_limit`** — PHP memory is not involved in client-side processing.
+
+The other image-processing filters (`image_editor_output_format`, `wp_editor_set_quality`, `jpeg_quality`, `big_image_size_threshold`, `image_save_progressive`, `image_strip_meta`, `image_max_bit_depth`) continue to work: their values are read on the server and shipped to the client, which honors them during processing. See [Customizing image processing settings](#customizing-image-processing-settings).
+
+### EXIF rotation
+
+`wp_image_maybe_exif_rotate` still fires for images that carry an EXIF orientation, but the server forces its value to `false` during a client-side upload: the client applies the rotation itself, using the `exif_orientation` field from the upload response.
 
 ## Controlling image quality
 
@@ -322,6 +366,7 @@ The endpoint checks that the uploaded file's dimensions are appropriate for the 
 | Upload fails with "image transcoding error" | Unsupported format or corrupt file | Verify the file is a supported format (JPEG, PNG, WebP, AVIF, GIF, HEIC). |
 | Save Draft button stays disabled | Lock not released | Ensure all upload items have completed or been cancelled. The lock releases when the upload queue is empty. |
 | Sideload request rejected with a 400 dimension error | Uploaded variant doesn't match the declared `image_size` | The sideload endpoint validates dimensions. Make sure the file matches the size in `image_size`: an exact match for `original`, or within the registered maximum for a named size like `thumbnail`. |
+| A plugin's image-processing hook stopped running | Hook doesn't fire on the client path | `wp_image_editors`, `image_make_intermediate_size`, and `image_memory_limit` never fire when processing happens in the browser. See [Hooks that no longer apply](#hooks-that-no-longer-apply) for replacements. |
 
 ## Debugging the WASM processor
 

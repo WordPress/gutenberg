@@ -263,6 +263,10 @@ Client-side processing reads the following existing WordPress filters from the s
 -   **`image_save_progressive`** — Controls progressive (JPEG) or interlaced (PNG, GIF) encoding. Applied during client-side compression and format conversion.
 -   **`wp_image_maybe_exif_rotate`** — Controls EXIF-based image rotation. When client-side processing is active, server-side rotation is disabled and the client handles it instead.
 -   **`wp_editor_set_quality`** (and **`jpeg_quality`** for JPEG output) — Encode quality (1–100). The server resolves these filters per registered size and reports the result in the upload response's size-aware `image_quality` field, which the client applies during sub-size resize and transcode. There is no separate JavaScript quality filter.
+-   **`image_strip_meta`** — Controls whether metadata is stripped from generated images. Exported on the REST index; when `false`, the client keeps all metadata (EXIF, XMP, IPTC) instead of stripping everything but color profiles (and HDR gain maps).
+-   **`image_max_bit_depth`** — Caps the bit depth of generated images (relevant for high-bit-depth AVIF/HDR sources). Exported on the REST index and honored by the client encoder, snapped to the depths the AVIF encoder supports (8, 10, or 12 bits).
+
+> **Note:** Three server-side hooks never fire when client-side processing is active, because no server-side `WP_Image_Editor` is involved: `wp_image_editors`, `image_make_intermediate_size`, and `image_memory_limit`. See [Server-side plugin compatibility](/docs/how-to-guides/client-side-media.md#server-side-plugin-compatibility) in the how-to guide for replacement signals.
 
 > **Note:** There is no filter for the set of MIME types eligible for client-side processing. The supported set is fixed at `CLIENT_SIDE_SUPPORTED_MIME_TYPES` (`image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/avif`) in `packages/upload-media/src/store/constants.ts`. Files outside this set fall through to server-side processing or, for HEIC/HEIF, to a separate canvas-based decode path.
 
