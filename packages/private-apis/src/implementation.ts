@@ -42,7 +42,6 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/routes',
 	'@wordpress/storybook',
 	'@wordpress/sync',
-	'@wordpress/theme',
 	'@wordpress/dataviews',
 	'@wordpress/fields',
 	'@wordpress/lazy-editor',
@@ -51,7 +50,6 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/upload-media',
 	'@wordpress/global-styles-engine',
 	'@wordpress/global-styles-ui',
-	'@wordpress/ui',
 	'@wordpress/views',
 	'@wordpress/widget-dashboard',
 ];
