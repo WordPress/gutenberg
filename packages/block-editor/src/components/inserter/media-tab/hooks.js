@@ -12,6 +12,27 @@ import { unlock } from '../../../lock-unlock';
 
 /** @typedef {import('../../../store/actions').InserterMediaRequest} InserterMediaRequest */
 /** @typedef {import('../../../store/actions').InserterMediaItem} InserterMediaItem */
+/** @typedef {import('../../../store/actions').InserterMediaResponse} InserterMediaResponse */
+
+/**
+ * Normalizes the result of a media category's `fetch`, which may be either a
+ * plain array of media items or an `InserterMediaResponse` carrying pagination
+ * totals. Sources that don't report totals leave them `undefined`, which is how
+ * the panel knows to hide the pager.
+ *
+ * @param {InserterMediaItem[]|InserterMediaResponse|undefined} result The raw `fetch` result.
+ * @return {{ mediaItems: InserterMediaItem[], totalItems: number|undefined, totalPages: number|undefined }} The normalized result.
+ */
+function normalizeFetchResult( result ) {
+	if ( Array.isArray( result ) ) {
+		return { mediaItems: result };
+	}
+	return {
+		mediaItems: result?.mediaItems ?? [],
+		totalItems: result?.totalItems,
+		totalPages: result?.totalPages,
+	};
+}
 
 /**
  * Fetches media items based on the provided category.
@@ -21,10 +42,11 @@ import { unlock } from '../../../lock-unlock';
  * @param {InserterMediaRequest} query      The query args to use for the request.
  * @param {any}                  refreshKey Optional value that, when changed, forces
  *                                          a refetch (e.g. after attaching/detaching).
- * @return {InserterMediaItem[]} The media results.
+ * @return {{ mediaList: InserterMediaItem[], isLoading: boolean, totalItems: number|undefined, totalPages: number|undefined }} The media results and paging totals.
  */
 export function useMediaResults( category, query = {}, refreshKey ) {
 	const [ mediaList, setMediaList ] = useState();
+	const [ totals, setTotals ] = useState( {} );
 	const [ isLoading, setIsLoading ] = useState( false );
 	// We need to keep track of the last request made because
 	// multiple request can be fired without knowing the order
@@ -36,6 +58,7 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 	const lastRequestRef = useRef();
 	const lastQueryKeyRef = useRef();
 	const lastFetchRef = useRef();
+	const lastSourceRef = useRef();
 	useEffect( () => {
 		( async () => {
 			const key = JSON.stringify( {
@@ -56,11 +79,26 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 			) {
 				setMediaList( [] );
 			}
+			// Reset paging totals only when the source (category or its `fetch`)
+			// changes, so switching to an array-returning source doesn't leave a
+			// stale pager showing. A mere page change keeps the previous totals,
+			// which is what holds the footer mounted while the next page loads.
+			if (
+				lastSourceRef.current !== category.name ||
+				lastFetchRef.current !== category.fetch
+			) {
+				setTotals( {} );
+			}
 			lastQueryKeyRef.current = key;
 			lastFetchRef.current = category.fetch;
-			const _media = await category.fetch?.( query );
+			lastSourceRef.current = category.name;
+			const { mediaItems, totalItems, totalPages } = normalizeFetchResult(
+				await category.fetch?.( query )
+			);
 			if ( request === lastRequestRef.current ) {
-				setMediaList( _media );
+				// Set together so the grid and the pager never disagree.
+				setMediaList( mediaItems );
+				setTotals( { totalItems, totalPages } );
 				setIsLoading( false );
 			}
 		} )();
@@ -70,7 +108,12 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 		...Object.values( query ),
 		refreshKey,
 	] );
-	return { mediaList, isLoading };
+	return {
+		mediaList,
+		isLoading,
+		totalItems: totals.totalItems,
+		totalPages: totals.totalPages,
+	};
 }
 
 /**
@@ -144,9 +187,10 @@ export function useMediaCategories( rootClientId ) {
 						}
 						let results = [];
 						try {
-							results = await category.fetch( {
-								per_page: 1,
-							} );
+							const { mediaItems } = normalizeFetchResult(
+								await category.fetch( { per_page: 1 } )
+							);
+							results = mediaItems;
 						} catch {
 							// If the request fails, we shallow the error and just don't show
 							// the category, in order to not break the media tab.

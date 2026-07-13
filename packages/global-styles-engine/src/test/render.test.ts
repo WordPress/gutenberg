@@ -1040,6 +1040,47 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'handles responsive block gap styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							'@mobile': {
+								spacing: {
+									blockGap: '24px',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					hasLayoutSupport: true,
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				true,
+				false,
+				false,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toContain( '@media (width <= 480px)' );
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-flow) > * { margin-block-start: 24px; margin-block-end: 0; }'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-flex) { gap: 24px; }'
+			);
+		} );
+
 		it( 'handles legacy responsive block styles', () => {
 			const tree = {
 				styles: {

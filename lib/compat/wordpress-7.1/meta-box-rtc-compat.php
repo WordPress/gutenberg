@@ -17,6 +17,8 @@
  * Hooks into filter_block_editor_meta_boxes at a late priority so that it
  * runs after any developer filters that add the flag to third-party meta boxes.
  *
+ * @global WP_Screen $current_screen WordPress current screen object.
+ *
  * @param array $wp_meta_boxes Global meta box state.
  * @return array Unmodified meta box state.
  */

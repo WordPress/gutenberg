@@ -30,7 +30,8 @@
 		"fast-glob": "^3.2.7",
 		"glob": "^7.1.2",
 		"json2md": "^2.0.1",
-		"react-docgen-typescript": "^2.4.0"
+		"react-docgen-typescript": "^2.4.0",
+		"typescript": "npm:@typescript/typescript6@^6.0.2"
 	},
 	"publishConfig": {
 		"access": "public"

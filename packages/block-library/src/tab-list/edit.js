@@ -21,7 +21,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
@@ -67,10 +67,14 @@ function Edit( {
 			},
 			[ clientId ]
 		);
+	const registry = useRegistry();
 	const { isBlockSelected, hasSelectedInnerBlock } =
 		useSelect( blockEditorStore );
-	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const {
+		updateBlockAttributes,
+		selectBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 	const { insertTab, removeTab } = useTabActions( tabsClientId );
 
 	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
@@ -85,9 +89,15 @@ function Edit( {
 
 	function selectTabPanel( tabIndex ) {
 		if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( tabsClientId, {
-				editorActiveTabIndex: tabIndex,
+			// Batch the selection and index update so the sync effect in
+			// the tab-panel block can't revert the switch from a stale
+			// inner-block selection in the previously active panel.
+			registry.batch( () => {
+				selectBlock( clientId );
+				__unstableMarkNextChangeAsNotPersistent();
+				updateBlockAttributes( tabsClientId, {
+					editorActiveTabIndex: tabIndex,
+				} );
 			} );
 		}
 	}

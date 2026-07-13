@@ -102,16 +102,19 @@ export function NoteThread( {
 		const isNoteFocused = event.relatedTarget?.closest(
 			'.editor-collab-sidebar-panel__thread'
 		);
-		const isDialogFocused =
-			event.relatedTarget?.closest( '[role="dialog"]' );
+		// Keep the note open when focus moves into a dialog (e.g. delete
+		// confirmation) or format popover (e.g. Cmd+K link UI) that portals
+		// out of the thread.
+		const isDialogOrPopoverFocused = event.relatedTarget?.closest(
+			'[role="dialog"], .components-popover'
+		);
 		const isTabbing = isKeyboardTabbingRef.current;
 
 		// When another note is clicked, do nothing because the current note is automatically closed.
 		if ( isNoteFocused && ! isTabbing ) {
 			return;
 		}
-		// When deleting a note, a dialog appears, but the note should not be collapsed.
-		if ( isDialogFocused ) {
+		if ( isDialogOrPopoverFocused ) {
 			return;
 		}
 		// When tabbing, do nothing if the focus is within the current note.
@@ -226,7 +229,11 @@ export function NoteThread( {
 				variant="secondary"
 				size="compact"
 				onClick={ () => {
-					focusNoteThread( note.id, sidebarRef.current, 'textarea' );
+					focusNoteThread(
+						note.id,
+						sidebarRef.current,
+						'[role="textbox"]'
+					);
 				} }
 			>
 				{ __( 'Add new reply' ) }
@@ -297,18 +304,17 @@ export function NoteThread( {
 						onSubmit={ ( inputComment ) => {
 							if ( 'approved' === note.status ) {
 								// For reopening, include the content in the reopen action.
-								onEditNote( {
+								return onEditNote( {
 									id: note.id,
 									status: 'hold',
 									content: inputComment,
 								} );
-							} else {
-								// For regular replies, add as separate comment.
-								onAddReply( {
-									content: inputComment,
-									parent: note.id,
-								} );
 							}
+							// For regular replies, add as separate comment.
+							return onAddReply( {
+								content: inputComment,
+								parent: note.id,
+							} );
 						} }
 						onCancel={ ( event ) => {
 							// Prevent the parent onClick from being triggered.

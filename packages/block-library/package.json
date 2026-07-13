@@ -73,6 +73,7 @@
 					"wp_enqueue_block_support_styles",
 					"wp_get_typography_font_size_value",
 					"wp_style_engine_get_styles",
+					"wp_get_global_styles",
 					"wp_get_global_settings"
 				],
 				"suffixClasses": [
@@ -91,7 +92,7 @@
 		"build-module/*/init.mjs"
 	],
 	"dependencies": {
-		"@arraypress/waveform-player": "^1.20.0",
+		"@arraypress/waveform-player": "^1.21.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
@@ -151,9 +152,9 @@
 		"deep-freeze": "^0.0.1"
 	},
 	"peerDependencies": {
-		"@types/react": "^18.3.27",
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {

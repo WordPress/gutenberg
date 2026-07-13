@@ -51,8 +51,11 @@ test.describe( 'Widgets screen', () => {
 			'Update button should start out disabled'
 		).toBeDisabled();
 
-		const [ firstWidgetArea, secondWidgetArea ] =
-			await widgetsScreen.widgetAreas.all();
+		await expect
+			.poll( () => widgetsScreen.widgetAreas.count() )
+			.toBeGreaterThanOrEqual( 2 );
+		const firstWidgetArea = widgetsScreen.widgetAreas.first();
+		const secondWidgetArea = widgetsScreen.widgetAreas.nth( 1 );
 
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
