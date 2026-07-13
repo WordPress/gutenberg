@@ -219,6 +219,30 @@ describe( 'EmojiPicker search announcements', () => {
 		delete window.gutenbergEmojibaseUrl;
 	} );
 
+	it( 'exposes categories as labelled rowgroups and flattens search results', async () => {
+		const user = userEvent.setup();
+		render( <EmojiPicker onSelect={ () => {} } /> );
+
+		await screen.findAllByRole( 'gridcell' );
+
+		// While browsing, each category is a rowgroup labelled by its
+		// visible heading, so cell-by-cell navigation has group context.
+		expect(
+			screen.getByRole( 'rowgroup', { name: 'Smileys' } )
+		).toBeVisible();
+
+		// While searching, results collapse into one flat grid with no
+		// category sections.
+		await user.type(
+			screen.getByRole( 'searchbox', { name: 'Search emoji' } ),
+			'face'
+		);
+		await waitFor( () =>
+			expect( screen.queryByRole( 'rowgroup' ) ).not.toBeInTheDocument()
+		);
+		expect( screen.getAllByRole( 'gridcell' ) ).toHaveLength( 2 );
+	} );
+
 	it( 'announces result counts and the empty state as the query settles', async () => {
 		const user = userEvent.setup();
 		render( <EmojiPicker onSelect={ () => {} } /> );

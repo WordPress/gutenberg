@@ -230,6 +230,19 @@ export default function EmojiPicker( { onSelect }: EmojiPickerProps ) {
 		[ visibleGroups ]
 	);
 
+	const isSearching = !! query.trim();
+
+	// Search results render as one flat grid: per-category sections would
+	// leave sparse, ragged rows (keyboard dead-ends when arrowing across
+	// column gaps) and mostly-empty category headers.
+	const searchRows = useMemo(
+		() =>
+			isSearching
+				? chunkRows( visibleGroups.flatMap( ( g ) => g.emojis ) )
+				: [],
+		[ isSearching, visibleGroups ]
+	);
+
 	// Index base records by their normalized hex key so the stored
 	// frequently-used keys can be resolved back to full emoji records.
 	const recordByHexKey = useMemo( () => {
@@ -375,37 +388,45 @@ export default function EmojiPicker( { onSelect }: EmojiPickerProps ) {
 					<Composite
 						role="grid"
 						aria-label={ _x( 'Emoji', 'emoji picker grid label' ) }
+						// A trailing partial row is expected (results rarely
+						// fill a multiple of 8): shift focus to the nearest
+						// cell instead of dead-ending when arrowing down
+						// into a missing column.
+						focusShift
 						className="editor-collab-sidebar-panel__picker-list"
 					>
-						{ frequentRows.length > 0 && (
-							<div>
-								<div
-									className="editor-collab-sidebar-panel__picker-category"
-									role="presentation"
-								>
+						{ isSearching &&
+							searchRows.map( ( row, rowIndex ) =>
+								renderRow( row, `search-${ rowIndex }` )
+							) }
+						{ ! isSearching && frequentRows.length > 0 && (
+							<Composite.Group role="rowgroup">
+								<Composite.GroupLabel className="editor-collab-sidebar-panel__picker-category">
 									{ __( 'Frequently used' ) }
-								</div>
+								</Composite.GroupLabel>
 								{ frequentRows.map( ( row, rowIndex ) =>
 									renderRow( row, `frequent-${ rowIndex }` )
 								) }
-							</div>
+							</Composite.Group>
 						) }
-						{ visibleGroups.map( ( group ) => (
-							<div key={ group.key }>
-								<div
-									className="editor-collab-sidebar-panel__picker-category"
-									role="presentation"
+						{ ! isSearching &&
+							visibleGroups.map( ( group ) => (
+								<Composite.Group
+									key={ group.key }
+									role="rowgroup"
 								>
-									{ groupLabelByKey.get( group.key ) || '' }
-								</div>
-								{ group.rows.map( ( row, rowIndex ) =>
-									renderRow(
-										row,
-										`${ group.key }-${ rowIndex }`
-									)
-								) }
-							</div>
-						) ) }
+									<Composite.GroupLabel className="editor-collab-sidebar-panel__picker-category">
+										{ groupLabelByKey.get( group.key ) ||
+											'' }
+									</Composite.GroupLabel>
+									{ group.rows.map( ( row, rowIndex ) =>
+										renderRow(
+											row,
+											`${ group.key }-${ rowIndex }`
+										)
+									) }
+								</Composite.Group>
+							) ) }
 					</Composite>
 				) }
 			</div>
