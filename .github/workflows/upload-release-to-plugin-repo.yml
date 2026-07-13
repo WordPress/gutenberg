@@ -74,6 +74,17 @@ jobs:
                     exit 1
                   fi
 
+            - name: Confirm Gutenberg plugin asset upload completed
+              env:
+                  RELEASE_ASSETS: ${{ toJson( github.event.release.assets ) }}
+              run: |
+                  asset_state="$(jq -r --arg name 'gutenberg.zip' '.[] | select(.name == $name) | .state // empty' <<< "$RELEASE_ASSETS")"
+                  asset_size="$(jq -r --arg name 'gutenberg.zip' '.[] | select(.name == $name) | .size // 0' <<< "$RELEASE_ASSETS")"
+                  if [[ "$asset_state" != "uploaded" || "$asset_size" -le 0 ]]; then
+                    echo "::error::The gutenberg.zip release asset upload is incomplete (state: $asset_state, size: $asset_size bytes). Delete the incomplete asset and upload it again."
+                    exit 1
+                  fi
+
             - name: Select Gutenberg plugin asset
               id: get_plugin_asset
               env:
