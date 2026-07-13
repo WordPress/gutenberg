@@ -167,7 +167,7 @@ async function writeInterstitialIntoPreviewWindow( previewWindow ) {
 	}
 }
 
-function usePostPreviewProps( { forceIsAutosaveable, onPreview } ) {
+function usePostPreview( { forceIsAutosaveable, onPreview } ) {
 	const { postId, currentPostLink, previewLink, isSaveable, isViewable } =
 		useSelect( ( select ) => {
 			const editor = select( editorStore );
@@ -198,11 +198,11 @@ function usePostPreviewProps( { forceIsAutosaveable, onPreview } ) {
 
 	const targetId = `wp-preview-${ postId }`;
 
-	const openPreviewWindow = async ( event ) => {
-		// Our Preview button has its 'href' and 'target' set correctly for a11y
-		// purposes. Unfortunately, though, we can't rely on the default 'click'
-		// handler since sometimes it incorrectly opens a new tab instead of reusing
-		// the existing one.
+	const handlePreviewClick = async ( event ) => {
+		// Preserve native link semantics with `href` and `target`, but intercept the
+		// click because the final preview URL may depend on an asynchronous save.
+		// Opening the named window synchronously also prevents popup blocking and
+		// ensures subsequent previews reuse the same tab.
 		// https://github.com/WordPress/gutenberg/pull/8330
 		event.preventDefault();
 
@@ -230,10 +230,9 @@ function usePostPreviewProps( { forceIsAutosaveable, onPreview } ) {
 
 	return {
 		href,
-		target: targetId,
-		accessibleWhenDisabled: true,
-		disabled: ! isSaveable,
-		onClick: openPreviewWindow,
+		handlePreviewClick,
+		isSaveable,
+		targetId,
 	};
 }
 
@@ -247,17 +246,25 @@ function usePostPreviewProps( { forceIsAutosaveable, onPreview } ) {
  * @return {React.ReactNode} The rendered menu item.
  */
 export function PostPreviewMenuItem( { forceIsAutosaveable, onPreview } ) {
-	const previewProps = usePostPreviewProps( {
+	const preview = usePostPreview( {
 		forceIsAutosaveable,
 		onPreview,
 	} );
 
-	if ( ! previewProps ) {
+	if ( ! preview ) {
 		return null;
 	}
 
+	const { handlePreviewClick, href, isSaveable, targetId } = preview;
+
 	return (
-		<MenuItem icon={ external } { ...previewProps }>
+		<MenuItem
+			href={ href }
+			target={ targetId }
+			disabled={ ! isSaveable }
+			onClick={ handlePreviewClick }
+			icon={ external }
+		>
 			{ __( 'Preview in new tab' ) }
 		</MenuItem>
 	);
@@ -285,14 +292,16 @@ export default function PostPreviewButton( {
 	role,
 	onPreview,
 } ) {
-	const previewProps = usePostPreviewProps( {
+	const preview = usePostPreview( {
 		forceIsAutosaveable,
 		onPreview,
 	} );
 
-	if ( ! previewProps ) {
+	if ( ! preview ) {
 		return null;
 	}
+
+	const { handlePreviewClick, href, isSaveable, targetId } = preview;
 
 	return (
 		<Button
@@ -300,7 +309,11 @@ export default function PostPreviewButton( {
 			className={ className || 'editor-post-preview' }
 			role={ role }
 			size="compact"
-			{ ...previewProps }
+			href={ href }
+			target={ targetId }
+			accessibleWhenDisabled
+			disabled={ ! isSaveable }
+			onClick={ handlePreviewClick }
 		>
 			{ textContent || (
 				<>

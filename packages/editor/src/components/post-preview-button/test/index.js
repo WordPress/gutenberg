@@ -21,7 +21,7 @@ jest.mock( '@wordpress/data/src/components/use-dispatch/use-dispatch', () =>
 	jest.fn()
 );
 
-function mockUseSelect( overrides ) {
+function mockUseSelect( overrides, dispatchOverrides ) {
 	useSelect.mockImplementation( ( map ) =>
 		map( () => ( {
 			getPostType: () => ( { viewable: true } ),
@@ -35,6 +35,7 @@ function mockUseSelect( overrides ) {
 	);
 	useDispatch.mockImplementation( () => ( {
 		__unstableSaveForPreview: () => Promise.resolve(),
+		...dispatchOverrides,
 	} ) );
 }
 
@@ -139,14 +140,22 @@ describe( 'PostPreviewButton', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'should render the menu variant with the shared menu item pattern.', () => {
-		mockUseSelect();
+	it( 'should render the menu variant as a link with the shared menu item pattern.', () => {
+		const url = 'https://wordpress.org';
+		mockUseSelect( {
+			getEditedPostPreviewLink: () => url,
+			isEditedPostSaveable: () => true,
+		} );
 
 		render( <PostPreviewMenuItem /> );
 
-		expect(
-			screen.getByRole( 'menuitem', { name: 'Preview in new tab' } )
-		).toHaveClass( 'components-menu-item__button' );
+		const menuItem = screen.getByRole( 'menuitem', {
+			name: 'Preview in new tab',
+		} );
+		expect( menuItem.tagName ).toBe( 'A' );
+		expect( menuItem ).toHaveAttribute( 'href', url );
+		expect( menuItem ).toHaveAttribute( 'target', 'wp-preview-123' );
+		expect( menuItem ).toHaveClass( 'components-menu-item__button' );
 	} );
 
 	it( 'should be accessibly disabled if post is not saveable.', () => {
@@ -238,6 +247,27 @@ describe( 'PostPreviewButton', () => {
 		await user.click( screen.getByRole( 'link' ) );
 
 		expect( global.open ).toHaveBeenCalledWith( '', 'wp-preview-123' );
+	} );
+
+	it( 'should navigate the preview window after saving', async () => {
+		const user = userEvent.setup();
+		const url = 'https://wordpress.org/?preview=true';
+		const saveForPreview = jest.fn().mockResolvedValue( url );
+
+		mockUseSelect(
+			{
+				getEditedPostPreviewLink: () => url,
+				isEditedPostSaveable: () => true,
+			},
+			{ __unstableSaveForPreview: saveForPreview }
+		);
+
+		render( <PostPreviewButton /> );
+
+		await user.click( screen.getByRole( 'link' ) );
+
+		expect( saveForPreview ).toHaveBeenCalled();
+		expect( setLocation ).toHaveBeenCalledWith( url );
 	} );
 
 	it( 'should display a `Generating preview` message while waiting for autosaving', async () => {
