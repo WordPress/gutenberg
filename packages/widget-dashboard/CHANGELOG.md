@@ -18,10 +18,15 @@
 -   Widget grid: reserve top paint space for outward tile focus rings so scroll
     containers do not clip the widget chrome outline ([#79990](https://github.com/WordPress/gutenberg/pull/79990)).
 -   Widget settings: use the `settings` icon for the per-tile settings
-    trigger instead of `moreVertical`.
+    trigger instead of `moreVertical` ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 -   Widget toolbar: when the tile header lacks room for the inline attribute
     controls, they collapse behind the settings trigger, whose dropdown holds
-    the promoted fields and a More settings entry point.
+    the promoted fields and a More settings entry point ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+
+### Documentation
+
+-   Document how attribute `relevance` maps to surfaces: the prominent
+    surface, the settings surface, and the measured collapse ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 
 ### Internal
 
@@ -35,7 +40,7 @@
 -   Restructure the tile chrome: extract `WidgetHeader` and `WidgetFrame`,
     and move widget and layout controls into toolbar chips.
 -   Add a Storybook story reproducing the tile header with multiple
-    high-relevance inline attribute controls.
+    high-relevance inline attribute controls ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 
 ## 0.2.0 (2026-07-01)
 
