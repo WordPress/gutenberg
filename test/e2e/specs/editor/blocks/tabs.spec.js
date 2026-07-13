@@ -6,10 +6,6 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 /**
  * Builds a tabs block from tab labels and their panel contents.
  *
- * The labels are stored on the tab panels, and mirrored into the tab list's
- * `tabs` attribute by `useTabListItemsSync`, so the returned object doubles as
- * an expectation for `editor.getBlocks()`.
- *
  * @param {string[]} labels Tab labels, in order.
  * @param {string[]} panels Paragraph content for each tab panel, in order.
  * @return {Object} The core/tabs block definition.
