@@ -316,7 +316,6 @@ export default ( props ) => ( element ) => {
 		window.queueMicrotask( handleSelectionChange );
 	}
 
-
 	// `input` and `compositionend` must run before block-editor's
 	// `input-rules.js` element-level listeners, which call `getValue()`
 	// reading `record.current` updated by our `onInput`. Use capture phase
@@ -350,16 +349,6 @@ export default ( props ) => ( element ) => {
 			handleSelectionChange,
 			true
 		)
-	);
-	// Pin the value before the browser mutates the DOM for `onInput`, which
-	// needs the offsets from before the input.
-	const unsubscribeBeforeInput = subscribeOwnedListener(
-		element,
-		'beforeinput',
-		() => {
-			props.current.preInputValueRef.current = props.current.getValue();
-		},
-		true
 	);
 	const unsubscribeCompositionStart = subscribeOwnedListener(
 		element,
