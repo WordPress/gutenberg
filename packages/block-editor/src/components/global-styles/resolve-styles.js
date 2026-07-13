@@ -502,8 +502,8 @@ function computeResolvedStyles( {
 	return { value, sources };
 }
 
-// Shared memo for `resolveStyles`, keyed by Global Styles object identity and
-// a `(blockName, ownVariation, selectedState)` composite.
+// Shared memo for `resolveStyles`, keyed by the raw Global Styles payload
+// identity and a `(blockName, ownVariation, selectedState)` composite.
 const memo = new WeakMap();
 
 /**
@@ -515,14 +515,18 @@ const memo = new WeakMap();
  * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map; may be a cache hit.
  */
 export function resolveStyles( args ) {
-	const globalStyles = args?.globalStyles;
-	if ( ! globalStyles || typeof globalStyles !== 'object' ) {
+	// Key the memo on the raw styles payload rather than the `{ styles }`
+	// wrapper. Each panel hook wraps the same stable payload in its own
+	// wrapper object, so keying on the shared payload lets all consumers hit
+	// one cascade merge per selection instead of recomputing an identical one.
+	const styleData = args?.globalStyles?.styles;
+	if ( ! styleData || typeof styleData !== 'object' ) {
 		return computeResolvedStyles( args );
 	}
-	let inner = memo.get( globalStyles );
+	let inner = memo.get( styleData );
 	if ( ! inner ) {
 		inner = new Map();
-		memo.set( globalStyles, inner );
+		memo.set( styleData, inner );
 	}
 	const selectedStateKey = args.selectedState
 		? `${ args.selectedState.viewport ?? '' }:${
