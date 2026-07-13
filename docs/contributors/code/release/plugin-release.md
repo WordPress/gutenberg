@@ -425,6 +425,8 @@ You must also ensure that all PRs being included are assigned to the GitHub Mile
 
 For example, if you are releasing version `12.5.4`, then all PRs picked for that release must be unassigned from the `12.6` Milestone and instead assigned to the `12.5` Milestone.
 
+If release-note generation reports that the milestone has no unreleased pull requests, verify that every cherry-picked PR is assigned to the release milestone before rerunning the workflow. Do not generate the notes from a different milestone.
+
 Once cherry picking is complete, you can also remove the `Backport to Gutenberg Minor Release` label from the PRs.
 
 Once you have the stable release branch in order and the correct Milestone assigned to your PRs you can _push the branch to GitHub_ and continue with the release process using the GitHub website GUI.
