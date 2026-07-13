@@ -42,11 +42,7 @@ module.exports = {
 						)
 							? '$font-weight-regular'
 							: '$font-weight-medium';
-						const status =
-							variable === '$font-weight-regular'
-								? 'is kept for backwards compatibility only'
-								: 'has been removed';
-						return `\`${ variable }\` ${ status }. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
+						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
 					}
 					if ( property === 'cursor' ) {
 						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
