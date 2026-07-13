@@ -116,14 +116,20 @@ function getRichTextElement( node ) {
 export default function useSelectionObserver() {
 	const { multiSelect, selectBlock, selectionChange } =
 		useDispatch( blockEditorStore );
-	const { getBlockParents, getBlockSelectionStart, isMultiSelecting } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockParents,
+		getBlockSelectionStart,
+		getSelectionStart,
+		getSelectionEnd,
+		isMultiSelecting,
+	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
 			let isTripleClick = false;
+			let processedSelection;
 
 			function onMouseDown( event ) {
 				isTripleClick = event.detail === 3;
@@ -139,6 +145,13 @@ export default function useSelectionObserver() {
 				if ( ! selection.rangeCount ) {
 					return;
 				}
+
+				processedSelection = {
+					anchorNode: selection.anchorNode,
+					anchorOffset: selection.anchorOffset,
+					focusNode: selection.focusNode,
+					focusOffset: selection.focusOffset,
+				};
 
 				const startNode = extractSelectionStartNode( selection );
 				const endNode = extractSelectionEndNode(
@@ -256,7 +269,7 @@ export default function useSelectionObserver() {
 								range,
 								__unstableIsEditableTree: true,
 							} );
-							selectionChange( {
+							const selectionUpdate = {
 								start: {
 									clientId: startClientId,
 									attributeKey:
@@ -280,7 +293,26 @@ export default function useSelectionObserver() {
 										richTextData.end ??
 										richTextData.text.length,
 								},
-							} );
+							};
+							const { start, end } = selectionUpdate;
+							const selectionStart = getSelectionStart();
+							const selectionEnd = getSelectionEnd();
+
+							// Skip the dispatch when the store already holds
+							// the same selection, e.g. when the `mouseup`
+							// after a drag re-processes the selection that
+							// the last `selectionchange` event already
+							// dispatched.
+							if (
+								selectionStart.clientId !== start.clientId ||
+								selectionEnd.clientId !== end.clientId ||
+								selectionStart.attributeKey !==
+									start.attributeKey ||
+								selectionStart.offset !== start.offset ||
+								selectionEnd.offset !== end.offset
+							) {
+								selectionChange( selectionUpdate );
+							}
 						} else {
 							selectBlock( startClientId );
 						}
@@ -349,6 +381,58 @@ export default function useSelectionObserver() {
 				}
 			}
 
+			// The native `selectionchange` event is asynchronous: an event
+			// that consumes the store selection can fire before the store
+			// has received a cross-block selection that was just made, and
+			// its handlers then act on the previous selection. Synchronize
+			// on capture, before any handler runs. Selections within a
+			// single block are synchronized the same way by rich text
+			// itself; the snapshot skips selections that have already been
+			// processed.
+			function ensureCrossBlockSelectionSync( event ) {
+				const selection = defaultView.getSelection();
+
+				if ( ! selection.rangeCount || selection.isCollapsed ) {
+					return;
+				}
+
+				if (
+					processedSelection &&
+					processedSelection.anchorNode === selection.anchorNode &&
+					processedSelection.anchorOffset ===
+						selection.anchorOffset &&
+					processedSelection.focusNode === selection.focusNode &&
+					processedSelection.focusOffset === selection.focusOffset
+				) {
+					return;
+				}
+
+				const startClientId = getBlockClientId(
+					extractSelectionStartNode( selection )
+				);
+				const endClientId = getBlockClientId(
+					extractSelectionEndNode( selection, isTripleClick )
+				);
+
+				if ( startClientId !== endClientId ) {
+					onSelectionChange( event );
+				}
+			}
+
+			const consumingEvents = [
+				'keydown',
+				'beforeinput',
+				'copy',
+				'cut',
+				'paste',
+			];
+			consumingEvents.forEach( ( eventType ) =>
+				ownerDocument.addEventListener(
+					eventType,
+					ensureCrossBlockSelectionSync,
+					true
+				)
+			);
 			ownerDocument.addEventListener(
 				'selectionchange',
 				onSelectionChange
@@ -357,6 +441,13 @@ export default function useSelectionObserver() {
 			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'keydown', onKeyDown );
 			return () => {
+				consumingEvents.forEach( ( eventType ) =>
+					ownerDocument.removeEventListener(
+						eventType,
+						ensureCrossBlockSelectionSync,
+						true
+					)
+				);
 				ownerDocument.removeEventListener(
 					'selectionchange',
 					onSelectionChange
