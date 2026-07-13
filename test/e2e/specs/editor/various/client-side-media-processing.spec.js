@@ -213,6 +213,81 @@ class MediaProcessingUtils {
 
 		return await this.getMediaDetails( requestUtils, imageId );
 	}
+
+	/**
+	 * Count the records in the durable upload queue's IndexedDB store.
+	 *
+	 * Returns 0 when the database or store does not exist yet.
+	 *
+	 * @return {Promise<number>} Number of persisted queue records.
+	 */
+	async countPersistedUploads() {
+		return await this.page.evaluate(
+			() =>
+				new Promise( ( resolve, reject ) => {
+					const request = window.indexedDB.open( 'wp-upload-media' );
+					request.onsuccess = () => {
+						const db = request.result;
+						if ( ! db.objectStoreNames.contains( 'queue' ) ) {
+							db.close();
+							resolve( 0 );
+							return;
+						}
+						const countRequest = db
+							.transaction( 'queue', 'readonly' )
+							.objectStore( 'queue' )
+							.count();
+						countRequest.onsuccess = () => {
+							db.close();
+							resolve( countRequest.result );
+						};
+						countRequest.onerror = () => {
+							db.close();
+							reject( countRequest.error );
+						};
+					};
+					request.onerror = () => reject( request.error );
+				} )
+		);
+	}
+
+	/**
+	 * Clear all records from the durable upload queue's IndexedDB store, so
+	 * persisted uploads from one test never surface a resume notice in the
+	 * next one.
+	 */
+	async clearPersistedUploads() {
+		try {
+			await this.page.evaluate(
+				() =>
+					new Promise( ( resolve ) => {
+						const request =
+							window.indexedDB.open( 'wp-upload-media' );
+						request.onsuccess = () => {
+							const db = request.result;
+							if ( ! db.objectStoreNames.contains( 'queue' ) ) {
+								db.close();
+								resolve();
+								return;
+							}
+							const tx = db.transaction( 'queue', 'readwrite' );
+							tx.objectStore( 'queue' ).clear();
+							tx.oncomplete = () => {
+								db.close();
+								resolve();
+							};
+							tx.onerror = () => {
+								db.close();
+								resolve();
+							};
+						};
+						request.onerror = () => resolve();
+					} )
+			);
+		} catch {
+			// Best-effort cleanup; the page may already be closed.
+		}
+	}
 }
 
 test.describe( 'Client-side media processing', () => {
@@ -228,7 +303,10 @@ test.describe( 'Client-side media processing', () => {
 		await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
+	test.afterEach( async ( { requestUtils, mediaProcessingUtils } ) => {
+		// Drop any queue records a failed durable-queue test left behind so
+		// they cannot surface a resume notice in a subsequent test.
+		await mediaProcessingUtils.clearPersistedUploads();
 		await requestUtils.deleteAllMedia();
 	} );
 
@@ -854,6 +932,24 @@ test.describe( 'Client-side media processing', () => {
 				timeout: 60_000,
 			} )
 			.toMatch( /^https?:\/\// );
+
+		// The durable marker is cleared from the block once the attachment
+		// lands, so a future reload has nothing left to resume.
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const [ block ] = window.wp.data
+						.select( 'core/block-editor' )
+						.getBlocks();
+					return block?.attributes?.uploadId ?? null;
+				} )
+			)
+			.toBeNull();
+
+		// The persisted queue record is deleted after the successful upload.
+		await expect
+			.poll( () => mediaProcessingUtils.countPersistedUploads() )
+			.toBe( 0 );
 	} );
 
 	test( 'discards an interrupted upload when the user declines to resume', async ( {
@@ -920,6 +1016,138 @@ test.describe( 'Client-side media processing', () => {
 		await discardButton.click();
 
 		// The notice is gone and no Resume button remains visible.
+		await expect(
+			page.getByRole( 'button', { name: /resume/i } )
+		).toBeHidden();
+
+		// Discard clears durable storage, not just the notice.
+		await expect
+			.poll( () => mediaProcessingUtils.countPersistedUploads() )
+			.toBe( 0 );
+
+		// A second reload must not re-prompt: with storage empty, the editor
+		// loads with no interrupted-upload notice.
+		await page.reload();
+		await expect(
+			editor.canvas.locator( 'role=document[name="Block: Image"i]' )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: /resume/i } )
+		).toBeHidden();
+	} );
+
+	test( 'resumes an interrupted gallery upload after a page reload', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		// Hang all POST requests to /wp/v2/media so the upload stays
+		// in-flight and its IndexedDB record persists until after the reload.
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			if (
+				route.request().method() === 'POST' &&
+				/\/wp\/v2\/media(\?|$)/.test( route.request().url() )
+			) {
+				await new Promise( () => {} );
+				return;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/gallery' } );
+
+		const galleryBlock = editor.canvas.locator(
+			'role=document[name="Block: Gallery"i]'
+		);
+		await expect( galleryBlock ).toBeVisible();
+
+		await mediaProcessingUtils.upload(
+			galleryBlock.locator( 'data-testid=form-file-upload-input' ),
+			'10x10_e2e_test_image_z9T8jK.png'
+		);
+
+		// The gallery nests a core/image block which carries the durable
+		// marker; wait for it to be serialized before saving.
+		await expect
+			.poll(
+				() =>
+					page.evaluate( () => {
+						const gallery = window.wp.data
+							.select( 'core/block-editor' )
+							.getBlocks()
+							.find( ( b ) => b.name === 'core/gallery' );
+						return (
+							gallery?.innerBlocks?.[ 0 ]?.attributes?.uploadId ??
+							null
+						);
+					} ),
+				{ timeout: 10_000 }
+			)
+			.not.toBeNull();
+
+		await editor.saveDraft();
+
+		await page.unroute( '**/wp/v2/media**' );
+
+		await page.reload();
+
+		const resumeButton = page.getByRole( 'button', { name: /resume/i } );
+		await expect( resumeButton ).toBeVisible( { timeout: 15_000 } );
+		await resumeButton.click();
+
+		// The resumed upload reconnects to the inner image block, which
+		// resolves to a real server URL once the pipeline finishes.
+		const img = editor.canvas
+			.locator( 'role=document[name="Block: Gallery"i]' )
+			.locator( 'role=document[name="Block: Image"i]' )
+			.getByRole( 'img' );
+		await expect
+			.poll( async () => ( await img.getAttribute( 'src' ) ) ?? '', {
+				timeout: 60_000,
+			} )
+			.toMatch( /^https?:\/\// );
+
+		await expect
+			.poll( () => mediaProcessingUtils.countPersistedUploads() )
+			.toBe( 0 );
+	} );
+
+	test( 'does not prompt to resume after an upload completes normally', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'10x10_e2e_test_image_z9T8jK.png'
+		);
+
+		await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
+			'src',
+			/^https?:\/\//,
+			{ timeout: 30_000 }
+		);
+		await mediaProcessingUtils.waitForUploadQueueEmpty();
+
+		// A completed upload leaves no persisted record behind.
+		await expect
+			.poll( () => mediaProcessingUtils.countPersistedUploads() )
+			.toBe( 0 );
+
+		await editor.saveDraft();
+		await page.reload();
+
+		// The editor loads without an interrupted-upload notice.
+		await expect(
+			editor.canvas.locator( 'role=document[name="Block: Image"i]' )
+		).toBeVisible();
 		await expect(
 			page.getByRole( 'button', { name: /resume/i } )
 		).toBeHidden();
