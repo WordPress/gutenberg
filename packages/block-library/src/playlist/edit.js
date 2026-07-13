@@ -18,12 +18,8 @@ import {
 	InspectorControls,
 	InnerBlocks,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
-	__experimentalUseColorProps as useColorProps,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	getColorObjectByAttributeValues,
-	getGradientSlugByValue,
-	getGradientValueBySlug,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -44,9 +40,8 @@ import { createBlock } from '@wordpress/blocks';
 import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { WaveformPlayer } from '../utils/waveform-player';
-import { unlock } from '../lock-unlock';
 import { PlaylistContext } from './context';
-import { getColorSupportAttributes, getTrackAttributes } from './utils';
+import { getTrackAttributes } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const DEFAULT_WAVEFORM_STYLE = 'bars';
@@ -58,22 +53,6 @@ const WAVEFORM_STYLE_OPTIONS = [
 	{ label: _x( 'Dots', 'waveform style option' ), value: 'dots' },
 	{ label: _x( 'Seekbar', 'waveform style option' ), value: 'seekbar' },
 ];
-
-const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
-
-function getStyleWithValues( style, colorValues, backgroundValues = {} ) {
-	return cleanEmptyObject( {
-		...style,
-		color: cleanEmptyObject( {
-			...style?.color,
-			...colorValues,
-		} ),
-		background: cleanEmptyObject( {
-			...style?.background,
-			...backgroundValues,
-		} ),
-	} );
-}
 
 const PlaylistEdit = ( {
 	attributes,
@@ -92,8 +71,6 @@ const PlaylistEdit = ( {
 		showTrackLength,
 		waveformStyle = DEFAULT_WAVEFORM_STYLE,
 		textColor,
-		backgroundColor,
-		backgroundGradient,
 		style,
 		waveformColor,
 		waveformGradient,
@@ -101,8 +78,7 @@ const PlaylistEdit = ( {
 		waveformBackgroundGradient,
 	} = attributes;
 
-	const colorProps = useColorProps( getColorSupportAttributes( attributes ) );
-	const blockProps = useBlockProps( colorProps );
+	const blockProps = useBlockProps();
 	const waveformPanelId = `${ clientId }-waveform`;
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -131,20 +107,10 @@ const PlaylistEdit = ( {
 		textColor,
 		style?.color?.text
 	).color;
-	const backgroundColorValue = getColorObjectByAttributeValues(
-		colors,
-		backgroundColor,
-		style?.color?.background
-	).color;
-	const backgroundGradientValue =
-		getGradientValueBySlug( gradients, backgroundGradient ) ||
-		style?.background?.gradient ||
-		style?.color?.gradient;
 	const waveformGradientValue = waveformGradient;
 	const waveformBackgroundGradientValue = waveformBackgroundGradient;
 	let waveformColorGradientChange;
 	let waveformBackgroundColorGradientChange;
-	let backgroundColorGradientChange;
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
@@ -347,72 +313,6 @@ const PlaylistEdit = ( {
 		} );
 	}
 
-	function updateTextColor( colorValue, colorSlug ) {
-		setAttributes( ( currentAttributes ) => ( {
-			textColor: colorSlug,
-			style: getStyleWithValues( currentAttributes.style, {
-				text: colorSlug ? undefined : colorValue,
-			} ),
-		} ) );
-	}
-
-	function updateBackgroundColor( colorValue, colorSlug ) {
-		const isSettingColor = colorValue !== undefined || colorSlug;
-		if (
-			! isSettingColor &&
-			backgroundColorGradientChange === 'gradient'
-		) {
-			backgroundColorGradientChange = undefined;
-			return;
-		}
-
-		backgroundColorGradientChange = 'color';
-
-		setAttributes( ( currentAttributes ) => ( {
-			backgroundColor: colorSlug,
-			backgroundGradient: undefined,
-			style: getStyleWithValues(
-				currentAttributes.style,
-				{
-					background: colorSlug ? undefined : colorValue,
-					gradient: undefined,
-				},
-				{
-					gradient: undefined,
-				}
-			),
-		} ) );
-	}
-
-	function updateBackgroundGradient( gradientValue ) {
-		const isSettingGradient = gradientValue !== undefined;
-		if (
-			! isSettingGradient &&
-			backgroundColorGradientChange === 'color'
-		) {
-			backgroundColorGradientChange = undefined;
-			return;
-		}
-
-		backgroundColorGradientChange = 'gradient';
-		const gradientSlug = getGradientSlugByValue( gradients, gradientValue );
-
-		setAttributes( ( currentAttributes ) => ( {
-			backgroundGradient: gradientSlug,
-			backgroundColor: undefined,
-			style: getStyleWithValues(
-				currentAttributes.style,
-				{
-					background: undefined,
-					gradient: undefined,
-				},
-				{
-					gradient: gradientSlug ? undefined : gradientValue,
-				}
-			),
-		} ) );
-	}
-
 	const hasSelectedChild = useSelect(
 		( select ) =>
 			select( blockEditorStore ).hasSelectedInnerBlock( clientId ),
@@ -461,54 +361,6 @@ const PlaylistEdit = ( {
 				} ),
 			}
 		);
-	}
-
-	if ( hasColors ) {
-		colorSettings.push( {
-			colorValue: textColorValue,
-			colorSlug: textColor,
-			label: __( 'Text' ),
-			onColorChange: updateTextColor,
-			isShownByDefault: true,
-			clearable: true,
-			enableAlpha: true,
-			resetAllFilter: ( newAttributes ) => ( {
-				textColor: undefined,
-				style: getStyleWithValues( newAttributes.style, {
-					text: undefined,
-				} ),
-			} ),
-		} );
-	}
-
-	if ( hasColors || hasGradients ) {
-		colorSettings.push( {
-			colorValue: hasColors ? backgroundColorValue : undefined,
-			colorSlug: hasColors ? backgroundColor : undefined,
-			gradientValue: hasGradients ? backgroundGradientValue : undefined,
-			label: __( 'Background' ),
-			onColorChange: hasColors ? updateBackgroundColor : undefined,
-			onGradientChange: hasGradients
-				? updateBackgroundGradient
-				: undefined,
-			isShownByDefault: true,
-			clearable: true,
-			enableAlpha: true,
-			resetAllFilter: ( newAttributes ) => ( {
-				backgroundColor: undefined,
-				backgroundGradient: undefined,
-				style: getStyleWithValues(
-					newAttributes.style,
-					{
-						background: undefined,
-						gradient: undefined,
-					},
-					{
-						gradient: undefined,
-					}
-				),
-			} ),
-		} );
 	}
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
