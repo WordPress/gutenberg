@@ -23,7 +23,7 @@ const meta: Meta< typeof ExternalLink > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use `Link` from `@wordpress/ui` instead, with the `openInNewTab` prop set.',
+			notes: 'Use [`Link`](?path=/docs/design-system-components-link--docs) from `@wordpress/ui` instead, with the `openInNewTab` prop set.',
 		},
 	},
 };

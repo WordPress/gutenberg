@@ -12,6 +12,7 @@ import { useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import PlaylistTrackEdit from '../edit';
+import { PlaylistContext } from '../../playlist/context';
 
 jest.mock( '@wordpress/block-editor', () => ( {
 	BlockControls: ( { children } ) => <div>{ children }</div>,
@@ -22,13 +23,12 @@ jest.mock( '@wordpress/block-editor', () => ( {
 	MediaUpload: ( { render: renderMediaUpload } ) =>
 		renderMediaUpload( { open: jest.fn() } ),
 	MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
-	RichText: ( {
-		allowedFormats,
+	PlainText: ( {
 		onChange,
 		placeholder,
 		tagName: TagName = 'div',
 		value,
-		withoutInteractiveFormatting,
+		__experimentalVersion,
 		...props
 	} ) => <TagName { ...props }>{ value || placeholder }</TagName>,
 	useBlockProps: jest.fn( () => ( {} ) ),
@@ -63,32 +63,40 @@ const defaultAttributes = {
 	album: 'Great Album',
 	artist: 'The Artist',
 	image: 'https://example.com/cover.jpg',
-	imageAlt: 'A bright abstract album cover',
+	imageAlt: 'A bright abstract track image',
 	length: '3:45',
 	title: 'Song One',
 };
 
 function renderEdit( props = {} ) {
 	const setAttributes = jest.fn();
+	const setCurrentTrackClientId = props.setCurrentTrackClientId || jest.fn();
 
 	render(
-		<PlaylistTrackEdit
-			attributes={ {
-				...defaultAttributes,
-				...props.attributes,
+		<PlaylistContext.Provider
+			value={ {
+				currentTrackClientId: props.currentTrackClientId ?? null,
+				setCurrentTrackClientId,
 			} }
-			setAttributes={ setAttributes }
-			context={ {
-				showArtists: true,
-				showImages: true,
-				...props.context,
-			} }
-			clientId="playlist-track-client-id"
-			isSelected={ false }
-		/>
+		>
+			<PlaylistTrackEdit
+				attributes={ {
+					...defaultAttributes,
+					...props.attributes,
+				} }
+				setAttributes={ setAttributes }
+				context={ {
+					showArtists: true,
+					showImages: true,
+					...props.context,
+				} }
+				clientId={ props.clientId || 'playlist-track-client-id' }
+				isSelected={ props.isSelected ?? false }
+			/>
+		</PlaylistContext.Provider>
 	);
 
-	return { setAttributes };
+	return { setAttributes, setCurrentTrackClientId };
 }
 
 describe( 'PlaylistTrackEdit', () => {
@@ -98,7 +106,7 @@ describe( 'PlaylistTrackEdit', () => {
 		} );
 	} );
 
-	it( 'allows the album cover alternative text to be edited', () => {
+	it( 'allows the track image alternative text to be edited', () => {
 		const { setAttributes } = renderEdit();
 
 		expect(
@@ -122,7 +130,7 @@ describe( 'PlaylistTrackEdit', () => {
 		} );
 	} );
 
-	it( 'does not show the alternative text control without an album cover image', () => {
+	it( 'does not show the alternative text control without a track image', () => {
 		renderEdit( {
 			attributes: {
 				image: undefined,
@@ -133,5 +141,29 @@ describe( 'PlaylistTrackEdit', () => {
 		expect(
 			screen.queryByLabelText( 'Alternative text' )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'sets the selected track as the current track', () => {
+		const { setCurrentTrackClientId } = renderEdit( {
+			currentTrackClientId: 'another-track-client-id',
+			isSelected: true,
+		} );
+
+		expect( setCurrentTrackClientId ).toHaveBeenCalledWith(
+			'playlist-track-client-id'
+		);
+	} );
+
+	it( 'does not set a selected placeholder track as the current track', () => {
+		const { setCurrentTrackClientId } = renderEdit( {
+			attributes: {
+				blob: undefined,
+				src: undefined,
+			},
+			currentTrackClientId: 'another-track-client-id',
+			isSelected: true,
+		} );
+
+		expect( setCurrentTrackClientId ).not.toHaveBeenCalled();
 	} );
 } );

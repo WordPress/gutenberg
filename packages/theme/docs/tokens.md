@@ -6,7 +6,9 @@ Design tokens are named values. They encode design decisions which describe the 
 
 ## How to pick a token
 
-Each segment of a token name answers one question about the value being applied:
+Start from what you are styling and the CSS property you are setting. For example, when setting the text or icon color for an interactive control with neutral intent, choose `--wpds-color-foreground-interactive-neutral`: `foreground` for the CSS property, `interactive` for the target, and `neutral` for the tone. The raw value is an implementation detail; a token name should describe the role that value plays in the interface.
+
+Each segment of a public token name answers one question about the value being applied:
 
 -   **Type** identifies the kind of value, like `color` or `dimension`. It is usually determined by the CSS property being set.
 -   **Property** describes which aspect of the element the token applies to, such as `background`, `foreground`, `stroke`, `padding`, or `gap`.
@@ -16,22 +18,40 @@ Each segment of a token name answers one question about the value being applied:
 
 ## Naming pattern
 
-Semantic tokens follow a consistent naming pattern:
+Semantic tokens use the `--wpds-` prefix followed by the token type and one or more role segments:
 
 ```text
---wpds-<type>-<property>-<target>[-<modifier>]
+--wpds-<type>-<role>[-<modifier>...]
 ```
+
+The most complete grammar is used by color tokens:
+
+```text
+--wpds-color-<property>-<target>-<tone>[-<emphasis>][-<state>]
+```
+
+Other token families use shorter forms when a segment would be redundant:
+
+| Token family            | Pattern                                                          | Example                                                   |
+| ----------------------- | ---------------------------------------------------------------- | --------------------------------------------------------- |
+| Color                   | `--wpds-color-<property>-<target>-<tone>[-<emphasis>][-<state>]` | `--wpds-color-background-interactive-brand-strong-active` |
+| Dimension               | `--wpds-dimension-<property>-<size>`                             | `--wpds-dimension-padding-lg`                             |
+| Dimension surface width | `--wpds-dimension-surface-width-<size>`                          | `--wpds-dimension-surface-width-md`                       |
+| Border                  | `--wpds-border-<property>-<size-or-target>`                      | `--wpds-border-radius-sm`                                 |
+| Typography              | `--wpds-typography-<property>-<role-or-size>`                    | `--wpds-typography-font-size-md`                          |
+| Motion                  | `--wpds-motion-<property>-<scale-or-intent>`                     | `--wpds-motion-easing-balanced`                           |
+| Cursor                  | `--wpds-cursor-<target>`                                         | `--wpds-cursor-control`                                   |
 
 ### Type
 
-Indicates what kind of value the token represents, usually mapping to a [DTCG](https://design-tokens.github.io/community-group/format/) token type.
+Indicates what kind of value the token represents, usually mapping to a [Design Tokens Format Module](https://www.designtokens.org/tr/2025.10/format/) token type.
 
 | Value        | Description                                                                    |
 | ------------ | ------------------------------------------------------------------------------ |
 | `color`      | Color values for backgrounds, foregrounds, and strokes                         |
 | `dimension`  | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
 | `border`     | Border properties like radius and width                                        |
-| `elevation`  | Shadow definitions for layering and depth                                      |
+| `cursor`     | Cursor values for interactive affordances                                      |
 | `motion`     | Animation durations and easing curves                                          |
 | `typography` | Typography properties like font family, font size, and line-height             |
 
@@ -39,21 +59,23 @@ Indicates what kind of value the token represents, usually mapping to a [DTCG](h
 
 The specific design property being defined.
 
-| Value         | Description                        |
-| ------------- | ---------------------------------- |
-| `background`  | Background color                   |
-| `foreground`  | Foreground color (text and icons)  |
-| `stroke`      | Border and outline color           |
-| `padding`     | Internal spacing within an element |
-| `gap`         | Spacing between elements           |
-| `radius`      | Border radius for rounded corners  |
-| `width`       | Border width                       |
-| `duration`    | Animation duration                 |
-| `easing`      | Animation easing curve             |
-| `font-size`   | Font size                          |
-| `font-family` | Font family                        |
-| `font-weight` | Font weight                        |
-| `line-height` | Line height                        |
+| Value           | Description                         |
+| --------------- | ----------------------------------- |
+| `background`    | Background color                    |
+| `foreground`    | Foreground color (text and icons)   |
+| `stroke`        | Border and outline color            |
+| `padding`       | Internal spacing within an element  |
+| `gap`           | Spacing between elements            |
+| `radius`        | Border radius for rounded corners   |
+| `width`         | Width for the relevant token family |
+| `size`          | Control, icon, and marker sizing    |
+| `surface-width` | Maximum width for layout surfaces   |
+| `duration`      | Animation duration                  |
+| `easing`        | Animation easing curve              |
+| `font-size`     | Font size                           |
+| `font-family`   | Font family                         |
+| `font-weight`   | Font weight                         |
+| `line-height`   | Line height                         |
 
 ### Target
 
@@ -66,14 +88,27 @@ The component or element type the token applies to.
 | `content`     | Static content like body text and icons. Use for foreground colors where there is no interactive behavior.                                    |
 | `track`       | The non-moving rail of a track-and-thumb control (scrollbar track, slider track, progressbar track).                                          |
 | `thumb`       | The moving indicator of a track-and-thumb control (scrollbar thumb, slider handle, filled progress).                                          |
+| `control`     | Interactive controls that are not links.                                                                                                      |
 
 ### Modifier
 
-An optional size or intensity modifier.
+An optional size, intensity, state, or role modifier.
 
-| Value                                      | Description          |
-| ------------------------------------------ | -------------------- |
-| `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl` | Size scale modifiers |
+| Value                                                                  | Description                    |
+| ---------------------------------------------------------------------- | ------------------------------ |
+| `5xs`, `4xs`, `3xs`, `2xs`, `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl` | Size scale modifiers           |
+| `weak`, `strong`                                                       | Color emphasis modifiers       |
+| `active`, `disabled`                                                   | Interactive state modifiers    |
+| `heading`, `body`, `mono`, `regular`, `medium`                         | Typography role modifiers      |
+| `subtle`, `balanced`, `expressive`                                     | Motion easing intent modifiers |
+
+### Shortened and compound forms
+
+Some public tokens intentionally use shortened or compound forms:
+
+-   `--wpds-dimension-surface-width-*` keeps `surface-width` together as a compound role for layout surface widths.
+-   `--wpds-border-width-focus` uses `focus` as the target because it describes the focus indicator width, not a size on the border scale.
+-   `--wpds-color-stroke-focus` is the standalone color-token exception described below.
 
 ## Color token modifiers
 
@@ -84,6 +119,12 @@ Most color tokens extend the base pattern with additional modifiers for tone, em
 ```
 
 `--wpds-color-stroke-focus` is the only color token that does not follow this target/tone grammar. Its `focus` segment describes the focus-ring purpose directly, and the token intentionally applies across tones.
+
+### Keep color roles aligned
+
+When styling one UI element across states, keep the token role aligned and change only the state segment. For example, pair `--wpds-color-foreground-interactive-neutral` with `--wpds-color-foreground-interactive-neutral-active` and `--wpds-color-foreground-interactive-neutral-disabled` rather than switching tones between states.
+
+When styling related parts of the same UI element, prefer matching the target and tone across properties. For example, an interactive neutral control should generally use the corresponding `background`, `foreground`, and `stroke` interactive neutral tokens. Mixing tones or targets should be intentional, usually to satisfy contrast, hierarchy, or a documented component-specific pattern.
 
 ### Tone
 
@@ -118,6 +159,14 @@ The interactive state of the element. The default (no modifier) is the idle stat
 | ---------- | ----------------------------------- |
 | `active`   | Hovered, pressed, or selected state |
 | `disabled` | Unavailable or inoperable state     |
+
+## Intentional omissions
+
+The semantic token set is role-based, not a complete matrix of every property, target, tone, emphasis, and state combination. A missing combination should stay omitted when it does not map to a supported design-system role.
+
+-   Do not create a token only to fill a missing slot in the naming pattern.
+-   Add a missing state token when the same target, tone, and emphasis already define the role in other states, and a component needs that state.
+-   Treat emphasis and tone variants as separate roles. For example, do not add strong interactive stroke variants unless a component specifically needs a distinct strong stroke role.
 
 <!-- START GENERATED TOKEN TABLES: Do not edit this section directly. -->
 
@@ -183,7 +232,8 @@ The interactive state of the element. The default (no modifier) is the idle stat
 | `--wpds-color-background-thumb-neutral-weak-active`           | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active.               |
 | `--wpds-color-background-thumb-brand`                         | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track).                                      |
 | `--wpds-color-background-thumb-brand-active`                  | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active. |
-| `--wpds-color-background-thumb-neutral-disabled`              | Background color for thumbs with normal emphasis (eg. slider thumb and filled track), in their disabled state, regardless of the tone.      |
+| `--wpds-color-background-thumb-brand-disabled`                | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state.             |
+| `--wpds-color-background-thumb-neutral-weak-disabled`         | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb), in their disabled state.                           |
 | `--wpds-color-foreground-content-neutral`                     | Foreground color for content like text with normal emphasis.                                                                                |
 | `--wpds-color-foreground-content-neutral-weak`                | Foreground color for content like text with weak emphasis.                                                                                  |
 | `--wpds-color-foreground-content-success`                     | Foreground color for content like text with success tone and normal emphasis.                                                               |
@@ -203,6 +253,7 @@ The interactive state of the element. The default (no modifier) is the idle stat
 | `--wpds-color-foreground-interactive-neutral-strong-active`   | Foreground color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active.                       |
 | `--wpds-color-foreground-interactive-neutral-strong-disabled` | Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state.                                   |
 | `--wpds-color-foreground-interactive-neutral-weak`            | Foreground color for interactive elements with neutral tone and weak emphasis.                                                              |
+| `--wpds-color-foreground-interactive-neutral-weak-active`     | Foreground color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active.                         |
 | `--wpds-color-foreground-interactive-neutral-weak-disabled`   | Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state.                                     |
 | `--wpds-color-foreground-interactive-brand`                   | Foreground color for interactive elements with brand tone and normal emphasis.                                                              |
 | `--wpds-color-foreground-interactive-brand-active`            | Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active.                         |
@@ -282,15 +333,6 @@ The interactive state of the element. The default (no modifier) is the idle stat
 | `--wpds-dimension-surface-width-lg`  | Large surface width                                                      |
 | `--wpds-dimension-surface-width-xl`  | Extra large surface width                                                |
 | `--wpds-dimension-surface-width-2xl` | 2x extra large surface width                                             |
-
-### Elevation
-
-| Variable name         | Description                                                                                                                       |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `--wpds-elevation-xs` | For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame.     |
-| `--wpds-elevation-sm` | For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar. |
-| `--wpds-elevation-md` | For components that offer additional actions. Example: Menus, Command Palette                                                     |
-| `--wpds-elevation-lg` | For components that confirm decisions or handle necessary interruptions. Example: Modals.                                         |
 
 ### Motion
 
