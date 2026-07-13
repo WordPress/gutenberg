@@ -61,7 +61,7 @@ the hook in its loading state: `widgetTypes` is empty and
     object, with an optional `relevance` hint (`'high' | 'low'`) marking
     attributes a host may promote to a prominent surface.
 -   Field types: `registerFieldType( definition )` names a reusable
-    field type (`{ name: 'core/rating', baseType: 'integer', Edit, ... }`,
+    field type (`{ name: 'core/location', baseType: 'text', Edit, ... }`,
     typed by `FieldTypeDefinition`) that attributes can reference via
     `type`. `useWidgetTypes` resolves such references into the plain
     per-field `Field` props DataViews understands, inheriting everything
