@@ -34,3 +34,45 @@ export async function ownsSelection( this: Editor, locator: Locator ) {
 		);
 	} );
 }
+
+/**
+ * Returns the label of the element owning the focus: the active element, or,
+ * when a focused editing host owns the selection, the editable element
+ * containing it. Falls back to the element's text when it has no label.
+ *
+ * @param this
+ */
+export async function getFocusOwnerLabel( this: Editor ) {
+	return this.page.evaluate( () => {
+		const doc =
+			( document.activeElement as HTMLIFrameElement | null )
+				?.contentDocument ?? document;
+		let activeElement = doc.activeElement as HTMLElement;
+		const selection = doc.defaultView?.getSelection();
+		const anchorNode = selection?.anchorNode;
+		const focusNode = selection?.focusNode;
+		if (
+			activeElement.isContentEditable &&
+			anchorNode &&
+			activeElement.contains( anchorNode )
+		) {
+			const editable = (
+				anchorNode.nodeType === anchorNode.ELEMENT_NODE
+					? ( anchorNode as HTMLElement )
+					: anchorNode.parentElement
+			)?.closest< HTMLElement >( '[contenteditable="true"]' );
+			if (
+				editable &&
+				editable !== activeElement &&
+				focusNode &&
+				editable.contains( focusNode )
+			) {
+				activeElement = editable;
+			}
+		}
+		return (
+			activeElement.getAttribute( 'aria-label' ) ||
+			activeElement.innerText
+		);
+	} );
+}

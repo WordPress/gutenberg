@@ -4,8 +4,10 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	ToolbarRovingTabindexUtils: async ( { page, pageUtils }, use ) => {
-		await use( new ToolbarRovingTabindexUtils( { page, pageUtils } ) );
+	ToolbarRovingTabindexUtils: async ( { editor, page, pageUtils }, use ) => {
+		await use(
+			new ToolbarRovingTabindexUtils( { editor, page, pageUtils } )
+		);
 	},
 } );
 
@@ -138,7 +140,8 @@ test.describe( 'Toolbar roving tabindex', () => {
 } );
 
 class ToolbarRovingTabindexUtils {
-	constructor( { page, pageUtils } ) {
+	constructor( { editor, page, pageUtils } ) {
+		this.editor = editor;
 		this.page = page;
 		this.pageUtils = pageUtils;
 	}
@@ -162,35 +165,11 @@ class ToolbarRovingTabindexUtils {
 	}
 
 	async expectLabelToHaveFocus( label ) {
-		// Resolves the element owning the focus: the active element, or,
-		// when a focused editing host owns the selection, the editable
-		// element containing the selection.
-		const getFocusOwnerLabel = () => {
-			const doc = document.activeElement.contentDocument ?? document;
-			let { activeElement } = doc;
-			const selection = doc.defaultView.getSelection();
-			const { anchorNode } = selection;
-			if (
-				activeElement.isContentEditable &&
-				anchorNode &&
-				activeElement.contains( anchorNode )
-			) {
-				const editable = (
-					anchorNode.nodeType === anchorNode.ELEMENT_NODE
-						? anchorNode
-						: anchorNode.parentElement
-				).closest( '[contenteditable="true"]' );
-				if ( editable && editable !== activeElement ) {
-					activeElement = editable;
-				}
-			}
-			return activeElement.getAttribute( 'aria-label' );
-		};
-		let ariaLabel = await this.page.evaluate( getFocusOwnerLabel );
+		let ariaLabel = await this.editor.getFocusOwnerLabel();
 		// If the labels don't match, try pressing Up Arrow to focus the block wrapper in non-content editable block.
 		if ( ariaLabel !== label ) {
 			await this.page.keyboard.press( 'ArrowUp' );
-			ariaLabel = await this.page.evaluate( getFocusOwnerLabel );
+			ariaLabel = await this.editor.getFocusOwnerLabel();
 		}
 		expect( ariaLabel ).toBe( label );
 	}
