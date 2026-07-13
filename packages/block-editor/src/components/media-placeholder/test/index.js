@@ -145,4 +145,93 @@ describe( 'MediaPlaceholder', () => {
 		expect( onSelect ).toHaveBeenCalledTimes( 1 );
 		expect( onSelect ).toHaveBeenCalledWith( [ firstTrack, secondTrack ] );
 	} );
+
+	it( 'preserves file order when multiple upload callbacks finish out of order', () => {
+		const onSelect = jest.fn();
+		const fileList = [
+			new File( [ 'audio' ], 'first.mp3', { type: 'audio/mpeg' } ),
+			new File( [ 'audio' ], 'second.mp3', { type: 'audio/mpeg' } ),
+		];
+		const firstTrack = {
+			id: 1,
+			filename: 'first.mp3',
+			url: 'https://example.com/first.mp3',
+		};
+		const secondTrack = {
+			id: 2,
+			filename: 'second.mp3',
+			url: 'https://example.com/second.mp3',
+		};
+
+		render(
+			<MediaPlaceholder
+				allowedTypes={ [ 'audio' ] }
+				multiple
+				onSelect={ onSelect }
+			/>
+		);
+
+		act( () => {
+			mockDropZoneProps.onFilesDrop( fileList );
+		} );
+
+		const { onBatchSuccess, onFileChange } =
+			mediaUpload.mock.calls[ 0 ][ 0 ];
+
+		act( () => {
+			onFileChange( [ { url: 'blob:https://example.com/first' } ] );
+			onFileChange( [ { url: 'blob:https://example.com/second' } ] );
+			onFileChange( [ secondTrack ] );
+			onFileChange( [ firstTrack ] );
+			onBatchSuccess();
+		} );
+
+		expect( onSelect ).toHaveBeenCalledTimes( 1 );
+		expect( onSelect ).toHaveBeenCalledWith( [ firstTrack, secondTrack ] );
+	} );
+
+	it( 'selects successful media when a multiple upload partially fails without a batch success callback', () => {
+		const onError = jest.fn();
+		const onSelect = jest.fn();
+		const fileList = [
+			new File( [ 'audio' ], 'first.mp3', { type: 'audio/mpeg' } ),
+			new File( [ 'audio' ], 'second.mp3', { type: 'audio/mpeg' } ),
+		];
+		const firstTrack = {
+			id: 1,
+			filename: 'first.mp3',
+			url: 'https://example.com/first.mp3',
+		};
+		const secondBlob = {
+			url: 'blob:https://example.com/second',
+		};
+
+		render(
+			<MediaPlaceholder
+				allowedTypes={ [ 'audio' ] }
+				multiple
+				onError={ onError }
+				onSelect={ onSelect }
+			/>
+		);
+
+		act( () => {
+			mockDropZoneProps.onFilesDrop( fileList );
+		} );
+
+		const { onError: onUploadError, onFileChange } =
+			mediaUpload.mock.calls[ 0 ][ 0 ];
+
+		act( () => {
+			onFileChange( [ firstTrack, secondBlob ] );
+			onFileChange( [ firstTrack ] );
+			onUploadError( 'The second file could not be uploaded.' );
+		} );
+
+		expect( onError ).toHaveBeenCalledWith(
+			'The second file could not be uploaded.'
+		);
+		expect( onSelect ).toHaveBeenCalledTimes( 1 );
+		expect( onSelect ).toHaveBeenCalledWith( [ firstTrack ] );
+	} );
 } );

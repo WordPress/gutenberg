@@ -15,7 +15,7 @@ import {
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	withFilters,
 } from '@wordpress/components';
-import { isBlobURL } from '@wordpress/blob';
+import { getBlobByURL, isBlobURL } from '@wordpress/blob';
 import { __, _x } from '@wordpress/i18n';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -36,6 +36,29 @@ const noop = () => {};
 
 function getMediaUrl( media ) {
 	return media?.url ?? media?.source_url;
+}
+
+function getFileNameFromUrl( url ) {
+	const fileName = url?.split( /[?#]/ )[ 0 ].split( '/' ).pop();
+
+	if ( ! fileName ) {
+		return fileName;
+	}
+
+	try {
+		return decodeURIComponent( fileName );
+	} catch {
+		return fileName;
+	}
+}
+
+function getMediaFileName( media ) {
+	const url = getMediaUrl( media );
+	return (
+		media?.filename ??
+		( isBlobURL( url ) ? getBlobByURL( url )?.name : undefined ) ??
+		getFileNameFromUrl( url )
+	);
 }
 
 function areMediaItemsSame( mediaA, mediaB ) {
@@ -215,6 +238,7 @@ export function MediaPlaceholder( {
 		onFilesPreUpload( files );
 		let setMedia;
 		let onBatchSuccess;
+		let onUploadError = onError;
 		if ( multiple ) {
 			if ( addToGallery ) {
 				// Since the setMedia function runs multiple times per upload group
@@ -252,50 +276,95 @@ export function MediaPlaceholder( {
 					} );
 				};
 			} else {
+				const filesList = Array.from( files );
 				const filesCount = files.length;
-				let selectedMedia = [];
+				let selectedMedia = new Array( filesCount );
 				let hasSelectedBatch = false;
+				let failedFilesCount = 0;
 
 				const selectBatchIfReady = () => {
+					const finalMedia = selectedMedia.filter(
+						isFinalMediaItem
+					);
 					if (
 						! hasSelectedBatch &&
-						selectedMedia.length >= filesCount &&
-						selectedMedia
-							.slice( 0, filesCount )
-							.every( isFinalMediaItem )
+						finalMedia.length > 0 &&
+						finalMedia.length + failedFilesCount >= filesCount
 					) {
-						onSelect( selectedMedia.slice( 0, filesCount ) );
+						onSelect( finalMedia );
 						hasSelectedBatch = true;
+					}
+				};
+
+				const findMediaIndex = ( media ) => {
+					const existingMediaIndex = selectedMedia.findIndex(
+						( selectedItem ) =>
+							areMediaItemsSame( selectedItem, media )
+					);
+					if ( existingMediaIndex !== -1 ) {
+						return existingMediaIndex;
+					}
+
+					const mediaFileName = getMediaFileName( media );
+					const matchingFileIndex = filesList.findIndex(
+						( file, index ) =>
+							file.name === mediaFileName &&
+							! isFinalMediaItem( selectedMedia[ index ] )
+					);
+					if ( matchingFileIndex !== -1 ) {
+						return matchingFileIndex;
+					}
+
+					return -1;
+				};
+
+				const setMediaItem = ( media ) => {
+					let mediaIndex = findMediaIndex( media );
+
+					if ( mediaIndex === -1 ) {
+						if ( isFinalMediaItem( media ) ) {
+							mediaIndex = selectedMedia.findIndex(
+								( selectedItem ) =>
+									! isFinalMediaItem( selectedItem )
+							);
+						} else {
+							mediaIndex = selectedMedia.findIndex(
+								( selectedItem ) => selectedItem === undefined
+							);
+						}
+					}
+
+					if ( mediaIndex !== -1 ) {
+						selectedMedia[ mediaIndex ] = media;
 					}
 				};
 
 				setMedia = ( newMedia ) => {
-					if (
-						newMedia.length === filesCount &&
-						newMedia.every( isFinalMediaItem )
-					) {
+					if ( newMedia.length === filesCount ) {
 						selectedMedia = newMedia;
-						onSelect( selectedMedia );
-						hasSelectedBatch = true;
+						selectBatchIfReady();
 						return;
 					}
 
-					selectedMedia = selectedMedia
-						.filter(
-							( media ) =>
-								! newMedia.some( ( newItem ) =>
-									areMediaItemsSame( media, newItem )
-								)
-						)
-						.concat( newMedia );
+					newMedia.forEach( setMediaItem );
 					selectBatchIfReady();
 				};
 				onBatchSuccess = () => {
-					const finalMedia = selectedMedia.filter( isFinalMediaItem );
-					if ( ! hasSelectedBatch && finalMedia.length > 0 ) {
-						onSelect( finalMedia );
-						hasSelectedBatch = true;
-					}
+					failedFilesCount = Math.max(
+						failedFilesCount,
+						filesCount -
+							selectedMedia.filter( isFinalMediaItem ).length
+					);
+					selectBatchIfReady();
+				};
+				onUploadError = ( ( originalOnError ) => ( ...args ) => {
+					failedFilesCount = Math.min(
+						failedFilesCount + 1,
+						filesCount
+					);
+					selectBatchIfReady();
+					originalOnError?.( ...args );
+				} )( onError );
 				};
 			}
 		} else {
@@ -306,7 +375,7 @@ export function MediaPlaceholder( {
 			filesList: files,
 			onFileChange: setMedia,
 			onBatchSuccess,
-			onError,
+			onError: onUploadError,
 			multiple,
 		} );
 	};
