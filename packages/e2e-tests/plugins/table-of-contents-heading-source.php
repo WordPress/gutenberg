@@ -8,7 +8,7 @@
  */
 
 /**
- * Enqueues the test block used by Table of Contents e2e coverage.
+ * Enqueues the test block used by Table of Contents e2e coverage in the block editor.
  */
 function gutenberg_test_table_of_contents_heading_source_enqueue() {
 	wp_enqueue_script(
@@ -24,4 +24,4 @@ function gutenberg_test_table_of_contents_heading_source_enqueue() {
 	);
 }
 
-add_action( 'init', 'gutenberg_test_table_of_contents_heading_source_enqueue' );
+add_action( 'enqueue_block_editor_assets', 'gutenberg_test_table_of_contents_heading_source_enqueue' );
