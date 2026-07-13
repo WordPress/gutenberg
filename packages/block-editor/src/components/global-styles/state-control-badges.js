@@ -3,7 +3,7 @@
  */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { Stack, Tooltip } from '@wordpress/ui';
+import { Stack, Tooltip, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -67,6 +67,11 @@ export default function StateControlBadges( {
 						intent="info"
 					>
 						{ state.label }
+						{ !! state.tooltipText && (
+							<VisuallyHidden render={ <span /> }>
+								{ state.tooltipText }
+							</VisuallyHidden>
+						) }
 					</WCBadge>
 				);
 

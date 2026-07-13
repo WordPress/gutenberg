@@ -33,7 +33,13 @@ describe( 'StateControlBadges', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Tablet' ) ).toBeVisible();
+		const badge = screen.getByText( 'Tablet' );
+		expect( badge ).toBeVisible();
+		// The explanation is also embedded in the badge, visually hidden, so
+		// screen reader users perceive it without relying on the tooltip.
+		expect( badge ).toHaveTextContent(
+			'Style changes apply to the Tablet viewport.'
+		);
 		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent(
 			'Style changes apply to the Tablet viewport.'
 		);
@@ -47,7 +53,11 @@ describe( 'StateControlBadges', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Hover' ) ).toBeVisible();
+		const badge = screen.getByText( 'Hover' );
+		expect( badge ).toBeVisible();
+		expect( badge ).toHaveTextContent(
+			'Style changes apply to the Hover state.'
+		);
 		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent(
 			'Style changes apply to the Hover state.'
 		);
