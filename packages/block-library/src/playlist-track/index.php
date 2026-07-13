@@ -56,7 +56,9 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 		$html .= '</span>';
 	}
 
-	$html .= '<span class="screen-reader-text">' . esc_html__( 'Select to play this track' ) . '</span>';
+	$html .= '<span class="screen-reader-text" data-wp-text="state.trackButtonActionLabel">';
+	$html .= esc_html__( 'Play' );
+	$html .= '</span>';
 	$html .= '</button>';
 	$html .= '</li>';
 

@@ -124,10 +124,13 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 		'data-wp-context',
 		wp_json_encode(
 			array(
-				'playlistId'    => $playlist_id,
-				'currentId'     => $playlist_tracks[0],
-				'tracks'        => $playlist_tracks,
-				'waveformStyle' => $waveform_style,
+				'playlistId'       => $playlist_id,
+				'currentId'        => $playlist_tracks[0],
+				'isPlaying'        => false,
+				'tracks'           => $playlist_tracks,
+				'waveformStyle'    => $waveform_style,
+				'labelPauseTrack'  => __( 'Pause' ),
+				'labelSelectTrack' => __( 'Play' ),
 			)
 		)
 	);

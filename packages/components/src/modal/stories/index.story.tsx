@@ -48,7 +48,7 @@ const meta: Meta< typeof Modal > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `Dialog` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`Dialog`](?path=/docs/design-system-components-dialog--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };

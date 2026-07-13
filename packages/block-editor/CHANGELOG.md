@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Writing flow: Only pull a forward selection ending at the next element's offset 0 back into the previous block for triple clicks, and clamp the dispatched selection end offset to the rich text content length so an overshooting selection no longer collapses to its start ([#80126](https://github.com/WordPress/gutenberg/pull/80126)).
 -   `ListView`: Use the DS focus color token for the row focus ring so it adapts to themed surfaces such as the site editor navigation sidebar, and remove the duplicate focus ring on the row's Options (three-dot) button, which already draws the standard `Button` focus ring. ([#80087](https://github.com/WordPress/gutenberg/pull/80087)).
 -   `DimensionControl`: Include component styles in the block editor stylesheet so the fieldset reset is applied in Storybook and other contexts without WordPress core styles ([#79916](https://github.com/WordPress/gutenberg/pull/79916)).
 -   `InnerContent`: Render the selected inner block synchronously so its rich text selection stays current while typing; otherwise a stale selection offset could place a typed character at the wrong position in editable static inner blocks ([#79726](https://github.com/WordPress/gutenberg/pull/79726)).
