@@ -117,7 +117,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	// so the grid reflects the newly attached images.
 	useEffect( () => {
 		if ( ! subscribe ) {
-			return undefined;
+			return;
 		}
 		return subscribe( () => setRefreshKey( ( key ) => key + 1 ), query );
 	}, [ subscribe, query ] );
