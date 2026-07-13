@@ -197,6 +197,8 @@ const getAllBlocks = () => {
 		pageList,
 		pageListItem,
 		pattern,
+		playlist,
+		playlistTrack,
 		preformatted,
 		pullquote,
 		reusableBlock,
@@ -285,8 +287,6 @@ const getAllBlocks = () => {
 		blocks.push( tabs );
 		blocks.push( tabPanel );
 		blocks.push( tabPanels );
-		blocks.push( playlist );
-		blocks.push( playlistTrack );
 	}
 
 	blocks.push( classic );
