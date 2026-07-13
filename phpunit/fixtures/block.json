@@ -21,7 +21,8 @@
 		}
 	},
 	"supports": {
-		"align": true
+		"align": true,
+		"autoRegister": true
 	},
 	"styles": [
 		{
