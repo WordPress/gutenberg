@@ -323,10 +323,8 @@ function LayoutPanelPure( {
 					'block'
 				),
 				themeSupportsLayout: getSettings().supportsLayout,
-				selectedState:
-					getSelectedBlockStyleState?.( clientId ) ??
-					DEFAULT_BLOCK_STYLE_STATE,
-				isResponsiveEditing: getIsResponsiveEditing?.() ?? false,
+				selectedState: getSelectedBlockStyleState( clientId ),
+				isResponsiveEditing: getIsResponsiveEditing(),
 			};
 		},
 		[ blockName, clientId ]
