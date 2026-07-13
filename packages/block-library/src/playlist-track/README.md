@@ -56,7 +56,7 @@ This is a [**dynamic block**](https://developer.wordpress.org/block-editor/getti
 In post content, it is stored as a block comment:
 
 ```html
-<!-- wp:playlist-track {"type":"audio"} /-->
+<!-- wp:core/playlist-track {"id":123,"src":"https://example.com/audio.mp3","album":"Example album","artist":"Example creator","image":"https://example.com/track-image.jpg","imageAlt":"Track image","length":"3:21","title":"Sample track"} /-->
 ```
 
 ## Source
