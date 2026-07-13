@@ -72,12 +72,11 @@ export default function StateControlBadges( {
 				return (
 					<Tooltip.Root key={ state.key }>
 						<Tooltip.Trigger
-							render={
-								<span className="block-editor-global-styles-state-control__badge-tooltip-trigger">
-									{ badge }
-								</span>
-							}
-						/>
+							type="button"
+							className="block-editor-global-styles-state-control__badge-tooltip-trigger"
+						>
+							{ badge }
+						</Tooltip.Trigger>
 						<Tooltip.Popup>{ state.tooltipText }</Tooltip.Popup>
 					</Tooltip.Root>
 				);
