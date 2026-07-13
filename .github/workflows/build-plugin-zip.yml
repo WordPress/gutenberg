@@ -63,8 +63,9 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
 
         steps:
-            # Request the same elevated permissions as create-release so a
-            # misconfigured GitHub App fails before version bump commits are pushed.
+            # Request the same elevated permissions as create-release so invalid
+            # credentials or unavailable requested permissions fail before version
+            # bump commits are pushed.
             - name: Generate application token
               uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
               id: app-token
