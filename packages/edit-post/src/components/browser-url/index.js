@@ -76,17 +76,17 @@ export default function BrowserURL() {
 		openRevision( initialRevisionId );
 	}, [ initialRevisionId, postId, openRevision ] );
 
-	// On deep links, delay the first write so `openRevision()` can update
-	// the store first.
+	// On revision deep links, delay the first write so `openRevision()` can
+	// update the store first.
 	const lastURLWriteTimeRef = useRef( null );
+	const lastPostIdRef = useRef( null );
 
 	useEffect( () => {
 		if ( ! postId || postStatus === 'auto-draft' ) {
 			return;
 		}
-		if ( lastURLWriteTimeRef.current === null ) {
-			lastURLWriteTimeRef.current = Date.now();
-		}
+		const previousPostId = lastPostIdRef.current;
+		lastPostIdRef.current = postId;
 		const url = getPostEditURL( postId, currentRevisionId );
 		const write = () => {
 			lastURLWriteTimeRef.current = Date.now();
@@ -101,6 +101,17 @@ export default function BrowserURL() {
 				// state change.
 			}
 		};
+		if ( previousPostId !== null && previousPostId !== postId ) {
+			write();
+			return;
+		}
+		if ( lastURLWriteTimeRef.current === null ) {
+			if ( ! initialRevisionId ) {
+				write();
+				return;
+			}
+			lastURLWriteTimeRef.current = Date.now();
+		}
 		if (
 			Date.now() - lastURLWriteTimeRef.current >=
 			URL_WRITE_DEBOUNCE_MS
@@ -110,7 +121,7 @@ export default function BrowserURL() {
 		}
 		const timeoutId = setTimeout( write, URL_WRITE_DEBOUNCE_MS );
 		return () => clearTimeout( timeoutId );
-	}, [ postId, postStatus, currentRevisionId ] );
+	}, [ postId, postStatus, currentRevisionId, initialRevisionId ] );
 
 	return null;
 }

@@ -69,7 +69,7 @@ describe( 'BrowserURL', () => {
 		expect( replaceStateSpy ).not.toHaveBeenCalled();
 	} );
 
-	it( 'update URL if post is no longer auto-draft', () => {
+	it( 'updates URL immediately if post is no longer auto-draft', () => {
 		setupUseSelectMock( {
 			postId: 1,
 			postStatus: 'auto-draft',
@@ -83,7 +83,6 @@ describe( 'BrowserURL', () => {
 		} );
 
 		rerender( <BrowserURL /> );
-		flushURLWrites();
 		expect( replaceStateSpy ).toHaveBeenCalledWith(
 			{ id: 1 },
 			'Post 1',
@@ -91,7 +90,7 @@ describe( 'BrowserURL', () => {
 		);
 	} );
 
-	it( 'update URL if post ID changes', () => {
+	it( 'updates URL immediately if post ID changes', () => {
 		setupUseSelectMock( {
 			postId: 1,
 			postStatus: 'draft',
@@ -106,7 +105,6 @@ describe( 'BrowserURL', () => {
 		replaceStateSpy.mockReset();
 
 		rerender( <BrowserURL /> );
-		flushURLWrites();
 		expect( replaceStateSpy ).toHaveBeenCalledWith(
 			{ id: 2 },
 			'Post 2',
@@ -172,6 +170,7 @@ describe( 'BrowserURL', () => {
 		replaceStateSpy.mockReset();
 
 		rerender( <BrowserURL /> );
+		expect( replaceStateSpy ).not.toHaveBeenCalled();
 		flushURLWrites();
 		expect( replaceStateSpy ).toHaveBeenCalledWith(
 			{ id: 1 },
