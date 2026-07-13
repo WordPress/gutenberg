@@ -54,9 +54,9 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 	$processed_css = WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $custom_css, $selector );
 
 	if ( ! empty( $processed_css ) ) {
-		/*
+		/**
 		 * Reuse one handle so identical custom CSS is enqueued only once via
-		 * wp_unique_id_from_values(). Explicitly declare the `wp-block-library`
+		 * {@see wp_unique_id_from_values()}. Explicitly declare the `wp-block-library`
 		 * dependency so `global-styles` is guaranteed to print after it, preventing
 		 * block default styles from unintentionally overriding global styles.
 		 */
