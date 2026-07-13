@@ -3,7 +3,8 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button, Composite, Dropdown } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useFocusReturn, useInstanceId } from '@wordpress/compose';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,6 +23,11 @@ interface SkinToneOption {
 interface SkinTonePickerProps {
 	value: number;
 	onChange: ( tone: number ) => void;
+}
+
+interface SkinToneMenuProps extends SkinTonePickerProps {
+	baseId: string;
+	onClose: () => void;
 }
 
 /**
@@ -66,6 +72,86 @@ export function applySkinTone(
 }
 
 /**
+ * The flyout body: a heading and the six-swatch listbox.
+ *
+ * @param props          Component props.
+ * @param props.value    The selected tone, 0–5.
+ * @param props.onChange Called with the newly selected tone.
+ * @param props.baseId   Unique ID prefix for the heading and options.
+ * @param props.onClose  Closes the flyout.
+ */
+function SkinToneMenu( {
+	value,
+	onChange,
+	baseId,
+	onClose,
+}: SkinToneMenuProps ) {
+	const headingId = `${ baseId }-heading`;
+	const optionId = ( tone: number ) => `${ baseId }-option-${ tone }`;
+	const current =
+		SKIN_TONES.find( ( option ) => option.tone === value ) ||
+		SKIN_TONES[ 0 ];
+	const selectedOptionId = optionId( current.tone );
+
+	// Per the APG listbox pattern, focus lands on the selected option
+	// (not the first) when the listbox receives focus. The popover's own
+	// focus-on-mount and the composite's `defaultActiveId` race against
+	// item registration, so move focus explicitly once on mount;
+	// focusing the option also makes it the composite's active item.
+	useEffect( () => {
+		document.getElementById( selectedOptionId )?.focus();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] );
+
+	// With the popover's focus-on-mount disabled, its automatic focus
+	// return is disabled too — restore focus to the toggle on unmount.
+	const focusReturnRef = useFocusReturn();
+
+	return (
+		<div
+			ref={ focusReturnRef }
+			className="editor-collab-sidebar-panel__skin-tone-menu"
+		>
+			<div
+				id={ headingId }
+				className="editor-collab-sidebar-panel__skin-tone-heading"
+			>
+				{ __( 'Choose your default skin tone' ) }
+			</div>
+			<Composite
+				role="listbox"
+				orientation="horizontal"
+				aria-labelledby={ headingId }
+				defaultActiveId={ selectedOptionId }
+				className="editor-collab-sidebar-panel__skin-tone-options"
+			>
+				{ SKIN_TONES.map( ( { tone, emoji, label } ) => (
+					<Composite.Item
+						key={ tone }
+						id={ optionId( tone ) }
+						render={
+							<Button
+								role="option"
+								size="compact"
+								aria-selected={ tone === value }
+								aria-label={ label }
+								className="editor-collab-sidebar-panel__skin-tone-option"
+								onClick={ () => {
+									onChange( tone );
+									onClose();
+								} }
+							/>
+						}
+					>
+						{ emoji }
+					</Composite.Item>
+				) ) }
+			</Composite>
+		</div>
+	);
+}
+
+/**
  * Skin tone selector for the emoji picker: a persistent toggle showing
  * the currently selected tone (a raised hand in that tone), opening a
  * flyout of six exemplar swatches under an explicit heading. Selecting
@@ -79,9 +165,9 @@ export default function SkinTonePicker( {
 	value,
 	onChange,
 }: SkinTonePickerProps ) {
-	const headingId = useInstanceId(
+	const baseId = useInstanceId(
 		SkinTonePicker,
-		'editor-collab-sidebar-panel__skin-tone-heading'
+		'editor-collab-sidebar-panel__skin-tone'
 	);
 	const current =
 		SKIN_TONES.find( ( option ) => option.tone === value ) ||
@@ -90,6 +176,10 @@ export default function SkinTonePicker( {
 	return (
 		<Dropdown
 			popoverProps={ { placement: 'bottom-end' } }
+			// The menu moves focus to the *selected* swatch on mount (per
+			// the APG listbox pattern); the popover's own first-element
+			// focus would land on the first swatch instead.
+			focusOnMount={ false }
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					size="compact"
@@ -107,41 +197,12 @@ export default function SkinTonePicker( {
 				</Button>
 			) }
 			renderContent={ ( { onClose } ) => (
-				<div className="editor-collab-sidebar-panel__skin-tone-menu">
-					<div
-						id={ headingId }
-						className="editor-collab-sidebar-panel__skin-tone-heading"
-					>
-						{ __( 'Choose your default skin tone' ) }
-					</div>
-					<Composite
-						role="listbox"
-						orientation="horizontal"
-						aria-labelledby={ headingId }
-						className="editor-collab-sidebar-panel__skin-tone-options"
-					>
-						{ SKIN_TONES.map( ( { tone, emoji, label } ) => (
-							<Composite.Item
-								key={ tone }
-								render={
-									<Button
-										role="option"
-										size="compact"
-										aria-selected={ tone === value }
-										aria-label={ label }
-										className="editor-collab-sidebar-panel__skin-tone-option"
-										onClick={ () => {
-											onChange( tone );
-											onClose();
-										} }
-									/>
-								}
-							>
-								{ emoji }
-							</Composite.Item>
-						) ) }
-					</Composite>
-				</div>
+				<SkinToneMenu
+					value={ value }
+					onChange={ onChange }
+					baseId={ baseId }
+					onClose={ onClose }
+				/>
 			) }
 		/>
 	);

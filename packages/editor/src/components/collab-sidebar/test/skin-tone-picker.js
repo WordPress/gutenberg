@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -99,6 +99,25 @@ describe( 'SkinTonePicker', () => {
 		expect( options[ 5 ] ).toHaveAttribute( 'aria-selected', 'false' );
 	} );
 
+	it( 'places focus on the selected tone when the listbox receives focus', async () => {
+		const user = userEvent.setup();
+		render( <SkinTonePicker value={ 4 } onChange={ () => {} } /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Skin tone: Medium-dark skin tone',
+			} )
+		);
+
+		// Per the APG listbox pattern, focus goes to the selected option
+		// (not the first) when the listbox receives focus.
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'option', { name: 'Medium-dark skin tone' } )
+			).toHaveFocus()
+		);
+	} );
+
 	it( 'reports the chosen tone and closes the flyout', async () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();
@@ -117,5 +136,12 @@ describe( 'SkinTonePicker', () => {
 		expect(
 			screen.queryByText( 'Choose your default skin tone' )
 		).not.toBeInTheDocument();
+		// Focus returns to the toggle when the flyout closes, even though
+		// the flyout manages its own focus on mount.
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Skin tone: Default skin tone',
+			} )
+		).toHaveFocus();
 	} );
 } );
