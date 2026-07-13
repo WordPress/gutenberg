@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getRangeSelection } from '../use-selection-gestures';
+import { getRangeSelection } from '../use-selection-props';
 
 const orderedIds = [ '1', '2', '3', '4', '5' ];
 

@@ -16,7 +16,7 @@
 
 ### Enhancements
 
-- DataViews: Add Shift+Click range selection through a shared `useSelectionGestures` hook that layouts can adopt, wired up in the table and grid layouts.[#80046](https://github.com/WordPress/gutenberg/pull/80046)
+- DataViews: Add Shift+Click range selection through a shared `useSelectionProps` hook that layouts can adopt, wired up in the table and grid layouts.[#80046](https://github.com/WordPress/gutenberg/pull/80046)
 
 ### Bug Fix
 

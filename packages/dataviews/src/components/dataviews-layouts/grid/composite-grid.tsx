@@ -40,7 +40,7 @@ import type {
 	ViewGrid as ViewGridType,
 } from '../../../types';
 import type { SetSelection } from '../../../types/private';
-import type { SelectionGestureProps } from '../utils/use-selection-gestures';
+import useSelectionProps from '../utils/use-selection-props';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
 const { Badge: WCBadge } = unlock( componentsPrivateApis );
 import { useGridColumns } from './preview-size-picker';
@@ -72,7 +72,6 @@ interface GridItemProps< Item > extends HTMLAttributes< HTMLDivElement > {
 	isItemClickable: ( item: Item ) => boolean;
 	item: Item;
 	actions: Action< Item >[];
-	getSelectionGestureProps: ( id: string ) => SelectionGestureProps;
 	titleField?: NormalizedField< Item >;
 	mediaField?: NormalizedField< Item >;
 	descriptionField?: NormalizedField< Item >;
@@ -98,7 +97,6 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 			getItemId,
 			item,
 			actions,
-			getSelectionGestureProps,
 			mediaField,
 			titleField,
 			descriptionField,
@@ -119,7 +117,6 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 		} = view;
 		const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 		const id = getItemId( item );
-		const gestureProps = getSelectionGestureProps( id );
 		const elementRef = useRef< HTMLDivElement | null >( null );
 
 		// Merge refs callback
@@ -187,14 +184,6 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 						'is-selected': hasBulkAction && isSelected,
 					}
 				) }
-				onMouseDown={ ( event ) => {
-					props.onMouseDown?.( event );
-					gestureProps.onMouseDown( event );
-				} }
-				onClickCapture={ ( event ) => {
-					props.onClickCapture?.( event );
-					gestureProps.onClickCapture( event );
-				} }
 			>
 				<ItemClickWrapper
 					item={ item }
@@ -352,7 +341,6 @@ interface CompositeGridProps< Item > {
 	) => ReactElement;
 	getItemId: ( item: Item ) => string;
 	actions: Action< Item >[];
-	getSelectionGestureProps: ( id: string ) => SelectionGestureProps;
 }
 
 export default function CompositeGrid< Item >( {
@@ -370,12 +358,18 @@ export default function CompositeGrid< Item >( {
 	renderItemLink,
 	getItemId,
 	actions,
-	getSelectionGestureProps,
 }: CompositeGridProps< Item > ) {
 	const { paginationInfo, resizeObserverRef } =
 		useContext( DataViewsContext );
 	const gridColumns = useGridColumns();
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	const { getSelectionProps } = useSelectionProps( {
+		data,
+		actions,
+		getItemId,
+		selection,
+		onChangeSelection,
+	} );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
 	);
@@ -472,6 +466,7 @@ export default function CompositeGrid< Item >( {
 						) }
 						{ data.map( ( item ) => {
 							const itemId = getItemId( item );
+							const selectionProps = getSelectionProps( itemId );
 							// Use position from item for infinite scroll
 							const stablePosition = ( item as any ).position;
 							return (
@@ -493,9 +488,18 @@ export default function CompositeGrid< Item >( {
 											getItemId={ getItemId }
 											item={ item }
 											actions={ actions }
-											getSelectionGestureProps={
-												getSelectionGestureProps
-											}
+											onMouseDown={ ( event ) => {
+												props.onMouseDown?.( event );
+												selectionProps.onMouseDown(
+													event
+												);
+											} }
+											onClickCapture={ ( event ) => {
+												props.onClickCapture?.( event );
+												selectionProps.onClickCapture(
+													event
+												);
+											} }
 											mediaField={ mediaField }
 											titleField={ titleField }
 											descriptionField={
@@ -559,6 +563,8 @@ export default function CompositeGrid< Item >( {
 							>
 								{ row.map( ( item ) => {
 									const itemId = getItemId( item );
+									const selectionProps =
+										getSelectionProps( itemId );
 									return (
 										<Composite.Item
 											key={ itemId }
@@ -582,9 +588,24 @@ export default function CompositeGrid< Item >( {
 													getItemId={ getItemId }
 													item={ item }
 													actions={ actions }
-													getSelectionGestureProps={
-														getSelectionGestureProps
-													}
+													onMouseDown={ ( event ) => {
+														props.onMouseDown?.(
+															event
+														);
+														selectionProps.onMouseDown(
+															event
+														);
+													} }
+													onClickCapture={ (
+														event
+													) => {
+														props.onClickCapture?.(
+															event
+														);
+														selectionProps.onClickCapture(
+															event
+														);
+													} }
 													mediaField={ mediaField }
 													titleField={ titleField }
 													descriptionField={

@@ -8,6 +8,8 @@ import { isAppleOS } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { SELECTION_CHECKBOX_CLASS } from '../../dataviews-selection-checkbox';
+import { hasAPossibleBulkAction } from '../../dataviews-bulk-actions';
+import type { Action } from '../../../types';
 import type { SetSelection } from '../../../types/private';
 
 interface RangeSelectionArgs {
@@ -67,7 +69,7 @@ export function getRangeSelection( {
 	return [ ...new Set( [ ...selection, ...range ] ) ];
 }
 
-export interface SelectionGestureProps {
+export interface SelectionProps {
 	onMouseDown: ( event: React.MouseEvent ) => void;
 	onClickCapture: ( event: React.MouseEvent ) => void;
 }
@@ -77,12 +79,13 @@ export interface SelectionGestureProps {
 // new state to the whole range between it and the anchor (the last item
 // interacted with), leaving the selection outside the range untouched.
 //
-// Layouts decide which items are selectable and in which order they render:
-// pass `selectableIds` — the ids of all selectable items in render order — and
-// spread `getSelectionGestureProps( id )` on each item's container element.
+// Layouts pass `data` in the order they render it, along with `actions` and
+// `getItemId`; the hook derives the selectable items itself (those with a
+// possible bulk action) so every layout doesn't repeat that logic. Spread
+// `getSelectionProps( id )` on each item's container element.
 //
 // The selection model is one-dimensional: a range is the contiguous run of
-// `selectableIds` between the anchor and the target. Two-dimensional layouts
+// selectable items between the anchor and the target. Two-dimensional layouts
 // (e.g. the grid) pass their items flattened to reading order, so a
 // Shift+Click range follows that order rather than a rectangular block of
 // rows and columns.
@@ -92,12 +95,16 @@ export interface SelectionGestureProps {
 // item in the view is selectable the gestures are inert and clicks fall
 // through to inner elements. Layout-specific concerns don't belong here:
 // layouts wrap the returned handlers to compose extra behavior ad-hoc.
-export default function useSelectionGestures( {
-	selectableIds,
+export default function useSelectionProps< Item >( {
+	data,
+	actions,
+	getItemId,
 	selection,
 	onChangeSelection,
 }: {
-	selectableIds: string[];
+	data: Item[];
+	actions: Action< Item >[];
+	getItemId: ( item: Item ) => string;
 	selection: string[];
 	onChangeSelection: SetSelection;
 } ) {
@@ -118,10 +125,15 @@ export default function useSelectionGestures( {
 			document.removeEventListener( 'touchstart', markTouchDevice );
 	}, [] );
 
+	// The ids of all selectable items — those with a possible bulk action —
+	// in the order the layout renders them; ranges follow this order.
+	const selectableIds = data
+		.filter( ( item ) => hasAPossibleBulkAction( actions, item ) )
+		.map( getItemId );
 	const selectableIdSet = new Set( selectableIds );
 	const hasSelectableItems = selectableIds.length > 0;
 
-	const getSelectionGestureProps = ( id: string ): SelectionGestureProps => {
+	const getSelectionProps = ( id: string ): SelectionProps => {
 		const isSelectable = selectableIdSet.has( id );
 		return {
 			onMouseDown: ( event: React.MouseEvent ) => {
@@ -206,5 +218,5 @@ export default function useSelectionGestures( {
 		};
 	};
 
-	return { getSelectionGestureProps };
+	return { getSelectionProps };
 }

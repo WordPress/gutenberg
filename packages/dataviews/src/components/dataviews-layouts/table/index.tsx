@@ -28,7 +28,6 @@ import { sortValues } from '../../../constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
-	hasAPossibleBulkAction,
 	BulkSelectionCheckbox,
 } from '../../dataviews-bulk-actions';
 import type {
@@ -42,9 +41,7 @@ import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
 import { useScrollState } from './use-scroll-state';
 import getDataByGroup from '../utils/get-data-by-group';
-import useSelectionGestures, {
-	type SelectionGestureProps,
-} from '../utils/use-selection-gestures';
+import useSelectionProps from '../utils/use-selection-props';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
@@ -82,7 +79,8 @@ interface TableRowProps< Item > {
 	selection: string[];
 	getItemId: ( item: Item ) => string;
 	onChangeSelection: SetSelection;
-	getSelectionGestureProps: ( id: string ) => SelectionGestureProps;
+	onMouseDown: ( event: React.MouseEvent ) => void;
+	onClickCapture: ( event: React.MouseEvent ) => void;
 	isItemClickable: ( item: Item ) => boolean;
 	onClickItem?: ( item: Item ) => void;
 	renderItemLink?: (
@@ -135,7 +133,8 @@ function TableRow< Item >( {
 	onClickItem,
 	renderItemLink,
 	onChangeSelection,
-	getSelectionGestureProps,
+	onMouseDown,
+	onClickCapture,
 	isActionsColumnSticky,
 	posinset,
 }: TableRowProps< Item > ) {
@@ -153,7 +152,6 @@ function TableRow< Item >( {
 		( titleField && showTitle ) ||
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
-	const selectionGestureProps = getSelectionGestureProps( id );
 
 	return (
 		<tr
@@ -166,7 +164,7 @@ function TableRow< Item >( {
 			}
 			aria-posinset={ posinset }
 			role={ infiniteScrollEnabled ? 'article' : undefined }
-			onClickCapture={ selectionGestureProps.onClickCapture }
+			onClickCapture={ onClickCapture }
 			onMouseDown={ ( event ) => {
 				// Firefox has a unique feature where ctrl/cmd + click selects a
 				// table cell. This interferes with the bulk selection behavior,
@@ -181,7 +179,7 @@ function TableRow< Item >( {
 				) {
 					event.preventDefault();
 				}
-				selectionGestureProps.onMouseDown( event );
+				onMouseDown( event );
 			} }
 		>
 			{ hasBulkActions && (
@@ -290,10 +288,10 @@ function ViewTable< Item >( {
 	const orderedData = dataByGroup
 		? Array.from( dataByGroup.values() ).flat()
 		: data;
-	const { getSelectionGestureProps } = useSelectionGestures( {
-		selectableIds: orderedData
-			.filter( ( item ) => hasAPossibleBulkAction( actions, item ) )
-			.map( getItemId ),
+	const { getSelectionProps } = useSelectionProps( {
+		data: orderedData,
+		actions,
+		getItemId,
 		selection,
 		onChangeSelection,
 	} );
@@ -596,7 +594,55 @@ function ViewTable< Item >( {
 											  ) }
 									</td>
 								</tr>
-								{ groupItems.map( ( item, index ) => (
+								{ groupItems.map( ( item, index ) => {
+									const id =
+										getItemId( item ) || index.toString();
+									return (
+										<TableRow
+											key={ getItemId( item ) }
+											item={ item }
+											level={
+												view.showLevels &&
+												typeof getItemLevel ===
+													'function'
+													? getItemLevel( item )
+													: undefined
+											}
+											hasBulkActions={ hasBulkActions }
+											actions={ actions }
+											fields={ fields }
+											id={ id }
+											view={ view }
+											titleField={ titleField }
+											mediaField={ mediaField }
+											descriptionField={
+												descriptionField
+											}
+											selection={ selection }
+											getItemId={ getItemId }
+											onChangeSelection={
+												onChangeSelection
+											}
+											{ ...getSelectionProps( id ) }
+											onClickItem={ onClickItem }
+											renderItemLink={ renderItemLink }
+											isItemClickable={ isItemClickable }
+											isActionsColumnSticky={
+												! isHorizontalScrollEnd
+											}
+										/>
+									);
+								} ) }
+							</tbody>
+						)
+					)
+				) : (
+					<tbody>
+						{ hasData &&
+							data.map( ( item, index ) => {
+								const id =
+									getItemId( item ) || index.toString();
+								return (
 									<TableRow
 										key={ getItemId( item ) }
 										item={ item }
@@ -609,10 +655,7 @@ function ViewTable< Item >( {
 										hasBulkActions={ hasBulkActions }
 										actions={ actions }
 										fields={ fields }
-										id={
-											getItemId( item ) ||
-											index.toString()
-										}
+										id={ id }
 										view={ view }
 										titleField={ titleField }
 										mediaField={ mediaField }
@@ -620,58 +663,21 @@ function ViewTable< Item >( {
 										selection={ selection }
 										getItemId={ getItemId }
 										onChangeSelection={ onChangeSelection }
-										getSelectionGestureProps={
-											getSelectionGestureProps
-										}
+										{ ...getSelectionProps( id ) }
 										onClickItem={ onClickItem }
 										renderItemLink={ renderItemLink }
 										isItemClickable={ isItemClickable }
 										isActionsColumnSticky={
 											! isHorizontalScrollEnd
 										}
+										posinset={
+											isInfiniteScroll
+												? index + 1
+												: undefined
+										}
 									/>
-								) ) }
-							</tbody>
-						)
-					)
-				) : (
-					<tbody>
-						{ hasData &&
-							data.map( ( item, index ) => (
-								<TableRow
-									key={ getItemId( item ) }
-									item={ item }
-									level={
-										view.showLevels &&
-										typeof getItemLevel === 'function'
-											? getItemLevel( item )
-											: undefined
-									}
-									hasBulkActions={ hasBulkActions }
-									actions={ actions }
-									fields={ fields }
-									id={ getItemId( item ) || index.toString() }
-									view={ view }
-									titleField={ titleField }
-									mediaField={ mediaField }
-									descriptionField={ descriptionField }
-									selection={ selection }
-									getItemId={ getItemId }
-									onChangeSelection={ onChangeSelection }
-									getSelectionGestureProps={
-										getSelectionGestureProps
-									}
-									onClickItem={ onClickItem }
-									renderItemLink={ renderItemLink }
-									isItemClickable={ isItemClickable }
-									isActionsColumnSticky={
-										! isHorizontalScrollEnd
-									}
-									posinset={
-										isInfiniteScroll ? index + 1 : undefined
-									}
-								/>
-							) ) }
+								);
+							} ) }
 					</tbody>
 				) }
 			</table>
