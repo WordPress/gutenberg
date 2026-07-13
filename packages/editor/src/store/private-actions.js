@@ -708,10 +708,42 @@ export const openRevision =
 			return;
 		}
 
-		const index = ( revisions ?? [] ).findIndex(
+		// core-data swallows request errors, so a missing collection
+		// means the request failed, not that the post has no revisions.
+		// Keep the selection; a reload can retry the deep link.
+		if ( ! revisions ) {
+			registry
+				.dispatch( noticesStore )
+				.createNotice(
+					'warning',
+					__( 'Revisions could not be loaded.' ),
+					{
+						type: 'snackbar',
+						id: 'editor-revisions-load-failed',
+					}
+				);
+			return;
+		}
+
+		const index = revisions.findIndex(
 			( revision ) => revision[ revisionKey ] === revisionId
 		);
 		if ( index === -1 ) {
+			// Autosaves still resolve individually when the collection
+			// omits them (e.g. with `WP_POST_REVISIONS` disabled), so
+			// check the single endpoint before declaring the ID invalid.
+			const revision = await registry
+				.resolveSelect( coreStore )
+				.getRevision( 'postType', postType, postId, revisionId, {
+					context: 'edit',
+					_fields: revisionKey,
+				} );
+			if ( select.getCurrentRevisionId() !== revisionId ) {
+				return;
+			}
+			if ( revision ) {
+				return;
+			}
 			dispatch.setCurrentRevisionId( null );
 			registry
 				.dispatch( noticesStore )

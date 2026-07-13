@@ -61,8 +61,9 @@ export default function BrowserURL() {
 		return {
 			postId: id,
 			postStatus: status,
-			// In template mode the URL points at the template, not
-			// at the post the revision belongs to.
+			// In template mode the URL points at the template, and
+			// `post.php` refuses to open templates (their `show_ui` is
+			// false), so a revision arg would make a dead link.
 			currentRevisionId: isTemplate ? null : getCurrentRevisionId(),
 		};
 	}, [] );

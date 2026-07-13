@@ -70,14 +70,39 @@ export const useMetaBoxInitialization = ( enabled ) => {
 
 				// The flag arrives after the editor is ready, so revisions
 				// mode may already be active (a deep link, or a click
-				// that beat the flag). Send those to the classic screen.
+				// that beat the flag). Send those to the classic screen,
+				// but only for revisions of this post: an unvalidated
+				// redirect would take invalid deep links to a wp_die
+				// instead of the in-editor invalid-revision notice.
 				const revisionId = unlock(
 					registry.select( editorStore )
 				).getCurrentRevisionId();
 				if ( revisionId ) {
-					window.location.href = addQueryArgs( 'revision.php', {
-						revision: revisionId,
-					} );
+					const { getCurrentPostType, getCurrentPostId } =
+						registry.select( editorStore );
+					registry
+						.resolveSelect( coreStore )
+						.getRevision(
+							'postType',
+							getCurrentPostType(),
+							getCurrentPostId(),
+							revisionId,
+							{ context: 'edit', _fields: 'id' }
+						)
+						.then( ( revision ) => {
+							if (
+								! revision ||
+								unlock(
+									registry.select( editorStore )
+								).getCurrentRevisionId() !== revisionId
+							) {
+								return;
+							}
+							window.location.href = addQueryArgs(
+								'revision.php',
+								{ revision: revisionId }
+							);
+						} );
 				}
 			}
 		}

@@ -74,6 +74,17 @@ export default function useRevisionsURLSync( enabled ) {
 			return;
 		}
 		const write = async () => {
+			// The route match resolves asynchronously, so `location` can
+			// lag behind the address bar right after a navigation, and a
+			// write based on it would undo that navigation. Skip while
+			// they disagree; the effect re-runs once the match resolves.
+			const addressBarArg =
+				new URLSearchParams( window.location.search ).get(
+					'revision'
+				) ?? undefined;
+			if ( addressBarArg !== location.query.revision ) {
+				return;
+			}
 			lastURLWriteTimeRef.current = Date.now();
 			// `location.path` already includes the current query args;
 			// passing undefined removes the arg.

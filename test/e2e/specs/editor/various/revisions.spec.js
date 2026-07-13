@@ -377,6 +377,37 @@ test.describe( 'Post revisions with classic meta boxes', () => {
 			new RegExp( `revision\\.php\\?revision=${ oldestRevisionId }` )
 		);
 	} );
+
+	test( 'keeps invalid revision deep links in the editor', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: {
+				title: 'Meta box invalid deep link',
+				content:
+					'<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			},
+		} );
+
+		await admin.visitAdminPage(
+			'post.php',
+			`post=${ post.id }&action=edit&revision=99999999`
+		);
+
+		// An invalid ID must not bounce to a revision.php error page;
+		// the editor loads and explains what happened.
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Invalid revision ID.' } )
+		).toBeVisible();
+		expect( new URL( page.url() ).pathname ).toContain( '/post.php' );
+	} );
 } );
 
 test.describe( 'Post revisions slider pagination', () => {
