@@ -167,7 +167,7 @@ async function writeInterstitialIntoPreviewWindow( previewWindow ) {
 	}
 }
 
-function usePostPreview( { forceIsAutosaveable, onPreview } ) {
+function usePostPreviewProps( { forceIsAutosaveable, onPreview } ) {
 	const { postId, currentPostLink, previewLink, isSaveable, isViewable } =
 		useSelect( ( select ) => {
 			const editor = select( editorStore );
@@ -196,7 +196,7 @@ function usePostPreview( { forceIsAutosaveable, onPreview } ) {
 		return null;
 	}
 
-	const targetId = `wp-preview-${ postId }`;
+	const target = `wp-preview-${ postId }`;
 
 	const handlePreviewClick = async ( event ) => {
 		// Preserve native link semantics with `href` and `target`, but intercept the
@@ -207,7 +207,7 @@ function usePostPreview( { forceIsAutosaveable, onPreview } ) {
 		event.preventDefault();
 
 		// Open up a Preview tab if needed. This is where we'll show the preview.
-		const previewWindow = window.open( '', targetId );
+		const previewWindow = window.open( '', target );
 
 		// Focus the Preview tab. This might not do anything, depending on the browser's
 		// and user's preferences.
@@ -230,9 +230,9 @@ function usePostPreview( { forceIsAutosaveable, onPreview } ) {
 
 	return {
 		href,
-		handlePreviewClick,
-		isSaveable,
-		targetId,
+		target,
+		disabled: ! isSaveable,
+		onClick: handlePreviewClick,
 	};
 }
 
@@ -246,25 +246,17 @@ function usePostPreview( { forceIsAutosaveable, onPreview } ) {
  * @return {React.ReactNode} The rendered menu item.
  */
 export function PostPreviewMenuItem( { forceIsAutosaveable, onPreview } ) {
-	const preview = usePostPreview( {
+	const previewProps = usePostPreviewProps( {
 		forceIsAutosaveable,
 		onPreview,
 	} );
 
-	if ( ! preview ) {
+	if ( ! previewProps ) {
 		return null;
 	}
 
-	const { handlePreviewClick, href, isSaveable, targetId } = preview;
-
 	return (
-		<MenuItem
-			href={ href }
-			target={ targetId }
-			disabled={ ! isSaveable }
-			onClick={ handlePreviewClick }
-			icon={ external }
-		>
+		<MenuItem icon={ external } { ...previewProps }>
 			{ __( 'Preview in new tab' ) }
 		</MenuItem>
 	);
@@ -292,16 +284,14 @@ export default function PostPreviewButton( {
 	role,
 	onPreview,
 } ) {
-	const preview = usePostPreview( {
+	const previewProps = usePostPreviewProps( {
 		forceIsAutosaveable,
 		onPreview,
 	} );
 
-	if ( ! preview ) {
+	if ( ! previewProps ) {
 		return null;
 	}
-
-	const { handlePreviewClick, href, isSaveable, targetId } = preview;
 
 	return (
 		<Button
@@ -309,11 +299,8 @@ export default function PostPreviewButton( {
 			className={ className || 'editor-post-preview' }
 			role={ role }
 			size="compact"
-			href={ href }
-			target={ targetId }
 			accessibleWhenDisabled
-			disabled={ ! isSaveable }
-			onClick={ handlePreviewClick }
+			{ ...previewProps }
 		>
 			{ textContent || (
 				<>
