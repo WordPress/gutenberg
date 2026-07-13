@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { Spinner } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
@@ -21,6 +22,7 @@ import VisualEditor from '../visual-editor';
 import {
 	registerDiffFormatTypes,
 	unregisterDiffFormatTypes,
+	useDiffDescriptionsRef,
 } from './diff-format-types';
 import { useDiffMarkers } from './diff-markers';
 
@@ -137,7 +139,9 @@ function DiffStyleOverrides( { showDiff } ) {
 }
 
 function CanvasContent( { showDiff } ) {
-	const [ contentRef, diffMarkers ] = useDiffMarkers();
+	const [ markersRef, diffMarkers ] = useDiffMarkers();
+	const descriptionsRef = useDiffDescriptionsRef();
+	const contentRef = useMergeRefs( [ markersRef, descriptionsRef ] );
 	return (
 		<>
 			<VisualEditor contentRef={ contentRef } />

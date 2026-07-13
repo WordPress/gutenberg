@@ -29,6 +29,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { DIFF_DESCRIPTION_IDS } from './diff-format-types';
 
 const { parseRawBlock } = unlock( blocksPrivateApis );
 
@@ -562,7 +563,10 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 				removedSlice,
 				{
 					type: 'revision/diff-removed',
-					attributes: { title: __( 'Removed' ) },
+					attributes: {
+						title: __( 'Removed' ),
+						ariaDescribedBy: DIFF_DESCRIPTION_IDS.removed,
+					},
 				},
 				0,
 				part.value.length
@@ -580,7 +584,10 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 				addedSlice,
 				{
 					type: 'revision/diff-added',
-					attributes: { title: __( 'Added' ) },
+					attributes: {
+						title: __( 'Added' ),
+						ariaDescribedBy: DIFF_DESCRIPTION_IDS.added,
+					},
 				},
 				0,
 				part.value.length
@@ -634,11 +641,20 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 							changed: 'revision/diff-format-changed',
 						}[ type ];
 
+						const descriptionId = {
+							added: DIFF_DESCRIPTION_IDS.formatAdded,
+							removed: DIFF_DESCRIPTION_IDS.formatRemoved,
+							changed: DIFF_DESCRIPTION_IDS.formatChanged,
+						}[ type ];
+
 						const marked = applyFormat(
 							rangeSlice,
 							{
 								type: formatType,
-								attributes: { title: description },
+								attributes: {
+									title: description,
+									ariaDescribedBy: descriptionId,
+								},
 							},
 							0,
 							i - rangeStart
