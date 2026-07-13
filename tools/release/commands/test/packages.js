@@ -299,6 +299,31 @@ describe( 'runNpmPublishPreflight', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'fails with an actionable error when a published version has no gitHead', async () => {
+		const commandFn = jest
+			.fn()
+			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( { stdout: '"4.50.0"' } )
+			.mockResolvedValueOnce( { stdout: '' } );
+
+		await expect(
+			runNpmPublishPreflight(
+				{
+					distTag: 'latest',
+					gitWorkingDirectoryPath: '/repo',
+					publishCommit: 'publish-sha',
+					releasePackages: [
+						{ name: '@wordpress/a11y', version: '4.50.0' },
+					],
+				},
+				{ commandFn }
+			)
+		).rejects.toThrow(
+			'@wordpress/a11y@4.50.0 exists in the npm registry with gitHead nothing, expected publish-sha.'
+		);
+		expect( console ).toHaveLogged();
+	} );
+
 	it( 'fails when a published version has the wrong dist-tag', async () => {
 		const commandFn = jest
 			.fn()

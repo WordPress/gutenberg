@@ -739,10 +739,12 @@ async function runNpmPublishPreflight(
 				stdio: 'pipe',
 			}
 		);
-		const registryGitHead = parseNpmJsonOutput(
-			gitHeadOutput,
-			`${ name }@${ version } gitHead`
-		);
+		const registryGitHead = gitHeadOutput.trim()
+			? parseNpmJsonOutput(
+					gitHeadOutput,
+					`${ name }@${ version } gitHead`
+			  )
+			: null;
 		if ( registryGitHead !== publishCommit ) {
 			throw new Error(
 				`${ name }@${ version } exists in the npm registry with gitHead ${
