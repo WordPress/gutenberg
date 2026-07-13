@@ -7,6 +7,7 @@
 			"order": "asc",
 			"showTracklist": true,
 			"showImages": true,
+			"showPlayButtonArtwork": false,
 			"showArtists": true,
 			"showNumbers": true,
 			"showTrackLength": true,
