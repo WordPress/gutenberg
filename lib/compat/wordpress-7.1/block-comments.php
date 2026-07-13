@@ -138,11 +138,15 @@ function gutenberg_notes_arm_mention_kses() {
 	add_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes', 10, 2 );
 
 	/*
-	 * wp_filter_kses() runs on 'pre_comment_content' at priority 10, so
-	 * priority 11 disarms right after this one comment's content has been
-	 * sanitized and the allowance cannot apply to any later comment.
+	 * Disarm once this one comment's content has been filtered, so the
+	 * allowance cannot apply to any later comment. PHP_INT_MAX runs after
+	 * every other 'pre_comment_content' callback (wp_filter_kses at 10,
+	 * wp_rel_ugc at 15, anything a plugin adds): when a callback empties its
+	 * own priority bucket mid-run, WP_Hook skips the bucket that follows, so
+	 * a self-removing disarm must be the final bucket or it would silently
+	 * swallow the next callback.
 	 */
-	add_filter( 'pre_comment_content', 'gutenberg_notes_disarm_mention_kses', 11 );
+	add_filter( 'pre_comment_content', 'gutenberg_notes_disarm_mention_kses', PHP_INT_MAX );
 
 	/*
 	 * Backstop: if the write aborts between arming and content filtering (for
@@ -165,7 +169,7 @@ function gutenberg_notes_arm_mention_kses() {
  */
 function gutenberg_notes_disarm_mention_kses( $value = null ) {
 	remove_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes' );
-	remove_filter( 'pre_comment_content', 'gutenberg_notes_disarm_mention_kses', 11 );
+	remove_filter( 'pre_comment_content', 'gutenberg_notes_disarm_mention_kses', PHP_INT_MAX );
 	remove_filter( 'rest_request_after_callbacks', 'gutenberg_notes_disarm_mention_kses' );
 
 	return $value;
