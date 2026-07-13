@@ -8,7 +8,7 @@ import clsx from 'clsx';
  */
 import { Button, Modal, Spinner, SearchControl } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { useDebouncedInput } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -84,16 +84,18 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const { createErrorNotice, createSuccessNotice, createWarningNotice } =
 		useDispatch( noticesStore );
 
-	// The attach/detach workflow belongs to WordPress's built-in Attachments
-	// source, which manages images attached to the current post. Any category
+	// Private to core's media categories, these capabilities act on WordPress
+	// attachments:
+	// - `attach`/`detach`/`invalidate` manage the images attached to this post.
+	// - `subscribe` watches the attachment cache backing them.
+	// An external resource can never own a post's attachments, and every category
 	// registered by an extender through the public `registerInserterMediaCategory`
-	// API is always flagged as an external resource, so this guard stops such a
-	// category from opting into that workflow just by setting these props. The
-	// guard also reflects the underlying semantics: an external resource can
-	// never own a post's attachments.
+	// API is flagged as one — so this guard stops such a category from opting into
+	// the workflow just by setting these props.
 	const supportsAttachments = ! category.isExternalResource;
 	const attach = supportsAttachments ? category.attach : undefined;
 	const detach = supportsAttachments ? category.detach : undefined;
+	const subscribe = supportsAttachments ? category.subscribe : undefined;
 
 	// Dim (rather than blank) the populated grid while a refetch is in flight,
 	// but only once it has run long enough to be worth signalling — quick
@@ -108,6 +110,17 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 		}
 		setRefreshKey( ( key ) => key + 1 );
 	}, [ category, query, supportsAttachments ] );
+
+	// A media modal opened anywhere in the editor (a canvas block, the featured
+	// image panel, the "Attach images" button) attaches its uploads to the current
+	// post, and invalidates the cached attachment queries when it closes. Refetch
+	// so the grid reflects the newly attached images.
+	useEffect( () => {
+		if ( ! subscribe ) {
+			return;
+		}
+		return subscribe( () => setRefreshKey( ( key ) => key + 1 ), query );
+	}, [ subscribe, query ] );
 
 	const handleAttach = useCallback(
 		async ( selectedMedia ) => {

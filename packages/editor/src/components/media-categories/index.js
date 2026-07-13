@@ -10,7 +10,7 @@
  * WordPress dependencies
  */
 import { __, sprintf, _x } from '@wordpress/i18n';
-import { dispatch, resolveSelect } from '@wordpress/data';
+import { dispatch, resolveSelect, select, subscribe } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -212,96 +212,131 @@ const invalidateAttachedImagesQueries = ( postId, query = {} ) => {
 	] );
 };
 
+// The inserter panel fetches imperatively into local state, so it can't react to
+// attachment cache invalidation on its own. Calls `onChange` on the resolved ->
+// unresolved edge of the resolution the grid reads, i.e. when that cache is
+// invalidated. `args` must match what `coreMediaFetch` resolves byte-for-byte,
+// since `invalidateResolution` keys on deep argument equality.
+const subscribeToMediaInvalidation = ( args, onChange ) => {
+	const isResolved = () =>
+		select( coreStore ).hasFinishedResolution( 'getEntityRecords', args );
+	let wasResolved = isResolved();
+	// Scoped to `coreStore` so the listener only runs on core-data changes.
+	return subscribe( () => {
+		const nowResolved = isResolved();
+		if ( wasResolved && ! nowResolved ) {
+			onChange();
+		}
+		wasResolved = nowResolved;
+	}, coreStore );
+};
+
+// Builds a core-data-backed category from a single `getQuery` mapper, so `fetch`
+// and `subscribe` can't drift apart on the resolution args. `coreMediaFetch`
+// applies `getCoreMediaQuery` internally, so `subscribe` mirrors it. External
+// sources (e.g. Openverse) don't use this and simply omit `subscribe`.
+const createCoreMediaCategory = ( { getQuery, ...category } ) => ( {
+	...category,
+	async fetch( query = {} ) {
+		return coreMediaFetch( getQuery( query ) );
+	},
+	subscribe( onChange, query = {} ) {
+		return subscribeToMediaInvalidation(
+			[
+				'postType',
+				'attachment',
+				getCoreMediaQuery( getQuery( query ) ),
+			],
+			onChange
+		);
+	},
+} );
+
 /**
  * Builds the "Attachments" media category for a given post. It behaves like
  * any other inserter media source (e.g. Openverse): it appears in the tab list
  * and renders through the shared media panel. In addition to `fetch`, it exposes
  * optional `attach`/`detach`/`invalidate` capabilities that the shared panel
  * picks up to offer an "Attach images" button and a per-item "Detach from post"
- * action in the same dropdown Openverse uses for "Report image".
+ * action in the same dropdown Openverse uses for "Report image". It also exposes
+ * `subscribe`, so the panel can refetch when the attachment cache is invalidated
+ * elsewhere (e.g. a media modal closing after an upload).
  *
  * @param {number}      postId      The current post id.
  * @param {string|null} [typeLabel] The post type's singular label to use in copy (e.g. "Page"),
  *                                  or null to fall back to the generic "post".
  * @return {InserterMediaCategory} The Attachments media category.
  */
-const getAttachedImagesCategory = ( postId, typeLabel ) => ( {
-	name: 'attached-images',
-	labels: {
-		name: __( 'Attached images' ),
-		search_items: __( 'Search attachments' ),
-	},
-	mediaType: 'image',
-	// The post type's singular label (e.g. "Page"), threaded through so the
-	// shared panel can word its attach/detach copy for the current post type.
-	postTypeLabel: typeLabel,
-	// Empty-state message. Providing this also keeps the source in the tab list
-	// when it has no items, so it stays discoverable and the first image can be
-	// attached even with none yet.
-	emptyMessage: typeLabel
-		? sprintf(
-				// translators: %s: Name of the post type e.g: "Page".
-				__( 'No images attached to this %s.' ),
-				typeLabel
-		  )
-		: __( 'No images attached to this post.' ),
-	async fetch( query = {} ) {
-		return coreMediaFetch( getAttachedImagesQuery( postId, query ) );
-	},
-	async attach( mediaItems ) {
-		const attachmentIds = getImageAttachmentIds( mediaItems );
+const getAttachedImagesCategory = ( postId, typeLabel ) =>
+	createCoreMediaCategory( {
+		name: 'attached-images',
+		labels: {
+			name: __( 'Attached images' ),
+			search_items: __( 'Search attachments' ),
+		},
+		mediaType: 'image',
+		getQuery: ( query ) => getAttachedImagesQuery( postId, query ),
+		// The post type's singular label (e.g. "Page"), threaded through so the
+		// shared panel can word its attach/detach copy for the current post type.
+		postTypeLabel: typeLabel,
+		// Empty-state message. Providing this also keeps the source in the tab
+		// list when it has no items, so it stays discoverable and the first
+		// image can be attached even with none yet.
+		emptyMessage: typeLabel
+			? sprintf(
+					// translators: %s: Name of the post type e.g: "Page".
+					__( 'No images attached to this %s.' ),
+					typeLabel
+			  )
+			: __( 'No images attached to this post.' ),
+		async attach( mediaItems ) {
+			const attachmentIds = getImageAttachmentIds( mediaItems );
 
-		await Promise.all(
-			attachmentIds.map( ( attachmentId ) =>
-				saveAttachmentParent( attachmentId, postId )
-			)
-		);
+			await Promise.all(
+				attachmentIds.map( ( attachmentId ) =>
+					saveAttachmentParent( attachmentId, postId )
+				)
+			);
 
-		return attachmentIds.length;
-	},
-	async detach( mediaItem ) {
-		await saveAttachmentParent( mediaItem.id, 0 );
-	},
-	invalidate( query = {} ) {
-		invalidateAttachedImagesQueries( postId, query );
-	},
-} );
+			return attachmentIds.length;
+		},
+		async detach( mediaItem ) {
+			await saveAttachmentParent( mediaItem.id, 0 );
+		},
+		invalidate( query = {} ) {
+			invalidateAttachedImagesQueries( postId, query );
+		},
+	} );
 
 /** @type {InserterMediaCategory[]} */
 const inserterMediaCategories = [
-	{
+	createCoreMediaCategory( {
 		name: 'images',
 		labels: {
 			name: __( 'Images' ),
 			search_items: __( 'Search images' ),
 		},
 		mediaType: 'image',
-		async fetch( query = {} ) {
-			return coreMediaFetch( { ...query, media_type: 'image' } );
-		},
-	},
-	{
+		getQuery: ( query ) => ( { ...query, media_type: 'image' } ),
+	} ),
+	createCoreMediaCategory( {
 		name: 'videos',
 		labels: {
 			name: __( 'Videos' ),
 			search_items: __( 'Search videos' ),
 		},
 		mediaType: 'video',
-		async fetch( query = {} ) {
-			return coreMediaFetch( { ...query, media_type: 'video' } );
-		},
-	},
-	{
+		getQuery: ( query ) => ( { ...query, media_type: 'video' } ),
+	} ),
+	createCoreMediaCategory( {
 		name: 'audio',
 		labels: {
 			name: __( 'Audio' ),
 			search_items: __( 'Search audio' ),
 		},
 		mediaType: 'audio',
-		async fetch( query = {} ) {
-			return coreMediaFetch( { ...query, media_type: 'audio' } );
-		},
-	},
+		getQuery: ( query ) => ( { ...query, media_type: 'audio' } ),
+	} ),
 	{
 		name: 'openverse',
 		labels: {
