@@ -4,6 +4,7 @@
 import {
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
+	getRemoteBranchSha,
 	getRemoteTagShas,
 	getTagPushCommands,
 	getTagRefspec,
@@ -115,7 +116,35 @@ describe( 'getNpmReleaseGitRecoveryCommands', () => {
 			'git push origin "abc123:refs/heads/wp/latest"'
 		);
 		expect( commands ).toContain(
+			'git ls-remote --heads origin "refs/heads/wp/latest"'
+		);
+		expect( commands ).toContain(
 			'git ls-remote --tags origin "refs/tags/@wordpress/a11y@4.50.0" "refs/tags/@wordpress/a11y@4.50.0^{}"'
+		);
+	} );
+} );
+
+describe( 'getRemoteBranchSha', () => {
+	it( 'returns the exact remote branch ref SHA', async () => {
+		const git = {
+			raw: jest
+				.fn()
+				.mockResolvedValue(
+					[
+						'wrong-sha\trefs/heads/backport/wp/latest',
+						'expected-sha\trefs/heads/wp/latest',
+					].join( '\n' )
+				),
+		};
+
+		await expect(
+			getRemoteBranchSha( '/repo', 'wp/latest', { git } )
+		).resolves.toBe( 'expected-sha' );
+		expect( git.raw ).toHaveBeenCalledWith(
+			'ls-remote',
+			'--heads',
+			'origin',
+			'refs/heads/wp/latest'
 		);
 	} );
 } );

@@ -462,7 +462,7 @@ function getNpmReleaseGitRecoveryCommands( {
 	return [
 		'Push and verify the release branch:',
 		`git push origin "${ publishCommit }:refs/heads/${ npmReleaseBranch }"`,
-		`git ls-remote --heads origin "${ npmReleaseBranch }"`,
+		`git ls-remote --heads origin "refs/heads/${ npmReleaseBranch }"`,
 		...( packageTags.length
 			? [
 					'',
@@ -526,14 +526,13 @@ async function getRemoteBranchSha(
 	deps = {}
 ) {
 	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
-	const output = await git.raw(
-		'ls-remote',
-		'--heads',
-		'origin',
-		branchName
-	);
-	const [ firstLine = '' ] = output.trim().split( '\n' );
-	const [ sha ] = firstLine.split( /\s+/ );
+	const branchRef = `refs/heads/${ branchName }`;
+	const output = await git.raw( 'ls-remote', '--heads', 'origin', branchRef );
+	const matchingLine = output
+		.trim()
+		.split( '\n' )
+		.find( ( line ) => line.split( /\s+/ )[ 1 ] === branchRef );
+	const [ sha ] = ( matchingLine || '' ).split( /\s+/ );
 	return sha || null;
 }
 
@@ -1150,6 +1149,7 @@ async function publishNpmNext( options ) {
 module.exports = {
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
+	getRemoteBranchSha,
 	getRemoteTagShas,
 	getTagPushCommands,
 	getTagRefspec,
