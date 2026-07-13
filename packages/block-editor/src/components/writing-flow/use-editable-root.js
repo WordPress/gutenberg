@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { hasBlockSupport } from '@wordpress/blocks';
 
@@ -68,8 +68,7 @@ export function useHasEditableRoot() {
  * browsers).
  */
 export default function useEditableRoot() {
-	const { getSelectedBlockClientId, hasMultiSelection, isMultiSelecting } =
-		useSelect( blockEditorStore );
+	const registry = useRegistry();
 	const isZoomOut = useSelect(
 		( select ) => unlock( select( blockEditorStore ) ).isZoomOut(),
 		[]
@@ -81,6 +80,12 @@ export default function useEditableRoot() {
 			if ( ! enabled ) {
 				return;
 			}
+
+			const {
+				getSelectedBlockClientId,
+				hasMultiSelection,
+				isMultiSelecting,
+			} = registry.select( blockEditorStore );
 
 			node.setAttribute( 'contenteditable', 'true' );
 
@@ -159,6 +164,6 @@ export default function useEditableRoot() {
 				}
 			};
 		},
-		[ enabled ]
+		[ enabled, registry ]
 	);
 }
