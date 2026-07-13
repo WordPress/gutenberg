@@ -463,15 +463,13 @@ The process is identical to the one documented above when an RC is already out: 
 
 ### Troubleshooting
 
-> The release draft was created but it was empty/contained an error message
+> Release-note generation failed because no unreleased pull requests were found
 
-If you forget to assign the correct Milestone to your cherry picked PR(s) then the changelog may not be generated as you would expect.
+The workflow fails before creating a release draft. Verify that every cherry-picked PR is assigned to the release milestone, then rerun the workflow. Do not manually create the release notes or use a different milestone.
 
-It is important to always manually verify that the PRs shown in the changelog match up with those cherry picked to the release branch.
+If the milestone has been closed, you may reopen it for the release.
 
-Moreover, if the release includes only a single PR, then failing to assign the PR to the correct Milestone will cause an error to be displayed when generating the changelog. In this case you can edit the release notes to include details of the missing PR (manually copying the format from a previous release).
-
-If for any reason the Milestone has been closed, you may reopen it for the purposes of the release.
+After rerunning the workflow, manually verify that the PRs shown in the changelog match those cherry-picked to the release branch.
 
 > The draft release only contains 1 asset file. Other releases have x3.
 
