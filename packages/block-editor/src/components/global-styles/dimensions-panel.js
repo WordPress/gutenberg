@@ -744,10 +744,19 @@ export default function DimensionsPanel( {
 					<UnitControl
 						label={ __( 'Content width' ) }
 						labelPosition="top"
-						value={ localContentSizeValue ?? '' }
+						// Local-then-inherited: render the inherited value as the
+						// control's value at rest so the unit parses from it
+						// (e.g. "620px" keeps its unit rather than the value
+						// string sitting greyed-out behind a default px unit). It
+						// is only written to local on user change.
+						value={
+							localContentSizeValue ?? inheritedContentSizeValue
+						}
 						placeholder={
 							isContentSizePlaceholder
-								? inheritedContentSizeValue
+								? getNumericPlaceholder(
+										inheritedContentSizeValue
+								  )
 								: undefined
 						}
 						onChange={ ( nextContentSize ) => {
@@ -780,10 +789,17 @@ export default function DimensionsPanel( {
 					<UnitControl
 						label={ __( 'Wide width' ) }
 						labelPosition="top"
-						value={ localWideSizeValue ?? '' }
+						// Local-then-inherited: render the inherited value as the
+						// control's value at rest so the unit parses from it
+						// rather than the value string sitting greyed-out behind
+						// a default px unit. It is only written to local on user
+						// change.
+						value={ localWideSizeValue ?? inheritedWideSizeValue }
 						placeholder={
 							isWideSizePlaceholder
-								? inheritedWideSizeValue
+								? getNumericPlaceholder(
+										inheritedWideSizeValue
+								  )
 								: undefined
 						}
 						onChange={ ( nextWideSize ) => {
