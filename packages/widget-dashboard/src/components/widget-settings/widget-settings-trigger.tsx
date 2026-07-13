@@ -3,7 +3,7 @@
  */
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { moreVertical } from '@wordpress/icons';
+import { settings } from '@wordpress/icons';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { IconButton } from '@wordpress/ui';
@@ -80,7 +80,7 @@ export function WidgetSettingsTrigger( {
 
 	return (
 		<IconButton
-			icon={ moreVertical }
+			icon={ settings }
 			label={ __( 'Widget settings' ) }
 			variant="minimal"
 			tone="neutral"
