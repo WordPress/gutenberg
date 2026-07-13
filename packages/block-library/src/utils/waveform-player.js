@@ -24,8 +24,8 @@ import {
  * @param {Object}  metadata              - The track metadata.
  * @param {string}  metadata.title        - The track title.
  * @param {string}  metadata.artist       - The artist name.
- * @param {string}  metadata.image        - The artwork image URL.
- * @param {string}  metadata.imageAlt     - The artwork image alt text.
+ * @param {string}  metadata.image        - The track image URL.
+ * @param {string}  metadata.imageAlt     - The track image alt text.
  * @param {boolean} showPlayButtonArtwork - Whether to show artwork on the play button.
  */
 function updatePlayerMetadata(
@@ -72,8 +72,8 @@ function updatePlayerMetadata(
  * @param {string}   props.src                   - The audio file URL.
  * @param {string}   props.title                 - The track title.
  * @param {string}   props.artist                - The artist name.
- * @param {string}   props.image                 - The artwork image URL.
- * @param {string}   props.imageAlt              - The artwork image alt text.
+ * @param {string}   props.image                 - The track image URL.
+ * @param {string}   props.imageAlt              - The track image alt text.
  * @param {string}   props.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
  * @param {Function} props.onEnded               - Callback when the track finishes playing.
  * @param {boolean}  props.showPlayButtonArtwork - Whether to show artwork on the play button.

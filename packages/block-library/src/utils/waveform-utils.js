@@ -47,7 +47,7 @@ export function getWaveformColors( element ) {
  * @param {string} options.url           - The audio URL.
  * @param {string} options.title         - The track title.
  * @param {string} options.artist        - The track artist.
- * @param {string} options.artwork       - The album artwork URL.
+ * @param {string} options.artwork       - The track image URL.
  * @param {string} options.waveformColor - The waveform bar color.
  * @param {string} options.progressColor - The progress indicator color.
  * @param {string} options.buttonColor   - The play button color.
@@ -187,7 +187,7 @@ export function updateSeekControlLabel( instance, label ) {
  * Show the current artwork as the play button background.
  *
  * @param {Element} container  - The waveform player container element.
- * @param {string}  artworkUrl - The album artwork URL.
+ * @param {string}  artworkUrl - The track image URL.
  */
 export function setupPlayButtonArtwork( container, artworkUrl ) {
 	if ( ! artworkUrl ) {
@@ -230,8 +230,8 @@ export function logPlayError( error ) {
  * @param {string}   options.src                   - The audio file URL.
  * @param {string}   options.title                 - The track title.
  * @param {string}   options.artist                - The artist name.
- * @param {string}   options.image                 - The artwork image URL.
- * @param {string}   options.imageAlt              - The artwork image alt text.
+ * @param {string}   options.image                 - The track image URL.
+ * @param {string}   options.imageAlt              - The track image alt text.
  * @param {boolean}  options.autoPlay              - Whether to auto-play when ready.
  * @param {Function} options.onEnded               - Callback when track ends.
  * @param {Object}   options.labels                - Translated button labels.

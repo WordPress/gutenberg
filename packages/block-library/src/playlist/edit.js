@@ -369,7 +369,7 @@ const PlaylistEdit = ( {
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
-						label={ __( 'Show album art on play button' ) }
+						label={ __( 'Show track image on play button' ) }
 						isShownByDefault
 						hasValue={ () => showPlayButtonArtwork === true }
 						onDeselect={ () =>
@@ -377,7 +377,7 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							label={ __( 'Show album art on play button' ) }
+							label={ __( 'Show track image on play button' ) }
 							onChange={ toggleAttribute(
 								'showPlayButtonArtwork'
 							) }

@@ -117,7 +117,7 @@ describe( 'WaveformPlayer', () => {
 		title: 'Original Title',
 		artist: 'Original Artist',
 		image: 'https://example.com/cover.jpg',
-		imageAlt: 'A bright abstract album cover',
+		imageAlt: 'A bright abstract track image',
 		onEnded: () => {},
 	};
 
@@ -136,7 +136,7 @@ describe( 'WaveformPlayer', () => {
 				title: 'Original Title',
 				artist: 'Original Artist',
 				image: 'https://example.com/cover.jpg',
-				imageAlt: 'A bright abstract album cover',
+				imageAlt: 'A bright abstract track image',
 				showPlayButtonArtwork: false,
 			} )
 		);
@@ -257,7 +257,7 @@ describe( 'WaveformPlayer', () => {
 			'Original Artist',
 			{
 				artwork: 'https://example.com/cover.jpg',
-				artworkAlt: 'A bright abstract album cover',
+				artworkAlt: 'A bright abstract track image',
 			}
 		);
 	} );
