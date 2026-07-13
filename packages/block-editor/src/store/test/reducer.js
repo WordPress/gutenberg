@@ -4236,8 +4236,25 @@ describe( 'state', () => {
 			);
 		} );
 
+		// The reducer reads this context mapping from the registered block type.
+		beforeAll( () => {
+			registerBlockType( 'core/block', {
+				apiVersion: 3,
+				save: noop,
+				edit: noop,
+				category: 'reusable',
+				title: 'Pattern',
+				attributes: {
+					ref: { type: 'number' },
+					content: { type: 'object' },
+				},
+				providesContext: { 'pattern/overrides': 'content' },
+			} );
+		} );
+
 		afterAll( () => {
 			isContentBlock.mockRestore();
+			unregisterBlockType( 'core/block' );
 		} );
 
 		describe( 'edit mode', () => {

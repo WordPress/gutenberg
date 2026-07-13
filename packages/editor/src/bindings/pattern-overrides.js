@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-const CONTENT = 'content';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * @type {WPBlockBindingsSource}
@@ -36,7 +35,7 @@ export default {
 		return overridesValues;
 	},
 	setValues( { select, dispatch, clientId, bindings } ) {
-		const { getBlockAttributes, getBlockParentsByBlockName, getBlocks } =
+		const { getBlockAttributes, getBlockName, getBlockParents, getBlocks } =
 			select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
 		const blockName = currentBlockAttributes?.metadata?.name;
@@ -44,10 +43,14 @@ export default {
 			return;
 		}
 
-		const [ patternClientId ] = getBlockParentsByBlockName(
-			clientId,
-			'core/block',
-			true
+		// The closest provider owns the overrides. Its context mapping also tells us
+		// which attribute stores them.
+		const { getBlockType } = select( blocksStore );
+		const patternClientId = getBlockParents( clientId, true ).find(
+			( parentId ) =>
+				getBlockType( getBlockName( parentId ) )?.providesContext?.[
+					'pattern/overrides'
+				]
 		);
 
 		// Extract the updated attributes from the source bindings.
@@ -76,11 +79,13 @@ export default {
 			syncBlocksWithSameName( getBlocks() );
 			return;
 		}
+		const contentAttribute = getBlockType( getBlockName( patternClientId ) )
+			.providesContext[ 'pattern/overrides' ];
 		const currentBindingValue =
-			getBlockAttributes( patternClientId )?.[ CONTENT ];
+			getBlockAttributes( patternClientId )?.[ contentAttribute ];
 
 		dispatch( blockEditorStore ).updateBlockAttributes( patternClientId, {
-			[ CONTENT ]: {
+			[ contentAttribute ]: {
 				...currentBindingValue,
 				[ blockName ]: {
 					...currentBindingValue?.[ blockName ],
