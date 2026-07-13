@@ -168,11 +168,6 @@ test.describe( 'Block Notes', () => {
 
 		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
 		await resolveButton.click();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note marked as resolved.' } )
-		).toBeVisible();
 		await expect( thread ).toBeFocused();
 		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
 
@@ -181,11 +176,6 @@ test.describe( 'Block Notes', () => {
 
 		await blockNoteUtils.clickBlockNoteActionMenuItem( 'Reopen' );
 		await expect( resolveButton ).toBeEnabled();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note reopened.' } )
-		).toBeVisible();
 	} );
 
 	test( 'can reopen a resolved note when adding a reply', async ( {
@@ -200,14 +190,11 @@ test.describe( 'Block Notes', () => {
 
 		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
 		await resolveButton.click();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note marked as resolved.' } )
-		).toBeVisible();
 
 		await blockNoteUtils.openBlockNoteSidebar();
 		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
+		// Re-selecting the thread shows the Resolve button, now disabled,
+		// confirming the note was resolved.
 		await expect( resolveButton ).toBeDisabled();
 		const commentForm = page.getByRole( 'textbox', { name: 'Reply to' } );
 		await commentForm.fill( 'Test reply that reopens the comment.' );
@@ -217,11 +204,92 @@ test.describe( 'Block Notes', () => {
 			.click();
 
 		await expect( resolveButton ).toBeEnabled();
+	} );
+
+	test( 'shows a "Resolved" divider between active and resolved notes', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		// First block: this note stays active and unresolved.
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Stays active.' },
+			comment: 'Active note.',
+		} );
+		// Second block: this note will be resolved.
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Resolve me.' },
+			comment: 'Note to resolve.',
+		} );
+		// Third block: its note is orphaned when the block is deleted.
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Orphan me.' },
+			comment: 'Note losing its block.',
+		} );
+
+		await blockNoteUtils.openBlockNoteSidebar();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const separator = sidebar.locator(
+			'.editor-collab-sidebar-panel__status-separator'
+		);
+
+		// No resolved notes yet, so the divider is absent.
+		await expect( separator ).toBeHidden();
+
+		// Resolve the second note.
+		const resolvedThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Note to resolve.',
+		} );
+		await resolvedThread.click();
+		await expect( resolvedThread ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+
+		// The divider appearing confirms the resolve completed and now labels
+		// the resolved section.
+		await expect( separator ).toBeVisible();
+		await expect( separator ).toHaveText( 'Resolved' );
+
+		// Delete the second block via the store, orphaning its note. Clicking
+		// the block in the canvas is unreliable here because the selected
+		// note's block toolbar popover overlaps it.
+		const orphanBlock = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Orphan me.' } );
+		const orphanClientId = await orphanBlock.getAttribute( 'data-block' );
+		await page.evaluate(
+			( clientId ) =>
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.removeBlock( clientId ),
+			orphanClientId
+		);
+
+		// The orphaned note persists and is flagged as detached, rather than
+		// being auto-deleted or moved into the resolved section.
 		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note reopened.' } )
+			sidebar.getByRole( 'treeitem', {
+				name: 'Original block deleted. Note: Note losing its block.',
+			} )
 		).toBeVisible();
+
+		// Rows render in DOM order: unresolved notes first, then orphaned ones,
+		// both above the divider, with the resolved note below it.
+		await expect(
+			sidebar.locator( '.editor-collab-sidebar-panel > *' )
+		).toContainText( [
+			'Active note.',
+			'Note losing its block.',
+			'Resolved',
+			'Note to resolve.',
+		] );
 	} );
 
 	test( 'selecting a block or note marks it as an active', async ( {
@@ -1008,11 +1076,9 @@ test.describe( 'Block Notes', () => {
 			} );
 			await threadA.click();
 			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note marked as resolved.' } )
-			).toBeVisible();
+			// Resolving removes the note from the floating "Unresolved notes"
+			// view, which confirms the action completed.
+			await expect( threadA ).toBeHidden();
 
 			// Note B should still be visible and unresolved (expanded).
 			const threadB = settings.getByRole( 'treeitem', {
@@ -1051,11 +1117,9 @@ test.describe( 'Block Notes', () => {
 			} );
 			await firstThread.click();
 			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note marked as resolved.' } )
-			).toBeVisible();
+			// Resolving removes the note from the floating "Unresolved notes"
+			// view, which confirms the action completed.
+			await expect( firstThread ).toBeHidden();
 
 			// Click the title to deselect the block and its comment.
 			await editor.canvas
@@ -1360,11 +1424,6 @@ test.describe( 'Block Notes', () => {
 			// Resolving drops the highlight, so the marker is removed from the
 			// content and the note settles back to a block-level note.
 			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note marked as resolved.' } )
-			).toBeVisible();
 
 			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
 				0

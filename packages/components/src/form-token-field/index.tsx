@@ -33,9 +33,7 @@ import {
 	StyledHelp,
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const identity = ( value: string ) => value;
 
@@ -78,17 +76,10 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalExpandOnFocus = false,
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo,
-		__next40pxDefaultSize = false,
 		__experimentalAutoSelectFirstMatch = false,
 		tokenizeOnBlur = false,
 		help,
-	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >( props );
-
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'FormTokenField',
-		size: undefined,
-		__next40pxDefaultSize,
-	} );
+	} = props;
 
 	const defaultHelp = tokenizeOnSpace
 		? __( 'Separate with commas, spaces, or the Enter key.' )
@@ -840,8 +831,6 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					align="center"
 					gap={ 1 }
 					wrap
-					__next40pxDefaultSize={ __next40pxDefaultSize }
-					hasTokens={ !! value.length }
 				>
 					{ renderTokensAndInput() }
 				</TokensAndInputWrapperFlex>

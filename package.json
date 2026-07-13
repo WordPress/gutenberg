@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.5.0-rc.3",
+	"version": "23.5.2",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -68,7 +68,7 @@
 		"@playwright/test": "^1.61.1",
 		"@types/react": "^18.3.27",
 		"@types/react-dom": "^18.3.1",
-		"@typescript/native-preview": "^7.0.0-dev.20260423.1",
+		"@typescript/native": "npm:typescript@^7.0.2",
 		"@wordpress/env": "file:./packages/env",
 		"@wordpress/eslint-tools": "file:./tools/eslint",
 		"@wordpress/release-tools": "file:./tools/release",
@@ -81,9 +81,7 @@
 		"lint-staged": "^16.4.0",
 		"npm-run-all": "^4.1.5",
 		"patch-package": "^8.0.0",
-		"rimraf": "^5.0.10",
 		"syncpack": "^15.3.1",
-		"typescript": "^6.0.2",
 		"wait-on": "^8.0.1"
 	},
 	"overrides": {
@@ -92,8 +90,8 @@
 	"scripts": {
 		"build": "npm run --workspace @wordpress/build-scripts build:all --",
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
-		"clean:package-types": "tsgo --build --clean && rimraf --glob \"./packages/*/build-types\"",
-		"clean:packages": "rimraf --glob \"./packages/*/{build,build-module,build-wp,build-style}\" \"./build\"",
+		"clean:package-types": "npm run --workspace @wordpress/build-scripts clean:package-types --",
+		"clean:packages": "npm run --workspace @wordpress/build-scripts clean:packages --",
 		"dev": "npm run --workspace @wordpress/build-scripts dev --",
 		"distclean": "git clean --force -d -X",
 		"docs:api-ref": "npm run --workspace @wordpress/docs-tools docs:api-ref --",
@@ -105,7 +103,7 @@
 		"docs:gen": "npm run --workspace @wordpress/docs-tools docs:gen --",
 		"docs:theme-ref": "npm run --workspace @wordpress/docs-tools docs:theme-ref --",
 		"env": "wp-env",
-		"fixtures:clean": "rimraf --glob \"test/integration/fixtures/blocks/*.{json,serialized.html}\"",
+		"fixtures:clean": "npm run --workspace @wordpress/integration-tests fixtures:clean --",
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test:unit -- test/integration/full-content/ && npm run format test/integration/fixtures/blocks/*.json",
 		"fixtures:regenerate": "npm-run-all fixtures:clean fixtures:generate",
 		"format": "wp-scripts format",
@@ -113,8 +111,9 @@
 		"format:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script format",
 		"prelint:js": "npm run --if-present --workspaces prelint:js",
 		"lint": "concurrently \"npm run lint:lockfile\" \"npm run lint:tsconfig\" \"npm run lint:js\" \"npm run lint:pkg-json\" \"npm run lint:deps\" \"npm run lint:css\"",
-		"lint:css": "wp-scripts lint-style \"**/*.scss\" \"**/*.module.css\"",
+		"lint:css": "wp-scripts lint-style --suppress-location=tools/stylelint/stylelint-suppressions.json \"**/*.{css,pcss,scss}\"",
 		"lint:css:fix": "npm run lint:css -- --fix",
+		"lint:css:update-suppressions": "npm run lint:css -- --suppress && wp-scripts format tools/stylelint/stylelint-suppressions.json",
 		"lint:deps": "syncpack lint",
 		"lint:deps:fix": "syncpack fix",
 		"lint:js": "node ./tools/eslint/lint-js.cjs --concurrency=auto",
@@ -139,7 +138,7 @@
 		"prepublishOnly": "npm run build",
 		"rtc:http": "node ./test/e2e/bin/rtc-dev.mjs --mode=http",
 		"rtc:ws": "node ./test/e2e/bin/rtc-dev.mjs --mode=websockets",
-		"rtc:ws:slow": "cross-env RTC_WS_DELAY=100 npm run rtc:ws",
+		"rtc:ws:slow": "cross-env RTC_WS_DELAY=50 npm run rtc:ws",
 		"start": "npm run dev",
 		"prestorybook:build": "npm run build -- --skip-types",
 		"storybook:build": "npm run --workspace @wordpress/storybook storybook:build",
@@ -148,16 +147,16 @@
 		"storybook:e2e:build": "npm run --workspace @wordpress/storybook-playwright storybook:build",
 		"test": "npm-run-all lint test:unit",
 		"test:create-block": "npm run --workspace @wordpress/validation-tools test-create-block --",
-		"test:e2e": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-playwright --config playwright.config.ts",
-		"test:e2e:debug": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-playwright --config playwright.config.ts --ui",
+		"test:e2e": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.config.ts",
+		"test:e2e:debug": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.config.ts --ui",
 		"test:e2e:playwright": "npm run test:e2e",
 		"test:e2e:playwright:debug": "npm run test:e2e:debug",
-		"test:e2e:rtc-websocket": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-playwright --config playwright.rtc-websocket.config.ts",
-		"test:e2e:rtc-websocket:debug": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-playwright --config playwright.rtc-websocket.config.ts --ui",
+		"test:e2e:rtc-websocket": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.rtc-websocket.config.ts",
+		"test:e2e:rtc-websocket:debug": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.rtc-websocket.config.ts --ui",
 		"test:e2e:storybook": "npm exec --workspace @wordpress/storybook-playwright -- playwright test --config playwright.config.ts",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
-		"test:performance": "npm exec --workspace @wordpress/performance-tests -- wp-scripts test-playwright --config playwright.config.ts",
-		"test:performance:debug": "npm exec --workspace @wordpress/performance-tests -- wp-scripts test-playwright --config playwright.config.ts --debug",
+		"test:performance": "npm exec --workspace @wordpress/performance-tests -- wp-scripts test-e2e --config playwright.config.ts",
+		"test:performance:debug": "npm exec --workspace @wordpress/performance-tests -- wp-scripts test-e2e --config playwright.config.ts --debug",
 		"test:php": "npm-run-all lint:php test:unit:php",
 		"test:php:watch": "wp-env --config .wp-env.test.json run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script test:watch",
 		"test:unit": "npm run --workspace @wordpress/unit-tests test:unit --",
@@ -177,49 +176,11 @@
 		"wp-env": "wp-env",
 		"wp-env-test": "wp-env --config .wp-env.test.json"
 	},
-	"lint-staged": {
-		"*.{js,json,ts,tsx,yml,yaml}": [
-			"wp-scripts format"
-		],
-		"**/*.{js,ts,tsx,jsx}": [
-			"npm run prelint:js",
-			"node ./tools/eslint/lint-js.cjs --config eslint.config.strict.cjs"
-		],
-		"*.scss": [
-			"wp-scripts lint-style"
-		],
-		"package-lock.json": [
-			"npm run lint:lockfile"
-		],
-		"packages/*/package.json": [
-			"wp-scripts lint-pkg-json"
-		],
-		"{docs/toc.json,tools/docs/*.cjs,packages/{*/README.md,components/src/*/**/README.md,block-library/src/*/README.md}}": [
-			"npm run docs:gen"
-		],
-		"packages/**/*.{js,ts,tsx,json}": [
-			"npm run docs:api-ref",
-			"npm run docs:blocks",
-			"npm run docs:blocks-detail",
-			"npm run docs:theme-ref",
-			"npm run docs:check-api-docs-unstaged"
-		],
-		"packages/icons/src/library/*": [
-			"npm run -w packages/icons build"
-		],
-		"**/tsconfig.json": [
-			"npm run lint:tsconfig"
-		]
-	},
 	"workspaces": [
 		"packages/*",
 		"routes/*",
 		"storybook",
-		"test/e2e",
-		"test/integration",
-		"test/performance",
-		"test/storybook-playwright",
-		"test/unit",
+		"test/*",
 		"tools/*",
 		"widgets/*"
 	]

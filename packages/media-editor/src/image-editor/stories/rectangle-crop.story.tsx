@@ -395,7 +395,6 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
 							label="Aspect ratio"
 							hideLabelFromVision
 							value={ aspectRatioValue }
@@ -417,7 +416,6 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
 							label="Grid"
 							hideLabelFromVision
 							value={ gridMode }
@@ -829,7 +827,6 @@ const DebugComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
 							label="Format"
 							hideLabelFromVision
 							value={ exportFormat as 'image/jpeg' }

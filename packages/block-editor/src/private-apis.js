@@ -56,6 +56,7 @@ import {
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
+	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
 	colorEditingSettingsKey,
 } from './store/private-keys';
@@ -146,6 +147,7 @@ lock( privateApis, {
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
+	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
 	colorEditingSettingsKey,
 	useBlockElement,

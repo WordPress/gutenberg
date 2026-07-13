@@ -518,22 +518,25 @@ $block-inserter-tabs-height: 44px;
 		flex-grow: 1;
 	}
 
+	.block-editor-inserter__media-panel-footer {
+		// Keeps the footer at its natural height rather than collapsing to make
+		// room for the scrolling grid above.
+		flex-shrink: 0;
+		padding-top: $grid-unit-20;
+		padding-bottom: $grid-unit-20;
+		@include break-medium() {
+			// Align with the search field and grid gutters.
+			padding-left: $grid-unit-30;
+			padding-right: $grid-unit-30;
+		}
+	}
+
 	.block-editor-inserter__media-panel-attach {
 		// Match the padding (and so the height) of the "Open Media Library"
 		// footer button in the adjacent column, so the two line up.
 		&.components-button {
 			justify-content: center;
 			padding: $grid-unit-20;
-		}
-		// Balanced breathing room above and below the footer button.
-		// `flex-shrink: 0` keeps it full height as a flex child rather than
-		// collapsing to its content.
-		flex-shrink: 0;
-		margin-top: $grid-unit-20;
-		margin-bottom: $grid-unit-20;
-		@include break-medium() {
-			margin-left: $grid-unit-30;
-			margin-right: $grid-unit-30;
 		}
 	}
 
@@ -561,10 +564,10 @@ $block-inserter-tabs-height: 44px;
 		}
 	}
 
-	// When the attach footer is present it supplies the breathing room beneath
-	// the grid, so drop the list's own bottom padding — otherwise scrolling to
-	// the end leaves a doubled gap before the footer.
-	&.has-attach-footer .block-editor-inserter__media-list {
+	// When the footer is present it supplies the breathing room beneath the grid,
+	// so drop the list's own bottom padding — otherwise scrolling to the end
+	// leaves a doubled gap before the footer.
+	&.has-footer .block-editor-inserter__media-list {
 		padding-bottom: 0;
 	}
 }

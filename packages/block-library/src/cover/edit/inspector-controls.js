@@ -87,7 +87,6 @@ function CoverHeightInput( {
 
 	return (
 		<UnitControl
-			__next40pxDefaultSize
 			label={ __( 'Minimum height' ) }
 			id={ inputId }
 			isResetValueOnUnitChange

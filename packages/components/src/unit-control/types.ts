@@ -70,7 +70,10 @@ export type UnitSelectControlProps = {
 
 export type UnitControlProps = Pick< InputControlProps, 'size' > &
 	Omit< UnitSelectControlProps, 'size' | 'unit' > &
-	Omit< NumberControlProps, 'spinControls' | 'suffix' | 'type' > & {
+	Omit<
+		NumberControlProps,
+		'spinControls' | 'suffix' | 'type' | '__next40pxDefaultSize'
+	> & {
 		/**
 		 * If `true`, the unit `<select>` is hidden.
 		 *
@@ -114,4 +117,11 @@ export type UnitControlProps = Pick< InputControlProps, 'size' > &
 		 * @ignore
 		 */
 		__shouldNotWarnDeprecated36pxSize?: boolean;
+		/**
+		 * Start opting into the larger default height that will become the default size in a future version.
+		 *
+		 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+		 * @ignore
+		 */
+		__next40pxDefaultSize?: boolean;
 	};

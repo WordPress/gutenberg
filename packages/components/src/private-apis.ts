@@ -24,6 +24,7 @@ import {
 	ValidatedNumberControl,
 	ValidatedSelectControl,
 	ValidatedRadioControl,
+	ValidatedContentEditableControl,
 	ValidatedTextControl,
 	ValidatedTextareaControl,
 	ValidatedToggleControl,
@@ -32,9 +33,11 @@ import {
 import { ValidatedFormTokenField } from './validated-form-controls/components/form-token-field';
 import { colorEditingKey } from './color-palette/private-keys';
 import { isColorEditingEnabled } from './color-palette/utils';
+import ContentEditableControl from './content-editable-control';
 
 export const privateApis = {};
 lock( privateApis, {
+	ContentEditableControl,
 	__experimentalPopoverLegacyPositionToPlacement,
 	ComponentsContext,
 	Tabs,
@@ -54,6 +57,7 @@ lock( privateApis, {
 	ValidatedNumberControl,
 	ValidatedSelectControl,
 	ValidatedRadioControl,
+	ValidatedContentEditableControl,
 	ValidatedTextControl,
 	ValidatedTextareaControl,
 	ValidatedToggleControl,

@@ -62,6 +62,22 @@ export const ToolsPanelHiddenInnerWrapper = css`
 	}
 `;
 
+export function getToolsPanelStyles( {
+	columns,
+	hasInnerWrapper,
+	areAllOptionalControlsHidden,
+}: {
+	columns: number;
+	hasInnerWrapper: boolean;
+	areAllOptionalControlsHidden: boolean;
+} ) {
+	return css(
+		ToolsPanel( columns ),
+		hasInnerWrapper && ToolsPanelWithInnerWrapper( columns ),
+		areAllOptionalControlsHidden && ToolsPanelHiddenInnerWrapper
+	);
+}
+
 export const ToolsPanelHeader = css`
 	${ toolsPanelGrid.item.fullWidth }
 	gap: ${ space( 2 ) };
