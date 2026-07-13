@@ -1,0 +1,18 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"declarationDir": "build-types",
+		"moduleResolution": "bundler",
+		"rootDir": ".",
+		"types": [ "node" ]
+	},
+	"include": [
+		"esbuild-plugins/*.mjs",
+		"postcss-plugins/*.mjs",
+		"prebuilt/js/*.mjs",
+		"stylelint-plugins/*.mjs",
+		"vite-plugins/*.mjs"
+	],
+	"exclude": []
+}

@@ -2,7 +2,10 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
+		"emitDeclarationOnly": false,
 		"moduleResolution": "bundler",
+		"noEmit": true,
+		"rootDir": ".",
 		"types": [
 			"jest",
 			"node",
@@ -10,13 +13,12 @@
 			"react-css-custom-properties"
 		]
 	},
-	"exclude": [ "**/stories/**", "**/test/**", "**/*.story.*" ],
+	"references": [ { "path": "./tsconfig.json" } ],
 	"files": [ "global.d.ts" ],
-	"references": [
-		{ "path": "../compose" },
-		{ "path": "../deprecated" },
-		{ "path": "../element" },
-		{ "path": "../private-apis" },
-		{ "path": "../style-runtime" }
-	]
+	"include": [
+		"src/**/stories/**/*",
+		"src/**/test/**/*",
+		"src/**/*.story.*"
+	],
+	"exclude": []
 }
