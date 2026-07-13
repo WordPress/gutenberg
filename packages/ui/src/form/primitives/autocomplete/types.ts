@@ -20,6 +20,18 @@ export type AutocompleteEmptyProps = ComponentProps<
 	children?: React.ReactNode;
 };
 
+export type AutocompleteGroupProps = ComponentProps<
+	typeof _Autocomplete.Group
+> & {
+	children?: React.ReactNode;
+};
+
+export type AutocompleteGroupLabelProps = ComponentProps<
+	typeof _Autocomplete.GroupLabel
+> & {
+	children?: React.ReactNode;
+};
+
 export type AutocompleteInputProps = Omit<
 	ComponentProps< typeof _Autocomplete.Input >,
 	'size'

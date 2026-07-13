@@ -4,11 +4,6 @@
 $waveform-player-height: 100px;
 
 .wp-block-playlist {
-	// Clip content to respect border-radius.
-	// `overflow: hidden` is a fallback for browsers that don't support `overflow: clip`.
-	overflow: hidden;
-	overflow: clip;
-
 	// Main waveform player container.
 	.wp-block-playlist__waveform-player {
 		width: 100%;
@@ -42,8 +37,15 @@ $waveform-player-height: 100px;
 		margin-bottom: 0;
 	}
 
-	.waveform-subtitle {
+	.waveform-artist {
 		opacity: 0.7;
+	}
+
+	.waveform-info,
+	.waveform-artist,
+	.waveform-title,
+	.waveform-time {
+		font-size: inherit;
 	}
 
 	.wp-block-playlist__tracklist {

@@ -835,6 +835,108 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should select a single paragraph on triple click', async ( {
+		page,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'One two three' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+
+		// Move the caret into the first paragraph so its block toolbar
+		// repositions above it and stops overlapping the text.
+		await page.keyboard.press( 'ArrowUp' );
+
+		// Triple click selects the paragraph. The browser extends the forward
+		// selection into the next block at offset 0; that overshoot must not
+		// collapse the selection or extend it into the next block.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click( { clickCount: 3 } );
+
+		// Only the first paragraph is selected, not a multi-block selection
+		// reaching into the second.
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [ { name: 'core/paragraph' } ] );
+
+		// The whole paragraph is selected (not collapsed), so typing replaces
+		// its content.
+		await page.keyboard.type( 'a' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'a' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
+	} );
+
+	test( 'should select the whole paragraph on triple click from the block edge', async ( {
+		page,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'One two three' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+
+		// Deselect the block so the rich text element is not focused and the
+		// selection observer, not the rich text, dispatches the selection.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		const box = await paragraph.boundingBox();
+
+		// Triple click just left of the paragraph text (on the canvas
+		// padding), so the paragraph selection is made without focusing the
+		// rich text element.
+		await page.mouse.click( box.x - 5, box.y + box.height / 2, {
+			clickCount: 3,
+		} );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'One two three' },
+				},
+			] );
+
+		// The store selection spans the whole paragraph, not collapsed and
+		// not extended into the next block (some browsers report the
+		// selection boundary in the next element at offset 0).
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectionStart, getSelectionEnd } =
+						window.wp.data.select( 'core/block-editor' );
+					return {
+						startOffset: getSelectionStart().offset,
+						endOffset: getSelectionEnd().offset,
+					};
+				} )
+			)
+			.toEqual( {
+				startOffset: 0,
+				endOffset: 'One two three'.length,
+			} );
+	} );
+
 	test( 'should gradually multi-select', async ( {
 		page,
 		editor,

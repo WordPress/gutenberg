@@ -40,8 +40,8 @@ import {
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { VisuallyHidden, Tooltip } from '@wordpress/ui';
+import { speak } from '@wordpress/a11y';
 import {
 	MediaUpload,
 	uploadMedia,
@@ -839,6 +839,13 @@ export default function MediaEdit< Item >( {
 			setCustomValidity( undefined );
 		}
 	}, [ isTouched, field.isValid, validity ] );
+
+	useEffect( () => {
+		if ( isTouched && customValidity?.message ) {
+			speak( customValidity.message );
+		}
+	}, [ isTouched, customValidity?.message ] );
+
 	const onBlur = useCallback(
 		( event: React.FocusEvent< HTMLElement > ) => {
 			if ( isTouched ) {
@@ -962,25 +969,23 @@ export default function MediaEdit< Item >( {
 				/>
 			</VisuallyHidden>
 			{ customValidity && (
-				<div aria-live="polite">
-					<p
-						className={ clsx(
-							'components-validated-control__indicator',
-							{
-								'is-invalid': customValidity.type === 'invalid',
-								'is-valid': customValidity.type === 'valid',
-							}
-						) }
-					>
-						<WCIcon
-							className="components-validated-control__indicator-icon"
-							icon={ errorIcon }
-							size={ 16 }
-							fill="currentColor"
-						/>
-						{ customValidity.message }
-					</p>
-				</div>
+				<p
+					className={ clsx(
+						'components-validated-control__indicator',
+						{
+							'is-invalid': customValidity.type === 'invalid',
+							'is-valid': customValidity.type === 'valid',
+						}
+					) }
+				>
+					<WCIcon
+						className="components-validated-control__indicator-icon"
+						icon={ errorIcon }
+						size={ 16 }
+						fill="currentColor"
+					/>
+					{ customValidity.message }
+				</p>
 			) }
 		</div>
 	);

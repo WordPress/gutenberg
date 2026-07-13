@@ -11,7 +11,9 @@ import {
 	editMediaEntity,
 	persistEntityBlockAttributes,
 	persistEntityCRDTDoc,
+	setCollaborationSupported,
 } from '../private-actions';
+import { getSyncManager, hasSyncManager } from '../sync';
 import { saveCRDTDoc } from '../utils';
 
 jest.mock( '@wordpress/api-fetch' );
@@ -19,6 +21,10 @@ jest.mock( '@wordpress/blocks', () => ( {
 	...jest.requireActual( '@wordpress/blocks' ),
 	parse: jest.fn(),
 	serialize: jest.fn(),
+} ) );
+jest.mock( '../sync', () => ( {
+	getSyncManager: jest.fn(),
+	hasSyncManager: jest.fn(),
 } ) );
 jest.mock( '../utils', () => ( {
 	...jest.requireActual( '../utils' ),
@@ -435,5 +441,37 @@ describe( 'persistEntityBlockAttributes', () => {
 		);
 		expect( apiFetch ).toHaveBeenCalled();
 		expect( didPersist ).toBe( true );
+	} );
+} );
+
+describe( 'setCollaborationSupported', () => {
+	afterEach( () => {
+		getSyncManager.mockReset();
+		hasSyncManager.mockReset();
+	} );
+
+	it( 'unloads sync and resets sync undo state when disabling collaboration', () => {
+		const syncManager = {
+			unloadAll: jest.fn(),
+		};
+		const dispatch = Object.assign( jest.fn(), {
+			__unstableNotifySyncUndoManagerChange: jest.fn(),
+		} );
+		hasSyncManager.mockReturnValue( true );
+		getSyncManager.mockReturnValue( syncManager );
+
+		setCollaborationSupported( false )( { dispatch } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'SET_COLLABORATION_SUPPORTED',
+			supported: false,
+		} );
+		expect( syncManager.unloadAll ).toHaveBeenCalledTimes( 1 );
+		expect(
+			dispatch.__unstableNotifySyncUndoManagerChange
+		).toHaveBeenCalledWith( {
+			hasUndo: false,
+			hasRedo: false,
+		} );
 	} );
 } );

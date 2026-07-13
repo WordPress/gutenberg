@@ -9,32 +9,42 @@ import { render, screen } from '@testing-library/react';
 import { Divider } from '..';
 
 describe( 'props', () => {
-	test( 'should render correctly', () => {
+	test( 'should render a horizontal separator by default', () => {
 		render( <Divider /> );
-		expect( screen.getByRole( 'separator' ) ).toMatchSnapshot();
+
+		const divider = screen.getByRole( 'separator' );
+		expect( divider ).toHaveAttribute( 'aria-orientation', 'horizontal' );
 	} );
 
 	test( 'should render marginStart', () => {
-		render( <Divider /> );
 		render( <Divider marginStart={ 5 } /> );
 
-		const dividers = screen.getAllByRole( 'separator' );
-		expect( dividers[ 0 ] ).toMatchStyleDiffSnapshot( dividers[ 1 ] );
+		expect( screen.getByRole( 'separator' ) ).toHaveStyle( {
+			'--wp-components-divider-margin-start': 'calc(4px * 5)',
+		} );
 	} );
 
 	test( 'should render marginEnd', () => {
-		render( <Divider /> );
 		render( <Divider marginEnd={ 5 } /> );
 
-		const dividers = screen.getAllByRole( 'separator' );
-		expect( dividers[ 0 ] ).toMatchStyleDiffSnapshot( dividers[ 1 ] );
+		expect( screen.getByRole( 'separator' ) ).toHaveStyle( {
+			'--wp-components-divider-margin-end': 'calc(4px * 5)',
+		} );
 	} );
 
 	test( 'should render margin', () => {
-		render( <Divider /> );
 		render( <Divider margin={ 7 } /> );
 
-		const dividers = screen.getAllByRole( 'separator' );
-		expect( dividers[ 0 ] ).toMatchStyleDiffSnapshot( dividers[ 1 ] );
+		expect( screen.getByRole( 'separator' ) ).toHaveStyle( {
+			'--wp-components-divider-margin-start': 'calc(4px * 7)',
+			'--wp-components-divider-margin-end': 'calc(4px * 7)',
+		} );
+	} );
+
+	test( 'should render vertical orientation', () => {
+		render( <Divider orientation="vertical" /> );
+
+		const divider = screen.getByRole( 'separator' );
+		expect( divider ).toHaveAttribute( 'aria-orientation', 'vertical' );
 	} );
 } );

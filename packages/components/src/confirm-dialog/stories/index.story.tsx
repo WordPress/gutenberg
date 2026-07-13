@@ -36,6 +36,7 @@ const meta: Meta< typeof ConfirmDialog > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
+			notes: 'Will be superseded by [`AlertDialog`](?path=/docs/design-system-components-alertdialog--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 	},

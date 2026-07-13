@@ -49,7 +49,6 @@ import {
 	useRefEffect,
 	useViewportMatch,
 } from '@wordpress/compose';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 
 /**
@@ -66,7 +65,6 @@ import WelcomeGuide from '../welcome-guide';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useEditPostCommands from '../../commands/use-commands';
-import { useShouldIframe } from './use-should-iframe';
 import useNavigateToEntityRecord from '../../hooks/use-navigate-to-entity-record';
 import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initialization';
 
@@ -132,11 +130,7 @@ function useEditorStyles( settings ) {
 	] );
 }
 
-/**
- * @param {Object}  props
- * @param {boolean} props.isLegacy True for device previews where split view is disabled.
- */
-function MetaBoxesMain( { isLegacy } ) {
+function MetaBoxesMain() {
 	const [ isOpen, openHeight, hasAnyVisible ] = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { isMetaBoxLocationVisible } = select( editPostStore );
@@ -285,16 +279,12 @@ function MetaBoxesMain( { isLegacy } ) {
 		<div
 			// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
 			className="edit-post-layout__metaboxes edit-post-meta-boxes-main__liner"
-			hidden={ ! isLegacy && ! isOpen }
+			hidden={ ! isOpen }
 		>
 			<MetaBoxes location="normal" />
 			<MetaBoxes location="advanced" />
 		</div>
 	);
-
-	if ( isLegacy ) {
-		return contents;
-	}
 
 	const isAutoHeight = openHeight === undefined;
 	const usedOpenHeight = isShort ? 'auto' : openHeight;
@@ -378,7 +368,6 @@ function Layout( {
 	initialEdits,
 } ) {
 	useEditPostCommands();
-	const shouldIframe = useShouldIframe();
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
 		currentPost: { postId: currentPostId, postType: currentPostType },
@@ -401,7 +390,6 @@ function Layout( {
 		showMetaBoxes,
 		isWelcomeGuideVisible,
 		templateId,
-		isDevicePreview,
 	} = useSelect(
 		( select ) => {
 			const { get } = select( preferencesStore );
@@ -420,8 +408,9 @@ function Layout( {
 			const { getBlockSelectionStart, isZoomOut } = unlock(
 				select( blockEditorStore )
 			);
-			const { getEditorMode, getDefaultRenderingMode, getDeviceType } =
-				unlock( select( editorStore ) );
+			const { getEditorMode, getDefaultRenderingMode } = unlock(
+				select( editorStore )
+			);
 			const isNotDesignPostType =
 				! DESIGN_POST_TYPES.includes( currentPostType );
 			const isDirectlyEditingPattern =
@@ -452,7 +441,6 @@ function Layout( {
 					! isEditingTemplate
 						? _templateId
 						: null,
-				isDevicePreview: getDeviceType() !== 'Desktop',
 			};
 		},
 		[
@@ -590,7 +578,6 @@ function Layout( {
 							templateId={ templateId }
 							className={ className }
 							forceIsDirty={ hasActiveMetaboxes }
-							disableIframe={ ! shouldIframe }
 							// We should auto-focus the canvas (title) on load.
 							// eslint-disable-next-line jsx-a11y/no-autofocus
 							autoFocus={ ! isWelcomeGuideVisible }
@@ -600,11 +587,7 @@ function Layout( {
 							}
 							extraContent={
 								! isDistractionFree &&
-								showMetaBoxes && (
-									<MetaBoxesMain
-										isLegacy={ isDevicePreview }
-									/>
-								)
+								showMetaBoxes && <MetaBoxesMain />
 							}
 						>
 							<PostLockedModal />

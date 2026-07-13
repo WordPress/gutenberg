@@ -19,9 +19,8 @@ import { menu } from '@wordpress/icons';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
-import { privateApis as themePrivateApis } from '@wordpress/theme';
+import { ThemeProvider } from '@wordpress/theme';
 
 /**
  * Internal dependencies
@@ -32,10 +31,10 @@ import CanvasRenderer from '../canvas-renderer';
 import useRouteTitle from '../app/use-route-title';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
+import useSyncBodyBackground from './use-sync-body-background';
 import './style.scss';
 
 const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
-const { ThemeProvider } = unlock( themePrivateApis );
 
 export default function Root() {
 	const matches = useMatches();
@@ -62,15 +61,18 @@ export default function Root() {
 
 	const themeColors = useMemo( getAdminThemeColors, [] );
 
+	const layoutRef = useSyncBodyBackground();
+
 	return (
 		<SlotFillProvider>
 			<Tooltip.Provider>
 				<ThemeProvider
 					isRoot
-					color={ { ...themeColors, bg: '#f8f8f8' } }
+					color={ { ...themeColors, background: '#f8f8f8' } }
 				>
 					<ThemeProvider color={ themeColors }>
 						<div
+							ref={ layoutRef }
 							className={ clsx( 'boot-layout', {
 								'has-canvas': !! canvas || canvas === null,
 								'has-full-canvas': isFullScreen,
@@ -155,7 +157,10 @@ export default function Root() {
 							) }
 							<div className="boot-layout__surfaces">
 								<ThemeProvider
-									color={ { ...themeColors, bg: '#ffffff' } }
+									color={ {
+										...themeColors,
+										background: '#ffffff',
+									} }
 								>
 									<Outlet />
 									{ /* Render Canvas in Root to prevent remounting on route changes */ }

@@ -20,6 +20,7 @@ import type { ActionButton, View } from '../../types';
 import { data, fields, type SpaceObject } from './fixtures';
 
 const meta = {
+	tags: [ 'manifest' ],
 	title: 'DataViews/DataViewsPicker',
 	component: DataViewsPicker,
 } as Meta< typeof DataViewsPicker >;

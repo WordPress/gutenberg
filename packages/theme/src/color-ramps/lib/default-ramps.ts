@@ -5,7 +5,7 @@ export const DEFAULT_RAMPS: Record<
 	keyof typeof DEFAULT_SEED_COLORS,
 	RampResult
 > = {
-	bg: {
+	background: {
 		ramp: {
 			surface2: '#fcfcfc',
 			bgFill1: '#555',

@@ -61,6 +61,9 @@ test.describe( 'Block Style Variations', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
+		// Reset the global styles saved by these tests so they don't leak
+		// into other specs that share this theme's global styles.
+		await requestUtils.resetThemeGlobalStyles();
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
 			requestUtils.deleteAllPages(),

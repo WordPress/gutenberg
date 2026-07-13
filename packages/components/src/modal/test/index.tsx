@@ -269,9 +269,6 @@ describe( 'Modal', () => {
 	} );
 
 	describe( 'Focus handling', () => {
-		const originalGetClientRects =
-			window.HTMLElement.prototype.getClientRects;
-
 		const FocusMountDemo = ( {
 			focusOnMount,
 		}: Pick< ModalProps, 'focusOnMount' > ) => {
@@ -299,27 +296,6 @@ describe( 'Modal', () => {
 				</>
 			);
 		};
-
-		beforeEach( () => {
-			/**
-			 * The test environment does not have a layout engine, so we need to mock
-			 * the getClientRects method. This ensures that the focusable elements can be
-			 * found by the `focusOnMount` logic which depends on layout information
-			 * to determine if the element is visible or not.
-			 * See https://github.com/WordPress/gutenberg/blob/trunk/packages/dom/src/focusable.js#L55-L61.
-			 */
-			// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
-			window.HTMLElement.prototype.getClientRects = function () {
-				return [ 'trick-jsdom-into-having-size-for-element-rect' ];
-			};
-		} );
-
-		afterEach( () => {
-			// Restore original HTMLElement prototype.
-			// See beforeEach for details.
-			window.HTMLElement.prototype.getClientRects =
-				originalGetClientRects;
-		} );
 
 		it( 'should focus the Modal dialog by default when `focusOnMount` prop is not provided', async () => {
 			const user = userEvent.setup();

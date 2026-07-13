@@ -36,9 +36,6 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDashboardWidgets = true', 'before' );
 	}
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-classic-block-deprecation' ) ) {
-		wp_add_inline_script( 'wp-block-library', 'window.__experimentalClassicBlockDeprecation = true', 'before' );
-	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );

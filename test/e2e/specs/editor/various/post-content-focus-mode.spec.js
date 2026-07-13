@@ -224,7 +224,7 @@ test.describe( 'Post Content focus mode', () => {
 			const siteTitle = headerTemplatePart.getByRole( 'document', {
 				name: 'Block: Site Title',
 			} );
-			await expect( siteTitle ).toHaveAttribute( 'inert', 'true' );
+			await expect( siteTitle ).toHaveAttribute( 'inert' );
 		} );
 
 		test( 'inserts blocks into Post Content from different selection states', async ( {

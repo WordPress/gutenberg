@@ -9,13 +9,13 @@ const ruleName = 'plugin-wpds/no-token-fallback-values';
 
 /**
  * Matches `var(--wpds-<name>,` — the comma signals a fallback value.
- * Captures the token name (e.g. `--wpds-color-fg-content-neutral`).
+ * Captures the token name (e.g. `--wpds-color-foreground-content-neutral`).
  */
 const varWithFallbackRegex = /var\(\s*(--wpds-[\w-]+)\s*,/g;
 
 const messages = ruleMessages( ruleName, {
 	rejected: ( tokenName ) =>
-		`Do not add a fallback value for Design System token '${ tokenName }'. Fallbacks are injected automatically at build time.`,
+		`Do not add a fallback value for Design System token '${ tokenName }'. Fallbacks should be injected automatically at build time (see @wordpress/theme package README).`,
 } );
 
 /** @type {import('stylelint').Rule} */

@@ -208,6 +208,98 @@ describe( 'getStateStylesCSS', () => {
 			'.wp-block-test:hover { border-top-color: #0000ff !important; }\n.wp-block-test:hover { border-top-style: solid; }'
 		);
 	} );
+
+	it( 'adds background-image reset when state sets solid background-color', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					color: {
+						background: '#ff0000',
+					},
+				},
+				'.wp-block-test:hover'
+			)
+		).toBe(
+			'.wp-block-test:hover { background-color: #ff0000 !important; }\n.wp-block-test:hover { background-image: unset !important; }'
+		);
+	} );
+
+	it( 'does not add background-image reset when state also sets a legacy gradient', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					color: {
+						background: '#ff0000',
+						gradient: 'linear-gradient(135deg, #ff0000, #0000ff)',
+					},
+				},
+				'.wp-block-test:hover'
+			)
+		).toBe(
+			'.wp-block-test:hover { background: linear-gradient(135deg, #ff0000, #0000ff) !important; background-color: #ff0000 !important; }'
+		);
+	} );
+
+	it( 'does not add background-image reset when state also sets a modern gradient', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					color: {
+						background: '#ff0000',
+					},
+					background: {
+						gradient: 'linear-gradient(135deg, #ff0000, #0000ff)',
+					},
+				},
+				'.wp-block-test:hover'
+			)
+		).toBe(
+			'.wp-block-test:hover { background-color: #ff0000 !important; background-image: linear-gradient(135deg, #ff0000, #0000ff) !important; }'
+		);
+	} );
+
+	it( 'adds important fallback dimensions when aspect ratio is set', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					dimensions: {
+						aspectRatio: '16/9',
+					},
+				},
+				'.wp-block-test'
+			)
+		).toBe(
+			'.wp-block-test { height: unset !important; min-height: unset !important; aspect-ratio: 16/9 !important; }'
+		);
+	} );
+
+	it( 'does not add fallback dimensions when aspect ratio is the default', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					dimensions: {
+						aspectRatio: 'auto',
+					},
+				},
+				'.wp-block-test'
+			)
+		).toBe( '.wp-block-test { aspect-ratio: auto !important; }' );
+	} );
+
+	it( 'adds important fallback aspect ratio when height is set', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					dimensions: {
+						height: '20rem',
+					},
+				},
+				'.wp-block-test'
+			)
+		).toBe(
+			'.wp-block-test { height: 20rem !important; aspect-ratio: unset !important; }'
+		);
+	} );
 } );
 
 describe( 'getBlockStateStylesCSS', () => {
@@ -247,7 +339,7 @@ describe( 'getBlockStateStylesCSS', () => {
 				}
 			)
 		).toBe(
-			'.wp-elements-abc123 .wp-block-button__link:hover { background-color: #ff00d0 !important; }\n.wp-elements-abc123:hover { width: 50% !important; }'
+			'.wp-elements-abc123 .wp-block-button__link:hover { background-color: #ff00d0 !important; }\n.wp-elements-abc123 .wp-block-button__link:hover { background-image: unset !important; }\n.wp-elements-abc123:hover { width: 50% !important; }'
 		);
 	} );
 
@@ -264,7 +356,7 @@ describe( 'getBlockStateStylesCSS', () => {
 				}
 			)
 		).toBe(
-			'[data-block="client-id"] .wp-block-button__link { background-color: #ff00d0 !important; }\n[data-block="client-id"] { width: 50% !important; }'
+			'[data-block="client-id"] .wp-block-button__link { background-color: #ff00d0 !important; }\n[data-block="client-id"] .wp-block-button__link { background-image: unset !important; }\n[data-block="client-id"] { width: 50% !important; }'
 		);
 	} );
 } );
@@ -286,17 +378,31 @@ describe( 'getResponsiveStateCSSRules', () => {
 				},
 			},
 		} );
+
+		registerBlockType( 'test/state-image', {
+			apiVersion: 3,
+			title: 'State Image',
+			category: 'media',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: {
+				root: '.wp-block-test-state-image',
+				dimensions: '.wp-block-test-state-image img',
+			},
+		} );
 	} );
 
 	afterEach( () => {
 		unregisterBlockType( 'test/state-button' );
+		unregisterBlockType( 'test/state-image' );
 	} );
 
 	it( 'generates media-query scoped root styles for viewport states', () => {
 		expect(
 			getResponsiveStateCSSRules(
 				{
-					mobile: {
+					'@mobile': {
 						color: { text: 'red' },
 					},
 				},
@@ -312,7 +418,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 		expect(
 			getResponsiveStateCSSRules(
 				{
-					mobile: {
+					'@mobile': {
 						color: { background: '#ff00d0' },
 						dimensions: { width: '50%' },
 					},
@@ -321,7 +427,23 @@ describe( 'getResponsiveStateCSSRules', () => {
 				'.wp-elements-1'
 			)
 		).toEqual( [
-			'@media (width <= 480px){.wp-elements-1 .wp-block-button__link { background-color: #ff00d0 !important; }\n.wp-elements-1 { width: 50% !important; }}',
+			'@media (width <= 480px){.wp-elements-1 .wp-block-button__link { background-color: #ff00d0 !important; }\n.wp-elements-1 .wp-block-button__link { background-image: unset !important; }\n.wp-elements-1 { width: 50% !important; }}',
+		] );
+	} );
+
+	it( 'outputs explicit fill object fit for viewport states', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					'@mobile': {
+						dimensions: { objectFit: 'fill' },
+					},
+				},
+				'test/state-image',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 img { object-fit: fill !important; }}',
 		] );
 	} );
 
@@ -329,7 +451,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 		expect(
 			getResponsiveStateCSSRules(
 				{
-					mobile: {
+					'@mobile': {
 						':hover': {
 							color: { background: 'black' },
 						},
@@ -339,7 +461,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 				'.wp-elements-1'
 			)
 		).toEqual( [
-			'@media (width <= 480px){.wp-elements-1:hover { background-color: black !important; }}',
+			'@media (width <= 480px){.wp-elements-1:hover { background-color: black !important; }\n.wp-elements-1:hover { background-image: unset !important; }}',
 		] );
 	} );
 
@@ -347,7 +469,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 		expect(
 			getResponsiveStateCSSRules(
 				{
-					mobile: {
+					'@mobile': {
 						elements: {
 							link: {
 								color: { text: 'blue' },
@@ -388,7 +510,7 @@ describe( 'getCanvasStateStyleValue', () => {
 						color: { text: 'red' },
 					},
 				},
-				{ viewport: 'mobile', pseudo: ':hover' }
+				{ viewport: '@mobile', pseudo: ':hover' }
 			)
 		).toEqual( {
 			color: { text: 'red' },
@@ -402,13 +524,13 @@ describe( 'getCanvasStateStyleValue', () => {
 					':hover': {
 						color: { background: 'blue', text: 'red' },
 					},
-					mobile: {
+					'@mobile': {
 						':hover': {
 							color: { text: 'yellow' },
 						},
 					},
 				},
-				{ viewport: 'mobile', pseudo: ':hover' }
+				{ viewport: '@mobile', pseudo: ':hover' }
 			)
 		).toEqual( {
 			color: { background: 'blue', text: 'yellow' },
