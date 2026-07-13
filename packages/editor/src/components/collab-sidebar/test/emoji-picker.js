@@ -3,12 +3,25 @@
  */
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
-import { chunkRows, groupEmojis, searchEmojis } from '../emoji-picker';
+import EmojiPicker, {
+	chunkRows,
+	groupEmojis,
+	searchEmojis,
+} from '../emoji-picker';
 import { EMOJIBASE_LOCALES, resolveEmojibaseLocale } from '../emojibase-data';
+
+jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 
 describe( 'resolveEmojibaseLocale', () => {
 	it( 'falls back to English for empty/invalid input', () => {
@@ -166,6 +179,75 @@ describe( 'searchEmojis', () => {
 		const odd = [ { hexcode: 'X', emoji: '?' } ];
 		expect( () => searchEmojis( odd, 'foo', null ) ).not.toThrow();
 		expect( searchEmojis( odd, 'foo', null ) ).toEqual( [] );
+	} );
+} );
+
+describe( 'EmojiPicker search announcements', () => {
+	const originalFetch = global.fetch;
+
+	beforeEach( () => {
+		speak.mockClear();
+		window.gutenbergEmojibaseUrl = 'https://example.test/emojibase';
+		global.fetch = jest.fn( ( url ) =>
+			Promise.resolve( {
+				ok: true,
+				json: () =>
+					Promise.resolve(
+						String( url ).includes( 'data.json' )
+							? [
+									{
+										hexcode: '1F600',
+										emoji: '😀',
+										label: 'grinning face',
+										group: 0,
+									},
+									{
+										hexcode: '1F601',
+										emoji: '😁',
+										label: 'beaming face',
+										group: 0,
+									},
+							  ]
+							: { groups: [ { order: 0, message: 'Smileys' } ] }
+					),
+			} )
+		);
+	} );
+
+	afterEach( () => {
+		global.fetch = originalFetch;
+		delete window.gutenbergEmojibaseUrl;
+	} );
+
+	it( 'announces result counts and the empty state as the query settles', async () => {
+		const user = userEvent.setup();
+		render( <EmojiPicker onSelect={ () => {} } /> );
+
+		// Wait for the dataset to load before searching.
+		await screen.findAllByRole( 'gridcell' );
+
+		const searchbox = screen.getByRole( 'searchbox', {
+			name: 'Search emoji',
+		} );
+
+		await user.type( searchbox, 'face' );
+		// The announcement is debounced, so it fires once the typing
+		// settles rather than per keystroke.
+		await waitFor( () =>
+			expect( speak ).toHaveBeenCalledWith( '2 emojis found.' )
+		);
+
+		await user.clear( searchbox );
+		await user.type( searchbox, 'grinning' );
+		await waitFor( () =>
+			expect( speak ).toHaveBeenCalledWith( '1 emoji found.' )
+		);
+
+		await user.clear( searchbox );
+		await user.type( searchbox, 'zzz' );
+		await waitFor( () =>
+			expect( speak ).toHaveBeenCalledWith( 'No emoji found.' )
+		);
 	} );
 } );
 

@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { Composite, SearchControl } from '@wordpress/components';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { speak } from '@wordpress/a11y';
+import { useDebounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -257,15 +258,23 @@ export default function EmojiPicker( { onSelect }: EmojiPickerProps ) {
 	}, [ frequentKeys, recordByHexKey, query ] );
 
 	// Announce result counts during search so screen readers stay in sync
-	// with the visible grid as the user types.
+	// with the visible grid as the user types. Debounced (matching the
+	// block-inserter search pattern) so fast typing announces only the
+	// settled result, not every intermediate count.
+	const debouncedSpeak = useDebounce( speak, 500 );
 	useEffect( () => {
 		if ( ! query.trim() || isLoading ) {
 			return;
 		}
-		if ( matchCount === 0 ) {
-			speak( __( 'No emoji found.' ) );
-		}
-	}, [ query, matchCount, isLoading ] );
+		const message = matchCount
+			? sprintf(
+					/* translators: %d: number of emojis matching the search. */
+					_n( '%d emoji found.', '%d emojis found.', matchCount ),
+					matchCount
+			  )
+			: __( 'No emoji found.' );
+		debouncedSpeak( message );
+	}, [ query, matchCount, isLoading, debouncedSpeak ] );
 
 	// Reset scroll position when the search query changes so the user
 	// always sees the top match instead of a stale scroll offset.
