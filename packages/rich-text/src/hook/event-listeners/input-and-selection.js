@@ -9,6 +9,7 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { getActiveFormats } from '../../get-active-formats';
 import { isCollapsed } from '../../is-collapsed';
 import { updateFormats } from '../../update-formats';
+import { subscribeOwnedListener } from '../../subscribe-owned-listener';
 import { unlock } from '../../lock-unlock';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
@@ -297,18 +298,18 @@ export default ( props ) => ( element ) => {
 	// `input-rules.js` element-level listeners, which call `getValue()`
 	// reading `record.current` updated by our `onInput`. Use capture phase
 	// so we fire before any ancestor bubble handlers.
-	const unsubscribeInput = subscribeDelegatedListener(
+	const unsubscribeInput = subscribeOwnedListener(
 		element,
 		'input',
 		onInput,
 		true
 	);
-	const unsubscribeCompositionStart = subscribeDelegatedListener(
+	const unsubscribeCompositionStart = subscribeOwnedListener(
 		element,
 		'compositionstart',
 		onCompositionStart
 	);
-	const unsubscribeCompositionEnd = subscribeDelegatedListener(
+	const unsubscribeCompositionEnd = subscribeOwnedListener(
 		element,
 		'compositionend',
 		onCompositionEnd,
