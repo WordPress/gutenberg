@@ -395,7 +395,8 @@ export default function BorderPanel( {
 					isShownByDefault={ showBorderByDefault }
 					panelId={ panelId }
 				>
-					{ showInheritanceLabelIndicators && (
+					{ ( showInheritanceLabelIndicators ||
+						hasShadowControl ) && (
 						// Render the visible label as `BaseControl.VisualLabel`
 						// (which produces `.components-base-control__label`)
 						// rather than passing `label` to `BorderBoxControl`,
@@ -405,6 +406,13 @@ export default function BorderPanel( {
 						// `.components-base-control__label`, so the visible
 						// "Border" label has to be a `BaseControl` label to
 						// receive them.
+						//
+						// Render it whenever a Shadow control is also present so
+						// the two controls stay disambiguated (mirrors the
+						// Shadow label's `hasBorderControl` guard below, and
+						// trunk's `hideLabelFromVision={ ! hasShadowControl }`),
+						// even when inheritance indicators are off (e.g. in
+						// Global Styles).
 						<BaseControl.VisualLabel as="legend">
 							{ __( 'Border' ) }
 						</BaseControl.VisualLabel>
