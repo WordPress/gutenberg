@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { resolveStyles, privateHelpers } from '../build-inherited-value';
+import { resolveStyles, privateHelpers } from '../resolve-styles';
 import { useResolvedStyles } from '../inherited-value-context';
 
 import { globalStylesDataKey } from '../../../store/private-keys';

@@ -13,7 +13,7 @@ import {
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 } from '../../store/private-keys';
-import { resolveStyles } from './build-inherited-value';
+import { resolveStyles } from './resolve-styles';
 import { getVariationNameFromClass } from '../../hooks/block-style-variation';
 
 /**

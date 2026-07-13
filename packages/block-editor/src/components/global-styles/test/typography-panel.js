@@ -584,7 +584,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				// layer-merge stage, so the panel never receives a
 				// `{}` leaf in production (asserted at the helper
 				// level by `preset-round-trip.js` and at the builder
-				// level by `build-inherited-value.js`'s
+				// level by `resolve-styles.js`'s
 				// `explicit-empty normalization` describe). The
 				// panel-level guard only needs to defend against
 				// `''` and `null` leaves, which can flow through
