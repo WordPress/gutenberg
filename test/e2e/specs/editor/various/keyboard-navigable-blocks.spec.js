@@ -116,9 +116,7 @@ class KeyboardNavigableBlocks {
 	async expectLabelToHaveFocus( label ) {
 		// Poll: the focused element and its label may settle asynchronously
 		// (selection changes sync to the store on `selectionchange`).
-		const readActiveLabel = () => this.editor.getFocusOwnerLabel();
-
-		await expect.poll( readActiveLabel ).toBe( label );
+		await expect.poll( this.editor.getFocusOwnerLabel ).toBe( label );
 	}
 
 	async navigateThroughBlockToolbar() {
