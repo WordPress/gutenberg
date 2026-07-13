@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockIcon,
@@ -28,10 +28,12 @@ import { code } from '@wordpress/icons';
  */
 import { unlock } from '../lock-unlock';
 import HTMLEditModal from './modal';
+import Preview from './preview';
+import { isSafeStandaloneIframeMarkup } from './preview-utils';
 
 const { InnerContent } = unlock( blockEditorPrivateApis );
 
-export default function HTMLEdit( { clientId, attributes } ) {
+export default function HTMLEdit( { clientId, attributes, isSelected } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const registry = useRegistry();
 	const { updateBlock, replaceInnerBlocks } = useDispatch( blockEditorStore );
@@ -45,6 +47,10 @@ export default function HTMLEdit( { clientId, attributes } ) {
 	const blockProps = useBlockProps( {
 		className: 'block-library-html__edit',
 	} );
+	const shouldRenderInlinePreview = useMemo(
+		() => isSafeStandaloneIframeMarkup( content ),
+		[ content ]
+	);
 
 	// Re-parse the edited content: static HTML becomes the block's
 	// `innerContent` fragments and `<!-- wp:* -->` delimited segments become
@@ -156,7 +162,11 @@ export default function HTMLEdit( { clientId, attributes } ) {
 					</Button>
 				</VStack>
 			</InspectorControls>
-			<InnerContent clientId={ clientId } />
+			{ shouldRenderInlinePreview ? (
+				<Preview content={ content } isSelected={ isSelected } />
+			) : (
+				<InnerContent clientId={ clientId } />
+			) }
 			{ isModalOpen && (
 				<HTMLEditModal
 					onRequestClose={ () => setIsModalOpen( false ) }

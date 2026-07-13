@@ -10,6 +10,11 @@ import { SandBox } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { getSafeStandaloneIframeProps } from './preview-utils';
+
 // Default styles used to unset some of the styles
 // that might be inherited from the editor style.
 const DEFAULT_STYLES = `
@@ -36,15 +41,33 @@ export default function HTMLEditPreview( { content, isSelected } ) {
 		],
 		[ settingStyles ]
 	);
+	const standaloneIframeProps = useMemo(
+		() => getSafeStandaloneIframeProps( content ),
+		[ content ]
+	);
 
 	return (
 		<>
-			<SandBox
-				html={ content }
-				styles={ styles }
-				title={ __( 'Custom HTML Preview' ) }
-				tabIndex={ -1 }
-			/>
+			{ standaloneIframeProps ? (
+				<div className="block-library-html__iframe-preview">
+					<iframe
+						{ ...standaloneIframeProps }
+						className="block-library-html__iframe-preview-frame"
+						title={
+							standaloneIframeProps.title ||
+							__( 'Custom HTML Preview' )
+						}
+						tabIndex={ -1 }
+					/>
+				</div>
+			) : (
+				<SandBox
+					html={ content }
+					styles={ styles }
+					title={ __( 'Custom HTML Preview' ) }
+					tabIndex={ -1 }
+				/>
+			) }
 			{ /*
 				An overlay is added when the block is not selected in order to register click events.
 				Some browsers do not bubble up the clicks from the sandboxed iframe, which makes it
