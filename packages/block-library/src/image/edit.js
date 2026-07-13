@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { isBlobURL, createBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockBindingsSource } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import {
 	BlockIcon,
 	useBlockProps,
@@ -34,6 +34,7 @@ import {
 	useUploadMediaFromBlobURL,
 	useResumeUploadFromMarker,
 } from '../utils/hooks';
+import { unlock } from '../lock-unlock';
 import Image from './image';
 import { isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
@@ -157,6 +158,7 @@ export function ImageEdit( {
 	} = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 
+	const registry = useRegistry();
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
@@ -239,6 +241,21 @@ export function ImageEdit( {
 
 		if ( isBlobURL( media.url ) ) {
 			setTemporaryURL( media.url );
+
+			/*
+			 * A placeholder-initiated upload bypasses
+			 * useUploadMediaFromBlobURL, so no durable marker was written.
+			 * Adopt the queue item's marker so the upload can be reconnected
+			 * to this block after a reload.
+			 */
+			if ( ! attributes.uploadId ) {
+				const item = unlock(
+					registry.select( uploadStore )
+				).getItemByPreviewUrl( media.url );
+				if ( item?.uploadId ) {
+					setAttributes( { uploadId: item.uploadId } );
+				}
+			}
 			return;
 		}
 

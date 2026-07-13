@@ -49,6 +49,30 @@ describe( 'persistence wiring', () => {
 		expect( persisted[ 0 ].postId ).toBe( 42 );
 	} );
 
+	it( 'self-generates an uploadId when the caller provides none', async () => {
+		const file = new File( [ 'x' ], 'a.jpg', { type: 'image/jpeg' } );
+		await unlock( registry.dispatch( uploadStore ) ).addItem( { file } );
+		await flush();
+
+		const [ item ] = unlock( registry.select( uploadStore ) ).getAllItems();
+		expect( item.uploadId ).toEqual( expect.any( String ) );
+
+		const persisted = await getAllItems();
+		expect( persisted[ 0 ].uploadId ).toBe( item.uploadId );
+	} );
+
+	it( 'finds an item by its preview URL', async () => {
+		const file = new File( [ 'x' ], 'a.jpg', { type: 'image/jpeg' } );
+		await unlock( registry.dispatch( uploadStore ) ).addItem( { file } );
+		await flush();
+
+		const [ item ] = unlock( registry.select( uploadStore ) ).getAllItems();
+		const found = unlock(
+			registry.select( uploadStore )
+		).getItemByPreviewUrl( item.attachment?.url );
+		expect( found?.id ).toBe( item.id );
+	} );
+
 	it( 'addItems forwards uploadId and postId onto the queue item', async () => {
 		const file = new File( [ 'x' ], 'a.jpg', { type: 'image/jpeg' } );
 		registry.dispatch( uploadStore ).addItems( {

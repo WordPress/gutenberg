@@ -247,7 +247,10 @@ export function addItem( {
 			item: {
 				id: itemId,
 				batchId,
-				uploadId,
+				// Self-generate a durable marker when the caller does not
+				// provide one, so every queue item can be persisted and
+				// resumed (at minimum to the Media Library) after a reload.
+				uploadId: uploadId ?? uuidv4(),
 				postId,
 				status: ItemStatus.Processing,
 				sourceFile: cloneFile( file ),

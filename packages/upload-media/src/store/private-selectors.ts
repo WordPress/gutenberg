@@ -239,6 +239,25 @@ export function getItemByUploadId(
 }
 
 /**
+ * Returns the queue item whose preview (or source) URL matches the given URL.
+ *
+ * Lets a block that received a blob preview URL from an upload it did not
+ * start itself (e.g. via MediaPlaceholder) find the underlying queue item.
+ *
+ * @param state Upload state.
+ * @param url   Preview blob URL or source URL.
+ * @return The matching item, or undefined.
+ */
+export function getItemByPreviewUrl(
+	state: State,
+	url: string
+): QueueItem | undefined {
+	return state.queue.find(
+		( item ) => item.attachment?.url === url || item.sourceUrl === url
+	);
+}
+
+/**
  * Returns items loaded from durable storage that are awaiting a resume decision.
  *
  * @param state Upload state.
