@@ -8,13 +8,13 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { isSelectionForward } from '@wordpress/dom';
-import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
+import { canHostEditableRoot } from './use-editable-root';
 import { unlock } from '../../lock-unlock';
 
 const { ownsSelection } = unlock( richTextPrivateApis );
@@ -132,18 +132,15 @@ function getRichTextElement( node ) {
 export default function useSelectionObserver() {
 	const { multiSelect, selectBlock, selectionChange } =
 		useDispatch( blockEditorStore );
+	const blockEditorSelectors = useSelect( blockEditorStore );
 	const {
 		getBlockParents,
 		getBlockSelectionStart,
 		isMultiSelecting,
-		getBlockName,
-		getBlockMode,
 		getSelectionStart,
 		getSelectionEnd,
 		getSelectedBlockClientId,
-		getBlockRootClientId,
-		getBlockOrder,
-	} = useSelect( blockEditorStore );
+	} = blockEditorSelectors;
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -212,21 +209,10 @@ export default function useSelectionObserver() {
 						// always move it), which must not re-enable the wrapper
 						// after another block has been selected.
 						collapsedClientId === getSelectedBlockClientId() &&
-						// Not while the block is edited as HTML: its content is
-						// a textarea, not rich text, which the editing host
-						// would interfere with.
-						getBlockMode( collapsedClientId ) === 'visual' &&
-						hasBlockSupport(
-							getBlockName( collapsedClientId ),
-							'editableRoot',
-							false
-						) &&
-						// Only host when the block has sibling blocks for a
-						// native selection to extend into; a lone block is
-						// edited on its own element.
-						getBlockOrder(
-							getBlockRootClientId( collapsedClientId )
-						).length > 1
+						canHostEditableRoot(
+							blockEditorSelectors,
+							collapsedClientId
+						)
 					) {
 						setContentEditableWrapper( node, true );
 

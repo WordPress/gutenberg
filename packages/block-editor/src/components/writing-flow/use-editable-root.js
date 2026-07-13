@@ -14,6 +14,53 @@ import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
 /**
+ * Returns true when the writing flow wrapper can host editing for the given
+ * block: it supports `editableRoot`, is edited visually in the default
+ * editing mode, and has sibling blocks for a native selection to extend
+ * into, all of them editable.
+ *
+ * @param {Object} select   Bound block editor store selectors.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {boolean} Whether an editing host can host the block.
+ */
+export function canHostEditableRoot( select, clientId ) {
+	const {
+		getBlockName,
+		getBlockEditingMode,
+		getBlockMode,
+		getBlockRootClientId,
+		getBlockOrder,
+	} = select;
+
+	if (
+		! clientId ||
+		getBlockEditingMode( clientId ) !== 'default' ||
+		// Not when the block is edited as HTML: there is no rich text to
+		// host then, only a textarea, which the editing host would
+		// interfere with.
+		getBlockMode( clientId ) !== 'visual' ||
+		! hasBlockSupport( getBlockName( clientId ), 'editableRoot', false )
+	) {
+		return false;
+	}
+
+	// Only host when the block has sibling blocks for a native selection to
+	// extend into, all of them editable. A lone block (e.g. a single
+	// paragraph nested in an HTML block) is edited on its own element, and
+	// read-only siblings (e.g. pattern content without overrides enabled)
+	// must not become editable by inheriting from the host.
+	const siblings = getBlockOrder( getBlockRootClientId( clientId ) );
+	return (
+		siblings.length > 1 &&
+		siblings.every(
+			( siblingClientId ) =>
+				getBlockEditingMode( siblingClientId ) === 'default'
+		)
+	);
+}
+
+/**
  * Returns true when the writing flow wrapper should be contentEditable: the
  * selected block supports `editableRoot`.
  *
@@ -21,32 +68,10 @@ import { unlock } from '../../lock-unlock';
  */
 export function useHasEditableRoot() {
 	return useSelect( ( select ) => {
-		const {
-			getSelectedBlockClientId,
-			getBlockName,
-			getBlockEditingMode,
-			getBlockMode,
-			getBlockRootClientId,
-			getBlockOrder,
-		} = select( blockEditorStore );
-		const clientId = getSelectedBlockClientId();
-		return (
-			!! clientId &&
-			getBlockEditingMode( clientId ) === 'default' &&
-			// Not when the block is edited as HTML: there is no rich text
-			// to host then, only a textarea, which the editing host would
-			// interfere with.
-			getBlockMode( clientId ) === 'visual' &&
-			hasBlockSupport(
-				getBlockName( clientId ),
-				'editableRoot',
-				false
-			) &&
-			// Only host when the block has sibling blocks for a native
-			// selection to extend into. A lone block (e.g. a single
-			// paragraph nested in an HTML block) is edited on its own
-			// element, not through a canvas-wide editing host.
-			getBlockOrder( getBlockRootClientId( clientId ) ).length > 1
+		const selectors = select( blockEditorStore );
+		return canHostEditableRoot(
+			selectors,
+			selectors.getSelectedBlockClientId()
 		);
 	}, [] );
 }
