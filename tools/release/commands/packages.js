@@ -39,6 +39,12 @@ const NPM_RELEASE_TAG_PUSH_BATCH_SIZE = 25;
  */
 
 /**
+ * Npm release phases.
+ *
+ * @typedef {('prepare'|'publish'|'finalize'|'all')} ReleasePhase
+ */
+
+/**
  * Semantic Versioning labels.
  *
  * @typedef {('major'|'minor'|'patch')} SemVer
@@ -47,24 +53,26 @@ const NPM_RELEASE_TAG_PUSH_BATCH_SIZE = 25;
 /**
  * @typedef WPPackagesCommandOptions
  *
- * @property {boolean} [ci]             Disables interactive mode when executed in CI mode.
- * @property {string}  [releaseId]      Stable identifier used to resume the same release.
- * @property {string}  [repositoryPath] Relative path to the git repository.
- * @property {SemVer}  [semver]         The selected semantic versioning. Defaults to `patch`.
- * @property {string}  [wpVersion]      The major WordPress version number, example: `6.0`.
+ * @property {boolean}      [ci]             Disables interactive mode when executed in CI mode.
+ * @property {ReleasePhase} [phase]          The release phase. Defaults to `all`.
+ * @property {string}       [releaseId]      Stable identifier used to resume the same release.
+ * @property {string}       [repositoryPath] Relative path to the git repository.
+ * @property {SemVer}       [semver]         The selected semantic versioning. Defaults to `patch`.
+ * @property {string}       [wpVersion]      The major WordPress version number, example: `6.0`.
  */
 
 /**
  * @typedef WPPackagesConfig
  *
- * @property {string}      abortMessage            Abort Message.
- * @property {string}      distTag                 The dist-tag used for npm publishing.
- * @property {string}      gitWorkingDirectoryPath Git working directory path.
- * @property {boolean}     interactive             Whether to run in interactive mode.
- * @property {SemVer}      minimumVersionBump      The selected minimum version bump.
- * @property {string}      npmReleaseBranch        The selected branch for npm release.
- * @property {string}      releaseId               Stable identifier for this release invocation.
- * @property {ReleaseType} releaseType             The selected release type.
+ * @property {string}       abortMessage            Abort Message.
+ * @property {string}       distTag                 The dist-tag used for npm publishing.
+ * @property {string}       gitWorkingDirectoryPath Git working directory path.
+ * @property {boolean}      interactive             Whether to run in interactive mode.
+ * @property {SemVer}       minimumVersionBump      The selected minimum version bump.
+ * @property {string}       npmReleaseBranch        The selected branch for npm release.
+ * @property {ReleasePhase} phase                   The release phase.
+ * @property {string}       releaseId               Stable identifier for this release invocation.
+ * @property {ReleaseType}  releaseType             The selected release type.
  */
 
 /**
@@ -1738,6 +1746,14 @@ async function runPackagesRelease( config, customMessages, deps = {} ) {
 	}
 
 	const temporaryFolders = [];
+	if (
+		[ 'publish', 'finalize' ].includes( config.phase ) &&
+		! config.gitWorkingDirectoryPath
+	) {
+		throw new Error(
+			`The ${ config.phase } phase requires --repository-path pointing to the prepared release checkout.`
+		);
+	}
 	if ( ! config.gitWorkingDirectoryPath ) {
 		const gitPath = getRandomTemporaryPath();
 		config.gitWorkingDirectoryPath = gitPath;
@@ -1759,16 +1775,27 @@ async function runPackagesRelease( config, customMessages, deps = {} ) {
 		);
 	}
 
-	const releaseState = await prepareNpmReleaseFn( config );
-	const hasPreparedRelease = Boolean(
-		releaseState && ! releaseState.isFinalized
-	);
-	if ( releaseState?.isFinalized ) {
-		log( '>> This npm release invocation is already finalized.' );
+	let hasPreparedRelease = true;
+	if ( [ 'prepare', 'all' ].includes( config.phase ) ) {
+		const releaseState = await prepareNpmReleaseFn( config );
+		hasPreparedRelease = Boolean(
+			releaseState && ! releaseState.isFinalized
+		);
+		if ( releaseState?.isFinalized ) {
+			log( '>> This npm release invocation is already finalized.' );
+		}
+		if ( config.phase === 'prepare' && hasPreparedRelease ) {
+			log( '>> npm release preparation finished.' );
+		}
 	}
 
-	if ( hasPreparedRelease ) {
+	if ( hasPreparedRelease && [ 'publish', 'all' ].includes( config.phase ) ) {
 		await publishPreparedPackagesToNpmFn( config );
+	}
+	if (
+		hasPreparedRelease &&
+		[ 'finalize', 'all' ].includes( config.phase )
+	) {
 		await finalizePreparedNpmReleaseFn( config );
 	}
 
@@ -1783,7 +1810,10 @@ async function runPackagesRelease( config, customMessages, deps = {} ) {
 			)
 	);
 
-	if ( hasPreparedRelease ) {
+	if (
+		hasPreparedRelease &&
+		[ 'finalize', 'all' ].includes( config.phase )
+	) {
 		log(
 			'\n>> 🎉 WordPress packages are now published!\n\n',
 			'Let also people know on WordPress Slack and celebrate together.'
@@ -1804,9 +1834,21 @@ async function runPackagesRelease( config, customMessages, deps = {} ) {
  */
 function getConfig(
 	releaseType,
-	{ ci, releaseId, repositoryPath, semver = 'patch', wpVersion },
+	{
+		ci,
+		phase = 'all',
+		releaseId,
+		repositoryPath,
+		semver = 'patch',
+		wpVersion,
+	},
 	deps = {}
 ) {
+	if ( ! [ 'prepare', 'publish', 'finalize', 'all' ].includes( phase ) ) {
+		throw new Error(
+			`Unknown npm release phase "${ phase }". Expected prepare, publish, finalize, or all.`
+		);
+	}
 	const {
 		createReleaseIdFn = randomUUID,
 		githubRunId = process.env.GITHUB_RUN_ID,
@@ -1841,6 +1883,7 @@ function getConfig(
 		interactive: ! ci,
 		minimumVersionBump: semver,
 		npmReleaseBranch,
+		phase,
 		releaseId: stableReleaseId,
 		releaseType,
 	};
@@ -1898,9 +1941,9 @@ module.exports = {
 	createNpmReleaseFinalizationMarker,
 	createNpmReleaseMarker,
 	finalizePreparedNpmRelease,
+	getConfig,
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
-	getConfig,
 	getPendingPreparedNpmReleaseState,
 	getPreparedNpmReleasePackages,
 	getPreparedNpmReleaseState,

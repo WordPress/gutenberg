@@ -19,6 +19,11 @@ const { runPerformanceTests } = require( './commands/performance' );
 
 const semverOption = [ '--semver <semver>', 'Semantic Versioning', 'patch' ];
 const ciOption = [ '-c, --ci', 'Run in CI (non interactive)' ];
+const phaseOption = [
+	'--phase <phase>',
+	'Release phase: prepare, publish, finalize, or all.',
+	'all',
+];
 const repositoryPathOption = [
 	'--repository-path <repository-path>',
 	'Relative path to the git repository.',
@@ -33,6 +38,7 @@ program
 	.alias( 'npm-latest' )
 	.option( ...semverOption )
 	.option( ...ciOption )
+	.option( ...phaseOption )
 	.option( ...releaseIdOption )
 	.option( ...repositoryPathOption )
 	.description(
@@ -44,6 +50,7 @@ program
 	.command( 'publish-npm-packages-bugfix-latest' )
 	.alias( 'npm-bugfix' )
 	.option( ...ciOption )
+	.option( ...phaseOption )
 	.option( ...releaseIdOption )
 	.option( ...repositoryPathOption )
 	.description(
@@ -56,6 +63,7 @@ program
 	.alias( 'npm-wp' )
 	.requiredOption( '--wp-version <wpVersion>', 'WordPress version' )
 	.option( ...ciOption )
+	.option( ...phaseOption )
 	.option( ...releaseIdOption )
 	.option( ...repositoryPathOption )
 	.description(
@@ -68,6 +76,7 @@ program
 	.alias( 'npm-next' )
 	.option( ...semverOption )
 	.option( ...ciOption )
+	.option( ...phaseOption )
 	.option( ...releaseIdOption )
 	.option( ...repositoryPathOption )
 	.description(

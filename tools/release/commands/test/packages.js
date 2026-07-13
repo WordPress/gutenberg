@@ -312,40 +312,68 @@ describe( 'createNpmReleaseFinalizationMarker', () => {
 } );
 
 describe( 'runPackagesRelease', () => {
-	const getTestConfig = () => ( {
+	const getTestConfig = ( phase ) => ( {
 		abortMessage: 'Aborting!',
 		gitWorkingDirectoryPath: '/repo',
 		interactive: false,
+		phase,
 	} );
 
-	it( 'runs the durable release lifecycle in order', async () => {
-		const config = getTestConfig();
-		const finalizePreparedNpmReleaseFn = jest.fn();
-		const prepareNpmReleaseFn = jest.fn().mockResolvedValue( true );
-		const publishPreparedPackagesToNpmFn = jest.fn();
+	it.each( [ 'publish', 'finalize' ] )(
+		'requires a prepared checkout for the %s phase',
+		async ( phase ) => {
+			await expect(
+				runPackagesRelease(
+					{
+						...getTestConfig( phase ),
+						gitWorkingDirectoryPath: undefined,
+					},
+					[]
+				)
+			).rejects.toThrow(
+				`The ${ phase } phase requires --repository-path pointing to the prepared release checkout.`
+			);
+			expect( console ).toHaveLogged();
+		}
+	);
+
+	it.each( [
+		[ 'prepare', [ 'prepare' ] ],
+		[ 'publish', [ 'publish' ] ],
+		[ 'finalize', [ 'finalize' ] ],
+		[ 'all', [ 'prepare', 'publish', 'finalize' ] ],
+	] )( 'runs only the %s phase steps', async ( phase, expectedSteps ) => {
+		const config = getTestConfig( phase );
+		const phaseSteps = {
+			finalize: jest.fn(),
+			prepare: jest.fn().mockResolvedValue( true ),
+			publish: jest.fn(),
+		};
 
 		await runPackagesRelease( config, [], {
-			finalizePreparedNpmReleaseFn,
-			prepareNpmReleaseFn,
-			publishPreparedPackagesToNpmFn,
+			finalizePreparedNpmReleaseFn: phaseSteps.finalize,
+			prepareNpmReleaseFn: phaseSteps.prepare,
+			publishPreparedPackagesToNpmFn: phaseSteps.publish,
 		} );
 
-		expect( prepareNpmReleaseFn ).toHaveBeenCalledTimes( 1 );
-		expect( prepareNpmReleaseFn ).toHaveBeenCalledWith( config );
-		expect( publishPreparedPackagesToNpmFn ).toHaveBeenCalledTimes( 1 );
-		expect( publishPreparedPackagesToNpmFn ).toHaveBeenCalledWith( config );
-		expect( finalizePreparedNpmReleaseFn ).toHaveBeenCalledTimes( 1 );
-		expect( finalizePreparedNpmReleaseFn ).toHaveBeenCalledWith( config );
-		expect(
-			prepareNpmReleaseFn.mock.invocationCallOrder[ 0 ]
-		).toBeLessThan(
-			publishPreparedPackagesToNpmFn.mock.invocationCallOrder[ 0 ]
+		expect( phaseSteps.prepare.mock.calls ).toEqual(
+			expectedSteps.includes( 'prepare' ) ? [ [ config ] ] : []
 		);
-		expect(
-			publishPreparedPackagesToNpmFn.mock.invocationCallOrder[ 0 ]
-		).toBeLessThan(
-			finalizePreparedNpmReleaseFn.mock.invocationCallOrder[ 0 ]
+		expect( phaseSteps.publish.mock.calls ).toEqual(
+			expectedSteps.includes( 'publish' ) ? [ [ config ] ] : []
 		);
+		expect( phaseSteps.finalize.mock.calls ).toEqual(
+			expectedSteps.includes( 'finalize' ) ? [ [ config ] ] : []
+		);
+		const actualSteps = Object.entries( phaseSteps )
+			.filter( ( [ , step ] ) => step.mock.calls.length )
+			.sort(
+				( [ , first ], [ , second ] ) =>
+					first.mock.invocationCallOrder[ 0 ] -
+					second.mock.invocationCallOrder[ 0 ]
+			)
+			.map( ( [ step ] ) => step );
+		expect( actualSteps ).toEqual( expectedSteps );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -353,7 +381,7 @@ describe( 'runPackagesRelease', () => {
 		const finalizePreparedNpmReleaseFn = jest.fn();
 		const publishPreparedPackagesToNpmFn = jest.fn();
 
-		await runPackagesRelease( getTestConfig(), [], {
+		await runPackagesRelease( getTestConfig( 'all' ), [], {
 			finalizePreparedNpmReleaseFn,
 			prepareNpmReleaseFn: jest.fn(),
 			publishPreparedPackagesToNpmFn,
@@ -368,7 +396,7 @@ describe( 'runPackagesRelease', () => {
 		const finalizePreparedNpmReleaseFn = jest.fn();
 		const publishPreparedPackagesToNpmFn = jest.fn();
 
-		await runPackagesRelease( getTestConfig(), [], {
+		await runPackagesRelease( getTestConfig( 'all' ), [], {
 			finalizePreparedNpmReleaseFn,
 			prepareNpmReleaseFn: jest.fn().mockResolvedValue( {
 				isFinalized: true,
@@ -380,6 +408,16 @@ describe( 'runPackagesRelease', () => {
 		expect( publishPreparedPackagesToNpmFn ).not.toHaveBeenCalled();
 		expect( finalizePreparedNpmReleaseFn ).not.toHaveBeenCalled();
 		expect( console ).toHaveLogged();
+	} );
+
+	it( 'does not report a successful preparation when nothing was prepared', async () => {
+		await runPackagesRelease( getTestConfig( 'prepare' ), [], {
+			prepareNpmReleaseFn: jest.fn(),
+		} );
+
+		expect( console ).not.toHaveLoggedWith(
+			'>> npm release preparation finished.'
+		);
 	} );
 } );
 
@@ -1627,6 +1665,7 @@ describe( 'preparePackagesForNpm', () => {
 		interactive: false,
 		minimumVersionBump: 'patch',
 		npmReleaseBranch: releaseType === 'next' ? 'wp/next' : 'wp/latest',
+		phase: 'prepare',
 		releaseType,
 	} );
 
@@ -2031,6 +2070,33 @@ describe( 'finalizePreparedNpmRelease', () => {
 } );
 
 describe( 'getConfig', () => {
+	it( 'configures independent release phases', () => {
+		expect(
+			getConfig(
+				'next',
+				{
+					ci: true,
+					phase: 'publish',
+					repositoryPath: '/repo',
+				},
+				{ githubRunId: '123456789' }
+			)
+		).toEqual(
+			expect.objectContaining( {
+				distTag: 'next',
+				interactive: false,
+				npmReleaseBranch: 'wp/next',
+				phase: 'publish',
+			} )
+		);
+	} );
+
+	it( 'rejects unknown release phases', () => {
+		expect( () => getConfig( 'latest', { phase: 'resume' } ) ).toThrow(
+			'Unknown npm release phase "resume". Expected prepare, publish, finalize, or all.'
+		);
+	} );
+
 	it( 'uses the stable GitHub Actions run ID in CI', () => {
 		expect(
 			getConfig(
