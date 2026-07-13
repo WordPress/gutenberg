@@ -188,6 +188,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			postTypeEntities,
 			isInRevisionsMode,
 			currentRevisionId,
+			isCollaborationEnabled,
 		} = useSelect(
 			( select ) => {
 				const {
@@ -197,6 +198,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					getDefaultRenderingMode,
 					isRevisionsMode: _isRevisionsMode,
 					getCurrentRevisionId: _getCurrentRevisionId,
+					isCollaborationEnabledForCurrentPost,
 				} = unlock( select( editorStore ) );
 				const { getEntitiesConfig, getEntityRecordEdits } =
 					select( coreStore );
@@ -239,6 +241,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							: null,
 					isInRevisionsMode: _isRevisionsMode(),
 					currentRevisionId: _getCurrentRevisionId(),
+					isCollaborationEnabled:
+						isCollaborationEnabledForCurrentPost(),
 				};
 			},
 			[ post.type, post.id, hasTemplate ]
@@ -345,7 +349,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			if ( ! registry.select( editorStore ).__unstableIsEditorReady() ) {
 				setupEditor( post, initialEdits, settings.template );
 			}
-			if ( settings.autosave ) {
+			if ( settings.autosave && ! isCollaborationEnabled ) {
 				// The only place core exposes the autosave ID is the edit
 				// link, always `revision.php?revision=<autosave ID>`.
 				const autosaveId = Number(
