@@ -336,9 +336,7 @@ class BlockToolbarUtils {
 		// (selection changes sync to the store on `selectionchange`). When a
 		// focused editing host owns the selection, the editable element
 		// containing the selection owns the focus.
-		const readActiveLabel = () => this.editor.getFocusOwnerLabel();
-
-		await expect.poll( readActiveLabel ).toBe( label );
+		await expect.poll( this.editor.getFocusOwnerLabel ).toBe( label );
 	}
 
 	async testScrollable( scrollableElement, elementToTest ) {
