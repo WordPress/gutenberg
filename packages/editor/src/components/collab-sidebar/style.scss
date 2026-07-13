@@ -148,14 +148,31 @@
 	font-style: italic;
 }
 
-.editor-collab-sidebar-panel__note-form textarea {
-	@include input-control;
-	// Vertical padding is to match the standard 40px control height when rows=1,
-	// in conjunction with the 20px line-height.
-	// "Standard" metrics are 10px 12px, but subtracts 1px each to account for the border width.
-	padding: 9px 11px;
-	line-height: 20px !important;
-	display: block;
+// The ContentEditableControl shell provides its own base styling (border, focus
+// ring, padding). Scope the few multi-line and inline-format tweaks the note
+// form needs to the editable element as rendered inside the note form. The
+// shell exposes no stable class name, so target the editable by its role.
+.editor-collab-sidebar-panel__note-form [role="textbox"] {
+	line-height: 20px;
+	max-height: calc(20px * 20 + 18px); // 20 rows + vertical padding.
+	overflow-y: auto;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+
+	// Inline formats inherit the surrounding text styles but keep
+	// their semantic emphasis (RichText renders <strong>, <em>, etc.).
+	code {
+		font-family: Menlo, Consolas, monaco, monospace;
+		font-size: 0.9em;
+		padding: 0 2px;
+		background: $gray-100;
+		border-radius: 2px;
+	}
+
+	a {
+		color: var(--wp-admin-theme-color);
+		text-decoration: underline;
+	}
 }
 
 // Visually hidden until focused (skip link pattern)

@@ -28,7 +28,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, _x } from '@wordpress/i18n';
-import { audio as icon } from '@wordpress/icons';
+import { playlist as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 
 /**

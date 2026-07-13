@@ -777,34 +777,116 @@ async function pushNpmReleaseGitMetadata(
 }
 
 /**
+ * Publishes locally versioned packages, then pushes and verifies Git metadata.
+ *
+ * @param {Object}   options                          Options.
+ * @param {string}   options.distTag                  The dist-tag used for npm publishing.
+ * @param {string}   options.gitWorkingDirectoryPath  Git working directory path.
+ * @param {string}   options.noVerifyAccessFlag       Lerna no-verify-access flag.
+ * @param {string}   options.npmReleaseBranch         Npm release branch.
+ * @param {string}   options.yesFlag                  Lerna yes flag.
+ * @param {Object}   deps                             Dependencies.
+ * @param {Function} deps.commandFn                   Command runner.
+ * @param {Object}   deps.git                         Git client.
+ * @param {Function} deps.getNpmReleasePackagesFn     Gets release package metadata.
+ * @param {Function} deps.pushNpmReleaseGitMetadataFn Pushes Git metadata.
+ * @param {Function} deps.runNpmPublishPreflightFn    Runs npm preflight.
+ */
+async function publishVersionedPackagesToNpm(
+	{
+		distTag,
+		gitWorkingDirectoryPath,
+		noVerifyAccessFlag,
+		npmReleaseBranch,
+		yesFlag,
+	},
+	deps = {}
+) {
+	const {
+		commandFn = command,
+		git = SimpleGit( gitWorkingDirectoryPath ),
+		getNpmReleasePackagesFn = getNpmReleasePackages,
+		pushNpmReleaseGitMetadataFn = pushNpmReleaseGitMetadata,
+		runNpmPublishPreflightFn = runNpmPublishPreflight,
+	} = deps;
+	const releasePackages = await getNpmReleasePackagesFn(
+		gitWorkingDirectoryPath
+	);
+	await runNpmPublishPreflightFn( {
+		gitWorkingDirectoryPath,
+		releasePackages,
+	} );
+
+	log( '>> Publishing modified packages to npm.' );
+	try {
+		await commandFn(
+			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'inherit',
+			}
+		);
+	} catch {
+		log(
+			'>> Trying to finish failed publishing of modified npm packages.'
+		);
+		// A failed Lerna publish can leave temporary `gitHead` manifest changes.
+		// Reset to the version commit so `from-package` sees a clean tree on retry.
+		await git.reset( 'hard' );
+		await commandFn(
+			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'inherit',
+			}
+		);
+	}
+
+	const publishCommit = await git.revparse( [ 'HEAD' ] );
+	await pushNpmReleaseGitMetadataFn( {
+		gitWorkingDirectoryPath,
+		npmReleaseBranch,
+		packageTags: releasePackages.map( ( { tagName } ) => tagName ),
+		publishCommit,
+	} );
+}
+
+/**
  * Publishes all changed packages to npm.
  *
  * @param {WPPackagesConfig} config Command config.
+ * @param {Object}           deps   Dependencies.
  *
  * @return {?string} The optional commit's hash when packages published to npm.
  */
-async function publishPackagesToNpm( {
-	distTag,
-	gitWorkingDirectoryPath,
-	interactive,
-	minimumVersionBump,
-	npmReleaseBranch,
-	releaseType,
-} ) {
+async function publishPackagesToNpm(
+	{
+		distTag,
+		gitWorkingDirectoryPath,
+		interactive,
+		minimumVersionBump,
+		npmReleaseBranch,
+		releaseType,
+	},
+	deps = {}
+) {
+	const {
+		commandFn = command,
+		git = SimpleGit( gitWorkingDirectoryPath ),
+		publishVersionedPackagesToNpmFn = publishVersionedPackagesToNpm,
+	} = deps;
 	log( '>> Installing npm packages.' );
-	await command( 'npm ci', {
+	await commandFn( 'npm ci', {
 		cwd: gitWorkingDirectoryPath,
 	} );
 
 	log( '>> Current npm user:' );
-	await command( 'npm whoami', {
+	await commandFn( 'npm whoami', {
 		cwd: gitWorkingDirectoryPath,
 		stdio: 'inherit',
 	} );
 
-	const beforeCommitHash = await SimpleGit(
-		gitWorkingDirectoryPath
-	).revparse( [ '--short', 'HEAD' ] );
+	const beforeCommitHash = await git.revparse( [ '--short', 'HEAD' ] );
 
 	// Timestamp is the current time in `YYYYMMDDHHMM` format.
 	const timestamp = new Date()
@@ -814,111 +896,42 @@ async function publishPackagesToNpm( {
 
 	const yesFlag = interactive ? '' : '--yes';
 	const noVerifyAccessFlag = interactive ? '' : '--no-verify-access';
+	// Keep version commits and package tags local until npm publishing succeeds,
+	// then push and verify Git metadata explicitly.
 	if ( releaseType === 'next' ) {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
 		);
 
-		await command(
-			`npx lerna version pre${ minimumVersionBump } --preid next.v.${ timestamp } --build-metadata ${ beforeCommitHash } --no-private ${ yesFlag }`,
+		await commandFn(
+			`npx lerna version pre${ minimumVersionBump } --preid next.v.${ timestamp } --build-metadata ${ beforeCommitHash } --no-private --no-push ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
 			}
 		);
-
-		log( '>> Publishing modified packages to npm.' );
-		await command(
-			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
-			{
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'inherit',
-			}
-		);
-	} else if ( [ 'bugfix', 'wp' ].includes( releaseType ) ) {
-		log( '>> Publishing modified packages to npm.' );
-		try {
-			await command(
-				`npx lerna publish ${ minimumVersionBump } --dist-tag ${ distTag } --no-private ${ yesFlag } ${ noVerifyAccessFlag }`,
-				{
-					cwd: gitWorkingDirectoryPath,
-					stdio: 'inherit',
-				}
-			);
-		} catch {
-			log(
-				'>> Trying to finish failed publishing of modified npm packages.'
-			);
-			await SimpleGit( gitWorkingDirectoryPath ).reset( 'hard' );
-			await command(
-				`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
-				{
-					cwd: gitWorkingDirectoryPath,
-					stdio: 'inherit',
-				}
-			);
-		}
 	} else {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
 		);
-		// --no-push keeps the version commit and package tags local until
-		// `lerna publish` succeeds, so a failed retry can re-version
-		// without hitting "tag '@wordpress/<pkg>@<version>' already exists"
-		// on origin.
-		await command(
+		await commandFn(
 			`npx lerna version ${ minimumVersionBump } --no-private --no-push ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
 			}
 		);
-
-		const releasePackages = await getNpmReleasePackages(
-			gitWorkingDirectoryPath
-		);
-		await runNpmPublishPreflight( {
-			gitWorkingDirectoryPath,
-			releasePackages,
-		} );
-
-		log( '>> Publishing modified packages to npm.' );
-		try {
-			await command(
-				`npx lerna publish from-package ${ yesFlag } ${ noVerifyAccessFlag }`,
-				{
-					cwd: gitWorkingDirectoryPath,
-					stdio: 'inherit',
-				}
-			);
-		} catch {
-			log(
-				'>> Trying to finish failed publishing of modified npm packages.'
-			);
-			await SimpleGit( gitWorkingDirectoryPath ).reset( 'hard' );
-			await command(
-				`npx lerna publish from-package ${ yesFlag } ${ noVerifyAccessFlag }`,
-				{
-					cwd: gitWorkingDirectoryPath,
-					stdio: 'inherit',
-				}
-			);
-		}
-
-		const publishCommit = await SimpleGit(
-			gitWorkingDirectoryPath
-		).revparse( [ 'HEAD' ] );
-		await pushNpmReleaseGitMetadata( {
-			gitWorkingDirectoryPath,
-			npmReleaseBranch,
-			packageTags: releasePackages.map( ( { tagName } ) => tagName ),
-			publishCommit,
-		} );
 	}
 
-	const afterCommitHash = await SimpleGit( gitWorkingDirectoryPath ).revparse(
-		[ '--short', 'HEAD' ]
-	);
+	await publishVersionedPackagesToNpmFn( {
+		distTag,
+		gitWorkingDirectoryPath,
+		noVerifyAccessFlag,
+		npmReleaseBranch,
+		yesFlag,
+	} );
+
+	const afterCommitHash = await git.revparse( [ '--short', 'HEAD' ] );
 	if ( afterCommitHash === beforeCommitHash ) {
 		return;
 	}
@@ -1153,6 +1166,8 @@ module.exports = {
 	getRemoteTagShas,
 	getTagPushCommands,
 	getTagRefspec,
+	publishPackagesToNpm,
+	publishVersionedPackagesToNpm,
 	pushNpmReleaseGitMetadata,
 	publishNpmGutenbergPlugin,
 	publishNpmBugfixLatest,

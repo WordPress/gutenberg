@@ -63,28 +63,93 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 				if ( ! document.hasFocus() ) {
 					return;
 				}
-				// Prevent blur from closing the form while the async submit
-				// is in progress. Clicking "Add note" moves focus away,
-				// triggering blur before onSubmit completes.
+				/*
+				 * Prevent blur from closing the form while the async submit
+				 * is in progress. Clicking "Add note" moves focus away,
+				 * triggering blur before onSubmit completes.
+				 */
 				if ( isSubmittingRef.current ) {
 					return;
 				}
-				if ( event.currentTarget.contains( event.relatedTarget ) ) {
+				const container = event.currentTarget;
+				const dismiss = () => {
+					toggleBlockSpotlight( clientId, false );
+					selectNote( undefined );
+				};
+				/*
+				 * A known target outside the form closes it, except a format
+				 * popover (e.g. the Cmd+K link UI) which portals out of the
+				 * form container and so reports a related target inside
+				 * `.components-popover` rather than `currentTarget`.
+				 */
+				if ( event.relatedTarget ) {
+					if ( container.contains( event.relatedTarget ) ) {
+						return;
+					}
+					if (
+						event.relatedTarget.closest( '.components-popover' )
+					) {
+						return;
+					}
+					dismiss();
 					return;
 				}
-				toggleBlockSpotlight( clientId, false );
-				selectNote( undefined );
+				/*
+				 * With no relatedTarget the blur is ambiguous: rich-text
+				 * re-renders briefly drop focus to the body while typing, but a
+				 * click on the empty document body also lands here. Re-check on
+				 * the next frame where focus actually settled and dismiss only
+				 * when it has truly left the form.
+				 */
+				container.ownerDocument.defaultView.requestAnimationFrame(
+					() => {
+						/*
+						 * A submit may have started between the blur and this
+						 * frame (e.g. Safari fires button-click blurs with no
+						 * relatedTarget); never dismiss mid-submit.
+						 */
+						if ( isSubmittingRef.current ) {
+							return;
+						}
+						const active = container.ownerDocument.activeElement;
+						if ( active && container.contains( active ) ) {
+							return;
+						}
+						if (
+							active &&
+							active.closest( '.components-popover' )
+						) {
+							return;
+						}
+						dismiss();
+					}
+				);
 			} }
 		>
 			<NoteCard>
 				<NoteForm
 					onSubmit={ async ( inputComment ) => {
 						isSubmittingRef.current = true;
-						const { id } = await onSubmit( {
-							content: inputComment,
-						} );
-						selectNote( id );
-						focusNoteThread( id, sidebarRef.current );
+						try {
+							/*
+							 * The create action resolves `undefined` when the
+							 * save fails (it surfaces its own error notice);
+							 * keep the form open so the draft isn't lost.
+							 */
+							const savedRecord = await onSubmit( {
+								content: inputComment,
+							} );
+							if ( savedRecord ) {
+								selectNote( savedRecord.id );
+								focusNoteThread(
+									savedRecord.id,
+									sidebarRef.current
+								);
+							}
+							return savedRecord;
+						} finally {
+							isSubmittingRef.current = false;
+						}
 					} }
 					onCancel={ unselectNote }
 					labels={ { input: __( 'New note' ) } }
