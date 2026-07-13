@@ -75,14 +75,26 @@ export function Edit( { attributes, setAttributes } ) {
 	const borderProps = useBorderProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
 
-	const { selectedIcon, allIcons = [] } = useSelect(
+	const {
+		selectedIcon,
+		allIcons = [],
+		hasResolvedSelectedIcon,
+	} = useSelect(
 		( select ) => {
-			const { getEntityRecord, getEntityRecords } =
+			const { getEntityRecord, getEntityRecords, hasFinishedResolution } =
 				select( coreDataStore );
+
+			const selectedIconQueryArgs = [ 'root', 'icon', icon ];
 			return {
 				selectedIcon: icon
-					? getEntityRecord( 'root', 'icon', icon )
+					? getEntityRecord( ...selectedIconQueryArgs )
 					: null,
+				hasResolvedSelectedIcon:
+					! icon ||
+					hasFinishedResolution(
+						'getEntityRecord',
+						selectedIconQueryArgs
+					),
 				allIcons: isInserterOpen
 					? getEntityRecords( 'root', 'icon' )
 					: undefined,
@@ -219,7 +231,7 @@ export function Edit( { attributes, setAttributes } ) {
 			{ blockControls }
 			{ inspectorControls }
 			<div { ...useBlockProps() }>
-				{ icon && ! iconToDisplay && (
+				{ icon && hasResolvedSelectedIcon && ! iconToDisplay && (
 					<Notice status="warning" isDismissible={ false }>
 						{ __(
 							'Icon not found. The icon may have been unregistered or removed.'
