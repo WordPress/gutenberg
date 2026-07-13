@@ -13,7 +13,7 @@ import '@wordpress/components/build-style/style.css';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/dataviews/build-style/style.css';
 import { useState } from '@wordpress/element';
-import { chartBar } from '@wordpress/icons';
+import { chartBar, trendingUp } from '@wordpress/icons';
 import type {
 	ResolveWidgetModule,
 	WidgetAttributeField,
@@ -147,15 +147,140 @@ const trafficSnapshotWidgetType: WidgetType = {
 	},
 };
 
+interface GoalAttributes {
+	metric?: 'revenue' | 'orders';
+	target?: string;
+}
+
+const GOAL_METRICS: {
+	value: NonNullable< GoalAttributes[ 'metric' ] >;
+	label: string;
+}[] = [
+	{ value: 'revenue', label: 'Revenue' },
+	{ value: 'orders', label: 'Orders' },
+];
+
+const GOAL_TARGETS = [
+	{ value: '1000', label: '1K target' },
+	{ value: '5000', label: '5K target' },
+	{ value: '10000', label: '10K target' },
+];
+
+// Deterministic current values, keyed by metric.
+const GOAL_CURRENT: Record<
+	NonNullable< GoalAttributes[ 'metric' ] >,
+	number
+> = {
+	revenue: 3600,
+	orders: 118,
+};
+
+function GoalProgressWidget( {
+	attributes,
+}: WidgetRenderProps< GoalAttributes > ) {
+	const { metric = 'revenue', target = '5000' } = attributes ?? {};
+
+	const metricLabel =
+		GOAL_METRICS.find( ( entry ) => entry.value === metric )?.label ??
+		metric;
+	const targetLabel =
+		GOAL_TARGETS.find( ( entry ) => entry.value === target )?.label ??
+		target;
+	const percent = Math.min(
+		100,
+		Math.round( ( GOAL_CURRENT[ metric ] / Number( target ) ) * 100 )
+	);
+
+	return (
+		<div
+			style={ {
+				display: 'grid',
+				gap: 'var(--wpds-dimension-gap-xs)',
+				alignContent: 'center',
+				height: '100%',
+				color: 'var(--wpds-color-foreground-content-neutral)',
+			} }
+		>
+			<strong
+				style={ {
+					fontSize: 'var(--wpds-typography-font-size-2xl)',
+				} }
+			>
+				{ `${ percent }%` }
+			</strong>
+			<div
+				style={ {
+					background:
+						'var(--wpds-color-background-surface-neutral-weak)',
+					borderRadius: 'var(--wpds-border-radius-md)',
+					height: 8,
+					overflow: 'hidden',
+				} }
+			>
+				<div
+					style={ {
+						background:
+							'var(--wpds-color-background-surface-brand)',
+						height: '100%',
+						width: `${ percent }%`,
+					} }
+				/>
+			</div>
+			<span
+				style={ {
+					color: 'var(--wpds-color-foreground-content-neutral-weak)',
+					fontSize: 'var(--wpds-typography-font-size-sm)',
+				} }
+			>
+				{ `${ metricLabel } vs ${ targetLabel }` }
+			</span>
+		</div>
+	);
+}
+
+// Two attributes, both promoted: nothing is left for the settings drawer.
+const GOAL_FIELDS: WidgetAttributeField< GoalAttributes >[] = [
+	{
+		id: 'metric',
+		label: 'Goal metric',
+		type: 'text',
+		elements: GOAL_METRICS,
+		relevance: 'high',
+	},
+	{
+		id: 'target',
+		label: 'Target',
+		type: 'text',
+		elements: GOAL_TARGETS,
+		relevance: 'high',
+	},
+];
+
+const goalProgressWidgetType: WidgetType = {
+	apiVersion: 1,
+	name: 'demo/goal-progress',
+	title: 'Goal Progress',
+	description: 'Sample goal widget whose attributes are all promoted.',
+	icon: trendingUp,
+	renderModule: 'demo/widgets/goal-progress/render',
+	attributes: GOAL_FIELDS as WidgetType[ 'attributes' ],
+	example: {
+		attributes: { metric: 'revenue', target: '5000' },
+	},
+};
+
 // What `import( widget.renderModule )` resolves to in a real host.
-const resolveDemoModule: ResolveWidgetModule = async () => ( {
-	default: TrafficSnapshotWidget as ComponentType<
+const resolveDemoModule: ResolveWidgetModule = async ( moduleId ) => ( {
+	default: ( moduleId === goalProgressWidgetType.renderModule
+		? GoalProgressWidget
+		: TrafficSnapshotWidget ) as ComponentType<
 		WidgetRenderProps< unknown >
 	>,
 } );
 
-// The same type placed twice, on a two-column and a one-column tile, so the
-// header behavior can be compared across width budgets.
+// The snapshot type at two widths, plus a one-column goal tile whose
+// attributes are all promoted, so the header presentations can be compared
+// across width budgets and attribute mixes.
 const INITIAL_LAYOUT: DashboardWidget[] = [
 	{
 		uuid: 'traffic-snapshot-wide',
@@ -168,6 +293,12 @@ const INITIAL_LAYOUT: DashboardWidget[] = [
 		type: 'demo/traffic-snapshot',
 		attributes: { metric: 'visitors', period: 'month', label: 'Audience' },
 		placement: { width: 1, height: 1, order: 2 },
+	},
+	{
+		uuid: 'goal-progress-narrow',
+		type: 'demo/goal-progress',
+		attributes: { metric: 'revenue', target: '5000' },
+		placement: { width: 1, height: 1, order: 3 },
 	},
 ];
 
@@ -193,13 +324,16 @@ const meta: Meta< typeof WidgetDashboard > = {
 
 export default meta;
 
-function MultipleHighRelevanceAttributesStory() {
+function DefaultStory() {
 	const [ layout, setLayout ] =
 		useState< DashboardWidget[] >( INITIAL_LAYOUT );
 
 	return (
 		<WidgetDashboard
-			widgetTypes={ [ trafficSnapshotWidgetType ] }
+			widgetTypes={ [
+				trafficSnapshotWidgetType,
+				goalProgressWidgetType,
+			] }
 			layout={ layout }
 			onLayoutChange={ setLayout }
 			resolveWidgetModule={ resolveDemoModule }
@@ -210,22 +344,25 @@ function MultipleHighRelevanceAttributesStory() {
 	);
 }
 
-export const MultipleHighRelevanceAttributes: StoryObj = {
-	render: () => <MultipleHighRelevanceAttributesStory />,
+export const Default: StoryObj = {
+	render: () => <DefaultStory />,
 	parameters: {
 		docs: {
 			description: {
 				story: `
 In normal mode the dashboard promotes every \`relevance: 'high'\` attribute into the tile header as a bare inline control beside the identity, plus the settings entry point when a non-promoted attribute exists.
 
-The demo type declares three attributes: \`metric\` and \`period\` are \`relevance: 'high'\`, and \`label\` stays on the settings drawer.
+Two demo types exercise that policy:
 
-The same type is placed on two tiles:
+- \`demo/traffic-snapshot\` declares three attributes: \`metric\` and \`period\` are \`relevance: 'high'\`, and \`label\` stays on the settings drawer.
+- \`demo/goal-progress\` declares two attributes, both \`relevance: 'high'\`: with nothing left for the drawer, no settings entry point shows at all.
+
+Their tiles compare the header presentations:
 
 - The two-column tile fits the identity and both inline controls, so they stay in the header.
-- The one-column tile does not: the chrome collapses the inline controls and the settings entry point into a single More dropdown, holding the promoted fields as a form and a More settings shortcut to the drawer.
+- The one-column tiles do not: the chrome collapses everything into a single More dropdown. The snapshot's dropdown holds the promoted fields plus a More settings shortcut to the drawer; the goal's dropdown holds only the fields.
 
-The widget only declares relevance; the fit is measured by the chrome, so the same declaration adapts to any tile width. Resize the canvas to watch the header switch presentations.
+The widget only declares relevance; the fit is measured by the chrome, so the same declaration adapts to any tile width. Resize the canvas to watch the headers switch presentations.
 `,
 			},
 		},
