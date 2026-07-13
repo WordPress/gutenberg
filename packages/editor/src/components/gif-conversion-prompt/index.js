@@ -232,11 +232,7 @@ export default function GifConversionPrompt() {
 
 	return (
 		<Modal
-			title={ _n(
-				'Convert animated GIF to video?',
-				'Convert animated GIFs to videos?',
-				count
-			) }
+			title={ _n( 'Convert to video', 'Convert to videos', count ) }
 			// Closing the dialog keeps the GIF for this upload only,
 			// without remembering anything.
 			onRequestClose={ () => resolveAll( 'gif', false ) }
@@ -246,8 +242,8 @@ export default function GifConversionPrompt() {
 			<Stack direction="column" gap="lg">
 				<p>
 					{ _n(
-						'Videos are much smaller and use less power, and look the same. The original GIF is kept in your Media Library either way.',
-						'Videos are much smaller and use less power, and look the same. The original GIFs are kept in your Media Library either way.',
+						'This will save space without changing the visuals. The GIF stays in your media library.',
+						'This will save space without changing the visuals. The GIFs stay in your media library.',
 						count
 					) }
 				</p>
@@ -266,7 +262,7 @@ export default function GifConversionPrompt() {
 								resolveAll( 'gif', rememberChoice )
 							}
 						>
-							{ _n( 'Keep as GIF', 'Keep as GIFs', count ) }
+							{ __( 'Not now' ) }
 						</Button>
 					</FlexItem>
 					<FlexItem>
@@ -278,11 +274,7 @@ export default function GifConversionPrompt() {
 								resolveAll( 'video', rememberChoice )
 							}
 						>
-							{ _n(
-								'Convert to video',
-								'Convert to videos',
-								count
-							) }
+							{ __( 'Convert' ) }
 						</Button>
 					</FlexItem>
 				</Flex>

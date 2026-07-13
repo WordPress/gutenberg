@@ -96,7 +96,7 @@ class GifToVideoUtils {
 	 */
 	getPromptDialog() {
 		return this.page.getByRole( 'dialog', {
-			name: 'Convert animated GIF to video?',
+			name: 'Convert to video',
 		} );
 	}
 
@@ -288,7 +288,8 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		// Converting is the steered default: the primary button holds focus,
 		// so Enter converts.
 		const convertButton = dialog.getByRole( 'button', {
-			name: 'Convert to video',
+			name: 'Convert',
+			exact: true,
 		} );
 		await expect( convertButton ).toBeFocused();
 		await convertButton.click();
@@ -383,7 +384,7 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 
 		const dialog = gifToVideoUtils.getPromptDialog();
 		await expect( dialog ).toBeVisible( { timeout: 60_000 } );
-		await dialog.getByRole( 'button', { name: 'Keep as GIF' } ).click();
+		await dialog.getByRole( 'button', { name: 'Not now' } ).click();
 		await expect( dialog ).toBeHidden();
 
 		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
@@ -417,7 +418,7 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		await dialog
 			.getByRole( 'checkbox', { name: 'Remember my choice' } )
 			.check();
-		await dialog.getByRole( 'button', { name: 'Keep as GIF' } ).click();
+		await dialog.getByRole( 'button', { name: 'Not now' } ).click();
 		await expect( dialog ).toBeHidden();
 
 		// The choice is persisted to the core/media preference.
