@@ -12,7 +12,8 @@ import { store as editorStore } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
 
 /**
- * Safari throws after more than 100 History API calls in 30 seconds.
+ * Safari throws when rapid revision changes trigger more than 100 History API
+ * calls in 30 seconds.
  */
 const URL_WRITE_DEBOUNCE_MS = 300;
 
