@@ -52,11 +52,11 @@
 		"layout": {
 			"default": {
 				"type": "flex",
-				"flexWrap": "nowrap"
+				"flexWrap": "wrap"
 			},
 			"allowVerticalAlignment": false,
 			"allowOrientation": false,
-			"allowWrap": true
+			"allowWrap": false
 		},
 		"spacing": {
 			"padding": true,
