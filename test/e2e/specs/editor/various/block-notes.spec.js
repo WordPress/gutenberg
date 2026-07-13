@@ -314,7 +314,7 @@ test.describe( 'Block Notes', () => {
 			).toBeHidden();
 
 			// Narrow the suggestions and pick the teammate.
-			await page.keyboard.type( 'Mento' );
+			await page.keyboard.type( 'Menti' );
 			await expect(
 				page.getByRole( 'option', { name: 'Mentionable Teammate' } )
 			).toBeVisible();
