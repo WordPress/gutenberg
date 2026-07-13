@@ -553,6 +553,10 @@ const PlaylistEdit = ( {
 					resetAll={ () => {
 						setAttributes( {
 							waveformStyle: undefined,
+							waveformColor: undefined,
+							waveformGradient: undefined,
+							waveformBackgroundColor: undefined,
+							waveformBackgroundGradient: undefined,
 						} );
 					} }
 					panelId={ waveformPanelId }
@@ -576,18 +580,18 @@ const PlaylistEdit = ( {
 							onChange={ onChangeWaveformStyle }
 						/>
 					</ToolsPanelItem>
+					{ colorSettings.length > 0 && (
+						<div className="wp-block-playlist__waveform-color-controls">
+							<ColorGradientSettingsDropdown
+								__experimentalIsRenderedInSidebar
+								settings={ colorSettings }
+								panelId={ waveformPanelId }
+								{ ...colorGradientSettings }
+							/>
+						</div>
+					) }
 				</ToolsPanel>
 			</InspectorControls>
-			{ colorSettings.length > 0 && (
-				<InspectorControls group="color">
-					<ColorGradientSettingsDropdown
-						__experimentalIsRenderedInSidebar
-						settings={ colorSettings }
-						panelId={ clientId }
-						{ ...colorGradientSettings }
-					/>
-				</InspectorControls>
-			) }
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
 					<WaveformPlayer
