@@ -31,9 +31,6 @@
 	text-transform: inherit;
 	text-align: inherit;
 
-	// Ensure keyboard-focused tabs scroll into view within the tab list.
-	scroll-margin: 24px;
-
 	&[aria-selected="true"]::before {
 		content: "";
 		position: absolute;
