@@ -117,7 +117,11 @@ async function build() {
 		}
 
 		console.log( '\n🧹 Cleaning packages...' );
-		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
+		await exec(
+			'node',
+			[ path.join( __dirname, 'clean.mjs' ), '--packages' ],
+			{ silent: true }
+		);
 
 		console.log( '\n📦 Building workspaces...' );
 		await exec(
