@@ -22,6 +22,7 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { createBlock } from '@wordpress/blocks';
+import { getQueryArg } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -309,6 +310,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setCurrentTemplateId,
 			setEditedPost,
 			setRenderingMode,
+			setCurrentRevisionId,
 		} = unlock( useDispatch( editorStore ) );
 		const { editEntityRecord } = useDispatch( coreStore );
 		const registry = useRegistry();
@@ -344,6 +346,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				setupEditor( post, initialEdits, settings.template );
 			}
 			if ( settings.autosave ) {
+				// The only place core exposes the autosave ID is the edit
+				// link, always `revision.php?revision=<autosave ID>`.
+				const autosaveId = Number(
+					getQueryArg( settings.autosave.editLink, 'revision' )
+				);
 				createWarningNotice(
 					__(
 						'There is an autosave of this post that is more recent than the version below.'
@@ -353,7 +360,28 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						actions: [
 							{
 								label: __( 'View the autosave' ),
-								url: settings.autosave.editLink,
+								...( autosaveId
+									? {
+											onClick: () => {
+												// `disableVisualRevisions`
+												// is only set after mount,
+												// so read it at click time.
+												const {
+													disableVisualRevisions,
+												} = registry
+													.select( editorStore )
+													.getEditorSettings();
+												if ( disableVisualRevisions ) {
+													window.location.href =
+														settings.autosave.editLink;
+													return;
+												}
+												setCurrentRevisionId(
+													autosaveId
+												);
+											},
+									  }
+									: { url: settings.autosave.editLink } ),
 							},
 						],
 					}

@@ -319,10 +319,16 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		// But the effective saved content is still empty:
 		expect( await editor.getEditedPostContent() ).toBe( '' );
 
-		// And focus is retained:
-		await expect(
-			editor.canvas.locator( 'role=document[name=/Empty block/i]' )
-		).toBeFocused();
+		// And the selection is retained:
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.locator(
+						'role=document[name=/Empty block/i]'
+					)
+				)
+			)
+			.toBe( true );
 	} );
 
 	test( 'should undo split in one go', async ( {

@@ -9,6 +9,11 @@ $waveform-player-height: 100px;
 		width: 100%;
 		margin: var(--wp--preset--spacing--20, 0.625em) 0;
 		position: relative;
+
+		&:focus-visible {
+			outline: revert;
+			outline-offset: revert;
+		}
 	}
 
 	// Set the waveform track height and remove gap between button and waveform.
@@ -19,6 +24,7 @@ $waveform-player-height: 100px;
 
 	// WaveformPlayer button styling.
 	.waveform-btn {
+		border: none;
 		border-radius: 0;
 		border-end-start-radius: 0.125rem;
 		border-start-start-radius: 0.125rem;
@@ -31,14 +37,50 @@ $waveform-player-height: 100px;
 		&:hover:not(:disabled) {
 			transform: none;
 		}
+
+		svg {
+			width: 3rem;
+			height: 3rem;
+		}
+	}
+
+	.waveform-player.has-play-button-artwork {
+		.waveform-btn {
+			background-image: var(--wp--playlist--play-button-artwork);
+			background-position: center;
+			background-size: cover;
+			color: #fff;
+
+			svg {
+				filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+			}
+
+			svg path {
+				// Override inline fills applied before artwork is added.
+				fill: #fff !important;
+			}
+		}
 	}
 
 	.waveform-track.waveform-align-bottom .waveform-btn {
 		margin-bottom: 0;
 	}
 
-	.waveform-subtitle {
+	.waveform-btn:focus-visible,
+	.waveform-container:focus-visible {
+		outline: revert;
+		outline-offset: revert;
+	}
+
+	.waveform-artist {
 		opacity: 0.7;
+	}
+
+	.waveform-info,
+	.waveform-artist,
+	.waveform-title,
+	.waveform-time {
+		font-size: inherit;
 	}
 
 	.wp-block-playlist__tracklist {

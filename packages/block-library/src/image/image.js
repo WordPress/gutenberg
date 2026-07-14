@@ -69,7 +69,6 @@ import {
 	getStyleStateKey,
 } from '../utils/style-state';
 import { useOpenImageMediaEditorModal } from './use-open-image-media-editor-modal';
-import AnimatedGifConvertControl from './animated-gif-convert-control';
 import {
 	MIN_SIZE,
 	ALLOWED_MEDIA_TYPES,
@@ -854,21 +853,23 @@ export default function Image( {
 
 	const showBlockControls = showUrlInput || allowCrop || showCoverControls;
 
-	const mediaReplaceFlow = isSingleSelected && ! lockUrlControls && (
-		// For contentOnly mode, put this button in its own area so it has borders around it.
-		<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
-			<MediaReplaceFlow
-				mediaId={ id }
-				mediaURL={ url }
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				onSelect={ onSelectImage }
-				onSelectURL={ onSelectURL }
-				onError={ onUploadError }
-				name={ ! url ? __( 'Add image' ) : __( 'Replace' ) }
-				onReset={ () => onSelectImage( undefined ) }
-				variant="toolbar"
-			/>
-		</BlockControls>
+	const mediaControls = isSingleSelected && ! lockUrlControls && (
+		<>
+			{ /* For contentOnly mode, put this button in its own area so it has borders around it. */ }
+			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ url }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onError={ onUploadError }
+					name={ ! url ? __( 'Add image' ) : __( 'Replace' ) }
+					onReset={ () => onSelectImage( undefined ) }
+					variant="toolbar"
+				/>
+			</BlockControls>
+		</>
 	);
 
 	const hasDataFormBlockFields =
@@ -1355,7 +1356,7 @@ export default function Image( {
 	if ( ! url && ! temporaryURL ) {
 		return (
 			<>
-				{ mediaReplaceFlow }
+				{ mediaControls }
 				{ controls }
 			</>
 		);
@@ -1390,13 +1391,7 @@ export default function Image( {
 
 	return (
 		<>
-			{ isSingleSelected && ! lockUrlControls && (
-				<AnimatedGifConvertControl
-					attributes={ attributes }
-					clientId={ clientId }
-				/>
-			) }
-			{ mediaReplaceFlow }
+			{ mediaControls }
 			{ controls }
 			{ featuredImageControl }
 			{ img }

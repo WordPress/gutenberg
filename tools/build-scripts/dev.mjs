@@ -151,12 +151,18 @@ async function dev() {
 				'@wordpress/validation-tools',
 				'--silent',
 			] ).catch( () => {
-				throw new Error( 'Run `npm install` to update.' );
+				throw new Error(
+					'Run `npm install` to update, or set GUTENBERG_CHECK_INSTALLED_DEPS=NEVER to skip this check.'
+				);
 			} );
 		}
 
 		console.log( '\n🧹 Cleaning packages...' );
-		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
+		await exec(
+			'node',
+			[ path.join( __dirname, 'clean.mjs' ), '--packages' ],
+			{ silent: true }
+		);
 
 		console.log( '\n📦 Building workspaces...' );
 		await exec(
@@ -174,7 +180,7 @@ async function dev() {
 		if ( ! skipTypes ) {
 			console.log( '\n📘 Building TypeScript types...\n' );
 			const tsStartTime = Date.now();
-			await exec( 'tsgo', [ '--build' ] ).catch( () => {
+			await exec( 'tsc', [ '--build' ] ).catch( () => {
 				console.error(
 					'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
 				);
@@ -213,7 +219,7 @@ async function dev() {
 		// Start TypeScript watch (unless types are skipped).
 		const tscWatch = skipTypes
 			? null
-			: execAsync( 'tsgo', [
+			: execAsync( 'tsc', [
 					'--build',
 					'--watch',
 					'--preserveWatchOutput',
