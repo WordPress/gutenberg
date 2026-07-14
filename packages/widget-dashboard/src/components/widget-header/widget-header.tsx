@@ -18,6 +18,7 @@ import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetInfotip } from './widget-header-infotip';
 import {
 	WIDGET_HEADER_IDENTITY_RESERVE,
+	WIDGET_TOOLBAR_CHIP_RESERVE,
 	WidgetHeaderAvailableSizeProvider,
 } from './widget-header-size';
 import styles from './widget-header.module.css';
@@ -80,7 +81,9 @@ export function WidgetHeader( {
 	const hasIdentity = showIdentity && !! widgetType?.title;
 	const availableSize =
 		headerWidth > 0
-			? headerWidth - ( hasIdentity ? WIDGET_HEADER_IDENTITY_RESERVE : 0 )
+			? headerWidth -
+			  WIDGET_TOOLBAR_CHIP_RESERVE -
+			  ( hasIdentity ? WIDGET_HEADER_IDENTITY_RESERVE : 0 )
 			: null;
 
 	return (

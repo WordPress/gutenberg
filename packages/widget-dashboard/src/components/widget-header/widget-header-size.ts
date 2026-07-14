@@ -10,6 +10,13 @@ import { createContext, useContext } from '@wordpress/element';
  */
 export const WIDGET_HEADER_IDENTITY_RESERVE = 128;
 
+/**
+ * Horizontal padding of the toolbar chip (`--wpds-dimension-padding-xs` per
+ * side). Part of the header budget in both header variants, with and
+ * without identity.
+ */
+export const WIDGET_TOOLBAR_CHIP_RESERVE = 8;
+
 const WidgetHeaderAvailableSizeContext = createContext< number | null >( null );
 
 export const WidgetHeaderAvailableSizeProvider =
