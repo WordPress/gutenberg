@@ -8,6 +8,7 @@
 			"showTracklist": true,
 			"showImages": true,
 			"showPlayButtonArtwork": false,
+			"showPlaybackControls": true,
 			"showArtists": true,
 			"showNumbers": true,
 			"showTrackLength": true,

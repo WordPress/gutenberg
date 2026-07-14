@@ -1,7 +1,7 @@
 .wp-block-playlist {
 	li.block-list-appender.block-list-appender {
 		position: initial;
-		margin-top: var( --wp--preset--spacing--30, 1em );
+		margin-top: var(--wp--preset--spacing--30, 1em);
 	}
 
 	// Override WaveformPlayer's inline width style on the canvas.

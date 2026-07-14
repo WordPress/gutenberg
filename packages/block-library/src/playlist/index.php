@@ -17,11 +17,11 @@
  * @return string Returns the Playlist.
  */
 function render_block_core_playlist( $attributes, $content, $block ) {
-	$playlist_id     = wp_unique_id( 'playlist-' );
-	$playlist_tracks = array();
-	$tracks_data     = array();
-	$show_images     = $attributes['showImages'] ?? true;
-	$show_controls   = $attributes['showPlaybackControls'] ?? true;
+	$playlist_id              = wp_unique_id( 'playlist-' );
+	$playlist_tracks          = array();
+	$tracks_data              = array();
+	$show_controls            = $attributes['showPlaybackControls'] ?? true;
+	$show_play_button_artwork = $attributes['showPlayButtonArtwork'] ?? false;
 
 	// Parse inner blocks to extract track data.
 	// This approach avoids duplicating track data in the HTML output.
@@ -64,8 +64,8 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					'title'     => wp_strip_all_tags( $title ),
 					'artist'    => wp_strip_all_tags( $artist ),
 					'album'     => wp_strip_all_tags( $album ),
-					'image'     => $show_images ? esc_url( $image ) : '',
-					'imageAlt'  => $show_images ? wp_strip_all_tags( $image_alt ) : '',
+					'image'     => esc_url( $image ),
+					'imageAlt'  => wp_strip_all_tags( $image_alt ),
 					'ariaLabel' => wp_strip_all_tags( $aria_label ),
 				);
 			}
@@ -107,14 +107,52 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$label_repeat_all = esc_attr__( 'Repeat playlist' );
 	$label_repeat_one = esc_attr__( 'Repeat current track' );
 	$player_class     = $show_controls ? 'wp-block-playlist__player has-playlist-controls' : 'wp-block-playlist__player';
-	$player_html      = '<div class="wp-block-playlist__waveform-player"
+
+	$waveform_color_attribute               = '';
+	$waveform_gradient_attribute            = '';
+	$waveform_background_color_attribute    = '';
+	$waveform_background_gradient_attribute = '';
+
+	if ( ! empty( $attributes['waveformColor'] ) ) {
+		$waveform_color_attribute = sprintf(
+			' data-waveform-player-color="%s"',
+			esc_attr( $attributes['waveformColor'] )
+		);
+	}
+
+	if ( ! empty( $attributes['waveformGradient'] ) ) {
+		$waveform_gradient_attribute = sprintf(
+			' data-waveform-player-gradient="%s"',
+			esc_attr( $attributes['waveformGradient'] )
+		);
+	}
+
+	if ( ! empty( $attributes['waveformBackgroundColor'] ) ) {
+		$waveform_background_color_attribute = sprintf(
+			' data-waveform-player-background-color="%s"',
+			esc_attr( $attributes['waveformBackgroundColor'] )
+		);
+	}
+
+	if ( ! empty( $attributes['waveformBackgroundGradient'] ) ) {
+		$waveform_background_gradient_attribute = sprintf(
+			' data-waveform-player-background-gradient="%s"',
+			esc_attr( $attributes['waveformBackgroundGradient'] )
+		);
+	}
+
+	$player_html   = '<div class="wp-block-playlist__waveform-player"' .
+		$waveform_color_attribute .
+		$waveform_gradient_attribute .
+		$waveform_background_color_attribute .
+		$waveform_background_gradient_attribute . '
 			data-wp-watch="callbacks.initWaveformPlayer"
 			data-label-play="' . $label_play . '"
 			data-label-pause="' . $label_pause . '"
 			data-label-seek="' . $label_seek . '"
 			data-label-seek-value="' . $label_seek_value . '"
 		></div>';
-	$controls_html    = $show_controls ? '<div class="wp-block-playlist__controls"
+	$controls_html = $show_controls ? '<div class="wp-block-playlist__controls"
 			data-wp-watch="callbacks.initPlaylistControls"
 			data-label-previous="' . $label_previous . '"
 			data-label-next="' . $label_next . '"
@@ -123,7 +161,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 			data-label-repeat-all="' . $label_repeat_all . '"
 			data-label-repeat-one="' . $label_repeat_one . '"
 		></div>' : '';
-	$html             = '<div class="' . $player_class . '">' . $player_html . $controls_html . '</div>';
+	$html          = '<div class="' . $player_class . '">' . $player_html . $controls_html . '</div>';
 
 	// Add the waveform player wrapper inside the figure.
 	$figure = null;
@@ -150,6 +188,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				'repeatMode'            => 'none',
 				'playedTracks'          => array(),
 				'showPlaybackControls'  => $show_controls,
+				'showPlayButtonArtwork' => $show_play_button_artwork,
 				'labelPauseTrack'       => __( 'Pause' ),
 				'labelSelectTrack'      => __( 'Play' ),
 			)
