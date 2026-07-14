@@ -211,6 +211,72 @@ describe( 'PaletteEdit', () => {
 		expect( screen.getByText( 'Test empty message' ) ).toBeVisible();
 	} );
 
+	it.each( [
+		{
+			palette: 'color',
+			props: { colors },
+			optionsLabel: 'Color options',
+			manageLabel: 'Manage colors',
+		},
+		{
+			palette: 'gradient',
+			props: { gradients },
+			optionsLabel: 'Gradient options',
+			manageLabel: 'Manage gradients',
+		},
+	] )(
+		'shows a clear management action for a $palette palette',
+		async ( { props, optionsLabel, manageLabel } ) => {
+			render( <PaletteEdit { ...defaultProps } { ...props } /> );
+
+			await click(
+				screen.getByRole( 'button', {
+					name: optionsLabel,
+				} )
+			);
+
+			expect(
+				screen.getByRole( 'button', {
+					name: manageLabel,
+				} )
+			).toBeVisible();
+		}
+	);
+
+	it( 'returns to the palette after managing colors', async () => {
+		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Color options',
+			} )
+		);
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Manage colors',
+			} )
+		);
+
+		expect( screen.getByDisplayValue( 'Primary' ) ).toBeVisible();
+
+		await click( screen.getByRole( 'button', { name: 'Done' } ) );
+
+		expect(
+			screen.queryByDisplayValue( 'Primary' )
+		).not.toBeInTheDocument();
+
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Color options',
+			} )
+		);
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Manage colors',
+			} )
+		).toBeVisible();
+	} );
+
 	it( 'shows an option to remove all colors', async () => {
 		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
@@ -350,7 +416,7 @@ describe( 'PaletteEdit', () => {
 		);
 		await click(
 			screen.getByRole( 'button', {
-				name: 'Show details',
+				name: 'Manage colors',
 			} )
 		);
 		await click( screen.getByRole( 'button', { name: 'Edit: Primary' } ) );
@@ -383,7 +449,7 @@ describe( 'PaletteEdit', () => {
 		);
 		await click(
 			screen.getByRole( 'button', {
-				name: 'Show details',
+				name: 'Manage colors',
 			} )
 		);
 		await click( screen.getByRole( 'button', { name: 'Edit: Primary' } ) );
