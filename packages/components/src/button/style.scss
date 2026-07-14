@@ -100,10 +100,6 @@
 			);
 			/* stylelint-enable */
 		}
-
-		@media (forced-colors: active) {
-			outline: 1px solid ButtonBorder;
-		}
 	}
 
 	/**
@@ -118,10 +114,6 @@
 			color: $gray-600;
 			background: transparent;
 			transform: none;
-		}
-
-		@media (forced-colors: active) {
-			outline: 1px solid ButtonBorder;
 		}
 	}
 
