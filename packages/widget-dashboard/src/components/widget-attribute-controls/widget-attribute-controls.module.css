@@ -2,6 +2,10 @@
 	flex-shrink: 0;
 }
 
+.persistent-controls {
+	display: inline-flex;
+}
+
 .dropdown-popup {
 	max-width: 300px;
 }

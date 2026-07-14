@@ -3,7 +3,7 @@
  */
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 
@@ -16,18 +16,6 @@ import { AttributeControlsDropdown } from './attribute-controls-dropdown';
 import { useInlineControlsFit } from './use-inline-controls-fit';
 import styles from './widget-attribute-controls.module.css';
 import type { DashboardWidget, WidgetAttributes } from '../../types';
-
-/*
- * Toolbar footprint of the settings trigger:
- * - a compact icon button (28px) (`--wpds-dimension-size-md`)
- * - a chip gap (8px)
- *
- * Reserved from the fit budget because the trigger stays in the toolbar in
- * both presentations.
- *
- * Todo: consider to compute the trigger reserve dynamically.
- */
-const SETTINGS_TRIGGER_RESERVE = 28 + 8;
 
 type WidgetAttributeControlsProps = {
 	/**
@@ -68,9 +56,32 @@ export function WidgetAttributeControls( {
 	const hasSettingsSurface = !! widgetType.attributes?.some(
 		( attribute ) => attribute.relevance !== 'high'
 	);
-	const { measureRef, collapsed } = useInlineControlsFit(
-		hasSettingsSurface ? SETTINGS_TRIGGER_RESERVE : 0
-	);
+
+	// Trigger reserve size.
+	//
+	// The settings trigger remains in the toolbar in both presentations,
+	// so its actual footprint (button width plus the chip gap)
+	// is reserved from the fit budget.
+	//
+	// The control's size is determined by design tokens. Read once per mount.
+	const [ triggerReserve, setTriggerReserve ] = useState( 0 );
+
+	const triggerReserveRef = useCallback( ( element: HTMLElement | null ) => {
+		if ( ! element ) {
+			setTriggerReserve( 0 );
+			return;
+		}
+
+		const { columnGap } = getComputedStyle(
+			element.parentElement as HTMLElement
+		);
+
+		setTriggerReserve(
+			element.offsetWidth + ( parseFloat( columnGap ) || 0 )
+		);
+	}, [] );
+
+	const { measureRef, collapsed } = useInlineControlsFit( triggerReserve );
 
 	const fields = useMemo< Field< WidgetAttributes >[] >(
 		() =>
@@ -145,10 +156,17 @@ export function WidgetAttributeControls( {
 				/>
 			) }
 
-			<WidgetSettingsTrigger
-				widget={ widget }
-				widgetType={ widgetType }
-			/>
+			{ hasSettingsSurface && (
+				<span
+					ref={ triggerReserveRef }
+					className={ styles[ 'persistent-controls' ] }
+				>
+					<WidgetSettingsTrigger
+						widget={ widget }
+						widgetType={ widgetType }
+					/>
+				</span>
+			) }
 		</>
 	);
 }
