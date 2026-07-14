@@ -403,6 +403,9 @@ class WP_Theme_JSON_Gutenberg {
 			'backgroundSize'  => null,
 			'gradient'        => null,
 		),
+		'blockVisibility'               => array(
+			'allowEditing' => true,
+		),
 		'border'                        => array(
 			'color'       => null,
 			'radius'      => null,
@@ -1305,7 +1308,9 @@ class WP_Theme_JSON_Gutenberg {
 		 */
 		foreach ( $valid_block_names as $block ) {
 			$schema_settings_blocks[ $block ] = static::VALID_SETTINGS;
+			// `viewport` and `blockVisibility` are global-only settings and cannot be set per block for now.
 			unset( $schema_settings_blocks[ $block ]['viewport'] );
+			unset( $schema_settings_blocks[ $block ]['blockVisibility'] );
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 

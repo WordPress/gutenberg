@@ -6,6 +6,7 @@ import { useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { resolveFields } from '../field-types';
 import type { WidgetModuleRecord, WidgetName, WidgetType } from '../types';
 
 /* `true` while records or their metadata imports are still resolving; hosts
@@ -17,6 +18,8 @@ type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
  *
  * For each record it dynamically imports `widget_module` and merges the
  * module's default export with the runtime fields (`name`, `renderModule`).
+ * Attribute schemas pass through `resolveFields`, so attributes referencing
+ * registered field types reach hosts as plain DataViews fields.
  * Pass `null`/`undefined` while records are still loading.
  *
  * @param records Host-supplied records, or `null`/`undefined` while loading.
@@ -62,6 +65,13 @@ export function useWidgetTypes(
 
 					return {
 						...metadata,
+						...( metadata.attributes
+							? {
+									attributes: resolveFields(
+										metadata.attributes
+									),
+							  }
+							: {} ),
 						name: record.name as WidgetName,
 						renderModule: record.render_module ?? '',
 						/*

@@ -304,7 +304,7 @@ Add an image or video with a text overlay.
 -	**Name:** [core/cover](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-cover/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Supports:** align, allowedBlocks, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio), filter (duotone), interactivity (clientNavigation), layout (~~allowJustification~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, poster, sizeSlug, tagName, templateLock, url, useFeaturedImage
+-	**Attributes:** allowedVideoProviders, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, poster, sizeSlug, tagName, templateLock, url, useFeaturedImage
 
 ## Details
 
@@ -616,7 +616,7 @@ Start with the basic building block of all narrative.
 
 -	**Name:** [core/paragraph](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-paragraph/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textColumns, textIndent), ~~className~~
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), editableRoot, interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textColumns, textIndent), ~~className~~
 -	**Attributes:** content, direction, dropCap, placeholder
 
 ## Pattern Placeholder
@@ -633,18 +633,16 @@ Show a block pattern.
 Embed a simple playlist.
 
 -	**Name:** [core/playlist](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-playlist/)
--	**Experimental:** true
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Allowed Blocks:** core/playlist-track
 -	**Supports:** align, anchor, color (background, gradients, link, text), interactivity, spacing (margin, padding), typography (fontSize)
--	**Attributes:** caption, order, showArtists, showImages, showNumbers, showTrackLength, showTracklist, type, waveformStyle
+-	**Attributes:** caption, order, showArtists, showImages, showNumbers, showPlayButtonArtwork, showTrackLength, showTracklist, type, waveformBackgroundColor, waveformBackgroundGradient, waveformColor, waveformGradient, waveformStyle
 
 ## Playlist track
 
 Playlist track.
 
 -	**Name:** [core/playlist-track](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-playlist-track/)
--	**Experimental:** true
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Parent:** core/playlist
 -	**Supports:** interactivity (clientNavigation), ~~html~~, ~~reusable~~
@@ -1102,8 +1100,8 @@ Displays the name of a taxonomy term.
 
 -	**Name:** [core/term-name](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-term-name/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isLink, level, levelOptions, textAlign
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Attributes:** isLink, level, levelOptions
 
 ## Term Template
 

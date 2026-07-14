@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Notes: Remove the snackbar notice shown when a note is resolved or reopened, as the note's appearance already updates in place to reflect the change. The result is still announced to screen readers ([#80017](https://github.com/WordPress/gutenberg/pull/80017)).
 -   The "View the autosave" notice now opens the autosave in the visual revisions view with its changes highlighted, instead of the classic revisions screen. It falls back to the classic screen when visual revisions are disabled ([#79947](https://github.com/WordPress/gutenberg/pull/79947)).
 

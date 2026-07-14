@@ -11,6 +11,7 @@ import {
 	Popover,
 	SlotFillProvider,
 	privateApis as componentsPrivateApis,
+	__unstableUseAutocompleteProps as useAutocompleteProps,
 } from '@wordpress/components';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
@@ -57,6 +58,17 @@ const {
 	shortcutsListener,
 	inputEventsListener,
 } = unlock( richTextPrivateApis );
+
+// The completer shape isn't exported from `@wordpress/components`, so derive
+// it from the autocomplete hook's own parameter type.
+type Completer = Parameters<
+	typeof useAutocompleteProps
+>[ 0 ][ 'completers' ][ number ];
+
+// Shared empty reference so the default `completers` value is stable across
+// renders and the autocomplete hook doesn't re-run for consumers that don't
+// opt into it.
+const EMPTY_COMPLETERS: Array< Completer > = [];
 
 export type RichTextControlProps = {
 	/**
@@ -141,6 +153,12 @@ export type RichTextControlProps = {
 	 * in for standalone forms where no other code lands focus on the field.
 	 */
 	focusOnMount?: boolean;
+	/**
+	 * Autocompleters to wire to the field (e.g. an `@` mention completer).
+	 * Each is a `WPCompleter` object as consumed by `@wordpress/components`'
+	 * `Autocomplete`. Omit to disable autocomplete.
+	 */
+	completers?: Array< Completer >;
 };
 
 /**
@@ -175,6 +193,7 @@ export default function RichTextControl( {
 	preserveWhiteSpace,
 	disableLineBreaks,
 	focusOnMount,
+	completers = EMPTY_COMPLETERS,
 }: RichTextControlProps ) {
 	const [ selection, setSelection ] = useState< {
 		start: number | undefined;
@@ -471,6 +490,41 @@ export default function RichTextControl( {
 		[ isSelected ]
 	);
 
+	/*
+	 * Wire optional autocompleters (e.g. an `@` mention completer) to the
+	 * field. The hook owns the editable element ref it anchors the popover to,
+	 * so we merge its `ref` into the contenteditable below and spread the
+	 * returned props (including the rendered popover as `children`). With no
+	 * `completers` it does no work and renders nothing, keeping the control
+	 * zero-cost for consumers that don't opt in.
+	 * The hook anchors its popover to its own internal ref and overrides
+	 * whatever `contentRef` is passed, but the parameter type requires one.
+	 */
+	const unusedContentRef = useRef< HTMLElement >( null );
+	const {
+		ref: autocompleteRef,
+		'aria-activedescendant': autocompleteActiveDescendant,
+		'aria-autocomplete': autocompleteAriaAutocomplete,
+		...autocompleteRest
+	} = useAutocompleteProps( {
+		completers,
+		record: value,
+		onChange: onRichTextChange,
+		// This control's completers insert their completion into the value;
+		// none replace the whole value, so the required `onReplace` is a
+		// no-op here.
+		onReplace: () => {},
+		contentRef: unusedContentRef,
+	} );
+	// Normalize the hook's loosely-typed aria values for the DOM element:
+	// `aria-activedescendant` may be `null` (React wants `undefined`) and
+	// `aria-autocomplete` is only ever `'list'` or `undefined` at runtime.
+	const autocompleteProps = {
+		...autocompleteRest,
+		'aria-activedescendant': autocompleteActiveDescendant ?? undefined,
+		'aria-autocomplete': autocompleteAriaAutocomplete as 'list' | undefined,
+	};
+
 	// The shell exposes no focus management of its own (form controls leave
 	// that to the surrounding region); focus the field on mount here when the
 	// form opts in.
@@ -490,6 +544,7 @@ export default function RichTextControl( {
 		enterRef,
 		focusOnMountRef,
 		popoverContainerRef,
+		autocompleteRef,
 	] );
 
 	return (
@@ -522,6 +577,7 @@ export default function RichTextControl( {
 				// plain text only drives its hidden validity delegate.
 				value={ value.text }
 				aria-multiline={ ! disableLineBreaks }
+				{ ...autocompleteProps }
 				ref={ editableRef }
 				onFocus={ onEditableFocus }
 				onBlur={ onEditableBlur }
