@@ -2,7 +2,7 @@
  * External dependencies
  */
 import '@testing-library/jest-dom';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
 
@@ -120,11 +120,11 @@ describe( 'WidgetAttributeControls fit', () => {
 			await screen.findByRole( 'dialog', { name: 'Snapshot settings' } )
 		).toBeInTheDocument();
 		expect(
-			screen.queryByRole( 'dialog', { name: 'Widget settings' } )
+			screen.queryByRole( 'dialog', { name: 'Widget controls' } )
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'collapses behind the settings trigger when space runs out', async () => {
+	it( 'collapses the fields into a dropdown when space runs out', async () => {
 		mockedUseInlineControlsFit.mockReturnValue( {
 			measureRef: () => {},
 			collapsed: true,
@@ -133,12 +133,17 @@ describe( 'WidgetAttributeControls fit', () => {
 		render( <Harness /> );
 		await screen.findByTestId( 'metric' );
 
-		await user.click(
+		// The settings trigger is not part of the collapse.
+		expect(
 			screen.getByRole( 'button', { name: 'Widget settings' } )
+		).toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Widget controls' } )
 		);
 
 		const dialog = await screen.findByRole( 'dialog', {
-			name: 'Widget settings',
+			name: 'Widget controls',
 		} );
 
 		// The high-relevance fields render as a labeled form…
@@ -148,9 +153,13 @@ describe( 'WidgetAttributeControls fit', () => {
 		expect(
 			within( dialog ).getByRole( 'combobox', { name: 'Period' } )
 		).toBeInTheDocument();
-		// …the low-relevance one stays on the settings surface.
+		// …the low-relevance one stays on the settings surface, with no
+		// entry point inside the dropdown.
 		expect(
 			within( dialog ).queryByLabelText( 'Label' )
+		).not.toBeInTheDocument();
+		expect(
+			within( dialog ).queryByRole( 'button', { name: 'More settings' } )
 		).not.toBeInTheDocument();
 	} );
 
@@ -164,10 +173,10 @@ describe( 'WidgetAttributeControls fit', () => {
 		await screen.findByTestId( 'metric' );
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Widget settings' } )
+			screen.getByRole( 'button', { name: 'Widget controls' } )
 		);
 		const dialog = await screen.findByRole( 'dialog', {
-			name: 'Widget settings',
+			name: 'Widget controls',
 		} );
 
 		await user.selectOptions(
@@ -178,7 +187,7 @@ describe( 'WidgetAttributeControls fit', () => {
 		expect( screen.getByTestId( 'metric' ) ).toHaveTextContent( 'orders' );
 	} );
 
-	it( 'reaches the settings surface from the dropdown', async () => {
+	it( 'keeps the settings surface reachable while collapsed', async () => {
 		mockedUseInlineControlsFit.mockReturnValue( {
 			measureRef: () => {},
 			collapsed: true,
@@ -190,22 +199,9 @@ describe( 'WidgetAttributeControls fit', () => {
 		await user.click(
 			screen.getByRole( 'button', { name: 'Widget settings' } )
 		);
-		const dialog = await screen.findByRole( 'dialog', {
-			name: 'Widget settings',
-		} );
-
-		await user.click(
-			within( dialog ).getByRole( 'button', { name: 'More settings' } )
-		);
 
 		expect(
 			await screen.findByRole( 'dialog', { name: 'Snapshot settings' } )
 		).toBeInTheDocument();
-
-		await waitFor( () =>
-			expect(
-				screen.queryByRole( 'dialog', { name: 'Widget settings' } )
-			).not.toBeInTheDocument()
-		);
 	} );
 } );

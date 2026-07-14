@@ -214,7 +214,7 @@ A widget declares importance per attribute through `relevance` (`'high' | 'low'`
 -   **Prominent surface**: `relevance: 'high'` fields render as bare inline controls in the tile header, for in-context edits.
 -   **Settings surface**: the full schema, opened from the settings trigger. The trigger shows only when some attribute is not promoted; otherwise it would repeat the prominent surface.
 
-The prominent surface holds only while it fits. The header measures the space it can grant its toolbar; when the inline controls' natural width exceeds it, they collapse behind the settings trigger, whose dropdown holds the promoted fields as a form plus, when non-promoted attributes exist, a More settings entry point to the settings surface. The presentation follows the measurement both ways: widen the tile and the controls return inline.
+The prominent surface holds only while it fits. The header measures the space it can grant its toolbar; when the promoted fields' natural width exceeds it, they collapse into a dropdown holding them as a form. The settings trigger is not part of the collapse: it stays in the toolbar whenever non-promoted attributes exist. The presentation follows the measurement both ways: widen the tile and the fields return inline.
 
 Edits on any surface stage through the engine's internal layer and reach `onLayoutChange` on commit. Prominent-surface and dropdown edits publish on a shared auto-save debounce; the settings surface publishes on Save.
 

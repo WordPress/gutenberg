@@ -22,6 +22,13 @@ import { useInlineControlsFit } from './use-inline-controls-fit';
 import styles from './widget-attribute-controls.module.css';
 import type { DashboardWidget, WidgetAttributes } from '../../types';
 
+/*
+ * Toolbar footprint of the settings trigger: a compact icon button
+ * (`--wpds-dimension-size-md`) plus the chip gap. Reserved from the fit
+ * budget because the trigger stays in the toolbar in both presentations.
+ */
+const SETTINGS_TRIGGER_RESERVE = 36;
+
 type WidgetAttributeControlsProps = {
 	/**
 	 * The instance whose attributes these controls edit.
@@ -42,10 +49,11 @@ type WidgetAttributeControlsProps = {
  * and auto-save on the dashboard's shared debounce.
  *
  * The inline presentation holds only while it fits the header.
- * When its natural width exceeds the space the header can grant, the fields
- * collapse behind the settings trigger, whose dropdown holds them as a form;
- * the inline controls stay mounted, hidden and inert, so the fit keeps being
- * measured and the presentation can expand back.
+ * When the fields' natural width exceeds the space the header can grant,
+ * they collapse into a dropdown holding them as a form; the settings trigger
+ * is not part of the collapse and stays in the toolbar. The inline fields
+ * stay mounted, hidden and inert, so the fit keeps being measured and the
+ * presentation can expand back.
  *
  * @param {WidgetAttributeControlsProps} props Component props.
  */
@@ -55,7 +63,13 @@ export function WidgetAttributeControls( {
 }: WidgetAttributeControlsProps ): React.ReactNode {
 	const { layout, onLayoutChange, scheduleAutoSave } =
 		useDashboardInternalContext();
-	const { measureRef, collapsed } = useInlineControlsFit();
+
+	const hasSettingsSurface = !! widgetType.attributes?.some(
+		( attribute ) => attribute.relevance !== 'high'
+	);
+	const { measureRef, collapsed } = useInlineControlsFit(
+		hasSettingsSurface ? SETTINGS_TRIGGER_RESERVE : 0
+	);
 
 	const fields = useMemo< Field< WidgetAttributes >[] >(
 		() =>
@@ -125,22 +139,20 @@ export function WidgetAttributeControls( {
 						onChange={ handleChange }
 					/>
 				) }
-
-				<WidgetSettingsTrigger
-					widget={ widget }
-					widgetType={ widgetType }
-				/>
 			</Stack>
 
 			{ collapsed && (
 				<AttributeControlsDropdown
-					widget={ widget }
-					widgetType={ widgetType }
 					fields={ fields }
 					data={ data }
 					onChange={ handleChange }
 				/>
 			) }
+
+			<WidgetSettingsTrigger
+				widget={ widget }
+				widgetType={ widgetType }
+			/>
 		</>
 	);
 }

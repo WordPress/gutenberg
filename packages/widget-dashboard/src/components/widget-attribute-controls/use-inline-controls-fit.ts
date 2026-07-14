@@ -33,8 +33,14 @@ interface InlineControlsFit {
 /**
  * Decides whether the inline attribute controls fit the space the header
  * row can grant its toolbar.
+ *
+ * @param {number} [reservedSize] Inline size (px) already claimed by fixed
+ *                                toolbar controls that are not part of the
+ *                                collapse.
  */
-export function useInlineControlsFit(): InlineControlsFit {
+export function useInlineControlsFit(
+	reservedSize: number = 0
+): InlineControlsFit {
 	const availableSize = useWidgetHeaderAvailableSize();
 	const [ naturalSize, setNaturalSize ] = useState( 0 );
 
@@ -47,7 +53,7 @@ export function useInlineControlsFit(): InlineControlsFit {
 	const collapsed =
 		availableSize !== null &&
 		naturalSize > 0 &&
-		naturalSize > availableSize;
+		naturalSize > availableSize - reservedSize;
 
 	return { measureRef, collapsed };
 }

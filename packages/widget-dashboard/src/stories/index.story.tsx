@@ -360,7 +360,7 @@ Two demo types exercise that policy:
 Their tiles compare the header presentations:
 
 - The two-column tile fits the identity and both inline controls, so they stay in the header.
-- The one-column tiles do not: the chrome collapses everything behind the settings trigger, whose dropdown holds the promoted fields as a form. The snapshot's dropdown adds a More settings entry point to the settings surface; the goal's dropdown holds only the fields.
+- The one-column tiles do not: the promoted fields collapse into a dropdown holding them as a form, while the settings trigger stays in the toolbar beside it. The goal tile, with every attribute promoted, shows only the dropdown.
 
 The widget only declares relevance; the fit is measured by the chrome, so the same declaration adapts to any tile width. Resize the canvas to watch the headers switch presentations.
 `,

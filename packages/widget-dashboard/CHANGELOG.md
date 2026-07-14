@@ -20,8 +20,8 @@
 -   Widget settings: use the `drawerRight` icon for the per-tile settings
     trigger instead of `moreVertical` ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 -   Widget toolbar: when the tile header lacks room for the inline attribute
-    controls, they collapse behind the settings trigger, whose dropdown holds
-    the promoted fields and a More settings entry point ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+    controls, the promoted fields collapse into a dropdown; the settings
+    trigger stays in the toolbar ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 
 ### Documentation
 
