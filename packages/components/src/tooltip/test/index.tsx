@@ -427,7 +427,7 @@ describe( 'Tooltip', () => {
 	} );
 
 	describe( 'event propagation', () => {
-		it( 'should close the parent dialog component when pressing the Escape key while the tooltip is visible', async () => {
+		it( 'should dismiss the tooltip and close its parent dialog when pressing the Escape key', async () => {
 			const onRequestClose = jest.fn();
 			render(
 				<Modal onRequestClose={ onRequestClose }>
@@ -449,13 +449,11 @@ describe( 'Tooltip', () => {
 				).toBeVisible()
 			);
 
-			// Press the Escape key, Modal should request to be closed
+			// Press the Escape key, the tooltip should hide and Modal should
+			// request to be closed.
 			await press.Escape();
-			expect( onRequestClose ).toHaveBeenCalled();
-
-			// Hover outside of the anchor, tooltip should hide
-			await hoverOutside();
 			await waitExpectTooltipToHide();
+			expect( onRequestClose ).toHaveBeenCalled();
 		} );
 	} );
 
