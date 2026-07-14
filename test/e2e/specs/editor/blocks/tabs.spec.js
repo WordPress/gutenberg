@@ -4,16 +4,6 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Tabs', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-block-experiments',
-		] );
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [] );
-	} );
-
 	test.describe( 'Editor functionality', () => {
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.createNewPost();

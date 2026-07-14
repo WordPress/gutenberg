@@ -12,7 +12,6 @@ import {
 	MenuGroup,
 	MenuItem,
 	MenuItemsChoice,
-	Icon as WCIcon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { desktop, mobile, tablet, external, check } from '@wordpress/icons';
@@ -28,7 +27,7 @@ import { VisuallyHidden } from '@wordpress/ui';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import PostPreviewButton from '../post-preview-button';
+import { PostPreviewMenuItem } from '../post-preview-button';
 import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
 
@@ -239,17 +238,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 					) }
 					{ isViewable && (
 						<MenuGroup>
-							<PostPreviewButton
-								className="editor-preview-dropdown__button-external"
-								role="menuitem"
+							<PostPreviewMenuItem
 								forceIsAutosaveable={ forceIsAutosaveable }
-								aria-label={ __( 'Preview in new tab' ) }
-								textContent={
-									<>
-										{ __( 'Preview in new tab' ) }
-										<WCIcon icon={ external } />
-									</>
-								}
 								onPreview={ onClose }
 							/>
 						</MenuGroup>
