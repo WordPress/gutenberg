@@ -59,10 +59,11 @@ const PlaylistTrackEdit = ( {
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const hasTrackSource = !! src || !! temporaryURL;
+
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
-	const hasTrackSource = !! src || !! temporaryURL;
 
 	useEffect( () => {
 		if (

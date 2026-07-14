@@ -43,6 +43,16 @@ function isFinalMediaItem( media ) {
 	return url && ! isBlobURL( url );
 }
 
+function areMediaItemsSame( firstMedia, secondMedia ) {
+	if ( firstMedia?.id && secondMedia?.id ) {
+		return Number( firstMedia.id ) === Number( secondMedia.id );
+	}
+
+	const firstUrl = getMediaUrl( firstMedia );
+	const secondUrl = getMediaUrl( secondMedia );
+	return firstUrl && secondUrl && firstUrl === secondUrl;
+}
+
 const InsertFromURLPopover = ( {
 	src,
 	onChange,
@@ -242,15 +252,25 @@ export function MediaPlaceholder( {
 					} );
 				};
 			} else {
-				let selectedMedia = [];
+				const selectedMedia = [];
 
 				setMedia = ( newMedia ) => {
-					selectedMedia = newMedia;
+					newMedia.filter( isFinalMediaItem ).forEach( ( media ) => {
+						const mediaIndex = selectedMedia.findIndex(
+							( selectedItem ) =>
+								areMediaItemsSame( selectedItem, media )
+						);
+
+						if ( mediaIndex === -1 ) {
+							selectedMedia.push( media );
+						} else {
+							selectedMedia[ mediaIndex ] = media;
+						}
+					} );
 				};
 				onBatchSuccess = () => {
-					const finalMedia = selectedMedia.filter( isFinalMediaItem );
-					if ( finalMedia.length > 0 ) {
-						onSelect( finalMedia );
+					if ( selectedMedia.length > 0 ) {
+						onSelect( selectedMedia );
 					}
 				};
 			}

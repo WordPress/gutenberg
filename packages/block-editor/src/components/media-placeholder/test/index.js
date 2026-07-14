@@ -109,4 +109,54 @@ describe( 'MediaPlaceholder', () => {
 		expect( onSelect ).toHaveBeenCalledTimes( 1 );
 		expect( onSelect ).toHaveBeenCalledWith( [ firstTrack, secondTrack ] );
 	} );
+
+	it( 'collects final media when multiple uploads complete separately', () => {
+		const onSelect = jest.fn();
+		const fileList = [
+			new File( [ 'audio' ], 'first.mp3', { type: 'audio/mpeg' } ),
+			new File( [ 'audio' ], 'second.mp3', { type: 'audio/mpeg' } ),
+		];
+		const firstTrack = {
+			id: 1,
+			url: 'https://example.com/first.mp3',
+		};
+		const secondTrack = {
+			id: 2,
+			url: 'https://example.com/second.mp3',
+		};
+
+		render(
+			<MediaPlaceholder
+				allowedTypes={ [ 'audio' ] }
+				multiple
+				onSelect={ onSelect }
+			/>
+		);
+
+		act( () => {
+			mockDropZoneProps.onFilesDrop( fileList );
+		} );
+
+		const { onBatchSuccess, onFileChange } =
+			mediaUpload.mock.calls[ 0 ][ 0 ];
+
+		act( () => {
+			onFileChange( [ firstTrack ] );
+		} );
+
+		expect( onSelect ).not.toHaveBeenCalled();
+
+		act( () => {
+			onFileChange( [ secondTrack ] );
+		} );
+
+		expect( onSelect ).not.toHaveBeenCalled();
+
+		act( () => {
+			onBatchSuccess();
+		} );
+
+		expect( onSelect ).toHaveBeenCalledTimes( 1 );
+		expect( onSelect ).toHaveBeenCalledWith( [ firstTrack, secondTrack ] );
+	} );
 } );
