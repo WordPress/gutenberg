@@ -108,14 +108,15 @@ export function useElevation(
 			`;
 		}
 
-		return cx(
+		const elevationStyles = css(
 			styles.Elevation,
 			sx.Base,
 			sx.hover,
 			sx.focus,
-			sx.active,
-			className
+			sx.active
 		);
+
+		return cx( elevationStyles, className );
 	}, [
 		active,
 		borderRadius,

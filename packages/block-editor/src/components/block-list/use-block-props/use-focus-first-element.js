@@ -29,9 +29,8 @@ import { unlock } from '../../../lock-unlock';
  */
 export function useFocusFirstElement( { clientId, initialPosition } ) {
 	const ref = useRef();
-	const { isBlockSelected, isMultiSelecting, isZoomOut } = unlock(
-		useSelect( blockEditorStore )
-	);
+	const { isBlockSelected, isMultiSelecting, isZoomOut, getSelectionStart } =
+		unlock( useSelect( blockEditorStore ) );
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
@@ -87,7 +86,27 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 				return;
 			}
 		}
-		placeCaretAtHorizontalEdge( target, isReverse );
+		// Do not place a caret when the target already contains one:
+		// while a focused editing host contains the target (the block
+		// supports `editableRoot`), the caret can be inside it without the
+		// target holding focus. Only a caret the rich text synchronized to
+		// the store (offsets present) is deliberate; a leftover one yields
+		// to an explicitly requested edge position (initialPosition -1).
+		const { activeElement } = ownerDocument;
+		const selection = ownerDocument.defaultView.getSelection();
+		const { clientId: selectionClientId, offset } = getSelectionStart();
+		const hasCaret =
+			activeElement?.isContentEditable &&
+			activeElement.contains( target ) &&
+			!! selection.anchorNode &&
+			target.contains( selection.anchorNode );
+		const isDeliberate =
+			initialPosition === 0 ||
+			( offset !== undefined && selectionClientId === clientId );
+
+		if ( ! ( hasCaret && isDeliberate ) ) {
+			placeCaretAtHorizontalEdge( target, isReverse );
+		}
 	}, [ initialPosition, clientId ] );
 
 	return ref;

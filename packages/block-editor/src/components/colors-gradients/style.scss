@@ -68,9 +68,9 @@ $swatch-gap: 12px;
 	background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 }
 
-// Space the in-popover contrast notice away from the color palette below it.
+// Space the in-popover contrast notice away from the color palette above it.
 .block-editor-panel-color-gradient-settings__contrast-notice {
-	margin-bottom: $grid-unit-20;
+	margin-top: $grid-unit-20;
 }
 
 /**

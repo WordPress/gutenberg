@@ -354,6 +354,16 @@ export function getShowStylebook( state ) {
 }
 
 /**
+ * Get the canvas width.
+ *
+ * @param {Object} state Global application state.
+ * @return {number} The canvas width in pixels.
+ */
+export function getCanvasWidth( state ) {
+	return state.canvasWidth;
+}
+
+/**
  * Returns the current revisions page number.
  *
  * @param {Object} state Global application state.
@@ -383,6 +393,7 @@ export function buildRevisionsPageQuery( revisionKey, page ) {
 				'date',
 				'modified',
 				'author',
+				'slug',
 				'meta',
 				'title.raw',
 				'excerpt.raw',
