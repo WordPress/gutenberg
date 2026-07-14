@@ -214,6 +214,58 @@ describe( 'WidgetAttributeControls fit', () => {
 		).toHaveFocus();
 	} );
 
+	it( 'locks the fit while the dropdown is open', async () => {
+		mockedUseInlineControlsFit.mockReturnValue( {
+			measureRef: () => {},
+			collapsed: true,
+		} );
+		const user = userEvent.setup();
+		render( <Harness /> );
+		await screen.findByTestId( 'metric' );
+
+		expect( mockedUseInlineControlsFit ).toHaveBeenLastCalledWith(
+			expect.objectContaining( { locked: false } )
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Widget controls' } )
+		);
+		await screen.findByRole( 'dialog', { name: 'Widget controls' } );
+
+		expect( mockedUseInlineControlsFit ).toHaveBeenLastCalledWith(
+			expect.objectContaining( { locked: true } )
+		);
+
+		await user.keyboard( '{Escape}' );
+
+		await waitFor( () =>
+			expect( mockedUseInlineControlsFit ).toHaveBeenLastCalledWith(
+				expect.objectContaining( { locked: false } )
+			)
+		);
+	} );
+
+	it( 'locks the fit while the inline form has focus', async () => {
+		const user = userEvent.setup();
+		render( <Harness /> );
+		await screen.findByTestId( 'metric' );
+
+		await user.click( screen.getAllByRole( 'combobox' )[ 0 ] );
+
+		expect( mockedUseInlineControlsFit ).toHaveBeenLastCalledWith(
+			expect.objectContaining( { locked: true } )
+		);
+
+		// Focus leaves the inline form.
+		await user.click( screen.getByTestId( 'metric' ) );
+
+		await waitFor( () =>
+			expect( mockedUseInlineControlsFit ).toHaveBeenLastCalledWith(
+				expect.objectContaining( { locked: false } )
+			)
+		);
+	} );
+
 	it( 'keeps the settings surface reachable while collapsed', async () => {
 		mockedUseInlineControlsFit.mockReturnValue( {
 			measureRef: () => {},

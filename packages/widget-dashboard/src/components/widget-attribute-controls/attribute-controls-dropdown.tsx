@@ -31,6 +31,17 @@ export interface AttributeControlsDropdownProps {
 	 * Stages an attribute edit, exactly like the inline controls do.
 	 */
 	onChange: ( edits: Record< string, unknown > ) => void;
+
+	/**
+	 * Whether the popover is open. Controlled by the caller so the fit can
+	 * hold the collapsed presentation while the user is inside it.
+	 */
+	open: boolean;
+
+	/**
+	 * Open-state changes, from the trigger and from dismissals.
+	 */
+	onOpenChange: ( open: boolean ) => void;
 }
 
 /**
@@ -44,6 +55,8 @@ export function AttributeControlsDropdown( {
 	fields,
 	data,
 	onChange,
+	open,
+	onOpenChange,
 }: AttributeControlsDropdownProps ): React.ReactNode {
 	const form = useMemo< Form >(
 		() => ( {
@@ -54,7 +67,7 @@ export function AttributeControlsDropdown( {
 	);
 
 	return (
-		<Popover.Root>
+		<Popover.Root open={ open } onOpenChange={ onOpenChange }>
 			<Popover.Trigger
 				render={
 					<IconButton

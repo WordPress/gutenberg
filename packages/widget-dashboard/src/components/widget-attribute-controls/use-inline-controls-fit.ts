@@ -14,6 +14,21 @@ import { useState } from '@wordpress/element';
  */
 import { useWidgetHeaderAvailableSize } from '../widget-header/widget-header-size';
 
+interface InlineControlsFitOptions {
+	/**
+	 * Inline size (px) already claimed by fixed toolbar controls that are
+	 * not part of the collapse.
+	 */
+	reservedSize?: number;
+
+	/**
+	 * Holds the current presentation while the user interacts with it (an
+	 * open dropdown, focus inside the inline form). Measurements keep
+	 * flowing; the pending transition applies when the hold releases.
+	 */
+	locked?: boolean;
+}
+
 interface InlineControlsFit {
 	/**
 	 * Ref for the element wrapping the inline controls at their natural
@@ -34,13 +49,13 @@ interface InlineControlsFit {
  * Decides whether the inline attribute controls fit the space the header
  * row can grant its toolbar.
  *
- * @param {number} [reservedSize] Inline size (px) already claimed by fixed
- *                                toolbar controls that are not part of the
- *                                collapse.
+ * @param {InlineControlsFitOptions} [options] Fit options.
  */
 export function useInlineControlsFit(
-	reservedSize: number = 0
+	options: InlineControlsFitOptions = {}
 ): InlineControlsFit {
+	const { reservedSize = 0, locked = false } = options;
+
 	const availableSize = useWidgetHeaderAvailableSize();
 	const [ naturalSize, setNaturalSize ] = useState( 0 );
 
@@ -50,10 +65,18 @@ export function useInlineControlsFit(
 
 	// The zero guards keep environments without layout (JSDOM) on the
 	// inline presentation.
-	const collapsed =
+	const computed =
 		availableSize !== null &&
 		naturalSize > 0 &&
 		naturalSize > availableSize - reservedSize;
 
-	return { measureRef, collapsed };
+	// The latch: while locked, the surface the user is interacting with
+	// must not be replaced under them, so the last unlocked decision holds.
+	// Releasing the lock lets the pending transition apply.
+	const [ held, setHeld ] = useState( computed );
+	if ( ! locked && held !== computed ) {
+		setHeld( computed );
+	}
+
+	return { measureRef, collapsed: locked ? held : computed };
 }

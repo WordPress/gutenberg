@@ -3,7 +3,7 @@
  */
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 
@@ -81,7 +81,25 @@ export function WidgetAttributeControls( {
 		);
 	}, [] );
 
-	const { measureRef, collapsed } = useInlineControlsFit( triggerReserve );
+	// While the user interacts with a presentation (the dropdown is open,
+	// or focus sits inside the inline form), the fit holds it in place;
+	// replacing it mid-interaction would drop focus on the floor. The
+	// pending transition applies when the interaction ends.
+	const [ dropdownOpen, setDropdownOpen ] = useState( false );
+	const [ inlineHasFocus, setInlineHasFocus ] = useState( false );
+
+	const { measureRef, collapsed } = useInlineControlsFit( {
+		reservedSize: triggerReserve,
+		locked: dropdownOpen || inlineHasFocus,
+	} );
+
+	// A collapse can only start once focus left the inline form; clear the
+	// flag if the fields unmount with it still set.
+	useEffect( () => {
+		if ( collapsed ) {
+			setInlineHasFocus( false );
+		}
+	}, [ collapsed ] );
 
 	const fields = useMemo< Field< WidgetAttributes >[] >(
 		() =>
@@ -139,6 +157,16 @@ export function WidgetAttributeControls( {
 						gap="xs"
 						ref={ measureRef }
 						className={ styles[ 'inline-controls' ] }
+						onFocus={ () => setInlineHasFocus( true ) }
+						onBlur={ ( event ) => {
+							if (
+								! event.currentTarget.contains(
+									event.relatedTarget as Node | null
+								)
+							) {
+								setInlineHasFocus( false );
+							}
+						} }
 					>
 						<DataForm< WidgetAttributes >
 							data={ data }
@@ -153,6 +181,8 @@ export function WidgetAttributeControls( {
 					fields={ fields }
 					data={ data }
 					onChange={ handleChange }
+					open={ dropdownOpen }
+					onOpenChange={ setDropdownOpen }
 				/>
 			) }
 
