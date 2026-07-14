@@ -87,6 +87,8 @@ function gutenberg_apply_pattern_block_rendering( $args, $block_name ) {
 		$args['supports']['html'] = false;
 	}
 
+	$args['skip_inner_blocks'] = true;
+
 	$args['render_callback'] = static function ( $attributes, $content, $block ) {
 		// A pattern can contain another instance of the same block. Render that nested
 		// instance as empty, matching `core/block`, to avoid infinite recursion.

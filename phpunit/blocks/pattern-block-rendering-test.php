@@ -23,8 +23,10 @@ class Tests_Blocks_Pattern_Block_Rendering extends WP_UnitTestCase {
 		. '</div><!-- /wp:group -->';
 
 	public function tear_down() {
-		if ( WP_Block_Type_Registry::get_instance()->is_registered( self::BLOCK_NAME ) ) {
-			unregister_block_type( self::BLOCK_NAME );
+		foreach ( array( self::BLOCK_NAME, 'tests/side-effect-block' ) as $block_name ) {
+			if ( WP_Block_Type_Registry::get_instance()->is_registered( $block_name ) ) {
+				unregister_block_type( $block_name );
+			}
 		}
 		parent::tear_down();
 	}
@@ -68,11 +70,23 @@ class Tests_Blocks_Pattern_Block_Rendering extends WP_UnitTestCase {
 	}
 
 	public function test_ignores_saved_inner_content() {
+		$calls = 0;
+		register_block_type(
+			'tests/side-effect-block',
+			array(
+				'render_callback' => static function () use ( &$calls ) {
+					++$calls;
+					return '<p>SIDE EFFECT OUTPUT</p>';
+				},
+			)
+		);
 		$this->register_pattern_block();
 
-		$output = do_blocks( '<!-- wp:' . self::BLOCK_NAME . ' --><p>INJECTED</p><!-- /wp:' . self::BLOCK_NAME . ' -->' );
+		$output = do_blocks( '<!-- wp:' . self::BLOCK_NAME . ' --><p>INJECTED</p><!-- wp:tests/side-effect-block /--><!-- /wp:' . self::BLOCK_NAME . ' -->' );
 
+		$this->assertSame( 0, $calls, 'Saved inner blocks must not render before the pattern callback.' );
 		$this->assertStringNotContainsString( 'INJECTED', $output );
+		$this->assertStringNotContainsString( 'SIDE EFFECT OUTPUT', $output );
 		$this->assertStringContainsString( 'Plugin-owned paragraph.', $output );
 	}
 
