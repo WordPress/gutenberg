@@ -17,6 +17,7 @@ import {
 } from '@wordpress/components';
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
 import { __, _x } from '@wordpress/i18n';
+import { cleanForSlug } from '@wordpress/url';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { keyboardReturn } from '@wordpress/icons';
@@ -59,6 +60,55 @@ function getMediaFileName( media ) {
 		( isBlobURL( url ) ? getBlobByURL( url )?.name : undefined ) ??
 		getFileNameFromUrl( url )
 	);
+}
+
+function getFileNameParts( fileName ) {
+	if ( ! fileName ) {
+		return {};
+	}
+
+	const dotIndex = fileName.lastIndexOf( '.' );
+	if ( dotIndex <= 0 ) {
+		return {
+			baseName: fileName,
+			extension: '',
+		};
+	}
+
+	return {
+		baseName: fileName.slice( 0, dotIndex ),
+		extension: fileName.slice( dotIndex + 1 ),
+	};
+}
+
+function areFileNamesEquivalent( fileNameA, fileNameB ) {
+	if ( ! fileNameA || ! fileNameB ) {
+		return false;
+	}
+
+	return (
+		fileNameA === fileNameB ||
+		cleanForSlug( fileNameA ) === cleanForSlug( fileNameB )
+	);
+}
+
+function getSanitizedSuffixMatchLength( fileName, mediaFileName ) {
+	const fileParts = getFileNameParts( fileName );
+	const mediaParts = getFileNameParts( mediaFileName );
+	const baseName = cleanForSlug( fileParts.baseName );
+	const mediaBaseName = cleanForSlug( mediaParts.baseName );
+
+	if (
+		! baseName ||
+		cleanForSlug( fileParts.extension ) !==
+			cleanForSlug( mediaParts.extension )
+	) {
+		return -1;
+	}
+
+	return mediaBaseName.startsWith( `${ baseName }-` )
+		? baseName.length
+		: -1;
 }
 
 function areMediaItemsSame( mediaA, mediaB ) {
@@ -308,11 +358,37 @@ export function MediaPlaceholder( {
 					const mediaFileName = getMediaFileName( media );
 					const matchingFileIndex = filesList.findIndex(
 						( file, index ) =>
-							file.name === mediaFileName &&
+							areFileNamesEquivalent( file.name, mediaFileName ) &&
 							! isFinalMediaItem( selectedMedia[ index ] )
 					);
 					if ( matchingFileIndex !== -1 ) {
 						return matchingFileIndex;
+					}
+
+					const sanitizedSuffixMatch = filesList.reduce(
+						( bestMatch, file, index ) => {
+							if ( isFinalMediaItem( selectedMedia[ index ] ) ) {
+								return bestMatch;
+							}
+
+							const matchLength =
+								getSanitizedSuffixMatchLength(
+									file.name,
+									mediaFileName
+								);
+							if ( matchLength <= bestMatch.length ) {
+								return bestMatch;
+							}
+
+							return {
+								index,
+								length: matchLength,
+							};
+						},
+						{ index: -1, length: -1 }
+					).index;
+					if ( sanitizedSuffixMatch !== -1 ) {
+						return sanitizedSuffixMatch;
 					}
 
 					return -1;
@@ -365,7 +441,6 @@ export function MediaPlaceholder( {
 					selectBatchIfReady();
 					originalOnError?.( ...args );
 				} )( onError );
-				};
 			}
 		} else {
 			setMedia = ( [ media ] ) => onSelect( media );

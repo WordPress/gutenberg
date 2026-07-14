@@ -190,6 +190,54 @@ describe( 'MediaPlaceholder', () => {
 		expect( onSelect ).toHaveBeenCalledWith( [ firstTrack, secondTrack ] );
 	} );
 
+	it( 'preserves file order when final media filenames are sanitized', () => {
+		const onSelect = jest.fn();
+		const fileList = [
+			new File( [ 'audio' ], 'First Track.mp3', {
+				type: 'audio/mpeg',
+			} ),
+			new File( [ 'audio' ], 'Second Track.mp3', {
+				type: 'audio/mpeg',
+			} ),
+		];
+		const firstTrack = {
+			id: 1,
+			filename: 'first-track-1.mp3',
+			url: 'https://example.com/first-track-1.mp3',
+		};
+		const secondTrack = {
+			id: 2,
+			filename: 'second-track-1.mp3',
+			url: 'https://example.com/second-track-1.mp3',
+		};
+
+		render(
+			<MediaPlaceholder
+				allowedTypes={ [ 'audio' ] }
+				multiple
+				onSelect={ onSelect }
+			/>
+		);
+
+		act( () => {
+			mockDropZoneProps.onFilesDrop( fileList );
+		} );
+
+		const { onBatchSuccess, onFileChange } =
+			mediaUpload.mock.calls[ 0 ][ 0 ];
+
+		act( () => {
+			onFileChange( [ { url: 'blob:https://example.com/first' } ] );
+			onFileChange( [ { url: 'blob:https://example.com/second' } ] );
+			onFileChange( [ secondTrack ] );
+			onFileChange( [ firstTrack ] );
+			onBatchSuccess();
+		} );
+
+		expect( onSelect ).toHaveBeenCalledTimes( 1 );
+		expect( onSelect ).toHaveBeenCalledWith( [ firstTrack, secondTrack ] );
+	} );
+
 	it( 'selects successful media when a multiple upload partially fails without a batch success callback', () => {
 		const onError = jest.fn();
 		const onSelect = jest.fn();
