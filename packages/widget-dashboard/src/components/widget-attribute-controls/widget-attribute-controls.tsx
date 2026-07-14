@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useResizeObserver } from '@wordpress/compose';
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
@@ -66,38 +67,47 @@ export function WidgetAttributeControls( {
 	// The control's size is determined by design tokens. Read once per mount.
 	const [ triggerReserve, setTriggerReserve ] = useState( 0 );
 
-	const triggerReserveRef = useCallback( ( element: HTMLElement | null ) => {
-		if ( ! element ) {
-			setTriggerReserve( 0 );
-			return;
+	const triggerReserveRef = useResizeObserver< HTMLElement >(
+		( [ entry ] ) => {
+			const { columnGap } = getComputedStyle(
+				entry.target.parentElement as HTMLElement
+			);
+
+			setTriggerReserve(
+				entry.contentRect.width + ( parseFloat( columnGap ) || 0 )
+			);
 		}
+	);
 
-		const { columnGap } = getComputedStyle(
-			element.parentElement as HTMLElement
-		);
+	useEffect( () => {
+		if ( ! hasSettingsSurface ) {
+			setTriggerReserve( 0 );
+		}
+	}, [ hasSettingsSurface ] );
 
-		setTriggerReserve(
-			element.offsetWidth + ( parseFloat( columnGap ) || 0 )
-		);
-	}, [] );
-
-	// While the user interacts with a presentation (the dropdown is open,
-	// or focus sits inside the inline form), the fit holds it in place;
-	// replacing it mid-interaction would drop focus on the floor. The
-	// pending transition applies when the interaction ends.
+	// While the user interacts with a presentation, the fit holds it in
+	// place; replacing it mid-interaction would drop focus on the floor.
+	// The hold covers the open dropdown, focus inside the inline form, and
+	// focus on the dropdown trigger itself: dismissing the popup restores
+	// focus to the trigger asynchronously, so the trigger must survive
+	// until focus moves on. The pending transition applies afterwards.
 	const [ dropdownOpen, setDropdownOpen ] = useState( false );
 	const [ inlineHasFocus, setInlineHasFocus ] = useState( false );
+	const [ dropdownTriggerHasFocus, setDropdownTriggerHasFocus ] =
+		useState( false );
 
 	const { measureRef, collapsed } = useInlineControlsFit( {
 		reservedSize: triggerReserve,
-		locked: dropdownOpen || inlineHasFocus,
+		locked: dropdownOpen || inlineHasFocus || dropdownTriggerHasFocus,
 	} );
 
-	// A collapse can only start once focus left the inline form; clear the
-	// flag if the fields unmount with it still set.
+	// A transition can only start once focus left the outgoing
+	// presentation; clear its flag if it unmounts with the flag still set.
 	useEffect( () => {
 		if ( collapsed ) {
 			setInlineHasFocus( false );
+		} else {
+			setDropdownTriggerHasFocus( false );
 		}
 	}, [ collapsed ] );
 
@@ -177,13 +187,26 @@ export function WidgetAttributeControls( {
 					</Stack>
 				)
 			) : (
-				<AttributeControlsDropdown
-					fields={ fields }
-					data={ data }
-					onChange={ handleChange }
-					open={ dropdownOpen }
-					onOpenChange={ setDropdownOpen }
-				/>
+				<span
+					className={ styles[ 'dropdown-area' ] }
+					onFocus={ () => setDropdownTriggerHasFocus( true ) }
+					onBlur={ ( event ) => {
+						if (
+							! event.currentTarget.contains(
+								event.relatedTarget as Node | null
+							)
+						) {
+							setDropdownTriggerHasFocus( false );
+						}
+					} }
+				>
+					<AttributeControlsDropdown
+						fields={ fields }
+						data={ data }
+						onChange={ handleChange }
+						onOpenChange={ setDropdownOpen }
+					/>
+				</span>
 			) }
 
 			{ hasSettingsSurface && (

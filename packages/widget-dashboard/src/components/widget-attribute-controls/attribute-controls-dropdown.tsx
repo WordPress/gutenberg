@@ -39,13 +39,9 @@ export interface AttributeControlsDropdownProps {
 	onChange: ( edits: Record< string, unknown > ) => void;
 
 	/**
-	 * Whether the popover is open. Controlled by the caller so the fit can
-	 * hold the collapsed presentation while the user is inside it.
-	 */
-	open: boolean;
-
-	/**
-	 * Open-state changes, from the trigger and from dismissals.
+	 * Observes open-state changes, from the trigger and from dismissals.
+	 * The popover owns its lifecycle; the caller only listens, so the fit
+	 * can hold the collapsed presentation while the user is inside it.
 	 */
 	onOpenChange: ( open: boolean ) => void;
 }
@@ -61,7 +57,6 @@ export function AttributeControlsDropdown( {
 	fields,
 	data,
 	onChange,
-	open,
 	onOpenChange,
 }: AttributeControlsDropdownProps ): React.ReactNode {
 	const form = useMemo< Form >(
@@ -73,7 +68,7 @@ export function AttributeControlsDropdown( {
 	);
 
 	return (
-		<Popover.Root open={ open } onOpenChange={ onOpenChange }>
+		<Popover.Root onOpenChange={ onOpenChange }>
 			<Popover.Trigger
 				render={
 					<IconButton
@@ -102,12 +97,9 @@ export function AttributeControlsDropdown( {
 						onChange={ onChange }
 					/>
 
-					<Button
-						variant="minimal"
-						onClick={ () => onOpenChange( false ) }
-					>
+					<Popover.Close render={ <Button variant="minimal" /> }>
 						{ __( 'Close' ) }
-					</Button>
+					</Popover.Close>
 				</Stack>
 			</Popover.Popup>
 		</Popover.Root>

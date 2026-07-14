@@ -237,7 +237,19 @@ describe( 'WidgetAttributeControls fit', () => {
 		);
 
 		await user.keyboard( '{Escape}' );
+		await waitFor( () =>
+			expect(
+				screen.queryByRole( 'dialog', { name: 'Widget controls' } )
+			).not.toBeInTheDocument()
+		);
 
+		// Escape restores focus to the trigger, which keeps the hold.
+		expect( mockedUseInlineControlsFit ).toHaveBeenLastCalledWith(
+			expect.objectContaining( { locked: true } )
+		);
+
+		// The hold releases once focus moves on.
+		await user.tab();
 		await waitFor( () =>
 			expect( mockedUseInlineControlsFit ).toHaveBeenLastCalledWith(
 				expect.objectContaining( { locked: false } )
