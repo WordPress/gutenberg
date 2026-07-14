@@ -29,6 +29,22 @@ import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
 import { useEntityBinding, useLinkPreview } from '../shared';
 
+function isURLLikeInput( value = '' ) {
+	const input = value.trim();
+
+	if ( ! input || input.includes( ' ' ) ) {
+		return false;
+	}
+
+	return (
+		isURL( input ) ||
+		/^\/\//.test( input ) ||
+		/^www\./i.test( input ) ||
+		/^(?:\/|\.\/|\.\.\/)/.test( input ) ||
+		/^[a-z0-9-]+\.[a-z]{2,}(?:[/?#].*)?$/i.test( input )
+	);
+}
+
 /**
  * Given the Link block's type attribute, return the query params to give to
  * /wp/v2/search.
@@ -187,6 +203,13 @@ function UnforwardedLinkUI( props, ref ) {
 
 	const blockEditingMode = useBlockEditingMode();
 
+	const currentSearchValue = initialSearchValue || initialSearchValue || '';
+
+	const canAddPage =
+		permissions?.canCreate &&
+		type === 'page' &&
+		! isURLLikeInput( currentSearchValue );
+
 	return (
 		<Popover
 			ref={ ref }
@@ -217,15 +240,11 @@ function UnforwardedLinkUI( props, ref ) {
 						value={ link }
 						showInitialSuggestions
 						withCreateSuggestion={ false }
-						noDirectEntry={ !! type }
-						noURLSuggestion={ !! type }
+						noDirectEntry={ false }
+						noURLSuggestion={ false }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 						onChange={ props.onChange }
-						onInputChange={ ( value ) => {
-							// Observe the input value so we can pass the value to the page creator
-							// and restore it on back button click
-							searchInputValueRef.current = value;
-						} }
+						onInputChange={ updateSearchValue }
 						inputValue={ initialSearchValue }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
@@ -247,10 +266,7 @@ function UnforwardedLinkUI( props, ref ) {
 									setAddingPage={ () => {
 										setAddingPage( true );
 									} }
-									canAddPage={
-										permissions?.canCreate &&
-										type === 'page'
-									}
+									canAddPage={ canAddPage }
 									canAddBlock={
 										blockEditingMode === 'default'
 									}
