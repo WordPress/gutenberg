@@ -210,7 +210,7 @@ export function Edit( { attributes, setAttributes } ) {
 			{ blockControls }
 			{ inspectorControls }
 			<div { ...useBlockProps() }>
-				{ icon ? (
+				{ iconToDisplay ? (
 					<HtmlRenderer
 						html={ iconToDisplay }
 						wrapperProps={ {

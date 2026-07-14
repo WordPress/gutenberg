@@ -122,6 +122,7 @@ if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 
 // WordPress 7.1 compat.
 require __DIR__ . '/compat/wordpress-7.1/admin-bar.php';
+require __DIR__ . '/compat/wordpress-7.1/blocks.php';
 require __DIR__ . '/compat/wordpress-7.1/kses.php';
 require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/preload.php';
@@ -136,7 +137,9 @@ require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/extensible-site-editor.php';
-require __DIR__ . '/experimental/block-bindings-inner-blocks.php';
+if ( gutenberg_is_experiment_enabled( 'gutenberg-pattern-overrides-inner-blocks' ) ) {
+	require __DIR__ . '/experimental/block-bindings-inner-blocks.php';
+}
 if ( gutenberg_is_experiment_enabled( 'gutenberg-dataform-inspector' ) ) {
 	require __DIR__ . '/experimental/dataform-inspector-preload.php';
 }

@@ -57,6 +57,7 @@
 /bin                                            @ntwb @nerrad @ajitbohra @manzoorwanijk
 /tools                                          @manzoorwanijk
 /tools/eslint/suppressions.json
+/tools/stylelint/stylelint-suppressions.json
 /packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @ntwb @nerrad @ajitbohra

@@ -25,6 +25,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables experimental blocks on a rolling basis as they are developed. (Warning: these blocks may have significant changes during development that cause validation errors and display issues.)', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-pattern-overrides-inner-blocks',
+					'label'       => __( 'Inner block bindings for synced patterns', 'gutenberg' ),
+					'description' => __( 'Enables experimental Block Bindings for editable areas in synced patterns, allowing their nested blocks to be customized for each pattern instance.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-form-blocks',
 					'label'       => __( 'Form and input blocks', 'gutenberg' ),
 					'description' => __( 'Enables new blocks to allow building forms. You are likely to experience UX issues that are being addressed.', 'gutenberg' ),

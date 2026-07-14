@@ -42,7 +42,7 @@
 }
 
 .components-placeholder__label {
-	font-weight: 600;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	align-items: center;
 	display: flex;
 
