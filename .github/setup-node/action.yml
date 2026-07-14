@@ -19,7 +19,7 @@ runs:
               node-version: ${{ inputs.node-version }}
               package-manager-cache: ${{ inputs.enable-caching == 'true' && 'true' || 'false' }}
               check-latest: true
-              cache: npm
+              cache: ${{ inputs.enable-caching == 'true' && 'npm' || '' }}
 
         - name: Get Node.js and npm version
           id: node-version
@@ -36,7 +36,7 @@ runs:
               key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
 
         - name: Install npm dependencies
-          if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
+          if: ${{ inputs.enable-caching == 'false' || steps.cache-node_modules.outputs.cache-hit != 'true' }}
           run: |
               npm ci
           shell: bash
