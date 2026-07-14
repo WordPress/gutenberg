@@ -1,5 +1,23 @@
 == Changelog ==
 
+= 23.5.3 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Global Styles
+- Block Supports: Improve handling of block class name to avoid fatal. ([80214](https://github.com/WordPress/gutenberg/pull/80214))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@aduth @ciampo
+
+
 = 23.5.2 =
 
 ## Changelog
