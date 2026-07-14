@@ -17,7 +17,7 @@ import _CustomSelectControl from '..';
 
 const UncontrolledCustomSelectControl = (
 	props: React.ComponentProps< typeof _CustomSelectControl >
-) => <_CustomSelectControl __next40pxDefaultSize { ...props } />;
+) => <_CustomSelectControl { ...props } />;
 
 const customClassName = 'amber-skies';
 const customStyles = {
@@ -483,7 +483,7 @@ describe.each( [
 			const customSelect = screen.getByRole( 'listbox', {
 				name: props.label,
 			} );
-			expect( customSelect ).toHaveFocus();
+			await waitFor( () => expect( customSelect ).toHaveFocus() );
 			await press.Enter();
 
 			expect( onKeyDown ).toHaveBeenCalledTimes( 0 );

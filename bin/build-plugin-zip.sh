@@ -81,7 +81,6 @@ zip --recurse-paths --no-dir-entries \
 	packages/block-serialization-default-parser/*.php \
 	packages/icons/src/manifest.php \
 	packages/icons/src/library/*.svg \
-	post-content.php \
 	build \
 	build-module \
 	readme.txt \

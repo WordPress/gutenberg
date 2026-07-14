@@ -98,6 +98,7 @@ function ListViewBlock( {
 		insertAfterBlock,
 		insertBeforeBlock,
 		showViewportModal,
+		stopEditingContentOnlySection,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	const debouncedToggleBlockHighlight = useDebounce(
@@ -125,21 +126,41 @@ function ListViewBlock( {
 
 	const pasteStyles = usePasteStyles();
 
-	const { block, blockName, allowRightClickOverrides } = useSelect(
+	const {
+		block,
+		blockName,
+		blockEditingMode,
+		allowRightClickOverrides,
+		editedSection,
+		viewportSettings,
+		blockVisibilitySetting,
+	} = useSelect(
 		( select ) => {
-			const { getBlock, getBlockName, getSettings } = unlock(
-				select( blockEditorStore )
-			);
+			const {
+				getBlock,
+				getBlockName,
+				getBlockEditingMode: getBlockEditingModeForClientId,
+				getSettings,
+				getEditedContentOnlySection,
+			} = unlock( select( blockEditorStore ) );
+			const settings = getSettings();
 
 			return {
 				block: getBlock( clientId ),
 				blockName: getBlockName( clientId ),
-				allowRightClickOverrides:
-					getSettings().allowRightClickOverrides,
+				blockEditingMode: getBlockEditingModeForClientId( clientId ),
+				allowRightClickOverrides: settings.allowRightClickOverrides,
+				editedSection: getEditedContentOnlySection(),
+				viewportSettings: settings.__experimentalFeatures?.viewport,
+				blockVisibilitySetting:
+					settings.__experimentalFeatures?.blockVisibility
+						?.allowEditing,
 			};
 		},
 		[ clientId ]
 	);
+
+	const isDisabled = blockEditingMode === 'disabled';
 	const { canRename } = useBlockRename( blockName );
 
 	const showBlockActions =
@@ -199,6 +220,13 @@ function ListViewBlock( {
 		// Do not handle events if it comes from modals;
 		// retain the default behavior for these keys.
 		if ( event.target.closest( '[role=dialog]' ) ) {
+			return;
+		}
+
+		if ( editedSection && isMatch( 'core/block-editor/unselect', event ) ) {
+			event.stopPropagation();
+			event.preventDefault();
+			stopEditingContentOnlySection();
 			return;
 		}
 
@@ -370,6 +398,9 @@ function ListViewBlock( {
 		} else if (
 			isMatch( 'core/block-editor/toggle-block-visibility', event )
 		) {
+			if ( blockVisibilitySetting === false ) {
+				return;
+			}
 			event.preventDefault();
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const blocks = getBlocksByClientId( blocksToUpdate );
@@ -535,11 +566,13 @@ function ListViewBlock( {
 
 	// Determine label based on where block is hidden (not when/current viewport)
 	const blockVisibilityDescription = getBlockVisibilityLabel(
-		block?.attributes?.metadata?.blockVisibility
+		block?.attributes?.metadata?.blockVisibility,
+		viewportSettings
 	);
 
 	const hasSiblings = siblingBlockCount > 0;
-	const hasRenderedMovers = showBlockMovers && hasSiblings;
+	const canShowBlockActions = showBlockActions && ! isDisabled;
+	const hasRenderedMovers = showBlockMovers && hasSiblings && ! isDisabled;
 	const moverCellClassName = clsx(
 		'block-editor-list-view-block__mover-cell',
 		{ 'is-visible': isHovered || isSelected }
@@ -553,7 +586,7 @@ function ListViewBlock( {
 	let colSpan;
 	if ( hasRenderedMovers ) {
 		colSpan = 2;
-	} else if ( ! showBlockActions ) {
+	} else if ( ! canShowBlockActions ) {
 		colSpan = 3;
 	}
 
@@ -566,12 +599,13 @@ function ListViewBlock( {
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
 		'is-synced': blockInformation?.isSynced,
-		'is-draggable': canMoveBlock,
+		'is-draggable': canMoveBlock && ! isDisabled,
 		'is-displacement-normal': displacement === 'normal',
 		'is-displacement-up': displacement === 'up',
 		'is-displacement-down': displacement === 'down',
 		'is-after-dragged-blocks': isAfterDraggedBlocks,
 		'is-nesting': isNesting,
+		'is-disabled': isDisabled,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block
@@ -582,19 +616,28 @@ function ListViewBlock( {
 		? selectedClientIds
 		: [ clientId ];
 
-	// Detect if there is a block in the canvas currently being edited and multi-selection is not happening.
-	const currentlyEditingBlockInCanvas =
-		isSelected && selectedClientIds.length === 1;
+	const getListViewBlockTabIndex = ( rovingTabIndex ) => {
+		if ( isDisabled ) {
+			return -1;
+		}
+
+		// Detect if there is a block in the canvas currently being edited and multi-selection is not happening.
+		if ( isSelected && selectedClientIds.length === 1 ) {
+			return 0;
+		}
+
+		return rovingTabIndex;
+	};
 
 	return (
 		<ListViewLeaf
 			className={ classes }
 			isDragged={ isDragged }
 			onKeyDown={ onKeyDown }
-			onMouseEnter={ onMouseEnter }
-			onMouseLeave={ onMouseLeave }
-			onFocus={ onMouseEnter }
-			onBlur={ onMouseLeave }
+			onMouseEnter={ isDisabled ? undefined : onMouseEnter }
+			onMouseLeave={ isDisabled ? undefined : onMouseLeave }
+			onFocus={ isDisabled ? undefined : onMouseEnter }
+			onBlur={ isDisabled ? undefined : onMouseLeave }
 			level={ level }
 			position={ position }
 			rowCount={ rowCount }
@@ -615,22 +658,25 @@ function ListViewBlock( {
 						<ListViewBlockContents
 							block={ block }
 							onClick={ selectEditorBlock }
-							onContextMenu={ onContextMenu }
+							onContextMenu={
+								isDisabled ? undefined : onContextMenu
+							}
 							onMouseDown={ onMouseDown }
-							onToggleExpanded={ toggleExpanded }
+							onToggleExpanded={
+								isDisabled ? undefined : toggleExpanded
+							}
 							isSelected={ isSelected }
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
 							ref={ ref }
-							tabIndex={
-								currentlyEditingBlockInCanvas ? 0 : tabIndex
-							}
+							tabIndex={ getListViewBlockTabIndex( tabIndex ) }
 							onFocus={ onFocus }
 							isExpanded={ canEditBlock ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
 							visibilityLabel={ blockVisibilityDescription }
+							isDisabled={ isDisabled }
 						/>
 						<AriaReferencedText id={ descriptionId }>
 							{ [
@@ -676,7 +722,7 @@ function ListViewBlock( {
 				</>
 			) }
 
-			{ showBlockActions && BlockSettingsMenu && (
+			{ canShowBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
 					aria-selected={ !! isSelected }

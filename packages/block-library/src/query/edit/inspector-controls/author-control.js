@@ -76,7 +76,6 @@ function AuthorControl( { value, onChange } ) {
 			suggestions={ authorsInfo.names }
 			onChange={ onAuthorChange }
 			help=""
-			__next40pxDefaultSize
 		/>
 	);
 }

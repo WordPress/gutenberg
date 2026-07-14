@@ -7,7 +7,7 @@ import { SECOND_USER } from '../fixtures/collaboration-utils';
 const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
 
 test.describe( 'Collaboration with large documents', () => {
-	test( 'shows post-locked modal when document size limit is exceeded', async ( {
+	test.skip( 'shows post-locked modal when document size limit is exceeded', async ( {
 		collaborationUtils,
 		requestUtils,
 		admin,

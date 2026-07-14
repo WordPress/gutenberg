@@ -4,6 +4,18 @@
 
 ### Enhancement
 
+- Honor the `wp_editor_set_quality` filter for client-side processed images. Sub-size resizing and transcoding now use the size-aware quality reported by the new `image_quality` field on the attachment upload response, instead of a hardcoded default.
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 0.35.0 (2026-07-01)
+
+## 0.34.0 (2026-06-24)
+
+### Enhancement
+
 -   Add `ErrorCode` enum and localized `getErrorMessage()` helper. Existing `UploadError` throw sites now use enum values, and `ErrorCode` / `getErrorMessage` are exported from the package entry point ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
 -   Log upload cancellations and batch completions via a `SCRIPT_DEBUG`-gated `console.debug` diagnostic; top-level cancellations without an `onError` handler are surfaced via `console.error` ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
 -   Emit User Timings API entries for upload, sideload, resize, rotate, and transcode operations under a custom "Upload Media" DevTools track when `SCRIPT_DEBUG` is enabled ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
@@ -11,6 +23,7 @@
 ### Bug Fix
 
 -   `uploadItem` no longer dispatches `finishOperation` twice when both `onFileChange` and `onSuccess` fire for the same attachment ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+-   Apply EXIF orientation to AVIF/HEIF sub-sizes when the orientation is stored in an EXIF tag rather than a native `irot` transform, which neither the server nor libvips auto-rotates ([#79384](https://github.com/WordPress/gutenberg/pull/79384)).
 
 ## 0.33.1 (2026-06-16)
 

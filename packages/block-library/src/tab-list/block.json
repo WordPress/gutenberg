@@ -16,8 +16,9 @@
 			"selector": "button",
 			"query": {
 				"label": {
-					"type": "string",
-					"source": "html"
+					"type": "rich-text",
+					"source": "rich-text",
+					"role": "content"
 				}
 			},
 			"default": []
@@ -25,6 +26,7 @@
 	},
 	"supports": {
 		"html": false,
+		"ariaLabel": true,
 		"visibility": false,
 		"lock": false,
 		"color": {
@@ -49,7 +51,8 @@
 		},
 		"layout": {
 			"default": {
-				"type": "flex"
+				"type": "flex",
+				"flexWrap": "wrap"
 			},
 			"allowVerticalAlignment": false,
 			"allowOrientation": false,
@@ -75,6 +78,5 @@
 			"padding": ".wp-block-tab-list button"
 		}
 	},
-	"editorStyle": "wp-block-tab-list-editor",
 	"style": "wp-block-tab-list"
 }

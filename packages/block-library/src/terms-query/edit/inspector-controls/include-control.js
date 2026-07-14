@@ -136,7 +136,6 @@ export default function IncludeControl( {
 
 	return (
 		<FormTokenField
-			__next40pxDefaultSize
 			value={ value }
 			onInputChange={ debouncedSearch }
 			suggestions={ suggestions }

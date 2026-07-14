@@ -2,7 +2,7 @@
 
 exports[`PostPublishPanel should render the post-publish panel if the post is published 1`] = `
 .emotion-0 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
@@ -19,36 +19,12 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
 
 .emotion-4 {
   font-size: 11px;
-  font-weight: 499;
+  font-weight: 600;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
   margin-bottom: calc(4px * 2);
   padding: 0;
-}
-
-.emotion-10 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: flex-start;
-  -webkit-box-align: flex-start;
-  -ms-flex-align: flex-start;
-  align-items: flex-start;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  gap: 0;
-  -webkit-box-pack: start;
-  -ms-flex-pack: start;
-  -webkit-justify-content: start;
-  justify-content: start;
-  width: 100%;
-}
-
-.emotion-10>* {
-  min-width: 0;
 }
 
 <div>
@@ -66,6 +42,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
       >
         <svg
           aria-hidden="true"
+          fill="currentColor"
           focusable="false"
           height="24"
           viewBox="0 0 24 24"
@@ -90,7 +67,6 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
           <a
             class="components-external-link"
             href="https://wordpress.local/sample-page/"
-            rel="external noopener"
             target="_blank"
           >
             <span
@@ -134,7 +110,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
                   post address
                 </label>
                 <input
-                  class="components-text-control__input is-next-40px-default-size"
+                  class="components-text-control__input"
                   id="inspector-text-control-0"
                   readonly=""
                   type="text"
@@ -162,12 +138,14 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
               target="_blank"
             >
               <span
+                class="style-visually-hidden"
                 data-visually-hidden=""
               >
                 (opens in a new tab)
               </span>
               <svg
                 aria-hidden="true"
+                fill="currentColor"
                 focusable="false"
                 height="24"
                 viewBox="0 0 24 24"
@@ -197,9 +175,10 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-10 emotion-11"
+            class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
             data-wp-c16t="true"
             data-wp-component="HStack"
+            style="--wp-components-flex-align: flex-start; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: 0; --wp-components-flex-justify: start;"
           >
             <span
               class="components-checkbox-control__input-container"
@@ -227,7 +206,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
 
 exports[`PostPublishPanel should render the post-publish panel if the post is scheduled 1`] = `
 .emotion-0 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
@@ -244,36 +223,12 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
 
 .emotion-4 {
   font-size: 11px;
-  font-weight: 499;
+  font-weight: 600;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
   margin-bottom: calc(4px * 2);
   padding: 0;
-}
-
-.emotion-10 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: flex-start;
-  -webkit-box-align: flex-start;
-  -ms-flex-align: flex-start;
-  align-items: flex-start;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  gap: 0;
-  -webkit-box-pack: start;
-  -ms-flex-pack: start;
-  -webkit-justify-content: start;
-  justify-content: start;
-  width: 100%;
-}
-
-.emotion-10>* {
-  min-width: 0;
 }
 
 <div>
@@ -291,6 +246,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
       >
         <svg
           aria-hidden="true"
+          fill="currentColor"
           focusable="false"
           height="24"
           viewBox="0 0 24 24"
@@ -315,7 +271,6 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
           <a
             class="components-external-link"
             href="https://wordpress.local/sample-page/"
-            rel="external noopener"
             target="_blank"
           >
             <span
@@ -362,7 +317,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
                   post address
                 </label>
                 <input
-                  class="components-text-control__input is-next-40px-default-size"
+                  class="components-text-control__input"
                   id="inspector-text-control-1"
                   readonly=""
                   type="text"
@@ -402,9 +357,10 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-10 emotion-11"
+            class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
             data-wp-c16t="true"
             data-wp-component="HStack"
+            style="--wp-components-flex-align: flex-start; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: 0; --wp-components-flex-justify: start;"
           >
             <span
               class="components-checkbox-control__input-container"
@@ -432,7 +388,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
 
 exports[`PostPublishPanel should render the pre-publish panel if post status is scheduled but date is before now 1`] = `
 .emotion-0 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
@@ -445,30 +401,6 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
 
 .components-panel__row .emotion-2 {
   margin-bottom: inherit;
-}
-
-.emotion-4 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: flex-start;
-  -webkit-box-align: flex-start;
-  -ms-flex-align: flex-start;
-  align-items: flex-start;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  gap: 0;
-  -webkit-box-pack: start;
-  -ms-flex-pack: start;
-  -webkit-justify-content: start;
-  justify-content: start;
-  width: 100%;
-}
-
-.emotion-4>* {
-  min-width: 0;
 }
 
 <div>
@@ -521,6 +453,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
           <svg
             aria-hidden="true"
             class="components-site-icon"
+            fill="currentColor"
             focusable="false"
             height="36px"
             viewBox="-2 -2 24 24"
@@ -556,9 +489,10 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-4 emotion-5"
+            class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
             data-wp-c16t="true"
             data-wp-component="HStack"
+            style="--wp-components-flex-align: flex-start; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: 0; --wp-components-flex-justify: start;"
           >
             <span
               class="components-checkbox-control__input-container"
@@ -586,7 +520,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
 
 exports[`PostPublishPanel should render the pre-publish panel if the post is not saving, published or scheduled 1`] = `
 .emotion-0 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
@@ -599,30 +533,6 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
 
 .components-panel__row .emotion-2 {
   margin-bottom: inherit;
-}
-
-.emotion-4 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: flex-start;
-  -webkit-box-align: flex-start;
-  -ms-flex-align: flex-start;
-  align-items: flex-start;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  gap: 0;
-  -webkit-box-pack: start;
-  -ms-flex-pack: start;
-  -webkit-justify-content: start;
-  justify-content: start;
-  width: 100%;
-}
-
-.emotion-4>* {
-  min-width: 0;
 }
 
 <div>
@@ -675,6 +585,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
           <svg
             aria-hidden="true"
             class="components-site-icon"
+            fill="currentColor"
             focusable="false"
             height="36px"
             viewBox="-2 -2 24 24"
@@ -710,9 +621,10 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-4 emotion-5"
+            class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
             data-wp-c16t="true"
             data-wp-component="HStack"
+            style="--wp-components-flex-align: flex-start; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: 0; --wp-components-flex-justify: start;"
           >
             <span
               class="components-checkbox-control__input-container"
@@ -784,7 +696,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
 }
 
 .emotion-6 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
@@ -797,30 +709,6 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
 
 .components-panel__row .emotion-8 {
   margin-bottom: inherit;
-}
-
-.emotion-10 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: flex-start;
-  -webkit-box-align: flex-start;
-  -ms-flex-align: flex-start;
-  align-items: flex-start;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  gap: 0;
-  -webkit-box-pack: start;
-  -ms-flex-pack: start;
-  -webkit-justify-content: start;
-  justify-content: start;
-  width: 100%;
-}
-
-.emotion-10>* {
-  min-width: 0;
 }
 
 <div>
@@ -889,9 +777,10 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
           class="components-base-control__field emotion-8 emotion-9"
         >
           <div
-            class="components-flex components-h-stack emotion-10 emotion-11"
+            class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
             data-wp-c16t="true"
             data-wp-component="HStack"
+            style="--wp-components-flex-align: flex-start; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: 0; --wp-components-flex-justify: start;"
           >
             <span
               class="components-checkbox-control__input-container"

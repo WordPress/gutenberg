@@ -5,7 +5,7 @@ import { Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as viewportStore } from '@wordpress/viewport';
 import {
@@ -20,14 +20,17 @@ import {
 /**
  * Internal dependencies
  */
+import { registerDashboardFieldTypes } from './field-types';
 import { useDashboardGridSettings, useDashboardLayout } from './hooks';
+
+registerDashboardFieldTypes();
 
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
 		'gutenberg_dashboard'
 	);
 
-	const [ gridSettings, setGridSettings ] = useDashboardGridSettings();
+	const gridSettings = useDashboardGridSettings();
 
 	const widgetsModules = useSelect(
 		( select ) =>
@@ -48,27 +51,6 @@ function Dashboard() {
 		[]
 	);
 
-	const greetingName = useSelect( ( select ) => {
-		const user = select( coreStore ).getCurrentUser();
-		if ( ! user ) {
-			return undefined;
-		}
-
-		const displayName = user.name?.trim();
-		if ( displayName ) {
-			return displayName;
-		}
-
-		if ( 'username' in user && typeof user.username === 'string' ) {
-			const username = user.username.trim();
-			if ( username ) {
-				return username;
-			}
-		}
-
-		return user.slug;
-	}, [] );
-
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const handleLayoutChange = ( next: DashboardWidget[] ) => {
@@ -78,16 +60,9 @@ function Dashboard() {
 		} );
 	};
 
-	let pageTitle: string = __( 'Dashboard' );
-	if ( editMode ) {
-		pageTitle = __( 'Customize Dashboard' );
-	} else if ( greetingName ) {
-		pageTitle = sprintf(
-			/* translators: %s: current user's display name. */
-			__( 'Howdy, %s' ),
-			greetingName
-		);
-	}
+	const pageTitle = editMode
+		? __( 'Customize Dashboard' )
+		: __( 'Dashboard' );
 
 	return (
 		<WidgetDashboard
@@ -97,7 +72,6 @@ function Dashboard() {
 			onLayoutChange={ handleLayoutChange }
 			onLayoutReset={ resetLayout }
 			gridSettings={ gridSettings }
-			onGridSettingsChange={ setGridSettings }
 			editMode={ editMode }
 			onEditChange={ setEditMode }
 		>

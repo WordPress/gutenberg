@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -10,6 +11,9 @@ import ReusableBlockConvertButton from './reusable-block-convert-button';
 import ReusableBlocksManageButton from './reusable-blocks-manage-button';
 
 export default function ReusableBlocksMenuItems( { rootClientId } ) {
+	deprecated( 'wp.reusableBlocks.ReusableBlocksMenuItems', {
+		since: '7.1',
+	} );
 	return (
 		<BlockSettingsMenuControls>
 			{ ( { onClose, selectedClientIds } ) => (
