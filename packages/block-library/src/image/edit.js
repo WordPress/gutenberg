@@ -330,7 +330,13 @@ export function ImageEdit( {
 		const normalizedNewURL = getProtocol( newURL )
 			? newURL
 			: prependHTTPS( newURL );
-		if ( normalizedNewURL !== url ) {
+
+		if ( normalizedNewURL === url ) {
+			return;
+		}
+
+		const testImage = new window.Image();
+		testImage.onload = () => {
 			setAttributes( {
 				blob: undefined,
 				url: normalizedNewURL,
@@ -338,7 +344,14 @@ export function ImageEdit( {
 				sizeSlug: getSettings().imageDefaultSize,
 			} );
 			setTemporaryURL();
-		}
+		};
+		testImage.onerror = () => {
+			createErrorNotice(
+				__( 'The provided URL could not be loaded as an image.' ),
+				{ type: 'snackbar' }
+			);
+		};
+		testImage.src = normalizedNewURL;
 	}
 
 	useUploadMediaFromBlobURL( {

@@ -461,6 +461,11 @@ export default function Image( {
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
+	const hasUploadPermissions = useSelect( ( select ) => {
+		const { canUser } = select( coreStore );
+		return canUser( 'create', 'media' ) ?? true;
+	}, [] );
+
 	/*
 	 * Externally hosted images can be uploaded to the media library. The
 	 * server sideloads the URL (see mediaSideloadFromUrl), so this works even
@@ -470,7 +475,8 @@ export default function Image( {
 	const canUploadExternalImage =
 		isSingleSelected &&
 		isExternalImage( id, url ) &&
-		!! getSettings()[ mediaSideloadFromUrlKey ];
+		!! getSettings()[ mediaSideloadFromUrlKey ] &&
+		hasUploadPermissions;
 
 	// Get naturalWidth and naturalHeight from image, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
