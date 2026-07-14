@@ -11,6 +11,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
+import { getQueryArg } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -119,6 +120,43 @@ function NotesSidebar( { postId } ) {
 		toggleBlockSpotlight( targetClientId, true );
 		selectNote( targetNoteId, { focus: true } );
 	}
+
+	/*
+	 * Deep link: a `note` query arg (e.g. from a mention notification email)
+	 * opens and focuses that thread once its data has loaded. One-shot: it
+	 * never re-fires, and it is skipped entirely if the user selects a note
+	 * before the linked thread loads.
+	 */
+	const deepLinkNoteIdRef = useRef();
+	if ( deepLinkNoteIdRef.current === undefined ) {
+		const noteArg = getQueryArg( window.location.href, 'note' );
+		deepLinkNoteIdRef.current = noteArg ? Number( noteArg ) : null;
+	}
+	useEffect( () => {
+		const targetId = deepLinkNoteIdRef.current;
+		if ( ! targetId || notes.length === 0 ) {
+			return;
+		}
+		if ( selectedNoteId !== undefined ) {
+			deepLinkNoteIdRef.current = null;
+			return;
+		}
+		// The linked ID may be a reply; resolve it to its thread.
+		const thread =
+			notes.find( ( { id } ) => id === targetId ) ??
+			notes.find( ( { reply } ) =>
+				reply.some( ( { id } ) => id === targetId )
+			);
+		if ( ! thread ) {
+			return;
+		}
+		deepLinkNoteIdRef.current = null;
+		focusNote( {
+			targetClientId: thread.blockClientId,
+			noteId: thread.id,
+			isApproved: thread.status === 'approved',
+		} );
+	} );
 
 	function openNoteForBlock( targetClientId ) {
 		// A block can carry multiple threads; surface the most relevant.
