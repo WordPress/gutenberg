@@ -196,7 +196,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 								'Style changes apply only to the selected viewport.'
 							) }
 						>
-							{ __( 'Responsive editing' ) }
+							{ __( 'Responsive styles' ) }
 						</MenuItem>
 					</MenuGroup>
 					{ isTemplate && (
