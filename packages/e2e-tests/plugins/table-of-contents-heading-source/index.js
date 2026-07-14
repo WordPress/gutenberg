@@ -3,6 +3,18 @@
 	const { useBlockProps } = wp.blockEditor;
 	const { createElement: el } = wp.element;
 
+	function getHeadingTagName( level ) {
+		return Number.isInteger( level ) && level >= 1 && level <= 6
+			? `h${ level }`
+			: 'h2';
+	}
+
+	function getAnchorProps( anchor ) {
+		return typeof anchor === 'string' && anchor !== ''
+			? { id: anchor }
+			: {};
+	}
+
 	registerBlockType( 'e2e-tests/table-of-contents-heading-source', {
 		apiVersion: 3,
 		title: 'ToC Heading Source',
@@ -23,20 +35,20 @@
 			},
 		},
 		edit: function Edit( { attributes } ) {
-			const TagName = `h${ attributes.level }`;
+			const TagName = getHeadingTagName( attributes.level );
 
 			return el(
 				TagName,
-				useBlockProps( { id: attributes.anchor } ),
+				useBlockProps( getAnchorProps( attributes.anchor ) ),
 				attributes.content
 			);
 		},
 		save: function Save( { attributes } ) {
-			const TagName = `h${ attributes.level }`;
+			const TagName = getHeadingTagName( attributes.level );
 
 			return el(
 				TagName,
-				useBlockProps.save( { id: attributes.anchor } ),
+				useBlockProps.save( getAnchorProps( attributes.anchor ) ),
 				attributes.content
 			);
 		},
@@ -62,20 +74,20 @@
 			},
 		},
 		edit: function Edit( { attributes } ) {
-			const TagName = `h${ attributes.level }`;
+			const TagName = getHeadingTagName( attributes.level );
 
 			return el(
 				TagName,
-				useBlockProps( { id: attributes.anchor } ),
+				useBlockProps( getAnchorProps( attributes.anchor ) ),
 				attributes.content
 			);
 		},
 		save: function Save( { attributes } ) {
-			const TagName = `h${ attributes.level }`;
+			const TagName = getHeadingTagName( attributes.level );
 
 			return el(
 				TagName,
-				useBlockProps.save( { id: attributes.anchor } ),
+				useBlockProps.save( getAnchorProps( attributes.anchor ) ),
 				attributes.content
 			);
 		},
