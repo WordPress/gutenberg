@@ -8,7 +8,6 @@ import { __experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitF
  */
 import {
 	getCustomValueFromPreset as getCustomValueFromPresetValue,
-	getPresetSlug as getPresetValueSlug,
 	getPresetValueFromCustomValue as getPresetValueFromCustomPresetValue,
 	getSliderValueFromPreset as getSliderValueFromPresetValue,
 	isValuePreset as isPresetValue,
@@ -149,17 +148,6 @@ export function hasDefinedValues( values ) {
 	} );
 
 	return !! filteredValues.length;
-}
-
-/**
- * Returns the slug section of the given preset string.
- *
- * @param {string} value Value to extract slug from.
- *
- * @return {string|undefined} The value slug from given preset.
- */
-export function getPresetSlug( value ) {
-	return getPresetValueSlug( value, BORDER_RADIUS_PRESET_TYPE );
 }
 
 /**
