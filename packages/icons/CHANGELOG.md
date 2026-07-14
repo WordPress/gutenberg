@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Validate icon SVGs include the standard `viewBox="0 0 24 24"` attribute.
+
 ## 15.2.0 (2026-07-14)
 
 ### Enhancements
