@@ -202,7 +202,7 @@
 	},
 	"packages/block-editor/src/components/inspector-popover-header/index.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 2
 		}
 	},
 	"packages/block-editor/src/components/link-control/index.js": {
