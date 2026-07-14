@@ -107,7 +107,6 @@ export {
 	isValueSpacingPreset,
 	getCustomValueFromPreset,
 } from './spacing-sizes-control/utils';
-export { isValuePreset } from './preset-input-control/utils';
 /*
  * Content Related Components
  */

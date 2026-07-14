@@ -671,10 +671,6 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md>
 
-### isValuePreset
-
-Undocumented declaration.
-
 ### isValueSpacingPreset
 
 Checks is given value is a spacing preset.
