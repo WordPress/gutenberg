@@ -62,7 +62,7 @@
 		attributes: {
 			content: {
 				type: 'string',
-				default: 'Unregistered heading-like source',
+				default: 'Plain heading-like block',
 			},
 			anchor: {
 				type: 'string',

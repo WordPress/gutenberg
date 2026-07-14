@@ -924,7 +924,7 @@ test.describe( 'Table of Contents', () => {
 
 		// Desired behavior: ToC should support plugin-registered heading sources; trunk has no custom heading-source contract yet.
 		test.fixme(
-			'a plugin-registered custom heading source appears in the editor and after publish while an unregistered heading-like block is ignored',
+			'a plugin heading-source block appears in the editor and after publish while a plain heading-like block is ignored',
 			async ( { editor, page } ) => {
 				await editor.setContent(
 					[
@@ -932,8 +932,8 @@ test.describe( 'Table of Contents', () => {
 						`<!-- wp:e2e-tests/table-of-contents-heading-source {"content":"Plugin heading source","anchor":"plugin-heading-source"} -->
 <h2 id="plugin-heading-source" class="wp-block-e2e-tests-table-of-contents-heading-source">Plugin heading source</h2>
 <!-- /wp:e2e-tests/table-of-contents-heading-source -->`,
-						`<!-- wp:e2e-tests/table-of-contents-heading-like {"content":"Unregistered heading-like source","anchor":"unregistered-heading-like-source"} -->
-<h2 id="unregistered-heading-like-source" class="wp-block-e2e-tests-table-of-contents-heading-like">Unregistered heading-like source</h2>
+						`<!-- wp:e2e-tests/table-of-contents-heading-like {"content":"Plain heading-like block","anchor":"plain-heading-like-block"} -->
+<h2 id="plain-heading-like-block" class="wp-block-e2e-tests-table-of-contents-heading-like">Plain heading-like block</h2>
 <!-- /wp:e2e-tests/table-of-contents-heading-like -->`,
 					].join( '\n\n' )
 				);
@@ -941,10 +941,10 @@ test.describe( 'Table of Contents', () => {
 				await expect(
 					getTableOfContentsEditorBlock( editor )
 				).toContainText( 'Plugin heading source' );
-				// The heading-like block renders an h2 but is not the registered heading source.
+				// Both test blocks are registered block types; only the heading-source block represents the future ToC opt-in contract.
 				await expect(
 					getTableOfContentsEditorBlock( editor ).getByText(
-						'Unregistered heading-like source'
+						'Plain heading-like block'
 					)
 				).toHaveCount( 0 );
 
@@ -959,9 +959,7 @@ test.describe( 'Table of Contents', () => {
 					} )
 				).toBeVisible();
 				await expect(
-					tableOfContents.getByText(
-						'Unregistered heading-like source'
-					)
+					tableOfContents.getByText( 'Plain heading-like block' )
 				).toHaveCount( 0 );
 			}
 		);
