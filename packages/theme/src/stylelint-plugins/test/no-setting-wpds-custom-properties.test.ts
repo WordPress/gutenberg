@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import plugin from '../no-setting-wpds-custom-properties.mjs';
+import plugin from '../../../stylelint-plugins/no-setting-wpds-custom-properties.mjs';
 import { getStylelintResult } from './utils';
 
 const CONFIG = {
