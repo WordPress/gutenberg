@@ -87,7 +87,7 @@ export function getCustomValueFromPreset( value, spacingSizes ) {
 		return value;
 	}
 
-	const slug = getSpacingPresetSlug( value );
+	const slug = getPresetSlug( value, SPACING_PRESET_TYPE );
 	const spacingSize = spacingSizes.find(
 		( size ) => String( size.slug ) === slug
 	);
@@ -144,17 +144,6 @@ export function getSpacingPresetCssVar( value ) {
 }
 
 /**
- * Returns the slug section of the given spacing preset string.
- *
- * @param {string} value Value to extract slug from.
- *
- * @return {string|undefined} The value slug from given spacing preset.
- */
-export function getSpacingPresetSlug( value ) {
-	return getPresetSlug( value, SPACING_PRESET_TYPE );
-}
-
-/**
  * Converts spacing preset value into a Range component value .
  *
  * @param {string} presetValue  Value to convert to Range value.
@@ -169,7 +158,7 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 	const slug =
 		parseFloat( presetValue, 10 ) === 0
 			? '0'
-			: getSpacingPresetSlug( presetValue );
+			: getPresetSlug( presetValue, SPACING_PRESET_TYPE );
 	const sliderValue = spacingSizes.findIndex( ( spacingSize ) => {
 		return String( spacingSize.slug ) === slug;
 	} );
