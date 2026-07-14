@@ -895,6 +895,35 @@ From the SPX interface, you can:
 
 SPX provides a more lightweight alternative to Xdebug for profiling, with minimal performance overhead and an intuitive web-based interface.
 
+## Shell completion
+
+`wp-env` ships completion scripts for Bash, Zsh, and Fish so you can press <kbd>Tab</kbd> to complete commands, options, and values such as run containers and environments.
+
+### Bash
+
+```sh
+wp-env completion >> ~/.bashrc
+# On macOS use ~/.bash_profile instead.
+```
+
+### Zsh
+
+```sh
+autoload -Uz compinit && compinit
+wp-env completion >> ~/.zshrc
+# On macOS use ~/.zprofile instead.
+```
+
+### Fish
+
+Copy the completion file into your Fish configuration directory:
+
+```sh
+cp "$( node -e "console.log( require.resolve( '@wordpress/env/lib/completion/fish/wp-env.fish' ) )" )" ~/.config/fish/completions/wp-env.fish
+```
+
+Once installed, `wp-env s` followed by <kbd>Tab</kbd> suggests `start`, `status`, and `stop`, and `wp-env run ` followed by <kbd>Tab</kbd> lists the available containers.
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.

@@ -195,4 +195,32 @@ describe( 'env cli', () => {
 		process.exit = processExit;
 		process.stderr.write = stderr;
 	} );
+
+	it( 'prints a bash/zsh completion script.', () => {
+		const logSpy = jest.spyOn( console, 'log' );
+		cli().parse( [ 'completion' ] );
+		expect( console ).toHaveLogged();
+		expect(
+			logSpy.mock.calls.map( ( call ) => call[ 0 ] ).join( '\n' )
+		).toMatch( /yargs_completions/ );
+	} );
+
+	it( 'completes top-level commands.', () => {
+		const logSpy = jest.spyOn( console, 'log' );
+		cli().parse( [ '--get-yargs-completions', 'wp-env', '' ] );
+		expect( console ).toHaveLogged();
+		const out = logSpy.mock.calls.map( ( call ) => call[ 0 ] ).join( '\n' );
+		expect( out ).toMatch( /\bstart\b/ );
+		expect( out ).toMatch( /\bstatus\b/ );
+		expect( out ).toMatch( /\brun\b/ );
+	} );
+
+	it( 'completes run containers from positional choices.', () => {
+		const logSpy = jest.spyOn( console, 'log' );
+		cli().parse( [ '--get-yargs-completions', 'wp-env', 'run', '' ] );
+		expect( console ).toHaveLogged();
+		const out = logSpy.mock.calls.map( ( call ) => call[ 0 ] ).join( '\n' );
+		expect( out ).toMatch( /\bcli\b/ );
+		expect( out ).toMatch( /\bwordpress\b/ );
+	} );
 } );
