@@ -679,7 +679,6 @@ describe( 'resolveStyles – merged output', () => {
 			expect( value.typography.lineHeight ).toBe( '1.5' );
 			expect( sources[ 'typography.fontSize' ] ).toMatchObject( {
 				layer: 'blockVariation',
-				path: [ 'typography', 'fontSize' ],
 			} );
 			expect( sources[ 'typography.lineHeight' ] ).toMatchObject( {
 				layer: 'root',
@@ -693,7 +692,6 @@ describe( 'resolveStyles – merged output', () => {
 			} );
 			expect( sources[ 'elements.link.color.text' ] ).toMatchObject( {
 				layer: 'root',
-				path: [ 'elements', 'link', 'color', 'text' ],
 			} );
 		} );
 	} );

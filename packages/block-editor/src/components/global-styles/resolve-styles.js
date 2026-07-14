@@ -89,12 +89,9 @@ function getPathKey( path ) {
 	return path.join( '.' );
 }
 
-// Clone the descriptor so source-map entries can diverge as paths differ.
-function getSourceForPath( source, path ) {
-	return {
-		...source,
-		path: [ ...path ],
-	};
+// Clone the descriptor so each source-map entry is its own object.
+function getSourceForPath( source ) {
+	return { ...source };
 }
 
 // Explicit-empty values do not contribute at their layer, allowing
@@ -249,10 +246,8 @@ function deepMergeDroppingEmpties(
 					? { ...sourceValue }
 					: sourceValue;
 			if ( sourceMetadata && sources ) {
-				sources[ getPathKey( nextPath ) ] = getSourceForPath(
-					sourceMetadata,
-					nextPath
-				);
+				sources[ getPathKey( nextPath ) ] =
+					getSourceForPath( sourceMetadata );
 			}
 		}
 	}
