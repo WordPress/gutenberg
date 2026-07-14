@@ -2,7 +2,12 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
-import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
+import {
+	alignLeft,
+	alignRight,
+	alignCenter,
+	alignJustify,
+} from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { AlignmentControl, BlockControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
@@ -41,9 +46,14 @@ const TEXT_ALIGNMENT_OPTIONS = [
 		title: __( 'Align text right' ),
 		align: 'right',
 	},
+	{
+		icon: alignJustify,
+		title: __( 'Justify text' ),
+		align: 'justify',
+	},
 ];
 
-const VALID_TEXT_ALIGNMENTS = [ 'left', 'center', 'right' ];
+const VALID_TEXT_ALIGNMENTS = [ 'left', 'center', 'right', 'justify' ];
 const NO_TEXT_ALIGNMENTS: string[] = [];
 
 /**
