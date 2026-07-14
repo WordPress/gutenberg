@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import {
 	DropdownMenu,
-	Notice,
 	TextControl,
 	ToolbarButton,
 	__experimentalToolsPanel as ToolsPanel,
@@ -219,14 +218,7 @@ export function Edit( { attributes, setAttributes } ) {
 			{ blockControls }
 			{ inspectorControls }
 			<div { ...useBlockProps() }>
-				{ icon && ! iconToDisplay && (
-					<Notice status="warning" isDismissible={ false }>
-						{ __(
-							'Icon not found. The icon may have been unregistered or removed.'
-						) }
-					</Notice>
-				) }
-				{ icon && iconToDisplay && (
+				{ icon ? (
 					<HtmlRenderer
 						html={ iconToDisplay }
 						wrapperProps={ {
@@ -246,8 +238,7 @@ export function Edit( { attributes, setAttributes } ) {
 							},
 						} }
 					/>
-				) }
-				{ ! icon && (
+				) : (
 					<IconPlaceholder
 						className={ clsx(
 							borderProps.className,

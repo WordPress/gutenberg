@@ -90,9 +90,7 @@ function render_block_core_icon( $attributes ) {
 	);
 
 	if ( '' === $svg ) {
-		$wrapper_attributes = get_block_wrapper_attributes();
-		// Return a comment for debugging when the icon is not found.
-		return sprintf( '<!-- wp:icon: icon "%s" not found --><div %s></div>', esc_attr( $attributes['icon'] ), $wrapper_attributes );
+		return;
 	}
 
 	$processor = new WP_HTML_Tag_Processor( $svg );
