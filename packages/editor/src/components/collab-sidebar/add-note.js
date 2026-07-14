@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
+import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	store as blockEditorStore,
@@ -36,9 +37,29 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isSubmittingRef = useRef( false );
-	const cancelPendingDismissRef = useRef( undefined );
 
-	useEffect( () => () => cancelPendingDismissRef.current?.(), [] );
+	/*
+	 * Dismiss the form once focus leaves it. `useFocusOutside` keeps the form
+	 * open while focus stays in UI it owns: format popovers (e.g. the Cmd+K
+	 * link UI) portal out of the form's DOM, but their focus events still
+	 * bubble here through the React tree. It also ignores window/tab blur.
+	 */
+	const focusOutside = useFocusOutside( ( event ) => {
+		// Keep the form open when focus returns to it, e.g. on link popover Escape.
+		if (
+			event.relatedTarget?.closest(
+				'.editor-collab-sidebar-panel__thread'
+			)
+		) {
+			return;
+		}
+		// Never dismiss mid-submit; clicking "Add note" blurs before it settles.
+		if ( isSubmittingRef.current ) {
+			return;
+		}
+		toggleBlockSpotlight( clientId, false );
+		selectNote( undefined );
+	} );
 
 	const unselectNote = () => {
 		selectNote( undefined );
@@ -61,69 +82,8 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 			style={
 				floating ? { opacity: ! floating.y ? 0 : undefined } : undefined
 			}
-			onFocus={ () => {
-				/*
-				 * Focus landing anywhere in UI owned by the form cancels a
-				 * pending dismissal from `onBlur`. This covers focus returning
-				 * to the form itself as well as format popovers (e.g. the
-				 * Cmd+K link UI): they portal out of the form's DOM, but their
-				 * focus events still bubble here through the React tree.
-				 */
-				cancelPendingDismissRef.current?.();
-			} }
-			onBlur={ ( event ) => {
-				// Don't deselect notes when the browser window/tab loses focus.
-				if ( ! document.hasFocus() ) {
-					return;
-				}
-				/*
-				 * Prevent blur from closing the form while the async submit
-				 * is in progress. Clicking "Add note" moves focus away,
-				 * triggering blur before onSubmit completes.
-				 */
-				if ( isSubmittingRef.current ) {
-					return;
-				}
-				const container = event.currentTarget;
-				// Focus staying within the form never dismisses it.
-				if (
-					event.relatedTarget &&
-					container.contains( event.relatedTarget )
-				) {
-					return;
-				}
-				/*
-				 * The blur is ambiguous at this point: focus may be moving to
-				 * a format popover that belongs to the form (which cancels the
-				 * dismissal via `onFocus` above), and rich-text re-renders
-				 * briefly drop focus to the body while typing. Re-check on the
-				 * next frame where focus actually settled and dismiss only
-				 * when it has truly left the form.
-				 */
-				const { defaultView } = container.ownerDocument;
-				cancelPendingDismissRef.current?.();
-				const frame = defaultView.requestAnimationFrame( () => {
-					cancelPendingDismissRef.current = undefined;
-					/*
-					 * A submit may have started between the blur and this
-					 * frame (e.g. Safari fires button-click blurs with no
-					 * relatedTarget); never dismiss mid-submit.
-					 */
-					if ( isSubmittingRef.current ) {
-						return;
-					}
-					const active = container.ownerDocument.activeElement;
-					if ( active && container.contains( active ) ) {
-						return;
-					}
-					toggleBlockSpotlight( clientId, false );
-					selectNote( undefined );
-				} );
-				cancelPendingDismissRef.current = () => {
-					defaultView.cancelAnimationFrame( frame );
-					cancelPendingDismissRef.current = undefined;
-				};
-			} }
+			onFocus={ focusOutside.onFocus }
+			onBlur={ focusOutside.onBlur }
 		>
 			<NoteCard>
 				<NoteForm

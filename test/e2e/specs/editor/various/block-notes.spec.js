@@ -138,6 +138,12 @@ test.describe( 'Block Notes', () => {
 				'Command palette should not have opened'
 			).toBeHidden();
 
+			// The popover moves focus to the search input asynchronously;
+			// Escape must reach the popover rather than the reply field.
+			await expect(
+				page.getByRole( 'combobox', { name: 'Search or type URL' } )
+			).toBeFocused();
+
 			/*
 			 * Pressing Escape closes the link popover and leaves the note
 			 * form intact — focus does not get yanked out of the editor.
@@ -189,6 +195,10 @@ test.describe( 'Block Notes', () => {
 			expect( inputBox.x + inputBox.width ).toBeLessThanOrEqual(
 				viewport.width
 			);
+
+			// The popover moves focus to the search input asynchronously;
+			// Escape must reach the popover rather than the reply field.
+			await expect( linkInput ).toBeFocused();
 
 			// Escape closes the popover and keeps the reply form intact.
 			await page.keyboard.press( 'Escape' );
