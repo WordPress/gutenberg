@@ -155,10 +155,8 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 	 * entity kind (e.g. `postType`) and the entity name (e.g. `page`).
 	 *
 	 * Callbacks receive a Gutenberg_View_Config_Data object and change the
-	 * configuration through its methods: the `update_*()` methods merge
-	 * partial changes into the current configuration, while `set()` replaces
-	 * a whole top-level key. Callbacks must return the object they were
-	 * given.
+	 * configuration by passing a versioned contribution to its `update_with()`
+	 * method. Callbacks must return the object they were given.
 	 *
 	 * @param Gutenberg_View_Config_Data $data   The view configuration container
 	 *                                           for the entity, exposing the
@@ -324,11 +322,16 @@ function _gutenberg_get_entity_view_config_post_type_page( $data ) {
 		),
 	);
 
-	$data->set( 'default_layouts', $default_layouts, 1 );
-	$data->set( 'default_view', $default_view, 1 );
 	// Append the status views, thereby preserving the base "all items" view,
 	// so its post-type-specific title is kept.
-	$data->update_view_list_items( array_column( $view_list, null, 'slug' ), 1 );
+	$data->update_with(
+		array(
+			'version'         => 1,
+			'default_layouts' => $default_layouts,
+			'default_view'    => $default_view,
+			'view_list'       => array_column( $view_list, null, 'slug' ),
+		)
+	);
 
 	return $data;
 }
@@ -366,9 +369,6 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $data ) {
 		'filters'    => array(),
 		'layout'     => $default_layouts['grid']['layout'],
 	);
-
-	$data->set( 'default_layouts', $default_layouts, 1 );
-	$data->set( 'default_view', $default_view, 1 );
 
 	$view_list = array(
 		array(
@@ -417,32 +417,40 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $data ) {
 		);
 	}
 
-	$data->set( 'view_list', $view_list, 1 );
-
-	$data->set(
-		'form',
+	$data->update_with(
 		array(
-			'layout' => array( 'type' => 'panel' ),
-			'fields' => array(
-				array(
-					'id'     => 'excerpt',
-					'layout' => array(
-						'type'          => 'panel',
-						'labelPosition' => 'top',
-					),
-				),
-				array(
-					'id'     => 'post-content-info',
-					'layout' => array(
-						'type'          => 'regular',
-						'labelPosition' => 'none',
-					),
-				),
-				'sync-status',
-				'revisions',
+			'version'         => 1,
+			'default_layouts' => array_merge(
+				$default_layouts,
+				array( 'list' => null )
 			),
-		),
-		1
+			'default_view'    => array_merge(
+				$default_view,
+				array( 'sort' => null )
+			),
+			'view_list'       => $view_list,
+			'form'            => array(
+				'layout' => array( 'type' => 'panel' ),
+				'fields' => array(
+					array(
+						'id'     => 'excerpt',
+						'layout' => array(
+							'type'          => 'panel',
+							'labelPosition' => 'top',
+						),
+					),
+					array(
+						'id'     => 'post-content-info',
+						'layout' => array(
+							'type'          => 'regular',
+							'labelPosition' => 'none',
+						),
+					),
+					'sync-status',
+					'revisions',
+				),
+			),
+		)
 	);
 
 	return $data;
@@ -479,9 +487,6 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $data ) {
 		'filters'    => array(),
 		'layout'     => $default_layouts['grid']['layout'],
 	);
-
-	$data->set( 'default_layouts', $default_layouts, 1 );
-	$data->set( 'default_view', $default_view, 1 );
 
 	$view_list = array(
 		array(
@@ -524,24 +529,32 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $data ) {
 		);
 	}
 
-	$data->set( 'view_list', $view_list, 1 );
-
-	$data->set(
-		'form',
+	$data->update_with(
 		array(
-			'layout' => array( 'type' => 'panel' ),
-			'fields' => array(
-				array(
-					'id'     => 'last_edited_date',
-					'layout' => array(
-						'type'          => 'panel',
-						'labelPosition' => 'none',
-					),
-				),
-				'revisions',
+			'version'         => 1,
+			'default_layouts' => array_merge(
+				$default_layouts,
+				array( 'list' => null )
 			),
-		),
-		1
+			'default_view'    => array_merge(
+				$default_view,
+				array( 'sort' => null )
+			),
+			'view_list'       => $view_list,
+			'form'            => array(
+				'layout' => array( 'type' => 'panel' ),
+				'fields' => array(
+					array(
+						'id'     => 'last_edited_date',
+						'layout' => array(
+							'type'          => 'panel',
+							'labelPosition' => 'none',
+						),
+					),
+					'revisions',
+				),
+			),
+		)
 	);
 
 	return $data;
@@ -574,9 +587,6 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $data ) {
 		'grid'  => array( 'showMedia' => true ),
 		'list'  => array( 'showMedia' => false ),
 	);
-
-	$data->set( 'default_view', $default_view, 1 );
-	$data->set( 'default_layouts', $default_layouts, 1 );
 
 	$view_list = array(
 		array(
@@ -716,45 +726,47 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $data ) {
 		}
 	}
 
-	$data->set( 'view_list', array_merge( $view_list, $registered_authors, $user_authors ), 1 );
-
-	$data->set(
-		'form',
+	$data->update_with(
 		array(
-			'layout' => array( 'type' => 'panel' ),
-			'fields' => array(
-				array(
-					'id'     => 'description',
-					'layout' => array(
-						'type'          => 'panel',
-						'labelPosition' => 'top',
+			'version'         => 1,
+			'default_view'    => $default_view,
+			'default_layouts' => $default_layouts,
+			'view_list'       => array_merge( $view_list, $registered_authors, $user_authors ),
+			'form'            => array(
+				'layout' => array( 'type' => 'panel' ),
+				'fields' => array(
+					array(
+						'id'     => 'description',
+						'layout' => array(
+							'type'          => 'panel',
+							'labelPosition' => 'top',
+						),
 					),
-				),
-				array(
-					'id'     => 'description_readonly',
-					'layout' => array(
-						'type'          => 'regular',
-						'labelPosition' => 'none',
+					array(
+						'id'     => 'description_readonly',
+						'layout' => array(
+							'type'          => 'regular',
+							'labelPosition' => 'none',
+						),
 					),
-				),
-				array(
-					'id'     => 'last_edited_date',
-					'layout' => array(
-						'type'          => 'panel',
-						'labelPosition' => 'none',
+					array(
+						'id'     => 'last_edited_date',
+						'layout' => array(
+							'type'          => 'panel',
+							'labelPosition' => 'none',
+						),
 					),
+					'revisions',
+					// The following fields are only meaningful in the `home`/`index`
+					// template summary. They edit other entities (`root/site` and the
+					// posts page); the editor merges those records into the form data
+					// under a namespace and controls when the fields are shown.
+					'posts_page_title',
+					'posts_per_page',
+					'default_comment_status',
 				),
-				'revisions',
-				// The following fields are only meaningful in the `home`/`index`
-				// template summary. They edit other entities (`root/site` and the
-				// posts page); the editor merges those records into the form data
-				// under a namespace and controls when the fields are shown.
-				'posts_page_title',
-				'posts_per_page',
-				'default_comment_status',
 			),
-		),
-		1
+		)
 	);
 
 	return $data;

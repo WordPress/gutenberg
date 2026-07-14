@@ -319,7 +319,9 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 		$decoded = json_decode( wp_json_encode( $this->dispatch_request( 'postType', 'wp_template_part' )->get_data() ) );
 
 		$this->assertIsObject( $decoded->default_view->layout );
+		$this->assertFalse( property_exists( $decoded->default_view, 'sort' ) );
 		$this->assertIsObject( $decoded->default_layouts->grid->layout );
+		$this->assertFalse( property_exists( $decoded->default_layouts, 'list' ) );
 	}
 
 	/**
@@ -337,19 +339,21 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 		wp_set_current_user( self::$editor_id );
 
 		$filter = static function ( $data ) {
-			return $data->update_view_list_items(
+			return $data->update_with(
 				array(
-					'custom' => array(
-						'title' => 'Custom',
-						'view'  => array(
-							'type'   => 'table',
-							'layout' => array(
-								'styles' => array(),
+					'version'   => 1,
+					'view_list' => array(
+						'custom' => array(
+							'title' => 'Custom',
+							'view'  => array(
+								'type'   => 'table',
+								'layout' => array(
+									'styles' => array(),
+								),
 							),
 						),
 					),
-				),
-				1
+				)
 			);
 		};
 		add_filter( 'get_entity_view_config_custom_kind_custom_name', $filter );

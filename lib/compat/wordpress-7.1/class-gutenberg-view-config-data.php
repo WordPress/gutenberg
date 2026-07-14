@@ -9,30 +9,21 @@
  * Holds an entity's view configuration while it is being built.
  *
  * An instance of this class is what `get_entity_view_config_{$kind}_{$name}`
- * filter callbacks receive: a callback changes the configuration by calling
- * methods on the instance and returning it. The configuration has four
- * top-level keys — `default_view`, `default_layouts`, `view_list`, and
- * `form` — and there are two ways to contribute:
+ * filter callbacks receive: a callback changes the configuration by passing a
+ * versioned contribution to `update_with()` and returning the instance. The
+ * contribution declares the configuration schema version it was written
+ * against (currently 1), so a future WordPress release that changes the
+ * configuration shape can migrate existing contributions forward instead of
+ * breaking them.
  *
- * - The `update_*()` methods merge partial changes (patches) into what is
- *   already there, each covering one part of the configuration:
- *   `update_properties()` for `default_view`, `default_layouts`, and the
- *   `form` settings other than its `fields`; `update_view_list_items()` for
- *   the `view_list` entries, keyed by view `slug`; and `update_form_fields()`
- *   for the `form` fields, keyed by field `id`. This is what plugins should
- *   use: patches compose with core's configuration and with other plugins'.
- * - `set()` replaces a whole top-level key. It shouldn't be the default
- *   choice — a callback using it stops inheriting core's future changes to
- *   that key — but it's useful for cases like a post type that doesn't
- *   want the default form at all.
- *
- * Patches follow three shared rules: an associative array merges key by
- * key, a numerically indexed array replaces the current value wholesale,
- * and `null` deletes what it names — deleting a whole top-level key resets
- * it to its default. Each patch and each `set()` value also declares the
- * configuration schema version it was written against (currently 1), so a
- * future WordPress release that changes the configuration shape can migrate
- * existing patches forward instead of breaking them.
+ * Contributions follow three shared rules: an associative array merges key by
+ * key, a numerically indexed array replaces the current value wholesale, and
+ * `null` deletes what it names. Deleting a whole top-level key resets it to its
+ * default when the configuration is returned. The `view_list` and
+ * `form.fields` lists additionally support identity-aware patches: pass an
+ * associative array keyed by view `slug` or field `id` to merge, append, or
+ * remove individual entries; pass a numerically indexed array to replace the
+ * entire list.
  *
  * @since 7.1.0
  */
@@ -85,73 +76,25 @@ class Gutenberg_View_Config_Data {
 	}
 
 	/**
-	 * Replaces a whole top-level key with a new value.
+	 * Updates the view configuration with the given versioned contribution.
 	 *
-	 * It shouldn't be the default choice — a callback using it stops
-	 * inheriting core's future changes to that key — but it's useful for
-	 * cases like a post type that doesn't want the default form at all.
-	 *
-	 * A value that declares an unsupported schema version is rejected and
-	 * does not replace anything.
+	 * The contribution must include a `version` key declaring the schema
+	 * version it was authored against. The documented configuration keys are
+	 * `default_view`, `default_layouts`, `view_list`, and `form`.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param string $key     The configuration key to replace.
-	 * @param mixed  $value   The new value.
-	 * @param int    $version The schema version the value was authored against.
+	 * @param array $new_data The versioned configuration contribution.
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
-	public function set( $key, $value, int $version ) {
-		if ( ! $this->check_version( $version, __METHOD__ ) ) {
+	public function update_with( array $new_data ) {
+		if ( ! $this->check_version( $new_data, __METHOD__ ) ) {
 			return $this;
 		}
 
-		if ( ! in_array( $key, self::CONFIG_KEYS, true ) ) {
-			_doing_it_wrong(
-				__METHOD__,
-				sprintf(
-					/* translators: %s: the configuration key. */
-					esc_html__( '"%s" is not a documented view configuration key.', 'gutenberg' ),
-					esc_html( $key )
-				),
-				'7.1.0'
-			);
-			return $this;
-		}
+		unset( $new_data['version'] );
 
-		$this->config[ $key ] = $value;
-		return $this;
-	}
-
-	/**
-	 * Merges a partial configuration into `default_view`, `default_layouts`,
-	 * and the `form` settings other than its `fields`.
-	 *
-	 * An associative array merges key by key, a numerically indexed array
-	 * replaces the current value wholesale, and `null` deletes the key it
-	 * names; deleting a whole top-level key (any documented key, including
-	 * `view_list`) resets it to its default.
-	 *
-	 * The keyed collections have dedicated methods and are rejected here: a
-	 * non-null `view_list` value must go through `update_view_list_items()`,
-	 * and a `fields` key inside a `form` value must go through
-	 * `update_form_fields()`.
-	 *
-	 * A patch that declares an unsupported schema version is rejected and
-	 * does not merge.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param array $patch   The partial configuration to merge.
-	 * @param int   $version The schema version the patch was authored against.
-	 * @return Gutenberg_View_Config_Data The instance, for chaining.
-	 */
-	public function update_properties( array $patch, int $version ) {
-		if ( ! $this->check_version( $version, __METHOD__ ) ) {
-			return $this;
-		}
-
-		foreach ( $patch as $key => $value ) {
+		foreach ( $new_data as $key => $value ) {
 			if ( ! in_array( $key, self::CONFIG_KEYS, true ) ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -164,74 +107,85 @@ class Gutenberg_View_Config_Data {
 				);
 				continue;
 			}
+
 			// A null patch value drops the whole key from the container rather
 			// than assigning null.
 			if ( null === $value ) {
 				unset( $this->config[ $key ] );
 				continue;
 			}
-			if ( 'view_list' === $key ) {
-				_doing_it_wrong(
-					__METHOD__,
-					esc_html__( 'The "view_list" entries are patched by identity. Use update_view_list_items() instead.', 'gutenberg' ),
-					'7.1.0'
-				);
-				continue;
-			}
-			if ( 'form' === $key ) {
-				$value = $this->extract_form_properties( $value );
-				// Nothing left to merge: the value was off-shape, or held only
-				// the rejected `fields` key.
-				if ( null === $value || array() === $value ) {
-					continue;
-				}
-			}
-			$this->config[ $key ] = $this->deep_merge( $this->config[ $key ] ?? array(), $value );
+
+			$this->merge_config_key( $key, $value );
 		}
 
 		return $this;
 	}
 
 	/**
-	 * Adds, updates, or removes `view_list` entries, keyed by view `slug`.
-	 *
-	 * Each patch key names the `slug` of the view it targets: a matching view
-	 * merges in place and keeps its position (following the shared rules —
-	 * e.g. the view's `filters`, being numerically indexed, replace
-	 * wholesale), an unknown slug appends a new view to the end, and `null`
-	 * removes the view. The patch key is the identity: a `slug` property
-	 * inside the value is ignored. A `null` for a slug that is not found is a
-	 * silent no-op — the view may have been removed by another callback or
-	 * simply not apply to this entity.
-	 *
-	 * A patch that declares an unsupported schema version is rejected and
-	 * does not merge.
+	 * Merges a documented top-level configuration key.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param array $items   The view patches, keyed by slug.
-	 * @param int   $version The schema version the patch was authored against.
-	 * @return Gutenberg_View_Config_Data The instance, for chaining.
+	 * @param string $key   The configuration key.
+	 * @param mixed  $value The incoming value.
 	 */
-	public function update_view_list_items( array $items, int $version ) {
-		if ( ! $this->check_version( $version, __METHOD__ ) ) {
-			return $this;
+	private function merge_config_key( $key, $value ) {
+		if ( 'view_list' === $key ) {
+			$this->merge_view_list( $value );
+			return;
 		}
 
-		if ( empty( $items ) ) {
-			return $this;
+		if ( 'form' === $key ) {
+			$this->merge_form( $value );
+			return;
 		}
-		if ( array_is_list( $items ) ) {
+
+		$this->config[ $key ] = $this->deep_merge( $this->config[ $key ] ?? array(), $value );
+	}
+
+	/**
+	 * Merges or replaces the `view_list` configuration.
+	 *
+	 * A numerically indexed array replaces the full list. An associative array
+	 * patches entries by view `slug`.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param mixed $value The incoming view list value.
+	 */
+	private function merge_view_list( $value ) {
+		if ( ! is_array( $value ) ) {
 			_doing_it_wrong(
-				__METHOD__,
-				esc_html__( 'A view list patch must be keyed by view "slug".', 'gutenberg' ),
+				'Gutenberg_View_Config_Data::update_with',
+				esc_html__( 'The "view_list" value must be an array.', 'gutenberg' ),
 				'7.1.0'
 			);
-			return $this;
+			return;
 		}
 
-		$view_list = isset( $this->config['view_list'] ) && is_array( $this->config['view_list'] ) ? $this->config['view_list'] : array();
+		if ( array_is_list( $value ) ) {
+			$this->config['view_list'] = $value;
+			return;
+		}
 
+		$view_list                  = isset( $this->config['view_list'] ) && is_array( $this->config['view_list'] ) ? $this->config['view_list'] : array();
+		$this->config['view_list'] = $this->merge_view_list_items( $view_list, $value );
+	}
+
+	/**
+	 * Adds, updates, or removes `view_list` entries, keyed by view `slug`.
+	 *
+	 * Each patch key names the `slug` of the view it targets: a matching view
+	 * merges in place and keeps its position, an unknown slug appends a new
+	 * view to the end, and `null` removes the view.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param array $view_list The current view list.
+	 * @param array $items     The view patches, keyed by slug.
+	 * @return array The merged view list.
+	 */
+	private function merge_view_list_items( array $view_list, array $items ) {
 		foreach ( $items as $slug => $value ) {
 			// PHP casts numeric-string array keys to integers; identities are strings.
 			$slug = (string) $slug;
@@ -248,7 +202,7 @@ class Gutenberg_View_Config_Data {
 
 			if ( ! is_array( $value ) || ( array() !== $value && array_is_list( $value ) ) ) {
 				_doing_it_wrong(
-					__METHOD__,
+					'Gutenberg_View_Config_Data::update_with',
 					esc_html__( 'Each view patch must be an associative array of view properties, or null to remove the view.', 'gutenberg' ),
 					'7.1.0'
 				);
@@ -277,77 +231,106 @@ class Gutenberg_View_Config_Data {
 			}
 		}
 
-		$this->config['view_list'] = array_values( $view_list );
-
-		return $this;
+		return array_values( $view_list );
 	}
 
 	/**
-	 * Adds, updates, or removes `form` fields, keyed by field `id`.
+	 * Merges the `form` configuration.
 	 *
-	 * Each patch key names the `id` of the field it targets, and the field is
-	 * found wherever it lives — at the top level or nested inside a group's
-	 * `children`. Fields are visited in document order and a group is checked
-	 * before its own children, so when an id appears at both levels the group
-	 * wins. A matching field merges in place, an unknown id appends a new field
-	 * to the end of the top-level fields, and `null` removes the field. The
-	 * patch key is the identity: an `id` property inside the value is ignored.
-	 * A `null` for an id that is not found is a silent no-op — the field may
-	 * have been removed by another callback or simply not apply to this
-	 * entity.
-	 *
-	 * Inside a field patch, `children` follows the shared rules: an associative
-	 * array merges into the group's children by id (appending unknown ones), a
-	 * numerically indexed array replaces the children wholesale, and `null`
-	 * deletes the key.
-	 *
-	 * A patch that declares an unsupported schema version is rejected and
-	 * does not merge.
+	 * Form properties merge normally. The `fields` property may be a list,
+	 * replacing all fields, or an associative array that patches fields by `id`.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param array $fields  The field patches, keyed by field id.
-	 * @param int   $version The schema version the patch was authored against.
-	 * @return Gutenberg_View_Config_Data The instance, for chaining.
+	 * @param mixed $value The incoming form value.
 	 */
-	public function update_form_fields( array $fields, int $version ) {
-		if ( ! $this->check_version( $version, __METHOD__ ) ) {
-			return $this;
-		}
-
-		if ( empty( $fields ) ) {
-			return $this;
-		}
-		if ( array_is_list( $fields ) ) {
+	private function merge_form( $value ) {
+		if ( ! is_array( $value ) || ( array() !== $value && array_is_list( $value ) ) ) {
 			_doing_it_wrong(
-				__METHOD__,
-				esc_html__( 'A fields patch must be keyed by field "id".', 'gutenberg' ),
+				'Gutenberg_View_Config_Data::update_with',
+				esc_html__( 'The "form" value must be an associative array of form properties.', 'gutenberg' ),
 				'7.1.0'
 			);
-			return $this;
+			return;
+		}
+
+		if ( array() === $value ) {
+			$this->config['form'] = array();
+			return;
 		}
 
 		if ( ! isset( $this->config['form'] ) || ! is_array( $this->config['form'] ) ) {
 			$this->config['form'] = array();
 		}
-		$current = isset( $this->config['form']['fields'] ) && is_array( $this->config['form']['fields'] ) ? $this->config['form']['fields'] : array();
 
-		$this->config['form']['fields'] = $this->merge_fields_by_identity( $current, $fields );
-
-		return $this;
+		foreach ( $value as $key => $item ) {
+			if ( 'fields' === $key ) {
+				$this->merge_form_fields( $item );
+				continue;
+			}
+			if ( null === $item ) {
+				unset( $this->config['form'][ $key ] );
+				continue;
+			}
+			$this->config['form'][ $key ] = $this->deep_merge(
+				array_key_exists( $key, $this->config['form'] ) ? $this->config['form'][ $key ] : array(),
+				$item
+			);
+		}
 	}
 
 	/**
-	 * Validates a declared patch version, reporting misuse against the given
+	 * Merges or replaces the `form.fields` list.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param mixed $fields The incoming fields value.
+	 */
+	private function merge_form_fields( $fields ) {
+		if ( null === $fields ) {
+			unset( $this->config['form']['fields'] );
+			return;
+		}
+		if ( ! is_array( $fields ) ) {
+			_doing_it_wrong(
+				'Gutenberg_View_Config_Data::update_with',
+				esc_html__( 'The form "fields" value must be an array or null.', 'gutenberg' ),
+				'7.1.0'
+			);
+			return;
+		}
+
+		if ( array_is_list( $fields ) ) {
+			$this->config['form']['fields'] = $fields;
+			return;
+		}
+
+		$current                        = isset( $this->config['form']['fields'] ) && is_array( $this->config['form']['fields'] ) ? $this->config['form']['fields'] : array();
+		$this->config['form']['fields'] = $this->merge_fields_by_identity( $current, $fields );
+	}
+
+	/**
+	 * Validates a declared contribution version, reporting misuse against the given
 	 * public method.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param int    $version The declared version.
-	 * @param string $method  The public method the patch was passed to.
+	 * @param array  $new_data The incoming contribution.
+	 * @param string $method   The public method the contribution was passed to.
 	 * @return bool Whether the declared version is a supported schema version.
 	 */
-	private function check_version( int $version, $method ) {
+	private function check_version( array $new_data, $method ) {
+		if ( ! array_key_exists( 'version', $new_data ) || ! is_int( $new_data['version'] ) ) {
+			_doing_it_wrong(
+				esc_html( $method ),
+				esc_html__( 'A view configuration contribution must declare a supported schema version.', 'gutenberg' ),
+				'7.1.0'
+			);
+
+			return false;
+		}
+
+		$version = $new_data['version'];
 		if ( $version >= 1 && $version <= self::LATEST_VERSION ) {
 			return true;
 		}
@@ -359,37 +342,6 @@ class Gutenberg_View_Config_Data {
 		);
 
 		return false;
-	}
-
-	/**
-	 * Validates a `form` patch value for update_properties() and strips the
-	 * `fields` key, which is managed by update_form_fields().
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param mixed $value The incoming `form` patch value.
-	 * @return array|null The form properties to merge, or null when the value
-	 *                    is off-shape.
-	 */
-	private function extract_form_properties( $value ) {
-		if ( ! is_array( $value ) || ( array() !== $value && array_is_list( $value ) ) ) {
-			_doing_it_wrong(
-				'Gutenberg_View_Config_Data::update_properties',
-				esc_html__( 'A "form" patch must be an associative array of form properties.', 'gutenberg' ),
-				'7.1.0'
-			);
-			return null;
-		}
-		if ( array_key_exists( 'fields', $value ) ) {
-			_doing_it_wrong(
-				'Gutenberg_View_Config_Data::update_properties',
-				esc_html__( 'The form "fields" are patched by identity. Use update_form_fields() instead.', 'gutenberg' ),
-				'7.1.0'
-			);
-			unset( $value['fields'] );
-		}
-
-		return $value;
 	}
 
 	/**
@@ -459,7 +411,7 @@ class Gutenberg_View_Config_Data {
 			}
 			if ( ! is_array( $value ) || ( array() !== $value && array_is_list( $value ) ) ) {
 				_doing_it_wrong(
-					'Gutenberg_View_Config_Data::update_form_fields',
+					'Gutenberg_View_Config_Data::update_with',
 					esc_html__( 'Each field patch must be an associative array of field properties, or null to remove the field.', 'gutenberg' ),
 					'7.1.0'
 				);
@@ -547,7 +499,7 @@ class Gutenberg_View_Config_Data {
 				}
 				if ( ! is_array( $item ) ) {
 					_doing_it_wrong(
-						'Gutenberg_View_Config_Data::update_form_fields',
+						'Gutenberg_View_Config_Data::update_with',
 						esc_html__( 'A "children" patch must be an associative array keyed by field id to merge, a numerically indexed array to replace the children wholesale, or null to delete the key.', 'gutenberg' ),
 						'7.1.0'
 					);

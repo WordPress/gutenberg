@@ -146,15 +146,17 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A filter can override configuration values through update_properties().
+	 * A filter can override configuration values through update_with().
 	 */
-	public function test_filter_update_properties_overrides_config() {
+	public function test_filter_update_with_overrides_config() {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
-				return $data->update_properties(
-					array( 'default_view' => array( 'type' => 'grid' ) ),
-					1
+				return $data->update_with(
+					array(
+						'version'      => 1,
+						'default_view' => array( 'type' => 'grid' ),
+					)
 				);
 			}
 		);
@@ -173,17 +175,18 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
-				return $data->set(
-					'form',
+				return $data->update_with(
 					array(
-						'fields' => array(
-							array(
-								'id'       => 'discussion',
-								'children' => array( 'comment_status', 'ping_status' ),
+						'version' => 1,
+						'form'    => array(
+							'fields' => array(
+								array(
+									'id'       => 'discussion',
+									'children' => array( 'comment_status', 'ping_status' ),
+								),
 							),
 						),
-					),
-					1
+					)
 				);
 			},
 			9
@@ -191,7 +194,14 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
-				return $data->update_form_fields( array( 'ping_status' => null ), 1 );
+				return $data->update_with(
+					array(
+						'version' => 1,
+						'form'    => array(
+							'fields' => array( 'ping_status' => null ),
+						),
+					)
+				);
 			},
 			11
 		);
@@ -242,7 +252,12 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
-				return $data->update_properties( array( 'default_view' => null ), 1 );
+				return $data->update_with(
+					array(
+						'version'      => 1,
+						'default_view' => null,
+					)
+				);
 			}
 		);
 
