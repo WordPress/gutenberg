@@ -356,10 +356,13 @@ export function NoteThread( {
 					onEditNote={ onEditNote }
 					onDeleteNote={ onDeleteNote }
 					isUnread={
-						viewedNotes?.isNoteUnread(
-							lastReply.id,
-							lastReply.author
-						) ?? false
+						lastReply.type === 'note' &&
+						lastReply.meta?._wp_note_status === 'resolved'
+							? false
+							: viewedNotes?.isNoteUnread(
+									lastReply.id,
+									lastReply.author
+							  ) ?? false
 					}
 				/>
 			) }

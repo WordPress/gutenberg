@@ -65,7 +65,6 @@ export function Note( {
 	onDeleteNote,
 	onResolve,
 	isUnread = false,
-	isThreadUnread = false,
 } ) {
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
@@ -216,7 +215,6 @@ export function Note( {
 			note={ note }
 			actions={ actions }
 			isUnread={ isUnread }
-			isThreadUnread={ isThreadUnread }
 			role={ note.parent !== 0 ? 'treeitem' : undefined }
 		>
 			{ body }
