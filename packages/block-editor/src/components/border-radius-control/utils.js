@@ -7,7 +7,7 @@ import { __experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitF
  * Internal dependencies
  */
 import {
-	getCustomValueFromPreset as getCustomValueFromPresetValue,
+	getCustomValueFromPreset,
 	getPresetValueFromCustomValue as getPresetValueFromCustomPresetValue,
 	isValuePreset as isPresetValue,
 } from '../preset-input-control/utils';
@@ -150,22 +150,6 @@ export function hasDefinedValues( values ) {
 }
 
 /**
- * Converts a preset into a custom value.
- *
- * @param {string} value   Value to convert
- * @param {Array}  presets Array of the current radius preset objects
- *
- * @return {string} Mapping of the radius preset to its equivalent custom value.
- */
-export function getCustomValueFromPreset( value, presets ) {
-	return getCustomValueFromPresetValue(
-		value,
-		presets,
-		BORDER_RADIUS_PRESET_TYPE
-	);
-}
-
-/**
  * Converts a control value into a preset value.
  *
  * @param {number} controlValue to convert to preset value.
@@ -226,7 +210,11 @@ export function convertPresetsToCustomValues( values, presets ) {
 	Object.keys( values ).forEach( ( key ) => {
 		const value = values[ key ];
 		if ( isPresetValue( value, BORDER_RADIUS_PRESET_TYPE ) ) {
-			const customValue = getCustomValueFromPreset( value, presets );
+			const customValue = getCustomValueFromPreset(
+				value,
+				presets,
+				BORDER_RADIUS_PRESET_TYPE
+			);
 			converted[ key ] = customValue !== undefined ? customValue : value;
 		} else {
 			converted[ key ] = value;
