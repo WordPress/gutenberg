@@ -205,7 +205,6 @@ export function MediaPlaceholder( {
 		onFilesPreUpload( files );
 		let setMedia;
 		let onBatchSuccess;
-		let onUploadError = onError;
 		if ( multiple ) {
 			if ( addToGallery ) {
 				// Since the setMedia function runs multiple times per upload group
@@ -243,47 +242,16 @@ export function MediaPlaceholder( {
 					} );
 				};
 			} else {
-				const filesCount = files.length;
 				let selectedMedia = [];
-				let hasSelectedBatch = false;
-				let failedFilesCount = 0;
-				let hasBatchSucceeded = false;
-
-				const selectBatchIfReady = () => {
-					const finalMedia = selectedMedia.filter( isFinalMediaItem );
-					if (
-						! hasSelectedBatch &&
-						finalMedia.length > 0 &&
-						( hasBatchSucceeded ||
-							( failedFilesCount > 0 &&
-								finalMedia.length + failedFilesCount >=
-									filesCount ) )
-					) {
-						onSelect( finalMedia );
-						hasSelectedBatch = true;
-					}
-				};
 
 				setMedia = ( newMedia ) => {
 					selectedMedia = newMedia;
-					selectBatchIfReady();
 				};
 				onBatchSuccess = () => {
-					hasBatchSucceeded = true;
-					failedFilesCount = Math.max(
-						failedFilesCount,
-						filesCount -
-							selectedMedia.filter( isFinalMediaItem ).length
-					);
-					selectBatchIfReady();
-				};
-				onUploadError = ( ...args ) => {
-					failedFilesCount = Math.min(
-						failedFilesCount + 1,
-						filesCount
-					);
-					selectBatchIfReady();
-					onError?.( ...args );
+					const finalMedia = selectedMedia.filter( isFinalMediaItem );
+					if ( finalMedia.length > 0 ) {
+						onSelect( finalMedia );
+					}
 				};
 			}
 		} else {
@@ -294,7 +262,7 @@ export function MediaPlaceholder( {
 			filesList: files,
 			onFileChange: setMedia,
 			onBatchSuccess,
-			onError: onUploadError,
+			onError,
 			multiple,
 		} );
 	};
