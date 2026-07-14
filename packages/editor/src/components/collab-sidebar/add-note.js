@@ -36,6 +36,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 	const blockElement = useBlockElement( clientId );
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const isSubmittingRef = useRef( false );
 
 	/*
@@ -57,8 +58,16 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 		if ( isSubmittingRef.current ) {
 			return;
 		}
-		toggleBlockSpotlight( clientId, false );
-		selectNote( undefined );
+
+		/*
+		 * Selection may have moved on before this deferred callback runs; only
+		 * clear it while this still owns the selection, or it would wipe out the
+		 * newly selected note.
+		 */
+		if ( getSelectedNote() === 'new' ) {
+			toggleBlockSpotlight( clientId, false );
+			selectNote( undefined );
+		}
 	} );
 
 	const unselectNote = () => {

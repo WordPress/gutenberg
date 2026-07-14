@@ -101,14 +101,10 @@ export function NoteThread( {
 			return;
 		}
 
-		toggleBlockHighlight( note.blockClientId, false );
-
 		/*
-		 * Selection may have moved while the deselect was pending: clicking
-		 * a noted block in the canvas blurs this thread and then selects
-		 * the block's own thread (asynchronously, via focusNote()). Only
-		 * clear the selection if this thread still owns it, or the pending
-		 * deselect would wipe out the newly selected thread.
+		 * Selection may have moved on before this deferred callback runs; only
+		 * clear it while this still owns the selection, or it would wipe out the
+		 * newly selected note.
 		 */
 		if ( getSelectedNote() === note.id ) {
 			onDeselectNote();

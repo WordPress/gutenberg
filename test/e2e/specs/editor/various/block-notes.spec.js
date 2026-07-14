@@ -392,6 +392,49 @@ test.describe( 'Block Notes', () => {
 		await expect( replyTextbox ).toBeVisible();
 	} );
 
+	test( 'selecting note marks it as active and closes add new note form', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		// An existing thread to select later.
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'First block' },
+			comment: 'First block comment',
+		} );
+
+		// Open a new-note form on a second block and move focus into it.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second block' },
+		} );
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		const newNoteForm = page.getByRole( 'textbox', {
+			name: 'New note',
+			exact: true,
+		} );
+		await newNoteForm.click();
+
+		const existingThread = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tree' )
+			.getByRole( 'treeitem', { name: 'Note: First block comment' } );
+
+		// Clicking the existing thread selects it and closes the new-note form.
+		await existingThread.click();
+		await expect( newNoteForm ).toBeHidden();
+
+		/*
+		 * The form unmounts on selection, but `useFocusOutside` still runs its
+		 * queued blur callback. It must not clear the newly selected thread.
+		 */
+		await expect( existingThread ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
+	} );
+
 	test.describe( 'Keyboard', () => {
 		const KEY_COMBINATIONS = [
 			{
