@@ -15,9 +15,8 @@ import {
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	withFilters,
 } from '@wordpress/components';
-import { getBlobByURL, isBlobURL } from '@wordpress/blob';
+import { isBlobURL } from '@wordpress/blob';
 import { __, _x } from '@wordpress/i18n';
-import { cleanForSlug } from '@wordpress/url';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { keyboardReturn } from '@wordpress/icons';
@@ -37,87 +36,6 @@ const noop = () => {};
 
 function getMediaUrl( media ) {
 	return media?.url ?? media?.source_url;
-}
-
-function getFileNameFromUrl( url ) {
-	const fileName = url?.split( /[?#]/ )[ 0 ].split( '/' ).pop();
-
-	if ( ! fileName ) {
-		return fileName;
-	}
-
-	try {
-		return decodeURIComponent( fileName );
-	} catch {
-		return fileName;
-	}
-}
-
-function getMediaFileName( media ) {
-	const url = getMediaUrl( media );
-	return (
-		media?.filename ??
-		( isBlobURL( url ) ? getBlobByURL( url )?.name : undefined ) ??
-		getFileNameFromUrl( url )
-	);
-}
-
-function getFileNameParts( fileName ) {
-	if ( ! fileName ) {
-		return {};
-	}
-
-	const dotIndex = fileName.lastIndexOf( '.' );
-	if ( dotIndex <= 0 ) {
-		return {
-			baseName: fileName,
-			extension: '',
-		};
-	}
-
-	return {
-		baseName: fileName.slice( 0, dotIndex ),
-		extension: fileName.slice( dotIndex + 1 ),
-	};
-}
-
-function areFileNamesEquivalent( fileNameA, fileNameB ) {
-	if ( ! fileNameA || ! fileNameB ) {
-		return false;
-	}
-
-	return (
-		fileNameA === fileNameB ||
-		cleanForSlug( fileNameA ) === cleanForSlug( fileNameB )
-	);
-}
-
-function getSanitizedSuffixMatchLength( fileName, mediaFileName ) {
-	const fileParts = getFileNameParts( fileName );
-	const mediaParts = getFileNameParts( mediaFileName );
-	const baseName = cleanForSlug( fileParts.baseName );
-
-	if (
-		! baseName ||
-		cleanForSlug( fileParts.extension ) !==
-			cleanForSlug( mediaParts.extension )
-	) {
-		return -1;
-	}
-
-	const mediaBaseName = cleanForSlug( mediaParts.baseName );
-
-	return mediaBaseName.startsWith( `${ baseName }-` ) ? baseName.length : -1;
-}
-
-function areMediaItemsSame( mediaA, mediaB ) {
-	const urlA = getMediaUrl( mediaA );
-	const urlB = getMediaUrl( mediaB );
-
-	return (
-		( mediaA?.id && mediaB?.id && mediaA.id === mediaB.id ) ||
-		( urlA && urlB && urlA === urlB )
-	);
 }
 
 function isFinalMediaItem( media ) {
@@ -325,105 +243,33 @@ export function MediaPlaceholder( {
 					} );
 				};
 			} else {
-				const filesList = Array.from( files );
 				const filesCount = files.length;
-				let selectedMedia = new Array( filesCount );
+				let selectedMedia = [];
 				let hasSelectedBatch = false;
 				let failedFilesCount = 0;
+				let hasBatchSucceeded = false;
 
 				const selectBatchIfReady = () => {
 					const finalMedia = selectedMedia.filter( isFinalMediaItem );
 					if (
 						! hasSelectedBatch &&
 						finalMedia.length > 0 &&
-						finalMedia.length + failedFilesCount >= filesCount
+						( hasBatchSucceeded ||
+							( failedFilesCount > 0 &&
+								finalMedia.length + failedFilesCount >=
+									filesCount ) )
 					) {
 						onSelect( finalMedia );
 						hasSelectedBatch = true;
 					}
 				};
 
-				const findMediaIndex = ( media ) => {
-					const existingMediaIndex = selectedMedia.findIndex(
-						( selectedItem ) =>
-							areMediaItemsSame( selectedItem, media )
-					);
-					if ( existingMediaIndex !== -1 ) {
-						return existingMediaIndex;
-					}
-
-					const mediaFileName = getMediaFileName( media );
-					const matchingFileIndex = filesList.findIndex(
-						( file, index ) =>
-							areFileNamesEquivalent(
-								file.name,
-								mediaFileName
-							) && ! isFinalMediaItem( selectedMedia[ index ] )
-					);
-					if ( matchingFileIndex !== -1 ) {
-						return matchingFileIndex;
-					}
-
-					const sanitizedSuffixMatch = filesList.reduce(
-						( bestMatch, file, index ) => {
-							if ( isFinalMediaItem( selectedMedia[ index ] ) ) {
-								return bestMatch;
-							}
-
-							const matchLength = getSanitizedSuffixMatchLength(
-								file.name,
-								mediaFileName
-							);
-							if ( matchLength <= bestMatch.length ) {
-								return bestMatch;
-							}
-
-							return {
-								index,
-								length: matchLength,
-							};
-						},
-						{ index: -1, length: -1 }
-					).index;
-					if ( sanitizedSuffixMatch !== -1 ) {
-						return sanitizedSuffixMatch;
-					}
-
-					return -1;
-				};
-
-				const setMediaItem = ( media ) => {
-					let mediaIndex = findMediaIndex( media );
-
-					if ( mediaIndex === -1 ) {
-						if ( isFinalMediaItem( media ) ) {
-							mediaIndex = selectedMedia.findIndex(
-								( selectedItem ) =>
-									! isFinalMediaItem( selectedItem )
-							);
-						} else {
-							mediaIndex = selectedMedia.findIndex(
-								( selectedItem ) => selectedItem === undefined
-							);
-						}
-					}
-
-					if ( mediaIndex !== -1 ) {
-						selectedMedia[ mediaIndex ] = media;
-					}
-				};
-
 				setMedia = ( newMedia ) => {
-					if ( newMedia.length === filesCount ) {
-						selectedMedia = newMedia;
-						selectBatchIfReady();
-						return;
-					}
-
-					newMedia.forEach( setMediaItem );
+					selectedMedia = newMedia;
 					selectBatchIfReady();
 				};
 				onBatchSuccess = () => {
+					hasBatchSucceeded = true;
 					failedFilesCount = Math.max(
 						failedFilesCount,
 						filesCount -

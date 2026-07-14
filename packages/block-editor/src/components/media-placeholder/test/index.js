@@ -48,7 +48,7 @@ describe( 'MediaPlaceholder', () => {
 		expect( () => render( <MediaPlaceholder multiple /> ) ).not.toThrow();
 	} );
 
-	it( 'selects all uploaded media when multiple upload callbacks are received individually', () => {
+	it( 'selects final media when a multiple upload batch succeeds', () => {
 		const onSelect = jest.fn();
 		const fileList = [
 			new File( [ 'audio' ], 'first.mp3', { type: 'audio/mpeg' } ),
@@ -75,16 +75,17 @@ describe( 'MediaPlaceholder', () => {
 			mockDropZoneProps.onFilesDrop( fileList );
 		} );
 
-		const { onFileChange } = mediaUpload.mock.calls[ 0 ][ 0 ];
+		const { onBatchSuccess, onFileChange } =
+			mediaUpload.mock.calls[ 0 ][ 0 ];
 
 		act( () => {
-			onFileChange( [ firstTrack ] );
+			onFileChange( [ firstTrack, secondTrack ] );
 		} );
 
 		expect( onSelect ).not.toHaveBeenCalled();
 
 		act( () => {
-			onFileChange( [ secondTrack ] );
+			onBatchSuccess();
 		} );
 
 		expect( onSelect ).toHaveBeenCalledTimes( 1 );
@@ -124,7 +125,8 @@ describe( 'MediaPlaceholder', () => {
 			mockDropZoneProps.onFilesDrop( fileList );
 		} );
 
-		const { onFileChange } = mediaUpload.mock.calls[ 0 ][ 0 ];
+		const { onBatchSuccess, onFileChange } =
+			mediaUpload.mock.calls[ 0 ][ 0 ];
 
 		act( () => {
 			onFileChange( [ firstBlob, secondBlob ] );
@@ -142,95 +144,9 @@ describe( 'MediaPlaceholder', () => {
 			onFileChange( [ firstTrack, secondTrack ] );
 		} );
 
-		expect( onSelect ).toHaveBeenCalledTimes( 1 );
-		expect( onSelect ).toHaveBeenCalledWith( [ firstTrack, secondTrack ] );
-	} );
-
-	it( 'preserves file order when multiple upload callbacks finish out of order', () => {
-		const onSelect = jest.fn();
-		const fileList = [
-			new File( [ 'audio' ], 'first.mp3', { type: 'audio/mpeg' } ),
-			new File( [ 'audio' ], 'second.mp3', { type: 'audio/mpeg' } ),
-		];
-		const firstTrack = {
-			id: 1,
-			filename: 'first.mp3',
-			url: 'https://example.com/first.mp3',
-		};
-		const secondTrack = {
-			id: 2,
-			filename: 'second.mp3',
-			url: 'https://example.com/second.mp3',
-		};
-
-		render(
-			<MediaPlaceholder
-				allowedTypes={ [ 'audio' ] }
-				multiple
-				onSelect={ onSelect }
-			/>
-		);
+		expect( onSelect ).not.toHaveBeenCalled();
 
 		act( () => {
-			mockDropZoneProps.onFilesDrop( fileList );
-		} );
-
-		const { onBatchSuccess, onFileChange } =
-			mediaUpload.mock.calls[ 0 ][ 0 ];
-
-		act( () => {
-			onFileChange( [ { url: 'blob:https://example.com/first' } ] );
-			onFileChange( [ { url: 'blob:https://example.com/second' } ] );
-			onFileChange( [ secondTrack ] );
-			onFileChange( [ firstTrack ] );
-			onBatchSuccess();
-		} );
-
-		expect( onSelect ).toHaveBeenCalledTimes( 1 );
-		expect( onSelect ).toHaveBeenCalledWith( [ firstTrack, secondTrack ] );
-	} );
-
-	it( 'preserves file order when final media filenames are sanitized', () => {
-		const onSelect = jest.fn();
-		const fileList = [
-			new File( [ 'audio' ], 'First Track.mp3', {
-				type: 'audio/mpeg',
-			} ),
-			new File( [ 'audio' ], 'Second Track.mp3', {
-				type: 'audio/mpeg',
-			} ),
-		];
-		const firstTrack = {
-			id: 1,
-			filename: 'first-track-1.mp3',
-			url: 'https://example.com/first-track-1.mp3',
-		};
-		const secondTrack = {
-			id: 2,
-			filename: 'second-track-1.mp3',
-			url: 'https://example.com/second-track-1.mp3',
-		};
-
-		render(
-			<MediaPlaceholder
-				allowedTypes={ [ 'audio' ] }
-				multiple
-				onSelect={ onSelect }
-			/>
-		);
-
-		act( () => {
-			mockDropZoneProps.onFilesDrop( fileList );
-		} );
-
-		const { onBatchSuccess, onFileChange } =
-			mediaUpload.mock.calls[ 0 ][ 0 ];
-
-		act( () => {
-			onFileChange( [ { url: 'blob:https://example.com/first' } ] );
-			onFileChange( [ { url: 'blob:https://example.com/second' } ] );
-			onFileChange( [ secondTrack ] );
-			onFileChange( [ firstTrack ] );
 			onBatchSuccess();
 		} );
 
