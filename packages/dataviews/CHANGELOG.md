@@ -2,9 +2,10 @@
 
 ## Unreleased
 
-### Bug Fixes
+### Bug Fix
 
 - Fix Dataviews popover hover text color readability issue on WordPress 7.0. [#80105](https://github.com/WordPress/gutenberg/pull/80105)
+- DataViews: Fix the unintended gap between `list` layout items when `groupBy` is set. [#80254](https://github.com/WordPress/gutenberg/pull/80254)
 
 ## 17.2.0 (2026-07-14)
 
