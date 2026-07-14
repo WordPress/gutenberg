@@ -795,17 +795,23 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		// firing `compositionend`.
 		// See https://github.com/puppeteer/puppeteer/issues/4981.
 		await editor.canvas.locator( ':root' ).evaluate( async () => {
-			document.activeElement.textContent = '`a`';
+			// Composition happens at the caret, which may be inside an
+			// editable element while a wrapper editing host holds focus.
 			const selection = window.getSelection();
+			const { anchorNode } = selection;
+			const editable = (
+				anchorNode.nodeType === anchorNode.ELEMENT_NODE
+					? anchorNode
+					: anchorNode.parentElement
+			).closest( '[contenteditable="true"]' );
+			editable.textContent = '`a`';
 			// The `selectionchange` and `compositionend` events should run in separate event
 			// loop ticks to process all data store updates in time. Native events would be
 			// scheduled the same way.
-			selection.selectAllChildren( document.activeElement );
+			selection.selectAllChildren( editable );
 			selection.collapseToEnd();
 			await new Promise( ( r ) => setTimeout( r, 0 ) );
-			document.activeElement.dispatchEvent(
-				new CompositionEvent( 'compositionend' )
-			);
+			editable.dispatchEvent( new CompositionEvent( 'compositionend' ) );
 		} );
 
 		expect( await editor.getBlocks() ).toMatchObject( [

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.43.0 (2026-07-14)
+
 ### Enhancements
 
 -   `Slug`: Use the emphasis font-weight token for help text ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).

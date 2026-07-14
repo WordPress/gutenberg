@@ -344,6 +344,24 @@ test.describe( 'Block Notes', () => {
 			await expect( savedChip ).toHaveText( '@Mentionable Teammate' );
 			await expect( savedChip ).toHaveClass( mentionClasses );
 		} );
+
+		test( 'can cancel mentions popover', async ( { editor, page } ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Mention host' },
+			} );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			const textbox = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			await textbox.pressSequentially( 'Ping @' );
+
+			await expect( page.getByRole( 'listbox' ) ).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( page.getByRole( 'listbox' ) ).toBeHidden();
+			await expect( textbox ).toBeFocused();
+		} );
 	} );
 
 	test( 'can reply to a block note', async ( { page, blockNoteUtils } ) => {
@@ -1057,10 +1075,12 @@ test.describe( 'Block Notes', () => {
 					name: 'Block: Paragraph',
 				} )
 				.nth( 1 );
-			await expect(
-				secondBlock,
-				"focus should move to the block if there isn't a next or previous note"
-			).toBeFocused();
+			await expect
+				.poll(
+					() => editor.ownsSelection( secondBlock ),
+					"focus should move to the block if there isn't a next or previous note"
+				)
+				.toBe( true );
 		} );
 
 		test( 'should focus note thread when reply is deleted', async ( {
