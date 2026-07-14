@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { settings } from '@wordpress/icons';
+import { drawerRight } from '@wordpress/icons';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { IconButton } from '@wordpress/ui';
@@ -54,7 +54,7 @@ export function WidgetSettingsTrigger( {
 
 	return (
 		<IconButton
-			icon={ settings }
+			icon={ drawerRight }
 			label={ __( 'Widget settings' ) }
 			variant="minimal"
 			tone="neutral"

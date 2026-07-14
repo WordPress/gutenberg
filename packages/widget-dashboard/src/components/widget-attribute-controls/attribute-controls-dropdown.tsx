@@ -5,7 +5,7 @@ import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { settings } from '@wordpress/icons';
+import { drawerRight, settings } from '@wordpress/icons';
 /* eslint-disable @wordpress/use-recommended-components -- Dashboard is still experimental. */
 import {
 	Button,
@@ -123,7 +123,7 @@ export function AttributeControlsDropdown( {
 								openSettings();
 							} }
 						>
-							<Button.Icon icon={ settings } />
+							<Button.Icon icon={ drawerRight } />
 							{ __( 'More settings' ) }
 						</Button>
 					) }
