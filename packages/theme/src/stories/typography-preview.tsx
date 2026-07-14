@@ -1,15 +1,69 @@
 import type { CSSProperties } from 'react';
-import _tokenFallbacks from '../prebuilt/js/design-token-fallbacks.mjs';
 import wpdsTokens from '../prebuilt/js/design-tokens.mjs';
 
-const tokenFallbacks: Record< string, string > = _tokenFallbacks;
+// Keep these references literal so the Storybook Vite plugin can inject the
+// generated fallback values. The check below prevents this list from drifting
+// from the generated typography token surface.
+const tokenValues = {
+	'--wpds-typography-font-family-heading':
+		'var(--wpds-typography-font-family-heading)',
+	'--wpds-typography-font-family-body':
+		'var(--wpds-typography-font-family-body)',
+	'--wpds-typography-font-family-mono':
+		'var(--wpds-typography-font-family-mono)',
+	'--wpds-typography-font-size-xs': 'var(--wpds-typography-font-size-xs)',
+	'--wpds-typography-font-size-sm': 'var(--wpds-typography-font-size-sm)',
+	'--wpds-typography-font-size-md': 'var(--wpds-typography-font-size-md)',
+	'--wpds-typography-font-size-lg': 'var(--wpds-typography-font-size-lg)',
+	'--wpds-typography-font-size-xl': 'var(--wpds-typography-font-size-xl)',
+	'--wpds-typography-font-size-2xl': 'var(--wpds-typography-font-size-2xl)',
+	'--wpds-typography-line-height-xs': 'var(--wpds-typography-line-height-xs)',
+	'--wpds-typography-line-height-sm': 'var(--wpds-typography-line-height-sm)',
+	'--wpds-typography-line-height-md': 'var(--wpds-typography-line-height-md)',
+	'--wpds-typography-line-height-lg': 'var(--wpds-typography-line-height-lg)',
+	'--wpds-typography-line-height-xl': 'var(--wpds-typography-line-height-xl)',
+	'--wpds-typography-line-height-2xl':
+		'var(--wpds-typography-line-height-2xl)',
+	'--wpds-typography-font-weight-default':
+		'var(--wpds-typography-font-weight-default)',
+	'--wpds-typography-font-weight-emphasis':
+		'var(--wpds-typography-font-weight-emphasis)',
+} as const;
+
+const typographyTokens = wpdsTokens.filter( ( tokenName ) =>
+	tokenName.startsWith( '--wpds-typography-' )
+);
+
+if (
+	typographyTokens.length !== Object.keys( tokenValues ).length ||
+	typographyTokens.some( ( tokenName ) => ! ( tokenName in tokenValues ) )
+) {
+	throw new Error(
+		'TypographyTokenPreview: Static token references are out of sync with the generated typography tokens.'
+	);
+}
+
+const fontSizeLineHeights = {
+	'--wpds-typography-font-size-xs':
+		tokenValues[ '--wpds-typography-line-height-xs' ],
+	'--wpds-typography-font-size-sm':
+		tokenValues[ '--wpds-typography-line-height-sm' ],
+	'--wpds-typography-font-size-md':
+		tokenValues[ '--wpds-typography-line-height-md' ],
+	'--wpds-typography-font-size-lg':
+		tokenValues[ '--wpds-typography-line-height-lg' ],
+	'--wpds-typography-font-size-xl':
+		tokenValues[ '--wpds-typography-line-height-xl' ],
+	'--wpds-typography-font-size-2xl':
+		tokenValues[ '--wpds-typography-line-height-2xl' ],
+} as const;
 
 type TypographyTokenGroup = {
 	title: string;
 	description: string;
 	tokenPrefix: string;
 	sampleLines: string[];
-	getSampleStyle: ( tokenValue: string ) => CSSProperties;
+	getSampleStyle: ( tokenValue: string, tokenName: string ) => CSSProperties;
 };
 
 const tokenGroups: TypographyTokenGroup[] = [
@@ -30,10 +84,11 @@ const tokenGroups: TypographyTokenGroup[] = [
 		description: 'Compare each step in the typography size scale.',
 		tokenPrefix: '--wpds-typography-font-size-',
 		sampleLines: [ 'Code is Poetry.' ],
-		getSampleStyle: ( tokenValue ) => ( {
+		getSampleStyle: ( tokenValue, tokenName ) => ( {
 			fontFamily: 'var(--wpds-typography-font-family-heading)',
 			fontSize: tokenValue,
 			fontWeight: 'var(--wpds-typography-font-weight-emphasis)',
+			lineHeight: getFontSizeLineHeight( tokenName ),
 		} ),
 	},
 	{
@@ -116,16 +171,29 @@ const sampleLineStyle: CSSProperties = {
 	overflowWrap: 'anywhere',
 };
 
-function getTokenValue( tokenName: string ) {
-	const fallback = tokenFallbacks[ tokenName ];
+function getFontSizeLineHeight( tokenName: string ) {
+	const lineHeight =
+		fontSizeLineHeights[ tokenName as keyof typeof fontSizeLineHeights ];
 
-	if ( ! fallback ) {
+	if ( ! lineHeight ) {
 		throw new Error(
-			`TypographyTokenPreview: Missing fallback for ${ tokenName }.`
+			`TypographyTokenPreview: Missing line height for ${ tokenName }.`
 		);
 	}
 
-	return `var(${ tokenName }, ${ fallback })`;
+	return lineHeight;
+}
+
+function getTokenValue( tokenName: string ) {
+	const tokenValue = tokenValues[ tokenName as keyof typeof tokenValues ];
+
+	if ( ! tokenValue ) {
+		throw new Error(
+			`TypographyTokenPreview: Missing static reference for ${ tokenName }.`
+		);
+	}
+
+	return tokenValue;
 }
 
 function TypographyTokenSection( {
@@ -135,7 +203,7 @@ function TypographyTokenSection( {
 	sampleLines,
 	getSampleStyle,
 }: TypographyTokenGroup ) {
-	const tokens = wpdsTokens.filter( ( tokenName ) =>
+	const tokens = typographyTokens.filter( ( tokenName ) =>
 		tokenName.startsWith( tokenPrefix )
 	);
 
@@ -146,7 +214,7 @@ function TypographyTokenSection( {
 			<dl style={ listStyle }>
 				{ tokens.map( ( tokenName ) => {
 					const tokenValue = getTokenValue( tokenName );
-					const tokenStyle = getSampleStyle( tokenValue );
+					const tokenStyle = getSampleStyle( tokenValue, tokenName );
 
 					return (
 						<div key={ tokenName } style={ itemStyle }>
