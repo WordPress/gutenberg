@@ -403,6 +403,15 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 			self::$commenter->ID
 		);
 
+		/*
+		 * Run the create-time handlers so the mentioned user has already been
+		 * notified (and, with the followers layer, subscribed); an edit that
+		 * merely repeats their mention must not email them again.
+		 */
+		do_action( 'rest_insert_comment', $note, null, true );
+		$this->sent    = array();
+		$this->sent_to = array();
+
 		wp_set_current_user( self::$commenter->ID );
 		if ( is_multisite() ) {
 			grant_super_admin( self::$commenter->ID );
