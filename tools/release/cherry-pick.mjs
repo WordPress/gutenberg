@@ -337,9 +337,11 @@ function cherryPickOne( commit, cwd = process.cwd() ) {
 			headAfterCleanup !== headBeforeCherryPick ||
 			cherryPickState.status === 0
 		) {
-			throw new Error(
-				`Failed to restore the repository after cherry-picking ${ commit }.`
+			console.error(
+				`Failed to restore the repository after cherry-picking ${ commit }. ` +
+					'Nothing was pushed. Restore the repository before running this script again.'
 			);
+			process.exit( 1 );
 		}
 
 		throw new Error( result.stderr.toString().trim() );
