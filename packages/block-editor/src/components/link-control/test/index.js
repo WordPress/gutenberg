@@ -820,6 +820,117 @@ describe( 'Manual link entry', () => {
 		);
 	} );
 
+	describe( 'Displaying no results found message', () => {
+		it( 'should display "No results found" when search returns no suggestions', async () => {
+			const user = userEvent.setup();
+
+			mockFetchSearchSuggestions.mockImplementation( () =>
+				Promise.resolve( [] )
+			);
+
+			render( <LinkControl showSuggestions /> );
+
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+
+			await user.type( searchInput, 'nonexistent' );
+
+			const noResultsMessage = await screen.findByText(
+				'No results found.',
+				{},
+				{ timeout: 2000 }
+			);
+
+			expect( noResultsMessage ).toBeVisible();
+			expect( noResultsMessage ).toHaveClass(
+				'block-editor-link-control__search-no-results'
+			);
+		} );
+
+		it( 'should not display "No results found" for initial suggestions', async () => {
+			mockFetchSearchSuggestions.mockImplementation( () =>
+				Promise.resolve( [] )
+			);
+
+			render( <LinkControl showInitialSuggestions /> );
+
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+
+			expect( searchInput ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			const noResultsMessage = screen.queryByText( 'No results found.' );
+			expect( noResultsMessage ).not.toBeInTheDocument();
+		} );
+
+		it( 'should hide "No results found" when results are available', async () => {
+			const user = userEvent.setup();
+
+			mockFetchSearchSuggestions.mockImplementation( async () => [] );
+
+			render( <LinkControl showSuggestions /> );
+
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+
+			await user.type( searchInput, 'nonexistent' );
+
+			const noResultsMessage =
+				await screen.findByText( 'No results found.' );
+			expect( noResultsMessage ).toBeVisible();
+
+			mockFetchSearchSuggestions.mockImplementation( () =>
+				Promise.resolve( fauxEntitySuggestions )
+			);
+
+			await user.clear( searchInput );
+			await user.type( searchInput, 'hello' );
+
+			const searchResults = await screen.findByRole( 'listbox', {
+				name: /Search results for/,
+			} );
+
+			expect(
+				screen.queryByText( 'No results found.' )
+			).not.toBeInTheDocument();
+			expect( searchResults ).toBeVisible();
+			expect(
+				within( searchResults ).getAllByRole( 'option' ).length
+			).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should display "No results found" alongside CREATE option when withCreateSuggestion is enabled', async () => {
+			const user = userEvent.setup();
+
+			mockFetchSearchSuggestions.mockImplementation( () =>
+				Promise.resolve( [] )
+			);
+
+			render( <LinkControl showSuggestions withCreateSuggestion /> );
+
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+
+			await user.type( searchInput, 'newpage' );
+
+			const searchResults = await screen.findByRole( 'listbox', {
+				name: /Search results for/,
+			} );
+
+			// Both "No results found." and CREATE option should be present
+			expect( screen.getByText( 'No results found.' ) ).toBeVisible();
+			expect(
+				within( searchResults ).getByRole( 'option', {
+					name: /^Create:/,
+				} )
+			).toBeVisible();
+		} );
+	} );
+
 	describe( 'Handling cancellation', () => {
 		it( 'should not show cancellation button during link creation', async () => {
 			const mockOnRemove = jest.fn();
