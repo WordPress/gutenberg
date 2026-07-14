@@ -116,6 +116,19 @@ const getValueFromObjectPath = ( object, path ) => {
 const sides = [ 'top', 'right', 'bottom', 'left' ];
 
 /**
+ * A single logical style change, grouping all the `{ path, value }` pairs it
+ * expands to so a selection can push them atomically.
+ *
+ * @typedef {Object} ChangeRow
+ * @property {string}                            id               Unique row id.
+ * @property {string[]}                          primaryPath      Path used for the current-value lookup.
+ * @property {Array<{path: string[], value: *}>} paths            Expanded path/value pairs to push.
+ * @property {string[]}                          presetAttributes Preset block attributes to clear when pushed.
+ * @property {*}                                 newValue         Value shown in the "New" column.
+ * @property {string}                            [format]         Display format hint (`border`, `borderRadius`, `spacing`).
+ */
+
+/**
  * Builds the border review rows.
  *
  * Border styles are grouped by scope so each row reads as a CSS `border`
@@ -132,7 +145,7 @@ const sides = [ 'top', 'right', 'bottom', 'left' ];
  * @param {Object}   attributes      Block attributes.
  * @param {Object}   blockUserConfig User Global Styles config for the block.
  *
- * @return {Array} Grouped border rows.
+ * @return {ChangeRow[]} Grouped border rows.
  */
 function getBorderRows( supports, attributes, blockUserConfig ) {
 	const rows = [];
@@ -215,7 +228,7 @@ function getBorderRows( supports, attributes, blockUserConfig ) {
  * @param {Object}   options.userBorder       User Global Styles border config.
  * @param {string[]} options.presetAttributes Preset block attributes to clear.
  *
- * @return {?Object} The border row, or `null` when the scope has no values.
+ * @return {?ChangeRow} The border row, or `null` when the scope has no values.
  */
 function buildBorderScopeRow( {
 	id,
@@ -292,8 +305,7 @@ function buildBorderScopeRow( {
  * @param {Object} attributes      Block attributes.
  * @param {Object} blockUserConfig User Global Styles config for the block.
  *
- * @return {Array<{id: string, primaryPath: string[], paths: Array<{path: string[], value: *}>, presetAttributes: string[], newValue: *, format?: string}>}
- *   Grouped change rows.
+ * @return {ChangeRow[]} Grouped change rows.
  */
 export function getChangesToPush( supports, attributes, blockUserConfig ) {
 	const rows = [];
