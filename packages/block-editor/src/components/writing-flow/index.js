@@ -68,7 +68,17 @@ export function useWritingFlow() {
 
 					return () => {
 						delete node.dataset.hasMultiSelection;
-						node.removeAttribute( 'aria-label' );
+						// The wrapper may remain the editing host (the
+						// collapsed block supports `editableRoot`): keep it
+						// named, as the textbox role requires.
+						if ( node.contentEditable === 'true' ) {
+							node.setAttribute(
+								'aria-label',
+								__( 'Editor canvas' )
+							);
+						} else {
+							node.removeAttribute( 'aria-label' );
+						}
 					};
 				},
 				[ hasMultiSelection ]

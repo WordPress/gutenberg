@@ -15,6 +15,7 @@ import { isSelectionForward } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
 import { canHostEditableRoot } from './use-editable-root';
+import { setContentEditableWrapper, setShiftClickInProgress } from './utils';
 import { unlock } from '../../lock-unlock';
 
 const { ownsSelection } = unlock( richTextPrivateApis );
@@ -91,35 +92,6 @@ function findDepth( a, b ) {
 	return depth;
 }
 
-/**
- * Sets the `contenteditable` wrapper element to `value`.
- *
- * @param {HTMLElement} node  Block element.
- * @param {boolean}     value `contentEditable` value (true or false)
- */
-function setContentEditableWrapper( node, value ) {
-	// Since we are calling this on every selection change, check if the value
-	// needs to be updated first because it trigger the browser to recalculate
-	// style.
-	if ( node.contentEditable !== String( value ) ) {
-		node.contentEditable = value;
-
-		if ( value ) {
-			// Only move focus to the wrapper once it is actually an editing
-			// host. If it did not become one (e.g. JSDOM does not implement
-			// contentEditable), it must not claim focus from the block's
-			// editable element.
-			if ( ! node.isContentEditable ) {
-				node.contentEditable = false;
-				return;
-			}
-
-			// Firefox doesn't automatically move focus.
-			node.focus();
-		}
-	}
-}
-
 function getRichTextElement( node ) {
 	const element =
 		node.nodeType === node.ELEMENT_NODE ? node : node.parentElement;
@@ -151,6 +123,7 @@ export default function useSelectionObserver() {
 
 			function onMouseDown( event ) {
 				isTripleClick = event.detail === 3;
+				setShiftClickInProgress( event.shiftKey );
 				// Remember the selection anchor when a shift+click starts:
 				// the click focuses the target block, whose focus handler
 				// selects it, overwriting the anchor in the store before the
@@ -163,6 +136,7 @@ export default function useSelectionObserver() {
 			function onKeyDown() {
 				isTripleClick = false;
 				shiftClickAnchor = undefined;
+				setShiftClickInProgress( false );
 			}
 
 			function onSelectionChange( event ) {
@@ -478,7 +452,12 @@ export default function useSelectionObserver() {
 				'selectionchange',
 				onSelectionChange
 			);
-			defaultView.addEventListener( 'mouseup', onSelectionChange );
+			function onMouseUp( event ) {
+				onSelectionChange( event );
+				setShiftClickInProgress( false );
+			}
+
+			defaultView.addEventListener( 'mouseup', onMouseUp );
 			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'keydown', onKeyDown );
 			ownerDocument.addEventListener(
@@ -501,7 +480,7 @@ export default function useSelectionObserver() {
 					'selectionchange',
 					onSelectionChange
 				);
-				defaultView.removeEventListener( 'mouseup', onSelectionChange );
+				defaultView.removeEventListener( 'mouseup', onMouseUp );
 				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'keydown', onKeyDown );
 				ownerDocument.removeEventListener(

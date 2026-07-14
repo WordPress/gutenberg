@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { hasBlockSupport } from '@wordpress/blocks';
@@ -10,6 +9,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { setContentEditableWrapper } from './utils';
 import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
@@ -112,22 +112,11 @@ export default function useEditableRoot() {
 				isMultiSelecting,
 			} = registry.select( blockEditorStore );
 
-			node.setAttribute( 'contenteditable', 'true' );
-
-			// Abort in environments without contentEditable support (JSDOM):
-			// without editing host semantics the wrapper must not claim to
-			// be one.
-			if ( ! node.isContentEditable ) {
-				node.removeAttribute( 'contenteditable' );
+			// Focus is moved separately below, only when an editable
+			// element belonging to the selected block holds it.
+			if ( ! setContentEditableWrapper( node, true, { focus: false } ) ) {
 				return;
 			}
-
-			// Expose the host as a named multiline textbox so it has a role
-			// and accessible name once it takes focus. The label is generic
-			// because the host can span several blocks.
-			node.setAttribute( 'role', 'textbox' );
-			node.setAttribute( 'aria-multiline', 'true' );
-			node.setAttribute( 'aria-label', __( 'Editor canvas' ) );
 
 			// Move focus from the block's editable element to the wrapper,
 			// but only when an editable element belonging to the selected
@@ -154,18 +143,17 @@ export default function useEditableRoot() {
 			}
 
 			return () => {
-				node.removeAttribute( 'role' );
-				node.removeAttribute( 'aria-multiline' );
-				node.removeAttribute( 'aria-label' );
-
 				// A multi-selection owns the wrapper as its editing host
-				// now; the selection observer disables it when the
-				// selection collapses.
+				// now: the host and its textbox semantics remain, and the
+				// selection observer disables both together when the
+				// selection collapses. Removing the attributes here would
+				// strip the accessible name off the focused editing host at
+				// the moment cross-block editing begins.
 				if ( hasMultiSelection() || isMultiSelecting() ) {
 					return;
 				}
 
-				node.setAttribute( 'contenteditable', 'false' );
+				setContentEditableWrapper( node, false );
 
 				// If the wrapper held focus, return focus to the editable
 				// element containing the selection, which is focusable

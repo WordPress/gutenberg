@@ -20,6 +20,7 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
+import { setContentEditableWrapper } from './utils';
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
@@ -290,9 +291,7 @@ export default function useArrowNav() {
 			if ( shiftKey ) {
 				if ( isNavEdge( target, isReverse ) ) {
 					if ( isClosestTabbableABlock( target, isReverse ) ) {
-						node.contentEditable = true;
-						// Firefox doesn't automatically move focus.
-						node.focus();
+						setContentEditableWrapper( node, true );
 					} else if ( node.contentEditable === 'true' ) {
 						// There is no block to extend the selection into.
 						// Within an editable wrapper the selection could

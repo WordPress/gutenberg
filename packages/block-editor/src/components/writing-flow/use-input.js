@@ -16,6 +16,7 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { setContentEditableWrapper } from './utils';
 import { getSelectionEditableElement } from '../../utils/dom';
 
 /**
@@ -143,7 +144,7 @@ export default function useInput() {
 			}
 
 			if ( event.keyCode === ENTER ) {
-				node.contentEditable = false;
+				setContentEditableWrapper( node, false );
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {
 					replaceBlocks(
@@ -157,7 +158,7 @@ export default function useInput() {
 				event.keyCode === BACKSPACE ||
 				event.keyCode === DELETE
 			) {
-				node.contentEditable = false;
+				setContentEditableWrapper( node, false );
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {
 					removeBlocks( getSelectedBlockClientIds() );
@@ -172,7 +173,7 @@ export default function useInput() {
 				event.key.length === 1 &&
 				! ( event.metaKey || event.ctrlKey )
 			) {
-				node.contentEditable = false;
+				setContentEditableWrapper( node, false );
 				if ( __unstableIsSelectionMergeable() ) {
 					__unstableDeleteSelection( event.keyCode === DELETE );
 				} else {
@@ -192,7 +193,7 @@ export default function useInput() {
 				return;
 			}
 
-			node.contentEditable = false;
+			setContentEditableWrapper( node, false );
 
 			if ( __unstableIsSelectionMergeable() ) {
 				__unstableDeleteSelection();
