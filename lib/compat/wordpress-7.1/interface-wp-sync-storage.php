@@ -85,5 +85,34 @@ if ( ! interface_exists( 'WP_Sync_Storage' ) ) {
 		 * @return bool True on success, false on failure.
 		 */
 		public function set_awareness_state( string $room, array $awareness ): bool;
+
+		/**
+		 * Gets the site URL recorded when this room's storage was first created.
+		 *
+		 * Returns null when the room does not exist or was created before origin
+		 * tracking was introduced (legacy data created before this fix shipped).
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return string|null Stored origin URL, or null if not recorded.
+		 */
+		public function get_origin_url( string $room ): ?string;
+
+		/**
+		 * Destroys all sync state for a room so the editor can start fresh from
+		 * canonical post content.
+		 *
+		 * Implementations must delete all stored updates, awareness state, and any
+		 * associated storage. The room is recreated automatically on the next
+		 * polling request, at which point the current site URL is recorded as the
+		 * new origin.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return bool True on success or when the room does not exist, false on failure.
+		 */
+		public function purge_room( string $room ): bool;
 	}
 }

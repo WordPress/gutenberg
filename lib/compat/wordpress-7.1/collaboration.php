@@ -104,8 +104,80 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 				'type'              => 'string',
 			)
 		);
+
+		register_meta(
+			'post',
+			'_crdt_document_origin_url',
+			array(
+				'auth_callback'     => static function ( bool $_allowed, string $_meta_key, int $object_id, int $user_id ): bool {
+					return user_can( $user_id, 'edit_post', $object_id );
+				},
+				'revisions_enabled' => false,
+				'show_in_rest'      => false,
+				'single'            => true,
+				'type'              => 'string',
+			)
+		);
 	}
 	add_action( 'init', 'gutenberg_rest_api_crdt_post_meta' );
+
+	/**
+	 * Records the origin URL when a CRDT document is persisted.
+	 */
+	function gutenberg_crdt_document_record_origin( $_meta_id, $object_id, $meta_key ) {
+		if ( '_crdt_document' === $meta_key ) {
+			// update_post_meta will trigger this action recursively if we're not careful,
+			// but we're updating a different key, so it's safe.
+			update_post_meta( $object_id, '_crdt_document_origin_url', site_url() );
+		}
+	}
+	add_action( 'added_post_meta', 'gutenberg_crdt_document_record_origin', 10, 3 );
+	add_action( 'updated_post_meta', 'gutenberg_crdt_document_record_origin', 10, 3 );
+
+	/**
+	 * Purges stale _crdt_document meta when the originating site URL
+	 * does not match the current site, indicating a database migration.
+	 */
+	function gutenberg_purge_stale_crdt_document_meta( $response, $post ) {
+		$origin      = get_post_meta( $post->ID, '_crdt_document_origin_url', true );
+		$current_url = site_url();
+
+		$should_purge = false;
+
+		if ( ! empty( $origin ) && $current_url !== $origin ) {
+			$should_purge = true;
+		} elseif ( empty( $origin ) ) {
+			$crdt_doc = get_post_meta( $post->ID, '_crdt_document', true );
+			if ( ! empty( $crdt_doc ) ) {
+				$should_purge = true;
+			}
+		}
+
+		if ( $should_purge ) {
+			error_log( sprintf( 'Gutenberg: Purging stale collaborative editing state (_crdt_document) for post ID %d due to site URL mismatch. This typically happens after a database migration or domain change.', $post->ID ) );
+			delete_post_meta( $post->ID, '_crdt_document' );
+			delete_post_meta( $post->ID, '_crdt_document_origin_url' );
+
+			$data = $response->get_data();
+			if ( isset( $data['meta']['_crdt_document'] ) ) {
+				$data['meta']['_crdt_document'] = '';
+				$response->set_data( $data );
+			}
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Registers the purge filter for all post types.
+	 */
+	function gutenberg_register_crdt_purge_filters() {
+		$post_types = get_post_types( array( 'show_in_rest' => true ), 'names' );
+		foreach ( $post_types as $post_type ) {
+			add_filter( "rest_prepare_{$post_type}", 'gutenberg_purge_stale_crdt_document_meta', 10, 2 );
+		}
+	}
+	add_action( 'rest_api_init', 'gutenberg_register_crdt_purge_filters' );
 }
 
 if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
