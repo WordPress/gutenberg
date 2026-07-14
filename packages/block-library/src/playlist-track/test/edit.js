@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,9 @@ import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 jest.mock( '@wordpress/block-editor', () => ( {
-	BlockControls: ( { children } ) => <div>{ children }</div>,
+	BlockControls: ( { children, group = 'default' } ) => (
+		<div data-testid={ `block-controls-${ group }` }>{ children }</div>
+	),
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
 	MediaPlaceholder: () => <div />,
@@ -195,5 +197,22 @@ describe( 'PlaylistTrackEdit', () => {
 		fireEvent.click( screen.getByRole( 'button', { name: 'Add' } ) );
 
 		expect( addTracks ).toHaveBeenCalledWith( {} );
+	} );
+
+	it( 'renders the add track control in a different toolbar group from replace', () => {
+		renderEdit( { addTracks: jest.fn() } );
+
+		expect(
+			within( screen.getByTestId( 'block-controls-other' ) ).getByRole(
+				'button',
+				{ name: 'Replace' }
+			)
+		).toBeInTheDocument();
+		expect(
+			within( screen.getByTestId( 'block-controls-block' ) ).getByRole(
+				'button',
+				{ name: 'Add' }
+			)
+		).toBeInTheDocument();
 	} );
 } );

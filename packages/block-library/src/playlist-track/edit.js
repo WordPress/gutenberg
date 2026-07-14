@@ -160,7 +160,9 @@ const PlaylistTrackEdit = ( {
 					onError={ onUploadError }
 					variant="toolbar"
 				/>
-				{ !! addTracks && (
+			</BlockControls>
+			{ !! addTracks && (
+				<BlockControls group="block">
 					<MediaReplaceFlow
 						name={ __( 'Add' ) }
 						onSelect={ addTracks }
@@ -171,8 +173,8 @@ const PlaylistTrackEdit = ( {
 						onError={ onUploadError }
 						variant="toolbar"
 					/>
-				) }
-			</BlockControls>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
