@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Spell out the accepted field-type name syntax: lowercase kebab-case
+    segments, with at most one namespace level ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+
+### Internal
+
+-   Add an integration test covering named field-type resolution in
+    `useWidgetTypes` ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+
 ## 0.3.0 (2026-07-14)
 
 ### New Features
@@ -36,13 +46,6 @@
 -   Add a `WithRelevance` Storybook story for attribute relevance hints.
 -   Add a Field Types doc, its pipeline diagram, and a `WithFieldType`
     story ([#80148](https://github.com/WordPress/gutenberg/pull/80148)).
--   Spell out the accepted field-type name syntax: lowercase kebab-case
-    segments, with at most one namespace level ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
-
-### Internal
-
--   Add an integration test covering named field-type resolution in
-    `useWidgetTypes` ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 
 ## 0.2.0 (2026-07-01)
 
