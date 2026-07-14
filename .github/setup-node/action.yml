@@ -17,9 +17,9 @@ runs:
           with:
               node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
-              package-manager-cache: ${{ inputs.enable-caching == 'false' && 'false' || 'true' }}
+              package-manager-cache: ${{ inputs.enable-caching }}
               check-latest: true
-              cache: npm
+              cache: ${{ inputs.enable-caching == 'true' && 'npm' || '' }}
 
         - name: Get Node.js and npm version
           id: node-version
@@ -28,6 +28,7 @@ runs:
           shell: bash
 
         - name: Cache node_modules
+          if: ${{ inputs.enable-caching == 'true' }}
           id: cache-node_modules
           uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
           with:
@@ -35,7 +36,7 @@ runs:
               key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
 
         - name: Install npm dependencies
-          if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
+          if: ${{ inputs.enable-caching == 'false' || steps.cache-node_modules.outputs.cache-hit != 'true' }}
           run: |
               npm ci
           shell: bash
