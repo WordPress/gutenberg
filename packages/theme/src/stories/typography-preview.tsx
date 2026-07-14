@@ -1,5 +1,8 @@
 import type { CSSProperties } from 'react';
+import _tokenFallbacks from '../prebuilt/js/design-token-fallbacks.mjs';
 import wpdsTokens from '../prebuilt/js/design-tokens.mjs';
+
+const tokenFallbacks: Record< string, string > = _tokenFallbacks;
 
 type TypographyTokenGroup = {
 	title: string;
@@ -106,12 +109,24 @@ const tokenNameStyle: CSSProperties = {
 
 const sampleStyle: CSSProperties = {
 	margin: 0,
-	overflowWrap: 'anywhere',
 };
 
 const sampleLineStyle: CSSProperties = {
 	display: 'block',
+	overflowWrap: 'anywhere',
 };
+
+function getTokenValue( tokenName: string ) {
+	const fallback = tokenFallbacks[ tokenName ];
+
+	if ( ! fallback ) {
+		throw new Error(
+			`TypographyTokenPreview: Missing fallback for ${ tokenName }.`
+		);
+	}
+
+	return `var(${ tokenName }, ${ fallback })`;
+}
 
 function TypographyTokenSection( {
 	title,
@@ -130,7 +145,8 @@ function TypographyTokenSection( {
 			<p style={ descriptionStyle }>{ description }</p>
 			<dl style={ listStyle }>
 				{ tokens.map( ( tokenName ) => {
-					const tokenValue = `var(${ tokenName })`;
+					const tokenValue = getTokenValue( tokenName );
+					const tokenStyle = getSampleStyle( tokenValue );
 
 					return (
 						<div key={ tokenName } style={ itemStyle }>
@@ -140,16 +156,14 @@ function TypographyTokenSection( {
 								</code>
 							</dt>
 							<dd style={ { margin: 0 } }>
-								<p
-									style={ {
-										...sampleStyle,
-										...getSampleStyle( tokenValue ),
-									} }
-								>
+								<p style={ sampleStyle }>
 									{ sampleLines.map( ( line ) => (
 										<span
 											key={ line }
-											style={ sampleLineStyle }
+											style={ {
+												...sampleLineStyle,
+												...tokenStyle,
+											} }
 										>
 											{ line }
 										</span>
