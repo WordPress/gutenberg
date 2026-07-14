@@ -350,6 +350,8 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that a non-string `className` attribute does not cause a fatal
 	 * error and the block content is returned unmodified.
+	 *
+	 * @covers ::gutenberg_render_block_style_variation_class_name
 	 */
 	public function test_block_style_variation_class_name_with_non_string_class_name() {
 		$block = array(
@@ -371,6 +373,8 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 	/**
 	 * Tests to ensure that there are no references to an undefined array key
 	 * if `className` is not assigned.
+	 *
+	 * @covers ::gutenberg_render_block_style_variation_class_name
 	 */
 	public function test_block_style_variation_class_name_with_missing_class_name() {
 		$block = array(
