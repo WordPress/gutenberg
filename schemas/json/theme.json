@@ -216,7 +216,7 @@
 										"type": "string"
 									},
 									"slug": {
-										"description": "Kebab-case unique identifier for the color preset.",
+										"description": "Kebab-case unique identifier for the color preset. The slugs 'text' and 'link' are reserved and cannot be used as they conflict with core CSS classes.",
 										"type": "string"
 									},
 									"color": {

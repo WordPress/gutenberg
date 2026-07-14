@@ -4944,6 +4944,19 @@ class WP_Theme_JSON_Gutenberg {
 						esc_attr( esc_html( $preset['name'] ) ) === $preset['name'] &&
 						sanitize_html_class( $preset['slug'] ) === $preset['slug']
 					) {
+						if ( in_array( $preset['slug'], array( 'text', 'link' ), true ) ) {
+							_doing_it_wrong(
+								__METHOD__,
+								sprintf(
+									/* translators: %s: slug name */
+									__( '"%s" is a reserved slug and cannot be used as a color preset in theme.json as it conflicts with core CSS classes.', 'gutenberg' ),
+									$preset['slug']
+								),
+								'7.1.0'
+							);
+							continue;
+						}
+
 						$value = null;
 						if ( isset( $preset_metadata['value_key'], $preset[ $preset_metadata['value_key'] ] ) ) {
 							$value = $preset[ $preset_metadata['value_key'] ];
