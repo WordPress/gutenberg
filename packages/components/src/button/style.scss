@@ -99,8 +99,8 @@
 	 * Secondary and tertiary buttons.
 	 */
 
-	&.is-secondary,
-	&.is-tertiary {
+	&.is-secondary:not(.is-destructive),
+	&.is-tertiary:not(.is-destructive) {
 		&:disabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
@@ -225,6 +225,17 @@
 					var(--wpds-color-background-interactive-error-strong) 70%
 				);
 				/* stylelint-enable */
+			}
+		}
+
+		&.is-secondary,
+		&.is-tertiary {
+			&:disabled,
+			&[aria-disabled="true"],
+			&[aria-disabled="true"]:hover {
+				color: var(--wpds-color-foreground-interactive-error-disabled);
+				background: var(--wpds-color-background-interactive-error-weak-disabled);
+				transform: none;
 			}
 		}
 
