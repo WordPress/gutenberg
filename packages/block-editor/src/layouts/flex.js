@@ -252,7 +252,7 @@ export default {
 		return (
 			<BlockControls
 				group={ controlsGroup }
-				__experimentalShareWithChildBlocks="layout"
+				__experimentalShareWithChildBlocks
 			>
 				{ allowJustification && (
 					<FlexLayoutJustifyContentControl

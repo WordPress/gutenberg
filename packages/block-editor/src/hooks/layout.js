@@ -594,7 +594,7 @@ function LayoutPanelPure( {
 }
 
 export default {
-	shareWithChildBlocks: 'layout',
+	shareWithChildBlocks: true,
 	edit: LayoutPanelPure,
 	attributeKeys: [ 'layout', 'style' ],
 	hasSupport( name ) {

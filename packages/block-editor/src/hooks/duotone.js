@@ -152,10 +152,7 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 					settings={ settings }
 				/>
 			</InspectorControls>
-			<BlockControls
-				group="block"
-				__experimentalShareWithChildBlocks="duotone"
-			>
+			<BlockControls group="block" __experimentalShareWithChildBlocks>
 				<DuotoneControl
 					duotonePalette={ duotonePalette }
 					colorPalette={ colorPalette }
@@ -187,7 +184,7 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 }
 
 export default {
-	shareWithChildBlocks: 'duotone',
+	shareWithChildBlocks: true,
 	edit: DuotonePanelPure,
 	useBlockProps,
 	attributeKeys: [ 'style' ],

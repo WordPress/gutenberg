@@ -141,7 +141,7 @@ function BlockEditAlignmentToolbarControlsPure( {
 	};
 
 	return (
-		<BlockControls group="block" __experimentalShareWithChildBlocks="align">
+		<BlockControls group="block" __experimentalShareWithChildBlocks>
 			<BlockAlignmentControl
 				value={ align }
 				onChange={ updateAlignment }
@@ -152,7 +152,7 @@ function BlockEditAlignmentToolbarControlsPure( {
 }
 
 export default {
-	shareWithChildBlocks: 'align',
+	shareWithChildBlocks: true,
 	edit: BlockEditAlignmentToolbarControlsPure,
 	useBlockProps,
 	addSaveProps: addAssignedAlign,

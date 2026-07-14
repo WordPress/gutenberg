@@ -229,7 +229,7 @@ export default {
 		return (
 			<BlockControls
 				group={ controlsGroup }
-				__experimentalShareWithChildBlocks="layout"
+				__experimentalShareWithChildBlocks
 			>
 				<DefaultLayoutJustifyContentControl
 					layout={ layout }
