@@ -3,7 +3,10 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import { create } from '@wordpress/rich-text';
+import {
+	create,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
 import { isSelectionForward } from '@wordpress/dom';
 
 /**
@@ -11,6 +14,11 @@ import { isSelectionForward } from '@wordpress/dom';
  */
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
+import { canHostEditableRoot } from './use-editable-root';
+import { setContentEditableWrapper, setShiftClickInProgress } from './utils';
+import { unlock } from '../../lock-unlock';
+
+const { ownsSelection } = unlock( richTextPrivateApis );
 
 /**
  * Extract the selection start node from the selection. When the anchor node is
@@ -84,26 +92,6 @@ function findDepth( a, b ) {
 	return depth;
 }
 
-/**
- * Sets the `contenteditable` wrapper element to `value`.
- *
- * @param {HTMLElement} node  Block element.
- * @param {boolean}     value `contentEditable` value (true or false)
- */
-function setContentEditableWrapper( node, value ) {
-	// Since we are calling this on every selection change, check if the value
-	// needs to be updated first because it trigger the browser to recalculate
-	// style.
-	if ( node.contentEditable !== String( value ) ) {
-		node.contentEditable = value;
-
-		// Firefox doesn't automatically move focus.
-		if ( value ) {
-			node.focus();
-		}
-	}
-}
-
 function getRichTextElement( node ) {
 	const element =
 		node.nodeType === node.ELEMENT_NODE ? node : node.parentElement;
@@ -116,8 +104,15 @@ function getRichTextElement( node ) {
 export default function useSelectionObserver() {
 	const { multiSelect, selectBlock, selectionChange } =
 		useDispatch( blockEditorStore );
-	const { getBlockParents, getBlockSelectionStart, isMultiSelecting } =
-		useSelect( blockEditorStore );
+	const blockEditorSelectors = useSelect( blockEditorStore );
+	const {
+		getBlockParents,
+		getBlockSelectionStart,
+		isMultiSelecting,
+		getSelectionStart,
+		getSelectionEnd,
+		getSelectedBlockClientId,
+	} = blockEditorSelectors;
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -127,10 +122,12 @@ export default function useSelectionObserver() {
 
 			function onMouseDown( event ) {
 				isTripleClick = event.detail === 3;
+				setShiftClickInProgress( event.shiftKey );
 			}
 
 			function onKeyDown() {
 				isTripleClick = false;
+				setShiftClickInProgress( false );
 			}
 
 			function onSelectionChange( event ) {
@@ -161,6 +158,49 @@ export default function useSelectionObserver() {
 				// For now we check if the event is a `mouse` event.
 				const isClickShift = event.shiftKey && event.type === 'mouseup';
 				if ( selection.isCollapsed && ! isClickShift ) {
+					const collapsedClientId = getBlockClientId( startNode );
+
+					// If the block supports an editable root, keep (or make)
+					// the wrapper contentEditable so the native selection can
+					// extend across blocks. The wrapper holds focus, so rich
+					// text instances don't sync the selection; do it here.
+					if (
+						! isMultiSelecting() &&
+						collapsedClientId &&
+						// Only keep the wrapper editable when the collapsed
+						// selection is in the block that is actually selected.
+						// A stale native selection may linger in a previously
+						// selected editable root block (e.g. Firefox does not
+						// always move it), which must not re-enable the wrapper
+						// after another block has been selected.
+						collapsedClientId === getSelectedBlockClientId() &&
+						canHostEditableRoot(
+							blockEditorSelectors,
+							collapsedClientId
+						)
+					) {
+						setContentEditableWrapper( node, true );
+
+						// While the wrapper is editable it must hold focus: a
+						// nested editable element cannot retain it (the first
+						// DOM mutation moves focus to the host, inconsistently
+						// across browsers). Don't steal focus from UI elements
+						// (e.g. buttons) or editables outside the block (e.g.
+						// the post title). The rich text instance owning the
+						// selection syncs it to the store itself.
+						const { activeElement } = ownerDocument;
+						if (
+							activeElement !== node &&
+							activeElement?.isContentEditable &&
+							node.contains( activeElement ) &&
+							getBlockClientId( activeElement ) ===
+								collapsedClientId
+						) {
+							node.focus();
+						}
+						return;
+					}
+
 					if (
 						node.contentEditable === 'true' &&
 						! isMultiSelecting()
@@ -232,7 +272,6 @@ export default function useSelectionObserver() {
 						return;
 					}
 				}
-
 				const isSingularSelection = startClientId === endClientId;
 				if ( isSingularSelection ) {
 					if ( ! isMultiSelecting() ) {
@@ -248,7 +287,16 @@ export default function useSelectionObserver() {
 
 						if (
 							richTextElement &&
-							ownerDocument.activeElement !== richTextElement
+							// The rich text instance syncs the selection
+							// itself when its element is editable and owns the
+							// selection (also through a focused editing host).
+							// It may be temporarily non-editable while a drag
+							// that started outside it is in progress (see
+							// rich-text's preventFocusCapture).
+							( richTextElement.contentEditable !== 'true' ||
+								( ownerDocument.activeElement !==
+									richTextElement &&
+									! ownsSelection( richTextElement ) ) )
 						) {
 							const range = selection.getRangeAt( 0 );
 							const richTextData = create( {
@@ -256,7 +304,7 @@ export default function useSelectionObserver() {
 								range,
 								__unstableIsEditableTree: true,
 							} );
-							selectionChange( {
+							const selectionUpdate = {
 								start: {
 									clientId: startClientId,
 									attributeKey:
@@ -280,7 +328,23 @@ export default function useSelectionObserver() {
 										richTextData.end ??
 										richTextData.text.length,
 								},
-							} );
+							};
+							const { start, end } = selectionUpdate;
+							const selectionStart = getSelectionStart();
+							const selectionEnd = getSelectionEnd();
+
+							// Skip the dispatch when the store already holds
+							// the same selection.
+							if (
+								selectionStart.clientId !== start.clientId ||
+								selectionEnd.clientId !== end.clientId ||
+								selectionStart.attributeKey !==
+									start.attributeKey ||
+								selectionStart.offset !== start.offset ||
+								selectionEnd.offset !== end.offset
+							) {
+								selectionChange( selectionUpdate );
+							}
 						} else {
 							selectBlock( startClientId );
 						}
@@ -349,21 +413,81 @@ export default function useSelectionObserver() {
 				}
 			}
 
+			// Native `selectionchange` events are asynchronous: a clipboard
+			// event may fire before the store has been updated with a cross
+			// block selection that was just made. Sync it before the clipboard
+			// handlers (bubble phase) read the store.
+			function ensureMultiBlockSelectionSync( event ) {
+				const selection = defaultView.getSelection();
+
+				if ( ! selection.rangeCount || selection.isCollapsed ) {
+					return;
+				}
+
+				// Only a selection across different blocks needs to be synced
+				// here; rich text owns selections within a single block.
+				const startClientId = getBlockClientId(
+					extractSelectionStartNode( selection )
+				);
+				const endClientId = getBlockClientId(
+					extractSelectionEndNode( selection, isTripleClick )
+				);
+
+				if ( startClientId !== endClientId ) {
+					onSelectionChange( event );
+				}
+			}
+
 			ownerDocument.addEventListener(
 				'selectionchange',
 				onSelectionChange
 			);
-			defaultView.addEventListener( 'mouseup', onSelectionChange );
+			function onMouseUp( event ) {
+				onSelectionChange( event );
+				setShiftClickInProgress( false );
+			}
+
+			defaultView.addEventListener( 'mouseup', onMouseUp );
 			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'keydown', onKeyDown );
+			ownerDocument.addEventListener(
+				'copy',
+				ensureMultiBlockSelectionSync,
+				true
+			);
+			ownerDocument.addEventListener(
+				'cut',
+				ensureMultiBlockSelectionSync,
+				true
+			);
+			ownerDocument.addEventListener(
+				'paste',
+				ensureMultiBlockSelectionSync,
+				true
+			);
 			return () => {
 				ownerDocument.removeEventListener(
 					'selectionchange',
 					onSelectionChange
 				);
-				defaultView.removeEventListener( 'mouseup', onSelectionChange );
+				defaultView.removeEventListener( 'mouseup', onMouseUp );
 				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'keydown', onKeyDown );
+				ownerDocument.removeEventListener(
+					'copy',
+					ensureMultiBlockSelectionSync,
+					true
+				);
+				ownerDocument.removeEventListener(
+					'cut',
+					ensureMultiBlockSelectionSync,
+					true
+				);
+				ownerDocument.removeEventListener(
+					'paste',
+					ensureMultiBlockSelectionSync,
+					true
+				);
 			};
 		},
 		[ multiSelect, selectBlock, selectionChange, getBlockParents ]

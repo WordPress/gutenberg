@@ -35,6 +35,7 @@
 
 ### Enhancements
 
+-   Update emphasized labels and controls from the legacy medium weight to the emphasis font-weight token, and align the default font-family stack with the `@wordpress/theme` body token ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 -   `Button`: Align focus rings with the design system ([#78646](https://github.com/WordPress/gutenberg/pull/78646)).
 -   The `size` prop no longer has any effect and can be safely removed from the following:
@@ -60,6 +61,7 @@
 ### Internal
 
 -   Add a private, presentational `ContentEditableControl`: a labeled `contentEditable` form field. The rich-text behavior is injected by the consumer (e.g. the DataViews `richtext` control), keeping the component free of any `@wordpress/rich-text` dependency ([#78471](https://github.com/WordPress/gutenberg/pull/78471)).
+-   `Autocomplete`: subscribe the keyboard listener through the rich text selection owner, so it also handles events targeting a focused editing host ([#79105](https://github.com/WordPress/gutenberg/pull/79105)).
 -   Enforce CSS Module class selector naming for component-library packages ([#79504](https://github.com/WordPress/gutenberg/pull/79504)).
 -   Update `@ariakit/react` to `0.4.32` ([#79860](https://github.com/WordPress/gutenberg/pull/79860)).
 -   `Flex`: Migrate styles from Emotion to SCSS Modules ([#79450](https://github.com/WordPress/gutenberg/pull/79450)).

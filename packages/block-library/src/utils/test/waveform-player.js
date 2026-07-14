@@ -8,9 +8,14 @@ import { act, render } from '@testing-library/react';
  * Internal dependencies
  */
 import { WaveformPlayer } from '../waveform-player';
-import { initWaveformPlayer, setupPlayButtonArtwork } from '../waveform-utils';
+import {
+	applyWaveformPlayerStyles,
+	initWaveformPlayer,
+	setupPlayButtonArtwork,
+} from '../waveform-utils';
 
 jest.mock( '../waveform-utils', () => ( {
+	applyWaveformPlayerStyles: jest.fn(),
 	initWaveformPlayer: jest.fn(),
 	setupPlayButtonArtwork: jest.fn(),
 	updateSeekControlLabel: jest.fn(),
@@ -108,6 +113,7 @@ describe( 'WaveformPlayer', () => {
 	afterEach( () => {
 		jest.runOnlyPendingTimers();
 		jest.useRealTimers();
+		applyWaveformPlayerStyles.mockReset();
 		initWaveformPlayer.mockReset();
 		setupPlayButtonArtwork.mockReset();
 	} );
@@ -153,6 +159,36 @@ describe( 'WaveformPlayer', () => {
 			expect.anything(),
 			expect.objectContaining( {
 				showPlayButtonArtwork: true,
+			} )
+		);
+	} );
+
+	it( 'initializes the player with custom color values', () => {
+		render(
+			<WaveformPlayer
+				{ ...baseProps }
+				color="#ff0000"
+				gradient="linear-gradient(90deg,#ff0000 0%,#0000ff 100%)"
+				backgroundColor="#ffeeaa"
+				backgroundGradient="linear-gradient(90deg,#ffeeaa 0%,#aabbcc 100%)"
+				textColor="#0000ff"
+			/>
+		);
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		expect( initWaveformPlayer ).toHaveBeenCalledWith(
+			expect.anything(),
+			expect.objectContaining( {
+				waveformColor: '#ff0000',
+				waveformGradient:
+					'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)',
+				backgroundColor: '#ffeeaa',
+				backgroundGradient:
+					'linear-gradient(90deg,#ffeeaa 0%,#aabbcc 100%)',
+				textColor: '#0000ff',
 			} )
 		);
 	} );
@@ -289,6 +325,98 @@ describe( 'WaveformPlayer', () => {
 		expect(
 			initWaveformPlayer.mock.results[ 1 ].value.instance.artworkEl
 		).toBeNull();
+	} );
+
+	it( 'recreates the player when the waveform color changes', () => {
+		const { rerender } = render(
+			<WaveformPlayer { ...baseProps } color="#ff0000" />
+		);
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		const player = initWaveformPlayer.mock.results[ 0 ].value;
+
+		rerender( <WaveformPlayer { ...baseProps } color="#0000ff" /> );
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		expect( player.destroy ).toHaveBeenCalledTimes( 1 );
+		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 2 );
+		expect( initWaveformPlayer ).toHaveBeenLastCalledWith(
+			expect.anything(),
+			expect.objectContaining( {
+				waveformColor: '#0000ff',
+			} )
+		);
+	} );
+
+	it( 'updates the waveform background color without recreating the player', () => {
+		const { rerender } = render(
+			<WaveformPlayer { ...baseProps } backgroundColor="#ffeeaa" />
+		);
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		const player = initWaveformPlayer.mock.results[ 0 ].value;
+
+		rerender(
+			<WaveformPlayer { ...baseProps } backgroundColor="#aabbcc" />
+		);
+
+		expect( player.destroy ).not.toHaveBeenCalled();
+		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 1 );
+		expect( applyWaveformPlayerStyles ).toHaveBeenCalledWith(
+			player.container,
+			{
+				backgroundColor: '#aabbcc',
+				backgroundGradient: undefined,
+				playButtonColor: undefined,
+				playButtonGradient: undefined,
+				textColor: undefined,
+			}
+		);
+	} );
+
+	it( 'recreates the player when the waveform gradient changes', () => {
+		const { rerender } = render(
+			<WaveformPlayer
+				{ ...baseProps }
+				gradient="linear-gradient(90deg,#ff0000 0%,#0000ff 100%)"
+			/>
+		);
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		const player = initWaveformPlayer.mock.results[ 0 ].value;
+
+		rerender(
+			<WaveformPlayer
+				{ ...baseProps }
+				gradient="linear-gradient(90deg,#00ff00 0%,#0000ff 100%)"
+			/>
+		);
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		expect( player.destroy ).toHaveBeenCalledTimes( 1 );
+		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 2 );
+		expect( initWaveformPlayer ).toHaveBeenLastCalledWith(
+			expect.anything(),
+			expect.objectContaining( {
+				waveformGradient:
+					'linear-gradient(90deg,#00ff00 0%,#0000ff 100%)',
+			} )
+		);
 	} );
 
 	it( 'updates the player in place to show an image added to a track that had none', () => {

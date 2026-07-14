@@ -9,6 +9,7 @@ import { __, _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
+	applyWaveformPlayerStyles,
 	initWaveformPlayer,
 	setupPlayButtonArtwork,
 	updateSeekControlLabel,
@@ -74,6 +75,11 @@ function updatePlayerMetadata(
  * @param {string}   props.artist                - The artist name.
  * @param {string}   props.image                 - The track image URL.
  * @param {string}   props.imageAlt              - The track image alt text.
+ * @param {string}   props.color                 - The waveform color.
+ * @param {string}   props.gradient              - The waveform gradient.
+ * @param {string}   props.backgroundColor       - The waveform background color.
+ * @param {string}   props.backgroundGradient    - The waveform background gradient.
+ * @param {string}   props.textColor             - The player text color.
  * @param {string}   props.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
  * @param {Function} props.onEnded               - Callback when the track finishes playing.
  * @param {boolean}  props.showPlayButtonArtwork - Whether to show artwork on the play button.
@@ -85,6 +91,11 @@ export function WaveformPlayer( {
 	artist,
 	image,
 	imageAlt,
+	color,
+	gradient,
+	backgroundColor,
+	backgroundGradient,
+	textColor,
 	waveformStyle,
 	onEnded,
 	showPlayButtonArtwork = false,
@@ -106,9 +117,47 @@ export function WaveformPlayer( {
 	// Combined props ref for `initWaveformPlayer`, which is called
 	// asynchronously after this component mounts.
 	const metadataRef = useRef( { src, title, artist, image, imageAlt } );
+	const stylesRef = useRef( {
+		color,
+		gradient,
+		backgroundColor,
+		backgroundGradient,
+		textColor,
+	} );
 	useEffect( () => {
 		metadataRef.current = { src, title, artist, image, imageAlt };
 	}, [ src, title, artist, image, imageAlt ] );
+
+	useEffect( () => {
+		stylesRef.current = {
+			color,
+			gradient,
+			backgroundColor,
+			backgroundGradient,
+			textColor,
+		};
+	}, [ color, gradient, backgroundColor, backgroundGradient, textColor ] );
+
+	useEffect( () => {
+		if ( playerRef.current?.container ) {
+			applyWaveformPlayerStyles( playerRef.current.container, {
+				backgroundColor,
+				backgroundGradient,
+				textColor,
+				playButtonColor: showPlayButtonArtwork ? undefined : color,
+				playButtonGradient: showPlayButtonArtwork
+					? undefined
+					: gradient,
+			} );
+		}
+	}, [
+		backgroundColor,
+		backgroundGradient,
+		color,
+		gradient,
+		showPlayButtonArtwork,
+		textColor,
+	] );
 
 	const ref = useRefEffect(
 		( element ) => {
@@ -129,6 +178,11 @@ export function WaveformPlayer( {
 					artist: metadataRef.current.artist,
 					image: metadataRef.current.image,
 					imageAlt: metadataRef.current.imageAlt,
+					waveformColor: stylesRef.current.color,
+					waveformGradient: stylesRef.current.gradient,
+					backgroundColor: stylesRef.current.backgroundColor,
+					backgroundGradient: stylesRef.current.backgroundGradient,
+					textColor: stylesRef.current.textColor,
 					waveformStyle,
 					labels: {
 						seek: __( 'Seek' ),
@@ -162,7 +216,15 @@ export function WaveformPlayer( {
 				playerDestroy?.();
 			};
 		},
-		[ onEndedEvent, hasSrc, waveformStyle, showPlayButtonArtwork ]
+		[
+			onEndedEvent,
+			hasSrc,
+			waveformStyle,
+			color,
+			gradient,
+			textColor,
+			showPlayButtonArtwork,
+		]
 	);
 
 	useEffect( () => {

@@ -18,6 +18,7 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
  */
 import { unlock } from '../../lock-unlock';
 import { sanitizeNoteContent } from './utils';
+import noteMentionCompleter from './note-mention-completer';
 
 /*
  * The rich text form field is assembled in `@wordpress/dataviews` on top of the
@@ -26,12 +27,19 @@ import { sanitizeNoteContent } from './utils';
  */
 const { RichTextControl } = unlock( dataviewsPrivateApis );
 
+/*
+ * `core/link` also carries `@` mentions: the completer inserts a mention as a
+ * link to the user's author page with a `wp-note-mention user-N` class, which
+ * rich text preserves as an unregistered attribute of the link format.
+ */
 const ALLOWED_NOTE_FORMATS = [
 	'core/bold',
 	'core/italic',
 	'core/link',
 	'core/code',
 ];
+
+const NOTE_COMPLETERS = [ noteMentionCompleter ];
 
 export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 	const [ inputComment, setInputComment ] = useState(
@@ -93,7 +101,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 					return;
 				}
 
-				if ( event.key === 'Escape' ) {
+				if ( event.key === 'Escape' && ! event.defaultPrevented ) {
 					event.preventDefault();
 					// Passing event for reply forms.
 					onCancel( event );
@@ -107,6 +115,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 				value={ inputComment }
 				onChange={ setInputComment }
 				allowedFormats={ ALLOWED_NOTE_FORMATS }
+				completers={ NOTE_COMPLETERS }
 			/>
 			<Stack
 				direction="row"

@@ -79,7 +79,7 @@ export const buttonView = ( {
 
 const pressed = css`
 	color: ${ COLORS.theme.foreground };
-	font-weight: ${ CONFIG.fontWeightMedium };
+	font-weight: ${ CONFIG.fontWeightEmphasis };
 `;
 
 const deselectable = css`

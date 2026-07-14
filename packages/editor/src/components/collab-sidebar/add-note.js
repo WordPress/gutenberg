@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	store as blockEditorStore,
@@ -36,6 +36,9 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isSubmittingRef = useRef( false );
+	const cancelPendingDismissRef = useRef( undefined );
+
+	useEffect( () => () => cancelPendingDismissRef.current?.(), [] );
 
 	const unselectNote = () => {
 		selectNote( undefined );
@@ -58,6 +61,16 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 			style={
 				floating ? { opacity: ! floating.y ? 0 : undefined } : undefined
 			}
+			onFocus={ () => {
+				/*
+				 * Focus landing anywhere in UI owned by the form cancels a
+				 * pending dismissal from `onBlur`. This covers focus returning
+				 * to the form itself as well as format popovers (e.g. the
+				 * Cmd+K link UI): they portal out of the form's DOM, but their
+				 * focus events still bubble here through the React tree.
+				 */
+				cancelPendingDismissRef.current?.();
+			} }
 			onBlur={ ( event ) => {
 				// Don't deselect notes when the browser window/tab loses focus.
 				if ( ! document.hasFocus() ) {
@@ -72,58 +85,44 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 					return;
 				}
 				const container = event.currentTarget;
-				const dismiss = () => {
-					toggleBlockSpotlight( clientId, false );
-					selectNote( undefined );
-				};
-				/*
-				 * A known target outside the form closes it, except a format
-				 * popover (e.g. the Cmd+K link UI) which portals out of the
-				 * form container and so reports a related target inside
-				 * `.components-popover` rather than `currentTarget`.
-				 */
-				if ( event.relatedTarget ) {
-					if ( container.contains( event.relatedTarget ) ) {
-						return;
-					}
-					if (
-						event.relatedTarget.closest( '.components-popover' )
-					) {
-						return;
-					}
-					dismiss();
+				// Focus staying within the form never dismisses it.
+				if (
+					event.relatedTarget &&
+					container.contains( event.relatedTarget )
+				) {
 					return;
 				}
 				/*
-				 * With no relatedTarget the blur is ambiguous: rich-text
-				 * re-renders briefly drop focus to the body while typing, but a
-				 * click on the empty document body also lands here. Re-check on
-				 * the next frame where focus actually settled and dismiss only
+				 * The blur is ambiguous at this point: focus may be moving to
+				 * a format popover that belongs to the form (which cancels the
+				 * dismissal via `onFocus` above), and rich-text re-renders
+				 * briefly drop focus to the body while typing. Re-check on the
+				 * next frame where focus actually settled and dismiss only
 				 * when it has truly left the form.
 				 */
-				container.ownerDocument.defaultView.requestAnimationFrame(
-					() => {
-						/*
-						 * A submit may have started between the blur and this
-						 * frame (e.g. Safari fires button-click blurs with no
-						 * relatedTarget); never dismiss mid-submit.
-						 */
-						if ( isSubmittingRef.current ) {
-							return;
-						}
-						const active = container.ownerDocument.activeElement;
-						if ( active && container.contains( active ) ) {
-							return;
-						}
-						if (
-							active &&
-							active.closest( '.components-popover' )
-						) {
-							return;
-						}
-						dismiss();
+				const { defaultView } = container.ownerDocument;
+				cancelPendingDismissRef.current?.();
+				const frame = defaultView.requestAnimationFrame( () => {
+					cancelPendingDismissRef.current = undefined;
+					/*
+					 * A submit may have started between the blur and this
+					 * frame (e.g. Safari fires button-click blurs with no
+					 * relatedTarget); never dismiss mid-submit.
+					 */
+					if ( isSubmittingRef.current ) {
+						return;
 					}
-				);
+					const active = container.ownerDocument.activeElement;
+					if ( active && container.contains( active ) ) {
+						return;
+					}
+					toggleBlockSpotlight( clientId, false );
+					selectNote( undefined );
+				} );
+				cancelPendingDismissRef.current = () => {
+					defaultView.cancelAnimationFrame( frame );
+					cancelPendingDismissRef.current = undefined;
+				};
 			} }
 		>
 			<NoteCard>

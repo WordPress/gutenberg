@@ -13,10 +13,12 @@
 ### Internal
 
 -   Expose the `richtext` control's `RichTextControl` assembly as a private API so other core packages can render a standalone rich text form field without a DataForm ([#78242](https://github.com/WordPress/gutenberg/pull/78242)).
+-   Add an optional `completers` prop to the private `RichTextControl` assembly, wiring `@wordpress/components`' autocomplete to the field (e.g. for `@` mentions) ([#79604](https://github.com/WordPress/gutenberg/pull/79604)).
 -   Update `@ariakit/react` to `0.4.32` ([#79860](https://github.com/WordPress/gutenberg/pull/79860)).
 
 ### Enhancements
 
+-   Update emphasized labels and controls from the legacy medium weight to the emphasis font-weight token ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
 - `ValidatedDateControl`: Update validation error message to be announced by screen readers using `speak` instead of an inline `aria-live` region ([#79600](https://github.com/WordPress/gutenberg/pull/79600))

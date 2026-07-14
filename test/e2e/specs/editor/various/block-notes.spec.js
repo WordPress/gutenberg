@@ -268,6 +268,102 @@ test.describe( 'Block Notes', () => {
 		} );
 	} );
 
+	test.describe( 'Mentions in the note form', () => {
+		let mentionedUserId;
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			const user = await requestUtils.createUser( {
+				username: 'notementions',
+				email: 'notementions@example.com',
+				firstName: 'Mentionable',
+				lastName: 'Teammate',
+				password: 'iLoVeE2EtEsTs',
+			} );
+			mentionedUserId = user.id;
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllUsers();
+		} );
+
+		test( 'inserts a mention chip that survives saving the note', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Mention host' },
+			} );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			const textbox = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			await textbox.click();
+			await page.keyboard.type( 'Ping @' );
+
+			await expect(
+				page.getByRole( 'option', { name: 'Mentionable Teammate' } )
+			).toBeVisible();
+
+			// Narrow the suggestions and pick the teammate.
+			await page.keyboard.type( 'Menti' );
+			await expect(
+				page.getByRole( 'option', { name: 'Mentionable Teammate' } )
+			).toBeVisible();
+			await page.keyboard.press( 'Enter' );
+
+			/*
+			 * The completer inserts the mention as a chip: a link to the
+			 * user's author page whose `user-N` class carries the mentioned
+			 * user's ID.
+			 */
+			const mentionClasses = new RegExp(
+				`^wp-note-mention user-${ mentionedUserId }$`
+			);
+			const draftChip = textbox.locator( 'a.wp-note-mention' );
+			await expect( draftChip ).toHaveText( '@Mentionable Teammate' );
+			await expect( draftChip ).toHaveClass( mentionClasses );
+			await expect( draftChip ).toHaveAttribute( 'href', /author/ );
+
+			await page.keyboard.type( 'please review' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			/*
+			 * The saved thread renders the content returned by the REST API,
+			 * so an intact chip here proves the mention markup survived
+			 * server-side sanitization.
+			 */
+			const savedChip = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem' )
+				.locator( 'a.wp-note-mention' );
+			await expect( savedChip ).toHaveText( '@Mentionable Teammate' );
+			await expect( savedChip ).toHaveClass( mentionClasses );
+		} );
+
+		test( 'can cancel mentions popover', async ( { editor, page } ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Mention host' },
+			} );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			const textbox = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			await textbox.pressSequentially( 'Ping @' );
+
+			await expect( page.getByRole( 'listbox' ) ).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( page.getByRole( 'listbox' ) ).toBeHidden();
+			await expect( textbox ).toBeFocused();
+		} );
+	} );
+
 	test( 'can reply to a block note', async ( { page, blockNoteUtils } ) => {
 		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/paragraph',
@@ -979,10 +1075,12 @@ test.describe( 'Block Notes', () => {
 					name: 'Block: Paragraph',
 				} )
 				.nth( 1 );
-			await expect(
-				secondBlock,
-				"focus should move to the block if there isn't a next or previous note"
-			).toBeFocused();
+			await expect
+				.poll(
+					() => editor.ownsSelection( secondBlock ),
+					"focus should move to the block if there isn't a next or previous note"
+				)
+				.toBe( true );
 		} );
 
 		test( 'should focus note thread when reply is deleted', async ( {

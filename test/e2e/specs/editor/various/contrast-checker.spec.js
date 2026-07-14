@@ -98,6 +98,64 @@ test.describe( 'Contrast Checker', () => {
 		await textButton.click();
 	} );
 
+	test( 'should show warning in both the Typography and Background panels for viewport states', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.openDocumentSettingsSidebar();
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Black text on Black background' },
+		} );
+
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive editing' } )
+			.click();
+		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
+		await page.keyboard.press( 'Escape' );
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		const typographyPanel = editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} );
+		const backgroundPanel = editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} );
+
+		const textButton = typographyPanel.getByRole( 'button', {
+			name: 'Color',
+			exact: true,
+		} );
+		const backgroundButton = backgroundPanel.getByRole( 'button', {
+			name: 'Color',
+			exact: true,
+		} );
+
+		await textButton.click();
+		await page.getByRole( 'option', { name: 'Black' } ).click();
+		await textButton.click();
+
+		await backgroundButton.click();
+		await page.getByRole( 'option', { name: 'Black' } ).click();
+		await backgroundButton.click();
+
+		await expect(
+			typographyPanel.locator( WARNING_SELECTOR )
+		).toBeVisible();
+		await expect(
+			backgroundPanel.locator( WARNING_SELECTOR )
+		).toBeVisible();
+	} );
+
 	test( 'should not show warning for sufficient contrast', async ( {
 		editor,
 		page,

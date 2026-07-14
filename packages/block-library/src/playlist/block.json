@@ -47,6 +47,18 @@
 			"enum": [ "bars", "mirror", "line", "blocks", "dots", "seekbar" ],
 			"default": "bars"
 		},
+		"waveformColor": {
+			"type": "string"
+		},
+		"waveformGradient": {
+			"type": "string"
+		},
+		"waveformBackgroundColor": {
+			"type": "string"
+		},
+		"waveformBackgroundGradient": {
+			"type": "string"
+		},
 		"caption": {
 			"type": "string"
 		}

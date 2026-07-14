@@ -95,11 +95,43 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$label_pause = esc_attr__( 'Pause' );
 	$label_seek  = esc_attr__( 'Seek' );
 	/* translators: %1$s: current audio time, %2$s: total audio duration. */
-	$label_seek_value = esc_attr_x(
+	$label_seek_value                       = esc_attr_x(
 		'%1$s of %2$s',
 		'audio current time of total duration'
 	);
-	$html             = '<div class="wp-block-playlist__waveform-player"
+	$waveform_color_attribute               = '';
+	$waveform_gradient_attribute            = '';
+	$waveform_background_color_attribute    = '';
+	$waveform_background_gradient_attribute = '';
+	if ( ! empty( $attributes['waveformColor'] ) ) {
+		$waveform_color_attribute = sprintf(
+			' data-waveform-player-color="%s"',
+			esc_attr( $attributes['waveformColor'] )
+		);
+	}
+	if ( ! empty( $attributes['waveformGradient'] ) ) {
+		$waveform_gradient_attribute = sprintf(
+			' data-waveform-player-gradient="%s"',
+			esc_attr( $attributes['waveformGradient'] )
+		);
+	}
+	if ( ! empty( $attributes['waveformBackgroundColor'] ) ) {
+		$waveform_background_color_attribute = sprintf(
+			' data-waveform-player-background-color="%s"',
+			esc_attr( $attributes['waveformBackgroundColor'] )
+		);
+	}
+	if ( ! empty( $attributes['waveformBackgroundGradient'] ) ) {
+		$waveform_background_gradient_attribute = sprintf(
+			' data-waveform-player-background-gradient="%s"',
+			esc_attr( $attributes['waveformBackgroundGradient'] )
+		);
+	}
+	$html = '<div class="wp-block-playlist__waveform-player"' .
+		$waveform_color_attribute .
+		$waveform_gradient_attribute .
+		$waveform_background_color_attribute .
+		$waveform_background_gradient_attribute . '
 		data-wp-watch="callbacks.initWaveformPlayer"
 		data-label-play="' . $label_play . '"
 		data-label-pause="' . $label_pause . '"
