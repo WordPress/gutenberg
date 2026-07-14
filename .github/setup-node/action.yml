@@ -17,7 +17,7 @@ runs:
           with:
               node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
-              package-manager-cache: ${{ inputs.enable-caching == 'false' && 'false' || 'true' }}
+              package-manager-cache: ${{ inputs.enable-caching == 'true' && 'true' || 'false' }}
               check-latest: true
               cache: npm
 
