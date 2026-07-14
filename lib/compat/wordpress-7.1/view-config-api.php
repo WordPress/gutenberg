@@ -195,12 +195,8 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 		return $config;
 	}
 
-	// The functions keep the container close to the documented shape (set() and
-	// update_properties() reject unknown keys), but a documented key may
-	// still be missing — dropped by a null reset patch, or omitted by a callback
-	// returning its own off-shape container. Normalize either way: drop
-	// undocumented keys and backfill any dropped documented keys from the
-	// defaults.
+	// Backfill any dropped keys with their defaults, then discard any keys the
+	// filter introduced that are not part of the documented configuration shape.
 	return array_intersect_key( array_merge( $config, $filtered->get_config() ), $config );
 }
 
@@ -330,10 +326,8 @@ function _gutenberg_get_entity_view_config_post_type_page( $data ) {
 
 	$data->set( 'default_layouts', $default_layouts, 1 );
 	$data->set( 'default_view', $default_view, 1 );
-	// Append the status views onto the inherited base "all items" view rather
-	// than replacing it, so its post-type-specific title is kept. The version
-	// is pinned to the literal this patch was authored against as an extra guard,
-	// so a future LATEST_VERSION bump migrates it instead of silently skipping it.
+	// Append the status views, thereby preserving the base "all items" view,
+	// so its post-type-specific title is kept.
 	$data->update_view_list_items( array_column( $view_list, null, 'slug' ), 1 );
 
 	return $data;

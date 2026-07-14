@@ -13,11 +13,13 @@
 
 ### Enhancements
 
+-   Update headings, buttons, and field labels from the legacy medium weight to the emphasis font-weight token ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 -   Add `LinkButton` component ([#78944](https://github.com/WordPress/gutenberg/pull/78944)).
 
 ### Bug Fixes
 
+-   `Link`: Restore the focus ring removed when `LinkButton` was added. ([#80091](https://github.com/WordPress/gutenberg/pull/80091))
 -   `Tabs`: Re-measure overflow when the list or its content changes size so the scroll fade stays in sync as labels/badges load or a web font reflows the tabs. ([#79856](https://github.com/WordPress/gutenberg/pull/79856))
 -   `IconButton`: Keep the inline padding override valid when reused in button length calculations ([#79722](https://github.com/WordPress/gutenberg/pull/79722)).
 -   `IconButton`: Restore the default tooltip delay on hover ([#79505](https://github.com/WordPress/gutenberg/pull/79505)).

@@ -92,7 +92,7 @@
 		"build-module/*/init.mjs"
 	],
 	"dependencies": {
-		"@arraypress/waveform-player": "^1.20.0",
+		"@arraypress/waveform-player": "^1.21.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `test-e2e` command now runs the Playwright-based end-to-end test runner instead of Puppeteer (`test-playwright` remains available as an alias). Removed the Puppeteer test environment and configuration (`jest-environment-puppeteer`, `jest-e2e.config.js`, `puppeteer.config.js`) along with the `puppeteer-core` and `expect-puppeteer` dependencies. Puppeteer-specific options (e.g. `--puppeteer-interactive`, `--puppeteer-devtools`) are no longer supported ([#60357](https://github.com/WordPress/gutenberg/issues/60357)).
+
 ### Enhancements
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).

@@ -1,10 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	useRefEffect,
-	privateApis as composePrivateApis,
-} from '@wordpress/compose';
+import { useRefEffect } from '@wordpress/compose';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { SPACE, TAB } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -16,7 +14,7 @@ import useIndentListItem from './use-indent-list-item';
 import useOutdentListItem from './use-outdent-list-item';
 import { unlock } from '../../lock-unlock';
 
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 export default function useSpace( clientId ) {
 	const { getSelectionStart, getSelectionEnd, getBlockIndex } =
@@ -63,7 +61,7 @@ export default function useSpace( clientId ) {
 
 			// Capture phase so we run before writing-flow's ancestor-bubble
 			// keydown handlers that gate on `event.defaultPrevented`.
-			return subscribeDelegatedListener(
+			return subscribeOwnedListener(
 				element,
 				'keydown',
 				onKeyDown,

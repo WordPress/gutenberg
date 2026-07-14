@@ -160,18 +160,24 @@ test.describe( 'List View Spotlight Mode', () => {
 				name: 'Block: Paragraph',
 			} )
 			.filter( { hasText: 'Pattern paragraph 2' } );
-		await expect( patternParagraph2 ).toBeFocused();
+		await expect
+			.poll( () => editor.ownsSelection( patternParagraph2 ) )
+			.toBe( true );
 
 		// Attempting to navigate beyond the pattern is prevented.
 		await page.keyboard.press( 'ArrowDown' );
-		await expect( patternParagraph2 ).toBeFocused();
+		await expect
+			.poll( () => editor.ownsSelection( patternParagraph2 ) )
+			.toBe( true );
 
 		const blockBeneath = editor.canvas
 			.getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} )
 			.filter( { hasText: 'Block beneath pattern' } );
-		await expect( blockBeneath ).not.toBeFocused();
+		await expect
+			.poll( () => editor.ownsSelection( blockBeneath ) )
+			.toBe( false );
 	} );
 
 	test( 'exits spotlight mode when clicking disabled block in list view', async ( {
@@ -260,7 +266,9 @@ test.describe( 'List View Spotlight Mode', () => {
 			.filter( { hasText: 'Block beneath pattern' } );
 
 		await blockBeneath.click();
-		await expect( blockBeneath ).toBeFocused();
+		await expect
+			.poll( () => editor.ownsSelection( blockBeneath ) )
+			.toBe( true );
 	} );
 
 	test( 'exits spotlight mode when pressing Escape key in list view', async ( {

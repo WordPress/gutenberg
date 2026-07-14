@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+/**
  * WordPress dependencies
  */
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
@@ -19,6 +25,7 @@ import { OperationType, Type } from '../types';
 import {
 	vipsHasTransparency,
 	vipsGetUltraHdrInfo,
+	vipsRotateImage,
 	terminateVipsWorker,
 } from '../utils';
 import {
@@ -39,6 +46,7 @@ jest.mock( '../utils', () => {
 	return {
 		vipsHasTransparency: jest.fn(),
 		vipsGetUltraHdrInfo: jest.fn(),
+		vipsRotateImage: jest.fn(),
 		terminateVipsWorker: jest.fn(),
 		maybeRecycleVipsWorker: jest.fn(),
 		isAnimatedGif: actual.isAnimatedGif,
@@ -1216,6 +1224,192 @@ describe( 'private actions', () => {
 					)
 			);
 			expect( anyTranscode ).toBe( true );
+		} );
+	} );
+
+	describe( 'generateThumbnails EXIF orientation', () => {
+		// `image_size: 'original'` is only sideloaded when the source is
+		// actually rotated, so its presence is a reliable proxy for
+		// "rotation happened".
+		const makeItem = ( attachmentOverrides = {}, itemOverrides = {} ) => ( {
+			id: 'orient-parent',
+			file: new File( [ 'fake' ], 'photo.jpg', { type: 'image/jpeg' } ),
+			sourceFile: new File( [ 'fake' ], 'photo.jpg', {
+				type: 'image/jpeg',
+			} ),
+			attachment: {
+				id: 7,
+				filename: 'photo.jpg',
+				missing_image_sizes: [],
+				exif_orientation: 1,
+				...attachmentOverrides,
+			},
+			...itemOverrides,
+		} );
+
+		const makeHarness = ( item ) => {
+			const addSideloadItem = jest.fn();
+			const dispatch = {
+				addSideloadItem,
+				finishOperation: jest.fn(),
+				addItem: jest.fn(),
+			};
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {
+					allImageSizes: {
+						thumbnail: { width: 150, height: 150, crop: true },
+					},
+				} ),
+			};
+			return { select, dispatch, addSideloadItem };
+		};
+
+		const sideloadedSize = ( addSideloadItem, size ) =>
+			addSideloadItem.mock.calls.find(
+				( [ args ] ) => args.additionalData.image_size === size
+			);
+
+		beforeEach( () => {
+			jest.clearAllMocks();
+			vipsRotateImage.mockResolvedValue(
+				new File( [ 'rotated' ], 'photo-rotated.jpg', {
+					type: 'image/jpeg',
+				} )
+			);
+		} );
+
+		it( 'rotates the original using the server-reported EXIF orientation', async () => {
+			const item = makeItem( { exif_orientation: 6 } );
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			await generateThumbnails( item.id )( { select, dispatch } );
+
+			expect( vipsRotateImage ).toHaveBeenCalledWith(
+				item.id,
+				item.sourceFile,
+				6,
+				undefined
+			);
+			expect(
+				sideloadedSize( addSideloadItem, 'original' )
+			).toBeDefined();
+		} );
+
+		it( 'does not rotate when the server reports an upright orientation', async () => {
+			const item = makeItem( { exif_orientation: 1 } );
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			await generateThumbnails( item.id )( { select, dispatch } );
+
+			expect( vipsRotateImage ).not.toHaveBeenCalled();
+			expect(
+				sideloadedSize( addSideloadItem, 'original' )
+			).toBeUndefined();
+		} );
+
+		it( 'skips the rotated-original sideload for already-scaled images', async () => {
+			// Images over the big-image threshold were already rotated by
+			// vips while scaling, so no separate rotated original is stored,
+			// matching WordPress core.
+			const item = makeItem(
+				{ exif_orientation: 6 },
+				{
+					file: new File( [ 'fake' ], 'photo-scaled.jpg', {
+						type: 'image/jpeg',
+					} ),
+				}
+			);
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			await generateThumbnails( item.id )( { select, dispatch } );
+
+			expect( vipsRotateImage ).not.toHaveBeenCalled();
+			expect(
+				sideloadedSize( addSideloadItem, 'original' )
+			).toBeUndefined();
+		} );
+
+		it( 'rotates AVIF sub-sizes from the client-parsed EXIF orientation', async () => {
+			// A real AVIF whose 90° CW rotation lives in an EXIF tag only (no
+			// native irot transform), so the server reports orientation 1 and
+			// the client parse is the source of truth.
+			const buffer = readFileSync(
+				join( __dirname, '../../test/fixtures/exif-rotated-90cw.avif' )
+			);
+			const rotatedFile = new File( [ 'rotated' ], 'photo-rotated.avif', {
+				type: 'image/avif',
+			} );
+			vipsRotateImage.mockResolvedValue( rotatedFile );
+
+			const item = makeItem(
+				{
+					exif_orientation: 1,
+					filename: 'photo.avif',
+					missing_image_sizes: [ 'thumbnail' ],
+				},
+				{
+					file: new File( [ buffer ], 'photo.avif', {
+						type: 'image/avif',
+					} ),
+					sourceFile: new File( [ buffer ], 'photo.avif', {
+						type: 'image/avif',
+					} ),
+				}
+			);
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			await generateThumbnails( item.id )( { select, dispatch } );
+
+			expect( vipsRotateImage ).toHaveBeenCalledWith(
+				item.id,
+				item.sourceFile,
+				6,
+				undefined
+			);
+			expect(
+				sideloadedSize( addSideloadItem, 'original' )
+			).toBeDefined();
+
+			// The thumbnail must be generated from the rotated source, not
+			// the original file, because libvips will not auto-rotate the
+			// EXIF-only orientation while resizing.
+			const thumbnailCall = sideloadedSize(
+				addSideloadItem,
+				'thumbnail'
+			);
+			expect( thumbnailCall ).toBeDefined();
+			expect( thumbnailCall[ 0 ].file.name ).toBe( 'photo.avif' );
+			expect( await thumbnailCall[ 0 ].file.text() ).toBe( 'rotated' );
+		} );
+
+		it( 'continues thumbnail generation when rotation fails', async () => {
+			const warnSpy = jest
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
+			vipsRotateImage.mockRejectedValue( new Error( 'decode failed' ) );
+
+			const item = makeItem( {
+				exif_orientation: 6,
+				missing_image_sizes: [ 'thumbnail' ],
+			} );
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			try {
+				await generateThumbnails( item.id )( { select, dispatch } );
+
+				expect( warnSpy ).toHaveBeenCalledWith(
+					'Failed to rotate image, continuing with thumbnails'
+				);
+				expect(
+					sideloadedSize( addSideloadItem, 'original' )
+				).toBeUndefined();
+				expect(
+					sideloadedSize( addSideloadItem, 'thumbnail' )
+				).toBeDefined();
+			} finally {
+				warnSpy.mockRestore();
+			}
 		} );
 	} );
 

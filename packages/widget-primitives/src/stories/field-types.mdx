@@ -1,0 +1,12 @@
+import { Meta, Markdown } from '@storybook/addon-docs/blocks';
+import FieldTypesDoc from './field-types.md?raw';
+import fieldTypePipeline from './assets/field-type-pipeline.svg';
+
+<Meta title="Widget Primitives/Field Types" />
+
+<Markdown>
+	{ FieldTypesDoc.replace(
+		'./assets/field-type-pipeline.svg',
+		fieldTypePipeline
+	) }
+</Markdown>

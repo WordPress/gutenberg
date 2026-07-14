@@ -157,14 +157,6 @@ export default {
 	'--wpds-dimension-surface-width-sm': '320px',
 	'--wpds-dimension-surface-width-xl': '720px',
 	'--wpds-dimension-surface-width-xs': '240px',
-	'--wpds-elevation-lg':
-		'0px 5px 15px 0px #00000014, 0px 15px 27px 0px #00000012, 0px 30px 36px 0px #0000000a, 0px 50px 43px 0px #00000005',
-	'--wpds-elevation-md':
-		'0px 2px 3px 0px #0000000d, 0px 4px 5px 0px #0000000a, 0px 12px 12px 0px #00000008, 0px 16px 16px 0px #00000005',
-	'--wpds-elevation-sm':
-		'0px 1px 2px 0px #0000000d, 0px 2px 3px 0px #0000000a, 0px 6px 6px 0px #00000008, 0px 8px 8px 0px #00000005',
-	'--wpds-elevation-xs':
-		'0px 1px 1px 0px #00000008, 0px 1px 2px 0px #00000005, 0px 3px 3px 0px #00000005, 0px 4px 4px 0px #00000003',
 	'--wpds-motion-duration-lg': '300ms',
 	'--wpds-motion-duration-md': '200ms',
 	'--wpds-motion-duration-sm': '100ms',
@@ -185,8 +177,8 @@ export default {
 	'--wpds-typography-font-size-sm': '12px',
 	'--wpds-typography-font-size-xl': '20px',
 	'--wpds-typography-font-size-xs': '11px',
-	'--wpds-typography-font-weight-medium': '499',
-	'--wpds-typography-font-weight-regular': '400',
+	'--wpds-typography-font-weight-default': '400',
+	'--wpds-typography-font-weight-emphasis': '600',
 	'--wpds-typography-line-height-2xl': '40px',
 	'--wpds-typography-line-height-lg': '28px',
 	'--wpds-typography-line-height-md': '24px',
