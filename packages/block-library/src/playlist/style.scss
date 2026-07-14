@@ -66,6 +66,24 @@ $waveform-player-height: 100px;
 				position: absolute;
 				transform-origin: center;
 			}
+
+			:where(.waveform-icon-play) {
+				filter: blur(0);
+			}
+
+			:where(.waveform-icon-pause) {
+				filter: blur(2px);
+			}
+
+			&:where(.playing) {
+				:where(.waveform-icon-play) {
+					filter: blur(2px);
+				}
+
+				:where(.waveform-icon-pause) {
+					filter: blur(0);
+				}
+			}
 		}
 	}
 
@@ -158,6 +176,7 @@ $waveform-player-height: 100px;
 				transition:
 					opacity 0.16s ease,
 					clip-path 0.24s cubic-bezier(0.2, 0.8, 0.2, 1),
+					filter 0.18s ease,
 					transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
 			}
 		}
@@ -166,6 +185,7 @@ $waveform-player-height: 100px;
 			:where(.waveform-icon-play, .waveform-icon-pause) {
 				transition:
 					opacity 0.2s ease,
+					filter 0.18s ease,
 					transform 0.36s cubic-bezier(0.34, 1.56, 0.64, 1);
 			}
 		}
