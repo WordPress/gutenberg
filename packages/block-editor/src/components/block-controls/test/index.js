@@ -121,4 +121,55 @@ describe( 'BlockControls', () => {
 			expect( control ).toHaveAttribute( 'align', align );
 		} );
 	} );
+
+	it( 'should render shared child controls when all parent controls are exposed', () => {
+		render(
+			<SlotFillProvider>
+				<BlockEdit name="core/test-block" mayDisplayParentControls>
+					<BlockControls __experimentalShareWithChildBlocks>
+						<p>Shared child control</p>
+					</BlockControls>
+					<BlockControls>
+						<p>Parent-only control</p>
+					</BlockControls>
+				</BlockEdit>
+				<BlockControls.Slot group="parent" />
+			</SlotFillProvider>
+		);
+
+		expect( screen.getByText( 'Shared child control' ) ).toBeVisible();
+		expect(
+			screen.queryByText( 'Parent-only control' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'should render shared child controls when the control is exposed by name', () => {
+		render(
+			<SlotFillProvider>
+				<BlockEdit
+					name="core/test-block"
+					mayDisplayParentControls={ [ 'media' ] }
+				>
+					<BlockControls __experimentalShareWithChildBlocks="media">
+						<p>Shared media control</p>
+					</BlockControls>
+					<BlockControls __experimentalShareWithChildBlocks="align">
+						<p>Shared align control</p>
+					</BlockControls>
+					<BlockControls __experimentalShareWithChildBlocks>
+						<p>Unnamed shared control</p>
+					</BlockControls>
+				</BlockEdit>
+				<BlockControls.Slot group="parent" />
+			</SlotFillProvider>
+		);
+
+		expect( screen.getByText( 'Shared media control' ) ).toBeVisible();
+		expect(
+			screen.queryByText( 'Shared align control' )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( 'Unnamed shared control' )
+		).not.toBeInTheDocument();
+	} );
 } );

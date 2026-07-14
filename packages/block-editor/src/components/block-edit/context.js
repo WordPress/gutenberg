@@ -35,3 +35,15 @@ export { Provider as BlockEditContextProvider };
 export function useBlockEditContext() {
 	return useContext( Context );
 }
+
+export function mayDisplayParentControl( exposedControls, controlName ) {
+	if ( exposedControls === true ) {
+		return !! controlName;
+	}
+
+	if ( Array.isArray( exposedControls ) ) {
+		return exposedControls.includes( controlName );
+	}
+
+	return false;
+}

@@ -236,7 +236,9 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 					blockName,
 					'__experimentalExposeControlsToChildren',
 					false
-				),
+				)
+					? true
+					: false,
 				name: blockName,
 				blockType: getBlockType( blockName ),
 				parentLock: getTemplateLock( parentClientId ),

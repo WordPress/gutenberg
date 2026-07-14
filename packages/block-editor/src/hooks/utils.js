@@ -20,6 +20,7 @@ import {
 	mayDisplayControlsKey,
 	mayDisplayParentControlsKey,
 	mayDisplayPatternEditingControlsKey,
+	mayDisplayParentControl,
 } from '../components/block-edit/context';
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
@@ -556,8 +557,10 @@ export function createBlockEditFilter( features ) {
 									mayDisplayPatternEditingControlsKey
 								] ) ||
 							context[ mayDisplayControlsKey ] ||
-							( context[ mayDisplayParentControlsKey ] &&
-								shareWithChildBlocks );
+							mayDisplayParentControl(
+								context[ mayDisplayParentControlsKey ],
+								shareWithChildBlocks
+							);
 
 						if (
 							! shouldDisplayControls ||

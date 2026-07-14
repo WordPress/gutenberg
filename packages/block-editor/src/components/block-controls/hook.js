@@ -10,6 +10,7 @@ import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
 	mayDisplayParentControlsKey,
+	mayDisplayParentControl,
 } from '../block-edit/context';
 
 export default function useBlockControlsFill( group, shareWithChildBlocks ) {
@@ -17,7 +18,12 @@ export default function useBlockControlsFill( group, shareWithChildBlocks ) {
 	if ( context[ mayDisplayControlsKey ] ) {
 		return groups[ group ]?.Fill;
 	}
-	if ( context[ mayDisplayParentControlsKey ] && shareWithChildBlocks ) {
+	if (
+		mayDisplayParentControl(
+			context[ mayDisplayParentControlsKey ],
+			shareWithChildBlocks
+		)
+	) {
 		return groups.parent.Fill;
 	}
 	return null;

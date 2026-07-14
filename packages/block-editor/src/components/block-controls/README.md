@@ -83,7 +83,7 @@ Additional control components to be rendered.
 
 ### `__experimentalShareWithChildBlocks`
 
-Whether the additional block controls should be added to the block toolbars of child blocks.
+Whether the additional block controls should be added to the block toolbars of child blocks. Passing a string names the control so parent blocks can expose only selected controls through `supports.__experimentalExposeControlsToChildren`.
 
-- Type: `boolean`
+- Type: `boolean|string`
 - Default: `false`
