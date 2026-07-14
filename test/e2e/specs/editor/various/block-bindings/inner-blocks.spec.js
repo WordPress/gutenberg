@@ -6,6 +6,8 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 const AREA_NAME = 'Editable body';
 const FALLBACK_TEXT = 'Pattern fallback paragraph';
 const EDITED_TEXT = 'Pattern override paragraph';
+const ADDED_TEXT = 'Paragraph added with Enter';
+const EXPERIMENT_ID = 'gutenberg-pattern-overrides-inner-blocks';
 
 function patternContent( { anchor, fallback } ) {
 	return [
@@ -28,6 +30,7 @@ async function createPattern( requestUtils, options ) {
 test.describe( 'Block bindings: innerBlocks pattern overrides', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
+		await requestUtils.setGutenbergExperiments( [ EXPERIMENT_ID ] );
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -42,6 +45,7 @@ test.describe( 'Block bindings: innerBlocks pattern overrides', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.setGutenbergExperiments( [] );
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
@@ -87,6 +91,15 @@ test.describe( 'Block bindings: innerBlocks pattern overrides', () => {
 				return block.attributes.content?.[ AREA_NAME ]?.innerBlocks;
 			} )
 			.toContain( EDITED_TEXT );
+
+		await paragraph.press( 'Enter' );
+		await page.keyboard.type( ADDED_TEXT );
+		await expect
+			.poll( async () => {
+				const [ block ] = await editor.getBlocks();
+				return block.attributes.content?.[ AREA_NAME ]?.innerBlocks;
+			} )
+			.toContain( ADDED_TEXT );
 
 		const resetButton = page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
