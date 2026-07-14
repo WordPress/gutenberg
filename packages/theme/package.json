@@ -83,7 +83,7 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
-		"colorjs.io": "^0.6.0",
+		"colorjs.io": "^0.7.0",
 		"memize": "^2.1.0"
 	},
 	"devDependencies": {
