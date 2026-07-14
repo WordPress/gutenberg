@@ -197,6 +197,8 @@ const getAllBlocks = () => {
 		pageList,
 		pageListItem,
 		pattern,
+		playlist,
+		playlistTrack,
 		preformatted,
 		pullquote,
 		reusableBlock,
@@ -285,8 +287,8 @@ const getAllBlocks = () => {
 	}
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( playlist );
-		blocks.push( playlistTrack );
+		// Blocks added here are only registered when the "Block experiments"
+		// option is enabled in the Gutenberg > Experiments settings page.
 	}
 
 	blocks.push( classic );

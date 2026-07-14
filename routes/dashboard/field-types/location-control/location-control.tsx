@@ -9,20 +9,17 @@ import { useCallback } from '@wordpress/element';
  */
 import { LocationPicker } from '../location-picker';
 
-export type EventsWidgetAttributes = {
-	location?: string;
-};
-
 /*
- * Custom DataForm control for the dashboard widget settings drawer.
- * Reuses the main widget location picker (city search + geolocation).
+ * DataForm Edit control for the `location` field type: a city search
+ * with autocomplete and geolocation, wired to the field's
+ * getValue/setValue pair.
  */
-export function LocationSettingControl( {
+export function LocationControl< Item >( {
 	data,
 	field,
 	onChange,
 	hideLabelFromVision,
-}: DataFormControlProps< EventsWidgetAttributes > ) {
+}: DataFormControlProps< Item > ) {
 	const value = field.getValue( { item: data } ) as string | undefined;
 
 	const onLocationChange = useCallback(
