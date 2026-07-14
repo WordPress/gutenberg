@@ -22,6 +22,16 @@ const TABLET_DEVICE_TYPE = 'Tablet';
 const MOBILE_DEVICE_TYPE = 'Mobile';
 
 /**
+ * Fixed device preview heights. Used to give the editor canvas a
+ * device-shaped frame in mobile and tablet previews. These are display
+ * dimensions for the preview frame, not responsive breakpoints.
+ */
+const DEVICE_HEIGHT_BY_DEVICE_TYPE = {
+	[ MOBILE_DEVICE_TYPE ]: 768,
+	[ TABLET_DEVICE_TYPE ]: 1024,
+};
+
+/**
  * Maps a device preview type to its corresponding viewport style state. Used
  * when Responsive editing is enabled so the device preview drives which
  * viewport block style edits are applied to.
@@ -83,4 +93,23 @@ export function getCanvasWidthByDeviceType( deviceType, viewportSettings ) {
 			getViewportBreakpoints( viewportSettings )[ viewportKey ]
 		);
 	}
+}
+
+/**
+ * Gets the preview frame height by device type. Returns a fixed pixel
+ * height for mobile and tablet so the canvas keeps a device-shaped
+ * aspect ratio, and `undefined` for desktop so the frame fills the
+ * editor.
+ *
+ * @param {string} deviceType The device type.
+ * @return {number|undefined} The preview height in pixels, or undefined
+ *                             when no fixed height applies.
+ */
+export function getCanvasHeightByDeviceType( deviceType ) {
+	return Object.prototype.hasOwnProperty.call(
+		DEVICE_HEIGHT_BY_DEVICE_TYPE,
+		deviceType
+	)
+		? DEVICE_HEIGHT_BY_DEVICE_TYPE[ deviceType ]
+		: undefined;
 }

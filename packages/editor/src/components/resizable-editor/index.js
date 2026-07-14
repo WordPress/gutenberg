@@ -16,6 +16,7 @@ import { ResizableBox } from '@wordpress/components';
 import ResizeHandle from './resize-handle';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { getCanvasHeightByDeviceType } from '../../utils/device-type';
 
 // Removes the inline styles in the drag handles.
 const HANDLE_STYLES_OVERRIDE = {
@@ -45,16 +46,25 @@ function isAtMaxWidth( currentWidth, containerWidth, tolerance = 0 ) {
 function ResizableEditor( { className, enableResizing, height, children } ) {
 	const [ isResizing, setIsResizing ] = useState( false );
 	const { setCanvasWidth } = unlock( useDispatch( editorStore ) );
-	const canvasWidth = useSelect(
+	const { canvasWidth, deviceType } = useSelect(
 		( select ) => {
 			if ( ! enableResizing ) {
-				return undefined;
+				return { canvasWidth: undefined, deviceType: undefined };
 			}
-			const { getCanvasWidth } = unlock( select( editorStore ) );
-			return getCanvasWidth();
+			const { getCanvasWidth, getDeviceType } = unlock(
+				select( editorStore )
+			);
+			return {
+				canvasWidth: getCanvasWidth(),
+				deviceType: getDeviceType(),
+			};
 		},
 		[ enableResizing ]
 	);
+
+	const canvasHeight = enableResizing
+		? getCanvasHeightByDeviceType( deviceType )
+		: undefined;
 
 	const resizableRef = useRef();
 	const resizeWidthBy = useCallback(
@@ -100,7 +110,10 @@ function ResizableEditor( { className, enableResizing, height, children } ) {
 			size={ {
 				width:
 					enableResizing && canvasWidth ? canvasWidth + 'px' : '100%',
-				height: enableResizing && height ? height : '100%',
+				height:
+					enableResizing && canvasHeight
+						? canvasHeight + 'px'
+						: height || '100%',
 			} }
 			onResizeStart={ () => {
 				setIsResizing( true );

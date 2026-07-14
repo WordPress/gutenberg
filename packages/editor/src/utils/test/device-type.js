@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import {
+	getCanvasHeightByDeviceType,
 	getCanvasWidthByDeviceType,
 	getDeviceTypeByCanvasWidth,
 } from '../device-type';
@@ -104,5 +105,11 @@ describe( 'device type utilities', () => {
 		expect( getDeviceTypeByCanvasWidth( 1200, viewportSettings ) ).toBe(
 			'Desktop'
 		);
+	} );
+
+	it( 'returns fixed preview heights for mobile and tablet, and undefined for desktop', () => {
+		expect( getCanvasHeightByDeviceType( 'Mobile' ) ).toBe( 768 );
+		expect( getCanvasHeightByDeviceType( 'Tablet' ) ).toBe( 1024 );
+		expect( getCanvasHeightByDeviceType( 'Desktop' ) ).toBeUndefined();
 	} );
 } );
