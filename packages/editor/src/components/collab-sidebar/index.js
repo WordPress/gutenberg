@@ -32,6 +32,7 @@ import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import { NOTE_FORMAT_NAME, noteFormat } from './format';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
+import { useCollabSidebarCommands } from './commands';
 
 function NotesSidebar( { postId } ) {
 	useEffect( () => {
@@ -87,6 +88,8 @@ function NotesSidebar( { postId } ) {
 		showFloatingSidebar &&
 			( unresolvedNotes.length > 0 || selectedNoteId !== undefined )
 	);
+
+	useCollabSidebarCommands();
 
 	async function focusNote( {
 		targetClientId,
