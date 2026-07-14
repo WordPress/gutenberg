@@ -166,6 +166,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'blockVisibility' => array(
 					'allowEditing' => false,
 				),
+				'blocks'          => array(
+					'core/group' => array(
+						'blockVisibility' => array(
+							'allowEditing' => true,
+						),
+					),
+				),
 			),
 		);
 		$sanitized       = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $theme_json_data );
@@ -173,6 +180,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$actual          = $theme_json->get_settings();
 
 		$this->assertFalse( $actual['blockVisibility']['allowEditing'] );
+		// The setting is global-only: block-scoped values are stripped during sanitization.
+		$this->assertArrayNotHasKey( 'blockVisibility', $actual['blocks']['core/group'] ?? array() );
 	}
 
 	public function test_get_settings_presets_are_keyed_by_origin() {
