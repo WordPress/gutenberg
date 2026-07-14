@@ -38,7 +38,7 @@ export const NavigatorHeading = styled( Heading )`
 	grid-column: 2 / 7;
 
 	strong {
-		font-weight: ${ CONFIG.fontWeightHeading };
+		font-weight: ${ CONFIG.fontWeightEmphasis };
 	}
 `;
 

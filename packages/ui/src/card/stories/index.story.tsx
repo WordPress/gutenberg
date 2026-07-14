@@ -13,7 +13,7 @@ function Text( { children }: { children: React.ReactNode } ) {
 				margin: 0,
 				fontFamily: 'var(--wpds-typography-font-family-body)',
 				fontSize: 'var(--wpds-typography-font-size-md)',
-				fontWeight: 'var(--wpds-typography-font-weight-regular)',
+				fontWeight: 'var(--wpds-typography-font-weight-default)',
 				lineHeight: 'var(--wpds-typography-line-height-sm)',
 				textWrap: 'pretty',
 				color: 'var(--wpds-color-foreground-content-neutral-weak)',

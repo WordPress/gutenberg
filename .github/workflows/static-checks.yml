@@ -110,6 +110,9 @@ jobs:
             - name: Type checking
               run: npm run build
 
+            - name: Validate package contents
+              run: npm run lint:package-contents
+
             - name: Audit published dependencies
               if: ${{ matrix.annotations }}
               run: npm run lint:published-deps -- --fail-unused-ignores

@@ -20,6 +20,9 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"type": "module",
+	"bin": {
+		"wp-validate-package-contents": "./validate-package-contents.mjs"
+	},
 	"devDependencies": {
 		"@mawesome/dependency-audit": "^0.4.5",
 		"@wordpress/create-block": "file:../../packages/create-block",

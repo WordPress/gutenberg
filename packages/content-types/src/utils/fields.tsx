@@ -262,7 +262,6 @@ export function SlugEdit< T extends ContentType >( {
 	};
 	return (
 		<ValidatedInputControl
-			__next40pxDefaultSize
 			required={ !! isValid.required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( validity ) }
