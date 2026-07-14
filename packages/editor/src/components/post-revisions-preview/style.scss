@@ -68,4 +68,89 @@
 			outline-offset: -2px;
 		}
 	}
+
+	// Activated when the "Show button text labels" preference
+	// is enabled.
+	.show-icon-labels & {
+		width: auto;
+		background: none;
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		padding: 4px;
+		overflow-y: auto;
+
+		.revision-diff-marker {
+			position: static !important;
+			width: 100%;
+			min-height: 24px;
+			height: auto !important;
+			border-radius: 2px;
+			padding: 4px 8px;
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			font-size: $helptext-font-size;
+			font-weight: 600;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+
+			// In text-labels mode, show a small color swatch before the label
+			// to retain color as a secondary cue alongside the text.
+			&::before {
+				content: "";
+				flex-shrink: 0;
+				display: inline-block;
+				width: 10px;
+				height: 10px;
+				border-radius: 2px;
+			}
+
+			// Add text label from aria-label
+			&::after {
+				content: attr(aria-label);
+				flex: 1;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			&.is-added {
+				background: rgba(#008a20, 0.12);
+				color: #006117;
+
+				&::before {
+					background: #008a20;
+				}
+			}
+
+			&.is-removed {
+				background: rgba(#d63638, 0.1);
+				color: #c12b2d;
+
+				&::before {
+					background: repeating-linear-gradient(45deg, #d63638, #d63638 3px, rgba(#d63638, 0.45) 3px, rgba(#d63638, 0.45) 4px);
+				}
+			}
+
+			&.is-modified {
+				background: rgba(#9a7000, 0.1);
+				color: #7d5c00;
+
+				&::before {
+					background: repeating-linear-gradient(-45deg, #9a7000, #9a7000 3px, rgba(#9a7000, 0.45) 3px, rgba(#9a7000, 0.45) 4px);
+				}
+			}
+
+			&:hover {
+				opacity: 1;
+				filter: brightness(0.9);
+			}
+
+			&:focus {
+				outline: 2px solid $gray-900;
+				outline-offset: 2px;
+			}
+		}
+	}
 }
