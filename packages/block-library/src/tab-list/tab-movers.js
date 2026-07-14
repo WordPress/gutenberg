@@ -54,7 +54,9 @@ export default function TabMovers( { tabsClientId } ) {
 			<ToolbarButton
 				className="wp-block-tab-list__mover-button"
 				icon={ isRTL() ? chevronRight : chevronLeft }
-				label={ __( 'Move tab left' ) }
+				label={
+					isRTL() ? __( 'Move tab right' ) : __( 'Move tab left' )
+				}
 				onClick={ () => moveTab( -1 ) }
 				disabled={ activeIndex <= 0 }
 				accessibleWhenDisabled
@@ -62,7 +64,9 @@ export default function TabMovers( { tabsClientId } ) {
 			<ToolbarButton
 				className="wp-block-tab-list__mover-button"
 				icon={ isRTL() ? chevronLeft : chevronRight }
-				label={ __( 'Move tab right' ) }
+				label={
+					isRTL() ? __( 'Move tab left' ) : __( 'Move tab right' )
+				}
 				onClick={ () => moveTab( 1 ) }
 				disabled={ activeIndex >= tabCount - 1 }
 				accessibleWhenDisabled
