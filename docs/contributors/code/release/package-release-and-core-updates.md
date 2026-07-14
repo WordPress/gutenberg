@@ -46,23 +46,25 @@ Before restarting any mutating step, inspect the npm registry state for the pack
 For one package:
 
 ```sh
-npm view @wordpress/components@X.Y.Z version
+git rev-parse HEAD
+npm view @wordpress/components@X.Y.Z version gitHead --json
 npm dist-tag ls @wordpress/components
 ```
 
 To inspect all package versions from the current release branch:
 
 ```sh
+git rev-parse HEAD
 npx lerna list --json --no-private | jq -r '.[] | "\(.name)@\(.version)"' | while read package_version; do
 	package="${package_version%@*}"
 	version="${package_version##*@}"
 	echo "$package@$version"
-	npm view "$package@$version" version || true
+	npm view "$package@$version" version gitHead --json || true
 	npm dist-tag ls "$package"
 done
 ```
 
-Resume from the package versions that already exist on npm. If the expected versions exist and the expected dist-tags point to them, continue either with [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package), which publishes local package versions that are not yet on npm and skips the ones that already made it, or the workflow's generated recovery command when one is printed.
+Resume only when each target already on npm reports the expected version, its registry `gitHead` matches the prepared release commit printed by `git rev-parse HEAD`, and the expected dist-tag points to it. Then continue either with [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package), which publishes local package versions that are not yet on npm and skips the ones that already made it, or the workflow's generated recovery command when one is printed.
 
 When a workflow run prints branch or package-tag recovery commands after npm publishing succeeds but Git metadata publication fails, prefer those run-specific commands over starting a fresh release.
 
@@ -178,7 +180,7 @@ In order to start the publishing process for development version of npm packages
 To publish development packages to npm, select `development` from the "Release type" dropdown and leave empty "WordPress major release" input field. Finally, press the green "Run workflow" button. It triggers the npm publishing job, and this needs to be approved by a Gutenberg Core team member. Locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) for the current publishing, and have it [approved](https://docs.github.com/en/actions/how-tos/managing-workflow-runs-and-deployments/managing-deployments/reviewing-deployments#approving-or-rejecting-a-job).
 
 Behind the scenes, the release process is fully automated via `npm exec --no release-cli -- npm-next` command. It ensures
-the `wp/next` branch is synchronized with the latest release branch (`release/X.Y`) created for the Gutenberg plugin. To avoid collisions in the versioning of packages, we always include the newest commit's `sha`, for example, `@wordpress/block-editor@5.2.10-next.645224df70.0`.
+the `wp/next` branch is synchronized with the latest release branch (`release/X.Y`) created for the Gutenberg plugin. To avoid version collisions, development releases include a timestamp, for example, `@wordpress/block-editor@5.2.10-next.v.202607130915.0`.
 
 [plugin repository]: https://plugins.trac.wordpress.org/browser/gutenberg/
 [package release process]: https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#releasing-packages

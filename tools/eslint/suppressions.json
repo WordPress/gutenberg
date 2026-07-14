@@ -1958,11 +1958,6 @@
 			"count": 1
 		}
 	},
-	"widgets/events/components/location-picker/location-picker.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 5
-		}
-	},
 	"widgets/quick-draft/components/drafts-list/drafts-list.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
