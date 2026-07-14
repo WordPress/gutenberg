@@ -437,6 +437,20 @@ test( 'that autop treats inline elements as inline', () => {
 	expect( autop( contentString ).trim() ).toBe( expectedString );
 } );
 
+test( 'that autop does not split anchors containing block elements', () => {
+	let content = '<a href="document.htm"><div>Text</div></a>';
+	let expected = '<a href="document.htm">\n<div>Text</div>\n</a>';
+
+	expect( autop( content ).trim() ).toBe( expected );
+
+	content =
+		'<a href="document.htm"><div>First</div><section>Second</section></a>';
+	expected =
+		'<a href="document.htm">\n<div>First</div>\n<section>Second</section>\n</a>';
+
+	expect( autop( content ).trim() ).toBe( expected );
+} );
+
 test( 'element sanity', () => {
 	[
 		[ 'Hello <a\nhref="world">', '<p>Hello <a\nhref="world"></p>\n' ],

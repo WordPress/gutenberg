@@ -138,6 +138,8 @@ function replaceInHtmlTags(
  */
 export function autop( text: string, br: boolean = true ): string {
 	const preTags: Array< [ string, string ] > = [];
+	let hasBlockAnchor = false;
+	let blockAnchorPlaceholder = '';
 
 	if ( text.trim() === '' ) {
 		return '';
@@ -176,8 +178,40 @@ export function autop( text: string, br: boolean = true ): string {
 	// Change multiple <br>s into two line breaks, which will turn into paragraphs.
 	text = text.replace( /<br\s*\/?>\s*<br\s*\/?>/g, '\n\n' );
 
-	const allBlocks =
+	let allBlocks =
 		'(?:table|thead|tfoot|caption|col|colgroup|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|form|map|area|blockquote|address|math|style|p|h[1-6]|hr|fieldset|legend|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
+
+	/*
+	 * Anchors can contain block-level elements. Replace their tags with temporary
+	 * block-level placeholders so the paragraph cleanup does not split the anchor.
+	 */
+	if ( text.indexOf( '<a' ) !== -1 ) {
+		blockAnchorPlaceholder = 'wp-autop-block-anchor';
+
+		while ( text.indexOf( '<' + blockAnchorPlaceholder ) !== -1 ) {
+			blockAnchorPlaceholder += '-';
+		}
+
+		text = text.replace(
+			new RegExp(
+				'<a(\\b[^>]*)>(?=\\s*<' +
+					allBlocks +
+					'[\\s/>])([\\s\\S]*?)(</a>)',
+				'g'
+			),
+			'<' +
+				blockAnchorPlaceholder +
+				'$1>$2</' +
+				blockAnchorPlaceholder +
+				'>'
+		);
+		hasBlockAnchor = text.indexOf( '<' + blockAnchorPlaceholder ) !== -1;
+
+		if ( hasBlockAnchor ) {
+			allBlocks =
+				allBlocks.slice( 0, -1 ) + '|' + blockAnchorPlaceholder + ')';
+		}
+	}
 
 	// Add a double line break above block-level opening tags.
 	text = text.replace(
@@ -265,6 +299,19 @@ export function autop( text: string, br: boolean = true ): string {
 	text = text.replace( /<p><blockquote([^>]*)>/gi, '<blockquote$1><p>' );
 	text = text.replace( /<\/blockquote><\/p>/g, '</p></blockquote>' );
 
+	// Move paragraphs inside anchors that contain block-level elements.
+	if ( hasBlockAnchor ) {
+		text = text.replace(
+			new RegExp( '<p>(<' + blockAnchorPlaceholder + '[^>]*>)', 'g' ),
+			'$1<p>'
+		);
+		text = text.replace(
+			new RegExp( '(</' + blockAnchorPlaceholder + '>)</p>', 'g' ),
+			'</p>$1'
+		);
+		text = text.replace( /<p>\s*<\/p>/g, '' );
+	}
+
 	// If an opening or closing block element tag is preceded by an opening <p> tag, remove it.
 	text = text.replace(
 		new RegExp( '<p>\\s*(</?' + allBlocks + '[^>]*>)', 'g' ),
@@ -319,6 +366,18 @@ export function autop( text: string, br: boolean = true ): string {
 	// Restore newlines in all elements.
 	if ( -1 !== text.indexOf( '<!-- wpnl -->' ) ) {
 		text = text.replace( /\s?<!-- wpnl -->\s?/g, '\n' );
+	}
+
+	// Restore anchors that contain block-level elements.
+	if ( hasBlockAnchor ) {
+		text = text.replace(
+			new RegExp( '<' + blockAnchorPlaceholder, 'g' ),
+			'<a'
+		);
+		text = text.replace(
+			new RegExp( '</' + blockAnchorPlaceholder + '>', 'g' ),
+			'</a>'
+		);
 	}
 
 	return text;
