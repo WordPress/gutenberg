@@ -8,7 +8,6 @@ import { __experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitF
  */
 import {
 	getCustomValueFromPreset,
-	getPresetValueFromCustomValue as getPresetValueFromCustomPresetValue,
 	isValuePreset as isPresetValue,
 } from '../preset-input-control/utils';
 
@@ -173,24 +172,6 @@ export function getPresetValueFromControlValue(
 	}
 
 	return `var:preset|border-radius|${ presets[ controlValue ]?.slug }`;
-}
-
-/**
- * Converts a custom value to preset value if one can be found.
- *
- * Returns value as-is if no match is found.
- *
- * @param {string} value   Value to convert
- * @param {Array}  presets Array of the current border radius preset objects
- *
- * @return {string} The preset value if it can be found.
- */
-export function getPresetValueFromCustomValue( value, presets ) {
-	return getPresetValueFromCustomPresetValue(
-		value,
-		presets,
-		BORDER_RADIUS_PRESET_TYPE
-	);
 }
 
 /**

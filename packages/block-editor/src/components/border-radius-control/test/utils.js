@@ -7,9 +7,9 @@ import {
 	hasMixedValues,
 	hasDefinedValues,
 	mode,
-	getPresetValueFromCustomValue,
 	getPresetValueFromControlValue,
 } from '../utils';
+import { getPresetValueFromCustomValue } from '../../preset-input-control/utils';
 
 const defaultUnitSelections = {
 	flat: undefined,
@@ -274,6 +274,7 @@ describe( 'mode', () => {
 } );
 
 describe( 'getPresetValueFromCustomValue', () => {
+	const presetType = 'border-radius';
 	const presets = [
 		{ name: 'None', slug: '0', size: 0 },
 		{ name: 'Small', slug: 'sm', size: '4px' },
@@ -281,34 +282,43 @@ describe( 'getPresetValueFromCustomValue', () => {
 	];
 
 	it( 'should return "0" if value is "0"', () => {
-		expect( getPresetValueFromCustomValue( '0', presets ) ).toBe( '0' );
+		expect(
+			getPresetValueFromCustomValue( '0', presets, presetType )
+		).toBe( '0' );
 	} );
 
 	it( 'should return preset reference if value matches a preset', () => {
-		expect( getPresetValueFromCustomValue( '4px', presets ) ).toBe(
-			'var:preset|border-radius|sm'
-		);
 		expect(
-			getPresetValueFromCustomValue( 'clamp(2px, 1vw, 8px)', presets )
+			getPresetValueFromCustomValue( '4px', presets, presetType )
+		).toBe( 'var:preset|border-radius|sm' );
+		expect(
+			getPresetValueFromCustomValue(
+				'clamp(2px, 1vw, 8px)',
+				presets,
+				presetType
+			)
 		).toBe( 'var:preset|border-radius|md' );
 	} );
 
 	it( 'should return value as-is if no matching preset', () => {
-		expect( getPresetValueFromCustomValue( '7px', presets ) ).toBe( '7px' );
+		expect(
+			getPresetValueFromCustomValue( '7px', presets, presetType )
+		).toBe( '7px' );
 	} );
 
 	it( 'should return value as-is if already a preset reference', () => {
 		expect(
 			getPresetValueFromCustomValue(
 				'var:preset|border-radius|md',
-				presets
+				presets,
+				presetType
 			)
 		).toBe( 'var:preset|border-radius|md' );
 	} );
 
 	it( 'should return undefined if value is undefined', () => {
 		expect(
-			getPresetValueFromCustomValue( undefined, presets )
+			getPresetValueFromCustomValue( undefined, presets, presetType )
 		).toBeUndefined();
 	} );
 } );
