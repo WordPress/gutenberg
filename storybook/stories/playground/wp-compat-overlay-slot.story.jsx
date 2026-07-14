@@ -3,6 +3,7 @@ import { useState } from '@wordpress/element';
 import {
 	Autocomplete,
 	Combobox,
+	Popover as UiPopover,
 	Select,
 	SelectControl,
 	Tooltip,
@@ -27,10 +28,58 @@ const inputWrapperStyle = {
 		'var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-xs)',
 };
 
-// Cross-library stacking: `@wordpress/ui` overlays (`Tooltip`, `Select`,
-// `Combobox`, `SelectControl`, `Autocomplete`) inside a
+function UiPopoverFixture() {
+	return (
+		<div style={ { marginTop: '1rem' } }>
+			<UiPopover.Root>
+				<UiPopover.Trigger>
+					Open `@wordpress/ui` Popover
+				</UiPopover.Trigger>
+				<UiPopover.Popup>
+					<UiPopover.Title>
+						Popover from `@wordpress/ui`
+					</UiPopover.Title>
+					<p>
+						The popover and its nested autocomplete should appear
+						above the host overlay.
+					</p>
+					<Autocomplete.Root items={ autocompleteItems }>
+						<Autocomplete.Input
+							placeholder="Search nested items"
+							aria-label="Autocomplete inside @wordpress/ui Popover"
+						/>
+						<Autocomplete.Popup>
+							<Autocomplete.Empty>
+								No matching items.
+							</Autocomplete.Empty>
+							<Autocomplete.List>
+								<Autocomplete.ListBody>
+									<Autocomplete.Collection>
+										{ ( item ) => (
+											<Autocomplete.Item
+												key={ item.id }
+												value={ item }
+											>
+												{ item.value }
+											</Autocomplete.Item>
+										) }
+									</Autocomplete.Collection>
+								</Autocomplete.ListBody>
+							</Autocomplete.List>
+						</Autocomplete.Popup>
+					</Autocomplete.Root>
+				</UiPopover.Popup>
+			</UiPopover.Root>
+		</div>
+	);
+}
+
+// Cross-library stacking: `@wordpress/ui` overlays (`Tooltip`, `Popover`,
+// `Select`, `Combobox`, `SelectControl`, `Autocomplete`) inside a
 // `@wordpress/components` Modal / Popover should sit above the
-// components-side overlay via the compat overlay slot.
+// components-side overlay via the compat overlay slot. The Popover fixture uses
+// controlled `@wordpress/ui` content; arbitrary legacy descendants remain out
+// of scope.
 export default {
 	title: 'Playground/Debug fixtures/WP Compat Overlay Slot',
 	decorators: [ WithWpCompatOverlaySlot ],
@@ -68,6 +117,8 @@ export const InsideComponentsModal = {
 								</Tooltip.Popup>
 							</Tooltip.Root>
 						</Tooltip.Provider>
+
+						<UiPopoverFixture />
 
 						<div style={ { marginTop: '1rem' } }>
 							<Select.Root items={ selectItems }>
@@ -191,6 +242,8 @@ export const InsideComponentsPopover = {
 									</Tooltip.Popup>
 								</Tooltip.Root>
 							</Tooltip.Provider>
+
+							<UiPopoverFixture />
 
 							<div style={ { marginTop: '1rem' } }>
 								<Select.Root items={ selectItems }>
