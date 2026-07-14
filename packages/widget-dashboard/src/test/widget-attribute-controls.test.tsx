@@ -2,7 +2,7 @@
  * External dependencies
  */
 import '@testing-library/jest-dom';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
 
@@ -185,6 +185,33 @@ describe( 'WidgetAttributeControls fit', () => {
 		);
 
 		expect( screen.getByTestId( 'metric' ) ).toHaveTextContent( 'orders' );
+	} );
+
+	it( 'dismisses the dropdown with Escape and restores focus', async () => {
+		mockedUseInlineControlsFit.mockReturnValue( {
+			measureRef: () => {},
+			collapsed: true,
+		} );
+		const user = userEvent.setup();
+		render( <Harness /> );
+		await screen.findByTestId( 'metric' );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Widget controls' } )
+		);
+		await screen.findByRole( 'dialog', { name: 'Widget controls' } );
+
+		await user.keyboard( '{Escape}' );
+
+		await waitFor( () =>
+			expect(
+				screen.queryByRole( 'dialog', { name: 'Widget controls' } )
+			).not.toBeInTheDocument()
+		);
+		// Focus returns to the invoker, per the dialog pattern.
+		expect(
+			screen.getByRole( 'button', { name: 'Widget controls' } )
+		).toHaveFocus();
 	} );
 
 	it( 'keeps the settings surface reachable while collapsed', async () => {
