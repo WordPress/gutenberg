@@ -202,8 +202,8 @@ export function NoteThread( {
 			onClick={ onSelectNote }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
+			{ ...focusOutside }
 			onFocus={ onFocus }
-			onBlur={ focusOutside.onBlur }
 			onKeyUp={ ( event ) => {
 				if ( event.key === 'Tab' ) {
 					isKeyboardTabbingRef.current = false;

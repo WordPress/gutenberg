@@ -82,8 +82,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 			style={
 				floating ? { opacity: ! floating.y ? 0 : undefined } : undefined
 			}
-			onFocus={ focusOutside.onFocus }
-			onBlur={ focusOutside.onBlur }
+			{ ...focusOutside }
 		>
 			<NoteCard>
 				<NoteForm
