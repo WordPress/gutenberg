@@ -3,7 +3,6 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"emitDeclarationOnly": false,
-		"moduleResolution": "bundler",
 		"noEmit": true,
 		"rootDir": ".",
 		"types": [

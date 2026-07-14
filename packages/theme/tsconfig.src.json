@@ -11,7 +11,6 @@
 		]
 	},
 	"exclude": [ "**/stories/**", "**/test/**", "**/*.story.*" ],
-	"files": [ "global.d.ts" ],
 	"references": [
 		{ "path": "../compose" },
 		{ "path": "../deprecated" },
