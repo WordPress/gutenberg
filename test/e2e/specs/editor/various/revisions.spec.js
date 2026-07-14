@@ -86,6 +86,90 @@ test.describe( 'Post revisions', () => {
 		] );
 	} );
 
+	test( 'should show revision changes in the code editor', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent(
+			'<!-- wp:paragraph -->\n<p>Original content</p>\n<!-- /wp:paragraph -->'
+		);
+		await editor.saveDraft();
+
+		await editor.setContent(
+			'<!-- wp:paragraph -->\n<p>Updated content</p>\n<!-- /wp:paragraph -->'
+		);
+		await editor.saveDraft();
+
+		await editor.openDocumentSettingsSidebar();
+		const settingsSidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
+		await settingsSidebar
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+			} )
+			.click();
+
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+
+		const optionsButton = page.getByRole( 'button', { name: 'Options' } );
+		await expect( optionsButton ).toBeEnabled();
+		await optionsButton.click();
+		await page
+			.getByRole( 'menuitemradio', { name: 'Code editor' } )
+			.click();
+
+		const codeDiff = page.getByRole( 'region', { name: 'Code changes' } );
+		await expect( codeDiff ).toBeVisible();
+		await expect(
+			codeDiff.locator( 'tr.is-removed' ).filter( {
+				hasText: '<p>Original content</p>',
+			} )
+		).toBeVisible();
+		await expect(
+			codeDiff.locator( 'tr.is-added' ).filter( {
+				hasText: '<p>Updated content</p>',
+			} )
+		).toBeVisible();
+		const slider = page.getByRole( 'slider', { name: 'Revision' } );
+		await expect( slider ).toBeVisible();
+		await slider.focus();
+		await page.keyboard.press( 'Home' );
+		await expect(
+			codeDiff.locator( 'tr.is-added' ).filter( {
+				hasText: '<p>Original content</p>',
+			} )
+		).toBeVisible();
+		await expect( codeDiff ).not.toContainText( '<p>Updated content</p>' );
+
+		await page.keyboard.press( 'End' );
+		await expect(
+			codeDiff.locator( 'tr.is-added' ).filter( {
+				hasText: '<p>Updated content</p>',
+			} )
+		).toBeVisible();
+
+		await page.getByRole( 'button', { name: 'Show changes' } ).click();
+		const revisionCode = page.getByRole( 'region', {
+			name: 'Revision code',
+		} );
+		await expect( revisionCode ).toContainText( '<p>Updated content</p>' );
+		await expect( revisionCode.locator( 'tr.is-removed' ) ).toHaveCount(
+			0
+		);
+
+		await optionsButton.click();
+		await page
+			.getByRole( 'menuitemradio', { name: 'Visual editor' } )
+			.click();
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		).toHaveText( 'Updated content' );
+	} );
+
 	test( 'should preserve block clientId when sliding between revisions', async ( {
 		editor,
 		page,
