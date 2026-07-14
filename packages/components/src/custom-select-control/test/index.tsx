@@ -705,7 +705,8 @@ describe( 'Legacy size support', () => {
 			<UncontrolledCustomSelectControl
 				label="Test"
 				options={ options }
-				{ ...{ size: '__unstable-large' } }
+				// @ts-expect-error testing legacy runtime support for removed size type
+				size="__unstable-large"
 			/>
 		);
 

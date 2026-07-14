@@ -246,7 +246,8 @@ describe( 'SelectControl', () => {
 					label="Test"
 					options={ options }
 					prefix={ prefix }
-					{ ...{ size: '__unstable-large' } }
+					// @ts-expect-error testing legacy runtime support for removed size type
+					size="__unstable-large"
 				/>
 			);
 
