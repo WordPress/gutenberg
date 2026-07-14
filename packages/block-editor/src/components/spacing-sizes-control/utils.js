@@ -15,10 +15,7 @@ import {
 /**
  * Internal dependencies
  */
-import {
-	getPresetSlug,
-	isValuePreset,
-} from '../preset-input-control/utils';
+import { getPresetSlug, isValuePreset } from '../preset-input-control/utils';
 
 const SPACING_PRESET_TYPE = 'spacing';
 

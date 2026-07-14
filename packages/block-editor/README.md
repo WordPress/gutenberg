@@ -671,17 +671,9 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md>
 
-### isValueSpacingPreset
+### isValuePreset
 
-Checks is given value is a spacing preset.
-
-_Parameters_
-
--   _value_ `string`: Value to check
-
-_Returns_
-
--   `boolean`: Return true if value is string in format var:preset|spacing|.
+Undocumented declaration.
 
 ### JustifyContentControl
 
