@@ -37,7 +37,6 @@ jobs:
         environment: WordPress packages
         steps:
             - name: Checkout (for CLI)
-              if: ${{ github.event.inputs.release_type != 'wp' }}
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   path: cli
@@ -83,6 +82,8 @@ jobs:
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
 
+            # Keep the release CLI and publish checkout on one runtime;
+            # active wp release branches must stay compatible with the trunk release CLI.
             - name: Setup Node.js (for WP major version)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
               uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -121,9 +122,9 @@ jobs:
             - name: Publish packages to npm for WP major version ("wp/${{ github.event.inputs.wp_version || 'X.Y' }}" dist-tag)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
               run: |
-                  cd publish
+                  cd cli
                   npm ci
-                  npx lerna publish patch --dist-tag "wp-$WP_VERSION" --no-private --yes --no-verify-access
+                  npm exec --no release-cli -- npm-wp --wp-version "$WP_VERSION" --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
                   WP_VERSION: ${{ github.event.inputs.wp_version }}

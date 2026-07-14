@@ -50,7 +50,7 @@
 
 .link-preview-button__title {
 	margin-top: $grid-unit-05;
-	font-weight: 500;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	color: $gray-900;
 	display: block;
 }

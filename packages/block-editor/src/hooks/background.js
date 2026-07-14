@@ -234,13 +234,15 @@ export function BackgroundImagePanel( {
 			},
 		} ),
 	};
+	const value = isStateSelected
+		? getStyleForState( style, selectedState )
+		: styleValue;
 
 	// Skipped for gradients, which can't be reliably evaluated for contrast.
 	const enableContrastChecking =
-		! isStateSelected &&
-		! styleValue?.color?.gradient &&
-		! styleValue?.background?.gradient &&
-		!! styleValue?.color?.background &&
+		! value?.color?.gradient &&
+		! value?.background?.gradient &&
+		!! value?.color?.background &&
 		( settings?.color?.text || settings?.color?.link ) &&
 		false !== getBlockSupport( name, [ 'color', 'enableContrastChecker' ] );
 
@@ -386,11 +388,7 @@ export function BackgroundImagePanel( {
 			settings={ updatedSettings }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
-			value={
-				isStateSelected
-					? getStyleForState( style, selectedState )
-					: styleValue
-			}
+			value={ value }
 			contrastWarning={ contrastWarning }
 		/>
 	);

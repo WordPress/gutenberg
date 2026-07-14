@@ -1495,6 +1495,11 @@
 		"filePath": "library/site-logo.svg"
 	},
 	{
+		"slug": "sites",
+		"label": "Sites",
+		"filePath": "library/sites.svg"
+	},
+	{
 		"slug": "square",
 		"label": "Square",
 		"filePath": "library/square.svg"

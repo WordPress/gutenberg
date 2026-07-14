@@ -1067,7 +1067,7 @@ getDefaultTemplateId.shouldInvalidate = ( action ) => {
  */
 export const getRevisions =
 	( kind, name, recordKey, query = {} ) =>
-	async ( { dispatch, registry, resolveSelect } ) => {
+	async ( { dispatch, resolveSelect } ) => {
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -1142,37 +1142,31 @@ export const getRevisions =
 					} );
 				}
 
-				registry.batch( () => {
-					dispatch.receiveRevisions(
+				await dispatch.receiveRevisions(
+					kind,
+					name,
+					recordKey,
+					records,
+					query,
+					false,
+					meta
+				);
+
+				// Mark individual getRevision resolutions as done so that
+				// subsequent getRevision calls skip redundant API fetches.
+				const key = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
+				const normalizedQuery = normalizeQueryForResolution( rawQuery );
+				const resolutionsArgs = records
+					.filter( ( record ) => record[ key ] )
+					.map( ( record ) => [
 						kind,
 						name,
 						recordKey,
-						records,
-						query,
-						false,
-						meta
-					);
+						record[ key ],
+						normalizedQuery,
+					] );
 
-					// Mark individual getRevision resolutions as done so that
-					// subsequent getRevision calls skip redundant API fetches.
-					const key = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
-					const normalizedQuery =
-						normalizeQueryForResolution( rawQuery );
-					const resolutionsArgs = records
-						.filter( ( record ) => record[ key ] )
-						.map( ( record ) => [
-							kind,
-							name,
-							recordKey,
-							record[ key ],
-							normalizedQuery,
-						] );
-
-					dispatch.finishResolutions(
-						'getRevision',
-						resolutionsArgs
-					);
-				} );
+				dispatch.finishResolutions( 'getRevision', resolutionsArgs );
 			}
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
@@ -1261,7 +1255,7 @@ export const getRevision =
 			}
 
 			if ( record ) {
-				dispatch.receiveRevisions(
+				await dispatch.receiveRevisions(
 					kind,
 					name,
 					recordKey,

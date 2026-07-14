@@ -277,6 +277,7 @@ describe( 'getRevisions', () => {
 	} );
 
 	it( 'preserves all revisions when getRevision resolves after getRevisions', async () => {
+		const revision = { id: 1 };
 		let resolveSlowFetch;
 		const slowFetchPromise = new Promise( ( resolve ) => {
 			resolveSlowFetch = resolve;
@@ -307,16 +308,15 @@ describe( 'getRevisions', () => {
 			1,
 			{ context: 'edit' }
 		);
-		await resolveSelectStore.getRevisions( KIND, NAME, RECORD_KEY, {
-			context: 'edit',
-		} );
+		await expect(
+			resolveSelectStore.getRevisions( KIND, NAME, RECORD_KEY, {
+				context: 'edit',
+			} )
+		).resolves.toEqual( REVISIONS );
 
 		// Now resolve the slow single-revision fetch.
-		resolveSlowFetch( REVISIONS[ 0 ] );
-		await revisionPromise;
-
-		// Wait for all pending thunks (receiveRevisions) to settle.
-		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		resolveSlowFetch( revision );
+		await expect( revisionPromise ).resolves.toEqual( revision );
 
 		const allRevisions = registry
 			.select( coreDataStore )
