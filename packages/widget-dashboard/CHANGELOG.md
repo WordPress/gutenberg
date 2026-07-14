@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.3.0 (2026-07-14)
+
 -   Remove layout-settings editing: the customize-toolbar button, the
     settings drawer, the layout-model switch commands, and the
     `onGridSettingsChange` prop. `gridSettings` is now read-only rendering
@@ -14,6 +16,7 @@
 
 ### Enhancements
 
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 -   Widget grid: reserve top paint space for outward tile focus rings so scroll
     containers do not clip the widget chrome outline ([#79990](https://github.com/WordPress/gutenberg/pull/79990)).
 

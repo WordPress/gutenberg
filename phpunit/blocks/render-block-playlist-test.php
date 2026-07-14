@@ -156,10 +156,16 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	/**
 	 * @covers ::render_block_core_playlist
 	 */
-	public function test_waveform_style_extracted_from_single_word_style_class() {
+	public function test_renders_waveform_player_color_attributes() {
+		$waveform_gradient            = 'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)';
+		$waveform_background_gradient = 'linear-gradient(90deg,#ffeeaa 0%,#aabbcc 100%)';
+
 		$markup = $this->build_playlist_markup(
 			array(
-				'className' => 'is-style-mirror',
+				'waveformColor'              => '#ff0000',
+				'waveformGradient'           => $waveform_gradient,
+				'waveformBackgroundColor'    => '#ffeeaa',
+				'waveformBackgroundGradient' => $waveform_background_gradient,
 			),
 			array(
 				array(
@@ -172,23 +178,27 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 
 		$output = do_blocks( $markup );
 		$p      = new WP_HTML_Tag_Processor( $output );
-		$p->next_tag( 'figure' );
+		$p->next_tag( array( 'class_name' => 'wp-block-playlist__waveform-player' ) );
 
-		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
-		$this->assertSame( 'mirror', $context['waveformStyle'] );
+		$this->assertSame( '#ff0000', $p->get_attribute( 'data-waveform-player-color' ) );
+		$this->assertSame(
+			$waveform_gradient,
+			$p->get_attribute( 'data-waveform-player-gradient' )
+		);
+		$this->assertSame( '#ffeeaa', $p->get_attribute( 'data-waveform-player-background-color' ) );
+		$this->assertSame(
+			$waveform_background_gradient,
+			$p->get_attribute( 'data-waveform-player-background-gradient' )
+		);
 	}
 
 	/**
-	 * A hyphenated block style slug (e.g. one registered by a theme) must be
-	 * extracted in full. The `\w+` pattern stops at the first hyphen and would
-	 * yield 'thin' instead of 'thin-line'.
-	 *
 	 * @covers ::render_block_core_playlist
 	 */
-	public function test_waveform_style_extracted_from_hyphenated_style_class() {
+	public function test_waveform_style_uses_attribute() {
 		$markup = $this->build_playlist_markup(
 			array(
-				'className' => 'is-style-thin-line',
+				'waveformStyle' => 'dots',
 			),
 			array(
 				array(
@@ -204,7 +214,32 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 		$p->next_tag( 'figure' );
 
 		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
-		$this->assertSame( 'thin-line', $context['waveformStyle'] );
+		$this->assertSame( 'dots', $context['waveformStyle'] );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 */
+	public function test_waveform_style_defaults_to_bars_for_invalid_attribute() {
+		$markup = $this->build_playlist_markup(
+			array(
+				'waveformStyle' => 'thin-line',
+			),
+			array(
+				array(
+					'id'    => 1,
+					'title' => 'Song One',
+					'src'   => 'http://example.com/song1.mp3',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+		$p      = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( 'figure' );
+
+		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
+		$this->assertSame( 'bars', $context['waveformStyle'] );
 	}
 
 	/**
@@ -256,9 +291,73 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 
 	/**
 	 * @covers ::render_block_core_playlist
+	 */
+	public function test_track_image_remains_in_interactivity_state_when_tracklist_images_are_disabled() {
+		$markup = $this->build_playlist_markup(
+			array(
+				'showImages'            => false,
+				'showPlayButtonArtwork' => false,
+			),
+			array(
+				array(
+					'id'       => 1,
+					'title'    => 'Song One',
+					'src'      => 'http://example.com/song1.mp3',
+					'image'    => 'http://example.com/image1.jpg',
+					'imageAlt' => 'A bright abstract track image',
+				),
+			)
+		);
+
+		do_blocks( $markup );
+
+		$state    = wp_interactivity_state( 'core/playlist' );
+		$playlist = reset( $state['playlists'] );
+		$track    = $playlist['tracks']['track-0'];
+
+		$this->assertSame( 'http://example.com/image1.jpg', $track['image'] );
+		$this->assertSame( 'A bright abstract track image', $track['imageAlt'] );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 */
+	public function test_track_image_is_available_for_play_button_artwork_when_images_are_disabled() {
+		$markup = $this->build_playlist_markup(
+			array(
+				'showImages'            => false,
+				'showPlayButtonArtwork' => true,
+			),
+			array(
+				array(
+					'id'       => 1,
+					'title'    => 'Song One',
+					'src'      => 'http://example.com/song1.mp3',
+					'image'    => 'http://example.com/image1.jpg',
+					'imageAlt' => 'A bright abstract track image',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+		$p      = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( 'figure' );
+		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
+
+		$state    = wp_interactivity_state( 'core/playlist' );
+		$playlist = reset( $state['playlists'] );
+		$track    = $playlist['tracks']['track-0'];
+
+		$this->assertTrue( $context['showPlayButtonArtwork'] );
+		$this->assertSame( 'http://example.com/image1.jpg', $track['image'] );
+		$this->assertSame( 'A bright abstract track image', $track['imageAlt'] );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
 	 * @covers ::render_block_core_playlist_track
 	 */
-	public function test_tracklist_renders_album_art_when_show_images_is_enabled() {
+	public function test_tracklist_renders_track_image_when_show_images_is_enabled() {
 		$markup = $this->build_playlist_markup(
 			array( 'showImages' => true ),
 			array(
@@ -267,7 +366,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 					'title'    => 'Song One',
 					'src'      => 'http://example.com/song1.mp3',
 					'image'    => 'http://example.com/image1.jpg',
-					'imageAlt' => 'A bright abstract album cover',
+					'imageAlt' => 'A bright abstract track image',
 				),
 			)
 		);
@@ -276,14 +375,14 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'class="wp-block-playlist-track__image"', $output );
 		$this->assertStringContainsString( 'src="http://example.com/image1.jpg"', $output );
-		$this->assertStringContainsString( 'alt="A bright abstract album cover"', $output );
+		$this->assertStringContainsString( 'alt="A bright abstract track image"', $output );
 	}
 
 	/**
 	 * @covers ::render_block_core_playlist
 	 * @covers ::render_block_core_playlist_track
 	 */
-	public function test_tracklist_does_not_render_album_art_when_show_images_is_disabled() {
+	public function test_tracklist_does_not_render_track_image_when_show_images_is_disabled() {
 		$markup = $this->build_playlist_markup(
 			array( 'showImages' => false ),
 			array(
@@ -323,10 +422,10 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 			array(
 				array(
 					'id'     => 1,
-					'title'  => 'Song One',
+					'title'  => 'Track One',
 					'artist' => 'Artist One',
 					'album'  => 'Album One',
-					'src'    => 'http://example.com/song1.mp3',
+					'src'    => 'http://example.com/track1.mp3',
 				),
 			)
 		);
@@ -338,7 +437,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 		$track    = $playlist['tracks']['track-0'];
 
 		$this->assertSame(
-			'Song One by Artist One from the album Album One',
+			'Track One by Artist One from the album Album One',
 			$track['ariaLabel']
 		);
 	}

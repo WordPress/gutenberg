@@ -4,8 +4,10 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	ToolbarRovingTabindexUtils: async ( { page, pageUtils }, use ) => {
-		await use( new ToolbarRovingTabindexUtils( { page, pageUtils } ) );
+	ToolbarRovingTabindexUtils: async ( { editor, page, pageUtils }, use ) => {
+		await use(
+			new ToolbarRovingTabindexUtils( { editor, page, pageUtils } )
+		);
 	},
 } );
 
@@ -138,7 +140,8 @@ test.describe( 'Toolbar roving tabindex', () => {
 } );
 
 class ToolbarRovingTabindexUtils {
-	constructor( { page, pageUtils } ) {
+	constructor( { editor, page, pageUtils } ) {
+		this.editor = editor;
 		this.page = page;
 		this.pageUtils = pageUtils;
 	}
@@ -162,19 +165,11 @@ class ToolbarRovingTabindexUtils {
 	}
 
 	async expectLabelToHaveFocus( label ) {
-		let ariaLabel = await this.page.evaluate( () => {
-			const { activeElement } =
-				document.activeElement.contentDocument ?? document;
-			return activeElement.getAttribute( 'aria-label' );
-		} );
+		let ariaLabel = await this.editor.getFocusOwnerLabel();
 		// If the labels don't match, try pressing Up Arrow to focus the block wrapper in non-content editable block.
 		if ( ariaLabel !== label ) {
 			await this.page.keyboard.press( 'ArrowUp' );
-			ariaLabel = await this.page.evaluate( () => {
-				const { activeElement } =
-					document.activeElement.contentDocument ?? document;
-				return activeElement.getAttribute( 'aria-label' );
-			} );
+			ariaLabel = await this.editor.getFocusOwnerLabel();
 		}
 		expect( ariaLabel ).toBe( label );
 	}

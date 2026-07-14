@@ -6,9 +6,9 @@ import { store as coreStore } from '@wordpress/core-data';
 import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { authorField } from '@wordpress/fields';
-import { Text } from '@wordpress/ui';
+import { Badge, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -40,16 +40,28 @@ function getDisplayDate( value ) {
 		: humanTimeDiff( date );
 }
 
+function isAutosaveRevision( item ) {
+	// Autosaves use the `{parent_id}-autosave-v1` slug, like Core's `wp_is_post_autosave()`.
+	return item.slug?.endsWith( '-autosave-v1' ) ?? false;
+}
+
+function RevisionBadges( { item } ) {
+	if ( ! isAutosaveRevision( item ) ) {
+		return null;
+	}
+
+	return <Badge intent="none">{ __( 'Autosave' ) }</Badge>;
+}
+
 export default function PostRevisionsTimeline() {
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
 	const [ view, setView ] = useState( baseView );
 
-	const { revisions, revisionKey, currentRevisionId, currentRevision } =
-		useSelect( ( select ) => {
+	const { revisions, revisionKey, currentRevisionId } = useSelect(
+		( select ) => {
 			const { getCurrentPostType } = select( editorStore );
 			const {
 				getCurrentRevisionId: _getCurrentRevisionId,
-				getCurrentRevision,
 				getRevisionPage,
 				getPageRevisions,
 			} = unlock( select( editorStore ) );
@@ -65,13 +77,10 @@ export default function PostRevisionsTimeline() {
 				revisions: getPageRevisions( getRevisionPage() ),
 				revisionKey: _revisionKey,
 				currentRevisionId: _currentRevisionId,
-				currentRevision: _currentRevisionId
-					? getCurrentRevision()
-					: undefined,
 			};
-		}, [] );
-
-	const postContent = currentRevision?.content?.raw;
+		},
+		[]
+	);
 
 	const isLoading = ! revisions;
 
@@ -83,14 +92,30 @@ export default function PostRevisionsTimeline() {
 				// Return the humanized label the row renders so the picker
 				// option's accessible name announces e.g. "5 minutes ago"
 				// instead of the raw ISO timestamp.
-				getValue: ( { item } ) => getDisplayDate( item.date ),
+				getValue: ( { item } ) => {
+					const displayDate = getDisplayDate( item.date );
+
+					if ( ! isAutosaveRevision( item ) ) {
+						return displayDate;
+					}
+
+					return sprintf(
+						/* translators: 1: revision date, 2: revision type. */
+						__( '%1$s, %2$s' ),
+						displayDate,
+						__( 'Autosave' )
+					);
+				},
 				render: ( { item } ) => (
-					<Text
-						variant="heading-sm"
-						render={ <time dateTime={ item.date } /> }
-					>
-						{ getDisplayDate( item.date ) }
-					</Text>
+					<Stack direction="row" align="center" gap="sm">
+						<Text
+							variant="heading-sm"
+							render={ <time dateTime={ item.date } /> }
+						>
+							{ getDisplayDate( item.date ) }
+						</Text>
+						<RevisionBadges item={ item } />
+					</Stack>
 				),
 				enableSorting: false,
 				enableHiding: false,
@@ -107,14 +132,16 @@ export default function PostRevisionsTimeline() {
 						return null;
 					}
 					return (
-						<PostContentInformationUI postContent={ postContent } />
+						<PostContentInformationUI
+							postContent={ item.content?.raw }
+						/>
 					);
 				},
 				enableSorting: false,
 				enableHiding: false,
 			},
 		],
-		[ revisionKey, currentRevisionId, postContent ]
+		[ revisionKey, currentRevisionId ]
 	);
 
 	const { data: shownRevisions, paginationInfo } = useMemo(
