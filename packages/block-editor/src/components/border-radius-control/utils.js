@@ -152,17 +152,6 @@ export function hasDefinedValues( values ) {
 }
 
 /**
- * Checks is given value is a radius preset.
- *
- * @param {string} value Value to check
- *
- * @return {boolean} Return true if value is string in format var:preset|border-radius|.
- */
-export function isValuePreset( value ) {
-	return isPresetValue( value, BORDER_RADIUS_PRESET_TYPE );
-}
-
-/**
  * Returns the slug section of the given preset string.
  *
  * @param {string} value Value to extract slug from.
@@ -265,7 +254,7 @@ export function convertPresetsToCustomValues( values, presets ) {
 	const converted = {};
 	Object.keys( values ).forEach( ( key ) => {
 		const value = values[ key ];
-		if ( isValuePreset( value ) ) {
+		if ( isPresetValue( value, BORDER_RADIUS_PRESET_TYPE ) ) {
 			const customValue = getCustomValueFromPreset( value, presets );
 			converted[ key ] = customValue !== undefined ? customValue : value;
 		} else {
