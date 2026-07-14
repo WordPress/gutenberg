@@ -808,7 +808,9 @@ describe( 'saveEntityRecord', () => {
 			updatedRecord,
 			undefined,
 			true,
-			post
+			post,
+			undefined,
+			null
 		);
 
 		expect( result ).toBe( updatedRecord );
@@ -917,7 +919,9 @@ describe( 'saveEntityRecord', () => {
 			updatedRecord,
 			undefined,
 			true,
-			post
+			post,
+			undefined,
+			null
 		);
 
 		expect( result ).toBe( updatedRecord );
@@ -953,6 +957,7 @@ describe( 'saveEntityRecord', () => {
 		};
 		const select = {
 			getRawEntityRecord: () => post,
+			getEntityRecordNonTransientEdits: () => ( {} ),
 		};
 		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
 
@@ -978,6 +983,89 @@ describe( 'saveEntityRecord', () => {
 			title: 'synced title',
 		} );
 		expect( result ).toBe( staleSaveResponse );
+	} );
+
+	it( 'captures the edit generation and excludes edits remaining after a PUT from sync updates', async () => {
+		const post = {
+			id: 10,
+			title: 'title before pre-persist',
+			content: 'content sent to the server',
+		};
+		const persistedRecord = {
+			id: 10,
+			title: 'persisted title',
+			content: 'persisted content',
+		};
+		const transformedPost = {
+			...post,
+			title: 'transformed title sent to the server',
+		};
+		const updatedRecord = {
+			id: 10,
+			title: 'server-normalized title',
+			content: 'server-normalized content',
+			status: 'draft',
+		};
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+				__unstablePrePersist: jest.fn( () => ( {
+					title: transformedPost.title,
+				} ) ),
+			},
+		];
+		const editsAtRequest = {
+			title: transformedPost.title,
+			content: post.content,
+		};
+		const select = {
+			getRawEntityRecord: jest.fn( () => persistedRecord ),
+			getEntityRecordEdits: jest.fn( () => editsAtRequest ),
+			getEntityRecordNonTransientEdits: jest.fn( () => ( {
+				title: 'title changed while the PUT was pending',
+			} ) ),
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+		const syncManager = { update: jest.fn() };
+
+		apiFetch.mockResolvedValue( updatedRecord );
+		getSyncManager.mockReturnValue( syncManager );
+
+		await saveEntityRecord(
+			'postType',
+			'post',
+			post
+		)( { select, dispatch, resolveSelect } );
+
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/posts/10',
+			method: 'PUT',
+			data: transformedPost,
+		} );
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			updatedRecord,
+			undefined,
+			true,
+			transformedPost,
+			undefined,
+			editsAtRequest
+		);
+		expect( syncManager.update ).toHaveBeenCalledWith(
+			'postType/post',
+			10,
+			{
+				id: 10,
+				content: 'server-normalized content',
+				status: 'draft',
+			},
+			'local-undo-ignored',
+			{ isSave: true }
+		);
 	} );
 
 	it( 'triggers a PUT request for an existing record with a custom key', async () => {
@@ -1041,7 +1129,9 @@ describe( 'saveEntityRecord', () => {
 			postType,
 			undefined,
 			true,
-			{ slug: 'page', title: 'Pages' }
+			{ slug: 'page', title: 'Pages' },
+			undefined,
+			null
 		);
 
 		expect( result ).toBe( postType );

@@ -245,6 +245,7 @@ _Parameters_
 -   _invalidateCache_ `?boolean`: Should invalidate query caches.
 -   _edits_ `?Object`: Edits to reset.
 -   _meta_ `?Object`: Meta information about pagination.
+-   _editsAtRequest_ `?Object`: Edit-state reference when the request started.
 
 _Returns_
 

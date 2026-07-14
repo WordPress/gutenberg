@@ -120,6 +120,99 @@ describe( 'entities', () => {
 		).toEqual( [ { kind: 'postType', name: 'posts' } ] );
 	} );
 
+	it( 'clears response and submitted values from an unchanged edit generation', () => {
+		let state = entities( undefined, {
+			type: 'ADD_ENTITIES',
+			entities: [ { kind: 'test', name: 'thing' } ],
+		} );
+
+		state = entities( state, {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'test',
+			name: 'thing',
+			recordId: 1,
+			edits: {
+				prePersistTransformed: 'editor value at request time',
+				responseValue: 'server response',
+				submittedValue: 'sent to the server',
+			},
+		} );
+		const editsAtRequest = state.records.test.thing.edits[ 1 ];
+
+		state = entities( deepFreeze( state ), {
+			type: 'RECEIVE_ITEMS',
+			kind: 'test',
+			name: 'thing',
+			items: {
+				id: 1,
+				prePersistTransformed: 'server-normalized value',
+				responseValue: 'server response',
+				submittedValue: 'server-normalized value',
+			},
+			persistedEdits: {
+				prePersistTransformed: 'transformed submitted value',
+				responseValue: 'submitted response value',
+				submittedValue: 'sent to the server',
+			},
+			editsAtRequest,
+		} );
+
+		expect( state.records.test.thing.edits ).toEqual( {} );
+	} );
+
+	it( 'preserves only fields edited while the request is pending', () => {
+		let state = entities( undefined, {
+			type: 'ADD_ENTITIES',
+			entities: [ { kind: 'test', name: 'thing' } ],
+		} );
+		state = entities( state, {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'test',
+			name: 'thing',
+			recordId: 1,
+			edits: {
+				content: 'submitted',
+				selection: 'old selection',
+				title: 'submitted title',
+			},
+		} );
+		const editsAtRequest = state.records.test.thing.edits[ 1 ];
+
+		state = entities( state, {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'test',
+			name: 'thing',
+			recordId: 1,
+			edits: {
+				content: 'late content',
+				selection: 'new selection',
+			},
+		} );
+		state = entities( deepFreeze( state ), {
+			type: 'RECEIVE_ITEMS',
+			kind: 'test',
+			name: 'thing',
+			items: {
+				id: 1,
+				content: 'submitted',
+				selection: undefined,
+				title: 'saved title',
+			},
+			persistedEdits: {
+				content: 'submitted',
+				title: 'submitted title',
+			},
+			editsAtRequest,
+		} );
+
+		expect( state.records.test.thing.edits ).toEqual( {
+			1: {
+				content: 'late content',
+				selection: 'new selection',
+			},
+		} );
+	} );
+
 	describe( 'entity revisions', () => {
 		const stateWithConfig = entities( undefined, {
 			type: 'ADD_ENTITIES',

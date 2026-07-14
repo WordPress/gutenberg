@@ -89,6 +89,7 @@ export function addEntities( entities ) {
  * @param {?boolean}     invalidateCache Should invalidate query caches.
  * @param {?Object}      edits           Edits to reset.
  * @param {?Object}      meta            Meta information about pagination.
+ * @param {?Object}      editsAtRequest  Edit-state reference when the request started.
  * @return {Object} Action object.
  */
 export function receiveEntityRecords(
@@ -98,7 +99,8 @@ export function receiveEntityRecords(
 	query = undefined,
 	invalidateCache = false,
 	edits = undefined,
-	meta = undefined
+	meta = undefined,
+	editsAtRequest = undefined
 ) {
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
@@ -119,6 +121,7 @@ export function receiveEntityRecords(
 		kind,
 		name,
 		invalidateCache,
+		...( editsAtRequest !== undefined ? { editsAtRequest } : {} ),
 	};
 }
 
@@ -769,6 +772,13 @@ export const saveEntityRecord =
 							) ),
 						};
 					}
+					const editsAtRequest = recordId
+						? select.getEntityRecordEdits?.(
+								kind,
+								name,
+								recordId
+						  ) ?? null
+						: null;
 					updatedRecord = await __unstableFetch( {
 						path,
 						method: recordId ? 'PUT' : 'POST',
@@ -780,15 +790,29 @@ export const saveEntityRecord =
 						updatedRecord,
 						undefined,
 						true,
-						edits
+						edits,
+						undefined,
+						editsAtRequest
 					);
 					if ( entityConfig.syncConfig ) {
+						const remainingEdits = recordId
+							? select.getEntityRecordNonTransientEdits(
+									kind,
+									name,
+									recordId
+							  ) ?? {}
+							: {};
+						const syncRecord = Object.fromEntries(
+							Object.entries( updatedRecord ).filter(
+								( [ key ] ) => ! ( key in remainingEdits )
+							)
+						);
 						// Use an untracked origin so that the save
 						// response does not create undo levels.
 						getSyncManager()?.update(
 							`${ kind }/${ name }`,
 							recordId,
-							__unstableSkipSyncUpdate ? {} : updatedRecord,
+							__unstableSkipSyncUpdate ? {} : syncRecord,
 							LOCAL_UNDO_IGNORED_ORIGIN,
 							{ isSave: true }
 						);

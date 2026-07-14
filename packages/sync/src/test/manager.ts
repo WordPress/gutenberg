@@ -33,13 +33,23 @@ import type {
 	RecordHandlers,
 	SyncConfig,
 } from '../types';
-import { serializeCrdtDoc } from '../utils';
+import { deserializeCrdtDoc, serializeCrdtDoc } from '../utils';
 
 // Mock dependencies.
 jest.mock( '../providers', () => ( {
 	getProviderCreators: jest.fn(),
 } ) );
 const mockGetProviderCreators = jest.mocked( getProviderCreators );
+
+async function createRequiredPersistedSnapshot(
+	manager: ReturnType< typeof createSyncManager >
+) {
+	const snapshot = await manager.createPersistedCRDTSnapshot( 'post', '123' );
+	if ( ! snapshot ) {
+		throw new Error( 'Expected a persisted CRDT snapshot.' );
+	}
+	return snapshot;
+}
 
 describe( 'SyncManager', () => {
 	let mockHandlers: jest.MockedObject< RecordHandlers >;
@@ -417,6 +427,685 @@ describe( 'SyncManager', () => {
 				expect( mockHandlers.persistCRDTDoc ).toHaveBeenCalledTimes(
 					1
 				);
+			} );
+		} );
+
+		describe( 'persisted CRDT access', () => {
+			function createSerializedRecordDoc( record: ObjectData ): string {
+				const doc = new Y.Doc();
+				const recordMap = doc.getMap( CRDT_RECORD_MAP_KEY );
+				Object.entries( record ).forEach( ( [ key, value ] ) => {
+					recordMap.set( key, value );
+				} );
+				const serialized = serializeCrdtDoc( doc );
+				doc.destroy();
+				return serialized;
+			}
+
+			function createLifecycleSyncConfig() {
+				return {
+					...mockSyncConfig,
+					applyChangesToCRDTDoc: jest.fn(
+						( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
+							const recordMap =
+								ydoc.getMap( CRDT_RECORD_MAP_KEY );
+							Object.entries( changes ).forEach(
+								( [ key, value ] ) => {
+									if ( key !== 'selection' ) {
+										recordMap.set( key, value );
+									}
+								}
+							);
+						}
+					),
+					getPersistedCRDTDoc: jest.fn(
+						( record: ObjectData ) =>
+							(
+								record.meta as
+									| { persisted?: string }
+									| undefined
+							 )?.persisted ?? null
+					),
+					shouldInvalidateSnapshot: (
+						changes: Partial< ObjectData >
+					) =>
+						Object.keys( changes ).some(
+							( key ) => key !== 'selection'
+						),
+				};
+			}
+
+			async function getLiveRecord(
+				manager: ReturnType< typeof createSyncManager >,
+				objectId = '123'
+			): Promise< ObjectData > {
+				const serialized = await manager.createPersistedCRDTDoc(
+					'post',
+					objectId
+				);
+				const doc = deserializeCrdtDoc( serialized ?? '' );
+				if ( ! doc ) {
+					throw new Error( 'Expected a live CRDT document.' );
+				}
+				const record = doc.getMap( CRDT_RECORD_MAP_KEY ).toJSON();
+				doc.destroy();
+				return record;
+			}
+
+			it( 'creates a detached candidate and commits it to the same live document', async () => {
+				const initialRecord = {
+					id: '123',
+					title: 'Local title',
+					meta: {},
+				};
+				const persistedDoc = new Y.Doc();
+				persistedDoc
+					.getMap( CRDT_RECORD_MAP_KEY )
+					.set( 'remoteField', 'Remote value' );
+				const serializedPersistedDoc = serializeCrdtDoc( persistedDoc );
+				const syncConfig = {
+					...mockSyncConfig,
+					applyChangesToCRDTDoc: jest.fn(
+						( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
+							const recordMap =
+								ydoc.getMap( CRDT_RECORD_MAP_KEY );
+							Object.entries( changes ).forEach(
+								( [ key, value ] ) =>
+									recordMap.set( key, value )
+							);
+						}
+					),
+					getChangesFromCRDTDoc: jest.fn( () => ( {} ) ),
+					getPersistedCRDTDoc: jest.fn(
+						( record: ObjectData ) =>
+							(
+								record.meta as
+									| { persisted?: string }
+									| undefined
+							 )?.persisted ?? null
+					),
+				};
+				const manager = createSyncManager();
+
+				await manager.load(
+					syncConfig,
+					'post',
+					'123',
+					initialRecord,
+					mockHandlers
+				);
+
+				const latestRecord = {
+					...initialRecord,
+					meta: { persisted: serializedPersistedDoc },
+				};
+				mockHandlers.persistCRDTDoc.mockClear();
+				const localSnapshot =
+					await createRequiredPersistedSnapshot( manager );
+				const candidate = await manager.createRebasedPersistedCRDTDoc(
+					'post',
+					'123',
+					latestRecord,
+					localSnapshot
+				);
+				expect( candidate?.record ).toEqual( {
+					...initialRecord,
+					remoteField: 'Remote value',
+				} );
+				expect( candidate?.serializedDoc ).toEqual(
+					expect.any( String )
+				);
+
+				const beforeCommit = deserializeCrdtDoc(
+					( await manager.createPersistedCRDTDoc( 'post', '123' ) ) ??
+						''
+				);
+				expect(
+					beforeCommit
+						?.getMap( CRDT_RECORD_MAP_KEY )
+						.has( 'remoteField' )
+				).toBe( false );
+				beforeCommit?.destroy();
+				expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
+
+				if ( ! candidate ) {
+					throw new Error( 'Expected a rebased CRDT candidate.' );
+				}
+				expect( await candidate.commit() ).toBe( true );
+				const afterCommit = deserializeCrdtDoc(
+					( await manager.createPersistedCRDTDoc( 'post', '123' ) ) ??
+						''
+				);
+				expect(
+					afterCommit
+						?.getMap( CRDT_RECORD_MAP_KEY )
+						.get( 'remoteField' )
+				).toBe( 'Remote value' );
+				afterCommit?.destroy();
+
+				// Committing the exact same Yjs update again is idempotent.
+				expect( await candidate.commit() ).toBe( true );
+				expect( mockHandlers.persistCRDTDoc ).not.toHaveBeenCalled();
+
+				persistedDoc.destroy();
+			} );
+
+			it( 'does not replace local state from an invalid persisted document during a save-time rebase', async () => {
+				const initialRecord = {
+					id: '123',
+					title: 'Unsaved local title',
+					meta: {},
+				};
+				const syncConfig = {
+					...mockSyncConfig,
+					applyChangesToCRDTDoc: jest.fn(
+						( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
+							const recordMap =
+								ydoc.getMap( CRDT_RECORD_MAP_KEY );
+							Object.entries( changes ).forEach(
+								( [ key, value ] ) =>
+									recordMap.set( key, value )
+							);
+						}
+					),
+					getPersistedCRDTDoc: jest.fn(
+						( record: ObjectData ) =>
+							(
+								record.meta as
+									| { persisted?: string }
+									| undefined
+							 )?.persisted ?? null
+					),
+				};
+				const manager = createSyncManager();
+
+				await manager.load(
+					syncConfig,
+					'post',
+					'123',
+					initialRecord,
+					mockHandlers
+				);
+				syncConfig.applyChangesToCRDTDoc.mockClear();
+				mockHandlers.persistCRDTDoc.mockClear();
+				const beforeRebase =
+					await createRequiredPersistedSnapshot( manager );
+
+				await expect(
+					manager.createRebasedPersistedCRDTDoc(
+						'post',
+						'123',
+						{
+							...initialRecord,
+							title: 'New server title',
+							meta: {
+								persisted: 'not a serialized Yjs document',
+							},
+						},
+						beforeRebase
+					)
+				).rejects.toThrow( 'Invalid persisted CRDT document.' );
+				const afterRebase = await manager.createPersistedCRDTDoc(
+					'post',
+					'123'
+				);
+				expect( JSON.parse( afterRebase ?? '' ).document ).toBe(
+					JSON.parse( beforeRebase.serializedDoc ).document
+				);
+				expect(
+					syncConfig.applyChangesToCRDTDoc
+				).not.toHaveBeenCalled();
+				expect( mockHandlers.persistCRDTDoc ).not.toHaveBeenCalled();
+			} );
+
+			it( 'rejects a valid document that is missing a required record field', async () => {
+				const initialRecord = { id: '123', content: 'Local content' };
+				const emptyDoc = new Y.Doc();
+				const serializedEmptyDoc = serializeCrdtDoc( emptyDoc );
+				const syncConfig = {
+					...mockSyncConfig,
+					getPersistedCRDTDoc: jest.fn(
+						( record: ObjectData ) =>
+							(
+								record.meta as
+									| { persisted?: string }
+									| undefined
+							 )?.persisted ?? null
+					),
+				};
+				const manager = createSyncManager();
+
+				await manager.load(
+					syncConfig,
+					'post',
+					'123',
+					initialRecord,
+					mockHandlers
+				);
+
+				await expect(
+					manager.createRebasedPersistedCRDTDoc(
+						'post',
+						'123',
+						{
+							...initialRecord,
+							meta: { persisted: serializedEmptyDoc },
+						},
+						await createRequiredPersistedSnapshot( manager ),
+						[ 'content' ]
+					)
+				).rejects.toThrow(
+					'Persisted CRDT document is missing required fields: content.'
+				);
+
+				emptyDoc.destroy();
+			} );
+
+			it( 'rejects independently initialized field roots despite unrelated shared history', async () => {
+				const commonDoc = new Y.Doc();
+				commonDoc.getMap( CRDT_RECORD_MAP_KEY ).set( 'version', 1 );
+				const serializedCommonDoc = serializeCrdtDoc( commonDoc );
+				const syncConfig = {
+					...mockSyncConfig,
+					applyChangesToCRDTDoc: jest.fn(
+						( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
+							const recordMap =
+								ydoc.getMap( CRDT_RECORD_MAP_KEY );
+							Object.entries( changes ).forEach(
+								( [ key, value ] ) => {
+									if ( key === 'content' ) {
+										recordMap.set(
+											key,
+											new Y.Text( String( value ) )
+										);
+									} else {
+										recordMap.set( key, value );
+									}
+								}
+							);
+						}
+					),
+					getChangesFromCRDTDoc: jest.fn( () => ( {} ) ),
+					getPersistedCRDTDoc: jest.fn(
+						( record: ObjectData ) =>
+							(
+								record.meta as
+									| { persisted?: string }
+									| undefined
+							 )?.persisted ?? null
+					),
+				};
+				const manager = createSyncManager();
+
+				await manager.load(
+					syncConfig,
+					'post',
+					'123',
+					{
+						id: '123',
+						meta: { persisted: serializedCommonDoc },
+					},
+					mockHandlers
+				);
+				manager.update(
+					'post',
+					'123',
+					{ content: 'local content' },
+					LOCAL_EDITOR_ORIGIN
+				);
+
+				const serverDoc = new Y.Doc();
+				Y.applyUpdateV2(
+					serverDoc,
+					Y.encodeStateAsUpdateV2( commonDoc )
+				);
+				serverDoc
+					.getMap( CRDT_RECORD_MAP_KEY )
+					.set( 'content', new Y.Text( 'server content' ) );
+				const localSnapshot =
+					await createRequiredPersistedSnapshot( manager );
+
+				await expect(
+					manager.createRebasedPersistedCRDTDoc(
+						'post',
+						'123',
+						{
+							id: '123',
+							content: 'server content',
+							meta: { persisted: serializeCrdtDoc( serverDoc ) },
+						},
+						localSnapshot,
+						[ 'content' ],
+						true,
+						[ 'content' ]
+					)
+				).rejects.toThrow(
+					'Persisted CRDT fields do not share roots with the local document: content.'
+				);
+
+				commonDoc.destroy();
+				serverDoc.destroy();
+			} );
+
+			it( 'repairs a stale candidate without persisting it during a save-time rebase', async () => {
+				const initialRecord = {
+					id: '123',
+					title: 'Unsaved local title',
+					meta: {},
+				};
+				const persistedDoc = new Y.Doc();
+				persistedDoc
+					.getMap( CRDT_RECORD_MAP_KEY )
+					.set( 'title', 'Older persisted title' );
+				const serializedPersistedDoc = serializeCrdtDoc( persistedDoc );
+				const syncConfig = {
+					...mockSyncConfig,
+					applyChangesToCRDTDoc: jest.fn(
+						( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
+							const recordMap =
+								ydoc.getMap( CRDT_RECORD_MAP_KEY );
+							Object.entries( changes ).forEach(
+								( [ key, value ] ) =>
+									recordMap.set( key, value )
+							);
+						}
+					),
+					getPersistedCRDTDoc: jest.fn(
+						( record: ObjectData ) =>
+							(
+								record.meta as
+									| { persisted?: string }
+									| undefined
+							 )?.persisted ?? null
+					),
+				};
+				const manager = createSyncManager();
+
+				await manager.load(
+					syncConfig,
+					'post',
+					'123',
+					initialRecord,
+					mockHandlers
+				);
+				syncConfig.applyChangesToCRDTDoc.mockClear();
+				mockHandlers.persistCRDTDoc.mockClear();
+				const localSnapshot =
+					await createRequiredPersistedSnapshot( manager );
+
+				const candidate = await manager.createRebasedPersistedCRDTDoc(
+					'post',
+					'123',
+					{
+						...initialRecord,
+						title: 'New server title',
+						meta: { persisted: serializedPersistedDoc },
+					},
+					localSnapshot
+				);
+				expect( candidate ).not.toBeNull();
+				expect( syncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
+					expect.any( Y.Doc ),
+					{
+						title: 'New server title',
+					}
+				);
+				expect( mockHandlers.persistCRDTDoc ).not.toHaveBeenCalled();
+
+				persistedDoc.destroy();
+			} );
+
+			it( 'rejects preparing a candidate after a deferred material edit', async () => {
+				const serializedPersistedDoc = createSerializedRecordDoc( {
+					remoteField: 'Remote value',
+				} );
+				const syncConfig = createLifecycleSyncConfig();
+				const manager = createSyncManager();
+
+				await manager.load(
+					syncConfig,
+					'post',
+					'123',
+					mockRecord,
+					mockHandlers
+				);
+				mockHandlers.editRecord.mockClear();
+				const localSnapshot =
+					await createRequiredPersistedSnapshot( manager );
+
+				manager.update(
+					'post',
+					'123',
+					{ title: 'Late local title' },
+					LOCAL_EDITOR_ORIGIN
+				);
+
+				await expect(
+					manager.createRebasedPersistedCRDTDoc(
+						'post',
+						'123',
+						{
+							...mockRecord,
+							remoteField: 'Remote value',
+							meta: { persisted: serializedPersistedDoc },
+						},
+						localSnapshot
+					)
+				).rejects.toThrow(
+					'Local record changed while checking the latest record.'
+				);
+
+				expect( await getLiveRecord( manager ) ).toMatchObject( {
+					title: 'Late local title',
+				} );
+				expect( await getLiveRecord( manager ) ).not.toHaveProperty(
+					'remoteField'
+				);
+				expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
+			} );
+
+			it( 'does not invalidate a snapshot for a selection-only update', async () => {
+				const serializedPersistedDoc = createSerializedRecordDoc( {
+					remoteField: 'Remote value',
+				} );
+				const syncConfig = createLifecycleSyncConfig();
+				const manager = createSyncManager();
+
+				await manager.load(
+					syncConfig,
+					'post',
+					'123',
+					mockRecord,
+					mockHandlers
+				);
+				const localSnapshot =
+					await createRequiredPersistedSnapshot( manager );
+				manager.update(
+					'post',
+					'123',
+					{ selection: { anchor: 1 } },
+					LOCAL_EDITOR_ORIGIN
+				);
+
+				const candidate = await manager.createRebasedPersistedCRDTDoc(
+					'post',
+					'123',
+					{
+						...mockRecord,
+						remoteField: 'Remote value',
+						meta: { persisted: serializedPersistedDoc },
+					},
+					localSnapshot
+				);
+
+				expect( candidate ).not.toBeNull();
+				expect( await candidate?.commit() ).toBe( true );
+				expect( await getLiveRecord( manager ) ).toMatchObject( {
+					remoteField: 'Remote value',
+				} );
+			} );
+
+			it( 'does not commit a candidate after a late material update', async () => {
+				const serializedPersistedDoc = createSerializedRecordDoc( {
+					remoteField: 'Remote value',
+				} );
+				const syncConfig = createLifecycleSyncConfig();
+				const manager = createSyncManager();
+
+				await manager.load(
+					syncConfig,
+					'post',
+					'123',
+					mockRecord,
+					mockHandlers
+				);
+				mockHandlers.editRecord.mockClear();
+				const localSnapshot =
+					await createRequiredPersistedSnapshot( manager );
+				const candidate = await manager.createRebasedPersistedCRDTDoc(
+					'post',
+					'123',
+					{
+						...mockRecord,
+						remoteField: 'Remote value',
+						meta: { persisted: serializedPersistedDoc },
+					},
+					localSnapshot
+				);
+				if ( ! candidate ) {
+					throw new Error( 'Expected a rebased CRDT candidate.' );
+				}
+
+				manager.update(
+					'post',
+					'123',
+					{ title: 'Late local title' },
+					LOCAL_EDITOR_ORIGIN
+				);
+				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+				expect( await candidate.commit() ).toBe( false );
+				expect( await getLiveRecord( manager ) ).toMatchObject( {
+					title: 'Late local title',
+				} );
+				expect( await getLiveRecord( manager ) ).not.toHaveProperty(
+					'remoteField'
+				);
+				expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
+			} );
+
+			it( 'rechecks the snapshot after awaiting the edited record during commit', async () => {
+				const serializedPersistedDoc = createSerializedRecordDoc( {
+					remoteField: 'Remote value',
+				} );
+				const syncConfig = createLifecycleSyncConfig();
+				const manager = createSyncManager();
+
+				await manager.load(
+					syncConfig,
+					'post',
+					'123',
+					mockRecord,
+					mockHandlers
+				);
+				mockHandlers.editRecord.mockClear();
+				const localSnapshot =
+					await createRequiredPersistedSnapshot( manager );
+				const candidate = await manager.createRebasedPersistedCRDTDoc(
+					'post',
+					'123',
+					{
+						...mockRecord,
+						remoteField: 'Remote value',
+						meta: { persisted: serializedPersistedDoc },
+					},
+					localSnapshot
+				);
+				if ( ! candidate ) {
+					throw new Error( 'Expected a rebased CRDT candidate.' );
+				}
+
+				let resolveEditedRecord:
+					| ( ( record: ObjectData ) => void )
+					| undefined;
+				const editedRecord = new Promise< ObjectData >( ( resolve ) => {
+					resolveEditedRecord = resolve;
+				} );
+				mockHandlers.getEditedRecord.mockReturnValueOnce(
+					editedRecord
+				);
+				const commit = candidate.commit();
+				expect( mockHandlers.getEditedRecord ).toHaveBeenCalled();
+
+				manager.update(
+					'post',
+					'123',
+					{ title: 'Late local title' },
+					LOCAL_EDITOR_ORIGIN
+				);
+				resolveEditedRecord?.( mockRecord );
+
+				expect( await commit ).toBe( false );
+				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+				expect( await getLiveRecord( manager ) ).toMatchObject( {
+					title: 'Late local title',
+				} );
+				expect( await getLiveRecord( manager ) ).not.toHaveProperty(
+					'remoteField'
+				);
+				expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
+			} );
+
+			it( 'rejects a snapshot captured for a different entity', async () => {
+				const serializedPersistedDoc = createSerializedRecordDoc( {
+					remoteField: 'Remote value',
+				} );
+				const syncConfig = createLifecycleSyncConfig();
+				const manager = createSyncManager();
+				const otherRecord = {
+					id: '456',
+					title: 'Other post',
+					meta: {},
+				};
+				const otherHandlers = {
+					...mockHandlers,
+					getEditedRecord: jest.fn( async () => otherRecord ),
+				};
+
+				await manager.load(
+					syncConfig,
+					'post',
+					'123',
+					mockRecord,
+					mockHandlers
+				);
+				await manager.load(
+					syncConfig,
+					'post',
+					'456',
+					otherRecord,
+					otherHandlers
+				);
+				const snapshot =
+					await createRequiredPersistedSnapshot( manager );
+
+				await expect(
+					manager.createRebasedPersistedCRDTDoc(
+						'post',
+						'456',
+						{
+							...otherRecord,
+							remoteField: 'Remote value',
+							meta: { persisted: serializedPersistedDoc },
+						},
+						snapshot
+					)
+				).rejects.toThrow(
+					'Local CRDT snapshot does not belong to this entity.'
+				);
+				expect(
+					await getLiveRecord( manager, '456' )
+				).not.toHaveProperty( 'remoteField' );
 			} );
 		} );
 	} );

@@ -772,11 +772,12 @@ test.describe( 'Pattern Overrides', () => {
 			attributes: { ref: id },
 		} );
 
-		// Focus the button, open the link popup.
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Button' } )
-			.getByRole( 'textbox', { name: 'Button text' } )
-			.focus();
+		// Select the button, open the link popup.
+		const buttonBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Button',
+			exact: true,
+		} );
+		await editor.selectBlocks( buttonBlock );
 		await expect(
 			page.getByRole( 'link', { name: 'wp.org' } ).getByText( '↗' )
 		).toHaveAttribute( 'aria-label', '(opens in a new tab)' );
@@ -826,6 +827,7 @@ test.describe( 'Pattern Overrides', () => {
 		await expect( buttonLink ).toHaveAttribute( 'rel', 'noopener' );
 
 		// Uncheck both checkboxes.
+		await editor.selectBlocks( buttonBlock );
 		await editLinkButton.click();
 		await openInNewTabCheckbox.setChecked( false );
 		await saveLinkButton.click();
@@ -842,6 +844,7 @@ test.describe( 'Pattern Overrides', () => {
 		await expect( buttonLink ).toHaveAttribute( 'rel', '' );
 
 		// Check only the "mark as nofollow" checkbox.
+		await editor.selectBlocks( buttonBlock );
 		await editLinkButton.click();
 		await markAsNoFollowCheckbox.setChecked( true );
 		await saveLinkButton.click();
