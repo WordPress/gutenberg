@@ -306,12 +306,17 @@ test.describe( 'Block Notes', () => {
 				page.getByRole( 'option', { name: 'Mentionable Teammate' } )
 			).toBeVisible();
 
-			// Narrow the suggestions and pick the teammate.
+			/*
+			 * Narrow the suggestions and pick the teammate by clicking its
+			 * option. The suggestion list refetches per keystroke, briefly
+			 * closing and reordering, so pressing Enter can race the refresh
+			 * and hit a stale (or no) selection; clicking the named option
+			 * retries until it is actionable.
+			 */
 			await page.keyboard.type( 'Menti' );
-			await expect(
-				page.getByRole( 'option', { name: 'Mentionable Teammate' } )
-			).toBeVisible();
-			await page.keyboard.press( 'Enter' );
+			await page
+				.getByRole( 'option', { name: 'Mentionable Teammate' } )
+				.click();
 
 			/*
 			 * The completer inserts the mention as a chip: a link to the
@@ -1910,10 +1915,16 @@ test.describe( 'Block Notes', () => {
 			await editor.saveDraft();
 			const postId = new URL( page.url() ).searchParams.get( 'post' );
 
-			const [ note ] = await requestUtils.rest( {
+			const notes = await requestUtils.rest( {
 				path: '/wp/v2/comments',
-				params: { type: 'note', post: postId, per_page: 1 },
+				params: {
+					type: 'note',
+					post: postId,
+					status: 'all',
+					context: 'edit',
+				},
 			} );
+			const note = notes.find( ( { parent } ) => parent === 0 );
 
 			// Load the editor through the URL a mention notification email
 			// links to; the linked thread should open focused.
