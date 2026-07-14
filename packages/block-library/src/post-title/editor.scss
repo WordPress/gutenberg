@@ -1,0 +1,8 @@
+// `RichText` cannot be used with an inline container, so the editable Post Title
+// link needs a non-inline display **in the editor** (see
+// https://github.com/WordPress/gutenberg/pull/30666). This rule is editor-only:
+// on the front end the link stays inline so its text can wrap around floats and
+// `shape-outside` (see https://github.com/WordPress/gutenberg/issues/79372).
+.wp-block-post-title :where(a) {
+	display: inline-block;
+}
