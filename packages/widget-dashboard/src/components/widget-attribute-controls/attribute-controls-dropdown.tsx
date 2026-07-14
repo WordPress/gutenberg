@@ -7,7 +7,13 @@ import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 /* eslint-disable @wordpress/use-recommended-components -- Dashboard is still experimental. */
-import { IconButton, Popover, Stack, VisuallyHidden } from '@wordpress/ui';
+import {
+	Button,
+	IconButton,
+	Popover,
+	Stack,
+	VisuallyHidden,
+} from '@wordpress/ui';
 /* eslint-enable @wordpress/use-recommended-components */
 
 /**
@@ -84,7 +90,7 @@ export function AttributeControlsDropdown( {
 				className={ styles[ 'dropdown-popup' ] }
 				positioner={ <Popover.Positioner side="bottom" align="end" /> }
 			>
-				<Stack direction="column" align="stretch" gap="sm">
+				<Stack direction="column" gap="md" align="baseline">
 					<VisuallyHidden render={ <Popover.Title /> }>
 						{ __( 'Widget controls' ) }
 					</VisuallyHidden>
@@ -95,6 +101,13 @@ export function AttributeControlsDropdown( {
 						form={ form }
 						onChange={ onChange }
 					/>
+
+					<Button
+						variant="minimal"
+						onClick={ () => onOpenChange( false ) }
+					>
+						{ __( 'Close' ) }
+					</Button>
 				</Stack>
 			</Popover.Popup>
 		</Popover.Root>
