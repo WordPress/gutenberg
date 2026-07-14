@@ -1,94 +1,90 @@
-export type FontSizePickerProps = {
-	/**
-	 * If `true`, it will not be possible to choose a custom fontSize. The user
-	 * will be forced to pick one of the pre-defined sizes passed in fontSizes.
-	 *
-	 * @default false
-	 */
-	disableCustomFontSizes?: boolean;
-	/**
-	 * If no value exists, this prop defines the starting position for the font
-	 * size picker slider. Only relevant if `withSlider` is `true`.
-	 */
-	fallbackFontSize?: number;
-	/**
-	 * An array of font size objects. The object should contain properties size,
-	 * name, and slug.
-	 */
-	fontSizes?: FontSize[];
-	/**
-	 * A function that receives the new font size value.
-	 * If onChange is called without any parameter, it should reset the value,
-	 * attending to what reset means in that context, e.g., set the font size to
-	 * undefined or set the font size a starting value.
-	 */
-	onChange?: (
-		value: number | string | undefined,
-		selectedItem?: FontSize
-	) => void;
-	/**
-	 * Available units for custom font size selection.
-	 *
-	 * @default [ 'px', 'em', 'rem', 'vw', 'vh' ]
-	 */
-	units?: string[];
-	/**
-	 * The current font size value.
-	 *
-	 * Note: For the `units` property to work, the current font size value must be specified
-	 * as strings with units (e.g., '12px' instead of 12). When the font size is provided
-	 * as a number, the component operates in "unitless mode" where the `units` property has no effect.
-	 */
-	value?: number | string;
-	/**
-	 * Determines how the `value` prop should be interpreted.
-	 * - `'literal'`: The `value` prop contains the actual font size value (number or string)
-	 * - `'slug'`: The `value` prop contains the slug of the selected font size
-	 *
-	 * @default 'literal'
-	 */
-	valueMode?: 'literal' | 'slug';
-	/**
-	 * If `true`, a slider will be displayed alongside the input field when a
-	 * custom font size is active. Has no effect when `disableCustomFontSizes`
-	 * is `true`.
-	 *
-	 * @default false
-	 */
-	withSlider?: boolean;
-	/**
-	 * If `true`, a reset button will be displayed alongside the input field
-	 * when a custom font size is active. Has no effect when
-	 * `disableCustomFontSizes` is `true`.
-	 *
-	 * @default true
-	 */
-	withReset?: boolean;
-	/**
-	 * Start opting into the new margin-free styles that will become the default
-	 * in a future version, currently scheduled to be WordPress 6.4. (The prop
-	 * can be safely removed once this happens.)
-	 *
-	 * @default false
-	 * @deprecated Default behavior since WP 6.5. Prop can be safely removed.
-	 * @ignore
-	 */
-	__nextHasNoMarginBottom?: boolean;
-	/**
-	 * Start opting into the larger default height that will become the default size in a future version.
-	 *
-	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
-	 * @ignore
-	 */
-	__next40pxDefaultSize?: boolean;
-	/**
-	 * Size of the control.
-	 *
-	 * @deprecated This prop no longer has any effect.
-	 * @ignore
-	 */
-	size?: 'default' | '__unstable-large';
-};
+/**
+ * Internal dependencies
+ */
+import type { ToggleGroupControlProps } from '../toggle-group-control/types';
+import type { UnitControlProps } from '../unit-control/types';
+
+export type FontSizePickerProps = Pick<
+	UnitControlProps,
+	'__next40pxDefaultSize'
+> &
+	Pick< ToggleGroupControlProps, 'size' > & {
+		/**
+		 * If `true`, it will not be possible to choose a custom fontSize. The user
+		 * will be forced to pick one of the pre-defined sizes passed in fontSizes.
+		 *
+		 * @default false
+		 */
+		disableCustomFontSizes?: boolean;
+		/**
+		 * If no value exists, this prop defines the starting position for the font
+		 * size picker slider. Only relevant if `withSlider` is `true`.
+		 */
+		fallbackFontSize?: number;
+		/**
+		 * An array of font size objects. The object should contain properties size,
+		 * name, and slug.
+		 */
+		fontSizes?: FontSize[];
+		/**
+		 * A function that receives the new font size value.
+		 * If onChange is called without any parameter, it should reset the value,
+		 * attending to what reset means in that context, e.g., set the font size to
+		 * undefined or set the font size a starting value.
+		 */
+		onChange?: (
+			value: number | string | undefined,
+			selectedItem?: FontSize
+		) => void;
+		/**
+		 * Available units for custom font size selection.
+		 *
+		 * @default [ 'px', 'em', 'rem', 'vw', 'vh' ]
+		 */
+		units?: string[];
+		/**
+		 * The current font size value.
+		 *
+		 * Note: For the `units` property to work, the current font size value must be specified
+		 * as strings with units (e.g., '12px' instead of 12). When the font size is provided
+		 * as a number, the component operates in "unitless mode" where the `units` property has no effect.
+		 */
+		value?: number | string;
+		/**
+		 * Determines how the `value` prop should be interpreted.
+		 * - `'literal'`: The `value` prop contains the actual font size value (number or string)
+		 * - `'slug'`: The `value` prop contains the slug of the selected font size
+		 *
+		 * @default 'literal'
+		 */
+		valueMode?: 'literal' | 'slug';
+		/**
+		 * If `true`, a slider will be displayed alongside the input field when a
+		 * custom font size is active. Has no effect when `disableCustomFontSizes`
+		 * is `true`.
+		 *
+		 * @default false
+		 */
+		withSlider?: boolean;
+		/**
+		 * If `true`, a reset button will be displayed alongside the input field
+		 * when a custom font size is active. Has no effect when
+		 * `disableCustomFontSizes` is `true`.
+		 *
+		 * @default true
+		 */
+		withReset?: boolean;
+		/**
+		 * Start opting into the new margin-free styles that will become the default
+		 * in a future version, currently scheduled to be WordPress 6.4. (The prop
+		 * can be safely removed once this happens.)
+		 *
+		 * @default false
+		 * @deprecated Default behavior since WP 6.5. Prop can be safely removed.
+		 * @ignore
+		 */
+		__nextHasNoMarginBottom?: boolean;
+	};
 
 export type FontSize = {
 	/**
