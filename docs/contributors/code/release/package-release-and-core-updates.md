@@ -46,23 +46,25 @@ Before restarting any mutating step, inspect the npm registry state for the pack
 For one package:
 
 ```sh
-npm view @wordpress/components@X.Y.Z version
+git rev-parse HEAD
+npm view @wordpress/components@X.Y.Z version gitHead --json
 npm dist-tag ls @wordpress/components
 ```
 
 To inspect all package versions from the current release branch:
 
 ```sh
+git rev-parse HEAD
 npx lerna list --json --no-private | jq -r '.[] | "\(.name)@\(.version)"' | while read package_version; do
 	package="${package_version%@*}"
 	version="${package_version##*@}"
 	echo "$package@$version"
-	npm view "$package@$version" version || true
+	npm view "$package@$version" version gitHead --json || true
 	npm dist-tag ls "$package"
 done
 ```
 
-Resume from the package versions that already exist on npm. If the expected versions exist and the expected dist-tags point to them, continue either with [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package), which publishes local package versions that are not yet on npm and skips the ones that already made it, or the workflow's generated recovery command when one is printed.
+Resume only when each target already on npm reports the expected version, its registry `gitHead` matches the prepared release commit printed by `git rev-parse HEAD`, and the expected dist-tag points to it. Then continue either with [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package), which publishes local package versions that are not yet on npm and skips the ones that already made it, or the workflow's generated recovery command when one is printed.
 
 When a workflow run prints branch or package-tag recovery commands after npm publishing succeeds but Git metadata publication fails, prefer those run-specific commands over starting a fresh release.
 

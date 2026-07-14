@@ -749,7 +749,7 @@ async function runNpmPublishPreflight(
 			throw new Error(
 				`${ name }@${ version } exists in the npm registry, but dist-tag "${ distTag }" points to ${
 					distTags[ distTag ] || 'nothing'
-				}. This release is no longer retryable because the dist-tag has moved.`
+				}. If another release moved the dist-tag, this prepared release is not safe to resume.`
 			);
 		}
 		publishedPackageNames.push( name );

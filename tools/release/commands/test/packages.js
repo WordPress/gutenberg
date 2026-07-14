@@ -348,7 +348,7 @@ describe( 'runNpmPublishPreflight', () => {
 				{ commandFn }
 			)
 		).rejects.toThrow(
-			'@wordpress/a11y@4.50.0 exists in the npm registry, but dist-tag "latest" points to 4.49.0. This release is no longer retryable because the dist-tag has moved.'
+			'@wordpress/a11y@4.50.0 exists in the npm registry, but dist-tag "latest" points to 4.49.0. If another release moved the dist-tag, this prepared release is not safe to resume.'
 		);
 		expect( console ).toHaveLogged();
 	} );
