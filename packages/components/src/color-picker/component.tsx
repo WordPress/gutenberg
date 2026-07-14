@@ -98,49 +98,41 @@ const UnconnectedColorPicker = (
 	// distinguish our own updates from external prop changes.
 	const lastProducedHexRef = useRef( safeColordColor.toHex() );
 
+	// While the user is dragging the visual picker, ignore color-prop sync.
+	const isPickerInteractingRef = useRef( false );
+
 	// Sync internalHSLA when the color prop changes externally (e.g.
 	// parent passes a new color that wasn't produced by our onChange).
 	useEffect( () => {
-		const incomingHex = safeColordColor.toHex();
+		if ( isPickerInteractingRef.current ) {
+			return;
+		}
 
-		// If this hex matches what we last produced, it's our own
-		// update arriving back — skip the sync to avoid overwriting
-		// internalHSLA with lossy round-tripped values.
-		if ( incomingHex === lastProducedHexRef.current ) {
+		// Compare by color equality, not hex string — rgb()/rgba()
+		// round-trips can differ in string form for the same color.
+		if ( safeColordColor.isEqual( lastProducedHexRef.current ) ) {
 			return;
 		}
 
 		// Genuinely external change — sync internalHSLA.
-		lastProducedHexRef.current = incomingHex;
+		lastProducedHexRef.current = safeColordColor.toHex();
 		const externalHSLA = safeColordColor.toHsl();
 		setInternalHSLA( ( prev ) => mergeHSLA( externalHSLA, prev ) );
 	}, [ safeColordColor ] );
 
-	// Handler for HSL-aware components (Picker, HSL inputs) that
-	// provide raw HSLA values without information loss.
-	// Uses direct setColor (not debounced) to prevent race conditions
-	// where a stale debounced hex would overwrite newer internalHSLA.
-	// This is safe performance-wise because react-colorful internally
-	// throttles its onChange callbacks using requestAnimationFrame.
-
+	// Handler for HSL inputs (and the HSVA picker after conversion to HSLA).
+	// Updates the local HSLA state, then notifies the parent only when the
+	// resulting color changes. Uses setColor directly (not debounced) to
+	// avoid races with the debounced hex/RGB updates.
 	const handleHSLAChange = useCallback(
 		( nextHSLA: HslaColor ) => {
-			setInternalHSLA( ( prev ) => {
-				const isPositionalDrag =
-					nextHSLA.s !== prev.s || nextHSLA.l !== prev.l;
-				const stabilizedHSLA = isPositionalDrag
-					? mergeHSLA( nextHSLA, prev )
-					: nextHSLA;
-				const previousHex = lastProducedHexRef.current;
-				const nextHex = colord( stabilizedHSLA ).toHex();
-
-				if ( nextHex !== previousHex ) {
-					lastProducedHexRef.current = nextHex;
-					setColor( nextHex );
-				}
-
-				return stabilizedHSLA;
-			} );
+			setInternalHSLA( nextHSLA );
+			const previousHex = lastProducedHexRef.current;
+			const nextHex = colord( nextHSLA ).toHex();
+			if ( ! colord( nextHex ).isEqual( previousHex ) ) {
+				lastProducedHexRef.current = nextHex;
+				setColor( nextHex );
+			}
 		},
 		[ setColor ]
 	);
@@ -217,6 +209,12 @@ const UnconnectedColorPicker = (
 				onChange={ handleHSLAChange }
 				hsla={ internalHSLA }
 				enableAlpha={ enableAlpha }
+				onInteractionStart={ () => {
+					isPickerInteractingRef.current = true;
+				} }
+				onInteractionEnd={ () => {
+					isPickerInteractingRef.current = false;
+				} }
 			/>
 			<AuxiliaryColorArtefactWrapper>
 				<AuxiliaryColorArtefactHStackHeader justify="space-between">
