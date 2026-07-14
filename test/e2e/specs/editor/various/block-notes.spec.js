@@ -1891,6 +1891,199 @@ test.describe( 'Block Notes', () => {
 			await expect.poll( alphaOf ).toBeGreaterThan( 0.4 );
 		} );
 	} );
+
+	test.describe( 'Note unread indicators', () => {
+		test( 'shows an unread dot for a reply from another user, and clears it on click', async ( {
+			page,
+			browser,
+			blockNoteUtils,
+			requestUtils,
+		} ) => {
+			const otherUsername = `notes-test-${ Date.now() }`;
+			const otherPassword = 'testpassword';
+			await requestUtils.rest( {
+				path: '/wp/v2/users',
+				method: 'POST',
+				data: {
+					username: otherUsername,
+					email: `${ otherUsername }@example.com`,
+					password: otherPassword,
+					roles: [ 'editor' ],
+				},
+			} );
+
+			const otherContext = await browser.newContext();
+
+			await otherContext.request.post( '/wp-login.php', {
+				form: {
+					log: otherUsername,
+					pwd: otherPassword,
+					'wp-submit': 'Log In',
+					redirect_to: '/wp-admin/',
+					testcookie: '1',
+				},
+			} );
+
+			const otherPage = await otherContext.newPage();
+
+			// Admin creates the post and note.
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Click to clear unread' },
+				comment: 'Note to click',
+			} );
+
+			const postId = await page.evaluate( () =>
+				window.wp.data.select( 'core/editor' ).getCurrentPostId()
+			);
+
+			await otherPage.goto(
+				`/wp-admin/post.php?post=${ postId }&action=edit`
+			);
+
+			await otherPage.evaluate( () => {
+				window.wp.data
+					.dispatch( 'core/preferences' )
+					.set( 'core/edit-post', 'welcomeGuide', false );
+			} );
+			await otherPage.reload();
+
+			const otherToggle = otherPage
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'All notes', exact: true } );
+			await otherToggle.click();
+
+			const otherThread = otherPage
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Note to click' } );
+
+			await expect(
+				otherThread.locator(
+					'.editor-collab-sidebar-panel__unread-dot'
+				)
+			).toBeVisible();
+
+			await otherThread.click();
+			await expect( otherThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+
+			await otherPage.keyboard.press( 'Escape' );
+			await expect( otherThread ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+
+			await otherContext.close();
+		} );
+
+		test( 'should clear unread dot when note thread is resolved', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Resolve clears unread' },
+				comment: 'Note to resolve',
+			} );
+			await blockNoteUtils.openBlockNoteSidebar();
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', {
+					name: 'Note: Note to resolve',
+				} );
+
+			// Own note: should not be unread.
+			await expect(
+				thread.locator( '.editor-collab-sidebar-panel__unread-dot' )
+			).toBeHidden();
+
+			// Expand the thread so the resolve button is visible.
+			await thread.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			const resolveButton = page.getByRole( 'button', {
+				name: 'Resolve',
+			} );
+			await resolveButton.click();
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note marked as resolved.' } )
+			).toBeVisible();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+		} );
+
+		test( 'should clear unread dot when replying to a note', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Reply clears unread' },
+				comment: 'Note to reply to',
+			} );
+
+			// addBlockWithNote already has the sidebar open and the thread expanded.
+			const commentForm = page.getByRole( 'textbox', {
+				name: 'Reply to',
+			} );
+			await commentForm.fill( 'My reply' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Reply', exact: true } )
+				.click();
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reply added.' } )
+			).toBeVisible();
+		} );
+
+		test( 'should not show unread dot for a resolved last reply', async ( {
+			page,
+			editor,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Resolved reply test' },
+				comment: 'Note to resolve again',
+			} );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', {
+					name: 'Note: Note to resolve again',
+				} );
+
+			// addBlockWithNote already has the thread expanded and resolve button visible.
+			const resolveButton = page.getByRole( 'button', {
+				name: 'Resolve',
+			} );
+			await resolveButton.click();
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note marked as resolved.' } )
+			).toBeVisible();
+
+			// [PERSON_NAME] so the thread collapses and shows the lastReply.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.focus();
+
+			// The last reply is a resolution note — should NOT show the unread dot.
+			await expect(
+				thread.locator( '.editor-collab-sidebar-panel__unread-dot' )
+			).toBeHidden();
+		} );
+	} );
 } );
 
 class BlockNoteUtils {
