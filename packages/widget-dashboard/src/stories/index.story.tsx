@@ -303,7 +303,7 @@ const INITIAL_LAYOUT: DashboardWidget[] = [
 ];
 
 const meta: Meta< typeof WidgetDashboard > = {
-	title: 'Widget Dashboard/WidgetDashboard',
+	title: 'Widget Dashboard',
 	component: WidgetDashboard,
 	tags: [ 'status-experimental' ],
 	parameters: {
