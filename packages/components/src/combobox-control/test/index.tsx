@@ -271,7 +271,7 @@ describe.each( [
 		await user.keyboard( '{Enter}' );
 
 		expect(
-			screen.getByText( 'Item selected.', {
+			await screen.findByText( 'Item selected.', {
 				selector: '[aria-live]',
 			} )
 		).toBeInTheDocument();

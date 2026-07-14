@@ -1,12 +1,14 @@
 /**
  * Internal dependencies
  */
-import clear from './clear';
 import filterMessage from './filter-message';
+import { enqueuePolite } from './queue';
 
 /**
  * Allows you to easily announce dynamic interface updates to screen readers using ARIA live regions.
  * This module is inspired by the `speak` function in `wp-a11y.js`.
+ * Polite announcements are queued and written asynchronously so rapid calls are announced in order.
+ * Assertive announcements are written immediately.
  *
  * @param message    The message to be announced by assistive technologies.
  * @param [ariaLive] The politeness level for aria-live; default: 'polite'.
@@ -26,31 +28,31 @@ export function speak(
 	message: string,
 	ariaLive?: 'polite' | 'assertive'
 ): void {
-	/*
-	 * Clear previous messages to allow repeated strings being read out and hide
-	 * the explanatory text from assistive technologies.
-	 */
-	clear();
-
 	message = filterMessage( message );
 
-	const introText = document.getElementById( 'a11y-speak-intro-text' );
-	const containerAssertive = document.getElementById(
-		'a11y-speak-assertive'
-	);
-	const containerPolite = document.getElementById( 'a11y-speak-polite' );
+	if ( ariaLive === 'assertive' ) {
+		/*
+		 * Assertive announcements are written synchronously so screen readers
+		 * can interrupt immediately. The polite queue is deliberately left
+		 * untouched so queued polite messages are not lost.
+		 */
+		const assertive = document.getElementById( 'a11y-speak-assertive' );
+		const polite = document.getElementById( 'a11y-speak-polite' );
+		const introText = document.getElementById( 'a11y-speak-intro-text' );
+		const destination = assertive ?? polite;
 
-	if ( containerAssertive && ariaLive === 'assertive' ) {
-		containerAssertive.textContent = message;
-	} else if ( containerPolite ) {
-		containerPolite.textContent = message;
-	}
+		if ( destination ) {
+			destination.textContent = message;
+		}
 
-	/*
-	 * Make the explanatory text available to assistive technologies by removing
-	 * the 'hidden' HTML attribute.
-	 */
-	if ( introText ) {
-		introText.removeAttribute( 'hidden' );
+		if ( introText ) {
+			introText.removeAttribute( 'hidden' );
+		}
+	} else {
+		/*
+		 * Polite messages are serialized through a queue. The queue owns the
+		 * clear-fill cycle so rapid speak() calls do not drop messages.
+		 */
+		enqueuePolite( message );
 	}
 }
