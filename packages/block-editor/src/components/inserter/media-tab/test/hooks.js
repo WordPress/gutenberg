@@ -78,6 +78,41 @@ describe( 'useMediaResults', () => {
 		expect( result.current.mediaList ).toEqual( [ { id: 1 } ] );
 	} );
 
+	it( 'omits the default first page from the fetch query', async () => {
+		const category = createCategory( 'images', [ { id: 1 } ] );
+		renderHook( () =>
+			useMediaResults(
+				category,
+				{ per_page: 20, page: 1, search: '' },
+				0
+			)
+		);
+		await waitFor( () =>
+			expect( category.fetch ).toHaveBeenCalledWith( {
+				per_page: 20,
+				search: '',
+			} )
+		);
+	} );
+
+	it( 'passes `page` to the fetch query when paging past the first page', async () => {
+		const category = createCategory( 'images', [ { id: 1 } ] );
+		renderHook( () =>
+			useMediaResults(
+				category,
+				{ per_page: 20, page: 2, search: '' },
+				0
+			)
+		);
+		await waitFor( () =>
+			expect( category.fetch ).toHaveBeenCalledWith( {
+				per_page: 20,
+				page: 2,
+				search: '',
+			} )
+		);
+	} );
+
 	it( 'leaves paging totals undefined for an array-returning source', async () => {
 		const category = createCategory( 'images', [ { id: 1 } ] );
 		const { result } = renderHook( () =>
