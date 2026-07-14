@@ -8,19 +8,20 @@ import {
 	getPresetValueFromCustomValue,
 	getSliderValueFromPreset,
 	getSpacingPresetCssVar,
-	getSpacingPresetSlug,
 	hasAxisSupport,
 	hasBalancedSidesSupport,
-	isValueSpacingPreset,
 	VIEWS,
 } from '../utils';
+import { getPresetSlug, isValuePreset } from '../../preset-input-control/utils';
 
-describe( 'isValueSpacingPreset', () => {
+describe( 'isValuePreset', () => {
 	it( 'should return true if value is string in spacing presets var format', () => {
-		expect( isValueSpacingPreset( 'var:preset|spacing|20' ) ).toBe( true );
+		expect( isValuePreset( 'var:preset|spacing|20', 'spacing' ) ).toBe(
+			true
+		);
 	} );
 	it( 'should return false if value is not a string in spacing presets var format', () => {
-		expect( isValueSpacingPreset( '30px' ) ).toBe( false );
+		expect( isValuePreset( '30px', 'spacing' ) ).toBe( false );
 	} );
 } );
 
@@ -84,13 +85,15 @@ describe( 'getSpacingPresetCssVar', () => {
 	} );
 } );
 
-describe( 'getSpacingPresetSlug', () => {
+describe( 'getPresetSlug', () => {
 	it( 'should return original value if 0 or default', () => {
-		expect( getSpacingPresetSlug( '0' ) ).toBe( '0' );
-		expect( getSpacingPresetSlug( 'default' ) ).toBe( 'default' );
+		expect( getPresetSlug( '0', 'spacing' ) ).toBe( '0' );
+		expect( getPresetSlug( 'default', 'spacing' ) ).toBe( 'default' );
 	} );
 	it( 'should return the int value of the slug portion of a valid preset var', () => {
-		expect( getSpacingPresetSlug( 'var:preset|spacing|20' ) ).toBe( '20' );
+		expect( getPresetSlug( 'var:preset|spacing|20', 'spacing' ) ).toBe(
+			'20'
+		);
 	} );
 } );
 

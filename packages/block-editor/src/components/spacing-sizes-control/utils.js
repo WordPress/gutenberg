@@ -20,6 +20,8 @@ import {
 	isValuePreset,
 } from '../preset-input-control/utils';
 
+const SPACING_PRESET_TYPE = 'spacing';
+
 export const RANGE_CONTROL_MAX_SIZE = 8;
 
 export const ALL_SIDES = [ 'top', 'bottom', 'left', 'right' ];
@@ -65,17 +67,6 @@ export const VIEWS = {
 };
 
 /**
- * Checks is given value is a spacing preset.
- *
- * @param {string} value Value to check
- *
- * @return {boolean} Return true if value is string in format var:preset|spacing|.
- */
-export function isValueSpacingPreset( value ) {
-	return isValuePreset( value, 'spacing' );
-}
-
-/**
  * Converts a spacing preset into a custom value.
  *
  * @param {string} value        Value to convert
@@ -84,11 +75,11 @@ export function isValueSpacingPreset( value ) {
  * @return {string} Mapping of the spacing preset to its equivalent custom value.
  */
 export function getCustomValueFromPreset( value, spacingSizes ) {
-	if ( ! isValueSpacingPreset( value ) ) {
+	if ( ! isValuePreset( value, SPACING_PRESET_TYPE ) ) {
 		return value;
 	}
 
-	const slug = getSpacingPresetSlug( value );
+	const slug = getPresetSlug( value, SPACING_PRESET_TYPE );
 	const spacingSize = spacingSizes.find(
 		( size ) => String( size.slug ) === slug
 	);
@@ -108,7 +99,11 @@ export function getCustomValueFromPreset( value, spacingSizes ) {
  */
 export function getPresetValueFromCustomValue( value, spacingSizes ) {
 	// Return value as-is if it is undefined or is already a preset, or '0';
-	if ( ! value || isValueSpacingPreset( value ) || value === '0' ) {
+	if (
+		! value ||
+		isValuePreset( value, SPACING_PRESET_TYPE ) ||
+		value === '0'
+	) {
 		return value;
 	}
 
@@ -145,17 +140,6 @@ export function getSpacingPresetCssVar( value ) {
 }
 
 /**
- * Returns the slug section of the given spacing preset string.
- *
- * @param {string} value Value to extract slug from.
- *
- * @return {string|undefined} The int value of the slug from given spacing preset.
- */
-export function getSpacingPresetSlug( value ) {
-	return getPresetSlug( value, 'spacing' );
-}
-
-/**
  * Converts spacing preset value into a Range component value .
  *
  * @param {string} presetValue  Value to convert to Range value.
@@ -170,7 +154,7 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 	const slug =
 		parseFloat( presetValue, 10 ) === 0
 			? '0'
-			: getSpacingPresetSlug( presetValue );
+			: getPresetSlug( presetValue, SPACING_PRESET_TYPE );
 	const sliderValue = spacingSizes.findIndex( ( spacingSize ) => {
 		return String( spacingSize.slug ) === slug;
 	} );

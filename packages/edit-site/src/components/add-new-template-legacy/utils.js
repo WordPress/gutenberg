@@ -3,31 +3,32 @@
  */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 import { useMemo, useCallback } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { blockMeta, post } from '@wordpress/icons';
+import { blockMeta, post, archive } from '@wordpress/icons';
 import { safeDecodeURI } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import {
-	useDefaultTemplateTypes,
-	useExistingTemplates,
-	usePublicPostTypes,
-	usePublicTaxonomies,
-} from '../add-new-template/utils';
-
-export {
-	mapToIHasNameAndId,
-	useDefaultTemplateTypes,
-	useExistingTemplates,
-	usePostTypeArchiveMenuItems,
-	usePublicPostTypes,
-	usePublicTaxonomies,
-} from '../add-new-template/utils';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const EMPTY_OBJECT = {};
+
+/**
+ * @typedef IHasNameAndId
+ * @property {string|number} id   The entity's id.
+ * @property {string}        name The entity's name.
+ */
+
+const getValueFromObjectPath = ( object, path ) => {
+	let value = object;
+	path.split( '.' ).forEach( ( fieldName ) => {
+		value = value?.[ fieldName ];
+	} );
+	return value;
+};
 
 /**
  * Helper that adds a prefix to a post slug. The slug needs to be URL-decoded first,
@@ -44,10 +45,162 @@ function prefixSlug( prefix, slug ) {
 }
 
 /**
+ * Helper util to map records to add a `name` prop from a
+ * provided path, in order to handle all entities in the same
+ * fashion(implementing`IHasNameAndId` interface).
+ *
+ * @param {Object[]} entities The array of entities.
+ * @param {string}   path     The path to map a `name` property from the entity.
+ * @return {IHasNameAndId[]} An array of entities that now implement the `IHasNameAndId` interface.
+ */
+export const mapToIHasNameAndId = ( entities, path ) => {
+	return ( entities || [] ).map( ( entity ) => ( {
+		...entity,
+		name: decodeEntities( getValueFromObjectPath( entity, path ) ),
+	} ) );
+};
+
+/**
  * @typedef {Object} EntitiesInfo
  * @property {boolean}  hasEntities         If an entity has available records(posts, terms, etc..).
  * @property {number[]} existingEntitiesIds An array of the existing entities ids.
  */
+
+export const useExistingTemplates = () => {
+	return useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecords(
+				'postType',
+				TEMPLATE_POST_TYPE,
+				{
+					per_page: -1,
+				}
+			),
+		[]
+	);
+};
+
+export const useDefaultTemplateTypes = () => {
+	return useSelect(
+		( select ) =>
+			select( coreStore ).getCurrentTheme()?.default_template_types || [],
+		[]
+	);
+};
+
+const usePublicPostTypes = () => {
+	const postTypes = useSelect(
+		( select ) => select( coreStore ).getPostTypes( { per_page: -1 } ),
+		[]
+	);
+	return useMemo( () => {
+		const excludedPostTypes = [ 'attachment' ];
+		return postTypes
+			?.filter(
+				( { viewable, slug } ) =>
+					viewable && ! excludedPostTypes.includes( slug )
+			)
+			.sort( ( a, b ) => {
+				// Sort post types alphabetically by name,
+				// but exclude the built-in 'post' type from sorting.
+				if ( a.slug === 'post' || b.slug === 'post' ) {
+					return 0;
+				}
+
+				return a.name.localeCompare( b.name );
+			} );
+	}, [ postTypes ] );
+};
+
+const usePublicTaxonomies = () => {
+	const taxonomies = useSelect(
+		( select ) => select( coreStore ).getTaxonomies( { per_page: -1 } ),
+		[]
+	);
+	return useMemo( () => {
+		return taxonomies?.filter(
+			( { visibility } ) => visibility?.publicly_queryable
+		);
+	}, [ taxonomies ] );
+};
+
+export function usePostTypeArchiveMenuItems() {
+	const publicPostTypes = usePublicPostTypes();
+	const postTypesWithArchives = useMemo(
+		() => publicPostTypes?.filter( ( postType ) => postType.has_archive ),
+		[ publicPostTypes ]
+	);
+	const existingTemplates = useExistingTemplates();
+	// We need to keep track of naming conflicts. If a conflict
+	// occurs, we need to add slug.
+	const postTypeLabels = useMemo(
+		() =>
+			publicPostTypes?.reduce( ( accumulator, { labels } ) => {
+				const singularName = labels.singular_name.toLowerCase();
+				accumulator[ singularName ] =
+					( accumulator[ singularName ] || 0 ) + 1;
+				return accumulator;
+			}, {} ),
+		[ publicPostTypes ]
+	);
+	const needsUniqueIdentifier = useCallback(
+		( { labels, slug } ) => {
+			const singularName = labels.singular_name.toLowerCase();
+			return postTypeLabels[ singularName ] > 1 && singularName !== slug;
+		},
+		[ postTypeLabels ]
+	);
+	return useMemo(
+		() =>
+			postTypesWithArchives
+				?.filter(
+					( postType ) =>
+						! ( existingTemplates || [] ).some(
+							( existingTemplate ) =>
+								existingTemplate.slug ===
+								'archive-' + postType.slug
+						)
+				)
+				.map( ( postType ) => {
+					let title;
+					if ( needsUniqueIdentifier( postType ) ) {
+						title = sprintf(
+							// translators: %1s: Name of the post type e.g: "Post"; %2s: Slug of the post type e.g: "book".
+							__( 'Archive: %1$s (%2$s)' ),
+							postType.labels.singular_name,
+							postType.slug
+						);
+					} else {
+						title = sprintf(
+							// translators: %s: Name of the post type e.g: "Post".
+							__( 'Archive: %s' ),
+							postType.labels.singular_name
+						);
+					}
+					return {
+						slug: 'archive-' + postType.slug,
+						description: sprintf(
+							// translators: %s: Name of the post type e.g: "Post".
+							__(
+								'Displays an archive with the latest posts of type: %s.'
+							),
+							postType.labels.singular_name
+						),
+						title,
+						// `icon` is the `menu_icon` property of a post type. We
+						// only handle `dashicons` for now, even if the `menu_icon`
+						// also supports urls and svg as values.
+						icon:
+							typeof postType.icon === 'string' &&
+							postType.icon.startsWith( 'dashicons-' )
+								? postType.icon.slice( 10 )
+								: archive,
+						templatePrefix: 'archive',
+					};
+				} ) || [],
+		[ postTypesWithArchives, existingTemplates, needsUniqueIdentifier ]
+	);
+}
 
 export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 	const publicPostTypes = usePublicPostTypes();

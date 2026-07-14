@@ -6,7 +6,7 @@ import {
 	InspectorControls,
 	useSettings,
 	__experimentalSpacingSizesControl as SpacingSizesControl,
-	isValueSpacingPreset,
+	isValuePreset,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
@@ -46,7 +46,7 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	// Force the unit to update to `px` when the Spacer is being resized.
 	const [ parsedQuantity, parsedUnit ] =
 		parseQuantityAndUnitFromRawValue( value );
-	const computedValue = isValueSpacingPreset( value )
+	const computedValue = isValuePreset( value, 'spacing' )
 		? value
 		: [ parsedQuantity, isResizing ? 'px' : parsedUnit ].join( '' );
 

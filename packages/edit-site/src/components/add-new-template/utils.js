@@ -88,7 +88,7 @@ export const useDefaultTemplateTypes = () => {
 	);
 };
 
-export const usePublicPostTypes = () => {
+const usePublicPostTypes = () => {
 	const postTypes = useSelect(
 		( select ) => select( coreStore ).getPostTypes( { per_page: -1 } ),
 		[]
@@ -112,7 +112,7 @@ export const usePublicPostTypes = () => {
 	}, [ postTypes ] );
 };
 
-export const usePublicTaxonomies = () => {
+const usePublicTaxonomies = () => {
 	const taxonomies = useSelect(
 		( select ) => select( coreStore ).getTaxonomies( { per_page: -1 } ),
 		[]

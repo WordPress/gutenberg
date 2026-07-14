@@ -104,9 +104,9 @@ export { default as withColorContext } from './color-palette/with-color-context'
 export { default as __experimentalSpacingSizesControl } from './spacing-sizes-control';
 export {
 	getSpacingPresetCssVar,
-	isValueSpacingPreset,
 	getCustomValueFromPreset,
 } from './spacing-sizes-control/utils';
+export { isValuePreset } from './preset-input-control/utils';
 /*
  * Content Related Components
  */
