@@ -51,7 +51,7 @@
 		"cross-spawn": "^7.0.6",
 		"docker-compose": "^0.24.3",
 		"got": "^11.8.5",
-		"js-yaml": "^3.13.1",
+		"js-yaml": "^3.15.0",
 		"ora": "^4.0.2",
 		"rimraf": "^5.0.10",
 		"simple-git": "^3.24.0",

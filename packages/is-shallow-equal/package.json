@@ -45,6 +45,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"devDependencies": {
+		"@wordpress/lazy-import": "file:../lazy-import",
 		"benchmark": "^2.1.4"
 	},
 	"publishConfig": {

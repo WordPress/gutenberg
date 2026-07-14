@@ -14,8 +14,9 @@
  * The base ref defaults to `origin/trunk`. The diff is computed against the
  * merge-base of HEAD and the base ref (matching how PR diffs work), so changes
  * that landed on the base branch after this branch diverged don't produce
- * false positives. Moves between dependency fields (e.g. devDependencies →
- * dependencies) are not flagged.
+ * false positives. On a shallow checkout it falls back to the base ref, which
+ * on a pull_request merge ref is the merge-base anyway. Moves between
+ * dependency fields (e.g. devDependencies → dependencies) are not flagged.
  */
 
 import fs from 'node:fs';
@@ -67,17 +68,25 @@ function depNames( pkg ) {
 	return result;
 }
 
-const mergeBase = (
-	await tryGit(
-		() => git.raw( [ 'merge-base', 'HEAD', baseRef ] ),
-		`unable to compute merge-base between HEAD and "${ baseRef }"`
-	)
-).trim();
+/*
+ * Use the merge-base, or the base ref directly when it's unreachable (shallow
+ * checkout). simple-git returns "" instead of throwing for no common ancestor;
+ * guard against it so `git show` never reads the index.
+ */
+let compareRef = baseRef;
+try {
+	const mergeBase = await git.raw( [ 'merge-base', 'HEAD', baseRef ] );
+	if ( mergeBase.trim() ) {
+		compareRef = mergeBase.trim();
+	}
+} catch {
+	// Shallow checkout: no shared history. Use the base ref directly.
+}
 
 const baseJson = JSON.parse(
 	await tryGit(
-		() => git.show( [ `${ mergeBase }:package.json` ] ),
-		`unable to read package.json at merge-base ${ mergeBase }`
+		() => git.show( [ `${ compareRef }:package.json` ] ),
+		`unable to read package.json at ${ compareRef }`
 	)
 );
 const headJson = JSON.parse( fs.readFileSync( ROOT_PACKAGE_JSON, 'utf8' ) );

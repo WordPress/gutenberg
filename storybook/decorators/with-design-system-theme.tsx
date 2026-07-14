@@ -39,7 +39,7 @@ export function WithDesignSystemTheme(
 			color={ color }
 			cursor={ cursorControl ? { control: cursorControl } : undefined }
 			cornerRadius={ cornerRadiusPreset }
-			isRoot
+			isRoot={ context.viewMode !== 'docs' }
 		>
 			<div
 				style={

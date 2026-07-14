@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add an "Attachments" source to the block inserter's Media tab, listing images attached to the current post with the ability to attach and detach them ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
+
+### Enhancements
+
+-   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Notes: Remove the snackbar notice shown when a note is resolved or reopened, as the note's appearance already updates in place to reflect the change. The result is still announced to screen readers ([#80017](https://github.com/WordPress/gutenberg/pull/80017)).
+-   The "View the autosave" notice now opens the autosave in the visual revisions view with its changes highlighted, instead of the classic revisions screen. It falls back to the classic screen when visual revisions are disabled ([#79947](https://github.com/WordPress/gutenberg/pull/79947)).
+
+### Bug Fixes
+
+-   Render the "Preview in new tab" action with the shared menu item pattern so its typography matches sibling menu items ([#80195](https://github.com/WordPress/gutenberg/pull/80195)).
+-   External images are now sideloaded on the server when uploaded to the media library, via a new `mediaSideloadFromUrl` block editor setting, so the upload works when the editor is cross-origin isolated (e.g. with client-side media processing enabled) ([#79409](https://github.com/WordPress/gutenberg/pull/79409)).
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
 ## 14.50.0 (2026-07-01)
 
 ## 14.49.0 (2026-06-24)

@@ -134,7 +134,6 @@ export const Container = styled.div< ContainerProps >`
 `;
 
 type InputProps = {
-	__next40pxDefaultSize?: boolean;
 	disabled?: boolean;
 	inputSize?: Size;
 	isDragging?: boolean;
@@ -177,10 +176,7 @@ export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 	`;
 };
 
-export const getSizeConfig = ( {
-	inputSize: size,
-	__next40pxDefaultSize,
-}: InputProps ) => {
+export const getSizeConfig = ( { inputSize: size }: InputProps ) => {
 	// Paddings may be overridden by the custom paddings props.
 	const sizes = {
 		default: {
@@ -212,10 +208,6 @@ export const getSizeConfig = ( {
 			paddingRight: CONFIG.controlPaddingX,
 		},
 	};
-
-	if ( ! __next40pxDefaultSize ) {
-		sizes.default = sizes.compact;
-	}
 
 	return sizes[ size as Size ] || sizes.default;
 };
@@ -332,12 +324,10 @@ export const LabelWrapper = styled( FlexItem )`
 const prefixSuffixWrapperStyles = ( {
 	variant = 'default',
 	size,
-	__next40pxDefaultSize,
 	isPrefix,
 }: PrefixSuffixWrapperProps & { isPrefix?: boolean } ) => {
 	const { paddingLeft: padding } = getSizeConfig( {
 		inputSize: size,
-		__next40pxDefaultSize,
 	} );
 
 	const paddingProperty = isPrefix

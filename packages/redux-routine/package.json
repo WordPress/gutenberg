@@ -50,6 +50,9 @@
 		"is-promise": "^4.0.0",
 		"rungen": "^0.3.2"
 	},
+	"devDependencies": {
+		"redux": "^5.0.1"
+	},
 	"peerDependencies": {
 		"redux": ">=4"
 	},

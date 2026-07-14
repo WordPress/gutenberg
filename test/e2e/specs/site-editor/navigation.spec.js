@@ -131,7 +131,7 @@ class EditorNavigationUtils {
 		this.pageUtils = pageUtils;
 	}
 
-	async tabToLabel( label, times = 10 ) {
+	async tabToLabel( label, times = 20 ) {
 		for ( let i = 0; i < times; i++ ) {
 			await this.pageUtils.pressKeys( 'Tab' );
 			const activeLabel = await this.page.evaluate( () => {

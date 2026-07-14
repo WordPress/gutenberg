@@ -22,19 +22,17 @@ import { useSettings } from '../../components/use-settings';
 /**
  * Control for line text indent.
  *
- * @param {Object}                  props                       Component props.
- * @param {boolean}                 props.__next40pxDefaultSize Start opting into the larger default height that will become the default size in a future version.
- * @param {string}                  props.value                 Currently selected text indent.
- * @param {Function}                props.onChange              Handles change in text indent selection.
- * @param {string|number|undefined} props.__unstableInputWidth  Input width to pass through to inner UnitControl. Should be a valid CSS value.
- * @param {boolean}                 props.withSlider            Whether to show the slider control.
- * @param {boolean}                 props.hasBottomMargin       Whether to add bottom margin below the control.
- * @param {string}                  props.help                  Help text to display below the control.
+ * @param {Object}                  props                      Component props.
+ * @param {string}                  props.value                Currently selected text indent.
+ * @param {Function}                props.onChange             Handles change in text indent selection.
+ * @param {string|number|undefined} props.__unstableInputWidth Input width to pass through to inner UnitControl. Should be a valid CSS value.
+ * @param {boolean}                 props.withSlider           Whether to show the slider control.
+ * @param {boolean}                 props.hasBottomMargin      Whether to add bottom margin below the control.
+ * @param {string}                  props.help                 Help text to display below the control.
  *
  * @return {Element} Text indent control.
  */
 export default function TextIndentControl( {
-	__next40pxDefaultSize = false,
 	value,
 	onChange,
 	__unstableInputWidth = '60px',
@@ -68,8 +66,6 @@ export default function TextIndentControl( {
 	if ( ! withSlider ) {
 		return (
 			<UnitControl
-				__next40pxDefaultSize={ __next40pxDefaultSize }
-				__shouldNotWarnDeprecated36pxSize
 				{ ...otherProps }
 				label={ __( 'Line indent' ) }
 				value={ value }
@@ -89,14 +85,11 @@ export default function TextIndentControl( {
 			<Flex>
 				<FlexItem isBlock>
 					<UnitControl
-						__next40pxDefaultSize={ __next40pxDefaultSize }
-						__shouldNotWarnDeprecated36pxSize
 						label={ __( 'Line indent' ) }
 						labelPosition="top"
 						hideLabelFromVision
 						value={ value }
 						onChange={ onChange }
-						size={ otherProps.size }
 						units={ units }
 						__unstableInputWidth={ __unstableInputWidth }
 						min={ 0 }
@@ -106,8 +99,6 @@ export default function TextIndentControl( {
 					<FlexItem isBlock>
 						<Spacer marginX={ 2 } marginBottom={ 0 }>
 							<RangeControl
-								__next40pxDefaultSize={ __next40pxDefaultSize }
-								__shouldNotWarnDeprecated36pxSize
 								label={ __( 'Line indent' ) }
 								hideLabelFromVision
 								value={ valueQuantity }

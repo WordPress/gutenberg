@@ -1,5 +1,64 @@
 == Changelog ==
 
+= 23.5.3 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Global Styles
+- Block Supports: Improve handling of block class name to avoid fatal. ([80214](https://github.com/WordPress/gutenberg/pull/80214))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@aduth @ciampo
+
+
+= 23.5.2 =
+
+## Changelog
+
+### Enhancements
+
+#### Block Library
+
+- Classic block: Remove migration notice and restore inserter availability. ([80164](https://github.com/WordPress/gutenberg/pull/80164))
+
+### Code Quality
+
+- Icons: Make WP_Icons_Registry::register() public. ([80139](https://github.com/WordPress/gutenberg/pull/80139))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@Mamaduka @t-hamano @tyxla 
+
+
+= 23.5.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Data Layer
+- Collaboration: Only report changed properties from the default sync configuration. ([79908](https://github.com/WordPress/gutenberg/pull/79908))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@adamsilverstein
+
+
 = 23.5.0 =
 
 ## Changelog
