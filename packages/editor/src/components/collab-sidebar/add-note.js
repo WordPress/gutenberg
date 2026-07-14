@@ -48,7 +48,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 		// Keep the form open when focus returns to it, e.g. on link popover Escape.
 		if (
 			event.relatedTarget?.closest(
-				'.editor-collab-sidebar-panel__thread'
+				'.editor-collab-sidebar-panel__add-note'
 			)
 		) {
 			return;
@@ -74,7 +74,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 	return (
 		<FloatingContainer
 			floating={ floating }
-			className="editor-collab-sidebar-panel__thread is-selected"
+			className="editor-collab-sidebar-panel__add-note is-selected"
 			gap="md"
 			tabIndex={ 0 }
 			aria-label={ __( 'New note' ) }
