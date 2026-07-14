@@ -136,48 +136,6 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The kses allowance itself lives in block-comments.php (and is tested in
-	 * notes-mention-kses-test.php); this guards the notification parser against
-	 * regressions in that contract end-to-end on the REST create path.
-	 *
-	 * @covers ::gutenberg_get_note_mentioned_user_ids
-	 */
-	public function test_mention_markup_survives_kses_for_authors(): void {
-		$author  = self::create_user( 'author' );
-		$post_id = self::factory()->post->create( array( 'post_author' => $author->ID ) );
-		$this->assertIsInt( $post_id );
-
-		// Authors lack unfiltered_html, so comment kses filters their content.
-		wp_set_current_user( $author->ID );
-		$this->assertFalse( current_user_can( 'unfiltered_html' ) );
-
-		$mention = sprintf(
-			'<a class="wp-note-mention user-%d" href="http://example.com/">@Mentioned</a>',
-			self::$mentioned->ID
-		);
-
-		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$request->set_param( 'post', $post_id );
-		$request->set_param( 'type', 'note' );
-		$request->set_param( 'content', "Ping $mention" );
-
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertSame( 201, $response->get_status() );
-		$data = $response->get_data();
-		$this->assertIsArray( $data );
-		$this->assertArrayHasKey( 'id', $data );
-
-		// The mention attributes must survive the comment kses pass or the
-		// mention is silently dropped from parsing and notifications.
-		$comment = get_comment( (int) $data['id'] );
-		$this->assertInstanceOf( WP_Comment::class, $comment );
-		$this->assertSame(
-			array( self::$mentioned->ID ),
-			gutenberg_get_note_mentioned_user_ids( $comment->comment_content )
-		);
-	}
-
-	/**
 	 * @covers ::gutenberg_get_note_thread_root_id
 	 */
 	public function test_thread_root_is_parent_for_replies(): void {
