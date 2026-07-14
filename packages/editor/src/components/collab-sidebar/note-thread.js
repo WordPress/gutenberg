@@ -188,12 +188,12 @@ export function NoteThread( {
 			// Pass `null` as the second parameter to prevent focusing the block.
 			selectBlock( note.blockClientId, null );
 		}
-		viewedNotes?.markNotesViewed( allNoteIds );
 	};
 
 	const onDeselectNote = () => {
 		selectNote( undefined );
 		toggleBlockSpotlight( note.blockClientId, false );
+		viewedNotes?.markNotesViewed( allNoteIds );
 	};
 
 	const handleResolve = () => {

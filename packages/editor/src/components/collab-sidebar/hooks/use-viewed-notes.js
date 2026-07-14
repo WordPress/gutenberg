@@ -21,6 +21,23 @@ export function useViewedNotes( postId ) {
 		[]
 	);
 
+	// `useEntityProp`'s own fetch uses the default (view) context, which
+	// strips custom meta fields like `viewed_notes` from the response
+	// entirely. Entity records are normalized per (kind, name, id) though,
+	// not per query — so priming a fetch with `context: 'edit'` here merges
+	// `meta` into the same shared record `useEntityProp` reads from below.
+	useSelect(
+		( select ) =>
+			currentUserId &&
+			select( coreStore ).getEntityRecord(
+				'root',
+				'user',
+				currentUserId,
+				{ context: 'edit' }
+			),
+		[ currentUserId ]
+	);
+
 	const [ meta, setMeta ] = useEntityProp(
 		'root',
 		'user',
@@ -36,7 +53,7 @@ export function useViewedNotes( postId ) {
 
 	const markNotesViewed = useCallback(
 		( noteIds = [] ) => {
-			if ( ! postId || ! noteIds.length ) {
+			if ( ! postId || ! noteIds.length || ! currentUserId ) {
 				return;
 			}
 
@@ -62,10 +79,19 @@ export function useViewedNotes( postId ) {
 				},
 			} );
 
-			// Persist to the server immediately (core-data already debounces saves).
-			saveEditedEntityRecord( 'root', 'user', 'me' );
+			// Same id (currentUserId) as used above for useEntityProp —
+			// mismatched ids between the edit and the save silently drop
+			// the write, which was the original bug in this hook.
+			saveEditedEntityRecord( 'root', 'user', currentUserId );
 		},
-		[ postId, seenIds, meta, setMeta, saveEditedEntityRecord ]
+		[
+			postId,
+			seenIds,
+			meta,
+			setMeta,
+			saveEditedEntityRecord,
+			currentUserId,
+		]
 	);
 
 	const isNoteUnread = useCallback(
