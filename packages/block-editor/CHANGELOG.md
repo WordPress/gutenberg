@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 16.0.0 (2026-07-14)
+
 ### Internal
 
 -   Extract a shared `getBlockBindingsContext` helper for assembling the context handed to block-bindings sources; only entries present in the surrounding block context are copied ([#79855](https://github.com/WordPress/gutenberg/pull/79855)).
