@@ -636,7 +636,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '<div class="wp-block-group is-layout-flow wp-block-group-is-layout-flow"></div>',
 			),
-			'single wrapper block layout with constrained type' => array(
+			'single wrapper block layout with constrained type and no inner blocks' => array(
 				'args'            => array(
 					'block_content' => '<div class="wp-block-group"></div>',
 					'block'         => array(
@@ -650,6 +650,29 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'innerHTML'    => '<div class="wp-block-group"></div>',
 						'innerContent' => array(
 							'<div class="wp-block-group"></div>',
+						),
+					),
+				),
+				'expected_output' => '<div class="wp-block-group wp-block-group-is-layout-constrained"></div>',
+			),
+			'single wrapper block layout with constrained type and inner blocks' => array(
+				'args'            => array(
+					'block_content' => '<div class="wp-block-group"></div>',
+					'block'         => array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(
+							'layout' => array(
+								'type' => 'constrained',
+							),
+						),
+						'innerBlocks'  => array(
+							array( 'blockName' => 'core/paragraph' ),
+						),
+						'innerHTML'    => '<div class="wp-block-group"></div>',
+						'innerContent' => array(
+							'<div class="wp-block-group">',
+							null,
+							'</div>',
 						),
 					),
 				),
