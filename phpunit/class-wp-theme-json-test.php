@@ -2160,7 +2160,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		unregister_block_type( 'test/clamp-me' );
 
 		$this->assertSameCSS(
-			':root{--wp--preset--font-size--pickles: clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.156), 16px);--wp--preset--font-size--toast: clamp(14.642px, 0.915rem + ((1vw - 3.2px) * 0.575), 22px);}body{font-size: clamp(0.875em, 0.875rem + ((1vw - 0.2em) * 0.156), 1em);}h1{font-size: clamp(50.171px, 3.136rem + ((1vw - 3.2px) * 3.893), 100px);}:root :where(.wp-block-test-clamp-me){font-size: clamp(27.894px, 1.743rem + ((1vw - 3.2px) * 1.571), 48px);}.has-pickles-font-size{font-size: var(--wp--preset--font-size--pickles) !important;}.has-toast-font-size{font-size: var(--wp--preset--font-size--toast) !important;}',
+			':root{--wp--preset--font-size--pickles: clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.156), 16px);--wp--preset--font-size--toast: clamp(14.642px, 0.915rem + ((1vw - 3.2px) * 0.575), 22px);}html{font-size: clamp(0.875em, 0.875rem + ((1vw - 0.2em) * 0.156), 1em);}body{font-size: clamp(0.875em, 0.875rem + ((1vw - 0.2em) * 0.156), 1em);}h1{font-size: clamp(50.171px, 3.136rem + ((1vw - 3.2px) * 3.893), 100px);}:root :where(.wp-block-test-clamp-me){font-size: clamp(27.894px, 1.743rem + ((1vw - 3.2px) * 1.571), 48px);}.has-pickles-font-size{font-size: var(--wp--preset--font-size--pickles) !important;}.has-toast-font-size{font-size: var(--wp--preset--font-size--toast) !important;}',
 			$theme_json->get_stylesheet( array( 'styles', 'variables', 'presets' ), null, array( 'skip_root_layout_styles' => true ) )
 		);
 	}

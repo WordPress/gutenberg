@@ -4023,10 +4023,15 @@ class WP_Theme_JSON_Gutenberg {
 		 * from the ones using the duotone selector.
 		 * - 'background|background-image': set the html min-height to 100%
 		 * to ensure the background covers the entire viewport.
+		 * - 'font-size': also set it on the html selector so that `rem` units
+		 * used elsewhere (e.g. spacing, blockGap) resolve against the same
+		 * base size, since `rem` always resolves against the root element
+		 * regardless of where it's used.
 		 *
 		 */
 		$declarations_duotone       = array();
 		$should_set_root_min_height = false;
+		$root_font_size             = null;
 
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
@@ -4048,6 +4053,10 @@ class WP_Theme_JSON_Gutenberg {
 			if ( $is_root_selector && ( 'background-image' === $declaration['name'] || 'background' === $declaration['name'] ) ) {
 				$should_set_root_min_height = true;
 			}
+
+			if ( $is_root_selector && 'font-size' === $declaration['name'] ) {
+				$root_font_size = $declaration['value'];
+			}
 		}
 
 		/*
@@ -4063,6 +4072,24 @@ class WP_Theme_JSON_Gutenberg {
 					array(
 						'name'  => 'min-height',
 						'value' => 'calc(100% - var(--wp-admin--admin-bar--height, 0px))',
+					),
+				)
+			);
+		}
+
+		/*
+		 * Also set the root font size on the html selector.
+		 * `rem` units always resolve against the root element's font size,
+		 * so without this, `rem` values used elsewhere (e.g. blockGap) would
+		 * resolve against the browser default instead of the site's root font size.
+		 */
+		if ( null !== $root_font_size ) {
+			$block_rules .= static::to_ruleset(
+				'html',
+				array(
+					array(
+						'name'  => 'font-size',
+						'value' => $root_font_size,
 					),
 				)
 			);
