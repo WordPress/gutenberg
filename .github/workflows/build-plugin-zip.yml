@@ -270,8 +270,14 @@ jobs:
               run: |
                   IFS='.' read -r -a VERSION_ARRAY <<< "${VERSION}"
                   MILESTONE="Gutenberg ${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
-                  npm run other:changelog -- --milestone="$MILESTONE" --unreleased > release-notes.txt
-                  sed -ie '1,6d' release-notes.txt
+                  RELEASE_NOTES_TMP="$(mktemp)"
+                  trap 'rm -f "$RELEASE_NOTES_TMP"' EXIT
+                  npm run other:changelog -- --milestone="$MILESTONE" --unreleased > "$RELEASE_NOTES_TMP"
+                  sed '1,6d' "$RELEASE_NOTES_TMP" > release-notes.txt
+                  if [[ ! -s release-notes.txt ]]; then
+                    echo "Release notes are empty for milestone \"$MILESTONE\"." >&2
+                    exit 1
+                  fi
                   if [[ "${VERSION}" != *"rc"* ]]; then
                     # Include previous RCs' release notes, if any
                     CHANGELOG_REGEX="=\s[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?\s="
