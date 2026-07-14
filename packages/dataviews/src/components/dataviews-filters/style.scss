@@ -198,6 +198,7 @@
 	cursor: default;
 	min-height: var(--wpds-dimension-size-md);
 	@include body-medium();
+	color: var(--wpds-color-foreground-interactive-neutral);
 
 	&:last-child {
 		margin-block-end: 0;
@@ -207,6 +208,7 @@
 	&[data-active-item],
 	&:focus {
 		background-color: var(--wpds-color-background-interactive-brand-weak-active);
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 
 		.dataviews-filters__search-widget-listitem-single-selection {
 			border-color: var(--wpds-color-stroke-interactive-brand-active);
@@ -226,6 +228,10 @@
 				background: var(--wpds-color-background-interactive-brand-strong-active);
 			}
 		}
+
+		.dataviews-filters__search-widget-listitem-description {
+			color: var(--wpds-color-foreground-interactive-neutral-weak-active);
+		}
 	}
 
 	.dataviews-filters__search-widget-listitem-value {
@@ -241,7 +247,7 @@
 		text-overflow: ellipsis;
 		font-size: var(--wpds-typography-font-size-sm);
 		line-height: 16px;
-		color: var(--wpds-color-foreground-content-neutral-weak);
+		color: var(--wpds-color-foreground-interactive-neutral-weak);
 	}
 
 	.dataviews-filters__search-widget-listitem-single-selection {
