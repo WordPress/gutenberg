@@ -9,6 +9,10 @@ export const EMPTY_VALUE_LABEL = '\u2014';
 // Matches a preset variable token, e.g. `var:preset|color|vivid-red`.
 const PRESET_TOKEN_REGEX = /^var:preset\|([^|]+)\|(.+)$/;
 
+// True when a style value is present (not unset or empty).
+const isSet = ( value ) =>
+	value !== undefined && value !== null && value !== '';
+
 /**
  * Formats a raw style value into a human-friendly string for display.
  *
@@ -24,7 +28,7 @@ const PRESET_TOKEN_REGEX = /^var:preset\|([^|]+)\|(.+)$/;
  * @return {string} A human-friendly representation of the value.
  */
 export function formatStyleValue( value ) {
-	if ( value === undefined || value === null || value === '' ) {
+	if ( ! isSet( value ) ) {
 		return EMPTY_VALUE_LABEL;
 	}
 
@@ -74,9 +78,7 @@ export function formatBorderShorthand( border ) {
 
 	const { width, style, color } = border;
 	const parts = [ width, style, color ]
-		.filter(
-			( part ) => part !== undefined && part !== null && part !== ''
-		)
+		.filter( isSet )
 		.map( ( part ) => formatStyleValue( part ) );
 
 	return parts.length ? parts.join( ' ' ) : EMPTY_VALUE_LABEL;
@@ -100,9 +102,7 @@ export function formatBorderRadius( radius ) {
 	if ( radius && typeof radius === 'object' ) {
 		const parts = RADIUS_CORNERS.map(
 			( corner ) => radius[ corner ]
-		).filter(
-			( value ) => value !== undefined && value !== null && value !== ''
-		);
+		).filter( isSet );
 		return parts.length ? parts.join( ' ' ) : EMPTY_VALUE_LABEL;
 	}
 
@@ -136,8 +136,6 @@ export function formatSpacingShorthand(
 		return format( spacing );
 	}
 
-	const isSet = ( value ) =>
-		value !== undefined && value !== null && value !== '';
 	const { top, right, bottom, left } = spacing;
 
 	// Collapse a full axial/uniform object to the shortest CSS shorthand.
