@@ -1,6 +1,7 @@
 import { readFile } from 'fs/promises';
 import { addFallbackToVar } from '../postcss-plugins/ds-token-fallbacks.mjs';
 
+/** @type {Record<string, import('esbuild').Loader>} */
 const LOADER_MAP = {
 	'.js': 'jsx',
 	'.jsx': 'jsx',
@@ -18,6 +19,8 @@ const LOADER_MAP = {
  * Replaces bare `var(--wpds-*)` references in string literals with
  * `var(--wpds-*, <fallback>)` so components render correctly without
  * a ThemeProvider.
+ *
+ * @type {import('esbuild').Plugin}
  */
 const plugin = {
 	name: 'ds-token-fallbacks-js',

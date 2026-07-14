@@ -17,7 +17,7 @@ const config: Config = {
 		'./tokens/motion.json',
 		'./tokens/typography.json',
 	],
-	outDir: './src/prebuilt',
+	outDir: '.',
 
 	// Preserve source ordering of tokens in output. This is important because
 	// many of our tokens operate on a size scale (2xs → 2xl) and it's more easy
@@ -27,7 +27,7 @@ const config: Config = {
 	plugins: [
 		inlineAliasValues( {
 			pattern: /^wpds-color\.primitive\./,
-			filename: 'ts/color-tokens.ts',
+			filename: 'src/prebuilt/ts/color-tokens.ts',
 			tokenId: ( tokenId ) =>
 				tokenId
 					.replace( /\.primitive/, '' )
@@ -36,7 +36,7 @@ const config: Config = {
 		} ),
 		inlineAliasValues( { pattern: /^wpds-dimension\.primitive\./ } ),
 		pluginCSS( {
-			filename: 'css/design-tokens.css',
+			filename: 'prebuilt/css/design-tokens.css',
 			variableName: ( token ) => makeCSSVar( token.id ),
 			baseSelector: ':root',
 			modeSelectors: [
@@ -87,20 +87,20 @@ const config: Config = {
 			legacyHex: true,
 		} ),
 		pluginKnownWpdsCssVariables( {
-			filename: 'js/design-tokens.mjs',
+			filename: 'prebuilt/js/design-tokens.mjs',
 		} ),
 		pluginDsTokenFallbacks( {
-			filename: 'js/design-token-fallbacks.mjs',
+			filename: 'prebuilt/js/design-token-fallbacks.mjs',
 			scssFilename: false,
 			additionalScssFilenames: [
-				'../../../base-styles/internal/_wpds-token-fallbacks.scss',
+				'../base-styles/internal/_wpds-token-fallbacks.scss',
 			],
 		} ),
 		pluginDsTokenDocs( {
-			filename: '../../docs/tokens.md',
+			filename: 'docs/tokens.md',
 		} ),
 		typescriptTypes( {
-			filename: 'ts/token-types.ts',
+			filename: 'src/prebuilt/ts/token-types.ts',
 			types: [
 				{
 					name: 'PaddingSize',

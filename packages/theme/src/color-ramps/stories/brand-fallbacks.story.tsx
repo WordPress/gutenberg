@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import colorTokens from '../../prebuilt/ts/color-tokens';
-import _tokenFallbacks from '../../prebuilt/js/design-token-fallbacks.mjs';
+import _tokenFallbacks from '../../../prebuilt/js/design-token-fallbacks.mjs';
 import { ThemeProvider } from '../../theme-provider';
 
 const tokenFallbacks: Record< string, string > = _tokenFallbacks;
