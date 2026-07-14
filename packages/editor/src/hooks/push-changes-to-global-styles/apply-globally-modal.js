@@ -11,7 +11,7 @@ import { useMemo, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { useGlobalStyles } from '../../components/global-styles/hooks';
-import { useReviewRows } from './index';
+import { useReviewRows } from './use-review-rows';
 
 // Only the table layout is offered so the modal always renders a compact list
 // of styles with a leading selection checkbox.
