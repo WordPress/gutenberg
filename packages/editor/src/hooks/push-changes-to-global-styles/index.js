@@ -176,7 +176,7 @@ function getBorderRows( supports, attributes, blockUserConfig ) {
 		rows.push( flatRow );
 	}
 
-	// Per-side borders (split border configuration).
+	// Per-side borders.
 	sides.forEach( ( side ) => {
 		const sideBorder = border?.[ side ];
 		const sideRow = buildBorderScopeRow( {
@@ -484,10 +484,8 @@ function PushChangesToGlobalStylesControl( {
 		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	// Pushes the given subset of grouped rows to Global Styles. Defaults to all
-	// rows so the caller can push everything without change to prior behaviour.
 	const pushChanges = useCallback(
-		( rowsToPush = rows ) => {
+		( rowsToPush ) => {
 			const update = getStylesUpdate( {
 				rowsToPush,
 				attributes,
@@ -534,7 +532,6 @@ function PushChangesToGlobalStylesControl( {
 		[
 			__unstableMarkNextChangeAsNotPersistent,
 			attributes,
-			rows,
 			createSuccessNotice,
 			name,
 			setAttributes,

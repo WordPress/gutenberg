@@ -13,8 +13,8 @@ import { useMemo, useState } from '@wordpress/element';
 import { useGlobalStyles } from '../../components/global-styles/hooks';
 import { useReviewRows } from './use-review-rows';
 
-// Only the table layout is offered so the modal always renders a compact list
-// of styles with a leading selection checkbox.
+// Only offer the table layout: a compact list with a leading selection
+// checkbox.
 const DEFAULT_LAYOUTS = { pickerTable: {} };
 
 const getItemId = ( row ) => row.id;
