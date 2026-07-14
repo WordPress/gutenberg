@@ -42,7 +42,7 @@ export interface ThemeProviderSettings {
 		 * (e.g. buttons, checkboxes, and toggles).
 		 *
 		 * By default, it inherits from the parent `ThemeProvider`,
-		 * and falls back to the prebuilt default (`default`).
+		 * and falls back to the prebuilt default (`pointer`).
 		 */
 		control?: 'default' | 'pointer';
 	};
@@ -79,6 +79,9 @@ export interface ThemeProviderProps extends ThemeProviderSettings {
 	 * This is useful, for example, to make sure that the `html` element can
 	 * consume the right background color, or that overlays rendered inside a
 	 * portal can inherit the correct color scheme.
+	 *
+	 * Render at most one root provider per document. Multiple root providers
+	 * that share the same document are unsupported.
 	 *
 	 * @default false
 	 */

@@ -25,7 +25,7 @@ $footer-height: 90px;
 
 	.font-library__subtitle {
 		text-transform: uppercase;
-		font-weight: variables.$font-weight-medium;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		font-size: 11px;
 	}
 }
@@ -81,13 +81,13 @@ $footer-height: 90px;
 
 .font-library__page-selection {
 	font-size: 11px;
-	font-weight: variables.$font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	text-transform: uppercase;
 
 	@include mixins.break-small() {
 		.font-library__page-selection-trigger {
 			font-size: 11px !important;
-			font-weight: variables.$font-weight-medium;
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 		}
 	}
 }
@@ -95,7 +95,7 @@ $footer-height: 90px;
 .font-library__fonts-title {
 	text-transform: uppercase;
 	font-size: 11px;
-	font-weight: 600;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	margin-top: 0;
 	margin-bottom: 0;
 }

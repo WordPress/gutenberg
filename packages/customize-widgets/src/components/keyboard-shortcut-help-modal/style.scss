@@ -7,7 +7,7 @@
 
 	&__section-title {
 		font-size: 0.9rem;
-		font-weight: 600;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 	}
 
 	&__shortcut {
@@ -27,7 +27,7 @@
 	}
 
 	&__shortcut-term {
-		font-weight: 600;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		margin: 0 0 0 1rem;
 		text-align: right;
 	}

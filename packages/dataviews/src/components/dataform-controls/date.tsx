@@ -22,6 +22,7 @@ import {
 	privateApis as componentsPrivateApis,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
+import { speak } from '@wordpress/a11y';
 import {
 	useCallback,
 	useEffect,
@@ -241,6 +242,12 @@ function ValidatedDateControl< Item >( {
 		}
 	}, [ isTouched, isValid, validity, validateRefs ] );
 
+	useEffect( () => {
+		if ( isTouched && customValidity?.message ) {
+			speak( customValidity.message );
+		}
+	}, [ isTouched, customValidity?.message ] );
+
 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
 		if ( isTouched ) {
 			return;
@@ -259,26 +266,24 @@ function ValidatedDateControl< Item >( {
 	return (
 		<div onBlur={ onBlur }>
 			{ children }
-			<div aria-live="polite">
-				{ customValidity && (
-					<p
-						className={ clsx(
-							'components-validated-control__indicator',
-							customValidity.type === 'invalid'
-								? 'is-invalid'
-								: undefined
-						) }
-					>
-						<WCIcon
-							className="components-validated-control__indicator-icon"
-							icon={ errorIcon }
-							size={ 16 }
-							fill="currentColor"
-						/>
-						{ customValidity.message }
-					</p>
-				) }
-			</div>
+			{ customValidity && (
+				<p
+					className={ clsx(
+						'components-validated-control__indicator',
+						customValidity.type === 'invalid'
+							? 'is-invalid'
+							: undefined
+					) }
+				>
+					<WCIcon
+						className="components-validated-control__indicator-icon"
+						icon={ errorIcon }
+						size={ 16 }
+						fill="currentColor"
+					/>
+					{ customValidity.message }
+				</p>
+			) }
 		</div>
 	);
 }
