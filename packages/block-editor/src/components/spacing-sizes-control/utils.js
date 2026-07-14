@@ -64,6 +64,17 @@ export const VIEWS = {
 };
 
 /**
+ * Checks is given value is a spacing preset.
+ *
+ * @param {string} value Value to check
+ *
+ * @return {boolean} Return true if value is string in format var:preset|spacing|.
+ */
+export function isValueSpacingPreset( value ) {
+	return isValuePreset( value, SPACING_PRESET_TYPE );
+}
+
+/**
  * Converts a spacing preset into a custom value.
  *
  * @param {string} value        Value to convert
@@ -72,7 +83,7 @@ export const VIEWS = {
  * @return {string} Mapping of the spacing preset to its equivalent custom value.
  */
 export function getCustomValueFromPreset( value, spacingSizes ) {
-	if ( ! isValuePreset( value, SPACING_PRESET_TYPE ) ) {
+	if ( ! isValueSpacingPreset( value ) ) {
 		return value;
 	}
 
@@ -96,11 +107,7 @@ export function getCustomValueFromPreset( value, spacingSizes ) {
  */
 export function getPresetValueFromCustomValue( value, spacingSizes ) {
 	// Return value as-is if it is undefined or is already a preset, or '0';
-	if (
-		! value ||
-		isValuePreset( value, SPACING_PRESET_TYPE ) ||
-		value === '0'
-	) {
+	if ( ! value || isValueSpacingPreset( value ) || value === '0' ) {
 		return value;
 	}
 

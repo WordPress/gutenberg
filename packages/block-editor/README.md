@@ -675,6 +675,18 @@ _Related_
 
 Undocumented declaration.
 
+### isValueSpacingPreset
+
+Checks is given value is a spacing preset.
+
+_Parameters_
+
+-   _value_ `string`: Value to check
+
+_Returns_
+
+-   `boolean`: Return true if value is string in format var:preset|spacing|.
+
 ### JustifyContentControl
 
 _Related_
