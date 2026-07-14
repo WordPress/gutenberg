@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Internal
+
+-   `Button`: Migrate hardcoded Sass spacing, border, and typography values to WPDS design tokens ([#79993](https://github.com/WordPress/gutenberg/pull/79993)).
+-   `Button`: Align brand, pressed, and destructive variant colors with WPDS interactive tokens used by `@wordpress/ui` Button while preserving admin theme color support via token fallbacks.
+
 ## 37.0.0 (2026-07-14)
 
 ### Enhancements
