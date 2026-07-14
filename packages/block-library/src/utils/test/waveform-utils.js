@@ -7,6 +7,7 @@ import '@testing-library/jest-dom';
  * Internal dependencies
  */
 import {
+	applyWaveformPlayerAnimation,
 	applyWaveformPlayerStyles,
 	createWaveformContainer,
 	getWaveformColors,
@@ -334,6 +335,54 @@ describe( 'Waveform utilities', () => {
 			expect( container ).not.toHaveStyle( {
 				'--wfp-button-color': '#ff0000',
 			} );
+		} );
+	} );
+
+	describe( 'applyWaveformPlayerAnimation', () => {
+		it( 'applies the spin play animation class', () => {
+			const container = document.createElement( 'div' );
+
+			applyWaveformPlayerAnimation( container, 'spin' );
+
+			expect( container ).toHaveClass( 'has-play-animation--spin' );
+		} );
+
+		it( 'applies the flip play animation class', () => {
+			const container = document.createElement( 'div' );
+
+			applyWaveformPlayerAnimation( container, 'flip' );
+
+			expect( container ).toHaveClass( 'has-play-animation--flip' );
+		} );
+
+		it( 'applies the scale play animation class', () => {
+			const container = document.createElement( 'div' );
+
+			applyWaveformPlayerAnimation( container, 'scale' );
+
+			expect( container ).toHaveClass( 'has-play-animation--scale' );
+		} );
+
+		it( 'replaces an existing play animation class', () => {
+			const container = document.createElement( 'div' );
+			container.className = 'has-play-animation--spin';
+
+			applyWaveformPlayerAnimation( container, 'scale' );
+
+			expect( container ).toHaveClass( 'has-play-animation--scale' );
+			expect( container ).not.toHaveClass( 'has-play-animation--spin' );
+		} );
+
+		it( 'removes play animation classes when set to none', () => {
+			const container = document.createElement( 'div' );
+			container.className =
+				'has-play-animation--flip has-play-animation--scale has-play-animation--spin';
+
+			applyWaveformPlayerAnimation( container, 'none' );
+
+			expect( container ).not.toHaveClass( 'has-play-animation--flip' );
+			expect( container ).not.toHaveClass( 'has-play-animation--scale' );
+			expect( container ).not.toHaveClass( 'has-play-animation--spin' );
 		} );
 	} );
 

@@ -151,6 +151,16 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$processor->set_attribute( 'data-wp-interactive', 'core/playlist' );
 
 	$waveform_style = $attributes['waveformStyle'] ?? 'bars';
+	$play_animation = $attributes['playAnimation'] ?? 'scale';
+	if (
+		! in_array(
+			$play_animation,
+			array( 'flip', 'none', 'scale', 'spin' ),
+			true
+		)
+	) {
+		$play_animation = 'scale';
+	}
 
 	$processor->set_attribute(
 		'data-wp-context',
@@ -161,6 +171,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				'isPlaying'             => false,
 				'tracks'                => $playlist_tracks,
 				'waveformStyle'         => $waveform_style,
+				'playAnimation'         => $play_animation,
 				'showPlayButtonArtwork' => $show_play_button_artwork,
 				'labelPauseTrack'       => __( 'Pause' ),
 				'labelSelectTrack'      => __( 'Play' ),

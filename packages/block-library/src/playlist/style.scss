@@ -52,6 +52,125 @@ $waveform-player-height: 100px;
 		}
 	}
 
+	:where(.waveform-player.has-play-animation--flip, .waveform-player.has-play-animation--scale, .waveform-player.has-play-animation--spin) {
+		:where(.waveform-btn) {
+			overflow: hidden;
+			position: relative;
+
+			:where(.waveform-icon-play, .waveform-icon-pause) {
+				align-items: center;
+				display: flex !important;
+				inset: 0;
+				justify-content: center;
+				pointer-events: none;
+				position: absolute;
+				transform-origin: center;
+			}
+		}
+	}
+
+	:where(.waveform-player.has-play-animation--scale) {
+		:where(.waveform-btn) {
+			:where(.waveform-icon-play) {
+				opacity: 1;
+				transform: scale(1);
+			}
+
+			:where(.waveform-icon-pause) {
+				opacity: 0;
+				transform: scale(0.2);
+			}
+
+			&:where(.playing) {
+				:where(.waveform-icon-play) {
+					opacity: 0;
+					transform: scale(0.2);
+				}
+
+				:where(.waveform-icon-pause) {
+					opacity: 1;
+					transform: scale(1);
+				}
+			}
+		}
+	}
+
+	:where(.waveform-player.has-play-animation--spin) {
+		:where(.waveform-btn) {
+			:where(.waveform-icon-play) {
+				opacity: 1;
+				transform: scale(1) rotate(0deg);
+			}
+
+			:where(.waveform-icon-pause) {
+				opacity: 0;
+				transform: scale(0.72) rotate(-90deg);
+			}
+
+			&:where(.playing) {
+				:where(.waveform-icon-play) {
+					opacity: 0;
+					transform: translateX(0.375rem) scale(0.72) rotate(90deg);
+				}
+
+				:where(.waveform-icon-pause) {
+					opacity: 1;
+					transform: scale(1) rotate(0deg);
+				}
+			}
+		}
+	}
+
+	:where(.waveform-player.has-play-animation--flip) {
+		:where(.waveform-btn) {
+			:where(.waveform-icon-play) {
+				clip-path: inset(0);
+				opacity: 1;
+				transform: scaleX(1);
+			}
+
+			:where(.waveform-icon-pause) {
+				clip-path: inset(0 42%);
+				opacity: 0;
+				transform: scaleX(0.2);
+			}
+
+			&:where(.playing) {
+				:where(.waveform-icon-play) {
+					clip-path: inset(0 42%);
+					opacity: 0;
+					transform: translateX(0) scaleX(0.2);
+				}
+
+				:where(.waveform-icon-pause) {
+					clip-path: inset(0);
+					opacity: 1;
+					transform: scaleX(1);
+				}
+			}
+		}
+	}
+
+	// Add transitions only for users who do not prefer reduced motion.
+	@media (prefers-reduced-motion: no-preference) {
+		:where(.waveform-player.has-play-animation--flip, .waveform-player.has-play-animation--spin) {
+			:where(.waveform-icon-play, .waveform-icon-pause) {
+				transition:
+					opacity 0.16s ease,
+					clip-path 0.24s cubic-bezier(0.2, 0.8, 0.2, 1),
+					transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+			}
+		}
+
+		:where(.waveform-player.has-play-animation--scale) {
+			:where(.waveform-icon-play, .waveform-icon-pause) {
+				transition:
+					opacity 0.2s ease,
+					transform 0.36s cubic-bezier(0.34, 1.56, 0.64, 1);
+			}
+		}
+	}
+
 	.waveform-player.has-play-button-artwork {
 		.waveform-btn {
 			background-image: var(--wp--playlist--play-button-artwork);

@@ -15,6 +15,12 @@ import WaveformPlayerLib from '@arraypress/waveform-player';
  */
 const DEFAULT_WAVEFORM_HEIGHT = 100;
 const DEFAULT_SEEK_LABEL = 'Seek';
+const PLAY_ANIMATION_CLASSES_BY_VALUE = {
+	flip: 'has-play-animation--flip',
+	scale: 'has-play-animation--scale',
+	spin: 'has-play-animation--spin',
+};
+const PLAY_ANIMATION_CLASSES = Object.values( PLAY_ANIMATION_CLASSES_BY_VALUE );
 
 /**
  * Get computed style for an element, using ownerDocument for iframe compatibility.
@@ -382,6 +388,22 @@ export function applyWaveformPlayerStyles(
 }
 
 /**
+ * Apply the selected play/pause icon animation style.
+ *
+ * @param {Element} container     - The generated player container.
+ * @param {string}  playAnimation - The selected play animation style.
+ */
+export function applyWaveformPlayerAnimation( container, playAnimation ) {
+	container.classList.remove( ...PLAY_ANIMATION_CLASSES );
+
+	if ( PLAY_ANIMATION_CLASSES_BY_VALUE[ playAnimation ] ) {
+		container.classList.add(
+			PLAY_ANIMATION_CLASSES_BY_VALUE[ playAnimation ]
+		);
+	}
+}
+
+/**
  * Apply contrasting color to SVG icon paths for visibility.
  * The icons should contrast with the button background.
  *
@@ -520,6 +542,7 @@ export function logPlayError( error ) {
  * @param {Function} options.onEnded               - Callback when track ends.
  * @param {Object}   options.labels                - Translated button labels.
  * @param {string}   options.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {string}   options.playAnimation         - Play/pause icon animation style.
  * @param {boolean}  options.showPlayButtonArtwork - Whether to show artwork on the play button.
  * @return {Object} Object with instance, container, and destroy function.
  */
@@ -540,6 +563,7 @@ export function initWaveformPlayer(
 		onEnded,
 		labels,
 		waveformStyle,
+		playAnimation = 'scale',
 		showPlayButtonArtwork = false,
 	}
 ) {
@@ -581,6 +605,7 @@ export function initWaveformPlayer(
 	// seek label and value-text templates from the container's data attributes
 	// and owns the seek slider's accessible label and value text.
 	const instance = new WaveformPlayerLib( container );
+	applyWaveformPlayerAnimation( container, playAnimation );
 	if ( instance.artworkEl ) {
 		instance.artworkEl.alt = imageAlt || '';
 	}
