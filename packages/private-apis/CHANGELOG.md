@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 1.51.0 (2026-07-14)
-
 ### Enhancements
 
 - Allow `@wordpress/global-styles-engine` to opt in to private APIs. ([#79104](https://github.com/WordPress/gutenberg/pull/79104))

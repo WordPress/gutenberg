@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 9.36.0 (2026-07-14)
-
 ### Enhancements
 
 -   `ComplementaryArea`: Use the emphasis font-weight token for headings ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).

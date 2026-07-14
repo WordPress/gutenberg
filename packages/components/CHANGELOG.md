@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 37.0.0 (2026-07-14)
-
 ### Enhancements
 
 -   `ControlWithError`: Remove redundant inline aria-live region for validation error messages to prevent duplicate announcements. ([#79600](https://github.com/WordPress/gutenberg/pull/79600)).

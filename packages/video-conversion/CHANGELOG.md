@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 0.2.0 (2026-07-14)
-
 ### New Features
 
 -   Initial release. Provides a WebCodecs-based wrapper for animated GIF to video (MP4/WebM) conversion. Uses the [mediabunny](https://github.com/Vanilagy/mediabunny) library internally for encoder orchestration.
