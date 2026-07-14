@@ -93,6 +93,9 @@ const otherOssLicenses = [
 	'Apache License, Version 2.0',
 	'CC-BY-3.0',
 	'CC-BY-SA-2.0',
+	'GPL-3.0',
+	'GPL-3.0-only',
+	'GPL-3.0-or-later',
 	'LGPL',
 	'Python-2.0',
 ];

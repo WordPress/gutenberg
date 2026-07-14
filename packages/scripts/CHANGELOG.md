@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `check-licenses`: Recognize GPLv3 licenses (`GPL-3.0`, `GPL-3.0-only`, `GPL-3.0-or-later`) as compatible when the `--gpl2` flag is not passed ([#20701](https://github.com/WordPress/gutenberg/issues/20701)).
+
 ## 33.0.0 (2026-07-14)
 
 ### Breaking Changes
