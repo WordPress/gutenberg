@@ -111,8 +111,8 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	 * @covers ::gutenberg_get_note_mentioned_user_ids
 	 */
 	public function test_parses_mentioned_user_ids(): void {
-		$content = '<p>Hi <a class="wp-note-mention" data-user-id="5" href="#">@Jane</a> and '
-			. '<a class="wp-note-mention" data-user-id="9" href="#">@Bob</a>.</p>';
+		$content = '<p>Hi <a class="wp-note-mention user-5" href="#">@Jane</a> and '
+			. '<a class="wp-note-mention user-9" href="#">@Bob</a>.</p>';
 
 		$this->assertSame(
 			array( 5, 9 ),
@@ -124,9 +124,10 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	 * @covers ::gutenberg_get_note_mentioned_user_ids
 	 */
 	public function test_ignores_plain_links_and_deduplicates(): void {
-		$content = '<p><a href="https://example.com" data-user-id="7">not a mention</a> '
-			. '<a class="wp-note-mention" data-user-id="5" href="#">@Jane</a> '
-			. '<a class="wp-note-mention" data-user-id="5" href="#">@Jane again</a></p>';
+		$content = '<p><a class="user-7" href="https://example.com">not a mention</a> '
+			. '<a class="wp-note-mention user-5" href="#">@Jane</a> '
+			. '<a class="wp-note-mention user-5" href="#">@Jane again</a> '
+			. '<a class="wp-note-mention" href="#">no user class</a></p>';
 
 		$this->assertSame(
 			array( 5 ),
@@ -135,10 +136,11 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::gutenberg_note_mention_allowed_html
-	 * @covers ::gutenberg_note_mentions_before_rest_callbacks
-	 * @covers ::gutenberg_note_mentions_after_rest_callbacks
-	 * @covers ::gutenberg_rest_request_saves_note
+	 * The kses allowance itself lives in block-comments.php (and is tested in
+	 * notes-mention-kses-test.php); this guards the notification parser against
+	 * regressions in that contract end-to-end on the REST create path.
+	 *
+	 * @covers ::gutenberg_get_note_mentioned_user_ids
 	 */
 	public function test_mention_markup_survives_kses_for_authors(): void {
 		$author  = self::create_user( 'author' );
@@ -150,7 +152,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$this->assertFalse( current_user_can( 'unfiltered_html' ) );
 
 		$mention = sprintf(
-			'<a class="wp-note-mention" data-user-id="%d" href="http://example.com/">@Mentioned</a>',
+			'<a class="wp-note-mention user-%d" href="http://example.com/">@Mentioned</a>',
 			self::$mentioned->ID
 		);
 
@@ -200,7 +202,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	 */
 	public function test_mentioned_user_is_emailed_and_subscribed(): void {
 		$mention = sprintf(
-			'<a class="wp-note-mention" data-user-id="%d" href="#">@Mentioned</a>',
+			'<a class="wp-note-mention user-%d" href="#">@Mentioned</a>',
 			self::$mentioned->ID
 		);
 		$note    = $this->insert_note( "Ping $mention", self::$commenter->ID );
@@ -220,7 +222,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	 */
 	public function test_author_is_not_notified_about_their_own_note(): void {
 		$self_mention = sprintf(
-			'<a class="wp-note-mention" data-user-id="%d" href="#">@Me</a>',
+			'<a class="wp-note-mention user-%d" href="#">@Me</a>',
 			self::$commenter->ID
 		);
 		$note         = $this->insert_note( "Note to $self_mention", self::$commenter->ID );
@@ -235,7 +237,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	 */
 	public function test_post_author_is_left_to_core(): void {
 		$mention = sprintf(
-			'<a class="wp-note-mention" data-user-id="%d" href="#">@Author</a>',
+			'<a class="wp-note-mention user-%d" href="#">@Author</a>',
 			self::$post_author->ID
 		);
 		$note    = $this->insert_note( "Hey $mention", self::$commenter->ID );
@@ -255,7 +257,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$subscriber_user = self::create_user( 'subscriber' );
 
 		$mention = sprintf(
-			'<a class="wp-note-mention" data-user-id="%d" href="#">@Subscriber</a>',
+			'<a class="wp-note-mention user-%d" href="#">@Subscriber</a>',
 			$subscriber_user->ID
 		);
 		$note    = $this->insert_note( "Ping $mention", self::$commenter->ID );
@@ -280,7 +282,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	 */
 	public function test_followers_are_notified_of_replies(): void {
 		$mention = sprintf(
-			'<a class="wp-note-mention" data-user-id="%d" href="#">@Mentioned</a>',
+			'<a class="wp-note-mention user-%d" href="#">@Mentioned</a>',
 			self::$mentioned->ID
 		);
 		$root    = $this->insert_note( "Start $mention", self::$commenter->ID );
@@ -303,7 +305,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		update_option( 'wp_notes_notify', 0 );
 
 		$mention = sprintf(
-			'<a class="wp-note-mention" data-user-id="%d" href="#">@Mentioned</a>',
+			'<a class="wp-note-mention user-%d" href="#">@Mentioned</a>',
 			self::$mentioned->ID
 		);
 		$note    = $this->insert_note( "Ping $mention", self::$commenter->ID );
@@ -319,7 +321,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	 */
 	public function test_editing_a_note_does_not_renotify(): void {
 		$mention = sprintf(
-			'<a class="wp-note-mention" data-user-id="%d" href="#">@Mentioned</a>',
+			'<a class="wp-note-mention user-%d" href="#">@Mentioned</a>',
 			self::$mentioned->ID
 		);
 		$note    = $this->insert_note( "Ping $mention", self::$commenter->ID );
@@ -344,7 +346,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		add_filter( 'wp_note_notification_recipients', $filter );
 
 		$mention = sprintf(
-			'<a class="wp-note-mention" data-user-id="%d" href="#">@Mentioned</a>',
+			'<a class="wp-note-mention user-%d" href="#">@Mentioned</a>',
 			self::$mentioned->ID
 		);
 		$note    = $this->insert_note( "Ping $mention", self::$commenter->ID );

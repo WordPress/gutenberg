@@ -2,14 +2,16 @@
 /**
  * Mention and follower notifications for notes (block comments).
  *
- * Note content can carry `@` mentions, stored as
- * `<a class="wp-note-mention" data-user-id="…">@Name</a>` (the markup contract
- * lives in the `core/note-mention` format, see
- * packages/editor/src/components/collab-sidebar/mention-format.js). When a
- * note is created through the REST API this file parses those mentions out of
- * the saved content and emails the mentioned users, in addition to maintaining
- * a per-thread "followers" list so that people who start, reply to, or are
- * mentioned in a thread are notified of later activity on it.
+ * Note content can carry `@` mentions, stored as author-page links of the form
+ * `<a class="wp-note-mention user-N" href="…">@Name</a>` where `N` is the
+ * mentioned user's ID (the markup contract lives in
+ * packages/editor/src/components/collab-sidebar/note-mention-completer.tsx,
+ * and kses allowance for the classes in
+ * lib/compat/wordpress-7.1/block-comments.php). When a note is created through
+ * the REST API this file parses those mentions out of the saved content and
+ * emails the mentioned users, in addition to maintaining a per-thread
+ * "followers" list so that people who start, reply to, or are mentioned in a
+ * thread are notified of later activity on it.
  *
  * WordPress core already notifies the post author of every note via
  * `wp_new_comment_via_rest_notify_postauthor()` on `rest_insert_comment`. This
@@ -24,9 +26,10 @@ if ( ! function_exists( 'gutenberg_get_note_mentioned_user_ids' ) ) {
 	/**
 	 * Extracts the mentioned user IDs from note content.
 	 *
-	 * Mentions are stored as links carrying a `data-user-id` attribute and the
-	 * `wp-note-mention` class. Only anchors that carry both are treated as
-	 * mentions so that ordinary links cannot be used to address notifications.
+	 * Mentions are stored as links carrying the `wp-note-mention` class plus a
+	 * `user-N` class token holding the mentioned user's ID. Only anchors that
+	 * carry both are treated as mentions so that ordinary links cannot be used
+	 * to address notifications.
 	 *
 	 * @param string $content Note (comment) content, as stored.
 	 * @return list<int> Unique, positive mentioned user IDs.
@@ -47,125 +50,16 @@ if ( ! function_exists( 'gutenberg_get_note_mentioned_user_ids' ) ) {
 				)
 			)
 		) {
-			$user_id = (int) $processor->get_attribute( 'data-user-id' );
-			if ( $user_id > 0 ) {
-				$user_ids[] = $user_id;
+			foreach ( $processor->class_list() as $class_name ) {
+				if ( 1 === preg_match( '/^user-([1-9][0-9]*)$/', $class_name, $matches ) ) {
+					$user_ids[] = (int) $matches[1];
+					break;
+				}
 			}
 		}
 
 		return array_values( array_unique( $user_ids, SORT_NUMERIC ) );
 	}
-}
-
-if ( ! function_exists( 'gutenberg_note_mention_allowed_html' ) ) {
-	/**
-	 * Adds the mention attributes to the comment kses allowlist.
-	 *
-	 * For users without `unfiltered_html`, comment content passes through
-	 * `wp_filter_kses()` with the default comment allowlist, which only permits
-	 * `href` and `title` on `<a>`. That strips the `class` and `data-user-id`
-	 * attributes mentions are stored with, silently breaking mention parsing
-	 * for authors and contributors (and everyone but super admins on
-	 * multisite). This filter is only installed while a REST request is saving
-	 * a note, so ordinary comments keep the default allowlist.
-	 *
-	 * @param array[] $tags    Allowed HTML tags and attributes.
-	 * @param string  $context Kses context name.
-	 * @return array[] Filtered tags.
-	 *
-	 * @phpstan-param array<non-empty-string, array<non-empty-string, bool>> $tags
-	 * @return array<non-empty-string, array<non-empty-string, bool>>
-	 */
-	function gutenberg_note_mention_allowed_html( $tags, string $context ): array {
-		if ( ! is_array( $tags ) ) {
-			$tags = array();
-		}
-		if ( 'pre_comment_content' === $context && isset( $tags['a'] ) && is_array( $tags['a'] ) ) {
-			$tags['a']['class']        = true;
-			$tags['a']['data-user-id'] = true;
-		}
-		return $tags;
-	}
-}
-
-if ( ! function_exists( 'gutenberg_rest_request_saves_note' ) ) {
-	/**
-	 * Determines whether a REST request creates or updates a note.
-	 *
-	 * @param WP_REST_Request $request The matched REST request.
-	 * @return bool Whether the request writes a note comment.
-	 */
-	function gutenberg_rest_request_saves_note( WP_REST_Request $request ): bool {
-		if ( ! in_array( $request->get_method(), array( 'POST', 'PUT', 'PATCH' ), true ) ) {
-			return false;
-		}
-
-		if ( ! str_starts_with( $request->get_route(), '/wp/v2/comments' ) ) {
-			return false;
-		}
-
-		if ( 'note' === $request->get_param( 'type' ) ) {
-			return true;
-		}
-
-		// Updates usually omit `type`; look at the targeted comment instead.
-		$comment_id = (int) $request->get_param( 'id' );
-		if ( $comment_id > 0 ) {
-			$existing = get_comment( $comment_id );
-			return $existing && 'note' === $existing->comment_type;
-		}
-
-		return false;
-	}
-}
-
-if ( ! function_exists( 'gutenberg_note_mentions_before_rest_callbacks' ) ) {
-	/**
-	 * Installs the mention kses allowance while a REST request saves a note.
-	 *
-	 * `rest_request_before_callbacks` runs after routing, so on updates the
-	 * targeted comment is known, and before the endpoint filters comment
-	 * content through kses. The paired `rest_request_after_callbacks` handler
-	 * removes the allowance again so other comment writes in the same request
-	 * lifecycle (e.g. batch requests) keep the default allowlist.
-	 *
-	 * @param mixed            $response Result to send; untouched here.
-	 * @param mixed[]|callable $handler  Route handler (unused).
-	 * @param WP_REST_Request  $request  The matched request.
-	 * @return mixed Untouched $response.
-	 *
-	 * @template T
-	 * @phpstan-param T $response
-	 * @phpstan-return T
-	 */
-	function gutenberg_note_mentions_before_rest_callbacks( $response, $handler, WP_REST_Request $request ) {
-		unset( $handler );
-
-		if ( gutenberg_rest_request_saves_note( $request ) ) {
-			add_filter( 'wp_kses_allowed_html', 'gutenberg_note_mention_allowed_html', 10, 2 );
-		}
-
-		return $response;
-	}
-	add_filter( 'rest_request_before_callbacks', 'gutenberg_note_mentions_before_rest_callbacks', 10, 3 );
-}
-
-if ( ! function_exists( 'gutenberg_note_mentions_after_rest_callbacks' ) ) {
-	/**
-	 * Removes the mention kses allowance after a REST request completes.
-	 *
-	 * @param mixed $response Result to send; untouched here.
-	 * @return mixed Untouched $response.
-	 *
-	 * @template T
-	 * @phpstan-param T $response
-	 * @phpstan-return T
-	 */
-	function gutenberg_note_mentions_after_rest_callbacks( $response ) {
-		remove_filter( 'wp_kses_allowed_html', 'gutenberg_note_mention_allowed_html', 10 );
-		return $response;
-	}
-	add_filter( 'rest_request_after_callbacks', 'gutenberg_note_mentions_after_rest_callbacks' );
 }
 
 if ( ! function_exists( 'gutenberg_get_note_thread_root_id' ) ) {
