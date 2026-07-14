@@ -8,15 +8,6 @@ const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
 const ICON_VIEW_BOX = '0 0 24 24';
 
 /*
- * Legacy icons that intentionally use a non-standard viewBox.
- */
-const LEGACY_VIEW_BOX_ICONS = new Set( [
-	'keyboard-close.svg',
-	'offline.svg',
-	'wordpress.svg',
-] );
-
-/*
  * Validating the icons collection means verifying that each icon defined in
  * the manifest has a corresponding SVG file found in the library/ folder and
  * vice versa, that each SVG uses currentColor so icons inherit text color,
@@ -107,15 +98,11 @@ async function validateCollection() {
 			);
 		}
 
-		const fileName = path.basename( file );
 		if ( ! svgContent.includes( 'viewBox=' ) ) {
 			problems.push(
 				`- Icon ${ svgPath } must set a viewBox attribute instead of width and height attributes`
 			);
-		} else if (
-			! LEGACY_VIEW_BOX_ICONS.has( fileName ) &&
-			! svgContent.includes( `viewBox="${ ICON_VIEW_BOX }"` )
-		) {
+		} else if ( ! svgContent.includes( `viewBox="${ ICON_VIEW_BOX }"` ) ) {
 			problems.push(
 				`- Icon ${ svgPath } must set viewBox="${ ICON_VIEW_BOX }"`
 			);
