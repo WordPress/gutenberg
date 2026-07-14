@@ -128,25 +128,9 @@ const sides = [ 'top', 'right', 'bottom', 'left' ];
  * @property {string}                            [format]         Display format hint (`border`, `borderRadius`, `spacing`).
  */
 
-/**
- * Builds the border review rows.
- *
- * Border styles are grouped by scope so each row reads as a CSS `border`
- * shorthand rather than one row per longhand: a single "Border" row for the
- * all-sides shorthand, one row per side for split borders, and a "Border
- * radius" row. Grouping keeps the modal compact and legible.
- *
- * Global Styles requires per-side longhand configuration (to override per-side
- * theme.json settings) and a border style for a border to render, so the
- * all-sides shorthand is also written to every side and a `solid` style
- * fallback is added when a color or width is set without a style.
- *
- * @param {string[]} supports        Supported style keys for the block.
- * @param {Object}   attributes      Block attributes.
- * @param {Object}   blockUserConfig User Global Styles config for the block.
- *
- * @return {ChangeRow[]} Grouped border rows.
- */
+// Builds the border review rows, grouped by scope so each row reads as a CSS
+// `border` shorthand (all-sides, per-side, and radius) rather than one row per
+// longhand.
 function getBorderRows( supports, attributes, blockUserConfig ) {
 	const rows = [];
 	const border = attributes.style?.border;
@@ -214,22 +198,9 @@ function getBorderRows( supports, attributes, blockUserConfig ) {
 	return rows;
 }
 
-/**
- * Builds a single border row (all-sides or one side) that pushes the scope's
- * color, width, and style together and displays them as a CSS shorthand.
- *
- * @param {Object}   options                  Options.
- * @param {string}   options.id               Row id.
- * @param {string[]} options.primaryPath      Path used for the current-value lookup.
- * @param {?string}  options.side             Side name, or `null` for all sides.
- * @param {*}        options.color            Border color value, if any.
- * @param {*}        options.width            Border width value, if any.
- * @param {*}        options.style            Border style value, if any.
- * @param {Object}   options.userBorder       User Global Styles border config.
- * @param {string[]} options.presetAttributes Preset block attributes to clear.
- *
- * @return {?ChangeRow} The border row, or `null` when the scope has no values.
- */
+// Builds a single border row (all-sides or one side) that pushes the scope's
+// color, width, and style together and displays them as a CSS shorthand.
+// Returns `null` when the scope has no values.
 function buildBorderScopeRow( {
 	id,
 	primaryPath,
@@ -294,12 +265,7 @@ function buildBorderScopeRow( {
 
 /**
  * Derives the block-instance style changes that can be pushed to Global Styles,
- * grouped into logical rows.
- *
- * Each row represents a single logical style (e.g. "Font size") and carries all
- * of its expanded `{ path, value }` pairs so that a selection can push them
- * atomically. Border styles are grouped by scope into shorthand rows (see
- * `getBorderRows`).
+ * grouped into logical rows (see `ChangeRow`).
  *
  * @param {Array}  supports        Supported style keys for the block.
  * @param {Object} attributes      Block attributes.
@@ -409,11 +375,8 @@ function useChangesToPush( name, attributes, userConfig ) {
 
 /**
  * Computes the block attribute and user Global Styles updates for a subset of
- * grouped rows without applying them.
- *
- * Preset block attributes are only cleared for rows that are part of the pushed
- * subset, so deselected preset styles are neither pushed nor wiped from the
- * block. Returns `null` when there is nothing to push.
+ * grouped rows without applying them. Returns `null` when there is nothing to
+ * push.
  *
  * @param {Object} options            Options.
  * @param {Array}  options.rowsToPush Grouped rows to push.
