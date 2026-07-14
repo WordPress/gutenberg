@@ -12,7 +12,7 @@ import {
 	publishVersionedPackagesToNpm,
 	pushNpmReleaseGitMetadata,
 	runNpmPublishPreflight,
-	runNpmReleaseGitPushPhase,
+	runNpmReleasePhase,
 	verifyRemotePackageTags,
 } from '../packages';
 
@@ -348,7 +348,7 @@ describe( 'runNpmPublishPreflight', () => {
 				{ commandFn }
 			)
 		).rejects.toThrow(
-			'@wordpress/a11y@4.50.0 exists in the npm registry, but dist-tag "latest" points to 4.49.0.'
+			'@wordpress/a11y@4.50.0 exists in the npm registry, but dist-tag "latest" points to 4.49.0. This release is no longer retryable because the dist-tag has moved.'
 		);
 		expect( console ).toHaveLogged();
 	} );
@@ -380,7 +380,7 @@ describe( 'runNpmPublishPreflight', () => {
 	} );
 } );
 
-describe( 'runNpmReleaseGitPushPhase', () => {
+describe( 'runNpmReleasePhase', () => {
 	it( 'retries a failed phase before surfacing success', async () => {
 		const task = jest
 			.fn()
@@ -388,7 +388,7 @@ describe( 'runNpmReleaseGitPushPhase', () => {
 			.mockResolvedValueOnce();
 		const wait = jest.fn();
 
-		await runNpmReleaseGitPushPhase( 'Package tag push', task, { wait } );
+		await runNpmReleasePhase( 'Package tag push', task, { wait } );
 
 		expect( task ).toHaveBeenCalledTimes( 2 );
 		expect( wait ).toHaveBeenCalledWith( 5000 );
@@ -609,6 +609,7 @@ describe( 'publishVersionedPackagesToNpm', () => {
 		const commandFn = jest.fn().mockResolvedValue();
 		const pushNpmReleaseGitMetadataFn = jest.fn();
 		const runNpmPublishPreflightFn = jest.fn().mockResolvedValue( [] );
+		const runPhase = jest.fn( async ( _label, task ) => task() );
 		const git = {
 			revparse: jest.fn().mockResolvedValue( 'publish-sha' ),
 		};
@@ -634,6 +635,7 @@ describe( 'publishVersionedPackagesToNpm', () => {
 					git,
 					pushNpmReleaseGitMetadataFn,
 					runNpmPublishPreflightFn,
+					runPhase,
 				}
 			)
 		).rejects.toThrow(
@@ -641,7 +643,56 @@ describe( 'publishVersionedPackagesToNpm', () => {
 		);
 
 		expect( runNpmPublishPreflightFn ).toHaveBeenCalledTimes( 2 );
+		expect( runPhase ).toHaveBeenCalledWith(
+			'npm publication verification',
+			expect.any( Function )
+		);
 		expect( pushNpmReleaseGitMetadataFn ).not.toHaveBeenCalled();
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'retries final registry verification after propagation lag', async () => {
+		const commandFn = jest.fn().mockResolvedValue();
+		const pushNpmReleaseGitMetadataFn = jest.fn();
+		const runNpmPublishPreflightFn = jest
+			.fn()
+			.mockResolvedValueOnce( [] )
+			.mockResolvedValueOnce( [] )
+			.mockResolvedValueOnce( [ '@wordpress/a11y' ] );
+		const wait = jest.fn();
+		const runPhase = ( label, task ) =>
+			runNpmReleasePhase( label, task, { wait } );
+		const git = {
+			revparse: jest.fn().mockResolvedValue( 'publish-sha' ),
+		};
+
+		await publishVersionedPackagesToNpm(
+			{
+				distTag: 'latest',
+				gitWorkingDirectoryPath: '/repo',
+				noVerifyAccessFlag: '--no-verify-access',
+				npmReleaseBranch: 'wp/latest',
+				yesFlag: '--yes',
+			},
+			{
+				commandFn,
+				getNpmReleasePackagesFn: jest.fn().mockResolvedValue( [
+					{
+						name: '@wordpress/a11y',
+						tagName: '@wordpress/a11y@4.50.0',
+						version: '4.50.0',
+					},
+				] ),
+				git,
+				pushNpmReleaseGitMetadataFn,
+				runNpmPublishPreflightFn,
+				runPhase,
+			}
+		);
+
+		expect( runNpmPublishPreflightFn ).toHaveBeenCalledTimes( 3 );
+		expect( wait ).toHaveBeenCalledWith( 5000 );
+		expect( pushNpmReleaseGitMetadataFn ).toHaveBeenCalled();
 		expect( console ).toHaveLogged();
 	} );
 } );
