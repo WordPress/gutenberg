@@ -244,7 +244,7 @@ describe( 'runNpmPublishPreflight', () => {
 		);
 		expect( commandFn ).toHaveBeenNthCalledWith(
 			2,
-			'npm view @wordpress/a11y@4.50.0 version --json',
+			'npm view @wordpress/a11y@4.50.0 version gitHead dist-tags --json',
 			{ cwd: '/repo', stdio: 'pipe' }
 		);
 		expect( console ).toHaveLogged();
@@ -254,9 +254,9 @@ describe( 'runNpmPublishPreflight', () => {
 		const commandFn = jest
 			.fn()
 			.mockResolvedValueOnce()
-			.mockResolvedValueOnce( { stdout: '"4.50.0"' } )
-			.mockResolvedValueOnce( { stdout: '"publish-sha"' } )
-			.mockResolvedValueOnce( { stdout: '{"latest":"4.50.0"}' } );
+			.mockResolvedValueOnce( {
+				stdout: '{"version":"4.50.0","gitHead":"publish-sha","dist-tags":{"latest":"4.50.0"}}',
+			} );
 
 		await expect(
 			runNpmPublishPreflight(
@@ -271,6 +271,7 @@ describe( 'runNpmPublishPreflight', () => {
 				{ commandFn }
 			)
 		).resolves.toEqual( [ '@wordpress/a11y' ] );
+		expect( commandFn ).toHaveBeenCalledTimes( 2 );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -278,8 +279,9 @@ describe( 'runNpmPublishPreflight', () => {
 		const commandFn = jest
 			.fn()
 			.mockResolvedValueOnce()
-			.mockResolvedValueOnce( { stdout: '"4.50.0"' } )
-			.mockResolvedValueOnce( { stdout: '"other-sha"' } );
+			.mockResolvedValueOnce( {
+				stdout: '{"version":"4.50.0","gitHead":"other-sha","dist-tags":{"latest":"4.50.0"}}',
+			} );
 
 		await expect(
 			runNpmPublishPreflight(
@@ -303,8 +305,9 @@ describe( 'runNpmPublishPreflight', () => {
 		const commandFn = jest
 			.fn()
 			.mockResolvedValueOnce()
-			.mockResolvedValueOnce( { stdout: '"4.50.0"' } )
-			.mockResolvedValueOnce( { stdout: '' } );
+			.mockResolvedValueOnce( {
+				stdout: '{"version":"4.50.0","dist-tags":{"latest":"4.50.0"}}',
+			} );
 
 		await expect(
 			runNpmPublishPreflight(
@@ -328,9 +331,9 @@ describe( 'runNpmPublishPreflight', () => {
 		const commandFn = jest
 			.fn()
 			.mockResolvedValueOnce()
-			.mockResolvedValueOnce( { stdout: '"4.50.0"' } )
-			.mockResolvedValueOnce( { stdout: '"publish-sha"' } )
-			.mockResolvedValueOnce( { stdout: '{"latest":"4.49.0"}' } );
+			.mockResolvedValueOnce( {
+				stdout: '{"version":"4.50.0","gitHead":"publish-sha","dist-tags":{"latest":"4.49.0"}}',
+			} );
 
 		await expect(
 			runNpmPublishPreflight(
@@ -354,7 +357,9 @@ describe( 'runNpmPublishPreflight', () => {
 		const commandFn = jest
 			.fn()
 			.mockResolvedValueOnce()
-			.mockResolvedValueOnce( { stdout: '"4.49.0"' } );
+			.mockResolvedValueOnce( {
+				stdout: '{"version":"4.49.0","gitHead":"publish-sha","dist-tags":{"latest":"4.49.0"}}',
+			} );
 
 		await expect(
 			runNpmPublishPreflight(

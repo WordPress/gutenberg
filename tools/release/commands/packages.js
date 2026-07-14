@@ -704,20 +704,20 @@ async function runNpmPublishPreflight(
 	log( '>> Verifying target package versions and dist-tags.' );
 	const publishedPackageNames = [];
 	// TODO: Consider bounded concurrency here if this preflight becomes too slow.
-	// Keep the first hardening pass sequential so registry errors stay easy to read.
+	// Keep registry checks sequential so errors stay easy to read.
 	for ( const { name, version } of releasePackages ) {
-		let registryVersion;
+		let registryPackage;
 		try {
 			const { stdout } = await commandFn(
-				`npm view ${ name }@${ version } version --json`,
+				`npm view ${ name }@${ version } version gitHead dist-tags --json`,
 				{
 					cwd: gitWorkingDirectoryPath,
 					stdio: 'pipe',
 				}
 			);
-			registryVersion = parseNpmJsonOutput(
+			registryPackage = parseNpmJsonOutput(
 				stdout,
-				`${ name }@${ version } version`
+				`${ name }@${ version } metadata`
 			);
 		} catch ( error ) {
 			if ( isNpmPackageVersionMissing( error ) ) {
@@ -726,25 +726,17 @@ async function runNpmPublishPreflight(
 			throw error;
 		}
 
+		const {
+			version: registryVersion,
+			gitHead: registryGitHead,
+			'dist-tags': distTags = {},
+		} = registryPackage;
 		if ( registryVersion !== version ) {
 			throw new Error(
 				`Expected npm registry lookup for ${ name }@${ version } to return version ${ version }, got ${ registryVersion }.`
 			);
 		}
 
-		const { stdout: gitHeadOutput } = await commandFn(
-			`npm view ${ name }@${ version } gitHead --json`,
-			{
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'pipe',
-			}
-		);
-		const registryGitHead = gitHeadOutput.trim()
-			? parseNpmJsonOutput(
-					gitHeadOutput,
-					`${ name }@${ version } gitHead`
-			  )
-			: null;
 		if ( registryGitHead !== publishCommit ) {
 			throw new Error(
 				`${ name }@${ version } exists in the npm registry with gitHead ${
@@ -753,17 +745,6 @@ async function runNpmPublishPreflight(
 			);
 		}
 
-		const { stdout: distTagsOutput } = await commandFn(
-			`npm view ${ name } dist-tags --json`,
-			{
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'pipe',
-			}
-		);
-		const distTags = parseNpmJsonOutput(
-			distTagsOutput,
-			`${ name } dist-tags`
-		);
 		if ( distTags[ distTag ] !== version ) {
 			throw new Error(
 				`${ name }@${ version } exists in the npm registry, but dist-tag "${ distTag }" points to ${
