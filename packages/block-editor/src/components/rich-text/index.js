@@ -236,9 +236,28 @@ export function RichTextWrapper(
 	const isInsidePatternOverrides = !! blockContext?.[ 'pattern/overrides' ];
 	const hasOverrideEnabled =
 		blockBindings?.__default?.source === 'core/pattern-overrides';
+	const isInsideEditableBoundInnerBlocks = useSelect(
+		( select ) => {
+			if ( ! isInsidePatternOverrides || hasOverrideEnabled ) {
+				return false;
+			}
+
+			const blockEditor = select( blockEditorStore );
+			if ( ! blockEditor.getSettings().blockBindingsInnerBlocks ) {
+				return false;
+			}
+
+			return unlock( blockEditor ).isWithinBoundInnerBlocks(
+				blockEditor.getBlockRootClientId( clientId )
+			);
+		},
+		[ clientId, isInsidePatternOverrides, hasOverrideEnabled ]
+	);
 
 	const shouldDisableForPattern =
-		isInsidePatternOverrides && ! hasOverrideEnabled;
+		isInsidePatternOverrides &&
+		! hasOverrideEnabled &&
+		! isInsideEditableBoundInnerBlocks;
 
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;

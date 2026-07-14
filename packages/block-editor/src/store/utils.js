@@ -17,6 +17,7 @@ import {
 	getSectionRootClientId,
 	isSectionBlock,
 	getParentSectionBlock,
+	isWithinBoundInnerBlocks,
 } from './private-selectors';
 import { getBlockEditingMode } from './selectors';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
@@ -141,6 +142,8 @@ export const getAllPatternsDependants = ( select ) => ( state ) => {
 };
 
 export const getInsertBlockTypeDependants = () => ( state, rootClientId ) => {
+	const innerBlocksBindingsEnabled =
+		!! state.settings.blockBindingsInnerBlocks;
 	return [
 		state.blockListSettings.get( rootClientId ),
 		state.blocks.byClientId.get( rootClientId ),
@@ -151,5 +154,9 @@ export const getInsertBlockTypeDependants = () => ( state, rootClientId ) => {
 		getSectionRootClientId( state ),
 		isSectionBlock( state, rootClientId ),
 		getParentSectionBlock( state, rootClientId ),
+		innerBlocksBindingsEnabled,
+		innerBlocksBindingsEnabled
+			? isWithinBoundInnerBlocks( state, rootClientId )
+			: false,
 	];
 };

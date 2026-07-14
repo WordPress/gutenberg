@@ -29,11 +29,90 @@ import {
 	hasSelectedStyleState,
 	isSelectedBlockStyleStateShownOnCanvas,
 	shouldRenderBlockListView,
+	isWithinBoundInnerBlocks,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
+import { BOUND_INNER_BLOCKS_SETTINGS_KEY } from '../../utils/block-bindings';
 
 describe( 'private selectors', () => {
+	describe( 'isWithinBoundInnerBlocks', () => {
+		const createState = () => ( {
+			blocks: {
+				byClientId: new Map( [
+					[ 'pattern', { name: 'core/block' } ],
+					[ 'container', { name: 'core/group' } ],
+					[ 'child', { name: 'core/paragraph' } ],
+				] ),
+				parents: new Map( [
+					[ 'pattern', '' ],
+					[ 'container', 'pattern' ],
+					[ 'child', 'container' ],
+				] ),
+				blockEditingModes: new Map(),
+			},
+			blockListSettings: new Map( [
+				[
+					'container',
+					{
+						[ BOUND_INNER_BLOCKS_SETTINGS_KEY ]:
+							'core/pattern-overrides',
+					},
+				],
+			] ),
+			settings: { blockBindingsInnerBlocks: true },
+			derivedBlockEditingModes: new Map(),
+		} );
+
+		it( 'recognizes only the gated editable area of one synced pattern', () => {
+			const state = createState();
+			expect( isWithinBoundInnerBlocks( state, 'child' ) ).toBe( true );
+
+			state.settings.blockBindingsInnerBlocks = false;
+			expect( isWithinBoundInnerBlocks( state, 'child' ) ).toBe( false );
+			state.settings.blockBindingsInnerBlocks = true;
+
+			state.blockListSettings.set( 'container', {
+				[ BOUND_INNER_BLOCKS_SETTINGS_KEY ]: 'plugin/source',
+			} );
+			expect( isWithinBoundInnerBlocks( state, 'child' ) ).toBe( false );
+
+			state.blockListSettings.set( 'container', {
+				[ BOUND_INNER_BLOCKS_SETTINGS_KEY ]: 'core/pattern-overrides',
+			} );
+			state.blocks.byClientId.set( 'pattern', { name: 'core/group' } );
+			expect( isWithinBoundInnerBlocks( state, 'child' ) ).toBe( false );
+		} );
+
+		it( 'allows the disabled bound root while keeping disabled descendants protected', () => {
+			const state = createState();
+			state.derivedBlockEditingModes.set( 'container', 'disabled' );
+			expect( isWithinBoundInnerBlocks( state, 'container' ) ).toBe(
+				true
+			);
+			state.derivedBlockEditingModes.delete( 'container' );
+
+			state.derivedBlockEditingModes.set( 'child', 'disabled' );
+			expect( isWithinBoundInnerBlocks( state, 'child' ) ).toBe( false );
+			state.derivedBlockEditingModes.delete( 'child' );
+		} );
+
+		it( 'keeps zoomed and nested pattern descendants protected', () => {
+			const state = createState();
+
+			state.zoomLevel = 80;
+			expect( isWithinBoundInnerBlocks( state, 'child' ) ).toBe( false );
+			state.zoomLevel = 100;
+
+			state.blocks.byClientId.set( 'nested-pattern', {
+				name: 'core/block',
+			} );
+			state.blocks.parents.set( 'nested-pattern', 'container' );
+			state.blocks.parents.set( 'child', 'nested-pattern' );
+			expect( isWithinBoundInnerBlocks( state, 'child' ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'isBlockInterfaceHidden', () => {
 		it( 'should return the true if toggled true in state', () => {
 			const state = {

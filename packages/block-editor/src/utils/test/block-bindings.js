@@ -3,9 +3,76 @@
  */
 import {
 	getBlockBindingsContext,
+	getInnerBlocksBinding,
 	hasPatternOverridesDefaultBinding,
 	replacePatternOverridesDefaultBinding,
 } from '../block-bindings';
+
+describe( 'getInnerBlocksBinding', () => {
+	it( 'returns a pattern-overrides structural binding on a Core host', () => {
+		expect(
+			getInnerBlocksBinding(
+				{
+					metadata: {
+						bindings: {
+							innerBlocks: {
+								source: 'core/pattern-overrides',
+								args: { key: 'value' },
+							},
+						},
+					},
+				},
+				'core/group'
+			)
+		).toEqual( {
+			source: 'core/pattern-overrides',
+			args: { key: 'value' },
+		} );
+	} );
+
+	it( 'ignores missing or malformed descriptors', () => {
+		expect( getInnerBlocksBinding( {}, 'core/group' ) ).toBeUndefined();
+		expect(
+			getInnerBlocksBinding(
+				{ metadata: { bindings: { innerBlocks: { source: '' } } } },
+				'core/group'
+			)
+		).toBeUndefined();
+	} );
+
+	it( 'excludes core/html until it has a single-area contract', () => {
+		expect(
+			getInnerBlocksBinding(
+				{
+					metadata: {
+						bindings: {
+							innerBlocks: {
+								source: 'core/pattern-overrides',
+							},
+						},
+					},
+				},
+				'core/html'
+			)
+		).toBeUndefined();
+	} );
+
+	it.each( [
+		[ 'a custom source', 'core/group', 'test/source' ],
+		[ 'a custom host', 'test/container', 'core/pattern-overrides' ],
+	] )( 'excludes %s', ( _description, blockName, source ) => {
+		expect(
+			getInnerBlocksBinding(
+				{
+					metadata: {
+						bindings: { innerBlocks: { source } },
+					},
+				},
+				blockName
+			)
+		).toBeUndefined();
+	} );
+} );
 
 describe( 'hasPatternOverridesDefaultBinding', () => {
 	it( 'returns true when the `__default` binding targets pattern overrides', () => {

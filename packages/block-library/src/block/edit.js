@@ -38,8 +38,11 @@ import { getBlockBindingsSource } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
+import hasOverridablePatternBlocks from '../utils/has-overridable-pattern-blocks';
 
-const { useLayoutClasses } = unlock( blockEditorPrivateApis );
+const { getInnerBlocksBinding, useLayoutClasses } = unlock(
+	blockEditorPrivateApis
+);
 const { isOverridableBlock } = unlock( patternsPrivateApis );
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
@@ -174,6 +177,7 @@ function ReusableBlockEdit( {
 		onNavigateToEntityRecord,
 		hasPatternOverridesSource,
 		supportedBlockTypesRaw,
+		blockBindingsInnerBlocks,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		// For editing link to the site editor if the theme and user permissions support it.
@@ -185,23 +189,27 @@ function ReusableBlockEdit( {
 			supportedBlockTypesRaw:
 				getSettings().__experimentalBlockBindingsSupportedAttributes ||
 				EMPTY_OBJECT,
+			blockBindingsInnerBlocks: !! getSettings().blockBindingsInnerBlocks,
 		};
 	}, [] );
 
 	const canOverrideBlocks = useMemo( () => {
 		const supportedBlockTypes = Object.keys( supportedBlockTypesRaw );
-		const hasOverridableBlocks = ( _blocks ) =>
-			_blocks.some( ( block ) => {
-				if (
-					supportedBlockTypes.includes( block.name ) &&
-					isOverridableBlock( block )
-				) {
-					return true;
-				}
-				return hasOverridableBlocks( block.innerBlocks );
-			} );
-		return hasPatternOverridesSource && hasOverridableBlocks( blocks );
-	}, [ hasPatternOverridesSource, blocks, supportedBlockTypesRaw ] );
+		return (
+			hasPatternOverridesSource &&
+			hasOverridablePatternBlocks( blocks, {
+				innerBlocks: blockBindingsInnerBlocks,
+				getBinding: getInnerBlocksBinding,
+				isOverridable: isOverridableBlock,
+				supportedTypes: supportedBlockTypes,
+			} )
+		);
+	}, [
+		hasPatternOverridesSource,
+		blocks,
+		supportedBlockTypesRaw,
+		blockBindingsInnerBlocks,
+	] );
 
 	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
 	const layoutClasses = useLayoutClasses( { layout }, name );

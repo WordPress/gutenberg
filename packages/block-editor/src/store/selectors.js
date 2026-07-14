@@ -45,6 +45,7 @@ import {
 	isContainerInsertableToInContentOnlyMode,
 	getClientIdWithClientIdsTree,
 	getClientIdsTree,
+	isWithinBoundInnerBlocks,
 } from './private-selectors';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -1706,6 +1707,9 @@ const canInsertBlockTypeUnmemoized = (
 		? rootClientId
 		: getParentSectionBlock( state, rootClientId );
 	const isWithinSection = !! sectionClientId;
+	const isWithinBoundArea =
+		!! state.settings.blockBindingsInnerBlocks &&
+		isWithinBoundInnerBlocks( state, rootClientId );
 
 	// Disabled containers reject all blocks, with one exception: within a
 	// section, the default block (paragraph) is allowed through so it can
@@ -1713,6 +1717,7 @@ const canInsertBlockTypeUnmemoized = (
 	// which conditionally permits it where a sibling paragraph exists.
 	if (
 		blockEditingMode === 'disabled' &&
+		! isWithinBoundArea &&
 		( ! isWithinSection || blockName !== getDefaultBlockName() )
 	) {
 		return false;
@@ -1729,13 +1734,14 @@ const canInsertBlockTypeUnmemoized = (
 	// It shouldn't be possible to insert inside a section block unless in
 	// some cases when the block is a content block.
 	const isContentRoleBlock = isContentBlock( blockName );
-	if ( isWithinSection && ! isContentRoleBlock ) {
+	if ( isWithinSection && ! isWithinBoundArea && ! isContentRoleBlock ) {
 		return false;
 	}
 
 	// Don't allow insertion into synced patterns.
 	if (
 		isWithinSection &&
+		! isWithinBoundArea &&
 		getBlockName( state, sectionClientId ) === 'core/block'
 	) {
 		return false;
@@ -1755,6 +1761,7 @@ const canInsertBlockTypeUnmemoized = (
 	 */
 	if (
 		isWithinSection &&
+		! isWithinBoundArea &&
 		( isParentSectionBlock ||
 			blockEditingMode === 'contentOnly' ||
 			blockEditingMode === 'disabled' ) &&
@@ -1966,16 +1973,20 @@ export function canRemoveBlock( state, clientId ) {
 		? rootClientId
 		: getParentSectionBlock( state, rootClientId );
 	const isWithinSection = !! sectionClientId;
+	const isWithinBoundArea =
+		!! state.settings.blockBindingsInnerBlocks &&
+		isWithinBoundInnerBlocks( state, rootClientId );
 	const isContentRoleBlock = isContentBlock(
 		getBlockName( state, clientId )
 	);
-	if ( isWithinSection && ! isContentRoleBlock ) {
+	if ( isWithinSection && ! isWithinBoundArea && ! isContentRoleBlock ) {
 		return false;
 	}
 
 	// Disallow removal from synced patterns.
 	if (
 		isWithinSection &&
+		! isWithinBoundArea &&
 		getBlockName( state, sectionClientId ) === 'core/block'
 	) {
 		return false;
@@ -1992,6 +2003,7 @@ export function canRemoveBlock( state, clientId ) {
 	// their *children*.
 	if (
 		isWithinSection &&
+		! isWithinBoundArea &&
 		( isParentSectionBlock ||
 			blockName === defaultBlockName ||
 			rootBlockEditingMode === 'contentOnly' ) &&
@@ -2017,7 +2029,7 @@ export function canRemoveBlock( state, clientId ) {
 		return false;
 	}
 
-	return rootBlockEditingMode !== 'disabled';
+	return isWithinBoundArea || rootBlockEditingMode !== 'disabled';
 }
 
 /**
@@ -2069,10 +2081,13 @@ export function canMoveBlock( state, clientId ) {
 	}
 
 	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
+	const isWithinBoundArea =
+		!! state.settings.blockBindingsInnerBlocks &&
+		isWithinBoundInnerBlocks( state, rootClientId );
 	const isContentRoleBlock = isContentBlock(
 		getBlockName( state, clientId )
 	);
-	if ( isBlockWithinSection && ! isContentRoleBlock ) {
+	if ( isBlockWithinSection && ! isWithinBoundArea && ! isContentRoleBlock ) {
 		return false;
 	}
 
@@ -2086,6 +2101,7 @@ export function canMoveBlock( state, clientId ) {
 	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
 	if (
 		isBlockWithinSection &&
+		! isWithinBoundArea &&
 		( isParentSectionBlock || rootBlockEditingMode === 'contentOnly' ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
@@ -2096,7 +2112,10 @@ export function canMoveBlock( state, clientId ) {
 		return false;
 	}
 
-	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
+	return (
+		isWithinBoundArea ||
+		getBlockEditingMode( state, rootClientId ) !== 'disabled'
+	);
 }
 
 /**

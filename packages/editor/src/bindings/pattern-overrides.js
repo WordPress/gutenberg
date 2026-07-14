@@ -4,6 +4,7 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 const CONTENT = 'content';
+const INNER_BLOCKS = 'innerBlocks';
 
 /**
  * @type {WPBlockBindingsSource}
@@ -12,8 +13,9 @@ export default {
 	name: 'core/pattern-overrides',
 	getValues( { select, clientId, context, bindings } ) {
 		const patternOverridesContent = context[ 'pattern/overrides' ];
-		const { getBlockAttributes } = select( blockEditorStore );
+		const { getBlockAttributes, getSettings } = select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
+		const supportsInnerBlocks = !! getSettings?.().blockBindingsInnerBlocks;
 
 		const overridesValues = {};
 		for ( const attributeName of Object.keys( bindings ) ) {
@@ -26,20 +28,32 @@ export default {
 			// Check undefined because empty string is a valid value.
 			if ( overridableValue === undefined ) {
 				overridesValues[ attributeName ] =
-					currentBlockAttributes?.[ attributeName ];
+					supportsInnerBlocks && attributeName === INNER_BLOCKS
+						? undefined
+						: currentBlockAttributes?.[ attributeName ];
 				continue;
-			} else {
-				overridesValues[ attributeName ] =
-					overridableValue === '' ? undefined : overridableValue;
 			}
+			if (
+				overridableValue === '' &&
+				( ! supportsInnerBlocks || attributeName !== INNER_BLOCKS )
+			) {
+				overridesValues[ attributeName ] = undefined;
+				continue;
+			}
+			overridesValues[ attributeName ] = overridableValue;
 		}
 		return overridesValues;
 	},
 	setValues( { select, dispatch, clientId, bindings } ) {
-		const { getBlockAttributes, getBlockParentsByBlockName, getBlocks } =
-			select( blockEditorStore );
+		const {
+			getBlockAttributes,
+			getBlockParentsByBlockName,
+			getBlocks,
+			getSettings,
+		} = select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
 		const blockName = currentBlockAttributes?.metadata?.name;
+		const supportsInnerBlocks = !! getSettings?.().blockBindingsInnerBlocks;
 		if ( ! blockName ) {
 			return;
 		}
@@ -61,12 +75,19 @@ export default {
 
 		// If there is no pattern client ID, sync blocks with the same name and same attributes.
 		if ( ! patternClientId ) {
+			const attributeValues = { ...attributes };
+			if ( supportsInnerBlocks ) {
+				delete attributeValues[ INNER_BLOCKS ];
+			}
+			if ( Object.keys( attributeValues ).length === 0 ) {
+				return;
+			}
 			const syncBlocksWithSameName = ( blocks ) => {
 				for ( const block of blocks ) {
 					if ( block.attributes?.metadata?.name === blockName ) {
 						dispatch( blockEditorStore ).updateBlockAttributes(
 							block.clientId,
-							attributes
+							attributeValues
 						);
 					}
 					syncBlocksWithSameName( block.innerBlocks );

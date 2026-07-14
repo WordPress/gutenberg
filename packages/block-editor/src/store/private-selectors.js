@@ -41,6 +41,7 @@ import {
 	isIsolatedEditorKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
+import { BOUND_INNER_BLOCKS_SETTINGS_KEY } from '../utils/block-bindings';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
@@ -82,6 +83,60 @@ export function getLastInsertedBlocksClientIds( state ) {
 
 export function getBlockWithoutAttributes( state, clientId ) {
 	return state.blocks.byClientId.get( clientId );
+}
+
+/**
+ * Returns the editing mode explicitly owned by a block, before derived modes.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Block client ID.
+ * @return {string|undefined} Explicitly assigned mode.
+ */
+export function getExplicitBlockEditingMode( state, clientId ) {
+	return state.blocks.blockEditingModes.get( clientId );
+}
+
+/**
+ * Returns whether a block-list root is inside the plugin-gated editable area
+ * of exactly one synced-pattern instance.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Block-list root client ID.
+ * @return {boolean} Whether the block list belongs to the editable area.
+ */
+export function isWithinBoundInnerBlocks( state, clientId ) {
+	const isBoundRoot =
+		getBlockListSettings( state, clientId )?.[
+			BOUND_INNER_BLOCKS_SETTINGS_KEY
+		] === 'core/pattern-overrides';
+	if (
+		! getSettings( state ).blockBindingsInnerBlocks ||
+		! clientId ||
+		isZoomOut( state ) ||
+		( getBlockEditingMode( state, clientId ) === 'disabled' &&
+			! isBoundRoot )
+	) {
+		return false;
+	}
+
+	let current = clientId;
+	let patternParentCount = 0;
+	let hasPatternOverrideArea = false;
+	while ( current ) {
+		if (
+			getBlockListSettings( state, current )?.[
+				BOUND_INNER_BLOCKS_SETTINGS_KEY
+			] === 'core/pattern-overrides'
+		) {
+			hasPatternOverrideArea = true;
+		}
+		if ( getBlockName( state, current ) === 'core/block' ) {
+			patternParentCount++;
+		}
+		current = state.blocks.parents.get( current );
+	}
+
+	return hasPatternOverrideArea && patternParentCount === 1;
 }
 
 /**
