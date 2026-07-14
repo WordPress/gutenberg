@@ -40,8 +40,13 @@ describe( 'textAlign', () => {
 
 		it( 'should return all text aligns sorted when provided in the random order', () => {
 			expect(
-				getValidTextAlignments( [ 'right', 'center', 'left' ] )
-			).toEqual( [ 'left', 'center', 'right' ] );
+				getValidTextAlignments( [
+					'right',
+					'justify',
+					'center',
+					'left',
+				] )
+			).toEqual( [ 'left', 'center', 'right', 'justify' ] );
 		} );
 
 		it( 'should return all text aligns if block defines text align support as true', () => {
@@ -49,12 +54,19 @@ describe( 'textAlign', () => {
 				'left',
 				'center',
 				'right',
+				'justify',
 			] );
+		} );
+
+		it( 'should keep justify when listed by the block', () => {
+			expect(
+				getValidTextAlignments( [ 'left', 'right', 'justify' ] )
+			).toEqual( [ 'left', 'right', 'justify' ] );
 		} );
 
 		it( 'should remove incorrect text aligns', () => {
 			expect(
-				getValidTextAlignments( [ 'left', 'right', 'justify' ] )
+				getValidTextAlignments( [ 'left', 'right', 'foo' ] )
 			).toEqual( [ 'left', 'right' ] );
 		} );
 	} );
@@ -135,6 +147,35 @@ describe( 'textAlign', () => {
 
 			expect( props ).toEqual( {
 				className: 'has-text-align-center foo',
+			} );
+		} );
+
+		it( 'should add the justify classname when text align is justify', () => {
+			registerBlockType( 'core/foo', {
+				...blockSettings,
+				supports: {
+					typography: {
+						textAlign: true,
+					},
+				},
+			} );
+
+			const props = addAssignedTextAlign(
+				{
+					className: 'foo',
+				},
+				'core/foo',
+				{
+					style: {
+						typography: {
+							textAlign: 'justify',
+						},
+					},
+				}
+			);
+
+			expect( props ).toEqual( {
+				className: 'has-text-align-justify foo',
 			} );
 		} );
 	} );

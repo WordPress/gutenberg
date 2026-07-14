@@ -660,7 +660,12 @@
 									"type": "array",
 									"items": {
 										"type": "string",
-										"enum": [ "left", "center", "right" ]
+										"enum": [
+											"left",
+											"center",
+											"right",
+											"justify"
+										]
 									}
 								}
 							],
