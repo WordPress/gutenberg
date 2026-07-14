@@ -9,7 +9,6 @@ import { __experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitF
 import {
 	getCustomValueFromPreset as getCustomValueFromPresetValue,
 	getPresetValueFromCustomValue as getPresetValueFromCustomPresetValue,
-	getSliderValueFromPreset as getSliderValueFromPresetValue,
 	isValuePreset as isPresetValue,
 } from '../preset-input-control/utils';
 
@@ -148,22 +147,6 @@ export function hasDefinedValues( values ) {
 	} );
 
 	return !! filteredValues.length;
-}
-
-/**
- * Converts radius preset value into a Range component value .
- *
- * @param {string} presetValue Value to convert to Range value.
- * @param {Array}  presets     Array of current radius preset value objects.
- *
- * @return {number} The int value for use in Range control.
- */
-export function getSliderValueFromPreset( presetValue, presets ) {
-	return getSliderValueFromPresetValue(
-		presetValue,
-		presets,
-		BORDER_RADIUS_PRESET_TYPE
-	);
 }
 
 /**
