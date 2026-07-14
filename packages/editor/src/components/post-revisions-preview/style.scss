@@ -31,6 +31,77 @@
 	}
 }
 
+.editor-revisions-code-diff {
+	height: 100%;
+	overflow: auto;
+	background: $white;
+	color: $gray-900;
+
+	&:focus-visible {
+		box-shadow:
+			inset 0 0 0 var(--wp-admin-border-width-focus)
+			var(--wp-admin-theme-color);
+		outline: none;
+	}
+}
+
+.editor-revisions-code-diff__table {
+	width: 100%;
+	min-width: max-content;
+	border: 0;
+	border-collapse: collapse;
+	font-family: $editor-html-font;
+	font-size: $text-editor-font-size;
+	line-height: 1.6;
+}
+
+.editor-revisions-code-diff__line {
+	&.is-added {
+		background: rgba(#00a32a, 0.12);
+	}
+
+	&.is-removed {
+		background: rgba(#d63638, 0.12);
+	}
+}
+
+.editor-revisions-code-diff__line-number,
+.editor-revisions-code-diff__marker {
+	width: 1%;
+	padding: 0 $grid-unit-10;
+	color: $gray-700;
+	text-align: right;
+	white-space: nowrap;
+	user-select: none;
+}
+
+.editor-revisions-code-diff__line-number {
+	border-right: $border-width solid $gray-200;
+	background: rgba($gray-100, 0.75);
+	font-variant-numeric: tabular-nums;
+}
+
+.editor-revisions-code-diff__marker {
+	padding-right: 0;
+	font-weight: 600;
+}
+
+.editor-revisions-code-diff__code {
+	width: 100%;
+	padding: 0 $grid-unit-20 0 $grid-unit-10;
+	white-space: pre;
+
+	code {
+		font: inherit;
+	}
+}
+
+.editor-revisions-code-diff__empty {
+	margin: 0;
+	padding: $grid-unit-30;
+	color: $gray-700;
+}
+
 // Diff markers minimap
 .revision-diff-markers {
 	position: relative;
