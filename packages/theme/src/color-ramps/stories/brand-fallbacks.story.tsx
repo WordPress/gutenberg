@@ -120,7 +120,7 @@ export const Default: StoryObj< typeof Verifier > = {
 
 const headerStyle: React.CSSProperties = {
 	fontSize: 11,
-	fontWeight: 600,
+	fontWeight: 'var(--wpds-typography-font-weight-emphasis)',
 	color: '#757575',
 	paddingBottom: 4,
 	borderBottom: '1px solid #e0e0e0',

@@ -44,6 +44,13 @@
 		--wp-components-color-accent: #{$alert-red};
 		border-color: $alert-red;
 	}
+
+	// For ContentEditableControl
+	&:has(input:invalid[data-validity-visible])
+	.components-validated-control__content-editable [role="textbox"] {
+		--wp-components-color-accent: #{$alert-red};
+		border-color: $alert-red;
+	}
 }
 
 .components-validated-control__error-delegate {

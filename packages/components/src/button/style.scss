@@ -12,6 +12,11 @@
  */
 
 .components-button {
+	// Defend against a conflicting focus ring from WordPress common.css on `a:focus`.
+	&:focus:is(a) {
+		box-shadow: none;
+	}
+
 	&:focus:not(:active) {
 		@include mixins.outset-ring__focus();
 	}
@@ -20,7 +25,7 @@
 	text-decoration: none;
 	font-family: inherit;
 	font-size: $default-font-size;
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	margin: 0;
 	cursor: var(--wpds-cursor-control);
 	appearance: none;
@@ -217,7 +222,7 @@
 		background: none;
 		outline: none;
 		text-align: left;
-		font-weight: $font-weight-regular;
+		font-weight: var(--wpds-typography-font-weight-default);
 		color: $components-color-accent;
 		text-decoration: underline;
 		text-underline-offset: 0.2em;

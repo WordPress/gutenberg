@@ -120,7 +120,7 @@
 		}
 
 		.dataviews-filters-__summary-filter-text-name {
-			font-weight: var(--wpds-typography-font-weight-medium);
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 		}
 	}
 
@@ -178,7 +178,7 @@
 
 	.dataviews-filters__search-widget-filter-combobox-item-value {
 		[data-user-value] {
-			font-weight: 600;
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 		}
 	}
 }

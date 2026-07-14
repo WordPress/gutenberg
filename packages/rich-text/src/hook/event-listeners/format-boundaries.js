@@ -2,15 +2,12 @@
  * WordPress dependencies
  */
 import { LEFT, RIGHT } from '@wordpress/keycodes';
-import { privateApis as composePrivateApis } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { isCollapsed } from '../../is-collapsed';
-import { unlock } from '../../lock-unlock';
-
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
+import { subscribeOwnedListener } from '../../subscribe-owned-listener';
 
 const EMPTY_ACTIVE_FORMATS = [];
 
@@ -99,5 +96,5 @@ export default ( props ) => ( element ) => {
 		forceRender();
 	}
 
-	return subscribeDelegatedListener( element, 'keydown', onKeyDown, true );
+	return subscribeOwnedListener( element, 'keydown', onKeyDown, true );
 };
