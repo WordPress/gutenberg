@@ -6,7 +6,6 @@ import { DataViewsPicker } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 import { useMemo, useState } from '@wordpress/element';
-import { Icon, chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -17,12 +16,6 @@ import { useReviewRows } from './index';
 // Only the table layout is offered so the modal always renders a compact list
 // of styles with a leading selection checkbox.
 const DEFAULT_LAYOUTS = { pickerTable: {} };
-
-// A dedicated, centered column for the subdued arrow between the current and
-// new value columns.
-const SEPARATOR_COLUMN_STYLES = {
-	separator: { align: 'center', width: '32px' },
-};
 
 const getItemId = ( row ) => row.id;
 
@@ -56,10 +49,10 @@ export default function ApplyGloballyModal( {
 	const [ view, setView ] = useState( () => ( {
 		type: 'pickerTable',
 		titleField: 'label',
-		fields: [ 'current', 'separator', 'new' ],
+		fields: [ 'current', 'new' ],
 		page: 1,
 		perPage: reviewRows.length,
-		layout: { enableMoving: false, styles: SEPARATOR_COLUMN_STYLES },
+		layout: { enableMoving: false },
 	} ) );
 
 	const fields = useMemo(
@@ -84,24 +77,6 @@ export default function ApplyGloballyModal( {
 					<span className="editor-push-changes-to-global-styles-modal__value">
 						{ item.formattedCurrentValue }
 					</span>
-				),
-			},
-			{
-				id: 'separator',
-				// The chevron conveys the direction, so the column needs no
-				// header. An empty string can't be used because DataViews treats
-				// a falsy header as unset and falls back to the label/id, so an
-				// empty element is passed instead.
-				header: <span aria-hidden="true" />,
-				enableSorting: false,
-				enableHiding: false,
-				filterBy: false,
-				render: () => (
-					<Icon
-						className="editor-push-changes-to-global-styles-modal__arrow"
-						icon={ chevronRight }
-						aria-hidden="true"
-					/>
 				),
 			},
 			{
