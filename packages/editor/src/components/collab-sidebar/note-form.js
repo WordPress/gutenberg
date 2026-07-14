@@ -101,7 +101,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 					return;
 				}
 
-				if ( event.key === 'Escape' ) {
+				if ( event.key === 'Escape' && ! event.defaultPrevented ) {
 					event.preventDefault();
 					// Passing event for reply forms.
 					onCancel( event );

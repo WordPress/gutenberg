@@ -683,6 +683,49 @@ describe( 'DataViews component', () => {
 				screen.getAllByRole( 'button', { name: 'Actions' } ).length
 			).toEqual( 3 );
 		} );
+
+		describe.each( [
+			[ 'ungrouped', undefined ],
+			[ 'grouped', { field: 'author', direction: 'asc' as const } ],
+		] )( 'when %s', ( _name, groupBy ) => {
+			const view: View = {
+				type: 'list',
+				groupBy,
+				layout: { density: 'compact' },
+			};
+
+			it( 'should apply the configured density', () => {
+				const { container } = render(
+					<DataViewWrapper view={ view } />
+				);
+				expect(
+					// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+					container.querySelector( '.dataviews-view-list' )
+				).toHaveClass( 'has-compact-density' );
+			} );
+
+			it( 'should become inert while loading and refreshing once the delay elapses', async () => {
+				const { container, rerender } = render(
+					<DataViewWrapper view={ view } />
+				);
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				const list = container.querySelector( '.dataviews-view-list' );
+
+				expect( screen.getByRole( 'grid' ) ).not.toHaveAttribute(
+					'inert'
+				);
+
+				rerender( <DataViewWrapper view={ view } isLoading /> );
+
+				expect( screen.getByRole( 'grid' ) ).toHaveAttribute( 'inert' );
+				// The refreshing state is deliberately delayed, so it is not
+				// applied on the render that starts the load.
+				expect( list ).not.toHaveClass( 'is-refreshing' );
+				await waitFor( () =>
+					expect( list ).toHaveClass( 'is-refreshing' )
+				);
+			} );
+		} );
 	} );
 
 	describe( 'actions on mobile viewport', () => {

@@ -45,7 +45,7 @@ How the widget represents its data: `attributes`, `example`, and the render modu
 
 The `attributes` are the contract between host and widget. The widget owns their shape and meaning; the host owns their values.
 
-Each entry in `attributes` is a DataViews `Field` plus an optional `relevance` hint (`'high' | 'low'`). The widget declares how important an attribute is; the host decides where, and whether, to expose it. When the hint is absent, treat it as `'low'`.
+Each entry in `attributes` is a DataViews `Field` plus an optional `relevance` hint (`'high' | 'low'`). Its `type` may also reference a registered field type by name, resolved to plain `Field` props before any host reads the schema (see **Field Types**). The widget declares how important an attribute is; the host decides where, and whether, to expose it. When the hint is absent, treat it as `'low'`.
 
 - `'high'`: the host _may_ promote the field to a prominent surface near the instance, for quick in-context editing without opening a separate settings UI.
 - `'low'` (default): the field belongs in the host's settings surface, a form built from the full schema.

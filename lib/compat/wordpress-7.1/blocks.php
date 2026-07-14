@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-if ( ! function_exists( '_wp_apply_content_filters' ) ) {
+if ( ! function_exists( '_wp_apply_block_content_filters' ) ) {
 	/**
 	 * Applies standard content filters similar to 'the_content' filter.
 	 *
@@ -35,7 +35,7 @@ if ( ! function_exists( '_wp_apply_content_filters' ) ) {
 	 * @param string|null $id       Optional. Unique identifier for this content, used with $seen_ids. Default null.
 	 * @return string The processed content.
 	 */
-	function _wp_apply_content_filters( $content, $context = '', &$seen_ids = null, $id = null ) {
+	function _wp_apply_block_content_filters( $content, $context = '', &$seen_ids = null, $id = null ) {
 		$content = shortcode_unautop( $content );
 		$content = do_shortcode( $content );
 
