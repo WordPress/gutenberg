@@ -222,6 +222,83 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		await expect( formatMark ).toHaveText( 'world' );
 	} );
 
+	/*
+	 * Regression (#79799): typing over a selection that still overlaps an
+	 * existing marker. The addition keyboard declines to build a combined
+	 * deletion+addition suggestion here (that is a later phase — wrapping the
+	 * overlapping run in a `del` would re-attribute part of the existing
+	 * marker). The bug was that it declined by *falling through* to native
+	 * `contentEditable`, which edited a DOM that still contained the `<mark>`
+	 * and corrupted it: the leading space was dropped, the format marker was
+	 * fragmented into several `<mark>` segments, and the paragraph sometimes
+	 * emptied entirely. The fix rejects the keystroke instead — cancel the
+	 * native edit and make no change — so the marker and text are untouched.
+	 */
+	test( 'type-over of a selection overlapping a marker is rejected, not corrupted', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+
+		// Format marker: bold the trailing word "world".
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+b' );
+		const formatMark = paragraph.locator(
+			`${ SUGGESTION_MARK }[data-suggestion-type="format"]`
+		);
+		await expect( formatMark ).toContainText( 'world' );
+
+		/*
+		 * The format-marker write re-renders RichText and restores the
+		 * selection over "world", so "world" is still selected. Type WITHOUT
+		 * collapsing the caret first: every keystroke is a type-over whose
+		 * selection overlaps the format marker — the exact #79799 trigger.
+		 */
+		await page.keyboard.type( ' more' );
+
+		// Rejected: no addition marker was created…
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+			)
+		).toHaveCount( 0 );
+		// …the format marker was neither fragmented nor lost (still exactly one
+		// marker, still spanning "world" — a fragmented marker fails strict
+		// `toHaveText`)…
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
+		await expect( formatMark ).toHaveText( 'world' );
+		// …and no marker ended up nested inside another.
+		await expect(
+			paragraph.locator( `${ SUGGESTION_MARK } ${ SUGGESTION_MARK }` )
+		).toHaveCount( 0 );
+		// The paragraph text is unchanged: nothing typed, nothing dropped, the
+		// block not emptied.
+		await expect
+			.poll( () => paragraph.textContent() )
+			.toBe( 'Hello world' );
+		// The user is told why the keystroke did nothing, so the rejection does
+		// not read as an unresponsive editor. Scope to the snackbar itself: the
+		// same copy is also mirrored into the `#a11y-speak-polite` live region,
+		// so a bare text match is ambiguous under Playwright strict mode.
+		await expect(
+			page
+				.getByTestId( 'snackbar' )
+				.filter( { hasText: /Accept or reject it first/i } )
+		).toBeVisible();
+	} );
+
 	// --- Seams (close in Phase 1) -----------------------------------------
 
 	test( 'seam: deleting a word backward becomes a deletion marker', async ( {

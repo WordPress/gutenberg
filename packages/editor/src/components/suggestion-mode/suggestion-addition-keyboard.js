@@ -5,6 +5,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -29,6 +31,32 @@ import {
 	readEventRange,
 } from './keyboard-target';
 import { isPartOfPendingInsertion } from './store-interceptor';
+
+/**
+ * Outcomes returned by the internal `insertText` router, telling the event
+ * handlers whether — and why — to cancel the browser's native edit:
+ *
+ * - `HANDLED`  we wrote the suggestion ourselves; cancel the native edit.
+ * - `REJECTED` we deliberately declined to write a suggestion (e.g. a type-over
+ *              whose selection overlaps an existing marker) but must still
+ *              cancel the native edit, because letting the browser edit a DOM
+ *              that contains `<mark>` markers corrupts them (dropped leading
+ *              space, fragmented marker, occasionally an emptied block — see
+ *              #79799). The keystroke is swallowed with no content change.
+ * - `DEFERRED` there is no valid inline anchor to own the edit (block-level
+ *              selection, a pending block insertion); let it fall through to
+ *              the native/overlay path *without* a `preventDefault`.
+ *
+ * Only `DEFERRED` falls through; `HANDLED` and `REJECTED` both cancel.
+ */
+const INSERT_HANDLED = 'handled';
+const INSERT_REJECTED = 'rejected';
+const INSERT_DEFERRED = 'deferred';
+
+// Stable id for the "can't type over a suggestion" snackbar. Reusing one id
+// means a burst of rejected keystrokes refreshes a single notice rather than
+// stacking one per character.
+const OVERLAP_REJECTED_NOTICE_ID = 'editor/suggestion-mode/type-over-rejected';
 
 /**
  * Turn typing (and simple paste) in Suggest mode into an inline addition
@@ -88,6 +116,26 @@ export default function SuggestionAdditionKeyboard() {
 	const { getBlockName } = useSelect( blockEditorStore );
 	const { requestInterceptorBypass, isDeferredInsertion } =
 		useSuggestionOverlay();
+	const { createNotice } = useDispatch( noticesStore );
+
+	// Tell the user why their keystroke did nothing when they type over a
+	// selection that overlaps an existing suggestion. Building a combined
+	// deletion+addition suggestion here is a later phase; until then the edit
+	// is rejected (see the overlap guard in `insertText`), and without this
+	// cue the swallowed keystroke reads as an unresponsive editor.
+	const notifyOverlapRejected = useCallback( () => {
+		createNotice(
+			'info',
+			__(
+				'You can’t type over an existing suggestion. Accept or reject it first.'
+			),
+			{
+				id: OVERLAP_REJECTED_NOTICE_ID,
+				type: 'snackbar',
+				isDismissible: true,
+			}
+		);
+	}, [ createNotice ] );
 
 	// The in-progress addition run. `id` is null while the suggestion note is
 	// being created; characters entered in that window queue in `pending` and
@@ -266,10 +314,10 @@ export default function SuggestionAdditionKeyboard() {
 	 * marker when the caret is still at its trailing edge, or start a new run.
 	 * `allowGrow` is false for paste so a pasted run is always its own marker.
 	 *
-	 * Returns whether the input was consumed. Callers must only cancel the
-	 * native edit when this returns true — when no valid single-attribute
-	 * anchor exists the input has to fall through to the native/overlay path
-	 * rather than being swallowed.
+	 * Returns one of `INSERT_HANDLED` / `INSERT_REJECTED` / `INSERT_DEFERRED`.
+	 * Callers cancel the native edit for the first two and let it fall through
+	 * for `INSERT_DEFERRED` — when no valid single-attribute anchor exists the
+	 * input has to reach the native/overlay path rather than being swallowed.
 	 *
 	 * `domRange` carries the DOM-derived offsets for the edit
 	 * (`readEventRange`); the store caret is only trusted for block/attribute
@@ -297,14 +345,14 @@ export default function SuggestionAdditionKeyboard() {
 					caret.attributeKey === inFlight.attributeKey
 				) {
 					inFlight.pending += text;
-					return true;
+					return INSERT_HANDLED;
 				}
 				resetRun();
 			}
 			if ( ! caret ) {
 				// Block-level / cross-attribute selection: nothing to anchor to.
 				resetRun();
-				return false;
+				return INSERT_DEFERRED;
 			}
 			const { clientId, attributeKey } = caret;
 			/*
@@ -324,7 +372,7 @@ export default function SuggestionAdditionKeyboard() {
 				)
 			) {
 				resetRun();
-				return false;
+				return INSERT_DEFERRED;
 			}
 			/*
 			 * Offsets come from the DOM truth at input time when available.
@@ -347,11 +395,15 @@ export default function SuggestionAdditionKeyboard() {
 				 * Type-over of a selection that overlaps an existing
 				 * suggestion marker: wrapping it in the `del` marker would
 				 * re-attribute part of that marker to the new id (see
-				 * `formatsRangeHasSuggestion`). Fall through to the
-				 * native/overlay path instead of intercepting.
+				 * `formatsRangeHasSuggestion`), so we decline to build a
+				 * combined suggestion here — that is left to a later phase.
+				 * Reject rather than fall through to native editing (which
+				 * corrupts the marker DOM — see `INSERT_REJECTED`), and tell
+				 * the user why nothing happened.
 				 */
 				resetRun();
-				return false;
+				notifyOverlapRejected();
+				return INSERT_REJECTED;
 			}
 			const run = runRef.current;
 			const isContiguous =
@@ -377,11 +429,11 @@ export default function SuggestionAdditionKeyboard() {
 				} );
 				run.end += text.length;
 				commit( clientId, attributeKey, grown, run.end );
-				return true;
+				return INSERT_HANDLED;
 			}
 
 			beginInsertion( clientId, attributeKey, start, end, text );
-			return true;
+			return INSERT_HANDLED;
 		},
 		[
 			getSelectionStart,
@@ -392,6 +444,7 @@ export default function SuggestionAdditionKeyboard() {
 			beginInsertion,
 			commit,
 			resetRun,
+			notifyOverlapRejected,
 			authorId,
 		]
 	);
@@ -423,12 +476,17 @@ export default function SuggestionAdditionKeyboard() {
 				return;
 			}
 			/*
-			 * We own insertion in Suggest mode, but only cancel the native
-			 * edit once the caret resolved to a valid single-attribute anchor
-			 * — a preventDefault without a subsequent write would silently
-			 * drop the typed character.
+			 * We own insertion in Suggest mode. Cancel the native edit when
+			 * we either wrote the suggestion (`HANDLED`) or deliberately
+			 * declined but must not let the browser touch the marker DOM
+			 * (`REJECTED`). Only `DEFERRED` — no valid single-attribute anchor
+			 * — falls through, since a preventDefault without a subsequent
+			 * write would silently drop the typed character.
 			 */
-			if ( insertText( text, true, readEventRange( event ) ) ) {
+			if (
+				insertText( text, true, readEventRange( event ) ) !==
+				INSERT_DEFERRED
+			) {
 				event.preventDefault();
 			}
 		},
@@ -461,8 +519,13 @@ export default function SuggestionAdditionKeyboard() {
 			 * otherwise let the editor's paste pipeline have it.
 			 */
 			// A clipboard event exposes no target ranges; `readEventRange`
-			// falls back to the live DOM selection.
-			if ( insertText( plain, false, readEventRange( event ) ) ) {
+			// falls back to the live DOM selection. A paste over a selection
+			// that overlaps a marker is `REJECTED` — cancel it rather than let
+			// the native paste corrupt the marker DOM (see `onBeforeInput`).
+			if (
+				insertText( plain, false, readEventRange( event ) ) !==
+				INSERT_DEFERRED
+			) {
 				event.preventDefault();
 				event.stopImmediatePropagation();
 			}
