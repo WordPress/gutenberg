@@ -40,7 +40,7 @@ import type {
 	ViewGrid as ViewGridType,
 } from '../../../types';
 import type { SetSelection } from '../../../types/private';
-import useSelectionProps from '../utils/use-selection-props';
+import type { SelectionProps } from '../utils/use-selection-props';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
 const { Badge: WCBadge } = unlock( componentsPrivateApis );
 import { useGridColumns } from './preview-size-picker';
@@ -341,6 +341,7 @@ interface CompositeGridProps< Item > {
 	) => ReactElement;
 	getItemId: ( item: Item ) => string;
 	actions: Action< Item >[];
+	getSelectionProps: ( id: string ) => SelectionProps;
 }
 
 export default function CompositeGrid< Item >( {
@@ -358,18 +359,12 @@ export default function CompositeGrid< Item >( {
 	renderItemLink,
 	getItemId,
 	actions,
+	getSelectionProps,
 }: CompositeGridProps< Item > ) {
 	const { paginationInfo, resizeObserverRef } =
 		useContext( DataViewsContext );
 	const gridColumns = useGridColumns();
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
-	const { getSelectionProps } = useSelectionProps( {
-		data,
-		actions,
-		getItemId,
-		selection,
-		onChangeSelection,
-	} );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
 	);
