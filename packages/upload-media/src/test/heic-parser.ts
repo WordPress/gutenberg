@@ -917,7 +917,7 @@ describe( 'parseExifOrientation / getUnappliedExifOrientation', () => {
 	describe( 'real encoder fixtures', () => {
 		const loadFixture = ( file: string ): ArrayBuffer => {
 			const contents = readFileSync(
-				join( __dirname, 'fixtures', file )
+				join( import.meta.dirname, 'fixtures', file )
 			);
 			return contents.buffer.slice(
 				contents.byteOffset,

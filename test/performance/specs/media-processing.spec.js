@@ -23,7 +23,7 @@ const IMAGE_SUB_SIZES = [
 ];
 
 const ASSETS_PATH =
-	process.env.ASSETS_PATH || path.join( __dirname, '..', 'assets' );
+	process.env.ASSETS_PATH || path.join( import.meta.dirname, '..', 'assets' );
 
 let vips;
 
@@ -36,7 +36,15 @@ async function getVips() {
 	}
 	// Resolve wasm-vips from the @wordpress/vips package where it's installed.
 	const require = createRequire(
-		path.join( __dirname, '..', '..', '..', 'packages', 'vips', 'index.js' )
+		path.join(
+			import.meta.dirname,
+			'..',
+			'..',
+			'..',
+			'packages',
+			'vips',
+			'index.js'
+		)
 	);
 	const Vips = require( 'wasm-vips' );
 	vips = await Vips( {

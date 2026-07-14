@@ -87,13 +87,13 @@ describe( 'utils', () => {
 
 	describe( 'hasProjectFile', () => {
 		test( 'should return false for the current directory and unknown file', () => {
-			getPackagePathMock.mockReturnValueOnce( __dirname );
+			getPackagePathMock.mockReturnValueOnce( import.meta.dirname );
 
 			expect( hasProjectFile( 'unknown-file.name' ) ).toBe( false );
 		} );
 
 		test( 'should return true for the current directory and this file', () => {
-			getPackagePathMock.mockReturnValueOnce( __dirname );
+			getPackagePathMock.mockReturnValueOnce( import.meta.dirname );
 
 			expect( hasProjectFile( 'index.js' ) ).toBe( true );
 		} );

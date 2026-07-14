@@ -46,7 +46,7 @@ jest.mock( 'wasm-vips', () => {
 	);
 } );
 
-const FIXTURES = join( __dirname, 'fixtures' );
+const FIXTURES = join( import.meta.dirname, 'fixtures' );
 
 const loadFixture = ( file: string ): ArrayBuffer => {
 	const contents = readFileSync( join( FIXTURES, file ) );

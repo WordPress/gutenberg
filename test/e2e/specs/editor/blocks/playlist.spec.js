@@ -9,11 +9,11 @@ const path = require( 'path' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const audioPath = path.join(
-	__dirname,
+	import.meta.dirname,
 	'../../../assets/playlist-e2e-test.wav'
 );
 const imagePath = path.join(
-	__dirname,
+	import.meta.dirname,
 	'../../../assets/10x10_e2e_test_image_green.png'
 );
 

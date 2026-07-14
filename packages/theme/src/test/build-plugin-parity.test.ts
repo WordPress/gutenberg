@@ -12,7 +12,7 @@ import esbuildPlugin from '../esbuild-plugins/esbuild-ds-token-fallbacks.mjs';
 import postcssPlugin from '../postcss-plugins/postcss-ds-token-fallbacks.mjs';
 import vitePlugin from '../vite-plugins/vite-ds-token-fallbacks.mjs';
 
-const fixturesDirectory = join( __dirname, 'fixtures/build-plugins' );
+const fixturesDirectory = join( import.meta.dirname, 'fixtures/build-plugins' );
 const validJsFixture = join( fixturesDirectory, 'source.ts' );
 const unknownJsFixture = join( fixturesDirectory, 'unknown-token.ts' );
 

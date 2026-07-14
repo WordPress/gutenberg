@@ -1335,7 +1335,10 @@ describe( 'private actions', () => {
 			// native irot transform), so the server reports orientation 1 and
 			// the client parse is the source of truth.
 			const buffer = readFileSync(
-				join( __dirname, '../../test/fixtures/exif-rotated-90cw.avif' )
+				join(
+					import.meta.dirname,
+					'../../test/fixtures/exif-rotated-90cw.avif'
+				)
 			);
 			const rotatedFile = new File( [ 'rotated' ], 'photo-rotated.avif', {
 				type: 'image/avif',

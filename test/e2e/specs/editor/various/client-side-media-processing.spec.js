@@ -56,7 +56,7 @@ async function probeUltraHdrUrl( url ) {
  * @typedef {import('@playwright/test').Page} Page
  */
 
-const ASSETS_DIR = path.join( __dirname, '..', '..', '..', 'assets' );
+const ASSETS_DIR = path.join( import.meta.dirname, '..', '..', '..', 'assets' );
 
 test.use( {
 	mediaProcessingUtils: async ( { page }, use ) => {

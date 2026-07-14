@@ -15,7 +15,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  * @typedef {import('@playwright/test').Page} Page
  */
 
-const ASSETS_DIR = path.join( __dirname, '..', '..', '..', 'assets' );
+const ASSETS_DIR = path.join( import.meta.dirname, '..', '..', '..', 'assets' );
 
 /**
  * Animated GIF fixture used for conversion tests.

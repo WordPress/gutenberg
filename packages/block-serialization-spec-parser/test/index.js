@@ -13,5 +13,5 @@ describe( 'block-serialization-spec-parser-js', jsTester( parse ) ); // eslint-d
 
 phpTester(
 	'block-serialization-spec-parser-php',
-	path.join( __dirname, 'test-parser.php' )
+	path.join( import.meta.dirname, 'test-parser.php' )
 );

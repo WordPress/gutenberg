@@ -8,10 +8,10 @@ const path = require( 'path' );
 const rimraf = require( 'rimraf' ).sync;
 const webpack = require( 'webpack' );
 
-const fixturesPath = path.join( __dirname, 'fixtures' );
+const fixturesPath = path.join( import.meta.dirname, 'fixtures' );
 const configFixtures = fs.readdirSync( fixturesPath ).sort();
 
-afterAll( () => rimraf( path.join( __dirname, 'build' ) ) );
+afterAll( () => rimraf( path.join( import.meta.dirname, 'build' ) ) );
 
 describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 	'DependencyExtractionWebpackPlugin %s',
@@ -19,7 +19,7 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 		describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 			const testDirectory = path.join( fixturesPath, configCase );
 			const outputDirectory = path.join(
-				__dirname,
+				import.meta.dirname,
 				'build',
 				moduleMode,
 				configCase

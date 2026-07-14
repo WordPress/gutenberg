@@ -10,7 +10,7 @@ import { defineConfig } from '@playwright/test';
  */
 import baseConfig from '@wordpress/scripts/config/playwright.config.js';
 
-process.env.ASSETS_PATH = path.join( __dirname, 'assets' );
+process.env.ASSETS_PATH = path.join( import.meta.dirname, 'assets' );
 
 const config = defineConfig( {
 	...baseConfig,
@@ -25,7 +25,7 @@ const config = defineConfig( {
 	timeout: parseInt( process.env.TIMEOUT || '', 10 ) || 600_000, // Defaults to 10 minutes.
 	reportSlowTests: null,
 	globalSetup: fileURLToPath(
-		new URL( './config/global-setup.ts', 'file:' + __filename ).href
+		new URL( './config/global-setup.ts', import.meta.url ).href
 	),
 	use: {
 		...baseConfig.use,
