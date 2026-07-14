@@ -3,6 +3,95 @@
  */
 import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
+import { select } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Returns the subset of block attributes that should be carried over when
+ * converting an animated-GIF Image block into its converted Video block.
+ *
+ * The conversion swaps one block for another via `createBlock`, which would
+ * otherwise drop everything the author set on the original block. This carries
+ * the attributes both blocks support: block alignment, the HTML anchor, custom
+ * class names, and margin spacing.
+ *
+ * Image-only attributes such as links (`href`/`linkDestination`), sizing
+ * (`sizeSlug`/`scale`), and `border`/`shadow` styles are intentionally not
+ * carried: the Video block has no equivalent, so copying them would leave
+ * attributes the target block cannot represent.
+ *
+ * @param {Object} attributes Source block attributes.
+ * @return {Object} Attributes to spread into the converted block.
+ */
+function getCarriedGifConversionAttributes( attributes ) {
+	const { align, anchor, className, style } = attributes;
+	const margin = style?.spacing?.margin;
+
+	return {
+		...( align && { align } ),
+		...( anchor && { anchor } ),
+		...( className && { className } ),
+		...( margin && { style: { spacing: { margin } } } ),
+	};
+}
+
+/**
+ * Returns the sideloaded video companion of an animated GIF image attachment,
+ * or `null` when the media is not a converted animated GIF.
+ *
+ * An animated GIF uploaded through the editor gets a muted, looping video
+ * transcode sideloaded next to it and recorded (as basenames) in the
+ * attachment's `media_details.animated_video` / `animated_video_poster`.
+ *
+ * Block transforms match and run synchronously, so this reads the attachment
+ * record straight from the core-data store: it only returns the companion once
+ * the record is resolved. The Image block resolves the record while the block
+ * is selected, which is also when the block switcher can offer the transform.
+ *
+ * @param {number} id  Image attachment ID.
+ * @param {string} url Image block URL, used to cheaply skip non-GIF media.
+ * @return {Object|null} Companion details (absolute `src`/`poster` URLs and
+ *                       the GIF's intrinsic `width`/`height`), or `null`.
+ */
+function getAnimatedGifVideoCompanion( id, url ) {
+	if ( ! id ) {
+		return null;
+	}
+	/*
+	 * Only animated GIFs have a video companion. Gate on the `.gif` extension
+	 * so an ordinary image never reaches into the attachment record just to
+	 * discover it has no companion. Strip any query string or fragment first
+	 * so a URL like `cat.gif?ver=2` still matches.
+	 */
+	const urlPath = url?.split( /[?#]/ )[ 0 ];
+	if ( ! urlPath?.toLowerCase().endsWith( '.gif' ) ) {
+		return null;
+	}
+	const record = select( coreStore ).getEntityRecord(
+		'postType',
+		'attachment',
+		id,
+		{ context: 'view' }
+	);
+	const details = record?.media_details;
+	if ( ! details?.animated_video || ! record?.source_url ) {
+		return null;
+	}
+	// Companion files are sideloaded next to the GIF, so they share its
+	// directory; build their URLs from the GIF's own source URL.
+	const dir = record.source_url.slice(
+		0,
+		record.source_url.lastIndexOf( '/' ) + 1
+	);
+	return {
+		src: dir + details.animated_video,
+		poster: details.animated_video_poster
+			? dir + details.animated_video_poster
+			: undefined,
+		width: details.width,
+		height: details.height,
+	};
+}
 
 export function stripFirstImage( attributes, { shortcode } ) {
 	const { body } = document.implementation.createHTMLDocument( '' );
@@ -250,6 +339,45 @@ const transforms = {
 						return align.replace( 'align', '' );
 					},
 				},
+			},
+		},
+	],
+	to: [
+		{
+			// Offer converting an animated GIF into the Video block's "GIF"
+			// variation: a muted, looping, autoplaying video transcoded from
+			// the GIF and sideloaded next to it when it was uploaded. Only
+			// matches when that companion video exists, so ordinary images
+			// never see this transform.
+			type: 'block',
+			blocks: [ 'core/video' ],
+			isMatch: ( { id, url } ) =>
+				!! getAnimatedGifVideoCompanion( id, url ),
+			transform( attributes ) {
+				const { id, url, caption } = attributes;
+				const companion = getAnimatedGifVideoCompanion( id, url );
+
+				return createBlock( 'core/video', {
+					...getCarriedGifConversionAttributes( attributes ),
+					id,
+					src: companion.src,
+					poster: companion.poster,
+					caption,
+					controls: false,
+					loop: true,
+					autoplay: true,
+					muted: true,
+					playsInline: true,
+					/*
+					 * Carry the GIF's intrinsic dimensions so the <video>
+					 * keeps its aspect ratio from the first paint. Without
+					 * them the element collapses to the browser-default size
+					 * and then jumps once the poster/metadata load, which
+					 * shows up as a brief duplicated image during the swap.
+					 */
+					width: companion.width,
+					height: companion.height,
+				} );
 			},
 		},
 	],

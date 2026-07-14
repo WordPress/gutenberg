@@ -59,21 +59,21 @@ const ALL_POSITIONS: HandlePosition[] = [
 function getHandleLabel( pos: HandlePosition ): string {
 	switch ( pos ) {
 		case 'n':
-			return __( 'Resize top edge' );
+			return __( 'Resize from top edge' );
 		case 's':
-			return __( 'Resize bottom edge' );
+			return __( 'Resize from bottom edge' );
 		case 'e':
-			return __( 'Resize right edge' );
+			return __( 'Resize from right edge' );
 		case 'w':
-			return __( 'Resize left edge' );
+			return __( 'Resize from left edge' );
 		case 'nw':
-			return __( 'Resize top-left corner' );
+			return __( 'Resize from top-left corner' );
 		case 'ne':
-			return __( 'Resize top-right corner' );
+			return __( 'Resize from top-right corner' );
 		case 'sw':
-			return __( 'Resize bottom-left corner' );
+			return __( 'Resize from bottom-left corner' );
 		case 'se':
-			return __( 'Resize bottom-right corner' );
+			return __( 'Resize from bottom-right corner' );
 	}
 }
 

@@ -13,7 +13,7 @@ const meta: Meta< typeof TabPanel > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use `Tabs` from `@wordpress/ui` instead.',
+			notes: 'Use [`Tabs`](?path=/docs/design-system-components-tabs--docs) from `@wordpress/ui` instead.',
 		},
 	},
 	args: {

@@ -8,44 +8,58 @@ import { __, _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { initWaveformPlayer, updateSeekControlLabel } from './waveform-utils';
-
-const EMPTY_ARTIST_PLACEHOLDER = '\u00a0';
+import {
+	applyWaveformPlayerStyles,
+	initWaveformPlayer,
+	setupPlayButtonArtwork,
+	updateSeekControlLabel,
+} from './waveform-utils';
 
 /**
- * Update a live waveform player's metadata elements in place.
+ * Update the metadata of a WaveformPlayer element to reflect current props.
  *
- * The title element always exists, so the title is updated in place. The
- * subtitle element is seeded during editor player creation, so it can be
- * updated in place and hidden when the track has no artist. The artwork
- * element only exists when the track had an image when the player was created,
- * so its value is updated in place here; adding or removing an image (which
- * creates or tears down that element) is instead handled by recreating the
- * player, keyed on the `hasImage` dependency.
+ * `loadTrack()` owns full track swaps, but it also resets the audio element.
+ * This keeps same-source metadata edits lightweight in the editor.
  *
- * The library's only metadata API is `loadTrack()`, which re-fetches and
- * re-decodes the audio and regenerates the waveform (resetting playback), so
- * it's unsuitable for live metadata edits. We instead write to the title,
- * subtitle, and artwork elements directly, which is what `loadTrack()` itself
- * does internally for these fields.
- *
- * @param {Object} instance        - The waveform player instance.
- * @param {Object} metadata        - The track metadata.
- * @param {string} metadata.title  - The track title.
- * @param {string} metadata.artist - The artist name.
- * @param {string} metadata.image  - The artwork image URL.
+ * @param {Object}  player                - The waveform player.
+ * @param {Object}  metadata              - The track metadata.
+ * @param {string}  metadata.title        - The track title.
+ * @param {string}  metadata.artist       - The artist name.
+ * @param {string}  metadata.image        - The track image URL.
+ * @param {string}  metadata.imageAlt     - The track image alt text.
+ * @param {boolean} showPlayButtonArtwork - Whether to show artwork on the play button.
  */
-function updatePlayerMetadata( instance, { title, artist, image } ) {
+function updatePlayerMetadata(
+	player,
+	{ title, artist, image, imageAlt },
+	showPlayButtonArtwork
+) {
+	const { instance, container } = player;
+	const playerArtwork = showPlayButtonArtwork ? undefined : image;
+
 	if ( instance.titleEl ) {
 		instance.titleEl.textContent = title ?? '';
 	}
 	updateSeekControlLabel( instance, title || __( 'Seek' ) );
-	if ( instance.subtitleEl ) {
-		instance.subtitleEl.textContent = artist ?? '';
-		instance.subtitleEl.style.display = artist ? '' : 'none';
+
+	if ( typeof instance.syncArtist === 'function' ) {
+		instance.syncArtist( artist || '' );
+	} else if ( instance.artistEl ) {
+		instance.artistEl.textContent = artist ?? '';
+		instance.artistEl.style.display = artist ? '' : 'none';
 	}
-	if ( instance.artworkEl && image ) {
-		instance.artworkEl.src = image;
+
+	if ( typeof instance.syncArtwork === 'function' ) {
+		instance.syncArtwork(
+			playerArtwork || null,
+			playerArtwork ? imageAlt || '' : ''
+		);
+	} else if ( instance.artworkEl && playerArtwork ) {
+		instance.artworkEl.src = playerArtwork;
+		instance.artworkEl.alt = imageAlt || '';
+	}
+	if ( showPlayButtonArtwork ) {
+		setupPlayButtonArtwork( container, image );
 	}
 }
 
@@ -55,13 +69,20 @@ function updatePlayerMetadata( instance, { title, artist, image } ) {
  * Renders an audio waveform visualization with play/pause controls.
  * Automatically inherits colors from the parent block's text color.
  *
- * @param {Object}   props               - Component props.
- * @param {string}   props.src           - The audio file URL.
- * @param {string}   props.title         - The track title.
- * @param {string}   props.artist        - The artist name.
- * @param {string}   props.image         - The artwork image URL.
- * @param {string}   props.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
- * @param {Function} props.onEnded       - Callback when the track finishes playing.
+ * @param {Object}   props                       - Component props.
+ * @param {string}   props.src                   - The audio file URL.
+ * @param {string}   props.title                 - The track title.
+ * @param {string}   props.artist                - The artist name.
+ * @param {string}   props.image                 - The track image URL.
+ * @param {string}   props.imageAlt              - The track image alt text.
+ * @param {string}   props.color                 - The waveform color.
+ * @param {string}   props.gradient              - The waveform gradient.
+ * @param {string}   props.backgroundColor       - The waveform background color.
+ * @param {string}   props.backgroundGradient    - The waveform background gradient.
+ * @param {string}   props.textColor             - The player text color.
+ * @param {string}   props.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {Function} props.onEnded               - Callback when the track finishes playing.
+ * @param {boolean}  props.showPlayButtonArtwork - Whether to show artwork on the play button.
  * @return {Element} The WaveformPlayer element.
  */
 export function WaveformPlayer( {
@@ -69,8 +90,15 @@ export function WaveformPlayer( {
 	title,
 	artist,
 	image,
+	imageAlt,
+	color,
+	gradient,
+	backgroundColor,
+	backgroundGradient,
+	textColor,
 	waveformStyle,
 	onEnded,
+	showPlayButtonArtwork = false,
 } ) {
 	// Store onEnded in a stable callback so it doesn't need to be a useRefEffect dependency.
 	// The callback changes reference on every render (its dependency chain
@@ -78,32 +106,62 @@ export function WaveformPlayer( {
 	// and recreate the entire player on every re-render, making it disappear
 	// during editor resizes.
 	const onEndedEvent = useEvent( onEnded );
-	const metadataRef = useRef( { title, artist, image } );
+
+	// Ref for the WaveformPlayer instance
 	const playerRef = useRef();
 
-	// The artwork element only exists when an image was present when the
-	// player was created. Recreate the player when one is added or removed so
-	// that element is created or torn down; value changes to an existing
-	// element are applied in place below.
-	const hasImage = !! image;
+	// WaveformPlayer needs an audio source on init, but the source may change
+	// throughout its lifetime.
+	const hasSrc = !! src;
 
-	// Keep the freshest metadata available to init() (which runs on a
-	// deferred timeout) and update the live player in place when metadata
-	// changes. Updating in place avoids destroying and recreating the
-	// player, which would flash it on every keystroke while editing a
-	// track's title or artist.
+	// Combined props ref for `initWaveformPlayer`, which is called
+	// asynchronously after this component mounts.
+	const metadataRef = useRef( { src, title, artist, image, imageAlt } );
+	const stylesRef = useRef( {
+		color,
+		gradient,
+		backgroundColor,
+		backgroundGradient,
+		textColor,
+	} );
 	useEffect( () => {
-		metadataRef.current = { title, artist, image };
+		metadataRef.current = { src, title, artist, image, imageAlt };
+	}, [ src, title, artist, image, imageAlt ] );
 
-		const instance = playerRef.current?.instance;
-		if ( instance ) {
-			updatePlayerMetadata( instance, { title, artist, image } );
+	useEffect( () => {
+		stylesRef.current = {
+			color,
+			gradient,
+			backgroundColor,
+			backgroundGradient,
+			textColor,
+		};
+	}, [ color, gradient, backgroundColor, backgroundGradient, textColor ] );
+
+	useEffect( () => {
+		if ( playerRef.current?.container ) {
+			applyWaveformPlayerStyles( playerRef.current.container, {
+				backgroundColor,
+				backgroundGradient,
+				textColor,
+				playButtonColor: showPlayButtonArtwork ? undefined : color,
+				playButtonGradient: showPlayButtonArtwork
+					? undefined
+					: gradient,
+			} );
 		}
-	}, [ title, artist, image ] );
+	}, [
+		backgroundColor,
+		backgroundGradient,
+		color,
+		gradient,
+		showPlayButtonArtwork,
+		textColor,
+	] );
 
 	const ref = useRefEffect(
 		( element ) => {
-			if ( ! src ) {
+			if ( ! hasSrc ) {
 				return;
 			}
 
@@ -115,11 +173,17 @@ export function WaveformPlayer( {
 					return;
 				}
 				const player = initWaveformPlayer( element, {
-					src,
-					...metadataRef.current,
+					src: metadataRef.current.src,
+					title: metadataRef.current.title,
+					artist: metadataRef.current.artist,
+					image: metadataRef.current.image,
+					imageAlt: metadataRef.current.imageAlt,
+					waveformColor: stylesRef.current.color,
+					waveformGradient: stylesRef.current.gradient,
+					backgroundColor: stylesRef.current.backgroundColor,
+					backgroundGradient: stylesRef.current.backgroundGradient,
+					textColor: stylesRef.current.textColor,
 					waveformStyle,
-					artist:
-						metadataRef.current.artist || EMPTY_ARTIST_PLACEHOLDER,
 					labels: {
 						seek: __( 'Seek' ),
 						/* translators: %1$s: current audio time, %2$s: total audio duration. */
@@ -129,9 +193,9 @@ export function WaveformPlayer( {
 						),
 					},
 					onEnded: () => onEndedEvent?.(),
+					showPlayButtonArtwork,
 				} );
 				playerRef.current = player;
-				updatePlayerMetadata( player.instance, metadataRef.current );
 				const { destroy } = player;
 				playerDestroy = destroy;
 			}
@@ -152,8 +216,64 @@ export function WaveformPlayer( {
 				playerDestroy?.();
 			};
 		},
-		[ onEndedEvent, src, waveformStyle, hasImage ]
+		[
+			onEndedEvent,
+			hasSrc,
+			waveformStyle,
+			color,
+			gradient,
+			textColor,
+			showPlayButtonArtwork,
+		]
 	);
+
+	useEffect( () => {
+		if ( playerRef.current?.instance ) {
+			const player = playerRef.current;
+			if ( player ) {
+				updatePlayerMetadata(
+					player,
+					{
+						title,
+						artist,
+						image,
+						imageAlt,
+					},
+					showPlayButtonArtwork
+				);
+			}
+		}
+	}, [ title, artist, image, imageAlt, showPlayButtonArtwork ] );
+
+	useEffect( () => {
+		if ( src && playerRef.current?.instance ) {
+			const wasPlaying = playerRef.current.instance.isPlaying;
+			const promise = playerRef.current.instance.loadTrack(
+				src,
+				metadataRef.current.title,
+				metadataRef.current.artist,
+				{
+					artwork: showPlayButtonArtwork
+						? undefined
+						: metadataRef.current.image,
+					artworkAlt: showPlayButtonArtwork
+						? ''
+						: metadataRef.current.imageAlt,
+				}
+			);
+			promise.then( () => {
+				if ( showPlayButtonArtwork && playerRef.current?.container ) {
+					setupPlayButtonArtwork(
+						playerRef.current.container,
+						metadataRef.current.image
+					);
+				}
+				if ( ! wasPlaying ) {
+					playerRef.current?.instance.pause();
+				}
+			} );
+		}
+	}, [ src, showPlayButtonArtwork ] );
 
 	return <div ref={ ref } className="wp-block-playlist__waveform-player" />;
 }

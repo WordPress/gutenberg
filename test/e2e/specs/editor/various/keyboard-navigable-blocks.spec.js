@@ -114,16 +114,9 @@ class KeyboardNavigableBlocks {
 	}
 
 	async expectLabelToHaveFocus( label ) {
-		const ariaLabel = await this.page.evaluate( () => {
-			const { activeElement } =
-				document.activeElement.contentDocument ?? document;
-			return (
-				activeElement.getAttribute( 'aria-label' ) ||
-				activeElement.innerText
-			);
-		} );
-
-		expect( ariaLabel ).toBe( label );
+		// Poll: the focused element and its label may settle asynchronously
+		// (selection changes sync to the store on `selectionchange`).
+		await expect.poll( this.editor.getFocusOwnerLabel ).toBe( label );
 	}
 
 	async navigateThroughBlockToolbar() {
