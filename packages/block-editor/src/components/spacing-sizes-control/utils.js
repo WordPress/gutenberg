@@ -12,6 +12,14 @@ import {
 	sidesVertical,
 } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import {
+	getPresetSlug,
+	isValuePreset,
+} from '../preset-input-control/utils';
+
 export const RANGE_CONTROL_MAX_SIZE = 8;
 
 export const ALL_SIDES = [ 'top', 'bottom', 'left', 'right' ];
@@ -64,10 +72,7 @@ export const VIEWS = {
  * @return {boolean} Return true if value is string in format var:preset|spacing|.
  */
 export function isValueSpacingPreset( value ) {
-	if ( ! value?.includes ) {
-		return false;
-	}
-	return value === '0' || value.includes( 'var:preset|spacing|' );
+	return isValuePreset( value, 'spacing' );
 }
 
 /**
@@ -147,17 +152,7 @@ export function getSpacingPresetCssVar( value ) {
  * @return {string|undefined} The int value of the slug from given spacing preset.
  */
 export function getSpacingPresetSlug( value ) {
-	if ( ! value ) {
-		return;
-	}
-
-	if ( value === '0' || value === 'default' ) {
-		return value;
-	}
-
-	const slug = value.match( /var:preset\|spacing\|(.+)/ );
-
-	return slug ? slug[ 1 ] : undefined;
+	return getPresetSlug( value, 'spacing' );
 }
 
 /**
