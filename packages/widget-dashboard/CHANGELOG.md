@@ -41,6 +41,8 @@
     and move widget and layout controls into toolbar chips.
 -   Add a Storybook story reproducing the tile header with multiple
     high-relevance inline attribute controls ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+-   Mark the default runtime module `import()` with `@vite-ignore` alongside
+    `webpackIgnore`, silencing Vite's import-analysis warning ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 
 ## 0.2.0 (2026-07-01)
 
