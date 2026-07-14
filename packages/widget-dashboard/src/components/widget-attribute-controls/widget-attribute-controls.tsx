@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { DataForm } from '@wordpress/dataviews';
@@ -55,10 +50,11 @@ type WidgetAttributeControlsProps = {
  *
  * The inline presentation holds only while it fits the header.
  * When the fields' natural width exceeds the space the header can grant,
- * they collapse into a dropdown holding them as a form; the settings trigger
- * is not part of the collapse and stays in the toolbar. The inline fields
- * stay mounted, hidden and inert, so the fit keeps being measured and the
- * presentation can expand back.
+ * they unmount and collapse into a dropdown holding them as a form; the
+ * settings trigger is not part of the collapse and stays in the toolbar.
+ * While collapsed, the last measurement is retained to decide when to
+ * expand back; remounting re-measures and re-collapses if the retained
+ * value went stale.
  *
  * @param {WidgetAttributeControlsProps} props Component props.
  */
@@ -124,29 +120,24 @@ export function WidgetAttributeControls( {
 
 	return (
 		<>
-			<Stack
-				direction="row"
-				align="center"
-				gap="xs"
-				ref={ measureRef }
-				className={ clsx(
-					styles[ 'inline-controls' ],
-					collapsed && styles[ 'is-collapsed' ]
-				) }
-				aria-hidden={ collapsed || undefined }
-				{ ...( collapsed ? { inert: 'true' } : {} ) }
-			>
-				{ fields.length > 0 && (
-					<DataForm< WidgetAttributes >
-						data={ data }
-						fields={ fields }
-						form={ form }
-						onChange={ handleChange }
-					/>
-				) }
-			</Stack>
-
-			{ collapsed && (
+			{ ! collapsed ? (
+				fields.length > 0 && (
+					<Stack
+						direction="row"
+						align="center"
+						gap="xs"
+						ref={ measureRef }
+						className={ styles[ 'inline-controls' ] }
+					>
+						<DataForm< WidgetAttributes >
+							data={ data }
+							fields={ fields }
+							form={ form }
+							onChange={ handleChange }
+						/>
+					</Stack>
+				)
+			) : (
 				<AttributeControlsDropdown
 					fields={ fields }
 					data={ data }

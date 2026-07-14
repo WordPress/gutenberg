@@ -2,20 +2,6 @@
 	flex-shrink: 0;
 }
 
-/*
- * Collapsed: the inline controls stay mounted so the fit hook keeps
- * measuring their natural width; out of flow, invisible, and inert so they
- * neither size the toolbar chip nor take interaction.
- */
-.is-collapsed {
-	position: absolute;
-	inset-block-start: 0;
-	inset-inline-start: 0;
-	width: max-content;
-	visibility: hidden;
-	pointer-events: none;
-}
-
 .dropdown-popup {
 	max-width: 300px;
 }

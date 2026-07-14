@@ -17,9 +17,9 @@ import { useWidgetHeaderAvailableSize } from '../widget-header/widget-header-siz
 interface InlineControlsFit {
 	/**
 	 * Ref for the element wrapping the inline controls at their natural
-	 * width. The caller keeps that element mounted (hidden and inert while
-	 * collapsed) so the measurement follows attribute-value and container
-	 * changes.
+	 * width. While mounted, the measurement tracks it live; when the caller
+	 * unmounts it (collapsed presentation), the last value is retained and
+	 * drives the expand-back decision, and remounting re-measures it.
 	 */
 	measureRef: Ref< HTMLDivElement >;
 
