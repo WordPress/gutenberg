@@ -8,6 +8,7 @@ import { useRefEffect } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { setContentEditableWrapper } from './utils';
 import { getBlockClientId } from '../../utils/dom';
 
 export default function useClickSelection() {
@@ -30,9 +31,7 @@ export default function useClickSelection() {
 					// When selecting a single block in a document by holding the shift key,
 					// don't mark this action as multiselection.
 					if ( startClientId && startClientId !== clickedClientId ) {
-						node.contentEditable = true;
-						// Firefox doesn't automatically move focus.
-						node.focus();
+						setContentEditableWrapper( node, true );
 					}
 				} else if ( hasMultiSelection() ) {
 					// Allow user to escape out of a multi-selection to a

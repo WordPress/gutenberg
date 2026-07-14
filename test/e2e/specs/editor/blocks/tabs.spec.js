@@ -38,16 +38,6 @@ function createTabs( labels, panels ) {
 }
 
 test.describe( 'Tabs', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-block-experiments',
-		] );
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [] );
-	} );
-
 	test.describe( 'Editor functionality', () => {
 		test.beforeEach( async ( { admin } ) => {
 			await admin.createNewPost();

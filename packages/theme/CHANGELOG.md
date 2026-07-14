@@ -2,9 +2,14 @@
 
 ## Unreleased
 
+### Stable Release
+
+This package is now considered stable and production-ready. The API will follow semantic versioning from this point forward.
+
 ### Breaking Changes
 
 -   Remove the `--wpds-elevation-*` design tokens while the complete elevation model is still being defined ([#80099](https://github.com/WordPress/gutenberg/pull/80099)).
+-   Rename the font-weight tokens by intent: `--wpds-typography-font-weight-default` for baseline text and `--wpds-typography-font-weight-emphasis` for labels, controls, and headings ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Make the package ESM-only by removing the published CommonJS entrypoints and requiring Node.js `^20.19.0` or `>=22.13.0`. ([#80063](https://github.com/WordPress/gutenberg/pull/80063))
 -   Rename `--wpds-color-background-thumb-neutral-disabled` to `--wpds-color-background-thumb-neutral-weak-disabled` so the disabled token belongs to the existing neutral weak thumb family ([#79770](https://github.com/WordPress/gutenberg/pull/79770)).
 -   `ThemeProvider`: reject partially transparent and `transparent` seed colors. `color.primary` and `color.background` now only accept fully opaque seed colors ([#79773](https://github.com/WordPress/gutenberg/pull/79773)).
@@ -20,6 +25,8 @@
 
 ### Documentation
 
+-   Correct the documented default `ThemeProvider` background seed to `#fcfcfc` ([#80237](https://github.com/WordPress/gutenberg/pull/80237)).
+-   Remove the experimental messaging from the package README and update the package keywords to reflect its stable design system purpose ([#80049](https://github.com/WordPress/gutenberg/pull/80049)).
 -   Clarify what `@wordpress/theme` provides, when consumers need to load `design-tokens.css`, the `ThemeProvider` contract including root provider usage, and the legacy compatibility boundary ([#79961](https://github.com/WordPress/gutenberg/pull/79961)).
 -   Document build plugin behavior and add parity coverage for PostCSS, esbuild, and Vite ([#80088](https://github.com/WordPress/gutenberg/pull/80088)).
 -   Document design token accessibility responsibilities ([#79943](https://github.com/WordPress/gutenberg/pull/79943)).
@@ -37,6 +44,10 @@
 ### Internal
 
 -   Add regression test coverage for the `ThemeProvider` wrapper's `display: contents` focus behavior ([#80056](https://github.com/WordPress/gutenberg/pull/80056)).
+
+### Code Quality
+
+-   Clean the npm package publish surface, correct ESM declaration export paths, and validate packed test/story artifacts and local export targets ([#79552](https://github.com/WordPress/gutenberg/pull/79552)).
 
 ## 0.17.0 (2026-06-30)
 

@@ -2,7 +2,7 @@
 
 exports[`PostPublishPanel should render the post-publish panel if the post is published 1`] = `
 .emotion-0 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
@@ -19,7 +19,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
 
 .emotion-4 {
   font-size: 11px;
-  font-weight: 499;
+  font-weight: 600;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
@@ -206,7 +206,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
 
 exports[`PostPublishPanel should render the post-publish panel if the post is scheduled 1`] = `
 .emotion-0 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
@@ -223,7 +223,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
 
 .emotion-4 {
   font-size: 11px;
-  font-weight: 499;
+  font-weight: 600;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
@@ -388,7 +388,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
 
 exports[`PostPublishPanel should render the pre-publish panel if post status is scheduled but date is before now 1`] = `
 .emotion-0 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
@@ -520,7 +520,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
 
 exports[`PostPublishPanel should render the pre-publish panel if the post is not saving, published or scheduled 1`] = `
 .emotion-0 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
@@ -696,7 +696,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
 }
 
 .emotion-6 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
