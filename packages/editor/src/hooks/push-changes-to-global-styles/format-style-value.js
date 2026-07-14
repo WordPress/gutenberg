@@ -3,18 +3,10 @@
  */
 import { capitalCase } from 'change-case';
 
-/**
- * Em dash used to represent an unset / default value.
- *
- * @type {string}
- */
+// Em dash used to represent an unset / default value.
 export const EMPTY_VALUE_LABEL = '\u2014';
 
-/**
- * Matches a preset variable token, e.g. `var:preset|color|vivid-red`.
- *
- * @type {RegExp}
- */
+// Matches a preset variable token, e.g. `var:preset|color|vivid-red`.
 const PRESET_TOKEN_REGEX = /^var:preset\|([^|]+)\|(.+)$/;
 
 /**
@@ -90,12 +82,7 @@ export function formatBorderShorthand( border ) {
 	return parts.length ? parts.join( ' ' ) : EMPTY_VALUE_LABEL;
 }
 
-/**
- * CSS `border-radius` shorthand corner order (top-left, top-right,
- * bottom-right, bottom-left).
- *
- * @type {string[]}
- */
+// CSS `border-radius` shorthand corner order.
 const RADIUS_CORNERS = [ 'topLeft', 'topRight', 'bottomRight', 'bottomLeft' ];
 
 /**
