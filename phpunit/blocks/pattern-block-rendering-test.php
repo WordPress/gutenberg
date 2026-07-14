@@ -17,10 +17,8 @@ class Tests_Blocks_Pattern_Block_Rendering extends WP_UnitTestCase {
 
 	const BLOCK_NAME = 'tests/pattern-block';
 
-	const PATTERN = '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group">'
-		. '<!-- wp:heading {"metadata":{"name":"Title","bindings":{"__default":{"source":"core/pattern-overrides"}}}} --><h2 class="wp-block-heading">Default title</h2><!-- /wp:heading -->'
-		. '<!-- wp:paragraph --><p>Plugin-owned paragraph.</p><!-- /wp:paragraph -->'
-		. '</div><!-- /wp:group -->';
+	const PATTERN = '<!-- wp:heading {"metadata":{"name":"Title","bindings":{"__default":{"source":"core/pattern-overrides"}}}} --><h2 class="wp-block-heading">Default title</h2><!-- /wp:heading -->'
+		. '<!-- wp:paragraph --><p>Plugin-owned paragraph.</p><!-- /wp:paragraph -->';
 
 	public function tear_down() {
 		foreach ( array( self::BLOCK_NAME, 'tests/side-effect-block' ) as $block_name ) {
@@ -28,6 +26,7 @@ class Tests_Blocks_Pattern_Block_Rendering extends WP_UnitTestCase {
 				unregister_block_type( $block_name );
 			}
 		}
+		WP_Theme_JSON_Resolver::clean_cached_data();
 		parent::tear_down();
 	}
 
@@ -165,7 +164,7 @@ class Tests_Blocks_Pattern_Block_Rendering extends WP_UnitTestCase {
 		do_blocks( '<!-- wp:' . self::BLOCK_NAME . ' /-->' );
 		remove_filter( 'pre_render_block', $collect );
 
-		$this->assertSame( array( 'core/group' ), $roots_seen );
+		$this->assertSame( array( 'core/heading', 'core/paragraph' ), $roots_seen );
 	}
 
 	public function test_renders_a_self_referencing_pattern_without_recursing() {
