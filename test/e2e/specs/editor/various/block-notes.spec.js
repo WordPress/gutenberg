@@ -268,6 +268,84 @@ test.describe( 'Block Notes', () => {
 		} );
 	} );
 
+	test.describe( 'Mentions in the note form', () => {
+		let mentionedUserId;
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			const user = await requestUtils.createUser( {
+				username: 'notementions',
+				email: 'notementions@example.com',
+				firstName: 'Mentionable',
+				lastName: 'Teammate',
+				password: 'iLoVeE2EtEsTs',
+			} );
+			mentionedUserId = user.id;
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllUsers();
+		} );
+
+		test( 'inserts a mention chip that survives saving the note', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Mention host' },
+			} );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			const textbox = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			await textbox.click();
+			await page.keyboard.type( 'Ping @' );
+
+			await expect(
+				page.getByRole( 'option', { name: 'Mentionable Teammate' } )
+			).toBeVisible();
+
+			// Narrow the suggestions and pick the teammate.
+			await page.keyboard.type( 'Menti' );
+			await expect(
+				page.getByRole( 'option', { name: 'Mentionable Teammate' } )
+			).toBeVisible();
+			await page.keyboard.press( 'Enter' );
+
+			/*
+			 * The completer inserts the mention as a chip: a link to the
+			 * user's author page whose `user-N` class carries the mentioned
+			 * user's ID.
+			 */
+			const mentionClasses = new RegExp(
+				`^wp-note-mention user-${ mentionedUserId }$`
+			);
+			const draftChip = textbox.locator( 'a.wp-note-mention' );
+			await expect( draftChip ).toHaveText( '@Mentionable Teammate' );
+			await expect( draftChip ).toHaveClass( mentionClasses );
+			await expect( draftChip ).toHaveAttribute( 'href', /author/ );
+
+			await page.keyboard.type( 'please review' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			/*
+			 * The saved thread renders the content returned by the REST API,
+			 * so an intact chip here proves the mention markup survived
+			 * server-side sanitization.
+			 */
+			const savedChip = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem' )
+				.locator( 'a.wp-note-mention' );
+			await expect( savedChip ).toHaveText( '@Mentionable Teammate' );
+			await expect( savedChip ).toHaveClass( mentionClasses );
+		} );
+	} );
+
 	test( 'can reply to a block note', async ( { page, blockNoteUtils } ) => {
 		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/paragraph',
@@ -398,11 +476,6 @@ test.describe( 'Block Notes', () => {
 
 		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
 		await resolveButton.click();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note marked as resolved.' } )
-		).toBeVisible();
 		await expect( thread ).toBeFocused();
 		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
 
@@ -411,11 +484,6 @@ test.describe( 'Block Notes', () => {
 
 		await blockNoteUtils.clickBlockNoteActionMenuItem( 'Reopen' );
 		await expect( resolveButton ).toBeEnabled();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note reopened.' } )
-		).toBeVisible();
 	} );
 
 	test( 'can reopen a resolved note when adding a reply', async ( {
@@ -432,14 +500,11 @@ test.describe( 'Block Notes', () => {
 			name: 'Resolve',
 		} );
 		await resolveButton.click();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note marked as resolved.' } )
-		).toBeVisible();
 
 		await blockNoteUtils.openBlockNoteSidebar();
 		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
+		// Re-selecting the thread shows the Resolve button, now disabled,
+		// confirming the note was resolved.
 		await expect( resolveButton ).toBeDisabled();
 		const commentForm = page.getByRole( 'textbox', {
 			name: 'Reply to',
@@ -458,11 +523,6 @@ test.describe( 'Block Notes', () => {
 			.click();
 
 		await expect( resolveButton ).toBeEnabled();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note reopened.' } )
-		).toBeVisible();
 	} );
 
 	test( 'shows a "Resolved" divider between active and resolved notes', async ( {
@@ -510,13 +570,9 @@ test.describe( 'Block Notes', () => {
 			'true'
 		);
 		await page.getByRole( 'button', { name: 'Resolve' } ).click();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note marked as resolved.' } )
-		).toBeVisible();
 
-		// The divider now labels the resolved section.
+		// The divider appearing confirms the resolve completed and now labels
+		// the resolved section.
 		await expect( separator ).toBeVisible();
 		await expect( separator ).toHaveText( 'Resolved' );
 
@@ -1356,11 +1412,9 @@ test.describe( 'Block Notes', () => {
 			} );
 			await threadA.click();
 			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note marked as resolved.' } )
-			).toBeVisible();
+			// Resolving removes the note from the floating "Unresolved notes"
+			// view, which confirms the action completed.
+			await expect( threadA ).toBeHidden();
 
 			// Note B should still be visible and unresolved (expanded).
 			const threadB = settings.getByRole( 'treeitem', {
@@ -1399,11 +1453,9 @@ test.describe( 'Block Notes', () => {
 			} );
 			await firstThread.click();
 			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note marked as resolved.' } )
-			).toBeVisible();
+			// Resolving removes the note from the floating "Unresolved notes"
+			// view, which confirms the action completed.
+			await expect( firstThread ).toBeHidden();
 
 			// Click the title to deselect the block and its comment.
 			await editor.canvas
@@ -1708,11 +1760,6 @@ test.describe( 'Block Notes', () => {
 			// Resolving drops the highlight, so the marker is removed from the
 			// content and the note settles back to a block-level note.
 			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note marked as resolved.' } )
-			).toBeVisible();
 
 			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
 				0

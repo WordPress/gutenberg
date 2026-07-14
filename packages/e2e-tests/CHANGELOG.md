@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+-   Removed the stale `puppeteer-core` peer dependency; the package no longer ships Puppeteer-based tests ([#60357](https://github.com/WordPress/gutenberg/issues/60357)).
 
 ## 9.15.0 (2026-07-01)
 

@@ -37,6 +37,7 @@
 		"magic-string": "^0.30.21",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
+		"rimraf": "^5.0.10",
 		"source-map": "^0.6.1"
 	},
 	"publishConfig": {
@@ -44,6 +45,8 @@
 	},
 	"scripts": {
 		"build:all": "node ./build.mjs",
+		"clean:package-types": "node ./clean.mjs --types",
+		"clean:packages": "node ./clean.mjs --packages",
 		"dev": "node ./dev.mjs",
 		"build-vendors": "node ./packages/build-vendors.mjs",
 		"generate-worker-placeholders": "node ./packages/generate-worker-placeholders.mjs",
