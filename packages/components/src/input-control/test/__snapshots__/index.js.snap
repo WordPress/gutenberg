@@ -4,3 +4,8 @@ exports[`InputControl Legacy size support treats __unstable-large the same as de
 Snapshot Diff:
 Compared values have no visual difference.
 `;
+
+exports[`InputControl Legacy size support treats __unstable-large the same as default 2`] = `
+Snapshot Diff:
+Compared values have no visual difference.
+`;

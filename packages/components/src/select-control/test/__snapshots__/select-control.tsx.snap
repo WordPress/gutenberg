@@ -4,3 +4,8 @@ exports[`SelectControl Legacy size support treats __unstable-large the same as d
 Snapshot Diff:
 Compared values have no visual difference.
 `;
+
+exports[`SelectControl Legacy size support treats __unstable-large the same as default 2`] = `
+Snapshot Diff:
+Compared values have no visual difference.
+`;

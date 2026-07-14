@@ -250,13 +250,15 @@ describe( 'SelectControl', () => {
 				/>
 			);
 
-			const wrappers = screen.getAllByText( '$' );
-			const [ defaultWrapper, legacyWrapper ] = wrappers.map(
-				// eslint-disable-next-line testing-library/no-node-access
-				( el ) => el.parentElement
-			);
+			const [ defaultPrefixWrapper, legacyPrefixWrapper ] =
+				screen.getAllByText( '$' );
+			const [ defaultSelect, legacySelect ] =
+				screen.getAllByRole( 'combobox' );
 
-			expect( legacyWrapper ).toMatchStyleDiffSnapshot( defaultWrapper );
+			expect( legacyPrefixWrapper ).toMatchStyleDiffSnapshot(
+				defaultPrefixWrapper
+			);
+			expect( legacySelect ).toMatchStyleDiffSnapshot( defaultSelect );
 		} );
 	} );
 } );
