@@ -13,7 +13,11 @@
  * External dependencies
  */
 import type { ComponentProps, ComponentType, ReactElement } from 'react';
-import type { Field } from '@wordpress/dataviews';
+
+/**
+ * Internal dependencies
+ */
+import type { ResolvableField } from './field-types';
 
 /**
  * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
@@ -66,8 +70,13 @@ export interface WidgetHelp {
  */
 type WidgetAttributeRelevance = 'high' | 'low';
 
-/** A DataViews `Field` plus the widget-layer `relevance` hint; what hosts read. */
-type WidgetAttribute< Item = unknown > = Field< Item > & {
+/**
+ * A DataViews `Field` plus the widget-layer `relevance` hint; what hosts
+ * read. Its `type` may also reference a registered field type by name
+ * (see `registerFieldType`); `useWidgetTypes` resolves such references
+ * into plain `Field` props.
+ */
+type WidgetAttribute< Item = unknown > = ResolvableField< Item > & {
 	relevance?: WidgetAttributeRelevance;
 };
 
