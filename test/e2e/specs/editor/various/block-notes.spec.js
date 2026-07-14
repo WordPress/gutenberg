@@ -302,14 +302,15 @@ test.describe( 'Block Notes', () => {
 			await textbox.click();
 			await page.keyboard.type( 'Ping @' );
 
-			await expect(
-				page.getByRole( 'option', { name: 'Mentionable Teammate' } )
-			).toBeVisible();
+			await expect( page.getByRole( 'listbox' ) ).toBeVisible();
 
 			// Narrow the suggestions and pick the teammate.
 			await page.keyboard.type( 'Menti' );
 			await expect(
-				page.getByRole( 'option', { name: 'Mentionable Teammate' } )
+				page.getByRole( 'option', {
+					name: 'Mentionable Teammate',
+					selected: true,
+				} )
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 
