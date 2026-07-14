@@ -35,7 +35,7 @@ export function getBlockVisibilityViewportEntries( viewportSettings ) {
  * @param {string} viewport The viewport to check (e.g., 'mobile', 'tablet', 'desktop').
  * @return {boolean} Whether the block is hidden for the viewport.
  */
-function isBlockHiddenForViewport( block, viewport ) {
+export function isBlockHiddenForViewport( block, viewport ) {
 	if ( ! block ) {
 		return false;
 	}

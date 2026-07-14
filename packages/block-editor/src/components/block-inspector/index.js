@@ -38,7 +38,10 @@ import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSett
 import { useBorderPanelLabel } from '../../hooks/border';
 import { BlockStateBadges, BlockStatesControl } from '../../hooks/states';
 import ContentTab from '../inspector-controls-tabs/content-tab';
-import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
+import {
+	ViewportVisibilityInfo,
+	ViewportVisibilityInspectorControl,
+} from '../block-visibility';
 import { unlock } from '../../lock-unlock';
 import {
 	hasPseudoBlockStyleState,
@@ -466,7 +469,9 @@ const BlockInspectorSingleBlock = ( {
 					/>
 				</Spacer>
 			) }
-			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
+			{ ! isEditingStyleState && (
+				<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
+			) }
 			<EditContents clientId={ renderedBlockClientId } />
 			{ ! isEditingStyleState && (
 				<BlockVariationTransforms
@@ -474,6 +479,14 @@ const BlockInspectorSingleBlock = ( {
 				/>
 			) }
 			<BlockInspectorPreTabsSlot />
+			{ isEditingStyleState && (
+				<ViewportVisibilityInspectorControl
+					blockEditingMode={ blockEditingMode }
+					blockName={ blockName }
+					clientId={ renderedBlockClientId }
+					selectedBlockStyleState={ selectedBlockStyleState }
+				/>
+			) }
 			{ isEditingStyleState && ! isSectionBlock && (
 				<StyleStateInspectorSlots
 					blockName={ blockName }
