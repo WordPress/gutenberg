@@ -46,7 +46,6 @@ const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const AUDIO_FILE_EXTENSION =
 	/\.(aac|aif|aiff|flac|m4a|m4b|mp3|oga|ogg|opus|wav|weba)$/i;
 const DEFAULT_WAVEFORM_STYLE = 'bars';
-const FILE_LIST_OBJECT_NAME = '[object FileList]';
 const WAVEFORM_STYLE_OPTIONS = [
 	{ label: _x( 'Bars', 'waveform style option' ), value: 'bars' },
 	{ label: _x( 'Mirror', 'waveform style option' ), value: 'mirror' },
@@ -57,10 +56,11 @@ const WAVEFORM_STYLE_OPTIONS = [
 ];
 
 function isFile( value ) {
-	return (
-		Object.prototype.toString.call( value ) === '[object File]' ||
-		( typeof File !== 'undefined' && value instanceof File )
-	);
+	return typeof File !== 'undefined' && value instanceof File;
+}
+
+function isFileList( value ) {
+	return typeof FileList !== 'undefined' && value instanceof FileList;
 }
 
 function isAudioFile( file ) {
@@ -182,10 +182,7 @@ const PlaylistEdit = ( {
 			}
 
 			let mediaItems = [ media ];
-			if (
-				Object.prototype.toString.call( media ) ===
-				FILE_LIST_OBJECT_NAME
-			) {
+			if ( isFileList( media ) ) {
 				mediaItems = Array.from( media );
 			} else if ( Array.isArray( media ) ) {
 				mediaItems = media;
