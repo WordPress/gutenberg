@@ -96,7 +96,6 @@ function getSanitizedSuffixMatchLength( fileName, mediaFileName ) {
 	const fileParts = getFileNameParts( fileName );
 	const mediaParts = getFileNameParts( mediaFileName );
 	const baseName = cleanForSlug( fileParts.baseName );
-	const mediaBaseName = cleanForSlug( mediaParts.baseName );
 
 	if (
 		! baseName ||
@@ -106,9 +105,9 @@ function getSanitizedSuffixMatchLength( fileName, mediaFileName ) {
 		return -1;
 	}
 
-	return mediaBaseName.startsWith( `${ baseName }-` )
-		? baseName.length
-		: -1;
+	const mediaBaseName = cleanForSlug( mediaParts.baseName );
+
+	return mediaBaseName.startsWith( `${ baseName }-` ) ? baseName.length : -1;
 }
 
 function areMediaItemsSame( mediaA, mediaB ) {
@@ -333,9 +332,7 @@ export function MediaPlaceholder( {
 				let failedFilesCount = 0;
 
 				const selectBatchIfReady = () => {
-					const finalMedia = selectedMedia.filter(
-						isFinalMediaItem
-					);
+					const finalMedia = selectedMedia.filter( isFinalMediaItem );
 					if (
 						! hasSelectedBatch &&
 						finalMedia.length > 0 &&
@@ -358,8 +355,10 @@ export function MediaPlaceholder( {
 					const mediaFileName = getMediaFileName( media );
 					const matchingFileIndex = filesList.findIndex(
 						( file, index ) =>
-							areFileNamesEquivalent( file.name, mediaFileName ) &&
-							! isFinalMediaItem( selectedMedia[ index ] )
+							areFileNamesEquivalent(
+								file.name,
+								mediaFileName
+							) && ! isFinalMediaItem( selectedMedia[ index ] )
 					);
 					if ( matchingFileIndex !== -1 ) {
 						return matchingFileIndex;
@@ -371,11 +370,10 @@ export function MediaPlaceholder( {
 								return bestMatch;
 							}
 
-							const matchLength =
-								getSanitizedSuffixMatchLength(
-									file.name,
-									mediaFileName
-								);
+							const matchLength = getSanitizedSuffixMatchLength(
+								file.name,
+								mediaFileName
+							);
 							if ( matchLength <= bestMatch.length ) {
 								return bestMatch;
 							}
@@ -433,14 +431,14 @@ export function MediaPlaceholder( {
 					);
 					selectBatchIfReady();
 				};
-				onUploadError = ( ( originalOnError ) => ( ...args ) => {
+				onUploadError = ( ...args ) => {
 					failedFilesCount = Math.min(
 						failedFilesCount + 1,
 						filesCount
 					);
 					selectBatchIfReady();
-					originalOnError?.( ...args );
-				} )( onError );
+					onError?.( ...args );
+				};
 			}
 		} else {
 			setMedia = ( [ media ] ) => onSelect( media );

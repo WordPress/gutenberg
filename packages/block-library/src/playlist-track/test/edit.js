@@ -63,6 +63,14 @@ jest.mock( '@wordpress/data', () => ( {
 	register: jest.fn(),
 } ) );
 
+jest.mock( '@wordpress/blocks', () => ( {
+	createBlock: jest.fn( ( name, attributes ) => ( {
+		clientId: `mock-${ attributes.id }`,
+		name,
+		attributes,
+	} ) ),
+} ) );
+
 jest.mock( '@wordpress/notices', () => ( {
 	store: 'core/notices',
 } ) );
