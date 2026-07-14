@@ -23,11 +23,16 @@ import styles from './widget-attribute-controls.module.css';
 import type { DashboardWidget, WidgetAttributes } from '../../types';
 
 /*
- * Toolbar footprint of the settings trigger: a compact icon button
- * (`--wpds-dimension-size-md`) plus the chip gap. Reserved from the fit
- * budget because the trigger stays in the toolbar in both presentations.
+ * Toolbar footprint of the settings trigger:
+ * - a compact icon button (28px) (`--wpds-dimension-size-md`)
+ * - a chip gap (8px)
+ *
+ * Reserved from the fit budget because the trigger stays in the toolbar in
+ * both presentations.
+ *
+ * Todo: consider to compute the trigger reserve dynamically.
  */
-const SETTINGS_TRIGGER_RESERVE = 36;
+const SETTINGS_TRIGGER_RESERVE = 28 + 8;
 
 type WidgetAttributeControlsProps = {
 	/**
