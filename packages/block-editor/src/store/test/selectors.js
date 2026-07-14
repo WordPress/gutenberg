@@ -2718,7 +2718,7 @@ describe( 'selectors', () => {
 						[ 'container', [ 'child' ] ],
 					] ),
 					blockEditingModes: new Map( [
-						[ 'container', 'contentOnly' ],
+						[ 'container', 'disabled' ],
 					] ),
 				},
 				blockListSettings: new Map( [
@@ -2736,7 +2736,7 @@ describe( 'selectors', () => {
 					[ sectionRootClientIdKey ]: '',
 				},
 				derivedBlockEditingModes: new Map( [
-					[ 'container', 'contentOnly' ],
+					[ 'container', 'disabled' ],
 				] ),
 			};
 

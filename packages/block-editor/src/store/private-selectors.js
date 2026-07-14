@@ -105,11 +105,16 @@ export function getExplicitBlockEditingMode( state, clientId ) {
  * @return {boolean} Whether the block list belongs to the editable area.
  */
 export function isWithinBoundInnerBlocks( state, clientId ) {
+	const isBoundRoot =
+		getBlockListSettings( state, clientId )?.[
+			BOUND_INNER_BLOCKS_SETTINGS_KEY
+		] === 'core/pattern-overrides';
 	if (
 		! getSettings( state ).blockBindingsInnerBlocks ||
 		! clientId ||
 		isZoomOut( state ) ||
-		getBlockEditingMode( state, clientId ) === 'disabled'
+		( getBlockEditingMode( state, clientId ) === 'disabled' &&
+			! isBoundRoot )
 	) {
 		return false;
 	}

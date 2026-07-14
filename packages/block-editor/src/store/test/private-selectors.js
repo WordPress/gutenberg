@@ -84,11 +84,21 @@ describe( 'private selectors', () => {
 			expect( isWithinBoundInnerBlocks( state, 'child' ) ).toBe( false );
 		} );
 
-		it( 'keeps disabled, zoomed, and nested pattern descendants protected', () => {
+		it( 'allows the disabled bound root while keeping disabled descendants protected', () => {
 			const state = createState();
+			state.derivedBlockEditingModes.set( 'container', 'disabled' );
+			expect( isWithinBoundInnerBlocks( state, 'container' ) ).toBe(
+				true
+			);
+			state.derivedBlockEditingModes.delete( 'container' );
+
 			state.derivedBlockEditingModes.set( 'child', 'disabled' );
 			expect( isWithinBoundInnerBlocks( state, 'child' ) ).toBe( false );
 			state.derivedBlockEditingModes.delete( 'child' );
+		} );
+
+		it( 'keeps zoomed and nested pattern descendants protected', () => {
+			const state = createState();
 
 			state.zoomLevel = 80;
 			expect( isWithinBoundInnerBlocks( state, 'child' ) ).toBe( false );
