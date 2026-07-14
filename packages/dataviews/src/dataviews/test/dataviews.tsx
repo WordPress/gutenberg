@@ -472,7 +472,7 @@ describe( 'DataViews component', () => {
 			}
 		} );
 
-		it( 'deselects the range when shift-clicking a selected item', async () => {
+		it( 'selects the range when shift-clicking a selected item', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -493,20 +493,16 @@ describe( 'DataViews component', () => {
 				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
 			);
 
-			// Shift-clicking the selected second item deselects the range
-			// between the anchor and it.
+			// Shift-clicking the selected second item selects the range
+			// between the anchor and it rather than deselecting it.
 			await user.keyboard( '{Shift>}' );
 			await user.click( screen.getByText( data[ 1 ].title ) );
 			await user.keyboard( '{/Shift}' );
-			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
-			).toBeChecked();
-			expect(
-				screen.getByRole( 'checkbox', { name: data[ 1 ].title } )
-			).not.toBeChecked();
-			expect(
-				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
-			).not.toBeChecked();
+			for ( const item of data ) {
+				expect(
+					screen.getByRole( 'checkbox', { name: item.title } )
+				).toBeChecked();
+			}
 		} );
 
 		it( 'selects the range when shift-clicking after deselecting an item', async () => {
