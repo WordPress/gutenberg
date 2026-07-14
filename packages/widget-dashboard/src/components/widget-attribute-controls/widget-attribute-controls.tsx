@@ -20,9 +20,7 @@ import { WidgetSettingsTrigger } from '../widget-settings';
 import { AttributeControlsDropdown } from './attribute-controls-dropdown';
 import { useInlineControlsFit } from './use-inline-controls-fit';
 import styles from './widget-attribute-controls.module.css';
-import type { DashboardWidget } from '../../types';
-
-type WidgetAttributes = Record< string, unknown >;
+import type { DashboardWidget, WidgetAttributes } from '../../types';
 
 type WidgetAttributeControlsProps = {
 	/**

@@ -22,9 +22,7 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  */
 import { useWidgetSettingsToggle } from '../widget-settings';
 import styles from './widget-attribute-controls.module.css';
-import type { DashboardWidget } from '../../types';
-
-type WidgetAttributes = Record< string, unknown >;
+import type { DashboardWidget, WidgetAttributes } from '../../types';
 
 export interface AttributeControlsDropdownProps {
 	/**
