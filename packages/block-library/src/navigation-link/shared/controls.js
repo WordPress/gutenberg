@@ -317,6 +317,17 @@ export function getInvalidLinkHelpText() {
 }
 
 /**
+ * Returns the help text for unbound legacy links that were created before entity binding was implemented.
+ *
+ * @return {string} Unbound legacy link help text
+ */
+export function getLegacyUnboundHelpText() {
+	return __(
+		'This link was created before entity binding was added to navigation links. Please select a new link to fix this item or remove it if it is no longer needed.'
+	);
+}
+
+/**
  * Returns the help text for links to draft entities
  *
  * @param {Object} props      - Function props

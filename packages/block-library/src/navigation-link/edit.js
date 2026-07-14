@@ -35,9 +35,11 @@ import {
 	LinkUI,
 	useEntityBinding,
 	getInvalidLinkHelpText,
+	getLegacyUnboundHelpText,
 	useHandleLinkChange,
 	useIsInvalidLink,
 	InvalidDraftDisplay,
+	NeedsUpdateDisplay,
 	useEnableLinkStatusValidation,
 	useIsDraggingWithin,
 	selectLabelText,
@@ -310,8 +312,13 @@ export default function NavigationLinkEdit( {
 
 	const instanceId = useInstanceId( NavigationLinkEdit );
 	const hasMissingEntity = hasUrlBinding && ! isBoundEntityAvailable;
+	const hasLegacyUnboundId =
+		validateLinkStatus && Number.isInteger( id ) && ! kind;
 	const missingEntityDescriptionId = hasMissingEntity
 		? sprintf( 'navigation-link-edit-%d-desc', instanceId )
+		: undefined;
+	const legacyUnboundDescriptionId = hasLegacyUnboundId
+		? sprintf( 'navigation-link-edit-%d-legacy-unbound-desc', instanceId )
 		: undefined;
 
 	const blockProps = useBlockProps( {
@@ -327,8 +334,11 @@ export default function NavigationLinkEdit( {
 			[ getColorClassName( 'background-color', backgroundColor ) ]:
 				!! backgroundColor,
 		} ),
-		'aria-describedby': missingEntityDescriptionId,
-		'aria-invalid': hasMissingEntity,
+		'aria-describedby': clsx( {
+			[ missingEntityDescriptionId ]: hasMissingEntity,
+			[ legacyUnboundDescriptionId ]: hasLegacyUnboundId,
+		} ),
+		'aria-invalid': hasMissingEntity || hasLegacyUnboundId,
 		style: {
 			color: ! textColor && customTextColor,
 			backgroundColor: ! backgroundColor && customBackgroundColor,
@@ -351,6 +361,7 @@ export default function NavigationLinkEdit( {
 		( ! url && ! ( hasUrlBinding && isBoundEntityAvailable ) ) ||
 		isInvalid ||
 		isDraft ||
+		hasLegacyUnboundId ||
 		( hasUrlBinding && ! isBoundEntityAvailable );
 
 	if ( needsValidLink ) {
@@ -365,6 +376,7 @@ export default function NavigationLinkEdit( {
 
 	const missingText = getMissingText( type );
 	const invalidLinkHelpText = getInvalidLinkHelpText();
+	const legacyUnboundHelpText = getLegacyUnboundHelpText();
 
 	return (
 		<>
@@ -402,6 +414,11 @@ export default function NavigationLinkEdit( {
 						{ invalidLinkHelpText }
 					</VisuallyHidden>
 				) }
+				{ hasLegacyUnboundId && (
+					<VisuallyHidden id={ legacyUnboundDescriptionId }>
+						{ legacyUnboundHelpText }
+					</VisuallyHidden>
+				) }
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
 					{ /* eslint-enable */ }
@@ -411,45 +428,53 @@ export default function NavigationLinkEdit( {
 						</div>
 					) : (
 						<>
-							{ ! isInvalid && ! isDraft && (
-								<>
-									<RichText
-										ref={ ref }
-										identifier="label"
-										className="wp-block-navigation-item__label"
-										value={ label }
-										onChange={ ( labelValue ) =>
-											setAttributes( {
-												label: labelValue,
-											} )
-										}
-										onMerge={ mergeBlocks }
-										onReplace={ onReplace }
-										__unstableOnSplitAtEnd={ () =>
-											insertBlocksAfter(
-												createBlock(
-													'core/navigation-link'
+							{ ! isInvalid &&
+								! isDraft &&
+								! hasLegacyUnboundId && (
+									<>
+										<RichText
+											ref={ ref }
+											identifier="label"
+											className="wp-block-navigation-item__label"
+											value={ label }
+											onChange={ ( labelValue ) =>
+												setAttributes( {
+													label: labelValue,
+												} )
+											}
+											onMerge={ mergeBlocks }
+											onReplace={ onReplace }
+											__unstableOnSplitAtEnd={ () =>
+												insertBlocksAfter(
+													createBlock(
+														'core/navigation-link'
+													)
 												)
-											)
-										}
-										aria-label={ __(
-											'Navigation link text'
+											}
+											aria-label={ __(
+												'Navigation link text'
+											) }
+											placeholder={ itemLabelPlaceholder }
+											withoutInteractiveFormatting
+										/>
+										{ description && (
+											<span className="wp-block-navigation-item__description">
+												{ description }
+											</span>
 										) }
-										placeholder={ itemLabelPlaceholder }
-										withoutInteractiveFormatting
-									/>
-									{ description && (
-										<span className="wp-block-navigation-item__description">
-											{ description }
-										</span>
-									) }
-								</>
-							) }
+									</>
+								) }
 							{ ( isInvalid || isDraft ) && (
 								<InvalidDraftDisplay
 									label={ label }
 									isInvalid={ isInvalid }
 									isDraft={ isDraft }
+									className="wp-block-navigation-link__label"
+								/>
+							) }
+							{ hasLegacyUnboundId && (
+								<NeedsUpdateDisplay
+									label={ label }
 									className="wp-block-navigation-link__label"
 								/>
 							) }
