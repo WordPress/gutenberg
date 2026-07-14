@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.0 (2026-07-14)
+
 ### Stable Release
 
 This package is now considered stable and production-ready. The API will follow semantic versioning from this point forward.
