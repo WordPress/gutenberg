@@ -2815,6 +2815,23 @@ class WP_Theme_JSON_Gutenberg {
 			foreach ( $preset_per_origin[ $origin ] as $preset ) {
 				$slug = _wp_to_kebab_case( $preset['slug'] );
 
+				/**
+				 * Check for reserved slugs that conflict with core CSS classes. If a reserved slug is found, trigger a warning and skip adding it to the result.
+				 * @see https://github.com/WordPress/gutenberg/issues/53153
+				 */
+				if ( in_array( $slug, array( 'text', 'link' ), true ) && array( 'color', 'palette' ) === $preset_metadata['path'] ) {
+					_doing_it_wrong(
+						__METHOD__,
+						sprintf(
+							/* translators: %s: slug name */
+							__( '"%s" is a reserved slug and cannot be used as a color preset in theme.json as it conflicts with core CSS classes.', 'gutenberg' ),
+							$slug
+						),
+						'7.1.0'
+					);
+					continue;
+				}
+
 				// Use the array as a set so we don't get duplicates.
 				$result[ $slug ] = $slug;
 			}
@@ -4949,19 +4966,6 @@ class WP_Theme_JSON_Gutenberg {
 						esc_attr( esc_html( $preset['name'] ) ) === $preset['name'] &&
 						sanitize_html_class( $preset['slug'] ) === $preset['slug']
 					) {
-						if ( in_array( $preset['slug'], array( 'text', 'link' ), true ) ) {
-							_doing_it_wrong(
-								__METHOD__,
-								sprintf(
-									/* translators: %s: slug name */
-									__( '"%s" is a reserved slug and cannot be used as a color preset in theme.json as it conflicts with core CSS classes.', 'gutenberg' ),
-									$preset['slug']
-								),
-								'7.1.0'
-							);
-							continue;
-						}
-
 						$value = null;
 						if ( isset( $preset_metadata['value_key'], $preset[ $preset_metadata['value_key'] ] ) ) {
 							$value = $preset[ $preset_metadata['value_key'] ];
