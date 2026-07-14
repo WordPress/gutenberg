@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+- DataViews: Fix the `list` layout ignoring the density setting, the refreshing state, and the loading state when `groupBy` is set. [#80255](https://github.com/WordPress/gutenberg/pull/80255)
+
 ## 17.2.0 (2026-07-14)
 
 ### New Features
