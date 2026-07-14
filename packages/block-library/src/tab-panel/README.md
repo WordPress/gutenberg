@@ -55,7 +55,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
 
 ```html
-<!-- wp:tab-panel -->
+<!-- wp:tab-panel {"label":"Tab 1"} -->
 <section role="tabpanel" tabindex="0" class="wp-block-tab-panel"><!-- wp:paragraph -->
 <p>Panel 1</p>
 <!-- /wp:paragraph --></section>

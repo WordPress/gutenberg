@@ -45,7 +45,7 @@ This is a [**static block**](https://developer.wordpress.org/block-editor/gettin
 
 ```html
 <!-- wp:tab-panels -->
-<div class="wp-block-tab-panels"><!-- wp:tab-panel -->
+<div class="wp-block-tab-panels"><!-- wp:tab-panel {"label":"Tab 1"} -->
 <section role="tabpanel" tabindex="0" class="wp-block-tab-panel"><!-- wp:paragraph -->
 <p>Panel 1</p>
 <!-- /wp:paragraph --></section>

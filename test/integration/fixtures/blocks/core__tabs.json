@@ -29,7 +29,9 @@
 					{
 						"name": "core/tab-panel",
 						"isValid": true,
-						"attributes": {},
+						"attributes": {
+							"label": "Tab 1"
+						},
 						"innerBlocks": [
 							{
 								"name": "core/paragraph",
@@ -45,7 +47,9 @@
 					{
 						"name": "core/tab-panel",
 						"isValid": true,
-						"attributes": {},
+						"attributes": {
+							"label": "Tab 2"
+						},
 						"innerBlocks": [
 							{
 								"name": "core/paragraph",

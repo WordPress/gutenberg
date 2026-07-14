@@ -1,7 +1,9 @@
 [
 	{
 		"blockName": "core/tab-panel",
-		"attrs": {},
+		"attrs": {
+			"label": "Tab 1"
+		},
 		"innerBlocks": [
 			{
 				"blockName": "core/paragraph",

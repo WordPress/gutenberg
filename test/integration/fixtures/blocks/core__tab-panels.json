@@ -7,7 +7,9 @@
 			{
 				"name": "core/tab-panel",
 				"isValid": true,
-				"attributes": {},
+				"attributes": {
+					"label": "Tab 1"
+				},
 				"innerBlocks": [
 					{
 						"name": "core/paragraph",
