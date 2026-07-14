@@ -214,7 +214,6 @@ export function TypographyPanel( {
 	// Link color failures are reported by the Elements panel, which owns the
 	// link color selection.
 	const enableContrastChecking =
-		! isStateSelected &&
 		! value?.color?.gradient &&
 		!! value?.color?.text &&
 		settings?.color?.text &&

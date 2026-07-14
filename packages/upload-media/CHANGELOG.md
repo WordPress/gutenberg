@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.36.0 (2026-07-14)
+
 ### Enhancement
 
 - Honor the `wp_editor_set_quality` filter for client-side processed images. Sub-size resizing and transcoding now use the size-aware quality reported by the new `image_quality` field on the attachment upload response, instead of a hardcoded default.

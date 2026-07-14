@@ -177,14 +177,49 @@ export function useTypewriter() {
 		}
 
 		/**
+		 * Returns the editable element owning the selection: the active
+		 * element, or, when a focused editing host contains the node
+		 * (a selected block supports `editableRoot`), the editable
+		 * element containing the selection.
+		 */
+		function getActiveEditableElement() {
+			const { activeElement } = ownerDocument;
+
+			if ( ! activeElement ) {
+				return null;
+			}
+
+			if (
+				! activeElement.isContentEditable ||
+				! activeElement.contains( node )
+			) {
+				return activeElement;
+			}
+
+			const { anchorNode } = defaultView.getSelection();
+
+			if ( ! anchorNode ) {
+				return null;
+			}
+
+			const element =
+				anchorNode.nodeType === anchorNode.ELEMENT_NODE
+					? anchorNode
+					: anchorNode.parentElement;
+			return element?.closest( '[contenteditable="true"]' ) ?? null;
+		}
+
+		/**
 		 * Checks if the current situation is eligible for scroll:
 		 * - The component must contain the selection.
 		 * - The active element must be contenteditable.
 		 */
 		function isSelectionEligibleForScroll() {
+			const activeEditableElement = getActiveEditableElement();
 			return (
-				node.contains( ownerDocument.activeElement ) &&
-				ownerDocument.activeElement.isContentEditable
+				!! activeEditableElement &&
+				node.contains( activeEditableElement ) &&
+				activeEditableElement.isContentEditable
 			);
 		}
 
@@ -193,7 +228,7 @@ export function useTypewriter() {
 				'[contenteditable="true"]'
 			);
 			const lastEditableNode = editableNodes[ editableNodes.length - 1 ];
-			return lastEditableNode === ownerDocument.activeElement;
+			return lastEditableNode === getActiveEditableElement();
 		}
 
 		// When the user scrolls or resizes, the scroll position should be
