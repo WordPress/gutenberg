@@ -111,7 +111,7 @@
 		"react": "^18 || ^19",
 		"react-dom": "^18 || ^19",
 		"stylelint": "^16.8.2",
-		"vite": "^7.3.2"
+		"vite": "^7 || ^8"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {

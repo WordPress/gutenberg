@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widen the optional `vite` peer dependency range to accept Vite 8, so projects on Vite 8 can install the package without peer resolution conflicts ([#80267](https://github.com/WordPress/gutenberg/pull/80267)).
+
 ### Documentation
 
 -   Add a Storybook typography showcase that renders the published CSS design tokens directly ([#80212](https://github.com/WordPress/gutenberg/pull/80212)).
