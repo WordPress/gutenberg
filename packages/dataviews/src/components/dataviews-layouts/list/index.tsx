@@ -572,11 +572,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 				>
 					{ Array.from( dataByGroup.entries() ).map(
 						( [ groupName, groupItems ] ) => (
-							<Stack
-								direction="column"
-								key={ groupName }
-								gap="sm"
-							>
+							<Stack direction="column" key={ groupName }>
 								<h3 className="dataviews-view-list__group-header">
 									{ view.groupBy?.showLabel === false
 										? groupName
