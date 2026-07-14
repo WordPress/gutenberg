@@ -8,10 +8,11 @@ const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
 const ICON_VIEW_BOX = '0 0 24 24';
 
 /*
- * Validating the icons collection means verifying that each icon defined in
- * the manifest has a corresponding SVG file found in the library/ folder and
- * vice versa, that each SVG uses currentColor so icons inherit text color,
- * and that each SVG uses the standard viewBox.
+ * Validating the icons collection checks that:
+ *
+ * - Each manifest entry has a matching SVG in library/, and vice versa.
+ * - Each SVG uses currentColor so icons inherit text color.
+ * - Each SVG uses viewBox="0 0 24 24".
  */
 async function validateCollection() {
 	const manifestPath = path.join( ICON_LIBRARY_DIR, '..', 'manifest.json' );
