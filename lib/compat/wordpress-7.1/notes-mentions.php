@@ -1,6 +1,6 @@
 <?php
 /**
- * Mention and follower notifications for notes (block comments).
+ * Mention notifications for notes (block comments).
  *
  * Note content can carry `@` mentions, stored as author-page links of the form
  * `<a class="wp-note-mention user-N" href="…">@Name</a>` where `N` is the
@@ -9,14 +9,15 @@
  * and kses allowance for the classes in
  * lib/compat/wordpress-7.1/block-comments.php). When a note is created through
  * the REST API this file parses those mentions out of the saved content and
- * emails the mentioned users, in addition to maintaining a per-thread
- * "followers" list so that people who start, reply to, or are mentioned in a
- * thread are notified of later activity on it.
+ * emails the mentioned users.
  *
  * WordPress core already notifies the post author of every note via
  * `wp_new_comment_via_rest_notify_postauthor()` on `rest_insert_comment`. This
- * file adds the mention/follower audience on the same hook and deliberately
+ * file adds the mentioned-user audience on the same hook and deliberately
  * leaves the post author to core to avoid sending them a duplicate email.
+ *
+ * A per-thread "followers" model (subscribing note authors and mentioned users
+ * to later activity on a thread) is planned as a follow-up on top of this.
  *
  * @package gutenberg
  * @since   7.1.0
@@ -67,8 +68,8 @@ if ( ! function_exists( 'gutenberg_get_note_thread_root_id' ) ) {
 	 * Returns the ID of the top-level note that anchors a thread.
 	 *
 	 * Notes are a single level deep: a top-level note (`comment_parent` of 0)
-	 * with replies hanging directly off it. Followers are tracked on the
-	 * top-level note so a single list covers the whole thread.
+	 * with replies hanging directly off it. The editor keys threads by their
+	 * top-level note, so deep links into a thread use the root ID.
 	 *
 	 * @param WP_Comment $comment A note comment.
 	 * @return int The top-level note ID for the thread.
@@ -79,131 +80,14 @@ if ( ! function_exists( 'gutenberg_get_note_thread_root_id' ) ) {
 	}
 }
 
-if ( ! function_exists( 'gutenberg_get_note_followers' ) ) {
-	/**
-	 * Returns the user IDs following a note thread.
-	 *
-	 * Followers are stored as one meta row per user so that concurrent
-	 * replies can subscribe users independently, without the lost updates a
-	 * read-modify-write of a single array value would allow.
-	 *
-	 * @param int $root_id Top-level note ID.
-	 * @return list<int> Follower user IDs.
-	 * @phpstan-param int|numeric-string $root_id
-	 * @phpstan-return list<positive-int>
-	 */
-	function gutenberg_get_note_followers( $root_id ): array {
-		$root_id   = (int) $root_id;
-		$followers = get_comment_meta( $root_id, '_wp_note_followers' );
-		if ( ! is_array( $followers ) ) {
-			return array();
-		}
-
-		$followers = array_filter(
-			array_map(
-				fn ( $user_id ) => (int) $user_id,
-				$followers
-			),
-			fn ( $user_id ) => $user_id > 0,
-		);
-
-		return array_values( array_unique( $followers, SORT_NUMERIC ) );
-	}
-}
-
-if ( ! function_exists( 'gutenberg_add_note_followers' ) ) {
-	/**
-	 * Adds user IDs to a note thread's follower list.
-	 *
-	 * @param int   $root_id  Top-level note ID.
-	 * @param int[] $user_ids User IDs to subscribe to the thread.
-	 * @return list<int> The updated follower list.
-	 * @phpstan-param int|numeric-string $root_id
-	 * @phpstan-param array<int|numeric-string> $user_ids
-	 * @phpstan-return list<positive-int>
-	 */
-	function gutenberg_add_note_followers( $root_id, array $user_ids ): array {
-		$root_id   = (int) $root_id;
-		$followers = gutenberg_get_note_followers( $root_id );
-
-		foreach ( $user_ids as $user_id ) {
-			$user_id = (int) $user_id;
-			if ( $user_id > 0 && ! in_array( $user_id, $followers, true ) ) {
-				add_comment_meta( $root_id, '_wp_note_followers', $user_id );
-				$followers[] = $user_id;
-			}
-		}
-
-		return $followers;
-	}
-}
-
-if ( ! function_exists( 'gutenberg_remove_note_followers' ) ) {
-	/**
-	 * Removes user IDs from a note thread's follower list.
-	 *
-	 * Lets a user unfollow a thread. The thread's own followers meta is deleted
-	 * automatically with the note when the note is trashed or deleted (comment
-	 * meta is removed alongside the comment, and deleting a top-level note also
-	 * removes its replies), so this only needs to handle explicit unsubscribes.
-	 *
-	 * @param int|numeric-string        $root_id  Top-level note ID.
-	 * @param array<int|numeric-string> $user_ids User IDs to unsubscribe from the thread.
-	 * @return list<int> The updated follower list.
-	 * @phpstan-return list<positive-int>
-	 */
-	function gutenberg_remove_note_followers( $root_id, array $user_ids ): array {
-		$root_id = (int) $root_id;
-		foreach ( $user_ids as $user_id ) {
-			$user_id = (int) $user_id;
-			if ( $user_id > 0 ) {
-				delete_comment_meta( $root_id, '_wp_note_followers', $user_id );
-			}
-		}
-
-		return gutenberg_get_note_followers( $root_id );
-	}
-}
-
-if ( ! function_exists( 'gutenberg_register_note_followers_meta' ) ) {
-	/**
-	 * Registers the note followers meta so it is available through the REST API.
-	 *
-	 * Mirrors core's `_wp_note_status` registration. The list is readable by
-	 * users who can moderate comments and editable by users who can edit the
-	 * note, so a follower management UI can read and update it.
-	 */
-	function gutenberg_register_note_followers_meta(): void {
-		register_meta(
-			'comment',
-			'_wp_note_followers',
-			array(
-				'type'          => 'integer',
-				'description'   => __( 'User IDs following the note thread.', 'gutenberg' ),
-				'single'        => false,
-				'show_in_rest'  => array(
-					'schema' => array(
-						'type'    => 'integer',
-						'minimum' => 1,
-					),
-				),
-				'auth_callback' => static fn ( $allowed, $meta_key, $object_id ) => current_user_can( 'edit_comment', $object_id ),
-			)
-		);
-	}
-	add_action( 'init', 'gutenberg_register_note_followers_meta' );
-}
-
 if ( ! function_exists( 'gutenberg_notify_note_mentions' ) ) {
 	/**
-	 * Notifies mentioned users and thread followers about a new note.
+	 * Notifies mentioned users about a new note.
 	 *
 	 * Runs on `rest_insert_comment` alongside core's post-author notification.
-	 * The recipient set is the union of users mentioned in this note and the
-	 * existing followers of its thread, minus the note's own author (you are
-	 * not notified about your own note) and the post author (core already
-	 * notifies them). Mentioned users and the note author are then subscribed
-	 * to the thread so they receive notifications about later replies.
+	 * The recipient set is the users mentioned in this note, minus the note's
+	 * own author (you are not notified about your own note) and the post
+	 * author (core already notifies them about every note).
 	 *
 	 * Only fires when a note is created, not when an existing one is edited,
 	 * so correcting a note does not re-notify everyone who already received it.
@@ -228,40 +112,32 @@ if ( ! function_exists( 'gutenberg_notify_note_mentions' ) ) {
 			return;
 		}
 
-		$root_id   = gutenberg_get_note_thread_root_id( $comment );
 		$mentioned = gutenberg_get_note_mentioned_user_ids( $comment->comment_content );
-		$followers = gutenberg_get_note_followers( $root_id );
 
 		$author_id      = (int) $comment->user_id;
 		$post           = get_post( (int) $comment->comment_post_ID );
 		$post_author_id = $post ? (int) $post->post_author : 0;
 
-		// Build the recipient set: mentions + current followers.
-		$recipient_ids = array_values( array_unique( array_merge( $mentioned, $followers ) ) );
-
 		/**
 		 * Filters the user IDs notified about a new note.
 		 *
-		 * Receives the union of users mentioned in the note and the thread's
-		 * existing followers. Developers can add or remove recipients, for
-		 * example to integrate a different audience or notification channel.
+		 * Receives the users mentioned in the note. Developers can add or
+		 * remove recipients, for example to integrate a different audience or
+		 * notification channel.
 		 *
 		 * @since 7.1.0
 		 *
 		 * @param int[]      $recipient_ids Candidate recipient user IDs.
 		 * @param WP_Comment $comment       The note that was inserted.
-		 * @param int        $root_id       The thread's top-level note ID.
 		 */
-		$recipient_ids = apply_filters( 'wp_note_notification_recipients', $recipient_ids, $comment, $root_id );
+		$recipient_ids = apply_filters( 'wp_note_notification_recipients', $mentioned, $comment );
 
 		/*
-		 * The recipient set is bounded and small (one note's mentions plus that
-		 * thread's followers), so emails are sent synchronously here. Pausing
-		 * inline (e.g. sleep()) would only hold the REST request open without
-		 * easing mail-server load; if notification volume ever warrants it, the
-		 * right fix is to offload delivery to a background queue
-		 * (wp_schedule_single_event() / Action Scheduler) rather than throttle
-		 * within the request.
+		 * The recipient set is bounded and small (one note's mentions), so
+		 * emails are sent synchronously here. If notification volume ever
+		 * warrants it, the right fix is to offload delivery to a background
+		 * queue (wp_schedule_single_event() / Action Scheduler) rather than
+		 * throttle within the request.
 		 */
 		foreach ( $recipient_ids as $user_id ) {
 			$user_id = (int) $user_id;
@@ -293,58 +169,64 @@ if ( ! function_exists( 'gutenberg_notify_note_mentions' ) ) {
 				continue;
 			}
 
-			$was_mentioned = in_array( $user_id, $mentioned, true );
-			gutenberg_send_note_notification( $user, $comment, $post, $was_mentioned );
+			gutenberg_send_note_notification( $user, $comment, $post );
 		}
-
-		/*
-		 * Subscribe the note author and everyone mentioned to the thread. To opt
-		 * out later, a user removes their ID from the thread root's
-		 * `_wp_note_followers` meta: either via gutenberg_remove_note_followers()
-		 * or by editing that meta through the REST API (it is registered as
-		 * editable by users who can edit the note). Removing an `@` mention on a
-		 * later edit intentionally does not unfollow, once pulled into a thread a
-		 * user stays subscribed until they explicitly opt out. A follower is also
-		 * dropped automatically when the thread is trashed or deleted, since
-		 * comment meta is removed alongside the comment.
-		 */
-		$new_followers = $mentioned;
-		if ( $author_id > 0 ) {
-			$new_followers[] = $author_id;
-		}
-		gutenberg_add_note_followers( $root_id, $new_followers );
 	}
 	add_action( 'rest_insert_comment', 'gutenberg_notify_note_mentions', 10, 3 );
 }
 
+if ( ! function_exists( 'gutenberg_get_note_notification_link' ) ) {
+	/**
+	 * Builds the editor deep link for a note notification email.
+	 *
+	 * Links to the block editor for the note's post with a `note` query arg
+	 * carrying the thread's top-level note ID; the editor opens and focuses
+	 * that thread on load. The URL is built directly from `admin_url()` rather
+	 * than `get_edit_post_link()` because the latter depends on the *current*
+	 * user's capabilities, which breaks once sending moves off the request
+	 * (e.g. to cron) and is irrelevant to the recipient anyway.
+	 *
+	 * @param WP_Post    $post    The post the note belongs to.
+	 * @param WP_Comment $comment The note.
+	 * @return string The editor URL focused on the note's thread.
+	 */
+	function gutenberg_get_note_notification_link( WP_Post $post, WP_Comment $comment ): string {
+		return add_query_arg(
+			array(
+				'post'   => $post->ID,
+				'action' => 'edit',
+				'note'   => gutenberg_get_note_thread_root_id( $comment ),
+			),
+			admin_url( 'post.php' )
+		);
+	}
+}
+
 if ( ! function_exists( 'gutenberg_send_note_notification' ) ) {
 	/**
-	 * Sends a single note notification email.
+	 * Sends a single note mention notification email.
 	 *
-	 * @param WP_User      $user          The recipient.
-	 * @param WP_Comment   $comment       The note that triggered the notification.
-	 * @param WP_Post|null $post          The post the note belongs to.
-	 * @param bool         $was_mentioned Whether the recipient was mentioned in this note.
+	 * The email is composed in the recipient's locale, matching how core
+	 * composes other user-directed notifications.
+	 *
+	 * @param WP_User      $user    The recipient.
+	 * @param WP_Comment   $comment The note that triggered the notification.
+	 * @param WP_Post|null $post    The post the note belongs to.
 	 * @return bool Whether the email was accepted for delivery by wp_mail().
 	 */
-	function gutenberg_send_note_notification( WP_User $user, WP_Comment $comment, ?WP_Post $post, bool $was_mentioned ): bool {
+	function gutenberg_send_note_notification( WP_User $user, WP_Comment $comment, ?WP_Post $post ): bool {
+		$switched_locale = switch_to_user_locale( $user->ID );
+
 		$blogname    = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
 		$post_title  = $post ? wp_specialchars_decode( get_the_title( $post ), ENT_QUOTES ) : '';
 		$author_name = $comment->comment_author ? $comment->comment_author : __( 'Someone', 'gutenberg' );
 		$content     = wp_strip_all_tags( wp_specialchars_decode( $comment->comment_content ) );
-		$edit_link   = $post ? get_edit_post_link( $post->ID, 'raw' ) : '';
+		$edit_link   = $post ? gutenberg_get_note_notification_link( $post, $comment ) : '';
 
-		if ( $was_mentioned ) {
-			/* translators: %1$s: commenter name, %2$s: post title. */
-			$message = sprintf( __( '%1$s mentioned you in a note on "%2$s".', 'gutenberg' ), $author_name, $post_title );
-			/* translators: %1$s: site name, %2$s: post title. */
-			$subject = sprintf( __( '[%1$s] You were mentioned in a note on "%2$s"', 'gutenberg' ), $blogname, $post_title );
-		} else {
-			/* translators: %1$s: commenter name, %2$s: post title. */
-			$message = sprintf( __( '%1$s added a note to a thread you follow on "%2$s".', 'gutenberg' ), $author_name, $post_title );
-			/* translators: %1$s: site name, %2$s: post title. */
-			$subject = sprintf( __( '[%1$s] New activity on a note you follow on "%2$s"', 'gutenberg' ), $blogname, $post_title );
-		}
+		/* translators: %1$s: commenter name, %2$s: post title. */
+		$message = sprintf( __( '%1$s mentioned you in a note on "%2$s".', 'gutenberg' ), $author_name, $post_title );
+		/* translators: %1$s: site name, %2$s: post title. */
+		$subject = sprintf( __( '[%1$s] You were mentioned in a note on "%2$s"', 'gutenberg' ), $blogname, $post_title );
 
 		$lines = array( $message, '' );
 		if ( '' !== $content ) {
@@ -362,25 +244,29 @@ if ( ! function_exists( 'gutenberg_send_note_notification' ) ) {
 		 *
 		 * @since 7.1.0
 		 *
-		 * @param string     $subject       Email subject.
-		 * @param WP_User    $user          Recipient.
-		 * @param WP_Comment $comment       The note.
-		 * @param bool       $was_mentioned Whether the recipient was mentioned.
+		 * @param string     $subject Email subject.
+		 * @param WP_User    $user    Recipient.
+		 * @param WP_Comment $comment The note.
 		 */
-		$subject = apply_filters( 'wp_note_notification_subject', $subject, $user, $comment, $was_mentioned );
+		$subject = apply_filters( 'wp_note_notification_subject', $subject, $user, $comment );
 
 		/**
 		 * Filters the note notification email body.
 		 *
 		 * @since 7.1.0
 		 *
-		 * @param string     $body          Email body.
-		 * @param WP_User    $user          Recipient.
-		 * @param WP_Comment $comment       The note.
-		 * @param bool       $was_mentioned Whether the recipient was mentioned.
+		 * @param string     $body    Email body.
+		 * @param WP_User    $user    Recipient.
+		 * @param WP_Comment $comment The note.
 		 */
-		$body = apply_filters( 'wp_note_notification_text', $body, $user, $comment, $was_mentioned );
+		$body = apply_filters( 'wp_note_notification_text', $body, $user, $comment );
 
-		return wp_mail( $user->user_email, wp_specialchars_decode( $subject ), $body );
+		$sent = wp_mail( $user->user_email, wp_specialchars_decode( $subject ), $body );
+
+		if ( $switched_locale ) {
+			restore_previous_locale();
+		}
+
+		return $sent;
 	}
 }

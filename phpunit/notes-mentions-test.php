@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for note mention and follower notifications.
+ * Tests for note mention notifications.
  *
  * @package gutenberg
  */
@@ -25,6 +25,13 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	 * A user who gets mentioned.
 	 */
 	private static WP_User $mentioned;
+
+	/**
+	 * Captured wp_mail() calls for the current test.
+	 *
+	 * @var array<array{to: string[], subject: string, message: string}>
+	 */
+	private array $sent = array();
 
 	/**
 	 * Captured wp_mail() recipients for the current test.
@@ -64,21 +71,28 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 
 	public function set_up(): void {
 		parent::set_up();
+		$this->sent    = array();
 		$this->sent_to = array();
-		// Short-circuit wp_mail() and record who would have been emailed.
+		// Short-circuit wp_mail() and record what would have been sent.
 		add_filter( 'pre_wp_mail', array( $this, 'capture_mail' ), 10, 2 );
 	}
 
 	/**
-	 * Records wp_mail() recipients and short-circuits delivery.
+	 * Records wp_mail() calls and short-circuits delivery.
 	 *
-	 * @param null                       $short_circuit Short-circuit value.
-	 * @param array{ to: string[], ... } $atts          wp_mail() arguments.
+	 * @param null                                              $short_circuit Short-circuit value.
+	 * @param array{ to: string|string[], subject: string, message: string } $atts wp_mail() arguments.
 	 * @return bool Always true to indicate a "sent" message.
 	 */
 	public function capture_mail( $short_circuit, $atts ): bool {
-		foreach ( (array) $atts['to'] as $to ) {
-			$this->sent_to[] = $to;
+		$to           = (array) $atts['to'];
+		$this->sent[] = array(
+			'to'      => $to,
+			'subject' => (string) $atts['subject'],
+			'message' => (string) $atts['message'],
+		);
+		foreach ( $to as $recipient ) {
+			$this->sent_to[] = $recipient;
 		}
 		return true;
 	}
@@ -105,6 +119,17 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$comment = get_comment( $comment_id );
 		assert( $comment instanceof WP_Comment );
 		return $comment;
+	}
+
+	/**
+	 * Builds mention markup for a user.
+	 *
+	 * @param int    $user_id User to mention.
+	 * @param string $label   Visible mention label.
+	 * @return string Mention anchor markup.
+	 */
+	private static function mention( int $user_id, string $label = '@User' ): string {
+		return sprintf( '<a class="wp-note-mention user-%d" href="#">%s</a>', $user_id, $label );
 	}
 
 	/**
@@ -155,35 +180,75 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	/**
 	 * @covers ::gutenberg_notify_note_mentions
 	 * @covers ::gutenberg_send_note_notification
-	 * @covers ::gutenberg_add_note_followers
-	 * @covers ::gutenberg_get_note_followers
 	 */
-	public function test_mentioned_user_is_emailed_and_subscribed(): void {
-		$mention = sprintf(
-			'<a class="wp-note-mention user-%d" href="#">@Mentioned</a>',
-			self::$mentioned->ID
+	public function test_mentioned_user_is_emailed(): void {
+		$note = $this->insert_note(
+			'Ping ' . self::mention( self::$mentioned->ID ),
+			self::$commenter->ID
 		);
-		$note    = $this->insert_note( "Ping $mention", self::$commenter->ID );
 
 		gutenberg_notify_note_mentions( $note );
 
 		$this->assertContains( self::$mentioned->user_email, $this->sent_to );
+	}
 
-		// The mentioned user and the note author both follow the thread now.
-		$followers = gutenberg_get_note_followers( $note->comment_ID );
-		$this->assertContains( self::$mentioned->ID, $followers );
-		$this->assertContains( self::$commenter->ID, $followers );
+	/**
+	 * @covers ::gutenberg_send_note_notification
+	 * @covers ::gutenberg_get_note_notification_link
+	 */
+	public function test_email_contains_context_and_deep_link(): void {
+		$note = $this->insert_note(
+			'<p>Please review ' . self::mention( self::$mentioned->ID, '@Reviewer' ) . '</p>',
+			self::$commenter->ID
+		);
+
+		gutenberg_notify_note_mentions( $note );
+
+		$this->assertCount( 1, $this->sent );
+		$email = $this->sent[0];
+
+		$this->assertStringContainsString( 'You were mentioned in a note', $email['subject'] );
+		// The note text is included, stripped of markup.
+		$this->assertStringContainsString( 'Please review @Reviewer', $email['message'] );
+		$this->assertStringNotContainsString( '<a', $email['message'] );
+		// The editor deep link targets the note's thread.
+		$this->assertStringContainsString(
+			add_query_arg(
+				array(
+					'post'   => self::$post->ID,
+					'action' => 'edit',
+					'note'   => (int) $note->comment_ID,
+				),
+				admin_url( 'post.php' )
+			),
+			$email['message']
+		);
+	}
+
+	/**
+	 * @covers ::gutenberg_get_note_notification_link
+	 */
+	public function test_deep_link_for_a_reply_targets_the_thread_root(): void {
+		$root  = $this->insert_note( 'Top level', self::$commenter->ID );
+		$reply = $this->insert_note(
+			'Ping ' . self::mention( self::$mentioned->ID ),
+			self::$commenter->ID,
+			$root->comment_ID
+		);
+
+		$link = gutenberg_get_note_notification_link( self::$post, $reply );
+
+		$this->assertStringContainsString( 'note=' . (int) $root->comment_ID, $link );
 	}
 
 	/**
 	 * @covers ::gutenberg_notify_note_mentions
 	 */
 	public function test_author_is_not_notified_about_their_own_note(): void {
-		$self_mention = sprintf(
-			'<a class="wp-note-mention user-%d" href="#">@Me</a>',
+		$note = $this->insert_note(
+			'Note to ' . self::mention( self::$commenter->ID, '@Me' ),
 			self::$commenter->ID
 		);
-		$note         = $this->insert_note( "Note to $self_mention", self::$commenter->ID );
 
 		gutenberg_notify_note_mentions( $note );
 
@@ -194,11 +259,10 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	 * @covers ::gutenberg_notify_note_mentions
 	 */
 	public function test_post_author_is_left_to_core(): void {
-		$mention = sprintf(
-			'<a class="wp-note-mention user-%d" href="#">@Author</a>',
-			self::$post_author->ID
+		$note = $this->insert_note(
+			'Hey ' . self::mention( self::$post_author->ID, '@Author' ),
+			self::$commenter->ID
 		);
-		$note    = $this->insert_note( "Hey $mention", self::$commenter->ID );
 
 		gutenberg_notify_note_mentions( $note );
 
@@ -209,51 +273,34 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 
 	/**
 	 * @covers ::gutenberg_notify_note_mentions
-	 * @covers ::gutenberg_get_note_followers
 	 */
 	public function test_mentioned_user_without_note_access_is_not_emailed(): void {
 		$subscriber_user = self::create_user( 'subscriber' );
 
-		$mention = sprintf(
-			'<a class="wp-note-mention user-%d" href="#">@Subscriber</a>',
-			$subscriber_user->ID
+		$note = $this->insert_note(
+			'Ping ' . self::mention( $subscriber_user->ID, '@Subscriber' ),
+			self::$commenter->ID
 		);
-		$note    = $this->insert_note( "Ping $mention", self::$commenter->ID );
 
 		gutenberg_notify_note_mentions( $note );
 
 		// Notes are only readable by users who can edit them; a subscriber
 		// cannot, so emailing them would leak content they cannot see.
-		$subscriber_email = $subscriber_user->user_email;
-		$this->assertNotContains( $subscriber_email, $this->sent_to );
-
-		// They are still recorded as a follower in case their role changes.
-		$this->assertContains(
-			$subscriber_user->ID,
-			gutenberg_get_note_followers( $note->comment_ID )
-		);
+		$this->assertNotContains( $subscriber_user->user_email, $this->sent_to );
 	}
 
 	/**
 	 * @covers ::gutenberg_notify_note_mentions
-	 * @covers ::gutenberg_get_note_thread_root_id
 	 */
-	public function test_followers_are_notified_of_replies(): void {
-		$mention = sprintf(
-			'<a class="wp-note-mention user-%d" href="#">@Mentioned</a>',
-			self::$mentioned->ID
+	public function test_mentioning_a_nonexistent_user_sends_nothing(): void {
+		$note = $this->insert_note(
+			'Ghost ' . self::mention( 999999, '@Ghost' ),
+			self::$commenter->ID
 		);
-		$root    = $this->insert_note( "Start $mention", self::$commenter->ID );
-		gutenberg_notify_note_mentions( $root );
 
-		// A different user replies; the mentioned user follows and should be
-		// notified even though they are not mentioned in the reply itself.
-		$this->sent_to = array();
-		$replier       = self::create_user( 'editor' );
-		$reply         = $this->insert_note( 'Following up', $replier->ID, $root->comment_ID );
-		gutenberg_notify_note_mentions( $reply );
+		gutenberg_notify_note_mentions( $note );
 
-		$this->assertContains( self::$mentioned->user_email, $this->sent_to );
+		$this->assertEmpty( $this->sent_to );
 	}
 
 	/**
@@ -262,11 +309,10 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	public function test_no_notifications_when_disabled(): void {
 		update_option( 'wp_notes_notify', 0 );
 
-		$mention = sprintf(
-			'<a class="wp-note-mention user-%d" href="#">@Mentioned</a>',
-			self::$mentioned->ID
+		$note = $this->insert_note(
+			'Ping ' . self::mention( self::$mentioned->ID ),
+			self::$commenter->ID
 		);
-		$note    = $this->insert_note( "Ping $mention", self::$commenter->ID );
 		gutenberg_notify_note_mentions( $note );
 
 		$this->assertEmpty( $this->sent_to );
@@ -278,11 +324,10 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	 * @covers ::gutenberg_notify_note_mentions
 	 */
 	public function test_editing_a_note_does_not_renotify(): void {
-		$mention = sprintf(
-			'<a class="wp-note-mention user-%d" href="#">@Mentioned</a>',
-			self::$mentioned->ID
+		$note = $this->insert_note(
+			'Ping ' . self::mention( self::$mentioned->ID ),
+			self::$commenter->ID
 		);
-		$note    = $this->insert_note( "Ping $mention", self::$commenter->ID );
 
 		// Simulate the update path of rest_insert_comment ($creating false).
 		gutenberg_notify_note_mentions( $note, null, false );
@@ -303,11 +348,10 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		};
 		add_filter( 'wp_note_notification_recipients', $filter );
 
-		$mention = sprintf(
-			'<a class="wp-note-mention user-%d" href="#">@Mentioned</a>',
-			self::$mentioned->ID
+		$note = $this->insert_note(
+			'Ping ' . self::mention( self::$mentioned->ID ),
+			self::$commenter->ID
 		);
-		$note    = $this->insert_note( "Ping $mention", self::$commenter->ID );
 		gutenberg_notify_note_mentions( $note );
 
 		$this->assertContains( $extra_user->user_email, $this->sent_to );
@@ -315,41 +359,68 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::gutenberg_add_note_followers
-	 * @covers ::gutenberg_remove_note_followers
-	 * @covers ::gutenberg_get_note_followers
+	 * Creating a note through the real REST endpoint must trigger the mention
+	 * email: this exercises the `rest_insert_comment` wiring (hook name,
+	 * priority, argument count), which the direct-call tests above bypass.
+	 *
+	 * @covers ::gutenberg_notify_note_mentions
 	 */
-	public function test_followers_can_be_removed(): void {
-		$note = $this->insert_note( 'Top level', self::$commenter->ID );
-		gutenberg_add_note_followers(
-			$note->comment_ID,
-			array( self::$commenter->ID, self::$mentioned->ID )
+	public function test_rest_note_creation_triggers_mention_email(): void {
+		wp_set_current_user( self::$commenter->ID );
+		if ( is_multisite() ) {
+			// Mention markup needs unfiltered_html until #80221 arms the kses
+			// allowance for REST note creation; on multisite only super admins
+			// have it.
+			grant_super_admin( self::$commenter->ID );
+		}
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->set_param( 'post', self::$post->ID );
+		$request->set_param( 'type', 'note' );
+		$request->set_param(
+			'content',
+			'Ping ' . self::mention( self::$mentioned->ID )
 		);
 
-		$remaining = gutenberg_remove_note_followers(
-			$note->comment_ID,
-			array( self::$mentioned->ID )
-		);
+		$response = rest_get_server()->dispatch( $request );
 
-		$this->assertSame( array( self::$commenter->ID ), $remaining );
-		$this->assertSame(
-			array( self::$commenter->ID ),
-			gutenberg_get_note_followers( $note->comment_ID )
-		);
+		if ( is_multisite() ) {
+			revoke_super_admin( self::$commenter->ID );
+		}
 
-		// Removing the last follower clears the meta entirely.
-		gutenberg_remove_note_followers( $note->comment_ID, array( self::$commenter->ID ) );
-		$this->assertSame( '', get_comment_meta( $note->comment_ID, '_wp_note_followers', true ) );
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertContains( self::$mentioned->user_email, $this->sent_to );
 	}
 
 	/**
-	 * @covers ::gutenberg_register_note_followers_meta
+	 * Updating a note through the real REST endpoint must not re-notify.
+	 *
+	 * @covers ::gutenberg_notify_note_mentions
 	 */
-	public function test_followers_meta_is_registered_for_rest(): void {
-		gutenberg_register_note_followers_meta();
+	public function test_rest_note_update_does_not_renotify(): void {
+		$note = $this->insert_note(
+			'Ping ' . self::mention( self::$mentioned->ID ),
+			self::$commenter->ID
+		);
 
-		$registered = get_registered_meta_keys( 'comment' );
-		$this->assertArrayHasKey( '_wp_note_followers', $registered );
-		$this->assertNotFalse( $registered['_wp_note_followers']['show_in_rest'] );
+		wp_set_current_user( self::$commenter->ID );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$commenter->ID );
+		}
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $note->comment_ID );
+		$request->set_param(
+			'content',
+			'Edited ping ' . self::mention( self::$mentioned->ID )
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+
+		if ( is_multisite() ) {
+			revoke_super_admin( self::$commenter->ID );
+		}
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertNotContains( self::$mentioned->user_email, $this->sent_to );
 	}
 }
