@@ -230,11 +230,16 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
 		return $block_content;
 	}
 
+	$block_class_name = $block['attrs']['className'];
+	if ( ! is_string( $block_class_name ) ) {
+		return $block_content;
+	}
+
 	/*
 	 * Matches a class prefixed by `is-style`, followed by the
 	 * variation slug, then `--`, and finally an instance number.
 	 */
-	preg_match( '/\bis-style-(\S+?--\d+)\b/', $block['attrs']['className'], $matches );
+	preg_match( '/\bis-style-(\S+?--\d+)\b/', $block_class_name, $matches );
 
 	if ( empty( $matches ) ) {
 		return $block_content;
