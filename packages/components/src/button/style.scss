@@ -53,6 +53,7 @@
 
 	/**
 	 * Primary button style.
+	 * Maps to `@wordpress/ui` Button: brand / solid.
 	 */
 
 	&.is-primary {
@@ -111,6 +112,7 @@
 
 	/**
 	 * Secondary button style.
+	 * Maps to `@wordpress/ui` Button: brand / outline.
 	 */
 
 	&.is-secondary {
@@ -148,6 +150,7 @@
 
 	/**
 	 * Tertiary buttons.
+	 * Maps to `@wordpress/ui` Button: brand / minimal.
 	 */
 
 	&.is-tertiary {
