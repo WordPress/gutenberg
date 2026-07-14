@@ -16,6 +16,7 @@ import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 let mockMediaPlaceholderProps;
+let mockMediaReplaceFlowProps;
 
 jest.mock( '@wordpress/block-editor', () => ( {
 	BlockControls: ( { children, group = 'default' } ) => (
@@ -27,9 +28,11 @@ jest.mock( '@wordpress/block-editor', () => ( {
 		mockMediaPlaceholderProps = props;
 		return <div />;
 	},
-	MediaReplaceFlow: ( { name, onSelect } ) => (
-		<button onClick={ () => onSelect( {} ) }>{ name }</button>
-	),
+	MediaReplaceFlow: ( props ) => {
+		mockMediaReplaceFlowProps = props;
+		const { name, onSelect } = props;
+		return <button onClick={ () => onSelect( {} ) }>{ name }</button>;
+	},
 	MediaUpload: ( { render: renderMediaUpload } ) =>
 		renderMediaUpload( { open: jest.fn() } ),
 	MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
@@ -117,6 +120,7 @@ describe( 'PlaylistTrackEdit', () => {
 
 	beforeEach( () => {
 		mockMediaPlaceholderProps = undefined;
+		mockMediaReplaceFlowProps = undefined;
 		replaceBlocks = jest.fn();
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
@@ -225,6 +229,17 @@ describe( 'PlaylistTrackEdit', () => {
 				{ name: 'Add' }
 			)
 		).toBeInTheDocument();
+	} );
+
+	it( 'preserves the current track source when a replacement upload fails', () => {
+		const { setAttributes } = renderEdit();
+
+		mockMediaReplaceFlowProps.onSelect();
+
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes.mock.calls[ 0 ][ 0 ] ).not.toHaveProperty(
+			'src'
+		);
 	} );
 
 	it( 'replaces an empty track placeholder with multiple selected tracks', () => {

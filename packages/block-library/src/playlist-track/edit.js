@@ -109,7 +109,6 @@ const PlaylistTrackEdit = ( {
 			// In this case there was an error and we should continue in the editing state
 			// previous attributes should be removed because they may be temporary blob urls.
 			setAttributes( {
-				src: undefined,
 				blob: undefined,
 				id: undefined,
 				artist: undefined,
