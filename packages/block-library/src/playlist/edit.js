@@ -485,26 +485,11 @@ const PlaylistEdit = ( {
 		<>
 			<BlockControls group="other">
 				<MediaReplaceFlow
-					name={ __( 'Edit' ) }
-					onSelect={ onSelectTracks }
-					accept="audio/*"
-					multiple
-					handleUpload={ false }
-					mediaIds={ tracks
-						.filter( ( track ) => track.id )
-						.map( ( track ) => track.id ) }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					onError={ onUploadError }
-				/>
-				<MediaReplaceFlow
 					name={ __( 'Add' ) }
 					onSelect={ onAddTracks }
 					accept="audio/*"
 					multiple
 					handleUpload={ false }
-					mediaIds={ tracks
-						.filter( ( track ) => track.id )
-						.map( ( track ) => track.id ) }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
 				/>
@@ -720,20 +705,20 @@ const PlaylistEdit = ( {
 						showPlayButtonArtwork={ showPlayButtonArtwork === true }
 					/>
 				</Disabled>
-				{ showTracklist && (
-					<ol
-						className={ clsx( 'wp-block-playlist__tracklist', {
-							'wp-block-playlist__tracklist-show-numbers':
-								showNumbers,
-							'wp-block-playlist__tracklist-length-is-hidden':
-								! showTrackLength,
-						} ) }
-					>
-						<PlaylistContext.Provider value={ playlistContext }>
-							{ innerBlocksProps.children }
-						</PlaylistContext.Provider>
-					</ol>
-				) }
+				<ol
+					className={ clsx( 'wp-block-playlist__tracklist', {
+						'wp-block-playlist__tracklist-is-hidden':
+							! showTracklist,
+						'wp-block-playlist__tracklist-show-numbers':
+							showNumbers,
+						'wp-block-playlist__tracklist-length-is-hidden':
+							! showTrackLength,
+					} ) }
+				>
+					<PlaylistContext.Provider value={ playlistContext }>
+						{ innerBlocksProps.children }
+					</PlaylistContext.Provider>
+				</ol>
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }
