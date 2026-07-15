@@ -337,68 +337,67 @@ test.describe( 'Table of Contents', () => {
 	} );
 
 	test.describe( 'Reading and navigating', () => {
-		// Desired behavior: the front-of-site ToC should render from the current post headings even when content changes outside the editor; trunk only reflects headings captured when the block was last updated in the editor.
-		test.fixme(
-			'front-of-site table of contents reflects updated post headings',
-			async ( { admin, editor, page, requestUtils } ) => {
-				await admin.createNewPost();
-				await editor.setContent(
-					postContentWithTocAndHeadings( [
-						{
-							content: 'Original section',
-							anchor: 'original-section',
-						},
-					] )
-				);
+		test( 'front-of-site table of contents reflects updated post headings', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await admin.createNewPost();
+			await editor.setContent(
+				postContentWithTocAndHeadings( [
+					{
+						content: 'Original section',
+						anchor: 'original-section',
+					},
+				] )
+			);
 
-				const postId = await editor.publishPost();
-				await openPostOnFrontend( page, postId );
+			const postId = await editor.publishPost();
+			await openPostOnFrontend( page, postId );
 
-				await expect(
-					page
-						.getByRole( 'navigation', {
-							name: 'Table of Contents',
-						} )
-						.getByRole( 'link', { name: 'Original section' } )
-				).toBeVisible();
-
-				// Update the post content without opening the editor so the reader view must reflect the current post headings.
-				await updatePostContent(
-					requestUtils,
-					postId,
-					postContentWithTocAndHeadings( [
-						{
-							content: 'Updated section',
-							anchor: 'updated-section',
-						},
-					] )
-				);
-
-				await openPostOnFrontend( page, postId );
-
-				const tableOfContents = page.getByRole( 'navigation', {
-					name: 'Table of Contents',
-				} );
-				await expect(
-					tableOfContents.getByRole( 'link', {
-						name: 'Updated section',
+			await expect(
+				page
+					.getByRole( 'navigation', {
+						name: 'Table of Contents',
 					} )
-				).toBeVisible();
-				await expect(
-					tableOfContents.getByRole( 'link', {
-						name: 'Original section',
-					} )
-				).toHaveCount( 0 );
+					.getByRole( 'link', { name: 'Original section' } )
+			).toBeVisible();
 
-				await tableOfContents
-					.getByRole( 'link', { name: 'Updated section' } )
-					.click();
-				await expect( page ).toHaveURL( /#updated-section$/ );
-				await expect(
-					page.locator( '#updated-section' )
-				).toBeInViewport();
-			}
-		);
+			// Update the post content without opening the editor so the reader view must reflect the current post headings.
+			await updatePostContent(
+				requestUtils,
+				postId,
+				postContentWithTocAndHeadings( [
+					{
+						content: 'Updated section',
+						anchor: 'updated-section',
+					},
+				] )
+			);
+
+			await openPostOnFrontend( page, postId );
+
+			const tableOfContents = page.getByRole( 'navigation', {
+				name: 'Table of Contents',
+			} );
+			await expect(
+				tableOfContents.getByRole( 'link', {
+					name: 'Updated section',
+				} )
+			).toBeVisible();
+			await expect(
+				tableOfContents.getByRole( 'link', {
+					name: 'Original section',
+				} )
+			).toHaveCount( 0 );
+
+			await tableOfContents
+				.getByRole( 'link', { name: 'Updated section' } )
+				.click();
+			await expect( page ).toHaveURL( /#updated-section$/ );
+			await expect( page.locator( '#updated-section' ) ).toBeInViewport();
+		} );
 
 		test( 'clicking a table of contents item on the front of site scrolls to the matching section', async ( {
 			page,
@@ -889,6 +888,81 @@ test.describe( 'Table of Contents', () => {
 		test.beforeEach( async ( { admin } ) => {
 			await admin.createNewPost();
 		} );
+
+		// Desired behavior: ToC should use the visible customized heading text from synced pattern overrides; this PR only handles direct core Heading blocks.
+		test.fixme(
+			'shows the customized synced pattern heading in the front-of-site table of contents',
+			async ( { page, requestUtils } ) => {
+				const customizableHeadingName = 'Section title';
+				const syncedPattern = await requestUtils.createBlock( {
+					title: 'Reusable section',
+					status: 'publish',
+					content: `<!-- wp:heading {"anchor":"custom-section-title","metadata":{"name":"${ customizableHeadingName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
+<h2 id="custom-section-title" class="wp-block-heading">Reusable section title</h2>
+<!-- /wp:heading -->`,
+				} );
+				const post = await createPostWithContent(
+					requestUtils,
+					'Customized synced pattern table of contents',
+					[
+						'<!-- wp:table-of-contents /-->',
+						`<!-- wp:block {"ref":${ syncedPattern.id },"content":{"${ customizableHeadingName }":{"content":"Custom section title"}}} /-->`,
+					].join( '\n\n' )
+				);
+
+				await openPostOnFrontend( page, post.id );
+
+				await expect(
+					page.getByRole( 'heading', {
+						name: 'Custom section title',
+					} )
+				).toBeVisible();
+				const tableOfContents = page.getByRole( 'navigation', {
+					name: 'Table of Contents',
+				} );
+				await expect(
+					tableOfContents.getByRole( 'link', {
+						name: 'Custom section title',
+					} )
+				).toHaveAttribute( 'href', /#custom-section-title$/ );
+				await expect(
+					tableOfContents.getByText( 'Reusable section title' )
+				).toHaveCount( 0 );
+			}
+		);
+
+		// Desired behavior: ToC should include registered pattern headings once server-side referenced-content traversal is implemented.
+		test.fixme(
+			'registered pattern block headings appear in the front-of-site table of contents',
+			async ( { page, requestUtils } ) => {
+				const post = await createPostWithContent(
+					requestUtils,
+					'Registered pattern heading table of contents',
+					[
+						'<!-- wp:table-of-contents /-->',
+						'<!-- wp:pattern {"slug":"gutenberg-test/table-of-contents-pattern-heading"} /-->',
+					].join( '\n\n' )
+				);
+
+				await openPostOnFrontend( page, post.id );
+
+				await expect(
+					page.getByRole( 'heading', {
+						name: 'Registered pattern heading',
+						exact: true,
+					} )
+				).toBeVisible();
+				await expect(
+					page
+						.getByRole( 'navigation', {
+							name: 'Table of Contents',
+						} )
+						.getByRole( 'link', {
+							name: 'Registered pattern heading',
+						} )
+				).toHaveAttribute( 'href', /#registered-pattern-heading$/ );
+			}
+		);
 
 		// This covers the author story that headings should count no matter which block created them.
 		// Desired behavior: ToC should extract heading elements from non-Heading blocks; trunk only observes core Heading blocks.
