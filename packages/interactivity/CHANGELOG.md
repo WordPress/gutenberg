@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Prototype: add `data-wp-preserve` directive, a successor to the deprecated `data-wp-ignore`, that keeps an element's live DOM intact across client-side navigations instead of diffing or replacing it. Useful for wrapper elements containing DOM injected by third-party scripts. ([#80298](https://github.com/WordPress/gutenberg/issues/80298))
+
 ## 6.51.0 (2026-07-14)
 
 ## 6.50.0 (2026-07-01)

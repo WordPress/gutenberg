@@ -123,6 +123,7 @@ export function toVdom( root: Node ): ComponentChild {
 			[ name: string, namespace: string | null, value: unknown ]
 		> = [];
 		let ignore = false;
+		let preserve = false;
 		let island = false;
 
 		for ( let i = 0; i < attributes.length; i++ ) {
@@ -135,6 +136,8 @@ export function toVdom( root: Node ): ComponentChild {
 			) {
 				if ( attributeName === 'data-wp-ignore' ) {
 					ignore = true;
+				} else if ( attributeName === 'data-wp-preserve' ) {
+					preserve = true;
 				} else {
 					const regexResult = nsPathRegExp.exec( attributeValue );
 					const namespace = regexResult?.[ 1 ] ?? null;
@@ -183,6 +186,29 @@ export function toVdom( root: Node ): ComponentChild {
 					__directives: { ignore: true },
 				} ),
 			];
+		}
+		if ( preserve && ! island ) {
+			// `data-wp-preserve` is matched by `id`, so an element without one
+			// can't be preserved across navigations. Warn and fall through to
+			// normal processing in that case.
+			if ( ! elementNode.id ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warn(
+						'The data-wp-preserve directive requires the element to have an `id` attribute. The directive will be ignored.'
+					);
+				}
+			} else {
+				const vnode = h< any, any >( localName, {
+					...props,
+					innerHTML: elementNode.innerHTML,
+					__directives: { preserve: true },
+				} );
+				// Set an explicit key so Preact is more likely to match this
+				// vnode with its previous instance even if its position among
+				// siblings shifts between navigations.
+				vnode.key = elementNode.id;
+				return [ vnode ];
+			}
 		}
 		if ( island ) {
 			hydratedIslands.add( elementNode );

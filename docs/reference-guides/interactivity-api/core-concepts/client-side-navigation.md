@@ -528,6 +528,34 @@ Use data-derived identifiers whenever possible — post IDs, term IDs, or any va
 <li data-wp-key="item-0">...</li>
 ```
 
+### Keeping third-party DOM intact with `data-wp-preserve`
+
+<div class="callout callout-alert">
+This is a prototype directive being discussed in <a href="https://github.com/WordPress/gutenberg/issues/80298">#80298</a>. Its API may still change.
+</div>
+
+Some content on a page isn't rendered or controlled by the Interactivity API at all. Consent managers, chat widgets, ad embeds, and other third-party scripts often inject DOM directly into the page after it loads. The virtual DOM diffing algorithm has no knowledge of this injected content, so during client-side navigation it either removes it or overwrites it with the server-rendered markup for that spot, as described in [Do not mutate the DOM outside the Interactivity API](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility.md#do-not-mutate-the-dom-outside-the-interactivity-api).
+
+`data-wp-preserve` tells the router to leave an element's live DOM exactly as it is across navigations, instead of diffing or replacing it. Add it to a wrapper element that you control, and let the third-party script inject its own markup inside that wrapper:
+
+```html
+<div id="consent-banner" data-wp-preserve>
+	<!-- A consent management script injects its widget here. The
+	     Interactivity API never touches this subtree. -->
+</div>
+```
+
+A few things to know about `data-wp-preserve`:
+
+-   **It's matched by `id`.** The element needs a unique `id` attribute so the router can recognize it as the same element across navigations. If the `id` is missing, the directive is ignored (a warning is logged when `SCRIPT_DEBUG` is enabled).
+-   **It must go on a wrapper you control.** Third-party scripts won't add WordPress-specific attributes to the markup they inject, so `data-wp-preserve` belongs on the container your theme or block renders around that content, not on the injected markup itself.
+-   **The whole subtree is preserved**, including anything injected into it after the page loaded.
+-   **It only applies on client-side navigation.** On the initial page load, the element renders normally from the server-rendered HTML.
+-   **Nested router regions aren't supported inside a preserved element.** Because the subtree is never diffed, a `data-wp-router-region` placed inside a `data-wp-preserve` element won't update during navigation.
+-   **Don't combine it with other directives on the same element.** Like `data-wp-ignore`, other directives on an element with `data-wp-preserve` are not processed. Put them on a parent element instead.
+
+`data-wp-preserve` is the direct successor to the deprecated `data-wp-ignore` directive, and is a good replacement for it in cases where the goal is to protect a subtree containing third-party DOM from client-side navigation.
+
 ### Handling server state updates
 
 During client-side navigation, the client-side state persists while the server provides new state for the target page. In some cases, you may want parts of your client state to stay in sync with what the server provides for each page — for example, updating a product count that changes across pages, or resetting an "expanded" flag based on the new page's context.

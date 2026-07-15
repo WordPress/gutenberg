@@ -795,6 +795,75 @@ describe( 'toVdom', () => {
 		} );
 	} );
 
+	describe( 'data-wp-preserve', () => {
+		it( 'should capture the innerHTML and mark the element for preservation', () => {
+			const element = createElementFromHTML(
+				`<div id="widget" data-wp-preserve><p>Original content</p></div>`
+			);
+			// A preserved element is returned wrapped in an array, matching
+			// the `data-wp-ignore` pattern it's modeled after.
+			const [ vnode ] = toVdom( element ) as any;
+			expect( vnode.props ).toEqual(
+				expect.objectContaining( {
+					id: 'widget',
+					innerHTML: '<p>Original content</p>',
+					__directives: { preserve: true },
+				} )
+			);
+		} );
+
+		it( 'should set the vnode key to the element id', () => {
+			const element = createElementFromHTML(
+				`<div id="widget" data-wp-preserve></div>`
+			);
+			const [ vnode ] = toVdom( element ) as any;
+			expect( vnode.key ).toBe( 'widget' );
+		} );
+
+		it( 'should not descend into children of a preserved element', () => {
+			const element = createElementFromHTML(
+				`<div id="widget" data-wp-preserve><div data-wp-test="test value"></div></div>`
+			);
+			const [ vnode ] = toVdom( element ) as any;
+			expect( vnode.props.children ).toBeUndefined();
+			expect( vnode.props.innerHTML ).toBe(
+				'<div data-wp-test="test value"></div>'
+			);
+		} );
+
+		it( 'should warn and ignore the directive when the element has no id', () => {
+			const console = global.console;
+			const originalWarn = console.warn;
+			console.warn = jest.fn();
+
+			const element = createElementFromHTML(
+				`<div data-wp-preserve><p>Content</p></div>`
+			);
+			const vnode = toVdom( element ) as any;
+
+			expect( console.warn ).toHaveBeenCalledWith(
+				'The data-wp-preserve directive requires the element to have an `id` attribute. The directive will be ignored.'
+			);
+			// Falls through to normal processing: children are walked and no
+			// `preserve` marker or frozen `innerHTML` is added.
+			expect( vnode.props.__directives ).toBeUndefined();
+			expect( vnode.props.innerHTML ).toBeUndefined();
+			expect( vnode.props.children ).toMatchVNode( [
+				h( 'p', null, [ 'Content' ] ),
+			] );
+
+			console.warn = originalWarn;
+		} );
+
+		it( 'should not preserve an element that is also an interactivity island', () => {
+			const element = createElementFromHTML(
+				`<div id="widget" data-wp-interactive="myPlugin" data-wp-preserve><p>Content</p></div>`
+			);
+			const vnode = toVdom( element ) as any;
+			expect( vnode.props.__directives?.preserve ).toBeUndefined();
+		} );
+	} );
+
 	describe( 'Hydrated islands', () => {
 		it( 'should add a topmost island', () => {
 			const element = createElementFromHTML( `
