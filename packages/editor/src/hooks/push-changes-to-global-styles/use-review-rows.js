@@ -65,7 +65,10 @@ export function useReviewRows( rows, merged, name ) {
 			const currentValue = getStyle(
 				merged,
 				row.primaryPath.join( '.' ),
-				name
+				name,
+				// Keep preset values encoded (e.g. `var:preset|color|vivid-red`)
+				// so they show by name, matching the new value.
+				false
 			);
 			return {
 				...row,
