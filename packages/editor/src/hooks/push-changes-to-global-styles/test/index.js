@@ -114,6 +114,29 @@ describe( 'getChangesToPush', () => {
 		} );
 	} );
 
+	it( 'keeps a uniform Global Styles border style as the new value', () => {
+		const rows = getChangesToPush(
+			[ 'borderColor' ],
+			{ style: { border: { color: '#ff9900' } } },
+			{
+				border: {
+					top: { style: 'dotted' },
+					right: { style: 'dotted' },
+					bottom: { style: 'dotted' },
+					left: { style: 'dotted' },
+				},
+			}
+		);
+
+		const [ row ] = rows;
+		// Every side already has `dotted` in Global Styles, so the border keeps
+		// it after Apply instead of falling back to `solid`.
+		expect( row.newValue.style ).toBe( 'dotted' );
+		expect( row.paths ).not.toContainEqual(
+			expect.objectContaining( { value: 'solid' } )
+		);
+	} );
+
 	it( 'emits a border radius row with the raw value', () => {
 		const radius = {
 			topLeft: '1px',

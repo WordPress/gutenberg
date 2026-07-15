@@ -236,18 +236,28 @@ function buildBorderScopeRow( {
 
 	// A border only shows with a style, so use `solid` when a color or width
 	// is set without one (unless Global Styles already sets a style for that
-	// side).
+	// side, which is kept).
 	let effectiveStyle = style;
 	if ( ! style && ( color || width ) ) {
-		targetSides.forEach( ( targetSide ) => {
-			if ( ! userBorder?.[ targetSide ]?.style ) {
+		const sideStyles = targetSides.map(
+			( targetSide ) => userBorder?.[ targetSide ]?.style
+		);
+		targetSides.forEach( ( targetSide, index ) => {
+			if ( ! sideStyles[ index ] ) {
 				paths.push( {
 					path: [ 'border', targetSide, 'style' ],
 					value: 'solid',
 				} );
 			}
 		} );
-		effectiveStyle = 'solid';
+		// Show the style the border will actually have after Apply: the shared
+		// Global Styles style when every side agrees on one, else `solid`.
+		const sharedStyle = sideStyles.every(
+			( sideStyle ) => sideStyle === sideStyles[ 0 ]
+		)
+			? sideStyles[ 0 ]
+			: undefined;
+		effectiveStyle = sharedStyle || 'solid';
 	}
 
 	return {

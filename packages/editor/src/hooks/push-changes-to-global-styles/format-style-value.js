@@ -9,8 +9,42 @@ export const EMPTY_VALUE_LABEL = '\u2014';
 // Matches a preset value, e.g. `var:preset|color|vivid-red`.
 const PRESET_TOKEN_REGEX = /^var:preset\|([^|]+)\|(.+)$/;
 
+// True when a value is actually set.
 const isSet = ( value ) =>
 	value !== undefined && value !== null && value !== '';
+
+const BORDER_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+
+// Global Styles stores border style, width and color per side (e.g.
+// `border.top.style`). Collapse a per-side border object to flat
+// `{ width, style, color }`, keeping a value only when every set side agrees.
+function flattenBorder( border ) {
+	if (
+		isSet( border.width ) ||
+		isSet( border.style ) ||
+		isSet( border.color )
+	) {
+		return border;
+	}
+
+	const setSides = BORDER_SIDES.filter( ( side ) => border[ side ] );
+	if ( ! setSides.length ) {
+		return border;
+	}
+
+	const collapse = ( property ) => {
+		const values = setSides.map( ( side ) => border[ side ]?.[ property ] );
+		return values.every( ( value ) => value === values[ 0 ] )
+			? values[ 0 ]
+			: undefined;
+	};
+
+	return {
+		width: collapse( 'width' ),
+		style: collapse( 'style' ),
+		color: collapse( 'color' ),
+	};
+}
 
 /**
  * Turns a raw style value into readable text for the modal.
@@ -61,10 +95,12 @@ export function formatStyleValue( value ) {
  * `2px dashed #000fff`.
  *
  * The parts follow the CSS order of `width style color`, anything that isn't
- * set is left out, and preset colors are shown by name. Returns an em dash
- * when the border has nothing set.
+ * set is left out, and preset colors are shown by name. A per-side object (as
+ * Global Styles stores borders) is collapsed to its shared values first.
+ * Returns an em dash when the border has nothing set.
  *
- * @param {*} border A border object, e.g. `{ color, width, style }`.
+ * @param {*} border A border object, e.g. `{ color, width, style }`, or a
+ *                   per-side object, e.g. `{ top: { style } }`.
  *
  * @return {string} The combined border value, or an em dash.
  */
@@ -73,7 +109,7 @@ export function formatBorderShorthand( border ) {
 		return formatStyleValue( border );
 	}
 
-	const { width, style, color } = border;
+	const { width, style, color } = flattenBorder( border );
 	const parts = [ width, style, color ]
 		.filter( isSet )
 		.map( ( part ) => formatStyleValue( part ) );

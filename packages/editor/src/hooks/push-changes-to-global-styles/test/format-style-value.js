@@ -76,6 +76,26 @@ describe( 'formatBorderShorthand', () => {
 		expect( formatBorderShorthand( {} ) ).toBe( EMPTY_VALUE_LABEL );
 		expect( formatBorderShorthand( undefined ) ).toBe( EMPTY_VALUE_LABEL );
 	} );
+
+	it( 'collapses a uniform per-side object to its shared values', () => {
+		expect(
+			formatBorderShorthand( {
+				top: { style: 'dotted' },
+				right: { style: 'dotted' },
+				bottom: { style: 'dotted' },
+				left: { style: 'dotted' },
+			} )
+		).toBe( 'dotted' );
+	} );
+
+	it( 'omits a per-side property when the sides disagree', () => {
+		expect(
+			formatBorderShorthand( {
+				top: { style: 'dotted', width: '1px' },
+				right: { style: 'dashed', width: '1px' },
+			} )
+		).toBe( '1px' );
+	} );
 } );
 
 describe( 'formatBorderRadius', () => {
