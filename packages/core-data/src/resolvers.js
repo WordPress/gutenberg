@@ -1381,3 +1381,16 @@ export const getViewConfig =
 		} );
 		dispatch.receiveViewConfig( kind, name, config );
 	};
+
+export const getViewedNoteIds =
+	( postId ) =>
+	async ( { dispatch } ) => {
+		try {
+			const res = await apiFetch( {
+				path: `/wp/v2/notes/${ postId }/viewed`,
+			} );
+			dispatch.receiveViewedNoteIds( postId, res?.note_ids ?? [] );
+		} catch {
+			dispatch.receiveViewedNoteIds( postId, [] );
+		}
+	};

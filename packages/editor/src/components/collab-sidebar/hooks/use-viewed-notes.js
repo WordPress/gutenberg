@@ -3,95 +3,44 @@
  */
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-
-const VIEWED_NOTES_META_KEY = 'viewed_notes';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
- * Tracks which note/reply ids the current user has viewed per post,
- * persisted in a single registered user-meta field (`viewed_notes`),
- * read/written entirely through core-data — no direct REST calls.
- *
- * @param {number} postId
- * @return {Object} { isNoteUnread, markNotesViewed }
+ * Internal dependencies
  */
+import { unlock } from '../../../lock-unlock';
+
 export function useViewedNotes( postId ) {
 	const currentUserId = useSelect(
 		( select ) => select( coreStore ).getCurrentUser()?.id,
 		[]
 	);
 
-	// `useEntityProp`'s own fetch uses the default (view) context, which
-	// strips custom meta fields like `viewed_notes` from the response
-	// entirely. Entity records are normalized per (kind, name, id) though,
-	// not per query — so priming a fetch with `context: 'edit'` here merges
-	// `meta` into the same shared record `useEntityProp` reads from below.
-	useSelect(
+	const viewedIds = useSelect(
 		( select ) =>
-			currentUserId &&
-			select( coreStore ).getEntityRecord(
-				'root',
-				'user',
-				currentUserId,
-				{ context: 'edit' }
-			),
-		[ currentUserId ]
+			postId
+				? unlock( select( coreStore ) ).getViewedNoteIds( postId )
+				: [],
+		[ postId ]
 	);
 
-	const [ meta, setMeta ] = useEntityProp(
-		'root',
-		'user',
-		'meta',
-		currentUserId
+	const { markNotesViewed: dispatchMarkNotesViewed } = unlock(
+		useDispatch( coreStore )
 	);
-	const { saveEditedEntityRecord } = useDispatch( coreStore );
 
-	const seenIds = useMemo( () => {
-		const postMap = meta?.[ VIEWED_NOTES_META_KEY ]?.[ postId ];
-		return new Set( ( postMap ?? [] ).map( String ) );
-	}, [ meta, postId ] );
+	const seenIds = useMemo(
+		() => new Set( viewedIds.map( String ) ),
+		[ viewedIds ]
+	);
 
 	const markNotesViewed = useCallback(
 		( noteIds = [] ) => {
-			if ( ! postId || ! noteIds.length || ! currentUserId ) {
+			if ( ! postId || ! noteIds?.length ) {
 				return;
 			}
-
-			const nextIds = new Set( seenIds );
-			let hasNew = false;
-			for ( const id of noteIds ) {
-				const idStr = String( id );
-				if ( ! nextIds.has( idStr ) ) {
-					nextIds.add( idStr );
-					hasNew = true;
-				}
-			}
-
-			if ( ! hasNew ) {
-				return;
-			}
-
-			setMeta( {
-				...meta,
-				[ VIEWED_NOTES_META_KEY ]: {
-					...( meta?.[ VIEWED_NOTES_META_KEY ] ?? {} ),
-					[ postId ]: Array.from( nextIds ),
-				},
-			} );
-
-			// Same id (currentUserId) as used above for useEntityProp —
-			// mismatched ids between the edit and the save silently drop
-			// the write, which was the original bug in this hook.
-			saveEditedEntityRecord( 'root', 'user', currentUserId );
+			dispatchMarkNotesViewed( postId, noteIds );
 		},
-		[
-			postId,
-			seenIds,
-			meta,
-			setMeta,
-			saveEditedEntityRecord,
-			currentUserId,
-		]
+		[ postId, dispatchMarkNotesViewed ]
 	);
 
 	const isNoteUnread = useCallback(

@@ -767,6 +767,26 @@ export function viewConfigs( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Tracks, per post, which note/reply ids the current user has viewed.
+ * Shape: { [postId]: string[] }
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ */
+export function viewedNotes( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_VIEWED_NOTE_IDS': {
+			const existing = state[ action.postId ] ?? [];
+			const merged = Array.from(
+				new Set( [ ...existing, ...action.noteIds.map( String ) ] )
+			);
+			return { ...state, [ action.postId ]: merged };
+		}
+		default:
+			return state;
+	}
+}
+
 export default combineReducers( {
 	users,
 	currentTheme,
@@ -793,4 +813,5 @@ export default combineReducers( {
 	syncConnectionStatuses,
 	collaborationSupported,
 	viewConfigs,
+	viewedNotes,
 } );

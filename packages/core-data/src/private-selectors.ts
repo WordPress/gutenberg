@@ -374,3 +374,16 @@ export function getSyncConnectionStatus(
 
 	return coalesced;
 }
+
+/**
+ *
+ * @param state
+ * @param postId
+ * @return Array of note ids that have been viewed by the current user for the given postId
+ */
+export function getViewedNoteIds(
+	state: State,
+	postId: string | number
+): Array< string > {
+	return state.viewedNotes[ postId ] ?? [];
+}

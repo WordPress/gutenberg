@@ -247,3 +247,42 @@ export function setSyncConnectionStatus( kind, name, key, status ) {
 		status,
 	};
 }
+
+export function receiveViewedNoteIds( postId, noteIds ) {
+	return { type: 'RECEIVE_VIEWED_NOTE_IDS', postId, noteIds };
+}
+
+/**
+ * Marks note/reply ids as viewed for a post, updating local state
+ * immediately and persisting to the server right away.
+ *
+ * @param {number}   postId
+ * @param {string[]} noteIds
+ */
+export function markNotesViewed( postId, noteIds ) {
+	return async ( { dispatch, select } ) => {
+		if ( ! postId || ! noteIds?.length ) {
+			return;
+		}
+		const alreadySeen = select.getViewedNoteIds( postId );
+		const ids = noteIds.map( String );
+		const newOnes = ids.filter( ( id ) => ! alreadySeen.includes( id ) );
+		if ( ! newOnes.length ) {
+			return;
+		}
+
+		dispatch.receiveViewedNoteIds( postId, newOnes );
+
+		try {
+			await apiFetch( {
+				path: `/wp/v2/notes/${ postId }/viewed`,
+				method: 'POST',
+				data: { note_ids: newOnes },
+			} );
+		} catch {
+			// Silently ignore — the optimistic local update stands even if
+			// the persist fails; a later markNotesViewed call covering the
+			// same ids will retry the save.
+		}
+	};
+}

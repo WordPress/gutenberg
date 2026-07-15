@@ -16,6 +16,8 @@ import {
 	SelectionType,
 	SelectionDirection,
 } from './utils/crdt-user-selections';
+import { getViewedNoteIds } from './resolvers';
+import { markNotesViewed } from './private-actions';
 
 const lockedApis = {
 	useEntityRecordsWithPermissions,
@@ -28,6 +30,8 @@ const lockedApis = {
 	useOnPostSave,
 	SelectionType,
 	SelectionDirection,
+	getViewedNoteIds,
+	markNotesViewed,
 };
 
 export type CoreDataPrivateApis = typeof lockedApis;
