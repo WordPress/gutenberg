@@ -1,4 +1,6 @@
 .widget-toolbar {
+	/* Anchors the collapsed inline-controls measurer (position: absolute). */
+	position: relative;
 	padding: var(--wpds-dimension-padding-xs);
 	background: var(--wpds-color-background-surface-neutral-strong);
 }
