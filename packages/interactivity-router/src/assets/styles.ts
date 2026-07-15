@@ -6,6 +6,56 @@ import { shortestCommonSupersequence } from './scs';
 export type StyleElement = HTMLLinkElement | HTMLStyleElement;
 
 /**
+ * Attribute that can be added to a `<style>` or `<link rel="stylesheet">`
+ * element to tell the router to leave it alone during the head merge, no
+ * matter what the fetched page looks like.
+ *
+ * This only helps for elements the site owner (or the developer building
+ * for them) controls directly. Third-party scripts (consent managers, chat
+ * widgets, etc.) that inject their own `<style>` tags at runtime will never
+ * add this attribute to their own markup, which is why
+ * {@link isPersistedElement|`isPersistedElement`} also accepts a list of
+ * selectors registered by the site owner.
+ */
+export const PERSIST_ATTRIBUTE = 'data-wp-router-persist';
+
+/**
+ * Checks whether a style or link element should be left untouched by the
+ * router's head merge.
+ *
+ * An element is considered "persisted" when it either carries the
+ * {@link PERSIST_ATTRIBUTE|`data-wp-router-persist`} attribute or matches
+ * one of the selectors registered through the `persistedHeadElements` config
+ * of the `core/router` store (see `wp_interactivity_config()`). The latter
+ * exists for elements injected by third-party scripts that will never add a
+ * WordPress-specific attribute to their own markup.
+ *
+ * @param element            `<style>` or `<link>` element.
+ * @param persistedSelectors List of CSS selectors registered by the site
+ *                           owner for elements that aren't under their
+ *                           direct control (e.g. `#onetrust-consent-sdk
+ *                           style`).
+ * @return Whether the element should be excluded from the head merge.
+ */
+export const isPersistedElement = (
+	element: StyleElement,
+	persistedSelectors: string[] = []
+): boolean => {
+	if ( element.hasAttribute( PERSIST_ATTRIBUTE ) ) {
+		return true;
+	}
+
+	return persistedSelectors.some( ( selector ) => {
+		try {
+			return element.matches( selector );
+		} catch {
+			// Ignore invalid selectors instead of breaking navigation.
+			return false;
+		}
+	} );
+};
+
+/**
  * Compares the passed style or link elements to check if they can be
  * considered equal.
  *
@@ -210,18 +260,30 @@ const prepareStylePromise = (
  * Note that this function alters the passed document, as it can transfer
  * nodes from it to the global document.
  *
- * @param doc Document instance.
+ * Elements considered "persisted" (see {@link isPersistedElement|
+ * `isPersistedElement`}) are excluded on both sides of the comparison, so
+ * the head merge doesn't add, remove, or reorder them regardless of whether
+ * a matching element exists in the fetched page.
+ *
+ * @param doc                Document instance.
+ * @param persistedSelectors List of CSS selectors registered by the site
+ *                           owner for third-party elements that should be
+ *                           left alone (see `persistedHeadElements` in the
+ *                           `core/router` config).
  * @return A list of promises for each style element in the passed document.
  */
-export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
+export const preloadStyles = (
+	doc: Document,
+	persistedSelectors: string[] = []
+): Promise< StyleElement >[] => {
 	const currentStyleElements = Array.from(
 		window.document.querySelectorAll< StyleElement >(
 			'style,link[rel=stylesheet]'
 		)
-	);
+	).filter( ( el ) => ! isPersistedElement( el, persistedSelectors ) );
 	const newStyleElements = Array.from(
 		doc.querySelectorAll< StyleElement >( 'style,link[rel=stylesheet]' )
-	);
+	).filter( ( el ) => ! isPersistedElement( el, persistedSelectors ) );
 
 	// Set styles in order.
 	return updateStylesWithSCS( currentStyleElements, newStyleElements );
@@ -234,12 +296,29 @@ export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
  * If the style element has the `data-original-media` attribute, the
  * original `media` value is restored.
  *
- * @param styles List of style elements to apply.
+ * Elements considered "persisted" (see {@link isPersistedElement|
+ * `isPersistedElement`}) are skipped entirely: their `sheet.disabled` state
+ * is left exactly as-is, whether or not they're included in `styles`. This
+ * is what stops the router from silently disabling CSS injected at runtime
+ * by third-party scripts (e.g. a consent manager banner) on navigation.
+ *
+ * @param styles             List of style elements to apply.
+ * @param persistedSelectors List of CSS selectors registered by the site
+ *                           owner for third-party elements that should be
+ *                           left alone (see `persistedHeadElements` in the
+ *                           `core/router` config).
  */
-export const applyStyles = ( styles: StyleElement[] ) => {
+export const applyStyles = (
+	styles: StyleElement[],
+	persistedSelectors: string[] = []
+) => {
 	window.document
 		.querySelectorAll( 'style,link[rel=stylesheet]' )
 		.forEach( ( el: HTMLLinkElement | HTMLStyleElement ) => {
+			if ( isPersistedElement( el, persistedSelectors ) ) {
+				return;
+			}
+
 			if ( el.sheet ) {
 				if ( styles.includes( el ) ) {
 					// Only update mediaText when necessary.
