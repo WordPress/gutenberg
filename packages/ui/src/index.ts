@@ -1,3 +1,5 @@
+import { DirectionProvider } from '@base-ui/react/direction-provider';
+
 export * from './badge';
 export * from './button';
 export * as Card from './card';
@@ -23,3 +25,5 @@ export * as Tooltip from './tooltip';
 export { getWpCompatOverlaySlot } from './utils/wp-compat-overlay-slot';
 export { useEnableWpCompatOverlaySlot } from './utils/use-enable-wp-compat-overlay-slot';
 export * from './visually-hidden';
+
+export { DirectionProvider };

@@ -1,12 +1,7 @@
-/**
- * WordPress dependencies
- */
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { DirectionProvider } from '@wordpress/ui';
 import { addFilter, removeFilter } from '@wordpress/hooks';
 import { useEffect, useRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import CONFIG from '../package-styles/config';
 import { useSharedStyle } from './utils/use-shared-style';
 
@@ -49,7 +44,9 @@ export const WithRTL = ( Story, context ) => {
 
 	return (
 		<div ref={ ref } key={ rerenderKey }>
-			<Story { ...context } />
+			<DirectionProvider direction={ context.globals.direction }>
+				<Story { ...context } />
+			</DirectionProvider>
 		</div>
 	);
 };
