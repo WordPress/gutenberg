@@ -6,10 +6,10 @@ import { RangeControl, Spinner, Button } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
-import { useMemo } from '@wordpress/element';
+import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
-import { useFocusOnMount } from '@wordpress/compose';
+import { useFocusOnMount, useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -65,7 +65,62 @@ function RevisionsSlider() {
 		useDispatch( editorStore )
 	);
 
-	const focusOnMountRef = useFocusOnMount( true );
+	const setFocusOnMountRef = useFocusOnMount( true );
+	const initialActiveElementRef = useRef();
+	const didInteractWhileLoadingRef = useRef( false );
+	const loadingRef = useRefEffect( ( node ) => {
+		if ( initialActiveElementRef.current === undefined ) {
+			initialActiveElementRef.current = node.ownerDocument.activeElement;
+		}
+
+		const handleInteraction = () => {
+			didInteractWhileLoadingRef.current = true;
+		};
+		const { ownerDocument } = node;
+		ownerDocument.addEventListener(
+			'pointerdown',
+			handleInteraction,
+			true
+		);
+		ownerDocument.addEventListener( 'keydown', handleInteraction, true );
+
+		return () => {
+			ownerDocument.removeEventListener(
+				'pointerdown',
+				handleInteraction,
+				true
+			);
+			ownerDocument.removeEventListener(
+				'keydown',
+				handleInteraction,
+				true
+			);
+		};
+	}, [] );
+
+	const focusOnMountRef = useCallback(
+		( node ) => {
+			if ( ! node ) {
+				setFocusOnMountRef( null );
+				return;
+			}
+
+			const { activeElement, body, documentElement } = node.ownerDocument;
+			const initialActiveElement =
+				initialActiveElementRef.current ?? activeElement;
+			const focusHasNotMoved =
+				activeElement === initialActiveElement ||
+				activeElement === body ||
+				activeElement === documentElement;
+
+			// If the user moves focus while revisions load, keep it there when the
+			// slider mounts.
+			if ( ! didInteractWhileLoadingRef.current && focusHasNotMoved ) {
+				setFocusOnMountRef( node );
+			}
+		},
+		[ setFocusOnMountRef ]
+	);
 
 	const isLoading = ! rawRevisions;
 	const totalPages = Math.ceil( totalRevisions / perPage ) || 1;
@@ -87,7 +142,6 @@ function RevisionsSlider() {
 		}
 	};
 
-	// Format date for tooltip.
 	const dateSettings = getDateSettings();
 	const renderTooltipContent = ( index ) => {
 		const revision = revisions?.[ index ];
@@ -100,7 +154,7 @@ function RevisionsSlider() {
 	const showPagination = totalPages > 1;
 
 	if ( isLoading && ! showPagination ) {
-		return <Spinner />;
+		return <Spinner ref={ loadingRef } />;
 	}
 
 	if ( ! isLoading && ! revisions?.length ) {
@@ -132,7 +186,7 @@ function RevisionsSlider() {
 
 	const sliderOrSpinner =
 		isLoading || selectedIndex === -1 ? (
-			<Spinner />
+			<Spinner ref={ loadingRef } />
 		) : (
 			<RangeControl
 				ref={ focusOnMountRef }

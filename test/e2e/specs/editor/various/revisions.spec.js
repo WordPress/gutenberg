@@ -3,6 +3,15 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+function defer() {
+	let resolve;
+	const deferred = new Promise( ( res ) => {
+		resolve = res;
+	} );
+	deferred.resolve = resolve;
+	return deferred;
+}
+
 test.describe( 'Post revisions', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -86,7 +95,7 @@ test.describe( 'Post revisions', () => {
 		] );
 	} );
 
-	test( 'should show revision changes in the code editor', async ( {
+	test( 'should show revision changes in the code editor (@webkit)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -100,6 +109,27 @@ test.describe( 'Post revisions', () => {
 		);
 		await editor.saveDraft();
 
+		const revisionsRequestStarted = defer();
+		const releaseRevisionsRequest = defer();
+		let shouldDelayRevisionsRequest = true;
+		await page.route(
+			( url ) => {
+				const restRoute = url.searchParams.get( 'rest_route' );
+				return ( restRoute ?? url.pathname ).includes( '/revisions' );
+			},
+			async ( route, request ) => {
+				if (
+					shouldDelayRevisionsRequest &&
+					request.method() === 'GET'
+				) {
+					shouldDelayRevisionsRequest = false;
+					revisionsRequestStarted.resolve();
+					await releaseRevisionsRequest;
+				}
+				await route.continue();
+			}
+		);
+
 		await editor.openDocumentSettingsSidebar();
 		const settingsSidebar = page.getByRole( 'region', {
 			name: 'Editor settings',
@@ -111,16 +141,30 @@ test.describe( 'Post revisions', () => {
 			} )
 			.click();
 
+		await revisionsRequestStarted;
 		await expect(
 			page.getByRole( 'button', { name: 'Restore' } )
 		).toBeVisible();
 
 		const optionsButton = page.getByRole( 'button', { name: 'Options' } );
 		await expect( optionsButton ).toBeEnabled();
-		await optionsButton.click();
-		await page
-			.getByRole( 'menuitemradio', { name: 'Code editor' } )
-			.click();
+		const codeEditorMenuItem = page.getByRole( 'menuitemradio', {
+			name: 'Code editor',
+		} );
+		try {
+			await expect(
+				page.locator( '.editor-revisions-header .components-spinner' )
+			).toBeVisible();
+			await optionsButton.click();
+			await expect( codeEditorMenuItem ).toBeVisible();
+		} finally {
+			releaseRevisionsRequest.resolve();
+		}
+
+		const slider = page.getByRole( 'slider', { name: 'Revision' } );
+		await expect( slider ).toBeVisible();
+		await expect( codeEditorMenuItem ).toBeVisible();
+		await codeEditorMenuItem.click();
 
 		const codeDiff = page.getByRole( 'region', { name: 'Code changes' } );
 		await expect( codeDiff ).toBeVisible();
@@ -134,8 +178,6 @@ test.describe( 'Post revisions', () => {
 				hasText: '<p>Updated content</p>',
 			} )
 		).toBeVisible();
-		const slider = page.getByRole( 'slider', { name: 'Revision' } );
-		await expect( slider ).toBeVisible();
 		await slider.focus();
 		await page.keyboard.press( 'Home' );
 		await expect(
