@@ -16,6 +16,7 @@
 ### Bug Fixes
 
 -   Widen the optional `@wordpress/theme` peer dependency range to allow 1.x releases and preserve automatic design token fallback plugin loading ([#80089](https://github.com/WordPress/gutenberg/pull/80089)).
+-   Pass the current `$hook_suffix` to the `admin_footer` action in the generated single-page admin template instead of an empty string ([#75985](https://github.com/WordPress/gutenberg/pull/75985)).
 
 ## 0.18.0 (2026-07-01)
 
