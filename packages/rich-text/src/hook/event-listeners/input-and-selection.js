@@ -9,6 +9,8 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { getActiveFormats } from '../../get-active-formats';
 import { isCollapsed } from '../../is-collapsed';
 import { updateFormats } from '../../update-formats';
+import { ownsSelection } from '../../owns-selection';
+import { subscribeOwnedListener } from '../../subscribe-owned-listener';
 import { unlock } from '../../lock-unlock';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
@@ -132,9 +134,14 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		// Ensure the active element is the rich text element. The listener
-		// stays subscribed but no-ops for instances that aren't focused.
-		if ( ownerDocument.activeElement !== element ) {
+		// Ensure the active element is the rich text element, or that the
+		// element owns the selection through a focused editing host (the
+		// editable block editor canvas wrapper). The listener stays
+		// subscribed but no-ops for instances that don't own the selection.
+		if (
+			ownerDocument.activeElement !== element &&
+			! ownsSelection( element )
+		) {
 			return;
 		}
 
@@ -263,6 +270,22 @@ export default ( props ) => ( element ) => {
 		// When the whole editor is editable, let writing flow handle
 		// selection.
 		if ( element.parentElement.closest( '[contenteditable="true"]' ) ) {
+			// A nested editable element does not receive a caret from being
+			// focused, unlike an editing host. When the element does not
+			// contain the selection, restore the internal record's selection,
+			// or match the editing host behavior for programmatic focus and
+			// place the caret at the start.
+			const selection = defaultView.getSelection();
+			if (
+				! selection.anchorNode ||
+				! element.contains( selection.anchorNode )
+			) {
+				if ( isSelected && record.current.start !== undefined ) {
+					applyRecord( record.current );
+				} else {
+					selection.collapse( element, 0 );
+				}
+			}
 			return;
 		}
 
@@ -297,18 +320,18 @@ export default ( props ) => ( element ) => {
 	// `input-rules.js` element-level listeners, which call `getValue()`
 	// reading `record.current` updated by our `onInput`. Use capture phase
 	// so we fire before any ancestor bubble handlers.
-	const unsubscribeInput = subscribeDelegatedListener(
+	const unsubscribeInput = subscribeOwnedListener(
 		element,
 		'input',
 		onInput,
 		true
 	);
-	const unsubscribeCompositionStart = subscribeDelegatedListener(
+	const unsubscribeCompositionStart = subscribeOwnedListener(
 		element,
 		'compositionstart',
 		onCompositionStart
 	);
-	const unsubscribeCompositionEnd = subscribeDelegatedListener(
+	const unsubscribeCompositionEnd = subscribeOwnedListener(
 		element,
 		'compositionend',
 		onCompositionEnd,
@@ -331,7 +354,10 @@ export default ( props ) => ( element ) => {
 	// The native `selectionchange` event is asynchronous and coalesced: the
 	// record and the store selection can be one selection behind the DOM when
 	// an event that acts on them arrives, regardless of how the selection got
-	// there. Synchronize on capture of the events that consume the record,
+	// there. When a focused editing host owns the element's selection, there
+	// are not even focus events to catch up on entry, and handlers that act
+	// on the selected block only attach once the store selects it.
+	// Synchronize on capture of the events that consume the record,
 	// the store selection, or a value rendered from them, before any other
 	// handler runs. The snapshot comparison in `handleSelectionChange` skips
 	// selections that have already been processed.

@@ -169,7 +169,7 @@
 		border-radius: 2px;
 	}
 
-	a {
+	a:not(.wp-note-mention) {
 		color: var(--wp-admin-theme-color);
 		text-decoration: underline;
 	}
@@ -242,4 +242,25 @@
 mark.wp-note {
 	border-radius: 1px;
 	transition: background-color 0.1s ease-in-out;
+}
+
+// Mention chips, both in the note input and the rendered note content. A
+// mention is a link to the mentioned user's author page, styled as a chip
+// rather than an underlined link.
+.wp-note-mention {
+	display: inline;
+	padding: 0 $grid-unit-05;
+	border-radius: $radius-small;
+	background: color-mix(in srgb, var(--wp-admin-theme-color) 12%, transparent);
+	color: var(--wp-admin-theme-color);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	white-space: nowrap;
+	text-decoration: none;
+}
+
+// Match the rounded avatars used for note bylines and the block toolbar
+// indicator in the mention suggestions popover (the shared completer style
+// leaves them square).
+.editor-collab-sidebar-panel__mention-suggestion .editor-autocompleters__user-avatar {
+	border-radius: $radius-round;
 }

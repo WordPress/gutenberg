@@ -94,6 +94,41 @@ describe( 'RichTextControl', () => {
 		expect( textbox ).toHaveAttribute( 'aria-label', 'Description' );
 	} );
 
+	it( 'renders without autocomplete when no `completers` are passed', () => {
+		const { container } = render(
+			<RichTextControl label="Note" value="" onChange={ () => {} } />
+		);
+
+		const textbox = getTextbox( container );
+		// Zero-cost when not opted in: the autocomplete aria wiring only
+		// appears once a completer matches typed input.
+		expect( textbox ).not.toHaveAttribute( 'aria-autocomplete' );
+	} );
+
+	it( 'accepts a `completers` prop without breaking rendering', () => {
+		const completer = {
+			name: 'test/mentions',
+			triggerPrefix: '@',
+			useItems: () => [ [] ],
+			getOptionCompletion: () => '@someone',
+		};
+
+		const { container } = render(
+			<RichTextControl
+				label="Note"
+				value=""
+				onChange={ () => {} }
+				completers={
+					[ completer ] as unknown as React.ComponentProps<
+						typeof RichTextControl
+					>[ 'completers' ]
+				}
+			/>
+		);
+
+		expect( getTextbox( container ) ).toBeInTheDocument();
+	} );
+
 	it( 'visually hides the label when `hideLabelFromVision` is set', () => {
 		render(
 			<RichTextControl

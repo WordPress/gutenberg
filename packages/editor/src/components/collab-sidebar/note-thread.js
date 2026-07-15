@@ -11,7 +11,7 @@ import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { useDebounce } from '@wordpress/compose';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	store as blockEditorStore,
@@ -51,6 +51,7 @@ export function NoteThread( {
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const registry = useRegistry();
 	const relatedBlockElement = useBlockElement( note.blockClientId );
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
@@ -58,6 +59,9 @@ export function NoteThread( {
 	);
 	const floatingRef = useRef( null );
 	const isKeyboardTabbingRef = useRef( false );
+	const blurDeselectTimeoutRef = useRef();
+
+	useEffect( () => () => clearTimeout( blurDeselectTimeoutRef.current ), [] );
 
 	const registerThread = floating?.registerThread;
 	const unregisterThread = floating?.unregisterThread;
@@ -90,6 +94,14 @@ export function NoteThread( {
 	};
 
 	const onFocus = () => {
+		/*
+		 * Focus landing anywhere in UI owned by this thread cancels a pending
+		 * deselect from `onBlur`. This includes the delete confirmation
+		 * dialog, the note actions menu and format popovers (e.g. the Cmd+K
+		 * link UI): they portal out of the thread's DOM, but their focus
+		 * events still bubble here through the React tree.
+		 */
+		clearTimeout( blurDeselectTimeoutRef.current );
 		toggleBlockHighlight( note.blockClientId, true );
 	};
 
@@ -102,19 +114,10 @@ export function NoteThread( {
 		const isNoteFocused = event.relatedTarget?.closest(
 			'.editor-collab-sidebar-panel__thread'
 		);
-		// Keep the note open when focus moves into a dialog (e.g. delete
-		// confirmation) or format popover (e.g. Cmd+K link UI) that portals
-		// out of the thread.
-		const isDialogOrPopoverFocused = event.relatedTarget?.closest(
-			'[role="dialog"], .components-popover'
-		);
 		const isTabbing = isKeyboardTabbingRef.current;
 
 		// When another note is clicked, do nothing because the current note is automatically closed.
 		if ( isNoteFocused && ! isTabbing ) {
-			return;
-		}
-		if ( isDialogOrPopoverFocused ) {
 			return;
 		}
 		// When tabbing, do nothing if the focus is within the current note.
@@ -125,11 +128,34 @@ export function NoteThread( {
 			return;
 		}
 
-		// Closes a note that has lost focus when any of the following conditions are met:
-		// - An element other than a note is clicked.
-		// - Focus was lost by tabbing.
-		toggleBlockHighlight( note.blockClientId, false );
-		onDeselectNote();
+		/*
+		 * Closes a note that has lost focus when any of the following
+		 * conditions are met:
+		 * - An element other than a note is clicked.
+		 * - Focus was lost by tabbing.
+		 * The deselect is deferred so that focus moving into a portaled
+		 * dialog, menu or popover belonging to this thread can cancel it via
+		 * `onFocus` above (their focus events reach it through React's
+		 * virtual bubbling, while `relatedTarget` reports them as outside).
+		 */
+		clearTimeout( blurDeselectTimeoutRef.current );
+		blurDeselectTimeoutRef.current = setTimeout( () => {
+			toggleBlockHighlight( note.blockClientId, false );
+
+			/*
+			 * Selection may have moved while the deselect was pending: clicking
+			 * a noted block in the canvas blurs this thread and then selects
+			 * the block's own thread (asynchronously, via focusNote()). Only
+			 * clear the selection if this thread still owns it, or the pending
+			 * deselect would wipe out the newly selected thread.
+			 */
+			const selectedNoteId = unlock(
+				registry.select( editorStore )
+			).getSelectedNote();
+			if ( selectedNoteId === note.id ) {
+				onDeselectNote();
+			}
+		}, 0 );
 	};
 
 	const onSelectNote = () => {
