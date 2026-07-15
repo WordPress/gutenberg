@@ -119,7 +119,10 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 						}
 					} }
 					onCancel={ unselectNote }
-					labels={ { input: __( 'New note' ) } }
+					labels={ {
+						input: __( 'New note' ),
+						placeholder: __( 'Write note or mention with @' ),
+					} }
 				/>
 			</NoteCard>
 		</FloatingContainer>
