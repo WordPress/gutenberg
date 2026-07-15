@@ -411,6 +411,12 @@ test.describe( 'Router navigate', () => {
 
 		await expect( getNavigationLoading( page ) ).resolves.toBe( false );
 
+		// The event's `title` reflects `document.title` (the browser tab
+		// title, e.g. "post title – site title"), which is not the same as
+		// the block's own "title" test id asserted above (its rendered
+		// heading), so read it straight from the page instead of hardcoding it.
+		const documentTitle = await page.evaluate( () => document.title );
+
 		const events = await getNavigationEvents( page );
 		expect( events ).toEqual( [
 			{ type: 'start', detail: { url: link1 } },
@@ -419,7 +425,7 @@ test.describe( 'Router navigate', () => {
 				detail: {
 					url: link1,
 					referrer: mainLink,
-					title: 'Link 1',
+					title: documentTitle,
 				},
 			},
 		] );
@@ -442,6 +448,10 @@ test.describe( 'Router navigate', () => {
 
 		await expect( getNavigationLoading( page ) ).resolves.toBe( false );
 
+		// See the comment in the previous test for why `title` is read from
+		// `document.title` instead of being hardcoded.
+		const documentTitle = await page.evaluate( () => document.title );
+
 		const events = await getNavigationEvents( page );
 		expect( events ).toEqual( [
 			{ type: 'start', detail: { url: mainLink } },
@@ -450,7 +460,7 @@ test.describe( 'Router navigate', () => {
 				detail: {
 					url: mainLink,
 					referrer: link1,
-					title: 'Main',
+					title: documentTitle,
 				},
 			},
 		] );
