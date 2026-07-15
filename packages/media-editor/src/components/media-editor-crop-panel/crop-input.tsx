@@ -73,7 +73,6 @@ export default function CropInput( props: CropInputProps ) {
 
 	return (
 		<NumberControl
-			__next40pxDefaultSize
 			label={ label }
 			aria-label={ ariaLabel }
 			step={ step }
