@@ -76,32 +76,30 @@ class Gutenberg_Image_Editor_GD extends WP_Image_Editor_GD {
 		/*
 		 * Clear the pixels outside the inscribed circle one scanline at a time.
 		 * For each row the circle spans the horizontal range
-		 * [center_x - half, center_x + half]; everything outside that span is
-		 * filled transparent with at most two rectangle fills. This keeps the
-		 * cost at O(height) rectangle fills rather than O(width * height)
-		 * per-pixel writes. `ceil()`/`floor()` preserve the same boundary as the
-		 * `dx^2 + dy^2 <= radius^2` test, so a pixel exactly on the radius stays
-		 * opaque and no seam appears at the rim.
+		 * [center_x - span, center_x + span]; everything outside it is filled
+		 * transparent with at most two rectangle fills, keeping the cost at
+		 * O(height) rectangle fills rather than O(width * height) per-pixel
+		 * writes. A pixel exactly on the radius stays opaque, so no seam appears
+		 * at the rim.
 		 */
 		for ( $y = 0; $y < $height; $y++ ) {
-			$dy     = $y - $center_y;
-			$inside = $radius_squared - ( $dy * $dy );
+			$dy = $y - $center_y;
 
-			// Row lies entirely outside the circle.
-			if ( $inside < 0 ) {
+			if ( ( $dy * $dy ) > $radius_squared ) {
 				imagefilledrectangle( $this->image, 0, $y, $width - 1, $y, $transparent );
 				continue;
 			}
 
-			$half    = sqrt( $inside );
-			$x_left  = (int) ceil( $center_x - $half );
-			$x_right = (int) floor( $center_x + $half );
+			$span  = sqrt( $radius_squared - ( $dy * $dy ) );
+			$left  = max( 0, (int) ceil( $center_x - $span ) );
+			$right = min( $width - 1, (int) floor( $center_x + $span ) );
 
-			if ( $x_left > 0 ) {
-				imagefilledrectangle( $this->image, 0, $y, $x_left - 1, $y, $transparent );
+			if ( $left > 0 ) {
+				imagefilledrectangle( $this->image, 0, $y, $left - 1, $y, $transparent );
 			}
-			if ( $x_right < $width - 1 ) {
-				imagefilledrectangle( $this->image, $x_right + 1, $y, $width - 1, $y, $transparent );
+
+			if ( $right < $width - 1 ) {
+				imagefilledrectangle( $this->image, $right + 1, $y, $width - 1, $y, $transparent );
 			}
 		}
 
