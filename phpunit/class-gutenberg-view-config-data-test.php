@@ -43,6 +43,117 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
+	 * update_properties() updates scalar property values
+	 *
+	 * @covers ::update_properties
+	 */
+	public function test_update_properties_scalar_values() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'type'    => 'table',
+					'perPage' => 20,
+					'showLevels' => false
+				),
+			)
+		);
+		$data->update_properties(
+			array(
+				'default_view' => array(
+					'type' => 'grid',
+					'perPage' => 50,
+					'showLevels' => false,
+				),
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				'type'    => 'grid',
+				'perPage' => 50,
+				'showLevels' => false
+			),
+			$data->get_config()['default_view']
+		);
+	}
+
+	/**
+	 * update_properties() updates object property values
+	 *
+	 * @covers ::update_properties
+	 */
+	public function test_update_properties_object_values() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'sort' => array(
+						'field' => 'title',
+						'direction' => 'asc'
+					)
+				),
+			)
+		);
+		$data->update_properties(
+			array(
+				'default_view' => array(
+					'sort' => array(
+						'direction' => 'desc'
+					)
+				),
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				'sort' => array(
+					'field' => 'title',
+					'direction' => 'desc'
+				)
+			),
+			$data->get_config()['default_view']
+		);
+	}
+
+	/**
+	 * update_properties() updates list property values
+	 *
+	 * @covers ::update_properties
+	 */
+	public function test_update_properties_list_values() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'fields' => array(
+						array( 'title' )
+					)
+				),
+			)
+		);
+		$data->update_properties(
+			array(
+				'default_view' => array(
+					'fields' => array(
+						array( 'slug' )
+					)
+				),
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				'fields' => array(
+					array( 'title' ),
+					array( 'slug' )
+				)
+			),
+			$data->get_config()['default_view']
+		);
+	}
+
+	/**
 	 * update_properties() merges object-shaped keys recursively.
 	 *
 	 * @covers ::update_properties
