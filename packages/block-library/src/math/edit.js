@@ -1,27 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
-	TextareaControl,
 	Popover,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
 
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
+const { ValidatedTextareaControl } = unlock( componentsPrivateApis );
 
 export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const { latex, mathML } = attributes;
@@ -77,58 +74,37 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					__unstableSlotName="__unstable-block-tools-after"
 				>
 					<div style={ { padding: '4px', minWidth: '300px' } }>
-						<Stack direction="column" gap="xs">
-							<TextareaControl
-								label={ __( 'LaTeX math syntax' ) }
-								hideLabelFromVision
-								value={ latex }
-								className="wp-block-math__textarea-control"
-								onChange={ ( newLatex ) => {
-									if ( ! latexToMathML ) {
-										setAttributes( { latex: newLatex } );
-										return;
-									}
-									let newMathML = '';
-									try {
-										newMathML = latexToMathML( newLatex, {
-											displayMode: true,
-										} );
-										setError( null );
-									} catch ( err ) {
-										setError( err.message );
-										speak(
-											sprintf(
-												/* translators: %s: error message returned when parsing LaTeX. */
-												__(
-													'Error parsing mathematical expression: %s'
-												),
-												err.message
-											)
-										);
-									}
-									setAttributes( {
-										mathML: newMathML,
-										latex: newLatex,
+						<ValidatedTextareaControl
+							label={ __( 'LaTeX math syntax' ) }
+							hideLabelFromVision
+							value={ latex }
+							className="wp-block-math__textarea-control"
+							customValidity={
+								error
+									? { type: 'invalid', message: error }
+									: undefined
+							}
+							onChange={ ( newLatex ) => {
+								if ( ! latexToMathML ) {
+									setAttributes( { latex: newLatex } );
+									return;
+								}
+								let newMathML = '';
+								try {
+									newMathML = latexToMathML( newLatex, {
+										displayMode: true,
 									} );
-								} }
-								placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
-							/>
-							{ error && (
-								<>
-									<WCBadge
-										intent="error"
-										className="wp-block-math__error"
-									>
-										{ sprintf(
-											/* translators: %s: error message returned when parsing LaTeX. */
-											__( 'Error: %s' ),
-											error
-										) }
-									</WCBadge>
-									<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
-								</>
-							) }
-						</Stack>
+									setError( null );
+								} catch ( err ) {
+									setError( err.message );
+								}
+								setAttributes( {
+									mathML: newMathML,
+									latex: newLatex,
+								} );
+							} }
+							placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
+						/>
 					</div>
 				</Popover>
 			) }
