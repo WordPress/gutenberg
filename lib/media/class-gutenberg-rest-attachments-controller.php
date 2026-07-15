@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-require_once __DIR__ . '/../compat/wordpress-7.2/class-gutenberg-rest-attachments-controller-with-mask.php';
+require_once __DIR__ . '/../compat/wordpress-7.2/class-gutenberg-rest-attachments-controller-7-2.php';
 
 /**
  * REST API controller for media attachments.
@@ -23,7 +23,7 @@ require_once __DIR__ . '/../compat/wordpress-7.2/class-gutenberg-rest-attachment
  *     original_image?: non-empty-string,
  * }
  */
-class Gutenberg_REST_Attachments_Controller extends Gutenberg_REST_Attachments_Controller_With_Mask {
+class Gutenberg_REST_Attachments_Controller extends Gutenberg_REST_Attachments_Controller_7_2 {
 	/**
 	 * Image size token for the source-format original preserved alongside a
 	 * client-generated derivative (e.g. the HEIC file kept next to its JPEG).

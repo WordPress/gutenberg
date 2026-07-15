@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: Gutenberg_REST_Attachments_Controller_With_Mask class
+ * REST API: Gutenberg_REST_Attachments_Controller_7_2 class
  *
  * @package gutenberg
  */
@@ -27,7 +27,7 @@
  *
  * @see WP_REST_Attachments_Controller
  */
-class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachments_Controller {
+class Gutenberg_REST_Attachments_Controller_7_2 extends WP_REST_Attachments_Controller {
 	/**
 	 * Gets the request args for the edit item route.
 	 *
