@@ -4,7 +4,6 @@
 import { isBlobURL } from '@wordpress/blob';
 import { useContext, useEffect, useRef, useState } from '@wordpress/element';
 import {
-	store as blockEditorStore,
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	MediaUpload,
@@ -29,7 +28,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -58,12 +56,10 @@ const PlaylistTrackEdit = ( {
 	const { currentTrackClientId, setCurrentTrackClientId, addTracks } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { replaceBlocks } = useDispatch( blockEditorStore );
-	const hasTrackSource = !! src || !! temporaryURL;
-
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
+	const hasTrackSource = !! src || !! temporaryURL;
 
 	useEffect( () => {
 		if (
@@ -89,21 +85,6 @@ const PlaylistTrackEdit = ( {
 	} );
 
 	function onSelectTrack( media ) {
-		if ( Array.isArray( media ) ) {
-			const newBlocks = media
-				.map( getTrackAttributes )
-				.filter( ( track ) => track.src )
-				.map( ( track ) =>
-					createBlock( 'core/playlist-track', track )
-				);
-
-			if ( newBlocks.length > 0 ) {
-				replaceBlocks( clientId, newBlocks );
-				setCurrentTrackClientId( newBlocks[ 0 ].clientId );
-			}
-			return;
-		}
-
 		const mediaUrl = media?.url ?? media?.source_url;
 
 		if ( ! media || ! mediaUrl ) {
@@ -160,7 +141,6 @@ const PlaylistTrackEdit = ( {
 					} }
 					onSelect={ onSelectTrack }
 					accept="audio/*"
-					multiple
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
 					onError={ onUploadError }

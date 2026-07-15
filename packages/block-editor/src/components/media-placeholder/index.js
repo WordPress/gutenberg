@@ -15,7 +15,6 @@ import {
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	withFilters,
 } from '@wordpress/components';
-import { isBlobURL } from '@wordpress/blob';
 import { __, _x } from '@wordpress/i18n';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -33,25 +32,6 @@ import { parseDropEvent } from '../use-on-block-drop';
 import { getComputedAcceptAttribute } from './utils';
 
 const noop = () => {};
-
-function getMediaUrl( media ) {
-	return media?.url ?? media?.source_url;
-}
-
-function isFinalMediaItem( media ) {
-	const url = getMediaUrl( media );
-	return url && ! isBlobURL( url );
-}
-
-function areMediaItemsSame( firstMedia, secondMedia ) {
-	if ( firstMedia?.id && secondMedia?.id ) {
-		return Number( firstMedia.id ) === Number( secondMedia.id );
-	}
-
-	const firstUrl = getMediaUrl( firstMedia );
-	const secondUrl = getMediaUrl( secondMedia );
-	return firstUrl && secondUrl && firstUrl === secondUrl;
-}
 
 const InsertFromURLPopover = ( {
 	src,
@@ -214,7 +194,6 @@ export function MediaPlaceholder( {
 		}
 		onFilesPreUpload( files );
 		let setMedia;
-		let onBatchSuccess;
 		if ( multiple ) {
 			if ( addToGallery ) {
 				// Since the setMedia function runs multiple times per upload group
@@ -252,27 +231,7 @@ export function MediaPlaceholder( {
 					} );
 				};
 			} else {
-				const selectedMedia = [];
-
-				setMedia = ( newMedia ) => {
-					newMedia.filter( isFinalMediaItem ).forEach( ( media ) => {
-						const mediaIndex = selectedMedia.findIndex(
-							( selectedItem ) =>
-								areMediaItemsSame( selectedItem, media )
-						);
-
-						if ( mediaIndex === -1 ) {
-							selectedMedia.push( media );
-						} else {
-							selectedMedia[ mediaIndex ] = media;
-						}
-					} );
-				};
-				onBatchSuccess = () => {
-					if ( selectedMedia.length > 0 ) {
-						onSelect( selectedMedia );
-					}
-				};
+				setMedia = onSelect;
 			}
 		} else {
 			setMedia = ( [ media ] ) => onSelect( media );
@@ -281,7 +240,6 @@ export function MediaPlaceholder( {
 			allowedTypes,
 			filesList: files,
 			onFileChange: setMedia,
-			onBatchSuccess,
 			onError,
 			multiple,
 		} );

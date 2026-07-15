@@ -15,7 +15,6 @@ import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
-let mockMediaPlaceholderProps;
 let mockMediaReplaceFlowProps;
 
 jest.mock( '@wordpress/block-editor', () => ( {
@@ -24,10 +23,7 @@ jest.mock( '@wordpress/block-editor', () => ( {
 	),
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
-	MediaPlaceholder: ( props ) => {
-		mockMediaPlaceholderProps = props;
-		return <div />;
-	},
+	MediaPlaceholder: () => <div />,
 	MediaReplaceFlow: ( props ) => {
 		mockMediaReplaceFlowProps = props;
 		const { name, onSelect } = props;
@@ -44,7 +40,6 @@ jest.mock( '@wordpress/block-editor', () => ( {
 		__experimentalVersion,
 		...props
 	} ) => <TagName { ...props }>{ value || placeholder }</TagName>,
-	store: 'core/block-editor',
 	useBlockProps: jest.fn( () => ( {} ) ),
 } ) );
 
@@ -61,14 +56,6 @@ jest.mock( '@wordpress/data', () => ( {
 	createReduxStore: jest.fn( () => ( {} ) ),
 	createSelector: jest.fn( ( fn ) => fn ),
 	register: jest.fn(),
-} ) );
-
-jest.mock( '@wordpress/blocks', () => ( {
-	createBlock: jest.fn( ( name, attributes ) => ( {
-		clientId: `mock-${ attributes.id }`,
-		name,
-		attributes,
-	} ) ),
 } ) );
 
 jest.mock( '@wordpress/notices', () => ( {
@@ -124,15 +111,10 @@ function renderEdit( props = {} ) {
 }
 
 describe( 'PlaylistTrackEdit', () => {
-	let replaceBlocks;
-
 	beforeEach( () => {
-		mockMediaPlaceholderProps = undefined;
 		mockMediaReplaceFlowProps = undefined;
-		replaceBlocks = jest.fn();
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
-			replaceBlocks,
 		} );
 		useUploadMediaFromBlobURL.mockClear();
 	} );
@@ -250,50 +232,22 @@ describe( 'PlaylistTrackEdit', () => {
 		);
 	} );
 
-	it( 'replaces an empty track placeholder with multiple selected tracks', () => {
-		renderEdit( {
-			attributes: {
-				id: undefined,
-				src: undefined,
-				title: undefined,
-			},
+	it( 'accepts raw uploaded attachment data when replacing a track', () => {
+		const { setAttributes } = renderEdit();
+
+		mockMediaReplaceFlowProps.onSelect( {
+			id: 2,
+			source_url: 'https://example.com/replacement.mp3',
+			title: { raw: 'Replacement &amp; Track' },
 		} );
 
-		expect( mockMediaPlaceholderProps.multiple ).toBe( true );
-
-		mockMediaPlaceholderProps.onSelect( [
-			{
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				blob: undefined,
 				id: 2,
-				source_url: 'https://example.com/first.mp3',
-				title: { raw: 'First &amp; Track' },
-			},
-			{
-				id: 3,
-				url: 'https://example.com/second.mp3',
-				title: 'Second Track',
-			},
-		] );
-
-		expect( replaceBlocks ).toHaveBeenCalledWith(
-			'playlist-track-client-id',
-			[
-				expect.objectContaining( {
-					name: 'core/playlist-track',
-					attributes: expect.objectContaining( {
-						id: 2,
-						src: 'https://example.com/first.mp3',
-						title: 'First & Track',
-					} ),
-				} ),
-				expect.objectContaining( {
-					name: 'core/playlist-track',
-					attributes: expect.objectContaining( {
-						id: 3,
-						src: 'https://example.com/second.mp3',
-						title: 'Second Track',
-					} ),
-				} ),
-			]
+				src: 'https://example.com/replacement.mp3',
+				title: 'Replacement & Track',
+			} )
 		);
 	} );
 } );
