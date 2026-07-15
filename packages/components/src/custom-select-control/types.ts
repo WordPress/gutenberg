@@ -89,7 +89,7 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	 *
 	 * @default 'default'
 	 */
-	size?: 'default' | 'small' | '__unstable-large';
+	size?: 'default' | 'small';
 	/**
 	 * Can be used to externally control the value of the control.
 	 */

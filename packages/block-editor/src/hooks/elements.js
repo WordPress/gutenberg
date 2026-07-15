@@ -93,7 +93,6 @@ export function ElementsEdit( {
 	// Text and background color failures are reported by the Typography and
 	// Background panels, which own those selections.
 	const enableContrastChecking =
-		! isStateSelected &&
 		!! value?.elements?.link?.color?.text &&
 		settings?.color?.link &&
 		false !==

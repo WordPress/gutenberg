@@ -48,7 +48,7 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 					style={ {
 						display: 'grid',
 						gridTemplateColumns: `repeat(${ RAMP_TOKENS_ORDER.length }, minmax(max-content, 1fr))`,
-						fontFamily: '-apple-system, "system-ui", sans-serif',
+						fontFamily: 'var(--wpds-typography-font-family-body)',
 						alignItems: 'end',
 					} }
 				>
@@ -59,7 +59,8 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 								textAlign: 'center',
 								padding: '8px 4px',
 								fontSize: 11,
-								fontWeight: 500,
+								fontWeight:
+									'var(--wpds-typography-font-weight-emphasis)',
 								color: ramps[ 0 ].ramp.fgSurface4,
 							} }
 						>
@@ -96,7 +97,8 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 											placeItems: 'center',
 											width: '100%',
 											fontSize: 8,
-											fontWeight: 500,
+											fontWeight:
+												'var(--wpds-typography-font-weight-emphasis)',
 											color:
 												tokenName === 'surface2'
 													? ramp.fgSurface4

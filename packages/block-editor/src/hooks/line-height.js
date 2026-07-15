@@ -41,7 +41,6 @@ export function LineHeightEdit( props ) {
 			__unstableInputWidth="100%"
 			value={ style?.typography?.lineHeight }
 			onChange={ onChange }
-			size="__unstable-large"
 		/>
 	);
 }
