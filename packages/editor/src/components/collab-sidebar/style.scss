@@ -455,12 +455,22 @@ mark.wp-note {
 	// keyboard navigation scrolls it into view.
 	scroll-margin-block: $grid-unit-40 $grid-unit-05;
 
-	&[data-active-item] {
+	// Highlight the cell under the pointer and the cell the roving
+	// tabindex is on — but only while it actually holds focus. The
+	// composite keeps `data-active-item` on the last active cell even
+	// when focus is elsewhere (e.g. the search field on open), and a
+	// highlight without focus reads as a phantom selection.
+	&:hover,
+	&[data-active-item]:focus {
 		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 	}
 
 	&:focus-visible {
-		// Standard component focus ring.
-		@include outset-ring__focus();
+		// An inset ring instead of the standard outset ring: grid rows
+		// use `content-visibility: auto`, whose paint containment clips
+		// ink overflow at the row box — an outset ring loses its top and
+		// bottom edges (and its left edge on first-column cells).
+		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
 	}
 }
