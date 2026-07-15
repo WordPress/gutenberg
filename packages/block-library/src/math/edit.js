@@ -9,9 +9,9 @@ import {
 import {
 	TextareaControl,
 	Popover,
-	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
@@ -77,7 +77,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					__unstableSlotName="__unstable-block-tools-after"
 				>
 					<div style={ { padding: '4px', minWidth: '300px' } }>
-						<VStack spacing={ 1 }>
+						<Stack direction="column" gap="xs">
 							<TextareaControl
 								label={ __( 'LaTeX math syntax' ) }
 								hideLabelFromVision
@@ -128,7 +128,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 									<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
 								</>
 							) }
-						</VStack>
+						</Stack>
 					</div>
 				</Popover>
 			) }

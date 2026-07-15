@@ -338,11 +338,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/math/edit.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/media-text/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
