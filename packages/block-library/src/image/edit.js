@@ -365,6 +365,25 @@ export function ImageEdit( {
 		[ id ]
 	);
 
+	/*
+	 * Determinate progress for long-running client-side processing of this
+	 * attachment (currently GIF-to-video conversion). Undefined when nothing
+	 * is reporting progress, in which case the indeterminate spinner shows.
+	 */
+	const uploadProgress = useSelect(
+		( select ) => {
+			if (
+				( ! window.__clientSideMediaProcessing &&
+					! window.__heicUploadSupport ) ||
+				! id
+			) {
+				return undefined;
+			}
+			return select( uploadStore ).getProgressById( id );
+		},
+		[ id ]
+	);
+
 	const mediaPreview = !! url && (
 		<img
 			alt={ __( 'Edit image' ) }
@@ -475,6 +494,7 @@ export function ImageEdit( {
 				<Image
 					temporaryURL={ temporaryURL }
 					isSideloading={ isSideloading }
+					uploadProgress={ uploadProgress }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					isSingleSelected={ isSingleSelected }

@@ -5,6 +5,7 @@ import {
 	ExternalLink,
 	FocalPointPicker,
 	ResizableBox,
+	ProgressBar,
 	Spinner,
 	TextareaControl,
 	TextControl,
@@ -271,6 +272,7 @@ function ContentOnlyControls( {
 export default function Image( {
 	temporaryURL,
 	isSideloading,
+	uploadProgress,
 	attributes,
 	setAttributes,
 	isSingleSelected,
@@ -1222,7 +1224,16 @@ export default function Image( {
 							...shadowProps.style,
 						} }
 					/>
-					{ isUploading && <Spinner /> }
+					{ isUploading &&
+						( uploadProgress !== undefined &&
+						uploadProgress < 100 ? (
+							<ProgressBar
+								className="wp-block-image__progress-bar"
+								value={ uploadProgress }
+							/>
+						) : (
+							<Spinner />
+						) ) }
 				</>
 			) }
 		</ImageWrapper>

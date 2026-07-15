@@ -43,6 +43,15 @@ figure.wp-block-image:not(.wp-block) {
 		transform: translate(-50%, -50%);
 		margin: 0;
 	}
+
+	// Shown instead of the spinner while a long-running client-side
+	// operation (e.g. GIF-to-video conversion) reports determinate progress.
+	.wp-block-image__progress-bar {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
 }
 
 // Shown while image is being uploaded but cannot be previewed.
