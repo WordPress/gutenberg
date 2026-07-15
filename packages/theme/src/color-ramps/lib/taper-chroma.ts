@@ -1,6 +1,6 @@
 import {
 	get,
-	toGamut,
+	toGamutCSS,
 	OKLCH,
 	sRGB,
 	type ColorSpace,
@@ -209,7 +209,7 @@ function maxInGamutChromaAtLH(
 	};
 
 	// Let `toGamut` reduce the chroma to the gamut maximum.
-	const clamped = toGamut( probe, { space: gamutSpace, method: 'css' } );
+	const clamped = toGamutCSS( probe, { space: gamutSpace } );
 
 	return get( clamped, [ OKLCH, 'c' ] );
 }
