@@ -26,6 +26,21 @@ describe( 'formatStyleValue', () => {
 		);
 	} );
 
+	it( 'humanizes preset CSS custom property values', () => {
+		expect(
+			formatStyleValue( 'var(--wp--preset--color--vivid-red)' )
+		).toBe( 'Vivid Red' );
+		expect(
+			formatStyleValue( 'var(--wp--preset--font-size--x-large)' )
+		).toBe( 'X Large' );
+	} );
+
+	it( 'humanizes preset CSS custom property values with a fallback', () => {
+		expect(
+			formatStyleValue( 'var(--wp--preset--color--vivid-red, #cf2e2e)' )
+		).toBe( 'Vivid Red' );
+	} );
+
 	it( 'passes plain strings through unchanged', () => {
 		expect( formatStyleValue( 'uppercase' ) ).toBe( 'uppercase' );
 		expect( formatStyleValue( '20px' ) ).toBe( '20px' );

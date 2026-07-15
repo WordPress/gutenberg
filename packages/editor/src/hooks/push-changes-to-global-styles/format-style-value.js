@@ -6,8 +6,28 @@ import { capitalCase } from 'change-case';
 // Em dash shown when a value isn't set.
 export const EMPTY_VALUE_LABEL = '\u2014';
 
-// Matches a preset value, e.g. `var:preset|color|vivid-red`.
-const PRESET_TOKEN_REGEX = /^var:preset\|([^|]+)\|(.+)$/;
+// Preset values come in two forms: the user form `var:preset|color|vivid-red`
+// and the CSS custom property form `var(--wp--preset--color--vivid-red)`. In
+// both the slug (e.g. `vivid-red`) is the last segment.
+const PRESET_USER_PREFIX = 'var:preset|';
+const PRESET_CSS_VAR_REGEX =
+	/^var\(\s*--wp--preset--[a-z0-9-]+?\s*(?:,[^)]*)?\)$/i;
+
+// Returns a preset's slug from either form, or `undefined` when the value isn't
+// a preset.
+function getPresetSlug( value ) {
+	if ( value.startsWith( PRESET_USER_PREFIX ) ) {
+		return value.split( '|' ).pop();
+	}
+	if ( PRESET_CSS_VAR_REGEX.test( value ) ) {
+		return value
+			.replace( /^var\(\s*/, '' )
+			.replace( /\s*(?:,[^)]*)?\)$/, '' )
+			.split( '--' )
+			.pop();
+	}
+	return undefined;
+}
 
 // True when a value is actually set.
 const isSet = ( value ) =>
@@ -50,7 +70,8 @@ function flattenBorder( border ) {
  * Turns a raw style value into readable text for the modal.
  *
  * - Empty, `null` or `undefined`: an em dash.
- * - Preset values (`var:preset|type|slug`): the readable slug.
+ * - Preset values (`var:preset|type|slug` or `var(--wp--preset--type--slug)`):
+ *   the readable slug.
  * - Strings and numbers: used as-is.
  * - Objects and arrays (like a border side): turned into text, or an em dash
  *   when there's nothing to show.
@@ -65,9 +86,9 @@ export function formatStyleValue( value ) {
 	}
 
 	if ( typeof value === 'string' ) {
-		const presetMatch = value.match( PRESET_TOKEN_REGEX );
-		if ( presetMatch ) {
-			return capitalCase( presetMatch[ 2 ] );
+		const presetSlug = getPresetSlug( value );
+		if ( presetSlug ) {
+			return capitalCase( presetSlug );
 		}
 		return value;
 	}
