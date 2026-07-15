@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactElement, ComponentType } from 'react';
+import type { ComponentType, ReactElement, ReactNode } from 'react';
 
 /**
  * Utility type that makes all properties of T optional recursively.
@@ -19,6 +19,12 @@ export type SortDirection = 'asc' | 'desc';
 export interface Option< Value extends any = any > {
 	value: Value;
 	label: string;
+	/**
+	 * Optional React node to render in place of `label` for contexts that
+	 * accept a node (e.g. the DataViews filter summary). When set, consumers
+	 * should prefer this over `label` for display.
+	 */
+	labelElement?: ReactNode;
 	description?: string;
 }
 
