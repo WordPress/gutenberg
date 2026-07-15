@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Honor the `image_strip_meta` and `image_max_bit_depth` filters for client-side processed images via the new `imageStripMeta` and `imageMaxBitDepth` settings, carried in the REST API root index ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
+
+## 0.36.0 (2026-07-14)
+
 ### Enhancement
 
 - Honor the `wp_editor_set_quality` filter for client-side processed images. Sub-size resizing and transcoding now use the size-aware quality reported by the new `image_quality` field on the attachment upload response, instead of a hardcoded default.
@@ -23,6 +29,7 @@
 ### Bug Fix
 
 -   `uploadItem` no longer dispatches `finishOperation` twice when both `onFileChange` and `onSuccess` fire for the same attachment ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+-   Apply EXIF orientation to AVIF/HEIF sub-sizes when the orientation is stored in an EXIF tag rather than a native `irot` transform, which neither the server nor libvips auto-rotates ([#79384](https://github.com/WordPress/gutenberg/pull/79384)).
 
 ## 0.33.1 (2026-06-16)
 

@@ -47,6 +47,12 @@ export type MasonryTilePlacement = Omit< DashboardLanesLayoutItem, 'key' >;
 export type DashboardTilePlacement = GridTilePlacement | MasonryTilePlacement;
 
 /**
+ * Attribute bag of a widget instance, as edited by the dashboard's
+ * attribute surfaces.
+ */
+export type WidgetAttributes = Record< string, unknown >;
+
+/**
  * A widget placed on the dashboard.
  *
  * A `WidgetType` describes the blueprint. A `DashboardWidget` is a

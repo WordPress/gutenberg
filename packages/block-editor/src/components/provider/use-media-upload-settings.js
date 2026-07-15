@@ -22,6 +22,8 @@ function useMediaUploadSettings( settings = {} ) {
 			allImageSizes: settings.allImageSizes,
 			bigImageSizeThreshold: settings.bigImageSizeThreshold,
 			gifConvert: settings.gifConvert,
+			imageStripMeta: settings.imageStripMeta,
+			imageMaxBitDepth: settings.imageMaxBitDepth,
 		} ),
 		[ settings ]
 	);

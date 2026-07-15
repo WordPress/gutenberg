@@ -11,8 +11,10 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  */
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { useSettings } from '../use-settings';
 
 export default function BlockVisibilityViewportMenuItem( { clientIds } ) {
+	const [ blockVisibility ] = useSettings( 'blockVisibility.allowEditing' );
 	const { areBlocksHiddenAnywhere, shortcut } = useSelect(
 		( select ) => {
 			const { isBlockHiddenAnywhere } = unlock(
@@ -31,7 +33,14 @@ export default function BlockVisibilityViewportMenuItem( { clientIds } ) {
 		},
 		[ clientIds ]
 	);
-	const { showViewportModal } = unlock( useDispatch( blockEditorStore ) );
+	const dispatch = useDispatch( blockEditorStore );
+
+	if ( blockVisibility === false ) {
+		return null;
+	}
+
+	const { showViewportModal } = unlock( dispatch );
+
 	return (
 		<MenuItem
 			onClick={ () => showViewportModal( clientIds ) }

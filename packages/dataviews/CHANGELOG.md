@@ -2,16 +2,36 @@
 
 ## Unreleased
 
+### Enhancements
+
+- DataViews: Add Shift+Click range selection through a shared `useSelectionProps` hook that layouts can adopt, wired up in the table and grid layouts.[#80046](https://github.com/WordPress/gutenberg/pull/80046)
+
+### Bug Fix
+
+- DataViews: Fix the `list` layout ignoring the density setting, the refreshing state, and the loading state when `groupBy` is set. [#80255](https://github.com/WordPress/gutenberg/pull/80255)
+- Fix Dataviews popover hover text color readability issue on WordPress 7.0. [#80105](https://github.com/WordPress/gutenberg/pull/80105)
+- DataViews: Fix the unintended gap between `list` layout items when `groupBy` is set. [#80254](https://github.com/WordPress/gutenberg/pull/80254)
+
+## 17.2.0 (2026-07-14)
+
+### New Features
+
+- DataForms: Add a `richtext` control, selectable via `Edit: 'richtext'` (or an `EditConfig` with `control: 'richtext'`). The control assembles `@wordpress/rich-text` into the presentational `ContentEditableControl` shell from `@wordpress/components`. [#78471](https://github.com/WordPress/gutenberg/pull/78471) [#79345](https://github.com/WordPress/gutenberg/pull/79345)
+
 ### Bug Fix
 
 - DataViews: Stop the infinite-scroll list from jumping while pages load asynchronously. The scroll-anchor restoration no longer discards scrolling the user did during the load, and the footer's visibility no longer depends on the loading state, so it no longer mounts mid-load (resizing the scroll container). [#79546](https://github.com/WordPress/gutenberg/pull/79546)
+- Fix Dataviews popover hover text color readability issue on WordPress 7.0. [#80105](https://github.com/WordPress/gutenberg/pull/80105)
 
 ### Internal
 
+-   Expose the `richtext` control's `RichTextControl` assembly as a private API so other core packages can render a standalone rich text form field without a DataForm ([#78242](https://github.com/WordPress/gutenberg/pull/78242)).
+-   Add an optional `completers` prop to the private `RichTextControl` assembly, wiring `@wordpress/components`' autocomplete to the field (e.g. for `@` mentions) ([#79604](https://github.com/WordPress/gutenberg/pull/79604)).
 -   Update `@ariakit/react` to `0.4.32` ([#79860](https://github.com/WordPress/gutenberg/pull/79860)).
 
 ### Enhancements
 
+-   Update emphasized labels and controls from the legacy medium weight to the emphasis font-weight token ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
 - `ValidatedDateControl`: Update validation error message to be announced by screen readers using `speak` instead of an inline `aria-live` region ([#79600](https://github.com/WordPress/gutenberg/pull/79600))
