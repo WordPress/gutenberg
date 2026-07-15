@@ -94,7 +94,7 @@ class Tests_Blocks_Render_Table_Of_Contents extends WP_UnitTestCase {
 			)
 		);
 
-		$nav = $this->get_table_of_contents_html( $this->render_post_content( $post_id ) );
+		$nav = $this->get_table_of_contents_html( $this->render_table_of_contents_for_post( $post_id ) );
 
 		$this->assertStringContainsString( 'Published template part', $nav );
 		$this->assertStringNotContainsString( 'Draft template part', $nav );
@@ -519,6 +519,16 @@ class Tests_Blocks_Render_Table_Of_Contents extends WP_UnitTestCase {
 		$page = $page_number;
 
 		return apply_filters( 'the_content', $GLOBALS['post']->post_content );
+	}
+
+	private function render_table_of_contents_for_post( $post_id ) {
+		$this->go_to( add_query_arg( 'p', $post_id, home_url( '/' ) ) );
+		$GLOBALS['post'] = get_post( $post_id );
+		setup_postdata( $GLOBALS['post'] );
+
+		$GLOBALS['_wp_current_template_content'] = '<!-- wp:post-content /-->';
+
+		return do_blocks( $this->table_of_contents_block() );
 	}
 
 	private function get_table_of_contents_html( $content ) {
