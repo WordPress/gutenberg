@@ -1,9 +1,9 @@
-import { Modal, Popover, Button } from '@wordpress/components';
+import { Modal, Popover as WCPopover, Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import {
 	Autocomplete,
 	Combobox,
-	Popover as UiPopover,
+	Popover,
 	Select,
 	SelectControl,
 	Tooltip,
@@ -31,14 +31,10 @@ const inputWrapperStyle = {
 function UiPopoverFixture() {
 	return (
 		<div style={ { marginTop: '1rem' } }>
-			<UiPopover.Root>
-				<UiPopover.Trigger>
-					Open `@wordpress/ui` Popover
-				</UiPopover.Trigger>
-				<UiPopover.Popup>
-					<UiPopover.Title>
-						Popover from `@wordpress/ui`
-					</UiPopover.Title>
+			<Popover.Root>
+				<Popover.Trigger>Open `@wordpress/ui` Popover</Popover.Trigger>
+				<Popover.Popup>
+					<Popover.Title>Popover from `@wordpress/ui`</Popover.Title>
 					<p>
 						The popover and its nested autocomplete should appear
 						above the host overlay.
@@ -68,8 +64,8 @@ function UiPopoverFixture() {
 							</Autocomplete.List>
 						</Autocomplete.Popup>
 					</Autocomplete.Root>
-				</UiPopover.Popup>
-			</UiPopover.Root>
+				</Popover.Popup>
+			</Popover.Root>
 		</div>
 	);
 }
@@ -224,7 +220,7 @@ export const InsideComponentsPopover = {
 					Toggle `@wordpress/components` Popover
 				</Button>
 				{ isOpen && anchor && (
-					<Popover
+					<WCPopover
 						anchor={ anchor }
 						onClose={ () => setIsOpen( false ) }
 					>
@@ -327,7 +323,7 @@ export const InsideComponentsPopover = {
 								</Autocomplete.Root>
 							</div>
 						</div>
-					</Popover>
+					</WCPopover>
 				) }
 			</>
 		);
