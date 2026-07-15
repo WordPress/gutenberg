@@ -15,10 +15,7 @@ import { fontSizeStyles } from '../../input-control/styles/input-control-styles'
 import InputBase from '../../input-control/input-base';
 
 interface SelectProps
-	extends Pick<
-		SelectControlProps,
-		'__next40pxDefaultSize' | 'disabled' | 'multiple' | 'variant'
-	> {
+	extends Pick< SelectControlProps, 'disabled' | 'multiple' | 'variant' > {
 	// Using `selectSize` instead of `size` to avoid a type conflict with the
 	// `size` HTML attribute of the `select` element.
 	selectSize?: SelectControlProps[ 'size' ];
@@ -53,11 +50,7 @@ export const StyledInputBase = styled( InputBase )`
 	${ inputBaseVariantStyles }
 `;
 
-const sizeStyles = ( {
-	__next40pxDefaultSize,
-	multiple,
-	selectSize = 'default',
-}: SelectProps ) => {
+const sizeStyles = ( { multiple, selectSize = 'default' }: SelectProps ) => {
 	if ( multiple ) {
 		// When `multiple`, just use the native browser styles
 		// without setting explicit height.
@@ -83,17 +76,7 @@ const sizeStyles = ( {
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
-		'__unstable-large': {
-			height: 40,
-			minHeight: 40,
-			paddingTop: 0,
-			paddingBottom: 0,
-		},
 	};
-
-	if ( ! __next40pxDefaultSize ) {
-		sizes.default = sizes.compact;
-	}
 
 	const style = sizes[ selectSize ] || sizes.default;
 
@@ -102,21 +85,12 @@ const sizeStyles = ( {
 
 export const chevronIconSize = 18;
 
-const sizePaddings = ( {
-	__next40pxDefaultSize,
-	multiple,
-	selectSize = 'default',
-}: SelectProps ) => {
+const sizePaddings = ( { multiple, selectSize = 'default' }: SelectProps ) => {
 	const padding = {
 		default: CONFIG.controlPaddingX,
 		small: CONFIG.controlPaddingXSmall,
 		compact: CONFIG.controlPaddingXSmall,
-		'__unstable-large': CONFIG.controlPaddingX,
 	};
-
-	if ( ! __next40pxDefaultSize ) {
-		padding.default = padding.compact;
-	}
 
 	const selectedPadding = padding[ selectSize ] || padding.default;
 

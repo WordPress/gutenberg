@@ -13,7 +13,11 @@ import {
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
 } from './config';
-import { logPerformanceTiming, passThru } from './performance';
+import {
+	logPerformanceTiming,
+	passThru,
+	yieldToEventLoop,
+} from './performance';
 import { getProviderCreators } from './providers';
 import type {
 	CollectionHandlers,
@@ -501,13 +505,13 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * Get the awareness instance for the given object type and object ID, if supported.
 	 *
 	 * @template {Awareness} State
-	 * @param {ObjectType} objectType Object type.
-	 * @param {ObjectID}   objectId   Object ID.
+	 * @param {ObjectType}    objectType Object type.
+	 * @param {ObjectID|null} objectId   Object ID.
 	 * @return {State | undefined} The awareness instance, or undefined if not supported.
 	 */
 	function getAwareness< State extends Awareness >(
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID | null
 	): State | undefined {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
@@ -677,6 +681,27 @@ export function createSyncManager( debug = false ): SyncManager {
 		}
 	}
 
+	// Deferred variant of `updateCRDTDoc`; keeps work off the typing hot path.
+	const deferUpdateCRDTDoc = yieldToEventLoop( updateCRDTDoc );
+
+	// Apply local changes to the CRDT doc — synchronously when a remote peer is
+	// present so the change lands before a remote update can race it (#78756),
+	// otherwise deferred off the typing hot path (#79964).
+	function updateOrDefer(
+		objectType: ObjectType,
+		objectId: ObjectID | null,
+		changes: Partial< ObjectData >,
+		origin: string,
+		options: SyncManagerUpdateOptions = {}
+	): void {
+		// `getStates()` counts the local client, so > 1 means a remote peer.
+		const hasRemotePeers =
+			( getAwareness( objectType, objectId )?.getStates().size ?? 0 ) > 1;
+
+		const update = hasRemotePeers ? updateCRDTDoc : deferUpdateCRDTDoc;
+		update( objectType, objectId, changes, origin, options );
+	}
+
 	/**
 	 * Update the entity record in the local store with changes from the CRDT
 	 * document.
@@ -723,16 +748,21 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * @param {ObjectType} objectType Object type.
 	 * @param {ObjectID}   objectId   Object ID.
 	 */
-	function createPersistedCRDTDoc(
+	async function createPersistedCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID
-	): string | null {
+	): Promise< string | null > {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
 		if ( ! entityState?.ydoc ) {
 			return null;
 		}
+
+		// Local updates may be deferred via yieldToEventLoop when editing alone.
+		// Await a promise that resolves on the next tick of the event loop so
+		// pending updates are flushed before we serialize the document.
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		return serializeCrdtDoc( entityState.ydoc );
 	}
@@ -755,6 +785,6 @@ export function createSyncManager( debug = false ): SyncManager {
 		},
 		unload: debugWrap( unloadEntity ),
 		unloadAll: debugWrap( unloadAll ),
-		update: debugWrap( updateCRDTDoc ),
+		update: debugWrap( updateOrDefer ),
 	};
 }

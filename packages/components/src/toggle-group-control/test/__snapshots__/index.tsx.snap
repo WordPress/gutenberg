@@ -2,7 +2,7 @@
 
 exports[`ToggleGroupControl controlled should render correctly with icons 1`] = `
 .emotion-0 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
@@ -19,7 +19,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 
 .emotion-4 {
   font-size: 11px;
-  font-weight: 499;
+  font-weight: 600;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
@@ -135,7 +135,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   padding-left: 0;
   padding-right: 0;
   color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
-  font-weight: 499;
+  font-weight: 600;
 }
 
 @media not ( prefers-reduced-motion ) {
@@ -337,7 +337,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 
 exports[`ToggleGroupControl controlled should render correctly with text options 1`] = `
 .emotion-0 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
@@ -354,7 +354,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
 
 .emotion-4 {
   font-size: 11px;
-  font-weight: 499;
+  font-weight: 600;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
@@ -578,7 +578,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
 
 exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] = `
 .emotion-0 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
@@ -595,7 +595,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 
 .emotion-4 {
   font-size: 11px;
-  font-weight: 499;
+  font-weight: 600;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
@@ -711,7 +711,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   padding-left: 0;
   padding-right: 0;
   color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
-  font-weight: 499;
+  font-weight: 600;
 }
 
 @media not ( prefers-reduced-motion ) {
@@ -907,7 +907,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 
 exports[`ToggleGroupControl uncontrolled should render correctly with text options 1`] = `
 .emotion-0 {
-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 }
@@ -924,7 +924,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
 
 .emotion-4 {
   font-size: 11px;
-  font-weight: 499;
+  font-weight: 600;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;

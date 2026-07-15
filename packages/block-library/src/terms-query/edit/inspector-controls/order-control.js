@@ -7,7 +7,6 @@ import { SelectControl } from '@wordpress/components';
 export default function OrderControl( { orderBy, order, onChange, ...props } ) {
 	return (
 		<SelectControl
-			__next40pxDefaultSize
 			options={ [
 				{
 					label: __( 'Name: A → Z' ),
