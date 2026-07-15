@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Returns a recompute token and a debounced callback that bumps it.
@@ -39,9 +39,17 @@ export function useDebouncedRecompute(
  *
  * @return A tuple of [recomputeToken, rerenderOnNextFrame].
  */
-export function useRafRecompute(): [ number, () => () => void ] {
+export function useRequestAnimationFrameRecompute(): [ number, () => void ] {
 	const [ recomputeToken, setRecomputeToken ] = useState( 0 );
 	const rafRef = useRef< number | null >( null );
+
+	useEffect( () => {
+		return () => {
+			if ( rafRef.current !== null ) {
+				cancelAnimationFrame( rafRef.current );
+			}
+		};
+	}, [] );
 
 	const rerenderOnNextFrame = useCallback( () => {
 		if ( rafRef.current !== null ) {
@@ -51,11 +59,6 @@ export function useRafRecompute(): [ number, () => () => void ] {
 			rafRef.current = null;
 			setRecomputeToken( ( t ) => t + 1 );
 		} );
-		return () => {
-			if ( rafRef.current !== null ) {
-				cancelAnimationFrame( rafRef.current );
-			}
-		};
 	}, [] );
 
 	return [ recomputeToken, rerenderOnNextFrame ];

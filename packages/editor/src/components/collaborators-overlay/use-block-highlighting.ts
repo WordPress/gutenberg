@@ -16,7 +16,7 @@ import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { getAvatarUrl } from './get-avatar-url';
 import {
 	useDebouncedRecompute,
-	useRafRecompute,
+	useRequestAnimationFrameRecompute,
 } from './use-debounced-recompute';
 
 const { useActiveCollaborators, useResolvedSelection } =
@@ -55,7 +55,7 @@ export function useBlockHighlighting(
 ): {
 	highlights: BlockHighlightData[];
 	rerenderHighlightsAfterDelay: () => () => void;
-	rerenderHighlightsOnResize: () => () => void;
+	rerenderHighlightsOnResize: () => void;
 } {
 	const highlightedBlockIds = useRef< Set< string > >( new Set() );
 	const userStates: ActiveCollaborator[] = useActiveCollaborators(
@@ -76,7 +76,8 @@ export function useBlockHighlighting(
 		useDebouncedRecompute( delayMs );
 	// Separate token for resize events: fires on the next animation frame so
 	// getBoundingClientRect() reflects the post-resize layout immediately.
-	const [ resizeToken, rerenderHighlightsOnResize ] = useRafRecompute();
+	const [ resizeToken, rerenderHighlightsOnResize ] =
+		useRequestAnimationFrameRecompute();
 
 	// All DOM mutations and position computations live inside useEffect.
 	useEffect( () => {

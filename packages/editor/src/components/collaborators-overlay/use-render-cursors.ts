@@ -14,7 +14,7 @@ import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { computeSelectionVisual } from './compute-selection';
 import {
 	useDebouncedRecompute,
-	useRafRecompute,
+	useRequestAnimationFrameRecompute,
 } from './use-debounced-recompute';
 import type { SelectionRect } from './cursor-dom-utils';
 
@@ -58,7 +58,7 @@ export function useRenderCursors(
 ): {
 	cursors: CursorData[];
 	rerenderCursorsAfterDelay: () => () => void;
-	rerenderCursorsOnResize: () => () => void;
+	rerenderCursorsOnResize: () => void;
 } {
 	const sortedUsers = useActiveCollaborators(
 		postId ?? null,
@@ -84,7 +84,8 @@ export function useRenderCursors(
 		useDebouncedRecompute( delayMs );
 	// Separate token for resize events: fires on the next animation frame so
 	// getBoundingClientRect() reflects the post-resize layout immediately.
-	const [ resizeToken, rerenderCursorsOnResize ] = useRafRecompute();
+	const [ resizeToken, rerenderCursorsOnResize ] =
+		useRequestAnimationFrameRecompute();
 
 	// All DOM position computations live inside useEffect.
 	useEffect( () => {
