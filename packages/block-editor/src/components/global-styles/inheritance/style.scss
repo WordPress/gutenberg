@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 // Inherited Global Styles values — visual treatment for inspector control
 // labels.
 //
@@ -44,13 +46,11 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-
-	// The wrapper wraps only the 14px reset dot (no fixed footprint), so the
-	// dot centers on the control's label/header line and sits a natural
-	// distance from any inline-end toggle. It is out of flow and must never
-	// intercept pointer events meant for an adjacent toggle button; only the
-	// reset button itself is interactive.
 	pointer-events: none;
+
+	// Match the label line height so the shorter (14px) reset dot centers on
+	// the 16px label rather than pinning to its top.
+	height: $grid-unit-20;
 
 	// Controls that render a 24px toggle at the item's inline-end (linked/
 	// unlink, units switch): shift the dot one toggle width plus an 8px gap
