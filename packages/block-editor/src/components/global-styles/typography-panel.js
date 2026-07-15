@@ -257,10 +257,13 @@ export default function TypographyPanel( {
 		// `var:preset|color|dark-text` both resolving to `#000`); comparing
 		// decoded values would conflate them and incorrectly force the link
 		// color to follow the text color even when the user deliberately
-		// chose a different palette slot.
+		// chose a different palette slot. Sync when the link color is unset
+		// (so it starts tracking the text color) or when it currently matches
+		// the text color; only skip when a distinct link color was set.
+		const inheritedLinkColor = inheritedValue?.elements?.link?.color?.text;
 		if (
-			inheritedValue?.color?.text ===
-			inheritedValue?.elements?.link?.color?.text
+			inheritedLinkColor === undefined ||
+			inheritedValue?.color?.text === inheritedLinkColor
 		) {
 			changedObject = setImmutably(
 				changedObject,
