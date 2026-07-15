@@ -32,7 +32,6 @@ function UnconnectedToggleGroupControl(
 		__nextHasNoMarginBottom: _,
 		size: _size,
 		__next40pxDefaultSize: _next40pxDefaultSize,
-		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,
