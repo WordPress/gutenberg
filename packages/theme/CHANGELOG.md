@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Add a Storybook typography showcase that renders the published CSS design tokens directly ([#80212](https://github.com/WordPress/gutenberg/pull/80212)).
+
 ### Code Quality
 
 -   Stop publishing `@wordpress/theme` source paths by moving publish-ready assets outside `src` and enforcing the package boundary ([#80213](https://github.com/WordPress/gutenberg/pull/80213)).

@@ -489,11 +489,3 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 function gutenberg_enqueue_video_conversion_loader() {
 	wp_enqueue_script_module( '@wordpress/video-conversion/loader' );
 }
-
-/**
- * Enqueues the core abilities script module in the admin screens.
- */
-add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_core_abilities' );
-function gutenberg_enqueue_core_abilities() {
-	wp_enqueue_script_module( '@wordpress/core-abilities' );
-}
