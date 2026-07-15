@@ -1135,6 +1135,10 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		// Add '-scaled' suffix for big image threshold resizing.
 		const scaledSuffix = Boolean( args.isThresholdResize );
 
+		// Metadata stripping and bit depth cap from the `image_strip_meta`
+		// and `image_max_bit_depth` filters, carried in the editor settings.
+		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+
 		try {
 			const file = await vipsResizeImage(
 				item.id,
@@ -1144,7 +1148,9 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				addSuffix,
 				item.abortController?.signal,
 				scaledSuffix,
-				args.quality
+				args.quality,
+				imageStripMeta,
+				imageMaxBitDepth
 			);
 
 			measure( {
@@ -1302,13 +1308,19 @@ export function transcodeImageItem(
 		const quality = args.outputQuality ?? DEFAULT_OUTPUT_QUALITY;
 		const interlaced = args.interlaced ?? false;
 
+		// Metadata stripping and bit depth cap from the `image_strip_meta`
+		// and `image_max_bit_depth` filters, carried in the editor settings.
+		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+
 		try {
 			const file = await vipsConvertImageFormat(
 				item.id,
 				item.file,
 				outputMimeType,
 				quality,
-				interlaced
+				interlaced,
+				imageStripMeta,
+				imageMaxBitDepth
 			);
 
 			measure( {

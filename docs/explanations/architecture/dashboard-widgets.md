@@ -70,6 +70,8 @@ Everything after the REST record is the job of [`@wordpress/widget-primitives`](
 
 `useWidgetTypes( records )` takes the host-supplied records, imports each record's `widget_module` for the live metadata, and merges it with the record into `WidgetType[]`. The record's `presentation`, `category`, `title`, `description`, `help`, and `keywords`, all sourced from `widget.json` (with `title`, `description`, `help`, and `keywords` localized server-side), win over the module's value. The hook reaches for no store or endpoint; a host such as the dashboard reads its own `widgetModule` core-data entity (backed by `/wp/v2/widget-modules`) and passes the records in.
 
+A module's `attributes` may also reference field types by name (`type: 'location'`). The application registers those definitions up front through `registerFieldType()` (the dashboard route registers its own on boot), and `useWidgetTypes` resolves every named reference through that registry while building each `WidgetType`: the registered definition supplies the field's behavior on top of its DataViews `baseType`, and hosts receive plain DataViews fields. The widget declaration stays serializable; resolution happens once, at this boundary.
+
 `<WidgetRender>` then resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. On a WordPress page the resolver can be as simple as `( id ) => import( id )`; hosts with other loading strategies supply their own.
 
 For what a widget declares through that contract, layer by layer, see [Anatomy of a widget type](https://github.com/WordPress/gutenberg/blob/HEAD/packages/widget-primitives/src/stories/anatomy.md).
