@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.51.0 (2026-07-14)
+
 ### Enhancements
 
 -   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).

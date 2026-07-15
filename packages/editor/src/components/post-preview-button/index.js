@@ -2,11 +2,12 @@
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
-import { Button, Path, SVG } from '@wordpress/components';
+import { Button, MenuItem, Path, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
+import { external } from '@wordpress/icons';
 import { VisuallyHidden } from '@wordpress/ui';
 
 /**
@@ -166,28 +167,7 @@ async function writeInterstitialIntoPreviewWindow( previewWindow ) {
 	}
 }
 
-/**
- * Renders a button that opens a new window or tab for the preview,
- * writes the interstitial message to this window, and then navigates
- * to the actual preview link. The button is not rendered if the post
- * is not viewable and disabled if the post is not saveable.
- *
- * @param {Object}   props                     The component props.
- * @param {string}   props.className           The class name for the button.
- * @param {string}   props.textContent         The text content for the button.
- * @param {boolean}  props.forceIsAutosaveable Whether to force autosave.
- * @param {string}   props.role                The role attribute for the button.
- * @param {Function} props.onPreview           The callback function for preview event.
- *
- * @return {React.ReactNode} The rendered button component.
- */
-export default function PostPreviewButton( {
-	className,
-	textContent,
-	forceIsAutosaveable,
-	role,
-	onPreview,
-} ) {
+function usePostPreviewProps( { forceIsAutosaveable, onPreview } ) {
 	const { postId, currentPostLink, previewLink, isSaveable, isViewable } =
 		useSelect( ( select ) => {
 			const editor = select( editorStore );
@@ -216,18 +196,18 @@ export default function PostPreviewButton( {
 		return null;
 	}
 
-	const targetId = `wp-preview-${ postId }`;
+	const target = `wp-preview-${ postId }`;
 
-	const openPreviewWindow = async ( event ) => {
-		// Our Preview button has its 'href' and 'target' set correctly for a11y
-		// purposes. Unfortunately, though, we can't rely on the default 'click'
-		// handler since sometimes it incorrectly opens a new tab instead of reusing
-		// the existing one.
+	const handlePreviewClick = async ( event ) => {
+		// Preserve native link semantics with `href` and `target`, but intercept the
+		// click because the final preview URL may depend on an asynchronous save.
+		// Opening the named window synchronously also prevents popup blocking and
+		// ensures subsequent previews reuse the same tab.
 		// https://github.com/WordPress/gutenberg/pull/8330
 		event.preventDefault();
 
 		// Open up a Preview tab if needed. This is where we'll show the preview.
-		const previewWindow = window.open( '', targetId );
+		const previewWindow = window.open( '', target );
 
 		// Focus the Preview tab. This might not do anything, depending on the browser's
 		// and user's preferences.
@@ -248,17 +228,79 @@ export default function PostPreviewButton( {
 	// just link to the post's URL.
 	const href = previewLink || currentPostLink;
 
+	return {
+		href,
+		target,
+		disabled: ! isSaveable,
+		onClick: handlePreviewClick,
+	};
+}
+
+/**
+ * Renders the post preview action as a menu item.
+ *
+ * @param {Object}   props                     The component props.
+ * @param {boolean}  props.forceIsAutosaveable Whether to force autosave.
+ * @param {Function} props.onPreview           The callback function for the preview event.
+ *
+ * @return {React.ReactNode} The rendered menu item.
+ */
+export function PostPreviewMenuItem( { forceIsAutosaveable, onPreview } ) {
+	const previewProps = usePostPreviewProps( {
+		forceIsAutosaveable,
+		onPreview,
+	} );
+
+	if ( ! previewProps ) {
+		return null;
+	}
+
+	return (
+		<MenuItem icon={ external } { ...previewProps }>
+			{ __( 'Preview in new tab' ) }
+		</MenuItem>
+	);
+}
+
+/**
+ * Renders a button that opens a new window or tab for the preview,
+ * writes the interstitial message to this window, and then navigates
+ * to the actual preview link. The button is not rendered if the post
+ * is not viewable and disabled if the post is not saveable.
+ *
+ * @param {Object}   props                     The component props.
+ * @param {string}   props.className           The class name for the button.
+ * @param {string}   props.textContent         The text content for the button.
+ * @param {boolean}  props.forceIsAutosaveable Whether to force autosave.
+ * @param {string}   props.role                The role attribute for the button.
+ * @param {Function} props.onPreview           The callback function for preview event.
+ *
+ * @return {React.ReactNode} The rendered button component.
+ */
+export default function PostPreviewButton( {
+	className,
+	textContent,
+	forceIsAutosaveable,
+	role,
+	onPreview,
+} ) {
+	const previewProps = usePostPreviewProps( {
+		forceIsAutosaveable,
+		onPreview,
+	} );
+
+	if ( ! previewProps ) {
+		return null;
+	}
+
 	return (
 		<Button
 			variant={ ! className ? 'tertiary' : undefined }
 			className={ className || 'editor-post-preview' }
-			href={ href }
-			target={ targetId }
-			accessibleWhenDisabled
-			disabled={ ! isSaveable }
-			onClick={ openPreviewWindow }
 			role={ role }
 			size="compact"
+			accessibleWhenDisabled
+			{ ...previewProps }
 		>
 			{ textContent || (
 				<>
