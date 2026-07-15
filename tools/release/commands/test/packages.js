@@ -215,10 +215,16 @@ describe( 'verifyRemotePackageTags', () => {
 } );
 
 describe( 'runNpmPublishPreflight', () => {
-	it( 'uses the npm access command supported by current npm versions', async () => {
+	// npm whoami output, intentionally padded to verify it is trimmed.
+	const WHOAMI = { stdout: 'wp-user\n' };
+	// Collaborators payload granting the authenticated user publish access.
+	const READ_WRITE = { stdout: '{"wp-user":"read-write"}' };
+
+	it( 'resolves the authenticated user and checks per-package access before registry state', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
+			.mockResolvedValueOnce( READ_WRITE )
 			.mockRejectedValueOnce( {
 				stderr: 'npm ERR! code E404',
 			} );
@@ -237,15 +243,191 @@ describe( 'runNpmPublishPreflight', () => {
 			)
 		).resolves.toEqual( [] );
 
+		expect( commandFn ).toHaveBeenNthCalledWith( 1, 'npm whoami', {
+			cwd: '/repo',
+			stdio: 'pipe',
+		} );
 		expect( commandFn ).toHaveBeenNthCalledWith(
-			1,
-			'npm access list packages @wordpress --json',
+			2,
+			'npm access list collaborators @wordpress/a11y --json',
 			{ cwd: '/repo', stdio: 'pipe' }
 		);
 		expect( commandFn ).toHaveBeenNthCalledWith(
-			2,
+			3,
 			'npm view @wordpress/a11y@4.50.0 version gitHead dist-tags --json',
 			{ cwd: '/repo', stdio: 'pipe' }
+		);
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'checks access for every release package with a single whoami lookup', async () => {
+		const commandFn = jest
+			.fn()
+			.mockResolvedValueOnce( WHOAMI )
+			.mockResolvedValueOnce( READ_WRITE )
+			.mockResolvedValueOnce( READ_WRITE )
+			.mockRejectedValue( { stderr: 'npm ERR! code E404' } );
+
+		await expect(
+			runNpmPublishPreflight(
+				{
+					distTag: 'latest',
+					gitWorkingDirectoryPath: '/repo',
+					publishCommit: 'publish-sha',
+					releasePackages: [
+						{ name: '@wordpress/a11y', version: '4.50.0' },
+						{ name: '@wordpress/blocks', version: '14.20.0' },
+					],
+				},
+				{ commandFn }
+			)
+		).resolves.toEqual( [] );
+
+		expect( commandFn ).toHaveBeenCalledWith( 'npm whoami', {
+			cwd: '/repo',
+			stdio: 'pipe',
+		} );
+		expect( commandFn ).toHaveBeenCalledWith(
+			'npm access list collaborators @wordpress/a11y --json',
+			{ cwd: '/repo', stdio: 'pipe' }
+		);
+		expect( commandFn ).toHaveBeenCalledWith(
+			'npm access list collaborators @wordpress/blocks --json',
+			{ cwd: '/repo', stdio: 'pipe' }
+		);
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'fails when the authenticated user is absent from the collaborators list', async () => {
+		const commandFn = jest
+			.fn()
+			.mockResolvedValueOnce( WHOAMI )
+			.mockResolvedValueOnce( {
+				stdout: '{"someone-else":"read-write"}',
+			} );
+
+		await expect(
+			runNpmPublishPreflight(
+				{
+					distTag: 'latest',
+					gitWorkingDirectoryPath: '/repo',
+					publishCommit: 'publish-sha',
+					releasePackages: [
+						{ name: '@wordpress/a11y', version: '4.50.0' },
+					],
+				},
+				{ commandFn }
+			)
+		).rejects.toThrow(
+			'The "wp-user" user does not have publish access to @wordpress/a11y (current: none).'
+		);
+		// Registry verification must not run once access fails.
+		expect( commandFn ).toHaveBeenCalledTimes( 2 );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'fails when the authenticated user only has read-only access', async () => {
+		const commandFn = jest
+			.fn()
+			.mockResolvedValueOnce( WHOAMI )
+			.mockResolvedValueOnce( {
+				stdout: '{"wp-user":"read-only"}',
+			} );
+
+		await expect(
+			runNpmPublishPreflight(
+				{
+					distTag: 'latest',
+					gitWorkingDirectoryPath: '/repo',
+					publishCommit: 'publish-sha',
+					releasePackages: [
+						{ name: '@wordpress/a11y', version: '4.50.0' },
+					],
+				},
+				{ commandFn }
+			)
+		).rejects.toThrow(
+			'The "wp-user" user does not have publish access to @wordpress/a11y (current: read-only).'
+		);
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'skips the access check for a package that does not exist yet', async () => {
+		const commandFn = jest
+			.fn()
+			.mockResolvedValueOnce( WHOAMI )
+			// Access check: package has never been published.
+			.mockRejectedValueOnce( { stderr: 'npm ERR! code E404' } )
+			// Registry verification: still unpublished.
+			.mockRejectedValueOnce( { stderr: 'npm ERR! code E404' } );
+
+		await expect(
+			runNpmPublishPreflight(
+				{
+					distTag: 'latest',
+					gitWorkingDirectoryPath: '/repo',
+					publishCommit: 'publish-sha',
+					releasePackages: [
+						{ name: '@wordpress/a11y', version: '4.50.0' },
+					],
+				},
+				{ commandFn }
+			)
+		).resolves.toEqual( [] );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'surfaces the failure reason without echoing stdout when the access check fails unexpectedly', async () => {
+		const commandFn = jest
+			.fn()
+			.mockResolvedValueOnce( WHOAMI )
+			.mockRejectedValueOnce( {
+				stderr: '403 Forbidden - you do not have permission',
+				// For a private package, stdout could carry the collaborator list.
+				stdout: '{"secret-collaborator":"read-write"}',
+			} );
+
+		const promise = runNpmPublishPreflight(
+			{
+				distTag: 'latest',
+				gitWorkingDirectoryPath: '/repo',
+				publishCommit: 'publish-sha',
+				releasePackages: [
+					{ name: '@wordpress/a11y', version: '4.50.0' },
+				],
+			},
+			{ commandFn }
+		);
+
+		// The stderr reason is surfaced to aid debugging.
+		await expect( promise ).rejects.toThrow(
+			'Unable to verify publish access for @wordpress/a11y: 403 Forbidden - you do not have permission'
+		);
+		// Captured stdout (a potential private collaborator list) must not leak.
+		await expect( promise ).rejects.not.toThrow( 'secret-collaborator' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'throws when the collaborators output cannot be parsed', async () => {
+		const commandFn = jest
+			.fn()
+			.mockResolvedValueOnce( WHOAMI )
+			.mockResolvedValueOnce( { stdout: 'not-json' } );
+
+		await expect(
+			runNpmPublishPreflight(
+				{
+					distTag: 'latest',
+					gitWorkingDirectoryPath: '/repo',
+					publishCommit: 'publish-sha',
+					releasePackages: [
+						{ name: '@wordpress/a11y', version: '4.50.0' },
+					],
+				},
+				{ commandFn }
+			)
+		).rejects.toThrow(
+			'Unable to parse npm registry @wordpress/a11y collaborators: not-json'
 		);
 		expect( console ).toHaveLogged();
 	} );
@@ -253,7 +435,8 @@ describe( 'runNpmPublishPreflight', () => {
 	it( 'accepts a published version from the prepared commit with the expected dist-tag', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
+			.mockResolvedValueOnce( READ_WRITE )
 			.mockResolvedValueOnce( {
 				stdout: '{"version":"4.50.0","gitHead":"publish-sha","dist-tags":{"latest":"4.50.0"}}',
 			} );
@@ -271,14 +454,15 @@ describe( 'runNpmPublishPreflight', () => {
 				{ commandFn }
 			)
 		).resolves.toEqual( [ '@wordpress/a11y' ] );
-		expect( commandFn ).toHaveBeenCalledTimes( 2 );
+		expect( commandFn ).toHaveBeenCalledTimes( 3 );
 		expect( console ).toHaveLogged();
 	} );
 
 	it( 'fails when a published version came from another commit', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
+			.mockResolvedValueOnce( READ_WRITE )
 			.mockResolvedValueOnce( {
 				stdout: '{"version":"4.50.0","gitHead":"other-sha","dist-tags":{"latest":"4.50.0"}}',
 			} );
@@ -304,7 +488,8 @@ describe( 'runNpmPublishPreflight', () => {
 	it( 'fails with an actionable error when a published version has no gitHead', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
+			.mockResolvedValueOnce( READ_WRITE )
 			.mockResolvedValueOnce( {
 				stdout: '{"version":"4.50.0","dist-tags":{"latest":"4.50.0"}}',
 			} );
@@ -330,7 +515,8 @@ describe( 'runNpmPublishPreflight', () => {
 	it( 'fails when a published version has the wrong dist-tag', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
+			.mockResolvedValueOnce( READ_WRITE )
 			.mockResolvedValueOnce( {
 				stdout: '{"version":"4.50.0","gitHead":"publish-sha","dist-tags":{"latest":"4.49.0"}}',
 			} );
@@ -356,7 +542,8 @@ describe( 'runNpmPublishPreflight', () => {
 	it( 'fails when the registry returns a different version', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
+			.mockResolvedValueOnce( READ_WRITE )
 			.mockResolvedValueOnce( {
 				stdout: '{"version":"4.49.0","gitHead":"publish-sha","dist-tags":{"latest":"4.49.0"}}',
 			} );
