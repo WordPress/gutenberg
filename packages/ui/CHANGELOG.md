@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Remove unused CSS property from `Tabs` stylesheet ([#80269](https://github.com/WordPress/gutenberg/pull/80269)).
+
 ## 0.18.0 (2026-07-14)
 
 ### Breaking Changes

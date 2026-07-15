@@ -6,6 +6,8 @@ import { addFallbackToVar } from '../postcss-plugins/ds-token-fallbacks.mjs';
  * Replaces bare `var(--wpds-*)` references in string literals with
  * `var(--wpds-*, <fallback>)` so components render correctly without
  * a ThemeProvider.
+ *
+ * @type {() => import('vite').Plugin}
  */
 const plugin = () => ( {
 	name: 'ds-token-fallbacks-js',
