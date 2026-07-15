@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Stop publishing `@wordpress/theme` source paths by moving publish-ready assets outside `src` and enforcing the package boundary ([#80213](https://github.com/WordPress/gutenberg/pull/80213)).
+
+## 1.0.0 (2026-07-14)
+
 ### Stable Release
 
 This package is now considered stable and production-ready. The API will follow semantic versioning from this point forward.

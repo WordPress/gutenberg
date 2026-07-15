@@ -76,12 +76,6 @@ const sizeStyles = ( { multiple, selectSize = 'default' }: SelectProps ) => {
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
-		'__unstable-large': {
-			height: 40,
-			minHeight: 40,
-			paddingTop: 0,
-			paddingBottom: 0,
-		},
 	};
 
 	const style = sizes[ selectSize ] || sizes.default;
@@ -96,7 +90,6 @@ const sizePaddings = ( { multiple, selectSize = 'default' }: SelectProps ) => {
 		default: CONFIG.controlPaddingX,
 		small: CONFIG.controlPaddingXSmall,
 		compact: CONFIG.controlPaddingXSmall,
-		'__unstable-large': CONFIG.controlPaddingX,
 	};
 
 	const selectedPadding = padding[ selectSize ] || padding.default;

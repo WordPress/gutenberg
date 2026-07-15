@@ -16,7 +16,6 @@ import {
 	useInnerBlocksProps,
 	BlockControls,
 	InspectorControls,
-	InnerBlocks,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
@@ -32,6 +31,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __, _x } from '@wordpress/i18n';
 import { playlist as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
+import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -43,8 +43,11 @@ import { PlaylistContext } from './context';
 import { getTrackAttributes } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+const AUDIO_FILE_EXTENSION =
+	/\.(aac|aif|aiff|flac|m4a|m4b|mp3|oga|ogg|opus|wav|weba)$/i;
 const DEFAULT_WAVEFORM_STYLE = 'bars';
 const DEFAULT_PLAY_ANIMATION = 'scale';
+const FILE_LIST_OBJECT_NAME = '[object FileList]';
 const WAVEFORM_STYLE_OPTIONS = [
 	{ label: _x( 'Bars', 'waveform style option' ), value: 'bars' },
 	{ label: _x( 'Mirror', 'waveform style option' ), value: 'mirror' },
@@ -59,6 +62,23 @@ const PLAY_ANIMATION_OPTIONS = [
 	{ label: _x( 'Scale', 'play animation option' ), value: 'scale' },
 	{ label: _x( 'Spin', 'play animation option' ), value: 'spin' },
 ];
+
+function isFile( value ) {
+	return (
+		Object.prototype.toString.call( value ) === '[object File]' ||
+		( typeof File !== 'undefined' && value instanceof File )
+	);
+}
+
+function isAudioFile( file ) {
+	return file.type
+		? file.type.startsWith( 'audio/' )
+		: AUDIO_FILE_EXTENSION.test( file.name );
+}
+
+function getTrackIdentifier( track ) {
+	return track.id ?? track.src ?? track.blob;
+}
 
 const PlaylistEdit = ( {
 	attributes,
@@ -85,7 +105,7 @@ const PlaylistEdit = ( {
 
 	const blockProps = useBlockProps();
 	const waveformPanelId = `${ clientId }-waveform`;
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks, selectBlock } = useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
@@ -111,9 +131,12 @@ const PlaylistEdit = ( {
 	const waveformBackgroundGradientValue = waveformBackgroundGradient;
 	let waveformColorGradientChange;
 	let waveformBackgroundColorGradientChange;
-	function onUploadError( message ) {
-		createErrorNotice( message, { type: 'snackbar' } );
-	}
+	const onUploadError = useCallback(
+		( message ) => {
+			createErrorNotice( message, { type: 'snackbar' } );
+		},
+		[ createErrorNotice ]
+	);
 	const [ currentTrackClientId, setCurrentTrackClientId ] = useState( null );
 
 	const { innerBlockTracks } = useSelect(
@@ -160,31 +183,112 @@ const PlaylistEdit = ( {
 		}
 	}, [ currentTrackClientId, setCurrentTrackClientId, validTracks ] );
 
-	const playlistContext = useMemo(
-		() => ( { currentTrackClientId, setCurrentTrackClientId } ),
-		[ currentTrackClientId, setCurrentTrackClientId ]
+	const createTrackBlocks = useCallback(
+		( media ) => {
+			if ( ! media ) {
+				return [];
+			}
+
+			let mediaItems = [ media ];
+			if (
+				Object.prototype.toString.call( media ) ===
+				FILE_LIST_OBJECT_NAME
+			) {
+				mediaItems = Array.from( media );
+			} else if ( Array.isArray( media ) ) {
+				mediaItems = media;
+			}
+			let hasInvalidFile = false;
+
+			const blocks = mediaItems
+				.map( ( mediaItem ) => {
+					if ( isFile( mediaItem ) ) {
+						if ( ! isAudioFile( mediaItem ) ) {
+							hasInvalidFile = true;
+							return null;
+						}
+
+						return createBlock( 'core/playlist-track', {
+							blob: createBlobURL( mediaItem ),
+							title: mediaItem.name,
+						} );
+					}
+
+					const track = getTrackAttributes( mediaItem );
+
+					return track.src
+						? createBlock( 'core/playlist-track', track )
+						: null;
+				} )
+				.filter( Boolean );
+
+			if ( hasInvalidFile ) {
+				onUploadError(
+					__( 'Only audio files can be added to a playlist.' )
+				);
+			}
+
+			return blocks;
+		},
+		[ onUploadError ]
 	);
 
 	const onSelectTracks = useCallback(
 		( media ) => {
-			if ( ! media ) {
+			const newBlocks = createTrackBlocks( media );
+			if ( newBlocks.length === 0 ) {
 				return;
 			}
 
-			if ( ! Array.isArray( media ) ) {
-				media = [ media ];
-			}
-
-			const trackList = media.map( getTrackAttributes );
-
-			const newBlocks = trackList.map( ( track ) =>
-				createBlock( 'core/playlist-track', track )
-			);
 			setCurrentTrackClientId( newBlocks[ 0 ]?.clientId ?? null );
 			// Replace the inner blocks with the new tracks.
 			replaceInnerBlocks( clientId, newBlocks );
 		},
-		[ replaceInnerBlocks, clientId, setCurrentTrackClientId ]
+		[
+			clientId,
+			createTrackBlocks,
+			replaceInnerBlocks,
+			setCurrentTrackClientId,
+		]
+	);
+
+	const onAddTracks = useCallback(
+		( media ) => {
+			const existingIds = new Set(
+				validTracks
+					.map( ( block ) => getTrackIdentifier( block.attributes ) )
+					.filter( Boolean )
+			);
+			const newBlocks = createTrackBlocks( media ).filter(
+				( block ) =>
+					! existingIds.has( getTrackIdentifier( block.attributes ) )
+			);
+			if ( newBlocks.length === 0 ) {
+				return;
+			}
+
+			const nextBlocks = [ ...validTracks, ...newBlocks ];
+			setCurrentTrackClientId( newBlocks[ 0 ].clientId );
+			replaceInnerBlocks( clientId, nextBlocks );
+			selectBlock( newBlocks[ 0 ].clientId );
+		},
+		[
+			clientId,
+			createTrackBlocks,
+			replaceInnerBlocks,
+			selectBlock,
+			setCurrentTrackClientId,
+			validTracks,
+		]
+	);
+
+	const playlistContext = useMemo(
+		() => ( {
+			currentTrackClientId,
+			setCurrentTrackClientId,
+			addTracks: onAddTracks,
+		} ),
+		[ currentTrackClientId, onAddTracks, setCurrentTrackClientId ]
 	);
 
 	// Get current track data by finding the track with matching client ID.
@@ -325,14 +429,6 @@ const PlaylistEdit = ( {
 		} );
 	}
 
-	const hasSelectedChild = useSelect(
-		( select ) =>
-			select( blockEditorStore ).hasSelectedInnerBlock( clientId ),
-		[ clientId ]
-	);
-
-	const hasAnySelected = isSelected || hasSelectedChild;
-
 	const colorSettings = [];
 	if ( hasColors || hasGradients ) {
 		colorSettings.push(
@@ -377,7 +473,7 @@ const PlaylistEdit = ( {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		__experimentalAppenderTagName: 'li',
-		renderAppender: hasAnySelected && InnerBlocks.ButtonBlockAppender,
+		renderAppender: false,
 	} );
 
 	if ( tracks.length === 0 ) {
@@ -397,6 +493,7 @@ const PlaylistEdit = ( {
 					onSelect={ onSelectTracks }
 					accept="audio/*"
 					multiple
+					handleUpload={ false }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
 				/>
@@ -408,13 +505,11 @@ const PlaylistEdit = ( {
 		<>
 			<BlockControls group="other">
 				<MediaReplaceFlow
-					name={ __( 'Edit' ) }
-					onSelect={ onSelectTracks }
+					name={ __( 'Add' ) }
+					onSelect={ onAddTracks }
 					accept="audio/*"
 					multiple
-					mediaIds={ tracks
-						.filter( ( track ) => track.id )
-						.map( ( track ) => track.id ) }
+					handleUpload={ false }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
 				/>
@@ -624,6 +719,15 @@ const PlaylistEdit = ( {
 				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
+				<MediaPlaceholder
+					onSelect={ onAddTracks }
+					accept="audio/*"
+					multiple
+					handleUpload={ false }
+					disableMediaButtons
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					onError={ onUploadError }
+				/>
 				<Disabled isDisabled={ ! isSelected }>
 					<WaveformPlayer
 						src={ currentTrackData?.src }
@@ -641,20 +745,20 @@ const PlaylistEdit = ( {
 						playAnimation={ playAnimation }
 					/>
 				</Disabled>
-				{ showTracklist && (
-					<ol
-						className={ clsx( 'wp-block-playlist__tracklist', {
-							'wp-block-playlist__tracklist-show-numbers':
-								showNumbers,
-							'wp-block-playlist__tracklist-length-is-hidden':
-								! showTrackLength,
-						} ) }
-					>
-						<PlaylistContext.Provider value={ playlistContext }>
-							{ innerBlocksProps.children }
-						</PlaylistContext.Provider>
-					</ol>
-				) }
+				<ol
+					className={ clsx( 'wp-block-playlist__tracklist', {
+						'wp-block-playlist__tracklist-is-hidden':
+							! showTracklist,
+						'wp-block-playlist__tracklist-show-numbers':
+							showNumbers,
+						'wp-block-playlist__tracklist-length-is-hidden':
+							! showTrackLength,
+					} ) }
+				>
+					<PlaylistContext.Provider value={ playlistContext }>
+						{ innerBlocksProps.children }
+					</PlaylistContext.Provider>
+				</ol>
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }
