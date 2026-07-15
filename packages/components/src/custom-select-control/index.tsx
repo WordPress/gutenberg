@@ -177,7 +177,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 			<CustomSelect
 				aria-describedby={ descriptionId }
 				renderSelectedValue={ renderSelectedValue }
-				size={ size === '__unstable-large' ? 'default' : size }
+				size={ size }
 				store={ store }
 				className={ clsx(
 					// Keeping the classname for legacy reasons

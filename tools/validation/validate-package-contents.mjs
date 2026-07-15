@@ -4,13 +4,31 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { parseArgs } from 'node:util';
 
-const [ packagePath, ...extraArgs ] = process.argv.slice( 2 );
+const usage =
+	'Usage: node tools/validation/validate-package-contents.mjs <package-directory> [--disallow-path <path>]';
+let packagePath;
+let configuredDisallowedPath;
 
-if ( ! packagePath || extraArgs.length ) {
-	console.error(
-		'Usage: node tools/validation/validate-package-contents.mjs <package-directory>'
-	);
+try {
+	const { positionals, values } = parseArgs( {
+		args: process.argv.slice( 2 ),
+		allowPositionals: true,
+		options: {
+			'disallow-path': { type: 'string' },
+		},
+		strict: true,
+	} );
+
+	if ( positionals.length !== 1 || values[ 'disallow-path' ] === '' ) {
+		throw new Error();
+	}
+
+	[ packagePath ] = positionals;
+	configuredDisallowedPath = values[ 'disallow-path' ];
+} catch {
+	console.error( usage );
 	process.exit( 1 );
 }
 
@@ -58,8 +76,12 @@ const disallowedPathPatterns = [
 	/(^|\/)[^/]+\.(spec|test)\.[^/]+$/,
 	/(^|\/)[^/]+\.stor(?:y|ies)\.[^/]+$/,
 ];
-const disallowedPaths = packedPaths.filter( ( path ) =>
-	disallowedPathPatterns.some( ( pattern ) => pattern.test( path ) )
+const disallowedPaths = packedPaths.filter(
+	( path ) =>
+		disallowedPathPatterns.some( ( pattern ) => pattern.test( path ) ) ||
+		( configuredDisallowedPath &&
+			( path === configuredDisallowedPath ||
+				path.startsWith( `${ configuredDisallowedPath }/` ) ) )
 );
 
 /**

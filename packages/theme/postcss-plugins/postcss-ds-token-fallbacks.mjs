@@ -1,5 +1,6 @@
 import { addFallbackToVar } from './ds-token-fallbacks.mjs';
 
+/** @type {import('postcss').PluginCreator<never>} */
 const plugin = () => ( {
 	postcssPlugin: 'postcss-ds-token-fallbacks',
 	/** @param {import('postcss').Declaration} decl */
