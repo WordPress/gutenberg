@@ -223,6 +223,10 @@
 			margin-inline-end: calc(-1 * var(--wpds-dimension-gap-sm));
 		}
 
+		.submenu-chevron:dir(rtl) {
+			transform: rotateZ(180deg);
+		}
+
 		.external-link-indicator {
 			display: inline-block;
 			line-height: 1;
