@@ -832,4 +832,105 @@ test.describe( 'Client-side media processing', () => {
 
 		await page.unroute( '**/wp/v2/media**' );
 	} );
+
+	test( 'recovers when the image processing worker crashes mid-upload', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		/*
+		 * Capture workers created from this point on. The vips worker is
+		 * created lazily (from a Blob URL) when the first image operation
+		 * starts, so wrapping the constructor before uploading reliably
+		 * captures it.
+		 */
+		await page.evaluate( () => {
+			window.__capturedBlobWorkers = [];
+			const OriginalWorker = window.Worker;
+			window.Worker = class extends OriginalWorker {
+				constructor( scriptURL, options ) {
+					super( scriptURL, options );
+					if ( String( scriptURL ).startsWith( 'blob:' ) ) {
+						window.__capturedBlobWorkers.push( this );
+					}
+				}
+			};
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		// A large image keeps transcoding busy long enough for the
+		// simulated crash to land while vips work is still pending.
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'5000x4000_e2e_test_image_oversized.jpeg'
+		);
+
+		// Wait for the vips worker to spin up, which means image
+		// processing has started.
+		await page.waitForFunction(
+			() => window.__capturedBlobWorkers.length > 0,
+			undefined,
+			{ timeout: 30_000 }
+		);
+
+		/*
+		 * Simulate a worker crash: stop the underlying thread, then fire the
+		 * error event a real crash would emit so the RPC layer marks the
+		 * worker as failed and rejects its pending calls.
+		 */
+		await page.evaluate( () => {
+			for ( const worker of window.__capturedBlobWorkers ) {
+				worker.terminate();
+				worker.dispatchEvent(
+					new ErrorEvent( 'error', {
+						message: 'Simulated worker crash',
+					} )
+				);
+			}
+		} );
+
+		// The failure must surface to the user rather than dying silently
+		// inside the queue.
+		const errorSnackbar = page
+			.locator( '.components-snackbar' )
+			.filter( { hasText: /cannot generate responsive image sizes/i } );
+		await expect( errorSnackbar ).toBeVisible( { timeout: 30_000 } );
+
+		// The failed item must leave the queue instead of hanging forever…
+		await mediaProcessingUtils.waitForUploadQueueEmpty( 30_000 );
+
+		// …which releases the save lock so the post is saveable again.
+		await expect
+			.poll(
+				() =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.isPostSavingLocked()
+					),
+				{ timeout: 10_000 }
+			)
+			.toBe( false );
+
+		/*
+		 * Emptying the queue also terminates the dead worker, so the next
+		 * upload lazily creates a fresh one and completes normally. Clear
+		 * the canvas first so the failed upload's leftover image block
+		 * doesn't collide with the helper's block locator.
+		 */
+		await editor.setContent( '' );
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'1024x768_e2e_test_image_size.jpeg'
+		);
+		expect( media.mime_type ).toBe( 'image/jpeg' );
+	} );
 } );
