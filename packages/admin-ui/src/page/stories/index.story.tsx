@@ -198,7 +198,7 @@ export const WithNavigation: Story = {
 				{ label: 'Orders', href: '/orders' },
 				{ label: 'Customers', href: '/customers' },
 			],
-			selected: '/overview',
+			currentHref: '/overview',
 		},
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
@@ -226,7 +226,7 @@ export const WithNavigationAndActions: Story = {
 				{ label: 'Orders', href: '/orders' },
 				{ label: 'Customers', href: '/customers' },
 			],
-			selected: '/overview',
+			currentHref: '/overview',
 		},
 		showSidebarToggle: false,
 		hasPadding: true,
@@ -254,7 +254,7 @@ export const FullHeader: Story = {
 				{ label: 'Orders', href: '/orders' },
 				{ label: 'Customers', href: '/customers' },
 			],
-			selected: '/overview',
+			currentHref: '/overview',
 		},
 		actions: (
 			<>

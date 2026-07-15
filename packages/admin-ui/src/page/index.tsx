@@ -49,7 +49,7 @@ function Page( {
 	actions?: React.ReactNode;
 	/**
 	 * Section navigation shown in the page header: the list of links and the
-	 * `href` of the selected one.
+	 * `href` of the current one.
 	 */
 	navigation?: NavigationProps;
 	ariaLabel?: string;

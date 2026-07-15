@@ -17,8 +17,8 @@ export interface NavigationProps {
 	items: NavigationItem[];
 
 	/**
-	 * The `href` of the currently selected item. The matching item is rendered
-	 * with `aria-current="page"` and a distinct visual treatment.
+	 * The `href` of the current item. The matching item is rendered with
+	 * `aria-current="page"` and a distinct visual treatment.
 	 */
-	selected?: string;
+	currentHref?: string;
 }

@@ -80,14 +80,14 @@ describe( 'Navigation', () => {
 			expect( links[ 1 ] ).toHaveAttribute( 'href', '/products' );
 		} );
 
-		it( 'should mark the item matching `selected` with aria-current="page"', () => {
+		it( 'should mark the item matching `currentHref` with aria-current="page"', () => {
 			render(
 				<Navigation
 					items={ [
 						{ label: 'Overview', href: '/overview' },
 						{ label: 'Products', href: '/products' },
 					] }
-					selected="/overview"
+					currentHref="/overview"
 				/>
 			);
 

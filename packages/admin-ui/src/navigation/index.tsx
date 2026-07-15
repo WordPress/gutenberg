@@ -13,7 +13,7 @@ import styles from './style.module.css';
 
 /**
  * Renders a horizontal list of links for navigating between the sections of a
- * screen. The item whose `href` matches `selected` is marked with
+ * screen. The item whose `href` matches `currentHref` is marked with
  * `aria-current="page"`.
  *
  * Internal to the package: configured through the `Page` `navigation` prop.
@@ -21,7 +21,7 @@ import styles from './style.module.css';
  * @param {NavigationProps} props
  */
 export const Navigation = ( props: NavigationProps ) => {
-	const { items, selected } = props;
+	const { items, currentHref } = props;
 
 	if ( ! items.length ) {
 		return null;
@@ -56,7 +56,7 @@ export const Navigation = ( props: NavigationProps ) => {
 									variant="unstyled"
 									href={ item.href }
 									aria-current={
-										item.href === selected
+										item.href === currentHref
 											? 'page'
 											: undefined
 									}

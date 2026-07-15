@@ -4,7 +4,7 @@
 
 ### New Features
 
--   `Page`: Add a `navigation` prop (`{ items, selected }`) for link-based navigation between sections, rendered in the page header.
+-   `Page`: Add a `navigation` prop (`{ items, currentHref }`) for link-based navigation between sections, rendered in the page header.
 
 ## 2.6.0 (2026-07-14)
 
