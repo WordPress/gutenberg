@@ -211,7 +211,7 @@ test.describe( 'Tabs', () => {
 			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
 			await tab2.click();
 
-			await editor.clickBlockToolbarButton( 'Move tab left' );
+			await editor.clickBlockToolbarButton( 'Move tab before' );
 
 			// The tab and its panel are reordered together.
 			await expect
@@ -246,7 +246,7 @@ test.describe( 'Tabs', () => {
 			const tab1 = editor.canvas.getByRole( 'tab', { name: 'Tab 1' } );
 			await tab1.click();
 
-			await editor.clickBlockToolbarButton( 'Move tab right' );
+			await editor.clickBlockToolbarButton( 'Move tab after' );
 
 			await expect
 				.poll( async () =>
