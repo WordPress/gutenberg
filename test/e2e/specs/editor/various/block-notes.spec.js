@@ -659,6 +659,7 @@ test.describe( 'Block Notes', () => {
 		} );
 
 		test( 'should collapse a note when the focus moves outside the note', async ( {
+			editor,
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -675,12 +676,17 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
 				} );
+			const block = editor.canvas.getByRole( 'document', {
+				name: 'Block: Heading',
+			} );
 
 			await thread.click();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect( block ).toHaveClass( /is-highlighted/ );
 			await page.keyboard.press( 'Shift+Tab' );
 			await expect( thread ).not.toBeFocused();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+			await expect( block ).not.toHaveClass( /is-highlighted/ );
 		} );
 
 		test( 'should have accessible name for the note threads', async ( {

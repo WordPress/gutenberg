@@ -101,6 +101,11 @@ export function NoteThread( {
 			return;
 		}
 
+		// Drop the highlight, unless another note (possibly on the same block) now owns it.
+		if ( ! isNoteFocused ) {
+			toggleBlockHighlight( note.blockClientId, false );
+		}
+
 		/*
 		 * Selection may have moved on before this deferred callback runs; only
 		 * clear it while this still owns the selection, or it would wipe out the
