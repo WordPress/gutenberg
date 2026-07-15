@@ -20,7 +20,8 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$playlist_id              = wp_unique_id( 'playlist-' );
 	$playlist_tracks          = array();
 	$tracks_data              = array();
-	$show_play_button_artwork = ! empty( $attributes['showPlayButtonArtwork'] );
+	$show_controls            = $attributes['showPlaybackControls'] ?? true;
+	$show_play_button_artwork = $attributes['showPlayButtonArtwork'] ?? false;
 
 	// Parse inner blocks to extract track data.
 	// This approach avoids duplicating track data in the HTML output.
@@ -90,56 +91,79 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 		)
 	);
 
-	// Add waveform player container with translated button labels.
+	// Add waveform player and playlist control containers with translated labels.
 	$label_play  = esc_attr__( 'Play' );
 	$label_pause = esc_attr__( 'Pause' );
 	$label_seek  = esc_attr__( 'Seek' );
 	/* translators: %1$s: current audio time, %2$s: total audio duration. */
-	$label_seek_value                       = esc_attr_x(
+	$label_seek_value = esc_attr_x(
 		'%1$s of %2$s',
 		'audio current time of total duration'
 	);
+	$label_previous   = esc_attr__( 'Previous track' );
+	$label_next       = esc_attr__( 'Next track' );
+	$label_shuffle    = esc_attr__( 'Shuffle' );
+	$label_repeat_off = esc_attr__( 'Repeat off' );
+	$label_repeat_all = esc_attr__( 'Repeat playlist' );
+	$label_repeat_one = esc_attr__( 'Repeat current track' );
+	$player_class     = $show_controls ? 'wp-block-playlist__player has-playlist-controls' : 'wp-block-playlist__player';
+
 	$waveform_color_attribute               = '';
 	$waveform_gradient_attribute            = '';
 	$waveform_background_color_attribute    = '';
 	$waveform_background_gradient_attribute = '';
+
 	if ( ! empty( $attributes['waveformColor'] ) ) {
 		$waveform_color_attribute = sprintf(
 			' data-waveform-player-color="%s"',
 			esc_attr( $attributes['waveformColor'] )
 		);
 	}
+
 	if ( ! empty( $attributes['waveformGradient'] ) ) {
 		$waveform_gradient_attribute = sprintf(
 			' data-waveform-player-gradient="%s"',
 			esc_attr( $attributes['waveformGradient'] )
 		);
 	}
+
 	if ( ! empty( $attributes['waveformBackgroundColor'] ) ) {
 		$waveform_background_color_attribute = sprintf(
 			' data-waveform-player-background-color="%s"',
 			esc_attr( $attributes['waveformBackgroundColor'] )
 		);
 	}
+
 	if ( ! empty( $attributes['waveformBackgroundGradient'] ) ) {
 		$waveform_background_gradient_attribute = sprintf(
 			' data-waveform-player-background-gradient="%s"',
 			esc_attr( $attributes['waveformBackgroundGradient'] )
 		);
 	}
-	$html = '<div class="wp-block-playlist__waveform-player"' .
+
+	$player_html   = '<div class="wp-block-playlist__waveform-player"' .
 		$waveform_color_attribute .
 		$waveform_gradient_attribute .
 		$waveform_background_color_attribute .
 		$waveform_background_gradient_attribute . '
-		data-wp-watch="callbacks.initWaveformPlayer"
-		data-label-play="' . $label_play . '"
-		data-label-pause="' . $label_pause . '"
-		data-label-seek="' . $label_seek . '"
-		data-label-seek-value="' . $label_seek_value . '"
-	></div>';
+			data-wp-watch="callbacks.initWaveformPlayer"
+			data-label-play="' . $label_play . '"
+			data-label-pause="' . $label_pause . '"
+			data-label-seek="' . $label_seek . '"
+			data-label-seek-value="' . $label_seek_value . '"
+		></div>';
+	$controls_html = $show_controls ? '<div class="wp-block-playlist__controls"
+			data-wp-watch="callbacks.initPlaylistControls"
+			data-label-previous="' . $label_previous . '"
+			data-label-next="' . $label_next . '"
+			data-label-shuffle="' . $label_shuffle . '"
+			data-label-repeat-off="' . $label_repeat_off . '"
+			data-label-repeat-all="' . $label_repeat_all . '"
+			data-label-repeat-one="' . $label_repeat_one . '"
+		></div>' : '';
+	$html          = '<div class="' . $player_class . '">' . $player_html . $controls_html . '</div>';
 
-	// Add the waveform player container inside the figure.
+	// Add the waveform player wrapper inside the figure.
 	$figure = null;
 	preg_match( '/<figure[^>]*>/', $content, $figure );
 	if ( ! empty( $figure[0] ) ) {
@@ -149,7 +173,6 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$processor = new WP_HTML_Tag_Processor( $content );
 	$processor->next_tag( 'figure' );
 	$processor->set_attribute( 'data-wp-interactive', 'core/playlist' );
-
 	$waveform_style = $attributes['waveformStyle'] ?? 'bars';
 
 	$processor->set_attribute(
@@ -161,6 +184,10 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				'isPlaying'             => false,
 				'tracks'                => $playlist_tracks,
 				'waveformStyle'         => $waveform_style,
+				'isShuffled'            => false,
+				'repeatMode'            => 'none',
+				'playedTracks'          => array(),
+				'showPlaybackControls'  => $show_controls,
 				'showPlayButtonArtwork' => $show_play_button_artwork,
 				'labelPauseTrack'       => __( 'Pause' ),
 				'labelSelectTrack'      => __( 'Play' ),

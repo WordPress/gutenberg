@@ -6,7 +6,13 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	MediaPlaceholder,
@@ -16,6 +22,7 @@ import {
 	useInnerBlocksProps,
 	BlockControls,
 	InspectorControls,
+	InnerBlocks,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
@@ -29,9 +36,15 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, _x } from '@wordpress/i18n';
-import { playlist as icon } from '@wordpress/icons';
+import {
+	playlist as icon,
+	repeat,
+	repeatAll,
+	shuffle,
+	skipBack,
+	skipForward,
+} from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
-import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -40,13 +53,16 @@ import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { WaveformPlayer } from '../utils/waveform-player';
 import { PlaylistContext } from './context';
+import {
+	getNextRepeatMode,
+	getPlaylistPlaybackAction,
+	getPlayedTracksAfterTrackSelection,
+	replayWaveformPlayerTrack,
+} from '../utils/waveform-utils';
 import { getTrackAttributes } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
-const AUDIO_FILE_EXTENSION =
-	/\.(aac|aif|aiff|flac|m4a|m4b|mp3|oga|ogg|opus|wav|weba)$/i;
 const DEFAULT_WAVEFORM_STYLE = 'bars';
-const FILE_LIST_OBJECT_NAME = '[object FileList]';
 const WAVEFORM_STYLE_OPTIONS = [
 	{ label: _x( 'Bars', 'waveform style option' ), value: 'bars' },
 	{ label: _x( 'Mirror', 'waveform style option' ), value: 'mirror' },
@@ -56,21 +72,81 @@ const WAVEFORM_STYLE_OPTIONS = [
 	{ label: _x( 'Seekbar', 'waveform style option' ), value: 'seekbar' },
 ];
 
-function isFile( value ) {
+function PlaylistControlIcon( { icon: controlIcon } ) {
 	return (
-		Object.prototype.toString.call( value ) === '[object File]' ||
-		( typeof File !== 'undefined' && value instanceof File )
+		<span className="wp-block-playlist__control-icon" aria-hidden="true">
+			{ controlIcon }
+		</span>
 	);
 }
 
-function isAudioFile( file ) {
-	return file.type
-		? file.type.startsWith( 'audio/' )
-		: AUDIO_FILE_EXTENSION.test( file.name );
-}
+function PlaylistPlaybackControls( {
+	isShuffled,
+	repeatMode,
+	onPrev,
+	onNext,
+	onShuffleToggle,
+	onRepeatToggle,
+} ) {
+	let repeatLabel = __( 'Repeat off' );
+	let repeatIcon = repeatAll;
 
-function getTrackIdentifier( track ) {
-	return track.id ?? track.src ?? track.blob;
+	if ( repeatMode === 'all' ) {
+		repeatLabel = __( 'Repeat playlist' );
+	} else if ( repeatMode === 'one' ) {
+		repeatLabel = __( 'Repeat current track' );
+		repeatIcon = repeat;
+	}
+
+	return (
+		<div className="wp-block-playlist__controls">
+			<div className="wp-block-playlist__controls-group">
+				<button
+					type="button"
+					className="wp-block-playlist__control-btn"
+					aria-label={ __( 'Previous track' ) }
+					title={ __( 'Previous track' ) }
+					onClick={ onPrev }
+				>
+					<PlaylistControlIcon icon={ skipBack } />
+				</button>
+				<button
+					type="button"
+					className="wp-block-playlist__control-btn"
+					aria-label={ __( 'Next track' ) }
+					title={ __( 'Next track' ) }
+					onClick={ onNext }
+				>
+					<PlaylistControlIcon icon={ skipForward } />
+				</button>
+			</div>
+			<div className="wp-block-playlist__controls-group">
+				<button
+					type="button"
+					className="wp-block-playlist__control-btn"
+					aria-pressed={ repeatMode !== 'none' }
+					aria-label={ repeatLabel }
+					title={ repeatLabel }
+					data-repeat-mode={ repeatMode }
+					onClick={ () =>
+						onRepeatToggle( getNextRepeatMode( repeatMode ) )
+					}
+				>
+					<PlaylistControlIcon icon={ repeatIcon } />
+				</button>
+				<button
+					type="button"
+					className="wp-block-playlist__control-btn"
+					aria-pressed={ isShuffled }
+					aria-label={ __( 'Shuffle' ) }
+					title={ __( 'Shuffle' ) }
+					onClick={ onShuffleToggle }
+				>
+					<PlaylistControlIcon icon={ shuffle } />
+				</button>
+			</div>
+		</div>
+	);
 }
 
 const PlaylistEdit = ( {
@@ -88,6 +164,7 @@ const PlaylistEdit = ( {
 		showPlayButtonArtwork,
 		showArtists,
 		showTrackLength,
+		showPlaybackControls,
 		waveformStyle = DEFAULT_WAVEFORM_STYLE,
 		waveformColor,
 		waveformGradient,
@@ -95,9 +172,15 @@ const PlaylistEdit = ( {
 		waveformBackgroundGradient,
 	} = attributes;
 
+	const [ isShuffled, setIsShuffled ] = useState( false );
+	const [ repeatMode, setRepeatMode ] = useState( 'none' );
+	const playerInstanceRef = useRef();
+	// Track IDs already played in the current shuffle cycle, so no track
+	// repeats until every other track has played once.
+	const [ playedTracks, setPlayedTracks ] = useState( [] );
 	const blockProps = useBlockProps();
 	const waveformPanelId = `${ clientId }-waveform`;
-	const { replaceInnerBlocks, selectBlock } = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
@@ -123,12 +206,9 @@ const PlaylistEdit = ( {
 	const waveformBackgroundGradientValue = waveformBackgroundGradient;
 	let waveformColorGradientChange;
 	let waveformBackgroundColorGradientChange;
-	const onUploadError = useCallback(
-		( message ) => {
-			createErrorNotice( message, { type: 'snackbar' } );
-		},
-		[ createErrorNotice ]
-	);
+	function onUploadError( message ) {
+		createErrorNotice( message, { type: 'snackbar' } );
+	}
 	const [ currentTrackClientId, setCurrentTrackClientId ] = useState( null );
 
 	const { innerBlockTracks } = useSelect(
@@ -158,11 +238,21 @@ const PlaylistEdit = ( {
 			} ) ),
 		[ validTracks ]
 	);
+	const selectTrackClientId = useCallback(
+		( trackClientId ) => {
+			setCurrentTrackClientId( trackClientId );
+			setPlayedTracks(
+				getPlayedTracksAfterTrackSelection( trackClientId, isShuffled )
+			);
+		},
+		[ isShuffled, setCurrentTrackClientId, setPlayedTracks ]
+	);
 
 	useEffect( () => {
 		if ( validTracks.length === 0 ) {
 			if ( currentTrackClientId !== null ) {
 				setCurrentTrackClientId( null );
+				setPlayedTracks( [] );
 			}
 			return;
 		}
@@ -171,116 +261,44 @@ const PlaylistEdit = ( {
 			( block ) => block.clientId === currentTrackClientId
 		);
 		if ( ! currentTrackExists ) {
-			setCurrentTrackClientId( validTracks[ 0 ].clientId );
+			selectTrackClientId( validTracks[ 0 ].clientId );
 		}
-	}, [ currentTrackClientId, setCurrentTrackClientId, validTracks ] );
-
-	const createTrackBlocks = useCallback(
-		( media ) => {
-			if ( ! media ) {
-				return [];
-			}
-
-			let mediaItems = [ media ];
-			if (
-				Object.prototype.toString.call( media ) ===
-				FILE_LIST_OBJECT_NAME
-			) {
-				mediaItems = Array.from( media );
-			} else if ( Array.isArray( media ) ) {
-				mediaItems = media;
-			}
-			let hasInvalidFile = false;
-
-			const blocks = mediaItems
-				.map( ( mediaItem ) => {
-					if ( isFile( mediaItem ) ) {
-						if ( ! isAudioFile( mediaItem ) ) {
-							hasInvalidFile = true;
-							return null;
-						}
-
-						return createBlock( 'core/playlist-track', {
-							blob: createBlobURL( mediaItem ),
-							title: mediaItem.name,
-						} );
-					}
-
-					const track = getTrackAttributes( mediaItem );
-
-					return track.src
-						? createBlock( 'core/playlist-track', track )
-						: null;
-				} )
-				.filter( Boolean );
-
-			if ( hasInvalidFile ) {
-				onUploadError(
-					__( 'Only audio files can be added to a playlist.' )
-				);
-			}
-
-			return blocks;
-		},
-		[ onUploadError ]
-	);
-
-	const onSelectTracks = useCallback(
-		( media ) => {
-			const newBlocks = createTrackBlocks( media );
-			if ( newBlocks.length === 0 ) {
-				return;
-			}
-
-			setCurrentTrackClientId( newBlocks[ 0 ]?.clientId ?? null );
-			// Replace the inner blocks with the new tracks.
-			replaceInnerBlocks( clientId, newBlocks );
-		},
-		[
-			clientId,
-			createTrackBlocks,
-			replaceInnerBlocks,
-			setCurrentTrackClientId,
-		]
-	);
-
-	const onAddTracks = useCallback(
-		( media ) => {
-			const existingIds = new Set(
-				validTracks
-					.map( ( block ) => getTrackIdentifier( block.attributes ) )
-					.filter( Boolean )
-			);
-			const newBlocks = createTrackBlocks( media ).filter(
-				( block ) =>
-					! existingIds.has( getTrackIdentifier( block.attributes ) )
-			);
-			if ( newBlocks.length === 0 ) {
-				return;
-			}
-
-			const nextBlocks = [ ...validTracks, ...newBlocks ];
-			setCurrentTrackClientId( newBlocks[ 0 ].clientId );
-			replaceInnerBlocks( clientId, nextBlocks );
-			selectBlock( newBlocks[ 0 ].clientId );
-		},
-		[
-			clientId,
-			createTrackBlocks,
-			replaceInnerBlocks,
-			selectBlock,
-			setCurrentTrackClientId,
-			validTracks,
-		]
-	);
+	}, [
+		currentTrackClientId,
+		selectTrackClientId,
+		setCurrentTrackClientId,
+		setPlayedTracks,
+		validTracks,
+	] );
 
 	const playlistContext = useMemo(
 		() => ( {
 			currentTrackClientId,
-			setCurrentTrackClientId,
-			addTracks: onAddTracks,
+			setCurrentTrackClientId: selectTrackClientId,
 		} ),
-		[ currentTrackClientId, onAddTracks, setCurrentTrackClientId ]
+		[ currentTrackClientId, selectTrackClientId ]
+	);
+
+	const onSelectTracks = useCallback(
+		( media ) => {
+			if ( ! media ) {
+				return;
+			}
+
+			if ( ! Array.isArray( media ) ) {
+				media = [ media ];
+			}
+
+			const trackList = media.map( getTrackAttributes );
+
+			const newBlocks = trackList.map( ( track ) =>
+				createBlock( 'core/playlist-track', track )
+			);
+			selectTrackClientId( newBlocks[ 0 ]?.clientId ?? null );
+			// Replace the inner blocks with the new tracks.
+			replaceInnerBlocks( clientId, newBlocks );
+		},
+		[ replaceInnerBlocks, clientId, selectTrackClientId ]
 	);
 
 	// Get current track data by finding the track with matching client ID.
@@ -288,16 +306,71 @@ const PlaylistEdit = ( {
 		tracks.find( ( track ) => track.clientId === currentTrackClientId ) ??
 		tracks[ 0 ];
 
-	// Handle track end - advance to next track or loop to first.
-	const onTrackEnded = useCallback( () => {
+	const selectNextTrack = useCallback(
+		( isUserInitiated, playerInstance ) => {
+			const { action, nextId, playedIds } = getPlaylistPlaybackAction(
+				tracks.map( ( track ) => track.clientId ),
+				currentTrackClientId,
+				{ repeatMode, isShuffled, playedTracks, isUserInitiated }
+			);
+			setPlayedTracks( playedIds );
+			if ( action === 'repeat' ) {
+				replayWaveformPlayerTrack( playerInstance );
+				return;
+			}
+			if ( nextId ) {
+				setCurrentTrackClientId( nextId );
+			}
+		},
+		[
+			currentTrackClientId,
+			tracks,
+			isShuffled,
+			playedTracks,
+			repeatMode,
+			setCurrentTrackClientId,
+		]
+	);
+
+	// Handle track end - repeat, shuffle, or advance in order.
+	const onTrackEnded = useCallback(
+		( playerInstance ) => {
+			selectNextTrack( false, playerInstance );
+		},
+		[ selectNextTrack ]
+	);
+
+	const onPrev = useCallback( () => {
 		const currentIndex = tracks.findIndex(
 			( track ) => track.clientId === currentTrackClientId
 		);
-		const nextTrack = tracks[ currentIndex + 1 ] || tracks[ 0 ];
-		if ( nextTrack?.clientId ) {
-			setCurrentTrackClientId( nextTrack.clientId );
+		const prevTrack =
+			tracks[ currentIndex - 1 ] || tracks[ tracks.length - 1 ];
+		if ( prevTrack?.clientId ) {
+			selectTrackClientId( prevTrack.clientId );
 		}
-	}, [ currentTrackClientId, setCurrentTrackClientId, tracks ] );
+	}, [ currentTrackClientId, selectTrackClientId, tracks ] );
+
+	const onNext = useCallback(
+		( playerInstance = playerInstanceRef.current ) => {
+			selectNextTrack( true, playerInstance );
+		},
+		[ selectNextTrack ]
+	);
+
+	const onPlayerChange = useCallback( ( playerInstance ) => {
+		playerInstanceRef.current = playerInstance;
+	}, [] );
+
+	const onShuffleToggle = useCallback( () => {
+		setIsShuffled( ( prev ) => ! prev );
+		// Start a fresh shuffle cycle whenever shuffle is toggled.
+		setPlayedTracks( [] );
+	}, [] );
+
+	const onRepeatToggle = useCallback( ( nextMode ) => {
+		setRepeatMode( nextMode );
+	}, [] );
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
@@ -311,7 +384,7 @@ const PlaylistEdit = ( {
 				return titleB.localeCompare( titleA );
 			} );
 			replaceInnerBlocks( clientId, sortedBlocks );
-			setCurrentTrackClientId( sortedBlocks[ 0 ]?.clientId ?? null );
+			selectTrackClientId( sortedBlocks[ 0 ]?.clientId ?? null );
 			setAttributes( {
 				order: trackOrder,
 			} );
@@ -320,8 +393,8 @@ const PlaylistEdit = ( {
 			clientId,
 			innerBlockTracks,
 			replaceInnerBlocks,
+			selectTrackClientId,
 			setAttributes,
-			setCurrentTrackClientId,
 		]
 	);
 
@@ -409,6 +482,14 @@ const PlaylistEdit = ( {
 		} );
 	}
 
+	const hasSelectedChild = useSelect(
+		( select ) =>
+			select( blockEditorStore ).hasSelectedInnerBlock( clientId ),
+		[ clientId ]
+	);
+
+	const hasAnySelected = isSelected || hasSelectedChild;
+
 	const colorSettings = [];
 	if ( hasColors || hasGradients ) {
 		colorSettings.push(
@@ -453,7 +534,7 @@ const PlaylistEdit = ( {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		__experimentalAppenderTagName: 'li',
-		renderAppender: false,
+		renderAppender: hasAnySelected && InnerBlocks.ButtonBlockAppender,
 	} );
 
 	if ( tracks.length === 0 ) {
@@ -473,7 +554,6 @@ const PlaylistEdit = ( {
 					onSelect={ onSelectTracks }
 					accept="audio/*"
 					multiple
-					handleUpload={ false }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
 				/>
@@ -485,11 +565,13 @@ const PlaylistEdit = ( {
 		<>
 			<BlockControls group="other">
 				<MediaReplaceFlow
-					name={ __( 'Add' ) }
-					onSelect={ onAddTracks }
+					name={ __( 'Edit' ) }
+					onSelect={ onSelectTracks }
 					accept="audio/*"
 					multiple
-					handleUpload={ false }
+					mediaIds={ tracks
+						.filter( ( track ) => track.id )
+						.map( ( track ) => track.id ) }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
 				/>
@@ -504,7 +586,7 @@ const PlaylistEdit = ( {
 							showNumbers: true,
 							showTrackLength: true,
 							showImages: true,
-							showPlayButtonArtwork: false,
+							showPlaybackControls: true,
 							order: 'asc',
 						} );
 					} }
@@ -565,9 +647,7 @@ const PlaylistEdit = ( {
 								/>
 							</ToolsPanelItem>
 							<ToolsPanelItem
-								label={ __(
-									'Show track duration in tracklist'
-								) }
+								label={ __( 'Show track length in Tracklist' ) }
 								isShownByDefault
 								hasValue={ () => showTrackLength !== true }
 								onDeselect={ () =>
@@ -576,7 +656,7 @@ const PlaylistEdit = ( {
 							>
 								<ToggleControl
 									label={ __(
-										'Show track duration in tracklist'
+										'Show track length in Tracklist'
 									) }
 									onChange={ toggleAttribute(
 										'showTrackLength'
@@ -587,7 +667,7 @@ const PlaylistEdit = ( {
 						</>
 					) }
 					<ToolsPanelItem
-						label={ __( 'Show tracklist images' ) }
+						label={ __( 'Show images' ) }
 						isShownByDefault
 						hasValue={ () => showImages !== true }
 						onDeselect={ () =>
@@ -595,7 +675,7 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							label={ __( 'Show tracklist images' ) }
+							label={ __( 'Show images' ) }
 							onChange={ toggleAttribute( 'showImages' ) }
 							checked={ showImages }
 						/>
@@ -614,6 +694,22 @@ const PlaylistEdit = ( {
 								'showPlayButtonArtwork'
 							) }
 							checked={ showPlayButtonArtwork === true }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Show playback controls' ) }
+						isShownByDefault
+						hasValue={ () => showPlaybackControls === false }
+						onDeselect={ () =>
+							setAttributes( { showPlaybackControls: true } )
+						}
+					>
+						<ToggleControl
+							label={ __( 'Show playback controls' ) }
+							onChange={ toggleAttribute(
+								'showPlaybackControls'
+							) }
+							checked={ showPlaybackControls !== false }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
@@ -680,45 +776,68 @@ const PlaylistEdit = ( {
 				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
-				<MediaPlaceholder
-					onSelect={ onAddTracks }
-					accept="audio/*"
-					multiple
-					handleUpload={ false }
-					disableMediaButtons
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					onError={ onUploadError }
-				/>
 				<Disabled isDisabled={ ! isSelected }>
-					<WaveformPlayer
-						src={ currentTrackData?.src }
-						title={ currentTrackData?.title }
-						artist={ currentTrackData?.artist }
-						image={ currentTrackData?.image }
-						imageAlt={ currentTrackData?.imageAlt }
-						waveformStyle={ waveformStyle }
-						color={ waveformColor }
-						gradient={ waveformGradientValue }
-						backgroundColor={ waveformBackgroundColor }
-						backgroundGradient={ waveformBackgroundGradientValue }
-						onEnded={ onTrackEnded }
-						showPlayButtonArtwork={ showPlayButtonArtwork === true }
-					/>
+					<div
+						className={ clsx( 'wp-block-playlist__player', {
+							'has-playlist-controls':
+								showPlaybackControls !== false,
+						} ) }
+					>
+						<WaveformPlayer
+							src={ currentTrackData?.src }
+							title={ currentTrackData?.title }
+							artist={ currentTrackData?.artist }
+							image={
+								showImages !== false
+									? currentTrackData?.image
+									: undefined
+							}
+							imageAlt={
+								showImages !== false
+									? currentTrackData?.imageAlt
+									: undefined
+							}
+							waveformStyle={ waveformStyle }
+							color={ waveformColor }
+							gradient={ waveformGradientValue }
+							backgroundColor={ waveformBackgroundColor }
+							backgroundGradient={
+								waveformBackgroundGradientValue
+							}
+							onEnded={ onTrackEnded }
+							onNextTrack={ onNext }
+							onPreviousTrack={ onPrev }
+							onPlayerChange={ onPlayerChange }
+							showPlayButtonArtwork={
+								showPlayButtonArtwork === true
+							}
+						/>
+						{ showPlaybackControls !== false && (
+							<PlaylistPlaybackControls
+								isShuffled={ isShuffled }
+								repeatMode={ repeatMode }
+								onPrev={ onPrev }
+								onNext={ onNext }
+								onShuffleToggle={ onShuffleToggle }
+								onRepeatToggle={ onRepeatToggle }
+							/>
+						) }
+					</div>
 				</Disabled>
-				<ol
-					className={ clsx( 'wp-block-playlist__tracklist', {
-						'wp-block-playlist__tracklist-is-hidden':
-							! showTracklist,
-						'wp-block-playlist__tracklist-show-numbers':
-							showNumbers,
-						'wp-block-playlist__tracklist-length-is-hidden':
-							! showTrackLength,
-					} ) }
-				>
-					<PlaylistContext.Provider value={ playlistContext }>
-						{ innerBlocksProps.children }
-					</PlaylistContext.Provider>
-				</ol>
+				{ showTracklist && (
+					<ol
+						className={ clsx( 'wp-block-playlist__tracklist', {
+							'wp-block-playlist__tracklist-show-numbers':
+								showNumbers,
+							'wp-block-playlist__tracklist-length-is-hidden':
+								! showTrackLength,
+						} ) }
+					>
+						<PlaylistContext.Provider value={ playlistContext }>
+							{ innerBlocksProps.children }
+						</PlaylistContext.Provider>
+					</ol>
+				) }
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }

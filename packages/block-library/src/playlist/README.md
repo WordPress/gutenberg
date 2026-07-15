@@ -28,6 +28,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `showArtists` | `boolean` | `true` | — |
 | `showNumbers` | `boolean` | `true` | — |
 | `showTrackLength` | `boolean` | `true` | — |
+| `showPlaybackControls` | `boolean` | `true` | — |
 | `waveformStyle` | `string` | `"bars"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `bars`, `mirror`, `line`, `blocks`, `dots`, `seekbar` |
 | `waveformColor` | `string` | — | — |
 | `waveformGradient` | `string` | — | — |

@@ -1,19 +1,20 @@
 @use "@arraypress/waveform-player/dist/waveform-player";
 
 // Waveform player dimensions.
-$waveform-player-height: 100px;
+$waveform-player-height: 120px;
+$playlist-control-size: 24px;
+$playlist-control-offset: 8px;
 
 .wp-block-playlist {
+	.wp-block-playlist__player {
+		position: relative;
+		margin: var(--wp--preset--spacing--20, 0.625em) 0;
+	}
+
 	// Main waveform player container.
 	.wp-block-playlist__waveform-player {
 		width: 100%;
-		margin: var(--wp--preset--spacing--20, 0.625em) 0;
 		position: relative;
-
-		&:focus-visible {
-			outline: revert;
-			outline-offset: revert;
-		}
 	}
 
 	// Set the waveform track height and remove gap between button and waveform.
@@ -24,13 +25,17 @@ $waveform-player-height: 100px;
 
 	// WaveformPlayer button styling.
 	.waveform-btn {
-		border: none;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+		overflow: hidden;
 		border-radius: 0;
-		border-end-start-radius: 0.125rem;
-		border-start-start-radius: 0.125rem;
+		border: 0;
 		width: $waveform-player-height;
 		height: $waveform-player-height;
 		min-width: $waveform-player-height;
+		padding: 0;
 		background: currentColor;
 		margin: 0;
 
@@ -38,35 +43,20 @@ $waveform-player-height: 100px;
 			transform: none;
 		}
 
+		&:focus:not(:focus-visible) {
+			box-shadow: none;
+			outline: none;
+		}
+
+		&:focus-visible {
+			box-shadow: none;
+			outline: 2px solid currentColor;
+			outline-offset: 2px;
+		}
+
 		svg {
-			width: 3rem;
-			height: 3rem;
-		}
-
-		.waveform-icon-pause svg {
-			// The pause icon's two full-height bars read larger than the
-			// play triangle at the same SVG box size, so optically scale it
-			// down to match the play icon's visual weight.
-			width: 2.625rem;
-			height: 2.625rem;
-		}
-	}
-
-	.waveform-player.has-play-button-artwork {
-		.waveform-btn {
-			background-image: var(--wp--playlist--play-button-artwork);
-			background-position: center;
-			background-size: cover;
-			color: #fff;
-
-			svg {
-				filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
-			}
-
-			svg path {
-				// Override inline fills applied before artwork is added.
-				fill: #fff !important;
-			}
+			width: 40px;
+			height: 40px;
 		}
 	}
 
@@ -74,21 +64,164 @@ $waveform-player-height: 100px;
 		margin-bottom: 0;
 	}
 
-	.waveform-btn:focus-visible,
-	.waveform-container:focus-visible {
-		outline: revert;
-		outline-offset: revert;
+	.wp-block-playlist__footer {
+		display: flex;
+		align-items: flex-start;
+		width: 100%;
+		min-height: calc($waveform-player-height / 3);
 	}
 
-	.waveform-artist {
-		opacity: 0.7;
+	// Playlist control buttons (prev/next, repeat/shuffle).
+	.wp-block-playlist__controls {
+		display: flex;
+		align-self: flex-start;
+		align-items: flex-start;
+		// Span the play button width and separate action/toggle groups.
+		flex: 0 0 $waveform-player-height;
+		width: $waveform-player-height;
+		justify-content: space-between;
+		margin-block-start: max(0px, calc((1.5em - $playlist-control-size) / 2 + 2px));
 	}
 
-	.waveform-info,
-	.waveform-artist,
-	.waveform-title,
-	.waveform-time {
-		font-size: inherit;
+	.wp-block-playlist__player > .wp-block-playlist__controls {
+		position: absolute;
+		inset-block-start: calc($waveform-player-height + $playlist-control-offset);
+		inset-inline-start: 0;
+		margin-block-start: 0;
+	}
+
+	.wp-block-playlist__controls-group {
+		display: flex;
+		gap: 4px;
+	}
+
+	.wp-block-playlist__control-btn {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: $playlist-control-size;
+		height: $playlist-control-size;
+		padding: 0;
+		border: none;
+		background: none;
+		color: currentColor;
+		opacity: 0.45;
+		cursor: pointer;
+
+		&:hover {
+			opacity: 0.8;
+		}
+
+		&:focus:not(:focus-visible) {
+			box-shadow: none;
+			outline: none;
+		}
+
+		&:focus-visible {
+			box-shadow: none;
+			outline: 2px solid currentColor;
+			outline-offset: 2px;
+		}
+
+		// Toggled-on state (shuffle/repeat): invert to a solid text-color
+		// background with a contrasting icon so it reads clearly at a glance.
+		// aria-pressed is the single source of truth for the toggle state.
+		// --wp-playlist-active-icon-color is set in JS to contrast the block's
+		// text color (white on dark text, black on light text).
+		&[aria-pressed="true"] {
+			background-color: currentColor;
+			opacity: 1;
+
+			svg {
+				color: var(--wp-playlist-active-icon-color, #fff);
+			}
+
+			svg path {
+				fill: var(--wp-playlist-active-icon-color, #fff);
+			}
+		}
+
+		svg {
+			width: $playlist-control-size;
+			height: $playlist-control-size;
+		}
+
+		svg path {
+			fill: currentColor;
+		}
+	}
+
+	.wp-block-playlist__player.has-playlist-controls
+	.wp-block-playlist__metadata {
+		margin-inline-start: calc($waveform-player-height + 12px);
+	}
+
+	// Override WaveformPlayer's inline text colors to inherit from the block.
+	.wp-block-playlist__metadata {
+		display: flex;
+		flex: 1 1 auto;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		margin-inline-start: 12px;
+		min-width: 0;
+
+		.waveform-artwork {
+			width: 40px !important;
+			height: 40px !important;
+			border-radius: 0 !important;
+			object-fit: cover;
+			flex-shrink: 0;
+		}
+
+		.wp-block-playlist__metadata-text {
+			display: flex;
+			flex: 1 1 auto;
+			flex-direction: column;
+			min-width: 0;
+		}
+
+		.wp-block-playlist__metadata-title-row {
+			display: flex;
+			align-items: baseline;
+			gap: 8px;
+			min-width: 0;
+		}
+
+		.waveform-title,
+		.waveform-subtitle,
+		.waveform-time {
+			overflow: hidden;
+			color: currentColor !important;
+			font-family: inherit !important;
+			line-height: 1.5;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.waveform-title,
+		.waveform-subtitle {
+			font-size: inherit;
+		}
+
+		.waveform-subtitle {
+			font-size: inherit !important;
+			opacity: 0.7;
+		}
+
+		.waveform-title {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+
+		.waveform-time {
+			flex: 0 0 auto;
+			font-size: 0.85em !important;
+			overflow: visible;
+			opacity: 0.7;
+			text-overflow: clip;
+		}
 	}
 
 	.wp-block-playlist__tracklist {

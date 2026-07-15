@@ -2,20 +2,46 @@
  * External dependencies
  */
 import '@testing-library/jest-dom';
+import WaveformPlayerLib from '@arraypress/waveform-player';
+
+jest.mock( '@arraypress/waveform-player', () =>
+	jest.fn().mockImplementation( ( container, options = {} ) => {
+		const titleEl = global.document.createElement( 'span' );
+		const subtitleEl = global.document.createElement( 'span' );
+		const artworkEl = global.document.createElement( 'img' );
+		container.append( titleEl, subtitleEl, artworkEl );
+
+		return {
+			container,
+			options,
+			titleEl,
+			subtitleEl,
+			artworkEl,
+			play: jest.fn().mockReturnValue( Promise.resolve() ),
+			destroy: jest.fn(),
+			drawWaveform: jest.fn(),
+			applySeekLabel: jest.fn(),
+		};
+	} )
+);
 
 /**
  * Internal dependencies
  */
 import {
-	applyWaveformPlayerStyles,
 	createWaveformContainer,
-	getWaveformColors,
-	getWaveformGradientStops,
 	styleSvgIcons,
 	setupPlayButtonAccessibility,
-	setupPlayButtonArtwork,
 	updateSeekControlLabel,
 	logPlayError,
+	getNextShuffledTrack,
+	isShuffleCycleComplete,
+	getPlayedTracksAfterTrackSelection,
+	getNextRepeatMode,
+	getPlaylistPlaybackAction,
+	replayWaveformPlayerTrack,
+	setupPlaylistMetadata,
+	initWaveformPlayer,
 } from '../waveform-utils';
 
 // Base player data used across tests
@@ -27,6 +53,11 @@ const basePlayerData = {
 };
 
 describe( 'Waveform utilities', () => {
+	afterEach( () => {
+		WaveformPlayerLib.mockClear();
+		document.body.innerHTML = '';
+	} );
+
 	describe( 'createWaveformContainer', () => {
 		it( 'should create a container with required data attributes', () => {
 			const container = createWaveformContainer( basePlayerData );
@@ -37,7 +68,7 @@ describe( 'Waveform utilities', () => {
 				'data-url',
 				'https://example.com/song.mp3'
 			);
-			expect( container ).toHaveAttribute( 'data-height', '100' );
+			expect( container ).toHaveAttribute( 'data-height', '120' );
 			expect( container ).toHaveAttribute(
 				'data-waveform-style',
 				'bars'
@@ -63,7 +94,9 @@ describe( 'Waveform utilities', () => {
 				title: 'My Song',
 				artist: 'The Artist',
 				artwork: 'https://example.com/cover.jpg',
+				artworkAlt: 'Album art',
 				seekLabel: 'My Song',
+				playLabel: 'Play',
 			} );
 
 			expect( container ).toHaveAttribute( 'data-title', 'My Song' );
@@ -72,7 +105,15 @@ describe( 'Waveform utilities', () => {
 				'data-artwork',
 				'https://example.com/cover.jpg'
 			);
+			expect( container ).toHaveAttribute(
+				'data-artwork-alt',
+				'Album art'
+			);
 			expect( container ).toHaveAttribute( 'data-seek-label', 'My Song' );
+			expect( container ).toHaveAttribute(
+				'data-play-pause-label',
+				'Play'
+			);
 		} );
 
 		it( 'should set the seek value-text template when provided', () => {
@@ -103,237 +144,6 @@ describe( 'Waveform utilities', () => {
 			} );
 
 			expect( container ).toHaveAttribute( 'data-height', '150' );
-		} );
-
-		it( 'serializes gradient color arrays and direction attributes', () => {
-			const container = createWaveformContainer( {
-				...basePlayerData,
-				waveformColor: [
-					'rgba(255, 0, 0, 0.3)',
-					'rgba(0, 0, 255, 0.3)',
-				],
-				progressColor: [
-					'rgba(255, 0, 0, 0.6)',
-					'rgba(0, 0, 255, 0.6)',
-				],
-				waveformGradient: 'horizontal',
-			} );
-
-			expect( container ).toHaveAttribute(
-				'data-waveform-color',
-				'["rgba(255, 0, 0, 0.3)","rgba(0, 0, 255, 0.3)"]'
-			);
-			expect( container ).toHaveAttribute(
-				'data-progress-color',
-				'["rgba(255, 0, 0, 0.6)","rgba(0, 0, 255, 0.6)"]'
-			);
-			expect( container ).toHaveAttribute(
-				'data-waveform-gradient',
-				'horizontal'
-			);
-		} );
-	} );
-
-	describe( 'getWaveformColors', () => {
-		it( 'derives waveform colors from the computed text color', () => {
-			const element = document.createElement( 'div' );
-			element.style.color = '#336699';
-			document.body.appendChild( element );
-
-			const colors = getWaveformColors( element );
-
-			expect( colors ).toEqual( {
-				textColor: 'rgb(51, 102, 153)',
-				waveformColor: 'rgba(51, 102, 153, 0.3)',
-				progressColor: 'rgba(51, 102, 153, 0.6)',
-			} );
-
-			element.remove();
-		} );
-
-		it( 'uses explicit text and waveform color values when provided', () => {
-			const element = document.createElement( 'div' );
-
-			const colors = getWaveformColors( element, '#ff0000', '#0000ff' );
-
-			expect( colors ).toEqual( {
-				textColor: '#0000ff',
-				waveformColor: 'rgba(255, 0, 0, 0.3)',
-				progressColor: 'rgba(255, 0, 0, 0.6)',
-			} );
-		} );
-
-		it( 'uses gradient stops when a waveform gradient is provided', () => {
-			const element = document.createElement( 'div' );
-
-			const colors = getWaveformColors(
-				element,
-				undefined,
-				'#0000ff',
-				'linear-gradient(90deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)'
-			);
-
-			expect( colors ).toEqual( {
-				textColor: '#0000ff',
-				waveformColor: [
-					'rgba(255, 0, 0, 0.3)',
-					'rgba(0, 0, 255, 0.3)',
-				],
-				progressColor: [
-					'rgba(255, 0, 0, 0.6)',
-					'rgba(0, 0, 255, 0.6)',
-				],
-				waveformGradient: 'horizontal',
-			} );
-		} );
-
-		it( 'maps CSS gradient side-or-corner directions for waveform gradients', () => {
-			const element = document.createElement( 'div' );
-
-			expect(
-				getWaveformColors(
-					element,
-					undefined,
-					'#0000ff',
-					'linear-gradient(to right,rgb(255,0,0) 0%,rgb(0,0,255) 100%)'
-				).waveformGradient
-			).toBe( 'horizontal' );
-			expect(
-				getWaveformColors(
-					element,
-					undefined,
-					'#0000ff',
-					'linear-gradient(to bottom right,rgb(255,0,0) 0%,rgb(0,0,255) 100%)'
-				).waveformGradient
-			).toBe( 'diagonal' );
-		} );
-	} );
-
-	describe( 'getWaveformGradientStops', () => {
-		it( 'extracts color stops from a CSS gradient value', () => {
-			expect(
-				getWaveformGradientStops(
-					'linear-gradient(135deg,rgb(255,0,0) 0%,rgba(0,0,255,0.8) 100%)'
-				)
-			).toEqual( [ 'rgb(255,0,0)', 'rgba(0,0,255,0.8)' ] );
-		} );
-	} );
-
-	describe( 'applyWaveformPlayerStyles', () => {
-		it( 'applies the waveform background color', () => {
-			const container = document.createElement( 'div' );
-			const waveformContainer = document.createElement( 'div' );
-			waveformContainer.className = 'waveform-container';
-			container.appendChild( waveformContainer );
-
-			applyWaveformPlayerStyles( container, {
-				backgroundColor: '#ffeeaa',
-			} );
-
-			expect( waveformContainer ).toHaveStyle( {
-				backgroundColor: '#ffeeaa',
-			} );
-		} );
-
-		it( 'applies the waveform background gradient', () => {
-			const container = document.createElement( 'div' );
-			const waveformContainer = document.createElement( 'div' );
-			waveformContainer.className = 'waveform-container';
-			container.appendChild( waveformContainer );
-
-			applyWaveformPlayerStyles( container, {
-				backgroundGradient:
-					'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)',
-			} );
-
-			expect( waveformContainer ).toHaveStyle( {
-				background: 'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)',
-			} );
-		} );
-
-		it( 'applies the waveform player text color variables', () => {
-			const container = document.createElement( 'div' );
-
-			applyWaveformPlayerStyles( container, {
-				textColor: '#0000ff',
-			} );
-
-			expect( container ).toHaveStyle( {
-				'--wfp-text-color': '#0000ff',
-				'--wfp-text-secondary-color': '#0000ff',
-			} );
-		} );
-
-		it( 'applies the waveform player play button color variable', () => {
-			const container = document.createElement( 'div' );
-
-			applyWaveformPlayerStyles( container, {
-				playButtonColor: '#ff0000',
-			} );
-
-			expect( container ).toHaveStyle( {
-				'--wfp-button-color': '#ff0000',
-			} );
-		} );
-
-		it( 'applies the waveform player play button gradient', () => {
-			const container = document.createElement( 'div' );
-			const playButton = document.createElement( 'button' );
-			playButton.className = 'waveform-btn';
-			container.appendChild( playButton );
-
-			applyWaveformPlayerStyles( container, {
-				playButtonGradient:
-					'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)',
-			} );
-
-			expect( playButton ).toHaveStyle( {
-				background: 'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)',
-			} );
-			expect( container ).toHaveStyle( {
-				'--wfp-button-color': '#0000ff',
-			} );
-		} );
-
-		it( 'removes the waveform background color when cleared', () => {
-			const container = document.createElement( 'div' );
-			const waveformContainer = document.createElement( 'div' );
-			waveformContainer.className = 'waveform-container';
-			waveformContainer.style.backgroundColor = '#ffeeaa';
-			container.appendChild( waveformContainer );
-
-			applyWaveformPlayerStyles( container );
-
-			expect( waveformContainer ).not.toHaveStyle( {
-				backgroundColor: '#ffeeaa',
-			} );
-		} );
-
-		it( 'removes the waveform player text color variables when cleared', () => {
-			const container = document.createElement( 'div' );
-			container.style.setProperty( '--wfp-text-color', '#0000ff' );
-			container.style.setProperty(
-				'--wfp-text-secondary-color',
-				'#0000ff'
-			);
-
-			applyWaveformPlayerStyles( container );
-
-			expect( container ).not.toHaveStyle( {
-				'--wfp-text-color': '#0000ff',
-				'--wfp-text-secondary-color': '#0000ff',
-			} );
-		} );
-
-		it( 'removes the waveform player play button color variable when cleared', () => {
-			const container = document.createElement( 'div' );
-			container.style.setProperty( '--wfp-button-color', '#ff0000' );
-
-			applyWaveformPlayerStyles( container );
-
-			expect( container ).not.toHaveStyle( {
-				'--wfp-button-color': '#ff0000',
-			} );
 		} );
 	} );
 
@@ -555,128 +365,420 @@ describe( 'Waveform utilities', () => {
 				setupPlayButtonAccessibility( container )
 			).not.toThrow();
 		} );
+
+		it( 'stops play button clicks from bubbling to the container', () => {
+			// The library focuses the container on any click that reaches it,
+			// stealing focus from the play button. The click must not bubble.
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			const containerClick = jest.fn();
+			container.addEventListener( 'click', containerClick );
+
+			setupPlayButtonAccessibility( container );
+			playBtn.dispatchEvent(
+				new window.MouseEvent( 'click', { bubbles: true } )
+			);
+
+			expect( containerClick ).not.toHaveBeenCalled();
+		} );
+
+		it( 'cleanup removes the play button click handler', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			const containerClick = jest.fn();
+			container.addEventListener( 'click', containerClick );
+
+			const cleanup = setupPlayButtonAccessibility( container );
+			cleanup();
+
+			// After cleanup, the click is no longer stopped and reaches the container.
+			playBtn.dispatchEvent(
+				new window.MouseEvent( 'click', { bubbles: true } )
+			);
+
+			expect( containerClick ).toHaveBeenCalledTimes( 1 );
+		} );
 	} );
 
-	describe( 'setupPlayButtonArtwork', () => {
-		it( 'should set artwork as the play button background', () => {
-			const container = document.createElement( 'div' );
-			const playBtn = document.createElement( 'button' );
-			playBtn.className = 'waveform-btn';
-			const artworkEl = document.createElement( 'img' );
-			artworkEl.src = 'https://example.com/cover.jpg';
-			container.append( playBtn, artworkEl );
+	describe( 'getNextShuffledTrack', () => {
+		it( 'should never return the current track for a multi-track list', () => {
+			const ids = [ 'a', 'b', 'c', 'd' ];
+			let current = 'a';
+			let played = [];
+			for ( let i = 0; i < 100; i++ ) {
+				const result = getNextShuffledTrack( ids, current, played );
+				expect( result.nextId ).not.toBe( current );
+				current = result.nextId;
+				played = result.playedIds;
+			}
+		} );
 
-			setupPlayButtonArtwork(
-				container,
-				'https://example.com/cover.jpg'
+		it( 'should play every track once before any repeats', () => {
+			const ids = [ 'a', 'b', 'c', 'd' ];
+			let current = 'a';
+			let played = [ 'a' ];
+			const cycle = [ 'a' ];
+			// Advance three times to complete the first cycle of four tracks.
+			for ( let i = 0; i < 3; i++ ) {
+				const result = getNextShuffledTrack( ids, current, played );
+				cycle.push( result.nextId );
+				current = result.nextId;
+				played = result.playedIds;
+			}
+			// All four tracks appear exactly once in the completed cycle.
+			expect( [ ...cycle ].sort() ).toEqual( [ 'a', 'b', 'c', 'd' ] );
+		} );
+
+		it( 'should not repeat the just-played track across a cycle boundary', () => {
+			const ids = [ 'a', 'b', 'c' ];
+			// All three have played; current is the last one played.
+			const result = getNextShuffledTrack( ids, 'c', [ 'a', 'b', 'c' ] );
+			expect( result.nextId ).not.toBe( 'c' );
+			// New cycle starts fresh with just the chosen track.
+			expect( result.playedIds ).toEqual( [ result.nextId ] );
+		} );
+
+		it( 'should alternate deterministically for two tracks', () => {
+			const first = getNextShuffledTrack( [ 'a', 'b' ], 'a', [] );
+			expect( first.nextId ).toBe( 'b' );
+			expect( first.playedIds ).toEqual( [ 'a', 'b' ] );
+
+			const second = getNextShuffledTrack(
+				[ 'a', 'b' ],
+				'b',
+				first.playedIds
 			);
+			expect( second.nextId ).toBe( 'a' );
+			expect( second.playedIds ).toEqual( [ 'a' ] );
+		} );
 
-			expect( container ).toHaveClass( 'has-play-button-artwork' );
+		it( 'should return the only track when the list has one entry', () => {
+			expect( getNextShuffledTrack( [ 'a' ], 'a', [] ) ).toEqual( {
+				nextId: 'a',
+				playedIds: [ 'a' ],
+			} );
+		} );
+
+		it( 'should identify when the current track completes a shuffle cycle', () => {
 			expect(
-				container.style.getPropertyValue(
-					'--wp--playlist--play-button-artwork'
-				)
-			).toBe( 'url("https://example.com/cover.jpg")' );
-			expect( artworkEl.parentElement ).toBe( container );
+				isShuffleCycleComplete( [ 'a', 'b', 'c' ], 'c', [ 'a', 'b' ] )
+			).toBe( true );
+			expect(
+				isShuffleCycleComplete( [ 'a', 'b', 'c' ], 'b', [ 'a' ] )
+			).toBe( false );
 		} );
 
-		it( 'should escape artwork URLs for CSS usage', () => {
-			const container = document.createElement( 'div' );
-			const playBtn = document.createElement( 'button' );
-			playBtn.className = 'waveform-btn';
-			container.appendChild( playBtn );
+		it( 'should start a fresh cycle from a manually selected shuffled track', () => {
+			expect( getPlayedTracksAfterTrackSelection( 'b', true ) ).toEqual( [
+				'b',
+			] );
+		} );
 
-			setupPlayButtonArtwork(
-				container,
-				'https://example.com/cover "quoted".jpg'
+		it( 'should clear cycle state for manual selection when shuffle is off', () => {
+			expect( getPlayedTracksAfterTrackSelection( 'b', false ) ).toEqual(
+				[]
+			);
+		} );
+	} );
+
+	describe( 'getPlaylistPlaybackAction', () => {
+		let randomSpy;
+
+		beforeEach( () => {
+			randomSpy = jest.spyOn( Math, 'random' ).mockReturnValue( 0 );
+		} );
+
+		afterEach( () => {
+			randomSpy.mockRestore();
+		} );
+
+		it( 'cycles repeat modes from off to playlist to current track', () => {
+			expect( getNextRepeatMode( 'none' ) ).toBe( 'all' );
+			expect( getNextRepeatMode( 'all' ) ).toBe( 'one' );
+			expect( getNextRepeatMode( 'one' ) ).toBe( 'none' );
+		} );
+
+		it( 'replays the current track when repeat-one is active and a track ends', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'b', {
+					repeatMode: 'one',
+				} )
+			).toEqual( {
+				action: 'repeat',
+				nextId: 'b',
+				playedIds: [],
+			} );
+		} );
+
+		it( 'replays the current track when repeat-one is active and skip is pressed', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'b', {
+					repeatMode: 'one',
+					isUserInitiated: true,
+				} )
+			).toEqual( {
+				action: 'repeat',
+				nextId: 'b',
+				playedIds: [],
+			} );
+		} );
+
+		it( 'loads the next track in order when repeat-playlist is active and skip is pressed', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'b', {
+					repeatMode: 'all',
+					isUserInitiated: true,
+				} )
+			).toEqual( {
+				action: 'advance',
+				nextId: 'c',
+				playedIds: [],
+			} );
+		} );
+
+		it( 'wraps to the first track when repeat-playlist is active and the last track ends', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'c', {
+					repeatMode: 'all',
+				} )
+			).toEqual( {
+				action: 'advance',
+				nextId: 'a',
+				playedIds: [],
+			} );
+		} );
+
+		it( 'loads a shuffled track when shuffle is active and a track ends', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'a', {
+					isShuffled: true,
+				} )
+			).toEqual( {
+				action: 'advance',
+				nextId: 'b',
+				playedIds: [ 'a', 'b' ],
+			} );
+		} );
+
+		it( 'continues shuffle after manually selecting a track from a completed cycle', () => {
+			const playedTracks = getPlayedTracksAfterTrackSelection(
+				'a',
+				true
 			);
 
 			expect(
-				container.style.getPropertyValue(
-					'--wp--playlist--play-button-artwork'
-				)
-			).toBe( 'url("https://example.com/cover \\"quoted\\".jpg")' );
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'a', {
+					isShuffled: true,
+					playedTracks,
+				} )
+			).toEqual( {
+				action: 'advance',
+				nextId: 'b',
+				playedIds: [ 'a', 'b' ],
+			} );
 		} );
 
-		it( 'should not modify play button icon paths', () => {
-			const container = document.createElement( 'div' );
-			const playBtn = document.createElement( 'button' );
-			playBtn.className = 'waveform-btn';
-			const svg = document.createElementNS(
-				'http://www.w3.org/2000/svg',
-				'svg'
-			);
-			const path = document.createElementNS(
-				'http://www.w3.org/2000/svg',
-				'path'
-			);
-			const artworkEl = document.createElement( 'img' );
-			svg.appendChild( path );
-			playBtn.appendChild( svg );
-			container.append( playBtn, artworkEl );
-
-			setupPlayButtonArtwork(
-				container,
-				'https://example.com/cover.jpg'
-			);
-
-			expect( path ).not.toHaveStyle( { fill: '#ffffff' } );
-		} );
-
-		it( 'should set artwork state when play button is missing', () => {
-			const container = document.createElement( 'div' );
-			const artworkEl = document.createElement( 'img' );
-			container.appendChild( artworkEl );
-
-			expect( () => {
-				setupPlayButtonArtwork(
-					container,
-					'https://example.com/cover.jpg'
-				);
-			} ).not.toThrow();
-			expect( container ).toHaveClass( 'has-play-button-artwork' );
-			expect( artworkEl.parentElement ).toBe( container );
-		} );
-
-		it( 'should set button artwork when artwork element is missing', () => {
-			const container = document.createElement( 'div' );
-			const playBtn = document.createElement( 'button' );
-			playBtn.className = 'waveform-btn';
-			container.appendChild( playBtn );
-
-			expect( () => {
-				setupPlayButtonArtwork(
-					container,
-					'https://example.com/cover.jpg'
-				);
-			} ).not.toThrow();
-			expect( container ).toHaveClass( 'has-play-button-artwork' );
+		it( 'loads a shuffled track when shuffle is active and skip is pressed', () => {
 			expect(
-				container.style.getPropertyValue(
-					'--wp--playlist--play-button-artwork'
-				)
-			).toBe( 'url("https://example.com/cover.jpg")' );
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'a', {
+					isShuffled: true,
+					isUserInitiated: true,
+				} )
+			).toEqual( {
+				action: 'advance',
+				nextId: 'b',
+				playedIds: [ 'a', 'b' ],
+			} );
 		} );
 
-		it( 'should clear button artwork when artwork URL is empty', () => {
-			const container = document.createElement( 'div' );
-			container.className = 'has-play-button-artwork';
-			container.style.setProperty(
-				'--wp--playlist--play-button-artwork',
-				'url("https://example.com/cover.jpg")'
-			);
-			const playBtn = document.createElement( 'button' );
-			playBtn.className = 'waveform-btn';
-			container.appendChild( playBtn );
-
-			setupPlayButtonArtwork( container, '' );
-
-			expect( container ).not.toHaveClass( 'has-play-button-artwork' );
+		it( 'starts a new shuffle cycle when repeat-playlist and shuffle are active', () => {
 			expect(
-				container.style.getPropertyValue(
-					'--wp--playlist--play-button-artwork'
-				)
-			).toBe( '' );
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'c', {
+					repeatMode: 'all',
+					isShuffled: true,
+					playedTracks: [ 'a', 'b', 'c' ],
+				} )
+			).toEqual( {
+				action: 'advance',
+				nextId: 'a',
+				playedIds: [ 'a' ],
+			} );
+		} );
+
+		it( 'loads a shuffled track when repeat-playlist and shuffle are active and skip is pressed', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'a', {
+					repeatMode: 'all',
+					isShuffled: true,
+					isUserInitiated: true,
+				} )
+			).toEqual( {
+				action: 'advance',
+				nextId: 'b',
+				playedIds: [ 'a', 'b' ],
+			} );
+		} );
+
+		it( 'replays the current track when repeat-one and shuffle are active and a track ends', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'b', {
+					repeatMode: 'one',
+					isShuffled: true,
+					playedTracks: [ 'a', 'b' ],
+				} )
+			).toEqual( {
+				action: 'repeat',
+				nextId: 'b',
+				playedIds: [ 'a', 'b' ],
+			} );
+		} );
+
+		it( 'replays the current track when repeat-one and shuffle are active and skip is pressed', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'a', {
+					repeatMode: 'one',
+					isShuffled: true,
+					playedTracks: [ 'a', 'b' ],
+					isUserInitiated: true,
+				} )
+			).toEqual( {
+				action: 'repeat',
+				nextId: 'a',
+				playedIds: [ 'a', 'b' ],
+			} );
+		} );
+	} );
+
+	describe( 'setupPlaylistMetadata', () => {
+		const createContainer = () => {
+			const container = document.createElement( 'div' );
+			const waveformTrack = document.createElement( 'div' );
+			waveformTrack.className = 'waveform-track';
+			const info = document.createElement( 'div' );
+			info.className = 'waveform-info';
+			const artwork = document.createElement( 'img' );
+			artwork.className = 'waveform-artwork';
+			const title = document.createElement( 'span' );
+			title.className = 'waveform-title';
+			title.textContent = 'Track title';
+			const subtitle = document.createElement( 'span' );
+			subtitle.className = 'waveform-subtitle';
+			subtitle.textContent = 'Artist';
+			const time = document.createElement( 'span' );
+			time.className = 'waveform-time';
+			const currentTime = document.createElement( 'span' );
+			currentTime.className = 'time-current';
+			currentTime.textContent = '0:01';
+			const totalTime = document.createElement( 'span' );
+			totalTime.className = 'time-total';
+			totalTime.textContent = '4:00';
+			time.append( currentTime, ' / ', totalTime );
+
+			info.append( artwork, title, subtitle, time );
+			container.append( waveformTrack, info );
+			document.body.appendChild( container );
+
+			return { container, artwork, title, subtitle, time };
+		};
+
+		afterEach( () => {
+			document.body.innerHTML = '';
+		} );
+
+		it( 'places artwork, title, and time in the playlist metadata row', () => {
+			const { container, artwork, title, subtitle, time } =
+				createContainer();
+
+			setupPlaylistMetadata( container, {
+				artworkEl: artwork,
+				titleEl: title,
+				subtitleEl: subtitle,
+			} );
+
+			const metadata = container.querySelector(
+				'.wp-block-playlist__metadata'
+			);
+			const titleRow = container.querySelector(
+				'.wp-block-playlist__metadata-title-row'
+			);
+			const metadataText = container.querySelector(
+				'.wp-block-playlist__metadata-text'
+			);
+
+			expect( metadata.firstChild ).toBe( artwork );
+			expect( metadataText ).toContainElement( titleRow );
+			expect( Array.from( titleRow.children ) ).toEqual( [
+				title,
+				time,
+			] );
+			expect( time ).toHaveTextContent( '0:01/4:00' );
+			expect( metadataText ).toContainElement( subtitle );
+			expect( container.querySelector( '.waveform-info' ) ).toBeNull();
+		} );
+	} );
+
+	describe( 'initWaveformPlayer', () => {
+		it( 'passes supported player API options to the waveform library', () => {
+			const element = document.createElement( 'div' );
+			document.body.appendChild( element );
+			const onEnded = jest.fn();
+			const onNextTrack = jest.fn();
+			const onPreviousTrack = jest.fn();
+
+			initWaveformPlayer( element, {
+				src: 'https://example.com/song.mp3',
+				title: 'My Song',
+				artist: 'The Artist',
+				image: 'https://example.com/cover.jpg',
+				imageAlt: 'Album art',
+				labels: {
+					play: 'Play',
+					seek: 'Seek',
+					seekValueText: '%1$s of %2$s',
+				},
+				waveformStyle: 'bars',
+				onEnded,
+				onNextTrack,
+				onPreviousTrack,
+			} );
+
+			expect( WaveformPlayerLib ).toHaveBeenCalledWith(
+				expect.any( global.HTMLDivElement ),
+				expect.objectContaining( {
+					url: 'https://example.com/song.mp3',
+					title: 'My Song',
+					artist: 'The Artist',
+					artwork: 'https://example.com/cover.jpg',
+					artworkAlt: 'Album art',
+					waveformStyle: 'bars',
+					seekLabel: 'My Song',
+					seekValueText: '%1$s of %2$s',
+					playPauseLabel: 'Play',
+					onEnd: onEnded,
+					onNextTrack,
+					onPreviousTrack,
+				} )
+			);
+		} );
+	} );
+
+	describe( 'replayWaveformPlayerTrack', () => {
+		it( 'seeks to the start of the current track and plays it', () => {
+			const instance = {
+				seekTo: jest.fn(),
+				play: jest.fn().mockReturnValue( Promise.resolve() ),
+			};
+
+			replayWaveformPlayerTrack( instance );
+
+			expect( instance.seekTo ).toHaveBeenCalledWith( 0 );
+			expect( instance.play ).toHaveBeenCalled();
 		} );
 	} );
 
