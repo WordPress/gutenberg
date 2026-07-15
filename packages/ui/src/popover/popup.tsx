@@ -80,7 +80,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	const positionedPopup = renderSlotWithChildren(
 		positioner,
 		<Positioner />,
-		popupContent
+		{ children: popupContent }
 	);
 
 	const portalChildren = (
@@ -90,7 +90,9 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		</>
 	);
 
-	return renderSlotWithChildren( portal, <Portal />, portalChildren );
+	return renderSlotWithChildren( portal, <Portal />, {
+		children: portalChildren,
+	} );
 } );
 
 export { Popup };

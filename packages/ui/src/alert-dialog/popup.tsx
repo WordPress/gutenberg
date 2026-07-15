@@ -166,7 +166,9 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 			</>
 		);
 
-		return renderSlotWithChildren( portal, <Portal />, portalChildren );
+		return renderSlotWithChildren( portal, <Portal />, {
+			children: portalChildren,
+		} );
 	}
 );
 

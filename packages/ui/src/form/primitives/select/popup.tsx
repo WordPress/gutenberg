@@ -36,9 +36,11 @@ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 		const positionedPopup = renderSlotWithChildren(
 			positioner,
 			<Positioner />,
-			popupContent
+			{ children: popupContent }
 		);
 
-		return renderSlotWithChildren( portal, <Portal />, positionedPopup );
+		return renderSlotWithChildren( portal, <Portal />, {
+			children: positionedPopup,
+		} );
 	}
 );

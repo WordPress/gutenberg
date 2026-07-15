@@ -16,32 +16,34 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function MenuPopup(
 	ref
 ) {
 	const popupContent = (
-		<ThemeProvider>
-			<_Menu.Popup
-				ref={ ref }
-				className={ clsx( styles.popup, className ) }
-				{ ...props }
+		<_Menu.Popup
+			ref={ ref }
+			className={ clsx( styles.popup, className ) }
+			{ ...props }
+		>
+			<div
+				/*
+				 * `styles.list` flattens this wrapper so menu items can
+				 * participate in the popup's shared grid.
+				 */
+				className={ styles.list }
 			>
-				<div
-					/*
-					 * `styles.list` flattens this wrapper so menu items can
-					 * participate in the popup's shared grid.
-					 */
-					className={ styles.list }
-				>
-					{ children }
-				</div>
-			</_Menu.Popup>
-		</ThemeProvider>
+				{ children }
+			</div>
+		</_Menu.Popup>
 	);
 
 	const positionedPopup = renderSlotWithChildren(
 		positioner,
 		<Positioner />,
-		popupContent
+		{ children: popupContent, className: styles.positioner }
 	);
 
-	return renderSlotWithChildren( portal, <Portal />, positionedPopup );
+	return renderSlotWithChildren( portal, <Portal />, {
+		// ThemeProvider wrap around the positioner so that the positioner
+		// can consume the correct DS token for its background color.
+		children: <ThemeProvider>{ positionedPopup }</ThemeProvider>,
+	} );
 } );
 
 export { Popup };
