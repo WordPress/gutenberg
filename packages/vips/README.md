@@ -39,6 +39,8 @@ _Parameters_
 -   _type_ `string`: Mime type.
 -   _quality_ Desired quality.
 -   _interlaced_ Whether to use interlaced/progressive mode. Only used if the outputType supports it.
+-   _stripMeta_ Whether to strip metadata (except color profiles), from the `image_strip_meta` filter.
+-   _maxBitdepth_ Maximum output bit depth, from the `image_max_bit_depth` filter.
 
 _Returns_
 
@@ -56,6 +58,8 @@ _Parameters_
 -   _outputType_ `string`: Output mime type.
 -   _quality_ Desired quality.
 -   _interlaced_ Whether to use interlaced/progressive mode. Only used if the outputType supports it.
+-   _stripMeta_ Whether to strip metadata (except color profiles), from the `image_strip_meta` filter.
+-   _maxBitdepth_ Maximum output bit depth, from the `image_max_bit_depth` filter.
 
 ### getUltraHdrInfo
 
@@ -99,6 +103,8 @@ _Parameters_
 -   _resize_ `ImageSizeCrop`: Resize options.
 -   _smartCrop_ Whether to use smart cropping (i.e. saliency-aware).
 -   _quality_ Desired quality (0-1).
+-   _stripMeta_ Whether to strip metadata (except color profiles), from the `image_strip_meta` filter.
+-   _maxBitdepth_ Maximum output bit depth, from the `image_max_bit_depth` filter.
 
 _Returns_
 
@@ -146,6 +152,8 @@ _Parameters_
 -   _type_ `string`: Mime type.
 -   _quality_ Desired quality.
 -   _interlaced_ Whether to use interlaced/progressive mode. Only used if the outputType supports it.
+-   _stripMeta_ Whether to strip metadata (except color profiles), from the `image_strip_meta` filter.
+-   _maxBitdepth_ Maximum output bit depth, from the `image_max_bit_depth` filter.
 
 _Returns_
 
@@ -163,6 +171,8 @@ _Parameters_
 -   _outputType_ `string`: Output mime type.
 -   _quality_ Desired quality.
 -   _interlaced_ Whether to use interlaced/progressive mode. Only used if the outputType supports it.
+-   _stripMeta_ Whether to strip metadata (except color profiles), from the `image_strip_meta` filter.
+-   _maxBitdepth_ Maximum output bit depth, from the `image_max_bit_depth` filter.
 
 ### vipsGetUltraHdrInfo
 
@@ -206,6 +216,8 @@ _Parameters_
 -   _resize_ `ImageSizeCrop`: Resize options.
 -   _smartCrop_ Whether to use smart cropping (i.e. saliency-aware).
 -   _quality_ Desired quality (0-1).
+-   _stripMeta_ Whether to strip metadata (except color profiles), from the `image_strip_meta` filter.
+-   _maxBitdepth_ Maximum output bit depth, from the `image_max_bit_depth` filter.
 
 _Returns_
 
