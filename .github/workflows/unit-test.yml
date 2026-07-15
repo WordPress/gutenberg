@@ -187,36 +187,33 @@ jobs:
                 php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5']
                 multisite: [false, true]
                 wordpress: ['', 'previous major version']
-                # TEMPORARY: full exclude matrix disabled to verify icon registry
-                # compatibility across all PHP and WordPress versions (incl. previous
-                # major WP, which lacks the core icon registry). Revert before merge.
-                # exclude:
-                #     # On PRs: Only test PHP 7.4 and 8.5, single-site, latest WP
-                #     - event: 'pull_request'
-                #       php: '8.0'
-                #     - event: 'pull_request'
-                #       php: '8.1'
-                #     - event: 'pull_request'
-                #       php: '8.2'
-                #     - event: 'pull_request'
-                #       php: '8.3'
-                #     - event: 'pull_request'
-                #       php: '8.4'
-                #     - event: 'pull_request'
-                #       multisite: true
-                #     - event: 'pull_request'
-                #       wordpress: 'previous major version'
-                #     # On trunk/releases: Only test previous WP version with specific PHP versions
-                #     - php: '8.0'
-                #       wordpress: 'previous major version'
-                #     - php: '8.1'
-                #       wordpress: 'previous major version'
-                #     - php: '8.2'
-                #       wordpress: 'previous major version'
-                #     - php: '8.3'
-                #       wordpress: 'previous major version'
-                #     - php: '8.4'
-                #       wordpress: 'previous major version'
+                exclude:
+                    # On PRs: Only test PHP 7.4 and 8.5, single-site, latest WP
+                    - event: 'pull_request'
+                      php: '8.0'
+                    - event: 'pull_request'
+                      php: '8.1'
+                    - event: 'pull_request'
+                      php: '8.2'
+                    - event: 'pull_request'
+                      php: '8.3'
+                    - event: 'pull_request'
+                      php: '8.4'
+                    - event: 'pull_request'
+                      multisite: true
+                    - event: 'pull_request'
+                      wordpress: 'previous major version'
+                    # On trunk/releases: Only test previous WP version with specific PHP versions
+                    - php: '8.0'
+                      wordpress: 'previous major version'
+                    - php: '8.1'
+                      wordpress: 'previous major version'
+                    - php: '8.2'
+                      wordpress: 'previous major version'
+                    - php: '8.3'
+                      wordpress: 'previous major version'
+                    - php: '8.4'
+                      wordpress: 'previous major version'
 
         env:
             WP_ENV_PHP_VERSION: ${{ matrix.php }}
