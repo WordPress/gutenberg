@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Keep overlays in the compat overlay slot available to assistive technologies inside `@wordpress/components` Modal ([#80310](https://github.com/WordPress/gutenberg/pull/80310)).
+-   Keep overlays in the compat overlay slot available to assistive technologies when used alongside `@wordpress/components` Modal ([#80310](https://github.com/WordPress/gutenberg/pull/80310)).
 
 ### Code Quality
 
