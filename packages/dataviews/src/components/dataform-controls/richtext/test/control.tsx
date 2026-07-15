@@ -7,8 +7,7 @@ import type { MutableRefObject } from 'react';
 /**
  * WordPress dependencies
  */
-import { Fill } from '@wordpress/components';
-import { useContext, useEffect } from '@wordpress/element';
+import { createPortal, useContext, useEffect } from '@wordpress/element';
 import {
 	unregisterFormatType,
 	registerFormatType,
@@ -50,8 +49,20 @@ const flushMicrotasks = () =>
 		await Promise.resolve();
 	} );
 
-async function focusTextbox( textbox: HTMLElement ) {
-	fireEvent.focus( textbox );
+// Flush a deferred (0ms `setTimeout`) update — e.g. `useFocusOutside`'s blur
+// check, or a validity message revealed after the field is touched.
+const flushTimeouts = () =>
+	act( async () => {
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+	} );
+
+// Move real focus (and flush the selection microtask focusing the editable
+// schedules). `useFocusOutside` needs real focus order: `focusout` on the old
+// element before `focusin` on the new.
+async function moveFocusTo( element: HTMLElement ) {
+	act( () => {
+		element.focus();
+	} );
 	await flushMicrotasks();
 }
 
@@ -203,7 +214,7 @@ describe( 'RichTextControl', () => {
 				/>
 			);
 			const textbox = getTextbox( container );
-			await focusTextbox( textbox );
+			await moveFocusTo( textbox );
 
 			// `fireEvent` returns `false` when `preventDefault()` was called.
 			expect( fireEvent.keyDown( textbox, { key: 'Enter' } ) ).toBe(
@@ -227,7 +238,7 @@ describe( 'RichTextControl', () => {
 					/>
 				);
 				const textbox = getTextbox( container );
-				await focusTextbox( textbox );
+				await moveFocusTo( textbox );
 
 				/*
 				 * The control takes over Enter handling from the browser
@@ -263,7 +274,7 @@ describe( 'RichTextControl', () => {
 					/>
 				);
 				const textbox = getTextbox( container );
-				await focusTextbox( textbox );
+				await moveFocusTo( textbox );
 
 				/*
 				 * During IME composition (e.g. CJK input), Enter confirms
@@ -292,7 +303,7 @@ describe( 'RichTextControl', () => {
 				/>
 			);
 			const textbox = getTextbox( container );
-			await focusTextbox( textbox );
+			await moveFocusTo( textbox );
 
 			expect(
 				fireEvent.keyDown( textbox, { key: 'Enter', metaKey: true } )
@@ -389,20 +400,18 @@ describe( 'RichTextControl', () => {
 				className: null,
 				edit: () => <TestShortcut onUse={ () => currentOnUse() } />,
 			} );
-			// Stand-in for a format type that opens a popover (e.g. the
-			// inline link UI). `Popover` renders its content through a
-			// `Fill` for the ambient popover slot — here that is the slot
-			// the assembly owns, which is exactly what its blur handling
-			// checks to prove the popover belongs to this field.
+			// Stand-in for a format type that opens a popover (e.g. the inline
+			// link UI). Like a real `Popover`, it portals out of the field's
+			// DOM subtree, but its focus still bubbles through the React tree.
 			registerTestFormatType( 'core/test-popover-ui', {
 				title: 'Test Popover UI',
 				tagName: 'kbd',
 				className: null,
-				edit: () => (
-					<Fill name="Popover">
-						<button type="button">Inside popover</button>
-					</Fill>
-				),
+				edit: () =>
+					createPortal(
+						<button type="button">Inside popover</button>,
+						document.body
+					),
 			} );
 		} );
 
@@ -414,18 +423,6 @@ describe( 'RichTextControl', () => {
 		beforeEach( () => {
 			currentOnUse = jest.fn();
 		} );
-
-		async function blurTextbox( textbox: HTMLElement ) {
-			fireEvent.blur( textbox );
-			// `RichTextControl` defers deselection on blur via a 0ms
-			// `setTimeout` so a portal-rendered popover (e.g., the
-			// inline link UI) can claim focus before `FormatEdit`
-			// unmounts. Flush that timer so the test sees the
-			// deselected state.
-			await act( async () => {
-				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
-			} );
-		}
 
 		// Dispatch a `primary+b` keydown — on non-Apple platforms (jsdom's
 		// default), the `primary` modifier maps to Ctrl, not Meta.
@@ -447,7 +444,7 @@ describe( 'RichTextControl', () => {
 			);
 			const textbox = getTextbox( container );
 
-			await focusTextbox( textbox );
+			await moveFocusTo( textbox );
 
 			// `fireEvent.keyDown` returns `false` when the dispatched event
 			// had `preventDefault()` called on it.
@@ -473,37 +470,26 @@ describe( 'RichTextControl', () => {
 
 		it( 'stops dispatching shortcuts after blur', async () => {
 			const { container } = render(
-				<RichTextControl
-					label="Shortcut blur"
-					value=""
-					onChange={ () => {} }
-				/>
+				<>
+					<RichTextControl
+						label="Shortcut blur"
+						value=""
+						onChange={ () => {} }
+					/>
+					<button type="button">Outside</button>
+				</>
 			);
 			const textbox = getTextbox( container );
 
-			await focusTextbox( textbox );
-			await blurTextbox( textbox );
+			await moveFocusTo( textbox );
+			await moveFocusTo(
+				screen.getByRole( 'button', { name: 'Outside' } )
+			);
+			await flushTimeouts();
 
 			dispatchPrimaryB( textbox );
 			expect( currentOnUse ).not.toHaveBeenCalled();
 		} );
-
-		// Focus the textbox, move focus into the supplied element, then blur
-		// the textbox and flush the deferred deselection timer.
-		async function blurWithFocusIn(
-			textbox: HTMLElement,
-			target: HTMLElement
-		) {
-			await focusTextbox( textbox );
-			// Focus the target before firing the textbox blur so
-			// `document.activeElement` points at it by the time the deferred
-			// check runs.
-			target.focus();
-			fireEvent.blur( textbox );
-			await act( async () => {
-				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
-			} );
-		}
 
 		it( "keeps dispatching shortcuts while focus is in the field's own popover", async () => {
 			const { container } = render(
@@ -515,17 +501,15 @@ describe( 'RichTextControl', () => {
 			);
 			const textbox = getTextbox( container );
 
-			// Selecting the field mounts the stub format's popover content,
-			// which portals into the `Popover.Slot` the field owns.
-			await focusTextbox( textbox );
-			const popoverButton = screen.getByRole( 'button', {
-				name: 'Inside popover',
-			} );
+			// Selecting the field mounts the stub format's portalled popover.
+			await moveFocusTo( textbox );
+			await moveFocusTo(
+				screen.getByRole( 'button', { name: 'Inside popover' } )
+			);
+			await flushTimeouts();
 
-			await blurWithFocusIn( textbox, popoverButton );
-
-			// `FormatEdit` should stay mounted, so the shortcut still
-			// fires on a subsequent keydown delivered to the textbox.
+			// Focus stayed in UI the field owns, so `FormatEdit` stays mounted
+			// and the shortcut still fires.
 			dispatchPrimaryB( textbox );
 			expect( currentOnUse ).toHaveBeenCalledTimes( 1 );
 		} );
@@ -543,24 +527,17 @@ describe( 'RichTextControl', () => {
 			);
 			const textbox = getTextbox( container );
 
-			await focusTextbox( textbox );
-			const popoverButton = screen.getByRole( 'button', {
-				name: 'Inside popover',
-			} );
+			await moveFocusTo( textbox );
+			await moveFocusTo(
+				screen.getByRole( 'button', { name: 'Inside popover' } )
+			);
 
-			await blurWithFocusIn( textbox, popoverButton );
-
-			/*
-			 * Focus now leaves the popover for an element that belongs to
-			 * neither the field nor its popovers. The field's own `onBlur`
-			 * already fired, so this exercises the document-level focus
-			 * tracking that takes over during the popover excursion.
-			 */
-			screen.getByRole( 'button', { name: 'Outside' } ).focus();
-			fireEvent.focusOut( popoverButton );
-			await act( async () => {
-				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
-			} );
+			// Focus leaves the popover for an unrelated element, so the field
+			// deselects.
+			await moveFocusTo(
+				screen.getByRole( 'button', { name: 'Outside' } )
+			);
+			await flushTimeouts();
 
 			// The field deselected, so `FormatEdit` unmounted and the
 			// shortcut no longer fires.
@@ -576,9 +553,9 @@ describe( 'RichTextControl', () => {
 						value=""
 						onChange={ () => {} }
 					/>
-					{ /* Stand-in for a popover owned by unrelated UI (an
-					   ambient popover slot outside the field): it must not
-					   keep the field selected. */ }
+					{ /* Stand-in for a popover owned by unrelated UI (outside
+					   the field's React tree): it must not keep the field
+					   selected. */ }
 					<div className="popover-slot">
 						<button type="button">Unrelated popover</button>
 					</div>
@@ -586,10 +563,11 @@ describe( 'RichTextControl', () => {
 			);
 			const textbox = getTextbox( container );
 
-			await blurWithFocusIn(
-				textbox,
+			await moveFocusTo( textbox );
+			await moveFocusTo(
 				screen.getByRole( 'button', { name: 'Unrelated popover' } )
 			);
+			await flushTimeouts();
 
 			// The field deselected, so `FormatEdit` unmounted and the
 			// shortcut no longer fires.
@@ -675,11 +653,9 @@ describe( 'RichTextControl', () => {
 				screen.queryByText( 'Enter a summary' )
 			).not.toBeInTheDocument();
 
-			await focusTextbox( textbox );
+			await moveFocusTo( textbox );
 			fireEvent.blur( textbox );
-			await act( async () => {
-				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
-			} );
+			await flushTimeouts();
 
 			expect( screen.getByText( 'Enter a summary' ) ).toBeVisible();
 		} );
@@ -738,7 +714,7 @@ describe( 'RichTextControl', () => {
 				screen.queryByTestId( 'format-edit-ui' )
 			).not.toBeInTheDocument();
 
-			await focusTextbox( textbox );
+			await moveFocusTo( textbox );
 
 			expect( screen.getByTestId( 'format-edit-ui' ) ).toHaveTextContent(
 				'true'
@@ -785,8 +761,7 @@ describe( 'RichTextControl', () => {
 			);
 			const textbox = getTextbox( container );
 
-			fireEvent.focus( textbox );
-			await flushMicrotasks();
+			await moveFocusTo( textbox );
 
 			fireEvent.input( textbox, { inputType: 'insertText' } );
 
@@ -809,8 +784,7 @@ describe( 'RichTextControl', () => {
 			);
 			const textbox = getTextbox( container );
 
-			fireEvent.focus( textbox );
-			await flushMicrotasks();
+			await moveFocusTo( textbox );
 
 			fireEvent.input( textbox, { inputType: 'deleteContentBackward' } );
 

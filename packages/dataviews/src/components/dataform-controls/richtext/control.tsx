@@ -2,21 +2,21 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { FocusEvent, MutableRefObject, ReactNode } from 'react';
+import type { MutableRefObject, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
  */
 import {
-	Popover,
-	SlotFillProvider,
 	privateApis as componentsPrivateApis,
 	__unstableUseAutocompleteProps as useAutocompleteProps,
 } from '@wordpress/components';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
-	createPortal,
-	useEffect,
+	useMergeRefs,
+	useRefEffect,
+	__experimentalUseFocusOutside as useFocusOutside,
+} from '@wordpress/compose';
+import {
 	useInsertionEffect,
 	useMemo,
 	useRef,
@@ -209,104 +209,11 @@ export default function RichTextControl( {
 		new Set< ( event: KeyboardEvent ) => void >()
 	);
 
-	/*
-	 * The assembly owns the selection ("active") lifetime, because only it
-	 * can prove that a popover receiving focus belongs to this field: format
-	 * popovers (e.g. the inline link UI opened via Cmd+K) portal into the
-	 * `Popover.Slot` this component renders below inside its own
-	 * `SlotFillProvider`, so "focus is in one of this field's popovers" is
-	 * simply containment in that slot.
-	 */
-	const popoverSlotRef = useRef< HTMLDivElement | null >( null );
-	/*
-	 * Where the `Popover.Slot` portals to: the editable's `ownerDocument`
-	 * body. The slot must not render inline where the field sits — form
-	 * fields routinely live inside scroll containers (`overflow` ancestors
-	 * clip the popovers) and transformed ancestors (which re-root the
-	 * popovers' positioning). Portaling to the body mirrors where popovers
-	 * land by default when no slot is present, while keeping the slot inside
-	 * this field's `SlotFillProvider` (React context crosses portals) so the
-	 * containment-based focus tracking above keeps working.
-	 */
-	const [ popoverContainer, setPopoverContainer ] =
-		useState< HTMLElement | null >( null );
-	const popoverContainerRef = useRefEffect< HTMLElement >( ( element ) => {
-		setPopoverContainer( element.ownerDocument.body );
-	}, [] );
-	// When the editable blurs, defer flipping the selection off so a
-	// portal-rendered popover can claim focus without `FormatEdit` — and
-	// therefore the popover itself — unmounting underneath it.
-	const blurDeselectTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
-	/*
-	 * Once focus moves into one of the field's popovers, the editable has
-	 * already blurred and its `onBlur` will not fire again when focus later
-	 * leaves that popover. Watch document-level `focusout` for the duration
-	 * of the popover excursion so the field still deselects (and tears down
-	 * its format UI) once focus settles outside both the editable and its
-	 * popovers.
-	 */
-	const stopPopoverFocusTrackingRef = useRef< ( () => void ) | undefined >(
-		undefined
-	);
-	useEffect(
-		() => () => {
-			clearTimeout( blurDeselectTimeoutRef.current );
-			stopPopoverFocusTrackingRef.current?.();
-		},
-		[]
-	);
-
-	function isFocusInField( ownerDocument: Document ) {
-		const active = ownerDocument.activeElement;
-		return !! (
-			active &&
-			( anchorRef.current?.contains( active ) ||
-				popoverSlotRef.current?.contains( active ) )
-		);
-	}
-
-	function trackPopoverFocusOut( ownerDocument: Document ) {
-		stopPopoverFocusTrackingRef.current?.();
-
-		function onDocumentFocusOut() {
-			clearTimeout( blurDeselectTimeoutRef.current );
-			blurDeselectTimeoutRef.current = setTimeout( () => {
-				if ( isFocusInField( ownerDocument ) ) {
-					return;
-				}
-				stopPopoverFocusTrackingRef.current?.();
-				setIsSelected( false );
-			}, 0 );
-		}
-
-		ownerDocument.addEventListener( 'focusout', onDocumentFocusOut );
-		stopPopoverFocusTrackingRef.current = () => {
-			ownerDocument.removeEventListener( 'focusout', onDocumentFocusOut );
-			stopPopoverFocusTrackingRef.current = undefined;
-		};
-	}
-
-	function onEditableFocus() {
-		clearTimeout( blurDeselectTimeoutRef.current );
-		// Focus is back in the editable, so its own blur handling takes over
-		// from the popover focus tracking again.
-		stopPopoverFocusTrackingRef.current?.();
-		setIsSelected( true );
-	}
-
-	function onEditableBlur( event: FocusEvent< HTMLElement > ) {
-		clearTimeout( blurDeselectTimeoutRef.current );
-		const { ownerDocument } = event.currentTarget;
-		blurDeselectTimeoutRef.current = setTimeout( () => {
-			// Stay selected while focus is inside one of the popovers this
-			// field's format UI opened.
-			if ( isFocusInField( ownerDocument ) ) {
-				trackPopoverFocusOut( ownerDocument );
-				return;
-			}
-			setIsSelected( false );
-		}, 0 );
-	}
+	// The focus boundary (below) wraps the editable and its format UI. Format
+	// popovers portal out of it in the DOM but still bubble focus events
+	// through the React tree, so `useFocusOutside` deselects only once focus
+	// leaves the field's own UI for good.
+	const focusOutside = useFocusOutside( () => setIsSelected( false ) );
 
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -543,21 +450,19 @@ export default function RichTextControl( {
 		eventListenersRef,
 		enterRef,
 		focusOnMountRef,
-		popoverContainerRef,
 		autocompleteRef,
 	] );
 
 	return (
-		/*
-		 * The provider scopes every slot/fill rendered by this field — most
-		 * importantly the format popovers, which land in the `Popover.Slot`
-		 * below. That containment is what the blur handling above checks to
-		 * decide whether focus is still within the field's own UI. A format
-		 * popover using a custom `__unstableSlotName` would portal to the
-		 * body-level fallback container instead and deselect the field;
-		 * `core/link` (and every other core format) uses the default slot.
-		 */
-		<SlotFillProvider>
+		// Focus boundary for the field's selection: `onFocus` selects on entry;
+		// the spread `useFocusOutside` handlers deselect once focus leaves.
+		<div
+			{ ...focusOutside }
+			onFocus={ ( event ) => {
+				setIsSelected( true );
+				focusOutside.onFocus( event );
+			} }
+		>
 			<RichTextControlShell
 				label={ label }
 				id={ id }
@@ -579,8 +484,6 @@ export default function RichTextControl( {
 				aria-multiline={ ! disableLineBreaks }
 				{ ...autocompleteProps }
 				ref={ editableRef }
-				onFocus={ onEditableFocus }
-				onBlur={ onEditableBlur }
 			/>
 			{ /*
 			 * The format assembly mounts only while the field is selected —
@@ -609,11 +512,6 @@ export default function RichTextControl( {
 					</InputEventContext.Provider>
 				</KeyboardShortcutContext.Provider>
 			) }
-			{ popoverContainer &&
-				createPortal(
-					<Popover.Slot ref={ popoverSlotRef } />,
-					popoverContainer
-				) }
-		</SlotFillProvider>
+		</div>
 	);
 }
