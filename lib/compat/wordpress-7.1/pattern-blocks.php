@@ -99,9 +99,14 @@ function gutenberg_apply_pattern_block_rendering( $args, $block_name ) {
 		$rendering[ $block->name ] = true;
 
 		// A later registration filter may replace the pattern, so read the current
-		// value here. Rebuilding the children also passes this block's override context
-		// to them.
-		$block->parsed_block['innerBlocks']  = parse_blocks( $block->block_type->pattern );
+		// value here. The pattern enters the content after the embed filters have run,
+		// so handle embeds before parsing it.
+		global $wp_embed;
+		$pattern = $wp_embed->run_shortcode( $block->block_type->pattern );
+		$pattern = $wp_embed->autoembed( $pattern );
+
+		// Rebuilding the children also passes this block's override context to them.
+		$block->parsed_block['innerBlocks']  = parse_blocks( $pattern );
 		$block->parsed_block['innerContent'] = array_fill( 0, count( $block->parsed_block['innerBlocks'] ), null );
 		$block->refresh_context_dependents();
 

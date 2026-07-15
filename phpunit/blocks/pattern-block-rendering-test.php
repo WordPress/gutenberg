@@ -17,6 +17,8 @@ class Tests_Blocks_Pattern_Block_Rendering extends WP_UnitTestCase {
 
 	const BLOCK_NAME = 'tests/pattern-block';
 
+	const EMBED_HANDLER = 'tests-pattern-block-embed';
+
 	const PATTERN = '<!-- wp:heading {"metadata":{"name":"Title","bindings":{"__default":{"source":"core/pattern-overrides"}}}} --><h2 class="wp-block-heading">Default title</h2><!-- /wp:heading -->'
 		. '<!-- wp:paragraph --><p>Plugin-owned paragraph.</p><!-- /wp:paragraph -->';
 
@@ -26,6 +28,7 @@ class Tests_Blocks_Pattern_Block_Rendering extends WP_UnitTestCase {
 				unregister_block_type( $block_name );
 			}
 		}
+		wp_embed_unregister_handler( self::EMBED_HANDLER );
 		WP_Theme_JSON_Resolver::clean_cached_data();
 		parent::tear_down();
 	}
@@ -131,6 +134,30 @@ class Tests_Blocks_Pattern_Block_Rendering extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'Replaced pattern.', $output );
 		$this->assertStringNotContainsString( 'Default title', $output );
+	}
+
+	public function test_renders_embeds_from_the_registered_pattern() {
+		wp_embed_register_handler(
+			self::EMBED_HANDLER,
+			'#^https://example\.com/embed/(auto|shortcode)$#',
+			static function ( $matches ) {
+				return '<p>EMBEDDED ' . strtoupper( $matches[1] ) . '</p>';
+			}
+		);
+
+		$pattern = '<!-- wp:embed {"url":"https://example.com/embed/auto"} -->'
+			. "\n<figure class=\"wp-block-embed\"><div class=\"wp-block-embed__wrapper\">\n"
+			. "https://example.com/embed/auto\n"
+			. "</div></figure>\n"
+			. '<!-- /wp:embed -->'
+			. '<!-- wp:shortcode -->[embed]https://example.com/embed/shortcode[/embed]<!-- /wp:shortcode -->';
+		$this->register_pattern_block( array( 'pattern' => $pattern ) );
+
+		$output = do_blocks( '<!-- wp:' . self::BLOCK_NAME . ' /-->' );
+
+		$this->assertStringContainsString( 'EMBEDDED AUTO', $output );
+		$this->assertStringContainsString( 'EMBEDDED SHORTCODE', $output );
+		$this->assertStringNotContainsString( 'https://example.com/embed/', $output );
 	}
 
 	public function test_applies_the_host_render_block_filters_once() {
