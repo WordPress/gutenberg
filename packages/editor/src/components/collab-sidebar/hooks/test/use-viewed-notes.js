@@ -3,7 +3,6 @@
  */
 import { renderHook, act } from '@testing-library/react';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEntityProp } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -16,73 +15,83 @@ jest.mock( '@wordpress/data', () => ( {
 } ) );
 
 jest.mock( '@wordpress/core-data', () => ( {
-	useEntityProp: jest.fn(),
-	store: {
-		getCurrentUser: jest.fn(),
-		getEntityRecord: jest.fn(),
-	},
+	store: 'core',
+} ) );
+
+// Mock the private getViewedNoteIds/markNotesViewed that `unlock()` exposes
+// on the core-data store object passed to useSelect/useDispatch callbacks.
+const mockGetViewedNoteIds = jest.fn();
+const mockMarkNotesViewed = jest.fn();
+
+jest.mock( '../../../../lock-unlock', () => ( {
+	unlock: jest.fn( () => ( {
+		getViewedNoteIds: mockGetViewedNoteIds,
+		markNotesViewed: mockMarkNotesViewed,
+	} ) ),
 } ) );
 
 describe( 'useViewedNotes', () => {
 	const mockPostId = 123;
 	const mockUserId = 42;
-	const mockSaveEditedEntityRecord = jest.fn();
-	const mockSetMeta = jest.fn();
 
 	beforeEach( () => {
 		jest.clearAllMocks();
 
-		// Default mock implementation for useDispatch
 		useDispatch.mockReturnValue( {
-			saveEditedEntityRecord: mockSaveEditedEntityRecord,
+			markNotesViewed: mockMarkNotesViewed,
 		} );
 	} );
 
-	it( 'should identify unread notes correctly and ignore author notes', () => {
-		// Setup mock select returns
-		useSelect.mockImplementation( () => {
-			// Mocking the getCurrentUser() selector inside the first useSelect
-			return mockUserId;
+	function mockSelectors( { currentUserId, viewedIds = [] } ) {
+		useSelect.mockImplementation( ( selectorFn ) => {
+			// First call in the hook resolves getCurrentUser via coreStore
+			// directly; second resolves getViewedNoteIds via unlock().
+			// We distinguish by calling the passed selector against a fake
+			// `select` that dispatches to the right mock per call shape.
+			const fakeSelect = () => ( {
+				getCurrentUser: () => ( { id: currentUserId } ),
+			} );
+			try {
+				const directResult = selectorFn( fakeSelect );
+				if ( directResult !== undefined ) {
+					return directResult;
+				}
+			} catch {
+				// Selector referenced unlock() internals; fall through.
+			}
+			return viewedIds;
 		} );
+	}
 
-		// Mock useEntityProp returning empty initial meta
-		useEntityProp.mockReturnValue( [ {}, mockSetMeta ] );
+	it( 'identifies unread notes and ignores notes authored by the current user', () => {
+		mockGetViewedNoteIds.mockReturnValue( [] );
+		mockSelectors( { currentUserId: mockUserId, viewedIds: [] } );
 
 		const { result } = renderHook( () => useViewedNotes( mockPostId ) );
 
-		// Note is unread by default if not seen
 		expect( result.current.isNoteUnread( 99, 55 ) ).toBe( true );
-
-		// Note is automatically "read" if the current user authored it
 		expect( result.current.isNoteUnread( 99, mockUserId ) ).toBe( false );
 	} );
 
-	it( 'should return false for isNoteUnread if the note ID is already seen', () => {
-		useSelect.mockReturnValue( mockUserId );
-
-		// Mock meta containing already seen notes for this post
-		const initialMeta = {
-			viewed_notes: {
-				[ mockPostId ]: [ '101', '102' ],
-			},
-		};
-		useEntityProp.mockReturnValue( [ initialMeta, mockSetMeta ] );
+	it( 'returns false for isNoteUnread when the id is already viewed', () => {
+		mockGetViewedNoteIds.mockReturnValue( [ '101', '102' ] );
+		mockSelectors( {
+			currentUserId: mockUserId,
+			viewedIds: [ '101', '102' ],
+		} );
 
 		const { result } = renderHook( () => useViewedNotes( mockPostId ) );
 
-		expect( result.current.isNoteUnread( 101, 55 ) ).toBe( false ); // Already seen
-		expect( result.current.isNoteUnread( 103, 55 ) ).toBe( true ); // New note
+		expect( result.current.isNoteUnread( 101, 55 ) ).toBe( false );
+		expect( result.current.isNoteUnread( 103, 55 ) ).toBe( true );
 	} );
 
-	it( 'should update meta and save record when marking new notes as viewed', () => {
-		useSelect.mockReturnValue( mockUserId );
-
-		const initialMeta = {
-			viewed_notes: {
-				[ mockPostId ]: [ '101' ],
-			},
-		};
-		useEntityProp.mockReturnValue( [ initialMeta, mockSetMeta ] );
+	it( 'dispatches markNotesViewed with the post id and note ids', () => {
+		mockGetViewedNoteIds.mockReturnValue( [ '101' ] );
+		mockSelectors( {
+			currentUserId: mockUserId,
+			viewedIds: [ '101' ],
+		} );
 
 		const { result } = renderHook( () => useViewedNotes( mockPostId ) );
 
@@ -90,51 +99,22 @@ describe( 'useViewedNotes', () => {
 			result.current.markNotesViewed( [ 101, 102, 103 ] );
 		} );
 
-		// Should combine old IDs and new unique IDs, converting them to strings
-		expect( mockSetMeta ).toHaveBeenCalledWith( {
-			viewed_notes: {
-				[ mockPostId ]: [ '101', '102', '103' ],
-			},
-		} );
-
-		// Verifies the crucial fix mentioned in your comments (saving with matching userId)
-		expect( mockSaveEditedEntityRecord ).toHaveBeenCalledWith(
-			'root',
-			'user',
-			mockUserId
+		expect( mockMarkNotesViewed ).toHaveBeenCalledWith(
+			mockPostId,
+			[ 101, 102, 103 ]
 		);
 	} );
 
-	it( 'should bail early and not update if no new note IDs are passed', () => {
-		useSelect.mockReturnValue( mockUserId );
+	it( 'does not dispatch when postId is missing', () => {
+		mockGetViewedNoteIds.mockReturnValue( [] );
+		mockSelectors( { currentUserId: mockUserId, viewedIds: [] } );
 
-		const initialMeta = {
-			viewed_notes: {
-				[ mockPostId ]: [ '101' ],
-			},
-		};
-		useEntityProp.mockReturnValue( [ initialMeta, mockSetMeta ] );
-
-		const { result } = renderHook( () => useViewedNotes( mockPostId ) );
-
-		act( () => {
-			result.current.markNotesViewed( [ 101 ] ); // 101 is already seen
-		} );
-
-		expect( mockSetMeta ).not.toHaveBeenCalled();
-		expect( mockSaveEditedEntityRecord ).not.toHaveBeenCalled();
-	} );
-
-	it( 'should bail early if required contexts (postId, notes, userId) are missing', () => {
-		useSelect.mockReturnValue( null ); // No logged in user
-		useEntityProp.mockReturnValue( [ {}, mockSetMeta ] );
-
-		const { result } = renderHook( () => useViewedNotes( mockPostId ) );
+		const { result } = renderHook( () => useViewedNotes( undefined ) );
 
 		act( () => {
 			result.current.markNotesViewed( [ 101 ] );
 		} );
 
-		expect( mockSetMeta ).not.toHaveBeenCalled();
+		expect( mockMarkNotesViewed ).not.toHaveBeenCalled();
 	} );
 } );
