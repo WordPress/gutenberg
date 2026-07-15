@@ -71,6 +71,10 @@
 			"types": "./build-types/stylelint-plugins/no-token-fallback-values.d.mts",
 			"default": "./stylelint-plugins/no-token-fallback-values.mjs"
 		},
+		"./stylelint-plugins/no-internal-component-classnames": {
+			"types": "./build-types/stylelint-plugins/no-internal-component-classnames.d.mts",
+			"default": "./stylelint-plugins/no-internal-component-classnames.mjs"
+		},
 		"./package.json": "./package.json"
 	},
 	"wpScript": true,

@@ -216,12 +216,14 @@ These rules validate design token usage in CSS. Enable them in your Stylelint co
 	"plugins": [
 		"@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens",
 		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties",
-		"@wordpress/theme/stylelint-plugins/no-token-fallback-values"
+		"@wordpress/theme/stylelint-plugins/no-token-fallback-values",
+		"@wordpress/theme/stylelint-plugins/no-internal-component-classnames"
 	],
 	"rules": {
 		"plugin-wpds/no-unknown-ds-tokens": true,
 		"plugin-wpds/no-setting-wpds-custom-properties": true,
-		"plugin-wpds/no-token-fallback-values": true
+		"plugin-wpds/no-token-fallback-values": true,
+		"plugin-wpds/no-internal-component-classnames": true
 	}
 }
 ```
@@ -237,6 +239,10 @@ Reports definitions or overrides in the `--wpds-*` namespace.
 ### `plugin-wpds/no-token-fallback-values`
 
 Reports manual fallbacks that can drift from the generated values.
+
+### `plugin-wpds/no-internal-component-classnames`
+
+Reports CSS selectors that target internal `component-*` or `components-*` class names from `@wordpress/components`. These selectors are not a stable API and component style overrides are not advised. Prefer a custom selector on the component instead.
 
 ## Build Plugins
 

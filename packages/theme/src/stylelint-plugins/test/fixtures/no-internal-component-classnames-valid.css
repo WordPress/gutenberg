@@ -1,0 +1,14 @@
+/* Valid: custom selector on the consuming component */
+.my-panel__color-indicator {
+	flex-shrink: 0;
+}
+
+/* Valid: unrelated class names that happen to contain "component" */
+.my-component-wrapper {
+	padding: 8px;
+}
+
+/* Valid: admin-ui internal classes are out of scope for this rule */
+.admin-ui-navigable-region {
+	padding: 0;
+}

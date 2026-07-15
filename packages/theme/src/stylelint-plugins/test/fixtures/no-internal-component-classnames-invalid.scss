@@ -1,0 +1,6 @@
+.my-panel {
+	/* Invalid: nested internal class override */
+	.component-color-indicator {
+		float: right;
+	}
+}
