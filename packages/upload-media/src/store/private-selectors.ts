@@ -8,6 +8,7 @@ import {
 	type QueueItem,
 	type QueueItemId,
 	type State,
+	type UploadPrompt,
 } from './types';
 
 /**
@@ -35,6 +36,22 @@ const EMPTY_GIF_CONVERSIONS: GifConversion[] = [];
 
 export function getGifConversions( state: State ): GifConversion[] {
 	return state.gifConversions ?? EMPTY_GIF_CONVERSIONS;
+}
+
+/**
+ * Returns pending upload prompts: questions awaiting a user decision about an
+ * upload (e.g. whether to convert a dropped animated GIF to a video). Generic
+ * and decoupled from any specific upload lifecycle; a host application renders
+ * the UI matching each prompt's `type`.
+ *
+ * @param state Upload state.
+ *
+ * @return Pending upload prompts.
+ */
+const EMPTY_UPLOAD_PROMPTS: UploadPrompt[] = [];
+
+export function getUploadPrompts( state: State ): UploadPrompt[] {
+	return state.uploadPrompts ?? EMPTY_UPLOAD_PROMPTS;
 }
 
 /**

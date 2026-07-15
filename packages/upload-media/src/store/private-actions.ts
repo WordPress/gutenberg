@@ -70,6 +70,8 @@ import type {
 	ResumeQueueAction,
 	RevokeBlobUrlsAction,
 	RemoveGifConversionAction,
+	RequestUploadPromptAction,
+	ResolveUploadPromptAction,
 	SideloadAdditionalData,
 	Settings,
 	State,
@@ -1646,6 +1648,50 @@ export function removeGifConversion(
 	return {
 		type: Type.RemoveGifConversion,
 		itemId,
+	};
+}
+
+/**
+ * Requests a prompt asking the user to decide something about an upload
+ * (see the UploadPrompt type). The host application observes pending prompts,
+ * renders the UI matching `type`, and calls resolveUploadPrompt() with the
+ * answer. The effect of the answer is owned by whoever requested the prompt.
+ *
+ * This is the shared primitive for upload/drag-and-drop prompts; GIF
+ * conversion is its first consumer.
+ *
+ * @param descriptor        Prompt descriptor.
+ * @param descriptor.type   Prompt variety; the host renders the matching UI.
+ * @param descriptor.itemId The upload queue item the prompt relates to.
+ * @param descriptor.data   Optional prompt-specific payload for the renderer.
+ * @return The created prompt's ID (its key for resolveUploadPrompt).
+ */
+export function requestUploadPrompt( descriptor: {
+	type: string;
+	itemId?: QueueItemId;
+	data?: Record< string, unknown >;
+} ) {
+	return ( { dispatch }: ThunkArgs ): string => {
+		const id = uuidv4();
+		dispatch< RequestUploadPromptAction >( {
+			type: Type.RequestUploadPrompt,
+			prompt: { id, ...descriptor },
+		} );
+		return id;
+	};
+}
+
+/**
+ * Resolves (dismisses) a pending upload prompt once the user has answered.
+ * This only removes the prompt; acting on the answer is the responsibility of
+ * whoever requested it.
+ *
+ * @param id ID of the prompt to resolve.
+ */
+export function resolveUploadPrompt( id: string ): ResolveUploadPromptAction {
+	return {
+		type: Type.ResolveUploadPrompt,
+		id,
 	};
 }
 

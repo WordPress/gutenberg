@@ -814,4 +814,48 @@ describe( 'reducer', () => {
 			expect( state.gifConversions ).toEqual( [ conversion ] );
 		} );
 	} );
+
+	describe( 'Upload prompts', () => {
+		const prompt = {
+			id: 'prompt-1',
+			type: 'gif-conversion',
+			itemId: 'original-item',
+		};
+
+		function buildState( extra: Partial< State > = {} ): State {
+			return {
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [],
+				uploadPrompts: [],
+				...extra,
+			} as State;
+		}
+
+		it( 'requests, appends, and resolves prompts by id', () => {
+			let state = reducer( buildState(), {
+				type: Type.RequestUploadPrompt,
+				prompt,
+			} );
+			expect( state.uploadPrompts ).toEqual( [ prompt ] );
+
+			// A second prompt is appended, not replaced.
+			const other = { id: 'prompt-2', type: 'gif-conversion' };
+			state = reducer( state, {
+				type: Type.RequestUploadPrompt,
+				prompt: other,
+			} );
+			expect( state.uploadPrompts ).toEqual( [ prompt, other ] );
+
+			// Resolving removes only the matching prompt.
+			state = reducer( state, {
+				type: Type.ResolveUploadPrompt,
+				id: 'prompt-1',
+			} );
+			expect( state.uploadPrompts ).toEqual( [ other ] );
+		} );
+	} );
 } );

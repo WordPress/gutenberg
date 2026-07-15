@@ -26,6 +26,8 @@ import {
 	type UnknownAction,
 	type UpdateGifConversionAction,
 	type RemoveGifConversionAction,
+	type RequestUploadPromptAction,
+	type ResolveUploadPromptAction,
 	type UpdateProgressAction,
 	type UpdateSettingsAction,
 } from './types';
@@ -42,6 +44,7 @@ const DEFAULT_STATE: State = {
 	queueStatus: 'active',
 	blobUrls: {},
 	gifConversions: [],
+	uploadPrompts: [],
 	settings: {
 		mediaUpload: noop,
 		maxConcurrentUploads: DEFAULT_MAX_CONCURRENT_UPLOADS,
@@ -71,6 +74,8 @@ type Action =
 	| AddGifConversionAction
 	| UpdateGifConversionAction
 	| RemoveGifConversionAction
+	| RequestUploadPromptAction
+	| ResolveUploadPromptAction
 	| UnknownAction;
 
 function reducer(
@@ -375,6 +380,23 @@ function reducer(
 				...state,
 				gifConversions: ( state.gifConversions ?? [] ).filter(
 					( conversion ) => conversion.itemId !== action.itemId
+				),
+			};
+
+		case Type.RequestUploadPrompt:
+			return {
+				...state,
+				uploadPrompts: [
+					...( state.uploadPrompts ?? [] ),
+					action.prompt,
+				],
+			};
+
+		case Type.ResolveUploadPrompt:
+			return {
+				...state,
+				uploadPrompts: ( state.uploadPrompts ?? [] ).filter(
+					( prompt ) => prompt.id !== action.id
 				),
 			};
 	}

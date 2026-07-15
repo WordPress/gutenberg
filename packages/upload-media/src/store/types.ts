@@ -74,6 +74,9 @@ export interface State {
 	// Optional for compatibility with partial states in tests; always
 	// present at runtime via the reducer's default state.
 	gifConversions?: GifConversion[];
+	// Pending prompts awaiting a user decision about an upload. Optional for
+	// compatibility with partial states in tests; always present at runtime.
+	uploadPrompts?: UploadPrompt[];
 }
 
 /**
@@ -102,6 +105,27 @@ export interface GifConversion {
 	status: 'pending' | 'accepted' | 'converting' | 'converted';
 }
 
+/**
+ * A request to ask the user something about an upload — for example whether
+ * to convert a dropped animated GIF to a video.
+ *
+ * Deliberately generic and decoupled from any specific upload lifecycle: the
+ * upload flow that needs an answer calls requestUploadPrompt(), a host
+ * application renders the UI matching `type`, and calls resolveUploadPrompt()
+ * once the user answers. This is the shared primitive for upload/drag-and-drop
+ * prompts; GIF conversion is its first consumer.
+ */
+export interface UploadPrompt {
+	// Unique ID of this prompt request (its key for resolveUploadPrompt).
+	id: string;
+	// Prompt variety; the host uses it to pick which UI to render.
+	type: string;
+	// The upload queue item the prompt relates to, when applicable.
+	itemId?: QueueItemId;
+	// Optional prompt-specific payload for the renderer.
+	data?: Record< string, unknown >;
+}
+
 export enum Type {
 	Unknown = 'REDUX_UNKNOWN',
 	Add = 'ADD_ITEM',
@@ -125,6 +149,8 @@ export enum Type {
 	AddGifConversion = 'ADD_GIF_CONVERSION',
 	UpdateGifConversion = 'UPDATE_GIF_CONVERSION',
 	RemoveGifConversion = 'REMOVE_GIF_CONVERSION',
+	RequestUploadPrompt = 'REQUEST_UPLOAD_PROMPT',
+	ResolveUploadPrompt = 'RESOLVE_UPLOAD_PROMPT',
 }
 
 type Action< T = Type, Payload = Record< string, unknown > > = {
@@ -209,6 +235,14 @@ export type UpdateGifConversionAction = Action<
 export type RemoveGifConversionAction = Action<
 	Type.RemoveGifConversion,
 	{ itemId: QueueItemId }
+>;
+export type RequestUploadPromptAction = Action<
+	Type.RequestUploadPrompt,
+	{ prompt: UploadPrompt }
+>;
+export type ResolveUploadPromptAction = Action<
+	Type.ResolveUploadPrompt,
+	{ id: string }
 >;
 
 interface UploadMediaArgs {

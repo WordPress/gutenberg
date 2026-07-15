@@ -18,6 +18,8 @@ import {
 	finalizeItem,
 	prepareItem,
 	resolveGifConversion,
+	requestUploadPrompt,
+	resolveUploadPrompt,
 	transcodeGifItem,
 	detectUltraHdr,
 	removeItem,
@@ -1678,6 +1680,33 @@ describe( 'private actions', () => {
 
 			expect( terminateVipsWorker ).not.toHaveBeenCalled();
 			expect( terminateVideoConversionWorker ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'upload prompts', () => {
+		it( 'requestUploadPrompt dispatches a prompt with a generated id and returns it', () => {
+			const dispatchFn = jest.fn();
+			const id = requestUploadPrompt( {
+				type: 'gif-conversion',
+				itemId: 'original-item',
+			} )( { dispatch: dispatchFn } );
+
+			expect( typeof id ).toBe( 'string' );
+			expect( dispatchFn ).toHaveBeenCalledWith( {
+				type: Type.RequestUploadPrompt,
+				prompt: {
+					id,
+					type: 'gif-conversion',
+					itemId: 'original-item',
+				},
+			} );
+		} );
+
+		it( 'resolveUploadPrompt returns a resolve action keyed by id', () => {
+			expect( resolveUploadPrompt( 'prompt-1' ) ).toEqual( {
+				type: Type.ResolveUploadPrompt,
+				id: 'prompt-1',
+			} );
 		} );
 	} );
 } );
