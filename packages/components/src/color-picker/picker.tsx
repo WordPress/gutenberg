@@ -24,11 +24,9 @@ function isSameHsla( a: HslaColor, b: HslaColor ): boolean {
 }
 
 /**
- * Visual color surface.
- *
  * Uses HSVA (react-colorful's native model) and keeps that value in local
  * state so HSLA↔hex round-trips cannot move the pointer
- * (#80110, #75157, #80205). Parent ColorPicker still speaks HSLA for
+ * Parent ColorPicker still speaks HSLA for
  * inputs and controlled value sync; conversion happens only at the boundary.
  *
  * Prop sync from parent HSLA is suppressed for:
@@ -43,7 +41,7 @@ export const Picker = ( {
 	onInteractionEnd,
 }: PickerProps ) => {
 	const [ hsva, setHsva ] = useState< HsvaColor >( () => toHsva( hsla ) );
-	// Last HSLA emitted by this picker — skip echoing it back into HSVA.
+	// Last HSLA emitted by this picker - skip echoing it back into HSVA.
 	const pickerOriginHslaRef = useRef< HslaColor | null >( null );
 	// Pointer/touch drag: never sync from HSLA mid-gesture (origin match alone
 	// can fail across rapid frames when parent gradient state re-renders).
