@@ -12,6 +12,7 @@
 			--wp-ui-menu-popup-padding: var(--wpds-dimension-padding-xs);
 			--wp-ui-menu-min-width: 160px;
 			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-md);
+			--_wp-ui-elevation-md: "0px 2px 3px 0px #0000000d, 0px 4px 5px 0px #0000000a, 0px 12px 12px 0px #00000008, 0px 16px 16px 0px #00000005";
 
 			display: grid;
 			grid-template-areas: none;
@@ -26,7 +27,7 @@
 			scroll-padding-block: var(--wp-ui-menu-popup-padding);
 			border-radius: var(--wpds-border-radius-md);
 			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-			box-shadow: var(--wpds-elevation-md);
+			box-shadow: var(--_wp-ui-elevation-md);
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 		}
 
@@ -51,7 +52,7 @@
 			padding-inline: var(--wpds-dimension-padding-md);
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-xs);
-			font-weight: var(--wpds-typography-font-weight-medium);
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 			line-height: var(--wpds-typography-line-height-sm);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 			text-transform: uppercase;
@@ -177,7 +178,7 @@
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
 			line-height: var(--wpds-typography-line-height-sm);
-			font-weight: var(--wpds-typography-font-weight-regular);
+			font-weight: var(--wpds-typography-font-weight-default);
 			color: inherit;
 		}
 
@@ -185,7 +186,7 @@
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-sm);
 			line-height: var(--wpds-typography-line-height-xs);
-			font-weight: var(--wpds-typography-font-weight-regular);
+			font-weight: var(--wpds-typography-font-weight-default);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 			overflow-wrap: anywhere;
 			/* For better optical alignment and spacing */
@@ -209,7 +210,7 @@
 			display: inline-block;
 			line-height: 1;
 			margin-inline-start: 0;
-			font-weight: var(--wpds-typography-font-weight-regular);
+			font-weight: var(--wpds-typography-font-weight-default);
 			text-decoration: none;
 		}
 
