@@ -9,11 +9,11 @@ import { capitalCase } from 'change-case';
 import { __ } from '@wordpress/i18n';
 
 /**
- * Human-readable labels for style paths, keyed by `path.join( '.' )`.
+ * Readable labels for style paths, keyed by `path.join( '.' )`.
  *
- * The block style property config (`__EXPERIMENTAL_STYLE_PROPERTY`) does not
- * carry display labels, so they are authored here. Any path without an entry
- * falls back to a humanized version of its last segment (see `getStyleLabel`).
+ * The block style config (`__EXPERIMENTAL_STYLE_PROPERTY`) has no labels of its
+ * own, so they live here. A path with no entry falls back to a readable version
+ * of its last part (see `getStyleLabel`).
  *
  * @type {Record<string, string>}
  */
@@ -58,14 +58,14 @@ export const STYLE_LABELS = {
 };
 
 /**
- * Returns a human-readable label for a given style path.
+ * Returns a readable label for a style path.
  *
- * When the path has no authored label it falls back to a humanized version of
- * the path's last segment so nothing renders blank.
+ * When the path has no label of its own, it falls back to a readable version of
+ * the path's last part so nothing shows up blank.
  *
  * @param {string[]} path Style path, e.g. `[ 'color', 'background' ]`.
  *
- * @return {string} A human-readable label.
+ * @return {string} A readable label.
  */
 export function getStyleLabel( path ) {
 	const key = path.join( '.' );

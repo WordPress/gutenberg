@@ -23,7 +23,7 @@ describe( 'getChangesToPush', () => {
 			style: 'solid',
 		} );
 
-		// Shorthand entry + four per-side longhands + four `solid` fallbacks.
+		// All-sides value + four per-side values + four `solid` fallbacks.
 		expect( row.paths ).toHaveLength( 9 );
 		expect( row.paths ).toContainEqual( {
 			path: [ 'border', 'color' ],
@@ -68,7 +68,7 @@ describe( 'getChangesToPush', () => {
 			style: 'dashed',
 		} );
 
-		// A per-side row does not write the shorthand entry, only the side.
+		// A per-side row writes only that side, not the all-sides value.
 		expect( row.paths ).toEqual( [
 			{ path: [ 'border', 'left', 'color' ], value: '#000fff' },
 			{ path: [ 'border', 'left', 'width' ], value: '2px' },
@@ -102,8 +102,8 @@ describe( 'getChangesToPush', () => {
 		);
 
 		const [ row ] = rows;
-		// The top side keeps the user's dotted style (no `solid` fallback),
-		// while the other three sides still get the fallback.
+		// The top side keeps its dotted style (no `solid` fallback); the other
+		// three sides still get the fallback.
 		expect( row.paths ).not.toContainEqual( {
 			path: [ 'border', 'top', 'style' ],
 			value: 'solid',
@@ -215,8 +215,8 @@ describe( 'getChangesToPush', () => {
 	it( 'skips root-only style properties that duplicate padding', () => {
 		const padding = { top: '10px', bottom: '10px' };
 		const rows = getChangesToPush(
-			// Both keys map to `spacing.padding`; the root-only one must be
-			// skipped so padding is not listed twice.
+			// Both keys map to `spacing.padding`, so the root-only one is
+			// skipped to avoid listing padding twice.
 			[ 'padding', '--wp--style--root--padding' ],
 			{ style: { spacing: { padding } } },
 			undefined
@@ -311,7 +311,7 @@ describe( 'getStylesUpdate', () => {
 
 		// The pushed preset attribute is cleared from the block.
 		expect( update.newBlockAttributes.backgroundColor ).toBeUndefined();
-		// The deselected preset attribute is left untouched (not wiped).
+		// The unselected preset attribute is left alone.
 		expect( update.newBlockAttributes ).not.toHaveProperty( 'textColor' );
 		expect(
 			update.newUserConfig.styles.blocks[ 'core/heading' ].color

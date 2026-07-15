@@ -19,15 +19,15 @@ import {
 } from './format-style-value';
 
 /**
- * Formats a raw style value for display, using the row's `format` hint so
- * border scopes render as CSS shorthands rather than raw objects.
+ * Turns a raw style value into readable text, using the row's `format` hint so
+ * borders and spacing show as a single CSS value instead of a raw object.
  *
  * @param {string}   format  Optional format hint (`border`, `borderRadius`,
  *                           `spacing`).
  * @param {*}        value   The raw style value.
- * @param {Function} resolve Resolver for preset tokens (used for spacing).
+ * @param {Function} resolve Callback to resolve preset values (used for spacing).
  *
- * @return {string} A human-friendly representation of the value.
+ * @return {string} Readable text for the value.
  */
 function formatReviewValue( format, value, resolve ) {
 	if ( format === 'border' ) {
@@ -43,21 +43,21 @@ function formatReviewValue( format, value, resolve ) {
 }
 
 /**
- * Enriches grouped change rows with a human-readable label and the current
- * effective Global Styles value for the block type, plus display-formatted
- * versions of the current and new values.
+ * Adds display details to each change row: a readable label, the block type's
+ * current Global Styles value, and readable versions of the current and new
+ * values.
  *
  * @param {Array}  rows   Grouped rows from `useChangesToPush`.
  * @param {Object} merged Merged Global Styles config.
  * @param {string} name   Block name.
  *
- * @return {Array} Rows extended with `label`, `currentValue`,
- *                 `formattedCurrentValue`, and `formattedNewValue`.
+ * @return {Array} Rows with `label`, `currentValue`, `formattedCurrentValue`
+ *                 and `formattedNewValue` added.
  */
 export function useReviewRows( rows, merged, name ) {
 	return useMemo( () => {
-		// Resolves preset tokens (e.g. `var:preset|spacing|40`) to their actual
-		// values so spacing reads as a real size rather than a preset slug.
+		// Swaps preset values (e.g. `var:preset|spacing|40`) for their real
+		// size so spacing reads as a size rather than a preset name.
 		const resolve = ( value ) =>
 			getValueFromVariable( merged, name, value );
 

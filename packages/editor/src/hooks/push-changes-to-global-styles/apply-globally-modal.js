@@ -13,26 +13,24 @@ import { useMemo, useState } from '@wordpress/element';
 import { useGlobalStyles } from '../../components/global-styles/hooks';
 import { useReviewRows } from './use-review-rows';
 
-// Only offer the table layout: a compact list with a leading selection
-// checkbox.
+// Show a simple table with a checkbox at the start of each row.
 const DEFAULT_LAYOUTS = { pickerTable: {} };
 
 const getItemId = ( row ) => row.id;
 
 /**
- * Modal that lets the user review the modified block-instance styles and choose
- * which ones to push to Global Styles for the block type.
+ * Modal for reviewing a block's changed styles and choosing which ones to apply
+ * to every block of the same type.
  *
- * The styles are presented in a `DataViewsPicker` table with all rows selected
- * by default. The footer `Apply` action pushes only the selected subset and is
- * disabled when nothing is selected. Dismissing the modal (close button or
- * Escape) leaves the block unchanged.
+ * Each style is a row in the table and starts out selected. Apply pushes only
+ * the rows that are still selected, and is turned off when none are. Closing
+ * the modal or pressing Escape leaves the block untouched.
  *
  * @param {Object}   props                Component props.
  * @param {string}   props.name           Block name.
- * @param {Array}    props.rows           Grouped change rows from `useChangesToPush`.
- * @param {Function} props.onApply        Called with the selected rows to push.
- * @param {Function} props.onRequestClose Called to dismiss the modal.
+ * @param {Array}    props.rows           The block's changed styles, grouped into rows.
+ * @param {Function} props.onApply        Called with the selected rows to apply.
+ * @param {Function} props.onRequestClose Called to close the modal.
  */
 export default function ApplyGloballyModal( {
 	name,

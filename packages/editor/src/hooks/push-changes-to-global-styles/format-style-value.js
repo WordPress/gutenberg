@@ -3,29 +3,27 @@
  */
 import { capitalCase } from 'change-case';
 
-// Em dash used to represent an unset / default value.
+// Em dash shown when a value isn't set.
 export const EMPTY_VALUE_LABEL = '\u2014';
 
-// Matches a preset variable token, e.g. `var:preset|color|vivid-red`.
+// Matches a preset value, e.g. `var:preset|color|vivid-red`.
 const PRESET_TOKEN_REGEX = /^var:preset\|([^|]+)\|(.+)$/;
 
-// True when a style value is present (not unset or empty).
 const isSet = ( value ) =>
 	value !== undefined && value !== null && value !== '';
 
 /**
- * Formats a raw style value into a human-friendly string for display.
+ * Turns a raw style value into readable text for the modal.
  *
- * Handles:
- * - `undefined`/`null`/empty: an em-dash placeholder.
- * - Preset tokens (`var:preset|type|slug`): the humanized slug.
- * - Plain strings/numbers: passed through as-is.
- * - Objects/arrays (e.g. border side objects): safely stringified, or the
- *   em-dash placeholder when they cannot be represented.
+ * - Empty, `null` or `undefined`: an em dash.
+ * - Preset values (`var:preset|type|slug`): the readable slug.
+ * - Strings and numbers: used as-is.
+ * - Objects and arrays (like a border side): turned into text, or an em dash
+ *   when there's nothing to show.
  *
  * @param {*} value The raw style value.
  *
- * @return {string} A human-friendly representation of the value.
+ * @return {string} Readable text for the value.
  */
 export function formatStyleValue( value ) {
 	if ( ! isSet( value ) ) {
@@ -59,17 +57,16 @@ export function formatStyleValue( value ) {
 }
 
 /**
- * Formats a border scope object into a CSS `border` shorthand for display,
- * e.g. `2px dashed #000fff`.
+ * Turns a border object into a single CSS `border` value, e.g.
+ * `2px dashed #000fff`.
  *
- * The parts are ordered `width style color` to match the CSS shorthand, unset
- * parts are omitted, and preset color tokens are humanized (via
- * `formatStyleValue`). Returns the empty-value placeholder when the scope
- * carries no values.
+ * The parts follow the CSS order of `width style color`, anything that isn't
+ * set is left out, and preset colors are shown by name. Returns an em dash
+ * when the border has nothing set.
  *
- * @param {*} border A border scope, e.g. `{ color, width, style }`.
+ * @param {*} border A border object, e.g. `{ color, width, style }`.
  *
- * @return {string} The shorthand representation, or the empty-value placeholder.
+ * @return {string} The combined border value, or an em dash.
  */
 export function formatBorderShorthand( border ) {
 	if ( ! border || typeof border !== 'object' ) {
@@ -84,19 +81,19 @@ export function formatBorderShorthand( border ) {
 	return parts.length ? parts.join( ' ' ) : EMPTY_VALUE_LABEL;
 }
 
-// CSS `border-radius` shorthand corner order.
+// Corner order used by the CSS `border-radius` shorthand.
 const RADIUS_CORNERS = [ 'topLeft', 'topRight', 'bottomRight', 'bottomLeft' ];
 
 /**
- * Formats a border radius value for display.
+ * Turns a border radius into readable text.
  *
- * A string radius is passed through; a per-corner object is joined into a
- * shorthand in CSS corner order, e.g. `1px 20px 1px 15px`. Returns the
- * empty-value placeholder when there is nothing to show.
+ * A plain string is used as-is. An object with a value per corner is joined in
+ * CSS corner order, e.g. `1px 20px 1px 15px`. Returns an em dash when there's
+ * nothing to show.
  *
- * @param {*} radius A radius string or a per-corner object.
+ * @param {*} radius A radius string or an object with a value per corner.
  *
- * @return {string} The formatted radius, or the empty-value placeholder.
+ * @return {string} The readable radius, or an em dash.
  */
 export function formatBorderRadius( radius ) {
 	if ( radius && typeof radius === 'object' ) {
@@ -110,21 +107,21 @@ export function formatBorderRadius( radius ) {
 }
 
 /**
- * Formats a spacing value (padding or margin) as a CSS shorthand for display.
+ * Turns a spacing value (padding or margin) into a single CSS value.
  *
- * A string value is passed through. A per-side object is collapsed to the
- * shortest CSS shorthand that represents it: a single value when all sides
- * match, a `vertical horizontal` pair for axial values, and otherwise the
- * defined sides in CSS `top right bottom left` order.
+ * A plain string is used as-is. An object with a value per side is shortened
+ * to the smallest CSS form: one value when every side matches, a
+ * `vertical horizontal` pair when top/bottom and left/right match, otherwise
+ * all four sides in `top right bottom left` order.
  *
- * An optional `resolve` callback maps a raw value to its resolved form before
- * display, e.g. turning a `var:preset|spacing|40` token into its actual size,
- * which is more meaningful than the preset slug.
+ * The optional `resolve` callback swaps a raw value for its real one first,
+ * e.g. turning `var:preset|spacing|40` into its actual size, which reads
+ * better than the preset name.
  *
- * @param {*}        spacing A spacing string or a per-side object.
- * @param {Function} resolve Optional resolver applied to each raw value.
+ * @param {*}        spacing A spacing string or an object with a value per side.
+ * @param {Function} resolve Optional callback to resolve each raw value.
  *
- * @return {string} The formatted spacing, or the empty-value placeholder.
+ * @return {string} The combined spacing, or an em dash.
  */
 export function formatSpacingShorthand(
 	spacing,
@@ -138,7 +135,6 @@ export function formatSpacingShorthand(
 
 	const { top, right, bottom, left } = spacing;
 
-	// Collapse a full axial/uniform object to the shortest CSS shorthand.
 	if ( isSet( top ) && isSet( right ) && isSet( bottom ) && isSet( left ) ) {
 		if ( top === right && right === bottom && bottom === left ) {
 			return format( top );
@@ -149,7 +145,6 @@ export function formatSpacingShorthand(
 		return [ top, right, bottom, left ].map( format ).join( ' ' );
 	}
 
-	// Partial object: show the defined sides in CSS order.
 	const parts = [ top, right, bottom, left ].filter( isSet ).map( format );
 
 	return parts.length ? parts.join( ' ' ) : EMPTY_VALUE_LABEL;

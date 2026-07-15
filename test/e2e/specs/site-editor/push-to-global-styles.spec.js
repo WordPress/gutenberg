@@ -21,8 +21,8 @@ test.describe( 'Push to Global Styles button', () => {
 	} );
 
 	/**
-	 * Returns the review-modal row (a listbox option) for a given style label.
-	 * The row toggles selection on click and reflects it via `aria-selected`.
+	 * Returns the modal row (a listbox option) for a style label. Clicking the
+	 * row toggles its selection, shown by `aria-selected`.
 	 *
 	 * @param {Object} modal Playwright locator for the review modal.
 	 * @param {string} label Style label, e.g. 'Letter case'.
@@ -34,8 +34,8 @@ test.describe( 'Push to Global Styles button', () => {
 	}
 
 	/**
-	 * Adds a Heading block, navigates to its Advanced panel and enables the
-	 * Letter case typography option so that there is a pushable change.
+	 * Adds a Heading block, opens its Advanced panel and turns on Letter case
+	 * so there's a change to push.
 	 *
 	 * @param {Object} options        Playwright fixtures.
 	 * @param {Object} options.page   Playwright page.
@@ -181,7 +181,7 @@ test.describe( 'Push to Global Styles button', () => {
 			} )
 		).toBeVisible();
 
-		// Letter case remains a local override, so a change is still pending.
+		// Letter case is still only set on the block, so there's a change to push.
 		await expect(
 			page.getByRole( 'button', { name: 'Apply globally' } )
 		).toBeEnabled();

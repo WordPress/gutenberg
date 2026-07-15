@@ -116,21 +116,20 @@ const getValueFromObjectPath = ( object, path ) => {
 const sides = [ 'top', 'right', 'bottom', 'left' ];
 
 /**
- * A single logical style change, grouping all the `{ path, value }` pairs it
- * expands to so a selection can push them atomically.
+ * One style change shown as a single row. It holds every `{ path, value }` pair
+ * the change covers so they all get pushed together.
  *
  * @typedef {Object} ChangeRow
  * @property {string}                            id               Unique row id.
- * @property {string[]}                          primaryPath      Path used for the current-value lookup.
- * @property {Array<{path: string[], value: *}>} paths            Expanded path/value pairs to push.
+ * @property {string[]}                          primaryPath      Path used to look up the current value.
+ * @property {Array<{path: string[], value: *}>} paths            The path/value pairs to push.
  * @property {string[]}                          presetAttributes Preset block attributes to clear when pushed.
  * @property {*}                                 newValue         Value shown in the "New" column.
- * @property {string}                            [format]         Display format hint (`border`, `borderRadius`, `spacing`).
+ * @property {string}                            [format]         How to display the value (`border`, `borderRadius`, `spacing`).
  */
 
-// Builds the border review rows, grouped by scope so each row reads as a CSS
-// `border` shorthand (all-sides, per-side, and radius) rather than one row per
-// longhand.
+// Builds the border rows, grouped so each one reads as a single CSS `border`
+// value (all sides, one side, and radius) instead of a row per property.
 function getBorderRows( supports, attributes, blockUserConfig ) {
 	const rows = [];
 	const border = attributes.style?.border;
@@ -140,8 +139,8 @@ function getBorderRows( supports, attributes, blockUserConfig ) {
 	const widthSupported = supports.includes( 'borderWidth' );
 	const styleSupported = supports.includes( 'borderStyle' );
 
-	// All-sides (flat) border shorthand. A preset border color is stored as a
-	// block attribute and pushed as a preset variable token.
+	// The all-sides border. A preset border color lives in a block attribute
+	// and is pushed as a preset value.
 	const presetBorderColor = attributes.borderColor;
 	const flatColor = presetBorderColor
 		? `var:preset|color|${ presetBorderColor }`
@@ -160,7 +159,6 @@ function getBorderRows( supports, attributes, blockUserConfig ) {
 		rows.push( flatRow );
 	}
 
-	// Per-side borders.
 	sides.forEach( ( side ) => {
 		const sideBorder = border?.[ side ];
 		const sideRow = buildBorderScopeRow( {
@@ -178,8 +176,8 @@ function getBorderRows( supports, attributes, blockUserConfig ) {
 		}
 	} );
 
-	// Border radius. Pushed as-is (a string or per-corner object) since Global
-	// Styles accepts both forms.
+	// Border radius, pushed as-is (a string or an object per corner) since
+	// Global Styles takes either.
 	if (
 		supports.includes( 'borderRadius' ) &&
 		border?.radius !== undefined &&
@@ -198,9 +196,9 @@ function getBorderRows( supports, attributes, blockUserConfig ) {
 	return rows;
 }
 
-// Builds a single border row (all-sides or one side) that pushes the scope's
-// color, width, and style together and displays them as a CSS shorthand.
-// Returns `null` when the scope has no values.
+// Builds one border row (all sides or a single side) that pushes its color,
+// width and style together and shows them as one CSS value. Returns `null`
+// when there's nothing set.
 function buildBorderScopeRow( {
 	id,
 	primaryPath,
@@ -216,8 +214,8 @@ function buildBorderScopeRow( {
 	}
 
 	const paths = [];
-	// The all-sides shorthand is also written to each side so it can override
-	// per-side theme.json configuration.
+	// The all-sides value is also written to each side so it can override any
+	// per-side values from theme.json.
 	const targetSides = side ? [ side ] : sides;
 
 	const addChange = ( property, value ) => {
@@ -225,7 +223,6 @@ function buildBorderScopeRow( {
 			return;
 		}
 		if ( ! side ) {
-			// The shorthand entry is cleared from the block and set globally.
 			paths.push( { path: [ 'border', property ], value } );
 		}
 		targetSides.forEach( ( targetSide ) => {
@@ -237,9 +234,9 @@ function buildBorderScopeRow( {
 	addChange( 'width', width );
 	addChange( 'style', style );
 
-	// A visible border needs a style, so fall back to `solid` when a color or
-	// width is set without one (unless Global Styles already define a style for
-	// that side).
+	// A border only shows with a style, so use `solid` when a color or width
+	// is set without one (unless Global Styles already sets a style for that
+	// side).
 	let effectiveStyle = style;
 	if ( ! style && ( color || width ) ) {
 		targetSides.forEach( ( targetSide ) => {
@@ -264,14 +261,14 @@ function buildBorderScopeRow( {
 }
 
 /**
- * Derives the block-instance style changes that can be pushed to Global Styles,
- * grouped into logical rows (see `ChangeRow`).
+ * Works out which of the block's style changes can be pushed to Global Styles,
+ * grouped into rows (see `ChangeRow`).
  *
  * @param {Array}  supports        Supported style keys for the block.
  * @param {Object} attributes      Block attributes.
- * @param {Object} blockUserConfig User Global Styles config for the block.
+ * @param {Object} blockUserConfig The block's user Global Styles config.
  *
- * @return {ChangeRow[]} Grouped change rows.
+ * @return {ChangeRow[]} The changes, grouped into rows.
  */
 export function getChangesToPush( supports, attributes, blockUserConfig ) {
 	const rows = [];
@@ -280,13 +277,12 @@ export function getChangesToPush( supports, attributes, blockUserConfig ) {
 		if ( ! STYLE_PROPERTY[ key ] ) {
 			return;
 		}
-		// Border styles are grouped by scope and handled separately below.
+		// Border styles are grouped and handled separately below.
 		if ( key.startsWith( 'border' ) ) {
 			return;
 		}
-		// Root-only properties (e.g. `--wp--style--root--padding`) duplicate
-		// their non-root counterpart (`padding`) and only apply to the root,
-		// so they are skipped here.
+		// Root-only properties (e.g. `--wp--style--root--padding`) repeat their
+		// normal version (`padding`) and only apply to the root, so skip them.
 		if ( STYLE_PROPERTY[ key ].rootOnly ) {
 			return;
 		}
@@ -301,15 +297,14 @@ export function getChangesToPush( supports, attributes, blockUserConfig ) {
 			? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
 			: getValueFromObjectPath( attributes.style, path );
 
-		// A preset attribute is only cleared from the block when its
-		// corresponding row is pushed (see `getStylesUpdate`).
+		// A preset attribute is only removed from the block when its row is
+		// pushed (see `getStylesUpdate`).
 		const presetAttributes = presetAttributeValue
 			? [ presetAttributeName ]
 			: [];
 
-		// Links only have a single support entry but have two element
-		// style properties, color and hover color. The following check
-		// will add the hover color to the changes if required.
+		// Links have a single support but two styles: color and hover color.
+		// Add the hover color to the changes when it's set.
 		if ( key === 'linkColor' ) {
 			const paths = value ? [ { path, value } ] : [];
 			const hoverPath = [ 'elements', 'link', ':hover', 'color', 'text' ];
@@ -337,9 +332,9 @@ export function getChangesToPush( supports, attributes, blockUserConfig ) {
 		}
 
 		if ( value ) {
-			// Padding and margin can be axial or per-side objects; a format
-			// hint lets them render as a single CSS shorthand instead of one
-			// row per side or a raw object.
+			// Padding and margin can be axial or per-side objects. The format
+			// hint lets them show as one CSS value instead of a row per side
+			// or a raw object.
 			const format =
 				key === 'padding' || key === 'margin' ? 'spacing' : undefined;
 			rows.push( {
@@ -374,18 +369,17 @@ function useChangesToPush( name, attributes, userConfig ) {
 }
 
 /**
- * Computes the block attribute and user Global Styles updates for a subset of
- * grouped rows without applying them. Returns `null` when there is nothing to
- * push.
+ * Works out the block attribute and user Global Styles updates for the chosen
+ * rows, without applying them. Returns `null` when there's nothing to push.
  *
  * @param {Object} options            Options.
- * @param {Array}  options.rowsToPush Grouped rows to push.
+ * @param {Array}  options.rowsToPush The rows to push.
  * @param {Object} options.attributes Current block attributes.
  * @param {Object} options.userConfig Current user Global Styles config.
  * @param {string} options.name       Block name.
  *
- * @return {?{newBlockAttributes: Object, newUserConfig: Object}} The computed
- *   updates, or `null` when the subset is empty.
+ * @return {?{newBlockAttributes: Object, newUserConfig: Object}} The updates,
+ *   or `null` when no rows were chosen.
  */
 export function getStylesUpdate( {
 	rowsToPush,
@@ -417,9 +411,9 @@ export function getStylesUpdate( {
 		);
 	}
 
-	// Only clear the preset block attributes that belong to the pushed rows.
-	// Clearing them unconditionally would wipe deselected preset styles from
-	// the block without pushing them to Global Styles.
+	// Only clear the preset attributes from the rows being pushed. Clearing
+	// them all would wipe unselected preset styles from the block without
+	// pushing them to Global Styles.
 	const newBlockAttributes = {
 		style: cleanEmptyObject( newBlockStyles ),
 	};
