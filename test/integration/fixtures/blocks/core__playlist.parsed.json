@@ -1,9 +1,7 @@
 [
 	{
 		"blockName": "core/playlist",
-		"attrs": {
-			"caption": "Sample playlist"
-		},
+		"attrs": {},
 		"innerBlocks": [
 			{
 				"blockName": "core/playlist-track",
@@ -22,11 +20,11 @@
 				"innerContent": []
 			}
 		],
-		"innerHTML": "\n<figure class=\"wp-block-playlist\">\n\t<ol class=\"wp-block-playlist__tracklist wp-block-playlist__tracklist-show-numbers\">\n\t\t\n\t</ol>\n\t<figcaption class=\"wp-element-caption\">Sample playlist</figcaption>\n</figure>\n",
+		"innerHTML": "\n<figure class=\"wp-block-playlist\">\n\t<ol class=\"wp-block-playlist__tracklist wp-block-playlist__tracklist-show-numbers\">\n\t\t\n\t</ol>\n</figure>\n",
 		"innerContent": [
 			"\n<figure class=\"wp-block-playlist\">\n\t<ol class=\"wp-block-playlist__tracklist wp-block-playlist__tracklist-show-numbers\">\n\t\t",
 			null,
-			"\n\t</ol>\n\t<figcaption class=\"wp-element-caption\">Sample playlist</figcaption>\n</figure>\n"
+			"\n\t</ol>\n</figure>\n"
 		]
 	}
 ]

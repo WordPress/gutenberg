@@ -72,10 +72,6 @@ jest.mock( '@wordpress/notices', () => ( {
 	store: {},
 } ) );
 
-jest.mock( '../../utils/caption', () => ( {
-	Caption: () => <figcaption />,
-} ) );
-
 jest.mock( '../../utils/hooks', () => ( {
 	useToolsPanelDropdownMenuProps: () => ( {} ),
 } ) );

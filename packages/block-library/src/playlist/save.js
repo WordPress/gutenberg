@@ -6,21 +6,11 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	RichText,
-	useBlockProps,
-	useInnerBlocksProps,
-	__experimentalGetElementClassName,
-} from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 export default function saveWithInnerBlocks( { attributes } ) {
-	const {
-		caption,
-		showNumbers,
-		showTracklist,
-		showArtists,
-		showTrackLength,
-	} = attributes;
+	const { showNumbers, showTracklist, showArtists, showTrackLength } =
+		attributes;
 
 	const blockProps = useBlockProps.save();
 	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
@@ -38,13 +28,6 @@ export default function saveWithInnerBlocks( { attributes } ) {
 			>
 				{ innerBlocksProps.children }
 			</ol>
-			{ ! RichText.isEmpty( caption ) && (
-				<RichText.Content
-					tagName="figcaption"
-					className={ __experimentalGetElementClassName( 'caption' ) }
-					value={ caption }
-				/>
-			) }
 		</figure>
 	);
 }

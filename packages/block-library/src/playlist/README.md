@@ -33,7 +33,6 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `waveformGradient` | `string` | — | — |
 | `waveformBackgroundColor` | `string` | — | — |
 | `waveformBackgroundGradient` | `string` | — | — |
-| `caption` | `string` | — | — |
 
 ## Supports
 
@@ -65,12 +64,11 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
 
 ```html
-<!-- wp:core/playlist {"caption":"Sample playlist"} -->
+<!-- wp:core/playlist -->
 <figure class="wp-block-playlist">
 	<ol class="wp-block-playlist__tracklist wp-block-playlist__tracklist-show-numbers">
 		<!-- wp:core/playlist-track {"id":123,"src":"https://example.com/audio.mp3","album":"Example album","artist":"Example creator","image":"https://example.com/track-image.jpg","imageAlt":"Track image","length":"3:21","title":"Sample track"} /-->
 	</ol>
-	<figcaption class="wp-element-caption">Sample playlist</figcaption>
 </figure>
 <!-- /wp:core/playlist -->
 ```

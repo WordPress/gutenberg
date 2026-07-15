@@ -11,8 +11,7 @@
 			"showArtists": true,
 			"showNumbers": true,
 			"showTrackLength": true,
-			"waveformStyle": "bars",
-			"caption": "Sample playlist"
+			"waveformStyle": "bars"
 		},
 		"innerBlocks": [
 			{

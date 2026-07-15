@@ -36,7 +36,6 @@ import { createBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { WaveformPlayer } from '../utils/waveform-player';
 import { PlaylistContext } from './context';
@@ -77,7 +76,6 @@ const PlaylistEdit = ( {
 	attributes,
 	setAttributes,
 	isSelected,
-	insertBlocksAfter,
 	clientId,
 } ) => {
 	const {
@@ -719,15 +717,6 @@ const PlaylistEdit = ( {
 						{ innerBlocksProps.children }
 					</PlaylistContext.Provider>
 				</ol>
-				<Caption
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					isSelected={ isSelected }
-					insertBlocksAfter={ insertBlocksAfter }
-					label={ __( 'Playlist caption text' ) }
-					showToolbarButton={ isSelected }
-					style={ { marginTop: 16 } }
-				/>
 			</figure>
 		</>
 	);
