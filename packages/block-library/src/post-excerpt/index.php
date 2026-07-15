@@ -74,7 +74,8 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	if ( $show_more_on_new_line && ! empty( $more_text ) ) {
 		$content .= '</p><p class="wp-block-post-excerpt__more-text">' . $more_text . '</p>';
 	} else {
-		$content .= " $more_text</p>";
+		$separator = ( ! empty( $excerpt ) && ! empty( $more_text ) ) ? ' ' : '';
+		$content  .= $separator . $more_text . '</p>';
 	}
 	remove_filter( 'excerpt_more', $filter_excerpt_more );
 	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $content );
