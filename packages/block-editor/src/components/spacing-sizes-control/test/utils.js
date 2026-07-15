@@ -10,18 +10,17 @@ import {
 	getSpacingPresetCssVar,
 	hasAxisSupport,
 	hasBalancedSidesSupport,
+	isValueSpacingPreset,
 	VIEWS,
 } from '../utils';
-import { getPresetSlug, isValuePreset } from '../../preset-input-control/utils';
+import { getPresetSlug } from '../../preset-input-control/utils';
 
-describe( 'isValuePreset', () => {
+describe( 'isValueSpacingPreset', () => {
 	it( 'should return true if value is string in spacing presets var format', () => {
-		expect( isValuePreset( 'var:preset|spacing|20', 'spacing' ) ).toBe(
-			true
-		);
+		expect( isValueSpacingPreset( 'var:preset|spacing|20' ) ).toBe( true );
 	} );
 	it( 'should return false if value is not a string in spacing presets var format', () => {
-		expect( isValuePreset( '30px', 'spacing' ) ).toBe( false );
+		expect( isValueSpacingPreset( '30px' ) ).toBe( false );
 	} );
 } );
 
