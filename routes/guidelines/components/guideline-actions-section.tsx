@@ -109,7 +109,7 @@ export default function GuidelineActionsSection( {
 			title: __( 'Import' ),
 			description: __( 'Upload a JSON file to import your guidelines.' ),
 			buttonLabel: __( 'Upload' ),
-			ariaLabel: __( 'Import guidelines' ),
+			ariaLabel: __( 'Upload guidelines' ),
 			onClick: handleImportClick,
 			isBusy: isImporting,
 			disabled: isImporting || !! pendingImport,
@@ -119,7 +119,7 @@ export default function GuidelineActionsSection( {
 			title: __( 'Export' ),
 			description: __( 'Export your guidelines to a JSON file.' ),
 			buttonLabel: __( 'Download' ),
-			ariaLabel: __( 'Export guidelines' ),
+			ariaLabel: __( 'Download guidelines' ),
 			onClick: handleExportClick,
 		},
 	];

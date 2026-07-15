@@ -143,10 +143,10 @@ test.describe( 'Guidelines', () => {
 
 		// The Actions card offers Import and Export, but not Revert / history.
 		await expect(
-			page.getByRole( 'button', { name: 'Export guidelines' } )
+			page.getByRole( 'button', { name: 'Download guidelines' } )
 		).toBeVisible();
 		await expect(
-			page.getByRole( 'button', { name: 'Import guidelines' } )
+			page.getByRole( 'button', { name: 'Upload guidelines' } )
 		).toBeVisible();
 		await expect( page.getByText( 'Revert' ) ).toHaveCount( 0 );
 		await expect(
@@ -341,7 +341,9 @@ test.describe( 'Guidelines', () => {
 
 		// Export and capture the downloaded file.
 		const downloadPromise = page.waitForEvent( 'download' );
-		await page.getByRole( 'button', { name: 'Export guidelines' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Download guidelines' } )
+			.click();
 		const download = await downloadPromise;
 		const exportPath = await download.path();
 
@@ -363,7 +365,7 @@ test.describe( 'Guidelines', () => {
 		await waitForGuidelinesApp( page );
 
 		const fileChooserPromise = page.waitForEvent( 'filechooser' );
-		await page.getByRole( 'button', { name: 'Import guidelines' } ).click();
+		await page.getByRole( 'button', { name: 'Upload guidelines' } ).click();
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles( exportPath );
 
