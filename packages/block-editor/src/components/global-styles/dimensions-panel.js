@@ -37,6 +37,31 @@ import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
+/**
+ * Determines whether a spacing control (`BoxControl` or `SpacingSizesControl`)
+ * renders its linked/unlink toggle button, which the local-override reset dot
+ * offsets itself against.
+ *
+ * @param {string[]|undefined} sides            Configurable sides for the control.
+ * @param {boolean}            isPresetsControl Whether the presets-based
+ *                                              `SpacingSizesControl` is used.
+ *
+ * @return {boolean} Whether the toggle button is rendered.
+ */
+function hasSpacingToggle( sides, isPresetsControl ) {
+	if ( sides?.length === 1 ) {
+		return false;
+	}
+	if ( isPresetsControl ) {
+		const hasOnlyAxialSides =
+			sides?.includes( 'horizontal' ) &&
+			sides?.includes( 'vertical' ) &&
+			sides?.length === 2;
+		return ! hasOnlyAxialSides;
+	}
+	return true;
+}
+
 export function useHasDimensionsPanel(
 	settings,
 	styleState = DEFAULT_BLOCK_STYLE_STATE
@@ -818,7 +843,10 @@ export default function DimensionsPanel( {
 				<InheritanceToolsPanelItem
 					hasValue={ hasPaddingValue }
 					label={ __( 'Padding' ) }
-					hasInlineEndToggle
+					hasInlineEndToggle={ hasSpacingToggle(
+						paddingSides,
+						showSpacingPresetsControl
+					) }
 					onDeselect={ resetPaddingValue }
 					isShownByDefault={
 						defaultControls.padding ?? DEFAULT_CONTROLS.padding
@@ -869,7 +897,10 @@ export default function DimensionsPanel( {
 				<InheritanceToolsPanelItem
 					hasValue={ hasMarginValue }
 					label={ __( 'Margin' ) }
-					hasInlineEndToggle
+					hasInlineEndToggle={ hasSpacingToggle(
+						marginSides,
+						showSpacingPresetsControl
+					) }
 					onDeselect={ resetMarginValue }
 					isShownByDefault={
 						defaultControls.margin ?? DEFAULT_CONTROLS.margin
