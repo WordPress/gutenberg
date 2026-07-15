@@ -16,7 +16,7 @@ import { useSelect } from '@wordpress/data';
 import useTabActions from '../tabs/use-tab-actions';
 
 /**
- * Block toolbar buttons that reorder the active tab one position left or right.
+ * Block toolbar buttons that reorder the active tab one position before or after.
  * Reordering acts on the underlying core/tab-panel blocks; the tab-list labels
  * follow their panel automatically via useTabListItemsSync. The buttons are
  * disabled at the first/last position.
@@ -54,9 +54,7 @@ export default function TabMovers( { tabsClientId } ) {
 			<ToolbarButton
 				className="wp-block-tab-list__mover-button"
 				icon={ isRTL() ? chevronRight : chevronLeft }
-				label={
-					isRTL() ? __( 'Move tab right' ) : __( 'Move tab left' )
-				}
+				label={ __( 'Move tab before' ) }
 				onClick={ () => moveTab( -1 ) }
 				disabled={ activeIndex <= 0 }
 				accessibleWhenDisabled
@@ -64,9 +62,7 @@ export default function TabMovers( { tabsClientId } ) {
 			<ToolbarButton
 				className="wp-block-tab-list__mover-button"
 				icon={ isRTL() ? chevronLeft : chevronRight }
-				label={
-					isRTL() ? __( 'Move tab left' ) : __( 'Move tab right' )
-				}
+				label={ __( 'Move tab after' ) }
 				onClick={ () => moveTab( 1 ) }
 				disabled={ activeIndex >= tabCount - 1 }
 				accessibleWhenDisabled
