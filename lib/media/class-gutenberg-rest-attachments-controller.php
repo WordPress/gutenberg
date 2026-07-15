@@ -1212,43 +1212,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$sub_size_data['file']      = wp_basename( $path );
 			$sub_size_data['mime_type'] = $type;
 			$sub_size_data['filesize']  = wp_filesize( $path );
-		} elseif ( 'original' === $image_size ) {
-			// The endpoint expects the caller to supply the full-size image with
-			// any EXIF orientation already applied. It replaces the attachment's
-			// main file with this image and keeps the file being replaced as
-			// `original_image`, which is the untouched upload. This is the same
-			// swap WordPress makes when it scales or rotates an image on upload.
-			// See the 'scaled' branch and core's _wp_image_meta_replace_original().
-			$current_file = get_attached_file( $attachment_id, true );
-
-			if ( ! $current_file ) {
-				return new WP_Error(
-					'rest_sideload_no_attached_file',
-					__( 'Unable to retrieve the attached file for this attachment.', 'gutenberg' ),
-					array( 'status' => 404 )
-				);
-			}
-
-			$sub_size_data['original_image'] = wp_basename( $current_file );
-
-			// Update the attached file to point to the supplied image.
-			// This writes to _wp_attached_file meta, not _wp_attachment_metadata.
-			// Guard against a failed update so a stale original is not recorded.
-			if (
-				get_attached_file( $attachment_id, true ) !== $path &&
-				! update_attached_file( $attachment_id, $path )
-			) {
-				return new WP_Error(
-					'rest_sideload_update_attached_file_failed',
-					__( 'Unable to update the attached file for this attachment.', 'gutenberg' ),
-					array( 'status' => 500 )
-				);
-			}
-
-			$sub_size_data['width']    = $size[0];
-			$sub_size_data['height']   = $size[1];
-			$sub_size_data['filesize'] = wp_filesize( $path );
-			$sub_size_data['file']     = _wp_relative_upload_path( $path );
 		} elseif ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
 			// Source-format original. finalize_item() writes the filename to
 			// $metadata[ self::META_KEY_SOURCE_IMAGE ] (separate from
@@ -1267,8 +1230,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// the filename to $metadata['animated_video_poster']; used as the
 			// video block's poster and deleted with the video.
 			$sub_size_data['file'] = wp_basename( $path );
-		} elseif ( 'scaled' === $image_size ) {
-			// Record the current attached file as the original.
+		} elseif ( 'scaled' === $image_size || 'original' === $image_size ) {
+			// 'scaled' and 'original' both replace the attachment's main file
+			// with the supplied image and keep the file being replaced as
+			// `original_image`, which is the untouched upload. A 'scaled' image is
+			// downsized and an 'original' image has any EXIF orientation already
+			// applied. This is the same swap WordPress makes when it scales or
+			// rotates an image on upload. See core's _wp_image_meta_replace_original().
 			$current_file = get_attached_file( $attachment_id, true );
 
 			if ( ! $current_file ) {
@@ -1281,7 +1249,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 			$sub_size_data['original_image'] = wp_basename( $current_file );
 
-			// Update the attached file to point to the scaled version.
+			// Update the attached file to point to the supplied image.
 			// This writes to _wp_attached_file meta, not _wp_attachment_metadata.
 			// Guard against a failed update so a stale original is not recorded.
 			if (
