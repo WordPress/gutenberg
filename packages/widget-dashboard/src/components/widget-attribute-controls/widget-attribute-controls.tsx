@@ -64,7 +64,7 @@ export function WidgetAttributeControls( {
 	// so its actual footprint (button width plus the chip gap)
 	// is reserved from the fit budget.
 	//
-	// The control's size is determined by design tokens. Read once per mount.
+	// The control's size is determined by design tokens.
 	const [ triggerReserve, setTriggerReserve ] = useState( 0 );
 
 	const triggerReserveRef = useResizeObserver< HTMLElement >(
