@@ -73,7 +73,8 @@ describe( 'convertGifToVideo', () => {
 			'item-1',
 			gif,
 			'video/mp4',
-			720
+			720,
+			undefined
 		);
 		expect( result ).toBeInstanceOf( File );
 		expect( result.name ).toBe( 'my-anim.mp4' );
@@ -95,6 +96,7 @@ describe( 'convertGifToVideo', () => {
 			'item-2',
 			gif,
 			'video/webm',
+			undefined,
 			undefined
 		);
 		expect( result.name ).toBe( 'clip.webm' );

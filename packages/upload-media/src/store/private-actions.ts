@@ -1382,25 +1382,34 @@ export function transcodeGifItem(
 		 */
 		const gifFile = item.file;
 
+		/*
+		 * The worker already throttles reports to whole-percent increments,
+		 * but a fast conversion can still emit ~100 reports in a couple of
+		 * seconds. Each dispatch synchronously re-renders every upload-store
+		 * consumer in the editor, which can saturate the main thread and
+		 * starve painting - the progress bar would be in the DOM but never
+		 * drawn. Time-gate dispatches so the browser gets to paint between
+		 * them. Progress is stored on this (sideload) queue item; the
+		 * getProgressById selector resolves it for the parent attachment via
+		 * additionalData.post.
+		 */
+		let lastProgressDispatch = 0;
+		const onProgress = ( progress: number ) => {
+			const now = Date.now();
+			if ( progress < 1 && now - lastProgressDispatch < 250 ) {
+				return;
+			}
+			lastProgressDispatch = now;
+			dispatch.updateItemProgress( id, Math.round( progress * 100 ) );
+		};
+
 		try {
 			const file = await convertGifToVideo(
 				item.id,
 				gifFile,
 				outputMimeType,
 				undefined,
-				/*
-				 * The worker throttles reports to whole-percent increments, so
-				 * this dispatches at most ~100 times per conversion. Progress
-				 * is stored on this (sideload) queue item; the getProgressById
-				 * selector resolves it for the parent attachment via
-				 * additionalData.post.
-				 */
-				( progress: number ) => {
-					dispatch.updateItemProgress(
-						id,
-						Math.round( progress * 100 )
-					);
-				}
+				onProgress
 			);
 
 			// Hand the transcoded video to the next Upload op as the
