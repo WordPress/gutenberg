@@ -89,6 +89,10 @@
 .editor-revisions-code-diff__code {
 	width: 100%;
 	padding: 0 $grid-unit-20 0 $grid-unit-10;
+	// Keep raw markup LTR even when the editor UI is RTL.
+	/*rtl:ignore*/
+	direction: ltr;
+	unicode-bidi: isolate;
 	white-space: pre;
 
 	code {

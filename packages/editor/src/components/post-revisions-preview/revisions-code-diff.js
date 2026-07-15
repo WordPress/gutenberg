@@ -18,9 +18,12 @@ import { VisuallyHidden } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
+const MAX_DIFF_EDIT_LENGTH = 1000;
+const DIFF_TIMEOUT = 100;
+
 /**
- * Splits a diff part into display lines without creating an extra line for a
- * trailing newline.
+ * Diff parts often end in a newline. Remove the trailing empty item so it is
+ * not rendered as another source line.
  *
  * @param {string} value Diff part value.
  * @return {string[]} Lines in the diff part.
@@ -43,9 +46,22 @@ function splitLines( value ) {
  * @return {Array<Object>} Code-diff rows.
  */
 export function getCodeDiffRows( previousContent, currentContent, showDiff ) {
-	const parts = showDiff
-		? diffLines( previousContent, currentContent )
-		: [ { value: currentContent } ];
+	let parts = [ { value: currentContent } ];
+	if ( showDiff ) {
+		parts = diffLines( previousContent, currentContent, {
+			maxEditLength: MAX_DIFF_EDIT_LENGTH,
+			timeout: DIFF_TIMEOUT,
+		} );
+
+		// Line diffing can be quadratic for unrelated revisions. If it exceeds
+		// either limit, mark every old and new line instead.
+		if ( ! parts ) {
+			parts = [
+				{ value: previousContent, removed: true },
+				{ value: currentContent, added: true },
+			];
+		}
+	}
 	let previousLineNumber = 1;
 	let currentLineNumber = 1;
 
@@ -83,22 +99,37 @@ export function getCodeDiffRows( previousContent, currentContent, showDiff ) {
  * @return {React.JSX.Element} The revision code diff.
  */
 export default function RevisionsCodeDiff() {
-	const { revision, previousRevision, showDiff } = useSelect( ( select ) => {
-		const {
-			getCurrentRevision,
-			getPreviousRevision,
-			isShowingRevisionDiff,
-		} = unlock( select( editorStore ) );
+	const { revision, previousRevision, showDiff, isPreviousRevisionLoading } =
+		useSelect( ( select ) => {
+			const editorSelectors = select( editorStore );
+			const {
+				getCurrentRevision,
+				getPreviousRevision,
+				getRevisionPage,
+				getRevisionsPerPage,
+				isShowingRevisionDiff,
+			} = unlock( editorSelectors );
+			const _previousRevision = getPreviousRevision();
+			const _showDiff = isShowingRevisionDiff();
+			const totalPages =
+				Math.ceil(
+					editorSelectors.getCurrentPostRevisionsCount() /
+						getRevisionsPerPage()
+				) || 1;
 
-		return {
-			revision: getCurrentRevision(),
-			previousRevision: getPreviousRevision(),
-			showDiff: isShowingRevisionDiff(),
-		};
-	}, [] );
+			return {
+				revision: getCurrentRevision(),
+				previousRevision: _previousRevision,
+				showDiff: _showDiff,
+				isPreviousRevisionLoading:
+					_showDiff &&
+					_previousRevision === null &&
+					getRevisionPage() < totalPages,
+			};
+		}, [] );
 
 	const rows = useMemo( () => {
-		if ( ! revision ) {
+		if ( ! revision || isPreviousRevisionLoading ) {
 			return [];
 		}
 
@@ -107,9 +138,9 @@ export default function RevisionsCodeDiff() {
 			revision.content?.raw ?? '',
 			showDiff
 		);
-	}, [ revision, previousRevision, showDiff ] );
+	}, [ revision, previousRevision, showDiff, isPreviousRevisionLoading ] );
 
-	if ( ! revision ) {
+	if ( ! revision || isPreviousRevisionLoading ) {
 		return (
 			<div className="editor-revisions-canvas__loading">
 				<Spinner />
@@ -135,7 +166,7 @@ export default function RevisionsCodeDiff() {
 						<tr>
 							{ showDiff && <th>{ __( 'Previous line' ) }</th> }
 							<th>{ __( 'Current line' ) }</th>
-							<th>{ __( 'Change' ) }</th>
+							{ showDiff && <th>{ __( 'Change' ) }</th> }
 							<th>{ __( 'Code' ) }</th>
 						</tr>
 					</VisuallyHidden>
@@ -164,16 +195,18 @@ export default function RevisionsCodeDiff() {
 									<td className="editor-revisions-code-diff__line-number">
 										{ row.currentLineNumber }
 									</td>
-									<td className="editor-revisions-code-diff__marker">
-										<VisuallyHidden>
-											{ statusLabel }
-										</VisuallyHidden>
-										<span aria-hidden="true">
-											{ marker }
-										</span>
-									</td>
+									{ showDiff && (
+										<td className="editor-revisions-code-diff__marker">
+											<VisuallyHidden>
+												{ statusLabel }
+											</VisuallyHidden>
+											<span aria-hidden="true">
+												{ marker }
+											</span>
+										</td>
+									) }
 									<td className="editor-revisions-code-diff__code">
-										<code>{ row.value || '\u00a0' }</code>
+										<code>{ row.value }</code>
 									</td>
 								</tr>
 							);

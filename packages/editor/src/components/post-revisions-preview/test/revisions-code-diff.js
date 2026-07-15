@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
+import { diffLines } from 'diff';
 
 /**
  * WordPress dependencies
@@ -12,6 +13,14 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import RevisionsCodeDiff, { getCodeDiffRows } from '../revisions-code-diff';
+
+jest.mock( 'diff', () => {
+	const actual = jest.requireActual( 'diff' );
+	return {
+		...actual,
+		diffLines: jest.fn( actual.diffLines ),
+	};
+} );
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 
@@ -26,16 +35,26 @@ jest.mock( '../../../lock-unlock', () => ( {
 function mockRevisions( {
 	currentContent = '',
 	previousContent = '',
+	previousRevision,
 	showDiff = true,
+	revisionPage = 1,
+	totalRevisions = 2,
+	revisionsPerPage = 100,
 } = {} ) {
+	const resolvedPreviousRevision =
+		previousRevision === undefined
+			? { content: { raw: previousContent } }
+			: previousRevision;
+
 	useSelect.mockImplementation( ( mapSelect ) =>
 		mapSelect( () => ( {
 			getCurrentRevision: () => ( {
 				content: { raw: currentContent },
 			} ),
-			getPreviousRevision: () => ( {
-				content: { raw: previousContent },
-			} ),
+			getPreviousRevision: () => resolvedPreviousRevision,
+			getRevisionPage: () => revisionPage,
+			getRevisionsPerPage: () => revisionsPerPage,
+			getCurrentPostRevisionsCount: () => totalRevisions,
 			isShowingRevisionDiff: () => showDiff,
 		} ) )
 	);
@@ -99,6 +118,47 @@ describe( 'getCodeDiffRows', () => {
 			},
 		] );
 	} );
+
+	it( 'uses a coarse diff when line diffing exceeds its limits', () => {
+		diffLines.mockReturnValueOnce( undefined );
+
+		expect( getCodeDiffRows( 'Before\nOld', 'After\nNew', true ) ).toEqual(
+			[
+				{
+					value: 'Before',
+					status: 'removed',
+					previousLineNumber: 1,
+					currentLineNumber: null,
+				},
+				{
+					value: 'Old',
+					status: 'removed',
+					previousLineNumber: 2,
+					currentLineNumber: null,
+				},
+				{
+					value: 'After',
+					status: 'added',
+					previousLineNumber: null,
+					currentLineNumber: 1,
+				},
+				{
+					value: 'New',
+					status: 'added',
+					previousLineNumber: null,
+					currentLineNumber: 2,
+				},
+			]
+		);
+		expect( diffLines ).toHaveBeenLastCalledWith(
+			'Before\nOld',
+			'After\nNew',
+			{
+				maxEditLength: 1000,
+				timeout: 100,
+			}
+		);
+	} );
 } );
 
 describe( 'RevisionsCodeDiff', () => {
@@ -136,5 +196,61 @@ describe( 'RevisionsCodeDiff', () => {
 		expect( screen.queryByText( '<p>Before</p>' ) ).not.toBeInTheDocument();
 		expect( screen.queryByText( 'Added' ) ).not.toBeInTheDocument();
 		expect( screen.queryByText( 'Removed' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'columnheader', { name: 'Change' } )
+		).not.toBeInTheDocument();
+		expect(
+			within(
+				screen.getByRole( 'row', { name: /<p>After<\/p>/ } )
+			).getAllByRole( 'cell' )
+		).toHaveLength( 2 );
+		expect( screen.queryByText( 'Unchanged' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'waits for the previous revision at a page boundary', () => {
+		mockRevisions( {
+			currentContent: '<p>Current</p>',
+			previousRevision: null,
+			revisionPage: 1,
+			totalRevisions: 101,
+		} );
+
+		render( <RevisionsCodeDiff /> );
+
+		expect( screen.getByRole( 'presentation' ) ).toHaveClass(
+			'components-spinner'
+		);
+		expect( screen.queryByRole( 'region' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'compares the oldest revision against empty content', () => {
+		mockRevisions( {
+			currentContent: '<p>Oldest</p>',
+			previousRevision: null,
+			revisionPage: 2,
+			totalRevisions: 101,
+		} );
+
+		render( <RevisionsCodeDiff /> );
+
+		expect(
+			screen.getByRole( 'row', { name: /Added.*<p>Oldest<\/p>/ } )
+		).toHaveClass( 'is-added' );
+	} );
+
+	it( 'preserves blank source lines without inserting text', () => {
+		mockRevisions( {
+			currentContent: 'First\n\nLast',
+			showDiff: false,
+		} );
+
+		render( <RevisionsCodeDiff /> );
+
+		expect(
+			screen.getByText( '', {
+				selector: '.editor-revisions-code-diff__code code',
+				normalizer: ( content ) => content,
+			} )
+		).toBeEmptyDOMElement();
 	} );
 } );
