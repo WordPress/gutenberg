@@ -7,7 +7,6 @@ const typographyTokens = wpdsTokens.filter( ( tokenName ) =>
 
 type TypographyTokenGroup = {
 	title: string;
-	description: string;
 	tokenPrefix: string;
 	sampleLines: string[];
 	getSampleStyle: ( tokenValue: string, tokenName: string ) => CSSProperties;
@@ -16,8 +15,6 @@ type TypographyTokenGroup = {
 const tokenGroups: TypographyTokenGroup[] = [
 	{
 		title: 'Font families',
-		description:
-			'Compare the heading, body, and monospace font family roles.',
 		tokenPrefix: '--wpds-typography-font-family-',
 		sampleLines: [ 'Code is Poetry.' ],
 		getSampleStyle: ( tokenValue ) => ( {
@@ -28,13 +25,12 @@ const tokenGroups: TypographyTokenGroup[] = [
 	},
 	{
 		title: 'Font sizes',
-		description: 'Compare each step in the typography size scale.',
 		tokenPrefix: '--wpds-typography-font-size-',
 		sampleLines: [ 'Code is Poetry.' ],
 		getSampleStyle: ( tokenValue, tokenName ) => ( {
 			fontFamily: 'var(--wpds-typography-font-family-heading)',
 			fontSize: tokenValue,
-			fontWeight: 'var(--wpds-typography-font-weight-emphasis)',
+			fontWeight: 'var(--wpds-typography-font-weight-default)',
 			lineHeight: getTokenValue(
 				tokenName.replace( '-font-size-', '-line-height-' )
 			),
@@ -42,7 +38,6 @@ const tokenGroups: TypographyTokenGroup[] = [
 	},
 	{
 		title: 'Line heights',
-		description: 'Compare the vertical rhythm of each line-height token.',
 		tokenPrefix: '--wpds-typography-line-height-',
 		sampleLines: [
 			'WordPress grows when people like you tell their friends about it.',
@@ -56,7 +51,6 @@ const tokenGroups: TypographyTokenGroup[] = [
 	},
 	{
 		title: 'Font weights',
-		description: 'Compare the default and emphasis font weight roles.',
 		tokenPrefix: '--wpds-typography-font-weight-',
 		sampleLines: [ 'Code is Poetry.' ],
 		getSampleStyle: ( tokenValue ) => ( {
@@ -77,11 +71,6 @@ const previewStyle: CSSProperties = {
 
 const headingStyle: CSSProperties = {
 	marginBlockEnd: 'var(--wpds-dimension-gap-xs)',
-};
-
-const descriptionStyle: CSSProperties = {
-	marginBlockStart: 0,
-	color: 'var(--wpds-color-foreground-content-neutral-weak)',
 };
 
 const listStyle: CSSProperties = {
@@ -111,6 +100,10 @@ const tokenNameStyle: CSSProperties = {
 	overflowWrap: 'anywhere',
 };
 
+const tokenNameContainerStyle: CSSProperties = {
+	margin: 0,
+};
+
 const sampleStyle: CSSProperties = {
 	margin: 0,
 };
@@ -126,7 +119,6 @@ function getTokenValue( tokenName: string ) {
 
 function TypographyTokenSection( {
 	title,
-	description,
 	tokenPrefix,
 	sampleLines,
 	getSampleStyle,
@@ -138,7 +130,6 @@ function TypographyTokenSection( {
 	return (
 		<section>
 			<h2 style={ headingStyle }>{ title }</h2>
-			<p style={ descriptionStyle }>{ description }</p>
 			<dl style={ listStyle }>
 				{ tokens.map( ( tokenName ) => {
 					const tokenValue = getTokenValue( tokenName );
@@ -146,7 +137,7 @@ function TypographyTokenSection( {
 
 					return (
 						<div key={ tokenName } style={ itemStyle }>
-							<dt>
+							<dt style={ tokenNameContainerStyle }>
 								<code style={ tokenNameStyle }>
 									{ tokenName }
 								</code>
