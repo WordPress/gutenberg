@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   Dispatch `wp-router-navigation-start` and `wp-router-navigation-end` native `CustomEvent`s on `window` so scripts that aren't built on the Interactivity API (e.g., consent managers, tag managers, analytics, chat widgets) can react to client-side navigations. ([#70882](https://github.com/WordPress/gutenberg/pull/70882))
+-   Add a public, documented `state.navigation.loading` property to the `core/router` store as the intended replacement for the deprecated `state.navigation.hasStarted`/`hasFinished` properties. ([#70882](https://github.com/WordPress/gutenberg/pull/70882))
+
 ## 2.51.0 (2026-07-14)
 
 ## 2.50.0 (2026-07-01)

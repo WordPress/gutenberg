@@ -1,7 +1,58 @@
 /**
+ * WordPress dependencies
+ */
+import type { Page } from '@playwright/test';
+
+/**
  * Internal dependencies
  */
 import { test, expect } from './fixtures';
+
+/**
+ * Starts collecting `wp-router-navigation-start`/`wp-router-navigation-end`
+ * events dispatched on `window` into `window.__navigationEvents`.
+ *
+ * @param page The Playwright page.
+ */
+const collectNavigationEvents = async ( page: Page ) => {
+	await page.evaluate( () => {
+		( window as any ).__navigationEvents = [];
+		const push = ( type: string ) => ( event: Event ) => {
+			( window as any ).__navigationEvents.push( {
+				type,
+				detail: ( event as CustomEvent ).detail,
+			} );
+		};
+		window.addEventListener(
+			'wp-router-navigation-start',
+			push( 'start' )
+		);
+		window.addEventListener( 'wp-router-navigation-end', push( 'end' ) );
+	} );
+};
+
+/**
+ * Returns the `wp-router-navigation-start`/`wp-router-navigation-end` events
+ * collected so far by {@link collectNavigationEvents}.
+ *
+ * @param page The Playwright page.
+ */
+const getNavigationEvents = ( page: Page ) =>
+	page.evaluate( () => ( window as any ).__navigationEvents );
+
+/**
+ * Returns the current value of `state.navigation.loading` from the
+ * `core/router` store, reading it from the module already loaded in the page
+ * instead of importing the package into the test's own dependency graph.
+ *
+ * @param page The Playwright page.
+ */
+const getNavigationLoading = ( page: Page ) =>
+	page.evaluate( async () => {
+		// eslint-disable-next-line import/no-extraneous-dependencies -- Resolved by the browser's import map, not by Node.
+		const { state } = await import( '@wordpress/interactivity-router' );
+		return ( state as any ).navigation.loading;
+	} );
 
 test.describe( 'Router navigate', () => {
 	test.beforeAll( async ( { interactivityUtils: utils } ) => {
@@ -324,5 +375,84 @@ test.describe( 'Router navigate', () => {
 
 		// Ensure the value from the getter has not changed.
 		await expect( derivedStateClosure ).toHaveText( 'helloFromGetter' );
+	} );
+
+	test( 'should dispatch native navigation-start/navigation-end events and update state.navigation.loading', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		const link1 = utils.getLink( 'router navigate - link 1' );
+		const mainLink = utils.getLink( 'router navigate - main' );
+
+		await expect( getNavigationLoading( page ) ).resolves.toBe( false );
+
+		await collectNavigationEvents( page );
+
+		let resolveLink1: Function;
+		await page.route( link1, async ( route ) => {
+			await new Promise( ( r ) => ( resolveLink1 = r ) );
+			await route.continue();
+		} );
+
+		await page.getByTestId( 'link 1' ).click();
+
+		// While the fetch for link 1 is still pending, the navigation-start
+		// event should have already fired and `state.navigation.loading`
+		// should be `true`.
+		await expect.poll( () => getNavigationLoading( page ) ).toBe( true );
+
+		await expect
+			.poll( () => getNavigationEvents( page ) )
+			.toEqual( [ { type: 'start', detail: { url: link1 } } ] );
+
+		await Promise.resolve().then( () => resolveLink1() );
+
+		await expect( page.getByTestId( 'title' ) ).toHaveText( 'Link 1' );
+
+		await expect( getNavigationLoading( page ) ).resolves.toBe( false );
+
+		const events = await getNavigationEvents( page );
+		expect( events ).toEqual( [
+			{ type: 'start', detail: { url: link1 } },
+			{
+				type: 'end',
+				detail: {
+					url: link1,
+					referrer: mainLink,
+					title: 'Link 1',
+				},
+			},
+		] );
+	} );
+
+	test( 'should dispatch navigation events for navigations restored from the cache via the back/forward buttons', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		const link1 = utils.getLink( 'router navigate - link 1' );
+		const mainLink = utils.getLink( 'router navigate - main' );
+
+		await page.getByTestId( 'link 1' ).click();
+		await expect( page.getByTestId( 'title' ) ).toHaveText( 'Link 1' );
+
+		await collectNavigationEvents( page );
+
+		await page.goBack();
+		await expect( page.getByTestId( 'title' ) ).toHaveText( 'Main' );
+
+		await expect( getNavigationLoading( page ) ).resolves.toBe( false );
+
+		const events = await getNavigationEvents( page );
+		expect( events ).toEqual( [
+			{ type: 'start', detail: { url: mainLink } },
+			{
+				type: 'end',
+				detail: {
+					url: mainLink,
+					referrer: link1,
+					title: 'Main',
+				},
+			},
+		] );
 	} );
 } );

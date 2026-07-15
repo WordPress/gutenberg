@@ -35,6 +35,87 @@ const regionAttr = `data-wp-router-region`;
 const interactiveAttr = `data-wp-interactive`;
 const regionsSelector = `[${ interactiveAttr }][${ regionAttr }], [${ interactiveAttr }] [${ interactiveAttr }][${ regionAttr }]`;
 
+// Native DOM events dispatched on `window` so scripts that are not built on
+// the Interactivity API (e.g., consent managers, tag managers, analytics, or
+// chat widgets) can react to client-side navigations without needing to
+// import `@wordpress/interactivity`.
+const NAVIGATION_START_EVENT = 'wp-router-navigation-start';
+const NAVIGATION_END_EVENT = 'wp-router-navigation-end';
+
+/**
+ * Dispatches a native `CustomEvent` on `window` announcing that a client-side
+ * navigation is about to start.
+ *
+ * This fires once the router has decided a client-side navigation will be
+ * attempted (i.e., after the relevant config checks pass), before the page is
+ * fetched or rendered.
+ *
+ * @param url The URL being navigated to.
+ */
+const dispatchNavigationStart = ( url: string ) => {
+	window.dispatchEvent(
+		new CustomEvent( NAVIGATION_START_EVENT, {
+			detail: { url },
+		} )
+	);
+};
+
+/**
+ * Dispatches a native `CustomEvent` on `window` announcing that a client-side
+ * navigation has finished.
+ *
+ * This fires after the DOM has been patched, `document.title` has been
+ * updated, and (for push navigations) the new entry has been added to the
+ * browser session history.
+ *
+ * @param url      The URL that was navigated to.
+ * @param referrer The URL of the previously active page.
+ * @param title    The new page's title.
+ */
+const dispatchNavigationEnd = (
+	url: string,
+	referrer: string,
+	title: string
+) => {
+	window.dispatchEvent(
+		new CustomEvent( NAVIGATION_END_EVENT, {
+			detail: { url, referrer, title },
+		} )
+	);
+};
+
+/**
+ * Marks the start of a client-side navigation.
+ *
+ * This is the single place where a navigation is considered "started": it
+ * flips the public `state.navigation.loading` flag to `true` and dispatches
+ * the `wp-router-navigation-start` event together, so the reactive state and
+ * the DOM event can never get out of sync.
+ *
+ * @param url The URL being navigated to.
+ */
+const beginNavigation = ( url: string ) => {
+	state.navigation.loading = true;
+	dispatchNavigationStart( url );
+};
+
+/**
+ * Marks the end of a client-side navigation.
+ *
+ * This is the single place where a navigation is considered "finished": it
+ * flips the public `state.navigation.loading` flag to `false` and dispatches
+ * the `wp-router-navigation-end` event together, so the reactive state and
+ * the DOM event can never get out of sync.
+ *
+ * @param url      The URL that was navigated to.
+ * @param referrer The URL of the previously active page.
+ * @param title    The new page's title.
+ */
+const endNavigation = ( url: string, referrer: string, title: string ) => {
+	state.navigation.loading = false;
+	dispatchNavigationEnd( url, referrer, title );
+};
+
 export interface NavigateOptions {
 	force?: boolean;
 	html?: string;
@@ -338,10 +419,17 @@ window.addEventListener( 'popstate', async () => {
 	const pagePath = getPagePath( window.location.href ); // Remove hash.
 	const page = pages.has( pagePath ) && ( await pages.get( pagePath ) );
 	if ( page ) {
+		const url = window.location.href;
+		const referrer = state.url;
+
+		beginNavigation( url );
+
 		batch( () => {
-			state.url = window.location.href;
+			state.url = url;
 			renderPage( page );
 		} );
+
+		endNavigation( url, referrer, document.title );
 	} else {
 		window.location.reload();
 	}
@@ -388,6 +476,7 @@ interface Store {
 	state: {
 		url: string;
 		navigation: {
+			loading: boolean;
 			hasStarted: boolean;
 			hasFinished: boolean;
 		};
@@ -416,13 +505,32 @@ const { state: privateState } = store(
 
 export const { state, actions } = store< Store >( 'core/router', {
 	state: {
-		get navigation() {
-			if ( globalThis.SCRIPT_DEBUG ) {
-				warn(
-					`The usage of state.navigation.{hasStarted|hasFinished} from core/router is deprecated and will stop working in WordPress 7.1.`
-				);
-			}
-			return privateState.navigation;
+		navigation: {
+			// The public, documented replacement for the deprecated
+			// `hasStarted`/`hasFinished` properties below. It's `true` from the
+			// moment a client-side navigation starts until its render has
+			// completed, and is meant to be used with `watch()` or
+			// `data-wp-watch` (e.g., to show a loading indicator on a Query
+			// Loop). It's always kept in sync with the `wp-router-navigation-*`
+			// DOM events dispatched on `window`; see `beginNavigation()` and
+			// `endNavigation()`.
+			loading: false,
+			get hasStarted() {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warn(
+						`The usage of state.navigation.hasStarted from core/router is deprecated and will stop working in WordPress 7.1. Use state.navigation.loading instead.`
+					);
+				}
+				return privateState.navigation.hasStarted;
+			},
+			get hasFinished() {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warn(
+						`The usage of state.navigation.hasFinished from core/router is deprecated and will stop working in WordPress 7.1. Use state.navigation.loading instead.`
+					);
+				}
+				return privateState.navigation.hasFinished;
+			},
 		},
 	},
 	actions: {
@@ -457,6 +565,12 @@ export const { state, actions } = store< Store >( 'core/router', {
 				screenReaderAnnouncement = true,
 				timeout = 10000,
 			} = options;
+
+			// Captured before any state changes so listeners can tell which
+			// page the user is navigating away from.
+			const referrer = state.url;
+
+			beginNavigation( href );
 
 			navigatingTo = href;
 			actions.prefetch( pagePath, options );
@@ -522,6 +636,8 @@ export const { state, actions } = store< Store >( 'core/router', {
 				window.history[
 					options.replace ? 'replaceState' : 'pushState'
 				]( { wpInteractivityId: sessionId }, '', href );
+
+				endNavigation( href, referrer, document.title );
 
 				if ( screenReaderAnnouncement ) {
 					a11ySpeak( 'loaded' );
