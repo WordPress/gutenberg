@@ -143,7 +143,7 @@ describe( 'resizeImage', () => {
 				width: 100,
 				height: 100,
 			},
-			true
+			{ smartCrop: true }
 		);
 
 		expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
@@ -169,7 +169,7 @@ describe( 'resizeImage', () => {
 				height: 100,
 				crop: true,
 			},
-			true
+			{ smartCrop: true }
 		);
 
 		expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
@@ -358,9 +358,7 @@ describe( 'resizeImage', () => {
 					width: 100,
 					height: 100,
 				},
-				false,
-				0.82,
-				false // stripMeta
+				{ stripMeta: false }
 			);
 
 			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
@@ -386,10 +384,7 @@ describe( 'resizeImage', () => {
 					width: 50,
 					height: 50,
 				},
-				false,
-				0.82,
-				true,
-				10 // maxBitdepth
+				{ maxBitdepth: 10 }
 			);
 
 			// Still high-bit-depth, so the precision-preserving path is used.
@@ -416,10 +411,7 @@ describe( 'resizeImage', () => {
 					width: 50,
 					height: 50,
 				},
-				false,
-				0.82,
-				true,
-				11 // maxBitdepth: AVIF only supports 8, 10, and 12.
+				{ maxBitdepth: 11 } // AVIF only supports 8, 10, and 12.
 			);
 
 			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
@@ -443,10 +435,7 @@ describe( 'resizeImage', () => {
 					width: 50,
 					height: 50,
 				},
-				false,
-				0.82,
-				true,
-				8 // maxBitdepth
+				{ maxBitdepth: 8 }
 			);
 
 			// An 8-bit result does not need the precision-preserving path,
@@ -474,10 +463,7 @@ describe( 'resizeImage', () => {
 					width: 50,
 					height: 50,
 				},
-				false,
-				0.82,
-				true,
-				12 // maxBitdepth
+				{ maxBitdepth: 12 }
 			);
 
 			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
