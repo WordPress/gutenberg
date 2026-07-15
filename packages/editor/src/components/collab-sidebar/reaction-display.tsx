@@ -360,7 +360,9 @@ export default function ReactionDisplay( {
 	}
 
 	return (
-		<Stack direction="row" gap="xs" justify="flex-start" wrap="wrap">
+		// `sm` gap: the pressed pills draw a full accent border, and at
+		// the `xs` gap adjacent borders read as touching.
+		<Stack direction="row" gap="sm" justify="flex-start" wrap="wrap">
 			{ reactedSlugs.map( ( slug ) => {
 				const count = getReactionCount( reactions, slug );
 				const isActive = hasUserReacted( reactions, slug );

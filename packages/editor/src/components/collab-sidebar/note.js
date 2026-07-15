@@ -220,7 +220,7 @@ export function Note( {
 		>
 			{ body }
 			{ isSelected && (
-				<Stack direction="row" gap="xs" justify="flex-start">
+				<Stack direction="row" gap="sm" justify="flex-start">
 					<AddReactionButton
 						noteId={ note.id }
 						disabled={ note.status === 'approved' }
