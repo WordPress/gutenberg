@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -13,13 +13,18 @@ import { useDispatch } from '@wordpress/data';
  */
 import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
+import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 jest.mock( '@wordpress/block-editor', () => ( {
-	BlockControls: ( { children } ) => <div>{ children }</div>,
+	BlockControls: ( { children, group = 'default' } ) => (
+		<div data-testid={ `block-controls-${ group }` }>{ children }</div>
+	),
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
 	MediaPlaceholder: () => <div />,
-	MediaReplaceFlow: () => <div />,
+	MediaReplaceFlow: ( { name, onSelect } ) => (
+		<button onClick={ () => onSelect( {} ) }>{ name }</button>
+	),
 	MediaUpload: ( { render: renderMediaUpload } ) =>
 		renderMediaUpload( { open: jest.fn() } ),
 	MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
@@ -71,12 +76,14 @@ const defaultAttributes = {
 function renderEdit( props = {} ) {
 	const setAttributes = jest.fn();
 	const setCurrentTrackClientId = props.setCurrentTrackClientId || jest.fn();
+	const addTracks = props.addTracks;
 
 	render(
 		<PlaylistContext.Provider
 			value={ {
 				currentTrackClientId: props.currentTrackClientId ?? null,
 				setCurrentTrackClientId,
+				addTracks,
 			} }
 		>
 			<PlaylistTrackEdit
@@ -104,6 +111,7 @@ describe( 'PlaylistTrackEdit', () => {
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
 		} );
+		useUploadMediaFromBlobURL.mockClear();
 	} );
 
 	it( 'allows the track image alternative text to be edited', () => {
@@ -165,5 +173,46 @@ describe( 'PlaylistTrackEdit', () => {
 		} );
 
 		expect( setCurrentTrackClientId ).not.toHaveBeenCalled();
+	} );
+
+	it( 'uploads temporary blob tracks', () => {
+		renderEdit( {
+			attributes: {
+				blob: 'blob:https://example.com/temporary-track',
+				src: undefined,
+			},
+		} );
+
+		expect( useUploadMediaFromBlobURL ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: 'blob:https://example.com/temporary-track',
+			} )
+		);
+	} );
+
+	it( 'allows tracks to be added from the track toolbar', () => {
+		const addTracks = jest.fn();
+		renderEdit( { addTracks } );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Add' } ) );
+
+		expect( addTracks ).toHaveBeenCalledWith( {} );
+	} );
+
+	it( 'renders the add track control in a different toolbar group from replace', () => {
+		renderEdit( { addTracks: jest.fn() } );
+
+		expect(
+			within( screen.getByTestId( 'block-controls-other' ) ).getByRole(
+				'button',
+				{ name: 'Replace' }
+			)
+		).toBeInTheDocument();
+		expect(
+			within( screen.getByTestId( 'block-controls-block' ) ).getByRole(
+				'button',
+				{ name: 'Add' }
+			)
+		).toBeInTheDocument();
 	} );
 } );
