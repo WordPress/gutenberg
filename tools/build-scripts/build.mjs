@@ -5,6 +5,7 @@
  */
 import spawn from 'cross-spawn';
 import { fileURLToPath } from 'url';
+import { parseArgs } from 'util';
 import path from 'path';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
@@ -78,7 +79,13 @@ function exec( command, args = [], options = {} ) {
  * Main build orchestration function.
  */
 async function build() {
-	const skipTypes = process.argv.includes( '--skip-types' );
+	const { values } = parseArgs( {
+		options: {
+			'skip-types': { type: 'boolean', default: false },
+		},
+		strict: false,
+	} );
+	const skipTypes = values[ 'skip-types' ];
 
 	console.log( '🔨 Starting build process...\n' );
 
@@ -105,12 +112,18 @@ async function build() {
 				'@wordpress/validation-tools',
 				'--silent',
 			] ).catch( () => {
-				throw new Error( 'Run `npm install` to update.' );
+				throw new Error(
+					'Run `npm install` to update, or set GUTENBERG_CHECK_INSTALLED_DEPS=NEVER to skip this check.'
+				);
 			} );
 		}
 
 		console.log( '\n🧹 Cleaning packages...' );
-		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
+		await exec(
+			'node',
+			[ path.join( __dirname, 'clean.mjs' ), '--packages' ],
+			{ silent: true }
+		);
 
 		console.log( '\n📦 Building workspaces...' );
 		await exec(
@@ -128,7 +141,7 @@ async function build() {
 		if ( ! skipTypes ) {
 			console.log( '\n📘 Building TypeScript types...\n' );
 			const tsStartTime = Date.now();
-			await exec( 'tsgo', [ '--build' ] ).catch( () => {
+			await exec( 'tsc', [ '--build' ] ).catch( () => {
 				console.error(
 					'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
 				);

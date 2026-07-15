@@ -1,6 +1,15 @@
 <?php
+/**
+ * Icon Collections: WP_Icon_Collections_Registry class
+ *
+ * @package gutenberg
+ */
 
 if ( ! class_exists( 'WP_Icon_Collections_Registry' ) ) {
+
+	/**
+	 * Core class used for managing registered icon collections.
+	 */
 	class WP_Icon_Collections_Registry {
 		/**
 		 * Registered icon collections array.
@@ -38,10 +47,10 @@ if ( ! class_exists( 'WP_Icon_Collections_Registry' ) ) {
 				return false;
 			}
 
-			if ( ! preg_match( '/^[a-z0-9-]+$/', $collection_slug ) ) {
+			if ( ! preg_match( '/^[a-z0-9]([a-z0-9_-]*[a-z0-9])?$/', $collection_slug ) ) {
 				_doing_it_wrong(
 					__METHOD__,
-					__( 'Icon collection slug must only contain lowercase alphanumeric characters and hyphens.', 'gutenberg' ),
+					__( 'Icon collection slug must start and end with a lowercase letter or digit and contain only lowercase letters, digits, hyphens, and underscores.', 'gutenberg' ),
 					'7.1.0'
 				);
 				return false;
@@ -85,6 +94,15 @@ if ( ! class_exists( 'WP_Icon_Collections_Registry' ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					__( 'Icon collection label must be a string.', 'gutenberg' ),
+					'7.1.0'
+				);
+				return false;
+			}
+
+			if ( isset( $collection_properties['description'] ) && ! is_string( $collection_properties['description'] ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'Icon collection description must be a string.', 'gutenberg' ),
 					'7.1.0'
 				);
 				return false;

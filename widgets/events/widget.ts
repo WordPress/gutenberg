@@ -8,24 +8,18 @@ import type { WidgetAttributeField } from '@wordpress/widget-primitives';
 /**
  * Internal dependencies
  */
-import {
-	LocationSettingControl,
-	type EventsWidgetAttributes,
-} from './components/location-setting-control';
+import type { EventsWidgetAttributes } from './types';
 
 export default {
 	name: 'core/events',
-	title: __( 'WordPress events' ),
 	icon: calendar,
 	attributes: [
 		{
 			id: 'location',
-			type: 'text',
+			type: 'location',
 			label: __( 'Event location' ),
-			description: __(
-				'City or region for nearby events. Edits apply when you save this panel.'
-			),
-			Edit: LocationSettingControl,
+			description: __( 'City or region for nearby events.' ),
+			relevance: 'high',
 		},
 	] satisfies WidgetAttributeField< EventsWidgetAttributes >[],
 };

@@ -17,6 +17,8 @@ import {
 	BlockControls,
 	InspectorControls,
 	InnerBlocks,
+	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -27,8 +29,8 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { __ } from '@wordpress/i18n';
-import { audio as icon } from '@wordpress/icons';
+import { __, _x } from '@wordpress/i18n';
+import { playlist as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -41,6 +43,15 @@ import { PlaylistContext } from './context';
 import { getTrackAttributes } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+const DEFAULT_WAVEFORM_STYLE = 'bars';
+const WAVEFORM_STYLE_OPTIONS = [
+	{ label: _x( 'Bars', 'waveform style option' ), value: 'bars' },
+	{ label: _x( 'Mirror', 'waveform style option' ), value: 'mirror' },
+	{ label: _x( 'Line', 'waveform style option' ), value: 'line' },
+	{ label: _x( 'Blocks', 'waveform style option' ), value: 'blocks' },
+	{ label: _x( 'Dots', 'waveform style option' ), value: 'dots' },
+	{ label: _x( 'Seekbar', 'waveform style option' ), value: 'seekbar' },
+];
 
 const PlaylistEdit = ( {
 	attributes,
@@ -54,17 +65,44 @@ const PlaylistEdit = ( {
 		showTracklist,
 		showNumbers,
 		showImages,
+		showPlayButtonArtwork,
 		showArtists,
 		showTrackLength,
+		waveformStyle = DEFAULT_WAVEFORM_STYLE,
+		waveformColor,
+		waveformGradient,
+		waveformBackgroundColor,
+		waveformBackgroundGradient,
 	} = attributes;
 
-	// Extract the waveform style from the block style variation class.
-	const waveformStyle =
-		attributes.className?.match( /is-style-([\w-]+)/ )?.[ 1 ] || 'bars';
 	const blockProps = useBlockProps();
+	const waveformPanelId = `${ clientId }-waveform`;
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+	const colors = useMemo(
+		() =>
+			colorGradientSettings.colors.flatMap(
+				( origin ) => origin?.colors ?? []
+			),
+		[ colorGradientSettings.colors ]
+	);
+	const gradients = useMemo(
+		() =>
+			colorGradientSettings.gradients.flatMap(
+				( origin ) => origin?.gradients ?? []
+			),
+		[ colorGradientSettings.gradients ]
+	);
+	const hasColors =
+		colors.length > 0 || ! colorGradientSettings.disableCustomColors;
+	const hasGradients =
+		gradients.length > 0 || ! colorGradientSettings.disableCustomGradients;
+	const waveformGradientValue = waveformGradient;
+	const waveformBackgroundGradientValue = waveformBackgroundGradient;
+	let waveformColorGradientChange;
+	let waveformBackgroundColorGradientChange;
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
@@ -189,6 +227,84 @@ const PlaylistEdit = ( {
 		};
 	}
 
+	const onChangeWaveformStyle = useCallback(
+		( newWaveformStyle ) => {
+			setAttributes( {
+				waveformStyle:
+					newWaveformStyle === DEFAULT_WAVEFORM_STYLE
+						? undefined
+						: newWaveformStyle,
+			} );
+		},
+		[ setAttributes ]
+	);
+
+	function updateWaveformColor( colorValue ) {
+		const isSettingColor = colorValue !== undefined;
+		if ( ! isSettingColor && waveformColorGradientChange === 'gradient' ) {
+			waveformColorGradientChange = undefined;
+			return;
+		}
+
+		waveformColorGradientChange = 'color';
+
+		setAttributes( {
+			waveformColor: colorValue,
+			waveformGradient: undefined,
+		} );
+	}
+
+	function updateWaveformGradient( gradientValue ) {
+		const isSettingGradient = gradientValue !== undefined;
+		if ( ! isSettingGradient && waveformColorGradientChange === 'color' ) {
+			waveformColorGradientChange = undefined;
+			return;
+		}
+
+		waveformColorGradientChange = 'gradient';
+
+		setAttributes( {
+			waveformGradient: gradientValue,
+			waveformColor: undefined,
+		} );
+	}
+
+	function updateWaveformBackgroundColor( colorValue ) {
+		const isSettingColor = colorValue !== undefined;
+		if (
+			! isSettingColor &&
+			waveformBackgroundColorGradientChange === 'gradient'
+		) {
+			waveformBackgroundColorGradientChange = undefined;
+			return;
+		}
+
+		waveformBackgroundColorGradientChange = 'color';
+
+		setAttributes( {
+			waveformBackgroundColor: colorValue,
+			waveformBackgroundGradient: undefined,
+		} );
+	}
+
+	function updateWaveformBackgroundGradient( gradientValue ) {
+		const isSettingGradient = gradientValue !== undefined;
+		if (
+			! isSettingGradient &&
+			waveformBackgroundColorGradientChange === 'color'
+		) {
+			waveformBackgroundColorGradientChange = undefined;
+			return;
+		}
+
+		waveformBackgroundColorGradientChange = 'gradient';
+
+		setAttributes( {
+			waveformBackgroundGradient: gradientValue,
+			waveformBackgroundColor: undefined,
+		} );
+	}
+
 	const hasSelectedChild = useSelect(
 		( select ) =>
 			select( blockEditorStore ).hasSelectedInnerBlock( clientId ),
@@ -196,6 +312,48 @@ const PlaylistEdit = ( {
 	);
 
 	const hasAnySelected = isSelected || hasSelectedChild;
+
+	const colorSettings = [];
+	if ( hasColors || hasGradients ) {
+		colorSettings.push(
+			{
+				colorValue: hasColors ? waveformColor : undefined,
+				gradientValue: hasGradients ? waveformGradientValue : undefined,
+				label: __( 'Waveform & Play button' ),
+				onColorChange: hasColors ? updateWaveformColor : undefined,
+				onGradientChange: hasGradients
+					? updateWaveformGradient
+					: undefined,
+				isShownByDefault: true,
+				clearable: true,
+				enableAlpha: true,
+				resetAllFilter: () => ( {
+					waveformColor: undefined,
+					waveformGradient: undefined,
+				} ),
+			},
+			{
+				colorValue: hasColors ? waveformBackgroundColor : undefined,
+				gradientValue: hasGradients
+					? waveformBackgroundGradientValue
+					: undefined,
+				label: __( 'Waveform background' ),
+				onColorChange: hasColors
+					? updateWaveformBackgroundColor
+					: undefined,
+				onGradientChange: hasGradients
+					? updateWaveformBackgroundGradient
+					: undefined,
+				isShownByDefault: true,
+				clearable: true,
+				enableAlpha: true,
+				resetAllFilter: () => ( {
+					waveformBackgroundColor: undefined,
+					waveformBackgroundGradient: undefined,
+				} ),
+			}
+		);
+	}
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		__experimentalAppenderTagName: 'li',
@@ -251,13 +409,14 @@ const PlaylistEdit = ( {
 							showNumbers: true,
 							showTrackLength: true,
 							showImages: true,
+							showPlayButtonArtwork: false,
 							order: 'asc',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
-						label={ __( 'Show Tracklist' ) }
+						label={ __( 'Show tracklist' ) }
 						isShownByDefault
 						hasValue={ () => showTracklist !== true }
 						onDeselect={ () =>
@@ -265,7 +424,7 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							label={ __( 'Show Tracklist' ) }
+							label={ __( 'Show tracklist' ) }
 							onChange={ toggleAttribute( 'showTracklist' ) }
 							checked={ showTracklist }
 						/>
@@ -273,7 +432,7 @@ const PlaylistEdit = ( {
 					{ showTracklist && (
 						<>
 							<ToolsPanelItem
-								label={ __( 'Show artist name in Tracklist' ) }
+								label={ __( 'Show artist name in tracklist' ) }
 								isShownByDefault
 								hasValue={ () => showArtists !== true }
 								onDeselect={ () =>
@@ -282,7 +441,7 @@ const PlaylistEdit = ( {
 							>
 								<ToggleControl
 									label={ __(
-										'Show artist name in Tracklist'
+										'Show artist name in tracklist'
 									) }
 									onChange={ toggleAttribute(
 										'showArtists'
@@ -291,7 +450,9 @@ const PlaylistEdit = ( {
 								/>
 							</ToolsPanelItem>
 							<ToolsPanelItem
-								label={ __( 'Show number in Tracklist' ) }
+								label={ __(
+									'Show track numbers in tracklist'
+								) }
 								isShownByDefault
 								hasValue={ () => showNumbers !== true }
 								onDeselect={ () =>
@@ -299,7 +460,9 @@ const PlaylistEdit = ( {
 								}
 							>
 								<ToggleControl
-									label={ __( 'Show number in Tracklist' ) }
+									label={ __(
+										'Show track numbers in tracklist'
+									) }
 									onChange={ toggleAttribute(
 										'showNumbers'
 									) }
@@ -307,7 +470,9 @@ const PlaylistEdit = ( {
 								/>
 							</ToolsPanelItem>
 							<ToolsPanelItem
-								label={ __( 'Show track length in Tracklist' ) }
+								label={ __(
+									'Show track duration in tracklist'
+								) }
 								isShownByDefault
 								hasValue={ () => showTrackLength !== true }
 								onDeselect={ () =>
@@ -316,7 +481,7 @@ const PlaylistEdit = ( {
 							>
 								<ToggleControl
 									label={ __(
-										'Show track length in Tracklist'
+										'Show track duration in tracklist'
 									) }
 									onChange={ toggleAttribute(
 										'showTrackLength'
@@ -327,7 +492,7 @@ const PlaylistEdit = ( {
 						</>
 					) }
 					<ToolsPanelItem
-						label={ __( 'Show images' ) }
+						label={ __( 'Show tracklist images' ) }
 						isShownByDefault
 						hasValue={ () => showImages !== true }
 						onDeselect={ () =>
@@ -335,9 +500,25 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							label={ __( 'Show images' ) }
+							label={ __( 'Show tracklist images' ) }
 							onChange={ toggleAttribute( 'showImages' ) }
 							checked={ showImages }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Show track image on play button' ) }
+						isShownByDefault
+						hasValue={ () => showPlayButtonArtwork === true }
+						onDeselect={ () =>
+							setAttributes( { showPlayButtonArtwork: false } )
+						}
+					>
+						<ToggleControl
+							label={ __( 'Show track image on play button' ) }
+							onChange={ toggleAttribute(
+								'showPlayButtonArtwork'
+							) }
+							checked={ showPlayButtonArtwork === true }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
@@ -347,7 +528,6 @@ const PlaylistEdit = ( {
 						onDeselect={ () => setAttributes( { order: 'asc' } ) }
 					>
 						<SelectControl
-							__next40pxDefaultSize
 							label={ __( 'Order' ) }
 							value={ order }
 							options={ [
@@ -359,6 +539,51 @@ const PlaylistEdit = ( {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
+			<InspectorControls group="styles">
+				<ToolsPanel
+					label={ __( 'Waveform' ) }
+					resetAll={ () => {
+						setAttributes( {
+							waveformStyle: undefined,
+							waveformColor: undefined,
+							waveformGradient: undefined,
+							waveformBackgroundColor: undefined,
+							waveformBackgroundGradient: undefined,
+						} );
+					} }
+					panelId={ waveformPanelId }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					{ colorSettings.length > 0 && (
+						<div className="wp-block-playlist__waveform-color-controls">
+							<ColorGradientSettingsDropdown
+								__experimentalIsRenderedInSidebar
+								settings={ colorSettings }
+								panelId={ waveformPanelId }
+								{ ...colorGradientSettings }
+							/>
+						</div>
+					) }
+					<ToolsPanelItem
+						label={ __( 'Shape' ) }
+						isShownByDefault
+						hasValue={ () =>
+							waveformStyle !== DEFAULT_WAVEFORM_STYLE
+						}
+						onDeselect={ () =>
+							onChangeWaveformStyle( DEFAULT_WAVEFORM_STYLE )
+						}
+						panelId={ waveformPanelId }
+					>
+						<SelectControl
+							label={ __( 'Shape' ) }
+							value={ waveformStyle }
+							options={ WAVEFORM_STYLE_OPTIONS }
+							onChange={ onChangeWaveformStyle }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</InspectorControls>
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
 					<WaveformPlayer
@@ -366,8 +591,14 @@ const PlaylistEdit = ( {
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
 						image={ currentTrackData?.image }
+						imageAlt={ currentTrackData?.imageAlt }
 						waveformStyle={ waveformStyle }
+						color={ waveformColor }
+						gradient={ waveformGradientValue }
+						backgroundColor={ waveformBackgroundColor }
+						backgroundGradient={ waveformBackgroundGradientValue }
 						onEnded={ onTrackEnded }
+						showPlayButtonArtwork={ showPlayButtonArtwork === true }
 					/>
 				</Disabled>
 				{ showTracklist && (

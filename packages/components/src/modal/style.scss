@@ -208,7 +208,7 @@
 
 	.components-modal__header-heading {
 		font-size: $font-size-x-large;
-		font-weight: 600;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 	}
 
 	h1 {

@@ -13,7 +13,11 @@
  * External dependencies
  */
 import type { ComponentProps, ComponentType, ReactElement } from 'react';
-import type { Field } from '@wordpress/dataviews';
+
+/**
+ * Internal dependencies
+ */
+import type { ResolvableField } from './field-types';
 
 /**
  * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
@@ -28,14 +32,60 @@ export type WidgetName = `${ string }/${ string }`;
 export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
 
 /**
- * Authoring helper for a widget's `attributes` schema: a DataViews `Field`
- * whose `id` is narrowed to the keys of the widget's attribute object (`Item`).
+ * A link in a widget's help note.
  */
-export type WidgetAttributeField< Item > = Field< Item > & {
-	/*
-	 * `& string` drops the number/symbol keys `keyof` can yield; `Field.id`
-	 * is a string.
+export interface WidgetHelpLink {
+	/**
+	 * Link label. Translatable.
 	 */
+	label: string;
+
+	/**
+	 * Link destination.
+	 */
+	href: string;
+}
+
+/**
+ * Declarative contextual help for a widget type, meant for compact
+ * surfaces such as tooltips.
+ */
+export interface WidgetHelp {
+	/**
+	 * The note. Translatable. May carry `<em>`/`<strong>`; links belong
+	 * in `links`.
+	 */
+	content: string;
+
+	/**
+	 * Links contextual to the note.
+	 */
+	links?: WidgetHelpLink[];
+}
+
+/**
+ * How relevant an attribute is. Hosts may promote `'high'` to a prominent
+ * surface; `'low'` (the default) is not. The widget declares importance,
+ * not a surface.
+ */
+type WidgetAttributeRelevance = 'high' | 'low';
+
+/**
+ * A DataViews `Field` plus the widget-layer `relevance` hint; what hosts
+ * read. Its `type` may also reference a registered field type by name
+ * (see `registerFieldType`); `useWidgetTypes` resolves such references
+ * into plain `Field` props.
+ */
+type WidgetAttribute< Item = unknown > = ResolvableField< Item > & {
+	relevance?: WidgetAttributeRelevance;
+};
+
+/**
+ * Authoring helper: a `WidgetAttribute` with `id` narrowed to the widget's
+ * attribute keys (`Item`).
+ */
+export type WidgetAttributeField< Item > = WidgetAttribute< Item > & {
+	// `& string` drops number/symbol keys; `Field.id` is a string.
 	id: keyof Item & string;
 };
 
@@ -58,14 +108,20 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	name: WidgetName;
 
 	/**
-	 * Display title; hosts surface it in pickers and chrome.
+	 * Human-readable title that names the widget type. Translatable.
 	 */
 	title: string;
 
 	/**
-	 * Short description; hosts surface it in pickers and help panels.
+	 * Human-readable description of what the widget type does.
+	 * Translatable.
 	 */
 	description?: string;
+
+	/**
+	 * Contextual help note for compact surfaces.
+	 */
+	help?: WidgetHelp;
 
 	/**
 	 * Visual identifier for the widget type; hosts decide where, and
@@ -83,8 +139,8 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	 * Authoring intent about how the widget renders. Not a user-editable
 	 * attribute.
 	 *
-	 * - `'framed'` (default when absent): the widget renders its
-	 *   content only.
+	 * - `'framed'` (default when absent): the host paints a header from
+	 *   identity and pads the content area.
 	 * - `'content-bleed'`: the host's chrome stays visible while the
 	 *   content fills the content area edge-to-edge, with no padding.
 	 * - `'full-bleed'`: the widget renders edge-to-edge with no
@@ -93,7 +149,8 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	presentation?: 'framed' | 'content-bleed' | 'full-bleed';
 
 	/**
-	 * Search aliases hosts use to match the widget in their pickers.
+	 * Alternative terms used to match the widget type when searching,
+	 * e.g. `calendar` for an events widget. Translatable.
 	 */
 	keywords?: string[];
 
@@ -115,9 +172,10 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	/**
 	 * Declarative attribute schema, bound to the widget's attribute
 	 * object via `Item`. Hosts render forms straight from this list
-	 * via `DataForm`, with no per-widget form wiring.
+	 * via `DataForm`, with no per-widget form wiring. Entries may carry
+	 * a `relevance` hint.
 	 */
-	attributes?: Field< Item >[];
+	attributes?: WidgetAttribute< Item >[];
 
 	/**
 	 * Structured example data hosts use for previews, and the default
@@ -181,11 +239,29 @@ export type ResolveWidgetModule = (
 ) => Promise< WidgetModule >;
 
 /**
+ * The `WidgetTypeMetadata` subset a record may carry, resolved server-side
+ * (already translated) and overriding the metadata module's values. Every
+ * field is optional and nullable; `null`/absent means the module's value
+ * stands.
+ */
+type WidgetModuleRecordOverrides = {
+	[ K in keyof Pick<
+		WidgetTypeMetadata,
+		| 'title'
+		| 'description'
+		| 'help'
+		| 'category'
+		| 'presentation'
+		| 'keywords'
+	> ]?: WidgetTypeMetadata[ K ] | null;
+};
+
+/**
  * Per-widget record a host feeds to `useWidgetTypes`, in snake_case wire
  * format. The host fetches these however it likes; only the field shape is
  * part of the contract.
  */
-export interface WidgetModuleRecord {
+export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	/**
 	 * Stable widget type identifier.
 	 */
@@ -200,14 +276,4 @@ export interface WidgetModuleRecord {
 	 * Script-module id dynamically imported for the widget's live metadata.
 	 */
 	widget_module?: string | null;
-
-	/**
-	 * Authoring presentation hint; overrides the metadata module's value.
-	 */
-	presentation?: WidgetTypeMetadata[ 'presentation' ] | null;
-
-	/**
-	 * Grouping category; overrides the metadata module's value.
-	 */
-	category?: WidgetTypeMetadata[ 'category' ] | null;
 }

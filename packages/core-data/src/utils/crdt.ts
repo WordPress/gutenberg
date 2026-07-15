@@ -345,8 +345,24 @@ function parseCursorSelection( selection?: WPSelection ): MergeCursorPosition {
 		: null;
 }
 
-function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
-	return getRootMap( crdtDoc, CRDT_RECORD_MAP_KEY ).toJSON();
+function defaultGetChangesFromCRDTDoc(
+	crdtDoc: CRDTDoc,
+	editedRecord: ObjectData
+): ObjectData {
+	const docRecord = getRootMap( crdtDoc, CRDT_RECORD_MAP_KEY ).toJSON();
+
+	/*
+	 * Only report properties that differ from the edited record. Reporting
+	 * unchanged properties as edits marks the record dirty: `Y.Map.toJSON()`
+	 * returns fresh object instances, so without this comparison every synced
+	 * update (e.g. from another tab) re-dispatches the entire record as edits.
+	 * See https://github.com/WordPress/gutenberg/issues/79907.
+	 */
+	return Object.fromEntries(
+		Object.entries( docRecord ).filter( ( [ key, newValue ] ) =>
+			haveValuesChanged( editedRecord?.[ key ], newValue )
+		)
+	);
 }
 
 /**

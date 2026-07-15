@@ -72,6 +72,8 @@ const VALID_SETTINGS = [
 	'typography.textIndent',
 	'typography.textTransform',
 	'typography.writingMode',
+	'viewport.mobile',
+	'viewport.tablet',
 ];
 
 export function getSetting< T = any >(
