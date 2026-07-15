@@ -1504,13 +1504,13 @@ test.describe( 'Block Notes', () => {
 		// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
 		// palette is changed without updating the e2e expectation.
 		const AVATAR_BORDER_COLORS = [
-			'#C36EFF',
+			'#6F42C1',
 			'#D94145',
-			'#E4780A',
+			'#FBBF24',
 			'#FF35EE',
 			'#879F11',
-			'#46A494',
-			'#00A2C3',
+			'#0F766E',
+			'#00CFFF',
 		];
 
 		function hexToRgb( hex ) {
