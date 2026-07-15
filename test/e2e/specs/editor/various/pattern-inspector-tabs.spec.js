@@ -72,11 +72,6 @@ test.describe( 'Pattern inspector tabs', () => {
 			} )
 		).toBeVisible();
 
-		const editorCanvasBody = editor.canvas.locator( 'body' );
-		// Focuses the editor canvas body. In the editor the click doesn’t have
-		// to be on the element itself – just somewhere that won’t focus a block.
-		await editorCanvasBody.click();
-
 		// Clicking the Heading on the canvas should reset back to Content.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Heading' } )
@@ -85,6 +80,86 @@ test.describe( 'Pattern inspector tabs', () => {
 		await expect(
 			blockSettings.getByRole( 'tab', {
 				name: 'Content',
+				selected: true,
+			} )
+		).toBeVisible();
+	} );
+
+	test( 'resets inspector tab to Content after opening List View for the already-selected block', async ( {
+		editor,
+		page,
+	} ) => {
+		const blockSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		// Select the Buttons block first, so that clicking its Content tab
+		// item below does not change the selection.
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Buttons' } )
+		);
+
+		await blockSettings
+			.getByRole( 'tabpanel', { name: 'Content' } )
+			.getByRole( 'button', { name: 'Buttons' } )
+			.click();
+
+		await expect(
+			blockSettings.getByRole( 'tab', {
+				name: 'List View',
+				selected: true,
+			} )
+		).toBeVisible();
+
+		// Clicking the Heading on the canvas must still reset back to Content
+		// even though the List View switch above was not accompanied by a
+		// selection change.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.click();
+
+		await expect(
+			blockSettings.getByRole( 'tab', {
+				name: 'Content',
+				selected: true,
+			} )
+		).toBeVisible();
+	} );
+
+	test( 'auto-switches to List View again when selecting a sibling list child', async ( {
+		editor,
+		page,
+	} ) => {
+		const blockSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		// Selecting Button One auto-switches to List View.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Button', exact: true } )
+			.filter( { hasText: 'Button One' } )
+			.click();
+
+		await expect(
+			blockSettings.getByRole( 'tab', {
+				name: 'List View',
+				selected: true,
+			} )
+		).toBeVisible();
+
+		// Leave List View manually.
+		await blockSettings.getByRole( 'tab', { name: 'Content' } ).click();
+
+		// Selecting Button Two — a sibling under the same Buttons parent —
+		// must switch back to List View just like the first selection did.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Button', exact: true } )
+			.filter( { hasText: 'Button Two' } )
+			.click();
+
+		await expect(
+			blockSettings.getByRole( 'tab', {
+				name: 'List View',
 				selected: true,
 			} )
 		).toBeVisible();
