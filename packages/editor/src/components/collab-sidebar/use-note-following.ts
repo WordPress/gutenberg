@@ -63,19 +63,26 @@ export function useNoteFollowing( rootNote?: NoteRecord ) {
 			} );
 
 			/*
-			 * Merge the fresh follower list into the cached note record so
-			 * every consumer of the thread query re-renders with the new
-			 * subscription state.
+			 * Merge the fresh follower list into the cached note record and
+			 * invalidate the query cache: the sidebar's thread query runs in
+			 * the edit context, and invalidation (the same mechanism note
+			 * edits use) is what refreshes it.
 			 */
-			receiveEntityRecords( 'root', 'comment', [
-				{
-					id: response.root,
-					meta: {
-						...rootNote.meta,
-						_wp_note_followers: response.followers,
+			receiveEntityRecords(
+				'root',
+				'comment',
+				[
+					{
+						id: response.root,
+						meta: {
+							...rootNote.meta,
+							_wp_note_followers: response.followers,
+						},
 					},
-				},
-			] );
+				],
+				undefined,
+				true
+			);
 		} catch ( error ) {
 			const { message, code } = ( error ?? {} ) as {
 				message?: string;
