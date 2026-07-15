@@ -30,7 +30,8 @@ import { StyleBookPreview } from './components/style-book';
 import { useGlobalStyles, useStyle } from './components/global-styles/hooks';
 import { GlobalStylesActionMenu } from './components/global-styles/menu';
 import UploadProgressSnackbar from './components/upload-progress-snackbar';
-import GifConversionPrompt from './components/gif-conversion-prompt';
+import UploadPromptHost from './components/upload-prompt';
+import { GifConversionBlockSwapper } from './components/gif-conversion-prompt';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -51,7 +52,8 @@ lock( privateApis, {
 	ViewMoreMenuGroup,
 	ResizableEditor,
 	UploadProgressSnackbar,
-	GifConversionPrompt,
+	UploadPromptHost,
+	GifConversionBlockSwapper,
 	registerCoreBlockBindingsSources,
 	getTemplateInfo,
 	// Global Styles

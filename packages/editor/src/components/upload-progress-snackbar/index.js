@@ -14,7 +14,7 @@ import { check } from '@wordpress/icons';
  * Internal dependencies
  */
 import { useTracker } from './tracker';
-import { useIsGifConversionPromptVisible } from '../gif-conversion-prompt';
+import { useHasActiveUploadPrompt } from '../upload-prompt';
 
 const NOTICE_ID = 'upload-progress';
 
@@ -111,12 +111,11 @@ export default function UploadProgressSnackbar() {
 
 	const { createNotice, removeNotice } = useDispatch( noticesStore );
 
-	// While the GIF conversion prompt is open the snackbar stays hidden:
-	// the prompt should be the single point of attention during the drop
-	// action, and it already implies the upload is underway. Audible
-	// announcements are kept so screen reader users still hear about the
-	// upload itself.
-	const isPromptVisible = useIsGifConversionPromptVisible();
+	// While an upload prompt is open the snackbar stays hidden: the prompt
+	// should be the single point of attention during the drop action, and it
+	// already implies the upload is underway. Audible announcements are kept
+	// so screen reader users still hear about the upload itself.
+	const isPromptVisible = useHasActiveUploadPrompt();
 
 	// Track whether the user has dismissed the notice. If so, don't re-create
 	// it until the current batch finishes and a new one starts.
