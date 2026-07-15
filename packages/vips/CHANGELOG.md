@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Add optional `stripMeta` and `maxBitdepth` parameters to `resizeImage`, `compressImage`, and `convertImageFormat`, so callers can keep all image metadata and cap the output bit depth, mirroring WordPress core's `image_strip_meta` and `image_max_bit_depth` filters ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
+
 ## 2.4.0 (2026-07-14)
 
 ## 2.3.0 (2026-07-01)

@@ -44,11 +44,13 @@ function loadVipsModule(): Promise< typeof import('@wordpress/vips/worker') > {
 /**
  * Converts an image to a different format using vips in a web worker.
  *
- * @param id         Queue item ID.
- * @param file       File object.
- * @param type       Output mime type.
- * @param quality    Desired quality (0-1).
- * @param interlaced Whether to use interlaced/progressive mode.
+ * @param id          Queue item ID.
+ * @param file        File object.
+ * @param type        Output mime type.
+ * @param quality     Desired quality (0-1).
+ * @param interlaced  Whether to use interlaced/progressive mode.
+ * @param stripMeta   Whether to strip metadata (except color profiles).
+ * @param maxBitDepth Maximum output bit depth.
  * @return Converted file.
  */
 export async function vipsConvertImageFormat(
@@ -61,7 +63,9 @@ export async function vipsConvertImageFormat(
 		| 'image/avif'
 		| 'image/gif',
 	quality: number,
-	interlaced?: boolean
+	interlaced?: boolean,
+	stripMeta?: boolean,
+	maxBitDepth?: number
 ) {
 	const { vipsConvertImageFormat: convertImageFormat } =
 		await loadVipsModule();
@@ -71,7 +75,9 @@ export async function vipsConvertImageFormat(
 		file.type,
 		type,
 		quality,
-		interlaced
+		interlaced,
+		stripMeta,
+		maxBitDepth
 	);
 	const ext = type.split( '/' )[ 1 ];
 	const fileName = `${ getFileBasename( file.name ) }.${ ext }`;
@@ -83,17 +89,21 @@ export async function vipsConvertImageFormat(
 /**
  * Compresses an image using vips in a web worker.
  *
- * @param id         Queue item ID.
- * @param file       File object.
- * @param quality    Desired quality (0-1).
- * @param interlaced Whether to use interlaced/progressive mode.
+ * @param id          Queue item ID.
+ * @param file        File object.
+ * @param quality     Desired quality (0-1).
+ * @param interlaced  Whether to use interlaced/progressive mode.
+ * @param stripMeta   Whether to strip metadata (except color profiles).
+ * @param maxBitDepth Maximum output bit depth.
  * @return Compressed file.
  */
 export async function vipsCompressImage(
 	id: QueueItemId,
 	file: File,
 	quality: number,
-	interlaced?: boolean
+	interlaced?: boolean,
+	stripMeta?: boolean,
+	maxBitDepth?: number
 ) {
 	const { vipsCompressImage: compressImage } = await loadVipsModule();
 	const buffer = await compressImage(
@@ -101,7 +111,9 @@ export async function vipsCompressImage(
 		await file.arrayBuffer(),
 		file.type,
 		quality,
-		interlaced
+		interlaced,
+		stripMeta,
+		maxBitDepth
 	);
 	return new File(
 		[ new Blob( [ buffer as ArrayBuffer ], { type: file.type } ) ],
@@ -151,6 +163,8 @@ export async function vipsGetUltraHdrInfo( buffer: ArrayBuffer ) {
  * @param signal       Optional abort signal to cancel the operation.
  * @param scaledSuffix Whether to add '-scaled' suffix instead of dimensions (for big image threshold).
  * @param quality      Desired quality (0-1). Defaults to 0.82.
+ * @param stripMeta    Whether to strip metadata (except color profiles).
+ * @param maxBitDepth  Maximum output bit depth.
  * @return Resized ImageFile with dimension metadata.
  */
 export async function vipsResizeImage(
@@ -161,7 +175,9 @@ export async function vipsResizeImage(
 	addSuffix: boolean,
 	signal?: AbortSignal,
 	scaledSuffix?: boolean,
-	quality?: number
+	quality?: number,
+	stripMeta?: boolean,
+	maxBitDepth?: number
 ) {
 	if ( signal?.aborted ) {
 		throw new Error( 'Operation aborted' );
@@ -175,7 +191,9 @@ export async function vipsResizeImage(
 			file.type,
 			resize,
 			smartCrop,
-			quality
+			quality,
+			stripMeta,
+			maxBitDepth
 		);
 
 	let fileName = file.name;
