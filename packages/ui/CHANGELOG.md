@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Popover`: Default the popup's portal container to the `@wordpress/ui` compat overlay slot when present, so popovers stack reliably above other overlays in mixed-library compositions. A caller-supplied `Popover.Portal` `container` prop continues to take precedence ([#80278](https://github.com/WordPress/gutenberg/pull/80278)).
+
+### Bug Fixes
+
+-   Keep overlays in the compat overlay slot available to assistive technologies when used alongside `@wordpress/components` Modal ([#80310](https://github.com/WordPress/gutenberg/pull/80310)).
+
 ### Code Quality
 
 -   Remove unused CSS property from `Tabs` stylesheet ([#80269](https://github.com/WordPress/gutenberg/pull/80269)).

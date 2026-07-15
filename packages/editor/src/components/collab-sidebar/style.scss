@@ -22,7 +22,8 @@
 	overflow: hidden;
 }
 
-.editor-collab-sidebar-panel__thread {
+.editor-collab-sidebar-panel__thread,
+.editor-collab-sidebar-panel__add-note {
 	position: relative;
 	padding: $grid-unit-20;
 	border-radius: $radius-large;
