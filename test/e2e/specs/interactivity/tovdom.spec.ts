@@ -16,26 +16,28 @@ test.describe( 'toVdom', () => {
 		await utils.deleteAllPosts();
 	} );
 
-	test( 'it should delete comments', async ( { page } ) => {
-		const el = page.getByTestId( 'it should delete comments' );
+	test( 'it should keep comments in the live DOM after hydration', async ( {
+		page,
+	} ) => {
+		const el = page.getByTestId( 'it should keep comments' );
 		const c = await el.innerHTML();
-		expect( c ).not.toContain( '##last-child##' );
-		expect( c ).not.toContain( '##1##' );
-		expect( c ).not.toContain( '##2##' );
+		expect( c ).toContain( '##last-child##' );
+		expect( c ).toContain( '##1##' );
+		expect( c ).toContain( '##2##' );
 		const el2 = page.getByTestId(
 			'it should keep this node between comments'
 		);
 		await expect( el2 ).toBeVisible();
 	} );
 
-	test( 'it should delete processing instructions', async ( { page } ) => {
-		const el = page.getByTestId(
-			'it should delete processing instructions'
-		);
+	test( 'it should keep processing instructions in the live DOM after hydration', async ( {
+		page,
+	} ) => {
+		const el = page.getByTestId( 'it should keep processing instructions' );
 		const c = await el.innerHTML();
-		expect( c ).not.toContain( '##last-child##' );
-		expect( c ).not.toContain( '##1##' );
-		expect( c ).not.toContain( '##2##' );
+		expect( c ).toContain( '##last-child##' );
+		expect( c ).toContain( '##1##' );
+		expect( c ).toContain( '##2##' );
 		const el2 = page.getByTestId(
 			'it should keep this node between processing instructions'
 		);

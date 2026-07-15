@@ -79,12 +79,40 @@ const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 export const hydratedIslands = new WeakSet();
 
 /**
+ * Information required to reinsert a comment or processing instruction node
+ * that was removed from the live DOM by `toVdom()`, back into its original
+ * position.
+ */
+export interface RemovedNode {
+	node: Comment | ProcessingInstruction;
+	parent: Node;
+	nextSibling: Node | null;
+}
+
+/**
  * Recursive function that transforms a DOM tree into vDOM.
  *
- * @param root The root element or node to start traversing on.
+ * Preact's vDOM has no representation for comments or processing
+ * instructions, so those nodes are removed from the DOM region being
+ * hydrated/rendered. This is required so that Preact doesn't try to reconcile
+ * them, and so its own hydration logic doesn't remove them anyway. Passing a
+ * `removedNodes` array allows a caller to restore these nodes back into the
+ * live DOM after hydration/rendering has completed. See `restoreRemovedNodes`.
+ *
+ * @param root         The root element or node to start traversing on.
+ * @param removedNodes Optional array that will be populated with the removed
+ *                     comment and processing instruction nodes, along with
+ *                     enough information to restore them later. When
+ *                     omitted, removed nodes are discarded, which is safe
+ *                     for detached/offscreen documents (e.g., pages fetched
+ *                     for client-side navigation) that are never attached to
+ *                     the live page.
  * @return The resulting vDOM tree.
  */
-export function toVdom( root: Node ): ComponentChild {
+export function toVdom(
+	root: Node,
+	removedNodes?: RemovedNode[]
+): ComponentChild {
 	const nodesToRemove = new Set< Node >();
 	const nodesToReplace = new Set< Node >();
 
@@ -236,7 +264,7 @@ export function toVdom( root: Node ): ComponentChild {
 		} else if ( localName === 'template' ) {
 			props.content = [
 				...( elementNode as HTMLTemplateElement ).content.childNodes,
-			].map( ( childNode ) => toVdom( childNode ) );
+			].map( ( childNode ) => toVdom( childNode, removedNodes ) );
 		} else {
 			let child = treeWalker.firstChild();
 			if ( child ) {
@@ -261,9 +289,18 @@ export function toVdom( root: Node ): ComponentChild {
 
 	const vdom = walk( treeWalker.currentNode );
 
-	nodesToRemove.forEach( ( node: Node ) =>
-		( node as Comment | ProcessingInstruction ).remove()
-	);
+	nodesToRemove.forEach( ( node: Node ) => {
+		// Record enough information to restore the node to its original
+		// position later on, if the caller wants to do so.
+		if ( removedNodes && node.parentNode ) {
+			removedNodes.push( {
+				node: node as Comment | ProcessingInstruction,
+				parent: node.parentNode,
+				nextSibling: node.nextSibling,
+			} );
+		}
+		( node as Comment | ProcessingInstruction ).remove();
+	} );
 	nodesToReplace.forEach( ( node: Node ) =>
 		( node as CDATASection ).replaceWith(
 			new window.Text( ( node as CDATASection ).nodeValue ?? '' )
@@ -271,4 +308,36 @@ export function toVdom( root: Node ): ComponentChild {
 	);
 
 	return vdom;
+}
+
+/**
+ * Restores comment and processing instruction nodes that were removed from
+ * the live DOM by `toVdom()` back to their original position.
+ *
+ * Preact has no vDOM representation for these node types, so they have to be
+ * removed from the DOM before hydrating/rendering with Preact: otherwise,
+ * Preact's own hydration logic would remove them anyway (as nodes it doesn't
+ * recognize), without giving us the chance to restore them afterwards.
+ *
+ * This function must be called only after the corresponding `hydrate()` (or
+ * `render()`) call has finished, so that the surrounding elements the removed
+ * nodes are anchored to already exist in their final position.
+ *
+ * @param removedNodes The array populated by a previous `toVdom()` call.
+ */
+export function restoreRemovedNodes( removedNodes: RemovedNode[] ): void {
+	// Iterate in reverse order. Each node was recorded together with the
+	// sibling that immediately followed it at the time it was removed, which
+	// may be another node that also needs to be restored. Restoring from the
+	// last removed node to the first guarantees that, by the time a node is
+	// reinserted, its recorded `nextSibling` anchor is already back in the
+	// DOM (or was never removed in the first place).
+	for ( let i = removedNodes.length - 1; i >= 0; i-- ) {
+		const { node, parent, nextSibling } = removedNodes[ i ];
+		if ( nextSibling && nextSibling.parentNode === parent ) {
+			parent.insertBefore( node, nextSibling );
+		} else {
+			parent.appendChild( node );
+		}
+	}
 }

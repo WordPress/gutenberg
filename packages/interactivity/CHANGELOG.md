@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Fix `toVdom()` permanently removing HTML comments and processing instructions from the live DOM during hydration, which stripped third-party markers (e.g. GTM snippets, A/B testing boundaries) from interactive regions. Comments and processing instructions are now restored to the DOM after hydration completes. ([#80297](https://github.com/WordPress/gutenberg/issues/80297))
+
 ## 6.51.0 (2026-07-14)
 
 ## 6.50.0 (2026-07-01)
