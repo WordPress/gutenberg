@@ -72,7 +72,9 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 		</>
 	);
 
-	return renderSlotWithChildren( portal, <Portal />, portalChildren );
+	return renderSlotWithChildren( portal, <Portal />, {
+		children: portalChildren,
+	} );
 } );
 
 export { Popup };

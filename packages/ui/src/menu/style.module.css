@@ -4,6 +4,10 @@
 	@layer components {
 		.positioner {
 			z-index: var(--wp-ui-menu-z-index, initial);
+
+			/* Prevent flash of unstyled background when overscrolling the popup */
+			background-color: var(--wpds-color-background-surface-neutral-strong);
+			border-radius: var(--wpds-border-radius-md);
 		}
 
 		.popup {
