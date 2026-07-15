@@ -100,22 +100,31 @@
 				grid-template-columns: subgrid;
 			}
 
-			&[data-highlighted]:not([aria-disabled="true"]) {
-				background-color: var(--wpds-color-background-interactive-brand-weak-active);
-				color: var(--wpds-color-foreground-interactive-neutral);
-				outline: none; /* Disable user agent focus ring */
+			&[data-highlighted] {
+				outline: var(--wpds-border-width-focus) solid transparent;
 
 				@media ( forced-colors: active ) {
-					outline: 1px solid Highlight;
+					outline-color: Highlight;
 				}
 			}
 
-			&[aria-disabled="true"] {
+			&[data-highlighted]:not([aria-disabled]) {
+				background-color: var(--wpds-color-background-interactive-brand-weak-active);
+				color: var(--wpds-color-foreground-interactive-neutral);
+			}
+
+			&[aria-disabled] {
 				background-color: var(--wpds-color-background-interactive-brand-weak-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media ( forced-colors: active ) {
 					color: GrayText;
+				}
+			}
+
+			&[aria-disabled]:focus-visible {
+				@media not ( forced-colors: active ) {
+					outline-color: var(--wpds-color-stroke-focus);
 				}
 			}
 		}
@@ -222,14 +231,14 @@
 			content: "\2196";
 		}
 
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-prefix,
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-suffix,
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-selection-indicator,
-		.item[aria-disabled="true"] .item-prefix,
-		.item[aria-disabled="true"] .item-description,
-		.item[aria-disabled="true"] .item-suffix,
-		.item[aria-disabled="true"] .item-selection-indicator {
+		.item[data-highlighted]:not([aria-disabled]) .item-prefix,
+		.item[data-highlighted]:not([aria-disabled]) .item-description,
+		.item[data-highlighted]:not([aria-disabled]) .item-suffix,
+		.item[data-highlighted]:not([aria-disabled]) .item-selection-indicator,
+		.item[aria-disabled] .item-prefix,
+		.item[aria-disabled] .item-description,
+		.item[aria-disabled] .item-suffix,
+		.item[aria-disabled] .item-selection-indicator {
 			color: inherit;
 		}
 	}
