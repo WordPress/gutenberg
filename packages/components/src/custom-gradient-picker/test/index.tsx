@@ -28,6 +28,8 @@ describe( 'CustomGradientPicker', () => {
 		it( 'preserves visual saturation when setting a new stop color through black', async () => {
 			const { container } = render( <ControlledCustomGradientPicker /> );
 
+			// Presentational gradient bar markup; no accessible roles.
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
 			const markers = container.querySelector(
 				'.components-custom-gradient-picker__markers-container'
 			) as HTMLElement;
@@ -44,12 +46,14 @@ describe( 'CustomGradientPicker', () => {
 					toJSON: () => ( {} ),
 				} ) as DOMRect;
 
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
 			const bar = container.querySelector(
 				'.components-custom-gradient-picker__gradient-bar'
 			) as HTMLElement;
 			// Hover mid-bar so the insert-point control appears (away from 0%/100%).
 			fireEvent.mouseMove( bar, { clientX: 100 } );
 
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
 			const insertButton = container.querySelector(
 				'.components-custom-gradient-picker__insert-point-dropdown'
 			) as HTMLElement;
@@ -70,6 +74,8 @@ describe( 'CustomGradientPicker', () => {
 					toJSON: () => ( {} ),
 				} ) as DOMRect;
 
+			// Choose a saturated mid-brightness color — creates the new stop and
+			// exercises parent gradient updates while picking.
 			fireEvent.mouseDown( colorSlider, {
 				buttons: 1,
 				pageX: 80,
@@ -78,6 +84,8 @@ describe( 'CustomGradientPicker', () => {
 				clientY: 20,
 			} );
 
+			// ColorPicker content is portaled; pointer has no accessible role.
+			// eslint-disable-next-line testing-library/no-node-access
 			const pointer = document.querySelector(
 				'.react-colorful__saturation-pointer'
 			) as HTMLElement;
@@ -86,6 +94,7 @@ describe( 'CustomGradientPicker', () => {
 			expect( parseFloat( leftBefore ) ).toBeGreaterThan( 50 );
 
 			// Keyboard to black — must not reset saturation via HSVA↔HSLA echo
+			// while the gradient parent keeps updating (#80110 / #80205).
 			colorSlider.focus();
 			for ( let i = 0; i < 20; i++ ) {
 				fireEvent.keyDown( colorSlider, {
