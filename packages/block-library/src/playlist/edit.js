@@ -278,9 +278,8 @@ const PlaylistEdit = ( {
 		() => ( {
 			currentTrackClientId,
 			setCurrentTrackClientId,
-			addTracks: onAddTracks,
 		} ),
-		[ currentTrackClientId, onAddTracks, setCurrentTrackClientId ]
+		[ currentTrackClientId, setCurrentTrackClientId ]
 	);
 
 	// Get current track data by finding the track with matching client ID.
@@ -483,7 +482,10 @@ const PlaylistEdit = ( {
 
 	return (
 		<>
-			<BlockControls group="other">
+			<BlockControls
+				group="other"
+				__experimentalShareWithChildBlocks="media"
+			>
 				<MediaReplaceFlow
 					name={ __( 'Add track' ) }
 					onSelect={ onAddTracks }

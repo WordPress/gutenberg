@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -15,11 +15,24 @@ import PlaylistEdit from '../edit';
 
 jest.mock( '@wordpress/block-editor', () => ( {
 	store: {},
-	BlockControls: ( { children } ) => <div>{ children }</div>,
+	BlockControls: ( {
+		children,
+		group = 'default',
+		__experimentalShareWithChildBlocks,
+	} ) => (
+		<div
+			data-share-with-child-blocks={
+				__experimentalShareWithChildBlocks || undefined
+			}
+			data-testid={ `block-controls-${ group }` }
+		>
+			{ children }
+		</div>
+	),
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
 	MediaPlaceholder: () => <div />,
-	MediaReplaceFlow: () => <div />,
+	MediaReplaceFlow: ( { name } ) => <button>{ name }</button>,
 	useBlockProps: () => ( { className: 'wp-block-playlist' } ),
 	useInnerBlocksProps: ( blockProps ) => ( {
 		...blockProps,
@@ -135,5 +148,27 @@ describe( 'PlaylistEdit', () => {
 			'wp-block-playlist__tracklist-is-hidden'
 		);
 		expect( screen.getByTestId( 'playlist-track' ) ).toBeInTheDocument();
+	} );
+
+	it( 'shares the add media control with child blocks', () => {
+		render(
+			<PlaylistEdit
+				attributes={ defaultAttributes }
+				clientId="playlist-1"
+				insertBlocksAfter={ jest.fn() }
+				isSelected
+				setAttributes={ jest.fn() }
+			/>
+		);
+
+		const otherControls = screen.getByTestId( 'block-controls-other' );
+
+		expect( otherControls ).toHaveAttribute(
+			'data-share-with-child-blocks',
+			'media'
+		);
+		expect(
+			within( otherControls ).getByRole( 'button', { name: 'Add' } )
+		).toBeInTheDocument();
 	} );
 } );
