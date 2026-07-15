@@ -30,6 +30,7 @@ interface BlockGuidelineModalProps {
 	contentBlocks: ContentBlock[];
 	bySlug: Record< string, GuidelineRow >;
 	query: GuidelineQuery;
+	onRemoved?: () => void;
 }
 
 export default function BlockGuidelineModal( {
@@ -38,6 +39,7 @@ export default function BlockGuidelineModal( {
 	contentBlocks,
 	bySlug,
 	query,
+	onRemoved,
 }: BlockGuidelineModalProps ) {
 	const [ selectedBlock, setSelectedBlock ] = useState< string | undefined >(
 		initialBlock
@@ -112,6 +114,9 @@ export default function BlockGuidelineModal( {
 						: __( 'Guideline removed.' ),
 					{ type: 'snackbar' }
 				);
+				if ( ! value && existingId ) {
+					onRemoved?.();
+				}
 				closeModal();
 			} )
 			.catch( ( e: Error ) => setError( e.message ) )

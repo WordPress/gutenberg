@@ -15,7 +15,7 @@ import {
 	type View,
 } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { blockDefault } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -95,6 +95,9 @@ export default function BlockGuidelines( {
 	);
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
+	const addButtonRef = useRef< HTMLButtonElement >( null );
+	const [ shouldFocusAddButton, setShouldFocusAddButton ] = useState( false );
+
 	const rows = useMemo(
 		() =>
 			contentBlocks
@@ -141,6 +144,7 @@ export default function BlockGuidelines( {
 		const row = bySlug[ blockSlug( itemToDelete.id ) ];
 		if ( ! row ) {
 			setItemToDelete( null );
+			setShouldFocusAddButton( true );
 			return;
 		}
 		setBusy( true );
@@ -155,6 +159,7 @@ export default function BlockGuidelines( {
 			.finally( () => {
 				setBusy( false );
 				setItemToDelete( null );
+				setShouldFocusAddButton( true );
 			} );
 	};
 
@@ -177,6 +182,13 @@ export default function BlockGuidelines( {
 			);
 		}
 	}, [ paginationInfo.totalPages, view.page ] );
+
+	useEffect( () => {
+		if ( shouldFocusAddButton ) {
+			addButtonRef.current?.focus();
+			setShouldFocusAddButton( false );
+		}
+	}, [ shouldFocusAddButton ] );
 
 	const closeModal = () => {
 		setIsOpen( false );
@@ -228,6 +240,7 @@ export default function BlockGuidelines( {
 			) }
 			<HStack>
 				<Button
+					ref={ addButtonRef }
 					variant="primary"
 					onClick={ openModal }
 					__next40pxDefaultSize
@@ -243,6 +256,7 @@ export default function BlockGuidelines( {
 					contentBlocks={ contentBlocks }
 					bySlug={ bySlug }
 					query={ query }
+					onRemoved={ () => setShouldFocusAddButton( true ) }
 				/>
 			) }
 			<ConfirmDialog
