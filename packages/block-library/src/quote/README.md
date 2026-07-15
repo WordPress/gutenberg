@@ -29,6 +29,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#background):
   - `backgroundImage`: `true`
   - `backgroundSize`: `true`
+  - `gradient`: `true`
 - [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
   - `minHeight`: `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):

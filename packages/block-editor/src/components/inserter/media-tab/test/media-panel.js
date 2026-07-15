@@ -92,3 +92,36 @@ describe( 'MediaCategoryPanel attach/detach gating', () => {
 		);
 	} );
 } );
+
+describe( 'MediaCategoryPanel subscription gating', () => {
+	it( 'subscribes a local source to media changes and unsubscribes on unmount', () => {
+		const unsubscribe = jest.fn();
+		const subscribe = jest.fn( () => unsubscribe );
+
+		const { unmount } = renderPanel( { ...baseCategory, subscribe } );
+
+		// The panel hands its own query over, so the source can watch the exact
+		// results the grid is showing.
+		expect( subscribe ).toHaveBeenCalledTimes( 1 );
+		expect( subscribe ).toHaveBeenCalledWith(
+			expect.any( Function ),
+			expect.objectContaining( { per_page: expect.any( Number ) } )
+		);
+		expect( unsubscribe ).not.toHaveBeenCalled();
+
+		unmount();
+
+		expect( unsubscribe ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'ignores subscribe when the source is an external resource', () => {
+		// `subscribe` is core-only, gated like `attach`/`detach`: an
+		// extender-registered source is always external, so it cannot hook into
+		// the panel's refresh cycle just by setting the prop.
+		const subscribe = jest.fn();
+
+		renderPanel( { ...baseCategory, subscribe, isExternalResource: true } );
+
+		expect( subscribe ).not.toHaveBeenCalled();
+	} );
+} );

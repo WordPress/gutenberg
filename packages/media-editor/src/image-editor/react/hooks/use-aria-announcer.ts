@@ -1,12 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	useEffect,
-	useLayoutEffect,
-	useRef,
-} from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
+import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -158,16 +154,16 @@ function buildAnnouncement(
 
 /**
  * Debounce and dedupe ARIA-live announcements for screen readers as the
- * cropper state changes. Returns the current announcement message to render
- * inside an `aria-live="polite"` region.
+ * cropper state changes. Calls `speak()` from `@wordpress/a11y` to use the
+ * centralized, persistent live region instead of a local one that may be
+ * dynamically mounted.
  *
- * Debouncing avoids flooding the live region during drag/pointermove bursts;
+ * Debouncing avoids flooding announcements during drag/pointermove bursts;
  * deduping avoids re-announcing the same state.
  *
  * @param state The current cropper state to announce.
  */
-export function useAriaAnnouncer( state: CropperState ): string {
-	const [ ariaMessage, setAriaMessage ] = useState( '' );
+export function useAriaAnnouncer( state: CropperState ): void {
 	const timerRef = useRef< ReturnType< typeof setTimeout > >();
 	const prevMessageRef = useRef( '' );
 	const prevStateRef = useRef< CropperState | null >( null );
@@ -184,7 +180,7 @@ export function useAriaAnnouncer( state: CropperState ): string {
 			prevStateRef.current = current;
 			if ( msg !== prevMessageRef.current ) {
 				prevMessageRef.current = msg;
-				setAriaMessage( msg );
+				speak( msg );
 			}
 		}, ARIA_DEBOUNCE_MS );
 
@@ -199,6 +195,4 @@ export function useAriaAnnouncer( state: CropperState ): string {
 		state.flip.horizontal,
 		state.flip.vertical,
 	] );
-
-	return ariaMessage;
 }
