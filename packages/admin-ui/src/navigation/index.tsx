@@ -17,12 +17,12 @@ import styles from './style.module.css';
  * `aria-current="page"`.
  *
  * Internal to the package: configured through the `Page` `navigation` prop.
- *
- * @param {NavigationProps} props
  */
-export const Navigation = ( props: NavigationProps ) => {
-	const { items, currentHref, ariaLabel } = props;
-
+export const Navigation = ( {
+	items,
+	currentHref,
+	ariaLabel,
+}: NavigationProps ) => {
 	if ( ! items.length ) {
 		return null;
 	}
