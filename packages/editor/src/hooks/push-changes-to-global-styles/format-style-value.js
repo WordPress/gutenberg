@@ -145,7 +145,19 @@ export function formatSpacingShorthand(
 		return [ top, right, bottom, left ].map( format ).join( ' ' );
 	}
 
-	const parts = [ top, right, bottom, left ].filter( isSet ).map( format );
+	if (
+		! isSet( top ) &&
+		! isSet( right ) &&
+		! isSet( bottom ) &&
+		! isSet( left )
+	) {
+		return EMPTY_VALUE_LABEL;
+	}
 
-	return parts.length ? parts.join( ' ' ) : EMPTY_VALUE_LABEL;
+	// Keep all four slots so an unset side still shows its position.
+	return [ top, right, bottom, left ]
+		.map( ( value ) =>
+			isSet( value ) ? format( value ) : EMPTY_VALUE_LABEL
+		)
+		.join( ' ' );
 }

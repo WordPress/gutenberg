@@ -137,10 +137,10 @@ describe( 'formatSpacingShorthand', () => {
 		).toBe( '1px 2px 3px 4px' );
 	} );
 
-	it( 'shows only the defined sides for a partial object', () => {
+	it( 'keeps all four slots for a partial object so positions stay clear', () => {
 		expect(
 			formatSpacingShorthand( { top: '10px', bottom: '10px' } )
-		).toBe( '10px 10px' );
+		).toBe( `10px ${ EMPTY_VALUE_LABEL } 10px ${ EMPTY_VALUE_LABEL }` );
 	} );
 
 	it( 'humanizes preset spacing tokens without a resolver', () => {
