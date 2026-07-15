@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Used here because it supports rendering as a `span` via the `render` prop to avoid invalid HTML.
-import { LinkButton, Stack, Text } from '@wordpress/ui';
+import { Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -62,8 +61,9 @@ export const Navigation = ( {
 					<li key={ item.href }>
 						<Text
 							variant="body-md"
+							className={ styles.item }
 							render={
-								<LinkButton
+								<Link
 									variant="unstyled"
 									href={ item.href }
 									aria-current={
@@ -71,7 +71,6 @@ export const Navigation = ( {
 											? 'page'
 											: undefined
 									}
-									className={ styles.item }
 								/>
 							}
 						>
