@@ -97,11 +97,15 @@ test.describe( 'Block Toolbar', () => {
 			).toBeFocused();
 
 			await BlockToolbarUtils.focusBlock();
-			await expect(
-				editor.canvas.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-			).toBeFocused();
+			await expect
+				.poll( () =>
+					editor.ownsSelection(
+						editor.canvas.getByRole( 'document', {
+							name: 'Block: Paragraph',
+						} )
+					)
+				)
+				.toBe( true );
 
 			await BlockToolbarUtils.focusBlockToolbar();
 			await expect(
@@ -328,16 +332,11 @@ class BlockToolbarUtils {
 	}
 
 	async expectLabelToHaveFocus( label ) {
-		const ariaLabel = await this.page.evaluate( () => {
-			const { activeElement } =
-				document.activeElement.contentDocument ?? document;
-			return (
-				activeElement.getAttribute( 'aria-label' ) ||
-				activeElement.innerText
-			);
-		} );
-
-		expect( ariaLabel ).toBe( label );
+		// Poll: the focused element and its label may settle asynchronously
+		// (selection changes sync to the store on `selectionchange`). When a
+		// focused editing host owns the selection, the editable element
+		// containing the selection owns the focus.
+		await expect.poll( this.editor.getFocusOwnerLabel ).toBe( label );
 	}
 
 	async testScrollable( scrollableElement, elementToTest ) {

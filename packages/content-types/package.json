@@ -52,8 +52,8 @@
 		"@wordpress/views": "file:../views"
 	},
 	"peerDependencies": {
-		"@types/react": "^18.3.27",
-		"react": "^18.0.0"
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {
