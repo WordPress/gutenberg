@@ -12,7 +12,13 @@ import {
 } from '@wordpress/blocks';
 import { useDisabled } from '@wordpress/compose';
 import { select } from '@wordpress/data';
-import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import {
+	RecursionProvider,
+	useBlockProps,
+	useHasRecursion,
+	useInnerBlocksProps,
+	Warning,
+} from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
@@ -316,10 +322,11 @@ const NOOP = () => {};
 /**
  * Builds block components for pattern-backed PHP-only blocks.
  *
- * @param {string} markup Pattern markup.
+ * @param {string} blockName Registered block name.
+ * @param {string} markup    Pattern markup.
  * @return {{ edit: Function, save: Function }} Block components.
  */
-function createPatternBlockComponents( markup ) {
+function createPatternBlockComponents( blockName, markup ) {
 	function save() {
 		// The markup stays in the registration, so an instance only saves attributes.
 		return null;
@@ -327,7 +334,7 @@ function createPatternBlockComponents( markup ) {
 
 	// The binding source writes bound edits to `content`, so this controlled
 	// tree needs no sync handlers.
-	function Edit() {
+	function PatternBlockEdit() {
 		const blocks = useMemo( () => parse( markup ), [] );
 		const innerBlocksProps = useInnerBlocksProps( useBlockProps(), {
 			value: blocks,
@@ -336,6 +343,31 @@ function createPatternBlockComponents( markup ) {
 			renderAppender: false,
 		} );
 		return <div { ...innerBlocksProps } />;
+	}
+
+	function RecursionWarning() {
+		const blockProps = useBlockProps();
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Block cannot be rendered inside itself.' ) }
+				</Warning>
+			</div>
+		);
+	}
+
+	function Edit() {
+		const hasAlreadyRendered = useHasRecursion( blockName );
+
+		if ( hasAlreadyRendered ) {
+			return <RecursionWarning />;
+		}
+
+		return (
+			<RecursionProvider uniqueId={ blockName }>
+				<PatternBlockEdit />
+			</RecursionProvider>
+		);
 	}
 
 	return { edit: Edit, save };
@@ -452,7 +484,7 @@ export const registerCoreBlocks = (
 						...bootstrappedBlockType?.attributes,
 						content: { type: 'object', default: {} },
 					},
-					...createPatternBlockComponents( markup ),
+					...createPatternBlockComponents( blockName, markup ),
 				} );
 			}
 		);

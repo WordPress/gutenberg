@@ -407,6 +407,62 @@ test.describe( 'PHP-only pattern blocks', () => {
 		).toBeVisible();
 	} );
 
+	test( 'can reset an override in a PHP-only pattern block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'test/php-only-synced-block' } );
+
+		const heading = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading',
+		} );
+		await heading.fill( 'My own title' );
+		await editor.selectBlocks( heading );
+		await editor.showBlockToolbar();
+
+		const resetButton = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Reset' } );
+		await expect( resetButton ).toBeEnabled();
+		await resetButton.click();
+
+		await expect( heading ).toHaveText( 'Synced title' );
+		expect( await editor.getEditedPostContent() ).toBe(
+			'<!-- wp:test/php-only-synced-block /-->'
+		);
+	} );
+
+	test( 'self-referencing patterns stop at the recursive block', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.getByRole( 'button', { name: 'Block Inserter' } ).click();
+		await page
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'Self-referencing PHP-only block' );
+
+		const blockOption = page.getByRole( 'option', {
+			name: 'Self-referencing PHP-only block',
+			exact: true,
+		} );
+		await blockOption.hover();
+
+		const preview = page
+			.locator( '.block-editor-inserter__preview iframe' )
+			.contentFrame();
+		await expect(
+			preview.getByText( 'Block cannot be rendered inside itself.' )
+		).toBeVisible();
+
+		await blockOption.click();
+		await expect(
+			editor.canvas.getByText( 'Before the recursive block.' )
+		).toBeVisible();
+		await expect(
+			editor.canvas.getByText( 'Block cannot be rendered inside itself.' )
+		).toBeVisible();
+	} );
+
 	test( 'a pattern replaces server rendering: the render_callback is ignored', async ( {
 		editor,
 		page,

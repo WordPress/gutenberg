@@ -5,11 +5,31 @@ import {
 	store as blockEditorStore,
 	__unstableBlockToolbarLastItem as BlockToolbarLastItem,
 } from '@wordpress/block-editor';
+import { store as blocksStore } from '@wordpress/blocks';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-const CONTENT = 'content';
+export function getPatternOverridesProvider( select, clientId ) {
+	const { getBlockName, getBlockParents } = select( blockEditorStore );
+	const { getBlockType } = select( blocksStore );
+	const patternClientId = getBlockParents( clientId, true ).find(
+		( parentId ) =>
+			getBlockType( getBlockName( parentId ) )?.providesContext?.[
+				'pattern/overrides'
+			]
+	);
+
+	if ( ! patternClientId ) {
+		return;
+	}
+
+	return {
+		clientId: patternClientId,
+		attributeName: getBlockType( getBlockName( patternClientId ) )
+			.providesContext[ 'pattern/overrides' ],
+	};
+}
 
 export default function ResetOverridesControl( props ) {
 	const name = props.attributes.metadata?.name;
@@ -20,45 +40,48 @@ export default function ResetOverridesControl( props ) {
 				return;
 			}
 
-			const { getBlockAttributes, getBlockParentsByBlockName } =
-				select( blockEditorStore );
-			const [ patternClientId ] = getBlockParentsByBlockName(
-				props.clientId,
-				'core/block',
-				true
+			const provider = getPatternOverridesProvider(
+				select,
+				props.clientId
 			);
 
-			if ( ! patternClientId ) {
+			if ( ! provider ) {
 				return;
 			}
 
-			const overrides = getBlockAttributes( patternClientId )[ CONTENT ];
+			const { getBlockAttributes } = select( blockEditorStore );
+			const overrides = getBlockAttributes( provider.clientId )[
+				provider.attributeName
+			];
 
 			if ( ! overrides ) {
 				return;
 			}
 
-			return overrides.hasOwnProperty( name );
+			return Object.prototype.hasOwnProperty.call( overrides, name );
 		},
 		[ props.clientId, name ]
 	);
 
 	function onClick() {
-		const { getBlockAttributes, getBlockParentsByBlockName } =
-			registry.select( blockEditorStore );
-		const [ patternClientId ] = getBlockParentsByBlockName(
-			props.clientId,
-			'core/block',
-			true
+		const provider = getPatternOverridesProvider(
+			registry.select,
+			props.clientId
 		);
 
-		if ( ! patternClientId ) {
+		if ( ! provider ) {
 			return;
 		}
 
-		const overrides = getBlockAttributes( patternClientId )[ CONTENT ];
+		const { getBlockAttributes } = registry.select( blockEditorStore );
+		const overrides = getBlockAttributes( provider.clientId )[
+			provider.attributeName
+		];
 
-		if ( ! overrides.hasOwnProperty( name ) ) {
+		if (
+			! overrides ||
+			! Object.prototype.hasOwnProperty.call( overrides, name )
+		) {
 			return;
 		}
 
@@ -73,8 +96,8 @@ export default function ResetOverridesControl( props ) {
 			newOverrides = undefined;
 		}
 
-		updateBlockAttributes( patternClientId, {
-			[ CONTENT ]: newOverrides,
+		updateBlockAttributes( provider.clientId, {
+			[ provider.attributeName ]: newOverrides,
 		} );
 	}
 

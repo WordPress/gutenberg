@@ -193,6 +193,18 @@ add_action(
 			)
 		);
 
+		register_block_type(
+			'test/php-only-recursive-pattern',
+			array(
+				'title'    => 'Self-referencing PHP-only block',
+				'supports' => array(
+					'autoRegister' => true,
+				),
+				'pattern'  => '<!-- wp:paragraph --><p>Before the recursive block.</p><!-- /wp:paragraph -->'
+					. '<!-- wp:test/php-only-recursive-pattern /-->',
+			)
+		);
+
 		// Displaying the expected `_doing_it_wrong()` notice would corrupt REST
 		// responses. The PHPUnit test covers the notice.
 		add_filter( 'doing_it_wrong_trigger_error', '__return_false' );
