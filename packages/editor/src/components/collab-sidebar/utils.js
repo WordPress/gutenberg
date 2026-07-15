@@ -23,13 +23,13 @@ const OVERLAP_MARGIN = 20;
  * the editor's semantic UI colors (Delta E > 10 between all pairs).
  */
 const AVATAR_BORDER_COLORS = [
-	'#C36EFF', // Purple
+	'#6F42C1', // Purple
 	'#D94145', // Red
-	'#E4780A', // Orange
+	'#FBBF24', // Orange
 	'#FF35EE', // Magenta
 	'#879F11', // Olive
-	'#46A494', // Teal
-	'#00A2C3', // Cyan
+	'#0F766E', // Teal
+	'#00CFFF', // Cyan
 ];
 
 /**
