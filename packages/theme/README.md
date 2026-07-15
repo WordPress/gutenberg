@@ -242,7 +242,7 @@ Reports manual fallbacks that can drift from the generated values.
 
 ### `plugin-wpds/no-internal-component-classnames`
 
-Reports CSS selectors that target internal `component-*` class names from `@wordpress/components`. These selectors are not a stable API and component style overrides are not advised. Prefer a custom selector on the component instead.
+Reports CSS selectors that target internal `component-*` or `components-*` class names from `@wordpress/components`. These selectors are not a stable API and component style overrides are not advised. Prefer a custom selector on the component instead.
 
 ## Build Plugins
 

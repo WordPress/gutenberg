@@ -9,7 +9,7 @@ exports[`flags warnings with invalid css snapshot matches warnings 1`] = `
     "line": 2,
     "rule": "plugin-wpds/no-internal-component-classnames",
     "severity": "error",
-    "text": "Avoid overriding internal "component-color-indicator" class names from @wordpress/components. These selectors are not a stable API. Target the component with a custom CSS selector instead. (plugin-wpds/no-internal-component-classnames)",
+    "text": "Avoid overriding internal "component-color-indicator" class names from @wordpress/components. These selectors are not a stable API and component style overrides are not advised. Target the component with a custom CSS selector instead. (plugin-wpds/no-internal-component-classnames)",
   },
   {
     "column": 1,
@@ -18,7 +18,16 @@ exports[`flags warnings with invalid css snapshot matches warnings 1`] = `
     "line": 7,
     "rule": "plugin-wpds/no-internal-component-classnames",
     "severity": "error",
-    "text": "Avoid overriding internal "component-box-control__reset-button" class names from @wordpress/components. These selectors are not a stable API. Target the component with a custom CSS selector instead. (plugin-wpds/no-internal-component-classnames)",
+    "text": "Avoid overriding internal "component-box-control__reset-button" class names from @wordpress/components. These selectors are not a stable API and component style overrides are not advised. Target the component with a custom CSS selector instead. (plugin-wpds/no-internal-component-classnames)",
+  },
+  {
+    "column": 1,
+    "endColumn": 2,
+    "endLine": 14,
+    "line": 12,
+    "rule": "plugin-wpds/no-internal-component-classnames",
+    "severity": "error",
+    "text": "Avoid overriding internal "components-button" class names from @wordpress/components. These selectors are not a stable API and component style overrides are not advised. Target the component with a custom CSS selector instead. (plugin-wpds/no-internal-component-classnames)",
   },
 ]
 `;

@@ -1,7 +1,8 @@
 import stylelint from 'stylelint';
 import selectorParser from 'postcss-selector-parser';
 
-const INTERNAL_CLASS_PREFIX = 'component-';
+// Check `components-` before `component-` because `components-*` also starts with `component-`.
+const INTERNAL_CLASS_PREFIXES = [ 'components-', 'component-' ];
 
 const {
 	createPlugin,
@@ -25,7 +26,11 @@ function getInternalClassNames( selector ) {
 
 	const processSelector = selectorParser( ( selectors ) => {
 		selectors.walkClasses( ( classNode ) => {
-			if ( classNode.value.startsWith( INTERNAL_CLASS_PREFIX ) ) {
+			if (
+				INTERNAL_CLASS_PREFIXES.some( ( prefix ) =>
+					classNode.value.startsWith( prefix )
+				)
+			) {
 				classNames.add( classNode.value );
 			}
 		} );

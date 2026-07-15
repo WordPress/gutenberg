@@ -7,3 +7,8 @@
 .component-box-control__reset-button {
 	margin: 0;
 }
+
+/* Invalid: legacy components-* class override */
+.my-panel .components-button {
+	margin: 0;
+}

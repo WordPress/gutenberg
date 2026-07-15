@@ -3,11 +3,6 @@
 	flex-shrink: 0;
 }
 
-/* Valid: legacy public components-* class names are out of scope */
-.components-button {
-	margin: 0;
-}
-
 /* Valid: unrelated class names that happen to contain "component" */
 .my-component-wrapper {
 	padding: 8px;

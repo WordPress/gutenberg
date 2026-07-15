@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Added `no-internal-component-classnames` stylelint rule that disallows overriding internal `component-*` class names from `@wordpress/components`. Available as `@wordpress/theme/stylelint-plugins/no-internal-component-classnames`.
+-   Added `no-internal-component-classnames` stylelint rule that disallows overriding internal `component-*` and `components-*` class names from `@wordpress/components`. Available as `@wordpress/theme/stylelint-plugins/no-internal-component-classnames`.
 
 ### Code Quality
 

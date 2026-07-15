@@ -1,22 +1,28 @@
 {
 	"packages/block-editor/src/components/colors-gradients/style.scss": {
 		"plugin-wpds/no-internal-component-classnames": {
-			"count": 1
+			"count": 3
 		}
 	},
 	"packages/block-editor/src/components/link-control/style.scss": {
 		"selector-class-pattern": {
 			"count": 1
+		},
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 20
 		}
 	},
 	"packages/block-library/src/image/editor.scss": {
 		"selector-class-pattern": {
 			"count": 2
+		},
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
 		}
 	},
 	"packages/block-library/src/navigation/editor.scss": {
 		"plugin-wpds/no-internal-component-classnames": {
-			"count": 1
+			"count": 19
 		}
 	},
 	"packages/block-library/src/navigation/style.scss": {
@@ -32,21 +38,33 @@
 	"packages/dataviews/src/components/dataviews-filters/style.scss": {
 		"selector-class-pattern": {
 			"count": 1
+		},
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 4
 		}
 	},
 	"packages/edit-site/src/components/add-new-template/style.scss": {
 		"selector-class-pattern": {
 			"count": 1
+		},
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 5
 		}
 	},
 	"packages/edit-site/src/components/sidebar-navigation-screen/style.scss": {
 		"selector-class-pattern": {
 			"count": 5
+		},
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 7
 		}
 	},
 	"packages/global-styles-ui/src/font-library/style.scss": {
 		"selector-class-pattern": {
 			"count": 2
+		},
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 6
 		}
 	},
 	"packages/global-styles-ui/src/variations/style.scss": {
@@ -67,6 +85,9 @@
 	"routes/template-list/add-new-template/style.scss": {
 		"selector-class-pattern": {
 			"count": 1
+		},
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 5
 		}
 	},
 	"widgets/events/components/events-list/events-list.module.css": {
@@ -111,6 +132,711 @@
 	},
 	"widgets/welcome/components/feature-highlight/feature-highlight.module.css": {
 		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/base-styles/_mixins.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"routes/connectors-home/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 6
+		}
+	},
+	"routes/post-list/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 4
+		}
+	},
+	"routes/styles/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/boot/src/view-transitions.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/content-types/src/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 4
+		}
+	},
+	"packages/customize-widgets/src/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/global-styles-ui/src/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/block-hooks.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/block-editor/src/hooks/layout.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/audio/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/avatar/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comments/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/embed/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/cover/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 5
+		}
+	},
+	"packages/block-library/src/file/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/freeform/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/gallery/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 6
+		}
+	},
+	"packages/block-library/src/gallery/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/html/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/media-text/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/block-library/src/post-featured-image/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 10
+		}
+	},
+	"packages/block-library/src/search/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/site-logo/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 7
+		}
+	},
+	"packages/block-library/src/social-links/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/spacer/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/utils/media-control.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/block-library/src/utils/poster-image.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 5
+		}
+	},
+	"packages/block-library/src/video/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 3
+		}
+	},
+	"packages/commands/src/components/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/dataviews/src/dataviews/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/format-library/src/language/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/global-styles-ui/src/pagination/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/global-styles-ui/src/screen-revisions/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 3
+		}
+	},
+	"packages/patterns/src/components/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/workflow/src/components/workflow-menu.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"storybook/stories/playground/with-undo-redo/style.css": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"widgets/quick-draft/fields/quick-draft-content-field/quick-draft-content-field.module.css": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 3
+		}
+	},
+	"packages/block-directory/src/components/downloadable-blocks-panel/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/background-image-control/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 12
+		}
+	},
+	"packages/block-editor/src/components/block-alignment-control/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-draggable/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/block-editor/src/components/block-inspector/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 8
+		}
+	},
+	"packages/block-editor/src/components/block-lock/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/block-editor/src/components/block-list/content.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 3
+		}
+	},
+	"packages/block-editor/src/components/block-manager/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 3
+		}
+	},
+	"packages/block-editor/src/components/block-mover/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-popover/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 5
+		}
+	},
+	"packages/block-editor/src/components/block-preview/content.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/block-editor/src/components/block-styles/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-tools/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 8
+		}
+	},
+	"packages/block-editor/src/components/block-switcher/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 3
+		}
+	},
+	"packages/block-editor/src/components/block-toolbar/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 21
+		}
+	},
+	"packages/block-editor/src/components/block-variation-picker/content.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 3
+		}
+	},
+	"packages/block-editor/src/components/border-radius-control/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 3
+		}
+	},
+	"packages/block-editor/src/components/default-block-appender/content.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 4
+		}
+	},
+	"packages/block-editor/src/components/duotone-control/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 4
+		}
+	},
+	"packages/block-editor/src/components/font-appearance-control/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/grid/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 4
+		}
+	},
+	"packages/block-editor/src/components/image-editor/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 16
+		}
+	},
+	"packages/block-editor/src/components/inserter-list-item/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/block-editor/src/components/link-picker/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/list-view/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 5
+		}
+	},
+	"packages/block-editor/src/components/rich-text/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 8
+		}
+	},
+	"packages/block-editor/src/components/responsive-block-control/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/url-input/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 5
+		}
+	},
+	"packages/block-editor/src/components/url-popover/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/warning/content.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/header/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/customize-widgets/src/components/more-menu/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/sidebar-block-editor/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/components/dataviews-item-actions/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/components/dataviews-pagination/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/components/dataviews-selection-checkbox/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/components/dataviews-view-config/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/pagination/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/page-patterns/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 3
+		}
+	},
+	"packages/edit-site/src/components/post-list/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 4
+		}
+	},
+	"packages/edit-site/src/components/sidebar-global-styles/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-item/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-details-footer/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-navigation-menus/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/welcome-guide/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/welcome-guide/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/edit-widgets/src/blocks/widget-area/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 5
+		}
+	},
+	"packages/edit-widgets/src/components/header/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 6
+		}
+	},
+	"packages/edit-widgets/src/components/more-menu/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/welcome-guide/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/sidebar/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/widget-areas-block-editor-content/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/hooks/push-changes-to-global-styles/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/blog-title/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collapsible-block-toolbar/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 4
+		}
+	},
+	"packages/editor/src/components/document-bar/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/editor/src/components/document-tools/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/editor/src/components/global-styles-sidebar/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 3
+		}
+	},
+	"packages/editor/src/components/header/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 8
+		}
+	},
+	"packages/editor/src/components/page-attributes/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-content-information/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-excerpt/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-discussion/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/editor/src/components/post-featured-image/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 5
+		}
+	},
+	"packages/editor/src/components/post-last-revision/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 3
+		}
+	},
+	"packages/editor/src/components/post-panel-row/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/editor/src/components/post-last-edited-panel/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-revisions-preview/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-publish-panel/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 14
+		}
+	},
+	"packages/editor/src/components/post-status/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 3
+		}
+	},
+	"packages/editor/src/components/post-schedule/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-template/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/editor/src/components/post-trash/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-url/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/posts-per-page/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/sidebar/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 3
+		}
+	},
+	"packages/editor/src/components/site-discussion/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/table-of-contents/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 4
+		}
+	},
+	"packages/editor/src/components/upload-progress-snackbar/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/visual-editor/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/fields/src/components/media-edit/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 4
+		}
+	},
+	"packages/fields/src/fields/slug/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/interface/src/components/complementary-area/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 6
+		}
+	},
+	"packages/interface/src/components/pinned-items/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/list-reusable-blocks/src/components/import-dropdown/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/media-utils/src/components/media-upload-modal/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 7
+		}
+	},
+	"packages/media-editor/src/components/media-editor/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/media-editor/src/components/media-editor-modal/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 6
+		}
+	},
+	"packages/preferences/src/components/preferences-modal/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/widgets/src/blocks/legacy-widget/editor.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/boot/src/components/navigation/navigation-item/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/boot/src/components/navigation/navigation-screen/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/components/dataform-layouts/regular/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 4
+		}
+	},
+	"packages/dataviews/src/components/dataform-layouts/panel/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 5
+		}
+	},
+	"packages/dataviews/src/components/dataviews-layouts/activity/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/components/dataviews-layouts/picker-table/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/components/dataviews-layouts/table/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 4
+		}
+	},
+	"packages/dataviews/src/components/dataviews-layouts/list/style.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collaborators-presence/styles/collaborators-list.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
+			"count": 2
+		}
+	},
+	"packages/editor/src/components/collaborators-presence/styles/collaborators-presence.scss": {
+		"plugin-wpds/no-internal-component-classnames": {
 			"count": 1
 		}
 	}
