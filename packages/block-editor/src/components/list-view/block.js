@@ -132,6 +132,8 @@ function ListViewBlock( {
 		blockEditingMode,
 		allowRightClickOverrides,
 		editedSection,
+		viewportSettings,
+		blockVisibilitySetting,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -141,21 +143,24 @@ function ListViewBlock( {
 				getSettings,
 				getEditedContentOnlySection,
 			} = unlock( select( blockEditorStore ) );
+			const settings = getSettings();
 
 			return {
 				block: getBlock( clientId ),
 				blockName: getBlockName( clientId ),
 				blockEditingMode: getBlockEditingModeForClientId( clientId ),
-				allowRightClickOverrides:
-					getSettings().allowRightClickOverrides,
+				allowRightClickOverrides: settings.allowRightClickOverrides,
 				editedSection: getEditedContentOnlySection(),
+				viewportSettings: settings.__experimentalFeatures?.viewport,
+				blockVisibilitySetting:
+					settings.__experimentalFeatures?.blockVisibility
+						?.allowEditing,
 			};
 		},
 		[ clientId ]
 	);
 
 	const isDisabled = blockEditingMode === 'disabled';
-
 	const { canRename } = useBlockRename( blockName );
 
 	const showBlockActions =
@@ -393,6 +398,9 @@ function ListViewBlock( {
 		} else if (
 			isMatch( 'core/block-editor/toggle-block-visibility', event )
 		) {
+			if ( blockVisibilitySetting === false ) {
+				return;
+			}
 			event.preventDefault();
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const blocks = getBlocksByClientId( blocksToUpdate );
@@ -558,7 +566,8 @@ function ListViewBlock( {
 
 	// Determine label based on where block is hidden (not when/current viewport)
 	const blockVisibilityDescription = getBlockVisibilityLabel(
-		block?.attributes?.metadata?.blockVisibility
+		block?.attributes?.metadata?.blockVisibility,
+		viewportSettings
 	);
 
 	const hasSiblings = siblingBlockCount > 0;

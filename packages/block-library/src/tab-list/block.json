@@ -1,6 +1,5 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"__experimental": true,
 	"apiVersion": 3,
 	"name": "core/tab-list",
 	"title": "Tab List",
@@ -26,6 +25,7 @@
 	},
 	"supports": {
 		"html": false,
+		"ariaLabel": true,
 		"visibility": false,
 		"lock": false,
 		"color": {
@@ -51,7 +51,7 @@
 		"layout": {
 			"default": {
 				"type": "flex",
-				"flexWrap": "nowrap"
+				"flexWrap": "wrap"
 			},
 			"allowVerticalAlignment": false,
 			"allowOrientation": false,

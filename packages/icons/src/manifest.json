@@ -1136,6 +1136,11 @@
 		"filePath": "library/play.svg"
 	},
 	{
+		"slug": "playlist",
+		"label": "Playlist",
+		"filePath": "library/playlist.svg"
+	},
+	{
 		"slug": "plus",
 		"label": "Plus",
 		"filePath": "library/plus.svg",
@@ -1317,6 +1322,11 @@
 		"filePath": "library/repeat.svg"
 	},
 	{
+		"slug": "repeat-all",
+		"label": "Repeat All",
+		"filePath": "library/repeat-all.svg"
+	},
+	{
 		"slug": "replay",
 		"label": "Replay",
 		"filePath": "library/replay.svg"
@@ -1483,6 +1493,11 @@
 		"slug": "site-logo",
 		"label": "Site Logo",
 		"filePath": "library/site-logo.svg"
+	},
+	{
+		"slug": "sites",
+		"label": "Sites",
+		"filePath": "library/sites.svg"
 	},
 	{
 		"slug": "square",

@@ -2,9 +2,18 @@
 
 ## Unreleased
 
+## 11.0.0 (2026-07-14)
+
+### Breaking Changes
+
+-   Remove `$font-weight-regular` and `$font-weight-medium`. Use `var(--wpds-typography-font-weight-default)` or `var(--wpds-typography-font-weight-emphasis)` based on the intended emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+
 ### Enhancements
 
--   Add `outset-ring__focus` mixin for outline-based focus rings using `--wpds-*` design tokens ([#78698](https://github.com/WordPress/gutenberg/pull/78698)).
+-   Use semantic `@wordpress/theme` font-weight tokens in typography mixins, and align the legacy font-family variables with the theme typography tokens ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Add `outset-ring__focus` mixin for outline-based focus rings using `--wpds-*` design tokens ([#78698](https://github.com/WordPress/gutenberg/pull/78698), [#80082](https://github.com/WordPress/gutenberg/pull/80082)).
+
+## 10.2.0 (2026-07-01)
 
 ## 10.1.0 (2026-06-24)
 

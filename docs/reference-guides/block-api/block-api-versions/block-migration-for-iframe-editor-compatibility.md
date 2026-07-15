@@ -31,7 +31,7 @@ In summary, if you haven't been able to fully test your blocks in the iframe edi
 
 ### When will the post editor work as an iframe?
 
-**In WordPress 7.1, the post editor is planned to always work as an iframe, regardless of the `apiVersion` of registered blocks**.
+**In WordPress 7.1, the post editor always works as an iframe, regardless of the `apiVersion` of the blocks in the post content.** The conditional fallback to a non-iframe editor is removed, so blocks with `apiVersion` 2 or lower always run inside the iframe.
 
 Ahead of this, to encourage developers to test in the iframe editor, WordPress 6.9 introduces a browser console warning when blocks are registered with `apiVersion` 2 or lower, and updates the [block.json schema](https://github.com/WordPress/gutenberg/blob/trunk/schemas/json/block.json) to only allow `apiVersion: 3`. For details, see [Preparing the post editor for full iframe integration](https://make.wordpress.org/core/2025/11/12/preparing-the-post-editor-for-full-iframe-integration/).
 

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 1.15.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 1.14.0 (2026-07-01)
+
 ## 1.13.0 (2026-06-24)
 
 ## 1.12.1 (2026-06-16)

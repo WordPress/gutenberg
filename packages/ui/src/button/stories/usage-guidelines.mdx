@@ -1,0 +1,76 @@
+import { Canvas, Markdown, Meta } from '@storybook/addon-docs/blocks';
+import * as UsageGuidelinesStories from './usage-guidelines.story';
+
+<Meta of={ UsageGuidelinesStories } />
+
+# Button, IconButton, Link, and LinkButton
+
+Choose the component based on **what happens when the user activates it**, not only on how it should look.
+
+## Quick reference
+
+<Markdown>{ `
+| Goal | Component | Element | Examples |
+| --- | --- | --- | --- |
+| Performs an action on the current page | [Button](?path=/docs/design-system-components-button--docs), [IconButton](?path=/docs/design-system-components-iconbutton--docs) | \`<button>\` | Save, Delete, Submit, toolbar icon actions |
+| Navigate to another page or URL | [Link](?path=/docs/design-system-components-link--docs) | \`<a>\` | "Learn more", docs links, external references |
+| Navigate with button styling | [LinkButton](?path=/docs/design-system-components-linkbutton--docs) | \`<a>\` | Standalone CTAs, card actions |
+` }</Markdown>
+
+## Use `Button` and `IconButton` for actions
+
+Use `Button` or `IconButton` when activation should **not** navigate away as a link would:
+
+-   Submitting or resetting a form (`type="submit"` / `type="reset"`)
+-   Opening overlays ([Dialog](?path=/docs/design-system-components-dialog--docs), [Popover](?path=/docs/design-system-components-popover--docs), etc.)
+-   Running JavaScript on the current page (`onClick` without a meaningful `href`)
+-   Toggle controls (`aria-pressed` on neutral minimal buttons)
+-   Showing a **loading** state while an async action completes
+
+Use [IconButton](?path=/docs/design-system-components-iconbutton--docs) for the same kinds of actions when the control is **icon-only** — for example, toolbar buttons. It inherits `Button` props and adds a built-in tooltip via the required `label` prop (used as the accessible name).
+
+`Button` and `IconButton` use button semantics. Do not use them as stand-ins for navigation when a real URL is the primary outcome.
+
+<Canvas of={ UsageGuidelinesStories.UseButtonForActions } />
+
+See [Button](?path=/docs/design-system-components-button--docs) and [IconButton](?path=/docs/design-system-components-iconbutton--docs) for API details and examples.
+
+## Use `Link` for navigation
+
+Use `Link` when activation should take the user to another page or URL. This is the default choice for navigation — not just inline references in running text, but any case where the outcome is “go somewhere else.”
+
+`Link` styling communicates navigation more clearly than a button-shaped control. Users can see at a glance that they are following a link, not triggering an action on the current page.
+
+Typical uses:
+
+-   Inline references inside [Text](?path=/docs/design-system-components-text--docs) or paragraphs
+-   Standalone “Learn more”, “View documentation”, or “Open site” actions
+-   External destinations with `openInNewTab` (adds `target="_blank"` and an accessible new-tab indicator)
+
+Compose `Text` as the host and `Link` via `render` when you need typography from `Text` on a standalone link.
+
+<Canvas of={ UsageGuidelinesStories.UseLinkForInlineNavigation } />
+
+See [Link](?path=/docs/design-system-components-link--docs) for API details and examples.
+
+## Use `LinkButton` for navigation with button styling
+
+Use `LinkButton` when the destination is a **URL** and the control should **look like a `Button`** — for example, standalone calls to action, card footers, or notice actions where button weight fits the layout.
+
+`LinkButton` shares `Button` visual props (`variant`, `tone`, `size`) but renders an `<a>` like `Link`. Use `openInNewTab` for external destinations (adds `target="_blank"` and an accessible new-tab indicator). It does **not** support `disabled`, `loading`, `focusableWhenDisabled`, `nativeButton`, or toggle `aria-pressed`.
+
+Do **not** use `LinkButton` for form submit, dialogs, or other non-navigation actions — use `Button` instead.
+
+Do **not** use `Button` with `render={ <a href="…" /> }` and `nativeButton={ false }` for new code when `LinkButton` fits; `LinkButton` is the supported pattern for button-styled links.
+
+<Canvas of={ UsageGuidelinesStories.UseLinkButtonForNavigation } />
+
+> **Note:** Prefer `Link` for navigation when possible. Its underline and link styling communicate where the user is going more clearly than a button-shaped control. Reach for `LinkButton` only when you have considered `Button` and `Link` and still need button prominence.
+
+See [LinkButton](?path=/docs/design-system-components-linkbutton--docs) for API details and examples.
+
+## Common mistakes
+
+-   **`Button` or `IconButton` + `onClick` for navigation** — Prefer `Link` with a real `href` so keyboard, assistive technology, and browser link affordances stay correct.
+-   **`LinkButton` when `Link` would work** — Default to `Link` for navigation; button styling can obscure that the control goes elsewhere.
+-   **`LinkButton` for submit or toggle actions** — Use `Button` or `IconButton`, depending on whether the control needs a visible text label or is icon-only; `LinkButton` does not support loading or pressed toggle styling.

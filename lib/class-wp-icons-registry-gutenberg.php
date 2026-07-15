@@ -34,7 +34,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		if ( false === strpos( $icon_name, '/' ) ) {
+		if ( ! str_contains( $icon_name, '/' ) ) {
 			_doing_it_wrong(
 				__METHOD__,
 				__( 'Icon name must be namespaced in the form "collection/icon-name".', 'gutenberg' ),
@@ -289,7 +289,7 @@ function gutenberg_override_wp_icons_registry() {
 	// the `core/` namespace onto the Gutenberg registry so they are not lost.
 	if ( null !== $original_registry ) {
 		foreach ( $original_registry->get_registered_icons() as $icon ) {
-			if ( strpos( $icon['name'], 'core/' ) === 0 ) {
+			if ( str_starts_with( $icon['name'], 'core/' ) ) {
 				continue;
 			}
 			$icon_properties = array( 'label' => $icon['label'] );
