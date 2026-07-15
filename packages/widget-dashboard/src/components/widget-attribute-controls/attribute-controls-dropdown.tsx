@@ -85,7 +85,7 @@ export function AttributeControlsDropdown( {
 				className={ styles[ 'dropdown-popup' ] }
 				positioner={ <Popover.Positioner side="bottom" align="end" /> }
 			>
-				<Stack direction="column" gap="md" align="baseline">
+				<Stack direction="column" gap="lg" align="flex-end">
 					<VisuallyHidden render={ <Popover.Title /> }>
 						{ __( 'Widget controls' ) }
 					</VisuallyHidden>
@@ -97,7 +97,7 @@ export function AttributeControlsDropdown( {
 						onChange={ onChange }
 					/>
 
-					<Popover.Close render={ <Button variant="minimal" /> }>
+					<Popover.Close render={ <Button variant="solid" /> }>
 						{ __( 'Close' ) }
 					</Popover.Close>
 				</Stack>
