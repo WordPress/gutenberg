@@ -2,13 +2,30 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Spell out the accepted field-type name syntax: lowercase kebab-case
+    segments, with at most one namespace level ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+
+### Internal
+
+-   Add an integration test covering named field-type resolution in
+    `useWidgetTypes` ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+
+## 0.3.0 (2026-07-14)
+
 ### New Features
 
 -   `WidgetAttributeField< Item >`: authoring helper narrowing a DataViews
     `Field.id` to the widget's attribute keys.
+-   Field type registry: `registerFieldType` names a reusable field type,
+    plain (`location`) or namespaced (`acme/rating`); `useWidgetTypes`
+    resolves attributes referencing registered names into plain DataViews
+    `Field` props ([#80148](https://github.com/WordPress/gutenberg/pull/80148)).
 
 ### Enhancements
 
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 -   `WidgetAttributeField`: add optional `relevance` hint (`'high' | 'low'`)
     marking attributes a host may promote to a prominent surface.
 -   `WidgetModuleRecord`: add optional `category`, overlaid onto the
@@ -24,6 +41,11 @@
 ### Documentation
 
 -   Add a widget anatomy doc and lighten the widget system doc.
+-   Document the `relevance` hint and `help` note across anatomy, authoring,
+    and architecture docs; add an attribute-relevance diagram.
+-   Add a `WithRelevance` Storybook story for attribute relevance hints.
+-   Add a Field Types doc, its pipeline diagram, and a `WithFieldType`
+    story ([#80148](https://github.com/WordPress/gutenberg/pull/80148)).
 
 ## 0.2.0 (2026-07-01)
 

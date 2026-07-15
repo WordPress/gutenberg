@@ -306,7 +306,6 @@ function GridControls( {
 			>
 				<FlexItem style={ { width: '50%' } }>
 					<InputControl
-						size="__unstable-large"
 						label={ __( 'Column span' ) }
 						type="number"
 						onChange={ ( value ) => {
@@ -331,7 +330,6 @@ function GridControls( {
 				</FlexItem>
 				<FlexItem style={ { width: '50%' } }>
 					<InputControl
-						size="__unstable-large"
 						label={ __( 'Row span' ) }
 						type="number"
 						onChange={ ( value ) => {
@@ -369,7 +367,6 @@ function GridControls( {
 				>
 					<FlexItem style={ { width: '50%' } }>
 						<InputControl
-							size="__unstable-large"
 							label={ __( 'Column' ) }
 							type="number"
 							onChange={ ( value ) => {
@@ -404,7 +401,6 @@ function GridControls( {
 					</FlexItem>
 					<FlexItem style={ { width: '50%' } }>
 						<InputControl
-							size="__unstable-large"
 							label={ __( 'Row' ) }
 							type="number"
 							onChange={ ( value ) => {

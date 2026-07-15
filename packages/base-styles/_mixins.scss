@@ -13,12 +13,12 @@
 
 @mixin _text-heading() {
 	font-family: variables.$font-family-headings;
-	font-weight: variables.$font-weight-medium;
+	font-weight: wpds.var("--wpds-typography-font-weight-emphasis");
 }
 
 @mixin _text-body() {
 	font-family: variables.$font-family-body;
-	font-weight: variables.$font-weight-regular;
+	font-weight: wpds.var("--wpds-typography-font-weight-default");
 }
 
 @mixin heading-small() {
@@ -191,11 +191,6 @@
 @mixin outset-ring__focus() {
 	outline: wpds.var("--wpds-border-width-focus") solid wpds.var("--wpds-color-stroke-focus");
 	outline-offset: wpds.var("--wpds-border-width-focus");
-
-	// Defend against a conflicting focus ring from WordPress common.css on `a:focus`.
-	&:is(a) {
-		box-shadow: none;
-	}
 }
 
 
