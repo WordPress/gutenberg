@@ -161,3 +161,41 @@ export function formatSpacingShorthand(
 		)
 		.join( ' ' );
 }
+
+/**
+ * Turns a block gap value into readable text.
+ *
+ * A plain string is used as-is. An axial object with a `top` (row) and `left`
+ * (column) gap reads as one value when both match, or `row - column` when they
+ * differ.
+ *
+ * The optional `resolve` callback swaps a raw value for its real one first,
+ * e.g. turning `var:preset|spacing|40` into its actual size.
+ *
+ * @param {*}        gap     A gap string or an axial `{ top, left }` object.
+ * @param {Function} resolve Optional callback to resolve each raw value.
+ *
+ * @return {string} The readable gap, or an em dash.
+ */
+export function formatBlockGap( gap, resolve = ( value ) => value ) {
+	const format = ( value ) => formatStyleValue( resolve( value ) );
+
+	if ( ! gap || typeof gap !== 'object' ) {
+		return format( gap );
+	}
+
+	const { top: row, left: column } = gap;
+
+	if ( ! isSet( row ) && ! isSet( column ) ) {
+		return EMPTY_VALUE_LABEL;
+	}
+
+	if ( row === column ) {
+		return format( row );
+	}
+
+	const rowLabel = isSet( row ) ? format( row ) : EMPTY_VALUE_LABEL;
+	const columnLabel = isSet( column ) ? format( column ) : EMPTY_VALUE_LABEL;
+
+	return `${ rowLabel } - ${ columnLabel }`;
+}

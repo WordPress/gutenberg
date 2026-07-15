@@ -6,6 +6,7 @@ import {
 	formatBorderShorthand,
 	formatBorderRadius,
 	formatSpacingShorthand,
+	formatBlockGap,
 	EMPTY_VALUE_LABEL,
 } from '../format-style-value';
 
@@ -174,5 +175,49 @@ describe( 'formatSpacingShorthand', () => {
 	it( 'falls back to a placeholder for empty values', () => {
 		expect( formatSpacingShorthand( {} ) ).toBe( EMPTY_VALUE_LABEL );
 		expect( formatSpacingShorthand( undefined ) ).toBe( EMPTY_VALUE_LABEL );
+	} );
+} );
+
+describe( 'formatBlockGap', () => {
+	it( 'passes a string value through unchanged', () => {
+		expect( formatBlockGap( '10px' ) ).toBe( '10px' );
+	} );
+
+	it( 'collapses matching axes to a single value', () => {
+		expect( formatBlockGap( { top: '10px', left: '10px' } ) ).toBe(
+			'10px'
+		);
+	} );
+
+	it( 'shows differing axes as a row - column pair', () => {
+		expect( formatBlockGap( { top: '10px', left: '20px' } ) ).toBe(
+			'10px - 20px'
+		);
+	} );
+
+	it( 'keeps a placeholder for an unset axis', () => {
+		expect( formatBlockGap( { top: '10px' } ) ).toBe(
+			`10px - ${ EMPTY_VALUE_LABEL }`
+		);
+		expect( formatBlockGap( { left: '20px' } ) ).toBe(
+			`${ EMPTY_VALUE_LABEL } - 20px`
+		);
+	} );
+
+	it( 'resolves preset gap tokens with a resolver', () => {
+		const resolve = ( value ) =>
+			value === 'var:preset|spacing|40' ? '1.5rem' : value;
+
+		expect(
+			formatBlockGap(
+				{ top: 'var:preset|spacing|40', left: '20px' },
+				resolve
+			)
+		).toBe( '1.5rem - 20px' );
+	} );
+
+	it( 'falls back to a placeholder for empty values', () => {
+		expect( formatBlockGap( {} ) ).toBe( EMPTY_VALUE_LABEL );
+		expect( formatBlockGap( undefined ) ).toBe( EMPTY_VALUE_LABEL );
 	} );
 } );

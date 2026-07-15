@@ -334,9 +334,13 @@ export function getChangesToPush( supports, attributes, blockUserConfig ) {
 		if ( value ) {
 			// Padding and margin can be axial or per-side objects. The format
 			// hint lets them show as one CSS value instead of a row per side
-			// or a raw object.
-			const format =
-				key === 'padding' || key === 'margin' ? 'spacing' : undefined;
+			// or a raw object. Block gap can be an axial `{ top, left }` object.
+			let format;
+			if ( key === 'padding' || key === 'margin' ) {
+				format = 'spacing';
+			} else if ( key === 'blockGap' ) {
+				format = 'blockGap';
+			}
 			rows.push( {
 				id: presetAttributeKey,
 				primaryPath: path,

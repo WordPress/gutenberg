@@ -16,6 +16,7 @@ import {
 	formatBorderShorthand,
 	formatBorderRadius,
 	formatSpacingShorthand,
+	formatBlockGap,
 } from './format-style-value';
 
 /**
@@ -23,7 +24,7 @@ import {
  * borders and spacing show as a single CSS value instead of a raw object.
  *
  * @param {string}   format  Optional format hint (`border`, `borderRadius`,
- *                           `spacing`).
+ *                           `spacing`, `blockGap`).
  * @param {*}        value   The raw style value.
  * @param {Function} resolve Callback to resolve preset values (used for spacing).
  *
@@ -38,6 +39,9 @@ function formatReviewValue( format, value, resolve ) {
 	}
 	if ( format === 'spacing' ) {
 		return formatSpacingShorthand( value, resolve );
+	}
+	if ( format === 'blockGap' ) {
+		return formatBlockGap( value, resolve );
 	}
 	return formatStyleValue( value );
 }
