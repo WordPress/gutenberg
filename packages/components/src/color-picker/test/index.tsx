@@ -733,9 +733,7 @@ describe( 'ColorPicker', () => {
 					.getAllByRole( 'slider', { name: 'Hue' } )
 					.at( -1 )!;
 				fireEvent.change( hueSlider, { target: { value: 200 } } );
-				await waitFor( () =>
-					expect( hueSlider ).toHaveValue( '200' )
-				);
+				await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
 
 				expect( pointer ).toHaveStyle( {
 					top: expectedTop,
@@ -777,7 +775,9 @@ describe( 'ColorPicker', () => {
 					'.react-colorful__saturation-pointer'
 				) as HTMLElement;
 				expect( pointer ).toHaveStyle( { top: expectedTop } );
-				expect( parseFloat( pointer.style.left ) ).toBeGreaterThan( 50 );
+				expect( parseFloat( pointer.style.left ) ).toBeGreaterThan(
+					50
+				);
 
 				const saturationSlider = screen.getByRole( 'slider', {
 					name: 'Saturation',
