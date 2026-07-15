@@ -14,7 +14,7 @@ import { Tooltip } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import './style.scss';
+import styles from './style.module.scss';
 import useSaveShortcut from '../save-panel/use-save-shortcut';
 
 export default function SaveButton() {
@@ -99,7 +99,7 @@ export default function SaveButton() {
 							accessibleWhenDisabled
 							isBusy={ isSaving }
 							aria-keyshortcuts={ rawShortcut.primary( 's' ) }
-							className="boot-save-button"
+							className={ styles[ 'save-button' ] }
 							icon={ isInSavedState ? check : undefined }
 						>
 							{ label }
@@ -109,9 +109,7 @@ export default function SaveButton() {
 				<Tooltip.Popup>
 					{ hasChanges && <span>{ label }</span> }
 					{ /* TODO: replace with a future `@wordpress/ui` `Shortcut` primitive once available */ }
-					<span className="boot-save-button__shortcut">
-						{ shortcut }
-					</span>
+					<span className={ styles.shortcut }>{ shortcut }</span>
 				</Tooltip.Popup>
 			</Tooltip.Root>
 			{ isSaveViewOpen && (

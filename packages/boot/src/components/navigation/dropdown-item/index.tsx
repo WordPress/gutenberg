@@ -27,7 +27,8 @@ import { STORE_NAME } from '../../../store';
 import NavigationItem from '../navigation-item';
 import { wrapIcon } from '../items';
 import type { IconType, MenuItem } from '../../../store/types';
-import './style.scss';
+import styles from './style.module.scss';
+import navigationItemStyles from '../navigation-item/style.module.scss';
 
 const ANIMATION_DURATION = 0.2;
 
@@ -79,9 +80,12 @@ export default function DropdownItem( {
 	const items = menuItems.filter( ( item ) => item.parent === id );
 	const disableMotion = useReducedMotion();
 	return (
-		<div className="boot-dropdown-item">
+		<div>
 			<Item
-				className={ clsx( 'boot-navigation-item', className ) }
+				className={ clsx(
+					navigationItemStyles[ 'navigation-item' ],
+					className
+				) }
 				onClick={ ( e ) => {
 					e.preventDefault();
 					e.stopPropagation();
@@ -98,8 +102,8 @@ export default function DropdownItem( {
 					<FlexBlock>{ children }</FlexBlock>
 					<WCIcon
 						icon={ chevronDownSmall }
-						className={ clsx( 'boot-dropdown-item__chevron', {
-							'is-up': isExpanded,
+						className={ clsx( styles.chevron, {
+							[ styles[ 'is-up' ] ]: isExpanded,
 						} ) }
 					/>
 				</HStack>
@@ -115,7 +119,7 @@ export default function DropdownItem( {
 							duration: disableMotion ? 0 : ANIMATION_DURATION,
 							ease: 'easeOut',
 						} }
-						className="boot-dropdown-item__children"
+						className={ styles.children }
 					>
 						{ items.map( ( item, index ) => (
 							<NavigationItem
