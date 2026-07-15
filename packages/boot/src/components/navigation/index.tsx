@@ -12,6 +12,7 @@ import NavigationItem from './navigation-item';
 import DrilldownItem from './drilldown-item';
 import DropdownItem from './dropdown-item';
 import NavigationScreen from './navigation-screen';
+import navigationItemStyles from './navigation-item/style.module.scss';
 import { useSidebarParent } from './use-sidebar-parent';
 import type { MenuItem } from '../../store/types';
 
@@ -79,7 +80,11 @@ function Navigation() {
 								<DropdownItem
 									key={ item.id }
 									id={ item.id }
-									className="boot-navigation-item"
+									className={
+										navigationItemStyles[
+											'navigation-item'
+										]
+									}
 									icon={ item.icon }
 									shouldShowPlaceholder={ hasRealIcons }
 									isExpanded={ parentDropdownId === item.id }

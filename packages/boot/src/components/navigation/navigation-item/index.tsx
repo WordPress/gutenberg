@@ -20,7 +20,7 @@ import {
 import RouterLinkItem from '../router-link-item';
 import { wrapIcon } from '../items';
 import type { IconType } from '../../../store/types';
-import './style.scss';
+import styles from './style.module.scss';
 
 interface NavigationItemProps {
 	/**
@@ -70,7 +70,7 @@ export default function NavigationItem( {
 			<Item
 				as="a"
 				href={ to }
-				className={ clsx( 'boot-navigation-item', className ) }
+				className={ clsx( styles[ 'navigation-item' ], className ) }
 			>
 				{ content }
 			</Item>
@@ -80,7 +80,7 @@ export default function NavigationItem( {
 	return (
 		<RouterLinkItem
 			to={ to }
-			className={ clsx( 'boot-navigation-item', className ) }
+			className={ clsx( styles[ 'navigation-item' ], className ) }
 		>
 			{ content }
 		</RouterLinkItem>

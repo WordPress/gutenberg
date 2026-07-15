@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Migrate component styles to CSS modules.
 ## 0.18.0 (2026-07-14)
 
 ### Enhancements

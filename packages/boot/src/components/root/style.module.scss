@@ -1,0 +1,470 @@
+@use "@wordpress/base-styles/breakpoints";
+@use "@wordpress/base-styles/colors";
+@use "@wordpress/base-styles/variables";
+@use "@wordpress/base-styles/mixins";
+
+:global(.boot-layout-container) .layout {
+	// On mobile the main content area has to scroll, otherwise you can invoke
+	// the overscroll bounce on the non-scrolling container, for a bad experience.
+	@include mixins.break-small {
+		position: absolute;
+		inset: 0;
+		min-height: calc(100vh - #{variables.$admin-bar-height-big});
+	}
+
+	// The WP header height changes at this breakpoint.
+	@include mixins.break-medium {
+		min-height: calc(100vh - #{variables.$admin-bar-height});
+
+		:global(body:has([data-full-canvas])) & {
+			min-height: 100vh;
+		}
+	}
+
+	img {
+		max-width: 100%;
+		height: auto;
+	}
+}
+
+.layout .notices-snackbar {
+	@include mixins.snackbar-container();
+}
+
+.layout {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	color: var(--wpds-color-foreground-content-neutral);
+	isolation: isolate;
+	background: var(--wpds-color-background-surface-neutral-weak);
+}
+
+.sidebar-backdrop {
+	position: fixed;
+	inset: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 100002;
+	cursor: var(--wpds-cursor-control);
+}
+
+.sidebar {
+	height: 100%;
+	flex-shrink: 0;
+	width: 240px;
+	position: relative;
+	overflow: hidden;
+
+	&.is-mobile {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		inset-inline-start: 0;
+		width: 300px;
+		max-width: 85vw;
+		background: var(--wpds-color-background-surface-neutral-weak);
+		z-index: 100003;
+		box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+	}
+}
+
+.mobile-sidebar-drawer {
+	position: fixed;
+	inset-block-start: 0;
+	inset-inline: 0;
+
+	.layout-single-page & {
+		top: variables.$admin-bar-height-big;
+	}
+
+	z-index: 3;
+	background: var(--wpds-color-background-surface-neutral);
+	padding: variables.$grid-unit-20;
+	border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.canvas.has-mobile-drawer {
+	position: relative;
+	padding-top: 65px;
+}
+
+.surfaces {
+	display: flex;
+	flex-grow: 1;
+	margin: 0;
+	gap: variables.$grid-unit-10;
+
+	@include mixins.break-medium {
+		margin: variables.$grid-unit-10;
+
+		.layout-single-page & {
+			margin-top: 0;
+			margin-inline-start: 0;
+		}
+	}
+}
+
+.stage,
+.inspector {
+	flex: 1;
+	overflow-y: auto;
+	background: var(--wpds-color-background-surface-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
+	position: relative;
+
+	// Mobile-first: surfaces take full screen with fixed positioning
+	position: fixed;
+	inset: 0;
+	width: 100vw;
+	height: 100vh;
+	border-radius: 0;
+	margin: 0;
+
+	.layout-single-page & {
+		top: variables.$admin-bar-height-big;
+		height: calc(100vh - variables.$admin-bar-height-big);
+	}
+
+	// Desktop: restore original styles
+	@include mixins.break-medium {
+		position: static;
+		width: auto;
+		height: auto;
+		border-radius: var(--wpds-border-radius-xl);
+		margin: 0;
+
+		.layout-single-page & {
+			height: auto;
+		}
+	}
+}
+
+.stage {
+	z-index: 2; // Highest surface priority on mobile
+
+	@include mixins.break-medium {
+		z-index: auto;
+	}
+}
+
+.inspector {
+	z-index: 3; // Medium surface priority on mobile
+
+	@include mixins.break-medium {
+		z-index: auto;
+	}
+}
+
+.canvas {
+	flex: 1;
+	overflow-y: auto;
+	background: var(--wpds-color-background-surface-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+	position: relative;
+
+	// Mobile-first: full screen with lowest priority
+	position: fixed;
+	inset: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 1; // Lowest surface priority
+	border-radius: 0;
+	margin: 0;
+
+	.layout-single-page & {
+		top: variables.$admin-bar-height-big;
+		height: calc(100vh - variables.$admin-bar-height-big);
+	}
+
+	// Desktop: restore original styles
+	@include mixins.break-medium {
+		position: static;
+		width: auto;
+		height: auto;
+		border-radius: var(--wpds-border-radius-xl);
+		z-index: auto;
+
+		.layout-single-page & {
+			height: auto;
+		}
+	}
+}
+
+.has-canvas .stage,
+.inspector {
+	@include mixins.break-medium {
+		max-width: 400px;
+	}
+}
+
+.canvas :global(.interface-interface-skeleton) {
+	position: relative;
+	height: 100%;
+	top: 0 !important;
+	inset-inline-start: 0 !important;
+}
+
+.has-full-canvas .surfaces {
+	margin: 0;
+	gap: 0;
+}
+
+.has-full-canvas .stage,
+.has-full-canvas .inspector {
+	display: none;
+}
+
+.has-full-canvas .canvas {
+	position: fixed;
+	inset-block-start: var(--wp-admin--admin-bar--height, 0);
+	inset-inline: 0;
+	inset-block-end: 0;
+	max-width: none;
+	margin: 0;
+	border-radius: 0;
+	border: none;
+	box-shadow: none;
+	overflow: hidden;
+
+	.layout-single-page & {
+		top: variables.$admin-bar-height-big;
+
+		@include mixins.break-medium {
+			top: variables.$admin-bar-height;
+		}
+	}
+}
+
+@media (max-width: #{breakpoints.$break-medium}) {
+	.stage,
+	.inspector,
+	.canvas:not(.has-mobile-drawer) {
+		top: var(--wp-admin--admin-bar--height, 0);
+		height: calc(100vh - var(--wp-admin--admin-bar--height, 0px));
+	}
+
+	.mobile-sidebar-drawer {
+		top: var(--wp-admin--admin-bar--height, 0);
+	}
+}
+
+// Disable view transitions on mobile devices
+// to avoid conflicts with sidebar navigation.
+@media (max-width: 782px) {
+	:global(*) {
+		view-transition-name: none !important;
+	}
+}
+
+:global(::view-transition-old(root)),
+:global(::view-transition-new(root)) {
+	animation-duration: 250ms;
+}
+
+@media not (prefers-reduced-motion: reduce) {
+	.canvas :global(.interface-interface-skeleton__header) {
+		view-transition-name: boot--canvas-header;
+	}
+
+	.canvas :global(.interface-interface-skeleton__sidebar) {
+		view-transition-name: boot--canvas-sidebar;
+	}
+
+	.stage {
+		view-transition-name: boot--stage;
+	}
+
+	.inspector {
+		view-transition-name: boot--inspector;
+	}
+
+	.canvas {
+		view-transition-name: boot--canvas;
+	}
+
+	// Safari-specific view transition names
+	// Uses CSS feature detection instead of .is-safari class
+	@supports (-webkit-hyphens:none) and (not (-moz-appearance:none)) {
+		.stage {
+			view-transition-name: boot-safari--stage;
+		}
+
+		.inspector {
+			view-transition-name: boot-safari--inspector;
+		}
+
+		.canvas {
+			view-transition-name: boot-safari--canvas;
+		}
+	}
+
+	// For any popover that stays open across a query change.
+	// Naming it avoids the stage overlaying it.
+	:global(.components-popover:first-of-type) {
+		view-transition-name: boot--components-popover;
+	}
+}
+
+:global(::view-transition-group(boot--canvas-header)),
+:global(::view-transition-group(boot--canvas-sidebar)),
+:global(::view-transition-group(boot-safari--canvas)),
+:global(::view-transition-group(boot--canvas)) {
+	z-index: 1;
+}
+
+// Safari-specific pseudo-element styles with width: auto fix
+:global(::view-transition-new(boot-safari--canvas)),
+:global(::view-transition-old(boot-safari--canvas)),
+:global(::view-transition-new(boot-safari--stage)),
+:global(::view-transition-old(boot-safari--stage)),
+:global(::view-transition-old(boot-safari--inspector)),
+:global(::view-transition-new(boot-safari--inspector)) {
+	width: auto;
+}
+
+// Safari trips up with using object fit on the pseudo images and filling out
+// background.
+:global(::view-transition-new(boot--canvas)),
+:global(::view-transition-old(boot--canvas)),
+:global(::view-transition-new(boot--stage)),
+:global(::view-transition-old(boot--stage)),
+:global(::view-transition-new(boot--inspector)),
+:global(::view-transition-old(boot--inspector)) {
+	background: colors.$white;
+	border-radius: var(--wpds-border-radius-xl);
+	width: 100%;
+	height: 100%;
+	object-fit: none;
+	object-position: left top;
+	overflow: hidden;
+}
+
+:global(::view-transition-new(boot--canvas)),
+:global(::view-transition-old(boot--canvas)) {
+	object-position: center top;
+}
+
+:global(::view-transition-old(boot-safari--inspector):only-child),
+:global(::view-transition-old(boot--inspector):only-child),
+:global(::view-transition-old(boot-safari--stage):only-child),
+:global(::view-transition-old(boot--stage):only-child) {
+	animation-name: zoomOut;
+	will-change: transform, opacity;
+}
+
+:global(::view-transition-new(boot-safari--inspector):only-child),
+:global(::view-transition-new(boot--inspector):only-child),
+:global(::view-transition-new(boot-safari--stage):only-child),
+:global(::view-transition-new(boot--stage):only-child) {
+	animation-name: zoomIn;
+	will-change: transform, opacity;
+}
+
+@keyframes zoomOut {
+	from {
+		transform: scale(1);
+		opacity: 1;
+	}
+
+	to {
+		transform: scale(0.9);
+		opacity: 0;
+	}
+}
+
+@keyframes zoomIn {
+	from {
+		transform: scale(0.95);
+		opacity: 0;
+	}
+
+	to {
+		transform: scale(1);
+		opacity: 1;
+	}
+}
+
+:global(::view-transition-new(boot-safari--canvas):only-child),
+:global(::view-transition-new(boot--canvas):only-child) {
+	animation-name: slideFromRight;
+	will-change: transform;
+}
+
+:global(::view-transition-old(boot-safari--canvas):only-child),
+:global(::view-transition-old(boot--canvas):only-child) {
+	animation-name: slideToRight;
+	will-change: transform;
+}
+
+@keyframes slideFromRight {
+	from {
+		// Should ideally be 100% + 16px, but we also need to take into account
+		// that the canvas can be the editor-interface-skeleton__content, which
+		// not placed on the right side.
+		transform: translateX(100vw);
+	}
+
+	to {
+		transform: translateX(0);
+	}
+}
+
+@keyframes slideToRight {
+	from {
+		transform: translateX(0);
+	}
+
+	to {
+		transform: translateX(100vw);
+	}
+}
+
+:global(::view-transition-new(boot--canvas-header):only-child) {
+	animation-name: slideHeaderFromTop;
+	will-change: transform;
+}
+
+:global(::view-transition-old(boot--canvas-header):only-child) {
+	animation-name: slideHeaderToTop;
+	will-change: transform;
+}
+
+@keyframes slideHeaderFromTop {
+	from {
+		transform: translateY(-100%);
+	}
+}
+
+@keyframes slideHeaderToTop {
+	to {
+		transform: translateY(-100%);
+	}
+}
+
+:global(::view-transition-new(boot--canvas-sidebar):only-child) {
+	animation-name: slideSidebarFromRight;
+	will-change: transform;
+}
+
+:global(::view-transition-old(boot--canvas-sidebar):only-child) {
+	animation-name: slideSidebarToRight;
+	will-change: transform;
+}
+
+@keyframes slideSidebarFromRight {
+	from {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes slideSidebarToRight {
+	to {
+		transform: translateX(100%);
+	}
+}

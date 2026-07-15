@@ -20,6 +20,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import Root from '../root';
+import layoutStyles from '../root/style.module.scss';
 import type { Route, RouteConfig, RouteLoaderContext } from '../../store/types';
 import { unlock } from '../../lock-unlock';
 
@@ -37,7 +38,7 @@ const {
 // Not found component
 function NotFoundComponent() {
 	return (
-		<div className="boot-layout__stage">
+		<div className={ layoutStyles.stage }>
 			<Page title={ __( 'Route not found' ) } hasPadding>
 				{ __( "The page you're looking for does not exist" ) }
 			</Page>
@@ -133,12 +134,12 @@ function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
 				return (
 					<>
 						{ Stage && (
-							<div className="boot-layout__stage">
+							<div className={ layoutStyles.stage }>
 								<Stage />
 							</div>
 						) }
 						{ Inspector && showInspector && (
-							<div className="boot-layout__inspector">
+							<div className={ layoutStyles.inspector }>
 								<Inspector />
 							</div>
 						) }
