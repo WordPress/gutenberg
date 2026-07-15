@@ -22,6 +22,6 @@ export const MENU_POPUP_POSITIONER_PROPS = {
 export const MENU_SUBMENU_POPUP_POSITIONER_PROPS = {
 	side: 'inline-end',
 	align: 'start',
-	sideOffset: 8,
+	sideOffset: -4,
 	collisionPadding: 12,
 } as const;

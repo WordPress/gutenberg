@@ -4,10 +4,6 @@
 	@layer components {
 		.positioner {
 			z-index: var(--wp-ui-menu-z-index, initial);
-
-			/* Prevent flash of unstyled background when overscrolling the popup */
-			background-color: var(--wpds-color-background-surface-neutral-strong);
-			border-radius: var(--wpds-border-radius-md);
 		}
 
 		.popup {
@@ -26,13 +22,21 @@
 			min-width: max(var(--anchor-width, 0px), var(--wp-ui-menu-min-width));
 			max-width: min(var(--available-width), var(--wp-ui-menu-max-width));
 			overflow-block: auto;
-			overscroll-behavior: contain;
+			overscroll-behavior: none;
 			padding-block: var(--wp-ui-menu-popup-padding);
 			scroll-padding-block: var(--wp-ui-menu-popup-padding);
 			border-radius: var(--wpds-border-radius-md);
 			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 			box-shadow: var(--_wp-ui-elevation-md);
 			background-color: var(--wpds-color-background-surface-neutral-strong);
+		}
+
+		.popup--root {
+			composes: dropdown-motion from "../utils/css/dropdown-motion.module.css";
+		}
+
+		.popup--submenu {
+			composes: dropdown-motion--fade-only from "../utils/css/dropdown-motion.module.css";
 		}
 
 		.list {

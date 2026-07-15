@@ -6,6 +6,7 @@ import { ThemeProvider } from '../utils/theme-provider';
 import styles from './style.module.css';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
+import { useMenuContext } from './context';
 import type { PopupProps } from './types';
 
 /**
@@ -15,10 +16,18 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function MenuPopup(
 	{ children, className, portal, positioner, ...props },
 	ref
 ) {
+	const { isSubmenu } = useMenuContext();
+
 	const popupContent = (
 		<_Menu.Popup
 			ref={ ref }
-			className={ clsx( styles.popup, className ) }
+			className={ clsx(
+				styles.popup,
+				isSubmenu
+					? styles[ 'popup--submenu' ]
+					: styles[ 'popup--root' ],
+				className
+			) }
 			{ ...props }
 		>
 			<div

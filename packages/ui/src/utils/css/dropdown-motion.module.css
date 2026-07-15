@@ -7,7 +7,8 @@
 	@layer utilities, components, compositions, overrides;
 
 	@layer utilities {
-		.dropdown-motion {
+		.dropdown-motion,
+		.dropdown-motion--fade-only {
 			--wp-ui-dropdown-slide-distance: 4px;
 			--wp-ui-dropdown-slide-duration: var(--wpds-motion-duration-md);
 			--wp-ui-dropdown-slide-easing: var(--wpds-motion-easing-expressive);
@@ -30,12 +31,15 @@
 			}
 
 			opacity: 1;
-			transform: translate(0);
 
 			&[data-starting-style],
 			&[data-ending-style] {
 				opacity: 0;
 			}
+		}
+
+		.dropdown-motion {
+			transform: translate(0);
 
 			&[data-side="bottom"][data-starting-style],
 			&[data-side="bottom"][data-ending-style] {
