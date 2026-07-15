@@ -71,7 +71,22 @@ describe( 'Navigation', () => {
 
 			expect(
 				screen.getByRole( 'navigation', {
-					name: 'Secondary navigation',
+					name: 'Sections',
+				} )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should use a custom `ariaLabel` when provided', () => {
+			render(
+				<Navigation
+					items={ [ { label: 'Overview', href: '/overview' } ] }
+					ariaLabel="Analytics sections"
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'navigation', {
+					name: 'Analytics sections',
 				} )
 			).toBeInTheDocument();
 		} );

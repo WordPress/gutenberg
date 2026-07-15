@@ -21,7 +21,7 @@ import styles from './style.module.css';
  * @param {NavigationProps} props
  */
 export const Navigation = ( props: NavigationProps ) => {
-	const { items, currentHref } = props;
+	const { items, currentHref, ariaLabel } = props;
 
 	if ( ! items.length ) {
 		return null;
@@ -50,7 +50,7 @@ export const Navigation = ( props: NavigationProps ) => {
 	}
 
 	return (
-		<nav aria-label={ __( 'Secondary navigation' ) }>
+		<nav aria-label={ ariaLabel ?? __( 'Sections' ) }>
 			<Stack
 				render={ <ul /> }
 				direction="row"

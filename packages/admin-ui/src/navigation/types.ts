@@ -21,4 +21,13 @@ export interface NavigationProps {
 	 * `aria-current="page"` and a distinct visual treatment.
 	 */
 	currentHref?: string;
+
+	/**
+	 * Accessible label for the navigation landmark. Give each navigation on a
+	 * screen a unique label, and omit the word "navigation" since the landmark
+	 * role already conveys it.
+	 *
+	 * @default 'Sections'
+	 */
+	ariaLabel?: string;
 }
