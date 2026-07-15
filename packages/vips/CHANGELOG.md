@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- `resizeImage`, `compressImage`, and `convertImageFormat` now accept their optional parameters (`quality`, `interlaced`, `smartCrop`, `stripMeta`, `maxBitdepth`) as a single trailing `options` object instead of positional arguments ([#80328](https://github.com/WordPress/gutenberg/issues/80328)).
+
 ### Enhancements
 
-- Add optional `stripMeta` and `maxBitdepth` parameters to `resizeImage`, `compressImage`, and `convertImageFormat`, so callers can keep all image metadata and cap the output bit depth, mirroring WordPress core's `image_strip_meta` and `image_max_bit_depth` filters ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
+- Add optional `stripMeta` and `maxBitdepth` options to `resizeImage`, `compressImage`, and `convertImageFormat`, so callers can keep all image metadata and cap the output bit depth, mirroring WordPress core's `image_strip_meta` and `image_max_bit_depth` filters ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
 
 ## 2.4.0 (2026-07-14)
 
