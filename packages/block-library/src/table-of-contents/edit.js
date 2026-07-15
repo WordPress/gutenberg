@@ -94,6 +94,23 @@ export default function TableOfContentsEdit( {
 		[ clientId ]
 	);
 
+	const { hasPostContentBlock, isTemplateLike } = useSelect( ( select ) => {
+		const { getBlocksByName } = select( blockEditorStore );
+		// Follow existing block-library precedent for avoiding an @wordpress/editor dependency.
+		// Blocks can also load in non-post editors, so read the editor store by name.
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		const editorSelectors = select( 'core/editor' );
+		const currentPostType = editorSelectors?.getCurrentPostType?.();
+
+		return {
+			hasPostContentBlock:
+				getBlocksByName( 'core/post-content' ).length > 0,
+			isTemplateLike:
+				currentPostType === 'wp_template' ||
+				currentPostType === 'wp_template_part',
+		};
+	}, [] );
+
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const headingTree = linearToNestedHeadingList( headings );
@@ -225,15 +242,27 @@ export default function TableOfContentsEdit( {
 	// Note that the toolbar controls are intentionally omitted since the
 	// "Convert to static list" option is useless to the placeholder state.
 	if ( headings.length === 0 ) {
+		let placeholderInstructions = __(
+			'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
+		);
+
+		if ( isTemplateLike && hasPostContentBlock ) {
+			placeholderInstructions = __(
+				'This table of contents will show headings from the post being viewed.'
+			);
+		} else if ( isTemplateLike ) {
+			placeholderInstructions = __(
+				'Table of Contents needs a single post or page to list headings.'
+			);
+		}
+
 		return (
 			<>
 				<div { ...blockProps }>
 					<Placeholder
 						icon={ <BlockIcon icon={ icon } /> }
 						label={ __( 'Table of Contents' ) }
-						instructions={ __(
-							'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
-						) }
+						instructions={ placeholderInstructions }
 					/>
 				</div>
 				{ inspectorControls }

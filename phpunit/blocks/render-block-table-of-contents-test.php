@@ -9,12 +9,22 @@
  */
 class Tests_Blocks_Render_Table_Of_Contents extends WP_UnitTestCase {
 
+	private $registered_patterns = array();
+
 	public function set_up() {
 		parent::set_up();
 		switch_theme( 'emptytheme' );
 	}
 
 	public function tear_down() {
+		foreach ( $this->registered_patterns as $pattern_name ) {
+			$registry = WP_Block_Patterns_Registry::get_instance();
+			if ( $registry->is_registered( $pattern_name ) ) {
+				unregister_block_pattern( $pattern_name );
+			}
+		}
+		$this->registered_patterns = array();
+
 		unset( $GLOBALS['_wp_current_template_content'] );
 		unset( $GLOBALS['page'] );
 		wp_reset_postdata();
@@ -201,6 +211,91 @@ class Tests_Blocks_Render_Table_Of_Contents extends WP_UnitTestCase {
 
 		$this->assertSame(
 			array( 'Repeated template part', 'Repeated template part' ),
+			wp_list_pluck( $headings, 'content' )
+		);
+	}
+
+	/**
+	 * @covers ::gutenberg_block_core_table_of_contents_render
+	 */
+	public function test_render_uses_synced_pattern_overrides_for_heading_content() {
+		$heading_name = 'Section title';
+		$pattern_id   = $this->create_synced_pattern_with_content(
+			'Reusable section',
+			$this->pattern_override_heading_block(
+				'Reusable section title',
+				'custom-section-title',
+				$heading_name
+			)
+		);
+		$post_id      = self::factory()->post->create(
+			array(
+				'post_status'  => 'publish',
+				'post_content' => implode(
+					"\n",
+					array(
+						$this->table_of_contents_block(),
+						$this->synced_pattern_block_with_attributes(
+							array(
+								'ref'     => $pattern_id,
+								'content' => array(
+									$heading_name => array(
+										'content' => 'Custom section title',
+									),
+								),
+							)
+						),
+					)
+				),
+			)
+		);
+
+		$nav = $this->get_table_of_contents_html( $this->render_post_content( $post_id ) );
+
+		$this->assertStringContainsString( 'Custom section title', $nav );
+		$this->assertStringContainsString( '#custom-section-title', $nav );
+		$this->assertStringNotContainsString( 'Reusable section title', $nav );
+	}
+
+	/**
+	 * @covers ::gutenberg_block_core_table_of_contents_get_headings_from_content
+	 */
+	public function test_heading_resolver_includes_registered_pattern_headings() {
+		$this->register_pattern(
+			'test/table-of-contents-pattern',
+			$this->heading_block( 'Registered pattern heading', 'registered-pattern-heading' )
+		);
+
+		$headings = gutenberg_block_core_table_of_contents_get_headings_from_content(
+			$this->pattern_block( 'test/table-of-contents-pattern' )
+		);
+
+		$this->assertSame(
+			array( 'Registered pattern heading' ),
+			wp_list_pluck( $headings, 'content' )
+		);
+	}
+
+	/**
+	 * @covers ::gutenberg_block_core_table_of_contents_get_headings_from_content
+	 */
+	public function test_heading_resolver_includes_repeated_registered_pattern_references() {
+		$this->register_pattern(
+			'test/repeated-table-of-contents-pattern',
+			$this->heading_block( 'Repeated registered pattern', 'repeated-registered-pattern' )
+		);
+		$content = implode(
+			"\n",
+			array(
+				$this->pattern_block( 'test/repeated-table-of-contents-pattern' ),
+				$this->pattern_block( 'test/repeated-table-of-contents-pattern' ),
+			)
+		);
+
+		$headings = gutenberg_block_core_table_of_contents_get_headings_from_content( $content );
+
+		$this->assertSame(
+			array( 'Repeated registered pattern', 'Repeated registered pattern' ),
 			wp_list_pluck( $headings, 'content' )
 		);
 	}
@@ -426,6 +521,41 @@ class Tests_Blocks_Render_Table_Of_Contents extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::gutenberg_block_core_table_of_contents_get_headings_from_content
+	 */
+	public function test_heading_resolver_halts_registered_pattern_cycles() {
+		$this->register_pattern(
+			'test/first-cycle-pattern',
+			implode(
+				"\n",
+				array(
+					$this->heading_block( 'First registered pattern', 'first-registered-pattern' ),
+					$this->pattern_block( 'test/second-cycle-pattern' ),
+				)
+			)
+		);
+		$this->register_pattern(
+			'test/second-cycle-pattern',
+			implode(
+				"\n",
+				array(
+					$this->heading_block( 'Second registered pattern', 'second-registered-pattern' ),
+					$this->pattern_block( 'test/first-cycle-pattern' ),
+				)
+			)
+		);
+
+		$headings = gutenberg_block_core_table_of_contents_get_headings_from_content(
+			$this->pattern_block( 'test/first-cycle-pattern' )
+		);
+
+		$this->assertSame(
+			array( 'First registered pattern', 'Second registered pattern' ),
+			wp_list_pluck( $headings, 'content' )
+		);
+	}
+
+	/**
 	 * @covers ::gutenberg_block_core_table_of_contents_render
 	 */
 	public function test_render_all_paginated_headings_links_to_each_page_when_current_page_filtering_is_disabled() {
@@ -597,6 +727,10 @@ class Tests_Blocks_Render_Table_Of_Contents extends WP_UnitTestCase {
 		return '<!-- wp:block {"ref":' . (int) $ref . '} /-->';
 	}
 
+	private function synced_pattern_block_with_attributes( $attributes ) {
+		return '<!-- wp:block ' . wp_json_encode( $attributes ) . ' /-->';
+	}
+
 	private function template_part_block( $slug, $theme = '' ) {
 		$attributes = array(
 			'slug' => $slug,
@@ -609,10 +743,48 @@ class Tests_Blocks_Render_Table_Of_Contents extends WP_UnitTestCase {
 		return '<!-- wp:template-part ' . wp_json_encode( $attributes ) . ' /-->';
 	}
 
+	private function pattern_block( $slug ) {
+		return '<!-- wp:pattern ' . wp_json_encode( array( 'slug' => $slug ) ) . ' /-->';
+	}
+
+	private function register_pattern( $slug, $content ) {
+		register_block_pattern(
+			$slug,
+			array(
+				'title'   => $slug,
+				'content' => $content,
+			)
+		);
+		$this->registered_patterns[] = $slug;
+	}
+
 	private function heading_block( $content, $anchor, $level = 2 ) {
 		$attributes = array(
 			'level'  => $level,
 			'anchor' => $anchor,
+		);
+
+		return sprintf(
+			'<!-- wp:heading %1$s --><h%2$d class="wp-block-heading" id="%3$s">%4$s</h%2$d><!-- /wp:heading -->',
+			wp_json_encode( $attributes ),
+			$level,
+			esc_attr( $anchor ),
+			esc_html( $content )
+		);
+	}
+
+	private function pattern_override_heading_block( $content, $anchor, $name, $level = 2 ) {
+		$attributes = array(
+			'anchor'   => $anchor,
+			'level'    => $level,
+			'metadata' => array(
+				'name'     => $name,
+				'bindings' => array(
+					'__default' => array(
+						'source' => 'core/pattern-overrides',
+					),
+				),
+			),
 		);
 
 		return sprintf(

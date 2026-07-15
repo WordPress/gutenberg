@@ -50,7 +50,7 @@ function block_core_table_of_contents_get_heading_from_block( $block, $max_level
 		return null;
 	}
 
-	$rendered_heading = render_block( $block );
+	$rendered_heading = block_core_table_of_contents_render_heading_block( $block, $context );
 	$processor        = new WP_HTML_Tag_Processor( $rendered_heading );
 	$heading_tags     = array( 'H1', 'H2', 'H3', 'H4', 'H5', 'H6' );
 	$id               = '';
@@ -78,6 +78,27 @@ function block_core_table_of_contents_get_heading_from_block( $block, $max_level
 		'level'   => $level,
 		'link'    => block_core_table_of_contents_get_heading_link( $id, $context ),
 	);
+}
+
+/**
+ * Renders a parsed heading block with heading resolution context.
+ *
+ * @param array $block   Parsed heading block.
+ * @param array $context Heading resolution context.
+ *
+ * @return string Rendered heading block.
+ */
+function block_core_table_of_contents_render_heading_block( $block, $context ) {
+	$block_context = isset( $context['block_context'] ) && is_array( $context['block_context'] )
+		? $context['block_context']
+		: array();
+
+	if ( ! empty( $block_context ) && class_exists( 'WP_Block' ) ) {
+		$block_instance = new WP_Block( $block, $block_context );
+		return $block_instance->render();
+	}
+
+	return render_block( $block );
 }
 
 /**
@@ -131,6 +152,63 @@ function block_core_table_of_contents_get_synced_pattern_content( $attributes ) 
 	}
 
 	return $pattern->post_content;
+}
+
+/**
+ * Gets pattern overrides context for a synced pattern block.
+ *
+ * @param array $attributes Synced pattern block attributes.
+ *
+ * @return array Pattern overrides block context.
+ */
+function block_core_table_of_contents_get_synced_pattern_context( $attributes ) {
+	if ( isset( $attributes['content'] ) && is_array( $attributes['content'] ) ) {
+		$content = $attributes['content'];
+	} elseif ( isset( $attributes['overrides'] ) && is_array( $attributes['overrides'] ) ) {
+		// Back compat for synced patterns saved before the attribute was renamed.
+		$content = $attributes['overrides'];
+	} else {
+		$content = array();
+	}
+
+	foreach ( $content as &$content_data ) {
+		if ( isset( $content_data['values'] ) && is_array( $content_data['values'] ) && ! wp_is_numeric_array( $content_data['values'] ) ) {
+			// Back compat for the previous attribute shape used by pattern overrides.
+			$content_data = $content_data['values'];
+		}
+	}
+	unset( $content_data );
+
+	return array(
+		'pattern/overrides' => $content,
+	);
+}
+
+/**
+ * Gets the content for a registered pattern block.
+ *
+ * @param array $attributes Pattern block attributes.
+ *
+ * @return string The registered pattern content.
+ */
+function block_core_table_of_contents_get_pattern_content( $attributes ) {
+	if ( empty( $attributes['slug'] ) || ! class_exists( 'WP_Block_Patterns_Registry' ) ) {
+		return '';
+	}
+
+	$slug     = (string) $attributes['slug'];
+	$registry = WP_Block_Patterns_Registry::get_instance();
+
+	if ( ! $registry->is_registered( $slug ) ) {
+		return '';
+	}
+
+	$pattern = $registry->get_registered( $slug );
+	if ( ! is_array( $pattern ) || ! isset( $pattern['content'] ) || ! is_string( $pattern['content'] ) ) {
+		return '';
+	}
+
+	return $pattern['content'];
 }
 
 /**
@@ -245,9 +323,10 @@ function block_core_table_of_contents_get_referenced_block_content( $block_type,
 		}
 
 		return array(
-			'content' => $content,
-			'id'      => $ref,
-			'type'    => 'core/block',
+			'block_context' => block_core_table_of_contents_get_synced_pattern_context( $attributes ),
+			'content'       => $content,
+			'id'            => $ref,
+			'type'          => 'core/block',
 		);
 	}
 
@@ -265,9 +344,31 @@ function block_core_table_of_contents_get_referenced_block_content( $block_type,
 		}
 
 		return array(
-			'content' => $content,
-			'id'      => $template_id,
-			'type'    => 'core/template-part',
+			'block_context' => array(),
+			'content'       => $content,
+			'id'            => $template_id,
+			'type'          => 'core/template-part',
+		);
+	}
+
+	if ( 'core/pattern' === $block_type ) {
+		$slug = empty( $attributes['slug'] ) ? '' : (string) $attributes['slug'];
+		if ( '' === $slug || isset( $seen['core/pattern'][ $slug ] ) ) {
+			return null;
+		}
+
+		$content = block_core_table_of_contents_get_pattern_content( $attributes );
+		// Unknown registered patterns render no front-end content, so they
+		// cannot contribute headings.
+		if ( '' === $content ) {
+			return null;
+		}
+
+		return array(
+			'block_context' => array(),
+			'content'       => $content,
+			'id'            => $slug,
+			'type'          => 'core/pattern',
 		);
 	}
 
@@ -309,6 +410,9 @@ function block_core_table_of_contents_normalize_seen_references( $seen = array()
 	if ( ! isset( $seen['core/template-part'] ) ) {
 		$seen['core/template-part'] = array();
 	}
+	if ( ! isset( $seen['core/pattern'] ) ) {
+		$seen['core/pattern'] = array();
+	}
 
 	return $seen;
 }
@@ -330,6 +434,7 @@ function block_core_table_of_contents_normalize_heading_context( $content, $cont
 			'only_include_current_page' => false,
 			'permalink'                 => '',
 			'target_page'               => 1,
+			'block_context'             => array(),
 		)
 	);
 
@@ -339,6 +444,7 @@ function block_core_table_of_contents_normalize_heading_context( $content, $cont
 		'only_include_current_page' => ! empty( $context['only_include_current_page'] ),
 		'permalink'                 => $context['permalink'],
 		'target_page'               => max( 1, (int) $context['target_page'] ),
+		'block_context'             => is_array( $context['block_context'] ) ? $context['block_context'] : array(),
 	);
 }
 
@@ -410,7 +516,7 @@ function block_core_table_of_contents_collect_headings_from_content( $content, $
 			continue;
 		}
 
-		if ( 'core/block' === $block_type || 'core/template-part' === $block_type ) {
+		if ( 'core/block' === $block_type || 'core/template-part' === $block_type || 'core/pattern' === $block_type ) {
 			if ( ! $include_current_page ) {
 				continue;
 			}
@@ -425,6 +531,8 @@ function block_core_table_of_contents_collect_headings_from_content( $content, $
 			// Track visited references per path to stop cycles without hiding
 			// repeated sibling references.
 			$referenced_seen[ $reference['type'] ][ $reference['id'] ] = true;
+			$referenced_context                                        = $context;
+			$referenced_context['block_context']                       = $reference['block_context'];
 
 			// Keep referenced-content page breaks from advancing pagination
 			// state in the parent content.
@@ -434,7 +542,7 @@ function block_core_table_of_contents_collect_headings_from_content( $content, $
 					$reference['content'],
 					$max_level,
 					$referenced_seen,
-					$context
+					$referenced_context
 				)
 			);
 		}
@@ -486,7 +594,7 @@ function block_core_table_of_contents_template_content_has_post_content( $conten
 			return true;
 		}
 
-		if ( 'core/template-part' !== $block_type ) {
+		if ( 'core/template-part' !== $block_type && 'core/pattern' !== $block_type ) {
 			continue;
 		}
 

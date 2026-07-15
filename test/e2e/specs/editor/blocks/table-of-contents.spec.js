@@ -680,137 +680,138 @@ test.describe( 'Table of Contents', () => {
 			).toBeVisible();
 		} );
 
-		// Desired behavior: ToC in template editing should explain that it uses viewed post headings; trunk only shows the generic empty-heading placeholder.
-		test.fixme(
-			'template editing explains when a live example cannot be shown and the front of site uses the viewed post',
-			async ( { admin, editor, page, requestUtils } ) => {
-				await requestUtils.createTemplate( 'wp_template', {
-					slug: 'single',
-					title: 'Single',
-					content: [
-						'<!-- wp:table-of-contents /-->',
-						'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
-					].join( '\n\n' ),
-				} );
-				const post = await createPostWithContent(
-					requestUtils,
-					'Template preview post',
-					headingBlock( {
-						content: 'Template preview section',
-						anchor: 'template-preview-section',
-					} )
-				);
+		test( 'template editing explains when a live example cannot be shown and the front of site uses the viewed post', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await requestUtils.createTemplate( 'wp_template', {
+				slug: 'single',
+				title: 'Single',
+				content: [
+					'<!-- wp:table-of-contents /-->',
+					'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
+				].join( '\n\n' ),
+			} );
+			const post = await createPostWithContent(
+				requestUtils,
+				'Template preview post',
+				headingBlock( {
+					content: 'Template preview section',
+					anchor: 'template-preview-section',
+				} )
+			);
 
-				await admin.visitSiteEditor( {
-					postId: 'emptytheme//single',
-					postType: 'wp_template',
-					canvas: 'edit',
-				} );
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//single',
+				postType: 'wp_template',
+				canvas: 'edit',
+			} );
 
-				await expect(
-					getTableOfContentsEditorBlock( editor )
-				).toContainText(
-					'This table of contents will show headings from the post being viewed.'
-				);
+			await expect(
+				getTableOfContentsEditorBlock( editor )
+			).toContainText(
+				'This table of contents will show headings from the post being viewed.'
+			);
 
-				await openPostOnFrontend( page, post.id );
-				await expect(
-					page
-						.getByRole( 'navigation', {
-							name: 'Table of Contents',
-						} )
-						.getByRole( 'link', {
-							name: 'Template preview section',
-						} )
-				).toBeVisible();
-			}
-		);
-
-		// Desired behavior: ToC in templates should list only the viewed post's own headings.
-		test.fixme(
-			'only lists headings from the viewed post content boundary',
-			async ( { page, requestUtils } ) => {
-				await requestUtils.createTemplate( 'wp_template_part', {
-					slug: 'toc-header',
-					title: 'ToC Header',
-					content: headingBlock( {
-						content: 'Header template heading',
-						anchor: 'header-template-heading',
-					} ),
-				} );
-				await requestUtils.createTemplate( 'wp_template', {
-					slug: 'single',
-					title: 'Single',
-					content: [
-						'<!-- wp:template-part {"slug":"toc-header","tagName":"header","theme":"emptytheme"} /-->',
-						headingBlock( {
-							content: 'Template heading',
-							anchor: 'template-heading',
-						} ),
-						'<!-- wp:table-of-contents /-->',
-						'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
-					].join( '\n\n' ),
-				} );
-				const post = await createPostWithContent(
-					requestUtils,
-					'Post headings only',
-					headingBlock( {
-						content: 'Actual post section',
-						anchor: 'actual-post-section',
-					} )
-				);
-
-				await openPostOnFrontend( page, post.id );
-
-				const tableOfContents = page.getByRole( 'navigation', {
-					name: 'Table of Contents',
-				} );
-				await expect(
-					tableOfContents.getByRole( 'link', {
-						name: 'Actual post section',
-					} )
-				).toBeVisible();
-				// Template-level headings are outside the viewed post context and should be ignored.
-				await expect(
-					tableOfContents.getByText( 'Template heading' )
-				).toHaveCount( 0 );
-				// Template part headings, such as header/footer headings, should also be ignored.
-				await expect(
-					tableOfContents.getByText( 'Header template heading' )
-				).toHaveCount( 0 );
-			}
-		);
-
-		// Desired behavior: ToC in templates without post content should show a specific editor explanation; trunk only shows the generic empty-heading placeholder.
-		test.fixme(
-			'templates that do not render post content show an editor placeholder and render nothing to readers',
-			async ( { admin, editor, page, requestUtils } ) => {
-				await requestUtils.createTemplate( 'wp_template', {
-					slug: 'archive',
-					title: 'Archive',
-					content: '<!-- wp:table-of-contents /-->',
-				} );
-
-				await admin.visitSiteEditor( {
-					postId: 'emptytheme//archive',
-					postType: 'wp_template',
-					canvas: 'edit',
-				} );
-				// TODO: Make this placeholder explain how users can fix the template, not only why no ToC can render.
-				await expect(
-					getTableOfContentsEditorBlock( editor )
-				).toContainText(
-					'Table of Contents needs a single post or page to list headings.'
-				);
-
-				await page.goto( '/?m=202001' );
-				await expect(
-					page.getByRole( 'navigation', {
+			await openPostOnFrontend( page, post.id );
+			await expect(
+				page
+					.getByRole( 'navigation', {
 						name: 'Table of Contents',
 					} )
-				).toHaveCount( 0 );
-			}
-		);
+					.getByRole( 'link', {
+						name: 'Template preview section',
+					} )
+			).toBeVisible();
+		} );
+
+		test( 'only lists headings from the viewed post content boundary', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await requestUtils.createTemplate( 'wp_template_part', {
+				slug: 'toc-header',
+				title: 'ToC Header',
+				content: headingBlock( {
+					content: 'Header template heading',
+					anchor: 'header-template-heading',
+				} ),
+			} );
+			await requestUtils.createTemplate( 'wp_template', {
+				slug: 'single',
+				title: 'Single',
+				content: [
+					'<!-- wp:template-part {"slug":"toc-header","tagName":"header","theme":"emptytheme"} /-->',
+					headingBlock( {
+						content: 'Template heading',
+						anchor: 'template-heading',
+					} ),
+					'<!-- wp:table-of-contents /-->',
+					'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
+				].join( '\n\n' ),
+			} );
+			const post = await createPostWithContent(
+				requestUtils,
+				'Post headings only',
+				headingBlock( {
+					content: 'Actual post section',
+					anchor: 'actual-post-section',
+				} )
+			);
+
+			await openPostOnFrontend( page, post.id );
+
+			const tableOfContents = page.getByRole( 'navigation', {
+				name: 'Table of Contents',
+			} );
+			await expect(
+				tableOfContents.getByRole( 'link', {
+					name: 'Actual post section',
+				} )
+			).toBeVisible();
+			// Template-level headings are outside the viewed post context and should be ignored.
+			await expect(
+				tableOfContents.getByText( 'Template heading' )
+			).toHaveCount( 0 );
+			// Template part headings, such as header/footer headings, should also be ignored.
+			await expect(
+				tableOfContents.getByText( 'Header template heading' )
+			).toHaveCount( 0 );
+		} );
+
+		test( 'templates that do not render post content show an editor placeholder and render nothing to readers', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await requestUtils.createTemplate( 'wp_template', {
+				slug: 'archive',
+				title: 'Archive',
+				content: '<!-- wp:table-of-contents /-->',
+			} );
+
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//archive',
+				postType: 'wp_template',
+				canvas: 'edit',
+			} );
+			// TODO: Make this placeholder explain how users can fix the template, not only why no ToC can render.
+			await expect(
+				getTableOfContentsEditorBlock( editor )
+			).toContainText(
+				'Table of Contents needs a single post or page to list headings.'
+			);
+
+			await page.goto( '/?m=202001' );
+			await expect(
+				page.getByRole( 'navigation', {
+					name: 'Table of Contents',
+				} )
+			).toHaveCount( 0 );
+		} );
 	} );
 
 	test.describe( 'Supporting content built with other blocks', () => {
