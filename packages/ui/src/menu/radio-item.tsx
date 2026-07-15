@@ -42,7 +42,6 @@ const RadioItem = forwardRef< HTMLDivElement, RadioItemProps >(
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
 					styles.item,
-					styles[ 'has-selection-indicator' ],
 					className
 				) }
 				{ ...props }

@@ -12,7 +12,7 @@
 			--wp-ui-menu-popup-padding: var(--wpds-dimension-padding-xs);
 			--wp-ui-menu-min-width: 160px;
 			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-md);
-			--_wp-ui-elevation-md: "0px 2px 3px 0px #0000000d, 0px 4px 5px 0px #0000000a, 0px 12px 12px 0px #00000008, 0px 16px 16px 0px #00000005";
+			--_wp-ui-elevation-md: "0px 2px 3px 0px #0000000d, 0px 4px 5px 0px #0000000a, 0px 12px 12px 0px #00000008, 0px 16xrpx 16px 0px #00000005";
 
 			display: grid;
 			grid-template-areas: none;
@@ -79,7 +79,7 @@
 		}
 
 		.item {
-			--wp-ui-menu-item-height: var(--wpds-dimension-size-md);
+			--wp-ui-menu-item-height: var(--wpds-dimension-size-lg);
 			--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-md);
 			--wp-ui-menu-item-padding-block: var(--wpds-dimension-padding-xs);
 
@@ -141,7 +141,9 @@
 			--wp-ui-menu-selection-indicator-size: var(--wpds-dimension-size-sm);
 
 			grid-column: 1;
-			margin-inline: calc(-1 * var(--wp-ui-menu-popup-padding));
+			/* shrink checkmark column via negative margin */
+			margin-inline-start: calc(-1 * var(--wp-ui-menu-popup-padding) - 2px);
+			margin-inline-end: calc(-2 * var(--wp-ui-menu-popup-padding));
 			align-self: center;
 			justify-self: center;
 			display: flex;
@@ -174,7 +176,7 @@
 			justify-content: flex-start;
 			box-sizing: border-box;
 			min-width: 0;
-			padding-inline-start: var(--wp-ui-menu-item-padding-inline);
+			padding-inline-start: var(--wpds-dimension-gap-sm);
 			/* Keep clicks on presentational labels and suffixes routed to the menu item. */
 			pointer-events: none;
 		}
@@ -183,7 +185,7 @@
 			flex: 1 1 auto;
 			display: inline-flex;
 			flex-direction: column;
-			gap: var(--wpds-dimension-gap-xs);
+			gap: 2px; /* var(--wpds-dimension-gap-xs); */
 			min-width: 0;
 		}
 
@@ -214,7 +216,7 @@
 			flex-shrink: 0;
 			display: flex;
 			align-items: center;
-			margin-inline-start: var(--wpds-dimension-gap-md);
+			margin-inline-start: var(--wpds-dimension-gap-lg);
 			gap: var(--wpds-dimension-gap-xs);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
