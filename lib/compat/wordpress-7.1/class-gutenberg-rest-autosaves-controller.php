@@ -152,7 +152,7 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	 * revisioned meta (e.g. `footnotes`) are compared, matching the fields core
 	 * itself diffs. Non-revisioned meta (e.g. `_crdt_document`) is excluded.
 	 *
-	 * @since 7.1.0
+	 * @since 7.2.0
 	 *
 	 * @param WP_Post $post      The saved parent post.
 	 * @param array   $post_data Prepared autosave post data.
@@ -194,7 +194,7 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	 * the correct baseline; otherwise (no revisions yet, or the parent was updated
 	 * directly) the parent post is used.
 	 *
-	 * @since 7.0.0
+	 * @since 7.2.0
 	 *
 	 * @param WP_Post $post The saved parent post.
 	 * @return WP_Post The post or revision to compare against.
@@ -213,6 +213,10 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 		$revisions       = wp_get_post_revisions( $post->ID, array( 'posts_per_page' => 1 ) );
 		$latest_revision = empty( $revisions ) ? null : array_shift( $revisions );
 
+		// Note that a draft which has never been updated keeps the floating
+		// post_modified_gmt of '0000-00-00 00:00:00', so any revision compares
+		// as newer than it. That is the desired outcome: under RTC the
+		// revisions hold newer content than the untouched parent draft.
 		if (
 			$latest_revision &&
 			$latest_revision->post_modified_gmt >= $post->post_modified_gmt
