@@ -6,7 +6,7 @@ import { subDays, subWeeks, subMonths, subYears } from 'date-fns';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, type TransformedText } from '@wordpress/i18n';
 import { createInterpolateElement, Fragment } from '@wordpress/element';
 import { getDate } from '@wordpress/date';
 import type { ReactElement, ReactNode } from 'react';
@@ -50,6 +50,16 @@ const filterTextWrappers = {
 };
 
 /**
+ * Translation template for a filter-chip prefix. Must contain a `%1$s`
+ * placeholder so `sprintf` can substitute the filter name. Mirrors the
+ * connectors package's `ConnectorHelpMessage` pattern so that
+ * `DistributeSprintfArgs` resolves to `[string]` instead of `[]`.
+ */
+type FilterTextTemplate =
+	| `${ string }%1$s${ string }`
+	| TransformedText< `${ string }%1$s${ string }` >;
+
+/**
  * Picks the displayable label for an option, preferring a React node
  * (`labelElement`) when provided so fields like User/Term can render rich
  * markup, otherwise falling back to the plain string `label`.
@@ -89,7 +99,7 @@ function joinOptionLabels( options: Option[] ): ReactNode {
  */
 function renderFilterTextPrefix(
 	filterName: string,
-	template: string
+	template: FilterTextTemplate
 ): ReactElement {
 	return createInterpolateElement(
 		sprintf( template, filterName ),
@@ -109,7 +119,7 @@ function renderFilterTextPrefix(
  */
 function renderFilterText(
 	filterName: string,
-	template: string,
+	template: FilterTextTemplate,
 	value: ReactNode
 ): ReactElement {
 	return (

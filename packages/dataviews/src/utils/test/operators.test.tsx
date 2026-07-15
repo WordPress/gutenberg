@@ -8,8 +8,10 @@ import { render, screen, within } from '@testing-library/react';
  */
 import { getOperatorByName } from '../operators';
 import { OPERATOR_IS, OPERATOR_IS_ANY } from '../../constants';
+import type { NormalizedFilter } from '../../types';
 
-const sampleFilter = { name: 'Author' } as const;
+// filterText only reads `filter.name`; cast keeps the mock small.
+const sampleFilter = { name: 'Author' } as unknown as NormalizedFilter;
 
 const ROOT_TEST_ID = 'filter-chip';
 const NAME_CLASS = 'dataviews-filters__summary-filter-text-name';
