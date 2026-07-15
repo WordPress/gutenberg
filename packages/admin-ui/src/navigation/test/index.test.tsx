@@ -24,6 +24,20 @@ describe( 'Navigation', () => {
 			expect( console ).toHaveErrored();
 		} );
 
+		it( 'should throw when two items share the same `href`', () => {
+			expect( () =>
+				render(
+					<Navigation
+						items={ [
+							{ label: 'Overview', href: '/overview' },
+							{ label: 'Duplicate', href: '/overview' },
+						] }
+					/>
+				)
+			).toThrow( /duplicate `href` "\/overview"/ );
+			expect( console ).toHaveErrored();
+		} );
+
 		it( 'should not throw when all items have `href`', () => {
 			expect( () =>
 				render(

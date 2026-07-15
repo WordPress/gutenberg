@@ -36,6 +36,17 @@ export const Navigation = ( props: NavigationProps ) => {
 				`Navigation: item "${ invalidItem.label }" is missing an \`href\` prop.`
 			);
 		}
+
+		const duplicate = items.find(
+			( item, index ) =>
+				items.findIndex( ( other ) => other.href === item.href ) !==
+				index
+		);
+		if ( duplicate ) {
+			throw new Error(
+				`Navigation: duplicate \`href\` "${ duplicate.href }". Each item must have a unique \`href\` so a single item receives \`aria-current="page"\`.`
+			);
+		}
 	}
 
 	return (
