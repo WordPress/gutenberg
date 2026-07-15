@@ -47,3 +47,10 @@ export function mayDisplayParentControl( exposedControls, controlName ) {
 
 	return false;
 }
+
+export function getMayDisplayParentControls(
+	exposedControls,
+	hasSelectedInnerBlock
+) {
+	return hasSelectedInnerBlock ? exposedControls : false;
+}

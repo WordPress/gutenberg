@@ -41,6 +41,7 @@ import { PrivateBlockContext } from './private-block-context';
 import { useBlockVisibility } from '../block-visibility/';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
+import { getMayDisplayParentControls } from '../block-edit/context';
 
 /**
  * Merges wrapper props with special handling for classNames and styles.
@@ -704,12 +705,14 @@ function BlockListBlockProvider( props ) {
 						getMultiSelectedBlockClientIds().every(
 							( id ) => getBlockName( id ) === blockName
 						) ),
-				mayDisplayParentControls:
+				mayDisplayParentControls: getMayDisplayParentControls(
 					_hasBlockSupport(
 						getBlockName( clientId ),
 						'__experimentalExposeControlsToChildren',
 						false
-					) && hasSelectedInnerBlock( clientId ),
+					),
+					hasSelectedInnerBlock( clientId )
+				),
 				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: match?.title || blockType?.title,
 				isSubtreeDisabled:
