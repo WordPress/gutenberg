@@ -7,7 +7,6 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import InputControl from '../input-control';
-import { InputControlSuffixWrapper } from '../input-control/input-suffix-wrapper';
 import Icon from '../icon';
 
 export const StyledInputControl = styled( InputControl )`
@@ -25,11 +24,4 @@ export const StyledIcon = styled( Icon )`
 	&:dir( ltr ) {
 		transform: scaleX( -1 );
 	}
-`;
-
-export const HidableInputControlSuffixWrapper = styled(
-	InputControlSuffixWrapper,
-	{ shouldForwardProp: ( prop ) => prop !== 'isHidden' }
-)< { isHidden?: boolean } >`
-	visibility: ${ ( { isHidden } ) => ( isHidden ? 'hidden' : 'visible' ) };
 `;

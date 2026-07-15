@@ -18,13 +18,10 @@ import deprecated from '@wordpress/deprecated';
  */
 import Button from '../button';
 import { InputControlPrefixWrapper } from '../input-control/input-prefix-wrapper';
+import { InputControlSuffixWrapper } from '../input-control/input-suffix-wrapper';
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { SearchControlProps, SuffixItemProps } from './types';
-import {
-	StyledInputControl,
-	StyledIcon,
-	HidableInputControlSuffixWrapper,
-} from './styles';
+import { StyledInputControl, StyledIcon } from './styles';
 
 function SuffixItem( {
 	searchRef,
@@ -44,9 +41,12 @@ function SuffixItem( {
 	};
 
 	return (
-		<HidableInputControlSuffixWrapper
+		<InputControlSuffixWrapper
 			variant="control"
-			isHidden={ ! onClose && ! value }
+			// The button is hidden to prevent the control width from changing as it toggles.
+			style={
+				! onClose && ! value ? { visibility: 'hidden' } : undefined
+			}
 		>
 			<Button
 				size="small"
@@ -54,7 +54,7 @@ function SuffixItem( {
 				label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
 				onClick={ onClose ?? onReset }
 			/>
-		</HidableInputControlSuffixWrapper>
+		</InputControlSuffixWrapper>
 	);
 }
 
