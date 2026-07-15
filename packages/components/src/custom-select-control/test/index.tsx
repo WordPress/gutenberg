@@ -694,6 +694,29 @@ describe.each( [
 	} );
 } );
 
+describe( 'Legacy size support', () => {
+	it( 'treats __unstable-large the same as default', async () => {
+		const options = [ { key: 'one', name: 'One' } ];
+
+		await render(
+			<UncontrolledCustomSelectControl label="Test" options={ options } />
+		);
+		await render(
+			<UncontrolledCustomSelectControl
+				label="Test"
+				options={ options }
+				// @ts-expect-error testing legacy runtime support for removed size type
+				size="__unstable-large"
+			/>
+		);
+
+		const comboboxes = screen.getAllByRole( 'combobox' );
+		const [ defaultCombobox, legacyCombobox ] = comboboxes;
+
+		expect( legacyCombobox ).toMatchStyleDiffSnapshot( defaultCombobox );
+	} );
+} );
+
 describe( 'Type checking', () => {
 	// eslint-disable-next-line jest/expect-expect
 	it( 'should infer the value type from available `options`, but not the `value` or `onChange` prop', () => {

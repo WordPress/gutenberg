@@ -754,16 +754,20 @@ export async function rotateImage(
 				image = image.flipVer();
 				break;
 			case 5:
-				// Rotated 90° CCW and flipped horizontally
-				image = image.rot270().flipHor();
+				// Mirrored horizontally and rotated 270° CW (transpose).
+				// The mirror is applied before the rotation, matching the
+				// EXIF spec; the operand order matters for orientations 5/7.
+				image = image.flipHor().rot270();
 				break;
 			case 6:
 				// Rotated 90° CW
 				image = image.rot90();
 				break;
 			case 7:
-				// Rotated 90° CW and flipped horizontally
-				image = image.rot90().flipHor();
+				// Mirrored horizontally and rotated 90° CW (transverse).
+				// The mirror is applied before the rotation, matching the
+				// EXIF spec; the operand order matters for orientations 5/7.
+				image = image.flipHor().rot90();
 				break;
 			case 8:
 				// Rotated 90° CCW
@@ -771,6 +775,13 @@ export async function rotateImage(
 				break;
 			// case 1 and default: no transformation needed
 		}
+
+		// The pixels have now been physically rotated, so strip the EXIF
+		// orientation tag (which `newFromBuffer` copies through from the
+		// source) to keep the output self-consistent. Otherwise a later
+		// consumer that auto-rotates from EXIF could apply the rotation a
+		// second time.
+		image.remove( 'orientation' );
 
 		const saveOptions: SaveOptions< typeof type > = {};
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
