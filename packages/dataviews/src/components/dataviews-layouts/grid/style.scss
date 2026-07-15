@@ -8,6 +8,7 @@
 	gap: var(--wpds-dimension-gap-xl);
 	container-type: inline-size;
 	margin-bottom: auto;
+	margin-top: 8px;
 
 	@media not (prefers-reduced-motion) {
 		transition: padding ease-out 0.1s;
@@ -63,8 +64,6 @@
 		justify-content: flex-start;
 		position: relative;
 		isolation: isolate;
-		box-sizing: border-box;
-		border: var(--wpds-border-width-xs) solid transparent;
 
 		.dataviews-view-grid__title-actions {
 			padding: var(--wpds-dimension-padding-sm) 0 var(--wpds-dimension-padding-xs);
@@ -83,12 +82,19 @@
 
 
 		&.is-selected {
-			background-color: var(--wpds-color-background-interactive-brand-weak-active);
-			border-color: var(--wpds-color-stroke-surface-brand);
-			padding: var(--wpds-dimension-padding-sm);
-
 			.dataviews-view-grid__fields .dataviews-view-grid__field .dataviews-view-grid__field-value {
 				color: var(--wpds-color-foreground-content-neutral);
+			}
+
+			&::before {
+				content: "";
+				position: absolute;
+				inset: calc(-1 * var(--wpds-dimension-padding-sm));
+				z-index: -1;
+				background-color: var(--wpds-color-background-interactive-brand-weak-active);
+				border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-brand);
+				border-radius: var(--wpds-border-radius-md);
+				pointer-events: none;
 			}
 		}
 		.dataviews-view-grid__media:focus::after {
