@@ -17,7 +17,6 @@ import { renderToString } from '@wordpress/element';
  * Internal dependencies
  */
 import InnerBlocks from '../';
-import { shouldCaptureToolbars } from '../utils';
 
 describe( 'InnerBlocks', () => {
 	afterEach( () => {
@@ -105,22 +104,6 @@ describe( 'InnerBlocks', () => {
 		block.originalContent = 'Original';
 
 		expect( serialize( block ) ).toMatchSnapshot();
-	} );
-
-	describe( 'shouldCaptureToolbars', () => {
-		it.each( [
-			[ true, true ],
-			[ true, [ 'align' ] ],
-			[ false, [] ],
-			[ false, false ],
-		] )(
-			'should return %s when controls exposed to children is %s',
-			( expected, exposedControls ) => {
-				expect( shouldCaptureToolbars( exposedControls ) ).toBe(
-					expected
-				);
-			}
-		);
 	} );
 } );
 

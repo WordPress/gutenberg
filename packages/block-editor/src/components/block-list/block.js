@@ -605,7 +605,7 @@ function BlockListBlockProvider( props ) {
 			}
 
 			const {
-				getBlockSupport: _getBlockSupport,
+				hasBlockSupport: _hasBlockSupport,
 				getActiveBlockVariation,
 			} = select( blocksStore );
 			const attributes = getBlockAttributes( clientId );
@@ -704,13 +704,12 @@ function BlockListBlockProvider( props ) {
 						getMultiSelectedBlockClientIds().every(
 							( id ) => getBlockName( id ) === blockName
 						) ),
-				mayDisplayParentControls: hasSelectedInnerBlock( clientId )
-					? _getBlockSupport(
-							blockName,
-							'__experimentalExposeControlsToChildren',
-							false
-					  )
-					: false,
+				mayDisplayParentControls:
+					_hasBlockSupport(
+						getBlockName( clientId ),
+						'__experimentalExposeControlsToChildren',
+						false
+					) && hasSelectedInnerBlock( clientId ),
 				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: match?.title || blockType?.title,
 				isSubtreeDisabled:

@@ -23,7 +23,6 @@ import DefaultBlockAppender from './default-block-appender';
 import useNestedSettingsUpdate from './use-nested-settings-update';
 import useInnerBlockTemplateSync from './use-inner-block-template-sync';
 import useBlockContext from './use-block-context';
-import { shouldCaptureToolbars } from './utils';
 import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
@@ -216,17 +215,11 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				};
 			}
 
-			const { getBlockSupport: _getBlockSupport, getBlockType } =
-				select( blocksStore );
+			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const blockEditingMode = getBlockEditingMode( clientId );
 			const parentClientId = getBlockRootClientId( clientId );
 			const [ defaultLayout ] = getBlockSettings( clientId, 'layout' );
-			const exposedControls = _getBlockSupport(
-				blockName,
-				'__experimentalExposeControlsToChildren',
-				false
-			);
 
 			let _isDropZoneDisabled = blockEditingMode === 'disabled';
 
@@ -239,8 +232,11 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			}
 
 			return {
-				__experimentalCaptureToolbars:
-					shouldCaptureToolbars( exposedControls ),
+				__experimentalCaptureToolbars: hasBlockSupport(
+					blockName,
+					'__experimentalExposeControlsToChildren',
+					false
+				),
 				name: blockName,
 				blockType: getBlockType( blockName ),
 				parentLock: getTemplateLock( parentClientId ),
