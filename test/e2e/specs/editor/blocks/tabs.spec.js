@@ -187,11 +187,14 @@ test.describe( 'Tabs', () => {
 				newTab.locator( '[contenteditable="true"]' )
 			).toBeFocused();
 
-			// The new tab's panel is the active one and is visible.
+			// Inactive panels render with the `hidden` attribute, so count them too.
 			const panels = editor.canvas.getByRole( 'document', {
 				name: 'Block: Tab Panel',
+				exact: true,
+				includeHidden: true,
 			} );
 			await expect( panels ).toHaveCount( 3 );
+			// The new tab's panel is the active one and is visible.
 			await expect( panels.nth( 2 ) ).toBeVisible();
 
 			// The tab insertion is persistent, so undo removes the new tab
