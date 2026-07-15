@@ -63,7 +63,7 @@ describe( 'vips utilities', () => {
 				'item-1',
 				jpegFile,
 				'image/webp',
-				0.8
+				{ quality: 0.8 }
 			);
 
 			expect( result.name ).toBe( 'test.webp' );
@@ -78,7 +78,9 @@ describe( 'vips utilities', () => {
 			expect( mockConvertImageFormat.mock.calls[ 0 ][ 3 ] ).toBe(
 				'image/webp'
 			);
-			expect( mockConvertImageFormat.mock.calls[ 0 ][ 4 ] ).toBe( 0.8 );
+			expect( mockConvertImageFormat.mock.calls[ 0 ][ 4 ] ).toEqual( {
+				quality: 0.8,
+			} );
 		} );
 
 		it( 'converts PNG to AVIF with interlacing', async () => {
@@ -88,30 +90,33 @@ describe( 'vips utilities', () => {
 				'item-2',
 				pngFile,
 				'image/avif',
-				0.9,
-				true
+				{ quality: 0.9, interlaced: true }
 			);
 
 			expect( result.name ).toBe( 'image.avif' );
 			expect( result.type ).toBe( 'image/avif' );
-			expect( mockConvertImageFormat.mock.calls[ 0 ][ 5 ] ).toBe( true );
+			expect( mockConvertImageFormat.mock.calls[ 0 ][ 4 ] ).toEqual( {
+				quality: 0.9,
+				interlaced: true,
+			} );
 		} );
 
 		it( 'forwards metadata stripping and bit depth cap to the worker', async () => {
 			mockConvertImageFormat.mockResolvedValue( new ArrayBuffer( 5 ) );
 
-			await vipsConvertImageFormat(
-				'item-3',
-				pngFile,
-				'image/avif',
-				0.9,
-				false,
-				false, // stripMeta
-				10 // maxBitDepth
-			);
+			await vipsConvertImageFormat( 'item-3', pngFile, 'image/avif', {
+				quality: 0.9,
+				interlaced: false,
+				stripMeta: false,
+				maxBitdepth: 10,
+			} );
 
-			expect( mockConvertImageFormat.mock.calls[ 0 ][ 6 ] ).toBe( false );
-			expect( mockConvertImageFormat.mock.calls[ 0 ][ 7 ] ).toBe( 10 );
+			expect( mockConvertImageFormat.mock.calls[ 0 ][ 4 ] ).toEqual( {
+				quality: 0.9,
+				interlaced: false,
+				stripMeta: false,
+				maxBitdepth: 10,
+			} );
 		} );
 	} );
 
@@ -119,7 +124,9 @@ describe( 'vips utilities', () => {
 		it( 'compresses image preserving filename and type', async () => {
 			mockCompressImage.mockResolvedValue( new ArrayBuffer( 5 ) );
 
-			const result = await vipsCompressImage( 'item-1', jpegFile, 0.8 );
+			const result = await vipsCompressImage( 'item-1', jpegFile, {
+				quality: 0.8,
+			} );
 
 			expect( result.name ).toBe( 'test.jpg' );
 			expect( result.type ).toBe( 'image/jpeg' );
@@ -128,21 +135,24 @@ describe( 'vips utilities', () => {
 			expect( mockCompressImage.mock.calls[ 0 ][ 2 ] ).toBe(
 				'image/jpeg'
 			);
-			expect( mockCompressImage.mock.calls[ 0 ][ 3 ] ).toBe( 0.8 );
+			expect( mockCompressImage.mock.calls[ 0 ][ 3 ] ).toEqual( {
+				quality: 0.8,
+			} );
 		} );
 
 		it( 'compresses image with interlacing option', async () => {
 			mockCompressImage.mockResolvedValue( new ArrayBuffer( 5 ) );
 
-			const result = await vipsCompressImage(
-				'item-2',
-				pngFile,
-				0.7,
-				true
-			);
+			const result = await vipsCompressImage( 'item-2', pngFile, {
+				quality: 0.7,
+				interlaced: true,
+			} );
 
 			expect( result.name ).toBe( 'image.png' );
-			expect( mockCompressImage.mock.calls[ 0 ][ 4 ] ).toBe( true );
+			expect( mockCompressImage.mock.calls[ 0 ][ 3 ] ).toEqual( {
+				quality: 0.7,
+				interlaced: true,
+			} );
 		} );
 	} );
 
@@ -216,13 +226,9 @@ describe( 'vips utilities', () => {
 			} );
 
 			const resize: ImageSizeCrop = { width: 150, height: 150 };
-			const result = await vipsResizeImage(
-				'item-1',
-				jpegFile,
-				resize,
-				false,
-				true
-			);
+			const result = await vipsResizeImage( 'item-1', jpegFile, resize, {
+				addSuffix: true,
+			} );
 
 			expect( result ).toBeInstanceOf( ImageFile );
 			// ImageFile extends File, so name/type are direct properties.
@@ -244,13 +250,9 @@ describe( 'vips utilities', () => {
 			} );
 
 			const resize: ImageSizeCrop = { width: 300, height: 300 };
-			const result = await vipsResizeImage(
-				'item-1',
-				jpegFile,
-				resize,
-				false,
-				true
-			);
+			const result = await vipsResizeImage( 'item-1', jpegFile, resize, {
+				addSuffix: true,
+			} );
 
 			expect( result.name ).toBe( 'test.jpg' );
 		} );
@@ -265,13 +267,9 @@ describe( 'vips utilities', () => {
 			} );
 
 			const resize: ImageSizeCrop = { width: 150, height: 150 };
-			const result = await vipsResizeImage(
-				'item-1',
-				jpegFile,
-				resize,
-				false,
-				false
-			);
+			const result = await vipsResizeImage( 'item-1', jpegFile, resize, {
+				addSuffix: false,
+			} );
 
 			expect( result.name ).toBe( 'test.jpg' );
 		} );
@@ -290,13 +288,18 @@ describe( 'vips utilities', () => {
 				height: 100,
 				crop: true,
 			};
-			await vipsResizeImage( 'item-1', jpegFile, resize, true, true );
+			await vipsResizeImage( 'item-1', jpegFile, resize, {
+				smartCrop: true,
+				addSuffix: true,
+			} );
 
 			expect( mockResizeImage ).toHaveBeenCalledTimes( 1 );
 			expect( mockResizeImage.mock.calls[ 0 ][ 0 ] ).toBe( 'item-1' );
 			expect( mockResizeImage.mock.calls[ 0 ][ 2 ] ).toBe( 'image/jpeg' );
 			expect( mockResizeImage.mock.calls[ 0 ][ 3 ] ).toEqual( resize );
-			expect( mockResizeImage.mock.calls[ 0 ][ 4 ] ).toBe( true );
+			expect( mockResizeImage.mock.calls[ 0 ][ 4 ].smartCrop ).toBe(
+				true
+			);
 		} );
 
 		it( 'forwards metadata stripping and bit depth cap to the worker', async () => {
@@ -309,21 +312,20 @@ describe( 'vips utilities', () => {
 			} );
 
 			const resize: ImageSizeCrop = { width: 100, height: 100 };
-			await vipsResizeImage(
-				'item-1',
-				jpegFile,
-				resize,
-				false,
-				true,
-				undefined,
-				false,
-				0.82,
-				false, // stripMeta
-				8 // maxBitDepth
-			);
+			await vipsResizeImage( 'item-1', jpegFile, resize, {
+				addSuffix: true,
+				scaledSuffix: false,
+				quality: 0.82,
+				stripMeta: false,
+				maxBitdepth: 8,
+			} );
 
-			expect( mockResizeImage.mock.calls[ 0 ][ 6 ] ).toBe( false );
-			expect( mockResizeImage.mock.calls[ 0 ][ 7 ] ).toBe( 8 );
+			expect( mockResizeImage.mock.calls[ 0 ][ 4 ].stripMeta ).toBe(
+				false
+			);
+			expect( mockResizeImage.mock.calls[ 0 ][ 4 ].maxBitdepth ).toBe(
+				8
+			);
 		} );
 	} );
 

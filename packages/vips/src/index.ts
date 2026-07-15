@@ -18,6 +18,8 @@ import type {
 	LoadOptions,
 	SaveOptions,
 	ThumbnailOptions,
+	ConvertImageOptions,
+	ResizeImageOptions,
 } from './types';
 import { supportsAnimation, supportsInterlace, supportsQuality } from './utils';
 
@@ -136,28 +138,25 @@ export async function cancelOperations( id: ItemId ) {
 /**
  * Converts an image to a different format using vips.
  *
- * @param id          Item ID.
- * @param buffer      Original file buffer.
- * @param inputType   Input mime type.
- * @param outputType  Output mime type.
- * @param quality     Desired quality.
- * @param interlaced  Whether to use interlaced/progressive mode.
- *                    Only used if the outputType supports it.
- * @param stripMeta   Whether to strip metadata (except color profiles),
- *                    from the `image_strip_meta` filter.
- * @param maxBitdepth Maximum output bit depth, from the
- *                    `image_max_bit_depth` filter.
+ * @param id         Item ID.
+ * @param buffer     Original file buffer.
+ * @param inputType  Input mime type.
+ * @param outputType Output mime type.
+ * @param options    Conversion options.
  */
 export async function convertImageFormat(
 	id: ItemId,
 	buffer: ArrayBuffer,
 	inputType: string,
 	outputType: string,
-	quality = 0.82,
-	interlaced = false,
-	stripMeta = true,
-	maxBitdepth = 16
+	options: ConvertImageOptions = {}
 ): Promise< ArrayBuffer | ArrayBufferLike > {
+	const {
+		quality = 0.82,
+		interlaced = false,
+		stripMeta = true,
+		maxBitdepth = 16,
+	} = options;
 	const ext = outputType.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
@@ -246,37 +245,19 @@ export async function convertImageFormat(
 /**
  * Compresses an existing image using vips.
  *
- * @param id          Item ID.
- * @param buffer      Original file buffer.
- * @param type        Mime type.
- * @param quality     Desired quality.
- * @param interlaced  Whether to use interlaced/progressive mode.
- *                    Only used if the outputType supports it.
- * @param stripMeta   Whether to strip metadata (except color profiles),
- *                    from the `image_strip_meta` filter.
- * @param maxBitdepth Maximum output bit depth, from the
- *                    `image_max_bit_depth` filter.
+ * @param id      Item ID.
+ * @param buffer  Original file buffer.
+ * @param type    Mime type.
+ * @param options Compression options.
  * @return Compressed file data.
  */
 export async function compressImage(
 	id: ItemId,
 	buffer: ArrayBuffer,
 	type: string,
-	quality = 0.82,
-	interlaced = false,
-	stripMeta = true,
-	maxBitdepth = 16
+	options: ConvertImageOptions = {}
 ): Promise< ArrayBuffer | ArrayBufferLike > {
-	return convertImageFormat(
-		id,
-		buffer,
-		type,
-		type,
-		quality,
-		interlaced,
-		stripMeta,
-		maxBitdepth
-	);
+	return convertImageFormat( id, buffer, type, type, options );
 }
 
 /**
@@ -579,16 +560,11 @@ function resizeHighBitDepth<
  * decode the gain map alongside the base image, and `jpegsave*` delegates
  * to `uhdrsave*` on output when a gain map is attached.
  *
- * @param id          Item ID.
- * @param buffer      Original file buffer.
- * @param type        Mime type.
- * @param resize      Resize options.
- * @param smartCrop   Whether to use smart cropping (i.e. saliency-aware).
- * @param quality     Desired quality (0-1).
- * @param stripMeta   Whether to strip metadata (except color profiles),
- *                    from the `image_strip_meta` filter.
- * @param maxBitdepth Maximum output bit depth, from the
- *                    `image_max_bit_depth` filter.
+ * @param id      Item ID.
+ * @param buffer  Original file buffer.
+ * @param type    Mime type.
+ * @param resize  Resize options.
+ * @param options Additional resize options.
  * @return Processed file data plus the old and new dimensions.
  */
 export async function resizeImage(
@@ -596,10 +572,7 @@ export async function resizeImage(
 	buffer: ArrayBuffer,
 	type: string,
 	resize: ImageSizeCrop,
-	smartCrop = false,
-	quality = 0.82,
-	stripMeta = true,
-	maxBitdepth = 16
+	options: ResizeImageOptions = {}
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -607,6 +580,12 @@ export async function resizeImage(
 	originalWidth: number;
 	originalHeight: number;
 } > {
+	const {
+		smartCrop = false,
+		quality = 0.82,
+		stripMeta = true,
+		maxBitdepth = 16,
+	} = options;
 	const ext = type.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );

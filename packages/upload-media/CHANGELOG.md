@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- `vipsResizeImage`, `vipsCompressImage`, and `vipsConvertImageFormat` now accept their optional parameters (`smartCrop`, `addSuffix`, `signal`, `scaledSuffix`, `quality`, `interlaced`, `stripMeta`, `maxBitdepth`) as a single trailing `options` object instead of positional arguments ([#80328](https://github.com/WordPress/gutenberg/issues/80328)).
+
 ### Enhancements
 
 - Honor the `image_strip_meta` and `image_max_bit_depth` filters for client-side processed images via the new `imageStripMeta` and `imageMaxBitDepth` settings, carried in the REST API root index ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
