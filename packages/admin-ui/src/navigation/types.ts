@@ -14,7 +14,7 @@ export interface NavigationProps {
 	/**
 	 * The navigation items to display.
 	 */
-	items: NavigationItem[];
+	items: readonly NavigationItem[];
 
 	/**
 	 * The `href` of the current item. The matching item is rendered with
