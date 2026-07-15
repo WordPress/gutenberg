@@ -116,6 +116,7 @@ type ActionCreators = {
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	detectUltraHdr: typeof detectUltraHdr;
+	requestUploadPrompt: typeof requestUploadPrompt;
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
