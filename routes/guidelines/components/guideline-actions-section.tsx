@@ -126,7 +126,7 @@ export default function GuidelineActionsSection( {
 
 	return (
 		<VStack spacing={ 4 } className="guidelines__actions">
-			<Heading level={ 3 } size={ 15 }>
+			<Heading level={ 2 } size={ 15 }>
 				{ __( 'Actions' ) }
 			</Heading>
 			<input
