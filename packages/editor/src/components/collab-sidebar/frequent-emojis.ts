@@ -8,7 +8,11 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import { REACTION_EMOJIS, emojiToHexKey } from './reaction-emoji-picker';
+import {
+	REACTION_EMOJIS,
+	emojiToHexKey,
+	useReactionEmojis,
+} from './reaction-emoji-picker';
 
 /**
  * A recorded frequently-used emoji: its normalized hex key and how many
@@ -110,13 +114,17 @@ export function recordEmojiUse(
  * padded with the curated default reactions the user hasn't recorded
  * yet, capped at `MAX_FREQUENT_EMOJIS`.
  *
- * @param entries Stored `{ key, count }` entries.
+ * @param entries     Stored `{ key, count }` entries.
+ * @param defaultKeys Hex keys used to seed the list before usage fills it.
  * @return Ordered hex keys.
  */
-export function getFrequentEmojiKeys( entries: unknown ): string[] {
+export function getFrequentEmojiKeys(
+	entries: unknown,
+	defaultKeys: string[] = DEFAULT_FREQUENT_EMOJI_KEYS
+): string[] {
 	const keys = sanitizeEntries( entries ).map( ( entry ) => entry.key );
 	const seen = new Set( keys );
-	for ( const key of DEFAULT_FREQUENT_EMOJI_KEYS ) {
+	for ( const key of defaultKeys ) {
 		if ( ! seen.has( key ) ) {
 			keys.push( key );
 			seen.add( key );
@@ -138,15 +146,20 @@ export function useFrequentEmojis(): {
 	recordUse: ( key: string ) => void;
 } {
 	const registry = useRegistry();
+	// Seed from the filtered curated list (not just the shipped
+	// defaults) so a site using the `gutenberg_note_reaction_emojis`
+	// filter sees its own reaction set before usage fills the list.
+	const emojis = useReactionEmojis();
 	const frequentKeys = useSelect(
 		( select ) =>
 			getFrequentEmojiKeys(
 				select( preferencesStore ).get(
 					'core',
 					FREQUENT_EMOJIS_PREFERENCE_KEY
-				)
+				),
+				emojis.map( ( entry ) => emojiToHexKey( entry.emoji ) )
 			),
-		[]
+		[ emojis ]
 	);
 	const recordUse = useCallback(
 		( key: string ) => {

@@ -293,7 +293,7 @@ describe( 'AddReactionButton', () => {
 		apiFetch.mockRejectedValue( new Error( 'not mocked' ) );
 	} );
 
-	it( 'opens the curated picker and toggles the chosen reaction', async () => {
+	it( 'falls back to the curated quick row when no Emojibase URL is set', async () => {
 		const user = userEvent.setup();
 		const onToggleReaction = jest.fn();
 		render(
@@ -314,11 +314,13 @@ describe( 'AddReactionButton', () => {
 		expect( onToggleReaction ).toHaveBeenCalledWith( 'rocket' );
 	} );
 
-	it( 'stores a filter-provided emoji under its slug from both picker paths', async () => {
-		// A site filter adds 👍 with the slug `thumbs-up`. Picking it from
-		// the curated quick row and from the full searchable picker must
-		// both store `thumbs-up`, not the raw hex key `1f44d`, so the two
-		// paths aggregate into a single reaction_summary bucket.
+	it( 'opens the full picker directly and stores a filter-provided emoji under its slug', async () => {
+		// With an Emojibase URL configured, "Add reaction" opens the full
+		// searchable picker straight away (no intermediate quick row).
+		// A site filter adds 👍 with the slug `thumbs-up`; picking it from
+		// the full picker must store `thumbs-up`, not the raw hex key
+		// `1f44d`, so it aggregates into the same reaction_summary bucket
+		// as historical quick-row picks.
 		window.gutenbergEmojibaseUrl = 'https://example.test/emojibase';
 		const originalFetch = global.fetch;
 		global.fetch = jest.fn( ( url ) =>
@@ -355,25 +357,17 @@ describe( 'AddReactionButton', () => {
 				/>
 			);
 
-			// Path 1: the curated quick row.
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add reaction' } )
 			);
-			await user.click(
-				await screen.findByRole( 'option', { name: 'Thumbs up' } )
-			);
-			expect( onToggleReaction ).toHaveBeenLastCalledWith( 'thumbs-up' );
-
-			// Path 2: the full searchable picker.
-			await user.click(
-				screen.getByRole( 'button', { name: 'Add reaction' } )
-			);
-			await user.click(
-				await screen.findByRole( 'button', { name: 'More emojis' } )
-			);
-			// The quick-row pick above also recorded 👍 as frequently
-			// used, so the grid shows it twice (Frequently used + its
-			// category); either cell exercises the same selection path.
+			// The full picker opens directly — no quick row, no
+			// intermediate "More emojis" step.
+			expect(
+				screen.queryByRole( 'option', { name: 'Thumbs up' } )
+			).not.toBeInTheDocument();
+			// The filter-provided emoji is seeded into "Frequently used"
+			// and also appears in its Emojibase category; either cell
+			// exercises the same selection path.
 			await user.click(
 				(
 					await screen.findAllByRole( 'gridcell', {
@@ -382,7 +376,7 @@ describe( 'AddReactionButton', () => {
 				)[ 0 ]
 			);
 			expect( onToggleReaction ).toHaveBeenLastCalledWith( 'thumbs-up' );
-			expect( onToggleReaction ).toHaveBeenCalledTimes( 2 );
+			expect( onToggleReaction ).toHaveBeenCalledTimes( 1 );
 		} finally {
 			global.fetch = originalFetch;
 			delete window.gutenbergEmojibaseUrl;

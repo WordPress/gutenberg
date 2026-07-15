@@ -165,10 +165,10 @@ export default function EmojiPicker( { onSelect }: EmojiPickerProps ) {
 	);
 	const { set: setPreference } = useDispatch( preferencesStore );
 
-	// Focus the search field on mount. The picker is swapped into the
-	// add-reaction popover when the quick row's `+` option is clicked,
-	// and that option unmounts with the quick row — without this the
-	// focus would fall back to the document body.
+	// Focus the search field on mount. The picker usually renders after
+	// the popover has already run its own focus-on-mount pass (the lazy
+	// chunk and Emojibase data resolve later), so without this focus
+	// would stay on the interim loading state's container.
 	useEffect( () => {
 		searchRef.current?.focus();
 	}, [] );

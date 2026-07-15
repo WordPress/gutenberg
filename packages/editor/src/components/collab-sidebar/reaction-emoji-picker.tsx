@@ -3,7 +3,6 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import { Button, Composite } from '@wordpress/components';
-import { plus as plusIcon } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -19,8 +18,6 @@ export interface CuratedEmoji {
 
 interface ReactionEmojiPickerProps {
 	onSelect: ( slug: string ) => void;
-	onMore?: () => void;
-	onMoreHover?: () => void;
 }
 
 /**
@@ -150,62 +147,42 @@ export function buildEmojiBySlugMap(
 }
 
 /**
- * A row of curated emoji buttons, optionally followed by a `+` "More
- * emojis" trigger that hands off to the full searchable picker. The `+`
- * is a plain button rendered after the listbox (not inside it) so the
- * listbox only contains selectable options.
+ * A row of curated emoji buttons: the fallback picker offered when no
+ * Emojibase URL is configured (npm consumers of the editor package that
+ * haven't opted into the full searchable picker).
  *
- * @param props             Component props.
- * @param props.onSelect    Called with the chosen slug when the user picks a
- *                          curated emoji.
- * @param props.onMore      When provided, renders the trailing `+` button and
- *                          is called when it is clicked.
- * @param props.onMoreHover Called when the `+` button is hovered or focused
- *                          (used to prefetch the full picker).
+ * @param props          Component props.
+ * @param props.onSelect Called with the chosen slug when the user picks a
+ *                       curated emoji.
  */
 export default function ReactionEmojiPicker( {
 	onSelect,
-	onMore,
-	onMoreHover,
 }: ReactionEmojiPickerProps ) {
 	const emojis = useReactionEmojis();
 
 	return (
-		<div className="editor-collab-sidebar-panel__emoji-picker-row">
-			<Composite
-				role="listbox"
-				orientation="horizontal"
-				aria-label={ __( 'Select an emoji reaction' ) }
-				className="editor-collab-sidebar-panel__emoji-picker"
-			>
-				{ emojis.map( ( { emoji, label, value } ) => (
-					<Composite.Item
-						key={ value }
-						render={
-							<Button
-								role="option"
-								size="compact"
-								onClick={ () => onSelect( value ) }
-								aria-label={ label }
-								className="editor-collab-sidebar-panel__emoji-option"
-							/>
-						}
-					>
-						{ emoji }
-					</Composite.Item>
-				) ) }
-			</Composite>
-			{ onMore && (
-				<Button
-					size="compact"
-					icon={ plusIcon }
-					label={ __( 'More emojis' ) }
-					className="editor-collab-sidebar-panel__emoji-option"
-					onClick={ onMore }
-					onMouseEnter={ onMoreHover }
-					onFocus={ onMoreHover }
-				/>
-			) }
-		</div>
+		<Composite
+			role="listbox"
+			orientation="horizontal"
+			aria-label={ __( 'Select an emoji reaction' ) }
+			className="editor-collab-sidebar-panel__emoji-picker"
+		>
+			{ emojis.map( ( { emoji, label, value } ) => (
+				<Composite.Item
+					key={ value }
+					render={
+						<Button
+							role="option"
+							size="compact"
+							onClick={ () => onSelect( value ) }
+							aria-label={ label }
+							className="editor-collab-sidebar-panel__emoji-option"
+						/>
+					}
+				>
+					{ emoji }
+				</Composite.Item>
+			) ) }
+		</Composite>
 	);
 }

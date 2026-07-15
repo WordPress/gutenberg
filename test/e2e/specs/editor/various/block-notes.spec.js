@@ -1337,15 +1337,11 @@ test.describe( 'Block Notes', () => {
 			await addReactionButton.focus();
 			await page.keyboard.press( 'Enter' );
 
-			// Verify the picker is visible.
-			const emojiPicker = page.locator(
-				'.editor-collab-sidebar-panel__emoji-picker'
-			);
-			await expect( emojiPicker ).toBeVisible();
+			await blockNoteUtils.waitForFullPicker();
 
-			// Navigate with arrow keys and select. The picker is a horizontal
-			// listbox, so ArrowRight moves to the next option.
-			const firstEmoji = emojiPicker.getByRole( 'option' ).first();
+			// Navigate with arrow keys and select. The picker grid moves
+			// the roving tabindex with ArrowRight.
+			const firstEmoji = page.getByRole( 'gridcell' ).first();
 			await firstEmoji.focus();
 			await page.keyboard.press( 'ArrowRight' );
 			await page.keyboard.press( 'Enter' );
@@ -1384,7 +1380,7 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 		} );
 
-		test( 'can open the full emoji picker via the + button', async ( {
+		test( 'opens the full emoji picker directly from the add-reaction button', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -1395,7 +1391,6 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 
 			await blockNoteUtils.waitForFullPicker();
 
@@ -1421,7 +1416,6 @@ test.describe( 'Block Notes', () => {
 			// first "heart"-containing label (e.g. "smiling face with
 			// hearts") instead of the curated red heart.
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 			await page.getByPlaceholder( 'Search emoji' ).fill( 'Heart' );
 			await page
@@ -1469,7 +1463,6 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 
 			await page.keyboard.press( 'Escape' );
@@ -1490,7 +1483,6 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 
 			// A query no Emojibase label/tag matches.
@@ -1527,7 +1519,6 @@ test.describe( 'Block Notes', () => {
 			);
 
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 
 			// The section leads the grid, seeded with the curated
@@ -1569,7 +1560,6 @@ test.describe( 'Block Notes', () => {
 			// …and on reopening the picker, the recorded pick has joined
 			// the Frequently used section.
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 			await expect(
 				frequentSection.getByRole( 'gridcell', {
@@ -1590,7 +1580,6 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 
 			// The persistent toggle next to the search field shows the
@@ -1654,7 +1643,7 @@ test.describe( 'Block Notes', () => {
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
 
 			const popover = page.locator(
-				'.editor-collab-sidebar-panel__add-reaction-popover'
+				'.editor-collab-sidebar-panel__picker-popover'
 			);
 			await expect( popover ).toBeVisible();
 
@@ -1686,9 +1675,7 @@ test.describe( 'Block Notes', () => {
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await expect(
-				page.locator( '.editor-collab-sidebar-panel__emoji-picker' )
-			).toBeVisible();
+			await blockNoteUtils.waitForFullPicker();
 
 			// Focus has moved into the portaled popover, but the note's
 			// onBlur handler exempts `.components-popover` so the thread
@@ -1707,7 +1694,6 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 
 			const popover = page.locator(
@@ -1739,7 +1725,6 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 
 			const picker = page.locator(
@@ -1787,7 +1772,7 @@ test.describe( 'Block Notes', () => {
 				);
 			} );
 
-			test( 'picker offers emojis added via the gutenberg_note_reaction_emojis filter', async ( {
+			test( 'seeds Frequently used with emojis added via the gutenberg_note_reaction_emojis filter', async ( {
 				page,
 				blockNoteUtils,
 			} ) => {
@@ -1800,20 +1785,28 @@ test.describe( 'Block Notes', () => {
 				await page
 					.getByRole( 'button', { name: 'Add reaction' } )
 					.click();
-				const emojiPicker = page.locator(
-					'.editor-collab-sidebar-panel__emoji-picker'
-				);
-				await expect( emojiPicker ).toBeVisible();
+				await blockNoteUtils.waitForFullPicker();
 
-				// The 5 defaults plus the 20 filter-added entries.
-				await expect( emojiPicker.getByRole( 'option' ) ).toHaveCount(
-					25
-				);
+				// The "Frequently used" section is seeded from the
+				// filtered curated list: the 5 defaults plus the 20
+				// filter-added entries.
+				const frequentGroup = page
+					.getByRole( 'rowgroup' )
+					.filter( { hasText: 'Frequently used' } );
 				await expect(
-					emojiPicker.getByRole( 'option', { name: 'Heart' } )
+					frequentGroup.getByRole( 'gridcell' )
+				).toHaveCount( 25 );
+				await expect(
+					frequentGroup.getByRole( 'gridcell', {
+						name: 'Heart',
+						exact: true,
+					} )
 				).toBeVisible();
 				await expect(
-					emojiPicker.getByRole( 'option', { name: 'Thumbs up' } )
+					frequentGroup.getByRole( 'gridcell', {
+						name: 'Thumbs up',
+						exact: true,
+					} )
 				).toBeVisible();
 			} );
 
@@ -1840,7 +1833,7 @@ test.describe( 'Block Notes', () => {
 				await expect( reactionButton ).toContainText( '1' );
 			} );
 
-			test( 'picker stays usable with many emojis', async ( {
+			test( 'picker stays usable with many seeded emojis', async ( {
 				page,
 				blockNoteUtils,
 			} ) => {
@@ -1853,15 +1846,16 @@ test.describe( 'Block Notes', () => {
 				await page
 					.getByRole( 'button', { name: 'Add reaction' } )
 					.click();
-				const emojiPicker = page.locator(
-					'.editor-collab-sidebar-panel__emoji-picker'
-				);
-				await expect( emojiPicker ).toBeVisible();
+				await blockNoteUtils.waitForFullPicker();
 
-				// The listbox wraps instead of growing unbounded, so the
-				// popover stays within the viewport.
+				// The picker keeps its fixed 8-column footprint no matter
+				// how many entries the filter seeds, so the popover stays
+				// within the viewport.
+				const picker = page.locator(
+					'.editor-collab-sidebar-panel__picker'
+				);
 				const viewport = page.viewportSize();
-				const box = await emojiPicker.boundingBox();
+				const box = await picker.boundingBox();
 				expect( box.width ).toBeLessThan( viewport.width / 2 );
 				expect( box.x ).toBeGreaterThanOrEqual( 0 );
 				expect( box.x + box.width ).toBeLessThanOrEqual(
@@ -1870,9 +1864,9 @@ test.describe( 'Block Notes', () => {
 
 				// The last filter-added entry is reachable (scrolls into
 				// view if needed) and selectable.
-				const lastOption = emojiPicker.getByRole( 'option', {
-					name: 'Trophy',
-				} );
+				const lastOption = page
+					.getByRole( 'gridcell', { name: 'Trophy', exact: true } )
+					.first();
 				await lastOption.scrollIntoViewIfNeeded();
 				await lastOption.click();
 
@@ -2551,16 +2545,16 @@ class BlockNoteUtils {
 		await this.#page
 			.getByRole( 'button', { name: 'Add reaction' } )
 			.click();
+		await this.waitForFullPicker();
 
-		// Wait for the emoji picker popover to appear.
-		const emojiPicker = this.#page.locator(
-			'.editor-collab-sidebar-panel__emoji-picker'
-		);
-		await expect( emojiPicker ).toBeVisible();
-
-		// Click the specific emoji within the picker.
-		await emojiPicker
-			.getByRole( 'option', { name: new RegExp( emoji, 'i' ) } )
+		// Curated and filter-provided reactions carry exact label
+		// overrides (e.g. "Heart") and are seeded into the "Frequently
+		// used" section, so an exact-name gridcell lookup finds them
+		// without matching Emojibase labels that merely contain the name
+		// (e.g. "smiling face with hearts").
+		await this.#page
+			.getByRole( 'gridcell', { name: emoji, exact: true } )
+			.first()
 			.click();
 	}
 
@@ -2579,9 +2573,8 @@ class BlockNoteUtils {
 	}
 
 	/**
-	 * Open the add-reaction popover, click its trailing + option to
-	 * swap in the full emoji picker, search by name,
-	 * and click the first matching emoji.
+	 * Open the emoji picker, search by name, and click the first
+	 * matching emoji.
 	 *
 	 * @param {string} search Search term (matched against Emojibase
 	 *                        labels, e.g. "red heart" or "thumbs up").
@@ -2590,7 +2583,6 @@ class BlockNoteUtils {
 		await this.#page
 			.getByRole( 'button', { name: 'Add reaction' } )
 			.click();
-		await this.#page.getByRole( 'button', { name: 'More emojis' } ).click();
 		await this.waitForFullPicker();
 
 		await this.#page.getByPlaceholder( 'Search emoji' ).fill( search );

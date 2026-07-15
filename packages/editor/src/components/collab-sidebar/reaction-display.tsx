@@ -77,8 +77,8 @@ interface ReactionComment {
 }
 
 /**
- * Lazy-load the full emoji picker. Its bundle is only fetched when a
- * user opens the "More emojis" popover for the first time in a session;
+ * Lazy-load the full emoji picker. Its bundle is only fetched the first
+ * time a user opens (or hovers) the add-reaction trigger in a session;
  * the Emojibase JSON dataset is fetched separately on first open.
  */
 const FullEmojiPicker = lazy( () => import( './emoji-picker' ) );
@@ -390,14 +390,16 @@ interface AddReactionButtonProps {
 }
 
 /**
- * Standalone add-reaction button. Opens the curated emoji quick row
- * (5 emoji); its trailing `+` option swaps the popover content to the
- * full searchable picker, so a single trigger covers both.
+ * Standalone add-reaction button. Opens the full searchable emoji
+ * picker directly; its "Frequently used" section is seeded with the
+ * curated reaction set, so the previous quick-row picks stay one click
+ * away.
  *
- * The `+` option only renders when `window.gutenbergEmojibaseUrl` is
+ * The full picker only renders when `window.gutenbergEmojibaseUrl` is
  * set — the Gutenberg plugin sets it via PHP, but npm consumers of the
  * editor package must opt in by providing a URL pointing at a
- * self-hosted emojibase dataset.
+ * self-hosted emojibase dataset. Without it, the curated quick row is
+ * offered instead.
  *
  * @param props                  Component props.
  * @param props.noteId           The parent note comment ID.
@@ -410,7 +412,6 @@ export function AddReactionButton( {
 	disabled = false,
 	onToggleReaction,
 }: AddReactionButtonProps ) {
-	const [ isFullPicker, setIsFullPicker ] = useState( false );
 	const { recordUse } = useFrequentEmojis();
 	const emojis = useReactionEmojis();
 	const emojiBySlug = useMemo(
@@ -424,7 +425,7 @@ export function AddReactionButton( {
 		<Dropdown
 			popoverProps={ POPOVER_PROPS }
 			contentClassName={
-				isFullPicker
+				hasFullPicker
 					? 'editor-collab-sidebar-panel__picker-popover'
 					: 'editor-collab-sidebar-panel__add-reaction-popover'
 			}
@@ -437,11 +438,16 @@ export function AddReactionButton( {
 					aria-expanded={ isOpen }
 					disabled={ disabled }
 					accessibleWhenDisabled
-					onClick={ () => {
-						// Always reopen on the curated quick row.
-						setIsFullPicker( false );
-						onToggle();
-					} }
+					onClick={ onToggle }
+					// Warm up the picker while the user is still
+					// deciding: hovering or focusing the trigger starts
+					// loading the lazy picker module and the Emojibase
+					// dataset, so the popover usually opens fully
+					// populated.
+					onMouseEnter={
+						hasFullPicker ? prefetchFullPicker : undefined
+					}
+					onFocus={ hasFullPicker ? prefetchFullPicker : undefined }
 				/>
 			) }
 			renderContent={ ( { onClose } ) => {
@@ -453,7 +459,7 @@ export function AddReactionButton( {
 					onToggleReaction( slug );
 				};
 
-				if ( isFullPicker ) {
+				if ( hasFullPicker ) {
 					return (
 						<Suspense
 							fallback={
@@ -472,8 +478,8 @@ export function AddReactionButton( {
 									// Match against the filtered curated
 									// list, not just the defaults, so a
 									// filter-provided emoji picked here
-									// stores under the same slug as the
-									// quick row.
+									// stores under the same slug as a
+									// quick-row pick.
 									pickReaction(
 										emojiToStorageKey( emoji, emojis )
 									)
@@ -486,9 +492,10 @@ export function AddReactionButton( {
 				return (
 					<ReactionEmojiPicker
 						onSelect={ ( slug ) => {
-							// Count the pick toward the full picker's
-							// "Frequently used" section. (The full picker
-							// records its own picks.)
+							// Keep counting picks toward the full picker's
+							// "Frequently used" section so the history is
+							// warm if the site later provides an Emojibase
+							// URL.
 							recordUse(
 								emojiToHexKey(
 									emojiBySlug.get( slug )?.emoji ?? ''
@@ -496,19 +503,6 @@ export function AddReactionButton( {
 							);
 							pickReaction( slug );
 						} }
-						onMore={
-							hasFullPicker
-								? () => setIsFullPicker( true )
-								: undefined
-						}
-						// Warm up the picker while the user is still
-						// deciding: hovering or focusing the `+` starts
-						// loading the lazy picker module and the Emojibase
-						// dataset, so the swapped-in view usually renders
-						// fully populated.
-						onMoreHover={
-							hasFullPicker ? prefetchFullPicker : undefined
-						}
 					/>
 				);
 			} }
