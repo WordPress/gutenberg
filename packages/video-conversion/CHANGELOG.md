@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `convertGifToVideo()` accepts an optional `onProgress` callback reporting conversion progress as a fraction from 0 to 1, throttled to whole-percent increments ([#80325](https://github.com/WordPress/gutenberg/issues/80325)).
+
 ## 0.2.0 (2026-07-14)
 
 ### New Features

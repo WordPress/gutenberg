@@ -193,6 +193,42 @@ describe( 'convertGifToVideo', () => {
 		expect( mockAddedSamples[ 2 ].init.timestamp ).toBeCloseTo( 0.2, 6 );
 	} );
 
+	it( 'reports per-frame progress fractions ending at 1', async () => {
+		const onProgress = jest.fn();
+		await convertGifToVideo(
+			'item-progress',
+			GIF_BUFFER,
+			'video/mp4',
+			undefined,
+			onProgress
+		);
+		expect( onProgress.mock.calls.map( ( [ p ] ) => p ) ).toEqual( [
+			1 / 3,
+			2 / 3,
+			1,
+		] );
+	} );
+
+	it( 'throttles progress reports to whole-percent increments', async () => {
+		mockFrameCount = 300;
+		const onProgress = jest.fn();
+		await convertGifToVideo(
+			'item-progress-throttle',
+			GIF_BUFFER,
+			'video/mp4',
+			undefined,
+			onProgress
+		);
+		const reported = onProgress.mock.calls.map( ( [ p ] ) => p );
+		// 300 frames collapse to at most one report per whole percent.
+		expect( reported.length ).toBeLessThanOrEqual( 101 );
+		// Reports are strictly increasing and finish at 1.
+		for ( let i = 1; i < reported.length; i++ ) {
+			expect( reported[ i ] ).toBeGreaterThan( reported[ i - 1 ] );
+		}
+		expect( reported[ reported.length - 1 ] ).toBe( 1 );
+	} );
+
 	it( 'rejects when cancelled before encoding completes', async () => {
 		mockCanEncodeVideo.mockImplementation(
 			() =>

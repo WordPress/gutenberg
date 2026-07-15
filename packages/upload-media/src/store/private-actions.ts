@@ -1386,7 +1386,21 @@ export function transcodeGifItem(
 			const file = await convertGifToVideo(
 				item.id,
 				gifFile,
-				outputMimeType
+				outputMimeType,
+				undefined,
+				/*
+				 * The worker throttles reports to whole-percent increments, so
+				 * this dispatches at most ~100 times per conversion. Progress
+				 * is stored on this (sideload) queue item; the getProgressById
+				 * selector resolves it for the parent attachment via
+				 * additionalData.post.
+				 */
+				( progress: number ) => {
+					dispatch.updateItemProgress(
+						id,
+						Math.round( progress * 100 )
+					);
+				}
 			);
 
 			// Hand the transcoded video to the next Upload op as the

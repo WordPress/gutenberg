@@ -49,6 +49,7 @@ _Parameters_
 -   _gifSource_ `ArrayBuffer | Blob`: GIF file as a Blob/File or ArrayBuffer.
 -   _outputMimeType_ `string`: Output MIME type ('video/mp4' or 'video/webm').
 -   _maxDimensions_ `number`: Optional maximum dimension for downscaling.
+-   _onProgress_ `( progress: number ) => void`: Optional callback reporting conversion progress as a fraction from 0 to 1. Throttled to whole-percent increments so a thousand-frame GIF does not flood the worker message channel. Must be a top-level argument: the worker RPC layer (comctx) only proxies functions in argument position, not ones nested in objects.
 
 _Returns_
 

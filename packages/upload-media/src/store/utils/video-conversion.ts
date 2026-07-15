@@ -87,18 +87,27 @@ function loadVideoConversionModule(): Promise<
  * @param file           GIF file object.
  * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
  * @param maxDimensions  Optional maximum dimension for downscaling.
+ * @param onProgress     Optional callback reporting conversion progress as a
+ *                       fraction from 0 to 1.
  * @return Converted video file.
  */
 export async function convertGifToVideo(
 	id: QueueItemId,
 	file: File,
 	outputMimeType: string,
-	maxDimensions?: number
+	maxDimensions?: number,
+	onProgress?: ( progress: number ) => void
 ) {
 	const { convertGifToVideo: convert } = await loadVideoConversionModule();
 	// Pass the File straight through: the worker reads its bytes once, off
 	// the main thread, instead of materializing an ArrayBuffer here.
-	const buffer = await convert( id, file, outputMimeType, maxDimensions );
+	const buffer = await convert(
+		id,
+		file,
+		outputMimeType,
+		maxDimensions,
+		onProgress
+	);
 
 	const ext = outputMimeType === 'video/webm' ? 'webm' : 'mp4';
 	const fileName = `${ getFileBasename( file.name ) }.${ ext }`;

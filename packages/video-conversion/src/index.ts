@@ -82,13 +82,20 @@ function padToEven( value: number ): number {
  * @param gifSource      GIF file as a Blob/File or ArrayBuffer.
  * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
  * @param maxDimensions  Optional maximum dimension for downscaling.
+ * @param onProgress     Optional callback reporting conversion progress as a
+ *                       fraction from 0 to 1. Throttled to whole-percent
+ *                       increments so a thousand-frame GIF does not flood the
+ *                       worker message channel. Must be a top-level argument:
+ *                       the worker RPC layer (comctx) only proxies functions
+ *                       in argument position, not ones nested in objects.
  * @return Encoded video buffer.
  */
 export async function convertGifToVideo(
 	id: ItemId,
 	gifSource: ArrayBuffer | Blob,
 	outputMimeType: string,
-	maxDimensions?: number
+	maxDimensions?: number,
+	onProgress?: ( progress: number ) => void
 ): Promise< ArrayBuffer > {
 	inProgressOperations.add( id );
 
@@ -176,6 +183,7 @@ export async function convertGifToVideo(
 			// ImageDecoder durations are MICROSECONDS; mediabunny VideoSample
 			// timestamps/durations are SECONDS. Accumulate in seconds.
 			let timestampSec = 0;
+			let lastReportedPercent = -1;
 			for ( let i = 0; i < frameCount; i++ ) {
 				if ( ! inProgressOperations.has( id ) ) {
 					throw new Error( 'Operation cancelled' );
@@ -239,6 +247,15 @@ export async function convertGifToVideo(
 					frameForEncode.close();
 				}
 				timestampSec += durationSec;
+
+				if ( onProgress ) {
+					const progress = ( i + 1 ) / frameCount;
+					const percent = Math.floor( progress * 100 );
+					if ( percent > lastReportedPercent ) {
+						lastReportedPercent = percent;
+						onProgress( progress );
+					}
+				}
 			}
 
 			await output.finalize();

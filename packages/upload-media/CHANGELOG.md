@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   GIF-to-video conversion now reports per-item progress to the store, and a new `getProgressById( attachmentId )` selector exposes it ([#80325](https://github.com/WordPress/gutenberg/issues/80325)).
+
 ## 0.36.0 (2026-07-14)
 
 ### Enhancement
