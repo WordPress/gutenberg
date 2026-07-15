@@ -96,6 +96,23 @@ describe( 'vips utilities', () => {
 			expect( result.type ).toBe( 'image/avif' );
 			expect( mockConvertImageFormat.mock.calls[ 0 ][ 5 ] ).toBe( true );
 		} );
+
+		it( 'forwards metadata stripping and bit depth cap to the worker', async () => {
+			mockConvertImageFormat.mockResolvedValue( new ArrayBuffer( 5 ) );
+
+			await vipsConvertImageFormat(
+				'item-3',
+				pngFile,
+				'image/avif',
+				0.9,
+				false,
+				false, // stripMeta
+				10 // maxBitDepth
+			);
+
+			expect( mockConvertImageFormat.mock.calls[ 0 ][ 6 ] ).toBe( false );
+			expect( mockConvertImageFormat.mock.calls[ 0 ][ 7 ] ).toBe( 10 );
+		} );
 	} );
 
 	describe( 'vipsCompressImage', () => {
@@ -280,6 +297,33 @@ describe( 'vips utilities', () => {
 			expect( mockResizeImage.mock.calls[ 0 ][ 2 ] ).toBe( 'image/jpeg' );
 			expect( mockResizeImage.mock.calls[ 0 ][ 3 ] ).toEqual( resize );
 			expect( mockResizeImage.mock.calls[ 0 ][ 4 ] ).toBe( true );
+		} );
+
+		it( 'forwards metadata stripping and bit depth cap to the worker', async () => {
+			mockResizeImage.mockResolvedValue( {
+				buffer: new ArrayBuffer( 10 ),
+				width: 100,
+				height: 100,
+				originalWidth: 200,
+				originalHeight: 200,
+			} );
+
+			const resize: ImageSizeCrop = { width: 100, height: 100 };
+			await vipsResizeImage(
+				'item-1',
+				jpegFile,
+				resize,
+				false,
+				true,
+				undefined,
+				false,
+				0.82,
+				false, // stripMeta
+				8 // maxBitDepth
+			);
+
+			expect( mockResizeImage.mock.calls[ 0 ][ 6 ] ).toBe( false );
+			expect( mockResizeImage.mock.calls[ 0 ][ 7 ] ).toBe( 8 );
 		} );
 	} );
 
