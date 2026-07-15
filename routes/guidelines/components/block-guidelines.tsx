@@ -147,7 +147,7 @@ export default function BlockGuidelines( {
 		deleteGuidelineRow( row.id )
 			.then( () => {
 				setError( null );
-				createSuccessNotice( __( 'Guidelines removed.' ), {
+				createSuccessNotice( __( 'Guideline removed.' ), {
 					type: 'snackbar',
 				} );
 			} )
@@ -232,7 +232,7 @@ export default function BlockGuidelines( {
 					onClick={ openModal }
 					__next40pxDefaultSize
 				>
-					{ __( 'Add guidelines' ) }
+					{ __( 'Add guideline' ) }
 				</Button>
 			</HStack>
 
@@ -247,7 +247,7 @@ export default function BlockGuidelines( {
 			) }
 			<ConfirmDialog
 				isOpen={ !! itemToDelete }
-				title={ __( 'Remove block guidelines' ) }
+				title={ __( 'Remove block guideline' ) }
 				__experimentalHideHeader={ false }
 				onConfirm={ handleDelete }
 				onCancel={ () => setItemToDelete( null ) }
@@ -258,7 +258,7 @@ export default function BlockGuidelines( {
 				{ sprintf(
 					/* translators: %s: Block name. */
 					__(
-						'You are about to remove the block guidelines for the %s block.'
+						'You are about to remove the block guideline for the %s block.'
 					),
 					itemToDelete?.label ?? ''
 				) }

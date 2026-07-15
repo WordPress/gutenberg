@@ -302,10 +302,10 @@ test.describe( 'Guidelines', () => {
 			.getByRole( 'button', { name: 'Blocks', exact: true } )
 			.click();
 		await blocksCard
-			.getByRole( 'button', { name: 'Add guidelines' } )
+			.getByRole( 'button', { name: 'Add guideline' } )
 			.click();
 
-		const dialog = page.getByRole( 'dialog', { name: 'Add guidelines' } );
+		const dialog = page.getByRole( 'dialog', { name: 'Add guideline' } );
 		await expect( dialog ).toBeVisible();
 
 		// Pick a content block in the combobox.
@@ -319,12 +319,12 @@ test.describe( 'Guidelines', () => {
 		await dialog
 			.getByRole( 'textbox', { name: 'Guideline text' } )
 			.fill( 'Keep paragraphs short.' );
-		await dialog.getByRole( 'button', { name: 'Save guidelines' } ).click();
+		await dialog.getByRole( 'button', { name: 'Save guideline' } ).click();
 
 		await expect(
 			page
 				.getByTestId( 'snackbar' )
-				.filter( { hasText: 'Guidelines saved.' } )
+				.filter( { hasText: 'Guideline saved.' } )
 		).toBeVisible();
 
 		// The block now appears in the Blocks list.
