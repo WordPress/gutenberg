@@ -320,7 +320,8 @@
 			display: inline-flex;
 			justify-content: center;
 			align-items: center;
-			padding: var(--wpds-dimension-padding-xs);
+			// 2px allows Dashicons (20px glyphs) to visually fill a 24px icon slot.
+			padding: 2px;
 			box-sizing: content-box;
 		}
 
