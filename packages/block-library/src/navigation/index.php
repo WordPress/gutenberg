@@ -41,6 +41,138 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
 }
 
 /**
+ * Returns the custom properties used by the Navigation block for a layout.
+ *
+ * @since 7.1.0
+ *
+ * @param array $layout Layout configuration.
+ * @return array Navigation layout custom property declarations.
+ */
+function block_core_navigation_get_layout_custom_property_declarations( $layout ) {
+	$justification_values = array(
+		'left'          => 'flex-start',
+		'center'        => 'center',
+		'right'         => 'flex-end',
+		'space-between' => 'space-between',
+	);
+	$justify_content      = is_array( $layout ) ? ( $layout['justifyContent'] ?? 'left' ) : 'left';
+	if ( ! is_string( $justify_content ) || ! isset( $justification_values[ $justify_content ] ) ) {
+		$justify_content = 'left';
+	}
+
+	$justification = $justification_values[ $justify_content ];
+	$is_vertical   = is_array( $layout ) && 'vertical' === ( $layout['orientation'] ?? null );
+	$align         = 'center';
+	$justify       = $justification;
+
+	if ( $is_vertical ) {
+		$align   = in_array( $justify_content, array( 'center', 'right' ), true ) ? $justification : 'flex-start';
+		$justify = 'left' === $justify_content ? 'initial' : $justification;
+	}
+
+	return array(
+		'--navigation-layout-justification-setting' => $justification,
+		'--navigation-layout-direction'             => $is_vertical ? 'column' : 'row',
+		'--navigation-layout-wrap'                  => is_array( $layout ) && 'nowrap' === ( $layout['flexWrap'] ?? null ) ? 'nowrap' : 'wrap',
+		'--navigation-layout-justify'               => $justify,
+		'--navigation-layout-align'                 => $align,
+	);
+}
+
+/**
+ * Adds responsive layout custom property styles to a Navigation block.
+ *
+ * Navigation uses layout classes on its outer wrapper to define custom
+ * properties consumed by its inner and overlay containers. Viewport layout
+ * styles cannot change those classes, so equivalent custom properties are
+ * generated inside each configured viewport media query.
+ *
+ * @since 7.1.0
+ *
+ * @param string $block_content Rendered Navigation block markup.
+ * @param array  $attributes    Navigation block attributes.
+ * @return string Updated Navigation block markup.
+ */
+function block_core_navigation_add_layout_custom_properties( $block_content, $attributes ) {
+	if ( empty( $block_content ) ) {
+		return $block_content;
+	}
+
+	$style = is_array( $attributes['style'] ?? null ) ? $attributes['style'] : array();
+	if (
+		defined( 'IS_GUTENBERG_PLUGIN' ) &&
+		IS_GUTENBERG_PLUGIN &&
+		function_exists( 'gutenberg_resolve_style_state_aliases' )
+	) {
+		$style = gutenberg_resolve_style_state_aliases( $style, 'core/navigation' );
+	}
+
+	$global_settings          = wp_get_global_settings();
+	$viewport_settings        = $global_settings['viewport'] ?? null;
+	$responsive_media_queries = array();
+	foreach ( array( 'WP_Theme_JSON_Gutenberg', 'WP_Theme_JSON' ) as $theme_json_class_name ) {
+		if ( method_exists( $theme_json_class_name, 'get_viewport_media_queries' ) ) {
+			$responsive_media_queries = $theme_json_class_name::get_viewport_media_queries( $viewport_settings );
+			break;
+		}
+	}
+
+	$styles      = array();
+	$base_layout = is_array( $attributes['layout'] ?? null ) ? $attributes['layout'] : array();
+	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
+		$viewport_style  = is_array( $style[ $breakpoint ] ?? null ) ? $style[ $breakpoint ] : array();
+		$viewport_layout = is_array( $viewport_style['layout'] ?? null ) ? $viewport_style['layout'] : array();
+		if ( empty( $viewport_layout ) ) {
+			continue;
+		}
+
+		$styles[] = array(
+			'declarations' => block_core_navigation_get_layout_custom_property_declarations(
+				array_replace( $base_layout, $viewport_layout )
+			),
+			'rules_group'  => $media_query,
+		);
+	}
+	if ( empty( $styles ) ) {
+		return $block_content;
+	}
+
+	$unique_classname = wp_unique_id( 'wp-block-navigation-' );
+	// The inner selector includes both Navigation classes so it overrides the
+	// default layout custom properties set by `.wp-block-navigation.items-*`.
+	$selector = ".wp-block-navigation.{$unique_classname},.wp-block-navigation.wp-block-navigation__container.{$unique_classname}";
+	foreach ( $styles as &$style_rule ) {
+		$style_rule['selector'] = $selector;
+	}
+	unset( $style_rule );
+
+	$processor = new WP_HTML_Tag_Processor( $block_content );
+	if ( ! $processor->next_tag() ) {
+		return $block_content;
+	}
+	$processor->add_class( $unique_classname );
+
+	while ( $processor->next_tag() ) {
+		// Custom overlay content can include nested Navigation blocks.
+		// Avoid applying the outer Navigation class to an inner nav block.
+		if ( $processor->has_class( 'wp-block-navigation' ) && ! $processor->has_class( 'wp-block-navigation__container' ) ) {
+			break;
+		}
+
+		if ( $processor->has_class( 'wp-block-navigation__container' ) ) {
+			$processor->add_class( $unique_classname );
+		}
+	}
+
+	wp_style_engine_get_stylesheet_from_css_rules(
+		$styles,
+		array( 'context' => 'block-supports' )
+	);
+
+	return $processor->get_updated_html();
+}
+
+/**
  * Helper functions used to render the navigation block.
  *
  * @since 6.5.0
@@ -1006,12 +1138,14 @@ class WP_Navigation_Block_Renderer {
 		$is_within_overlay = $attributes['_isWithinOverlayTemplatePart'] ?? false;
 		$tag_name          = $is_within_overlay ? 'div' : 'nav';
 
-		return sprintf(
+		$navigation_markup = sprintf(
 			'<%1$s %2$s>%3$s</%1$s>',
 			$tag_name,
 			static::get_nav_attributes( $attributes, $inner_blocks ),
 			static::get_inner_block_markup( $attributes, $inner_blocks )
 		);
+
+		return block_core_navigation_add_layout_custom_properties( $navigation_markup, $attributes );
 	}
 }
 

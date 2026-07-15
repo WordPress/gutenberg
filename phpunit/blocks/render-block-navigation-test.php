@@ -249,4 +249,60 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 			$actual
 		);
 	}
+
+	/**
+	 * Test that layout values are converted to the Navigation custom properties.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_get_layout_custom_property_declarations
+	 */
+	public function test_get_layout_custom_property_declarations() {
+		$actual = gutenberg_block_core_navigation_get_layout_custom_property_declarations(
+			array(
+				'orientation'    => 'vertical',
+				'justifyContent' => 'right',
+				'flexWrap'       => 'nowrap',
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'--navigation-layout-justification-setting' => 'flex-end',
+				'--navigation-layout-direction' => 'column',
+				'--navigation-layout-wrap'      => 'nowrap',
+				'--navigation-layout-justify'   => 'flex-end',
+				'--navigation-layout-align'     => 'flex-end',
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Test responsive layout styles and classes on local Navigation containers.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_add_layout_custom_properties
+	 */
+	public function test_add_layout_custom_properties_updates_navigation_containers_only() {
+		$block_content = '<nav class="wp-block-navigation"><ul class="wp-block-navigation__container wp-block-navigation items-justified-right"><li>One</li></ul><div>Separator</div><ul class="wp-block-navigation__container wp-block-navigation items-justified-right"><li>Two</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation"><ul class="wp-block-navigation__container wp-block-navigation"><li>Nested</li></ul></nav></div></nav>';
+		$attributes    = array(
+			'layout' => array(
+				'justifyContent' => 'right',
+				'flexWrap'       => 'nowrap',
+			),
+			'style'  => array(
+				'@mobile' => array(
+					'layout' => array( 'orientation' => 'vertical' ),
+				),
+			),
+		);
+
+		$actual = gutenberg_block_core_navigation_add_layout_custom_properties( $block_content, $attributes );
+		$this->assertMatchesRegularExpression( '/\bwp-block-navigation-(\d+)\b/', $actual );
+		preg_match( '/\bwp-block-navigation-(\d+)\b/', $actual, $matches );
+		$responsive_class = $matches[0];
+
+		$this->assertSame(
+			'<nav class="wp-block-navigation ' . $responsive_class . '"><ul class="wp-block-navigation__container wp-block-navigation items-justified-right ' . $responsive_class . '"><li>One</li></ul><div>Separator</div><ul class="wp-block-navigation__container wp-block-navigation items-justified-right ' . $responsive_class . '"><li>Two</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation"><ul class="wp-block-navigation__container wp-block-navigation"><li>Nested</li></ul></nav></div></nav>',
+			$actual
+		);
+	}
 }
