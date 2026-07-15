@@ -5,6 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const CUSTOM_HEADING_SOURCE_PLUGIN =
 	'gutenberg-test-table-of-contents-heading-source';
+const REGISTERED_PATTERN_PLUGIN = 'gutenberg-test-table-of-contents-pattern';
 
 function headingBlock( { content, level = 2, anchor } ) {
 	const attributes = { level };
@@ -82,10 +83,12 @@ test.describe( 'Table of Contents', () => {
 			'gutenberg-block-experiments',
 		] );
 		await requestUtils.activatePlugin( CUSTOM_HEADING_SOURCE_PLUGIN );
+		await requestUtils.activatePlugin( REGISTERED_PATTERN_PLUGIN );
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await Promise.all( [
+			requestUtils.deleteAllBlocks(),
 			requestUtils.deleteAllPosts(),
 			requestUtils.deleteAllPages(),
 			requestUtils.deleteAllTemplates( 'wp_template' ),
@@ -96,6 +99,7 @@ test.describe( 'Table of Contents', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin( CUSTOM_HEADING_SOURCE_PLUGIN );
+		await requestUtils.deactivatePlugin( REGISTERED_PATTERN_PLUGIN );
 		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
@@ -812,6 +816,79 @@ test.describe( 'Table of Contents', () => {
 	test.describe( 'Supporting content built with other blocks', () => {
 		test.beforeEach( async ( { admin } ) => {
 			await admin.createNewPost();
+		} );
+
+		test( 'shows the customized synced pattern heading in the front-of-site table of contents', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			const customizableHeadingName = 'Section title';
+			const syncedPattern = await requestUtils.createBlock( {
+				title: 'Reusable section',
+				status: 'publish',
+				content: `<!-- wp:heading {"anchor":"custom-section-title","metadata":{"name":"${ customizableHeadingName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
+<h2 id="custom-section-title" class="wp-block-heading">Reusable section title</h2>
+<!-- /wp:heading -->`,
+			} );
+			const post = await createPostWithContent(
+				requestUtils,
+				'Customized synced pattern table of contents',
+				[
+					tableOfContentsBlock(),
+					`<!-- wp:block {"ref":${ syncedPattern.id },"content":{"${ customizableHeadingName }":{"content":"Custom section title"}}} /-->`,
+				].join( '\n\n' )
+			);
+
+			await openPostOnFrontend( page, post.id );
+
+			// The reader sees the customized title in the post content, so the
+			// table of contents should use that same visible title.
+			await expect(
+				page.getByRole( 'heading', { name: 'Custom section title' } )
+			).toBeVisible();
+			const tableOfContents = page.getByRole( 'navigation', {
+				name: 'Table of Contents',
+			} );
+			await expect(
+				tableOfContents.getByRole( 'link', {
+					name: 'Custom section title',
+				} )
+			).toHaveAttribute( 'href', /#custom-section-title$/ );
+			await expect(
+				tableOfContents.getByText( 'Reusable section title' )
+			).toHaveCount( 0 );
+		} );
+
+		test( 'registered pattern block headings appear in the front-of-site table of contents', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			const post = await createPostWithContent(
+				requestUtils,
+				'Registered pattern heading table of contents',
+				[
+					tableOfContentsBlock(),
+					'<!-- wp:pattern {"slug":"gutenberg-test/table-of-contents-pattern-heading"} /-->',
+				].join( '\n\n' )
+			);
+
+			await openPostOnFrontend( page, post.id );
+
+			await expect(
+				page.getByRole( 'heading', {
+					name: 'Registered pattern heading',
+					exact: true,
+				} )
+			).toBeVisible();
+			await expect(
+				page
+					.getByRole( 'navigation', {
+						name: 'Table of Contents',
+					} )
+					.getByRole( 'link', {
+						name: 'Registered pattern heading',
+					} )
+			).toHaveAttribute( 'href', /#registered-pattern-heading$/ );
 		} );
 
 		// This covers the author story that headings should count no matter which block created them.
