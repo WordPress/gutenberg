@@ -201,14 +201,20 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 
 		item.abortController?.abort();
 
-		// Cancel any ongoing vips operations for this item.
-		await vipsCancelOperations( id );
+		/*
+		 * Cancel any ongoing vips operations for this item. This is
+		 * best-effort cleanup: when the worker has crashed, the cancel call
+		 * itself rejects, and that must not abort the cancellation flow —
+		 * onError, item removal, and worker teardown below still need to run.
+		 */
+		await vipsCancelOperations( id ).catch( () => {} );
 
 		/*
 		 * Cancel any ongoing GIF-to-video conversion for this item so a
 		 * cancelled upload does not leave the encoder running off-thread.
+		 * Best-effort for the same reason as above.
 		 */
-		await cancelGifToVideoOperations( id );
+		await cancelGifToVideoOperations( id ).catch( () => {} );
 
 		if ( ! silent ) {
 			const { onError } = item;

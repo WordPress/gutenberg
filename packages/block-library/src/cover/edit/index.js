@@ -20,7 +20,6 @@ import {
 	withColors,
 	ColorPalette,
 	useBlockProps,
-	useSettings,
 	useInnerBlocksProps,
 	__experimentalUseGradient,
 	store as blockEditorStore,
@@ -28,7 +27,8 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 import { isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -134,8 +134,9 @@ function CoverEdit( {
 		[]
 	);
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
+	const { __unstableMarkNextChangeAsNotPersistent, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
+	const registry = useRegistry();
 
 	// Ref to access latest values after async operations (e.g. getMediaColor),
 	// avoiding stale values that could overwrite concurrent remote changes.
@@ -225,6 +226,35 @@ function CoverEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 
+	// Create the initial inner paragraph when the block gains a background
+	// and has no content yet.
+	const scaffoldInnerBlocks = () => {
+		const {
+			getBlocks,
+			isBlockSelected,
+			getSelectedBlocksInitialCaretPosition,
+		} = registry.select( blockEditorStore );
+		if ( getBlocks( clientId ).length > 0 ) {
+			return;
+		}
+		// Check for fontSize support before we pass a fontSize attribute to
+		// the innerBlocks.
+		const [ fontSizes ] = unlock(
+			registry.select( blockEditorStore )
+		).getBlockSettings( clientId, 'typography.fontSizes' );
+		const hasFontSizes = fontSizes?.length > 0;
+		replaceInnerBlocks(
+			clientId,
+			createBlocksFromInnerBlocksTemplate(
+				getInnerBlocksTemplate( {
+					fontSize: hasFontSizes ? 'large' : undefined,
+				} )
+			),
+			isBlockSelected( clientId ),
+			getSelectedBlocksInitialCaretPosition()
+		);
+	};
+
 	const onSelectMedia = async ( newMedia ) => {
 		const mediaAttributes = attributesFromMedia( newMedia );
 		const isImage = [ newMedia?.type, newMedia?.media_type ].includes(
@@ -289,13 +319,17 @@ function CoverEdit( {
 			}
 		}
 
-		setAttributes( {
-			...mediaAttributes,
-			focalPoint: undefined,
-			useFeaturedImage: undefined,
-			dimRatio: newDimRatio,
-			isDark: newIsDark,
-			isUserOverlayColor: currentAttrs.isUserOverlayColor || false,
+		registry.batch( () => {
+			setAttributes( {
+				...mediaAttributes,
+				focalPoint: undefined,
+				useFeaturedImage: undefined,
+				dimRatio: newDimRatio,
+				isDark: newIsDark,
+				isUserOverlayColor: currentAttrs.isUserOverlayColor || false,
+			} );
+
+			scaffoldInnerBlocks();
 		} );
 	};
 
@@ -345,9 +379,17 @@ function CoverEdit( {
 		// Fold next attribute change into the same undo level as the setOverlayColor above.
 		__unstableMarkNextChangeAsNotPersistent();
 
-		setAttributes( {
-			isUserOverlayColor: true,
-			isDark: newIsDark,
+		registry.batch( () => {
+			setAttributes( {
+				isUserOverlayColor: true,
+				isDark: newIsDark,
+			} );
+
+			// Skip when the color is cleared: that returns the block to its
+			// placeholder, which only renders while there is no content.
+			if ( newOverlayColor ) {
+				scaffoldInnerBlocks();
+			}
 		} );
 	};
 
@@ -477,22 +519,11 @@ function CoverEdit( {
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
 
-	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
-	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
-	const hasFontSizes = fontSizes?.length > 0;
-	const innerBlocksTemplate = getInnerBlocksTemplate( {
-		fontSize: hasFontSizes ? 'large' : undefined,
-	} );
-
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-cover__inner-container',
 		},
 		{
-			// Avoid template sync when the `templateLock` value is `all` or `contentOnly`.
-			// See: https://github.com/WordPress/gutenberg/pull/45632
-			template: ! hasInnerBlocks ? innerBlocksTemplate : undefined,
-			templateInsertUpdatesSelection: true,
 			allowedBlocks,
 			templateLock,
 			dropZoneElement: ref.current,
@@ -615,15 +646,24 @@ function CoverEdit( {
 			averageBackgroundColor
 		);
 
-		setAttributes( {
-			id: undefined,
-			url: undefined,
-			useFeaturedImage: newUseFeaturedImage,
-			dimRatio: newDimRatio,
-			backgroundType: useFeaturedImage
-				? IMAGE_BACKGROUND_TYPE
-				: undefined,
-			isDark: newIsDark,
+		registry.batch( () => {
+			setAttributes( {
+				id: undefined,
+				url: undefined,
+				useFeaturedImage: newUseFeaturedImage,
+				dimRatio: newDimRatio,
+				backgroundType: useFeaturedImage
+					? IMAGE_BACKGROUND_TYPE
+					: undefined,
+				isDark: newIsDark,
+			} );
+
+			// Skip when the featured image is disabled: that can return the
+			// block to its placeholder, which only renders while there is no
+			// content.
+			if ( newUseFeaturedImage ) {
+				scaffoldInnerBlocks();
+			}
 		} );
 	};
 
