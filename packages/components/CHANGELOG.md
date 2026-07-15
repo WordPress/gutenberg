@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `SearchControl`: Keep the reset button space reserved while it is hidden, so the control width no longer changes when a value is entered or cleared. ([#80315](https://github.com/WordPress/gutenberg/pull/80315)).
+
 ### Internal
 
 -   `InputControl`, `SelectControl`, `CustomSelectControl`: Remove obsolete `__unstable-large` from the public `size` type. The value continues to work at runtime, and is equivalent to the `default` size. ([#80081](https://github.com/WordPress/gutenberg/pull/80081)).
