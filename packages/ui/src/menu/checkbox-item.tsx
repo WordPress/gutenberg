@@ -42,7 +42,6 @@ const CheckboxItem = forwardRef< HTMLDivElement, CheckboxItemProps >(
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
 					styles.item,
-					styles[ 'has-selection-indicator' ],
 					className
 				) }
 				{ ...props }
