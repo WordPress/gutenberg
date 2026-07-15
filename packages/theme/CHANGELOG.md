@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added `no-internal-component-classnames` stylelint rule that disallows overriding internal `component-*` class names from `@wordpress/components`. Available as `@wordpress/theme/stylelint-plugins/no-internal-component-classnames`.
+
 ### Code Quality
 
 -   Stop publishing `@wordpress/theme` source paths by moving publish-ready assets outside `src` and enforcing the package boundary ([#80213](https://github.com/WordPress/gutenberg/pull/80213)).

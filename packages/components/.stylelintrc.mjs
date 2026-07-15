@@ -28,6 +28,7 @@ export default {
 				},
 			},
 		],
+		'plugin-wpds/no-internal-component-classnames': null,
 	},
 	overrides: [
 		{

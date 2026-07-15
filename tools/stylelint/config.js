@@ -7,6 +7,7 @@ module.exports = {
 	plugins: [
 		'stylelint-plugin-logical-css',
 		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
+		'@wordpress/theme/stylelint-plugins/no-internal-component-classnames',
 	],
 	reportNeedlessDisables: true,
 	rules: {
@@ -82,6 +83,7 @@ module.exports = {
 		'scss/at-if-closing-brace-space-after': null,
 		'no-invalid-position-at-import-rule': null,
 		'plugin-wpds/no-token-fallback-values': true,
+		'plugin-wpds/no-internal-component-classnames': true,
 	},
 	overrides: [
 		{

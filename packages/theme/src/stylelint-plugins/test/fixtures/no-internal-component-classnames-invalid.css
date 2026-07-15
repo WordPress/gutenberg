@@ -1,0 +1,9 @@
+/* Invalid: overriding an internal @wordpress/components class */
+.my-panel .component-color-indicator {
+	flex-shrink: 0;
+}
+
+/* Invalid: BEM element on an internal class */
+.component-box-control__reset-button {
+	margin: 0;
+}
