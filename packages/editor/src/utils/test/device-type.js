@@ -107,9 +107,13 @@ describe( 'device type utilities', () => {
 		);
 	} );
 
-	it( 'returns fixed preview heights for mobile and tablet, and undefined for desktop', () => {
-		expect( getCanvasHeightByDeviceType( 'Mobile' ) ).toBe( 768 );
-		expect( getCanvasHeightByDeviceType( 'Tablet' ) ).toBe( 1024 );
-		expect( getCanvasHeightByDeviceType( 'Desktop' ) ).toBeUndefined();
+	it( 'derives preview height from the canvas width using the device aspect ratio', () => {
+		// Mobile is portrait (8:5), tablet is landscape (3:4).
+		expect( getCanvasHeightByDeviceType( 'Mobile', 480 ) ).toBe( 768 );
+		expect( getCanvasHeightByDeviceType( 'Tablet', 782 ) ).toBe( 587 );
+		expect(
+			getCanvasHeightByDeviceType( 'Desktop', 1200 )
+		).toBeUndefined();
+		expect( getCanvasHeightByDeviceType( 'Mobile' ) ).toBeUndefined();
 	} );
 } );

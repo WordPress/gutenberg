@@ -171,6 +171,18 @@ _Related_
 
 -   getBlockSelectionStart in core/block-editor store.
 
+### getCanvasHeight
+
+Returns the device preview canvas height in pixels, derived from the canvas width using the device aspect ratio. Only applies when the canvas width matches the device preset (set via the Preview dropdown), so dragging away from the preset frees the frame to fill the editor. Returns `undefined` for desktop or when no device height applies.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `number|undefined`: The canvas height in pixels, or undefined.
+
 ### getClientIdsOfDescendants
 
 _Related_

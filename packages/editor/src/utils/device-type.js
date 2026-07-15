@@ -22,13 +22,14 @@ const TABLET_DEVICE_TYPE = 'Tablet';
 const MOBILE_DEVICE_TYPE = 'Mobile';
 
 /**
- * Fixed device preview heights. Used to give the editor canvas a
- * device-shaped frame in mobile and tablet previews. These are display
- * dimensions for the preview frame, not responsive breakpoints.
+ * Device preview aspect ratios (height / width). Used to give the editor
+ * canvas a device-shaped frame in mobile and tablet previews. These are
+ * display ratios for the preview frame, not responsive breakpoints.
+ * Mobile is portrait (taller than wide), tablet is landscape.
  */
-const DEVICE_HEIGHT_BY_DEVICE_TYPE = {
-	[ MOBILE_DEVICE_TYPE ]: 768,
-	[ TABLET_DEVICE_TYPE ]: 1024,
+const DEVICE_ASPECT_RATIO_BY_DEVICE_TYPE = {
+	[ MOBILE_DEVICE_TYPE ]: 8 / 5,
+	[ TABLET_DEVICE_TYPE ]: 3 / 4,
 };
 
 /**
@@ -96,20 +97,19 @@ export function getCanvasWidthByDeviceType( deviceType, viewportSettings ) {
 }
 
 /**
- * Gets the preview frame height by device type. Returns a fixed pixel
- * height for mobile and tablet so the canvas keeps a device-shaped
- * aspect ratio, and `undefined` for desktop so the frame fills the
- * editor.
+ * Gets the preview frame height for a device type, derived from the canvas
+ * width using the device aspect ratio. Returns `undefined` for desktop (or when
+ * no width is available) so the frame fills the editor.
  *
- * @param {string} deviceType The device type.
- * @return {number|undefined} The preview height in pixels, or undefined
- *                             when no fixed height applies.
+ * @param {string} deviceType  The device type.
+ * @param {number} canvasWidth The canvas width in pixels.
+ * @return {number|undefined} The preview height in pixels, or undefined when no
+ *                             fixed height applies.
  */
-export function getCanvasHeightByDeviceType( deviceType ) {
-	return Object.prototype.hasOwnProperty.call(
-		DEVICE_HEIGHT_BY_DEVICE_TYPE,
-		deviceType
-	)
-		? DEVICE_HEIGHT_BY_DEVICE_TYPE[ deviceType ]
-		: undefined;
+export function getCanvasHeightByDeviceType( deviceType, canvasWidth ) {
+	const ratio = DEVICE_ASPECT_RATIO_BY_DEVICE_TYPE[ deviceType ];
+
+	if ( ratio && canvasWidth > 0 ) {
+		return Math.round( canvasWidth * ratio );
+	}
 }
