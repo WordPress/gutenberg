@@ -63,7 +63,7 @@ export default function GuidelineAccordionForm( {
 
 	const form: Form = useMemo(
 		() => ( {
-			layout: { type: 'regular', labelPosition: 'none' },
+			layout: { type: 'regular', labelPosition: 'top' },
 			fields: [ 'guidelines' ],
 		} ),
 		[]
