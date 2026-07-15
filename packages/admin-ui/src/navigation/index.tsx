@@ -58,7 +58,7 @@ export const Navigation = ( {
 				className={ styles.list }
 			>
 				{ items.map( ( item ) => (
-					<li key={ item.href }>
+					<li key={ item.href } className={ styles.li }>
 						<Text
 							variant="body-md"
 							className={ styles.item }

@@ -8,10 +8,28 @@
 	overflow-x: auto;
 }
 
-.list > li {
+.li {
 	flex-shrink: 0;
 }
 
-.list .item {
+.item {
+	display: flex;
+	align-items: center;
+	/**
+	 * Meet the minimum 44x44px pointer target size (WCAG 2.5.8). No design
+	 * token maps to this accessibility constant.
+	 */
+	min-block-size: 44px;
+	color: var(--wpds-color-foreground-interactive-neutral-weak);
+	font-weight: var(--wpds-typography-font-weight-default);
 	text-decoration: none;
+}
+
+.item:hover {
+	color: var(--wpds-color-foreground-interactive-neutral-weak-active);
+}
+
+.item[aria-current="page"] {
+	color: var(--wpds-color-foreground-interactive-neutral-weak-active);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
