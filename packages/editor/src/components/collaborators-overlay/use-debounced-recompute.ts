@@ -41,22 +41,22 @@ export function useDebouncedRecompute(
  */
 export function useRequestAnimationFrameRecompute(): [ number, () => void ] {
 	const [ recomputeToken, setRecomputeToken ] = useState( 0 );
-	const rafRef = useRef< number | null >( null );
+	const requestAnimationFrameRef = useRef< number | null >( null );
 
 	useEffect( () => {
 		return () => {
-			if ( rafRef.current !== null ) {
-				cancelAnimationFrame( rafRef.current );
+			if ( requestAnimationFrameRef.current !== null ) {
+				cancelAnimationFrame( requestAnimationFrameRef.current );
 			}
 		};
 	}, [] );
 
 	const rerenderOnNextFrame = useCallback( () => {
-		if ( rafRef.current !== null ) {
-			cancelAnimationFrame( rafRef.current );
+		if ( requestAnimationFrameRef.current !== null ) {
+			cancelAnimationFrame( requestAnimationFrameRef.current );
 		}
-		rafRef.current = requestAnimationFrame( () => {
-			rafRef.current = null;
+		requestAnimationFrameRef.current = requestAnimationFrame( () => {
+			requestAnimationFrameRef.current = null;
 			setRecomputeToken( ( t ) => t + 1 );
 		} );
 	}, [] );
