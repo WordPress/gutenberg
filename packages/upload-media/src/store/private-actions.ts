@@ -1206,13 +1206,15 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				item.id,
 				item.file,
 				args.resize,
-				false, // smartCrop
-				addSuffix,
-				item.abortController?.signal,
-				scaledSuffix,
-				args.quality,
-				imageStripMeta,
-				imageMaxBitDepth
+				{
+					smartCrop: false,
+					addSuffix,
+					signal: item.abortController?.signal,
+					scaledSuffix,
+					quality: args.quality,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+				}
 			);
 
 			measure( {
@@ -1379,10 +1381,12 @@ export function transcodeImageItem(
 				item.id,
 				item.file,
 				outputMimeType,
-				quality,
-				interlaced,
-				imageStripMeta,
-				imageMaxBitDepth
+				{
+					quality,
+					interlaced,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+				}
 			);
 
 			measure( {
