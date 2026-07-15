@@ -121,7 +121,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 					onCancel={ unselectNote }
 					labels={ {
 						input: __( 'New note' ),
-						placeholder: __( 'Write note or mention with @' ),
+						placeholder: __( 'Add a note or @ mention' ),
 					} }
 				/>
 			</NoteCard>

@@ -331,7 +331,7 @@ export function NoteThread( {
 								note.id,
 								note.author_name
 							),
-							placeholder: __( 'Reply or mention with @' ),
+							placeholder: __( 'Reply or @ mention' ),
 						} }
 					/>
 				</NoteCard>
