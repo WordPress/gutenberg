@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-require_once __DIR__ . '/../compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-with-mask.php';
+require_once __DIR__ . '/../compat/wordpress-7.2/class-gutenberg-rest-attachments-controller-with-mask.php';
 
 /**
  * REST API controller for media attachments.

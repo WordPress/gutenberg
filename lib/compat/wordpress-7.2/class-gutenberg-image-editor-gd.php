@@ -22,6 +22,7 @@ class Gutenberg_Image_Editor_GD extends WP_Image_Editor_GD {
 
 		if ( isset( $args['methods'] ) && in_array( 'mask', $args['methods'], true ) ) {
 			return (
+				self::supports_mime_type( 'image/png' ) &&
 				function_exists( 'imagealphablending' ) &&
 				function_exists( 'imagecolorallocatealpha' ) &&
 				function_exists( 'imagefilledrectangle' ) &&

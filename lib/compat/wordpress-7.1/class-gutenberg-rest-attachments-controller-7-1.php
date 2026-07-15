@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-require_once __DIR__ . '/class-gutenberg-rest-attachments-controller-with-mask.php';
+require_once __DIR__ . '/../wordpress-7.2/class-gutenberg-rest-attachments-controller-with-mask.php';
 
 /**
  * Controller which provides REST endpoint for retrieving attachments.

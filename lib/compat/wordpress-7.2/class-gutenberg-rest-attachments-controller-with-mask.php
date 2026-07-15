@@ -41,6 +41,7 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 		if ( isset( $args['modifiers']['items']['oneOf'] ) && is_array( $args['modifiers']['items']['oneOf'] ) ) {
 			$args['modifiers']['items']['oneOf'][] = array(
 				'title'      => __( 'Mask', 'gutenberg' ),
+				'type'       => 'object',
 				'properties' => array(
 					'type' => array(
 						'description' => __( 'Mask type. Masks are applied after flip, rotate, and crop modifiers, regardless of position.', 'gutenberg' ),
@@ -104,7 +105,7 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 	 * Applies Core-supported edits and a circle mask before inserting the new attachment.
 	 *
 	 * This is a fork of WP_REST_Attachments_Controller::edit_media_item(), last
-	 * synced against WordPress 7.1. Core applies its modifiers inside a closed
+	 * synced against WordPress 7.2. Core applies its modifiers inside a closed
 	 * `switch` with no hook at "apply this modifier" time, so there is no way to
 	 * inject the `mask` modifier without owning the loop; extending the method
 	 * means copying it. Keep this method as close to verbatim Core as possible
@@ -192,21 +193,29 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 		$image_editor = wp_get_image_editor(
 			$image_file_to_edit,
 			array(
-				'methods'   => array( 'mask' ),
-				'mime_type' => $mime_type,
+				'methods'          => array( 'mask' ),
+				'mime_type'        => $mime_type,
+				'output_mime_type' => 'image/png',
 			)
 		);
 		remove_filter( 'wp_image_editors', 'gutenberg_register_mask_image_editors' );
 
 		if ( is_wp_error( $image_editor ) ) {
+			if ( 'image_no_editor' === $image_editor->get_error_code() ) {
+				return new WP_Error(
+					'rest_image_mask_unsupported',
+					__( 'Unable to mask this image.', 'gutenberg' ),
+					array( 'status' => 500 )
+				);
+			}
+
 			return new WP_Error(
-				'rest_image_mask_unsupported',
-				__( 'Unable to mask this image.', 'gutenberg' ),
+				'rest_unknown_image_file_type',
+				__( 'Unable to edit this image.', 'gutenberg' ),
 				array( 'status' => 500 )
 			);
 		}
 
-		$has_mask_modifier = false;
 		foreach ( $modifiers as $modifier ) {
 			$args = $modifier['args'];
 			switch ( $modifier['type'] ) {
@@ -276,17 +285,8 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 						);
 					}
 
-					$has_mask_modifier = true;
 					break;
 			}
-		}
-
-		if ( ! $has_mask_modifier ) {
-			return new WP_Error(
-				'rest_image_mask_failed',
-				__( 'Unable to mask this image.', 'gutenberg' ),
-				array( 'status' => 400 )
-			);
 		}
 
 		/*
@@ -318,7 +318,7 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 			$output_mime_type = 'image/png';
 		}
 
-		$output_extension = wp_get_default_extension_for_mime_type( $output_mime_type );
+		$output_ext = wp_get_default_extension_for_mime_type( $output_mime_type );
 
 		// Calculate the file name.
 		$image_ext  = pathinfo( $image_file, PATHINFO_EXTENSION );
@@ -336,7 +336,7 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 			$image_name .= '-edited';
 		}
 
-		$filename = "{$image_name}.{$output_extension}";
+		$filename = "{$image_name}.{$output_ext}";
 
 		// Create the uploads subdirectory if needed.
 		$uploads = wp_upload_dir();
@@ -349,9 +349,9 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 		 * output-format filter during the save so it cannot remap the chosen
 		 * format back to an opaque one, which would discard the mask.
 		 */
-		add_filter( 'image_editor_output_format', '__return_empty_array', 100 );
+		add_filter( 'image_editor_output_format', '__return_empty_array', PHP_INT_MAX );
 		$saved = $image_editor->save( $uploads['path'] . "/$filename", $output_mime_type );
-		remove_filter( 'image_editor_output_format', '__return_empty_array', 100 );
+		remove_filter( 'image_editor_output_format', '__return_empty_array', PHP_INT_MAX );
 
 		if ( is_wp_error( $saved ) ) {
 			return $saved;
@@ -363,7 +363,7 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 		// Check request fields and assign default values.
 		$new_attachment_post                 = $this->prepare_item_for_database( $request );
 		$new_attachment_post->post_mime_type = $saved['mime-type'];
-		$new_attachment_post->guid           = $uploads['url'] . "/$filename";
+		$new_attachment_post->guid           = $uploads['url'] . '/' . $saved['file'];
 
 		// Unset ID so wp_insert_attachment generates a new ID.
 		unset( $new_attachment_post->ID );
