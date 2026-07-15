@@ -1417,17 +1417,11 @@ export function getListViewChildParentId( state, contentClientIds ) {
 		return null;
 	}
 	const parents = getBlockParents( state, selectedId );
-	for ( const parentId of parents ) {
-		if ( ! contentClientIds?.includes( parentId ) ) {
-			continue;
-		}
-		const parentName = getBlockName( state, parentId );
-		if (
-			parentName === 'core/navigation' ||
-			hasBlockSupport( parentName, 'listView' )
-		) {
-			return parentId;
-		}
-	}
-	return null;
+	return (
+		parents.find(
+			( parentId ) =>
+				contentClientIds?.includes( parentId ) &&
+				shouldRenderBlockListView( state, parentId )
+		) ?? null
+	);
 }

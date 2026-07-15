@@ -2605,6 +2605,7 @@ describe( 'private selectors', () => {
 
 		const makeState = ( clientId ) => ( {
 			blocks: baseBlocks,
+			blockListSettings: new Map(),
 			selection: {
 				selectionStart: clientId ? { clientId } : {},
 				selectionEnd: clientId ? { clientId } : {},
@@ -2682,6 +2683,7 @@ describe( 'private selectors', () => {
 			const nestedContentIds = [ 'outer-list-view', 'inner-list-view' ];
 			const nestedState = {
 				blocks: nestedBlocks,
+				blockListSettings: new Map(),
 				selection: {
 					selectionStart: { clientId: 'deep-child' },
 					selectionEnd: { clientId: 'deep-child' },
