@@ -8,7 +8,7 @@ import { __experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitF
  */
 import {
 	getCustomValueFromPreset,
-	isValuePreset as isPresetValue,
+	isValuePreset,
 } from '../preset-input-control/utils';
 
 const BORDER_RADIUS_PRESET_TYPE = 'border-radius';
@@ -190,7 +190,7 @@ export function convertPresetsToCustomValues( values, presets ) {
 	const converted = {};
 	Object.keys( values ).forEach( ( key ) => {
 		const value = values[ key ];
-		if ( isPresetValue( value, BORDER_RADIUS_PRESET_TYPE ) ) {
+		if ( isValuePreset( value, BORDER_RADIUS_PRESET_TYPE ) ) {
 			const customValue = getCustomValueFromPreset(
 				value,
 				presets,
