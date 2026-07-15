@@ -188,11 +188,11 @@ export default function RevisionsCodeDiff() {
 									className={ `editor-revisions-code-diff__line is-${ row.status }` }
 								>
 									{ showDiff && (
-										<td className="editor-revisions-code-diff__line-number">
+										<td className="editor-revisions-code-diff__line-number is-previous">
 											{ row.previousLineNumber }
 										</td>
 									) }
-									<td className="editor-revisions-code-diff__line-number">
+									<td className="editor-revisions-code-diff__line-number is-current">
 										{ row.currentLineNumber }
 									</td>
 									{ showDiff && (
