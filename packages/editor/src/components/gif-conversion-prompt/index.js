@@ -1,21 +1,14 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	CheckboxControl,
-	Flex,
-	FlexItem,
-	Modal,
-} from '@wordpress/components';
+import { Button, Flex, FlexItem, Modal } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { switchToBlockType } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
-import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useRegistry, useSelect } from '@wordpress/data';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { __, _n } from '@wordpress/i18n';
-import { store as preferencesStore } from '@wordpress/preferences';
 import { store as uploadStore } from '@wordpress/upload-media';
 
 /**
@@ -96,8 +89,7 @@ async function swapImageBlocksToVideo( registry, attachmentId ) {
 
 /**
  * Whether the GIF conversion prompt is currently shown: there are animated
- * GIF uploads awaiting a decision and no remembered preference resolves
- * them automatically.
+ * GIF uploads awaiting a decision.
  *
  * Shared with the upload progress snackbar, which stays hidden while the
  * prompt is open so the prompt is the single point of attention.
@@ -105,19 +97,13 @@ async function swapImageBlocksToVideo( registry, attachmentId ) {
  * @return {boolean} Whether the prompt is visible.
  */
 export function useIsGifConversionPromptVisible() {
-	return useSelect( ( select ) => {
-		const preference =
-			select( preferencesStore ).get(
-				'core/media',
-				'animatedGifUploads'
-			) ?? 'ask';
-		if ( preference !== 'ask' ) {
-			return false;
-		}
-		return unlock( select( uploadStore ) )
-			.getGifConversions()
-			.some( ( conversion ) => conversion.status === 'pending' );
-	}, [] );
+	return useSelect(
+		( select ) =>
+			unlock( select( uploadStore ) )
+				.getGifConversions()
+				.some( ( conversion ) => conversion.status === 'pending' ),
+		[]
+	);
 }
 
 /**
@@ -129,25 +115,13 @@ export function useIsGifConversionPromptVisible() {
  * action. Uploads themselves are never blocked: the GIF uploads as a plain
  * image in the background while this prompt is open, and the answer only
  * decides whether a companion video is transcoded and the block swapped.
- * The answer can be remembered in the `core/media` `animatedGifUploads`
- * preference, in which case the prompt no longer appears: 'video' converts
- * every animated GIF automatically, 'gif' keeps them all as GIFs.
  */
 export default function GifConversionPrompt() {
 	const registry = useRegistry();
-	const { conversions, preference } = useSelect(
-		( select ) => ( {
-			conversions: unlock( select( uploadStore ) ).getGifConversions(),
-			preference:
-				select( preferencesStore ).get(
-					'core/media',
-					'animatedGifUploads'
-				) ?? 'ask',
-		} ),
+	const conversions = useSelect(
+		( select ) => unlock( select( uploadStore ) ).getGifConversions(),
 		[]
 	);
-	const { set: setPreference } = useDispatch( preferencesStore );
-	const [ rememberChoice, setRememberChoice ] = useState( false );
 	const convertButtonRef = useRef();
 	// Conversion records whose block swap is already running, so a re-render
 	// while the async swap is in flight doesn't start a second one.
@@ -167,19 +141,6 @@ export default function GifConversionPrompt() {
 			),
 		[ conversions ]
 	);
-
-	// A remembered 'video' choice resolves new uploads without prompting.
-	useEffect( () => {
-		if ( preference !== 'video' || ! pending.length ) {
-			return;
-		}
-		const { resolveGifConversion } = unlock(
-			registry.dispatch( uploadStore )
-		);
-		for ( const { itemId } of pending ) {
-			resolveGifConversion( itemId, 'video' );
-		}
-	}, [ preference, pending, registry ] );
 
 	// Once a conversion finishes, swap the corresponding Image blocks to the
 	// Video block's GIF variation and drop the record.
@@ -202,7 +163,7 @@ export default function GifConversionPrompt() {
 		}
 	}, [ converted, registry ] );
 
-	const isModalVisible = preference === 'ask' && pending.length > 0;
+	const isModalVisible = pending.length > 0;
 
 	// Steer towards converting: focus the primary button so Enter converts.
 	useEffect( () => {
@@ -217,25 +178,20 @@ export default function GifConversionPrompt() {
 
 	const count = pending.length;
 
-	const resolveAll = ( decision, remember ) => {
+	const resolveAll = ( decision ) => {
 		const { resolveGifConversion } = unlock(
 			registry.dispatch( uploadStore )
 		);
 		for ( const { itemId } of pending ) {
 			resolveGifConversion( itemId, decision );
 		}
-		if ( remember ) {
-			setPreference( 'core/media', 'animatedGifUploads', decision );
-		}
-		setRememberChoice( false );
 	};
 
 	return (
 		<Modal
 			title={ _n( 'Convert to video', 'Convert to videos', count ) }
-			// Closing the dialog keeps the GIF for this upload only,
-			// without remembering anything.
-			onRequestClose={ () => resolveAll( 'gif', false ) }
+			// Closing the dialog keeps the GIF for this upload.
+			onRequestClose={ () => resolveAll( 'gif' ) }
 			size="small"
 			focusOnMount={ false }
 		>
@@ -247,20 +203,12 @@ export default function GifConversionPrompt() {
 						count
 					) }
 				</p>
-				<CheckboxControl
-					label={ __( 'Remember my choice' ) }
-					help={ __( 'You can change this anytime in Preferences.' ) }
-					checked={ rememberChoice }
-					onChange={ setRememberChoice }
-				/>
 				<Flex direction="row" justify="flex-end">
 					<FlexItem>
 						<Button
 							variant="tertiary"
 							__next40pxDefaultSize
-							onClick={ () =>
-								resolveAll( 'gif', rememberChoice )
-							}
+							onClick={ () => resolveAll( 'gif' ) }
 						>
 							{ __( 'Not now' ) }
 						</Button>
@@ -270,9 +218,7 @@ export default function GifConversionPrompt() {
 							variant="primary"
 							__next40pxDefaultSize
 							ref={ convertButtonRef }
-							onClick={ () =>
-								resolveAll( 'video', rememberChoice )
-							}
+							onClick={ () => resolveAll( 'video' ) }
 						>
 							{ __( 'Convert' ) }
 						</Button>

@@ -101,19 +101,6 @@ class GifToVideoUtils {
 	}
 
 	/**
-	 * Sets the animated GIF uploads preference directly.
-	 *
-	 * @param {string} value 'ask', 'gif', or 'video'.
-	 */
-	async setGifUploadsPreference( value ) {
-		await this.page.evaluate( ( preferenceValue ) => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/media', 'animatedGifUploads', preferenceValue );
-		}, value );
-	}
-
-	/**
 	 * Wait for the upload-media store queue to drain.
 	 *
 	 * @param {number} timeout Timeout in milliseconds.
@@ -227,9 +214,6 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 	test.beforeEach( async ( { admin, gifToVideoUtils } ) => {
 		await admin.createNewPost();
 		await gifToVideoUtils.skipIfGifConversionInactive( test );
-		// The prompt tests rely on the default 'ask' behavior; reset it in
-		// case a previous test remembered a choice.
-		await gifToVideoUtils.setGifUploadsPreference( 'ask' );
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
@@ -405,75 +389,5 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		} );
 		expect( media.mime_type ).toBe( 'image/gif' );
 		expect( media.media_details?.animated_video ).toBeUndefined();
-	} );
-
-	test( 'remembers the choice and stops prompting', async ( {
-		editor,
-		gifToVideoUtils,
-	} ) => {
-		await gifToVideoUtils.uploadAnimatedGif();
-
-		const dialog = gifToVideoUtils.getPromptDialog();
-		await expect( dialog ).toBeVisible( { timeout: 60_000 } );
-		await dialog
-			.getByRole( 'checkbox', { name: 'Remember my choice' } )
-			.check();
-		await dialog.getByRole( 'button', { name: 'Not now' } ).click();
-		await expect( dialog ).toBeHidden();
-
-		// The choice is persisted to the core/media preference.
-		const preference = await gifToVideoUtils.page.evaluate( () =>
-			window.wp.data
-				.select( 'core/preferences' )
-				.get( 'core/media', 'animatedGifUploads' )
-		);
-		expect( preference ).toBe( 'gif' );
-
-		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
-
-		// The next upload is not prompted: the GIF uploads as a plain image
-		// with no conversion offered.
-		await editor.insertBlock( { name: 'core/image' } );
-		const imageBlocks = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		await gifToVideoUtils.upload(
-			imageBlocks.last().locator( 'data-testid=form-file-upload-input' ),
-			ANIMATED_GIF_FIXTURE
-		);
-		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
-
-		await expect( gifToVideoUtils.getPromptDialog() ).toBeHidden();
-		const blocks = await gifToVideoUtils.getBlocks();
-		expect( blocks.some( ( block ) => block.name === 'core/video' ) ).toBe(
-			false
-		);
-		for ( const image of blocks.filter(
-			( block ) => block.name === 'core/image'
-		) ) {
-			expect( image.attributes.url ).toMatch( /\.gif(\?.*)?$/i );
-		}
-	} );
-
-	test( 'converts automatically when the preference is video', async ( {
-		gifToVideoUtils,
-	} ) => {
-		await gifToVideoUtils.setGifUploadsPreference( 'video' );
-		await gifToVideoUtils.uploadAnimatedGif();
-
-		// No prompt: the remembered choice resolves the conversion, and the
-		// block ends up as the Video block's GIF variation.
-		await gifToVideoUtils.waitForBlock( 'core/video' );
-		await expect( gifToVideoUtils.getPromptDialog() ).toBeHidden();
-
-		const videoBlock = ( await gifToVideoUtils.getBlocks() ).find(
-			( block ) => block.name === 'core/video'
-		);
-		expect( videoBlock.attributes.controls ).toBe( false );
-		expect( videoBlock.attributes.loop ).toBe( true );
-		expect( videoBlock.attributes.autoplay ).toBe( true );
-		expect( videoBlock.attributes.muted ).toBe( true );
-		expect( videoBlock.attributes.playsInline ).toBe( true );
-		expect( videoBlock.attributes.src ).toMatch( /\.(mp4|webm)(\?.*)?$/i );
 	} );
 } );
