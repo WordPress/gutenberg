@@ -225,7 +225,7 @@ describe( 'ReactionDisplay', () => {
 		await waitFor( () =>
 			expect(
 				screen.getByRole( 'button', {
-					name: 'Alice reacted with Heart emoji',
+					name: 'Alice reacted with Heart',
 				} )
 			).toBeVisible()
 		);
@@ -256,7 +256,7 @@ describe( 'ReactionDisplay', () => {
 		await waitFor( () =>
 			expect(
 				screen.getByRole( 'button', {
-					name: 'Alice, Bob, and 1 other reacted with Heart emoji',
+					name: 'Alice, Bob, and 1 other reacted with Heart',
 				} )
 			).toBeVisible()
 		);

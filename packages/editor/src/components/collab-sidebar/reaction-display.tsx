@@ -160,7 +160,7 @@ function formatReactionTooltip( names: string[], emojiLabel: string ): string {
 	if ( names.length === 1 ) {
 		return sprintf(
 			/* translators: 1: user name, 2: emoji label. */
-			__( '%1$s reacted with %2$s emoji' ),
+			__( '%1$s reacted with %2$s' ),
 			names[ 0 ],
 			emojiLabel
 		);
@@ -169,7 +169,7 @@ function formatReactionTooltip( names: string[], emojiLabel: string ): string {
 	if ( names.length === 2 ) {
 		return sprintf(
 			/* translators: 1: first user name, 2: second user name, 3: emoji label. */
-			__( '%1$s and %2$s reacted with %3$s emoji' ),
+			__( '%1$s and %2$s reacted with %3$s' ),
 			names[ 0 ],
 			names[ 1 ],
 			emojiLabel
@@ -180,8 +180,8 @@ function formatReactionTooltip( names: string[], emojiLabel: string ): string {
 	return sprintf(
 		/* translators: 1: first user name, 2: second user name, 3: number of other users, 4: emoji label. */
 		_n(
-			'%1$s, %2$s, and %3$d other reacted with %4$s emoji',
-			'%1$s, %2$s, and %3$d others reacted with %4$s emoji',
+			'%1$s, %2$s, and %3$d other reacted with %4$s',
+			'%1$s, %2$s, and %3$d others reacted with %4$s',
 			othersCount
 		),
 		names[ 0 ],
