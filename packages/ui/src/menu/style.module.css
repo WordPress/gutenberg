@@ -250,7 +250,7 @@
 		.external-link-indicator {
 			display: inline-block;
 			line-height: 1;
-			margin-inline-start: 0;
+			margin-inline-start: var(--wpds-dimension-gap-xs);
 			font-weight: var(--wpds-typography-font-weight-default);
 			text-decoration: none;
 		}
