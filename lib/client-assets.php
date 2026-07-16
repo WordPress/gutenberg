@@ -125,8 +125,10 @@ function gutenberg_register_packages_styles( $styles ) {
 	$version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 	$suffix  = SCRIPT_DEBUG ? '' : '.min';
 
-	// wp-components: add dashicons (icon font dependency)
-	$styles->query( 'wp-components', 'registered' )->deps[] = 'dashicons';
+	// wp-components: add dashicons (icon font dependency) and design tokens.
+	$components_style         = $styles->query( 'wp-components', 'registered' );
+	$components_style->deps[] = 'dashicons';
+	$components_style->deps[] = 'wp-theme';
 
 	// wp-edit-post: add wp-edit-blocks (custom handle not auto-inferred)
 	$styles->query( 'wp-edit-post', 'registered' )->deps[] = 'wp-edit-blocks';
@@ -143,10 +145,10 @@ function gutenberg_register_packages_styles( $styles ) {
 	// wp-customize-widgets: add wp-edit-blocks (custom handle not auto-inferred)
 	$styles->query( 'wp-customize-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
 
-	// Register wp-theme (Design System tokens from @wordpress/theme) as a
-	// dependency of wp-base-styles so its `:root` token block loads
-	// everywhere wp-base-styles does, including the editor iframe via
-	// $wp_edit_blocks_dependencies below.
+	// Register wp-theme (Design System tokens from @wordpress/theme).
+	// wp-base-styles also depends on wp-theme so tokens load on admin pages
+	// that enqueue wp-admin but not wp-components. admin-schemes.css itself
+	// does not consume --wpds-* tokens; wp-components is the primary consumer.
 	gutenberg_override_style(
 		$styles,
 		'wp-theme',
