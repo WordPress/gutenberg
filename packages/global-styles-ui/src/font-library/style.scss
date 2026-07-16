@@ -173,10 +173,15 @@ $footer-height: 90px;
 	height: variables.$grid-unit-80 * 4 !important; // 256px
 
 	width: 100%;
-}
+	color: var(--wp-admin-theme-color);
+	cursor: var(--wpds-cursor-control);
+	border: variables.$border-width dashed var(--wp-admin-theme-color);
 
-button.font-library__upload-area {
-	background-color: colors.$gray-100;
+	&:hover {
+		background-color: color-mix(in srgb, var(--wp-admin-theme-color, #3858e9) 4%, transparent);
+		color: var(--wp-admin-theme-color-darker-20);
+		border-color: var(--wp-admin-theme-color-darker-20);
+	}
 }
 
 .font-library__local-fonts {
