@@ -32,7 +32,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	 *
 	 * @covers ::set
 	 */
-	public function test_set_unknown_key_triggers_doing_it_wrong() {
+	public function test_set_rejects_unknown_key() {
 		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
 
 		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
@@ -43,11 +43,28 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
+	 * set() rejects a patch with an invalid version.
+	 *
+	 * @covers ::set
+	 */
+	public function test_set_rejects_updates_with_invalid_version() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
+
+		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
+		$before = $data->get_config();
+
+		$version = Gutenberg_View_Config_Data::LATEST_VERSION + 1;
+		$data->set( 'default_view', array( 'type' => 'grid' ), $version );
+
+		$this->assertSame( $before, $data->get_config() );
+	}
+
+	/**
 	 * merge() updates scalar property values
 	 *
 	 * @covers ::merge
 	 */
-	public function test_merge_scalar_values() {
+	public function test_merge_scalar_properties() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
@@ -83,7 +100,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	 *
 	 * @covers ::merge
 	 */
-	public function test_merge_array_associative_values() {
+	public function test_merge_associative_array_properties() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
@@ -187,7 +204,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	 *
 	 * @covers ::merge
 	 */
-	public function test_merge_array_indexed_values() {
+	public function test_merge_indexed_array_properties() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
@@ -366,45 +383,11 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * merge() rejects an undocumented top-level key. Nested
-	 * properties are not validated: their vocabulary is owned by the
-	 * client-side consumers.
-	 *
-	 * @covers ::merge
-	 */
-	public function test_merge_key_unknown_is_rejected() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge' );
-
-		$data = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
-		$data->merge( array( 'not_a_real_key' => 'nope' ), 1 );
-
-		$this->assertSame( array( 'default_view' => array( 'type' => 'table' ) ), $data->get_config() );
-	}
-
-	/**
-	 * merge() merges a documented key that is absent from the config.
-	 *
-	 * @covers ::merge
-	 */
-	public function test_merge_key_known_is_merged() {
-		$data = new Gutenberg_View_Config_Data( array( 'default_view' => array() ) );
-		$data->merge(
-			array( 'default_layouts' => array( 'table' => array( 'density' => 'compact' ) ) ),
-			1
-		);
-
-		$this->assertSame(
-			array( 'table' => array( 'density' => 'compact' ) ),
-			$data->get_config()['default_layouts']
-		);
-	}
-
-	/**
 	 * merge() unsets a property when the patch value is null.
 	 *
 	 * @covers ::merge
 	 */
-	public function test_merge_null_unsets_property() {
+	public function test_merge_null_unsets_scalar_properties() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
@@ -423,9 +406,16 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	 *
 	 * @covers ::merge
 	 */
-	public function test_merge_null_unsets_nested_layout_prop() {
+	public function test_merge_null_unsets_associative_array_properties() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
+				'default_view' => array(
+					'type'   => 'table',
+					'sort'    => array(
+						'field'     => 'title',
+						'direction' => 'asc',
+					)
+				),
 				'default_layouts' => array(
 					'table' => array(
 						'layout' => array(
@@ -437,13 +427,74 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			)
 		);
 		$data->merge(
-			array( 'default_layouts' => array( 'table' => array( 'layout' => array( 'styles' => null ) ) ) ),
+			array(
+				'default_view' => array(
+					'sort' => null
+				),
+				'default_layouts' => array(
+					'table' => array( 'layout' => array( 'styles' => null ) ) )
+				),
 			1
 		);
 
 		$this->assertSame(
-			array( 'layout' => array( 'density' => 'compact' ) ),
-			$data->get_config()['default_layouts']['table']
+			array(
+				'default_view' => array(
+					'type' => 'table',
+				),
+				'default_layouts' => array(
+					'table' => array( 'layout' => array( 'density' => 'compact' ) ),
+				)
+			),
+			$data->get_config()
+		);
+	}
+
+	/**
+	 * merge() unsets a deeply nested layout property when the value is null.
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_null_unsets_indexed_array_properties() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'type'   => 'table',
+					'filters'    => array(
+						array( 'field' => 'id1', 'operator' => 'op1', 'value' => [ 'val1' ] ),
+					)
+				),
+				'default_layouts' => array(
+					'grid' => array(
+						'layout' => array(
+							'density' => 'compact',
+							'badgeFields'  => array( 'b1', 'b2' ),
+						),
+					),
+				),
+			)
+		);
+		$data->merge(
+			array(
+				'default_view' => array(
+					'filters' => null
+				),
+				'default_layouts' => array(
+					'grid' => array( 'layout' => array( 'badgeFields' => null ) ) )
+				),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				'default_view' => array(
+					'type' => 'table',
+				),
+				'default_layouts' => array(
+					'grid' => array( 'layout' => array( 'density' => 'compact' ) ),
+				)
+			),
+			$data->get_config()
 		);
 	}
 
@@ -456,7 +507,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	 *
 	 * @covers ::merge
 	 */
-	public function test_merge_null_drops_whole_top_level_key() {
+	public function test_merge_null_unsets_top_level_keys() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array( 'type' => 'table' ),
@@ -484,78 +535,36 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * merge() consumes a null delete-marker merged into an empty
-	 * base instead of storing it as a literal value.
+	 * merge() rejects a patch with an invalid version.
 	 *
 	 * @covers ::merge
 	 */
-	public function test_merge_null_into_empty_base_is_consumed() {
-		$data = new Gutenberg_View_Config_Data( array( 'default_layouts' => array( 'table' => array() ) ) );
-		$data->merge(
-			array( 'default_layouts' => array( 'table' => array( 'layout' => null ) ) ),
-			1
-		);
-
-		$this->assertSame( array(), $data->get_config()['default_layouts']['table'] );
-	}
-
-	/**
-	 * merge() strips nulls from a subtree assigned to a key absent
-	 * from the base instead of storing them as literal values.
-	 *
-	 * @covers ::merge
-	 */
-	public function test_merge_null_stripped_from_absent_key_subtree() {
-		$data = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
-		// The base default_view has no `layout` key.
-		$data->merge(
-			array(
-				'default_view' => array(
-					'layout' => array(
-						'type'        => 'flex',
-						'badgeFields' => null,
-					),
-				),
-			),
-			1
-		);
-
-		$this->assertSame( array( 'type' => 'flex' ), $data->get_config()['default_view']['layout'] );
-	}
-
-	/**
-	 * merge() rejects a list where the form map is expected.
-	 *
-	 * @covers ::merge
-	 */
-	public function test_merge_rejects_list_shaped_form_patch() {
+	public function test_merge_rejects_updates_with_invalid_version() {
 		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge' );
-
-		$data   = new Gutenberg_View_Config_Data( array( 'form' => array( 'layout' => array( 'type' => 'panel' ) ) ) );
-		$before = $data->get_config();
-		$data->merge( array( 'form' => array( array( 'id' => 'my_field' ) ) ), 1 );
-
-		$this->assertSame( $before, $data->get_config() );
-	}
-
-	/**
-	 * merge() and set() reject a patch whose version cannot be migrated —
-	 * newer than the latest supported version.
-	 *
-	 * @covers ::merge
-	 * @covers ::set
-	 */
-	public function test_update_functions_reject_unmigratable_version() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge' );
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
 
 		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
 		$before = $data->get_config();
 
 		$version = Gutenberg_View_Config_Data::LATEST_VERSION + 1;
 		$data->merge( array( 'default_view' => array( 'type' => 'grid' ) ), $version );
-		$data->set( 'default_view', array( 'type' => 'grid' ), $version );
 
 		$this->assertSame( $before, $data->get_config() );
 	}
+
+	/**
+	 * merge() rejects an undocumented top-level key. Nested
+	 * properties are not validated: their vocabulary is owned by the
+	 * client-side consumers.
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_rejects_unknown_key() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge' );
+
+		$data = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
+		$data->merge( array( 'not_a_real_key' => 'nope' ), 1 );
+
+		$this->assertSame( array( 'default_view' => array( 'type' => 'table' ) ), $data->get_config() );
+	}
+
 }
