@@ -127,7 +127,7 @@ class Gutenberg_View_Config_Data {
 	 * Scalar values replace the current value,
 	 * associative arrays merge key by key,
 	 * and numerical indexed arrays merge by member identity.
-	 * Identity is determined by finding a key (`id`, `slug`, `field`, `name`) within the item.
+	 * Identity is determined by finding a key (`id`, `slug`, `field`) within the item.
 	 * A member with no identity is always appended to the end of the list.
 	 *
 	 * For example, given this patch:
@@ -296,7 +296,7 @@ class Gutenberg_View_Config_Data {
 	 * The identity is simply the member's value cast to a string, regardless of
 	 * which key carries it: a bare scalar is its own identity, and a map is
 	 * identified by the value of the first of the well-known identity keys
-	 * (`id`, `slug`, `field`, `name`) it carries. Because the key is not part of
+	 * (`id`, `slug`, `field`) it carries. Because the key is not part of
 	 * the identity, a bare field like `'f3'` matches any map carrying that
 	 * value, whether it appears as `array( 'id' => 'f3' )`,
 	 * `array( 'slug' => 'f3' )`, and so on — this lets the same shorthand target
