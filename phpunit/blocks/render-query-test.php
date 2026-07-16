@@ -82,7 +82,7 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 	public function test_rendering_query_with_enhanced_pagination() {
 		global $wp_query, $wp_the_query, $paged;
 
-		$content = <<<'HTML'
+		$content = <<<HTML
 		<!-- wp:query {"queryId":0,"query":{"inherit":true},"enhancedPagination":true} -->
 		<div class="wp-block-query">
 			<!-- wp:post-template {"align":"wide"} -->
@@ -145,7 +145,7 @@ HTML;
 	public function test_rendering_query_with_enhanced_pagination_auto_disabled_when_plugins_blocks_are_found() {
 		global $wp_query, $wp_the_query;
 
-		$content = <<<'HTML'
+		$content = <<<HTML
 		<!-- wp:query {"queryId":0,"query":{"inherit":true},"enhancedPagination":true} -->
 		<div class="wp-block-query">
 			<!-- wp:post-template {"align":"wide"} -->
@@ -183,7 +183,7 @@ HTML;
 	public function test_rendering_nested_queries_with_enhanced_pagination_auto_disabled() {
 		global $wp_query, $wp_the_query;
 
-		$content = <<<'HTML'
+		$content = <<<HTML
 			<!-- wp:query {"queryId":0,"query":{"inherit":true},"enhancedPagination":true} -->
 			<div class="wp-block-query">
 				<!-- wp:post-template {"align":"wide"} -->
@@ -241,7 +241,7 @@ HTML;
 	public function test_rendering_query_with_enhanced_pagination_is_disabled_with_incompatible_block_inside_post_content() {
 		global $wp_query, $wp_the_query;
 
-		$content      = <<<'HTML'
+		$content      = <<<HTML
 		<!-- wp:query {"queryId":0,"query":{"inherit":true},"enhancedPagination":true} -->
 		<div class="wp-block-query">
 			<!-- wp:post-template {"align":"wide"} -->
@@ -274,7 +274,7 @@ HTML;
 	public function test_rendering_query_with_enhanced_pagination_with_compatible_blocks_inside_post_content() {
 		global $wp_query, $wp_the_query, $paged;
 
-		$content      = <<<'HTML'
+		$content      = <<<HTML
 		<!-- wp:query {"queryId":0,"query":{"inherit":true},"enhancedPagination":true} -->
 		<div class="wp-block-query">
 			<!-- wp:post-template {"align":"wide"} -->

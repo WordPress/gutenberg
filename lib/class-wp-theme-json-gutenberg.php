@@ -1051,7 +1051,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string $origin     Optional. What source of data this object represents.
 	 *                           One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
 	 */
-	public function __construct( $theme_json = array( 'version' => self::LATEST_SCHEMA ), $origin = 'theme' ) {
+	public function __construct( $theme_json = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA ), $origin = 'theme' ) {
 		if ( ! in_array( $origin, static::VALID_ORIGINS, true ) ) {
 			$origin = 'theme';
 		}

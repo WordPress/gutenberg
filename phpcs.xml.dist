@@ -22,10 +22,14 @@
 		<exclude name="Generic.CodeAnalysis.UnconditionalIfStatement"/>
 		<exclude name="Generic.CodeAnalysis.UnusedFunctionParameter"/>
 		<exclude name="Generic.CodeAnalysis.UselessOverridingMethod"/>
+		<exclude name="Generic.Strings.UnnecessaryHeredoc"/>
 		<exclude name="PSR2.Methods.MethodDeclaration"/>
+		<exclude name="Squiz.Classes.SelfMemberReference"/>
 		<exclude name="Squiz.Operators.IncrementDecrementUsage"/>
 		<exclude name="Squiz.PHP.CommentedOutCode"/>
 		<exclude name="Squiz.PHP.DisallowSizeFunctionsInLoops"/>
+		<exclude name="Universal.CodeAnalysis.StaticInFinalClass"/>
+		<exclude name="Universal.ControlStructures.DisallowLonelyIf"/>
 		<exclude name="Universal.Files.SeparateFunctionsFromOO"/>
 		<exclude name="WordPress.NamingConventions.ValidPostTypeSlug"/>
 		<exclude name="WordPress.PHP.DevelopmentFunctions"/>
@@ -42,16 +46,6 @@
 		<exclude name="WordPress.WP.GlobalVariablesOverride"/>
 	</rule>
 
-	<!--
-		The following files are synced to WordPress Core, so their existing
-		violations must be fixed in Core first to avoid requiring a backport.
-	-->
-	<rule ref="Universal.CodeAnalysis.StaticInFinalClass">
-		<exclude-pattern>/packages/style-engine/src/class-wp-style-engine\.php$</exclude-pattern>
-	</rule>
-	<rule ref="Universal.ControlStructures.DisallowLonelyIf">
-		<exclude-pattern>/packages/block-library/src/media-text/index\.php$</exclude-pattern>
-	</rule>
 
 	<rule ref="WordPress.WP.I18n">
 		<properties>
