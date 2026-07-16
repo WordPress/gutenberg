@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 33.0.0 (2026-07-14)
+
 ### Breaking Changes
 
 -   The `test-e2e` command now runs the Playwright-based end-to-end test runner instead of Puppeteer (`test-playwright` remains available as an alias). Removed the Puppeteer test environment and configuration (`jest-environment-puppeteer`, `jest-e2e.config.js`, `puppeteer.config.js`) along with the `puppeteer-core` and `expect-puppeteer` dependencies. Puppeteer-specific options (e.g. `--puppeteer-interactive`, `--puppeteer-devtools`) are no longer supported ([#60357](https://github.com/WordPress/gutenberg/issues/60357)).
