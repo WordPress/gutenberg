@@ -4,9 +4,8 @@
 
 ### Enhancements
 
--   Ship the package as a WordPress script module (`wpScriptModuleExports`),
-    so consumers resolve one shared instance from the import map instead of
-    bundling their own copy ([#80149](https://github.com/WordPress/gutenberg/pull/80149)).
+-   Ship the package as a WordPress script module
+    (`wpScriptModuleExports`) ([#80149](https://github.com/WordPress/gutenberg/pull/80149)).
 
 ### Documentation
 
