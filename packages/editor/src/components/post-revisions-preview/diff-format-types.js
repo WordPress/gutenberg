@@ -4,6 +4,21 @@
 import { __ } from '@wordpress/i18n';
 import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
 
+/**
+ * IDs of the visually-hidden description elements rendered into the
+ * revisions canvas (see revisions-canvas.js). Diff formats reference
+ * these via `aria-describedby` instead of a `title` attribute, since
+ * `title` is inconsistently announced by screen readers in
+ * low-verbosity modes.
+ */
+export const DIFF_DESCRIPTION_IDS = {
+	removed: 'revision-diff-removed-desc',
+	added: 'revision-diff-added-desc',
+	formatAdded: 'revision-diff-format-added-desc',
+	formatRemoved: 'revision-diff-format-removed-desc',
+	formatChanged: 'revision-diff-format-changed-desc',
+};
+
 const DIFF_FORMAT_TYPES = [
 	{
 		name: 'revision/diff-removed',
@@ -41,7 +56,7 @@ export function registerDiffFormatTypes() {
 	for ( const formatType of DIFF_FORMAT_TYPES ) {
 		registerFormatType( formatType.name, {
 			...formatType,
-			attributes: { title: 'title' },
+			attributes: { 'aria-describedby': 'aria-describedby' },
 			edit: () => null,
 		} );
 	}
