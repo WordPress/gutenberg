@@ -973,6 +973,7 @@ describe( 'saveEntityRecord', () => {
 			'local-undo-ignored',
 			{ isSave: true }
 		);
+		expect( syncManager.update ).toHaveBeenCalledTimes( 1 );
 		expect( liveSyncState ).toEqual( {
 			isSaved: true,
 			title: 'synced title',
@@ -1021,6 +1022,13 @@ describe( 'saveEntityRecord', () => {
 			edits
 		)( { select, dispatch, resolveSelect } );
 
+		expect( syncManager.update ).toHaveBeenNthCalledWith(
+			1,
+			'postType/post',
+			10,
+			edits,
+			'local-undo-ignored'
+		);
 		expect( syncManager.update ).toHaveBeenCalledWith(
 			'postType/post',
 			10,
@@ -1030,7 +1038,120 @@ describe( 'saveEntityRecord', () => {
 			'local-undo-ignored',
 			{ isSave: true }
 		);
+		expect( syncManager.update ).toHaveBeenCalledTimes( 2 );
 		expect( result ).toBe( updatedRecord );
+	} );
+
+	it( 'syncs direct save changes before pre-persisting the record', async () => {
+		const persistedRecord = {
+			id: 10,
+			status: 'auto-draft',
+			template: '',
+		};
+		const edits = {
+			id: 10,
+			template: 'page-no-title',
+		};
+		const syncManager = {
+			update: jest.fn(),
+		};
+		const prePersist = jest.fn( async () => {
+			expect( syncManager.update ).toHaveBeenCalledTimes( 1 );
+			expect( syncManager.update ).toHaveBeenLastCalledWith(
+				'postType/page',
+				10,
+				edits,
+				'local-undo-ignored'
+			);
+
+			return { status: 'draft' };
+		} );
+		const configs = [
+			{
+				name: 'page',
+				kind: 'postType',
+				baseURL: '/wp/v2/pages',
+				syncConfig: {},
+				__unstablePrePersist: prePersist,
+			},
+		];
+		const select = {
+			getRawEntityRecord: () => persistedRecord,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+		const updatedRecord = {
+			...persistedRecord,
+			...edits,
+			status: 'draft',
+		};
+		apiFetch.mockImplementation( () => updatedRecord );
+		getSyncManager.mockReturnValue( syncManager );
+
+		const result = await saveEntityRecord(
+			'postType',
+			'page',
+			edits
+		)( { select, dispatch, resolveSelect } );
+
+		expect( prePersist ).toHaveBeenCalledWith( persistedRecord, edits );
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/pages/10',
+			method: 'PUT',
+			data: { ...edits, status: 'draft' },
+		} );
+		expect( syncManager.update ).toHaveBeenNthCalledWith(
+			2,
+			'postType/page',
+			10,
+			{ status: 'draft' },
+			'local-undo-ignored',
+			{ isSave: true }
+		);
+		expect( syncManager.update ).toHaveBeenCalledTimes( 2 );
+		expect( result ).toBe( updatedRecord );
+	} );
+
+	it( 'does not mark pre-synced direct save changes as saved when the request fails', async () => {
+		const persistedRecord = {
+			id: 10,
+			template: '',
+		};
+		const edits = {
+			id: 10,
+			template: 'page-no-title',
+		};
+		const configs = [
+			{
+				name: 'page',
+				kind: 'postType',
+				baseURL: '/wp/v2/pages',
+				syncConfig: {},
+			},
+		];
+		const syncManager = {
+			update: jest.fn(),
+		};
+		const select = {
+			getRawEntityRecord: () => persistedRecord,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+		const error = new Error( 'API error' );
+		apiFetch.mockRejectedValue( error );
+		getSyncManager.mockReturnValue( syncManager );
+
+		await expect(
+			saveEntityRecord( 'postType', 'page', edits, {
+				throwOnError: true,
+			} )( { select, dispatch, resolveSelect } )
+		).rejects.toBe( error );
+
+		expect( syncManager.update ).toHaveBeenCalledTimes( 1 );
+		expect( syncManager.update ).toHaveBeenCalledWith(
+			'postType/page',
+			10,
+			edits,
+			'local-undo-ignored'
+		);
 	} );
 
 	it( 'passes server-normalized edited fields to SyncManager#update after saving', async () => {
@@ -1079,6 +1200,7 @@ describe( 'saveEntityRecord', () => {
 			'local-undo-ignored',
 			{ isSave: true }
 		);
+		expect( syncManager.update ).toHaveBeenCalledTimes( 2 );
 		expect( result ).toBe( updatedRecord );
 	} );
 
@@ -1142,6 +1264,7 @@ describe( 'saveEntityRecord', () => {
 			'local-undo-ignored',
 			{ isSave: true }
 		);
+		expect( syncManager.update ).toHaveBeenCalledTimes( 2 );
 		expect( result ).toBe( updatedRecord );
 	} );
 
@@ -1295,6 +1418,7 @@ describe( 'saveEntityRecord', () => {
 			'local-undo-ignored',
 			{ isSave: true }
 		);
+		expect( syncManager.update ).toHaveBeenCalledTimes( 1 );
 		expect( result ).toBe( updatedRecord );
 	} );
 

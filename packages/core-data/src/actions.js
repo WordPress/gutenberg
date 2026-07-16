@@ -31,11 +31,17 @@ function addTitleToAutoDraft( record ) {
 	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
 }
 
-function getServerMutatedFields( updatedRecord, persistedRecord, edits ) {
+function getServerMutatedFields(
+	updatedRecord,
+	persistedRecord,
+	syncedChanges
+) {
 	return Object.fromEntries(
 		Object.entries( updatedRecord ).filter( ( [ key, value ] ) => {
 			const baseline =
-				key in edits ? edits[ key ] : persistedRecord[ key ];
+				key in syncedChanges
+					? syncedChanges[ key ]
+					: persistedRecord[ key ];
 
 			// The save response nests raw attributes as `{ raw, rendered }`
 			// while the baseline holds raw strings; compare raw values so the
@@ -778,6 +784,23 @@ export const saveEntityRecord =
 						);
 					}
 				} else {
+					// `saveEntityRecord` can be called directly, bypassing
+					// `editEntityRecord`, so make sure its changes enter the
+					// CRDT before the persisted document is created below.
+					if (
+						entityConfig.syncConfig &&
+						! __unstableSkipSyncUpdate &&
+						! isNewRecord &&
+						persistedRecord
+					) {
+						getSyncManager()?.update(
+							`${ kind }/${ name }`,
+							recordId,
+							record,
+							LOCAL_UNDO_IGNORED_ORIGIN
+						);
+					}
+
 					let edits = record;
 					if ( entityConfig.__unstablePrePersist ) {
 						edits = {
@@ -811,7 +834,7 @@ export const saveEntityRecord =
 							syncChanges = getServerMutatedFields(
 								updatedRecord,
 								persistedRecord,
-								edits
+								record
 							);
 						}
 
