@@ -33,8 +33,8 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function MenuPopup(
 			>
 				<div
 					/*
-					 * `styles.list` flattens this wrapper so menu items can
-					 * participate in the popup's shared grid.
+					 * `styles.list` provides the alignment scope for items
+					 * that are not inside an explicit Menu.Group.
 					 */
 					className={ styles.list }
 				>

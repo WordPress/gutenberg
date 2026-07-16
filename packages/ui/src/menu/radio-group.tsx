@@ -12,7 +12,7 @@ const RadioGroup = forwardRef< HTMLDivElement, RadioGroupProps >(
 		return (
 			<_Menu.RadioGroup
 				ref={ ref }
-				className={ clsx( styles.group, className ) }
+				className={ clsx( styles[ 'radio-group' ], className ) }
 				{ ...props }
 			/>
 		);

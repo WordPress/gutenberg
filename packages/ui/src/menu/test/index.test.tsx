@@ -9,6 +9,16 @@ function queryItemPrefix( item: HTMLElement ) {
 	return item.querySelector< HTMLElement >( '.style-item-prefix' );
 }
 
+function queryItemContent( item: HTMLElement ) {
+	return item.querySelector< HTMLElement >( '.style-item-content' );
+}
+
+function queryItemSelectionIndicator( item: HTMLElement ) {
+	return item.querySelector< HTMLElement >(
+		'.style-item-selection-indicator'
+	);
+}
+
 function queryItemLabel( item: HTMLElement ) {
 	return item.querySelector< HTMLElement >( '.style-item-label' );
 }
@@ -373,6 +383,48 @@ describe( 'Menu', () => {
 		expect( queryItemPrefix( itemWithPrefix ) ).toHaveTextContent(
 			'Prefix'
 		);
+	} );
+
+	it( 'keeps shared alignment slots outside the item-local content', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.CheckboxItem
+						checked
+						prefix="Prefix"
+						shortcut={ {
+							displayShortcut: '⌘S',
+							ariaKeyShortcut: 'Meta+S',
+							description: 'Command S',
+						} }
+						suffix="Suffix"
+					>
+						Save
+					</Menu.CheckboxItem>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		const item = await screen.findByRole( 'menuitemcheckbox', {
+			name: 'Save',
+		} );
+		const content = queryItemContent( item );
+		const prefix = queryItemPrefix( item );
+		const selectionIndicator = queryItemSelectionIndicator( item );
+
+		expect( selectionIndicator ).toBeInTheDocument();
+		expect( prefix ).toBeInTheDocument();
+		expect( content ).toBeInTheDocument();
+		expect( content ).toContainElement( queryItemLabel( item ) );
+		expect( content ).toContainElement( queryItemSuffix( item ) );
+		expect( content ).toContainElement( queryItemShortcut( item ) );
+		expect( content ).not.toContainElement( prefix );
+		expect( content ).not.toContainElement( selectionIndicator );
 	} );
 
 	it( 'supports link items that open in a new tab', async () => {
