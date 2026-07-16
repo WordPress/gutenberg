@@ -59,12 +59,19 @@ describe( 'SearchControl', () => {
 			expect(
 				screen.queryByRole( 'button', { name: 'Reset search' } )
 			).not.toBeInTheDocument();
+			// The input shouldn't reserve suffix padding when there's no suffix.
+			expect( searchInput ).not.toHaveStyle( {
+				paddingInlineEnd: 'calc(4px * 1)',
+			} );
 
 			await type( 'test', searchInput );
 			const resetButton = screen.getByRole( 'button', {
 				name: 'Reset search',
 			} );
 			expect( resetButton ).toBeVisible();
+			expect( searchInput ).toHaveStyle( {
+				paddingInlineEnd: 'calc(4px * 1)',
+			} );
 
 			await click( resetButton );
 			expect( searchInput ).toHaveValue( '' );
