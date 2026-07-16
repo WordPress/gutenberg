@@ -16,3 +16,20 @@ html :where(.wp-block-column) {
 	margin-top: 0;
 	margin-bottom: 0;
 }
+
+// Stretch the appender to fill empty Column blocks, so the whole column area
+// acts as a visible drop zone when dragging blocks into it.
+.wp-block-column:has(> .block-list-appender:only-child) {
+	display: flex;
+	flex-direction: column;
+}
+
+.wp-block-column > .block-list-appender:only-child {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+
+	.block-editor-button-block-appender {
+		flex: 1;
+	}
+}
