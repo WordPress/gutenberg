@@ -293,10 +293,8 @@
 
 	&.is-small {
 		height: var(--wpds-dimension-size-sm);
-		// 22px has no exact WPDS line-height token match (sm is 20px, md is 24px).
-		line-height: 22px;
+		line-height: var(--wpds-typography-line-height-sm);
 		padding: 0 var(--wpds-dimension-padding-sm);
-		font-size: var(--wpds-typography-font-size-xs);
 
 		&.has-icon:not(.has-text) {
 			padding: 0;
