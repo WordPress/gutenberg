@@ -25,10 +25,32 @@ import {
 	getSyncManager,
 } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
-import { getRawValue } from './utils/crdt';
+import {
+	getRawValue,
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+} from './utils/crdt';
 
 function addTitleToAutoDraft( record ) {
 	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
+}
+
+// Post meta is applied to the CRDT one subkey at a time, so compare the save
+// response at the same granularity to avoid carrying stale sibling values.
+function getServerMutatedMetaFields( updatedMeta, persistedMeta, syncedMeta ) {
+	const baseline = { ...persistedMeta, ...syncedMeta };
+
+	return Object.fromEntries(
+		Object.entries( updatedMeta ?? {} ).filter( ( [ key, value ] ) => {
+			if ( key === POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ) {
+				// The persisted CRDT snapshot may change on save and is
+				// intentionally excluded from CRDT meta synchronization, so it
+				// is not a server mutation.
+				return false;
+			}
+
+			return ! fastDeepEqual( value, baseline[ key ] );
+		} )
+	);
 }
 
 function getServerMutatedFields(
@@ -37,7 +59,19 @@ function getServerMutatedFields(
 	syncedChanges
 ) {
 	return Object.fromEntries(
-		Object.entries( updatedRecord ).filter( ( [ key, value ] ) => {
+		Object.entries( updatedRecord ).flatMap( ( [ key, value ] ) => {
+			if ( key === 'meta' ) {
+				const serverMutatedMeta = getServerMutatedMetaFields(
+					value,
+					persistedRecord.meta,
+					syncedChanges.meta
+				);
+
+				return Object.keys( serverMutatedMeta ).length
+					? [ [ key, serverMutatedMeta ] ]
+					: [];
+			}
+
 			const baseline =
 				key in syncedChanges
 					? syncedChanges[ key ]
@@ -46,10 +80,12 @@ function getServerMutatedFields(
 			// The save response nests raw attributes as `{ raw, rendered }`
 			// while the baseline holds raw strings; compare raw values so the
 			// shape difference does not read as a server mutation.
-			return ! fastDeepEqual(
+			const wasServerMutated = ! fastDeepEqual(
 				getRawValue( value ) ?? value,
 				getRawValue( baseline ) ?? baseline
 			);
+
+			return wasServerMutated ? [ [ key, value ] ] : [];
 		} )
 	);
 }

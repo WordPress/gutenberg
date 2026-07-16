@@ -1042,6 +1042,151 @@ describe( 'saveEntityRecord', () => {
 		expect( result ).toBe( updatedRecord );
 	} );
 
+	it( 'does not pass unchanged meta fields to SyncManager#update after saving', async () => {
+		const persistedRecord = {
+			id: 10,
+			content: 'Initial content',
+			meta: {
+				plugin_value: 'persisted',
+				peer_value: 'persisted',
+				_crdt_document: 'old-doc',
+			},
+		};
+		const edits = {
+			id: 10,
+			content: 'Updated content',
+		};
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+				__unstablePrePersist: async () => ( {
+					meta: { _crdt_document: 'new-doc' },
+				} ),
+			},
+		];
+		const syncManager = {
+			update: jest.fn(),
+		};
+		const select = {
+			getRawEntityRecord: () => persistedRecord,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+		const updatedRecord = {
+			...persistedRecord,
+			content: edits.content,
+			meta: {
+				plugin_value: 'persisted',
+				peer_value: 'persisted',
+				_crdt_document: 'new-doc',
+			},
+		};
+		apiFetch.mockImplementation( () => updatedRecord );
+		getSyncManager.mockReturnValue( syncManager );
+
+		const result = await saveEntityRecord(
+			'postType',
+			'post',
+			edits
+		)( { select, dispatch, resolveSelect } );
+
+		expect( syncManager.update ).toHaveBeenNthCalledWith(
+			2,
+			'postType/post',
+			10,
+			{},
+			'local-undo-ignored',
+			{ isSave: true }
+		);
+		expect( syncManager.update ).toHaveBeenCalledTimes( 2 );
+		expect( result ).toBe( updatedRecord );
+	} );
+
+	it( 'passes only server-mutated meta fields to SyncManager#update after saving', async () => {
+		const persistedRecord = {
+			id: 10,
+			meta: {
+				unchanged: 'persisted',
+				peer_value: 'persisted',
+				edited: 'initial',
+				server_mutated: 'before',
+				settings: { color: 'blue', size: 'small' },
+			},
+		};
+		const edits = {
+			id: 10,
+			meta: {
+				edited: 'local',
+				server_mutated: 'Needs Normalizing',
+			},
+		};
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+				__unstablePrePersist: async () => ( {
+					meta: {
+						...edits.meta,
+						_crdt_document: 'new-doc',
+					},
+				} ),
+			},
+		];
+		const syncManager = {
+			update: jest.fn(),
+		};
+		const select = {
+			getRawEntityRecord: () => persistedRecord,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+		const updatedRecord = {
+			id: 10,
+			meta: {
+				unchanged: 'persisted',
+				peer_value: 'persisted',
+				edited: 'local',
+				server_mutated: 'needs-normalizing',
+				settings: { color: 'red', size: 'small' },
+				_crdt_document: 'new-doc',
+			},
+		};
+		apiFetch.mockImplementation( () => updatedRecord );
+		getSyncManager.mockReturnValue( syncManager );
+
+		const result = await saveEntityRecord(
+			'postType',
+			'post',
+			edits
+		)( { select, dispatch, resolveSelect } );
+
+		expect( syncManager.update ).toHaveBeenNthCalledWith(
+			1,
+			'postType/post',
+			10,
+			edits,
+			'local-undo-ignored'
+		);
+		expect( syncManager.update ).toHaveBeenNthCalledWith(
+			2,
+			'postType/post',
+			10,
+			{
+				meta: {
+					server_mutated: 'needs-normalizing',
+					settings: { color: 'red', size: 'small' },
+				},
+			},
+			'local-undo-ignored',
+			{ isSave: true }
+		);
+		expect( syncManager.update ).toHaveBeenCalledTimes( 2 );
+		expect( result ).toBe( updatedRecord );
+	} );
+
 	it( 'syncs direct save changes before pre-persisting the record', async () => {
 		const persistedRecord = {
 			id: 10,
