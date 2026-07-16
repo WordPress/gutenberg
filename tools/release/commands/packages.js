@@ -548,11 +548,12 @@ async function getPreparedNpmReleasePackages(
 	deps = {}
 ) {
 	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
-	const changedPaths = (
+	const changedManifests = (
 		await git.raw(
 			'diff-tree',
 			'--no-commit-id',
-			'--name-only',
+			'--name-status',
+			'--diff-filter=AM',
 			'-r',
 			`${ publishCommit }^`,
 			publishCommit,
@@ -561,22 +562,29 @@ async function getPreparedNpmReleasePackages(
 		)
 	)
 		.split( '\n' )
-		.filter( Boolean );
+		.filter( Boolean )
+		.map( ( line ) => {
+			const [ status, packageJSONPath ] = line.split( '\t' );
+			return { packageJSONPath, status };
+		} );
 
 	const packages = await Promise.all(
-		changedPaths.map( async ( packageJSONPath ) => {
+		changedManifests.map( async ( { packageJSONPath, status } ) => {
 			const packageJson = JSON.parse(
 				await git.raw(
 					'show',
 					`${ publishCommit }:${ packageJSONPath }`
 				)
 			);
-			const previousPackageJson = JSON.parse(
-				await git.raw(
-					'show',
-					`${ publishCommit }^:${ packageJSONPath }`
-				)
-			);
+			const previousPackageJson =
+				status === 'A'
+					? null
+					: JSON.parse(
+							await git.raw(
+								'show',
+								`${ publishCommit }^:${ packageJSONPath }`
+							)
+					  );
 			return { packageJson, previousPackageJson };
 		} )
 	);
@@ -585,7 +593,8 @@ async function getPreparedNpmReleasePackages(
 		.filter(
 			( { packageJson, previousPackageJson } ) =>
 				packageJson.private !== true &&
-				packageJson.version !== previousPackageJson.version
+				( previousPackageJson === null ||
+					packageJson.version !== previousPackageJson.version )
 		)
 		.map( ( { packageJson: { name, version } } ) => ( {
 			name,

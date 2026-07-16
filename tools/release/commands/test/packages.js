@@ -464,7 +464,7 @@ describe( 'getPreparedNpmReleasePackages', () => {
 			raw: jest
 				.fn()
 				.mockResolvedValueOnce(
-					'packages/a11y/package.json\npackages/blocks/package.json\npackages/private/package.json\n'
+					'M\tpackages/a11y/package.json\nM\tpackages/blocks/package.json\nM\tpackages/private/package.json\n'
 				)
 				.mockImplementation( ( commandName, manifestRef ) =>
 					Promise.resolve( manifestByRef[ manifestRef ] )
@@ -486,6 +486,42 @@ describe( 'getPreparedNpmReleasePackages', () => {
 			'show',
 			'publish-sha:packages/a11y/package.json'
 		);
+	} );
+
+	it( 'includes added public packages and excludes removed manifests', async () => {
+		const git = {
+			raw: jest
+				.fn()
+				.mockResolvedValueOnce( 'A\tpackages/new/package.json\n' )
+				.mockResolvedValueOnce(
+					'{"name":"@wordpress/new","version":"1.0.0"}'
+				),
+		};
+
+		await expect(
+			getPreparedNpmReleasePackages( '/repo', 'publish-sha', {
+				git,
+			} )
+		).resolves.toEqual( [
+			{
+				name: '@wordpress/new',
+				tagName: '@wordpress/new@1.0.0',
+				version: '1.0.0',
+			},
+		] );
+		expect( git.raw ).toHaveBeenNthCalledWith(
+			1,
+			'diff-tree',
+			'--no-commit-id',
+			'--name-status',
+			'--diff-filter=AM',
+			'-r',
+			'publish-sha^',
+			'publish-sha',
+			'--',
+			'packages/*/package.json'
+		);
+		expect( git.raw ).toHaveBeenCalledTimes( 2 );
 	} );
 } );
 
