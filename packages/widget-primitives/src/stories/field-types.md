@@ -24,7 +24,7 @@ registerFieldType( {
 } );
 ```
 
-`name` is any lowercase identifier, plain (`location`) or namespaced (`acme/location`). Resolution is registry-first, so a registered name wins over a DataViews built-in of the same name; prefer names that don't mirror the built-in list. `baseType` names the DataViews type whose built-in behavior (sort, operators, validation semantics) the resolved field inherits; the definition supplies only what differs. First registration wins.
+`name` is one or two lowercase kebab-case segments, each starting with a letter and using only letters, digits, and hyphens: plain (`location`) or namespaced with a single `/` (`acme/location`). Resolution is registry-first, so a registered name wins over a DataViews built-in of the same name; prefer names that don't mirror the built-in list. `baseType` names the DataViews type whose built-in behavior (sort, operators, validation semantics) the resolved field inherits; the definition supplies only what differs. First registration wins.
 
 ## Referencing
 

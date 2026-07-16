@@ -219,6 +219,12 @@ export interface Settings {
 	// Default image quality (0-1) for resize/crop operations.
 	// Default is 0.82 if not set.
 	imageQuality?: number;
+	// Whether to strip image metadata (except color profiles) when encoding,
+	// from the `image_strip_meta` filter. Default is true (matching WordPress core).
+	imageStripMeta?: boolean;
+	// Maximum output bit depth for generated images, from the
+	// `image_max_bit_depth` filter. Default is 16 (no cap).
+	imageMaxBitDepth?: number;
 	// Function for finalizing an upload after all client-side processing is complete.
 	// May return the up-to-date attachment so the queue and block markup can pick
 	// up the post-finalize URL (the scaled file), which is required for `srcset`.

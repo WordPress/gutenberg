@@ -2,9 +2,18 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- `resizeImage`, `compressImage`, and `convertImageFormat` now accept their optional parameters (`quality`, `interlaced`, `smartCrop`, `stripMeta`, `maxBitdepth`) as a single trailing `options` object instead of positional arguments ([#80328](https://github.com/WordPress/gutenberg/issues/80328)).
+
+### Enhancements
+
+- Add optional `stripMeta` and `maxBitdepth` options to `resizeImage`, `compressImage`, and `convertImageFormat`, so callers can keep all image metadata and cap the output bit depth, mirroring WordPress core's `image_strip_meta` and `image_max_bit_depth` filters ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
+
 ### Bug Fixes
 
--   `resizeImage`: Generate sub-sizes of animated images from the first frame only, matching WordPress core's server-side behavior. Re-encoding a full animated GIF per sub-size took tens of seconds per size for long GIFs and could produce sub-sizes larger than the original file ([#80266](https://github.com/WordPress/gutenberg/issues/80266)).
+- `convertImageFormat`: Only decode all animation frames when the output format supports animation. Converting a long animated GIF to a still format (e.g. a JPEG poster) previously decoded every frame as one vertical strip, which exceeded the JPEG encoder's 65,500 px dimension limit and produced a film-strip image instead of a single frame ([#80259](https://github.com/WordPress/gutenberg/issues/80259)).
+- `resizeImage`: Generate sub-sizes of animated images from the first frame only, matching WordPress core's server-side behavior. Re-encoding a full animated GIF per sub-size took tens of seconds per size for long GIFs and could produce sub-sizes larger than the original file ([#80266](https://github.com/WordPress/gutenberg/issues/80266)).
 
 ## 2.4.0 (2026-07-14)
 
