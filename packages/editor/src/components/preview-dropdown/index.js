@@ -18,7 +18,7 @@ import { desktop, mobile, tablet, external, check } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { ActionItem } from '@wordpress/interface';
+import { ActionItem, store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { VisuallyHidden } from '@wordpress/ui';
@@ -28,6 +28,7 @@ import { VisuallyHidden } from '@wordpress/ui';
  */
 import { store as editorStore } from '../../store';
 import { PostPreviewMenuItem } from '../post-preview-button';
+import { sidebars } from '../sidebar/constants';
 import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
 
@@ -45,6 +46,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		isTemplateHidden,
 		templateId,
 		isResponsiveEditing,
+		hasBlockSelection,
+		activeComplementaryArea,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostType,
@@ -52,15 +55,16 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			getRenderingMode,
 			getDeviceType,
 		} = unlock( select( editorStore ) );
-		const { isResponsiveEditing: _isResponsiveEditing } = unlock(
-			select( blockEditorStore )
-		);
-		const blockEditorSettings = select( blockEditorStore ).getSettings();
+		const {
+			isResponsiveEditing: _isResponsiveEditing,
+			getBlockSelectionStart,
+			getSettings,
+		} = unlock( select( blockEditorStore ) );
 		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
 		const _currentPostType = getCurrentPostType();
 		const viewportBreakpoints = getViewportBreakpoints(
-			blockEditorSettings.__experimentalFeatures?.viewport
+			getSettings().__experimentalFeatures?.viewport
 		);
 		return {
 			deviceType: getDeviceType(),
@@ -73,6 +77,9 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			isTemplateHidden: getRenderingMode() === 'post-only',
 			templateId: getCurrentTemplateId(),
 			isResponsiveEditing: _isResponsiveEditing(),
+			hasBlockSelection: !! getBlockSelectionStart(),
+			activeComplementaryArea:
+				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
 		};
 	}, [] );
 	const { setDeviceType, setRenderingMode, setDefaultRenderingMode } = unlock(
@@ -80,6 +87,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	);
 	const { resetZoomLevel, setStyleStateViewport, setResponsiveEditing } =
 		unlock( useDispatch( blockEditorStore ) );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const handleDevicePreviewChange = ( newDeviceType ) => {
 		setDeviceType( newDeviceType );
@@ -94,6 +102,15 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 				? VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
 				: 'default'
 		);
+		// Only auto-open the block inspector when enabling responsive styles
+		// for a selected block and no complementary area is already open.
+		if (
+			newIsResponsiveEditing &&
+			hasBlockSelection &&
+			! activeComplementaryArea
+		) {
+			enableComplementaryArea( 'core', sidebars.block );
+		}
 	};
 
 	const isMobile = useViewportMatch( 'medium', '<' );
