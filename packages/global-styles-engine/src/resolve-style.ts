@@ -535,36 +535,43 @@ function computeResolvedStyle( {
 	return { value, sources };
 }
 
-// Shared memo for `resolveStyle`, keyed by the raw Global Styles payload
-// identity and a `(blockName, ownVariation, selectedState)` composite.
-const memo = new WeakMap< object, Map< string, ResolvedStyle > >();
+const NO_LINKS = {};
+
+// Two-level memo: keyed by the raw Global Styles payload identity, then by the
+// `_links` map identity, then by a `(blockName, ownVariation, selectedState)`
+// string. Keying on both object identities means a change to either the styles
+// payload or the theme-file links produces a fresh entry.
+const memo = new WeakMap<
+	object,
+	WeakMap< object, Map< string, ResolvedStyle > >
+>();
 
 /**
- * Public entry point. Builds the merged Global Styles payload and source map
- * for a block (see `computeResolvedStyle` for the argument shape), memoized by
- * Global Styles object identity and a composite of the remaining arguments.
+ * Public, memoized entry point for `computeResolvedStyle`. The active
+ * variation's styles are resolved internally from `ownVariation`.
  *
- * The active variation's styles are resolved internally from `ownVariation`.
- * Keying the memo on the variation slug (a stable string shared by every
- * consumer of the same selection) lets all inspector panels collapse to a
- * single cascade merge per selection.
+ * Panels for the same selection share one `globalStyles.styles` payload, so
+ * keying on it (not the per-hook `{ styles }` wrapper) collapses them to a
+ * single cascade merge.
  *
  * @param args
  * @return Merged panel-scoped payload and source map; may be a cache hit.
  */
 export function resolveStyle( args: ResolveStyleArgs ): ResolvedStyle {
-	// Key the memo on the raw styles payload rather than the `{ styles }`
-	// wrapper. Each panel hook wraps the same stable payload in its own
-	// wrapper object, so keying on the shared payload lets all consumers hit
-	// one cascade merge per selection instead of recomputing an identical one.
 	const styleData = args?.globalStyles?.styles;
 	if ( ! styleData || typeof styleData !== 'object' ) {
 		return computeResolvedStyle( args );
 	}
-	let inner = memo.get( styleData );
+	let byLinks = memo.get( styleData );
+	if ( ! byLinks ) {
+		byLinks = new WeakMap();
+		memo.set( styleData, byLinks );
+	}
+	const linksKey = args._links ?? NO_LINKS;
+	let inner = byLinks.get( linksKey );
 	if ( ! inner ) {
 		inner = new Map();
-		memo.set( styleData, inner );
+		byLinks.set( linksKey, inner );
 	}
 	const selectedStateKey = args.selectedState
 		? `${ args.selectedState.viewport ?? '' }:${

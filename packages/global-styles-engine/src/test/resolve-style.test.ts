@@ -683,6 +683,41 @@ describe( 'resolveStyle – memoization', () => {
 		expect( a ).not.toBe( b );
 	} );
 
+	test( 'same globalStyles but different _links → re-computed', () => {
+		// Same styles payload identity, different theme-file links. The memo
+		// must key on `_links` too, so the second call resolves the image
+		// against its own links instead of returning the first cache hit.
+		const gs = {
+			styles: {
+				blocks: {
+					'core/paragraph': {
+						background: {
+							backgroundImage: {
+								url: 'file:./img.jpg',
+								source: 'file',
+							},
+						},
+					},
+				},
+			},
+		};
+		const buildWithLinks = ( href ) =>
+			resolveStyle( {
+				blockName: 'core/paragraph',
+				globalStyles: gs,
+				_links: {
+					'wp:theme-file': [ { name: 'file:./img.jpg', href } ],
+				},
+			} ).value.background.backgroundImage.url;
+
+		expect( buildWithLinks( 'https://example.test/a.jpg' ) ).toBe(
+			'https://example.test/a.jpg'
+		);
+		expect( buildWithLinks( 'https://example.test/b.jpg' ) ).toBe(
+			'https://example.test/b.jpg'
+		);
+	} );
+
 	test( 'falsy globalStyles delegates to the pure builder', () => {
 		const { value: a } = resolveStyle( {
 			blockName: 'core/paragraph',
