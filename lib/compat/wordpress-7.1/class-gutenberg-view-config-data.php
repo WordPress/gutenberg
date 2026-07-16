@@ -126,7 +126,23 @@ class Gutenberg_View_Config_Data {
 	 *
 	 * Scalar values replace the current value,
 	 * associative arrays merge key by key,
-	 * and indexed arrays merge by member identity.
+	 * and numerical indexed arrays merge by member identity.
+	 * Identity is determined by finding a key (`id`, `slug`, `field`, `name`) within the item.
+	 * A member with no identity is always appended to the end of the list.
+	 *
+	 * For example, given this patch:
+	 *
+	 * ```php
+	 * array(
+	 *   'default_view' => array( 'search' => 'new search', 'fields' => array( 'newField' ) )
+	 *   'default_layouts' => array( 'grid' => array( 'layout' => array( 'badgeFields' => array( 'newField' ) ) ) ),
+	 *   'view_list' => array( array( 'slug' => 'table', 'title' => 'New title' ) )
+	 * )
+	 * ```
+	 *
+	 * - default_view will be updated so the search string is 'new search' and the newField is appened to the list of fields.
+	 * - default_layouts will be updated so that newField is appended to the badgeFields.
+	 * - view_list will be updated so that the view with slug 'table' has its title changed to 'New title'.
 	 *
 	 * @since 7.1.0
 	 *
@@ -190,17 +206,6 @@ class Gutenberg_View_Config_Data {
 	}
 
 	/**
-	 * Merges a `default_view`, `default_layouts`, `form`, or `view_list` value,
-	 * treating numerically indexed arrays (lists) as collections merged by
-	 * identity.
-	 *
-	 * It recurses through maps and merges lists element by element: a member
-	 * whose identity
-	 * (a scalar's own value, or a map's `id`/`slug`/`field`/`name`) matches an
-	 * existing member merges into it in place — recursively by these same rules,
-	 * so a list nested inside a member merges by identity too — and an unmatched
-	 * member is appended. Members without an identity (e.g. nested lists) are
-	 * always appended, so a list of such values grows rather than replacing.
 	 *
 	 * @since 7.1.0
 	 *
@@ -209,10 +214,12 @@ class Gutenberg_View_Config_Data {
 	 * @return mixed The merged value.
 	 */
 	private function merge_properties( $current, $incoming ) {
+		// Scalar properties are merged as-is.
 		if ( ! is_array( $incoming ) ) {
 			return $incoming;
 		}
 
+		// Numerical indexed arrays are expected to be lists (sequential integer keys starting at 0).
 		if ( array_is_list( $incoming ) ) {
 			return $this->merge_list_by_identity(
 				is_array( $current ) && array_is_list( $current ) ? $current : array(),
@@ -220,21 +227,21 @@ class Gutenberg_View_Config_Data {
 			);
 		}
 
-		// Merge onto the current map, or onto an empty base when the current
-		// value is absent, empty, or not a map, so null delete-markers in the
-		// patch are consumed rather than stored as literal values.
+		// Consider any other array as associative (keys are strings).
 		$result = is_array( $current ) && ! array_is_list( $current ) ? $current : array();
 		foreach ( $incoming as $key => $value ) {
+			// A null patch value deletes the property.
 			if ( null === $value ) {
-				// A null patch value deletes the key.
 				unset( $result[ $key ] );
 				continue;
 			}
+
 			$result[ $key ] = $this->merge_properties(
 				array_key_exists( $key, $result ) ? $result[ $key ] : array(),
 				$value
 			);
 		}
+
 		return $result;
 	}
 
@@ -260,6 +267,8 @@ class Gutenberg_View_Config_Data {
 		foreach ( $incoming as $item ) {
 			$identity = $this->list_item_identity( $item );
 
+			// Find the index of the existing member with the same identity, if any.
+			// If there's none, append the incoming member to the end of the list.
 			$index = null;
 			if ( null !== $identity ) {
 				foreach ( $result as $i => $existing ) {
@@ -269,11 +278,12 @@ class Gutenberg_View_Config_Data {
 					}
 				}
 			}
-
 			if ( null === $index ) {
 				$result[] = $item;
 				continue;
 			}
+
+			// Otherwise, merge the incoming member into the existing one in place.
 			$result[ $index ] = $this->merge_properties( $result[ $index ], $item );
 		}
 
@@ -299,6 +309,7 @@ class Gutenberg_View_Config_Data {
 		if ( is_scalar( $item ) ) {
 			return 'id:' . $item;
 		}
+
 		if ( is_array( $item ) && ! array_is_list( $item ) ) {
 			foreach ( array( 'id', 'slug', 'field', 'name' ) as $key ) {
 				if ( isset( $item[ $key ] ) && is_scalar( $item[ $key ] ) ) {
@@ -306,6 +317,7 @@ class Gutenberg_View_Config_Data {
 				}
 			}
 		}
+
 		return null;
 	}
 }
