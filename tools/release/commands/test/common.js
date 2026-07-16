@@ -17,7 +17,9 @@ describe( 'findPluginReleaseBranchName', () => {
 			findPluginReleaseBranchName( '/repo', { git } )
 		).resolves.toBe( 'release/18.7' );
 
-		expect( git.fetch ).toHaveBeenCalledWith( 'origin', 'trunk' );
+		expect( git.fetch ).toHaveBeenCalledWith( 'origin', 'trunk', [
+			'--depth=1',
+		] );
 		expect( git.show ).toHaveBeenCalledWith( 'FETCH_HEAD:package.json' );
 	} );
 } );

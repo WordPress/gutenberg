@@ -19,7 +19,7 @@ async function findPluginReleaseBranchName(
 	deps = {}
 ) {
 	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
-	await git.fetch( 'origin', 'trunk' );
+	await git.fetch( 'origin', 'trunk', [ '--depth=1' ] );
 	const mainPackageJson = JSON.parse(
 		await git.show( 'FETCH_HEAD:package.json' )
 	);
