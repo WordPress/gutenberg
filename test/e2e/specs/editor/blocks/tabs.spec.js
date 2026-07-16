@@ -166,6 +166,8 @@ test.describe( 'Tabs', () => {
 			// The new tab's panel is the active one and is visible.
 			const panels = editor.canvas.getByRole( 'document', {
 				name: 'Block: Tab Panel',
+				exact: true,
+				includeHidden: true,
 			} );
 			await expect( panels ).toHaveCount( 3 );
 			await expect( panels.nth( 2 ) ).toBeVisible();
