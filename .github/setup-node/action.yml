@@ -30,6 +30,7 @@ runs:
           id: node-version
           run: |
               echo "NODE_VERSION=$(node -v)" >> "$GITHUB_OUTPUT"
+              echo "NPM_VERSION=$(npm -v)" >> "$GITHUB_OUTPUT"
           shell: bash
 
         - name: Cache node_modules
@@ -46,7 +47,7 @@ runs:
                   test/*/node_modules
                   tools/*/node_modules
                   widgets/*/node_modules
-              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
+              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-npm-${{ steps.node-version.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
 
         - name: Install npm dependencies
           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
