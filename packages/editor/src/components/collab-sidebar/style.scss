@@ -257,21 +257,25 @@ mark.wp-note {
 	white-space: nowrap;
 	text-decoration: none;
 
-	// Interactive states, since the chip look drops the link underline.
-	&:hover,
-	&:active {
-		background: var(--wpds-color-background-interactive-brand-weak-active);
-		color: var(--wpds-color-foreground-interactive-brand-active);
-	}
-
 	// Focus ring matching `ExternalLink`/`Link`; 0-width at rest avoids a stray forced-colors outline.
 	outline: 0 solid transparent;
 	outline-offset: 1px;
 
+	// Also clears the wp-admin common.css `a:focus` shadow/color/radius, which outrank the base rule.
 	&:focus {
 		outline:
 			var(--wpds-border-width-focus) solid
 			var(--wpds-color-stroke-focus);
+		box-shadow: none;
+		border-radius: var(--wpds-border-radius-sm);
+		color: var(--wpds-color-foreground-interactive-brand);
+	}
+
+	// Interactive states, since the chip look drops the link underline. After `:focus` so hover wins when both apply.
+	&:hover,
+	&:active {
+		background: var(--wpds-color-background-interactive-brand-weak-active);
+		color: var(--wpds-color-foreground-interactive-brand-active);
 	}
 
 	// Restore the underline when forced-colors drops the background tint.
