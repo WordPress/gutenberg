@@ -37,12 +37,16 @@ interface BlockStylesNavigationScreensProps {
 	parentMenu: string;
 	blockStyles: any[];
 	blockName: string;
+	selectedViewport?: string;
+	showViewportStateControl?: boolean;
 }
 
 function BlockStylesNavigationScreens( {
 	parentMenu,
 	blockStyles,
 	blockName,
+	selectedViewport,
+	showViewportStateControl,
 }: BlockStylesNavigationScreensProps ) {
 	return (
 		<>
@@ -51,7 +55,12 @@ function BlockStylesNavigationScreens( {
 					key={ index }
 					path={ parentMenu + '/variations/' + style.name }
 				>
-					<ScreenBlock name={ blockName } variation={ style.name } />
+					<ScreenBlock
+						name={ blockName }
+						variation={ style.name }
+						selectedViewport={ selectedViewport }
+						showViewportStateControl={ showViewportStateControl }
+					/>
 				</Navigator.Screen>
 			) ) }
 		</>
@@ -61,6 +70,8 @@ function BlockStylesNavigationScreens( {
 interface ContextScreensProps {
 	name?: string;
 	parentMenu?: string;
+	selectedViewport?: string;
+	showViewportStateControl?: boolean;
 }
 
 interface GlobalStylesNavigationScreenProps {
@@ -68,7 +79,12 @@ interface GlobalStylesNavigationScreenProps {
 	children: React.ReactNode;
 }
 
-function ContextScreens( { name, parentMenu = '' }: ContextScreensProps ) {
+function ContextScreens( {
+	name,
+	parentMenu = '',
+	selectedViewport,
+	showViewportStateControl,
+}: ContextScreensProps ) {
 	const blockStyleVariations = useSelect(
 		( select ) => {
 			if ( ! name ) {
@@ -89,6 +105,8 @@ function ContextScreens( { name, parentMenu = '' }: ContextScreensProps ) {
 			parentMenu={ parentMenu }
 			blockStyles={ blockStyleVariations }
 			blockName={ name || '' }
+			selectedViewport={ selectedViewport }
+			showViewportStateControl={ showViewportStateControl }
 		/>
 	);
 }
@@ -110,6 +128,10 @@ interface GlobalStylesUIProps {
 	serverCSS?: { isGlobalStyles?: boolean }[];
 	/** Server settings for BlockEditorProvider (optional) */
 	serverSettings?: { __unstableResolvedAssets: Record< string, unknown > };
+	/** Selected viewport state (optional) */
+	selectedViewport?: string;
+	/** Whether to show viewport state controls (optional) */
+	showViewportStateControl?: boolean;
 }
 
 export function GlobalStylesUI( {
@@ -121,6 +143,8 @@ export function GlobalStylesUI( {
 	fontLibraryEnabled = false,
 	serverCSS,
 	serverSettings,
+	selectedViewport,
+	showViewportStateControl = true,
 }: GlobalStylesUIProps ) {
 	const blocks = getBlockTypes();
 
@@ -232,13 +256,23 @@ export function GlobalStylesUI( {
 									encodeURIComponent( block.name )
 								}
 							>
-								<ScreenBlock name={ block.name } />
+								<ScreenBlock
+									name={ block.name }
+									selectedViewport={ selectedViewport }
+									showViewportStateControl={
+										showViewportStateControl
+									}
+								/>
 							</GlobalStylesNavigationScreen>
 							<ContextScreens
 								name={ block.name }
 								parentMenu={
 									'/blocks/' +
 									encodeURIComponent( block.name )
+								}
+								selectedViewport={ selectedViewport }
+								showViewportStateControl={
+									showViewportStateControl
 								}
 							/>
 						</Fragment>
