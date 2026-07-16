@@ -293,27 +293,32 @@ class Gutenberg_View_Config_Data {
 	/**
 	 * Resolves the identity used to match a list member against another.
 	 *
-	 * A bare scalar is shorthand for a member referenced by its `id`, so it
-	 * shares an identity with a map carrying that same `id` (this is how a
-	 * bare field like `'f3'` and a `array( 'id' => 'f3' )` patch match). A map
-	 * is otherwise identified by the first of the well-known identity keys it
-	 * carries. Anything else (e.g. a nested list) has no identity and never
-	 * matches, so it is always appended.
+	 * The identity is simply the member's value cast to a string, regardless of
+	 * which key carries it: a bare scalar is its own identity, and a map is
+	 * identified by the value of the first of the well-known identity keys
+	 * (`id`, `slug`, `field`, `name`) it carries. Because the key is not part of
+	 * the identity, a bare field like `'f3'` matches any map carrying that
+	 * value, whether it appears as `array( 'id' => 'f3' )`,
+	 * `array( 'slug' => 'f3' )`, and so on — this lets the same shorthand target
+	 * lists keyed by different fields. Casting to string keeps numeric
+	 * identities matching whether they arrive as an int or a string. Anything
+	 * else (e.g. a nested list) has no identity and never matches, so it is
+	 * always appended.
 	 *
 	 * @since 7.1.0
 	 *
 	 * @param mixed $item The list member.
-	 * @return mixed The identity, or null when the member has none.
+	 * @return string|null The identity, or null when the member has none.
 	 */
 	private function list_item_identity( $item ) {
 		if ( is_scalar( $item ) ) {
-			return 'id:' . $item;
+			return (string) $item;
 		}
 
 		if ( is_array( $item ) && ! array_is_list( $item ) ) {
 			foreach ( array( 'id', 'slug', 'field', 'name' ) as $key ) {
 				if ( isset( $item[ $key ] ) && is_scalar( $item[ $key ] ) ) {
-					return $key . ':' . $item[ $key ];
+					return (string) $item[ $key ];
 				}
 			}
 		}
