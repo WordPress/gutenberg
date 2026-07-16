@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -21,10 +21,9 @@ jest.mock( '@wordpress/block-editor', () => ( {
 		__experimentalShareWithChildBlocks,
 	} ) => (
 		<div
-			data-share-with-child-blocks={
-				__experimentalShareWithChildBlocks || undefined
-			}
-			data-testid={ `block-controls-${ group }` }
+			data-testid={ `block-controls-${
+				__experimentalShareWithChildBlocks ? 'parent' : group
+			}` }
 		>
 			{ children }
 		</div>
@@ -32,7 +31,19 @@ jest.mock( '@wordpress/block-editor', () => ( {
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
 	MediaPlaceholder: () => <div />,
-	MediaReplaceFlow: ( { name } ) => <button>{ name }</button>,
+	MediaReplaceFlow: ( { name, onSelect } ) => (
+		<button
+			onClick={ () =>
+				onSelect( {
+					id: 2,
+					url: 'https://example.com/second-track.mp3',
+					title: 'Second track',
+				} )
+			}
+		>
+			{ name }
+		</button>
+	),
 	useBlockProps: () => ( { className: 'wp-block-playlist' } ),
 	useInnerBlocksProps: ( blockProps ) => ( {
 		...blockProps,
@@ -108,11 +119,16 @@ const defaultAttributes = {
 };
 
 describe( 'PlaylistEdit', () => {
+	let replaceInnerBlocks;
+	let selectBlock;
+
 	beforeEach( () => {
+		replaceInnerBlocks = jest.fn();
+		selectBlock = jest.fn();
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
-			replaceInnerBlocks: jest.fn(),
-			selectBlock: jest.fn(),
+			replaceInnerBlocks,
+			selectBlock,
 		} );
 		useSelect.mockReturnValue( {
 			innerBlockTracks: [
@@ -150,27 +166,37 @@ describe( 'PlaylistEdit', () => {
 		expect( screen.getByTestId( 'playlist-track' ) ).toBeInTheDocument();
 	} );
 
-	it( 'shares the add track control with child blocks', () => {
+	it( 'adds tracks from the child block controls', () => {
 		render(
 			<PlaylistEdit
 				attributes={ defaultAttributes }
 				clientId="playlist-1"
 				insertBlocksAfter={ jest.fn() }
-				isSelected
+				isSelected={ false }
 				setAttributes={ jest.fn() }
 			/>
 		);
 
-		const otherControls = screen.getByTestId( 'block-controls-other' );
+		const childControls = screen.getByTestId( 'block-controls-parent' );
 
-		expect( otherControls ).toHaveAttribute(
-			'data-share-with-child-blocks',
-			'true'
-		);
-		expect(
-			within( otherControls ).getByRole( 'button', {
+		fireEvent.click(
+			within( childControls ).getByRole( 'button', {
 				name: 'Add track',
 			} )
-		).toBeInTheDocument();
+		);
+
+		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'playlist-1', [
+			expect.objectContaining( { clientId: 'track-1' } ),
+			expect.objectContaining( {
+				clientId: 'new-track',
+				name: 'core/playlist-track',
+				attributes: expect.objectContaining( {
+					id: 2,
+					src: 'https://example.com/second-track.mp3',
+					title: 'Second track',
+				} ),
+			} ),
+		] );
+		expect( selectBlock ).toHaveBeenCalledWith( 'new-track' );
 	} );
 } );
