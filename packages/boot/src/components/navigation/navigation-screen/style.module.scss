@@ -1,10 +1,21 @@
 .screen {
+	overflow: hidden;
+	position: relative;
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr;
 	// Avoid cutting off focus ring of the last menu item
 	padding-block-end: var(--wpds-dimension-padding-xs);
 }
 
 .screen :global(.components-text) {
 	color: var(--wpds-color-foreground-content-neutral);
+}
+
+.panel {
+	width: 100%;
+	grid-column: 1;
+	grid-row: 1;
 }
 
 .title-icon {

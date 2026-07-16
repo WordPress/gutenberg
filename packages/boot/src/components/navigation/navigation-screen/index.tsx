@@ -76,19 +76,11 @@ export default function NavigationScreen( {
 	};
 
 	return (
-		<div
-			className={ styles.screen }
-			style={ {
-				overflow: 'hidden',
-				position: 'relative',
-				display: 'grid',
-				gridTemplateColumns: '1fr',
-				gridTemplateRows: '1fr',
-			} }
-		>
+		<div className={ styles.screen }>
 			<AnimatePresence initial={ false }>
 				<motion.div
 					key={ navigationKey }
+					className={ styles.panel }
 					custom={ animationDirection }
 					variants={ slideVariants }
 					initial="initial"
@@ -98,11 +90,6 @@ export default function NavigationScreen( {
 						type: 'tween',
 						duration: disableMotion ? 0 : ANIMATION_DURATION,
 						ease: [ 0.33, 0, 0, 1 ],
-					} }
-					style={ {
-						width: '100%',
-						gridColumn: '1',
-						gridRow: '1',
 					} }
 				>
 					<HStack spacing={ 2 } className={ styles[ 'title-icon' ] }>
