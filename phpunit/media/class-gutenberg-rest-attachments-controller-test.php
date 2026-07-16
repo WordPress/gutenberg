@@ -868,16 +868,18 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertSame( 200, $response->get_status() );
 
 		// The current attached file is recorded as the original_image, and the
-		// new main file's dimensions are returned for finalize.
+		// new main file's dimensions are returned for finalize. Compare against
+		// the actual attached file: the stored names may gain a numeric suffix
+		// from wp_unique_filename() when earlier tests uploaded the same file.
 		$this->assertSame( 'original', $data['image_size'] );
-		$this->assertSame( 'canola.jpg', $data['original_image'] );
+		$this->assertSame( wp_basename( $attached_file_before ), $data['original_image'] );
 		$this->assertSame( 640, $data['width'] );
 		$this->assertSame( 480, $data['height'] );
 		$this->assertGreaterThan( 0, $data['filesize'] );
 
 		// Verify the attached file was replaced by the sideloaded version.
 		$attached_file_after = get_attached_file( $attachment_id, true );
-		$this->assertSame( 'canola-original.jpg', wp_basename( $attached_file_after ) );
+		$this->assertSame( wp_basename( $data['file'] ), wp_basename( $attached_file_after ) );
 		$this->assertNotSame( $attached_file_before, $attached_file_after, 'Attached file should be replaced by the sideloaded original.' );
 	}
 
@@ -894,6 +896,10 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * @covers ::finalize_item
 	 */
 	public function test_sideload_original_accepts_transposed_dimensions() {
+		if ( ! wp_image_editor_supports( array( 'methods' => array( 'rotate' ) ) ) ) {
+			$this->markTestSkipped( 'This test requires an image editor with rotation support.' );
+		}
+
 		wp_set_current_user( self::$admin_id );
 
 		// Upload a 640x480 image with client-side processing (no server-side
@@ -907,6 +913,10 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$response      = rest_get_server()->dispatch( $request );
 		$attachment_id = $response->get_data()['id'];
 		$this->assertSame( 201, $response->get_status() );
+
+		// The uploaded file's stored name may gain a numeric suffix from
+		// wp_unique_filename() when earlier tests uploaded the same file.
+		$uploaded_basename = wp_basename( get_attached_file( $attachment_id, true ) );
 
 		// Build a rotated (transposed) version of the source: 640x480 -> 480x640.
 		// Save it to a temp file so the source fixture directory is untouched.
@@ -935,7 +945,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( 480, $original_data['width'] );
 		$this->assertSame( 640, $original_data['height'] );
-		$this->assertSame( 'canola.jpg', $original_data['original_image'] );
+		$this->assertSame( $uploaded_basename, $original_data['original_image'] );
 
 		// Finalize and confirm the rotated dimensions replace the stored ones.
 		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
@@ -946,7 +956,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$metadata = wp_get_attachment_metadata( $attachment_id, true );
 		$this->assertSame( 480, $metadata['width'] );
 		$this->assertSame( 640, $metadata['height'] );
-		$this->assertSame( 'canola.jpg', $metadata['original_image'] );
+		$this->assertSame( $uploaded_basename, $metadata['original_image'] );
 		// The rotated file becomes the main file. Its stored name may gain a
 		// numeric suffix (core reserves the `-rotated` suffix), so compare against
 		// the file the sideload returned rather than a fixed basename.
@@ -968,6 +978,10 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * @covers ::validate_image_dimensions
 	 */
 	public function test_original_sideload_matches_server_side_rotation() {
+		if ( ! function_exists( 'exif_read_data' ) || ! wp_image_editor_supports( array( 'methods' => array( 'rotate' ) ) ) ) {
+			$this->markTestSkipped( 'This test requires the exif extension and an image editor with rotation support.' );
+		}
+
 		wp_set_current_user( self::$admin_id );
 
 		$fixture = DIR_TESTDATA . '/images/test-image-rotated-90ccw.jpg';
@@ -1566,6 +1580,97 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertSame( 1920, $metadata['height'] );
 		$this->assertSame( 500000, $metadata['filesize'] );
 		$this->assertSame( '2026/04/big-photo-scaled.jpg', $metadata['file'] );
+	}
+
+	/**
+	 * Verifies that finalize resets the stored EXIF orientation for `scaled`
+	 * sub-sizes. The client (vips) applies the EXIF rotation when scaling, so
+	 * the stored orientation must be reset to 1 as wp_create_image_subsizes()
+	 * does, or exif_orientation would keep reporting the pre-rotation value.
+	 *
+	 * @covers ::finalize_item
+	 */
+	public function test_finalize_scaled_resets_orientation() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=big-rotated-photo.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response      = rest_get_server()->dispatch( $request );
+		$attachment_id = $response->get_data()['id'];
+
+		// Simulate an EXIF-rotated upload: canola.jpg carries no orientation
+		// tag, so store the pre-rotation value directly.
+		$metadata                              = wp_get_attachment_metadata( $attachment_id, true );
+		$metadata['image_meta']['orientation'] = 6;
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
+		$request->set_param(
+			'sub_sizes',
+			array(
+				array(
+					'image_size'     => 'scaled',
+					'width'          => 1920,
+					'height'         => 2560,
+					'file'           => '2026/04/big-rotated-photo-scaled.jpg',
+					'filesize'       => 500000,
+					'original_image' => 'big-rotated-photo.jpg',
+				),
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		$metadata = wp_get_attachment_metadata( $attachment_id, true );
+		$this->assertSame( 1, (int) $metadata['image_meta']['orientation'], 'Finalizing a scaled sub-size should reset the stored EXIF orientation.' );
+	}
+
+	/**
+	 * Verifies that finalize ignores an `original`/`scaled` entry that is
+	 * missing the file name, so a malformed payload cannot blank out the main
+	 * file metadata.
+	 *
+	 * @covers ::finalize_item
+	 */
+	public function test_finalize_ignores_main_file_entry_without_file() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=guarded.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response      = rest_get_server()->dispatch( $request );
+		$attachment_id = $response->get_data()['id'];
+
+		$metadata_before = wp_get_attachment_metadata( $attachment_id, true );
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
+		$request->set_param(
+			'sub_sizes',
+			array(
+				array(
+					'image_size' => 'original',
+					'width'      => 9999,
+					'height'     => 9999,
+				),
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		$metadata = wp_get_attachment_metadata( $attachment_id, true );
+		$this->assertSame( $metadata_before['file'], $metadata['file'], 'The main file must not be blanked by an entry without a file.' );
+		$this->assertSame( $metadata_before['width'], $metadata['width'] );
+		$this->assertSame( $metadata_before['height'], $metadata['height'] );
+		$this->assertArrayNotHasKey( 'original_image', $metadata );
 	}
 
 	/**

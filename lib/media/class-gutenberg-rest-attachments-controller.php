@@ -785,22 +785,32 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				continue;
 			}
 
-			if ( 'original' === $image_size ) {
+			if ( 'original' === $image_size || 'scaled' === $image_size ) {
+				// Skip malformed entries so a bad payload cannot blank out the
+				// main file metadata.
+				if ( empty( $sub_size['file'] ) ) {
+					continue;
+				}
+
 				// Record the supplied full-size image (from sideload_item()) as
 				// the main file, keeping the current attached file as
-				// `original_image`. Same as the 'scaled' branch.
+				// `original_image`. A 'scaled' image is downsized and an
+				// 'original' image is rotated; both have any EXIF orientation
+				// already applied by the client.
 				if ( ! empty( $sub_size['original_image'] ) ) {
 					$metadata['original_image'] = $sub_size['original_image'];
 				}
 				$metadata['width']    = $sub_size['width'] ?? 0;
 				$metadata['height']   = $sub_size['height'] ?? 0;
 				$metadata['filesize'] = $sub_size['filesize'] ?? 0;
-				$metadata['file']     = $sub_size['file'] ?? '';
+				$metadata['file']     = $sub_size['file'];
 
-				// The endpoint expects the supplied image to have its orientation
-				// applied already, so reset the stored value (from the upload) to
-				// 1. Otherwise exif_orientation would still report the pre-rotation
-				// value and the client would rotate the image again on a re-fetch.
+				// The supplied image has its orientation applied already, so
+				// reset the stored value (from the upload) to 1, as
+				// wp_create_image_subsizes() does for both its scale and rotate
+				// paths. Otherwise exif_orientation would still report the
+				// pre-rotation value and the client would rotate the image
+				// again on a re-fetch.
 				if ( ! empty( $metadata['image_meta']['orientation'] ) ) {
 					$metadata['image_meta']['orientation'] = 1;
 				}
@@ -822,14 +832,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				// the video block's poster and deleted alongside the video.
 				// See lib/media/animated-gif-to-video.php.
 				$metadata[ self::META_KEY_ANIMATED_VIDEO_POSTER ] = $sub_size['file'];
-			} elseif ( 'scaled' === $image_size ) {
-				if ( ! empty( $sub_size['original_image'] ) ) {
-					$metadata['original_image'] = $sub_size['original_image'];
-				}
-				$metadata['width']    = $sub_size['width'] ?? 0;
-				$metadata['height']   = $sub_size['height'] ?? 0;
-				$metadata['filesize'] = $sub_size['filesize'] ?? 0;
-				$metadata['file']     = $sub_size['file'] ?? '';
 			} else {
 				$metadata['sizes'] = $metadata['sizes'] ?? array();
 
