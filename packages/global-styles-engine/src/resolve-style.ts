@@ -31,12 +31,8 @@ interface ResolveStyleArgs {
 	_links?: Record< string, any > | null;
 }
 
-// Inlined from `block-editor`'s `hooks/block-style-state.js` to keep this
-// resolver free of that module's dependency chain so it stays pure and easy to
-// test.
 const DEFAULT_STATE_VALUE = 'default';
 
-// Whether the selected block style state is the default (no pseudo/viewport).
 function isDefaultBlockStyleState( selectedState?: SelectedState | null ) {
 	const viewport = selectedState?.viewport;
 	const pseudo = selectedState?.pseudo;
@@ -46,9 +42,6 @@ function isDefaultBlockStyleState( selectedState?: SelectedState | null ) {
 	);
 }
 
-// Object path for the selected state's styles: `[ viewport, pseudo ]` with
-// default segments removed. Mirrors `getStyleForState` in
-// `block-editor`'s `hooks/block-style-state.js`.
 function getStyleStatePath( selectedState: SelectedState ) {
 	if ( isDefaultBlockStyleState( selectedState ) ) {
 		return [];
@@ -58,8 +51,6 @@ function getStyleStatePath( selectedState: SelectedState ) {
 	);
 }
 
-// State-scoped sub-style for the selected state, or the style itself for the
-// default state.
 function getStyleForState( style: StyleTree, selectedState: SelectedState ) {
 	const path = getStyleStatePath( selectedState );
 	if ( ! path.length ) {
@@ -87,10 +78,10 @@ const SOURCE_DESCRIPTORS: Record< string, SourceDescriptor > = {
 	blockVariation: { layer: 'blockVariation' },
 };
 
-// Blocks whose canvas rendering is effected by a Global Styles *element*
+// Blocks whose canvas rendering is driven by a Global Styles *element*
 // selector (e.g. `.wp-element-button`, `h1`–`h6`) rather than the block's own
 // class. For these, the matching root-level `styles.elements[ element ]` layer
-// styles the block on the canvas, so it must be folded into the block's.
+// is folded in as its own inheritance layer.
 const BLOCK_TO_ROOT_ELEMENT: Record< string, string > = {
 	'core/button': 'button',
 	'core/heading': 'heading',
@@ -290,8 +281,6 @@ function deepMergeDroppingEmpties(
 	return target;
 }
 
-// State-scoped slice of a layer-shaped object for the selected state,
-// guarding against nullish inputs.
 function getStateSlice(
 	layerObject: StyleTree | null,
 	selectedState: SelectedState

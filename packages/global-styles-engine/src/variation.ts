@@ -32,23 +32,18 @@ export function getVariationStylesWithRefValues(
 		return undefined;
 	}
 
-	// Helper to recursively look for `ref` values to resolve.
 	const replaceRefs = ( variationStyles: StyleTree ) => {
 		Object.keys( variationStyles ).forEach( ( key ) => {
 			const value = variationStyles[ key ];
 
-			// Only process objects.
 			if ( typeof value === 'object' && value !== null ) {
-				// Process `ref` value if present.
 				if ( value.ref !== undefined ) {
 					if (
 						typeof value.ref !== 'string' ||
 						value.ref.trim() === ''
 					) {
-						// Remove invalid ref.
 						delete variationStyles[ key ];
 					} else {
-						// Resolve `ref` value.
 						const refValue = getValueFromObjectPath(
 							globalStyles,
 							value.ref
@@ -61,7 +56,6 @@ export function getVariationStylesWithRefValues(
 						}
 					}
 				} else {
-					// Recursively resolve `ref` values in nested objects.
 					replaceRefs( value );
 
 					// After recursion, if value is empty due to explicitly

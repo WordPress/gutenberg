@@ -20,10 +20,9 @@ import { unlock } from '../../lock-unlock';
 const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
 
 /**
- * Internal hook that reads the Global Styles payload and returns the wrapped
- * `{ styles }` shape the builder and ref-resolver helpers expect, along with
- * the theme-file `_links` map used to resolve theme-file pointers (e.g.
- * background images).
+ * Reads the Global Styles payload and returns it wrapped as `{ styles }` (the
+ * shape `resolveStyle` expects), plus the theme-file `_links` map used to
+ * resolve theme-file pointers such as background images.
  *
  * @return {{ globalStyles: ?Object, links: ?Object }} Wrapped Global Styles payload and links map.
  */
