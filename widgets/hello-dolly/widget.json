@@ -4,5 +4,19 @@
 	"description": "This is not just a widget, it symbolizes the hope and enthusiasm of an entire generation summed up in two words sung most famously by Louis Armstrong: Hello, Dolly. When activated you will randomly see a lyric from Hello, Dolly in the dashboard.",
 	"category": "dashboard",
 	"presentation": "full-bleed",
+	"actions": [
+		{
+			"id": "plugin-page",
+			"label": "Plugin page",
+			"href": "https://wordpress.org/plugins/hello-dolly/",
+			"openInNewTab": true
+		},
+		{
+			"id": "download-lyrics",
+			"label": "Download lyrics",
+			"href": "data:text/plain;charset=utf-8,Hello%2C%20Dolly%0AWell%2C%20hello%2C%20Dolly%0AIt's%20so%20nice%20to%20have%20you%20back%20where%20you%20belong%0AYou're%20lookin'%20swell%2C%20Dolly%0AI%20can%20tell%2C%20Dolly%0AYou're%20still%20glowin'%2C%20you're%20still%20crowin'%0AYou're%20still%20goin'%20strong%0AI%20feel%20the%20room%20swayin'%0AWhile%20the%20band's%20playin'%0AOne%20of%20our%20old%20favorite%20songs%20from%20way%20back%20when%0ASo%2C%20take%20her%20wrap%2C%20fellas%0ADolly%2C%20never%20go%20away%20again%0AHello%2C%20Dolly%0AWell%2C%20hello%2C%20Dolly%0AIt's%20so%20nice%20to%20have%20you%20back%20where%20you%20belong%0AYou're%20lookin'%20swell%2C%20Dolly%0AI%20can%20tell%2C%20Dolly%0AYou're%20still%20glowin'%2C%20you're%20still%20crowin'%0AYou're%20still%20goin'%20strong%0AI%20feel%20the%20room%20swayin'%0AWhile%20the%20band's%20playin'%0AOne%20of%20our%20old%20favorite%20songs%20from%20way%20back%20when%0ASo%2C%20golly%2C%20gee%2C%20fellas%0AHave%20a%20little%20faith%20in%20me%2C%20fellas%0ADolly%2C%20never%20go%20away%0APromise%2C%20you'll%20never%20go%20away%0ADolly'll%20never%20go%20away%20again",
+			"download": "hello-dolly-lyrics.txt"
+		}
+	],
 	"textdomain": "default"
 }
