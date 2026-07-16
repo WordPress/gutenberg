@@ -328,7 +328,7 @@ function _gutenberg_get_entity_view_config_post_type_page( $data ) {
 	$data->set( 'default_view', $default_view, 1 );
 	// Append the status views, thereby preserving the base "all items" view,
 	// so its post-type-specific title is kept.
-	$data->update_view_list_items( array_column( $view_list, null, 'slug' ), 1 );
+	$data->merge( array( 'view_list' => $view_list ), 1 );
 
 	return $data;
 }

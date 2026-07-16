@@ -14,12 +14,11 @@
  * top-level keys — `default_view`, `default_layouts`, `view_list`, and
  * `form` — and there are two ways to contribute:
  *
- * - The `merge()` and `update_view_list_items()` methods merge partial changes
- *   (patches) into what is already there, each covering one part of the
- *   configuration: `merge()` for `default_view`, `default_layouts`, and the
- *   `form` settings; and `update_view_list_items()` for the `view_list`
- *   entries, keyed by view `slug`. This is what plugins should
- *   use: patches compose with core's configuration and with other plugins'.
+ * - The `merge()` method merges partial changes (patches) into what is already
+ *   there: `default_view`, `default_layouts`, and the `form` settings by key,
+ *   and the `view_list` entries by view `slug` identity. This is what plugins
+ *   should use: patches compose with core's configuration and with other
+ *   plugins'.
  * - `set()` replaces a whole top-level key. It shouldn't be the default
  *   choice — a callback using it stops inheriting core's future changes to
  *   that key — but it's useful for cases like a post type that doesn't
@@ -124,11 +123,14 @@ class Gutenberg_View_Config_Data {
 
 	/**
 	 * Merges a partial configuration into `default_view`, `default_layouts`,
-	 * and the `form` settings.
+	 * the `form` settings, and the `view_list` collection.
 	 *
-	 * The `view_list` collection has a dedicated method (`update_view_list_items`),
-	 * and is rejected here. A patch that declares an unsupporte schema version
-	 * is also rejected.
+	 * A `view_list` patch is a list of view objects that merge into the current
+	 * collection by `slug` identity: a view whose `slug` matches one already
+	 * present merges into it in place and keeps its position, and one with a
+	 * new `slug` is appended. The patch must be list-shaped — a map is rejected,
+	 * mirroring how a `form` patch must be map-shaped. A patch that declares an
+	 * unsupported schema version is also rejected.
 	 *
 	 * @since 7.1.0
 	 *
@@ -163,12 +165,17 @@ class Gutenberg_View_Config_Data {
 			}
 
 			if ( 'view_list' === $key ) {
-				_doing_it_wrong(
-					__METHOD__,
-					esc_html__( 'The "view_list" entries are patched by identity. Use update_view_list_items() instead.', 'gutenberg' ),
-					'7.1.0'
-				);
-				continue;
+				// The view list is a collection of view objects, each identified
+				// by its `slug`; a patch must be a list, mirroring how `form`
+				// must be a map. Entries then merge by slug identity below.
+				if ( ! is_array( $value ) || ( array() !== $value && ! array_is_list( $value ) ) ) {
+					_doing_it_wrong(
+						__METHOD__,
+						esc_html__( 'A "view_list" patch must be a list of view objects.', 'gutenberg' ),
+						'7.1.0'
+					);
+					continue;
+				}
 			}
 
 			if ( 'form' === $key ) {
@@ -189,96 +196,6 @@ class Gutenberg_View_Config_Data {
 
 			$this->config[ $key ] = $this->merge_properties( $this->config[ $key ] ?? array(), $value );
 		}
-
-		return $this;
-	}
-
-	/**
-	 * Adds, updates, or removes `view_list` entries, keyed by view `slug`.
-	 *
-	 * Each patch key names the `slug` of the view it targets: a matching view
-	 * merges in place and keeps its position (following the shared rules —
-	 * e.g. the view's `filters`, being numerically indexed, replace
-	 * wholesale), an unknown slug appends a new view to the end, and `null`
-	 * removes the view. The patch key is the identity: a `slug` property
-	 * inside the value is ignored. A `null` for a slug that is not found is a
-	 * silent no-op — the view may have been removed by another callback or
-	 * simply not apply to this entity.
-	 *
-	 * A patch that declares an unsupported schema version is rejected and
-	 * does not merge.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param array $items   The view patches, keyed by slug.
-	 * @param int   $version The schema version the patch was authored against.
-	 * @return Gutenberg_View_Config_Data The instance, for chaining.
-	 */
-	public function update_view_list_items( array $items, int $version ) {
-		if ( ! $this->check_version( $version, __METHOD__ ) ) {
-			return $this;
-		}
-
-		if ( empty( $items ) ) {
-			return $this;
-		}
-		if ( array_is_list( $items ) ) {
-			_doing_it_wrong(
-				__METHOD__,
-				esc_html__( 'A view list patch must be keyed by view "slug".', 'gutenberg' ),
-				'7.1.0'
-			);
-			return $this;
-		}
-
-		$view_list = isset( $this->config['view_list'] ) && is_array( $this->config['view_list'] ) ? $this->config['view_list'] : array();
-
-		foreach ( $items as $slug => $value ) {
-			// PHP casts numeric-string array keys to integers; identities are strings.
-			$slug = (string) $slug;
-
-			if ( null === $value ) {
-				$view_list = array_values(
-					array_filter(
-						$view_list,
-						static fn( $item ) => ! is_array( $item ) || ! isset( $item['slug'] ) || $item['slug'] !== $slug
-					)
-				);
-				continue;
-			}
-
-			if ( ! is_array( $value ) || ( array() !== $value && array_is_list( $value ) ) ) {
-				_doing_it_wrong(
-					__METHOD__,
-					esc_html__( 'Each view patch must be an associative array of view properties, or null to remove the view.', 'gutenberg' ),
-					'7.1.0'
-				);
-				continue;
-			}
-
-			// The patch key is the identity.
-			unset( $value['slug'] );
-
-			$index = null;
-			foreach ( $view_list as $i => $item ) {
-				if ( is_array( $item ) && isset( $item['slug'] ) && $item['slug'] === $slug ) {
-					$index = $i;
-					break;
-				}
-			}
-
-			if ( null === $index ) {
-				$view_list[] = array_merge( array( 'slug' => $slug ), $value );
-				continue;
-			}
-			// An empty patch value has nothing to merge (and deep_merge would
-			// treat an empty array as a list, replacing the whole view).
-			if ( array() !== $value ) {
-				$view_list[ $index ] = $this->deep_merge( $view_list[ $index ], $value );
-			}
-		}
-
-		$this->config['view_list'] = array_values( $view_list );
 
 		return $this;
 	}
@@ -308,52 +225,12 @@ class Gutenberg_View_Config_Data {
 	}
 
 	/**
-	 * Recursively merges two values.
+	 * Merges a `default_view`, `default_layouts`, `form`, or `view_list` value,
+	 * treating numerically indexed arrays (lists) as collections merged by
+	 * identity.
 	 *
-	 * Associative arrays (maps) merge key by key and a null patch value deletes
-	 * the key; lists and scalars are replaced wholesale by the incoming value,
-	 * since lists without a defined identity cannot be merged member by member.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param mixed $current  The current value.
-	 * @param mixed $incoming The incoming value.
-	 * @return mixed The merged value.
-	 */
-	private function deep_merge( $current, $incoming ) {
-		// An empty array counts as a list, so patching with array() empties
-		// the key (e.g. 'filters' => array() clears the filters) rather than
-		// being a no-op map merge.
-		if ( ! is_array( $incoming ) || array_is_list( $incoming ) ) {
-			return $incoming;
-		}
-
-		// Merge onto the current map, or onto an empty base when the current
-		// value is absent, empty, or not a map, so null delete-markers in the
-		// patch are consumed rather than stored as literal values (e.g.
-		// array( 'layout' => null ) merged into an empty layouts entry yields
-		// array(), not array( 'layout' => null )).
-		$result = is_array( $current ) && ! array_is_list( $current ) ? $current : array();
-		foreach ( $incoming as $key => $value ) {
-			if ( null === $value ) {
-				// A null patch value deletes the key.
-				unset( $result[ $key ] );
-				continue;
-			}
-			$result[ $key ] = $this->deep_merge(
-				array_key_exists( $key, $result ) ? $result[ $key ] : array(),
-				$value
-			);
-		}
-		return $result;
-	}
-
-	/**
-	 * Merges a `default_view`, `default_layouts`, or `form` value, treating
-	 * numerically indexed arrays (lists) as collections merged by identity.
-	 *
-	 * Unlike deep_merge(), which replaces a list wholesale, this recurses
-	 * through maps and merges lists element by element: a member whose identity
+	 * It recurses through maps and merges lists element by element: a member
+	 * whose identity
 	 * (a scalar's own value, or a map's `id`/`slug`/`field`/`name`) matches an
 	 * existing member merges into it in place — recursively by these same rules,
 	 * so a list nested inside a member merges by identity too — and an unmatched

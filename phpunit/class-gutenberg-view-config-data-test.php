@@ -313,6 +313,143 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
+	 * merge() merges a matching view by slug in place, keeping its position,
+	 * and appends an unknown one.
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_view_list_merges_by_slug_and_appends_unknown() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'view_list' => array(
+					array(
+						'title' => 'All',
+						'slug'  => 'all',
+					),
+					array(
+						'title' => 'Published',
+						'slug'  => 'published',
+					),
+				),
+			)
+		);
+		$data->merge(
+			array(
+				'view_list' => array(
+					array(
+						'slug'  => 'published',
+						'title' => 'Live',
+					),
+					array(
+						'slug'  => 'mine',
+						'title' => 'Mine',
+					),
+				),
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'title' => 'All',
+					'slug'  => 'all',
+				),
+				array(
+					'title' => 'Live',
+					'slug'  => 'published',
+				),
+				array(
+					'slug'  => 'mine',
+					'title' => 'Mine',
+				),
+			),
+			$data->get_config()['view_list']
+		);
+	}
+
+	/**
+	 * merge() merges a view's nested object properties in place while leaving
+	 * the sibling views untouched.
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_view_list_merges_nested_view_props() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'view_list' => array(
+					array(
+						'title' => 'Published',
+						'slug'  => 'published',
+						'view'  => array(
+							'type' => 'list',
+							'sort' => array(
+								'field'     => 'title',
+								'direction' => 'asc',
+							),
+						),
+					),
+				),
+			)
+		);
+		$data->merge(
+			array(
+				'view_list' => array(
+					array(
+						'slug' => 'published',
+						'view' => array(
+							'sort' => array( 'direction' => 'desc' ),
+						),
+					),
+				),
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'title' => 'Published',
+					'slug'  => 'published',
+					'view'  => array(
+						'type' => 'list',
+						'sort' => array(
+							'field'     => 'title',
+							'direction' => 'desc',
+						),
+					),
+				),
+			),
+			$data->get_config()['view_list']
+		);
+	}
+
+	/**
+	 * merge() rejects a map where the view_list list is expected, mirroring how
+	 * a list-shaped form patch is rejected.
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_rejects_map_shaped_view_list_patch() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge' );
+
+		$data   = new Gutenberg_View_Config_Data(
+			array(
+				'view_list' => array(
+					array(
+						'title' => 'All',
+						'slug'  => 'all',
+					),
+				),
+			)
+		);
+		$before = $data->get_config();
+		$data->merge( array( 'view_list' => array( 'published' => array( 'title' => 'Live' ) ) ), 1 );
+
+		$this->assertSame( $before, $data->get_config() );
+	}
+
+	/**
 	 * merge() rejects an undocumented top-level key. Nested
 	 * properties are not validated: their vocabulary is owned by the
 	 * client-side consumers.
@@ -486,16 +623,14 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Every update function and set() reject a patch whose version cannot be
-	 * migrated — newer than the latest supported version.
+	 * merge() and set() reject a patch whose version cannot be migrated —
+	 * newer than the latest supported version.
 	 *
 	 * @covers ::merge
-	 * @covers ::update_view_list_items
 	 * @covers ::set
 	 */
 	public function test_update_functions_reject_unmigratable_version() {
 		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge' );
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_view_list_items' );
 		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
 
 		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
@@ -503,188 +638,8 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 
 		$version = Gutenberg_View_Config_Data::LATEST_VERSION + 1;
 		$data->merge( array( 'default_view' => array( 'type' => 'grid' ) ), $version );
-		$data->update_view_list_items( array( 'mine' => array( 'title' => 'Mine' ) ), $version );
 		$data->set( 'default_view', array( 'type' => 'grid' ), $version );
 
 		$this->assertSame( $before, $data->get_config() );
-	}
-
-	/**
-	 * update_view_list_items() merges a matching slug in place and appends an
-	 * unknown one, injecting the slug from the patch key.
-	 *
-	 * @covers ::update_view_list_items
-	 */
-	public function test_update_view_list_items_merges_by_slug_and_appends_unknown() {
-		$data = new Gutenberg_View_Config_Data(
-			array(
-				'view_list' => array(
-					array(
-						'title' => 'All',
-						'slug'  => 'all',
-					),
-					array(
-						'title' => 'Published',
-						'slug'  => 'published',
-					),
-				),
-			)
-		);
-		$data->update_view_list_items(
-			array(
-				'published' => array( 'title' => 'Live' ),
-				'mine'      => array( 'title' => 'Mine' ),
-			),
-			1
-		);
-
-		$this->assertSame(
-			array(
-				array(
-					'title' => 'All',
-					'slug'  => 'all',
-				),
-				array(
-					'title' => 'Live',
-					'slug'  => 'published',
-				),
-				array(
-					'slug'  => 'mine',
-					'title' => 'Mine',
-				),
-			),
-			$data->get_config()['view_list']
-		);
-	}
-
-	/**
-	 * update_view_list_items() removes a view when the patch value is null.
-	 *
-	 * @covers ::update_view_list_items
-	 */
-	public function test_update_view_list_items_null_removes_view() {
-		$data = new Gutenberg_View_Config_Data(
-			array(
-				'view_list' => array(
-					array(
-						'title' => 'All',
-						'slug'  => 'all',
-					),
-					array(
-						'title' => 'Published',
-						'slug'  => 'published',
-					),
-				),
-			)
-		);
-		$data->update_view_list_items( array( 'published' => null ), 1 );
-
-		$this->assertSame(
-			array(
-				array(
-					'title' => 'All',
-					'slug'  => 'all',
-				),
-			),
-			$data->get_config()['view_list']
-		);
-	}
-
-	/**
-	 * The patch key is the identity: a conflicting `slug` property inside the
-	 * value is ignored.
-	 *
-	 * @covers ::update_view_list_items
-	 */
-	public function test_update_view_list_items_patch_key_wins_over_slug_property() {
-		$data = new Gutenberg_View_Config_Data( array( 'view_list' => array() ) );
-		$data->update_view_list_items(
-			array(
-				'mine' => array(
-					'slug'  => 'other',
-					'title' => 'Mine',
-				),
-			),
-			1
-		);
-
-		$this->assertSame(
-			array(
-				array(
-					'slug'  => 'mine',
-					'title' => 'Mine',
-				),
-			),
-			$data->get_config()['view_list']
-		);
-	}
-
-	/**
-	 * update_view_list_items() rejects patches that are not keyed by slug and
-	 * members that are not view objects.
-	 *
-	 * @covers ::update_view_list_items
-	 */
-	public function test_update_view_list_items_rejects_off_shape_patches() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_view_list_items' );
-
-		$data   = new Gutenberg_View_Config_Data(
-			array(
-				'view_list' => array(
-					array(
-						'title' => 'All',
-						'slug'  => 'all',
-					),
-				),
-			)
-		);
-		$before = $data->get_config();
-
-		// A positional list where a map keyed by slug is expected.
-		$data->update_view_list_items(
-			array(
-				array(
-					'slug'  => 'mine',
-					'title' => 'Mine',
-				),
-			),
-			1
-		);
-		// A scalar where a view object (or null) is expected.
-		$data->update_view_list_items( array( 'all' => 'nope' ), 1 );
-
-		$this->assertSame( $before, $data->get_config() );
-	}
-
-	/**
-	 * A null patch for an identity that is not found is a silent no-op.
-	 *
-	 * A member that is not present may have been removed by another filter or
-	 * simply not apply to this entity, so it is not treated as misuse.
-	 *
-	 * @covers ::update_view_list_items
-	 */
-	public function test_null_patch_for_unknown_identity_is_silent_no_op() {
-		$data = new Gutenberg_View_Config_Data(
-			array(
-				'view_list' => array(
-					array(
-						'title' => 'All',
-						'slug'  => 'all',
-					),
-				),
-			)
-		);
-		$data->update_view_list_items( array( 'does_not_exist' => null ), 1 );
-
-		$this->assertSame(
-			array(
-				array(
-					'title' => 'All',
-					'slug'  => 'all',
-				),
-			),
-			$data->get_config()['view_list']
-		);
 	}
 }
