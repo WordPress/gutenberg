@@ -384,7 +384,7 @@ describe( 'border-radius preset round-trip', () => {
 // fall back to the next layer instead of rendering an empty placeholder.
 // ---------------------------------------------------------------------------
 describe( 'explicit-empty handling per domain', () => {
-	// Reproduce `resolveStyles`'s emptiness predicate verbatim.
+	// Reproduce `resolveStyle`'s emptiness predicate verbatim.
 	function isEmpty( v ) {
 		if ( v === '' || v === null || v === undefined ) {
 			return true;

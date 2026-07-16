@@ -4,6 +4,7 @@
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -13,8 +14,10 @@ import {
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 } from '../../store/private-keys';
-import { resolveStyles } from './resolve-styles';
 import { getVariationNameFromClass } from '../../hooks/block-style-variation';
+import { unlock } from '../../lock-unlock';
+
+const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
 
 /**
  * Internal hook that reads the Global Styles payload and returns the wrapped
@@ -75,8 +78,9 @@ function useOwnVariation( blockName, className ) {
  *
  * It reads the merged Global Styles payload and the block's applied variation,
  * then folds the Root ‹ Block-type ‹ applied-variation cascade (resolving
- * `{ ref }` envelopes and theme-file pointers) in the pure `resolveStyles`
- * builder. All store access lives here; the panels stay presentational.
+ * `{ ref }` envelopes and theme-file pointers) via the pure `resolveStyle`
+ * resolver in `@wordpress/global-styles-engine`. All store access lives here;
+ * the panels stay presentational.
  *
  * Before the `globalStylesDataKey` payload settles (hydration) or when
  * `blockName` is missing, the hook returns empty value and source objects, so
@@ -87,11 +91,7 @@ function useOwnVariation( blockName, className ) {
  * @param {?Object} [selectedState] Selected block style state (`{ viewport, pseudo }`), or null for the default state.
  * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map.
  */
-export function useResolvedStyles(
-	blockName,
-	className,
-	selectedState = null
-) {
+export function useResolvedStyle( blockName, className, selectedState = null ) {
 	const ownVariation = useOwnVariation( blockName, className );
 	const { globalStyles, links } = useRawGlobalStyles();
 
@@ -99,7 +99,7 @@ export function useResolvedStyles(
 		if ( ! blockName ) {
 			return { value: {}, sources: {} };
 		}
-		return resolveStyles( {
+		return resolveStyle( {
 			blockName,
 			ownVariation,
 			globalStyles,

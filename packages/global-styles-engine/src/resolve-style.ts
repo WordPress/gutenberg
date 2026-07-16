@@ -1,20 +1,43 @@
 /**
- * WordPress dependencies
- */
-import { getResolvedValue } from '@wordpress/global-styles-engine';
-
-/**
  * Internal dependencies
  */
-import { getValueFromObjectPath } from '../../utils/object';
-import { getVariationStylesWithRefValues } from '../../hooks/block-style-variation';
+import { getResolvedValue } from './utils/common';
+import { getValueFromObjectPath } from './utils/object';
+import { getVariationStylesWithRefValues } from './variation';
 
-// Inlined from `hooks/block-style-state.js` to keep this builder free of that
-// module's dependency chain so it stays pure and easy to test.
+type StyleTree = Record< string, any >;
+
+interface SelectedState {
+	viewport?: string;
+	pseudo?: string;
+}
+
+interface SourceDescriptor {
+	layer: string;
+}
+
+interface ResolvedStyle {
+	value: StyleTree;
+	sources: Record< string, SourceDescriptor >;
+}
+
+interface ResolveStyleArgs {
+	blockName?: string | null;
+	// Slug of the active block style variation, if any. Its styles are resolved
+	// against `globalStyles` internally and folded in as the highest layer.
+	ownVariation?: string | null;
+	globalStyles?: { styles?: StyleTree } | null;
+	selectedState?: SelectedState | null;
+	_links?: Record< string, any > | null;
+}
+
+// Inlined from `block-editor`'s `hooks/block-style-state.js` to keep this
+// resolver free of that module's dependency chain so it stays pure and easy to
+// test.
 const DEFAULT_STATE_VALUE = 'default';
 
 // Whether the selected block style state is the default (no pseudo/viewport).
-function isDefaultBlockStyleState( selectedState ) {
+function isDefaultBlockStyleState( selectedState?: SelectedState | null ) {
 	const viewport = selectedState?.viewport;
 	const pseudo = selectedState?.pseudo;
 	return (
@@ -25,19 +48,19 @@ function isDefaultBlockStyleState( selectedState ) {
 
 // Object path for the selected state's styles: `[ viewport, pseudo ]` with
 // default segments removed. Mirrors `getStyleForState` in
-// `hooks/block-style-state.js`.
-function getStyleStatePath( selectedState ) {
+// `block-editor`'s `hooks/block-style-state.js`.
+function getStyleStatePath( selectedState: SelectedState ) {
 	if ( isDefaultBlockStyleState( selectedState ) ) {
 		return [];
 	}
 	return [ selectedState.viewport, selectedState.pseudo ].filter(
-		( state ) => state && state !== DEFAULT_STATE_VALUE
+		( state ): state is string => !! state && state !== DEFAULT_STATE_VALUE
 	);
 }
 
 // State-scoped sub-style for the selected state, or the style itself for the
 // default state.
-function getStyleForState( style, selectedState ) {
+function getStyleForState( style: StyleTree, selectedState: SelectedState ) {
 	const path = getStyleStatePath( selectedState );
 	if ( ! path.length ) {
 		return style;
@@ -50,11 +73,14 @@ function getStyleForState( style, selectedState ) {
 const TREE_STRUCTURAL_KEYS = new Set( [ 'blocks', 'variations', 'css' ] );
 
 // Empty inheritance data returned before Global Styles payloads settle.
-const EMPTY_INHERITANCE = Object.freeze( { value: {}, sources: {} } );
+const EMPTY_INHERITANCE: ResolvedStyle = Object.freeze( {
+	value: {},
+	sources: {},
+} );
 
 // Source descriptors per inheritance layer. `layer` identifies which layer
 // supplied a leaf and drives inherited-value detection.
-const SOURCE_DESCRIPTORS = {
+const SOURCE_DESCRIPTORS: Record< string, SourceDescriptor > = {
 	root: { layer: 'root' },
 	element: { layer: 'element' },
 	block: { layer: 'block' },
@@ -65,12 +91,12 @@ const SOURCE_DESCRIPTORS = {
 // selector (e.g. `.wp-element-button`, `h1`–`h6`) rather than the block's own
 // class. For these, the matching root-level `styles.elements[ element ]` layer
 // styles the block on the canvas, so it must be folded into the block's.
-const BLOCK_TO_ROOT_ELEMENT = {
+const BLOCK_TO_ROOT_ELEMENT: Record< string, string > = {
 	'core/button': 'button',
 	'core/heading': 'heading',
 };
 
-function createSourceDescriptor( type ) {
+function createSourceDescriptor( type: string ): SourceDescriptor | null {
 	const descriptor = SOURCE_DESCRIPTORS[ type ];
 	if ( ! descriptor ) {
 		return null;
@@ -78,45 +104,53 @@ function createSourceDescriptor( type ) {
 	return { ...descriptor };
 }
 
-function createContribution( styles, source ) {
+interface Contribution {
+	styles: StyleTree;
+	source: SourceDescriptor;
+}
+
+function createContribution(
+	styles: StyleTree | null,
+	source: SourceDescriptor | null
+): Contribution | null {
 	if ( ! styles || ! source ) {
 		return null;
 	}
 	return { styles, source };
 }
 
-function getPathKey( path ) {
+function getPathKey( path: string[] ) {
 	return path.join( '.' );
 }
 
 // Clone the descriptor so each source-map entry is its own object.
-function getSourceForPath( source ) {
+function getSourceForPath( source: SourceDescriptor ): SourceDescriptor {
 	return { ...source };
 }
 
 // Explicit-empty values do not contribute at their layer, allowing
 // lower-precedence layers to surface instead. `0`, `'0'`, `false`, and `NaN`
 // remain valid user-facing values.
-function isExplicitEmpty( value ) {
+function isExplicitEmpty( value: unknown ) {
 	if ( value === '' || value === null ) {
 		return true;
 	}
 	if (
 		typeof value === 'object' &&
 		! Array.isArray( value ) &&
-		Object.keys( value ).length === 0
+		Object.keys( value as object ).length === 0
 	) {
 		return true;
 	}
 	return false;
 }
 
-function isRefObject( value ) {
+function isRefObject( value: unknown ): value is { ref: string } {
 	return (
 		value !== null &&
 		typeof value === 'object' &&
 		! Array.isArray( value ) &&
-		typeof value.ref === 'string'
+		typeof ( value as { ref?: unknown } ).ref === 'string'
 	);
 }
 
@@ -131,14 +165,16 @@ function isRefObject( value ) {
  * layer's sub-objects. The deep-merge step copies them into a fresh tree and
  * resolves `{ ref }` envelopes inline as it goes.
  *
- * @param {Object} layer Raw styles layer.
- * @return {Object|null} Root-scope contribution, or `null` when the layer is empty.
+ * @param layer Raw styles layer.
+ * @return Root-scope contribution, or `null` when the layer is empty.
  */
-function pickLayerRootContribution( layer ) {
+function pickLayerRootContribution(
+	layer: StyleTree | null
+): StyleTree | null {
 	if ( ! layer || typeof layer !== 'object' || Array.isArray( layer ) ) {
 		return null;
 	}
-	const contribution = {};
+	const contribution: StyleTree = {};
 	for ( const key of Object.keys( layer ) ) {
 		if ( TREE_STRUCTURAL_KEYS.has( key ) ) {
 			continue;
@@ -174,22 +210,22 @@ const ATOMIC_OBJECT_KEYS = new Set( [ 'backgroundImage' ] );
  *
  * Mutates and returns `target`; does not mutate `source`.
  *
- * @param {Object} target
- * @param {Object} source
- * @param {Object} globalStyles
- * @param {Object} sourceMetadata
- * @param {Object} sources
- * @param {Array}  path
- * @return {Object} The mutated `target`.
+ * @param target
+ * @param source
+ * @param globalStyles
+ * @param sourceMetadata
+ * @param sources
+ * @param path
+ * @return The mutated `target`.
  */
 function deepMergeDroppingEmpties(
-	target,
-	source,
-	globalStyles,
-	sourceMetadata,
-	sources,
-	path = []
-) {
+	target: StyleTree,
+	source: StyleTree,
+	globalStyles: StyleTree,
+	sourceMetadata?: SourceDescriptor,
+	sources?: Record< string, SourceDescriptor >,
+	path: string[] = []
+): StyleTree {
 	if ( ! source || typeof source !== 'object' || Array.isArray( source ) ) {
 		return target;
 	}
@@ -256,7 +292,10 @@ function deepMergeDroppingEmpties(
 
 // State-scoped slice of a layer-shaped object for the selected state,
 // guarding against nullish inputs.
-function getStateSlice( layerObject, selectedState ) {
+function getStateSlice(
+	layerObject: StyleTree | null,
+	selectedState: SelectedState
+): StyleTree | null {
 	if ( ! layerObject ) {
 		return null;
 	}
@@ -289,7 +328,7 @@ const NON_CASCADING_ROOT_PREFIXES = [
 // Whether a leaf dot-path is a non-cascading property (see
 // `NON_CASCADING_ROOT_PREFIXES`). The `elements.*` passthrough is exempt: its
 // values are emitted onto their own global selectors and do reach the block.
-function isNonCascadingRootPath( pathKey ) {
+function isNonCascadingRootPath( pathKey: string ) {
 	if ( pathKey.startsWith( 'elements.' ) ) {
 		return false;
 	}
@@ -300,7 +339,7 @@ function isNonCascadingRootPath( pathKey ) {
 
 // Delete a leaf at `pathSegments` from `target`, pruning any parent objects
 // left empty by the removal.
-function deleteAtPath( target, pathSegments ) {
+function deleteAtPath( target: StyleTree, pathSegments: string[] ) {
 	if ( ! target || typeof target !== 'object' ) {
 		return;
 	}
@@ -321,7 +360,10 @@ function deleteAtPath( target, pathSegments ) {
 // Drop root-sourced non-cascading leaves from the merged value and its source
 // map together, so an inspector control never surfaces a root value that does
 // not actually reach the block. See `NON_CASCADING_ROOT_PREFIXES`.
-function dropNonCascadingRootLeaves( value, sources ) {
+function dropNonCascadingRootLeaves(
+	value: StyleTree,
+	sources: Record< string, SourceDescriptor >
+) {
 	for ( const pathKey of Object.keys( sources ) ) {
 		if (
 			sources[ pathKey ].layer === 'root' &&
@@ -338,14 +380,18 @@ function dropNonCascadingRootLeaves( value, sources ) {
 // `{ ref }` envelopes are already resolved during the merge; this additionally
 // resolves theme-file `.url` paths. The merge produces a fresh
 // `backgroundImage` object, so resolving in place does not mutate store data.
-function resolveThemeFileBackgroundImage( value, globalStyles, links ) {
+function resolveThemeFileBackgroundImage(
+	value: StyleTree,
+	globalStyles: StyleTree,
+	links: Record< string, any > | null
+) {
 	const image = value?.background?.backgroundImage;
 	if ( ! image ) {
 		return;
 	}
 	const resolved = getResolvedValue( image, {
 		...globalStyles,
-		_links: links,
+		_links: links ?? undefined,
 	} );
 	if ( resolved !== undefined ) {
 		value.background.backgroundImage = resolved;
@@ -355,23 +401,23 @@ function resolveThemeFileBackgroundImage( value, globalStyles, links ) {
 /**
  * Internal, uncached merge. Computes the merged Global Styles payload and a
  * source map describing which Global Styles layer supplied each winning leaf.
- * `resolveStyles` is the public, memoized entry point.
+ * `resolveStyle` is the public, memoized entry point.
  *
- * @param {Object}  args
- * @param {string}  args.blockName       Block name (e.g. `core/heading`).
- * @param {?string} [args.ownVariation]  Active block style variation slug, or null.
- * @param {Object}  [args.globalStyles]  The `settings[ globalStylesDataKey ]` payload.
- * @param {?Object} [args.selectedState] Selected block style state, or null for the default state.
- * @param {?Object} [args._links]        Theme-file links (`settings[ globalStylesLinksDataKey ]`), used to resolve theme-file pointers.
- * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map.
+ * @param args
+ * @param args.blockName     Block name (e.g. `core/heading`).
+ * @param args.ownVariation  Slug of the active block style variation, or null.
+ * @param args.globalStyles  The `settings[ globalStylesDataKey ]` payload, wrapped as `{ styles }`.
+ * @param args.selectedState Selected block style state, or null for the default state.
+ * @param args._links        Theme-file links, used to resolve theme-file pointers.
+ * @return Merged panel-scoped payload and source map.
  */
-function computeResolvedStyles( {
+function computeResolvedStyle( {
 	blockName,
 	ownVariation = null,
 	globalStyles,
 	selectedState = null,
 	_links = null,
-} = {} ) {
+}: ResolveStyleArgs = {} ): ResolvedStyle {
 	if ( ! globalStyles || ! globalStyles.styles ) {
 		return EMPTY_INHERITANCE;
 	}
@@ -390,7 +436,8 @@ function computeResolvedStyles( {
 	const element = rootElement
 		? styles.elements?.[ rootElement ] ?? null
 		: null;
-	// Variation layer is pre-resolved for refs via the production helper.
+	// Resolve the active block style variation's styles (with `{ ref }`
+	// envelopes resolved) against the Global Styles tree.
 	const variation = ownVariation
 		? getVariationStylesWithRefValues(
 				globalStyles,
@@ -469,13 +516,15 @@ function computeResolvedStyles( {
 		);
 	}
 
-	const filteredContributions = contributions.filter( Boolean );
+	const filteredContributions = contributions.filter(
+		Boolean
+	) as Contribution[];
 
 	if ( filteredContributions.length === 0 ) {
 		return EMPTY_INHERITANCE;
 	}
 
-	const sources = {};
+	const sources: Record< string, SourceDescriptor > = {};
 	const value = filteredContributions.reduce(
 		( mergedValue, contribution ) =>
 			deepMergeDroppingEmpties(
@@ -485,7 +534,7 @@ function computeResolvedStyles( {
 				contribution.source,
 				sources
 			),
-		{}
+		{} as StyleTree
 	);
 
 	// Root-level non-cascading values do not reach the block; drop them from
@@ -497,26 +546,31 @@ function computeResolvedStyles( {
 	return { value, sources };
 }
 
-// Shared memo for `resolveStyles`, keyed by the raw Global Styles payload
+// Shared memo for `resolveStyle`, keyed by the raw Global Styles payload
 // identity and a `(blockName, ownVariation, selectedState)` composite.
-const memo = new WeakMap();
+const memo = new WeakMap< object, Map< string, ResolvedStyle > >();
 
 /**
  * Public entry point. Builds the merged Global Styles payload and source map
- * for a block (see `computeResolvedStyles` for the argument shape), memoized by
+ * for a block (see `computeResolvedStyle` for the argument shape), memoized by
  * Global Styles object identity and a composite of the remaining arguments.
  *
- * @param {Object} args
- * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map; may be a cache hit.
+ * The active variation's styles are resolved internally from `ownVariation`.
+ * Keying the memo on the variation slug (a stable string shared by every
+ * consumer of the same selection) lets all inspector panels collapse to a
+ * single cascade merge per selection.
+ *
+ * @param args
+ * @return Merged panel-scoped payload and source map; may be a cache hit.
  */
-export function resolveStyles( args ) {
+export function resolveStyle( args: ResolveStyleArgs ): ResolvedStyle {
 	// Key the memo on the raw styles payload rather than the `{ styles }`
 	// wrapper. Each panel hook wraps the same stable payload in its own
 	// wrapper object, so keying on the shared payload lets all consumers hit
 	// one cascade merge per selection instead of recomputing an identical one.
 	const styleData = args?.globalStyles?.styles;
 	if ( ! styleData || typeof styleData !== 'object' ) {
-		return computeResolvedStyles( args );
+		return computeResolvedStyle( args );
 	}
 	let inner = memo.get( styleData );
 	if ( ! inner ) {
@@ -535,15 +589,15 @@ export function resolveStyles( args ) {
 		'\u0001' +
 		selectedStateKey;
 	if ( inner.has( key ) ) {
-		return inner.get( key );
+		return inner.get( key ) as ResolvedStyle;
 	}
-	const result = computeResolvedStyles( args );
+	const result = computeResolvedStyle( args );
 	inner.set( key, result );
 	return result;
 }
 
-// Internal helpers exported for unit tests only — not re-exported from the
-// package root.
+// Internal helpers exported for unit tests only — not part of the package's
+// public or private API surface.
 export const privateHelpers = {
 	isExplicitEmpty,
 	isRefObject,

@@ -578,13 +578,13 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		it.each( [ '', null ] )(
 			'does not render the at-rest placeholder cue when inheritedValue.typography.lineHeight is explicit-empty (%p)',
 			( emptyValue ) => {
-				// Note on `{}` empty-object: the builder
-				// (`resolveStyles` →
+				// Note on `{}` empty-object: the resolver
+				// (`resolveStyle` →
 				// `pickLayerRootContribution`) drops `{}` at the
 				// layer-merge stage, so the panel never receives a
 				// `{}` leaf in production (asserted at the helper
-				// level by `preset-round-trip.js` and at the builder
-				// level by `resolve-styles.js`'s
+				// level by `preset-round-trip.js` and at the resolver
+				// level by `resolve-style.ts`'s
 				// `explicit-empty normalization` describe). The
 				// panel-level guard only needs to defend against
 				// `''` and `null` leaves, which can flow through

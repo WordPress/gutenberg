@@ -19,7 +19,7 @@ import {
 	DimensionsPanel as StylesDimensionsPanel,
 	useHasDimensionsPanel,
 } from '../components/global-styles';
-import { useResolvedStyles } from '../components/global-styles/inherited-value-context';
+import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -95,7 +95,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId, isEnabled ]
 	);
 
-	const { value: inheritedValue } = useResolvedStyles(
+	const { value: inheritedValue } = useResolvedStyle(
 		name,
 		className,
 		selectedState

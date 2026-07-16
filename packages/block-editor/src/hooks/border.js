@@ -29,7 +29,7 @@ import {
 	useHasBorderPanelControls,
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
-import { useResolvedStyles } from '../components/global-styles/inherited-value-context';
+import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { store as blockEditorStore } from '../store';
 import {
 	getStyleForState,
@@ -170,7 +170,7 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId, isEnabled ]
 	);
 
-	const { value: inheritedValue } = useResolvedStyles(
+	const { value: inheritedValue } = useResolvedStyle(
 		name,
 		className,
 		selectedState

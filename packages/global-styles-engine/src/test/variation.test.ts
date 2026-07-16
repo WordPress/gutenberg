@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getVariationStylesWithRefValues } from '../block-style-variation';
+import { getVariationStylesWithRefValues } from '../variation';
 
 describe( 'getVariationStylesWithRefValues', () => {
 	it( 'should resolve ref values correctly', () => {

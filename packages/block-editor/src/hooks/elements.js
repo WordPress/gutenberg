@@ -14,7 +14,7 @@ import {
 	useHasColorPanel,
 	default as StylesColorPanel,
 } from '../components/global-styles/color-panel';
-import { useResolvedStyles } from '../components/global-styles/inherited-value-context';
+import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 import { COLOR_SUPPORT_KEY } from './color';
@@ -75,7 +75,7 @@ export function ElementsEdit( {
 		[ clientId, isEnabled ]
 	);
 
-	const { value: inheritedValue } = useResolvedStyles(
+	const { value: inheritedValue } = useResolvedStyle(
 		name,
 		className,
 		selectedState

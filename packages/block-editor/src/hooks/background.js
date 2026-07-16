@@ -30,7 +30,7 @@ import {
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
-import { useResolvedStyles } from '../components/global-styles/inherited-value-context';
+import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
@@ -193,7 +193,7 @@ export function BackgroundImagePanel( {
 		[ clientId ]
 	);
 
-	const { value: inheritedValue } = useResolvedStyles(
+	const { value: inheritedValue } = useResolvedStyle(
 		name,
 		className,
 		selectedState

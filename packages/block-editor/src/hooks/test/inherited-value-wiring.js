@@ -7,7 +7,7 @@ import { render } from '@testing-library/react';
  * Tests the wiring between inspector hook wrappers and shared
  * Global Styles panels.
  *
- * Each wrapper calls `useResolvedStyles( blockName, className, selectedState )`
+ * Each wrapper calls `useResolvedStyle( blockName, className, selectedState )`
  * and forwards the returned merged value to the shared panel via the
  * `inheritedValue` prop. The full shared-panel render tree (ToolsPanel
  * machinery, `InspectorControls` slot-fill, data store, etc.) is
@@ -22,7 +22,7 @@ const mockInheritedReturn = { value: {} };
 
 jest.mock( '../../components/global-styles/inherited-value-context', () => ( {
 	__esModule: true,
-	useResolvedStyles: ( blockName, className, selectedState ) => {
+	useResolvedStyle: ( blockName, className, selectedState ) => {
 		mockHookRecorder.calls.push( { blockName, className, selectedState } );
 		return {
 			value: mockInheritedReturn.value,
@@ -185,14 +185,14 @@ beforeEach( () => {
 } );
 
 // The `className` → variation-slug derivation now lives inside
-// `useResolvedStyles` (mocked here) and has direct coverage in the
+// `useResolvedStyle` (mocked here) and has direct coverage in the
 // `inherited-value-context` and `block-style-variation` suites. These
-// tests verify that each hook wrapper calls `useResolvedStyles` with the
+// tests verify that each hook wrapper calls `useResolvedStyle` with the
 // block's name and forwards its return value to the shared panel via the
 // `inheritedValue` prop.
 
 describe( 'inspector hook wrappers thread inheritedValue into the panel', () => {
-	test( 'TypographyPanel calls useResolvedStyles with the block name and threads inheritedValue', () => {
+	test( 'TypographyPanel calls useResolvedStyle with the block name and threads inheritedValue', () => {
 		// Imported inside the test so the `jest.mock` factories are
 		// applied before the wrapper's module graph is resolved.
 		const { TypographyPanel } = require( '../typography' );
@@ -354,7 +354,7 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 		} );
 	} );
 
-	test( 'wrappers forward the block className to useResolvedStyles', () => {
+	test( 'wrappers forward the block className to useResolvedStyle', () => {
 		const { TypographyPanel } = require( '../typography' );
 		mockUseSelectImpl.fn = () => ( {
 			style: undefined,
