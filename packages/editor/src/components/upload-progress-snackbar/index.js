@@ -102,7 +102,7 @@ export default function UploadProgressSnackbar() {
 	// Track peak total across sources during a session. The CSM queue removes
 	// items on completion, and the tracker tops out at its recorded total, so
 	// `total` has to be tracked as the high-water mark. Held in a ref (updated
-	// inside the effect below) because it never drives rendering — setting
+	// inside the effect below) because it never drives rendering - setting
 	// state during render here discarded the in-progress render pass, which
 	// corrupted `useSyncExternalStore`'s snapshot bookkeeping and made it drop
 	// the tracker's completion notification, leaving the snackbar stuck in its
