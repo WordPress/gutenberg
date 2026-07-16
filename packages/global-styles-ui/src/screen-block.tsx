@@ -214,7 +214,8 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		userSettings,
 		settings
 	);
-	const hasVariationsPanel = !! blockVariations?.length && ! variation;
+	const hasVariationsPanel =
+		!! blockVariations?.length && ! variation && ! hasSelectedState;
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
 			select( coreStore );
