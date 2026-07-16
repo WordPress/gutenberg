@@ -115,7 +115,11 @@ function block_core_table_of_contents_get_heading_from_block( $block, $max_level
 	}
 
 	$content = preg_replace( '/<br\s*\/?>/i', ' ', $rendered_heading );
-	$content = trim( wp_strip_all_tags( $content ) );
+	$content = html_entity_decode(
+		trim( wp_strip_all_tags( $content ) ),
+		ENT_QUOTES,
+		get_option( 'blog_charset' )
+	);
 
 	if ( '' === $content ) {
 		return null;

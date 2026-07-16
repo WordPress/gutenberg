@@ -160,6 +160,29 @@ class Tests_Blocks_Render_Table_Of_Contents_Test extends WP_UnitTestCase {
 	/**
 	 * @covers ::gutenberg_block_core_table_of_contents_render
 	 */
+	public function test_render_escapes_heading_entities_once() {
+		$post_id = self::factory()->post->create(
+			array(
+				'post_status'  => 'publish',
+				'post_content' => implode(
+					"\n",
+					array(
+						$this->table_of_contents_block(),
+						$this->heading_block( 'Research & Development', 'research-development' ),
+					)
+				),
+			)
+		);
+
+		$nav = $this->get_table_of_contents_html( $this->render_post_content( $post_id ) );
+
+		$this->assertStringContainsString( 'Research &amp; Development', $nav );
+		$this->assertStringNotContainsString( '&amp;amp;', $nav );
+	}
+
+	/**
+	 * @covers ::gutenberg_block_core_table_of_contents_render
+	 */
 	public function test_render_only_include_current_page_uses_current_paginated_page() {
 		$post_id = self::factory()->post->create(
 			array(
