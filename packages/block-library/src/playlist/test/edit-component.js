@@ -168,7 +168,9 @@ describe( 'PlaylistEdit', () => {
 			'media'
 		);
 		expect(
-			within( otherControls ).getByRole( 'button', { name: 'Add' } )
+			within( otherControls ).getByRole( 'button', {
+				name: 'Add track',
+			} )
 		).toBeInTheDocument();
 	} );
 } );
