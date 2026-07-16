@@ -223,6 +223,72 @@ test.describe( 'Table of Contents', () => {
 			).toBeVisible();
 		} );
 
+		test( 'uses the anchor chosen for a heading after publish', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const headingText = 'Chosen section';
+			const chosenAnchor = 'reader-picked-section';
+			const post = await requestUtils.createPost( {
+				title: 'Chosen anchor table of contents',
+				content: postContentWithTocAndHeadings( [
+					{ content: headingText },
+				] ),
+				status: 'draft',
+			} );
+
+			await admin.editPost( post.id );
+
+			await editor.canvas
+				.getByText( headingText, { exact: true } )
+				.last()
+				.click();
+			await editor.openDocumentSettingsSidebar();
+			const editorSettings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await editorSettings
+				.getByRole( 'button', { name: 'Advanced' } )
+				.click();
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'textbox', { name: /HTML anchor/i } )
+				.fill( chosenAnchor );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{ name: 'core/table-of-contents' },
+				{
+					name: 'core/heading',
+					attributes: {
+						content: headingText,
+						anchor: chosenAnchor,
+					},
+				},
+			] );
+
+			const postId = await editor.publishPost();
+			await openPostOnFrontend( page, postId );
+
+			const link = page
+				.getByRole( 'navigation', { name: 'Table of Contents' } )
+				.getByRole( 'link', { name: headingText } );
+
+			await expect( link ).toHaveAttribute(
+				'href',
+				new RegExp( `#${ chosenAnchor }$` )
+			);
+
+			await link.click();
+			await expect( page ).toHaveURL(
+				new RegExp( `#${ chosenAnchor }$` )
+			);
+			await expect(
+				page.locator( `#${ chosenAnchor }` )
+			).toBeInViewport();
+		} );
+
 		test( 'limits visible heading levels in the editor and after publish when the block setting changes', async ( {
 			editor,
 			page,
