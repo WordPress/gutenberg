@@ -173,7 +173,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
-				return $data->set(
+				return $data->replace(
 					'form',
 					array(
 						'fields' => array(
@@ -314,7 +314,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
-				return $data->set(
+				return $data->replace(
 					'default_view',
 					array(
 						'fields' => array( 'title' ),

@@ -19,7 +19,7 @@
  *   and the `view_list` entries by view `slug` identity. This is what plugins
  *   should use: patches compose with core's configuration and with other
  *   plugins'.
- * - `set()` replaces a whole top-level key. It shouldn't be the default
+ * - `replace()` replaces a whole top-level key. It shouldn't be the default
  *   choice — a callback using it stops inheriting core's future changes to
  *   that key — but it's useful for cases like a post type that doesn't
  *   want the default form at all.
@@ -27,7 +27,7 @@
  * Patches follow three shared rules: an associative array merges key by
  * key, a numerically indexed array replaces the current value wholesale,
  * and `null` deletes what it names — deleting a whole top-level key resets
- * it to its default. Each patch and each `set()` value also declares the
+ * it to its default. Each patch and each `replace()` value also declares the
  * configuration schema version it was written against (currently 1), so a
  * future WordPress release that changes the configuration shape can migrate
  * existing patches forward instead of breaking them.
@@ -78,7 +78,7 @@ class Gutenberg_View_Config_Data {
 	 *
 	 * @return array The configuration.
 	 */
-	public function get_config() {
+	public function get_data() {
 		return $this->config;
 	}
 
@@ -99,7 +99,7 @@ class Gutenberg_View_Config_Data {
 	 * @param int    $version The schema version the value was authored against.
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
-	public function set( $key, $value, int $version ) {
+	public function replace( $key, $value, int $version ) {
 		if ( ! $this->check_version( $version, __METHOD__ ) ) {
 			return $this;
 		}

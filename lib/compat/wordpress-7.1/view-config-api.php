@@ -156,7 +156,7 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 	 *
 	 * Callbacks receive a Gutenberg_View_Config_Data object and change the
 	 * configuration through its methods: the `update_*()` methods merge
-	 * partial changes into the current configuration, while `set()` replaces
+	 * partial changes into the current configuration, while `replace()` replaces
 	 * a whole top-level key. Callbacks must return the object they were
 	 * given.
 	 *
@@ -197,7 +197,7 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 
 	// Backfill any dropped keys with their defaults, then discard any keys the
 	// filter introduced that are not part of the documented configuration shape.
-	return array_intersect_key( array_merge( $config, $filtered->get_config() ), $config );
+	return array_intersect_key( array_merge( $config, $filtered->get_data() ), $config );
 }
 
 /**
@@ -324,8 +324,8 @@ function _gutenberg_get_entity_view_config_post_type_page( $data ) {
 		),
 	);
 
-	$data->set( 'default_layouts', $default_layouts, 1 );
-	$data->set( 'default_view', $default_view, 1 );
+	$data->replace( 'default_layouts', $default_layouts, 1 );
+	$data->replace( 'default_view', $default_view, 1 );
 	// Append the status views, thereby preserving the base "all items" view,
 	// so its post-type-specific title is kept.
 	$data->merge( array( 'view_list' => $view_list ), 1 );
@@ -367,8 +367,8 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $data ) {
 		'layout'     => $default_layouts['grid']['layout'],
 	);
 
-	$data->set( 'default_layouts', $default_layouts, 1 );
-	$data->set( 'default_view', $default_view, 1 );
+	$data->replace( 'default_layouts', $default_layouts, 1 );
+	$data->replace( 'default_view', $default_view, 1 );
 
 	$view_list = array(
 		array(
@@ -417,9 +417,9 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $data ) {
 		);
 	}
 
-	$data->set( 'view_list', $view_list, 1 );
+	$data->replace( 'view_list', $view_list, 1 );
 
-	$data->set(
+	$data->replace(
 		'form',
 		array(
 			'layout' => array( 'type' => 'panel' ),
@@ -480,8 +480,8 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $data ) {
 		'layout'     => $default_layouts['grid']['layout'],
 	);
 
-	$data->set( 'default_layouts', $default_layouts, 1 );
-	$data->set( 'default_view', $default_view, 1 );
+	$data->replace( 'default_layouts', $default_layouts, 1 );
+	$data->replace( 'default_view', $default_view, 1 );
 
 	$view_list = array(
 		array(
@@ -524,9 +524,9 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $data ) {
 		);
 	}
 
-	$data->set( 'view_list', $view_list, 1 );
+	$data->replace( 'view_list', $view_list, 1 );
 
-	$data->set(
+	$data->replace(
 		'form',
 		array(
 			'layout' => array( 'type' => 'panel' ),
@@ -575,8 +575,8 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $data ) {
 		'list'  => array( 'showMedia' => false ),
 	);
 
-	$data->set( 'default_view', $default_view, 1 );
-	$data->set( 'default_layouts', $default_layouts, 1 );
+	$data->replace( 'default_view', $default_view, 1 );
+	$data->replace( 'default_layouts', $default_layouts, 1 );
 
 	$view_list = array(
 		array(
@@ -716,9 +716,9 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $data ) {
 		}
 	}
 
-	$data->set( 'view_list', array_merge( $view_list, $registered_authors, $user_authors ), 1 );
+	$data->replace( 'view_list', array_merge( $view_list, $registered_authors, $user_authors ), 1 );
 
-	$data->set(
+	$data->replace(
 		'form',
 		array(
 			'layout' => array( 'type' => 'panel' ),

@@ -11,7 +11,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	/**
 	 * set() replaces a whole documented key.
 	 *
-	 * @covers ::set
+	 * @covers ::replace
 	 */
 	public function test_set_replaces_key() {
 		$data = new Gutenberg_View_Config_Data(
@@ -22,41 +22,41 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				),
 			)
 		);
-		$data->set( 'default_view', array( 'type' => 'grid' ), 1 );
+		$data->replace( 'default_view', array( 'type' => 'grid' ), 1 );
 
-		$this->assertSame( array( 'type' => 'grid' ), $data->get_config()['default_view'] );
+		$this->assertSame( array( 'type' => 'grid' ), $data->get_data()['default_view'] );
 	}
 
 	/**
 	 * set() rejects an undocumented key.
 	 *
-	 * @covers ::set
+	 * @covers ::replace
 	 */
 	public function test_set_rejects_unknown_key() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::replace' );
 
 		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
-		$before = $data->get_config();
-		$data->set( 'not_a_real_key', 'nope', 1 );
+		$before = $data->get_data();
+		$data->replace( 'not_a_real_key', 'nope', 1 );
 
-		$this->assertSame( $before, $data->get_config() );
+		$this->assertSame( $before, $data->get_data() );
 	}
 
 	/**
 	 * set() rejects a patch with an invalid version.
 	 *
-	 * @covers ::set
+	 * @covers ::replace
 	 */
 	public function test_set_rejects_updates_with_invalid_version() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::replace' );
 
 		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
-		$before = $data->get_config();
+		$before = $data->get_data();
 
 		$version = Gutenberg_View_Config_Data::LATEST_VERSION + 1;
-		$data->set( 'default_view', array( 'type' => 'grid' ), $version );
+		$data->replace( 'default_view', array( 'type' => 'grid' ), $version );
 
-		$this->assertSame( $before, $data->get_config() );
+		$this->assertSame( $before, $data->get_data() );
 	}
 
 	/**
@@ -91,7 +91,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'perPage' => 50,
 				'showLevels' => false
 			),
-			$data->get_config()['default_view']
+			$data->get_data()['default_view']
 		);
 	}
 
@@ -193,7 +193,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					)
 				)
 			),
-			$data->get_config()
+			$data->get_data()
 		);
 	}
 
@@ -378,7 +378,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				)
 			)
 			),
-			$data->get_config()
+			$data->get_data()
 		);
 	}
 
@@ -398,7 +398,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 		$data->merge( array( 'default_view' => array( 'perPage' => null ) ), 1 );
 
-		$this->assertSame( array( 'type' => 'table' ), $data->get_config()['default_view'] );
+		$this->assertSame( array( 'type' => 'table' ), $data->get_data()['default_view'] );
 	}
 
 	/**
@@ -446,7 +446,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					'table' => array( 'layout' => array( 'density' => 'compact' ) ),
 				)
 			),
-			$data->get_config()
+			$data->get_data()
 		);
 	}
 
@@ -494,7 +494,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					'grid' => array( 'layout' => array( 'density' => 'compact' ) ),
 				)
 			),
-			$data->get_config()
+			$data->get_data()
 		);
 	}
 
@@ -530,7 +530,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 
 		$this->assertSame(
 			array( 'form' => array( 'layout' => array( 'type' => 'panel' ) ) ),
-			$data->get_config()
+			$data->get_data()
 		);
 	}
 
@@ -543,12 +543,12 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge' );
 
 		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
-		$before = $data->get_config();
+		$before = $data->get_data();
 
 		$version = Gutenberg_View_Config_Data::LATEST_VERSION + 1;
 		$data->merge( array( 'default_view' => array( 'type' => 'grid' ) ), $version );
 
-		$this->assertSame( $before, $data->get_config() );
+		$this->assertSame( $before, $data->get_data() );
 	}
 
 	/**
@@ -564,7 +564,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$data = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
 		$data->merge( array( 'not_a_real_key' => 'nope' ), 1 );
 
-		$this->assertSame( array( 'default_view' => array( 'type' => 'table' ) ), $data->get_config() );
+		$this->assertSame( array( 'default_view' => array( 'type' => 'table' ) ), $data->get_data() );
 	}
 
 
@@ -598,7 +598,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				),
 			),
 			),
-			$data->get_config()
+			$data->get_data()
 		);
 	}
 
@@ -648,7 +648,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				),
 			),
 			),
-			$data->get_config()
+			$data->get_data()
 		);
 	}
 
@@ -683,7 +683,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				),
 			),
 			),
-			$data->get_config()
+			$data->get_data()
 		);
 	}
 
@@ -715,7 +715,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				)
 			),
 			),
-			$data->get_config()
+			$data->get_data()
 		);
 	}
 
