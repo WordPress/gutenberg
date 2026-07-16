@@ -1,5 +1,5 @@
 import { cloneElement } from '@wordpress/element';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 /**
  * Fills an optional "slot" element prop with content by cloning it and
@@ -19,14 +19,13 @@ import type { ReactElement } from 'react';
  *                    may have passed on the slot element.
  * @param defaultSlot Unpopulated default element used when `slot` is omitted
  *                    (e.g. `<Tooltip.Portal />`).
- * @param props       Content to inject as the slot's children (backdrop,
+ * @param children    Content to inject as the slot's children (backdrop,
  *                    positioner, popup subtree, etc.).
  */
 export function renderSlotWithChildren(
 	slot: ReactElement | undefined,
 	defaultSlot: ReactElement,
-	props: Record< string, unknown >
+	children: ReactNode
 ): ReactElement {
-	// TODO: do we need to somehow merge props here?
-	return cloneElement( slot ?? defaultSlot, { ...props } );
+	return cloneElement( slot ?? defaultSlot, { children } );
 }

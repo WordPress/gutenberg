@@ -23,11 +23,9 @@ export const Popup = forwardRef< HTMLDivElement, ComboboxPopupProps >(
 		const positionedPopup = renderSlotWithChildren(
 			positioner,
 			<Positioner />,
-			{ children: popupContent }
+			popupContent
 		);
 
-		return renderSlotWithChildren( portal, <Portal />, {
-			children: positionedPopup,
-		} );
+		return renderSlotWithChildren( portal, <Portal />, positionedPopup );
 	}
 );
