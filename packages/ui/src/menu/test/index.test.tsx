@@ -9,6 +9,10 @@ function queryItemPrefix( item: HTMLElement ) {
 	return item.querySelector( '.style-item-prefix' );
 }
 
+function queryItemShortcut( item: HTMLElement ) {
+	return item.querySelector( '.style-item-shortcut' );
+}
+
 describe( 'Menu', () => {
 	it( 'opens from the trigger and exposes menu semantics', async () => {
 		const user = userEvent.setup();
@@ -148,6 +152,135 @@ describe( 'Menu', () => {
 		} );
 
 		expect( item ).toHaveAccessibleDescription( 'Create a separate copy.' );
+	} );
+
+	it( 'uses shortcut metadata for visual and accessible item descriptions', async () => {
+		const user = userEvent.setup();
+
+		function MenuWithShortcutDescription() {
+			const externalDescriptionId = useId();
+
+			return (
+				<Menu.Root>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<span id={ externalDescriptionId }>
+							Available offline.
+						</span>
+						<Menu.Item
+							aria-describedby={ externalDescriptionId }
+							shortcut={ {
+								displayShortcut: '⌘S',
+								ariaKeyShortcut: 'Meta+S',
+								description: 'Command S',
+							} }
+						>
+							<Menu.ItemLabel>Save</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Save the current file.
+							</Menu.ItemDescription>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			);
+		}
+
+		render( <MenuWithShortcutDescription /> );
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		const item = await screen.findByRole( 'menuitem', {
+			name: 'Save',
+			description:
+				'Available offline. Save the current file. Keyboard shortcut: Command S',
+		} );
+		const shortcut = queryItemShortcut( item );
+		const externalDescription = screen.getByText( 'Available offline.' );
+		const description = screen.getByText( 'Save the current file.' );
+		const shortcutDescription = screen.getByText(
+			'Keyboard shortcut: Command S'
+		);
+
+		expect( item ).toHaveAttribute( 'aria-keyshortcuts', 'Meta+S' );
+		expect( shortcut ).toHaveTextContent( '⌘S' );
+		expect( shortcut ).toHaveAttribute( 'aria-hidden', 'true' );
+		expect( item ).toHaveAttribute(
+			'aria-describedby',
+			`${ externalDescription.id } ${ description.id } ${ shortcutDescription.id }`
+		);
+	} );
+
+	it( 'supports shortcut metadata across menu item variants', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem
+						href="https://wordpress.org"
+						shortcut={ {
+							displayShortcut: '⌘L',
+							ariaKeyShortcut: 'Meta+L',
+							description: 'Command L',
+						} }
+					>
+						WordPress.org
+					</Menu.LinkItem>
+					<Menu.CheckboxItem
+						checked
+						shortcut={ {
+							displayShortcut: '⌘B',
+							ariaKeyShortcut: 'Meta+B',
+							description: 'Command B',
+						} }
+					>
+						Bookmarks
+					</Menu.CheckboxItem>
+					<Menu.RadioGroup value="list">
+						<Menu.RadioItem
+							value="list"
+							shortcut={ {
+								displayShortcut: '⌘1',
+								ariaKeyShortcut: 'Meta+1',
+								description: 'Command 1',
+							} }
+						>
+							List
+						</Menu.RadioItem>
+					</Menu.RadioGroup>
+					<Menu.SubmenuRoot>
+						<Menu.SubmenuTrigger
+							shortcut={ {
+								displayShortcut: '⌘M',
+								ariaKeyShortcut: 'Meta+M',
+								description: 'Command M',
+							} }
+						>
+							Move to
+						</Menu.SubmenuTrigger>
+						<Menu.Popup>
+							<Menu.Item>Archive</Menu.Item>
+						</Menu.Popup>
+					</Menu.SubmenuRoot>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		expect(
+			await screen.findByRole( 'menuitem', { name: 'WordPress.org' } )
+		).toHaveAttribute( 'aria-keyshortcuts', 'Meta+L' );
+		expect(
+			screen.getByRole( 'menuitemcheckbox', { name: 'Bookmarks' } )
+		).toHaveAttribute( 'aria-keyshortcuts', 'Meta+B' );
+		expect(
+			screen.getByRole( 'menuitemradio', { name: 'List' } )
+		).toHaveAttribute( 'aria-keyshortcuts', 'Meta+1' );
+		expect(
+			screen.getByRole( 'menuitem', { name: 'Move to' } )
+		).toHaveAttribute( 'aria-keyshortcuts', 'Meta+M' );
 	} );
 
 	it( 'does not render empty prefix slots', async () => {

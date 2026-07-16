@@ -7,12 +7,10 @@
 		}
 
 		.popup {
-			composes: dropdown-motion from "../utils/css/dropdown-motion.module.css";
-
 			--wp-ui-menu-popup-padding: var(--wpds-dimension-padding-xs);
 			--wp-ui-menu-min-width: 160px;
 			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-md);
-			--_wp-ui-elevation-md: "0px 2px 3px 0px #0000000d, 0px 4px 5px 0px #0000000a, 0px 12px 12px 0px #00000008, 0px 16xrpx 16px 0px #00000005";
+			--_wp-ui-elevation-md: 0px 2px 3px 0px #0000000d, 0px 4px 5px 0px #0000000a, 0px 12px 12px 0px #00000008, 0px 16px 16px 0px #00000005;
 
 			display: grid;
 			grid-template-areas: none;
@@ -221,6 +219,14 @@
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
+		.item-shortcut {
+			flex-shrink: 0;
+			margin-inline-start: var(--wpds-dimension-gap-lg);
+			color: var(--wpds-color-foreground-content-neutral-weak);
+			direction: ltr;
+			unicode-bidi: isolate;
+		}
+
 		.submenu-chevron {
 			margin-inline-end: calc(-1 * var(--wpds-dimension-gap-sm));
 		}
@@ -248,10 +254,12 @@
 		.item[data-highlighted]:not([aria-disabled]) .item-prefix,
 		.item[data-highlighted]:not([aria-disabled]) .item-description,
 		.item[data-highlighted]:not([aria-disabled]) .item-suffix,
+		.item[data-highlighted]:not([aria-disabled]) .item-shortcut,
 		.item[data-highlighted]:not([aria-disabled]) .item-selection-indicator,
 		.item[aria-disabled] .item-prefix,
 		.item[aria-disabled] .item-description,
 		.item[aria-disabled] .item-suffix,
+		.item[aria-disabled] .item-shortcut,
 		.item[aria-disabled] .item-selection-indicator {
 			color: inherit;
 		}

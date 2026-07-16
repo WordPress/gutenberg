@@ -18,22 +18,24 @@ const CheckboxItem = forwardRef< HTMLDivElement, CheckboxItemProps >(
 			children,
 			className,
 			prefix,
+			shortcut,
 			suffix,
 			'aria-describedby': ariaDescribedBy,
+			'aria-keyshortcuts': ariaKeyShortcuts,
 			'aria-label': ariaLabel,
 			'aria-labelledby': ariaLabelledBy,
 			...props
 		},
 		ref
 	) {
-		const { contentContextValue, itemAriaProps } = useItemContent(
-			children,
-			{
+		const { contentContextValue, itemAriaProps, shortcutDescriptionId } =
+			useItemContent( children, {
 				'aria-describedby': ariaDescribedBy,
+				'aria-keyshortcuts': ariaKeyShortcuts,
 				'aria-label': ariaLabel,
 				'aria-labelledby': ariaLabelledBy,
-			}
-		);
+				shortcut,
+			} );
 
 		return (
 			<_Menu.CheckboxItem
@@ -53,7 +55,12 @@ const CheckboxItem = forwardRef< HTMLDivElement, CheckboxItemProps >(
 					<Icon icon={ check } size={ 24 } aria-hidden="true" />
 				</_Menu.CheckboxItemIndicator>
 				<MenuItemContentContext.Provider value={ contentContextValue }>
-					<ItemContent prefix={ prefix } suffix={ suffix }>
+					<ItemContent
+						prefix={ prefix }
+						shortcut={ shortcut }
+						shortcutDescriptionId={ shortcutDescriptionId }
+						suffix={ suffix }
+					>
 						{ children }
 					</ItemContent>
 				</MenuItemContentContext.Provider>

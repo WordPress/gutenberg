@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import { archive } from '@wordpress/icons';
-import { ariaKeyShortcut, displayShortcut } from '@wordpress/keycodes';
+import {
+	ariaKeyShortcut,
+	displayShortcut,
+	shortcutAriaLabel,
+} from '@wordpress/keycodes';
 import { Icon } from '../../icon';
 import * as Menu from '../';
 
@@ -42,6 +46,44 @@ export default meta;
 
 type Story = StoryObj< typeof Menu.Root >;
 
+const SHORTCUTS = {
+	commandPalette: {
+		displayShortcut: displayShortcut.primary( 'k' ),
+		ariaKeyShortcut: ariaKeyShortcut.primary( 'k' ),
+		description: shortcutAriaLabel.primary( 'k' ),
+	},
+	comfortableDensity: {
+		displayShortcut: displayShortcut.primary( '2' ),
+		ariaKeyShortcut: ariaKeyShortcut.primary( '2' ),
+		description: shortcutAriaLabel.primary( '2' ),
+	},
+	developerResources: {
+		displayShortcut: displayShortcut.primary( 'd' ),
+		ariaKeyShortcut: ariaKeyShortcut.primary( 'd' ),
+		description: shortcutAriaLabel.primary( 'd' ),
+	},
+	downloads: {
+		displayShortcut: displayShortcut.primary( 'd' ),
+		ariaKeyShortcut: ariaKeyShortcut.primary( 'd' ),
+		description: shortcutAriaLabel.primary( 'd' ),
+	},
+	move: {
+		displayShortcut: displayShortcut.primary( 'm' ),
+		ariaKeyShortcut: ariaKeyShortcut.primary( 'm' ),
+		description: shortcutAriaLabel.primary( 'm' ),
+	},
+	save: {
+		displayShortcut: displayShortcut.primary( 's' ),
+		ariaKeyShortcut: ariaKeyShortcut.primary( 's' ),
+		description: shortcutAriaLabel.primary( 's' ),
+	},
+	shared: {
+		displayShortcut: displayShortcut.primaryShift( 's' ),
+		ariaKeyShortcut: ariaKeyShortcut.primaryShift( 's' ),
+		description: shortcutAriaLabel.primaryShift( 's' ),
+	},
+};
+
 export const Default: Story = {
 	render: function Render() {
 		const [ bookmarks, setBookmarks ] = useState( true );
@@ -70,8 +112,7 @@ export const Default: Story = {
 						prefix={
 							<Icon icon={ archive } size={ 24 } aria-hidden />
 						}
-						aria-keyshortcuts={ ariaKeyShortcut.primary( 's' ) }
-						suffix={ displayShortcut.primary( 's' ) }
+						shortcut={ SHORTCUTS.save }
 					>
 						Save
 					</Menu.Item>
@@ -103,8 +144,7 @@ export const Default: Story = {
 						<Menu.CheckboxItem
 							checked={ downloads }
 							onCheckedChange={ setDownloads }
-							aria-keyshortcuts={ ariaKeyShortcut.primary( 'd' ) }
-							suffix={ displayShortcut.primary( 'd' ) }
+							shortcut={ SHORTCUTS.downloads }
 						>
 							<Menu.ItemLabel>Downloads</Menu.ItemLabel>
 							<Menu.ItemDescription>
@@ -150,10 +190,7 @@ export const Default: Story = {
 					</Menu.RadioGroup>
 					<Menu.Separator />
 					<Menu.SubmenuRoot>
-						<Menu.SubmenuTrigger
-							aria-keyshortcuts={ ariaKeyShortcut.primary( 'm' ) }
-							suffix={ displayShortcut.primary( 'm' ) }
-						>
+						<Menu.SubmenuTrigger shortcut={ SHORTCUTS.move }>
 							<Menu.ItemLabel>Move to</Menu.ItemLabel>
 							<Menu.ItemDescription>
 								Choose another collection.
@@ -207,8 +244,8 @@ export const LinkItem: Story = {
 					<Menu.LinkItem
 						href="https://developer.wordpress.org"
 						openInNewTab
-						aria-keyshortcuts={ ariaKeyShortcut.primary( 'd' ) }
-						suffix={ displayShortcut.primary( 'd' ) }
+						shortcut={ SHORTCUTS.developerResources }
+						suffix="Docs"
 					>
 						<Menu.ItemLabel>
 							WordPress developer resources
@@ -231,8 +268,8 @@ export const LinkItem: Story = {
 };
 
 /**
- * Use `ariaKeyShortcut` for the `aria-keyshortcuts` value, and keep the suffix
- * as the visual shortcut label.
+ * Use `shortcut` to provide the visual label, `aria-keyshortcuts` value, and
+ * accessible shortcut description together.
  */
 export const KeyboardShortcuts: Story = {
 	args: {
@@ -240,16 +277,8 @@ export const KeyboardShortcuts: Story = {
 			<>
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item
-						aria-keyshortcuts={ ariaKeyShortcut.primary( 's' ) }
-						suffix={ displayShortcut.primary( 's' ) }
-					>
-						Save
-					</Menu.Item>
-					<Menu.Item
-						aria-keyshortcuts={ ariaKeyShortcut.primary( 'k' ) }
-						suffix={ displayShortcut.primary( 'k' ) }
-					>
+					<Menu.Item shortcut={ SHORTCUTS.save }>Save</Menu.Item>
+					<Menu.Item shortcut={ SHORTCUTS.commandPalette }>
 						Open command palette
 					</Menu.Item>
 				</Menu.Popup>
@@ -281,19 +310,15 @@ export const RichItems: Story = {
 						prefix={
 							<Icon icon={ archive } size={ 24 } aria-hidden />
 						}
-						aria-keyshortcuts={ ariaKeyShortcut.primary( 's' ) }
-						suffix={ displayShortcut.primary( 's' ) }
+						shortcut={ SHORTCUTS.save }
+						suffix="Modified"
 					>
 						<Menu.ItemLabel>With prefix and suffix</Menu.ItemLabel>
 						<Menu.ItemDescription>
 							Description text keeps the same highlighted area.
 						</Menu.ItemDescription>
 					</Menu.Item>
-					<Menu.Item
-						disabled
-						aria-keyshortcuts={ ariaKeyShortcut.primary( 'd' ) }
-						suffix={ displayShortcut.primary( 'd' ) }
-					>
+					<Menu.Item disabled shortcut={ SHORTCUTS.downloads }>
 						<Menu.ItemLabel>Disabled item</Menu.ItemLabel>
 						<Menu.ItemDescription>
 							Disabled foreground treatment applies to all item
@@ -314,10 +339,7 @@ export const Submenu: Story = {
 				<Menu.Popup>
 					<Menu.Item>Rename</Menu.Item>
 					<Menu.SubmenuRoot>
-						<Menu.SubmenuTrigger
-							aria-keyshortcuts={ ariaKeyShortcut.primary( 'm' ) }
-							suffix={ displayShortcut.primary( 'm' ) }
-						>
+						<Menu.SubmenuTrigger shortcut={ SHORTCUTS.move }>
 							<Menu.ItemLabel>
 								Move to another collection
 							</Menu.ItemLabel>
@@ -370,8 +392,7 @@ export const CheckboxItems: Story = {
 						<Menu.CheckboxItem
 							checked={ downloads }
 							onCheckedChange={ setDownloads }
-							aria-keyshortcuts={ ariaKeyShortcut.primary( 'd' ) }
-							suffix={ displayShortcut.primary( 'd' ) }
+							shortcut={ SHORTCUTS.downloads }
 						>
 							<Menu.ItemLabel>Downloads</Menu.ItemLabel>
 							<Menu.ItemDescription>
@@ -408,10 +429,7 @@ export const CheckboxItems: Story = {
 									aria-hidden
 								/>
 							}
-							aria-keyshortcuts={ ariaKeyShortcut.primaryShift(
-								's'
-							) }
-							suffix={ displayShortcut.primaryShift( 's' ) }
+							shortcut={ SHORTCUTS.shared }
 						>
 							<Menu.ItemLabel>Shared</Menu.ItemLabel>
 							<Menu.ItemDescription>
@@ -488,10 +506,7 @@ export const RadioItems: Story = {
 										aria-hidden
 									/>
 								}
-								aria-keyshortcuts={ ariaKeyShortcut.primary(
-									'2'
-								) }
-								suffix={ displayShortcut.primary( '2' ) }
+								shortcut={ SHORTCUTS.comfortableDensity }
 							>
 								<Menu.ItemLabel>Comfortable</Menu.ItemLabel>
 								<Menu.ItemDescription>
