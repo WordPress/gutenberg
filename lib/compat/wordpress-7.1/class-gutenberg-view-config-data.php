@@ -14,9 +14,9 @@
  * top-level keys — `default_view`, `default_layouts`, `view_list`, and
  * `form` — and there are two ways to contribute:
  *
- * - The `update_*()` methods merge partial changes (patches) into what is
- *   already there, each covering one part of the configuration:
- *   `update_properties()` for `default_view`, `default_layouts`, and the
+ * - The `merge()` and `update_view_list_items()` methods merge partial changes
+ *   (patches) into what is already there, each covering one part of the
+ *   configuration: `merge()` for `default_view`, `default_layouts`, and the
  *   `form` settings; and `update_view_list_items()` for the `view_list`
  *   entries, keyed by view `slug`. This is what plugins should
  *   use: patches compose with core's configuration and with other plugins'.
@@ -136,7 +136,7 @@ class Gutenberg_View_Config_Data {
 	 * @param int   $version The schema version the patch was authored against.
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
-	public function update_properties( array $patch, int $version ) {
+	public function merge( array $patch, int $version ) {
 		if ( ! $this->check_version( $version, __METHOD__ ) ) {
 			return $this;
 		}

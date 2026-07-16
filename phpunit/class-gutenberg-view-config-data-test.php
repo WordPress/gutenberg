@@ -43,11 +43,11 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * update_properties() updates scalar property values
+	 * merge() updates scalar property values
 	 *
-	 * @covers ::update_properties
+	 * @covers ::merge
 	 */
-	public function test_update_properties_scalar_values() {
+	public function test_merge_scalar_values() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
@@ -57,7 +57,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				),
 			)
 		);
-		$data->update_properties(
+		$data->merge(
 			array(
 				'default_view' => array(
 					'type' => 'grid',
@@ -79,11 +79,11 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * update_properties() updates object property values
+	 * merge() updates object property values
 	 *
-	 * @covers ::update_properties
+	 * @covers ::merge
 	 */
-	public function test_update_properties_object_values() {
+	public function test_merge_object_values() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
@@ -115,7 +115,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				)
 			)
 		);
-		$data->update_properties(
+		$data->merge(
 			array(
 				'default_view' => array(
 					'sort' => array(
@@ -181,11 +181,11 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * update_properties() updates list property values
+	 * merge() updates list property values
 	 *
-	 * @covers ::update_properties
+	 * @covers ::merge
 	 */
-	public function test_update_properties_list_values() {
+	public function test_merge_list_values() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
@@ -221,7 +221,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				)
 			)
 		);
-		$data->update_properties(
+		$data->merge(
 			array(
 				'default_view' => array(
 					'fields' => array(
@@ -313,29 +313,29 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * update_properties() rejects an undocumented top-level key. Nested
+	 * merge() rejects an undocumented top-level key. Nested
 	 * properties are not validated: their vocabulary is owned by the
 	 * client-side consumers.
 	 *
-	 * @covers ::update_properties
+	 * @covers ::merge
 	 */
-	public function test_update_properties_key_unknown_is_rejected() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_properties' );
+	public function test_merge_key_unknown_is_rejected() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge' );
 
 		$data = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
-		$data->update_properties( array( 'not_a_real_key' => 'nope' ), 1 );
+		$data->merge( array( 'not_a_real_key' => 'nope' ), 1 );
 
 		$this->assertSame( array( 'default_view' => array( 'type' => 'table' ) ), $data->get_config() );
 	}
 
 	/**
-	 * update_properties() merges a documented key that is absent from the config.
+	 * merge() merges a documented key that is absent from the config.
 	 *
-	 * @covers ::update_properties
+	 * @covers ::merge
 	 */
-	public function test_update_properties_key_known_is_merged() {
+	public function test_merge_key_known_is_merged() {
 		$data = new Gutenberg_View_Config_Data( array( 'default_view' => array() ) );
-		$data->update_properties(
+		$data->merge(
 			array( 'default_layouts' => array( 'table' => array( 'density' => 'compact' ) ) ),
 			1
 		);
@@ -347,11 +347,11 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * update_properties() unsets a property when the patch value is null.
+	 * merge() unsets a property when the patch value is null.
 	 *
-	 * @covers ::update_properties
+	 * @covers ::merge
 	 */
-	public function test_update_properties_null_unsets_property() {
+	public function test_merge_null_unsets_property() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
@@ -360,17 +360,17 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				),
 			)
 		);
-		$data->update_properties( array( 'default_view' => array( 'perPage' => null ) ), 1 );
+		$data->merge( array( 'default_view' => array( 'perPage' => null ) ), 1 );
 
 		$this->assertSame( array( 'type' => 'table' ), $data->get_config()['default_view'] );
 	}
 
 	/**
-	 * update_properties() unsets a deeply nested layout property when the value is null.
+	 * merge() unsets a deeply nested layout property when the value is null.
 	 *
-	 * @covers ::update_properties
+	 * @covers ::merge
 	 */
-	public function test_update_properties_null_unsets_nested_layout_prop() {
+	public function test_merge_null_unsets_nested_layout_prop() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_layouts' => array(
@@ -383,7 +383,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				),
 			)
 		);
-		$data->update_properties(
+		$data->merge(
 			array( 'default_layouts' => array( 'table' => array( 'layout' => array( 'styles' => null ) ) ) ),
 			1
 		);
@@ -395,15 +395,15 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * update_properties() drops a whole top-level key when the patch value is
+	 * merge() drops a whole top-level key when the patch value is
 	 * null — any documented key, including the identity-keyed view_list —
 	 * rather than storing a literal null. gutenberg_get_entity_view_config()
 	 * backfills a dropped documented key from the defaults, so that reads as
 	 * a reset.
 	 *
-	 * @covers ::update_properties
+	 * @covers ::merge
 	 */
-	public function test_update_properties_null_drops_whole_top_level_key() {
+	public function test_merge_null_drops_whole_top_level_key() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array( 'type' => 'table' ),
@@ -416,7 +416,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
 			)
 		);
-		$data->update_properties(
+		$data->merge(
 			array(
 				'default_view' => null,
 				'view_list'    => null,
@@ -431,14 +431,14 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * update_properties() consumes a null delete-marker merged into an empty
+	 * merge() consumes a null delete-marker merged into an empty
 	 * base instead of storing it as a literal value.
 	 *
-	 * @covers ::update_properties
+	 * @covers ::merge
 	 */
-	public function test_update_properties_null_into_empty_base_is_consumed() {
+	public function test_merge_null_into_empty_base_is_consumed() {
 		$data = new Gutenberg_View_Config_Data( array( 'default_layouts' => array( 'table' => array() ) ) );
-		$data->update_properties(
+		$data->merge(
 			array( 'default_layouts' => array( 'table' => array( 'layout' => null ) ) ),
 			1
 		);
@@ -447,15 +447,15 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * update_properties() strips nulls from a subtree assigned to a key absent
+	 * merge() strips nulls from a subtree assigned to a key absent
 	 * from the base instead of storing them as literal values.
 	 *
-	 * @covers ::update_properties
+	 * @covers ::merge
 	 */
-	public function test_update_properties_null_stripped_from_absent_key_subtree() {
+	public function test_merge_null_stripped_from_absent_key_subtree() {
 		$data = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
 		// The base default_view has no `layout` key.
-		$data->update_properties(
+		$data->merge(
 			array(
 				'default_view' => array(
 					'layout' => array(
@@ -471,16 +471,16 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * update_properties() rejects a list where the form map is expected.
+	 * merge() rejects a list where the form map is expected.
 	 *
-	 * @covers ::update_properties
+	 * @covers ::merge
 	 */
-	public function test_update_properties_rejects_list_shaped_form_patch() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_properties' );
+	public function test_merge_rejects_list_shaped_form_patch() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge' );
 
 		$data   = new Gutenberg_View_Config_Data( array( 'form' => array( 'layout' => array( 'type' => 'panel' ) ) ) );
 		$before = $data->get_config();
-		$data->update_properties( array( 'form' => array( array( 'id' => 'my_field' ) ) ), 1 );
+		$data->merge( array( 'form' => array( array( 'id' => 'my_field' ) ) ), 1 );
 
 		$this->assertSame( $before, $data->get_config() );
 	}
@@ -489,12 +489,12 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	 * Every update function and set() reject a patch whose version cannot be
 	 * migrated — newer than the latest supported version.
 	 *
-	 * @covers ::update_properties
+	 * @covers ::merge
 	 * @covers ::update_view_list_items
 	 * @covers ::set
 	 */
 	public function test_update_functions_reject_unmigratable_version() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_properties' );
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge' );
 		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_view_list_items' );
 		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
 
@@ -502,7 +502,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$before = $data->get_config();
 
 		$version = Gutenberg_View_Config_Data::LATEST_VERSION + 1;
-		$data->update_properties( array( 'default_view' => array( 'type' => 'grid' ) ), $version );
+		$data->merge( array( 'default_view' => array( 'type' => 'grid' ) ), $version );
 		$data->update_view_list_items( array( 'mine' => array( 'title' => 'Mine' ) ), $version );
 		$data->set( 'default_view', array( 'type' => 'grid' ), $version );
 

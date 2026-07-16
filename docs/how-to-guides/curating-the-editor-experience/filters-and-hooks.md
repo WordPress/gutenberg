@@ -87,7 +87,7 @@ The configuration has four keys: `default_view`, `default_layouts`, `view_list` 
 
 The filter receives an object holding the entity's view configuration. Change the configuration by calling its methods and return the object. Each method merges a partial change (a patch) into one part of the configuration, and patches follow three shared rules: an associative array merges key by key, a numerically indexed array replaces the current value wholesale, and `null` deletes what it names.
 
--   `update_properties( $patch, $version )` merges into `default_view`, `default_layouts`, and `form`, including the `form` `fields`. Passing `null` for a whole top-level key resets it to its default.
+-   `merge( $patch, $version )` merges into `default_view`, `default_layouts`, and `form`, including the `form` `fields`. Passing `null` for a whole top-level key resets it to its default.
 -   `update_view_list_items( $items, $version )` adds, updates, or removes views in the `view_list`, keyed by `slug`: a matching view merges in place, an unknown slug appends a new view to the end, and `null` removes the view.
 
 Within a `form` patch, `fields` is a list whose members merge by their `id`: an object whose `id` matches a field already in the list merges into it in place, and a member with an unknown id — an object, or a bare string like `'my_field'` for a field that carries no overrides — is appended to the end. A group's `children` is an identity-merged list too, so listing a field in a group's `children` appends it to that group. A patch only adds to or updates the form; to remove fields, replace the whole `form` with `set( 'form', $form, $version )`.
@@ -128,7 +128,7 @@ function example_filter_page_view_config( $data ) {
     // layout option, change a form property, and patch form fields by id —
     // update the label position of the post content info field and append a
     // new field ( a bare string ) to the discussion group's children.
-    $data->update_properties(
+    $data->merge(
         array(
             'default_layouts' => array( 'grid' => null ),
             'form'            => array(

@@ -146,13 +146,13 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A filter can override configuration values through update_properties().
+	 * A filter can override configuration values through merge().
 	 */
-	public function test_filter_update_properties_overrides_config() {
+	public function test_filter_merge_overrides_config() {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
-				return $data->update_properties(
+				return $data->merge(
 					array( 'default_view' => array( 'type' => 'grid' ) ),
 					1
 				);
@@ -191,7 +191,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
-				return $data->update_properties(
+				return $data->merge(
 					array(
 						'form' => array(
 							'fields' => array(
@@ -254,7 +254,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
-				return $data->update_properties( array( 'default_view' => null ), 1 );
+				return $data->merge( array( 'default_view' => null ), 1 );
 			}
 		);
 
