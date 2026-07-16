@@ -92,6 +92,17 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 						'direction' => 'asc'
 					)
 				),
+				'default_layouts' => array(
+					'table' => array(
+		            	'layout' => array(
+		                	'styles' => array(
+		                    	'width' => 1,
+		                	),
+		                	'density' => 'd2',
+		                	'enableMoving' => true
+		            	)
+			    	)
+				)
 			)
 		);
 		$data->update_properties(
@@ -101,18 +112,42 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 						'direction' => 'desc'
 					)
 				),
+				'default_layouts' => array(
+					'table' => array(
+						'layout' => array(
+							'styles' => array(
+								'minWidth' => 2
+							),
+							'density' => 'd2',
+						)
+					)
+				)
 			),
 			1
 		);
 
 		$this->assertSame(
 			array(
-				'sort' => array(
-					'field' => 'title',
-					'direction' => 'desc'
+				'default_view'=> array(
+					'sort' => array(
+						'field' => 'title',
+						'direction' => 'desc'
+						)
+				),
+				'default_layouts' => array(
+					'table' => array(
+						'layout' => array(
+							'styles' => array(
+								'width' => 1,
+								'minWidth' => 2
+							),
+							'density' => 'd2',
+							'enableMoving' => true
+						)
+					)
 				)
 			),
-			$data->get_config()['default_view']
+			$data->get_config()
 		);
 	}
 
@@ -168,47 +203,6 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'layout' => array(
 					'badgeFields' => array( 'b1', 'b2' )
 				)
-			),
-			$data->get_config()['default_view']
-		);
-	}
-
-	/**
-	 * update_properties() merges object-shaped keys recursively.
-	 *
-	 * @covers ::update_properties
-	 */
-	public function test_update_properties_merges_default_view_recursively() {
-		$data = new Gutenberg_View_Config_Data(
-			array(
-				'default_view' => array(
-					'type'    => 'table',
-					'perPage' => 20,
-					'sort'    => array(
-						'field'     => 'title',
-						'direction' => 'asc',
-					),
-				),
-			)
-		);
-		$data->update_properties(
-			array(
-				'default_view' => array(
-					'perPage' => 50,
-					'sort'    => array( 'direction' => 'desc' ),
-				),
-			),
-			1
-		);
-
-		$this->assertSame(
-			array(
-				'type'    => 'table',
-				'perPage' => 50,
-				'sort'    => array(
-					'field'     => 'title',
-					'direction' => 'desc',
-				),
 			),
 			$data->get_config()['default_view']
 		);
