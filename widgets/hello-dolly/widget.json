@@ -7,7 +7,7 @@
 	"actions": [
 		{
 			"id": "plugin-page",
-			"label": "Plugin page",
+			"label": "WordPress.org plugin page",
 			"href": "https://wordpress.org/plugins/hello-dolly/",
 			"openInNewTab": true
 		},
