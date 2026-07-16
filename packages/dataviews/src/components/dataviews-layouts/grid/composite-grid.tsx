@@ -374,7 +374,7 @@ export default function CompositeGrid< Item >( {
 	// to the default square `1/1` when unset).
 	const gridStyle: CSSProperties | undefined = view.layout?.aspectRatio
 		? ( {
-				'--dataviews-grid-media-aspect-ratio': view.layout.aspectRatio,
+				'--dataviews-media-aspect-ratio': view.layout.aspectRatio,
 		  } as CSSProperties )
 		: undefined;
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );

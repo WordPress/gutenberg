@@ -254,6 +254,13 @@ export interface ViewTable extends ViewBase {
 		 * Whether the view allows column moving.
 		 */
 		enableMoving?: boolean;
+
+		/**
+		 * A fixed aspect ratio for the primary column's media preview, as a
+		 * CSS `aspect-ratio` value (e.g. `'1/1'`, `'16/9'`, `'4/3'`). Applied
+		 * uniformly to every row. Defaults to `'1/1'`.
+		 */
+		aspectRatio?: string;
 	};
 }
 

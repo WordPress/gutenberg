@@ -2,7 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { ComponentProps, ReactElement } from 'react';
+import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 
 /**
  * WordPress dependencies
@@ -390,6 +390,14 @@ function ViewTable< Item >( {
 		};
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 	const isRtl = isRTL();
+	// Optional consumer-configured aspect ratio for the primary column's media
+	// preview, surfaced to CSS as a custom property the media stylesheet reads
+	// (falling back to the default square `1/1` when unset).
+	const tableStyle: CSSProperties | undefined = view.layout?.aspectRatio
+		? ( {
+				'--dataviews-media-aspect-ratio': view.layout.aspectRatio,
+		  } as CSSProperties )
+		: undefined;
 	if ( ! hasData ) {
 		return (
 			<div
@@ -415,6 +423,7 @@ function ViewTable< Item >( {
 					'has-bulk-actions': hasBulkActions,
 					'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 				} ) }
+				style={ tableStyle }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }

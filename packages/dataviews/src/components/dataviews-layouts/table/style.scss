@@ -275,9 +275,15 @@
 }
 
 .dataviews-column-primary__media {
+	// The preview box: a fixed height keeps rows uniform while the
+	// (consumer-configurable) aspect ratio sets the width. Sized on the
+	// wrapper rather than the img so custom media field renders are covered
+	// too; ratios wider than ~17/9 at this height are clipped by `max-width`
+	// rather than allowed to crowd out the title.
+	height: var(--wpds-dimension-size-md);
+	aspect-ratio: var(--dataviews-media-aspect-ratio, 1/1);
 	max-width: 60px;
 	min-width: var(--wpds-dimension-size-md);
-	min-height: var(--wpds-dimension-size-md);
 	overflow: hidden;
 	position: relative;
 	flex-shrink: 0;
@@ -285,8 +291,8 @@
 	border-radius: var(--wpds-border-radius-md);
 
 	img {
-		width: var(--wpds-dimension-size-md);
-		height: var(--wpds-dimension-size-md);
+		width: 100%;
+		height: 100%;
 		object-fit: cover;
 	}
 

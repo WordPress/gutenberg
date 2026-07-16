@@ -257,13 +257,14 @@ Properties:
 | `styles`       | ✓       | ✓             |        |              |        |            |
 | `badgeFields`  |         |               | ✓      | ✓            |        |            |
 | `previewSize`  |         |               | ✓      | ✓            |        |            |
-| `aspectRatio`  |         |               | ✓      |              |        |            |
+| `aspectRatio`  | ✓       |               | ✓      |              |        |            |
 
 `table` and `pickerTable` layouts:
 
 -   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 -   `enableMoving`: whether the table columns should display moving controls.
 -   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column. The `align` property accepts `'start'`, `'center'`, or `'end'`.
+-   `aspectRatio` (`table` only): a fixed CSS [`aspect-ratio`](https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio) value (e.g. `'1/1'`, `'16/9'`, `'4/3'`) applied to the primary column's media preview. Defaults to `'1/1'`.
 
 **For column alignment (`align` property), follow these guidelines:**
 Right-align (`'end'`) whenever the cell value is fundamentally quantitative—numbers, decimals, currency, percentages—so that digits and decimal points line up, aiding comparison and calculation. Otherwise, default to left-alignment (`'start'`) for all other types (text, codes, labels, dates).
