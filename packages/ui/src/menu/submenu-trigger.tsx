@@ -53,16 +53,14 @@ const SubmenuTrigger = forwardRef< HTMLDivElement, SubmenuTriggerProps >(
 						prefix={ prefix }
 						shortcut={ shortcut }
 						shortcutDescriptionId={ shortcutDescriptionId }
-						suffix={
-							<>
-								{ suffix }
-								<Icon
-									className={ styles[ 'submenu-chevron' ] }
-									icon={ chevronRightSmall }
-									size={ 24 }
-									aria-hidden="true"
-								/>
-							</>
+						suffix={ suffix }
+						trailing={
+							<Icon
+								className={ styles[ 'submenu-chevron' ] }
+								icon={ chevronRightSmall }
+								size={ 24 }
+								aria-hidden="true"
+							/>
 						}
 					>
 						{ children }

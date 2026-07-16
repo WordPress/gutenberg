@@ -130,8 +130,10 @@ function ItemContent( {
 	shortcut,
 	shortcutDescriptionId,
 	suffix,
+	trailing,
 }: Pick< ItemProps, 'children' | 'prefix' | 'shortcut' | 'suffix' > & {
 	shortcutDescriptionId?: string;
+	trailing?: ItemProps[ 'suffix' ];
 } ) {
 	const itemChildren = getStructuredItemContent( children )
 		.hasStructuredContent ? (
@@ -159,6 +161,11 @@ function ItemContent( {
 				{ shortcut && (
 					<span className={ styles[ 'item-shortcut' ] }>
 						<KeyboardShortcutDisplay shortcut={ shortcut } />
+					</span>
+				) }
+				{ trailing && (
+					<span className={ styles[ 'item-trailing' ] }>
+						{ trailing }
 					</span>
 				) }
 			</span>

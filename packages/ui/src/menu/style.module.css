@@ -227,6 +227,18 @@
 			unicode-bidi: isolate;
 		}
 
+		.item-trailing {
+			flex-shrink: 0;
+			display: flex;
+			align-items: center;
+			margin-inline-start: var(--wpds-dimension-gap-lg);
+			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
+		.item-shortcut + .item-trailing {
+			margin-inline-start: var(--wpds-dimension-gap-xs);
+		}
+
 		.submenu-chevron {
 			margin-inline-end: calc(-1 * var(--wpds-dimension-gap-sm));
 		}
@@ -255,11 +267,13 @@
 		.item[data-highlighted]:not([aria-disabled]) .item-description,
 		.item[data-highlighted]:not([aria-disabled]) .item-suffix,
 		.item[data-highlighted]:not([aria-disabled]) .item-shortcut,
+		.item[data-highlighted]:not([aria-disabled]) .item-trailing,
 		.item[data-highlighted]:not([aria-disabled]) .item-selection-indicator,
 		.item[aria-disabled] .item-prefix,
 		.item[aria-disabled] .item-description,
 		.item[aria-disabled] .item-suffix,
 		.item[aria-disabled] .item-shortcut,
+		.item[aria-disabled] .item-trailing,
 		.item[aria-disabled] .item-selection-indicator {
 			color: inherit;
 		}
