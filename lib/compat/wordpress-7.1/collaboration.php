@@ -432,14 +432,20 @@ if ( ! function_exists( 'gutenberg_block_quick_edit_for_active_lock' ) ) {
 		$lock_user = gutenberg_get_active_edit_lock_user( $post_id );
 		if ( ! $lock_user ) {
 			/*
-			 * Core creates a lock during inline save. Remove it on shutdown so
-			 * a later Quick Edit is not mistaken for an active editor session.
+			 * Core creates a lock during inline save. Prevent that specific write
+			 * so a later Quick Edit is not mistaken for an active editor session.
 			 */
-			add_action(
-				'shutdown',
-				static function () use ( $post_id ) {
-					gutenberg_release_own_edit_lock( $post_id );
-				}
+			add_filter(
+				'update_post_metadata',
+				static function ( $check, $object_id, $meta_key ) use ( $post_id ) {
+					if ( $post_id === (int) $object_id && '_edit_lock' === $meta_key ) {
+						return false;
+					}
+
+					return $check;
+				},
+				10,
+				3
 			);
 			return;
 		}
@@ -450,28 +456,6 @@ if ( ! function_exists( 'gutenberg_block_quick_edit_for_active_lock' ) ) {
 		}
 
 		wp_die( esc_html__( 'Quick Edit is disabled: You are currently editing this post in another tab or window.', 'gutenberg' ) );
-	}
-}
-
-if ( ! function_exists( 'gutenberg_release_own_edit_lock' ) ) {
-	/**
-	 * Deletes a fresh edit lock owned by the current user.
-	 *
-	 * Core creates a lock during inline save. Without an editor session, that
-	 * lock would block the next Quick Edit until it expires.
-	 *
-	 * If an editor opens before shutdown, its new lock may also be deleted;
-	 * the editor restores it on the next heartbeat.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param int $post_id Post ID.
-	 */
-	function gutenberg_release_own_edit_lock( $post_id ) {
-		$lock_user = gutenberg_get_active_edit_lock_user( $post_id );
-		if ( $lock_user && get_current_user_id() === $lock_user ) {
-			delete_post_meta( $post_id, '_edit_lock' );
-		}
 	}
 }
 

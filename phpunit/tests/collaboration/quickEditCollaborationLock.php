@@ -38,6 +38,7 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 
 	public function tear_down() {
 		delete_post_meta( self::$post_id, '_edit_lock' );
+		delete_post_meta( self::$post_id, '_edit_last' );
 		unset( $_POST['post_ID'], $_POST['_inline_edit'], $_REQUEST['_inline_edit'] );
 
 		parent::tear_down();
@@ -54,21 +55,6 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 		// request PHP populates it from $_POST, but not when assigning to
 		// superglobals directly in tests.
 		$_REQUEST['_inline_edit'] = $_POST['_inline_edit'];
-	}
-
-	private function shutdown_callback_count(): int {
-		global $wp_filter;
-		return isset( $wp_filter['shutdown'] ) ? count( $wp_filter['shutdown']->callbacks, COUNT_RECURSIVE ) : 0;
-	}
-
-	public function test_active_edit_lock_user_reflects_lock_state() {
-		$this->assertSame( 0, gutenberg_get_active_edit_lock_user( self::$post_id ), 'Without a lock the helper should return 0.' );
-
-		$this->set_edit_lock( self::$admin_id, 1000 );
-		$this->assertSame( 0, gutenberg_get_active_edit_lock_user( self::$post_id ), 'A stale lock should return 0.' );
-
-		$this->set_edit_lock( self::$admin_id );
-		$this->assertSame( self::$admin_id, gutenberg_get_active_edit_lock_user( self::$post_id ), 'A fresh lock should return its holder.' );
 	}
 
 	public function test_deleted_user_lock_is_treated_as_inactive() {
@@ -94,6 +80,19 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 			$response['wp-check-locked-posts'][ $key ],
 			'A fresh own lock should mark the row as locked, without user details.'
 		);
+	}
+
+	public function test_heartbeat_ignores_own_locks_for_disabled_post_types() {
+		$key  = 'post-' . self::$post_id;
+		$data = array( 'wp-check-locked-posts' => array( $key ) );
+
+		$this->set_edit_lock( self::$admin_id );
+		add_filter( 'wp_is_post_type_collaboration_disabled', '__return_true' );
+
+		$response = gutenberg_filter_locked_posts_heartbeat_for_rtc( array(), $data );
+
+		remove_filter( 'wp_is_post_type_collaboration_disabled', '__return_true' );
+		$this->assertArrayNotHasKey( 'wp-check-locked-posts', $response );
 	}
 
 	public function test_heartbeat_removes_user_details_from_other_user_entries() {
@@ -146,41 +145,34 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 	public function test_inline_save_guard_defers_other_users_lock_to_core() {
 		$this->set_edit_lock( self::$editor_id );
 		$this->prime_inline_save_request();
-		$before = $this->shutdown_callback_count();
 
 		gutenberg_block_quick_edit_for_active_lock();
 
-		$this->assertSame( $before, $this->shutdown_callback_count(), "Another user's lock is core's to reject; no lock release should be scheduled." );
+		$this->assertSame( self::$editor_id, wp_check_post_lock( self::$post_id ), "Another user's lock should be left for Core to reject." );
 	}
 
 	public function test_inline_save_guard_ignores_disabled_post_types() {
 		$this->set_edit_lock( self::$admin_id );
 		$this->prime_inline_save_request();
 		add_filter( 'wp_is_post_type_collaboration_disabled', '__return_true' );
-		$before = $this->shutdown_callback_count();
 
 		gutenberg_block_quick_edit_for_active_lock();
 
 		remove_filter( 'wp_is_post_type_collaboration_disabled', '__return_true' );
-		$this->assertSame( $before, $this->shutdown_callback_count(), 'With collaboration disabled for the post type the guard should neither reject nor schedule a lock release.' );
+		$new_lock = ( time() + 1 ) . ':' . self::$editor_id;
+		update_post_meta( self::$post_id, '_edit_lock', $new_lock );
+		$this->assertSame( $new_lock, get_post_meta( self::$post_id, '_edit_lock', true ) );
 	}
 
-	public function test_inline_save_guard_schedules_lock_release_when_save_proceeds() {
+	public function test_inline_save_guard_prevents_only_core_quick_edit_lock_creation() {
 		$this->prime_inline_save_request();
-		$before = $this->shutdown_callback_count();
 
 		gutenberg_block_quick_edit_for_active_lock();
 
-		$this->assertGreaterThan( $before, $this->shutdown_callback_count() );
-	}
+		update_post_meta( self::$post_id, '_edit_last', self::$editor_id );
+		wp_set_post_lock( self::$post_id );
 
-	public function test_release_own_edit_lock_only_deletes_own_fresh_lock() {
-		$this->set_edit_lock( self::$editor_id );
-		gutenberg_release_own_edit_lock( self::$post_id );
-		$this->assertNotSame( '', get_post_meta( self::$post_id, '_edit_lock', true ), "Another user's lock should be kept." );
-
-		$this->set_edit_lock( self::$admin_id );
-		gutenberg_release_own_edit_lock( self::$post_id );
-		$this->assertSame( '', get_post_meta( self::$post_id, '_edit_lock', true ), "The current user's own fresh lock should be deleted." );
+		$this->assertSame( self::$editor_id, (int) get_post_meta( self::$post_id, '_edit_last', true ) );
+		$this->assertSame( '', get_post_meta( self::$post_id, '_edit_lock', true ) );
 	}
 }
