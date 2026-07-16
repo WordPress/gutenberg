@@ -18,8 +18,10 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 		className,
 		openInNewTab = false,
 		prefix,
+		shortcut,
 		suffix,
 		'aria-describedby': ariaDescribedBy,
+		'aria-keyshortcuts': ariaKeyShortcuts,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledBy,
 		rel,
@@ -47,12 +49,15 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 	) : (
 		suffix
 	);
-	const { contentContextValue, itemAriaProps } = useItemContent( children, {
-		'aria-describedby': ariaDescribedBy,
-		'aria-label': ariaLabel,
-		'aria-labelledby': ariaLabelledBy,
-		labelledBy: openInNewTab ? externalLinkIndicatorId : undefined,
-	} );
+	const { contentContextValue, itemAriaProps, shortcutDescriptionId } =
+		useItemContent( children, {
+			'aria-describedby': ariaDescribedBy,
+			'aria-keyshortcuts': ariaKeyShortcuts,
+			'aria-label': ariaLabel,
+			'aria-labelledby': ariaLabelledBy,
+			labelledBy: openInNewTab ? externalLinkIndicatorId : undefined,
+			shortcut,
+		} );
 
 	return (
 		<_Menu.LinkItem
@@ -69,7 +74,12 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 			) }
 		>
 			<MenuItemContentContext.Provider value={ contentContextValue }>
-				<ItemContent prefix={ prefix } suffix={ itemSuffix }>
+				<ItemContent
+					prefix={ prefix }
+					shortcut={ shortcut }
+					shortcutDescriptionId={ shortcutDescriptionId }
+					suffix={ itemSuffix }
+				>
 					{ children }
 				</ItemContent>
 			</MenuItemContentContext.Provider>

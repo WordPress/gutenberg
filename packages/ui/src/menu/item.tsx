@@ -7,6 +7,11 @@ import {
 	useId,
 } from '@wordpress/element';
 import resetStyles from '../utils/css/resets.module.css';
+import {
+	KeyboardShortcutDescription,
+	KeyboardShortcutDisplay,
+	useKeyboardShortcutProps,
+} from '../utils/keyboard-shortcut';
 import styles from './style.module.css';
 import { MenuItemContentContext } from './context';
 import { ItemDescription } from './item-description';
@@ -15,10 +20,11 @@ import type { ItemProps } from './types';
 
 type ItemAriaProps = Pick<
 	ItemProps,
-	'aria-describedby' | 'aria-label' | 'aria-labelledby'
+	'aria-describedby' | 'aria-keyshortcuts' | 'aria-label' | 'aria-labelledby'
 >;
 type UseItemContentOptions = ItemAriaProps & {
 	labelledBy?: string;
+	shortcut?: ItemProps[ 'shortcut' ];
 };
 
 function getStructuredItemContent( children: ItemProps[ 'children' ] ) {
@@ -55,9 +61,11 @@ function useItemContent(
 	children: ItemProps[ 'children' ],
 	{
 		'aria-describedby': ariaDescribedBy,
+		'aria-keyshortcuts': ariaKeyShortcuts,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledBy,
 		labelledBy: additionalLabelledBy,
+		shortcut,
 	}: UseItemContentOptions
 ) {
 	const generatedLabelId = useId();
@@ -73,13 +81,20 @@ function useItemContent(
 		labelId ??
 		( hasLabel || ! hasStructuredContent ? generatedLabelId : undefined );
 	const resolvedDescriptionId = descriptionId ?? generatedDescriptionId;
-
-	const describedBy = [
+	const itemDescribedBy = [
 		ariaDescribedBy,
 		hasDescription && resolvedDescriptionId,
 	]
 		.filter( Boolean )
 		.join( ' ' );
+	const {
+		descriptionId: shortcutDescriptionId,
+		targetProps: shortcutAriaProps,
+	} = useKeyboardShortcutProps( {
+		'aria-describedby': itemDescribedBy || undefined,
+		'aria-keyshortcuts': ariaKeyShortcuts,
+		shortcut,
+	} );
 	/*
 	 * `aria-labelledby` takes precedence over `aria-label` in the accessible
 	 * name algorithm. Only provide our generated label relationship when the
@@ -101,18 +116,23 @@ function useItemContent(
 			labelId: resolvedLabelId,
 		},
 		itemAriaProps: {
-			'aria-describedby': describedBy || undefined,
+			...shortcutAriaProps,
 			'aria-label': ariaLabel,
 			'aria-labelledby': labelledBy,
 		},
+		shortcutDescriptionId,
 	};
 }
 
 function ItemContent( {
 	children,
 	prefix,
+	shortcut,
+	shortcutDescriptionId,
 	suffix,
-}: Pick< ItemProps, 'children' | 'prefix' | 'suffix' > ) {
+}: Pick< ItemProps, 'children' | 'prefix' | 'shortcut' | 'suffix' > & {
+	shortcutDescriptionId?: string;
+} ) {
 	const itemChildren = getStructuredItemContent( children )
 		.hasStructuredContent ? (
 		children
@@ -136,7 +156,18 @@ function ItemContent( {
 						{ suffix }
 					</span>
 				) }
+				{ shortcut && (
+					<span className={ styles[ 'item-shortcut' ] }>
+						<KeyboardShortcutDisplay shortcut={ shortcut } />
+					</span>
+				) }
 			</span>
+			{ shortcut && shortcutDescriptionId && (
+				<KeyboardShortcutDescription
+					descriptionId={ shortcutDescriptionId }
+					shortcut={ shortcut }
+				/>
+			) }
 		</>
 	);
 }
@@ -149,19 +180,24 @@ const Item = forwardRef< HTMLDivElement, ItemProps >( function MenuItem(
 		children,
 		className,
 		prefix,
+		shortcut,
 		suffix,
 		'aria-describedby': ariaDescribedBy,
+		'aria-keyshortcuts': ariaKeyShortcuts,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledBy,
 		...props
 	},
 	ref
 ) {
-	const { contentContextValue, itemAriaProps } = useItemContent( children, {
-		'aria-describedby': ariaDescribedBy,
-		'aria-label': ariaLabel,
-		'aria-labelledby': ariaLabelledBy,
-	} );
+	const { contentContextValue, itemAriaProps, shortcutDescriptionId } =
+		useItemContent( children, {
+			'aria-describedby': ariaDescribedBy,
+			'aria-keyshortcuts': ariaKeyShortcuts,
+			'aria-label': ariaLabel,
+			'aria-labelledby': ariaLabelledBy,
+			shortcut,
+		} );
 
 	return (
 		<_Menu.Item
@@ -175,7 +211,12 @@ const Item = forwardRef< HTMLDivElement, ItemProps >( function MenuItem(
 			{ ...props }
 		>
 			<MenuItemContentContext.Provider value={ contentContextValue }>
-				<ItemContent prefix={ prefix } suffix={ suffix }>
+				<ItemContent
+					prefix={ prefix }
+					shortcut={ shortcut }
+					shortcutDescriptionId={ shortcutDescriptionId }
+					suffix={ suffix }
+				>
 					{ children }
 				</ItemContent>
 			</MenuItemContentContext.Provider>

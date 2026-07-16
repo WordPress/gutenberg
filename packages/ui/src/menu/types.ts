@@ -1,6 +1,7 @@
 import type { Menu as _Menu } from '@base-ui/react/menu';
 import type { ElementType, ReactElement, ReactNode } from 'react';
 
+import type { KeyboardShortcut } from '../utils/keyboard-shortcut';
 import type { ComponentProps } from '../utils/types';
 
 export type PortalProps = ComponentProps< typeof _Menu.Portal >;
@@ -65,6 +66,15 @@ export interface MenuItemLayoutProps {
 	 * Presentational content displayed after the item label.
 	 */
 	suffix?: ReactNode;
+
+	/**
+	 * The keyboard shortcut associated with this item. When provided, the
+	 * shortcut is displayed in the item and announced to assistive technology.
+	 *
+	 * **Note**: This prop is for display and accessibility purposes only; the
+	 * consumer is responsible for implementing the actual keyboard event handler.
+	 */
+	shortcut?: KeyboardShortcut;
 }
 
 export interface ItemLabelProps extends ComponentProps< 'span' > {
