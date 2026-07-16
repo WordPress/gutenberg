@@ -102,6 +102,16 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		                	'enableMoving' => true
 		            	)
 			    	)
+				),
+				'form' => array(
+					'layout' => array(
+						'type' => 'panel',
+						'labelPosition' => 'top',
+						'openAs' => array(
+							'type' => 'modal',
+							'applyLabel' => 'Apply'
+						),
+					)
 				)
 			)
 		);
@@ -120,6 +130,15 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 							),
 							'density' => 'd2',
 						)
+					)
+				),
+				'form' => array(
+					'layout' => array(
+						'type' => 'panel',
+						'labelPosition' => 'side',
+						'openAs' => array(
+							'type' => 'drawer'
+						),
 					)
 				)
 			),
@@ -144,6 +163,16 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 							'density' => 'd2',
 							'enableMoving' => true
 						)
+					)
+				),
+				'form' => array(
+					'layout' => array(
+						'type' => 'panel',
+						'labelPosition' => 'side',
+						'openAs' => array(
+							'type' => 'drawer',
+							'applyLabel' => 'Apply'
+						),
 					)
 				)
 			),
@@ -170,6 +199,11 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 						'badgeFields' => array( 'b1', 'b2' )
 					)
 				),
+				'form' => array(
+					'layout' => array(
+						'summary' => array( 'f1' )
+					)
+				)
 			)
 		);
 		$data->update_properties(
@@ -186,12 +220,17 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 						'badgeFields' => array( 'b2' )
 					)
 				),
+				'form' => array(
+					'layout' => array(
+						'summary' => array( 'f2' )
+					)
+				)
 			),
 			1
 		);
 
-		$this->assertSame(
-			array(
+		$this->assertSame( array(
+			'default_view' => array(
 				'fields' => array(
 					array( 'title' ),
 					array( 'slug' )
@@ -204,71 +243,30 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					'badgeFields' => array( 'b1', 'b2' )
 				)
 			),
-			$data->get_config()['default_view']
+			'form' => array(
+				'layout' => array(
+					'summary' => array( 'f1', 'f2' )
+				)
+			)
+			),
+			$data->get_config()
 		);
 	}
 
 	/**
-	 * update_properties() merges default_layouts by map key and adds unknown ones.
+	 * update_properties() rejects an undocumented top-level key. Nested
+	 * properties are not validated: their vocabulary is owned by the
+	 * client-side consumers.
 	 *
 	 * @covers ::update_properties
 	 */
-	public function test_update_properties_merges_default_layouts_by_key() {
-		$data = new Gutenberg_View_Config_Data(
-			array(
-				'default_layouts' => array(
-					'table' => array(),
-					'grid'  => array(),
-				),
-			)
-		);
-		$data->update_properties(
-			array(
-				'default_layouts' => array(
-					'table'    => array( 'density' => 'compact' ),
-					'activity' => array(),
-				),
-			),
-			1
-		);
+	public function test_update_properties_key_unknown_is_rejected() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_properties' );
 
-		$this->assertSame(
-			array(
-				'table'    => array( 'density' => 'compact' ),
-				'grid'     => array(),
-				'activity' => array(),
-			),
-			$data->get_config()['default_layouts']
-		);
-	}
+		$data = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
+		$data->update_properties( array( 'not_a_real_key' => 'nope' ), 1 );
 
-	/**
-	 * update_properties() merges the form's plain properties and leaves its
-	 * fields untouched.
-	 *
-	 * @covers ::update_properties
-	 */
-	public function test_update_properties_merges_form_layout() {
-		$data = new Gutenberg_View_Config_Data(
-			array(
-				'form' => array(
-					'layout' => array( 'type' => 'panel' ),
-					'fields' => array( 'date', 'slug' ),
-				),
-			)
-		);
-		$data->update_properties(
-			array( 'form' => array( 'layout' => array( 'type' => 'card' ) ) ),
-			1
-		);
-
-		$this->assertSame(
-			array(
-				'layout' => array( 'type' => 'card' ),
-				'fields' => array( 'date', 'slug' ),
-			),
-			$data->get_config()['form']
-		);
+		$this->assertSame( array( 'default_view' => array( 'type' => 'table' ) ), $data->get_config() );
 	}
 
 	/**
@@ -276,7 +274,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	 *
 	 * @covers ::update_properties
 	 */
-	public function test_update_properties_merges_a_documented_key_absent_from_config() {
+	public function test_update_properties_key_known_is_merged() {
 		$data = new Gutenberg_View_Config_Data( array( 'default_view' => array() ) );
 		$data->update_properties(
 			array( 'default_layouts' => array( 'table' => array( 'density' => 'compact' ) ) ),
@@ -463,21 +461,6 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 	}
 
-	/**
-	 * update_properties() rejects an undocumented top-level key. Nested
-	 * properties are not validated: their vocabulary is owned by the
-	 * client-side consumers.
-	 *
-	 * @covers ::update_properties
-	 */
-	public function test_update_properties_warns_on_unknown_top_level_key() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_properties' );
-
-		$data = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
-		$data->update_properties( array( 'not_a_real_key' => 'nope' ), 1 );
-
-		$this->assertSame( array( 'default_view' => array( 'type' => 'table' ) ), $data->get_config() );
-	}
 
 	/**
 	 * update_properties() rejects a list where the form map is expected.
