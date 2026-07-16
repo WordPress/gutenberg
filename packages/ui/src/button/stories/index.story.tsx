@@ -1,7 +1,10 @@
-import { Fragment } from '@wordpress/element';
+import { Fragment, useId } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { wordpress } from '@wordpress/icons';
+import { displayShortcut, shortcutAriaLabel } from '@wordpress/keycodes';
+
 import { Button } from '../index';
+import * as Tooltip from '../../tooltip';
 
 const meta: Meta< typeof Button > = {
 	title: 'Design System/Components/Button',
@@ -180,5 +183,53 @@ export const Pressed: Story = {
 		tone: 'neutral',
 		variant: 'minimal',
 		'aria-pressed': true,
+	},
+};
+
+/**
+ * `Button` has no dedicated `shortcut` prop, so keyboard shortcuts must be
+ * composed manually: a visual hint in the tooltip, `aria-keyshortcuts` for
+ * assistive technology, and a visually hidden description.
+ */
+export const WithKeyboardShortcut: Story = {
+	render: () => {
+		const descriptionId = useId();
+
+		return (
+			<>
+				<Tooltip.Root>
+					<Tooltip.Trigger
+						{ ...( {
+							render: (
+								<Button
+									aria-keyshortcuts="Meta+S"
+									aria-describedby={ descriptionId }
+								>
+									Save
+								</Button>
+							),
+						} as React.ComponentProps< typeof Tooltip.Trigger > ) }
+					/>
+					<Tooltip.Popup>
+						{ displayShortcut.primary( 's' ) }
+					</Tooltip.Popup>
+				</Tooltip.Root>
+				<span
+					id={ descriptionId }
+					style={ {
+						position: 'absolute',
+						width: 1,
+						height: 1,
+						overflow: 'hidden',
+						clip: 'rect(0 0 0 0)',
+						whiteSpace: 'nowrap',
+					} }
+				>
+					{ `Keyboard shortcut: ${ shortcutAriaLabel.primary(
+						's'
+					) }` }
+				</span>
+			</>
+		);
 	},
 };
