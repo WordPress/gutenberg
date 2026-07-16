@@ -34,7 +34,7 @@ export type WordPressComponent<
 	IsPolymorphic extends boolean,
 > = {
 	< TT extends React.ElementType >(
-		props: WordPressComponentProps< O, TT, IsPolymorphic > &
+		props: WordPressComponentProps< O, TT, false > &
 			( IsPolymorphic extends true ? { as: TT } : {} )
 	): React.ReactNode;
 	( props: WordPressComponentProps< O, T, IsPolymorphic > ): React.ReactNode;
