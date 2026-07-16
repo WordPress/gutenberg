@@ -7,11 +7,15 @@ const { execSync } = require( 'child_process' );
 const rimraf = require( 'rimraf' ).sync;
 
 const fixturesPath = path.join(
-	__dirname,
+	import.meta.dirname,
 	'fixtures',
 	'build-blocks-manifest'
 );
-const outputPath = path.join( __dirname, 'build', 'test-blocks-manifest' );
+const outputPath = path.join(
+	import.meta.dirname,
+	'build',
+	'test-blocks-manifest'
+);
 
 describe( 'build-blocks-manifest script', () => {
 	beforeAll( () => {
@@ -31,7 +35,7 @@ describe( 'build-blocks-manifest script', () => {
 
 		// Run the build-blocks-manifest script
 		const scriptPath = path.resolve(
-			__dirname,
+			import.meta.dirname,
 			'..',
 			'build-blocks-manifest.js'
 		);
@@ -48,7 +52,7 @@ describe( 'build-blocks-manifest script', () => {
 		const outputFile = path.join( outputPath, 'empty-blocks-manifest.php' );
 
 		const scriptPath = path.resolve(
-			__dirname,
+			import.meta.dirname,
 			'..',
 			'build-blocks-manifest.js'
 		);
@@ -77,7 +81,7 @@ describe( 'build-blocks-manifest script', () => {
 		const outputFile = path.join( outputPath, 'empty-blocks-manifest.php' );
 
 		const scriptPath = path.resolve(
-			__dirname,
+			import.meta.dirname,
 			'..',
 			'build-blocks-manifest.js'
 		);

@@ -12,7 +12,7 @@ const { randomUUID } = require( 'crypto' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const TEST_IMAGE_FILE_PATH = path.join(
-	__dirname,
+	import.meta.dirname,
 	'..',
 	'..',
 	'..',

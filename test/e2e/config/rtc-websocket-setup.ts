@@ -23,7 +23,7 @@ const PROVIDER_PLUGIN = 'gutenberg-test-plugin-rtc-websocket-provider';
 
 function getProviderPluginDir() {
 	return path.resolve(
-		__dirname,
+		import.meta.dirname,
 		'../../../packages/e2e-tests/plugins/rtc-websocket-provider'
 	);
 }

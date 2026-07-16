@@ -21,12 +21,12 @@ const generateStylelintCommand = ( filename ) =>
 	'node ' +
 	stylelintBin +
 	' ' +
-	path.resolve( __dirname, '../', filename ) +
+	path.resolve( import.meta.dirname, '../', filename ) +
 	' -c' +
-	path.resolve( __dirname, '../', './.stylelintrc.tests.json' ) +
+	path.resolve( import.meta.dirname, '../', './.stylelintrc.tests.json' ) +
 	' --formatter json' +
 	' --ignore-path ' +
-	path.resolve( __dirname, '../', './.stylelintignore' );
+	path.resolve( import.meta.dirname, '../', './.stylelintignore' );
 
 module.exports = {
 	getStylelintResult: ( filename ) =>

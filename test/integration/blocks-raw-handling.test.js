@@ -436,19 +436,19 @@ describe( 'Blocks raw handling', () => {
 			it( type, () => {
 				const HTML = readFile(
 					path.join(
-						__dirname,
+						import.meta.dirname,
 						`fixtures/documents/${ type }-in.html`
 					)
 				);
 				const plainText = readFile(
 					path.join(
-						__dirname,
+						import.meta.dirname,
 						`fixtures/documents/${ type }-in.txt`
 					)
 				);
 				const output = readFile(
 					path.join(
-						__dirname,
+						import.meta.dirname,
 						`fixtures/documents/${ type }-out.html`
 					)
 				);
@@ -485,7 +485,7 @@ describe( 'Blocks raw handling', () => {
 		it( 'should remove extra blank lines', () => {
 			const HTML = readFile(
 				path.join(
-					__dirname,
+					import.meta.dirname,
 					'fixtures/documents/google-docs-blank-lines.html'
 				)
 			);
@@ -495,7 +495,10 @@ describe( 'Blocks raw handling', () => {
 
 		it( 'should strip windows data', () => {
 			const HTML = readFile(
-				path.join( __dirname, 'fixtures/documents/windows.html' )
+				path.join(
+					import.meta.dirname,
+					'fixtures/documents/windows.html'
+				)
 			);
 			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
 			expect( console ).toHaveLogged();
@@ -504,7 +507,7 @@ describe( 'Blocks raw handling', () => {
 		it( 'should strip HTML formatting space from inline text', () => {
 			const HTML = readFile(
 				path.join(
-					__dirname,
+					import.meta.dirname,
 					'fixtures/documents/inline-with-html-formatting-space.html'
 				)
 			);
@@ -517,14 +520,20 @@ describe( 'Blocks raw handling', () => {
 describe( 'rawHandler', () => {
 	it( 'should convert HTML post to blocks with minimal content changes', () => {
 		const HTML = readFile(
-			path.join( __dirname, 'fixtures/documents/wordpress-convert.html' )
+			path.join(
+				import.meta.dirname,
+				'fixtures/documents/wordpress-convert.html'
+			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
 	it( 'should convert a caption shortcode', () => {
 		const HTML = readFile(
-			path.join( __dirname, 'fixtures/documents/shortcode-caption.html' )
+			path.join(
+				import.meta.dirname,
+				'fixtures/documents/shortcode-caption.html'
+			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
@@ -532,7 +541,7 @@ describe( 'rawHandler', () => {
 	it( 'should convert a caption shortcode with link', () => {
 		const HTML = readFile(
 			path.join(
-				__dirname,
+				import.meta.dirname,
 				'fixtures/documents/shortcode-caption-with-link.html'
 			)
 		);
@@ -542,7 +551,7 @@ describe( 'rawHandler', () => {
 	it( 'should convert a caption shortcode with caption', () => {
 		const HTML = readFile(
 			path.join(
-				__dirname,
+				import.meta.dirname,
 				'fixtures/documents/shortcode-caption-with-caption-link.html'
 			)
 		);
@@ -552,7 +561,7 @@ describe( 'rawHandler', () => {
 	it( 'should convert a list with attributes', () => {
 		const HTML = readFile(
 			path.join(
-				__dirname,
+				import.meta.dirname,
 				'fixtures/documents/list-with-attributes.html'
 			)
 		);

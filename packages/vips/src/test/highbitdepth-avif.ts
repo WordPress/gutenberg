@@ -23,7 +23,7 @@ import { join } from 'node:path';
  */
 const Vips = require( 'wasm-vips' );
 
-const FIXTURES = join( __dirname, 'fixtures' );
+const FIXTURES = join( import.meta.dirname, 'fixtures' );
 
 describe( 'wasm-vips high-bit-depth AVIF decoding', () => {
 	let vips: Awaited< ReturnType< typeof Vips > >;

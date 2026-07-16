@@ -9,8 +9,8 @@ const rimraf = require( 'rimraf' ).sync;
 const webpack = require( 'webpack' );
 
 describe( 'ReadableJsAssetsWebpackPlugin', () => {
-	const outputDirectory = path.join( __dirname, 'build' );
-	const testDirectory = path.join( __dirname, 'fixtures' );
+	const outputDirectory = path.join( import.meta.dirname, 'build' );
+	const testDirectory = path.join( import.meta.dirname, 'fixtures' );
 
 	beforeEach( () => {
 		rimraf( outputDirectory );

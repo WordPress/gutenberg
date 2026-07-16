@@ -20,5 +20,5 @@ describe( 'block-serialization-default-parser-js', jsTester( parse ) ); // eslin
 
 phpTester(
 	'block-serialization-default-parser-php',
-	path.join( __dirname, 'test-parser.php' )
+	path.join( import.meta.dirname, 'test-parser.php' )
 );

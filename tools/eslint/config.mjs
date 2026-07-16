@@ -584,6 +584,31 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: Tests are written as ESM, and should avoid relying on globals
+	// that don't exist in the context of ES Modules. Ideally we'd avoid these
+	// ever being made available as globals. This can be achieved with ESLint
+	// globals configuration, but `no-undef` is disabled for TypeScript files,
+	// and TypeScript doesn't provide a way to disable the CommonJS globals.
+	{
+		files: [ '**/@(__tests__|test)/**/*.[tj]s?(x)' ],
+		// Jest harness under test/unit is plain CommonJS loaded by Node/Jest
+		// directly (not Babel-transformed), so import.meta.* is unavailable.
+		ignores: [ 'test/unit/**' ],
+		rules: {
+			'no-restricted-globals': [
+				'error',
+				{
+					name: '__dirname',
+					message: 'Use `import.meta.dirname` instead',
+				},
+				{
+					name: '__filename',
+					message: 'Use `import.meta.filename` instead',
+				},
+			],
+		},
+	},
+
 	// Override: CLI/bin/env files — allow console.
 	{
 		files: [ '**/{bin,scripts,tools}/**', 'packages/env/**' ],

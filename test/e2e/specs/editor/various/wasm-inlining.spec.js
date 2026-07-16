@@ -18,7 +18,7 @@ const path = require( 'path' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const buildModulePath = path.resolve(
-	__dirname,
+	import.meta.dirname,
 	'../../../../../packages/vips/build-module/index.mjs'
 );
 

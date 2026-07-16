@@ -15,12 +15,12 @@ import { test as base, expect } from '@wordpress/e2e-test-utils-playwright';
 import { setCollaboration } from './fixtures/collaboration-utils';
 
 const STEP1_CONTENT = readFileSync(
-	join( __dirname, 'data', 'code-editor-perf-step1.md' ),
+	join( import.meta.dirname, 'data', 'code-editor-perf-step1.md' ),
 	'utf-8'
 );
 
 const STEP2_CONTENT = readFileSync(
-	join( __dirname, 'data', 'code-editor-perf-step2.md' ),
+	join( import.meta.dirname, 'data', 'code-editor-perf-step2.md' ),
 	'utf-8'
 );
 

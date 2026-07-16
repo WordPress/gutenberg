@@ -7,11 +7,11 @@ describe( 'index', () => {
 		// As described in the CONTRIBUTING.md file, each component should be
 		// exported from an index.ts in its implementation directory.
 		const components = await glob( '*/index.ts', {
-			cwd: join( __dirname, '..' ),
+			cwd: join( import.meta.dirname, '..' ),
 		} );
 		const directories = components.map( ( c ) => basename( dirname( c ) ) );
 		const index = await readFile(
-			join( __dirname, '../index.ts' ),
+			join( import.meta.dirname, '../index.ts' ),
 			'utf-8'
 		);
 

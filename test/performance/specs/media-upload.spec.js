@@ -23,7 +23,13 @@ const results = {
 	multipleImageUploadProcessing: [],
 };
 
-const E2E_ASSETS_PATH = path.join( __dirname, '..', '..', 'e2e', 'assets' );
+const E2E_ASSETS_PATH = path.join(
+	import.meta.dirname,
+	'..',
+	'..',
+	'e2e',
+	'assets'
+);
 
 /**
  * Creates a temporary copy of a test image with a unique filename.

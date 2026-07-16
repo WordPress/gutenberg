@@ -4,7 +4,7 @@
 const path = require( 'path' );
 const { spawnSync } = require( 'child_process' );
 
-const cliPath = path.resolve( __dirname, '../cli.js' );
+const cliPath = path.resolve( import.meta.dirname, '../cli.js' );
 const script = `
 	const { Command } = require( 'commander' );
 	const { run } = require( ${ JSON.stringify( cliPath ) } );

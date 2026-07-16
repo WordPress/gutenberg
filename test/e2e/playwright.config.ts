@@ -36,7 +36,7 @@ const config = defineConfig( {
 		: 'list',
 	workers: 1,
 	globalSetup: fileURLToPath(
-		new URL( './config/global-setup.ts', 'file:' + __filename ).href
+		new URL( './config/global-setup.ts', import.meta.url ).href
 	),
 	// The default suite runs RTC tests on the HTTP polling provider. Specs
 	// that rely on WebSocket-only semantics live under `websocket-only/` and
