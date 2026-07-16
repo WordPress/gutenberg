@@ -2,3 +2,9 @@
 	padding-right: 4px;
 	padding-left: 6px;
 }
+
+// Tint the device icon to signal that responsive styling is active,
+// reusing the synced-pattern color for a consistent "special state" cue.
+.editor-preview-dropdown.is-responsive-editing .editor-preview-dropdown__toggle svg {
+	fill: var(--wp-block-synced-color);
+}
