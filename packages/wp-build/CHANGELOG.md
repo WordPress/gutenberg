@@ -9,7 +9,7 @@
 
 ### Bug Fixes
 
--   Ignore generated `src/worker-code.ts` in watch mode to stop rebuild loops for worker packages like `@wordpress/vips`.
+-   Ignore generated `src/worker-code.ts` in watch mode to stop rebuild loops for worker packages like `@wordpress/vips` ([#80361](https://github.com/WordPress/gutenberg/pull/80361)).
 -   Pass the current `$hook_suffix` to the `admin_footer` action in the generated single-page admin template instead of an empty string ([#75985](https://github.com/WordPress/gutenberg/pull/75985)).
 
 ## 0.19.0 (2026-07-14)
