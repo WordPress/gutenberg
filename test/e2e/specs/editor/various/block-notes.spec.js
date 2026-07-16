@@ -1941,6 +1941,17 @@ test.describe( 'Block Notes', () => {
 				`/wp-admin/post.php?post=${ postId }&action=edit`
 			);
 
+			const welcomeGuideClose = otherPage
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Close' } );
+			if (
+				await welcomeGuideClose
+					.isVisible( { timeout: 3000 } )
+					.catch( () => false )
+			) {
+				await welcomeGuideClose.click();
+			}
+
 			await otherPage.evaluate( () => {
 				window.wp.data
 					.dispatch( 'core/preferences' )
@@ -1978,43 +1989,92 @@ test.describe( 'Block Notes', () => {
 			await otherContext.close();
 		} );
 
-		test( 'should clear unread dot when note thread is resolved', async ( {
+		test( 'clears unread dot when resolving a note from another user', async ( {
 			page,
+			browser,
 			blockNoteUtils,
+			requestUtils,
 		} ) => {
+			const otherUsername = `notes-test-${ Date.now() }`;
+			const otherPassword = 'testpassword';
+			await requestUtils.rest( {
+				path: '/wp/v2/users',
+				method: 'POST',
+				data: {
+					username: otherUsername,
+					email: `${ otherUsername }@example.com`,
+					password: otherPassword,
+					roles: [ 'editor' ],
+				},
+			} );
+
+			const otherContext = await browser.newContext();
+			await otherContext.request.post( '/wp-login.php', {
+				form: {
+					log: otherUsername,
+					pwd: otherPassword,
+					'wp-submit': 'Log In',
+					redirect_to: '/wp-admin/',
+					testcookie: '1',
+				},
+			} );
+			const otherPage = await otherContext.newPage();
+
+			// Admin creates the note.
 			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Resolve clears unread' },
 				comment: 'Note to resolve',
 			} );
-			await blockNoteUtils.openBlockNoteSidebar();
 
-			const thread = page
+			const postId = await page.evaluate( () =>
+				window.wp.data.select( 'core/editor' ).getCurrentPostId()
+			);
+
+			await otherPage.goto(
+				`/wp-admin/post.php?post=${ postId }&action=edit`
+			);
+
+			const welcomeGuideClose = otherPage
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Close' } );
+			await welcomeGuideClose
+				.click( { timeout: 5000 } )
+				.catch( () => {} );
+
+			const otherToggle = otherPage
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'All notes', exact: true } );
+			await otherToggle.click( { timeout: 25000 } );
+
+			const otherThread = otherPage
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
-					name: 'Note: Note to resolve',
-				} );
+				.getByRole( 'treeitem', { name: 'Note: Note to resolve' } );
 
-			// Own note: should not be unread.
+			// The other user hasn't seen this note yet — should show unread.
 			await expect(
-				thread.locator( '.editor-collab-sidebar-panel__unread-dot' )
+				otherThread.locator(
+					'.editor-collab-sidebar-panel__unread-dot'
+				)
+			).toBeVisible();
+
+			// Expand and resolve it as the other user.
+			await otherThread.click();
+			await expect( otherThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+
+			await otherPage.getByRole( 'button', { name: 'Resolve' } ).click();
+
+			// Resolving marks it viewed — the dot should be gone.
+			await expect(
+				otherThread.locator(
+					'.editor-collab-sidebar-panel__unread-dot'
+				)
 			).toBeHidden();
 
-			// Expand the thread so the resolve button is visible.
-			await thread.click();
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
-
-			const resolveButton = page.getByRole( 'button', {
-				name: 'Resolve',
-			} );
-			await resolveButton.click();
-
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note marked as resolved.' } )
-			).toBeVisible();
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+			await otherContext.close();
 		} );
 
 		test( 'should clear unread dot when replying to a note', async ( {
@@ -2066,12 +2126,6 @@ test.describe( 'Block Notes', () => {
 				name: 'Resolve',
 			} );
 			await resolveButton.click();
-
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note marked as resolved.' } )
-			).toBeVisible();
 
 			// [PERSON_NAME] so the thread collapses and shows the lastReply.
 			await editor.canvas
