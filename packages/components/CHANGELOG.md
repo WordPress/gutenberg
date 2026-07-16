@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   `InputControl`, `SelectControl`, `CustomSelectControl`: Remove obsolete `__unstable-large` from the public `size` type. The value continues to work at runtime, and is equivalent to the `default` size. ([#80081](https://github.com/WordPress/gutenberg/pull/80081)).
+
+## 37.0.0 (2026-07-14)
+
 ### Enhancements
 
 -   `ControlWithError`: Remove redundant inline aria-live region for validation error messages to prevent duplicate announcements. ([#79600](https://github.com/WordPress/gutenberg/pull/79600)).

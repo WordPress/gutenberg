@@ -198,9 +198,9 @@ function gutenberg_notes_scope_mention_kses( $commentdata ) {
  * Arms the mention markup allowance for REST note writes.
  *
  * Runs in WP_REST_Comments_Controller::prepare_item_for_database() for both
- * creates and updates, before the comment is sanitized. Updates do not carry
- * the comment type in the prepared data, so it is resolved from the comment
- * being updated.
+ * creates and updates, before the comment is sanitized. Neither carries the
+ * comment type in the prepared data, so it is resolved from the comment being
+ * updated or, on creation, from the request's `type` param.
  *
  * @param array           $prepared_comment Prepared comment data.
  * @param WP_REST_Request $request          The REST request.
@@ -211,6 +211,17 @@ function gutenberg_notes_scope_mention_kses_rest( $prepared_comment, $request ) 
 
 	if ( '' === $comment_type && ! empty( $request['id'] ) ) {
 		$comment_type = get_comment_type( (int) $request['id'] );
+	}
+
+	/*
+	 * On creation the controller only copies the `type` param into the
+	 * prepared data after this filter has run, and it inserts through
+	 * wp_filter_comment() directly - never through wp_new_comment() and its
+	 * 'preprocess_comment' filter - so this is the only chance to arm and the
+	 * type must be resolved from the request.
+	 */
+	if ( '' === $comment_type && isset( $request['type'] ) ) {
+		$comment_type = $request['type'];
 	}
 
 	if ( 'note' === $comment_type ) {

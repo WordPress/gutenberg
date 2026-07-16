@@ -203,6 +203,39 @@ describe( 'getWpCompatOverlaySlot', () => {
 		} );
 	} );
 
+	describe( 'modal accessibility isolation', () => {
+		beforeEach( () => {
+			internalWindow.__wpUiCompatOverlaySlotEnabled = true;
+		} );
+
+		it( 'exempts a newly created slot from modal accessibility isolation', () => {
+			const slot = getWpCompatOverlaySlot();
+
+			expect( slot ).toHaveAttribute( 'aria-hidden', 'false' );
+			expect( slot ).not.toHaveAttribute( 'aria-live' );
+		} );
+
+		it( 'restores a cached slot hidden by modal accessibility isolation', () => {
+			const slot = getWpCompatOverlaySlot();
+			slot?.setAttribute( 'aria-hidden', 'true' );
+
+			expect( getWpCompatOverlaySlot() ).toBe( slot );
+			expect( slot ).toHaveAttribute( 'aria-hidden', 'false' );
+		} );
+
+		it( 'restores an adopted slot hidden by modal accessibility isolation', () => {
+			const preExisting = document.createElement( 'div' );
+			preExisting.setAttribute( WP_COMPAT_OVERLAY_SLOT_ATTRIBUTE, '' );
+			preExisting.setAttribute( 'aria-hidden', 'true' );
+			document.body.appendChild( preExisting );
+
+			const slot = getWpCompatOverlaySlot();
+
+			expect( slot ).toBe( preExisting );
+			expect( slot ).toHaveAttribute( 'aria-hidden', 'false' );
+		} );
+	} );
+
 	describe( 'DOM-level singleton (cross-instance coordination)', () => {
 		beforeEach( () => {
 			internalWindow.__wpUiCompatOverlaySlotEnabled = true;

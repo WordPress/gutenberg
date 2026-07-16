@@ -4,6 +4,12 @@
 
 ### New Features
 
+-   The "Apply globally" control now opens a review modal so you can choose which of a block's modified styles are pushed to Global Styles, showing each style's current and new value ([#79839](https://github.com/WordPress/gutenberg/pull/79839)).
+
+## 14.51.0 (2026-07-14)
+
+### New Features
+
 -   Add an "Attachments" source to the block inserter's Media tab, listing images attached to the current post with the ability to attach and detach them ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
 
 ### Enhancements
@@ -14,6 +20,7 @@
 
 ### Bug Fixes
 
+-   Render the "Preview in new tab" action with the shared menu item pattern so its typography matches sibling menu items ([#80195](https://github.com/WordPress/gutenberg/pull/80195)).
 -   External images are now sideloaded on the server when uploaded to the media library, via a new `mediaSideloadFromUrl` block editor setting, so the upload works when the editor is cross-origin isolated (e.g. with client-side media processing enabled) ([#79409](https://github.com/WordPress/gutenberg/pull/79409)).
 
 ### Enhancements

@@ -7,6 +7,8 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
+import { useResizeObserver } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 import { Card, Icon, Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 
@@ -14,6 +16,11 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  * Internal dependencies
  */
 import { WidgetInfotip } from './widget-header-infotip';
+import {
+	WIDGET_HEADER_IDENTITY_RESERVE,
+	WIDGET_TOOLBAR_CHIP_RESERVE,
+	WidgetHeaderAvailableSizeProvider,
+} from './widget-header-size';
 import styles from './widget-header.module.css';
 
 export interface WidgetHeaderProps {
@@ -64,8 +71,24 @@ export function WidgetHeader( {
 	editMode = false,
 	children,
 }: WidgetHeaderProps ): React.ReactNode {
+	// Content-box width of the header row, so toolbar controls can compare
+	// their natural width against the space the row actually offers.
+	const [ headerWidth, setHeaderWidth ] = useState( 0 );
+	const headerMeasureRef = useResizeObserver< HTMLDivElement >(
+		( [ entry ] ) => setHeaderWidth( entry.contentRect.width )
+	);
+
+	const hasIdentity = showIdentity && !! widgetType?.title;
+	const availableSize =
+		headerWidth > 0
+			? headerWidth -
+			  WIDGET_TOOLBAR_CHIP_RESERVE -
+			  ( hasIdentity ? WIDGET_HEADER_IDENTITY_RESERVE : 0 )
+			: null;
+
 	return (
 		<Card.Header
+			ref={ headerMeasureRef }
 			className={ clsx(
 				styles[ 'widget-header' ],
 				overlay && styles.overlay
@@ -98,7 +121,13 @@ export function WidgetHeader( {
 				</Stack>
 			) }
 
-			{ children && <div className={ styles.toolbar }>{ children }</div> }
+			{ children && (
+				<div className={ styles.toolbar }>
+					<WidgetHeaderAvailableSizeProvider value={ availableSize }>
+						{ children }
+					</WidgetHeaderAvailableSizeProvider>
+				</div>
+			) }
 		</Card.Header>
 	);
 }

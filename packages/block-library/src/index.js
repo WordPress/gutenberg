@@ -210,6 +210,10 @@ const getAllBlocks = () => {
 		socialLinks,
 		spacer,
 		table,
+		tabs,
+		tabList,
+		tabPanels,
+		tabPanel,
 		tagCloud,
 		textColumns,
 		verse,
@@ -283,10 +287,8 @@ const getAllBlocks = () => {
 	}
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( tabList );
-		blocks.push( tabs );
-		blocks.push( tabPanel );
-		blocks.push( tabPanels );
+		// Blocks added here are only registered when the "Block experiments"
+		// option is enabled in the Gutenberg > Experiments settings page.
 	}
 
 	blocks.push( classic );

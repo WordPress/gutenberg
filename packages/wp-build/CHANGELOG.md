@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.19.0 (2026-07-14)
+
 ### Enhancements
 
 -   Align the generated single-page admin font-family stack with the `@wordpress/theme` body token ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
