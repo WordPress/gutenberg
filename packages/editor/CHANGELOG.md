@@ -6,6 +6,10 @@
 
 -   The "Apply globally" control now opens a review modal so you can choose which of a block's modified styles are pushed to Global Styles, showing each style's current and new value ([#79839](https://github.com/WordPress/gutenberg/pull/79839)).
 
+### Bug Fixes
+
+-   `mediaUpload`: Skip upload progress tracking when called by the `@wordpress/upload-media` queue, which counts its own items. Fixes the progress snackbar showing "1 of 2" for a single HEIC upload in Safari ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
+
 ## 14.51.0 (2026-07-14)
 
 ### New Features

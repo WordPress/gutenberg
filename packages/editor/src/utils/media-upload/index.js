@@ -35,6 +35,9 @@ const noop = () => {};
  * @param {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
  * @param {Function} $0.onSuccess         Function called after the final representation of the file is available.
  * @param {boolean}  $0.multiple          Whether to allow multiple files to be uploaded.
+ * @param {boolean}  $0.skipTracking      Whether the caller tracks upload progress itself. Set by the
+ *                                        `@wordpress/upload-media` queue, which counts its own items for the
+ *                                        progress snackbar and uses this function only as its server transport.
  */
 export default function mediaUpload( {
 	additionalData = {},
@@ -45,6 +48,7 @@ export default function mediaUpload( {
 	onFileChange,
 	onSuccess,
 	multiple = true,
+	skipTracking = false,
 } ) {
 	const { receiveEntityRecords } = dispatch( coreDataStore );
 	const { getCurrentPost, getEditorSettings } = select( editorStore );
@@ -82,11 +86,16 @@ export default function mediaUpload( {
 
 	const postData = currentPostId ? { post: currentPostId } : {};
 
-	// Track this batch for the upload progress snackbar. Only applies to the
-	// non-CSM path — when CSM is enabled, the block-editor provider intercepts
-	// mediaUpload and dispatches to the upload-media store, so this wrapper is
-	// not called.
-	if ( ! isClientSideMediaActive ) {
+	// Track this batch for the upload progress snackbar. Only applies to
+	// direct calls on the non-CSM path — when CSM is enabled, the
+	// block-editor provider intercepts mediaUpload and dispatches to the
+	// upload-media store instead. The upload-media queue also calls this
+	// wrapper as its server transport (with `skipTracking` set) even when
+	// full CSM is unsupported — e.g. Safari's HEIC-only canvas mode — and
+	// its items are already counted by the snackbar, so registering them
+	// here would double-count them (see gutenberg#80369).
+	const shouldTrack = ! isClientSideMediaActive && ! skipTracking;
+	if ( shouldTrack ) {
 		const trackingFiles = Array.from( filesList ).map(
 			( f ) => f?.name || ''
 		);
@@ -124,7 +133,7 @@ export default function mediaUpload( {
 			}
 
 			// Advance the snackbar tracker for newly-completed files.
-			if ( ! isClientSideMediaActive ) {
+			if ( shouldTrack ) {
 				const completedCount = entityFiles.length;
 				if ( completedCount > lastCompletedCount ) {
 					trackAdvance( completedCount - lastCompletedCount );
@@ -141,6 +150,8 @@ export default function mediaUpload( {
 		onError: ( { message } ) => {
 			if ( ! isClientSideMediaActive ) {
 				clearSaveLock();
+			}
+			if ( shouldTrack ) {
 				// Failed files still count as "done" for the snackbar.
 				trackAdvance( 1 );
 			}

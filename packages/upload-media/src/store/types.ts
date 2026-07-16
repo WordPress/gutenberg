@@ -174,6 +174,9 @@ interface UploadMediaArgs {
 	wpAllowedMimeTypes?: Record< string, string > | null;
 	// Abort signal.
 	signal?: AbortSignal;
+	// Whether the caller tracks upload progress itself, so the handler
+	// should skip its own progress tracking to avoid double-counting.
+	skipTracking?: boolean;
 }
 
 /**

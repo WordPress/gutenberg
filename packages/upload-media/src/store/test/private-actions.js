@@ -20,6 +20,7 @@ import {
 	transcodeGifItem,
 	detectUltraHdr,
 	removeItem,
+	uploadItem,
 } from '../private-actions';
 import { OperationType, Type } from '../types';
 import {
@@ -1410,6 +1411,38 @@ describe( 'private actions', () => {
 			} finally {
 				warnSpy.mockRestore();
 			}
+		} );
+	} );
+
+	describe( 'uploadItem', () => {
+		it( 'flags the transport call so consumers skip their own progress tracking', async () => {
+			// The queue already counts its items for progress UI; the
+			// `mediaUpload` callback it delegates the server upload to must
+			// not count the same file again (see gutenberg#80369).
+			const mediaUpload = jest.fn();
+			const file = new File( [ 'content' ], 'photo.jpg', {
+				type: 'image/jpeg',
+			} );
+			const item = { id: 'item-1', file, additionalData: {} };
+
+			const dispatch = jest.fn();
+			dispatch.finishOperation = jest.fn();
+			dispatch.cancelItem = jest.fn();
+
+			await uploadItem( 'item-1' )( {
+				select: {
+					getItem: () => item,
+					getSettings: () => ( { mediaUpload } ),
+				},
+				dispatch,
+			} );
+
+			expect( mediaUpload ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					filesList: [ file ],
+					skipTracking: true,
+				} )
+			);
 		} );
 	} );
 
