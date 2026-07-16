@@ -19,40 +19,38 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function MenuPopup(
 	const { isSubmenu } = useMenuContext();
 
 	const popupContent = (
-		<_Menu.Popup
-			ref={ ref }
-			className={ clsx(
-				styles.popup,
-				isSubmenu
-					? styles[ 'popup--submenu' ]
-					: styles[ 'popup--root' ],
-				className
-			) }
-			{ ...props }
-		>
-			<div
-				/*
-				 * `styles.list` flattens this wrapper so menu items can
-				 * participate in the popup's shared grid.
-				 */
-				className={ styles.list }
+		<ThemeProvider>
+			<_Menu.Popup
+				ref={ ref }
+				className={ clsx(
+					styles.popup,
+					isSubmenu
+						? styles[ 'popup--submenu' ]
+						: styles[ 'popup--root' ],
+					className
+				) }
+				{ ...props }
 			>
-				{ children }
-			</div>
-		</_Menu.Popup>
+				<div
+					/*
+					 * `styles.list` flattens this wrapper so menu items can
+					 * participate in the popup's shared grid.
+					 */
+					className={ styles.list }
+				>
+					{ children }
+				</div>
+			</_Menu.Popup>
+		</ThemeProvider>
 	);
 
 	const positionedPopup = renderSlotWithChildren(
 		positioner,
 		<Positioner />,
-		{ children: popupContent, className: styles.positioner }
+		popupContent
 	);
 
-	return renderSlotWithChildren( portal, <Portal />, {
-		// ThemeProvider wrap around the positioner so that the positioner
-		// can consume the correct DS token for its background color.
-		children: <ThemeProvider>{ positionedPopup }</ThemeProvider>,
-	} );
+	return renderSlotWithChildren( portal, <Portal />, positionedPopup );
 } );
 
 export { Popup };

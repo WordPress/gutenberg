@@ -38,12 +38,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 	const positionedPopup = renderSlotWithChildren(
 		positioner,
 		<Positioner />,
-		{ children: popupContent }
+		popupContent
 	);
 
-	return renderSlotWithChildren( portal, <Portal />, {
-		children: positionedPopup,
-	} );
+	return renderSlotWithChildren( portal, <Portal />, positionedPopup );
 } );
 
 export { Popup };
