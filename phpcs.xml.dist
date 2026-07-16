@@ -9,7 +9,38 @@
 	</rule>
 
 	<rule ref="WordPress-Core"/>
-	<rule ref="WordPress-Extra"/>
+	<rule ref="WordPress-Extra">
+		<!--
+			The sniffs below have existing violations in the codebase. They are
+			excluded so the rest of the WordPress-Extra ruleset can be enforced
+			right away. Each exclusion should be removed once the corresponding
+			violations are fixed in follow-up PRs. See #18502.
+		-->
+		<exclude name="Generic.CodeAnalysis.EmptyStatement"/>
+		<exclude name="Generic.CodeAnalysis.ForLoopWithTestFunctionCall"/>
+		<exclude name="Generic.CodeAnalysis.RequireExplicitBooleanOperatorPrecedence"/>
+		<exclude name="Generic.CodeAnalysis.UnconditionalIfStatement"/>
+		<exclude name="Generic.CodeAnalysis.UnusedFunctionParameter"/>
+		<exclude name="Generic.CodeAnalysis.UselessOverridingMethod"/>
+		<exclude name="PSR2.Methods.MethodDeclaration"/>
+		<exclude name="Squiz.Operators.IncrementDecrementUsage"/>
+		<exclude name="Squiz.PHP.CommentedOutCode"/>
+		<exclude name="Squiz.PHP.DisallowSizeFunctionsInLoops"/>
+		<exclude name="Universal.Files.SeparateFunctionsFromOO"/>
+		<exclude name="WordPress.NamingConventions.ValidPostTypeSlug"/>
+		<exclude name="WordPress.PHP.DevelopmentFunctions"/>
+		<exclude name="WordPress.PHP.DiscouragedPHPFunctions"/>
+		<exclude name="WordPress.PHP.PregQuoteDelimiter"/>
+		<exclude name="WordPress.Security.EscapeOutput"/>
+		<exclude name="WordPress.Security.NonceVerification"/>
+		<exclude name="WordPress.WP.AlternativeFunctions"/>
+		<exclude name="WordPress.WP.Capabilities"/>
+		<exclude name="WordPress.WP.DeprecatedFunctions"/>
+		<exclude name="WordPress.WP.EnqueuedResourceParameters"/>
+		<exclude name="WordPress.WP.EnqueuedResources"/>
+		<exclude name="WordPress.WP.GetMetaSingle"/>
+		<exclude name="WordPress.WP.GlobalVariablesOverride"/>
+	</rule>
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">

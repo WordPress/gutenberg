@@ -129,7 +129,7 @@ class Tests_Blocks_RenderCommentTemplateBlock extends WP_UnitTestCase {
 		$render_block_data_callback = static function ( $parsed_block ) {
 			// Add a Social Links block to a Comment Template block's inner blocks.
 			if ( 'core/comment-template' === $parsed_block['blockName'] ) {
-				$inserted_block_markup = <<<END
+				$inserted_block_markup = <<<'END'
 <!-- wp:social-links -->
 <ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
 <!-- /wp:social-links -->'

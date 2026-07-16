@@ -66,11 +66,9 @@ function render_block_core_media_text( $attributes, $content ) {
 			// Insert a unique ID to identify the figure tag.
 			$media_tag_processor->set_attribute( 'id', $unique_id );
 		}
-	} else {
-		if ( $media_tag_processor->next_tag( $wrapping_figure_query ) ) {
-			// Insert a unique ID to identify the figure tag.
-			$media_tag_processor->set_attribute( 'id', $unique_id );
-		}
+	} elseif ( $media_tag_processor->next_tag( $wrapping_figure_query ) ) {
+		// Insert a unique ID to identify the figure tag.
+		$media_tag_processor->set_attribute( 'id', $unique_id );
 	}
 
 	$content = $media_tag_processor->get_updated_html();

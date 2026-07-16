@@ -389,8 +389,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 */
 		protected static function get_css_var_value( $style_value, $css_vars ) {
 			foreach ( $css_vars as  $property_key => $css_var_pattern ) {
-				$slug = static::get_slug_from_preset_value( $style_value, $property_key );
-				if ( static::is_valid_style_value( $slug ) ) {
+				$slug = self::get_slug_from_preset_value( $style_value, $property_key );
+				if ( self::is_valid_style_value( $slug ) ) {
 					$var = strtr(
 						$css_var_pattern,
 						array( '$slug' => $slug )
@@ -427,7 +427,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			if ( empty( $store_name ) || empty( $css_selector ) || empty( $css_declarations ) ) {
 				return;
 			}
-			static::get_store( $store_name )->add_rule( $css_selector, $rules_group )->add_declarations( $css_declarations );
+			self::get_store( $store_name )->add_rule( $css_selector, $rules_group )->add_declarations( $css_declarations );
 		}
 
 		/**
@@ -471,23 +471,23 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			}
 
 			// Collect CSS and classnames.
-			foreach ( static::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group_key => $definition_group_style ) {
+			foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group_key => $definition_group_style ) {
 				if ( empty( $block_styles[ $definition_group_key ] ) ) {
 					continue;
 				}
 				foreach ( $definition_group_style as $style_definition ) {
 					$style_value = _wp_array_get( $block_styles, $style_definition['path'], null );
 
-					if ( ! static::is_valid_style_value( $style_value ) ) {
+					if ( ! self::is_valid_style_value( $style_value ) ) {
 						continue;
 					}
 
-					$classnames = static::get_classnames( $style_value, $style_definition );
+					$classnames = self::get_classnames( $style_value, $style_definition );
 					if ( ! empty( $classnames ) ) {
 						$parsed_styles['classnames'] = array_merge( $parsed_styles['classnames'], $classnames );
 					}
 
-					$css_declarations = static::get_css_declarations( $style_value, $style_definition, $options );
+					$css_declarations = self::get_css_declarations( $style_value, $style_definition, $options );
 					if ( ! empty( $css_declarations ) ) {
 						/*
 						 * Combine background gradient and background image into a single
@@ -525,7 +525,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						continue;
 					}
 
-					$slug = static::get_slug_from_preset_value( $style_value, $property_key );
+					$slug = self::get_slug_from_preset_value( $style_value, $property_key );
 
 					if ( $slug ) {
 						/*
@@ -572,8 +572,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			*/
 			if ( is_string( $style_value ) && str_contains( $style_value, 'var:' ) ) {
 				if ( ! $should_skip_css_vars && ! empty( $style_definition['css_vars'] ) ) {
-					$css_var = static::get_css_var_value( $style_value, $style_definition['css_vars'] );
-					if ( static::is_valid_style_value( $css_var ) ) {
+					$css_var = self::get_css_var_value( $style_value, $style_definition['css_vars'] );
+					if ( self::is_valid_style_value( $css_var ) ) {
 						$css_declarations[ $style_property_keys['default'] ] = $css_var;
 					}
 				}
@@ -593,12 +593,12 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 
 				foreach ( $style_value as $key => $value ) {
 					if ( is_string( $value ) && str_contains( $value, 'var:' ) && ! $should_skip_css_vars && ! empty( $style_definition['css_vars'] ) ) {
-						$value = static::get_css_var_value( $value, $style_definition['css_vars'] );
+						$value = self::get_css_var_value( $value, $style_definition['css_vars'] );
 					}
 
 					$individual_property = sprintf( $style_property_keys['individual'], _wp_to_kebab_case( $key ) );
 
-					if ( $individual_property && static::is_valid_style_value( $value ) ) {
+					if ( $individual_property && self::is_valid_style_value( $value ) ) {
 						$css_declarations[ $individual_property ] = $value;
 					}
 				}
@@ -649,12 +649,12 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 
 				// Build a path to the individual rules in definitions.
 				$style_definition_path = array( $definition_group_key, $css_property );
-				$style_definition      = _wp_array_get( static::BLOCK_STYLE_DEFINITIONS_METADATA, $style_definition_path, null );
+				$style_definition      = _wp_array_get( self::BLOCK_STYLE_DEFINITIONS_METADATA, $style_definition_path, null );
 
 				if ( $style_definition && isset( $style_definition['property_keys']['individual'] ) ) {
 					// Set a CSS var if there is a valid preset value.
 					if ( is_string( $value ) && str_contains( $value, 'var:' ) && ! $should_skip_css_vars && ! empty( $individual_property_definition['css_vars'] ) ) {
-						$value = static::get_css_var_value( $value, $individual_property_definition['css_vars'] );
+						$value = self::get_css_var_value( $value, $individual_property_definition['css_vars'] );
 					}
 					$individual_css_property                      = sprintf( $style_definition['property_keys']['individual'], $individual_property_key );
 					$css_declarations[ $individual_css_property ] = $value;

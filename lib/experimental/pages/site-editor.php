@@ -64,7 +64,7 @@ function gutenberg_site_editor_enable_admin_bar() {
 	wp_enqueue_style( 'admin-bar' );
 	wp_enqueue_style( 'colors' );
 
-	$css = <<<CSS
+	$css = <<<'CSS'
 #wpadminbar {
 	display: block;
 }

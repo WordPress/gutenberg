@@ -364,7 +364,7 @@ add_action( 'wp_nav_menu_item_custom_fields', 'gutenberg_output_block_menu_item_
  */
 function gutenberg_add_block_menu_item_styles_to_nav_menus( $hook ) {
 	if ( 'nav-menus.php' === $hook ) {
-		$css = <<<CSS
+		$css = <<<'CSS'
 			/**
 			 * HACK: We're hiding the description field using CSS because this
 			 * cannot be done using a filter. When merged to Core, we should

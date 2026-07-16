@@ -56,7 +56,7 @@ add_action( 'admin_bar_menu', 'gutenberg_admin_bar_site_icon', 31 );
  * Enqueues the styles for the admin bar site icon.
  */
 function gutenberg_admin_bar_site_icon_styles(): void {
-	$css = <<<CSS
+	$css = <<<'CSS'
 		#wpadminbar .quicklinks li img.blavatar {
 			border-radius: 2px;
 		}

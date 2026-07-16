@@ -79,7 +79,7 @@ class Tests_Block_Bindings extends WP_UnitTestCase {
 		return array(
 			'paragraph block' => array(
 				'content',
-				<<<HTML
+				<<<'HTML'
 <!-- wp:paragraph -->
 <p>This should not appear</p>
 <!-- /wp:paragraph -->
@@ -89,7 +89,7 @@ HTML
 			),
 			'button block'    => array(
 				'text',
-				<<<HTML
+				<<<'HTML'
 <!-- wp:button -->
 <div class="wp-block-button"><a class="wp-block-button__link wp-element-button">This should not appear</a></div>
 <!-- /wp:button -->
@@ -99,7 +99,7 @@ HTML
 			),
 			'test block'      => array(
 				'myAttribute',
-				<<<HTML
+				<<<'HTML'
 <!-- wp:test/block -->
 <p>This should not appear</p>
 <!-- /wp:test/block -->
@@ -195,7 +195,7 @@ HTML
 			)
 		);
 
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"test/source", "args": {"key": "test"}}}}} -->
 <p>This should not appear</p>
 <!-- /wp:paragraph -->
@@ -236,7 +236,7 @@ HTML;
 			)
 		);
 
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:test/block {"metadata":{"bindings":{"myAttribute":{"source":"test/source", "args": {"key": "test"}}}}} -->
 <p>This should not appear</p>
 <!-- /wp:test/block -->
@@ -290,7 +290,7 @@ HTML;
 			)
 		);
 
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:image {"metadata":{"bindings":{"url":{"source":"test/source"},"caption":{"source":"test/source"}}}} -->
 <figure class="wp-block-image"><img alt=""/><figcaption class="wp-element-caption"></figcaption></figure>
 <!-- /wp:image -->
@@ -323,7 +323,7 @@ HTML;
 	 * @covers WP_Block::process_block_bindings
 	 */
 	public function test_default_binding_for_pattern_overrides() {
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:test/block {"metadata":{"bindings":{"__default":{"source":"core/pattern-overrides"}},"name":"Test"}} -->
 <p>This should not appear</p>
 <!-- /wp:test/block -->
@@ -374,7 +374,7 @@ HTML;
 
 		add_filter( 'block_bindings_source_value', $filter_value, 10, 5 );
 
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"test/source", "args":{"test_key":"test_arg"}}}}} -->
 <p>Default content</p>
 <!-- /wp:paragraph -->
@@ -421,7 +421,7 @@ HTML;
 	 * @covers WP_Block::render
 	 */
 	public function test_update_list_item_with_plain_text_value_from_source() {
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
 <li>This should not appear</li>
 <!-- /wp:list-item -->
@@ -440,7 +440,7 @@ HTML;
 	 * @covers WP_Block::render
 	 */
 	public function test_update_list_item_with_raw_nested_list_markup_without_inner_block_replaces_markup() {
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
 <li>Default content<ul><li>Raw nested list should be replaced</li></ul></li>
 <!-- /wp:list-item -->
@@ -460,7 +460,7 @@ HTML;
 	 * @covers WP_Block::render
 	 */
 	public function test_update_list_item_source_image_renders_after_kses() {
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
 <li>This should not appear</li>
 <!-- /wp:list-item -->
@@ -483,7 +483,7 @@ HTML;
 	 * @covers WP_Block::render
 	 */
 	public function test_update_list_item_unsafe_source_markup_is_sanitized() {
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
 <li>This should not appear</li>
 <!-- /wp:list-item -->
@@ -516,7 +516,7 @@ HTML;
 	 * @covers WP_Block::render
 	 */
 	public function test_update_list_item_original_inline_image_is_replaced_by_source_text() {
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
 <li>Original <img src="https://example.com/original-image.jpg" alt="Original inline image" /> content</li>
 <!-- /wp:list-item -->
@@ -546,7 +546,7 @@ HTML;
 	 * @covers WP_Block::render
 	 */
 	public function test_update_list_item_with_nested_list_preserves_nested_list() {
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
 <li>Default content<!-- wp:list -->
@@ -578,7 +578,7 @@ HTML;
 	 * @covers WP_Block::render
 	 */
 	public function test_update_list_item_with_raw_list_markup_before_nested_list_replaces_raw_markup() {
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
 <li>Default content<ul><li>Raw list markup should be replaced</li></ul><!-- wp:list -->
@@ -610,7 +610,7 @@ HTML;
 	 * @covers WP_Block::render
 	 */
 	public function test_update_list_item_with_empty_value_preserves_nested_list() {
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
 <li>Default content<!-- wp:list -->
@@ -642,7 +642,7 @@ HTML;
 	 * @covers WP_Block::render
 	 */
 	public function test_update_list_item_with_nested_ordered_list_preserves_nested_list() {
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
 <li>Default content<!-- wp:list {"ordered":true} -->
@@ -674,7 +674,7 @@ HTML;
 	 * @covers WP_Block::render
 	 */
 	public function test_update_list_item_with_deeply_nested_list_preserves_all_levels() {
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
 <li>Level one default<!-- wp:list -->
@@ -719,7 +719,7 @@ HTML;
 	 * @covers WP_Block::render
 	 */
 	public function test_update_list_item_preserves_non_list_inner_block() {
-		$block_content = <<<HTML
+		$block_content = <<<'HTML'
 <!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
 <li>Default content<!-- wp:button -->

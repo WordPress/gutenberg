@@ -158,7 +158,7 @@ class Media_Processing_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_add_crossorigin_attributes
 	 */
 	public function test_add_crossorigin_attributes() {
-		$html = <<<HTML
+		$html = <<<'HTML'
 <img src="https://www.someothersite.com/test1.jpg" />
 <img src="test2.jpg" />
 <audio><source src="https://www.someothersite.com/test1.mp3"></audio>
@@ -173,7 +173,7 @@ class Media_Processing_Test extends WP_UnitTestCase {
 <link href="/test2.css"></link>
 HTML;
 
-		$expected = <<<HTML
+		$expected = <<<'HTML'
 <img src="https://www.someothersite.com/test1.jpg" />
 <img src="test2.jpg" />
 <audio crossorigin="anonymous"><source src="https://www.someothersite.com/test1.mp3"></audio>
