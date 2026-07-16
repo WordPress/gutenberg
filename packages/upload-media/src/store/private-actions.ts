@@ -444,6 +444,10 @@ export function processItem( id: QueueItemId ) {
 			operation,
 		} );
 
+		debug(
+			`Starting operation ${ operation } for ${ item.file.name } (item ${ item.id })`
+		);
+
 		switch ( operation ) {
 			case OperationType.Prepare:
 				dispatch.prepareItem( item.id );
