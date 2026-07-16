@@ -1,18 +1,19 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+import { Component, createPortal } from '@wordpress/element';
+import { registerStyle } from '@wordpress/style-runtime';
 
 /**
  * Internal dependencies
  */
 import { Slot, Fill, Provider, useSlotFills } from '../';
-
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
 
 class Filler extends Component {
 	constructor() {
@@ -285,6 +286,37 @@ describe( 'Slot', () => {
 
 		expect( container ).toMatchSnapshot();
 		expect( console ).toHaveWarned();
+	} );
+
+	it( 'injects registered SCSS module styles into the Slot document', () => {
+		const iframeDocument = document.implementation.createHTMLDocument();
+		const styleHash = 'slot-fill-cross-document-style';
+		const css = '.slot-fill-cross-document{padding:32px;}';
+
+		const { unmount } = render(
+			<Provider>
+				{ createPortal(
+					<Slot name="cross-document" bubblesVirtually />,
+					iframeDocument.body
+				) }
+				<Fill name="cross-document">
+					<div className="slot-fill-cross-document" />
+				</Fill>
+			</Provider>
+		);
+
+		// CSS module registration is skipped by the Jest transform, so mirror the
+		// generated production call explicitly.
+		registerStyle( styleHash, css );
+
+		expect(
+			within( iframeDocument.head ).queryAllByText( css, {
+				ignore: false,
+				selector: `style[data-wp-hash="${ styleHash }"]`,
+			} )
+		).toHaveLength( 1 );
+
+		unmount();
 	} );
 
 	describe.each( [ false, true ] )(
