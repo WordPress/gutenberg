@@ -20,61 +20,87 @@ import {
 } from '../packages';
 
 describe( 'prepareNpmRelease', () => {
-	it( 'prepares the release branch and returns finalization state', async () => {
-		const config = {
-			gitWorkingDirectoryPath: '/repo',
-			releaseType: 'latest',
-		};
-		const runNpmReleaseBranchSyncStepFn = jest.fn();
+	it.each( [
+		[ 'latest', 'release/23.5' ],
+		[ 'next', 'trunk' ],
+		[ 'bugfix', undefined ],
+		[ 'wp', undefined ],
+	] )(
+		'prepares a %s release',
+		async ( releaseType, expectedPluginReleaseBranch ) => {
+			const config = {
+				gitWorkingDirectoryPath: '/repo',
+				releaseType,
+			};
+			const checkoutNpmReleaseBranchFn = jest.fn();
+			const findPluginReleaseBranchNameFn = jest
+				.fn()
+				.mockResolvedValue( 'release/23.5' );
+			const runNpmReleaseBranchSyncStepFn = jest.fn();
+			const updatePackagesFn = jest
+				.fn()
+				.mockResolvedValue( 'changelog-sha' );
 
-		await expect(
-			prepareNpmRelease( config, {
-				findPluginReleaseBranchNameFn: jest
-					.fn()
-					.mockResolvedValue( 'release/23.5' ),
-				runNpmReleaseBranchSyncStepFn,
-				updatePackagesFn: jest
-					.fn()
-					.mockResolvedValue( 'changelog-sha' ),
-			} )
-		).resolves.toEqual( {
-			changelogCommit: 'changelog-sha',
-			pluginReleaseBranch: 'release/23.5',
-		} );
-		expect( runNpmReleaseBranchSyncStepFn ).toHaveBeenCalledWith(
-			'release/23.5',
-			config
-		);
-	} );
+			await expect(
+				prepareNpmRelease( config, {
+					checkoutNpmReleaseBranchFn,
+					findPluginReleaseBranchNameFn,
+					runNpmReleaseBranchSyncStepFn,
+					updatePackagesFn,
+				} )
+			).resolves.toEqual( {
+				changelogCommit: 'changelog-sha',
+				pluginReleaseBranch: expectedPluginReleaseBranch,
+			} );
+			expect( findPluginReleaseBranchNameFn.mock.calls ).toEqual(
+				releaseType === 'latest' ? [ [ '/repo' ] ] : []
+			);
+			expect( checkoutNpmReleaseBranchFn.mock.calls ).toEqual(
+				[ 'bugfix', 'wp' ].includes( releaseType ) ? [ [ config ] ] : []
+			);
+			expect( runNpmReleaseBranchSyncStepFn.mock.calls ).toEqual(
+				expectedPluginReleaseBranch
+					? [ [ expectedPluginReleaseBranch, config ] ]
+					: []
+			);
+			expect( updatePackagesFn ).toHaveBeenCalledTimes( 1 );
+			expect( updatePackagesFn ).toHaveBeenCalledWith( config );
+		}
+	);
 } );
 
 describe( 'finalizePreparedNpmRelease', () => {
-	it( 'backports the prepared commits to stable branches', async () => {
-		const config = { releaseType: 'latest' };
-		const backportCommitsToBranchFn = jest.fn();
-		const commits = [ 'changelog-sha', 'publish-sha' ];
+	it.each( [
+		[ 'latest', 'release/23.5', [ 'trunk', 'release/23.5' ] ],
+		[ 'bugfix', undefined, [ 'trunk' ] ],
+		[ 'next', undefined, [] ],
+		[ 'wp', undefined, [] ],
+	] )(
+		'finalizes a %s release',
+		async ( releaseType, pluginReleaseBranch, expectedBranches ) => {
+			const config = { releaseType };
+			const backportCommitsToBranchFn = jest.fn();
+			const commits = [ 'changelog-sha', 'publish-sha' ];
 
-		await finalizePreparedNpmRelease(
-			config,
-			{
-				changelogCommit: commits[ 0 ],
-				pluginReleaseBranch: 'release/23.5',
-				publishCommit: commits[ 1 ],
-			},
-			{ backportCommitsToBranchFn }
-		);
+			await finalizePreparedNpmRelease(
+				config,
+				{
+					changelogCommit: commits[ 0 ],
+					pluginReleaseBranch,
+					publishCommit: commits[ 1 ],
+				},
+				{ backportCommitsToBranchFn }
+			);
 
-		expect( backportCommitsToBranchFn ).toHaveBeenCalledWith(
-			'trunk',
-			commits,
-			config
-		);
-		expect( backportCommitsToBranchFn ).toHaveBeenCalledWith(
-			'release/23.5',
-			commits,
-			config
-		);
-	} );
+			expect( backportCommitsToBranchFn.mock.calls ).toEqual(
+				expectedBranches.map( ( branch ) => [
+					branch,
+					commits,
+					config,
+				] )
+			);
+		}
+	);
 } );
 
 describe( 'runPackagesRelease', () => {
@@ -96,10 +122,25 @@ describe( 'runPackagesRelease', () => {
 			publishPreparedPackagesToNpmFn,
 		} );
 
+		expect( prepareNpmReleaseFn ).toHaveBeenCalledTimes( 1 );
+		expect( prepareNpmReleaseFn ).toHaveBeenCalledWith( config );
+		expect( publishPreparedPackagesToNpmFn ).toHaveBeenCalledTimes( 1 );
+		expect( publishPreparedPackagesToNpmFn ).toHaveBeenCalledWith( config );
+		expect( finalizePreparedNpmReleaseFn ).toHaveBeenCalledTimes( 1 );
 		expect( finalizePreparedNpmReleaseFn ).toHaveBeenCalledWith( config, {
 			changelogCommit: 'changelog-sha',
 			publishCommit: 'publish-sha',
 		} );
+		expect(
+			prepareNpmReleaseFn.mock.invocationCallOrder[ 0 ]
+		).toBeLessThan(
+			publishPreparedPackagesToNpmFn.mock.invocationCallOrder[ 0 ]
+		);
+		expect(
+			publishPreparedPackagesToNpmFn.mock.invocationCallOrder[ 0 ]
+		).toBeLessThan(
+			finalizePreparedNpmReleaseFn.mock.invocationCallOrder[ 0 ]
+		);
 		expect( console ).toHaveLogged();
 	} );
 } );
