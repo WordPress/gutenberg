@@ -41,6 +41,18 @@
 		<exclude name="WordPress.WP.GetMetaSingle"/>
 		<exclude name="WordPress.WP.GlobalVariablesOverride"/>
 	</rule>
+
+	<!--
+		The following files are synced to WordPress Core, so their existing
+		violations must be fixed in Core first to avoid requiring a backport.
+	-->
+	<rule ref="Universal.CodeAnalysis.StaticInFinalClass">
+		<exclude-pattern>/packages/style-engine/src/class-wp-style-engine\.php$</exclude-pattern>
+	</rule>
+	<rule ref="Universal.ControlStructures.DisallowLonelyIf">
+		<exclude-pattern>/packages/block-library/src/media-text/index\.php$</exclude-pattern>
+	</rule>
+
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
