@@ -122,15 +122,11 @@ class Gutenberg_View_Config_Data {
 	}
 
 	/**
-	 * Merges a partial configuration into `default_view`, `default_layouts`,
-	 * the `form` settings, and the `view_list` collection.
+	 * Merges a partial configuration into the existing.
 	 *
-	 * A `view_list` patch is a list of view objects that merge into the current
-	 * collection by `slug` identity: a view whose `slug` matches one already
-	 * present merges into it in place and keeps its position, and one with a
-	 * new `slug` is appended. The patch must be list-shaped — a map is rejected,
-	 * mirroring how a `form` patch must be map-shaped. A patch that declares an
-	 * unsupported schema version is also rejected.
+	 * Scalar values replace the current value,
+	 * associative arrays merge key by key,
+	 * and indexed arrays merge by member identity.
 	 *
 	 * @since 7.1.0
 	 *
@@ -157,41 +153,10 @@ class Gutenberg_View_Config_Data {
 				continue;
 			}
 
-			// A null patch value drops the whole key from the container rather
-			// than assigning null.
+			// A null patch value drops the property.
 			if ( null === $value ) {
 				unset( $this->config[ $key ] );
 				continue;
-			}
-
-			if ( 'view_list' === $key ) {
-				// The view list is a collection of view objects, each identified
-				// by its `slug`; a patch must be a list, mirroring how `form`
-				// must be a map. Entries then merge by slug identity below.
-				if ( ! is_array( $value ) || ( array() !== $value && ! array_is_list( $value ) ) ) {
-					_doing_it_wrong(
-						__METHOD__,
-						esc_html__( 'A "view_list" patch must be a list of view objects.', 'gutenberg' ),
-						'7.1.0'
-					);
-					continue;
-				}
-			}
-
-			if ( 'form' === $key ) {
-				if ( ! is_array( $value ) || ( array() !== $value && array_is_list( $value ) ) ) {
-					_doing_it_wrong(
-						__METHOD__,
-						esc_html__( 'A "form" patch must be an associative array of form properties.', 'gutenberg' ),
-						'7.1.0'
-					);
-					$value = null;
-				}
-
-				// Nothing left to merge: the value was off-shape.
-				if ( null === $value || array() === $value ) {
-					continue;
-				}
 			}
 
 			$this->config[ $key ] = $this->merge_properties( $this->config[ $key ] ?? array(), $value );
