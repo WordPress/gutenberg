@@ -3,8 +3,11 @@
  */
 import {
 	backportCommitsToBranch,
+	checkoutNpmReleaseBranch,
+	createNpmReleaseFinalizationMarker,
 	createNpmReleaseMarker,
 	finalizePreparedNpmRelease,
+	getConfig,
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
 	getPendingPreparedNpmReleaseState,
@@ -14,6 +17,7 @@ import {
 	getRemoteTagShas,
 	getTagPushCommands,
 	getTagRefspec,
+	isNpmReleaseFinalizationMarker,
 	prepareNpmRelease,
 	preparePackagesForNpm,
 	publishPreparedPackagesToNpm,
@@ -74,6 +78,37 @@ describe( 'backportCommitsToBranch', () => {
 	} );
 } );
 
+describe( 'checkoutNpmReleaseBranch', () => {
+	it( 'resets an existing local branch to the fetched remote head', async () => {
+		const git = {
+			fetch: jest.fn().mockResolvedValue(),
+			raw: jest.fn().mockResolvedValue(),
+		};
+
+		await checkoutNpmReleaseBranch(
+			{
+				gitWorkingDirectoryPath: '/repo',
+				npmReleaseBranch: 'wp/latest',
+			},
+			{ git }
+		);
+
+		expect( git.fetch ).toHaveBeenCalledWith( 'origin', 'wp/latest', [
+			'--depth=999',
+		] );
+		expect( git.raw ).toHaveBeenCalledWith(
+			'checkout',
+			'-B',
+			'wp/latest',
+			'FETCH_HEAD'
+		);
+		expect( git.fetch.mock.invocationCallOrder[ 0 ] ).toBeLessThan(
+			git.raw.mock.invocationCallOrder[ 0 ]
+		);
+		expect( console ).toHaveLogged();
+	} );
+} );
+
 describe( 'createNpmReleaseMarker', () => {
 	it( 'records the release type and synced source branch', async () => {
 		const git = { raw: jest.fn().mockResolvedValue() };
@@ -82,6 +117,7 @@ describe( 'createNpmReleaseMarker', () => {
 			'release/23.5',
 			{
 				gitWorkingDirectoryPath: '/repo',
+				releaseId: 'run-123',
 				releaseType: 'latest',
 			},
 			{ git }
@@ -91,8 +127,187 @@ describe( 'createNpmReleaseMarker', () => {
 			'commit',
 			'--allow-empty',
 			'-m',
-			'chore(release): prepare npm latest from release/23.5'
+			'chore(release): prepare npm latest from release/23.5 [release-id: run-123]'
 		);
+	} );
+} );
+
+describe( 'isNpmReleaseFinalizationMarker', () => {
+	it( 'accepts an exact child marker with the prepared release tree', async () => {
+		const git = {
+			raw: jest
+				.fn()
+				.mockResolvedValue(
+					'publish-sha\u0000tree-sha\u0000chore(release): finalize npm latest [release-id: run-123]\n'
+				),
+			revparse: jest.fn().mockResolvedValue( 'tree-sha\n' ),
+		};
+
+		await expect(
+			isNpmReleaseFinalizationMarker(
+				'finalization-sha',
+				{
+					gitWorkingDirectoryPath: '/repo',
+					publishCommit: 'publish-sha',
+					releaseId: 'run-123',
+					releaseType: 'latest',
+				},
+				{ git }
+			)
+		).resolves.toBe( true );
+	} );
+
+	it.each( [
+		[
+			'another parent',
+			'other-sha\u0000tree-sha\u0000chore(release): finalize npm latest [release-id: run-123]\n',
+		],
+		[
+			'another tree',
+			'publish-sha\u0000other-tree\u0000chore(release): finalize npm latest [release-id: run-123]\n',
+		],
+	] )( 'rejects a marker with %s', async ( _label, description ) => {
+		await expect(
+			isNpmReleaseFinalizationMarker(
+				'finalization-sha',
+				{
+					gitWorkingDirectoryPath: '/repo',
+					publishCommit: 'publish-sha',
+					releaseId: 'run-123',
+					releaseType: 'latest',
+				},
+				{
+					git: {
+						raw: jest.fn().mockResolvedValue( description ),
+						revparse: jest.fn().mockResolvedValue( 'tree-sha\n' ),
+					},
+				}
+			)
+		).resolves.toBe( false );
+	} );
+} );
+
+describe( 'createNpmReleaseFinalizationMarker', () => {
+	it( 'advances the release branch after finalization completes', async () => {
+		const git = {
+			raw: jest
+				.fn()
+				.mockResolvedValueOnce( 'finalization-sha\n' )
+				.mockResolvedValueOnce(),
+		};
+		const runPhase = jest.fn( ( description, callback ) => callback() );
+		const releaseState = {
+			npmReleaseBranch: 'wp/latest',
+			publishCommit: 'publish-sha',
+			releaseId: 'run-123',
+			releaseType: 'latest',
+		};
+
+		await createNpmReleaseFinalizationMarker(
+			releaseState,
+			{ gitWorkingDirectoryPath: '/repo' },
+			{
+				getRemoteBranchShaFn: jest
+					.fn()
+					.mockResolvedValue( 'publish-sha' ),
+				git,
+				runPhase,
+			}
+		);
+
+		expect( git.raw ).toHaveBeenNthCalledWith(
+			1,
+			'commit-tree',
+			'publish-sha^{tree}',
+			'-p',
+			'publish-sha',
+			'-m',
+			'chore(release): finalize npm latest [release-id: run-123]'
+		);
+		expect( runPhase ).toHaveBeenCalledWith(
+			'Finalization marker push',
+			expect.any( Function )
+		);
+		expect( git.raw ).toHaveBeenNthCalledWith(
+			2,
+			'push',
+			'origin',
+			'finalization-sha:refs/heads/wp/latest'
+		);
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'recovers when a successful marker push loses its acknowledgement', async () => {
+		const git = {
+			raw: jest
+				.fn()
+				.mockResolvedValueOnce( 'finalization-sha\n' )
+				.mockRejectedValueOnce( new Error( 'Connection closed' ) ),
+		};
+		const getRemoteBranchShaFn = jest
+			.fn()
+			.mockResolvedValueOnce( 'publish-sha' )
+			.mockResolvedValueOnce( 'finalization-sha' );
+		const runPhase = jest.fn( async ( _description, callback ) => {
+			await expect( callback() ).rejects.toThrow( 'Connection closed' );
+			await callback();
+		} );
+
+		await createNpmReleaseFinalizationMarker(
+			{
+				npmReleaseBranch: 'wp/latest',
+				publishCommit: 'publish-sha',
+				releaseId: 'run-123',
+				releaseType: 'latest',
+			},
+			{ gitWorkingDirectoryPath: '/repo' },
+			{ getRemoteBranchShaFn, git, runPhase }
+		);
+
+		expect( getRemoteBranchShaFn ).toHaveBeenCalledTimes( 2 );
+		expect( git.raw ).toHaveBeenCalledTimes( 2 );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'accepts an equivalent marker without truncating release history', async () => {
+		const git = {
+			fetch: jest.fn().mockResolvedValue(),
+			raw: jest.fn().mockResolvedValue( 'local-finalization-sha\n' ),
+		};
+		const isFinalizationMarkerFn = jest.fn().mockResolvedValue( true );
+
+		await createNpmReleaseFinalizationMarker(
+			{
+				npmReleaseBranch: 'wp/latest',
+				publishCommit: 'publish-sha',
+				releaseId: 'run-123',
+				releaseType: 'latest',
+			},
+			{ gitWorkingDirectoryPath: '/repo' },
+			{
+				getRemoteBranchShaFn: jest
+					.fn()
+					.mockResolvedValue( 'remote-finalization-sha' ),
+				git,
+				isFinalizationMarkerFn,
+				runPhase: jest.fn( ( _description, callback ) => callback() ),
+			}
+		);
+
+		expect( git.fetch ).toHaveBeenCalledWith( 'origin', 'wp/latest', [
+			'--depth=999',
+		] );
+		expect( isFinalizationMarkerFn ).toHaveBeenCalledWith(
+			'remote-finalization-sha',
+			expect.objectContaining( {
+				publishCommit: 'publish-sha',
+				releaseId: 'run-123',
+				releaseType: 'latest',
+			} ),
+			{ git }
+		);
+		expect( git.raw ).toHaveBeenCalledTimes( 1 );
+		expect( console ).toHaveLogged();
 	} );
 } );
 
@@ -141,6 +356,24 @@ describe( 'runPackagesRelease', () => {
 		await runPackagesRelease( getTestConfig(), [], {
 			finalizePreparedNpmReleaseFn,
 			prepareNpmReleaseFn: jest.fn(),
+			publishPreparedPackagesToNpmFn,
+		} );
+
+		expect( publishPreparedPackagesToNpmFn ).not.toHaveBeenCalled();
+		expect( finalizePreparedNpmReleaseFn ).not.toHaveBeenCalled();
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'stops when the same release invocation is already finalized', async () => {
+		const finalizePreparedNpmReleaseFn = jest.fn();
+		const publishPreparedPackagesToNpmFn = jest.fn();
+
+		await runPackagesRelease( getTestConfig(), [], {
+			finalizePreparedNpmReleaseFn,
+			prepareNpmReleaseFn: jest.fn().mockResolvedValue( {
+				isFinalized: true,
+				releaseId: 'run-123',
+			} ),
 			publishPreparedPackagesToNpmFn,
 		} );
 
@@ -266,7 +499,9 @@ describe( 'getPreparedNpmReleaseState', () => {
 	];
 
 	it( 'reconstructs release state from commit ancestry', async () => {
-		const verifyRemoteNpmReleaseBranchFn = jest.fn();
+		const getRemoteBranchShaFn = jest
+			.fn()
+			.mockResolvedValue( 'publish-sha' );
 		const git = {
 			raw: jest
 				.fn()
@@ -275,7 +510,7 @@ describe( 'getPreparedNpmReleaseState', () => {
 					'changelog-sha\u0000Update changelog files\n'
 				)
 				.mockResolvedValueOnce(
-					'chore(release): prepare npm latest from release/23.5\n'
+					'chore(release): prepare npm latest from release/23.5 [release-id: run-123]\n'
 				),
 			revparse: jest.fn().mockResolvedValue( 'publish-sha' ),
 		};
@@ -293,23 +528,82 @@ describe( 'getPreparedNpmReleaseState', () => {
 						.fn()
 						.mockResolvedValue( releasePackages ),
 					git,
-					verifyRemoteNpmReleaseBranchFn,
+					getRemoteBranchShaFn,
 				}
 			)
 		).resolves.toEqual( {
 			changelogCommit: 'changelog-sha',
 			distTag: 'latest',
+			isFinalized: false,
 			npmReleaseBranch: 'wp/latest',
 			pluginReleaseBranch: 'release/23.5',
 			publishCommit: 'publish-sha',
 			releasePackages,
+			releaseId: 'run-123',
 			releaseType: 'latest',
 		} );
-		expect( verifyRemoteNpmReleaseBranchFn ).toHaveBeenCalledWith( {
-			gitWorkingDirectoryPath: '/repo',
-			npmReleaseBranch: 'wp/latest',
-			publishCommit: 'publish-sha',
-		} );
+		expect( getRemoteBranchShaFn ).toHaveBeenCalledWith(
+			'/repo',
+			'wp/latest'
+		);
+	} );
+
+	it( 'recognizes a release finalized by an earlier split-phase run', async () => {
+		const git = {
+			fetch: jest.fn().mockResolvedValue(),
+			raw: jest
+				.fn()
+				.mockResolvedValueOnce( 'chore(release): publish\n' )
+				.mockResolvedValueOnce(
+					'changelog-sha\u0000Update changelog files\n'
+				)
+				.mockResolvedValueOnce(
+					'chore(release): prepare npm latest from release/23.5 [release-id: run-123]\n'
+				),
+			revparse: jest.fn().mockResolvedValue( 'publish-sha' ),
+		};
+		const isFinalizationMarkerFn = jest.fn().mockResolvedValue( true );
+
+		await expect(
+			getPreparedNpmReleaseState(
+				{
+					distTag: 'latest',
+					gitWorkingDirectoryPath: '/repo',
+					npmReleaseBranch: 'wp/latest',
+					releaseType: 'latest',
+				},
+				{
+					getPreparedNpmReleasePackagesFn: jest
+						.fn()
+						.mockResolvedValue( releasePackages ),
+					getRemoteBranchShaFn: jest
+						.fn()
+						.mockResolvedValue( 'finalization-sha' ),
+					git,
+					isFinalizationMarkerFn,
+					publishCommit: 'publish-sha',
+				}
+			)
+		).resolves.toEqual(
+			expect.objectContaining( {
+				isFinalized: true,
+				publishCommit: 'publish-sha',
+				releaseId: 'run-123',
+			} )
+		);
+		expect( git.fetch ).toHaveBeenCalledWith( 'origin', 'wp/latest', [
+			'--depth=999',
+		] );
+		expect( git.revparse ).not.toHaveBeenCalled();
+		expect( isFinalizationMarkerFn ).toHaveBeenCalledWith(
+			'finalization-sha',
+			expect.objectContaining( {
+				publishCommit: 'publish-sha',
+				releaseId: 'run-123',
+				releaseType: 'latest',
+			} ),
+			{ git }
+		);
 	} );
 
 	it( 'rejects a prepared commit from another release route', async () => {
@@ -318,10 +612,10 @@ describe( 'getPreparedNpmReleaseState', () => {
 				.fn()
 				.mockResolvedValueOnce( 'chore(release): publish\n' )
 				.mockResolvedValueOnce(
-					'marker-sha\u0000chore(release): prepare npm bugfix\n'
+					'marker-sha\u0000chore(release): prepare npm bugfix [release-id: run-123]\n'
 				)
 				.mockResolvedValueOnce(
-					'chore(release): prepare npm bugfix\n'
+					'chore(release): prepare npm bugfix [release-id: run-123]\n'
 				),
 			revparse: jest.fn().mockResolvedValue( 'publish-sha' ),
 		};
@@ -357,6 +651,9 @@ describe( 'getPendingPreparedNpmReleaseState', () => {
 	];
 	const config = {
 		gitWorkingDirectoryPath: '/repo',
+		npmReleaseBranch: 'wp/latest',
+		releaseId: 'run-123',
+		releaseType: 'latest',
 	};
 
 	it( 'reuses a prepared commit whose package tags are still missing', async () => {
@@ -384,8 +681,11 @@ describe( 'getPendingPreparedNpmReleaseState', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'allows a new preparation after every package tag is finalized', async () => {
-		const getPreparedNpmReleaseStateFn = jest.fn();
+	it( 'reuses a prepared commit until finalization is recorded', async () => {
+		const releaseState = { publishCommit: 'publish-sha' };
+		const getPreparedNpmReleaseStateFn = jest
+			.fn()
+			.mockResolvedValue( releaseState );
 
 		await expect(
 			getPendingPreparedNpmReleaseState( config, {
@@ -407,8 +707,73 @@ describe( 'getPendingPreparedNpmReleaseState', () => {
 					revparse: jest.fn().mockResolvedValue( 'publish-sha' ),
 				},
 			} )
-		).resolves.toBeNull();
-		expect( getPreparedNpmReleaseStateFn ).not.toHaveBeenCalled();
+		).resolves.toBe( releaseState );
+		expect( getPreparedNpmReleaseStateFn ).toHaveBeenCalledWith( config );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'returns the finalized release identity recorded at HEAD', async () => {
+		const getPreparedNpmReleasePackagesFn = jest.fn();
+		const releaseState = {
+			isFinalized: true,
+			publishCommit: 'publish-sha',
+			releaseId: 'run-123',
+			releaseType: 'latest',
+		};
+		const getPreparedNpmReleaseStateFn = jest
+			.fn()
+			.mockResolvedValue( releaseState );
+		const git = {
+			raw: jest
+				.fn()
+				.mockResolvedValue(
+					'chore(release): finalize npm latest [release-id: run-123]\n'
+				),
+			revparse: jest
+				.fn()
+				.mockResolvedValueOnce( 'finalization-sha' )
+				.mockResolvedValueOnce( 'publish-sha' ),
+		};
+		await expect(
+			getPendingPreparedNpmReleaseState( config, {
+				getPreparedNpmReleasePackagesFn,
+				getPreparedNpmReleaseStateFn,
+				git,
+			} )
+		).resolves.toBe( releaseState );
+		expect( getPreparedNpmReleasePackagesFn ).not.toHaveBeenCalled();
+		expect( getPreparedNpmReleaseStateFn ).toHaveBeenCalledWith(
+			expect.objectContaining( { releaseType: 'latest' } ),
+			expect.objectContaining( { git, publishCommit: 'publish-sha' } )
+		);
+	} );
+
+	it( 'rejects a marker whose parent is not a valid prepared release', async () => {
+		const git = {
+			raw: jest
+				.fn()
+				.mockResolvedValue(
+					'chore(release): finalize npm latest [release-id: run-123]\n'
+				),
+			revparse: jest
+				.fn()
+				.mockResolvedValueOnce( 'finalization-sha' )
+				.mockResolvedValueOnce( 'publish-sha' ),
+		};
+
+		await expect(
+			getPendingPreparedNpmReleaseState( config, {
+				getPreparedNpmReleaseStateFn: jest.fn().mockResolvedValue( {
+					isFinalized: false,
+					publishCommit: 'publish-sha',
+					releaseId: 'run-123',
+					releaseType: 'latest',
+				} ),
+				git,
+			} )
+		).rejects.toThrow(
+			'Invalid npm release finalization marker finalization-sha.'
+		);
 	} );
 
 	it( 'rejects package tags that point to another commit', async () => {
@@ -1091,7 +1456,12 @@ describe( 'publishVersionedPackagesToNpm', () => {
 
 describe( 'prepareNpmRelease', () => {
 	it( 'reuses a pending prepared commit without mutating the branch', async () => {
-		const pendingReleaseState = { publishCommit: 'publish-sha' };
+		const pendingReleaseState = {
+			isFinalized: false,
+			publishCommit: 'publish-sha',
+			releaseId: 'run-123',
+			releaseType: 'latest',
+		};
 		const checkoutNpmReleaseBranchFn = jest.fn();
 		const createNpmReleaseMarkerFn = jest.fn();
 		const findPluginReleaseBranchNameFn = jest.fn();
@@ -1103,6 +1473,7 @@ describe( 'prepareNpmRelease', () => {
 			prepareNpmRelease(
 				{
 					gitWorkingDirectoryPath: '/repo',
+					releaseId: 'run-123',
 					releaseType: 'latest',
 				},
 				{
@@ -1125,6 +1496,127 @@ describe( 'prepareNpmRelease', () => {
 		expect( createNpmReleaseMarkerFn ).not.toHaveBeenCalled();
 		expect( updatePackagesFn ).not.toHaveBeenCalled();
 		expect( preparePackagesForNpmFn ).not.toHaveBeenCalled();
+	} );
+
+	it( 'rejects a pending release from another invocation', async () => {
+		const createNpmReleaseMarkerFn = jest.fn();
+		const preparePackagesForNpmFn = jest.fn();
+
+		await expect(
+			prepareNpmRelease(
+				{
+					gitWorkingDirectoryPath: '/repo',
+					releaseId: 'run-456',
+					releaseType: 'latest',
+				},
+				{
+					checkoutNpmReleaseBranchFn: jest.fn(),
+					createNpmReleaseMarkerFn,
+					getPendingPreparedNpmReleaseStateFn: jest
+						.fn()
+						.mockResolvedValue( {
+							isFinalized: false,
+							publishCommit: 'publish-sha',
+							releaseId: 'run-123',
+							releaseType: 'latest',
+						} ),
+					preparePackagesForNpmFn,
+				}
+			)
+		).rejects.toThrow(
+			'A latest release from invocation run-123 is still pending.'
+		);
+
+		expect( createNpmReleaseMarkerFn ).not.toHaveBeenCalled();
+		expect( preparePackagesForNpmFn ).not.toHaveBeenCalled();
+	} );
+
+	it( 'returns a finalized state for the same release invocation', async () => {
+		const finalizedReleaseState = {
+			isFinalized: true,
+			releaseId: 'run-123',
+			releaseType: 'latest',
+		};
+		const createNpmReleaseMarkerFn = jest.fn();
+		const preparePackagesForNpmFn = jest.fn();
+
+		await expect(
+			prepareNpmRelease(
+				{
+					gitWorkingDirectoryPath: '/repo',
+					releaseId: 'run-123',
+					releaseType: 'latest',
+				},
+				{
+					checkoutNpmReleaseBranchFn: jest.fn(),
+					createNpmReleaseMarkerFn,
+					getPendingPreparedNpmReleaseStateFn: jest
+						.fn()
+						.mockResolvedValue( finalizedReleaseState ),
+					preparePackagesForNpmFn,
+				}
+			)
+		).resolves.toBe( finalizedReleaseState );
+
+		expect( createNpmReleaseMarkerFn ).not.toHaveBeenCalled();
+		expect( preparePackagesForNpmFn ).not.toHaveBeenCalled();
+	} );
+
+	it( 'prepares a new release after another invocation finalized', async () => {
+		const askForConfirmationFn = jest.fn().mockResolvedValue();
+		const createNpmReleaseMarkerFn = jest.fn();
+		const preparePackagesForNpmFn = jest
+			.fn()
+			.mockResolvedValue( { publishCommit: 'new-publish-sha' } );
+		const runNpmReleaseBranchSyncStepFn = jest.fn();
+		const updatePackagesFn = jest.fn();
+
+		await expect(
+			prepareNpmRelease(
+				{
+					abortMessage: 'Aborting!',
+					gitWorkingDirectoryPath: '/repo',
+					interactive: true,
+					releaseId: 'run-456',
+					releaseType: 'latest',
+				},
+				{
+					askForConfirmationFn,
+					checkoutNpmReleaseBranchFn: jest.fn(),
+					createNpmReleaseMarkerFn,
+					findPluginReleaseBranchNameFn: jest
+						.fn()
+						.mockResolvedValue( 'release/23.5' ),
+					getPendingPreparedNpmReleaseStateFn: jest
+						.fn()
+						.mockResolvedValue( {
+							isFinalized: true,
+							releaseId: 'run-123',
+							releaseType: 'latest',
+						} ),
+					preparePackagesForNpmFn,
+					runNpmReleaseBranchSyncStepFn,
+					updatePackagesFn,
+				}
+			)
+		).resolves.toEqual( { publishCommit: 'new-publish-sha' } );
+
+		expect( askForConfirmationFn ).toHaveBeenCalledWith(
+			'The previous npm release (run-123) is finalized. Start a new latest release?',
+			false,
+			'Aborting!'
+		);
+		expect( runNpmReleaseBranchSyncStepFn ).toHaveBeenCalledWith(
+			'release/23.5',
+			expect.objectContaining( { releaseId: 'run-456' } )
+		);
+		expect( createNpmReleaseMarkerFn ).toHaveBeenCalledWith(
+			'release/23.5',
+			expect.objectContaining( { releaseId: 'run-456' } )
+		);
+		expect( updatePackagesFn ).toHaveBeenCalled();
+		expect( preparePackagesForNpmFn ).toHaveBeenCalled();
+		expect( console ).toHaveLogged();
 	} );
 } );
 
@@ -1248,6 +1740,7 @@ describe( 'publishPreparedPackagesToNpm', () => {
 	it( 'installs and publishes from reconstructed release state', async () => {
 		const releaseState = {
 			distTag: 'latest',
+			isFinalized: false,
 			publishCommit: 'publish-sha',
 			releasePackages: [
 				{
@@ -1292,12 +1785,36 @@ describe( 'publishPreparedPackagesToNpm', () => {
 		);
 		expect( console ).toHaveLogged();
 	} );
+
+	it( 'does not publish a release that is already finalized', async () => {
+		const commandFn = jest.fn();
+		const publishVersionedPackagesToNpmFn = jest.fn();
+
+		await publishPreparedPackagesToNpm(
+			{
+				gitWorkingDirectoryPath: '/repo',
+				interactive: false,
+			},
+			{
+				commandFn,
+				getPreparedNpmReleaseStateFn: jest
+					.fn()
+					.mockResolvedValue( { isFinalized: true } ),
+				publishVersionedPackagesToNpmFn,
+			}
+		);
+
+		expect( commandFn ).not.toHaveBeenCalled();
+		expect( publishVersionedPackagesToNpmFn ).not.toHaveBeenCalled();
+		expect( console ).toHaveLogged();
+	} );
 } );
 
 describe( 'finalizePreparedNpmRelease', () => {
 	const releaseState = {
 		changelogCommit: 'changelog-sha',
 		distTag: 'latest',
+		isFinalized: false,
 		npmReleaseBranch: 'wp/latest',
 		pluginReleaseBranch: 'release/23.5',
 		publishCommit: 'publish-sha',
@@ -1313,11 +1830,43 @@ describe( 'finalizePreparedNpmRelease', () => {
 				version: '14.20.0',
 			},
 		],
+		releaseId: 'run-123',
 		releaseType: 'latest',
 	};
 
+	it( 'does not finalize a release that is already finalized', async () => {
+		const backportCommitsToBranchFn = jest.fn();
+		const createNpmReleaseFinalizationMarkerFn = jest.fn();
+		const getRemoteTagShasFn = jest.fn();
+		const pushNpmReleaseGitMetadataFn = jest.fn();
+
+		await finalizePreparedNpmRelease(
+			{
+				gitWorkingDirectoryPath: '/repo',
+				releaseType: 'latest',
+			},
+			{
+				backportCommitsToBranchFn,
+				createNpmReleaseFinalizationMarkerFn,
+				getPreparedNpmReleaseStateFn: jest
+					.fn()
+					.mockResolvedValue( { isFinalized: true } ),
+				getRemoteTagShasFn,
+				git: { raw: jest.fn() },
+				pushNpmReleaseGitMetadataFn,
+			}
+		);
+
+		expect( getRemoteTagShasFn ).not.toHaveBeenCalled();
+		expect( backportCommitsToBranchFn ).not.toHaveBeenCalled();
+		expect( pushNpmReleaseGitMetadataFn ).not.toHaveBeenCalled();
+		expect( createNpmReleaseFinalizationMarkerFn ).not.toHaveBeenCalled();
+		expect( console ).toHaveLogged();
+	} );
+
 	it( 'backports idempotently and pushes only missing final tags', async () => {
 		const backportCommitsToBranchFn = jest.fn();
+		const createNpmReleaseFinalizationMarkerFn = jest.fn();
 		const git = { raw: jest.fn().mockResolvedValue() };
 		const pushNpmReleaseGitMetadataFn = jest.fn();
 		const runNpmPublishPreflightFn = jest
@@ -1331,6 +1880,7 @@ describe( 'finalizePreparedNpmRelease', () => {
 			},
 			{
 				backportCommitsToBranchFn,
+				createNpmReleaseFinalizationMarkerFn,
 				getPreparedNpmReleaseStateFn: jest
 					.fn()
 					.mockResolvedValue( releaseState ),
@@ -1378,11 +1928,18 @@ describe( 'finalizePreparedNpmRelease', () => {
 			packageTags: [ '@wordpress/blocks@14.20.0' ],
 			publishCommit: 'publish-sha',
 		} );
+		expect( createNpmReleaseFinalizationMarkerFn ).toHaveBeenCalledWith(
+			releaseState,
+			expect.objectContaining( { releaseType: 'latest' } )
+		);
 	} );
 
-	it( 'does nothing when every final tag is already remote', async () => {
+	it( 'records finalization when every final tag is already remote', async () => {
+		const createNpmReleaseFinalizationMarkerFn = jest.fn();
 		const pushNpmReleaseGitMetadataFn = jest.fn();
-		const runNpmPublishPreflightFn = jest.fn();
+		const runNpmPublishPreflightFn = jest
+			.fn()
+			.mockResolvedValue( [ '@wordpress/a11y', '@wordpress/blocks' ] );
 
 		await finalizePreparedNpmRelease(
 			{
@@ -1390,6 +1947,7 @@ describe( 'finalizePreparedNpmRelease', () => {
 				releaseType: 'latest',
 			},
 			{
+				createNpmReleaseFinalizationMarkerFn,
 				getPreparedNpmReleaseStateFn: jest
 					.fn()
 					.mockResolvedValue( releaseState ),
@@ -1408,8 +1966,18 @@ describe( 'finalizePreparedNpmRelease', () => {
 			}
 		);
 
-		expect( runNpmPublishPreflightFn ).not.toHaveBeenCalled();
+		expect( runNpmPublishPreflightFn ).toHaveBeenCalledWith( {
+			checkAccess: false,
+			distTag: 'latest',
+			gitWorkingDirectoryPath: '/repo',
+			publishCommit: 'publish-sha',
+			releasePackages: releaseState.releasePackages,
+		} );
 		expect( pushNpmReleaseGitMetadataFn ).not.toHaveBeenCalled();
+		expect( createNpmReleaseFinalizationMarkerFn ).toHaveBeenCalledWith(
+			releaseState,
+			expect.objectContaining( { releaseType: 'latest' } )
+		);
 		expect( console ).toHaveLogged();
 	} );
 
@@ -1432,6 +2000,7 @@ describe( 'finalizePreparedNpmRelease', () => {
 				releaseType: 'next',
 			},
 			{
+				createNpmReleaseFinalizationMarkerFn: jest.fn(),
 				getPreparedNpmReleaseStateFn: jest
 					.fn()
 					.mockResolvedValue( nextReleaseState ),
@@ -1457,6 +2026,68 @@ describe( 'finalizePreparedNpmRelease', () => {
 			expect.anything(),
 			expect.anything(),
 			expect.anything()
+		);
+	} );
+} );
+
+describe( 'getConfig', () => {
+	it( 'uses the stable GitHub Actions run ID in CI', () => {
+		expect(
+			getConfig(
+				'latest',
+				{ ci: true },
+				{
+					createReleaseIdFn: jest.fn(),
+					githubRunId: '123456789',
+				}
+			)
+		).toEqual(
+			expect.objectContaining( {
+				interactive: false,
+				releaseId: '123456789',
+			} )
+		);
+	} );
+
+	it( 'prefers an explicit release ID', () => {
+		expect(
+			getConfig(
+				'latest',
+				{ ci: true, releaseId: 'manual-release' },
+				{ githubRunId: '123456789' }
+			).releaseId
+		).toBe( 'manual-release' );
+	} );
+
+	it( 'requires a stable release ID outside interactive mode', () => {
+		expect( () =>
+			getConfig( 'latest', { ci: true }, { githubRunId: null } )
+		).toThrow( 'A stable release ID is required in non-interactive mode.' );
+	} );
+
+	it( 'creates a release ID for a new interactive invocation', () => {
+		expect(
+			getConfig(
+				'latest',
+				{ ci: false },
+				{
+					createReleaseIdFn: jest
+						.fn()
+						.mockReturnValue( 'generated-release' ),
+					githubRunId: null,
+				}
+			).releaseId
+		).toBe( 'generated-release' );
+	} );
+
+	it( 'rejects release IDs that cannot be recorded unambiguously', () => {
+		expect( () =>
+			getConfig( 'latest', {
+				ci: true,
+				releaseId: 'invalid release',
+			} )
+		).toThrow(
+			'The release ID may contain only letters, numbers, dots, underscores, and hyphens.'
 		);
 	} );
 } );

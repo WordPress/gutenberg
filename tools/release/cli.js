@@ -23,12 +23,17 @@ const repositoryPathOption = [
 	'--repository-path <repository-path>',
 	'Relative path to the git repository.',
 ];
+const releaseIdOption = [
+	'--release-id <release-id>',
+	'Stable identifier used to resume the same release.',
+];
 
 program
 	.command( 'publish-npm-packages-latest' )
 	.alias( 'npm-latest' )
 	.option( ...semverOption )
 	.option( ...ciOption )
+	.option( ...releaseIdOption )
 	.option( ...repositoryPathOption )
 	.description(
 		'Publishes to npm packages synced from the Gutenberg plugin (latest dist-tag, production version)'
@@ -39,6 +44,7 @@ program
 	.command( 'publish-npm-packages-bugfix-latest' )
 	.alias( 'npm-bugfix' )
 	.option( ...ciOption )
+	.option( ...releaseIdOption )
 	.option( ...repositoryPathOption )
 	.description(
 		'Publishes to npm bugfixes for packages (latest dist-tag, production version)'
@@ -50,6 +56,7 @@ program
 	.alias( 'npm-wp' )
 	.requiredOption( '--wp-version <wpVersion>', 'WordPress version' )
 	.option( ...ciOption )
+	.option( ...releaseIdOption )
 	.option( ...repositoryPathOption )
 	.description(
 		'Publishes to npm bugfixes targeting WordPress core (wp-X.Y dist-tag, production version)'
@@ -61,6 +68,7 @@ program
 	.alias( 'npm-next' )
 	.option( ...semverOption )
 	.option( ...ciOption )
+	.option( ...releaseIdOption )
 	.option( ...repositoryPathOption )
 	.description(
 		'Publishes to npm development version of packages (next dist-tag, prerelease version)'
