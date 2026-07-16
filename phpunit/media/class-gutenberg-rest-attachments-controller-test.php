@@ -870,7 +870,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		// The current attached file is recorded as the original_image, and the
 		// new main file's dimensions are returned for finalize.
 		$this->assertSame( 'original', $data['image_size'] );
-		$this->assertSame( 'canola.jpg', $data['original_image'] );
+		$this->assertSame( wp_basename( $attached_file_before ), $data['original_image'] );
 		$this->assertSame( 640, $data['width'] );
 		$this->assertSame( 480, $data['height'] );
 		$this->assertGreaterThan( 0, $data['filesize'] );
@@ -908,6 +908,9 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$attachment_id = $response->get_data()['id'];
 		$this->assertSame( 201, $response->get_status() );
 
+		// The attached file before sideload becomes the original_image.
+		$attached_file_before = get_attached_file( $attachment_id, true );
+
 		// Build a rotated (transposed) version of the source: 640x480 -> 480x640.
 		// Save it to a temp file so the source fixture directory is untouched.
 		$editor = wp_get_image_editor( DIR_TESTDATA . '/images/canola.jpg' );
@@ -935,7 +938,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( 480, $original_data['width'] );
 		$this->assertSame( 640, $original_data['height'] );
-		$this->assertSame( 'canola.jpg', $original_data['original_image'] );
+		$this->assertSame( wp_basename( $attached_file_before ), $original_data['original_image'] );
 
 		// Finalize and confirm the rotated dimensions replace the stored ones.
 		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
@@ -946,7 +949,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$metadata = wp_get_attachment_metadata( $attachment_id, true );
 		$this->assertSame( 480, $metadata['width'] );
 		$this->assertSame( 640, $metadata['height'] );
-		$this->assertSame( 'canola.jpg', $metadata['original_image'] );
+		$this->assertSame( wp_basename( $attached_file_before ), $metadata['original_image'] );
 		// The rotated file becomes the main file. Its stored name may gain a
 		// numeric suffix (core reserves the `-rotated` suffix), so compare against
 		// the file the sideload returned rather than a fixed basename.
