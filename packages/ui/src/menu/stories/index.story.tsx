@@ -310,6 +310,71 @@ export const RichItems: Story = {
 	},
 };
 
+export const GroupedItems: Story = {
+	args: {
+		children: (
+			<>
+				<Menu.Trigger>Open menu</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Group>
+						<Menu.GroupLabel>File</Menu.GroupLabel>
+						<Menu.Item
+							prefix={
+								<Icon
+									icon={ archive }
+									size={ 24 }
+									aria-hidden
+								/>
+							}
+						>
+							New draft
+						</Menu.Item>
+						<Menu.Item shortcut={ SHORTCUTS.save }>Save</Menu.Item>
+						<Menu.Item suffix="Edited">
+							<Menu.ItemLabel>Save as copy</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Create a duplicate from the current version.
+							</Menu.ItemDescription>
+						</Menu.Item>
+					</Menu.Group>
+					<Menu.Separator />
+					<Menu.Group>
+						<Menu.GroupLabel>Organize</Menu.GroupLabel>
+						<Menu.Item
+							prefix={
+								<Icon
+									icon={ archive }
+									size={ 24 }
+									aria-hidden
+								/>
+							}
+							shortcut={ SHORTCUTS.move }
+							suffix="3"
+						>
+							<Menu.ItemLabel>Move to collection</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Choose from recent destinations.
+							</Menu.ItemDescription>
+						</Menu.Item>
+						<Menu.Item
+							prefix={
+								<Icon
+									icon={ archive }
+									size={ 24 }
+									aria-hidden
+								/>
+							}
+							suffix="12"
+						>
+							Archive
+						</Menu.Item>
+					</Menu.Group>
+				</Menu.Popup>
+			</>
+		),
+	},
+};
+
 export const Submenu: Story = {
 	args: {
 		children: (
