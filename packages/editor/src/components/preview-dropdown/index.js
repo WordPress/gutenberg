@@ -47,6 +47,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		templateId,
 		isResponsiveEditing,
 		hasBlockSelection,
+		activeComplementaryArea,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostType,
@@ -77,6 +78,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			templateId: getCurrentTemplateId(),
 			isResponsiveEditing: _isResponsiveEditing(),
 			hasBlockSelection: !! getBlockSelectionStart(),
+			activeComplementaryArea:
+				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
 		};
 	}, [] );
 	const { setDeviceType, setRenderingMode, setDefaultRenderingMode } = unlock(
@@ -99,7 +102,13 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 				? VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
 				: 'default'
 		);
-		if ( newIsResponsiveEditing && hasBlockSelection ) {
+		// Only auto-open the block inspector when enabling responsive styles
+		// for a selected block and no complementary area is already open.
+		if (
+			newIsResponsiveEditing &&
+			hasBlockSelection &&
+			! activeComplementaryArea
+		) {
 			enableComplementaryArea( 'core', sidebars.block );
 		}
 	};
