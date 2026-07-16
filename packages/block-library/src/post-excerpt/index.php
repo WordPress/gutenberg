@@ -76,7 +76,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	} elseif ( empty( $more_text ) ) {
 		$content .= '</p>';
 	} else {
-		$separator = empty( $excerpt ) ? '' : ' ';
+		$separator = '' === $excerpt ? '' : ' ';
 		$content  .= $separator . $more_text . '</p>';
 	}
 	remove_filter( 'excerpt_more', $filter_excerpt_more );
