@@ -75,8 +75,6 @@ The widget names the intent and a link target; the host renders it as an anchor 
 
 `useWidgetTypes` resolves those references into the plain per-field `Field` props DataViews understands, inheriting the rest from `baseType`.
 
-See the [Field Types story](https://wordpress.github.io/gutenberg/?path=/docs/widget-primitives-field-types--docs) for the pipeline diagram and a worked example.
-
 ## Architecture
 
 For how the full pipeline fits together (authoring, build, server registry, and
