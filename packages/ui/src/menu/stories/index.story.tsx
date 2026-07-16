@@ -507,9 +507,23 @@ export const RadioItems: Story = {
 			<Menu.Root>
 				<Menu.Trigger>Sort</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.RadioGroup value={ sort } onValueChange={ setSort }>
-						<Menu.Group>
-							<Menu.GroupLabel>Sort by</Menu.GroupLabel>
+					<Menu.Group>
+						<Menu.GroupLabel>Sort by</Menu.GroupLabel>
+						<Menu.Item
+							prefix={
+								<Icon
+									icon={ archive }
+									size={ 32 }
+									aria-hidden
+								/>
+							}
+						>
+							Reset sorting
+						</Menu.Item>
+						<Menu.RadioGroup
+							value={ sort }
+							onValueChange={ setSort }
+						>
 							<Menu.RadioItem value="name">
 								<Menu.ItemLabel>Name</Menu.ItemLabel>
 								<Menu.ItemDescription>
@@ -528,8 +542,8 @@ export const RadioItems: Story = {
 									Keep the current custom order.
 								</Menu.ItemDescription>
 							</Menu.RadioItem>
-						</Menu.Group>
-					</Menu.RadioGroup>
+						</Menu.RadioGroup>
+					</Menu.Group>
 					<Menu.Separator />
 					<Menu.RadioGroup
 						value={ density }
