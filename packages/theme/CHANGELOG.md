@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Regenerate design token styles using the shared CSS/SCSS Prettier configuration ([#80365](https://github.com/WordPress/gutenberg/pull/80365)).
+
 ### Documentation
 
 -   Add a Storybook typography showcase that renders the published CSS design tokens directly ([#80212](https://github.com/WordPress/gutenberg/pull/80212)).
