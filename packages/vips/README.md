@@ -37,8 +37,7 @@ _Parameters_
 -   _id_ `ItemId`: Item ID.
 -   _buffer_ `ArrayBuffer`: Original file buffer.
 -   _type_ `string`: Mime type.
--   _quality_ Desired quality.
--   _interlaced_ Whether to use interlaced/progressive mode. Only used if the outputType supports it.
+-   _options_ `ConvertImageOptions`: Compression options.
 
 _Returns_
 
@@ -54,8 +53,7 @@ _Parameters_
 -   _buffer_ `ArrayBuffer`: Original file buffer.
 -   _inputType_ `string`: Input mime type.
 -   _outputType_ `string`: Output mime type.
--   _quality_ Desired quality.
--   _interlaced_ Whether to use interlaced/progressive mode. Only used if the outputType supports it.
+-   _options_ `ConvertImageOptions`: Conversion options.
 
 ### getUltraHdrInfo
 
@@ -97,8 +95,7 @@ _Parameters_
 -   _buffer_ `ArrayBuffer`: Original file buffer.
 -   _type_ `string`: Mime type.
 -   _resize_ `ImageSizeCrop`: Resize options.
--   _smartCrop_ Whether to use smart cropping (i.e. saliency-aware).
--   _quality_ Desired quality (0-1).
+-   _options_ `ResizeImageOptions`: Additional resize options.
 
 _Returns_
 
@@ -144,8 +141,7 @@ _Parameters_
 -   _id_ `ItemId`: Item ID.
 -   _buffer_ `ArrayBuffer`: Original file buffer.
 -   _type_ `string`: Mime type.
--   _quality_ Desired quality.
--   _interlaced_ Whether to use interlaced/progressive mode. Only used if the outputType supports it.
+-   _options_ `ConvertImageOptions`: Compression options.
 
 _Returns_
 
@@ -161,8 +157,7 @@ _Parameters_
 -   _buffer_ `ArrayBuffer`: Original file buffer.
 -   _inputType_ `string`: Input mime type.
 -   _outputType_ `string`: Output mime type.
--   _quality_ Desired quality.
--   _interlaced_ Whether to use interlaced/progressive mode. Only used if the outputType supports it.
+-   _options_ `ConvertImageOptions`: Conversion options.
 
 ### vipsGetUltraHdrInfo
 
@@ -204,8 +199,7 @@ _Parameters_
 -   _buffer_ `ArrayBuffer`: Original file buffer.
 -   _type_ `string`: Mime type.
 -   _resize_ `ImageSizeCrop`: Resize options.
--   _smartCrop_ Whether to use smart cropping (i.e. saliency-aware).
--   _quality_ Desired quality (0-1).
+-   _options_ `ResizeImageOptions`: Additional resize options.
 
 _Returns_
 

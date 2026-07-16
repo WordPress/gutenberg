@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   The "Apply globally" control now opens a review modal so you can choose which of a block's modified styles are pushed to Global Styles, showing each style's current and new value ([#79839](https://github.com/WordPress/gutenberg/pull/79839)).
+
 ## 14.51.0 (2026-07-14)
 
 ### New Features
