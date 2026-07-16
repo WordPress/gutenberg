@@ -29,7 +29,7 @@
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 
 			&:has(.item-selection-indicator) {
-				--wp-ui-menu-selection-indicator-track-size: var(--wpds-dimension-size-2xs);
+				--wp-ui-menu-selection-indicator-track-size: var(--wpds-dimension-size-3xs);
 				--wp-ui-menu-selection-indicator-gap: var(--wpds-dimension-gap-sm);
 			}
 		}
