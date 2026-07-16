@@ -693,6 +693,64 @@ describe( 'actions', () => {
 			expect( onError ).not.toHaveBeenCalled();
 		} );
 
+		it( 'still calls onError and removes the item when vips cancellation rejects', async () => {
+			/*
+			 * When the vips worker has crashed, any call on its remote —
+			 * including the cancellation itself — rejects. That rejection
+			 * must not abort cancelItem, or the item would be stuck in the
+			 * queue forever with no error surfaced.
+			 */
+			( vipsCancelOperations as jest.Mock ).mockImplementationOnce( () =>
+				Promise.reject( new Error( 'Worker error: crashed' ) )
+			);
+
+			const onError = jest.fn();
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				onError,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Test error' ) );
+
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( { message: 'Test error' } )
+			);
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+		} );
+
+		it( 'still calls onError and removes the item when GIF-to-video cancellation rejects', async () => {
+			( cancelGifToVideoOperations as jest.Mock ).mockImplementationOnce(
+				() => Promise.reject( new Error( 'Worker error: crashed' ) )
+			);
+
+			const onError = jest.fn();
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				onError,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Test error' ) );
+
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( { message: 'Test error' } )
+			);
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+		} );
+
 		describe( 'parent cancellation when child sideload fails', () => {
 			// Helpers used by every scenario below. Set up a parent that
 			// has finished its primary upload (so it has an attachment.id),

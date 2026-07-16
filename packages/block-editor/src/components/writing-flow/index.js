@@ -14,6 +14,8 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import useEditableRoot from './use-editable-root';
+import useHomeEnd from './use-home-end';
 import useMultiSelection from './use-multi-selection';
 import useTabNav from './use-tab-nav';
 import useArrowNav from './use-arrow-nav';
@@ -39,6 +41,8 @@ export function useWritingFlow() {
 			ref,
 			useClipboardHandler(),
 			useInput(),
+			useEditableRoot(),
+			useHomeEnd(),
 			useDragSelection(),
 			useSelectionObserver(),
 			useClickSelection(),
@@ -64,7 +68,17 @@ export function useWritingFlow() {
 
 					return () => {
 						delete node.dataset.hasMultiSelection;
-						node.removeAttribute( 'aria-label' );
+						// The wrapper may remain the editing host (the
+						// collapsed block supports `editableRoot`): keep it
+						// named, as the textbox role requires.
+						if ( node.contentEditable === 'true' ) {
+							node.setAttribute(
+								'aria-label',
+								__( 'Editor canvas' )
+							);
+						} else {
+							node.removeAttribute( 'aria-label' );
+						}
 					};
 				},
 				[ hasMultiSelection ]
