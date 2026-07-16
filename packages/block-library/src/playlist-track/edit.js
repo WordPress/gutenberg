@@ -85,7 +85,9 @@ const PlaylistTrackEdit = ( {
 	} );
 
 	function onSelectTrack( media ) {
-		if ( ! media || ! media.url ) {
+		const mediaUrl = media?.url ?? media?.source_url;
+
+		if ( ! media || ! mediaUrl ) {
 			// In this case there was an error and we should continue in the editing state
 			// previous attributes should be removed because they may be temporary blob urls.
 			setAttributes( {
@@ -103,8 +105,8 @@ const PlaylistTrackEdit = ( {
 			return;
 		}
 
-		if ( isBlobURL( media.url ) ) {
-			setTemporaryURL( media.url );
+		if ( isBlobURL( mediaUrl ) ) {
+			setTemporaryURL( mediaUrl );
 			return;
 		}
 
