@@ -59,7 +59,7 @@ function toHsvaFromHsla(
 /**
  * Visual color surface.
  *
- * Uses HSVA (react-colorful native model) and keeps that value in local
+ * Uses HSVA (react-colorful's native model) and keeps that value in local
  * state so HSLA↔hex round-trips cannot move the pointer
  * Parent ColorPicker still speaks HSLA for
  * inputs and controlled value sync; conversion happens only at the boundary.
