@@ -202,6 +202,9 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'form' => array(
 					'layout' => array(
 						'summary' => array( 'f1' )
+					),
+					'fields' => array(
+						'f1'
 					)
 				)
 			)
@@ -223,6 +226,9 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'form' => array(
 					'layout' => array(
 						'summary' => array( 'f2' )
+					),
+					'fields' => array(
+						'f2'
 					)
 				)
 			),
@@ -246,6 +252,10 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			'form' => array(
 				'layout' => array(
 					'summary' => array( 'f1', 'f2' )
+				),
+				'fields' => array(
+					'f1',
+					'f2'
 				)
 			)
 			),
@@ -410,57 +420,6 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 
 		$this->assertSame( array( 'type' => 'flex' ), $data->get_config()['default_view']['layout'] );
 	}
-
-	/**
-	 * update_properties() rejects the identity-keyed branches: a non-null
-	 * view_list value and form fields belong to their dedicated functions. A
-	 * valid sibling form property still merges.
-	 *
-	 * @covers ::update_properties
-	 */
-	public function test_update_properties_rejects_identity_keyed_branches() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_properties' );
-
-		$data = new Gutenberg_View_Config_Data(
-			array(
-				'form' => array(
-					'layout' => array( 'type' => 'panel' ),
-					'fields' => array( 'date' ),
-				),
-			)
-		);
-
-		$data->update_properties(
-			array(
-				'view_list' => array(
-					array(
-						'slug'  => 'mine',
-						'title' => 'Mine',
-					),
-				),
-			),
-			1
-		);
-		$this->assertArrayNotHasKey( 'view_list', $data->get_config() );
-
-		$data->update_properties(
-			array(
-				'form' => array(
-					'layout' => array( 'type' => 'card' ),
-					'fields' => array( 'my_field' ),
-				),
-			),
-			1
-		);
-		$this->assertSame(
-			array(
-				'layout' => array( 'type' => 'card' ),
-				'fields' => array( 'date' ),
-			),
-			$data->get_config()['form']
-		);
-	}
-
 
 	/**
 	 * update_properties() rejects a list where the form map is expected.

@@ -180,8 +180,7 @@ class Gutenberg_View_Config_Data {
 			}
 			if ( 'form' === $key ) {
 				$value = $this->extract_form_properties( $value );
-				// Nothing left to merge: the value was off-shape, or held only
-				// the rejected `fields` key.
+				// Nothing left to merge: the value was off-shape.
 				if ( null === $value || array() === $value ) {
 					continue;
 				}
@@ -362,8 +361,7 @@ class Gutenberg_View_Config_Data {
 	}
 
 	/**
-	 * Validates a `form` patch value for update_properties() and strips the
-	 * `fields` key, which is managed by update_form_fields().
+	 * Validates a `form` patch value for update_properties().
 	 *
 	 * @since 7.1.0
 	 *
@@ -379,14 +377,6 @@ class Gutenberg_View_Config_Data {
 				'7.1.0'
 			);
 			return null;
-		}
-		if ( array_key_exists( 'fields', $value ) ) {
-			_doing_it_wrong(
-				'Gutenberg_View_Config_Data::update_properties',
-				esc_html__( 'The form "fields" are patched by identity. Use update_form_fields() instead.', 'gutenberg' ),
-				'7.1.0'
-			);
-			unset( $value['fields'] );
 		}
 
 		return $value;
