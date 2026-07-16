@@ -83,7 +83,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	 *
 	 * @covers ::merge
 	 */
-	public function test_merge_object_values() {
+	public function test_merge_array_associative_values() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
@@ -181,11 +181,13 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * merge() updates list property values
+	 * merge() updates list property values, including an identity-keyed
+	 * view_list whose matching entries merge in place by slug (keeping their
+	 * position and deep-merging nested props) while unknown ones are appended.
 	 *
 	 * @covers ::merge
 	 */
-	public function test_merge_list_values() {
+	public function test_merge_array_indexed_values() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
@@ -198,6 +200,23 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					'layout' => array(
 						'badgeFields' => array( 'b1', 'b2' )
 					)
+				),
+				'view_list' => array(
+					array(
+						'title' => 'All',
+						'slug'  => 'all',
+					),
+					array(
+						'title' => 'Published',
+						'slug'  => 'published',
+						'view'  => array(
+							'type' => 'list',
+							'sort' => array(
+								'field'     => 'title',
+								'direction' => 'asc',
+							),
+						),
+					),
 				),
 				'form' => array(
 					'layout' => array(
@@ -234,6 +253,19 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					'layout' => array(
 						'badgeFields' => array( 'b2' )
 					)
+				),
+				'view_list' => array(
+					array(
+						'slug'  => 'published',
+						'title' => 'Live',
+						'view'  => array(
+							'sort' => array( 'direction' => 'desc' ),
+						),
+					),
+					array(
+						'slug'  => 'mine',
+						'title' => 'Mine',
+					),
 				),
 				'form' => array(
 					'layout' => array(
@@ -279,6 +311,27 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					'badgeFields' => array( 'b1', 'b2' )
 				)
 			),
+			'view_list' => array(
+				array(
+					'title' => 'All',
+					'slug'  => 'all',
+				),
+				array(
+					'title' => 'Live',
+					'slug'  => 'published',
+					'view'  => array(
+						'type' => 'list',
+						'sort' => array(
+							'field'     => 'title',
+							'direction' => 'desc',
+						),
+					),
+				),
+				array(
+					'slug'  => 'mine',
+					'title' => 'Mine',
+				),
+			),
 			'form' => array(
 				'layout' => array(
 					'summary' => array( 'f1', 'f2' )
@@ -309,118 +362,6 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			)
 			),
 			$data->get_config()
-		);
-	}
-
-	/**
-	 * merge() merges a matching view by slug in place, keeping its position,
-	 * and appends an unknown one.
-	 *
-	 * @covers ::merge
-	 */
-	public function test_merge_view_list_merges_by_slug_and_appends_unknown() {
-		$data = new Gutenberg_View_Config_Data(
-			array(
-				'view_list' => array(
-					array(
-						'title' => 'All',
-						'slug'  => 'all',
-					),
-					array(
-						'title' => 'Published',
-						'slug'  => 'published',
-					),
-				),
-			)
-		);
-		$data->merge(
-			array(
-				'view_list' => array(
-					array(
-						'slug'  => 'published',
-						'title' => 'Live',
-					),
-					array(
-						'slug'  => 'mine',
-						'title' => 'Mine',
-					),
-				),
-			),
-			1
-		);
-
-		$this->assertSame(
-			array(
-				array(
-					'title' => 'All',
-					'slug'  => 'all',
-				),
-				array(
-					'title' => 'Live',
-					'slug'  => 'published',
-				),
-				array(
-					'slug'  => 'mine',
-					'title' => 'Mine',
-				),
-			),
-			$data->get_config()['view_list']
-		);
-	}
-
-	/**
-	 * merge() merges a view's nested object properties in place while leaving
-	 * the sibling views untouched.
-	 *
-	 * @covers ::merge
-	 */
-	public function test_merge_view_list_merges_nested_view_props() {
-		$data = new Gutenberg_View_Config_Data(
-			array(
-				'view_list' => array(
-					array(
-						'title' => 'Published',
-						'slug'  => 'published',
-						'view'  => array(
-							'type' => 'list',
-							'sort' => array(
-								'field'     => 'title',
-								'direction' => 'asc',
-							),
-						),
-					),
-				),
-			)
-		);
-		$data->merge(
-			array(
-				'view_list' => array(
-					array(
-						'slug' => 'published',
-						'view' => array(
-							'sort' => array( 'direction' => 'desc' ),
-						),
-					),
-				),
-			),
-			1
-		);
-
-		$this->assertSame(
-			array(
-				array(
-					'title' => 'Published',
-					'slug'  => 'published',
-					'view'  => array(
-						'type' => 'list',
-						'sort' => array(
-							'field'     => 'title',
-							'direction' => 'desc',
-						),
-					),
-				),
-			),
-			$data->get_config()['view_list']
 		);
 	}
 
