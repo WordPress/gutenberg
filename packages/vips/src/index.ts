@@ -18,6 +18,8 @@ import type {
 	LoadOptions,
 	SaveOptions,
 	ThumbnailOptions,
+	ConvertImageOptions,
+	ResizeImageOptions,
 } from './types';
 import { supportsAnimation, supportsInterlace, supportsQuality } from './utils';
 
@@ -140,18 +142,21 @@ export async function cancelOperations( id: ItemId ) {
  * @param buffer     Original file buffer.
  * @param inputType  Input mime type.
  * @param outputType Output mime type.
- * @param quality    Desired quality.
- * @param interlaced Whether to use interlaced/progressive mode.
- *                   Only used if the outputType supports it.
+ * @param options    Conversion options.
  */
 export async function convertImageFormat(
 	id: ItemId,
 	buffer: ArrayBuffer,
 	inputType: string,
 	outputType: string,
-	quality = 0.82,
-	interlaced = false
+	options: ConvertImageOptions = {}
 ): Promise< ArrayBuffer | ArrayBufferLike > {
+	const {
+		quality = 0.82,
+		interlaced = false,
+		stripMeta = true,
+		maxBitdepth = 16,
+	} = options;
 	const ext = outputType.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
@@ -160,8 +165,18 @@ export async function convertImageFormat(
 		let strOptions = '';
 		const loadOptions: LoadOptions< typeof inputType > = {};
 
-		// To ensure all frames are loaded in case the image is animated.
-		if ( supportsAnimation( inputType ) ) {
+		/*
+		 * To ensure all frames are loaded in case the image is animated and
+		 * the output format can represent them. A still output (e.g. a JPEG
+		 * poster for a GIF) only needs the first frame; loading all frames
+		 * would decode them as one vertical strip whose height easily
+		 * exceeds encoder dimension limits for long animations.
+		 * See https://github.com/WordPress/gutenberg/issues/80259.
+		 */
+		if (
+			supportsAnimation( inputType ) &&
+			supportsAnimation( outputType )
+		) {
 			strOptions = '[n=-1]';
 			( loadOptions as LoadOptions< typeof inputType > ).n = -1;
 		}
@@ -182,8 +197,9 @@ export async function convertImageFormat(
 
 		const saveOptions: SaveOptions< typeof outputType > = {
 			// Strip metadata except ICC color profiles,
-			// matching WordPress core's behavior.
-			keep: 'icc',
+			// matching WordPress core's behavior. The `image_strip_meta`
+			// filter can disable stripping entirely.
+			keep: stripMeta ? 'icc' : 'all',
 		};
 
 		if ( supportsQuality( outputType ) ) {
@@ -202,9 +218,16 @@ export async function convertImageFormat(
 			// images stay high-bit-depth when compressed or converted to AVIF
 			// instead of being flattened to 8-bit. Unlike resizing, this path
 			// keeps the decoded 16-bit image, so no extra handling is needed.
+			// The `image_max_bit_depth` filter can cap the output depth; the
+			// depth is set explicitly whenever the source is high-bit-depth,
+			// since heifsave would otherwise default to 12-bit for 16-bit
+			// pixel data.
 			const sourceBitdepth = getSourceBitdepth( image );
 			if ( sourceBitdepth > 8 ) {
-				saveOptions.bitdepth = sourceBitdepth;
+				saveOptions.bitdepth = resolveSaveBitdepth(
+					sourceBitdepth,
+					maxBitdepth
+				);
 			}
 		}
 
@@ -222,22 +245,19 @@ export async function convertImageFormat(
 /**
  * Compresses an existing image using vips.
  *
- * @param id         Item ID.
- * @param buffer     Original file buffer.
- * @param type       Mime type.
- * @param quality    Desired quality.
- * @param interlaced Whether to use interlaced/progressive mode.
- *                   Only used if the outputType supports it.
+ * @param id      Item ID.
+ * @param buffer  Original file buffer.
+ * @param type    Mime type.
+ * @param options Compression options.
  * @return Compressed file data.
  */
 export async function compressImage(
 	id: ItemId,
 	buffer: ArrayBuffer,
 	type: string,
-	quality = 0.82,
-	interlaced = false
+	options: ConvertImageOptions = {}
 ): Promise< ArrayBuffer | ArrayBufferLike > {
-	return convertImageFormat( id, buffer, type, type, quality, interlaced );
+	return convertImageFormat( id, buffer, type, type, options );
 }
 
 /**
@@ -408,22 +428,49 @@ function getSourceBitdepth< T extends { getInt: ( name: string ) => number } >(
 }
 
 /**
+ * Resolves the effective AVIF save bit depth from the source depth and the
+ * `image_max_bit_depth` cap, snapping down to the nearest depth supported by
+ * heifsave (8, 10, or 12) since the filter may return any integer.
+ *
+ * @param sourceBitdepth Source bit depth (8, 10, or 12).
+ * @param maxBitdepth    Maximum bit depth from the `image_max_bit_depth` filter.
+ * @return The bit depth to save at.
+ */
+function resolveSaveBitdepth(
+	sourceBitdepth: number,
+	maxBitdepth: number
+): number {
+	const target = Math.min( sourceBitdepth, maxBitdepth );
+	if ( target >= 12 ) {
+		return 12;
+	}
+	if ( target >= 10 ) {
+		return 10;
+	}
+	return 8;
+}
+
+/**
  * Builds save options for writing an image to a buffer.
  *
- * @param type     Output mime type.
- * @param quality  Desired quality (0-1).
- * @param bitdepth Source bit depth; values above 8 are preserved for AVIF.
+ * @param type      Output mime type.
+ * @param quality   Desired quality (0-1).
+ * @param bitdepth  Save bit depth; values above 8 are preserved for AVIF.
+ * @param stripMeta Whether to strip metadata (except color profiles),
+ *                  from the `image_strip_meta` filter.
  * @return Save options object.
  */
 function buildSaveOptions(
 	type: string,
 	quality: number,
-	bitdepth = 8
+	bitdepth = 8,
+	stripMeta = true
 ): SaveOptions< typeof type > {
 	const saveOptions: SaveOptions< typeof type > = {
 		// Strip metadata except ICC color profiles or gainmaps,
-		// matching WordPress core's behavior.
-		keep: 'icc|gainmap',
+		// matching WordPress core's behavior. The `image_strip_meta`
+		// filter can disable stripping entirely.
+		keep: stripMeta ? 'icc|gainmap' : 'all',
 	};
 
 	if ( supportsQuality( type ) ) {
@@ -513,12 +560,11 @@ function resizeHighBitDepth<
  * decode the gain map alongside the base image, and `jpegsave*` delegates
  * to `uhdrsave*` on output when a gain map is attached.
  *
- * @param id        Item ID.
- * @param buffer    Original file buffer.
- * @param type      Mime type.
- * @param resize    Resize options.
- * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
- * @param quality   Desired quality (0-1).
+ * @param id      Item ID.
+ * @param buffer  Original file buffer.
+ * @param type    Mime type.
+ * @param resize  Resize options.
+ * @param options Additional resize options.
  * @return Processed file data plus the old and new dimensions.
  */
 export async function resizeImage(
@@ -526,8 +572,7 @@ export async function resizeImage(
 	buffer: ArrayBuffer,
 	type: string,
 	resize: ImageSizeCrop,
-	smartCrop = false,
-	quality = 0.82
+	options: ResizeImageOptions = {}
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -535,6 +580,12 @@ export async function resizeImage(
 	originalWidth: number;
 	originalHeight: number;
 } > {
+	const {
+		smartCrop = false,
+		quality = 0.82,
+		stripMeta = true,
+		maxBitdepth = 16,
+	} = options;
 	const ext = type.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
@@ -574,7 +625,14 @@ export async function resizeImage(
 			'image/avif' === type && ! strOptions
 				? getSourceBitdepth( image )
 				: 8;
-		const isHighBitDepth = sourceBitdepth > 8;
+		// The `image_max_bit_depth` filter can cap the output depth. When the
+		// cap flattens the image to 8-bit anyway, the regular colour-managed
+		// `thumbnail` path is used, matching standard-depth sources.
+		const saveBitdepth =
+			sourceBitdepth > 8
+				? resolveSaveBitdepth( sourceBitdepth, maxBitdepth )
+				: 8;
+		const isHighBitDepth = saveBitdepth > 8;
 		const sourceImage = image;
 
 		image = applyResizeAndCrop(
@@ -605,7 +663,12 @@ export async function resizeImage(
 			}
 		);
 
-		const saveOptions = buildSaveOptions( type, quality, sourceBitdepth );
+		const saveOptions = buildSaveOptions(
+			type,
+			quality,
+			saveBitdepth,
+			stripMeta
+		);
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {

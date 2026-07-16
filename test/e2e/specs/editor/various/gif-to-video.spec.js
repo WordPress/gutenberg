@@ -28,6 +28,18 @@ const ASSETS_DIR = path.join( __dirname, '..', '..', '..', 'assets' );
  */
 const ANIMATED_GIF_FIXTURE = '599x441_e2e_test_image_animated.gif';
 
+/**
+ * Long animated GIF fixture: 100x100 with 700 frames.
+ *
+ * Chosen so that `frame count × frame height` (70,000 px) exceeds libjpeg's
+ * 65,500 px maximum image dimension while keeping the file tiny. Decoding
+ * all frames produces one vertical strip image that no JPEG encoder can
+ * save, which used to make the first-frame poster generation fail in a way
+ * that hung the upload queue forever.
+ * See https://github.com/WordPress/gutenberg/issues/80259.
+ */
+const LONG_ANIMATED_GIF_FIXTURE = '100x100_e2e_test_image_animated_long.gif';
+
 test.use( {
 	gifToVideoUtils: async ( { page }, use ) => {
 		await use( new GifToVideoUtils( { page } ) );
@@ -324,5 +336,88 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		);
 		expect( restoredImage.attributes.id ).toBe( attachmentId );
 		expect( restoredImage.attributes.url ).toMatch( /\.gif(\?.*)?$/i );
+	} );
+
+	test( 'completes the upload of a long animated GIF and produces a single-frame poster', async ( {
+		editor,
+		page,
+		gifToVideoUtils,
+		requestUtils,
+	} ) => {
+		/*
+		 * Regression test for
+		 * https://github.com/WordPress/gutenberg/issues/80259: uploading a
+		 * GIF whose frame count × height exceeds the 65,500 px JPEG
+		 * dimension limit used to hang the upload forever. The poster
+		 * generation decoded all frames as one tall strip, the JPEG save
+		 * failed inside the image worker, and the failure never settled
+		 * the upload queue, so the spinner never cleared.
+		 */
+		await expect(
+			editor.canvas.getByRole( 'button', { name: 'Add default block' } )
+		).toBeVisible();
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await gifToVideoUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			LONG_ANIMATED_GIF_FIXTURE
+		);
+
+		// The queue must drain: the parent GIF upload plus the companion
+		// video and poster sideloads all complete. The regression hung
+		// here forever. Kept below the test timeout so a hang fails here,
+		// pointing at the queue, rather than as a generic test timeout.
+		await gifToVideoUtils.waitForUploadQueueEmpty( 90_000 );
+
+		const uploadedImage = await page.evaluate( () =>
+			window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks()
+				.find( ( block ) => block.name === 'core/image' )
+		);
+		expect( uploadedImage.attributes.url ).toMatch( /\.gif(\?.*)?$/i );
+
+		const attachmentId = uploadedImage.attributes.id;
+		expect( attachmentId ).toBeDefined();
+
+		// Both companions are recorded in the attachment metadata: the
+		// converted video and its static poster.
+		let media;
+		await expect
+			.poll(
+				async () => {
+					media = await requestUtils.rest( {
+						method: 'GET',
+						path: `/wp/v2/media/${ attachmentId }`,
+					} );
+					return media.media_details?.animated_video_poster;
+				},
+				{ timeout: 30_000 }
+			)
+			.toMatch( /\.jpe?g$/i );
+
+		expect( media.media_details?.animated_video ).toMatch(
+			/\.(mp4|webm)$/i
+		);
+
+		// The poster is a single frame with the GIF's own dimensions —
+		// not a film strip of all frames stacked vertically.
+		const posterUrl = new URL( media.source_url );
+		posterUrl.pathname = posterUrl.pathname.replace(
+			/[^/]+$/,
+			media.media_details.animated_video_poster
+		);
+		const posterDimensions = await page.evaluate( async ( url ) => {
+			const blob = await ( await fetch( url ) ).blob();
+			const bitmap = await window.createImageBitmap( blob );
+			return { width: bitmap.width, height: bitmap.height };
+		}, posterUrl.href );
+		expect( posterDimensions ).toEqual( { width: 100, height: 100 } );
 	} );
 } );
