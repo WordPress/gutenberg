@@ -127,6 +127,12 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'default_view' => array(
 					'fields' => array(
 						array( 'title' )
+					),
+					'filters' => array(
+						array( 'field' => 'id1', 'operator' => 'op1', 'value' => [ 'val1' ] ),
+					),
+					'layout' => array(
+						'badgeFields' => array( 'b1', 'b2' )
 					)
 				),
 			)
@@ -136,6 +142,13 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'default_view' => array(
 					'fields' => array(
 						array( 'slug' )
+					),
+					'filters' => array(
+						array( 'field' => 'id1', 'operator' => 'change', 'value' => [ 'change' ], 'isLocked' => true ),
+						array( 'field' => 'id2', 'operator' => 'op2', 'value' => [ 'val2' ] ),
+					),
+					'layout' => array(
+						'badgeFields' => array( 'b2' )
 					)
 				),
 			),
@@ -147,6 +160,13 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'fields' => array(
 					array( 'title' ),
 					array( 'slug' )
+				),
+				'filters' => array(
+					array( 'field' => 'id1', 'operator' => 'change', 'value' => [ 'change' ], 'isLocked' => true ),
+					array( 'field' => 'id2', 'operator' => 'op2', 'value' => [ 'val2' ] ),
+				),
+				'layout' => array(
+					'badgeFields' => array( 'b1', 'b2' )
 				)
 			),
 			$data->get_config()['default_view']

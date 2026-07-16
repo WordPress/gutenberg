@@ -186,7 +186,7 @@ class Gutenberg_View_Config_Data {
 					continue;
 				}
 			}
-			$this->config[ $key ] = $this->deep_merge( $this->config[ $key ] ?? array(), $value );
+			$this->config[ $key ] = $this->merge_properties( $this->config[ $key ] ?? array(), $value );
 		}
 
 		return $this;
@@ -431,6 +431,120 @@ class Gutenberg_View_Config_Data {
 			);
 		}
 		return $result;
+	}
+
+	/**
+	 * Merges a `default_view`, `default_layouts`, or `form` value, treating
+	 * numerically indexed arrays (lists) as collections merged by identity.
+	 *
+	 * Unlike deep_merge(), which replaces a list wholesale, this recurses
+	 * through maps and merges lists element by element: a member whose identity
+	 * (a scalar's own value, or a map's `id`/`slug`/`field`/`name`) matches an
+	 * existing member merges into it in place — the merged member's own contents
+	 * then follow the ordinary wholesale-list rule — and an unmatched member is
+	 * appended. Members without an identity (e.g. nested lists) are always
+	 * appended, so a list of such values grows rather than replacing.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param mixed $current  The current value.
+	 * @param mixed $incoming The incoming value.
+	 * @return mixed The merged value.
+	 */
+	private function merge_properties( $current, $incoming ) {
+		if ( ! is_array( $incoming ) ) {
+			return $incoming;
+		}
+
+		if ( array_is_list( $incoming ) ) {
+			return $this->merge_list_by_identity(
+				is_array( $current ) && array_is_list( $current ) ? $current : array(),
+				$incoming
+			);
+		}
+
+		// Merge onto the current map, or onto an empty base when the current
+		// value is absent, empty, or not a map, so null delete-markers in the
+		// patch are consumed rather than stored as literal values.
+		$result = is_array( $current ) && ! array_is_list( $current ) ? $current : array();
+		foreach ( $incoming as $key => $value ) {
+			if ( null === $value ) {
+				// A null patch value deletes the key.
+				unset( $result[ $key ] );
+				continue;
+			}
+			$result[ $key ] = $this->merge_properties(
+				array_key_exists( $key, $result ) ? $result[ $key ] : array(),
+				$value
+			);
+		}
+		return $result;
+	}
+
+	/**
+	 * Merges an incoming list into the current one by member identity.
+	 *
+	 * A member of the incoming list whose identity matches one already present
+	 * merges into it in place, keeping its position; an unmatched member is
+	 * appended to the end. A matched member's contents merge with the ordinary
+	 * wholesale-list rule (deep_merge), so lists nested inside a member replace
+	 * rather than merging again.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param array $current  The current list.
+	 * @param array $incoming The incoming list.
+	 * @return array The merged list.
+	 */
+	private function merge_list_by_identity( array $current, array $incoming ) {
+		$result = $current;
+		foreach ( $incoming as $item ) {
+			$identity = $this->list_item_identity( $item );
+
+			$index = null;
+			if ( null !== $identity ) {
+				foreach ( $result as $i => $existing ) {
+					if ( $this->list_item_identity( $existing ) === $identity ) {
+						$index = $i;
+						break;
+					}
+				}
+			}
+
+			if ( null === $index ) {
+				$result[] = $item;
+				continue;
+			}
+			$result[ $index ] = $this->deep_merge( $result[ $index ], $item );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Resolves the identity used to match a list member against another.
+	 *
+	 * A scalar is its own identity; a map is identified by the first of the
+	 * well-known identity keys it carries. Anything else (e.g. a nested list)
+	 * has no identity and never matches, so it is always appended.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param mixed $item The list member.
+	 * @return mixed The identity, or null when the member has none.
+	 */
+	private function list_item_identity( $item ) {
+		if ( is_scalar( $item ) ) {
+			return $item;
+		}
+		if ( is_array( $item ) && ! array_is_list( $item ) ) {
+			foreach ( array( 'id', 'slug', 'field', 'name' ) as $key ) {
+				if ( isset( $item[ $key ] ) && is_scalar( $item[ $key ] ) ) {
+					return $key . ':' . $item[ $key ];
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
