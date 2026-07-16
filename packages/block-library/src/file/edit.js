@@ -77,14 +77,14 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const { media } = useSelect(
 		( select ) => ( {
-			media:
-				id === undefined
-					? undefined
-					: select( coreStore ).getEntityRecord(
-							'postType',
-							'attachment',
-							id
-					  ),
+			media: !! id
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id,
+						{ context: 'view' }
+				  )
+				: undefined,
 		} ),
 		[ id ]
 	);

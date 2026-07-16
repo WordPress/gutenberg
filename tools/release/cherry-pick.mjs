@@ -5,6 +5,7 @@ import fetch from 'node-fetch';
 import readline from 'readline';
 
 import { spawnSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 
 const REPO = 'WordPress/gutenberg';
 const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
@@ -197,15 +198,16 @@ function getGitHubAuthToken() {
  * success since the last attempt.
  *
  * @param {Object[]} PRs The list of PRs to cherry-pick.
+ * @param {string}   cwd The repository directory.
  * @return {Array} A two-tuple containing a list of successful cherry-picks and a list of failed ones.
  */
-function cherryPickAll( PRs ) {
+function cherryPickAll( PRs, cwd = process.cwd() ) {
 	let remainingPRs = [ ...PRs ];
 	let i = 1;
 	let allSuccesses = [];
 	while ( remainingPRs.length ) {
 		console.log( `Cherry-picking round ${ i++ }: ` );
-		const [ successes, failures ] = cherryPickRound( remainingPRs );
+		const [ successes, failures ] = cherryPickRound( remainingPRs, cwd );
 		allSuccesses = [ ...allSuccesses, ...successes ];
 		remainingPRs = failures;
 		if ( ! successes.length ) {
@@ -224,16 +226,17 @@ function cherryPickAll( PRs ) {
  * Processes every PR once.
  *
  * @param {Object[]} PRs The list of PRs to cherry-pick.
+ * @param {string}   cwd The repository directory.
  * @return {Array} A two-tuple containing a list of successful cherry-picks and a list of failed ones.
  */
-function cherryPickRound( PRs ) {
+function cherryPickRound( PRs, cwd ) {
 	const stack = [ ...PRs ];
 	const successes = [];
 	const failures = [];
 	while ( stack.length ) {
 		const PR = stack.shift();
 		try {
-			const cherryPickHash = cherryPickOne( PR.mergeCommitHash );
+			const cherryPickHash = cherryPickOne( PR.mergeCommitHash, cwd );
 			successes.push( {
 				...PR,
 				cherryPickHash,
@@ -307,20 +310,47 @@ function indent( text, width = 3 ) {
  * Attempts to cherry-pick a given commit into the current branch,
  *
  * @param {string} commit A commit hash.
+ * @param {string} cwd    The repository directory.
  * @return {string} Branch name.
  */
-function cherryPickOne( commit ) {
-	const result = spawnSync( 'git', [ 'cherry-pick', commit ] );
-	const message = result.stdout.toString().trim();
-	if ( result.status !== 0 || ! message.includes( 'Author: ' ) ) {
-		spawnSync( 'git', [ 'reset', '--hard' ] );
+function cherryPickOne( commit, cwd = process.cwd() ) {
+	const headBeforeCherryPick = spawnSync( 'git', [ 'rev-parse', 'HEAD' ], {
+		cwd,
+	} )
+		.stdout.toString()
+		.trim();
+	const result = spawnSync( 'git', [ 'cherry-pick', commit ], { cwd } );
+	if ( result.status !== 0 ) {
+		spawnSync( 'git', [ 'cherry-pick', '--abort' ], { cwd } );
+
+		const headAfterCleanup = spawnSync( 'git', [ 'rev-parse', 'HEAD' ], {
+			cwd,
+		} )
+			.stdout.toString()
+			.trim();
+		const cherryPickState = spawnSync(
+			'git',
+			[ 'rev-parse', '--verify', '--quiet', 'CHERRY_PICK_HEAD' ],
+			{ cwd }
+		);
+		if (
+			headAfterCleanup !== headBeforeCherryPick ||
+			cherryPickState.status === 0
+		) {
+			console.error(
+				`Failed to restore the repository after cherry-picking ${ commit }. ` +
+					'Nothing was pushed. Restore the repository before running this script again.'
+			);
+			process.exit( 1 );
+		}
+
 		throw new Error( result.stderr.toString().trim() );
 	}
-	const commitHashOutput = spawnSync( 'git', [
-		'rev-parse',
-		'--short',
-		'HEAD',
-	] );
+	const commitHashOutput = spawnSync(
+		'git',
+		[ 'rev-parse', '--short', 'HEAD' ],
+		{ cwd }
+	);
 	return commitHashOutput.stdout.toString().trim();
 }
 
@@ -548,4 +578,11 @@ async function promptDoYouWantToProceed() {
 	rl.close();
 }
 
-main();
+if (
+	process.argv[ 1 ] &&
+	import.meta.url === pathToFileURL( process.argv[ 1 ] ).href
+) {
+	main();
+}
+
+export { cherryPickAll, cherryPickOne };

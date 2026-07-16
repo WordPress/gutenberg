@@ -95,14 +95,23 @@ jobs:
             - name: Lint JavaScript
               if: ${{ matrix.annotations }}
               # `--quiet` reports only errors so they aren't buried under warnings in the CI log.
-              run: npm run lint:js -- --format compact --quiet
+              # `--prune-suppressions` ensures `suppressions.json` stays in sync.
+              run: npm run lint:js -- --format compact --quiet --prune-suppressions
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}
-              run: npm run lint:css -- --formatter compact
+              # Stylelint has no separate prune flag. Run lint first so new violations fail,
+              # then `--suppress` to prune stale suppressions (same outcome as ESLint's
+              # `--prune-suppressions` + check-local-changes).
+              run: |
+                  npm run lint:css -- --formatter compact
+                  npm run lint:css:update-suppressions
 
             - name: Type checking
               run: npm run build
+
+            - name: Validate package contents
+              run: npm run lint:package-contents
 
             - name: Audit published dependencies
               if: ${{ matrix.annotations }}

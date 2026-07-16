@@ -65,6 +65,16 @@ Settings related to background.
 
 ---
 
+### blockVisibility
+
+Settings related to block visibility.
+
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| allowEditing | Whether block visibility can be edited in the editor. Set to `false` to hide the block visibility controls. Saved block visibility attributes are always rendered regardless of this setting. | `boolean` | `true` |
+
+---
+
 ### border
 
 Settings related to borders.
@@ -204,6 +214,17 @@ Settings related to typography.
 | dropCap | Enable drop cap. | `boolean` | `true` |
 | fontSizes | Font size presets for the font size selector. | `[ { name, slug, size, fluid } ]` |  |
 | fontFamilies | Font family presets for the font family selector. | `[ { name, slug, fontFamily, fontFace } ]` |  |
+
+---
+
+### viewport
+
+Viewport breakpoint settings used for responsive block styles and block visibility. Invalid breakpoint values are ignored. If only one valid breakpoint is declared, it remains keyed by its configured viewport and uses a single max-width query. If neither breakpoint is valid, the default breakpoints are used. If `mobile` is greater than or equal to `tablet`, only the `mobile` breakpoint is used.
+
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| mobile | Maximum viewport width for mobile styles. | `string` | `"480px"` |
+| tablet | Maximum viewport width for tablet styles. Tablet styles apply above the mobile width and up to this width when both breakpoints are configured, or up to this width when tablet is the only valid breakpoint. | `string` | `"782px"` |
 
 ---
 

@@ -7,17 +7,26 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
+import { useResizeObserver } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 import { Card, Icon, Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
  */
+import { WidgetInfotip } from './widget-header-infotip';
+import {
+	WIDGET_HEADER_IDENTITY_RESERVE,
+	WIDGET_TOOLBAR_CHIP_RESERVE,
+	WidgetHeaderAvailableSizeProvider,
+} from './widget-header-size';
 import styles from './widget-header.module.css';
 
 export interface WidgetHeaderProps {
 	/**
-	 * Widget type, source of the icon and title shown as identity.
+	 * Widget type, source of the icon, title, and help note shown as
+	 * identity.
 	 */
 	widgetType?: WidgetType;
 
@@ -37,6 +46,11 @@ export interface WidgetHeaderProps {
 	overlay?: boolean;
 
 	/**
+	 * Inert the identity while customizing, so it does not capture interaction.
+	 */
+	editMode?: boolean;
+
+	/**
 	 * Toolbar placed on the trailing edge.
 	 */
 	children?: ReactNode;
@@ -44,8 +58,8 @@ export interface WidgetHeaderProps {
 
 /**
  * Tile header row: identity (icon + title) and a toolbar on one line. Rendered
- * as a `base` in the card flow and as an `overlay` in the grid slot (outside the
- * card's `inert`) so the toolbar stays interactive.
+ * in the card flow, or as an `overlay` in the grid slot for full-bleed widgets
+ * that have no in-card header.
  *
  * @param {WidgetHeaderProps} props Component props.
  */
@@ -54,11 +68,31 @@ export function WidgetHeader( {
 	titleId,
 	showIdentity = false,
 	overlay = false,
+	editMode = false,
 	children,
 }: WidgetHeaderProps ): React.ReactNode {
+	// Content-box width of the header row, so toolbar controls can compare
+	// their natural width against the space the row actually offers.
+	const [ headerWidth, setHeaderWidth ] = useState( 0 );
+	const headerMeasureRef = useResizeObserver< HTMLDivElement >(
+		( [ entry ] ) => setHeaderWidth( entry.contentRect.width )
+	);
+
+	const hasIdentity = showIdentity && !! widgetType?.title;
+	const availableSize =
+		headerWidth > 0
+			? headerWidth -
+			  WIDGET_TOOLBAR_CHIP_RESERVE -
+			  ( hasIdentity ? WIDGET_HEADER_IDENTITY_RESERVE : 0 )
+			: null;
+
 	return (
 		<Card.Header
-			className={ clsx( styles.widgetHeader, overlay && styles.overlay ) }
+			ref={ headerMeasureRef }
+			className={ clsx(
+				styles[ 'widget-header' ],
+				overlay && styles.overlay
+			) }
 		>
 			{ showIdentity && widgetType?.title && (
 				<Stack
@@ -66,6 +100,7 @@ export function WidgetHeader( {
 					align="center"
 					gap="sm"
 					className={ styles.identity }
+					{ ...( editMode ? { inert: 'true' } : {} ) }
 				>
 					{ widgetType.icon && (
 						<span className={ styles.icon } aria-hidden="true">
@@ -76,9 +111,23 @@ export function WidgetHeader( {
 					<Card.Title id={ titleId } render={ <h2 /> }>
 						{ widgetType.title }
 					</Card.Title>
+
+					{ widgetType.help && (
+						<WidgetInfotip
+							content={ widgetType.help.content }
+							links={ widgetType.help.links }
+						/>
+					) }
 				</Stack>
 			) }
-			{ children && <div className={ styles.toolbar }>{ children }</div> }
+
+			{ children && (
+				<div className={ styles.toolbar }>
+					<WidgetHeaderAvailableSizeProvider value={ availableSize }>
+						{ children }
+					</WidgetHeaderAvailableSizeProvider>
+				</div>
+			) }
 		</Card.Header>
 	);
 }

@@ -760,8 +760,14 @@ export const setRenderingMode =
  * @return {Object} Action object.
  */
 export function setDeviceType( deviceType ) {
-	return ( { dispatch } ) => {
-		const width = getCanvasWidthByDeviceType( deviceType );
+	return ( { dispatch, registry } ) => {
+		const viewportSettings = unlock(
+			registry.select( blockEditorStore )
+		).getSettings().__experimentalFeatures?.viewport;
+		const width = getCanvasWidthByDeviceType(
+			deviceType,
+			viewportSettings
+		);
 		dispatch( setCanvasWidth( width ) );
 	};
 }

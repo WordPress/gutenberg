@@ -1,14 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { privateApis as composePrivateApis } from '@wordpress/compose';
+
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../../lock-unlock';
 
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 export default ( props ) => ( element ) => {
 	const { keyboardShortcuts } = props.current;
@@ -18,5 +19,5 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	return subscribeDelegatedListener( element, 'keydown', onKeyDown, true );
+	return subscribeOwnedListener( element, 'keydown', onKeyDown, true );
 };

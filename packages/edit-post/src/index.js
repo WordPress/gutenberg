@@ -10,7 +10,6 @@ import deprecated from '@wordpress/deprecated';
 import { createRoot, StrictMode } from '@wordpress/element';
 import { dispatch, resolveSelect, select } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { applyFilters } from '@wordpress/hooks';
 import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
@@ -66,16 +65,6 @@ export function initializeEditor(
 		welcomeGuideTemplate: true,
 	} );
 
-	const collaborationNotificationPreferenceDefaults = applyFilters(
-		'editor.CollaborationNotificationPreferenceDefaults',
-		{
-			showCollaborationJoinNotifications: true,
-			showCollaborationLeaveNotifications: true,
-			showCollaborationPostSaveNotifications: true,
-		},
-		'core/edit-post'
-	);
-
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
 		editorMode: 'visual',
@@ -90,12 +79,9 @@ export function initializeEditor(
 		enableChoosePatternModal: true,
 		isPublishSidebarEnabled: true,
 		showCollaborationCursor: false,
-		showCollaborationJoinNotifications:
-			collaborationNotificationPreferenceDefaults.showCollaborationJoinNotifications,
-		showCollaborationLeaveNotifications:
-			collaborationNotificationPreferenceDefaults.showCollaborationLeaveNotifications,
-		showCollaborationPostSaveNotifications:
-			collaborationNotificationPreferenceDefaults.showCollaborationPostSaveNotifications,
+		showCollaborationJoinNotifications: true,
+		showCollaborationLeaveNotifications: true,
+		showCollaborationPostSaveNotifications: true,
 	} );
 
 	if ( window.__clientSideMediaProcessing ) {
@@ -254,6 +240,17 @@ async function preloadResolutions( postType, postId ) {
 				kind: 'postType',
 				name: 'wp_template',
 			} ),
+			// The DataForm-based inspector requests the entity form config
+			// when the document sidebar mounts. The args must match the
+			// `useViewConfig` call in `@wordpress/views` exactly for the
+			// resolution (and its preload entry) to be shared.
+			...( postType && window?.__experimentalDataFormInspector
+				? [
+						unlock( core ).getViewConfig( 'postType', postType, {
+							fields: 'form',
+						} ),
+				  ]
+				: [] ),
 			// Per-post resolvers. `getPostType` and `getEditedEntityRecord`
 			// are shorthand/forward-resolver aliases with their own
 			// resolution metadata, so they need separate kicks.
