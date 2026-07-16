@@ -77,7 +77,8 @@
 					"wp_get_global_settings"
 				],
 				"suffixClasses": [
-					"WP_Navigation_Block_Renderer"
+					"WP_Navigation_Block_Renderer",
+					"WP_Table_Of_Contents"
 				],
 				"addActionPriority": 20,
 				"flattenIndexFiles": true
