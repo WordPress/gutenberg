@@ -94,6 +94,34 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 		gutenberg_notes_disarm_mention_kses();
 	}
 
+	public function test_rest_prepare_arms_for_note_creation() {
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->set_param( 'type', 'note' );
+
+		// On creation the prepared data does not carry the comment type either:
+		// the controller only copies the `type` param in after preparing.
+		gutenberg_notes_scope_mention_kses_rest( array(), $request );
+
+		$this->assertNotFalse(
+			has_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes' ),
+			'Creating a note should arm the mention allowance.'
+		);
+
+		gutenberg_notes_disarm_mention_kses();
+	}
+
+	public function test_rest_prepare_does_not_arm_for_regular_comment_creation() {
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->set_param( 'type', 'comment' );
+
+		gutenberg_notes_scope_mention_kses_rest( array(), $request );
+
+		$this->assertFalse(
+			has_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes' ),
+			'Creating a regular comment should not arm the mention allowance.'
+		);
+	}
+
 	public function test_rest_prepare_does_not_arm_for_regular_comment_update() {
 		$post_id    = self::factory()->post->create();
 		$comment_id = self::factory()->comment->create( array( 'comment_post_ID' => $post_id ) );
@@ -132,6 +160,35 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 
 		$this->assertIsInt( $comment_id );
 		$this->assertSame( self::MENTION_FILTERED, get_comment( $comment_id )->comment_content );
+	}
+
+	public function test_mention_markup_survives_rest_note_creation_end_to_end() {
+		$author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$post_id   = self::factory()->post->create( array( 'post_author' => $author_id ) );
+
+		// Authors lack `unfiltered_html`, so comment kses filters their content.
+		wp_set_current_user( $author_id );
+		$this->assertFalse( current_user_can( 'unfiltered_html' ) );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->set_param( 'post', $post_id );
+		$request->set_param( 'type', 'note' );
+		$request->set_param( 'content', self::MENTION_CONTENT );
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		/*
+		 * REST creation reaches kses through wp_filter_comment() directly, not
+		 * through wp_new_comment() and its 'preprocess_comment' filter, so the
+		 * REST-specific arming must cover it or mentions written by users
+		 * without `unfiltered_html` are silently stripped on save.
+		 */
+		$data = $response->get_data();
+		$this->assertSame(
+			self::MENTION_FILTERED,
+			get_comment( (int) $data['id'] )->comment_content
+		);
 	}
 
 	/**

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.2.0 (2026-07-14)
+
 ### Enhancements
 
 -   Make the Playlist and Playlist Track blocks stable ([#80203](https://github.com/WordPress/gutenberg/pull/80203)).

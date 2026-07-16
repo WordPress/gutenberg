@@ -47,7 +47,7 @@ module.exports = {
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
 			'packages/$1/src',
 		'@wordpress/theme/design-tokens.js':
-			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
+			'<rootDir>/packages/theme/prebuilt/js/design-tokens.mjs',
 		'@wordpress/block-library/build-module/(.*).mjs':
 			'<rootDir>/packages/block-library/src/$1.js',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',

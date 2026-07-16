@@ -23,7 +23,7 @@ export type DragDirection = 'n' | 's' | 'e' | 'w';
 
 export type DragProps = Parameters< Parameters< typeof useDrag >[ 0 ] >[ 0 ];
 
-export type Size = 'default' | 'small' | 'compact' | '__unstable-large';
+export type Size = 'default' | 'small' | 'compact';
 
 interface BaseProps {
 	__unstableInputWidth?: CSSProperties[ 'width' ];
