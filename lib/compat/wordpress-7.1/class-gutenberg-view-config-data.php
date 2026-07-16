@@ -19,18 +19,20 @@
  *   and the `view_list` entries by view `slug` identity. This is what plugins
  *   should use: patches compose with core's configuration and with other
  *   plugins'.
- * - `replace()` replaces a whole top-level key. It shouldn't be the default
- *   choice — a callback using it stops inheriting core's future changes to
- *   that key — but it's useful for cases like a post type that doesn't
- *   want the default form at all.
+ * - `replace()` applies a patch the same way `merge()` does, with one
+ *   difference: a list in the patch replaces the current list wholesale
+ *   instead of merging into it by member identity. It shouldn't be the
+ *   default choice — a callback that replaces a list stops inheriting core's
+ *   future additions to it — but it's useful when a contributor needs to pin
+ *   a list to an exact set of members.
  *
- * Patches follow three shared rules: an associative array merges key by
- * key, a numerically indexed array replaces the current value wholesale,
- * and `null` deletes what it names — deleting a whole top-level key resets
- * it to its default. Each patch and each `replace()` value also declares the
- * configuration schema version it was written against (currently 1), so a
- * future WordPress release that changes the configuration shape can migrate
- * existing patches forward instead of breaking them.
+ * Both methods follow the same rules for the rest of a patch: an associative
+ * array merges key by key, `null` deletes what it names — deleting a whole
+ * top-level key resets it to its default — and a scalar replaces the current
+ * value. Each patch also declares the configuration schema version it was
+ * written against (currently 1), so a future WordPress release that changes
+ * the configuration shape can migrate existing patches forward instead of
+ * breaking them.
  *
  * @since 7.1.0
  */
@@ -83,42 +85,29 @@ class Gutenberg_View_Config_Data {
 	}
 
 	/**
-	 * Replaces a whole top-level key with a new value.
+	 * Replaces list values while merging the rest of a partial configuration.
 	 *
-	 * It shouldn't be the default choice — a callback using it stops
-	 * inheriting core's future changes to that key — but it's useful for
-	 * cases like a post type that doesn't want the default form at all.
+	 * Takes the same arguments as merge() and applies the patch the same way,
+	 * with one difference: a list in the patch replaces the current list
+	 * wholesale instead of merging into it by member identity. Associative
+	 * arrays still merge key by key, `null` still drops what it names, and a
+	 * scalar still replaces the current value.
 	 *
-	 * A value that declares an unsupported schema version is rejected and
-	 * does not replace anything.
+	 * It shouldn't be the default choice — a callback that replaces a list
+	 * stops inheriting core's future additions to it — but it's useful when a
+	 * contributor needs to pin a list to an exact set of members.
+	 *
+	 * A patch that declares an unsupported schema version is rejected and does
+	 * not change anything.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param string $key     The configuration key to replace.
-	 * @param mixed  $value   The new value.
-	 * @param int    $version The schema version the value was authored against.
+	 * @param array $patch   The partial configuration to apply.
+	 * @param int   $version The schema version the patch was authored against.
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
-	public function replace( $key, $value, int $version ) {
-		if ( ! $this->check_version( $version, __METHOD__ ) ) {
-			return $this;
-		}
-
-		if ( ! in_array( $key, self::CONFIG_KEYS, true ) ) {
-			_doing_it_wrong(
-				__METHOD__,
-				sprintf(
-					/* translators: %s: the configuration key. */
-					esc_html__( '"%s" is not a documented view configuration key.', 'gutenberg' ),
-					esc_html( $key )
-				),
-				'7.1.0'
-			);
-			return $this;
-		}
-
-		$this->config[ $key ] = $value;
-		return $this;
+	public function replace( array $patch, int $version ) {
+		return $this->apply( $patch, $version, __METHOD__, true );
 	}
 
 	/**
@@ -151,14 +140,39 @@ class Gutenberg_View_Config_Data {
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
 	public function merge( array $patch, int $version ) {
-		if ( ! $this->check_version( $version, __METHOD__ ) ) {
+		return $this->apply( $patch, $version, __METHOD__, false );
+	}
+
+	/**
+	 * Applies a patch to the configuration, top-level key by top-level key.
+	 *
+	 * Shared by merge() and replace(); the two differ only in how a list in the
+	 * patch is treated, which is carried by $replace_lists.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param array  $patch         The partial configuration to apply.
+	 * @param int    $version       The schema version the patch was authored against.
+	 * @param string $method        The public method the patch was passed to, for misuse reporting.
+	 * @param bool   $replace_lists Whether a list in the patch replaces the current list
+	 *                              wholesale ( replace() ) instead of merging by identity ( merge() ).
+	 * @return Gutenberg_View_Config_Data The instance, for chaining.
+	 */
+	private function apply( array $patch, int $version, $method, $replace_lists ) {
+		if ( $version <= 0 || $version > self::LATEST_VERSION ) {
+			_doing_it_wrong(
+				esc_html( $method ),
+				esc_html__( 'A view configuration contribution must declare a supported schema version.', 'gutenberg' ),
+				'7.1.0'
+			);
+
 			return $this;
 		}
 
 		foreach ( $patch as $key => $value ) {
 			if ( ! in_array( $key, self::CONFIG_KEYS, true ) ) {
 				_doing_it_wrong(
-					__METHOD__,
+					esc_html( $method ),
 					sprintf(
 						/* translators: %s: the configuration key. */
 						esc_html__( '"%s" is not a documented view configuration key.', 'gutenberg' ),
@@ -175,45 +189,23 @@ class Gutenberg_View_Config_Data {
 				continue;
 			}
 
-			$this->config[ $key ] = $this->merge_properties( $this->config[ $key ] ?? array(), $value );
+			$this->config[ $key ] = $this->merge_properties( $this->config[ $key ] ?? array(), $value, $replace_lists );
 		}
 
 		return $this;
 	}
 
 	/**
-	 * Validates a declared patch version, reporting misuse against the given
-	 * public method.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param int    $version The declared version.
-	 * @param string $method  The public method the patch was passed to.
-	 * @return bool Whether the declared version is a supported schema version.
-	 */
-	private function check_version( int $version, $method ) {
-		if ( $version >= 1 && $version <= self::LATEST_VERSION ) {
-			return true;
-		}
-
-		_doing_it_wrong(
-			esc_html( $method ),
-			esc_html__( 'A view configuration contribution must declare a supported schema version.', 'gutenberg' ),
-			'7.1.0'
-		);
-
-		return false;
-	}
-
-	/**
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param mixed $current  The current value.
-	 * @param mixed $incoming The incoming value.
+	 * @param mixed $current       The current value.
+	 * @param mixed $incoming      The incoming value.
+	 * @param bool  $replace_lists Whether a list in $incoming replaces the current list
+	 *                             wholesale instead of merging into it by member identity.
 	 * @return mixed The merged value.
 	 */
-	private function merge_properties( $current, $incoming ) {
+	private function merge_properties( $current, $incoming, $replace_lists ) {
 		// Scalar properties are merged as-is.
 		if ( ! is_array( $incoming ) ) {
 			return $incoming;
@@ -221,6 +213,10 @@ class Gutenberg_View_Config_Data {
 
 		// Numerical indexed arrays are expected to be lists (sequential integer keys starting at 0).
 		if ( array_is_list( $incoming ) ) {
+			// replace() takes an incoming list as-is; merge() merges it by member identity.
+			if ( $replace_lists ) {
+				return $incoming;
+			}
 			return $this->merge_list_by_identity(
 				is_array( $current ) && array_is_list( $current ) ? $current : array(),
 				$incoming
@@ -238,7 +234,8 @@ class Gutenberg_View_Config_Data {
 
 			$result[ $key ] = $this->merge_properties(
 				array_key_exists( $key, $result ) ? $result[ $key ] : array(),
-				$value
+				$value,
+				$replace_lists
 			);
 		}
 
@@ -284,7 +281,7 @@ class Gutenberg_View_Config_Data {
 			}
 
 			// Otherwise, merge the incoming member into the existing one in place.
-			$result[ $index ] = $this->merge_properties( $result[ $index ], $item );
+			$result[ $index ] = $this->merge_properties( $result[ $index ], $item, false );
 		}
 
 		return $result;
