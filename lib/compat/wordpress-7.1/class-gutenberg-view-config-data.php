@@ -316,7 +316,7 @@ class Gutenberg_View_Config_Data {
 		}
 
 		if ( is_array( $item ) && ! array_is_list( $item ) ) {
-			foreach ( array( 'id', 'slug', 'field', 'name' ) as $key ) {
+			foreach ( array( 'id', 'slug', 'field' ) as $key ) {
 				if ( isset( $item[ $key ] ) && is_scalar( $item[ $key ] ) ) {
 					return (string) $item[ $key ];
 				}

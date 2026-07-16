@@ -567,4 +567,156 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$this->assertSame( array( 'default_view' => array( 'type' => 'table' ) ), $data->get_config() );
 	}
 
+
+	public function test_identity_for_scalars(){
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'fields' => array(
+						'title'
+					),
+				),
+			)
+		);
+		$data->merge(
+			array(
+				'default_view' => array(
+					'fields' => array(
+						'title',
+						'slug'
+					),
+				),
+			),
+			1
+		);
+
+		$this->assertSame( array(
+			'default_view' => array(
+				'fields' => array(
+					'title',
+					'slug'
+				),
+			),
+			),
+			$data->get_config()
+		);
+	}
+
+	public function test_identity_for_key_id(){
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'form' => array(
+					'fields' => array(
+						'title', // this scalar will be matched with array( 'id' => 'title' )
+						array(
+							'id' => 'slug',
+							'label' => 'Slug'
+						)
+					),
+				),
+			)
+		);
+		$data->merge(
+			array(
+				'form' => array(
+					'fields' => array(
+						array(
+							'id' => 'title',
+							'label' => 'Changed'
+						),
+						array(
+							'id' => 'slug',
+							'label' => 'Changed'
+						)
+					),
+				),
+			),
+			1
+		);
+
+		$this->assertSame( array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id' => 'title',
+						'label' => 'Changed'
+					),
+					array(
+						'id' => 'slug',
+						'label' => 'Changed'
+					)
+				),
+			),
+			),
+			$data->get_config()
+		);
+	}
+
+	public function test_identity_for_key_slug(){
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'view_list' => array(
+					array(
+						'slug'  => 'all',
+						'title' => 'All',
+					),
+				),
+			)
+		);
+		$data->merge(
+			array(
+				'view_list' => array(
+					array(
+						'slug'  => 'all',
+						'title' => 'Changed',
+					)
+				),
+			),
+			1
+		);
+
+		$this->assertSame( array(
+			'view_list' => array(
+				array(
+					'slug'  => 'all',
+					'title' => 'Changed',
+				),
+			),
+			),
+			$data->get_config()
+		);
+	}
+
+	public function test_identity_for_key_field(){
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'filters' => array(
+						array( 'field' => 'id1', 'operator' => 'op1', 'value' => [ 'val1' ] ),
+					)
+				),
+			)
+		);
+		$data->merge(
+			array(
+				'default_view' => array(
+					'filters' => array(
+						array( 'field' => 'id1', 'operator' => 'change' ),
+					)
+				),
+			),
+			1
+		);
+
+		$this->assertSame( array(
+			'default_view' => array(
+				'filters' => array(
+					array( 'field' => 'id1', 'operator' => 'change', 'value' => [ 'val1' ] ),
+				)
+			),
+			),
+			$data->get_config()
+		);
+	}
+
 }
