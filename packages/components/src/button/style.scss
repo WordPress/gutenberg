@@ -305,7 +305,8 @@
 	}
 
 	&.has-icon {
-		padding-block: var(--wpds-dimension-padding-xs);
+		// Legacy 6px has no exact WPDS padding token match (xs is 4px, sm is 8px).
+		padding-block: 6px;
 		padding-inline: 0;
 
 		// Icon buttons are square.
