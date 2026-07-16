@@ -11,7 +11,8 @@
 			--wp-ui-menu-min-width: 160px;
 			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-md);
 			--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-md);
-			--wp-ui-menu-selection-indicator-size: 0px;
+			--wp-ui-menu-selection-indicator-track-size: 0px;
+			--wp-ui-menu-selection-indicator-size: var(--wpds-dimension-size-sm);
 			--wp-ui-menu-selection-indicator-gap: 0px;
 			--_wp-ui-menu-elevation-md: 0px 2px 3px 0px #0000000d, 0px 4px 5px 0px #0000000a, 0px 12px 12px 0px #00000008, 0px 16px 16px 0px #00000005;
 
@@ -28,7 +29,7 @@
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 
 			&:has(.item-selection-indicator) {
-				--wp-ui-menu-selection-indicator-size: var(--wpds-dimension-size-sm);
+				--wp-ui-menu-selection-indicator-track-size: var(--wpds-dimension-size-2xs);
 				--wp-ui-menu-selection-indicator-gap: var(--wpds-dimension-gap-sm);
 			}
 		}
@@ -60,7 +61,7 @@
 			display: grid;
 			grid-template-columns:
 				[item-padding-start] var(--wp-ui-menu-item-padding-inline)
-				[selection-start] var(--wp-ui-menu-selection-indicator-size)
+				[selection-start] var(--wp-ui-menu-selection-indicator-track-size)
 				[selection-end] var(--wp-ui-menu-selection-indicator-gap)
 				[prefix-start] max-content
 				[prefix-end] var(--wp-ui-menu-group-prefix-gap)
@@ -120,7 +121,7 @@
 			grid-column: 1 / -1;
 			grid-template-columns:
 				[item-padding-start] var(--wp-ui-menu-item-padding-inline)
-				[selection-start] var(--wp-ui-menu-selection-indicator-size)
+				[selection-start] var(--wp-ui-menu-selection-indicator-track-size)
 				[selection-end] var(--wp-ui-menu-selection-indicator-gap)
 				[prefix-start] max-content
 				[prefix-end] var(--wp-ui-menu-group-prefix-gap)
