@@ -268,11 +268,12 @@ The build plugins inject generated fallbacks into bare `var(--wpds-*)` reference
 
 `@wordpress/build` already applies these plugins automatically when `@wordpress/theme` is installed. You only need to configure them manually for custom build setups.
 
-| Export                                                        | Tool    | Scope |
-| ------------------------------------------------------------- | ------- | ----- |
-| `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks` | PostCSS | CSS   |
-| `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks` | esbuild | JS/TS |
-| `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`       | Vite    | JS/TS |
+| Export                                                                  | Tool          | Scope |
+| ----------------------------------------------------------------------- | ------------- | ----- |
+| `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`           | PostCSS       | CSS   |
+| `@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks` | Lightning CSS | CSS   |
+| `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`           | esbuild       | JS/TS |
+| `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`                 | Vite          | JS/TS |
 
 Existing fallbacks are unchanged. An unknown token in a bare reference fails the build.
 
@@ -285,6 +286,19 @@ import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-
 export default {
 	plugins: [ dsTokenFallbacks ],
 };
+```
+
+### Lightning CSS
+
+```js
+import { transform, composeVisitors } from 'lightningcss';
+import dsTokenFallbacks from '@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks';
+
+const { code } = transform( {
+	filename: 'styles.css',
+	code: Buffer.from( css ),
+	visitor: composeVisitors( [ dsTokenFallbacks ] ),
+} );
 ```
 
 ### esbuild
