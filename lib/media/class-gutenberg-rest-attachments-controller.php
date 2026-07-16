@@ -1163,8 +1163,10 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		// Read dimensions once up-front. Needed both for early-error handling
 		// (corrupted/unsupported files) and for populating the sub-size payload
-		// below. Scalar 'original' is a byte-only passthrough and does not need
-		// dimensions, but reading them here is harmless.
+		// below. 'original' and 'scaled' both replace the main file, so their
+		// dimensions are written to metadata; 'original' is additionally
+		// validated against the stored attachment size (it must match it or be
+		// its transpose).
 		//
 		// 'animated_video' companions are video files (MP4/WebM); the image
 		// helpers can't read their dimensions and would falsely report the
