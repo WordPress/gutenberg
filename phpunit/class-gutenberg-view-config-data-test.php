@@ -1195,7 +1195,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 
-	public function test_identity_for_scalars(){
+	public function test_merge_identity_for_scalars(){
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
@@ -1229,7 +1229,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_identity_for_key_id(){
+	public function test_merge_identity_for_key_id(){
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'form' => array(
@@ -1279,7 +1279,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_identity_for_key_slug(){
+	public function test_merge_identity_for_key_slug(){
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'view_list' => array(
@@ -1314,7 +1314,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_identity_for_key_field(){
+	public function test_merge_identity_for_key_field(){
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
