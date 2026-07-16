@@ -322,14 +322,25 @@ export const GroupedItems: Story = {
 							prefix={
 								<Icon
 									icon={ archive }
-									size={ 24 }
+									size={ 32 }
 									aria-hidden
 								/>
 							}
 						>
 							New draft
 						</Menu.Item>
-						<Menu.Item shortcut={ SHORTCUTS.save }>Save</Menu.Item>
+						<Menu.Item
+							prefix={
+								<Icon
+									icon={ archive }
+									size={ 24 }
+									aria-hidden
+								/>
+							}
+							shortcut={ SHORTCUTS.save }
+						>
+							Save
+						</Menu.Item>
 						<Menu.Item suffix="Edited">
 							<Menu.ItemLabel>Save as copy</Menu.ItemLabel>
 							<Menu.ItemDescription>
