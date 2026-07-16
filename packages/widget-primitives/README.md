@@ -60,6 +60,13 @@ the hook in its loading state: `widgetTypes` is empty and
     `Field` whose `id` is narrowed to the keys of the widget's attribute
     object, with an optional `relevance` hint (`'high' | 'low'`) marking
     attributes a host may promote to a prominent surface.
+-   `WidgetAction`: a declarative action a widget type exposes, the
+    declarative sibling of a DataViews `Action`. Each carries `id`,
+    `label`, `href`, and optional `download` / `openInNewTab`. The widget
+    names the intent and a link target; the host renders it as an anchor and
+    owns placement (the dashboard surfaces them in a "More" menu). Only the
+    link target exists today; because navigation and download are the
+    browser's, the widget stays host-agnostic.
 -   Field types: `registerFieldType( definition )` names a reusable
     field type (`{ name: 'location', baseType: 'text', Edit, ... }`,
     typed by `FieldTypeDefinition`) that attributes can reference via

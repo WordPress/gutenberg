@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### New Features
+
+-   `WidgetTypeMetadata`: add optional `actions`, a declarative list of
+    user-triggerable links a widget exposes. Each `WidgetAction` carries
+    `id`, `label`, `href`, and optional `download` / `openInNewTab`, and is
+    also carried by `WidgetModuleRecord` with labels localized server-side.
+
 ### Documentation
 
 -   Spell out the accepted field-type name syntax: lowercase kebab-case
