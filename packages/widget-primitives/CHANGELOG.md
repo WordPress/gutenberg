@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Spell out the accepted field-type name syntax: lowercase kebab-case
+    segments, with at most one namespace level ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+
+### Internal
+
+-   Add an integration test covering named field-type resolution in
+    `useWidgetTypes` ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+
 ## 0.3.0 (2026-07-14)
 
 ### New Features

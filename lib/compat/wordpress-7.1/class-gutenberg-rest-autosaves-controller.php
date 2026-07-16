@@ -110,7 +110,7 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 
 		if ( $should_update_parent_draft_post ) {
 			$autosave_id = wp_update_post( wp_slash( (array) $prepared_post ), true );
-		} elseif ( $this->is_redundant_autosave( $post, (array) $prepared_post, (array) $request->get_param( 'meta' ), $user_id ) ) {
+		} elseif ( $this->is_redundant_autosave( $post, (array) $prepared_post, (array) $request->get_param( 'meta' ) ) ) {
 			/*
 			 * Nothing changed and there is no existing autosave to update, so
 			 * storing a revision would only create one that is identical to the
@@ -138,39 +138,35 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	/**
 	 * Determines whether an incoming autosave would be a redundant no-op.
 	 *
-	 * Core's WP_REST_Autosaves_Controller::create_post_autosave() already avoids
-	 * a redundant write, but only when an autosave already exists for the user.
-	 * When none exists yet, it still creates a brand-new revision even if that
-	 * revision is identical to the parent post.
+	 * Core's WP_REST_Autosaves_Controller::create_post_autosave() avoids a
+	 * redundant write by comparing the incoming autosave against the parent post.
+	 * That baseline is wrong under RTC. The parent draft is intentionally never
+	 * updated, so peer autosaves can accumulate as revisions while the parent stays
+	 * stale. An autosave that matches the latest shared revision still looks different
+	 * from the parent, so core stores another revision identical to the previous
+	 * one, which renders as a blank diff on the revisions page.
 	 *
-	 * The revisioned post fields (title, content, excerpt) and revisioned meta
-	 * (e.g. `footnotes`) are compared, matching the fields core itself diffs.
-	 * Revisioned meta matters because some edits live only in meta: changing a
-	 * footnote's text leaves the post content untouched, and previewing those
-	 * changes depends on the autosave carrying the new meta, so it must not be
-	 * skipped. Non-revisioned meta (e.g. the constantly changing `_crdt_document`)
-	 * is naturally excluded because it is not a revisioned meta key.
+	 * The correct baseline is the most recent revision when it is newer
+	 * than the parent (the RTC case), falling back to the parent when no revision
+	 * exists yet. The revisioned post fields (title, content, excerpt) and
+	 * revisioned meta (e.g. `footnotes`) are compared, matching the fields core
+	 * itself diffs. Non-revisioned meta (e.g. `_crdt_document`) is excluded.
 	 *
-	 * @since 7.1.0
+	 * @since 7.2.0
 	 *
 	 * @param WP_Post $post      The saved parent post.
 	 * @param array   $post_data Prepared autosave post data.
 	 * @param array   $meta      Meta values submitted with the autosave.
-	 * @param int     $user_id   The current user ID.
 	 * @return bool Whether the autosave can be skipped without losing anything.
 	 */
-	private function is_redundant_autosave( $post, $post_data, $meta, $user_id ) {
-		// Core already returns the existing autosave unchanged when nothing
-		// differs, so only the first autosave needs guarding here.
-		if ( wp_get_post_autosave( $post->ID, $user_id ) ) {
-			return false;
-		}
+	private function is_redundant_autosave( $post, $post_data, $meta ) {
+		$baseline = $this->get_autosave_comparison_baseline( $post );
 
 		$new_autosave    = _wp_post_revision_data( $post_data, true );
-		$revision_fields = _wp_post_revision_fields( $post );
+		$revision_fields = _wp_post_revision_fields( $baseline );
 
 		foreach ( array_intersect( array_keys( $new_autosave ), array_keys( $revision_fields ) ) as $field ) {
-			if ( normalize_whitespace( $new_autosave[ $field ] ) !== normalize_whitespace( $post->$field ) ) {
+			if ( normalize_whitespace( $new_autosave[ $field ] ) !== normalize_whitespace( $baseline->$field ) ) {
 				return false;
 			}
 		}
@@ -179,7 +175,7 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			// get_metadata_raw avoids the registered default. Treat an unset value
 			// and an empty string as equivalent so the editor's empty default for
 			// an unset key is not mistaken for a change.
-			$old_meta = get_metadata_raw( 'post', $post->ID, $meta_key, true ) ?? '';
+			$old_meta = get_metadata_raw( 'post', $baseline->ID, $meta_key, true ) ?? '';
 			$new_meta = $meta[ $meta_key ] ?? '';
 
 			if ( $old_meta !== $new_meta ) {
@@ -188,5 +184,46 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Returns the post to compare an incoming autosave against.
+	 *
+	 * Under RTC the parent draft is not updated with an autosave, so its latest content
+	 * lives in the most recent revision. When that revision is newer than the parent it is
+	 * the correct baseline; otherwise (no revisions yet, or the parent was updated
+	 * directly) the parent post is used.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_Post $post The saved parent post.
+	 * @return WP_Post The post or revision to compare against.
+	 */
+	private function get_autosave_comparison_baseline( $post ) {
+		// Outside RTC the parent post is kept up to date (author draft autosaves
+		// update it directly), so core's parent comparison is already correct.
+		// Keep the default behavior for non-RTC.
+		if ( ! wp_is_collaboration_enabled() ) {
+			return $post;
+		}
+
+		// wp_get_post_revisions() returns revisions newest-first by default, and
+		// includes per-user autosaves (they are revisions), so the first entry is
+		// the most recent shared content.
+		$revisions       = wp_get_post_revisions( $post->ID, array( 'posts_per_page' => 1 ) );
+		$latest_revision = empty( $revisions ) ? null : array_shift( $revisions );
+
+		// Note that a draft which has never been updated keeps the floating
+		// post_modified_gmt of '0000-00-00 00:00:00', so any revision compares
+		// as newer than it. That is the desired outcome: under RTC the
+		// revisions hold newer content than the untouched parent draft.
+		if (
+			$latest_revision &&
+			$latest_revision->post_modified_gmt >= $post->post_modified_gmt
+		) {
+			return $latest_revision;
+		}
+
+		return $post;
 	}
 }

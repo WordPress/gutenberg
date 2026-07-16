@@ -143,7 +143,7 @@ describe( 'resizeImage', () => {
 				width: 100,
 				height: 100,
 			},
-			true
+			{ smartCrop: true }
 		);
 
 		expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
@@ -169,7 +169,7 @@ describe( 'resizeImage', () => {
 				height: 100,
 				crop: true,
 			},
-			true
+			{ smartCrop: true }
 		);
 
 		expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
@@ -322,6 +322,153 @@ describe( 'resizeImage', () => {
 			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
 				'.avif',
 				expect.not.objectContaining( { bitdepth: expect.anything() } )
+			);
+		} );
+	} );
+
+	describe( 'image_strip_meta', () => {
+		it( 'strips metadata except color profiles and gain maps by default', async () => {
+			const jpegFile = new File( [ '<BLOB>' ], 'example.jpg', {
+				type: 'image/jpeg',
+			} );
+			const buffer = await jpegFile.arrayBuffer();
+
+			await resizeImage( 'itemId', buffer, 'image/jpeg', {
+				width: 100,
+				height: 100,
+			} );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.objectContaining( { keep: 'icc|gainmap' } )
+			);
+		} );
+
+		it( 'keeps all metadata when stripping is disabled', async () => {
+			const jpegFile = new File( [ '<BLOB>' ], 'example.jpg', {
+				type: 'image/jpeg',
+			} );
+			const buffer = await jpegFile.arrayBuffer();
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/jpeg',
+				{
+					width: 100,
+					height: 100,
+				},
+				{ stripMeta: false }
+			);
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.objectContaining( { keep: 'all' } )
+			);
+		} );
+	} );
+
+	describe( 'image_max_bit_depth', () => {
+		it( 'caps a 12-bit AVIF at 10-bit', async () => {
+			mockBitdepth = 12;
+			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
+				type: 'image/avif',
+			} );
+			const buffer = await avifFile.arrayBuffer();
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/avif',
+				{
+					width: 50,
+					height: 50,
+				},
+				{ maxBitdepth: 10 }
+			);
+
+			// Still high-bit-depth, so the precision-preserving path is used.
+			expect( mockResize ).toHaveBeenCalled();
+			expect( mockThumbnailBuffer ).not.toHaveBeenCalled();
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.avif',
+				expect.objectContaining( { bitdepth: 10 } )
+			);
+		} );
+
+		it( 'snaps an unsupported cap down to the nearest valid depth', async () => {
+			mockBitdepth = 12;
+			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
+				type: 'image/avif',
+			} );
+			const buffer = await avifFile.arrayBuffer();
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/avif',
+				{
+					width: 50,
+					height: 50,
+				},
+				{ maxBitdepth: 11 } // AVIF only supports 8, 10, and 12.
+			);
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.avif',
+				expect.objectContaining( { bitdepth: 10 } )
+			);
+		} );
+
+		it( 'flattens a 10-bit AVIF via the thumbnail path when capped at 8-bit', async () => {
+			mockBitdepth = 10;
+			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
+				type: 'image/avif',
+			} );
+			const buffer = await avifFile.arrayBuffer();
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/avif',
+				{
+					width: 50,
+					height: 50,
+				},
+				{ maxBitdepth: 8 }
+			);
+
+			// An 8-bit result does not need the precision-preserving path,
+			// so the regular colour-managed thumbnail path is used.
+			expect( mockThumbnailBuffer ).toHaveBeenCalled();
+			expect( mockResize ).not.toHaveBeenCalled();
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.avif',
+				expect.not.objectContaining( { bitdepth: expect.anything() } )
+			);
+		} );
+
+		it( 'ignores the cap for sources at or below it', async () => {
+			mockBitdepth = 10;
+			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
+				type: 'image/avif',
+			} );
+			const buffer = await avifFile.arrayBuffer();
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/avif',
+				{
+					width: 50,
+					height: 50,
+				},
+				{ maxBitdepth: 12 }
+			);
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.avif',
+				expect.objectContaining( { bitdepth: 10 } )
 			);
 		} );
 	} );

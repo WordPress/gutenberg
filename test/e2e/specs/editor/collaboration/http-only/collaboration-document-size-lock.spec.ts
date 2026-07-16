@@ -7,7 +7,7 @@ import { SECOND_USER } from '../fixtures/collaboration-utils';
 const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
 
 test.describe( 'Collaboration with large documents', () => {
-	test.skip( 'shows post-locked modal when document size limit is exceeded', async ( {
+	test( 'shows post-locked modal when document size limit is exceeded', async ( {
 		collaborationUtils,
 		requestUtils,
 		admin,
@@ -137,9 +137,10 @@ test.describe( 'Collaboration with large documents', () => {
 				`/wp-admin/post.php?post=${ post.id }&action=edit`
 			);
 
-			// Assert the post-locked modal appears. Match it by its stable
-			// class rather than the dialog title, which depends on the lock
-			// state and isn't what this test is concerned with.
+			// Assert the post-locked modal appears.
+			// Because collaboration is disabled (document too large),
+			// WordPress falls back to standard post-locking. User 2
+			// sees the post-locked modal.
 			const modal = page2.locator( '.editor-post-locked-modal' );
 			await expect( modal ).toBeVisible( { timeout: 60000 } );
 
