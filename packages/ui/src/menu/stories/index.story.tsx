@@ -186,7 +186,10 @@ export const Default: Story = {
 					</Menu.RadioGroup>
 					<Menu.Separator />
 					<Menu.SubmenuRoot>
-						<Menu.SubmenuTrigger shortcut={ SHORTCUTS.move }>
+						<Menu.SubmenuTrigger
+							shortcut={ SHORTCUTS.move }
+							suffix="3"
+						>
 							<Menu.ItemLabel>Move to</Menu.ItemLabel>
 							<Menu.ItemDescription>
 								Choose another collection.

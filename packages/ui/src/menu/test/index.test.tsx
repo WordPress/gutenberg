@@ -13,6 +13,14 @@ function queryItemShortcut( item: HTMLElement ) {
 	return item.querySelector( '.style-item-shortcut' );
 }
 
+function queryItemSuffix( item: HTMLElement ) {
+	return item.querySelector( '.style-item-suffix' );
+}
+
+function queryItemTrailing( item: HTMLElement ) {
+	return item.querySelector( '.style-item-trailing' );
+}
+
 describe( 'Menu', () => {
 	it( 'opens from the trigger and exposes menu semantics', async () => {
 		const user = userEvent.setup();
@@ -281,6 +289,52 @@ describe( 'Menu', () => {
 		expect(
 			screen.getByRole( 'menuitem', { name: 'Move to' } )
 		).toHaveAttribute( 'aria-keyshortcuts', 'Meta+M' );
+	} );
+
+	it( 'renders submenu suffixes before shortcuts and chevrons after shortcuts', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.SubmenuRoot>
+						<Menu.SubmenuTrigger
+							suffix="Recent"
+							shortcut={ {
+								displayShortcut: '⌘M',
+								ariaKeyShortcut: 'Meta+M',
+								description: 'Command M',
+							} }
+						>
+							Move to
+						</Menu.SubmenuTrigger>
+						<Menu.Popup>
+							<Menu.Item>Archive</Menu.Item>
+						</Menu.Popup>
+					</Menu.SubmenuRoot>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		const item = await screen.findByRole( 'menuitem', {
+			name: 'Move to',
+		} );
+		const suffix = queryItemSuffix( item );
+		const shortcut = queryItemShortcut( item );
+		const trailing = queryItemTrailing( item );
+
+		expect( suffix ).toHaveTextContent( 'Recent' );
+		expect( shortcut ).toHaveTextContent( '⌘M' );
+		expect( trailing ).toBeInTheDocument();
+		expect( suffix?.compareDocumentPosition( shortcut as Node ) ).toBe(
+			Node.DOCUMENT_POSITION_FOLLOWING
+		);
+		expect( shortcut?.compareDocumentPosition( trailing as Node ) ).toBe(
+			Node.DOCUMENT_POSITION_FOLLOWING
+		);
 	} );
 
 	it( 'does not render empty prefix slots', async () => {
