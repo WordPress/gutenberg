@@ -6,11 +6,10 @@
 	// we add padding around the menu items.
 	// At the same time, we use the same value to tweak margins so that
 	// the items still retain the same position and footprint.
-	$padding-to-avoid-cutting-focus-ring: 2px;
-	padding: $padding-to-avoid-cutting-focus-ring;
-	margin-block-start: -$padding-to-avoid-cutting-focus-ring;
-	margin-block-end: $padding-to-avoid-cutting-focus-ring;
-	margin-inline-start: calc(var(--wpds-dimension-gap-2xl) - #{$padding-to-avoid-cutting-focus-ring});
+	padding: var(--wpds-border-width-focus);
+	margin-block-start: calc(var(--wpds-border-width-focus) * -1);
+	margin-block-end: var(--wpds-border-width-focus);
+	margin-inline-start: calc(var(--wpds-dimension-gap-2xl) - var(--wpds-border-width-focus));
 	overflow: hidden;
 
 	:global(.components-item) {
