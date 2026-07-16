@@ -506,9 +506,12 @@ class Gutenberg_View_Config_Data {
 	/**
 	 * Resolves the identity used to match a list member against another.
 	 *
-	 * A scalar is its own identity; a map is identified by the first of the
-	 * well-known identity keys it carries. Anything else (e.g. a nested list)
-	 * has no identity and never matches, so it is always appended.
+	 * A bare scalar is shorthand for a member referenced by its `id`, so it
+	 * shares an identity with a map carrying that same `id` (this is how a
+	 * bare field like `'f3'` and a `array( 'id' => 'f3' )` patch match). A map
+	 * is otherwise identified by the first of the well-known identity keys it
+	 * carries. Anything else (e.g. a nested list) has no identity and never
+	 * matches, so it is always appended.
 	 *
 	 * @since 7.1.0
 	 *
@@ -517,7 +520,7 @@ class Gutenberg_View_Config_Data {
 	 */
 	private function list_item_identity( $item ) {
 		if ( is_scalar( $item ) ) {
-			return $item;
+			return 'id:' . $item;
 		}
 		if ( is_array( $item ) && ! array_is_list( $item ) ) {
 			foreach ( array( 'id', 'slug', 'field', 'name' ) as $key ) {

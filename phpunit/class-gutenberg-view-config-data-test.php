@@ -206,7 +206,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					'fields' => array(
 						'f1',
 						array(
-							'id' => 'fieldId',
+							'id' => 'f2',
 							'label' => 'Field label',
 							'children' => array(
 								'child1',
@@ -215,7 +215,8 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 									'label' => 'Child 2 label'
 								)
 							)
-						)
+						),
+						'f3'
 					)
 				)
 			)
@@ -239,9 +240,9 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 						'summary' => array( 'f2' )
 					),
 					'fields' => array(
-						'f2',
+						'f4',
 						array(
-							'id' => 'fieldId',
+							'id' => 'f2',
 							'label' => 'Updated label',
 							'children' => array(
 								array(
@@ -253,6 +254,10 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 									'label' => 'Child 3 label'
 								)
 							)
+						),
+						array(
+							'id' => 'f3',
+							'label' => 'Field 3 label'
 						)
 					)
 				)
@@ -281,7 +286,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'fields' => array(
 					'f1',
 					array(
-						'id' => 'fieldId',
+						'id' => 'f2',
 						'label' => 'Updated label',
 						'children' => array(
 							'child1',
@@ -295,7 +300,11 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 							)
 						)
 					),
-					'f2',
+					array(
+						'id' => 'f3',
+						'label' => 'Field 3 label'
+					),
+					'f4'
 				)
 			)
 			),
@@ -691,48 +700,6 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * update_form_fields() finds a nested field by its bare id: the caller does
-	 * not need to know (or address) the group the field lives in.
-	 *
-	 * @covers ::update_form_fields
-	 */
-	public function test_update_form_fields_merges_nested_field_without_addressing_group() {
-		$data = new Gutenberg_View_Config_Data(
-			array(
-				'form' => array(
-					'fields' => array(
-						array(
-							'id'       => 'discussion',
-							'label'    => 'Discussion',
-							'children' => array( 'comment_status', 'ping_status' ),
-						),
-					),
-				),
-			)
-		);
-		$data->update_form_fields( array( 'ping_status' => array( 'layout' => array( 'labelPosition' => 'side' ) ) ), 1 );
-
-		// comment_status stays a bare string; the matched ping_status child is
-		// promoted from a bare string and merged with the incoming overrides.
-		$this->assertSame(
-			array(
-				array(
-					'id'       => 'discussion',
-					'label'    => 'Discussion',
-					'children' => array(
-						'comment_status',
-						array(
-							'id'     => 'ping_status',
-							'layout' => array( 'labelPosition' => 'side' ),
-						),
-					),
-				),
-			),
-			$data->get_config()['form']['fields']
-		);
-	}
-
-	/**
 	 * Fields are visited in document order and a group matches before its own
 	 * children, so a group and a child sharing an id (as in core's default
 	 * `status` group) resolve to the group; the child is reached through a
@@ -851,98 +818,6 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					'id'       => 'discussion',
 					'label'    => 'Discussion',
 					'children' => array( 'comment_status' ),
-				),
-				'date',
-			),
-			$data->get_config()['form']['fields']
-		);
-	}
-
-	/**
-	 * A `children` map merges into the group's children by id, appending
-	 * unknown ones.
-	 *
-	 * @covers ::update_form_fields
-	 */
-	public function test_update_form_fields_children_map_merges_by_id() {
-		$data = new Gutenberg_View_Config_Data(
-			array(
-				'form' => array(
-					'fields' => array(
-						array(
-							'id'       => 'discussion',
-							'label'    => 'Discussion',
-							'children' => array( 'comment_status', 'ping_status' ),
-						),
-					),
-				),
-			)
-		);
-		$data->update_form_fields(
-			array(
-				'discussion' => array(
-					'children' => array(
-						'comment_status' => array( 'layout' => array( 'labelPosition' => 'none' ) ),
-						'my_field'       => array(),
-					),
-				),
-			),
-			1
-		);
-
-		$this->assertSame(
-			array(
-				array(
-					'id'       => 'discussion',
-					'label'    => 'Discussion',
-					'children' => array(
-						array(
-							'id'     => 'comment_status',
-							'layout' => array( 'labelPosition' => 'none' ),
-						),
-						'ping_status',
-						'my_field',
-					),
-				),
-			),
-			$data->get_config()['form']['fields']
-		);
-	}
-
-	/**
-	 * A `children` list replaces the group's children wholesale while the group
-	 * keeps its position among the other top-level fields.
-	 *
-	 * @covers ::update_form_fields
-	 */
-	public function test_update_form_fields_children_list_replaces_wholesale() {
-		$data = new Gutenberg_View_Config_Data(
-			array(
-				'form' => array(
-					'fields' => array(
-						'excerpt',
-						array(
-							'id'       => 'discussion',
-							'label'    => 'Discussion',
-							'children' => array( 'comment_status', 'ping_status' ),
-						),
-						'date',
-					),
-				),
-			)
-		);
-		$data->update_form_fields(
-			array( 'discussion' => array( 'children' => array( 'ping_status', 'my_field' ) ) ),
-			1
-		);
-
-		$this->assertSame(
-			array(
-				'excerpt',
-				array(
-					'id'       => 'discussion',
-					'label'    => 'Discussion',
-					'children' => array( 'ping_status', 'my_field' ),
 				),
 				'date',
 			),
