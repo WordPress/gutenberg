@@ -145,9 +145,6 @@ function gutenberg_register_packages_styles( $styles ) {
 	// wp-customize-widgets: add wp-edit-blocks (custom handle not auto-inferred)
 	$styles->query( 'wp-customize-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
 
-	// Register wp-theme (Design System tokens from @wordpress/theme).
-	// Entry points that consume --wpds-* tokens declare this dependency
-	// explicitly (for example wp-components and wp-edit-blocks).
 	gutenberg_override_style(
 		$styles,
 		'wp-theme',
