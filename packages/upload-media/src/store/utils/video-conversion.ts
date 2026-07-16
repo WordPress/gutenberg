@@ -40,7 +40,6 @@ const CONVERSION_TIMEOUT_ERROR_PREFIX = 'GIF to video conversion timed out';
  * is abandoned and only the original GIF is kept.
  *
  * Beyond ~30 seconds the companion video stops being worth the CPU churn:
- * pathological GIFs have been observed converting for half an hour.
  */
 export const DEFAULT_CONVERSION_TIMEOUT = 30_000;
 
