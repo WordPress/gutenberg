@@ -914,9 +914,10 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$attachment_id = $response->get_data()['id'];
 		$this->assertSame( 201, $response->get_status() );
 
-		// The uploaded file's stored name may gain a numeric suffix from
-		// wp_unique_filename() when earlier tests uploaded the same file.
-		$uploaded_basename = wp_basename( get_attached_file( $attachment_id, true ) );
+		// The attached file before sideload becomes the original_image. Its
+		// stored name may gain a numeric suffix from wp_unique_filename() when
+		// earlier tests uploaded the same file.
+		$attached_file_before = get_attached_file( $attachment_id, true );
 
 		// Build a rotated (transposed) version of the source: 640x480 -> 480x640.
 		// Save it to a temp file so the source fixture directory is untouched.
@@ -945,7 +946,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( 480, $original_data['width'] );
 		$this->assertSame( 640, $original_data['height'] );
-		$this->assertSame( $uploaded_basename, $original_data['original_image'] );
+		$this->assertSame( wp_basename( $attached_file_before ), $original_data['original_image'] );
 
 		// Finalize and confirm the rotated dimensions replace the stored ones.
 		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
@@ -956,7 +957,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$metadata = wp_get_attachment_metadata( $attachment_id, true );
 		$this->assertSame( 480, $metadata['width'] );
 		$this->assertSame( 640, $metadata['height'] );
-		$this->assertSame( $uploaded_basename, $metadata['original_image'] );
+		$this->assertSame( wp_basename( $attached_file_before ), $metadata['original_image'] );
 		// The rotated file becomes the main file. Its stored name may gain a
 		// numeric suffix (core reserves the `-rotated` suffix), so compare against
 		// the file the sideload returned rather than a fixed basename.
