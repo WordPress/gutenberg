@@ -124,18 +124,11 @@ class Gutenberg_View_Config_Data {
 
 	/**
 	 * Merges a partial configuration into `default_view`, `default_layouts`,
-	 * and the `form` settings other than its `fields`.
+	 * and the `form` settings.
 	 *
-	 * An associative array merges key by key, a numerically indexed array
-	 * replaces the current value wholesale, and `null` deletes the key it
-	 * names; deleting a whole top-level key (any documented key, including
-	 * `view_list`) resets it to its default.
-	 *
-	 * The `view_list` collection has a dedicated method and is rejected here:
-	 * a non-null `view_list` value must go through `update_view_list_items()`.
-	 *
-	 * A patch that declares an unsupported schema version is rejected and
-	 * does not merge.
+	 * The `view_list` collection has a dedicated method (`update_view_list_items`),
+	 * and is rejected here. A patch that declares an unsupporte schema version
+	 * is also rejected.
 	 *
 	 * @since 7.1.0
 	 *
