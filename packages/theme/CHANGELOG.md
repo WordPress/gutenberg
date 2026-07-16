@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Widen the optional `vite` peer dependency range to accept Vite 8, so projects on Vite 8 can install the package without peer resolution conflicts ([#80267](https://github.com/WordPress/gutenberg/pull/80267)).
+-   Widen the optional `vite` and `stylelint` peer dependency ranges to accept Vite 8 and Stylelint 17 (and the full Stylelint 16 range), so projects on newer tooling can install the package without peer resolution conflicts ([#80267](https://github.com/WordPress/gutenberg/pull/80267)).
 
 ### Documentation
 
