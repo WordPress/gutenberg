@@ -164,12 +164,14 @@ class Gutenberg_View_Config_Data {
 				);
 				continue;
 			}
+
 			// A null patch value drops the whole key from the container rather
 			// than assigning null.
 			if ( null === $value ) {
 				unset( $this->config[ $key ] );
 				continue;
 			}
+
 			if ( 'view_list' === $key ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -178,13 +180,23 @@ class Gutenberg_View_Config_Data {
 				);
 				continue;
 			}
+
 			if ( 'form' === $key ) {
-				$value = $this->extract_form_properties( $value );
+				if ( ! is_array( $value ) || ( array() !== $value && array_is_list( $value ) ) ) {
+					_doing_it_wrong(
+						__METHOD__,
+						esc_html__( 'A "form" patch must be an associative array of form properties.', 'gutenberg' ),
+						'7.1.0'
+					);
+					$value = null;
+				}
+
 				// Nothing left to merge: the value was off-shape.
 				if ( null === $value || array() === $value ) {
 					continue;
 				}
 			}
+
 			$this->config[ $key ] = $this->merge_properties( $this->config[ $key ] ?? array(), $value );
 		}
 
@@ -358,28 +370,6 @@ class Gutenberg_View_Config_Data {
 		);
 
 		return false;
-	}
-
-	/**
-	 * Validates a `form` patch value for update_properties().
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param mixed $value The incoming `form` patch value.
-	 * @return array|null The form properties to merge, or null when the value
-	 *                    is off-shape.
-	 */
-	private function extract_form_properties( $value ) {
-		if ( ! is_array( $value ) || ( array() !== $value && array_is_list( $value ) ) ) {
-			_doing_it_wrong(
-				'Gutenberg_View_Config_Data::update_properties',
-				esc_html__( 'A "form" patch must be an associative array of form properties.', 'gutenberg' ),
-				'7.1.0'
-			);
-			return null;
-		}
-
-		return $value;
 	}
 
 	/**
