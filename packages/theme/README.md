@@ -1,9 +1,5 @@
 # Theme
 
-<div class="callout callout-alert">
-This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 A theming package that's part of the WordPress Design System. It has two parts:
 
 -   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more.
@@ -64,9 +60,7 @@ If your application renders React content into additional documents (an iframe, 
 
 ### Developer Tools
 
-For the best development experience, we recommend configuring the [Stylelint rules](#stylelint-plugins) provided by this package. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
-
-If you reference `--wpds-*` tokens in CSS or JS/TS source, use the [build plugins](#build-plugins) to inject fallback values at build time so components render correctly even when the tokens stylesheet is not loaded. If you use `@wordpress/build`, these plugins are already enabled by default when `@wordpress/theme` is installed.
+Use the [Stylelint plugins](#stylelint-plugins) to validate token usage and the [build plugins](#build-plugins) to inject generated fallback values. `@wordpress/build` enables the build plugins automatically when `@wordpress/theme` is installed.
 
 ### Accessibility
 
@@ -108,7 +102,7 @@ function App() {
 The `color` prop accepts an object with the following optional properties:
 
 -   `primary`: The primary/accent seed color (default: `'#3858e9'`).
--   `background`: The background seed color (default: `'#f8f8f8'`).
+-   `background`: The background seed color (default: `'#fcfcfc'`).
 
 Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
 
@@ -215,7 +209,7 @@ After the prebuild step, the package will be built into its final form via the r
 
 ## Stylelint Plugins
 
-This package provides Stylelint plugins to help enforce consistent usage of design tokens. To use them, add the plugins to your Stylelint configuration:
+These rules validate design token usage in CSS. Enable them in your Stylelint configuration:
 
 ```json
 {
@@ -234,69 +228,21 @@ This package provides Stylelint plugins to help enforce consistent usage of desi
 
 ### `plugin-wpds/no-unknown-ds-tokens`
 
-This rule reports an error when a CSS value references a `--wpds-*` custom property that is not a valid design token. This helps catch typos and ensures that only valid design tokens are used.
-
-```css
-/* ✗ Error: '--wpds-unknown-token' is not a valid Design System token */
-.example {
-	color: var( --wpds-unknown-token );
-}
-
-/* ✓ OK */
-.example {
-	color: var( --wpds-color-foreground-content-neutral );
-}
-```
+Reports references to unknown `--wpds-*` tokens.
 
 ### `plugin-wpds/no-setting-wpds-custom-properties`
 
-This rule reports an error when a CSS declaration sets (defines) a custom property in the `--wpds-*` namespace. The design system tokens should only be consumed, not defined or overridden in consuming code.
-
-```css
-/* ✗ Error: Do not set CSS custom properties using the Design System tokens namespace */
-.example {
-	--wpds-my-token: red;
-}
-
-/* ✗ Error: Overriding existing tokens is also not allowed */
-.example {
-	--wpds-color-foreground-content-neutral: red;
-}
-
-/* ✓ OK */
-.example {
-	--my-custom-token: red;
-}
-```
+Reports definitions or overrides in the `--wpds-*` namespace.
 
 ### `plugin-wpds/no-token-fallback-values`
 
-This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. In CSS processed by the [build plugins](#build-plugins), fallback values are injected automatically, so manual fallbacks in `var(--wpds-*)` references are redundant and can drift out of sync with the token definitions.
-
-```css
-/* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-foreground-content-neutral' */
-.example {
-	color: var( --wpds-color-foreground-content-neutral, #1e1e1e );
-}
-
-/* ✓ OK */
-.example {
-	color: var( --wpds-color-foreground-content-neutral );
-}
-
-/* ✓ OK: Non-wpds custom properties are not checked */
-.example {
-	color: var( --my-custom-color, red );
-}
-```
+Reports manual fallbacks that can drift from the generated values.
 
 ## Build Plugins
 
-This package provides build plugins that inject fallback values into bare `var(--wpds-*)` references at build time. This ensures components render correctly even when a `ThemeProvider` or design tokens stylesheet is not present — for example, `var(--wpds-color-foreground-content-neutral)` becomes `var(--wpds-color-foreground-content-neutral, #1e1e1e)`.
+The build plugins inject generated fallbacks into bare `var(--wpds-*)` references so components still render when the design tokens stylesheet is unavailable. For example, `var(--wpds-color-foreground-content-neutral)` becomes `var(--wpds-color-foreground-content-neutral, #1e1e1e)`.
 
 `@wordpress/build` already applies these plugins automatically when `@wordpress/theme` is installed. You only need to configure them manually for custom build setups.
-
-Three plugin variants are available, covering common build tool setups:
 
 | Export                                                        | Tool    | Scope |
 | ------------------------------------------------------------- | ------- | ----- |
@@ -304,7 +250,7 @@ Three plugin variants are available, covering common build tool setups:
 | `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks` | esbuild | JS/TS |
 | `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`       | Vite    | JS/TS |
 
-All three plugins skip files that don't contain `--wpds-` references, so there is zero overhead on unrelated modules.
+Existing fallbacks are unchanged. An unknown token in a bare reference fails the build.
 
 ### PostCSS
 

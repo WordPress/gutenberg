@@ -54,7 +54,7 @@
 			line-height: 1;
 			display: inline-block;
 			margin-inline-start: var(--wpds-dimension-padding-xs);
-			font-weight: var(--wpds-typography-font-weight-regular);
+			font-weight: var(--wpds-typography-font-weight-default);
 			text-decoration: none;
 		}
 

@@ -1,9 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { insert, toHTMLString } from '@wordpress/rich-text';
+import {
+	insert,
+	toHTMLString,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
-import { privateApis as composePrivateApis } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -16,7 +19,7 @@ import {
 } from '../../../utils/selection';
 import { unlock } from '../../../lock-unlock';
 
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 export function findSelection( blocks ) {
 	let i = blocks.length;
@@ -160,13 +163,13 @@ export default ( props ) => ( element ) => {
 
 	// Capture phase so these run before ancestor (writing flow) bubble
 	// handlers, matching the timing of the previous raw element listeners.
-	const unsubscribeInput = subscribeDelegatedListener(
+	const unsubscribeInput = subscribeOwnedListener(
 		element,
 		'input',
 		onInput,
 		true
 	);
-	const unsubscribeCompositionEnd = subscribeDelegatedListener(
+	const unsubscribeCompositionEnd = subscribeOwnedListener(
 		element,
 		'compositionend',
 		onInput,

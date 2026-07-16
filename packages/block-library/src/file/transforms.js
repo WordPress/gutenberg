@@ -11,6 +11,31 @@ import { getFilename } from '@wordpress/url';
 // Transforms bypass the default variation, so set the localized default here.
 const downloadButtonText = _x( 'Download', 'button label' );
 
+// The File → audio/video/image transforms are identical apart from the target
+// block, its media MIME type, and the src attribute name (image uses `url`).
+const toMediaTransform = ( blockName, mediaType, srcAttribute ) => ( {
+	type: 'block',
+	blocks: [ blockName ],
+	isMatch: ( { id } ) => {
+		if ( ! id ) {
+			return false;
+		}
+		const { getEntityRecord } = select( coreStore );
+		const media = getEntityRecord( 'postType', 'attachment', id, {
+			context: 'view',
+		} );
+		return !! media && media.mime_type.includes( mediaType );
+	},
+	transform: ( attributes ) => {
+		return createBlock( blockName, {
+			[ srcAttribute ]: attributes.href,
+			caption: attributes.fileName,
+			id: attributes.id,
+			anchor: attributes.anchor,
+		} );
+	},
+} );
+
 const transforms = {
 	from: [
 		{
@@ -78,72 +103,9 @@ const transforms = {
 		},
 	],
 	to: [
-		{
-			type: 'block',
-			blocks: [ 'core/audio' ],
-			isMatch: ( { id } ) => {
-				if ( ! id ) {
-					return false;
-				}
-				const { getEntityRecord } = select( coreStore );
-				const media = getEntityRecord( 'postType', 'attachment', id, {
-					context: 'view',
-				} );
-				return !! media && media.mime_type.includes( 'audio' );
-			},
-			transform: ( attributes ) => {
-				return createBlock( 'core/audio', {
-					src: attributes.href,
-					caption: attributes.fileName,
-					id: attributes.id,
-					anchor: attributes.anchor,
-				} );
-			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/video' ],
-			isMatch: ( { id } ) => {
-				if ( ! id ) {
-					return false;
-				}
-				const { getEntityRecord } = select( coreStore );
-				const media = getEntityRecord( 'postType', 'attachment', id, {
-					context: 'view',
-				} );
-				return !! media && media.mime_type.includes( 'video' );
-			},
-			transform: ( attributes ) => {
-				return createBlock( 'core/video', {
-					src: attributes.href,
-					caption: attributes.fileName,
-					id: attributes.id,
-					anchor: attributes.anchor,
-				} );
-			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/image' ],
-			isMatch: ( { id } ) => {
-				if ( ! id ) {
-					return false;
-				}
-				const { getEntityRecord } = select( coreStore );
-				const media = getEntityRecord( 'postType', 'attachment', id, {
-					context: 'view',
-				} );
-				return !! media && media.mime_type.includes( 'image' );
-			},
-			transform: ( attributes ) => {
-				return createBlock( 'core/image', {
-					url: attributes.href,
-					caption: attributes.fileName,
-					id: attributes.id,
-					anchor: attributes.anchor,
-				} );
-			},
-		},
+		toMediaTransform( 'core/audio', 'audio', 'src' ),
+		toMediaTransform( 'core/video', 'video', 'src' ),
+		toMediaTransform( 'core/image', 'image', 'url' ),
 	],
 };
 

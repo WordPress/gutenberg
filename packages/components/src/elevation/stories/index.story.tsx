@@ -24,7 +24,7 @@ const meta: Meta< typeof Elevation > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Planned for deprecation. Use [elevation tokens](?path=/docs/foundations-design-language-elevation--page) from `@wordpress/base-styles` instead.',
+			notes: 'Planned for deprecation. Use [`elevation tokens`](?path=/docs/foundations-design-language-elevation--page) from `@wordpress/base-styles` instead.',
 		},
 	},
 };

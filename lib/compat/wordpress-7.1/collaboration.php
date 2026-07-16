@@ -197,7 +197,7 @@ if ( ! function_exists( 'wp_is_collaboration_allowed' ) ) {
 			} else {
 				/*
 				* Environment variable is defined, let's confirm it is actually set to
-				* "true" as it may still have a string value "false" – the preceeding
+				* "true" as it may still have a string value "false" – the preceding
 				* `if` branch only tests for the boolean `false`.
 				*/
 				define( 'WP_ALLOW_COLLABORATION', 'true' === $env_value );

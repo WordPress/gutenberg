@@ -1,9 +1,20 @@
 /* eslint-disable no-bitwise, jsdoc/require-param */
 
 /**
+ * External dependencies
+ */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+/**
  * Internal dependencies
  */
-import { parseHeic, reverseBits32 } from '../heic-parser';
+import {
+	parseHeic,
+	reverseBits32,
+	parseExifOrientation,
+	getUnappliedExifOrientation,
+} from '../heic-parser';
 
 // ---------------------------------------------------------------------------
 // Helpers for constructing synthetic ISOBMFF structures
@@ -726,6 +737,222 @@ describe( 'heic-parser', () => {
 			expect( () => parseHeic( meta.buffer ) ).toThrow(
 				'No property associations'
 			);
+		} );
+	} );
+} );
+
+describe( 'parseExifOrientation / getUnappliedExifOrientation', () => {
+	/**
+	 * Build a TIFF/EXIF block carrying a single Orientation tag (0x0112).
+	 *
+	 * Big-endian ('MM') layout: header (8) + IFD0 (count + one 12-byte entry +
+	 * next-IFD offset).
+	 *
+	 * @param orientation EXIF orientation value (1-8).
+	 * @param withPrefix  Prepend the 4-byte exif_tiff_header_offset (=0).
+	 */
+	function buildExifTiff(
+		orientation: number,
+		withPrefix = true
+	): Uint8Array {
+		const tiff = new Uint8Array( 8 + 2 + 12 + 4 );
+		const view = new DataView( tiff.buffer );
+		// 'MM' big-endian + magic 0x002A + IFD0 offset = 8.
+		tiff[ 0 ] = 0x4d;
+		tiff[ 1 ] = 0x4d;
+		writeU16( view, 2, 0x002a );
+		writeU32( view, 4, 8 );
+		// IFD0: one entry.
+		writeU16( view, 8, 1 );
+		// Entry: tag=0x0112, type=3 (SHORT), count=1, value in first 2 bytes.
+		writeU16( view, 10, 0x0112 );
+		writeU16( view, 12, 3 );
+		writeU32( view, 14, 1 );
+		writeU16( view, 18, orientation );
+		// next-IFD offset = 0 at byte 24.
+		if ( ! withPrefix ) {
+			return tiff;
+		}
+		const payload = new Uint8Array( 4 + tiff.length );
+		payload.set( tiff, 4 ); // 4-byte exif_tiff_header_offset = 0.
+		return payload;
+	}
+
+	/** Build an iinf box declaring item types via infe entries. */
+	function buildIinf( entries: Array< [ number, string ] > ): Uint8Array {
+		const infeBoxes = entries.map( ( [ itemId, type ] ) => {
+			const data = new Uint8Array( 2 + 2 + 4 + 1 );
+			const view = new DataView( data.buffer );
+			writeU16( view, 0, itemId );
+			writeU16( view, 2, 0 ); // protection index
+			for ( let i = 0; i < 4; i++ ) {
+				data[ 4 + i ] = type.charCodeAt( i );
+			}
+			// trailing null item name at byte 8.
+			return buildFullBox( 'infe', 2, 0, data );
+		} );
+		const count = new Uint8Array( 2 );
+		writeU16( new DataView( count.buffer ), 0, entries.length );
+		return buildFullBox( 'iinf', 0, 0, concat( count, ...infeBoxes ) );
+	}
+
+	/**
+	 * Build a minimal ISOBMFF (AVIF-shaped) file with an `Exif` item.
+	 *
+	 * Options: `orientation` (1-8) to embed, `withIrot` to add a native irot
+	 * transform property, and `withPrefix` to include the EXIF offset prefix.
+	 */
+	function buildAvifWithExif( {
+		orientation = 1,
+		withIrot = false,
+		withPrefix = true,
+	}: {
+		orientation?: number;
+		withIrot?: boolean;
+		withPrefix?: boolean;
+	} = {} ): ArrayBuffer {
+		const primaryItemId = 1;
+		const exifItemId = 2;
+		const exifPayload = buildExifTiff( orientation, withPrefix );
+
+		const ftyp = buildBox(
+			'ftyp',
+			new Uint8Array( [ 0x61, 0x76, 0x69, 0x66 ] ) // brand='avif'
+		);
+		const hdlr = buildHdlr();
+		const pitm = buildPitm( primaryItemId );
+		const iinf = buildIinf( [
+			[ primaryItemId, 'av01' ],
+			[ exifItemId, 'Exif' ],
+		] );
+
+		// Optional native transform property associated with the primary item.
+		let iprp = new Uint8Array( 0 );
+		if ( withIrot ) {
+			const ipco = buildIpco( buildIspe( 10, 10 ), buildIrot( 1 ) );
+			const ipma = buildIpma( [ [ primaryItemId, [ 1, 2 ] ] ] );
+			iprp = buildIprp( ipco, ipma );
+		}
+
+		// Compute the absolute file offset of the EXIF payload inside mdat.
+		// Build a placeholder iloc to size the meta box, then fix the offset.
+		const buildMeta = ( exifOffset: number ) => {
+			const iloc = buildIloc( [
+				[ exifItemId, [ [ exifOffset, exifPayload.length ] ] ],
+			] );
+			return buildFullBox(
+				'meta',
+				0,
+				0,
+				concat( hdlr, pitm, iinf, iloc, iprp )
+			);
+		};
+
+		const metaSize = buildMeta( 0 ).length;
+		const exifOffset = ftyp.length + metaSize + 8; // +8 for mdat header.
+		const meta = buildMeta( exifOffset );
+		const mdat = buildBox( 'mdat', exifPayload );
+
+		return concat( ftyp, meta, mdat ).buffer;
+	}
+
+	describe( 'parseExifOrientation', () => {
+		it.each( [ 1, 2, 3, 4, 5, 6, 7, 8 ] )(
+			'reads EXIF orientation %i from the Exif item',
+			( orientation ) => {
+				const buffer = buildAvifWithExif( { orientation } );
+				expect( parseExifOrientation( buffer ) ).toBe( orientation );
+			}
+		);
+
+		it( 'reads orientation when the EXIF payload omits the offset prefix', () => {
+			const buffer = buildAvifWithExif( {
+				orientation: 6,
+				withPrefix: false,
+			} );
+			expect( parseExifOrientation( buffer ) ).toBe( 6 );
+		} );
+
+		it( 'returns 1 when there is no Exif item', () => {
+			// A plain HEIC has no Exif item.
+			const buffer = buildSingleImageHeic();
+			expect( parseExifOrientation( buffer ) ).toBe( 1 );
+		} );
+
+		it( 'returns 1 for a non-ISOBMFF buffer', () => {
+			const buffer = new Uint8Array( [ 0xff, 0xd8, 0xff, 0xe0 ] ).buffer;
+			expect( parseExifOrientation( buffer ) ).toBe( 1 );
+		} );
+	} );
+
+	describe( 'getUnappliedExifOrientation', () => {
+		it( 'returns the EXIF orientation when no native transform is present', () => {
+			const buffer = buildAvifWithExif( { orientation: 6 } );
+			expect( getUnappliedExifOrientation( buffer ) ).toBe( 6 );
+		} );
+
+		it( 'returns 1 when a native irot transform is present (libheif handles it)', () => {
+			const buffer = buildAvifWithExif( {
+				orientation: 6,
+				withIrot: true,
+			} );
+			expect( getUnappliedExifOrientation( buffer ) ).toBe( 1 );
+		} );
+	} );
+
+	/*
+	 * Real encoder output (ImageMagick/libheif + exiftool), complementing the
+	 * hand-built boxes above — mirroring the rotated-image fixture set used
+	 * by WordPress core's PHPUnit media tests. Generated with:
+	 *
+	 *     magick -size 32x32 xc:'#cc0000' -size 32x32 xc:'#0000cc' +append base.png
+	 *     magick base.png -quality 60 exif-base.avif   # also base.heic
+	 *     exiftool -n -Orientation=6 -o exif-rotated-90cw.avif exif-base.avif
+	 *     exiftool -n -Orientation=8 -o exif-rotated-90ccw.avif exif-base.avif
+	 *     exiftool -n -Orientation=3 -o exif-upside-down.avif exif-base.avif
+	 *     exiftool -n -Orientation=6 -o exif-rotated-90cw.heic base.heic
+	 *     heif-enc base.png --rotate-cw 90 -A -o irot-rotated-90.avif
+	 *     exiftool -n -Orientation=6 -o irot-and-exif.avif irot-rotated-90.avif
+	 */
+	describe( 'real encoder fixtures', () => {
+		const loadFixture = ( file: string ): ArrayBuffer => {
+			const contents = readFileSync(
+				join( __dirname, 'fixtures', file )
+			);
+			return contents.buffer.slice(
+				contents.byteOffset,
+				contents.byteOffset + contents.byteLength
+			) as ArrayBuffer;
+		};
+
+		it.each( [
+			[ 'exif-rotated-90cw.avif', 6 ],
+			[ 'exif-rotated-90ccw.avif', 8 ],
+			[ 'exif-upside-down.avif', 3 ],
+			[ 'exif-rotated-90cw.heic', 6 ],
+		] )(
+			'reads the unapplied EXIF orientation from %s',
+			( file, orientation ) => {
+				expect(
+					getUnappliedExifOrientation( loadFixture( file ) )
+				).toBe( orientation );
+			}
+		);
+
+		it( 'returns 1 when an EXIF tag coexists with a native irot transform', () => {
+			// Some encoders write both; libheif already applies the `irot`
+			// on decode, so rotating again from EXIF would double-rotate.
+			expect(
+				getUnappliedExifOrientation(
+					loadFixture( 'irot-and-exif.avif' )
+				)
+			).toBe( 1 );
+		} );
+
+		it( 'returns 1 for a file without an orientation tag', () => {
+			expect(
+				getUnappliedExifOrientation( loadFixture( 'exif-base.avif' ) )
+			).toBe( 1 );
 		} );
 	} );
 } );
