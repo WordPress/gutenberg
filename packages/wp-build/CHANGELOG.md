@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- Wrap script bundles in an IIFE to avoid `use strict` affecting external code in concatenated JavaScript files ([#79792](https://github.com/WordPress/gutenberg/pull/79792).
+
 ## 0.19.0 (2026-07-14)
 
 ### Enhancements
