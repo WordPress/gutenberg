@@ -818,7 +818,11 @@ function gutenberg_get_block_templates( $output, $query = array(), $template_typ
 				$matching_registered_templates
 			);
 
-			$query_result = array_merge( $query_result, $matching_registered_templates );
+			// Re-index the array: `$matching_registered_templates` is keyed by the registered
+			// template name (e.g. `my-plugin//my-template`), so a plain `array_merge()` would
+			// leave the result with a mix of numeric and string keys whenever it is the only
+			// match for a query. Callers of `get_block_templates()` expect a zero-based list.
+			$query_result = array_values( array_merge( $query_result, $matching_registered_templates ) );
 		}
 	}
 
