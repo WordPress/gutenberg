@@ -1,23 +1,47 @@
 /**
+ * External dependencies
+ */
+import { renderHook } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import { useSettings, useStyleOverride } from '@wordpress/block-editor';
+
+/**
  * Internal dependencies
  */
-import {
-	getNavigationLayoutCustomProperties,
-	getNavigationResponsiveLayoutCSS,
-} from '../layout-custom-properties';
+import useLayoutCustomProperties from '../use-layout-custom-properties';
+
+const mockGetResponsiveMediaQueries = jest.fn();
+
+jest.mock( '@wordpress/block-editor', () => ( {
+	useSettings: jest.fn(),
+	useStyleOverride: jest.fn(),
+} ) );
+
+jest.mock( '@wordpress/global-styles-engine', () => ( {
+	privateApis: {},
+} ) );
+
+jest.mock( '../../../lock-unlock', () => ( {
+	unlock: () => ( {
+		getResponsiveMediaQueries: ( ...args ) =>
+			mockGetResponsiveMediaQueries( ...args ),
+	} ),
+} ) );
 
 describe( 'Navigation layout custom properties', () => {
-	describe( 'getNavigationLayoutCustomProperties', () => {
-		it( 'returns the default horizontal layout properties', () => {
-			expect( getNavigationLayoutCustomProperties() ).toEqual( {
-				'--navigation-layout-justification-setting': 'flex-start',
-				'--navigation-layout-direction': 'row',
-				'--navigation-layout-wrap': 'wrap',
-				'--navigation-layout-justify': 'flex-start',
-				'--navigation-layout-align': 'center',
-			} );
+	beforeEach( () => {
+		jest.clearAllMocks();
+		useSettings.mockReturnValue( [ { mobile: 480, tablet: 782 } ] );
+		mockGetResponsiveMediaQueries.mockReturnValue( {
+			'@tablet': '@media (480px < width <= 782px)',
+			'@mobile': '@media (width <= 480px)',
 		} );
+	} );
 
+	describe( 'vertical layouts', () => {
 		it.each( [
 			[ 'left', 'initial', 'flex-start' ],
 			[ 'center', 'center', 'center' ],
@@ -26,27 +50,41 @@ describe( 'Navigation layout custom properties', () => {
 		] )(
 			'reproduces the vertical %s class cascade',
 			( justifyContent, justify, align ) => {
-				expect(
-					getNavigationLayoutCustomProperties( {
-						orientation: 'vertical',
-						justifyContent,
-						flexWrap: 'nowrap',
+				renderHook( () =>
+					useLayoutCustomProperties( {
+						clientId: 'test',
+						style: {
+							'@mobile': {
+								layout: {
+									orientation: 'vertical',
+									justifyContent,
+									flexWrap: 'nowrap',
+								},
+							},
+						},
 					} )
-				).toMatchObject( {
-					'--navigation-layout-direction': 'column',
-					'--navigation-layout-wrap': 'nowrap',
-					'--navigation-layout-justify': justify,
-					'--navigation-layout-align': align,
-				} );
+				);
+
+				const { css } = useStyleOverride.mock.calls.at( -1 )[ 0 ];
+				expect( css ).toContain(
+					'--navigation-layout-direction: column;'
+				);
+				expect( css ).toContain( '--navigation-layout-wrap: nowrap;' );
+				expect( css ).toContain(
+					`--navigation-layout-justify: ${ justify };`
+				);
+				expect( css ).toContain(
+					`--navigation-layout-align: ${ align };`
+				);
 			}
 		);
 	} );
 
-	describe( 'getNavigationResponsiveLayoutCSS', () => {
+	describe( 'responsive styles', () => {
 		it( 'merges viewport overrides with the base layout', () => {
-			expect(
-				getNavigationResponsiveLayoutCSS( {
-					selector: '#block-test',
+			renderHook( () =>
+				useLayoutCustomProperties( {
+					clientId: 'test',
 					layout: {
 						justifyContent: 'right',
 						flexWrap: 'nowrap',
@@ -56,44 +94,45 @@ describe( 'Navigation layout custom properties', () => {
 							layout: { orientation: 'vertical' },
 						},
 					},
-					mediaQueries: {
-						'@mobile': '@media (width <= 480px)',
-					},
 				} )
-			).toBe(
-				'@media (width <= 480px){#block-test {--navigation-layout-justification-setting: flex-end;--navigation-layout-direction: column;--navigation-layout-wrap: nowrap;--navigation-layout-justify: flex-end;--navigation-layout-align: flex-end;}}'
 			);
+
+			expect( useStyleOverride ).toHaveBeenCalledWith( {
+				css: '@media (width <= 480px){#block-test {--navigation-layout-justification-setting: flex-end;--navigation-layout-direction: column;--navigation-layout-wrap: nowrap;--navigation-layout-justify: flex-end;--navigation-layout-align: flex-end;}}',
+			} );
 		} );
 
 		it( 'uses default values for explicit viewport resets', () => {
-			expect(
-				getNavigationResponsiveLayoutCSS( {
-					selector: '#block-test',
+			renderHook( () =>
+				useLayoutCustomProperties( {
+					clientId: 'test',
 					layout: { justifyContent: 'right' },
 					style: {
 						'@tablet': {
 							layout: { justifyContent: null },
 						},
 					},
-					mediaQueries: {
-						'@tablet': '@media (480px < width <= 782px)',
-					},
 				} )
-			).toContain( '--navigation-layout-justify: flex-start;' );
+			);
+
+			expect( useStyleOverride ).toHaveBeenCalledWith( {
+				css: expect.stringContaining(
+					'--navigation-layout-justify: flex-start;'
+				),
+			} );
 		} );
 
 		it( 'does not emit styles without a viewport layout override', () => {
-			expect(
-				getNavigationResponsiveLayoutCSS( {
-					selector: '#block-test',
+			renderHook( () =>
+				useLayoutCustomProperties( {
+					clientId: 'test',
 					style: {
 						'@mobile': { spacing: { blockGap: '10px' } },
 					},
-					mediaQueries: {
-						'@mobile': '@media (width <= 480px)',
-					},
 				} )
-			).toBe( '' );
+			);
+
+			expect( useStyleOverride ).toHaveBeenCalledWith( { css: '' } );
 		} );
 	} );
 } );
