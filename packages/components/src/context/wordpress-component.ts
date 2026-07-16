@@ -35,7 +35,12 @@ export type WordPressComponent<
 > = {
 	< TT extends React.ElementType >(
 		props: WordPressComponentProps< O, TT, false > &
-			( IsPolymorphic extends true ? { as: TT } : {} )
+			( IsPolymorphic extends true
+				? {
+						/** The HTML element or React component to render the component as. */
+						as: TT;
+				  }
+				: {} )
 	): React.ReactNode;
 	( props: WordPressComponentProps< O, T, IsPolymorphic > ): React.ReactNode;
 	displayName?: string;
