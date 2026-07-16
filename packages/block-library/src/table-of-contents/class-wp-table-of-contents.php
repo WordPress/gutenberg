@@ -29,14 +29,14 @@ final class WP_Table_Of_Contents {
 	}
 
 	/**
-	 * Gets heading data for the Table of Contents block.
+	 * Gets heading data for the Table of Contents block from a post.
 	 *
 	 * @param WP_Post $post       Post to scan.
 	 * @param array   $attributes Attributes of the block being rendered.
 	 *
 	 * @return array Heading data.
 	 */
-	public static function get_headings( $post, $attributes ) {
+	public static function get_headings_from_post( $post, $attributes ) {
 		if ( ! $post instanceof WP_Post ) {
 			return array();
 		}

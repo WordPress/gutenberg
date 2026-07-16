@@ -151,7 +151,7 @@ function block_core_table_of_contents_render( $attributes, $content ) {
 		return '';
 	}
 
-	$headings = WP_Table_Of_Contents::get_headings( $post, $attributes );
+	$headings = WP_Table_Of_Contents::get_headings_from_post( $post, $attributes );
 
 	if ( empty( $headings ) ) {
 		return '';
