@@ -430,10 +430,10 @@ class Gutenberg_View_Config_Data {
 	 * Unlike deep_merge(), which replaces a list wholesale, this recurses
 	 * through maps and merges lists element by element: a member whose identity
 	 * (a scalar's own value, or a map's `id`/`slug`/`field`/`name`) matches an
-	 * existing member merges into it in place — the merged member's own contents
-	 * then follow the ordinary wholesale-list rule — and an unmatched member is
-	 * appended. Members without an identity (e.g. nested lists) are always
-	 * appended, so a list of such values grows rather than replacing.
+	 * existing member merges into it in place — recursively by these same rules,
+	 * so a list nested inside a member merges by identity too — and an unmatched
+	 * member is appended. Members without an identity (e.g. nested lists) are
+	 * always appended, so a list of such values grows rather than replacing.
 	 *
 	 * @since 7.1.0
 	 *
@@ -476,9 +476,11 @@ class Gutenberg_View_Config_Data {
 	 *
 	 * A member of the incoming list whose identity matches one already present
 	 * merges into it in place, keeping its position; an unmatched member is
-	 * appended to the end. A matched member's contents merge with the ordinary
-	 * wholesale-list rule (deep_merge), so lists nested inside a member replace
-	 * rather than merging again.
+	 * appended to the end. A matched member's contents merge recursively with
+	 * the same rules (merge_properties), so the identity-aware merge applies at
+	 * any nesting level: each key named by the patch is substituted while the
+	 * others are left intact, and a list nested inside a member merges by
+	 * identity just like the list it lives in.
 	 *
 	 * @since 7.1.0
 	 *
@@ -505,7 +507,7 @@ class Gutenberg_View_Config_Data {
 				$result[] = $item;
 				continue;
 			}
-			$result[ $index ] = $this->deep_merge( $result[ $index ], $item );
+			$result[ $index ] = $this->merge_properties( $result[ $index ], $item );
 		}
 
 		return $result;

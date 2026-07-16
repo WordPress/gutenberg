@@ -204,7 +204,18 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 						'summary' => array( 'f1' )
 					),
 					'fields' => array(
-						'f1'
+						'f1',
+						array(
+							'id' => 'fieldId',
+							'label' => 'Field label',
+							'children' => array(
+								'child1',
+								array(
+									'id' => 'child2',
+									'label' => 'Child 2 label'
+								)
+							)
+						)
 					)
 				)
 			)
@@ -216,7 +227,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 						array( 'slug' )
 					),
 					'filters' => array(
-						array( 'field' => 'id1', 'operator' => 'change', 'value' => [ 'change' ], 'isLocked' => true ),
+						array( 'field' => 'id1', 'operator' => 'change', 'isLocked' => true ),
 						array( 'field' => 'id2', 'operator' => 'op2', 'value' => [ 'val2' ] ),
 					),
 					'layout' => array(
@@ -228,7 +239,21 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 						'summary' => array( 'f2' )
 					),
 					'fields' => array(
-						'f2'
+						'f2',
+						array(
+							'id' => 'fieldId',
+							'label' => 'Updated label',
+							'children' => array(
+								array(
+									'id' => 'child2',
+									'label' => 'Child 2 updated label'
+								),
+								array(
+									'id' => 'child3',
+									'label' => 'Child 3 label'
+								)
+							)
+						)
 					)
 				)
 			),
@@ -242,7 +267,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					array( 'slug' )
 				),
 				'filters' => array(
-					array( 'field' => 'id1', 'operator' => 'change', 'value' => [ 'change' ], 'isLocked' => true ),
+					array( 'field' => 'id1', 'operator' => 'change', 'value' => [ 'val1' ], 'isLocked' => true ),
 					array( 'field' => 'id2', 'operator' => 'op2', 'value' => [ 'val2' ] ),
 				),
 				'layout' => array(
@@ -255,7 +280,22 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				),
 				'fields' => array(
 					'f1',
-					'f2'
+					array(
+						'id' => 'fieldId',
+						'label' => 'Updated label',
+						'children' => array(
+							'child1',
+							array(
+								'id' => 'child2',
+								'label' => 'Child 2 updated label'
+							),
+							array(
+								'id' => 'child3',
+								'label' => 'Child 3 label'
+							)
+						)
+					),
+					'f2',
 				)
 			)
 			),
