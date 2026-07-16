@@ -637,7 +637,7 @@ describe.each( [
 	} );
 } );
 
-test( 'should compose block styles in a single generated class', () => {
+test( 'should render block styles without Emotion-generated classes', () => {
 	render(
 		<ToggleGroupControl label="Test Toggle Group Control" isBlock>
 			{ options }
@@ -648,6 +648,5 @@ test( 'should compose block styles in a single generated class', () => {
 		name: 'Test Toggle Group Control',
 	} );
 
-	expect( getGeneratedEmotionClassNames( control ) ).toHaveLength( 1 );
-	expect( control ).toHaveStyle( { display: 'flex' } );
+	expect( getGeneratedEmotionClassNames( control ) ).toHaveLength( 0 );
 } );

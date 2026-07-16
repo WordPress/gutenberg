@@ -1,0 +1,90 @@
+@use "../../utils/theme-variables" as *;
+
+.label {
+	display: inline-flex;
+	max-width: 100%;
+	min-width: 0;
+	position: relative;
+}
+
+.label-block {
+	flex: 1;
+}
+
+.button {
+	align-items: center;
+	appearance: none;
+	background: transparent;
+	border: none;
+	border-radius: var(--wpds-border-radius-xs);
+	color: $components-color-gray-700;
+	fill: currentColor;
+	cursor: var(--wpds-cursor-control);
+	display: flex;
+	font-family: inherit;
+	height: 100%;
+	justify-content: center;
+	/* stylelint-disable-next-line declaration-property-unit-allowed-list -- Preserve the existing percentage line height. */
+	line-height: 100%;
+	outline: none;
+	padding: 0 12px;
+	position: relative;
+	text-align: center;
+
+	@media not ( prefers-reduced-motion ) {
+		transition:
+			color 160ms linear,
+			font-weight 60ms linear;
+	}
+
+	user-select: none;
+	width: 100%;
+	z-index: 2;
+
+	&::-moz-focus-inner {
+		border: 0;
+	}
+
+	&[disabled],
+	&[aria-disabled="true"] {
+		opacity: 0.4;
+		cursor: default;
+	}
+
+	&:hover:not([disabled]):not([aria-disabled="true"]) {
+		color: $components-color-foreground;
+	}
+}
+
+.is-deselectable {
+	&:focus {
+		outline: 1.5px solid $components-color-accent;
+		outline-offset: 2px;
+
+		// Hide overlapping border.
+		&[aria-pressed="false"] {
+			background: $components-color-background;
+			box-shadow: 0 0 0 2px $components-color-background;
+		}
+	}
+}
+
+.is-icon {
+	height: 38px;
+	aspect-ratio: 1;
+	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the existing physical padding override. */
+	padding-left: 0;
+	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the existing physical padding override. */
+	padding-right: 0;
+}
+
+.is-pressed {
+	color: $components-color-foreground;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
+.button-content {
+	display: flex;
+	font-size: var(--wpds-typography-font-size-md);
+	line-height: 1;
+}
