@@ -74,7 +74,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	/**
 	 * The default configuration exposes the documented shape for an unknown entity.
 	 */
-	public function test_returns_default_config_shape_for_unknown_entity() {
+	public function test_default_config_for_unknown_entity() {
 		$config = gutenberg_get_entity_view_config( 'custom_kind', 'custom_name' );
 
 		$this->assertIsArray( $config );
@@ -148,7 +148,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	/**
 	 * A filter can override configuration values through merge().
 	 */
-	public function test_filter_merge_overrides_config() {
+	public function test_filter_data_is_merged() {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
@@ -169,7 +169,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	 * their effects compose: a later filter can add a form field to a group that
 	 * an earlier one defined.
 	 */
-	public function test_filters_compose_across_the_chain() {
+	public function test_filter_data_chain() {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
@@ -221,7 +221,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	 * undocumented keys are dropped and dropped documented keys are backfilled
 	 * from the defaults.
 	 */
-	public function test_off_shape_container_return_is_normalized() {
+	public function test_filter_data_normalized() {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function () {
@@ -250,7 +250,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	 * A documented key dropped through a null patch value is backfilled from
 	 * the defaults, so a null never reaches the response.
 	 */
-	public function test_filter_null_reset_is_backfilled_from_defaults() {
+	public function test_filter_data_backfilled_if_null() {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
@@ -267,7 +267,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	 * A filter that returns something other than the container falls back to the
 	 * default config.
 	 */
-	public function test_non_object_filter_return_falls_back_to_default() {
+	public function test_filter_data_backfilled_if_bad_data() {
 		$this->setExpectedIncorrectUsage( 'gutenberg_get_entity_view_config' );
 
 		add_filter(
@@ -286,4 +286,117 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		$this->assertSame( self::DEFAULT_VIEW_LIST, $config['view_list'] );
 		$this->assertSame( self::DEFAULT_FORM, $config['form'] );
 	}
+
+	public function test_filter_default_view_merge_fields() {
+		add_filter(
+			'get_entity_view_config_custom_kind_custom_name',
+			function ( $data ) {
+				return $data->merge(
+					array(
+						'default_view' => array(
+							'fields' => array( 'title', 'author' ),
+						),
+					),
+					1
+				);
+			}
+		);
+
+		$config = gutenberg_get_entity_view_config( 'custom_kind', 'custom_name' );
+
+		$this->assertSame(
+			array( 'author', 'status', 'title' ),
+			$config['default_view']['fields']
+		);
+	}
+
+	public function test_filter_default_view_replace_fields() {
+		add_filter(
+			'get_entity_view_config_custom_kind_custom_name',
+			function ( $data ) {
+				return $data->set(
+					'default_view',
+					array(
+						'fields' => array( 'title' ),
+					),
+					1
+				);
+			}
+		);
+
+		$config = gutenberg_get_entity_view_config( 'custom_kind', 'custom_name' );
+
+		$this->assertSame(
+			array( 'title' ),
+			$config['default_view']['fields']
+		);
+	}
+
+	public function test_filter_default_view_remove_fields(){
+		add_filter(
+			'get_entity_view_config_custom_kind_custom_name',
+			function ( $data ) {
+				$data->merge(
+					array(
+						'default_view' => array(
+							'fields' => null,
+						),
+					),
+					1
+				);
+				$data->merge(
+					array(
+						'default_view' => array(
+							'fields' => array( 'author' ),
+						),
+					),
+					1
+				);
+				return $data;
+			}
+		);
+
+		$config = gutenberg_get_entity_view_config( 'custom_kind', 'custom_name' );
+
+		$this->assertSame(
+			array( 'author' ),
+			$config['default_view']['fields']
+		);
+	}
+
+	public function test_filter_view_list_add_view() {
+		add_filter(
+			'get_entity_view_config_custom_kind_custom_name',
+			function ( $data ) {
+				return $data->merge(
+					array(
+						'view_list' => array(
+							array(
+								'slug'  => 'my_view',
+								'title' => 'My View',
+							),
+						),
+					),
+					1
+				);
+			}
+		);
+
+		$config = gutenberg_get_entity_view_config( 'custom_kind', 'custom_name' );
+
+		$this->assertSame(
+			array(
+				array(
+					'slug'  => 'all',
+					'title' => 'All items',
+				),
+				array(
+					'slug'  => 'my_view',
+					'title' => 'My View',
+				),
+			),
+			$config['view_list']
+		);
+	}
+
 }
