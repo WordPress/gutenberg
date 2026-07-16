@@ -146,9 +146,8 @@ function gutenberg_register_packages_styles( $styles ) {
 	$styles->query( 'wp-customize-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
 
 	// Register wp-theme (Design System tokens from @wordpress/theme).
-	// wp-base-styles also depends on wp-theme so tokens load on admin pages
-	// that enqueue wp-admin but not wp-components. admin-schemes.css itself
-	// does not consume --wpds-* tokens; wp-components is the primary consumer.
+	// Entry points that consume --wpds-* tokens declare this dependency
+	// explicitly (for example wp-components and wp-edit-blocks).
 	gutenberg_override_style(
 		$styles,
 		'wp-theme',
@@ -165,7 +164,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-base-styles',
 		gutenberg_url( 'build/styles/base-styles/admin-schemes' . $suffix . '.css' ),
-		array( 'wp-theme' ),
+		array(),
 		$version
 	);
 	$styles->add_data( 'wp-base-styles', 'rtl', 'replace' );
