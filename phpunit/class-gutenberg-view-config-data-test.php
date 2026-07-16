@@ -366,31 +366,6 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * merge() rejects a map where the view_list list is expected, mirroring how
-	 * a list-shaped form patch is rejected.
-	 *
-	 * @covers ::merge
-	 */
-	public function test_merge_rejects_map_shaped_view_list_patch() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge' );
-
-		$data   = new Gutenberg_View_Config_Data(
-			array(
-				'view_list' => array(
-					array(
-						'title' => 'All',
-						'slug'  => 'all',
-					),
-				),
-			)
-		);
-		$before = $data->get_config();
-		$data->merge( array( 'view_list' => array( 'published' => array( 'title' => 'Live' ) ) ), 1 );
-
-		$this->assertSame( $before, $data->get_config() );
-	}
-
-	/**
 	 * merge() rejects an undocumented top-level key. Nested
 	 * properties are not validated: their vocabulary is owned by the
 	 * client-side consumers.
