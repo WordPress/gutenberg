@@ -166,8 +166,8 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 
 	/**
 	 * Successive filters share the same Gutenberg_View_Config_Data instance, so
-	 * their effects compose: a later filter can remove a form field that an
-	 * earlier one added.
+	 * their effects compose: a later filter can add a form field to a group that
+	 * an earlier one defined.
 	 */
 	public function test_filters_compose_across_the_chain() {
 		add_filter(
@@ -179,7 +179,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 						'fields' => array(
 							array(
 								'id'       => 'discussion',
-								'children' => array( 'comment_status', 'ping_status' ),
+								'children' => array( 'comment_status' ),
 							),
 						),
 					),
@@ -191,7 +191,19 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
-				return $data->update_form_fields( array( 'ping_status' => null ), 1 );
+				return $data->update_properties(
+					array(
+						'form' => array(
+							'fields' => array(
+								array(
+									'id'       => 'discussion',
+									'children' => array( 'ping_status' ),
+								),
+							),
+						),
+					),
+					1
+				);
 			},
 			11
 		);
@@ -199,7 +211,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		$config = gutenberg_get_entity_view_config( 'custom_kind', 'custom_name' );
 
 		$this->assertSame(
-			array( 'comment_status' ),
+			array( 'comment_status', 'ping_status' ),
 			$config['form']['fields'][0]['children']
 		);
 	}

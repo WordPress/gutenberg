@@ -17,9 +17,8 @@
  * - The `update_*()` methods merge partial changes (patches) into what is
  *   already there, each covering one part of the configuration:
  *   `update_properties()` for `default_view`, `default_layouts`, and the
- *   `form` settings other than its `fields`; `update_view_list_items()` for
- *   the `view_list` entries, keyed by view `slug`; and `update_form_fields()`
- *   for the `form` fields, keyed by field `id`. This is what plugins should
+ *   `form` settings; and `update_view_list_items()` for the `view_list`
+ *   entries, keyed by view `slug`. This is what plugins should
  *   use: patches compose with core's configuration and with other plugins'.
  * - `set()` replaces a whole top-level key. It shouldn't be the default
  *   choice — a callback using it stops inheriting core's future changes to
@@ -132,10 +131,8 @@ class Gutenberg_View_Config_Data {
 	 * names; deleting a whole top-level key (any documented key, including
 	 * `view_list`) resets it to its default.
 	 *
-	 * The keyed collections have dedicated methods and are rejected here: a
-	 * non-null `view_list` value must go through `update_view_list_items()`,
-	 * and a `fields` key inside a `form` value must go through
-	 * `update_form_fields()`.
+	 * The `view_list` collection has a dedicated method and is rejected here:
+	 * a non-null `view_list` value must go through `update_view_list_items()`.
 	 *
 	 * A patch that declares an unsupported schema version is rejected and
 	 * does not merge.
@@ -289,61 +286,6 @@ class Gutenberg_View_Config_Data {
 		}
 
 		$this->config['view_list'] = array_values( $view_list );
-
-		return $this;
-	}
-
-	/**
-	 * Adds, updates, or removes `form` fields, keyed by field `id`.
-	 *
-	 * Each patch key names the `id` of the field it targets, and the field is
-	 * found wherever it lives — at the top level or nested inside a group's
-	 * `children`. Fields are visited in document order and a group is checked
-	 * before its own children, so when an id appears at both levels the group
-	 * wins. A matching field merges in place, an unknown id appends a new field
-	 * to the end of the top-level fields, and `null` removes the field. The
-	 * patch key is the identity: an `id` property inside the value is ignored.
-	 * A `null` for an id that is not found is a silent no-op — the field may
-	 * have been removed by another callback or simply not apply to this
-	 * entity.
-	 *
-	 * Inside a field patch, `children` follows the shared rules: an associative
-	 * array merges into the group's children by id (appending unknown ones), a
-	 * numerically indexed array replaces the children wholesale, and `null`
-	 * deletes the key.
-	 *
-	 * A patch that declares an unsupported schema version is rejected and
-	 * does not merge.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param array $fields  The field patches, keyed by field id.
-	 * @param int   $version The schema version the patch was authored against.
-	 * @return Gutenberg_View_Config_Data The instance, for chaining.
-	 */
-	public function update_form_fields( array $fields, int $version ) {
-		if ( ! $this->check_version( $version, __METHOD__ ) ) {
-			return $this;
-		}
-
-		if ( empty( $fields ) ) {
-			return $this;
-		}
-		if ( array_is_list( $fields ) ) {
-			_doing_it_wrong(
-				__METHOD__,
-				esc_html__( 'A fields patch must be keyed by field "id".', 'gutenberg' ),
-				'7.1.0'
-			);
-			return $this;
-		}
-
-		if ( ! isset( $this->config['form'] ) || ! is_array( $this->config['form'] ) ) {
-			$this->config['form'] = array();
-		}
-		$current = isset( $this->config['form']['fields'] ) && is_array( $this->config['form']['fields'] ) ? $this->config['form']['fields'] : array();
-
-		$this->config['form']['fields'] = $this->merge_fields_by_identity( $current, $fields );
 
 		return $this;
 	}
@@ -528,195 +470,6 @@ class Gutenberg_View_Config_Data {
 					return $key . ':' . $item[ $key ];
 				}
 			}
-		}
-		return null;
-	}
-
-	/**
-	 * Merges a map of field patches into a field list by identity.
-	 *
-	 * Shared by the top-level `form` fields and a group's `children`: a `null`
-	 * value removes the matching field (recursing into children), a map value
-	 * merges into the matching field wherever it lives, and an unknown id
-	 * appends a new field to the end of this list. A `null` for an id that is
-	 * not found is a silent no-op.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param array $current The current list of fields.
-	 * @param array $patches The field patches, keyed by field id.
-	 * @return array The merged list of fields.
-	 */
-	private function merge_fields_by_identity( array $current, array $patches ) {
-		foreach ( $patches as $id => $value ) {
-			// PHP casts numeric-string array keys to integers; identities are strings.
-			$id = (string) $id;
-
-			if ( null === $value ) {
-				$current = $this->reject_fields( $current, array( $id ) );
-				continue;
-			}
-			if ( ! is_array( $value ) || ( array() !== $value && array_is_list( $value ) ) ) {
-				_doing_it_wrong(
-					'Gutenberg_View_Config_Data::update_form_fields',
-					esc_html__( 'Each field patch must be an associative array of field properties, or null to remove the field.', 'gutenberg' ),
-					'7.1.0'
-				);
-				continue;
-			}
-
-			// The patch key is the identity.
-			unset( $value['id'] );
-
-			$merged = $this->merge_field_in_tree( $current, $id, $value );
-			if ( null !== $merged ) {
-				$current = $merged;
-				continue;
-			}
-			// An unknown id appends: as a bare string reference when the patch
-			// carries no overrides, as an array otherwise.
-			$current[] = array() === $value ? $id : $this->merge_field_item( $id, $id, $value );
-		}
-
-		return $current;
-	}
-
-	/**
-	 * Merges a field patch into the field carrying the given identity, wherever
-	 * it lives in the tree.
-	 *
-	 * Fields are visited in document order and a group is checked before its
-	 * own children, so when an id appears at both levels the group wins.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param array  $fields The list of fields to search.
-	 * @param string $id     The identity of the field to patch.
-	 * @param array  $value  The field patch.
-	 * @return array|null The updated list, or null when the id was not found.
-	 */
-	private function merge_field_in_tree( array $fields, $id, array $value ) {
-		foreach ( $fields as $index => $field ) {
-			if ( $this->field_identity( $field ) === $id ) {
-				$fields[ $index ] = $this->merge_field_item( $field, $id, $value );
-				return $fields;
-			}
-			if ( is_array( $field ) && isset( $field['children'] ) && is_array( $field['children'] ) ) {
-				$children = $this->merge_field_in_tree( $field['children'], $id, $value );
-				if ( null !== $children ) {
-					$fields[ $index ]['children'] = $children;
-					return $fields;
-				}
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Merges a field patch into an existing field.
-	 *
-	 * A bare string reference is promoted to an array so the overrides apply.
-	 * The `children` key follows the same rules — a map merges into the
-	 * group's children by id, a list replaces them wholesale, and `null`
-	 * deletes the key — and every other key merges via deep_merge().
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param array|string $existing The existing field.
-	 * @param string       $id       The field identity.
-	 * @param array        $value    The field patch.
-	 * @return array|string The merged field.
-	 */
-	private function merge_field_item( $existing, $id, array $value ) {
-		if ( ! is_array( $existing ) ) {
-			// Nothing to apply: keep the bare string reference.
-			if ( array() === $value ) {
-				return $existing;
-			}
-			// Promote the reference so the incoming overrides apply.
-			$existing = array( 'id' => $id );
-		}
-
-		foreach ( $value as $key => $item ) {
-			if ( 'children' === $key ) {
-				if ( null === $item ) {
-					unset( $existing['children'] );
-					continue;
-				}
-				if ( ! is_array( $item ) ) {
-					_doing_it_wrong(
-						'Gutenberg_View_Config_Data::update_form_fields',
-						esc_html__( 'A "children" patch must be an associative array keyed by field id to merge, a numerically indexed array to replace the children wholesale, or null to delete the key.', 'gutenberg' ),
-						'7.1.0'
-					);
-					continue;
-				}
-				// A list replaces the children wholesale (an empty array counts
-				// as a list, clearing them)...
-				if ( array_is_list( $item ) ) {
-					$existing['children'] = $item;
-					continue;
-				}
-				// ...and a map merges into them by identity.
-				$children             = isset( $existing['children'] ) && is_array( $existing['children'] ) ? $existing['children'] : array();
-				$existing['children'] = $this->merge_fields_by_identity( $children, $item );
-				continue;
-			}
-			if ( null === $item ) {
-				// A null patch value deletes the key.
-				unset( $existing[ $key ] );
-				continue;
-			}
-			$existing[ $key ] = $this->deep_merge(
-				array_key_exists( $key, $existing ) ? $existing[ $key ] : array(),
-				$item
-			);
-		}
-
-		return $existing;
-	}
-
-	/**
-	 * Returns a field list with the fields matching the given identities removed,
-	 * recursing into group children.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param array    $fields The list of fields.
-	 * @param string[] $ids    The identities of the fields to remove.
-	 * @return array The list with the matching fields removed.
-	 */
-	private function reject_fields( array $fields, array $ids ) {
-		$result = array();
-		foreach ( $fields as $field ) {
-			if ( in_array( $this->field_identity( $field ), $ids, true ) ) {
-				continue;
-			}
-			if ( is_array( $field ) && isset( $field['children'] ) && is_array( $field['children'] ) ) {
-				$field['children'] = $this->reject_fields( $field['children'], $ids );
-			}
-			$result[] = $field;
-		}
-		return $result;
-	}
-
-	/**
-	 * Resolves the identity of a form field.
-	 *
-	 * A bare string is its own identity; an object is identified by its `id`.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param mixed $field The field.
-	 * @return string|null The identity, or null if it cannot be resolved.
-	 */
-	private function field_identity( $field ) {
-		if ( is_string( $field ) ) {
-			return $field;
-		}
-		if ( is_array( $field ) && isset( $field['id'] ) && is_string( $field['id'] ) ) {
-			return $field['id'];
 		}
 		return null;
 	}

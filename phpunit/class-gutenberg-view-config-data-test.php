@@ -491,13 +491,11 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	 *
 	 * @covers ::update_properties
 	 * @covers ::update_view_list_items
-	 * @covers ::update_form_fields
 	 * @covers ::set
 	 */
 	public function test_update_functions_reject_unmigratable_version() {
 		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_properties' );
 		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_view_list_items' );
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_form_fields' );
 		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
 
 		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
@@ -506,7 +504,6 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$version = Gutenberg_View_Config_Data::LATEST_VERSION + 1;
 		$data->update_properties( array( 'default_view' => array( 'type' => 'grid' ) ), $version );
 		$data->update_view_list_items( array( 'mine' => array( 'title' => 'Mine' ) ), $version );
-		$data->update_form_fields( array( 'excerpt' => array( 'layout' => array( 'labelPosition' => 'side' ) ) ), $version );
 		$data->set( 'default_view', array( 'type' => 'grid' ), $version );
 
 		$this->assertSame( $before, $data->get_config() );
@@ -665,15 +662,9 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	 * A member that is not present may have been removed by another filter or
 	 * simply not apply to this entity, so it is not treated as misuse.
 	 *
-	 * @covers ::update_form_fields
 	 * @covers ::update_view_list_items
 	 */
 	public function test_null_patch_for_unknown_identity_is_silent_no_op() {
-		$data = new Gutenberg_View_Config_Data( array( 'form' => array( 'fields' => array( 'date' ) ) ) );
-		$data->update_form_fields( array( 'does_not_exist' => null ), 1 );
-
-		$this->assertSame( array( 'date' ), $data->get_config()['form']['fields'] );
-
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'view_list' => array(

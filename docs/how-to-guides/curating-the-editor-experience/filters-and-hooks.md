@@ -87,15 +87,14 @@ The configuration has four keys: `default_view`, `default_layouts`, `view_list` 
 
 The filter receives an object holding the entity's view configuration. Change the configuration by calling its methods and return the object. Each method merges a partial change (a patch) into one part of the configuration, and patches follow three shared rules: an associative array merges key by key, a numerically indexed array replaces the current value wholesale, and `null` deletes what it names.
 
--   `update_properties( $patch, $version )` merges into `default_view`, `default_layouts`, and the `form` properties other than its `fields`. Passing `null` for a whole top-level key resets it to its default.
+-   `update_properties( $patch, $version )` merges into `default_view`, `default_layouts`, and `form`, including the `form` `fields`. Passing `null` for a whole top-level key resets it to its default.
 -   `update_view_list_items( $items, $version )` adds, updates, or removes views in the `view_list`, keyed by `slug`: a matching view merges in place, an unknown slug appends a new view to the end, and `null` removes the view.
--   `update_form_fields( $fields, $version )` adds, updates, or removes `form` fields, keyed by `id`. A field is found wherever it lives — at the top level or nested inside a group's `children` — so a patch only needs the id: a matching field merges in place, an unknown id appends a new field, and `null` removes the field. Within a field patch, `children` follows the shared rules: an associative array merges into the group's children by `id` (unknown ids append to the group), a numerically indexed array replaces the children wholesale, and `null` deletes the key.
 
-For form fields, the id always lives in the patch key and the value only carries overrides, so a new field with no overrides is expressed as `'my_field' => array()` — not `array( 'my_field' )`, which is a numerically indexed array and would replace the group's children with just that field. Patch entries apply in order and `null` removes every occurrence of an id, so to move a field into a group, remove it first and append it to the group's `children` later in the same patch.
+Within a `form` patch, `fields` is a list whose members merge by their `id`: an object whose `id` matches a field already in the list merges into it in place, and a member with an unknown id — an object, or a bare string like `'my_field'` for a field that carries no overrides — is appended to the end. A group's `children` is an identity-merged list too, so listing a field in a group's `children` appends it to that group. A patch only adds to or updates the form; to remove fields, replace the whole `form` with `set( 'form', $form, $version )`.
 
 The `$version` argument declares the configuration schema version the patch was written against (currently `1`), so that a future release that changes the configuration shape can migrate existing patches forward instead of breaking them.
 
-In the following example, a custom saved view is added to the `page` list, the existing Drafts view is retitled, the Trash view is removed, the `grid` layout option is unset, and `slug` and `author` fields are removed from the form.
+In the following example, a custom saved view is added to the `page` list, the existing Drafts view is retitled, the Trash view is removed, the `grid` layout option is unset, the post content info field's label position is changed, and a new field is appended to the discussion group.
 
 ```php
 function example_filter_page_view_config( $data ) {
@@ -125,30 +124,26 @@ function example_filter_page_view_config( $data ) {
         1
     );
 
-    // Patch form fields by id, wherever they live in the form: update the
-    // label position of the post content info field, remove the slug and
-    // author fields with null, and append a new field to the discussion
-    // group's children ( array() carries no overrides ).
-    $data->update_form_fields(
-        array(
-            'post-content-info' => array(
-                'layout' => array( 'labelPosition' => 'side' ),
-            ),
-            'slug'              => null,
-            'author'            => null,
-            'discussion'        => array(
-                'children' => array( 'my_field' => array() ),
-            ),
-        ),
-        1
-    );
-
-    // Unset a nested value with null: drop the grid layout option. Form
-    // properties other than `fields` also merge here.
+    // Patch properties: unset a nested value with null to drop the grid
+    // layout option, change a form property, and patch form fields by id —
+    // update the label position of the post content info field and append a
+    // new field ( a bare string ) to the discussion group's children.
     $data->update_properties(
         array(
             'default_layouts' => array( 'grid' => null ),
-            'form'            => array( 'layout' => array( 'type' => 'regular' ) ),
+            'form'            => array(
+                'layout' => array( 'type' => 'regular' ),
+                'fields' => array(
+                    array(
+                        'id'     => 'post-content-info',
+                        'layout' => array( 'labelPosition' => 'side' ),
+                    ),
+                    array(
+                        'id'       => 'discussion',
+                        'children' => array( 'my_field' ),
+                    ),
+                ),
+            ),
         ),
         1
     );
