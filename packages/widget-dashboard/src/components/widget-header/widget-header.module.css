@@ -12,8 +12,14 @@
 	height: var(--wpds-dimension-size-lg);
 }
 
+/*
+ * The identity may shrink below its natural width, but never below this
+ * floor: the icon plus a usable slice of title. Paired with the toolbar's
+ * fit logic (`WIDGET_HEADER_IDENTITY_RESERVE`), which collapses the inline
+ * controls before they would push the identity past it.
+ */
 .identity {
-	min-width: 0;
+	min-inline-size: 120px;
 }
 
 .icon {

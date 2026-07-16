@@ -16,8 +16,7 @@ import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { getWidgetSettingsTitle } from './utils';
 import styles from './widget-settings.module.css';
-
-type WidgetAttributes = Record< string, unknown >;
+import type { WidgetAttributes } from '../../types';
 
 /**
  * Side drawer that edits one instance's attributes, mounted once at the
