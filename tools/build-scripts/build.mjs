@@ -150,6 +150,17 @@ async function build() {
 			const buildTime = Date.now() - tsStartTime;
 			console.log( `   ✔ Built TypeScript types (${ buildTime }ms)` );
 
+			// Add explicit extensions to relative specifiers in ESM package
+			// declarations so they resolve under Node-style ESM (node16/nodenext),
+			// not just bundler resolution. See https://github.com/WordPress/gutenberg/issues/80206.
+			console.log( '\n🧩 Normalizing ESM declaration extensions...' );
+			await exec( 'node', [
+				path.join(
+					__dirname,
+					'packages/normalize-declaration-extensions.mjs'
+				),
+			] );
+
 			console.log( '\n✅ Checking type declaration files...' );
 			await exec( 'node', [
 				path.join(
