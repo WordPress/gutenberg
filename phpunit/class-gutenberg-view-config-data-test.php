@@ -9,7 +9,9 @@
 class Tests_View_Config_Data extends WP_UnitTestCase {
 
 	/**
-	 * set() replaces a whole documented key.
+	 * replace() merges scalar and associative properties within a documented
+	 * key just like merge() does — the untouched `fields` and `sort` under
+	 * default_view survive; only the keys the patch names change.
 	 *
 	 * @covers ::replace
 	 */
@@ -17,47 +19,54 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
-					'type'    => 'table',
-					'perPage' => 23,
+					'type'       => 'table',
+					'perPage'    => 23,
 					'showLevels' => true,
-					'fields' => array( 'f1', 'f2' ),
-					'sort' => array(
+					'fields'     => array( 'f1', 'f2' ),
+					'sort'       => array(
 						'field'     => 'title',
 						'direction' => 'asc',
-					)
+					),
 				),
-				'form' => array(
-					'fields' => array( 'f1', 'f2' )
-				)
+				'form'         => array(
+					'fields' => array( 'f1', 'f2' ),
+				),
 			)
 		);
-		$data->replace( array(
-			'default_view' => array(
-				'type'    => 'grid',
-				'perPage' => 50,
-				'showLevels' => false,
-			)
-		), 1 );
-
-		$this->assertSame( array(
-			'default_view' => array(
-				'type'    => 'grid',
-				'perPage' => 50,
-				'showLevels' => false,
-				'fields' => array( 'f1', 'f2' ),
-				'sort' => array(
-					'field'     => 'title',
-					'direction' => 'asc',
-				)
+		$data->replace(
+			array(
+				'default_view' => array(
+					'type'       => 'grid',
+					'perPage'    => 50,
+					'showLevels' => false,
+				),
 			),
-			'form' => array(
-				'fields' => array( 'f1', 'f2' )
-			)
-		), $data->get_data() );
+			1
+		);
+
+		$this->assertSame(
+			array(
+				'default_view' => array(
+					'type'       => 'grid',
+					'perPage'    => 50,
+					'showLevels' => false,
+					'fields'     => array( 'f1', 'f2' ),
+					'sort'       => array(
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
+				),
+				'form'         => array(
+					'fields' => array( 'f1', 'f2' ),
+				),
+			),
+			$data->get_data()
+		);
 	}
 
 	/**
-	 * set() rejects an undocumented key.
+	 * replace() rejects an undocumented top-level key and leaves the
+	 * configuration untouched.
 	 *
 	 * @covers ::replace
 	 */
@@ -72,7 +81,8 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * set() rejects a patch with an invalid version.
+	 * replace() rejects a patch with an unsupported version and leaves the
+	 * configuration untouched.
 	 *
 	 * @covers ::replace
 	 */
@@ -97,95 +107,95 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	public function test_replace_associative_array_properties() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
-				'default_view' => array(
+				'default_view'    => array(
 					'sort' => array(
-						'field' => 'title',
-						'direction' => 'asc'
-					)
-				),
-				'default_layouts' => array(
-					'table' => array(
-		            	'layout' => array(
-		                	'styles' => array(
-		                    	'width' => 1,
-		                	),
-		                	'density' => 'd2',
-		                	'enableMoving' => true
-		            	)
-			    	)
-				),
-				'form' => array(
-					'layout' => array(
-						'type' => 'panel',
-						'labelPosition' => 'top',
-						'openAs' => array(
-							'type' => 'modal',
-							'applyLabel' => 'Apply'
-						),
-					)
-				)
-			)
-		);
-		$data->replace(
-			array(
-				'default_view' => array(
-					'sort' => array(
-						'direction' => 'desc'
-					)
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
 				),
 				'default_layouts' => array(
 					'table' => array(
 						'layout' => array(
-							'styles' => array(
-								'minWidth' => 2
+							'styles'       => array(
+								'width' => 1,
+							),
+							'density'      => 'd2',
+							'enableMoving' => true,
+						),
+					),
+				),
+				'form'            => array(
+					'layout' => array(
+						'type'          => 'panel',
+						'labelPosition' => 'top',
+						'openAs'        => array(
+							'type'       => 'modal',
+							'applyLabel' => 'Apply',
+						),
+					),
+				),
+			)
+		);
+		$data->replace(
+			array(
+				'default_view'    => array(
+					'sort' => array(
+						'direction' => 'desc',
+					),
+				),
+				'default_layouts' => array(
+					'table' => array(
+						'layout' => array(
+							'styles'  => array(
+								'minWidth' => 2,
 							),
 							'density' => 'd2',
-						)
-					)
-				),
-				'form' => array(
-					'layout' => array(
-						'type' => 'panel',
-						'labelPosition' => 'side',
-						'openAs' => array(
-							'type' => 'drawer'
 						),
-					)
-				)
+					),
+				),
+				'form'            => array(
+					'layout' => array(
+						'type'          => 'panel',
+						'labelPosition' => 'side',
+						'openAs'        => array(
+							'type' => 'drawer',
+						),
+					),
+				),
 			),
 			1
 		);
 
 		$this->assertSame(
 			array(
-				'default_view'=> array(
+				'default_view'    => array(
 					'sort' => array(
-						'field' => 'title',
-						'direction' => 'desc'
-						)
+						'field'     => 'title',
+						'direction' => 'desc',
+					),
 				),
 				'default_layouts' => array(
 					'table' => array(
 						'layout' => array(
-							'styles' => array(
-								'width' => 1,
-								'minWidth' => 2
+							'styles'       => array(
+								'width'    => 1,
+								'minWidth' => 2,
 							),
-							'density' => 'd2',
-							'enableMoving' => true
-						)
-					)
-				),
-				'form' => array(
-					'layout' => array(
-						'type' => 'panel',
-						'labelPosition' => 'side',
-						'openAs' => array(
-							'type' => 'drawer',
-							'applyLabel' => 'Apply'
+							'density'      => 'd2',
+							'enableMoving' => true,
 						),
-					)
-				)
+					),
+				),
+				'form'            => array(
+					'layout' => array(
+						'type'          => 'panel',
+						'labelPosition' => 'side',
+						'openAs'        => array(
+							'type'       => 'drawer',
+							'applyLabel' => 'Apply',
+						),
+					),
+				),
 			),
 			$data->get_data()
 		);
@@ -205,17 +215,21 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
-					'fields' => array(
-						array( 'title' )
+					'fields'  => array(
+						array( 'title' ),
 					),
 					'filters' => array(
-						array( 'field' => 'id1', 'operator' => 'op1', 'value' => [ 'val1' ] ),
+						array(
+							'field'    => 'id1',
+							'operator' => 'op1',
+							'value'    => array( 'val1' ),
+						),
 					),
-					'layout' => array(
-						'badgeFields' => array( 'b1', 'b2' )
-					)
+					'layout'  => array(
+						'badgeFields' => array( 'b1', 'b2' ),
+					),
 				),
-				'view_list' => array(
+				'view_list'    => array(
 					array(
 						'title' => 'All',
 						'slug'  => 'all',
@@ -232,43 +246,51 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 						),
 					),
 				),
-				'form' => array(
+				'form'         => array(
 					'layout' => array(
-						'summary' => array( 'f1' )
+						'summary' => array( 'f1' ),
 					),
 					'fields' => array(
 						'f1',
 						array(
-							'id' => 'f2',
-							'label' => 'Field label',
+							'id'       => 'f2',
+							'label'    => 'Field label',
 							'children' => array(
 								'child1',
 								array(
-									'id' => 'child2',
-									'label' => 'Child 2 label'
-								)
-							)
+									'id'    => 'child2',
+									'label' => 'Child 2 label',
+								),
+							),
 						),
-						'f3'
-					)
-				)
+						'f3',
+					),
+				),
 			)
 		);
 		$data->replace(
 			array(
 				'default_view' => array(
-					'fields' => array(
-						array( 'slug' )
+					'fields'  => array(
+						array( 'slug' ),
 					),
 					'filters' => array(
-						array( 'field' => 'id1', 'operator' => 'change', 'isLocked' => true ),
-						array( 'field' => 'id2', 'operator' => 'op2', 'value' => [ 'val2' ] ),
+						array(
+							'field'    => 'id1',
+							'operator' => 'change',
+							'isLocked' => true,
+						),
+						array(
+							'field'    => 'id2',
+							'operator' => 'op2',
+							'value'    => array( 'val2' ),
+						),
 					),
-					'layout' => array(
-						'badgeFields' => array( 'b2' )
-					)
+					'layout'  => array(
+						'badgeFields' => array( 'b2' ),
+					),
 				),
-				'view_list' => array(
+				'view_list'    => array(
 					array(
 						'slug'  => 'published',
 						'title' => 'Live',
@@ -281,88 +303,97 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 						'title' => 'Mine',
 					),
 				),
-				'form' => array(
+				'form'         => array(
 					'layout' => array(
-						'summary' => array( 'f2' )
+						'summary' => array( 'f2' ),
 					),
 					'fields' => array(
 						'f4',
 						array(
-							'id' => 'f2',
-							'label' => 'Updated label',
+							'id'       => 'f2',
+							'label'    => 'Updated label',
 							'children' => array(
 								array(
-									'id' => 'child2',
-									'label' => 'Child 2 updated label'
+									'id'    => 'child2',
+									'label' => 'Child 2 updated label',
 								),
 								array(
-									'id' => 'child3',
-									'label' => 'Child 3 label'
-								)
-							)
+									'id'    => 'child3',
+									'label' => 'Child 3 label',
+								),
+							),
 						),
 						array(
-							'id' => 'f3',
-							'label' => 'Field 3 label'
-						)
-					)
-				)
+							'id'    => 'f3',
+							'label' => 'Field 3 label',
+						),
+					),
+				),
 			),
 			1
 		);
 
-		$this->assertSame( array(
-			'default_view' => array(
-				'fields' => array(
-					array( 'slug' )
-				),
-				'filters' => array(
-					array( 'field' => 'id1', 'operator' => 'change', 'isLocked' => true ),
-					array( 'field' => 'id2', 'operator' => 'op2', 'value' => [ 'val2' ] ),
-				),
-				'layout' => array(
-					'badgeFields' => array( 'b2' )
-				)
-			),
-			'view_list' => array(
-				array(
-					'slug'  => 'published',
-					'title' => 'Live',
-					'view'  => array(
-						'sort' => array( 'direction' => 'desc' ),
+		$this->assertSame(
+			array(
+				'default_view' => array(
+					'fields'  => array(
+						array( 'slug' ),
+					),
+					'filters' => array(
+						array(
+							'field'    => 'id1',
+							'operator' => 'change',
+							'isLocked' => true,
+						),
+						array(
+							'field'    => 'id2',
+							'operator' => 'op2',
+							'value'    => array( 'val2' ),
+						),
+					),
+					'layout'  => array(
+						'badgeFields' => array( 'b2' ),
 					),
 				),
-				array(
-					'slug'  => 'mine',
-					'title' => 'Mine',
-				),
-			),
-			'form' => array(
-				'layout' => array(
-					'summary' => array( 'f2' )
-				),
-				'fields' => array(
-					'f4',
+				'view_list'    => array(
 					array(
-						'id' => 'f2',
-						'label' => 'Updated label',
-						'children' => array(
-							array(
-								'id' => 'child2',
-								'label' => 'Child 2 updated label'
+						'slug'  => 'published',
+						'title' => 'Live',
+						'view'  => array(
+							'sort' => array( 'direction' => 'desc' ),
+						),
+					),
+					array(
+						'slug'  => 'mine',
+						'title' => 'Mine',
+					),
+				),
+				'form'         => array(
+					'layout' => array(
+						'summary' => array( 'f2' ),
+					),
+					'fields' => array(
+						'f4',
+						array(
+							'id'       => 'f2',
+							'label'    => 'Updated label',
+							'children' => array(
+								array(
+									'id'    => 'child2',
+									'label' => 'Child 2 updated label',
+								),
+								array(
+									'id'    => 'child3',
+									'label' => 'Child 3 label',
+								),
 							),
-							array(
-								'id' => 'child3',
-								'label' => 'Child 3 label'
-							)
-						)
+						),
+						array(
+							'id'    => 'f3',
+							'label' => 'Field 3 label',
+						),
 					),
-					array(
-						'id' => 'f3',
-						'label' => 'Field 3 label'
-					)
-				)
-			)
+				),
 			),
 			$data->get_data()
 		);
@@ -395,12 +426,12 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	public function test_replace_null_unsets_associative_array_properties() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
-				'default_view' => array(
-					'type'   => 'table',
-					'sort'    => array(
+				'default_view'    => array(
+					'type' => 'table',
+					'sort' => array(
 						'field'     => 'title',
 						'direction' => 'asc',
-					)
+					),
 				),
 				'default_layouts' => array(
 					'table' => array(
@@ -414,23 +445,24 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 		$data->replace(
 			array(
-				'default_view' => array(
-					'sort' => null
+				'default_view'    => array(
+					'sort' => null,
 				),
 				'default_layouts' => array(
-					'table' => array( 'layout' => array( 'styles' => null ) ) )
+					'table' => array( 'layout' => array( 'styles' => null ) ),
 				),
+			),
 			1
 		);
 
 		$this->assertSame(
 			array(
-				'default_view' => array(
+				'default_view'    => array(
 					'type' => 'table',
 				),
 				'default_layouts' => array(
 					'table' => array( 'layout' => array( 'density' => 'compact' ) ),
-				)
+				),
 			),
 			$data->get_data()
 		);
@@ -444,17 +476,21 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	public function test_replace_null_unsets_indexed_array_properties() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
-				'default_view' => array(
-					'type'   => 'table',
-					'filters'    => array(
-						array( 'field' => 'id1', 'operator' => 'op1', 'value' => [ 'val1' ] ),
-					)
+				'default_view'    => array(
+					'type'    => 'table',
+					'filters' => array(
+						array(
+							'field'    => 'id1',
+							'operator' => 'op1',
+							'value'    => array( 'val1' ),
+						),
+					),
 				),
 				'default_layouts' => array(
 					'grid' => array(
 						'layout' => array(
-							'density' => 'compact',
-							'badgeFields'  => array( 'b1', 'b2' ),
+							'density'     => 'compact',
+							'badgeFields' => array( 'b1', 'b2' ),
 						),
 					),
 				),
@@ -462,23 +498,24 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 		$data->replace(
 			array(
-				'default_view' => array(
-					'filters' => null
+				'default_view'    => array(
+					'filters' => null,
 				),
 				'default_layouts' => array(
-					'grid' => array( 'layout' => array( 'badgeFields' => null ) ) )
+					'grid' => array( 'layout' => array( 'badgeFields' => null ) ),
 				),
+			),
 			1
 		);
 
 		$this->assertSame(
 			array(
-				'default_view' => array(
+				'default_view'    => array(
 					'type' => 'table',
 				),
 				'default_layouts' => array(
 					'grid' => array( 'layout' => array( 'density' => 'compact' ) ),
-				)
+				),
 			),
 			$data->get_data()
 		);
@@ -528,7 +565,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			array(
 				'default_view' => array(
 					'fields' => array(
-						'title'
+						'title',
 					),
 				),
 			)
@@ -537,19 +574,20 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			array(
 				'default_view' => array(
 					'fields' => array(
-						'slug'
+						'slug',
 					),
 				),
 			),
 			1
 		);
 
-		$this->assertSame( array(
-			'default_view' => array(
-				'fields' => array(
-					'slug'
+		$this->assertSame(
+			array(
+				'default_view' => array(
+					'fields' => array(
+						'slug',
+					),
 				),
-			),
 			),
 			$data->get_data()
 		);
@@ -568,9 +606,9 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					'fields' => array(
 						'title',
 						array(
-							'id' => 'slug',
-							'label' => 'Slug'
-						)
+							'id'    => 'slug',
+							'label' => 'Slug',
+						),
 					),
 				),
 			)
@@ -580,24 +618,25 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'form' => array(
 					'fields' => array(
 						array(
-							'id' => 'title',
-							'label' => 'Changed'
-						)
+							'id'    => 'title',
+							'label' => 'Changed',
+						),
 					),
 				),
 			),
 			1
 		);
 
-		$this->assertSame( array(
-			'form' => array(
-				'fields' => array(
-					array(
-						'id' => 'title',
-						'label' => 'Changed'
-					)
+		$this->assertSame(
+			array(
+				'form' => array(
+					'fields' => array(
+						array(
+							'id'    => 'title',
+							'label' => 'Changed',
+						),
+					),
 				),
-			),
 			),
 			$data->get_data()
 		);
@@ -629,19 +668,20 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					array(
 						'slug'  => 'all',
 						'title' => 'Changed',
-					)
+					),
 				),
 			),
 			1
 		);
 
-		$this->assertSame( array(
-			'view_list' => array(
-				array(
-					'slug'  => 'all',
-					'title' => 'Changed',
+		$this->assertSame(
+			array(
+				'view_list' => array(
+					array(
+						'slug'  => 'all',
+						'title' => 'Changed',
+					),
 				),
-			),
 			),
 			$data->get_data()
 		);
@@ -659,8 +699,12 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			array(
 				'default_view' => array(
 					'filters' => array(
-						array( 'field' => 'id1', 'operator' => 'op1', 'value' => [ 'val1' ] ),
-					)
+						array(
+							'field'    => 'id1',
+							'operator' => 'op1',
+							'value'    => array( 'val1' ),
+						),
+					),
 				),
 			)
 		);
@@ -668,19 +712,26 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			array(
 				'default_view' => array(
 					'filters' => array(
-						array( 'field' => 'id1', 'operator' => 'change' ),
-					)
+						array(
+							'field'    => 'id1',
+							'operator' => 'change',
+						),
+					),
 				),
 			),
 			1
 		);
 
-		$this->assertSame( array(
-			'default_view' => array(
-				'filters' => array(
-					array( 'field' => 'id1', 'operator' => 'change' ),
-				)
-			),
+		$this->assertSame(
+			array(
+				'default_view' => array(
+					'filters' => array(
+						array(
+							'field'    => 'id1',
+							'operator' => 'change',
+						),
+					),
+				),
 			),
 			$data->get_data()
 		);
@@ -695,17 +746,17 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
-					'type'    => 'table',
-					'perPage' => 20,
-					'showLevels' => false
+					'type'       => 'table',
+					'perPage'    => 20,
+					'showLevels' => false,
 				),
 			)
 		);
 		$data->merge(
 			array(
 				'default_view' => array(
-					'type' => 'grid',
-					'perPage' => 50,
+					'type'       => 'grid',
+					'perPage'    => 50,
 					'showLevels' => false,
 				),
 			),
@@ -714,9 +765,9 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 
 		$this->assertSame(
 			array(
-				'type'    => 'grid',
-				'perPage' => 50,
-				'showLevels' => false
+				'type'       => 'grid',
+				'perPage'    => 50,
+				'showLevels' => false,
 			),
 			$data->get_data()['default_view']
 		);
@@ -730,95 +781,95 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	public function test_merge_associative_array_properties() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
-				'default_view' => array(
+				'default_view'    => array(
 					'sort' => array(
-						'field' => 'title',
-						'direction' => 'asc'
-					)
-				),
-				'default_layouts' => array(
-					'table' => array(
-		            	'layout' => array(
-		                	'styles' => array(
-		                    	'width' => 1,
-		                	),
-		                	'density' => 'd2',
-		                	'enableMoving' => true
-		            	)
-			    	)
-				),
-				'form' => array(
-					'layout' => array(
-						'type' => 'panel',
-						'labelPosition' => 'top',
-						'openAs' => array(
-							'type' => 'modal',
-							'applyLabel' => 'Apply'
-						),
-					)
-				)
-			)
-		);
-		$data->merge(
-			array(
-				'default_view' => array(
-					'sort' => array(
-						'direction' => 'desc'
-					)
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
 				),
 				'default_layouts' => array(
 					'table' => array(
 						'layout' => array(
-							'styles' => array(
-								'minWidth' => 2
+							'styles'       => array(
+								'width' => 1,
+							),
+							'density'      => 'd2',
+							'enableMoving' => true,
+						),
+					),
+				),
+				'form'            => array(
+					'layout' => array(
+						'type'          => 'panel',
+						'labelPosition' => 'top',
+						'openAs'        => array(
+							'type'       => 'modal',
+							'applyLabel' => 'Apply',
+						),
+					),
+				),
+			)
+		);
+		$data->merge(
+			array(
+				'default_view'    => array(
+					'sort' => array(
+						'direction' => 'desc',
+					),
+				),
+				'default_layouts' => array(
+					'table' => array(
+						'layout' => array(
+							'styles'  => array(
+								'minWidth' => 2,
 							),
 							'density' => 'd2',
-						)
-					)
-				),
-				'form' => array(
-					'layout' => array(
-						'type' => 'panel',
-						'labelPosition' => 'side',
-						'openAs' => array(
-							'type' => 'drawer'
 						),
-					)
-				)
+					),
+				),
+				'form'            => array(
+					'layout' => array(
+						'type'          => 'panel',
+						'labelPosition' => 'side',
+						'openAs'        => array(
+							'type' => 'drawer',
+						),
+					),
+				),
 			),
 			1
 		);
 
 		$this->assertSame(
 			array(
-				'default_view'=> array(
+				'default_view'    => array(
 					'sort' => array(
-						'field' => 'title',
-						'direction' => 'desc'
-						)
+						'field'     => 'title',
+						'direction' => 'desc',
+					),
 				),
 				'default_layouts' => array(
 					'table' => array(
 						'layout' => array(
-							'styles' => array(
-								'width' => 1,
-								'minWidth' => 2
+							'styles'       => array(
+								'width'    => 1,
+								'minWidth' => 2,
 							),
-							'density' => 'd2',
-							'enableMoving' => true
-						)
-					)
-				),
-				'form' => array(
-					'layout' => array(
-						'type' => 'panel',
-						'labelPosition' => 'side',
-						'openAs' => array(
-							'type' => 'drawer',
-							'applyLabel' => 'Apply'
+							'density'      => 'd2',
+							'enableMoving' => true,
 						),
-					)
-				)
+					),
+				),
+				'form'            => array(
+					'layout' => array(
+						'type'          => 'panel',
+						'labelPosition' => 'side',
+						'openAs'        => array(
+							'type'       => 'drawer',
+							'applyLabel' => 'Apply',
+						),
+					),
+				),
 			),
 			$data->get_data()
 		);
@@ -835,17 +886,21 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
-					'fields' => array(
-						array( 'title' )
+					'fields'  => array(
+						array( 'title' ),
 					),
 					'filters' => array(
-						array( 'field' => 'id1', 'operator' => 'op1', 'value' => [ 'val1' ] ),
+						array(
+							'field'    => 'id1',
+							'operator' => 'op1',
+							'value'    => array( 'val1' ),
+						),
 					),
-					'layout' => array(
-						'badgeFields' => array( 'b1', 'b2' )
-					)
+					'layout'  => array(
+						'badgeFields' => array( 'b1', 'b2' ),
+					),
 				),
-				'view_list' => array(
+				'view_list'    => array(
 					array(
 						'title' => 'All',
 						'slug'  => 'all',
@@ -862,43 +917,51 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 						),
 					),
 				),
-				'form' => array(
+				'form'         => array(
 					'layout' => array(
-						'summary' => array( 'f1' )
+						'summary' => array( 'f1' ),
 					),
 					'fields' => array(
 						'f1',
 						array(
-							'id' => 'f2',
-							'label' => 'Field label',
+							'id'       => 'f2',
+							'label'    => 'Field label',
 							'children' => array(
 								'child1',
 								array(
-									'id' => 'child2',
-									'label' => 'Child 2 label'
-								)
-							)
+									'id'    => 'child2',
+									'label' => 'Child 2 label',
+								),
+							),
 						),
-						'f3'
-					)
-				)
+						'f3',
+					),
+				),
 			)
 		);
 		$data->merge(
 			array(
 				'default_view' => array(
-					'fields' => array(
-						array( 'slug' )
+					'fields'  => array(
+						array( 'slug' ),
 					),
 					'filters' => array(
-						array( 'field' => 'id1', 'operator' => 'change', 'isLocked' => true ),
-						array( 'field' => 'id2', 'operator' => 'op2', 'value' => [ 'val2' ] ),
+						array(
+							'field'    => 'id1',
+							'operator' => 'change',
+							'isLocked' => true,
+						),
+						array(
+							'field'    => 'id2',
+							'operator' => 'op2',
+							'value'    => array( 'val2' ),
+						),
 					),
-					'layout' => array(
-						'badgeFields' => array( 'b2' )
-					)
+					'layout'  => array(
+						'badgeFields' => array( 'b2' ),
+					),
 				),
-				'view_list' => array(
+				'view_list'    => array(
 					array(
 						'slug'  => 'published',
 						'title' => 'Live',
@@ -911,99 +974,109 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 						'title' => 'Mine',
 					),
 				),
-				'form' => array(
+				'form'         => array(
 					'layout' => array(
-						'summary' => array( 'f2' )
+						'summary' => array( 'f2' ),
 					),
 					'fields' => array(
 						'f4',
 						array(
-							'id' => 'f2',
-							'label' => 'Updated label',
+							'id'       => 'f2',
+							'label'    => 'Updated label',
 							'children' => array(
 								array(
-									'id' => 'child2',
-									'label' => 'Child 2 updated label'
+									'id'    => 'child2',
+									'label' => 'Child 2 updated label',
 								),
 								array(
-									'id' => 'child3',
-									'label' => 'Child 3 label'
-								)
-							)
+									'id'    => 'child3',
+									'label' => 'Child 3 label',
+								),
+							),
 						),
 						array(
-							'id' => 'f3',
-							'label' => 'Field 3 label'
-						)
-					)
-				)
+							'id'    => 'f3',
+							'label' => 'Field 3 label',
+						),
+					),
+				),
 			),
 			1
 		);
 
-		$this->assertSame( array(
-			'default_view' => array(
-				'fields' => array(
-					array( 'title' ),
-					array( 'slug' )
-				),
-				'filters' => array(
-					array( 'field' => 'id1', 'operator' => 'change', 'value' => [ 'val1' ], 'isLocked' => true ),
-					array( 'field' => 'id2', 'operator' => 'op2', 'value' => [ 'val2' ] ),
-				),
-				'layout' => array(
-					'badgeFields' => array( 'b1', 'b2' )
-				)
-			),
-			'view_list' => array(
-				array(
-					'title' => 'All',
-					'slug'  => 'all',
-				),
-				array(
-					'title' => 'Live',
-					'slug'  => 'published',
-					'view'  => array(
-						'type' => 'list',
-						'sort' => array(
-							'field'     => 'title',
-							'direction' => 'desc',
+		$this->assertSame(
+			array(
+				'default_view' => array(
+					'fields'  => array(
+						array( 'title' ),
+						array( 'slug' ),
+					),
+					'filters' => array(
+						array(
+							'field'    => 'id1',
+							'operator' => 'change',
+							'value'    => array( 'val1' ),
+							'isLocked' => true,
+						),
+						array(
+							'field'    => 'id2',
+							'operator' => 'op2',
+							'value'    => array( 'val2' ),
 						),
 					),
+					'layout'  => array(
+						'badgeFields' => array( 'b1', 'b2' ),
+					),
 				),
-				array(
-					'slug'  => 'mine',
-					'title' => 'Mine',
-				),
-			),
-			'form' => array(
-				'layout' => array(
-					'summary' => array( 'f1', 'f2' )
-				),
-				'fields' => array(
-					'f1',
+				'view_list'    => array(
 					array(
-						'id' => 'f2',
-						'label' => 'Updated label',
-						'children' => array(
-							'child1',
-							array(
-								'id' => 'child2',
-								'label' => 'Child 2 updated label'
+						'title' => 'All',
+						'slug'  => 'all',
+					),
+					array(
+						'title' => 'Live',
+						'slug'  => 'published',
+						'view'  => array(
+							'type' => 'list',
+							'sort' => array(
+								'field'     => 'title',
+								'direction' => 'desc',
 							),
-							array(
-								'id' => 'child3',
-								'label' => 'Child 3 label'
-							)
-						)
+						),
 					),
 					array(
-						'id' => 'f3',
-						'label' => 'Field 3 label'
+						'slug'  => 'mine',
+						'title' => 'Mine',
 					),
-					'f4'
-				)
-			)
+				),
+				'form'         => array(
+					'layout' => array(
+						'summary' => array( 'f1', 'f2' ),
+					),
+					'fields' => array(
+						'f1',
+						array(
+							'id'       => 'f2',
+							'label'    => 'Updated label',
+							'children' => array(
+								'child1',
+								array(
+									'id'    => 'child2',
+									'label' => 'Child 2 updated label',
+								),
+								array(
+									'id'    => 'child3',
+									'label' => 'Child 3 label',
+								),
+							),
+						),
+						array(
+							'id'    => 'f3',
+							'label' => 'Field 3 label',
+						),
+						'f4',
+					),
+				),
 			),
 			$data->get_data()
 		);
@@ -1036,12 +1109,12 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	public function test_merge_null_unsets_associative_array_properties() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
-				'default_view' => array(
-					'type'   => 'table',
-					'sort'    => array(
+				'default_view'    => array(
+					'type' => 'table',
+					'sort' => array(
 						'field'     => 'title',
 						'direction' => 'asc',
-					)
+					),
 				),
 				'default_layouts' => array(
 					'table' => array(
@@ -1055,23 +1128,24 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 		$data->merge(
 			array(
-				'default_view' => array(
-					'sort' => null
+				'default_view'    => array(
+					'sort' => null,
 				),
 				'default_layouts' => array(
-					'table' => array( 'layout' => array( 'styles' => null ) ) )
+					'table' => array( 'layout' => array( 'styles' => null ) ),
 				),
+			),
 			1
 		);
 
 		$this->assertSame(
 			array(
-				'default_view' => array(
+				'default_view'    => array(
 					'type' => 'table',
 				),
 				'default_layouts' => array(
 					'table' => array( 'layout' => array( 'density' => 'compact' ) ),
-				)
+				),
 			),
 			$data->get_data()
 		);
@@ -1085,17 +1159,21 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	public function test_merge_null_unsets_indexed_array_properties() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
-				'default_view' => array(
-					'type'   => 'table',
-					'filters'    => array(
-						array( 'field' => 'id1', 'operator' => 'op1', 'value' => [ 'val1' ] ),
-					)
+				'default_view'    => array(
+					'type'    => 'table',
+					'filters' => array(
+						array(
+							'field'    => 'id1',
+							'operator' => 'op1',
+							'value'    => array( 'val1' ),
+						),
+					),
 				),
 				'default_layouts' => array(
 					'grid' => array(
 						'layout' => array(
-							'density' => 'compact',
-							'badgeFields'  => array( 'b1', 'b2' ),
+							'density'     => 'compact',
+							'badgeFields' => array( 'b1', 'b2' ),
 						),
 					),
 				),
@@ -1103,23 +1181,24 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 		$data->merge(
 			array(
-				'default_view' => array(
-					'filters' => null
+				'default_view'    => array(
+					'filters' => null,
 				),
 				'default_layouts' => array(
-					'grid' => array( 'layout' => array( 'badgeFields' => null ) ) )
+					'grid' => array( 'layout' => array( 'badgeFields' => null ) ),
 				),
+			),
 			1
 		);
 
 		$this->assertSame(
 			array(
-				'default_view' => array(
+				'default_view'    => array(
 					'type' => 'table',
 				),
 				'default_layouts' => array(
 					'grid' => array( 'layout' => array( 'density' => 'compact' ) ),
-				)
+				),
 			),
 			$data->get_data()
 		);
@@ -1195,12 +1274,18 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 
-	public function test_merge_identity_for_scalars(){
+	/**
+	 * merge() treats a scalar list member as its own identity: an incoming
+	 * scalar that already appears is a no-op, and a new one is appended.
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_identity_for_scalars() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
 					'fields' => array(
-						'title'
+						'title',
 					),
 				),
 			)
@@ -1210,35 +1295,43 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'default_view' => array(
 					'fields' => array(
 						'title',
-						'slug'
+						'slug',
 					),
 				),
 			),
 			1
 		);
 
-		$this->assertSame( array(
-			'default_view' => array(
-				'fields' => array(
-					'title',
-					'slug'
+		$this->assertSame(
+			array(
+				'default_view' => array(
+					'fields' => array(
+						'title',
+						'slug',
+					),
 				),
-			),
 			),
 			$data->get_data()
 		);
 	}
 
-	public function test_merge_identity_for_key_id(){
+	/**
+	 * merge() matches list members by their `id`, and a bare scalar member
+	 * (`'title'`) matches an incoming map carrying that same value
+	 * (`array( 'id' => 'title' )`), merging into it in place.
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_identity_for_key_id() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'form' => array(
 					'fields' => array(
 						'title', // this scalar will be matched with array( 'id' => 'title' )
 						array(
-							'id' => 'slug',
-							'label' => 'Slug'
-						)
+							'id'    => 'slug',
+							'label' => 'Slug',
+						),
 					),
 				),
 			)
@@ -1248,38 +1341,45 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'form' => array(
 					'fields' => array(
 						array(
-							'id' => 'title',
-							'label' => 'Changed'
+							'id'    => 'title',
+							'label' => 'Changed',
 						),
 						array(
-							'id' => 'slug',
-							'label' => 'Changed'
-						)
+							'id'    => 'slug',
+							'label' => 'Changed',
+						),
 					),
 				),
 			),
 			1
 		);
 
-		$this->assertSame( array(
-			'form' => array(
-				'fields' => array(
-					array(
-						'id' => 'title',
-						'label' => 'Changed'
+		$this->assertSame(
+			array(
+				'form' => array(
+					'fields' => array(
+						array(
+							'id'    => 'title',
+							'label' => 'Changed',
+						),
+						array(
+							'id'    => 'slug',
+							'label' => 'Changed',
+						),
 					),
-					array(
-						'id' => 'slug',
-						'label' => 'Changed'
-					)
 				),
-			),
 			),
 			$data->get_data()
 		);
 	}
 
-	public function test_merge_identity_for_key_slug(){
+	/**
+	 * merge() matches view_list members by their `slug`, merging an incoming
+	 * view into the existing one of the same slug in place.
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_identity_for_key_slug() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'view_list' => array(
@@ -1296,31 +1396,43 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					array(
 						'slug'  => 'all',
 						'title' => 'Changed',
-					)
+					),
 				),
 			),
 			1
 		);
 
-		$this->assertSame( array(
-			'view_list' => array(
-				array(
-					'slug'  => 'all',
-					'title' => 'Changed',
+		$this->assertSame(
+			array(
+				'view_list' => array(
+					array(
+						'slug'  => 'all',
+						'title' => 'Changed',
+					),
 				),
-			),
 			),
 			$data->get_data()
 		);
 	}
 
-	public function test_merge_identity_for_key_field(){
+	/**
+	 * merge() matches filter members by their `field`, merging the incoming
+	 * member's keys onto the existing one so untouched props (e.g. `value`)
+	 * are preserved — the behavior that distinguishes merge() from replace().
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_identity_for_key_field() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_view' => array(
 					'filters' => array(
-						array( 'field' => 'id1', 'operator' => 'op1', 'value' => [ 'val1' ] ),
-					)
+						array(
+							'field'    => 'id1',
+							'operator' => 'op1',
+							'value'    => array( 'val1' ),
+						),
+					),
 				),
 			)
 		);
@@ -1328,22 +1440,29 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			array(
 				'default_view' => array(
 					'filters' => array(
-						array( 'field' => 'id1', 'operator' => 'change' ),
-					)
+						array(
+							'field'    => 'id1',
+							'operator' => 'change',
+						),
+					),
 				),
 			),
 			1
 		);
 
-		$this->assertSame( array(
-			'default_view' => array(
-				'filters' => array(
-					array( 'field' => 'id1', 'operator' => 'change', 'value' => [ 'val1' ] ),
-				)
-			),
+		$this->assertSame(
+			array(
+				'default_view' => array(
+					'filters' => array(
+						array(
+							'field'    => 'id1',
+							'operator' => 'change',
+							'value'    => array( 'val1' ),
+						),
+					),
+				),
 			),
 			$data->get_data()
 		);
 	}
-
 }

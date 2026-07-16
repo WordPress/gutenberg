@@ -118,18 +118,19 @@ class Gutenberg_View_Config_Data {
 	 * and numerical indexed arrays merge by member identity.
 	 * Identity is determined by finding a key (`id`, `slug`, `field`) within the item.
 	 * A member with no identity is always appended to the end of the list.
+	 * A `null` value deletes the property it names.
 	 *
 	 * For example, given this patch:
 	 *
 	 * ```php
 	 * array(
-	 *   'default_view' => array( 'search' => 'new search', 'fields' => array( 'newField' ) )
+	 *   'default_view' => array( 'search' => 'new search', 'fields' => array( 'newField' ) ),
 	 *   'default_layouts' => array( 'grid' => array( 'layout' => array( 'badgeFields' => array( 'newField' ) ) ) ),
-	 *   'view_list' => array( array( 'slug' => 'table', 'title' => 'New title' ) )
+	 *   'view_list' => array( array( 'slug' => 'table', 'title' => 'New title' ) ),
 	 * )
 	 * ```
 	 *
-	 * - default_view will be updated so the search string is 'new search' and the newField is appened to the list of fields.
+	 * - default_view will be updated so the search string is 'new search' and the newField is appended to the list of fields.
 	 * - default_layouts will be updated so that newField is appended to the badgeFields.
 	 * - view_list will be updated so that the view with slug 'table' has its title changed to 'New title'.
 	 *
@@ -196,6 +197,15 @@ class Gutenberg_View_Config_Data {
 	}
 
 	/**
+	 * Merges an incoming value into the current one, recursing by value shape.
+	 *
+	 * This is the core of the merge algorithm and is applied at every nesting
+	 * level: a scalar (or `null`) in $incoming replaces $current outright, an
+	 * associative array merges key by key (recursing here for each key, with a
+	 * `null` value deleting that key), and a list either replaces $current
+	 * wholesale ($replace_lists) or merges into it by member identity. The
+	 * $replace_lists flag is carried down through associative nesting so that,
+	 * under replace(), every list reached along the way is swapped wholesale.
 	 *
 	 * @since 7.1.0
 	 *

@@ -174,12 +174,13 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
 				return $data->replace(
-					'form',
 					array(
-						'fields' => array(
-							array(
-								'id'       => 'discussion',
-								'children' => array( 'comment_status' ),
+						'form' => array(
+							'fields' => array(
+								array(
+									'id'       => 'discussion',
+									'children' => array( 'comment_status' ),
+								),
 							),
 						),
 					),
@@ -315,9 +316,10 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
 				return $data->replace(
-					'default_view',
 					array(
-						'fields' => array( 'title' ),
+						'default_view' => array(
+							'fields' => array( 'title' ),
+						),
 					),
 					1
 				);
@@ -332,7 +334,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_filter_default_view_remove_fields(){
+	public function test_filter_default_view_remove_fields() {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
@@ -387,8 +389,8 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		$this->assertSame(
 			array(
 				array(
-					'slug'  => 'all',
 					'title' => 'All items',
+					'slug'  => 'all',
 				),
 				array(
 					'slug'  => 'my_view',
@@ -398,5 +400,4 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 			$config['view_list']
 		);
 	}
-
 }

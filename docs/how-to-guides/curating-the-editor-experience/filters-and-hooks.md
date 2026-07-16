@@ -83,23 +83,42 @@ The filter receives an instance of the `WP_Theme_JSON_Data class` with the data 
 
 DataViews-powered screens (such as the Pages list and its Quick Edit form) build their configuration on the server. A dynamic filter, `get_entity_view_config_{$kind}_{$name}`, lets you customize that configuration for a specific entity, where the dynamic portions are the entity kind (e.g. `postType`) and name (e.g. `page`).
 
-The configuration has four keys: `default_view`, `default_layouts`, `view_list` (the saved views shown in the list), and `form` (the DataForm used by consumers like Quick Edit).
+The configuration has four top-level keys: `default_view`, `default_layouts`, `view_list` (the saved views shown in the list), and `form` (the DataForm used by consumers like Quick Edit).
 
-The filter receives an object holding the entity's view configuration. Change the configuration by calling its methods and return the object. The `merge( $patch, $version )` method merges a partial change (a patch) into the configuration following these rules: an associative array (map) merges key by key; a list merges member by member by identity — a member whose identity matches one already present merges into it in place, and an unmatched member is appended; and `null` deletes what it names.
+The filter receives a `Gutenberg_View_Config_Data` object holding the entity's view configuration. Change the configuration by calling its methods and **return the object** (a callback that returns anything else is ignored and the unfiltered configuration is used). Only the four documented top-level keys are accepted; a patch that names any other key, or that declares an unsupported `$version`, is rejected with a `_doing_it_wrong()` notice.
 
--   `merge( $patch, $version )` merges into `default_view`, `default_layouts`, `form` (including the `form` `fields`), and the `view_list`. A `view_list` patch is a list of view objects that merge by `slug`: a view whose `slug` matches one already present merges into it in place and keeps its position, and one with a new `slug` is appended to the end. Passing `null` for a whole top-level key resets it to its default.
--   `set( $key, $value, $version )` replaces a whole top-level key, so it stops inheriting core's future changes to that key. Use it when you don't want to merge — for example, to remove views by replacing the whole `view_list`, or to drop the default form.
+### Merging a patch
 
-Within a `form` patch, `fields` is a list whose members merge by their `id`: an object whose `id` matches a field already in the list merges into it in place, and a member with an unknown id — an object, or a bare string like `'my_field'` for a field that carries no overrides — is appended to the end. A group's `children` is an identity-merged list too, so listing a field in a group's `children` appends it to that group. A patch only adds to or updates the form; to remove fields, replace the whole `form` with `set( 'form', $form, $version )`.
+`merge( $patch, $version )` merges a partial change (a *patch*) into the configuration. The patch is applied recursively, and each value is handled according to its shape:
+
+-   A **scalar** replaces the current value.
+-   An **associative array** (map) merges key by key, recursing into each key.
+-   A **list** (a sequential, zero-indexed array) merges member by member *by identity*: a member whose identity matches one already present merges into it in place and keeps its position, and an unmatched member is appended to the end. A member's identity is the value of the first identity key (`id`, `slug`, or `field`) it carries, or, for a bare scalar member, the scalar itself. Because only the value matters, a bare string like `'my_field'` matches a map carrying that same value under any identity key.
+-   `null` deletes the property it names. Passing `null` for a whole top-level key drops it, which reads as a reset: `gutenberg_get_entity_view_config()` backfills any missing top-level key from the defaults.
+
+These rules apply at every nesting level. In `view_list`, entries merge by `slug`. Within a `form`, `fields` is a list whose members merge by their `id`; a group's `children` is an identity-merged list too, so listing a field in a group's `children` appends it there. Because `merge()` only adds to or updates lists, it never removes an existing list member — to drop members, replace the list with `replace()`.
+
+### Replacing lists
+
+`replace( $patch, $version )` applies a patch exactly like `merge()` — scalars replace, maps merge key by key, and `null` deletes — with one difference: any **list** the patch names replaces the current list wholesale instead of merging into it by identity. Use it to pin a list to an exact set of members, for example to remove saved views by giving a shorter `view_list`, or to drop form fields by giving a shorter `form.fields`.
+
+`replace()` does *not* replace a whole top-level key wholesale: because a map still merges key by key, keys the patch omits from an associative value (such as `default_view` or `form`) are preserved. To fully swap an associative top-level key, drop it first with a `null` patch and then apply the new value.
+
+Prefer `merge()`: a callback that replaces a list stops inheriting core's future additions to it.
+
+### The version argument
 
 The `$version` argument declares the configuration schema version the patch was written against (currently `1`), so that a future release that changes the configuration shape can migrate existing patches forward instead of breaking them.
 
-In the following example, a custom saved view is added to the `page` list, the existing Drafts view is retitled, the `grid` layout option is unset, the post content info field's label position is changed, and a new field is appended to the discussion group.
+### Example
+
+In the following example, `merge()` adds a custom saved view to the `page` list, retitles the existing Drafts view, unsets the `grid` layout option, changes the post content info field's label position, and appends a new field to the discussion group. Then `replace()` swaps the whole set of form fields for an exact list.
 
 ```php
 function example_filter_page_view_config( $data ) {
-    // Patch the view list by slug: add a saved view and retitle the existing
-    // Drafts view — only the given keys change.
+    // merge(): patch the view list by slug — add a saved view and retitle the
+    // existing Drafts view. Only the given keys change; every other view is
+    // left in place.
     $data->merge(
         array(
             'view_list' => array(
@@ -126,10 +145,10 @@ function example_filter_page_view_config( $data ) {
         1
     );
 
-    // Patch properties: unset a nested value with null to drop the grid
-    // layout option, change a form property, and patch form fields by id —
-    // update the label position of the post content info field and append a
-    // new field ( a bare string ) to the discussion group's children.
+    // merge(): patch properties — unset a nested value with null to drop the
+    // grid layout option, change a form property, update the label position of
+    // the post content info field by id, and append a new field ( a bare
+    // string ) to the discussion group's children.
     $data->merge(
         array(
             'default_layouts' => array( 'grid' => null ),
@@ -145,6 +164,18 @@ function example_filter_page_view_config( $data ) {
                         'children' => array( 'my_field' ),
                     ),
                 ),
+            ),
+        ),
+        1
+    );
+
+    // replace(): swap the form field list wholesale. Because `fields` is a
+    // list, replace() drops every field not listed here rather than merging;
+    // the surrounding `form` map still merges, so `layout` is untouched.
+    $data->replace(
+        array(
+            'form' => array(
+                'fields' => array( 'title', 'status', 'author' ),
             ),
         ),
         1
