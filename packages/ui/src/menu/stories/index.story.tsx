@@ -47,11 +47,6 @@ export default meta;
 type Story = StoryObj< typeof Menu.Root >;
 
 const SHORTCUTS = {
-	commandPalette: {
-		displayShortcut: displayShortcut.primary( 'k' ),
-		ariaKeyShortcut: ariaKeyShortcut.primary( 'k' ),
-		description: shortcutAriaLabel.primary( 'k' ),
-	},
 	comfortableDensity: {
 		displayShortcut: displayShortcut.primary( '2' ),
 		ariaKeyShortcut: ariaKeyShortcut.primary( '2' ),
@@ -113,6 +108,7 @@ export const Default: Story = {
 							<Icon icon={ archive } size={ 24 } aria-hidden />
 						}
 						shortcut={ SHORTCUTS.save }
+						suffix="Draft"
 					>
 						Save
 					</Menu.Item>
@@ -261,26 +257,6 @@ export const LinkItem: Story = {
 							Navigate with a regular anchor target.
 						</Menu.ItemDescription>
 					</Menu.LinkItem>
-				</Menu.Popup>
-			</>
-		),
-	},
-};
-
-/**
- * Use `shortcut` to provide the visual label, `aria-keyshortcuts` value, and
- * accessible shortcut description together.
- */
-export const KeyboardShortcuts: Story = {
-	args: {
-		children: (
-			<>
-				<Menu.Trigger>Open menu</Menu.Trigger>
-				<Menu.Popup>
-					<Menu.Item shortcut={ SHORTCUTS.save }>Save</Menu.Item>
-					<Menu.Item shortcut={ SHORTCUTS.commandPalette }>
-						Open command palette
-					</Menu.Item>
 				</Menu.Popup>
 			</>
 		),
