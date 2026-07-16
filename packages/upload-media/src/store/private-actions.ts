@@ -21,6 +21,7 @@ import {
 	renameFile,
 } from '../utils';
 import { canvasConvertToJpeg } from '../canvas-utils';
+import { getUnappliedExifOrientation } from '../heic-parser';
 import {
 	isClientSideMediaSupported,
 	exceedsClientProcessingMemory,
@@ -765,9 +766,9 @@ export function prepareItem( id: QueueItemId ) {
 		// a companion file of this same attachment after upload (see
 		// generateThumbnails) — like the HEIC original — not as a separate
 		// media library attachment. It is recorded in attachment metadata; the
-		// editor then switches the block to the Video block's GIF variation
-		// playing that companion (see
-		// packages/block-library/src/image/animated-gif-converter.js).
+		// editor offers switching the block to the Video block's GIF variation
+		// playing that companion via a block transform (see
+		// packages/block-library/src/image/transforms.js).
 		if (
 			file.type === 'image/gif' &&
 			settings.gifConvert !== false &&
@@ -1134,16 +1135,24 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		// Add '-scaled' suffix for big image threshold resizing.
 		const scaledSuffix = Boolean( args.isThresholdResize );
 
+		// Metadata stripping and bit depth cap from the `image_strip_meta`
+		// and `image_max_bit_depth` filters, carried in the editor settings.
+		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+
 		try {
 			const file = await vipsResizeImage(
 				item.id,
 				item.file,
 				args.resize,
-				false, // smartCrop
-				addSuffix,
-				item.abortController?.signal,
-				scaledSuffix,
-				args.quality
+				{
+					smartCrop: false,
+					addSuffix,
+					signal: item.abortController?.signal,
+					scaledSuffix,
+					quality: args.quality,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+				}
 			);
 
 			measure( {
@@ -1301,13 +1310,21 @@ export function transcodeImageItem(
 		const quality = args.outputQuality ?? DEFAULT_OUTPUT_QUALITY;
 		const interlaced = args.interlaced ?? false;
 
+		// Metadata stripping and bit depth cap from the `image_strip_meta`
+		// and `image_max_bit_depth` filters, carried in the editor settings.
+		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+
 		try {
 			const file = await vipsConvertImageFormat(
 				item.id,
 				item.file,
 				outputMimeType,
-				quality,
-				interlaced
+				{
+					quality,
+					interlaced,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+				}
 			);
 
 			measure( {
@@ -1546,47 +1563,75 @@ export function generateThumbnails( id: QueueItemId ) {
 			 */
 		}
 
-		// Check if image needs rotation.
-		// If exif_orientation is not 1, the image needs rotation.
-		// Images that were scaled (bigImageSizeThreshold) are already rotated by vips.
+		// Determine the EXIF orientation. For JPEG/TIFF the server reads it and
+		// libvips auto-rotates the sub-sizes from EXIF. For AVIF/HEIF libheif/
+		// libvips only auto-rotate from a native `irot` transform, never from
+		// EXIF, so those sub-sizes must be rotated explicitly. Read the EXIF
+		// orientation on the client for those formats and treat it as the
+		// source of truth: `getUnappliedExifOrientation` returns 1 when an
+		// `irot` transform is present (already handled on decode), otherwise
+		// the EXIF orientation that nothing else applies.
+		// See https://github.com/WordPress/gutenberg/issues/79383.
+		let exifOrientation = attachment.exif_orientation || 1;
+		const sourceType = item.sourceFile.type;
+		const isHeifFamily =
+			sourceType === 'image/avif' || sourceType === 'image/heif';
+
+		let needsClientRotation = false;
+		if ( isHeifFamily ) {
+			exifOrientation = getUnappliedExifOrientation(
+				await item.sourceFile.arrayBuffer()
+			);
+			// libvips will not auto-rotate these sub-sizes, so they must be
+			// generated from an explicitly rotated source rather than the
+			// original file.
+			needsClientRotation = exifOrientation !== 1;
+		}
+
+		// Rotate the source once and reuse it for the sideloaded "original"
+		// (original_image metadata) and, for the client-rotation case, as the
+		// thumbnail/scaled source. Images that were scaled
+		// (bigImageSizeThreshold) are already rotated by vips, so the original
+		// is skipped for them, matching WordPress core.
+		let rotatedSource: File | undefined;
 		{
 			const needsRotation =
-				attachment.exif_orientation &&
-				attachment.exif_orientation !== 1 &&
-				! item.file.name.includes( '-scaled' );
+				exifOrientation !== 1 && ! item.file.name.includes( '-scaled' );
 
-			// If rotation is needed for a non-scaled image, sideload the rotated version.
-			// This matches WordPress core's behavior of creating a -rotated version.
-			if ( needsRotation && attachment.id ) {
+			if ( ( needsRotation || needsClientRotation ) && attachment.id ) {
 				try {
-					const rotatedFile = await vipsRotateImage(
+					rotatedSource = await vipsRotateImage(
 						item.id,
 						item.sourceFile,
-						attachment.exif_orientation as number,
+						exifOrientation,
 						item.abortController?.signal
 					);
-
-					// Sideload the rotated file as the "original" to set original_image metadata.
-					// The server will store this in $metadata['original_image'].
-					dispatch.addSideloadItem( {
-						file: rotatedFile,
-						batchId: uuidv4(),
-						parentId: item.id,
-						additionalData: {
-							post: attachment.id,
-							image_size: 'original',
-							convert_format: false,
-						},
-						operations: [ OperationType.Upload ],
-					} );
 				} catch {
 					// If rotation fails, continue with thumbnail generation.
-					// Thumbnails will still be rotated correctly by vips.
+					// Thumbnails will still be rotated correctly by vips for
+					// server-readable formats.
 					// eslint-disable-next-line no-console
 					console.warn(
 						'Failed to rotate image, continuing with thumbnails'
 					);
 				}
+			}
+
+			// Sideload the rotated file as the "original" to set
+			// original_image metadata; the server stores it in
+			// $metadata['original_image'].
+			if ( needsRotation && rotatedSource && attachment.id ) {
+				dispatch.addSideloadItem( {
+					file: rotatedSource,
+					batchId: uuidv4(),
+					parentId: item.id,
+					additionalData: {
+						post: attachment.id,
+						image_size: 'original',
+						convert_format: false,
+					},
+					operations: [ OperationType.Upload ],
+				} );
 			}
 		}
 
@@ -1600,7 +1645,10 @@ export function generateThumbnails( id: QueueItemId ) {
 			const sizesToGenerate: string[] =
 				attachment.missing_image_sizes as string[];
 
-			const thumbnailSource = item.sourceFile;
+			const thumbnailSource =
+				needsClientRotation && rotatedSource
+					? rotatedSource
+					: item.sourceFile;
 			const file = attachment.filename
 				? renameFile( thumbnailSource, attachment.filename )
 				: thumbnailSource;

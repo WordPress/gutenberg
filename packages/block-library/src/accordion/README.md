@@ -35,6 +35,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#background):
   - `backgroundImage`: `true`
   - `backgroundSize`: `true`
+  - `gradient`: `true`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
   - [`gradients`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
