@@ -188,8 +188,13 @@ export function MediaPreview( { media, onClick, onDetach, category } ) {
 				.fetch( url )
 				.then( ( response ) => response.blob() )
 				.then( ( blob ) => {
+					// A `data:`/`blob:` url has no filename in its path.
+					const canDeriveFilename =
+						! url.startsWith( 'data:' ) && ! isBlobURL( url );
 					const fileName =
-						media.filename || getFilename( url ) || 'image.jpg';
+						media.filename ||
+						( canDeriveFilename && getFilename( url ) ) ||
+						'image.jpg';
 					const file = new File( [ blob ], fileName, {
 						type: blob.type,
 					} );

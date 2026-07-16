@@ -137,4 +137,22 @@ describe( 'MediaPreview external media upload', () => {
 
 		expect( filesList[ 0 ].name ).toBe( 'tree.jpg' );
 	} );
+
+	it( 'does not derive a filename from a data url', async () => {
+		const { filesList } = await insertMedia( {
+			...baseMedia,
+			url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUg',
+		} );
+
+		expect( filesList[ 0 ].name ).toBe( 'image.jpg' );
+	} );
+
+	it( 'does not derive a filename from a blob url', async () => {
+		const { filesList } = await insertMedia( {
+			...baseMedia,
+			url: 'blob:https://example.com/e4b1a532-9797-4a6b-a55c-b81e88a52e39',
+		} );
+
+		expect( filesList[ 0 ].name ).toBe( 'image.jpg' );
+	} );
 } );
