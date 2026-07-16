@@ -186,11 +186,32 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 	/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
 	$image_max_bit_depth = (int) apply_filters( 'image_max_bit_depth', 16, 16 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
+	/**
+	 * Filters whether sub-sizes of animated images should keep their animation.
+	 *
+	 * By default, sub-sizes of animated images (e.g. animated GIFs) are static,
+	 * generated from the first frame only, matching WordPress core's
+	 * server-side behavior. Re-encoding every frame per sub-size is very
+	 * resource intensive, so animated sub-sizes are opt-in.
+	 *
+	 * Only uncropped sub-sizes keep their animation; cropped sizes (such as
+	 * `thumbnail`) are always generated from the first frame. Uploads that
+	 * take the server-side path (e.g. some Media Library uploads) also still
+	 * produce static sub-sizes, as core has no animated resize support.
+	 *
+	 * @since 23.7.0
+	 *
+	 * @param bool $animated_image_subsizes Whether to generate animated sub-sizes
+	 *                                      for animated images. Default false.
+	 */
+	$animated_image_subsizes = (bool) apply_filters( 'wp_generate_animated_image_subsizes', false ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
 	if ( current_user_can( 'upload_files' ) ) {
-		$response->data['image_sizes']          = gutenberg_get_all_image_sizes();
-		$response->data['image_size_threshold'] = $image_size_threshold;
-		$response->data['image_strip_meta']     = $image_strip_meta;
-		$response->data['image_max_bit_depth']  = $image_max_bit_depth;
+		$response->data['image_sizes']             = gutenberg_get_all_image_sizes();
+		$response->data['image_size_threshold']    = $image_size_threshold;
+		$response->data['image_strip_meta']        = $image_strip_meta;
+		$response->data['image_max_bit_depth']     = $image_max_bit_depth;
+		$response->data['animated_image_subsizes'] = $animated_image_subsizes;
 	}
 
 	return $response;

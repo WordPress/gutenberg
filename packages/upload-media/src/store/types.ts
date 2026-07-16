@@ -225,6 +225,11 @@ export interface Settings {
 	// Maximum output bit depth for generated images, from the
 	// `image_max_bit_depth` filter. Default is 16 (no cap).
 	imageMaxBitDepth?: number;
+	// Whether sub-sizes of animated images should keep their animation, from
+	// the `wp_generate_animated_image_subsizes` filter. Only applies to
+	// uncropped sub-sizes. Default is false (static first-frame sub-sizes,
+	// matching WordPress core).
+	animatedImageSubsizes?: boolean;
 	// Function for finalizing an upload after all client-side processing is complete.
 	// May return the up-to-date attachment so the queue and block markup can pick
 	// up the post-finalize URL (the scaled file), which is required for `srcset`.

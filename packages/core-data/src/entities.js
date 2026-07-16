@@ -46,6 +46,7 @@ export const rootEntitiesConfig = [
 			// Please also change the preload path when changing this.
 			// @see lib/compat/wordpress-7.1/preload.php
 			_fields: [
+				'animated_image_subsizes',
 				'description',
 				'gmt_offset',
 				'home',

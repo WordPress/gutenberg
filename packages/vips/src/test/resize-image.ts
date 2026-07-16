@@ -99,16 +99,113 @@ describe( 'resizeImage', () => {
 		} );
 
 		/*
-		 * Sub-sizes of animated images are static, generated from the first
-		 * frame, matching WordPress core's server-side behavior. All frames
-		 * must NOT be loaded (no `option_string: '[n=-1]'`), which used to
-		 * re-encode a full animated GIF per sub-size.
+		 * Sub-sizes of animated images are static by default, generated from
+		 * the first frame, matching WordPress core's server-side behavior.
+		 * All frames must NOT be loaded (no `option_string: '[n=-1]'`), which
+		 * used to re-encode a full animated GIF per sub-size.
 		 */
 		expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
 			height: 100,
 			size: 'down',
 		} );
 		expect( mockCrop ).not.toHaveBeenCalled();
+	} );
+
+	describe( 'preserveAnimation', () => {
+		it( 'loads all frames and tunes gifsave for uncropped animated resizes', async () => {
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				lastModified: 1234567891,
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/gif',
+				{
+					width: 100,
+					height: 100,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
+				height: 100,
+				size: 'down',
+				option_string: '[n=-1]',
+			} );
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.objectContaining( {
+					effort: 2,
+					interframe_maxerror: 8,
+					interpalette_maxerror: 16,
+				} )
+			);
+		} );
+
+		it( 'flattens cropped sizes to the first frame', async () => {
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				lastModified: 1234567891,
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/gif',
+				{
+					width: 100,
+					height: 100,
+					crop: true,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
+				height: 100,
+				crop: 'centre',
+				size: 'down',
+			} );
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( {
+					interframe_maxerror: expect.anything(),
+				} )
+			);
+		} );
+
+		it( 'has no effect on still image formats', async () => {
+			const jpegFile = new File( [ '<BLOB>' ], 'example.jpg', {
+				lastModified: 1234567891,
+				type: 'image/jpeg',
+			} );
+			const buffer = await jpegFile.arrayBuffer();
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/jpeg',
+				{
+					width: 100,
+					height: 100,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
+				height: 100,
+				size: 'down',
+			} );
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.not.objectContaining( {
+					interframe_maxerror: expect.anything(),
+				} )
+			);
+		} );
 	} );
 
 	it( 'resizes with center crop', async () => {

@@ -585,6 +585,7 @@ export async function resizeImage(
 		quality = 0.82,
 		stripMeta = true,
 		maxBitdepth = 16,
+		preserveAnimation = false,
 	} = options;
 	const ext = type.split( '/' )[ 1 ];
 
@@ -595,15 +596,29 @@ export async function resizeImage(
 
 		/*
 		 * Sub-sizes of animated images are generated from the first frame
-		 * only, matching WordPress core's server-side behavior: both GD and
-		 * Imagick flatten animated images when resizing, and
+		 * only by default, matching WordPress core's server-side behavior:
+		 * both GD and Imagick flatten animated images when resizing, and
 		 * wp_calculate_image_srcset() prevents flattened sub-sizes and the
 		 * animated full-size image from mixing in a srcset. Loading all
-		 * frames ([n=-1]) would re-encode a full animated GIF per sub-size,
+		 * frames ([n=-1]) re-encodes a full animated GIF per sub-size,
 		 * which takes tens of seconds for long animations and can produce
 		 * sub-sizes larger than the original file.
 		 * See https://github.com/WordPress/gutenberg/issues/80266.
+		 *
+		 * Sites can opt into animated sub-sizes via the
+		 * `wp_generate_animated_image_subsizes` filter, carried here as
+		 * `preserveAnimation`. Cropped sizes always flatten to the first
+		 * frame (per-frame cropping is not supported), also matching the
+		 * pre-existing behavior.
+		 * See https://github.com/WordPress/gutenberg/issues/80383.
 		 */
+		let strOptions = '';
+		const loadOptions: LoadOptions< typeof type > = {};
+
+		if ( preserveAnimation && supportsAnimation( type ) && ! resize.crop ) {
+			strOptions = '[n=-1]';
+			( loadOptions as LoadOptions< typeof type > ).n = -1;
+		}
 
 		// TODO: Report progress, see https://github.com/swissspidy/media-experiments/issues/327.
 		const onProgress = () => {
@@ -612,7 +627,7 @@ export async function resizeImage(
 			}
 		};
 
-		let image = vips.Image.newFromBuffer( buffer );
+		let image = vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
 
 		image.onProgress = onProgress;
 
@@ -648,6 +663,9 @@ export async function resizeImage(
 					resized.onProgress = onProgress;
 					return resized;
 				}
+				if ( strOptions ) {
+					thumbnailOptions.option_string = strOptions;
+				}
 				const thumb = vips.Image.thumbnailBuffer(
 					buffer,
 					resizeWidth,
@@ -664,6 +682,22 @@ export async function resizeImage(
 			saveBitdepth,
 			stripMeta
 		);
+
+		/*
+		 * When writing an animated GIF, tune gifsave for speed and size:
+		 * per-frame palette quantization dominates the re-encode cost, and
+		 * the defaults can produce sub-sizes larger than the original file.
+		 * Lower effort plus allowing slight inter-frame/inter-palette error
+		 * is 4-8x faster and eliminates the size bloat, with no visible
+		 * quality difference at sub-size dimensions.
+		 * See https://github.com/WordPress/gutenberg/issues/80266.
+		 */
+		if ( strOptions && 'image/gif' === type ) {
+			saveOptions.effort = 2;
+			saveOptions.interframe_maxerror = 8;
+			saveOptions.interpalette_maxerror = 16;
+		}
+
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {

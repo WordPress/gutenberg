@@ -511,4 +511,110 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		expect( frameCounts.full ).toBeGreaterThan( 1 );
 		expect( frameCounts.medium ).toBe( 1 );
 	} );
+
+	test.describe( 'with the wp_generate_animated_image_subsizes filter enabled', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-animated-image-subsizes'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-animated-image-subsizes'
+			);
+		} );
+
+		test( 'generates animated sub-sizes for animated GIFs', async ( {
+			editor,
+			page,
+			gifToVideoUtils,
+			requestUtils,
+		} ) => {
+			/*
+			 * The `wp_generate_animated_image_subsizes` filter opts a site
+			 * into animated (multi-frame) sub-sizes for animated images.
+			 * Uncropped sub-sizes such as `medium` keep their animation
+			 * instead of flattening to the first frame.
+			 * See https://github.com/WordPress/gutenberg/issues/80383.
+			 */
+			await expect(
+				editor.canvas.getByRole( 'button', {
+					name: 'Add default block',
+				} )
+			).toBeVisible();
+
+			await editor.insertBlock( { name: 'core/image' } );
+
+			const imageBlock = editor.canvas.locator(
+				'role=document[name="Block: Image"i]'
+			);
+			await expect( imageBlock ).toBeVisible();
+
+			await gifToVideoUtils.upload(
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
+				ANIMATED_GIF_FIXTURE
+			);
+
+			await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
+
+			const uploadedImage = await page.evaluate( () =>
+				window.wp.data
+					.select( 'core/block-editor' )
+					.getBlocks()
+					.find( ( block ) => block.name === 'core/image' )
+			);
+			const attachmentId = uploadedImage.attributes.id;
+			expect( attachmentId ).toBeDefined();
+
+			// The medium sub-size (uncropped) is recorded in the attachment
+			// metadata shortly after the queue drains.
+			let media;
+			await expect
+				.poll(
+					async () => {
+						media = await requestUtils.rest( {
+							method: 'GET',
+							path: `/wp/v2/media/${ attachmentId }`,
+						} );
+						return media.media_details?.sizes?.medium?.source_url;
+					},
+					{ timeout: 30_000 }
+				)
+				.toMatch( /\.gif$/i );
+
+			// The source GIF is animated (the fixture has 12 frames); its
+			// uncropped medium sub-size must keep multiple frames.
+			const frameCounts = await page.evaluate(
+				async ( { fullUrl, mediumUrl } ) => {
+					const countFrames = async ( url ) => {
+						const data = await ( await fetch( url ) ).arrayBuffer();
+						const decoder = new window.ImageDecoder( {
+							data,
+							type: 'image/gif',
+						} );
+						try {
+							await decoder.tracks.ready;
+							return (
+								decoder.tracks.selectedTrack?.frameCount ?? 0
+							);
+						} finally {
+							decoder.close();
+						}
+					};
+					return {
+						full: await countFrames( fullUrl ),
+						medium: await countFrames( mediumUrl ),
+					};
+				},
+				{
+					fullUrl: media.source_url,
+					mediumUrl: media.media_details.sizes.medium.source_url,
+				}
+			);
+
+			expect( frameCounts.full ).toBeGreaterThan( 1 );
+			expect( frameCounts.medium ).toBe( frameCounts.full );
+		} );
+	} );
 } );
