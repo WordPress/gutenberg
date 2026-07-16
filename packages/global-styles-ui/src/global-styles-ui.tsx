@@ -38,7 +38,7 @@ interface BlockStylesNavigationScreensProps {
 	blockStyles: any[];
 	blockName: string;
 	selectedViewport?: string;
-	showViewportStateControl?: boolean;
+	showResponsiveStateControls?: boolean;
 }
 
 function BlockStylesNavigationScreens( {
@@ -46,7 +46,7 @@ function BlockStylesNavigationScreens( {
 	blockStyles,
 	blockName,
 	selectedViewport,
-	showViewportStateControl,
+	showResponsiveStateControls,
 }: BlockStylesNavigationScreensProps ) {
 	return (
 		<>
@@ -59,7 +59,9 @@ function BlockStylesNavigationScreens( {
 						name={ blockName }
 						variation={ style.name }
 						selectedViewport={ selectedViewport }
-						showViewportStateControl={ showViewportStateControl }
+						showResponsiveStateControls={
+							showResponsiveStateControls
+						}
 					/>
 				</Navigator.Screen>
 			) ) }
@@ -71,7 +73,7 @@ interface ContextScreensProps {
 	name?: string;
 	parentMenu?: string;
 	selectedViewport?: string;
-	showViewportStateControl?: boolean;
+	showResponsiveStateControls?: boolean;
 }
 
 interface GlobalStylesNavigationScreenProps {
@@ -83,7 +85,7 @@ function ContextScreens( {
 	name,
 	parentMenu = '',
 	selectedViewport,
-	showViewportStateControl,
+	showResponsiveStateControls,
 }: ContextScreensProps ) {
 	const blockStyleVariations = useSelect(
 		( select ) => {
@@ -106,7 +108,7 @@ function ContextScreens( {
 			blockStyles={ blockStyleVariations }
 			blockName={ name || '' }
 			selectedViewport={ selectedViewport }
-			showViewportStateControl={ showViewportStateControl }
+			showResponsiveStateControls={ showResponsiveStateControls }
 		/>
 	);
 }
@@ -130,8 +132,8 @@ interface GlobalStylesUIProps {
 	serverSettings?: { __unstableResolvedAssets: Record< string, unknown > };
 	/** Selected viewport state (optional) */
 	selectedViewport?: string;
-	/** Whether to show viewport state controls (optional) */
-	showViewportStateControl?: boolean;
+	/** Whether to show responsive state controls (optional) */
+	showResponsiveStateControls?: boolean;
 }
 
 export function GlobalStylesUI( {
@@ -144,7 +146,7 @@ export function GlobalStylesUI( {
 	serverCSS,
 	serverSettings,
 	selectedViewport,
-	showViewportStateControl = true,
+	showResponsiveStateControls = true,
 }: GlobalStylesUIProps ) {
 	const blocks = getBlockTypes();
 
@@ -259,8 +261,8 @@ export function GlobalStylesUI( {
 								<ScreenBlock
 									name={ block.name }
 									selectedViewport={ selectedViewport }
-									showViewportStateControl={
-										showViewportStateControl
+									showResponsiveStateControls={
+										showResponsiveStateControls
 									}
 								/>
 							</GlobalStylesNavigationScreen>
@@ -271,8 +273,8 @@ export function GlobalStylesUI( {
 									encodeURIComponent( block.name )
 								}
 								selectedViewport={ selectedViewport }
-								showViewportStateControl={
-									showViewportStateControl
+								showResponsiveStateControls={
+									showResponsiveStateControls
 								}
 							/>
 						</Fragment>

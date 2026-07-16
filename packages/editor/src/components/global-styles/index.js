@@ -80,7 +80,7 @@ export default function GlobalStylesUIWrapper( {
 	onPathChange,
 	settings,
 	selectedViewport,
-	showViewportStateControl,
+	showResponsiveStateControls,
 } ) {
 	const {
 		user: userConfig,
@@ -108,7 +108,7 @@ export default function GlobalStylesUIWrapper( {
 				serverCSS={ serverCSS }
 				serverSettings={ serverSettings }
 				selectedViewport={ selectedViewport }
-				showViewportStateControl={ showViewportStateControl }
+				showResponsiveStateControls={ showResponsiveStateControls }
 			/>
 			<GlobalStylesBlockLink
 				path={ path }

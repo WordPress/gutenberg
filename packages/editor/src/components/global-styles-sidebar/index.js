@@ -178,7 +178,7 @@ export default function GlobalStylesSidebar() {
 					onPathChange={ setStylesPath }
 					settings={ editorSettings }
 					selectedViewport={ styleStateViewport }
-					showViewportStateControl={ false }
+					showResponsiveStateControls={ false }
 				/>
 			</DefaultSidebar>
 			<WelcomeGuideStyles />

@@ -98,14 +98,14 @@ interface ScreenBlockProps {
 	name: string;
 	variation?: string;
 	selectedViewport?: string;
-	showViewportStateControl?: boolean;
+	showResponsiveStateControls?: boolean;
 }
 
 function ScreenBlock( {
 	name,
 	variation,
 	selectedViewport: controlledSelectedViewport,
-	showViewportStateControl = true,
+	showResponsiveStateControls = true,
 }: ScreenBlockProps ) {
 	const {
 		user: userConfig,
@@ -371,10 +371,12 @@ function ScreenBlock( {
 				selectedViewport={ effectiveSelectedViewport }
 				selectedPseudoState={ selectedPseudoState }
 				onChangeViewport={
-					showViewportStateControl ? setSelectedViewport : undefined
+					showResponsiveStateControls
+						? setSelectedViewport
+						: undefined
 				}
 				onChangePseudoState={ setSelectedPseudoState }
-				showViewportStateControl={ showViewportStateControl }
+				showResponsiveStateControls={ showResponsiveStateControls }
 			/>
 			<BlockPreviewPanel
 				name={ name }
