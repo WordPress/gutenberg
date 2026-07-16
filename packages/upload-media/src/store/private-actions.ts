@@ -792,22 +792,9 @@ export function prepareItem( id: QueueItemId ) {
 		// editor offers switching the block to the Video block's GIF variation
 		// playing that companion via a block transform (see
 		// packages/block-library/src/image/transforms.js).
-		// A multi-file drop is implicitly a gallery, and a Video block cannot
-		// be inserted into a gallery. So animated GIFs dropped as part of a
-		// batch are never converted — they upload as plain images, matching
-		// the block switcher transform's gallery guard. A lone GIF (or
-		// replacing a single image) still converts.
-		const isMultiFileBatch =
-			!! item.batchId &&
-			select
-				.getAllItems()
-				.filter( ( other ) => other.batchId === item.batchId ).length >
-				1;
-
 		if (
 			file.type === 'image/gif' &&
 			settings.gifConvert !== false &&
-			! isMultiFileBatch &&
 			typeof ImageDecoder !== 'undefined' &&
 			typeof VideoEncoder !== 'undefined'
 		) {

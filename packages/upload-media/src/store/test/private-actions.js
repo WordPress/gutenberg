@@ -512,17 +512,12 @@ describe( 'private actions', () => {
 			);
 		}
 
-		async function runPrepareItem(
-			settings = {},
-			itemOverrides = {},
-			allItems
-		) {
+		async function runPrepareItem( settings = {} ) {
 			const file = createGifFile();
 			const item = {
 				id: 'gif-id',
 				file,
 				additionalData: {},
-				...itemOverrides,
 			};
 
 			let dispatchedOperations;
@@ -540,7 +535,6 @@ describe( 'private actions', () => {
 			const select = {
 				getItem: () => item,
 				getSettings: () => settings,
-				getAllItems: () => allItems ?? [ item ],
 			};
 
 			const thunk = prepareItem( 'gif-id' );
@@ -609,33 +603,6 @@ describe( 'private actions', () => {
 				type: 'gif-conversion',
 				itemId: 'gif-id',
 			} );
-		} );
-
-		it( 'skips conversion and prompt for a multi-file (gallery) drop', async () => {
-			// A multi-file drop is implicitly a gallery, where a Video block
-			// cannot be inserted. Such GIFs upload as plain images: no
-			// conversion record, no prompt, no animatedGifFile stash.
-			const { actions, dispatch } = await runPrepareItem(
-				{ gifConvert: 'prompt' },
-				{ batchId: 'batch-1' },
-				[
-					{ id: 'gif-id', batchId: 'batch-1' },
-					{ id: 'sibling', batchId: 'batch-1' },
-				]
-			);
-
-			// The conversion branch is skipped entirely: no record, no
-			// prompt, and the original GIF is not stashed for transcoding.
-			expect( actions ).not.toContainEqual(
-				expect.objectContaining( { type: Type.AddGifConversion } )
-			);
-			expect( dispatch.requestUploadPrompt ).not.toHaveBeenCalled();
-			expect( dispatch.finishOperation ).not.toHaveBeenCalledWith(
-				'gif-id',
-				expect.objectContaining( {
-					animatedGifFile: expect.anything(),
-				} )
-			);
 		} );
 
 		it( 'does not record a conversion in prompt mode for a transparent GIF', async () => {

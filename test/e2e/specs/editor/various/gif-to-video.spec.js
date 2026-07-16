@@ -65,31 +65,6 @@ class GifToVideoUtils {
 	}
 
 	/**
-	 * Uploads several files at once to the given input (a single drop / batch,
-	 * as when dropping multiple images to build a gallery). Each is copied to
-	 * a unique temp file to avoid cross-test collisions.
-	 *
-	 * @param {import('@playwright/test').Locator} inputElement File input locator.
-	 * @param {string[]}                           fileNames    Asset file names.
-	 */
-	async uploadMultiple( inputElement, fileNames ) {
-		const tmpDirectory = await fs.mkdtemp(
-			path.join( os.tmpdir(), 'gutenberg-test-gif-' )
-		);
-		const tmpFiles = [];
-		for ( const fileName of fileNames ) {
-			const extension = path.extname( fileName );
-			const tmpFileName = path.join(
-				tmpDirectory,
-				randomUUID() + extension
-			);
-			await fs.copyFile( path.join( ASSETS_DIR, fileName ), tmpFileName );
-			tmpFiles.push( tmpFileName );
-		}
-		await inputElement.setInputFiles( tmpFiles );
-	}
-
-	/**
 	 * Inserts an Image block and uploads the animated GIF fixture into it.
 	 * Waits for the editor to finish setting up first: an insert dispatched
 	 * during setup is wiped by the editor's initial blocks reset.
@@ -414,38 +389,5 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		} );
 		expect( media.mime_type ).toBe( 'image/gif' );
 		expect( media.media_details?.animated_video ).toBeUndefined();
-	} );
-
-	test( 'does not prompt for a multi-file (gallery) drop', async ( {
-		editor,
-		gifToVideoUtils,
-	} ) => {
-		// A multi-file drop is implicitly a gallery, and a Video block cannot
-		// live in a gallery, so animated GIFs uploaded together are never
-		// offered for conversion — no prompt, no companion transcode.
-		await editor.insertBlock( { name: 'core/gallery' } );
-
-		const galleryBlock = editor.canvas.locator(
-			'role=document[name="Block: Gallery"i]'
-		);
-		await expect( galleryBlock ).toBeVisible();
-
-		await gifToVideoUtils.uploadMultiple(
-			galleryBlock.locator( 'data-testid=form-file-upload-input' ),
-			[ ANIMATED_GIF_FIXTURE, ANIMATED_GIF_FIXTURE ]
-		);
-
-		// The prompt must never appear, even briefly, while the batch uploads.
-		await expect( gifToVideoUtils.getPromptDialog() ).toBeHidden();
-		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
-		await expect( gifToVideoUtils.getPromptDialog() ).toBeHidden();
-
-		// The GIFs stay as Image blocks inside the gallery; nothing converted.
-		await expect(
-			editor.canvas.locator( 'role=document[name="Block: Video"i]' )
-		).toHaveCount( 0 );
-		await expect(
-			galleryBlock.locator( 'role=document[name="Block: Image"i]' )
-		).not.toHaveCount( 0 );
 	} );
 } );
