@@ -51,6 +51,26 @@ test.describe( 'Block custom CSS', () => {
 		await expect( editorGroup ).toHaveCSS( 'border-style', 'double' );
 		await expect( editorGroup ).toHaveCSS( 'border-width', '6px' );
 
+		// Switch to another block style variation. Updating a style override
+		// re-registers it after the custom CSS override, so this guards
+		// against the variation styles jumping ahead in the cascade.
+		// See https://github.com/WordPress/gutenberg/pull/80340.
+		await page.evaluate( () => {
+			const { select, dispatch } = window.wp.data;
+			const [ group ] = select( 'core/block-editor' ).getBlocks();
+			dispatch( 'core/block-editor' ).updateBlockAttributes(
+				group.clientId,
+				{
+					className:
+						'custom-css-test-group is-style-block-style-variation-b',
+				}
+			);
+		} );
+
+		// Variation B sets `border: 2px dashed`; custom CSS must still win.
+		await expect( editorGroup ).toHaveCSS( 'border-style', 'double' );
+		await expect( editorGroup ).toHaveCSS( 'border-width', '6px' );
+
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 

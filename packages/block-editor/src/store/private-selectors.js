@@ -416,11 +416,26 @@ export const getStyleOverrides = createSelector(
 			// Once the overrides Map is spread to an array, the first element
 			// is the key, while the second is the override itself including
 			// the clientId to sort by.
-			const [ , { clientId: clientIdA } ] = overrideA;
-			const [ , { clientId: clientIdB } ] = overrideB;
+			const [ , { clientId: clientIdA, __unstableType: typeA } ] =
+				overrideA;
+			const [ , { clientId: clientIdB, __unstableType: typeB } ] =
+				overrideB;
 
 			const aIndex = clientIdMap[ clientIdA ] ?? -1;
 			const bIndex = clientIdMap[ clientIdB ] ?? -1;
+
+			if ( aIndex === bIndex ) {
+				// For overrides belonging to the same block, block style
+				// variation styles must print before other overrides (e.g.
+				// custom CSS) so the latter win the cascade at equal
+				// specificity, matching the front end. Insertion order can't
+				// be relied on here: updating an override (e.g. switching to
+				// another variation) deletes and re-adds it, moving it to the
+				// end of the map.
+				const aPriority = typeA === 'variation' ? 0 : 1;
+				const bPriority = typeB === 'variation' ? 0 : 1;
+				return aPriority - bPriority;
+			}
 
 			return aIndex - bIndex;
 		} );

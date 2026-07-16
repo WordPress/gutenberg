@@ -29,6 +29,7 @@ import {
 	hasSelectedStyleState,
 	isSelectedBlockStyleStateShownOnCanvas,
 	shouldRenderBlockListView,
+	getStyleOverrides,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -1346,6 +1347,65 @@ describe( 'private selectors', () => {
 			expect( getExpandedBlock( state ) ).toBe(
 				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f'
 			);
+		} );
+	} );
+
+	describe( 'getStyleOverrides', () => {
+		it( 'sorts overrides by the order of the blocks they belong to', () => {
+			const state = {
+				blocks: {
+					order: new Map( [ [ '', [ 'block-1', 'block-2' ] ] ] ),
+				},
+				styleOverrides: new Map( [
+					[ 'override-2', { clientId: 'block-2', css: '.b{}' } ],
+					[ 'override-1', { clientId: 'block-1', css: '.a{}' } ],
+					[ 'override-global', { css: '.global{}' } ],
+				] ),
+			};
+
+			expect( getStyleOverrides( state ) ).toEqual( [
+				[ 'override-global', { css: '.global{}' } ],
+				[ 'override-1', { clientId: 'block-1', css: '.a{}' } ],
+				[ 'override-2', { clientId: 'block-2', css: '.b{}' } ],
+			] );
+		} );
+
+		it( 'sorts block style variation overrides before other overrides of the same block, regardless of registration order', () => {
+			const state = {
+				blocks: {
+					order: new Map( [ [ '', [ 'block-1' ] ] ] ),
+				},
+				// The variation override is registered last, as happens when
+				// a block's style variation is switched after its custom CSS
+				// override was registered (updates delete and re-add the
+				// override, moving it to the end of the map).
+				styleOverrides: new Map( [
+					[
+						'custom-css-1',
+						{ clientId: 'block-1', css: '.custom{}' },
+					],
+					[
+						'variation-block-1',
+						{
+							clientId: 'block-1',
+							__unstableType: 'variation',
+							css: '.variation{}',
+						},
+					],
+				] ),
+			};
+
+			expect( getStyleOverrides( state ) ).toEqual( [
+				[
+					'variation-block-1',
+					{
+						clientId: 'block-1',
+						__unstableType: 'variation',
+						css: '.variation{}',
+					},
+				],
+				[ 'custom-css-1', { clientId: 'block-1', css: '.custom{}' } ],
+			] );
 		} );
 	} );
 
