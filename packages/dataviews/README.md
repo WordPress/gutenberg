@@ -264,7 +264,7 @@ Properties:
 -   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 -   `enableMoving`: whether the table columns should display moving controls.
 -   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column. The `align` property accepts `'start'`, `'center'`, or `'end'`.
--   `aspectRatio` (`table` only): a fixed CSS [`aspect-ratio`](https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio) value (e.g. `'1/1'`, `'16/9'`, `'4/3'`) applied to the primary column's media preview. Defaults to `'1/1'`.
+-   `aspectRatio` (`table` only): one of the preset ratios `'1/1'`, `'4/3'`, `'3/4'`, `'3/2'`, `'2/3'`, `'16/9'`, or `'9/16'`, applied to the primary column's media preview. Defaults to `'1/1'`.
 
 **For column alignment (`align` property), follow these guidelines:**
 Right-align (`'end'`) whenever the cell value is fundamentally quantitative—numbers, decimals, currency, percentages—so that digits and decimal points line up, aiding comparison and calculation. Otherwise, default to left-alignment (`'start'`) for all other types (text, codes, labels, dates).
@@ -274,7 +274,7 @@ Right-align (`'end'`) whenever the cell value is fundamentally quantitative—nu
 -   `badgeFields`: a list of field's `id` to render without label and styled as badges.
 -   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the gap between items in the grid.
 -   `previewSize`: a `number` representing the size of the preview.
--   `aspectRatio` (`grid` only): a fixed CSS [`aspect-ratio`](https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio) value (e.g. `'1/1'`, `'16/9'`, `'4/3'`) applied uniformly to every item preview, keeping rows aligned. Defaults to `'1/1'`.
+-   `aspectRatio` (`grid` only): one of the preset ratios `'1/1'`, `'4/3'`, `'3/4'`, `'3/2'`, `'2/3'`, `'16/9'`, or `'9/16'`, applied uniformly to every item preview, keeping rows aligned. Defaults to `'1/1'`.
 
 `list` layout:
 

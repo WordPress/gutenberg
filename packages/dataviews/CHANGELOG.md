@@ -14,7 +14,7 @@
 
 ### Enhancements
 
-- DataViews: Add an `aspectRatio` layout option to the `grid` and `table` layouts so consumers can configure the aspect ratio of item media previews, instead of the hard-coded square. Defaults to `1/1`, so existing consumers are unaffected. [#79329](https://github.com/WordPress/gutenberg/pull/79329)
+- DataViews: Add an `aspectRatio` layout option to the `grid` and `table` layouts so consumers can configure the aspect ratio of item media previews from a set of preset ratios, instead of the hard-coded square. Defaults to `1/1`, so existing consumers are unaffected. [#79329](https://github.com/WordPress/gutenberg/pull/79329)
 
 ### Bug Fix
 

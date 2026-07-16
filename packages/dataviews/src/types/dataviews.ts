@@ -236,6 +236,19 @@ export interface ColumnStyle {
 
 export type Density = 'compact' | 'balanced' | 'comfortable';
 
+/**
+ * The preset aspect ratios available for item media previews, mirroring
+ * Core's default `aspect-ratio` presets.
+ */
+export type MediaAspectRatio =
+	| '1/1'
+	| '4/3'
+	| '3/4'
+	| '3/2'
+	| '2/3'
+	| '16/9'
+	| '9/16';
+
 export interface ViewTable extends ViewBase {
 	type: 'table';
 
@@ -256,11 +269,11 @@ export interface ViewTable extends ViewBase {
 		enableMoving?: boolean;
 
 		/**
-		 * A fixed aspect ratio for the primary column's media preview, as a
-		 * CSS `aspect-ratio` value (e.g. `'1/1'`, `'16/9'`, `'4/3'`). Applied
-		 * uniformly to every row. Defaults to `'1/1'`.
+		 * A fixed aspect ratio for the primary column's media preview, one of
+		 * the preset ratios. Applied uniformly to every row. Defaults to
+		 * `'1/1'`.
 		 */
-		aspectRatio?: string;
+		aspectRatio?: MediaAspectRatio;
 	};
 }
 
@@ -306,11 +319,11 @@ export interface ViewGrid extends ViewBase {
 		density?: Density;
 
 		/**
-		 * A fixed aspect ratio for the grid item previews (the media field), as
-		 * a CSS `aspect-ratio` value (e.g. `'1/1'`, `'16/9'`, `'4/3'`). Applied
-		 * uniformly to every item so rows stay aligned. Defaults to `'1/1'`.
+		 * A fixed aspect ratio for the grid item previews (the media field),
+		 * one of the preset ratios. Applied uniformly to every item so rows
+		 * stay aligned. Defaults to `'1/1'`.
 		 */
-		aspectRatio?: string;
+		aspectRatio?: MediaAspectRatio;
 	};
 }
 
