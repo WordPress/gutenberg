@@ -94,6 +94,9 @@ export function useWidgetTypes(
 						...( record.keywords
 							? { keywords: record.keywords }
 							: {} ),
+						...( record.actions
+							? { actions: record.actions }
+							: {} ),
 					} as WidgetType;
 				} catch {
 					return null;
