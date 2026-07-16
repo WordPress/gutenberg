@@ -53,7 +53,7 @@ const PlaylistTrackEdit = ( {
 	const showImages = context?.showImages ?? true;
 	const imageButton = useRef();
 	const blockProps = useBlockProps();
-	const { currentTrackClientId, setCurrentTrackClientId } =
+	const { currentTrackClientId, setCurrentTrackClientId, addTracks } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
@@ -166,7 +166,7 @@ const PlaylistTrackEdit = ( {
 			{ !! addTracks && (
 				<BlockControls group="block">
 					<MediaReplaceFlow
-						name={ __( 'Add' ) }
+						name={ __( 'Add track' ) }
 						onSelect={ addTracks }
 						accept="audio/*"
 						multiple

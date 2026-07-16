@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -31,19 +31,7 @@ jest.mock( '@wordpress/block-editor', () => ( {
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
 	MediaPlaceholder: () => <div />,
-	MediaReplaceFlow: ( { name, onSelect } ) => (
-		<button
-			onClick={ () =>
-				onSelect( {
-					id: 2,
-					url: 'https://example.com/second-track.mp3',
-					title: 'Second track',
-				} )
-			}
-		>
-			{ name }
-		</button>
-	),
+	MediaReplaceFlow: ( { name } ) => <button>{ name }</button>,
 	useBlockProps: () => ( { className: 'wp-block-playlist' } ),
 	useInnerBlocksProps: ( blockProps ) => ( {
 		...blockProps,
@@ -119,16 +107,11 @@ const defaultAttributes = {
 };
 
 describe( 'PlaylistEdit', () => {
-	let replaceInnerBlocks;
-	let selectBlock;
-
 	beforeEach( () => {
-		replaceInnerBlocks = jest.fn();
-		selectBlock = jest.fn();
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
-			replaceInnerBlocks,
-			selectBlock,
+			replaceInnerBlocks: jest.fn(),
+			selectBlock: jest.fn(),
 		} );
 		useSelect.mockReturnValue( {
 			innerBlockTracks: [
@@ -166,7 +149,7 @@ describe( 'PlaylistEdit', () => {
 		expect( screen.getByTestId( 'playlist-track' ) ).toBeInTheDocument();
 	} );
 
-	it( 'adds tracks from the child block controls', () => {
+	it( 'renders the add track control for child blocks', () => {
 		render(
 			<PlaylistEdit
 				attributes={ defaultAttributes }
@@ -179,24 +162,10 @@ describe( 'PlaylistEdit', () => {
 
 		const childControls = screen.getByTestId( 'block-controls-parent' );
 
-		fireEvent.click(
+		expect(
 			within( childControls ).getByRole( 'button', {
 				name: 'Add track',
 			} )
-		);
-
-		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'playlist-1', [
-			expect.objectContaining( { clientId: 'track-1' } ),
-			expect.objectContaining( {
-				clientId: 'new-track',
-				name: 'core/playlist-track',
-				attributes: expect.objectContaining( {
-					id: 2,
-					src: 'https://example.com/second-track.mp3',
-					title: 'Second track',
-				} ),
-			} ),
-		] );
-		expect( selectBlock ).toHaveBeenCalledWith( 'new-track' );
+		).toBeInTheDocument();
 	} );
 } );

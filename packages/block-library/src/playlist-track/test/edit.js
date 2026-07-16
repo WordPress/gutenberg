@@ -6,7 +6,6 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { BlockControls, MediaReplaceFlow } from '@wordpress/block-editor';
 import { useDispatch } from '@wordpress/data';
 
 /**
@@ -19,18 +18,8 @@ import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 let mockMediaReplaceFlowProps;
 
 jest.mock( '@wordpress/block-editor', () => ( {
-	BlockControls: ( {
-		children,
-		group = 'default',
-		__experimentalShareWithChildBlocks,
-	} ) => (
-		<div
-			data-testid={ `block-controls-${
-				__experimentalShareWithChildBlocks ? 'parent' : group
-			}` }
-		>
-			{ children }
-		</div>
+	BlockControls: ( { children, group = 'default' } ) => (
+		<div data-testid={ `block-controls-${ group }` }>{ children }</div>
 	),
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
@@ -91,19 +80,16 @@ const defaultAttributes = {
 function renderEdit( props = {} ) {
 	const setAttributes = jest.fn();
 	const setCurrentTrackClientId = props.setCurrentTrackClientId || jest.fn();
+	const addTracks = props.addTracks;
 
 	render(
 		<PlaylistContext.Provider
 			value={ {
 				currentTrackClientId: props.currentTrackClientId ?? null,
 				setCurrentTrackClientId,
+				addTracks,
 			} }
 		>
-			{ props.sharedControls && (
-				<BlockControls __experimentalShareWithChildBlocks>
-					{ props.sharedControls }
-				</BlockControls>
-			) }
 			<PlaylistTrackEdit
 				attributes={ {
 					...defaultAttributes,
@@ -209,18 +195,17 @@ describe( 'PlaylistTrackEdit', () => {
 		);
 	} );
 
-	it( 'renders the shared add track control in a different toolbar group from replace', () => {
-		renderEdit( {
-			sharedControls: (
-				<MediaReplaceFlow
-					name="Add track"
-					onSelect={ jest.fn() }
-					accept="audio/*"
-					multiple
-					handleUpload={ false }
-				/>
-			),
-		} );
+	it( 'allows tracks to be added from the track toolbar', () => {
+		const addTracks = jest.fn();
+		renderEdit( { addTracks } );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Add track' } ) );
+
+		expect( addTracks ).toHaveBeenCalledWith( {} );
+	} );
+
+	it( 'renders the add track control in a different toolbar group from replace', () => {
+		renderEdit( { addTracks: jest.fn() } );
 
 		expect(
 			within( screen.getByTestId( 'block-controls-other' ) ).getByRole(
@@ -229,7 +214,7 @@ describe( 'PlaylistTrackEdit', () => {
 			)
 		).toBeInTheDocument();
 		expect(
-			within( screen.getByTestId( 'block-controls-parent' ) ).getByRole(
+			within( screen.getByTestId( 'block-controls-block' ) ).getByRole(
 				'button',
 				{ name: 'Add track' }
 			)
