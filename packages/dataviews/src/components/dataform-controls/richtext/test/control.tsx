@@ -7,7 +7,8 @@ import type { MutableRefObject } from 'react';
 /**
  * WordPress dependencies
  */
-import { createPortal, useContext, useEffect } from '@wordpress/element';
+import { useContext, useEffect } from '@wordpress/element';
+import { Fill, Popover, Slot, SlotFillProvider } from '@wordpress/components';
 import {
 	unregisterFormatType,
 	registerFormatType,
@@ -400,18 +401,18 @@ describe( 'RichTextControl', () => {
 				className: null,
 				edit: () => <TestShortcut onUse={ () => currentOnUse() } />,
 			} );
-			// Stand-in for a format type that opens a popover (e.g. the inline
-			// link UI). Like a real `Popover`, it portals out of the field's
-			// DOM subtree, but its focus still bubbles through the React tree.
+			// Stand-in for a format type that opens inline UI in a popover
+			// (e.g. the link UI behind Cmd+K). A real `Popover`, so the tests
+			// exercise the actual Slot/Fill decision rather than a portal stub.
 			registerTestFormatType( 'core/test-popover-ui', {
 				title: 'Test Popover UI',
 				tagName: 'kbd',
 				className: null,
-				edit: () =>
-					createPortal(
-						<button type="button">Inside popover</button>,
-						document.body
-					),
+				edit: () => (
+					<Popover>
+						<button type="button">Inside popover</button>
+					</Popover>
+				),
 			} );
 		} );
 
@@ -501,11 +502,23 @@ describe( 'RichTextControl', () => {
 			);
 			const textbox = getTextbox( container );
 
-			// Selecting the field mounts the stub format's portalled popover.
+			// Selecting the field mounts the stub format's popover.
 			await moveFocusTo( textbox );
-			await moveFocusTo(
-				screen.getByRole( 'button', { name: 'Inside popover' } )
-			);
+			const popoverButton = screen.getByRole( 'button', {
+				name: 'Inside popover',
+			} );
+
+			// No `Popover.Slot` in the field's registry, so the popover lands
+			// in the body-level fallback container, outside the field's DOM.
+			expect(
+				// eslint-disable-next-line testing-library/no-node-access
+				popoverButton.closest(
+					'.components-popover__fallback-container'
+				)
+			).toBeInTheDocument();
+			expect( container ).not.toContainElement( popoverButton );
+
+			await moveFocusTo( popoverButton );
 			await flushTimeouts();
 
 			// Focus stayed in UI the field owns, so `FormatEdit` stays mounted
@@ -680,8 +693,7 @@ describe( 'RichTextControl', () => {
 		// Format types receive `isVisible` and gate both their toolbar
 		// buttons and their inline UIs (e.g. the link popover opened via
 		// Cmd+K) on it. The assembly must pass `isVisible` so the inline
-		// UIs can open; the toolbar-button fills render into nothing since
-		// a standalone field mounts no `RichText.ToolbarControls` slot.
+		// UIs can open.
 		beforeAll( () => {
 			registerTestFormatType( 'core/test-edit-ui', {
 				title: 'Test Edit UI',
@@ -693,10 +705,24 @@ describe( 'RichTextControl', () => {
 					</div>
 				),
 			} );
+			// Re-implement `RichTextToolbarButton` locally
+			// (`@wordpress/block-editor` isn't a dependency here): format types
+			// contribute toolbar buttons as `RichText.ToolbarControls.*` fills.
+			registerTestFormatType( 'core/test-toolbar-button', {
+				title: 'Test Toolbar Button',
+				tagName: 'b',
+				className: null,
+				edit: () => (
+					<Fill name="RichText.ToolbarControls.test">
+						<button type="button">Format toolbar button</button>
+					</Fill>
+				),
+			} );
 		} );
 
 		afterAll( () => {
 			unregisterFormatType( 'core/test-edit-ui' );
+			unregisterFormatType( 'core/test-toolbar-button' );
 		} );
 
 		it( 'mounts format edit components with `isVisible` while the field is selected', async () => {
@@ -719,6 +745,33 @@ describe( 'RichTextControl', () => {
 			expect( screen.getByTestId( 'format-edit-ui' ) ).toHaveTextContent(
 				'true'
 			);
+		} );
+
+		it( 'keeps format toolbar fills out of a surrounding block toolbar', async () => {
+			const { container } = render(
+				<SlotFillProvider>
+					<RichTextControl
+						label="Toolbar isolation"
+						value=""
+						onChange={ () => {} }
+					/>
+					{ /* Stands in for the editor's block toolbar, which renders
+					   the matching slots through `FormatToolbar`. */ }
+					<div data-testid="block-toolbar">
+						<Slot name="RichText.ToolbarControls.test" />
+					</div>
+				</SlotFillProvider>
+			);
+
+			// Selecting the field mounts `FormatEdit` and its toolbar fill.
+			await moveFocusTo( getTextbox( container ) );
+			expect(
+				screen.getByTestId( 'format-edit-ui' )
+			).toBeInTheDocument();
+
+			expect(
+				screen.getByTestId( 'block-toolbar' )
+			).toBeEmptyDOMElement();
 		} );
 	} );
 

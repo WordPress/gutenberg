@@ -14,7 +14,7 @@
 
 ### Internal
 
-- DataForms: Track the `richtext` control's selection with a single React-tree focus boundary (`useFocusOutside`) instead of a per-field `SlotFillProvider`/`Popover.Slot`, letting format popovers use the default Popover container. No behavior change. [#80324](https://github.com/WordPress/gutenberg/pull/80324)
+- DataForms: Track the `richtext` control's selection with a single React-tree focus boundary (`useFocusOutside`) instead of document-level focus bookkeeping, and drop the field-owned `Popover.Slot` so format popovers use the default Popover container. No behavior change. [#80324](https://github.com/WordPress/gutenberg/pull/80324)
 
 ## 17.2.0 (2026-07-14)
 
