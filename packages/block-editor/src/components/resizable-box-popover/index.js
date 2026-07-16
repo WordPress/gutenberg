@@ -16,7 +16,7 @@ export default function ResizableBoxPopover( {
 	return (
 		<BlockPopoverCover
 			clientId={ clientId }
-			__unstablePopoverSlot="block-toolbar"
+			__unstablePopoverSlot="__unstable-block-tools-after"
 			{ ...props }
 		>
 			<ResizableBox { ...resizableBoxProps } />
