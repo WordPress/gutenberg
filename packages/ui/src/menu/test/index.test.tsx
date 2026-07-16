@@ -6,19 +6,29 @@ import * as Menu from '../index';
 // The prefix slot is presentational, so this structural regression is not
 // observable through Testing Library's semantic queries.
 function queryItemPrefix( item: HTMLElement ) {
-	return item.querySelector( '.style-item-prefix' );
+	return item.querySelector< HTMLElement >( '.style-item-prefix' );
+}
+
+function queryItemLabel( item: HTMLElement ) {
+	return item.querySelector< HTMLElement >( '.style-item-label' );
 }
 
 function queryItemShortcut( item: HTMLElement ) {
-	return item.querySelector( '.style-item-shortcut' );
+	return item.querySelector< HTMLElement >( '.style-item-shortcut' );
 }
 
 function queryItemSuffix( item: HTMLElement ) {
-	return item.querySelector( '.style-item-suffix' );
+	return item.querySelector< HTMLElement >( '.style-item-suffix' );
 }
 
 function queryItemTrailing( item: HTMLElement ) {
-	return item.querySelector( '.style-item-trailing' );
+	return item.querySelector< HTMLElement >( '.style-item-trailing' );
+}
+
+function queryExternalLinkIndicator( item: HTMLElement ) {
+	return item.querySelector< HTMLElement >(
+		'.style-external-link-indicator'
+	);
 }
 
 describe( 'Menu', () => {
@@ -379,6 +389,7 @@ describe( 'Menu', () => {
 						href="https://developer.wordpress.org"
 						openInNewTab
 						rel="nofollow"
+						suffix="Docs"
 					>
 						Developer resources
 					</Menu.LinkItem>
@@ -412,11 +423,19 @@ describe( 'Menu', () => {
 		expect(
 			screen.getAllByLabelText( '(opens in a new tab)' )
 		).toHaveLength( 3 );
-		expect(
-			screen.getByRole( 'menuitem', {
-				name: 'Developer resources (opens in a new tab)',
-			} )
-		).toHaveAttribute( 'rel', 'nofollow' );
+		const developerItem = screen.getByRole( 'menuitem', {
+			name: 'Developer resources (opens in a new tab)',
+		} );
+		const developerItemIndicator =
+			queryExternalLinkIndicator( developerItem );
+		expect( developerItem ).toHaveAttribute( 'rel', 'nofollow' );
+		expect( queryItemLabel( developerItem ) ).toContainElement(
+			developerItemIndicator
+		);
+		expect( queryItemSuffix( developerItem ) ).toHaveTextContent( 'Docs' );
+		expect( queryItemSuffix( developerItem ) ).not.toContainElement(
+			developerItemIndicator
+		);
 		expect(
 			screen.getByRole( 'menuitem', { name: 'WordPress project' } )
 		).not.toHaveAttribute( 'aria-labelledby' );

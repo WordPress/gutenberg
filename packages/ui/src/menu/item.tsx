@@ -2,6 +2,7 @@ import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import {
 	Children,
+	cloneElement,
 	forwardRef,
 	isValidElement,
 	useId,
@@ -122,20 +123,44 @@ function useItemContent(
 
 function ItemContent( {
 	children,
+	labelTrailing,
 	prefix,
 	shortcut,
 	shortcutDescriptionId,
 	suffix,
 	trailing,
 }: Pick< ItemProps, 'children' | 'prefix' | 'shortcut' | 'suffix' > & {
+	labelTrailing?: ItemProps[ 'suffix' ];
 	shortcutDescriptionId?: string;
 	trailing?: ItemProps[ 'suffix' ];
 } ) {
-	const itemChildren = getStructuredItemContent( children )
-		.hasStructuredContent ? (
-		children
+	const hasStructuredContent =
+		getStructuredItemContent( children ).hasStructuredContent;
+	const itemChildren = hasStructuredContent ? (
+		Children.map( children, ( child ) => {
+			if (
+				isValidElement< { children?: ItemProps[ 'children' ] } >(
+					child
+				) &&
+				child.type === ItemLabel
+			) {
+				return cloneElement( child, {
+					children: (
+						<>
+							{ child.props.children }
+							{ labelTrailing }
+						</>
+					),
+				} );
+			}
+
+			return child;
+		} )
 	) : (
-		<ItemLabel>{ children }</ItemLabel>
+		<ItemLabel>
+			{ children }
+			{ labelTrailing }
+		</ItemLabel>
 	);
 
 	return (

@@ -1,6 +1,6 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
-import { forwardRef, useId } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
@@ -29,10 +29,8 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 	},
 	ref
 ) {
-	const externalLinkIndicatorId = useId();
 	const externalLinkIndicator = openInNewTab ? (
 		<span
-			id={ externalLinkIndicatorId }
 			className={ styles[ 'external-link-indicator' ] }
 			role="img"
 			aria-label={
@@ -41,21 +39,12 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 			}
 		/>
 	) : null;
-	const itemSuffix = externalLinkIndicator ? (
-		<>
-			{ suffix }
-			{ externalLinkIndicator }
-		</>
-	) : (
-		suffix
-	);
 	const { contentContextValue, itemAriaProps, shortcutDescriptionId } =
 		useItemContent( children, {
 			'aria-describedby': ariaDescribedBy,
 			'aria-keyshortcuts': ariaKeyShortcuts,
 			'aria-label': ariaLabel,
 			'aria-labelledby': ariaLabelledBy,
-			labelledBy: openInNewTab ? externalLinkIndicatorId : undefined,
 			shortcut,
 		} );
 
@@ -75,10 +64,11 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 		>
 			<MenuItemContentContext.Provider value={ contentContextValue }>
 				<ItemContent
+					labelTrailing={ externalLinkIndicator }
 					prefix={ prefix }
 					shortcut={ shortcut }
 					shortcutDescriptionId={ shortcutDescriptionId }
-					suffix={ itemSuffix }
+					suffix={ suffix }
 				>
 					{ children }
 				</ItemContent>
