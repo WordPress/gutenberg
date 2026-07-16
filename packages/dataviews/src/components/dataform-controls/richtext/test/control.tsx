@@ -86,12 +86,11 @@ describe( 'RichTextControl', () => {
 		expect( textbox ).toBeInTheDocument();
 		expect( textbox ).toHaveAttribute( 'role', 'textbox' );
 		expect( textbox ).toHaveAttribute( 'contenteditable', 'true' );
-		// `BaseControl` wires the label's `for` to the control's `id`.
-		expect( label ).toHaveAttribute( 'for', textbox.id );
-		// `<label for>` does not contribute an accessible name to a non-form
-		// element (a `<div role="textbox">`), so the label is also mirrored
-		// onto `aria-label` for assistive tech and test locators.
-		expect( textbox ).toHaveAttribute( 'aria-label', 'Description' );
+		// A `<div contenteditable>` is not a labelable element, so the label
+		// must not use `for`; the name is wired through `aria-labelledby`.
+		expect( label ).not.toHaveAttribute( 'for' );
+		expect( textbox ).toHaveAttribute( 'aria-labelledby', label.id );
+		expect( textbox ).toHaveAccessibleName( 'Description' );
 	} );
 
 	it( 'renders without autocomplete when no `completers` are passed', () => {
@@ -185,9 +184,13 @@ describe( 'RichTextControl', () => {
 
 		const textbox = getTextbox( container );
 		expect( textbox ).toHaveAttribute( 'id', 'my-custom-id' );
+		expect( textbox ).toHaveAttribute(
+			'aria-labelledby',
+			'my-custom-id__label'
+		);
 		expect( screen.getByText( 'Custom id' ) ).toHaveAttribute(
-			'for',
-			'my-custom-id'
+			'id',
+			'my-custom-id__label'
 		);
 	} );
 
