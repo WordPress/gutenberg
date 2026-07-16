@@ -51,6 +51,7 @@ import type {
 } from './types';
 import { overlayMiddlewares } from './overlay-middlewares';
 import { StyleProvider } from '../style-provider';
+import styles from './style.module.scss';
 
 /**
  * Name of slot in which popover should fill.
@@ -74,15 +75,21 @@ const ArrowTriangle = () => (
 	<SVG
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 100 100"
-		className="components-popover__triangle"
+		className={ clsx( styles.triangle, 'components-popover__triangle' ) }
 		role="presentation"
 	>
 		<Path
-			className="components-popover__triangle-bg"
+			className={ clsx(
+				styles[ 'triangle-bg' ],
+				'components-popover__triangle-bg'
+			) }
 			d="M 0 0 L 50 50 L 100 0"
 		/>
 		<Path
-			className="components-popover__triangle-border"
+			className={ clsx(
+				styles[ 'triangle-border' ],
+				'components-popover__triangle-border'
+			) }
 			d="M 0 0 L 50 50 L 100 0"
 			vectorEffect="non-scaling-stroke"
 		/>
@@ -452,16 +459,25 @@ const UnforwardedPopover = (
 
 	let content = (
 		<motion.div
-			className={ clsx( className, {
-				'is-expanded': isExpanded,
-				'is-positioned': isPositioned,
-				// Use the 'alternate' classname for 'toolbar' variant for back compat.
-				[ `is-${
-					computedVariant === 'toolbar'
-						? 'alternate'
-						: computedVariant
-				}` ]: computedVariant,
-			} ) }
+			className={ clsx(
+				styles.popover,
+				{
+					[ styles[ 'is-expanded' ] ]: isExpanded,
+					[ styles[ 'is-alternate' ] ]: computedVariant === 'toolbar',
+					[ styles[ 'is-unstyled' ] ]: computedVariant === 'unstyled',
+				},
+				className,
+				{
+					'is-expanded': isExpanded,
+					'is-positioned': isPositioned,
+					// Use the 'alternate' classname for 'toolbar' variant for back compat.
+					[ `is-${
+						computedVariant === 'toolbar'
+							? 'alternate'
+							: computedVariant
+					}` ]: computedVariant,
+				}
+			) }
 			{ ...animationProps }
 			{ ...contentProps }
 			ref={ mergedFloatingRef }
@@ -471,8 +487,18 @@ const UnforwardedPopover = (
 			{ /* Prevents scroll on the document */ }
 			{ isExpanded && <ScrollLock /> }
 			{ isExpanded && (
-				<div className="components-popover__header">
-					<span className="components-popover__header-title">
+				<div
+					className={ clsx(
+						styles.header,
+						'components-popover__header'
+					) }
+				>
+					<span
+						className={ clsx(
+							styles[ 'header-title' ],
+							'components-popover__header-title'
+						) }
+					>
 						{ headerTitle }
 					</span>
 					<Button
@@ -484,14 +510,23 @@ const UnforwardedPopover = (
 					/>
 				</div>
 			) }
-			<div className="components-popover__content">{ children }</div>
+			<div
+				className={ clsx(
+					styles.content,
+					'components-popover__content'
+				) }
+			>
+				{ children }
+			</div>
 			{ hasArrow && (
 				<div
 					ref={ arrowCallbackRef }
-					className={ [
+					className={ clsx(
+						styles.arrow,
+						styles[ `is-${ computedPlacement.split( '-' )[ 0 ] }` ],
 						'components-popover__arrow',
-						`is-${ computedPlacement.split( '-' )[ 0 ] }`,
-					].join( ' ' ) }
+						`is-${ computedPlacement.split( '-' )[ 0 ] }`
+					) }
 					style={ {
 						left:
 							typeof arrowData?.x !== 'undefined' &&

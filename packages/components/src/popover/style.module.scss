@@ -10,7 +10,7 @@ $shadow-popover-border-default-alternate: 0 0 0 $border-width $gray-900;
 $shadow-popover-border-top-only: 0 #{-$border-width} 0 0 $gray-400;
 $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 
-.components-popover {
+.popover {
 	@include reset;
 	z-index: z-index(".components-popover");
 	will-change: transform;
@@ -18,24 +18,26 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 	&.is-expanded {
 		position: fixed;
 		top: 0;
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve Popover's physical viewport positioning. */
 		left: 0;
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve Popover's physical viewport positioning. */
 		right: 0;
 		bottom: 0;
 		z-index: z-index(".components-popover") !important;
 	}
 }
 
-.components-popover__content {
-	background: $white;
+.content {
+	background: var(--wpds-color-background-surface-neutral-strong);
 	box-shadow: $shadow-popover-border-default, $elevation-medium;
-	border-radius: $radius-medium;
+	border-radius: var(--wpds-border-radius-md);
 	box-sizing: border-box;
 	width: min-content;
 
 	// Alternate treatment for popovers that put them at elevation zero with high contrast and smaller radius.
 	.is-alternate & {
 		box-shadow: $shadow-popover-border-default-alternate;
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 	}
 
 	// A style that gives the popover no visible ui.
@@ -45,35 +47,37 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 		box-shadow: none;
 	}
 
-	.components-popover.is-expanded & {
+	.popover.is-expanded & {
 		position: static;
-		height: calc(100% - #{ $panel-header-height });
+		height: calc(100% - #{$panel-header-height});
 		overflow-y: visible;
 		width: auto;
 		box-shadow: $shadow-popover-border-top-only;
 	}
-	.components-popover.is-expanded.is-alternate & {
+
+	.popover.is-expanded.is-alternate & {
 		box-shadow: $shadow-popover-border-top-only-alternate;
 	}
 }
 
-.components-popover__header {
+.header {
 	align-items: center;
-	background: $white;
+	background: var(--wpds-color-background-surface-neutral-strong);
 	display: flex;
 	height: $panel-header-height;
 	justify-content: space-between;
-	padding: 0 8px 0 $grid-unit-20;
+	/* stylelint-disable-next-line declaration-property-max-values -- Preserve the existing physical header padding. */
+	padding: 0 var(--wpds-dimension-padding-sm) 0 var(--wpds-dimension-padding-lg);
 }
 
-.components-popover__header-title {
+.header-title {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	width: 100%;
 }
 
-.components-popover__arrow {
+.arrow {
 	position: absolute;
 	width: $arrow-triangle-base-size;
 	height: $arrow-triangle-base-size;
@@ -87,10 +91,12 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 		content: "";
 		position: absolute;
 		top: -1px;
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the arrow's physical geometry. */
 		left: 1px;
 		height: 2px;
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the arrow's physical geometry. */
 		right: 1px;
-		background-color: $white;
+		background-color: var(--wpds-color-background-surface-neutral-strong);
 	}
 
 	// Position and rotate the arrow depending on the popover's placement.
@@ -99,35 +105,40 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 		bottom: -1 * $arrow-triangle-base-size !important;
 		transform: rotate(0);
 	}
+
 	&.is-right {
 		/*rtl:begin:ignore*/
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- The physical side is part of the arrow rotation calculation. */
 		left: -1 * $arrow-triangle-base-size !important;
 		transform: rotate(90deg);
 	}
+
 	&.is-bottom {
 		top: -1 * $arrow-triangle-base-size !important;
 		transform: rotate(180deg);
 	}
+
 	&.is-left {
 		/*rtl:begin:ignore*/
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- The physical side is part of the arrow rotation calculation. */
 		right: -1 * $arrow-triangle-base-size !important;
 		transform: rotate(-90deg);
 		/*rtl:end:ignore*/
 	}
 }
 
-.components-popover__triangle {
+.triangle {
 	display: block;
 	flex: 1;
 }
 
-.components-popover__triangle-bg {
-	// Fill color is the same as the .components-popover__content's background
-	fill: $white;
+.triangle-bg {
+	// Fill color is the same as the .content's background.
+	fill: var(--wpds-color-background-surface-neutral-strong);
 }
 
-.components-popover__triangle-border {
-	// Stroke colors are the same as the .components-popover__content's outline
+.triangle-border {
+	// Stroke colors are the same as the .content's outline.
 	fill: transparent;
 	stroke-width: $border-width;
 	stroke: $gray-400;
