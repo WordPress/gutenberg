@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -164,29 +159,14 @@ function createCornerUnitChangeHandler(
 /**
  * Control to display border radius options.
  *
- * @param {Object}        props               Component props.
- * @param {Function}      props.onChange      Callback to handle onChange.
- * @param {Object}        props.values        Border radius values.
- * @param {Object}        props.presets       Border radius presets.
- * @param {string}        [props.className]   Optional class name applied to the
- *                                            wrapping fieldset.
- * @param {string|Object} [props.placeholder]
- *                                            Either a single placeholder string
- *                                            (linked mode) or an object with
- *                                            per-corner keys (`topLeft`,
- *                                            `topRight`, `bottomLeft`,
- *                                            `bottomRight`) to display as the
- *                                            placeholder on each unlinked input.
+ * @param {Object}   props          Component props.
+ * @param {Function} props.onChange Callback to handle onChange.
+ * @param {Object}   props.values   Border radius values.
+ * @param {Object}   props.presets  Border radius presets.
  *
  * @return {Element}              Custom border radius control.
  */
-export default function BorderRadiusControl( {
-	onChange,
-	values,
-	presets,
-	className,
-	placeholder,
-} ) {
+export default function BorderRadiusControl( { onChange, values, presets } ) {
 	const [ isLinked, setIsLinked ] = useState(
 		! hasDefinedValues( values ) || ! hasMixedValues( values )
 	);
@@ -214,25 +194,8 @@ export default function BorderRadiusControl( {
 
 	const toggleLinked = () => setIsLinked( ! isLinked );
 
-	// Resolve per-mode placeholder.
-	// In linked mode, accept either a string or an object with `all`/per-corner
-	// keys; we prefer `all` then any per-corner. In unlinked mode, each corner
-	// reads its own per-corner key.
-	const linkedPlaceholder =
-		typeof placeholder === 'string'
-			? placeholder
-			: placeholder?.all ??
-			  placeholder?.topLeft ??
-			  placeholder?.topRight ??
-			  placeholder?.bottomLeft ??
-			  placeholder?.bottomRight;
-	const cornerPlaceholder = ( corner ) =>
-		typeof placeholder === 'string' ? placeholder : placeholder?.[ corner ];
-
 	return (
-		<fieldset
-			className={ clsx( 'components-border-radius-control', className ) }
-		>
+		<fieldset className="components-border-radius-control">
 			<HStack className="components-border-radius-control__header">
 				<BaseControl.VisualLabel as="legend">
 					{ __( 'Radius' ) }
@@ -255,7 +218,6 @@ export default function BorderRadiusControl( {
 						selectedUnits,
 						setSelectedUnits
 					) }
-					placeholder={ linkedPlaceholder }
 					presets={ options }
 					presetType="border-radius"
 					selectedUnit={ getCornerUnit( selectedUnits, 'all' ) }
@@ -287,7 +249,6 @@ export default function BorderRadiusControl( {
 								selectedUnits,
 								setSelectedUnits
 							) }
-							placeholder={ cornerPlaceholder( corner ) }
 							presets={ options }
 							presetType="border-radius"
 							selectedUnit={ getCornerUnit(
