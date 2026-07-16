@@ -6,7 +6,12 @@ import { wrap, terminate, type Remote } from '@wordpress/worker-threads';
 /**
  * Internal dependencies
  */
-import type { ItemId, ImageSizeCrop } from './types';
+import type {
+	ItemId,
+	ImageSizeCrop,
+	ConvertImageOptions,
+	ResizeImageOptions,
+} from './types';
 import type { WorkerAPI } from './worker';
 import { workerCode } from './worker-code';
 
@@ -52,14 +57,11 @@ function getWorkerAPI(): Remote< WorkerAPI > {
 /**
  * Converts an image to a different format using vips in a worker.
  *
- * @param id          Item ID.
- * @param buffer      Original file buffer.
- * @param inputType   Input mime type.
- * @param outputType  Output mime type.
- * @param quality     Desired quality.
- * @param interlaced  Whether to use interlaced/progressive mode.
- * @param stripMeta   Whether to strip metadata (except color profiles).
- * @param maxBitdepth Maximum output bit depth.
+ * @param id         Item ID.
+ * @param buffer     Original file buffer.
+ * @param inputType  Input mime type.
+ * @param outputType Output mime type.
+ * @param options    Conversion options.
  * @return Converted file buffer.
  */
 export async function vipsConvertImageFormat(
@@ -67,55 +69,29 @@ export async function vipsConvertImageFormat(
 	buffer: ArrayBuffer,
 	inputType: string,
 	outputType: string,
-	quality = 0.82,
-	interlaced = false,
-	stripMeta = true,
-	maxBitdepth = 16
+	options: ConvertImageOptions = {}
 ): Promise< ArrayBuffer | ArrayBufferLike > {
 	const api = getWorkerAPI();
-	return api.convertImageFormat(
-		id,
-		buffer,
-		inputType,
-		outputType,
-		quality,
-		interlaced,
-		stripMeta,
-		maxBitdepth
-	);
+	return api.convertImageFormat( id, buffer, inputType, outputType, options );
 }
 
 /**
  * Compresses an existing image using vips in a worker.
  *
- * @param id          Item ID.
- * @param buffer      Original file buffer.
- * @param type        Mime type.
- * @param quality     Desired quality.
- * @param interlaced  Whether to use interlaced/progressive mode.
- * @param stripMeta   Whether to strip metadata (except color profiles).
- * @param maxBitdepth Maximum output bit depth.
+ * @param id      Item ID.
+ * @param buffer  Original file buffer.
+ * @param type    Mime type.
+ * @param options Compression options.
  * @return Compressed file buffer.
  */
 export async function vipsCompressImage(
 	id: ItemId,
 	buffer: ArrayBuffer,
 	type: string,
-	quality = 0.82,
-	interlaced = false,
-	stripMeta = true,
-	maxBitdepth = 16
+	options: ConvertImageOptions = {}
 ): Promise< ArrayBuffer | ArrayBufferLike > {
 	const api = getWorkerAPI();
-	return api.compressImage(
-		id,
-		buffer,
-		type,
-		quality,
-		interlaced,
-		stripMeta,
-		maxBitdepth
-	);
+	return api.compressImage( id, buffer, type, options );
 }
 
 /**
@@ -124,14 +100,11 @@ export async function vipsCompressImage(
  * UltraHDR JPEGs are auto-detected by libvips and their gain map is
  * preserved through the resize.
  *
- * @param id          Item ID.
- * @param buffer      Original file buffer.
- * @param type        Mime type.
- * @param resize      Resize options.
- * @param smartCrop   Whether to use smart cropping (i.e. saliency-aware).
- * @param quality     Desired quality (0-1). Defaults to 0.82.
- * @param stripMeta   Whether to strip metadata (except color profiles).
- * @param maxBitdepth Maximum output bit depth.
+ * @param id      Item ID.
+ * @param buffer  Original file buffer.
+ * @param type    Mime type.
+ * @param resize  Resize options.
+ * @param options Additional resize options.
  * @return Processed file data plus the old and new dimensions.
  */
 export async function vipsResizeImage(
@@ -139,10 +112,7 @@ export async function vipsResizeImage(
 	buffer: ArrayBuffer,
 	type: string,
 	resize: ImageSizeCrop,
-	smartCrop = false,
-	quality = 0.82,
-	stripMeta = true,
-	maxBitdepth = 16
+	options: ResizeImageOptions = {}
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -151,16 +121,7 @@ export async function vipsResizeImage(
 	originalHeight: number;
 } > {
 	const api = getWorkerAPI();
-	return api.resizeImage(
-		id,
-		buffer,
-		type,
-		resize,
-		smartCrop,
-		quality,
-		stripMeta,
-		maxBitdepth
-	);
+	return api.resizeImage( id, buffer, type, resize, options );
 }
 
 /**
