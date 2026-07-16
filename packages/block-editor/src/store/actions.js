@@ -1945,13 +1945,15 @@ export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
  * WordPress media blocks (image, video, audio).
  *
  * @typedef {Object} InserterMediaItem
- * @property {string}        title        The title of the media item.
- * @property {string}        url          The source url of the media item.
- * @property {string}        [previewUrl] The preview source url of the media item to display in the media list.
- * @property {number}        [id]         The WordPress id of the media item.
- * @property {number|string} [sourceId]   The id of the media item from external source.
- * @property {string}        [alt]        The alt text of the media item.
- * @property {string}        [caption]    The caption of the media item.
+ * @property {string}        title         The title of the media item.
+ * @property {string}        url           The source url of the media item.
+ * @property {string}        [previewUrl]  The preview source url of the media item to display in the media list.
+ * @property {number}        [id]          The WordPress id of the media item.
+ * @property {number|string} [sourceId]    The id of the media item from external source.
+ * @property {string}        [alt]         The alt text of the media item.
+ * @property {string}        [caption]     The caption of the media item.
+ * @property {string}        [description] The description of the media item.
+ * @property {string}        [filename]    The file name to use when the media item is uploaded to the media library. Falls back to the file name from the item's url.
  */
 
 /**
@@ -1996,6 +1998,12 @@ export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
  * - _sourceId_ `[number|string]`: The id of the media item from external source.
  * - _alt_ `[string]`: The alt text of the media item.
  * - _caption_ `[string]`: The caption of the media item.
+ * - _description_ `[string]`: The description of the media item.
+ * - _filename_ `[string]`: The file name to use when the media item is uploaded to the media library. Falls back to the file name from the item's url.
+ *
+ * When an external media item (one without a WordPress `id`) is inserted, it is
+ * uploaded to the media library, and the item's `title`, `alt`, `caption`,
+ * `description`, and `filename` are saved on the created attachment.
  *
  * _Type Definition_
  *
