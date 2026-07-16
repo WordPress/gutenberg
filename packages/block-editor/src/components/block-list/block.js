@@ -606,7 +606,7 @@ function BlockListBlockProvider( props ) {
 			}
 
 			const {
-				hasBlockSupport: _hasBlockSupport,
+				getBlockSupport: _getBlockSupport,
 				getActiveBlockVariation,
 			} = select( blocksStore );
 			const attributes = getBlockAttributes( clientId );
@@ -706,8 +706,8 @@ function BlockListBlockProvider( props ) {
 							( id ) => getBlockName( id ) === blockName
 						) ),
 				mayDisplayParentControls: getMayDisplayParentControls(
-					_hasBlockSupport(
-						getBlockName( clientId ),
+					_getBlockSupport(
+						blockName,
 						'__experimentalExposeControlsToChildren',
 						false
 					),
