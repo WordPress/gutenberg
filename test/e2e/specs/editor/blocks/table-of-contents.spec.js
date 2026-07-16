@@ -817,6 +817,53 @@ test.describe( 'Table of Contents', () => {
 			}
 		);
 
+		// Desired behavior: a template-level ToC should still create working
+		// links when headings were authored in the Post Editor without a ToC in
+		// post content. In that scenario, the Single template contains the ToC,
+		// `generateAnchors` keeps its default false value, and the template is
+		// never loaded while editing the post. That means the Heading block's
+		// ToC-triggered editor auto-anchor generation never runs for the post
+		// heading, so template ToC support needs a separate anchor strategy.
+		test.fixme(
+			'a table of contents in a shared template links to post headings created without a post-level table of contents',
+			async ( { page, requestUtils } ) => {
+				await requestUtils.createTemplate( 'wp_template', {
+					// The single template slug makes this template apply to posts viewed on the front of site.
+					slug: 'single',
+					title: 'Single',
+					content: [
+						'<!-- wp:table-of-contents /-->',
+						'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
+					].join( '\n\n' ),
+				} );
+				const post = await createPostWithContent(
+					requestUtils,
+					'Unanchored templated post',
+					headingBlock( {
+						content: 'Post editor section',
+					} )
+				);
+
+				await openPostOnFrontend( page, post.id );
+
+				const tableOfContents = page.getByRole( 'navigation', {
+					name: 'Table of Contents',
+				} );
+				const link = tableOfContents.getByRole( 'link', {
+					name: 'Post editor section',
+				} );
+				await expect( link ).toHaveAttribute(
+					'href',
+					/#post-editor-section$/
+				);
+				await link.click();
+				await expect( page ).toHaveURL( /#post-editor-section$/ );
+				await expect(
+					page.locator( '#post-editor-section' )
+				).toBeInViewport();
+			}
+		);
+
 		// Desired behavior: ToC in template editing should explain that it uses viewed post headings; trunk only shows the generic empty-heading placeholder.
 		test.fixme(
 			'template editing explains when a live example cannot be shown and the front of site uses the viewed post',
