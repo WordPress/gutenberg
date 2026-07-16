@@ -50,6 +50,12 @@ const continents = [
 	'Oceania',
 ];
 
+const countryLabelMap: Record< string, string > = {
+	us: 'United States',
+	uk: 'United Kingdom',
+	es: 'Spain',
+};
+
 const DefaultTemplate: StoryFn< typeof FormTokenField > = ( { ...args } ) => {
 	const [ selectedContinents, setSelectedContinents ] = useState<
 		ComponentProps< typeof FormTokenField >[ 'value' ]
@@ -151,3 +157,17 @@ ValidateNewTokens.args = {
 		continents.includes( input ),
 	__experimentalExpandOnFocus: true,
 };
+
+/**
+ * This demonstrates matching suggestions by their display labels.
+ */
+export const DisplayLabelMatching: StoryFn< typeof FormTokenField > =
+	DefaultTemplate.bind( {} );
+DisplayLabelMatching.args = {
+	label: 'Countries',
+	suggestions: Object.keys( countryLabelMap ),
+	displayTransform: ( token ) => countryLabelMap[ token ] ?? token,
+	placeholder: 'Type by label, e.g. "United"...',
+	__experimentalExpandOnFocus: true,
+};
+DisplayLabelMatching.storyName = 'Label and value matching';

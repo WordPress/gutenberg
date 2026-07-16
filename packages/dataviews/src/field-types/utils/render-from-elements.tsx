@@ -22,6 +22,16 @@ export default function RenderFromElements< Item >( {
 		return value;
 	}
 
+	if ( Array.isArray( value ) ) {
+		return value
+			.map(
+				( entry ) =>
+					elements?.find( ( element ) => element.value === entry )
+						?.label ?? entry
+			)
+			.join( ', ' );
+	}
+
 	return (
 		elements?.find( ( element ) => element.value === value )?.label ||
 		field.getValue( { item } )
