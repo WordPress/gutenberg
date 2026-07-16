@@ -230,10 +230,14 @@ export default function TypographyPanel( {
 } ) {
 	const { colors, allColors, areCustomSolidsEnabled, decodeValue } =
 		useColorGradientSettings( settings );
+	// Always keep the layout className (e.g. `single-column`); only the
+	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
 	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>
-		showInheritanceLabelIndicators
-			? getInheritanceProps( isInherited, hasLocalOverride, className )
-			: {};
+		getInheritanceProps(
+			showInheritanceLabelIndicators && isInherited,
+			showInheritanceLabelIndicators && hasLocalOverride,
+			className
+		);
 
 	// Text color. Writes to `color.text` (unchanged storage path). The
 	// control is rendered here instead of the Color panel because text

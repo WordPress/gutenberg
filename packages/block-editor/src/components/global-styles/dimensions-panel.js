@@ -376,10 +376,14 @@ export default function DimensionsPanel( {
 			rawValue
 		);
 	};
+	// Always keep the layout className (e.g. `single-column`); only the
+	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
 	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>
-		showInheritanceLabelIndicators
-			? getInheritanceProps( isInherited, hasLocalOverride, className )
-			: {};
+		getInheritanceProps(
+			showInheritanceLabelIndicators && isInherited,
+			showInheritanceLabelIndicators && hasLocalOverride,
+			className
+		);
 
 	const showSpacingPresetsControl = hasSpacingPresets( settings );
 	const units = useCustomUnits( {

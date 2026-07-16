@@ -809,3 +809,57 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 		expect( result?.elements?.link?.color?.text ).toBeUndefined();
 	} );
 } );
+
+describe( 'TypographyPanel layout className preserved regardless of inheritance indicators', () => {
+	const inheritedValue = {
+		typography: { lineHeight: '1.5', letterSpacing: '1px' },
+	};
+
+	const getItem = ( name ) => {
+		const control = screen.getByRole( 'spinbutton', { name } );
+		// The layout class sits on the wrapping ToolsPanelItem, which has no role.
+		// eslint-disable-next-line testing-library/no-node-access
+		return control.closest( '.components-tools-panel-item' );
+	};
+
+	it( 'keeps the single-column layout class when showInheritanceLabelIndicators is false (regression)', () => {
+		renderPanel( {
+			showInheritanceLabelIndicators: false,
+			value: {},
+			inheritedValue,
+		} );
+
+		const lineHeightItem = getItem( /line height/i );
+		const letterSpacingItem = getItem( /letter spacing/i );
+
+		expect( lineHeightItem ).toHaveClass( 'single-column' );
+		expect( letterSpacingItem ).toHaveClass( 'single-column' );
+
+		expect( lineHeightItem ).not.toHaveClass(
+			'is-inherited-from-global-styles'
+		);
+		expect( letterSpacingItem ).not.toHaveClass(
+			'is-inherited-from-global-styles'
+		);
+	} );
+
+	it( 'folds the single-column layout class together with the inherited treatment when indicators are on', () => {
+		renderPanel( {
+			showInheritanceLabelIndicators: true,
+			value: {},
+			inheritedValue,
+		} );
+
+		const lineHeightItem = getItem( /line height/i );
+		const letterSpacingItem = getItem( /letter spacing/i );
+
+		expect( lineHeightItem ).toHaveClass( 'single-column' );
+		expect( lineHeightItem ).toHaveClass(
+			'is-inherited-from-global-styles'
+		);
+		expect( letterSpacingItem ).toHaveClass( 'single-column' );
+		expect( letterSpacingItem ).toHaveClass(
+			'is-inherited-from-global-styles'
+		);
+	} );
+} );

@@ -111,10 +111,14 @@ export default function BorderPanel( {
 		( rawValue ) => getValueFromVariable( { settings }, '', rawValue ),
 		[ settings ]
 	);
+	// Always keep the layout className (e.g. `single-column`); only the
+	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
 	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>
-		showInheritanceLabelIndicators
-			? getInheritanceProps( isInherited, hasLocalOverride, className )
-			: {};
+		getInheritanceProps(
+			showInheritanceLabelIndicators && isInherited,
+			showInheritanceLabelIndicators && hasLocalOverride,
+			className
+		);
 	const encodeColorValue = ( colorValue ) => {
 		const allColors = colors.flatMap(
 			( { colors: originColors } ) => originColors

@@ -190,10 +190,14 @@ export default function FiltersPanel( {
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
+	// Always keep the layout className (e.g. `single-column`); only the
+	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
 	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>
-		showInheritanceLabelIndicators
-			? getInheritanceProps( isInherited, hasLocalOverride, className )
-			: {};
+		getInheritanceProps(
+			showInheritanceLabelIndicators && isInherited,
+			showInheritanceLabelIndicators && hasLocalOverride,
+			className
+		);
 
 	// Duotone
 	const hasDuotoneEnabled = useHasDuotoneControl( settings );
