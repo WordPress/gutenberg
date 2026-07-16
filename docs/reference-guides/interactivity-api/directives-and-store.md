@@ -640,6 +640,22 @@ But it can also be used on other elements:
 
 When the list is re-rendered, the Interactivity API will match elements by their keys to determine if an item was added/removed/reordered. Elements without keys might be recreated unnecessarily.
 
+### `wp-preserve`
+
+> This is a prototype directive being discussed in [#80298](https://github.com/WordPress/gutenberg/issues/80298). Its API may still change.
+
+The `wp-preserve` directive tells the [Interactivity Router](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md) to keep an element's live DOM exactly as it is across client-side navigations, instead of diffing or replacing it with the server-rendered version. It's meant to be added to a wrapper element around content that isn't rendered by the Interactivity API, such as DOM injected by a third-party script (a consent manager, chat widget, or similar embed).
+
+The element must have a unique `id` attribute, since that's what the router uses to match it across navigations:
+
+```html
+<div id="chat-widget" data-wp-preserve>
+	<!-- A third-party script injects its widget here. -->
+</div>
+```
+
+`wp-preserve` is the successor to the deprecated `wp-ignore` directive. See [Keeping third-party DOM intact with data-wp-preserve](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#keeping-third-party-dom-intact-with-data-wp-preserve) for the full set of caveats, including its current limitation around nested router regions.
+
 ### `wp-each`
 
 The `wp-each` directive is intended to render a list of elements. The directive can be used in `<template>` tags, being the value a path to an array stored in the global state or the context. The content inside the `<template>` tag is the template used to render each of the items.

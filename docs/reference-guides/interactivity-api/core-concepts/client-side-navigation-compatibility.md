@@ -265,6 +265,8 @@ Use a value that uniquely identifies each element across navigations, such as a 
 
 Directly manipulating the DOM using vanilla JavaScript APIs — such as `document.createElement()`, `element.appendChild()`, `element.remove()`, or jQuery methods — is not compatible with client-side navigation. Elements added this way (like dynamically created tooltips or injected widgets) will vanish after navigating away and back, because the virtual DOM diffing is not aware of them.
 
+If the content in question comes from a third-party script you don't control (a consent manager, chat widget, or similar embed), wrap it in an element with the [`data-wp-preserve` directive](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#keeping-third-party-dom-intact-with-data-wp-preserve) so the router leaves its live DOM alone across navigations.
+
 Always use Interactivity API directives to modify DOM elements. For example, `data-wp-text`, `data-wp-bind`, `data-wp-each`, `data-wp-class`, `data-wp-style`, etc.
 
 For cases where you need to update the inner HTML of an element or make other imperative DOM changes that are not possible using the existing directives, use the [`data-wp-watch`](/docs/reference-guides/interactivity-api/directives-and-store.md#wp-watch) directive. This directive runs a callback whenever [reactive state](/docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-derived-state-and-config.md) changes, giving you a controlled way to perform side effects — including imperative DOM updates — that re-execute correctly after each navigation:

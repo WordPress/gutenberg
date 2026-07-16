@@ -341,6 +341,20 @@ export const routerRegions = new Map<
 	Signal< VNode | null | undefined >
 >();
 
+/**
+ * Live DOM nodes for elements using the `data-wp-preserve` directive, keyed by
+ * their `id` attribute.
+ *
+ * The registry lives outside the Preact component tree on purpose. Router
+ * regions are rebuilt from scratch on every client-side navigation, so the
+ * component instance backing a given `data-wp-preserve` element isn't
+ * guaranteed to be reused between navigations. Keeping a reference here lets
+ * the directive reattach the previously live subtree (including anything a
+ * third-party script injected into it) even when a new component instance is
+ * mounted for it.
+ */
+const preservedElements = new Map< string, Element >();
+
 export default () => {
 	// data-wp-context---[unique-id]
 	directive(
@@ -829,6 +843,56 @@ export default () => {
 			return createElement( Type, {
 				dangerouslySetInnerHTML: { __html: cached },
 				...rest,
+			} );
+		}
+	);
+
+	// data-wp-preserve
+	directive(
+		'preserve',
+		( {
+			element: {
+				type: Type,
+				props: { innerHTML, id, ...rest },
+			},
+		}: {
+			element: any;
+		} ) => {
+			// Freeze the server-rendered HTML on first render. Preact only
+			// touches the DOM's `innerHTML` again if this value changes
+			// (see `dangerouslySetInnerHTML` below), so as long as the same
+			// component instance is reused across navigations, the live DOM
+			// - including anything a third-party script injected into it -
+			// is left completely alone.
+			const cached = useMemo( () => innerHTML, [] );
+
+			return createElement( Type, {
+				...rest,
+				id,
+				// A new function is created on every render on purpose. Since
+				// its identity changes each time, Preact calls it again on
+				// every render (not just on mount/unmount), which is what
+				// lets this run after every navigation, whether or not the
+				// same component instance was reused for the new page.
+				ref: ( node: Element | null ) => {
+					if ( ! node ) {
+						return;
+					}
+					const preserved = preservedElements.get( id );
+					// A different DOM node was preserved for this id. This
+					// happens when this component instance couldn't be
+					// reused across a navigation (e.g., because the
+					// surrounding markup changed enough that Preact
+					// recreated it). Move the previously preserved live
+					// children over instead of keeping the freshly
+					// server-rendered markup that was just applied via
+					// `dangerouslySetInnerHTML`.
+					if ( preserved && preserved !== node ) {
+						node.replaceChildren( ...preserved.childNodes );
+					}
+					preservedElements.set( id, node );
+				},
+				dangerouslySetInnerHTML: { __html: cached },
 			} );
 		}
 	);
