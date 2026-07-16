@@ -1,4 +1,3 @@
-// eslint-disable-next-line @wordpress/use-recommended-components
 import { DirectionProvider } from '@wordpress/ui';
 import { addFilter, removeFilter } from '@wordpress/hooks';
 import { useEffect, useRef, useState } from '@wordpress/element';
