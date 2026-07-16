@@ -156,12 +156,7 @@ export const WithIcon: Story = {
 	...Default,
 	args: {
 		...Default.args,
-		children: (
-			<>
-				<Button.Icon icon={ wordpress } />
-				Button
-			</>
-		),
+		children: [ <Button.Icon icon={ wordpress } key="icon" />, 'Button' ],
 	},
 };
 

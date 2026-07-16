@@ -5,8 +5,13 @@ const path = require( 'path' );
 const { spawnSync } = require( 'child_process' );
 
 const cliPath = path.resolve( __dirname, '../cli.js' );
+/*
+ * Resolve from this file: an `-e` script resolves requires from the cwd,
+ * which is the repo root under Jest and has no `commander` installed.
+ */
+const commanderPath = require.resolve( 'commander' );
 const script = `
-	const { Command } = require( 'commander' );
+	const { Command } = require( ${ JSON.stringify( commanderPath ) } );
 	const { run } = require( ${ JSON.stringify( cliPath ) } );
 	const program = new Command();
 	program.command( 'reject' ).action( async () => {
