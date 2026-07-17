@@ -889,6 +889,77 @@ describe( 'ColorPicker', () => {
 			expect( pointer ).toHaveStyle( { top: '0%', left: '0%' } );
 		} );
 
+		it( 'uses the HSL hue when leaving white through the visual surface', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			render(
+				<ControlledColorPicker
+					onChange={ onChange }
+					enableAlpha={ false }
+					initialColor="#cc0000"
+				/>
+			);
+
+			await user.selectOptions( screen.getByRole( 'combobox' ), 'hsl' );
+			const lightnessSlider = screen.getByRole( 'slider', {
+				name: 'Lightness',
+			} );
+			fireEvent.change( lightnessSlider, { target: { value: 100 } } );
+
+			const hueSlider = screen
+				.getAllByRole( 'slider', { name: 'Hue' } )
+				.at( -1 )!;
+			fireEvent.change( hueSlider, { target: { value: 200 } } );
+			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
+
+			const colorSlider = screen.getByRole( 'slider', { name: 'Color' } );
+			mockInteractiveBounds( colorSlider );
+			onChange.mockClear();
+			fireEvent.mouseDown( colorSlider, {
+				buttons: 1,
+				pageX: 50,
+				pageY: 0,
+				clientX: 50,
+				clientY: 0,
+			} );
+
+			expect( onChange ).toHaveBeenLastCalledWith( '#80d4ff' );
+		} );
+
+		it( 'uses the HSL hue when leaving a mid-gray through the visual surface', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			render(
+				<ControlledColorPicker
+					onChange={ onChange }
+					enableAlpha={ false }
+					initialColor="#808080"
+				/>
+			);
+
+			await user.selectOptions( screen.getByRole( 'combobox' ), 'hsl' );
+			const hueSlider = screen
+				.getAllByRole( 'slider', { name: 'Hue' } )
+				.at( -1 )!;
+			fireEvent.change( hueSlider, { target: { value: 200 } } );
+			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
+
+			const colorSlider = screen.getByRole( 'slider', { name: 'Color' } );
+			mockInteractiveBounds( colorSlider );
+			onChange.mockClear();
+			fireEvent.mouseDown( colorSlider, {
+				buttons: 1,
+				pageX: 50,
+				pageY: 50,
+				clientX: 50,
+				clientY: 50,
+			} );
+
+			expect( onChange ).toHaveBeenLastCalledWith( '#416c81' );
+		} );
+
 		it( 'updates visual saturation when HSL saturation is edited at black', async () => {
 			const user = userEvent.setup();
 

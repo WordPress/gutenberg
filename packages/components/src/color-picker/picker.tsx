@@ -15,6 +15,9 @@ import type { PickerProps } from './types';
 function toHsva( hsla: PickerProps[ 'hsla' ] ): HsvaColor {
 	return {
 		...colord( hsla ).toHsv(),
+		// HSL and HSV share the hue angle. Color conversion collapses achromatic
+		// hue to 0, but HSLA retains the user's latent hue.
+		h: hsla.h,
 		a: hsla.a,
 	};
 }
