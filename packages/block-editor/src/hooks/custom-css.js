@@ -151,10 +151,11 @@ function useBlockProps( { style, clientId } ) {
 		return processCSSNesting( customCSS, customCSSSelector );
 	}, [ customCSS, customCSSSelector, isValidCSS ] );
 
-	// Inject the CSS via style override. The clientId is stored with the
-	// override so it is sorted with the block it belongs to, and the type
-	// makes it print after the block's other overrides (e.g. block style
-	// variations), matching the cascade order on the front end.
+	// Inject the CSS via style override. The type makes EditorStyles print
+	// it after all other overrides (e.g. block style variations), matching
+	// the front end where the custom CSS stylesheet is printed last. The
+	// clientId keeps custom CSS overrides in block order relative to each
+	// other, which is the order they print in on the front end.
 	usePrivateStyleOverride( {
 		css: transformedCSS,
 		clientId,

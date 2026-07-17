@@ -1369,55 +1369,6 @@ describe( 'private selectors', () => {
 				[ 'override-2', { clientId: 'block-2', css: '.b{}' } ],
 			] );
 		} );
-
-		it( 'sorts custom CSS overrides after other overrides of the same block, regardless of registration order', () => {
-			const state = {
-				blocks: {
-					order: new Map( [ [ '', [ 'block-1' ] ] ] ),
-				},
-				// The variation override is registered last, as happens when
-				// a block's style variation is switched after its custom CSS
-				// override was registered (updates delete and re-add the
-				// override, moving it to the end of the map).
-				styleOverrides: new Map( [
-					[
-						'custom-css-1',
-						{
-							clientId: 'block-1',
-							__unstableType: 'custom-css',
-							css: '.custom{}',
-						},
-					],
-					[
-						'variation-block-1',
-						{
-							clientId: 'block-1',
-							__unstableType: 'variation',
-							css: '.variation{}',
-						},
-					],
-				] ),
-			};
-
-			expect( getStyleOverrides( state ) ).toEqual( [
-				[
-					'variation-block-1',
-					{
-						clientId: 'block-1',
-						__unstableType: 'variation',
-						css: '.variation{}',
-					},
-				],
-				[
-					'custom-css-1',
-					{
-						clientId: 'block-1',
-						__unstableType: 'custom-css',
-						css: '.custom{}',
-					},
-				],
-			] );
-		} );
 	} );
 
 	describe( 'getBlockStyles', () => {

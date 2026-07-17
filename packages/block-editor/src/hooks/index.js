@@ -73,12 +73,9 @@ createBlockListBlockFilter( [
 	fontSize,
 	fitText,
 	border,
+	customCSS,
 	position,
 	blockStyleVariation,
-	// customCSS must come after blockStyleVariation so its style override is
-	// registered later and wins the cascade at equal specificity, matching
-	// the stylesheet order on the front end.
-	customCSS,
 	childLayout,
 ] );
 createBlockSaveFilter( [
