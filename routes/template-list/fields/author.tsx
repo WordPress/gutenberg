@@ -6,7 +6,10 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
+import {
+	Icon as WCIcon,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
@@ -72,7 +75,7 @@ function AuthorField( { item }: { item: any } ) {
 			) }
 			{ ! imageUrl && (
 				<div className="routes-template-list-author-field__icon">
-					<Icon icon={ icon } />
+					<WCIcon icon={ icon } />
 				</div>
 			) }
 			<span className="routes-template-list-author-field__name">

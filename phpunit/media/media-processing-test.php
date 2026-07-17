@@ -121,6 +121,8 @@ class Media_Processing_Test extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'png_interlaced', $data );
 		$this->assertArrayNotHasKey( 'gif_interlaced', $data );
 		$this->assertArrayNotHasKey( 'image_sizes', $data );
+		$this->assertArrayNotHasKey( 'image_strip_meta', $data );
+		$this->assertArrayNotHasKey( 'image_max_bit_depth', $data );
 	}
 
 	/**
@@ -136,11 +138,65 @@ class Media_Processing_Test extends WP_UnitTestCase {
 		$data    = $index->get_data();
 
 		$this->assertArrayHasKey( 'image_size_threshold', $data );
-		$this->assertArrayHasKey( 'image_output_formats', $data );
-		$this->assertArrayHasKey( 'jpeg_interlaced', $data );
-		$this->assertArrayHasKey( 'png_interlaced', $data );
-		$this->assertArrayHasKey( 'gif_interlaced', $data );
+		/*
+		 * TODO: Reactivate these assertions once the Core PR below merges into trunk:
+		 * https://github.com/WordPress/wordpress-develop/pull/12007
+		 *
+		 * Core's re-introduced client-side media processing still exposes these
+		 * file-less output-format settings on the REST API root index. PR #12007
+		 * removes them in favor of the per-attachment `image_output_format` and
+		 * `image_save_progressive` response fields (completing the migration from
+		 * Gutenberg #75793). Until that lands in Core, these keys are present when
+		 * running against Core trunk, so the assertions are temporarily disabled.
+		 */
+		// $this->assertArrayNotHasKey( 'image_output_formats', $data );
+		// $this->assertArrayNotHasKey( 'jpeg_interlaced', $data );
+		// $this->assertArrayNotHasKey( 'png_interlaced', $data );
+		// $this->assertArrayNotHasKey( 'gif_interlaced', $data );
 		$this->assertArrayHasKey( 'image_sizes', $data );
+		$this->assertArrayHasKey( 'image_strip_meta', $data );
+		$this->assertTrue( $data['image_strip_meta'] );
+		$this->assertArrayHasKey( 'image_max_bit_depth', $data );
+		$this->assertSame( 16, $data['image_max_bit_depth'] );
+	}
+
+	/**
+	 * @covers ::gutenberg_media_processing_filter_rest_index
+	 */
+	public function test_get_rest_index_honors_image_strip_meta_filter() {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter( 'image_strip_meta', '__return_false' );
+
+		$server = new WP_REST_Server();
+
+		$request = new WP_REST_Request( 'GET', '/' );
+		$index   = $server->dispatch( $request );
+		$data    = $index->get_data();
+
+		$this->assertFalse( $data['image_strip_meta'] );
+	}
+
+	/**
+	 * @covers ::gutenberg_media_processing_filter_rest_index
+	 */
+	public function test_get_rest_index_honors_image_max_bit_depth_filter() {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter(
+			'image_max_bit_depth',
+			static function ( $max_depth ) {
+				return min( 8, $max_depth );
+			}
+		);
+
+		$server = new WP_REST_Server();
+
+		$request = new WP_REST_Request( 'GET', '/' );
+		$index   = $server->dispatch( $request );
+		$data    = $index->get_data();
+
+		$this->assertSame( 8, $data['image_max_bit_depth'] );
 	}
 
 	/**
@@ -222,7 +278,7 @@ HTML;
 	}
 
 	/**
-	 * Tests that the 6.9 compat REST controller is used when filter disables client-side media.
+	 * Tests that the 7.1 compat REST controller is used when filter disables client-side media.
 	 *
 	 * @covers ::gutenberg_override_attachments_rest_controller
 	 */
@@ -234,13 +290,13 @@ HTML;
 		remove_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
 
 		$this->assertSame(
-			array( 'rest_controller_class' => 'Gutenberg_REST_Attachments_Controller_6_9' ),
+			array( 'rest_controller_class' => 'Gutenberg_REST_Attachments_Controller_7_1' ),
 			$result
 		);
 	}
 
 	/**
-	 * Tests that the 6.9 compat REST controller is not used when filter is enabled.
+	 * Tests that the 7.1 compat REST controller is not used when filter is enabled.
 	 *
 	 * @covers ::gutenberg_override_attachments_rest_controller
 	 */

@@ -1,0 +1,23 @@
+.body {
+	height: 100%;
+}
+
+.icon {
+	color: var(--wpds-color-foreground-content-success);
+	border-color: var(--wpds-color-stroke-surface-success);
+	background-color: var(--wpds-color-background-surface-success-weak);
+}
+
+/*
+ * API gap workaround.
+ *
+ * The "Continue editing" action is a `Button` rendered as a `Link`
+ * (polymorphic `render`). `@wordpress/ui` Button exposes no color/tone prop
+ * that reaches the rendered anchor, so the brand-strong link color is set
+ * here; the unlayered module class wins over `@layer wp-ui`. Drop
+ * once Button exposes a color API for the rendered element, or once a
+ * dedicated link component lands (https://github.com/WordPress/gutenberg/issues/77098).
+ */
+.continueLink {
+	color: var(--wpds-color-foreground-interactive-brand-strong);
+}

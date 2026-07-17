@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalText as Text } from '@wordpress/components';
+import { __experimentalText as WCText } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { count as wordCount } from '@wordpress/wordcount';
@@ -76,14 +76,14 @@ export function PostContentInformationUI( { postContent } ) {
 			  );
 	return (
 		<div className="editor-post-content-information">
-			<Text>
+			<WCText>
 				{ sprintf(
 					/* translators: 1: How many words a post has. 2: the number of minutes to read the post (e.g. 130 words, 2 minutes read time.) */
 					__( '%1$s, %2$s read time.' ),
 					wordsCountText,
 					minutesText
 				) }
-			</Text>
+			</WCText>
 		</div>
 	);
 }

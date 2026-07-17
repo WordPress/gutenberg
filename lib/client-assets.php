@@ -87,24 +87,15 @@ function gutenberg_override_translation_file( $file, $handle ) {
 add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file', 10, 2 );
 
 /**
- * Handle special case dependencies for wp-block-library that depend on runtime conditions.
- *
- * This adds the 'editor' dependency conditionally based on experiments and classic block requirements.
- * All other script registrations are handled by the auto-generated build/scripts.php file.
+ * Adds the 'editor' dependency to wp-block-library, required by the Classic block.
  *
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
 function gutenberg_register_block_library_script_special_case( $scripts ) {
 	$handle = 'wp-block-library';
 	$script = $scripts->query( $handle, 'registered' );
-	if (
-		! gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ||
-		! empty( $_GET['requiresTinymce'] ) ||
-		gutenberg_post_being_edited_requires_classic_block()
-	) {
-		if ( ! in_array( 'editor', $script->deps, true ) ) {
-			$script->deps[] = 'editor';
-		}
+	if ( ! in_array( 'editor', $script->deps, true ) ) {
+		$script->deps[] = 'editor';
 	}
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_block_library_script_special_case', 11 );
@@ -134,8 +125,10 @@ function gutenberg_register_packages_styles( $styles ) {
 	$version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 	$suffix  = SCRIPT_DEBUG ? '' : '.min';
 
-	// wp-components: add dashicons (icon font dependency)
-	$styles->query( 'wp-components', 'registered' )->deps[] = 'dashicons';
+	// wp-components: add dashicons (icon font dependency) and design tokens.
+	$components_style         = $styles->query( 'wp-components', 'registered' );
+	$components_style->deps[] = 'dashicons';
+	$components_style->deps[] = 'wp-theme';
 
 	// wp-edit-post: add wp-edit-blocks (custom handle not auto-inferred)
 	$styles->query( 'wp-edit-post', 'registered' )->deps[] = 'wp-edit-blocks';
@@ -151,6 +144,17 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	// wp-customize-widgets: add wp-edit-blocks (custom handle not auto-inferred)
 	$styles->query( 'wp-customize-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
+
+	gutenberg_override_style(
+		$styles,
+		'wp-theme',
+		gutenberg_url( 'build/styles/theme/design-tokens' . $suffix . '.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-theme', 'rtl', 'replace' );
+	$styles->add_data( 'wp-theme', 'suffix', $suffix );
+	$styles->add_data( 'wp-theme', 'path', gutenberg_dir_path() . 'build/styles/theme/design-tokens' . $suffix . '.css' );
 
 	// Register wp-base-styles and add it to the already registered wp-admin stylesheet
 	gutenberg_override_style(
@@ -189,6 +193,10 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	// Only add CONTENT styles here that should be enqueued in the iframe!
 	$wp_edit_blocks_dependencies = array(
+		// Design System tokens load first so the `:root` CSS custom
+		// properties are defined before any consuming stylesheet reads
+		// them inside the editor iframe.
+		'wp-theme',
 		'wp-components',
 		// This need to be added before the block library styles,
 		// The block library styles override the "reset" styles.
@@ -370,10 +378,15 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 	$extension   = SCRIPT_DEBUG ? '.js' : '.min.js';
 	$vendors_dir = gutenberg_dir_path() . 'build/scripts/vendors/';
 
+	// When the React 19 experiment is enabled, register React 19 vendor
+	// scripts under the `react`, `react-dom`, and `react-jsx-runtime` handles.
+	$use_react_19 = gutenberg_is_experiment_enabled( 'gutenberg-react-19' );
+
 	$vendor_handles = array( 'react', 'react-dom', 'react-jsx-runtime' );
 
 	foreach ( $vendor_handles as $handle ) {
-		$asset_file   = $vendors_dir . $handle . '.min.asset.php';
+		$source       = $use_react_19 ? $handle . '-19' : $handle;
+		$asset_file   = $vendors_dir . $source . '.min.asset.php';
 		$asset        = file_exists( $asset_file ) ? require $asset_file : array();
 		$dependencies = $asset['dependencies'] ?? array();
 		$version      = $asset['version'] ?? '0';
@@ -381,7 +394,7 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		gutenberg_override_script(
 			$scripts,
 			$handle,
-			gutenberg_url( 'build/scripts/vendors/' . $handle . $extension ),
+			gutenberg_url( 'build/scripts/vendors/' . $source . $extension ),
 			$dependencies,
 			$version
 		);
@@ -436,6 +449,9 @@ remove_action( 'wp_footer', 'wp_enqueue_stored_styles', 1 );
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
 
+/**
+ * Enqueues the LaTeX to MathML loader script module in the block editor.
+ */
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_latex_to_mathml_loader' );
 function gutenberg_enqueue_latex_to_mathml_loader() {
 	wp_enqueue_script_module( '@wordpress/latex-to-mathml/loader' );
@@ -450,14 +466,24 @@ function gutenberg_enqueue_latex_to_mathml_loader() {
  *
  * @see packages/vips/src/loader.ts
  */
-if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-	add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_vips_loader' );
-}
+add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_vips_loader' );
 function gutenberg_enqueue_vips_loader() {
 	wp_enqueue_script_module( '@wordpress/vips/loader' );
 }
 
-add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_core_abilities' );
-function gutenberg_enqueue_core_abilities() {
-	wp_enqueue_script_module( '@wordpress/core-abilities' );
+/**
+ * Enqueue the video-conversion loader script module in the block editor.
+ *
+ * This registers @wordpress/video-conversion/worker as a dynamic dependency
+ * in the import map, enabling on-demand loading of the WebCodecs-based
+ * GIF-to-video processing module when animated GIF conversion is triggered
+ * via @wordpress/upload-media.
+ *
+ * @see packages/video-conversion/src/loader.ts
+ */
+if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+	add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_video_conversion_loader' );
+}
+function gutenberg_enqueue_video_conversion_loader() {
+	wp_enqueue_script_module( '@wordpress/video-conversion/loader' );
 }

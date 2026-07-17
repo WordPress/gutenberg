@@ -59,7 +59,7 @@ export const globalTypes = {
 	},
 	dsColorTheme: {},
 	dsCursorControl: {},
-	dsDensity: {},
+	dsCornerRadius: {},
 };
 
 export const decorators = [
@@ -116,6 +116,8 @@ export const parameters = {
 				],
 				'Icons',
 				'Design System',
+				'Widget Primitives',
+				[ 'Introduction', 'Anatomy', 'System Architecture' ],
 			];
 			const PRIORITIZED_MDX_DOCS = [ 'Introduction', 'Overview' ];
 
@@ -251,4 +253,4 @@ export const parameters = {
 	},
 };
 
-export const tags = [ 'autodocs' ];
+export const tags = [ 'autodocs', '!manifest' ];

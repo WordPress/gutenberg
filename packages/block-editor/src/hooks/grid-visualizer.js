@@ -11,6 +11,7 @@ import { useSelect } from '@wordpress/data';
 import { GridVisualizer, useGridLayoutSync } from '../components/grid';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
+import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
 import { deviceTypeKey } from '../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
@@ -20,7 +21,7 @@ function GridLayoutSync( props ) {
 }
 
 function GridTools( { clientId, layout } ) {
-	const { isVisible, blockVisibility, deviceType, isAnyAncestorHidden } =
+	const { isVisible, blockVisibility, deviceType, viewportSettings } =
 		useSelect(
 			( select ) => {
 				const {
@@ -46,33 +47,50 @@ function GridTools( { clientId, layout } ) {
 					return { isVisible: false };
 				}
 
-				const { isBlockParentHiddenAtViewport } = unlock(
-					select( blockEditorStore )
-				);
-
 				const attributes = getBlockAttributes( clientId );
 				const settings = getSettings();
 				const currentDeviceType =
 					settings?.[ deviceTypeKey ]?.toLowerCase() ||
-					BLOCK_VISIBILITY_VIEWPORTS.desktop.value;
+					BLOCK_VISIBILITY_VIEWPORTS.desktop.key;
 
 				return {
 					isVisible: true,
 					blockVisibility: attributes?.metadata?.blockVisibility,
 					deviceType: currentDeviceType,
-					isAnyAncestorHidden: isBlockParentHiddenAtViewport(
-						clientId,
-						currentDeviceType
-					),
+					viewportSettings:
+						settings?.__experimentalFeatures?.viewport,
 				};
 			},
 			[ clientId ]
 		);
 
-	const { isBlockCurrentlyHidden } = useBlockVisibility( {
+	// Get the block's DOM element to derive the canvas iframe window,
+	// so viewport detection matches the actual block rendering context
+	const blockElement = useBlockElement( clientId );
+	const rawCanvasView = blockElement?.ownerDocument?.defaultView;
+	const canvasView = rawCanvasView === null ? undefined : rawCanvasView;
+
+	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
 		blockVisibility,
 		deviceType,
+		view: canvasView,
+		viewportSettings,
 	} );
+
+	// Check whether any ancestor is hidden at the viewport actually detected
+	// from the canvas, so it stays consistent with how blocks are hidden.
+	const isAnyAncestorHidden = useSelect(
+		( select ) => {
+			if ( ! isVisible ) {
+				return false;
+			}
+			const { isBlockParentHiddenAtViewport } = unlock(
+				select( blockEditorStore )
+			);
+			return isBlockParentHiddenAtViewport( clientId, currentViewport );
+		},
+		[ clientId, currentViewport, isVisible ]
+	);
 
 	return (
 		<>

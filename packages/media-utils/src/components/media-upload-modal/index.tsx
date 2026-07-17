@@ -70,14 +70,34 @@ const NOTICES_CONTEXT = 'media-modal';
 // Notice ID - reused for all upload-related notices to prevent flooding
 const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
 
+type ViewQueryParams = Pick< View, 'page' | 'search' >;
+
+const defaultQueryParams: ViewQueryParams = {
+	page: 1,
+	search: '',
+};
+
+/**
+ * Derives the selection (attachment IDs as strings) from the `value` prop, which
+ * may be a single id, an array of ids, or undefined.
+ *
+ * @param value The currently selected media item(s).
+ */
+function getSelectionFromValue(
+	value: number | number[] | undefined
+): string[] {
+	if ( ! value ) {
+		return [];
+	}
+	return Array.isArray( value ) ? value.map( String ) : [ String( value ) ];
+}
+
 const defaultView: View = {
 	type: LAYOUT_PICKER_GRID,
 	fields: [],
 	showTitle: false,
 	titleField: 'title',
 	mediaField: 'media_thumbnail',
-	search: '',
-	page: 1,
 	perPage: 50,
 	filters: [],
 	layout: {
@@ -120,8 +140,9 @@ interface MediaUploadModalProps {
 	multiple?: boolean;
 
 	/**
-	 * The currently selected media item(s).
-	 * Can be a single ID number or array of IDs for multiple selection.
+	 * Media item(s) to pre-select — a single ID or an array of IDs. Seeds the
+	 * selection each time the modal opens (so an external change is picked up on
+	 * the next open); changes while the modal is open are not tracked.
 	 */
 	value?: number | number[];
 
@@ -217,19 +238,17 @@ export function MediaUploadModal( {
 	search = true,
 	searchLabel = __( 'Search media' ),
 }: MediaUploadModalProps ) {
-	const [ selection, setSelection ] = useState< string[] >( () => {
-		if ( ! value ) {
-			return [];
-		}
-		return Array.isArray( value )
-			? value.map( String )
-			: [ String( value ) ];
-	} );
+	const [ selection, setSelection ] = useState< string[] >( () =>
+		getSelectionFromValue( value )
+	);
 
 	const { createSuccessNotice, removeAllNotices } =
 		useDispatch( noticesStore );
 	const invalidateAttachmentResolutions =
 		useInvalidateAttachmentResolutions();
+	const [ queryParams, setQueryParams ] = useState< ViewQueryParams >(
+		() => defaultQueryParams
+	);
 
 	// Persist view configuration across sessions via the preferences store.
 	const { view, updateView, isModified, resetToDefault } = useView( {
@@ -237,7 +256,21 @@ export function MediaUploadModal( {
 		name: 'attachment',
 		slug: 'media-modal',
 		defaultView,
+		queryParams,
+		onChangeQueryParams: setQueryParams,
 	} );
+
+	// Normalize undefined transient DataViews values so they do not persist as modified modal preferences.
+	const handleChangeView = useCallback(
+		( nextView: View ) => {
+			const normalizedView = { ...nextView };
+			if ( normalizedView.startPosition === undefined ) {
+				delete normalizedView.startPosition;
+			}
+			updateView( normalizedView );
+		},
+		[ updateView ]
+	);
 
 	// Build query args based on view properties, similar to PostList
 	const queryArgs = useMemo( () => {
@@ -270,11 +303,34 @@ export function MediaUploadModal( {
 			}
 		} );
 
-		// Base media type on allowedTypes if no filter is set
-		if ( ! filters.media_type ) {
-			filters.media_type = allowedTypes?.includes( '*' )
-				? undefined
-				: allowedTypes;
+		// Base media and mime type on allowedTypes if no filter is set
+		if (
+			! filters.media_type &&
+			! filters.mime_type &&
+			allowedTypes &&
+			! allowedTypes.includes( '*' )
+		) {
+			const { mediaTypes, mimeTypes } = allowedTypes.reduce(
+				( acc, type ) => {
+					if ( type.endsWith( '/*' ) ) {
+						acc.mediaTypes.push( type.replace( '/*', '' ) );
+					} else if ( type.includes( '/' ) ) {
+						acc.mimeTypes.push( type );
+					} else {
+						acc.mediaTypes.push( type );
+					}
+
+					return acc;
+				},
+				{ mediaTypes: [] as string[], mimeTypes: [] as string[] }
+			);
+
+			if ( mediaTypes.length ) {
+				filters.media_type = mediaTypes;
+			}
+			if ( mimeTypes.length ) {
+				filters.mime_type = mimeTypes;
+			}
 		}
 
 		return {
@@ -421,6 +477,28 @@ export function MediaUploadModal( {
 		onClose?.();
 	}, [ removeAllNotices, onClose ] );
 
+	// Keep the latest `value` in a ref so the open effect can read it without
+	// depending on it. Not depending on `value` means a change while the modal is
+	// open won't discard the user's in-progress selection, and an unstable array
+	// prop can't retrigger the effect.
+	const valueRef = useRef( value );
+	useEffect( () => {
+		valueRef.current = value;
+	}, [ value ] );
+
+	useEffect( () => {
+		if ( isOpen ) {
+			// The modal instance stays mounted between opens, so re-seed the
+			// selection from the current `value` each time it opens. This clears
+			// a previous session's selection and picks up any change to `value`
+			// made while the modal was closed.
+			setSelection( getSelectionFromValue( valueRef.current ) );
+		} else {
+			// Reset the view (page/search) on close, as before.
+			setQueryParams( defaultQueryParams );
+		}
+	}, [ isOpen ] );
+
 	// Use onUpload if provided, otherwise fall back to uploadMedia
 	const handleUpload = onUpload || uploadMedia;
 
@@ -510,7 +588,6 @@ export function MediaUploadModal( {
 					accept={ acceptTypes }
 					multiple
 					onChange={ handleFileSelect }
-					__next40pxDefaultSize
 					render={ ( { openFileDialog } ) => (
 						<Button
 							onClick={ openFileDialog }
@@ -558,7 +635,7 @@ export function MediaUploadModal( {
 				data={ mediaRecords || [] }
 				fields={ fields }
 				view={ view }
-				onChangeView={ updateView }
+				onChangeView={ handleChangeView }
 				actions={ actions }
 				selection={ selection }
 				onChangeSelection={ setSelection }
@@ -604,7 +681,7 @@ export function MediaUploadModal( {
 						onDismissError={ dismissError }
 						onOpenChange={ handlePopoverOpenChange }
 					/>
-					<DataViewsPicker.BulkActionToolbar />
+					<DataViewsPicker.Footer />
 				</div>
 			</DataViewsPicker>
 			{ createPortal(

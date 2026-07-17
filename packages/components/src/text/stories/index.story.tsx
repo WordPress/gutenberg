@@ -33,7 +33,7 @@ const meta: Meta< typeof Text > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use `Text` from `@wordpress/ui` instead.',
+			notes: 'Use [`Text`](?path=/docs/design-system-components-text--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };

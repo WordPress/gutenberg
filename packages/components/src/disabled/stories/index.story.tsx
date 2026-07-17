@@ -18,6 +18,7 @@ import TextareaControl from '../../textarea-control/';
 import { VStack } from '../../v-stack/';
 
 const meta: Meta< typeof Disabled > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Utilities/Disabled',
 	id: 'components-disabled',
 	component: Disabled,
@@ -31,7 +32,7 @@ const meta: Meta< typeof Disabled > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},
@@ -45,7 +46,6 @@ const Form = () => {
 	return (
 		<VStack>
 			<TextControl
-				__next40pxDefaultSize
 				label="Text Control"
 				value={ textControlValue }
 				onChange={ setTextControlValue }
@@ -56,7 +56,6 @@ const Form = () => {
 				onChange={ setTextAreaValue }
 			/>
 			<SelectControl
-				__next40pxDefaultSize
 				label="Select Control"
 				onChange={ () => {} }
 				options={ [

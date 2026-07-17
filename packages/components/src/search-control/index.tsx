@@ -23,16 +23,7 @@ import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { SearchControlProps, SuffixItemProps } from './types';
 import { StyledInputControl, StyledIcon } from './styles';
 
-function SuffixItem( {
-	searchRef,
-	value,
-	onChange,
-	onClose,
-}: SuffixItemProps ) {
-	if ( ! onClose && ! value ) {
-		return null;
-	}
-
+function SuffixItem( { searchRef, onChange, onClose }: SuffixItemProps ) {
 	if ( onClose ) {
 		deprecated( '`onClose` prop in wp.components.SearchControl', {
 			since: '6.8',
@@ -58,7 +49,9 @@ function SuffixItem( {
 
 function UnforwardedSearchControl(
 	{
-		__nextHasNoMarginBottom: _, // Prevent passing to internal component
+		// Prevent passing legacy props to internal component.
+		__nextHasNoMarginBottom: _,
+		__next40pxDefaultSize: _next40pxDefaultSize,
 		className,
 		onChange,
 		value,
@@ -84,10 +77,10 @@ function UnforwardedSearchControl(
 		SearchControl,
 		'components-search-control'
 	);
+	const hasSuffix = !! onClose || !! value;
 
 	return (
 		<StyledInputControl
-			__next40pxDefaultSize
 			id={ instanceId }
 			hideLabelFromVision={ hideLabelFromVision }
 			label={ label }
@@ -105,12 +98,13 @@ function UnforwardedSearchControl(
 				</InputControlPrefixWrapper>
 			}
 			suffix={
-				<SuffixItem
-					searchRef={ searchRef }
-					value={ value }
-					onChange={ onChange }
-					onClose={ onClose }
-				/>
+				hasSuffix && (
+					<SuffixItem
+						searchRef={ searchRef }
+						onChange={ onChange }
+						onClose={ onClose }
+					/>
+				)
 			}
 			{ ...filteredRestProps }
 		/>

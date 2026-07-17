@@ -6,13 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	useCallback,
-	useState,
-	useEffect,
-	useRef,
-	Platform,
-} from '@wordpress/element';
+import { useCallback, useState, useEffect, useRef } from '@wordpress/element';
 import {
 	InspectorControls,
 	useBlockProps,
@@ -81,6 +75,7 @@ import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
+import useLayoutCustomProperties from './use-layout-custom-properties';
 import {
 	DEFAULT_BLOCK,
 	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
@@ -152,12 +147,7 @@ function ColorTools( {
 	// Detect if we're editing inside an overlay template part.
 	const isWithinOverlay = useSelect( () => isWithinNavigationOverlay(), [] );
 
-	// Turn on contrast checker for web only since it's not supported on mobile yet.
-	const enableContrastChecking = Platform.OS === 'web';
 	useEffect( () => {
-		if ( ! enableContrastChecking ) {
-			return;
-		}
 		detectColors(
 			navRef.current,
 			setDetectedColor,
@@ -182,12 +172,7 @@ function ColorTools( {
 				setDetectedOverlayBackgroundColor
 			);
 		}
-	}, [
-		enableContrastChecking,
-		overlayTextColor.color,
-		overlayBackgroundColor.color,
-		navRef,
-	] );
+	}, [ overlayTextColor.color, overlayBackgroundColor.color, navRef ] );
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	if ( ! colorGradientSettings.hasColorsOrGradients ) {
 		return null;
@@ -248,18 +233,14 @@ function ColorTools( {
 				gradients={ [] }
 				disableCustomGradients
 			/>
-			{ enableContrastChecking && (
-				<>
-					<ContrastChecker
-						backgroundColor={ detectedBackgroundColor }
-						textColor={ detectedColor }
-					/>
-					<ContrastChecker
-						backgroundColor={ detectedOverlayBackgroundColor }
-						textColor={ detectedOverlayColor }
-					/>
-				</>
-			) }
+			<ContrastChecker
+				backgroundColor={ detectedBackgroundColor }
+				textColor={ detectedColor }
+			/>
+			<ContrastChecker
+				backgroundColor={ detectedOverlayBackgroundColor }
+				textColor={ detectedOverlayColor }
+			/>
 		</>
 	);
 }
@@ -300,6 +281,11 @@ function Navigation( {
 	} = attributes;
 
 	const ref = attributes.ref;
+	useLayoutCustomProperties( {
+		clientId,
+		layout: attributes.layout,
+		style: attributes.style,
+	} );
 
 	const setRef = useCallback(
 		( postId ) => {
@@ -307,16 +293,6 @@ function Navigation( {
 		},
 		[ setAttributes ]
 	);
-
-	// Reset submenuVisibility to default if orientation changes to horizontal while "always" is selected
-	useEffect( () => {
-		if ( orientation === 'horizontal' && submenuVisibility === 'always' ) {
-			setAttributes( {
-				submenuVisibility: 'hover',
-				showSubmenuIcon: true,
-			} );
-		}
-	}, [ orientation, submenuVisibility, setAttributes ] );
 
 	const recursionId = `navigationMenu/${ ref }`;
 
@@ -327,22 +303,30 @@ function Navigation( {
 		onNavigateToEntityRecord,
 		currentTheme,
 		editorDisabledResponsive,
-	} = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
+		hasSelectedStyleState,
+	} = useSelect(
+		( select ) => {
+			const {
+				getSettings,
+				hasSelectedStyleState: hasSelectedBlockStyleState,
+			} = unlock( select( blockEditorStore ) );
+			const settings = getSettings();
 
-		return {
-			isPreviewMode: settings.isPreviewMode,
-			onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
-			// Needed to construct the template part ID for the overlay preview.
-			currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
-			// When editing a navigation post directly in an isolated editor,
-			// always show navigation expanded (no hamburger) so users can see
-			// and interact with all menu items.
-			editorDisabledResponsive:
-				!! settings?.[ isNavigationPostEditorKey ],
-		};
-	}, [] );
+			return {
+				isPreviewMode: settings.isPreviewMode,
+				onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
+				// Needed to construct the template part ID for the overlay preview.
+				currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
+				// When editing a navigation post directly in an isolated editor,
+				// always show navigation expanded (no hamburger) so users can see
+				// and interact with all menu items.
+				editorDisabledResponsive:
+					!! settings?.[ isNavigationPostEditorKey ],
+				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
+			};
+		},
+		[ clientId ]
+	);
 	const hasAlreadyRendered = isPreviewMode ? false : recursionDetected;
 
 	const blockEditingMode = useBlockEditingMode();
@@ -391,6 +375,31 @@ function Navigation( {
 		isInnerBlockSelected,
 		innerBlocks,
 	} = useInnerBlocks( clientId );
+
+	const {
+		replaceInnerBlocks,
+		selectBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
+
+	// Reset submenuVisibility to default if orientation changes to horizontal
+	// while "always" is selected, but only when the Navigation block or one
+	// of its inner blocks is being edited. Rendering related template parts
+	// should not mark them dirty.
+	useEffect( () => {
+		if ( orientation === 'horizontal' && submenuVisibility === 'always' ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				submenuVisibility: 'hover',
+				showSubmenuIcon: true,
+			} );
+		}
+	}, [
+		orientation,
+		submenuVisibility,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	// Use a ref to store whether we've confirmed a page-list has submenus.
 	// Once confirmed, we don't need to keep checking the page-list blocks.
@@ -448,12 +457,6 @@ function Navigation( {
 			( templatePart ) =>
 				templatePart.area === NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
 		) ?? false;
-
-	const {
-		replaceInnerBlocks,
-		selectBlock,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
 
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] =
 		useState( false );
@@ -831,7 +834,6 @@ function Navigation( {
 									isShownByDefault
 								>
 									<ToggleGroupControl
-										__next40pxDefaultSize
 										label={ __( 'Submenu Visibility' ) }
 										value={ submenuVisibility }
 										onChange={ ( value ) => {
@@ -936,26 +938,28 @@ function Navigation( {
 					/>
 				</InspectorControls>
 			) }
-			<InspectorControls group="color">
-				{ /*
-				 * Avoid useMultipleOriginColorsAndGradients and detectColors
-				 * on block mount. InspectorControls only mounts this component
-				 * when the block is selected.
-				 * */ }
-				<ColorTools
-					textColor={ textColor }
-					setTextColor={ setTextColor }
-					backgroundColor={ backgroundColor }
-					setBackgroundColor={ setBackgroundColor }
-					overlayTextColor={ overlayTextColor }
-					setOverlayTextColor={ setOverlayTextColor }
-					overlayBackgroundColor={ overlayBackgroundColor }
-					setOverlayBackgroundColor={ setOverlayBackgroundColor }
-					clientId={ clientId }
-					navRef={ navRef }
-					hasCustomOverlay={ !! overlay }
-				/>
-			</InspectorControls>
+			{ ! hasSelectedStyleState && (
+				<InspectorControls group="color">
+					{ /*
+					 * Avoid useMultipleOriginColorsAndGradients and detectColors
+					 * on block mount. InspectorControls only mounts this component
+					 * when the block is selected.
+					 * */ }
+					<ColorTools
+						textColor={ textColor }
+						setTextColor={ setTextColor }
+						backgroundColor={ backgroundColor }
+						setBackgroundColor={ setBackgroundColor }
+						overlayTextColor={ overlayTextColor }
+						setOverlayTextColor={ setOverlayTextColor }
+						overlayBackgroundColor={ overlayBackgroundColor }
+						setOverlayBackgroundColor={ setOverlayBackgroundColor }
+						clientId={ clientId }
+						navRef={ navRef }
+						hasCustomOverlay={ !! overlay }
+					/>
+				</InspectorControls>
+			) }
 		</>
 	);
 

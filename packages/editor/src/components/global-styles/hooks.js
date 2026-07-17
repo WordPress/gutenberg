@@ -35,6 +35,13 @@ function useGlobalStylesUserConfig() {
 
 			let record;
 
+			/*
+			 * Ensure that the global styles ID request is complete by testing `_globalStylesId`,
+			 * before firing off the `canUser` OPTIONS request for user capabilities, otherwise it will
+			 * fetch `/wp/v2/global-styles` instead of `/wp/v2/global-styles/{id}`.
+			 * NOTE: Please keep in sync any preload paths sent to `block_editor_rest_api_preload()`,
+			 * or set using the `block_editor_rest_api_preload_paths` filter, if this changes.
+			 */
 			const userCanEditGlobalStyles = _globalStylesId
 				? canUser( 'update', {
 						kind: 'root',
@@ -45,8 +52,21 @@ function useGlobalStylesUserConfig() {
 
 			if (
 				_globalStylesId &&
+				/*
+				 * Test that the OPTIONS request for user capabilities is complete
+				 * before fetching the global styles entity record.
+				 * This is to avoid fetching the global styles entity unnecessarily.
+				 */
 				typeof userCanEditGlobalStyles === 'boolean'
 			) {
+				/*
+				 * Fetch the global styles entity record based on the user's capabilities.
+				 * The default context is `edit` for users who can edit global styles.
+				 * Otherwise, the context is `view`.
+				 * NOTE: There is an equivalent conditional check using `current_user_can()` in the backend
+				 * to preload the global styles entity. Please keep in sync any preload paths sent to `block_editor_rest_api_preload()`,
+				 * or set using `block_editor_rest_api_preload_paths` filter, if this changes.
+				 */
 				if ( userCanEditGlobalStyles ) {
 					record = getEditedEntityRecord(
 						'root',
@@ -110,6 +130,12 @@ function useGlobalStylesUserConfig() {
 	}, [ settings, styles, _links ] );
 
 	const setConfig = useCallback(
+		/**
+		 * Set the global styles config.
+		 * @param {Function|Object} callbackOrObject If the callbackOrObject is a function, pass the current config to the callback so the consumer can merge values.
+		 *                                           Otherwise, overwrite the current config with the incoming object.
+		 * @param {Object}          options          Options for editEntityRecord Core selector.
+		 */
 		( callbackOrObject, options = {} ) => {
 			const record = getEditedEntityRecord(
 				'root',

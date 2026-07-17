@@ -16,10 +16,13 @@ function useMediaUploadSettings( settings = {} ) {
 			mediaUpload: settings.mediaUpload,
 			mediaSideload: settings.mediaSideload,
 			mediaFinalize: settings.mediaFinalize,
+			mediaDelete: settings.mediaDelete,
 			maxUploadFileSize: settings.maxUploadFileSize,
 			allowedMimeTypes: settings.allowedMimeTypes,
 			allImageSizes: settings.allImageSizes,
 			bigImageSizeThreshold: settings.bigImageSizeThreshold,
+			imageStripMeta: settings.imageStripMeta,
+			imageMaxBitDepth: settings.imageMaxBitDepth,
 		} ),
 		[ settings ]
 	);

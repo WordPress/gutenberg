@@ -10,6 +10,7 @@ export const AUTHENTICATION_FAILED = 'authentication-failed';
 export const CONNECTION_EXPIRED = 'connection-expired';
 export const CONNECTION_LIMIT_EXCEEDED = 'connection-limit-exceeded';
 export const DOCUMENT_SIZE_LIMIT_EXCEEDED = 'document-size-limit-exceeded';
+export const PROTOCOL_MISMATCH = 'protocol-mismatch';
 export const UNKNOWN_ERROR = 'unknown-error';
 
 interface ConnectionErrorMessages {
@@ -40,6 +41,13 @@ const ERROR_MESSAGES: Record< string, ConnectionErrorMessages > = {
 		description: __(
 			'Real-time collaboration has reached its connection limit. ' +
 				'Try again later or contact your site administrator.'
+		),
+	},
+	[ PROTOCOL_MISMATCH ]: {
+		title: __( 'Protocol update' ),
+		description: __(
+			'Real-time collaboration has been updated. ' +
+				'Please refresh the page to continue editing.'
 		),
 	},
 	// DOCUMENT_SIZE_LIMIT_EXCEEDED is not included here because it results in

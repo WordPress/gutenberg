@@ -8,7 +8,7 @@ import clsx from 'clsx';
  */
 import {
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	Button,
 } from '@wordpress/components';
 import { __, _x, _n, sprintf, isRTL } from '@wordpress/i18n';
@@ -44,7 +44,7 @@ export default function Pagination( {
 			justify="flex-start"
 			className={ clsx( 'global-styles-ui-pagination', className ) }
 		>
-			<Text
+			<WCText
 				variant="muted"
 				className="global-styles-ui-pagination__total"
 			>
@@ -53,7 +53,7 @@ export default function Pagination( {
 					_n( '%d item', '%d items', totalItems ),
 					totalItems
 				) }
-			</Text>
+			</WCText>
 			<HStack expanded={ false } spacing={ 1 }>
 				<Button
 					variant={ buttonVariant }
@@ -74,14 +74,14 @@ export default function Pagination( {
 					size="compact"
 				/>
 			</HStack>
-			<Text variant="muted">
+			<WCText variant="muted">
 				{ sprintf(
 					// translators: 1: Current page number. 2: Total number of pages.
 					_x( '%1$d of %2$d', 'paging' ),
 					currentPage,
 					numPages
 				) }
-			</Text>
+			</WCText>
 			<HStack expanded={ false } spacing={ 1 }>
 				<Button
 					variant={ buttonVariant }

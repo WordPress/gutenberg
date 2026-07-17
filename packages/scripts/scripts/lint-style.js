@@ -24,10 +24,14 @@ const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '**/*.{css,pcss,scss}' ];
 const hasLintConfig =
 	hasArgInCLI( '--config' ) ||
 	hasProjectFile( '.stylelintrc.js' ) ||
+	hasProjectFile( '.stylelintrc.cjs' ) ||
+	hasProjectFile( '.stylelintrc.mjs' ) ||
 	hasProjectFile( '.stylelintrc.json' ) ||
 	hasProjectFile( '.stylelintrc.yaml' ) ||
 	hasProjectFile( '.stylelintrc.yml' ) ||
 	hasProjectFile( 'stylelint.config.js' ) ||
+	hasProjectFile( 'stylelint.config.cjs' ) ||
+	hasProjectFile( 'stylelint.config.mjs' ) ||
 	hasProjectFile( '.stylelintrc' ) ||
 	hasPackageProp( 'stylelint' );
 
