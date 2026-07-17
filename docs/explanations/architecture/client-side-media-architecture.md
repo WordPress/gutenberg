@@ -308,7 +308,7 @@ Conversion lives in a dedicated package that mirrors the `@wordpress/vips` worke
 
 ### Conversion pipeline
 
-![The GIF to video conversion pipeline: detect an opaque animated GIF, decode frames with ImageDecoder, encode with the WebCodecs VideoEncoder and mediabunny, store the video and poster as companion files, and swap the block in the editor](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/client-side-media-gif-to-video.svg)
+![The GIF to video conversion pipeline: detect an opaque animated GIF, decode frames with ImageDecoder, encode with the WebCodecs VideoEncoder and mediabunny, store the video and poster as companion files, and offer a block switch in the editor](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/client-side-media-gif-to-video.svg)
 
 1.  **Detection.** `isAnimatedGif()` (in `packages/upload-media/src/utils.ts`) inspects the GIF89a Graphic Control Extension blocks to confirm the file is actually animated. Transparent GIFs are excluded — a `<video>` cannot reproduce GIF transparency — so they upload as a normal image with no companion.
 2.  **Decode.** The browser's `ImageDecoder` decodes each GIF frame, honoring the real per-frame `delay` values (defaulting to the GIF spec's 100ms / 10fps when a frame reports none).
@@ -319,11 +319,11 @@ The operation is wired into the upload store as `OperationType.TranscodeGif` wit
 
 ### Editor block switch
 
-Unlike HEIC (which only swaps the stored file), the GIF→video swap changes the _block_ in the editor — there is no render-time PHP filter.
+Unlike HEIC (which only swaps the stored file), the GIF→video conversion offers to change the _block_ in the editor — there is no render-time PHP filter.
 
 -   **A "GIF" variation of the Video block.** `core/video` declares two variations, "Video" and "GIF", distinguished purely by their attribute combination — the GIF variation is `! controls && loop && autoplay && muted && playsInline` (`isGifVariation()` in `packages/block-library/src/video/variations.js`). No new block attribute is introduced. The variation is scoped to `block` + `transform` (not the inserter), since it represents a converted GIF rather than something inserted directly. Its editor preview autoplays, loops, and is muted, so it behaves like the original GIF.
--   **Swap on upload.** Once the companion video is available, a **standalone** `core/image` block is replaced by the Video block's GIF variation playing the companion. Images inside a **Gallery** are left as GIFs (a gallery only accepts image blocks); **Media & Text** and **Cover** are unaffected because their media is not a `core/image` block. A `.gif`-URL gate prevents non-GIF images from triggering an attachment fetch, and a client-id guard keeps **undo** from immediately re-converting.
--   **Fully reversible.** A "Display as GIF" toolbar control on the GIF video block switches it back to the original `core/image` and opts it out of re-conversion; the Image block's "Display as original GIF" toggle (`preserveAnimatedGif`) governs the editor conversion, so the round-trip works in both directions.
+-   **Opt-in switch.** The block is never replaced automatically. Once the companion video is available, a **standalone** `core/image` block shows a "Display as video" toolbar control (`AnimatedGifConvertControl` in `packages/block-library/src/image/animated-gif-convert-control.js`) that replaces it with the Video block's GIF variation playing the companion. The control is not offered inside a **Gallery** (a gallery only accepts image blocks); **Media & Text** and **Cover** are unaffected because their media is not a `core/image` block. A `.gif`-URL gate prevents non-GIF images from triggering an attachment fetch just to look for a companion.
+-   **Fully reversible.** A "Display as GIF" toolbar control on the GIF video block switches it back to the original `core/image`, so the round-trip works in both directions.
 -   **Native front-end rendering.** Because the converted block is a real `core/video`, it serializes a native `<video autoplay loop muted playsinline poster>` and renders on the front end with no filtering.
 
 ### Browser support and fallback

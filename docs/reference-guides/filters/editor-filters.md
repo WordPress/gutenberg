@@ -280,7 +280,7 @@ Client-side processing uses these additional REST API parameters when uploading 
 
 ### Animated GIF to video conversion
 
-Opaque animated GIFs are converted client-side to a companion MP4/WebM video and the block is switched to a "GIF" variation of the Video block. There is no dedicated filter for this behavior — it is governed by the same `wp_client_side_media_processing_enabled` master toggle above, and falls back to uploading the original GIF when the browser lacks WebCodecs video encoding. See the [architecture documentation](/docs/explanations/architecture/client-side-media-architecture.md#animated-gif-to-video-conversion) and the [how-to guide](/docs/how-to-guides/client-side-media.md#animated-gif-to-video-conversion) for details.
+Opaque animated GIFs are converted client-side to a companion MP4/WebM video, and a "Display as video" control on the Image block lets the user switch it to a "GIF" variation of the Video block. There is no dedicated filter for this behavior — it is governed by the same `wp_client_side_media_processing_enabled` master toggle above, and falls back to uploading the original GIF when the browser lacks WebCodecs video encoding. See the [architecture documentation](/docs/explanations/architecture/client-side-media-architecture.md#animated-gif-to-video-conversion) and the [how-to guide](/docs/how-to-guides/client-side-media.md#animated-gif-to-video-conversion) for details.
 
 ## Logging errors
 
