@@ -22,17 +22,6 @@ const TABLET_DEVICE_TYPE = 'Tablet';
 const MOBILE_DEVICE_TYPE = 'Mobile';
 
 /**
- * Device preview aspect ratios (height / width). Used to give the editor
- * canvas a device-shaped frame in mobile and tablet previews. These are
- * display ratios for the preview frame, not responsive breakpoints.
- * Mobile is portrait (taller than wide), tablet is landscape.
- */
-const DEVICE_ASPECT_RATIO_BY_DEVICE_TYPE = {
-	[ MOBILE_DEVICE_TYPE ]: 8 / 5,
-	[ TABLET_DEVICE_TYPE ]: 3 / 4,
-};
-
-/**
  * Maps a device preview type to its corresponding viewport style state. Used
  * when Responsive editing is enabled so the device preview drives which
  * viewport block style edits are applied to.
@@ -93,23 +82,5 @@ export function getCanvasWidthByDeviceType( deviceType, viewportSettings ) {
 		return getViewportBreakpointValueInPixels(
 			getViewportBreakpoints( viewportSettings )[ viewportKey ]
 		);
-	}
-}
-
-/**
- * Gets the preview frame height for a device type, derived from the canvas
- * width using the device aspect ratio. Returns `undefined` for desktop (or when
- * no width is available) so the frame fills the editor.
- *
- * @param {string} deviceType  The device type.
- * @param {number} canvasWidth The canvas width in pixels.
- * @return {number|undefined} The preview height in pixels, or undefined when no
- *                             fixed height applies.
- */
-export function getCanvasHeightByDeviceType( deviceType, canvasWidth ) {
-	const ratio = DEVICE_ASPECT_RATIO_BY_DEVICE_TYPE[ deviceType ];
-
-	if ( ratio && canvasWidth > 0 ) {
-		return Math.round( canvasWidth * ratio );
 	}
 }

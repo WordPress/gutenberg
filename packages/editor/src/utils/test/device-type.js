@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import {
-	getCanvasHeightByDeviceType,
 	getCanvasWidthByDeviceType,
 	getDeviceTypeByCanvasWidth,
 } from '../device-type';
@@ -105,15 +104,5 @@ describe( 'device type utilities', () => {
 		expect( getDeviceTypeByCanvasWidth( 1200, viewportSettings ) ).toBe(
 			'Desktop'
 		);
-	} );
-
-	it( 'derives preview height from the canvas width using the device aspect ratio', () => {
-		// Mobile is portrait (8:5), tablet is landscape (3:4).
-		expect( getCanvasHeightByDeviceType( 'Mobile', 480 ) ).toBe( 768 );
-		expect( getCanvasHeightByDeviceType( 'Tablet', 782 ) ).toBe( 587 );
-		expect(
-			getCanvasHeightByDeviceType( 'Desktop', 1200 )
-		).toBeUndefined();
-		expect( getCanvasHeightByDeviceType( 'Mobile' ) ).toBeUndefined();
 	} );
 } );

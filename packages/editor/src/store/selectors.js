@@ -29,11 +29,7 @@ import { getPostRawValue } from './reducer';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
 import { unlock } from '../lock-unlock';
 import { getTemplateInfo } from '../utils/get-template-info';
-import {
-	getDeviceTypeByCanvasWidth,
-	getCanvasWidthByDeviceType,
-	getCanvasHeightByDeviceType,
-} from '../utils/device-type';
+import { getDeviceTypeByCanvasWidth } from '../utils/device-type';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -1362,42 +1358,6 @@ export const getDeviceType = createRegistrySelector(
 		const viewportSettings =
 			blockEditorSelect.getSettings().__experimentalFeatures?.viewport;
 		return getDeviceTypeByCanvasWidth( canvasWidth, viewportSettings );
-	}
-);
-
-/**
- * Returns the device preview canvas height in pixels, derived from the canvas
- * width using the device aspect ratio. Only applies when the canvas width
- * matches the device preset (set via the Preview dropdown), so dragging away
- * from the preset frees the frame to fill the editor. Returns `undefined` for
- * desktop or when no device height applies.
- *
- * @param {Object} state Global application state.
- *
- * @return {number|undefined} The canvas height in pixels, or undefined.
- */
-export const getCanvasHeight = createRegistrySelector(
-	( select ) => ( state ) => {
-		const blockEditorSelect = unlock( select( blockEditorStore ) );
-		if ( blockEditorSelect.isZoomOut() ) {
-			return undefined;
-		}
-		const canvasWidth = state.canvasWidth;
-		const viewportSettings =
-			blockEditorSelect.getSettings().__experimentalFeatures?.viewport;
-		const deviceType = getDeviceTypeByCanvasWidth(
-			canvasWidth,
-			viewportSettings
-		);
-		// Only apply the device height at the preset width; a dragged width
-		// within a band frees the canvas to fill the editor.
-		if (
-			canvasWidth !==
-			getCanvasWidthByDeviceType( deviceType, viewportSettings )
-		) {
-			return undefined;
-		}
-		return getCanvasHeightByDeviceType( deviceType, canvasWidth );
 	}
 );
 
