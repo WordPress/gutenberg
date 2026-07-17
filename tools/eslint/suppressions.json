@@ -1139,6 +1139,11 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/collab-sidebar/suggestion-actions.js": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/document-bar/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1305,6 +1310,11 @@
 	"packages/editor/src/components/suggestion-mode/store-interceptor.js": {
 		"react-hooks/refs": {
 			"count": 6
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/suggestion-summary.js": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/suggestion-mode/suggestion-undo-guard.js": {
