@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const { serializeRawBlock } = require( '../../../../../packages/blocks' );
 
 const CUSTOM_HEADING_SOURCE_PLUGIN =
 	'gutenberg-test-table-of-contents-heading-source';
@@ -13,48 +14,42 @@ function headingBlock( { content, level = 2, anchor } ) {
 	}
 	const id = anchor ? ` id="${ anchor }"` : '';
 
-	return `<!-- wp:heading ${ JSON.stringify( attributes ) } -->
-<h${ level }${ id } class="wp-block-heading">${ content }</h${ level }>
-<!-- /wp:heading -->`;
+	return serializeRawBlock( {
+		blockName: 'core/heading',
+		attrs: attributes,
+		innerContent: [
+			`<h${ level }${ id } class="wp-block-heading">${ content }</h${ level }>`,
+		],
+	} );
 }
 
 function htmlBlock( content ) {
-	return `<!-- wp:html -->
-${ content }
-<!-- /wp:html -->`;
+	return serializeRawBlock( {
+		blockName: 'core/html',
+		innerContent: [ content ],
+	} );
 }
 
-// This helper mirrors the current static saved ToC markup so reader-focused
-// tests can exercise frontend interactions without opening the editor. If the
-// block becomes dynamically rendered on the front of site, update these fixtures
-// to avoid depending on saved ToC markup.
-function tableOfContentsBlock( { headings, ordered = true } ) {
-	const attributes = { headings };
+function tableOfContentsBlock( {
+	ordered = true,
+	maxLevel,
+	onlyIncludeCurrentPage,
+} = {} ) {
+	const attributes = {};
 	if ( ! ordered ) {
 		attributes.ordered = false;
 	}
-	const ListTag = ordered ? 'ol' : 'ul';
-	const items = headings
-		.map(
-			( { content, link } ) =>
-				`<li><a class="wp-block-table-of-contents__entry" href="${ link }">${ content }</a></li>`
-		)
-		.join( '' );
+	if ( maxLevel ) {
+		attributes.maxLevel = maxLevel;
+	}
+	if ( onlyIncludeCurrentPage ) {
+		attributes.onlyIncludeCurrentPage = true;
+	}
 
-	return `<!-- wp:table-of-contents ${ JSON.stringify( attributes ) } -->
-<nav class="wp-block-table-of-contents"><${ ListTag }>${ items }</${ ListTag }></nav>
-<!-- /wp:table-of-contents -->`;
-}
-
-function nestedTableOfContentsBlock() {
-	const headings = [
-		{ content: 'Main Section', level: 2, link: '#main-section' },
-		{ content: 'Subsection', level: 3, link: '#subsection' },
-	];
-
-	return `<!-- wp:table-of-contents ${ JSON.stringify( { headings } ) } -->
-<nav class="wp-block-table-of-contents"><ol><li><a class="wp-block-table-of-contents__entry" href="#main-section">Main Section</a><ol><li><a class="wp-block-table-of-contents__entry" href="#subsection">Subsection</a></li></ol></li></ol></nav>
-<!-- /wp:table-of-contents -->`;
+	return serializeRawBlock( {
+		blockName: 'core/table-of-contents',
+		attrs: attributes,
+	} );
 }
 
 function postContentWithTocAndHeadings( headings, extraBlocks = '' ) {
@@ -473,15 +468,7 @@ test.describe( 'Table of Contents', () => {
 				requestUtils,
 				'Table of Contents navigation',
 				[
-					tableOfContentsBlock( {
-						headings: [
-							{
-								content: 'Destination section',
-								level: 2,
-								link: '#destination-section',
-							},
-						],
-					} ),
+					tableOfContentsBlock(),
 					// Push the target below the viewport so the click must move the reader to the section, not only update the URL hash.
 					'<!-- wp:spacer {"height":"1000px"} --><div style="height:1000px" aria-hidden="true" class="wp-block-spacer"></div><!-- /wp:spacer -->',
 					headingBlock( {
@@ -512,15 +499,7 @@ test.describe( 'Table of Contents', () => {
 				requestUtils,
 				'Valid table of contents links',
 				[
-					tableOfContentsBlock( {
-						headings: [
-							{
-								content: 'Reliable section',
-								level: 2,
-								link: '#reliable-section',
-							},
-						],
-					} ),
+					tableOfContentsBlock(),
 					headingBlock( {
 						content: 'Reliable section',
 						anchor: 'reliable-section',
@@ -556,15 +535,7 @@ test.describe( 'Table of Contents', () => {
 				requestUtils,
 				post.id,
 				[
-					tableOfContentsBlock( {
-						headings: [
-							{
-								content: 'Second page section',
-								level: 2,
-								link: `/?p=${ post.id }&page=2#second-page-section`,
-							},
-						],
-					} ),
+					tableOfContentsBlock(),
 					headingBlock( {
 						content: 'First page section',
 						anchor: 'first-page-section',
@@ -601,7 +572,7 @@ test.describe( 'Table of Contents', () => {
 				requestUtils,
 				'Nested table of contents',
 				[
-					nestedTableOfContentsBlock(),
+					tableOfContentsBlock(),
 					headingBlock( {
 						content: 'Main Section',
 						anchor: 'main-section',
@@ -639,15 +610,7 @@ test.describe( 'Table of Contents', () => {
 				requestUtils,
 				'Named table of contents',
 				[
-					tableOfContentsBlock( {
-						headings: [
-							{
-								content: 'Named region section',
-								level: 2,
-								link: '#named-region-section',
-							},
-						],
-					} ),
+					tableOfContentsBlock(),
 					headingBlock( {
 						content: 'Named region section',
 						anchor: 'named-region-section',
@@ -670,20 +633,7 @@ test.describe( 'Table of Contents', () => {
 				requestUtils,
 				'Keyboard table of contents',
 				[
-					tableOfContentsBlock( {
-						headings: [
-							{
-								content: 'Keyboard first',
-								level: 2,
-								link: '#keyboard-first',
-							},
-							{
-								content: 'Keyboard second',
-								level: 2,
-								link: '#keyboard-second',
-							},
-						],
-					} ),
+					tableOfContentsBlock(),
 					headingBlock( {
 						content: 'Keyboard first',
 						anchor: 'keyboard-first',
@@ -733,15 +683,7 @@ test.describe( 'Table of Contents', () => {
 					htmlBlock(
 						'<nav aria-label="Main menu"><a href="/">Home</a></nav>'
 					),
-					tableOfContentsBlock( {
-						headings: [
-							{
-								content: 'Content navigation section',
-								level: 2,
-								link: '#content-navigation-section',
-							},
-						],
-					} ),
+					tableOfContentsBlock(),
 					headingBlock( {
 						content: 'Content navigation section',
 						anchor: 'content-navigation-section',
