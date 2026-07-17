@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `InputControl`, `SelectControl`, `CustomSelectControl`: Align focus rings with the design system. ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
+
 ### Bug Fixes
 
 -   `SearchControl`: Render suffix only if there is one. ([#80356](https://github.com/WordPress/gutenberg/pull/80356), [#80406](https://github.com/WordPress/gutenberg/pull/80406)).
