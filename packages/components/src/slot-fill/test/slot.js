@@ -300,7 +300,9 @@ describe( 'Slot', () => {
 					<Slot name="cross-document" bubblesVirtually />
 				</IframePortal>
 				<Fill name="cross-document">
-					<div className="slot-fill-cross-document" />
+					<div className="slot-fill-cross-document">
+						Styled content
+					</div>
 				</Fill>
 			</Provider>
 		);
@@ -311,12 +313,12 @@ describe( 'Slot', () => {
 		// generated production call explicitly.
 		registerStyle( styleHash, css );
 
+		const styledElement = within( iframeDocument.body ).getByText(
+			'Styled content'
+		);
 		expect(
-			within( iframeDocument.head ).queryAllByText( css, {
-				ignore: false,
-				selector: `style[data-wp-hash="${ styleHash }"]`,
-			} )
-		).toHaveLength( 1 );
+			iframeDocument.defaultView.getComputedStyle( styledElement ).padding
+		).toBe( '32px' );
 
 		unmount();
 	} );
