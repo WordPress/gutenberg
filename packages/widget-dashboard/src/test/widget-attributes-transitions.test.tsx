@@ -136,7 +136,7 @@ async function renderCollapsed() {
 	return { header };
 }
 
-describe( 'WidgetAttributeControls presentation transitions', () => {
+describe( 'WidgetAttributes presentation transitions', () => {
 	beforeEach( () => {
 		mockObserved.clear();
 	} );

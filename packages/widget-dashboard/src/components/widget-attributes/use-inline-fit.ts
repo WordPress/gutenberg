@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
  */
 import { useWidgetHeaderAvailableSize } from '../widget-header/widget-header-size';
 
-interface InlineControlsFitOptions {
+interface InlineFitOptions {
 	/**
 	 * Holds the current presentation while the user interacts with it (an
 	 * open dropdown, focus inside the inline form). Measurements keep
@@ -23,7 +23,7 @@ interface InlineControlsFitOptions {
 	locked?: boolean;
 }
 
-interface InlineControlsFit {
+interface InlineFit {
 	/**
 	 * Ref for the element wrapping the inline controls at their natural
 	 * width. While mounted, the measurement tracks it live; when the caller
@@ -43,11 +43,9 @@ interface InlineControlsFit {
  * Decides whether the inline attribute controls fit the space the header
  * row can grant its toolbar.
  *
- * @param {InlineControlsFitOptions} [options] Fit options.
+ * @param {InlineFitOptions} [options] Fit options.
  */
-export function useInlineControlsFit(
-	options: InlineControlsFitOptions = {}
-): InlineControlsFit {
+export function useInlineFit( options: InlineFitOptions = {} ): InlineFit {
 	const { locked = false } = options;
 
 	const availableSize = useWidgetHeaderAvailableSize();

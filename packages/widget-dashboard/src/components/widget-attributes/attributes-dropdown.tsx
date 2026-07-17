@@ -19,10 +19,10 @@ import {
 /**
  * Internal dependencies
  */
-import styles from './widget-attribute-controls.module.css';
+import styles from './widget-attributes.module.css';
 import type { WidgetAttributeValues } from '../../types';
 
-export interface AttributeControlsDropdownProps {
+export interface AttributesDropdownProps {
 	/**
 	 * The high-relevance fields the inline surface would have shown.
 	 */
@@ -51,14 +51,14 @@ export interface AttributeControlsDropdownProps {
  * popover holds the high-relevance fields as a form. The settings trigger
  * is not part of the collapse; it stays in the toolbar.
  *
- * @param {AttributeControlsDropdownProps} props Component props.
+ * @param {AttributesDropdownProps} props Component props.
  */
-export function AttributeControlsDropdown( {
+export function AttributesDropdown( {
 	fields,
 	data,
 	onChange,
 	onOpenChange,
-}: AttributeControlsDropdownProps ): React.ReactNode {
+}: AttributesDropdownProps ): React.ReactNode {
 	const form = useMemo< Form >(
 		() => ( {
 			layout: { type: 'regular', labelPosition: 'top' },

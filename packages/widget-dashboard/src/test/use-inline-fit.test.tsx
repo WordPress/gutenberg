@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 /**
  * Internal dependencies
  */
-import { useInlineControlsFit } from '../components/widget-attribute-controls/use-inline-controls-fit';
+import { useInlineFit } from '../components/widget-attributes/use-inline-fit';
 import { WidgetHeaderAvailableSizeProvider } from '../components/widget-header/widget-header-size';
 
 let notifyResize: ( entries: unknown[] ) => void = () => {};
@@ -34,12 +34,11 @@ function measureFields( width: number ) {
 	act( () => notifyResize( [ { contentRect: { width } } ] ) );
 }
 
-describe( 'useInlineControlsFit', () => {
+describe( 'useInlineFit', () => {
 	it( 'collapses when the fields exceed the budget and expands back', () => {
 		availableSize = 200;
 		const { result, rerender } = renderHook(
-			( { locked }: { locked: boolean } ) =>
-				useInlineControlsFit( { locked } ),
+			( { locked }: { locked: boolean } ) => useInlineFit( { locked } ),
 			{ wrapper, initialProps: { locked: false } }
 		);
 
@@ -58,8 +57,7 @@ describe( 'useInlineControlsFit', () => {
 	it( 'holds the inline presentation while locked', () => {
 		availableSize = 200;
 		const { result, rerender } = renderHook(
-			( { locked }: { locked: boolean } ) =>
-				useInlineControlsFit( { locked } ),
+			( { locked }: { locked: boolean } ) => useInlineFit( { locked } ),
 			{ wrapper, initialProps: { locked: false } }
 		);
 
@@ -80,8 +78,7 @@ describe( 'useInlineControlsFit', () => {
 	it( 'holds the collapsed presentation while locked', () => {
 		availableSize = 80;
 		const { result, rerender } = renderHook(
-			( { locked }: { locked: boolean } ) =>
-				useInlineControlsFit( { locked } ),
+			( { locked }: { locked: boolean } ) => useInlineFit( { locked } ),
 			{ wrapper, initialProps: { locked: false } }
 		);
 

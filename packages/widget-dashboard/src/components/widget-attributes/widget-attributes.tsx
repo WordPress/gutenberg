@@ -13,12 +13,12 @@ import type { WidgetType } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useReserveHeaderSpace } from '../widget-header/widget-header-size';
 import { WidgetSettingsTrigger } from '../widget-settings';
-import { AttributeControlsDropdown } from './attribute-controls-dropdown';
-import { useInlineControlsFit } from './use-inline-controls-fit';
-import styles from './widget-attribute-controls.module.css';
+import { AttributesDropdown } from './attributes-dropdown';
+import { useInlineFit } from './use-inline-fit';
+import styles from './widget-attributes.module.css';
 import type { DashboardWidget, WidgetAttributeValues } from '../../types';
 
-type WidgetAttributeControlsProps = {
+type WidgetAttributesProps = {
 	/**
 	 * The instance whose attributes these controls edit.
 	 */
@@ -45,12 +45,12 @@ type WidgetAttributeControlsProps = {
  * expand back; remounting re-measures and re-collapses if the retained
  * value went stale.
  *
- * @param {WidgetAttributeControlsProps} props Component props.
+ * @param {WidgetAttributesProps} props Component props.
  */
-export function WidgetAttributeControls( {
+export function WidgetAttributes( {
 	widget,
 	widgetType,
-}: WidgetAttributeControlsProps ): React.ReactNode {
+}: WidgetAttributesProps ): React.ReactNode {
 	const { layout, onLayoutChange, scheduleAutoSave } =
 		useDashboardInternalContext();
 
@@ -74,7 +74,7 @@ export function WidgetAttributeControls( {
 	const [ dropdownTriggerHasFocus, setDropdownTriggerHasFocus ] =
 		useState( false );
 
-	const { measureRef, collapsed } = useInlineControlsFit( {
+	const { measureRef, collapsed } = useInlineFit( {
 		locked: dropdownOpen || inlineHasFocus || dropdownTriggerHasFocus,
 	} );
 
@@ -177,7 +177,7 @@ export function WidgetAttributeControls( {
 						}
 					} }
 				>
-					<AttributeControlsDropdown
+					<AttributesDropdown
 						fields={ fields }
 						data={ data }
 						onChange={ handleChange }
