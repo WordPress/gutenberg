@@ -67,6 +67,8 @@ jest.mock( '../utils/video-conversion', () => {
 		cancelGifToVideoOperations: jest.fn(),
 		terminateVideoConversionWorker: jest.fn(),
 		isUnsupportedConversionError: actual.isUnsupportedConversionError,
+		isSizeLimitConversionError: actual.isSizeLimitConversionError,
+		isConversionTimeoutError: actual.isConversionTimeoutError,
 	};
 } );
 
@@ -724,6 +726,7 @@ describe( 'private actions', () => {
 		}
 
 		let consoleError;
+		let consoleDebug;
 
 		beforeEach( () => {
 			convertGifToVideo.mockReset();
@@ -731,10 +734,14 @@ describe( 'private actions', () => {
 			consoleError = jest
 				.spyOn( console, 'error' )
 				.mockImplementation( () => {} );
+			consoleDebug = jest
+				.spyOn( console, 'debug' )
+				.mockImplementation( () => {} );
 		} );
 
 		afterEach( () => {
 			consoleError.mockRestore();
+			consoleDebug.mockRestore();
 		} );
 
 		it( 'hands the transcoded video to the next Upload via finishOperation', async () => {
@@ -752,7 +759,8 @@ describe( 'private actions', () => {
 			expect( convertGifToVideo ).toHaveBeenCalledWith(
 				'gif-1',
 				gifFile,
-				'video/mp4'
+				'video/mp4',
+				{ timeout: undefined, maxTotalPixels: undefined }
 			);
 			// Sideload context: no CacheBlobUrl, no attachment URL update -
 			// the parent GIF attachment already owns the block's URL.
@@ -812,7 +820,30 @@ describe( 'private actions', () => {
 			expect( convertGifToVideo ).toHaveBeenCalledWith(
 				'gif-1',
 				gifFile,
-				'video/mp4'
+				'video/mp4',
+				{ timeout: undefined, maxTotalPixels: undefined }
+			);
+		} );
+
+		it( 'passes timeout and maxTotalPixels operation args through', async () => {
+			convertGifToVideo.mockResolvedValue(
+				new File( [ 'webm' ], 'animation.webm', {
+					type: 'video/webm',
+				} )
+			);
+			const { select, dispatch } = buildArgs();
+
+			await transcodeGifItem( 'gif-1', {
+				outputFormat: 'webm',
+				timeout: 5000,
+				maxTotalPixels: 1_000_000,
+			} )( { select, dispatch } );
+
+			expect( convertGifToVideo ).toHaveBeenCalledWith(
+				'gif-1',
+				gifFile,
+				'video/webm',
+				{ timeout: 5000, maxTotalPixels: 1_000_000 }
 			);
 		} );
 
@@ -836,6 +867,58 @@ describe( 'private actions', () => {
 			expect( silent ).toBe( true );
 			expect( consoleError ).not.toHaveBeenCalled();
 			// No video means no poster: the sideload is never queued.
+			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'logs a SCRIPT_DEBUG diagnostic and silently cancels when the GIF exceeds the conversion size limit', async () => {
+			// An over-budget GIF is a graceful skip like any Unsupported
+			// outcome, but the skip is logged (under SCRIPT_DEBUG, true in
+			// this test env) so developers testing large GIFs understand
+			// why no companion video was produced.
+			convertGifToVideo.mockRejectedValue(
+				new Error(
+					'Unsupported: GIF exceeds maximum conversion size (5000x5000 x 100 frames = 2500000000 pixels; limit is 300000000)'
+				)
+			);
+			const { select, dispatch } = buildArgs();
+
+			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+
+			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
+			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
+			const [ cancelledId, , silent ] =
+				dispatch.cancelItem.mock.calls[ 0 ];
+			expect( cancelledId ).toBe( 'gif-1' );
+			expect( silent ).toBe( true );
+			expect( consoleDebug ).toHaveBeenCalledWith(
+				expect.stringContaining( 'exceeds maximum conversion size' )
+			);
+			expect( consoleError ).not.toHaveBeenCalled();
+			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'logs a SCRIPT_DEBUG diagnostic and silently cancels when the conversion times out', async () => {
+			// The conversion was abandoned after the timeout; the GIF
+			// attachment stands alone. No user-facing error, but the
+			// timeout is logged (under SCRIPT_DEBUG) for debuggability.
+			convertGifToVideo.mockRejectedValue(
+				new Error( 'GIF to video conversion timed out after 30000ms' )
+			);
+			const { select, dispatch } = buildArgs();
+
+			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+
+			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
+			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
+			const [ cancelledId, error, silent ] =
+				dispatch.cancelItem.mock.calls[ 0 ];
+			expect( cancelledId ).toBe( 'gif-1' );
+			expect( error.message ).toMatch( /timed out/i );
+			expect( silent ).toBe( true );
+			expect( consoleDebug ).toHaveBeenCalledWith(
+				expect.stringContaining( 'timed out' )
+			);
+			expect( consoleError ).not.toHaveBeenCalled();
 			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
 		} );
 
