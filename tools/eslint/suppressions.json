@@ -1297,6 +1297,16 @@
 			"count": 2
 		}
 	},
+	"packages/editor/src/components/suggestion-mode/auto-save.js": {
+		"react-hooks/refs": {
+			"count": 6
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/test/auto-save.js": {
+		"react-hooks/globals": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/sync-connection-error-modal/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2

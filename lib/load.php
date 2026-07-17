@@ -79,6 +79,11 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/block-bindings.php';
 	require __DIR__ . '/compat/wordpress-7.1/query-block.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
+	// The suggestion meta registration and REST controller are always loaded:
+	// both are inert without suggestion data, which only the experiment-gated
+	// editor UI creates. The user-facing feature is gated in JS.
+	require __DIR__ . '/compat/wordpress-7.1/block-suggestions.php';
+	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-comment-controller-7-1.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
