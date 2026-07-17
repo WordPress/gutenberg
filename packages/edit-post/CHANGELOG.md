@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Provide RTL direction context to `@wordpress/ui` components in the Post Editor. ([#80400](https://github.com/WordPress/gutenberg/pull/80400))
+
 ## 8.51.0 (2026-07-14)
 
 ### Enhancements

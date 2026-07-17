@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Provide RTL direction context to `@wordpress/ui` components in boot-powered admin pages. ([#80400](https://github.com/WordPress/gutenberg/pull/80400))
+
 ## 0.18.0 (2026-07-14)
 
 ### Enhancements
