@@ -8,6 +8,7 @@
 
 ### Bug Fix
 
+-   DataViews: Prevent the filter operator select focus ring from being clipped. [#80417](https://github.com/WordPress/gutenberg/pull/80417)
 -   DataViews: Fix the `list` layout ignoring the density setting, the refreshing state, and the loading state when `groupBy` is set. [#80255](https://github.com/WordPress/gutenberg/pull/80255)
 -   Fix Dataviews popover hover text color readability issue on WordPress 7.0. [#80105](https://github.com/WordPress/gutenberg/pull/80105)
 -   DataViews: Fix the unintended gap between `list` layout items when `groupBy` is set. [#80254](https://github.com/WordPress/gutenberg/pull/80254)
