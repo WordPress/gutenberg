@@ -1,10 +1,21 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { Component, createPortal } from '@wordpress/element';
+import { Component, createPortal, useState } from '@wordpress/element';
 import { registerStyle } from '@wordpress/style-runtime';
 
 import { Slot, Fill, Provider, useSlotFills } from '../';
+
+function IframePortal( { children } ) {
+	const [ iframe, setIframe ] = useState( null );
+	const body = iframe?.contentDocument?.body;
+
+	return (
+		<iframe title="Slot document" ref={ setIframe }>
+			{ body && createPortal( children, body ) }
+		</iframe>
+	);
+}
 
 class Filler extends Component {
 	constructor() {
@@ -280,21 +291,21 @@ describe( 'Slot', () => {
 	} );
 
 	it( 'injects registered SCSS module styles into the Slot document', () => {
-		const iframeDocument = document.implementation.createHTMLDocument();
 		const styleHash = 'slot-fill-cross-document-style';
 		const css = '.slot-fill-cross-document{padding:32px;}';
 
 		const { unmount } = render(
 			<Provider>
-				{ createPortal(
-					<Slot name="cross-document" bubblesVirtually />,
-					iframeDocument.body
-				) }
+				<IframePortal>
+					<Slot name="cross-document" bubblesVirtually />
+				</IframePortal>
 				<Fill name="cross-document">
 					<div className="slot-fill-cross-document" />
 				</Fill>
 			</Provider>
 		);
+		const iframeDocument =
+			screen.getByTitle( 'Slot document' ).contentDocument;
 
 		// CSS module registration is skipped by the Jest transform, so mirror the
 		// generated production call explicitly.
