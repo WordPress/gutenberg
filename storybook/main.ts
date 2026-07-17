@@ -127,7 +127,7 @@ const config: StorybookConfig = {
 			plugins: [
 				dsTokenFallbacksJs(),
 				react( {
-					jsxImportSource: getAbsolutePath( '@emotion/react' ),
+					jsxImportSource: '@emotion/react',
 					babel: {
 						plugins: [ getAbsolutePath( '@emotion/babel-plugin' ) ],
 					},
