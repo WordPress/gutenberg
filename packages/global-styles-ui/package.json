@@ -40,7 +40,7 @@
 			"default": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
-		"./build-style/": "./build-style/"
+		"./build-style/*": "./build-style/*"
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",

@@ -86,6 +86,7 @@ function UnforwardedSearchControl(
 		SearchControl,
 		'components-search-control'
 	);
+	const hasSuffix = !! onClose || !! value;
 
 	return (
 		<StyledInputControl
@@ -106,12 +107,14 @@ function UnforwardedSearchControl(
 				</InputControlPrefixWrapper>
 			}
 			suffix={
-				<SuffixItem
-					searchRef={ searchRef }
-					value={ value }
-					onChange={ onChange }
-					onClose={ onClose }
-				/>
+				hasSuffix && (
+					<SuffixItem
+						searchRef={ searchRef }
+						value={ value }
+						onChange={ onChange }
+						onClose={ onClose }
+					/>
+				)
 			}
 			{ ...filteredRestProps }
 		/>

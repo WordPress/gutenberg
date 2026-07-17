@@ -5,10 +5,12 @@
 ### New Features
 
 -   `WidgetTypeMetadata`: add optional `actions`, a declarative list of
-    user-triggerable links a widget exposes. Each `WidgetAction` carries
-    `id`, `label`, `href`, and optional `download` / `openInNewTab`, and is
-    also carried by `WidgetModuleRecord` with labels localized server-side
-    ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+    user-triggerable links a widget exposes ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+
+### Enhancements
+
+-   Ship the package as a WordPress script module
+    (`wpScriptModuleExports`) ([#80149](https://github.com/WordPress/gutenberg/pull/80149)).
 
 ### Documentation
 
