@@ -36,13 +36,17 @@
   <text x="562" y="85" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1e3a8a">Traffic…</text>
   <circle cx="636" cy="81" r="7" fill="#eef4fe" stroke="#7f9cd8" stroke-width="1.1"/>
   <text x="636" y="84.5" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="9" font-weight="700" font-style="italic" fill="#3b62b0">i</text>
-  <rect x="662" y="72" width="62" height="20" rx="5" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.1"/>
-  <text x="670" y="86" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#475569">fields</text>
-  <path d="M710 79 l6 0 l-3 4 z" fill="#94a3b8"/>
-  <rect x="732" y="72" width="26" height="20" rx="5" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.1"/>
-  <circle cx="745" cy="78" r="1.5" fill="#475569"/>
-  <circle cx="745" cy="82" r="1.5" fill="#475569"/>
-  <circle cx="745" cy="86" r="1.5" fill="#475569"/>
+  <!-- Folded attributes: compact settings icon button -->
+  <rect x="688" y="72" width="26" height="20" rx="5" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.1"/>
+  <line x1="694" y1="79" x2="708" y2="79" stroke="#475569" stroke-width="1.3"/>
+  <circle cx="703" cy="79" r="2.1" fill="#ffffff" stroke="#475569" stroke-width="1.3"/>
+  <line x1="694" y1="85" x2="708" y2="85" stroke="#475569" stroke-width="1.3"/>
+  <circle cx="699" cy="85" r="2.1" fill="#ffffff" stroke="#475569" stroke-width="1.3"/>
+  <!-- More -->
+  <rect x="722" y="72" width="26" height="20" rx="5" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.1"/>
+  <circle cx="735" cy="78" r="1.5" fill="#475569"/>
+  <circle cx="735" cy="82" r="1.5" fill="#475569"/>
+  <circle cx="735" cy="86" r="1.5" fill="#475569"/>
   <text x="650" y="130" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="700" fill="#334155">narrow tile</text>
   <text x="650" y="146" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">attributes fold into a dropdown</text>
 
