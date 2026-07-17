@@ -10,6 +10,13 @@
     controls, the promoted fields collapse into a dropdown; the settings
     trigger stays in the toolbar ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 
+### Bug Fixes
+
+-   Widget toolbar: measure the header's identity cluster instead of reserving
+    a fixed width, so the inline attribute controls collapse correctly when the
+    identity carries an info tooltip (a widget's `help` note) or otherwise
+    differs from the assumed layout ([#80398](https://github.com/WordPress/gutenberg/issues/80398)).
+
 ### Documentation
 
 -   Document how attribute `relevance` maps to surfaces: the prominent
