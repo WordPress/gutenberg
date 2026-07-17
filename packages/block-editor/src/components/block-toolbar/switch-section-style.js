@@ -21,9 +21,7 @@ import { store as blockEditorStore } from '../../store';
 import { globalStylesDataKey } from '../../store/private-keys';
 import { unlock } from '../../lock-unlock';
 
-const { getVariationStylesWithRefValues } = unlock(
-	globalStylesEnginePrivateApis
-);
+const { getVariationStyle } = unlock( globalStylesEnginePrivateApis );
 
 const styleIcon = (
 	<SVG
@@ -64,7 +62,7 @@ function SwitchSectionStyle( { clientId } ) {
 
 	// Get the background color for the active style
 	const activeStyleBackground = activeStyle?.name
-		? getVariationStylesWithRefValues(
+		? getVariationStyle(
 				{
 					settings: globalSettings,
 					styles: globalStyles,

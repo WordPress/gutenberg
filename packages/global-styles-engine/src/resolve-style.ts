@@ -3,7 +3,7 @@
  */
 import { getResolvedValue } from './utils/common';
 import { getValueFromObjectPath } from './utils/object';
-import { getVariationStylesWithRefValues } from './variation';
+import { getVariationStyle } from './variation';
 
 type StyleTree = Record< string, any >;
 
@@ -428,11 +428,7 @@ function computeResolvedStyle( {
 	// Resolve the active block style variation's styles (with `{ ref }`
 	// envelopes resolved) against the Global Styles tree.
 	const variation = ownVariation
-		? getVariationStylesWithRefValues(
-				globalStyles,
-				blockName,
-				ownVariation
-		  ) ?? null
+		? getVariationStyle( globalStyles, blockName, ownVariation ) ?? null
 		: null;
 
 	// Layers ordered low to high precedence: root defaults, the matching

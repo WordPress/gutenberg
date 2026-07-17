@@ -7,7 +7,7 @@ import {
 	getViewportBreakpointValueInPixels,
 } from './utils/viewport';
 import { resolveStyle } from './resolve-style';
-import { getVariationStylesWithRefValues } from './variation';
+import { getVariationStyle } from './variation';
 import { lock } from './lock-unlock';
 
 export const privateApis = {};
@@ -16,5 +16,5 @@ lock( privateApis, {
 	getViewportBreakpoints,
 	getViewportBreakpointValueInPixels,
 	resolveStyle,
-	getVariationStylesWithRefValues,
+	getVariationStyle,
 } );

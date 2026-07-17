@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { getVariationStylesWithRefValues } from '../variation';
+import { getVariationStyle } from '../variation';
 
-describe( 'getVariationStylesWithRefValues', () => {
+describe( 'getVariationStyle', () => {
 	it( 'should resolve ref values correctly', () => {
 		const globalStyles = {
 			styles: {
@@ -64,11 +64,7 @@ describe( 'getVariationStylesWithRefValues', () => {
 		};
 
 		expect(
-			getVariationStylesWithRefValues(
-				globalStyles,
-				'core/group',
-				'custom'
-			)
+			getVariationStyle( globalStyles, 'core/group', 'custom' )
 		).toEqual( {
 			color: { background: 'red' },
 			blocks: {
@@ -118,14 +114,67 @@ describe( 'getVariationStylesWithRefValues', () => {
 		};
 
 		expect(
-			getVariationStylesWithRefValues(
-				globalStyles,
-				'core/group',
-				'custom'
-			)
+			getVariationStyle( globalStyles, 'core/group', 'custom' )
 		).toEqual( {
 			typography: { lineHeight: 0 },
 			color: { text: false },
 		} );
+	} );
+
+	it( 'leaves { ref } values in place when resolveRefs is false', () => {
+		const globalStyles = {
+			styles: {
+				color: { background: 'red' },
+				blocks: {
+					'core/group': {
+						variations: {
+							custom: {
+								color: {
+									background: {
+										ref: 'styles.color.background',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		};
+
+		expect(
+			getVariationStyle( globalStyles, 'core/group', 'custom', {
+				resolveRefs: false,
+			} )
+		).toEqual( {
+			color: { background: { ref: 'styles.color.background' } },
+		} );
+	} );
+
+	it( 'returns a deep clone, leaving the input global styles unmutated', () => {
+		const globalStyles = {
+			styles: {
+				color: { background: 'red' },
+				blocks: {
+					'core/group': {
+						variations: {
+							custom: {
+								color: {
+									background: {
+										ref: 'styles.color.background',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		};
+
+		getVariationStyle( globalStyles, 'core/group', 'custom' );
+
+		expect(
+			globalStyles.styles.blocks[ 'core/group' ].variations.custom.color
+				.background
+		).toEqual( { ref: 'styles.color.background' } );
 	} );
 } );

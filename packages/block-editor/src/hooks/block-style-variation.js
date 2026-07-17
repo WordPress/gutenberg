@@ -18,9 +18,7 @@ import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
 
-const { getVariationStylesWithRefValues } = unlock(
-	globalStylesEnginePrivateApis
-);
+const { getVariationStyle } = unlock( globalStylesEnginePrivateApis );
 
 const VARIATION_PREFIX = 'is-style-';
 
@@ -192,7 +190,7 @@ function useBlockStyleVariation( name, variation, clientId ) {
 	}, [] );
 
 	return useMemo( () => {
-		const variationStyles = getVariationStylesWithRefValues(
+		const variationStyles = getVariationStyle(
 			{
 				settings: globalSettings,
 				styles: globalStyles,

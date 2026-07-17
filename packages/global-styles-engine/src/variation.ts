@@ -10,23 +10,31 @@ interface GlobalStyles {
 	styles?: StyleTree;
 }
 
+interface GetVariationStyleOptions {
+	resolveRefs?: boolean;
+}
+
 /**
- * Retrieves any block style variation styles data and resolves any referenced
- * values (`{ ref }` envelopes) against the supplied Global Styles tree.
+ * Retrieves a block style variation's styles from the Global Styles tree.
  *
- * The returned object is a deep clone of the variation node with every `{ ref }`
- * envelope replaced by its resolved value; invalid or unresolvable refs are
- * dropped. The input `globalStyles` is never mutated.
+ * The result is always a deep clone, so callers can mutate it and the input is
+ * left untouched. By default, a `{ ref }` value (a reference that points at
+ * another value in the tree, e.g. `{ ref: 'styles.color.background' }`) is
+ * replaced with the value it points at, and any invalid or missing reference is
+ * dropped. Pass `resolveRefs: false` to leave those references in place.
  *
- * @param globalStyles A complete Global Styles object, containing `settings` and `styles`.
- * @param name         The name of the desired block type (e.g. `core/group`).
- * @param variation    The block style variation slug to retrieve data for.
- * @return The resolved Global Styles data for the specified variation, or `undefined`.
+ * @param globalStyles        A complete Global Styles object, containing `settings` and `styles`.
+ * @param name                The block type name (e.g. `core/group`).
+ * @param variation           The block style variation slug to retrieve.
+ * @param options             Optional settings.
+ * @param options.resolveRefs Whether to replace a `{ ref }` value with the value it points at. Defaults to `true`.
+ * @return The variation's styles, or `undefined` when the variation is not present.
  */
-export function getVariationStylesWithRefValues(
+export function getVariationStyle(
 	globalStyles: GlobalStyles | null | undefined,
 	name: string,
-	variation: string
+	variation: string,
+	{ resolveRefs = true }: GetVariationStyleOptions = {}
 ): StyleTree | undefined {
 	if ( ! globalStyles?.styles?.blocks?.[ name ]?.variations?.[ variation ] ) {
 		return undefined;
@@ -74,7 +82,9 @@ export function getVariationStylesWithRefValues(
 			globalStyles.styles.blocks[ name ].variations[ variation ]
 		)
 	);
-	replaceRefs( styles );
+	if ( resolveRefs ) {
+		replaceRefs( styles );
+	}
 
 	return styles;
 }
