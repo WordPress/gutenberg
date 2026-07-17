@@ -116,6 +116,13 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				.evaluate( () => {
 					return document.activeElement.getAttribute( 'aria-owns' );
 				} );
+			const ariaControls = await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => {
+					return document.activeElement.getAttribute(
+						'aria-controls'
+					);
+				} );
 			const ariaActiveDescendant = await editor.canvas
 				.locator( ':root' )
 				.evaluate( () => {
@@ -123,10 +130,16 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 						'aria-activedescendant'
 					);
 				} );
-			// Ensure `aria-owns` is part of the same document and ensure the
-			// selected option is equal to the active descendant.
+			// Ensure `aria-owns` and `aria-controls` are part of the same
+			// document and ensure the selected option is equal to the active
+			// descendant.
 			await expect(
 				editor.canvas.locator( `#${ ariaOwns } [aria-selected="true"]` )
+			).toHaveAttribute( 'id', ariaActiveDescendant );
+			await expect(
+				editor.canvas.locator(
+					`#${ ariaControls } [aria-selected="true"]`
+				)
 			).toHaveAttribute( 'id', ariaActiveDescendant );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );

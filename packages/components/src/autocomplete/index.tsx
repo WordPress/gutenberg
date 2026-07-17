@@ -35,6 +35,7 @@ import type {
 	OptionCompletion,
 	ReplaceOption,
 	UseAutocompleteProps,
+	UseAutocompletePropsReturn,
 } from './types';
 import getNodeText from '../utils/get-node-text';
 import { unlock } from '../lock-unlock';
@@ -379,7 +380,9 @@ export function useLastDifferentValue(
 	return history.current[ 0 ];
 }
 
-export function useAutocompleteProps( options: UseAutocompleteProps ) {
+export function useAutocompleteProps(
+	options: UseAutocompleteProps
+): UseAutocompletePropsReturn {
 	const ref = useRef< HTMLElement >( null );
 	const onKeyDownRef =
 		useRef< ( event: KeyboardEvent ) => void >( undefined );
@@ -421,12 +424,21 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 		return { ref: mergedRefs };
 	}
 
+	// `aria-owns` and `aria-controls` point at the same list: either one lets
+	// `aria-activedescendant` resolve to an option rendered outside this
+	// element, and assistive technology support differs between them.
+	//
+	// No `aria-expanded`: consumers are `textbox` elements, which don't
+	// support it; that would mean `role="combobox"`, which in turn doesn't
+	// support the `aria-multiline` these fields set.
 	return {
 		ref: mergedRefs,
 		children: popover,
 		'aria-autocomplete': listBoxId ? 'list' : undefined,
+		'aria-haspopup': listBoxId ? 'listbox' : undefined,
+		'aria-controls': listBoxId,
 		'aria-owns': listBoxId,
-		'aria-activedescendant': activeId,
+		'aria-activedescendant': activeId ?? undefined,
 	};
 }
 
