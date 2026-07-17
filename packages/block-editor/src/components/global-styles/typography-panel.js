@@ -43,6 +43,32 @@ import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
 
+/**
+ * Whether a link color should follow a text color change.
+ *
+ * A link color tracks the text color (e.g. a Button's) unless it was set
+ * deliberately. Raw preset refs are compared rather than decoded hex, since
+ * distinct slots can share a hex (`dark-background`/`dark-text` both `#000`).
+ *
+ * @param {Object} value          Local block styles.
+ * @param {Object} inheritedValue Styles inherited from Global Styles.
+ * @return {boolean} Whether to sync the link color to the text color.
+ */
+function shouldSyncLinkColor( value, inheritedValue ) {
+	const localLinkColor = value?.elements?.link?.color?.text;
+	// A local link color keeps tracking only while it matches the text color;
+	// once it differs it was set deliberately and is left alone.
+	if ( localLinkColor !== undefined ) {
+		return localLinkColor === value?.color?.text;
+	}
+	// With none set, defer to the inherited values.
+	const inheritedLinkColor = inheritedValue?.elements?.link?.color?.text;
+	return (
+		inheritedLinkColor === undefined ||
+		inheritedValue?.color?.text === inheritedLinkColor
+	);
+}
+
 export function useHasTypographyPanel( settings ) {
 	const hasFontFamily = useHasFontFamilyControl( settings );
 	const hasLineHeight = useHasLineHeightControl( settings );
@@ -253,22 +279,7 @@ export default function TypographyPanel( {
 			newSlug
 		);
 		let changedObject = setImmutably( value, [ 'color', 'text' ], encoded );
-		// Keep an in-sync link color following the text color (e.g. a
-		// Button's link color tracks its text color). Compare raw encoded
-		// references (e.g. `var:preset|color|slug`), not decoded hex values.
-		// Two palette entries can share the same hex but carry different
-		// slugs (e.g. `var:preset|color|dark-background` and
-		// `var:preset|color|dark-text` both resolving to `#000`); comparing
-		// decoded values would conflate them and incorrectly force the link
-		// color to follow the text color even when the user deliberately
-		// chose a different palette slot. Sync when the link color is unset
-		// (so it starts tracking the text color) or when it currently matches
-		// the text color; only skip when a distinct link color was set.
-		const inheritedLinkColor = inheritedValue?.elements?.link?.color?.text;
-		if (
-			inheritedLinkColor === undefined ||
-			inheritedValue?.color?.text === inheritedLinkColor
-		) {
+		if ( shouldSyncLinkColor( value, inheritedValue ) ) {
 			changedObject = setImmutably(
 				changedObject,
 				[ 'elements', 'link', 'color', 'text' ],

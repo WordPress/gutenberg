@@ -808,6 +808,88 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 		// not decoded-value equality.
 		expect( result?.elements?.link?.color?.text ).toBeUndefined();
 	} );
+
+	it( 'preserves a deliberately-set local link color when the text color changes and nothing is inherited', async () => {
+		// Regression: with a theme that inherits no link color, a link
+		// color the user set on the block instance must survive a
+		// subsequent text color change instead of being overwritten to
+		// track the text color.
+		const onChange = jest.fn();
+
+		await renderAriakit(
+			<TypographyPanel
+				value={ {
+					elements: {
+						link: {
+							color: { text: 'var:preset|color|dark-text' },
+						},
+					},
+				} }
+				inheritedValue={ {} }
+				settings={ DUPLICATE_PALETTE_SETTINGS }
+				panelId="test"
+				onChange={ onChange }
+			/>
+		);
+
+		const swatches = await openTextColorDropdown();
+		// swatch[0] = 'dark-background'
+		await click( swatches[ 0 ] );
+
+		const result = onChange.mock.calls[ 0 ][ 0 ];
+		expect( result?.color?.text ).toBe(
+			'var:preset|color|dark-background'
+		);
+		// The deliberately-set local link color is untouched.
+		expect( result?.elements?.link?.color?.text ).toBe(
+			'var:preset|color|dark-text'
+		);
+	} );
+
+	it( 'keeps a local link color tracking when it currently matches the local text color', async () => {
+		// When the local link color equals the local text color it is
+		// still tracking, so a text color change carries the link along.
+		const onChange = jest.fn();
+		const sharedRef = 'var:preset|color|blue';
+		const distinctPaletteSettings = {
+			color: {
+				text: true,
+				custom: false,
+				customGradient: false,
+				defaultPalette: false,
+				palette: {
+					theme: [
+						{ color: '#0000ff', name: 'Blue', slug: 'blue' },
+						{ color: '#ff0000', name: 'Red', slug: 'red' },
+					],
+				},
+			},
+		};
+
+		await renderAriakit(
+			<TypographyPanel
+				value={ {
+					color: { text: sharedRef },
+					elements: { link: { color: { text: sharedRef } } },
+				} }
+				inheritedValue={ {} }
+				settings={ distinctPaletteSettings }
+				panelId="test"
+				onChange={ onChange }
+			/>
+		);
+
+		const swatches = await openTextColorDropdown();
+		// swatch[1] = 'red'
+		await click( swatches[ 1 ] );
+
+		const result = onChange.mock.calls[ 0 ][ 0 ];
+		expect( result?.color?.text ).toBe( 'var:preset|color|red' );
+		// Link follows because it was still tracking the text color.
+		expect( result?.elements?.link?.color?.text ).toBe(
+			'var:preset|color|red'
+		);
+	} );
 } );
 
 describe( 'TypographyPanel layout className preserved regardless of inheritance indicators', () => {
