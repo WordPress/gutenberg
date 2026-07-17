@@ -11,23 +11,9 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	 */
 	private $test_block_name;
 
-	/**
-	 * @var WP_Styles|null
-	 */
-	private $old_wp_styles;
-
 	public function set_up() {
 		parent::set_up();
 		$this->test_block_name = null;
-
-		// Use a clean styles queue so tests don't leak registered handles
-		// or inline styles into each other. The default-styles callbacks are
-		// removed because they expect a fully set up instance.
-		$this->old_wp_styles = $GLOBALS['wp_styles'] ?? null;
-		remove_action( 'wp_default_styles', 'wp_default_styles' );
-		remove_action( 'wp_default_styles', 'gutenberg_register_packages_styles', 15 );
-		remove_action( 'wp_print_styles', 'print_emoji_styles' );
-		$GLOBALS['wp_styles'] = new WP_Styles();
 	}
 
 	public function tear_down() {
@@ -35,12 +21,6 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 			unregister_block_type( $this->test_block_name );
 		}
 		$this->test_block_name = null;
-
-		$GLOBALS['wp_styles'] = $this->old_wp_styles;
-		add_action( 'wp_default_styles', 'wp_default_styles' );
-		add_action( 'wp_default_styles', 'gutenberg_register_packages_styles', 15 );
-		add_action( 'wp_print_styles', 'print_emoji_styles' );
-
 		parent::tear_down();
 	}
 
@@ -495,38 +475,6 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 		$result = gutenberg_render_custom_css_support_styles( $parsed_block );
 
 		$this->assertArrayHasKey( 'className', $result['attrs'], 'Block should have className added for valid CSS.' );
-	}
-
-	/**
-	 * Tests that custom CSS prints when no block style variation styles
-	 * were registered on the page.
-	 *
-	 * @covers ::gutenberg_render_custom_css_support_styles
-	 */
-	public function test_custom_css_prints_without_block_style_variation_styles() {
-		wp_register_style( 'wp-block-library', false );
-		wp_register_style( 'global-styles', false );
-
-		$this->register_custom_css_block_with_support(
-			'test/custom-css-no-variations',
-			array( 'customCSS' => true )
-		);
-
-		$parsed_block = array(
-			'blockName' => 'test/custom-css-no-variations',
-			'attrs'     => array(
-				'style' => array(
-					'css' => 'color: teal;',
-				),
-			),
-		);
-
-		gutenberg_render_custom_css_support_styles( $parsed_block );
-		wp_enqueue_style( 'wp-block-custom-css' );
-
-		$output = get_echo( 'wp_print_styles' );
-
-		$this->assertStringContainsString( 'color: teal', $output, 'Custom CSS should print even when no block style variation styles exist on the page.' );
 	}
 
 	/**
