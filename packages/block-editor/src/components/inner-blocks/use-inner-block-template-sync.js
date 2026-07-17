@@ -9,6 +9,7 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { useRef, useLayoutEffect } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { getBlockType, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -41,6 +42,26 @@ export default function useInnerBlockTemplateSync(
 	templateLock,
 	templateInsertUpdatesSelection
 ) {
+	if ( template !== undefined ) {
+		deprecated(
+			'The template prop of InnerBlocks and useInnerBlocksProps',
+			{
+				since: '7.2',
+				alternative: 'a `template` declared in the block type settings',
+			}
+		);
+	}
+	if ( templateInsertUpdatesSelection !== undefined ) {
+		deprecated(
+			'The templateInsertUpdatesSelection prop of InnerBlocks and useInnerBlocksProps',
+			{
+				since: '7.2',
+				alternative:
+					'`templateInsertUpdatesSelection` declared in the block type settings',
+			}
+		);
+	}
+
 	// Instead of adding a useSelect mapping here, please add to the useSelect
 	// mapping in InnerBlocks! Every subscription impacts performance.
 	const registry = useRegistry();
