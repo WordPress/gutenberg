@@ -1,14 +1,11 @@
-import { mergeProps, useRender } from '@base-ui/react';
+import { mergeProps } from '@base-ui/react';
 import clsx from 'clsx';
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useState } from '@wordpress/element';
 import type { ForwardedRef } from 'react';
+import { Link } from '../link';
 import * as Menu from '../menu';
 import * as Tooltip from '../tooltip';
-import defenseStyles from '../utils/css/global-css-defense.module.css';
-import focusStyles from '../utils/css/focus.module.css';
-import resetStyles from '../utils/css/resets.module.css';
-import linkStyles from '../link/style.module.css';
 import { useBreadcrumbItemRenderContext } from './context';
 import { enforceRenderProps } from './enforce-render-props';
 import { Separator } from './separator';
@@ -28,6 +25,7 @@ function VisibleLinkItem( {
 	render,
 	onBlur,
 	onFocus,
+	target,
 	...props
 }: LinkItemImplementationProps ) {
 	const {
@@ -42,35 +40,37 @@ function VisibleLinkItem( {
 	);
 	const mergedRef = useMergeRefs( [ forwardedRef, setElement ] );
 	const isTruncated = useIsTruncated( element, measurementVersion );
-	const enforcedRender = enforceRenderProps( render, {
-		'aria-current': undefined,
-		href,
-	} );
-	const link = useRender( {
-		render: enforcedRender,
-		defaultTagName: 'a',
-		ref: mergedRef,
-		props: mergeProps< 'a' >(
-			{ ...props, onBlur, onFocus },
-			{
-				'aria-current': undefined,
-				children,
-				className: clsx(
-					defenseStyles.a,
-					resetStyles[ 'box-sizing' ],
-					focusStyles[ 'outset-ring--focus-except-active' ],
-					linkStyles.link,
-					linkStyles[ 'is-neutral' ],
-					styles.label,
-					styles.link,
-					className
-				),
-				href,
-				onBlur: () => onLinkBlur( itemKey ),
-				onFocus: () => onLinkFocus( itemKey ),
-			}
-		),
-	} );
+	const enforcedRender = enforceRenderProps(
+		render ??
+			( target !== undefined ? (
+				/* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid -- Link clones this template with the required href and accessible content. */
+				<a />
+			) : undefined ),
+		{
+			'aria-current': undefined,
+			href,
+			...( target !== undefined && { target } ),
+		}
+	);
+	const linkProps = mergeProps< 'a' >(
+		{ ...props, onBlur, onFocus },
+		{
+			'aria-current': undefined,
+			children,
+			className: clsx( styles.label, styles.link, className ),
+			href,
+			onBlur: () => onLinkBlur( itemKey ),
+			onFocus: () => onLinkFocus( itemKey ),
+		}
+	);
+	const link = (
+		<Link
+			{ ...linkProps }
+			ref={ mergedRef }
+			render={ enforcedRender }
+			tone="neutral"
+		/>
+	);
 
 	return (
 		<li className={ styles.item }>

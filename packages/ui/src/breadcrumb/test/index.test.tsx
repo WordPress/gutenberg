@@ -12,7 +12,7 @@ type ResizeObserverRecord = {
 };
 
 const DEFAULT_LABEL_WIDTH = 30;
-const OVERFLOW_TRIGGER_WIDTH = 44;
+const OVERFLOW_TRIGGER_WIDTH = 24;
 const SEPARATOR_WIDTH = 10;
 
 describe( 'Breadcrumb', () => {
@@ -108,7 +108,11 @@ describe( 'Breadcrumb', () => {
 						inlineEndMargin
 					);
 				}
-				if ( element.classList.contains( 'style-overflow-trigger' ) ) {
+				if (
+					element.classList.contains(
+						'style-measurement-overflow-trigger'
+					)
+				) {
 					return OVERFLOW_TRIGGER_WIDTH;
 				}
 				if ( element.classList.contains( 'style-separator' ) ) {
@@ -318,6 +322,7 @@ describe( 'Breadcrumb', () => {
 
 		it( 'passes complete link props through a custom renderer', () => {
 			const href = '/settings/general?section=writing#defaults';
+			const target = 'docs-frame';
 			const renderLink = jest.fn(
 				( {
 					children: linkChildren,
@@ -331,7 +336,11 @@ describe( 'Breadcrumb', () => {
 
 			render(
 				<Breadcrumb.Root>
-					<Breadcrumb.LinkItem href={ href } render={ renderLink }>
+					<Breadcrumb.LinkItem
+						href={ href }
+						render={ renderLink }
+						target={ target }
+					>
 						General
 					</Breadcrumb.LinkItem>
 					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
@@ -340,6 +349,7 @@ describe( 'Breadcrumb', () => {
 
 			const link = screen.getByRole( 'link', { name: 'General' } );
 			expect( link ).toHaveAttribute( 'href', href );
+			expect( link ).toHaveAttribute( 'target', target );
 			expect( link ).toHaveAttribute( 'data-router-link' );
 			expect( renderLink ).toHaveBeenCalled();
 		} );
@@ -524,6 +534,21 @@ describe( 'Breadcrumb', () => {
 	} );
 
 	describe( 'overflow menu', () => {
+		it( 'uses the shared small neutral minimal button treatment', () => {
+			availableWidth = 150;
+			labelWidths.set( 'Section', 80 );
+			renderDefaultTrail();
+
+			const trigger = screen.getByRole( 'button', {
+				name: 'Show 1 hidden breadcrumb item',
+			} );
+			expect( trigger ).toHaveClass(
+				'style-is-neutral',
+				'style-is-minimal',
+				'style-is-small'
+			);
+		} );
+
 		it( 'contains exactly the collapsed link and closes on activation', async () => {
 			const user = userEvent.setup();
 			availableWidth = 164;

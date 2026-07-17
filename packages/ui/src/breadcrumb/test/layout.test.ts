@@ -4,7 +4,7 @@ const BASE_METRICS = {
 	availableWidth: 500,
 	currentItemWidth: 30,
 	linkItemWidths: [ 30, 80, 30 ],
-	overflowTriggerWidth: 44,
+	overflowTriggerWidth: 24,
 	separatorWidth: 10,
 };
 
@@ -69,7 +69,7 @@ describe( 'Breadcrumb responsive layout', () => {
 		expect(
 			getCollapsedLayout( {
 				...BASE_METRICS,
-				availableWidth: 70,
+				availableWidth: 60,
 				linkItemWidths: [ 100, 20 ],
 			} ).shouldTruncateCurrent
 		).toBe( true );

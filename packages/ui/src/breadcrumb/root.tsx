@@ -12,11 +12,10 @@ import {
 } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
+import { Button } from '../button';
 import * as Menu from '../menu';
 import type { RootProps as MenuRootProps } from '../menu/types';
 import * as Tooltip from '../tooltip';
-import defenseStyles from '../utils/css/global-css-defense.module.css';
-import focusStyles from '../utils/css/focus.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import { BreadcrumbItemRenderContext } from './context';
 import { CurrentItem } from './current-item';
@@ -520,17 +519,22 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 							<Menu.Trigger
 								ref={ overflowTriggerRef }
 								aria-label={ overflowLabel }
-								className={ clsx(
-									defenseStyles.button,
-									resetStyles[ 'box-sizing' ],
-									focusStyles[ 'outset-ring--focus-visible' ],
-									styles[ 'overflow-trigger' ]
-								) }
+								className={ styles[ 'overflow-trigger' ] }
 								onBlur={ handleOverflowTriggerBlur }
 								onFocus={ () =>
 									setIsOverflowTriggerFocused( true )
 								}
-								render={ <Tooltip.Trigger /> }
+								render={
+									<Tooltip.Trigger
+										render={
+											<Button
+												size="small"
+												tone="neutral"
+												variant="minimal"
+											/>
+										}
+									/>
+								}
 							>
 								<span aria-hidden="true">…</span>
 							</Menu.Trigger>
@@ -625,10 +629,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 				</div>
 				<span
 					ref={ intrinsicOverflowTriggerRef }
-					className={ clsx(
-						styles[ 'overflow-trigger' ],
-						styles[ 'measurement-overflow-trigger' ]
-					) }
+					className={ styles[ 'measurement-overflow-trigger' ] }
 				>
 					…
 				</span>
