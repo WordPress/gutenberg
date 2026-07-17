@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/mixins";
 @use "../../utils/theme-variables" as *;
 
 .label {
@@ -58,8 +59,9 @@
 
 .is-deselectable {
 	&:focus {
-		outline: 1.5px solid $components-color-accent;
-		outline-offset: 2px;
+		@include mixins.outset-ring__focus();
+		// Preserve legacy Theme and validated-control accent overrides.
+		outline-color: $components-color-focus;
 
 		// Hide overlapping border.
 		&[aria-pressed="false"] {

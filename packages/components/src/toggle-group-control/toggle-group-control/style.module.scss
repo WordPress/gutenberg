@@ -1,4 +1,4 @@
-@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins";
 @use "../../utils/theme-variables" as *;
 
 .toggle-group-control {
@@ -42,18 +42,19 @@
 }
 
 .has-border {
-	border-color: $gray-300;
+	border-color: $components-color-gray-300;
 }
 
 .has-enclosing-borders {
 	&:hover {
-		border-color: $gray-400;
+		border-color: $components-color-gray-400;
 	}
 
 	&:focus-within {
 		z-index: 1;
-		outline: 1.5px solid $components-color-accent;
-		outline-offset: 1px;
+		@include mixins.outset-ring__focus();
+		// Preserve legacy Theme and validated-control accent overrides.
+		outline-color: $components-color-focus;
 	}
 }
 
