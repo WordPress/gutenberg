@@ -165,8 +165,18 @@ export async function convertImageFormat(
 		let strOptions = '';
 		const loadOptions: LoadOptions< typeof inputType > = {};
 
-		// To ensure all frames are loaded in case the image is animated.
-		if ( supportsAnimation( inputType ) ) {
+		/*
+		 * To ensure all frames are loaded in case the image is animated and
+		 * the output format can represent them. A still output (e.g. a JPEG
+		 * poster for a GIF) only needs the first frame; loading all frames
+		 * would decode them as one vertical strip whose height easily
+		 * exceeds encoder dimension limits for long animations.
+		 * See https://github.com/WordPress/gutenberg/issues/80259.
+		 */
+		if (
+			supportsAnimation( inputType ) &&
+			supportsAnimation( outputType )
+		) {
 			strOptions = '[n=-1]';
 			( loadOptions as LoadOptions< typeof inputType > ).n = -1;
 		}
