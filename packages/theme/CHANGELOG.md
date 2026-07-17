@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Bug Fixes
+### Enhancements
 
--   Regenerate design token styles using the shared CSS/SCSS Prettier configuration ([#80365](https://github.com/WordPress/gutenberg/pull/80365)).
+-   Widen optional peer dependency ranges so projects on newer tooling can install without peer resolution conflicts: Vite `^7 || ^8`, Stylelint `^16 || ^17`, and esbuild `>=0.27.2 <1.0.0` ([#80267](https://github.com/WordPress/gutenberg/pull/80267)).
 
 ### Documentation
 
@@ -14,6 +14,7 @@
 
 -   Stop publishing `@wordpress/theme` source paths by moving publish-ready assets outside `src` and enforcing the package boundary ([#80213](https://github.com/WordPress/gutenberg/pull/80213)).
 -   Update `colorjs.io` dependency to remove need for colorspace registration workaround ([#80272](https://github.com/WordPress/gutenberg/pull/80272)).
+-   Regenerate design token styles using the shared CSS/SCSS Prettier configuration ([#80365](https://github.com/WordPress/gutenberg/pull/80365)).
 
 ## 1.0.0 (2026-07-14)
 
