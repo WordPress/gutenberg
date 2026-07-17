@@ -490,7 +490,8 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	 *
 	 * @see: https://github.com/WordPress/gutenberg/pull/58733
 	 */
-	if ( ! empty( $attributes['randomOrder'] ) ) {
+	$order_by = $attributes['orderBy'] ?? null;
+	if ( ! empty( $attributes['randomOrder'] ) || 'rand' === $order_by ) {
 		// This pattern matches figure elements with the `wp-block-image`
 		// class to avoid the gallery's wrapping `figure` element and
 		// extract images only.
@@ -510,6 +511,84 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 				$updated_content
 			);
 		}
+	} elseif ( $order_by && 'custom' !== $order_by ) {
+		$pattern = '/<figure[^>]*\bwp-block-image\b[^>]*>.*?<\/figure>/s';
+
+		preg_match_all( $pattern, $updated_content, $matches );
+		if ( ! $matches || empty( $matches[0] ) ) {
+			return $updated_content;
+		}
+
+		$image_blocks = $matches[0];
+		$image_ids    = array();
+
+		foreach ( $image_blocks as $block_html ) {
+			$image_id = 0;
+			if ( preg_match( '/wp-image-(\d+)/', $block_html, $id_match ) ) {
+				$image_id = (int) $id_match[1];
+			}
+			$image_ids[] = $image_id;
+		}
+
+		$valid_ids = array_values( array_filter( $image_ids ) );
+		if ( empty( $valid_ids ) ) {
+			return $updated_content;
+		}
+
+		$attachments = get_posts(
+			array(
+				'post_type'      => 'attachment',
+				'post__in'       => $valid_ids,
+				'orderby'        => 'post__in',
+				'posts_per_page' => -1,
+				'fields'         => 'all',
+			)
+		);
+
+		$attachment_map = array();
+		foreach ( $attachments as $attachment ) {
+			$attachment_map[ $attachment->ID ] = $attachment;
+		}
+
+		$sort_values = array();
+		foreach ( $image_ids as $i => $id ) {
+			$attachment = isset( $attachment_map[ $id ] ) ? $attachment_map[ $id ] : null;
+
+			if ( ! $attachment ) {
+				$sort_values[ $i ] = 'date' === $order_by ? '0000-00-00 00:00:00' : '';
+				continue;
+			}
+
+			switch ( $order_by ) {
+				case 'title':
+					$sort_values[ $i ] = $attachment->post_title;
+					break;
+				case 'date':
+					$sort_values[ $i ] = $attachment->post_date;
+					break;
+				case 'menu_order':
+					$sort_values[ $i ] = (int) $attachment->menu_order;
+					break;
+				case 'id':
+					$sort_values[ $i ] = $attachment->ID;
+					break;
+				default:
+					$sort_values[ $i ] = 0;
+			}
+		}
+
+		$order_direction = strtoupper( $attributes['order'] ?? 'asc' ) === 'DESC' ? SORT_DESC : SORT_ASC;
+		$sort_flags      = ( 'menu_order' === $order_by || 'id' === $order_by ) ? SORT_NUMERIC : SORT_STRING;
+		array_multisort( $sort_values, $order_direction, $sort_flags, $image_blocks );
+
+		$i               = 0;
+		$updated_content = preg_replace_callback(
+			$pattern,
+			static function () use ( $image_blocks, &$i ) {
+				return $image_blocks[ $i++ ];
+			},
+			$updated_content
+		);
 	}
 
 	// Gets all image IDs from the state that match this gallery's ID.

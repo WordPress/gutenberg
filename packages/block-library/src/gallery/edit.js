@@ -115,6 +115,37 @@ const NAVIGATION_BUTTON_TYPE_OPTIONS = [
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
+const SORT_OPTIONS = [
+	{
+		label: __( 'Custom order' ),
+		value: 'custom/asc',
+	},
+	{
+		label: __( 'Title A → Z' ),
+		value: 'title/asc',
+	},
+	{
+		label: __( 'Title Z → A' ),
+		value: 'title/desc',
+	},
+	{
+		label: __( 'Newest to oldest' ),
+		value: 'date/desc',
+	},
+	{
+		label: __( 'Oldest to newest' ),
+		value: 'date/asc',
+	},
+	{
+		label: __( 'ID ascending' ),
+		value: 'id/asc',
+	},
+	{
+		label: __( 'ID descending' ),
+		value: 'id/desc',
+	},
+];
+
 const PLACEHOLDER_TEXT = __(
 	'Drag and drop images, upload, or choose from your library.'
 );
@@ -169,6 +200,8 @@ export default function GalleryEdit( props ) {
 		linkTo,
 		sizeSlug,
 		aspectRatio,
+		orderBy,
+		order,
 	} = attributes;
 
 	const {
@@ -510,6 +543,76 @@ export default function GalleryEdit( props ) {
 		setAttributes( { randomOrder: ! randomOrder } );
 	}
 
+	function sortInnerBlocks( blocks, sortBy, sortDirection, mediaData ) {
+		if ( ! sortBy || sortBy === 'custom' ) {
+			return blocks;
+		}
+
+		const blocksWithValue = blocks.map( ( block ) => {
+			const media = mediaData.find(
+				( m ) => m.id === block.attributes.id
+			);
+			let sortValue;
+
+			switch ( sortBy ) {
+				case 'title':
+					sortValue = media?.title?.raw ?? '';
+					break;
+				case 'date':
+					sortValue = media?.date ?? '';
+					break;
+				case 'id':
+					sortValue = block.attributes.id ?? 0;
+					break;
+				default:
+					sortValue = 0;
+			}
+
+			return { block, sortValue };
+		} );
+
+		const dir = sortDirection === 'desc' ? -1 : 1;
+
+		blocksWithValue.sort( ( a, b ) => {
+			if ( a.sortValue < b.sortValue ) {
+				return -1 * dir;
+			}
+			if ( a.sortValue > b.sortValue ) {
+				return 1 * dir;
+			}
+			return 0;
+		} );
+
+		return blocksWithValue.map( ( { block } ) => block );
+	}
+
+	useEffect( () => {
+		if ( ! hasImages || isDynamic || ! orderBy || orderBy === 'custom' ) {
+			return;
+		}
+
+		if ( ! imageData || imageData.length === 0 ) {
+			return;
+		}
+
+		const sorted = sortInnerBlocks(
+			innerBlockImages,
+			orderBy,
+			order || 'asc',
+			imageData
+		);
+
+		const currentIds = innerBlockImages
+			.map( ( b ) => b.clientId )
+			.join( ',' );
+		const newIds = sorted.map( ( b ) => b.clientId ).join( ',' );
+
+		if ( currentIds !== newIds ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			replaceInnerBlocks( clientId, sorted, false );
+		}
+	}, [ orderBy, order, imageData ] );
+
 	function toggleOpenInNewTab( openInNewTab ) {
 		const newLinkTarget = openInNewTab ? '_blank' : undefined;
 		setAttributes( { linkTarget: newLinkTarget } );
@@ -725,6 +828,8 @@ export default function GalleryEdit( props ) {
 							columns: undefined,
 							imageCrop: true,
 							randomOrder: false,
+							orderBy: undefined,
+							order: undefined,
 						} );
 
 						setAspectRatio( 'auto' );
@@ -804,6 +909,38 @@ export default function GalleryEdit( props ) {
 							onChange={ toggleImageCrop }
 						/>
 					</ToolsPanelItem>
+					{ ! isDynamic && (
+						<ToolsPanelItem
+							isShownByDefault
+							label={ __( 'Order by' ) }
+							hasValue={ () =>
+								!! orderBy && orderBy !== 'custom'
+							}
+							onDeselect={ () =>
+								setAttributes( {
+									orderBy: undefined,
+									order: undefined,
+								} )
+							}
+						>
+							<SelectControl
+								label={ __( 'Order by' ) }
+								value={ `${ orderBy || 'custom' }/${
+									order || 'asc'
+								}` }
+								options={ SORT_OPTIONS }
+								onChange={ ( value ) => {
+									const [ newOrderBy, newOrder ] =
+										value.split( '/' );
+									setAttributes( {
+										orderBy: newOrderBy,
+										order: newOrder,
+									} );
+								} }
+								hideCancelButton
+							/>
+						</ToolsPanelItem>
+					) }
 					<ToolsPanelItem
 						isShownByDefault
 						label={ __( 'Randomize order' ) }
