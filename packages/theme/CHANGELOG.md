@@ -14,6 +14,7 @@
 
 -   Stop publishing `@wordpress/theme` source paths by moving publish-ready assets outside `src` and enforcing the package boundary ([#80213](https://github.com/WordPress/gutenberg/pull/80213)).
 -   Update `colorjs.io` dependency to remove need for colorspace registration workaround ([#80272](https://github.com/WordPress/gutenberg/pull/80272)).
+-   Regenerate design token styles using the shared CSS/SCSS Prettier configuration ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
 
 ## 1.0.0 (2026-07-14)
 

@@ -46,6 +46,12 @@ const userList = [
 		lastName: 'Elf',
 		password: 'sm1lingsmyfavorite',
 	},
+	{
+		username: 'thescribe',
+		firstName: 'შოთა',
+		lastName: 'რუსთაველი',
+		password: 'n0nl@t1nName',
+	},
 ];
 
 test.describe( 'Autocomplete (@firefox, @webkit)', () => {
@@ -745,5 +751,24 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				name: 'Frodo Baggins',
 			} )
 		).toBeVisible();
+	} );
+
+	// The search term must reach the REST API unencoded. Pre-encoding it means
+	// WordPress's `sanitize_text_field` strips every percent-encoded sequence,
+	// so a non-latin term is erased entirely and matches every user.
+	test( 'should filter mentions by non-latin search terms', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+
+		await page.keyboard.type( '@შოთა' );
+
+		await expect(
+			page.getByRole( 'option', { name: 'შოთა რუსთაველი' } )
+		).toBeVisible();
+		await expect( page.getByRole( 'option' ) ).toHaveCount( 1 );
 	} );
 } );
