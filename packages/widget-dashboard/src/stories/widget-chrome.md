@@ -11,8 +11,6 @@ The widget never paints its own header or toolbar.
 
 ## The frame
 
-The widget declares its identity and how it wants to be framed; the chrome materializes both. The widget never paints its own header or toolbar.
-
 The dashboard widget interprets `presentation` and determines how much chrome a widget gets.
 
 * `framed` paints a header and pads the content. 
@@ -41,7 +39,7 @@ Attributes are inline fields when they fit, or a form within a dropdown when the
 
 ![Wide tiles keep the attributes inline; narrow tiles fold them into a dropdown, while the identity holds its floor and the actions menu stays.](./assets/header-fit.svg)
 
-The header is determined by the actual number of rows.
+The header decides by measuring the row it actually has, not by assuming fixed widths.
 
 It reserves the identity its floor, then gives the attributes their inline form while the row still has room; when the room runs out, they fold.
 The actions menu stays compact throughout.
