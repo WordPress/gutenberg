@@ -9,7 +9,11 @@ import {
 	upload,
 	wordpress,
 } from '@wordpress/icons';
-import { displayShortcut, ariaKeyShortcut } from '@wordpress/keycodes';
+import {
+	displayShortcut,
+	ariaKeyShortcut,
+	shortcutAriaLabel,
+} from '@wordpress/keycodes';
 import { IconButton } from '../index';
 import * as Tooltip from '../../tooltip';
 
@@ -125,6 +129,7 @@ export const Pressed: Story = {
 const EXAMPLE_SHORTCUT_OBJECT = {
 	displayShortcut: displayShortcut.primary( 'c' ),
 	ariaKeyShortcut: ariaKeyShortcut.primary( 'c' ),
+	description: shortcutAriaLabel.primary( 'c' ),
 };
 
 export const WithShortcut: Story = {
