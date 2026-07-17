@@ -8,6 +8,7 @@ import { tableOfContents as icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import initBlock from '../utils/init-block';
+import deprecated from './deprecated';
 import metadata from './block.json';
 import edit from './edit';
 
@@ -17,6 +18,7 @@ export { metadata, name };
 
 export const settings = {
 	icon,
+	deprecated,
 	edit,
 	example: {
 		innerBlocks: [
