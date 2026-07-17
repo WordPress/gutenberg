@@ -36,7 +36,12 @@ const ELLIPSIS = '…';
 
 export default function PostExcerptEditor( props ) {
 	const {
-		attributes: { moreText, showMoreOnNewLine, excerptLength },
+		attributes: {
+			moreText,
+			showMoreOnNewLine,
+			excerptLength,
+			preserveFormatting,
+		},
 		setAttributes,
 		isSelected,
 		context: { postId, postType, queryId },
@@ -184,30 +189,43 @@ export default function PostExcerptEditor( props ) {
 
 	const isTrimmed = trimmedExcerpt !== rawOrRenderedExcerpt;
 
-	const excerptContent = isEditable ? (
-		<RichText
-			className={ excerptClassName }
-			aria-label={ __( 'Excerpt text' ) }
-			value={
-				isSelected
-					? rawOrRenderedExcerpt
-					: ( ! isTrimmed
-							? rawOrRenderedExcerpt
-							: trimmedExcerpt + ELLIPSIS ) ||
-					  __( 'No excerpt found' )
-			}
-			onChange={ setExcerpt }
-			tagName="p"
-			allowedFormats={ [] }
-			preserveWhiteSpace
-		/>
-	) : (
-		<p className={ excerptClassName }>
-			{ ! isTrimmed
-				? rawOrRenderedExcerpt || __( 'No excerpt found' )
-				: trimmedExcerpt + ELLIPSIS }
-		</p>
-	);
+	let excerptContent;
+	if ( isEditable ) {
+		excerptContent = (
+			<RichText
+				className={ excerptClassName }
+				aria-label={ __( 'Excerpt text' ) }
+				value={
+					isSelected
+						? rawOrRenderedExcerpt
+						: ( ! isTrimmed
+								? rawOrRenderedExcerpt
+								: trimmedExcerpt + ELLIPSIS ) ||
+						  __( 'No excerpt found' )
+				}
+				onChange={ setExcerpt }
+				tagName={ preserveFormatting ? 'div' : 'p' }
+				allowedFormats={ [] }
+				preserveWhiteSpace
+			/>
+		);
+	} else if ( preserveFormatting ) {
+		excerptContent = (
+			<div className={ excerptClassName }>
+				{ ! isTrimmed
+					? rawOrRenderedExcerpt || __( 'No excerpt found' )
+					: trimmedExcerpt + ELLIPSIS }
+			</div>
+		);
+	} else {
+		excerptContent = (
+			<p className={ excerptClassName }>
+				{ ! isTrimmed
+					? rawOrRenderedExcerpt || __( 'No excerpt found' )
+					: trimmedExcerpt + ELLIPSIS }
+			</p>
+		);
+	}
 	return (
 		<>
 			<InspectorControls>
@@ -217,10 +235,29 @@ export default function PostExcerptEditor( props ) {
 						setAttributes( {
 							showMoreOnNewLine: true,
 							excerptLength: 55,
+							preserveFormatting: false,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
+					<ToolsPanelItem
+						hasValue={ () => preserveFormatting !== false }
+						label={ __( 'Preserve formatting' ) }
+						onDeselect={ () =>
+							setAttributes( { preserveFormatting: false } )
+						}
+						isShownByDefault
+					>
+						<ToggleControl
+							label={ __( 'Preserve formatting' ) }
+							checked={ preserveFormatting }
+							onChange={ ( newPreserveFormatting ) =>
+								setAttributes( {
+									preserveFormatting: newPreserveFormatting,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={ () => showMoreOnNewLine !== true }
 						label={ __( 'Show link on new line' ) }

@@ -6,6 +6,85 @@
  */
 
 /**
+ * Collects rendered paragraph HTML from a parsed block tree, up to a word limit.
+ *
+ * Only `core/paragraph` blocks are rendered, preserving their `<p>` tags.
+ * Layout container blocks (Group, Columns, Column, Cover, Media & Text) are
+ * recursed into so paragraphs nested inside them are still found.
+ * All other blocks (lists, headings, tables, images, embeds, etc.) are skipped,
+ * matching the default excerpt which discards non-prose formatting.
+ *
+ * @since x.x.x
+ *
+ * @see excerpt_remove_blocks()
+ *
+ * @param array $blocks     Parsed block array from parse_blocks().
+ * @param int   $max_words  Maximum number of words to include.
+ * @param int   $word_count Running word count, passed by reference.
+ * @return string Rendered HTML containing one or more `<p>` tags, safely truncated.
+ */
+function block_core_post_excerpt_render_paragraphs( $blocks, $max_words, &$word_count ) {
+	$output = '';
+
+	/*
+	 * Use the same wrapper-block allowlist that WordPress core uses in
+	 * excerpt_remove_blocks() (wp-includes/blocks.php). Recursing into only
+	 * these blocks ensures our preserve-formatting path is consistent with
+	 * what core considers "excerpt-worthy" container blocks, and the same
+	 * `excerpt_allowed_wrapper_blocks` filter is applied so any site-level
+	 * customisation is automatically inherited here too.
+	 */
+	$allowed_wrapper_blocks = array(
+		'core/columns',
+		'core/column',
+		'core/group',
+	);
+
+	/** This filter is documented in wp-includes/blocks.php */
+	$allowed_wrapper_blocks = apply_filters( 'excerpt_allowed_wrapper_blocks', $allowed_wrapper_blocks );
+
+	foreach ( $blocks as $block ) {
+		if ( $word_count >= $max_words ) {
+			break;
+		}
+
+		// Recurse into wrapper blocks whose inner content counts toward excerpts.
+		if ( in_array( $block['blockName'], $allowed_wrapper_blocks, true ) && ! empty( $block['innerBlocks'] ) ) {
+			$output .= block_core_post_excerpt_render_paragraphs( $block['innerBlocks'], $max_words, $word_count );
+			continue;
+		}
+
+		// Only render core/paragraph blocks — everything else is skipped.
+		if ( 'core/paragraph' !== $block['blockName'] ) {
+			continue;
+		}
+
+		$block_html       = render_block( $block );
+		$block_text       = wp_strip_all_tags( $block_html );
+		$words            = preg_split( '/\s+/u', trim( $block_text ), -1, PREG_SPLIT_NO_EMPTY );
+		$block_word_count = count( $words );
+
+		if ( 0 === $block_word_count ) {
+			continue;
+		}
+
+		if ( $word_count + $block_word_count <= $max_words ) {
+			// Entire paragraph fits within the word limit — render it as-is.
+			$output     .= $block_html;
+			$word_count += $block_word_count;
+		} else {
+			// Paragraph exceeds the remaining budget — trim and append ellipsis.
+			$remaining     = $max_words - $word_count;
+			$trimmed_words = array_slice( $words, 0, $remaining );
+			$output       .= '<p>' . esc_html( implode( ' ', $trimmed_words ) ) . '&hellip;</p>';
+			$word_count    = $max_words;
+		}
+	}
+
+	return $output;
+}
+
+/**
  * Renders the `core/post-excerpt` block on the server.
  *
  * @since 5.8.0
@@ -18,6 +97,60 @@
 function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
+	}
+
+	/*
+	 * Preserve Formatting path: when the toggle is on, bypass get_the_excerpt()
+	 * and render individual paragraph blocks so that paragraph breaks are kept.
+	 * Falls back to the standard flat-text path when:
+	 *   - the toggle is off (default),
+	 *   - the post has a manually written excerpt, or
+	 *   - no paragraph blocks are found in the content.
+	 */
+	if ( ! empty( $attributes['preserveFormatting'] ) ) {
+		$post_id        = (int) $block->context['postId'];
+		$manual_excerpt = get_post_field( 'post_excerpt', $post_id );
+
+		if ( empty( trim( (string) $manual_excerpt ) ) ) {
+			$post_content  = get_post_field( 'post_content', $post_id, 'raw' );
+			$parsed_blocks = parse_blocks( (string) $post_content );
+			$word_count    = 0;
+			$max_words     = isset( $attributes['excerptLength'] ) ? (int) $attributes['excerptLength'] : 55;
+
+			$excerpt_html = block_core_post_excerpt_render_paragraphs( $parsed_blocks, $max_words, $word_count );
+
+			if ( ! empty( $excerpt_html ) ) {
+				$more_text = ! empty( $attributes['moreText'] )
+					? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $post_id ) ) . '">' . wp_kses_post( $attributes['moreText'] ) . '</a>'
+					: '';
+
+				$show_more_on_new_line = ! isset( $attributes['showMoreOnNewLine'] ) || $attributes['showMoreOnNewLine'];
+
+				$classes = array();
+				if ( isset( $attributes['textAlign'] ) ) {
+					$classes[] = 'has-text-align-' . $attributes['textAlign'];
+				}
+				if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+					$classes[] = 'has-link-color';
+				}
+				$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
+
+				/*
+				 * Use a <div> wrapper (not <p>) for the excerpt container so that the
+				 * rendered paragraph <p> tags inside are never nested within another <p>,
+				 * which would produce invalid HTML.
+				 */
+				$inner  = '<div class="wp-block-post-excerpt__excerpt">' . $excerpt_html . '</div>';
+				if ( ! empty( $more_text ) ) {
+					$inner .= $show_more_on_new_line
+						? '<p class="wp-block-post-excerpt__more-text">' . $more_text . '</p>'
+						: $more_text;
+				}
+
+				return sprintf( '<div %s>%s</div>', $wrapper_attributes, $inner );
+			}
+		}
+		// Falls through to the default path below.
 	}
 
 	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . wp_kses_post( $attributes['moreText'] ) . '</a>' : '';

@@ -734,7 +734,7 @@ Display the excerpt.
 -	**Name:** [core/post-excerpt](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-excerpt/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign, textColumns), ~~html~~
--	**Attributes:** excerptLength, moreText, showMoreOnNewLine
+-	**Attributes:** excerptLength, moreText, preserveFormatting, showMoreOnNewLine
 
 ## Featured Image
 

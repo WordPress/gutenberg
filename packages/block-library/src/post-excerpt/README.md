@@ -17,6 +17,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `moreText` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `showMoreOnNewLine` | `boolean` | `true` | — |
 | `excerptLength` | `number` | `55` | — |
+| `preserveFormatting` | `boolean` | `false` | — |
 
 ## Supports
 
