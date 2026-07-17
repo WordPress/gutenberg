@@ -136,6 +136,8 @@ export function getClosestSelectedId( {
 export interface SelectionProps {
 	onMouseDown: ( event: React.MouseEvent ) => void;
 	onClickCapture: ( event: React.MouseEvent ) => void;
+	// Only returned to the picker layouts, whose plain clicks select.
+	onClick?: () => void;
 }
 
 // Encapsulates the pointer gestures for multi-selection, shared by layouts:
@@ -147,6 +149,11 @@ export interface SelectionProps {
 // `getItemId`; the hook derives the selectable items itself (those with a
 // possible bulk action) so every layout doesn't repeat that logic. Spread
 // `getSelectionProps( id )` on each item's container element.
+//
+// The picker layouts select on a plain click instead, and set
+// `pickerMultiselect`; for them the hook also returns the `onClick` that
+// selects and anchors the range, and every rendered item is selectable rather
+// than only those with a bulk action.
 //
 // The selection model is one-dimensional: a range is the contiguous run of
 // selectable items between the anchor and the target. Two-dimensional layouts
@@ -165,12 +172,19 @@ export default function useSelectionProps< Item >( {
 	getItemId,
 	selection,
 	onChangeSelection,
+	pickerMultiselect,
 }: {
 	data: Item[];
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
 	selection: string[];
 	onChangeSelection: SetSelection;
+	// Set by the picker layouts, where clicking an item is what selects it:
+	// `true` toggles the item into a multi-selection, `false` replaces the
+	// selection. Omitted by the other layouts, where a click opens the item and
+	// only the checkbox and modifier gestures select. `isEligible` is
+	// unsupported in a picker, so every rendered item is selectable there.
+	pickerMultiselect?: boolean;
 } ) {
 	// The Shift+Click range gesture in progress: the anchor ranges extend from
 	// — the last item whose selection was directly toggled — and the target of
@@ -182,6 +196,9 @@ export default function useSelectionProps< Item >( {
 		anchorId: string;
 		lastTargetId: string | null;
 	} | null >( null );
+	const anchorTo = ( id: string ) => {
+		gestureRef.current = { anchorId: id, lastTargetId: null };
+	};
 	// Set to true on the first `touchstart` anywhere in the document, and
 	// used to exclude touchscreen devices from the modifier-click gestures.
 	const isTouchDeviceRef = useRef( false );
@@ -196,30 +213,53 @@ export default function useSelectionProps< Item >( {
 			document.removeEventListener( 'touchstart', markTouchDevice );
 	}, [] );
 
-	// The ids of all selectable items — those with a possible bulk action —
-	// in the order the layout renders them; ranges follow this order.
-	const selectableIds = data
-		.filter( ( item ) => hasAPossibleBulkAction( actions, item ) )
-		.map( getItemId );
+	// The ids of all selectable items, in the order the layout renders them;
+	// ranges follow this order. A picker selects from every item it renders, so
+	// bulk actions don't gate it: `isEligible` is unsupported there, and reading
+	// `supportsBulk` with `some` would contradict the `every` that made the
+	// picker single-select in the first place.
+	const isPicker = pickerMultiselect !== undefined;
+	const selectableIds = (
+		isPicker
+			? data
+			: data.filter( ( item ) => hasAPossibleBulkAction( actions, item ) )
+	).map( getItemId );
 	const selectableIdSet = new Set( selectableIds );
 	const hasSelectableItems = selectableIds.length > 0;
+	// A single-select picker has no range to extend and no second item to add,
+	// so the modifier gestures have nothing to offer; its plain clicks are
+	// handled in `onClick` below.
+	const hasRangeGesture = hasSelectableItems && pickerMultiselect !== false;
 
 	const getSelectionProps = ( id: string ): SelectionProps => {
 		const isSelectable = selectableIdSet.has( id );
 		return {
+			// A picker selects on a plain click, so that click is also what
+			// anchors the range a following Shift+Click extends from. Modifier
+			// clicks never reach here: `onClickCapture` stops them.
+			...( isPicker && {
+				onClick: () => {
+					if ( selection.includes( id ) ) {
+						onChangeSelection(
+							selection.filter( ( itemId ) => id !== itemId )
+						);
+					} else {
+						onChangeSelection(
+							pickerMultiselect ? [ ...selection, id ] : [ id ]
+						);
+					}
+					anchorTo( id );
+				},
+			} ),
 			onMouseDown: ( event: React.MouseEvent ) => {
 				// Prevent native text selection from swallowing the
 				// Shift+Click range selection gesture.
-				if (
-					event.button === 0 &&
-					event.shiftKey &&
-					hasSelectableItems
-				) {
+				if ( event.button === 0 && event.shiftKey && hasRangeGesture ) {
 					event.preventDefault();
 				}
 			},
 			onClickCapture: ( event: React.MouseEvent ) => {
-				if ( ! hasSelectableItems ) {
+				if ( ! hasRangeGesture ) {
 					return;
 				}
 
@@ -235,10 +275,7 @@ export default function useSelectionProps< Item >( {
 					// it in the checkbox's own handler; it only anchors a new
 					// gesture here.
 					if ( isSelectable && isSelectionCheckboxClick ) {
-						gestureRef.current = {
-							anchorId: id,
-							lastTargetId: null,
-						};
+						anchorTo( id );
 					}
 					return;
 				}
@@ -310,7 +347,7 @@ export default function useSelectionProps< Item >( {
 							? selection.filter( ( itemId ) => id !== itemId )
 							: [ ...selection, id ]
 					);
-					gestureRef.current = { anchorId: id, lastTargetId: null };
+					anchorTo( id );
 				}
 			},
 		};
