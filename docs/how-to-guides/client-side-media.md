@@ -356,11 +356,10 @@ The endpoint checks that the uploaded file's dimensions are appropriate for the 
 | --- | --- | --- |
 | Client-side processing not activating | Browser lacks Document-Isolation-Policy support | Client-side processing requires Chrome/Edge 137+. Check `window.crossOriginIsolated` in the browser console. |
 | Client-side processing not activating on Chrome 137+ | `Document-Isolation-Policy` header not sent | Verify you're editing a post or page (the header is skipped on admin pages with an `action` other than `edit`). Some third-party page builders may suppress the header. |
-| WASM module fails to load | Incorrect MIME type for `.wasm` files | Add `AddType application/wasm wasm` to your `.htaccess` or server configuration. WordPress does this automatically for Apache via `mod_rewrite_rules`. |
 | CSP blocks worker creation | `worker-src` directive too restrictive | Add `blob:` to the `worker-src` CSP directive: `worker-src 'self' blob:` |
 | Processing falls back on capable browser | Feature disabled server-side | Check that `wp_client_side_media_processing_enabled` filter is not returning `false`. |
 | Large images cause browser to slow down | Insufficient device memory | Devices with ≤ 2 GB RAM are automatically excluded. Consider reducing the big image size threshold for your site. |
-| Feature disabled on a low-spec laptop | Below 2 CPU cores or 2 GB RAM | These thresholds protect underpowered devices from OOMs. Disable the gate per request only if you've confirmed the device can handle WASM image processing. |
+| Feature disabled on a low-spec laptop | Below 2 CPU cores or 2 GB RAM | These thresholds protect underpowered devices from out-of-memory crashes and are not configurable. Affected devices fall back to server-side processing. |
 | Feature disabled on slow network | `2g`/`slow-2g` connection or Save-Data is on | The ~13 MB worker download is gated behind `effectiveType` and `saveData`. `3g` and faster connections are allowed. |
 | HEIC upload error on a server without HEIC support | Server-side HEIC decoder missing | The client converts HEIC to JPEG before upload — this should not occur in browsers that match `isHeicCanvasSupported()`. Verify the browser provides `createImageBitmap` and `OffscreenCanvas`. |
 | Upload fails with "image transcoding error" | Unsupported format or corrupt file | Verify the file is a supported format (JPEG, PNG, WebP, AVIF, GIF, HEIC). |
