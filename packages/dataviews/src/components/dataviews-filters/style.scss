@@ -408,7 +408,7 @@
 
 .dataviews-search {
 	// Fixed width to ensure the control doesn't resize with the reset button.
-	width: 210px;
+	flex-basis: 210px;
 }
 
 .dataviews-filters__user-input-widget {
