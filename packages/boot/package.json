@@ -39,6 +39,9 @@
 	},
 	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
+	"sideEffects": [
+		"src/**/*.module.scss"
+	],
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/admin-ui": "file:../admin-ui",
