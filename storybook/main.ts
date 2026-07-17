@@ -127,7 +127,7 @@ const config: StorybookConfig = {
 			plugins: [
 				dsTokenFallbacksJs(),
 				react( {
-					jsxImportSource: getAbsolutePath( '@emotion/react' ),
+					jsxImportSource: '@emotion/react',
 					babel: {
 						plugins: [ getAbsolutePath( '@emotion/babel-plugin' ) ],
 					},
@@ -231,12 +231,6 @@ const config: StorybookConfig = {
 				},
 			},
 			optimizeDeps: {
-				// Pre-bundle CJS deps so Vite exposes a default export for Emotion.
-				include: [
-					'@emotion/react',
-					'@emotion/styled',
-					'hoist-non-react-statics',
-				],
 				esbuildOptions: {
 					loader: {
 						'.js': 'tsx',
