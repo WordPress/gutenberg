@@ -117,7 +117,7 @@ function isBundledPackageForScripts( request ) {
 		return false;
 	}
 
-	return packageMetadata.wpScript === false;
+	return packageMetadata.wpScript !== true;
 }
 
 /**
