@@ -1,6 +1,6 @@
 # Storybook Playwright Tests
 
-This is primarily set up for testing visual regressions in the `components` package. Visual regression tests do not run on CI and are meant as a testing tool for local development. A focused smoke test runs on CI against the development Storybook server.
+This is currently set up for testing visual regressions in the `components` package. The tests do not run on CI, and is meant as a testing tool for local development.
 
 ## How to run
 

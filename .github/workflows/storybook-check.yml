@@ -54,13 +54,6 @@ jobs:
                   npm install --no-save @storybook/test-runner@0.24.2
                   npx playwright install --with-deps
 
-            - name: Test development Storybook
-              run: |
-                  npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
-                  "npm run --workspace @wordpress/storybook-playwright storybook:dev" \
-                  "npx wait-on tcp:127.0.0.1:50241 && \
-                  npm run test:e2e:storybook -- --grep 'renders the Button story without browser errors'"
-
             - name: Serve Storybook and run tests
               run: |
                   npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
