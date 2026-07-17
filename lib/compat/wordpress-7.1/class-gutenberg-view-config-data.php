@@ -12,7 +12,8 @@
  * filter callbacks receive: a callback changes the configuration by calling
  * methods on the instance and returning it. The configuration has four
  * top-level keys — `default_view`, `default_layouts`, `view_list`, and
- * `form` — and there are two ways to contribute:
+ * `form` — and there are three ways to contribute. They form a gradient of how
+ * deep the replacement reaches:
  *
  * - The `merge()` method merges partial changes (patches) into what is already
  *   there: `default_view`, `default_layouts`, and the `form` settings by key,
@@ -25,14 +26,22 @@
  *   default choice — a callback that replaces a list stops inheriting core's
  *   future additions to it — but it's useful when a contributor needs to pin
  *   a list to an exact set of members.
+ * - `set()` goes one step further: it replaces each top-level key the patch
+ *   names wholesale, dropping whatever that key held instead of merging into
+ *   it. It's for a callback that owns a key outright and wants to pin it to an
+ *   exact shape without the inherited default leaking through a key-by-key
+ *   merge.
  *
- * Both methods follow the same rules for the rest of a patch: an associative
- * array merges key by key, `null` deletes what it names — deleting a whole
- * top-level key resets it to its default — and a scalar replaces the current
- * value. Each patch also declares the configuration schema version it was
- * written against (currently 1), so a future WordPress release that changes
- * the configuration shape can migrate existing patches forward instead of
- * breaking them.
+ * All three touch only the top-level keys the patch names — an omitted key
+ * keeps whatever it had, and a `null` value drops the key it names, which
+ * resets it to its default. They differ only in how deep the replacement
+ * reaches once a key is named: `merge()` and `replace()` merge the value in
+ * key by key (an associative array merges member by member, a nested `null`
+ * deletes just that leaf, a scalar replaces just that value), while `set()`
+ * swaps the whole value. Each patch also declares the configuration schema
+ * version it was written against (currently 1), so a future WordPress release
+ * that changes the configuration shape can migrate existing patches forward
+ * instead of breaking them.
  *
  * @since 7.1.0
  */
@@ -85,6 +94,32 @@ class Gutenberg_View_Config_Data {
 	}
 
 	/**
+	 * Replaces whole top-level keys, leaving the rest of the configuration alone.
+	 *
+	 * Like merge() and replace(), set() applies a patch of top-level keys and
+	 * touches only the keys the patch names: a key the patch omits keeps whatever
+	 * it had, and a `null` value drops the key it names (which resets it to its
+	 * default). The difference is depth — where merge() and replace() merge a
+	 * named key's value into the current one key by key, set() swaps the whole
+	 * value in wholesale, dropping whatever the key held before.
+	 *
+	 * Use it when a callback owns a key outright and wants to pin it to an exact
+	 * shape, without the inherited default leaking through a key-by-key merge.
+	 *
+	 * A patch that declares an unsupported schema version is rejected and does
+	 * not change anything.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param array $patch   The partial configuration whose named keys to replace.
+	 * @param int   $version The schema version the patch was authored against.
+	 * @return Gutenberg_View_Config_Data The instance, for chaining.
+	 */
+	public function set( array $patch, int $version ) {
+		return $this->apply( $patch, $version, __METHOD__, 'set' );
+	}
+
+	/**
 	 * Replaces list values while merging the rest of a partial configuration.
 	 *
 	 * Takes the same arguments as merge() and applies the patch the same way,
@@ -107,7 +142,7 @@ class Gutenberg_View_Config_Data {
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
 	public function replace( array $patch, int $version ) {
-		return $this->apply( $patch, $version, __METHOD__, true );
+		return $this->apply( $patch, $version, __METHOD__, 'replace' );
 	}
 
 	/**
@@ -141,25 +176,31 @@ class Gutenberg_View_Config_Data {
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
 	public function merge( array $patch, int $version ) {
-		return $this->apply( $patch, $version, __METHOD__, false );
+		return $this->apply( $patch, $version, __METHOD__, 'merge' );
 	}
 
 	/**
 	 * Applies a patch to the configuration, top-level key by top-level key.
 	 *
-	 * Shared by merge() and replace(); the two differ only in how a list in the
-	 * patch is treated, which is carried by $replace_lists.
+	 * Shared by merge(), replace(), and set(); the three differ only in how the
+	 * value of a named key is applied, which is carried by $mode:
+	 *
+	 * - `merge`   merges the value into the current one, lists by member identity;
+	 * - `replace` merges the value in the same way but swaps lists wholesale;
+	 * - `set`     swaps the whole value in wholesale, without merging.
+	 *
+	 * In every mode a `null` value drops the key it names and an omitted key is
+	 * left untouched, so all three compose the same way at the top level.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param array  $patch         The partial configuration to apply.
-	 * @param int    $version       The schema version the patch was authored against.
-	 * @param string $method        The public method the patch was passed to, for misuse reporting.
-	 * @param bool   $replace_lists Whether a list in the patch replaces the current list
-	 *                              wholesale ( replace() ) instead of merging by identity ( merge() ).
+	 * @param array  $patch   The partial configuration to apply.
+	 * @param int    $version The schema version the patch was authored against.
+	 * @param string $method  The public method the patch was passed to, for misuse reporting.
+	 * @param string $mode    How to apply each named key's value: `merge`, `replace`, or `set`.
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
-	private function apply( array $patch, int $version, $method, $replace_lists ) {
+	private function apply( array $patch, int $version, $method, $mode ) {
 		if ( $version <= 0 || $version > self::LATEST_VERSION ) {
 			_doing_it_wrong(
 				esc_html( $method ),
@@ -190,7 +231,11 @@ class Gutenberg_View_Config_Data {
 				continue;
 			}
 
-			$this->config[ $key ] = $this->merge_properties( $this->config[ $key ] ?? array(), $value, $replace_lists );
+			// set() swaps the whole value in; merge()/replace() merge it into the
+			// current one, differing only in how they treat lists.
+			$this->config[ $key ] = 'set' === $mode
+				? $value
+				: $this->merge_properties( $this->config[ $key ] ?? array(), $value, 'replace' === $mode );
 		}
 
 		return $this;

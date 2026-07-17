@@ -159,8 +159,9 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 	 * (a patch) into the current configuration, and `replace()` applies a
 	 * patch the same way but swaps any list it names wholesale instead of
 	 * merging it by member identity. Both take the patch and the schema
-	 * version it was authored against. Callbacks must return the object they
-	 * were given.
+	 * version it was authored against. `set()` ignores what is already there
+	 * and replaces the whole configuration, for a callback that owns every key
+	 * for the entity. Callbacks must return the object they were given.
 	 *
 	 * @param Gutenberg_View_Config_Data $data   The view configuration container
 	 *                                           for the entity, exposing the
@@ -326,13 +327,16 @@ function _gutenberg_get_entity_view_config_post_type_page( $data ) {
 		),
 	);
 
-	// Fully replace these keys. Because replace() merges a map key by key, drop
-	// the inherited default first ( a null patch ) so no base key leaks through,
-	// then set the new value.
-	$data->replace( array( 'default_layouts' => null ), 1 );
-	$data->replace( array( 'default_layouts' => $default_layouts ), 1 );
-	$data->replace( array( 'default_view' => null ), 1 );
-	$data->replace( array( 'default_view' => $default_view ), 1 );
+	// Pin default_view and default_layouts to an exact shape: set() replaces them
+	// wholesale, so no inherited default leaks through a key-by-key merge. The
+	// inherited form is left untouched.
+	$data->set(
+		array(
+			'default_view'    => $default_view,
+			'default_layouts' => $default_layouts,
+		),
+		1
+	);
 	// Append the status views, thereby preserving the base "all items" view,
 	// so its post-type-specific title is kept.
 	$data->merge( array( 'view_list' => $view_list ), 1 );
@@ -373,14 +377,6 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $data ) {
 		'filters'    => array(),
 		'layout'     => $default_layouts['grid']['layout'],
 	);
-
-	// Fully replace these keys. Because replace() merges a map key by key, drop
-	// the inherited default first ( a null patch ) so no base key leaks through,
-	// then set the new value.
-	$data->replace( array( 'default_layouts' => null ), 1 );
-	$data->replace( array( 'default_layouts' => $default_layouts ), 1 );
-	$data->replace( array( 'default_view' => null ), 1 );
-	$data->replace( array( 'default_view' => $default_view ), 1 );
 
 	$view_list = array(
 		array(
@@ -429,35 +425,36 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $data ) {
 		);
 	}
 
-	// view_list is a list, so a single replace() swaps it wholesale.
-	$data->replace( array( 'view_list' => $view_list ), 1 );
-
-	// Fully replace the form: drop the inherited default first ( a null patch )
-	// so no base key leaks through the map merge, then set the new value.
-	$data->replace( array( 'form' => null ), 1 );
-	$data->replace(
-		array(
-			'form' => array(
-				'layout' => array( 'type' => 'panel' ),
-				'fields' => array(
-					array(
-						'id'     => 'excerpt',
-						'layout' => array(
-							'type'          => 'panel',
-							'labelPosition' => 'top',
-						),
-					),
-					array(
-						'id'     => 'post-content-info',
-						'layout' => array(
-							'type'          => 'regular',
-							'labelPosition' => 'none',
-						),
-					),
-					'sync-status',
-					'revisions',
+	$form = array(
+		'layout' => array( 'type' => 'panel' ),
+		'fields' => array(
+			array(
+				'id'     => 'excerpt',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'top',
 				),
 			),
+			array(
+				'id'     => 'post-content-info',
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'none',
+				),
+			),
+			'sync-status',
+			'revisions',
+		),
+	);
+
+	// This callback owns the whole configuration for the entity, so replace it
+	// wholesale with set() instead of patching the inherited defaults key by key.
+	$data->set(
+		array(
+			'default_view'    => $default_view,
+			'default_layouts' => $default_layouts,
+			'view_list'       => $view_list,
+			'form'            => $form,
 		),
 		1
 	);
@@ -496,14 +493,6 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $data ) {
 		'filters'    => array(),
 		'layout'     => $default_layouts['grid']['layout'],
 	);
-
-	// Fully replace these keys. Because replace() merges a map key by key, drop
-	// the inherited default first ( a null patch ) so no base key leaks through,
-	// then set the new value.
-	$data->replace( array( 'default_layouts' => null ), 1 );
-	$data->replace( array( 'default_layouts' => $default_layouts ), 1 );
-	$data->replace( array( 'default_view' => null ), 1 );
-	$data->replace( array( 'default_view' => $default_view ), 1 );
 
 	$view_list = array(
 		array(
@@ -546,27 +535,28 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $data ) {
 		);
 	}
 
-	// view_list is a list, so a single replace() swaps it wholesale.
-	$data->replace( array( 'view_list' => $view_list ), 1 );
-
-	// Fully replace the form: drop the inherited default first ( a null patch )
-	// so no base key leaks through the map merge, then set the new value.
-	$data->replace( array( 'form' => null ), 1 );
-	$data->replace(
-		array(
-			'form' => array(
-				'layout' => array( 'type' => 'panel' ),
-				'fields' => array(
-					array(
-						'id'     => 'last_edited_date',
-						'layout' => array(
-							'type'          => 'panel',
-							'labelPosition' => 'none',
-						),
-					),
-					'revisions',
+	$form = array(
+		'layout' => array( 'type' => 'panel' ),
+		'fields' => array(
+			array(
+				'id'     => 'last_edited_date',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'none',
 				),
 			),
+			'revisions',
+		),
+	);
+
+	// This callback owns the whole configuration for the entity, so replace it
+	// wholesale with set() instead of patching the inherited defaults key by key.
+	$data->set(
+		array(
+			'default_view'    => $default_view,
+			'default_layouts' => $default_layouts,
+			'view_list'       => $view_list,
+			'form'            => $form,
 		),
 		1
 	);
@@ -601,14 +591,6 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $data ) {
 		'grid'  => array( 'showMedia' => true ),
 		'list'  => array( 'showMedia' => false ),
 	);
-
-	// Fully replace these keys. Because replace() merges a map key by key, drop
-	// the inherited default first ( a null patch ) so no base key leaks through,
-	// then set the new value.
-	$data->replace( array( 'default_view' => null ), 1 );
-	$data->replace( array( 'default_view' => $default_view ), 1 );
-	$data->replace( array( 'default_layouts' => null ), 1 );
-	$data->replace( array( 'default_layouts' => $default_layouts ), 1 );
 
 	$view_list = array(
 		array(
@@ -748,50 +730,50 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $data ) {
 		}
 	}
 
-	// view_list is a list, so a single replace() swaps it wholesale.
-	$data->replace( array( 'view_list' => array_merge( $view_list, $registered_authors, $user_authors ) ), 1 );
-
-	// Fully replace the form: drop the inherited default first ( a null patch )
-	// so no base key leaks through the map merge, then set the new value.
-	$data->replace( array( 'form' => null ), 1 );
-	$data->replace(
-		array(
-			'form' => array(
-				'layout' => array( 'type' => 'panel' ),
-				'fields' => array(
-					array(
-						'id'     => 'description',
-						'layout' => array(
-							'type'          => 'panel',
-							'labelPosition' => 'top',
-						),
-					),
-					array(
-						'id'     => 'description_readonly',
-						'layout' => array(
-							'type'          => 'regular',
-							'labelPosition' => 'none',
-						),
-					),
-					array(
-						'id'     => 'last_edited_date',
-						'layout' => array(
-							'type'          => 'panel',
-							'labelPosition' => 'none',
-						),
-					),
-					'revisions',
-					// The following fields are only meaningful in the `home`/`index`
-					// template summary. They edit other entities (`root/site` and the
-					// posts page); the editor merges those records into the form data
-					// under a namespace and controls when the fields are shown.
-					'posts_page_title',
-					'posts_per_page',
-					'default_comment_status',
+	$form = array(
+		'layout' => array( 'type' => 'panel' ),
+		'fields' => array(
+			array(
+				'id'     => 'description',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'top',
 				),
 			),
+			array(
+				'id'     => 'description_readonly',
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'none',
+				),
+			),
+			array(
+				'id'     => 'last_edited_date',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'none',
+				),
+			),
+			'revisions',
+			// The following fields are only meaningful in the `home`/`index`
+			// template summary. They edit other entities (`root/site` and the
+			// posts page); the editor merges those records into the form data
+			// under a namespace and controls when the fields are shown.
+			'posts_page_title',
+			'posts_per_page',
+			'default_comment_status',
 		),
-		1
+	);
+
+	// This callback owns the whole configuration for the entity, so replace it
+	// wholesale with set() instead of patching the inherited defaults key by key.
+	$data->set(
+		array(
+			'default_view'    => $default_view,
+			'default_layouts' => $default_layouts,
+			'view_list'       => array_merge( $view_list, $registered_authors, $user_authors ),
+			'form'            => $form,
+		)
 	);
 
 	return $data;

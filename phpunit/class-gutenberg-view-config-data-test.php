@@ -9,6 +9,114 @@
 class Tests_View_Config_Data extends WP_UnitTestCase {
 
 	/**
+	 * set() replaces the whole value of each top-level key it names, dropping
+	 * whatever that key held before instead of merging into it, while a key the
+	 * patch omits (`form`) is left untouched. This is where it diverges from
+	 * replace(), which would keep the untouched props under `default_view`.
+	 *
+	 * @covers ::set
+	 */
+	public function test_set_replaces_named_keys_and_leaves_the_rest() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'type'       => 'table',
+					'perPage'    => 23,
+					'showLevels' => true,
+					'fields'     => array( 'f1', 'f2' ),
+					'sort'       => array(
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
+				),
+				'form'         => array(
+					'fields' => array( 'f1', 'f2' ),
+				),
+			)
+		);
+		$data->set(
+			array(
+				'default_view' => array(
+					'type' => 'table',
+				),
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				'default_view' => array(
+					'type' => 'table',
+				),
+				'form'         => array(
+					'fields' => array( 'f1', 'f2' ),
+				),
+			),
+			$data->get_data()
+		);
+	}
+
+	/**
+	 * set() drops a whole top-level key when the patch value is null, leaving the
+	 * keys it does not name in place.
+	 *
+	 * @covers ::set
+	 */
+	public function test_set_null_unsets_top_level_keys() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array( 'type' => 'table' ),
+				'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
+			)
+		);
+		$data->set(
+			array(
+				'default_view' => null,
+			),
+			1
+		);
+
+		$this->assertSame(
+			array( 'form' => array( 'layout' => array( 'type' => 'panel' ) ) ),
+			$data->get_data()
+		);
+	}
+
+	/**
+	 * set() rejects an undocumented top-level key and leaves the configuration
+	 * untouched.
+	 *
+	 * @covers ::set
+	 */
+	public function test_set_rejects_unknown_key() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
+
+		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
+		$before = $data->get_data();
+		$data->set( array( 'not_a_real_key' => 'nope' ), 1 );
+
+		$this->assertSame( $before, $data->get_data() );
+	}
+
+	/**
+	 * set() rejects a patch with an unsupported version and leaves the
+	 * configuration untouched.
+	 *
+	 * @covers ::set
+	 */
+	public function test_set_rejects_updates_with_invalid_version() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
+
+		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
+		$before = $data->get_data();
+
+		$version = Gutenberg_View_Config_Data::LATEST_VERSION + 1;
+		$data->set( array( 'default_view' => array( 'type' => 'grid' ) ), $version );
+
+		$this->assertSame( $before, $data->get_data() );
+	}
+
+	/**
 	 * replace() merges scalar and associative properties within a documented
 	 * key just like merge() does — the untouched `fields` and `sort` under
 	 * default_view survive; only the keys the patch names change.
