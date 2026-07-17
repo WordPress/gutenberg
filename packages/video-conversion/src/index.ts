@@ -164,6 +164,13 @@ export async function convertGifToVideo(
 			const source = new VideoSampleSource( {
 				codec,
 				bitrate: QUALITY_HIGH,
+				/*
+				 * A sparser key frame cadence than mediabunny's 2s default
+				 * roughly halves the output size for long GIFs at no
+				 * encode-time or quality cost. These looping, autoplaying
+				 * GIF replacements don't need fine seek granularity.
+				 */
+				keyFrameInterval: 10,
 			} );
 			const target = new BufferTarget();
 			const output = new Output( {
