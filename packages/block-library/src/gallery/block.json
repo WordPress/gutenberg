@@ -116,13 +116,6 @@
 		"aspectRatio": {
 			"type": "string",
 			"default": "auto"
-		},
-		"orderBy": {
-			"type": "string"
-		},
-		"order": {
-			"type": "string",
-			"default": "asc"
 		}
 	},
 	"providesContext": {

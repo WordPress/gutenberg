@@ -307,8 +307,6 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
  * @return string The content of the block being rendered.
  */
 function block_core_gallery_render( $attributes, $content, $block ) {
-	static $global_styles = null;
-
 	// In dynamic mode the gallery's images are resolved at render time instead of
 	// being authored as inner blocks, so `save.js` persists at most the
 	// gallery-level caption — a bare `<figcaption>`, or nothing when there is no
@@ -401,20 +399,7 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
 	// gap on the gallery.
 	$fallback_gap = 'var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )';
-
-	if ( null === $global_styles ) {
-		$global_styles = function_exists( 'wp_get_global_styles' ) ? wp_get_global_styles() : array();
-	}
-
-	$global_gallery_styles = $global_styles['blocks']['core/gallery'] ?? array();
-	$global_gallery_gap    = $global_gallery_styles['spacing']['blockGap'] ?? $fallback_gap;
-	$has_block_gap         = is_array( $style_attr['spacing'] ?? null ) && array_key_exists( 'blockGap', $style_attr['spacing'] );
-	// Prefer the block's own gap value, then Gallery global styles. Missing
-	// values fall back to the Gallery blockGap default.
-	$block_gap  = $has_block_gap
-		? $style_attr['spacing']['blockGap']
-		: $global_gallery_gap;
-	$gap_column = block_core_gallery_get_column_gap_value( $block_gap, $fallback_gap );
+	$gap_column   = block_core_gallery_get_column_gap_value( $style_attr['spacing']['blockGap'] ?? null, $fallback_gap );
 
 	// Set the CSS variable to the column value for Gallery's flex width calculations.
 	$gallery_styles = array(
@@ -437,24 +422,8 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	}
 
 	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
-		$viewport_style                = $style_attr[ $breakpoint ] ?? null;
-		$has_viewport_block_gap        = is_array( $viewport_style ) &&
-			is_array( $viewport_style['spacing'] ?? null ) &&
-			array_key_exists( 'blockGap', $viewport_style['spacing'] );
-		$has_global_viewport_block_gap = is_array( $global_gallery_styles[ $breakpoint ]['spacing'] ?? null ) &&
-			array_key_exists( 'blockGap', $global_gallery_styles[ $breakpoint ]['spacing'] );
-
-		// Viewport-specific block values win. Gallery global viewport values
-		// only apply when the block has no base gap, so they do not override an instance value.
-		if ( $has_viewport_block_gap ) {
-			$viewport_gap = $viewport_style['spacing']['blockGap'];
-		} elseif ( ! $has_block_gap && $has_global_viewport_block_gap ) {
-			$viewport_gap = $global_gallery_styles[ $breakpoint ]['spacing']['blockGap'];
-		} else {
-			continue;
-		}
-
-		if ( null === $viewport_gap ) {
+		$viewport_style = $style_attr[ $breakpoint ] ?? null;
+		if ( ! is_array( $viewport_style ) || ! isset( $viewport_style['spacing']['blockGap'] ) ) {
 			continue;
 		}
 
@@ -462,7 +431,7 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 			'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
 			'declarations' => array(
 				'--wp--style--unstable-gallery-gap' => block_core_gallery_get_column_gap_value(
-					$viewport_gap,
+					$viewport_style['spacing']['blockGap'],
 					$fallback_gap
 				),
 			),
@@ -490,8 +459,7 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	 *
 	 * @see: https://github.com/WordPress/gutenberg/pull/58733
 	 */
-	$order_by = $attributes['orderBy'] ?? null;
-	if ( ! empty( $attributes['randomOrder'] ) || 'rand' === $order_by ) {
+	if ( ! empty( $attributes['randomOrder'] ) ) {
 		// This pattern matches figure elements with the `wp-block-image`
 		// class to avoid the gallery's wrapping `figure` element and
 		// extract images only.
@@ -511,84 +479,6 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 				$updated_content
 			);
 		}
-	} elseif ( $order_by && 'custom' !== $order_by ) {
-		$pattern = '/<figure[^>]*\bwp-block-image\b[^>]*>.*?<\/figure>/s';
-
-		preg_match_all( $pattern, $updated_content, $matches );
-		if ( ! $matches || empty( $matches[0] ) ) {
-			return $updated_content;
-		}
-
-		$image_blocks = $matches[0];
-		$image_ids    = array();
-
-		foreach ( $image_blocks as $block_html ) {
-			$image_id = 0;
-			if ( preg_match( '/wp-image-(\d+)/', $block_html, $id_match ) ) {
-				$image_id = (int) $id_match[1];
-			}
-			$image_ids[] = $image_id;
-		}
-
-		$valid_ids = array_values( array_filter( $image_ids ) );
-		if ( empty( $valid_ids ) ) {
-			return $updated_content;
-		}
-
-		$attachments = get_posts(
-			array(
-				'post_type'      => 'attachment',
-				'post__in'       => $valid_ids,
-				'orderby'        => 'post__in',
-				'posts_per_page' => -1,
-				'fields'         => 'all',
-			)
-		);
-
-		$attachment_map = array();
-		foreach ( $attachments as $attachment ) {
-			$attachment_map[ $attachment->ID ] = $attachment;
-		}
-
-		$sort_values = array();
-		foreach ( $image_ids as $i => $id ) {
-			$attachment = isset( $attachment_map[ $id ] ) ? $attachment_map[ $id ] : null;
-
-			if ( ! $attachment ) {
-				$sort_values[ $i ] = 'date' === $order_by ? '0000-00-00 00:00:00' : '';
-				continue;
-			}
-
-			switch ( $order_by ) {
-				case 'title':
-					$sort_values[ $i ] = $attachment->post_title;
-					break;
-				case 'date':
-					$sort_values[ $i ] = $attachment->post_date;
-					break;
-				case 'menu_order':
-					$sort_values[ $i ] = (int) $attachment->menu_order;
-					break;
-				case 'id':
-					$sort_values[ $i ] = $attachment->ID;
-					break;
-				default:
-					$sort_values[ $i ] = 0;
-			}
-		}
-
-		$order_direction = strtoupper( $attributes['order'] ?? 'asc' ) === 'DESC' ? SORT_DESC : SORT_ASC;
-		$sort_flags      = ( 'menu_order' === $order_by || 'id' === $order_by ) ? SORT_NUMERIC : SORT_STRING;
-		array_multisort( $sort_values, $order_direction, $sort_flags, $image_blocks );
-
-		$i               = 0;
-		$updated_content = preg_replace_callback(
-			$pattern,
-			static function () use ( $image_blocks, &$i ) {
-				return $image_blocks[ $i++ ];
-			},
-			$updated_content
-		);
 	}
 
 	// Gets all image IDs from the state that match this gallery's ID.

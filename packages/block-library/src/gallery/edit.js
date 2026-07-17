@@ -42,6 +42,7 @@ import {
 	image as imageIcon,
 	linkOff,
 	fullscreen,
+	listView,
 } from '@wordpress/icons';
 
 /**
@@ -116,10 +117,6 @@ const NAVIGATION_BUTTON_TYPE_OPTIONS = [
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const SORT_OPTIONS = [
-	{
-		label: __( 'Custom order' ),
-		value: 'custom/asc',
-	},
 	{
 		label: __( 'Title A → Z' ),
 		value: 'title/asc',
@@ -200,8 +197,6 @@ export default function GalleryEdit( props ) {
 		linkTo,
 		sizeSlug,
 		aspectRatio,
-		orderBy,
-		order,
 	} = attributes;
 
 	const {
@@ -543,75 +538,42 @@ export default function GalleryEdit( props ) {
 		setAttributes( { randomOrder: ! randomOrder } );
 	}
 
-	function sortInnerBlocks( blocks, sortBy, sortDirection, mediaData ) {
-		if ( ! sortBy || sortBy === 'custom' ) {
-			return blocks;
+	function getMediaSortValue( block, field ) {
+		const media = imageData.find( ( m ) => m.id === block.attributes.id );
+		if ( field === 'title' ) {
+			return ( media?.title?.raw ?? '' ).toLowerCase();
 		}
-
-		const blocksWithValue = blocks.map( ( block ) => {
-			const media = mediaData.find(
-				( m ) => m.id === block.attributes.id
-			);
-			let sortValue;
-
-			switch ( sortBy ) {
-				case 'title':
-					sortValue = media?.title?.raw ?? '';
-					break;
-				case 'date':
-					sortValue = media?.date ?? '';
-					break;
-				case 'id':
-					sortValue = block.attributes.id ?? 0;
-					break;
-				default:
-					sortValue = 0;
-			}
-
-			return { block, sortValue };
-		} );
-
-		const dir = sortDirection === 'desc' ? -1 : 1;
-
-		blocksWithValue.sort( ( a, b ) => {
-			if ( a.sortValue < b.sortValue ) {
-				return -1 * dir;
-			}
-			if ( a.sortValue > b.sortValue ) {
-				return 1 * dir;
-			}
-			return 0;
-		} );
-
-		return blocksWithValue.map( ( { block } ) => block );
+		if ( field === 'date' ) {
+			return media?.date ?? '';
+		}
+		if ( field === 'id' ) {
+			return block.attributes.id ?? 0;
+		}
+		return 0;
 	}
 
-	useEffect( () => {
-		if ( ! hasImages || isDynamic || ! orderBy || orderBy === 'custom' ) {
-			return;
-		}
-
+	function sortImages( sortBy ) {
 		if ( ! imageData || imageData.length === 0 ) {
 			return;
 		}
 
-		const sorted = sortInnerBlocks(
-			innerBlockImages,
-			orderBy,
-			order || 'asc',
-			imageData
-		);
+		const [ field, direction ] = sortBy.split( '/' );
+		const sorted = [ ...innerBlockImages ].sort( ( a, b ) => {
+			const valueA = getMediaSortValue( a, field );
+			const valueB = getMediaSortValue( b, field );
 
-		const currentIds = innerBlockImages
-			.map( ( b ) => b.clientId )
-			.join( ',' );
-		const newIds = sorted.map( ( b ) => b.clientId ).join( ',' );
+			if ( valueA < valueB ) {
+				return direction === 'desc' ? 1 : -1;
+			}
+			if ( valueA > valueB ) {
+				return direction === 'desc' ? -1 : 1;
+			}
+			return 0;
+		} );
 
-		if ( currentIds !== newIds ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( clientId, sorted, false );
-		}
-	}, [ orderBy, order, imageData ] );
+		__unstableMarkNextChangeAsNotPersistent();
+		replaceInnerBlocks( clientId, sorted, false );
+	}
 
 	function toggleOpenInNewTab( openInNewTab ) {
 		const newLinkTarget = openInNewTab ? '_blank' : undefined;
@@ -828,8 +790,6 @@ export default function GalleryEdit( props ) {
 							columns: undefined,
 							imageCrop: true,
 							randomOrder: false,
-							orderBy: undefined,
-							order: undefined,
 						} );
 
 						setAspectRatio( 'auto' );
@@ -909,38 +869,6 @@ export default function GalleryEdit( props ) {
 							onChange={ toggleImageCrop }
 						/>
 					</ToolsPanelItem>
-					{ ! isDynamic && (
-						<ToolsPanelItem
-							isShownByDefault
-							label={ __( 'Order by' ) }
-							hasValue={ () =>
-								!! orderBy && orderBy !== 'custom'
-							}
-							onDeselect={ () =>
-								setAttributes( {
-									orderBy: undefined,
-									order: undefined,
-								} )
-							}
-						>
-							<SelectControl
-								label={ __( 'Order by' ) }
-								value={ `${ orderBy || 'custom' }/${
-									order || 'asc'
-								}` }
-								options={ SORT_OPTIONS }
-								onChange={ ( value ) => {
-									const [ newOrderBy, newOrder ] =
-										value.split( '/' );
-									setAttributes( {
-										orderBy: newOrderBy,
-										order: newOrder,
-									} );
-								} }
-								hideCancelButton
-							/>
-						</ToolsPanelItem>
-					) }
 					<ToolsPanelItem
 						isShownByDefault
 						label={ __( 'Randomize order' ) }
@@ -1060,6 +988,28 @@ export default function GalleryEdit( props ) {
 						</MenuGroup>
 					) }
 				</ToolbarDropdownMenu>
+				{ ! isDynamic && hasImages && (
+					<ToolbarDropdownMenu
+						icon={ listView }
+						label={ __( 'Sort images' ) }
+					>
+						{ ( { onClose } ) => (
+							<MenuGroup>
+								{ SORT_OPTIONS.map( ( option ) => (
+									<MenuItem
+										key={ option.value }
+										onClick={ () => {
+											sortImages( option.value );
+											onClose();
+										} }
+									>
+										{ option.label }
+									</MenuItem>
+								) ) }
+							</MenuGroup>
+						) }
+					</ToolbarDropdownMenu>
+				) }
 			</BlockControls>
 			<>
 				{ ! multiGallerySelection && ! isDynamic && (
