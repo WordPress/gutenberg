@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Bug Fixes
-
--   `SearchControl`: Keep the reset button space reserved while it is hidden, so the control width no longer changes when a value is entered or cleared. ([#80315](https://github.com/WordPress/gutenberg/pull/80315)).
-
 ### TypeScript
 
 -   Improved performance of TypeScript types for internal polymorphic `WordPressComponent` component type ([#80364](https://github.com/WordPress/gutenberg/pull/80364)).

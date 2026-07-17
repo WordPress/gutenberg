@@ -29,6 +29,10 @@ function SuffixItem( {
 	onChange,
 	onClose,
 }: SuffixItemProps ) {
+	if ( ! onClose && ! value ) {
+		return null;
+	}
+
 	if ( onClose ) {
 		deprecated( '`onClose` prop in wp.components.SearchControl', {
 			since: '6.8',
@@ -41,13 +45,7 @@ function SuffixItem( {
 	};
 
 	return (
-		<InputControlSuffixWrapper
-			variant="control"
-			// The button is hidden to prevent the control width from changing as it toggles.
-			style={
-				! onClose && ! value ? { visibility: 'hidden' } : undefined
-			}
-		>
+		<InputControlSuffixWrapper variant="control">
 			<Button
 				size="small"
 				icon={ closeSmall }
