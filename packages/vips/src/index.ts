@@ -560,6 +560,15 @@ function resizeHighBitDepth<
  * decode the gain map alongside the base image, and `jpegsave*` delegates
  * to `uhdrsave*` on output when a gain map is attached.
  *
+ * Sub-sizes of animated images are generated from the first frame only,
+ * matching WordPress core's server-side behavior: both GD and Imagick
+ * flatten animated images when resizing, and `wp_calculate_image_srcset()`
+ * prevents flattened sub-sizes and the animated full-size image from mixing
+ * in a srcset. Loading all frames (`[n=-1]`) would re-encode a full animated
+ * GIF per sub-size, which takes tens of seconds for long animations and can
+ * produce sub-sizes larger than the original file.
+ * See https://github.com/WordPress/gutenberg/issues/80266.
+ *
  * @param id      Item ID.
  * @param buffer  Original file buffer.
  * @param type    Mime type.
@@ -593,16 +602,6 @@ export async function resizeImage(
 	try {
 		const vips = await getVips();
 
-		let strOptions = '';
-		const loadOptions: LoadOptions< typeof type > = {};
-
-		// To ensure all frames are loaded in case the image is animated.
-		// But only if we're not cropping.
-		if ( supportsAnimation( type ) && ! resize.crop ) {
-			strOptions = '[n=-1]';
-			( loadOptions as LoadOptions< typeof type > ).n = -1;
-		}
-
 		// TODO: Report progress, see https://github.com/swissspidy/media-experiments/issues/327.
 		const onProgress = () => {
 			if ( ! inProgressOperations.has( id ) ) {
@@ -610,7 +609,7 @@ export async function resizeImage(
 			}
 		};
 
-		let image = vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
+		let image = vips.Image.newFromBuffer( buffer );
 
 		image.onProgress = onProgress;
 
@@ -618,13 +617,9 @@ export async function resizeImage(
 
 		// Detect high-bit-depth (10/12-bit) AVIF sources. `thumbnail` would
 		// flatten these to 8-bit sRGB, so they are resized directly from the
-		// decoded 16-bit image, which keeps full precision. Animated images
-		// keep the streaming `thumbnail` path (multi-page resize/crop is not
-		// handled here, and HDR is a still-image concern).
+		// decoded 16-bit image, which keeps full precision.
 		const sourceBitdepth =
-			'image/avif' === type && ! strOptions
-				? getSourceBitdepth( image )
-				: 8;
+			'image/avif' === type ? getSourceBitdepth( image ) : 8;
 		// The `image_max_bit_depth` filter can cap the output depth. When the
 		// cap flattens the image to 8-bit anyway, the regular colour-managed
 		// `thumbnail` path is used, matching standard-depth sources.
@@ -649,9 +644,6 @@ export async function resizeImage(
 					);
 					resized.onProgress = onProgress;
 					return resized;
-				}
-				if ( strOptions ) {
-					thumbnailOptions.option_string = strOptions;
 				}
 				const thumb = vips.Image.thumbnailBuffer(
 					buffer,
