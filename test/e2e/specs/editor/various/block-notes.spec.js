@@ -1723,13 +1723,19 @@ test.describe( 'Block Notes', () => {
 
 			/*
 			 * Pressing Escape closes the link popover and leaves the note
-			 * form intact — focus does not get yanked out of the editor.
+			 * form intact; focus does not get yanked out of the editor, and
+			 * the selection is restored rather than left collapsed.
 			 */
 			await page.keyboard.press( 'Escape' );
 			await expect(
 				page.getByRole( 'combobox', { name: 'Search or type URL' } )
 			).toBeHidden();
-			await expect( textbox ).toBeVisible();
+			await expect( textbox ).toBeFocused();
+			await expect
+				.poll( () =>
+					page.evaluate( () => window.getSelection().toString() )
+				)
+				.toBe( 'visit example' );
 		} );
 
 		test( 'Cmd+K opens an unclipped link popover in the reply form', async ( {
