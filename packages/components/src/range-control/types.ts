@@ -13,6 +13,7 @@ import type {
  */
 import type { BaseControlProps } from '../base-control/types';
 import type { IconType } from '../icon';
+import type { NumberControlProps } from '../number-control/types';
 
 export type NumericProps = {
 	/**
@@ -78,6 +79,7 @@ export type RangeControlProps = Pick<
 	BaseControlProps,
 	'__nextHasNoMarginBottom' | 'hideLabelFromVision' | 'help'
 > &
+	Pick< NumberControlProps, '__next40pxDefaultSize' > &
 	MarksProps & {
 		/**
 		 * If this property is added, an Icon component will be rendered
@@ -199,13 +201,6 @@ export type RangeControlProps = Pick<
 		 * @default 10
 		 */
 		shiftStep?: number;
-		/**
-		 * Start opting into the larger default height that will become the default size in a future version.
-		 *
-		 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
-		 * @ignore
-		 */
-		__next40pxDefaultSize?: boolean;
 		/**
 		 * Forcing the Tooltip UI to show or hide. This is overridden to `false`
 		 * when `step` is set to the special string value `any`.

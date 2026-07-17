@@ -96,7 +96,11 @@ test.describe( 'Paragraph', () => {
 				attributes: { content: 'My Heading' },
 			} );
 			await editor.insertBlock( { name: 'core/paragraph' } );
-			await editor.canvas.locator( 'text=My Heading' ).focus();
+			// Select the heading by clicking it. Focusing it programmatically
+			// does not move focus when the empty paragraph is selected and its
+			// editable root wrapper holds focus (a nested editable element
+			// cannot take focus from an editing host ancestor).
+			await editor.canvas.locator( 'text=My Heading' ).click();
 			await editor.showBlockToolbar();
 
 			const dragHandle = page.locator(

@@ -451,6 +451,9 @@ remove_action( 'wp_footer', 'wp_enqueue_stored_styles', 1 );
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
 
+/**
+ * Enqueues the LaTeX to MathML loader script module in the block editor.
+ */
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_latex_to_mathml_loader' );
 function gutenberg_enqueue_latex_to_mathml_loader() {
 	wp_enqueue_script_module( '@wordpress/latex-to-mathml/loader' );
@@ -485,9 +488,4 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 }
 function gutenberg_enqueue_video_conversion_loader() {
 	wp_enqueue_script_module( '@wordpress/video-conversion/loader' );
-}
-
-add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_core_abilities' );
-function gutenberg_enqueue_core_abilities() {
-	wp_enqueue_script_module( '@wordpress/core-abilities' );
 }

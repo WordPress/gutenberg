@@ -594,7 +594,7 @@ test.describe( 'Cover', () => {
 
 		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Responsive editing' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
 		await page.getByRole( 'menuitemradio', { name: 'Tablet' } ).click();
 		await page.keyboard.press( 'Escape' );

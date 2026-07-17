@@ -21,7 +21,7 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	color: $components-color-foreground;
 	background-color: $components-color-background;
 	font-size: $font-size-medium;
-	font-weight: $font-weight-regular;
+	font-weight: var(--wpds-typography-font-weight-default);
 	z-index: 0; // Create a stacking context and render on top of the background.
 
 	*,
