@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useResizeObserver } from '@wordpress/compose';
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
@@ -12,6 +11,7 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
+import { useReserveHeaderSpace } from '../widget-header/widget-header-size';
 import { WidgetSettingsTrigger } from '../widget-settings';
 import { AttributeControlsDropdown } from './attribute-controls-dropdown';
 import { useInlineControlsFit } from './use-inline-controls-fit';
@@ -58,32 +58,10 @@ export function WidgetAttributeControls( {
 		( attribute ) => attribute.relevance !== 'high'
 	);
 
-	// Trigger reserve size.
-	//
-	// The settings trigger remains in the toolbar in both presentations,
-	// so its actual footprint (button width plus the chip gap)
-	// is reserved from the fit budget.
-	//
-	// The control's size is determined by design tokens.
-	const [ triggerReserve, setTriggerReserve ] = useState( 0 );
-
-	const triggerReserveRef = useResizeObserver< HTMLElement >(
-		( [ entry ] ) => {
-			const { columnGap } = getComputedStyle(
-				entry.target.parentElement as HTMLElement
-			);
-
-			setTriggerReserve(
-				entry.contentRect.width + ( parseFloat( columnGap ) || 0 )
-			);
-		}
-	);
-
-	useEffect( () => {
-		if ( ! hasSettingsSurface ) {
-			setTriggerReserve( 0 );
-		}
-	}, [ hasSettingsSurface ] );
+	// The settings trigger stays in the toolbar in both presentations, so it
+	// reserves its own footprint from the header's fit budget.
+	const settingsReserveRef =
+		useReserveHeaderSpace< HTMLSpanElement >( 'settings' );
 
 	// While the user interacts with a presentation, the fit holds it in
 	// place; replacing it mid-interaction would drop focus on the floor.
@@ -97,7 +75,6 @@ export function WidgetAttributeControls( {
 		useState( false );
 
 	const { measureRef, collapsed } = useInlineControlsFit( {
-		reservedSize: triggerReserve,
 		locked: dropdownOpen || inlineHasFocus || dropdownTriggerHasFocus,
 	} );
 
@@ -211,7 +188,7 @@ export function WidgetAttributeControls( {
 
 			{ hasSettingsSurface && (
 				<span
-					ref={ triggerReserveRef }
+					ref={ settingsReserveRef }
 					className={ styles[ 'persistent-controls' ] }
 				>
 					<WidgetSettingsTrigger

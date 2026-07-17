@@ -55,21 +55,6 @@ describe( 'useInlineControlsFit', () => {
 		expect( result.current.collapsed ).toBe( false );
 	} );
 
-	it( 'subtracts the reserved size from the budget', () => {
-		availableSize = 120;
-		const { result, rerender } = renderHook(
-			( { reservedSize }: { reservedSize: number } ) =>
-				useInlineControlsFit( { reservedSize } ),
-			{ wrapper, initialProps: { reservedSize: 0 } }
-		);
-
-		measureFields( 100 );
-		expect( result.current.collapsed ).toBe( false );
-
-		rerender( { reservedSize: 36 } );
-		expect( result.current.collapsed ).toBe( true );
-	} );
-
 	it( 'holds the inline presentation while locked', () => {
 		availableSize = 200;
 		const { result, rerender } = renderHook(

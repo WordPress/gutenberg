@@ -16,12 +16,6 @@ import { useWidgetHeaderAvailableSize } from '../widget-header/widget-header-siz
 
 interface InlineControlsFitOptions {
 	/**
-	 * Inline size (px) already claimed by fixed toolbar controls that are
-	 * not part of the collapse.
-	 */
-	reservedSize?: number;
-
-	/**
 	 * Holds the current presentation while the user interacts with it (an
 	 * open dropdown, focus inside the inline form). Measurements keep
 	 * flowing; the pending transition applies when the hold releases.
@@ -54,7 +48,7 @@ interface InlineControlsFit {
 export function useInlineControlsFit(
 	options: InlineControlsFitOptions = {}
 ): InlineControlsFit {
-	const { reservedSize = 0, locked = false } = options;
+	const { locked = false } = options;
 
 	const availableSize = useWidgetHeaderAvailableSize();
 	const [ naturalSize, setNaturalSize ] = useState( 0 );
@@ -68,7 +62,7 @@ export function useInlineControlsFit(
 	const computed =
 		availableSize !== null &&
 		naturalSize > 0 &&
-		naturalSize > availableSize - reservedSize;
+		naturalSize > availableSize;
 
 	// The latch: while locked, the surface the user is interacting with
 	// must not be replaced under them, so the last unlocked decision holds.
