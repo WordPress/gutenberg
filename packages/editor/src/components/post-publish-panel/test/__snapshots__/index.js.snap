@@ -78,7 +78,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
                 class="style-field components-base-control__field components-base-control__field"
               >
                 <label
-                  class="style-label components-base-control__label components-base-control__label"
+                  class="style-label components-base-control__label"
                   for="inspector-text-control-0"
                 >
                   post address
@@ -259,7 +259,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
                 class="style-field components-base-control__field components-base-control__field"
               >
                 <label
-                  class="style-label components-base-control__label components-base-control__label"
+                  class="style-label components-base-control__label"
                   for="inspector-text-control-1"
                 >
                   post address
