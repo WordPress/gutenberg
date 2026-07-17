@@ -1,4 +1,3 @@
-import type { ComponentProps } from 'react';
 import { Fragment, useId } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { wordpress } from '@wordpress/icons';
@@ -195,38 +194,46 @@ export const Pressed: Story = {
 /**
  * `Button` has no dedicated `shortcut` prop, so keyboard shortcuts must be
  * composed manually: a visual hint in the tooltip, `aria-keyshortcuts` for
- * assistive technology, and a visually hidden description.
+ * assistive technology, and a visually hidden description. Consumers remain
+ * responsible for registering the shortcut and handling the corresponding
+ * keyboard event.
  */
 export const WithKeyboardShortcut: Story = {
 	args: {
 		children: 'Save',
 		'aria-keyshortcuts': ariaKeyShortcut.primary( 's' ),
 	},
-	render: ( { 'aria-describedby': consumerDescribedBy, ...args } ) => {
+	render: ( {
+		children,
+		'aria-describedby': consumerDescribedBy,
+		...args
+	} ) => {
 		const descriptionId = useId();
 
 		return (
-			<>
-				<Tooltip.Root>
-					<Tooltip.Trigger
-						{ ...( {
-							render: <Button { ...args } />,
-						} as ComponentProps< typeof Tooltip.Trigger > ) }
-						aria-describedby={ [
-							consumerDescribedBy,
-							descriptionId,
-						]
-							.filter( Boolean )
-							.join( ' ' ) }
-					/>
-					<Tooltip.Popup>
-						{ args.children } { displayShortcut.primary( 's' ) }
-					</Tooltip.Popup>
-				</Tooltip.Root>
-				<VisuallyHidden id={ descriptionId }>
-					Keyboard shortcut: { shortcutAriaLabel.primary( 's' ) }
-				</VisuallyHidden>
-			</>
+			<Tooltip.Root>
+				<Tooltip.Trigger
+					render={ <Button { ...args } /> }
+					aria-describedby={ [ consumerDescribedBy, descriptionId ]
+						.filter( Boolean )
+						.join( ' ' ) }
+				>
+					{ children }
+					<VisuallyHidden
+						id={ descriptionId }
+						aria-hidden="true"
+						render={ <span /> }
+					>
+						Keyboard shortcut: { shortcutAriaLabel.primary( 's' ) }
+					</VisuallyHidden>
+				</Tooltip.Trigger>
+				<Tooltip.Popup>
+					{ children }{ ' ' }
+					<span aria-hidden="true" dir="ltr">
+						{ displayShortcut.primary( 's' ) }
+					</span>
+				</Tooltip.Popup>
+			</Tooltip.Root>
 		);
 	},
 };
