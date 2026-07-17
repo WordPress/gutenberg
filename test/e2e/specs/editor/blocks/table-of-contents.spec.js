@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-const { serializeRawBlock } = require( '../../../../../packages/blocks' );
 
 const CUSTOM_HEADING_SOURCE_PLUGIN =
 	'gutenberg-test-table-of-contents-heading-source';
@@ -14,20 +13,15 @@ function headingBlock( { content, level = 2, anchor } ) {
 	}
 	const id = anchor ? ` id="${ anchor }"` : '';
 
-	return serializeRawBlock( {
-		blockName: 'core/heading',
-		attrs: attributes,
-		innerContent: [
-			`<h${ level }${ id } class="wp-block-heading">${ content }</h${ level }>`,
-		],
-	} );
+	return `<!-- wp:heading ${ JSON.stringify( attributes ) } -->
+<h${ level }${ id } class="wp-block-heading">${ content }</h${ level }>
+<!-- /wp:heading -->`;
 }
 
 function htmlBlock( content ) {
-	return serializeRawBlock( {
-		blockName: 'core/html',
-		innerContent: [ content ],
-	} );
+	return `<!-- wp:html -->
+${ content }
+<!-- /wp:html -->`;
 }
 
 function tableOfContentsBlock( {
@@ -46,10 +40,11 @@ function tableOfContentsBlock( {
 		attributes.onlyIncludeCurrentPage = true;
 	}
 
-	return serializeRawBlock( {
-		blockName: 'core/table-of-contents',
-		attrs: attributes,
-	} );
+	const attrsStr = Object.keys( attributes ).length
+		? ` ${ JSON.stringify( attributes ) }`
+		: '';
+
+	return `<!-- wp:table-of-contents${ attrsStr } /-->`;
 }
 
 function postContentWithTocAndHeadings( headings, extraBlocks = '' ) {
