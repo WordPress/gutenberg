@@ -15,6 +15,8 @@ import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
+let mockMediaReplaceFlowProps;
+
 jest.mock( '@wordpress/block-editor', () => ( {
 	BlockControls: ( { children, group = 'default' } ) => (
 		<div data-testid={ `block-controls-${ group }` }>{ children }</div>
@@ -22,9 +24,11 @@ jest.mock( '@wordpress/block-editor', () => ( {
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
 	MediaPlaceholder: () => <div />,
-	MediaReplaceFlow: ( { name, onSelect } ) => (
-		<button onClick={ () => onSelect( {} ) }>{ name }</button>
-	),
+	MediaReplaceFlow: ( props ) => {
+		mockMediaReplaceFlowProps = props;
+		const { name, onSelect } = props;
+		return <button onClick={ () => onSelect( {} ) }>{ name }</button>;
+	},
 	MediaUpload: ( { render: renderMediaUpload } ) =>
 		renderMediaUpload( { open: jest.fn() } ),
 	MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
@@ -108,6 +112,7 @@ function renderEdit( props = {} ) {
 
 describe( 'PlaylistTrackEdit', () => {
 	beforeEach( () => {
+		mockMediaReplaceFlowProps = undefined;
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
 		} );
@@ -194,7 +199,7 @@ describe( 'PlaylistTrackEdit', () => {
 		const addTracks = jest.fn();
 		renderEdit( { addTracks } );
 
-		fireEvent.click( screen.getByRole( 'button', { name: 'Add' } ) );
+		fireEvent.click( screen.getByRole( 'button', { name: 'Add track' } ) );
 
 		expect( addTracks ).toHaveBeenCalledWith( {} );
 	} );
@@ -211,8 +216,38 @@ describe( 'PlaylistTrackEdit', () => {
 		expect(
 			within( screen.getByTestId( 'block-controls-block' ) ).getByRole(
 				'button',
-				{ name: 'Add' }
+				{ name: 'Add track' }
 			)
 		).toBeInTheDocument();
+	} );
+
+	it( 'preserves the current track source when a replacement upload fails', () => {
+		const { setAttributes } = renderEdit();
+
+		mockMediaReplaceFlowProps.onSelect();
+
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes.mock.calls[ 0 ][ 0 ] ).not.toHaveProperty(
+			'src'
+		);
+	} );
+
+	it( 'accepts raw uploaded attachment data when replacing a track', () => {
+		const { setAttributes } = renderEdit();
+
+		mockMediaReplaceFlowProps.onSelect( {
+			id: 2,
+			source_url: 'https://example.com/replacement.mp3',
+			title: { raw: 'Replacement &amp; Track' },
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				blob: undefined,
+				id: 2,
+				src: 'https://example.com/replacement.mp3',
+				title: 'Replacement & Track',
+			} )
+		);
 	} );
 } );
