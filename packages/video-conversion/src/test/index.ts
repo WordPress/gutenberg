@@ -107,6 +107,10 @@ let encodeGateResolve: ( ( v: boolean ) => void ) | undefined;
 // is close()d (mediabunny warns about GC'd, unclosed samples).
 let mockVideoSamples: Array< { closed: boolean } > = [];
 
+// Options each VideoSampleSource was constructed with, so tests can pin the
+// encoding configuration.
+let mockVideoSampleSourceOpts: Array< Record< string, unknown > > = [];
+
 jest.mock( 'mediabunny', () => ( {
 	Output: class {
 		opts: { target: { buffer: ArrayBuffer | null } };
@@ -125,6 +129,9 @@ jest.mock( 'mediabunny', () => ( {
 	Mp4OutputFormat: class {},
 	WebMOutputFormat: class {},
 	VideoSampleSource: class {
+		constructor( opts: Record< string, unknown > ) {
+			mockVideoSampleSourceOpts.push( opts );
+		}
 		add( sample: { init: { timestamp: number; duration: number } } ) {
 			return mockSourceAdd( sample );
 		}
@@ -159,6 +166,7 @@ beforeEach( () => {
 	mockCanvases = [];
 	mockReplacementFrames = [];
 	mockVideoSamples = [];
+	mockVideoSampleSourceOpts = [];
 	encodeGateResolve = undefined;
 	mockCanEncodeVideo.mockResolvedValue( true );
 	mockSourceAdd.mockReset();
@@ -184,6 +192,18 @@ describe( 'convertGifToVideo', () => {
 		);
 		expect( result ).toBeInstanceOf( ArrayBuffer );
 		expect( mockAddedSamples ).toHaveLength( 3 );
+	} );
+
+	it( 'configures the encoder with high quality and a sparse key frame cadence', async () => {
+		await convertGifToVideo( 'item-config', GIF_BUFFER, 'video/mp4' );
+		expect( mockVideoSampleSourceOpts ).toHaveLength( 1 );
+		expect( mockVideoSampleSourceOpts[ 0 ] ).toEqual( {
+			codec: 'avc',
+			bitrate: 'quality-high',
+			// Sparser than mediabunny's 2s default: roughly halves output
+			// size for long GIFs at no encode-time or quality cost.
+			keyFrameInterval: 10,
+		} );
 	} );
 
 	it( 'converts ImageDecoder microsecond durations to mediabunny seconds', async () => {
