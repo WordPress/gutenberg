@@ -185,7 +185,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		<DropdownMenu
 			className={ clsx(
 				'editor-preview-dropdown',
-				`editor-preview-dropdown--${ deviceType.toLowerCase() }`
+				`editor-preview-dropdown--${ deviceType.toLowerCase() }`,
+				{ 'is-responsive-editing': isResponsiveEditing }
 			) }
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
