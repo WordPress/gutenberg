@@ -20,6 +20,7 @@
 
 ### New Features
 
+-   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
 -   Add `Spinner` component ([#81358](https://github.com/WordPress/gutenberg/pull/81358)).
 -   `Calendar`, `RangeCalendar`: Accept BCP 47 locale codes in the `locale` prop and keep localized date text aligned with the Gregorian date grid. ([#81814](https://github.com/WordPress/gutenberg/pull/81814))
 -   Add a `Menu` component. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
