@@ -52,7 +52,7 @@ export default {
 				const { getUsers } = select( coreStore );
 				return getUsers( {
 					context: 'view',
-					search: encodeURIComponent( filterValue ),
+					search: filterValue,
 				} );
 			},
 			[ filterValue ]
