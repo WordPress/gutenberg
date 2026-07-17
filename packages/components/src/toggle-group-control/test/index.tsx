@@ -21,6 +21,8 @@ import {
 } from '../index';
 import { TOOLTIP_DELAY } from '../../tooltip';
 import type { ToggleGroupControlProps } from '../types';
+import controlStyles from '../toggle-group-control/style.module.scss';
+import optionStyles from '../toggle-group-control-option-base/style.module.scss';
 
 const hoverOutside = async () => {
 	await hover( document.body );
@@ -649,4 +651,33 @@ test( 'should render block styles without Emotion-generated classes', () => {
 	} );
 
 	expect( getGeneratedEmotionClassNames( control ) ).toHaveLength( 0 );
+	expect( control ).toHaveClass(
+		controlStyles[ 'toggle-group-control' ],
+		controlStyles[ 'is-block' ],
+		controlStyles[ 'has-border' ],
+		controlStyles[ 'has-enclosing-borders' ]
+	);
+} );
+
+test( 'should render deselectable styles without enclosing borders', () => {
+	render(
+		<ToggleGroupControl label="Test Toggle Group Control" isDeselectable>
+			{ options }
+		</ToggleGroupControl>
+	);
+
+	const control = screen.getByRole( 'group', {
+		name: 'Test Toggle Group Control',
+	} );
+	const option = screen.getByRole( 'button', { name: 'R' } );
+
+	expect( control ).toHaveClass( controlStyles[ 'toggle-group-control' ] );
+	expect( control ).not.toHaveClass(
+		controlStyles[ 'has-border' ],
+		controlStyles[ 'has-enclosing-borders' ]
+	);
+	expect( option ).toHaveClass(
+		optionStyles.button,
+		optionStyles[ 'is-deselectable' ]
+	);
 } );
