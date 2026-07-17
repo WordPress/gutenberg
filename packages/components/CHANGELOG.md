@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `SearchControl`: Render suffix only if there is one. ([#80356](https://github.com/WordPress/gutenberg/pull/80356)).
+
 ### TypeScript
 
 -   Improved performance of TypeScript types for internal polymorphic `WordPressComponent` component type ([#80364](https://github.com/WordPress/gutenberg/pull/80364)).
