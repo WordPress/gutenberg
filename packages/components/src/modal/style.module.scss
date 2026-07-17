@@ -6,11 +6,13 @@
 @use "../utils/theme-variables" as *;
 
 // The scrim behind the modal window.
-.components-modal__screen-overlay {
+.screen-overlay {
 	position: fixed;
 	top: 0;
+	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the legacy viewport-relative positioning in every writing mode. */
 	right: 0;
 	bottom: 0;
+	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the legacy viewport-relative positioning in every writing mode. */
 	left: 0;
 	background-color: rgba($black, 0.35);
 	z-index: z-index(".components-modal__screen-overlay");
@@ -27,7 +29,7 @@
 }
 
 // The modal window element.
-.components-modal__frame {
+.frame {
 	@include reset;
 	// On smaller screens, render as a bottom sheet: edge-to-edge, anchored
 	// to the bottom of the viewport. `align-self: flex-end` both anchors
@@ -39,13 +41,16 @@
 	max-height: calc(100% - #{$grid-unit-50});
 	background: $white;
 	box-shadow: $elevation-large;
+	/* stylelint-disable-next-line declaration-property-max-values -- Preserve the legacy physical corner values. */
 	border-radius: $radius-large $radius-large 0 0;
 	overflow: hidden;
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
 	color: $gray-900;
 	// Animate the modal frame/contents appearing on the page.
-	animation-name: components-modal__appear-animation;
+	// The fallback prevents CSS Modules from scoping the global animation name
+	// that is also observed by the exit-animation hook.
+	animation-name: var(--_wp-components-modal-animation-name, components-modal__appear-animation);
 	animation-fill-mode: forwards;
 	animation-timing-function: var(--wpds-motion-easing-expressive);
 
@@ -60,8 +65,8 @@
 		animation-duration: var(--wpds-motion-duration-md);
 	}
 
-	.components-modal__screen-overlay.is-animating-out & {
-		animation-name: components-modal__disappear-animation;
+	.screen-overlay.is-animating-out & {
+		animation-name: var(--_wp-components-modal-animation-name, components-modal__disappear-animation);
 		animation-timing-function: var(--wpds-motion-easing-expressive);
 	}
 
@@ -107,7 +112,7 @@
 		border-radius: 0;
 
 		// When full screen, make sure the children container is full height.
-		:where(.components-modal__content) {
+		:where(.content) {
 			display: flex;
 			// If this container is scrollable, bottom padding won't apply so we use margin instead.
 			margin-bottom: $grid-unit-30;
@@ -135,8 +140,10 @@
 	}
 }
 
+// Keep the animation names global because the exit-animation hook listens for
+// the existing `components-modal__disappear-animation` name.
 // On mobile, the modal slides up from the bottom of the viewport.
-@keyframes components-modal__appear-animation {
+@keyframes :global(components-modal__appear-animation) {
 	from {
 		opacity: 0;
 		transform: translateY(100%);
@@ -147,9 +154,7 @@
 	}
 }
 
-// Note: this animation is also used in the animationend JS event listener.
-// Make sure that the animation name is kept in sync across the two files.
-@keyframes components-modal__disappear-animation {
+@keyframes :global(components-modal__disappear-animation) {
 	from {
 		opacity: 1;
 		transform: translateY(0);
@@ -164,7 +169,7 @@
 // names are intentionally reused so the JS animationend listener
 // (use-modal-exit-animation.ts) keeps working unchanged.
 @include break-small() {
-	@keyframes components-modal__appear-animation {
+	@keyframes :global(components-modal__appear-animation) {
 		from {
 			opacity: 0;
 			transform: scale(0.9);
@@ -175,7 +180,7 @@
 		}
 	}
 
-	@keyframes components-modal__disappear-animation {
+	@keyframes :global(components-modal__disappear-animation) {
 		from {
 			opacity: 1;
 			transform: scale(1);
@@ -190,7 +195,7 @@
 // Fix header to the top so it is always there to provide context to the modal
 // if the content needs to be scrolled (for example, on the keyboard shortcuts
 // modal screen).
-.components-modal__header {
+.header {
 	box-sizing: border-box;
 	border-bottom: $border-width solid transparent;
 	padding: $grid-unit-30;
@@ -204,9 +209,10 @@
 	z-index: 10;
 	position: absolute;
 	top: 0;
+	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the legacy physical positioning. */
 	left: 0;
 
-	.components-modal__header-heading {
+	.header-heading {
 		font-size: $font-size-x-large;
 		font-weight: var(--wpds-typography-font-weight-emphasis);
 	}
@@ -216,7 +222,8 @@
 		margin: 0;
 	}
 
-	.components-modal__content.has-scrolled-content:not(.hide-header) & {
+	.content.has-scrolled-content:not(.hide-header) & {
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the legacy physical border declaration. */
 		border-bottom-color: var(--wpds-color-stroke-surface-neutral);
 	}
 
@@ -225,7 +232,7 @@
 	}
 }
 
-.components-modal__header-heading-container {
+.header-heading-container {
 	align-items: center;
 	flex-grow: 1;
 	display: flex;
@@ -233,7 +240,7 @@
 	justify-content: flex-start;
 }
 
-.components-modal__header-icon-container {
+.header-icon-container {
 	display: inline-block;
 
 	svg {
@@ -244,7 +251,7 @@
 }
 
 // Modal contents.
-.components-modal__content {
+.content {
 	flex: 1;
 	margin-top: $header-height + $grid-unit-10;
 	// Small top padding required to avoid cutting off the visible outline when the first child element is focusable.

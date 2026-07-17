@@ -81,6 +81,37 @@ describe( 'Modal', () => {
 		expect( title ).not.toBeInTheDocument();
 	} );
 
+	it( 'preserves legacy public class names', () => {
+		render(
+			<Modal
+				className="custom-frame"
+				overlayClassName="custom-overlay"
+				size="small"
+				__experimentalHideHeader
+				onRequestClose={ noop }
+			>
+				<p>Modal content</p>
+			</Modal>
+		);
+
+		const dialog = screen.getByRole( 'dialog' );
+		expect( dialog ).toHaveClass(
+			'components-modal__frame',
+			'has-size-small',
+			'custom-frame'
+		);
+		// Disable reason: No semantic query can reach the overlay.
+		// eslint-disable-next-line testing-library/no-node-access
+		expect( dialog.parentElement ).toHaveClass(
+			'components-modal__screen-overlay',
+			'custom-overlay'
+		);
+		expect( screen.getByRole( 'document' ) ).toHaveClass(
+			'components-modal__content',
+			'hide-header'
+		);
+	} );
+
 	it( 'should call onRequestClose when the escape key is pressed', async () => {
 		const user = userEvent.setup();
 		const onRequestClose = jest.fn();

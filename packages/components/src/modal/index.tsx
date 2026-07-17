@@ -27,6 +27,7 @@ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import { Spacer } from '../spacer';
 import { useModalExitAnimation } from './use-modal-exit-animation';
 import { ModalContext, type Dismissers } from './context';
+import styles from './style.module.scss';
 
 // Used to track body class names applied while modals are open.
 const bodyOpenClasses = new Map< string, number >();
@@ -245,7 +246,9 @@ function UnforwardedModal(
 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
 			className={ clsx(
 				'components-modal__screen-overlay',
+				styles[ 'screen-overlay' ],
 				overlayClassname,
+				overlayClassname && styles[ 'is-animating-out' ],
 				overlayClassnameProp
 			) }
 			onKeyDown={ withIgnoreIMEEvents( handleEscapeKeyDown ) }
@@ -255,7 +258,9 @@ function UnforwardedModal(
 				<div
 					className={ clsx(
 						'components-modal__frame',
+						styles.frame,
 						sizeClass,
+						sizeClass && styles[ sizeClass ],
 						className
 					) }
 					style={ style }
@@ -275,11 +280,17 @@ function UnforwardedModal(
 					onKeyDown={ onKeyDown }
 				>
 					<div
-						className={ clsx( 'components-modal__content', {
-							'hide-header': __experimentalHideHeader,
-							'is-scrollable': hasScrollableContent,
-							'has-scrolled-content': hasScrolledContent,
-						} ) }
+						className={ clsx(
+							'components-modal__content',
+							styles.content,
+							__experimentalHideHeader && 'hide-header',
+							__experimentalHideHeader && styles[ 'hide-header' ],
+							hasScrollableContent && 'is-scrollable',
+							hasScrollableContent && styles[ 'is-scrollable' ],
+							hasScrolledContent && 'has-scrolled-content',
+							hasScrolledContent &&
+								styles[ 'has-scrolled-content' ]
+						) }
 						role="document"
 						onScroll={ onContentContainerScroll }
 						ref={ contentRef }
@@ -291,8 +302,18 @@ function UnforwardedModal(
 						tabIndex={ hasScrollableContent ? 0 : undefined }
 					>
 						{ ! __experimentalHideHeader && (
-							<div className="components-modal__header">
-								<div className="components-modal__header-heading-container">
+							<div
+								className={ clsx(
+									'components-modal__header',
+									styles.header
+								) }
+							>
+								<div
+									className={ clsx(
+										'components-modal__header-heading-container',
+										styles[ 'header-heading-container' ]
+									) }
+								>
 									{ icon && (
 										<span
 											className="components-modal__icon-container"
@@ -304,7 +325,10 @@ function UnforwardedModal(
 									{ title && (
 										<h1
 											id={ headingId }
-											className="components-modal__header-heading"
+											className={ clsx(
+												'components-modal__header-heading',
+												styles[ 'header-heading' ]
+											) }
 										>
 											{ title }
 										</h1>
