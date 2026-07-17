@@ -24,6 +24,36 @@ function isSameHsla( a: HslaColor, b: HslaColor ): boolean {
 }
 
 /**
+ * Convert parent HSLA into HSVA for prop sync.
+ *
+ * At black/white, RGB round-trips collapse saturation to 0. Preserve the
+ * native HSVA saturation coordinate unless the HSL saturation channel itself
+ * changed (sibling hue/alpha/lightness edits must not snap the pointer).
+ */
+function toHsvaFromHsla(
+	hsla: HslaColor,
+	prevHsva: HsvaColor,
+	prevHsla: HslaColor | null
+): HsvaColor {
+	const converted = toHsva( hsla );
+
+	if ( hsla.l !== 0 && hsla.l !== 100 ) {
+		return converted;
+	}
+
+	const saturationChanged = prevHsla !== null && prevHsla.s !== hsla.s;
+
+	return {
+		h: hsla.h,
+		s: saturationChanged ? hsla.s : prevHsva.s,
+		v: hsla.l === 0 ? 0 : 100,
+		a: hsla.a,
+	};
+}
+
+/**
+ * Visual color surface.
+ *
  * Uses HSVA (react-colorful's native model) and keeps that value in local
  * state so HSLA↔hex round-trips cannot move the pointer
  * Parent ColorPicker still speaks HSLA for
@@ -32,6 +62,9 @@ function isSameHsla( a: HslaColor, b: HslaColor ): boolean {
  * Prop sync from parent HSLA is suppressed for:
  * - pointer/touch drags (interaction flag), and
  * - any picker-originated update including keyboard (HSLA origin token).
+ *
+ * Achromatic HSL sibling edits (hue/alpha while at black/white) preserve
+ * native HSVA saturation unless saturation itself changed.
  */
 export const Picker = ( {
 	hsla,
@@ -41,8 +74,10 @@ export const Picker = ( {
 	onInteractionEnd,
 }: PickerProps ) => {
 	const [ hsva, setHsva ] = useState< HsvaColor >( () => toHsva( hsla ) );
-	// Last HSLA emitted by this picker - skip echoing it back into HSVA.
+	// Last HSLA emitted by this picker — skip echoing it back into HSVA.
 	const pickerOriginHslaRef = useRef< HslaColor | null >( null );
+	// Previous parent HSLA — detect which channel changed on achromatic sync.
+	const prevHslaRef = useRef< HslaColor >( hsla );
 	// Pointer/touch drag: never sync from HSLA mid-gesture (origin match alone
 	// can fail across rapid frames when parent gradient state re-renders).
 	const isPointerInteractingRef = useRef( false );
@@ -55,10 +90,14 @@ export const Picker = ( {
 			pickerOriginHslaRef.current &&
 			isSameHsla( pickerOriginHslaRef.current, hsla )
 		) {
+			prevHslaRef.current = hsla;
 			return;
 		}
 		pickerOriginHslaRef.current = null;
-		setHsva( toHsva( hsla ) );
+		setHsva( ( prev ) =>
+			toHsvaFromHsla( hsla, prev, prevHslaRef.current )
+		);
+		prevHslaRef.current = hsla;
 	}, [ hsla ] );
 
 	// Inline handlers so refs are not passed into a helper during render
