@@ -5,6 +5,7 @@ import { Icon } from '../icon';
 import * as Tooltip from '../tooltip';
 import {
 	KeyboardShortcutDescription,
+	KeyboardShortcutDisplay,
 	useKeyboardShortcut,
 } from '../utils/keyboard-shortcut';
 import styles from './style.module.css';
@@ -76,9 +77,7 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 					{ shortcut && (
 						<>
 							{ ' ' }
-							<span aria-hidden="true" dir="ltr">
-								{ shortcut.displayShortcut }
-							</span>
+							<KeyboardShortcutDisplay shortcut={ shortcut } />
 						</>
 					) }
 				</Tooltip.Popup>

@@ -72,4 +72,22 @@ function KeyboardShortcutDescription( {
 	);
 }
 
-export { KeyboardShortcutDescription, useKeyboardShortcut };
+function KeyboardShortcutDisplay( {
+	className,
+	shortcut,
+}: {
+	className?: string;
+	shortcut: KeyboardShortcut;
+} ) {
+	return (
+		<span aria-hidden="true" className={ className } dir="ltr">
+			{ shortcut.displayShortcut }
+		</span>
+	);
+}
+
+export {
+	KeyboardShortcutDescription,
+	KeyboardShortcutDisplay,
+	useKeyboardShortcut,
+};
