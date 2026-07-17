@@ -359,9 +359,15 @@ export function getShowStylebook( state ) {
  * @param {Object} state Global application state.
  * @return {number} The canvas width in pixels.
  */
-export function getCanvasWidth( state ) {
-	return state.canvasWidth;
-}
+export const getCanvasWidth = createRegistrySelector(
+	( select ) => ( state ) => {
+		// Return undefined while zoomed out to disable canvas resizing.
+		if ( unlock( select( blockEditorStore ) ).isZoomOut() ) {
+			return undefined;
+		}
+		return state.canvasWidth;
+	}
+);
 
 /**
  * Returns the current revisions page number.
