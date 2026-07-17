@@ -20,18 +20,18 @@ import {
  * Internal dependencies
  */
 import styles from './widget-attribute-controls.module.css';
-import type { WidgetAttributes } from '../../types';
+import type { WidgetAttributeValues } from '../../types';
 
 export interface AttributeControlsDropdownProps {
 	/**
 	 * The high-relevance fields the inline surface would have shown.
 	 */
-	fields: Field< WidgetAttributes >[];
+	fields: Field< WidgetAttributeValues >[];
 
 	/**
 	 * Current attribute values.
 	 */
-	data: WidgetAttributes;
+	data: WidgetAttributeValues;
 
 	/**
 	 * Stages an attribute edit, exactly like the inline controls do.
@@ -90,7 +90,7 @@ export function AttributeControlsDropdown( {
 						{ __( 'Widget controls' ) }
 					</VisuallyHidden>
 
-					<DataForm< WidgetAttributes >
+					<DataForm< WidgetAttributeValues >
 						data={ data }
 						fields={ fields }
 						form={ form }

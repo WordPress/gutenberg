@@ -16,7 +16,7 @@ import { WidgetSettingsTrigger } from '../widget-settings';
 import { AttributeControlsDropdown } from './attribute-controls-dropdown';
 import { useInlineControlsFit } from './use-inline-controls-fit';
 import styles from './widget-attribute-controls.module.css';
-import type { DashboardWidget, WidgetAttributes } from '../../types';
+import type { DashboardWidget, WidgetAttributeValues } from '../../types';
 
 type WidgetAttributeControlsProps = {
 	/**
@@ -88,11 +88,11 @@ export function WidgetAttributeControls( {
 		}
 	}, [ collapsed ] );
 
-	const fields = useMemo< Field< WidgetAttributes >[] >(
+	const fields = useMemo< Field< WidgetAttributeValues >[] >(
 		() =>
 			( widgetType.attributes ?? [] ).filter(
 				( attribute ) => attribute.relevance === 'high'
-			) as Field< WidgetAttributes >[],
+			) as Field< WidgetAttributeValues >[],
 		[ widgetType.attributes ]
 	);
 
@@ -132,7 +132,7 @@ export function WidgetAttributeControls( {
 
 	const data = ( widget.attributes ??
 		widgetType.example?.attributes ??
-		{} ) as WidgetAttributes;
+		{} ) as WidgetAttributeValues;
 
 	return (
 		<>
@@ -155,7 +155,7 @@ export function WidgetAttributeControls( {
 							}
 						} }
 					>
-						<DataForm< WidgetAttributes >
+						<DataForm< WidgetAttributeValues >
 							data={ data }
 							fields={ fields }
 							form={ form }
