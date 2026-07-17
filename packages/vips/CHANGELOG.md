@@ -6,6 +6,10 @@
 
 - Add optional `stripMeta` and `maxBitdepth` parameters to `resizeImage`, `compressImage`, and `convertImageFormat`, so callers can keep all image metadata and cap the output bit depth, mirroring WordPress core's `image_strip_meta` and `image_max_bit_depth` filters ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
 
+### Bug Fixes
+
+- `convertImageFormat`: Only decode all animation frames when the output format supports animation. Converting a long animated GIF to a still format (e.g. a JPEG poster) previously decoded every frame as one vertical strip, which exceeded the JPEG encoder's 65,500 px dimension limit and produced a film-strip image instead of a single frame ([#80259](https://github.com/WordPress/gutenberg/issues/80259)).
+
 ## 2.4.0 (2026-07-14)
 
 ## 2.3.0 (2026-07-01)
