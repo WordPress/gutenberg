@@ -34,6 +34,7 @@ import {
 	getEntityFields as _getEntityFields,
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
+import { EDITOR_INTENT_EDIT } from './constants';
 import { getTemplatePartIcon } from '../utils';
 import { unlock } from '../lock-unlock';
 
@@ -629,3 +630,25 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		);
 	}
 );
+
+/**
+ * Returns the current editor intent. The intent represents the user's
+ * editing purpose — directly editing content (`edit`), suggesting changes
+ * that the author can apply or reject (`suggest`), or viewing the post in
+ * a read-only mode (`view`).
+ *
+ * The intent is orthogonal to the `editorMode` preference (visual vs. code).
+ *
+ * Storage: the intent is session-scoped — it lives in the editor store's
+ * reducer, not the preferences store, so reloading the editor always
+ * returns to the default `edit` intent. When no value has been set the
+ * selector falls back to `EDITOR_INTENT_EDIT` so callers can rely on a
+ * non-null result.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} The current editor intent. One of `edit`, `suggest`, `view`.
+ */
+export function getEditorIntent( state ) {
+	return state.editorIntent ?? EDITOR_INTENT_EDIT;
+}

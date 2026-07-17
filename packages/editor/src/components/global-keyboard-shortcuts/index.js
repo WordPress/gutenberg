@@ -10,6 +10,13 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import {
+	EDITOR_INTENT_EDIT,
+	EDITOR_INTENT_SUGGEST,
+	EDITOR_INTENT_VIEW,
+} from '../../store/constants';
+import { unlock } from '../../lock-unlock';
+import { useCanSuggest } from '../suggestion-mode/gate';
 
 /**
  * Handles the keyboard shortcuts for the editor.
@@ -36,6 +43,8 @@ export default function EditorKeyboardShortcuts() {
 		switchEditorMode,
 		toggleDistractionFree,
 	} = useDispatch( editorStore );
+	// The intent API is private while Suggest mode is experimental.
+	const { setEditorIntent } = unlock( useDispatch( editorStore ) );
 	const {
 		isEditedPostDirty,
 		isPostSavingLocked,
@@ -98,6 +107,38 @@ export default function EditorKeyboardShortcuts() {
 			event.preventDefault();
 			setIsListViewOpened( true );
 		}
+	} );
+
+	/*
+	 * The intent shortcuts share the gate the intent menu uses: Suggestion
+	 * Mode experiment on AND the current post type supports `editor.notes`.
+	 * Without the support check the shortcut could switch intent on post
+	 * types where the menu never offers it.
+	 */
+	const canSuggest = useCanSuggest();
+
+	useShortcut( 'core/editor/intent-edit', ( event ) => {
+		if ( ! canSuggest ) {
+			return;
+		}
+		event.preventDefault();
+		setEditorIntent( EDITOR_INTENT_EDIT );
+	} );
+
+	useShortcut( 'core/editor/intent-suggest', ( event ) => {
+		if ( ! canSuggest ) {
+			return;
+		}
+		event.preventDefault();
+		setEditorIntent( EDITOR_INTENT_SUGGEST );
+	} );
+
+	useShortcut( 'core/editor/intent-view', ( event ) => {
+		if ( ! canSuggest ) {
+			return;
+		}
+		event.preventDefault();
+		setEditorIntent( EDITOR_INTENT_VIEW );
 	} );
 
 	useShortcut( 'core/editor/toggle-sidebar', ( event ) => {

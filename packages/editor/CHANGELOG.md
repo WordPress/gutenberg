@@ -4,6 +4,8 @@
 
 ### New Features
 
+-   Added a session-scoped editor intent (`edit`, `suggest`, `view`) with a matching private `setEditorIntent` action and private `getEditorIntent` selector (the intent API is private while Suggest mode is experimental). Surfaced as an Edit / Suggest / View menu in the editor options for post types that support notes. The `view` intent puts the block editor into a read-only preview. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit), +X (Suggest), +C (View) on Windows / ⌘⌥⇧Z/X/C on macOS.
+-   `setEditorIntent` now surfaces mode transitions with a snackbar ('You're suggesting' / 'You're editing' / 'You're viewing') alongside the existing a11y announcement.
 -   The "Apply globally" control now opens a review modal so you can choose which of a block's modified styles are pushed to Global Styles, showing each style's current and new value ([#79839](https://github.com/WordPress/gutenberg/pull/79839)).
 
 ### Bug Fixes

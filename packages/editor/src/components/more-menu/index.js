@@ -17,6 +17,8 @@ import { VisuallyHidden } from '@wordpress/ui';
  * Internal dependencies
  */
 import CopyContentMenuItem from './copy-content-menu-item';
+import IntentSwitcher from '../intent-switcher';
+import { isSuggestionModeEnabled } from '../suggestion-mode/gate';
 import ModeSwitcher from '../mode-switcher';
 import ToolsMoreMenuGroup from './tools-more-menu-group';
 import ViewMoreMenuGroup from './view-more-menu-group';
@@ -106,6 +108,7 @@ export default function MoreMenu( { disabled = false } ) {
 							/>
 							<ViewMoreMenuGroup.Slot fillProps={ { onClose } } />
 						</MenuGroup>
+						{ isSuggestionModeEnabled() && <IntentSwitcher /> }
 						<ModeSwitcher />
 						<ActionItem.Slot
 							name="core/plugin-more-menu"

@@ -37,3 +37,38 @@ export const DESIGN_POST_TYPES = [
 	PATTERN_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 ];
+
+/**
+ * Editor intent values. The intent represents the user's current editing
+ * purpose (edit the post directly, suggest changes, or view in read-only).
+ *
+ * Orthogonal to the `editorMode` preference (visual vs. code): a user can
+ * be in `suggest` intent in either visual or code mode.
+ *
+ * Storage and defaults:
+ *   - Session-scoped: held in the editor store's reducer, not the
+ *     preferences store, so reloading the editor always returns to the
+ *     default `edit` intent.
+ *   - The private `getEditorIntent` selector falls back to
+ *     `EDITOR_INTENT_EDIT` when no value is set, so consumers can rely on
+ *     a non-null result.
+ *
+ * Suggest Mode context:
+ * Phase 1 of the Suggest Mode feature only wires the intent state and the
+ * UI surface (menu + keyboard shortcuts). Subsequent phases use the
+ * `suggest` intent to capture edits as in-memory overlays, render them as
+ * suggestions, and let other users apply or reject them. Adding a new
+ * intent here also requires updates to:
+ *   - packages/editor/src/components/intent-switcher/index.js (UI choices)
+ *   - packages/editor/src/components/global-keyboard-shortcuts/* (shortcut
+ *     registration and dispatch)
+ */
+export const EDITOR_INTENT_EDIT = 'edit';
+export const EDITOR_INTENT_SUGGEST = 'suggest';
+export const EDITOR_INTENT_VIEW = 'view';
+export const EDITOR_INTENTS = [
+	EDITOR_INTENT_EDIT,
+	EDITOR_INTENT_SUGGEST,
+	EDITOR_INTENT_VIEW,
+] as const;
+export type EditorIntent = ( typeof EDITOR_INTENTS )[ number ];

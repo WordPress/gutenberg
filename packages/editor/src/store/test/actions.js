@@ -673,6 +673,66 @@ describe( 'Editor actions', () => {
 		} );
 	} );
 
+	describe( 'setEditorIntent', () => {
+		let registry;
+
+		beforeEach( () => {
+			registry = createRegistryWithStores();
+		} );
+
+		it( 'defaults to edit', () => {
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'edit' );
+		} );
+
+		it( 'switches between edit, suggest, and view', () => {
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'suggest' );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'view'
+			);
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'view' );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'edit' );
+		} );
+
+		it( 'ignores unknown intents', () => {
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'bogus'
+			);
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'suggest' );
+		} );
+
+		it( 'does not write to the preferences store (session-scoped only)', () => {
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'view'
+			);
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'editorIntent' )
+			).toBeUndefined();
+		} );
+	} );
+
 	describe( 'toggleDistractionFree', () => {
 		it( 'should properly update settings to prevent layout corruption when enabling distraction free mode', () => {
 			const registry = createRegistryWithStores();
