@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### New Features
-
--   Add `DirectionProvider` component. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
-
 ### Enhancements
 
 -   `Menu`: Add shortcut display and accessibility metadata support. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))

@@ -1,6 +1,12 @@
-import { DirectionProvider } from '@wordpress/ui';
+/**
+ * WordPress dependencies
+ */
 import { addFilter, removeFilter } from '@wordpress/hooks';
 import { useEffect, useRef, useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
 import CONFIG from '../package-styles/config';
 import { useSharedStyle } from './utils/use-shared-style';
 
@@ -43,9 +49,7 @@ export const WithRTL = ( Story, context ) => {
 
 	return (
 		<div ref={ ref } key={ rerenderKey }>
-			<DirectionProvider direction={ context.globals.direction }>
-				<Story { ...context } />
-			</DirectionProvider>
+			<Story { ...context } />
 		</div>
 	);
 };
