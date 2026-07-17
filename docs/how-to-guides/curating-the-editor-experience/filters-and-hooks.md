@@ -106,13 +106,24 @@ These rules apply at every nesting level. In `view_list`, entries merge by `slug
 
 Prefer `merge()`: a callback that replaces a list stops inheriting core's future additions to it.
 
+### Removing entries
+
+`remove( $spec, $version )` deletes entries without touching the rest. Where the other methods take a patch of *values* to write, `remove()` takes a *spec of names* to delete, and its shape mirrors the configuration it prunes:
+
+-   A **list** of names deletes each named entry at that level: a key from a map, or the member with a matching identity (`id`, `slug`, `field`, or a bare scalar) from a list.
+-   An **associative array** maps a name to a nested spec, recursing into that entry's value to prune from within it.
+
+For example, `array( 'default_view' )` drops the whole `default_view` key, `array( 'default_view' => array( 'sort' ) )` drops just its `sort` property, and `array( 'view_list' => array( 'drafts' ) )` drops the saved view whose `slug` is `drafts` while leaving every other view in place. A name that is not present is ignored, and a list is renumbered after a member is removed.
+
+This is the targeted counterpart to `replace()`: to drop a single saved view or form field, name it with `remove()` instead of pinning the whole `view_list` or `form.fields` to a shorter list — so the callback keeps inheriting core's future additions to the entries it does not touch.
+
 ### The version argument
 
 The `$version` argument declares the configuration schema version the patch was written against (currently `1`), so that a future release that changes the configuration shape can migrate existing patches forward instead of breaking them.
 
 ### Example
 
-In the following example, `merge()` adds a custom saved view to the `page` list, retitles the existing Drafts view, unsets the `grid` layout option, changes the post content info field's label position, and appends a new field to the discussion group. Then `replace()` swaps the whole set of form fields for an exact list.
+In the following example, `merge()` adds a custom saved view to the `page` list, retitles the existing Drafts view, unsets the `grid` layout option, changes the post content info field's label position, and appends a new field to the discussion group. Then `replace()` swaps the whole set of form fields for an exact list, and `remove()` drops the Pending saved view by slug.
 
 ```php
 function example_filter_page_view_config( $data ) {
@@ -180,6 +191,11 @@ function example_filter_page_view_config( $data ) {
         ),
         1
     );
+
+    // remove(): drop the "Pending" saved view by slug, without touching the
+    // rest of the list. Naming the one member keeps inheriting core's future
+    // additions to view_list — unlike replacing it with a shorter list.
+    $data->remove( array( 'view_list' => array( 'pending' ) ), 1 );
 
     return $data;
 }

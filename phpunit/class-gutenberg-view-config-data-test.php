@@ -82,6 +82,190 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_remove_deletes_named_keys_and_leaves_the_rest() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'type'       => 'table',
+					'perPage'    => 23,
+					'showLevels' => true,
+					'fields'     => array( 'f1', 'f2' ),
+					'sort'       => array(
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
+				),
+				'form'         => array(
+					'fields' => array( 'f1', 'f2' ),
+				),
+			)
+		);
+		$data->remove( array( 'default_view' ), 1 );
+
+		$this->assertSame(
+			array(
+				'form' => array(
+					'fields' => array( 'f1', 'f2' ),
+				),
+			),
+			$data->get_data()
+		);
+	}
+
+	public function test_remove_deletes_scalar_properties() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'type'       => 'table',
+					'perPage'    => 23,
+					'showLevels' => true,
+					'fields'     => array( 'f1', 'f2' ),
+					'sort'       => array(
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
+				),
+				'form'         => array(
+					'fields' => array( 'f1', 'f2' ),
+				),
+			)
+		);
+		$data->remove( array( 'default_view' => array( 'showLevels' ) ), 1 );
+
+		$this->assertSame(
+		array(
+			'default_view' => array(
+				'type'       => 'table',
+				'perPage'    => 23,
+				'fields'     => array( 'f1', 'f2' ),
+				'sort'       => array(
+					'field'     => 'title',
+					'direction' => 'asc',
+				),
+			),
+			'form'         => array(
+				'fields' => array( 'f1', 'f2' ),
+			),
+		),
+			$data->get_data()
+		);
+	}
+
+	public function test_remove_deletes_associative_array_properties() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'type'       => 'table',
+					'perPage'    => 23,
+					'showLevels' => true,
+					'fields'     => array( 'f1', 'f2' ),
+					'sort'       => array(
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
+				),
+				'form'         => array(
+					'fields' => array( 'f1', 'f2' ),
+				),
+			)
+		);
+		$data->remove( array( 'default_view' => array( 'sort' ) ), 1 );
+
+		$this->assertSame(
+		array(
+			'default_view' => array(
+				'type'       => 'table',
+				'perPage'    => 23,
+				'showLevels' => true,
+				'fields'     => array( 'f1', 'f2' ),
+			),
+			'form'         => array(
+				'fields' => array( 'f1', 'f2' ),
+			),
+		),
+			$data->get_data()
+		);
+	}
+
+	public function test_remove_deletes_indexed_array_properties() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'type'       => 'table',
+					'perPage'    => 23,
+					'showLevels' => true,
+					'fields'     => array( 'f1', 'f2' ),
+					'sort'       => array(
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
+				),
+				'form'         => array(
+					'fields' => array( 'f1', 'f2' ),
+				),
+			)
+		);
+		$data->remove( array( 'default_view' => array( 'fields' ) ), 1 );
+
+		$this->assertSame(
+		array(
+			'default_view' => array(
+				'type'       => 'table',
+				'perPage'    => 23,
+				'showLevels' => true,
+				'sort' => array(
+				'field' => 'title',
+				'direction' => 'asc',
+				)
+			),
+			'form'         => array(
+				'fields' => array( 'f1', 'f2' ),
+			),
+		),
+			$data->get_data()
+		);
+	}
+
+	public function test_remove_deletes_items_in_indexed_array_properties() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'type'       => 'table',
+					'perPage'    => 23,
+					'showLevels' => true,
+					'fields'     => array( 'f1', 'f2', 'f3' ),
+					'sort'       => array(
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
+				),
+				'form'         => array(
+					'fields' => array( 'f1', 'f2' ),
+				),
+			)
+		);
+		$data->remove( array( 'default_view' => array( 'fields' => array( 'f2' )) ), 1 );
+
+		$this->assertSame(
+		array(
+			'default_view' => array(
+				'type'       => 'table',
+				'perPage'    => 23,
+				'showLevels' => true,
+				'fields' => array( 'f1', 'f3' ),
+				'sort' => array(
+				'field' => 'title',
+				'direction' => 'asc',
+				)
+			),
+			'form'         => array(
+				'fields' => array( 'f1', 'f2' ),
+			),
+		),
+			$data->get_data()
+		);
+	}
+
 	/**
 	 * set() rejects an undocumented top-level key and leaves the configuration
 	 * untouched.

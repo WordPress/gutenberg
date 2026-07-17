@@ -43,6 +43,11 @@
  * that changes the configuration shape can migrate existing patches forward
  * instead of breaking them.
  *
+ * Where those three write values, `remove()` deletes them: it takes a spec of
+ * names — a list to delete entries at a level, or a nested map to reach deeper —
+ * and prunes just what it names, mirroring the configuration's shape all the way
+ * down to individual list members.
+ *
  * @since 7.1.0
  */
 class Gutenberg_View_Config_Data {
@@ -117,6 +122,67 @@ class Gutenberg_View_Config_Data {
 	 */
 	public function set( array $patch, int $version ) {
 		return $this->apply( $patch, $version, __METHOD__, 'set' );
+	}
+
+	/**
+	 * Removes named properties from the configuration, leaving the rest alone.
+	 *
+	 * Where merge(), replace(), and set() take a patch of *values* to write,
+	 * remove() takes a spec of *names* to delete, and its shape mirrors the
+	 * configuration it prunes:
+	 *
+	 * - A list of names deletes each named entry from the value at that level: a
+	 *   key from an associative array, or the member with a matching identity
+	 *   (`id`, `slug`, `field`, or a bare scalar) from a list.
+	 * - An associative array maps a name to a nested spec, recursing into that
+	 *   entry's value to delete from within it.
+	 *
+	 * So `array( 'default_view' )` drops the whole `default_view` key,
+	 * `array( 'default_view' => array( 'sort' ) )` drops just its `sort`
+	 * property, and `array( 'default_view' => array( 'fields' => array( 'f2' ) ) )`
+	 * drops the `f2` member from its `fields` list. A name that is not present is
+	 * ignored, and a list is renumbered after a member is removed.
+	 *
+	 * A spec that declares an unsupported schema version is rejected and does not
+	 * change anything.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param array $spec    The names to remove, keyed to match the configuration shape.
+	 * @param int   $version The schema version the spec was authored against.
+	 * @return Gutenberg_View_Config_Data The instance, for chaining.
+	 */
+	public function remove( array $spec, int $version ) {
+		if ( $version <= 0 || $version > self::LATEST_VERSION ) {
+			_doing_it_wrong(
+				__METHOD__,
+				esc_html__( 'A view configuration contribution must declare a supported schema version.', 'gutenberg' ),
+				'7.1.0'
+			);
+
+			return $this;
+		}
+
+		// The top-level keys named for removal are the spec's values when it is a
+		// flat list of key names, or its keys when it maps a key to a nested spec.
+		$named_keys = array_is_list( $spec ) ? $spec : array_keys( $spec );
+		foreach ( $named_keys as $key ) {
+			if ( ! in_array( $key, self::CONFIG_KEYS, true ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					sprintf(
+						/* translators: %s: the configuration key. */
+						esc_html__( '"%s" is not a documented view configuration key.', 'gutenberg' ),
+						esc_html( $key )
+					),
+					'7.1.0'
+				);
+			}
+		}
+
+		$this->config = $this->remove_properties( $this->config, $spec );
+
+		return $this;
 	}
 
 	/**
@@ -295,6 +361,78 @@ class Gutenberg_View_Config_Data {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Removes the properties a spec names from the current value.
+	 *
+	 * The mirror of merge_properties(), applied at every nesting level: a list in
+	 * $spec names entries to delete from $current — associative keys are unset,
+	 * and list members are matched by identity (list_item_identity) and dropped —
+	 * while an associative $spec recurses into each named entry to prune from
+	 * within it. A name absent from $current is ignored, and a list is renumbered
+	 * after members are removed so it keeps sequential keys.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param mixed $current The current value.
+	 * @param mixed $spec    The names to remove from it.
+	 * @return mixed The pruned value.
+	 */
+	private function remove_properties( $current, $spec ) {
+		if ( ! is_array( $current ) || ! is_array( $spec ) ) {
+			return $current;
+		}
+
+		$current_is_list = array_is_list( $current );
+
+		if ( array_is_list( $spec ) ) {
+			// Each entry names something to delete from the current value.
+			foreach ( $spec as $name ) {
+				if ( $current_is_list ) {
+					$current = $this->remove_list_member( $current, $name );
+				} else {
+					unset( $current[ $name ] );
+				}
+			}
+		} else {
+			// Each key names an entry to recurse into and prune from within.
+			foreach ( $spec as $name => $subspec ) {
+				if ( $current_is_list ) {
+					foreach ( $current as $index => $member ) {
+						if ( $this->list_item_identity( $member ) === (string) $name ) {
+							$current[ $index ] = $this->remove_properties( $member, $subspec );
+							break;
+						}
+					}
+				} elseif ( array_key_exists( $name, $current ) ) {
+					$current[ $name ] = $this->remove_properties( $current[ $name ], $subspec );
+				}
+			}
+		}
+
+		// Renumber so a list from which a member was removed keeps sequential keys.
+		return $current_is_list ? array_values( $current ) : $current;
+	}
+
+	/**
+	 * Removes the first list member matching an identity, leaving the rest.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param array $members  The current list.
+	 * @param mixed $identity The identity of the member to remove.
+	 * @return array The list with the matching member removed, if any.
+	 */
+	private function remove_list_member( array $members, $identity ) {
+		foreach ( $members as $index => $member ) {
+			if ( $this->list_item_identity( $member ) === (string) $identity ) {
+				unset( $members[ $index ] );
+				break;
+			}
+		}
+
+		return $members;
 	}
 
 	/**
