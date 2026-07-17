@@ -3,6 +3,7 @@ import { Button } from '../button';
 import * as Tooltip from '../tooltip';
 import {
 	KeyboardShortcutDescription,
+	KeyboardShortcutDisplay,
 	useKeyboardShortcut,
 } from '../utils/keyboard-shortcut';
 import type { ShortcutButtonProps } from './types';
@@ -68,10 +69,8 @@ export const ShortcutButton = forwardRef<
 				) }
 			</Tooltip.Trigger>
 			<Tooltip.Popup positioner={ positioner }>
-				{ children }{ ' ' }
-				<span aria-hidden="true" dir="ltr">
-					{ shortcut.displayShortcut }
-				</span>
+				{ children }
+				<KeyboardShortcutDisplay shortcut={ shortcut } />
 			</Tooltip.Popup>
 		</Tooltip.Root>
 	);
