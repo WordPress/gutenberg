@@ -560,6 +560,23 @@ function resizeHighBitDepth<
  * decode the gain map alongside the base image, and `jpegsave*` delegates
  * to `uhdrsave*` on output when a gain map is attached.
  *
+ * Sub-sizes of animated images are generated from the first frame only
+ * by default, matching WordPress core's server-side behavior: both GD and
+ * Imagick flatten animated images when resizing, and
+ * `wp_calculate_image_srcset()` prevents flattened sub-sizes and the
+ * animated full-size image from mixing in a srcset. Loading all frames
+ * (`[n=-1]`) re-encodes a full animated GIF per sub-size, which takes tens
+ * of seconds for long animations and can produce sub-sizes larger than the
+ * original file.
+ * See https://github.com/WordPress/gutenberg/issues/80266.
+ *
+ * Sites can opt into animated sub-sizes via the
+ * `wp_generate_animated_image_subsizes` filter, carried here as the
+ * `preserveAnimation` option. Cropped sizes always flatten to the first
+ * frame (per-frame cropping is not supported), also matching the
+ * pre-existing behavior.
+ * See https://github.com/WordPress/gutenberg/issues/80383.
+ *
  * @param id      Item ID.
  * @param buffer  Original file buffer.
  * @param type    Mime type.
@@ -594,24 +611,6 @@ export async function resizeImage(
 	try {
 		const vips = await getVips();
 
-		/*
-		 * Sub-sizes of animated images are generated from the first frame
-		 * only by default, matching WordPress core's server-side behavior:
-		 * both GD and Imagick flatten animated images when resizing, and
-		 * wp_calculate_image_srcset() prevents flattened sub-sizes and the
-		 * animated full-size image from mixing in a srcset. Loading all
-		 * frames ([n=-1]) re-encodes a full animated GIF per sub-size,
-		 * which takes tens of seconds for long animations and can produce
-		 * sub-sizes larger than the original file.
-		 * See https://github.com/WordPress/gutenberg/issues/80266.
-		 *
-		 * Sites can opt into animated sub-sizes via the
-		 * `wp_generate_animated_image_subsizes` filter, carried here as
-		 * `preserveAnimation`. Cropped sizes always flatten to the first
-		 * frame (per-frame cropping is not supported), also matching the
-		 * pre-existing behavior.
-		 * See https://github.com/WordPress/gutenberg/issues/80383.
-		 */
 		let strOptions = '';
 		const loadOptions: LoadOptions< typeof type > = {};
 
