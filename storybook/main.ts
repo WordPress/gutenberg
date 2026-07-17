@@ -231,6 +231,12 @@ const config: StorybookConfig = {
 				},
 			},
 			optimizeDeps: {
+				// Pre-bundle CJS deps so Vite exposes a default export for Emotion.
+				include: [
+					'@emotion/react',
+					'@emotion/styled',
+					'hoist-non-react-statics',
+				],
 				esbuildOptions: {
 					loader: {
 						'.js': 'tsx',
