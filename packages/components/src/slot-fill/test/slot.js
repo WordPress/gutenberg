@@ -304,7 +304,7 @@ describe( 'Slot', () => {
 			// generated production call explicitly.
 			registerStyle( styleHash, css );
 
-			const { unmount } = render(
+			render(
 				<Provider>
 					<IframePortal>
 						<Slot name="cross-document" bubblesVirtually />
@@ -326,8 +326,6 @@ describe( 'Slot', () => {
 				iframeDocument.defaultView.getComputedStyle( styledElement )
 					.padding
 			).toBe( '32px' );
-
-			unmount();
 		} );
 	} );
 
