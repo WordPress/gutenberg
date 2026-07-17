@@ -1,14 +1,13 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import { createContext, useContext } from '@wordpress/element';
+import type { Ref } from 'react';
 
 /**
- * Inline size (px) the header keeps for the identity cluster before the
- * toolbar may claim the rest: the identity's CSS truncation floor (see
- * `.identity` in the header styles) plus the identity/toolbar gap.
+ * WordPress dependencies
  */
-export const WIDGET_HEADER_IDENTITY_RESERVE = 128;
+import { useResizeObserver } from '@wordpress/compose';
+import { createContext, useContext, useEffect } from '@wordpress/element';
 
 /**
  * Horizontal padding of the toolbar chip (`--wpds-dimension-padding-xs` per
@@ -29,4 +28,52 @@ export const WidgetHeaderAvailableSizeProvider =
  */
 export function useWidgetHeaderAvailableSize(): number | null {
 	return useContext( WidgetHeaderAvailableSizeContext );
+}
+
+interface WidgetHeaderReserve {
+	registerReserved: ( id: string, width: number ) => void;
+	unregisterReserved: ( id: string ) => void;
+}
+
+const WidgetHeaderReserveContext = createContext< WidgetHeaderReserve >( {
+	registerReserved: () => {},
+	unregisterReserved: () => {},
+} );
+
+export const WidgetHeaderReserveProvider = WidgetHeaderReserveContext.Provider;
+
+/**
+ * Reserves a trailing section's footprint from the header's fit budget.
+ *
+ * A section that sits beside the collapsible controls (the actions menu, and
+ * whatever the header gains next) attaches the returned ref to its root. Its
+ * measured width, plus the gap before it, is discounted from the space the
+ * collapsible controls plan for, so no section overflows onto another.
+ *
+ * @param {string} id Stable identifier for the reserving section.
+ */
+export function useReserveHeaderSpace< T extends HTMLElement = HTMLElement >(
+	id: string
+): Ref< T > {
+	const { registerReserved, unregisterReserved } = useContext(
+		WidgetHeaderReserveContext
+	);
+
+	const ref = useResizeObserver< T >( ( [ entry ] ) => {
+		const { columnGap } = getComputedStyle(
+			entry.target.parentElement as HTMLElement
+		);
+
+		registerReserved(
+			id,
+			entry.contentRect.width + ( parseFloat( columnGap ) || 0 )
+		);
+	} );
+
+	useEffect(
+		() => () => unregisterReserved( id ),
+		[ id, unregisterReserved ]
+	);
+
+	return ref;
 }

@@ -117,6 +117,7 @@ async function renderCollapsed() {
 	// are looked up only to dispatch simulated resize notifications.
 	/* eslint-disable testing-library/no-node-access */
 	const header = document.querySelector( '.style-widget-header' ) as Element;
+	const identity = document.querySelector( '.style-identity' ) as Element;
 	const inline = document.querySelector(
 		'.style-inline-controls'
 	) as Element;
@@ -127,6 +128,7 @@ async function renderCollapsed() {
 
 	notifyResize( persistent, 32 );
 	notifyResize( inline, 150 );
+	notifyResize( identity, 120 );
 	notifyResize( header, 200 );
 
 	await screen.findByRole( 'button', { name: 'Widget controls' } );
