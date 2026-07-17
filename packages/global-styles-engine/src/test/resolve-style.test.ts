@@ -25,7 +25,7 @@ describe( 'resolveStyle – merged output', () => {
 			expect( isExplicitEmpty( { a: 1 } ) ).toBe( false );
 		} );
 
-		test( 'isRefObject recognises { ref: "..." } envelopes', () => {
+		test( 'isRefObject recognises { ref: "..." } values', () => {
 			expect( isRefObject( { ref: 'styles.color.text' } ) ).toBe( true );
 			expect( isRefObject( { ref: '' } ) ).toBe( true );
 			expect( isRefObject( { ref: 42 } ) ).toBe( false );
@@ -182,38 +182,35 @@ describe( 'resolveStyle – merged output', () => {
 		};
 
 		test( 'root only (layer 1)', () => {
-			const { value: out } = resolveStyle( {
+			const { value: out } = resolveStyle( gs, {
 				blockName: 'core/paragraph',
-				globalStyles: gs,
 			} );
 			expect( out.typography.fontSize ).toBe( '16px' );
 			expect( out.typography.lineHeight ).toBe( '1.5' );
 		} );
 
 		test( 'block-default (layer 3) overrides element + root', () => {
-			const { value: out } = resolveStyle( {
+			const { value: out } = resolveStyle( gs, {
 				blockName: 'core/heading',
-				globalStyles: gs,
 			} );
 			expect( out.typography.fontSize ).toBe( '28px' );
 			expect( out.typography.lineHeight ).toBe( '1.5' );
 		} );
 
 		test( 'own-variation (layer 4b) wins', () => {
-			const { value: out } = resolveStyle( {
+			const { value: out } = resolveStyle( gs, {
 				blockName: 'core/heading',
-				ownVariation: 'plain',
-				globalStyles: gs,
+				variationName: 'plain',
 			} );
 			expect( out.typography.fontSize ).toBe( '20px' );
 			expect( out.typography.lineHeight ).toBe( '1.1' );
 		} );
 	} );
 
-	describe( 'state-aware inheritance (selectedState)', () => {
-		const DEFAULT_STATE = { viewport: 'default', pseudo: 'default' };
-		const HOVER_STATE = { viewport: 'default', pseudo: ':hover' };
-		const MOBILE_STATE = { viewport: '@mobile', pseudo: 'default' };
+	describe( 'state-aware inheritance (viewport + pseudoState)', () => {
+		const DEFAULT_STATE = { viewport: 'default', pseudoState: 'default' };
+		const HOVER_STATE = { viewport: 'default', pseudoState: ':hover' };
+		const MOBILE_STATE = { viewport: '@mobile', pseudoState: 'default' };
 
 		// Button-style block with base + `:hover` slices at the root element,
 		// block, and block-element layers, plus a base-only leaf (fontSize).
@@ -230,48 +227,43 @@ describe( 'resolveStyle – merged output', () => {
 			},
 		};
 
-		test( 'no selectedState behaves as the default state (base value)', () => {
-			const { value: out } = resolveStyle( {
+		test( 'no state behaves as the default state (base value)', () => {
+			const { value: out } = resolveStyle( gs, {
 				blockName: 'core/button',
-				globalStyles: gs,
 			} );
 			expect( out.color.text ).toBe( 'buttonBase' );
 		} );
 
-		test( 'explicit default selectedState is identical to base', () => {
-			const { value: out } = resolveStyle( {
+		test( 'explicit default state is identical to base', () => {
+			const { value: out } = resolveStyle( gs, {
 				blockName: 'core/button',
-				globalStyles: gs,
-				selectedState: DEFAULT_STATE,
+				...DEFAULT_STATE,
 			} );
 			expect( out.color.text ).toBe( 'buttonBase' );
 		} );
 
 		test( 'pseudo state layers the block `:hover` slice over base', () => {
-			const { value: out } = resolveStyle( {
+			const { value: out } = resolveStyle( gs, {
 				blockName: 'core/button',
-				globalStyles: gs,
-				selectedState: HOVER_STATE,
+				...HOVER_STATE,
 			} );
 			// Block-level `:hover` wins over the base color.
 			expect( out.color.text ).toBe( 'buttonHover' );
 		} );
 
 		test( 'base-only leaves still inherit under a selected state (CSS cascade)', () => {
-			const { value: out } = resolveStyle( {
+			const { value: out } = resolveStyle( gs, {
 				blockName: 'core/button',
-				globalStyles: gs,
-				selectedState: HOVER_STATE,
+				...HOVER_STATE,
 			} );
 			// fontSize has no `:hover` override → cascades from the base.
 			expect( out.typography.fontSize ).toBe( '13px' );
 		} );
 
 		test( 'responsive state with no Global Styles slice falls back to base', () => {
-			const { value: out } = resolveStyle( {
+			const { value: out } = resolveStyle( gs, {
 				blockName: 'core/button',
-				globalStyles: gs,
-				selectedState: MOBILE_STATE,
+				...MOBILE_STATE,
 			} );
 			// Global Styles carries no responsive sub-tree, so mobile inherits
 			// the base value unchanged.
@@ -293,10 +285,9 @@ describe( 'resolveStyle – merged output', () => {
 					},
 				},
 			};
-			const { value: out } = resolveStyle( {
+			const { value: out } = resolveStyle( responsiveGs, {
 				blockName: 'core/button',
-				globalStyles: responsiveGs,
-				selectedState: MOBILE_STATE,
+				...MOBILE_STATE,
 			} );
 			// The `@mobile` slice wins over the base color...
 			expect( out.color.text ).toBe( 'buttonMobile' );
@@ -306,25 +297,22 @@ describe( 'resolveStyle – merged output', () => {
 		} );
 
 		test( 'source map attributes a state-won leaf to its originating layer', () => {
-			const { value, sources } = resolveStyle( {
+			const { value, sources } = resolveStyle( gs, {
 				blockName: 'core/button',
-				globalStyles: gs,
-				selectedState: HOVER_STATE,
+				...HOVER_STATE,
 			} );
 			expect( value.color.text ).toBe( 'buttonHover' );
 			expect( sources[ 'color.text' ]?.layer ).toBe( 'block' );
 		} );
 
 		test( 'memoized variant keys distinct states separately', () => {
-			const { value: base } = resolveStyle( {
+			const { value: base } = resolveStyle( gs, {
 				blockName: 'core/button',
-				globalStyles: gs,
-				selectedState: DEFAULT_STATE,
+				...DEFAULT_STATE,
 			} );
-			const { value: hover } = resolveStyle( {
+			const { value: hover } = resolveStyle( gs, {
 				blockName: 'core/button',
-				globalStyles: gs,
-				selectedState: HOVER_STATE,
+				...HOVER_STATE,
 			} );
 			expect( base.color.text ).toBe( 'buttonBase' );
 			expect( hover.color.text ).toBe( 'buttonHover' );
@@ -332,7 +320,7 @@ describe( 'resolveStyle – merged output', () => {
 	} );
 
 	describe( 'element-based blocks fold root element styles', () => {
-		const HOVER_STATE = { viewport: 'default', pseudo: ':hover' };
+		const HOVER_STATE = { viewport: 'default', pseudoState: ':hover' };
 
 		test( 'core/button picks up root `elements.button` color and typography', () => {
 			const gs = {
@@ -346,9 +334,8 @@ describe( 'resolveStyle – merged output', () => {
 					},
 				},
 			};
-			const { value, sources } = resolveStyle( {
+			const { value, sources } = resolveStyle( gs, {
 				blockName: 'core/button',
-				globalStyles: gs,
 			} );
 			// Element styles surface as the block's own inherited values, so
 			// the Typography/Background/Border controls reflect the canvas.
@@ -374,9 +361,8 @@ describe( 'resolveStyle – merged output', () => {
 					},
 				},
 			};
-			const { value, sources } = resolveStyle( {
+			const { value, sources } = resolveStyle( gs, {
 				blockName: 'core/button',
-				globalStyles: gs,
 			} );
 			expect( value.color.text ).toBe( 'blockText' );
 			expect( sources[ 'color.text' ]?.layer ).toBe( 'block' );
@@ -390,9 +376,8 @@ describe( 'resolveStyle – merged output', () => {
 					},
 				},
 			};
-			const { value } = resolveStyle( {
+			const { value } = resolveStyle( gs, {
 				blockName: 'core/heading',
-				globalStyles: gs,
 			} );
 			expect( value.typography.fontWeight ).toBe( '700' );
 		} );
@@ -405,9 +390,8 @@ describe( 'resolveStyle – merged output', () => {
 					},
 				},
 			};
-			const { value } = resolveStyle( {
+			const { value } = resolveStyle( gs, {
 				blockName: 'core/paragraph',
-				globalStyles: gs,
 			} );
 			expect( value.color?.text ).toBeUndefined();
 		} );
@@ -423,10 +407,9 @@ describe( 'resolveStyle – merged output', () => {
 					},
 				},
 			};
-			const { value } = resolveStyle( {
+			const { value } = resolveStyle( gs, {
 				blockName: 'core/button',
-				globalStyles: gs,
-				selectedState: HOVER_STATE,
+				...HOVER_STATE,
 			} );
 			expect( value.color.background ).toBe( 'elementHover' );
 		} );
@@ -444,9 +427,8 @@ describe( 'resolveStyle – merged output', () => {
 					},
 				},
 			};
-			const { value: out } = resolveStyle( {
+			const { value: out } = resolveStyle( gs, {
 				blockName: 'core/heading',
-				globalStyles: gs,
 			} );
 			expect( out.typography.fontSize ).toBe( '16px' );
 		} );
@@ -461,9 +443,8 @@ describe( 'resolveStyle – merged output', () => {
 					},
 				},
 			};
-			const { value: out } = resolveStyle( {
+			const { value: out } = resolveStyle( gs, {
 				blockName: 'core/group',
-				globalStyles: gs,
 			} );
 			expect( out.spacing.padding.top ).toBe( '0' );
 		} );
@@ -472,34 +453,27 @@ describe( 'resolveStyle – merged output', () => {
 	describe( 'hydration + edge cases', () => {
 		test( 'falsy globalStyles returns {}', () => {
 			expect(
-				resolveStyle( {
+				resolveStyle( null, {
 					blockName: 'core/heading',
-					globalStyles: null,
 				} ).value
 			).toEqual( {} );
 			expect(
-				resolveStyle( {
-					blockName: 'core/heading',
-					globalStyles: {},
-				} ).value
+				resolveStyle( {}, { blockName: 'core/heading' } ).value
 			).toEqual( {} );
 		} );
 
 		test( 'missing blockName returns {}', () => {
 			expect(
 				resolveStyle( {
-					globalStyles: {
-						styles: { typography: { fontSize: '16px' } },
-					},
+					styles: { typography: { fontSize: '16px' } },
 				} ).value
 			).toEqual( {} );
 		} );
 
 		test( 'unknown block still inherits from root', () => {
 			const gs = { styles: { typography: { fontSize: '16px' } } };
-			const { value: out } = resolveStyle( {
+			const { value: out } = resolveStyle( gs, {
 				blockName: 'core/does-not-exist',
-				globalStyles: gs,
 			} );
 			expect( out.typography.fontSize ).toBe( '16px' );
 		} );
@@ -512,9 +486,8 @@ describe( 'resolveStyle – merged output', () => {
 					color: { text: 'var:preset|color|vivid-red' },
 				},
 			};
-			const { value: out } = resolveStyle( {
+			const { value: out } = resolveStyle( gs, {
 				blockName: 'core/paragraph',
-				globalStyles: gs,
 			} );
 			expect( out.color.text ).toBe( 'var:preset|color|vivid-red' );
 		} );
@@ -525,9 +498,8 @@ describe( 'resolveStyle – merged output', () => {
 					color: { text: 'var(--wp--preset--color--vivid-red)' },
 				},
 			};
-			const { value: out } = resolveStyle( {
+			const { value: out } = resolveStyle( gs, {
 				blockName: 'core/paragraph',
-				globalStyles: gs,
 			} );
 			expect( out.color.text ).toBe(
 				'var(--wp--preset--color--vivid-red)'
@@ -546,9 +518,8 @@ describe( 'resolveStyle – merged output', () => {
 					css: ':root { --x: 1; }',
 				},
 			};
-			const { value: out } = resolveStyle( {
+			const { value: out } = resolveStyle( gs, {
 				blockName: 'core/heading',
-				globalStyles: gs,
 			} );
 			expect( out ).not.toHaveProperty( 'blocks' );
 			expect( out ).not.toHaveProperty( 'variations' );
@@ -563,9 +534,8 @@ describe( 'resolveStyle – merged output', () => {
 					},
 				},
 			};
-			const { value: out } = resolveStyle( {
+			const { value: out } = resolveStyle( gs, {
 				blockName: 'core/paragraph',
-				globalStyles: gs,
 			} );
 			expect( out.elements.link.color.text ).toBe( '#0073aa' );
 		} );
@@ -602,10 +572,9 @@ describe( 'resolveStyle – merged output', () => {
 		};
 
 		test( 'returns value and source map from the same merge', () => {
-			const { value, sources } = resolveStyle( {
+			const { value, sources } = resolveStyle( gs, {
 				blockName: 'core/heading',
-				ownVariation: 'plain',
-				globalStyles: gs,
+				variationName: 'plain',
 			} );
 			expect( value.typography.fontSize ).toBe( '20px' );
 			expect( value.typography.lineHeight ).toBe( '1.5' );
@@ -618,9 +587,8 @@ describe( 'resolveStyle – merged output', () => {
 		} );
 
 		test( 'records preserved element sub-tree source paths', () => {
-			const { sources } = resolveStyle( {
+			const { sources } = resolveStyle( gs, {
 				blockName: 'core/paragraph',
-				globalStyles: gs,
 			} );
 			expect( sources[ 'elements.link.color.text' ] ).toMatchObject( {
 				layer: 'root',
@@ -632,13 +600,11 @@ describe( 'resolveStyle – merged output', () => {
 describe( 'resolveStyle – memoization', () => {
 	test( 'returns the same inheritance object identity for identical keys', () => {
 		const gs = { styles: { typography: { fontSize: '16px' } } };
-		const a = resolveStyle( {
+		const a = resolveStyle( gs, {
 			blockName: 'core/paragraph',
-			globalStyles: gs,
 		} );
-		const b = resolveStyle( {
+		const b = resolveStyle( gs, {
 			blockName: 'core/paragraph',
-			globalStyles: gs,
 		} );
 		expect( a ).toBe( b );
 		expect( a.value.typography.fontSize ).toBe( '16px' );
@@ -654,13 +620,11 @@ describe( 'resolveStyle – memoization', () => {
 				},
 			},
 		};
-		const { value: a } = resolveStyle( {
+		const { value: a } = resolveStyle( gs, {
 			blockName: 'core/paragraph',
-			globalStyles: gs,
 		} );
-		const { value: b } = resolveStyle( {
+		const { value: b } = resolveStyle( gs, {
 			blockName: 'core/heading',
-			globalStyles: gs,
 		} );
 		expect( a.typography.fontSize ).toBe( '16px' );
 		expect( b.typography.fontSize ).toBe( '24px' );
@@ -670,13 +634,11 @@ describe( 'resolveStyle – memoization', () => {
 	test( 'different globalStyles reference → re-computed', () => {
 		const gs1 = { styles: { typography: { fontSize: '16px' } } };
 		const gs2 = { styles: { typography: { fontSize: '18px' } } };
-		const { value: a } = resolveStyle( {
+		const { value: a } = resolveStyle( gs1, {
 			blockName: 'core/paragraph',
-			globalStyles: gs1,
 		} );
-		const { value: b } = resolveStyle( {
+		const { value: b } = resolveStyle( gs2, {
 			blockName: 'core/paragraph',
-			globalStyles: gs2,
 		} );
 		expect( a.typography.fontSize ).toBe( '16px' );
 		expect( b.typography.fontSize ).toBe( '18px' );
@@ -702,13 +664,15 @@ describe( 'resolveStyle – memoization', () => {
 			},
 		};
 		const buildWithLinks = ( href ) =>
-			resolveStyle( {
-				blockName: 'core/paragraph',
-				globalStyles: gs,
-				_links: {
-					'wp:theme-file': [ { name: 'file:./img.jpg', href } ],
+			resolveStyle(
+				{
+					...gs,
+					_links: {
+						'wp:theme-file': [ { name: 'file:./img.jpg', href } ],
+					},
 				},
-			} ).value.background.backgroundImage.url;
+				{ blockName: 'core/paragraph' }
+			).value.background.backgroundImage.url;
 
 		expect( buildWithLinks( 'https://example.test/a.jpg' ) ).toBe(
 			'https://example.test/a.jpg'
@@ -719,9 +683,8 @@ describe( 'resolveStyle – memoization', () => {
 	} );
 
 	test( 'falsy globalStyles delegates to the pure builder', () => {
-		const { value: a } = resolveStyle( {
+		const { value: a } = resolveStyle( null, {
 			blockName: 'core/paragraph',
-			globalStyles: null,
 		} );
 		expect( a ).toEqual( {} );
 	} );
@@ -731,11 +694,13 @@ describe( 'resolveStyle – non-cascading root drop', () => {
 	// Each call builds against a fresh `globalStyles` object so the
 	// identity-keyed memo never returns a cross-test cache hit.
 	const build = ( styles, extra = {} ) =>
-		resolveStyle( {
-			blockName: 'core/paragraph',
-			globalStyles: { styles },
-			...extra,
-		} );
+		resolveStyle(
+			{ styles },
+			{
+				blockName: 'core/paragraph',
+				...extra,
+			}
+		);
 
 	test( 'drops a root-sourced background color and its source', () => {
 		const { value, sources } = build( {
@@ -800,9 +765,8 @@ describe( 'resolveStyle – non-cascading root drop', () => {
 	} );
 
 	test( 'resolves a theme-file background image url via _links', () => {
-		const { value } = resolveStyle( {
-			blockName: 'core/paragraph',
-			globalStyles: {
+		const { value } = resolveStyle(
+			{
 				styles: {
 					blocks: {
 						'core/paragraph': {
@@ -815,16 +779,17 @@ describe( 'resolveStyle – non-cascading root drop', () => {
 						},
 					},
 				},
+				_links: {
+					'wp:theme-file': [
+						{
+							name: 'file:./img.jpg',
+							href: 'https://example.test/img.jpg',
+						},
+					],
+				},
 			},
-			_links: {
-				'wp:theme-file': [
-					{
-						name: 'file:./img.jpg',
-						href: 'https://example.test/img.jpg',
-					},
-				],
-			},
-		} );
+			{ blockName: 'core/paragraph' }
+		);
 		expect( value.background.backgroundImage.url ).toBe(
 			'https://example.test/img.jpg'
 		);

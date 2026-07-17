@@ -4,12 +4,13 @@
 import { getResolvedValue } from './utils/common';
 import { getValueFromObjectPath } from './utils/object';
 import { getVariationStyle } from './variation';
+import type { GlobalStylesConfig } from './types';
 
 type StyleTree = Record< string, any >;
 
 interface SelectedState {
-	viewport?: string;
-	pseudo?: string;
+	viewport?: string | null;
+	pseudoState?: string | null;
 }
 
 interface SourceDescriptor {
@@ -21,24 +22,28 @@ interface ResolvedStyle {
 	sources: Record< string, SourceDescriptor >;
 }
 
-interface ResolveStyleArgs {
+// Query describing which slice of `globalStyles` to resolve. Kept separate from
+// the styles data itself, which is the first argument to `resolveStyle`.
+interface ResolveStyleContext {
 	blockName?: string | null;
 	// Slug of the active block style variation, if any. Its styles are resolved
 	// against `globalStyles` internally and folded in as the highest layer.
-	ownVariation?: string | null;
-	globalStyles?: { styles?: StyleTree } | null;
-	selectedState?: SelectedState | null;
-	_links?: Record< string, any > | null;
+	variationName?: string | null;
+	// Responsive breakpoint (e.g. `@mobile`), or null for the default viewport.
+	viewport?: string | null;
+	// CSS pseudo-state (e.g. `:hover`), or null for the default state. Matches
+	// the `pseudo` terminology used across the block-editor state helpers.
+	pseudoState?: string | null;
 }
 
 const DEFAULT_STATE_VALUE = 'default';
 
 function isDefaultBlockStyleState( selectedState?: SelectedState | null ) {
 	const viewport = selectedState?.viewport;
-	const pseudo = selectedState?.pseudo;
+	const pseudoState = selectedState?.pseudoState;
 	return (
 		( ! viewport || viewport === DEFAULT_STATE_VALUE ) &&
-		( ! pseudo || pseudo === DEFAULT_STATE_VALUE )
+		( ! pseudoState || pseudoState === DEFAULT_STATE_VALUE )
 	);
 }
 
@@ -46,7 +51,7 @@ function getStyleStatePath( selectedState: SelectedState ) {
 	if ( isDefaultBlockStyleState( selectedState ) ) {
 		return [];
 	}
-	return [ selectedState.viewport, selectedState.pseudo ].filter(
+	return [ selectedState.viewport, selectedState.pseudoState ].filter(
 		( state ): state is string => !! state && state !== DEFAULT_STATE_VALUE
 	);
 }
@@ -154,7 +159,7 @@ function isRefObject( value: unknown ): value is { ref: string } {
  *
  * Does not recurse or clone; the returned contribution references the original
  * layer's sub-objects. The deep-merge step copies them into a fresh tree and
- * resolves `{ ref }` envelopes inline as it goes.
+ * resolves `{ ref }` values inline as it goes.
  *
  * @param layer Raw styles layer.
  * @return Root-scope contribution, or `null` when the layer is empty.
@@ -192,8 +197,8 @@ const ATOMIC_OBJECT_KEYS = new Set( [ 'backgroundImage' ] );
 /**
  * Deep-merge `source` into `target`:
  * - Plain objects recurse.
- * - `{ ref }` envelopes at source are resolved against `globalStyles` and
- *   merged in place of the envelope.
+ * - `{ ref }` values at source are resolved against `globalStyles` and merged
+ *   in place of the reference.
  * - Arrays, primitives, null, and atomic-object leaves (`ATOMIC_OBJECT_KEYS`)
  *   replace wholesale.
  * - Explicit-empty source leaves (`''`, `null`, `{}`) are dropped, preserving
@@ -366,7 +371,7 @@ function dropNonCascadingRootLeaves(
 
 // Resolve the inherited `background.backgroundImage` against the Global Styles
 // tree and its theme-file links, so consumers receive a final image value.
-// `{ ref }` envelopes are already resolved during the merge; this additionally
+// `{ ref }` values are already resolved during the merge; this additionally
 // resolves theme-file `.url` paths. The merge produces a fresh
 // `backgroundImage` object, so resolving in place does not mutate store data.
 function resolveThemeFileBackgroundImage(
@@ -392,21 +397,23 @@ function resolveThemeFileBackgroundImage(
  * source map describing which Global Styles layer supplied each winning leaf.
  * `resolveStyle` is the public, memoized entry point.
  *
- * @param args
- * @param args.blockName     Block name (e.g. `core/heading`).
- * @param args.ownVariation  Slug of the active block style variation, or null.
- * @param args.globalStyles  The `settings[ globalStylesDataKey ]` payload, wrapped as `{ styles }`.
- * @param args.selectedState Selected block style state, or null for the default state.
- * @param args._links        Theme-file links, used to resolve theme-file pointers.
+ * @param globalStyles          The Global Styles config (`{ styles, _links }`).
+ * @param context               Which slice to resolve.
+ * @param context.blockName     Block name (e.g. `core/heading`).
+ * @param context.variationName Slug of the active block style variation, or null.
+ * @param context.viewport      Responsive breakpoint, or null for the default viewport.
+ * @param context.pseudoState   CSS pseudo-state, or null for the default state.
  * @return Merged panel-scoped payload and source map.
  */
-function computeResolvedStyle( {
-	blockName,
-	ownVariation = null,
-	globalStyles,
-	selectedState = null,
-	_links = null,
-}: ResolveStyleArgs = {} ): ResolvedStyle {
+function computeResolvedStyle(
+	globalStyles?: GlobalStylesConfig | null,
+	{
+		blockName,
+		variationName = null,
+		viewport = null,
+		pseudoState = null,
+	}: ResolveStyleContext = {}
+): ResolvedStyle {
 	if ( ! globalStyles || ! globalStyles.styles ) {
 		return EMPTY_INHERITANCE;
 	}
@@ -414,7 +421,11 @@ function computeResolvedStyle( {
 		return EMPTY_INHERITANCE;
 	}
 
-	const { styles } = globalStyles;
+	// `styles` is the styles sub-tree each inheritance layer is picked from.
+	// `globalStyles` (the whole payload) is passed to the merge and variation
+	// lookups so a `{ ref }` value can resolve against a `styles.*` path.
+	const styles = globalStyles.styles as StyleTree;
+	const selectedState: SelectedState = { viewport, pseudoState };
 
 	const root = styles;
 	const block = styles.blocks?.[ blockName ] ?? null;
@@ -426,9 +437,9 @@ function computeResolvedStyle( {
 		? styles.elements?.[ rootElement ] ?? null
 		: null;
 	// Resolve the active block style variation's styles (with `{ ref }`
-	// envelopes resolved) against the Global Styles tree.
-	const variation = ownVariation
-		? getVariationStyle( globalStyles, blockName, ownVariation ) ?? null
+	// values resolved) against the Global Styles tree.
+	const variation = variationName
+		? getVariationStyle( globalStyles, blockName, variationName ) ?? null
 		: null;
 
 	// Layers ordered low to high precedence: root defaults, the matching
@@ -466,7 +477,7 @@ function computeResolvedStyle( {
 	// cascade: a block's `:hover`/responsive styles inherit from its base
 	// styles. State slices are appended after all base layers, preserving the
 	// same low-to-high scope ordering, so state values win over base.
-	if ( selectedState && ! isDefaultBlockStyleState( selectedState ) ) {
+	if ( ! isDefaultBlockStyleState( selectedState ) ) {
 		contributions.push(
 			createContribution(
 				pickLayerRootContribution(
@@ -515,7 +526,7 @@ function computeResolvedStyle( {
 			deepMergeDroppingEmpties(
 				mergedValue,
 				contribution.styles,
-				globalStyles,
+				globalStyles as StyleTree,
 				contribution.source,
 				sources
 			),
@@ -526,7 +537,11 @@ function computeResolvedStyle( {
 	// value and sources together. Then resolve theme-file image pointers so
 	// consumers receive fully-resolved values.
 	dropNonCascadingRootLeaves( value, sources );
-	resolveThemeFileBackgroundImage( value, globalStyles, _links );
+	resolveThemeFileBackgroundImage(
+		value,
+		globalStyles as StyleTree,
+		( globalStyles._links as Record< string, any > ) ?? null
+	);
 
 	return { value, sources };
 }
@@ -534,9 +549,9 @@ function computeResolvedStyle( {
 const NO_LINKS = {};
 
 // Two-level memo: keyed by the raw Global Styles payload identity, then by the
-// `_links` map identity, then by a `(blockName, ownVariation, selectedState)`
-// string. Keying on both object identities means a change to either the styles
-// payload or the theme-file links produces a fresh entry.
+// `_links` map identity, then by a `(blockName, variationName, viewport,
+// pseudoState)` string. Keying on both object identities means a change to
+// either the styles payload or the theme-file links produces a fresh entry.
 const memo = new WeakMap<
 	object,
 	WeakMap< object, Map< string, ResolvedStyle > >
@@ -544,51 +559,53 @@ const memo = new WeakMap<
 
 /**
  * Public, memoized entry point for `computeResolvedStyle`. The active
- * variation's styles are resolved internally from `ownVariation`.
+ * variation's styles are resolved internally from `context.variationName`.
  *
  * Panels for the same selection share one `globalStyles.styles` payload, so
- * keying on it (not the per-hook `{ styles }` wrapper) collapses them to a
- * single cascade merge.
+ * keying on it (not the per-hook config wrapper) collapses them to a single
+ * cascade merge.
  *
- * @param args
+ * @param globalStyles The Global Styles config (`{ styles, _links }`).
+ * @param context      Which slice to resolve (block, variation, state).
  * @return Merged panel-scoped payload and source map; may be a cache hit.
  */
-export function resolveStyle( args: ResolveStyleArgs ): ResolvedStyle {
-	const styleData = args?.globalStyles?.styles;
+export function resolveStyle(
+	globalStyles?: GlobalStylesConfig | null,
+	context: ResolveStyleContext = {}
+): ResolvedStyle {
+	const styleData = globalStyles?.styles;
 	if ( ! styleData || typeof styleData !== 'object' ) {
-		return computeResolvedStyle( args );
+		return computeResolvedStyle( globalStyles, context );
 	}
 	let byLinks = memo.get( styleData );
 	if ( ! byLinks ) {
 		byLinks = new WeakMap();
 		memo.set( styleData, byLinks );
 	}
-	const linksKey = args._links ?? NO_LINKS;
+	const linksKey = globalStyles?._links ?? NO_LINKS;
 	let inner = byLinks.get( linksKey );
 	if ( ! inner ) {
 		inner = new Map();
 		byLinks.set( linksKey, inner );
 	}
-	const selectedStateKey = args.selectedState
-		? `${ args.selectedState.viewport ?? '' }:${
-				args.selectedState.pseudo ?? ''
-		  }`
-		: '';
+	const stateKey = `${ context.viewport ?? '' }:${
+		context.pseudoState ?? ''
+	}`;
 	const key =
-		( args.blockName || '' ) +
+		( context.blockName || '' ) +
 		'\u0001' +
-		( args.ownVariation || '' ) +
+		( context.variationName || '' ) +
 		'\u0001' +
-		selectedStateKey;
+		stateKey;
 	if ( inner.has( key ) ) {
 		return inner.get( key ) as ResolvedStyle;
 	}
-	const result = computeResolvedStyle( args );
+	const result = computeResolvedStyle( globalStyles, context );
 	inner.set( key, result );
 	return result;
 }
 
-// Internal helpers exported for unit tests only — not part of the package's
+// Internal helpers exported for unit tests only. Not part of the package's
 // public or private API surface.
 export const privateHelpers = {
 	isExplicitEmpty,

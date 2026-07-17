@@ -20,11 +20,11 @@ import { unlock } from '../../lock-unlock';
 const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
 
 /**
- * Reads the Global Styles payload and returns it wrapped as `{ styles }` (the
- * shape `resolveStyle` expects), plus the theme-file `_links` map used to
- * resolve theme-file pointers such as background images.
+ * Reads the Global Styles payload and returns it as a `GlobalStylesConfig`
+ * (`{ styles, _links }`), the shape `resolveStyle` expects. `_links` carries
+ * the theme-file map used to resolve pointers such as background images.
  *
- * @return {{ globalStyles: ?Object, links: ?Object }} Wrapped Global Styles payload and links map.
+ * @return {?Object} Global Styles config, or `null` before the payload settles.
  */
 function useRawGlobalStyles() {
 	const { rawGlobalStylesData, links } = useSelect( ( select ) => {
@@ -34,11 +34,13 @@ function useRawGlobalStyles() {
 			links: settings[ globalStylesLinksDataKey ] ?? null,
 		};
 	}, [] );
-	const globalStyles = useMemo(
-		() => ( rawGlobalStylesData ? { styles: rawGlobalStylesData } : null ),
-		[ rawGlobalStylesData ]
+	return useMemo(
+		() =>
+			rawGlobalStylesData
+				? { styles: rawGlobalStylesData, _links: links ?? undefined }
+				: null,
+		[ rawGlobalStylesData, links ]
 	);
-	return { globalStyles, links };
 }
 
 /**
@@ -91,19 +93,18 @@ function useOwnVariation( blockName, className ) {
  * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map.
  */
 export function useResolvedStyle( blockName, className, selectedState = null ) {
-	const ownVariation = useOwnVariation( blockName, className );
-	const { globalStyles, links } = useRawGlobalStyles();
+	const variationName = useOwnVariation( blockName, className );
+	const globalStyles = useRawGlobalStyles();
 
 	return useMemo( () => {
 		if ( ! blockName ) {
 			return { value: {}, sources: {} };
 		}
-		return resolveStyle( {
+		return resolveStyle( globalStyles, {
 			blockName,
-			ownVariation,
-			globalStyles,
-			selectedState,
-			_links: links,
+			variationName,
+			viewport: selectedState?.viewport ?? null,
+			pseudoState: selectedState?.pseudo ?? null,
 		} );
-	}, [ blockName, ownVariation, globalStyles, selectedState, links ] );
+	}, [ blockName, variationName, globalStyles, selectedState ] );
 }
