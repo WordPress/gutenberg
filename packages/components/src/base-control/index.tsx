@@ -28,7 +28,7 @@ const UnconnectedBaseControl = (
 	} = useContextSystem( props, 'BaseControl' );
 
 	return (
-		<Wrapper className={ className }>
+		<Wrapper className={ clsx( 'components-base-control', className ) }>
 			<StyledField className="components-base-control__field">
 				{ label &&
 					id &&
