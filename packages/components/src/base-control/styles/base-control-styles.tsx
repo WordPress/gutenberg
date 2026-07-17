@@ -35,11 +35,7 @@ function UnforwardedWrapper< T extends ElementType = 'div' >(
 		<PolymorphicElement
 			ref={ ref }
 			{ ...props }
-			className={ clsx(
-				styles.wrapper,
-				'components-base-control',
-				className
-			) }
+			className={ clsx( styles.wrapper, className ) }
 		/>
 	);
 }
