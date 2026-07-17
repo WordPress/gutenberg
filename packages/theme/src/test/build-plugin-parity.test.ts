@@ -16,6 +16,8 @@ import vitePlugin from '../../vite-plugins/vite-ds-token-fallbacks.mjs';
 const fixturesDirectory = join( __dirname, 'fixtures/build-plugins' );
 const validJsFixture = join( fixturesDirectory, 'source.ts' );
 const unknownJsFixture = join( fixturesDirectory, 'unknown-token.ts' );
+const emptyFallbackCssFixture = join( fixturesDirectory, 'empty-fallback.css' );
+const emptyFallbackJsFixture = join( fixturesDirectory, 'empty-fallback.ts' );
 
 function transformWithLightningcss( source: string, filename: string ) {
 	return lightningcssTransform( {
@@ -113,6 +115,45 @@ describe( 'design token fallback build plugin parity', () => {
 		);
 		expect( lightningcssResult ).toContain(
 			'var(--wpds-dimension-gap-sm, 8px)'
+		);
+	} );
+
+	it( 'leaves an empty var() fallback untouched in PostCSS', async () => {
+		const source = await readFile( emptyFallbackCssFixture, 'utf8' );
+		const result = await postcss( [ postcssPlugin ] ).process( source, {
+			from: emptyFallbackCssFixture,
+		} );
+
+		expect( result.css ).toContain( 'gap: var(--wpds-dimension-gap-sm,);' );
+	} );
+
+	it( 'leaves an empty var() fallback untouched in Lightning CSS', async () => {
+		const source = await readFile( emptyFallbackCssFixture, 'utf8' );
+		const result = transformWithLightningcss(
+			source,
+			emptyFallbackCssFixture
+		);
+
+		// Lightning CSS normalizes empty fallbacks with a space before `)`.
+		expect( result ).toContain( 'var(--wpds-dimension-gap-sm, )' );
+	} );
+
+	it( 'leaves an empty var() fallback untouched in esbuild', async () => {
+		const result = await getEsbuildHook().transform( {
+			path: emptyFallbackJsFixture,
+		} as OnLoadArgs );
+
+		expect( result?.contents ).toContain(
+			'gap: var(--wpds-dimension-gap-sm,);'
+		);
+	} );
+
+	it( 'leaves an empty var() fallback untouched in Vite', async () => {
+		const source = await readFile( emptyFallbackJsFixture, 'utf8' );
+		const result = getViteTransform()( source, emptyFallbackJsFixture );
+
+		expect( result?.code ).toContain(
+			'gap: var(--wpds-dimension-gap-sm,);'
 		);
 	} );
 

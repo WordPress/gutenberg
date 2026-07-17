@@ -12,8 +12,9 @@ import { addFallbackToVar } from '../postcss-plugins/ds-token-fallbacks.mjs';
 const plugin = {
 	/** @param {import('lightningcss').Variable} variable */
 	Variable( variable ) {
-		// Leave existing fallbacks alone (idempotent).
-		if ( variable.fallback?.length ) {
+		// Leave existing fallbacks alone, including the valid empty fallback
+		// form `var(--token,)` which Lightning CSS parses as `fallback: []`.
+		if ( variable.fallback !== null ) {
 			return;
 		}
 
