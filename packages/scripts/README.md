@@ -177,6 +177,8 @@ It uses [check-node-version](https://www.npmjs.com/package/check-node-version) b
 
 Validates that all dependencies of a project are compatible with the project’s own license.
 
+Note that this is a WordPress-specific tool: it assumes that the project is distributed under the terms of the GPL version 2 (or later). GPLv3-licensed dependencies are considered compatible by default, since a "GPLv2 or later" project can be combined with GPLv3 code and distributed under GPLv3. Passing the `--gpl2` flag restricts the check to strict GPLv2 compatibility, which excludes GPLv3 (and other GPLv2-incompatible licenses such as Apache-2.0). This tool performs a best-effort check of `license` metadata and license files; it isn't guaranteed to produce legally accurate results.
+
 _Example:_
 
 ```json

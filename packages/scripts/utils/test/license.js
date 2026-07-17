@@ -7,7 +7,11 @@ const path = require( 'path' );
 /**
  * Internal dependencies
  */
-import { detectTypeFromLicenseText, checkAllCompatible } from '../license';
+const {
+	detectTypeFromLicenseText,
+	checkAllCompatible,
+	getLicenses,
+} = require( '../license' );
 
 describe( 'detectTypeFromLicenseText', () => {
 	let licenseText;
@@ -82,5 +86,28 @@ describe( 'checkAllCompatible', () => {
 		expect( checkAllCompatible( [ 'A', 'D' ], [ 'A', 'B', 'C' ] ) ).toBe(
 			false
 		);
+	} );
+} );
+
+describe( 'getLicenses', () => {
+	it( 'should include GPLv3 licenses by default', () => {
+		const licenses = getLicenses( false );
+
+		expect( licenses ).toContain( 'GPL-3.0' );
+		expect( licenses ).toContain( 'GPL-3.0-only' );
+		expect( licenses ).toContain( 'GPL-3.0-or-later' );
+	} );
+
+	it( 'should exclude GPLv3 licenses when gpl2 is true', () => {
+		const licenses = getLicenses( true );
+
+		expect( licenses ).not.toContain( 'GPL-3.0' );
+		expect( licenses ).not.toContain( 'GPL-3.0-only' );
+		expect( licenses ).not.toContain( 'GPL-3.0-or-later' );
+	} );
+
+	it( 'should always include GPLv2 compatible licenses', () => {
+		expect( getLicenses( true ) ).toContain( 'GPL-2.0-or-later' );
+		expect( getLicenses( false ) ).toContain( 'GPL-2.0-or-later' );
 	} );
 } );
