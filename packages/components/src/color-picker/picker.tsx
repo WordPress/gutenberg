@@ -5,35 +5,12 @@ import type { PointerEvent } from 'react';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { HsvColorPicker, HsvaColorPicker } from 'react-colorful';
 import { colord } from 'colord';
-import type { HsvaColor } from 'react-colorful';
+import type { HslaColor, HsvaColor } from 'react-colorful';
 
 /**
  * Internal dependencies
  */
 import type { PickerProps } from './types';
-
-function getPointerCaptureProps( {
-	onInteractionStart,
-	onInteractionEnd,
-}: {
-	onInteractionStart?: () => void;
-	onInteractionEnd?: () => void;
-} ) {
-	return {
-		onPointerDown( { currentTarget, pointerId }: PointerEvent ) {
-			onInteractionStart?.();
-			currentTarget.setPointerCapture( pointerId );
-		},
-		onPointerUp( { currentTarget, pointerId }: PointerEvent ) {
-			currentTarget.releasePointerCapture( pointerId );
-			onInteractionEnd?.();
-		},
-		onPointerCancel( { currentTarget, pointerId }: PointerEvent ) {
-			currentTarget.releasePointerCapture( pointerId );
-			onInteractionEnd?.();
-		},
-	};
-}
 
 function toHsva( hsla: PickerProps[ 'hsla' ] ): HsvaColor {
 	return {
@@ -42,13 +19,21 @@ function toHsva( hsla: PickerProps[ 'hsla' ] ): HsvaColor {
 	};
 }
 
+function isSameHsla( a: HslaColor, b: HslaColor ): boolean {
+	return a.h === b.h && a.s === b.s && a.l === b.l && a.a === b.a;
+}
+
 /**
  * Visual color surface.
  *
  * Uses HSVA (react-colorful's native model) and keeps that value in local
- * state while dragging so HSLA↔hex round-trips cannot move the pointer
- * Parent ColorPicker still speaks HSLA for
- * inputs and controlled value sync, conversion happens only at the boundary.
+ * state so HSLA↔hex round-trips cannot move the pointer
+ * (#80110, #75157, #80205). Parent ColorPicker still speaks HSLA for
+ * inputs and controlled value sync; conversion happens only at the boundary.
+ *
+ * Prop sync from parent HSLA is suppressed for:
+ * - pointer/touch drags (interaction flag), and
+ * - any picker-originated update including keyboard (HSLA origin token).
  */
 export const Picker = ( {
 	hsla,
@@ -58,31 +43,51 @@ export const Picker = ( {
 	onInteractionEnd,
 }: PickerProps ) => {
 	const [ hsva, setHsva ] = useState< HsvaColor >( () => toHsva( hsla ) );
-	const isInteractingRef = useRef( false );
+	// Last HSLA emitted by this picker — skip echoing it back into HSVA.
+	const pickerOriginHslaRef = useRef< HslaColor | null >( null );
+	// Pointer/touch drag: never sync from HSLA mid-gesture (origin match alone
+	// can fail across rapid frames when parent gradient state re-renders).
+	const isPointerInteractingRef = useRef( false );
 
-	// Sync from parent HSLA only when not dragging (HSL inputs / external).
 	useEffect( () => {
-		if ( isInteractingRef.current ) {
+		if ( isPointerInteractingRef.current ) {
 			return;
 		}
+		if (
+			pickerOriginHslaRef.current &&
+			isSameHsla( pickerOriginHslaRef.current, hsla )
+		) {
+			return;
+		}
+		pickerOriginHslaRef.current = null;
 		setHsva( toHsva( hsla ) );
 	}, [ hsla ] );
 
-	const pointerCaptureProps = getPointerCaptureProps( {
-		onInteractionStart: () => {
-			isInteractingRef.current = true;
+	// Inline handlers so refs are not passed into a helper during render
+	// (react-hooks/refs). Pointer capture also keeps drag working over iframes.
+	const pointerCaptureProps = {
+		onPointerDown( { currentTarget, pointerId }: PointerEvent ) {
+			isPointerInteractingRef.current = true;
 			onInteractionStart?.();
+			currentTarget.setPointerCapture( pointerId );
 		},
-		onInteractionEnd: () => {
-			isInteractingRef.current = false;
+		onPointerUp( { currentTarget, pointerId }: PointerEvent ) {
+			currentTarget.releasePointerCapture( pointerId );
+			isPointerInteractingRef.current = false;
 			onInteractionEnd?.();
 		},
-	} );
+		onPointerCancel( { currentTarget, pointerId }: PointerEvent ) {
+			currentTarget.releasePointerCapture( pointerId );
+			isPointerInteractingRef.current = false;
+			onInteractionEnd?.();
+		},
+	};
 
 	const handleChange = ( next: HsvaColor ) => {
 		setHsva( next );
-		const nextHsl = colord( next ).toHsl();
-		onChange( { ...nextHsl, a: next.a } );
+		const nextHsla: HslaColor = { ...colord( next ).toHsl(), a: next.a };
+		pickerOriginHslaRef.current = nextHsla;
+		onChange( nextHsla );
 	};
 
 	if ( enableAlpha ) {
@@ -95,11 +100,16 @@ export const Picker = ( {
 		);
 	}
 
+	// HsvColorPicker's equality checks enumerate own keys — never pass `a`,
+	// or every parent re-render looks like an external color change and the
+	// pointer jitters while dragging.
+	const hsv = { h: hsva.h, s: hsva.s, v: hsva.v };
+
 	return (
 		<HsvColorPicker
-			color={ hsva }
+			color={ hsv }
 			onChange={ ( next ) => {
-				handleChange( { ...next, a: hsla.a } );
+				handleChange( { ...next, a: hsva.a } );
 			} }
 			{ ...pointerCaptureProps }
 		/>

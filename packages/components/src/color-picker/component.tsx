@@ -98,7 +98,8 @@ const UnconnectedColorPicker = (
 	// distinguish our own updates from external prop changes.
 	const lastProducedHexRef = useRef( safeColordColor.toHex() );
 
-	// While the user is dragging the visual picker, ignore color-prop sync.
+	// While the user is dragging the visual picker, ignore color-prop sync
+	// so delayed/stale controlled echoes cannot overwrite internalHSLA mid-drag.
 	const isPickerInteractingRef = useRef( false );
 
 	// Sync internalHSLA when the color prop changes externally (e.g.
@@ -120,10 +121,11 @@ const UnconnectedColorPicker = (
 		setInternalHSLA( ( prev ) => mergeHSLA( externalHSLA, prev ) );
 	}, [ safeColordColor ] );
 
-	// Handler for HSL inputs (and the HSVA picker after conversion to HSLA).
-	// Updates the local HSLA state, then notifies the parent only when the
-	// resulting color changes. Uses setColor directly (not debounced) to
-	// avoid races with the debounced hex/RGB updates.
+	// Handler for HSL inputs (and the HSVA picker after it converts to HSLA).
+	// Apply the user's HSLA, then notify the parent only when the color
+	// actually changes. setColor must not run inside setInternalHSLA
+	// (state updaters must be pure). Uses direct setColor (not debounced)
+	// to avoid races with hex/RGB's debouncedSetColor.
 	const handleHSLAChange = useCallback(
 		( nextHSLA: HslaColor ) => {
 			setInternalHSLA( nextHSLA );

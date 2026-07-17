@@ -131,8 +131,6 @@ function ControlPoints( {
 }: ControlPointsProps ) {
 	const controlPointMoveStateRef =
 		useRef< ControlPointMoveState >( undefined );
-	const controlPointsRef = useRef( controlPoints );
-	controlPointsRef.current = controlPoints;
 
 	const onMouseMove = ( event: MouseEvent ) => {
 		if (
@@ -287,7 +285,7 @@ function ControlPoints( {
 										onChange={ ( color ) => {
 											onChange(
 												updateControlPointColor(
-													controlPointsRef.current,
+													controlPoints,
 													index,
 													colord(
 														color
@@ -344,14 +342,6 @@ function InsertPoint( {
 	__experimentalIsRenderedInSidebar,
 }: InsertPointProps ) {
 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
-	// Keep the ColorPicker controlled so parent gradient updates during
-	// drag do not reset it to the default white and jitter
-	const [ pickerColor, setPickerColor ] = useState( '#ffffff' );
-	const controlPointsRef = useRef( controlPoints );
-	controlPointsRef.current = controlPoints;
-	const alreadyInsertedRef = useRef( alreadyInsertedPoint );
-	alreadyInsertedRef.current = alreadyInsertedPoint;
-
 	return (
 		<GradientColorPickerDropdown
 			isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
@@ -369,7 +359,6 @@ function InsertPoint( {
 							onCloseInserter();
 						} else {
 							setAlreadyInsertedPoint( false );
-							setPickerColor( '#ffffff' );
 							onOpenInserter();
 						}
 						onToggle();
@@ -382,14 +371,11 @@ function InsertPoint( {
 				<DropdownContentWrapper paddingSize="none">
 					<ColorPicker
 						enableAlpha={ ! disableAlpha }
-						color={ pickerColor }
 						onChange={ ( color ) => {
-							setPickerColor( color );
-							const points = controlPointsRef.current;
-							if ( ! alreadyInsertedRef.current ) {
+							if ( ! alreadyInsertedPoint ) {
 								onChange(
 									addControlPoint(
-										points,
+										controlPoints,
 										insertPosition,
 										colord( color ).toRgbString()
 									)
@@ -398,7 +384,7 @@ function InsertPoint( {
 							} else {
 								onChange(
 									updateControlPointColorByPosition(
-										points,
+										controlPoints,
 										insertPosition,
 										colord( color ).toRgbString()
 									)
