@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `IconButton`: Require shortcut metadata to include a human-readable description and render that description for assistive technologies. ([#80402](https://github.com/WordPress/gutenberg/pull/80402))
+
 ### Enhancements
 
 -   Add `SearchableChipSelect` primitive ([#80779](https://github.com/WordPress/gutenberg/pull/80779)).
