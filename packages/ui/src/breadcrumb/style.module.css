@@ -10,7 +10,7 @@
 		}
 
 		.list {
-			--wp-ui-breadcrumb-focus-ring-space: calc(var(--wpds-border-width-focus) * 2);
+			--wp-ui-breadcrumb-focus-ring-space: var(--wpds-dimension-padding-xs);
 
 			display: flex;
 			align-items: center;
