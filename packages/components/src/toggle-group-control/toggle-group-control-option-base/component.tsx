@@ -8,7 +8,13 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
+import {
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+	useEffect,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -53,6 +59,8 @@ function ToggleGroupControlOptionBase(
 ) {
 	const toggleGroupControlContext = useToggleGroupControlContext();
 
+	const [ isInitiallyPressed, setIsInitiallyPressed ] = useState( false );
+
 	const id = useInstanceId(
 		ToggleGroupControlOptionBase,
 		toggleGroupControlContext.baseId || 'toggle-group-control-option-base'
@@ -77,6 +85,14 @@ function ToggleGroupControlOptionBase(
 	} = buttonProps;
 
 	const isPressed = toggleGroupControlContext.value === value;
+
+	// Track initial pressed state on first render.
+	useEffect( () => {
+		if ( isPressed && ! isInitiallyPressed ) {
+			setIsInitiallyPressed( true );
+		}
+	}, [] );
+
 	const cx = useCx();
 	const labelViewClasses = useMemo(
 		() => cx( isBlock && styles.labelBlock ),
@@ -96,7 +112,7 @@ function ToggleGroupControlOptionBase(
 	);
 
 	const buttonOnClick = () => {
-		if ( isDeselectable && isPressed ) {
+		if ( isDeselectable && isPressed && ! isInitiallyPressed ) {
 			toggleGroupControlContext.setValue( undefined );
 		} else {
 			toggleGroupControlContext.setValue( value );
