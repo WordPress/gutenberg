@@ -27,7 +27,7 @@
 			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.mjs"
 		},
-		"./build-style/": "./build-style/",
+		"./build-style/*": "./build-style/*",
 		"./package.json": "./package.json"
 	},
 	"wpScriptModuleExports": "./build-module/index.mjs",
