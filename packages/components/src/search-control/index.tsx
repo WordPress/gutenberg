@@ -23,16 +23,7 @@ import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { SearchControlProps, SuffixItemProps } from './types';
 import { StyledInputControl, StyledIcon } from './styles';
 
-function SuffixItem( {
-	searchRef,
-	value,
-	onChange,
-	onClose,
-}: SuffixItemProps ) {
-	if ( ! onClose && ! value ) {
-		return null;
-	}
-
+function SuffixItem( { searchRef, onChange, onClose }: SuffixItemProps ) {
 	if ( onClose ) {
 		deprecated( '`onClose` prop in wp.components.SearchControl', {
 			since: '6.8',
@@ -110,7 +101,6 @@ function UnforwardedSearchControl(
 				hasSuffix && (
 					<SuffixItem
 						searchRef={ searchRef }
-						value={ value }
 						onChange={ onChange }
 						onClose={ onClose }
 					/>
