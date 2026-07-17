@@ -99,17 +99,25 @@
 			return jsx( 'div', {
 				...blockProps,
 				children: [
-					// An element that relies on the `inert` attribute, created with
-					// the bundled React 18 runtime (legacy `react.element` symbol).
 					jsxDEV(
 						'div',
 						{
-							className: 'react-18-compat-block__inert',
+							className: 'react-18-compat-block__inert-string',
 							inert: '',
 							children:
-								'This subtree is inert and built with the React 18 runtime.',
+								'This subtree is inert and uses a React 18 style string attribute.',
 						},
 						'inert'
+					),
+					jsx(
+						'div',
+						{
+							className: 'react-18-compat-block__inert-boolean',
+							inert: true,
+							children:
+								'This subtree is inert and uses a React 19 style boolean attribute.',
+						},
+						'inert-boolean'
 					),
 					// The `defaultProps` component, created with the
 					// externalized React runtime.
