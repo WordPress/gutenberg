@@ -59,21 +59,10 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 		 * {@see wp_unique_id_from_values()}. Explicitly declare the `wp-block-library`
 		 * dependency so `global-styles` is guaranteed to print after it, preventing
 		 * block default styles from unintentionally overriding global styles.
-		 *
-		 * Also depend on `block-style-variation-styles` so custom CSS always prints
-		 * after block style variation styles and wins the cascade at equal
-		 * specificity; without an explicit dependency the order is decided by
-		 * enqueue order. The handle must be registered here if it doesn't exist
-		 * yet (it is normally registered lazily while rendering a block with a
-		 * variation), because a style with an unregistered dependency is never
-		 * printed.
 		 */
 		$handle = 'wp-block-custom-css';
 		if ( ! wp_style_is( $handle, 'registered' ) ) {
-			if ( ! wp_style_is( 'block-style-variation-styles', 'registered' ) ) {
-				wp_register_style( 'block-style-variation-styles', false, array( 'wp-block-library', 'global-styles' ) );
-			}
-			wp_register_style( $handle, false, array( 'wp-block-library', 'global-styles', 'block-style-variation-styles' ) );
+			wp_register_style( $handle, false, array( 'wp-block-library', 'global-styles' ) );
 		}
 		$after_styles = wp_styles()->get_data( $handle, 'after' );
 		if ( ! is_array( $after_styles ) ) {

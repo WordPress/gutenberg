@@ -498,57 +498,8 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that custom CSS styles print after block style variation styles,
-	 * regardless of enqueue order, so that custom CSS wins the cascade at
-	 * equal specificity.
-	 *
-	 * @covers ::gutenberg_render_custom_css_support_styles
-	 */
-	public function test_custom_css_prints_after_block_style_variation_styles() {
-		wp_register_style( 'wp-block-library', false );
-		wp_register_style( 'global-styles', false );
-
-		$this->register_custom_css_block_with_support(
-			'test/custom-css-print-order',
-			array( 'customCSS' => true )
-		);
-
-		$parsed_block = array(
-			'blockName' => 'test/custom-css-print-order',
-			'attrs'     => array(
-				'style' => array(
-					'css' => 'border-style: double;',
-				),
-			),
-		);
-
-		gutenberg_render_custom_css_support_styles( $parsed_block );
-
-		// Mimic the block style variation support registering its per-instance
-		// styles, as done in gutenberg_render_block_style_variation_support_styles().
-		wp_register_style( 'block-style-variation-styles', false, array( 'wp-block-library', 'global-styles' ) );
-		wp_add_inline_style( 'block-style-variation-styles', ':root :where(.is-style-test-variation){border-style: dotted;}' );
-
-		// Enqueue custom CSS first to prove the declared dependency decides
-		// the print order, not the enqueue order.
-		wp_enqueue_style( 'wp-block-custom-css' );
-		wp_enqueue_style( 'block-style-variation-styles' );
-
-		$output = get_echo( 'wp_print_styles' );
-
-		$variation_position  = strpos( $output, 'border-style: dotted' );
-		$custom_css_position = strpos( $output, 'border-style: double' );
-
-		$this->assertNotFalse( $variation_position, 'Block style variation styles should be printed.' );
-		$this->assertNotFalse( $custom_css_position, 'Custom CSS should be printed.' );
-		$this->assertLessThan( $custom_css_position, $variation_position, 'Block style variation styles should print before custom CSS so custom CSS wins ties at equal specificity.' );
-	}
-
-	/**
-	 * Tests that custom CSS still prints when no block style variation styles
-	 * were registered on the page. The `block-style-variation-styles` handle
-	 * is normally registered lazily while rendering a block with a variation,
-	 * and a style with an unregistered dependency is never printed.
+	 * Tests that custom CSS prints when no block style variation styles
+	 * were registered on the page.
 	 *
 	 * @covers ::gutenberg_render_custom_css_support_styles
 	 */
