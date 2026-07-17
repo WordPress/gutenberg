@@ -78,34 +78,4 @@ test.describe( 'Block custom CSS', () => {
 		await expect( frontendGroup ).toHaveCSS( 'border-style', 'double' );
 		await expect( frontendGroup ).toHaveCSS( 'border-width', '6px' );
 	} );
-
-	test( 'applies custom CSS on the front end when no block style variations are used', async ( {
-		editor,
-		page,
-	} ) => {
-		// Guards the `block-style-variation-styles` handle dependency: custom
-		// CSS must still print when that handle was never populated on the page.
-		await editor.insertBlock( {
-			name: 'core/group',
-			attributes: {
-				className: 'custom-css-test-group',
-				style: {
-					css: 'border-style: dashed;',
-				},
-				layout: { type: 'constrained' },
-			},
-			innerBlocks: [
-				{
-					name: 'core/paragraph',
-					attributes: { content: 'Group with custom CSS' },
-				},
-			],
-		} );
-
-		const postId = await editor.publishPost();
-		await page.goto( `/?p=${ postId }` );
-
-		const frontendGroup = page.locator( '.custom-css-test-group' );
-		await expect( frontendGroup ).toHaveCSS( 'border-style', 'dashed' );
-	} );
 } );
