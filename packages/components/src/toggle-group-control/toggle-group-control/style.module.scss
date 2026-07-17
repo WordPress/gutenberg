@@ -25,7 +25,6 @@
 		background: $components-color-gray-100;
 		border: 1px solid $components-color-gray-700;
 
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
 		outline-offset: -3px;
 
@@ -53,7 +52,7 @@
 	&:focus-within {
 		z-index: 1;
 		@include mixins.outset-ring__focus();
-		// Preserve legacy Theme and validated-control accent overrides.
+		// Preserve validated-control accent overrides.
 		outline-color: $components-color-focus;
 	}
 }

@@ -25,8 +25,7 @@
 	font-family: inherit;
 	height: 100%;
 	justify-content: center;
-	/* stylelint-disable-next-line declaration-property-unit-allowed-list -- Preserve the existing percentage line height. */
-	line-height: 100%;
+	line-height: 1;
 	outline: none;
 	padding: 0 12px;
 	position: relative;
@@ -60,7 +59,7 @@
 .is-deselectable {
 	&:focus {
 		@include mixins.outset-ring__focus();
-		// Preserve legacy Theme and validated-control accent overrides.
+		// Preserve validated-control accent overrides.
 		outline-color: $components-color-focus;
 
 		// Hide overlapping border.
@@ -74,10 +73,7 @@
 .is-icon {
 	height: 38px;
 	aspect-ratio: 1;
-	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the existing physical padding override. */
-	padding-left: 0;
-	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the existing physical padding override. */
-	padding-right: 0;
+	padding: 0;
 }
 
 .is-pressed {
