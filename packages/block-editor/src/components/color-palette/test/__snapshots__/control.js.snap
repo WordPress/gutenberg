@@ -22,7 +22,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
               class="block-editor-color-gradient-control__color-indicator"
             >
               <span
-                class="style-label components-base-control__label components-base-control__label"
+                class="style-label components-base-control__label"
               >
                 Test Color
               </span>

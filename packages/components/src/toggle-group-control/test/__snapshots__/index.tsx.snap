@@ -35,7 +35,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
       class="style-field components-base-control__field components-base-control__field"
     >
       <label
-        class="style-label components-base-control__label components-base-control__label"
+        class="style-label components-base-control__label"
         for="wp-components-base-control-19"
       >
         Test Toggle Group Control
@@ -166,7 +166,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
       class="style-field components-base-control__field components-base-control__field"
     >
       <label
-        class="style-label components-base-control__label components-base-control__label"
+        class="style-label components-base-control__label"
         for="wp-components-base-control-18"
       >
         Test Toggle Group Control
@@ -272,7 +272,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
       class="style-field components-base-control__field components-base-control__field"
     >
       <label
-        class="style-label components-base-control__label components-base-control__label"
+        class="style-label components-base-control__label"
         for="wp-components-base-control-1"
       >
         Test Toggle Group Control
@@ -397,7 +397,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
       class="style-field components-base-control__field components-base-control__field"
     >
       <label
-        class="style-label components-base-control__label components-base-control__label"
+        class="style-label components-base-control__label"
         for="wp-components-base-control-0"
       >
         Test Toggle Group Control
