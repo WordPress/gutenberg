@@ -301,6 +301,8 @@ const { code } = transform( {
 } );
 ```
 
+> **Note:** CSS Modules [`from global`](https://lightningcss.dev/css-modules.html#local-css-variables) references (for example `var(--wpds-dimension-gap-sm from global)` with `cssModules.dashedIdents`) are not yet supported. The visitor rebuilds `var()` from the token name alone, so `from` metadata is dropped and global custom properties may be incorrectly hashed.
+
 ### esbuild
 
 ```js
