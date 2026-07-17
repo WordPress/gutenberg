@@ -11,7 +11,7 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
-import { useReserveHeaderSpace } from '../widget-header/widget-header-size';
+import { useReserveHeaderSpace } from '../widget-header/widget-header-fit';
 import { WidgetSettingsTrigger } from '../widget-settings';
 import { AttributesDropdown } from './attributes-dropdown';
 import { useInlineFit } from './use-inline-fit';

@@ -11,7 +11,7 @@ import type { WidgetType } from '@wordpress/widget-primitives';
 /**
  * Internal dependencies
  */
-import { useReserveHeaderSpace } from '../widget-header/widget-header-size';
+import { useReserveHeaderSpace } from '../widget-header/widget-header-fit';
 import styles from './widget-actions.module.css';
 
 import { unlock } from '../../lock-unlock';

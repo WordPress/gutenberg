@@ -20,7 +20,7 @@ import {
 	WIDGET_TOOLBAR_CHIP_RESERVE,
 	WidgetHeaderAvailableSizeProvider,
 	WidgetHeaderReserveProvider,
-} from './widget-header-size';
+} from './widget-header-fit';
 import styles from './widget-header.module.css';
 
 export interface WidgetHeaderProps {

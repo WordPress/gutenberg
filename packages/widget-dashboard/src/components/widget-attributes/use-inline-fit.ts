@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useWidgetHeaderAvailableSize } from '../widget-header/widget-header-size';
+import { useWidgetHeaderAvailableSize } from '../widget-header/widget-header-fit';
 
 interface InlineFitOptions {
 	/**

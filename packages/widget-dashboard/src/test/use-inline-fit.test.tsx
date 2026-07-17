@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
  * Internal dependencies
  */
 import { useInlineFit } from '../components/widget-attributes/use-inline-fit';
-import { WidgetHeaderAvailableSizeProvider } from '../components/widget-header/widget-header-size';
+import { WidgetHeaderAvailableSizeProvider } from '../components/widget-header/widget-header-fit';
 
 let notifyResize: ( entries: unknown[] ) => void = () => {};
 
