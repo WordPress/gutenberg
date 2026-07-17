@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `DirectionProvider` component. ([#80399](https://github.com/WordPress/gutenberg/pull/80399))
+
 ### Enhancements
 
 -   Add `SearchableChipSelect` primitive ([#80779](https://github.com/WordPress/gutenberg/pull/80779)).
