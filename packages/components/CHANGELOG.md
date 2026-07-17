@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `SearchControl`: Render suffix only if there is one. ([#80356](https://github.com/WordPress/gutenberg/pull/80356)).
+-   `SearchControl`: Render suffix only if there is one. ([#80356](https://github.com/WordPress/gutenberg/pull/80356), [#80406](https://github.com/WordPress/gutenberg/pull/80406)).
 
 ### TypeScript
 
