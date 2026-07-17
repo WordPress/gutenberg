@@ -75,10 +75,67 @@ jobs:
                   path: test/e2e/flaky-tests
                   if-no-files-found: ignore
 
+    e2e-playwright-rtc-websocket:
+        name: Playwright - RTC WebSocket
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+            id-token: write
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        steps:
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Npm build
+              run: npm run build -- --skip-types
+
+            - name: Install Playwright dependencies
+              run: |
+                  npx playwright install chromium firefox webkit --with-deps
+
+            - name: Install WordPress and start the server
+              run: |
+                  npm run wp-env-test start
+
+            - name: Run the tests
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+                  # Run against the "slow" profile (a short simulated send
+                  # delay) for better coverage of real-world timing.
+                  RTC_WS_DELAY: 50
+                  # Label flaky reports so this job's diagnostics don't collide
+                  # with the default suite's when artifacts are merged, and so
+                  # WebSocket-provider flakes are reported as their own issues.
+                  FLAKY_TESTS_REPORT_LABEL: 'RTC WebSocket'
+              run: |
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e:rtc-websocket
+
+            - name: Archive blob reports (HTML)
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              if: ${{ !cancelled() }}
+              with:
+                  name: blob-reports--rtc-websocket
+                  path: test/e2e/blob-report
+                  if-no-files-found: ignore
+
+            - name: Archive flaky tests report
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              if: ${{ !cancelled() }}
+              with:
+                  name: flaky-tests-report--rtc-websocket
+                  path: test/e2e/flaky-tests
+                  if-no-files-found: ignore
+
     merge-artifacts:
         name: Merge Artifacts
         if: ${{ !cancelled() }}
-        needs: [e2e-playwright]
+        needs: [e2e-playwright, e2e-playwright-rtc-websocket]
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read

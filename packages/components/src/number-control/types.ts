@@ -91,11 +91,4 @@ export type NumberControlProps = Omit<
 	 * The value of the input.
 	 */
 	value?: number | string;
-	/**
-	 * Do not throw a warning for the deprecated 36px default size.
-	 * For internal components of other components that already throw the warning.
-	 *
-	 * @ignore
-	 */
-	__shouldNotWarnDeprecated36pxSize?: boolean;
 };

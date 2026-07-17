@@ -624,33 +624,83 @@ test.describe( 'Image', () => {
 		await expect( urlInput ).toHaveValue( 'https://example.com' );
 	} );
 
-	// TODO: Re-enable once client-side external-image upload lands. With CSM
-	// active on Chromium 148+, "Upload to Media Library" routes the external
-	// URL through the client-side pipeline, which does not yet finalize to a
-	// /wp-content/uploads/ URL. Fixed by
-	// https://github.com/WordPress/gutenberg/issues/79407; re-introduce the
-	// CSM-aware coverage there.
-	// eslint-disable-next-line playwright/no-skipped-test
-	test.skip( 'should upload external image to media library', async ( {
+	test( 'should upload external image to media library only when the toolbar button is clicked', async ( {
 		editor,
+		page,
+		requestUtils,
 	} ) => {
-		await editor.insertBlock( {
-			name: 'core/image',
-			attributes: {
-				url: 'https://cldup.com/cXyG__fTLN.jpg',
-			},
+		/*
+		 * Track attachment creation requests so the test can prove that
+		 * inserting an external URL does not sideload anything on its own.
+		 */
+		const mediaPostRequests = [];
+		page.on( 'request', ( request ) => {
+			if (
+				request.method() === 'POST' &&
+				request.url().includes( '/wp/v2/media' )
+			) {
+				mediaPostRequests.push( request.url() );
+			}
 		} );
 
-		await editor.clickBlockToolbarButton( 'Upload to Media Library' );
-
-		await expect(
-			editor.canvas
-				.locator( 'role=document[name="Block: Image"i]' )
-				.locator( 'img[src^="http"]' )
-		).toHaveAttribute(
-			'src',
-			expect.stringMatching( /\/wp-content\/uploads\// )
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
 		);
+		await expect( imageBlock ).toBeVisible();
+
+		await imageBlock
+			.getByRole( 'button' )
+			.filter( { hasText: 'Insert from URL' } )
+			.click();
+
+		const form = page.locator(
+			'form.block-editor-media-placeholder__url-input-form'
+		);
+		const imgUrl = 'https://cldup.com/cXyG__fTLN.jpg';
+		await form.getByLabel( 'URL' ).fill( imgUrl );
+		await form.getByRole( 'button', { name: 'Apply' } ).click();
+
+		// The image is inserted with its external URL, nothing is uploaded.
+		const image = imageBlock.locator( 'role=img' );
+		await expect( image ).toHaveAttribute( 'src', imgUrl );
+
+		// The toolbar offers to upload the external image to the library.
+		await editor.showBlockToolbar();
+		const uploadButton = page.getByRole( 'button', {
+			name: 'Upload to Media Library',
+		} );
+		await expect( uploadButton ).toBeVisible();
+
+		// Inserting from URL must not have triggered any upload by itself.
+		expect( mediaPostRequests ).toHaveLength( 0 );
+		expect(
+			await requestUtils.rest( { path: '/wp/v2/media' } )
+		).toHaveLength( 0 );
+
+		await uploadButton.click();
+
+		// The server sideloads the URL and the block switches to the local
+		// library copy of the image.
+		await expect( image ).toHaveAttribute(
+			'src',
+			/\/wp-content\/uploads\//,
+			{ timeout: 30_000 }
+		);
+		await expect(
+			page
+				.locator( '.components-snackbar__content' )
+				.filter( { hasText: 'Image uploaded.' } )
+		).toBeVisible();
+
+		// The button goes away once the image is in the library.
+		await editor.showBlockToolbar();
+		await expect( uploadButton ).toBeHidden();
+
+		// Exactly one attachment was created, by the button click.
+		expect(
+			await requestUtils.rest( { path: '/wp/v2/media' } )
+		).toHaveLength( 1 );
 	} );
 
 	test( 'should upload through prepublish panel', async ( {

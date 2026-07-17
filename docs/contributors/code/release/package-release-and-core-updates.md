@@ -34,8 +34,39 @@ Behind the scenes, all steps are automated via `npm exec release-cli -- npm-late
 10. Run the script `npx lerna publish --no-private`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
-    - If the publishing process ends up incomplete (perhaps because it timed-out or a bad OTP was introduced) you can resume it via [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package).
+    - If the publishing process ends up incomplete (perhaps because it timed-out or a bad OTP was introduced), inspect npm state before resuming with [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package). See [Recovering from a partial npm publish](#recovering-from-a-partial-npm-publish).
 11. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
+
+### Recovering from a partial npm publish
+
+If npm publishing fails part-way through, do not assume every target package version is still unpublished. Some expected versions may already exist on npm while the release branch, package tags, or dist-tags still need recovery.
+
+Before restarting any mutating step, inspect the npm registry state for the packages listed in the failed job. Do not infer the remaining work from the package where the job stopped; retries or manual recovery attempts can leave a non-contiguous set of package versions published.
+
+For one package:
+
+```sh
+git rev-parse HEAD
+npm view @wordpress/components@X.Y.Z version gitHead --json
+npm dist-tag ls @wordpress/components
+```
+
+To inspect all package versions from the current release branch:
+
+```sh
+git rev-parse HEAD
+npx lerna list --json --no-private | jq -r '.[] | "\(.name)@\(.version)"' | while read package_version; do
+	package="${package_version%@*}"
+	version="${package_version##*@}"
+	echo "$package@$version"
+	npm view "$package@$version" version gitHead --json || true
+	npm dist-tag ls "$package"
+done
+```
+
+Resume only when each target already on npm reports the expected version, its registry `gitHead` matches the prepared release commit printed by `git rev-parse HEAD`, and the expected dist-tag points to it. Then continue either with [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package), which publishes local package versions that are not yet on npm and skips the ones that already made it, or the workflow's generated recovery command when one is printed.
+
+When a workflow run prints branch or package-tag recovery commands after npm publishing succeeds but Git metadata publication fails, prefer those run-specific commands over starting a fresh release.
 
 ## WordPress releases
 
@@ -127,7 +158,7 @@ Behind the scenes, the rest of the process is automated with `npm exec --no rele
 5. Run the script `npx lerna publish --no-private`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
-    - If the publishing process ends up incomplete (perhaps because it timed-out or a bad OTP was introduced) you can resume it via [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package).
+    - If the publishing process ends up incomplete (perhaps because it timed-out or a bad OTP was introduced), inspect npm state before resuming with [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package). See [Recovering from a partial npm publish](#recovering-from-a-partial-npm-publish).
 6. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
 ## Development releases
@@ -149,7 +180,7 @@ In order to start the publishing process for development version of npm packages
 To publish development packages to npm, select `development` from the "Release type" dropdown and leave empty "WordPress major release" input field. Finally, press the green "Run workflow" button. It triggers the npm publishing job, and this needs to be approved by a Gutenberg Core team member. Locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) for the current publishing, and have it [approved](https://docs.github.com/en/actions/how-tos/managing-workflow-runs-and-deployments/managing-deployments/reviewing-deployments#approving-or-rejecting-a-job).
 
 Behind the scenes, the release process is fully automated via `npm exec --no release-cli -- npm-next` command. It ensures
-the `wp/next` branch is synchronized with the latest release branch (`release/X.Y`) created for the Gutenberg plugin. To avoid collisions in the versioning of packages, we always include the newest commit's `sha`, for example, `@wordpress/block-editor@5.2.10-next.645224df70.0`.
+the `wp/next` branch is synchronized with the latest release branch (`release/X.Y`) created for the Gutenberg plugin. To avoid version collisions, development releases include a timestamp, for example, `@wordpress/block-editor@5.2.10-next.v.202607130915.0`.
 
 [plugin repository]: https://plugins.trac.wordpress.org/browser/gutenberg/
 [package release process]: https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#releasing-packages

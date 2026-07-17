@@ -167,6 +167,7 @@ export type ForegroundColor =
 	| 'neutral-strong'
 	| 'neutral-strong-active'
 	| 'neutral-strong-disabled'
+	| 'neutral-weak-active'
 	| 'neutral-weak-disabled'
 	| 'brand'
 	| 'brand-active'
@@ -193,7 +194,7 @@ export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 /**
  * Font weight variants.
  */
-export type FontWeight = 'regular' | 'medium';
+export type FontWeight = 'default' | 'emphasis';
 
 /**
  * Line height scale.

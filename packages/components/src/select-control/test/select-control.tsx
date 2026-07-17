@@ -7,13 +7,8 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import _SelectControl from '..';
-
-const SelectControl = (
-	props: React.ComponentProps< typeof _SelectControl >
-) => {
-	return <_SelectControl { ...props } __next40pxDefaultSize />;
-};
+import SelectControl from '..';
+import { InputControlPrefixWrapper } from '../../input-control/input-prefix-wrapper';
 
 describe( 'SelectControl', () => {
 	it( 'should not render when no options or children are provided', () => {
@@ -129,7 +124,7 @@ describe( 'SelectControl', () => {
 					onChange={ onChange }
 				/>;
 
-				<_SelectControl
+				<SelectControl
 					// @ts-expect-error "string" is not "narrow" or "value"
 					value="string"
 					options={ [
@@ -148,7 +143,7 @@ describe( 'SelectControl', () => {
 			} );
 
 			it( 'should accept an explicit type argument', () => {
-				<_SelectControl< 'narrow' | 'value' >
+				<SelectControl< 'narrow' | 'value' >
 					// @ts-expect-error "string" is not "narrow" or "value"
 					value="string"
 					options={ [
@@ -172,7 +167,7 @@ describe( 'SelectControl', () => {
 					value: ( 'foo' | 'bar' )[]
 				) => void = () => {};
 
-				<_SelectControl
+				<SelectControl
 					multiple
 					value={ [ 'narrow' ] }
 					options={ [
@@ -189,7 +184,7 @@ describe( 'SelectControl', () => {
 					onChange={ onChange }
 				/>;
 
-				<_SelectControl
+				<SelectControl
 					multiple
 					// @ts-expect-error "string" is not "narrow" or "value"
 					value={ [ 'string' ] }
@@ -211,7 +206,7 @@ describe( 'SelectControl', () => {
 			} );
 
 			it( 'should accept an explicit type argument', () => {
-				<_SelectControl< 'narrow' | 'value' >
+				<SelectControl< 'narrow' | 'value' >
 					multiple
 					// @ts-expect-error "string" is not "narrow" or "value"
 					value={ [ 'string' ] }
@@ -231,4 +226,40 @@ describe( 'SelectControl', () => {
 		} );
 	} );
 	/* eslint-enable jest/expect-expect */
+
+	describe( 'Legacy size support', () => {
+		it( 'treats __unstable-large the same as default', () => {
+			const prefix = (
+				<InputControlPrefixWrapper>$</InputControlPrefixWrapper>
+			);
+			const options = [ { value: 'one', label: 'One' } ];
+
+			render(
+				<SelectControl
+					label="Test"
+					options={ options }
+					prefix={ prefix }
+				/>
+			);
+			render(
+				<SelectControl
+					label="Test"
+					options={ options }
+					prefix={ prefix }
+					// @ts-expect-error testing legacy runtime support for removed size type
+					size="__unstable-large"
+				/>
+			);
+
+			const [ defaultPrefixWrapper, legacyPrefixWrapper ] =
+				screen.getAllByText( '$' );
+			const [ defaultSelect, legacySelect ] =
+				screen.getAllByRole( 'combobox' );
+
+			expect( legacyPrefixWrapper ).toMatchStyleDiffSnapshot(
+				defaultPrefixWrapper
+			);
+			expect( legacySelect ).toMatchStyleDiffSnapshot( defaultSelect );
+		} );
+	} );
 } );
