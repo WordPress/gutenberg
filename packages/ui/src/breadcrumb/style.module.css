@@ -123,6 +123,10 @@
 
 			flex: 0 0 var(--wpds-dimension-size-sm);
 			inline-size: var(--wpds-dimension-size-sm);
+
+			&:focus:not(:active) {
+				outline-offset: calc(var(--wpds-border-width-focus) * -1);
+			}
 		}
 	}
 }
