@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Ship the package as a WordPress script module
+    (`wpScriptModuleExports`) ([#80149](https://github.com/WordPress/gutenberg/pull/80149)).
+
 ### Documentation
 
 -   Spell out the accepted field-type name syntax: lowercase kebab-case
