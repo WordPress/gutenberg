@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables";
+
 .scrollable {
 	overflow: auto;
 	height: 100%;
@@ -13,11 +15,11 @@
 }
 
 .footer {
-	padding-block: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-sm);
-	padding-inline: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-lg);
+	padding-block: variables.$grid-unit-20 variables.$grid-unit-10;
+	padding-inline: variables.$grid-unit-10 variables.$grid-unit-20;
 }
 
 .back-button {
-	margin-block: var(--wpds-dimension-gap-lg) var(--wpds-dimension-gap-sm);
-	margin-inline: var(--wpds-dimension-gap-md);
+	margin-block: variables.$grid-unit-20 variables.$grid-unit-10;
+	margin-inline: variables.$grid-unit-15;
 }

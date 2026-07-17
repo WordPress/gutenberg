@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables";
+
 .screen {
 	overflow: hidden;
 	position: relative;
@@ -5,7 +7,7 @@
 	grid-template-columns: 1fr;
 	grid-template-rows: 1fr;
 	// Avoid cutting off focus ring of the last menu item
-	padding-block-end: var(--wpds-dimension-padding-xs);
+	padding-block-end: variables.$grid-unit-05;
 }
 
 .screen :global(.components-text) {
@@ -21,8 +23,8 @@
 .title-icon {
 	position: sticky;
 	top: 0;
-	padding-block: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-sm);
-	padding-inline: var(--wpds-dimension-padding-lg);
+	padding-block: variables.$grid-unit-15 variables.$grid-unit-10;
+	padding-inline: variables.$grid-unit-20;
 }
 
 .title {
@@ -30,7 +32,7 @@
 	overflow-wrap: break-word;
 
 	&#{&} .title {
-		line-height: var(--wpds-typography-line-height-xl);
+		line-height: variables.$font-line-height-x-large;
 		color: var(--wpds-color-foreground-content-neutral);
 	}
 }

@@ -1,15 +1,20 @@
+@use "@wordpress/base-styles/breakpoints";
+@use "@wordpress/base-styles/colors";
+@use "@wordpress/base-styles/variables";
+@use "@wordpress/base-styles/mixins";
+
 :global(.boot-layout-container) .layout {
 	// On mobile the main content area has to scroll, otherwise you can invoke
 	// the overscroll bounce on the non-scrolling container, for a bad experience.
-	@media (min-width: 600px) {
+	@include mixins.break-small {
 		position: absolute;
 		inset: 0;
-		min-height: calc(100vh - var(--wp-admin--admin-bar--height, 0px));
+		min-height: calc(100vh - #{variables.$admin-bar-height-big});
 	}
 
 	// The WP header height changes at this breakpoint.
-	@media (min-width: 782px) {
-		min-height: calc(100vh - var(--wp-admin--admin-bar--height, 0px));
+	@include mixins.break-medium {
+		min-height: calc(100vh - #{variables.$admin-bar-height});
 
 		:global(body:has([data-full-canvas])) & {
 			min-height: 100vh;
@@ -23,18 +28,7 @@
 }
 
 .layout .notices-snackbar {
-	position: fixed;
-	bottom: var(--wpds-dimension-gap-xl);
-	inset-inline: 0;
-	padding-inline: var(--wpds-dimension-padding-lg);
-	box-sizing: border-box;
-	display: flex;
-	flex-direction: column;
-	pointer-events: none;
-
-	:global(.components-snackbar) {
-		margin-inline: auto;
-	}
+	@include mixins.snackbar-container();
 }
 
 .layout {
@@ -81,13 +75,13 @@
 	inset-inline: 0;
 
 	.layout-single-page & {
-		top: var(--wp-admin--admin-bar--height, 0);
+		top: variables.$admin-bar-height-big;
 	}
 
 	z-index: 3;
 	background: var(--wpds-color-background-surface-neutral);
-	padding: var(--wpds-dimension-padding-lg);
-	border-bottom: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	padding: variables.$grid-unit-20;
+	border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 	display: flex;
 	justify-content: flex-start;
 	align-items: center;
@@ -102,10 +96,10 @@
 	display: flex;
 	flex-grow: 1;
 	margin: 0;
-	gap: var(--wpds-dimension-gap-sm);
+	gap: variables.$grid-unit-10;
 
-	@media (min-width: 782px) {
-		margin: var(--wpds-dimension-gap-sm);
+	@include mixins.break-medium {
+		margin: variables.$grid-unit-10;
 
 		.layout-single-page & {
 			margin-top: 0;
@@ -131,12 +125,12 @@
 	margin: 0;
 
 	.layout-single-page & {
-		top: var(--wp-admin--admin-bar--height, 0);
-		height: calc(100vh - var(--wp-admin--admin-bar--height, 0px));
+		top: variables.$admin-bar-height-big;
+		height: calc(100vh - variables.$admin-bar-height-big);
 	}
 
 	// Desktop: restore original styles
-	@media (min-width: 782px) {
+	@include mixins.break-medium {
 		position: static;
 		width: auto;
 		height: auto;
@@ -152,7 +146,7 @@
 .stage {
 	z-index: 2; // Highest surface priority on mobile
 
-	@media (min-width: 782px) {
+	@include mixins.break-medium {
 		z-index: auto;
 	}
 }
@@ -160,7 +154,7 @@
 .inspector {
 	z-index: 3; // Medium surface priority on mobile
 
-	@media (min-width: 782px) {
+	@include mixins.break-medium {
 		z-index: auto;
 	}
 }
@@ -171,7 +165,7 @@
 	background: var(--wpds-color-background-surface-neutral);
 	color: var(--wpds-color-foreground-content-neutral);
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 	position: relative;
 
 	// Mobile-first: full screen with lowest priority
@@ -184,12 +178,12 @@
 	margin: 0;
 
 	.layout-single-page & {
-		top: var(--wp-admin--admin-bar--height, 0);
-		height: calc(100vh - var(--wp-admin--admin-bar--height, 0px));
+		top: variables.$admin-bar-height-big;
+		height: calc(100vh - variables.$admin-bar-height-big);
 	}
 
 	// Desktop: restore original styles
-	@media (min-width: 782px) {
+	@include mixins.break-medium {
 		position: static;
 		width: auto;
 		height: auto;
@@ -204,7 +198,7 @@
 
 .has-canvas .stage,
 .inspector {
-	@media (min-width: 782px) {
+	@include mixins.break-medium {
 		max-width: 400px;
 	}
 }
@@ -239,11 +233,15 @@
 	overflow: hidden;
 
 	.layout-single-page & {
-		top: var(--wp-admin--admin-bar--height, 0);
+		top: variables.$admin-bar-height-big;
+
+		@include mixins.break-medium {
+			top: variables.$admin-bar-height;
+		}
 	}
 }
 
-@media (max-width: 782px) {
+@media (max-width: #{breakpoints.$break-medium}) {
 	.stage,
 	.inspector,
 	.canvas:not(.has-mobile-drawer) {
@@ -338,7 +336,7 @@
 :global(::view-transition-old(boot--stage)),
 :global(::view-transition-new(boot--inspector)),
 :global(::view-transition-old(boot--inspector)) {
-	background: var(--wpds-color-background-surface-neutral-strong);
+	background: colors.$white;
 	border-radius: var(--wpds-border-radius-xl);
 	width: 100%;
 	height: 100%;

@@ -5,7 +5,7 @@
 ### Code Quality
 
 -   Migrate component styles to CSS modules ([#80359](https://github.com/WordPress/gutenberg/pull/80359)).
--   Replace Sass variables with WPDS design tokens and drop the `@wordpress/base-styles` dependency ([#80359](https://github.com/WordPress/gutenberg/pull/80359)).
+-   Declare CSS module side effects for correct tree shaking ([#80359](https://github.com/WordPress/gutenberg/pull/80359)).
 
 ## 0.18.0 (2026-07-14)
 
