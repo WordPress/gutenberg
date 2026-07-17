@@ -1,32 +1,6 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`PostPublishPanel should render the post-publish panel if the post is published 1`] = `
-.emotion-0 {
-  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
-  font-size: 13px;
-  box-sizing: border-box;
-}
-
-.emotion-0 *,
-.emotion-0 *::before,
-.emotion-0 *::after {
-  box-sizing: inherit;
-}
-
-.components-panel__row .emotion-2 {
-  margin-bottom: inherit;
-}
-
-.emotion-4 {
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.4;
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: calc(4px * 2);
-  padding: 0;
-}
-
 <div>
   <div
     class="editor-post-publish-panel"
@@ -205,32 +179,6 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
 `;
 
 exports[`PostPublishPanel should render the post-publish panel if the post is scheduled 1`] = `
-.emotion-0 {
-  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
-  font-size: 13px;
-  box-sizing: border-box;
-}
-
-.emotion-0 *,
-.emotion-0 *::before,
-.emotion-0 *::after {
-  box-sizing: inherit;
-}
-
-.components-panel__row .emotion-2 {
-  margin-bottom: inherit;
-}
-
-.emotion-4 {
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.4;
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: calc(4px * 2);
-  padding: 0;
-}
-
 <div>
   <div
     class="editor-post-publish-panel"
@@ -387,22 +335,6 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
 `;
 
 exports[`PostPublishPanel should render the pre-publish panel if post status is scheduled but date is before now 1`] = `
-.emotion-0 {
-  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
-  font-size: 13px;
-  box-sizing: border-box;
-}
-
-.emotion-0 *,
-.emotion-0 *::before,
-.emotion-0 *::after {
-  box-sizing: inherit;
-}
-
-.components-panel__row .emotion-2 {
-  margin-bottom: inherit;
-}
-
 <div>
   <div
     class="editor-post-publish-panel"
@@ -519,22 +451,6 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
 `;
 
 exports[`PostPublishPanel should render the pre-publish panel if the post is not saving, published or scheduled 1`] = `
-.emotion-0 {
-  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
-  font-size: 13px;
-  box-sizing: border-box;
-}
-
-.emotion-0 *,
-.emotion-0 *::before,
-.emotion-0 *::after {
-  box-sizing: inherit;
-}
-
-.components-panel__row .emotion-2 {
-  margin-bottom: inherit;
-}
-
 <div>
   <div
     class="editor-post-publish-panel"
