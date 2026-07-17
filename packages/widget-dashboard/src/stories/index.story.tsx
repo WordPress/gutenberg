@@ -252,13 +252,6 @@ const GOAL_FIELDS: WidgetAttributeField< GoalAttributes >[] = [
 		elements: GOAL_METRICS,
 		relevance: 'high',
 	},
-	{
-		id: 'target',
-		label: 'Target',
-		type: 'text',
-		elements: GOAL_TARGETS,
-		relevance: 'high',
-	},
 ];
 
 // Two declarative actions: an external link and a client-side download.
