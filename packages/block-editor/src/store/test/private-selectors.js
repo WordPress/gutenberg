@@ -1370,7 +1370,7 @@ describe( 'private selectors', () => {
 			] );
 		} );
 
-		it( 'sorts block style variation overrides before other overrides of the same block, regardless of registration order', () => {
+		it( 'sorts custom CSS overrides after other overrides of the same block, regardless of registration order', () => {
 			const state = {
 				blocks: {
 					order: new Map( [ [ '', [ 'block-1' ] ] ] ),
@@ -1382,7 +1382,11 @@ describe( 'private selectors', () => {
 				styleOverrides: new Map( [
 					[
 						'custom-css-1',
-						{ clientId: 'block-1', css: '.custom{}' },
+						{
+							clientId: 'block-1',
+							__unstableType: 'custom-css',
+							css: '.custom{}',
+						},
 					],
 					[
 						'variation-block-1',
@@ -1404,7 +1408,14 @@ describe( 'private selectors', () => {
 						css: '.variation{}',
 					},
 				],
-				[ 'custom-css-1', { clientId: 'block-1', css: '.custom{}' } ],
+				[
+					'custom-css-1',
+					{
+						clientId: 'block-1',
+						__unstableType: 'custom-css',
+						css: '.custom{}',
+					},
+				],
 			] );
 		} );
 	} );

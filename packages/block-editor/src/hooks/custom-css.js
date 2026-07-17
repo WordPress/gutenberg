@@ -152,10 +152,14 @@ function useBlockProps( { style, clientId } ) {
 	}, [ customCSS, customCSSSelector, isValidCSS ] );
 
 	// Inject the CSS via style override. The clientId is stored with the
-	// override so it is sorted with the block it belongs to, keeping the
-	// cascade order relative to other overrides (e.g. block style
-	// variations) the same as on the front end.
-	usePrivateStyleOverride( { css: transformedCSS, clientId } );
+	// override so it is sorted with the block it belongs to, and the type
+	// makes it print after the block's other overrides (e.g. block style
+	// variations), matching the cascade order on the front end.
+	usePrivateStyleOverride( {
+		css: transformedCSS,
+		clientId,
+		__unstableType: 'custom-css',
+	} );
 
 	// Only add the class if there's valid custom CSS.
 	if ( ! isValidCSS ) {

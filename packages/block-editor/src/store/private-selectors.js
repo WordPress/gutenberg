@@ -425,15 +425,15 @@ export const getStyleOverrides = createSelector(
 			const bIndex = clientIdMap[ clientIdB ] ?? -1;
 
 			if ( aIndex === bIndex ) {
-				// For overrides belonging to the same block, block style
-				// variation styles must print before other overrides (e.g.
-				// custom CSS) so the latter win the cascade at equal
-				// specificity, matching the front end. Insertion order can't
-				// be relied on here: updating an override (e.g. switching to
-				// another variation) deletes and re-adds it, moving it to the
-				// end of the map.
-				const aPriority = typeA === 'variation' ? 0 : 1;
-				const bPriority = typeB === 'variation' ? 0 : 1;
+				// For overrides belonging to the same block, custom CSS must
+				// print after the block's other overrides (e.g. block style
+				// variations) so it wins the cascade at equal specificity,
+				// matching the front end where the custom CSS stylesheet is
+				// printed last. Insertion order can't be relied on here:
+				// updating an override (e.g. switching to another variation)
+				// deletes and re-adds it, moving it to the end of the map.
+				const aPriority = typeA === 'custom-css' ? 1 : 0;
+				const bPriority = typeB === 'custom-css' ? 1 : 0;
 				return aPriority - bPriority;
 			}
 
