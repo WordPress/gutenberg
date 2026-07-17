@@ -201,17 +201,18 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 	 *
 	 * @since 23.7.0
 	 *
-	 * @param bool $animated_image_subsizes Whether to generate animated sub-sizes
-	 *                                      for animated images. Default false.
+	 * @param bool $generate_animated_image_subsizes Whether to generate animated
+	 *                                                sub-sizes for animated images.
+	 *                                                Default false.
 	 */
-	$animated_image_subsizes = (bool) apply_filters( 'wp_generate_animated_image_subsizes', false ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+	$generate_animated_image_subsizes = (bool) apply_filters( 'wp_generate_animated_image_subsizes', false ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 	if ( current_user_can( 'upload_files' ) ) {
-		$response->data['image_sizes']             = gutenberg_get_all_image_sizes();
-		$response->data['image_size_threshold']    = $image_size_threshold;
-		$response->data['image_strip_meta']        = $image_strip_meta;
-		$response->data['image_max_bit_depth']     = $image_max_bit_depth;
-		$response->data['animated_image_subsizes'] = $animated_image_subsizes;
+		$response->data['image_sizes']                      = gutenberg_get_all_image_sizes();
+		$response->data['image_size_threshold']             = $image_size_threshold;
+		$response->data['image_strip_meta']                 = $image_strip_meta;
+		$response->data['image_max_bit_depth']              = $image_max_bit_depth;
+		$response->data['generate_animated_image_subsizes'] = $generate_animated_image_subsizes;
 	}
 
 	return $response;

@@ -229,7 +229,7 @@ export interface Settings {
 	// the `wp_generate_animated_image_subsizes` filter. Only applies to
 	// uncropped sub-sizes. Default is false (static first-frame sub-sizes,
 	// matching WordPress core).
-	animatedImageSubsizes?: boolean;
+	generateAnimatedImageSubsizes?: boolean;
 	// Function for finalizing an upload after all client-side processing is complete.
 	// May return the up-to-date attachment so the queue and block markup can pick
 	// up the post-finalize URL (the scaled file), which is required for `srcset`.

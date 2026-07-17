@@ -23,7 +23,8 @@ function useMediaUploadSettings( settings = {} ) {
 			bigImageSizeThreshold: settings.bigImageSizeThreshold,
 			imageStripMeta: settings.imageStripMeta,
 			imageMaxBitDepth: settings.imageMaxBitDepth,
-			animatedImageSubsizes: settings.animatedImageSubsizes,
+			generateAnimatedImageSubsizes:
+				settings.generateAnimatedImageSubsizes,
 		} ),
 		[ settings ]
 	);

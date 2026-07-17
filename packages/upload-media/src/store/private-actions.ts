@@ -1145,8 +1145,11 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		// the `image_strip_meta`, `image_max_bit_depth`, and
 		// `wp_generate_animated_image_subsizes` filters, carried in the
 		// editor settings.
-		const { imageStripMeta, imageMaxBitDepth, animatedImageSubsizes } =
-			select.getSettings();
+		const {
+			imageStripMeta,
+			imageMaxBitDepth,
+			generateAnimatedImageSubsizes,
+		} = select.getSettings();
 
 		try {
 			const file = await vipsResizeImage(
@@ -1161,7 +1164,7 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 					quality: args.quality,
 					stripMeta: imageStripMeta,
 					maxBitdepth: imageMaxBitDepth,
-					preserveAnimation: animatedImageSubsizes,
+					preserveAnimation: generateAnimatedImageSubsizes,
 				}
 			);
 

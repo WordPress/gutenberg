@@ -139,7 +139,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		bigImageSizeThreshold,
 		imageStripMeta,
 		imageMaxBitDepth,
-		animatedImageSubsizes,
+		generateAnimatedImageSubsizes,
 		allowRightClickOverrides,
 		blockTypes,
 		focusMode,
@@ -218,7 +218,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				bigImageSizeThreshold: baseData?.image_size_threshold,
 				imageStripMeta: baseData?.image_strip_meta,
 				imageMaxBitDepth: baseData?.image_max_bit_depth,
-				animatedImageSubsizes: baseData?.animated_image_subsizes,
+				generateAnimatedImageSubsizes:
+					baseData?.generate_animated_image_subsizes,
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
@@ -377,7 +378,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			bigImageSizeThreshold,
 			imageStripMeta,
 			imageMaxBitDepth,
-			animatedImageSubsizes,
+			generateAnimatedImageSubsizes,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,
@@ -504,7 +505,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		bigImageSizeThreshold,
 		imageStripMeta,
 		imageMaxBitDepth,
-		animatedImageSubsizes,
+		generateAnimatedImageSubsizes,
 		isNavigationOverlayContext,
 	] );
 }
