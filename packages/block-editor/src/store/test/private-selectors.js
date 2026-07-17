@@ -29,6 +29,7 @@ import {
 	hasSelectedStyleState,
 	isSelectedBlockStyleStateShownOnCanvas,
 	shouldRenderBlockListView,
+	getStyleOverrides,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -1346,6 +1347,27 @@ describe( 'private selectors', () => {
 			expect( getExpandedBlock( state ) ).toBe(
 				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f'
 			);
+		} );
+	} );
+
+	describe( 'getStyleOverrides', () => {
+		it( 'sorts overrides by the order of the blocks they belong to', () => {
+			const state = {
+				blocks: {
+					order: new Map( [ [ '', [ 'block-1', 'block-2' ] ] ] ),
+				},
+				styleOverrides: new Map( [
+					[ 'override-2', { clientId: 'block-2', css: '.b{}' } ],
+					[ 'override-1', { clientId: 'block-1', css: '.a{}' } ],
+					[ 'override-global', { css: '.global{}' } ],
+				] ),
+			};
+
+			expect( getStyleOverrides( state ) ).toEqual( [
+				[ 'override-global', { css: '.global{}' } ],
+				[ 'override-1', { clientId: 'block-1', css: '.a{}' } ],
+				[ 'override-2', { clientId: 'block-2', css: '.b{}' } ],
+			] );
 		} );
 	} );
 

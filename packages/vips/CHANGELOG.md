@@ -13,8 +13,8 @@
 
 ### Bug Fixes
 
--   `convertImageFormat`: Only decode all animation frames when the output format supports animation. Converting a long animated GIF to a still format (e.g. a JPEG poster) previously decoded every frame as one vertical strip, which exceeded the JPEG encoder's 65,500 px dimension limit and produced a film-strip image instead of a single frame ([#80259](https://github.com/WordPress/gutenberg/issues/80259)).
--   `resizeImage`: Generate sub-sizes of animated images from the first frame only, matching WordPress core's server-side behavior. Re-encoding a full animated GIF per sub-size took tens of seconds per size for long GIFs and could produce sub-sizes larger than the original file ([#80266](https://github.com/WordPress/gutenberg/issues/80266)).
+- `convertImageFormat`: Only decode all animation frames when the output format supports animation. Converting a long animated GIF to a still format (e.g. a JPEG poster) previously decoded every frame as one vertical strip, which exceeded the JPEG encoder's 65,500 px dimension limit and produced a film-strip image instead of a single frame ([#80259](https://github.com/WordPress/gutenberg/issues/80259)).
+- `resizeImage`: Generate sub-sizes of animated images from the first frame only, matching WordPress core's server-side behavior. Re-encoding a full animated GIF per sub-size took tens of seconds per size for long GIFs and could produce sub-sizes larger than the original file ([#80266](https://github.com/WordPress/gutenberg/issues/80266)).
 
 ## 2.4.0 (2026-07-14)
 
