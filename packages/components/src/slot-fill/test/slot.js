@@ -290,37 +290,45 @@ describe( 'Slot', () => {
 		expect( console ).toHaveWarned();
 	} );
 
-	it( 'injects registered SCSS module styles into the Slot document', () => {
-		const styleHash = 'slot-fill-cross-document-style';
-		const css = '.slot-fill-cross-document{padding:32px;}';
+	describe( 'cross-document styles', () => {
+		afterEach( () => {
+			delete globalThis.__wpStyleRuntime;
+			document.head.innerHTML = '';
+		} );
 
-		const { unmount } = render(
-			<Provider>
-				<IframePortal>
-					<Slot name="cross-document" bubblesVirtually />
-				</IframePortal>
-				<Fill name="cross-document">
-					<div className="slot-fill-cross-document">
-						Styled content
-					</div>
-				</Fill>
-			</Provider>
-		);
-		const iframeDocument =
-			screen.getByTitle( 'Slot document' ).contentDocument;
+		it( 'injects registered SCSS module styles into the Slot document', () => {
+			const styleHash = 'slot-fill-cross-document-style';
+			const css = '.slot-fill-cross-document{padding:32px;}';
 
-		// CSS module registration is skipped by the Jest transform, so mirror the
-		// generated production call explicitly.
-		registerStyle( styleHash, css );
+			// CSS module registration is skipped by the Jest transform, so mirror the
+			// generated production call explicitly.
+			registerStyle( styleHash, css );
 
-		const styledElement = within( iframeDocument.body ).getByText(
-			'Styled content'
-		);
-		expect(
-			iframeDocument.defaultView.getComputedStyle( styledElement ).padding
-		).toBe( '32px' );
+			const { unmount } = render(
+				<Provider>
+					<IframePortal>
+						<Slot name="cross-document" bubblesVirtually />
+					</IframePortal>
+					<Fill name="cross-document">
+						<div className="slot-fill-cross-document">
+							Styled content
+						</div>
+					</Fill>
+				</Provider>
+			);
+			const iframeDocument =
+				screen.getByTitle( 'Slot document' ).contentDocument;
 
-		unmount();
+			const styledElement = within( iframeDocument.body ).getByText(
+				'Styled content'
+			);
+			expect(
+				iframeDocument.defaultView.getComputedStyle( styledElement )
+					.padding
+			).toBe( '32px' );
+
+			unmount();
+		} );
 	} );
 
 	describe.each( [ false, true ] )(
