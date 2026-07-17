@@ -1,8 +1,8 @@
 // Import the default config file and expose it in the project root.
 // Useful for editor integrations.
-const baseConfig = require( './packages/prettier-config' );
+import baseConfig from './packages/prettier-config/lib/index.js';
 
-module.exports = {
+export default {
 	...baseConfig,
 	overrides: [
 		...( baseConfig.overrides ?? [] ),
