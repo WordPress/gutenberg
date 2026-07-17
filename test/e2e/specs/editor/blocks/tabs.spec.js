@@ -187,7 +187,10 @@ test.describe( 'Tabs', () => {
 				newTab.locator( '[contenteditable="true"]' )
 			).toBeFocused();
 
-			// Inactive panels render with the `hidden` attribute, so count them too.
+			// The new tab's panel is the active one and is visible.
+			// Use `exact: true` to avoid matching the parent 'Block: Tab Panels' name.
+			// Use `includeHidden: true` to check the number of hidden panels. getByRole()
+			// only returns visible elements by default.
 			const panels = editor.canvas.getByRole( 'document', {
 				name: 'Block: Tab Panel',
 				exact: true,

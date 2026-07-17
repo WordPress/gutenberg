@@ -785,8 +785,35 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				continue;
 			}
 
-			if ( 'original' === $image_size && isset( $sub_size['file'] ) ) {
-				$metadata['original_image'] = $sub_size['file'];
+			if ( 'original' === $image_size || 'scaled' === $image_size ) {
+				// Skip malformed entries so a bad payload cannot blank out the
+				// main file metadata.
+				if ( empty( $sub_size['file'] ) ) {
+					continue;
+				}
+
+				// Record the supplied full-size image (from sideload_item()) as
+				// the main file, keeping the current attached file as
+				// `original_image`. A 'scaled' image is downsized and an
+				// 'original' image is rotated; both have any EXIF orientation
+				// already applied by the client.
+				if ( ! empty( $sub_size['original_image'] ) ) {
+					$metadata['original_image'] = $sub_size['original_image'];
+				}
+				$metadata['width']    = $sub_size['width'] ?? 0;
+				$metadata['height']   = $sub_size['height'] ?? 0;
+				$metadata['filesize'] = $sub_size['filesize'] ?? 0;
+				$metadata['file']     = $sub_size['file'];
+
+				// The supplied image has its orientation applied already, so
+				// reset the stored value (from the upload) to 1, as
+				// wp_create_image_subsizes() does for both its scale and rotate
+				// paths. Otherwise exif_orientation would still report the
+				// pre-rotation value and the client would rotate the image
+				// again on a re-fetch.
+				if ( ! empty( $metadata['image_meta']['orientation'] ) ) {
+					$metadata['image_meta']['orientation'] = 1;
+				}
 			} elseif ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
 				// Source-format original: stored under its own meta key so the
 				// scaled-sideload flow (which writes 'original_image') cannot
@@ -805,14 +832,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				// the video block's poster and deleted alongside the video.
 				// See lib/media/animated-gif-to-video.php.
 				$metadata[ self::META_KEY_ANIMATED_VIDEO_POSTER ] = $sub_size['file'];
-			} elseif ( 'scaled' === $image_size ) {
-				if ( ! empty( $sub_size['original_image'] ) ) {
-					$metadata['original_image'] = $sub_size['original_image'];
-				}
-				$metadata['width']    = $sub_size['width'] ?? 0;
-				$metadata['height']   = $sub_size['height'] ?? 0;
-				$metadata['filesize'] = $sub_size['filesize'] ?? 0;
-				$metadata['file']     = $sub_size['file'] ?? '';
 			} else {
 				$metadata['sizes'] = $metadata['sizes'] ?? array();
 
@@ -967,14 +986,21 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			return true;
 		}
 
-		// 'original' size: should match original attachment dimensions.
+		// 'original' size: the full-size image that replaces the main file (see
+		// sideload_item()/finalize_item()). The endpoint expects any EXIF
+		// orientation to be applied to the image already, which can swap width
+		// and height, so the dimensions must match the stored dimensions or be
+		// their transpose.
 		if ( 'original' === $image_size ) {
 			$metadata = wp_get_attachment_metadata( $attachment_id, true );
 			if ( is_array( $metadata ) && isset( $metadata['width'], $metadata['height'] ) ) {
 				$expected_width  = (int) $metadata['width'];
 				$expected_height = (int) $metadata['height'];
 
-				if ( $width !== $expected_width || $height !== $expected_height ) {
+				$matches_dimensions    = $width === $expected_width && $height === $expected_height;
+				$transposes_dimensions = $width === $expected_height && $height === $expected_width;
+
+				if ( ! $matches_dimensions && ! $transposes_dimensions ) {
 					return new WP_Error(
 						'rest_upload_dimension_mismatch',
 						sprintf(
@@ -1137,8 +1163,10 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		// Read dimensions once up-front. Needed both for early-error handling
 		// (corrupted/unsupported files) and for populating the sub-size payload
-		// below. Scalar 'original' is a byte-only passthrough and does not need
-		// dimensions, but reading them here is harmless.
+		// below. 'original' and 'scaled' both replace the main file, so their
+		// dimensions are written to metadata; 'original' is additionally
+		// validated against the stored attachment size (it must match it or be
+		// its transpose).
 		//
 		// 'animated_video' companions are video files (MP4/WebM); the image
 		// helpers can't read their dimensions and would falsely report the
@@ -1188,8 +1216,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$sub_size_data['file']      = wp_basename( $path );
 			$sub_size_data['mime_type'] = $type;
 			$sub_size_data['filesize']  = wp_filesize( $path );
-		} elseif ( 'original' === $image_size ) {
-			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
 			// Source-format original. finalize_item() writes the filename to
 			// $metadata[ self::META_KEY_SOURCE_IMAGE ] (separate from
@@ -1208,8 +1234,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// the filename to $metadata['animated_video_poster']; used as the
 			// video block's poster and deleted with the video.
 			$sub_size_data['file'] = wp_basename( $path );
-		} elseif ( 'scaled' === $image_size ) {
-			// Record the current attached file as the original.
+		} elseif ( 'scaled' === $image_size || 'original' === $image_size ) {
+			// 'scaled' and 'original' both replace the attachment's main file
+			// with the supplied image and keep the file being replaced as
+			// `original_image`, which is the untouched upload. A 'scaled' image is
+			// downsized and an 'original' image has any EXIF orientation already
+			// applied. This is the same swap WordPress makes when it scales or
+			// rotates an image on upload. See core's _wp_image_meta_replace_original().
 			$current_file = get_attached_file( $attachment_id, true );
 
 			if ( ! $current_file ) {
@@ -1222,7 +1253,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 			$sub_size_data['original_image'] = wp_basename( $current_file );
 
-			// Update the attached file to point to the scaled version.
+			// Update the attached file to point to the supplied image.
 			// This writes to _wp_attached_file meta, not _wp_attachment_metadata.
 			// Guard against a failed update so a stale original is not recorded.
 			if (
