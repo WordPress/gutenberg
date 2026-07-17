@@ -26,9 +26,13 @@ function isSameHsla( a: HslaColor, b: HslaColor ): boolean {
 /**
  * Convert parent HSLA into HSVA for prop sync.
  *
- * At black/white, RGB round-trips collapse saturation to 0. Preserve the
- * native HSVA saturation coordinate unless the HSL saturation channel itself
- * changed (sibling hue/alpha/lightness edits must not snap the pointer).
+ * At black, RGB round-trips collapse saturation to 0. Preserve the native
+ * HSVA saturation coordinate unless the HSL saturation channel itself
+ * changed (sibling hue/alpha edits must not snap the pointer).
+ *
+ * At white, only `v: 100, s: 0` is visually white — preserving a prior
+ * chromatic saturation would leave the pointer at the top-right and make
+ * the first keyboard step jump from white to a saturated color.
  */
 function toHsvaFromHsla(
 	hsla: HslaColor,
@@ -37,7 +41,8 @@ function toHsvaFromHsla(
 ): HsvaColor {
 	const converted = toHsva( hsla );
 
-	if ( hsla.l !== 0 && hsla.l !== 100 ) {
+	// White and chromatic colors use the converted value as-is.
+	if ( hsla.l !== 0 ) {
 		return converted;
 	}
 
@@ -46,7 +51,7 @@ function toHsvaFromHsla(
 	return {
 		h: hsla.h,
 		s: saturationChanged ? hsla.s : prevHsva.s,
-		v: hsla.l === 0 ? 0 : 100,
+		v: 0,
 		a: hsla.a,
 	};
 }
@@ -54,7 +59,7 @@ function toHsvaFromHsla(
 /**
  * Visual color surface.
  *
- * Uses HSVA (react-colorful's native model) and keeps that value in local
+ * Uses HSVA (react-colorful native model) and keeps that value in local
  * state so HSLA↔hex round-trips cannot move the pointer
  * Parent ColorPicker still speaks HSLA for
  * inputs and controlled value sync; conversion happens only at the boundary.
@@ -63,8 +68,9 @@ function toHsvaFromHsla(
  * - pointer/touch drags (interaction flag), and
  * - any picker-originated update including keyboard (HSLA origin token).
  *
- * Achromatic HSL sibling edits (hue/alpha while at black/white) preserve
- * native HSVA saturation unless saturation itself changed.
+ * Achromatic HSL sibling edits (hue/alpha while at black) preserve native
+ * HSVA saturation unless saturation itself changed. White always syncs to
+ * the converted `s: 0` visual coordinate.
  */
 export const Picker = ( {
 	hsla,
@@ -84,6 +90,10 @@ export const Picker = ( {
 
 	useEffect( () => {
 		if ( isPointerInteractingRef.current ) {
+			// Keep prevHsla in lockstep with parent updates during the gesture
+			// so a post-drag HSL sibling edit is not compared against pre-drag
+			// HSLA and mistaken for a saturation change.
+			prevHslaRef.current = hsla;
 			return;
 		}
 		if (

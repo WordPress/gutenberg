@@ -688,114 +688,248 @@ describe( 'ColorPicker', () => {
 			expect( onChange ).toHaveBeenLastCalledWith( '#000000' );
 		} );
 
-		it.each( [
-			[ 'black', 0, '100%' ],
-			[ 'white', 100, '0%' ],
-		] as const )(
-			'preserves visual saturation when HSL hue is edited at %s',
-			async ( _label, lightness, expectedTop ) => {
-				const user = userEvent.setup();
+		it( 'preserves saturation after a full pointer drag to black then HSL hue edit', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
 
-				// Saturated mid-brightness red — HSVA s stays high at extremes.
-				const { container } = render(
-					<ControlledColorPicker
-						enableAlpha={ false }
-						initialColor="#cc0000"
-					/>
-				);
+			const { container } = render(
+				<ControlledColorPicker
+					onChange={ onChange }
+					enableAlpha={ false }
+					initialColor="#cc0000"
+				/>
+			);
 
-				const formatSelector = screen.getByRole( 'combobox' );
-				await user.selectOptions( formatSelector, 'hsl' );
+			const interactive = screen.getByRole( 'slider', { name: 'Color' } );
+			mockInteractiveBounds( interactive );
 
-				const lightnessSlider = screen.getByRole( 'slider', {
-					name: 'Lightness',
-				} );
-				fireEvent.change( lightnessSlider, {
-					target: { value: lightness },
-				} );
-				await waitFor( () =>
-					expect( lightnessSlider ).toHaveValue( String( lightness ) )
-				);
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const pointer = container.querySelector(
+				'.react-colorful__saturation-pointer'
+			) as HTMLElement;
 
-				// Pointer is a presentational sibling; no accessible role.
-				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-				const pointer = container.querySelector(
-					'.react-colorful__saturation-pointer'
-				) as HTMLElement;
-				expect( pointer ).toBeTruthy();
-				const leftBefore = pointer.style.left;
-				expect( parseFloat( leftBefore ) ).toBeGreaterThan( 50 );
-				expect( pointer ).toHaveStyle( { top: expectedTop } );
+			// Full pointer lifecycle so isPointerInteractingRef is exercised
+			// and prevHslaRef stays in sync across mid-gesture parent updates.
+			fireEvent.pointerDown( interactive, {
+				pointerId: 1,
+				buttons: 1,
+				pageX: 80,
+				pageY: 50,
+				clientX: 80,
+				clientY: 50,
+			} );
+			fireEvent.mouseDown( interactive, {
+				buttons: 1,
+				pageX: 80,
+				pageY: 50,
+				clientX: 80,
+				clientY: 50,
+			} );
+			fireEvent.mouseMove( interactive, {
+				buttons: 1,
+				pageX: 80,
+				pageY: 100,
+				clientX: 80,
+				clientY: 100,
+			} );
+			fireEvent.pointerUp( interactive, {
+				pointerId: 1,
+				buttons: 0,
+				pageX: 80,
+				pageY: 100,
+				clientX: 80,
+				clientY: 100,
+			} );
+			fireEvent.mouseUp( interactive, {
+				buttons: 0,
+				pageX: 80,
+				pageY: 100,
+				clientX: 80,
+				clientY: 100,
+			} );
 
-				// Sibling HSL edit at the achromatic boundary must not reset
-				// native HSVA saturation via lossy HSLA→HSVA prop sync.
-				const hueSlider = screen
-					.getAllByRole( 'slider', { name: 'Hue' } )
-					.at( -1 )!;
-				fireEvent.change( hueSlider, { target: { value: 200 } } );
-				await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
+			expect( pointer ).toHaveStyle( { top: '100%' } );
+			expect( parseFloat( pointer.style.left ) ).toBeGreaterThan( 50 );
+			expect( onChange ).toHaveBeenLastCalledWith( '#000000' );
+			const leftAfterDrag = pointer.style.left;
 
-				expect( pointer ).toHaveStyle( {
-					top: expectedTop,
-					left: leftBefore,
-				} );
-			}
-		);
+			const formatSelector = screen.getByRole( 'combobox' );
+			await user.selectOptions( formatSelector, 'hsl' );
 
-		it.each( [
-			[ 'black', 0, '100%' ],
-			[ 'white', 100, '0%' ],
-		] as const )(
-			'updates visual saturation when HSL saturation is edited at %s',
-			async ( _label, lightness, expectedTop ) => {
-				const user = userEvent.setup();
+			const hueSlider = screen
+				.getAllByRole( 'slider', { name: 'Hue' } )
+				.at( -1 )!;
+			fireEvent.change( hueSlider, { target: { value: 200 } } );
+			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
 
-				const { container } = render(
-					<ControlledColorPicker
-						enableAlpha={ false }
-						initialColor="#cc0000"
-					/>
-				);
+			// Stale prevHslaRef would mistake the hue edit for a saturation
+			// change and snap the pointer to left: 0%.
+			expect( pointer ).toHaveStyle( {
+				top: '100%',
+				left: leftAfterDrag,
+			} );
+		} );
 
-				const formatSelector = screen.getByRole( 'combobox' );
-				await user.selectOptions( formatSelector, 'hsl' );
+		it( 'places the pointer at s:0 when HSL lightness is set to white', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
 
-				const lightnessSlider = screen.getByRole( 'slider', {
-					name: 'Lightness',
-				} );
-				fireEvent.change( lightnessSlider, {
-					target: { value: lightness },
-				} );
-				await waitFor( () =>
-					expect( lightnessSlider ).toHaveValue( String( lightness ) )
-				);
+			const { container } = render(
+				<ControlledColorPicker
+					onChange={ onChange }
+					enableAlpha={ false }
+					initialColor="#cc0000"
+				/>
+			);
 
-				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-				const pointer = container.querySelector(
-					'.react-colorful__saturation-pointer'
-				) as HTMLElement;
-				expect( pointer ).toHaveStyle( { top: expectedTop } );
-				expect( parseFloat( pointer.style.left ) ).toBeGreaterThan(
-					50
-				);
+			const formatSelector = screen.getByRole( 'combobox' );
+			await user.selectOptions( formatSelector, 'hsl' );
 
-				const saturationSlider = screen.getByRole( 'slider', {
-					name: 'Saturation',
-				} );
-				fireEvent.change( saturationSlider, {
-					target: { value: 25 },
-				} );
-				await waitFor( () =>
-					expect( saturationSlider ).toHaveValue( '25' )
-				);
+			const lightnessSlider = screen.getByRole( 'slider', {
+				name: 'Lightness',
+			} );
+			fireEvent.change( lightnessSlider, { target: { value: 100 } } );
+			await waitFor( () =>
+				expect( lightnessSlider ).toHaveValue( '100' )
+			);
+			expect( onChange ).toHaveBeenLastCalledWith( '#ffffff' );
 
-				// Explicit saturation edits should move the visual coordinate.
-				expect( pointer ).toHaveStyle( {
-					top: expectedTop,
-					left: '25%',
-				} );
-			}
-		);
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const pointer = container.querySelector(
+				'.react-colorful__saturation-pointer'
+			) as HTMLElement;
+			// Only v:100,s:0 is white; a preserved chromatic s leaves the
+			// pointer at top-right and makes the next key step jump to red.
+			expect( pointer ).toHaveStyle( { top: '0%', left: '0%' } );
+
+			const colorSlider = screen.getByRole( 'slider', { name: 'Color' } );
+			colorSlider.focus();
+			fireEvent.keyDown( colorSlider, {
+				key: 'ArrowDown',
+				keyCode: 40,
+				which: 40,
+			} );
+
+			expect( onChange ).not.toHaveBeenLastCalledWith( '#f50000' );
+			expect( onChange ).not.toHaveBeenLastCalledWith( '#cc0000' );
+		} );
+
+		it( 'preserves visual saturation when HSL hue is edited at black', async () => {
+			const user = userEvent.setup();
+
+			const { container } = render(
+				<ControlledColorPicker
+					enableAlpha={ false }
+					initialColor="#cc0000"
+				/>
+			);
+
+			const formatSelector = screen.getByRole( 'combobox' );
+			await user.selectOptions( formatSelector, 'hsl' );
+
+			const lightnessSlider = screen.getByRole( 'slider', {
+				name: 'Lightness',
+			} );
+			fireEvent.change( lightnessSlider, { target: { value: 0 } } );
+			await waitFor( () => expect( lightnessSlider ).toHaveValue( '0' ) );
+
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const pointer = container.querySelector(
+				'.react-colorful__saturation-pointer'
+			) as HTMLElement;
+			const leftBefore = pointer.style.left;
+			expect( parseFloat( leftBefore ) ).toBeGreaterThan( 50 );
+			expect( pointer ).toHaveStyle( { top: '100%' } );
+
+			const hueSlider = screen
+				.getAllByRole( 'slider', { name: 'Hue' } )
+				.at( -1 )!;
+			fireEvent.change( hueSlider, { target: { value: 200 } } );
+			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
+
+			expect( pointer ).toHaveStyle( {
+				top: '100%',
+				left: leftBefore,
+			} );
+		} );
+
+		it( 'keeps the white visual coordinate at s:0 when HSL hue is edited', async () => {
+			const user = userEvent.setup();
+
+			const { container } = render(
+				<ControlledColorPicker
+					enableAlpha={ false }
+					initialColor="#cc0000"
+				/>
+			);
+
+			const formatSelector = screen.getByRole( 'combobox' );
+			await user.selectOptions( formatSelector, 'hsl' );
+
+			const lightnessSlider = screen.getByRole( 'slider', {
+				name: 'Lightness',
+			} );
+			fireEvent.change( lightnessSlider, { target: { value: 100 } } );
+			await waitFor( () =>
+				expect( lightnessSlider ).toHaveValue( '100' )
+			);
+
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const pointer = container.querySelector(
+				'.react-colorful__saturation-pointer'
+			) as HTMLElement;
+			expect( pointer ).toHaveStyle( { top: '0%', left: '0%' } );
+
+			const hueSlider = screen
+				.getAllByRole( 'slider', { name: 'Hue' } )
+				.at( -1 )!;
+			fireEvent.change( hueSlider, { target: { value: 200 } } );
+			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
+
+			expect( pointer ).toHaveStyle( { top: '0%', left: '0%' } );
+		} );
+
+		it( 'updates visual saturation when HSL saturation is edited at black', async () => {
+			const user = userEvent.setup();
+
+			const { container } = render(
+				<ControlledColorPicker
+					enableAlpha={ false }
+					initialColor="#cc0000"
+				/>
+			);
+
+			const formatSelector = screen.getByRole( 'combobox' );
+			await user.selectOptions( formatSelector, 'hsl' );
+
+			const lightnessSlider = screen.getByRole( 'slider', {
+				name: 'Lightness',
+			} );
+			fireEvent.change( lightnessSlider, { target: { value: 0 } } );
+			await waitFor( () => expect( lightnessSlider ).toHaveValue( '0' ) );
+
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const pointer = container.querySelector(
+				'.react-colorful__saturation-pointer'
+			) as HTMLElement;
+			expect( pointer ).toHaveStyle( { top: '100%' } );
+			expect( parseFloat( pointer.style.left ) ).toBeGreaterThan( 50 );
+
+			const saturationSlider = screen.getByRole( 'slider', {
+				name: 'Saturation',
+			} );
+			fireEvent.change( saturationSlider, {
+				target: { value: 25 },
+			} );
+			await waitFor( () =>
+				expect( saturationSlider ).toHaveValue( '25' )
+			);
+
+			expect( pointer ).toHaveStyle( {
+				top: '100%',
+				left: '25%',
+			} );
+		} );
 	} );
 
 	describe.each( [
