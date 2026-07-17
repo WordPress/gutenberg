@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Migrate component styles to CSS modules. Global `boot-*` class names and the package stylesheet entry are removed; styles are now scoped modules injected at runtime ([#80359](https://github.com/WordPress/gutenberg/pull/80359)).
+
 ### Code Quality
 
--   Migrate component styles to CSS modules ([#80359](https://github.com/WordPress/gutenberg/pull/80359)).
 -   Declare CSS module side effects for correct tree shaking ([#80359](https://github.com/WordPress/gutenberg/pull/80359)).
 
 ## 0.18.0 (2026-07-14)
