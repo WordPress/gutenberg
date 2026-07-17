@@ -40,7 +40,7 @@ test.describe( 'InnerBlocks Template Sync', () => {
 		);
 
 		await editor.insertBlock( {
-			name: 'test/test-inner-blocks-paragraph-placeholder',
+			name: 'test/test-inner-blocks-deprecated-props',
 		} );
 
 		await Promise.all( [ templateWarning, selectionWarning ] );
