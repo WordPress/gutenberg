@@ -20,6 +20,8 @@ import {
 } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
+import { isRTL } from '@wordpress/i18n';
+import { DirectionProvider } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -188,12 +190,14 @@ export function initializeEditor(
 		}
 		root.render(
 			<StrictMode>
-				<Layout
-					settings={ settings }
-					postId={ postId }
-					postType={ postType }
-					initialEdits={ initialEdits }
-				/>
+				<DirectionProvider direction={ isRTL() ? 'rtl' : 'ltr' }>
+					<Layout
+						settings={ settings }
+						postId={ postId }
+						postType={ postType }
+						initialEdits={ initialEdits }
+					/>
+				</DirectionProvider>
 			</StrictMode>
 		);
 	} );

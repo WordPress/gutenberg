@@ -16,6 +16,8 @@ import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
+import { isRTL } from '@wordpress/i18n';
+import { DirectionProvider } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -94,7 +96,9 @@ export function initializeEditor( id, settings ) {
 
 	root.render(
 		<StrictMode>
-			<App />
+			<DirectionProvider direction={ isRTL() ? 'rtl' : 'ltr' }>
+				<App />
+			</DirectionProvider>
 		</StrictMode>
 	);
 

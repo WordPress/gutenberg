@@ -3,6 +3,8 @@
  */
 import { createRoot, StrictMode, type ComponentType } from '@wordpress/element';
 import { dispatch, useSelect } from '@wordpress/data';
+import { isRTL } from '@wordpress/i18n';
+import { DirectionProvider } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -69,7 +71,9 @@ export async function init( {
 		const root = createRoot( rootElement );
 		root.render(
 			<StrictMode>
-				<App />
+				<DirectionProvider direction={ isRTL() ? 'rtl' : 'ltr' }>
+					<App />
+				</DirectionProvider>
 			</StrictMode>
 		);
 	}
@@ -98,7 +102,9 @@ export async function initSinglePage( {
 		const root = createRoot( rootElement );
 		root.render(
 			<StrictMode>
-				<App rootComponent={ RootSinglePage } />
+				<DirectionProvider direction={ isRTL() ? 'rtl' : 'ltr' }>
+					<App rootComponent={ RootSinglePage } />
+				</DirectionProvider>
 			</StrictMode>
 		);
 	}
