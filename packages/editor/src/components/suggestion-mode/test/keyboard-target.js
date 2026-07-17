@@ -157,6 +157,95 @@ describe( 'isEventTargetSelectedRichText', () => {
 			false
 		);
 	} );
+
+	/*
+	 * The `editableRoot` block support (native cross-block selection) makes
+	 * the writing-flow wrapper the editing host whenever the selected block
+	 * supports it and has editable siblings. Input events then target the
+	 * WRAPPER — the affected block has to be resolved from the event's target
+	 * range (or, for clipboard events, the live selection) instead.
+	 */
+	describe( 'with an editableRoot editing host', () => {
+		afterEach( () => {
+			jest.restoreAllMocks();
+		} );
+
+		function createEditableRootCanvas() {
+			const wrapper = document.createElement( 'div' );
+			wrapper.setAttribute( 'contenteditable', 'true' );
+			markContentEditable( wrapper );
+			document.body.appendChild( wrapper );
+			const first = createBlockEditable( {
+				clientId: 'block-1',
+				attributeKey: 'content',
+			} );
+			const second = createBlockEditable( {
+				clientId: 'block-2',
+				attributeKey: 'content',
+			} );
+			wrapper.appendChild( first.block );
+			wrapper.appendChild( second.block );
+			first.editable.appendChild( document.createTextNode( 'Alpha' ) );
+			second.editable.appendChild( document.createTextNode( 'Beta' ) );
+			return { wrapper, first, second };
+		}
+
+		it( 'accepts input targeting the host with a range in the selected block', () => {
+			const { wrapper, first } = createEditableRootCanvas();
+			const text = first.editable.firstChild;
+			const event = {
+				target: wrapper,
+				getTargetRanges: () => [
+					{
+						startContainer: text,
+						startOffset: 5,
+						endContainer: text,
+						endOffset: 5,
+					},
+				],
+			};
+			expect( isEventTargetSelectedRichText( event, selection ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'rejects input whose range sits in a different block', () => {
+			const { wrapper, second } = createEditableRootCanvas();
+			const text = second.editable.firstChild;
+			const event = {
+				target: wrapper,
+				getTargetRanges: () => [
+					{
+						startContainer: text,
+						startOffset: 0,
+						endContainer: text,
+						endOffset: 0,
+					},
+				],
+			};
+			expect( isEventTargetSelectedRichText( event, selection ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'accepts a clipboard event via the live selection', () => {
+			const { wrapper, first } = createEditableRootCanvas();
+			const text = first.editable.firstChild;
+			jest.spyOn( window, 'getSelection' ).mockReturnValue( {
+				rangeCount: 1,
+				getRangeAt: () => ( {
+					startContainer: text,
+					startOffset: 2,
+					endContainer: text,
+					endOffset: 2,
+				} ),
+			} );
+			// A clipboard event exposes no target ranges.
+			expect(
+				isEventTargetSelectedRichText( { target: wrapper }, selection )
+			).toBe( true );
+		} );
+	} );
 } );
 
 describe( 'readEventRange', () => {
@@ -289,6 +378,28 @@ describe( 'readEventRange', () => {
 			readEventRange( { target: outside, getTargetRanges: () => [] } )
 		).toBeNull();
 		expect( readEventRange( undefined ) ).toBeNull();
+	} );
+
+	it( 'maps offsets within the block editable when the event targets an editableRoot host', () => {
+		// The wrapper is the editing host (`editableRoot` support): it carries
+		// `contenteditable` and holds content BEFORE the block so that offsets
+		// computed against the wrapper would differ from offsets computed
+		// against the block's own editable.
+		const wrapper = document.createElement( 'div' );
+		wrapper.setAttribute( 'contenteditable', 'true' );
+		const preceding = document.createElement( 'p' );
+		preceding.appendChild( document.createTextNode( 'Preceding block' ) );
+		wrapper.appendChild( preceding );
+		document.body.appendChild( wrapper );
+		const { editable, worldText } = createEditableWithMark();
+		wrapper.appendChild( editable );
+		const event = {
+			target: wrapper,
+			getTargetRanges: () => [
+				staticRange( worldText, 0, worldText, 5 ),
+			],
+		};
+		expect( readEventRange( event ) ).toEqual( { start: 6, end: 11 } );
 	} );
 
 	it( 'returns null when the range reaches outside the editable', () => {

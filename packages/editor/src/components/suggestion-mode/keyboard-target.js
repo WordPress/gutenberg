@@ -28,6 +28,38 @@ const RICH_TEXT_EDITABLE_SELECTOR =
  * @return {Document[]} Candidate documents.
  */
 /**
+ * Resolve the element an input event actually affects. Input events target the
+ * EDITING HOST — the outermost contentEditable element containing the edited
+ * range. With the `editableRoot` block support (native cross-block selection)
+ * that host is the writing-flow wrapper whenever the selected block supports
+ * it and has editable siblings, so `event.target` no longer identifies the
+ * block whose text is being edited. The event's target range (or, for
+ * clipboard events, which expose no target ranges, the live selection) still
+ * points at the affected node — resolve the element from there, falling back
+ * to the raw target.
+ *
+ * @param {Event} event Input/clipboard event.
+ * @return {?Element} The element the edit lands in, or null.
+ */
+function resolveEventElement( event ) {
+	const target = event?.target;
+	let node = null;
+	if ( typeof event?.getTargetRanges === 'function' ) {
+		node = event.getTargetRanges()[ 0 ]?.startContainer ?? null;
+	}
+	if ( ! node ) {
+		const selection = target?.ownerDocument?.defaultView?.getSelection?.();
+		if ( selection && selection.rangeCount > 0 ) {
+			node = selection.getRangeAt( 0 ).startContainer;
+		}
+	}
+	if ( ! node ) {
+		return target ?? null;
+	}
+	return node.nodeType === node.ELEMENT_NODE ? node : node.parentElement;
+}
+
+/**
  * Whether an input event targets the block-editor rich-text element bound to
  * the current block-editor selection.
  *
@@ -37,16 +69,17 @@ const RICH_TEXT_EDITABLE_SELECTOR =
  * editables, and so on. Block selection persists while focus sits in the
  * sidebar, so acting on `isContentEditable` alone would cancel typing in a
  * note reply and write it into the previously selected block as a suggestion
- * marker. Only intercept when the event target is inside the selected block's
+ * marker. Only intercept when the edit lands inside the selected block's
  * element AND inside a block rich-text editable whose attribute key (when
- * exposed) matches the selection's.
+ * exposed) matches the selection's. The affected element is resolved from the
+ * event's range rather than `event.target` (see `resolveEventElement`).
  *
  * @param {Event}   event          Input/clipboard event.
  * @param {?Object} selectionStart Block-editor `getSelectionStart()` value.
  * @return {boolean} True when the event targets the selected rich text.
  */
 export function isEventTargetSelectedRichText( event, selectionStart ) {
-	const target = event?.target;
+	const target = resolveEventElement( event );
 	const clientId = selectionStart?.clientId;
 	if (
 		! target ||
@@ -122,7 +155,11 @@ export function isEventTargetSelectedRichText( event, selectionStart ) {
  * @return {?{start: number, end: number}} Normalized offsets, or null.
  */
 export function readEventRange( event, { preferTargetRanges = true } = {} ) {
-	const target = event?.target;
+	// Resolved from the event's range rather than `event.target`: with an
+	// `editableRoot` editing host the target is the writing-flow wrapper, and
+	// mapping offsets against the wrapper instead of the block's own editable
+	// would shift them by everything preceding the block.
+	const target = resolveEventElement( event );
 	if ( ! target || typeof target.closest !== 'function' ) {
 		return null;
 	}

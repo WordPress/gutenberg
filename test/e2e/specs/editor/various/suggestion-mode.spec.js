@@ -941,6 +941,19 @@ test.describe( 'Suggestion mode', () => {
 		await expect( sidebar ).toBeHidden();
 	} );
 
+	// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
+	// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
+	// palette is changed without updating the e2e expectation.
+	const AVATAR_BORDER_COLORS = [
+		'#6F42C1',
+		'#D94145',
+		'#FBBF24',
+		'#FF35EE',
+		'#879F11',
+		'#0F766E',
+		'#00CFFF',
+	];
+
 	test( 'with multiple suggesters, markers are tinted per author', async ( {
 		editor,
 		page,
@@ -977,12 +990,23 @@ test.describe( 'Suggestion mode', () => {
 			alpha.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
+		// The typed run must land INSIDE the marker: with the `editableRoot`
+		// editing host, input events target the writing-flow wrapper, and a
+		// mis-resolved target once dropped everything after the first
+		// character (an attribute-only assertion missed it).
+		await expect(
+			alpha.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+		).toHaveText( ' one' );
+
 		await beta.click();
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' two' );
 		await expect(
 			beta.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		await expect(
+			beta.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+		).toHaveText( ' two' );
 
 		// Each marker records who proposed it.
 		const currentUserId = await page.evaluate(
@@ -1055,12 +1079,22 @@ test.describe( 'Suggestion mode', () => {
 			.locator( 'mark.wp-suggestion' );
 		await expect( alphaMark ).toBeVisible();
 		await expect( betaMark ).toBeVisible();
+		// Each author's expected tint is the deterministic palette pick for
+		// their user id. Asserting the exact colors (rather than merely "the
+		// two tints differ") keeps the test meaningful even when two user ids
+		// collide on the same palette slot (`id % length`) — the created
+		// user's id depends on how many users earlier tests made.
+		const expectedTint = ( userId ) =>
+			AVATAR_BORDER_COLORS[
+				userId % AVATAR_BORDER_COLORS.length
+			].toLowerCase();
 		// The per-author rules are injected asynchronously with the note
 		// threads, so poll rather than reading once.
-		await expect.poll( () => tintOf( alphaMark ) ).not.toBe( '' );
-		await expect.poll( () => tintOf( betaMark ) ).not.toBe( '' );
-		expect( await tintOf( alphaMark ) ).not.toBe(
-			await tintOf( betaMark )
-		);
+		await expect
+			.poll( async () => ( await tintOf( alphaMark ) ).toLowerCase() )
+			.toBe( expectedTint( currentUserId ) );
+		await expect
+			.poll( async () => ( await tintOf( betaMark ) ).toLowerCase() )
+			.toBe( expectedTint( secondAuthor.id ) );
 	} );
 } );
