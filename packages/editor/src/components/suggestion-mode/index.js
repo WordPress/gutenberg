@@ -12,6 +12,20 @@ export { MoveGhostsProvider } from './use-move-ghosts';
 export { default as SuggestionAutoSave } from './auto-save';
 export { default as SuggestionStoreInterceptor } from './store-interceptor';
 export { default as SuggestionUndoGuard } from './suggestion-undo-guard';
+export { default as SuggestionNoteGC } from './suggestion-note-gc';
+export { default as SuggestionDeletionKeyboard } from './suggestion-deletion-keyboard';
+export { default as SuggestionAdditionKeyboard } from './suggestion-addition-keyboard';
+export { default as SuggestionFormatKeyboard } from './suggestion-format-keyboard';
+export { default as SuggestionContentReconciler } from './suggestion-content-reconciler';
+export {
+	default as SuggestionAnnotations,
+	suggestionAnnotations,
+	useAnnotateSuggestionThreads,
+} from './annotate-suggestions';
+export {
+	default as SuggestionAuthorColors,
+	buildSuggestionAuthorColorCss,
+} from './suggestion-author-colors';
 export {
 	useSuggestionsProvider,
 	operationsFromOverlay,

@@ -3,9 +3,9 @@
  *
  * 1. `withSuggestionOverlay` HOC — pass-through outside Suggest intent;
  *    in Suggest intent, diversion of `setAttributes` into the overlay,
- *    rendering the merged overlay-on-baseline value, writing through for
- *    pending-insert/deferred blocks, and surviving an overlay
- *    clear-and-re-edit cycle.
+ *    rendering the merged overlay-on-baseline value, surviving an overlay
+ *    clear-and-re-edit cycle, and handing text/format edits off to the
+ *    marker path instead of the overlay.
  * 2. `mergeOverlayAttributes` — replace-vs-deep-merge contract for
  *    overlapping overlay keys, including the `style`/`metadata` deep merge
  *    that keeps untouched fields alive.
@@ -25,6 +25,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { unregisterFormatType } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -39,6 +40,10 @@ import {
 	SuggestionOverlayProvider,
 	useSuggestionOverlay,
 } from '../overlay-context';
+import {
+	registerSuggestionFormat,
+	SUGGESTION_FORMAT_NAME,
+} from '../../inline-suggestions';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -134,6 +139,107 @@ describe( 'withSuggestionOverlay', () => {
 		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
 			'proposed'
 		);
+	} );
+
+	it( 'hands a text edit off to the content reconciler instead of the overlay', () => {
+		const setAttributes = jest.fn();
+		const handler = jest.fn();
+
+		// Registers a content handler so `requestContentSuggestion` takes
+		// ownership of the edit, standing in for the mounted reconciler.
+		function RegisterContentHandler() {
+			const { registerContentHandler } = useSuggestionOverlay();
+			useEffect(
+				() => registerContentHandler( handler ),
+				[ registerContentHandler ]
+			);
+			return null;
+		}
+
+		renderWithProviders(
+			<>
+				<RegisterContentHandler />
+				<Wrapped
+					clientId="a"
+					name="core/paragraph"
+					attributes={ { content: 'Hello' } }
+					setAttributes={ setAttributes }
+				/>
+			</>,
+			{ intent: 'suggest' }
+		);
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+
+		// The reconciler receives the block, the pre-edit value, and a marker
+		// plan whose actions all open a fresh note.
+		expect( handler ).toHaveBeenCalledTimes( 1 );
+		const request = handler.mock.calls[ 0 ][ 0 ];
+		expect( request ).toEqual(
+			expect.objectContaining( {
+				clientId: 'a',
+				blockName: 'core/paragraph',
+				prevContent: 'Hello',
+			} )
+		);
+		expect( request.plan.actions.length ).toBeGreaterThan( 0 );
+		expect(
+			request.plan.actions.every( ( action ) => action.newNote )
+		).toBe( true );
+
+		// The reconciler took ownership: the edit is neither written through
+		// nor diverted into the overlay, so the block still shows its original
+		// value (the reconciler writes the marker itself, out of band).
+		expect( setAttributes ).not.toHaveBeenCalled();
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent( 'Hello' );
+	} );
+
+	it( 'strips live suggestion markers from overlay baseline and after snapshots', () => {
+		// Another author's pending marker lives in the block content. When an
+		// edit falls through to the attribute overlay, neither the baseline
+		// nor the proposed value may capture that marker - replaying `after`
+		// on accept would otherwise resurrect a marker whose suggestion was
+		// resolved in the interim.
+		registerSuggestionFormat();
+		try {
+			const marked =
+				'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="del">doomed</mark>';
+			let overlayHandle;
+			function CaptureOverlay() {
+				const overlay = useSuggestionOverlay();
+				useEffect( () => {
+					overlayHandle = overlay;
+				}, [ overlay ] );
+				return null;
+			}
+
+			renderWithProviders(
+				<>
+					<CaptureOverlay />
+					<Wrapped
+						clientId="a"
+						name="core/paragraph"
+						attributes={ { content: marked } }
+						setAttributes={ jest.fn() }
+					/>
+				</>,
+				{ intent: 'suggest' }
+			);
+
+			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+
+			const entry = overlayHandle.entries.a;
+			expect( entry ).toBeDefined();
+			// Baseline keeps the marked run's text but not the marker.
+			expect( entry.baselineAttributes.content ).toBe( 'Hello doomed' );
+			expect( entry.baselineAttributes.content ).not.toContain(
+				'wp-suggestion'
+			);
+			// The proposed value is clean too.
+			expect( entry.overlayAttributes.content ).toBe( 'proposed' );
+		} finally {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
 	} );
 
 	it( 'writes setAttributes through (no overlay) for a pending-insert block in Suggest intent', () => {

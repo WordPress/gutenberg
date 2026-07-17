@@ -53,13 +53,18 @@ import {
 	SuggestionAutoSave,
 	SuggestionStoreInterceptor,
 	SuggestionUndoGuard,
+	SuggestionNoteGC,
+	SuggestionAnnotations,
+	SuggestionAuthorColors,
+	SuggestionDeletionKeyboard,
+	SuggestionAdditionKeyboard,
+	SuggestionFormatKeyboard,
+	SuggestionContentReconciler,
 	registerSuggestionOverlayFilter,
 	isSuggestionModeEnabled,
 	MoveGhostsProvider,
 } from '../suggestion-mode';
-
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
-const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
+import { registerSuggestionFormat } from '../inline-suggestions';
 
 /*
  * Register the suggestion overlay filters once when the editor provider
@@ -71,6 +76,16 @@ const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 if ( isSuggestionModeEnabled() ) {
 	registerSuggestionOverlayFilter();
 }
+
+// Register the `core/suggestion` inline marker format so rich-text round-trips
+// suggestion markers in block content and the annotations API can decorate
+// them. The format is inert (no toolbar entry): suggestions are created by
+// editing in Suggest mode, not from a control. Idempotent, so it's safe
+// globally.
+registerSuggestionFormat();
+
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 /*
  * With the experiment off the overlay context (and its block-tree
@@ -526,7 +541,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 												<>
 													<SuggestionStoreInterceptor />
 													<SuggestionUndoGuard />
+													<SuggestionNoteGC />
 													<SuggestionAutoSave />
+													<SuggestionAnnotations />
+													<SuggestionAuthorColors />
+													<SuggestionDeletionKeyboard />
+													<SuggestionAdditionKeyboard />
+													<SuggestionFormatKeyboard />
+													<SuggestionContentReconciler />
 												</>
 											) }
 											<MediaEditorModalMount />

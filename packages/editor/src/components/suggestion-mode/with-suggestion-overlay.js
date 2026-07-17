@@ -1,16 +1,21 @@
 /**
  * Suggest-mode overlay HOC.
  *
- * This HOC captures block edits made in Suggest intent: primitive attribute
- * changes (heading level, alignment) and content edits route through
- * `wrappedSetAttributes` into the overlay, a per-block store of the clean
- * proposed value that auto-save reads to build the suggestion's operations.
- * The block-editor store stays at the baseline until Accept/Reject, so the
- * document is never mutated in place. The HOC also renders the pending-
- * suggestion visual treatment: the green "bracket" for an attribute overlay,
- * and the strikethrough/dim/move overlays for a structural marker. See #77867
- * for the overlay tradeoff and #73411 for the feature. Inline text and
- * formatting markers are layered on top of this HOC in a later step.
+ * With inline markers (Option B) as the primary suggestion surface, this HOC
+ * covers the edits that markers don't: primitive attribute changes (heading
+ * level, alignment) and the rare content edit the marker path can't resolve
+ * unambiguously. Those route through `wrappedSetAttributes` into the overlay,
+ * a per-block store of the clean proposed value that auto-save reads to build
+ * the suggestion's operations. The block-editor store stays at the baseline
+ * until Accept/Reject, so the document is never mutated in place.
+ *
+ * Text and formatting edits never reach the overlay: typing, deletion, cut,
+ * and single-line paste are caught on `beforeinput`/`cut`/`paste` by the
+ * suggestion keyboards, and the remaining seams (committed IME composition,
+ * autocorrect, drag-drop, multi-line paste, format toggles) are diverted to
+ * inline markers by `maybeHandleFormatEdit` / `maybeHandleContentEdit` before
+ * the overlay path runs. See #77867 for the original overlay tradeoff and
+ * #73411 for the marker migration.
  */
 
 /**
@@ -26,6 +31,7 @@ import { useRegistry, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
 
@@ -38,7 +44,33 @@ import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import SuggestionMoveGhost from './suggestion-move-ghost';
 import useMoveGhosts from './use-move-ghosts';
+import {
+	planFormatMarkers,
+	planEditMarkers,
+	stripSuggestionMarkersFromAttributes,
+} from '../inline-suggestions';
 import { isPartOfPendingInsertion } from './store-interceptor';
+
+/**
+ * True for plain strings and for objects that stringify to a meaningful HTML
+ * form (the rich-text package's `RichTextData` is the case we care about).
+ * Duck-typed against `toString` rather than `instanceof RichTextData` so we
+ * don't take a hard dependency on the rich-text package's internal class.
+ *
+ * @param {*} value Candidate attribute value.
+ * @return {boolean} True when `String( value )` will produce useful HTML.
+ */
+function isStringLike( value ) {
+	if ( typeof value === 'string' ) {
+		return true;
+	}
+	return (
+		value !== null &&
+		value !== undefined &&
+		typeof value.toString === 'function' &&
+		value.toString !== Object.prototype.toString
+	);
+}
 
 /**
  * Attribute keys whose values are known to be object-valued and therefore
@@ -103,6 +135,8 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 		entries,
 		captureBaseline,
 		setOverlayAttributes,
+		requestFormatSuggestion,
+		requestContentSuggestion,
 		isDeferredInsertion,
 	} = useSuggestionOverlay();
 
@@ -126,6 +160,14 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 	const overlayEntry = entries[ clientId ];
 	const overlayAttributes = overlayEntry?.overlayAttributes ?? null;
 
+	// The suggester's user id, forwarded to `maybeHandleContentEdit` so a
+	// reconciled text edit opens its note under the right author. Defaults to
+	// `null` for anonymous / pre-collab edits.
+	const { authorId } = useSelect( ( select ) => {
+		const core = select( coreStore );
+		return { authorId: core?.getCurrentUser?.()?.id ?? null };
+	}, [] );
+
 	// Does an overlay entry currently exist for this block? This is the
 	// source of truth; `captureBaseline` only creates an entry when there
 	// isn't one, so we can skip the dispatch when we already know there is.
@@ -133,11 +175,110 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 	// was cleared (auto-save trash, orphan prune, intent-switch).
 	const entryExists = !! overlayEntry;
 
+	// Detect a formatting-only edit (bold/italic/link toggled over a run, the
+	// text unchanged) and hand it to the single-mount format handler, which
+	// creates the note and writes a `format` marker to the live block instead
+	// of routing the edit into the overlay diff. A format toggle arrives here
+	// as a fresh `content` value with no earlier DOM event to intercept
+	// (unlike typing, which the addition keyboard catches on `beforeinput`),
+	// so this per-block `setAttributes` seam is the one point that covers every
+	// source — toolbar button, keyboard shortcut, and the link popover alike.
+	// Returns true only when the handler took ownership; with no handler
+	// registered (isolated unit tests) it returns false and the edit falls
+	// through to the overlay path.
+	const maybeHandleFormatEdit = useCallback(
+		( nextAttributes, prevAttributes ) => {
+			if (
+				! nextAttributes ||
+				! Object.prototype.hasOwnProperty.call(
+					nextAttributes,
+					'content'
+				)
+			) {
+				return false;
+			}
+			const prevContent = prevAttributes?.content;
+			const nextContent = nextAttributes.content;
+			if (
+				! isStringLike( prevContent ) ||
+				! isStringLike( nextContent )
+			) {
+				return false;
+			}
+			const plan = planFormatMarkers( prevContent, nextContent );
+			if ( plan.kind !== 'format' ) {
+				return false;
+			}
+			// `prevContent` rides along so the handler can re-validate the
+			// live block content against the snapshot the plan was diffed
+			// from before (and after) its async note round trip.
+			return requestFormatSuggestion( {
+				clientId,
+				blockName: name,
+				prevContent,
+				nextContent,
+				plan,
+			} );
+		},
+		[ clientId, name, requestFormatSuggestion ]
+	);
+
+	// Detect a text edit that reaches the block as a whole new `content` value
+	// with no `beforeinput` for the typing/deletion keyboards to catch (a
+	// committed IME composition, autocorrect, drag-drop, multi-line paste) and
+	// hand it to the single-mount content reconciler, which turns it into inline
+	// markers instead of an overlay diff. Only plans this converter can fully
+	// execute — every action opens a fresh note (`insert-add`/`wrap-del`) — are
+	// handed off; edits that grow or remove an existing marker, or that the diff
+	// can't resolve unambiguously, return false and fall through to the overlay
+	// path below. Returns true only when the reconciler took ownership; with no
+	// handler registered (isolated unit tests) `requestContentSuggestion` returns
+	// false and the edit falls through.
+	const maybeHandleContentEdit = useCallback(
+		( nextAttributes, prevAttributes ) => {
+			if (
+				! nextAttributes ||
+				! Object.prototype.hasOwnProperty.call(
+					nextAttributes,
+					'content'
+				)
+			) {
+				return false;
+			}
+			const prevContent = prevAttributes?.content;
+			const nextContent = nextAttributes.content;
+			if (
+				! isStringLike( prevContent ) ||
+				! isStringLike( nextContent )
+			) {
+				return false;
+			}
+			const plan = planEditMarkers( prevContent, nextContent, {
+				authorId,
+			} );
+			const actions = plan?.actions ?? [];
+			if ( actions.length === 0 ) {
+				return false;
+			}
+			if ( ! actions.every( ( action ) => action.newNote ) ) {
+				return false;
+			}
+			return requestContentSuggestion( {
+				clientId,
+				blockName: name,
+				prevContent,
+				plan,
+			} );
+		},
+		[ clientId, name, authorId, requestContentSuggestion ]
+	);
+
 	const wrappedSetAttributes = useCallback(
 		( nextAttributes ) => {
 			/*
 			 * Edits inside a block that IS the suggestion write through to
-			 * the real attributes instead of the overlay:
+			 * the real attributes instead of the overlay and the marker
+			 * reconcilers:
 			 * - A deferred insertion (an empty default block the interceptor
 			 *   hasn't registered yet) receives its first content this way,
 			 *   which is what triggers the interceptor to register the whole
@@ -157,17 +298,51 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 				setAttributes( nextAttributes );
 				return;
 			}
+			// A formatting-only change becomes a live `format` marker rather
+			// than an overlay diff; everything else (text edits, primitive
+			// attribute changes) still routes to the overlay below.
+			// The block-editor store holds the live value RichText renders (a
+			// format-suggestion block keeps no overlay entry), so the block's
+			// current attributes are the "before" side of the format diff.
+			if (
+				maybeHandleFormatEdit( nextAttributes, attributesRef.current )
+			) {
+				return;
+			}
+			// A text edit that surfaced as a fresh `content` value (not caught
+			// by the typing/deletion keyboards) becomes inline markers too, so
+			// it never reaches the overlay diff path.
+			if (
+				maybeHandleContentEdit( nextAttributes, attributesRef.current )
+			) {
+				return;
+			}
 			/*
 			 * First overlay write for this block snapshots the current
 			 * attributes as the baseline; subsequent writes only record
 			 * overlay deltas. This lets the diff renderer below compare
 			 * "what the block looked like when the suggestion started"
 			 * against "what the suggester is proposing now".
+			 *
+			 * Both snapshots are stripped of live `core/suggestion` markers
+			 * (other suggestions' pending marks may sit in the block's
+			 * content): the overlay stores clean values, so accepting this
+			 * attribute suggestion later can't replay — and resurrect — a
+			 * marker whose suggestion was resolved in the interim.
 			 */
 			if ( ! entryExists ) {
-				captureBaseline( clientId, name, attributesRef.current );
+				captureBaseline(
+					clientId,
+					name,
+					stripSuggestionMarkersFromAttributes(
+						attributesRef.current
+					)
+				);
 			}
-			setOverlayAttributes( clientId, nextAttributes );
+			setOverlayAttributes(
+				clientId,
+				stripSuggestionMarkersFromAttributes( nextAttributes )
+			);
 		},
 		[
 			clientId,
@@ -175,6 +350,8 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 			captureBaseline,
 			setOverlayAttributes,
 			entryExists,
+			maybeHandleFormatEdit,
+			maybeHandleContentEdit,
 			isDeferredInsertion,
 			setAttributes,
 			registry,

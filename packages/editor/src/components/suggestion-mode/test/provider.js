@@ -10,6 +10,7 @@ import {
 	createRegistry,
 	createReduxStore,
 	RegistryProvider,
+	select,
 } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
@@ -19,10 +20,20 @@ import {
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
+import {
+	RichTextData,
+	registerFormatType,
+	unregisterFormatType,
+	store as richTextStore,
+} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
+import {
+	SUGGESTION_FORMAT_NAME,
+	suggestionFormat,
+} from '../../inline-suggestions';
 import {
 	operationsFromOverlay,
 	applyOperations,
@@ -31,6 +42,7 @@ import {
 	payloadByteLength,
 	PAYLOAD_MAX_BYTES,
 	findStructuralOp,
+	findInlineOp,
 	clearSuggestionMarkerAttributes,
 	useSuggestionsProvider,
 } from '../provider';
@@ -475,6 +487,33 @@ describe( 'findStructuralOp', () => {
 	} );
 } );
 
+describe( 'findInlineOp', () => {
+	it( 'returns the inline-suggestion op when present', () => {
+		const op = findInlineOp( [
+			{ type: 'attribute-set', attribute: 'level', before: 2, after: 3 },
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'del',
+			},
+		] );
+		expect( op?.type ).toBe( 'inline-suggestion' );
+		expect( op?.attribute ).toBe( 'content' );
+	} );
+
+	it( 'returns null when there is no inline op', () => {
+		expect(
+			findInlineOp( [ { type: 'attribute-set', attribute: 'content' } ] )
+		).toBeNull();
+		expect( findInlineOp( [ { type: 'block-remove' } ] ) ).toBeNull();
+	} );
+
+	it( 'returns null for non-array input', () => {
+		expect( findInlineOp( null ) ).toBeNull();
+		expect( findInlineOp( undefined ) ).toBeNull();
+	} );
+} );
+
 describe( 'clearSuggestionMarkerAttributes', () => {
 	it( 'returns null when there is no marker to clear', () => {
 		expect( clearSuggestionMarkerAttributes( {} ) ).toBeNull();
@@ -676,6 +715,158 @@ describe( 'rejectSuggestion (block-move)', () => {
 		expect( blockEditor.getBlockIndex( moved.clientId ) ).toBe( 0 );
 		expect( blockEditor.getBlockRootClientId( moved.clientId ) || '' ).toBe(
 			''
+		);
+	} );
+} );
+
+describe( 'rejectSuggestion (inline marker)', () => {
+	const PARAGRAPH = 'core/test-inline-paragraph';
+
+	beforeAll( () => {
+		if (
+			! select( richTextStore ).getFormatType( SUGGESTION_FORMAT_NAME )
+		) {
+			registerFormatType( SUGGESTION_FORMAT_NAME, suggestionFormat );
+		}
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Inline Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		if ( select( richTextStore ).getFormatType( SUGGESTION_FORMAT_NAME ) ) {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	/*
+	 * Stub core store whose `saveEntityRecord` is a thunk that resolves or
+	 * rejects on demand, so the comment-status round-trip can be failed
+	 * deterministically.
+	 */
+	function createStubCoreStore( { failSave } ) {
+		return createReduxStore( 'core', {
+			reducer: ( state = {} ) => state,
+			actions: {
+				saveEntityRecord: () => async () => {
+					if ( failSave ) {
+						throw new Error( 'save failed' );
+					}
+					return { id: 9 };
+				},
+			},
+			selectors: {
+				getEditedEntityRecord: () => null,
+				getEntityRecord: () => null,
+				getCurrentUser: () => null,
+			},
+		} );
+	}
+
+	function setup( { failSave = false } = {} ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register( createStubCoreStore( { failSave } ) );
+		registry.register( createStubInterfaceStore() );
+
+		const block = createBlock( PARAGRAPH );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+		// Write the marked value directly so the attribute is a real
+		// RichTextData (as in the editor), bypassing string sanitization.
+		const markedValue = RichTextData.fromHTMLString(
+			'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+		);
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( block.clientId, {
+				content: markedValue,
+			} );
+
+		let providerHandle;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return { registry, block, getProvider: () => providerHandle };
+	}
+
+	const inlinePayload = {
+		schemaVersion: 2,
+		blockName: PARAGRAPH,
+		baseRevision: null,
+		operations: [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+			},
+		],
+	};
+
+	it( 'strips the marker and its text when the status save succeeds', async () => {
+		const { registry, block, getProvider } = setup();
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		const content = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( block.clientId )?.content;
+		expect( content.toHTMLString() ).toBe( 'Hello ' );
+	} );
+
+	it( 'rolls the attribute back when the status save fails', async () => {
+		// Before the fix, reject rewrote the attribute BEFORE the comment
+		// save; a server failure then left the marker stripped from content
+		// while the comment stayed unresolved ('hold') — the suggestion
+		// silently vanished for every viewer but still counted as pending.
+		const { registry, block, getProvider } = setup( { failSave: true } );
+		const before = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( block.clientId )
+			?.content.toHTMLString();
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		const content = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( block.clientId )?.content;
+		// The marker (and its proposed text) is restored.
+		expect( content.toHTMLString() ).toBe( before );
+		expect( content.toHTMLString() ).toContain( 'data-suggestion-id="9"' );
+		// And the failure is surfaced.
+		const notices = registry.select( noticesStore ).getNotices();
+		expect( notices.some( ( notice ) => notice.status === 'error' ) ).toBe(
+			true
 		);
 	} );
 } );
