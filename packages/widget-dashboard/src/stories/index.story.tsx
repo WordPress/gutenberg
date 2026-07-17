@@ -16,6 +16,7 @@ import { useState } from '@wordpress/element';
 import { chartBar, trendingUp } from '@wordpress/icons';
 import type {
 	ResolveWidgetModule,
+	WidgetAction,
 	WidgetAttributeField,
 	WidgetRenderProps,
 	WidgetType,
@@ -139,6 +140,10 @@ const trafficSnapshotWidgetType: WidgetType = {
 	title: 'Traffic Snapshot',
 	description:
 		'Sample metric widget used to exercise the inline attribute controls.',
+	help: {
+		content:
+			'Three attributes. <strong>Metric</strong> and <strong>Period</strong> are <strong>high</strong> relevance — two fields in the header. <strong>Label</strong> is <strong>low</strong>, behind the settings button.',
+	},
 	icon: chartBar,
 	renderModule: 'demo/widgets/traffic-snapshot/render',
 	attributes: SNAPSHOT_FIELDS as WidgetType[ 'attributes' ],
@@ -256,14 +261,35 @@ const GOAL_FIELDS: WidgetAttributeField< GoalAttributes >[] = [
 	},
 ];
 
+// Two declarative actions: an external link and a client-side download.
+const GOAL_ACTIONS: WidgetAction[] = [
+	{
+		id: 'view-goal',
+		label: 'View goal details',
+		href: 'https://wordpress.org/',
+		openInNewTab: true,
+	},
+	{
+		id: 'export-progress',
+		label: 'Export progress',
+		href: 'data:text/csv;charset=utf-8,metric,target,current,percent%0Arevenue,5000,3600,72',
+		download: 'goal-progress.csv',
+	},
+];
+
 const goalProgressWidgetType: WidgetType = {
 	apiVersion: 1,
 	name: 'demo/goal-progress',
 	title: 'Goal Progress',
 	description: 'Sample goal widget whose attributes are all promoted.',
+	help: {
+		content:
+			'Two attributes, <strong>Goal metric</strong> and <strong>Target</strong>, both <strong>high</strong> relevance — two fields in the header, no settings button. Two actions in the <strong>More</strong> menu: a link and a download.',
+	},
 	icon: trendingUp,
 	renderModule: 'demo/widgets/goal-progress/render',
 	attributes: GOAL_FIELDS as WidgetType[ 'attributes' ],
+	actions: GOAL_ACTIONS,
 	example: {
 		attributes: { metric: 'revenue', target: '5000' },
 	},
@@ -360,9 +386,13 @@ Two demo types exercise that policy:
 Their tiles compare the header presentations:
 
 - The two-column tile fits the identity and both inline controls, so they stay in the header.
-- The one-column tiles do not: the promoted fields collapse into a dropdown holding them as a form, while the settings trigger stays in the toolbar beside it. The goal tile, with every attribute promoted, shows only the dropdown.
+- The one-column tiles do not: the promoted fields collapse into a dropdown holding them as a form, while the settings trigger stays in the toolbar beside it. The goal tile, with every attribute promoted, shows the dropdown next to its actions menu.
 
 The widget only declares relevance; the fit is measured by the chrome, so the same declaration adapts to any tile width. Resize the canvas to watch the headers switch presentations.
+
+Beyond attributes, \`demo/goal-progress\` declares two \`actions\`: a "View goal details" link and an "Export progress" download. The host surfaces them in a "More" menu in the toolbar, so the widget declares each action as data and the host owns where it appears.
+
+Each type also carries a \`help\` note, opened from the info icon in the header, that describes its attributes and what they do.
 `,
 			},
 		},

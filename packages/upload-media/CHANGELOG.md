@@ -9,9 +9,11 @@
 ### Enhancements
 
 -   Honor the `image_strip_meta` and `image_max_bit_depth` filters for client-side processed images via the new `imageStripMeta` and `imageMaxBitDepth` settings, carried in the REST API root index ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
+-   Animated GIF to video conversion is now abandoned after a timeout (default 30 seconds) and skipped entirely for GIFs whose total decoded pixels (width × height × frame count) exceed a budget. In both cases the original GIF upload is kept and no error is surfaced; a `SCRIPT_DEBUG` diagnostic explains the skip. Both knobs are configurable via the `TranscodeGif` operation args ([#80376](https://github.com/WordPress/gutenberg/issues/80376)).
 
 ### Bug Fixes
 
+-   `cancelItem` no longer awaits the best-effort worker cancellation calls. A busy vips worker is synchronously blocked inside a wasm call and cannot answer the cancellation RPC until every operation already queued in the worker finishes, which for a large animated GIF left cancelled items stuck in the queue - and the parent attachment unfinalized - for minutes ([#80376](https://github.com/WordPress/gutenberg/issues/80376)).
 -   Pass `isTransportOnly: true` to the `mediaUpload` setting when the queue uploads a file, so consumers that manage the upload lifecycle themselves (progress tracking, save locking) don't handle the same file twice ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
 
 ## 0.36.0 (2026-07-14)

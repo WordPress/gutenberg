@@ -21,6 +21,7 @@ import type { WidgetName } from '@wordpress/widget-primitives';
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardContainerColumnCount } from '../../hooks/use-dashboard-container-column-count';
+import { WidgetActions } from '../widget-actions';
 import { WidgetAttributeControls } from '../widget-attribute-controls';
 import { WidgetChrome } from '../widget-chrome';
 import { WidgetHeader } from '../widget-header';
@@ -134,21 +135,31 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				( type ) => type.name === widget.type
 			);
 			const hasSettings = !! widgetType?.attributes?.length;
+			const hasActions = !! widgetType?.actions?.length;
+
 			const isFullBleed = widgetType?.presentation === 'full-bleed';
 
 			// The active mode's controls: layout while customizing, the
 			// attribute controls (high-relevance fields on the prominent
-			// surface, plus a settings entry point when needed)
-			// otherwise.
+			// surface, plus a settings entry point when needed) and the
+			// declared actions otherwise.
 			let controls: React.ReactNode;
 			if ( editMode ) {
 				controls = <WidgetLayoutControls widget={ widget } />;
-			} else if ( hasSettings && widgetType ) {
+			} else if ( ( hasSettings || hasActions ) && widgetType ) {
 				controls = (
-					<WidgetAttributeControls
-						widget={ widget }
-						widgetType={ widgetType }
-					/>
+					<>
+						{ hasSettings && (
+							<WidgetAttributeControls
+								widget={ widget }
+								widgetType={ widgetType }
+							/>
+						) }
+
+						{ hasActions && (
+							<WidgetActions widgetType={ widgetType } />
+						) }
+					</>
 				);
 			}
 
