@@ -1415,7 +1415,7 @@ describe( 'private actions', () => {
 	} );
 
 	describe( 'uploadItem', () => {
-		it( 'flags the transport call so consumers skip their own progress tracking', async () => {
+		it( 'flags the transport call so consumers skip their own lifecycle handling', async () => {
 			// The queue already counts its items for progress UI; the
 			// `mediaUpload` callback it delegates the server upload to must
 			// not count the same file again (see gutenberg#80369).
@@ -1440,7 +1440,7 @@ describe( 'private actions', () => {
 			expect( mediaUpload ).toHaveBeenCalledWith(
 				expect.objectContaining( {
 					filesList: [ file ],
-					skipTracking: true,
+					isTransportOnly: true,
 				} )
 			);
 		} );

@@ -488,7 +488,7 @@ _Parameters_
 -   _$0.onFileChange_ `Function`: Function called each time a file or a temporary representation of the file is available.
 -   _$0.onSuccess_ `Function`: Function called after the final representation of the file is available.
 -   _$0.multiple_ `boolean`: Whether to allow multiple files to be uploaded.
--   _$0.skipTracking_ `boolean`: Whether the caller tracks upload progress itself. Set by the `@wordpress/upload-media` queue, which counts its own items for the progress snackbar and uses this function only as its server transport.
+-   _$0.isTransportOnly_ `boolean`: Whether the caller owns the upload lifecycle UX (progress tracking and save locking) and uses this function only as its server transport. Set by the `@wordpress/upload-media` queue, which counts its own items for the progress snackbar and locks saving via `useUploadSaveLock`.
 
 ### MediaUploadCheck
 

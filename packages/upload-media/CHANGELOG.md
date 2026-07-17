@@ -12,7 +12,7 @@
 
 ### Bug Fixes
 
--   Pass `skipTracking: true` to the `mediaUpload` setting when the queue uploads a file, so consumers that track upload progress themselves don't count the same file twice ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
+-   Pass `isTransportOnly: true` to the `mediaUpload` setting when the queue uploads a file, so consumers that manage the upload lifecycle themselves (progress tracking, save locking) don't handle the same file twice ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
 
 ## 0.36.0 (2026-07-14)
 

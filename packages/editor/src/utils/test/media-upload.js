@@ -11,10 +11,6 @@ jest.mock( '@wordpress/media-utils', () => ( {
 	uploadMedia: jest.fn(),
 } ) );
 
-jest.mock( '@wordpress/upload-media', () => ( {
-	isClientSideMediaSupported: jest.fn( () => false ),
-} ) );
-
 jest.mock( '@wordpress/core-data', () => ( {
 	store: { name: 'core' },
 } ) );
@@ -22,6 +18,9 @@ jest.mock( '@wordpress/core-data', () => ( {
 jest.mock( '../../store', () => ( {
 	store: { name: 'core/editor' },
 } ) );
+
+const mockLockPostSaving = jest.fn();
+const mockLockPostAutosaving = jest.fn();
 
 jest.mock( '@wordpress/data', () => ( {
 	select: jest.fn( () => ( {
@@ -33,9 +32,9 @@ jest.mock( '@wordpress/data', () => ( {
 	} ) ),
 	dispatch: jest.fn( () => ( {
 		receiveEntityRecords: jest.fn(),
-		lockPostSaving: jest.fn(),
+		lockPostSaving: mockLockPostSaving,
 		unlockPostSaving: jest.fn(),
-		lockPostAutosaving: jest.fn(),
+		lockPostAutosaving: mockLockPostAutosaving,
 		unlockPostAutosaving: jest.fn(),
 	} ) ),
 } ) );
@@ -43,9 +42,10 @@ jest.mock( '@wordpress/data', () => ( {
 describe( 'mediaUpload', () => {
 	beforeEach( () => {
 		reset();
+		jest.clearAllMocks();
 	} );
 
-	it( 'registers files with the upload progress tracker', () => {
+	it( 'registers files with the upload progress tracker and locks saving', () => {
 		const file = new File( [ 'content' ], 'photo.jpg', {
 			type: 'image/jpeg',
 		} );
@@ -57,19 +57,23 @@ describe( 'mediaUpload', () => {
 			completed: 0,
 			pending: [ 'photo.jpg' ],
 		} );
+		expect( mockLockPostSaving ).toHaveBeenCalled();
+		expect( mockLockPostAutosaving ).toHaveBeenCalled();
 	} );
 
-	it( 'skips tracker registration when the caller tracks progress itself', () => {
-		// The upload-media queue calls this wrapper as its server transport
-		// and already counts its own queue items for the progress snackbar;
-		// registering the same file here would double-count it
-		// (see gutenberg#80369).
+	it( 'skips tracking and save locking for transport-only calls', () => {
+		// The upload-media queue calls this wrapper as its server transport;
+		// it already counts its own queue items for the progress snackbar
+		// (registering the same file here would double-count it, see
+		// gutenberg#80369) and locks saving via useUploadSaveLock.
 		const file = new File( [ 'content' ], 'photo.jpg', {
 			type: 'image/jpeg',
 		} );
 
-		mediaUpload( { filesList: [ file ], skipTracking: true } );
+		mediaUpload( { filesList: [ file ], isTransportOnly: true } );
 
 		expect( getState() ).toBeNull();
+		expect( mockLockPostSaving ).not.toHaveBeenCalled();
+		expect( mockLockPostAutosaving ).not.toHaveBeenCalled();
 	} );
 } );
