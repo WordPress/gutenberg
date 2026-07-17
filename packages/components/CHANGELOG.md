@@ -131,6 +131,7 @@
 -   `ToggleGroupControl`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#80381](https://github.com/WordPress/gutenberg/pull/80381)).
 -   `Disabled`: Migrate styles from Emotion to an SCSS Module ([#80643](https://github.com/WordPress/gutenberg/pull/80643)).
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
+-   `BaseControl`: migrate `StyledLabel` styles from Emotion to an SCSS module ([#80001](https://github.com/WordPress/gutenberg/pull/80001)).
 
 ## 37.0.0 (2026-07-14)
 
