@@ -35,7 +35,6 @@ import type {
 	OptionCompletion,
 	ReplaceOption,
 	UseAutocompleteProps,
-	UseAutocompletePropsReturn,
 } from './types';
 import getNodeText from '../utils/get-node-text';
 import { unlock } from '../lock-unlock';
@@ -380,9 +379,11 @@ export function useLastDifferentValue(
 	return history.current[ 0 ];
 }
 
+// The popover is anchored to the element this hook's own `ref` lands on, so it
+// owns `contentRef` and callers don't provide one.
 export function useAutocompleteProps(
-	options: UseAutocompleteProps
-): UseAutocompletePropsReturn {
+	options: Omit< UseAutocompleteProps, 'contentRef' >
+) {
 	const ref = useRef< HTMLElement >( null );
 	const onKeyDownRef =
 		useRef< ( event: KeyboardEvent ) => void >( undefined );
@@ -434,8 +435,8 @@ export function useAutocompleteProps(
 	return {
 		ref: mergedRefs,
 		children: popover,
-		'aria-autocomplete': listBoxId ? 'list' : undefined,
-		'aria-haspopup': listBoxId ? 'listbox' : undefined,
+		'aria-autocomplete': listBoxId ? ( 'list' as const ) : undefined,
+		'aria-haspopup': listBoxId ? ( 'listbox' as const ) : undefined,
 		'aria-controls': listBoxId,
 		'aria-owns': listBoxId,
 		'aria-activedescendant': activeId ?? undefined,

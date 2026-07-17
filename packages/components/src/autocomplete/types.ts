@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactElement, ReactNode, RefCallback } from 'react';
+import type { ReactElement } from 'react';
 
 /**
  * WordPress dependencies
@@ -184,16 +184,6 @@ export type UseAutocompleteProps = {
 	 * `Autocomplete`'s `Popover`.
 	 */
 	contentRef: ContentRef;
-};
-
-export type UseAutocompletePropsReturn = {
-	ref: RefCallback< HTMLElement >;
-	children?: ReactNode;
-	'aria-autocomplete'?: 'list';
-	'aria-haspopup'?: 'listbox';
-	'aria-controls'?: string;
-	'aria-owns'?: string;
-	'aria-activedescendant'?: string;
 };
 
 export type AutocompleteState = {

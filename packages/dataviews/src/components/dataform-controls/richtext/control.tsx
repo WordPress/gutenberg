@@ -405,10 +405,7 @@ export default function RichTextControl( {
 	 * returned props (including the rendered popover as `children`). With no
 	 * `completers` it does no work and renders nothing, keeping the control
 	 * zero-cost for consumers that don't opt in.
-	 * The hook anchors its popover to its own internal ref and overrides
-	 * whatever `contentRef` is passed, but the parameter type requires one.
 	 */
-	const unusedContentRef = useRef< HTMLElement >( null );
 	const { ref: autocompleteRef, ...autocompleteProps } = useAutocompleteProps(
 		{
 			completers,
@@ -418,7 +415,6 @@ export default function RichTextControl( {
 			// none replace the whole value, so the required `onReplace` is a
 			// no-op here.
 			onReplace: () => {},
-			contentRef: unusedContentRef,
 		}
 	);
 
