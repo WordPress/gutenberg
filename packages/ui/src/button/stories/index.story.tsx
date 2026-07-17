@@ -1,10 +1,16 @@
+import type { ComponentProps } from 'react';
 import { Fragment, useId } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { wordpress } from '@wordpress/icons';
-import { displayShortcut, shortcutAriaLabel } from '@wordpress/keycodes';
+import {
+	displayShortcut,
+	shortcutAriaLabel,
+	ariaKeyShortcut,
+} from '@wordpress/keycodes';
 
 import { Button } from '../index';
 import * as Tooltip from '../../tooltip';
+import { VisuallyHidden } from '../../visually-hidden';
 
 const meta: Meta< typeof Button > = {
 	title: 'Design System/Components/Button',
@@ -192,7 +198,11 @@ export const Pressed: Story = {
  * assistive technology, and a visually hidden description.
  */
 export const WithKeyboardShortcut: Story = {
-	render: () => {
+	args: {
+		children: 'Save',
+		'aria-keyshortcuts': ariaKeyShortcut.primary( 's' ),
+	},
+	render: ( { 'aria-describedby': consumerDescribedBy, ...args } ) => {
 		const descriptionId = useId();
 
 		return (
@@ -200,35 +210,22 @@ export const WithKeyboardShortcut: Story = {
 				<Tooltip.Root>
 					<Tooltip.Trigger
 						{ ...( {
-							render: (
-								<Button
-									aria-keyshortcuts="Meta+S"
-									aria-describedby={ descriptionId }
-								>
-									Save
-								</Button>
-							),
-						} as React.ComponentProps< typeof Tooltip.Trigger > ) }
+							render: <Button { ...args } />,
+						} as ComponentProps< typeof Tooltip.Trigger > ) }
+						aria-describedby={ [
+							consumerDescribedBy,
+							descriptionId,
+						]
+							.filter( Boolean )
+							.join( ' ' ) }
 					/>
 					<Tooltip.Popup>
-						{ displayShortcut.primary( 's' ) }
+						{ args.children } { displayShortcut.primary( 's' ) }
 					</Tooltip.Popup>
 				</Tooltip.Root>
-				<span
-					id={ descriptionId }
-					style={ {
-						position: 'absolute',
-						width: 1,
-						height: 1,
-						overflow: 'hidden',
-						clip: 'rect(0 0 0 0)',
-						whiteSpace: 'nowrap',
-					} }
-				>
-					{ `Keyboard shortcut: ${ shortcutAriaLabel.primary(
-						's'
-					) }` }
-				</span>
+				<VisuallyHidden id={ descriptionId }>
+					Keyboard shortcut: { shortcutAriaLabel.primary( 's' ) }
+				</VisuallyHidden>
 			</>
 		);
 	},
