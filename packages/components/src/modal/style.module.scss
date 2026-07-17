@@ -5,8 +5,13 @@
 @use "@wordpress/base-styles/z-index" as *;
 @use "../utils/theme-variables" as *;
 
+// CSS Module styles are injected after static consumer styles. Qualifying the
+// zero-specificity module class with the rendered element keeps these defaults
+// above element resets but below the public `className`, `overlayClassName`, and
+// legacy class selectors that previously followed the components stylesheet.
+
 // The scrim behind the modal window.
-.screen-overlay {
+div:where(.screen-overlay) {
 	position: fixed;
 	top: 0;
 	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the legacy viewport-relative positioning in every writing mode. */
@@ -29,7 +34,7 @@
 }
 
 // The modal window element.
-.frame {
+div:where(.frame) {
 	@include reset;
 	// On smaller screens, render as a bottom sheet: edge-to-edge, anchored
 	// to the bottom of the viewport. `align-self: flex-end` both anchors
@@ -195,7 +200,7 @@
 // Fix header to the top so it is always there to provide context to the modal
 // if the content needs to be scrolled (for example, on the keyboard shortcuts
 // modal screen).
-.header {
+div:where(.header) {
 	box-sizing: border-box;
 	border-bottom: $border-width solid transparent;
 	padding: $grid-unit-30;
@@ -232,7 +237,7 @@
 	}
 }
 
-.header-heading-container {
+div:where(.header-heading-container) {
 	align-items: center;
 	flex-grow: 1;
 	display: flex;
@@ -251,7 +256,7 @@
 }
 
 // Modal contents.
-.content {
+div:where(.content) {
 	flex: 1;
 	margin-top: $header-height + $grid-unit-10;
 	// Small top padding required to avoid cutting off the visible outline when the first child element is focusable.
