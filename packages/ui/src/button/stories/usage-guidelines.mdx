@@ -3,7 +3,7 @@ import * as UsageGuidelinesStories from './usage-guidelines.story';
 
 <Meta of={ UsageGuidelinesStories } />
 
-# Button, IconButton, Link, and LinkButton
+# Button, ShortcutButton, IconButton, Link, and LinkButton
 
 Choose the component based on **what happens when the user activates it**, not only on how it should look.
 
@@ -12,14 +12,14 @@ Choose the component based on **what happens when the user activates it**, not o
 <Markdown>{ `
 | Goal | Component | Element | Examples |
 | --- | --- | --- | --- |
-| Performs an action on the current page | [Button](?path=/docs/design-system-components-button--docs), [IconButton](?path=/docs/design-system-components-iconbutton--docs) | \`<button>\` | Save, Delete, Submit, toolbar icon actions |
+| Performs an action on the current page | [Button](?path=/docs/design-system-components-button--docs), [ShortcutButton](?path=/docs/design-system-components-shortcutbutton--docs), [IconButton](?path=/docs/design-system-components-iconbutton--docs) | \`<button>\` | Save, Delete, Submit, toolbar icon actions |
 | Navigate to another page or URL | [Link](?path=/docs/design-system-components-link--docs) | \`<a>\` | "Learn more", docs links, external references |
 | Navigate with button styling | [LinkButton](?path=/docs/design-system-components-linkbutton--docs) | \`<a>\` | Standalone CTAs, card actions |
 ` }</Markdown>
 
-## Use `Button` and `IconButton` for actions
+## Use `Button`, `ShortcutButton`, and `IconButton` for actions
 
-Use `Button` or `IconButton` when activation should **not** navigate away as a link would:
+Use `Button`, `ShortcutButton`, or `IconButton` when activation should **not** navigate away as a link would:
 
 -   Submitting or resetting a form (`type="submit"` / `type="reset"`)
 -   Opening overlays ([Dialog](?path=/docs/design-system-components-dialog--docs), [Popover](?path=/docs/design-system-components-popover--docs), etc.)
@@ -29,11 +29,13 @@ Use `Button` or `IconButton` when activation should **not** navigate away as a l
 
 Use [IconButton](?path=/docs/design-system-components-iconbutton--docs) for the same kinds of actions when the control is **icon-only** — for example, toolbar buttons. It inherits `Button` props and adds a built-in tooltip via the required `label` prop (used as the accessible name).
 
-`Button` and `IconButton` use button semantics. Do not use them as stand-ins for navigation when a real URL is the primary outcome.
+Use [ShortcutButton](?path=/docs/design-system-components-shortcutbutton--docs) when a text-label action has an associated keyboard shortcut. It inherits `Button` props, displays the shortcut in a tooltip, and exposes its human-readable description to assistive technology. It does not register or handle the shortcut; keep the external shortcut handler synchronized with the button's disabled state.
+
+`Button`, `ShortcutButton`, and `IconButton` use button semantics. Do not use them as stand-ins for navigation when a real URL is the primary outcome.
 
 <Canvas of={ UsageGuidelinesStories.UseButtonForActions } />
 
-See [Button](?path=/docs/design-system-components-button--docs) and [IconButton](?path=/docs/design-system-components-iconbutton--docs) for API details and examples.
+See [Button](?path=/docs/design-system-components-button--docs), [ShortcutButton](?path=/docs/design-system-components-shortcutbutton--docs), and [IconButton](?path=/docs/design-system-components-iconbutton--docs) for API details and examples.
 
 ## Use `Link` for navigation
 
@@ -71,6 +73,7 @@ See [LinkButton](?path=/docs/design-system-components-linkbutton--docs) for API 
 
 ## Common mistakes
 
--   **`Button` or `IconButton` + `onClick` for navigation** — Prefer `Link` with a real `href` so keyboard, assistive technology, and browser link affordances stay correct.
+-   **`Button`, `ShortcutButton`, or `IconButton` + `onClick` for navigation** — Prefer `Link` with a real `href` so keyboard, assistive technology, and browser link affordances stay correct.
+-   **`ShortcutButton` without a matching shortcut handler** — The component presents shortcut metadata but does not implement the shortcut. Register the handler separately and disable it whenever the button is disabled.
 -   **`LinkButton` when `Link` would work** — Default to `Link` for navigation; button styling can obscure that the control goes elsewhere.
 -   **`LinkButton` for submit or toggle actions** — Use `Button` or `IconButton`, depending on whether the control needs a visible text label or is icon-only; `LinkButton` does not support loading or pressed toggle styling.

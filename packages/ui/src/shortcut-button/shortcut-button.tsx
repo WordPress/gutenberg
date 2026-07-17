@@ -1,0 +1,78 @@
+import { forwardRef } from '@wordpress/element';
+import { Button } from '../button';
+import * as Tooltip from '../tooltip';
+import {
+	KeyboardShortcutDescription,
+	useKeyboardShortcut,
+} from '../utils/keyboard-shortcut';
+import type { ShortcutButtonProps } from './types';
+
+/**
+ * A button that displays its keyboard shortcut in a tooltip and exposes a
+ * human-readable shortcut description to assistive technology.
+ *
+ * This component does not register or handle the keyboard shortcut. Consumers
+ * are responsible for implementing the shortcut and keeping its handler
+ * synchronized with the button's disabled state.
+ *
+ * When rendering a group of `ShortcutButton`s, wrap them in a
+ * `Tooltip.Provider` to coordinate tooltip delays across the group.
+ *
+ * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
+ * for when to use `Button`, `ShortcutButton`, `IconButton`, `Link`, or
+ * `LinkButton`.
+ */
+export const ShortcutButton = forwardRef<
+	HTMLButtonElement,
+	ShortcutButtonProps
+>( function ShortcutButton(
+	{
+		children,
+		disabled,
+		focusableWhenDisabled = true,
+		loading,
+		positioner,
+		shortcut,
+		'aria-describedby': ariaDescribedBy,
+		...restProps
+	},
+	ref
+) {
+	const { descriptionId, shortcutAriaProps } = useKeyboardShortcut( {
+		'aria-describedby': ariaDescribedBy,
+		shortcut,
+	} );
+	const isDisabled = disabled ?? loading;
+
+	return (
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				ref={ ref }
+				{ ...shortcutAriaProps }
+				disabled={ isDisabled && ! focusableWhenDisabled }
+				render={
+					<Button
+						{ ...restProps }
+						disabled={ disabled }
+						focusableWhenDisabled={ focusableWhenDisabled }
+						loading={ loading }
+					/>
+				}
+			>
+				{ children }
+				{ descriptionId && (
+					<KeyboardShortcutDescription
+						descriptionId={ descriptionId }
+						shortcut={ shortcut }
+					/>
+				) }
+			</Tooltip.Trigger>
+			<Tooltip.Popup positioner={ positioner }>
+				{ children }{ ' ' }
+				<span aria-hidden="true" dir="ltr">
+					{ shortcut.displayShortcut }
+				</span>
+			</Tooltip.Popup>
+		</Tooltip.Root>
+	);
+} );
