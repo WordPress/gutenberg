@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useObservableValue } from '@wordpress/compose';
 import {
 	useContext,
@@ -9,9 +6,6 @@ import {
 	createPortal,
 } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
 import SlotFillContext from './context';
 import type { FillComponentProps } from './types';
 import StyleProvider from '../style-provider';

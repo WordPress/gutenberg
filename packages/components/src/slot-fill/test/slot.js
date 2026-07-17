@@ -1,18 +1,9 @@
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-/**
- * WordPress dependencies
- */
 import { Component, createPortal } from '@wordpress/element';
 import { registerStyle } from '@wordpress/style-runtime';
 
-/**
- * Internal dependencies
- */
 import { Slot, Fill, Provider, useSlotFills } from '../';
 
 class Filler extends Component {

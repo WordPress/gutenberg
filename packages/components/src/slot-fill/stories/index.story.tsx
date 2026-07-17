@@ -1,12 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ReactNode } from 'react';
 
-/**
- * WordPress dependencies
- */
 import {
 	createContext,
 	createPortal,
@@ -14,9 +8,6 @@ import {
 	useState,
 } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
 import { Slot, Fill, Provider as SlotFillProvider } from '../';
 import { Spacer } from '../../spacer';
 
