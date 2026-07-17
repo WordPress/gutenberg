@@ -20,6 +20,7 @@ ruleTester.run( 'use-recommended-components', rule, {
 
 		// Allowed @wordpress/ui components.
 		"import { Badge } from '@wordpress/ui';",
+		"import { DirectionProvider } from '@wordpress/ui';",
 		"import { Icon } from '@wordpress/ui';",
 		"import { Link } from '@wordpress/ui';",
 		"import { Stack } from '@wordpress/ui';",
