@@ -231,11 +231,13 @@ test.describe( 'Block Hiding', () => {
 		await page.keyboard.press( 'Escape' );
 
 		// The hidden block now renders ghosted, and its accessible name
-		// announces why it's hidden.
+		// announces why it's hidden. Blocks omitted from published content
+		// get a distinct ghost style from viewport-conditional ones.
 		const ghostedBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Paragraph. Always hidden.',
 		} );
 		await expect( ghostedBlock ).toBeVisible();
+		await expect( ghostedBlock ).toHaveClass( /is-block-ghosted-always/ );
 
 		// Selecting the ghosted block keeps it editable, and the block
 		// toolbar states why it's hidden.
