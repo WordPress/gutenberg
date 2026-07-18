@@ -284,6 +284,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-block-hidden':
 					isBlockCurrentlyHidden && ! isResponsiveEditing,
 				'is-block-ghosted': isGhosted,
+				'is-block-ghosted-always': ghostCondition?.type === 'always',
 			},
 			className,
 			props.className,
