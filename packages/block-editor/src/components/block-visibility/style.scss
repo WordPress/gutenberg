@@ -48,6 +48,15 @@
 	}
 }
 
+.block-editor-block-visibility__ghost-reason {
+	display: flex;
+	align-items: center;
+	gap: $grid-unit-10;
+	padding: $grid-unit-05 $grid-unit-10;
+	font-size: $font-size-small;
+	color: $gray-900;
+}
+
 .block-editor-block-visibility-info {
 	padding-top: $grid-unit-05;
 	padding-bottom: $grid-unit-05;

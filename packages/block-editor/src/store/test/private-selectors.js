@@ -22,6 +22,7 @@ import {
 	isLockedBlock,
 	isBlockHiddenAnywhere,
 	isBlockHiddenAtViewport,
+	isBlockGhosted,
 	getViewportModalClientIds,
 	isSectionBlock,
 	getParentSectionBlock,
@@ -2195,6 +2196,89 @@ describe( 'private selectors', () => {
 			);
 			const result = isBlockHiddenAnywhere( state, 'test-block' );
 			expect( result ).toBe( false );
+		} );
+	} );
+
+	describe( 'isBlockGhosted', () => {
+		const createState = ( blockVisibility, deviceType, responsive ) => ( {
+			isResponsiveEditing: responsive,
+			settings: {
+				[ deviceTypeKey ]: deviceType,
+			},
+			blocks: {
+				byClientId: new Map( [
+					[ 'test-block', { name: 'core/paragraph' } ],
+				] ),
+				attributes: new Map( [
+					[ 'test-block', { metadata: { blockVisibility } } ],
+				] ),
+			},
+		} );
+
+		it( 'returns false for everything while responsive editing is off', () => {
+			expect(
+				isBlockGhosted(
+					createState( false, 'Desktop', false ),
+					'test-block'
+				)
+			).toBe( false );
+			expect(
+				isBlockGhosted(
+					createState(
+						{ viewport: { mobile: false } },
+						'Mobile',
+						false
+					),
+					'test-block'
+				)
+			).toBe( false );
+		} );
+
+		it( 'returns true for blocks hidden everywhere at any device', () => {
+			expect(
+				isBlockGhosted(
+					createState( false, 'Desktop', true ),
+					'test-block'
+				)
+			).toBe( true );
+			expect(
+				isBlockGhosted(
+					createState( false, 'Mobile', true ),
+					'test-block'
+				)
+			).toBe( true );
+		} );
+
+		it( 'returns true for viewport conditions only at the matching device', () => {
+			expect(
+				isBlockGhosted(
+					createState(
+						{ viewport: { mobile: false } },
+						'Mobile',
+						true
+					),
+					'test-block'
+				)
+			).toBe( true );
+			expect(
+				isBlockGhosted(
+					createState(
+						{ viewport: { mobile: false } },
+						'Desktop',
+						true
+					),
+					'test-block'
+				)
+			).toBe( false );
+		} );
+
+		it( 'returns false when the block has no visibility rule', () => {
+			expect(
+				isBlockGhosted(
+					createState( undefined, 'Mobile', true ),
+					'test-block'
+				)
+			).toBe( false );
 		} );
 	} );
 

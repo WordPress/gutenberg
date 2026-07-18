@@ -39,6 +39,7 @@ import {
 	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
 	isIsolatedEditorKey,
+	deviceTypeKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
 
@@ -1073,6 +1074,30 @@ export const isBlockParentHiddenAtViewport = ( state, clientId, viewport ) => {
 	return parents.some( ( parentId ) =>
 		isBlockHiddenAtViewport( state, parentId, viewport )
 	);
+};
+
+/**
+ * Returns true if the block renders ghosted in the canvas: responsive editing
+ * is on and the block's visibility rules hide it in the previewed device
+ * context. Always false while responsive editing is off.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {boolean} Whether the block is ghosted.
+ */
+export const isBlockGhosted = ( state, clientId ) => {
+	if ( ! state.isResponsiveEditing ) {
+		return false;
+	}
+
+	const blockName = getBlockName( state, clientId );
+	if ( ! hasBlockSupport( blockName, 'visibility', true ) ) {
+		return false;
+	}
+
+	const deviceType = state.settings?.[ deviceTypeKey ] || 'Desktop';
+	return isBlockHiddenAtViewport( state, clientId, deviceType );
 };
 
 /**
