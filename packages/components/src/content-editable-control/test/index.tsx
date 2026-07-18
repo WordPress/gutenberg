@@ -21,12 +21,20 @@ describe( 'ContentEditableControl', () => {
 		const label = screen.getByText( 'Description' );
 
 		expect( textbox ).toHaveAttribute( 'contenteditable', 'true' );
-		// `BaseControl` wires the label's `for` to the control's `id`.
-		expect( label ).toHaveAttribute( 'for', textbox.id );
-		// `<label for>` does not contribute an accessible name to a non-form
-		// element (a `<div role="textbox">`), so the label is also mirrored
-		// onto `aria-label` for assistive tech and test locators.
-		expect( textbox ).toHaveAttribute( 'aria-label', 'Description' );
+		// A `<div contenteditable>` is not a labelable element, so the label
+		// must not use `for` (Chrome logs a console error for the invalid
+		// association). The name is wired through `aria-labelledby` instead.
+		expect( label ).not.toHaveAttribute( 'for' );
+		expect( textbox ).toHaveAttribute( 'aria-labelledby', label.id );
+		expect( textbox ).toHaveAccessibleName( 'Description' );
+	} );
+
+	it( 'focuses the textbox when the label is clicked', () => {
+		render( <ContentEditableControl label="Description" /> );
+
+		fireEvent.click( screen.getByText( 'Description' ) );
+
+		expect( screen.getByRole( 'textbox' ) ).toHaveFocus();
 	} );
 
 	it( 'visually hides the label when `hideLabelFromVision` is set', () => {
@@ -95,9 +103,13 @@ describe( 'ContentEditableControl', () => {
 			'id',
 			'my-custom-id'
 		);
+		expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(
+			'aria-labelledby',
+			'my-custom-id__label'
+		);
 		expect( screen.getByText( 'Custom id' ) ).toHaveAttribute(
-			'for',
-			'my-custom-id'
+			'id',
+			'my-custom-id__label'
 		);
 	} );
 
