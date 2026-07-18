@@ -131,6 +131,12 @@ function ParagraphBlock( {
 		style: { direction },
 	} );
 	const blockEditingMode = useBlockEditingMode();
+	// The generic wrapper label announces why a ghosted block is hidden.
+	// Outside the ghost state, keep the hardcoded label this block has
+	// always used, without subscribing to any extra store state.
+	const isGhosted = blockProps.className
+		?.split( ' ' )
+		.includes( 'is-block-ghosted' );
 
 	return (
 		<>
@@ -168,7 +174,8 @@ function ParagraphBlock( {
 						? __(
 								'Empty block; start writing or type forward slash to choose a block'
 						  )
-						: blockProps[ 'aria-label' ]
+						: ( isGhosted && blockProps[ 'aria-label' ] ) ||
+						  __( 'Block: Paragraph' )
 				}
 				data-empty={ RichText.isEmpty( content ) }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }
