@@ -59,7 +59,9 @@ jobs:
                   cache: npm
 
             - name: Pin npm version for consistency
-              run: npm install -g npm@10
+              run: |
+                  npm install --global npm@10
+                  npm --version
 
             - name: npm install
               # A "full" install is executed, since `npm ci` does not always exit
