@@ -97,9 +97,16 @@ const {
 interface ScreenBlockProps {
 	name: string;
 	variation?: string;
+	selectedViewport?: string;
+	showResponsiveStateControls?: boolean;
 }
 
-function ScreenBlock( { name, variation }: ScreenBlockProps ) {
+function ScreenBlock( {
+	name,
+	variation,
+	selectedViewport: controlledSelectedViewport,
+	showResponsiveStateControls = true,
+}: ScreenBlockProps ) {
 	const {
 		user: userConfig,
 		merged: mergedConfig,
@@ -113,10 +120,12 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 	const prefix = prefixParts.join( '.' );
 
 	// State selector state
-	const [ selectedViewport, setSelectedViewport ] =
+	const [ localSelectedViewport, setSelectedViewport ] =
 		useState< string >( 'default' );
 	const [ selectedPseudoState, setSelectedPseudoState ] =
 		useState< string >( 'default' );
+	const selectedViewport =
+		controlledSelectedViewport ?? localSelectedViewport;
 	const viewportSettings = mergedConfig.settings?.viewport;
 	const validViewportStates = useMemo(
 		() => getValidViewportStates( viewportSettings ),
@@ -214,7 +223,8 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		userSettings,
 		settings
 	);
-	const hasVariationsPanel = !! blockVariations?.length && ! variation;
+	const hasVariationsPanel =
+		!! blockVariations?.length && ! variation && ! hasSelectedState;
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
 			select( coreStore );
@@ -360,8 +370,13 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 				pseudoStates={ validPseudoStates }
 				selectedViewport={ effectiveSelectedViewport }
 				selectedPseudoState={ selectedPseudoState }
-				onChangeViewport={ setSelectedViewport }
+				onChangeViewport={
+					showResponsiveStateControls
+						? setSelectedViewport
+						: undefined
+				}
 				onChangePseudoState={ setSelectedPseudoState }
+				showResponsiveStateControls={ showResponsiveStateControls }
 			/>
 			<BlockPreviewPanel
 				name={ name }

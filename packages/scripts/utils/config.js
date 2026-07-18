@@ -86,6 +86,7 @@ const hasPrettierConfig = () =>
 	hasProjectFile( '.prettierrc.yaml' ) ||
 	hasProjectFile( '.prettierrc.yml' ) ||
 	hasProjectFile( 'prettier.config.js' ) ||
+	hasProjectFile( 'prettier.config.mjs' ) ||
 	hasProjectFile( '.prettierrc' ) ||
 	hasPackageProp( 'prettier' );
 

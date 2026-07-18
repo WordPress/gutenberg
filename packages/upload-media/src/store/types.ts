@@ -174,6 +174,9 @@ interface UploadMediaArgs {
 	wpAllowedMimeTypes?: Record< string, string > | null;
 	// Abort signal.
 	signal?: AbortSignal;
+	// Whether the caller owns the upload lifecycle UX (progress tracking,
+	// save locking) and uses the handler only as its server transport.
+	isTransportOnly?: boolean;
 }
 
 /**
@@ -378,6 +381,18 @@ export interface OperationArgs {
 	[ OperationType.TranscodeGif ]: {
 		/** Video output format: 'mp4' or 'webm'. */
 		outputFormat: 'mp4' | 'webm';
+		/**
+		 * Time in milliseconds before the conversion is abandoned and only
+		 * the original GIF is kept. `0` disables the timeout. Defaults to
+		 * 30 seconds.
+		 */
+		timeout?: number;
+		/**
+		 * Budget for total decoded pixels (width × height × frame count)
+		 * beyond which conversion is not attempted. `0` disables the check.
+		 * Defaults to the `@wordpress/video-conversion` package default.
+		 */
+		maxTotalPixels?: number;
 	};
 }
 

@@ -38,15 +38,16 @@ type Story = StoryObj< typeof AlertDialog.Root >;
  */
 export const Default: Story = {
 	args: {
-		children: (
-			<>
-				<AlertDialog.Trigger>Move to trash</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					title="Move to trash?"
-					description="This post will be moved to trash. You can restore it later."
-				/>
-			</>
-		),
+		children: [
+			<AlertDialog.Trigger key="trigger">
+				Move to trash
+			</AlertDialog.Trigger>,
+			<AlertDialog.Popup
+				title="Move to trash?"
+				description="This post will be moved to trash. You can restore it later."
+				key="popup"
+			/>,
+		],
 	},
 };
 
@@ -56,17 +57,18 @@ export const Default: Story = {
  */
 export const Irreversible: Story = {
 	args: {
-		children: (
-			<>
-				<AlertDialog.Trigger>Delete permanently</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					intent="irreversible"
-					title="Delete permanently?"
-					description="This action cannot be undone. All data will be lost."
-					confirmButtonText="Delete permanently"
-				/>
-			</>
-		),
+		children: [
+			<AlertDialog.Trigger key="trigger">
+				Delete permanently
+			</AlertDialog.Trigger>,
+			<AlertDialog.Popup
+				intent="irreversible"
+				title="Delete permanently?"
+				description="This action cannot be undone. All data will be lost."
+				confirmButtonText="Delete permanently"
+				key="popup"
+			/>,
+		],
 	},
 };
 
@@ -75,17 +77,18 @@ export const Irreversible: Story = {
  */
 export const CustomLabels: Story = {
 	args: {
-		children: (
-			<>
-				<AlertDialog.Trigger>Send feedback</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					title="Send feedback?"
-					description="Your feedback helps us improve. Would you like to send it now?"
-					confirmButtonText="Send feedback"
-					cancelButtonText="Not now"
-				/>
-			</>
-		),
+		children: [
+			<AlertDialog.Trigger key="trigger">
+				Send feedback
+			</AlertDialog.Trigger>,
+			<AlertDialog.Popup
+				title="Send feedback?"
+				description="Your feedback helps us improve. Would you like to send it now?"
+				confirmButtonText="Send feedback"
+				cancelButtonText="Not now"
+				key="popup"
+			/>,
+		],
 	},
 };
 
@@ -96,27 +99,28 @@ export const CustomLabels: Story = {
  */
 export const WithCustomContent: Story = {
 	args: {
-		children: (
-			<>
-				<AlertDialog.Trigger>Remove pages</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					title="Remove 3 pages?"
-					description="These pages will be moved to trash."
-					confirmButtonText="Delete pages"
+		children: [
+			<AlertDialog.Trigger key="trigger">
+				Remove pages
+			</AlertDialog.Trigger>,
+			<AlertDialog.Popup
+				title="Remove 3 pages?"
+				description="These pages will be moved to trash."
+				confirmButtonText="Delete pages"
+				key="popup"
+			>
+				<ul
+					style={ {
+						margin: 'var(--wpds-dimension-gap-sm) 0 0',
+						paddingInlineStart: 'var(--wpds-dimension-gap-lg)',
+					} }
 				>
-					<ul
-						style={ {
-							margin: 'var(--wpds-dimension-gap-sm) 0 0',
-							paddingInlineStart: 'var(--wpds-dimension-gap-lg)',
-						} }
-					>
-						<Text render={ <li /> }>About us</Text>
-						<Text render={ <li /> }>Contact</Text>
-						<Text render={ <li /> }>Privacy policy</Text>
-					</ul>
-				</AlertDialog.Popup>
-			</>
-		),
+					<Text render={ <li /> }>About us</Text>
+					<Text render={ <li /> }>Contact</Text>
+					<Text render={ <li /> }>Privacy policy</Text>
+				</ul>
+			</AlertDialog.Popup>,
+		],
 	},
 };
 
@@ -140,20 +144,21 @@ export const WithCustomContent: Story = {
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
 	args: {
-		children: (
-			<>
-				<AlertDialog.Trigger>Move to trash</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					title="Move to trash?"
-					description="This post will be moved to trash. You can restore it later."
-					portal={
-						<AlertDialog.Portal
-							style={ { '--wp-ui-dialog-z-index': '9999' } }
-						/>
-					}
-				/>
-			</>
-		),
+		children: [
+			<AlertDialog.Trigger key="trigger">
+				Move to trash
+			</AlertDialog.Trigger>,
+			<AlertDialog.Popup
+				title="Move to trash?"
+				description="This post will be moved to trash. You can restore it later."
+				portal={
+					<AlertDialog.Portal
+						style={ { '--wp-ui-dialog-z-index': '9999' } }
+					/>
+				}
+				key="popup"
+			/>,
+		],
 	},
 };
 
@@ -338,6 +343,7 @@ function StickyToggle( {
 				checked={ value }
 				onChange={ ( event ) => onChange( event.target.checked ) }
 			/>
+
 			<label htmlFor={ id }>{ label }</label>
 		</Stack>
 	);
@@ -355,6 +361,7 @@ function ScrollableContent() {
 						value={ stickyHeader }
 						onChange={ setStickyHeader }
 					/>
+
 					<StickyToggle
 						label="Sticky footer"
 						value={ stickyFooter }
