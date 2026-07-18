@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add a `NavigationMenu` component for persistent navigation links and disclosure flyouts. ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER))
+-   Add a `NavigationMenu` component for persistent navigation links and disclosure flyouts. ([#80446](https://github.com/WordPress/gutenberg/pull/80446))
 
 ### Enhancements
 
