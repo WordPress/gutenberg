@@ -30,7 +30,10 @@ import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
-import { useBlockVisibility } from '../../block-visibility/';
+import {
+	useBlockVisibility,
+	getBlockVisibilityCondition,
+} from '../../block-visibility/';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -150,7 +153,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		: {};
 
 	// Use block visibility hook with data from context to avoid extra subscription.
-	const { isBlockCurrentlyHidden } = useBlockVisibility( {
+	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
@@ -160,13 +163,20 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	// Hidden blocks are only ghosted while responsive editing is on; otherwise
 	// they render like any other block.
 	const isGhosted = !! isResponsiveEditing && isBlockCurrentlyHidden;
+	const ghostCondition = isGhosted
+		? getBlockVisibilityCondition(
+				blockVisibility,
+				currentViewport,
+				viewportSettings
+		  )
+		: null;
 
-	const blockLabel = isGhosted
+	const blockLabel = ghostCondition
 		? sprintf(
 				/* translators: %1$s: Type of block (i.e. Text, Image etc). %2$s: Reason the block is hidden, e.g. "Hidden on Mobile". */
 				__( 'Block: %1$s. %2$s.' ),
 				blockTitle,
-				__( 'Hidden in this view' )
+				ghostCondition.label
 		  )
 		: // translators: %s: Type of block (i.e. Text, Image etc)
 		  sprintf( __( 'Block: %s' ), blockTitle );
@@ -200,6 +210,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
+		'data-block-visibility-label': ghostCondition?.label,
+		'data-block-visibility-condition': ghostCondition?.type,
 		inert: isSubtreeDisabled ? 'true' : undefined,
 		className: clsx(
 			'block-editor-block-list__block',

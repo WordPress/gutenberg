@@ -74,6 +74,47 @@ function isBlockHiddenForViewport( block, viewport ) {
 }
 
 /**
+ * Returns the visibility condition that hides a block in the given viewport
+ * context, or null when nothing hides it there.
+ *
+ * Each condition type maps to a short human label used by the canvas ghost
+ * chip and accessible names. New condition types (for example date or role
+ * based visibility) should be added here so every consumer picks them up.
+ *
+ * @param {boolean|Object} blockVisibility  The block's visibility metadata.
+ * @param {string}         currentViewport  The viewport context to check ('desktop', 'tablet', 'mobile').
+ * @param {Object}         viewportSettings Viewport breakpoint settings.
+ * @return {{type: string, label: string}|null} The matching condition, or null.
+ */
+export function getBlockVisibilityCondition(
+	blockVisibility,
+	currentViewport,
+	viewportSettings
+) {
+	if ( blockVisibility === false ) {
+		return { type: 'always', label: __( 'Always hidden' ) };
+	}
+
+	if (
+		blockVisibility?.viewport?.[ currentViewport ] === false &&
+		getBlockVisibilityViewportEntries( viewportSettings ).some(
+			( [ key ] ) => key === currentViewport
+		)
+	) {
+		return {
+			type: 'viewport',
+			label: sprintf(
+				/* translators: %s: viewport name, e.g. Tablet or Mobile. */
+				__( 'Hidden on %s' ),
+				BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ].label
+			),
+		};
+	}
+
+	return null;
+}
+
+/**
  * Gets the checkbox state for a viewport across multiple blocks.
  * Returns `true` if all blocks are hidden, `null` if some are hidden, `false` if none are hidden.
  *

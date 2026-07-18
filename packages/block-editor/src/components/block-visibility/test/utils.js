@@ -3,6 +3,7 @@
  */
 import {
 	getBlockVisibilityViewportEntries,
+	getBlockVisibilityCondition,
 	getViewportCheckboxState,
 	getHideEverywhereCheckboxState,
 } from '../utils';
@@ -288,6 +289,55 @@ describe( 'block-visibility utils', () => {
 				},
 			];
 			expect( getHideEverywhereCheckboxState( blocks ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getBlockVisibilityCondition', () => {
+		it( 'returns null when the block has no visibility rule', () => {
+			expect( getBlockVisibilityCondition( undefined, 'mobile' ) ).toBe(
+				null
+			);
+			expect( getBlockVisibilityCondition( true, 'mobile' ) ).toBe(
+				null
+			);
+		} );
+
+		it( 'returns the always condition when hidden everywhere', () => {
+			expect( getBlockVisibilityCondition( false, 'desktop' ) ).toEqual( {
+				type: 'always',
+				label: 'Always hidden',
+			} );
+		} );
+
+		it( 'returns the viewport condition at a matching viewport', () => {
+			expect(
+				getBlockVisibilityCondition(
+					{ viewport: { mobile: false } },
+					'mobile'
+				)
+			).toEqual( {
+				type: 'viewport',
+				label: 'Hidden on Mobile',
+			} );
+		} );
+
+		it( 'returns null at a non-matching viewport', () => {
+			expect(
+				getBlockVisibilityCondition(
+					{ viewport: { mobile: false } },
+					'tablet'
+				)
+			).toBe( null );
+		} );
+
+		it( 'ignores viewports the theme does not configure', () => {
+			expect(
+				getBlockVisibilityCondition(
+					{ viewport: { mobile: false } },
+					'mobile',
+					{ tablet: '64rem' }
+				)
+			).toBe( null );
 		} );
 	} );
 } );
