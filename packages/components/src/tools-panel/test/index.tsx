@@ -315,6 +315,27 @@ describe( 'ToolsPanel', () => {
 
 			expect( header ).toBeInTheDocument();
 		} );
+
+		it( 'should preserve the panel heading style specificity', () => {
+			renderPanel();
+			const header = screen.getByRole( 'heading', {
+				name: defaultProps.label,
+			} );
+			const headingStyleClass = Array.from( header.classList ).find(
+				( className ) => className.includes( 'ToolsPanelHeading' )
+			);
+
+			expect( headingStyleClass ).toBeDefined();
+			expect(
+				Array.from( document.styleSheets ).some( ( sheet ) =>
+					Array.from( sheet.cssRules ).some(
+						( rule ) =>
+							( rule as CSSStyleRule ).selectorText ===
+							`.${ headingStyleClass }.${ headingStyleClass }`
+					)
+				)
+			).toBe( true );
+		} );
 	} );
 
 	describe( 'conditional rendering of panel items', () => {

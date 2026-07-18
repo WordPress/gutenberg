@@ -100,12 +100,11 @@ export const ToolsPanelHeader = css`
 `;
 
 export const ToolsPanelHeading = css`
-	font-size: inherit;
-	font-weight: ${ CONFIG.fontWeightEmphasis };
-	line-height: normal;
-
-	/* Required to meet specificity requirements to ensure zero margin */
+	/* Outrank Heading's base typography regardless of Emotion insertion order. */
 	&& {
+		font-size: inherit;
+		font-weight: ${ CONFIG.fontWeightEmphasis };
+		line-height: normal;
 		margin: 0;
 	}
 `;
