@@ -41,7 +41,7 @@
 		"./README.md": "./README.md",
 		"./CONTRIBUTING.md": "./CONTRIBUTING.md",
 		"./package.json": "./package.json",
-		"./build-style/": "./build-style/"
+		"./build-style/*": "./build-style/*"
 	},
 	"wpScript": true,
 	"types": "build-types",

@@ -114,6 +114,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 				hideLabelFromVision
 				value={ inputComment }
 				onChange={ setInputComment }
+				placeholder={ labels?.placeholder }
 				allowedFormats={ ALLOWED_NOTE_FORMATS }
 				completers={ NOTE_COMPLETERS }
 			/>

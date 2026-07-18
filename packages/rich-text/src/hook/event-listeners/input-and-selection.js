@@ -305,7 +305,9 @@ export default ( props ) => ( element ) => {
 			// snapshot must not skip synchronization.
 			selectionSnapshot = undefined;
 		} else {
-			applyRecord( record.current, { domOnly: true } );
+			// The document's selection may have moved elsewhere while the
+			// element was blurred, so restore it from the record.
+			applyRecord( record.current );
 		}
 
 		onSelectionChange( record.current.start, record.current.end );
