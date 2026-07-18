@@ -48,13 +48,13 @@
 	}
 }
 
-.block-editor-block-visibility__ghost-reason {
+.block-editor-block-visibility-toolbar__reason {
 	display: flex;
 	align-items: center;
-	gap: $grid-unit-10;
-	padding: $grid-unit-05 $grid-unit-10;
+	padding-inline-end: $grid-unit-15;
 	font-size: $font-size-small;
-	color: $gray-900;
+	color: $gray-700;
+	white-space: nowrap;
 }
 
 .block-editor-block-visibility-info {
