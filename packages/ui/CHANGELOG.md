@@ -12,7 +12,7 @@
 -   `Meter.Indicator`: Add `success`, `warning`, and `error` tones ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
 -   `ControlWithError`: Add a `getInteractiveTarget` prop, so a control that validates a hidden stand-in element can attach the validation message to the description of the element users interact with ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
 -   Add `LoadingIndicator` to `Combobox`, `Autocomplete`, `SearchableSelect`, `SearchableChipSelect`, and their controls, with a fixed spinner, customizable loading message, and popup item layout ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
--   Add a `NavigationMenu` component for persistent navigation links and disclosure flyouts. ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER))
+-   Add a `NavigationMenu` component for persistent navigation links and disclosure flyouts. ([#80446](https://github.com/WordPress/gutenberg/pull/80446))
 
 
 ### Enhancements
