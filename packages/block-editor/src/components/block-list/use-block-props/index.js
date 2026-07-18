@@ -210,8 +210,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
-		'data-block-visibility-label': ghostCondition?.label,
-		'data-block-visibility-condition': ghostCondition?.type,
 		inert: isSubtreeDisabled ? 'true' : undefined,
 		className: clsx(
 			'block-editor-block-list__block',
