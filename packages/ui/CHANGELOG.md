@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `NavigationMenu` component for persistent navigation links and disclosure flyouts. ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER))
+
 ### Enhancements
 
 -   `Menu`: Add shortcut display and accessibility metadata support. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
