@@ -1,0 +1,70 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design System/Components/NavigationMenu/Best Practices" />
+
+# NavigationMenu
+
+Use `NavigationMenu` for persistent links to destinations, with optional disclosure flyouts. It follows the WAI-ARIA disclosure navigation pattern: every destination is a native link, every flyout opener is a native button, and all links and triggers stay in the normal Tab sequence.
+
+The outer `NavigationMenu.Root` renders a navigation landmark and must have a concise accessible name through `aria-label` or `aria-labelledby`. Do not include the word “navigation” in that name because screen readers already announce the landmark role.
+
+```tsx
+import { NavigationMenu } from '@wordpress/ui';
+
+function EditorNavigation() {
+	return (
+		<NavigationMenu.Root aria-label="Editor">
+			<NavigationMenu.List>
+				<NavigationMenu.Item>
+					<NavigationMenu.Link href="/posts" active>
+						Posts
+					</NavigationMenu.Link>
+				</NavigationMenu.Item>
+				<NavigationMenu.Item value="appearance">
+					<NavigationMenu.Trigger>Appearance</NavigationMenu.Trigger>
+					<NavigationMenu.Content>
+						<NavigationMenu.Root orientation="vertical">
+							<NavigationMenu.List>
+								<NavigationMenu.Item>
+									<NavigationMenu.Link href="/themes">
+										Themes
+									</NavigationMenu.Link>
+								</NavigationMenu.Item>
+							</NavigationMenu.List>
+						</NavigationMenu.Root>
+					</NavigationMenu.Content>
+				</NavigationMenu.Item>
+			</NavigationMenu.List>
+			<NavigationMenu.Popup>
+				<NavigationMenu.Viewport />
+			</NavigationMenu.Popup>
+		</NavigationMenu.Root>
+	);
+}
+```
+
+## Links and routers
+
+Always provide a real `href`. This preserves browser navigation, copy-link actions, modifier clicks, deep links, and history. Compose a router link with `render`; do not replace the anchor with a button or an element that lacks an `href`.
+
+Use `active` only for the one link representing the current page. It produces `aria-current="page"`; it is independent of which flyout is open.
+
+## Choosing the right component
+
+| Need                                             | Use              |
+| ------------------------------------------------ | ---------------- |
+| Move between pages or destinations               | `NavigationMenu` |
+| Switch between views without navigating          | `Tabs`           |
+| Present application actions in a temporary popup | `Menu`           |
+
+`NavigationMenu` flyouts contain destination links and use disclosure-navigation semantics. `Menu` popups contain commands and use the ARIA menu pattern. They are not interchangeable even when their visual item layout is similar.
+
+## Content and nesting
+
+Pair each `NavigationMenu.Trigger` with one `NavigationMenu.Content` in the same `NavigationMenu.Item`. Use a nested vertical `NavigationMenu.Root` for the links inside a flyout. Nested roots render neutral containers rather than additional navigation landmarks.
+
+Use `ItemLabel` and `ItemDescription` for structured content. `prefix`, `suffix`, and `shortcut` share alignment tracks across related items. Shortcut metadata only communicates an existing shortcut; it does not install a keyboard handler.
+
+## Accessibility checks
+
+Test the landmark name, current-page announcement, expanded state, Tab order, Escape and focus restoration, multiple nesting levels, RTL, forced colors, reduced motion, touch, 200% zoom, and horizontal overflow. A portalled popup must not create an extra unlabeled navigation landmark.
