@@ -214,15 +214,15 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		  )
 		: null;
 
-	const blockLabel = ghostCondition
-		? sprintf(
-				/* translators: %1$s: Type of block (i.e. Text, Image etc). %2$s: Reason the block is hidden, e.g. "Hidden on Mobile". */
-				__( 'Block: %1$s. %2$s.' ),
-				blockTitle,
-				ghostCondition.label
-		  )
-		: // translators: %s: Type of block (i.e. Text, Image etc)
-		  sprintf( __( 'Block: %s' ), blockTitle );
+	// translators: %s: Type of block (i.e. Text, Image etc)
+	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
+	const baseLabel =
+		ariaLabel ??
+		( clientId === ghostBlock?.clientId
+			? __( 'Add default block' )
+			: undefined ) ??
+		props[ 'aria-label' ] ??
+		blockLabel;
 
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
@@ -249,13 +249,17 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
 		role: 'document',
-		'aria-label':
-			ariaLabel ??
-			( clientId === ghostBlock?.clientId
-				? __( 'Add default block' )
-				: undefined ) ??
-			props[ 'aria-label' ] ??
-			blockLabel,
+		// A ghosted block announces why it is hidden after whatever name it
+		// would otherwise have, so blocks that supply their own label (like
+		// Paragraph) keep it and still announce the reason.
+		'aria-label': ghostCondition
+			? sprintf(
+					/* translators: %1$s: Accessible block name, e.g. "Block: Paragraph". %2$s: Reason the block is hidden, e.g. "Hidden on Mobile". */
+					__( '%1$s. %2$s.' ),
+					baseLabel,
+					ghostCondition.label
+			  )
+			: baseLabel,
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
