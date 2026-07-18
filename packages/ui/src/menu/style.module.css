@@ -3,43 +3,22 @@
 
 	@layer components {
 		.positioner {
-			z-index: var(--wp-ui-menu-z-index, initial);
+			--wp-ui-dropdown-popup-z-index: var(--wp-ui-menu-z-index, initial);
 		}
 
 		.popup {
-			--wp-ui-menu-popup-padding: var(--wpds-dimension-padding-xs);
-			--wp-ui-menu-min-width: 160px;
-			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-md);
-			--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-md);
-			--wp-ui-menu-selection-indicator-track-size: 0px;
-			--wp-ui-menu-selection-indicator-size: var(--wpds-dimension-size-sm);
-			--wp-ui-menu-selection-indicator-gap: 0px;
-			--_wp-ui-menu-elevation-md: 0px 2px 3px 0px #0000000d, 0px 4px 5px 0px #0000000a, 0px 12px 12px 0px #00000008, 0px 16px 16px 0px #00000005;
+			--wp-ui-dropdown-popup-padding: var(--wpds-dimension-padding-xs);
+			--wp-ui-dropdown-popup-min-width: var(--wp-ui-menu-min-width, 160px);
+			--wp-ui-dropdown-popup-max-width: var(--wp-ui-menu-max-width, var(--wpds-dimension-surface-width-md));
+			--wp-ui-item-layout-padding-inline: var(--wpds-dimension-padding-md);
+			--wp-ui-item-layout-selection-track-size: 0px;
+			--wp-ui-item-layout-selection-size: var(--wpds-dimension-size-sm);
+			--wp-ui-item-layout-selection-gap: 0px;
 
-			max-height: min(var(--available-height), 480px, 60dvh);
-			min-width: max(var(--anchor-width, 0px), var(--wp-ui-menu-min-width));
-			max-width: min(var(--available-width), var(--wp-ui-menu-max-width));
-			overflow-block: auto;
-			overscroll-behavior: none;
-			padding: var(--wp-ui-menu-popup-padding);
-			scroll-padding: var(--wp-ui-menu-popup-padding);
-			border-radius: var(--wpds-border-radius-md);
-			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-			box-shadow: var(--_wp-ui-menu-elevation-md);
-			background-color: var(--wpds-color-background-surface-neutral-strong);
-
-			&:has(.item-selection-indicator) {
-				--wp-ui-menu-selection-indicator-track-size: var(--wpds-dimension-size-3xs);
-				--wp-ui-menu-selection-indicator-gap: var(--wpds-dimension-gap-sm);
+			&:has([data-wp-ui-item-layout-selection]) {
+				--wp-ui-item-layout-selection-track-size: var(--wpds-dimension-size-3xs);
+				--wp-ui-item-layout-selection-gap: var(--wpds-dimension-gap-sm);
 			}
-		}
-
-		.popup--root {
-			composes: dropdown-motion from "../utils/css/dropdown-motion.module.css";
-		}
-
-		.popup--submenu {
-			composes: dropdown-motion--fade-only from "../utils/css/dropdown-motion.module.css";
 		}
 
 		.list {
@@ -49,41 +28,8 @@
 			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 
-		/*
-		 * The list is the implicit alignment group for direct items. Explicit
-		 * groups each establish an independent prefix track while inheriting the
-		 * menu-wide selection tracks. Radio groups are transparent to layout.
-		 */
-		.list,
-		.group {
-			--wp-ui-menu-group-prefix-gap: 0px;
-
-			display: grid;
-			grid-template-columns:
-				[item-padding-start] var(--wp-ui-menu-item-padding-inline)
-				[selection-start] var(--wp-ui-menu-selection-indicator-track-size)
-				[selection-end] var(--wp-ui-menu-selection-indicator-gap)
-				[prefix-start] max-content
-				[prefix-end] var(--wp-ui-menu-group-prefix-gap)
-				[content-start] minmax(0, 1fr)
-				[content-end] var(--wp-ui-menu-item-padding-inline)
-				[item-padding-end];
-			min-width: 0;
-		}
-
 		.group {
 			grid-column: 1 / -1;
-		}
-
-		.radio-group {
-			display: contents;
-		}
-
-		.list:has(> .item > .item-prefix),
-		.list:has(> .radio-group > .item > .item-prefix),
-		.group:has(> .item > .item-prefix),
-		.group:has(> .radio-group > .item > .item-prefix) {
-			--wp-ui-menu-group-prefix-gap: var(--wpds-dimension-gap-sm);
 		}
 
 		.group-label {
@@ -114,37 +60,17 @@
 		}
 
 		.item {
-			--wp-ui-menu-item-height: var(--wpds-dimension-size-lg);
+			--wp-ui-item-layout-min-height: var(--wpds-dimension-size-lg);
 			--wp-ui-menu-item-padding-block: var(--wpds-dimension-padding-xs);
 
-			display: grid;
-			grid-column: 1 / -1;
-			grid-template-columns:
-				[item-padding-start] var(--wp-ui-menu-item-padding-inline)
-				[selection-start] var(--wp-ui-menu-selection-indicator-track-size)
-				[selection-end] var(--wp-ui-menu-selection-indicator-gap)
-				[prefix-start] max-content
-				[prefix-end] var(--wp-ui-menu-group-prefix-gap)
-				[content-start] minmax(0, 1fr)
-				[content-end] var(--wp-ui-menu-item-padding-inline)
-				[item-padding-end];
-			gap: 0;
-			align-items: center;
-			justify-content: stretch;
-			min-width: 0;
-			min-height: var(--wp-ui-menu-item-height);
 			padding-block: var(--wp-ui-menu-item-padding-block);
 			border-radius: var(--wpds-border-radius-sm);
 			text-decoration: none;
 			user-select: none;
-			scroll-margin: var(--wp-ui-menu-popup-padding);
+			scroll-margin: var(--wp-ui-dropdown-popup-padding);
 
 			&:not([data-disabled]) {
 				cursor: var(--wpds-cursor-control);
-			}
-
-			@supports ( grid-template-columns: subgrid ) {
-				grid-template-columns: subgrid;
 			}
 
 			&[data-highlighted] {
@@ -176,116 +102,8 @@
 			}
 		}
 
-		.item-selection-indicator {
-			grid-column: selection-start / selection-end;
-			align-self: center;
-			justify-self: center;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			width: var(--wp-ui-menu-selection-indicator-size);
-			height: var(--wp-ui-menu-selection-indicator-size);
-			color: var(--wpds-color-foreground-content-neutral-weak);
-			pointer-events: none;
-
-			&[data-unchecked] {
-				opacity: 0;
-			}
-		}
-
-		.item-prefix {
-			grid-column: prefix-start / prefix-end;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			gap: var(--wpds-dimension-gap-xs);
-			min-width: 0;
-			color: var(--wpds-color-foreground-content-neutral-weak);
-		}
-
-		.item-content {
-			grid-column: content-start / content-end;
-			/* Everything after the prefix is laid out independently per item. */
-			display: grid;
-			grid-template-columns:
-				[label-start] minmax(0, 1fr)
-				[label-end suffix-start] auto
-				[suffix-end shortcut-start] auto
-				[shortcut-end trailing-start] auto
-				[trailing-end];
-			align-items: center;
-			box-sizing: border-box;
-			min-width: 0;
-			/* Keep clicks on presentational labels and suffixes routed to the menu item. */
-			pointer-events: none;
-		}
-
-		.item-children {
-			grid-column: label-start / label-end;
-			display: inline-flex;
-			flex-direction: column;
-			gap: 2px; /* var(--wpds-dimension-gap-xs); */
-			min-width: 0;
-		}
-
-		.item-label {
-			min-width: 0;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			font-family: var(--wpds-typography-font-family-body);
-			font-size: var(--wpds-typography-font-size-md);
-			line-height: var(--wpds-typography-line-height-sm);
-			font-weight: var(--wpds-typography-font-weight-default);
-			color: inherit;
-		}
-
-		.item-description {
-			font-family: var(--wpds-typography-font-family-body);
-			font-size: var(--wpds-typography-font-size-sm);
-			line-height: var(--wpds-typography-line-height-xs);
-			font-weight: var(--wpds-typography-font-weight-default);
-			color: var(--wpds-color-foreground-content-neutral-weak);
-			overflow-wrap: anywhere;
-			/* For better optical alignment and spacing */
-			padding-block-end: var(--wpds-dimension-padding-xs);
-		}
-
-		.item-suffix {
-			grid-column: suffix-start / suffix-end;
-			display: flex;
-			align-items: center;
-			margin-inline-start: var(--wpds-dimension-gap-lg);
-			gap: var(--wpds-dimension-gap-xs);
-			color: var(--wpds-color-foreground-content-neutral-weak);
-		}
-
-		.item-shortcut {
-			grid-column: shortcut-start / shortcut-end;
-			margin-inline-start: var(--wpds-dimension-gap-lg);
-			color: var(--wpds-color-foreground-content-neutral-weak);
-			direction: ltr;
-			unicode-bidi: isolate;
-		}
-
-		.item-trailing {
-			grid-column: trailing-start / trailing-end;
-			display: flex;
-			align-items: center;
-			margin-inline-start: var(--wpds-dimension-gap-lg);
-			color: var(--wpds-color-foreground-content-neutral-weak);
-		}
-
-		.item-shortcut + .item-trailing {
-			margin-inline-start: var(--wpds-dimension-gap-xs);
-		}
-
 		.submenu-chevron {
 			margin-inline-end: calc(-1 * var(--wpds-dimension-gap-sm));
-		}
-
-		.submenu-chevron:dir(rtl) {
-			transform: rotateZ(180deg);
 		}
 
 		.external-link-indicator {
@@ -304,18 +122,8 @@
 			content: "\2196";
 		}
 
-		.item[data-highlighted]:not([aria-disabled]) .item-prefix,
-		.item[data-highlighted]:not([aria-disabled]) .item-description,
-		.item[data-highlighted]:not([aria-disabled]) .item-suffix,
-		.item[data-highlighted]:not([aria-disabled]) .item-shortcut,
-		.item[data-highlighted]:not([aria-disabled]) .item-trailing,
-		.item[data-highlighted]:not([aria-disabled]) .item-selection-indicator,
-		.item[aria-disabled] .item-prefix,
-		.item[aria-disabled] .item-description,
-		.item[aria-disabled] .item-suffix,
-		.item[aria-disabled] .item-shortcut,
-		.item[aria-disabled] .item-trailing,
-		.item[aria-disabled] .item-selection-indicator {
+		.item[data-highlighted]:not([aria-disabled]) [data-wp-ui-item-layout-muted],
+		.item[aria-disabled] [data-wp-ui-item-layout-muted] {
 			color: inherit;
 		}
 	}

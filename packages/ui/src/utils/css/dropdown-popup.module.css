@@ -1,0 +1,43 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer utilities {
+		.positioner {
+			z-index: var(--wp-ui-dropdown-popup-z-index, initial);
+		}
+
+		.surface {
+			--wp-ui-dropdown-popup-padding: var(--wpds-dimension-padding-xs);
+			--wp-ui-dropdown-popup-min-width: 160px;
+			--wp-ui-dropdown-popup-max-width: var(--wpds-dimension-surface-width-md);
+			--_wp-ui-dropdown-popup-elevation-md:
+				0px 2px 3px 0px #0000000d,
+				0px 4px 5px 0px #0000000a,
+				0px 12px 12px 0px #00000008,
+				0px 16px 16px 0px #00000005;
+
+			box-sizing: border-box;
+			max-height: min(var(--available-height), 480px, 60dvh);
+			min-width: max(var(--anchor-width, 0px), var(--wp-ui-dropdown-popup-min-width));
+			max-width: min(var(--available-width), var(--wp-ui-dropdown-popup-max-width));
+			overflow-block: auto;
+			overscroll-behavior: none;
+			padding: var(--wp-ui-dropdown-popup-padding);
+			scroll-padding: var(--wp-ui-dropdown-popup-padding);
+			border-radius: var(--wpds-border-radius-md);
+			border:
+				var(--wpds-border-width-xs) solid
+				var(--wpds-color-stroke-surface-neutral);
+			box-shadow: var(--_wp-ui-dropdown-popup-elevation-md);
+			background-color: var(--wpds-color-background-surface-neutral-strong);
+		}
+
+		.root-motion {
+			composes: dropdown-motion from "./dropdown-motion.module.css";
+		}
+
+		.nested-motion {
+			composes: dropdown-motion--fade-only from "./dropdown-motion.module.css";
+		}
+	}
+}

@@ -1,6 +1,12 @@
 import type { Menu as _Menu } from '@base-ui/react/menu';
 import type { ElementType, ReactElement, ReactNode } from 'react';
 
+import type {
+	ItemDescriptionProps as SharedItemDescriptionProps,
+	ItemLabelProps as SharedItemLabelProps,
+	ItemLayoutProps,
+	ItemShortcut,
+} from '../utils/item-layout';
 import type { ComponentProps } from '../utils/types';
 
 export type PortalProps = ComponentProps< typeof _Menu.Portal >;
@@ -55,63 +61,10 @@ export interface PopupProps extends ComponentProps< typeof _Menu.Popup > {
 	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
 }
 
-export interface MenuItemShortcut {
-	/**
-	 * The human-readable representation of the shortcut, displayed in the menu
-	 * item. Use platform-appropriate symbols (e.g., "⌘S" on macOS, "Ctrl+S" on
-	 * Windows).
-	 */
-	displayShortcut: string;
-
-	/**
-	 * The shortcut in a format compatible with the
-	 * [aria-keyshortcuts](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts)
-	 * attribute. Use "+" to separate keys and standard key names
-	 * (e.g., "Meta+S", "Control+Shift+P").
-	 */
-	ariaKeyShortcut: string;
-
-	/**
-	 * A human-readable description of the shortcut, announced as part of the
-	 * item's accessible description.
-	 */
-	description: string;
-}
-
-export interface MenuItemLayoutProps {
-	/**
-	 * Presentational content displayed before the item label.
-	 */
-	prefix?: ReactNode;
-
-	/**
-	 * Presentational content displayed after the item label.
-	 */
-	suffix?: ReactNode;
-
-	/**
-	 * The keyboard shortcut associated with this item. When provided, the
-	 * shortcut is displayed in the item and announced to assistive technology.
-	 *
-	 * **Note**: This prop is for display and accessibility purposes only; the
-	 * consumer is responsible for implementing the actual keyboard event handler.
-	 */
-	shortcut?: MenuItemShortcut;
-}
-
-export interface ItemLabelProps extends ComponentProps< 'span' > {
-	/**
-	 * The primary label for a menu item.
-	 */
-	children?: ReactNode;
-}
-
-export interface ItemDescriptionProps extends ComponentProps< 'span' > {
-	/**
-	 * Supplementary text displayed below a menu item label.
-	 */
-	children?: ReactNode;
-}
+export type MenuItemShortcut = ItemShortcut;
+export type MenuItemLayoutProps = ItemLayoutProps;
+export type ItemLabelProps = SharedItemLabelProps;
+export type ItemDescriptionProps = SharedItemDescriptionProps;
 
 type MenuItemComponentProps< T extends ElementType > = Omit<
 	ComponentProps< T >,

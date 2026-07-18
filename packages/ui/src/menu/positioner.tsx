@@ -5,6 +5,7 @@ import {
 	MENU_POPUP_POSITIONER_PROPS,
 	MENU_SUBMENU_POPUP_POSITIONER_PROPS,
 } from '../form/primitives/constants';
+import popupStyles from '../utils/css/dropdown-popup.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
 import { useMenuContext } from './context';
@@ -35,6 +36,7 @@ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 				ref={ ref }
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
+					popupStyles.positioner,
 					styles.positioner,
 					className
 				) }
