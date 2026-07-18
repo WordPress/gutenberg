@@ -21,7 +21,7 @@ import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { BlockRenameModal, useBlockRename } from '../block-rename';
-import { BlockVisibilityModal } from '../block-visibility';
+import { BlockVisibilityModal, GhostReasonPopover } from '../block-visibility';
 
 function selector( select ) {
 	const {
@@ -308,6 +308,13 @@ export default function BlockTools( {
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 						isTyping={ isTyping }
+					/>
+				) }
+
+				{ clientId && ! isTyping && (
+					<GhostReasonPopover
+						__unstableContentRef={ __unstableContentRef }
+						clientId={ clientId }
 					/>
 				) }
 
