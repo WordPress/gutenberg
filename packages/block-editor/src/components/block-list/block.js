@@ -868,11 +868,16 @@ function BlockListBlockProvider( props ) {
 		isResponsiveEditing,
 	};
 
-	// In preview canvases (pattern and style previews), apply visibility rules
-	// for real so the preview matches the front end. In the editable canvas
-	// hidden blocks always render; when responsive editing is on they are
-	// ghosted via the is-block-hidden class instead of being removed.
-	if ( isPreviewMode && isBlockCurrentlyHidden ) {
+	// While responsive editing is off, hidden blocks stay out of the canvas
+	// so editing matches the front end. When it's on, they render ghosted
+	// instead (see useBlockProps) so authors can find and edit them.
+	if (
+		isBlockCurrentlyHidden &&
+		! isResponsiveEditing &&
+		! isSelected &&
+		! isMultiSelected &&
+		! hasChildSelected
+	) {
 		return null;
 	}
 

@@ -161,7 +161,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	} );
 
 	// Hidden blocks are only ghosted while responsive editing is on; otherwise
-	// they render like any other block.
+	// they are visually hidden like on the front end.
 	const isGhosted = !! isResponsiveEditing && isBlockCurrentlyHidden;
 	const ghostCondition = isGhosted
 		? getBlockVisibilityCondition(
@@ -230,7 +230,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'has-editable-outline': hasEditableOutline,
 				'has-negative-margin': hasNegativeMargin,
 				'is-editing-content-only-section': isEditingContentOnlySection,
-				'is-block-hidden': isGhosted,
+				'is-block-hidden':
+					isBlockCurrentlyHidden && ! isResponsiveEditing,
+				'is-block-ghosted': isGhosted,
 			},
 			className,
 			props.className,
