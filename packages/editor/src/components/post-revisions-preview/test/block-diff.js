@@ -859,7 +859,7 @@ describe( 'diffRevisionContent', () => {
 							attributes: {
 								// jumps→leaps modification with inline diff
 								content:
-									'The quick brown fox <del title="Removed" class="revision-diff-removed">jumps</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">leaps</ins> over the lazy dog',
+									'The quick brown fox <del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">jumps</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">leaps</ins> over the lazy dog',
 								__revisionDiffStatus: {
 									status: 'modified',
 								},
@@ -1166,7 +1166,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Visit <a href="https://example.com"><del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">our</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">the</ins> <del title="Removed" class="revision-diff-removed">site</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">website</ins></a> today',
+							'Visit <a href="https://example.com"><del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">our</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">the</ins> <del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">site</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">website</ins></a> today',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1216,7 +1216,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'<span aria-describedby="revision-diff-format-changed-desc" class="revision-diff-format-removed">Bold</span> and <span title="1 format removed" class="revision-diff-format-removed">italic</span> text',
+							'<span aria-describedby="revision-diff-format-removed-desc" class="revision-diff-format-removed">Bold</span> and <span aria-describedby="revision-diff-format-removed-desc" class="revision-diff-format-removed">italic</span> text',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
