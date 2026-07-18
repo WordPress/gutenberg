@@ -1738,6 +1738,227 @@ test.describe( 'List (@firefox)', () => {
 		}
 	} );
 
+	test( 'should select the outer item fully when a text selection crosses the nesting boundary backward', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* ab' );
+		await page.keyboard.press( 'Enter' );
+		// Leading space at the start of an empty item triggers indent.
+		await page.keyboard.type( ' cd' );
+		// Enter on an empty nested item outdents back to the top level.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'zz' );
+
+		// Verify setup: "ab" with a nested "cd" item, then a top-level
+		// sibling "zz"; caret at the end of "zz".
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'ab' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'cd' },
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz‸' },
+					},
+				],
+			},
+		] );
+		await page.keyboard.press( 'Backspace' );
+
+		// Move the caret to the middle of "cd".
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'ab' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'c‸d' },
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+					},
+				],
+			},
+		] );
+		await page.keyboard.press( 'Backspace' );
+
+		// Extend the selection backward past the nesting boundary into
+		// "ab", then yield so the selection observer can process it.
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 2 } );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		// A partial selection across a nesting boundary is not
+		// mergeable, so the first press falls back to selecting the
+		// outer "ab" item fully without deleting anything.
+		await page.keyboard.press( 'Backspace' );
+		await expect(
+			editor.canvas
+				.locator( 'role=document[name="Block: List item"i]' )
+				.first()
+		).toBeFocused();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'ab' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+					},
+				],
+			},
+		] );
+
+		// The second press removes the selected item as a whole,
+		// together with its nested list; the unrelated sibling remains.
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+						innerBlocks: [],
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should select the outer item fully when a text selection crosses the nesting boundary forward', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* ab' );
+		await page.keyboard.press( 'Enter' );
+		// Leading space at the start of an empty item triggers indent.
+		await page.keyboard.type( ' cd' );
+		// Enter on an empty nested item outdents back to the top level.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'zz' );
+
+		// Move the caret to the middle of "ab" and verify.
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 7 } );
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a‸b' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'cd' },
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+					},
+				],
+			},
+		] );
+		await page.keyboard.press( 'Backspace' );
+
+		// Extend the selection forward past the nesting boundary into
+		// "cd", then yield so the selection observer can process it.
+		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 2 } );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		// A partial selection across a nesting boundary is not
+		// mergeable, so the first press falls back to selecting the
+		// outer "ab" item fully without deleting anything.
+		await page.keyboard.press( 'Delete' );
+		await expect(
+			editor.canvas
+				.locator( 'role=document[name="Block: List item"i]' )
+				.first()
+		).toBeFocused();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'ab' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+					},
+				],
+			},
+		] );
+
+		// The second press removes the selected item as a whole,
+		// together with its nested list; the unrelated sibling remains.
+		await page.keyboard.press( 'Delete' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+						innerBlocks: [],
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'should merge a following paragraph into the outermost list with Delete from a nested item (#77245)', async ( {
 		editor,
 		page,
