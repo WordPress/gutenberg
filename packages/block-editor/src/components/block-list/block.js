@@ -592,6 +592,7 @@ function BlockListBlockProvider( props ) {
 				isDragging,
 				__unstableHasActiveBlockOverlayActive,
 				getSelectedBlocksInitialCaretPosition,
+				isResponsiveEditing,
 			} = unlock( select( blockEditorStore ) );
 			const blockWithoutAttributes =
 				getBlockWithoutAttributes( clientId );
@@ -739,6 +740,7 @@ function BlockListBlockProvider( props ) {
 				blockVisibility,
 				deviceType,
 				viewportSettings,
+				isResponsiveEditing: isResponsiveEditing(),
 			};
 		},
 		[ clientId, rootClientId ]
@@ -822,6 +824,7 @@ function BlockListBlockProvider( props ) {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
+		isResponsiveEditing = false,
 	} = selectedProps;
 
 	const privateContext = {
@@ -862,14 +865,14 @@ function BlockListBlockProvider( props ) {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
+		isResponsiveEditing,
 	};
 
-	if (
-		isBlockCurrentlyHidden &&
-		! isSelected &&
-		! isMultiSelected &&
-		! hasChildSelected
-	) {
+	// In preview canvases (pattern and style previews), apply visibility rules
+	// for real so the preview matches the front end. In the editable canvas
+	// hidden blocks always render; when responsive editing is on they are
+	// ghosted via the is-block-hidden class instead of being removed.
+	if ( isPreviewMode && isBlockCurrentlyHidden ) {
 		return null;
 	}
 

@@ -168,7 +168,7 @@ function ParagraphBlock( {
 						? __(
 								'Empty block; start writing or type forward slash to choose a block'
 						  )
-						: __( 'Block: Paragraph' )
+						: blockProps[ 'aria-label' ]
 				}
 				data-empty={ RichText.isEmpty( content ) }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }

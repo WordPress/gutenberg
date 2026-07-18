@@ -106,6 +106,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
+		isResponsiveEditing,
 	} = useContext( PrivateBlockContext );
 
 	const defaultViewRef = useRefEffect( ( element ) => {
@@ -116,8 +117,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		}
 	}, [] );
 
-	// translators: %s: Type of block (i.e. Text, Image etc)
-	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const ffDragRef = useFirefoxDraggableCompatibility();
 	const isHoverEnabled = ! isWithinSectionBlock;
@@ -157,6 +156,20 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		viewportSettings,
 		view: defaultViewRef.current,
 	} );
+
+	// Hidden blocks are only ghosted while responsive editing is on; otherwise
+	// they render like any other block.
+	const isGhosted = !! isResponsiveEditing && isBlockCurrentlyHidden;
+
+	const blockLabel = isGhosted
+		? sprintf(
+				/* translators: %1$s: Type of block (i.e. Text, Image etc). %2$s: Reason the block is hidden, e.g. "Hidden on Mobile". */
+				__( 'Block: %1$s. %2$s.' ),
+				blockTitle,
+				__( 'Hidden in this view' )
+		  )
+		: // translators: %s: Type of block (i.e. Text, Image etc)
+		  sprintf( __( 'Block: %s' ), blockTitle );
 
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
@@ -205,7 +218,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'has-editable-outline': hasEditableOutline,
 				'has-negative-margin': hasNegativeMargin,
 				'is-editing-content-only-section': isEditingContentOnlySection,
-				'is-block-hidden': isBlockCurrentlyHidden,
+				'is-block-hidden': isGhosted,
 			},
 			className,
 			props.className,
