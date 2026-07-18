@@ -1052,6 +1052,41 @@ export function __unstableSelectionHasUnmergeableBlock( state ) {
 }
 
 /**
+ * Compare two block client IDs in document order.
+ *
+ * Returns `true` when `a` appears before `b`, `false` when after, or `null`
+ * when the order can't be determined (e.g. the blocks are in unrelated
+ * subtrees that don't share a comparable common ancestor).
+ *
+ * @param {Object} state Editor state.
+ * @param {string} a     A client ID.
+ * @param {string} b     Another client ID.
+ * @return {?boolean} Whether `a` is before `b`, or null if undeterminable.
+ */
+function isClientIdBefore( state, a, b ) {
+	if ( a === b ) {
+		return false;
+	}
+	// Same parent: simple index comparison.
+	const aParent = getBlockRootClientId( state, a );
+	const bParent = getBlockRootClientId( state, b );
+	if ( aParent === bParent ) {
+		const order = getBlockOrder( state, aParent );
+		return order.indexOf( a ) < order.indexOf( b );
+	}
+	// Ancestor/descendant: ancestor comes first in document order.
+	const bParents = getBlockParents( state, b );
+	if ( bParents.includes( a ) ) {
+		return true;
+	}
+	const aParents = getBlockParents( state, a );
+	if ( aParents.includes( b ) ) {
+		return false;
+	}
+	return null;
+}
+
+/**
  * Check whether the selection is mergeable.
  *
  * @param {Object}  state     Editor state.
@@ -1078,35 +1113,20 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 		return false;
 	}
 
-	const anchorRootClientId = getBlockRootClientId(
+	// Determine document order. Cross-parent selections are allowed as long
+	// as the two endpoints have a determinable order (same parent, or one
+	// is an ancestor of the other).
+	const anchorBeforeFocus = isClientIdBefore(
 		state,
-		selectionAnchor.clientId
-	);
-	const focusRootClientId = getBlockRootClientId(
-		state,
+		selectionAnchor.clientId,
 		selectionFocus.clientId
 	);
-
-	// It's not mergeable if the selection doesn't start and end in the same
-	// block list. Maybe in the future it should be allowed.
-	if ( anchorRootClientId !== focusRootClientId ) {
+	if ( anchorBeforeFocus === null ) {
 		return false;
 	}
 
-	const blockOrder = getBlockOrder( state, anchorRootClientId );
-	const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
-	const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
-
-	// Reassign selection start and end based on order.
-	let selectionStart, selectionEnd;
-
-	if ( anchorIndex > focusIndex ) {
-		selectionStart = selectionFocus;
-		selectionEnd = selectionAnchor;
-	} else {
-		selectionStart = selectionAnchor;
-		selectionEnd = selectionFocus;
-	}
+	const selectionStart = anchorBeforeFocus ? selectionAnchor : selectionFocus;
+	const selectionEnd = anchorBeforeFocus ? selectionFocus : selectionAnchor;
 
 	const targetBlockClientId = isForward
 		? selectionEnd.clientId

@@ -713,35 +713,53 @@ export const __unstableDeleteSelection =
 			return false;
 		}
 
-		const anchorRootClientId = select.getBlockRootClientId(
+		// Determine document order. Cross-parent selections are allowed
+		// when one block is an ancestor of the other; the descendant
+		// chain between them is cascade-removed by `replaceBlocks`.
+		const anchorParents = select.getBlockParents(
 			selectionAnchor.clientId
 		);
-		const focusRootClientId = select.getBlockRootClientId(
-			selectionFocus.clientId
-		);
+		const focusParents = select.getBlockParents( selectionFocus.clientId );
+		const sameParent =
+			select.getBlockRootClientId( selectionAnchor.clientId ) ===
+			select.getBlockRootClientId( selectionFocus.clientId );
 
-		// It's not mergeable if the selection doesn't start and end in the same
-		// block list. Maybe in the future it should be allowed.
-		if ( anchorRootClientId !== focusRootClientId ) {
-			return;
-		}
-
-		const blockOrder = select.getBlockOrder( anchorRootClientId );
-		const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
-		const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
-
-		// Reassign selection start and end based on order.
 		let selectionStart, selectionEnd;
-
-		if ( anchorIndex > focusIndex ) {
+		if ( sameParent ) {
+			const blockOrder = select.getBlockOrder(
+				select.getBlockRootClientId( selectionAnchor.clientId )
+			);
+			if (
+				blockOrder.indexOf( selectionAnchor.clientId ) >
+				blockOrder.indexOf( selectionFocus.clientId )
+			) {
+				selectionStart = selectionFocus;
+				selectionEnd = selectionAnchor;
+			} else {
+				selectionStart = selectionAnchor;
+				selectionEnd = selectionFocus;
+			}
+		} else if ( focusParents.includes( selectionAnchor.clientId ) ) {
+			selectionStart = selectionAnchor;
+			selectionEnd = selectionFocus;
+		} else if ( anchorParents.includes( selectionFocus.clientId ) ) {
 			selectionStart = selectionFocus;
 			selectionEnd = selectionAnchor;
 		} else {
-			selectionStart = selectionAnchor;
-			selectionEnd = selectionFocus;
+			// Cross-parent without an ancestor relationship is not yet
+			// supported here.
+			return;
 		}
 
-		const targetSelection = isForward ? selectionEnd : selectionStart;
+		// For an ancestor/descendant selection the ancestor is always
+		// `selectionStart` in document order, and the merged content
+		// must land there (with the descendant chain removed) no matter
+		// which key was pressed. Forward delete would otherwise target
+		// the descendant and orphan the ancestor, so force a
+		// backward-style merge whenever the endpoints aren't siblings.
+		const isForwardMerge = isForward && sameParent;
+
+		const targetSelection = isForwardMerge ? selectionEnd : selectionStart;
 		const targetBlock = select.getBlock( targetSelection.clientId );
 		const targetBlockType = getBlockType( targetBlock.name );
 
@@ -772,7 +790,7 @@ export const __unstableDeleteSelection =
 			[ selectionB.attributeKey ]: toHTMLString( { value: valueB } ),
 		} );
 
-		const followingBlock = isForward ? cloneA : cloneB;
+		const followingBlock = isForwardMerge ? cloneA : cloneB;
 
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
@@ -788,7 +806,7 @@ export const __unstableDeleteSelection =
 
 		let updatedAttributes;
 
-		if ( isForward ) {
+		if ( isForwardMerge ) {
 			const blockToMerge = blocksWithTheSameType.pop();
 			updatedAttributes = targetBlockType.merge(
 				blockToMerge.attributes,
@@ -812,9 +830,20 @@ export const __unstableDeleteSelection =
 
 		updatedAttributes[ newAttributeKey ] = newHtml;
 
-		const selectedBlockClientIds = select.getSelectedBlockClientIds();
+		// When one endpoint is a descendant of the other,
+		// `getSelectedBlockClientIds` can't map the range (the endpoints
+		// share no block list), so replace the ancestor; its subtree,
+		// which contains the whole selection, is cascade-removed.
+		const otherBlock = targetBlock === blockA ? blockB : blockA;
+		const targetIsAncestor = select
+			.getBlockParents( otherBlock.clientId )
+			.includes( targetBlock.clientId );
+
+		const selectedBlockClientIds = targetIsAncestor
+			? [ targetBlock.clientId ]
+			: select.getSelectedBlockClientIds();
 		const replacement = [
-			...( isForward ? blocksWithTheSameType : [] ),
+			...( isForwardMerge ? blocksWithTheSameType : [] ),
 			{
 				// Preserve the original client ID.
 				...targetBlock,
@@ -822,10 +851,12 @@ export const __unstableDeleteSelection =
 					...targetBlock.attributes,
 					...updatedAttributes,
 				},
-				// Block A's inner blocks sit inside the selection; only B's survive.
+				// Block A's inner blocks sit inside the selection; only B's
+				// survive. This also holds when A is B's ancestor: B ends
+				// the selection, so B's own children come after it.
 				innerBlocks: blockB.innerBlocks,
 			},
-			...( isForward ? [] : blocksWithTheSameType ),
+			...( isForwardMerge ? [] : blocksWithTheSameType ),
 		];
 
 		registry.batch( () => {
