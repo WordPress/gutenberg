@@ -30,7 +30,13 @@ const UnconnectedToolsPanel = (
 	} = useToolsPanel( props );
 
 	return (
-		<Grid { ...toolsPanelProps } columns={ 2 } ref={ forwardedRef }>
+		<Grid
+			{ ...toolsPanelProps }
+			columns={ 2 }
+			gap={ 4 }
+			templateColumns="repeat( 2, minmax(0, 1fr) )"
+			ref={ forwardedRef }
+		>
 			<ToolsPanelContext.Provider value={ panelContext }>
 				<ToolsPanelHeader
 					label={ label }

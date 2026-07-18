@@ -16,7 +16,7 @@
 
 ### Bug Fixes
 
--   `ToolsPanel`: Restore the header heading typography after `View` stopped preserving the Emotion style cascade. ([#80445](https://github.com/WordPress/gutenberg/pull/80445)).
+-   `ToolsPanel`: Migrate styles from Emotion to an SCSS Module and restore the header heading typography after the `View` migration. ([#80445](https://github.com/WordPress/gutenberg/pull/80445)).
 -   `Autocomplete`: Expose the suggestions list to assistive technology with `aria-controls` and `aria-haspopup`, both required alongside `aria-autocomplete="list"` ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
 -   `Autocomplete`: Omit `aria-activedescendant` while no suggestion is highlighted, instead of returning `null` for it ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
 -   `ContentEditableControl`: Associate the label with the `contentEditable` field via `aria-labelledby` instead of an invalid `label[for]`, which triggered Chrome console errors ([#80344](https://github.com/WordPress/gutenberg/pull/80344)).

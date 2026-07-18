@@ -9,8 +9,7 @@ import userEvent from '@testing-library/user-event';
  */
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
-import * as styles from '../styles';
-import { useCx } from '../../utils/hooks/use-cx';
+import moduleStyles from '../style.module.scss';
 import type {
 	ToolsPanelContext as ToolsPanelContextType,
 	ResetAllFilter,
@@ -19,25 +18,6 @@ import type {
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
 const resetAll = jest.fn();
 const noop = () => undefined;
-
-type EmotionStyleFragment = Parameters< ReturnType< typeof useCx > >[ 0 ];
-
-const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
-	Array.from( element.classList ).filter( ( className ) =>
-		/^(css|emotion)-/.test( className )
-	);
-
-function EmotionStyleTest( {
-	styleFragment,
-}: {
-	styleFragment: EmotionStyleFragment;
-} ) {
-	const cx = useCx();
-
-	return (
-		<div data-testid="emotion-style" className={ cx( styleFragment ) } />
-	);
-}
 
 type ControlValue = boolean | undefined;
 
@@ -280,24 +260,6 @@ describe( 'ToolsPanel', () => {
 			expect( resetAllItem ).toBeInTheDocument();
 		} );
 
-		it( 'should compose inner wrapper visibility styles in a single generated class', () => {
-			render(
-				<EmotionStyleTest
-					styleFragment={ styles.getToolsPanelStyles( {
-						columns: 2,
-						hasInnerWrapper: true,
-						areAllOptionalControlsHidden: true,
-					} ) }
-				/>
-			);
-
-			expect(
-				getGeneratedEmotionClassNames(
-					screen.getByTestId( 'emotion-style' )
-				)
-			).toHaveLength( 1 );
-		} );
-
 		it( 'should render panel menu items correctly', async () => {
 			renderPanel();
 			await openDropdownMenu();
@@ -316,25 +278,74 @@ describe( 'ToolsPanel', () => {
 			expect( header ).toBeInTheDocument();
 		} );
 
-		it( 'should preserve the panel heading style specificity', () => {
-			renderPanel();
-			const header = screen.getByRole( 'heading', {
-				name: defaultProps.label,
-			} );
-			const headingStyleClass = Array.from( header.classList ).find(
-				( className ) => className.includes( 'ToolsPanelHeading' )
+		it( 'should apply SCSS Module styles to the panel and its items', () => {
+			render(
+				<ToolsPanel { ...defaultProps } data-testid="tools-panel">
+					<ToolsPanelItem
+						{ ...controlProps }
+						className="custom-item"
+						data-testid="tools-panel-item"
+					>
+						<div>Example control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			);
 
-			expect( headingStyleClass ).toBeDefined();
-			expect(
-				Array.from( document.styleSheets ).some( ( sheet ) =>
-					Array.from( sheet.cssRules ).some(
-						( rule ) =>
-							( rule as CSSStyleRule ).selectorText ===
-							`.${ headingStyleClass }.${ headingStyleClass }`
-					)
-				)
-			).toBe( true );
+			expect( screen.getByTestId( 'tools-panel' ) ).toHaveClass(
+				moduleStyles[ 'tools-panel' ],
+				'components-tools-panel'
+			);
+			expect( screen.getByTestId( 'tools-panel-item' ) ).toHaveClass(
+				moduleStyles[ 'tools-panel-item' ],
+				'components-tools-panel-item',
+				'custom-item'
+			);
+
+			const heading = screen.getByRole( 'heading', {
+				name: defaultProps.label,
+			} );
+
+			expect( heading ).toHaveClass(
+				moduleStyles[ 'tools-panel-heading' ]
+			);
+			// Disable reason: Semantic queries can't reach the header wrapper.
+			// eslint-disable-next-line testing-library/no-node-access
+			expect( heading.parentElement ).toHaveClass(
+				moduleStyles[ 'tools-panel-header' ],
+				'components-tools-panel-header'
+			);
+		} );
+
+		it( 'should apply SCSS Module variants for inner wrappers and placeholders', () => {
+			render(
+				<ToolsPanel
+					{ ...defaultProps }
+					data-testid="tools-panel"
+					hasInnerWrapper
+					shouldRenderPlaceholderItems
+				>
+					<ToolsPanelItem
+						{ ...altControlProps }
+						className="custom-item"
+						data-testid="tools-panel-item"
+					>
+						<div>Alt control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			expect( screen.getByTestId( 'tools-panel' ) ).toHaveClass(
+				moduleStyles[ 'tools-panel-with-inner-wrapper' ],
+				moduleStyles[ 'tools-panel-hidden-inner-wrapper' ]
+			);
+			expect( screen.getByTestId( 'tools-panel-item' ) ).toHaveClass(
+				moduleStyles[ 'tools-panel-item' ],
+				moduleStyles[ 'tools-panel-item-placeholder' ]
+			);
+			expect( screen.getByTestId( 'tools-panel-item' ) ).not.toHaveClass(
+				'components-tools-panel-item',
+				'custom-item'
+			);
 		} );
 	} );
 
