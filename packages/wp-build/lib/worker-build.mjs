@@ -104,7 +104,7 @@ function getWorkerResolveMap( workerConfig ) {
  * Creates an esbuild plugin that short-circuits resolution of `./worker-code`
  * imports, marking them as external without touching the filesystem.
  *
- * `src/worker-code.ts` is a committed stub used only for TypeScript type
+ * `src/worker-code.d.ts` is a committed stub used only for TypeScript type
  * checking. The real output (`build-module/worker-code.mjs` / `build/
  * worker-code.cjs`) is written directly by `writeWorkerCodeOutputs` after the
  * worker bundle is built. This plugin prevents esbuild from attempting a

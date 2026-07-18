@@ -171,12 +171,6 @@ async function dev() {
 			{ silent: true }
 		);
 
-		// This must happen before TypeScript compilation because some packages
-		// (like vips) have source files that import from generated worker-code.ts
-		await exec( 'node', [
-			path.join( __dirname, 'packages/generate-worker-placeholders.mjs' ),
-		] );
-
 		if ( ! skipTypes ) {
 			console.log( '\n📘 Building TypeScript types...\n' );
 			const tsStartTime = Date.now();

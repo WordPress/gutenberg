@@ -1446,7 +1446,7 @@ async function transpilePackage( packageName ) {
 		needsEmotionPlugin && emotionPlugin,
 		wasmInlinePlugin,
 		// Must come before externalizeAllExceptCssPlugin so the filesystem is
-		// never consulted for the stub src/worker-code.ts.
+		// never consulted for the stub src/worker-code.d.ts.
 		packageJson.wpWorkers && createWorkerCodeExternalPlugin(),
 		// CSS modules import @wordpress/style-runtime in generated JS. Resolve
 		// that alias before externalizing imports so the runtime is bundled.
@@ -1534,7 +1534,7 @@ async function transpilePackage( packageName ) {
 	} );
 
 	// Write worker-code.mjs / worker-code.cjs directly to the build directories.
-	// The src/worker-code.ts stub is only for TypeScript type checking; the
+	// The src/worker-code.d.ts stub is only for TypeScript type checking; the
 	// real output is written here to avoid touching src/ and triggering the watcher.
 	await writeWorkerCodeOutputs( packageName, packageJson, {
 		buildDir,

@@ -37,11 +37,11 @@ module.exports = {
 	rootDir: '../../',
 	moduleNameMapper: {
 		// Mock @wordpress/vips/worker before the general pattern so it doesn't try to load the real file.
-		// The worker-code.ts file is auto-generated during full builds and is gitignored.
+		// The worker-code runtime module is generated into build-module/ during full builds.
 		'@wordpress/vips/worker':
 			'<rootDir>/test/unit/config/vips-worker-code-stub.js',
 		// Mock @wordpress/video-conversion/worker before the general pattern so it doesn't try to load the real file.
-		// The worker-code.ts file is auto-generated during full builds and is gitignored.
+		// The worker-code runtime module is generated into build-module/ during full builds.
 		'@wordpress/video-conversion/worker':
 			'<rootDir>/test/unit/config/video-conversion-worker-code-stub.js',
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
