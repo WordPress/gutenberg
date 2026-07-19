@@ -6,8 +6,8 @@
 			--wp-ui-item-layout-padding-inline: var(--wpds-dimension-padding-md);
 			--wp-ui-item-layout-selection-track-size: 0px;
 			--wp-ui-item-layout-selection-gap: 0px;
-			--wp-ui-item-layout-prefix-gap: var(--wpds-dimension-gap-sm);
-			--wp-ui-item-layout-min-height: calc(var(--wpds-dimension-size-lg) + var(--wpds-dimension-padding-xs));
+			--wp-ui-item-layout-prefix-gap: 0px;
+			--wp-ui-item-layout-min-height: calc(var(--wpds-dimension-size-lg) + var(--wpds-dimension-gap-xs));
 
 			min-width: 0;
 			max-width: 100%;
@@ -75,14 +75,27 @@
 		.interactive--horizontal {
 			width: max-content;
 			max-width: none;
+			min-inline-size: calc(var(--wpds-dimension-size-lg) + var(--wpds-dimension-gap-xs));
+			min-block-size: calc(var(--wpds-dimension-size-lg) + var(--wpds-dimension-gap-xs));
+			color: var(--wpds-color-foreground-interactive-neutral-weak);
 		}
 
 		.interactive--vertical {
 			width: 100%;
 			max-width: 100%;
+			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 
-		.interactive:is(:hover, [data-popup-open], [data-active]) {
+		.interactive:has(> [data-wp-ui-item-layout-prefix]) {
+			--wp-ui-item-layout-prefix-gap: var(--wpds-dimension-gap-sm);
+		}
+
+		.interactive--horizontal:is(:hover, :focus-visible, [data-popup-open], [data-active]) {
+			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+			color: var(--wpds-color-foreground-interactive-neutral-weak-active);
+		}
+
+		.interactive--vertical:is(:hover, :focus-visible, [data-popup-open], [data-active]) {
 			background-color: var(--wpds-color-background-interactive-brand-weak-active);
 			color: var(--wpds-color-foreground-interactive-neutral);
 		}
@@ -97,7 +110,7 @@
 			color: var(--wpds-color-foreground-interactive-neutral-disabled);
 		}
 
-		.interactive:is(:hover, [data-popup-open], [data-active])
+		.interactive:is(:hover, :focus-visible, [data-popup-open], [data-active])
 		[data-wp-ui-item-layout-muted],
 		.interactive[aria-disabled] [data-wp-ui-item-layout-muted] {
 			color: inherit;
@@ -139,6 +152,21 @@
 			transform-origin: var(--transform-origin);
 			overflow: hidden;
 			outline: 0;
+
+			@media not ( prefers-reduced-motion ) {
+				transition-property: width, height, transform, opacity;
+				transition-duration:
+					var(--wp-ui-dropdown-slide-duration),
+					var(--wp-ui-dropdown-slide-duration),
+					var(--wp-ui-dropdown-slide-duration),
+					var(--wp-ui-dropdown-fade-duration);
+				transition-timing-function:
+					var(--wp-ui-dropdown-slide-easing),
+					var(--wp-ui-dropdown-slide-easing),
+					var(--wp-ui-dropdown-slide-easing),
+					var(--wp-ui-dropdown-fade-easing);
+				will-change: width, height, transform, opacity;
+			}
 		}
 
 		.viewport {
@@ -154,8 +182,14 @@
 			min-width: 100%;
 			max-width: var(--wp-ui-navigation-menu-popup-max-width, var(--wpds-dimension-surface-width-md));
 			padding: var(--wpds-dimension-padding-xs);
+			max-height: min(var(--available-height), 480px, 60dvh);
+			overflow-block: auto;
+			overflow-inline: hidden;
+			overscroll-behavior: contain;
+			scroll-padding: var(--wpds-dimension-padding-xs);
 			outline: 0;
 			opacity: 1;
+			translate: 0;
 
 			@media not ( prefers-reduced-motion ) {
 				transition:
@@ -169,21 +203,29 @@
 				opacity: 0;
 			}
 
-			&[data-activation-direction="left"] {
+			&[data-starting-style][data-activation-direction="left"],
+			&[data-ending-style][data-activation-direction="right"] {
 				translate: calc(-1 * var(--wpds-dimension-gap-sm));
 			}
 
-			&[data-activation-direction="right"] {
+			&[data-starting-style][data-activation-direction="right"],
+			&[data-ending-style][data-activation-direction="left"] {
 				translate: var(--wpds-dimension-gap-sm);
 			}
 
-			&[data-activation-direction="up"] {
+			&[data-starting-style][data-activation-direction="up"],
+			&[data-ending-style][data-activation-direction="down"] {
 				translate: 0 calc(-1 * var(--wpds-dimension-gap-sm));
 			}
 
-			&[data-activation-direction="down"] {
+			&[data-starting-style][data-activation-direction="down"],
+			&[data-ending-style][data-activation-direction="up"] {
 				translate: 0 var(--wpds-dimension-gap-sm);
 			}
+		}
+
+		.positioner[data-instant] :is(.popup, .content) {
+			transition: none;
 		}
 
 		.backdrop {
