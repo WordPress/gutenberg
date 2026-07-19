@@ -15,7 +15,8 @@
 	pointer-events: none;
 	z-index: 1;
 
-	.editor-collab-sidebar-panel__thread {
+	.editor-collab-sidebar-panel__thread,
+	.editor-collab-sidebar-panel__add-note {
 		pointer-events: auto;
 	}
 }
