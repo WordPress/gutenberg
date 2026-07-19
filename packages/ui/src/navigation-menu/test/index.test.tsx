@@ -396,6 +396,64 @@ describe( 'NavigationMenu', () => {
 		).not.toHaveFocus();
 	} );
 
+	it.each( [
+		[ 'ltr', '{ArrowRight}' ],
+		[ 'rtl', '{ArrowLeft}' ],
+	] as const )(
+		'opens a nested flyout with the inline-end arrow in %s',
+		async ( direction, openKey ) => {
+			const user = userEvent.setup();
+			render(
+				<DirectionProvider direction={ direction }>
+					<NavigationMenu.Root aria-label="Content">
+						<NavigationMenu.List>
+							<NavigationMenu.Item value="appearance">
+								<NavigationMenu.Trigger>
+									Appearance
+								</NavigationMenu.Trigger>
+								<NavigationMenu.Content>
+									<NavigationMenu.Root orientation="vertical">
+										<NavigationMenu.List>
+											<NavigationMenu.Item value="design">
+												<NavigationMenu.Trigger>
+													Design
+												</NavigationMenu.Trigger>
+												<NavigationMenu.Content>
+													<NavigationMenu.Link href="/styles">
+														Styles
+													</NavigationMenu.Link>
+												</NavigationMenu.Content>
+											</NavigationMenu.Item>
+										</NavigationMenu.List>
+										<DefaultPopup />
+									</NavigationMenu.Root>
+								</NavigationMenu.Content>
+							</NavigationMenu.Item>
+						</NavigationMenu.List>
+						<DefaultPopup />
+					</NavigationMenu.Root>
+				</DirectionProvider>
+			);
+
+			const outerTrigger = screen.getByRole( 'button', {
+				name: 'Appearance',
+			} );
+			outerTrigger.focus();
+			await user.keyboard( '{ArrowDown}' );
+
+			const nestedTrigger = await screen.findByRole( 'button', {
+				name: 'Design',
+			} );
+			expect( nestedTrigger ).toHaveFocus();
+			await user.keyboard( openKey );
+
+			expect( nestedTrigger ).toHaveAttribute( 'aria-expanded', 'true' );
+			expect(
+				await screen.findByRole( 'link', { name: 'Styles' } )
+			).toHaveFocus();
+		}
+	);
+
 	it( 'closes on focus-out without restoring focus to the trigger', async () => {
 		const user = userEvent.setup();
 		render(

@@ -1,4 +1,5 @@
 import { NavigationMenu as _NavigationMenu } from '@base-ui/react/navigation-menu';
+import { useDirection } from '@base-ui/react/direction-provider';
 import clsx from 'clsx';
 import {
 	Children,
@@ -20,6 +21,10 @@ import { Icon } from './icon';
 import styles from './style.module.css';
 import type { TriggerProps } from './types';
 
+type TriggerKeyboardEvent = Parameters<
+	NonNullable< TriggerProps[ 'onKeyDown' ] >
+>[ 0 ];
+
 /**
  * Renders a disclosure button that opens the corresponding Content.
  */
@@ -35,11 +40,13 @@ const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
 			'aria-keyshortcuts': ariaKeyShortcuts,
 			'aria-label': ariaLabel,
 			'aria-labelledby': ariaLabelledBy,
+			onKeyDown,
 			...props
 		},
 		ref
 	) {
-		const { orientation } = useNavigationMenuContext();
+		const { depth, orientation } = useNavigationMenuContext();
+		const direction = useDirection();
 		const itemValidationContext = useItemValidationContext();
 		const childArray = Children.toArray( children );
 		const customIcon = childArray.find(
@@ -62,10 +69,45 @@ const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
 			[ itemValidationContext ]
 		);
 
+		function handleKeyDown( event: TriggerKeyboardEvent ) {
+			onKeyDown?.( event );
+
+			if (
+				event.defaultPrevented ||
+				event.baseUIHandlerPrevented ||
+				event.altKey ||
+				event.ctrlKey ||
+				event.metaKey ||
+				event.shiftKey ||
+				depth === 0 ||
+				event.currentTarget.getAttribute( 'aria-disabled' ) ===
+					'true' ||
+				event.currentTarget.getAttribute( 'aria-expanded' ) === 'true'
+			) {
+				return;
+			}
+
+			let openKey = 'ArrowDown';
+			if ( orientation === 'vertical' ) {
+				openKey = direction === 'rtl' ? 'ArrowLeft' : 'ArrowRight';
+			}
+
+			if ( event.key !== openKey ) {
+				return;
+			}
+
+			// Base UI delegates arrow keys from nested triggers to the parent
+			// composite. Activate the disclosure here so focus enters its flyout.
+			event.preventDefault();
+			event.stopPropagation();
+			event.currentTarget.click();
+		}
+
 		return (
 			<_NavigationMenu.Trigger
 				ref={ ref }
 				{ ...itemAriaProps }
+				onKeyDown={ handleKeyDown }
 				className={ clsx(
 					defenseStyles.button,
 					resetStyles[ 'box-sizing' ],
