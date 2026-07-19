@@ -1754,7 +1754,7 @@ test.describe( 'Block Notes', () => {
 				// note will attach to (the canvas keeps its selection while
 				// focus is in the form).
 				const form = page.locator(
-					'.editor-collab-sidebar-panel__thread.is-floating'
+					'.editor-collab-sidebar-panel__add-note.is-floating'
 				);
 				await expect( form ).toBeVisible();
 
