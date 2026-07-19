@@ -118,7 +118,7 @@ test.describe( 'Block Notes', () => {
 		} );
 
 		const thread = page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'treeitem', { name: 'Note: Focus test note' } );
 		const replyTextbox = page.getByRole( 'textbox', { name: 'Reply to' } );
 
@@ -417,7 +417,7 @@ test.describe( 'Block Notes', () => {
 		await newNoteForm.click();
 
 		const existingThread = page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'tree' )
 			.getByRole( 'treeitem', { name: 'Note: First block comment' } );
 
@@ -683,6 +683,10 @@ test.describe( 'Block Notes', () => {
 			await thread.click();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 			await expect( block ).toHaveClass( /is-highlighted/ );
+			// Park the pointer away from the floating thread: hovering a
+			// thread highlights its block, which would mask the un-highlight
+			// this test asserts.
+			await page.mouse.move( 0, 0 );
 			await page.keyboard.press( 'Shift+Tab' );
 			await expect( thread ).not.toBeFocused();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
@@ -1876,7 +1880,7 @@ test.describe( 'Block Notes', () => {
 
 			await page.keyboard.type( 'please review' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1886,7 +1890,7 @@ test.describe( 'Block Notes', () => {
 			 * server-side sanitization.
 			 */
 			const savedChip = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem' )
 				.locator( 'a.wp-note-mention' );
 			await expect( savedChip ).toHaveText( '@Mentionable Teammate' );
