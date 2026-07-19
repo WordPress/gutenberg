@@ -11,13 +11,12 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Upload progress snackbar (HEIC-only canvas mode) (@webkit)', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		// Disable full client-side media processing while leaving the
-		// HEIC canvas-conversion mode active (`window.__heicUploadSupport`
-		// is set regardless). This mirrors Safari, where full client-side
-		// processing is unsupported but HEIC files are still converted to
-		// JPEG via createImageBitmap + OffscreenCanvas before upload.
+		// Disable cross-origin isolation while leaving client-side media
+		// processing enabled. Without SharedArrayBuffer, the full vips
+		// pipeline fails feature detection and the editor uses HEIC canvas
+		// conversion instead, mirroring Safari.
 		await requestUtils.activatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
+			'gutenberg-test-plugin-disable-cross-origin-isolation'
 		);
 	} );
 
@@ -31,7 +30,7 @@ test.describe( 'Upload progress snackbar (HEIC-only canvas mode) (@webkit)', () 
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
+			'gutenberg-test-plugin-disable-cross-origin-isolation'
 		);
 	} );
 

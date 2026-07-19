@@ -199,19 +199,6 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 add_filter( 'rest_index', 'gutenberg_media_processing_filter_rest_index' );
 
 /**
- * Sets a global JS variable to indicate that HEIC canvas-based upload support is available.
- *
- * This flag is set whenever the media processing feature is enabled,
- * regardless of whether the browser supports full VIPS-based processing.
- * Browsers like Safari can use createImageBitmap() to decode HEIC images
- * and convert them to JPEG for server-side sub-size generation.
- */
-function gutenberg_set_heic_upload_support_flag() {
-	wp_add_inline_script( 'wp-block-editor', 'window.__heicUploadSupport = true', 'before' );
-}
-add_action( 'admin_init', 'gutenberg_set_heic_upload_support_flag' );
-
-/**
  * Deletes the source-format companion file when its attachment is deleted.
  *
  * When the client-side media flow sideloads a source-format original (such as
