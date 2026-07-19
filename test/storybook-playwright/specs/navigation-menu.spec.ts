@@ -203,6 +203,42 @@ test.describe( 'NavigationMenu', () => {
 		await expect( chevron ).toHaveCSS( 'rotate', '0deg' );
 	} );
 
+	test( 'opens nested flyouts with arrow keys and moves focus into each level', async ( {
+		page,
+	} ) => {
+		await gotoStoryId(
+			page,
+			'design-system-components-navigationmenu--two-level-nested-flyout'
+		);
+
+		const outerTrigger = page.getByRole( 'button', {
+			name: 'Appearance',
+		} );
+		await outerTrigger.focus();
+		await page.keyboard.press( 'ArrowDown' );
+
+		await expect( outerTrigger ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect(
+			page.getByRole( 'link', { name: 'Themes', exact: true } )
+		).toBeFocused();
+
+		await page.keyboard.press( 'ArrowDown' );
+		const nestedTrigger = page.getByRole( 'button', { name: 'Design' } );
+		await expect( nestedTrigger ).toBeFocused();
+		await page.keyboard.press( 'ArrowRight' );
+
+		await expect( nestedTrigger ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
+		await expect(
+			page.getByRole( 'link', {
+				name: 'Themes',
+				description: 'Choose how the site looks.',
+			} )
+		).toBeFocused();
+	} );
+
 	test( 'preserves RTL direction in portaled flyouts', async ( { page } ) => {
 		await gotoStoryId(
 			page,
@@ -216,11 +252,13 @@ test.describe( 'NavigationMenu', () => {
 		await expect( nestedTrigger ).toHaveCSS( 'direction', 'rtl' );
 		await expect( chevron ).toHaveCSS( 'rotate', '180deg' );
 
-		await nestedTrigger.click();
+		await nestedTrigger.focus();
+		await page.keyboard.press( 'ArrowLeft' );
 		const richLink = page.getByRole( 'link', {
 			name: 'Themes',
 			description: 'Choose how the site looks.',
 		} );
+		await expect( richLink ).toBeFocused();
 		await expect( richLink ).toHaveCSS( 'direction', 'rtl' );
 
 		const prefixBox = await richLink
