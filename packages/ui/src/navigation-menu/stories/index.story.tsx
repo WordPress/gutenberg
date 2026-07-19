@@ -67,6 +67,7 @@ function AppearanceLinks() {
 				<NavigationMenu.Item>
 					<NavigationMenu.Link
 						href="#themes"
+						closeOnClick
 						prefix={ <Icon icon={ archive } size={ 24 } /> }
 						suffix="12"
 					>
@@ -81,6 +82,7 @@ function AppearanceLinks() {
 				<NavigationMenu.Item>
 					<NavigationMenu.Link
 						href="#patterns"
+						closeOnClick
 						prefix={ <Icon icon={ archive } size={ 24 } /> }
 						shortcut={ SHORTCUT }
 					>
@@ -90,6 +92,7 @@ function AppearanceLinks() {
 				<NavigationMenu.Item>
 					<NavigationMenu.Link
 						href="https://wordpress.org"
+						closeOnClick
 						openInNewTab
 					>
 						WordPress.org
@@ -170,6 +173,43 @@ export const FlyoutNavigation: Story = {
 	},
 };
 
+export const SwitchingFlyouts: Story = {
+	render: function Render() {
+		return (
+			<NavigationMenu.Root aria-label="Editor">
+				<NavigationMenu.List>
+					<NavigationMenu.Item value="appearance">
+						<NavigationMenu.Trigger>
+							Appearance
+						</NavigationMenu.Trigger>
+						<NavigationMenu.Content>
+							<AppearanceLinks />
+						</NavigationMenu.Content>
+					</NavigationMenu.Item>
+					<NavigationMenu.Item value="help">
+						<NavigationMenu.Trigger>Help</NavigationMenu.Trigger>
+						<NavigationMenu.Content>
+							<NavigationMenu.Root orientation="vertical">
+								<NavigationMenu.List>
+									<NavigationMenu.Item>
+										<NavigationMenu.Link
+											href="#documentation"
+											closeOnClick
+										>
+											Documentation
+										</NavigationMenu.Link>
+									</NavigationMenu.Item>
+								</NavigationMenu.List>
+							</NavigationMenu.Root>
+						</NavigationMenu.Content>
+					</NavigationMenu.Item>
+				</NavigationMenu.List>
+				<DefaultPopup />
+			</NavigationMenu.Root>
+		);
+	},
+};
+
 function TwoLevelNavigation() {
 	return (
 		<NavigationMenu.Root aria-label="Editor">
@@ -211,7 +251,7 @@ export const TwoLevelNestedFlyout: Story = {
 
 export const ControlledRoot: Story = {
 	render: function Render() {
-		const [ value, setValue ] = useState< string | null >( 'appearance' );
+		const [ value, setValue ] = useState< string | null >( null );
 
 		return (
 			<NavigationMenu.Root
@@ -286,6 +326,44 @@ export const LongContentAndOverflow: Story = {
 					</NavigationMenu.List>
 				</NavigationMenu.Root>
 			</div>
+		);
+	},
+};
+
+export const TallFlyoutContent: Story = {
+	render: function Render() {
+		return (
+			<NavigationMenu.Root aria-label="Editor">
+				<NavigationMenu.List>
+					<NavigationMenu.Item value="destinations">
+						<NavigationMenu.Trigger>
+							Destinations
+						</NavigationMenu.Trigger>
+						<NavigationMenu.Content>
+							<NavigationMenu.Root orientation="vertical">
+								<NavigationMenu.List>
+									{ Array.from(
+										{ length: 20 },
+										( _, index ) => (
+											<NavigationMenu.Item key={ index }>
+												<NavigationMenu.Link
+													href={ `#destination-${ index }` }
+													closeOnClick
+												>
+													{ `Destination ${
+														index + 1
+													}` }
+												</NavigationMenu.Link>
+											</NavigationMenu.Item>
+										)
+									) }
+								</NavigationMenu.List>
+							</NavigationMenu.Root>
+						</NavigationMenu.Content>
+					</NavigationMenu.Item>
+				</NavigationMenu.List>
+				<DefaultPopup />
+			</NavigationMenu.Root>
 		);
 	},
 };
