@@ -162,7 +162,7 @@
 			grid-column: trailing-start / trailing-end;
 			display: flex;
 			align-items: center;
-			margin-inline-start: var(--wpds-dimension-gap-lg);
+			margin-inline-start: var(--wp-ui-item-layout-trailing-gap, var(--wpds-dimension-gap-lg));
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
@@ -180,8 +180,10 @@
 		.item-chevron--block-end {
 			rotate: 0deg;
 
-			[data-popup-open] & {
-				rotate: 180deg;
+			&.item-chevron--rotate-on-open {
+				[data-popup-open] & {
+					rotate: 180deg;
+				}
 			}
 		}
 
@@ -192,9 +194,11 @@
 				rotate: 180deg;
 			}
 
-			[data-popup-open] &,
-			[data-popup-open] &:dir(rtl) {
-				rotate: 90deg;
+			&.item-chevron--rotate-on-open {
+				[data-popup-open] &,
+				[data-popup-open] &:dir(rtl) {
+					rotate: 90deg;
+				}
 			}
 		}
 

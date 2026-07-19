@@ -72,6 +72,37 @@ test.describe( 'NavigationMenu', () => {
 		).toBeLessThan( 1 );
 	} );
 
+	test( 'uses compact spacing between a top-level trigger label and chevron', async ( {
+		page,
+	} ) => {
+		await gotoStoryId(
+			page,
+			'design-system-components-navigationmenu--flyout-navigation'
+		);
+
+		const trigger = page.getByRole( 'button', { name: 'Appearance' } );
+		const spacing = await trigger.evaluate( ( element ) => {
+			const trailing = element.querySelector(
+				'[data-wp-ui-item-layout-muted]'
+			);
+
+			if ( ! trailing ) {
+				return null;
+			}
+
+			return {
+				paddingInlineStart:
+					getComputedStyle( element ).paddingInlineStart,
+				trailingMarginInlineStart:
+					getComputedStyle( trailing ).marginInlineStart,
+			};
+		} );
+
+		expect( spacing ).not.toBeNull();
+		expect( spacing?.paddingInlineStart ).toBe( '0px' );
+		expect( spacing?.trailingMarginInlineStart ).toBe( '8px' );
+	} );
+
 	test( 'keeps the flyout open while moving from its trigger to its popup', async ( {
 		page,
 	} ) => {
@@ -148,5 +179,38 @@ test.describe( 'NavigationMenu', () => {
 		const lastLink = page.getByRole( 'link', { name: 'Destination 20' } );
 		await lastLink.scrollIntoViewIfNeeded();
 		await expect( lastLink ).toBeInViewport();
+	} );
+
+	test( 'keeps nested flyout chevrons pointing inline when open', async ( {
+		page,
+	} ) => {
+		for ( const { expectedRotation, storyId } of [
+			{
+				expectedRotation: '0deg',
+				storyId:
+					'design-system-components-navigationmenu--two-level-nested-flyout',
+			},
+			{
+				expectedRotation: '180deg',
+				storyId:
+					'design-system-components-navigationmenu--right-to-left',
+			},
+		] ) {
+			await gotoStoryId( page, storyId );
+
+			await page.getByRole( 'button', { name: 'Appearance' } ).click();
+			const nestedTrigger = page.getByRole( 'button', {
+				name: 'Design',
+			} );
+			const chevron = nestedTrigger.locator( 'svg' );
+
+			await expect( chevron ).toHaveCSS( 'rotate', expectedRotation );
+			await nestedTrigger.click();
+			await expect( nestedTrigger ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect( chevron ).toHaveCSS( 'rotate', expectedRotation );
+		}
 	} );
 } );
