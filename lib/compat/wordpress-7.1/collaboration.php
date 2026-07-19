@@ -208,18 +208,18 @@ if ( ! function_exists( 'wp_is_collaboration_allowed' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_is_post_type_collaboration_disabled' ) ) {
+if ( ! function_exists( 'wp_is_post_type_collaboration_enabled' ) ) {
 	/**
-	 * Determines whether real-time collaboration is disabled for a post type.
+	 * Determines whether real-time collaboration is enabled for a post type.
 	 *
 	 * @since 7.1.0
 	 *
 	 * @param string $post_type Post type name.
-	 * @return bool Whether real-time collaboration is disabled for the post type.
+	 * @return bool Whether real-time collaboration is enabled for the post type.
 	 */
-	function wp_is_post_type_collaboration_disabled( $post_type ) {
+	function wp_is_post_type_collaboration_enabled( $post_type ) {
 		if ( ! post_type_exists( $post_type ) ) {
-			return true;
+			return false;
 		}
 
 		/**
@@ -230,7 +230,7 @@ if ( ! function_exists( 'wp_is_post_type_collaboration_disabled' ) ) {
 		 * @param bool   $disabled  Whether real-time collaboration is disabled for the post type.
 		 * @param string $post_type Post type name.
 		 */
-		return (bool) apply_filters( 'wp_is_post_type_collaboration_disabled', false, $post_type );
+		return ! (bool) apply_filters( 'wp_is_post_type_collaboration_disabled', false, $post_type );
 	}
 }
 
@@ -294,7 +294,7 @@ function gutenberg_inject_real_time_collaboration_setting() {
 	$disabled_post_types = array_values(
 		array_filter(
 			get_post_types( array( 'show_in_rest' => true ) ),
-			'wp_is_post_type_collaboration_disabled'
+			static fn( $post_type ) => ! wp_is_post_type_collaboration_enabled( $post_type )
 		)
 	);
 
@@ -389,7 +389,7 @@ function gutenberg_filter_locked_posts_heartbeat_for_rtc( $response, $data = arr
 			}
 
 			$post = get_post( $post_id );
-			if ( ! $post || wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+			if ( ! $post || ! wp_is_post_type_collaboration_enabled( $post->post_type ) ) {
 				continue;
 			}
 
@@ -425,7 +425,7 @@ if ( ! function_exists( 'gutenberg_block_quick_edit_for_active_lock' ) ) {
 		}
 
 		$post = get_post( $post_id );
-		if ( ! $post || wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+		if ( ! $post || ! wp_is_post_type_collaboration_enabled( $post->post_type ) ) {
 			return;
 		}
 
@@ -553,7 +553,7 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 		return $actions;
 	}
 
-	if ( wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+	if ( ! wp_is_post_type_collaboration_enabled( $post->post_type ) ) {
 		return $actions;
 	}
 
