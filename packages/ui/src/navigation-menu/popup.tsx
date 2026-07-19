@@ -1,4 +1,5 @@
 import { NavigationMenu as _NavigationMenu } from '@base-ui/react/navigation-menu';
+import { useDirection } from '@base-ui/react/direction-provider';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import popupStyles from '../utils/css/dropdown-popup.module.css';
@@ -27,12 +28,14 @@ const Popup = forwardRef< HTMLElement, PopupProps >(
 		ref
 	) {
 		const { depth } = useNavigationMenuContext();
+		const direction = useDirection();
 		const backdropElement = backdrop || null;
 		const popupContent = (
 			<ThemeProvider>
 				<_NavigationMenu.Popup
 					ref={ ref }
 					render={ render ?? <div /> }
+					dir={ direction }
 					className={ clsx(
 						popupStyles.surface,
 						depth > 0

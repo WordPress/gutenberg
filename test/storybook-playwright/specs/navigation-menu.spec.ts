@@ -45,6 +45,7 @@ test.describe( 'NavigationMenu', () => {
 		);
 
 		const postsLink = page.getByRole( 'link', { name: 'Posts' } );
+		await expect( postsLink ).toBeVisible();
 		const dimensions = await postsLink.evaluate( ( link ) => {
 			const content = link.firstElementChild;
 			if ( ! content ) {
@@ -184,33 +185,58 @@ test.describe( 'NavigationMenu', () => {
 	test( 'keeps nested flyout chevrons pointing inline when open', async ( {
 		page,
 	} ) => {
-		for ( const { expectedRotation, storyId } of [
-			{
-				expectedRotation: '0deg',
-				storyId:
-					'design-system-components-navigationmenu--two-level-nested-flyout',
-			},
-			{
-				expectedRotation: '180deg',
-				storyId:
-					'design-system-components-navigationmenu--right-to-left',
-			},
-		] ) {
-			await gotoStoryId( page, storyId );
+		await gotoStoryId(
+			page,
+			'design-system-components-navigationmenu--two-level-nested-flyout'
+		);
 
-			await page.getByRole( 'button', { name: 'Appearance' } ).click();
-			const nestedTrigger = page.getByRole( 'button', {
-				name: 'Design',
-			} );
-			const chevron = nestedTrigger.locator( 'svg' );
+		await page.getByRole( 'button', { name: 'Appearance' } ).click();
+		const nestedTrigger = page.getByRole( 'button', { name: 'Design' } );
+		const chevron = nestedTrigger.locator( 'svg' );
 
-			await expect( chevron ).toHaveCSS( 'rotate', expectedRotation );
-			await nestedTrigger.click();
-			await expect( nestedTrigger ).toHaveAttribute(
-				'aria-expanded',
-				'true'
-			);
-			await expect( chevron ).toHaveCSS( 'rotate', expectedRotation );
-		}
+		await expect( chevron ).toHaveCSS( 'rotate', '0deg' );
+		await nestedTrigger.click();
+		await expect( nestedTrigger ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
+		await expect( chevron ).toHaveCSS( 'rotate', '0deg' );
+	} );
+
+	test( 'preserves RTL direction in portaled flyouts', async ( { page } ) => {
+		await gotoStoryId(
+			page,
+			'design-system-components-navigationmenu--right-to-left'
+		);
+
+		await page.getByRole( 'button', { name: 'Appearance' } ).click();
+		const nestedTrigger = page.getByRole( 'button', { name: 'Design' } );
+		const chevron = nestedTrigger.locator( 'svg' );
+
+		await expect( nestedTrigger ).toHaveCSS( 'direction', 'rtl' );
+		await expect( chevron ).toHaveCSS( 'rotate', '180deg' );
+
+		await nestedTrigger.click();
+		const richLink = page.getByRole( 'link', {
+			name: 'Themes',
+			description: 'Choose how the site looks.',
+		} );
+		await expect( richLink ).toHaveCSS( 'direction', 'rtl' );
+
+		const prefixBox = await richLink
+			.locator( '[data-wp-ui-item-layout-prefix]' )
+			.boundingBox();
+		const labelBox = await richLink
+			.getByText( 'Themes', { exact: true } )
+			.boundingBox();
+		const suffixBox = await richLink
+			.getByText( '12', { exact: true } )
+			.boundingBox();
+
+		expect( prefixBox ).not.toBeNull();
+		expect( labelBox ).not.toBeNull();
+		expect( suffixBox ).not.toBeNull();
+		expect( prefixBox?.x ).toBeGreaterThan( labelBox?.x ?? 0 );
+		expect( suffixBox?.x ).toBeLessThan( labelBox?.x ?? 0 );
 	} );
 } );
