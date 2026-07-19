@@ -1,12 +1,15 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { chevronRightSmall } from '@wordpress/icons';
-import { Icon } from '../icon';
 import resetStyles from '../utils/css/resets.module.css';
+import {
+	ItemChevron,
+	ItemLayout,
+	ItemLayoutContext,
+	useItemContent,
+} from '../utils/item-layout';
+import itemLayoutStyles from '../utils/item-layout/style.module.css';
 import styles from './style.module.css';
-import { MenuItemContentContext } from './context';
-import { ItemContent, useItemContent } from './item';
 import type { SubmenuTriggerProps } from './types';
 
 /**
@@ -43,29 +46,28 @@ const SubmenuTrigger = forwardRef< HTMLDivElement, SubmenuTriggerProps >(
 				{ ...itemAriaProps }
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
+					itemLayoutStyles.item,
 					styles.item,
 					className
 				) }
 				{ ...props }
 			>
-				<MenuItemContentContext.Provider value={ contentContextValue }>
-					<ItemContent
+				<ItemLayoutContext.Provider value={ contentContextValue }>
+					<ItemLayout
 						prefix={ prefix }
 						shortcut={ shortcut }
 						shortcutDescriptionId={ shortcutDescriptionId }
 						suffix={ suffix }
 						trailing={
-							<Icon
+							<ItemChevron
 								className={ styles[ 'submenu-chevron' ] }
-								icon={ chevronRightSmall }
-								size={ 24 }
-								aria-hidden="true"
+								direction="inline-end"
 							/>
 						}
 					>
 						{ children }
-					</ItemContent>
-				</MenuItemContentContext.Provider>
+					</ItemLayout>
+				</ItemLayoutContext.Provider>
 			</_Menu.SubmenuTrigger>
 		);
 	}

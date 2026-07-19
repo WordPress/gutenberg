@@ -10,19 +10,4 @@ const MenuContext = createContext< MenuContextValue >( {
 
 const useMenuContext = () => useContext( MenuContext );
 
-type MenuItemContentContextValue = {
-	labelId?: string;
-	descriptionId: string;
-};
-
-const MenuItemContentContext =
-	createContext< MenuItemContentContextValue | null >( null );
-
-const useMenuItemContentContext = () => useContext( MenuItemContentContext );
-
-export {
-	MenuContext,
-	MenuItemContentContext,
-	useMenuContext,
-	useMenuItemContentContext,
-};
+export { MenuContext, useMenuContext };

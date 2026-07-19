@@ -1,6 +1,7 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
+import itemLayoutStyles from '../utils/item-layout/style.module.css';
 import styles from './style.module.css';
 import type { GroupProps } from './types';
 
@@ -14,7 +15,11 @@ const Group = forwardRef< HTMLDivElement, GroupProps >( function MenuGroup(
 	return (
 		<_Menu.Group
 			ref={ ref }
-			className={ clsx( styles.group, className ) }
+			className={ clsx(
+				itemLayoutStyles[ 'alignment-group' ],
+				styles.group,
+				className
+			) }
 			{ ...props }
 		/>
 	);

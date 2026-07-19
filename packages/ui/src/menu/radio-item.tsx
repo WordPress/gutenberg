@@ -4,9 +4,13 @@ import { forwardRef } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import { Icon } from '../icon';
 import resetStyles from '../utils/css/resets.module.css';
+import {
+	ItemLayout,
+	ItemLayoutContext,
+	useItemContent,
+} from '../utils/item-layout';
+import itemLayoutStyles from '../utils/item-layout/style.module.css';
 import styles from './style.module.css';
-import { MenuItemContentContext } from './context';
-import { ItemContent, useItemContent } from './item';
 import type { RadioItemProps } from './types';
 
 /**
@@ -43,27 +47,31 @@ const RadioItem = forwardRef< HTMLDivElement, RadioItemProps >(
 				{ ...itemAriaProps }
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
+					itemLayoutStyles.item,
 					styles.item,
 					className
 				) }
 				{ ...props }
 			>
-				<_Menu.RadioItemIndicator
-					keepMounted
-					className={ styles[ 'item-selection-indicator' ] }
-				>
-					<Icon icon={ check } size={ 24 } aria-hidden="true" />
-				</_Menu.RadioItemIndicator>
-				<MenuItemContentContext.Provider value={ contentContextValue }>
-					<ItemContent
+				<ItemLayoutContext.Provider value={ contentContextValue }>
+					<ItemLayout
 						prefix={ prefix }
+						selectionIndicator={
+							<_Menu.RadioItemIndicator keepMounted>
+								<Icon
+									icon={ check }
+									size={ 24 }
+									aria-hidden="true"
+								/>
+							</_Menu.RadioItemIndicator>
+						}
 						shortcut={ shortcut }
 						shortcutDescriptionId={ shortcutDescriptionId }
 						suffix={ suffix }
 					>
 						{ children }
-					</ItemContent>
-				</MenuItemContentContext.Provider>
+					</ItemLayout>
+				</ItemLayoutContext.Provider>
 			</_Menu.RadioItem>
 		);
 	}

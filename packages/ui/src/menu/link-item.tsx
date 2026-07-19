@@ -4,9 +4,13 @@ import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
+import {
+	ItemLayout,
+	ItemLayoutContext,
+	useItemContent,
+} from '../utils/item-layout';
+import itemLayoutStyles from '../utils/item-layout/style.module.css';
 import styles from './style.module.css';
-import { MenuItemContentContext } from './context';
-import { ItemContent, useItemContent } from './item';
 import type { LinkItemProps } from './types';
 
 /**
@@ -58,12 +62,13 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 			className={ clsx(
 				defenseStyles.a,
 				resetStyles[ 'box-sizing' ],
+				itemLayoutStyles.item,
 				styles.item,
 				className
 			) }
 		>
-			<MenuItemContentContext.Provider value={ contentContextValue }>
-				<ItemContent
+			<ItemLayoutContext.Provider value={ contentContextValue }>
+				<ItemLayout
 					labelTrailing={ externalLinkIndicator }
 					prefix={ prefix }
 					shortcut={ shortcut }
@@ -71,8 +76,8 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 					suffix={ suffix }
 				>
 					{ children }
-				</ItemContent>
-			</MenuItemContentContext.Provider>
+				</ItemLayout>
+			</ItemLayoutContext.Provider>
 		</_Menu.LinkItem>
 	);
 } );
