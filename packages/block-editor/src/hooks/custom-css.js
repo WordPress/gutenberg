@@ -10,7 +10,7 @@ import InspectorControls from '../components/inspector-controls';
 import AdvancedPanel, {
 	validateCSS,
 } from '../components/global-styles/advanced-panel';
-import { cleanEmptyObject, useStyleOverride } from './utils';
+import { cleanEmptyObject, usePrivateStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 
 // Stable reference for useInstanceId.
@@ -96,11 +96,12 @@ function CustomCSSEdit( { clientId, name, setAttributes } ) {
  * Hook to handle custom CSS for a block in the editor.
  * Generates a unique class and applies scoped CSS via style override.
  *
- * @param {Object} props       Block props.
- * @param {Object} props.style Block style attribute.
+ * @param {Object} props          Block props.
+ * @param {Object} props.style    Block style attribute.
+ * @param {string} props.clientId Block client ID.
  * @return {Object} Block props including className for custom CSS scoping.
  */
-function useBlockProps( { style } ) {
+function useBlockProps( { style, clientId } ) {
 	const customCSS = style?.css;
 
 	// Validate CSS is non-empty and passes validation checks.
@@ -150,8 +151,16 @@ function useBlockProps( { style } ) {
 		return processCSSNesting( customCSS, customCSSSelector );
 	}, [ customCSS, customCSSSelector, isValidCSS ] );
 
-	// Inject the CSS via style override.
-	useStyleOverride( { css: transformedCSS } );
+	// Inject the CSS via style override. The type makes EditorStyles print
+	// it after all other overrides (e.g. block style variations), matching
+	// the front end where the custom CSS stylesheet is printed last. The
+	// clientId keeps custom CSS overrides in block order relative to each
+	// other, which is the order they print in on the front end.
+	usePrivateStyleOverride( {
+		css: transformedCSS,
+		clientId,
+		__unstableType: 'custom-css',
+	} );
 
 	// Only add the class if there's valid custom CSS.
 	if ( ! isValidCSS ) {

@@ -8,6 +8,10 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
+import {
+	getWpCompatOverlaySlot,
+	useEnableWpCompatOverlaySlot,
+} from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -252,6 +256,44 @@ describe( 'Modal', () => {
 		// Closes outer modal > Unhides container.
 		await user.keyboard( '[Escape]' );
 		expect( container ).not.toHaveAttribute( 'aria-hidden' );
+	} );
+
+	it( 'keeps the @wordpress/ui compat overlay slot exposed while open', async () => {
+		const user = userEvent.setup();
+
+		const CompatOverlayDemo = () => {
+			useEnableWpCompatOverlaySlot();
+			useEffect( () => {
+				const slot = getWpCompatOverlaySlot();
+				return () => slot?.remove();
+			}, [] );
+
+			const [ isShown, setIsShown ] = useState( false );
+			return (
+				<>
+					<button onClick={ () => setIsShown( true ) }>
+						Open Modal
+					</button>
+					{ isShown && (
+						<Modal onRequestClose={ () => setIsShown( false ) }>
+							<p>Modal content</p>
+						</Modal>
+					) }
+				</>
+			);
+		};
+
+		const { container } = render( <CompatOverlayDemo /> );
+		// Disable reason: The infrastructure slot has no semantic role.
+		// eslint-disable-next-line testing-library/no-node-access
+		const slot = document.querySelector( '[data-wp-compat-overlay-slot]' );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Open Modal' } )
+		);
+
+		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
+		expect( slot ).toHaveAttribute( 'aria-hidden', 'false' );
 	} );
 
 	it( 'should render `headerActions` React nodes', async () => {

@@ -16,7 +16,8 @@ import {
 	useInnerBlocksProps,
 	BlockControls,
 	InspectorControls,
-	InnerBlocks,
+	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -28,8 +29,9 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, _x } from '@wordpress/i18n';
-import { audio as icon } from '@wordpress/icons';
+import { playlist as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
+import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -41,7 +43,10 @@ import { PlaylistContext } from './context';
 import { getTrackAttributes } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+const AUDIO_FILE_EXTENSION =
+	/\.(aac|aif|aiff|flac|m4a|m4b|mp3|oga|ogg|opus|wav|weba)$/i;
 const DEFAULT_WAVEFORM_STYLE = 'bars';
+const FILE_LIST_OBJECT_NAME = '[object FileList]';
 const WAVEFORM_STYLE_OPTIONS = [
 	{ label: _x( 'Bars', 'waveform style option' ), value: 'bars' },
 	{ label: _x( 'Mirror', 'waveform style option' ), value: 'mirror' },
@@ -50,6 +55,23 @@ const WAVEFORM_STYLE_OPTIONS = [
 	{ label: _x( 'Dots', 'waveform style option' ), value: 'dots' },
 	{ label: _x( 'Seekbar', 'waveform style option' ), value: 'seekbar' },
 ];
+
+function isFile( value ) {
+	return (
+		Object.prototype.toString.call( value ) === '[object File]' ||
+		( typeof File !== 'undefined' && value instanceof File )
+	);
+}
+
+function isAudioFile( file ) {
+	return file.type
+		? file.type.startsWith( 'audio/' )
+		: AUDIO_FILE_EXTENSION.test( file.name );
+}
+
+function getTrackIdentifier( track ) {
+	return track.id ?? track.src ?? track.blob;
+}
 
 const PlaylistEdit = ( {
 	attributes,
@@ -63,19 +85,50 @@ const PlaylistEdit = ( {
 		showTracklist,
 		showNumbers,
 		showImages,
+		showPlayButtonArtwork,
 		showArtists,
 		showTrackLength,
 		waveformStyle = DEFAULT_WAVEFORM_STYLE,
+		waveformColor,
+		waveformGradient,
+		waveformBackgroundColor,
+		waveformBackgroundGradient,
 	} = attributes;
 
 	const blockProps = useBlockProps();
 	const waveformPanelId = `${ clientId }-waveform`;
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks, selectBlock } = useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	function onUploadError( message ) {
-		createErrorNotice( message, { type: 'snackbar' } );
-	}
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+	const colors = useMemo(
+		() =>
+			colorGradientSettings.colors.flatMap(
+				( origin ) => origin?.colors ?? []
+			),
+		[ colorGradientSettings.colors ]
+	);
+	const gradients = useMemo(
+		() =>
+			colorGradientSettings.gradients.flatMap(
+				( origin ) => origin?.gradients ?? []
+			),
+		[ colorGradientSettings.gradients ]
+	);
+	const hasColors =
+		colors.length > 0 || ! colorGradientSettings.disableCustomColors;
+	const hasGradients =
+		gradients.length > 0 || ! colorGradientSettings.disableCustomGradients;
+	const waveformGradientValue = waveformGradient;
+	const waveformBackgroundGradientValue = waveformBackgroundGradient;
+	let waveformColorGradientChange;
+	let waveformBackgroundColorGradientChange;
+	const onUploadError = useCallback(
+		( message ) => {
+			createErrorNotice( message, { type: 'snackbar' } );
+		},
+		[ createErrorNotice ]
+	);
 	const [ currentTrackClientId, setCurrentTrackClientId ] = useState( null );
 
 	const { innerBlockTracks } = useSelect(
@@ -122,31 +175,112 @@ const PlaylistEdit = ( {
 		}
 	}, [ currentTrackClientId, setCurrentTrackClientId, validTracks ] );
 
-	const playlistContext = useMemo(
-		() => ( { currentTrackClientId, setCurrentTrackClientId } ),
-		[ currentTrackClientId, setCurrentTrackClientId ]
+	const createTrackBlocks = useCallback(
+		( media ) => {
+			if ( ! media ) {
+				return [];
+			}
+
+			let mediaItems = [ media ];
+			if (
+				Object.prototype.toString.call( media ) ===
+				FILE_LIST_OBJECT_NAME
+			) {
+				mediaItems = Array.from( media );
+			} else if ( Array.isArray( media ) ) {
+				mediaItems = media;
+			}
+			let hasInvalidFile = false;
+
+			const blocks = mediaItems
+				.map( ( mediaItem ) => {
+					if ( isFile( mediaItem ) ) {
+						if ( ! isAudioFile( mediaItem ) ) {
+							hasInvalidFile = true;
+							return null;
+						}
+
+						return createBlock( 'core/playlist-track', {
+							blob: createBlobURL( mediaItem ),
+							title: mediaItem.name,
+						} );
+					}
+
+					const track = getTrackAttributes( mediaItem );
+
+					return track.src
+						? createBlock( 'core/playlist-track', track )
+						: null;
+				} )
+				.filter( Boolean );
+
+			if ( hasInvalidFile ) {
+				onUploadError(
+					__( 'Only audio files can be added to a playlist.' )
+				);
+			}
+
+			return blocks;
+		},
+		[ onUploadError ]
 	);
 
 	const onSelectTracks = useCallback(
 		( media ) => {
-			if ( ! media ) {
+			const newBlocks = createTrackBlocks( media );
+			if ( newBlocks.length === 0 ) {
 				return;
 			}
 
-			if ( ! Array.isArray( media ) ) {
-				media = [ media ];
-			}
-
-			const trackList = media.map( getTrackAttributes );
-
-			const newBlocks = trackList.map( ( track ) =>
-				createBlock( 'core/playlist-track', track )
-			);
 			setCurrentTrackClientId( newBlocks[ 0 ]?.clientId ?? null );
 			// Replace the inner blocks with the new tracks.
 			replaceInnerBlocks( clientId, newBlocks );
 		},
-		[ replaceInnerBlocks, clientId, setCurrentTrackClientId ]
+		[
+			clientId,
+			createTrackBlocks,
+			replaceInnerBlocks,
+			setCurrentTrackClientId,
+		]
+	);
+
+	const onAddTracks = useCallback(
+		( media ) => {
+			const existingIds = new Set(
+				validTracks
+					.map( ( block ) => getTrackIdentifier( block.attributes ) )
+					.filter( Boolean )
+			);
+			const newBlocks = createTrackBlocks( media ).filter(
+				( block ) =>
+					! existingIds.has( getTrackIdentifier( block.attributes ) )
+			);
+			if ( newBlocks.length === 0 ) {
+				return;
+			}
+
+			const nextBlocks = [ ...validTracks, ...newBlocks ];
+			setCurrentTrackClientId( newBlocks[ 0 ].clientId );
+			replaceInnerBlocks( clientId, nextBlocks );
+			selectBlock( newBlocks[ 0 ].clientId );
+		},
+		[
+			clientId,
+			createTrackBlocks,
+			replaceInnerBlocks,
+			selectBlock,
+			setCurrentTrackClientId,
+			validTracks,
+		]
+	);
+
+	const playlistContext = useMemo(
+		() => ( {
+			currentTrackClientId,
+			setCurrentTrackClientId,
+			addTracks: onAddTracks,
+		} ),
+		[ currentTrackClientId, onAddTracks, setCurrentTrackClientId ]
 	);
 
 	// Get current track data by finding the track with matching client ID.
@@ -209,17 +343,117 @@ const PlaylistEdit = ( {
 		[ setAttributes ]
 	);
 
-	const hasSelectedChild = useSelect(
-		( select ) =>
-			select( blockEditorStore ).hasSelectedInnerBlock( clientId ),
-		[ clientId ]
-	);
+	function updateWaveformColor( colorValue ) {
+		const isSettingColor = colorValue !== undefined;
+		if ( ! isSettingColor && waveformColorGradientChange === 'gradient' ) {
+			waveformColorGradientChange = undefined;
+			return;
+		}
 
-	const hasAnySelected = isSelected || hasSelectedChild;
+		waveformColorGradientChange = 'color';
+
+		setAttributes( {
+			waveformColor: colorValue,
+			waveformGradient: undefined,
+		} );
+	}
+
+	function updateWaveformGradient( gradientValue ) {
+		const isSettingGradient = gradientValue !== undefined;
+		if ( ! isSettingGradient && waveformColorGradientChange === 'color' ) {
+			waveformColorGradientChange = undefined;
+			return;
+		}
+
+		waveformColorGradientChange = 'gradient';
+
+		setAttributes( {
+			waveformGradient: gradientValue,
+			waveformColor: undefined,
+		} );
+	}
+
+	function updateWaveformBackgroundColor( colorValue ) {
+		const isSettingColor = colorValue !== undefined;
+		if (
+			! isSettingColor &&
+			waveformBackgroundColorGradientChange === 'gradient'
+		) {
+			waveformBackgroundColorGradientChange = undefined;
+			return;
+		}
+
+		waveformBackgroundColorGradientChange = 'color';
+
+		setAttributes( {
+			waveformBackgroundColor: colorValue,
+			waveformBackgroundGradient: undefined,
+		} );
+	}
+
+	function updateWaveformBackgroundGradient( gradientValue ) {
+		const isSettingGradient = gradientValue !== undefined;
+		if (
+			! isSettingGradient &&
+			waveformBackgroundColorGradientChange === 'color'
+		) {
+			waveformBackgroundColorGradientChange = undefined;
+			return;
+		}
+
+		waveformBackgroundColorGradientChange = 'gradient';
+
+		setAttributes( {
+			waveformBackgroundGradient: gradientValue,
+			waveformBackgroundColor: undefined,
+		} );
+	}
+
+	const colorSettings = [];
+	if ( hasColors || hasGradients ) {
+		colorSettings.push(
+			{
+				colorValue: hasColors ? waveformColor : undefined,
+				gradientValue: hasGradients ? waveformGradientValue : undefined,
+				label: __( 'Waveform & Play button' ),
+				onColorChange: hasColors ? updateWaveformColor : undefined,
+				onGradientChange: hasGradients
+					? updateWaveformGradient
+					: undefined,
+				isShownByDefault: true,
+				clearable: true,
+				enableAlpha: true,
+				resetAllFilter: () => ( {
+					waveformColor: undefined,
+					waveformGradient: undefined,
+				} ),
+			},
+			{
+				colorValue: hasColors ? waveformBackgroundColor : undefined,
+				gradientValue: hasGradients
+					? waveformBackgroundGradientValue
+					: undefined,
+				label: __( 'Waveform background' ),
+				onColorChange: hasColors
+					? updateWaveformBackgroundColor
+					: undefined,
+				onGradientChange: hasGradients
+					? updateWaveformBackgroundGradient
+					: undefined,
+				isShownByDefault: true,
+				clearable: true,
+				enableAlpha: true,
+				resetAllFilter: () => ( {
+					waveformBackgroundColor: undefined,
+					waveformBackgroundGradient: undefined,
+				} ),
+			}
+		);
+	}
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		__experimentalAppenderTagName: 'li',
-		renderAppender: hasAnySelected && InnerBlocks.ButtonBlockAppender,
+		renderAppender: false,
 	} );
 
 	if ( tracks.length === 0 ) {
@@ -239,6 +473,7 @@ const PlaylistEdit = ( {
 					onSelect={ onSelectTracks }
 					accept="audio/*"
 					multiple
+					handleUpload={ false }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
 				/>
@@ -250,13 +485,11 @@ const PlaylistEdit = ( {
 		<>
 			<BlockControls group="other">
 				<MediaReplaceFlow
-					name={ __( 'Edit' ) }
-					onSelect={ onSelectTracks }
+					name={ __( 'Add track' ) }
+					onSelect={ onAddTracks }
 					accept="audio/*"
 					multiple
-					mediaIds={ tracks
-						.filter( ( track ) => track.id )
-						.map( ( track ) => track.id ) }
+					handleUpload={ false }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
 				/>
@@ -271,6 +504,7 @@ const PlaylistEdit = ( {
 							showNumbers: true,
 							showTrackLength: true,
 							showImages: true,
+							showPlayButtonArtwork: false,
 							order: 'asc',
 						} );
 					} }
@@ -353,7 +587,7 @@ const PlaylistEdit = ( {
 						</>
 					) }
 					<ToolsPanelItem
-						label={ __( 'Show images' ) }
+						label={ __( 'Show tracklist images' ) }
 						isShownByDefault
 						hasValue={ () => showImages !== true }
 						onDeselect={ () =>
@@ -361,9 +595,25 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							label={ __( 'Show images' ) }
+							label={ __( 'Show tracklist images' ) }
 							onChange={ toggleAttribute( 'showImages' ) }
 							checked={ showImages }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Show track image on play button' ) }
+						isShownByDefault
+						hasValue={ () => showPlayButtonArtwork === true }
+						onDeselect={ () =>
+							setAttributes( { showPlayButtonArtwork: false } )
+						}
+					>
+						<ToggleControl
+							label={ __( 'Show track image on play button' ) }
+							onChange={ toggleAttribute(
+								'showPlayButtonArtwork'
+							) }
+							checked={ showPlayButtonArtwork === true }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
@@ -390,11 +640,25 @@ const PlaylistEdit = ( {
 					resetAll={ () => {
 						setAttributes( {
 							waveformStyle: undefined,
+							waveformColor: undefined,
+							waveformGradient: undefined,
+							waveformBackgroundColor: undefined,
+							waveformBackgroundGradient: undefined,
 						} );
 					} }
 					panelId={ waveformPanelId }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
+					{ colorSettings.length > 0 && (
+						<div className="wp-block-playlist__waveform-color-controls">
+							<ColorGradientSettingsDropdown
+								__experimentalIsRenderedInSidebar
+								settings={ colorSettings }
+								panelId={ waveformPanelId }
+								{ ...colorGradientSettings }
+							/>
+						</div>
+					) }
 					<ToolsPanelItem
 						label={ __( 'Shape' ) }
 						isShownByDefault
@@ -416,39 +680,45 @@ const PlaylistEdit = ( {
 				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
+				<MediaPlaceholder
+					onSelect={ onAddTracks }
+					accept="audio/*"
+					multiple
+					handleUpload={ false }
+					disableMediaButtons
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					onError={ onUploadError }
+				/>
 				<Disabled isDisabled={ ! isSelected }>
 					<WaveformPlayer
 						src={ currentTrackData?.src }
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
-						image={
-							showImages !== false
-								? currentTrackData?.image
-								: undefined
-						}
-						imageAlt={
-							showImages !== false
-								? currentTrackData?.imageAlt
-								: undefined
-						}
+						image={ currentTrackData?.image }
+						imageAlt={ currentTrackData?.imageAlt }
 						waveformStyle={ waveformStyle }
+						color={ waveformColor }
+						gradient={ waveformGradientValue }
+						backgroundColor={ waveformBackgroundColor }
+						backgroundGradient={ waveformBackgroundGradientValue }
 						onEnded={ onTrackEnded }
+						showPlayButtonArtwork={ showPlayButtonArtwork === true }
 					/>
 				</Disabled>
-				{ showTracklist && (
-					<ol
-						className={ clsx( 'wp-block-playlist__tracklist', {
-							'wp-block-playlist__tracklist-show-numbers':
-								showNumbers,
-							'wp-block-playlist__tracklist-length-is-hidden':
-								! showTrackLength,
-						} ) }
-					>
-						<PlaylistContext.Provider value={ playlistContext }>
-							{ innerBlocksProps.children }
-						</PlaylistContext.Provider>
-					</ol>
-				) }
+				<ol
+					className={ clsx( 'wp-block-playlist__tracklist', {
+						'wp-block-playlist__tracklist-is-hidden':
+							! showTracklist,
+						'wp-block-playlist__tracklist-show-numbers':
+							showNumbers,
+						'wp-block-playlist__tracklist-length-is-hidden':
+							! showTrackLength,
+					} ) }
+				>
+					<PlaylistContext.Provider value={ playlistContext }>
+						{ innerBlocksProps.children }
+					</PlaylistContext.Provider>
+				</ol>
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }
