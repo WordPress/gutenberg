@@ -7,15 +7,18 @@ import type { ItemChevronDirection } from './types';
 export function ItemChevron( {
 	className,
 	direction,
+	rotateOnOpen = true,
 }: {
 	className?: string;
 	direction: ItemChevronDirection;
+	rotateOnOpen?: boolean;
 } ) {
 	return (
 		<Icon
 			className={ clsx(
 				styles[ 'item-chevron' ],
 				styles[ `item-chevron--${ direction }` ],
+				rotateOnOpen && styles[ 'item-chevron--rotate-on-open' ],
 				className
 			) }
 			icon={

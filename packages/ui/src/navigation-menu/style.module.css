@@ -60,6 +60,7 @@
 			--_gcd-button-font-weight: inherit;
 
 			appearance: none;
+			padding: 0;
 			border: 0;
 			border-radius: var(--wpds-border-radius-sm);
 			background: transparent;
@@ -73,6 +74,8 @@
 		}
 
 		.interactive--horizontal {
+			--wp-ui-item-layout-trailing-gap: var(--wpds-dimension-gap-sm);
+
 			width: max-content;
 			max-width: none;
 			min-inline-size: calc(var(--wpds-dimension-size-lg) + var(--wpds-dimension-gap-xs));
