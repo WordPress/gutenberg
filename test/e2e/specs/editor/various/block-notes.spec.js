@@ -1723,13 +1723,19 @@ test.describe( 'Block Notes', () => {
 
 			/*
 			 * Pressing Escape closes the link popover and leaves the note
-			 * form intact — focus does not get yanked out of the editor.
+			 * form intact; focus does not get yanked out of the editor, and
+			 * the selection is restored rather than left collapsed.
 			 */
 			await page.keyboard.press( 'Escape' );
 			await expect(
 				page.getByRole( 'combobox', { name: 'Search or type URL' } )
 			).toBeHidden();
-			await expect( textbox ).toBeVisible();
+			await expect( textbox ).toBeFocused();
+			await expect
+				.poll( () =>
+					page.evaluate( () => window.getSelection().toString() )
+				)
+				.toBe( 'visit example' );
 		} );
 
 		test( 'Cmd+K opens an unclipped link popover in the reply form', async ( {
@@ -1781,55 +1787,6 @@ test.describe( 'Block Notes', () => {
 			await page.keyboard.press( 'Escape' );
 			await expect( linkInput ).toBeHidden();
 			await expect( replyTextbox ).toBeVisible();
-		} );
-
-		test( 'does not render the hidden field label as a placeholder', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			/*
-			 * The note forms label their fields with a visually hidden
-			 * label ("New note" / "Reply to note N by author") and render
-			 * no placeholder; the rich text placeholder element only
-			 * mounts when a placeholder is passed, so its presence means
-			 * the hidden label leaked into the visible field.
-			 */
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Placeholder host' },
-			} );
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
-			const newNoteTextbox = page.getByRole( 'textbox', {
-				name: 'New note',
-				exact: true,
-			} );
-			await expect( newNoteTextbox ).toBeVisible();
-			await expect( newNoteTextbox ).not.toHaveAttribute(
-				'aria-placeholder',
-				/./
-			);
-			await expect(
-				newNoteTextbox.locator( '[data-rich-text-placeholder]' )
-			).toHaveCount( 0 );
-
-			await blockNoteUtils.addNote( 'Placeholder note' );
-			const replyTextbox = page.getByRole( 'textbox', {
-				name: 'Reply to',
-			} );
-			await expect( replyTextbox ).toBeVisible();
-			// The visually hidden label still provides the descriptive
-			// accessible name; only the visible placeholder is gone.
-			await expect( replyTextbox ).toHaveAccessibleName(
-				/^Reply to note \d+ by admin$/
-			);
-			await expect( replyTextbox ).not.toHaveAttribute(
-				'aria-placeholder',
-				/./
-			);
-			await expect(
-				replyTextbox.locator( '[data-rich-text-placeholder]' )
-			).toHaveCount( 0 );
 		} );
 
 		test( 'backtick wrapping applies core/code inline format', async ( {

@@ -46,7 +46,7 @@
 		"./package.json": {
 			"default": "./package.json"
 		},
-		"./build-style/": "./build-style/"
+		"./build-style/*": "./build-style/*"
 	},
 	"types": "build-types",
 	"sideEffects": false,
