@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Inserter media categories: save the media item's `title`, `alt`, `description`, and new optional `filename` on the attachment created when an external media item is uploaded to the media library ([#80370](https://github.com/WordPress/gutenberg/pull/80370)).
+
 ## 16.0.0 (2026-07-14)
 
 ### Internal

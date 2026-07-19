@@ -152,6 +152,9 @@ export function MediaPreview( { media, onClick, onDetach, category } ) {
 	const { getSettings, getBlock } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
+	const mediaTitle =
+		typeof media.title === 'string' ? media.title : media.title?.rendered;
+
 	const onMediaInsert = useCallback(
 		( previewBlock ) => {
 			// Prevent multiple uploads when we're in the process of inserting.
@@ -185,14 +188,30 @@ export function MediaPreview( { media, onClick, onDetach, category } ) {
 				.fetch( url )
 				.then( ( response ) => response.blob() )
 				.then( ( blob ) => {
-					const fileName = getFilename( url ) || 'image.jpg';
+					// A `data:`/`blob:` url has no filename in its path.
+					const canDeriveFilename =
+						! url.startsWith( 'data:' ) && ! isBlobURL( url );
+					const fileName =
+						media.filename ||
+						( canDeriveFilename && getFilename( url ) ) ||
+						'image.jpg';
 					const file = new File( [ blob ], fileName, {
 						type: blob.type,
 					} );
+					const additionalData = { caption };
+					if ( media.alt ) {
+						additionalData.alt_text = media.alt;
+					}
+					if ( mediaTitle ) {
+						additionalData.title = mediaTitle;
+					}
+					if ( media.description ) {
+						additionalData.description = media.description;
+					}
 
 					settings.mediaUpload( {
 						filesList: [ file ],
-						additionalData: { caption },
+						additionalData,
 						onFileChange( [ img ] ) {
 							if ( isBlobURL( img.url ) ) {
 								return;
@@ -242,6 +261,8 @@ export function MediaPreview( { media, onClick, onDetach, category } ) {
 		[
 			isInserting,
 			getSettings,
+			media,
+			mediaTitle,
 			onClick,
 			createSuccessNotice,
 			updateBlockAttributes,
@@ -250,10 +271,7 @@ export function MediaPreview( { media, onClick, onDetach, category } ) {
 		]
 	);
 
-	const title =
-		typeof media.title === 'string'
-			? media.title
-			: media.title?.rendered || __( 'no title' );
+	const title = mediaTitle || __( 'no title' );
 
 	const onMouseEnter = useCallback( () => setIsHovered( true ), [] );
 	const onMouseLeave = useCallback( () => setIsHovered( false ), [] );
