@@ -5,3 +5,16 @@
 	@include snackbar-container();
 }
 
+.edit-widgets-notices.notices-inline-notices-wrapper,
+.edit-widgets-notices .components-notice-list {
+	gap: 0;
+}
+
+.edit-widgets-notices .components-notice-list + .components-notice-list .components-notice:first-child,
+.edit-widgets-notices .components-notice + .components-notice {
+	border-top-width: 0;
+}
+
+.edit-widgets-notices .components-notice {
+	border-inline-width: 0;
+}
