@@ -34,7 +34,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 		[]
 	);
 	const blockElement = useBlockElement( clientId );
-	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const isSubmittingRef = useRef( false );
@@ -65,7 +65,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 		 * newly selected note.
 		 */
 		if ( getSelectedNote() === 'new' ) {
-			toggleBlockSpotlight( clientId, false );
+			toggleBlockHighlight( clientId, false );
 			selectNote( undefined );
 		}
 	} );
@@ -73,7 +73,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 	const unselectNote = () => {
 		selectNote( undefined );
 		blockElement?.focus();
-		toggleBlockSpotlight( clientId, false );
+		toggleBlockHighlight( clientId, false );
 	};
 
 	if ( selectedNote !== 'new' || ! clientId ) {

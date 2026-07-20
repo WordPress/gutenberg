@@ -43,7 +43,7 @@ function NotesSidebar( { postId } ) {
 
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const { toggleBlockSpotlight, selectBlock } = unlock(
+	const { toggleBlockHighlight, selectBlock } = unlock(
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
@@ -116,7 +116,7 @@ function NotesSidebar( { postId } ) {
 		// A special case for the List View, where block selection isn't required to trigger an action.
 		// The action won't do anything if the block is already selected.
 		selectBlock( targetClientId, null );
-		toggleBlockSpotlight( targetClientId, true );
+		toggleBlockHighlight( targetClientId, true );
 		selectNote( targetNoteId, { focus: true } );
 	}
 
