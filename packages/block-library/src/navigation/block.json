@@ -90,7 +90,7 @@
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
 		},
-		"collapsedMenuBreakpoint": {
+		"overlayBreakpoint": {
 			"type": "string",
 			"default": "600px"
 		}

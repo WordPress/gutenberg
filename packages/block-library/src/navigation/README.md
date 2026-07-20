@@ -64,7 +64,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `customOverlayTextColor` | `string` | — | — |
 | `maxNestingLevel` | `number` | `5` | — |
 | `templateLock` | `string \| boolean` | — | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `all`, `insert`, `contentOnly`, `false` |
-| `collapsedMenuBreakpoint` | `string` | `"600px"` | — |
+| `overlayBreakpoint` | `string` | `"600px"` | — |
 
 ## Supports
 
