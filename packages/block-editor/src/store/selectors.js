@@ -790,13 +790,6 @@ export function getSelectedBlocksInitialCaretPosition( state ) {
 }
 
 /**
- * Returns the current selection set of block client IDs (multiselection or single selection).
- *
- * @param {Object} state Editor state.
- *
- * @return {Array} Multi-selected block client IDs.
- */
-/**
  * Returns the ancestor client ID when one selection endpoint is nested
  * inside the other, or undefined for any other selection shape. Such a
  * selection has no sibling range; the ancestor contains all of it.
@@ -820,6 +813,13 @@ function getSelectionNestingAncestor( state ) {
 	return undefined;
 }
 
+/**
+ * Returns the current selection set of block client IDs (multiselection or single selection).
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Array} Multi-selected block client IDs.
+ */
 export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
 		const { selectionStart, selectionEnd } = state.selection;
