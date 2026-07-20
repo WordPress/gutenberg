@@ -65,6 +65,8 @@ export default function OverlayPanel( {
 	const hasCustomOverlayBreakpointValue =
 		hasCustomOverlayBreakpoint( overlayBreakpoint );
 
+	// Keep the editable field in sync when the attribute changes outside direct
+	// input, while still allowing partial/invalid draft values before commit.
 	useEffect( () => {
 		setOverlayBreakpointInputValue( normalizedOverlayBreakpoint );
 	}, [ normalizedOverlayBreakpoint ] );
