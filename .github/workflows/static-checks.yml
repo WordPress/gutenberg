@@ -59,7 +59,9 @@ jobs:
                   cache: npm
 
             - name: Pin npm version for consistency
-              run: npm install -g npm@10
+              run: |
+                  npm install --global npm@10
+                  npm --version
 
             - name: npm install
               # A "full" install is executed, since `npm ci` does not always exit
@@ -100,10 +102,18 @@ jobs:
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}
-              run: npm run lint:css -- --formatter compact
+              # Stylelint has no separate prune flag. Run lint first so new violations fail,
+              # then `--suppress` to prune stale suppressions (same outcome as ESLint's
+              # `--prune-suppressions` + check-local-changes).
+              run: |
+                  npm run lint:css -- --formatter compact
+                  npm run lint:css:update-suppressions
 
             - name: Type checking
               run: npm run build
+
+            - name: Validate package contents
+              run: npm run lint:package-contents
 
             - name: Audit published dependencies
               if: ${{ matrix.annotations }}

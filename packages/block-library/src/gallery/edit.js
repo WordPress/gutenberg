@@ -66,7 +66,7 @@ import {
 import useImageSizes from './use-image-sizes';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
-import GapStyles from './gap-styles';
+import GalleryGapCustomProperties from './gap-styles';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
 import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
@@ -787,7 +787,6 @@ export default function GalleryEdit( props ) {
 								options={ imageSizeOptions }
 								onChange={ updateImagesSize }
 								hideCancelButton
-								size="__unstable-large"
 							/>
 						</ToolsPanelItem>
 					) }
@@ -843,7 +842,6 @@ export default function GalleryEdit( props ) {
 							isShownByDefault
 						>
 							<SelectControl
-								__next40pxDefaultSize
 								label={ __( 'Aspect ratio' ) }
 								help={ __(
 									'Set a consistent aspect ratio for all images in the gallery.'
@@ -943,8 +941,8 @@ export default function GalleryEdit( props ) {
 						/>
 					</BlockControls>
 				) }
-				<GapStyles
-					blockGap={ attributes.style?.spacing?.blockGap }
+				<GalleryGapCustomProperties
+					style={ attributes.style }
 					clientId={ clientId }
 				/>
 			</>

@@ -121,6 +121,8 @@ class Media_Processing_Test extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'png_interlaced', $data );
 		$this->assertArrayNotHasKey( 'gif_interlaced', $data );
 		$this->assertArrayNotHasKey( 'image_sizes', $data );
+		$this->assertArrayNotHasKey( 'image_strip_meta', $data );
+		$this->assertArrayNotHasKey( 'image_max_bit_depth', $data );
 	}
 
 	/**
@@ -152,6 +154,49 @@ class Media_Processing_Test extends WP_UnitTestCase {
 		// $this->assertArrayNotHasKey( 'png_interlaced', $data );
 		// $this->assertArrayNotHasKey( 'gif_interlaced', $data );
 		$this->assertArrayHasKey( 'image_sizes', $data );
+		$this->assertArrayHasKey( 'image_strip_meta', $data );
+		$this->assertTrue( $data['image_strip_meta'] );
+		$this->assertArrayHasKey( 'image_max_bit_depth', $data );
+		$this->assertSame( 16, $data['image_max_bit_depth'] );
+	}
+
+	/**
+	 * @covers ::gutenberg_media_processing_filter_rest_index
+	 */
+	public function test_get_rest_index_honors_image_strip_meta_filter() {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter( 'image_strip_meta', '__return_false' );
+
+		$server = new WP_REST_Server();
+
+		$request = new WP_REST_Request( 'GET', '/' );
+		$index   = $server->dispatch( $request );
+		$data    = $index->get_data();
+
+		$this->assertFalse( $data['image_strip_meta'] );
+	}
+
+	/**
+	 * @covers ::gutenberg_media_processing_filter_rest_index
+	 */
+	public function test_get_rest_index_honors_image_max_bit_depth_filter() {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter(
+			'image_max_bit_depth',
+			static function ( $max_depth ) {
+				return min( 8, $max_depth );
+			}
+		);
+
+		$server = new WP_REST_Server();
+
+		$request = new WP_REST_Request( 'GET', '/' );
+		$index   = $server->dispatch( $request );
+		$data    = $index->get_data();
+
+		$this->assertSame( 8, $data['image_max_bit_depth'] );
 	}
 
 	/**

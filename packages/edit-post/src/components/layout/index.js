@@ -65,7 +65,6 @@ import WelcomeGuide from '../welcome-guide';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useEditPostCommands from '../../commands/use-commands';
-import { useShouldIframe } from './use-should-iframe';
 import useNavigateToEntityRecord from '../../hooks/use-navigate-to-entity-record';
 import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initialization';
 
@@ -131,11 +130,7 @@ function useEditorStyles( settings ) {
 	] );
 }
 
-/**
- * @param {Object}  props
- * @param {boolean} props.isLegacy True for device previews where split view is disabled.
- */
-function MetaBoxesMain( { isLegacy } ) {
+function MetaBoxesMain() {
 	const [ isOpen, openHeight, hasAnyVisible ] = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { isMetaBoxLocationVisible } = select( editPostStore );
@@ -282,16 +277,12 @@ function MetaBoxesMain( { isLegacy } ) {
 		<div
 			// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
 			className="edit-post-layout__metaboxes edit-post-meta-boxes-main__liner"
-			hidden={ ! isLegacy && ! isOpen }
+			hidden={ ! isOpen }
 		>
 			<MetaBoxes location="normal" />
 			<MetaBoxes location="advanced" />
 		</div>
 	);
-
-	if ( isLegacy ) {
-		return contents;
-	}
 
 	const isAutoHeight = openHeight === undefined;
 	const usedOpenHeight = isShort ? 'auto' : openHeight;
@@ -375,7 +366,6 @@ function Layout( {
 	initialEdits,
 } ) {
 	useEditPostCommands();
-	const shouldIframe = useShouldIframe();
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
 		currentPost: { postId: currentPostId, postType: currentPostType },
@@ -586,7 +576,6 @@ function Layout( {
 							templateId={ templateId }
 							className={ className }
 							forceIsDirty={ hasActiveMetaboxes }
-							disableIframe={ ! shouldIframe }
 							// We should auto-focus the canvas (title) on load.
 							// eslint-disable-next-line jsx-a11y/no-autofocus
 							autoFocus={ ! isWelcomeGuideVisible }
@@ -596,11 +585,7 @@ function Layout( {
 							}
 							extraContent={
 								! isDistractionFree &&
-								showMetaBoxes && (
-									<MetaBoxesMain
-										isLegacy={ ! shouldIframe }
-									/>
-								)
+								showMetaBoxes && <MetaBoxesMain />
 							}
 						>
 							<PostLockedModal />

@@ -172,9 +172,25 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 	/** This filter is documented in wp-admin/includes/image.php */
 	$image_size_threshold = (int) apply_filters( 'big_image_size_threshold', 2560, array( 0, 0 ), '', 0 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
+	/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
+	$image_strip_meta = (bool) apply_filters( 'image_strip_meta', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+	/*
+	 * On the server, this filter receives the decoded image's actual bit depth.
+	 * The client path never decodes the image on the server, so the filter is
+	 * applied with 16 (the maximum depth vips can produce) as both the value
+	 * and the current depth. The client caps its output bit depth at the
+	 * filtered value, so a plugin lowering it (e.g. to 8) takes effect on
+	 * client-generated images too.
+	 */
+	/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
+	$image_max_bit_depth = (int) apply_filters( 'image_max_bit_depth', 16, 16 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
 	if ( current_user_can( 'upload_files' ) ) {
 		$response->data['image_sizes']          = gutenberg_get_all_image_sizes();
 		$response->data['image_size_threshold'] = $image_size_threshold;
+		$response->data['image_strip_meta']     = $image_strip_meta;
+		$response->data['image_max_bit_depth']  = $image_max_bit_depth;
 	}
 
 	return $response;

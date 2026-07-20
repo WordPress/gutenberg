@@ -1,14 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Button, Icon as WCIcon } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { __, isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import './back-button.scss';
 
 /**
  * Back button component that appears in full-screen canvas mode.
@@ -28,16 +23,11 @@ export default function BootBackButton( { length }: { length: number } ) {
 	}
 
 	return (
-		<div className="boot-canvas-back-button">
-			<Button
-				className="boot-canvas-back-button__link"
-				onClick={ handleBack }
-				aria-label={ __( 'Go back' ) }
-				__next40pxDefaultSize
-			/>
-			<div className="boot-canvas-back-button__icon">
-				<WCIcon icon={ isRTL() ? chevronRight : chevronLeft } />
-			</div>
-		</div>
+		<Button
+			size="compact"
+			onClick={ handleBack }
+			label={ __( 'Go back' ) }
+			icon={ isRTL() ? chevronRight : chevronLeft }
+		/>
 	);
 }
