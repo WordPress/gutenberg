@@ -156,7 +156,7 @@ class Gutenberg_View_Config_Data {
 		if ( $version <= 0 || $version > self::LATEST_VERSION ) {
 			_doing_it_wrong(
 				__METHOD__,
-				esc_html__( 'A view configuration contribution must declare a supported schema version.', 'gutenberg' ),
+				esc_html__( 'A view configuration patch must declare a supported schema version.', 'gutenberg' ),
 				'7.1.0'
 			);
 
@@ -270,7 +270,7 @@ class Gutenberg_View_Config_Data {
 		if ( $version <= 0 || $version > self::LATEST_VERSION ) {
 			_doing_it_wrong(
 				esc_html( $method ),
-				esc_html__( 'A view configuration contribution must declare a supported schema version.', 'gutenberg' ),
+				esc_html__( 'A view configuration patch must declare a supported schema version.', 'gutenberg' ),
 				'7.1.0'
 			);
 
