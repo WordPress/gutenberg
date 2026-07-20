@@ -362,9 +362,19 @@ export default function useSelectionObserver() {
 					];
 					const depth = findDepth( startPath, endPath );
 
+					// If one path ends before they diverge, one block
+					// contains the other, so there are no sibling blocks
+					// to promote the selection to. Record the selection as
+					// is: it resolves to the outer block, which is treated
+					// as fully selected. See `getSelectionNestingAncestor`
+					// in the store.
+					const isAncestorDescendant =
+						depth >= startPath.length || depth >= endPath.length;
+
 					if (
-						startPath[ depth ] !== startClientId ||
-						endPath[ depth ] !== endClientId
+						! isAncestorDescendant &&
+						( startPath[ depth ] !== startClientId ||
+							endPath[ depth ] !== endClientId )
 					) {
 						multiSelect( startPath[ depth ], endPath[ depth ] );
 						return;
