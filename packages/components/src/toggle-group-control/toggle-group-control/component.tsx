@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -14,10 +15,9 @@ import { useMergeRefs } from '@wordpress/compose';
  */
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect, useContextSystem } from '../../context';
-import { useCx } from '../../utils/hooks';
 import BaseControl, { useBaseControlProps } from '../../base-control';
 import type { ToggleGroupControlProps } from '../types';
-import * as styles from './styles';
+import styles from './style.module.scss';
 import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
 import { ToggleGroupControlAsButtonGroup } from './as-button-group';
 import { useTrackElementOffsetRect } from '../../utils/element-rect';
@@ -32,7 +32,6 @@ function UnconnectedToggleGroupControl(
 		__nextHasNoMarginBottom: _,
 		size: _size,
 		__next40pxDefaultSize: _next40pxDefaultSize,
-		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,
@@ -67,18 +66,14 @@ function UnconnectedToggleGroupControl(
 		roundRect: false,
 	} );
 
-	const cx = useCx();
-
-	const classes = useMemo(
-		() =>
-			cx(
-				styles.toggleGroupControl( {
-					isBlock,
-					isDeselectable,
-				} ),
-				className
-			),
-		[ className, cx, isBlock, isDeselectable ]
+	const classes = clsx(
+		styles[ 'toggle-group-control' ],
+		{
+			[ styles[ 'is-block' ] ]: isBlock,
+			[ styles[ 'has-border' ] ]: isBlock && ! isDeselectable,
+			[ styles[ 'has-enclosing-borders' ] ]: ! isDeselectable,
+		},
+		className
 	);
 
 	const MainControl = isDeselectable

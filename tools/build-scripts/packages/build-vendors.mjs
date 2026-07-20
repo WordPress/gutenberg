@@ -31,27 +31,21 @@ const patchReactDOM = createPatcher(
 
 const VENDOR_SCRIPTS = [
 	{
-		name: 'react',
+		name: '@wordpress/react-18/react',
 		global: 'React',
 		handle: 'react',
 		dependencies: [ 'wp-polyfill' ],
 		version: '18.3.1',
 	},
 	{
-		name: 'react-dom',
+		name: '@wordpress/react-18/react-dom',
 		global: 'ReactDOM',
 		handle: 'react-dom',
 		dependencies: [ 'react' ],
-		contents: [
-			'module.exports = {',
-			'  ...require("react-dom"),',
-			'  ...require("react-dom/client"),',
-			'};',
-		].join( '\n' ),
 		version: '18.3.1',
 	},
 	{
-		name: 'react/jsx-runtime',
+		name: '@wordpress/react-18/react-jsx-runtime',
 		global: 'ReactJSXRuntime',
 		handle: 'react-jsx-runtime',
 		dependencies: [ 'react' ],
@@ -128,7 +122,7 @@ async function patchVendorOutput( fileName, patch ) {
  * This is used to build packages like React that don't ship UMD builds.
  *
  * @param {Object}   config              Vendor script configuration.
- * @param {string}   config.name         Package name (e.g., 'react', 'react-dom', 'react/jsx-runtime').
+ * @param {string}   config.name         Entry point name (e.g., '@wordpress/react-18/react').
  * @param {string}   config.global       Global variable name (e.g., 'React', 'ReactDOM').
  * @param {string}   config.handle       WordPress script handle (e.g., 'react', 'react-dom').
  * @param {string[]} config.dependencies WordPress script dependencies.
@@ -136,7 +130,7 @@ async function patchVendorOutput( fileName, patch ) {
  * @return {Promise<void>} Promise that resolves when all builds are finished.
  */
 async function bundleVendorScript( config ) {
-	const { name, global, handle, contents, dependencies } = config;
+	const { name, global, handle, dependencies } = config;
 
 	// Plugin that externalizes the `react` package.
 	const reactExternalPlugin = {
@@ -168,22 +162,13 @@ async function bundleVendorScript( config ) {
 		globalName: global,
 		target: 'esnext',
 		platform: 'browser',
+		entryPoints: [ name ],
 		// Resolve imports from this workspace's dependencies.
 		absWorkingDir: WORKSPACE_DIR,
 		plugins: dependencies?.includes( 'react' )
 			? [ reactExternalPlugin ]
 			: [],
 	};
-
-	if ( contents ) {
-		esbuildOptions.stdin = {
-			contents,
-			resolveDir: WORKSPACE_DIR,
-			loader: 'js',
-		};
-	} else {
-		esbuildOptions.entryPoints = [ name ];
-	}
 
 	await Promise.all( [
 		esbuild.build( {
