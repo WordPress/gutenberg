@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
 	useState,
@@ -68,9 +69,11 @@ export function useNoteThreads( postId ) {
 			return { notes: [], unresolvedNotes: [] };
 		}
 
-		// Single pass over clientIds builds the forward map and reverse lookup
-		// together. getNoteIdsFromMetadata returns numeric ids, matching the
-		// types returned by the comments REST endpoint.
+		/*
+		 * Single pass over clientIds builds the forward map and reverse lookup
+		 * together. getNoteIdsFromMetadata returns numeric ids, matching the
+		 * types returned by the comments REST endpoint.
+		 */
 		const blocksWithNotes = {};
 		const clientIdByNoteId = new Map();
 		for ( const clientId of clientIds ) {
@@ -316,11 +319,14 @@ export function useNoteActions() {
 				{ throwOnError: true }
 			);
 
-			// If it's a top-level note, update the block attributes with the note id.
-			// Read-modify-write on metadata is racy under concurrent edits:
-			// two near-simultaneous adds against the same base will each write
-			// a 2-element array and the later write wins, dropping the other
-			// id. Tracking issue: https://github.com/WordPress/gutenberg/issues/74751.
+			/*
+			 * If it's a top-level note, update the block attributes with the
+			 * note id. Read-modify-write on metadata is racy under concurrent
+			 * edits: two near-simultaneous adds against the same base will each
+			 * write a 2-element array and the later write wins, dropping the
+			 * other id. Tracking issue:
+			 * https://github.com/WordPress/gutenberg/issues/74751.
+			 */
 			if ( ! parent && savedRecord?.id ) {
 				const clientId =
 					inlineSelection?.clientId || getSelectedBlockClientId();
@@ -369,13 +375,6 @@ export function useNoteActions() {
 	};
 
 	const onEdit = async ( { id, content, status } ) => {
-		const messageType = status ? status : 'updated';
-		const messages = {
-			approved: __( 'Note marked as resolved.' ),
-			hold: __( 'Note reopened.' ),
-			updated: __( 'Note updated.' ),
-		};
-
 		try {
 			// For resolution or reopen actions, create a new note with metadata.
 			if ( status === 'approved' || status === 'hold' ) {
@@ -419,6 +418,14 @@ export function useNoteActions() {
 						updateBlockAttributes
 					);
 				}
+
+				// The note visibly updates in place, so there is no snackbar,
+				// but screen reader users still need the confirmation.
+				speak(
+					status === 'approved'
+						? __( 'Note marked as resolved.' )
+						: __( 'Note reopened.' )
+				);
 			} else {
 				const updateData = {
 					id,
@@ -429,16 +436,12 @@ export function useNoteActions() {
 				await saveEntityRecord( 'root', 'comment', updateData, {
 					throwOnError: true,
 				} );
-			}
 
-			createNotice(
-				'snackbar',
-				messages[ messageType ] ?? __( 'Note updated.' ),
-				{
+				createNotice( 'snackbar', __( 'Note updated.' ), {
 					type: 'snackbar',
 					isDismissible: true,
-				}
-			);
+				} );
+			}
 		} catch ( error ) {
 			onError( error );
 		}

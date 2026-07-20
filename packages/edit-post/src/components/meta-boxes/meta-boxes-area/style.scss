@@ -39,7 +39,7 @@
 	#poststuff h2.hndle { /* WordPress selectors yolo */
 		box-sizing: border-box;
 		color: inherit;
-		font-weight: 600;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		outline: none;
 		padding: 0 $grid-unit-30;
 		position: relative;

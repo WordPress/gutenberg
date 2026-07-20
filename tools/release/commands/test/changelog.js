@@ -1,6 +1,16 @@
 /**
  * Internal dependencies
  */
+jest.mock( '@octokit/rest' );
+jest.mock( '../../lib/milestone' );
+jest.mock( '../../lib/logger', () => ( {
+	log: jest.fn(),
+	formats: {
+		title: jest.fn( ( message ) => message ),
+		error: jest.fn( ( message ) => message ),
+	},
+} ) );
+
 import {
 	getNormalizedTitle,
 	reword,
@@ -20,9 +30,18 @@ import {
 	getContributorProps,
 	getContributorsList,
 	mapLabelsToFeatures,
+	createChangelog,
+	fetchAllPullRequests,
 } from '../changelog';
 import _pullRequests from './fixtures/pull-requests.json';
 import botPullRequestFixture from './fixtures/bot-pull-requests.json';
+
+const Octokit = require( '@octokit/rest' );
+const {
+	getMilestoneByTitle,
+	getIssuesByMilestone,
+} = require( '../../lib/milestone' );
+const { log } = require( '../../lib/logger' );
 
 /**
  * pull-requests.json is a static snapshot of real data from the GitHub API.
@@ -32,6 +51,88 @@ import botPullRequestFixture from './fixtures/bot-pull-requests.json';
  * See: https://github.com/WordPress/gutenberg/pull/38777#discussion_r808992346.
  */
 const pullRequests = _pullRequests.concat( botPullRequestFixture );
+
+describe( 'createChangelog', () => {
+	const settings = {
+		owner: 'WordPress',
+		repo: 'gutenberg',
+		milestone: 'Gutenberg 23.5',
+		unreleased: false,
+	};
+
+	beforeEach( () => {
+		jest.clearAllMocks();
+		Octokit.mockImplementation( () => ( {} ) );
+	} );
+
+	it( 'keeps successful changelog output unchanged', async () => {
+		getMilestoneByTitle.mockResolvedValue( {
+			number: 235,
+			title: settings.milestone,
+		} );
+		getIssuesByMilestone.mockResolvedValue( pullRequests );
+
+		await createChangelog( settings );
+
+		expect( log ).toHaveBeenCalledTimes( 2 );
+		expect( log ).toHaveBeenNthCalledWith(
+			2,
+			getChangelog( pullRequests ) +
+				getContributorProps( pullRequests ) +
+				getContributorsList( pullRequests )
+		);
+	} );
+
+	it( 'does not swallow operational errors', async () => {
+		getMilestoneByTitle.mockRejectedValue(
+			new Error( 'GitHub request failed.' )
+		);
+
+		await expect( createChangelog( settings ) ).rejects.toThrow(
+			'GitHub request failed.'
+		);
+		expect( log ).toHaveBeenCalledTimes( 1 );
+	} );
+} );
+
+describe( 'fetchAllPullRequests', () => {
+	it( 'explains how to recover when a milestone has no unreleased pull requests', async () => {
+		const milestone = 'Gutenberg 23.5';
+		const octokit = {
+			repos: {
+				listReleases: {
+					endpoint: {
+						merge: jest.fn().mockReturnValue( {} ),
+					},
+				},
+			},
+			paginate: {
+				iterator: jest.fn().mockReturnValue(
+					( async function* () {
+						yield { data: [] };
+					} )()
+				),
+			},
+		};
+
+		getMilestoneByTitle.mockResolvedValue( {
+			number: 235,
+			title: milestone,
+		} );
+		getIssuesByMilestone.mockResolvedValue( [ { number: 123 } ] );
+
+		await expect(
+			fetchAllPullRequests( octokit, {
+				owner: 'WordPress',
+				repo: 'gutenberg',
+				milestone,
+				unreleased: true,
+			} )
+		).rejects.toThrow(
+			'There are no unreleased pull requests associated with milestone "Gutenberg 23.5". Release coordinator: verify that every cherry-picked pull request is assigned to this milestone before rerunning the release.'
+		);
+	} );
+} );
 
 describe( 'getNormalizedTitle', () => {
 	const DEFAULT_ISSUE = {

@@ -209,14 +209,14 @@ When a widget type declares `help`, the tile chrome surfaces its `content` and o
 
 ### Attribute editing
 
-Hosts build settings UI from the declarative `attributes` schema. This host splits editing across two surfaces:
+A widget declares importance per attribute through `relevance` (`'high' | 'low'`, absent means `'low'`). The declaration states importance, not placement; this host maps it to two surfaces:
 
-- **Prominent surface**: fields marked `relevance: 'high'` render inline in the tile chrome, for quick in-context edits.
-- **Settings surface**: the full schema is available through a dedicated settings UI. When some attributes are not promoted to the prominent surface, a settings entry point exposes the rest; fields already promoted may still appear there.
+-   **Prominent surface**: `relevance: 'high'` fields render as bare inline controls in the tile header, for in-context edits.
+-   **Settings surface**: the full schema, opened from the settings trigger. The trigger shows only when some attribute is not promoted; otherwise it would repeat the prominent surface.
 
-When every attribute is `'high'`, no separate settings entry point is shown. A second surface would only repeat what the prominent surface already exposes.
+The prominent surface holds only while it fits. The header measures the space it can grant its toolbar; when the promoted fields' natural width exceeds it, they collapse into a dropdown holding them as a form. The settings trigger is not part of the collapse: it stays in the toolbar whenever non-promoted attributes exist. The presentation follows the measurement both ways: widen the tile and the fields return inline.
 
-Edits on either surface stage through the engine's internal layer and reach `onLayoutChange` on commit.
+Edits on any surface stage through the engine's internal layer and reach `onLayoutChange` on commit. Prominent-surface and dropdown edits publish on a shared auto-save debounce; the settings surface publishes on Save.
 
 ## Authoring widgets
 

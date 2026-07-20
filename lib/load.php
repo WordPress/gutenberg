@@ -77,6 +77,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/collaboration.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-bindings.php';
+	require __DIR__ . '/compat/wordpress-7.1/query-block.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
 
 	// Plugin specific code.
@@ -121,6 +122,7 @@ if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 
 // WordPress 7.1 compat.
 require __DIR__ . '/compat/wordpress-7.1/admin-bar.php';
+require __DIR__ . '/compat/wordpress-7.1/blocks.php';
 require __DIR__ . '/compat/wordpress-7.1/kses.php';
 require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/preload.php';

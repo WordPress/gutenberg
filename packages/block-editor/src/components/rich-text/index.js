@@ -11,6 +11,7 @@ import {
 	useRef,
 	useState,
 	useCallback,
+	useEffect,
 	useMemo,
 	forwardRef,
 	useContext,
@@ -38,6 +39,7 @@ import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
+import { useHasEditableRoot } from '../writing-flow/use-editable-root';
 import { unlock } from '../../lock-unlock';
 
 // `RichTextShortcut` and `RichTextInputEvent` now live in
@@ -241,6 +243,13 @@ export function RichTextWrapper(
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;
 
+	const hasEditableRoot = useHasEditableRoot();
+	const hasDefaultEditingMode = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockEditingMode( clientId ) ===
+			'default',
+		[ clientId ]
+	);
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
@@ -344,6 +353,55 @@ export function RichTextWrapper(
 		onChange,
 	} );
 
+	// While a focused editing host owns the selection (the block supports
+	// `editableRoot`), ARIA attributes describing the autocomplete state must
+	// be mirrored onto the host: assistive technology resolves them relative
+	// to the focused element.
+	const {
+		'aria-autocomplete': ariaAutocomplete,
+		'aria-owns': ariaOwns,
+		'aria-activedescendant': ariaActiveDescendant,
+	} = autocompleteProps;
+	useEffect( () => {
+		if ( ! hasEditableRoot || ! isSelected ) {
+			return;
+		}
+
+		const host = anchorRef.current?.parentElement?.closest(
+			'[contenteditable="true"]'
+		);
+
+		if ( ! host ) {
+			return;
+		}
+
+		const attributes = {
+			'aria-autocomplete': ariaAutocomplete,
+			'aria-owns': ariaOwns,
+			'aria-activedescendant': ariaActiveDescendant,
+		};
+
+		for ( const [ key, value_ ] of Object.entries( attributes ) ) {
+			if ( value_ === undefined ) {
+				host.removeAttribute( key );
+			} else {
+				host.setAttribute( key, value_ );
+			}
+		}
+
+		return () => {
+			for ( const key of Object.keys( attributes ) ) {
+				host.removeAttribute( key );
+			}
+		};
+	}, [
+		hasEditableRoot,
+		isSelected,
+		ariaAutocomplete,
+		ariaOwns,
+		ariaActiveDescendant,
+	] );
+
 	useMarkPersistent( { html: adjustedValue, value } );
 
 	const keyboardShortcuts = useRef( new Set() );
@@ -351,6 +409,24 @@ export function RichTextWrapper(
 
 	function onFocus() {
 		anchorRef.current?.focus();
+	}
+
+	// Setting tabIndex to 0 is unnecessary, the element is already focusable
+	// because it's contentEditable. This also fixes a Safari bug where it's
+	// not possible to Shift+Click multi select blocks when Shift Clicking
+	// into an element with tabIndex because Safari will focus the element.
+	// However, Safari will correctly ignore nested contentEditable elements.
+	// While the writing flow wrapper is contentEditable (the selected block
+	// supports `editableRoot`), nested editable elements are no longer
+	// focusable areas on their own, so an explicit tabIndex restores their
+	// focusability.
+	let tabIndex = props.tabIndex;
+	if ( ! shouldDisableEditing ) {
+		if ( hasEditableRoot && hasDefaultEditingMode && isBlockSelected ) {
+			tabIndex = props.tabIndex ?? 0;
+		} else if ( hasEditableRoot && props.tabIndex === 0 ) {
+			tabIndex = null;
+		}
 	}
 
 	const TagName = tagName;
@@ -436,17 +512,7 @@ export function RichTextWrapper(
 					props.className,
 					'rich-text'
 				) }
-				// Setting tabIndex to 0 is unnecessary, the element is already
-				// focusable because it's contentEditable. This also fixes a
-				// Safari bug where it's not possible to Shift+Click multi
-				// select blocks when Shift Clicking into an element with
-				// tabIndex because Safari will focus the element. However,
-				// Safari will correctly ignore nested contentEditable elements.
-				tabIndex={
-					props.tabIndex === 0 && ! shouldDisableEditing
-						? null
-						: props.tabIndex
-				}
+				tabIndex={ tabIndex }
 				data-wp-block-attribute-key={ identifier }
 			/>
 		</>
