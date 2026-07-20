@@ -14,6 +14,7 @@ import {
 	default as StylesTypographyPanel,
 	useHasTypographyPanel,
 } from '../components/global-styles/typography-panel';
+import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 
 import { LINE_HEIGHT_SUPPORT_KEY } from './line-height';
 import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
@@ -151,31 +152,41 @@ export function TypographyPanel( {
 	const selectedState = useBlockStyleState();
 	const isEnabled = useHasTypographyPanel( settings );
 
-	const { style, fontFamily, fontSize, fitText, textColor } = useSelect(
-		( select ) => {
-			// Early return to avoid subscription when disabled.
-			if ( ! isEnabled ) {
-				return {};
-			}
-			const {
-				style: _style,
-				fontFamily: _fontFamily,
-				fontSize: _fontSize,
-				fitText: _fitText,
-				textColor: _textColor,
-			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-			return {
-				style: _style,
-				fontFamily: _fontFamily,
-				fontSize: _fontSize,
-				fitText: _fitText,
-				textColor: _textColor,
-			};
-		},
-		[ clientId, isEnabled ]
-	);
+	const { style, fontFamily, fontSize, fitText, textColor, className } =
+		useSelect(
+			( select ) => {
+				// Early return to avoid subscription when disabled.
+				if ( ! isEnabled ) {
+					return {};
+				}
+				const {
+					style: _style,
+					fontFamily: _fontFamily,
+					fontSize: _fontSize,
+					fitText: _fitText,
+					textColor: _textColor,
+					className: _className,
+				} = select( blockEditorStore ).getBlockAttributes( clientId ) ||
+				{};
+				return {
+					style: _style,
+					fontFamily: _fontFamily,
+					fontSize: _fontSize,
+					fitText: _fitText,
+					textColor: _textColor,
+					className: _className,
+				};
+			},
+			[ clientId, isEnabled ]
+		);
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
+
+	const { value: inheritedValue } = useResolvedStyle(
+		name,
+		className,
+		selectedState
+	);
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
@@ -257,6 +268,7 @@ export function TypographyPanel( {
 			onChange={ onChange }
 			defaultControls={ defaultControls }
 			contrastWarning={ contrastWarning }
+			inheritedValue={ inheritedValue }
 		/>
 	);
 }
