@@ -118,7 +118,7 @@ test.describe( 'Block Notes', () => {
 		} );
 
 		const thread = page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'treeitem', { name: 'Note: Focus test note' } );
 		const replyTextbox = page.getByRole( 'textbox', { name: 'Reply to' } );
 
@@ -417,7 +417,7 @@ test.describe( 'Block Notes', () => {
 		await newNoteForm.click();
 
 		const existingThread = page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'tree' )
 			.getByRole( 'treeitem', { name: 'Note: First block comment' } );
 
@@ -1873,7 +1873,7 @@ test.describe( 'Block Notes', () => {
 
 			await page.keyboard.type( 'please review' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1883,7 +1883,7 @@ test.describe( 'Block Notes', () => {
 			 * server-side sanitization.
 			 */
 			const savedChip = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem' )
 				.locator( 'a.wp-note-mention' );
 			await expect( savedChip ).toHaveText( '@Mentionable Teammate' );
