@@ -212,14 +212,23 @@ class Gutenberg_View_Config_Data {
 	}
 
 	/**
-	 * Merges a partial configuration into the existing.
+	 * Merges a partial configuration into the existing one.
 	 *
-	 * Scalar values replace the current value,
-	 * associative arrays merge key by key,
-	 * and numerical indexed arrays merge by member identity.
-	 * Identity is determined by finding a key (`id`, `slug`, `field`) within the item.
-	 * A member with no identity is always appended to the end of the list.
-	 * A `null` value deletes the property it names.
+	 * Applies a patch of top-level keys and touches only the keys the patch
+	 * names: a key the patch omits keeps whatever it had, and a `null` value
+	 * drops the key it names (which resets it to its default). Each named key's
+	 * value is then merged into the current one by value shape:
+	 *
+	 * - a scalar replaces the current value;
+	 * - an associative array merges key by key, with a nested `null` deleting
+	 *   just the leaf it names;
+	 * - a list merges into the current list by member identity.
+	 *
+	 * Identity is the member's value cast to a string: a bare scalar is its own
+	 * identity, and a map is identified by the value of the first of the
+	 * well-known identity keys (`id`, `slug`, `field`) it carries. A member
+	 * whose identity matches one already present merges into it in place, keeping
+	 * its position; a member with no identity is appended to the end of the list.
 	 *
 	 * For example, given this patch:
 	 *
@@ -234,6 +243,9 @@ class Gutenberg_View_Config_Data {
 	 * - default_view will be updated so the search string is 'new search' and the newField is appended to the list of fields.
 	 * - default_layouts will be updated so that newField is appended to the badgeFields.
 	 * - view_list will be updated so that the view with slug 'table' has its title changed to 'New title'.
+	 *
+	 * A patch that declares an unsupported schema version is rejected and does
+	 * not change anything.
 	 *
 	 * @since 7.1.0
 	 *
