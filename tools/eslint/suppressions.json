@@ -804,11 +804,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/search-control/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/select-control/styles/select-control-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
