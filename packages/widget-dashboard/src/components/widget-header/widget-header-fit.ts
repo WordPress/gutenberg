@@ -76,13 +76,10 @@ export function useReserveHeaderSpace< T extends HTMLElement = HTMLElement >(
 }
 
 /**
- * Reserves a container's own horizontal frame from the header's fit budget.
+ * Reserves a container's own padding and border from the header's fit budget.
  *
- * The toolbar chip pads its controls on both sides, and gains a border while
- * customizing; neither is space the controls can use. The difference between
- * the two boxes the entry reports is exactly that, so the stylesheet stays the
- * only place the values live. Observing the border box is what makes a padding
- * change notify at all: it leaves the content box untouched.
+ * Observing the border box is what makes a padding change notify: it leaves
+ * the content box untouched.
  *
  * @param {string} id Stable identifier for the reserving container.
  */
