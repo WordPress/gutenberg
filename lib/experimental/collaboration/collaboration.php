@@ -580,8 +580,8 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 		. '<span class="join-action-text"><a href="%1$s" aria-label="%4$s">%5$s</a></span>',
 		esc_url( get_edit_post_link( $post->ID ) ),
 		/* translators: %s: Post title. */
-		esc_attr( sprintf( __( 'Edit &#8220;%s&#8221;' ), $title ) ),
-		__( 'Edit' ),
+		esc_attr( sprintf( __( 'Edit &#8220;%s&#8221;', 'default' ), $title ) ),
+		__( 'Edit', 'default' ),
 		/* translators: %s: Post title. */
 		esc_attr( sprintf( __( 'Join editing &#8220;%s&#8221;', 'gutenberg' ), $title ) ),
 		/* translators: Action link text for a singular post in the post list. Can be any type of post. */
