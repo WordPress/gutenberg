@@ -4,7 +4,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { reset as resetIcon } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
 import OverlayTemplatePartSelector from './overlay-template-part-selector';
@@ -13,6 +13,7 @@ import OverlayMenuPreviewButton from './overlay-menu-preview-button';
 import OverlayPreview from './overlay-preview';
 import {
 	hasCustomOverlayBreakpoint,
+	isValidOverlayBreakpoint,
 	normalizeOverlayBreakpoint,
 } from './utils';
 import {
@@ -59,16 +60,47 @@ export default function OverlayPanel( {
 	const [ isCreatingOverlay, setIsCreatingOverlay ] = useState( false );
 	const normalizedOverlayBreakpoint =
 		normalizeOverlayBreakpoint( overlayBreakpoint );
+	const [ overlayBreakpointInputValue, setOverlayBreakpointInputValue ] =
+		useState( normalizedOverlayBreakpoint );
 	const hasCustomOverlayBreakpointValue =
 		hasCustomOverlayBreakpoint( overlayBreakpoint );
 
+	useEffect( () => {
+		setOverlayBreakpointInputValue( normalizedOverlayBreakpoint );
+	}, [ normalizedOverlayBreakpoint ] );
+
 	const handleOverlayBreakpointChange = ( nextValue ) => {
-		setAttributes( {
-			overlayBreakpoint: normalizeOverlayBreakpoint( nextValue ),
-		} );
+		setOverlayBreakpointInputValue( nextValue );
+
+		if ( isValidOverlayBreakpoint( nextValue ) ) {
+			setAttributes( {
+				overlayBreakpoint: normalizeOverlayBreakpoint( nextValue ),
+			} );
+		}
+	};
+
+	const commitOverlayBreakpoint = () => {
+		const nextOverlayBreakpoint = normalizeOverlayBreakpoint(
+			overlayBreakpointInputValue
+		);
+
+		setOverlayBreakpointInputValue( nextOverlayBreakpoint );
+
+		if ( nextOverlayBreakpoint !== normalizedOverlayBreakpoint ) {
+			setAttributes( {
+				overlayBreakpoint: nextOverlayBreakpoint,
+			} );
+		}
+	};
+
+	const handleOverlayBreakpointKeyDown = ( event ) => {
+		if ( event.key === 'Enter' ) {
+			commitOverlayBreakpoint();
+		}
 	};
 
 	const handleOverlayBreakpointReset = () => {
+		setOverlayBreakpointInputValue( DEFAULT_OVERLAY_BREAKPOINT );
 		setAttributes( {
 			overlayBreakpoint: DEFAULT_OVERLAY_BREAKPOINT,
 		} );
@@ -91,10 +123,12 @@ export default function OverlayPanel( {
 							isResetValueOnUnitChange
 							label={ __( 'Overlay breakpoint' ) }
 							min={ 0 }
+							onBlur={ commitOverlayBreakpoint }
 							onChange={ handleOverlayBreakpointChange }
+							onKeyDown={ handleOverlayBreakpointKeyDown }
 							step="any"
 							units={ OVERLAY_BREAKPOINT_UNITS }
-							value={ normalizedOverlayBreakpoint }
+							value={ overlayBreakpointInputValue }
 						/>
 						{ hasCustomOverlayBreakpointValue && (
 							<Button
