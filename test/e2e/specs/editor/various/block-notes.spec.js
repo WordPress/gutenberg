@@ -2,6 +2,33 @@
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+/**
+ * Internal dependencies
+ */
+const {
+	setCollaboration,
+} = require( '../collaboration/fixtures/collaboration-utils' );
+
+// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
+// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
+// palette is changed without updating the e2e expectation.
+const AVATAR_BORDER_COLORS = [
+	'#6F42C1',
+	'#D94145',
+	'#FBBF24',
+	'#FF35EE',
+	'#879F11',
+	'#0F766E',
+	'#00CFFF',
+];
+
+function hexToRgb( hex ) {
+	return {
+		r: parseInt( hex.slice( 1, 3 ), 16 ),
+		g: parseInt( hex.slice( 3, 5 ), 16 ),
+		b: parseInt( hex.slice( 5, 7 ), 16 ),
+	};
+}
 
 test.use( {
 	blockNoteUtils: async ( { page, editor }, use ) => {
@@ -73,6 +100,104 @@ test.describe( 'Block Notes', () => {
 		await expect( thread ).toBeVisible();
 		// Should focus the newly added note thread.
 		await expect( thread ).toBeFocused();
+	} );
+
+	test( 'colors the avatar ring only for authors active in the document', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+		blockNoteUtils,
+	} ) => {
+		/*
+		 * The colored ring is a presence indicator driven by the RTC
+		 * awareness state. The current user is always active in the document
+		 * they have open, so their own note shows their identity color; a
+		 * note by an author with no session in the document keeps the
+		 * neutral $gray-300 (#ddd) fallback ring.
+		 */
+		/*
+		 * The ring is driven by the RTC awareness state, which only exists
+		 * while collaboration is enabled. Pin the setting explicitly: it is a
+		 * site-wide option that the collaboration suites toggle, so inheriting
+		 * whatever they left behind makes this test order-dependent. With
+		 * collaboration off there is no presence signal at all and every ring
+		 * is neutral, including your own.
+		 */
+		await setCollaboration( requestUtils, true );
+
+		await requestUtils.deleteAllUsers();
+		const absentAuthor = await requestUtils.createUser( {
+			username: 'absentnoteauthor',
+			email: 'absent-note-author@example.com',
+			password: 'password',
+			roles: [ 'editor' ],
+		} );
+
+		const post = await requestUtils.createPost( {
+			title: 'Presence ring test',
+			status: 'draft',
+			content:
+				'<!-- wp:paragraph --><p>Presence ring host</p><!-- /wp:paragraph -->' +
+				'<!-- wp:paragraph --><p>Absent author host</p><!-- /wp:paragraph -->',
+		} );
+		const absentNote = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/comments',
+			data: {
+				post: post.id,
+				type: 'note',
+				status: 'hold',
+				content: 'Absent author note',
+				author: absentAuthor.id,
+			},
+		} );
+
+		/*
+		 * Anchor the note to its block. The notes view lists only notes
+		 * reachable from a block's `metadata.noteId`; an unanchored note is
+		 * treated as an orphan and surfaces solely in the "All notes" drawer.
+		 */
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/posts/${ post.id }`,
+			data: {
+				content:
+					'<!-- wp:paragraph --><p>Presence ring host</p><!-- /wp:paragraph -->' +
+					`<!-- wp:paragraph {"metadata":{"noteId":[${ absentNote.id }]}} --><p>Absent author host</p><!-- /wp:paragraph -->`,
+			},
+		} );
+
+		await admin.editPost( post.id );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click();
+		await blockNoteUtils.addNote( 'Present author note' );
+
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		// The current user's note: identity color ring (they are present).
+		const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
+		const { r, g, b } = hexToRgb(
+			AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
+		);
+		await expect(
+			settings
+				.getByRole( 'treeitem', { name: 'Note: Present author note' } )
+				.locator( '.editor-collab-sidebar-panel__user-avatar' )
+				.first()
+		).toHaveCSS( 'border-top-color', `rgb(${ r }, ${ g }, ${ b })` );
+
+		// The absent author's note: neutral gray ring.
+		await expect(
+			settings
+				.getByRole( 'treeitem', { name: 'Note: Absent author note' } )
+				.locator( '.editor-collab-sidebar-panel__user-avatar' )
+				.first()
+		).toHaveCSS( 'border-top-color', 'rgb(221, 221, 221)' );
 	} );
 
 	test( 'can reply to a block note', async ( { page, blockNoteUtils } ) => {
@@ -1260,27 +1385,6 @@ test.describe( 'Block Notes', () => {
 	} );
 
 	test.describe( 'Inline notes', () => {
-		// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
-		// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
-		// palette is changed without updating the e2e expectation.
-		const AVATAR_BORDER_COLORS = [
-			'#6F42C1',
-			'#D94145',
-			'#FBBF24',
-			'#FF35EE',
-			'#879F11',
-			'#0F766E',
-			'#00CFFF',
-		];
-
-		function hexToRgb( hex ) {
-			return {
-				r: parseInt( hex.slice( 1, 3 ), 16 ),
-				g: parseInt( hex.slice( 3, 5 ), 16 ),
-				b: parseInt( hex.slice( 5, 7 ), 16 ),
-			};
-		}
-
 		test( 'highlights an inline marker with the author color at the rest opacity', async ( {
 			editor,
 			page,

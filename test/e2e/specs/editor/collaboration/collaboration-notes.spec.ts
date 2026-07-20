@@ -3,6 +3,27 @@
  */
 import { test, expect } from './fixtures';
 
+// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
+// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
+// palette is changed without updating the e2e expectation.
+const AVATAR_BORDER_COLORS = [
+	'#6F42C1',
+	'#D94145',
+	'#FBBF24',
+	'#FF35EE',
+	'#879F11',
+	'#0F766E',
+	'#00CFFF',
+];
+
+function hexToRgb( hex: string ) {
+	return {
+		r: parseInt( hex.slice( 1, 3 ), 16 ),
+		g: parseInt( hex.slice( 3, 5 ), 16 ),
+		b: parseInt( hex.slice( 5, 7 ), 16 ),
+	};
+}
+
 test.describe( 'Collaboration - Notes Sync', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllComments( 'note' );
@@ -70,6 +91,27 @@ test.describe( 'Collaboration - Notes Sync', () => {
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'treeitem', { name: 'Note: Hello from User A' } )
 		).toBeVisible( { timeout: 10000 } );
+
+		/*
+		 * The avatar ring is a presence indicator. User A holds a connected
+		 * RTC session, so on User B's screen the ring around A's note avatar
+		 * shows A's identity color rather than the neutral fallback.
+		 */
+		const userA = await requestUtils.rest< { id: number } >( {
+			path: '/wp/v2/users/me',
+		} );
+		const { r, g, b } = hexToRgb(
+			AVATAR_BORDER_COLORS[ userA.id % AVATAR_BORDER_COLORS.length ]
+		);
+		await expect(
+			page2
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Hello from User A' } )
+				.locator( '.editor-collab-sidebar-panel__user-avatar' )
+				.first()
+		).toHaveCSS( 'border-top-color', `rgb(${ r }, ${ g }, ${ b })`, {
+			timeout: 10000,
+		} );
 	} );
 
 	test( 'User B adds a note, User A sees it', async ( {
