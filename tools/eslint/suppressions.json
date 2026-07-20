@@ -711,11 +711,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/form-token-field/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/grid/hook.ts": {
 		"no-restricted-imports": {
 			"count": 1
