@@ -373,9 +373,17 @@ export default function useSelectionObserver() {
 					];
 					const depth = findDepth( startPath, endPath );
 
+					// One block is an ancestor of the other. Treat as a
+					// rich-text selection across the nesting boundary
+					// instead of promoting to a block-level multiSelect.
+					const isAncestorDescendant =
+						endPath.slice( 0, -1 ).includes( startClientId ) ||
+						startPath.slice( 0, -1 ).includes( endClientId );
+
 					if (
-						startPath[ depth ] !== startClientId ||
-						endPath[ depth ] !== endClientId
+						! isAncestorDescendant &&
+						( startPath[ depth ] !== startClientId ||
+							endPath[ depth ] !== endClientId )
 					) {
 						multiSelect( startPath[ depth ], endPath[ depth ] );
 						return;
