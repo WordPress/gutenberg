@@ -362,13 +362,12 @@ export default function useSelectionObserver() {
 					];
 					const depth = findDepth( startPath, endPath );
 
-					// When one block is an ancestor of the other, the
-					// divergence depth runs past the end of the shorter
-					// path, so there is no sibling pair to promote to.
-					// Record the selection as a rich-text selection across
-					// the nesting boundary so the gesture can continue;
-					// the input handler falls back to selecting the
-					// ancestor fully when a key acts on it.
+					// If one path ends before they diverge, one block
+					// contains the other, so there are no sibling blocks
+					// to promote the selection to. Record the selection as
+					// is: it resolves to the outer block, which is treated
+					// as fully selected. See `getSelectionNestingAncestor`
+					// in the store.
 					const isAncestorDescendant =
 						depth >= startPath.length || depth >= endPath.length;
 

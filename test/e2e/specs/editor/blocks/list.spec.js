@@ -1931,6 +1931,68 @@ test.describe( 'List (@firefox)', () => {
 		] );
 	} );
 
+	test( 'should select the outer item fully when dragging a selection across the nesting boundary', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* ab' );
+		await page.keyboard.press( 'Enter' );
+		// Leading space at the start of an empty item triggers indent.
+		await page.keyboard.type( ' cd' );
+		// Enter on an empty nested item outdents back to the top level.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'zz' );
+
+		// Drag from the middle of "ab" to the middle of "cd".
+		const outer = await editor.canvas
+			.getByText( 'ab', { exact: true } )
+			.boundingBox();
+		const nested = await editor.canvas
+			.getByText( 'cd', { exact: true } )
+			.boundingBox();
+		await page.mouse.move(
+			outer.x + outer.width / 2,
+			outer.y + outer.height / 2
+		);
+		await page.mouse.down();
+		await page.mouse.move(
+			nested.x + nested.width / 2,
+			nested.y + nested.height / 2,
+			{ steps: 10 }
+		);
+		await page.mouse.up();
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		// The outer "ab" item is presented as fully selected, like a
+		// block multi-selection.
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 1 );
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveText( 'abcd' );
+
+		// The press removes the fully selected item as a whole, together
+		// with its nested list; the unrelated sibling remains.
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+						innerBlocks: [],
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'should multi-select the top level items when extending a selection from a nested item to the previous top level item', async ( {
 		editor,
 		page,
