@@ -35,7 +35,6 @@ export default function useInput() {
 		getSelectionStart,
 		getSelectionEnd,
 		getBlockAttributes,
-		getBlockParents,
 	} = useSelect( blockEditorStore );
 	const {
 		replaceBlocks,
@@ -166,31 +165,7 @@ export default function useInput() {
 				} else if ( __unstableIsSelectionMergeable() ) {
 					__unstableDeleteSelection( event.keyCode === DELETE );
 				} else {
-					// A selection with one endpoint nested inside the
-					// other has no sibling range to expand to. The
-					// ancestor end is already presented as fully
-					// selected, so remove it.
-					const anchorClientId = getSelectionStart().clientId;
-					const focusClientId = getSelectionEnd().clientId;
-					let ancestorClientId;
-					if (
-						getBlockParents( focusClientId ).includes(
-							anchorClientId
-						)
-					) {
-						ancestorClientId = anchorClientId;
-					} else if (
-						getBlockParents( anchorClientId ).includes(
-							focusClientId
-						)
-					) {
-						ancestorClientId = focusClientId;
-					}
-					if ( ancestorClientId ) {
-						removeBlocks( [ ancestorClientId ] );
-					} else {
-						__unstableExpandSelection();
-					}
+					__unstableExpandSelection();
 				}
 			} else if (
 				// If key.length is longer than 1, it's a control key that doesn't

@@ -563,9 +563,6 @@ function BlockListBlockProvider( props ) {
 		( select ) => {
 			const {
 				isBlockSelected,
-				getSelectionStart,
-				getSelectionEnd,
-				getBlockParents,
 				getBlockMode,
 				isSelectionEnabled,
 				getTemplateLock,
@@ -663,17 +660,6 @@ function BlockListBlockProvider( props ) {
 			const _isSelected = isBlockSelected( clientId );
 			const canRemove = canRemoveBlock( clientId );
 			const canMove = canMoveBlock( clientId );
-			const selectionStartClientId = getSelectionStart().clientId;
-			const selectionEndClientId = getSelectionEnd().clientId;
-			const isSelectionAncestor =
-				selectionStartClientId !== selectionEndClientId &&
-				( clientId === selectionStartClientId ||
-					clientId === selectionEndClientId ) &&
-				getBlockParents(
-					clientId === selectionStartClientId
-						? selectionEndClientId
-						: selectionStartClientId
-				).includes( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
 			const checkDeep = true;
 			const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
@@ -737,12 +723,8 @@ function BlockListBlockProvider( props ) {
 					: undefined,
 				isHighlighted: isBlockHighlighted( clientId ),
 				isMultiSelected,
-				// A text selection that crosses into a nested block has no
-				// mergeable range, so the ancestor end is presented as
-				// fully selected rather than partially.
 				isPartiallySelected:
 					isMultiSelected &&
-					! isSelectionAncestor &&
 					! __unstableIsFullySelected() &&
 					! __unstableSelectionHasUnmergeableBlock(),
 				isDragging: isBlockBeingDragged( clientId ),

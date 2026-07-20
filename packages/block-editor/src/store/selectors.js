@@ -796,6 +796,30 @@ export function getSelectedBlocksInitialCaretPosition( state ) {
  *
  * @return {Array} Multi-selected block client IDs.
  */
+/**
+ * Returns the ancestor client ID when one selection endpoint is nested
+ * inside the other, or undefined for any other selection shape. Such a
+ * selection has no sibling range; the ancestor contains all of it.
+ *
+ * @param {Object} state Editor state.
+ * @return {?string} The ancestor client ID, if any.
+ */
+function getSelectionNestingAncestor( state ) {
+	const { selectionStart, selectionEnd } = state.selection;
+	const startClientId = selectionStart.clientId;
+	const endClientId = selectionEnd.clientId;
+	if ( ! startClientId || ! endClientId || startClientId === endClientId ) {
+		return undefined;
+	}
+	if ( getBlockParents( state, endClientId ).includes( startClientId ) ) {
+		return startClientId;
+	}
+	if ( getBlockParents( state, startClientId ).includes( endClientId ) ) {
+		return endClientId;
+	}
+	return undefined;
+}
+
 export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
 		const { selectionStart, selectionEnd } = state.selection;
@@ -808,21 +832,9 @@ export const getSelectedBlockClientIds = createSelector(
 			return [ selectionStart.clientId ];
 		}
 
-		// When one endpoint is nested inside the other, the ancestor
-		// contains the whole selection.
-		if (
-			getBlockParents( state, selectionEnd.clientId ).includes(
-				selectionStart.clientId
-			)
-		) {
-			return [ selectionStart.clientId ];
-		}
-		if (
-			getBlockParents( state, selectionStart.clientId ).includes(
-				selectionEnd.clientId
-			)
-		) {
-			return [ selectionEnd.clientId ];
+		const nestingAncestorClientId = getSelectionNestingAncestor( state );
+		if ( nestingAncestorClientId ) {
+			return [ nestingAncestorClientId ];
 		}
 
 		// Retrieve root client ID to aid in retrieving relevant nested block
@@ -1032,6 +1044,12 @@ export function getMultiSelectedBlocksEndClientId( state ) {
  * @return {boolean} Whether the selection is mergeable.
  */
 export function __unstableIsFullySelected( state ) {
+	// A text selection with one endpoint nested inside the other has no
+	// sibling range; it resolves to the ancestor, which is presented and
+	// treated as fully selected.
+	if ( getSelectionNestingAncestor( state ) ) {
+		return true;
+	}
 	const selectionAnchor = getSelectionStart( state );
 	const selectionFocus = getSelectionEnd( state );
 	return (
