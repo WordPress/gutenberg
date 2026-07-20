@@ -21,12 +21,11 @@ import { closeSmall } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { InputWrapperFlex } from './styles';
 import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
 import BaseControl from '../base-control';
 import Button from '../button';
-import { FlexBlock } from '../flex';
+import { Flex, FlexBlock } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
 import { useControlledValue } from '../utils/hooks';
 import { normalizeTextString } from '../utils/strings';
@@ -34,6 +33,7 @@ import type { ComboboxControlOption, ComboboxControlProps } from './types';
 import type { TokenInputProps } from '../form-token-field/types';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import Spinner from '../spinner';
+import styles from './style.module.scss';
 
 const noop = () => {};
 
@@ -329,7 +329,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 					tabIndex={ -1 }
 					onKeyDown={ onKeyDown }
 				>
-					<InputWrapperFlex>
+					<Flex className={ styles[ 'input-wrapper' ] }>
 						<FlexBlock>
 							<TokenInput
 								className="components-combobox-control__input"
@@ -364,7 +364,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								label={ __( 'Reset' ) }
 							/>
 						) }
-					</InputWrapperFlex>
+					</Flex>
 					{ isExpanded && ! isLoading && (
 						<SuggestionsList
 							instanceId={ instanceId }
