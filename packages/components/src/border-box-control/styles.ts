@@ -13,9 +13,13 @@ import type { Borders } from './types';
 
 export const borderBoxControl = css``;
 
+// '&&' outranks BorderControl's base 'margin: 0' to keep the 24px unlink
+// button gutter, which View no longer preserves via className (#79443).
 export const linkedBorderControl = () => css`
-	flex: 1;
-	${ rtl( { marginRight: '24px' } )() }
+	&& {
+		flex: 1;
+		${ rtl( { marginRight: '24px' } )() }
+	}
 `;
 
 export const wrapper = css`

@@ -10,7 +10,11 @@ import {
 /**
  * Internal dependencies
  */
-import { getValidTextAlignments, addAssignedTextAlign } from '../text-align';
+import {
+	getValidTextAlignments,
+	addAssignedTextAlign,
+	getTextAlignControlGroup,
+} from '../text-align';
 
 const noop = () => {};
 
@@ -59,6 +63,35 @@ describe( 'textAlign', () => {
 			expect(
 				getValidTextAlignments( [ 'left', 'right', 'justify' ] )
 			).toEqual( [ 'left', 'right' ] );
+		} );
+	} );
+
+	describe( 'getTextAlignControlGroup()', () => {
+		it( 'uses the regular block slot by default', () => {
+			expect(
+				getTextAlignControlGroup( false, {
+					viewport: 'default',
+					pseudo: 'default',
+				} )
+			).toBe( 'block' );
+		} );
+
+		it( 'uses the regular block slot when responsive editing has no viewport state', () => {
+			expect(
+				getTextAlignControlGroup( true, {
+					viewport: 'default',
+					pseudo: 'default',
+				} )
+			).toBe( 'block' );
+		} );
+
+		it( 'uses the style-state slot when responsive editing has a viewport state', () => {
+			expect(
+				getTextAlignControlGroup( true, {
+					viewport: '@mobile',
+					pseudo: 'default',
+				} )
+			).toBe( 'style-state' );
 		} );
 	} );
 

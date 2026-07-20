@@ -45,7 +45,7 @@ const meta: Meta< typeof VStack > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use `Stack` from `@wordpress/ui` instead.',
+			notes: 'Use [`Stack`](?path=/docs/design-system-components-stack--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };

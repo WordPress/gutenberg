@@ -71,7 +71,6 @@ export default function EditorInterface( {
 	children,
 	forceIsDirty,
 	contentRef,
-	disableIframe,
 	autoFocus,
 	customSaveButton,
 	customSavePanel,
@@ -233,7 +232,6 @@ export default function EditorInterface( {
 							{ ( isPreviewMode || mode === 'visual' ) && (
 								<VisualEditor
 									contentRef={ contentRef }
-									disableIframe={ disableIframe }
 									// We should auto-focus the canvas (title) on load.
 									// eslint-disable-next-line jsx-a11y/no-autofocus
 									autoFocus={ autoFocus }

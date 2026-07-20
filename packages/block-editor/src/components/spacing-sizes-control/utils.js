@@ -126,7 +126,7 @@ export function getPresetValueFromCustomValue( value, spacingSizes ) {
  * @return {string | undefined} CSS var string for given spacing preset value.
  */
 export function getSpacingPresetCssVar( value ) {
-	if ( ! value ) {
+	if ( ! value || typeof value !== 'string' ) {
 		return;
 	}
 

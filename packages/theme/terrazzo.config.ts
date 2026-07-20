@@ -14,11 +14,10 @@ const config: Config = {
 		'./tokens/color.json',
 		'./tokens/cursor.json',
 		'./tokens/dimension.json',
-		'./tokens/elevation.json',
 		'./tokens/motion.json',
 		'./tokens/typography.json',
 	],
-	outDir: './src/prebuilt',
+	outDir: '.',
 
 	// Preserve source ordering of tokens in output. This is important because
 	// many of our tokens operate on a size scale (2xs → 2xl) and it's more easy
@@ -28,7 +27,7 @@ const config: Config = {
 	plugins: [
 		inlineAliasValues( {
 			pattern: /^wpds-color\.primitive\./,
-			filename: 'ts/color-tokens.ts',
+			filename: 'src/prebuilt/ts/color-tokens.ts',
 			tokenId: ( tokenId ) =>
 				tokenId
 					.replace( /\.primitive/, '' )
@@ -37,30 +36,8 @@ const config: Config = {
 		} ),
 		inlineAliasValues( { pattern: /^wpds-dimension\.primitive\./ } ),
 		pluginCSS( {
-			filename: 'css/design-tokens.css',
+			filename: 'prebuilt/css/design-tokens.css',
 			variableName: ( token ) => makeCSSVar( token.id ),
-			transform( token ) {
-				// This addresses a specific browser issue where Chrome renders
-				// a font-weight of 500 as 600 instead of 400 when the target
-				// weight is not locally available, which is inconsistent with
-				// the spec-defined behavior. This workaround ensures that a 400
-				// weight is used if the 500 weight is not locally available,
-				// while still using the 500 weight if it _is_ available. This
-				// is applied at the plugin layer to ensure the original token
-				// value can be preserved at the intended 500 weight, where the
-				// bug only occurs in specific browser rendering.
-				//
-				// See: https://issues.chromium.org/issues/40552893
-				// See: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/font-weight#fallback_weights
-				if (
-					token.id.startsWith( 'wpds-typography.font-weight.' ) &&
-					token.$value === 500
-				) {
-					return '499';
-				}
-
-				return undefined;
-			},
 			baseSelector: ':root',
 			modeSelectors: [
 				{
@@ -110,20 +87,20 @@ const config: Config = {
 			legacyHex: true,
 		} ),
 		pluginKnownWpdsCssVariables( {
-			filename: 'js/design-tokens.mjs',
+			filename: 'prebuilt/js/design-tokens.mjs',
 		} ),
 		pluginDsTokenFallbacks( {
-			filename: 'js/design-token-fallbacks.mjs',
+			filename: 'prebuilt/js/design-token-fallbacks.mjs',
 			scssFilename: false,
 			additionalScssFilenames: [
-				'../../../base-styles/internal/_wpds-token-fallbacks.scss',
+				'../base-styles/internal/_wpds-token-fallbacks.scss',
 			],
 		} ),
 		pluginDsTokenDocs( {
-			filename: '../../docs/tokens.md',
+			filename: 'docs/tokens.md',
 		} ),
 		typescriptTypes( {
-			filename: 'ts/token-types.ts',
+			filename: 'src/prebuilt/ts/token-types.ts',
 			types: [
 				{
 					name: 'PaddingSize',

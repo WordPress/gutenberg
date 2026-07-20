@@ -23,6 +23,11 @@ import clsx from 'clsx';
 import { Tooltip } from '@wordpress/ui';
 
 /**
+ * Internal dependencies
+ */
+import { InheritanceResetButton } from './inheritance';
+
+/**
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation.
  *
@@ -119,7 +124,15 @@ export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 	);
 }
 
-export function ShadowPopover( { shadow, onShadowChange, settings } ) {
+export function ShadowPopover( {
+	shadow,
+	onShadowChange,
+	settings,
+	className,
+	hasLocalValue = !! shadow,
+	hasLocalOverride = false,
+	onReset,
+} ) {
 	const popoverProps = {
 		placement: 'left-start',
 		offset: 36,
@@ -129,8 +142,15 @@ export function ShadowPopover( { shadow, onShadowChange, settings } ) {
 	return (
 		<Dropdown
 			popoverProps={ popoverProps }
-			className="block-editor-global-styles__shadow-dropdown"
-			renderToggle={ renderShadowToggle( shadow, onShadowChange ) }
+			className={ clsx(
+				'block-editor-global-styles__shadow-dropdown',
+				className
+			) }
+			renderToggle={ renderShadowToggle( shadow, onShadowChange, {
+				hasLocalValue,
+				hasLocalOverride,
+				onReset: onReset ?? ( () => onShadowChange( undefined ) ),
+			} ) }
 			renderContent={ () => (
 				<DropdownContentWrapper paddingSize="medium">
 					<ShadowPopoverContainer
@@ -144,7 +164,8 @@ export function ShadowPopover( { shadow, onShadowChange, settings } ) {
 	);
 }
 
-function renderShadowToggle( shadow, onShadowChange ) {
+function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
+	const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
 	return function ShadowToggle( { onToggle, isOpen } ) {
 		const shadowButtonRef = useRef( undefined );
 
@@ -158,20 +179,13 @@ function renderShadowToggle( shadow, onShadowChange ) {
 			ref: shadowButtonRef,
 		};
 
-		const removeButtonProps = {
-			onClick: () => {
-				if ( isOpen ) {
-					onToggle();
-				}
-				onShadowChange( undefined );
-				// Return focus to parent button.
-				shadowButtonRef.current?.focus();
-			},
-			className: clsx(
-				'block-editor-global-styles__shadow-editor__remove-button',
-				{ 'is-open': isOpen }
-			),
-			label: __( 'Remove' ),
+		const handleReset = () => {
+			if ( isOpen ) {
+				onToggle();
+			}
+			onReset();
+			// Return focus to parent button.
+			shadowButtonRef.current?.focus();
 		};
 
 		return (
@@ -186,14 +200,22 @@ function renderShadowToggle( shadow, onShadowChange ) {
 						<FlexItem>{ __( 'Drop shadow' ) }</FlexItem>
 					</HStack>
 				</Button>
-				{ !! shadow && (
-					<Button
-						__next40pxDefaultSize
-						size="small"
-						icon={ reset }
-						{ ...removeButtonProps }
-					/>
-				) }
+				{ hasLocalValue &&
+					( hasLocalOverride ? (
+						<InheritanceResetButton
+							className="block-editor-global-styles__shadow-editor__remove-button"
+							onResetToInherited={ handleReset }
+						/>
+					) : (
+						<Button
+							__next40pxDefaultSize
+							size="small"
+							icon={ reset }
+							label={ __( 'Remove' ) }
+							className="block-editor-global-styles__shadow-editor__remove-button"
+							onClick={ handleReset }
+						/>
+					) ) }
 			</>
 		);
 	};
