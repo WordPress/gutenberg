@@ -180,6 +180,8 @@ function LinkControl( {
 	hasRichPreviews = false,
 	hasTextControl = false,
 	renderControlBottom = null,
+	tabs = [],
+	showTabs,
 	handleEntities = false,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
@@ -700,6 +702,9 @@ function LinkControl( {
 							hideLabelFromVision={ ! showTextControl }
 							isEntity={ isEntity }
 							customValidity={ customValidity }
+							tabs={ tabs }
+							showTabs={ showTabs }
+							tabClassName="block-editor-tab-control__field"
 							suffix={
 								<SearchSuffixControl
 									isEntity={ isEntity }

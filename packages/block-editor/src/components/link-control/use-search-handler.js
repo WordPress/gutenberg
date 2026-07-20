@@ -107,12 +107,16 @@ export default function useSearchHandler(
 		: handleNoop;
 
 	return useCallback(
-		( val, { isInitialSuggestions } ) => {
+		( val, { isInitialSuggestions, type = 'post' } ) => {
 			return isURLLike( val )
 				? directEntryHandler( val, { isInitialSuggestions } )
 				: handleEntitySearch(
 						val,
-						{ ...suggestionsQuery, isInitialSuggestions },
+						{
+							...suggestionsQuery,
+							isInitialSuggestions,
+							type,
+						},
 						fetchSearchSuggestions,
 						withCreateSuggestion,
 						pageOnFront,

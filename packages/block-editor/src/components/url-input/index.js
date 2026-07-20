@@ -14,6 +14,7 @@ import {
 	Button,
 	__experimentalInputControl as InputControl,
 	Spinner,
+	TabPanel,
 	withSpokenMessages,
 	Popover,
 	privateApis as componentsPrivateApis,
@@ -74,11 +75,12 @@ class URLInput extends Component {
 			selectedSuggestion: null,
 			suggestionsListboxId: '',
 			suggestionOptionIdPrefix: '',
+			selectedTab: 'post',
 		};
 	}
 
-	componentDidUpdate( prevProps ) {
-		const { showSuggestions, selectedSuggestion } = this.state;
+	componentDidUpdate( prevProps, prevState ) {
+		const { showSuggestions, selectedSuggestion, selectedTab } = this.state;
 		const { value, __experimentalShowInitialSuggestions = false } =
 			this.props;
 
@@ -96,11 +98,15 @@ class URLInput extends Component {
 			} );
 		}
 
+		if ( prevState.selectedTab !== selectedTab ) {
+			this.updateSuggestions( value, selectedTab );
+		}
+
 		// Update suggestions when the value changes.
 		if ( prevProps.value !== value && ! this.props.disableSuggestions ) {
 			if ( value?.length ) {
 				// If the new value is not empty we need to update with suggestions for it.
-				this.updateSuggestions( value );
+				this.updateSuggestions( value, selectedTab );
 			} else if ( __experimentalShowInitialSuggestions ) {
 				// If the new value is empty and we can show initial suggestions, then show initial suggestions.
 				this.updateSuggestions();
@@ -133,10 +139,11 @@ class URLInput extends Component {
 		);
 	}
 
-	updateSuggestions( value = '' ) {
+	updateSuggestions( value = '', selectedTab = null ) {
 		const {
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 			__experimentalHandleURLSuggestions: handleURLSuggestions,
+			showTabs,
 		} = this.props;
 
 		if ( ! fetchLinkSuggestions ) {
@@ -180,6 +187,7 @@ class URLInput extends Component {
 
 		const request = fetchLinkSuggestions( value, {
 			isInitialSuggestions,
+			...( showTabs && selectedTab ? { type: selectedTab } : {} ),
 		} );
 
 		request
@@ -414,8 +422,35 @@ class URLInput extends Component {
 		return (
 			<>
 				{ this.renderControl() }
+				{ this.renderTabPanel() }
 				{ this.renderSuggestions() }
 			</>
+		);
+	}
+
+	renderTabPanel() {
+		const { tabClassName, tabs = [], showTabs = false } = this.props;
+
+		if ( ! showTabs ) {
+			return null;
+		}
+
+		return (
+			<TabPanel
+				className={ tabClassName }
+				tabs={ tabs }
+				onSelect={ ( tabName ) => {
+					this.setState( {
+						selectedTab: tabName,
+					} );
+
+					if ( this.props.onTabSelect ) {
+						this.props.onTabSelect( tabName );
+					}
+				} }
+			>
+				{ () => null }
+			</TabPanel>
 		);
 	}
 

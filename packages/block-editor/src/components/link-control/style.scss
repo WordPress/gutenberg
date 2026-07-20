@@ -81,7 +81,7 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 .block-editor-link-control__field {
-	margin: $grid-unit-20; // allow margin collapse for vertical spacing.
+	margin: $grid-unit-20 $grid-unit-20 0 $grid-unit-20; // allow margin collapse for vertical spacing.
 
 	.components-base-control__label {
 		color: $gray-900;
@@ -133,6 +133,10 @@ $block-editor-link-control-number-of-actions: 1;
 	&.is-loading {
 		opacity: 0.2;
 	}
+}
+
+.block-editor-tab-control__field {
+	margin: 0 $grid-unit-20 $grid-unit-20 $grid-unit-20;
 }
 
 .block-editor-link-control__search-item {
