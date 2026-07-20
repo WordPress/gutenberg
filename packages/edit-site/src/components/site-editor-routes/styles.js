@@ -16,7 +16,7 @@ import SidebarGlobalStyles from '../sidebar-global-styles';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { StyleBookPreview, useGlobalStyles } = unlock( editorPrivateApis );
 
-function StylebookPreviewArea( { siteData } ) {
+function StyleBookPreviewArea( { siteData } ) {
 	const { path, query } = useLocation();
 	const history = useHistory();
 	const { user: userConfig } = useGlobalStyles();
@@ -46,7 +46,7 @@ function StylesPreviewArea( { siteData } ) {
 	const { query } = useLocation();
 
 	if ( query.preview === 'stylebook' ) {
-		return <StylebookPreviewArea siteData={ siteData } />;
+		return <StyleBookPreviewArea siteData={ siteData } />;
 	}
 
 	return <Editor />;
