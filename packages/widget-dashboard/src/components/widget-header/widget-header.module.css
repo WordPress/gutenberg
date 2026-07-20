@@ -13,13 +13,19 @@
 }
 
 /*
- * The identity may shrink below its natural width, but never below this
- * floor: the icon plus a usable slice of title. The header measures the
- * identity's actual width, which bottoms out here, and the toolbar's fit
- * logic collapses the inline controls before they would push it past.
+ * The identity yields its width to the toolbar down to this floor: the icon,
+ * a truncated slice of title, and the help.
  */
 .identity {
 	min-inline-size: 120px;
+}
+
+/* The row is one line tall, so the title truncates instead of wrapping. */
+.title {
+	min-inline-size: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 .icon {

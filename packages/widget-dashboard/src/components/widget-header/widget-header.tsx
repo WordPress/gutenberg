@@ -159,7 +159,11 @@ export function WidgetHeader( {
 						</span>
 					) }
 
-					<Card.Title id={ titleId } render={ <h2 /> }>
+					<Card.Title
+						id={ titleId }
+						render={ <h2 /> }
+						className={ styles.title }
+					>
 						{ widgetType.title }
 					</Card.Title>
 
