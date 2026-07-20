@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { CSSProperties } from 'react';
 import { useRef, useState } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import * as Autocomplete from '../index';
@@ -8,9 +9,11 @@ import { InputLayout } from '../../input-layout';
 import { Textarea } from '../../textarea';
 import {
 	COMMANDS,
+	EMOJI_GROUPS,
 	GROUPED_COMMANDS,
 	URLS,
 	USERS,
+	type EmojiGroup,
 	type FixtureGroup,
 	type FixtureItem,
 } from './fixtures';
@@ -30,6 +33,7 @@ const meta: Meta< typeof Autocomplete.Root > = {
 		'Autocomplete.Group': Autocomplete.Group,
 		'Autocomplete.GroupLabel': Autocomplete.GroupLabel,
 		'Autocomplete.Item': Autocomplete.Item,
+		'Autocomplete.Row': Autocomplete.Row,
 		'Autocomplete.Value': Autocomplete.Value,
 		'Autocomplete.Empty': Autocomplete.Empty,
 		'Autocomplete.Clear': Autocomplete.Clear,
@@ -497,5 +501,95 @@ export const Grouped: Story = {
 				</Autocomplete.List>
 			</Autocomplete.Popup>,
 		],
+	},
+};
+
+const EMOJI_COLUMNS = 8;
+const EMOJI_TILE_SIZE = 'var(--wpds-dimension-size-lg)';
+
+const emojiPickerRowStyle: CSSProperties = {
+	display: 'grid',
+	gridTemplateColumns: `repeat(${ EMOJI_COLUMNS }, ${ EMOJI_TILE_SIZE })`,
+	gap: 'var(--wpds-dimension-gap-xs)',
+	width: 'fit-content',
+};
+
+const emojiPickerCellStyle: CSSProperties = {
+	display: 'flex',
+	alignItems: 'center',
+	justifyContent: 'center',
+	width: EMOJI_TILE_SIZE,
+	aspectRatio: '1 / 1',
+	marginInline: 0,
+	padding: 'var(--wpds-dimension-padding-xs)',
+	fontSize: 'var(--wpds-typography-font-size-xl)',
+};
+
+function chunkItems< T >( items: T[], size: number ): T[][] {
+	const rows: T[][] = [];
+
+	for ( let index = 0; index < items.length; index += size ) {
+		rows.push( items.slice( index, index + size ) );
+	}
+
+	return rows;
+}
+
+/**
+ * `Autocomplete.Row` groups multiple `Autocomplete.Item` cells in grid mode.
+ * This example arranges emoji suggestions in a searchable grid.
+ */
+export const Grid: Story = {
+	args: {
+		items: EMOJI_GROUPS,
+		inline: true,
+		open: true,
+		grid: true,
+	},
+	render: function Template( args ) {
+		return (
+			<Autocomplete.Root { ...args }>
+				<Autocomplete.Input placeholder="Search emojis" />
+				<div
+					style={ {
+						marginTop: 'var(--wpds-dimension-gap-sm)',
+					} }
+				>
+					<Autocomplete.Empty>No matching emojis.</Autocomplete.Empty>
+					<Autocomplete.List>
+						{ ( group: EmojiGroup ) => (
+							<Autocomplete.Group
+								key={ group.value }
+								items={ group.items }
+							>
+								{ chunkItems( group.items, EMOJI_COLUMNS ).map(
+									( row, rowIndex ) => (
+										<Autocomplete.Row
+											key={ rowIndex }
+											style={ emojiPickerRowStyle }
+										>
+											{ row.map( ( emoji ) => (
+												<Autocomplete.Item
+													key={ emoji.value }
+													value={ emoji }
+													aria-label={ emoji.label }
+													style={
+														emojiPickerCellStyle
+													}
+												>
+													<span aria-hidden="true">
+														{ emoji.emoji }
+													</span>
+												</Autocomplete.Item>
+											) ) }
+										</Autocomplete.Row>
+									)
+								) }
+							</Autocomplete.Group>
+						) }
+					</Autocomplete.List>
+				</div>
+			</Autocomplete.Root>
+		);
 	},
 };
