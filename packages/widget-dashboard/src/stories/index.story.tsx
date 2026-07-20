@@ -363,6 +363,61 @@ function DefaultStory() {
 	);
 }
 
+// The snapshot type under a title no tile fits comfortably, so the identity's
+// truncation shows at the widths the grid offers.
+const longTitleWidgetType: WidgetType = {
+	...trafficSnapshotWidgetType,
+	name: 'demo/long-title',
+	title: 'Traffic Snapshot Against the Quarterly Revenue Target',
+};
+
+const LONG_TITLE_LAYOUT: DashboardWidget[] = [
+	{
+		uuid: 'long-title-wide',
+		type: 'demo/long-title',
+		attributes: { metric: 'views', period: 'week', label: 'Traffic' },
+		placement: { width: 2, height: 1, order: 1 },
+	},
+	{
+		uuid: 'long-title-narrow',
+		type: 'demo/long-title',
+		attributes: { metric: 'visitors', period: 'month', label: 'Audience' },
+		placement: { width: 1, height: 1, order: 2 },
+	},
+];
+
+function LongTitleStory() {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( LONG_TITLE_LAYOUT );
+
+	return (
+		<WidgetDashboard
+			widgetTypes={ [ longTitleWidgetType ] }
+			layout={ layout }
+			onLayoutChange={ setLayout }
+			resolveWidgetModule={ resolveDemoModule }
+			gridSettings={ { model: 'grid', rowHeight: 200 } }
+		>
+			<WidgetDashboard.Widgets />
+		</WidgetDashboard>
+	);
+}
+
+export const LongTitle: StoryObj = {
+	render: () => <LongTitleStory />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+The identity holds the widget type's title. When the row cannot fit it, the title truncates with an ellipsis rather than wrapping: the header is one line tall.
+
+The same type appears at two widths. Resize the canvas to watch where the cut lands.
+`,
+			},
+		},
+	},
+};
+
 export const Default: StoryObj = {
 	render: () => <DefaultStory />,
 	parameters: {
