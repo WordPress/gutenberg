@@ -27,22 +27,21 @@ The header is a single row of three sections.
 
 The sections are semantic. A control belongs to a section by its nature, not by how it renders.
 
--   **Identity.** The widget's icon, title, and help.  It names the tile and shrinks to a readable floor before anything else gives way.
+-   **Identity.** The widget's icon, title, and help. It names the tile, and its title truncates to a readable floor before anything else gives way.
 -   **Attributes.** The widget's high-relevance attributes: quick in-place editing or a dropdown button when there isn't enough space.
 -   **More.** The widget's declared actions, gathered in a menu on the trailing edge.
 
 ### Fitting the row
 
-Each section renders inline when the row has room, and folds into a compact form when it does not.
+Only the attributes change form. The identity truncates to its floor, and the actions menu is compact throughout.
 
 Attributes are inline fields when they fit, or a form within a dropdown when they do not.
 
 ![Wide tiles keep the attributes inline; narrow tiles fold them into a dropdown, while the identity holds its floor and the actions menu stays.](./assets/header-fit.svg)
 
-The header decides by measuring the row it actually has, not by assuming fixed widths.
+The header decides from what it measures: the row's own width, and the width each section reports.
 
 It reserves the identity its floor, then gives the attributes their inline form while the row still has room; when the room runs out, they fold.
-The actions menu stays compact throughout.
 
 Because the decision measures the real row, every section counts on its own.
 
