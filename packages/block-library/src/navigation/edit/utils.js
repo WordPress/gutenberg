@@ -7,30 +7,38 @@ import { paramCase as kebabCase } from 'change-case';
 /**
  * Internal dependencies
  */
-import { DEFAULT_MOBILE_BREAKPOINT } from '../constants';
+import { DEFAULT_COLLAPSED_MENU_BREAKPOINT } from '../constants';
 
-const VALID_MOBILE_BREAKPOINT = /^([0-9]*\.?[0-9]+)(px|em|rem)$/i;
+const VALID_COLLAPSED_MENU_BREAKPOINT = /^([0-9]*\.?[0-9]+)(px|em|rem)$/i;
+const UNSAFE_CSS_VALUE = /[\\{}();&=<>`]|\/\*/;
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
 }
 
-export function normalizeMobileBreakpoint( value ) {
+export function normalizeCollapsedMenuBreakpoint( value ) {
 	if ( typeof value !== 'string' ) {
-		return DEFAULT_MOBILE_BREAKPOINT;
+		return DEFAULT_COLLAPSED_MENU_BREAKPOINT;
 	}
 
 	const trimmedValue = value.trim();
-	const match = trimmedValue.match( VALID_MOBILE_BREAKPOINT );
+	if ( UNSAFE_CSS_VALUE.test( trimmedValue ) ) {
+		return DEFAULT_COLLAPSED_MENU_BREAKPOINT;
+	}
+
+	const match = trimmedValue.match( VALID_COLLAPSED_MENU_BREAKPOINT );
 	if ( ! match || parseFloat( match[ 1 ] ) <= 0 ) {
-		return DEFAULT_MOBILE_BREAKPOINT;
+		return DEFAULT_COLLAPSED_MENU_BREAKPOINT;
 	}
 
 	return `${ match[ 1 ] }${ match[ 2 ].toLowerCase() }`;
 }
 
-export function hasCustomMobileBreakpoint( value ) {
-	return normalizeMobileBreakpoint( value ) !== DEFAULT_MOBILE_BREAKPOINT;
+export function hasCustomCollapsedMenuBreakpoint( value ) {
+	return (
+		normalizeCollapsedMenuBreakpoint( value ) !==
+		DEFAULT_COLLAPSED_MENU_BREAKPOINT
+	);
 }
 
 export function detectColors(

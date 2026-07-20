@@ -16,10 +16,10 @@ import OverlayTemplatePartSelector from './overlay-template-part-selector';
 import OverlayVisibilityControl from './overlay-visibility-control';
 import OverlayMenuPreviewButton from './overlay-menu-preview-button';
 import OverlayPreview from './overlay-preview';
-import { normalizeMobileBreakpoint } from './utils';
+import { normalizeCollapsedMenuBreakpoint } from './utils';
 import {
-	DEFAULT_MOBILE_BREAKPOINT,
-	MOBILE_BREAKPOINT_UNITS,
+	DEFAULT_COLLAPSED_MENU_BREAKPOINT,
+	COLLAPSED_MENU_BREAKPOINT_UNITS,
 } from '../constants';
 
 /**
@@ -39,7 +39,7 @@ import {
  * @param {boolean}  props.isResponsive              Whether overlay menu is responsive.
  * @param {string}   props.currentTheme              Current theme stylesheet name.
  * @param {boolean}  props.hasOverlays               Whether any overlay template parts exist.
- * @param {string}   props.mobileBreakpoint          Breakpoint at which the overlay switches to desktop layout.
+ * @param {string}   props.collapsedMenuBreakpoint   Breakpoint at which the overlay switches to inline layout.
  * @return {React.JSX.Element}                       The overlay panel component or null if overlay is disabled.
  */
 export default function OverlayPanel( {
@@ -56,13 +56,14 @@ export default function OverlayPanel( {
 	isResponsive,
 	currentTheme,
 	hasOverlays,
-	mobileBreakpoint = DEFAULT_MOBILE_BREAKPOINT,
+	collapsedMenuBreakpoint = DEFAULT_COLLAPSED_MENU_BREAKPOINT,
 } ) {
 	const [ isCreatingOverlay, setIsCreatingOverlay ] = useState( false );
 
-	const handleMobileBreakpointChange = ( nextValue ) => {
+	const handleCollapsedMenuBreakpointChange = ( nextValue ) => {
 		setAttributes( {
-			mobileBreakpoint: normalizeMobileBreakpoint( nextValue ),
+			collapsedMenuBreakpoint:
+				normalizeCollapsedMenuBreakpoint( nextValue ),
 		} );
 	};
 
@@ -76,13 +77,17 @@ export default function OverlayPanel( {
 
 				{ overlayMenu !== 'never' && (
 					<UnitControl
+						help={ __(
+							'Below this width, the navigation is collapsed behind a menu button. At this width and wider, links are shown inline.'
+						) }
 						isResetValueOnUnitChange
 						label={ __( 'Breakpoint' ) }
-						min={ 0.01 }
-						onChange={ handleMobileBreakpointChange }
-						units={ MOBILE_BREAKPOINT_UNITS }
-						value={ normalizeMobileBreakpoint(
-							mobileBreakpoint
+						min={ 0 }
+						onChange={ handleCollapsedMenuBreakpointChange }
+						step="any"
+						units={ COLLAPSED_MENU_BREAKPOINT_UNITS }
+						value={ normalizeCollapsedMenuBreakpoint(
+							collapsedMenuBreakpoint
 						) }
 					/>
 				) }

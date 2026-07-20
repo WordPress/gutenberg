@@ -68,8 +68,8 @@ import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
 import {
 	detectColors,
-	hasCustomMobileBreakpoint,
-	normalizeMobileBreakpoint,
+	hasCustomCollapsedMenuBreakpoint,
+	normalizeCollapsedMenuBreakpoint,
 } from './utils';
 import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
@@ -282,13 +282,14 @@ function Navigation( {
 		} = {},
 		hasIcon,
 		icon = 'handle',
-		mobileBreakpoint,
+		collapsedMenuBreakpoint,
 	} = attributes;
 
-	const normalizedMobileBreakpoint =
-		normalizeMobileBreakpoint( mobileBreakpoint );
-	const hasCustomMobileBreakpointValue =
-		hasCustomMobileBreakpoint( mobileBreakpoint );
+	const normalizedCollapsedMenuBreakpoint = normalizeCollapsedMenuBreakpoint(
+		collapsedMenuBreakpoint
+	);
+	const hasCustomCollapsedMenuBreakpointValue =
+		hasCustomCollapsedMenuBreakpoint( collapsedMenuBreakpoint );
 	const ref = attributes.ref;
 	useLayoutCustomProperties( {
 		clientId,
@@ -651,8 +652,8 @@ function Navigation( {
 					backgroundColor?.slug
 				) ]: !! backgroundColor?.slug,
 				[ `has-text-decoration-${ textDecoration }` ]: textDecoration,
-				'has-custom-mobile-breakpoint':
-					isResponsive && hasCustomMobileBreakpointValue,
+				'has-custom-collapsed-menu-breakpoint':
+					isResponsive && hasCustomCollapsedMenuBreakpointValue,
 				'block-editor-block-content-overlay': hasBlockOverlay,
 			},
 			layoutClassNames
@@ -946,7 +947,9 @@ function Navigation( {
 						isResponsive={ isResponsive }
 						currentTheme={ currentTheme }
 						hasOverlays={ hasOverlays }
-						mobileBreakpoint={ normalizedMobileBreakpoint }
+						collapsedMenuBreakpoint={
+							normalizedCollapsedMenuBreakpoint
+						}
 					/>
 				</InspectorControls>
 			) }
@@ -1020,9 +1023,11 @@ function Navigation( {
 						overlayTextColor={ overlayTextColor }
 						overlay={ overlay }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }
-						mobileBreakpoint={ normalizedMobileBreakpoint }
-						hasCustomMobileBreakpoint={
-							hasCustomMobileBreakpointValue
+						collapsedMenuBreakpoint={
+							normalizedCollapsedMenuBreakpoint
+						}
+						hasCustomCollapsedMenuBreakpoint={
+							hasCustomCollapsedMenuBreakpointValue
 						}
 					>
 						<UnsavedInnerBlocks
@@ -1193,11 +1198,11 @@ function Navigation( {
 									onNavigateToEntityRecord={
 										onNavigateToEntityRecord
 									}
-									mobileBreakpoint={
-										normalizedMobileBreakpoint
+									collapsedMenuBreakpoint={
+										normalizedCollapsedMenuBreakpoint
 									}
-									hasCustomMobileBreakpoint={
-										hasCustomMobileBreakpointValue
+									hasCustomCollapsedMenuBreakpoint={
+										hasCustomCollapsedMenuBreakpointValue
 									}
 								>
 									{ isEntityAvailable && (

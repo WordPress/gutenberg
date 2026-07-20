@@ -40,7 +40,8 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
 	return $submenu_visibility ?? 'hover';
 }
 
-const BLOCK_CORE_NAVIGATION_MOBILE_BREAKPOINT_DEFAULT = '600px';
+const BLOCK_CORE_NAVIGATION_COLLAPSED_MENU_BREAKPOINT_DEFAULT = '600px';
+const BLOCK_CORE_NAVIGATION_UNSAFE_COLLAPSED_MENU_BREAKPOINT_PATTERN = '%[\\\\{}();&=<>`]|/\*%';
 
 /**
  * Returns whether or not this is responsive navigation.
@@ -59,42 +60,55 @@ function block_core_navigation_is_responsive( $attributes ) {
 }
 
 /**
- * Returns a valid Navigation mobile breakpoint.
+ * Returns a valid Navigation collapsed menu breakpoint.
  *
  * @since 7.1.0
  *
  * @param array $attributes The block attributes.
- * @return string Mobile breakpoint with a supported CSS length unit.
+ * @return string Collapsed menu breakpoint with a supported CSS length unit.
  */
-function block_core_navigation_get_mobile_breakpoint( $attributes ) {
-	if ( ! isset( $attributes['mobileBreakpoint'] ) || ! is_string( $attributes['mobileBreakpoint'] ) ) {
-		return BLOCK_CORE_NAVIGATION_MOBILE_BREAKPOINT_DEFAULT;
+function block_core_navigation_get_collapsed_menu_breakpoint( $attributes ) {
+	if ( ! isset( $attributes['collapsedMenuBreakpoint'] ) || ! is_string( $attributes['collapsedMenuBreakpoint'] ) ) {
+		return BLOCK_CORE_NAVIGATION_COLLAPSED_MENU_BREAKPOINT_DEFAULT;
 	}
 
-	$mobile_breakpoint = trim( $attributes['mobileBreakpoint'] );
-	if ( ! preg_match( '/^([0-9]*\.?[0-9]+)(px|em|rem)$/i', $mobile_breakpoint, $matches ) ) {
-		return BLOCK_CORE_NAVIGATION_MOBILE_BREAKPOINT_DEFAULT;
+	$collapsed_menu_breakpoint = trim( $attributes['collapsedMenuBreakpoint'] );
+	if (
+		'' === $collapsed_menu_breakpoint ||
+		$collapsed_menu_breakpoint !== wp_strip_all_tags( $collapsed_menu_breakpoint, true ) ||
+		preg_match( BLOCK_CORE_NAVIGATION_UNSAFE_COLLAPSED_MENU_BREAKPOINT_PATTERN, $collapsed_menu_breakpoint )
+	) {
+		return BLOCK_CORE_NAVIGATION_COLLAPSED_MENU_BREAKPOINT_DEFAULT;
 	}
 
-	if ( (float) $matches[1] <= 0 ) {
-		return BLOCK_CORE_NAVIGATION_MOBILE_BREAKPOINT_DEFAULT;
+	if ( ! preg_match( '/^([0-9]*\.?[0-9]+)(px|em|rem)$/i', $collapsed_menu_breakpoint, $matches ) ) {
+		return BLOCK_CORE_NAVIGATION_COLLAPSED_MENU_BREAKPOINT_DEFAULT;
 	}
 
-	return $matches[1] . strtolower( $matches[2] );
+	if ( (float) $matches[1] <= 0 || ! is_finite( (float) $matches[1] ) ) {
+		return BLOCK_CORE_NAVIGATION_COLLAPSED_MENU_BREAKPOINT_DEFAULT;
+	}
+
+	$normalized_collapsed_menu_breakpoint = $matches[1] . strtolower( $matches[2] );
+	if ( "width:{$normalized_collapsed_menu_breakpoint}" !== safecss_filter_attr( "width:{$normalized_collapsed_menu_breakpoint}" ) ) {
+		return BLOCK_CORE_NAVIGATION_COLLAPSED_MENU_BREAKPOINT_DEFAULT;
+	}
+
+	return $normalized_collapsed_menu_breakpoint;
 }
 
 /**
- * Returns whether a Navigation block uses a custom mobile breakpoint.
+ * Returns whether a Navigation block uses a custom collapsed menu breakpoint.
  *
  * @since 7.1.0
  *
  * @param array $attributes The block attributes.
- * @return bool Whether the block has a non-default mobile breakpoint.
+ * @return bool Whether the block has a non-default collapsed menu breakpoint.
  */
-function block_core_navigation_has_custom_mobile_breakpoint( $attributes ) {
+function block_core_navigation_has_custom_collapsed_menu_breakpoint( $attributes ) {
 	return (
-		block_core_navigation_get_mobile_breakpoint( $attributes ) !==
-		BLOCK_CORE_NAVIGATION_MOBILE_BREAKPOINT_DEFAULT
+		block_core_navigation_get_collapsed_menu_breakpoint( $attributes ) !==
+		BLOCK_CORE_NAVIGATION_COLLAPSED_MENU_BREAKPOINT_DEFAULT
 	);
 }
 
@@ -703,7 +717,7 @@ class WP_Navigation_Block_Renderer {
 		$colors                       = block_core_navigation_build_css_colors( $attributes );
 		$font_sizes                   = block_core_navigation_build_css_font_sizes( $attributes );
 		$is_responsive_menu           = static::is_responsive( $attributes );
-		$has_custom_mobile_breakpoint = $is_responsive_menu && block_core_navigation_has_custom_mobile_breakpoint( $attributes );
+		$has_custom_collapsed_menu_breakpoint = $is_responsive_menu && block_core_navigation_has_custom_collapsed_menu_breakpoint( $attributes );
 
 		// Manually add block support text decoration as CSS class.
 		$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
@@ -713,8 +727,8 @@ class WP_Navigation_Block_Renderer {
 			$colors['css_classes'],
 			$font_sizes['css_classes'],
 			$is_responsive_menu ? array( 'is-responsive' ) : array(),
-			$has_custom_mobile_breakpoint
-				? array( 'has-custom-mobile-breakpoint' )
+			$has_custom_collapsed_menu_breakpoint
+				? array( 'has-custom-collapsed-menu-breakpoint' )
 				: array(),
 			$layout_class ? array( $layout_class ) : array(),
 			$text_decoration ? array( $text_decoration_class ) : array()
@@ -1670,7 +1684,7 @@ add_action( 'init', 'register_block_core_navigation' );
  * change those classes, so equivalent custom properties and a scoping class
  * are generated for each configured viewport layout.
  *
- * Navigation blocks with custom mobile breakpoints also need scoped rules so
+ * Navigation blocks with custom collapsed menu breakpoints also need scoped rules so
  * they can opt out of the default static breakpoint without affecting other
  * Navigation blocks on the page.
  *
@@ -1735,10 +1749,10 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 	if ( is_string( $class_attribute ) && preg_match( '/\bwp-states-[a-f0-9]{8}\b/', $class_attribute, $matches ) ) {
 		$state_class = $matches[0];
 	}
-	$has_custom_mobile_breakpoint =
+	$has_custom_collapsed_menu_breakpoint =
 		is_string( $class_attribute ) &&
-		preg_match( '/\bhas-custom-mobile-breakpoint\b/', $class_attribute ) &&
-		block_core_navigation_has_custom_mobile_breakpoint( $attributes );
+		preg_match( '/\bhas-custom-collapsed-menu-breakpoint\b/', $class_attribute ) &&
+		block_core_navigation_has_custom_collapsed_menu_breakpoint( $attributes );
 
 	$layout_class = null;
 	if ( ! empty( $styles ) ) {
@@ -1758,22 +1772,22 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 		);
 	}
 
-	$custom_mobile_breakpoint_class = null;
-	if ( $has_custom_mobile_breakpoint ) {
-		$custom_mobile_breakpoint_class = wp_unique_id( 'wp-block-navigation-custom-breakpoint-' );
-		$processor->add_class( $custom_mobile_breakpoint_class );
+	$custom_collapsed_menu_breakpoint_class = null;
+	if ( $has_custom_collapsed_menu_breakpoint ) {
+		$custom_collapsed_menu_breakpoint_class = wp_unique_id( 'wp-block-navigation-custom-breakpoint-' );
+		$processor->add_class( $custom_collapsed_menu_breakpoint_class );
 
-		$mobile_breakpoint           = block_core_navigation_get_mobile_breakpoint( $attributes );
-		$selector_base               = ".wp-block-navigation.{$custom_mobile_breakpoint_class}.has-custom-mobile-breakpoint";
-		$container_selector          = $selector_base . ' .wp-block-navigation__responsive-container';
-		$container_desktop_selector  = $container_selector . ':not(.hidden-by-default):not(.is-menu-open)';
-		$submenu_container_selectors = '.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container';
-		$rules_group                 = "@media (min-width: {$mobile_breakpoint})";
+			$collapsed_menu_breakpoint    = block_core_navigation_get_collapsed_menu_breakpoint( $attributes );
+			$selector_base                = ".wp-block-navigation.{$custom_collapsed_menu_breakpoint_class}.has-custom-collapsed-menu-breakpoint";
+			$container_selector           = $selector_base . ' .wp-block-navigation__responsive-container';
+			$container_inline_selector    = $container_selector . ':not(.hidden-by-default):not(.is-menu-open)';
+			$submenu_container_selectors  = '.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container';
+			$rules_group                  = "@media (min-width: {$collapsed_menu_breakpoint})";
 
 		wp_style_engine_get_stylesheet_from_css_rules(
 			array(
 				array(
-					'selector'     => $container_desktop_selector,
+					'selector'     => $container_inline_selector,
 					'declarations' => array(
 						'display'          => 'block',
 						'width'            => '100%',
@@ -1784,7 +1798,7 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 					'rules_group'  => $rules_group,
 				),
 				array(
-					'selector'     => $container_desktop_selector . ' .wp-block-navigation__responsive-container-close',
+					'selector'     => $container_inline_selector . ' .wp-block-navigation__responsive-container-close',
 					'declarations' => array(
 						'display' => 'none',
 					),
@@ -1809,7 +1823,7 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 		);
 	}
 
-	if ( null === $state_class && null === $layout_class && null === $custom_mobile_breakpoint_class ) {
+	if ( null === $state_class && null === $layout_class && null === $custom_collapsed_menu_breakpoint_class ) {
 		return $block_content;
 	}
 

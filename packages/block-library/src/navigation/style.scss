@@ -13,8 +13,6 @@
 // Size of burger and close icons.
 $navigation-icon-size: 24px;
 
-
-
 .wp-block-navigation {
 	position: relative;
 
@@ -721,8 +719,11 @@ button.wp-block-navigation-item__content {
 		}
 	}
 
+	// Keep the static default breakpoint for Navigation blocks without a
+	// custom breakpoint. Custom breakpoint blocks opt out here and receive
+	// instance-scoped rules from server rendering.
 	@include break-small() {
-		.wp-block-navigation:not(.has-custom-mobile-breakpoint) & {
+		.wp-block-navigation:not(.has-custom-collapsed-menu-breakpoint) & {
 			&:not(.hidden-by-default) {
 				&:not(.is-menu-open) {
 					display: block;
@@ -746,7 +747,7 @@ button.wp-block-navigation-item__content {
 		}
 	}
 
-	&.is-custom-mobile-breakpoint-desktop {
+	&.is-custom-collapsed-menu-breakpoint-inline {
 		&:not(.hidden-by-default) {
 			&:not(.is-menu-open) {
 				display: block;
@@ -823,13 +824,16 @@ button.wp-block-navigation-item__content {
 	}
 
 	&:not(.always-shown) {
+		// Keep the static default breakpoint for Navigation blocks without a
+		// custom breakpoint. Custom breakpoint blocks opt out here and receive
+		// instance-scoped rules from server rendering.
 		@include break-small {
-			.wp-block-navigation:not(.has-custom-mobile-breakpoint) & {
+			.wp-block-navigation:not(.has-custom-collapsed-menu-breakpoint) & {
 				display: none;
 			}
 		}
 
-		&.is-custom-mobile-breakpoint-desktop {
+		&.is-custom-collapsed-menu-breakpoint-inline {
 			display: none;
 		}
 	}

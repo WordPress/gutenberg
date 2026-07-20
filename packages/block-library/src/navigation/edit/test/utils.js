@@ -4,31 +4,43 @@
 import {
 	getUniqueTemplatePartTitle,
 	getCleanTemplatePartSlug,
-	hasCustomMobileBreakpoint,
-	normalizeMobileBreakpoint,
+	hasCustomCollapsedMenuBreakpoint,
+	normalizeCollapsedMenuBreakpoint,
 } from '../utils';
 
-describe( 'normalizeMobileBreakpoint', () => {
+describe( 'normalizeCollapsedMenuBreakpoint', () => {
 	it( 'normalizes valid breakpoint values', () => {
-		expect( normalizeMobileBreakpoint( '48rem' ) ).toBe( '48rem' );
-		expect( normalizeMobileBreakpoint( '37.5EM' ) ).toBe( '37.5em' );
-		expect( normalizeMobileBreakpoint( ' 720px ' ) ).toBe( '720px' );
+		expect( normalizeCollapsedMenuBreakpoint( '48rem' ) ).toBe( '48rem' );
+		expect( normalizeCollapsedMenuBreakpoint( '37.5EM' ) ).toBe( '37.5em' );
+		expect( normalizeCollapsedMenuBreakpoint( ' 720px ' ) ).toBe( '720px' );
 	} );
 
 	it( 'falls back to the default for empty, invalid, or non-positive values', () => {
-		expect( normalizeMobileBreakpoint() ).toBe( '600px' );
-		expect( normalizeMobileBreakpoint( '' ) ).toBe( '600px' );
-		expect( normalizeMobileBreakpoint( '0px' ) ).toBe( '600px' );
-		expect( normalizeMobileBreakpoint( '-1px' ) ).toBe( '600px' );
-		expect( normalizeMobileBreakpoint( '40vw' ) ).toBe( '600px' );
+		expect( normalizeCollapsedMenuBreakpoint() ).toBe( '600px' );
+		expect( normalizeCollapsedMenuBreakpoint( '' ) ).toBe( '600px' );
+		expect( normalizeCollapsedMenuBreakpoint( '0px' ) ).toBe( '600px' );
+		expect( normalizeCollapsedMenuBreakpoint( '-1px' ) ).toBe( '600px' );
+		expect( normalizeCollapsedMenuBreakpoint( '40vw' ) ).toBe( '600px' );
+	} );
+
+	it.each( [
+		'10px);body{background:red}',
+		'10px;background:url(javascript:alert(1))',
+		'10px/*comment*/',
+		'<style>10px</style>',
+		'expression(alert(1))',
+		'url(javascript:alert(1))',
+		'calc(100vw - 1rem)',
+	] )( 'rejects unsafe CSS breakpoint value %p', ( value ) => {
+		expect( normalizeCollapsedMenuBreakpoint( value ) ).toBe( '600px' );
 	} );
 } );
 
-describe( 'hasCustomMobileBreakpoint', () => {
+describe( 'hasCustomCollapsedMenuBreakpoint', () => {
 	it( 'returns true only for valid non-default breakpoints', () => {
-		expect( hasCustomMobileBreakpoint( '600px' ) ).toBe( false );
-		expect( hasCustomMobileBreakpoint( '0px' ) ).toBe( false );
-		expect( hasCustomMobileBreakpoint( '48rem' ) ).toBe( true );
+		expect( hasCustomCollapsedMenuBreakpoint( '600px' ) ).toBe( false );
+		expect( hasCustomCollapsedMenuBreakpoint( '0px' ) ).toBe( false );
+		expect( hasCustomCollapsedMenuBreakpoint( '48rem' ) ).toBe( true );
 	} );
 } );
 
