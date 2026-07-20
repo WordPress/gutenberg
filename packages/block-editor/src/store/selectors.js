@@ -808,6 +808,23 @@ export const getSelectedBlockClientIds = createSelector(
 			return [ selectionStart.clientId ];
 		}
 
+		// When one endpoint is nested inside the other, the ancestor
+		// contains the whole selection.
+		if (
+			getBlockParents( state, selectionEnd.clientId ).includes(
+				selectionStart.clientId
+			)
+		) {
+			return [ selectionStart.clientId ];
+		}
+		if (
+			getBlockParents( state, selectionStart.clientId ).includes(
+				selectionEnd.clientId
+			)
+		) {
+			return [ selectionEnd.clientId ];
+		}
+
 		// Retrieve root client ID to aid in retrieving relevant nested block
 		// order, being careful to allow the falsey empty string top-level root
 		// by explicitly testing against null.
@@ -832,6 +849,7 @@ export const getSelectedBlockClientIds = createSelector(
 	},
 	( state ) => [
 		state.blocks.order,
+		state.blocks.parents,
 		state.selection.selectionStart.clientId,
 		state.selection.selectionEnd.clientId,
 	]

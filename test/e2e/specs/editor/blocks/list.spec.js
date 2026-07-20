@@ -1822,33 +1822,19 @@ test.describe( 'List (@firefox)', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 2 } );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
-		// A partial selection across a nesting boundary is not
-		// mergeable, so the first press falls back to selecting the
-		// outer "ab" item fully without deleting anything.
-		await page.keyboard.press( 'Backspace' );
+		// The outer "ab" item is presented as fully selected, like a
+		// block multi-selection.
 		await expect(
-			editor.canvas
-				.locator( 'role=document[name="Block: List item"i]' )
-				.first()
-		).toBeFocused();
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/list',
-				innerBlocks: [
-					{
-						name: 'core/list-item',
-						attributes: { content: 'ab' },
-					},
-					{
-						name: 'core/list-item',
-						attributes: { content: 'zz' },
-					},
-				],
-			},
-		] );
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 1 );
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveText( 'abcd' );
 
-		// The second press removes the selected item as a whole,
-		// together with its nested list; the unrelated sibling remains.
+		// A partial selection across a nesting boundary is not
+		// mergeable; the press removes the fully selected item as a
+		// whole, together with its nested list; the unrelated sibling
+		// remains.
 		await page.keyboard.press( 'Backspace' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -1917,33 +1903,19 @@ test.describe( 'List (@firefox)', () => {
 		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 2 } );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
-		// A partial selection across a nesting boundary is not
-		// mergeable, so the first press falls back to selecting the
-		// outer "ab" item fully without deleting anything.
-		await page.keyboard.press( 'Delete' );
+		// The outer "ab" item is presented as fully selected, like a
+		// block multi-selection.
 		await expect(
-			editor.canvas
-				.locator( 'role=document[name="Block: List item"i]' )
-				.first()
-		).toBeFocused();
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/list',
-				innerBlocks: [
-					{
-						name: 'core/list-item',
-						attributes: { content: 'ab' },
-					},
-					{
-						name: 'core/list-item',
-						attributes: { content: 'zz' },
-					},
-				],
-			},
-		] );
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 1 );
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveText( 'abcd' );
 
-		// The second press removes the selected item as a whole,
-		// together with its nested list; the unrelated sibling remains.
+		// A partial selection across a nesting boundary is not
+		// mergeable; the press removes the fully selected item as a
+		// whole, together with its nested list; the unrelated sibling
+		// remains.
 		await page.keyboard.press( 'Delete' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -1955,6 +1927,73 @@ test.describe( 'List (@firefox)', () => {
 						innerBlocks: [],
 					},
 				],
+			},
+		] );
+	} );
+
+	test( 'should multi-select the top level items when extending a selection from a nested item to the previous top level item', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.press( 'Enter' );
+		// Leading space at the start of an empty item triggers indent.
+		await page.keyboard.type( ' nested' );
+
+		// Verify setup: "one" and "two" at the top level, "nested"
+		// indented under "two"; caret at the end of "nested".
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'one' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'two' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'nested‸' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
+		await page.keyboard.press( 'Backspace' );
+
+		// Extend the selection up across "two" to "one".
+		await page.keyboard.press( 'Shift+ArrowUp' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		await page.keyboard.press( 'Shift+ArrowUp' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		// The endpoints are promoted to the top level items, which are
+		// multi-selected as blocks.
+		await expect( page.locator( '[aria-live="assertive"]' ) ).toHaveText(
+			'2 blocks selected.'
+		);
+
+		// Both items, including the nested one, are removed.
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [],
 			},
 		] );
 	} );

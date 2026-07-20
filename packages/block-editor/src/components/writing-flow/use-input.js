@@ -44,7 +44,6 @@ export default function useInput() {
 		__unstableDeleteSelection,
 		__unstableExpandSelection,
 		__unstableMarkAutomaticChange,
-		selectBlock,
 	} = useDispatch( blockEditorStore );
 
 	return useRefEffect( ( node ) => {
@@ -168,10 +167,9 @@ export default function useInput() {
 					__unstableDeleteSelection( event.keyCode === DELETE );
 				} else {
 					// A selection with one endpoint nested inside the
-					// other has no sibling range to expand to. Fall back
-					// to selecting the ancestor as a whole: focusing its
-					// wrapper selects the block, and a follow-up key
-					// press acts on the full block.
+					// other has no sibling range to expand to. The
+					// ancestor end is already presented as fully
+					// selected, so remove it.
 					const anchorClientId = getSelectionStart().clientId;
 					const focusClientId = getSelectionEnd().clientId;
 					let ancestorClientId;
@@ -189,17 +187,7 @@ export default function useInput() {
 						ancestorClientId = focusClientId;
 					}
 					if ( ancestorClientId ) {
-						// Select first, without caret placement, so that
-						// focusing the wrapper doesn't re-select with a
-						// caret position and pull focus into the block's
-						// text.
-						selectBlock( ancestorClientId, null );
-						node.ownerDocument.defaultView
-							.getSelection()
-							.removeAllRanges();
-						node.ownerDocument
-							.getElementById( 'block-' + ancestorClientId )
-							?.focus();
+						removeBlocks( [ ancestorClientId ] );
 					} else {
 						__unstableExpandSelection();
 					}
