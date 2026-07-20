@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Image: Check only `window.__clientSideMediaProcessing` for sideloading status, following the removal of the redundant `window.__heicUploadSupport` flag ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
+
 ## 10.2.0 (2026-07-14)
 
 ### Enhancements
