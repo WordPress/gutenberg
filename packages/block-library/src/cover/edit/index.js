@@ -633,6 +633,7 @@ function CoverEdit( {
 		!! id &&
 		!! url &&
 		! isUploadingMedia &&
+		! isSwappingMedia &&
 		!! openMediaEditorModal;
 
 	const toggleUseFeaturedImage = async () => {

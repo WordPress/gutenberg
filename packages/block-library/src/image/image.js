@@ -628,7 +628,8 @@ export default function Image( {
 		canEditImage &&
 		!! openImageMediaEditorModal &&
 		! isContentOnlyMode &&
-		! isUploading;
+		! isUploading &&
+		! isSwappingMedia;
 
 	function switchToCover() {
 		replaceBlocks(
