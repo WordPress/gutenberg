@@ -23,6 +23,7 @@ jest.mock( '@wordpress/blocks', () => ( {
 	serialize: jest.fn(),
 } ) );
 jest.mock( '../sync', () => ( {
+	...jest.requireActual( '../sync' ),
 	getSyncManager: jest.fn(),
 	hasSyncManager: jest.fn(),
 } ) );
