@@ -10,6 +10,27 @@ vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	getColorClassName: vi.fn( () => '' ),
 } ) );
 
+vi.mock( import( '@wordpress/components' ), () => ( {
+	Button: ( { children, className, onClick, ...props } ) => {
+		const buttonProps = Object.fromEntries(
+			Object.entries( props ).filter(
+				( [ key, value ] ) =>
+					key !== '__next40pxDefaultSize' && value !== false
+			)
+		);
+
+		return (
+			<button
+				className={ className }
+				onClick={ onClick }
+				{ ...buttonProps }
+			>
+				{ children }
+			</button>
+		);
+	},
+} ) );
+
 vi.mock( import( '@wordpress/compose' ), () => ( {
 	useMediaQuery: vi.fn(),
 } ) );
@@ -38,6 +59,12 @@ vi.mock( import( '@wordpress/data' ), () => ( {
 describe( 'ResponsiveWrapper', () => {
 	const mockOnToggle = vi.fn();
 	const mockOnNavigateToEntityRecord = vi.fn();
+	const getResponsiveContainer = () => {
+		// eslint-disable-next-line testing-library/no-node-access
+		return document.querySelector(
+			'.wp-block-navigation__responsive-container'
+		);
+	};
 
 	const defaultProps = {
 		id: 'test-navigation',
@@ -71,14 +98,14 @@ describe( 'ResponsiveWrapper', () => {
 		} );
 	} );
 
-	describe( 'Custom mobile breakpoints', () => {
-		it( 'preserves the default breakpoint behavior without desktop state classes', () => {
+	describe( 'Custom collapsed menu breakpoints', () => {
+		it( 'preserves the default breakpoint behavior without inline state classes', () => {
 			useMediaQuery.mockReturnValue( true );
 
 			render(
 				<ResponsiveWrapper
 					{ ...defaultProps }
-					mobileBreakpoint="600px"
+					collapsedMenuBreakpoint="600px"
 				/>
 			);
 
@@ -87,57 +114,54 @@ describe( 'ResponsiveWrapper', () => {
 			);
 			expect(
 				screen.getByRole( 'button', { name: 'Menu' } )
-			).not.toHaveClass( 'is-custom-mobile-breakpoint-desktop' );
-			expect(
-				document.querySelector(
-					'.wp-block-navigation__responsive-container'
-				)
-			).not.toHaveClass( 'is-custom-mobile-breakpoint-desktop' );
+			).not.toHaveClass( 'is-custom-collapsed-menu-breakpoint-inline' );
+			expect( getResponsiveContainer() ).not.toHaveClass(
+				'is-custom-collapsed-menu-breakpoint-inline'
+			);
 		} );
 
-		it( 'adds desktop state classes when the custom breakpoint matches', () => {
-			useMediaQuery.mockReturnValue( true );
+		it.each( [ '10px', '37.5em', '48rem' ] )(
+			'adds inline state classes when the custom %s breakpoint matches',
+			( collapsedMenuBreakpoint ) => {
+				useMediaQuery.mockReturnValue( true );
 
-			render(
-				<ResponsiveWrapper
-					{ ...defaultProps }
-					mobileBreakpoint="48rem"
-					hasCustomMobileBreakpoint
-				/>
-			);
+				render(
+					<ResponsiveWrapper
+						{ ...defaultProps }
+						collapsedMenuBreakpoint={ collapsedMenuBreakpoint }
+						hasCustomCollapsedMenuBreakpoint
+					/>
+				);
 
-			expect( useMediaQuery ).toHaveBeenCalledWith(
-				'(min-width: 48rem)'
-			);
-			expect(
-				screen.getByRole( 'button', { name: 'Menu' } )
-			).toHaveClass( 'is-custom-mobile-breakpoint-desktop' );
-			expect(
-				document.querySelector(
-					'.wp-block-navigation__responsive-container'
-				)
-			).toHaveClass( 'is-custom-mobile-breakpoint-desktop' );
-		} );
+				expect( useMediaQuery ).toHaveBeenCalledWith(
+					`(min-width: ${ collapsedMenuBreakpoint })`
+				);
+				expect(
+					screen.getByRole( 'button', { name: 'Menu' } )
+				).toHaveClass( 'is-custom-collapsed-menu-breakpoint-inline' );
+				expect( getResponsiveContainer() ).toHaveClass(
+					'is-custom-collapsed-menu-breakpoint-inline'
+				);
+			}
+		);
 
-		it( 'keeps mobile state classes when the custom breakpoint does not match', () => {
+		it( 'keeps collapsed state classes when the custom breakpoint does not match', () => {
 			useMediaQuery.mockReturnValue( false );
 
 			render(
 				<ResponsiveWrapper
 					{ ...defaultProps }
-					mobileBreakpoint="48rem"
-					hasCustomMobileBreakpoint
+					collapsedMenuBreakpoint="48rem"
+					hasCustomCollapsedMenuBreakpoint
 				/>
 			);
 
 			expect(
 				screen.getByRole( 'button', { name: 'Menu' } )
-			).not.toHaveClass( 'is-custom-mobile-breakpoint-desktop' );
-			expect(
-				document.querySelector(
-					'.wp-block-navigation__responsive-container'
-				)
-			).not.toHaveClass( 'is-custom-mobile-breakpoint-desktop' );
+			).not.toHaveClass( 'is-custom-collapsed-menu-breakpoint-inline' );
+			expect( getResponsiveContainer() ).not.toHaveClass(
+				'is-custom-collapsed-menu-breakpoint-inline'
+			);
 		} );
 	} );
 

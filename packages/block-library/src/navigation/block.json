@@ -90,7 +90,7 @@
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
 		},
-		"mobileBreakpoint": {
+		"collapsedMenuBreakpoint": {
 			"type": "string",
 			"default": "600px"
 		}
