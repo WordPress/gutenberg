@@ -773,7 +773,8 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $data ) {
 			'default_layouts' => $default_layouts,
 			'view_list'       => array_merge( $view_list, $registered_authors, $user_authors ),
 			'form'            => $form,
-		)
+		),
+		1
 	);
 
 	return $data;
