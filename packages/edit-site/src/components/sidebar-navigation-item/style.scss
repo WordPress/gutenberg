@@ -21,7 +21,7 @@
 	&[aria-current="true"] {
 		background: var(--wpds-color-background-interactive-neutral-weak-active);
 		color: var(--wpds-color-foreground-interactive-neutral-weak-active);
-		font-weight: $font-weight-medium;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 	}
 
 	// Make sure the focus style is drawn on top of the current item background.

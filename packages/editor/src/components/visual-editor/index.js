@@ -10,7 +10,6 @@ import {
 	BlockList,
 	store as blockEditorStore,
 	__unstableUseTypewriter as useTypewriter,
-	__unstableUseTypingObserver as useTypingObserver,
 	useSettings,
 	RecursionProvider,
 	privateApis as blockEditorPrivateApis,
@@ -304,7 +303,6 @@ function VisualEditor( {
 		blockListLayout?.type === 'default' && ! hasPostContentAtRootLevel
 			? fallbackLayout
 			: blockListLayout;
-	const observeTypingRef = useTypingObserver();
 	const titleRef = useRef();
 	useEffect( () => {
 		if ( ! autoFocus || ! isCleanNewPost() ) {
@@ -453,7 +451,6 @@ function VisualEditor( {
 								}
 							) }
 							contentEditable={ false }
-							ref={ observeTypingRef }
 							style={ {
 								// This is using inline styles so it's applied
 								// within the editor iframe.

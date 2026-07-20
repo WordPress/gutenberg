@@ -8,6 +8,7 @@
 		{ "path": "../compose" },
 		{ "path": "../style-runtime" },
 		{ "path": "./tsconfig.src.json" },
+		{ "path": "./tsconfig.plugins.json" },
 		{ "path": "./tsconfig.bin.json" }
 	]
 }
