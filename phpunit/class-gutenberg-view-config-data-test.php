@@ -1879,5 +1879,4 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			self::read_config( $data )
 		);
 	}
-
 }
