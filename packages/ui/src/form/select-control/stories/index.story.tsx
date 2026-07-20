@@ -156,6 +156,7 @@ const User = ( { user }: { user: ( typeof userOptions )[ number ] } ) => (
 				borderRadius: '50%',
 			} }
 		/>
+
 		{ user.label }
 	</span>
 );
@@ -175,19 +176,18 @@ export const WithCustomTriggerAndItems: Story = {
 		label: 'Label',
 		description: 'This is the description.',
 		triggerContent: ( item ) => <User user={ item } />,
-		children: (
-			<>
-				{ userOptions.map( ( item ) => (
-					<SelectControl.Item
-						key={ item.value }
-						value={ item }
-						label={ item.label }
-					>
-						<User user={ item } />
-					</SelectControl.Item>
-				) ) }
-			</>
-		),
+		children: [
+			userOptions.map( ( item ) => (
+				<SelectControl.Item
+					key={ item.value }
+					value={ item }
+					label={ item.label }
+				>
+					<User user={ item } />
+				</SelectControl.Item>
+			) ),
+		],
+
 		defaultValue: userOptions[ 0 ],
 	},
 };
@@ -202,19 +202,17 @@ export const WithCustomTriggerAndItems: Story = {
 export const WithItemsArrayAndPartialCustomization: Story = {
 	args: {
 		...Default.args,
-		children: (
-			<>
-				{ Default.args?.items?.map( ( item ) => (
-					<SelectControl.Item
-						key={ item.value ?? 'null' }
-						value={ item }
-						label={ item.label }
-						disabled={ item.disabled }
-					>
-						✨ { item.label }
-					</SelectControl.Item>
-				) ) }
-			</>
-		),
+		children: [
+			Default.args?.items?.map( ( item ) => (
+				<SelectControl.Item
+					key={ item.value ?? 'null' }
+					value={ item }
+					label={ item.label }
+					disabled={ item.disabled }
+				>
+					✨ { item.label }
+				</SelectControl.Item>
+			) ),
+		],
 	},
 };

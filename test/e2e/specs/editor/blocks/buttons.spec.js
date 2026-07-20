@@ -317,7 +317,10 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page.click( 'role=button[name="Custom color picker"i]' );
+		// Match by substring: when the control has a value (e.g. an inherited
+		// color), the button's accessible name gains a "The currently selected
+		// color is…" suffix, so an exact-name match no longer works.
+		await page.click( 'role=button[name=/Custom color picker/i]' );
 		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
 
 		await editorSettings
@@ -327,7 +330,7 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page.click( 'role=button[name="Custom color picker"i]' );
+		await page.click( 'role=button[name=/Custom color picker/i]' );
 		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
 
 		// Check the content.
@@ -514,8 +517,12 @@ test.describe( 'Buttons', () => {
 				.getByLabel( 'Set custom value' )
 				.click();
 
-			// Change the unit from px to % using the combobox
+			// Change the unit from px to % using the combobox. Scope the
+			// lookup to the Width control's group: the block inspector now
+			// renders other unit selectors (e.g. Typography font size) above
+			// it, so a panel-wide `.first()` would match the wrong control.
 			await settingsPanel
+				.getByRole( 'group', { name: 'Width' } )
 				.getByRole( 'combobox', { name: 'Select unit' } )
 				.first()
 				.selectOption( '%' );

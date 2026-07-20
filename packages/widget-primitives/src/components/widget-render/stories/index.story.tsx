@@ -13,16 +13,21 @@ import '@wordpress/components/build-style/style.css';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/dataviews/build-style/style.css';
 import { DataForm, useFormValidity } from '@wordpress/dataviews';
-import type { Field, Form } from '@wordpress/dataviews';
+import type { DataFormControlProps, Field, Form } from '@wordpress/dataviews';
 import { Suspense, useId, useMemo, useState } from '@wordpress/element';
-import { globe } from '@wordpress/icons';
-import { Card, Icon, Stack } from '@wordpress/ui';
+import { globe, starFilled } from '@wordpress/icons';
+// `IconButton` is not on the recommended list yet.
+/* eslint-disable @wordpress/use-recommended-components */
+import { Card, Icon, IconButton, Link, Stack } from '@wordpress/ui';
+/* eslint-enable @wordpress/use-recommended-components */
 
 /**
  * Internal dependencies
  */
 import { WidgetRender } from '..';
+import { registerFieldType, resolveFields } from '../../../field-types';
 import type {
+	WidgetAction,
 	WidgetAttributeField,
 	WidgetRenderProps,
 	WidgetType,
@@ -387,8 +392,10 @@ function WidgetWithRelevance() {
 	} );
 
 	const titleId = useId();
+	// Hosts receive attributes already resolved by `useWidgetTypes`; the
+	// story bypasses the hook, so it resolves them itself.
 	const allFields = useMemo(
-		() => demoWidgetTypeWithRelevance.attributes ?? [],
+		() => resolveFields( demoWidgetTypeWithRelevance.attributes ?? [] ),
 		[]
 	);
 
@@ -533,6 +540,303 @@ Each attribute may carry a \`relevance\` hint (\`'high' | 'low'\`). The widget d
 **Takeaway**
 
 When every attribute is \`'high'\`, a host need not expose a second settings surface. Another host could fold everything into one panel and still honor the contract.
+`,
+			},
+		},
+	},
+};
+
+/*
+ * Edit control for the `rating` field type. Registered once below;
+ * widgets then reference the type by name, never this component.
+ */
+function RatingEdit< Item >( {
+	data,
+	field,
+	onChange,
+}: DataFormControlProps< Item > ) {
+	const value = Number( field.getValue( { item: data } ) ?? 0 );
+
+	return (
+		<Stack direction="row" align="center">
+			{ [ 1, 2, 3, 4, 5 ].map( ( star ) => (
+				<IconButton
+					key={ star }
+					label={ `Rate ${ star } of 5` }
+					icon={ starFilled }
+					variant="unstyled"
+					onClick={ () =>
+						onChange(
+							field.setValue( { item: data, value: star } )
+						)
+					}
+					style={ {
+						cursor: 'pointer',
+						fontSize: '1.5em',
+						opacity: star <= value ? 1 : 0.25,
+						padding: 0,
+					} }
+				/>
+			) ) }
+		</Stack>
+	);
+}
+
+// The application registers the vocabulary once, before anything renders.
+// First registration wins, so Storybook hot reloads are harmless.
+registerFieldType( {
+	name: 'rating',
+	baseType: 'integer',
+	Edit: RatingEdit,
+} );
+
+interface RatedAttributes {
+	rating?: number;
+}
+
+function RatedWidget( { attributes }: WidgetRenderProps< RatedAttributes > ) {
+	const rating = attributes?.rating ?? 0;
+
+	return (
+		<div
+			style={ {
+				background: 'var(--wpds-color-background-surface-neutral)',
+				border: '1px solid var(--wpds-color-stroke-surface-neutral)',
+				borderRadius: 'var(--wpds-border-radius-md)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
+				display: 'grid',
+				gap: 'var(--wpds-dimension-gap-md)',
+				justifyItems: 'center',
+				padding: 'var(--wpds-dimension-padding-xl)',
+			} }
+		>
+			<strong style={ { fontSize: '1.5em' } }>
+				{ rating > 0 ? '⭐'.repeat( rating ) : 'Not rated yet' }
+			</strong>
+			<span>{ `Rated ${ rating } / 5 from the prominent surface.` }</span>
+		</div>
+	);
+}
+
+/*
+ * The declarative payoff: the attribute references `rating` by name.
+ * No Edit import, no component, pure data.
+ */
+const ratedWidgetType: WidgetType< RatedAttributes > = {
+	apiVersion: 1,
+	name: 'demo/rated',
+	title: 'Rated',
+	description: 'Declares its rating attribute by field type name.',
+	icon: starFilled,
+	renderModule: 'demo/widgets/rated/render',
+	attributes: [
+		{
+			id: 'rating',
+			type: 'rating',
+			label: 'Rating',
+			relevance: 'high',
+		},
+	] satisfies WidgetAttributeField< RatedAttributes >[],
+	example: {
+		attributes: { rating: 3 },
+	},
+};
+
+const resolveRatedModule = async () => ( {
+	default: RatedWidget as ComponentType< WidgetRenderProps< unknown > >,
+} );
+
+function WidgetWithFieldType() {
+	const [ attributes, setAttributes ] = useState< RatedAttributes >( {
+		...ratedWidgetType.example?.attributes,
+	} );
+
+	const titleId = useId();
+
+	// Hosts receive attributes already resolved by `useWidgetTypes`; the
+	// story bypasses the hook, so it resolves them itself.
+	const prominentFields = useMemo(
+		() =>
+			resolveFields( ratedWidgetType.attributes ?? [] ).filter(
+				( field ) => field.relevance === 'high'
+			) as Field< RatedAttributes >[],
+		[]
+	);
+
+	const prominentForm = useMemo< Form >(
+		() => ( {
+			layout: { type: 'row', alignment: 'center' },
+			fields: prominentFields.map( ( field ) => ( {
+				id: field.id,
+				layout: { type: 'regular', labelPosition: 'none' },
+			} ) ),
+		} ),
+		[ prominentFields ]
+	);
+
+	const applyEdits = ( edits: Partial< RatedAttributes > ) =>
+		setAttributes( ( prev ) => ( { ...prev, ...edits } ) );
+
+	return (
+		<div style={ { maxWidth: 560 } }>
+			<Card.Root
+				render={ <section /> }
+				aria-labelledby={ titleId }
+				style={ {
+					background: `repeating-linear-gradient(
+						45deg,
+						var(--wpds-color-background-surface-neutral),
+						var(--wpds-color-background-surface-neutral) 8px,
+						var(--wpds-color-background-surface-neutral-weak) 8px,
+						var(--wpds-color-background-surface-neutral-weak) 16px
+					)`,
+				} }
+			>
+				<Card.Header>
+					<Stack direction="row" align="center" gap="sm">
+						{ ratedWidgetType.icon && (
+							<span aria-hidden="true">
+								<Icon icon={ ratedWidgetType.icon } />
+							</span>
+						) }
+						<Card.Title
+							id={ titleId }
+							render={ <h3 /> }
+							style={ { flexGrow: 1 } }
+						>
+							{ ratedWidgetType.title }
+						</Card.Title>
+
+						<DataForm< RatedAttributes >
+							data={ attributes }
+							fields={ prominentFields }
+							form={ prominentForm }
+							onChange={ applyEdits }
+						/>
+					</Stack>
+				</Card.Header>
+				<Card.Content>
+					<Suspense fallback={ null }>
+						<WidgetRender< RatedAttributes >
+							widgetType={ ratedWidgetType }
+							attributes={ attributes }
+							setAttributes={ applyEdits }
+							resolveWidgetModule={ resolveRatedModule }
+						/>
+					</Suspense>
+				</Card.Content>
+			</Card.Root>
+		</div>
+	);
+}
+
+export const WithFieldType: StoryObj = {
+	render: () => <WidgetWithFieldType />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+The attribute references a **field type** by name instead of carrying a control:
+
+1. The application registers \`rating\` once (\`registerFieldType\`), binding the name to \`baseType: 'integer'\` plus a star-rating \`Edit\` control.
+2. The widget declares \`{ id: 'rating', type: 'rating', relevance: 'high' }\`. Pure data: no imports, no components.
+3. The host resolves the schema (hosts get this through \`useWidgetTypes\`; the story calls the resolver itself) and promotes the field to the prominent surface, where the registered control renders.
+
+An unregistered name would degrade silently, exactly like an unknown type in DataViews. See the **Field Types** doc for the full pipeline.
+`,
+			},
+		},
+	},
+};
+
+const actionsWidgetType: WidgetType< DemoAttributes > = {
+	...demoWidgetType,
+	actions: [
+		{
+			id: 'open-docs',
+			label: 'Open docs',
+			href: 'https://developer.wordpress.org/',
+			openInNewTab: true,
+		},
+		{
+			id: 'export-greeting',
+			label: 'Export greeting',
+			href: 'data:text/plain;charset=utf-8,Hello%20World',
+			download: 'greeting.txt',
+		},
+	] satisfies WidgetAction[],
+};
+
+function WidgetWithActions() {
+	const titleId = useId();
+	const actions = actionsWidgetType.actions ?? [];
+	const [ attributes ] = useState< DemoAttributes >( {
+		...actionsWidgetType.example?.attributes,
+	} );
+
+	return (
+		<div style={ { maxWidth: 560 } }>
+			<Card.Root render={ <section /> } aria-labelledby={ titleId }>
+				<Card.Header>
+					<Stack direction="row" align="center" gap="sm">
+						{ actionsWidgetType.icon && (
+							<span aria-hidden="true">
+								<Icon icon={ actionsWidgetType.icon } />
+							</span>
+						) }
+						<Card.Title
+							id={ titleId }
+							render={ <h3 /> }
+							style={ { flexGrow: 1 } }
+						>
+							{ actionsWidgetType.title }
+						</Card.Title>
+
+						{ /* The host materializes the declared actions; here, as links. */ }
+						<Stack direction="row" align="center" gap="md">
+							{ actions.map( ( action ) => (
+								<Link
+									key={ action.id }
+									href={ action.href }
+									download={ action.download }
+									openInNewTab={ action.openInNewTab }
+								>
+									{ action.label }
+								</Link>
+							) ) }
+						</Stack>
+					</Stack>
+				</Card.Header>
+				<Card.Content>
+					<Suspense fallback={ null }>
+						<WidgetRender< DemoAttributes >
+							widgetType={ actionsWidgetType }
+							attributes={ attributes }
+							resolveWidgetModule={ resolveDemoModule }
+						/>
+					</Suspense>
+				</Card.Content>
+			</Card.Root>
+		</div>
+	);
+}
+
+export const WithActions: StoryObj = {
+	render: () => <WidgetWithActions />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+Beyond its data, a widget can declare \`actions\`: verbs a user can trigger, like opening docs or downloading a file. The widget names each action (\`id\`, \`label\`, and a link \`href\`); the host decides where to put it and materializes it.
+
+**In this demo**
+
+- The widget declares two actions: an external link (\`Open docs\`) and a download (\`Export greeting\`).
+- The host renders them as links beside the title. Another host could surface them in a menu, a footer, or a command palette.
+
+**Takeaway**
+
+The widget names the intent and a link target; navigation and download are the browser's, so the widget never knows its surface.
 `,
 			},
 		},
