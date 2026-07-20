@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -390,6 +395,10 @@ export default function Image( {
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
 	const cropButtonRef = useRef();
+	// Set while the media editor has pointed the block at a freshly
+	// generated file (crop/rotate result) that the browser hasn't finished
+	// loading; cleared by the <img> load/error handlers.
+	const [ isSwappingMedia, setIsSwappingMedia ] = useState( false );
 	const handleMediaEditorModalClose = useCallback(
 		() => cropButtonRef.current?.focus(),
 		[]
@@ -398,6 +407,7 @@ export default function Image( {
 		attributes,
 		setAttributes,
 		onClose: handleMediaEditorModalClose,
+		onUrlChange: useCallback( () => setIsSwappingMedia( true ), [] ),
 	} );
 
 	const {
@@ -486,6 +496,7 @@ export default function Image( {
 	}, [ loadedNaturalWidth, loadedNaturalHeight, imageElement?.complete ] );
 
 	function onImageError() {
+		setIsSwappingMedia( false );
 		setHasImageErrored( true );
 
 		// Check if there's an embed block that handles this URL, e.g., instagram URL.
@@ -497,6 +508,7 @@ export default function Image( {
 	}
 
 	function onImageLoad( event ) {
+		setIsSwappingMedia( false );
 		setHasImageErrored( false );
 		setLoadedNaturalSize( {
 			loadedNaturalWidth: event.target?.naturalWidth,
@@ -1173,7 +1185,9 @@ export default function Image( {
 						onError={ onImageError }
 						onLoad={ onImageLoad }
 						ref={ setRefs }
-						className={ borderProps.className }
+						className={ clsx( borderProps.className, {
+							'is-swapping-media': isSwappingMedia,
+						} ) }
 						width={ naturalWidth }
 						height={ naturalHeight }
 						style={ {
@@ -1222,7 +1236,7 @@ export default function Image( {
 							...shadowProps.style,
 						} }
 					/>
-					{ isUploading && <Spinner /> }
+					{ ( isUploading || isSwappingMedia ) && <Spinner /> }
 				</>
 			) }
 		</ImageWrapper>

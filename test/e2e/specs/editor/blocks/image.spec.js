@@ -269,6 +269,12 @@ test.describe( 'Image', () => {
 		expect( id ).not.toBe( initialId );
 		expect( url ).not.toBe( initialUrl );
 		await expect( image ).toHaveAttribute( 'src', url );
+
+		// The swap loading state must clear once the new file has loaded.
+		await expect( image ).not.toHaveClass( /is-swapping-media/ );
+		await expect(
+			imageBlock.locator( '.components-spinner' )
+		).toBeHidden();
 	} );
 
 	test( 'should undo without broken temporary state', async ( {

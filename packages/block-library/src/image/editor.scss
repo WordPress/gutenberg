@@ -27,7 +27,8 @@ figure.wp-block-image:not(.wp-block) {
 	}
 
 	.is-applying img,
-	&.is-transient img {
+	&.is-transient img,
+	img.is-swapping-media {
 		opacity: 0.3;
 	}
 
