@@ -589,7 +589,7 @@ button.wp-block-navigation-item__content {
 		// Add padding above to accommodate close button.
 		// Don't apply default padding when custom overlay is present.
 		&:not(.disable-default-overlay) .wp-block-navigation__responsive-container-content {
-			padding-top: calc(2rem + #{ $navigation-icon-size });
+			padding-top: var(--wp-navigation-overlay-content-offset, calc(2rem + #{ $navigation-icon-size }));
 		}
 
 		&:where(:not(.disable-default-overlay)) {

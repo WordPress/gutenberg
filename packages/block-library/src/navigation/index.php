@@ -810,6 +810,7 @@ class WP_Navigation_Block_Renderer {
 			';
 			$close_button_directives                 = '
 				data-wp-on--click="actions.closeMenuOnClick"
+				data-wp-watch="callbacks.positionCloseButton"
 			';
 			$responsive_container_content_directives = '
 				data-wp-watch="callbacks.focusFirstElement"

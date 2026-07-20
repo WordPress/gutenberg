@@ -116,6 +116,10 @@ const { state, actions } = store(
 				const ctx = getContext();
 				const { ref } = getElement();
 				ctx.previousFocus = ref;
+				// Remember where the toggle button actually is on screen so the
+				// close button can be placed in the same spot instead of jumping
+				// to a hard-coded corner. See #49402.
+				ctx.toggleButtonRect = ref.getBoundingClientRect();
 				actions.openMenu( 'click' );
 			},
 			closeMenuOnClick() {
@@ -142,6 +146,8 @@ const { state, actions } = store(
 					actions.closeMenu( 'hover' );
 				} else {
 					ctx.previousFocus = ref;
+					// See comment in `openMenuOnClick` above.
+					ctx.toggleButtonRect = ref.getBoundingClientRect();
 					actions.openMenu( 'click' );
 				}
 			},
@@ -245,6 +251,73 @@ const { state, actions } = store(
 					const focusableElements = getFocusableElements( ref );
 					focusableElements?.[ 0 ]?.focus();
 				}
+			},
+			// Positions the default overlay close button so that it lands
+			// exactly where the toggle (burger) button was, instead of a
+			// fixed top-right corner that rarely matches the toggle's real
+			// position in the theme's layout. See #49402.
+			//
+			// Because the close button can now end up anywhere vertically
+			// (not just pinned to the top), it also pushes the menu content
+			// down far enough to always clear the button, via a CSS custom
+			// property the stylesheet falls back from.
+			positionCloseButton() {
+				const ctx = getContext();
+
+				// Only the top-level overlay uses this positioning strategy;
+				// submenus keep their own (unrelated) close behavior.
+				if ( ctx.type !== 'overlay' ) {
+					return;
+				}
+
+				const { ref } = getElement();
+				const dialog = ref.closest(
+					'.wp-block-navigation__responsive-dialog'
+				);
+
+				// Nothing to align to, or the overlay isn't open: reset to
+				// the CSS-defined defaults so we don't leave stale inline
+				// styles/vars lying around (e.g. after a viewport resize
+				// while the previous position no longer makes sense).
+				if ( ! state.isMenuOpen || ! ctx.toggleButtonRect ) {
+					ref.style.removeProperty( 'top' );
+					ref.style.removeProperty( 'right' );
+					ref.style.removeProperty( 'left' );
+					dialog?.style.removeProperty(
+						'--wp-navigation-overlay-content-offset'
+					);
+					return;
+				}
+
+				if ( ! dialog ) {
+					return;
+				}
+
+				const dialogRect = dialog.getBoundingClientRect();
+				const openRect = ctx.toggleButtonRect;
+
+				ref.style.top = `${ openRect.top - dialogRect.top }px`;
+				ref.style.right = `${ dialogRect.right - openRect.right }px`;
+				ref.style.left = 'auto';
+
+				// Re-measure the close button now that it's been moved, so
+				// the content offset matches its *actual* rendered bottom
+				// edge (accounts for the button's own height/padding).
+				const closeRect = ref.getBoundingClientRect();
+				const rootFontSize =
+					parseFloat(
+						window.getComputedStyle( document.documentElement )
+							.fontSize
+					) || 16;
+				// Keep the same breathing room the static default used
+				// (2rem) below whatever the close button's real bottom is.
+				const contentOffset =
+					closeRect.bottom - dialogRect.top + rootFontSize * 2;
+
+				dialog.style.setProperty(
+					'--wp-navigation-overlay-content-offset',
+					`${ contentOffset }px`
+				);
 			},
 		},
 	},
