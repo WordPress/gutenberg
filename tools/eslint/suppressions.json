@@ -621,11 +621,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/combobox-control/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/context/test/context-system-provider.js": {
 		"no-restricted-imports": {
 			"count": 1
