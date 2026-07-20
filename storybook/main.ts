@@ -16,9 +16,7 @@ import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fall
  */
 function getAbsolutePath( packageName: string ) {
 	return path.dirname(
-		fileURLToPath(
-			import.meta.resolve( path.join( packageName, 'package.json' ) )
-		)
+		fileURLToPath( import.meta.resolve( `${ packageName }/package.json` ) )
 	);
 }
 

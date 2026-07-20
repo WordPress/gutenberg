@@ -12,10 +12,16 @@ import { getSelectionEditableElement } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 
 /**
- * While the wrapper is the contentEditable editing host (a selected block
- * supports `editableRoot`), browsers don't perform the default caret
- * movement for Home and End. Perform the equivalent movement with
- * `Selection.modify()`.
+ * Moves the caret to the start or end of the visual line for Home and End
+ * with `Selection.modify()`, because the browser's default caret movement
+ * cannot be relied on in two cases:
+ *
+ * - While the wrapper is the contentEditable editing host (a selected block
+ *   supports `editableRoot`), browsers don't perform the default caret
+ *   movement for Home and End.
+ * - Chromium on macOS maps Home and End to scroll commands, so it never
+ *   moves the caret in editable content on that platform, including nested
+ *   editable elements like the tab labels in the tab-list block.
  */
 export default function useHomeEnd() {
 	const { hasMultiSelection } = useSelect( blockEditorStore );
@@ -33,11 +39,13 @@ export default function useHomeEnd() {
 				return;
 			}
 
-			if (
-				node.contentEditable !== 'true' ||
-				node.ownerDocument.activeElement !== node ||
-				hasMultiSelection()
-			) {
+			// Only handle keys pressed in editable content, in both of the
+			// cases mentioned above: `event.target` is the focused element,
+			// and `isContentEditable` is true both for the wrapper as the
+			// editing host and for a nested editable element like a tab label.
+			// Anything else that takes focus like inputs and textareas keep
+			// default behavior.
+			if ( ! event.target.isContentEditable || hasMultiSelection() ) {
 				return;
 			}
 

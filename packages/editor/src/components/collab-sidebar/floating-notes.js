@@ -27,10 +27,10 @@ import {
 export const { Slot: FloatingNotesSlot, Fill: FloatingNotesFill } =
 	createSlotFill( Symbol( 'EditorFloatingNotes' ) );
 
-// The boundary divider sits this far inside the reserved space, so content
-// clipped at the boundary (e.g. full-bleed blocks) keeps a visible gap from
-// the line.
-const DIVIDER_GAP = 8;
+// The boundary divider sits this far inside the reserved space: per the
+// design, full-bleed blocks clipped at the boundary sit flush with the line
+// but must not overlap it.
+const DIVIDER_GAP = 1;
 const DIVIDER_WIDTH = 1;
 
 /**
