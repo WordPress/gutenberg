@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 import * as Ariakit from '@ariakit/react';
 
@@ -8,7 +9,7 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
+import { useLayoutEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,11 +21,8 @@ import type {
 	WithToolTipProps,
 } from '../types';
 import { useToggleGroupControlContext } from '../context';
-import * as styles from './styles';
-import { useCx } from '../../utils/hooks';
+import styles from './style.module.scss';
 import Tooltip from '../../tooltip';
-
-const { ButtonContentView, LabelView } = styles;
 
 const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 	if ( showTooltip && text ) {
@@ -77,22 +75,18 @@ function ToggleGroupControlOptionBase(
 	} = buttonProps;
 
 	const isPressed = toggleGroupControlContext.value === value;
-	const cx = useCx();
-	const labelViewClasses = useMemo(
-		() => cx( isBlock && styles.labelBlock ),
-		[ cx, isBlock ]
+	const labelClasses = clsx(
+		styles.label,
+		isBlock && styles[ 'label-block' ]
 	);
-	const itemClasses = useMemo(
-		() =>
-			cx(
-				styles.buttonView( {
-					isDeselectable,
-					isIcon,
-					isPressed,
-				} ),
-				className
-			),
-		[ cx, isDeselectable, isIcon, isPressed, className ]
+	const itemClasses = clsx(
+		styles.button,
+		{
+			[ styles[ 'is-deselectable' ] ]: isDeselectable,
+			[ styles[ 'is-icon' ] ]: isIcon,
+			[ styles[ 'is-pressed' ] ]: isPressed,
+		},
+		className
 	);
 
 	const buttonOnClick = () => {
@@ -118,7 +112,7 @@ function ToggleGroupControlOptionBase(
 	}, [ isPressed, toggleGroupControlContext ] );
 
 	return (
-		<LabelView ref={ labelRef } className={ labelViewClasses }>
+		<div ref={ labelRef } className={ labelClasses }>
 			<WithToolTip
 				showTooltip={ showTooltip }
 				text={ otherButtonProps[ 'aria-label' ] }
@@ -131,7 +125,9 @@ function ToggleGroupControlOptionBase(
 						type="button"
 						onClick={ buttonOnClick }
 					>
-						<ButtonContentView>{ children }</ButtonContentView>
+						<div className={ styles[ 'button-content' ] }>
+							{ children }
+						</div>
 					</button>
 				) : (
 					<Ariakit.Radio
@@ -153,11 +149,13 @@ function ToggleGroupControlOptionBase(
 						render={ <button type="button" { ...commonProps } /> }
 						value={ value }
 					>
-						<ButtonContentView>{ children }</ButtonContentView>
+						<div className={ styles[ 'button-content' ] }>
+							{ children }
+						</div>
 					</Ariakit.Radio>
 				) }
 			</WithToolTip>
-		</LabelView>
+		</div>
 	);
 }
 
