@@ -594,6 +594,29 @@ export function isNoteFocused( state ) {
 }
 
 /**
+ * Returns the stored draft content for the given note draft key.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} key   Draft key, unique per form (e.g. per block for new notes).
+ *
+ * @return {string} The draft content, or an empty string if none.
+ */
+export function getNoteDraft( state, key ) {
+	return state.noteDrafts[ key ] ?? '';
+}
+
+/**
+ * Returns whether any unsent note drafts are stored.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether any note drafts exist.
+ */
+export function hasNoteDrafts( state ) {
+	return Object.keys( state.noteDrafts ).length > 0;
+}
+
+/**
  * Returns the previous revision (the one before the current revision).
  * Used for diffing between revisions.
  *

@@ -17,6 +17,7 @@ import {
 	removedPanels,
 	blockInserterPanel,
 	listViewPanel,
+	noteDrafts,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -283,6 +284,48 @@ describe( 'state', () => {
 			const state = removedPanels( original, {
 				type: 'REMOVE_PANEL',
 				panelName: 'post-status',
+			} );
+			expect( state ).toBe( original );
+		} );
+	} );
+
+	describe( 'noteDrafts()', () => {
+		it( 'should apply default state', () => {
+			expect( noteDrafts( undefined, {} ) ).toEqual( {} );
+		} );
+
+		it( 'should store a draft per key', () => {
+			const original = deepFreeze( { 'new-note-a': 'First draft' } );
+			const state = noteDrafts( original, {
+				type: 'SET_NOTE_DRAFT',
+				key: 'new-note-b',
+				content: 'Second draft',
+			} );
+			expect( state ).toEqual( {
+				'new-note-a': 'First draft',
+				'new-note-b': 'Second draft',
+			} );
+		} );
+
+		it( 'should remove a draft when content is empty', () => {
+			const original = deepFreeze( {
+				'new-note-a': 'First draft',
+				'new-note-b': 'Second draft',
+			} );
+			const state = noteDrafts( original, {
+				type: 'SET_NOTE_DRAFT',
+				key: 'new-note-a',
+				content: '',
+			} );
+			expect( state ).toEqual( { 'new-note-b': 'Second draft' } );
+		} );
+
+		it( 'should not change the state when removing an absent draft', () => {
+			const original = deepFreeze( { 'new-note-a': 'First draft' } );
+			const state = noteDrafts( original, {
+				type: 'SET_NOTE_DRAFT',
+				key: 'new-note-b',
+				content: '',
 			} );
 			expect( state ).toBe( original );
 		} );

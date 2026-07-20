@@ -1259,6 +1259,185 @@ test.describe( 'Block Notes', () => {
 		} );
 	} );
 
+	test.describe( 'Draft persistence', () => {
+		test( 'preserves an unsent draft when switching blocks', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'First block' },
+			} );
+			/*
+			 * A spacer between the two blocks keeps the selected block's
+			 * floating toolbar from covering the other block's click target.
+			 */
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Middle block' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Second block' },
+			} );
+
+			// Start a draft on the first block without submitting it.
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			await newNoteForm.pressSequentially( 'Unsent draft' );
+
+			// Moving selection to another block dismisses the form.
+			await editor.canvas.getByText( 'Second block' ).click();
+			await expect( newNoteForm ).toBeHidden();
+
+			// Returning to the first block restores the draft.
+			await editor.canvas.getByText( 'First block' ).click();
+			await expect( newNoteForm ).toBeVisible();
+			await expect( newNoteForm ).toHaveText( 'Unsent draft' );
+
+			// The draft still submits as a regular note.
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'treeitem', { name: 'Note: Unsent draft' } )
+			).toBeVisible();
+		} );
+
+		test( 'caches a draft per block', async ( { editor, page } ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'First block' },
+			} );
+			/*
+			 * A spacer between the two blocks keeps the selected block's
+			 * floating toolbar from covering the other block's click target.
+			 */
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Middle block' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Second block' },
+			} );
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+
+			// Draft a note on each block.
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await newNoteForm.pressSequentially( 'First draft' );
+
+			await editor.canvas.getByText( 'Second block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( newNoteForm ).toHaveText( '' );
+			await newNoteForm.pressSequentially( 'Second draft' );
+
+			// Each block restores its own draft.
+			await editor.canvas.getByText( 'First block' ).click();
+			await expect( newNoteForm ).toHaveText( 'First draft' );
+			await editor.canvas.getByText( 'Second block' ).click();
+			await expect( newNoteForm ).toHaveText( 'Second draft' );
+		} );
+
+		test( 'discards a draft when the form is cancelled', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'First block' },
+			} );
+			/*
+			 * A spacer between the two blocks keeps the selected block's
+			 * floating toolbar from covering the other block's click target.
+			 */
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Middle block' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Second block' },
+			} );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			await newNoteForm.pressSequentially( 'Discarded draft' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Cancel' } )
+				.click();
+			await expect( newNoteForm ).toBeHidden();
+
+			// Cancelling discards the draft: no form on reselection...
+			await editor.canvas.getByText( 'Second block' ).click();
+			await editor.canvas.getByText( 'First block' ).click();
+			await expect( newNoteForm ).toBeHidden();
+
+			// ...and reopening the form starts empty.
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( newNoteForm ).toHaveText( '' );
+		} );
+
+		test( 'preserves an unsent reply draft when the thread is deselected', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'First block' },
+				comment: 'Test comment',
+			} );
+			/*
+			 * A spacer between the two blocks keeps the selected block's
+			 * floating toolbar from covering the other block's click target.
+			 */
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Middle block' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Second block' },
+			} );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Test comment' } );
+			const replyForm = page.getByRole( 'textbox', {
+				name: 'Reply to',
+			} );
+
+			await thread.click();
+			await replyForm.click();
+			await replyForm.pressSequentially( 'Unsent reply' );
+
+			// Deselecting the thread dismisses the reply form.
+			await editor.canvas.getByText( 'Second block' ).click();
+			await expect( replyForm ).toBeHidden();
+
+			// Reselecting the thread restores the reply draft.
+			await editor.canvas.getByText( 'First block' ).click();
+			await expect( replyForm ).toHaveText( 'Unsent reply' );
+		} );
+	} );
+
 	test.describe( 'Inline notes', () => {
 		// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
 		// collab-sidebar/utils.js. Duplicated so the test fails loudly if the

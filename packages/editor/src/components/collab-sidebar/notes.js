@@ -33,6 +33,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		onDelete,
 	} = useNoteActions();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const { getNoteDraft } = unlock( useSelect( editorStore ) );
 	const { selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -152,8 +153,15 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			return;
 		}
 		prevBlockIdRef.current = selectedBlockClientId;
-		selectNote( targetNoteId );
-	}, [ selectedBlockClientId, targetNoteId, selectNote ] );
+		/*
+		 * When the block has no thread but carries an unsent draft, reopen
+		 * the new note form so the draft surfaces again like saved threads.
+		 */
+		const hasDraft =
+			!! selectedBlockClientId &&
+			!! getNoteDraft( `new-note-${ selectedBlockClientId }` );
+		selectNote( targetNoteId ?? ( hasDraft ? 'new' : undefined ) );
+	}, [ selectedBlockClientId, targetNoteId, selectNote, getNoteDraft ] );
 
 	// Focus the selected note when requested.
 	useEffect( () => {

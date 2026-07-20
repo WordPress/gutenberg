@@ -783,3 +783,19 @@ export function selectNote( noteId, options = { focus: false } ) {
 		options,
 	};
 }
+
+/**
+ * Stores an unsent note draft so it can be restored after the note form
+ * is dismissed. Passing empty content discards the draft.
+ *
+ * @param {string} key     Draft key, unique per form (e.g. per block for new notes).
+ * @param {string} content The draft content.
+ * @return {Object} Action object.
+ */
+export function setNoteDraft( key, content ) {
+	return {
+		type: 'SET_NOTE_DRAFT',
+		key,
+		content,
+	};
+}

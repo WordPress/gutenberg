@@ -8,6 +8,7 @@ import {
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { isKeyboardEvent } from '@wordpress/keycodes';
 import { privateApis as dataviewsPrivateApis } from '@wordpress/dataviews';
@@ -19,6 +20,7 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { unlock } from '../../lock-unlock';
 import { sanitizeNoteContent } from './utils';
 import noteMentionCompleter from './note-mention-completer';
+import { store as editorStore } from '../../store';
 
 /*
  * The rich text form field is assembled in `@wordpress/dataviews` on top of the
@@ -41,11 +43,28 @@ const ALLOWED_NOTE_FORMATS = [
 
 const NOTE_COMPLETERS = [ noteMentionCompleter ];
 
-export function NoteForm( { onSubmit, onCancel, note, labels } ) {
+export function NoteForm( { onSubmit, onCancel, note, labels, draftKey } ) {
+	const { setNoteDraft } = unlock( useDispatch( editorStore ) );
+	const { getNoteDraft } = unlock( useSelect( editorStore ) );
+	/*
+	 * Forms with a `draftKey` stash unsent content in the editor store, so a
+	 * draft survives the form unmounting (e.g. when selection moves to
+	 * another block) and each key restores its own draft independently.
+	 */
 	const [ inputComment, setInputComment ] = useState(
-		note?.content?.raw ?? ''
+		() =>
+			( draftKey ? getNoteDraft( draftKey ) : '' ) ||
+			note?.content?.raw ||
+			''
 	);
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
+
+	const updateComment = ( value ) => {
+		setInputComment( value );
+		if ( draftKey ) {
+			setNoteDraft( draftKey, value );
+		}
+	};
 
 	const inputId = useInstanceId( NoteForm, 'comment-input' );
 	const trimmedPlainText = sanitizeNoteContent( stripHTML( inputComment ) );
@@ -76,12 +95,23 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 				setInputComment( ( current ) =>
 					current === submitted ? '' : current
 				);
+				if ( draftKey && getNoteDraft( draftKey ) === submitted ) {
+					setNoteDraft( draftKey, '' );
+				}
 			}
 		} catch {
 			// Keep the draft so the user can retry.
 		} finally {
 			setIsSubmitting( false );
 		}
+	}
+
+	function handleCancel( event ) {
+		// Cancelling is an explicit discard, unlike dismissing the form.
+		if ( draftKey ) {
+			setNoteDraft( draftKey, '' );
+		}
+		onCancel( event );
 	}
 
 	return (
@@ -104,7 +134,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 				if ( event.key === 'Escape' && ! event.defaultPrevented ) {
 					event.preventDefault();
 					// Passing event for reply forms.
-					onCancel( event );
+					handleCancel( event );
 				}
 			} }
 		>
@@ -113,7 +143,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 				label={ labels?.input ?? __( 'Note' ) }
 				hideLabelFromVision
 				value={ inputComment }
-				onChange={ setInputComment }
+				onChange={ updateComment }
 				placeholder={ labels?.placeholder }
 				allowedFormats={ ALLOWED_NOTE_FORMATS }
 				completers={ NOTE_COMPLETERS }
@@ -125,7 +155,11 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 				gap="sm"
 				wrap="wrap"
 			>
-				<Button size="compact" variant="tertiary" onClick={ onCancel }>
+				<Button
+					size="compact"
+					variant="tertiary"
+					onClick={ handleCancel }
+				>
 					<Truncate>{ __( 'Cancel' ) }</Truncate>
 				</Button>
 				<Button

@@ -37,7 +37,14 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
+	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 	const isSubmittingRef = useRef( false );
+	/*
+	 * The block whose form owns focus. Recorded at focus time because by the
+	 * time the deferred blur callback runs, `clientId` may already point at a
+	 * newly selected block.
+	 */
+	const ownerClientIdRef = useRef( clientId );
 
 	/*
 	 * Dismiss the form once focus leaves it. `useFocusOutside` keeps the form
@@ -56,6 +63,17 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 		}
 		// Never dismiss mid-submit; clicking "Add note" blurs before it settles.
 		if ( isSubmittingRef.current ) {
+			return;
+		}
+
+		/*
+		 * When focus left because block selection moved to another block, the
+		 * block-transition logic in `notes.js` owns the note selection — it
+		 * may have just reopened a stashed draft on the new block — so only
+		 * drop the spotlight for the block whose form was dismissed.
+		 */
+		if ( getSelectedBlockClientId() !== ownerClientIdRef.current ) {
+			toggleBlockSpotlight( ownerClientIdRef.current, false );
 			return;
 		}
 
@@ -92,9 +110,14 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 				floating ? { opacity: ! floating.y ? 0 : undefined } : undefined
 			}
 			{ ...focusOutside }
+			onFocus={ ( event ) => {
+				focusOutside.onFocus( event );
+				ownerClientIdRef.current = clientId;
+			} }
 		>
 			<NoteCard>
 				<NoteForm
+					key={ clientId }
 					onSubmit={ async ( inputComment ) => {
 						isSubmittingRef.current = true;
 						try {
@@ -123,6 +146,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 						input: __( 'New note' ),
 						placeholder: __( 'Add a note or @ mention' ),
 					} }
+					draftKey={ `new-note-${ clientId }` }
 				/>
 			</NoteCard>
 		</FloatingContainer>

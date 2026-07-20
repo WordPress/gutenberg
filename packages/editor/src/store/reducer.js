@@ -486,6 +486,33 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning unsent note drafts, keyed by draft key.
+ *
+ * Keeps in-progress note content around when a note form is dismissed
+ * without being submitted, so each block (and each reply thread) can
+ * restore its own draft independently.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {Object} Updated state.
+ */
+export function noteDrafts( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_NOTE_DRAFT': {
+			if ( ! action.content ) {
+				if ( ! ( action.key in state ) ) {
+					return state;
+				}
+				const { [ action.key ]: removed, ...rest } = state;
+				return rest;
+			}
+			return { ...state, [ action.key ]: action.content };
+		}
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -511,5 +538,6 @@ export default combineReducers( {
 	revisionPage,
 	showRevisionDiff,
 	selectedNote,
+	noteDrafts,
 	dataviews: dataviewsReducer,
 } );
