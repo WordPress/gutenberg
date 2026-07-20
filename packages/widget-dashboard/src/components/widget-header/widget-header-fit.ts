@@ -9,13 +9,6 @@ import type { Ref } from 'react';
 import { useResizeObserver } from '@wordpress/compose';
 import { createContext, useContext, useEffect } from '@wordpress/element';
 
-/**
- * Horizontal padding of the toolbar chip (`--wpds-dimension-padding-xs` per
- * side). Part of the header budget in both header variants, with and
- * without identity.
- */
-export const WIDGET_TOOLBAR_CHIP_RESERVE = 8;
-
 const WidgetHeaderAvailableSizeContext = createContext< number | null >( null );
 
 export const WidgetHeaderAvailableSizeProvider =
@@ -69,6 +62,42 @@ export function useReserveHeaderSpace< T extends HTMLElement = HTMLElement >(
 			entry.contentRect.width + ( parseFloat( columnGap ) || 0 )
 		);
 	} );
+
+	useEffect(
+		() => () => unregisterReserved( id ),
+		[ id, unregisterReserved ]
+	);
+
+	return ref;
+}
+
+/**
+ * Reserves a container's own horizontal frame from the header's fit budget.
+ *
+ * The toolbar chip pads its controls on both sides, and gains a border while
+ * customizing; neither is space the controls can use. The difference between
+ * the two boxes the entry reports is exactly that, so the stylesheet stays the
+ * only place the values live. Observing the border box is what makes a padding
+ * change notify at all: it leaves the content box untouched.
+ *
+ * @param {string} id Stable identifier for the reserving container.
+ */
+export function useReserveHeaderPadding< T extends HTMLElement = HTMLElement >(
+	id: string
+): Ref< T > {
+	const { registerReserved, unregisterReserved } = useContext(
+		WidgetHeaderReserveContext
+	);
+
+	const ref = useResizeObserver< T >(
+		( [ entry ] ) => {
+			const border = entry.borderBoxSize?.[ 0 ]?.inlineSize ?? 0;
+			const content = entry.contentBoxSize?.[ 0 ]?.inlineSize ?? 0;
+
+			registerReserved( id, Math.max( 0, border - content ) );
+		},
+		{ box: 'border-box' }
+	);
 
 	useEffect(
 		() => () => unregisterReserved( id ),

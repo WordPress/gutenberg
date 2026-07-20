@@ -17,7 +17,6 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  */
 import { WidgetInfotip } from './widget-header-infotip';
 import {
-	WIDGET_TOOLBAR_CHIP_RESERVE,
 	WidgetHeaderAvailableSizeProvider,
 	WidgetHeaderReserveProvider,
 } from './widget-header-fit';
@@ -94,9 +93,9 @@ export function WidgetHeader( {
 		}
 	);
 
-	// Footprint of the trailing sections beside the collapsible controls (the
-	// actions menu, and whatever the header gains next). Each reports its own
-	// width; the sum is discounted from the fit budget.
+	// Everything in the toolbar the collapsible controls cannot use: the chip's
+	// own padding, and each section beside them (the actions menu, and whatever
+	// the header gains next). Each reports itself; the sum leaves the budget.
 	const [ reserved, setReserved ] = useState< Record< string, number > >(
 		{}
 	);
@@ -131,7 +130,6 @@ export function WidgetHeader( {
 	const availableSize =
 		headerWidth > 0
 			? headerWidth -
-			  WIDGET_TOOLBAR_CHIP_RESERVE -
 			  ( hasIdentity ? identityReserve : 0 ) -
 			  totalReserved
 			: null;

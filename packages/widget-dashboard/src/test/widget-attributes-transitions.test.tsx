@@ -40,11 +40,21 @@ jest.mock( '@wordpress/compose', () => ( {
 	},
 } ) );
 
-function notifyResize( element: Element, width: number ) {
+/**
+ * @param element Observed element.
+ * @param width   Content width to report.
+ * @param frame   Padding and border to report around that width.
+ */
+function notifyResize( element: Element, width: number, frame = 0 ) {
 	act(
 		() =>
 			mockObserved.get( element )?.( [
-				{ target: element, contentRect: { width } },
+				{
+					target: element,
+					contentRect: { width },
+					contentBoxSize: [ { inlineSize: width } ],
+					borderBoxSize: [ { inlineSize: width + frame } ],
+				},
 			] )
 	);
 }
@@ -135,6 +145,51 @@ async function renderCollapsed() {
 
 	return { header };
 }
+
+describe( 'header fit budget', () => {
+	beforeEach( () => {
+		mockObserved.clear();
+	} );
+
+	it( "counts the toolbar chip's own padding and border", async () => {
+		render( <Harness /> );
+		await screen.findByTestId( 'metric' );
+
+		/* eslint-disable testing-library/no-node-access */
+		const header = document.querySelector(
+			'.style-widget-header'
+		) as Element;
+		const identity = document.querySelector( '.style-identity' ) as Element;
+		const chip = document.querySelector(
+			'.style-widget-toolbar'
+		) as Element;
+		const inline = document.querySelector(
+			'.style-inline-controls'
+		) as Element;
+		const persistent = document.querySelector(
+			'.style-persistent-controls'
+		) as Element;
+		/* eslint-enable testing-library/no-node-access */
+
+		// 300 less 120 of identity and 32 of settings leaves 148 for fields
+		// that measure 140: they fit.
+		notifyResize( chip, 200 );
+		notifyResize( persistent, 32 );
+		notifyResize( inline, 140 );
+		notifyResize( identity, 120 );
+		notifyResize( header, 300 );
+
+		expect( await screen.findByRole( 'combobox' ) ).toBeInTheDocument();
+
+		// The chip reports 16px of frame around the same content: the fields
+		// no longer fit and collapse.
+		notifyResize( chip, 200, 16 );
+
+		expect(
+			await screen.findByRole( 'button', { name: 'Widget controls' } )
+		).toBeInTheDocument();
+	} );
+} );
 
 describe( 'WidgetAttributes presentation transitions', () => {
 	beforeEach( () => {
