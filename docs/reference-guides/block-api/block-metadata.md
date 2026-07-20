@@ -162,8 +162,9 @@ An implementation should expect and tolerate unknown categories, providing some 
 
 ### Parent
 
--   Type: `string[]`
+-   Type: `string[]` or `undefined`
 -   Optional
+-   Default: `undefined`
 -   Localized: No
 -   Property: `parent`
 
@@ -172,6 +173,12 @@ An implementation should expect and tolerate unknown categories, providing some 
 ```
 
 Setting `parent` lets a block require that it is only available when nested within the specified blocks. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+
+When `parent` is `undefined`, the block is available at any level where insertion is otherwise allowed. When `parent` is an empty array (`[]`), the block is only available at the root level.
+
+```json
+{ "parent": [] }
+```
 
 ### Ancestor
 
