@@ -102,6 +102,11 @@ function gutenberg_filter_wp_navigation_post_type_args( $args, $post_type ) {
 	}
 
 	$args['map_meta_cap'] = true;
+	/*
+	 * Core migration: replace the capabilities array on the
+	 * register_post_type( 'wp_navigation', ... ) call in wp-includes/post.php,
+	 * inside create_initial_post_types().
+	 */
 	$args['capabilities'] = array_merge(
 		isset( $args['capabilities'] ) && is_array( $args['capabilities'] )
 			? $args['capabilities']
