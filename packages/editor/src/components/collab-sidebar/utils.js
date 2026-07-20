@@ -3,6 +3,7 @@
  */
 import { _x } from '@wordpress/i18n';
 import { create, RichTextData } from '@wordpress/rich-text';
+import { getRectangleFromRange } from '@wordpress/dom';
 
 /**
  * Sanitizes a note string by trimming leading and trailing whitespace.
@@ -216,10 +217,22 @@ export function findNoteInBlock( attributes, noteId ) {
  * @return {string} Selector for the note's marker element(s).
  */
 export function getNoteMarkerSelector( noteId ) {
-	// `noteId` is a server comment ID (always a positive integer), but escape
-	// `"`/`\` defensively since it composes a quoted attribute value from
-	// stored data.
-	const escapedId = String( noteId ).replace( /["\\]/g, '\\$&' );
+	/*
+	 * `noteId` is a server comment ID (always a positive integer), but the
+	 * value composes a selector from stored data, so escape it defensively.
+	 *
+	 * Deliberately not `CSS.escape`: that escapes for *identifier* context,
+	 * where a leading digit is illegal, so it renders the id 7 as `\37 `.
+	 * That is valid, and matches, but it makes every rule
+	 * `buildHighlightCss` generates unreadable. Inside a quoted attribute
+	 * value the only characters that need escaping are the quote, the
+	 * backslash, and raw line breaks (a parse error in a CSS string).
+	 */
+	const escapedId = String( noteId ).replace( /["\\\n\r\f]/g, ( char ) =>
+		char === '"' || char === '\\'
+			? `\\${ char }`
+			: `\\${ char.codePointAt( 0 ).toString( 16 ) } `
+	);
 	return `mark.wp-note[data-id="${ escapedId }"]`;
 }
 
@@ -242,7 +255,18 @@ export function getSelectionRect( blockEl ) {
 	if ( ! blockEl.contains( range.commonAncestorContainer ) ) {
 		return null;
 	}
-	return range.getBoundingClientRect();
+	// `getRectangleFromRange` over `Range.getBoundingClientRect()`: it drops
+	// the zero-width rects a selection picks up at a line's edge, so a
+	// selection starting at the end of one line aligns to the line that
+	// actually holds the text rather than to the line above it.
+	const rect = getRectangleFromRange( range );
+	// A range with no rendered client rects still yields an all-zero rect
+	// rather than null, which would pin the thread to the top of the canvas.
+	// Treat it as "no usable selection" so callers fall back to the block.
+	if ( ! rect || ( rect.width === 0 && rect.height === 0 ) ) {
+		return null;
+	}
+	return rect;
 }
 
 // Sentinel that sorts a block-level (whole-block) note before any inline note
@@ -442,12 +466,26 @@ export function calculateNotePositions( {
 } ) {
 	const offsets = {};
 
-	const anchorIndex = Math.max(
-		0,
-		threads.findIndex( ( thread ) => thread.id === selectedNoteId )
+	// The overlap sweep walks outward from the anchor assuming each thread's
+	// top is greater than the previous one's. Thread order is document order,
+	// which tracks visual order for notes anchored to their markers, but a
+	// pending "new" note anchors to the live selection and can therefore sit
+	// above notes that precede it in the list. Sort by measured top so the
+	// sweep's assumption holds and cards never displace past their markers.
+	// Threads without a rect keep their relative order; they are skipped
+	// below and never receive a position.
+	const orderedThreads = [ ...threads ].sort(
+		( a, b ) =>
+			( blockRects[ a.id ]?.top ?? Number.MAX_VALUE ) -
+			( blockRects[ b.id ]?.top ?? Number.MAX_VALUE )
 	);
 
-	const anchorThread = threads[ anchorIndex ];
+	const anchorIndex = Math.max(
+		0,
+		orderedThreads.findIndex( ( thread ) => thread.id === selectedNoteId )
+	);
+
+	const anchorThread = orderedThreads[ anchorIndex ];
 
 	if ( ! anchorThread || ! blockRects[ anchorThread.id ] ) {
 		return { positions: {} };
@@ -463,8 +501,8 @@ export function calculateNotePositions( {
 	let prevAdjustedTop = anchorTop + THREAD_ALIGN_OFFSET;
 	let prevHeight = anchorHeight;
 
-	for ( let i = anchorIndex + 1; i < threads.length; i++ ) {
-		const thread = threads[ i ];
+	for ( let i = anchorIndex + 1; i < orderedThreads.length; i++ ) {
+		const thread = orderedThreads[ i ];
 		const threadRect = blockRects[ thread.id ];
 		if ( ! threadRect ) {
 			continue;
@@ -490,7 +528,7 @@ export function calculateNotePositions( {
 	let belowAdjustedTop = anchorTop + THREAD_ALIGN_OFFSET;
 
 	for ( let i = anchorIndex - 1; i >= 0; i-- ) {
-		const thread = threads[ i ];
+		const thread = orderedThreads[ i ];
 		const threadRect = blockRects[ thread.id ];
 		if ( ! threadRect ) {
 			continue;
@@ -516,7 +554,7 @@ export function calculateNotePositions( {
 	// blockRect.top + scrollTop is the block's absolute y within the editor's
 	// scroll content; CSS translates each thread by -scrollTop at render time.
 	const positions = {};
-	for ( const thread of threads ) {
+	for ( const thread of orderedThreads ) {
 		const blockRect = blockRects[ thread.id ];
 		if ( blockRect && offsets[ thread.id ] !== undefined ) {
 			positions[ thread.id ] =

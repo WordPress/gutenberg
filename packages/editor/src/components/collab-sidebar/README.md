@@ -74,11 +74,18 @@ A plain JS module returning a store created via `createBoardStore()` (one per mo
 
 A single shared `ResizeObserver` watches every registered floating element; when a floating note changes height, it updates `heights`, snapshots, and calls every `listener` in the store's `Set`.
 
+A second `ResizeObserver` watches the registered *block* elements. Anchors are read from the DOM, so a thread's position goes stale whenever content moves under it - editing a block reflows its own marker onto a different line and shifts every block after it. Block sizes are never recorded; the observer only re-emits so the board recomputes.
+
 API:
 - `subscribe(listener)` / `getSnapshot()` - wired to React via `useSyncExternalStore`. Disconnects the observer when the last subscriber leaves.
 - `registerThread(id, blockEl, floatingEl)` - called by each `NoteThread` once mounted. Adds the block ref, swaps the floating ref (unobserving the previous one), starts observing the new one, emits.
 - `unregisterThread(id)` - inverse; called on unmount.
-- `getBlockRects()` - returns a batched snapshot of block `getBoundingClientRect()` values. Batches reads so subsequent CSS writes don't trigger layout thrash.
+- `getBlockRects()` - returns a batched snapshot of each thread's *anchor* rect, so a thread lines up with the text it annotates rather than with the top of its block. The anchor is resolved per thread at read time, because rich-text re-renders replace the marker element:
+  - an inline note anchors to its in-content `mark.wp-note[data-id]` marker (its first run when the marker is split across several runs);
+  - the pending `new` note has no marker yet, so it anchors to the text selection it is about to wrap;
+  - a block-level note - or any note whose marker or selection can't be measured - falls back to the block's own `getBoundingClientRect()`.
+
+  Batches reads so subsequent CSS writes don't trigger layout thrash.
 - `getFirstBlockElement()` - the first registered block, used to locate the canvas scroll container.
 
 The store owns DOM references directly, not through React - floating note height changes must update layout without re-rendering the thread list.
@@ -100,6 +107,7 @@ Given the list of threads, the currently selected note id, the block rects, the 
 
 Algorithm, keyed on the selected note as an **anchor**:
 
+0. Sort the threads by measured anchor top. The two sweeps below assume tops increase with index; document order satisfies that for notes anchored to their markers, but the pending `new` note anchors to the live selection and can sit above notes that precede it in the list.
 1. Anchor the selected note at `blockRect.top + THREAD_ALIGN_OFFSET` (−16). If no selected note, anchor the first thread.
 2. Walk forward from the anchor: each subsequent thread starts at its block's top; if it would overlap the previous thread's bottom (plus `THREAD_GAP` of 16), push it further down by `OVERLAP_MARGIN` (20).
 3. Walk backward from the anchor: mirror - push upward into any overlap.

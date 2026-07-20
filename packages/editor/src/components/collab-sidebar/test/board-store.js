@@ -72,18 +72,46 @@ describe( 'createBoardStore', () => {
 			afterEach( () => {
 				window.getSelection().removeAllRanges();
 				document.body.removeChild( blockEl );
-				// jsdom's Range has no getBoundingClientRect; selectText
-				// defines one, so drop it to keep tests isolated.
+				// jsdom's Range has neither getClientRects nor
+				// getBoundingClientRect; selectText defines both, so drop
+				// them to keep tests isolated.
+				delete window.Range.prototype.getClientRects;
 				delete window.Range.prototype.getBoundingClientRect;
 			} );
 
-			function selectText( node, start, end ) {
+			/**
+			 * Select a range and give it the client rects a browser would
+			 * report. One rect per line the selection covers; the bounding
+			 * rect is their union, as in a real engine.
+			 *
+			 * @param {Node}     node  Text node to select within.
+			 * @param {number}   start Start offset.
+			 * @param {number}   end   End offset.
+			 * @param {Object[]} rects Per-line rects the selection reports.
+			 */
+			function selectText(
+				node,
+				start,
+				end,
+				rects = [ { top: 160, width: 50, height: 20 } ]
+			) {
 				const range = document.createRange();
 				range.setStart( node, start );
 				range.setEnd( node, end );
-				window.Range.prototype.getBoundingClientRect = () => ( {
-					top: 160,
-				} );
+				window.Range.prototype.getClientRects = () => rects;
+				window.Range.prototype.getBoundingClientRect = () =>
+					rects.length
+						? {
+								top: Math.min( ...rects.map( ( r ) => r.top ) ),
+								width: Math.max(
+									...rects.map( ( r ) => r.width )
+								),
+								height: rects.reduce(
+									( sum, r ) => sum + r.height,
+									0
+								),
+						  }
+						: { top: 0, width: 0, height: 0 };
 				const selection = window.getSelection();
 				selection.removeAllRanges();
 				selection.addRange( range );
@@ -130,6 +158,40 @@ describe( 'createBoardStore', () => {
 
 				expect( store.getBlockRects().new.top ).toBe( 100 );
 				document.body.removeChild( other );
+			} );
+
+			it( 'ignores the zero-width rect a selection picks up at a line edge', () => {
+				// A selection starting at the very end of one line reports a
+				// zero-width rect there plus the real rect on the next line.
+				// The union would align the form to the line above the text.
+				selectText( blockEl.firstChild, 5, 11, [
+					{ top: 100, width: 0, height: 20 },
+					{ top: 160, width: 50, height: 20 },
+				] );
+
+				const store = createBoardStore();
+				store.registerThread(
+					'new',
+					blockEl,
+					document.createElement( 'div' )
+				);
+
+				expect( store.getBlockRects().new.top ).toBe( 160 );
+			} );
+
+			it( 'falls back to the block rect when the selection has no rendered rects', () => {
+				// An unrendered range still yields an all-zero rect rather
+				// than null, which would pin the form to the top of the canvas.
+				selectText( blockEl.firstChild, 5, 11, [] );
+
+				const store = createBoardStore();
+				store.registerThread(
+					'new',
+					blockEl,
+					document.createElement( 'div' )
+				);
+
+				expect( store.getBlockRects().new.top ).toBe( 100 );
 			} );
 
 			it( 'falls back to the block rect when there is no selection', () => {
@@ -206,6 +268,61 @@ describe( 'createBoardStore', () => {
 			const rects = store.getBlockRects();
 			expect( rects[ 12 ].top ).toBe( 120 );
 			expect( rects[ 34 ].top ).toBe( 180 );
+		} );
+	} );
+
+	describe( 'block observation', () => {
+		let observe;
+		let unobserve;
+
+		beforeEach( () => {
+			observe = jest.spyOn( window.ResizeObserver.prototype, 'observe' );
+			unobserve = jest.spyOn(
+				window.ResizeObserver.prototype,
+				'unobserve'
+			);
+		} );
+
+		afterEach( () => {
+			observe.mockRestore();
+			unobserve.mockRestore();
+		} );
+
+		it( 'observes a block so reflow under a thread retriggers layout', () => {
+			const store = createBoardStore();
+			const blockEl = document.createElement( 'p' );
+
+			store.registerThread(
+				12,
+				blockEl,
+				document.createElement( 'div' )
+			);
+
+			expect( observe ).toHaveBeenCalledWith( blockEl );
+		} );
+
+		it( 'keeps observing a block another thread still references', () => {
+			const store = createBoardStore();
+			const blockEl = document.createElement( 'p' );
+
+			store.registerThread(
+				12,
+				blockEl,
+				document.createElement( 'div' )
+			);
+			store.registerThread(
+				34,
+				blockEl,
+				document.createElement( 'div' )
+			);
+
+			// Two notes share one block, so dropping one must not stop
+			// tracking the block the other still anchors to.
+			store.unregisterThread( 12 );
+			expect( unobserve ).not.toHaveBeenCalledWith( blockEl );
+
+			store.unregisterThread( 34 );
+			expect( unobserve ).toHaveBeenCalledWith( blockEl );
 		} );
 	} );
 } );
