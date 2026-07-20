@@ -1755,38 +1755,8 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'zz' );
 
-		// Verify setup: "ab" with a nested "cd" item, then a top-level
-		// sibling "zz"; caret at the end of "zz".
-		await page.keyboard.type( '‸' );
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/list',
-				innerBlocks: [
-					{
-						name: 'core/list-item',
-						attributes: { content: 'ab' },
-						innerBlocks: [
-							{
-								name: 'core/list',
-								innerBlocks: [
-									{
-										name: 'core/list-item',
-										attributes: { content: 'cd' },
-									},
-								],
-							},
-						],
-					},
-					{
-						name: 'core/list-item',
-						attributes: { content: 'zz‸' },
-					},
-				],
-			},
-		] );
-		await page.keyboard.press( 'Backspace' );
-
-		// Move the caret to the middle of "cd".
+		// Move the caret to the middle of "cd", and verify the setup:
+		// "ab" with a nested "cd" item, then a top-level sibling "zz".
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
 		await page.keyboard.type( '‸' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -1830,6 +1800,16 @@ test.describe( 'List (@firefox)', () => {
 		await expect(
 			editor.canvas.locator( '.is-multi-selected' )
 		).toHaveText( 'abcd' );
+
+		// The native selection is untouched (only hidden by the block
+		// overlay), so the gesture could still continue.
+		expect(
+			await page
+				.frame( { name: 'editor-canvas' } )
+				.evaluate( () =>
+					document.getSelection().toString().replace( /\s/g, '' )
+				)
+		).toBe( 'c' );
 
 		// A partial selection across a nesting boundary is not
 		// mergeable; the press removes the fully selected item as a
