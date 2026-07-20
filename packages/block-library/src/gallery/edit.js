@@ -571,7 +571,6 @@ export default function GalleryEdit( props ) {
 			return 0;
 		} );
 
-		__unstableMarkNextChangeAsNotPersistent();
 		replaceInnerBlocks( clientId, sorted, false );
 	}
 
