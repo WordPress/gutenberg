@@ -40,7 +40,7 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
 	return $submenu_visibility ?? 'hover';
 }
 
-const BLOCK_CORE_NAVIGATION_OVERLAY_BREAKPOINT_DEFAULT = '600px';
+const BLOCK_CORE_NAVIGATION_OVERLAY_BREAKPOINT_DEFAULT        = '600px';
 const BLOCK_CORE_NAVIGATION_UNSAFE_OVERLAY_BREAKPOINT_PATTERN = '%[\\\\{}();&=<>`]|/\*%';
 
 /**
@@ -75,7 +75,7 @@ function block_core_navigation_get_overlay_breakpoint( $attributes ) {
 	$overlay_breakpoint = trim( $attributes['overlayBreakpoint'] );
 	if (
 		'' === $overlay_breakpoint ||
-		$overlay_breakpoint !== wp_strip_all_tags( $overlay_breakpoint, true ) ||
+		wp_strip_all_tags( $overlay_breakpoint, true ) !== $overlay_breakpoint ||
 		preg_match( BLOCK_CORE_NAVIGATION_UNSAFE_OVERLAY_BREAKPOINT_PATTERN, $overlay_breakpoint )
 	) {
 		return BLOCK_CORE_NAVIGATION_OVERLAY_BREAKPOINT_DEFAULT;
@@ -1778,12 +1778,12 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 		$custom_overlay_breakpoint_class = wp_unique_id( 'wp-block-navigation-custom-overlay-breakpoint-' );
 		$processor->add_class( $custom_overlay_breakpoint_class );
 
-		$overlay_breakpoint           = block_core_navigation_get_overlay_breakpoint( $attributes );
-		$selector_base                = ".wp-block-navigation.{$custom_overlay_breakpoint_class}.has-custom-overlay-breakpoint";
-		$container_selector           = $selector_base . ' .wp-block-navigation__responsive-container';
-		$container_inline_selector    = $container_selector . ':not(.hidden-by-default):not(.is-menu-open)';
-		$submenu_container_selectors  = '.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container';
-		$rules_group                  = "@media (min-width: {$overlay_breakpoint})";
+		$overlay_breakpoint          = block_core_navigation_get_overlay_breakpoint( $attributes );
+		$selector_base               = ".wp-block-navigation.{$custom_overlay_breakpoint_class}.has-custom-overlay-breakpoint";
+		$container_selector          = $selector_base . ' .wp-block-navigation__responsive-container';
+		$container_inline_selector   = $container_selector . ':not(.hidden-by-default):not(.is-menu-open)';
+		$submenu_container_selectors = '.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container';
+		$rules_group                 = "@media (min-width: {$overlay_breakpoint})";
 
 		wp_style_engine_get_stylesheet_from_css_rules(
 			array(

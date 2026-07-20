@@ -262,14 +262,14 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 */
 	public function data_invalid_overlay_breakpoints() {
 		return array(
-			'calc expression'       => array( 'calc(100vw - 1rem)', 'calc(100vw - 1rem)' ),
-			'css rule injection'   => array( '10px);body{background:red}', 'body{background:red}' ),
-			'javascript URL'       => array( '10px;background:url(javascript:alert(1))', 'javascript:alert(1)' ),
-			'css comment'          => array( '10px/*comment*/', '/*comment*/' ),
-			'html style tag'       => array( '<style>10px</style>', '<style>' ),
-			'css expression'       => array( 'expression(alert(1))', 'expression(alert(1))' ),
-			'unsupported unit'     => array( '40vw', '40vw' ),
-			'non-positive length'  => array( '0px', '0px' ),
+			'calc expression'     => array( 'calc(100vw - 1rem)', 'calc(100vw - 1rem)' ),
+			'css rule injection'  => array( '10px);body{background:red}', 'body{background:red}' ),
+			'javascript URL'      => array( '10px;background:url(javascript:alert(1))', 'javascript:alert(1)' ),
+			'css comment'         => array( '10px/*comment*/', '/*comment*/' ),
+			'html style tag'      => array( '<style>10px</style>', '<style>' ),
+			'css expression'      => array( 'expression(alert(1))', 'expression(alert(1))' ),
+			'unsupported unit'    => array( '40vw', '40vw' ),
+			'non-positive length' => array( '0px', '0px' ),
 		);
 	}
 
