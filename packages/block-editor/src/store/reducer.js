@@ -1446,7 +1446,12 @@ export function selection( state = {}, action ) {
 
 			if (
 				start === state.selectionStart?.clientId &&
-				end === state.selectionEnd?.clientId
+				end === state.selectionEnd?.clientId &&
+				// A text selection between the same blocks is not the
+				// same selection: it carries attribute keys and offsets,
+				// making it partial rather than a block multi-selection.
+				state.selectionStart?.attributeKey === undefined &&
+				state.selectionEnd?.attributeKey === undefined
 			) {
 				return state;
 			}

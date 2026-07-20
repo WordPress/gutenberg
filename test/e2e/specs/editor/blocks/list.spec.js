@@ -1975,6 +1975,155 @@ test.describe( 'List (@firefox)', () => {
 		] );
 	} );
 
+	test( 'should select the outer item fully when extending a selection down into its nested item', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* ab' );
+		await page.keyboard.press( 'Enter' );
+		// Leading space at the start of an empty item triggers indent.
+		await page.keyboard.type( ' cd' );
+		// Enter on an empty nested item outdents back to the top level.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'zz' );
+
+		// Move the caret to the middle of "ab" and verify the setup:
+		// "ab" with a nested "cd" item, then a top-level sibling "zz".
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 7 } );
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a‸b' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'cd' },
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+					},
+				],
+			},
+		] );
+		await page.keyboard.press( 'Backspace' );
+
+		// Extend the selection down into the nested "cd" line, then
+		// yield so the selection observer can process it.
+		await page.keyboard.press( 'Shift+ArrowDown' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		// The outer "ab" item is presented as fully selected, like a
+		// block multi-selection.
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 1 );
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveText( 'abcd' );
+
+		// The press removes the fully selected item as a whole, together
+		// with its nested list; the unrelated sibling remains.
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'zz' },
+						innerBlocks: [],
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should multi-select the top level items when extending a selection down across an item with a nested item', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.press( 'Enter' );
+		// Leading space at the start of an empty item triggers indent.
+		await page.keyboard.type( ' nested' );
+
+		// Move the caret to the end of "one" and verify the setup: "one"
+		// and "two" at the top level, "nested" indented under "two".
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 11 } );
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'one‸' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'two' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'nested' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
+		await page.keyboard.press( 'Backspace' );
+
+		// Extend the selection down across "two" into "nested".
+		await page.keyboard.press( 'Shift+ArrowDown' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		await page.keyboard.press( 'Shift+ArrowDown' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		// The endpoints are promoted to the top level items, which are
+		// multi-selected as blocks.
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 2 );
+
+		// Both items, including the nested one, are removed.
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [],
+			},
+		] );
+	} );
+
 	test( 'should multi-select the top level items when extending a selection from a nested item to the previous top level item', async ( {
 		editor,
 		page,
