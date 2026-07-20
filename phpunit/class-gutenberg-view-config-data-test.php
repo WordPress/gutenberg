@@ -133,20 +133,20 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$data->remove( array( 'default_view' => array( 'showLevels' ) ), 1 );
 
 		$this->assertSame(
-		array(
-			'default_view' => array(
-				'type'       => 'table',
-				'perPage'    => 23,
-				'fields'     => array( 'f1', 'f2' ),
-				'sort'       => array(
-					'field'     => 'title',
-					'direction' => 'asc',
+			array(
+				'default_view' => array(
+					'type'    => 'table',
+					'perPage' => 23,
+					'fields'  => array( 'f1', 'f2' ),
+					'sort'    => array(
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
+				),
+				'form'         => array(
+					'fields' => array( 'f1', 'f2' ),
 				),
 			),
-			'form'         => array(
-				'fields' => array( 'f1', 'f2' ),
-			),
-		),
 			$data->get_data()
 		);
 	}
@@ -172,17 +172,17 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$data->remove( array( 'default_view' => array( 'sort' ) ), 1 );
 
 		$this->assertSame(
-		array(
-			'default_view' => array(
-				'type'       => 'table',
-				'perPage'    => 23,
-				'showLevels' => true,
-				'fields'     => array( 'f1', 'f2' ),
+			array(
+				'default_view' => array(
+					'type'       => 'table',
+					'perPage'    => 23,
+					'showLevels' => true,
+					'fields'     => array( 'f1', 'f2' ),
+				),
+				'form'         => array(
+					'fields' => array( 'f1', 'f2' ),
+				),
 			),
-			'form'         => array(
-				'fields' => array( 'f1', 'f2' ),
-			),
-		),
 			$data->get_data()
 		);
 	}
@@ -208,20 +208,20 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$data->remove( array( 'default_view' => array( 'fields' ) ), 1 );
 
 		$this->assertSame(
-		array(
-			'default_view' => array(
-				'type'       => 'table',
-				'perPage'    => 23,
-				'showLevels' => true,
-				'sort' => array(
-				'field' => 'title',
-				'direction' => 'asc',
-				)
+			array(
+				'default_view' => array(
+					'type'       => 'table',
+					'perPage'    => 23,
+					'showLevels' => true,
+					'sort'       => array(
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
+				),
+				'form'         => array(
+					'fields' => array( 'f1', 'f2' ),
+				),
 			),
-			'form'         => array(
-				'fields' => array( 'f1', 'f2' ),
-			),
-		),
 			$data->get_data()
 		);
 	}
@@ -244,24 +244,24 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				),
 			)
 		);
-		$data->remove( array( 'default_view' => array( 'fields' => array( 'f2' )) ), 1 );
+		$data->remove( array( 'default_view' => array( 'fields' => array( 'f2' ) ) ), 1 );
 
 		$this->assertSame(
-		array(
-			'default_view' => array(
-				'type'       => 'table',
-				'perPage'    => 23,
-				'showLevels' => true,
-				'fields' => array( 'f1', 'f3' ),
-				'sort' => array(
-				'field' => 'title',
-				'direction' => 'asc',
-				)
+			array(
+				'default_view' => array(
+					'type'       => 'table',
+					'perPage'    => 23,
+					'showLevels' => true,
+					'fields'     => array( 'f1', 'f3' ),
+					'sort'       => array(
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
+				),
+				'form'         => array(
+					'fields' => array( 'f1', 'f2' ),
+				),
 			),
-			'form'         => array(
-				'fields' => array( 'f1', 'f2' ),
-			),
-		),
 			$data->get_data()
 		);
 	}
