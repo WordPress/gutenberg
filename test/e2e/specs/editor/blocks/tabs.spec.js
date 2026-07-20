@@ -169,9 +169,17 @@ test.describe( 'Tabs', () => {
 			await pageUtils.pressKeys( 'ArrowRight' );
 			await page.keyboard.press( 'Enter' );
 
-			const tabs = editor.canvas.getByRole( 'tab' );
-			await expect( tabs ).toHaveCount( 3 );
+			// A new tab is appended with the default label and an empty panel.
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs(
+						[ 'Tab 1', 'Tab 2', 'Tab' ],
+						[ 'Panel 1', 'Panel 2', '' ]
+					),
+				] );
 
+			const tabs = editor.canvas.getByRole( 'tab' );
 			await expect( tabs.nth( 0 ) ).toHaveAttribute(
 				'aria-selected',
 				'false'
@@ -189,20 +197,25 @@ test.describe( 'Tabs', () => {
 
 			// The new tab's panel is the active one and is visible.
 			// Use `exact: true` to avoid matching the parent 'Block: Tab Panels' name.
-			// Use `includeHidden: true` to check the number of hidden panels. getByRole()
-			// only returns visible elements by default.
+			// Use `includeHidden: true` so the hidden panels are indexed too;
+			// getByRole() only returns visible elements by default.
 			const panels = editor.canvas.getByRole( 'document', {
 				name: 'Block: Tab Panel',
 				exact: true,
 				includeHidden: true,
 			} );
-			await expect( panels ).toHaveCount( 3 );
-			// The new tab's panel is the active one and is visible.
 			await expect( panels.nth( 2 ) ).toBeVisible();
 
-			// The tab insertion is persistent, so undo removes the new tab
+			// The tab insertion is persistent, so undo removes the new tab.
 			await pageUtils.pressKeys( 'primary+z' );
-			await expect( tabs ).toHaveCount( 2 );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs(
+						[ 'Tab 1', 'Tab 2' ],
+						[ 'Panel 1', 'Panel 2' ]
+					),
+				] );
 
 			// FIXME: Undo should activate the tab the new one was inserted from
 			// and focus its label, but the tab is left inactive and unfocused.
@@ -230,8 +243,10 @@ test.describe( 'Tabs', () => {
 			await page.keyboard.press( 'Delete' );
 			await page.keyboard.press( 'Backspace' );
 
-			const tabs = editor.canvas.getByRole( 'tab' );
-			await expect( tabs ).toHaveCount( 1 );
+			// The emptied tab and its panel are removed together.
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [ createTabs( [ 'Tab 1' ], [ 'Panel 1' ] ) ] );
 
 			const tab1 = editor.canvas.getByRole( 'tab', { name: 'Tab 1' } );
 			await expect( tab1 ).toHaveAttribute( 'aria-selected', 'true' );
@@ -240,9 +255,14 @@ test.describe( 'Tabs', () => {
 			).toBeFocused();
 			await expect( editor.canvas.getByText( 'Panel 1' ) ).toBeVisible();
 
-			// The tab removal is persistent, so undo brings the tab back.
+			// The tab removal is persistent, so undo brings the tab back with the
+			// emptied label it had before removal.
 			await pageUtils.pressKeys( 'primary+z' );
-			await expect( tabs ).toHaveCount( 2 );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs( [ 'Tab 1', '' ], [ 'Panel 1', 'Panel 2' ] ),
+				] );
 
 			// FIXME: Undo should activate the restored tab and focus its label,
 			// but the tab is left inactive and unfocused.
@@ -464,71 +484,103 @@ test.describe( 'Tabs', () => {
 
 		test( 'moves the active tab to the previous position with the toolbar mover', async ( {
 			editor,
+			page,
 			pageUtils,
 		} ) => {
+			await editor.insertBlock(
+				createTabs(
+					[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+					[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+				)
+			);
+
 			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
 			await tab2.click();
 
 			await editor.clickBlockToolbarButton( 'Move tab before' );
 
-			// The tab and its panel are reordered together.
 			await expect
-				.poll( async () =>
-					(
-						await editor.getBlocks()
-					)[ 0 ].innerBlocks[ 1 ].innerBlocks.map(
-						( panel ) => panel.attributes.label
-					)
-				)
-				.toEqual( [ 'Tab 2', 'Tab 1' ] );
-			await expect( editor.canvas.getByRole( 'tab' ) ).toHaveText( [
-				'Tab 2',
-				'Tab 1',
-			] );
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs(
+						[ 'Tab 2', 'Tab 1', 'Tab 3' ],
+						[ 'Panel 2', 'Panel 1', 'Panel 3' ]
+					),
+				] );
 
 			// The moved tab stays active.
 			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
 
 			// Undo restores the original order.
 			await pageUtils.pressKeys( 'primary+z' );
-			await expect( editor.canvas.getByRole( 'tab' ) ).toHaveText( [
-				'Tab 1',
-				'Tab 2',
-			] );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs(
+						[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+						[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+					),
+				] );
+
+			// The focus stays on the mover button.
+			await expect(
+				page.getByRole( 'button', { name: 'Move tab before' } )
+			).toBeFocused();
+
+			// FIXME: Undo should reactivate the moved tab (Tab 2), but it is left
+			// inactive.
+			// await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 
 		test( 'moves the active tab to the next position with the toolbar mover', async ( {
 			editor,
+			page,
 			pageUtils,
 		} ) => {
-			const tab1 = editor.canvas.getByRole( 'tab', { name: 'Tab 1' } );
-			await tab1.click();
+			await editor.insertBlock(
+				createTabs(
+					[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+					[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+				)
+			);
+
+			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
+			await tab2.click();
 
 			await editor.clickBlockToolbarButton( 'Move tab after' );
 
+			// The tab and its panel are reordered together.
 			await expect
-				.poll( async () =>
-					(
-						await editor.getBlocks()
-					)[ 0 ].innerBlocks[ 1 ].innerBlocks.map(
-						( panel ) => panel.attributes.label
-					)
-				)
-				.toEqual( [ 'Tab 2', 'Tab 1' ] );
-			await expect( editor.canvas.getByRole( 'tab' ) ).toHaveText( [
-				'Tab 2',
-				'Tab 1',
-			] );
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs(
+						[ 'Tab 1', 'Tab 3', 'Tab 2' ],
+						[ 'Panel 1', 'Panel 3', 'Panel 2' ]
+					),
+				] );
 
 			// The moved tab stays active.
-			await expect( tab1 ).toHaveAttribute( 'aria-selected', 'true' );
+			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
 
 			// Undo restores the original order.
 			await pageUtils.pressKeys( 'primary+z' );
-			await expect( editor.canvas.getByRole( 'tab' ) ).toHaveText( [
-				'Tab 1',
-				'Tab 2',
-			] );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					createTabs(
+						[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+						[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+					),
+				] );
+
+			// The focus stays on the mover button.
+			await expect(
+				page.getByRole( 'button', { name: 'Move tab after' } )
+			).toBeFocused();
+
+			// FIXME: Undo should reactivate the moved tab (Tab 2), but it is left
+			// inactive.
+			// await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 	} );
 
