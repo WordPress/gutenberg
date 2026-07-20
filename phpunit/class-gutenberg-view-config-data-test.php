@@ -1773,4 +1773,111 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			self::read_config( $data )
 		);
 	}
+
+	/**
+	 * A field written as a bare name means "show this field with the consumer's
+	 * default props", so merging one over a field currently stored as a map resets
+	 * it to defaults: the explicit overrides (here `layout`) are discarded and the
+	 * member is left as the bare name. This mirrors the reverse — a map merged over
+	 * a bare name *adds* overrides. Sibling members are untouched. To reset a single
+	 * override without dropping the others, set that prop to `null` instead.
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_bare_name_resets_field_to_defaults() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'form' => array(
+					'fields' => array(
+						array(
+							'id'     => 'featured_media',
+							'layout' => array( 'type' => 'regular' ),
+						),
+						'author',
+					),
+				),
+			)
+		);
+		$data->merge(
+			array(
+				'form' => array(
+					'fields' => array( 'featured_media' ),
+				),
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				'form' => array(
+					'fields' => array(
+						'featured_media', // Reset to defaults: the `layout` override is discarded.
+						'author',
+					),
+				),
+			),
+			self::read_config( $data )
+		);
+	}
+
+	/**
+	 * The same reset-to-defaults rule applies at any nesting level. The parent
+	 * field (`status`) merges in place and keeps its `label`, while the bare child
+	 * name resets the matching child to defaults, discarding that child's `layout`.
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_bare_name_resets_nested_child_to_defaults() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'form' => array(
+					'fields' => array(
+						array(
+							'id'       => 'status',
+							'label'    => 'Status',
+							'children' => array(
+								array(
+									'id'     => 'comment_status',
+									'layout' => array( 'type' => 'regular' ),
+								),
+								'ping_status',
+							),
+						),
+					),
+				),
+			)
+		);
+		$data->merge(
+			array(
+				'form' => array(
+					'fields' => array(
+						array(
+							'id'       => 'status',
+							'children' => array( 'comment_status' ),
+						),
+					),
+				),
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				'form' => array(
+					'fields' => array(
+						array(
+							'id'       => 'status',
+							'label'    => 'Status',
+							'children' => array(
+								'comment_status', // Reset to defaults: the `layout` override is discarded.
+								'ping_status',
+							),
+						),
+					),
+				),
+			),
+			self::read_config( $data )
+		);
+	}
+
 }
