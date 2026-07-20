@@ -19,7 +19,9 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	 */
 	private static function read_config( Gutenberg_View_Config_Data $data ) {
 		$property = new ReflectionProperty( 'Gutenberg_View_Config_Data', 'config' );
-		$property->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$property->setAccessible( true );
+		}
 
 		return $property->getValue( $data );
 	}
