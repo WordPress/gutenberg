@@ -56,20 +56,24 @@ function getWorkerAPI(): Remote< WorkerAPI > {
  * @param gifSource      GIF file as a Blob/File or ArrayBuffer.
  * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
  * @param maxDimensions  Optional maximum dimension for downscaling.
+ * @param maxTotalPixels Optional budget for total decoded pixels
+ *                       (width × height × frame count); `0` disables.
  * @return Video file buffer.
  */
 export async function convertGifToVideo(
 	id: ItemId,
 	gifSource: ArrayBuffer | Blob,
 	outputMimeType: string,
-	maxDimensions?: number
+	maxDimensions?: number,
+	maxTotalPixels?: number
 ): Promise< ArrayBuffer > {
 	const api = getWorkerAPI();
 	return api.convertGifToVideo(
 		id,
 		gifSource,
 		outputMimeType,
-		maxDimensions
+		maxDimensions,
+		maxTotalPixels
 	);
 }
 

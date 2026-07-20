@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -24,9 +25,69 @@ import {
 	getSyncManager,
 } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
+import {
+	getRawValue,
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+} from './utils/crdt';
 
 function addTitleToAutoDraft( record ) {
 	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
+}
+
+// Post meta is applied to the CRDT one subkey at a time, so compare the save
+// response at the same granularity to avoid carrying stale sibling values.
+function getServerMutatedMetaFields( updatedMeta, persistedMeta, syncedMeta ) {
+	const baseline = { ...persistedMeta, ...syncedMeta };
+
+	return Object.fromEntries(
+		Object.entries( updatedMeta ?? {} ).filter( ( [ key, value ] ) => {
+			if ( key === POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ) {
+				// The persisted CRDT snapshot may change on save and is
+				// intentionally excluded from CRDT meta synchronization, so it
+				// is not a server mutation.
+				return false;
+			}
+
+			return ! fastDeepEqual( value, baseline[ key ] );
+		} )
+	);
+}
+
+function getServerMutatedFields(
+	updatedRecord,
+	persistedRecord,
+	syncedChanges
+) {
+	return Object.fromEntries(
+		Object.entries( updatedRecord ).flatMap( ( [ key, value ] ) => {
+			if ( key === 'meta' ) {
+				const serverMutatedMeta = getServerMutatedMetaFields(
+					value,
+					persistedRecord.meta,
+					syncedChanges.meta
+				);
+
+				return Object.keys( serverMutatedMeta ).length
+					? [ [ key, serverMutatedMeta ] ]
+					: [];
+			}
+
+			const baseline =
+				key in syncedChanges
+					? syncedChanges[ key ]
+					: persistedRecord[ key ];
+
+			// The save response nests raw attributes as `{ raw, rendered }`
+			// while the baseline holds raw strings; compare raw values so the
+			// shape difference does not read as a server mutation.
+			const wasServerMutated = ! fastDeepEqual(
+				getRawValue( value ) ?? value,
+				getRawValue( baseline ) ?? baseline
+			);
+
+			return wasServerMutated ? [ [ key, value ] ] : [];
+		} )
+	);
 }
 
 /**
@@ -759,6 +820,23 @@ export const saveEntityRecord =
 						);
 					}
 				} else {
+					// `saveEntityRecord` can be called directly, bypassing
+					// `editEntityRecord`, so make sure its changes enter the
+					// CRDT before the persisted document is created below.
+					if (
+						entityConfig.syncConfig &&
+						! __unstableSkipSyncUpdate &&
+						! isNewRecord &&
+						persistedRecord
+					) {
+						getSyncManager()?.update(
+							`${ kind }/${ name }`,
+							recordId,
+							record,
+							LOCAL_UNDO_IGNORED_ORIGIN
+						);
+					}
+
 					let edits = record;
 					if ( entityConfig.__unstablePrePersist ) {
 						edits = {
@@ -783,12 +861,25 @@ export const saveEntityRecord =
 						edits
 					);
 					if ( entityConfig.syncConfig ) {
+						let syncChanges;
+						if ( __unstableSkipSyncUpdate ) {
+							syncChanges = {};
+						} else if ( isNewRecord || ! persistedRecord ) {
+							syncChanges = updatedRecord;
+						} else {
+							syncChanges = getServerMutatedFields(
+								updatedRecord,
+								persistedRecord,
+								record
+							);
+						}
+
 						// Use an untracked origin so that the save
 						// response does not create undo levels.
 						getSyncManager()?.update(
 							`${ kind }/${ name }`,
 							recordId,
-							__unstableSkipSyncUpdate ? {} : updatedRecord,
+							syncChanges,
 							LOCAL_UNDO_IGNORED_ORIGIN,
 							{ isSave: true }
 						);
