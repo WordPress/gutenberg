@@ -223,16 +223,21 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	 * from the defaults.
 	 */
 	public function test_filter_data_normalized() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
+
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
-			function () {
-				return new Gutenberg_View_Config_Data(
+			function ( $data ) {
+				return $data->set(
 					array(
 						'default_view'   => array( 'type' => 'grid' ),
 						'not_a_real_key' => 'nope',
-					)
+					),
+					1
 				);
-			}
+			},
+			10,
+			2
 		);
 
 		$config = gutenberg_get_entity_view_config( 'custom_kind', 'custom_name' );
@@ -269,7 +274,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	 * default config.
 	 */
 	public function test_filter_data_backfilled_if_bad_data() {
-		$this->setExpectedIncorrectUsage( 'gutenberg_get_entity_view_config' );
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::apply_filters' );
 
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
