@@ -5,6 +5,7 @@ import {
 	getUniqueTemplatePartTitle,
 	getCleanTemplatePartSlug,
 	hasCustomOverlayBreakpoint,
+	isValidOverlayBreakpoint,
 	normalizeOverlayBreakpoint,
 } from '../utils';
 
@@ -41,6 +42,17 @@ describe( 'hasCustomOverlayBreakpoint', () => {
 		expect( hasCustomOverlayBreakpoint( '600px' ) ).toBe( false );
 		expect( hasCustomOverlayBreakpoint( '0px' ) ).toBe( false );
 		expect( hasCustomOverlayBreakpoint( '48rem' ) ).toBe( true );
+	} );
+} );
+
+describe( 'isValidOverlayBreakpoint', () => {
+	it( 'returns true only for valid positive breakpoints with supported units', () => {
+		expect( isValidOverlayBreakpoint( '600px' ) ).toBe( true );
+		expect( isValidOverlayBreakpoint( '37.5rem' ) ).toBe( true );
+		expect( isValidOverlayBreakpoint( '0px' ) ).toBe( false );
+		expect( isValidOverlayBreakpoint( '' ) ).toBe( false );
+		expect( isValidOverlayBreakpoint( '37.' ) ).toBe( false );
+		expect( isValidOverlayBreakpoint( '40vw' ) ).toBe( false );
 	} );
 } );
 
