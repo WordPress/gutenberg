@@ -49,6 +49,7 @@ function getExpectedVisualTypeName( type ) {
  * when we are testing the "rich previews" to we update this value with a true mock.
  */
 let mockFetchRichUrlData;
+let mockBlocks;
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
 	// This allows us to tweak the returned value on each test.
@@ -58,6 +59,7 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 useSelect.mockImplementation( () => ( {
 	fetchSearchSuggestions: mockFetchSearchSuggestions,
 	fetchRichUrlData: mockFetchRichUrlData,
+	blocks: mockBlocks,
 } ) );
 
 jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
@@ -72,6 +74,7 @@ jest.mock( '@wordpress/compose', () => ( {
 beforeEach( () => {
 	// Setup a DOM element as a render target.
 	mockFetchSearchSuggestions.mockImplementation( fetchFauxEntitySuggestions );
+	mockBlocks = [];
 } );
 
 afterEach( () => {
@@ -942,6 +945,49 @@ describe( 'Manual link entry', () => {
 	} );
 
 	describe( 'Alternative link protocols and formats', () => {
+		it( 'should suggest matching anchor ids from the current page when typing a hash link', async () => {
+			const user = userEvent.setup();
+			mockBlocks = [
+				{
+					attributes: { anchor: 'intro' },
+					innerBlocks: [],
+				},
+				{
+					attributes: { anchor: 'section-two' },
+					innerBlocks: [
+						{
+							attributes: { anchor: 'nested-section' },
+							innerBlocks: [],
+						},
+					],
+				},
+			];
+
+			render( <LinkControl /> );
+
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+
+			await user.type( searchInput, '#' );
+
+			const searchResults = await screen.findByRole( 'listbox', {
+				name: /Search results for.*/,
+			} );
+
+			const searchResultElements =
+				within( searchResults ).getAllByRole( 'option' );
+
+			expect( searchResultElements ).toHaveLength( 3 );
+			expect( searchResultElements[ 0 ] ).toHaveTextContent( '#intro' );
+			expect( searchResultElements[ 1 ] ).toHaveTextContent(
+				'#nested-section'
+			);
+			expect( searchResultElements[ 2 ] ).toHaveTextContent(
+				'#section-two'
+			);
+		} );
+
 		it.each( [
 			[ 'mailto:example123456@wordpress.org', 'mailto' ],
 			[ 'tel:example123456@wordpress.org', 'tel' ],

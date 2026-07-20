@@ -155,9 +155,13 @@ class URLInput extends Component {
 		// - there are at least 2 characters in the search input (except manual searches where
 		//   search input length is not required to trigger a fetch)
 		// - this is a direct entry (eg: a URL)
+		const shouldAllowHashOnlySuggestions =
+			handleURLSuggestions && value === '#';
+
 		if (
 			! isInitialSuggestions &&
-			( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) )
+			( ( value.length < 2 && ! shouldAllowHashOnlySuggestions ) ||
+				( ! handleURLSuggestions && isURL( value ) ) )
 		) {
 			this.suggestionsRequest?.cancel?.();
 			this.suggestionsRequest = null;
