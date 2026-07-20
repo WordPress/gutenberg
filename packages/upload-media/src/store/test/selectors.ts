@@ -3,7 +3,6 @@
  */
 import {
 	getItems,
-	getProgressById,
 	isUploading,
 	isUploadingById,
 	isUploadingByUrl,
@@ -117,45 +116,6 @@ describe( 'selectors', () => {
 
 			expect( isUploadingById( state, 123 ) ).toBe( true );
 			expect( isUploadingById( state, 789 ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'getProgressById', () => {
-		it( 'should return progress from items matched by attachment, source attachment, or sideload target', () => {
-			const state: State = {
-				queue: [
-					// The attachment's own item, not reporting progress.
-					{
-						status: ItemStatus.Processing,
-						attachment: {
-							id: 123,
-						},
-					},
-					// A sideload companion (e.g. GIF-to-video conversion)
-					// targeting the attachment, reporting progress.
-					{
-						status: ItemStatus.Processing,
-						additionalData: {
-							post: 123,
-						},
-						progress: 42,
-					},
-					{
-						status: ItemStatus.Processing,
-						sourceAttachmentId: 456,
-						progress: 7,
-					},
-				] as QueueItem[],
-				queueStatus: 'paused',
-				blobUrls: {},
-				settings: {
-					mediaUpload: jest.fn(),
-				},
-			};
-
-			expect( getProgressById( state, 123 ) ).toBe( 42 );
-			expect( getProgressById( state, 456 ) ).toBe( 7 );
-			expect( getProgressById( state, 789 ) ).toBeUndefined();
 		} );
 	} );
 

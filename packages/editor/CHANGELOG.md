@@ -5,6 +5,7 @@
 ### New Features
 
 -   The "Apply globally" control now opens a review modal so you can choose which of a block's modified styles are pushed to Global Styles, showing each style's current and new value ([#79839](https://github.com/WordPress/gutenberg/pull/79839)).
+-   The upload progress snackbar now shows a determinate progress bar and a "Processing" label while a long-running client-side operation (currently GIF-to-video conversion) reports its progress ([#80325](https://github.com/WordPress/gutenberg/issues/80325)).
 
 ### Bug Fixes
 

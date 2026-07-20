@@ -7,7 +7,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { store as noticesStore } from '@wordpress/notices';
-import { Icon as WCIcon, Spinner } from '@wordpress/components';
+import { Icon as WCIcon, ProgressBar, Spinner } from '@wordpress/components';
 import { check } from '@wordpress/icons';
 
 /**
@@ -64,6 +64,30 @@ export const UPLOAD_DONE = (
 );
 
 /**
+ * Icon-slot markup for the determinate state: a small progress bar shown in
+ * place of the spinner while a long-running client-side operation (currently
+ * GIF-to-video conversion) reports its progress.
+ *
+ * Exported for the Storybook story, like the icons above.
+ *
+ * @param {number} progress Progress from 0 to 100.
+ * @return {JSX.Element} The icon-slot markup.
+ */
+export function uploadProgressBar( progress ) {
+	return (
+		<span
+			className="editor-upload-progress-snackbar__progress"
+			aria-hidden="true"
+		>
+			<ProgressBar
+				className="editor-upload-progress-snackbar__progress-bar"
+				value={ progress }
+			/>
+		</span>
+	);
+}
+
+/**
  * Manages a snackbar notice that shows media upload progress while uploads are
  * in progress. It creates/updates a notice via the notices store so that it
  * positions and stacks with every other snackbar in the editor.
@@ -93,6 +117,23 @@ export default function UploadProgressSnackbar() {
 		[ items ]
 	);
 	const csmRemaining = csmOriginals.length;
+
+	/*
+	 * Determinate progress reported by a long-running client-side operation
+	 * (currently GIF-to-video conversion). The reporting item is a sideload
+	 * companion of an original (it has a `parentId`), so it is looked up in
+	 * the full queue rather than in `csmOriginals`. Progress of 100 means the
+	 * operation finished and the item moved on to uploading its result, so
+	 * the snackbar falls back to the indeterminate uploading state.
+	 */
+	const progressItem = useMemo(
+		() =>
+			items.find(
+				( item ) => item.progress !== undefined && item.progress < 100
+			),
+		[ items ]
+	);
+	const processingProgress = progressItem?.progress;
 
 	// Non-CSM path: files tracked by the editor's mediaUpload wrapper.
 	const trackedRemaining = tracker ? tracker.total - tracker.completed : 0;
@@ -182,19 +223,38 @@ export default function UploadProgressSnackbar() {
 		const total = peakRef.current;
 		const current = total - remaining + 1;
 
-		// Prefer the CSM queue's first original filename, then fall back to
-		// the tracker's first pending filename.
+		const isProcessing = processingProgress !== undefined;
+
+		// Prefer the filename of the item reporting progress, then the CSM
+		// queue's first original filename, then the tracker's first pending
+		// filename.
 		const filename = truncateFilename(
-			csmOriginals[ 0 ]?.sourceFile?.name ||
+			( isProcessing && progressItem.sourceFile?.name ) ||
+				csmOriginals[ 0 ]?.sourceFile?.name ||
 				tracker?.pending[ 0 ] ||
 				__( 'Uploading' )
 		);
 
-		const content =
-			total === 1
+		let content;
+		if ( total === 1 ) {
+			content = isProcessing
 				? sprintf(
 						/* translators: %s: filename. */
+						__( 'Processing — %s' ),
+						filename
+				  )
+				: sprintf(
+						/* translators: %s: filename. */
 						__( 'Uploading — %s' ),
+						filename
+				  );
+		} else {
+			content = isProcessing
+				? sprintf(
+						/* translators: 1: current upload number, 2: total uploads, 3: filename. */
+						__( 'Processing %1$d of %2$d — %3$s' ),
+						current,
+						total,
 						filename
 				  )
 				: sprintf(
@@ -204,6 +264,7 @@ export default function UploadProgressSnackbar() {
 						total,
 						filename
 				  );
+		}
 
 		createNotice( 'info', content, {
 			id: NOTICE_ID,
@@ -211,7 +272,9 @@ export default function UploadProgressSnackbar() {
 			isDismissible: false,
 			explicitDismiss: true,
 			speak: false,
-			icon: UPLOAD_SPINNER,
+			icon: isProcessing
+				? uploadProgressBar( processingProgress )
+				: UPLOAD_SPINNER,
 			onDismiss: () => {
 				dismissedRef.current = true;
 			},
@@ -220,6 +283,8 @@ export default function UploadProgressSnackbar() {
 		remaining,
 		sessionTotal,
 		csmOriginals,
+		progressItem,
+		processingProgress,
 		tracker,
 		createNotice,
 		removeNotice,

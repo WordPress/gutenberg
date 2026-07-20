@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 .editor-upload-progress-snackbar__spinner,
@@ -17,6 +18,35 @@
 	// which offsets it within the centered icon slot. Reset it so the flex
 	// centering above keeps the spinner vertically centered against the text.
 	margin: 0;
+}
+
+.editor-upload-progress-snackbar__progress {
+	display: inline-flex;
+	align-items: center;
+	// Wider than the spinner slot so the determinate bar is readable, same
+	// height so it stays vertically centered against the notice text.
+	width: $icon-size * 2;
+	height: $icon-size;
+}
+
+// The snackbar's icon slot is tuned for a square $icon-size icon. When the
+// slot holds the wider determinate bar, indent the notice text to clear it.
+.components-snackbar__content-with-icon:has(.editor-upload-progress-snackbar__progress) {
+	padding-left: $icon-size * 2;
+}
+
+// Nested under .components-snackbar so the height override outranks the
+// ProgressBar's own single-class emotion styles, which are injected later in
+// the document and would otherwise win the tie.
+.components-snackbar .editor-upload-progress-snackbar__progress-bar {
+	width: 100%;
+	// Thicker than the component's hairline default so the fill level reads
+	// at snackbar size.
+	height: $grid-unit-05;
+	// The ProgressBar derives both its track and indicator colors from the
+	// theme foreground, which is near-black and disappears on the snackbar's
+	// dark surface. Use the snackbar's white foreground instead.
+	--wp-components-color-foreground: #{$white};
 }
 
 .editor-upload-progress-snackbar__check svg {

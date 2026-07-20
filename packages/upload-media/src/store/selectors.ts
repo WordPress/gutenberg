@@ -56,38 +56,6 @@ export function isUploadingById( state: State, attachmentId: number ): boolean {
 }
 
 /**
- * Returns the processing progress for a given attachment ID, if known.
- *
- * Long-running operations (currently GIF-to-video conversion) report
- * per-item progress. The reporting item may be a sideload companion of the
- * attachment rather than the attachment's own queue item, so items are also
- * matched by their sideload target (`additionalData.post`).
- *
- * @param state        Upload state.
- * @param attachmentId Attachment ID.
- *
- * @return Progress as a number between 0 and 100, or undefined if no
- *         matching item is reporting progress.
- */
-export function getProgressById(
-	state: State,
-	attachmentId: number
-): number | undefined {
-	for ( const item of state.queue ) {
-		if (
-			item.progress !== undefined &&
-			( item.attachment?.id === attachmentId ||
-				item.sourceAttachmentId === attachmentId ||
-				( item.additionalData?.post as number | undefined ) ===
-					attachmentId )
-		) {
-			return item.progress;
-		}
-	}
-	return undefined;
-}
-
-/**
  * Returns the media upload settings.
  *
  * @param state Upload state.

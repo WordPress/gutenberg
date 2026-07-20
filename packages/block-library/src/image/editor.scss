@@ -43,23 +43,6 @@ figure.wp-block-image:not(.wp-block) {
 		transform: translate(-50%, -50%);
 		margin: 0;
 	}
-
-	// Shown instead of the spinner while a long-running client-side
-	// operation (e.g. GIF-to-video conversion) reports determinate progress.
-	.wp-block-image__progress-bar {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		// The bar overlays arbitrary media (noisy GIF frames, black video
-		// posters), so it cannot rely on theme colors for contrast: render a
-		// white indicator on a dark translucent track, with a light outline
-		// and drop shadow so the track extent stays visible over dark media.
-		--wp-components-color-foreground: #{$white};
-		height: 6px;
-		background-color: rgba($black, 0.6);
-		box-shadow: 0 0 0 1px rgba($white, 0.6), 0 2px 4px rgba($black, 0.4);
-	}
 }
 
 // Shown while image is being uploaded but cannot be previewed.

@@ -118,21 +118,6 @@ _Returns_
 
 -   `QueueItem[]`: Queue items.
 
-#### getProgressById
-
-Returns the processing progress for a given attachment ID, if known.
-
-Long-running operations (currently GIF-to-video conversion) report per-item progress. The reporting item may be a sideload companion of the attachment rather than the attachment's own queue item, so items are also matched by their sideload target (`additionalData.post`).
-
-_Parameters_
-
--   _state_ `State`: Upload state.
--   _attachmentId_ `number`: Attachment ID.
-
-_Returns_
-
--   `number | undefined`: Progress as a number between 0 and 100, or undefined if no matching item is reporting progress.
-
 #### getSettings
 
 Returns the media upload settings.
