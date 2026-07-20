@@ -1787,9 +1787,10 @@ test.describe( 'List (@firefox)', () => {
 		] );
 		await page.keyboard.press( 'Backspace' );
 
-		// Extend the selection backward past the nesting boundary into
-		// "ab", then yield so the selection observer can process it.
-		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 2 } );
+		// Extend the selection backward into "ab": over "c", over the
+		// nesting boundary, then over "b". Yield so the selection
+		// observer can process it.
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 3 } );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
 		// The outer "ab" item is presented as fully selected, like a
@@ -1809,7 +1810,7 @@ test.describe( 'List (@firefox)', () => {
 				.evaluate( () =>
 					document.getSelection().toString().replace( /\s/g, '' )
 				)
-		).toBe( 'c' );
+		).toBe( 'bc' );
 
 		// A partial selection across a nesting boundary is not
 		// mergeable; the press removes the fully selected item as a
@@ -1944,6 +1945,7 @@ test.describe( 'List (@firefox)', () => {
 			nested.y + nested.height / 2,
 			{ steps: 10 }
 		);
+
 		await page.mouse.up();
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
