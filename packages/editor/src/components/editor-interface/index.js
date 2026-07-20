@@ -19,7 +19,6 @@ import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { InlineNotices } from '@wordpress/notices';
-import { ThemeProvider } from '@wordpress/theme';
 
 /**
  * Internal dependencies
@@ -57,15 +56,13 @@ function Notices() {
 	}, [] );
 
 	return (
-		<ThemeProvider cornerRadius="none">
-			<InlineNotices
-				className="editor-notices"
-				pinnedNoticesClassName="editor-notices__pinned"
-				dismissibleNoticesClassName="editor-notices__dismissible"
-			>
-				{ ! isValidTemplate && <TemplateValidationNotice /> }
-			</InlineNotices>
-		</ThemeProvider>
+		<InlineNotices
+			className="editor-notices"
+			pinnedNoticesClassName="editor-notices__pinned"
+			dismissibleNoticesClassName="editor-notices__dismissible"
+		>
+			{ ! isValidTemplate && <TemplateValidationNotice /> }
+		</InlineNotices>
 	);
 }
 
