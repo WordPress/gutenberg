@@ -40,7 +40,6 @@ Other token families use shorter forms when a segment would be redundant:
 | Border                  | `--wpds-border-<property>-<size-or-target>`                      | `--wpds-border-radius-sm`                                 |
 | Typography              | `--wpds-typography-<property>-<role-or-size>`                    | `--wpds-typography-font-size-md`                          |
 | Motion                  | `--wpds-motion-<property>-<scale-or-intent>`                     | `--wpds-motion-easing-balanced`                           |
-| Elevation               | `--wpds-elevation-<size>`                                        | `--wpds-elevation-sm`                                     |
 | Cursor                  | `--wpds-cursor-<target>`                                         | `--wpds-cursor-control`                                   |
 
 ### Type
@@ -53,7 +52,6 @@ Indicates what kind of value the token represents, usually mapping to a [Design 
 | `dimension`  | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
 | `border`     | Border properties like radius and width                                        |
 | `cursor`     | Cursor values for interactive affordances                                      |
-| `elevation`  | Shadow definitions for layering and depth                                      |
 | `motion`     | Animation durations and easing curves                                          |
 | `typography` | Typography properties like font family, font size, and line-height             |
 
@@ -101,7 +99,7 @@ An optional size, intensity, state, or role modifier.
 | `5xs`, `4xs`, `3xs`, `2xs`, `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl` | Size scale modifiers           |
 | `weak`, `strong`                                                       | Color emphasis modifiers       |
 | `active`, `disabled`                                                   | Interactive state modifiers    |
-| `heading`, `body`, `mono`, `regular`, `medium`                         | Typography role modifiers      |
+| `heading`, `body`, `mono`, `default`, `emphasis`                       | Typography role modifiers      |
 | `subtle`, `balanced`, `expressive`                                     | Motion easing intent modifiers |
 
 ### Shortened and compound forms
@@ -336,15 +334,6 @@ The semantic token set is role-based, not a complete matrix of every property, t
 | `--wpds-dimension-surface-width-xl`  | Extra large surface width                                                |
 | `--wpds-dimension-surface-width-2xl` | 2x extra large surface width                                             |
 
-### Elevation
-
-| Variable name         | Description                                                                                                                       |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `--wpds-elevation-xs` | For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame.     |
-| `--wpds-elevation-sm` | For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar. |
-| `--wpds-elevation-md` | For components that offer additional actions. Example: Menus, Command Palette                                                     |
-| `--wpds-elevation-lg` | For components that confirm decisions or handle necessary interruptions. Example: Modals.                                         |
-
 ### Motion
 
 | Variable name                     | Description                                                                                         |
@@ -360,24 +349,24 @@ The semantic token set is role-based, not a complete matrix of every property, t
 
 ### Typography
 
-| Variable name                           | Description                                  |
-| --------------------------------------- | -------------------------------------------- |
-| `--wpds-typography-font-family-heading` | Headings font family                         |
-| `--wpds-typography-font-family-body`    | Body font family                             |
-| `--wpds-typography-font-family-mono`    | Monospace font family                        |
-| `--wpds-typography-font-size-xs`        | Extra small font size                        |
-| `--wpds-typography-font-size-sm`        | Small font size                              |
-| `--wpds-typography-font-size-md`        | Medium font size                             |
-| `--wpds-typography-font-size-lg`        | Large font size                              |
-| `--wpds-typography-font-size-xl`        | Extra large font size                        |
-| `--wpds-typography-font-size-2xl`       | 2X large font size                           |
-| `--wpds-typography-line-height-xs`      | Extra small line height                      |
-| `--wpds-typography-line-height-sm`      | Small line height                            |
-| `--wpds-typography-line-height-md`      | Medium line height                           |
-| `--wpds-typography-line-height-lg`      | Large line height                            |
-| `--wpds-typography-line-height-xl`      | Extra large line height                      |
-| `--wpds-typography-line-height-2xl`     | 2X large line height                         |
-| `--wpds-typography-font-weight-regular` | Regular font weight for body text            |
-| `--wpds-typography-font-weight-medium`  | Medium font weight for emphasis and headings |
+| Variable name                            | Description                                             |
+| ---------------------------------------- | ------------------------------------------------------- |
+| `--wpds-typography-font-family-heading`  | Headings font family                                    |
+| `--wpds-typography-font-family-body`     | Body font family                                        |
+| `--wpds-typography-font-family-mono`     | Monospace font family                                   |
+| `--wpds-typography-font-size-xs`         | Extra small font size                                   |
+| `--wpds-typography-font-size-sm`         | Small font size                                         |
+| `--wpds-typography-font-size-md`         | Medium font size                                        |
+| `--wpds-typography-font-size-lg`         | Large font size                                         |
+| `--wpds-typography-font-size-xl`         | Extra large font size                                   |
+| `--wpds-typography-font-size-2xl`        | 2X large font size                                      |
+| `--wpds-typography-line-height-xs`       | Extra small line height                                 |
+| `--wpds-typography-line-height-sm`       | Small line height                                       |
+| `--wpds-typography-line-height-md`       | Medium line height                                      |
+| `--wpds-typography-line-height-lg`       | Large line height                                       |
+| `--wpds-typography-line-height-xl`       | Extra large line height                                 |
+| `--wpds-typography-line-height-2xl`      | 2X large line height                                    |
+| `--wpds-typography-font-weight-default`  | Baseline text weight for body copy and UI text          |
+| `--wpds-typography-font-weight-emphasis` | Elevated text weight for labels, controls, and headings |
 
 <!-- END GENERATED TOKEN TABLES -->

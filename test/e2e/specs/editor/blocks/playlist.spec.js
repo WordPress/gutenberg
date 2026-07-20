@@ -94,7 +94,7 @@ test.describe( 'Playlist block', () => {
 		await page.goto( post.link );
 
 		// `exact` avoids matching the track button, whose accessible name
-		// includes the "Select to play this track" screen-reader text.
+		// includes the "Play" or "Pause" screen-reader text.
 		const playButton = page.getByRole( 'button', {
 			name: 'Play',
 			exact: true,

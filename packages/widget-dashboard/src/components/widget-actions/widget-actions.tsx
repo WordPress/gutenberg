@@ -1,0 +1,79 @@
+/**
+ * WordPress dependencies
+ */
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { moreVertical } from '@wordpress/icons';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { IconButton, Link } from '@wordpress/ui';
+import type { WidgetType } from '@wordpress/widget-primitives';
+
+/**
+ * Internal dependencies
+ */
+import styles from './widget-actions.module.css';
+
+import { unlock } from '../../lock-unlock';
+
+const { Menu } = unlock( componentsPrivateApis );
+
+type WidgetActionsProps = {
+	/**
+	 * The widget type whose declared actions render here.
+	 */
+	widgetType: WidgetType;
+};
+
+/**
+ * Materializes a widget type's declared `actions` as a "more" menu in the
+ * chrome: a three-dots trigger surfacing each action as a link. Each action
+ * is a declarative link target; the host renders it as an anchor and owns
+ * placement.
+ *
+ * @param {WidgetActionsProps} props Component props.
+ */
+export function WidgetActions( {
+	widgetType,
+}: WidgetActionsProps ): React.ReactNode {
+	const actions = widgetType.actions ?? [];
+
+	if ( actions.length === 0 ) {
+		return null;
+	}
+
+	return (
+		<Menu>
+			<Menu.TriggerButton
+				render={
+					<IconButton
+						icon={ moreVertical }
+						label={ __( 'More' ) }
+						variant="minimal"
+						tone="neutral"
+						size="compact"
+					/>
+				}
+			/>
+
+			<Menu.Popover>
+				<Menu.Group className={ styles[ 'widget-action-items' ] }>
+					{ actions.map( ( action ) => (
+						<Menu.Item
+							key={ action.id }
+							render={
+								<Link
+									href={ action.href }
+									download={ action.download }
+									openInNewTab={ action.openInNewTab }
+									className={ styles[ 'widget-action-link' ] }
+								/>
+							}
+						>
+							{ action.label }
+						</Menu.Item>
+					) ) }
+				</Menu.Group>
+			</Menu.Popover>
+		</Menu>
+	);
+}

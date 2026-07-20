@@ -1426,6 +1426,7 @@ _Type Definition_
 _Properties_
 
 -   _per_page_ `number`: How many items to fetch per page.
+-   _page_ `[number]`: Which page of results to fetch. Defaults to the first page.
 -   _search_ `string`: The search term to use for filtering the results.
 
 _Type Definition_
@@ -1441,6 +1442,16 @@ _Properties_
 -   _sourceId_ `[number|string]`: The id of the media item from external source.
 -   _alt_ `[string]`: The alt text of the media item.
 -   _caption_ `[string]`: The caption of the media item.
+
+_Type Definition_
+
+-   _InserterMediaResponse_ `Object`: Interface for paginated inserter media responses. A media category's `fetch` may return this instead of a plain array to opt into pagination, in which case the media tab renders paging controls for the category.
+
+_Properties_
+
+-   _mediaItems_ `InserterMediaItem[]`: The media items for the requested page.
+-   _totalItems_ `number`: The total number of items across all pages.
+-   _totalPages_ `number`: The total number of pages available.
 
 _Usage_
 
@@ -1511,7 +1522,7 @@ _Properties_
 -   _labels.name_ `string`: General name of the media category. It's used in the inserter media items list.
 -   _labels.search_items_ `[string]`: Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
 -   _mediaType_ `('image'|'audio'|'video')`: The media type of the media category.
--   _fetch_ `(InserterMediaRequest) => Promise<InserterMediaItem[]>`: The function to fetch media items for the category.
+-   _fetch_ `(InserterMediaRequest) => Promise<InserterMediaItem[]|InserterMediaResponse>`: The function to fetch media items for the category. Returning an `InserterMediaResponse` instead of a plain array opts the category into pagination.
 -   _getReportUrl_ `[(InserterMediaItem) => string]`: If the media category supports reporting media items, this function should return the report url for the media item. It accepts the `InserterMediaItem` as an argument.
 -   _isExternalResource_ `[boolean]`: If the media category is an external resource, this should be set to true. This is used to avoid making a request to the external resource when checking whether the category has any media items to display in the media tab.
 -   _emptyMessage_ `[string]`: Optional message shown in place of the generic "No results found." when the source has no items and there is no active search. Providing it also keeps the source in the tab list while empty, so the message stays reachable.

@@ -29,7 +29,7 @@
 	}
 
 	&.active {
-		font-weight: variables.$font-weight-medium;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 	}
 
 	svg:last-child {
@@ -38,7 +38,7 @@
 
 	&[aria-current="true"] {
 		color: var(--wpds-color-foreground-interactive-brand-active);
-		font-weight: variables.$font-weight-medium;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 	}
 
 	// Make sure the focus style is drawn on top of the current item background.

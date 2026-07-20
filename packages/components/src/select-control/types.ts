@@ -36,13 +36,6 @@ type SelectControlBaseProps< V extends string > = Pick<
 		 */
 		__next40pxDefaultSize?: boolean;
 		/**
-		 * Do not throw a warning for the deprecated 36px default size.
-		 * For internal components of other components that already throw the warning.
-		 *
-		 * @ignore
-		 */
-		__shouldNotWarnDeprecated36pxSize?: boolean;
-		/**
 		 * An array of option property objects to be rendered,
 		 * each with a `label` and `value` property, as well as any other
 		 * `<option>` attributes.

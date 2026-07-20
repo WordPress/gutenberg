@@ -70,7 +70,7 @@ export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
 
 export type SuffixItemProps = Pick<
 	SearchControlProps,
-	'value' | 'onChange' | 'onClose'
+	'onChange' | 'onClose'
 > & {
 	searchRef: React.RefObject< HTMLInputElement | null >;
 };
