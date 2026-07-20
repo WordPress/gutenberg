@@ -54,7 +54,7 @@ function gutenberg_get_wp_navigation_menu_capability_names() {
  *
  * The override is intentionally conservative: if Core or another plugin has
  * already moved any relevant `wp_navigation` primitive capability away from
- * `edit_theme_options`, Gutenberg leaves the mapping alone.
+ * Core's current mapping, Gutenberg leaves the mapping alone.
  *
  * @param array $args Post type registration arguments.
  * @return bool Whether Gutenberg should replace the capability mapping.
@@ -70,13 +70,11 @@ function gutenberg_should_override_wp_navigation_post_type_capabilities( $args )
 	}
 
 	foreach ( gutenberg_get_wp_navigation_post_type_capabilities() as $capability_name => $mapped_capability ) {
-		if ( 'read' === $mapped_capability ) {
-			continue;
-		}
+		$core_capability = 'read' === $mapped_capability ? 'read' : 'edit_theme_options';
 
 		if (
 			isset( $capabilities[ $capability_name ] ) &&
-			'edit_theme_options' !== $capabilities[ $capability_name ]
+			$core_capability !== $capabilities[ $capability_name ]
 		) {
 			return false;
 		}
