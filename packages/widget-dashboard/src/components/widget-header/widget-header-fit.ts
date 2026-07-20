@@ -52,16 +52,20 @@ export function useReserveHeaderSpace< T extends HTMLElement = HTMLElement >(
 		WidgetHeaderReserveContext
 	);
 
-	const ref = useResizeObserver< T >( ( [ entry ] ) => {
-		const { columnGap } = getComputedStyle(
-			entry.target.parentElement as HTMLElement
-		);
+	const ref = useResizeObserver< T >(
+		( [ entry ] ) => {
+			const { columnGap } = getComputedStyle(
+				entry.target.parentElement as HTMLElement
+			);
 
-		registerReserved(
-			id,
-			entry.contentRect.width + ( parseFloat( columnGap ) || 0 )
-		);
-	} );
+			registerReserved(
+				id,
+				( entry.borderBoxSize?.[ 0 ]?.inlineSize ?? 0 ) +
+					( parseFloat( columnGap ) || 0 )
+			);
+		},
+		{ box: 'border-box' }
+	);
 
 	useEffect(
 		() => () => unregisterReserved( id ),
