@@ -14,7 +14,7 @@
  * All other blocks (lists, headings, tables, images, embeds, etc.) are skipped,
  * matching the default excerpt which discards non-prose formatting.
  *
- * @since x.x.x
+ * @since 7.0.2
  *
  * @see excerpt_remove_blocks()
  *
@@ -140,7 +140,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 				 * rendered paragraph <p> tags inside are never nested within another <p>,
 				 * which would produce invalid HTML.
 				 */
-				$inner  = '<div class="wp-block-post-excerpt__excerpt">' . $excerpt_html . '</div>';
+				$inner = '<div class="wp-block-post-excerpt__excerpt">' . $excerpt_html . '</div>';
 				if ( ! empty( $more_text ) ) {
 					$inner .= $show_more_on_new_line
 						? '<p class="wp-block-post-excerpt__more-text">' . $more_text . '</p>'

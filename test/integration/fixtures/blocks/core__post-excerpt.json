@@ -4,7 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"showMoreOnNewLine": true,
-			"excerptLength": 55
+			"excerptLength": 55,
+			"preserveFormatting": false
 		},
 		"innerBlocks": []
 	}
