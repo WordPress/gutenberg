@@ -273,9 +273,17 @@ const PlaylistTrackEdit = ( {
 			</InspectorControls>
 			<li { ...blockProps }>
 				{ !! temporaryURL && <Spinner /> }
-				<button
+				<div
 					className="wp-block-playlist-track__button"
 					onClick={ () => setCurrentTrackClientId( clientId ) }
+					onKeyDown={ ( event ) => {
+						if ( event.key === 'Enter' || event.key === ' ' ) {
+							event.preventDefault();
+							setCurrentTrackClientId( clientId );
+						}
+					} }
+					role="button"
+					tabIndex={ 0 }
 					aria-current={
 						currentTrackClientId === clientId ? 'true' : 'false'
 					}
@@ -323,7 +331,7 @@ const PlaylistTrackEdit = ( {
 						{ length }
 					</span>
 					<span className="screen-reader-text">{ __( 'Play' ) }</span>
-				</button>
+				</div>
 			</li>
 		</>
 	);

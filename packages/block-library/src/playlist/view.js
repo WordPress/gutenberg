@@ -10,6 +10,7 @@ import {
 	initWaveformPlayer,
 	logPlayError,
 	setupPlayButtonArtwork,
+	updatePlayButtonAccessibilityLabel,
 	updateSeekControlLabel,
 } from '../utils/waveform-utils';
 
@@ -88,6 +89,15 @@ const { state } = store(
 				const shouldAutoPlay = !! existing?.url;
 
 				initPlayer( ref, track, shouldAutoPlay, context );
+
+				return () => {
+					if ( ! ref.isConnected ) {
+						const player = playerState.get( ref );
+						player?.destroy?.();
+						playerState.delete( ref );
+						playlistPlayerState.delete( context.playlistId );
+					}
+				};
 			},
 		},
 	},
@@ -138,6 +148,27 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 							track.image
 						);
 					}
+					if ( track.title ) {
+						existing.container.setAttribute(
+							'data-title',
+							track.title
+						);
+					} else {
+						existing.container.removeAttribute( 'data-title' );
+					}
+					if ( track.artist ) {
+						existing.container.setAttribute(
+							'data-artist',
+							track.artist
+						);
+					} else {
+						existing.container.removeAttribute( 'data-artist' );
+					}
+					updatePlayButtonAccessibilityLabel(
+						existing.container,
+						existing.instance
+					);
+
 					if ( shouldAutoPlay ) {
 						existing.instance.play()?.catch( logPlayError );
 					}

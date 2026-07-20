@@ -6,7 +6,13 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	MediaPlaceholder,
@@ -121,8 +127,8 @@ const PlaylistEdit = ( {
 		gradients.length > 0 || ! colorGradientSettings.disableCustomGradients;
 	const waveformGradientValue = waveformGradient;
 	const waveformBackgroundGradientValue = waveformBackgroundGradient;
-	let waveformColorGradientChange;
-	let waveformBackgroundColorGradientChange;
+	const colorGradientChangeRef = useRef();
+	const backgroundColorGradientChangeRef = useRef();
 	const onUploadError = useCallback(
 		( message ) => {
 			createErrorNotice( message, { type: 'snackbar' } );
@@ -343,71 +349,89 @@ const PlaylistEdit = ( {
 		[ setAttributes ]
 	);
 
-	function updateWaveformColor( colorValue ) {
-		const isSettingColor = colorValue !== undefined;
-		if ( ! isSettingColor && waveformColorGradientChange === 'gradient' ) {
-			waveformColorGradientChange = undefined;
-			return;
-		}
+	const updateWaveformColor = useCallback(
+		( colorValue ) => {
+			const isSettingColor = colorValue !== undefined;
+			if (
+				! isSettingColor &&
+				colorGradientChangeRef.current === 'gradient'
+			) {
+				colorGradientChangeRef.current = undefined;
+				return;
+			}
 
-		waveformColorGradientChange = 'color';
+			colorGradientChangeRef.current = 'color';
 
-		setAttributes( {
-			waveformColor: colorValue,
-			waveformGradient: undefined,
-		} );
-	}
+			setAttributes( {
+				waveformColor: colorValue,
+				waveformGradient: undefined,
+			} );
+		},
+		[ setAttributes ]
+	);
 
-	function updateWaveformGradient( gradientValue ) {
-		const isSettingGradient = gradientValue !== undefined;
-		if ( ! isSettingGradient && waveformColorGradientChange === 'color' ) {
-			waveformColorGradientChange = undefined;
-			return;
-		}
+	const updateWaveformGradient = useCallback(
+		( gradientValue ) => {
+			const isSettingGradient = gradientValue !== undefined;
+			if (
+				! isSettingGradient &&
+				colorGradientChangeRef.current === 'color'
+			) {
+				colorGradientChangeRef.current = undefined;
+				return;
+			}
 
-		waveformColorGradientChange = 'gradient';
+			colorGradientChangeRef.current = 'gradient';
 
-		setAttributes( {
-			waveformGradient: gradientValue,
-			waveformColor: undefined,
-		} );
-	}
+			setAttributes( {
+				waveformGradient: gradientValue,
+				waveformColor: undefined,
+			} );
+		},
+		[ setAttributes ]
+	);
 
-	function updateWaveformBackgroundColor( colorValue ) {
-		const isSettingColor = colorValue !== undefined;
-		if (
-			! isSettingColor &&
-			waveformBackgroundColorGradientChange === 'gradient'
-		) {
-			waveformBackgroundColorGradientChange = undefined;
-			return;
-		}
+	const updateWaveformBackgroundColor = useCallback(
+		( colorValue ) => {
+			const isSettingColor = colorValue !== undefined;
+			if (
+				! isSettingColor &&
+				backgroundColorGradientChangeRef.current === 'gradient'
+			) {
+				backgroundColorGradientChangeRef.current = undefined;
+				return;
+			}
 
-		waveformBackgroundColorGradientChange = 'color';
+			backgroundColorGradientChangeRef.current = 'color';
 
-		setAttributes( {
-			waveformBackgroundColor: colorValue,
-			waveformBackgroundGradient: undefined,
-		} );
-	}
+			setAttributes( {
+				waveformBackgroundColor: colorValue,
+				waveformBackgroundGradient: undefined,
+			} );
+		},
+		[ setAttributes ]
+	);
 
-	function updateWaveformBackgroundGradient( gradientValue ) {
-		const isSettingGradient = gradientValue !== undefined;
-		if (
-			! isSettingGradient &&
-			waveformBackgroundColorGradientChange === 'color'
-		) {
-			waveformBackgroundColorGradientChange = undefined;
-			return;
-		}
+	const updateWaveformBackgroundGradient = useCallback(
+		( gradientValue ) => {
+			const isSettingGradient = gradientValue !== undefined;
+			if (
+				! isSettingGradient &&
+				backgroundColorGradientChangeRef.current === 'color'
+			) {
+				backgroundColorGradientChangeRef.current = undefined;
+				return;
+			}
 
-		waveformBackgroundColorGradientChange = 'gradient';
+			backgroundColorGradientChangeRef.current = 'gradient';
 
-		setAttributes( {
-			waveformBackgroundGradient: gradientValue,
-			waveformBackgroundColor: undefined,
-		} );
-	}
+			setAttributes( {
+				waveformBackgroundGradient: gradientValue,
+				waveformBackgroundColor: undefined,
+			} );
+		},
+		[ setAttributes ]
+	);
 
 	const colorSettings = [];
 	if ( hasColors || hasGradients ) {

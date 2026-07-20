@@ -256,6 +256,8 @@ export function getWaveformColors(
  * @param {string} options.buttonColor      - The play button color.
  * @param {string} options.seekLabel        - Accessible label for the seek control.
  * @param {string} options.seekValueText    - Accessible value-text template for the seek control (e.g. '%1$s of %2$s').
+ * @param {string} options.playLabel        - Accessible label for the play button.
+ * @param {string} options.pauseLabel       - Accessible label for the pause button.
  * @param {number} options.height           - The waveform height in pixels.
  * @param {string} options.waveformStyle    - The visualization style (bars, mirror, line, blocks, dots, seekbar).
  * @return {Element} The configured container element.
@@ -271,6 +273,8 @@ export function createWaveformContainer( {
 	buttonColor,
 	seekLabel,
 	seekValueText,
+	playLabel,
+	pauseLabel,
 	height = DEFAULT_WAVEFORM_HEIGHT,
 	waveformStyle = 'bars',
 } ) {
@@ -299,6 +303,12 @@ export function createWaveformContainer( {
 	// into this translated template for the seek slider's aria-valuetext.
 	if ( seekValueText ) {
 		container.setAttribute( 'data-seek-value-text', seekValueText );
+	}
+	if ( playLabel ) {
+		container.setAttribute( 'data-label-play', playLabel );
+	}
+	if ( pauseLabel ) {
+		container.setAttribute( 'data-label-pause', pauseLabel );
 	}
 	container.setAttribute( 'data-text-color', buttonColor );
 	container.setAttribute( 'data-text-secondary-color', buttonColor );
@@ -400,26 +410,55 @@ export function styleSvgIcons( container, buttonColor ) {
 }
 
 /**
- * Set up play button accessibility: aria-label that toggles on play/pause.
+ * Update the play button's aria-label based on play state and track metadata.
  *
- * @param {Element} container    - The waveform container element.
- * @param {Object}  labels       - Button labels.
- * @param {string}  labels.play  - Label for the play state.
- * @param {string}  labels.pause - Label for the pause state.
+ * @param {Element} container - The player container.
+ * @param {Object}  instance  - The player instance (optional).
+ * @param {boolean} isPlaying - Override for the play state (optional).
  */
-export function setupPlayButtonAccessibility(
+export function updatePlayButtonAccessibilityLabel(
 	container,
-	{ play: playLabel = 'Play', pause: pauseLabel = 'Pause' } = {}
+	instance,
+	isPlaying
 ) {
 	const playBtn = container.querySelector( '.waveform-btn' );
 	if ( ! playBtn ) {
 		return;
 	}
 
-	playBtn.setAttribute( 'aria-label', playLabel );
+	const playLabel = container.getAttribute( 'data-label-play' ) || 'Play';
+	const pauseLabel = container.getAttribute( 'data-label-pause' ) || 'Pause';
 
-	const onPlay = () => playBtn.setAttribute( 'aria-label', pauseLabel );
-	const onPause = () => playBtn.setAttribute( 'aria-label', playLabel );
+	const activeIsPlaying =
+		isPlaying !== undefined ? isPlaying : !! instance?.isPlaying;
+	const baseLabel = activeIsPlaying ? pauseLabel : playLabel;
+
+	const title = container.getAttribute( 'data-title' );
+	const artist = container.getAttribute( 'data-artist' );
+
+	let ariaLabel = baseLabel;
+	if ( title && artist ) {
+		ariaLabel = `${ baseLabel } - ${ title } by ${ artist }`;
+	} else if ( title ) {
+		ariaLabel = `${ baseLabel } - ${ title }`;
+	}
+
+	playBtn.setAttribute( 'aria-label', ariaLabel );
+}
+
+/**
+ * Set up play button accessibility: aria-label that toggles on play/pause.
+ *
+ * @param {Element} container - The waveform container element.
+ * @param {Object}  instance  - The player instance.
+ */
+export function setupPlayButtonAccessibility( container, instance ) {
+	updatePlayButtonAccessibilityLabel( container, instance );
+
+	const onPlay = () =>
+		updatePlayButtonAccessibilityLabel( container, instance, true );
+	const onPause = () =>
+		updatePlayButtonAccessibilityLabel( container, instance, false );
 
 	container.addEventListener( 'waveformplayer:play', onPlay );
 	container.addEventListener( 'waveformplayer:pause', onPause );
@@ -573,6 +612,8 @@ export function initWaveformPlayer(
 		buttonColor: textColor,
 		seekLabel: title || labels?.seek,
 		seekValueText: labels?.seekValueText,
+		playLabel: labels?.play,
+		pauseLabel: labels?.pause,
 		waveformStyle,
 	} );
 	element.appendChild( container );
@@ -604,9 +645,10 @@ export function initWaveformPlayer(
 			if ( showPlayButtonArtwork ) {
 				setupPlayButtonArtwork( container, image );
 			}
+			cleanupPlayButtonAccessibility?.();
 			cleanupPlayButtonAccessibility = setupPlayButtonAccessibility(
 				container,
-				labels
+				instance
 			);
 			if ( autoPlay ) {
 				instance.play()?.catch( logPlayError );

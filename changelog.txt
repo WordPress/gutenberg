@@ -1,5 +1,16 @@
 == Changelog ==
 
+= 23.6.0-rc.2 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Library
+- Fix React rendering, unmount memory leaks, and play button accessibility in the Playlist block. ([80468](https://github.com/WordPress/gutenberg/pull/80468))
+
+
 = 23.6.0-rc.1 =
 
 

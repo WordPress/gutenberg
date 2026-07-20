@@ -12,6 +12,7 @@ import {
 	applyWaveformPlayerStyles,
 	initWaveformPlayer,
 	setupPlayButtonArtwork,
+	updatePlayButtonAccessibilityLabel,
 	updateSeekControlLabel,
 } from './waveform-utils';
 
@@ -61,6 +62,18 @@ function updatePlayerMetadata(
 	if ( showPlayButtonArtwork ) {
 		setupPlayButtonArtwork( container, image );
 	}
+
+	if ( title ) {
+		container.setAttribute( 'data-title', title );
+	} else {
+		container.removeAttribute( 'data-title' );
+	}
+	if ( artist ) {
+		container.setAttribute( 'data-artist', artist );
+	} else {
+		container.removeAttribute( 'data-artist' );
+	}
+	updatePlayButtonAccessibilityLabel( container, instance );
 }
 
 /**
