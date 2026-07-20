@@ -1,0 +1,12 @@
+.color-heading {
+	text-transform: uppercase;
+	line-height: 24px;
+	font-weight: 600;
+
+	// Triple specificity to override the base Heading styles, matching the
+	// pre-migration Emotion `&&&` behavior.
+	&&& {
+		font-size: 11px;
+		margin-bottom: 0;
+	}
+}
