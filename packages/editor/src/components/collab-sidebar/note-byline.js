@@ -17,6 +17,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { getAvatarBorderColor } from './utils';
+import { useActiveAuthorIds } from './hooks';
 
 export function NoteByline( { avatar, name, date, userId } ) {
 	const hasAvatar = !! avatar;
@@ -58,6 +59,8 @@ export function NoteByline( { avatar, name, date, userId } ) {
 		[ hasAvatar ]
 	);
 
+	const activeAuthorIds = useActiveAuthorIds();
+
 	const commentDate = getDate( date );
 	const commentDateTime = dateI18n( 'c', commentDate );
 	const shouldShowHumanTimeDiff =
@@ -83,11 +86,17 @@ export function NoteByline( { avatar, name, date, userId } ) {
 				alt={ __( 'User avatar' ) }
 				width={ 32 }
 				height={ 32 }
-				style={ {
-					borderColor: getAvatarBorderColor(
-						userId ?? currentUserId
-					),
-				} }
+				// The colored ring is a presence indicator: it only shows
+				// while the author is active in the document.
+				style={
+					activeAuthorIds.has( userId ?? currentUserId )
+						? {
+								borderColor: getAvatarBorderColor(
+									userId ?? currentUserId
+								),
+						  }
+						: undefined
+				}
 			/>
 			<Stack direction="column">
 				<span className="editor-collab-sidebar-panel__user-name">

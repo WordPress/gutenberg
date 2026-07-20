@@ -46,6 +46,26 @@ export function getAvatarBorderColor( userId ) {
 }
 
 /**
+ * Derives the set of user IDs that are currently active in the document from
+ * the RTC awareness state. A user counts as active while they have at least
+ * one connected collaboration session; the same user connected from several
+ * clients appears once.
+ *
+ * @param {Array} collaborators Awareness states as returned by `useActiveCollaborators`.
+ * @return {Set<number>} User IDs of the currently active collaborators.
+ */
+export function getActiveAuthorIds( collaborators ) {
+	const ids = new Set();
+	for ( const collaborator of collaborators ) {
+		const id = collaborator?.collaboratorInfo?.id;
+		if ( collaborator?.isConnected && typeof id === 'number' ) {
+			ids.add( id );
+		}
+	}
+	return ids;
+}
+
+/**
  * Generates a note excerpt from text based on word count type and length.
  *
  * @param {string} text          - The note text to generate excerpt from.

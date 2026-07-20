@@ -107,6 +107,9 @@
 	flex-shrink: 0;
 	border-width: var(--wp-admin-border-width-focus);
 	border-style: solid;
+	// Neutral ring for authors who are not active in the document; an inline
+	// identity color overrides it while the author is present.
+	border-color: $gray-300;
 	padding: var(--wp-admin-border-width-focus);
 	background: $white;
 }
@@ -208,6 +211,9 @@
 	margin-left: -12px;
 	border-width: var(--wp-admin-border-width-focus);
 	border-style: solid;
+	// Neutral ring for participants who are not active in the document; an
+	// inline identity color overrides it while the participant is present.
+	border-color: $gray-300;
 	padding: var(--wp-admin-border-width-focus);
 	background: $white;
 	box-sizing: border-box;

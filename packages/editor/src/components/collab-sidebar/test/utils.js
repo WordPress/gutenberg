@@ -26,6 +26,7 @@ import {
 	pickPrimaryNote,
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
+	getActiveAuthorIds,
 } from '../utils';
 
 function makeRect( top ) {
@@ -996,5 +997,56 @@ describe( 'removeNoteFormat', () => {
 				'5'
 			).toHTMLString()
 		).toBe( 'a b c' );
+	} );
+} );
+
+describe( 'getActiveAuthorIds', () => {
+	const collaborator = ( id, isConnected = true ) => ( {
+		clientId: id * 100,
+		isConnected,
+		isMe: false,
+		collaboratorInfo: { id },
+	} );
+
+	it( 'returns an empty set for an empty list', () => {
+		expect( getActiveAuthorIds( [] ) ).toEqual( new Set() );
+	} );
+
+	it( 'returns the user ids of connected collaborators', () => {
+		expect(
+			getActiveAuthorIds( [ collaborator( 3 ), collaborator( 7 ) ] )
+		).toEqual( new Set( [ 3, 7 ] ) );
+	} );
+
+	it( 'excludes disconnected collaborators', () => {
+		expect(
+			getActiveAuthorIds( [
+				collaborator( 3 ),
+				collaborator( 7, false ),
+			] )
+		).toEqual( new Set( [ 3 ] ) );
+	} );
+
+	it( 'ignores collaborators without a user id', () => {
+		expect(
+			getActiveAuthorIds( [
+				{ clientId: 1, isConnected: true, collaboratorInfo: {} },
+				{ clientId: 2, isConnected: true },
+			] )
+		).toEqual( new Set() );
+	} );
+
+	it( 'deduplicates the same user connected from multiple clients', () => {
+		expect(
+			getActiveAuthorIds( [
+				collaborator( 5 ),
+				{
+					clientId: 42,
+					isConnected: true,
+					isMe: true,
+					collaboratorInfo: { id: 5 },
+				},
+			] )
+		).toEqual( new Set( [ 5 ] ) );
 	} );
 } );

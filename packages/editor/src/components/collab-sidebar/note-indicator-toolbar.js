@@ -16,6 +16,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from './utils';
+import { useActiveAuthorIds } from './hooks';
 
 const { NoteIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
@@ -25,6 +26,7 @@ function ThreadParticipants( { participants } ) {
 		const { __experimentalDiscussionSettings } = getSettings();
 		return __experimentalDiscussionSettings?.avatarURL;
 	}, [] );
+	const activeAuthorIds = useActiveAuthorIds();
 
 	// If there are more than 3 participants, show 2 avatars and a "+n" number.
 	const maxAvatars = 3;
@@ -56,9 +58,17 @@ function ThreadParticipants( { participants } ) {
 					src={ participant.avatar || defaultAvatar }
 					alt={ participant.name }
 					className="editor-note-indicator__avatar"
-					style={ {
-						borderColor: getAvatarBorderColor( participant.id ),
-					} }
+					// The colored ring is a presence indicator: it only
+					// shows while the participant is active in the document.
+					style={
+						activeAuthorIds.has( participant.id )
+							? {
+									borderColor: getAvatarBorderColor(
+										participant.id
+									),
+							  }
+							: undefined
+					}
 				/>
 			) ) }
 			{ overflowCount > 0 && (

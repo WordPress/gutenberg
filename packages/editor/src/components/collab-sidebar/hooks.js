@@ -9,7 +9,11 @@ import {
 	useMemo,
 	useSyncExternalStore,
 } from '@wordpress/element';
-import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import {
+	useEntityRecords,
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import {
 	store as blockEditorStore,
@@ -38,9 +42,11 @@ import {
 	addNoteIdToMetadata,
 	removeNoteFormat,
 	removeNoteIdFromMetadata,
+	getActiveAuthorIds,
 } from './utils';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
+const { useActiveCollaborators } = unlock( coreDataPrivateApis );
 
 export function useNoteThreads( postId ) {
 	const queryArgs = {
@@ -592,4 +598,30 @@ export function useFloatingBoard( {
 		registerThread: store.registerThread,
 		unregisterThread: store.unregisterThread,
 	};
+}
+
+/**
+ * Returns the set of user IDs currently active in the document, derived from
+ * the RTC awareness state. The Notes UI colors avatar rings only for these
+ * users, so a colored ring reads as a presence indicator. When collaboration
+ * is not enabled the set is empty and every ring stays neutral.
+ *
+ * @return {Set<number>} User IDs of the currently active collaborators.
+ */
+export function useActiveAuthorIds() {
+	const { postId, postType } = useSelect(
+		( select ) => ( {
+			postId: select( editorStore ).getCurrentPostId(),
+			postType: select( editorStore ).getCurrentPostType(),
+		} ),
+		[]
+	);
+	const activeCollaborators = useActiveCollaborators(
+		typeof postId === 'number' ? postId : null,
+		postType ?? null
+	);
+	return useMemo(
+		() => getActiveAuthorIds( activeCollaborators ),
+		[ activeCollaborators ]
+	);
 }
