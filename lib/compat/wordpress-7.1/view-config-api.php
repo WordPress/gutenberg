@@ -148,59 +148,7 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 
 	$data = new Gutenberg_View_Config_Data( $config );
 
-	/**
-	 * Filters the view configuration for a given entity.
-	 *
-	 * The dynamic portions of the hook name, `$kind` and `$name`, refer to the
-	 * entity kind (e.g. `postType`) and the entity name (e.g. `page`).
-	 *
-	 * Callbacks receive a Gutenberg_View_Config_Data object and change the
-	 * configuration through its methods: `merge()` merges a partial change
-	 * (a patch) into the current configuration, and `replace()` applies a
-	 * patch the same way but swaps any list it names wholesale instead of
-	 * merging it by member identity. Both take the patch and the schema
-	 * version it was authored against. `set()` ignores what is already there
-	 * and replaces the whole configuration, for a callback that owns every key
-	 * for the entity. Callbacks must return the object they were given.
-	 *
-	 * @param Gutenberg_View_Config_Data $data   The view configuration container
-	 *                                           for the entity, exposing the
-	 *                                           `default_view`, `default_layouts`,
-	 *                                           `view_list`, and `form` keys.
-	 * @param array                      $entity {
-	 *     The entity the configuration is built for.
-	 *
-	 *     @type string $kind The entity kind.
-	 *     @type string $name The entity name.
-	 * }
-	 */
-	$filtered = apply_filters(
-		"get_entity_view_config_{$kind}_{$name}",
-		$data,
-		array(
-			'kind' => $kind,
-			'name' => $name,
-		)
-	);
-
-	// A well-behaved callback returns the object it was given. Fall back to the
-	// unfiltered config if a callback replaced it with something else.
-	if ( ! $filtered instanceof Gutenberg_View_Config_Data ) {
-		_doing_it_wrong(
-			__FUNCTION__,
-			sprintf(
-				/* translators: %s: the filter hook name. */
-				esc_html__( 'A "%s" filter callback must return the Gutenberg_View_Config_Data object it was given.', 'gutenberg' ),
-				esc_html( "get_entity_view_config_{$kind}_{$name}" )
-			),
-			'7.1.0'
-		);
-		return $config;
-	}
-
-	// Backfill any dropped keys with their defaults, then discard any keys the
-	// filter introduced that are not part of the documented configuration shape.
-	return array_intersect_key( array_merge( $config, $filtered->get_data() ), $config );
+	return $data->apply_filters( $kind, $name );
 }
 
 /**

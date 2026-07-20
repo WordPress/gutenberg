@@ -90,12 +90,106 @@ class Gutenberg_View_Config_Data {
 	/**
 	 * Returns the current configuration array.
 	 *
+	 * Deliberately private: filter callbacks receive the container, not the
+	 * materialized configuration, so they cannot read the built result and
+	 * become coupled to a specific configuration shape or schema version. Only
+	 * the class itself reconciles the container back into an array.
+	 *
 	 * @since 7.1.0
 	 *
 	 * @return array The configuration.
 	 */
-	public function get_data() {
+	private function get_data() {
 		return $this->config;
+	}
+
+	/**
+	 * Applies the entity view configuration filter and returns the result.
+	 *
+	 * Exposes the container through the dynamic
+	 * `get_entity_view_config_{$kind}_{$name}` filter so that core and third
+	 * parties can provide the configuration for a specific entity, then
+	 * reconciles the filtered container back into a plain configuration array,
+	 * limited to the documented configuration keys.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string $kind The entity kind (e.g. `postType`).
+	 * @param string $name The entity name (e.g. `page`).
+	 * @return array The filtered configuration, limited to the documented keys.
+	 */
+	public function apply_filters( $kind, $name ) {
+		$config = $this->get_data();
+
+		/**
+		 * Filters the view configuration for a given entity.
+		 *
+		 * The dynamic portions of the hook name, `$kind` and `$name`, refer to the
+		 * entity kind (e.g. `postType`) and the entity name (e.g. `page`).
+		 *
+		 * Callbacks receive a Gutenberg_View_Config_Data object and change the
+		 * configuration through its methods. Each write method takes the schema
+		 * version the change was authored against as its second argument,
+		 * and returns the object for chaining:
+		 *
+		 * - `merge( $patch, $version )` merges a partial change into the current
+		 *   configuration. It touches only the top-level keys the patch names, and
+		 *   merges each named value into the current one by shape: a scalar
+		 *   replaces, an associative array merges key by key, and a list merges by
+		 *   member identity (`id`, `slug`, or `field`). A `null` value drops the
+		 *   key it names, resetting it to its default.
+		 * - `replace( $patch, $version )` applies a patch exactly like `merge()`,
+		 *   but swaps any list it names wholesale instead of merging that list by
+		 *   member identity.
+		 * - `set( $patch, $version )` also touches only the keys the patch names,
+		 *   but swaps each named value in wholesale, dropping whatever the key held
+		 *   before — for a callback that owns those keys outright.
+		 * - `remove( $spec, $version )` deletes named properties. The spec mirrors
+		 *   the configuration shape: a list of names deletes entries at that level,
+		 *   and a nested map recurses to prune from within a named value, down to
+		 *   individual list members.
+		 *
+		 * A change that declares an unsupported schema version is rejected and does
+		 * not alter anything. Callbacks must return the very object they were given.
+		 *
+		 * @param Gutenberg_View_Config_Data $data   The view configuration container
+		 *                                           for the entity, exposing the
+		 *                                           `default_view`, `default_layouts`,
+		 *                                           `view_list`, and `form` keys.
+		 * @param array                      $entity {
+		 *     The entity the configuration is built for.
+		 *
+		 *     @type string $kind The entity kind.
+		 *     @type string $name The entity name.
+		 * }
+		 */
+		$filtered = apply_filters(
+			"get_entity_view_config_{$kind}_{$name}",
+			$this,
+			array(
+				'kind' => $kind,
+				'name' => $name,
+			)
+		);
+
+		// A well-behaved callback returns the very object it was given. Fall back to
+		// the unfiltered config if a callback replaced it with something else.
+		if ( $filtered !== $this ) {
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					/* translators: %s: the filter hook name. */
+					esc_html__( 'A "%s" filter callback must return the Gutenberg_View_Config_Data object it was given.', 'gutenberg' ),
+					esc_html( "get_entity_view_config_{$kind}_{$name}" )
+				),
+				'7.1.0'
+			);
+			return $config;
+		}
+
+		// Backfill any dropped keys with their defaults, then discard any keys the
+		// filter introduced that are not part of the documented configuration shape.
+		return array_intersect_key( array_merge( $config, $this->get_data() ), $config );
 	}
 
 	/**
