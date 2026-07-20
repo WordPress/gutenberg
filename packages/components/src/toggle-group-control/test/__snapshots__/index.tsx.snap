@@ -29,10 +29,10 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 
 <div>
   <div
-    class="style-wrapper components-base-control components-base-control"
+    class="style-wrapper components-base-control"
   >
     <div
-      class="style-field components-base-control__field components-base-control__field"
+      class="style-field components-base-control__field"
     >
       <label
         class="style-label components-base-control__label"
@@ -160,10 +160,10 @@ exports[`ToggleGroupControl controlled should render correctly with text options
 
 <div>
   <div
-    class="style-wrapper components-base-control components-base-control"
+    class="style-wrapper components-base-control"
   >
     <div
-      class="style-field components-base-control__field components-base-control__field"
+      class="style-field components-base-control__field"
     >
       <label
         class="style-label components-base-control__label"
@@ -266,10 +266,10 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 
 <div>
   <div
-    class="style-wrapper components-base-control components-base-control"
+    class="style-wrapper components-base-control"
   >
     <div
-      class="style-field components-base-control__field components-base-control__field"
+      class="style-field components-base-control__field"
     >
       <label
         class="style-label components-base-control__label"
@@ -391,10 +391,10 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
 
 <div>
   <div
-    class="style-wrapper components-base-control components-base-control"
+    class="style-wrapper components-base-control"
   >
     <div
-      class="style-field components-base-control__field components-base-control__field"
+      class="style-field components-base-control__field"
     >
       <label
         class="style-label components-base-control__label"

@@ -72,10 +72,10 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
             class="post-publish-panel__postpublish-post-address-container"
           >
             <div
-              class="style-wrapper components-base-control components-base-control post-publish-panel__postpublish-post-address"
+              class="style-wrapper components-base-control post-publish-panel__postpublish-post-address"
             >
               <div
-                class="style-field components-base-control__field components-base-control__field"
+                class="style-field components-base-control__field"
               >
                 <label
                   class="style-label components-base-control__label"
@@ -143,10 +143,10 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
       class="editor-post-publish-panel__footer"
     >
       <div
-        class="style-wrapper components-base-control components-base-control components-checkbox-control"
+        class="style-wrapper components-base-control components-checkbox-control"
       >
         <div
-          class="style-field components-base-control__field components-base-control__field"
+          class="style-field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -253,10 +253,10 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
             class="post-publish-panel__postpublish-post-address-container"
           >
             <div
-              class="style-wrapper components-base-control components-base-control post-publish-panel__postpublish-post-address"
+              class="style-wrapper components-base-control post-publish-panel__postpublish-post-address"
             >
               <div
-                class="style-field components-base-control__field components-base-control__field"
+                class="style-field components-base-control__field"
               >
                 <label
                   class="style-label components-base-control__label"
@@ -299,10 +299,10 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
       class="editor-post-publish-panel__footer"
     >
       <div
-        class="style-wrapper components-base-control components-base-control components-checkbox-control"
+        class="style-wrapper components-base-control components-checkbox-control"
       >
         <div
-          class="style-field components-base-control__field components-base-control__field"
+          class="style-field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -415,10 +415,10 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
       class="editor-post-publish-panel__footer"
     >
       <div
-        class="style-wrapper components-base-control components-base-control components-checkbox-control"
+        class="style-wrapper components-base-control components-checkbox-control"
       >
         <div
-          class="style-field components-base-control__field components-base-control__field"
+          class="style-field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -531,10 +531,10 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
       class="editor-post-publish-panel__footer"
     >
       <div
-        class="style-wrapper components-base-control components-base-control components-checkbox-control"
+        class="style-wrapper components-base-control components-checkbox-control"
       >
         <div
-          class="style-field components-base-control__field components-base-control__field"
+          class="style-field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"

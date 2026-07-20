@@ -48,11 +48,7 @@ function UnforwardedStyledField< T extends ElementType = 'div' >(
 		<PolymorphicElement
 			ref={ ref }
 			{ ...props }
-			className={ clsx(
-				styles.field,
-				'components-base-control__field',
-				className
-			) }
+			className={ clsx( styles.field, className ) }
 		/>
 	);
 }

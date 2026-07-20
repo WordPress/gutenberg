@@ -3,10 +3,10 @@
 exports[`ColorPaletteControl matches the snapshot 1`] = `
 <div>
   <div
-    class="style-wrapper components-base-control components-base-control block-editor-color-gradient-control"
+    class="style-wrapper components-base-control block-editor-color-gradient-control"
   >
     <div
-      class="style-field components-base-control__field components-base-control__field"
+      class="style-field components-base-control__field"
     >
       <fieldset
         class="block-editor-color-gradient-control__fieldset"
