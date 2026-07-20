@@ -7,38 +7,35 @@ import { paramCase as kebabCase } from 'change-case';
 /**
  * Internal dependencies
  */
-import { DEFAULT_COLLAPSED_MENU_BREAKPOINT } from '../constants';
+import { DEFAULT_OVERLAY_BREAKPOINT } from '../constants';
 
-const VALID_COLLAPSED_MENU_BREAKPOINT = /^([0-9]*\.?[0-9]+)(px|em|rem)$/i;
+const VALID_OVERLAY_BREAKPOINT = /^([0-9]*\.?[0-9]+)(px|em|rem)$/i;
 const UNSAFE_CSS_VALUE = /[\\{}();&=<>`]|\/\*/;
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
 }
 
-export function normalizeCollapsedMenuBreakpoint( value ) {
+export function normalizeOverlayBreakpoint( value ) {
 	if ( typeof value !== 'string' ) {
-		return DEFAULT_COLLAPSED_MENU_BREAKPOINT;
+		return DEFAULT_OVERLAY_BREAKPOINT;
 	}
 
 	const trimmedValue = value.trim();
 	if ( UNSAFE_CSS_VALUE.test( trimmedValue ) ) {
-		return DEFAULT_COLLAPSED_MENU_BREAKPOINT;
+		return DEFAULT_OVERLAY_BREAKPOINT;
 	}
 
-	const match = trimmedValue.match( VALID_COLLAPSED_MENU_BREAKPOINT );
+	const match = trimmedValue.match( VALID_OVERLAY_BREAKPOINT );
 	if ( ! match || parseFloat( match[ 1 ] ) <= 0 ) {
-		return DEFAULT_COLLAPSED_MENU_BREAKPOINT;
+		return DEFAULT_OVERLAY_BREAKPOINT;
 	}
 
 	return `${ match[ 1 ] }${ match[ 2 ].toLowerCase() }`;
 }
 
-export function hasCustomCollapsedMenuBreakpoint( value ) {
-	return (
-		normalizeCollapsedMenuBreakpoint( value ) !==
-		DEFAULT_COLLAPSED_MENU_BREAKPOINT
-	);
+export function hasCustomOverlayBreakpoint( value ) {
+	return normalizeOverlayBreakpoint( value ) !== DEFAULT_OVERLAY_BREAKPOINT;
 }
 
 export function detectColors(

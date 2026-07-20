@@ -28,9 +28,9 @@ export const SELECT_NAVIGATION_MENUS_ARGS = [
 	PRELOADED_NAVIGATION_MENUS_QUERY,
 ];
 
-export const DEFAULT_COLLAPSED_MENU_BREAKPOINT = '600px';
+export const DEFAULT_OVERLAY_BREAKPOINT = '600px';
 
-export const COLLAPSED_MENU_BREAKPOINT_UNITS = [
+export const OVERLAY_BREAKPOINT_UNITS = [
 	{ value: 'px', label: 'px', default: 600 },
 	{ value: 'em', label: 'em', default: 37.5 },
 	{ value: 'rem', label: 'rem', default: 37.5 },

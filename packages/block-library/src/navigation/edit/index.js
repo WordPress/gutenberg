@@ -68,8 +68,8 @@ import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
 import {
 	detectColors,
-	hasCustomCollapsedMenuBreakpoint,
-	normalizeCollapsedMenuBreakpoint,
+	hasCustomOverlayBreakpoint,
+	normalizeOverlayBreakpoint,
 } from './utils';
 import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
@@ -282,14 +282,14 @@ function Navigation( {
 		} = {},
 		hasIcon,
 		icon = 'handle',
-		collapsedMenuBreakpoint,
+		overlayBreakpoint,
 	} = attributes;
 
-	const normalizedCollapsedMenuBreakpoint = normalizeCollapsedMenuBreakpoint(
-		collapsedMenuBreakpoint
-	);
-	const hasCustomCollapsedMenuBreakpointValue =
-		hasCustomCollapsedMenuBreakpoint( collapsedMenuBreakpoint );
+	const normalizedOverlayBreakpoint =
+		normalizeOverlayBreakpoint( overlayBreakpoint );
+	const hasCustomOverlayBreakpointValue =
+		overlayMenu === 'mobile' &&
+		hasCustomOverlayBreakpoint( overlayBreakpoint );
 	const ref = attributes.ref;
 	useLayoutCustomProperties( {
 		clientId,
@@ -652,8 +652,8 @@ function Navigation( {
 					backgroundColor?.slug
 				) ]: !! backgroundColor?.slug,
 				[ `has-text-decoration-${ textDecoration }` ]: textDecoration,
-				'has-custom-collapsed-menu-breakpoint':
-					isResponsive && hasCustomCollapsedMenuBreakpointValue,
+				'has-custom-overlay-breakpoint':
+					isResponsive && hasCustomOverlayBreakpointValue,
 				'block-editor-block-content-overlay': hasBlockOverlay,
 			},
 			layoutClassNames
@@ -947,9 +947,7 @@ function Navigation( {
 						isResponsive={ isResponsive }
 						currentTheme={ currentTheme }
 						hasOverlays={ hasOverlays }
-						collapsedMenuBreakpoint={
-							normalizedCollapsedMenuBreakpoint
-						}
+						overlayBreakpoint={ normalizedOverlayBreakpoint }
 					/>
 				</InspectorControls>
 			) }
@@ -1023,11 +1021,9 @@ function Navigation( {
 						overlayTextColor={ overlayTextColor }
 						overlay={ overlay }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }
-						collapsedMenuBreakpoint={
-							normalizedCollapsedMenuBreakpoint
-						}
-						hasCustomCollapsedMenuBreakpoint={
-							hasCustomCollapsedMenuBreakpointValue
+						overlayBreakpoint={ normalizedOverlayBreakpoint }
+						hasCustomOverlayBreakpoint={
+							hasCustomOverlayBreakpointValue
 						}
 					>
 						<UnsavedInnerBlocks
@@ -1198,11 +1194,11 @@ function Navigation( {
 									onNavigateToEntityRecord={
 										onNavigateToEntityRecord
 									}
-									collapsedMenuBreakpoint={
-										normalizedCollapsedMenuBreakpoint
+									overlayBreakpoint={
+										normalizedOverlayBreakpoint
 									}
-									hasCustomCollapsedMenuBreakpoint={
-										hasCustomCollapsedMenuBreakpointValue
+									hasCustomOverlayBreakpoint={
+										hasCustomOverlayBreakpointValue
 									}
 								>
 									{ isEntityAvailable && (

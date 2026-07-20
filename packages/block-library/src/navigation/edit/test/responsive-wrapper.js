@@ -108,14 +108,14 @@ describe( 'ResponsiveWrapper', () => {
 		} );
 	} );
 
-	describe( 'Custom collapsed menu breakpoints', () => {
+	describe( 'Custom overlay breakpoints', () => {
 		it( 'preserves the default breakpoint behavior without inline state classes', () => {
 			useMediaQuery.mockReturnValue( true );
 
 			render(
 				<ResponsiveWrapper
 					{ ...defaultProps }
-					collapsedMenuBreakpoint="600px"
+					overlayBreakpoint="600px"
 				/>
 			);
 
@@ -124,33 +124,33 @@ describe( 'ResponsiveWrapper', () => {
 			);
 			expect(
 				screen.getByRole( 'button', { name: 'Menu' } )
-			).not.toHaveClass( 'is-custom-collapsed-menu-breakpoint-inline' );
+			).not.toHaveClass( 'is-custom-overlay-breakpoint-inline' );
 			expect( getResponsiveContainer() ).not.toHaveClass(
-				'is-custom-collapsed-menu-breakpoint-inline'
+				'is-custom-overlay-breakpoint-inline'
 			);
 		} );
 
 		it.each( [ '10px', '37.5em', '48rem' ] )(
 			'adds inline state classes when the custom %s breakpoint matches',
-			( collapsedMenuBreakpoint ) => {
+			( overlayBreakpoint ) => {
 				useMediaQuery.mockReturnValue( true );
 
 				render(
 					<ResponsiveWrapper
 						{ ...defaultProps }
-						collapsedMenuBreakpoint={ collapsedMenuBreakpoint }
-						hasCustomCollapsedMenuBreakpoint
+						overlayBreakpoint={ overlayBreakpoint }
+						hasCustomOverlayBreakpoint
 					/>
 				);
 
 				expect( useMediaQuery ).toHaveBeenCalledWith(
-					`(min-width: ${ collapsedMenuBreakpoint })`
+					`(min-width: ${ overlayBreakpoint })`
 				);
 				expect(
 					screen.getByRole( 'button', { name: 'Menu' } )
-				).toHaveClass( 'is-custom-collapsed-menu-breakpoint-inline' );
+				).toHaveClass( 'is-custom-overlay-breakpoint-inline' );
 				expect( getResponsiveContainer() ).toHaveClass(
-					'is-custom-collapsed-menu-breakpoint-inline'
+					'is-custom-overlay-breakpoint-inline'
 				);
 			}
 		);
@@ -161,16 +161,16 @@ describe( 'ResponsiveWrapper', () => {
 			render(
 				<ResponsiveWrapper
 					{ ...defaultProps }
-					collapsedMenuBreakpoint="48rem"
-					hasCustomCollapsedMenuBreakpoint
+					overlayBreakpoint="48rem"
+					hasCustomOverlayBreakpoint
 				/>
 			);
 
 			expect(
 				screen.getByRole( 'button', { name: 'Menu' } )
-			).not.toHaveClass( 'is-custom-collapsed-menu-breakpoint-inline' );
+			).not.toHaveClass( 'is-custom-overlay-breakpoint-inline' );
 			expect( getResponsiveContainer() ).not.toHaveClass(
-				'is-custom-collapsed-menu-breakpoint-inline'
+				'is-custom-overlay-breakpoint-inline'
 			);
 		} );
 	} );

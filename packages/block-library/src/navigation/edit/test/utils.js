@@ -4,23 +4,23 @@
 import {
 	getUniqueTemplatePartTitle,
 	getCleanTemplatePartSlug,
-	hasCustomCollapsedMenuBreakpoint,
-	normalizeCollapsedMenuBreakpoint,
+	hasCustomOverlayBreakpoint,
+	normalizeOverlayBreakpoint,
 } from '../utils';
 
-describe( 'normalizeCollapsedMenuBreakpoint', () => {
+describe( 'normalizeOverlayBreakpoint', () => {
 	it( 'normalizes valid breakpoint values', () => {
-		expect( normalizeCollapsedMenuBreakpoint( '48rem' ) ).toBe( '48rem' );
-		expect( normalizeCollapsedMenuBreakpoint( '37.5EM' ) ).toBe( '37.5em' );
-		expect( normalizeCollapsedMenuBreakpoint( ' 720px ' ) ).toBe( '720px' );
+		expect( normalizeOverlayBreakpoint( '48rem' ) ).toBe( '48rem' );
+		expect( normalizeOverlayBreakpoint( '37.5EM' ) ).toBe( '37.5em' );
+		expect( normalizeOverlayBreakpoint( ' 720px ' ) ).toBe( '720px' );
 	} );
 
 	it( 'falls back to the default for empty, invalid, or non-positive values', () => {
-		expect( normalizeCollapsedMenuBreakpoint() ).toBe( '600px' );
-		expect( normalizeCollapsedMenuBreakpoint( '' ) ).toBe( '600px' );
-		expect( normalizeCollapsedMenuBreakpoint( '0px' ) ).toBe( '600px' );
-		expect( normalizeCollapsedMenuBreakpoint( '-1px' ) ).toBe( '600px' );
-		expect( normalizeCollapsedMenuBreakpoint( '40vw' ) ).toBe( '600px' );
+		expect( normalizeOverlayBreakpoint() ).toBe( '600px' );
+		expect( normalizeOverlayBreakpoint( '' ) ).toBe( '600px' );
+		expect( normalizeOverlayBreakpoint( '0px' ) ).toBe( '600px' );
+		expect( normalizeOverlayBreakpoint( '-1px' ) ).toBe( '600px' );
+		expect( normalizeOverlayBreakpoint( '40vw' ) ).toBe( '600px' );
 	} );
 
 	it.each( [
@@ -32,15 +32,15 @@ describe( 'normalizeCollapsedMenuBreakpoint', () => {
 		'url(javascript:alert(1))',
 		'calc(100vw - 1rem)',
 	] )( 'rejects unsafe CSS breakpoint value %p', ( value ) => {
-		expect( normalizeCollapsedMenuBreakpoint( value ) ).toBe( '600px' );
+		expect( normalizeOverlayBreakpoint( value ) ).toBe( '600px' );
 	} );
 } );
 
-describe( 'hasCustomCollapsedMenuBreakpoint', () => {
+describe( 'hasCustomOverlayBreakpoint', () => {
 	it( 'returns true only for valid non-default breakpoints', () => {
-		expect( hasCustomCollapsedMenuBreakpoint( '600px' ) ).toBe( false );
-		expect( hasCustomCollapsedMenuBreakpoint( '0px' ) ).toBe( false );
-		expect( hasCustomCollapsedMenuBreakpoint( '48rem' ) ).toBe( true );
+		expect( hasCustomOverlayBreakpoint( '600px' ) ).toBe( false );
+		expect( hasCustomOverlayBreakpoint( '0px' ) ).toBe( false );
+		expect( hasCustomOverlayBreakpoint( '48rem' ) ).toBe( true );
 	} );
 } );
 

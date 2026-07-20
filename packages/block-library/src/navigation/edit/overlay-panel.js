@@ -2,12 +2,14 @@
  * WordPress dependencies
  */
 import {
+	Button,
 	PanelBody,
-	__experimentalVStack as VStack,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
+import { reset as resetIcon } from '@wordpress/icons';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -16,10 +18,13 @@ import OverlayTemplatePartSelector from './overlay-template-part-selector';
 import OverlayVisibilityControl from './overlay-visibility-control';
 import OverlayMenuPreviewButton from './overlay-menu-preview-button';
 import OverlayPreview from './overlay-preview';
-import { normalizeCollapsedMenuBreakpoint } from './utils';
 import {
-	DEFAULT_COLLAPSED_MENU_BREAKPOINT,
-	COLLAPSED_MENU_BREAKPOINT_UNITS,
+	hasCustomOverlayBreakpoint,
+	normalizeOverlayBreakpoint,
+} from './utils';
+import {
+	DEFAULT_OVERLAY_BREAKPOINT,
+	OVERLAY_BREAKPOINT_UNITS,
 } from '../constants';
 
 /**
@@ -39,7 +44,7 @@ import {
  * @param {boolean}  props.isResponsive              Whether overlay menu is responsive.
  * @param {string}   props.currentTheme              Current theme stylesheet name.
  * @param {boolean}  props.hasOverlays               Whether any overlay template parts exist.
- * @param {string}   props.collapsedMenuBreakpoint   Breakpoint at which the overlay switches to inline layout.
+ * @param {string}   props.overlayBreakpoint         Breakpoint at which the overlay switches to inline layout.
  * @return {React.JSX.Element}                       The overlay panel component or null if overlay is disabled.
  */
 export default function OverlayPanel( {
@@ -56,40 +61,58 @@ export default function OverlayPanel( {
 	isResponsive,
 	currentTheme,
 	hasOverlays,
-	collapsedMenuBreakpoint = DEFAULT_COLLAPSED_MENU_BREAKPOINT,
+	overlayBreakpoint = DEFAULT_OVERLAY_BREAKPOINT,
 } ) {
 	const [ isCreatingOverlay, setIsCreatingOverlay ] = useState( false );
+	const normalizedOverlayBreakpoint =
+		normalizeOverlayBreakpoint( overlayBreakpoint );
+	const hasCustomOverlayBreakpointValue =
+		hasCustomOverlayBreakpoint( overlayBreakpoint );
 
-	const handleCollapsedMenuBreakpointChange = ( nextValue ) => {
+	const handleOverlayBreakpointChange = ( nextValue ) => {
 		setAttributes( {
-			collapsedMenuBreakpoint:
-				normalizeCollapsedMenuBreakpoint( nextValue ),
+			overlayBreakpoint: normalizeOverlayBreakpoint( nextValue ),
+		} );
+	};
+
+	const handleOverlayBreakpointReset = () => {
+		setAttributes( {
+			overlayBreakpoint: DEFAULT_OVERLAY_BREAKPOINT,
 		} );
 	};
 
 	return (
 		<PanelBody title={ __( 'Overlay' ) } initialOpen>
-			<VStack spacing={ 4 }>
+			<Stack direction="column" gap="lg">
 				<OverlayVisibilityControl
 					overlayMenu={ overlayMenu }
 					setAttributes={ setAttributes }
 				/>
 
-				{ overlayMenu !== 'never' && (
-					<UnitControl
-						help={ __(
-							'Below this width, the navigation is collapsed behind a menu button. At this width and wider, links are shown inline.'
+				{ overlayMenu === 'mobile' && (
+					<Stack direction="row" gap="sm" align="flex-start">
+						<UnitControl
+							help={ __(
+								'Sets the width where navigation items switch from collapsed to inline.'
+							) }
+							isResetValueOnUnitChange
+							label={ __( 'Overlay breakpoint' ) }
+							min={ 0 }
+							onChange={ handleOverlayBreakpointChange }
+							step="any"
+							units={ OVERLAY_BREAKPOINT_UNITS }
+							value={ normalizedOverlayBreakpoint }
+						/>
+						{ hasCustomOverlayBreakpointValue && (
+							<Button
+								__next40pxDefaultSize
+								icon={ resetIcon }
+								label={ __( 'Reset overlay breakpoint' ) }
+								onClick={ handleOverlayBreakpointReset }
+								size="small"
+							/>
 						) }
-						isResetValueOnUnitChange
-						label={ __( 'Breakpoint' ) }
-						min={ 0 }
-						onChange={ handleCollapsedMenuBreakpointChange }
-						step="any"
-						units={ COLLAPSED_MENU_BREAKPOINT_UNITS }
-						value={ normalizeCollapsedMenuBreakpoint(
-							collapsedMenuBreakpoint
-						) }
-					/>
+					</Stack>
 				) }
 
 				{ overlayMenu !== 'never' && (
@@ -125,7 +148,7 @@ export default function OverlayPanel( {
 							currentTheme={ currentTheme }
 						/>
 					) }
-			</VStack>
+			</Stack>
 		</PanelBody>
 	);
 }

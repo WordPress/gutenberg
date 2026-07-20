@@ -157,13 +157,13 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that the default collapsed menu breakpoint preserves the original markup.
+	 * Test that the default overlay breakpoint preserves the original markup.
 	 *
-	 * @covers ::gutenberg_block_core_navigation_get_collapsed_menu_breakpoint
-	 * @covers ::gutenberg_block_core_navigation_has_custom_collapsed_menu_breakpoint
+	 * @covers ::gutenberg_block_core_navigation_get_overlay_breakpoint
+	 * @covers ::gutenberg_block_core_navigation_has_custom_overlay_breakpoint
 	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
 	 */
-	public function test_default_collapsed_menu_breakpoint_preserves_block_markup() {
+	public function test_default_overlay_breakpoint_preserves_block_markup() {
 		$block_content = '<nav class="wp-block-navigation is-responsive"><button class="wp-block-navigation__responsive-container-open">Menu</button><div class="wp-block-navigation__responsive-container"><div class="wp-block-navigation__responsive-close"><div class="wp-block-navigation__responsive-dialog"><button class="wp-block-navigation__responsive-container-close">Close</button><div class="wp-block-navigation__responsive-container-content"><ul class="wp-block-navigation__container wp-block-navigation"><li>Item</li></ul></div></div></div></div></nav>';
 		$block         = array(
 			'blockName' => 'core/navigation',
@@ -175,48 +175,48 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$actual = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
 
 		$this->assertSame( $block_content, $actual );
-		$this->assertSame( '600px', gutenberg_block_core_navigation_get_collapsed_menu_breakpoint( $block['attrs'] ) );
-		$this->assertFalse( gutenberg_block_core_navigation_has_custom_collapsed_menu_breakpoint( $block['attrs'] ) );
+		$this->assertSame( '600px', gutenberg_block_core_navigation_get_overlay_breakpoint( $block['attrs'] ) );
+		$this->assertFalse( gutenberg_block_core_navigation_has_custom_overlay_breakpoint( $block['attrs'] ) );
 	}
 
 	/**
-	 * Test that custom collapsed menu breakpoints add a scoping class and CSS.
+	 * Test that custom overlay breakpoints add a scoping class and CSS.
 	 *
-	 * @covers ::gutenberg_block_core_navigation_get_collapsed_menu_breakpoint
-	 * @covers ::gutenberg_block_core_navigation_has_custom_collapsed_menu_breakpoint
+	 * @covers ::gutenberg_block_core_navigation_get_overlay_breakpoint
+	 * @covers ::gutenberg_block_core_navigation_has_custom_overlay_breakpoint
 	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
-	 * @dataProvider data_custom_collapsed_menu_breakpoints
+	 * @dataProvider data_custom_overlay_breakpoints
 	 *
-	 * @param string $collapsed_menu_breakpoint The breakpoint value to test.
+	 * @param string $overlay_breakpoint The breakpoint value to test.
 	 */
-	public function test_custom_collapsed_menu_breakpoint_adds_scoped_styles( $collapsed_menu_breakpoint ) {
-		$block_content = '<nav class="wp-block-navigation is-responsive has-custom-collapsed-menu-breakpoint"><button class="wp-block-navigation__responsive-container-open">Menu</button><div class="wp-block-navigation__responsive-container"><div class="wp-block-navigation__responsive-close"><div class="wp-block-navigation__responsive-dialog"><button class="wp-block-navigation__responsive-container-close">Close</button><div class="wp-block-navigation__responsive-container-content"><ul class="wp-block-navigation__container wp-block-navigation"><li>Item</li></ul></div></div></div></div></nav>';
+	public function test_custom_overlay_breakpoint_adds_scoped_styles( $overlay_breakpoint ) {
+		$block_content = '<nav class="wp-block-navigation is-responsive has-custom-overlay-breakpoint"><button class="wp-block-navigation__responsive-container-open">Menu</button><div class="wp-block-navigation__responsive-container"><div class="wp-block-navigation__responsive-close"><div class="wp-block-navigation__responsive-dialog"><button class="wp-block-navigation__responsive-container-close">Close</button><div class="wp-block-navigation__responsive-container-content"><ul class="wp-block-navigation__container wp-block-navigation"><li>Item</li></ul></div></div></div></div></nav>';
 		$block         = array(
 			'blockName' => 'core/navigation',
 			'attrs'     => array(
 				'overlayMenu'       => 'mobile',
-				'collapsedMenuBreakpoint'  => $collapsed_menu_breakpoint,
+				'overlayBreakpoint' => $overlay_breakpoint,
 			),
 		);
 
 		$actual = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
-		$this->assertMatchesRegularExpression( '/\bwp-block-navigation-custom-breakpoint-(\d+)\b/', $actual );
-		preg_match( '/\bwp-block-navigation-custom-breakpoint-(\d+)\b/', $actual, $matches );
+		$this->assertMatchesRegularExpression( '/\bwp-block-navigation-custom-overlay-breakpoint-(\d+)\b/', $actual );
+		preg_match( '/\bwp-block-navigation-custom-overlay-breakpoint-(\d+)\b/', $actual, $matches );
 		$breakpoint_class = $matches[0];
 		$stylesheet       = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 
-		$this->assertSame( $collapsed_menu_breakpoint, gutenberg_block_core_navigation_get_collapsed_menu_breakpoint( $block['attrs'] ) );
-		$this->assertTrue( gutenberg_block_core_navigation_has_custom_collapsed_menu_breakpoint( $block['attrs'] ) );
-		$this->assertStringContainsString( "@media (min-width: $collapsed_menu_breakpoint){.wp-block-navigation.$breakpoint_class.has-custom-collapsed-menu-breakpoint .wp-block-navigation__responsive-container:not(.hidden-by-default):not(.is-menu-open){display:block;width:100%;position:relative;z-index:auto;background-color:inherit;}", $stylesheet );
-		$this->assertStringContainsString( ".wp-block-navigation.$breakpoint_class.has-custom-collapsed-menu-breakpoint .wp-block-navigation__responsive-container-open:not(.always-shown){display:none;}", $stylesheet );
+		$this->assertSame( $overlay_breakpoint, gutenberg_block_core_navigation_get_overlay_breakpoint( $block['attrs'] ) );
+		$this->assertTrue( gutenberg_block_core_navigation_has_custom_overlay_breakpoint( $block['attrs'] ) );
+		$this->assertStringContainsString( "@media (min-width: $overlay_breakpoint){.wp-block-navigation.$breakpoint_class.has-custom-overlay-breakpoint .wp-block-navigation__responsive-container:not(.hidden-by-default):not(.is-menu-open){display:block;width:100%;position:relative;z-index:auto;background-color:inherit;}", $stylesheet );
+		$this->assertStringContainsString( ".wp-block-navigation.$breakpoint_class.has-custom-overlay-breakpoint .wp-block-navigation__responsive-container-open:not(.always-shown){display:none;}", $stylesheet );
 	}
 
 	/**
-	 * Data provider for valid custom collapsed menu breakpoints.
+	 * Data provider for valid custom overlay breakpoints.
 	 *
 	 * @return array[]
 	 */
-	public function data_custom_collapsed_menu_breakpoints() {
+	public function data_custom_overlay_breakpoints() {
 		return array(
 			'px'  => array( '10px' ),
 			'em'  => array( '37.5em' ),
@@ -225,23 +225,23 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that invalid collapsed menu breakpoints fall back to the default.
+	 * Test that invalid overlay breakpoints fall back to the default.
 	 *
-	 * @covers ::gutenberg_block_core_navigation_get_collapsed_menu_breakpoint
-	 * @covers ::gutenberg_block_core_navigation_has_custom_collapsed_menu_breakpoint
+	 * @covers ::gutenberg_block_core_navigation_get_overlay_breakpoint
+	 * @covers ::gutenberg_block_core_navigation_has_custom_overlay_breakpoint
 	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
-	 * @dataProvider data_invalid_collapsed_menu_breakpoints
+	 * @dataProvider data_invalid_overlay_breakpoints
 	 *
-	 * @param string $collapsed_menu_breakpoint Invalid breakpoint value to test.
+	 * @param string $overlay_breakpoint Invalid breakpoint value to test.
 	 * @param string $unsafe_fragment   Unsafe fragment that must not be emitted.
 	 */
-	public function test_invalid_collapsed_menu_breakpoint_falls_back_to_default( $collapsed_menu_breakpoint, $unsafe_fragment ) {
+	public function test_invalid_overlay_breakpoint_falls_back_to_default( $overlay_breakpoint, $unsafe_fragment ) {
 		$block_content = '<nav class="wp-block-navigation is-responsive"><button class="wp-block-navigation__responsive-container-open">Menu</button><div class="wp-block-navigation__responsive-container"><div class="wp-block-navigation__responsive-close"><div class="wp-block-navigation__responsive-dialog"><button class="wp-block-navigation__responsive-container-close">Close</button><div class="wp-block-navigation__responsive-container-content"><ul class="wp-block-navigation__container wp-block-navigation"><li>Item</li></ul></div></div></div></div></nav>';
 		$block         = array(
 			'blockName' => 'core/navigation',
 			'attrs'     => array(
 				'overlayMenu'       => 'mobile',
-				'collapsedMenuBreakpoint'  => $collapsed_menu_breakpoint,
+				'overlayBreakpoint' => $overlay_breakpoint,
 			),
 		);
 
@@ -249,18 +249,18 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 
 		$this->assertSame( $block_content, $actual );
-		$this->assertSame( '600px', gutenberg_block_core_navigation_get_collapsed_menu_breakpoint( $block['attrs'] ) );
-		$this->assertFalse( gutenberg_block_core_navigation_has_custom_collapsed_menu_breakpoint( $block['attrs'] ) );
-		$this->assertStringNotContainsString( 'wp-block-navigation-custom-breakpoint-', $stylesheet );
+		$this->assertSame( '600px', gutenberg_block_core_navigation_get_overlay_breakpoint( $block['attrs'] ) );
+		$this->assertFalse( gutenberg_block_core_navigation_has_custom_overlay_breakpoint( $block['attrs'] ) );
+		$this->assertStringNotContainsString( 'wp-block-navigation-custom-overlay-breakpoint-', $stylesheet );
 		$this->assertStringNotContainsString( $unsafe_fragment, $stylesheet );
 	}
 
 	/**
-	 * Data provider for invalid and malicious custom collapsed menu breakpoints.
+	 * Data provider for invalid and malicious custom overlay breakpoints.
 	 *
 	 * @return array[]
 	 */
-	public function data_invalid_collapsed_menu_breakpoints() {
+	public function data_invalid_overlay_breakpoints() {
 		return array(
 			'calc expression'       => array( 'calc(100vw - 1rem)', 'calc(100vw - 1rem)' ),
 			'css rule injection'   => array( '10px);body{background:red}', 'body{background:red}' ),
@@ -270,6 +270,48 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 			'css expression'       => array( 'expression(alert(1))', 'expression(alert(1))' ),
 			'unsupported unit'     => array( '40vw', '40vw' ),
 			'non-positive length'  => array( '0px', '0px' ),
+		);
+	}
+
+	/**
+	 * Test that custom overlay breakpoints are ignored outside the responsive overlay setting.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_get_overlay_breakpoint
+	 * @covers ::gutenberg_block_core_navigation_has_custom_overlay_breakpoint
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 * @dataProvider data_non_responsive_overlay_menu_settings
+	 *
+	 * @param string $overlay_menu Overlay menu setting to test.
+	 */
+	public function test_custom_overlay_breakpoint_is_ignored_when_overlay_visibility_is_not_responsive( $overlay_menu ) {
+		$block_content = '<nav class="wp-block-navigation is-responsive has-custom-overlay-breakpoint"><button class="wp-block-navigation__responsive-container-open">Menu</button><div class="wp-block-navigation__responsive-container"><div class="wp-block-navigation__responsive-close"><div class="wp-block-navigation__responsive-dialog"><button class="wp-block-navigation__responsive-container-close">Close</button><div class="wp-block-navigation__responsive-container-content"><ul class="wp-block-navigation__container wp-block-navigation"><li>Item</li></ul></div></div></div></div></nav>';
+		$block         = array(
+			'blockName' => 'core/navigation',
+			'attrs'     => array(
+				'overlayMenu'       => $overlay_menu,
+				'overlayBreakpoint' => '10px',
+			),
+		);
+
+		$actual     = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertSame( $block_content, $actual );
+		$this->assertSame( '10px', gutenberg_block_core_navigation_get_overlay_breakpoint( $block['attrs'] ) );
+		$this->assertFalse( gutenberg_block_core_navigation_has_custom_overlay_breakpoint( $block['attrs'] ) );
+		$this->assertStringNotContainsString( 'wp-block-navigation-custom-overlay-breakpoint-', $actual );
+		$this->assertStringNotContainsString( 'wp-block-navigation-custom-overlay-breakpoint-', $stylesheet );
+	}
+
+	/**
+	 * Data provider for overlay visibility settings that do not use breakpoints.
+	 *
+	 * @return array[]
+	 */
+	public function data_non_responsive_overlay_menu_settings() {
+		return array(
+			'never'  => array( 'never' ),
+			'always' => array( 'always' ),
 		);
 	}
 

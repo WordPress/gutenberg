@@ -399,11 +399,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/navigation/edit/overlay-panel.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/navigation/edit/overlay-template-part-selector.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2

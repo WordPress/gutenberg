@@ -720,10 +720,10 @@ button.wp-block-navigation-item__content {
 	}
 
 	// Keep the static default breakpoint for Navigation blocks without a
-	// custom breakpoint. Custom breakpoint blocks opt out here and receive
-	// instance-scoped rules from server rendering.
+	// custom overlay breakpoint. Custom overlay breakpoint blocks opt out here
+	// and receive instance-scoped rules from server rendering.
 	@include break-small() {
-		.wp-block-navigation:not(.has-custom-collapsed-menu-breakpoint) & {
+		.wp-block-navigation:not(.has-custom-overlay-breakpoint) & {
 			&:not(.hidden-by-default) {
 				&:not(.is-menu-open) {
 					display: block;
@@ -747,7 +747,7 @@ button.wp-block-navigation-item__content {
 		}
 	}
 
-	&.is-custom-collapsed-menu-breakpoint-inline {
+	&.is-custom-overlay-breakpoint-inline {
 		&:not(.hidden-by-default) {
 			&:not(.is-menu-open) {
 				display: block;
@@ -825,15 +825,15 @@ button.wp-block-navigation-item__content {
 
 	&:not(.always-shown) {
 		// Keep the static default breakpoint for Navigation blocks without a
-		// custom breakpoint. Custom breakpoint blocks opt out here and receive
-		// instance-scoped rules from server rendering.
+		// custom overlay breakpoint. Custom overlay breakpoint blocks opt out here
+		// and receive instance-scoped rules from server rendering.
 		@include break-small {
-			.wp-block-navigation:not(.has-custom-collapsed-menu-breakpoint) & {
+			.wp-block-navigation:not(.has-custom-overlay-breakpoint) & {
 				display: none;
 			}
 		}
 
-		&.is-custom-collapsed-menu-breakpoint-inline {
+		&.is-custom-overlay-breakpoint-inline {
 			display: none;
 		}
 	}
