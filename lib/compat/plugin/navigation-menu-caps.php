@@ -64,6 +64,11 @@ function gutenberg_should_override_wp_navigation_post_type_capabilities( $args )
 		? $args['capabilities']
 		: array();
 
+	// Only override when Core is still using the legacy edit_theme_options mapping.
+	if ( empty( $capabilities ) || empty( $capabilities['edit_posts'] ) || 'edit_theme_options' !== $capabilities['edit_posts'] ) {
+		return false;
+	}
+
 	foreach ( gutenberg_get_wp_navigation_post_type_capabilities() as $capability_name => $mapped_capability ) {
 		if ( 'read' === $mapped_capability ) {
 			continue;
