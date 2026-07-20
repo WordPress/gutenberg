@@ -751,6 +751,45 @@ describe( 'actions', () => {
 			).toHaveLength( 0 );
 		} );
 
+		it( 'removes the item even when the workers never answer the cancel calls', async () => {
+			/*
+			 * A busy vips worker is synchronously blocked inside a wasm call
+			 * and cannot answer the cancellation RPC until the current
+			 * operation - and every operation already queued behind it -
+			 * finishes, which for a large animated GIF takes minutes. The
+			 * worker cancels are best-effort cleanup; cancelItem must not
+			 * block on them, or the cancelled item lingers in the queue and
+			 * gates the parent's finalization the whole time.
+			 */
+			( vipsCancelOperations as jest.Mock ).mockImplementationOnce(
+				() => new Promise( () => {} )
+			);
+			( cancelGifToVideoOperations as jest.Mock ).mockImplementationOnce(
+				() => new Promise( () => {} )
+			);
+
+			const onError = jest.fn();
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				onError,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Test error' ) );
+
+			expect( vipsCancelOperations ).toHaveBeenCalledWith( item.id );
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( { message: 'Test error' } )
+			);
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+		} );
+
 		describe( 'parent cancellation when child sideload fails', () => {
 			// Helpers used by every scenario below. Set up a parent that
 			// has finished its primary upload (so it has an attachment.id),

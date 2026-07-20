@@ -15,7 +15,7 @@ import { isSelectionForward } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
 import { canHostEditableRoot } from './use-editable-root';
-import { setContentEditableWrapper, setShiftClickInProgress } from './utils';
+import { setContentEditableWrapper } from './utils';
 import { unlock } from '../../lock-unlock';
 
 const { ownsSelection } = unlock( richTextPrivateApis );
@@ -102,8 +102,13 @@ function getRichTextElement( node ) {
  * Sets a multi-selection based on the native selection across blocks.
  */
 export default function useSelectionObserver() {
-	const { multiSelect, selectBlock, selectionChange } =
-		useDispatch( blockEditorStore );
+	const {
+		multiSelect,
+		selectBlock,
+		selectionChange,
+		startMultiSelect,
+		stopMultiSelect,
+	} = useDispatch( blockEditorStore );
 	const blockEditorSelectors = useSelect( blockEditorStore );
 	const {
 		getBlockParents,
@@ -122,12 +127,18 @@ export default function useSelectionObserver() {
 
 			function onMouseDown( event ) {
 				isTripleClick = event.detail === 3;
-				setShiftClickInProgress( event.shiftKey );
+				// A shift+click makes a multi-selection: mark the gesture as
+				// in progress so the clicked block's focus handler does not
+				// select it (collapsing the native range being made), and so
+				// use-multi-selection does not clear the native selection.
+				// The selection is built on mouseup.
+				if ( event.shiftKey ) {
+					startMultiSelect();
+				}
 			}
 
 			function onKeyDown() {
 				isTripleClick = false;
-				setShiftClickInProgress( false );
 			}
 
 			function onSelectionChange( event ) {
@@ -444,7 +455,7 @@ export default function useSelectionObserver() {
 			);
 			function onMouseUp( event ) {
 				onSelectionChange( event );
-				setShiftClickInProgress( false );
+				stopMultiSelect();
 			}
 
 			defaultView.addEventListener( 'mouseup', onMouseUp );

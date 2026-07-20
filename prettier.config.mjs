@@ -1,8 +1,11 @@
 // Import the default config file and expose it in the project root.
 // Useful for editor integrations.
-module.exports = {
-	...require( './packages/prettier-config' ),
+import baseConfig from './packages/prettier-config/lib/index.js';
+
+export default {
+	...baseConfig,
 	overrides: [
+		...( baseConfig.overrides ?? [] ),
 		{
 			files: [ 'changelog.txt' ],
 			options: { parser: 'markdown' },
