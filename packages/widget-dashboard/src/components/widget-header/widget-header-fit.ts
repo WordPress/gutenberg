@@ -16,14 +16,6 @@ import { createContext, useContext, useEffect } from '@wordpress/element';
  */
 export const WIDGET_TOOLBAR_CHIP_RESERVE = 8;
 
-/**
- * Width the identity cluster shrinks to, mirroring `.identity`'s
- * `min-inline-size`. Identity is the row's flexible section, so the budget
- * reserves this floor: a measured width moves with the presentation the
- * budget has to decide.
- */
-export const WIDGET_HEADER_IDENTITY_FLOOR = 120;
-
 const WidgetHeaderAvailableSizeContext = createContext< number | null >( null );
 
 export const WidgetHeaderAvailableSizeProvider =

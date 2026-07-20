@@ -17,7 +17,6 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  */
 import { WidgetInfotip } from './widget-header-infotip';
 import {
-	WIDGET_HEADER_IDENTITY_FLOOR,
 	WIDGET_TOOLBAR_CHIP_RESERVE,
 	WidgetHeaderAvailableSizeProvider,
 	WidgetHeaderReserveProvider,
@@ -72,17 +71,26 @@ export function WidgetHeader( {
 	editMode = false,
 	children,
 }: WidgetHeaderProps ): React.ReactNode {
-	// Content-box width of the header row and the gap between its sections, so
-	// toolbar controls can compare their natural width against the space the
-	// row actually offers.
+	// Content-box width of the header row, so toolbar controls can compare
+	// their natural width against the space the row actually offers.
 	const [ headerWidth, setHeaderWidth ] = useState( 0 );
-	const [ headerGap, setHeaderGap ] = useState( 0 );
 	const headerMeasureRef = useResizeObserver< HTMLDivElement >(
-		( [ entry ] ) => {
-			const { columnGap } = getComputedStyle( entry.target );
+		( [ entry ] ) => setHeaderWidth( entry.contentRect.width )
+	);
 
-			setHeaderWidth( entry.contentRect.width );
-			setHeaderGap( parseFloat( columnGap ) || 0 );
+	// Actual footprint of the identity cluster plus the gap before the toolbar.
+	// Measured, so whatever identity holds (a help tip, a future badge) is
+	// reserved without a per-element constant.
+	const [ identityReserve, setIdentityReserve ] = useState( 0 );
+	const identityMeasureRef = useResizeObserver< HTMLDivElement >(
+		( [ entry ] ) => {
+			const { columnGap } = getComputedStyle(
+				entry.target.parentElement as HTMLElement
+			);
+
+			setIdentityReserve(
+				entry.contentRect.width + ( parseFloat( columnGap ) || 0 )
+			);
 		}
 	);
 
@@ -124,7 +132,7 @@ export function WidgetHeader( {
 		headerWidth > 0
 			? headerWidth -
 			  WIDGET_TOOLBAR_CHIP_RESERVE -
-			  ( hasIdentity ? WIDGET_HEADER_IDENTITY_FLOOR + headerGap : 0 ) -
+			  ( hasIdentity ? identityReserve : 0 ) -
 			  totalReserved
 			: null;
 
@@ -138,6 +146,7 @@ export function WidgetHeader( {
 		>
 			{ showIdentity && widgetType?.title && (
 				<Stack
+					ref={ identityMeasureRef }
 					direction="row"
 					align="center"
 					gap="sm"
