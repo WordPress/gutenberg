@@ -35,16 +35,12 @@ describe( 'slimImageObject', () => {
 		const filterName = 'media.slimImageObject';
 		const namespace = 'test/slim-image-object';
 
-		addFilter(
-			filterName,
-			namespace,
-			( slimmed, img ) => {
-				if ( img?.hasOwnProperty( 'custom_meta' ) ) {
-					slimmed.custom_meta = img.custom_meta;
-				}
-				return slimmed;
+		addFilter( filterName, namespace, ( slimmed, img ) => {
+			if ( img?.hasOwnProperty( 'custom_meta' ) ) {
+				slimmed.custom_meta = img.custom_meta;
 			}
-		);
+			return slimmed;
+		} );
 
 		const img = {
 			id: 2,

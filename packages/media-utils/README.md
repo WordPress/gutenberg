@@ -33,6 +33,10 @@ Private @wordpress/media-utils APIs.
 
 Undocumented declaration.
 
+### slimImageObject
+
+Undocumented declaration.
+
 ### SubSizeData
 
 Undocumented declaration.
