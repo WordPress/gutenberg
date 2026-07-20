@@ -739,7 +739,8 @@ button.wp-block-navigation-item__content {
 			}
 
 			&.is-menu-open {
-				// Override breakpoint-inherited submenu rules.
+				// Preserve open-overlay submenu positioning after the default
+				// breakpoint styles are scoped away from custom breakpoints.
 				.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
 					left: 0;
 				}
@@ -763,7 +764,8 @@ button.wp-block-navigation-item__content {
 		}
 
 		&.is-menu-open {
-			// Override breakpoint-inherited submenu rules.
+			// Match the default breakpoint path so custom breakpoints keep
+			// open-overlay submenus positioned as overlay content.
 			.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
 				left: 0;
 			}
