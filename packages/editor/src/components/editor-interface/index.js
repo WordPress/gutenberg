@@ -36,6 +36,7 @@ import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import StylesCanvas from '../styles-canvas';
+import { CollabSidebarSlot } from '../collab-sidebar';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -230,13 +231,16 @@ export default function EditorInterface( {
 									<BlockToolbar hideDragHandle />
 								) }
 							{ ( isPreviewMode || mode === 'visual' ) && (
-								<VisualEditor
-									contentRef={ contentRef }
-									// We should auto-focus the canvas (title) on load.
-									// eslint-disable-next-line jsx-a11y/no-autofocus
-									autoFocus={ autoFocus }
-									iframeProps={ iframeProps }
-								/>
+								<div className="editor-collab-sidebar-layout">
+									<VisualEditor
+										contentRef={ contentRef }
+										// We should auto-focus the canvas (title) on load.
+										// eslint-disable-next-line jsx-a11y/no-autofocus
+										autoFocus={ autoFocus }
+										iframeProps={ iframeProps }
+									/>
+									<CollabSidebarSlot />
+								</div>
 							) }
 							{ children }
 							<CollaboratorsOverlay

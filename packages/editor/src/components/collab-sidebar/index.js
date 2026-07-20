@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { createSlotFill } from '@wordpress/components';
 import { useEffect, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -32,6 +33,9 @@ import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import { NOTE_FORMAT_NAME, noteFormat } from './format';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
+
+export const { Slot: CollabSidebarSlot, Fill: CollabSidebarFill } =
+	createSlotFill( 'CollabSidebar' );
 
 function NotesSidebar( { postId } ) {
 	useEffect( () => {
@@ -79,14 +83,22 @@ function NotesSidebar( { postId } ) {
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
 
+	const isNotesSidebarOpen = useSelect( ( select ) => {
+		return (
+			select( interfaceStore ).getActiveComplementaryArea( 'core' ) ===
+			ALL_NOTES_SIDEBAR
+		);
+	}, [] );
+
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
 	// Fallback to "All notes" sidebar on smaller viewports.
 	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
-	useEnableFloatingSidebar(
+
+	const shouldShowFloatingNotes =
 		showFloatingSidebar &&
-			( unresolvedNotes.length > 0 || selectedNoteId !== undefined )
-	);
+		( unresolvedNotes.length > 0 || selectedNoteId !== undefined );
+	useEnableFloatingSidebar( shouldShowFloatingNotes );
 
 	async function focusNote( {
 		targetClientId,
@@ -109,7 +121,7 @@ function NotesSidebar( { postId } ) {
 
 		const currentArea = await getActiveComplementaryArea( 'core' );
 		// Bail out if the current active area is not one of note sidebars.
-		if ( ! SIDEBARS.includes( currentArea ) ) {
+		if ( ! SIDEBARS.includes( currentArea ) && ! shouldShowFloatingNotes ) {
 			return;
 		}
 
@@ -200,23 +212,25 @@ function NotesSidebar( { postId } ) {
 					<Notes notes={ notes } sidebarRef={ sidebarRef } />
 				</PluginSidebar>
 			) }
-			{ isLargeViewport && (
-				<PluginSidebar
-					isPinnable={ false }
-					header={ false }
-					identifier={ FLOATING_NOTES_SIDEBAR }
-					className="editor-collab-sidebar"
-					headerClassName="editor-collab-sidebar__header"
-					backgroundColor={ backgroundColor }
-				>
-					<Notes
-						notes={ unresolvedNotes }
-						sidebarRef={ sidebarRef }
-						styles={ { backgroundColor } }
-						isFloating
-					/>
-				</PluginSidebar>
-			) }
+			{ isLargeViewport &&
+				shouldShowFloatingNotes &&
+				! isNotesSidebarOpen && (
+					<CollabSidebarFill>
+						<div
+							role="region"
+							aria-label={ __( 'Collab panel' ) }
+							className="editor-collab-sidebar"
+							style={ { backgroundColor } }
+						>
+							<Notes
+								notes={ unresolvedNotes }
+								sidebarRef={ sidebarRef }
+								styles={ { backgroundColor } }
+								isFloating
+							/>
+						</div>
+					</CollabSidebarFill>
+				) }
 		</>
 	);
 }
