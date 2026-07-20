@@ -18,6 +18,8 @@ import deprecated from '../deprecated';
 import metadata from '../block.json';
 
 describe( 'Table of Contents deprecations', () => {
+	const [ v1 ] = deprecated;
+
 	beforeAll( () => {
 		if ( getBlockType( metadata.name ) ) {
 			unregisterBlockType( metadata.name );
@@ -57,5 +59,56 @@ describe( 'Table of Contents deprecations', () => {
 		expect( serializedBlock ).toMatch(
 			/^<!-- wp:table-of-contents \{.*\} \/-->$/
 		);
+	} );
+
+	it( 'is eligible when legacy cached headings or saved markup are present', () => {
+		expect( v1.isEligible( { headings: [] } ) ).toBe( true );
+		expect(
+			v1.isEligible( {}, [], {
+				blockNode: {
+					innerHTML: '<nav class="wp-block-table-of-contents"></nav>',
+				},
+			} )
+		).toBe( true );
+		expect(
+			v1.isEligible( {}, [], { blockNode: { innerHTML: '' } } )
+		).toBe( false );
+	} );
+
+	it( 'drops only cached heading data during migration', () => {
+		expect(
+			v1.migrate( {
+				headings: [
+					{
+						content: 'Heading text',
+						level: 2,
+						link: '#heading-id-1',
+					},
+				],
+				maxLevel: 3,
+				ordered: false,
+				onlyIncludeCurrentPage: true,
+				anchor: 'contents',
+				style: {
+					spacing: {
+						margin: {
+							top: '1rem',
+						},
+					},
+				},
+			} )
+		).toEqual( {
+			maxLevel: 3,
+			ordered: false,
+			onlyIncludeCurrentPage: true,
+			anchor: 'contents',
+			style: {
+				spacing: {
+					margin: {
+						top: '1rem',
+					},
+				},
+			},
+		} );
 	} );
 } );
