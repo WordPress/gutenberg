@@ -8,7 +8,16 @@ import { addFilter, removeFilter } from '@wordpress/hooks';
  */
 import { slimImageObject } from '../index.js';
 
+const FILTER_NAME = 'media.slimImageObject';
+const FILTER_NAMESPACE = 'test/slim-image-object';
+
 describe( 'slimImageObject', () => {
+	// Runs even when an assertion throws, so a registered filter cannot leak
+	// into later tests. Removing a filter that was never added is a no-op.
+	afterEach( () => {
+		removeFilter( FILTER_NAME, FILTER_NAMESPACE );
+	} );
+
 	it( 'returns only the standard set of attachment fields', () => {
 		const img = {
 			id: 1,
@@ -32,10 +41,7 @@ describe( 'slimImageObject', () => {
 	} );
 
 	it( 'passes the full attachment to the media.slimImageObject filter', () => {
-		const filterName = 'media.slimImageObject';
-		const namespace = 'test/slim-image-object';
-
-		addFilter( filterName, namespace, ( slimmed, img ) => {
+		addFilter( FILTER_NAME, FILTER_NAMESPACE, ( slimmed, img ) => {
 			if ( img?.hasOwnProperty( 'custom_meta' ) ) {
 				slimmed.custom_meta = img.custom_meta;
 			}
@@ -53,7 +59,5 @@ describe( 'slimImageObject', () => {
 
 		expect( result.id ).toBe( 2 );
 		expect( result.custom_meta ).toBe( 'plugin-data' );
-
-		removeFilter( filterName, namespace );
 	} );
 } );

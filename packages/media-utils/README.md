@@ -35,7 +35,17 @@ Undocumented declaration.
 
 ### slimImageObject
 
-Undocumented declaration.
+Reduces a media library image object down to the fields needed to display it in the library.
+
+The base set of fields below is deliberately small. Consumers that need to preserve additional attachment fields, such as custom meta registered by a plugin, can extend the result through the `media.slimImageObject` filter, which receives the reduced object and the full original attachment.
+
+_Parameters_
+
+-   _img_ `Object`: The full media library image object.
+
+_Returns_
+
+-   `Object`: The reduced image object, after filtering.
 
 ### SubSizeData
 
