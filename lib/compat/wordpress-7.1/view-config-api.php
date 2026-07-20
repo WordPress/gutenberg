@@ -327,9 +327,6 @@ function _gutenberg_get_entity_view_config_post_type_page( $data ) {
 		),
 	);
 
-	// Pin default_view and default_layouts to an exact shape: set() replaces them
-	// wholesale, so no inherited default leaks through a key-by-key merge. The
-	// inherited form is left untouched.
 	$data->set(
 		array(
 			'default_view'    => $default_view,
@@ -447,8 +444,6 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $data ) {
 		),
 	);
 
-	// This callback owns the whole configuration for the entity, so replace it
-	// wholesale with set() instead of patching the inherited defaults key by key.
 	$data->set(
 		array(
 			'default_view'    => $default_view,
@@ -549,8 +544,6 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $data ) {
 		),
 	);
 
-	// This callback owns the whole configuration for the entity, so replace it
-	// wholesale with set() instead of patching the inherited defaults key by key.
 	$data->set(
 		array(
 			'default_view'    => $default_view,
@@ -765,8 +758,6 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $data ) {
 		),
 	);
 
-	// This callback owns the whole configuration for the entity, so replace it
-	// wholesale with set() instead of patching the inherited defaults key by key.
 	$data->set(
 		array(
 			'default_view'    => $default_view,
