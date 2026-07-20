@@ -4,7 +4,9 @@
 
 ### Bug Fixes
 
+-   `ContentEditableControl`: Associate the label with the `contentEditable` field via `aria-labelledby` instead of an invalid `label[for]`, which triggered Chrome console errors ([#80344](https://github.com/WordPress/gutenberg/pull/80344)).
 -   `SearchControl`: Render suffix only if there is one. ([#80356](https://github.com/WordPress/gutenberg/pull/80356), [#80406](https://github.com/WordPress/gutenberg/pull/80406)).
+-   `ColorPicker`: Keep the visual picker in native HSVA so gradient/controlled HSLA echoes no longer jitter the saturation pointer, and preserve the black-edge saturation coordinate without leaving white at a chromatic position ([#80205](https://github.com/WordPress/gutenberg/pull/80205)).
 
 ### TypeScript
 
@@ -18,6 +20,7 @@
 ### Internal
 
 -   `ConfirmDialog`: Migrate styles from Emotion to an SCSS Module ([#80394](https://github.com/WordPress/gutenberg/pull/80394)).
+-   `InputControl`, `SelectControl`, `CustomSelectControl`, `ToggleGroupControl`, and `RangeControl`: Remove obsolete internal `__shouldNotWarnDeprecated36pxSize` prop ([#80323](https://github.com/WordPress/gutenberg/pull/80323)).
 -   `InputControl`, `SelectControl`, `CustomSelectControl`: Remove obsolete `__unstable-large` from the public `size` type. The value continues to work at runtime, and is equivalent to the `default` size. ([#80081](https://github.com/WordPress/gutenberg/pull/80081)).
 -   `ToggleGroupControl`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#80381](https://github.com/WordPress/gutenberg/pull/80381)).
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
