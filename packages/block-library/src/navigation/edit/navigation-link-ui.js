@@ -86,6 +86,7 @@ export function NavigationLinkUI( { block, insertedBlock, setInsertedBlock } ) {
 			clientId={ insertedBlock?.clientId }
 			link={ insertedBlock?.attributes }
 			onBlockInsert={ handleSetInsertedBlock }
+			onBulkMenuItemsComplete={ () => setInsertedBlock( null ) }
 			onClose={ () => {
 				// Use cleanup function
 				cleanupInsertedBlock();

@@ -23,11 +23,103 @@
 	padding: $grid-unit-10;
 }
 
-.link-ui-block-inserter {
-	padding-top: $grid-unit-10;
+// Bulk "Add menu items" uses `Modal` (portaled to `document.body`), not the Link popover.
+// Tab row follows Components/Tabs "Insert custom elements" pattern: flex row + trailing control.
+.link-ui-add-menu-items-modal.components-modal__frame {
+	// Column flex so the modal fills max-height and inner panels can shrink (`min-height: 0`).
+	flex-direction: column;
+	min-height: min(65vh, 680px);
+
+	// Core modal styles use `overflow: auto` here, which stacks with the list scrollbar.
+	.components-modal__content {
+		display: flex;
+		flex: 1 1 auto;
+		flex-direction: column;
+		min-height: 0;
+		overflow: hidden;
+	}
+
+	.components-modal__children-container {
+		display: flex;
+		flex: 1 1 auto;
+		flex-direction: column;
+		min-height: 0;
+		overflow: hidden;
+	}
+
+	.link-ui-add-menu-items__tabs-shell {
+		display: flex;
+		flex: 1 1 auto;
+		flex-direction: column;
+		min-height: 0;
+		overflow: hidden;
+
+		// `Tabs` is a fragment: tab row + tabpanels are direct children of this shell.
+		> [role="tabpanel"],
+		> .link-ui-add-menu-items__panel--extra {
+			display: flex;
+			flex: 1 1 auto;
+			flex-direction: column;
+			min-height: 0;
+			overflow: hidden;
+		}
+	}
+
+	.link-ui-add-menu-items__tab-row-inner {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-end;
+		gap: $grid-unit-20;
+		width: 100%;
+		padding-bottom: $grid-unit-20;
+		margin-bottom: $grid-unit-10;
+		border-bottom: 1px solid $gray-100;
+	}
+
+	.link-ui-add-menu-items__tab-list {
+		flex: 0 1 auto;
+		width: fit-content;
+		max-width: 100%;
+		min-width: 0;
+
+		// Components `Tabs.Tab` defaults to `flex: 1 0 auto`, stretching each label.
+		[role="tab"] {
+			flex: 0 0 auto;
+		}
+	}
+
+	.link-ui-add-menu-items__type-dropdown {
+		flex: 0 1 280px;
+		margin-inline-start: auto;
+		min-width: min(100%, 220px);
+	}
+
+	.link-ui-add-menu-items__panel-inner {
+		box-sizing: border-box;
+		flex: 1 1 auto;
+		flex-direction: column;
+		min-height: 0;
+		overflow: hidden;
+		// Keep footer actions inside the modal padding; avoid bottom clipping.
+		padding-bottom: $grid-unit-10;
+	}
+
+	// Single scroll container: search + footer actions stay visible; only results scroll.
+	.link-ui-add-menu-items__list {
+		flex: 1 1 auto;
+		min-height: 0;
+		overflow-x: hidden;
+		overflow-y: auto;
+		// Breathing room so rows do not sit flush against the filter or footer.
+		padding-block: $grid-unit-15;
+	}
+
+	.link-ui-add-menu-items__row {
+		padding-block: $grid-unit-05;
+	}
 }
 
-.link-ui-block-inserter__back {
-	margin-left: $grid-unit-10;
-	text-transform: uppercase;
+.link-ui-add-menu-items__empty {
+	margin: 0;
+	color: $gray-700;
 }
