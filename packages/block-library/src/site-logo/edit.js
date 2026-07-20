@@ -67,6 +67,8 @@ const SiteLogo = ( {
 	iconId,
 	setIcon,
 	canUserEdit,
+	isSwappingMedia,
+	setIsSwappingMedia,
 } ) => {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = [ 'wide', 'full' ].includes( align );
@@ -114,9 +116,13 @@ const SiteLogo = ( {
 
 	// Always apply modal updates as snackbar Undo may restore the original id.
 	const handleMediaUpdate = ( { id: newId } ) => {
-		if ( typeof newId === 'number' ) {
-			setLogo( newId );
+		if ( typeof newId !== 'number' ) {
+			return;
 		}
+		if ( newId !== logoId ) {
+			setIsSwappingMedia( true );
+		}
+		setLogo( newId );
 	};
 
 	function onResizeStart() {
@@ -134,13 +140,15 @@ const SiteLogo = ( {
 				src={ logoUrl }
 				alt={ alt }
 				onLoad={ ( event ) => {
+					setIsSwappingMedia( false );
 					setNaturalSize( {
 						naturalWidth: event.target.naturalWidth,
 						naturalHeight: event.target.naturalHeight,
 					} );
 				} }
+				onError={ () => setIsSwappingMedia( false ) }
 			/>
-			{ isBlobURL( logoUrl ) && <Spinner /> }
+			{ ( isBlobURL( logoUrl ) || isSwappingMedia ) && <Spinner /> }
 		</>
 	);
 
@@ -341,7 +349,8 @@ const SiteLogo = ( {
 			</InspectorControls>
 			{ canEditImage &&
 				openMediaEditorModal &&
-				shouldShowCropAndDimensions && (
+				shouldShowCropAndDimensions &&
+				! isSwappingMedia && (
 					<BlockControls group="block">
 						<ToolbarButton
 							ref={ cropButtonRef }
@@ -451,6 +460,12 @@ export default function LogoEdit( {
 	}, [] );
 	const { getSettings } = useSelect( blockEditorStore );
 	const [ temporaryURL, setTemporaryURL ] = useState();
+	// Set while the media editor has pointed the logo at a new attachment
+	// whose record and file are still loading; cleared by the <img>
+	// load/error handlers. Also hides the Crop action while pending.
+	// Lives here rather than in SiteLogo because SiteLogo unmounts while
+	// the new attachment record resolves (logoUrl is briefly undefined).
+	const [ isSwappingMedia, setIsSwappingMedia ] = useState( false );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { editEntityRecord } = useDispatch( coreStore );
@@ -579,6 +594,8 @@ export default function LogoEdit( {
 					setIcon={ setIcon }
 					iconId={ siteIconId }
 					canUserEdit={ canUserEdit }
+					isSwappingMedia={ isSwappingMedia }
+					setIsSwappingMedia={ setIsSwappingMedia }
 				/>
 				{ canUserEdit && <DropZone onFilesDrop={ onFilesDrop } /> }
 			</>
