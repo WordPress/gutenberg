@@ -65,13 +65,7 @@ export const URLS: FixtureItem[] = [
 	{ id: 'u7', value: 'make.wordpress.org/design/' },
 ];
 
-export interface EmojiItem {
-	value: string;
-	emoji: string;
-	label: string;
-}
-
-export const EMOJIS: EmojiItem[] = [
+export const EMOJIS = [
 	{ value: 'grinning', emoji: '😀', label: 'grinning face' },
 	{ value: 'laugh', emoji: '😂', label: 'face with tears of joy' },
 	{ value: 'wink', emoji: '😉', label: 'winking face' },
@@ -94,13 +88,7 @@ export const EMOJIS: EmojiItem[] = [
 	{ value: 'rocket', emoji: '🚀', label: 'rocket' },
 ];
 
-export interface EmojiGroup {
-	value: string;
-	label: string;
-	items: EmojiItem[];
-}
-
-export const EMOJI_GROUPS: EmojiGroup[] = [
+export const EMOJI_GROUPS = [
 	{
 		value: 'emojis',
 		label: 'Emojis',

@@ -13,7 +13,6 @@ import {
 	GROUPED_COMMANDS,
 	URLS,
 	USERS,
-	type EmojiGroup,
 	type FixtureGroup,
 	type FixtureItem,
 } from './fixtures';
@@ -557,7 +556,7 @@ export const Grid: Story = {
 				>
 					<Autocomplete.Empty>No matching emojis.</Autocomplete.Empty>
 					<Autocomplete.List>
-						{ ( group: EmojiGroup ) => (
+						{ ( group: ( typeof EMOJI_GROUPS )[ number ] ) => (
 							<Autocomplete.Group
 								key={ group.value }
 								items={ group.items }
