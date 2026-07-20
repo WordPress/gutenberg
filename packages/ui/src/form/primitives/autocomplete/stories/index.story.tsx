@@ -561,6 +561,9 @@ export const Grid: Story = {
 								key={ group.value }
 								items={ group.items }
 							>
+								<Autocomplete.GroupLabel>
+									{ group.label }
+								</Autocomplete.GroupLabel>
 								{ chunkItems( group.items, EMOJI_COLUMNS ).map(
 									( row, rowIndex ) => (
 										<Autocomplete.Row

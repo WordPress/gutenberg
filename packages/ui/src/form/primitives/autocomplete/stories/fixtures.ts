@@ -91,7 +91,7 @@ export const EMOJIS = [
 export const EMOJI_GROUPS = [
 	{
 		value: 'emojis',
-		label: 'Emojis',
+		label: 'Recently used',
 		items: EMOJIS,
 	},
 ];
