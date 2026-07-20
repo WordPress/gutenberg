@@ -6,6 +6,63 @@ import { getFileBasename } from '../../utils';
 import type { ImageSizeCrop, QueueItemId } from '../types';
 
 /**
+ * Options for converting or compressing an image in a web worker.
+ */
+interface VipsConvertOptions {
+	/**
+	 * Desired quality (0-1).
+	 */
+	quality?: number;
+	/**
+	 * Whether to use interlaced/progressive mode.
+	 */
+	interlaced?: boolean;
+	/**
+	 * Whether to strip metadata (except color profiles).
+	 */
+	stripMeta?: boolean;
+	/**
+	 * Maximum output bit depth.
+	 */
+	maxBitdepth?: number;
+}
+
+/**
+ * Options for resizing an image in a web worker.
+ */
+interface VipsResizeOptions {
+	/**
+	 * Whether to use smart cropping (saliency-aware).
+	 */
+	smartCrop?: boolean;
+	/**
+	 * Whether to add dimension suffix to the filename.
+	 */
+	addSuffix?: boolean;
+	/**
+	 * Optional abort signal to cancel the operation.
+	 */
+	signal?: AbortSignal;
+	/**
+	 * Whether to add a '-scaled' suffix instead of dimensions (for the big
+	 * image threshold).
+	 */
+	scaledSuffix?: boolean;
+	/**
+	 * Desired quality (0-1).
+	 */
+	quality?: number;
+	/**
+	 * Whether to strip metadata (except color profiles).
+	 */
+	stripMeta?: boolean;
+	/**
+	 * Maximum output bit depth.
+	 */
+	maxBitdepth?: number;
+}
+
+/**
  * Cached dynamic import promise for @wordpress/vips/worker.
  *
  * The module contains ~10MB of inlined WASM code. By using a dynamic import,
@@ -44,11 +101,10 @@ function loadVipsModule(): Promise< typeof import('@wordpress/vips/worker') > {
 /**
  * Converts an image to a different format using vips in a web worker.
  *
- * @param id         Queue item ID.
- * @param file       File object.
- * @param type       Output mime type.
- * @param quality    Desired quality (0-1).
- * @param interlaced Whether to use interlaced/progressive mode.
+ * @param id      Queue item ID.
+ * @param file    File object.
+ * @param type    Output mime type.
+ * @param options Conversion options.
  * @return Converted file.
  */
 export async function vipsConvertImageFormat(
@@ -60,8 +116,7 @@ export async function vipsConvertImageFormat(
 		| 'image/webp'
 		| 'image/avif'
 		| 'image/gif',
-	quality: number,
-	interlaced?: boolean
+	options: VipsConvertOptions = {}
 ) {
 	const { vipsConvertImageFormat: convertImageFormat } =
 		await loadVipsModule();
@@ -70,8 +125,7 @@ export async function vipsConvertImageFormat(
 		await file.arrayBuffer(),
 		file.type,
 		type,
-		quality,
-		interlaced
+		options
 	);
 	const ext = type.split( '/' )[ 1 ];
 	const fileName = `${ getFileBasename( file.name ) }.${ ext }`;
@@ -83,25 +137,22 @@ export async function vipsConvertImageFormat(
 /**
  * Compresses an image using vips in a web worker.
  *
- * @param id         Queue item ID.
- * @param file       File object.
- * @param quality    Desired quality (0-1).
- * @param interlaced Whether to use interlaced/progressive mode.
+ * @param id      Queue item ID.
+ * @param file    File object.
+ * @param options Compression options.
  * @return Compressed file.
  */
 export async function vipsCompressImage(
 	id: QueueItemId,
 	file: File,
-	quality: number,
-	interlaced?: boolean
+	options: VipsConvertOptions = {}
 ) {
 	const { vipsCompressImage: compressImage } = await loadVipsModule();
 	const buffer = await compressImage(
 		id,
 		await file.arrayBuffer(),
 		file.type,
-		quality,
-		interlaced
+		options
 	);
 	return new File(
 		[ new Blob( [ buffer as ArrayBuffer ], { type: file.type } ) ],
@@ -143,40 +194,40 @@ export async function vipsGetUltraHdrInfo( buffer: ArrayBuffer ) {
  * UltraHDR JPEGs are auto-detected by libvips and their gain map is
  * preserved through the resize.
  *
- * @param id           Queue item ID.
- * @param file         File object.
- * @param resize       Resize options (width, height, crop).
- * @param smartCrop    Whether to use smart cropping (saliency-aware).
- * @param addSuffix    Whether to add dimension suffix to filename.
- * @param signal       Optional abort signal to cancel the operation.
- * @param scaledSuffix Whether to add '-scaled' suffix instead of dimensions (for big image threshold).
- * @param quality      Desired quality (0-1). Defaults to 0.82.
+ * @param id      Queue item ID.
+ * @param file    File object.
+ * @param resize  Resize options (width, height, crop).
+ * @param options Additional resize options.
  * @return Resized ImageFile with dimension metadata.
  */
 export async function vipsResizeImage(
 	id: QueueItemId,
 	file: File,
 	resize: ImageSizeCrop,
-	smartCrop: boolean,
-	addSuffix: boolean,
-	signal?: AbortSignal,
-	scaledSuffix?: boolean,
-	quality?: number
+	options: VipsResizeOptions = {}
 ) {
+	const {
+		smartCrop = false,
+		addSuffix = false,
+		signal,
+		scaledSuffix,
+		quality,
+		stripMeta,
+		maxBitdepth,
+	} = options;
+
 	if ( signal?.aborted ) {
 		throw new Error( 'Operation aborted' );
 	}
 
 	const { vipsResizeImage: resizeImage } = await loadVipsModule();
 	const { buffer, width, height, originalWidth, originalHeight } =
-		await resizeImage(
-			id,
-			await file.arrayBuffer(),
-			file.type,
-			resize,
+		await resizeImage( id, await file.arrayBuffer(), file.type, resize, {
 			smartCrop,
-			quality
-		);
+			quality,
+			stripMeta,
+			maxBitdepth,
+		} );
 
 	let fileName = file.name;
 	const wasResized = originalWidth > width || originalHeight > height;

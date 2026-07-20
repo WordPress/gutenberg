@@ -332,7 +332,6 @@ export default function PageListEdit( {
 								isShownByDefault
 							>
 								<ComboboxControl
-									__next40pxDefaultSize
 									className="editor-page-attributes__parent"
 									label={ __( 'Parent' ) }
 									value={ parentPageID }

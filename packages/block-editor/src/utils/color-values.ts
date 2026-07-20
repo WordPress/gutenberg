@@ -29,3 +29,35 @@ export function extractPresetSlug(
 	);
 	return themeFormatMatch?.[ 1 ];
 }
+
+/**
+ * Encodes a color value for storage in the style object.
+ *
+ * When a `slug` is provided it is used directly (the slug-based selection
+ * path). This is important because two palette entries can share the same
+ * hex value (e.g. two custom colors both set to `#e10000`); relying on a
+ * hex lookup alone would collapse them onto whichever entry appears first
+ * in the palette and silently discard the user's actual choice. Only when
+ * no slug is supplied does the function fall back to matching the hex value
+ * against the palette; if a match is found the slug is encoded, otherwise
+ * the raw value is stored as-is.
+ *
+ * Callers pass the flattened palette (`allColors`), typically computed once
+ * per render from the per-origin `colors` array.
+ *
+ * @param allColors  Flat array of `{ color, slug }` objects.
+ * @param colorValue Hex or CSS color string.
+ * @param slug       Optional palette slug from slug-aware selection.
+ * @return Encoded value suitable for the style object.
+ */
+export function encodeColorValueWithPalette(
+	allColors: { color: string; slug: string }[],
+	colorValue?: string,
+	slug?: string
+) {
+	if ( slug ) {
+		return 'var:preset|color|' + slug;
+	}
+	const colorObject = allColors.find( ( { color } ) => color === colorValue );
+	return colorObject ? 'var:preset|color|' + colorObject.slug : colorValue;
+}

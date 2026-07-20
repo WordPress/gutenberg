@@ -16,7 +16,6 @@ import { symbol } from '@wordpress/icons';
  */
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { isIsolatedEditorKey } from '../../store/private-keys';
 
 /** @typedef {import('@wordpress/blocks').WPIcon} WPIcon */
 
@@ -78,8 +77,8 @@ export default function useBlockDisplayInformation( clientId ) {
 			const {
 				getBlockName,
 				getBlockAttributes,
+				getBlock,
 				__experimentalGetParsedPattern,
-				getSettings,
 			} = blockEditorSelect;
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
@@ -89,20 +88,12 @@ export default function useBlockDisplayInformation( clientId ) {
 				return null;
 			}
 			const attributes = getBlockAttributes( clientId );
-			const { isWithinEditedContentOnlySection } =
-				unlock( blockEditorSelect );
-			const isIsolatedEditor = !! getSettings()?.[ isIsolatedEditorKey ];
+			const { isSectionBlock } = unlock( blockEditorSelect );
 
 			// Check if this block is a pattern
 			const patternName = attributes?.metadata?.patternName;
-			const isEditedContentOnlySection =
-				isWithinEditedContentOnlySection( clientId );
 
-			if (
-				patternName &&
-				! isEditedContentOnlySection &&
-				! isIsolatedEditor
-			) {
+			if ( patternName && isSectionBlock( clientId ) ) {
 				const pattern = __experimentalGetParsedPattern( patternName );
 				const positionLabel = getPositionTypeLabel( attributes );
 				return {
@@ -118,7 +109,12 @@ export default function useBlockDisplayInformation( clientId ) {
 				};
 			}
 
-			const match = getActiveBlockVariation( blockName, attributes );
+			const match = getActiveBlockVariation(
+				blockName,
+				attributes,
+				undefined,
+				getBlock?.( clientId )?.innerContent
+			);
 			const isSynced =
 				isReusableBlock( blockType ) || isTemplatePart( blockType );
 			const syncedTitle = isSynced

@@ -140,10 +140,8 @@ test.describe( 'Collaboration with large documents', () => {
 			// Assert the post-locked modal appears.
 			// Because collaboration is disabled (document too large),
 			// WordPress falls back to standard post-locking. User 2
-			// sees the "This post is already being edited" modal.
-			const modal = page2.getByRole( 'dialog', {
-				name: 'This post is already being edited',
-			} );
+			// sees the post-locked modal.
+			const modal = page2.locator( '.editor-post-locked-modal' );
 			await expect( modal ).toBeVisible( { timeout: 60000 } );
 
 			// Assert the explanation about document size limit.
@@ -151,11 +149,6 @@ test.describe( 'Collaboration with large documents', () => {
 				modal.getByText(
 					'Because this post is too large for real-time collaboration, only one person can edit at a time.'
 				)
-			).toBeVisible();
-
-			// Assert the "Take over" option is available.
-			await expect(
-				modal.getByRole( 'link', { name: 'Take over' } )
 			).toBeVisible();
 		} finally {
 			await secondContext.close();

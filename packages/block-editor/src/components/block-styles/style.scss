@@ -30,7 +30,7 @@
 
 	button.components-button.block-editor-block-styles__item {
 		color: $gray-900;
-		box-shadow: inset 0 0 0 $border-width $gray-300;
+		border-color: $gray-300;
 		display: inline-block;
 		width: calc(50% - #{$grid-unit-05});
 
@@ -52,7 +52,7 @@
 
 		&:focus,
 		&.is-active:focus {
-			@include block-toolbar-button-style__focus();
+			@include outset-ring__focus();
 		}
 	}
 

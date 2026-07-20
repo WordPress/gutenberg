@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
 	type InlineConfig,
 	type PluginOption,
@@ -10,16 +11,20 @@ import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
 import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
 
+/**
+ * @see https://storybook.js.org/docs/faq#how-do-i-fix-module-resolution-in-special-environments
+ */
+function getAbsolutePath( packageName: string ) {
+	return path.dirname(
+		fileURLToPath( import.meta.resolve( `${ packageName }/package.json` ) )
+	);
+}
+
 const { NODE_ENV = 'development' } = process.env;
 
 const stories = [
-	// Smoke tests ensure that the stories are rendered without any errors, but
-	// we don't need to test everything:
-	// - `.mdx` documentation is generally plain text and unlikely to break.
-	// - Playground stories are complex renderings of many components, which is
-	//   both slow and redundant with individual component stories.
-	NODE_ENV === 'test' ? '' : './stories/playground/**/*.story.@(jsx|tsx)',
-	NODE_ENV === 'test' ? '' : './stories/**/*.mdx',
+	'./stories/playground/**/*.story.@(jsx|tsx)',
+	'./stories/**/*.mdx',
 	'./stories/design-system/**/*.story.@(ts|tsx)',
 	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
@@ -37,11 +42,12 @@ const stories = [
 	'../packages/grid/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/widget-primitives/src/**/stories/*.mdx',
 	'../packages/widget-primitives/src/**/stories/*.story.@(ts|tsx)',
+	'../packages/widget-dashboard/src/**/stories/*.story.@(ts|tsx)',
 	'../routes/dashboard/**/stories/*.story.@(ts|tsx)',
 	'../packages/ui/src/**/stories/*.mdx',
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/admin-ui/src/**/stories/*.story.@(ts|tsx)',
-].filter( Boolean );
+];
 
 const config: StorybookConfig = {
 	core: {
@@ -51,15 +57,15 @@ const config: StorybookConfig = {
 	staticDirs: [ './static' ],
 	addons: [
 		{
-			name: '@storybook/addon-docs',
+			name: getAbsolutePath( '@storybook/addon-docs' ),
 			options: { configureJSX: true },
 		},
-		'@storybook/addon-a11y',
+		getAbsolutePath( '@storybook/addon-a11y' ),
 		import.meta.resolve( './addons/source-link/preset.ts' ),
-		'storybook-addon-tag-badges',
+		getAbsolutePath( 'storybook-addon-tag-badges' ),
 		import.meta.resolve( './addons/design-system-theme/preset.ts' ),
 	],
-	framework: '@storybook/react-vite',
+	framework: getAbsolutePath( '@storybook/react-vite' ),
 	features: {
 		componentsManifest: NODE_ENV !== 'development',
 		// Use experimental TypeScript LanguageService prop extractor for the
@@ -121,7 +127,7 @@ const config: StorybookConfig = {
 				react( {
 					jsxImportSource: '@emotion/react',
 					babel: {
-						plugins: [ '@emotion/babel-plugin' ],
+						plugins: [ getAbsolutePath( '@emotion/babel-plugin' ) ],
 					},
 				} ) as PluginOption,
 				{

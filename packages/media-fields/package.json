@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/media-fields",
-	"version": "0.13.1",
+	"version": "0.16.0",
 	"description": "Reusable field definitions for displaying and editing media attachment properties in WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -70,8 +70,8 @@
 		"@types/jest": "^29.5.14"
 	},
 	"peerDependencies": {
-		"@types/react": "^18.3.27",
-		"react": "^18.0.0"
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {

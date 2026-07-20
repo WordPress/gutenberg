@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event';
  * Internal dependencies
  */
 import { ConfirmDialog } from '..';
+import styles from '../style.module.scss';
 
 const noop = () => {};
 
@@ -25,6 +26,10 @@ describe( 'Confirm', () => {
 				const elementsTexts = [ 'Are you sure?', 'OK', 'Cancel' ];
 
 				expect( dialog ).toBeInTheDocument();
+				expect( dialog ).toHaveClass( 'components-confirm-dialog' );
+				// Disable reason: Semantic queries can't reach the overlay.
+				// eslint-disable-next-line testing-library/no-node-access
+				expect( dialog.parentElement ).toHaveClass( styles.wrapper );
 
 				elementsTexts.forEach( ( txt ) => {
 					const el = screen.getByText( txt );

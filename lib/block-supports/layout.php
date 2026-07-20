@@ -290,7 +290,7 @@ function gutenberg_get_layout_container_values( $layout ) {
 function gutenberg_sanitize_block_gap_value( $gap_value ) {
 	if ( is_array( $gap_value ) ) {
 		foreach ( $gap_value as $key => $value ) {
-			$gap_value[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
+			$gap_value[ $key ] = ! is_scalar( $value ) || ( $value && preg_match( '%[\\\(&=}]|/\*%', (string) $value ) ) ? null : $value;
 		}
 		return $gap_value;
 	}
@@ -472,13 +472,16 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
  * @return string CSS styles, or empty string.
  */
 function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null, $options = array() ) {
-	$base_layout                    = is_array( $layout ) ? $layout : array();
-	$viewport_overrides             = $options['viewport_overrides'] ?? null;
-	$layout_for_styles              = null === $viewport_overrides ? $base_layout : array_replace( $base_layout, $viewport_overrides );
-	$layout_type                    = $base_layout['type'] ?? 'default';
-	$rules_group                    = $options['rules_group'] ?? null;
-	$has_block_gap_override         = ! empty( $options['has_block_gap_override'] );
-	$should_output_block_gap        = null === $viewport_overrides || $has_block_gap_override;
+	$base_layout             = is_array( $layout ) ? $layout : array();
+	$viewport_overrides      = $options['viewport_overrides'] ?? null;
+	$layout_for_styles       = null === $viewport_overrides ? $base_layout : array_replace( $base_layout, $viewport_overrides );
+	$layout_type             = $base_layout['type'] ?? 'default';
+	$rules_group             = $options['rules_group'] ?? null;
+	$has_block_gap_override  = ! empty( $options['has_block_gap_override'] );
+	$should_output_block_gap = null === $viewport_overrides || $has_block_gap_override;
+	// Viewport styles only store changed fields. If a field is present with null,
+	// the user cleared a value inherited from the default viewport, so check
+	// whether the key exists rather than whether the value is truthy.
 	$has_viewport_property_override = static function ( $property ) use ( $viewport_overrides ) {
 		return array_key_exists( $property, $viewport_overrides );
 	};
@@ -521,8 +524,28 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$wide_size       = $layout_for_styles['wideSize'] ?? '';
 		$justify_content = $layout_for_styles['justifyContent'] ?? 'center';
 
-		$all_max_width_value  = $content_size ? $content_size : $wide_size;
-		$wide_max_width_value = $wide_size ? $wide_size : $content_size;
+		// Check if viewport-specific ("override") values exist. Null values are valid and mean the user cleared a value inherited from the default viewport.
+		$has_justify_content_override = null !== $viewport_overrides && $has_viewport_property_override( 'justifyContent' );
+		$has_content_size_override    = null !== $viewport_overrides && $has_viewport_property_override( 'contentSize' );
+		$has_wide_size_override       = null !== $viewport_overrides && $has_viewport_property_override( 'wideSize' );
+
+		/* Styles should be output either if there are no viewport overrides (this is the default case), or if the user has set a new viewport-specific
+		 * value for contentSize or wideSize. If a viewport clears a custom constrained size, reset to the global layout variable.
+		 */
+		$should_output_constrained_sizes = null === $viewport_overrides || $has_content_size_override || $has_wide_size_override;
+		$is_resetting_constrained_sizes  = null !== $viewport_overrides &&
+			(
+				( $has_content_size_override && ! $content_size ) ||
+				( $has_wide_size_override && ! $wide_size )
+			);
+
+		// If a viewport clears a custom constrained size, reset to the global layout variable.
+		$all_max_width_value  = $content_size
+			? $content_size
+			: ( $wide_size && ! $has_content_size_override ? $wide_size : 'var(--wp--style--global--content-size, none)' );
+		$wide_max_width_value = $wide_size
+			? $wide_size
+			: ( $content_size && ! $has_wide_size_override ? $content_size : 'var(--wp--style--global--wide-size, none)' );
 
 		// Make sure there is a single CSS rule, and all tags are stripped for security.
 		$all_max_width_value  = safecss_filter_attr( explode( ';', $all_max_width_value )[0] );
@@ -531,9 +554,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$margin_left  = 'left' === $justify_content ? '0 !important' : 'auto !important';
 		$margin_right = 'right' === $justify_content ? '0 !important' : 'auto !important';
 
-		$has_justify_content_override    = null !== $viewport_overrides && $has_viewport_property_override( 'justifyContent' );
-		$should_output_constrained_sizes = null === $viewport_overrides || $has_viewport_property_override( 'contentSize' ) || $has_viewport_property_override( 'wideSize' );
-		if ( $should_output_constrained_sizes && ( $content_size || $wide_size ) ) {
+		if ( $should_output_constrained_sizes && ( $content_size || $wide_size || $is_resetting_constrained_sizes ) ) {
 			$content_size_declarations = array(
 				'max-width' => $all_max_width_value,
 			);
@@ -673,6 +694,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$vertical_alignment_options += array( 'space-between' => 'space-between' );
 		}
 
+		/* Styles should be output either if there are no viewport overrides (this is the default case), or if the user has set a new viewport-specific
+		 * value for any of the flex properties.
+		 */
 		$should_output_flex_wrap          = null === $viewport_overrides || $has_viewport_property_override( 'flexWrap' );
 		$should_output_flex_orientation   = null === $viewport_overrides || $has_viewport_property_override( 'orientation' );
 		$should_output_flex_justification = null === $viewport_overrides || $has_viewport_property_override( 'justifyContent' ) || $has_viewport_property_override( 'orientation' );
@@ -803,7 +827,10 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$responsive_gap_value = '0px';
 		}
 
-		$should_output_grid_columns = null === $viewport_overrides || $has_viewport_property_override( 'minimumColumnWidth' ) || $has_viewport_property_override( 'columnCount' );
+		/* Styles should be output either if there are no viewport overrides (this is the default case), or if the user has set a new viewport-specific
+		 * value for any of the grid properties.
+		 */
+		$should_output_grid_columns = null === $viewport_overrides || $has_viewport_property_override( 'minimumColumnWidth' ) || $has_viewport_property_override( 'columnCount' ) || $has_viewport_property_override( 'autoFit' );
 		$uses_gap_in_grid_columns   = ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['minimumColumnWidth'] );
 		if ( $has_block_gap_override && $uses_gap_in_grid_columns ) {
 			$should_output_grid_columns = true;
@@ -812,14 +839,19 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$should_output_grid_rows = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) ) && ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['rowCount'] );
 		$grid_declarations       = array();
 
+		/* When enabled, columns stretch to fill the available space using
+		 * `auto-fit`; otherwise empty tracks are preserved with `auto-fill`.
+		 */
+		$auto_placement = ! empty( $layout_for_styles['autoFit'] ) ? 'auto-fit' : 'auto-fill';
+
 		if ( $should_output_grid_columns && ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['minimumColumnWidth'] ) ) {
 			$max_value                                  = 'max(min(' . $layout_for_styles['minimumColumnWidth'] . ', 100%), (100% - (' . $responsive_gap_value . ' * (' . $layout_for_styles['columnCount'] . ' - 1))) /' . $layout_for_styles['columnCount'] . ')';
-			$grid_declarations['grid-template-columns'] = 'repeat(auto-fill, minmax(' . $max_value . ', 1fr))';
+			$grid_declarations['grid-template-columns'] = 'repeat(' . $auto_placement . ', minmax(' . $max_value . ', 1fr))';
 		} elseif ( $should_output_grid_columns && ! empty( $layout_for_styles['columnCount'] ) ) {
 			$grid_declarations['grid-template-columns'] = 'repeat(' . $layout_for_styles['columnCount'] . ', minmax(0, 1fr))';
 		} elseif ( $should_output_grid_columns ) {
 			$minimum_column_width                       = ! empty( $layout_for_styles['minimumColumnWidth'] ) ? $layout_for_styles['minimumColumnWidth'] : '12rem';
-			$grid_declarations['grid-template-columns'] = 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))';
+			$grid_declarations['grid-template-columns'] = 'repeat(' . $auto_placement . ', minmax(min(' . $minimum_column_width . ', 100%), 1fr))';
 		}
 
 		if ( ! empty( $grid_declarations ) ) {
@@ -923,19 +955,22 @@ function gutenberg_unique_id_from_values( array $data, string $prefix = '' ): st
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	static $global_styles = null;
 
-	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$style_attr            = gutenberg_resolve_style_state_aliases(
+	$block_type               = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$block_supports_layout    = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$style_attr               = gutenberg_resolve_style_state_aliases(
 		$block['attrs']['style'] ?? array(),
 		$block['blockName']
 	);
+	$global_settings          = gutenberg_get_global_settings();
+	$viewport_settings        = $global_settings['viewport'] ?? null;
+	$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $viewport_settings );
 	// If there is any value in style -> layout, the block has a child layout.
 	$child_layout = $style_attr['layout'] ?? null;
 
 	// Collect responsive viewport child layout overrides so that a block with
 	// only responsive child layout (no base child layout) is still processed.
 	$viewport_child_layouts = array();
-	foreach ( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS as $breakpoint => $media_query ) {
+	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
 		$viewport_child = gutenberg_get_layout_child_values( $style_attr[ $breakpoint ]['layout'] ?? null );
 		if ( ! empty( $viewport_child ) ) {
 			$viewport_child_layouts[ $breakpoint ] = array(
@@ -1045,7 +1080,6 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$global_settings = gutenberg_get_global_settings();
 	$fallback_layout = $block_type->supports['layout']['default'] ?? array();
 	if ( empty( $fallback_layout ) ) {
 		$fallback_layout = $block_type->supports['__experimentalLayout']['default'] ?? array();
@@ -1125,7 +1159,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		// Check if the block has an active style variation with a blockGap value.
 		// Only check the registry if the className contains a variation class to avoid unnecessary lookups.
 		$variation_block_gap_value = null;
-		$block_class_name          = $block['attrs']['className'] ?? '';
+		$block_class_name          = is_string( $block['attrs']['className'] ?? null )
+			? $block['attrs']['className']
+			: '';
 		if ( $block_class_name && str_contains( $block_class_name, 'is-style-' ) && $block_name ) {
 			$styles_registry   = WP_Block_Styles_Registry::get_instance();
 			$registered_styles = $styles_registry->get_registered_styles_for_block( $block_name );
@@ -1157,7 +1193,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$block_spacing,
 		);
 
-		foreach ( array_keys( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+		foreach ( array_keys( $responsive_media_queries ) as $breakpoint ) {
 			$viewport_style = $style_attr[ $breakpoint ] ?? null;
 			if ( ! is_array( $viewport_style ) ) {
 				continue;
@@ -1203,7 +1239,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		 * Emit responsive container layout styles using the same $container_class
 		 * selector as the base layout so they target the inner block wrapper.
 		 */
-		foreach ( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS as $breakpoint => $media_query ) {
+		foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
 			$viewport_style = $style_attr[ $breakpoint ] ?? null;
 			if ( ! is_array( $viewport_style ) ) {
 				continue;

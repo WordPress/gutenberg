@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockContent } from '@wordpress/blocks';
 import { create, toHTMLString } from '@wordpress/rich-text';
 
 /**
@@ -31,14 +31,16 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/html' ],
-			transform: ( attributes ) => {
-				const { content: text } = attributes;
+			__experimentalConvert( block ) {
+				const { attributes } = block;
 				return createBlock( 'core/code', {
 					...attributes,
 					...getTransformedAttributes( attributes, 'core/code' ),
 					// The HTML is plain text (with plain line breaks), so
 					// convert it to rich text.
-					content: toHTMLString( { value: create( { text } ) } ),
+					content: toHTMLString( {
+						value: create( { text: getBlockContent( block ) } ),
+					} ),
 				} );
 			},
 		},
