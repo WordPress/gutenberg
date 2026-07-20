@@ -172,6 +172,23 @@ class Gutenberg_Navigation_Menu_Caps_Test extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * @covers ::gutenberg_filter_wp_navigation_post_type_args
+	 */
+	public function test_wp_navigation_post_type_caps_are_not_overridden_when_read_cap_is_customized() {
+		$args = array(
+			'capabilities' => array(
+				'edit_posts' => 'edit_theme_options',
+				'read'       => 'custom_read_navigation_menus',
+			),
+		);
+
+		$this->assertSame(
+			$args,
+			gutenberg_filter_wp_navigation_post_type_args( $args, 'wp_navigation' )
+		);
+	}
+
+	/**
 	 * @covers ::gutenberg_maybe_grant_wp_navigation_menu_caps
 	 */
 	public function test_admins_receive_navigation_menu_caps_through_edit_theme_options_bridge() {
