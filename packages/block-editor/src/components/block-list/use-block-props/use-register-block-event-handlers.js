@@ -9,7 +9,6 @@ import { useEffect, useInsertionEffect, useRef } from '@wordpress/element';
 import {
 	getEventHandlers,
 	setBlockEventHandlers,
-	noteEventTypes,
 } from '../../writing-flow/editable-root-event-handlers';
 
 /**
@@ -19,7 +18,7 @@ import {
  *
  * Handlers are keyed by client ID, so the host resolves them from the block
  * hierarchy. A ref is stored so the host always calls the latest render's
- * handlers.
+ * handlers, and only blocks that have a handler are registered.
  *
  * @param {string} clientId     Block client ID.
  * @param {Object} wrapperProps The block's merged wrapper props.
@@ -29,13 +28,12 @@ export function useRegisterBlockEventHandlers( clientId, wrapperProps ) {
 	const handlersRef = useRef();
 	useInsertionEffect( () => {
 		handlersRef.current = handlers;
-		if ( handlers ) {
-			noteEventTypes( handlers );
-		}
 	} );
 
-	useEffect(
-		() => setBlockEventHandlers( clientId, handlersRef ),
-		[ clientId ]
-	);
+	const hasHandlers = !! handlers;
+	useEffect( () => {
+		if ( hasHandlers ) {
+			return setBlockEventHandlers( clientId, handlersRef );
+		}
+	}, [ clientId, hasHandlers ] );
 }

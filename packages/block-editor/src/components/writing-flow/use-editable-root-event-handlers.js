@@ -3,7 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import { useContext, useSyncExternalStore } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,9 +12,9 @@ import { store as blockEditorStore } from '../../store';
 import { getSelectionEditableElement } from '../../utils/dom';
 import { BlockRefs } from '../provider/block-refs-provider';
 import {
+	EVENT_TYPES,
 	getBlockEventHandlers,
-	subscribeEventTypes,
-	getEventTypes,
+	hasBlockEventHandlers,
 } from './editable-root-event-handlers';
 
 /**
@@ -98,18 +98,14 @@ export default function useEditableRootEventHandlers() {
 	const { hasMultiSelection, getBlockParents } =
 		useSelect( blockEditorStore );
 	const { refsMap } = useContext( BlockRefs );
-	// The event types blocks have handlers for. The host listens for exactly
-	// these, re-attaching when the set changes, rather than a fixed list.
-	const eventTypes = useSyncExternalStore(
-		subscribeEventTypes,
-		getEventTypes
-	);
 	return useRefEffect(
 		( node ) => {
 			function onEvent( event ) {
 				// Only act on real events targeting the host itself, while it
-				// is the editing host for a single block.
+				// is the editing host for a single block and some block has a
+				// handler to call.
 				if (
+					! hasBlockEventHandlers() ||
 					event.target !== node ||
 					! event.isTrusted ||
 					node.contentEditable !== 'true' ||
@@ -176,13 +172,13 @@ export default function useEditableRootEventHandlers() {
 				}
 			}
 
-			const unsubscribers = eventTypes.map( ( type ) => {
+			const unsubscribers = EVENT_TYPES.map( ( type ) => {
 				node.addEventListener( type, onEvent, true );
 				return () => node.removeEventListener( type, onEvent, true );
 			} );
 			return () =>
 				unsubscribers.forEach( ( unsubscribe ) => unsubscribe() );
 		},
-		[ hasMultiSelection, getBlockParents, eventTypes ]
+		[ hasMultiSelection, getBlockParents, refsMap ]
 	);
 }
