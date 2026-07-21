@@ -39,7 +39,6 @@ import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
-import { useHasEditableRoot } from '../writing-flow/use-editable-root';
 import { unlock } from '../../lock-unlock';
 
 // `RichTextShortcut` and `RichTextInputEvent` now live in
@@ -243,12 +242,36 @@ export function RichTextWrapper(
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;
 
-	const hasEditableRoot = useHasEditableRoot();
-	const hasDefaultEditingMode = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockEditingMode( clientId ) ===
-			'default',
-		[ clientId ]
+	// The editing host state only adjusts this instance when the block is
+	// selected, or to strip an explicit tabIndex while the wrapper is the
+	// editing host. Otherwise avoid subscribing to the block editor store.
+	const needsEditableRoot = isBlockSelected || props.tabIndex === 0;
+	const { hasEditableRoot, hasDefaultEditingMode } = useSelect(
+		( select ) => {
+			if ( ! needsEditableRoot ) {
+				return { hasEditableRoot: false, hasDefaultEditingMode: false };
+			}
+
+			const {
+				getSelectedBlockClientId,
+				canHostEditableRoot,
+				getBlockEditingMode,
+			} = unlock( select( blockEditorStore ) );
+
+			return {
+				// Whether the wrapper is an editing host, which depends on the
+				// selected block. That is this block when it is selected, but
+				// not on the `tabIndex` path below, which also runs while
+				// another block is selected.
+				hasEditableRoot: canHostEditableRoot(
+					getSelectedBlockClientId()
+				),
+				hasDefaultEditingMode:
+					isBlockSelected &&
+					getBlockEditingMode( clientId ) === 'default',
+			};
+		},
+		[ needsEditableRoot, isBlockSelected, clientId ]
 	);
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
