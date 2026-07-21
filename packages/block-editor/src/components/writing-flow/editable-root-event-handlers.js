@@ -1,8 +1,7 @@
-// Block event handlers keyed by the block element, so an unmounted block's
-// entry is collected with its element and no explicit deregistration is
-// needed. A ref is stored, not the handlers directly, so the host always calls
-// the latest render's handlers.
-const handlersByElement = new WeakMap();
+// Block event handlers keyed by client ID, so the host can resolve them from
+// the block hierarchy (getBlockParents). A ref is stored, not the handlers
+// directly, so the host always calls the latest render's handlers.
+const handlersByClientId = new Map();
 
 // The event types any block has had a handler for. Append-only: a WeakMap
 // cannot be enumerated to recompute this, and a type is never worth removing
@@ -36,15 +35,20 @@ export function getEventHandlers( props ) {
 }
 
 /**
- * Stores a block's handlers, keyed by its element. No deregistration: the entry
- * is collected with the element when the block unmounts.
+ * Stores a block's handlers, keyed by its client ID.
  *
- * @param {HTMLElement} element     Block element.
- * @param {Object}      handlersRef Ref holding the block's handlers by event
- *                                  type.
+ * @param {string} clientId    Block client ID.
+ * @param {Object} handlersRef Ref holding the block's handlers by event type.
  */
-export function setBlockEventHandlers( element, handlersRef ) {
-	handlersByElement.set( element, handlersRef );
+export function setBlockEventHandlers( clientId, handlersRef ) {
+	handlersByClientId.set( clientId, handlersRef );
+}
+
+/**
+ * @param {string} clientId Block client ID.
+ */
+export function deleteBlockEventHandlers( clientId ) {
+	handlersByClientId.delete( clientId );
 }
 
 /**
@@ -69,12 +73,12 @@ export function noteEventTypes( handlers ) {
 }
 
 /**
- * @param {HTMLElement} element Block element.
+ * @param {string} clientId Block client ID.
  *
  * @return {Object|undefined} The block's current handlers by event type.
  */
-export function getBlockEventHandlers( element ) {
-	return handlersByElement.get( element )?.current;
+export function getBlockEventHandlers( clientId ) {
+	return handlersByClientId.get( clientId )?.current;
 }
 
 /**

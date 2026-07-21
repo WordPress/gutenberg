@@ -3,13 +3,14 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import { useSyncExternalStore } from '@wordpress/element';
+import { useContext, useSyncExternalStore } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
 import { getSelectionEditableElement } from '../../utils/dom';
+import { BlockRefs } from '../provider/block-refs-provider';
 import {
 	getBlockEventHandlers,
 	subscribeEventTypes,
@@ -96,6 +97,7 @@ function createBlockSyntheticEvent( nativeEvent, target ) {
 export default function useEditableRootEventHandlers() {
 	const { hasMultiSelection, getBlockParents } =
 		useSelect( blockEditorStore );
+	const { refsMap } = useContext( BlockRefs );
 	// The event types blocks have handlers for. The host listens for exactly
 	// these, re-attaching when the set changes, rather than a fixed list.
 	const eventTypes = useSyncExternalStore(
@@ -123,33 +125,31 @@ export default function useEditableRootEventHandlers() {
 				}
 
 				const editable = getSelectionEditableElement( selection, node );
-				const blockElement = editable?.closest( '[data-block]' );
+				const clientId = editable
+					?.closest( '[data-block]' )
+					?.getAttribute( 'data-block' );
 
-				if ( ! blockElement ) {
+				if ( ! clientId ) {
 					return;
 				}
 
 				// The block that owns the selection and its block ancestors,
-				// innermost first, taking the hierarchy from the store rather
-				// than walking the DOM.
-				const clientId = blockElement.getAttribute( 'data-block' );
-				const elements = [
-					blockElement,
-					...getBlockParents( clientId, true )
-						.map( ( parentClientId ) =>
-							node.querySelector(
-								`[data-block="${ parentClientId }"]`
-							)
-						)
-						.filter( Boolean ),
+				// innermost first, taking the hierarchy from the store and the
+				// elements from the block refs rather than walking the DOM.
+				const clientIds = [
+					clientId,
+					...getBlockParents( clientId, true ),
 				];
 
 				let syntheticEvent;
-				for ( const element of elements ) {
+				for ( const ancestorClientId of clientIds ) {
 					const handler =
-						getBlockEventHandlers( element )?.[ event.type ];
+						getBlockEventHandlers( ancestorClientId )?.[
+							event.type
+						];
+					const element = refsMap.get( ancestorClientId );
 
-					if ( ! handler ) {
+					if ( ! handler || ! element ) {
 						continue;
 					}
 

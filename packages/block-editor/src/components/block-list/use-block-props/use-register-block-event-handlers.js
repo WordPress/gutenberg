@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useInsertionEffect, useRef } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import { useEffect, useInsertionEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -10,6 +9,7 @@ import { useRefEffect } from '@wordpress/compose';
 import {
 	getEventHandlers,
 	setBlockEventHandlers,
+	deleteBlockEventHandlers,
 	noteEventTypes,
 } from '../../writing-flow/editable-root-event-handlers';
 
@@ -18,15 +18,14 @@ import {
  * can call them when a block that supports `editableRoot` is edited through the
  * host and the events no longer reach the block.
  *
- * The handlers are stored keyed by the block element, so the entry is collected
- * with the element on unmount without an explicit deregistration. A ref is
- * stored so the host always calls the latest render's handlers.
+ * Handlers are keyed by client ID, so the host resolves them from the block
+ * hierarchy. A ref is stored so the host always calls the latest render's
+ * handlers.
  *
+ * @param {string} clientId     Block client ID.
  * @param {Object} wrapperProps The block's merged wrapper props.
- *
- * @return {Function} Ref to attach to the block element.
  */
-export function useRegisterBlockEventHandlers( wrapperProps ) {
+export function useRegisterBlockEventHandlers( clientId, wrapperProps ) {
 	const handlers = getEventHandlers( wrapperProps );
 	const handlersRef = useRef();
 	useInsertionEffect( () => {
@@ -36,7 +35,8 @@ export function useRegisterBlockEventHandlers( wrapperProps ) {
 		}
 	} );
 
-	return useRefEffect( ( element ) => {
-		setBlockEventHandlers( element, handlersRef );
-	}, [] );
+	useEffect( () => {
+		setBlockEventHandlers( clientId, handlersRef );
+		return () => deleteBlockEventHandlers( clientId );
+	}, [ clientId ] );
 }

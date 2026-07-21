@@ -109,6 +109,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		viewportSettings,
 	} = useContext( PrivateBlockContext );
 
+	useRegisterBlockEventHandlers( clientId, wrapperProps );
+
 	const defaultViewRef = useRefEffect( ( element ) => {
 		if ( element ) {
 			const { ownerDocument } = element;
@@ -125,7 +127,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const mergedRefs = useMergeRefs( [
 		props.ref,
 		defaultViewRef,
-		useRegisterBlockEventHandlers( wrapperProps ),
 		useFocusFirstElement( { clientId, initialPosition } ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
