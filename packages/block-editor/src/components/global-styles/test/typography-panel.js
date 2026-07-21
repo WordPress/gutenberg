@@ -739,16 +739,44 @@ const DUPLICATE_PALETTE_SETTINGS = {
 	},
 };
 
-describe( 'TypographyPanel — setTextColor link sync', () => {
-	// Helper: open the text Color dropdown and return the rendered swatches.
-	async function openTextColorDropdown() {
-		await click(
-			screen.getByRole( 'button', { name: /Color/, expanded: false } )
-		);
-		// `findAllByRole` waits for the Popover/portal content to appear.
-		return screen.findAllByRole( 'option' );
-	}
+// Helper: open the text Color dropdown and return the rendered swatches.
+async function openTextColorDropdown() {
+	await click(
+		screen.getByRole( 'button', { name: /Color/, expanded: false } )
+	);
+	// `findAllByRole` waits for the Popover/portal content to appear.
+	return screen.findAllByRole( 'option' );
+}
 
+describe( 'TypographyPanel — duplicate-hex preset slug identity', () => {
+	it( 'commits the inherited preset slug when accepting the preselected inherited color', async () => {
+		const onChange = jest.fn();
+
+		await renderAriakit(
+			<TypographyPanel
+				value={ {} }
+				inheritedValue={ {
+					color: { text: 'var:preset|color|dark-text' },
+				} }
+				settings={ DUPLICATE_PALETTE_SETTINGS }
+				panelId="test"
+				onChange={ onChange }
+			/>
+		);
+
+		const swatches = await openTextColorDropdown();
+		// swatch[1] ('Dark Text') is the preselected inherited option;
+		// activating it is the "accept inherited value" gesture. The commit
+		// must carry the inherited slug, not re-encode the shared #000 hex
+		// to whichever duplicate appears first in the palette.
+		await click( swatches[ 1 ] );
+
+		const result = onChange.mock.calls[ 0 ][ 0 ];
+		expect( result?.color?.text ).toBe( 'var:preset|color|dark-text' );
+	} );
+} );
+
+describe( 'TypographyPanel — setTextColor link sync', () => {
 	it( 'syncs the link color when text and link share the same raw preset reference', async () => {
 		const onChange = jest.fn();
 		const sharedRef = 'var:preset|color|dark-background';

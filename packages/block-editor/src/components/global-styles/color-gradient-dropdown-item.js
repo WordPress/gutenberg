@@ -151,7 +151,7 @@ function ColorGradientTab( {
 	// set, the same click correctly clears local back to at rest.
 	const onChange = ( newValue, newSlug ) => {
 		if ( isPlaceholder && newValue === undefined ) {
-			setValue( inheritedValue );
+			setValue( inheritedValue, inheritedSlug );
 			return;
 		}
 		setValue( newValue, newSlug );
