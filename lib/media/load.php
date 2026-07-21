@@ -199,17 +199,22 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 add_filter( 'rest_index', 'gutenberg_media_processing_filter_rest_index' );
 
 /**
- * Sets a global JS variable to indicate that HEIC canvas-based upload support is available.
+ * Sets a global JS variable to indicate that client-side media processing is enabled.
  *
- * This flag is set whenever the media processing feature is enabled,
- * regardless of whether the browser supports full VIPS-based processing.
- * Browsers like Safari can use createImageBitmap() to decode HEIC images
- * and convert them to JPEG for server-side sub-size generation.
+ * The flag gates both processing modes: the full VIPS/WASM pipeline (browsers
+ * that pass feature detection) and the HEIC canvas fallback used by browsers
+ * such as Safari that can decode HEIC via createImageBitmap() but lack
+ * SharedArrayBuffer support. The browser-capability check happens client-side.
  */
-function gutenberg_set_heic_upload_support_flag() {
-	wp_add_inline_script( 'wp-block-editor', 'window.__heicUploadSupport = true', 'before' );
+function gutenberg_set_client_side_media_processing_flag() {
+	// Re-check the filter at action time, since other plugins (loaded after Gutenberg)
+	// may have added a filter to disable client-side media processing.
+	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
+		return;
+	}
+	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
 }
-add_action( 'admin_init', 'gutenberg_set_heic_upload_support_flag' );
+add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
 
 /**
  * Deletes the source-format companion file when its attachment is deleted.
@@ -257,17 +262,6 @@ add_action( 'delete_attachment', 'gutenberg_delete_heic_companion_file' );
 // ── Tier 2: Full client-side processing (VIPS/WASM) ─────────────────
 // Everything below requires cross-origin isolation (Document-Isolation-Policy)
 // and SharedArrayBuffer support, which is only available in Chromium 137+.
-
-/**
- * Sets a global JS variable to indicate that client-side media processing is enabled.
- */
-function gutenberg_set_client_side_media_processing_flag() {
-	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
-		return;
-	}
-	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
-}
-add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
 
 /**
  * Filters the list of rewrite rules formatted for output to an .htaccess file.
