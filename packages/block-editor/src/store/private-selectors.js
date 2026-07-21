@@ -15,6 +15,7 @@ import {
 	getBlockOrder,
 	getBlockParents,
 	getBlockEditingMode,
+	getBlockMode,
 	getBlockListSettings,
 	getSettings,
 	canInsertBlockType,
@@ -242,6 +243,62 @@ function hasExplicitDisabledParent( state, clientId ) {
 
 	return false;
 }
+
+/**
+ * Returns true when the writing flow wrapper can host editing for the given
+ * block: it supports `editableRoot`, is edited visually in the default
+ * editing mode, and has sibling blocks for a native selection to extend
+ * into, all of them editable.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {boolean} Whether an editing host can host the block.
+ */
+export const canHostEditableRoot = createSelector(
+	( state, clientId ) => {
+		if (
+			! clientId ||
+			getBlockEditingMode( state, clientId ) !== 'default' ||
+			// Not when the block is edited as HTML: there is no rich text to
+			// host then, only a textarea, which the editing host would
+			// interfere with.
+			getBlockMode( state, clientId ) !== 'visual' ||
+			! hasBlockSupport(
+				getBlockName( state, clientId ),
+				'editableRoot',
+				false
+			)
+		) {
+			return false;
+		}
+
+		// Only host when the block has sibling blocks for a native selection to
+		// extend into, all of them editable. A lone block (e.g. a single
+		// paragraph nested in an HTML block) is edited on its own element, and
+		// read-only siblings (e.g. pattern content without overrides enabled)
+		// must not become editable by inheriting from the host.
+		const siblings = getBlockOrder(
+			state,
+			getBlockRootClientId( state, clientId )
+		);
+		return (
+			siblings.length > 1 &&
+			siblings.every(
+				( siblingClientId ) =>
+					getBlockEditingMode( state, siblingClientId ) === 'default'
+			)
+		);
+	},
+	( state ) => [
+		state.blocks.order,
+		state.blocks.parents,
+		state.blocks.byClientId,
+		state.blocks.blockEditingModes,
+		state.derivedBlockEditingModes,
+		state.blocksMode,
+	]
+);
 
 /**
  * Returns the block tree displayed by List View.

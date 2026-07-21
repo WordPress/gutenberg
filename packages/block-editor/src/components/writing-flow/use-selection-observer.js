@@ -14,7 +14,6 @@ import { isSelectionForward } from '@wordpress/dom';
  */
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
-import { canHostEditableRoot } from './use-editable-root';
 import { setContentEditableWrapper } from './utils';
 import { unlock } from '../../lock-unlock';
 
@@ -109,7 +108,6 @@ export default function useSelectionObserver() {
 		startMultiSelect,
 		stopMultiSelect,
 	} = useDispatch( blockEditorStore );
-	const blockEditorSelectors = useSelect( blockEditorStore );
 	const {
 		getBlockParents,
 		getBlockSelectionStart,
@@ -117,7 +115,8 @@ export default function useSelectionObserver() {
 		getSelectionStart,
 		getSelectionEnd,
 		getSelectedBlockClientId,
-	} = blockEditorSelectors;
+		canHostEditableRoot,
+	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -185,10 +184,7 @@ export default function useSelectionObserver() {
 						// always move it), which must not re-enable the wrapper
 						// after another block has been selected.
 						collapsedClientId === getSelectedBlockClientId() &&
-						canHostEditableRoot(
-							blockEditorSelectors,
-							collapsedClientId
-						)
+						canHostEditableRoot( collapsedClientId )
 					) {
 						setContentEditableWrapper( node, true );
 

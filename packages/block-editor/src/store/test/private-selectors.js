@@ -30,6 +30,7 @@ import {
 	isSelectedBlockStyleStateShownOnCanvas,
 	shouldRenderBlockListView,
 	getStyleOverrides,
+	canHostEditableRoot,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -2548,6 +2549,131 @@ describe( 'private selectors', () => {
 			expect( getParentSectionBlock( state, 'inner-block' ) ).toBe(
 				'pattern-a'
 			);
+		} );
+	} );
+
+	describe( 'canHostEditableRoot', () => {
+		beforeEach( () => {
+			registerBlockType( 'core/test-editable-root', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Editable root',
+				supports: { editableRoot: true },
+			} );
+			registerBlockType( 'core/test-plain', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Plain',
+			} );
+		} );
+
+		afterEach( () => {
+			unregisterBlockType( 'core/test-editable-root' );
+			unregisterBlockType( 'core/test-plain' );
+		} );
+
+		const createState = () => ( {
+			blocks: {
+				byClientId: new Map( [
+					[ 'a', { name: 'core/test-editable-root' } ],
+					[ 'b', { name: 'core/test-editable-root' } ],
+				] ),
+				attributes: new Map( [
+					[ 'a', { content: 'a' } ],
+					[ 'b', { content: 'b' } ],
+				] ),
+				order: new Map( [
+					[ '', [ 'a', 'b' ] ],
+					[ 'a', [] ],
+					[ 'b', [] ],
+				] ),
+				parents: new Map( [
+					[ 'a', '' ],
+					[ 'b', '' ],
+				] ),
+				blockEditingModes: new Map(),
+			},
+			derivedBlockEditingModes: new Map(),
+			blocksMode: {},
+		} );
+
+		it( 'should return true for a block supporting editableRoot with editable siblings', () => {
+			expect( canHostEditableRoot( createState(), 'a' ) ).toBe( true );
+		} );
+
+		it( 'should return false without a client ID', () => {
+			expect( canHostEditableRoot( createState(), null ) ).toBe( false );
+		} );
+
+		it( 'should return false when the block does not support editableRoot', () => {
+			const state = createState();
+			state.blocks.byClientId.set( 'a', { name: 'core/test-plain' } );
+
+			expect( canHostEditableRoot( state, 'a' ) ).toBe( false );
+		} );
+
+		it( 'should return false when the block is edited as HTML', () => {
+			const state = createState();
+			state.blocksMode = { a: 'html' };
+
+			expect( canHostEditableRoot( state, 'a' ) ).toBe( false );
+		} );
+
+		it( 'should return false when the block is not in the default editing mode', () => {
+			const state = createState();
+			state.blocks.blockEditingModes = new Map( [
+				[ 'a', 'contentOnly' ],
+			] );
+
+			expect( canHostEditableRoot( state, 'a' ) ).toBe( false );
+		} );
+
+		it( 'should return false for a lone block', () => {
+			const state = createState();
+			state.blocks.order = new Map( [
+				[ '', [ 'a' ] ],
+				[ 'a', [] ],
+			] );
+
+			expect( canHostEditableRoot( state, 'a' ) ).toBe( false );
+		} );
+
+		it( 'should return false when a sibling is not editable', () => {
+			const state = createState();
+			state.derivedBlockEditingModes = new Map( [ [ 'b', 'disabled' ] ] );
+
+			expect( canHostEditableRoot( state, 'a' ) ).toBe( false );
+		} );
+
+		// The sibling scan is O(number of siblings) and runs in every rich text
+		// instance, so it must not recompute while typing, which only replaces
+		// block attributes.
+		it( 'should not recompute when only block attributes change', () => {
+			const state = createState();
+			expect( canHostEditableRoot( state, 'a' ) ).toBe( true );
+
+			// Make the uncached result differ without touching any dependant,
+			// so a cache hit is the only way to still get the primed value.
+			state.blocks.byClientId.set( 'a', { name: 'core/test-plain' } );
+
+			const nextState = {
+				...state,
+				blocks: {
+					...state.blocks,
+					attributes: new Map( [
+						[ 'a', { content: 'typed' } ],
+						[ 'b', { content: 'b' } ],
+					] ),
+				},
+			};
+
+			expect( canHostEditableRoot( nextState, 'a' ) ).toBe( true );
+
+			// The same state does recompute once a dependant changes.
+			nextState.blocks.byClientId = new Map( state.blocks.byClientId );
+			expect( canHostEditableRoot( nextState, 'a' ) ).toBe( false );
 		} );
 	} );
 } );
