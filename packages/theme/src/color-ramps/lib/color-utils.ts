@@ -43,9 +43,7 @@ export function getContrast(
  * `rgb()`/`rgba()`, or a CSS named color), throwing otherwise.
  *
  * Rejection is deterministic regardless of which `ColorSpace`s are globally
- * registered: `clampToGamut` registers `OKLCH`, which would otherwise make
- * `oklch()` strings parse, but their space id is `oklch` (not `srgb`) so they
- * are still rejected.
+ * registered.
  *
  * @param seed The seed-color string to validate.
  * @throws If `seed` is not an sRGB-parseable, fully opaque string.
@@ -87,8 +85,5 @@ export function assertValidSeedColor( seed: string ): void {
  */
 export function clampToGamut( c: string | PlainColorObject ) {
 	ColorSpace.register( sRGB );
-	// Workaround for upstream toGamut(method:'css') bug.
-	// https://github.com/color-js/color.js/pull/734
-	ColorSpace.register( OKLCH );
 	return to( toGamut( c, { space: sRGB, method: 'css' } ), OKLCH );
 }

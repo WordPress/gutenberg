@@ -8,20 +8,7 @@ import { useRefEffect } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-
-/**
- * Sets the `contenteditable` wrapper element to `value`.
- *
- * @param {HTMLElement} node  Block element.
- * @param {boolean}     value `contentEditable` value (true or false)
- */
-function setContentEditableWrapper( node, value ) {
-	node.contentEditable = value;
-	// Firefox doesn't automatically move focus.
-	if ( value ) {
-		node.focus();
-	}
-}
+import { setContentEditableWrapper } from './utils';
 
 /**
  * Sets a multi-selection based on the native selection across blocks.

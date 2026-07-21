@@ -2,7 +2,15 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
+
+## 9.36.0 (2026-07-14)
+
 ### Enhancements
+
+-   `ComplementaryArea`: Use the emphasis font-weight token for headings ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
