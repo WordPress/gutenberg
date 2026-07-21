@@ -367,6 +367,39 @@ export function pickPrimaryNote( threads ) {
 }
 
 /**
+ * Gets the distinct block clientIds referenced by a list of note threads.
+ *
+ * @param {Array<{blockClientId?: string}>} notes Note threads.
+ * @return {string[]} Distinct blockClientIds, in first-seen order.
+ */
+export function getBlockIdsWithNotes( notes ) {
+	const ids = [];
+	for ( const note of notes ) {
+		if ( note.blockClientId && ! ids.includes( note.blockClientId ) ) {
+			ids.push( note.blockClientId );
+		}
+	}
+	return ids;
+}
+
+/**
+ * Picks one representative note thread per block, for blocks that have notes.
+ *
+ * @param {Array<{blockClientId?: string, status?: string}>} notes Note threads.
+ * @return {Array<{clientId: string, note: Object}>} One entry per distinct
+ *                                                    blockClientId, in
+ *                                                    first-seen order.
+ */
+export function getPrimaryNoteByBlock( notes ) {
+	return getBlockIdsWithNotes( notes ).map( ( clientId ) => ( {
+		clientId,
+		note: pickPrimaryNote(
+			notes.filter( ( note ) => note.blockClientId === clientId )
+		),
+	} ) );
+}
+
+/**
  * Removes a note ID from the metadata.
  *
  * @param {Object} metadata Existing block metadata

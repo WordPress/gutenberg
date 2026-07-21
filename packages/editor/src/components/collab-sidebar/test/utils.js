@@ -26,6 +26,8 @@ import {
 	pickPrimaryNote,
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
+	getBlockIdsWithNotes,
+	getPrimaryNoteByBlock,
 } from '../utils';
 
 function makeRect( top ) {
@@ -922,6 +924,50 @@ describe( 'getInlineMarkerStart', () => {
 			return a.id - b.id;
 		} );
 		expect( sorted.map( ( t ) => t.id ) ).toEqual( [ 99, 2, 3, 1 ] );
+	} );
+} );
+
+describe( 'getBlockIdsWithNotes', () => {
+	it( 'returns the distinct blockClientIds referenced by the given notes', () => {
+		expect(
+			getBlockIdsWithNotes( [
+				{ id: 1, blockClientId: 'block-a' },
+				{ id: 2, blockClientId: 'block-b' },
+				{ id: 3, blockClientId: 'block-a' },
+			] )
+		).toEqual( [ 'block-a', 'block-b' ] );
+	} );
+
+	it( 'skips notes with no blockClientId', () => {
+		expect(
+			getBlockIdsWithNotes( [
+				{ id: 1, blockClientId: 'block-a' },
+				{ id: 2, blockClientId: null },
+				{ id: 3 },
+			] )
+		).toEqual( [ 'block-a' ] );
+	} );
+
+	it( 'returns an empty array for no notes', () => {
+		expect( getBlockIdsWithNotes( [] ) ).toEqual( [] );
+	} );
+} );
+
+describe( 'getPrimaryNoteByBlock', () => {
+	it( 'picks the unresolved thread per block over an approved one', () => {
+		const notes = [
+			{ id: 1, blockClientId: 'block-a', status: 'approved' },
+			{ id: 2, blockClientId: 'block-a', status: 'hold' },
+			{ id: 3, blockClientId: 'block-b', status: 'hold' },
+		];
+		expect( getPrimaryNoteByBlock( notes ) ).toEqual( [
+			{ clientId: 'block-a', note: notes[ 1 ] },
+			{ clientId: 'block-b', note: notes[ 2 ] },
+		] );
+	} );
+
+	it( 'returns an empty array for no notes', () => {
+		expect( getPrimaryNoteByBlock( [] ) ).toEqual( [] );
 	} );
 } );
 
