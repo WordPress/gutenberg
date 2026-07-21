@@ -37,34 +37,34 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 	return mock;
 } );
 
-function resolveRecords( registry, menus ) {
+const VIEW_QUERY = {
+	per_page: 100,
+	status: 'publish',
+	context: 'view',
+	order: 'desc',
+	orderby: 'date',
+};
+
+const EDIT_QUERY = {
+	per_page: 100,
+	status: [ 'publish', 'draft' ],
+	order: 'desc',
+	orderby: 'date',
+};
+
+function resolveRecords( registry, menus, query = VIEW_QUERY ) {
 	const dispatch = registry.dispatch( coreStore );
-	dispatch.startResolution( 'getEntityRecords', [
-		'postType',
-		'wp_navigation',
-		{
-			per_page: 100,
-			status: [ 'publish', 'draft' ],
-			order: 'desc',
-			orderby: 'date',
-		},
-	] );
-	dispatch.finishResolution( 'getEntityRecords', [
-		'postType',
-		'wp_navigation',
-		{
-			per_page: 100,
-			status: [ 'publish', 'draft' ],
-			order: 'desc',
-			orderby: 'date',
-		},
-	] );
-	dispatch.receiveEntityRecords( 'postType', 'wp_navigation', menus, {
-		per_page: 100,
-		status: [ 'publish', 'draft' ],
-		order: 'desc',
-		orderby: 'date',
-	} );
+	const args = [ 'postType', 'wp_navigation', query ];
+	dispatch.startResolution( 'getEntityRecords', args );
+	dispatch.finishResolution( 'getEntityRecords', args );
+	dispatch.receiveEntityRecords( 'postType', 'wp_navigation', menus, query );
+}
+
+function resolveRecord( registry, ref, query = { context: 'view' } ) {
+	const dispatch = registry.dispatch( coreStore );
+	const args = [ 'postType', 'wp_navigation', ref, query ];
+	dispatch.startResolution( 'getEntityRecord', args );
+	dispatch.finishResolution( 'getEntityRecord', args );
 }
 
 function resolveReadPermission( registry, allowed ) {
@@ -142,14 +142,25 @@ function resolveDeletePermission( registry, ref, allowed ) {
 }
 
 describe( 'useNavigationMenus', () => {
-	const navigationMenu1 = { id: 1, title: 'Menu 1', status: 'publish' };
-	const navigationMenu2 = { id: 2, title: 'Menu 2', status: 'publish' };
-	const navigationMenu3 = { id: 3, title: 'Menu 3', status: 'publish' };
-	const navigationMenus = [
-		navigationMenu1,
-		navigationMenu2,
-		navigationMenu3,
-	];
+	const publishedMenu = {
+		id: 1,
+		title: { rendered: 'Menu 1', raw: 'Menu 1' },
+		content: { rendered: '<a href="/">Home</a>', raw: 'raw menu' },
+		status: 'publish',
+	};
+	const anotherPublishedMenu = {
+		id: 2,
+		title: { rendered: 'Menu 2', raw: 'Menu 2' },
+		content: { rendered: '<a href="/about">About</a>', raw: 'raw menu 2' },
+		status: 'publish',
+	};
+	const draftMenu = {
+		id: 3,
+		title: { rendered: 'Draft Menu', raw: 'Draft Menu' },
+		content: { rendered: '', raw: 'draft menu' },
+		status: 'draft',
+	};
+	const publishedMenus = [ publishedMenu, anotherPublishedMenu ];
 
 	let registry;
 	beforeEach( () => {
@@ -157,159 +168,111 @@ describe( 'useNavigationMenus', () => {
 		useSelect.mockImplementation( ( fn ) => fn( registry.select ) );
 	} );
 
-	it( 'Should return no information when no data is resolved', () => {
-		expect( useNavigationMenu() ).toEqual( {
-			navigationMenus: null,
-			navigationMenu: undefined,
-			canSwitchNavigationMenu: false,
-			canUserCreateNavigationMenus: false,
-			canUserDeleteNavigationMenu: undefined,
-			canUserUpdateNavigationMenu: undefined,
-			hasResolvedCanUserCreateNavigationMenus: false,
-			hasResolvedCanUserDeleteNavigationMenu: undefined,
-			hasResolvedCanUserUpdateNavigationMenu: undefined,
-			hasResolvedNavigationMenus: false,
-			isNavigationMenuMissing: true,
-			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenus: false,
-			isResolvingNavigationMenus: false,
-		} );
+	function resolvePermissions(
+		ref,
+		{
+			create = false,
+			read = true,
+			update = false,
+			delete: canDelete = false,
+		} = {}
+	) {
+		resolveCreatePermission( registry, create );
+		resolveReadRecordPermission( registry, ref, read );
+		resolveUpdatePermission( registry, ref, update );
+		resolveDeletePermission( registry, ref, canDelete );
+	}
+
+	it( 'returns unresolved state before data and permissions resolve', () => {
+		expect( useNavigationMenu() ).toEqual(
+			expect.objectContaining( {
+				navigationMenus: null,
+				publishedNavigationMenus: null,
+				navigationMenu: undefined,
+				isNavigationMenuMissing: false,
+				hasResolvedNavigationMenus: false,
+			} )
+		);
 	} );
 
-	it( 'Should return information about all menus when the ref is missing', () => {
-		resolveRecords( registry, navigationMenus );
-		resolveCreatePermission( registry, true );
-		resolveReadPermission( registry, true );
-		expect( useNavigationMenu() ).toEqual( {
-			navigationMenus,
-			navigationMenu: undefined,
-			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenus: true,
-			canUserDeleteNavigationMenu: undefined,
-			canUserUpdateNavigationMenu: undefined,
-			hasResolvedCanUserCreateNavigationMenus: true,
-			hasResolvedCanUserDeleteNavigationMenu: undefined,
-			hasResolvedCanUserUpdateNavigationMenu: undefined,
-			hasResolvedNavigationMenus: true,
-			isNavigationMenuMissing: true,
-			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenus: false,
-			isResolvingNavigationMenus: false,
-		} );
-	} );
-
-	it( 'Should return information about a specific menu when ref is given', () => {
-		resolveRecords( registry, navigationMenus );
-		expect( useNavigationMenu( 1 ) ).toEqual( {
-			navigationMenu: navigationMenu1,
-			navigationMenus,
-			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenus: false,
-			canUserDeleteNavigationMenu: false,
-			canUserUpdateNavigationMenu: false,
-			hasResolvedCanUserCreateNavigationMenus: false,
-			hasResolvedCanUserDeleteNavigationMenu: false,
-			hasResolvedCanUserUpdateNavigationMenu: false,
-			hasResolvedNavigationMenus: true,
-			isNavigationMenuMissing: false,
-			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenus: false,
-			isResolvingNavigationMenus: false,
-		} );
-	} );
-
-	it( 'Should return the menu when menu status is "draft"', () => {
-		const navigationMenuDraft = { id: 4, title: 'Menu 3', status: 'draft' };
-		const testMenus = [ ...navigationMenus, navigationMenuDraft ];
-		resolveRecords( registry, testMenus );
-		expect( useNavigationMenu( 4 ) ).toEqual( {
-			navigationMenu: navigationMenuDraft,
-			navigationMenus: testMenus,
-			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenus: false,
-			canUserDeleteNavigationMenu: false,
-			canUserUpdateNavigationMenu: false,
-			hasResolvedCanUserCreateNavigationMenus: false,
-			hasResolvedCanUserDeleteNavigationMenu: false,
-			hasResolvedCanUserUpdateNavigationMenu: false,
-			hasResolvedNavigationMenus: true,
-			isNavigationMenuMissing: false,
-			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenus: false,
-			isResolvingNavigationMenus: false,
-		} );
-	} );
-
-	it( 'Should return correct permissions (create, update)', () => {
-		resolveRecords( registry, navigationMenus );
-		resolveCreatePermission( registry, true );
-		resolveReadRecordPermission( registry, 1, true );
-		resolveUpdatePermission( registry, 1, true );
-		resolveDeletePermission( registry, 1, false );
-		expect( useNavigationMenu( 1 ) ).toEqual( {
-			navigationMenu: navigationMenu1,
-			navigationMenus,
-			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenus: true,
-			canUserDeleteNavigationMenu: false,
-			canUserUpdateNavigationMenu: true,
-			hasResolvedCanUserCreateNavigationMenus: true,
-			hasResolvedCanUserDeleteNavigationMenu: true,
-			hasResolvedCanUserUpdateNavigationMenu: true,
-			hasResolvedNavigationMenus: true,
-			isNavigationMenuMissing: false,
-			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenus: false,
-			isResolvingNavigationMenus: false,
-		} );
-	} );
-
-	it( 'Should return correct permissions (delete only)', () => {
-		resolveRecords( registry, navigationMenus );
+	it( 'lists published menus in view context when no ref is selected', () => {
+		resolveRecords( registry, publishedMenus );
 		resolveCreatePermission( registry, false );
-		resolveReadRecordPermission( registry, 1, false );
-		resolveUpdatePermission( registry, 1, false );
-		resolveDeletePermission( registry, 1, true );
-		expect( useNavigationMenu( 1 ) ).toEqual( {
-			navigationMenu: navigationMenu1,
-			navigationMenus,
-			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenus: false,
-			canUserDeleteNavigationMenu: true,
-			canUserUpdateNavigationMenu: false,
-			hasResolvedCanUserCreateNavigationMenus: true,
-			hasResolvedCanUserDeleteNavigationMenu: true,
-			hasResolvedCanUserUpdateNavigationMenu: true,
-			hasResolvedNavigationMenus: true,
-			isNavigationMenuMissing: false,
-			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenus: false,
-			isResolvingNavigationMenus: false,
-		} );
+		resolveReadPermission( registry, true );
+
+		expect( useNavigationMenu() ).toEqual(
+			expect.objectContaining( {
+				navigationMenus: publishedMenus,
+				publishedNavigationMenus: publishedMenus,
+				canSwitchNavigationMenu: true,
+				canUserCreateNavigationMenus: false,
+				hasResolvedNavigationMenus: true,
+			} )
+		);
 	} );
 
-	it( 'Should return correct permissions (no permissions)', () => {
-		const requestedMenu = navigationMenu1;
-		// Note the "delete" permission is resolved for menu 2, but we're requesting
-		// the details of menu 1.
-		resolveDeletePermission( registry, navigationMenu2, true );
-		resolveRecords( registry, navigationMenus );
+	it( 'normalizes a published menu for a user without update permission', () => {
+		resolveRecords( registry, publishedMenus );
+		resolveRecord( registry, publishedMenu.id );
+		resolvePermissions( publishedMenu.id );
 
-		expect( useNavigationMenu( requestedMenu.id ) ).toEqual( {
-			navigationMenu: requestedMenu,
-			navigationMenus,
-			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenus: false,
-			canUserDeleteNavigationMenu: false,
-			canUserUpdateNavigationMenu: false,
-			hasResolvedCanUserCreateNavigationMenus: false,
-			hasResolvedCanUserDeleteNavigationMenu: false,
-			hasResolvedCanUserUpdateNavigationMenu: false,
-			hasResolvedNavigationMenus: true,
-			isNavigationMenuMissing: false,
-			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenus: false,
-			isResolvingNavigationMenus: false,
+		expect( useNavigationMenu( publishedMenu.id ) ).toEqual(
+			expect.objectContaining( {
+				navigationMenu: expect.objectContaining( {
+					id: publishedMenu.id,
+					title: 'Menu 1',
+					content: '<a href="/">Home</a>',
+					status: 'publish',
+				} ),
+				navigationMenus: publishedMenus,
+				canUserUpdateNavigationMenu: false,
+				isNavigationMenuMissing: false,
+				isNavigationMenuResolved: true,
+			} )
+		);
+	} );
+
+	it( 'does not expose a draft menu without update permission', () => {
+		resolveRecords( registry, publishedMenus );
+		resolveRecord( registry, draftMenu.id );
+		resolvePermissions( draftMenu.id );
+
+		expect( useNavigationMenu( draftMenu.id ) ).toEqual(
+			expect.objectContaining( {
+				navigationMenu: null,
+				navigationMenus: publishedMenus,
+				isNavigationMenuMissing: true,
+			} )
+		);
+	} );
+
+	it( 'preserves editable draft menus for an authorized user', () => {
+		resolveRecords( registry, publishedMenus );
+		resolveRecords(
+			registry,
+			[ ...publishedMenus, draftMenu ],
+			EDIT_QUERY
+		);
+		resolvePermissions( draftMenu.id, {
+			create: true,
+			update: true,
+			delete: true,
 		} );
+
+		expect( useNavigationMenu( draftMenu.id ) ).toEqual(
+			expect.objectContaining( {
+				navigationMenu: expect.objectContaining( {
+					id: draftMenu.id,
+					title: 'Draft Menu',
+					content: 'draft menu',
+					status: 'draft',
+				} ),
+				navigationMenus: [ ...publishedMenus, draftMenu ],
+				publishedNavigationMenus: publishedMenus,
+				canUserCreateNavigationMenus: true,
+				canUserUpdateNavigationMenu: true,
+				canUserDeleteNavigationMenu: true,
+			} )
+		);
 	} );
 } );

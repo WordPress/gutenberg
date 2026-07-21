@@ -12,7 +12,7 @@
  * @group navigation
  */
 class Gutenberg_Navigation_Menu_Caps_Test extends WP_Test_REST_TestCase {
-	const NAVIGATION_MANAGER_ROLE = 'gutenberg_navigation_menu_manager';
+	const NAVIGATION_CAPABILITY_MANAGER_ROLE = 'gutenberg_navigation_menu_manager';
 
 	/**
 	 * Administrator user ID.
@@ -41,9 +41,9 @@ class Gutenberg_Navigation_Menu_Caps_Test extends WP_Test_REST_TestCase {
 	 * @param WP_UnitTest_Factory $factory Factory instance.
 	 */
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
-		remove_role( self::NAVIGATION_MANAGER_ROLE );
+		remove_role( self::NAVIGATION_CAPABILITY_MANAGER_ROLE );
 		add_role(
-			self::NAVIGATION_MANAGER_ROLE,
+			self::NAVIGATION_CAPABILITY_MANAGER_ROLE,
 			'Gutenberg Navigation Menu Manager',
 			self::get_navigation_manager_role_capabilities()
 		);
@@ -62,7 +62,7 @@ class Gutenberg_Navigation_Menu_Caps_Test extends WP_Test_REST_TestCase {
 
 		self::$navigation_manager_id = $factory->user->create(
 			array(
-				'role' => self::NAVIGATION_MANAGER_ROLE,
+				'role' => self::NAVIGATION_CAPABILITY_MANAGER_ROLE,
 			)
 		);
 	}
@@ -74,7 +74,7 @@ class Gutenberg_Navigation_Menu_Caps_Test extends WP_Test_REST_TestCase {
 		self::delete_user( self::$admin_id );
 		self::delete_user( self::$editor_id );
 		self::delete_user( self::$navigation_manager_id );
-		remove_role( self::NAVIGATION_MANAGER_ROLE );
+		remove_role( self::NAVIGATION_CAPABILITY_MANAGER_ROLE );
 	}
 
 	/**
@@ -98,6 +98,33 @@ class Gutenberg_Navigation_Menu_Caps_Test extends WP_Test_REST_TestCase {
 		}
 
 		return $capabilities;
+	}
+
+	/**
+	 * Asserts that the current user has no Navigation Menu management caps.
+	 */
+	private function assert_current_user_has_no_navigation_management_capabilities() {
+		$this->assertFalse( current_user_can( 'edit_theme_options' ) );
+		foreach ( gutenberg_get_wp_navigation_menu_capability_names() as $capability ) {
+			$this->assertFalse(
+				current_user_can( $capability ),
+				"Expected user not to have {$capability}."
+			);
+		}
+	}
+
+	/**
+	 * Asserts that the current user relies only on Navigation Menu caps.
+	 */
+	private function assert_current_user_has_only_navigation_management_capabilities() {
+		$this->assertFalse( current_user_can( 'edit_theme_options' ) );
+		$this->assertFalse( current_user_can( 'edit_posts' ) );
+		foreach ( gutenberg_get_wp_navigation_menu_capability_names() as $capability ) {
+			$this->assertTrue(
+				current_user_can( $capability ),
+				"Expected user to have {$capability}."
+			);
+		}
 	}
 
 	/**
@@ -210,17 +237,11 @@ class Gutenberg_Navigation_Menu_Caps_Test extends WP_Test_REST_TestCase {
 	/**
 	 * @covers ::gutenberg_maybe_grant_wp_navigation_menu_caps
 	 */
-	public function test_default_editors_do_not_receive_navigation_menu_caps() {
+	public function test_default_editor_without_navigation_write_caps_cannot_manage_navigation_menus() {
 		$navigation_id = $this->create_navigation_menu();
 
 		wp_set_current_user( self::$editor_id );
-
-		foreach ( gutenberg_get_wp_navigation_menu_capability_names() as $capability ) {
-			$this->assertFalse(
-				current_user_can( $capability ),
-				"Expected editor not to have {$capability}."
-			);
-		}
+		$this->assert_current_user_has_no_navigation_management_capabilities();
 
 		$this->assertFalse( current_user_can( 'edit_post', $navigation_id ) );
 		$this->assertFalse( current_user_can( 'delete_post', $navigation_id ) );
@@ -229,19 +250,11 @@ class Gutenberg_Navigation_Menu_Caps_Test extends WP_Test_REST_TestCase {
 	/**
 	 * @covers ::gutenberg_maybe_grant_wp_navigation_menu_caps
 	 */
-	public function test_custom_role_can_manage_wp_navigation_without_edit_theme_options() {
+	public function test_navigation_capability_manager_can_manage_menus_without_edit_theme_options() {
 		$navigation_id = $this->create_navigation_menu();
 
 		wp_set_current_user( self::$navigation_manager_id );
-
-		$this->assertFalse( current_user_can( 'edit_theme_options' ) );
-
-		foreach ( gutenberg_get_wp_navigation_menu_capability_names() as $capability ) {
-			$this->assertTrue(
-				current_user_can( $capability ),
-				"Expected custom role to have {$capability}."
-			);
-		}
+		$this->assert_current_user_has_only_navigation_management_capabilities();
 
 		$this->assertTrue( current_user_can( 'edit_post', $navigation_id ) );
 		$this->assertTrue( current_user_can( 'delete_post', $navigation_id ) );
@@ -271,8 +284,9 @@ class Gutenberg_Navigation_Menu_Caps_Test extends WP_Test_REST_TestCase {
 	 * @covers WP_REST_Posts_Controller::update_item
 	 * @covers WP_REST_Posts_Controller::delete_item
 	 */
-	public function test_custom_role_can_create_update_and_delete_wp_navigation_via_rest() {
+	public function test_navigation_capability_manager_can_mutate_menus_via_rest_without_general_post_caps() {
 		wp_set_current_user( self::$navigation_manager_id );
+		$this->assert_current_user_has_only_navigation_management_capabilities();
 
 		$create_response = $this->dispatch_request(
 			'POST',
@@ -315,10 +329,11 @@ class Gutenberg_Navigation_Menu_Caps_Test extends WP_Test_REST_TestCase {
 	 * @covers WP_REST_Posts_Controller::update_item_permissions_check
 	 * @covers WP_REST_Posts_Controller::delete_item_permissions_check
 	 */
-	public function test_default_editors_cannot_write_wp_navigation_via_rest() {
+	public function test_default_editor_without_navigation_write_caps_cannot_mutate_menus_via_rest() {
 		$navigation_id = $this->create_navigation_menu();
 
 		wp_set_current_user( self::$editor_id );
+		$this->assert_current_user_has_no_navigation_management_capabilities();
 
 		$create_response = $this->dispatch_request(
 			'POST',
@@ -348,6 +363,110 @@ class Gutenberg_Navigation_Menu_Caps_Test extends WP_Test_REST_TestCase {
 			)
 		);
 		$this->assertSame( 403, $delete_response->get_status() );
+	}
+
+	/**
+	 * @covers WP_REST_Posts_Controller::get_items
+	 * @covers WP_REST_Posts_Controller::get_item
+	 */
+	public function test_default_editor_without_navigation_write_caps_can_read_published_menus_in_view_context() {
+		$navigation_id = $this->create_navigation_menu();
+
+		wp_set_current_user( self::$editor_id );
+		$this->assert_current_user_has_no_navigation_management_capabilities();
+
+		$collection_response = $this->dispatch_request(
+			'GET',
+			'/wp/v2/navigation',
+			array(
+				'context' => 'view',
+				'status'  => 'publish',
+			)
+		);
+
+		$this->assertSame( 200, $collection_response->get_status() );
+		$this->assertContains(
+			$navigation_id,
+			wp_list_pluck( $collection_response->get_data(), 'id' )
+		);
+
+		$item_response = $this->dispatch_request(
+			'GET',
+			'/wp/v2/navigation/' . $navigation_id,
+			array( 'context' => 'view' )
+		);
+
+		$this->assertSame( 200, $item_response->get_status() );
+		$item = $item_response->get_data();
+		$this->assertSame( $navigation_id, $item['id'] );
+		$this->assertArrayHasKey( 'rendered', $item['content'] );
+		$this->assertArrayNotHasKey( 'raw', $item['content'] );
+	}
+
+	/**
+	 * @covers WP_REST_Posts_Controller::get_items
+	 * @covers WP_REST_Posts_Controller::get_item
+	 */
+	public function test_default_editor_without_navigation_write_caps_cannot_use_edit_context_or_query_drafts() {
+		$navigation_id = $this->create_navigation_menu();
+
+		wp_set_current_user( self::$editor_id );
+		$this->assert_current_user_has_no_navigation_management_capabilities();
+
+		$item_response = $this->dispatch_request(
+			'GET',
+			'/wp/v2/navigation/' . $navigation_id,
+			array( 'context' => 'edit' )
+		);
+		$this->assertSame( 403, $item_response->get_status() );
+
+		$collection_response = $this->dispatch_request(
+			'GET',
+			'/wp/v2/navigation',
+			array(
+				'context' => 'edit',
+				'status'  => array( 'publish', 'draft' ),
+			)
+		);
+		$this->assertSame( 400, $collection_response->get_status() );
+	}
+
+	/**
+	 * @covers ::gutenberg_get_navigation_fallback_permissions_check
+	 */
+	public function test_navigation_capability_manager_can_create_fallback_without_theme_or_general_post_caps() {
+		wp_set_current_user( self::$navigation_manager_id );
+		$this->assert_current_user_has_only_navigation_management_capabilities();
+
+		$response = $this->dispatch_request(
+			'GET',
+			'/wp-block-editor/v1/navigation-fallback',
+			array( '_embed' => true )
+		);
+
+		$this->assertSame( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertArrayHasKey( 'id', $data );
+		$this->assertSame( 'wp_navigation', get_post_type( $data['id'] ) );
+		$this->assertSame( 'publish', get_post_status( $data['id'] ) );
+	}
+
+	/**
+	 * @covers ::gutenberg_get_navigation_fallback_permissions_check
+	 */
+	public function test_default_editor_without_navigation_write_caps_cannot_create_fallback() {
+		wp_set_current_user( self::$editor_id );
+		$this->assert_current_user_has_no_navigation_management_capabilities();
+		$before = wp_count_posts( 'wp_navigation' )->publish;
+
+		$response = $this->dispatch_request(
+			'GET',
+			'/wp-block-editor/v1/navigation-fallback',
+			array( '_embed' => true )
+		);
+
+		$this->assertSame( 403, $response->get_status() );
+		$this->assertSame( $before, wp_count_posts( 'wp_navigation' )->publish );
 	}
 
 	/**

@@ -11,7 +11,10 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
+import {
+	PRELOADED_NAVIGATION_MENUS_QUERY,
+	VIEW_NAVIGATION_MENUS_QUERY,
+} from './constants';
 
 export default function useNavigationMenu( ref ) {
 	const permissions = useResourcePermissions( {
@@ -19,17 +22,6 @@ export default function useNavigationMenu( ref ) {
 		name: 'wp_navigation',
 		id: ref,
 	} );
-
-	const {
-		navigationMenu,
-		isNavigationMenuResolved,
-		isNavigationMenuMissing,
-	} = useSelect(
-		( select ) => {
-			return selectExistingMenu( select, ref );
-		},
-		[ ref ]
-	);
 
 	const {
 		// Can the user create navigation menus?
@@ -45,13 +37,57 @@ export default function useNavigationMenu( ref ) {
 	} = permissions;
 
 	const {
-		records: navigationMenus,
-		isResolving: isResolvingNavigationMenus,
-		hasResolved: hasResolvedNavigationMenus,
+		records: publishedNavigationMenus,
+		isResolving: isResolvingPublishedNavigationMenus,
+		hasResolved: hasResolvedPublishedNavigationMenus,
 	} = useEntityRecords(
 		'postType',
 		`wp_navigation`,
-		PRELOADED_NAVIGATION_MENUS_QUERY
+		VIEW_NAVIGATION_MENUS_QUERY
+	);
+
+	const canUseEditContext =
+		!! ref && hasResolvedPermissions && canUpdateNavigationMenu;
+
+	const {
+		records: editableNavigationMenus,
+		isResolving: isResolvingEditableNavigationMenus,
+		hasResolved: hasResolvedEditableNavigationMenus,
+	} = useEntityRecords(
+		'postType',
+		'wp_navigation',
+		PRELOADED_NAVIGATION_MENUS_QUERY,
+		{ enabled: canUseEditContext }
+	);
+
+	const navigationMenus = canUseEditContext
+		? editableNavigationMenus
+		: publishedNavigationMenus;
+	const isResolvingNavigationMenus = canUseEditContext
+		? isResolvingEditableNavigationMenus
+		: isResolvingPublishedNavigationMenus;
+	const hasResolvedNavigationMenus = canUseEditContext
+		? hasResolvedEditableNavigationMenus
+		: hasResolvedPublishedNavigationMenus;
+
+	const {
+		navigationMenu,
+		isNavigationMenuResolved,
+		isNavigationMenuMissing,
+	} = useSelect(
+		( select ) => {
+			if ( ! hasResolvedPermissions ) {
+				return {
+					isNavigationMenuResolved: false,
+					isNavigationMenuMissing: false,
+				};
+			}
+
+			return canUseEditContext
+				? selectEditableMenu( select, ref )
+				: selectViewableMenu( select, ref );
+		},
+		[ ref, hasResolvedPermissions, canUseEditContext ]
 	);
 
 	const canSwitchNavigationMenu = ref
@@ -63,8 +99,11 @@ export default function useNavigationMenu( ref ) {
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
 		navigationMenus,
+		publishedNavigationMenus,
 		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
+		isResolvingPublishedNavigationMenus,
+		hasResolvedPublishedNavigationMenus,
 		canSwitchNavigationMenu,
 		canUserCreateNavigationMenus: canCreateNavigationMenus,
 		isResolvingCanUserCreateNavigationMenus: isResolvingPermissions,
@@ -80,7 +119,7 @@ export default function useNavigationMenu( ref ) {
 	};
 }
 
-function selectExistingMenu( select, ref ) {
+function selectEditableMenu( select, ref ) {
 	if ( ! ref ) {
 		return {
 			isNavigationMenuResolved: false,
@@ -117,6 +156,40 @@ function selectExistingMenu( select, ref ) {
 		// Therefore if the found post is not published then we should ignore it.
 		navigationMenu: isNavigationMenuPublishedOrDraft
 			? editedNavigationMenu
+			: null,
+	};
+}
+
+function selectViewableMenu( select, ref ) {
+	if ( ! ref ) {
+		return {
+			isNavigationMenuResolved: false,
+			isNavigationMenuMissing: true,
+		};
+	}
+
+	const { getEntityRecord, hasFinishedResolution } = select( coreStore );
+	const args = [ 'postType', 'wp_navigation', ref, { context: 'view' } ];
+	const navigationMenu = getEntityRecord( ...args );
+	const hasResolvedNavigationMenu = hasFinishedResolution(
+		'getEntityRecord',
+		args
+	);
+	const isNavigationMenuPublished = navigationMenu?.status === 'publish';
+
+	return {
+		isNavigationMenuResolved: hasResolvedNavigationMenu,
+		isNavigationMenuMissing:
+			hasResolvedNavigationMenu && ! isNavigationMenuPublished,
+		navigationMenu: isNavigationMenuPublished
+			? {
+					...navigationMenu,
+					title:
+						navigationMenu.title?.rendered ?? navigationMenu.title,
+					content:
+						navigationMenu.content?.rendered ??
+						navigationMenu.content,
+			  }
 			: null,
 	};
 }

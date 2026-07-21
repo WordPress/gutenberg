@@ -6,7 +6,11 @@ import { Button, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, createInterpolateElement } from '@wordpress/element';
 
-function DeletedNavigationWarning( { onCreateNew, isNotice = false } ) {
+function DeletedNavigationWarning( {
+	onCreateNew,
+	canCreate = false,
+	isNotice = false,
+} ) {
 	const [ isButtonDisabled, setIsButtonDisabled ] = useState( false );
 
 	const handleButtonClick = () => {
@@ -14,22 +18,24 @@ function DeletedNavigationWarning( { onCreateNew, isNotice = false } ) {
 		onCreateNew();
 	};
 
-	const message = createInterpolateElement(
-		__(
-			'Navigation Menu has been deleted or is unavailable. <button>Create a new Menu?</button>'
-		),
-		{
-			button: (
-				<Button
-					__next40pxDefaultSize
-					onClick={ handleButtonClick }
-					variant="link"
-					disabled={ isButtonDisabled }
-					accessibleWhenDisabled
-				/>
-			),
-		}
-	);
+	const message = canCreate
+		? createInterpolateElement(
+				__(
+					'Navigation Menu has been deleted or is unavailable. <button>Create a new Menu?</button>'
+				),
+				{
+					button: (
+						<Button
+							__next40pxDefaultSize
+							onClick={ handleButtonClick }
+							variant="link"
+							disabled={ isButtonDisabled }
+							accessibleWhenDisabled
+						/>
+					),
+				}
+		  )
+		: __( 'Navigation Menu has been deleted or is unavailable.' );
 
 	return isNotice ? (
 		<Notice status="warning" isDismissible={ false }>

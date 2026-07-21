@@ -11,7 +11,7 @@ import { moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { useEntityRecords, useEntityProp } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -52,12 +52,8 @@ function NavigationMenuSelector( {
 
 	actionLabel = actionLabel || createActionLabel;
 
-	const { records: classicMenus } = useEntityRecords( 'root', 'menu', {
-		per_page: -1,
-		context: 'view',
-	} );
-
 	const {
+		navigationMenu,
 		navigationMenus,
 		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
@@ -66,18 +62,34 @@ function NavigationMenuSelector( {
 		isNavigationMenuMissing,
 	} = useNavigationMenu( currentMenuId );
 
-	const [ currentTitle ] = useEntityProp(
-		'postType',
-		'wp_navigation',
-		'title',
-		currentMenuId
+	const { records: classicMenus } = useEntityRecords(
+		'root',
+		'menu',
+		{
+			per_page: -1,
+			context: 'view',
+		},
+		{ enabled: canUserCreateNavigationMenus }
 	);
+
+	const currentMenu =
+		navigationMenu ||
+		navigationMenus?.find( ( menu ) => menu.id === currentMenuId );
+	const currentTitle = currentMenu
+		? buildMenuLabel(
+				typeof currentMenu.title === 'string'
+					? currentMenu.title
+					: currentMenu.title?.rendered,
+				currentMenu.id,
+				currentMenu.status
+		  )
+		: '';
 
 	const menuChoices = useMemo( () => {
 		return (
 			navigationMenus?.map( ( { id, title, status }, index ) => {
 				const label = buildMenuLabel(
-					title?.rendered,
+					typeof title === 'string' ? title : title?.rendered,
 					index + 1,
 					status
 				);
@@ -197,25 +209,24 @@ function NavigationMenuSelector( {
 						</MenuGroup>
 					) }
 
-					{ canUserCreateNavigationMenus && (
-						<MenuGroup label={ __( 'Tools' ) }>
-							<MenuItem
-								onClick={ async () => {
-									setIsUpdatingMenuRef( true );
-									await onCreateNew();
-									setIsUpdatingMenuRef( false );
-									onClose();
-								} }
-								disabled={
-									isUpdatingMenuRef ||
-									isResolvingNavigationMenus ||
-									! hasResolvedNavigationMenus
-								}
-							>
-								{ __( 'Create new Menu' ) }
-							</MenuItem>
-						</MenuGroup>
-					) }
+					<MenuGroup label={ __( 'Tools' ) }>
+						<MenuItem
+							onClick={ async () => {
+								setIsUpdatingMenuRef( true );
+								await onCreateNew();
+								setIsUpdatingMenuRef( false );
+								onClose();
+							} }
+							disabled={
+								! canUserCreateNavigationMenus ||
+								isUpdatingMenuRef ||
+								isResolvingNavigationMenus ||
+								! hasResolvedNavigationMenus
+							}
+						>
+							{ __( 'Create new Menu' ) }
+						</MenuItem>
+					</MenuGroup>
 				</>
 			) }
 		</DropdownMenu>

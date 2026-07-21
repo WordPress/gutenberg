@@ -145,3 +145,68 @@ function gutenberg_maybe_grant_wp_navigation_menu_caps( $allcaps, $caps ) {
 	return $allcaps;
 }
 add_filter( 'user_has_cap', 'gutenberg_maybe_grant_wp_navigation_menu_caps', 10, 2 );
+
+/**
+ * Checks whether the current user can fetch or create a Navigation fallback.
+ *
+ * The endpoint can create a published Navigation Menu, so both create and
+ * publish capabilities are required. Core migration should update
+ * WP_REST_Navigation_Fallback_Controller with equivalent checks.
+ *
+ * @param WP_REST_Request $request Full details about the request.
+ * @return true|WP_Error True if the request has access, otherwise an error.
+ */
+function gutenberg_get_navigation_fallback_permissions_check( $request ) {
+	$post_type = get_post_type_object( 'wp_navigation' );
+
+	if (
+		! $post_type ||
+		! current_user_can( $post_type->cap->create_posts ) ||
+		! current_user_can( $post_type->cap->publish_posts )
+	) {
+		return new WP_Error(
+			'rest_cannot_create',
+			__( 'Sorry, you are not allowed to create Navigation Menus as this user.' ),
+			array( 'status' => rest_authorization_required_code() )
+		);
+	}
+
+	if (
+		'edit' === $request['context'] &&
+		! current_user_can( $post_type->cap->edit_posts )
+	) {
+		return new WP_Error(
+			'rest_forbidden_context',
+			__( 'Sorry, you are not allowed to edit Navigation Menus as this user.' ),
+			array( 'status' => rest_authorization_required_code() )
+		);
+	}
+
+	return true;
+}
+
+/**
+ * Replaces Core's Navigation fallback REST route with the capability-aware one.
+ */
+function gutenberg_register_navigation_fallback_controller() {
+	if ( ! class_exists( 'WP_REST_Navigation_Fallback_Controller' ) ) {
+		return;
+	}
+
+	$controller = new WP_REST_Navigation_Fallback_Controller();
+	register_rest_route(
+		'wp-block-editor/v1',
+		'/navigation-fallback',
+		array(
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $controller, 'get_item' ),
+				'permission_callback' => 'gutenberg_get_navigation_fallback_permissions_check',
+				'args'                => $controller->get_endpoint_args_for_item_schema( WP_REST_Server::READABLE ),
+			),
+			'schema' => array( $controller, 'get_item_schema' ),
+		),
+		true
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_navigation_fallback_controller', 100 );

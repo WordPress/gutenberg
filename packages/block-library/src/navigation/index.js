@@ -3,9 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { navigation as icon } from '@wordpress/icons';
-import { select } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -15,10 +12,12 @@ import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import deprecated from './deprecated';
+import getNavigationMenuLabel from './get-navigation-menu-label';
 
 const { name } = metadata;
 
 export { metadata, name };
+export { getNavigationMenuLabel };
 
 export const settings = {
 	icon,
@@ -55,23 +54,7 @@ export const settings = {
 	},
 	edit,
 	save,
-	__experimentalLabel: ( { ref } ) => {
-		if ( ! ref ) {
-			return;
-		}
-
-		const navigation = select( coreStore ).getEditedEntityRecord(
-			'postType',
-			'wp_navigation',
-			ref
-		);
-
-		if ( ! navigation?.title ) {
-			return;
-		}
-
-		return decodeEntities( navigation.title );
-	},
+	__experimentalLabel: getNavigationMenuLabel,
 	deprecated,
 };
 
