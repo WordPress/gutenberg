@@ -92,6 +92,11 @@ $footer-height: 90px;
 	}
 }
 
+.font-library__search {
+	// Fixed width to ensure the control doesn't resize with the reset button.
+	width: 240px;
+}
+
 .font-library__fonts-title {
 	text-transform: uppercase;
 	font-size: 11px;
