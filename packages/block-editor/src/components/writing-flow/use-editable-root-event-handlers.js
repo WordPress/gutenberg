@@ -17,20 +17,61 @@ import {
 	hasBlockEventHandlers,
 } from './editable-root-event-handlers';
 
+// The native properties React copies onto its SyntheticEvent for each event
+// type (the *EventInterface tables in react-dom), so the wrapper exposes exactly
+// what a React handler would see and nothing more. Values are copied straight
+// from the native event; React's normalizers only paper over browsers we don't
+// support, and anything omitted stays reachable through `nativeEvent`, as in
+// React (e.g. `getTargetRanges` on a `beforeinput`).
+const EVENT_INTERFACE = [
+	'eventPhase',
+	'bubbles',
+	'cancelable',
+	'timeStamp',
+	'defaultPrevented',
+	'isTrusted',
+];
+const KEYBOARD_EVENT_INTERFACE = [
+	...EVENT_INTERFACE,
+	'view',
+	'detail',
+	'key',
+	'code',
+	'location',
+	'ctrlKey',
+	'shiftKey',
+	'altKey',
+	'metaKey',
+	'repeat',
+	'locale',
+	'getModifierState',
+	'charCode',
+	'keyCode',
+	'which',
+];
+const INPUT_EVENT_INTERFACE = [ ...EVENT_INTERFACE, 'data' ];
+const EVENT_INTERFACES = {
+	keydown: KEYBOARD_EVENT_INTERFACE,
+	keyup: KEYBOARD_EVENT_INTERFACE,
+	keypress: KEYBOARD_EVENT_INTERFACE,
+	beforeinput: INPUT_EVENT_INTERFACE,
+	input: INPUT_EVENT_INTERFACE,
+	compositionstart: INPUT_EVENT_INTERFACE,
+	compositionupdate: INPUT_EVENT_INTERFACE,
+	compositionend: INPUT_EVENT_INTERFACE,
+};
+
 /**
- * Wraps a native event in a React `SyntheticEvent`-like object to pass to
- * extension handlers, which expect one. React does not export a way to
- * construct a synthetic event, but its own is a thin wrapper over the real
- * native event (see `createSyntheticEvent` in react-dom): reads delegate to the
- * native event, and `preventDefault` / `stopPropagation` are methods paired
- * with `isDefaultPrevented` / `isPropagationStopped`.
+ * Builds a React `SyntheticEvent`-like object for an extension handler, which
+ * expects one. It mirrors what react-dom does: a plain object wrapping the real
+ * native event, eagerly copying the same interface properties React exposes for
+ * the event type, so a handler sees exactly React's surface and nothing more.
  *
- * The real event is wrapped, so `preventDefault` and `stopPropagation` reach it
- * and behave as React's do (`stopPropagation` also ends the walk through block
- * ancestors via a local flag). `target` is overridden because the real event
- * targets the editing host above the block, while a handler expects the
- * editable inside its block, as it would without `editableRoot`. `currentTarget`
- * is assignable, moved from block to block as the event bubbles.
+ * `preventDefault` and `stopPropagation` forward to the native event, so they
+ * behave as through React; `stopPropagation` also flags the walk through block
+ * ancestors to stop. `target` is the editable inside the block rather than the
+ * real target (the editing host above it), and `currentTarget` is reassigned as
+ * the event bubbles from block to block.
  *
  * @param {Event}       nativeEvent The event to wrap.
  * @param {HTMLElement} target      The element to report as the target.
@@ -38,49 +79,43 @@ import {
  * @return {Object} The synthetic event.
  */
 function createBlockSyntheticEvent( nativeEvent, target ) {
-	let currentTarget = null;
 	let propagationStopped = false;
 
-	const properties = {
+	const syntheticEvent = {
 		nativeEvent,
+		type: nativeEvent.type,
 		target,
-		preventDefault: () => nativeEvent.preventDefault(),
-		isDefaultPrevented: () => nativeEvent.defaultPrevented,
-		// Forwarded to the native event, as React does, plus a local flag to
-		// end the walk through block ancestors. The host listens where React
-		// listens (the portal container), so this stops propagation at the
-		// same point and can't cut core's listeners below it.
-		stopPropagation: () => {
+		currentTarget: null,
+		preventDefault() {
+			nativeEvent.preventDefault();
+			syntheticEvent.defaultPrevented = true;
+		},
+		isDefaultPrevented() {
+			return syntheticEvent.defaultPrevented;
+		},
+		stopPropagation() {
 			nativeEvent.stopPropagation();
 			propagationStopped = true;
 		},
-		isPropagationStopped: () => propagationStopped,
-		// Not exposed, as on React's synthetic event. Reaching the native
-		// method would let a handler stop core's listeners on the host.
-		stopImmediatePropagation: undefined,
-		// The modern event system doesn't pool, so persistence is a no-op.
-		persist: () => {},
-		isPersistent: () => true,
-	};
-
-	return new Proxy( nativeEvent, {
-		get( event, property ) {
-			if ( property === 'currentTarget' ) {
-				return currentTarget;
-			}
-			if ( Object.hasOwn( properties, property ) ) {
-				return properties[ property ];
-			}
-			const value = event[ property ];
-			return typeof value === 'function' ? value.bind( event ) : value;
+		isPropagationStopped() {
+			return propagationStopped;
 		},
-		set( event, property, value ) {
-			if ( property === 'currentTarget' ) {
-				currentTarget = value;
-			}
+		// The modern event system doesn't pool, so persistence is a no-op.
+		persist() {},
+		isPersistent() {
 			return true;
 		},
-	} );
+	};
+
+	const eventInterface =
+		EVENT_INTERFACES[ nativeEvent.type ] ?? EVENT_INTERFACE;
+	for ( const property of eventInterface ) {
+		const value = nativeEvent[ property ];
+		syntheticEvent[ property ] =
+			typeof value === 'function' ? value.bind( nativeEvent ) : value;
+	}
+
+	return syntheticEvent;
 }
 
 /**

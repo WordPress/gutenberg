@@ -122,8 +122,11 @@ test.describe( 'Editable root block event handler compatibility', () => {
 									// The real event is wrapped, so these
 									// are faithful, not a scripted copy's.
 									isTrusted: event.isTrusted,
+									// Not on React's synthetic event, so
+									// reached through the native event.
 									hasTargetRanges:
-										event.getTargetRanges().length > 0,
+										event.nativeEvent.getTargetRanges()
+											.length > 0,
 								} );
 							},
 						},
