@@ -10,7 +10,6 @@ import { parse, serialize } from '@wordpress/blocks';
 import { STORE_NAME } from './name';
 import { getSyncManager, hasSyncManager } from './sync';
 import { enqueueCRDTDocSave, saveCRDTDoc } from './utils';
-import { POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './utils/crdt';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -336,89 +335,110 @@ export const persistEntityBlockAttributes =
 		}
 
 		const objectType = `${ kind }/${ name }`;
+		const room = `${ objectType }:${ recordId }`;
 		return enqueueCRDTDocSave( objectType, recordId, async () => {
-			// Re-read after earlier room operations so rapid repairs build on the
-			// record received from their predecessor rather than a stale snapshot.
-			const persistedRecord =
+			const initialRecord =
 				select.getRawEntityRecord?.( kind, name, recordId ) || record;
-			const content = getRawContent( persistedRecord );
-			if ( ! content ) {
+			if ( ! getRawContent( initialRecord ) ) {
 				return false;
 			}
 
-			const parsedBlocks = parse( content );
-			let targetPath = blockPath;
-			if ( isMatch ) {
-				const matchingPaths = findBlockPaths( parsedBlocks, isMatch );
-				if (
-					! Number.isInteger( matchIndex ) ||
-					! Number.isInteger( matchCount )
-				) {
+			for ( let attempt = 0; attempt < 20; attempt++ ) {
+				const persistedRecord = await apiFetch( {
+					path: `${ entityConfig.baseURL }/${ recordId }?context=edit`,
+				} );
+				const content = getRawContent( persistedRecord || record );
+				if ( ! content ) {
 					return false;
 				}
 
-				if ( matchingPaths.length === matchCount ) {
-					targetPath = matchingPaths[ matchIndex ];
-				} else {
-					const pathBlock = getBlockAtPath( parsedBlocks, blockPath );
-					const canUseDirtyPath =
-						matchingPaths.length === 0 &&
-						matchCount === 1 &&
-						Number.isInteger( blockCount ) &&
-						countBlocks( parsedBlocks ) === blockCount &&
-						pathBlock?.name === blockName;
-					if ( ! canUseDirtyPath ) {
+				const parsedBlocks = parse( content );
+				let targetPath = blockPath;
+				if ( isMatch ) {
+					const matchingPaths = findBlockPaths(
+						parsedBlocks,
+						isMatch
+					);
+					if (
+						! Number.isInteger( matchIndex ) ||
+						! Number.isInteger( matchCount )
+					) {
 						return false;
 					}
+
+					if ( matchingPaths.length === matchCount ) {
+						targetPath = matchingPaths[ matchIndex ];
+					} else {
+						const pathBlock = getBlockAtPath(
+							parsedBlocks,
+							blockPath
+						);
+						const canUseDirtyPath =
+							matchingPaths.length === 0 &&
+							matchCount === 1 &&
+							Number.isInteger( blockCount ) &&
+							countBlocks( parsedBlocks ) === blockCount &&
+							pathBlock?.name === blockName;
+						if ( ! canUseDirtyPath ) {
+							return false;
+						}
+					}
 				}
-			}
 
-			if ( ! targetPath ) {
-				return false;
-			}
+				if ( ! targetPath ) {
+					return false;
+				}
 
-			const blocks = updateBlockAttributesAtPath(
-				parsedBlocks,
-				targetPath,
-				attributes
-			);
-			if ( ! blocks ) {
-				return false;
-			}
-
-			const serializedDoc =
-				await getSyncManager()?.createPersistedCRDTDoc(
-					objectType,
-					recordId
+				const blocks = updateBlockAttributesAtPath(
+					parsedBlocks,
+					targetPath,
+					attributes
 				);
-			if ( ! serializedDoc ) {
-				return false;
+				if ( ! blocks ) {
+					return false;
+				}
+
+				const serializedDoc =
+					await getSyncManager()?.createPersistedCRDTDoc(
+						objectType,
+						recordId
+					);
+				if ( ! serializedDoc ) {
+					return false;
+				}
+
+				try {
+					await apiFetch( {
+						path: '/wp-sync/v1/save-entity',
+						method: 'POST',
+						data: {
+							room,
+							expected_content: content,
+							content: serialize( blocks ),
+							doc: serializedDoc,
+						},
+					} );
+				} catch ( error ) {
+					if ( error?.code === 'rest_sync_content_conflict' ) {
+						continue;
+					}
+					throw error;
+				}
+
+				const updatedRecord = await apiFetch( {
+					path: `${ entityConfig.baseURL }/${ recordId }?context=edit`,
+				} );
+				dispatch.receiveEntityRecords(
+					kind,
+					name,
+					updatedRecord,
+					undefined,
+					true
+				);
+				return true;
 			}
 
-			const updatedRecord = await apiFetch( {
-				path: `${ entityConfig.baseURL }/${ recordId }`,
-				method: 'POST',
-				data: {
-					content: serialize( blocks ),
-					meta: {
-						[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]:
-							serializedDoc,
-					},
-				},
-			} );
-
-			if ( ! updatedRecord ) {
-				return false;
-			}
-
-			dispatch.receiveEntityRecords(
-				kind,
-				name,
-				updatedRecord,
-				undefined,
-				true
-			);
-			return true;
+			return false;
 		} );
 	};
 

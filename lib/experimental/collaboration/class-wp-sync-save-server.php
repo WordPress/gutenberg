@@ -48,30 +48,60 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 		 * @since 7.1.0
 		 */
 		public function register_routes(): void {
-			if ( isset( rest_get_server()->get_routes()[ '/' . self::REST_NAMESPACE . '/save' ] ) ) {
-				return;
+			$routes = rest_get_server()->get_routes();
+			if ( ! isset( $routes[ '/' . self::REST_NAMESPACE . '/save' ] ) ) {
+				register_rest_route(
+					self::REST_NAMESPACE,
+					'/save',
+					array(
+						'methods'             => array( WP_REST_Server::CREATABLE ),
+						'callback'            => array( $this, 'handle_request' ),
+						'permission_callback' => array( $this, 'check_permissions' ),
+						'args'                => array(
+							'room' => array(
+								'required' => true,
+								'type'     => 'string',
+							),
+							'doc'  => array(
+								'maxLength' => self::MAX_DOC_LENGTH,
+								'required'  => true,
+								'type'      => 'string',
+							),
+						),
+					)
+				);
 			}
 
-			register_rest_route(
-				self::REST_NAMESPACE,
-				'/save',
-				array(
-					'methods'             => array( WP_REST_Server::CREATABLE ),
-					'callback'            => array( $this, 'handle_request' ),
-					'permission_callback' => array( $this, 'check_permissions' ),
-					'args'                => array(
-						'room' => array(
-							'required' => true,
-							'type'     => 'string',
+			if ( ! isset( $routes[ '/' . self::REST_NAMESPACE . '/save-entity' ] ) ) {
+				register_rest_route(
+					self::REST_NAMESPACE,
+					'/save-entity',
+					array(
+						'methods'             => array( WP_REST_Server::CREATABLE ),
+						'callback'            => array( $this, 'handle_entity_request' ),
+						'permission_callback' => array( $this, 'check_permissions' ),
+						'args'                => array(
+							'room'             => array(
+								'required' => true,
+								'type'     => 'string',
+							),
+							'doc'              => array(
+								'maxLength' => self::MAX_DOC_LENGTH,
+								'required'  => true,
+								'type'      => 'string',
+							),
+							'expected_content' => array(
+								'required' => true,
+								'type'     => 'string',
+							),
+							'content'          => array(
+								'required' => true,
+								'type'     => 'string',
+							),
 						),
-						'doc'  => array(
-							'maxLength' => self::MAX_DOC_LENGTH,
-							'required'  => true,
-							'type'      => 'string',
-						),
-					),
-				)
-			);
+					)
+				);
+			}
 		}
 
 		/**
@@ -134,6 +164,64 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 				);
 			}
 
+			return array();
+		}
+
+		/**
+		 * Atomically persists entity content and its CRDT snapshot.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param WP_REST_Request $request The REST request.
+		 * @return array|WP_Error Empty response or a conflict/error.
+		 */
+		public function handle_entity_request( WP_REST_Request $request ) {
+			global $wpdb;
+
+			$parsed_room = WP_Sync_Config::parse_room( $request['room'] );
+			$post_id     = WP_Sync_Config::get_crdt_doc_persistence_post_id(
+				$parsed_room['entity_kind'],
+				$parsed_room['entity_name'],
+				$parsed_room['object_id']
+			);
+			$content     = $request['content'];
+			$expected    = $request['expected_content'];
+
+			$updated = $wpdb->query(
+				$wpdb->prepare(
+					"UPDATE $wpdb->posts SET post_content = %s WHERE ID = %d AND post_content = %s",
+					$content,
+					$post_id,
+					$expected
+				)
+			);
+
+			if ( false === $updated ) {
+				return new WP_Error(
+					'rest_sync_content_save_failed',
+					__( 'Failed to save synchronized content.', 'gutenberg' ),
+					array( 'status' => 500 )
+				);
+			}
+
+			if ( 0 === $updated && get_post_field( 'post_content', $post_id, 'raw' ) !== $content ) {
+				return new WP_Error(
+					'rest_sync_content_conflict',
+					__( 'The synchronized content changed before it could be saved.', 'gutenberg' ),
+					array( 'status' => 409 )
+				);
+			}
+
+			$doc_updated = update_post_meta( $post_id, self::CRDT_DOC_META_KEY, $request['doc'] );
+			if ( false === $doc_updated && get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) !== $request['doc'] ) {
+				return new WP_Error(
+					'rest_crdt_save_failed',
+					__( 'Failed to save CRDT document.', 'gutenberg' ),
+					array( 'status' => 500 )
+				);
+			}
+
+			clean_post_cache( $post_id );
 			return array();
 		}
 

@@ -358,14 +358,14 @@ describe( 'persistEntityBlockAttributes', () => {
 			123
 		);
 		expect( apiFetch ).toHaveBeenCalledWith( {
-			path: '/wp/v2/posts/123',
+			path: '/wp-sync/v1/save-entity',
 			method: 'POST',
 			data: {
+				room: 'postType/post:123',
+				expected_content: 'serialized repaired content',
 				content:
 					'<!-- wp:paragraph {"metadata":{"noteId":[456]}} -->\n<p>Updated</p>\n<!-- /wp:paragraph -->',
-				meta: {
-					_crdt_document: 'serialized CRDT document',
-				},
+				doc: 'serialized CRDT document',
 			},
 		} );
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
@@ -401,7 +401,9 @@ describe( 'persistEntityBlockAttributes', () => {
 			}
 		)( { dispatch, select } );
 
-		expect( apiFetch ).not.toHaveBeenCalled();
+		expect( apiFetch ).not.toHaveBeenCalledWith(
+			expect.objectContaining( { method: 'POST' } )
+		);
 		expect( didPersist ).toBe( false );
 	} );
 
@@ -514,7 +516,9 @@ describe( 'persistEntityBlockAttributes', () => {
 			}
 		)( { dispatch, select } );
 
-		expect( apiFetch ).not.toHaveBeenCalled();
+		expect( apiFetch ).not.toHaveBeenCalledWith(
+			expect.objectContaining( { method: 'POST' } )
+		);
 		expect( didPersist ).toBe( false );
 	} );
 
@@ -575,16 +579,10 @@ describe( 'persistEntityBlockAttributes', () => {
 		expect( didPersist ).toBe( false );
 	} );
 
-	it( 're-reads the persisted record after earlier queued repairs', async () => {
-		const firstFetch = {};
-		firstFetch.promise = new Promise( ( resolve ) => {
-			firstFetch.resolve = resolve;
-		} );
+	it( 'retries against fresh content after a cross-session conflict', async () => {
 		const firstRecord = { content: 'first saved content' };
 		const secondRecord = { content: 'second saved content' };
-		select.getRawEntityRecord
-			.mockReturnValueOnce( firstRecord )
-			.mockReturnValueOnce( secondRecord );
+		select.getRawEntityRecord.mockReturnValue( firstRecord );
 		parse.mockReturnValue( [
 			{
 				name: 'core/paragraph',
@@ -593,8 +591,14 @@ describe( 'persistEntityBlockAttributes', () => {
 			},
 		] );
 		serialize.mockReturnValue( 'repaired content' );
+		const conflict = Object.assign( new Error( 'Conflict' ), {
+			code: 'rest_sync_content_conflict',
+		} );
 		apiFetch
-			.mockImplementationOnce( () => firstFetch.promise )
+			.mockResolvedValueOnce( firstRecord )
+			.mockRejectedValueOnce( conflict )
+			.mockResolvedValueOnce( secondRecord )
+			.mockResolvedValueOnce( {} )
 			.mockResolvedValueOnce( { id: 123 } );
 
 		const options = {
@@ -602,27 +606,16 @@ describe( 'persistEntityBlockAttributes', () => {
 			blockPath: [ 0 ],
 			attributes: { metadata: { noteId: [ 456 ] } },
 		};
-		const firstRepair = persistEntityBlockAttributes(
+		const didPersist = await persistEntityBlockAttributes(
 			'postType',
 			'post',
 			123,
 			options
 		)( { dispatch, select } );
-		const secondRepair = persistEntityBlockAttributes(
-			'postType',
-			'post',
-			123,
-			options
-		)( { dispatch, select } );
-
-		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
-		expect( select.getRawEntityRecord ).toHaveBeenCalledTimes( 1 );
-		firstFetch.resolve( { id: 123 } );
-		await firstRepair;
-		await secondRepair;
 
 		expect( parse ).toHaveBeenNthCalledWith( 1, 'first saved content' );
 		expect( parse ).toHaveBeenNthCalledWith( 2, 'second saved content' );
+		expect( didPersist ).toBe( true );
 	} );
 } );
 

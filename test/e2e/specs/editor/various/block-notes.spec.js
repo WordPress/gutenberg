@@ -17,8 +17,8 @@ function getRestPath( url ) {
 function isTargetedRepairRequest( request ) {
 	return (
 		request.method() === 'POST' &&
-		/^\/wp\/v2\/posts\/\d+$/.test( getRestPath( request.url() ) ) &&
-		typeof request.postDataJSON()?.meta?._crdt_document === 'string'
+		getRestPath( request.url() ) === '/wp-sync/v1/save-entity' &&
+		typeof request.postDataJSON()?.doc === 'string'
 	);
 }
 
@@ -1330,10 +1330,17 @@ test.describe( 'Block Notes', () => {
 			} );
 			let repairCount = 0;
 			let successfulRepairCount = 0;
+			let conflictCount = 0;
 			page.on( 'response', ( response ) => {
 				const request = response.request();
 				if ( response.ok() && isTargetedRepairRequest( request ) ) {
 					successfulRepairCount++;
+				}
+				if (
+					response.status() === 409 &&
+					isTargetedRepairRequest( request )
+				) {
+					conflictCount++;
 				}
 			} );
 			await page.route( '**/*', async ( route ) => {
@@ -1446,8 +1453,9 @@ test.describe( 'Block Notes', () => {
 				.toBe( true );
 			releaseFirstRepair();
 			await page.evaluate( () => window.__secondOverlappingRepair );
-			await expect.poll( () => repairCount ).toBe( 2 );
+			await expect.poll( () => repairCount ).toBe( 3 );
 			await expect.poll( () => successfulRepairCount ).toBe( 2 );
+			await expect.poll( () => conflictCount ).toBe( 1 );
 
 			await page.reload();
 			expect(
