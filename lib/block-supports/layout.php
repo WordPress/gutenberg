@@ -391,7 +391,7 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 		);
 	}
 
-	$minimum_column_width = $parent_layout['minimumColumnWidth'] ?? null;
+	$minimum_column_width = is_string( $parent_layout['minimumColumnWidth'] ?? null ) ? $parent_layout['minimumColumnWidth'] : null;
 	$column_count         = $parent_layout['columnCount'] ?? null;
 
 	/*
@@ -520,9 +520,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'constrained' === $layout_type ) {
-		$content_size    = $layout_for_styles['contentSize'] ?? '';
-		$wide_size       = $layout_for_styles['wideSize'] ?? '';
-		$justify_content = $layout_for_styles['justifyContent'] ?? 'center';
+		$content_size    = is_string( $layout_for_styles['contentSize'] ?? null ) ? $layout_for_styles['contentSize'] : '';
+		$wide_size       = is_string( $layout_for_styles['wideSize'] ?? null ) ? $layout_for_styles['wideSize'] : '';
+		$justify_content = is_string( $layout_for_styles['justifyContent'] ?? null ) ? $layout_for_styles['justifyContent'] : 'center';
 
 		// Check if viewport-specific ("override") values exist. Null values are valid and mean the user cleared a value inherited from the default viewport.
 		$has_justify_content_override = null !== $viewport_overrides && $has_viewport_property_override( 'justifyContent' );
@@ -747,14 +747,14 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 * since we intend to convert blocks that had flex layout implemented
 			 * by custom css.
 			 */
-			if ( $should_output_flex_justification && ! empty( $layout_for_styles['justifyContent'] ) && array_key_exists( $layout_for_styles['justifyContent'], $justify_content_options ) ) {
+			if ( $should_output_flex_justification && ! empty( $layout_for_styles['justifyContent'] ) && is_string( $layout_for_styles['justifyContent'] ) && array_key_exists( $layout_for_styles['justifyContent'], $justify_content_options ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
 					'declarations' => array( 'justify-content' => $justify_content_options[ $layout_for_styles['justifyContent'] ] ),
 				);
 			}
 
-			if ( $should_output_flex_alignment && ! empty( $layout_for_styles['verticalAlignment'] ) && array_key_exists( $layout_for_styles['verticalAlignment'], $vertical_alignment_options ) ) {
+			if ( $should_output_flex_alignment && ! empty( $layout_for_styles['verticalAlignment'] ) && is_string( $layout_for_styles['verticalAlignment'] ) && array_key_exists( $layout_for_styles['verticalAlignment'], $vertical_alignment_options ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
 					'declarations' => array( 'align-items' => $vertical_alignment_options[ $layout_for_styles['verticalAlignment'] ] ),
@@ -767,7 +767,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					'declarations' => array( 'flex-direction' => 'column' ),
 				);
 			}
-			if ( $should_output_flex_justification && ! empty( $layout_for_styles['justifyContent'] ) && array_key_exists( $layout_for_styles['justifyContent'], $justify_content_options ) ) {
+			if ( $should_output_flex_justification && ! empty( $layout_for_styles['justifyContent'] ) && is_string( $layout_for_styles['justifyContent'] ) && array_key_exists( $layout_for_styles['justifyContent'], $justify_content_options ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
 					'declarations' => array( 'align-items' => $justify_content_options[ $layout_for_styles['justifyContent'] ] ),
@@ -778,7 +778,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					'declarations' => array( 'align-items' => 'flex-start' ),
 				);
 			}
-			if ( $should_output_flex_alignment && ! empty( $layout_for_styles['verticalAlignment'] ) && array_key_exists( $layout_for_styles['verticalAlignment'], $vertical_alignment_options ) ) {
+			if ( $should_output_flex_alignment && ! empty( $layout_for_styles['verticalAlignment'] ) && is_string( $layout_for_styles['verticalAlignment'] ) && array_key_exists( $layout_for_styles['verticalAlignment'], $vertical_alignment_options ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
 					'declarations' => array( 'justify-content' => $vertical_alignment_options[ $layout_for_styles['verticalAlignment'] ] ),
@@ -1121,11 +1121,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	 * not intended to provide an extended set of classes to match all block layout attributes
 	 * here.
 	 */
-	if ( ! empty( $block['attrs']['layout']['orientation'] ) ) {
+	if ( ! empty( $block['attrs']['layout']['orientation'] ) && is_string( $block['attrs']['layout']['orientation'] ) ) {
 		$class_names[] = 'is-' . sanitize_title( $block['attrs']['layout']['orientation'] );
 	}
 
-	if ( ! empty( $block['attrs']['layout']['justifyContent'] ) ) {
+	if ( ! empty( $block['attrs']['layout']['justifyContent'] ) && is_string( $block['attrs']['layout']['justifyContent'] ) ) {
 		$class_names[] = 'is-content-justification-' . sanitize_title( $block['attrs']['layout']['justifyContent'] );
 	}
 
@@ -1134,7 +1134,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	// Get classname for layout type.
-	if ( isset( $used_layout['type'] ) ) {
+	if ( isset( $used_layout['type'] ) && is_string( $used_layout['type'] ) ) {
 		$layout_classname = $layout_definitions[ $used_layout['type'] ]['className'] ?? '';
 	} else {
 		$layout_classname = $layout_definitions['default']['className'] ?? '';
@@ -1459,7 +1459,7 @@ add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
  * @return string                Filtered block content.
  */
 function gutenberg_restore_group_inner_container( $block_content, $block ) {
-	$tag_name                         = $block['attrs']['tagName'] ?? 'div';
+	$tag_name                         = is_string( $block['attrs']['tagName'] ?? null ) ? $block['attrs']['tagName'] : 'div';
 	$group_with_inner_container_regex = sprintf(
 		'/(^\s*<%1$s\b[^>]*wp-block-group(\s|")[^>]*>)(\s*<div\b[^>]*wp-block-group__inner-container(\s|")[^>]*>)((.|\S|\s)*)/U',
 		preg_quote( $tag_name, '/' )
