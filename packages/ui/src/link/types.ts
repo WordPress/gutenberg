@@ -22,7 +22,9 @@ export interface LinkProps extends Omit< ComponentProps< 'a' >, 'target' > {
 
 	/**
 	 * Whether to open the link in a new browser tab.
-	 * When true, sets `target="_blank"` and appends a visual arrow indicator.
+	 * When true, sets `target="_blank"`, adds `rel="noopener noreferrer"`
+	 * (merged with any caller-supplied `rel`), and appends a visual arrow
+	 * indicator.
 	 *
 	 * @default false
 	 */

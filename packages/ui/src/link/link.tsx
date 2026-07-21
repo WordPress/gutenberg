@@ -23,10 +23,22 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 		openInNewTab = false,
 		render,
 		className,
+		rel,
 		...props
 	},
 	ref
 ) {
+	let resolvedRel = rel;
+	if ( openInNewTab ) {
+		const tokens = new Set(
+			`${ rel ?? '' } noopener noreferrer`
+				.trim()
+				.split( /\s+/ )
+				.filter( Boolean )
+		);
+		resolvedRel = [ ...tokens ].join( ' ' );
+	}
+
 	const element = useRender( {
 		render,
 		defaultTagName: 'a',
@@ -42,6 +54,7 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 				className
 			),
 			target: openInNewTab ? '_blank' : undefined,
+			rel: resolvedRel,
 			children: (
 				<>
 					{ children }

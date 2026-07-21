@@ -48,12 +48,44 @@ describe( 'Link', () => {
 			);
 		} );
 
+		it( 'sets rel="noopener noreferrer" when true', () => {
+			render(
+				<Link href="https://example.com" openInNewTab>
+					External
+				</Link>
+			);
+
+			expect( screen.getByRole( 'link' ) ).toHaveAttribute(
+				'rel',
+				'noopener noreferrer'
+			);
+		} );
+
+		it( 'merges noopener noreferrer into a caller-supplied rel', () => {
+			render(
+				<Link href="https://example.com" openInNewTab rel="nofollow">
+					External
+				</Link>
+			);
+
+			const rel = screen.getByRole( 'link' ).getAttribute( 'rel' );
+			expect( rel?.split( /\s+/ ).sort() ).toEqual(
+				[ 'nofollow', 'noopener', 'noreferrer' ].sort()
+			);
+		} );
+
 		it( 'does not set target="_blank" when false', () => {
 			render( <Link href="https://example.com">External</Link> );
 
 			expect( screen.getByRole( 'link' ) ).not.toHaveAttribute(
 				'target'
 			);
+		} );
+
+		it( 'does not force a rel when openInNewTab is false', () => {
+			render( <Link href="https://example.com">External</Link> );
+
+			expect( screen.getByRole( 'link' ) ).not.toHaveAttribute( 'rel' );
 		} );
 
 		it( 'renders an accessible arrow indicator', () => {
