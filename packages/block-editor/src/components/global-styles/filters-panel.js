@@ -162,8 +162,6 @@ const renderToggle = ( duotone, resetConfig ) =>
 					<InheritanceIndicatorButton
 						className="block-editor-panel-duotone-settings__reset"
 						hasLocalOverride={ hasLocalOverride }
-						// No focus move: the indicator stays mounted and keeps
-						// focus, now showing the inherited state.
 						onResetToInherited={ handleReset }
 					/>
 				) }

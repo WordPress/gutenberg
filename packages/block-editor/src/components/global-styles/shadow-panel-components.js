@@ -205,8 +205,6 @@ function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
 					<InheritanceIndicatorButton
 						className="block-editor-global-styles__shadow-editor__remove-button"
 						hasLocalOverride={ hasLocalOverride }
-						// No focus move: the indicator stays mounted and keeps
-						// focus, now showing the inherited state.
 						onResetToInherited={ handleReset }
 					/>
 				) }

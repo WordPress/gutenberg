@@ -13,8 +13,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { Tooltip } from '@wordpress/ui';
 
-const INHERITED_LABEL = __( 'Inherited from Global Styles' );
-
 /**
  * Returns props to spread onto a wrapping `<InheritanceToolsPanelItem>`
  * so the item renders the matching inherited-from-Global-Styles affordance.
@@ -99,7 +97,7 @@ export function InheritanceIndicatorButton( {
 } ) {
 	const label = hasLocalOverride
 		? __( 'Reset to inherited value' )
-		: INHERITED_LABEL;
+		: __( 'Inherited from Global Styles' );
 
 	return (
 		<Tooltip.Root>
