@@ -7,6 +7,7 @@ import {
 	useLayoutEffect,
 	useMemo,
 	useRef,
+	useState,
 } from '@wordpress/element';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -55,6 +56,15 @@ const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 const { getEntityAutosavedAt } = unlock( coreDataPrivateApis );
 
 const noop = () => {};
+
+/**
+ * How long the deferred autosave notice waits for the author's autosave
+ * marker to arrive from the sync backend before failing open and showing
+ * the notice. Sync providers report 'connected' at different points relative
+ * to the initial document sync, so a missing marker is not treated as
+ * definitive until this wait expires.
+ */
+const AUTOSAVE_NOTICE_SYNC_WAIT_MS = 3000;
 
 /**
  * These are global entities that are only there to split blocks into logical units
@@ -383,9 +393,16 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const { createWarningNotice, removeNotice } =
 			useDispatch( noticesStore );
 
-		// Whether the "more recent autosave" notice decision is pending the
-		// sync connection status. Only set for collaborative posts.
+		// Whether the "more recent autosave" notice decision is pending a
+		// signal from the shared document. Only set for collaborative posts.
 		const isAutosaveNoticeDeferredRef = useRef( false );
+
+		// Whether the deferred autosave notice has waited long enough for the
+		// autosave marker to arrive from the sync backend.
+		const [
+			hasAutosaveNoticeWaitExpired,
+			setHasAutosaveNoticeWaitExpired,
+		] = useState( false );
 
 		// Selected values used to run the deferred autosave notice effect
 		// below. The effect reads fresh store values when it runs.
@@ -441,8 +458,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					// Under real-time collaboration the autosave content is
 					// usually already part of the shared document, making
 					// the notice redundant. Defer the decision until the
-					// sync connection status is known (see the effect
-					// below).
+					// shared document confirms the autosave, sync fails, or
+					// the wait expires (see the effects below).
 					isAutosaveNoticeDeferredRef.current = true;
 				} else {
 					showAutosaveExistsNotice( {
@@ -459,17 +476,42 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			// A better solution in the future would be to split this effect into multiple ones.
 		}, [] );
 
+		// Backstop timer for the deferred autosave notice decision below.
+		useEffect( () => {
+			if ( ! isAutosaveNoticeDeferredRef.current ) {
+				return;
+			}
+
+			const timeoutId = setTimeout( () => {
+				setHasAutosaveNoticeWaitExpired( true );
+			}, AUTOSAVE_NOTICE_SYNC_WAIT_MS );
+
+			return () => clearTimeout( timeoutId );
+			// The wait starts once, on mount, alongside the deferral above.
+		}, [] );
+
 		// Deferred autosave notice decision for collaborative posts. Decides
-		// at most once: after the first successful poll ('connected') the
-		// CRDT document contains all server-stored updates, so the per-user
-		// autosave marker tells us whether the autosave content is already
-		// part of the shared document. Fails open (shows the notice) if the
-		// connection fails or collaboration is disabled before connecting,
+		// at most once. The notice is suppressed as soon as the author's
+		// autosave marker in the CRDT document confirms that the autosave
+		// content is already part of the shared document; the marker is the
+		// only positive signal, so the decision holds for any sync provider
+		// regardless of what its connection status implies about the initial
+		// document sync. Without that signal, the notice is shown (fail open)
+		// once sync fails, collaboration is disabled, or the wait expires,
 		// because the autosave may then be the only copy of the content.
 		useEffect( () => {
 			if ( ! isAutosaveNoticeDeferredRef.current ) {
 				return;
 			}
+
+			const autosavedAt = getEntityAutosavedAt(
+				'postType',
+				post.type,
+				post.id,
+				settings.autosave.authorId
+			);
+			const isAutosaveInSharedDocument =
+				!! autosavedAt && autosavedAt >= settings.autosave.modified;
 
 			const isCollaborationEnabled = unlock(
 				registry.select( editorStore )
@@ -484,26 +526,22 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 			let shouldShowNotice;
 
-			if ( ! isCollaborationEnabled ) {
+			if ( isAutosaveInSharedDocument ) {
+				shouldShowNotice = false;
+			} else if ( ! isCollaborationEnabled ) {
 				// Collaboration was disabled after mount (e.g. incompatible
 				// metaboxes were detected). Sync will never connect.
 				shouldShowNotice = true;
-			} else if ( 'connected' === syncStatus ) {
-				const autosavedAt = getEntityAutosavedAt(
-					'postType',
-					post.type,
-					post.id,
-					settings.autosave.authorId
-				);
-
-				shouldShowNotice =
-					! autosavedAt || autosavedAt < settings.autosave.modified;
 			} else if ( 'disconnected' === syncStatus ) {
 				// The connection failed before it was established, so the
 				// shared document may be missing the autosaved content.
 				shouldShowNotice = true;
+			} else if ( hasAutosaveNoticeWaitExpired ) {
+				// The marker did not arrive in time. Treat the autosave as
+				// missing from the shared document.
+				shouldShowNotice = true;
 			} else {
-				// Still connecting. Wait for a definitive status.
+				// Keep waiting for a definitive signal.
 				return;
 			}
 
@@ -517,13 +555,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					setCurrentRevisionId,
 				} );
 			}
-			// The decision must run at most once, when the sync connection
-			// status is first known. `settings.autosave` and the notice
-			// actions are stable for the lifetime of the provider; the
+			// The decision must run at most once. `settings.autosave` and the
+			// notice actions are stable for the lifetime of the provider; the
 			// selected values only trigger re-evaluation.
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [
 			autosaveSyncStatus,
+			hasAutosaveNoticeWaitExpired,
 			isCollaborationEnabledForPost,
 			post.type,
 			post.id,

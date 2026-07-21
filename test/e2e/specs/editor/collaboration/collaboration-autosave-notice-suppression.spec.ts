@@ -153,6 +153,13 @@ test.describe( 'Collaboration - autosave notice suppression', () => {
 			timeout: 30_000,
 		} );
 
+		// Outwait the notice's fail-open deadline
+		// (AUTOSAVE_NOTICE_SYNC_WAIT_MS in the editor provider) so that
+		// asserting absence below is meaningful. Without this, the assertion
+		// could pass before a wrongly triggered fail-open shows the notice.
+		// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+		await page.waitForTimeout( 3_500 );
+
 		await expect(
 			page.locator( '.components-notice__content' ).filter( {
 				hasText: NOTICE_TEXT,
