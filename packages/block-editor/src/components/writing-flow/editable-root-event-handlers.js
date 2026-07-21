@@ -1,8 +1,8 @@
 // The React `on*` props the host bridges, mapped to their DOM event type.
 // Only editing events are redirected under `editableRoot` (the wrapper becomes
 // the editing host, so keyboard, input and composition events target it instead
-// of the block); pointer, focus and other events still reach the block and need
-// no bridging. React prop names don't map to DOM types by lowercasing in
+// of the block); pointer and other events still reach the block and need no
+// bridging. React prop names don't map to DOM types by lowercasing in
 // general (onChange is `input`, onDoubleClick is `dblclick`), so the mapping is
 // explicit, which also locks the bridged surface to events React actually fires.
 const SUPPORTED_EVENTS = {

@@ -119,6 +119,11 @@ test.describe( 'Editable root block event handler compatibility', () => {
 										event.nativeEvent?.constructor?.name,
 									isDefaultPrevented:
 										event.isDefaultPrevented(),
+									// The real event is wrapped, so these
+									// are faithful, not a scripted copy's.
+									isTrusted: event.isTrusted,
+									hasTargetRanges:
+										event.getTargetRanges().length > 0,
 								} );
 							},
 						},
@@ -146,6 +151,8 @@ test.describe( 'Editable root block event handler compatibility', () => {
 			isSynthetic: true,
 			nativeEventType: 'InputEvent',
 			isDefaultPrevented: false,
+			isTrusted: true,
+			hasTargetRanges: true,
 		} );
 	} );
 
