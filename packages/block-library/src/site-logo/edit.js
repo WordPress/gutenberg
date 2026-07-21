@@ -623,7 +623,10 @@ export default function LogoEdit( {
 
 	const classes = clsx( className, {
 		'is-default-size': ! width,
-		'is-transient': temporaryURL,
+		// While swapping in a media-editor edit, `is-transient` dims the old
+		// logo and centres the spinner as an overlay (see editor.scss), matching
+		// the upload treatment.
+		'is-transient': temporaryURL || isSwappingMedia,
 	} );
 
 	const blockProps = useBlockProps( { className: classes } );
