@@ -1,0 +1,20 @@
+.z-stack {
+	display: inline-grid;
+	grid-auto-flow: column;
+	position: relative;
+}
+
+.child {
+	position: relative;
+	justify-self: start;
+
+	&:not(:first-of-type) {
+		margin-inline-start: var(--z-stack-offset, 0);
+	}
+}
+
+// When the ZStack is layered, all items overlap in the same grid cell.
+.layered > .child {
+	grid-row-start: 1;
+	grid-column-start: 1;
+}
