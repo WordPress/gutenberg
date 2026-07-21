@@ -434,8 +434,6 @@ export function useNoteActions() {
 					}
 				}
 
-				updateBlockAttributes( clientId, newAttributes );
-
 				const blocks = getBlocks();
 				const blockPath = getBlockPath( blocks, clientId );
 				const isMatch = ( block ) =>
@@ -447,6 +445,9 @@ export function useNoteActions() {
 					clientId,
 					isMatch
 				);
+
+				updateBlockAttributes( clientId, newAttributes );
+
 				const didPersistBlockAttributes = persistEntityBlockAttributes
 					? await persistEntityBlockAttributes(
 							'postType',
