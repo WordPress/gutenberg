@@ -49,9 +49,9 @@
 
 	// Override the default IconButton chrome so the trigger appears as a
 	// tight inline circle that never shifts the sibling label text.
-	min-width: 14px !important;
-	width: 14px !important;
-	height: 14px !important;
+	min-width: $grid-unit-20 !important;
+	width: $grid-unit-20 !important;
+	height: $grid-unit-20 !important;
 	padding: 0 !important;
 	border-radius: 50% !important;
 	background: transparent !important;
