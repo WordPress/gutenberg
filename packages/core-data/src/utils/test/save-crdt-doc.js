@@ -7,7 +7,7 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { getSyncManager } from '../../sync';
-import { saveCRDTDoc } from '../save-crdt-doc';
+import { enqueueCRDTDocSave, saveCRDTDoc } from '../save-crdt-doc';
 
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../../sync', () => ( {
@@ -183,5 +183,46 @@ describe( 'saveCRDTDoc', () => {
 		} );
 
 		await secondSave;
+	} );
+
+	it( 'serializes a targeted repair against a sync endpoint save for the same room', async () => {
+		const repairFetch = createDeferred();
+		syncManager.createPersistedCRDTDoc.mockResolvedValue( 'sync-doc' );
+		apiFetch
+			.mockImplementationOnce( () => repairFetch.promise )
+			.mockResolvedValueOnce( {} );
+
+		const repair = enqueueCRDTDocSave( 'postType/post', 1, () =>
+			apiFetch( {
+				path: '/wp/v2/posts/1',
+				method: 'POST',
+				data: { content: 'repaired content' },
+			} )
+		);
+		const syncSave = saveCRDTDoc( 'postType/post', 1 );
+
+		await flushPromises();
+		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/posts/1',
+			method: 'POST',
+			data: { content: 'repaired content' },
+		} );
+		expect( syncManager.createPersistedCRDTDoc ).not.toHaveBeenCalled();
+
+		repairFetch.resolve( {} );
+		await repair;
+		await flushPromises();
+
+		expect( syncManager.createPersistedCRDTDoc ).toHaveBeenCalledTimes( 1 );
+		expect( apiFetch ).toHaveBeenLastCalledWith( {
+			path: '/wp-sync/v1/save',
+			method: 'POST',
+			data: {
+				room: 'postType/post:1',
+				doc: 'sync-doc',
+			},
+		} );
+		await syncSave;
 	} );
 } );

@@ -36,7 +36,7 @@ async function serializeAndSaveCRDTDoc( objectType, objectId, room ) {
 	return saveSerializedCRDTDoc( room, serializedDoc );
 }
 
-async function enqueueCRDTDocSave( room, save ) {
+async function enqueueRoomSave( room, save ) {
 	// Saves are chained per-room, which forms a queue.
 	// Without a queue, two /save calls might fire close together with a risk
 	// that the older serialized CRDT snapshot completes after the newer one and
@@ -61,6 +61,19 @@ async function enqueueCRDTDocSave( room, save ) {
 }
 
 /**
+ * Serialize persistence operations for a sync room.
+ *
+ * @param {import('@wordpress/sync').ObjectType} objectType Object type.
+ * @param {import('@wordpress/sync').ObjectID}   objectId   Object ID.
+ * @param {Function}                             save       Persistence operation.
+ * @return {Promise<*>} Result of the persistence operation.
+ */
+export function enqueueCRDTDocSave( objectType, objectId, save ) {
+	const room = `${ objectType }:${ objectId }`;
+	return enqueueRoomSave( room, save );
+}
+
+/**
  * Persist the current CRDT document through the sync /save endpoint.
  *
  * @param {import('@wordpress/sync').ObjectType} objectType Object type.
@@ -69,7 +82,7 @@ async function enqueueCRDTDocSave( room, save ) {
  */
 export async function saveCRDTDoc( objectType, objectId ) {
 	const room = `${ objectType }:${ objectId }`;
-	return enqueueCRDTDocSave( room, () =>
+	return enqueueCRDTDocSave( objectType, objectId, () =>
 		serializeAndSaveCRDTDoc( objectType, objectId, room )
 	);
 }

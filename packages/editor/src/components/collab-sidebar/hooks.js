@@ -342,13 +342,8 @@ export function useNoteActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { persistEntityBlockAttributes } = unlock( useDispatch( coreStore ) );
-	const { savePost } = useDispatch( editorStore );
-	const {
-		getCurrentPost,
-		getCurrentPostId,
-		getCurrentPostType,
-		isEditedPostDirty,
-	} = useSelect( editorStore );
+	const { getCurrentPost, getCurrentPostId, getCurrentPostType } =
+		useSelect( editorStore );
 	const {
 		getBlock,
 		getBlockAttributes,
@@ -408,7 +403,6 @@ export function useNoteActions() {
 				if ( ! clientId ) {
 					return savedRecord;
 				}
-				const wasDirty = isEditedPostDirty();
 				const attributes = getBlockAttributes( clientId );
 				const metadata = attributes?.metadata;
 				const selectedBlock = getBlock( clientId );
@@ -448,50 +442,47 @@ export function useNoteActions() {
 
 				updateBlockAttributes( clientId, newAttributes );
 
-				const didPersistBlockAttributes = persistEntityBlockAttributes
-					? await persistEntityBlockAttributes(
-							'postType',
-							getCurrentPostType(),
-							getCurrentPostId(),
-							{
-								record: getCurrentPost(),
-								blockPath,
-								isMatch,
-								matchCount,
-								matchIndex,
-								blockCount: getBlockCount( blocks ),
-								blockName: selectedBlock?.name,
-								attributes: ( blockAttributes ) => {
-									const repairedAttributes = {
-										metadata: cleanEmptyObject(
-											mergeNoteMetadata(
-												blockAttributes?.metadata,
-												updatedMetadata
-											)
-										),
-									};
-									if ( inlineSelection ) {
-										const wrapped = wrapInlineNote(
-											blockAttributes?.[
-												inlineSelection.attributeKey
-											],
-											savedRecord.id,
-											inlineSelection.start,
-											inlineSelection.end
-										);
-										if ( wrapped ) {
-											repairedAttributes[
-												inlineSelection.attributeKey
-											] = wrapped;
-										}
+				if ( persistEntityBlockAttributes ) {
+					await persistEntityBlockAttributes(
+						'postType',
+						getCurrentPostType(),
+						getCurrentPostId(),
+						{
+							record: getCurrentPost(),
+							blockPath,
+							isMatch,
+							matchCount,
+							matchIndex,
+							blockCount: getBlockCount( blocks ),
+							blockName: selectedBlock?.name,
+							attributes: ( blockAttributes ) => {
+								const repairedAttributes = {
+									metadata: cleanEmptyObject(
+										mergeNoteMetadata(
+											blockAttributes?.metadata,
+											updatedMetadata
+										)
+									),
+								};
+								if ( inlineSelection ) {
+									const wrapped = wrapInlineNote(
+										blockAttributes?.[
+											inlineSelection.attributeKey
+										],
+										savedRecord.id,
+										inlineSelection.start,
+										inlineSelection.end
+									);
+									if ( wrapped ) {
+										repairedAttributes[
+											inlineSelection.attributeKey
+										] = wrapped;
 									}
-									return repairedAttributes;
-								},
-							}
-					  )
-					: false;
-				if ( ! didPersistBlockAttributes && ! wasDirty ) {
-					await savePost();
+								}
+								return repairedAttributes;
+							},
+						}
+					);
 				}
 			}
 

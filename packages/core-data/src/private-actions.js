@@ -8,14 +8,8 @@ import { parse, serialize } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import {
-	createYjsDoc,
-	getSyncManager,
-	hasSyncManager,
-	initializeYjsDoc,
-	serializeCrdtDoc,
-} from './sync';
-import { saveCRDTDoc } from './utils';
+import { getSyncManager, hasSyncManager } from './sync';
+import { enqueueCRDTDocSave, saveCRDTDoc } from './utils';
 import { POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './utils/crdt';
 
 /**
@@ -212,7 +206,11 @@ export const persistEntityCRDTDoc =
 	};
 
 function getRawContent( record ) {
-	return record?.content?.raw || record?.content || '';
+	const content = record?.content;
+	if ( typeof content === 'string' ) {
+		return content;
+	}
+	return typeof content?.raw === 'string' ? content.raw : '';
 }
 
 function findBlockPaths( blocks, isMatch ) {
@@ -327,7 +325,7 @@ export const persistEntityBlockAttributes =
 			blockName,
 		}
 	) =>
-	async ( { select } ) => {
+	async ( { dispatch, select } ) => {
 		const entityConfig = select.getEntityConfig( kind, name );
 		if (
 			! entityConfig?.baseURL ||
@@ -337,78 +335,91 @@ export const persistEntityBlockAttributes =
 			return false;
 		}
 
-		const content = getRawContent( record );
-		if ( ! content ) {
-			return false;
-		}
-
-		const parsedBlocks = parse( content );
-		let targetPath = blockPath;
-		if ( isMatch ) {
-			const matchingPaths = findBlockPaths( parsedBlocks, isMatch );
-			if (
-				! Number.isInteger( matchIndex ) ||
-				! Number.isInteger( matchCount )
-			) {
+		const objectType = `${ kind }/${ name }`;
+		return enqueueCRDTDocSave( objectType, recordId, async () => {
+			// Re-read after earlier room operations so rapid repairs build on the
+			// record received from their predecessor rather than a stale snapshot.
+			const persistedRecord =
+				select.getRawEntityRecord?.( kind, name, recordId ) || record;
+			const content = getRawContent( persistedRecord );
+			if ( ! content ) {
 				return false;
 			}
 
-			if ( matchingPaths.length === matchCount ) {
-				targetPath = matchingPaths[ matchIndex ];
-			} else {
-				const pathBlock = getBlockAtPath( parsedBlocks, blockPath );
-				const canUseDirtyPath =
-					matchingPaths.length === 0 &&
-					matchCount === 1 &&
-					Number.isInteger( blockCount ) &&
-					countBlocks( parsedBlocks ) === blockCount &&
-					pathBlock?.name === blockName;
-				if ( ! canUseDirtyPath ) {
+			const parsedBlocks = parse( content );
+			let targetPath = blockPath;
+			if ( isMatch ) {
+				const matchingPaths = findBlockPaths( parsedBlocks, isMatch );
+				if (
+					! Number.isInteger( matchIndex ) ||
+					! Number.isInteger( matchCount )
+				) {
 					return false;
 				}
+
+				if ( matchingPaths.length === matchCount ) {
+					targetPath = matchingPaths[ matchIndex ];
+				} else {
+					const pathBlock = getBlockAtPath( parsedBlocks, blockPath );
+					const canUseDirtyPath =
+						matchingPaths.length === 0 &&
+						matchCount === 1 &&
+						Number.isInteger( blockCount ) &&
+						countBlocks( parsedBlocks ) === blockCount &&
+						pathBlock?.name === blockName;
+					if ( ! canUseDirtyPath ) {
+						return false;
+					}
+				}
 			}
-		}
 
-		if ( ! targetPath ) {
-			return false;
-		}
+			if ( ! targetPath ) {
+				return false;
+			}
 
-		const blocks = updateBlockAttributesAtPath(
-			parsedBlocks,
-			targetPath,
-			attributes
-		);
-		if ( ! blocks ) {
-			return false;
-		}
+			const blocks = updateBlockAttributesAtPath(
+				parsedBlocks,
+				targetPath,
+				attributes
+			);
+			if ( ! blocks ) {
+				return false;
+			}
 
-		const updatedRecord = {
-			...record,
-			blocks,
-			content: serialize( blocks ),
-		};
-		const ydoc = createYjsDoc();
-		initializeYjsDoc( ydoc );
-		entityConfig.syncConfig.applyChangesToCRDTDoc( ydoc, updatedRecord );
-		const serializedDoc = serializeCrdtDoc( ydoc );
-		ydoc.destroy();
+			const serializedDoc =
+				await getSyncManager()?.createPersistedCRDTDoc(
+					objectType,
+					recordId
+				);
+			if ( ! serializedDoc ) {
+				return false;
+			}
 
-		if ( ! serializedDoc ) {
-			return false;
-		}
-
-		await apiFetch( {
-			path: `${ entityConfig.baseURL }/${ recordId }`,
-			method: 'POST',
-			data: {
-				content: updatedRecord.content,
-				meta: {
-					[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serializedDoc,
+			const updatedRecord = await apiFetch( {
+				path: `${ entityConfig.baseURL }/${ recordId }`,
+				method: 'POST',
+				data: {
+					content: serialize( blocks ),
+					meta: {
+						[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]:
+							serializedDoc,
+					},
 				},
-			},
-		} );
+			} );
 
-		return true;
+			if ( ! updatedRecord ) {
+				return false;
+			}
+
+			dispatch.receiveEntityRecords(
+				kind,
+				name,
+				updatedRecord,
+				undefined,
+				true
+			);
+			return true;
+		} );
 	};
 
 /**

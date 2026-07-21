@@ -284,23 +284,39 @@ describe( 'persistEntityCRDTDoc', () => {
 } );
 
 describe( 'persistEntityBlockAttributes', () => {
+	let dispatch;
 	let entityConfig;
 	let select;
+	let syncManager;
 
 	beforeEach( () => {
 		apiFetch.mockReset();
 		parse.mockReset();
 		serialize.mockReset();
+		dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+		} );
+		syncManager = {
+			createPersistedCRDTDoc: jest
+				.fn()
+				.mockResolvedValue( 'serialized CRDT document' ),
+		};
+		getSyncManager.mockReturnValue( syncManager );
 		entityConfig = {
 			baseURL: '/wp/v2/posts',
 			syncConfig: {
-				applyChangesToCRDTDoc: jest.fn(),
 				supportsPersistence: true,
 			},
 		};
 		select = {
 			getEntityConfig: jest.fn( () => entityConfig ),
+			getRawEntityRecord: jest.fn(),
 		};
+		apiFetch.mockResolvedValue( {
+			id: 123,
+			content: { raw: 'serialized repaired content' },
+			meta: { _crdt_document: 'serialized CRDT document' },
+		} );
 	} );
 
 	it( 'persists targeted block attributes with repaired content and CRDT metadata', async () => {
@@ -335,23 +351,11 @@ describe( 'persistEntityBlockAttributes', () => {
 					},
 				} ),
 			}
-		)( { select } );
+		)( { dispatch, select } );
 
-		expect(
-			entityConfig.syncConfig.applyChangesToCRDTDoc
-		).toHaveBeenCalledWith(
-			expect.any( Object ),
-			expect.objectContaining( {
-				blocks: [
-					expect.objectContaining( {
-						attributes: expect.objectContaining( {
-							metadata: { noteId: [ 456 ] },
-						} ),
-					} ),
-				],
-				content:
-					'<!-- wp:paragraph {"metadata":{"noteId":[456]}} -->\n<p>Updated</p>\n<!-- /wp:paragraph -->',
-			} )
+		expect( syncManager.createPersistedCRDTDoc ).toHaveBeenCalledWith(
+			'postType/post',
+			123
 		);
 		expect( apiFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/posts/123',
@@ -360,10 +364,17 @@ describe( 'persistEntityBlockAttributes', () => {
 				content:
 					'<!-- wp:paragraph {"metadata":{"noteId":[456]}} -->\n<p>Updated</p>\n<!-- /wp:paragraph -->',
 				meta: {
-					_crdt_document: expect.any( String ),
+					_crdt_document: 'serialized CRDT document',
 				},
 			},
 		} );
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			expect.objectContaining( { id: 123 } ),
+			undefined,
+			true
+		);
 		expect( didPersist ).toBe( true );
 	} );
 
@@ -388,7 +399,7 @@ describe( 'persistEntityBlockAttributes', () => {
 				blockPath: [ 1 ],
 				attributes: { metadata: { noteId: [ 456 ] } },
 			}
-		)( { select } );
+		)( { dispatch, select } );
 
 		expect( apiFetch ).not.toHaveBeenCalled();
 		expect( didPersist ).toBe( false );
@@ -424,26 +435,19 @@ describe( 'persistEntityBlockAttributes', () => {
 				blockName: 'core/paragraph',
 				attributes: { metadata: { noteId: [ 456 ] } },
 			}
-		)( { select } );
+		)( { dispatch, select } );
 
-		expect(
-			entityConfig.syncConfig.applyChangesToCRDTDoc
-		).toHaveBeenCalledWith(
-			expect.any( Object ),
+		expect( serialize ).toHaveBeenCalledWith( [
 			expect.objectContaining( {
-				blocks: [
-					expect.objectContaining( {
-						attributes: {
-							content: 'Target paragraph',
-							metadata: { noteId: [ 456 ] },
-						},
-					} ),
-					expect.objectContaining( {
-						attributes: { content: 'Sibling paragraph' },
-					} ),
-				],
-			} )
-		);
+				attributes: {
+					content: 'Target paragraph',
+					metadata: { noteId: [ 456 ] },
+				},
+			} ),
+			expect.objectContaining( {
+				attributes: { content: 'Sibling paragraph' },
+			} ),
+		] );
 		expect( apiFetch ).toHaveBeenCalled();
 		expect( didPersist ).toBe( true );
 	} );
@@ -473,7 +477,7 @@ describe( 'persistEntityBlockAttributes', () => {
 				blockName: 'core/paragraph',
 				attributes: { metadata: { noteId: [ 456 ] } },
 			}
-		)( { select } );
+		)( { dispatch, select } );
 
 		expect( apiFetch ).toHaveBeenCalled();
 		expect( didPersist ).toBe( true );
@@ -508,7 +512,7 @@ describe( 'persistEntityBlockAttributes', () => {
 				blockName: 'core/paragraph',
 				attributes: { metadata: { noteId: [ 456 ] } },
 			}
-		)( { select } );
+		)( { dispatch, select } );
 
 		expect( apiFetch ).not.toHaveBeenCalled();
 		expect( didPersist ).toBe( false );
@@ -543,22 +547,82 @@ describe( 'persistEntityBlockAttributes', () => {
 				blockName: 'core/separator',
 				attributes: { metadata: { noteId: [ 456 ] } },
 			}
-		)( { select } );
+		)( { dispatch, select } );
 
-		expect(
-			entityConfig.syncConfig.applyChangesToCRDTDoc
-		).toHaveBeenCalledWith(
-			expect.any( Object ),
+		expect( serialize ).toHaveBeenCalledWith( [
+			expect.objectContaining( { attributes: {} } ),
 			expect.objectContaining( {
-				blocks: [
-					expect.objectContaining( { attributes: {} } ),
-					expect.objectContaining( {
-						attributes: { metadata: { noteId: [ 456 ] } },
-					} ),
-				],
-			} )
-		);
+				attributes: { metadata: { noteId: [ 456 ] } },
+			} ),
+		] );
 		expect( didPersist ).toBe( true );
+	} );
+
+	it( 'does not parse an empty raw-content object', async () => {
+		const didPersist = await persistEntityBlockAttributes(
+			'postType',
+			'post',
+			123,
+			{
+				record: { content: { raw: '', rendered: '<p>Rendered</p>' } },
+				blockPath: [ 0 ],
+				attributes: { metadata: { noteId: [ 456 ] } },
+			}
+		)( { dispatch, select } );
+
+		expect( parse ).not.toHaveBeenCalled();
+		expect( apiFetch ).not.toHaveBeenCalled();
+		expect( didPersist ).toBe( false );
+	} );
+
+	it( 're-reads the persisted record after earlier queued repairs', async () => {
+		const firstFetch = {};
+		firstFetch.promise = new Promise( ( resolve ) => {
+			firstFetch.resolve = resolve;
+		} );
+		const firstRecord = { content: 'first saved content' };
+		const secondRecord = { content: 'second saved content' };
+		select.getRawEntityRecord
+			.mockReturnValueOnce( firstRecord )
+			.mockReturnValueOnce( secondRecord );
+		parse.mockReturnValue( [
+			{
+				name: 'core/paragraph',
+				attributes: {},
+				innerBlocks: [],
+			},
+		] );
+		serialize.mockReturnValue( 'repaired content' );
+		apiFetch
+			.mockImplementationOnce( () => firstFetch.promise )
+			.mockResolvedValueOnce( { id: 123 } );
+
+		const options = {
+			record: { content: 'stale content' },
+			blockPath: [ 0 ],
+			attributes: { metadata: { noteId: [ 456 ] } },
+		};
+		const firstRepair = persistEntityBlockAttributes(
+			'postType',
+			'post',
+			123,
+			options
+		)( { dispatch, select } );
+		const secondRepair = persistEntityBlockAttributes(
+			'postType',
+			'post',
+			123,
+			options
+		)( { dispatch, select } );
+
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		expect( select.getRawEntityRecord ).toHaveBeenCalledTimes( 1 );
+		firstFetch.resolve( { id: 123 } );
+		await firstRepair;
+		await secondRepair;
+
+		expect( parse ).toHaveBeenNthCalledWith( 1, 'first saved content' );
+		expect( parse ).toHaveBeenNthCalledWith( 2, 'second saved content' );
 	} );
 } );
 
