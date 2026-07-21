@@ -25,13 +25,12 @@ import {
  * native event, and `preventDefault` / `stopPropagation` are methods paired
  * with `isDefaultPrevented` / `isPropagationStopped`.
  *
- * The real event is wrapped, so `preventDefault` reaches the browser and core.
- * `stopPropagation` is kept local: it only ends the walk through block
- * ancestors here, so a handler can't stop the event for core's own listeners.
- * `target` is overridden because the real event targets the editing host above
- * the block, while a handler expects the editable inside its block, as it would
- * without `editableRoot`. `currentTarget` is assignable, moved from block to
- * block as the event bubbles.
+ * The real event is wrapped, so `preventDefault` and `stopPropagation` reach it
+ * and behave as React's do (`stopPropagation` also ends the walk through block
+ * ancestors via a local flag). `target` is overridden because the real event
+ * targets the editing host above the block, while a handler expects the
+ * editable inside its block, as it would without `editableRoot`. `currentTarget`
+ * is assignable, moved from block to block as the event bubbles.
  *
  * @param {Event}       nativeEvent The event to wrap.
  * @param {HTMLElement} target      The element to report as the target.
@@ -47,14 +46,18 @@ function createBlockSyntheticEvent( nativeEvent, target ) {
 		target,
 		preventDefault: () => nativeEvent.preventDefault(),
 		isDefaultPrevented: () => nativeEvent.defaultPrevented,
-		// Kept local so a handler can't stop the event for core's listeners.
+		// Forwarded to the native event, as React does, plus a local flag to
+		// end the walk through block ancestors. The host listens where React
+		// listens (the portal container), so this stops propagation at the
+		// same point and can't cut core's listeners below it.
 		stopPropagation: () => {
-			propagationStopped = true;
-		},
-		stopImmediatePropagation: () => {
+			nativeEvent.stopPropagation();
 			propagationStopped = true;
 		},
 		isPropagationStopped: () => propagationStopped,
+		// Not exposed, as on React's synthetic event. Reaching the native
+		// method would let a handler stop core's listeners on the host.
+		stopImmediatePropagation: undefined,
 		// The modern event system doesn't pool, so persistence is a no-op.
 		persist: () => {},
 		isPersistent: () => true,
@@ -92,10 +95,10 @@ function createBlockSyntheticEvent( nativeEvent, target ) {
  * The block registers those handlers (see `useBlockProps`), and this hook
  * calls them from the host: it resolves the block that owns the selection and
  * every block ancestor, and invokes each registered handler with a synthetic
- * event, innermost first, like a bubbling event. The event wraps the real
- * native event, so `preventDefault` reaches the browser and core, while
- * `stopPropagation` is kept local to the walk through ancestors and can't
- * interfere with core's own listeners.
+ * event, innermost first, like a bubbling event. The listeners are attached
+ * where React attaches its own (the portal container, the iframe's document
+ * element), so a block's handler runs and its `preventDefault` /
+ * `stopPropagation` behave as they would through React, without editableRoot.
  *
  * This does not cover handlers a filter puts on its own wrapping element rather
  * than the block's `wrapperProps`; the block element is the supported event
@@ -173,11 +176,16 @@ export default function useEditableRootEventHandlers() {
 				}
 			}
 
-			// Non-capture, so a block's handler fires in the bubbling phase,
-			// as its React `on*` handler would.
+			// Attach where React attaches its own event system: the portal
+			// container, which for the iframed canvas is the document element
+			// (see `preparePortalMount` in react-dom). Listening at the same
+			// node, non-capture, means a block's handler runs in the bubbling
+			// phase after core, and its stopPropagation stops at the same point
+			// React's would, as its `on*` handler would without editableRoot.
+			const root = node.ownerDocument.documentElement;
 			const unsubscribers = EVENT_TYPES.map( ( type ) => {
-				node.addEventListener( type, onEvent );
-				return () => node.removeEventListener( type, onEvent );
+				root.addEventListener( type, onEvent );
+				return () => root.removeEventListener( type, onEvent );
 			} );
 			return () =>
 				unsubscribers.forEach( ( unsubscribe ) => unsubscribe() );
