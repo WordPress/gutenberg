@@ -23,10 +23,13 @@ type MentionableUser = {
  * A user mention completer for notes.
  *
  * Mirrors the editor's `@` user completer but inserts the mention as a link
- * to the user's author page, carrying the mentioned user's ID in a `user-N`
- * class so the mention can be styled as a chip and, in a follow-up, resolved
- * to a notification recipient. A plain `core/link` format handles the anchor,
- * so no dedicated mention format is needed.
+ * to the user's author page, carrying the mentioned user's ID in a
+ * `data-wp-note-mention-user` attribute so the mention can be styled as a chip
+ * and, in a follow-up, resolved to a notification recipient. A purpose-specific
+ * data attribute (rather than a class) keeps the kses allowance inert - it is
+ * not a CSS or JavaScript selector hook outside the notes sidebar. A plain
+ * `core/link` format handles the anchor, so no dedicated mention format is
+ * needed.
  */
 const noteMentionCompleter = {
 	name: 'note-mentions',
@@ -66,7 +69,7 @@ const noteMentionCompleter = {
 			action: 'insert-at-caret' as const,
 			value: (
 				<a
-					className={ `wp-note-mention user-${ user.id }` }
+					data-wp-note-mention-user={ String( user.id ) }
 					href={ user.link }
 				>
 					{ '@' + user.name }

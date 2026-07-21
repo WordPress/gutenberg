@@ -29,8 +29,8 @@ const { RichTextControl } = unlock( dataviewsPrivateApis );
 
 /*
  * `core/link` also carries `@` mentions: the completer inserts a mention as a
- * link to the user's author page with a `wp-note-mention user-N` class, which
- * rich text preserves as an unregistered attribute of the link format.
+ * link to the user's author page with a `data-wp-note-mention-user` attribute,
+ * which rich text preserves as an unregistered attribute of the link format.
  */
 const ALLOWED_NOTE_FORMATS = [
 	'core/bold',

@@ -170,7 +170,7 @@
 		border-radius: 2px;
 	}
 
-	a:not(.wp-note-mention) {
+	a:not(.wp-note-mention):not([data-wp-note-mention-user]) {
 		color: var(--wp-admin-theme-color);
 		text-decoration: underline;
 	}
@@ -247,7 +247,10 @@ mark.wp-note {
 
 // Mention chips, both in the note input and the rendered note content. A
 // mention is a link to the mentioned user's author page, styled as a chip
-// rather than an underlined link.
+// rather than an underlined link. The `[data-wp-note-mention-user]` selector
+// matches current mentions; the legacy `.wp-note-mention` class keeps notes
+// saved before the switch to the data attribute styled the same way.
+a[data-wp-note-mention-user],
 .wp-note-mention {
 	display: inline;
 	padding: 0 var(--wpds-dimension-padding-xs);
