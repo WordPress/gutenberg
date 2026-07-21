@@ -914,11 +914,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/z-stack/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/compose/src/hooks/use-dialog/index.ts": {
 		"react-hooks/immutability": {
 			"count": 1
