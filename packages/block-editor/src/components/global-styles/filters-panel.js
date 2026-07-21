@@ -33,7 +33,7 @@ import { setImmutably } from '../../utils/object';
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	InheritanceResetButton,
+	InheritanceIndicatorButton,
 } from './inheritance';
 
 const EMPTY_ARRAY = [];
@@ -129,7 +129,8 @@ const LabeledColorIndicator = ( { indicator, label } ) => (
 
 const renderToggle = ( duotone, resetConfig ) =>
 	function Toggle( { onToggle, isOpen } ) {
-		const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
+		const { hasLocalValue, hasLocalOverride, isInherited, onReset } =
+			resetConfig;
 		const duotoneButtonRef = useRef( undefined );
 
 		const toggleProps = {
@@ -147,8 +148,6 @@ const renderToggle = ( duotone, resetConfig ) =>
 				onToggle();
 			}
 			onReset();
-			// Return focus to parent button.
-			duotoneButtonRef.current?.focus();
 		};
 
 		return (
@@ -159,21 +158,29 @@ const renderToggle = ( duotone, resetConfig ) =>
 						label={ __( 'Duotone' ) }
 					/>
 				</Button>
-				{ hasLocalValue &&
-					( hasLocalOverride ? (
-						<InheritanceResetButton
-							className="block-editor-panel-duotone-settings__reset"
-							onResetToInherited={ handleReset }
-						/>
-					) : (
-						<Button
-							size="small"
-							icon={ resetIcon }
-							label={ __( 'Reset' ) }
-							className="block-editor-panel-duotone-settings__reset"
-							onClick={ handleReset }
-						/>
-					) ) }
+				{ ( isInherited || hasLocalOverride ) && (
+					<InheritanceIndicatorButton
+						className="block-editor-panel-duotone-settings__reset"
+						hasLocalOverride={ hasLocalOverride }
+						// No focus move: the indicator stays mounted and keeps
+						// focus, now showing the inherited state.
+						onResetToInherited={ handleReset }
+					/>
+				) }
+				{ hasLocalValue && ! hasLocalOverride && (
+					<Button
+						size="small"
+						icon={ resetIcon }
+						label={ __( 'Reset' ) }
+						className="block-editor-panel-duotone-settings__reset"
+						onClick={ () => {
+							handleReset();
+							// This button unmounts on reset, so hand focus back
+							// to the toggle.
+							duotoneButtonRef.current?.focus();
+						} }
+					/>
+				) }
 			</>
 		);
 	};
@@ -274,9 +281,9 @@ export default function FiltersPanel( {
 					hasValue={ hasDuotone }
 					onDeselect={ resetDuotone }
 					isShownByDefault={ defaultControls.duotone }
-					// Toggle renders its own reset dot, so the item must not
-					// add a second.
-					showLocalOverrideActionsInLabel={ false }
+					// Toggle renders its own inheritance affordance, so the item
+					// must not add a second.
+					showInheritanceAffordance={ false }
 					panelId={ panelId }
 				>
 					<Dropdown
@@ -285,6 +292,9 @@ export default function FiltersPanel( {
 						renderToggle={ renderToggle( duotone, {
 							hasLocalValue: hasDuotone(),
 							hasLocalOverride: hasDuotoneLocalOverride,
+							isInherited:
+								showInheritanceLabelIndicators &&
+								isDuotonePlaceholder,
 							onReset: resetDuotone,
 						} ) }
 						renderContent={ () => (

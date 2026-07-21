@@ -466,11 +466,11 @@ export default function BorderPanel( {
 					hasValue={ hasShadow }
 					onDeselect={ resetShadow }
 					isShownByDefault={ defaultControls.shadow }
-					// The shadow toggle renders its own reset affordance (blue
-					// dot for a local override, default reset otherwise) inside
-					// the control, mirroring the color/gradient controls, so the
-					// panel item must not render a second sibling reset dot.
-					showLocalOverrideActionsInLabel={ false }
+					// The shadow toggle renders its own inheritance affordance
+					// inside the control, mirroring the color/gradient
+					// controls, so the panel item must not render a second
+					// sibling one.
+					showInheritanceAffordance={ false }
 					panelId={ panelId }
 				>
 					{ hasBorderControl ? (
@@ -485,6 +485,10 @@ export default function BorderPanel( {
 						settings={ settings }
 						hasLocalValue={ hasShadow() }
 						hasLocalOverride={ hasShadowLocalOverride }
+						isInherited={
+							showInheritanceLabelIndicators &&
+							isShadowPlaceholder
+						}
 						onReset={ resetShadow }
 					/>
 				</InheritanceToolsPanelItem>

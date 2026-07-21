@@ -46,7 +46,34 @@ const baseSettings = {
 };
 
 describe( 'FiltersPanel — visual treatment and display-without-commit', () => {
-	it( 'renders the InheritanceResetButton for a local override', () => {
+	it( 'renders the InheritanceIndicatorButton in its inherited state when the duotone is only inherited', () => {
+		const inheritedValue = {
+			filter: { duotone: [ '#000000', '#ffffff' ] },
+		};
+
+		render(
+			<FiltersPanel
+				value={ {} }
+				inheritedValue={ inheritedValue }
+				settings={ baseSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: /inherited from global styles/i,
+			} )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', {
+				name: /reset to inherited value/i,
+			} )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'renders the InheritanceIndicatorButton in its reset state for a local override', () => {
 		const inheritedValue = {
 			filter: { duotone: [ '#000000', '#ffffff' ] },
 		};

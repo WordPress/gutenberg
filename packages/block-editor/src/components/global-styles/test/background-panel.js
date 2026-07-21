@@ -187,6 +187,43 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 	} );
 
 	describe( 'Background image slot', () => {
+		it( 'exposes the inherited indicator when the image is only inherited', () => {
+			const inheritedValue = {
+				background: {
+					backgroundImage: {
+						id: 1,
+						url: 'http://example.com/inherited.jpg',
+					},
+				},
+			};
+
+			render(
+				<BackgroundPanel
+					value={ {} }
+					inheritedValue={ inheritedValue }
+					settings={ {
+						background: {
+							backgroundImage: true,
+							backgroundSize: true,
+						},
+					} }
+					onChange={ () => {} }
+					panelId="test-panel"
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'button', {
+					name: /inherited from global styles/i,
+				} )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', {
+					name: /reset to inherited value/i,
+				} )
+			).not.toBeInTheDocument();
+		} );
+
 		it( 'exposes an accessible reset-to-inherited button when size/position/repeat settings are enabled', () => {
 			const inheritedValue = {
 				background: {

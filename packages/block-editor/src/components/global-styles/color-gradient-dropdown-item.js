@@ -28,7 +28,7 @@ import ColorGradientControl from '../colors-gradients/control';
 import { unlock } from '../../lock-unlock';
 import {
 	getInheritanceProps,
-	InheritanceResetButton,
+	InheritanceIndicatorButton,
 	InheritanceToolsPanelItem,
 } from './inheritance';
 
@@ -220,13 +220,16 @@ export default function ColorGradientDropdownItem( {
 	// actions and the override label indicator.
 	const hasLocalOverride =
 		showInheritanceLabelIndicators && hasValue() && hasInheritedValue;
+	// At rest the same slot holds the inherited-value indicator instead.
+	const isInheritedAtRest =
+		showInheritanceLabelIndicators && isPlaceholder && ! hasValue();
 	const inheritanceProps = showInheritanceLabelIndicators
 		? getInheritanceProps( isPlaceholder, hasLocalOverride, itemClassName )
 		: { className: itemClassName };
 	return (
 		<InheritanceToolsPanelItem
 			{ ...inheritanceProps }
-			showLocalOverrideActionsInLabel={ false }
+			showInheritanceAffordance={ false }
 			hasValue={ hasValue }
 			label={ label }
 			onDeselect={ resetValue }
@@ -258,34 +261,37 @@ export default function ColorGradientDropdownItem( {
 									label={ label }
 								/>
 							</Button>
-							{ hasValue() &&
-								( hasLocalOverride ? (
-									<InheritanceResetButton
-										className="block-editor-panel-color-gradient-settings__reset"
-										onResetToInherited={ () => {
-											resetValue();
-											if ( isOpen ) {
-												onToggle();
-											}
-											colorGradientDropdownButtonRef.current?.focus();
-										} }
-									/>
-								) : (
-									<Button
-										__next40pxDefaultSize
-										label={ __( 'Reset' ) }
-										className="block-editor-panel-color-gradient-settings__reset"
-										size="small"
-										icon={ resetIcon }
-										onClick={ () => {
-											resetValue();
-											if ( isOpen ) {
-												onToggle();
-											}
-											colorGradientDropdownButtonRef.current?.focus();
-										} }
-									/>
-								) ) }
+							{ ( isInheritedAtRest || hasLocalOverride ) && (
+								<InheritanceIndicatorButton
+									className="block-editor-panel-color-gradient-settings__reset"
+									hasLocalOverride={ hasLocalOverride }
+									onResetToInherited={ () => {
+										resetValue();
+										if ( isOpen ) {
+											onToggle();
+										}
+										// No focus move: the indicator stays
+										// mounted and keeps focus, now showing
+										// the inherited state.
+									} }
+								/>
+							) }
+							{ hasValue() && ! hasLocalOverride && (
+								<Button
+									__next40pxDefaultSize
+									label={ __( 'Reset' ) }
+									className="block-editor-panel-color-gradient-settings__reset"
+									size="small"
+									icon={ resetIcon }
+									onClick={ () => {
+										resetValue();
+										if ( isOpen ) {
+											onToggle();
+										}
+										colorGradientDropdownButtonRef.current?.focus();
+									} }
+								/>
+							) }
 							{ contrastWarning && (
 								// An icon-only warning that stays visible while a
 								// contrast warning is in effect. It is not a menu;

@@ -10,7 +10,7 @@ import userEvent from '@testing-library/user-event';
 import BorderPanel from '../border-panel';
 
 /**
- * Tests for the inherited Global Styles label treatment in `BorderPanel`.
+ * Tests for the inherited Global Styles treatment in `BorderPanel`.
  * The visual treatment lands on the parent `ToolsPanelItem` via the
  * `.is-inherited-from-global-styles` / `.has-local-override-from-global-styles`
  * class hooks. The inner controls (`BorderBoxControl`,
@@ -351,7 +351,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
 
-		it( 'renders no reset affordance when the shadow is only inherited (no local override)', () => {
+		it( 'renders the inherited indicator, and no reset affordance, when the shadow is only inherited', () => {
 			const inheritedValue = { shadow: 'var:preset|shadow|soft' };
 
 			render(
@@ -363,6 +363,12 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 					panelId="test-panel"
 				/>
 			);
+
+			expect(
+				screen.getByRole( 'button', {
+					name: /inherited from global styles/i,
+				} )
+			).toBeInTheDocument();
 
 			// A merely-inherited value must not show the default remove
 			// button nor the local-override blue-dot reset.
@@ -376,7 +382,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'renders the blue-dot InheritanceResetButton for a local override', () => {
+		it( 'renders the blue-dot InheritanceIndicatorButton for a local override', () => {
 			const inheritedValue = { shadow: 'var:preset|shadow|soft' };
 			const value = { shadow: 'var:preset|shadow|hard' };
 
@@ -416,13 +422,19 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			);
 
 			// With no inherited value there is no override to reset to, so
-			// the plain remove button is used, not the blue-dot affordance.
+			// the plain remove button is used, not the indicator in either
+			// of its states.
 			expect(
 				screen.getByRole( 'button', { name: /^remove$/i } )
 			).toBeInTheDocument();
 			expect(
 				screen.queryByRole( 'button', {
 					name: /reset to inherited value/i,
+				} )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', {
+					name: /inherited from global styles/i,
 				} )
 			).not.toBeInTheDocument();
 		} );

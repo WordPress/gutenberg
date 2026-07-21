@@ -25,7 +25,7 @@ import { Tooltip } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import { InheritanceResetButton } from './inheritance';
+import { InheritanceIndicatorButton } from './inheritance';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -131,6 +131,7 @@ export function ShadowPopover( {
 	className,
 	hasLocalValue = !! shadow,
 	hasLocalOverride = false,
+	isInherited = false,
 	onReset,
 } ) {
 	const popoverProps = {
@@ -149,6 +150,7 @@ export function ShadowPopover( {
 			renderToggle={ renderShadowToggle( shadow, onShadowChange, {
 				hasLocalValue,
 				hasLocalOverride,
+				isInherited,
 				onReset: onReset ?? ( () => onShadowChange( undefined ) ),
 			} ) }
 			renderContent={ () => (
@@ -165,7 +167,8 @@ export function ShadowPopover( {
 }
 
 function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
-	const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
+	const { hasLocalValue, hasLocalOverride, isInherited, onReset } =
+		resetConfig;
 	return function ShadowToggle( { onToggle, isOpen } ) {
 		const shadowButtonRef = useRef( undefined );
 
@@ -184,8 +187,6 @@ function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
 				onToggle();
 			}
 			onReset();
-			// Return focus to parent button.
-			shadowButtonRef.current?.focus();
 		};
 
 		return (
@@ -200,22 +201,30 @@ function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
 						<FlexItem>{ __( 'Drop shadow' ) }</FlexItem>
 					</HStack>
 				</Button>
-				{ hasLocalValue &&
-					( hasLocalOverride ? (
-						<InheritanceResetButton
-							className="block-editor-global-styles__shadow-editor__remove-button"
-							onResetToInherited={ handleReset }
-						/>
-					) : (
-						<Button
-							__next40pxDefaultSize
-							size="small"
-							icon={ reset }
-							label={ __( 'Remove' ) }
-							className="block-editor-global-styles__shadow-editor__remove-button"
-							onClick={ handleReset }
-						/>
-					) ) }
+				{ ( isInherited || hasLocalOverride ) && (
+					<InheritanceIndicatorButton
+						className="block-editor-global-styles__shadow-editor__remove-button"
+						hasLocalOverride={ hasLocalOverride }
+						// No focus move: the indicator stays mounted and keeps
+						// focus, now showing the inherited state.
+						onResetToInherited={ handleReset }
+					/>
+				) }
+				{ hasLocalValue && ! hasLocalOverride && (
+					<Button
+						__next40pxDefaultSize
+						size="small"
+						icon={ reset }
+						label={ __( 'Remove' ) }
+						className="block-editor-global-styles__shadow-editor__remove-button"
+						onClick={ () => {
+							handleReset();
+							// This button unmounts on reset, so hand focus back
+							// to the toggle.
+							shadowButtonRef.current?.focus();
+						} }
+					/>
+				) }
 			</>
 		);
 	};

@@ -211,6 +211,33 @@ const baseSettings = {
 
 describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 	describe( 'Link color', () => {
+		it( 'exposes the inherited indicator when link.text is only inherited', () => {
+			const inheritedValue = {
+				elements: { link: { color: { text: '#0000ff' } } },
+			};
+
+			render(
+				<ColorPanel
+					value={ {} }
+					inheritedValue={ inheritedValue }
+					settings={ baseSettings }
+					onChange={ () => {} }
+					panelId="test-panel"
+				/>
+			);
+
+			expect(
+				screen.getAllByRole( 'button', {
+					name: /inherited from global styles/i,
+				} ).length
+			).toBeGreaterThanOrEqual( 1 );
+			expect(
+				screen.queryByRole( 'button', {
+					name: /reset to inherited value/i,
+				} )
+			).not.toBeInTheDocument();
+		} );
+
 		it( 'exposes an accessible reset when local link.text overrides the inherited value', () => {
 			const inheritedValue = {
 				elements: { link: { color: { text: '#0000ff' } } },

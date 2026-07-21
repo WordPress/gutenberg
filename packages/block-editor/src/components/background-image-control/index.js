@@ -39,7 +39,7 @@ import { getResolvedValue } from '@wordpress/global-styles-engine';
  * Internal dependencies
  */
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
-import { InheritanceResetButton } from '../global-styles/inheritance';
+import { InheritanceIndicatorButton } from '../global-styles/inheritance';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
@@ -195,6 +195,7 @@ function BackgroundControlsPanel( {
 	hasImageValue,
 	onReset,
 	hasLocalOverride,
+	isInherited,
 	containerRef,
 } ) {
 	if ( ! hasImageValue ) {
@@ -227,38 +228,40 @@ function BackgroundControlsPanel( {
 							as="button"
 							onToggleCallback={ onToggleCallback }
 						/>
-						{ onReset &&
-							( hasLocalOverride ? (
-								<InheritanceResetButton
-									className="block-editor-global-styles-background-panel__reset"
-									onResetToInherited={ () => {
-										onReset();
-										// Close the dropdown if open.
-										if ( isOpen ) {
-											onToggle();
-										}
-										// Focus the toggle button.
-										focusToggleButton( containerRef );
-									} }
-								/>
-							) : (
-								<Button
-									__next40pxDefaultSize
-									label={ __( 'Reset' ) }
-									className="block-editor-global-styles-background-panel__reset"
-									size="small"
-									icon={ resetIcon }
-									onClick={ () => {
-										onReset();
-										// Close the dropdown if open.
-										if ( isOpen ) {
-											onToggle();
-										}
-										// Focus the toggle button.
-										focusToggleButton( containerRef );
-									} }
-								/>
-							) ) }
+						{ ( isInherited || hasLocalOverride ) && (
+							<InheritanceIndicatorButton
+								className="block-editor-global-styles-background-panel__reset"
+								hasLocalOverride={ hasLocalOverride }
+								onResetToInherited={ () => {
+									onReset();
+									// Close the dropdown if open.
+									if ( isOpen ) {
+										onToggle();
+									}
+									// No focus move: the indicator stays
+									// mounted and keeps focus, now showing the
+									// inherited state.
+								} }
+							/>
+						) }
+						{ onReset && ! hasLocalOverride && (
+							<Button
+								__next40pxDefaultSize
+								label={ __( 'Reset' ) }
+								className="block-editor-global-styles-background-panel__reset"
+								size="small"
+								icon={ resetIcon }
+								onClick={ () => {
+									onReset();
+									// Close the dropdown if open.
+									if ( isOpen ) {
+										onToggle();
+									}
+									// Focus the toggle button.
+									focusToggleButton( containerRef );
+								} }
+							/>
+						) }
 					</>
 				);
 			} }
@@ -755,6 +758,9 @@ export default function BackgroundImagePanel( {
 					onToggle={ setIsDropDownOpen }
 					hasImageValue={ hasImageValue }
 					hasLocalOverride={ hasLocalOverride }
+					isInherited={
+						showInheritanceLabelIndicators && ! localHasImageValue
+					}
 					onReset={ localHasImageValue ? resetBackground : undefined }
 					containerRef={ containerRef }
 				>

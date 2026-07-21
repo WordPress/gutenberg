@@ -512,7 +512,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			// A local override now gets the same local-override flag as
 			// every other control, so the inline reset button can attach.
 			// The button itself is portaled and covered by the
-			// InheritanceResetButton unit tests.
+			// InheritanceIndicatorButton unit tests.
 			expectLocalOverride();
 		} );
 

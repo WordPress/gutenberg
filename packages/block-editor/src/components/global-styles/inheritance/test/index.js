@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { click } from '@ariakit/test';
 
 /**
@@ -14,13 +14,41 @@ import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
  */
 import {
 	getInheritanceProps,
-	InheritanceResetButton,
+	InheritanceIndicatorButton,
 	InheritanceToolsPanelItem,
 } from '../';
 
-describe( 'InheritanceResetButton', () => {
-	test( 'renders an always-visible reset button labelled for the inherited value', () => {
-		render( <InheritanceResetButton onResetToInherited={ () => {} } /> );
+describe( 'InheritanceIndicatorButton', () => {
+	test( 'renders an always-visible indicator labelled for the inherited value', () => {
+		render( <InheritanceIndicatorButton /> );
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Inherited from Global Styles',
+			} )
+		).toBeVisible();
+	} );
+
+	test( 'carries no action in the inherited state', async () => {
+		const onResetToInherited = jest.fn();
+		const onClick = jest.fn();
+		render(
+			<div onClick={ onClick } role="presentation">
+				<InheritanceIndicatorButton
+					onResetToInherited={ onResetToInherited }
+				/>
+			</div>
+		);
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Inherited from Global Styles',
+			} )
+		);
+		expect( onResetToInherited ).not.toHaveBeenCalled();
+		expect( onClick ).not.toHaveBeenCalled();
+	} );
+
+	test( 'relabels as the reset action when a local override is set', () => {
+		render( <InheritanceIndicatorButton hasLocalOverride /> );
 		expect(
 			screen.getByRole( 'button', {
 				name: 'Reset to inherited value',
@@ -28,10 +56,13 @@ describe( 'InheritanceResetButton', () => {
 		).toBeVisible();
 	} );
 
-	test( 'invokes the reset handler when activated', async () => {
+	test( 'invokes the reset handler when activated in the override state', async () => {
 		const onResetToInherited = jest.fn();
 		render(
-			<InheritanceResetButton onResetToInherited={ onResetToInherited } />
+			<InheritanceIndicatorButton
+				hasLocalOverride
+				onResetToInherited={ onResetToInherited }
+			/>
 		);
 		await click(
 			screen.getByRole( 'button', { name: 'Reset to inherited value' } )
@@ -40,11 +71,31 @@ describe( 'InheritanceResetButton', () => {
 	} );
 
 	test( 'does not expose a menu or a push-to-Global-Styles action', () => {
-		render( <InheritanceResetButton onResetToInherited={ () => {} } /> );
+		render( <InheritanceIndicatorButton hasLocalOverride /> );
 		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 		expect(
 			screen.queryByRole( 'menuitem', { name: /Make default/ } )
 		).not.toBeInTheDocument();
+	} );
+
+	test( 'keeps the same button element and its focus after a reset', async () => {
+		const { rerender } = render(
+			<InheritanceIndicatorButton hasLocalOverride />
+		);
+		const button = screen.getByRole( 'button', {
+			name: 'Reset to inherited value',
+		} );
+		await act( async () => button.focus() );
+		expect( button ).toHaveFocus();
+
+		rerender( <InheritanceIndicatorButton hasLocalOverride={ false } /> );
+
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Inherited from Global Styles',
+			} )
+		).toBe( button );
+		expect( button ).toHaveFocus();
 	} );
 } );
 
@@ -57,9 +108,6 @@ describe( 'getInheritanceProps', () => {
 	} );
 
 	test( 'returns ONLY the inherited className when isInherited is set', () => {
-		// The inherited state is conveyed purely through the className hook
-		// (`is-inherited-from-global-styles`), which the SCSS uses to apply
-		// the dotted-underline label treatment. No dot is rendered.
 		expect( getInheritanceProps( true, false ) ).toEqual( {
 			className: 'is-inherited-from-global-styles',
 			isInherited: true,
@@ -143,43 +191,48 @@ describe( 'getInheritanceProps', () => {
 } );
 
 describe( 'InheritanceToolsPanelItem inherited state', () => {
-	function renderInheritedItem( label, labelClassName ) {
+	function renderInheritedItem( props ) {
 		return render(
 			<ToolsPanel label="Panel" panelId="panel">
 				<InheritanceToolsPanelItem
 					{ ...getInheritanceProps( true, false ) }
-					label={ label }
+					label="Line height"
 					panelId="panel"
 					isShownByDefault
 					hasValue={ () => false }
+					{ ...props }
 				>
-					<div className={ labelClassName }>{ label }</div>
+					<div className="components-base-control__label">
+						Line height
+					</div>
 				</InheritanceToolsPanelItem>
 			</ToolsPanel>
 		);
 	}
 
-	// The SCSS treatment keys off the label class, and controls on a bare
-	// `UnitControl`/`NumberControl` expose `input-control__label` rather than
-	// the usual `base-control__label`, so guard both.
-	test.each( [
-		[ 'base-control', 'components-base-control__label' ],
-		[ 'input-control', 'components-input-control__label' ],
-	] )(
-		'nests the %s label inside the inherited-from-global-styles item',
-		( _name, labelClassName ) => {
-			renderInheritedItem( 'Line height', labelClassName );
-			const label = screen.getByText( 'Line height' );
-			expect( label ).toHaveClass( labelClassName );
-			expect(
-				// eslint-disable-next-line testing-library/no-node-access
-				label.closest( '.is-inherited-from-global-styles' )
-			).not.toBeNull();
-		}
-	);
+	test( 'renders the inherited indicator as a sibling of the control, not inside the label', () => {
+		renderInheritedItem();
+		const indicator = screen.getByRole( 'button', {
+			name: 'Inherited from Global Styles',
+		} );
+		expect( indicator ).toBeVisible();
+		expect(
+			// eslint-disable-next-line testing-library/no-node-access
+			indicator.closest( '.components-base-control__label' )
+		).toBeNull();
+	} );
+
+	test( 'does not render the indicator when showInheritanceAffordance is false', () => {
+		renderInheritedItem( { showInheritanceAffordance: false } );
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Inherited from Global Styles',
+			} )
+		).not.toBeInTheDocument();
+	} );
 
 	test( 'does not render a reset dot in the inherited state', () => {
-		renderInheritedItem( 'Line height', 'components-base-control__label' );
+		renderInheritedItem();
 		expect(
 			screen.queryByRole( 'button', {
 				name: 'Reset to inherited value',
@@ -225,12 +278,12 @@ describe( 'InheritanceToolsPanelItem local-override reset dot', () => {
 		).toBeNull();
 	} );
 
-	test( 'does not render the item reset dot when showLocalOverrideActionsInLabel is false', () => {
+	test( 'does not render the item reset dot when showInheritanceAffordance is false', () => {
 		// Color/background render their own reset control next to a custom
 		// toggle, so the item must not render a second one.
 		renderItem( {
 			hasLocalOverride: true,
-			showLocalOverrideActionsInLabel: false,
+			showInheritanceAffordance: false,
 			onDeselect: () => {},
 		} );
 		expect(

@@ -1,39 +1,8 @@
 @use "@wordpress/base-styles/variables" as *;
 
-// Inherited Global Styles values — visual treatment for inspector control
-// labels.
-//
-// `.is-inherited-from-global-styles` marks controls displaying inherited
-// values: the label gets a dotted underline.
-// `.has-local-override-from-global-styles` marks controls that locally override
-// inherited values: a blue reset dot is rendered as a sibling at the item's
-// inline-end. The states are mutually exclusive.
-.is-inherited-from-global-styles {
-	// `.components-base-control__label` covers most controls (ToggleGroup,
-	// selects, the visible `<span>` label some controls render). Controls
-	// built on a bare `UnitControl`/`NumberControl` (Line height, Letter
-	// spacing, Columns, and unit-based dimension inputs) instead expose their
-	// visible label as `.components-input-control__label`, so it must be
-	// targeted too or those controls silently miss the inherited treatment.
-	.components-base-control__label,
-	.components-input-control__label {
-		text-decoration-line: underline;
-		text-decoration-style: dotted;
-		text-decoration-thickness: 1px;
-		text-underline-offset: 0.2em;
-	}
-
-	// These labels sit in truncated flex containers where an underline is
-	// clipped by `overflow: hidden`; a dotted bottom border stays visible.
-	.block-editor-panel-color-gradient-settings__color-name,
-	.block-editor-global-styles-background-panel__inspector-media-replace-title,
-	.block-editor-panel-duotone-settings__label {
-		border-bottom: 1px dotted currentColor;
-	}
-}
-
-// Local-override reset dot — a sibling of the control positioned at the item's
-// inline-end.
+// Inherited Global Styles values — mutually exclusive state hooks. Both
+// position the same indicator button at the item's inline-end.
+.is-inherited-from-global-styles,
 .has-local-override-from-global-styles {
 	position: relative;
 }
@@ -48,19 +17,19 @@
 	justify-content: center;
 	pointer-events: none;
 
-	// Match the label line height so the shorter (14px) reset dot centers on
+	// Match the label line height so the shorter (14px) indicator centers on
 	// the 16px label rather than pinning to its top.
 	height: $grid-unit-20;
 
 	// Controls that render a 24px toggle at the item's inline-end (linked/
-	// unlink, units switch): shift the dot one toggle width plus an 8px gap
-	// toward the inline-start so it sits just to the left of that toggle and
-	// the two never overlap.
+	// unlink, units switch): shift the indicator one toggle width plus an 8px
+	// gap toward the inline-start so it sits just to the left of that toggle
+	// and the two never overlap.
 	&--offset-toggle {
 		inset-inline-end: calc(24px + 8px);
 	}
 
-	.has-local-override-from-global-styles__reset {
+	.global-styles-inheritance-indicator {
 		pointer-events: auto;
 		// The affordance wrapper handles placement; drop the inline margin the
 		// shared rule adds for the in-label (color/background) context.
@@ -68,10 +37,9 @@
 	}
 }
 
-// Local-override reset button. At rest it shows the blue dot signalling a local
-// override; on hover/focus the dot is swapped for the `reset` (dash) icon and a
-// "Reset to inherited value" tooltip.
-.has-local-override-from-global-styles__reset {
+// One button for both states: a purple rhombus while the value is inherited,
+// a blue dot to reset once the value is locally overridden.
+.global-styles-inheritance-indicator {
 	display: inline-flex !important;
 	align-items: center;
 	justify-content: center;
@@ -100,23 +68,32 @@
 	// pre-existing CSS). Reset to the design-system pointer token.
 	cursor: var(--wpds-cursor-control);
 
-	&:hover,
-	&:focus {
-		background: transparent !important;
-
-		.has-local-override-from-global-styles__dot {
-			display: none;
-		}
-
-		.has-local-override-from-global-styles__reset-icon {
-			display: block;
-		}
+	// Styles for when there is a Global Styles value to inherit.
+	&:not(.has-local-override)::before {
+		content: "";
+		display: block;
+		width: 6px;
+		height: 6px;
+		background-color: var(--wp-block-synced-color, #7a00df);
+		border-color: var(--wp-block-synced-color, #7a00df);
+		transform: rotate(45deg);
 	}
 
-	&:focus-visible {
-		// Inset focus ring so it doesn't push other text around.
-		outline: 1.5px solid var(--wp-admin-theme-color, #007cba);
-		outline-offset: 1px;
+	// Styles for when that inherited value is overridden locally.
+	&.has-local-override {
+		&::before {
+			content: "";
+			display: block;
+			width: 8px;
+			height: 8px;
+			background-color: var(--wp-admin-theme-color, #007cba);
+			border-radius: 50%;
+		}
+
+		&:hover::before,
+		&:focus::before {
+			height: 2px;
+		}
 	}
 
 	// Color/gradient control context: the button is positioned by
@@ -134,11 +111,10 @@
 		opacity: 1;
 	}
 
-	// Shadow control context: the blue-dot override reset reuses the shadow
-	// remove-button slot, which is absolutely positioned and hover-revealed
-	// (`opacity: 0`). The override dot must stay visible, so re-assert
-	// placement and force `opacity: 1` (this compound selector wins on
-	// specificity).
+	// Shadow control context: the indicator reuses the shadow remove-button
+	// slot, which is absolutely positioned and hover-revealed (`opacity: 0`).
+	// The indicator must stay visible, so re-assert placement and force
+	// `opacity: 1` (this compound selector wins on specificity).
 	&.block-editor-global-styles__shadow-editor__remove-button {
 		position: absolute;
 		justify-content: center;
@@ -150,8 +126,8 @@
 		opacity: 1;
 	}
 
-	// Reuses the hover-revealed remove-button slot; keep the override dot
-	// placed and always visible.
+	// Reuses the hover-revealed remove-button slot; keep the indicator placed
+	// and always visible.
 	&.block-editor-panel-duotone-settings__reset {
 		position: absolute;
 		justify-content: center;
@@ -162,23 +138,4 @@
 		margin-inline-start: 0;
 		opacity: 1;
 	}
-}
-
-.has-local-override-from-global-styles__dot {
-	display: block;
-	width: 8px;
-	height: 8px;
-	background-color: var(--wp-admin-theme-color, #007cba);
-	border-radius: 50%;
-}
-
-// The dash icon revealed on hover/focus, centered over the dot's slot and
-// clipped to the circular button bounds so the box size stays stable.
-.has-local-override-from-global-styles__reset-icon {
-	display: none;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	color: var(--wp-admin-theme-color, #007cba);
 }

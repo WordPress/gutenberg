@@ -359,7 +359,7 @@ export default function BackgroundImagePanel( {
 						hasLocalBackgroundImage && inheritedBackgroundImage,
 						'block-editor-color-gradient-item'
 					) }
-					showLocalOverrideActionsInLabel={ false }
+					showInheritanceAffordance={ false }
 					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
 					onDeselect={ resetBackground }
