@@ -94,6 +94,7 @@ $GLOBALS['wp_tests_options'] = array(
 		'gutenberg-guidelines'         => 1,
 		'gutenberg-content-types'      => 1,
 		'gutenberg-dashboard-widgets'  => 1,
+		'gutenberg-real-time-collaboration-polling-provider' => 1,
 	),
 );
 

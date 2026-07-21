@@ -52,6 +52,8 @@ export const SECOND_USER: UserCredentials = {
 
 const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
 const USE_TEST_WS_PROVIDER = process.env.GUTENBERG_RTC_TEST_WS_PROVIDER === '1';
+const POLLING_PROVIDER_EXPERIMENT =
+	'gutenberg-real-time-collaboration-polling-provider';
 
 export default class CollaborationUtils {
 	private admin: Admin;
@@ -631,11 +633,48 @@ export default class CollaborationUtils {
 }
 
 /**
+ * Set the HTTP polling provider experiment for collaboration tests. The
+ * WebSocket suite always leaves polling disabled.
+ *
+ * @param requestUtils An instance of RequestUtils for making HTTP requests.
+ * @param enabled      Whether to enable or disable the polling experiment.
+ */
+async function setPollingProviderExperiment(
+	requestUtils: RequestUtils,
+	enabled: boolean
+): Promise< void > {
+	const settings = await requestUtils.rest< {
+		'gutenberg-experiments'?: Record< string, boolean >;
+	} >( {
+		path: '/wp/v2/settings',
+		method: 'GET',
+	} );
+	const experiments = {
+		...( settings[ 'gutenberg-experiments' ] || {} ),
+	};
+
+	if ( enabled && ! USE_TEST_WS_PROVIDER ) {
+		experiments[ POLLING_PROVIDER_EXPERIMENT ] = true;
+	} else {
+		delete experiments[ POLLING_PROVIDER_EXPERIMENT ];
+	}
+
+	await requestUtils.rest( {
+		path: '/wp/v2/settings',
+		method: 'POST',
+		data: {
+			'gutenberg-experiments': experiments,
+		},
+	} );
+}
+
+/**
  * Set the real-time collaboration WordPress setting.
  *
  * Uses the form-based approach (similar to setGutenbergExperiments)
  * because this setting is registered on admin_init in the "writing"
- * group and is not exposed via /wp/v2/settings.
+ * group and is not exposed via /wp/v2/settings. The HTTP polling experiment
+ * is kept in sync, while the WebSocket suite leaves polling disabled.
  *
  * @param requestUtils An instance of RequestUtils for making HTTP requests.
  * @param enabled      Whether to enable or disable collaboration.
@@ -644,6 +683,8 @@ export async function setCollaboration(
 	requestUtils: RequestUtils,
 	enabled: boolean
 ): Promise< void > {
+	await setPollingProviderExperiment( requestUtils, enabled );
+
 	// Relative path: a leading slash would resolve against the origin and
 	// break on subdirectory installs.
 	const response = await requestUtils.request.get(

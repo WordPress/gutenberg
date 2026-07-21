@@ -58,9 +58,11 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 	 * Registers REST API routes for collaborative editing.
 	 */
 	function gutenberg_register_collaboration_rest_routes(): void {
-		$sync_storage = new WP_Sync_Post_Meta_Storage();
-		$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
-		$sync_server->register_routes();
+		if ( gutenberg_is_experiment_enabled( 'gutenberg-real-time-collaboration-polling-provider' ) ) {
+			$sync_storage = new WP_Sync_Post_Meta_Storage();
+			$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
+			$sync_server->register_routes();
+		}
 
 		$sync_save_server = new WP_Sync_Save_Server();
 		$sync_save_server->register_routes();

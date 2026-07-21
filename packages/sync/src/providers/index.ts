@@ -12,13 +12,15 @@ import type { ProviderCreator } from '../types';
 let providerCreators: ProviderCreator[] | null = null;
 
 /**
- * Returns the defeault provider creators. HTTP polling is the current default
- * provider.
+ * Returns the default provider creators. HTTP polling is available when its
+ * Gutenberg experiment is enabled.
  *
  * @return {ProviderCreator[]} Creator functions for Yjs providers.
  */
 export function getDefaultProviderCreators(): ProviderCreator[] {
-	return [ createHttpPollingProvider() ];
+	return window.experimentalPollingProvider
+		? [ createHttpPollingProvider() ]
+		: [];
 }
 
 /**

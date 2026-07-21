@@ -80,6 +80,17 @@ function gutenberg_initialize_experiments_settings() {
 			),
 		),
 		array(
+			'slug'  => 'real-time-collaboration',
+			'label' => _x( 'Real-Time Collaboration', 'experiments group name', 'gutenberg' ),
+			'items' => array(
+				array(
+					'id'          => 'gutenberg-real-time-collaboration-polling-provider',
+					'label'       => __( 'Polling provider', 'gutenberg' ),
+					'description' => __( 'Enables the HTTP polling provider for real-time collaboration.', 'gutenberg' ),
+				),
+			),
+		),
+		array(
 			'slug'  => 'templates',
 			'label' => _x( 'Templates', 'experiments group name', 'gutenberg' ),
 			'items' => array(

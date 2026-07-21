@@ -10,11 +10,15 @@ const {
 	recordRequests,
 	waitForRequestsToSettle,
 } = require( './record-requests' );
+const {
+	setCollaboration,
+} = require( '../editor/collaboration/fixtures/collaboration-utils' );
 
 test.describe( 'Preload', () => {
 	let postId;
 
 	test.beforeAll( async ( { requestUtils } ) => {
+		await setCollaboration( requestUtils, true );
 		const post = await requestUtils.createPost( {
 			content:
 				'<!-- wp:heading -->\n<h2 class="wp-block-heading">Hello</h2>\n<!-- /wp:heading -->',
@@ -24,7 +28,11 @@ test.describe( 'Preload', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
+		try {
+			await requestUtils.deleteAllPosts();
+		} finally {
+			await setCollaboration( requestUtils, false );
+		}
 	} );
 
 	test( 'Should fetch a known set of routes during startup', async ( {
