@@ -46,9 +46,10 @@ jest.mock( '../../../store', () => ( {
 } ) );
 
 // `inherited-value-context.js` imports `store as blocksStore` from
-// `@wordpress/blocks` for `useOwnVariation`. The blocks store's transitive
-// import chain fails under this file's `@wordpress/data` mock (missing
-// `createSelector`), so stub the blocks module with just the shape needed.
+// `@wordpress/blocks` for `useVariationAndElements`. The blocks store's
+// transitive import chain fails under this file's `@wordpress/data` mock
+// (missing `createSelector`), so stub the blocks module with just the shape
+// needed.
 jest.mock( '@wordpress/blocks', () => ( {
 	store: { name: 'core/blocks' },
 	getBlockType: ( blockName ) =>
@@ -96,6 +97,10 @@ describe( 'useResolvedStyle hook', () => {
 					[ globalStylesDataKey ]: rawGlobalStyles,
 				} ),
 				getBlockStyles: () => blockStyles,
+				// The hook reads the block's `level` attribute to pick the
+				// heading element layers; no block edit context is provided
+				// here, so `clientId` is undefined and attributes are empty.
+				getBlockAttributes: () => ( {} ),
 			} ) )
 		);
 	}
@@ -226,6 +231,7 @@ describe( 'useResolvedStyle – production bare-tree shape', () => {
 					[ globalStylesDataKey ]: rawGlobalStyles,
 				} ),
 				getBlockStyles: () => [],
+				getBlockAttributes: () => ( {} ),
 			} ) )
 		);
 		return render( ui );
