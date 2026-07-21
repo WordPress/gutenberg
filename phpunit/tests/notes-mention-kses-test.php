@@ -52,6 +52,22 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_class_tokens_are_stripped_from_uppercase_span_tags() {
+		// kses preserves tag-name casing, so the class reduction must match
+		// `SPAN` case-insensitively rather than bail on a `<span` substring check.
+		$filtered = $this->filter_comment_with_kses(
+			'note',
+			'Hi <SPAN class="wp-note-mention user-2 is-destructive">@admin</SPAN>!'
+		);
+
+		$this->assertEqualHTML(
+			self::MENTION_CONTENT,
+			wp_unslash( $filtered['comment_content'] ),
+			'<body>',
+			'Class tokens should be reduced on spans regardless of tag-name casing.'
+		);
+	}
+
 	public function test_class_attribute_is_removed_when_no_mention_tokens_remain() {
 		$filtered = $this->filter_comment_with_kses(
 			'comment',
