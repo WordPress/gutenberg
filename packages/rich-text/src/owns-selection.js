@@ -20,11 +20,11 @@ export function ownsSelection( element ) {
 		return false;
 	}
 
-	// Test the selection before the editing host. When the host is the
-	// editable canvas wrapper it contains every instance, so the host checks
-	// pass for all of them and only the selection discriminates. Reading
-	// `isContentEditable` also forces a style and layout tree update, so it
-	// is kept off the path that every unrelated instance walks.
+	// Order matters: the selection is checked before the editing host. When
+	// the host is the canvas wrapper it contains every editable element, so
+	// the host checks pass for all of them and only the selection tells them
+	// apart. Reading `isContentEditable` also forces a style and layout tree
+	// update, which every instance would then pay on every keystroke.
 	const selection = ownerDocument.defaultView?.getSelection();
 	const anchorNode = selection?.anchorNode;
 	const focusNode = selection?.focusNode;
