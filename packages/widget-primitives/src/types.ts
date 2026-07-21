@@ -13,7 +13,11 @@
  * External dependencies
  */
 import type { ComponentProps, ComponentType, ReactElement } from 'react';
-import type { Field } from '@wordpress/dataviews';
+
+/**
+ * Internal dependencies
+ */
+import type { ResolvableField } from './field-types';
 
 /**
  * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
@@ -66,8 +70,48 @@ export interface WidgetHelp {
  */
 type WidgetAttributeRelevance = 'high' | 'low';
 
-/** A DataViews `Field` plus the widget-layer `relevance` hint; what hosts read. */
-type WidgetAttribute< Item = unknown > = Field< Item > & {
+/**
+ * A user-triggerable action a widget type declares. The declaration is
+ * serializable data; the host materializes it as an affordance and owns
+ * placement. The action points at a `link` target the host renders as an
+ * anchor; `download` turns it into a file download.
+ */
+export interface WidgetAction {
+	/**
+	 * Stable identifier, local to the widget type.
+	 */
+	id: string;
+
+	/**
+	 * Human-readable label naming the action. Translatable.
+	 */
+	label: string;
+
+	/**
+	 * Destination the action points at. External URLs and admin PHP entry
+	 * points load a full page.
+	 */
+	href: string;
+
+	/**
+	 * When set, the browser downloads the destination instead of navigating.
+	 * A string supplies the suggested filename.
+	 */
+	download?: string | boolean;
+
+	/**
+	 * Whether the destination opens in a new browser tab.
+	 */
+	openInNewTab?: boolean;
+}
+
+/**
+ * A DataViews `Field` plus the widget-layer `relevance` hint; what hosts
+ * read. Its `type` may also reference a registered field type by name
+ * (see `registerFieldType`); `useWidgetTypes` resolves such references
+ * into plain `Field` props.
+ */
+type WidgetAttribute< Item = unknown > = ResolvableField< Item > & {
 	relevance?: WidgetAttributeRelevance;
 };
 
@@ -130,8 +174,8 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	 * Authoring intent about how the widget renders. Not a user-editable
 	 * attribute.
 	 *
-	 * - `'framed'` (default when absent): the widget renders its
-	 *   content only.
+	 * - `'framed'` (default when absent): the host paints a header from
+	 *   identity and pads the content area.
 	 * - `'content-bleed'`: the host's chrome stays visible while the
 	 *   content fills the content area edge-to-edge, with no padding.
 	 * - `'full-bleed'`: the widget renders edge-to-edge with no
@@ -167,6 +211,12 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	 * a `relevance` hint.
 	 */
 	attributes?: WidgetAttribute< Item >[];
+
+	/**
+	 * Declarative actions the widget type exposes. Hosts materialize each
+	 * one as an affordance and decide where to place it.
+	 */
+	actions?: WidgetAction[];
 
 	/**
 	 * Structured example data hosts use for previews, and the default
@@ -244,6 +294,7 @@ type WidgetModuleRecordOverrides = {
 		| 'category'
 		| 'presentation'
 		| 'keywords'
+		| 'actions'
 	> ]?: WidgetTypeMetadata[ K ] | null;
 };
 

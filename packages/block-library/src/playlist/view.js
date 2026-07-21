@@ -9,6 +9,7 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
 import {
 	initWaveformPlayer,
 	logPlayError,
+	setupPlayButtonArtwork,
 	updateSeekControlLabel,
 } from '../utils/waveform-utils';
 
@@ -16,6 +17,7 @@ import {
  * Store player state for each element.
  */
 const playerState = new WeakMap();
+const playlistPlayerState = new Map();
 
 const { state } = store(
 	'core/playlist',
@@ -26,10 +28,34 @@ const { state } = store(
 				const { currentId, trackId } = getContext();
 				return currentId === trackId;
 			},
+			get isCurrentTrackPlaying() {
+				const { currentId, isPlaying, trackId } = getContext();
+				return currentId === trackId && !! isPlaying;
+			},
+			get trackButtonActionLabel() {
+				const { labelPauseTrack, labelSelectTrack } = getContext();
+				return state.isCurrentTrackPlaying
+					? labelPauseTrack
+					: labelSelectTrack;
+			},
 		},
 		actions: {
 			changeTrack() {
 				const context = getContext();
+				if ( context.currentId === context.trackId ) {
+					const player = playlistPlayerState.get(
+						context.playlistId
+					)?.instance;
+					if ( player?.isPlaying ) {
+						context.isPlaying = false;
+						player.pause();
+					} else {
+						player?.play()?.catch( logPlayError );
+					}
+					return;
+				}
+
+				context.isPlaying = false;
 				context.currentId = context.trackId;
 			},
 		},
@@ -78,26 +104,47 @@ const { state } = store(
  */
 function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const existing = playerState.get( ref );
+	const showPlayButtonArtwork = context.showPlayButtonArtwork === true;
+	const playerArtwork = showPlayButtonArtwork ? '' : track.image;
 
 	// If a player already exists, load the new track without recreating.
 	if ( existing?.instance ) {
-		existing.instance
-			.loadTrack( track.url, track.title, track.artist, {
-				artwork: track.image,
-			} )
-			.then( () => {
-				existing.url = track.url;
-				// loadTrack() preserves the previous explicit seekLabel option.
-				updateSeekControlLabel(
-					existing.instance,
-					track.title || ref.dataset.labelSeek
-				);
-				if ( shouldAutoPlay ) {
-					existing.instance.play()?.catch( logPlayError );
-				}
-			} )
-			.catch( logPlayError );
-		return;
+		const shouldRecreatePlayer =
+			!! existing.instance.artworkEl !== !! playerArtwork;
+
+		if ( shouldRecreatePlayer ) {
+			existing.destroy?.();
+			playerState.delete( ref );
+		} else {
+			playlistPlayerState.set( context.playlistId, existing );
+			existing.instance
+				.loadTrack( track.url, track.title, track.artist, {
+					artwork: playerArtwork,
+					artworkAlt: playerArtwork ? track.imageAlt : '',
+				} )
+				.then( () => {
+					existing.url = track.url;
+					if ( existing.instance.artworkEl ) {
+						existing.instance.artworkEl.alt = track.imageAlt || '';
+					}
+					// loadTrack() preserves the previous explicit seekLabel option.
+					updateSeekControlLabel(
+						existing.instance,
+						track.title || ref.dataset.labelSeek
+					);
+					if ( showPlayButtonArtwork ) {
+						setupPlayButtonArtwork(
+							existing.container,
+							track.image
+						);
+					}
+					if ( shouldAutoPlay ) {
+						existing.instance.play()?.catch( logPlayError );
+					}
+				} )
+				.catch( logPlayError );
+			return;
+		}
 	}
 
 	// Read translated labels from server-rendered data attributes.
@@ -114,9 +161,15 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		title: track.title,
 		artist: track.artist,
 		image: track.image,
+		imageAlt: track.imageAlt,
+		waveformColor: ref.dataset.waveformPlayerColor,
+		waveformGradient: ref.dataset.waveformPlayerGradient,
+		backgroundColor: ref.dataset.waveformPlayerBackgroundColor,
+		backgroundGradient: ref.dataset.waveformPlayerBackgroundGradient,
 		autoPlay: shouldAutoPlay,
 		labels,
 		waveformStyle: context.waveformStyle,
+		showPlayButtonArtwork,
 		onEnded: () => {
 			// Advance to next track (autoPlay handles playback).
 			const currentIndex = context.tracks.findIndex(
@@ -128,11 +181,28 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			}
 		},
 	} );
+	const setIsPlaying = ( isPlaying ) => {
+		context.isPlaying = isPlaying;
+	};
+	const onPlay = () => setIsPlaying( true );
+	const onPause = () => setIsPlaying( false );
+	player.container.addEventListener( 'waveformplayer:play', onPlay );
+	player.container.addEventListener( 'waveformplayer:pause', onPause );
+	player.container.addEventListener( 'waveformplayer:ended', onPause );
+	const destroy = () => {
+		player.container.removeEventListener( 'waveformplayer:play', onPlay );
+		player.container.removeEventListener( 'waveformplayer:pause', onPause );
+		player.container.removeEventListener( 'waveformplayer:ended', onPause );
+		player.destroy();
+	};
 
 	// Store state for cleanup, including instance for loadTrack reuse.
-	playerState.set( ref, {
+	const nextState = {
 		url: track.url,
 		instance: player.instance,
-		destroy: player.destroy,
-	} );
+		container: player.container,
+		destroy,
+	};
+	playerState.set( ref, nextState );
+	playlistPlayerState.set( context.playlistId, nextState );
 }

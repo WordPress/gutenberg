@@ -49,7 +49,6 @@ export default function RenameDialog( {
 			>
 				<Stack gap="sm" direction="column">
 					<InputControl
-						__next40pxDefaultSize
 						autoComplete="off"
 						value={ newName }
 						onChange={ setNewName }
