@@ -1076,7 +1076,7 @@ test.describe( 'Block Notes', () => {
 		test( 'refuses a divergent dirty path instead of attaching to a saved sibling', async ( {
 			editor,
 			page,
-			blockNoteUtils,
+			pageUtils,
 		} ) => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -1109,7 +1109,25 @@ test.describe( 'Block Notes', () => {
 					.selectBlock( clientId );
 			}, targetClientId );
 
-			await blockNoteUtils.addNote( 'Do not attach to the sibling' );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.filter( { hasText: 'Dirty target' } )
+				.click();
+			await pageUtils.pressKeys( 'primaryAlt+M' );
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Do not attach to the sibling' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'treeitem', {
+						name: 'Note: Do not attach to the sibling',
+					} )
+			).toBeVisible();
 			await page.reload();
 
 			const blocks = await editor.getBlocks();
@@ -1260,7 +1278,6 @@ test.describe( 'Block Notes', () => {
 		test( 'serializes attachment repair behind an active sync save', async ( {
 			editor,
 			page,
-			blockNoteUtils,
 		} ) => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -1320,13 +1337,36 @@ test.describe( 'Block Notes', () => {
 			}, CORE_DATA_PRIVATE_APIS_CONSENT );
 			await syncSaveStarted;
 
-			const commentSaved = page.waitForResponse(
-				( response ) =>
-					response.request().method() === 'POST' &&
-					getRestPath( response.url() ) === '/wp/v2/comments'
-			);
-			const noteCreation = blockNoteUtils.addNote( 'Queued race note' );
-			await commentSaved;
+			await page.evaluate( ( consent ) => {
+				const { unlock } =
+					window.wp.privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+						consent,
+						'@wordpress/core-data'
+					);
+				const editorSelect = window.wp.data.select( 'core/editor' );
+				const blockEditorSelect =
+					window.wp.data.select( 'core/block-editor' );
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.updateBlockAttributes(
+						blockEditorSelect.getBlocks()[ 0 ].clientId,
+						{ metadata: { noteId: [ 123 ] } }
+					);
+				window.__blockNotesRepair = unlock(
+					window.wp.data.dispatch( 'core' )
+				).persistEntityBlockAttributes(
+					'postType',
+					editorSelect.getCurrentPostType(),
+					editorSelect.getCurrentPostId(),
+					{
+						record: editorSelect.getCurrentPost(),
+						blockPath: [ 0 ],
+						attributes: {
+							metadata: { noteId: [ 123 ] },
+						},
+					}
+				);
+			}, CORE_DATA_PRIVATE_APIS_CONSENT );
 			await page.evaluate(
 				() =>
 					new Promise( ( resolve ) =>
@@ -1338,7 +1378,7 @@ test.describe( 'Block Notes', () => {
 			expect( persistenceRequests ).toEqual( [ 'sync-save' ] );
 
 			releaseSyncSave();
-			await noteCreation;
+			await page.evaluate( () => window.__blockNotesRepair );
 			expect( persistenceRequests ).toEqual( [
 				'sync-save',
 				'attachment-repair',
@@ -1346,7 +1386,7 @@ test.describe( 'Block Notes', () => {
 			await page.reload();
 			expect(
 				( await editor.getBlocks() )[ 0 ].attributes.metadata.noteId
-			).toHaveLength( 1 );
+			).toEqual( [ 123 ] );
 		} );
 	} );
 
