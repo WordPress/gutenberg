@@ -132,6 +132,7 @@ function ColorGradientTab( {
 	isGradient,
 	inheritedValue,
 	inheritedSlug,
+	localSlug,
 	userValue,
 	setValue,
 	isPlaceholder,
@@ -142,6 +143,11 @@ function ColorGradientTab( {
 	// back to the inherited value so the at-rest preselection is visible
 	// inside the picker.
 	const displayed = userValue ?? inheritedValue;
+	// Selection inside the picker follows the slug of whichever value is
+	// displayed: the local slug once a value is set, the inherited slug at
+	// rest. Matching by slug keeps two same-hex presets apart; a slug-less
+	// (custom) value falls back to the picker's own hex matching.
+	const displayedSlug = userValue !== undefined ? localSlug : inheritedSlug;
 	// Display-without-commit interceptor. `ColorPalette` and `GradientPicker`
 	// fire `onChange( undefined )` when the user clicks the currently-selected
 	// option. At rest (placeholder mode), that click is the user's "accept
@@ -163,11 +169,7 @@ function ColorGradientTab( {
 			enableAlpha
 			__experimentalIsRenderedInSidebar
 			colorValue={ isGradient ? undefined : displayed }
-			colorSlug={
-				isGradient || userValue !== undefined
-					? undefined
-					: inheritedSlug
-			}
+			colorSlug={ isGradient ? undefined : displayedSlug }
 			gradientValue={ isGradient ? displayed : undefined }
 			onColorChange={ isGradient ? undefined : onChange }
 			onGradientChange={ isGradient ? onChange : undefined }

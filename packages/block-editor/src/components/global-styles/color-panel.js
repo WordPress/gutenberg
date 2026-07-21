@@ -324,6 +324,10 @@ export default function ColorPanel( {
 						inheritedValue?.elements?.link?.color?.text,
 						'color'
 					),
+					localSlug: extractPresetSlug(
+						value?.elements?.link?.color?.text,
+						'color'
+					),
 					setValue: setLinkColor,
 					userValue: userLinkColor,
 					isPlaceholder:
@@ -336,6 +340,10 @@ export default function ColorPanel( {
 					inheritedSlug: extractPresetSlug(
 						inheritedValue?.elements?.link?.[ ':hover' ]?.color
 							?.text,
+						'color'
+					),
+					localSlug: extractPresetSlug(
+						value?.elements?.link?.[ ':hover' ]?.color?.text,
 						'color'
 					),
 					setValue: setHoverLinkColor,
@@ -476,6 +484,10 @@ export default function ColorPanel( {
 						inheritedValue?.elements?.[ name ]?.color?.text,
 						'color'
 					),
+					localSlug: extractPresetSlug(
+						value?.elements?.[ name ]?.color?.text,
+						'color'
+					),
 					setValue: setElementTextColor,
 					userValue: elementTextUserColor,
 					isPlaceholder: isElementTextPlaceholder,
@@ -488,6 +500,10 @@ export default function ColorPanel( {
 						inheritedSlug: extractPresetSlug(
 							inheritedValue?.elements?.[ name ]?.color
 								?.background,
+							'color'
+						),
+						localSlug: extractPresetSlug(
+							value?.elements?.[ name ]?.color?.background,
 							'color'
 						),
 						setValue: setElementBackgroundColor,

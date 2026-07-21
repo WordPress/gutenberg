@@ -400,22 +400,19 @@ export default function BackgroundImagePanel( {
 							key: 'background',
 							label: __( 'Color' ),
 							inheritedValue: backgroundColor,
-							// Resolve the slug from the same source as the
-							// displayed value (user value first, then the
-							// inherited fallback). For a block instance the
-							// selection lives in `value` while `inheritedValue`
-							// only holds the global styles fallback, so reading
-							// the slug from `inheritedValue` alone would miss it
-							// and two same-hex presets would both appear selected.
-							inheritedSlug:
-								extractPresetSlug(
-									value?.color?.background,
-									'color'
-								) ??
-								extractPresetSlug(
-									inheritedValue?.color?.background,
-									'color'
-								),
+							// The picker matches selection by slug, following
+							// whichever value is displayed: `localSlug` once a
+							// value is set, `inheritedSlug` at rest. Without
+							// the slugs it falls back to hex matching, which
+							// marks two same-hex presets as both selected.
+							inheritedSlug: extractPresetSlug(
+								inheritedValue?.color?.background,
+								'color'
+							),
+							localSlug: extractPresetSlug(
+								value?.color?.background,
+								'color'
+							),
 							setValue: setBackgroundColor,
 							userValue: userBackgroundColor,
 							isPlaceholder:

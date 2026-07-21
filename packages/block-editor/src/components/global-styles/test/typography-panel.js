@@ -774,6 +774,23 @@ describe( 'TypographyPanel — duplicate-hex preset slug identity', () => {
 		const result = onChange.mock.calls[ 0 ][ 0 ];
 		expect( result?.color?.text ).toBe( 'var:preset|color|dark-text' );
 	} );
+
+	it( 'marks only the local preset as selected when another preset shares its hex', async () => {
+		await renderAriakit(
+			<TypographyPanel
+				value={ { color: { text: 'var:preset|color|dark-text' } } }
+				settings={ DUPLICATE_PALETTE_SETTINGS }
+				panelId="test"
+				onChange={ jest.fn() }
+			/>
+		);
+
+		// swatch[0] = 'Dark Background', swatch[1] = 'Dark Text'. Selection
+		// must follow the stored slug; matching by hex would mark both.
+		const swatches = await openTextColorDropdown();
+		expect( swatches[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
+		expect( swatches[ 0 ] ).toHaveAttribute( 'aria-selected', 'false' );
+	} );
 } );
 
 describe( 'TypographyPanel — setTextColor link sync', () => {
