@@ -18,6 +18,64 @@ test.describe( 'Block Notes', () => {
 		await requestUtils.deleteAllComments( 'note' );
 	} );
 
+	// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
+	// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
+	// palette is changed without updating the e2e expectation.
+	const AVATAR_BORDER_COLORS = [
+		'#6F42C1',
+		'#D94145',
+		'#FBBF24',
+		'#FF35EE',
+		'#879F11',
+		'#0F766E',
+		'#00CFFF',
+	];
+
+	function hexToRgb( hex ) {
+		return {
+			r: parseInt( hex.slice( 1, 3 ), 16 ),
+			g: parseInt( hex.slice( 3, 5 ), 16 ),
+			b: parseInt( hex.slice( 5, 7 ), 16 ),
+		};
+	}
+
+	/**
+	 * Classify an element's computed background against an expected author
+	 * color. Returns 'rest' (alpha ≈ 0x40), 'active' (alpha ≈ 0x80), or a
+	 * readable description of what was actually found so a failure reports the
+	 * real value rather than just `false`.
+	 *
+	 * @param {import('@playwright/test').Locator} locator Element to inspect.
+	 * @param {Object}                             rgb     Expected author color.
+	 * @param {number}                             rgb.r   Red channel.
+	 * @param {number}                             rgb.g   Green channel.
+	 * @param {number}                             rgb.b   Blue channel.
+	 * @return {Promise<string>} 'rest', 'active', or a description.
+	 */
+	async function readTint( locator, { r, g, b } ) {
+		const bg = await locator.evaluate(
+			( el ) => window.getComputedStyle( el ).backgroundColor
+		);
+		const m = bg.match(
+			/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
+		);
+		if ( ! m ) {
+			return bg;
+		}
+		const alpha = m[ 4 ] ? Number( m[ 4 ] ) : 1;
+		const matchesColor =
+			Number( m[ 1 ] ) === r &&
+			Number( m[ 2 ] ) === g &&
+			Number( m[ 3 ] ) === b;
+		if ( matchesColor && alpha > 0.2 && alpha < 0.35 ) {
+			return 'rest';
+		}
+		if ( matchesColor && alpha > 0.45 && alpha < 0.55 ) {
+			return 'active';
+		}
+		return `${ m[ 1 ] },${ m[ 2 ] },${ m[ 3 ] } a=${ alpha }`;
+	}
+
 	test( 'should move focus to add a new note form', async ( {
 		editor,
 		page,
@@ -1263,27 +1321,6 @@ test.describe( 'Block Notes', () => {
 	} );
 
 	test.describe( 'Inline notes', () => {
-		// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
-		// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
-		// palette is changed without updating the e2e expectation.
-		const AVATAR_BORDER_COLORS = [
-			'#6F42C1',
-			'#D94145',
-			'#FBBF24',
-			'#FF35EE',
-			'#879F11',
-			'#0F766E',
-			'#00CFFF',
-		];
-
-		function hexToRgb( hex ) {
-			return {
-				r: parseInt( hex.slice( 1, 3 ), 16 ),
-				g: parseInt( hex.slice( 3, 5 ), 16 ),
-				b: parseInt( hex.slice( 5, 7 ), 16 ),
-			};
-		}
-
 		test( 'highlights an inline marker with the author color at the rest opacity', async ( {
 			editor,
 			page,
@@ -1760,6 +1797,103 @@ test.describe( 'Block Notes', () => {
 					} )
 					.toBeLessThan( 12 );
 			} );
+		} );
+	} );
+
+	test.describe( 'Block-level note highlight', () => {
+		test( 'tints the whole text block with the author color and strengthens when selected', async ( {
+			editor,
+			page,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
+			const rgb = hexToRgb(
+				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
+			);
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Note the whole block.' },
+			} );
+
+			// No text selection, so this takes the block-level path: the note
+			// is anchored via `metadata.noteId` with no inline `<mark>`.
+			await blockNoteUtils.addNote( 'Whole block note' );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			// The block-level note carries no inline marker to tint.
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+
+			// Adding a note auto-selects it, so the block starts at the active
+			// alpha. Move focus to the title to settle it back to rest.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+			await expect
+				.poll( () => readTint( paragraph, rgb ) )
+				.toBe( 'rest' );
+
+			// Selecting the note from the sidebar promotes the block to the
+			// stronger active alpha.
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Whole block note' } )
+				.click();
+			await expect
+				.poll( () => readTint( paragraph, rgb ) )
+				.toBe( 'active' );
+		} );
+
+		test( 'clears the tint when the block-level note is deleted', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Tint goes away.' },
+			} );
+			await blockNoteUtils.addNote( 'Temporary note' );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const backgroundOf = () =>
+				paragraph.evaluate(
+					( el ) => window.getComputedStyle( el ).backgroundColor
+				);
+
+			// Tinted while the note exists.
+			await expect
+				.poll( backgroundOf )
+				.not.toMatch( /rgba\(0,\s*0,\s*0,\s*0\)|transparent/ );
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await settings
+				.getByRole( 'treeitem', { name: 'Note: Temporary note' } )
+				.click();
+			await settings
+				.getByRole( 'button', { name: 'Actions' } )
+				.first()
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
+			// Confirm the destructive action in the dialog.
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+
+			// Back to no background once the anchoring metadata is gone.
+			await expect
+				.poll( backgroundOf )
+				.toMatch( /rgba\(0,\s*0,\s*0,\s*0\)|transparent/ );
 		} );
 	} );
 
