@@ -50,6 +50,8 @@ import CustomValueControls from './custom-value-controls';
  * @param {Function} props.onMouseOut          Callback for mouse out events.
  * @param {Function} props.onMouseOver         Callback for mouse over events.
  * @param {Function} props.onUnitChange        Callback when unit changes.
+ * @param {string}   props.placeholder         Placeholder text forwarded to the inner UnitControl when
+ *                                             rendered in custom-value mode.
  * @param {Array}    props.presets             Array of preset objects with name, slug, and size.
  * @param {string}   props.presetType          Type of preset (e.g., 'spacing', 'border-radius').
  * @param {string}   props.selectedUnit        Currently selected unit (e.g., 'px', 'em').
@@ -73,6 +75,7 @@ export default function PresetInputControl( {
 	onMouseOut,
 	onMouseOver,
 	onUnitChange,
+	placeholder,
 	presets = [],
 	presetType,
 	selectedUnit,
@@ -95,7 +98,7 @@ export default function PresetInputControl( {
 	const hasPresets = marks.length > 0;
 	const showRangeControl = presets.length <= RANGE_CONTROL_MAX_SIZE;
 
-	const allPlaceholder = isMixed ? __( 'Mixed' ) : null;
+	const allPlaceholder = isMixed ? __( 'Mixed' ) : placeholder ?? null;
 
 	const [ minValue, setMinValue ] = useState( minimumCustomValue );
 	const [ showCustomValueControl, setShowCustomValueControl ] = useState(

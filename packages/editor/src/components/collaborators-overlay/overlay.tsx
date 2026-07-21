@@ -46,15 +46,20 @@ export function Overlay( {
 	const [ overlayElement, setOverlayElement ] =
 		useState< HTMLDivElement | null >( null );
 
-	const { cursors, rerenderCursorsAfterDelay } = useRenderCursors(
-		overlayElement,
-		blockEditorDocument ?? null,
-		postId ?? null,
-		postType ?? null,
-		RERENDER_DELAY_MS
-	);
+	const { cursors, rerenderCursorsAfterDelay, rerenderCursorsOnResize } =
+		useRenderCursors(
+			overlayElement,
+			blockEditorDocument ?? null,
+			postId ?? null,
+			postType ?? null,
+			RERENDER_DELAY_MS
+		);
 
-	const { highlights, rerenderHighlightsAfterDelay } = useBlockHighlighting(
+	const {
+		highlights,
+		rerenderHighlightsAfterDelay,
+		rerenderHighlightsOnResize,
+	} = useBlockHighlighting(
 		overlayElement,
 		blockEditorDocument ?? null,
 		postId ?? null,
@@ -64,10 +69,12 @@ export function Overlay( {
 
 	// Detect layout changes on overlay (e.g. turning on "Show Template") and window
 	// resizes, and re-render the cursors and block highlights.
+	// Use the RAF-based callback so positions are measured after the browser
+	// has finished layout, without an arbitrary fixed delay.
 	const onResize = useCallback( () => {
-		rerenderCursorsAfterDelay();
-		rerenderHighlightsAfterDelay();
-	}, [ rerenderCursorsAfterDelay, rerenderHighlightsAfterDelay ] );
+		rerenderCursorsOnResize();
+		rerenderHighlightsOnResize();
+	}, [ rerenderCursorsOnResize, rerenderHighlightsOnResize ] );
 	const resizeObserverRef = useResizeObserver( onResize );
 
 	// Trigger the initial position computation on mount.
