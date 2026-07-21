@@ -38,7 +38,9 @@ import { createUndoManager } from './undo-manager';
 import {
 	createYjsDoc,
 	deserializeCrdtDoc,
+	getEntityAutosavedAt,
 	initializeYjsDoc,
+	markEntityAsAutosaved,
 	markEntityAsSaved,
 	serializeCrdtDoc,
 } from './utils';
@@ -703,6 +705,63 @@ export function createSyncManager( debug = false ): SyncManager {
 	}
 
 	/**
+	 * Record a successful autosave by a user in the entity's CRDT document.
+	 *
+	 * @param {ObjectType} objectType  Object type.
+	 * @param {ObjectID}   objectId    Object ID.
+	 * @param {number}     authorId    WordPress user ID of the autosave author.
+	 * @param {number}     autosavedAt Autosave modified time as epoch seconds (UTC).
+	 */
+	function markEntityAutosaved(
+		objectType: ObjectType,
+		objectId: ObjectID,
+		authorId: number,
+		autosavedAt: number
+	): void {
+		const entityId = getEntityId( objectType, objectId );
+		const entityState = entityStates.get( entityId );
+
+		if ( ! entityState ) {
+			log( 'markEntityAutosaved', 'no entity state', entityId );
+			return;
+		}
+
+		const { ydoc } = entityState;
+
+		// This runs once per autosave, not on the typing hot path, so a
+		// synchronous transaction is fine and guarantees the marker is
+		// captured by `createPersistedCRDTDoc` and the provider update
+		// queue. The state map is not in the undo scope.
+		ydoc.transact( () => {
+			markEntityAsAutosaved( ydoc, authorId, autosavedAt );
+		}, LOCAL_SYNC_MANAGER_ORIGIN );
+	}
+
+	/**
+	 * Get the last recorded autosave time for a user from the entity's CRDT
+	 * document, if the entity is loaded and a marker exists.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 * @param {number}     authorId   WordPress user ID of the autosave author.
+	 * @return {number|undefined} Autosave modified time as epoch seconds (UTC).
+	 */
+	function getEntityAutosavedAtForEntity(
+		objectType: ObjectType,
+		objectId: ObjectID,
+		authorId: number
+	): number | undefined {
+		const entityId = getEntityId( objectType, objectId );
+		const entityState = entityStates.get( entityId );
+
+		if ( ! entityState ) {
+			return undefined;
+		}
+
+		return getEntityAutosavedAt( entityState.ydoc, authorId );
+	}
+
+	/**
 	 * Update the entity record in the local store with changes from the CRDT
 	 * document.
 	 *
@@ -777,8 +836,10 @@ export function createSyncManager( debug = false ): SyncManager {
 	return {
 		createPersistedCRDTDoc: debugWrap( createPersistedCRDTDoc ),
 		getAwareness,
+		getEntityAutosavedAt: getEntityAutosavedAtForEntity,
 		load: debugWrap( loadEntity ),
 		loadCollection: debugWrap( loadCollection ),
+		markEntityAutosaved: debugWrap( markEntityAutosaved ),
 		// Use getter to ensure we always return the current value of `undoManager`.
 		get undoManager(): SyncUndoManager | undefined {
 			return undoManager;
