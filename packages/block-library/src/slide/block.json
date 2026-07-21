@@ -12,10 +12,22 @@
 		"anchor": true,
 		"html": false,
 		"reusable": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
 		"color": {
 			"background": true,
 			"text": true,
-			"gradients": true
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true
+			}
 		},
 		"__experimentalBorder": {
 			"radius": true,

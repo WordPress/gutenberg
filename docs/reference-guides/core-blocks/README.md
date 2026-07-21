@@ -975,7 +975,7 @@ A single slide within a slider.
 -	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/slider
--	**Supports:** anchor, color (background, gradients, text), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), ~~html~~, ~~reusable~~
 
 ## Slider
 
@@ -985,7 +985,7 @@ Display content in a scrolling slider.
 -	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Allowed Blocks:** core/slide
--	**Supports:** align, ariaLabel, interactivity, spacing (margin), ~~html~~
+-	**Supports:** align, ariaLabel, dimensions (minHeight), interactivity, spacing (margin), ~~html~~
 -	**Attributes:** arrowIcon, indicatorStyle, loop, navigationButtonType, navigationJustification, navigationPosition, showIndicators, slidesToShow
 
 ## Social Icon

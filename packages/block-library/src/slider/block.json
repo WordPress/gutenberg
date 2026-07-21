@@ -52,6 +52,12 @@
 		"ariaLabel": true,
 		"html": false,
 		"interactivity": true,
+		"dimensions": {
+			"minHeight": true,
+			"__experimentalDefaultControls": {
+				"minHeight": true
+			}
+		},
 		"spacing": {
 			"margin": true
 		}

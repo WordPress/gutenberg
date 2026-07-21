@@ -38,6 +38,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`ariaLabel`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#arialabel): `true`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
+- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - `minHeight`: `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
 

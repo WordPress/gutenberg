@@ -18,12 +18,13 @@
 		white-space: nowrap;
 		scrollbar-width: none;
 		flex: 1 1 0%;
-		min-height: 0;
+		min-height: inherit;
 
 		// Slides: inline-block so they sit side-by-side inside the scroll container.
 		// Width is set by slide/style.scss via --wp--slider-slides-to-show.
 		> .wp-block-slide {
 			display: inline-block;
+			min-height: inherit;
 			vertical-align: top;
 			white-space: normal;
 		}
