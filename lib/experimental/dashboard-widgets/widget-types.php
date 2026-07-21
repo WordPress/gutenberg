@@ -113,11 +113,11 @@ function gutenberg_sanitize_widget_help( $help ) {
 /**
  * Resolves a widget-local file href to a plugin URL.
  *
- * Leaves absolute, scheme-relative, root-relative, and admin `.php` hrefs
- * unchanged. Returns '' for local path traversal and for relative hrefs that
- * are not a file under `widgets/{dir}/` (so `esc_url_raw()` cannot invent
- * `http://filename`). Query strings on local filenames are not stripped —
- * `report.csv?v=2` will not resolve as a file.
+ * Leaves absolute, scheme-relative, root-relative, and single-segment admin
+ * `.php` hrefs unchanged. Returns '' for local path traversal and for
+ * relative hrefs that are not a file under `widgets/{dir}/` (so
+ * `esc_url_raw()` cannot invent `http://filename`). Query strings on local
+ * filenames are not stripped: `report.csv?v=2` will not resolve as a file.
  *
  * @param string $href     Action href.
  * @param string $dir_name Widget directory name.
@@ -142,10 +142,12 @@ function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
 		return '';
 	}
 
-	$path_only = explode( '?', $href, 2 )[0];
-	// Admin-relative PHP entry points stay as-is.
+	$path_only = preg_split( '/[?#]/', $href, 2 )[0];
 	if ( str_ends_with( strtolower( $path_only ), '.php' ) ) {
-		return $href;
+		// Single-segment admin entry points stay as-is. Deeper relative
+		// paths would come out of `esc_url_raw()` as `http://` URLs, and
+		// PHP files never resolve as local widget assets.
+		return str_contains( $path_only, '/' ) ? '' : $href;
 	}
 
 	if ( ! is_string( $dir_name ) || '' === $dir_name ) {

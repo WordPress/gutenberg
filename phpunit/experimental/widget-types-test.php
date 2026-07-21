@@ -131,6 +131,16 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 					'download' => 'report.csv',
 				),
 				array(
+					'id'    => 'admin-fragment',
+					'label' => 'Admin with fragment',
+					'href'  => 'options-general.php#timezone',
+				),
+				array(
+					'id'    => 'nested-admin',
+					'label' => 'Nested admin path',
+					'href'  => 'network/settings.php',
+				),
+				array(
 					'id'    => 'dots-in-path',
 					'label' => 'Dots in absolute path',
 					'href'  => 'https://example.com/a..b/',
@@ -192,6 +202,11 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 					'label'    => 'Export CSV',
 					'href'     => 'admin.php?page=reports',
 					'download' => 'report.csv',
+				),
+				array(
+					'id'    => 'admin-fragment',
+					'label' => 'Admin with fragment',
+					'href'  => 'options-general.php#timezone',
 				),
 				array(
 					'id'    => 'dots-in-path',
@@ -272,6 +287,11 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 					'id'    => 'missing',
 					'label' => 'Missing file',
 					'href'  => 'no-such-file.txt',
+				),
+				array(
+					'id'    => 'nested-admin',
+					'label' => 'Nested admin path',
+					'href'  => 'network/settings.php',
 				),
 				array(
 					'id'    => 'health',
