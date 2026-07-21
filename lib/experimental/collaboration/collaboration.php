@@ -590,3 +590,45 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 
 	return $actions;
 }
+
+/**
+ * Adds the autosave author and modified time to the block editor settings
+ * when real-time collaboration is enabled.
+ *
+ * The editor uses these fields to decide whether the autosave content is
+ * already part of the shared collaboration document, in which case the
+ * "there is a more recent autosave" notice is not shown.
+ *
+ * @since 7.3.0
+ *
+ * @param array                   $settings             Editor settings.
+ * @param WP_Block_Editor_Context $block_editor_context The current block editor context.
+ * @return array Filtered editor settings.
+ */
+function gutenberg_add_autosave_details_to_editor_settings( $settings, $block_editor_context ) {
+	if ( ! isset( $settings['autosave'] ) || empty( $block_editor_context->post ) ) {
+		return $settings;
+	}
+
+	if ( ! wp_is_collaboration_enabled() ) {
+		return $settings;
+	}
+
+	$post = $block_editor_context->post;
+
+	if ( wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+		return $settings;
+	}
+
+	$autosave = wp_get_post_autosave( $post->ID );
+
+	if ( ! $autosave ) {
+		return $settings;
+	}
+
+	$settings['autosave']['authorId'] = (int) $autosave->post_author;
+	$settings['autosave']['modified'] = (int) mysql2date( 'U', $autosave->post_modified_gmt, false );
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'gutenberg_add_autosave_details_to_editor_settings', 10, 2 );
