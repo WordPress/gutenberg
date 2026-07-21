@@ -104,6 +104,7 @@ export default function save( { attributes } ) {
 				return style;
 			} )() }
 			title={ title }
+			role={ isDecorative ? 'none' : undefined }
 		/>
 	);
 
