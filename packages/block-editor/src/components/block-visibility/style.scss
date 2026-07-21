@@ -48,6 +48,15 @@
 	}
 }
 
+.block-editor-block-visibility-toolbar__reason {
+	display: flex;
+	align-items: center;
+	padding-inline-end: $grid-unit-15;
+	font-size: $font-size-small;
+	color: $gray-700;
+	white-space: nowrap;
+}
+
 .block-editor-block-visibility-info {
 	padding-top: $grid-unit-05;
 	padding-bottom: $grid-unit-05;

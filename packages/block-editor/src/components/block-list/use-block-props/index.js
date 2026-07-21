@@ -30,7 +30,10 @@ import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
-import { useBlockVisibility } from '../../block-visibility/';
+import {
+	useBlockVisibility,
+	getBlockVisibilityCondition,
+} from '../../block-visibility/';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -106,6 +109,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
+		isResponsiveEditing,
 	} = useContext( PrivateBlockContext );
 
 	const defaultViewRef = useRefEffect( ( element ) => {
@@ -116,8 +120,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		}
 	}, [] );
 
-	// translators: %s: Type of block (i.e. Text, Image etc)
-	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const ffDragRef = useFirefoxDraggableCompatibility();
 	const isHoverEnabled = ! isWithinSectionBlock;
@@ -151,12 +153,33 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		: {};
 
 	// Use block visibility hook with data from context to avoid extra subscription.
-	const { isBlockCurrentlyHidden } = useBlockVisibility( {
+	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
 		view: defaultViewRef.current,
 	} );
+
+	// Hidden blocks are only ghosted while responsive editing is on; otherwise
+	// they are visually hidden like on the front end.
+	const isGhosted = !! isResponsiveEditing && isBlockCurrentlyHidden;
+	const ghostCondition = isGhosted
+		? getBlockVisibilityCondition(
+				blockVisibility,
+				currentViewport,
+				viewportSettings
+		  )
+		: null;
+
+	const blockLabel = ghostCondition
+		? sprintf(
+				/* translators: %1$s: Type of block (i.e. Text, Image etc). %2$s: Reason the block is hidden, e.g. "Hidden on Mobile". */
+				__( 'Block: %1$s. %2$s.' ),
+				blockTitle,
+				ghostCondition.label
+		  )
+		: // translators: %s: Type of block (i.e. Text, Image etc)
+		  sprintf( __( 'Block: %s' ), blockTitle );
 
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
@@ -205,7 +228,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'has-editable-outline': hasEditableOutline,
 				'has-negative-margin': hasNegativeMargin,
 				'is-editing-content-only-section': isEditingContentOnlySection,
-				'is-block-hidden': isBlockCurrentlyHidden,
+				'is-block-hidden':
+					isBlockCurrentlyHidden && ! isResponsiveEditing,
+				'is-block-ghosted': isGhosted,
+				'is-block-ghosted-always': ghostCondition?.type === 'always',
 			},
 			className,
 			props.className,

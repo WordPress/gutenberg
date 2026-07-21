@@ -12,33 +12,61 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { deviceTypeKey } from '../../store/private-keys';
 import { unlock } from '../../lock-unlock';
 import { useSettings } from '../use-settings';
+import { getBlockVisibilityCondition } from './utils';
 
 export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 	const hasBlockVisibilityButtonShownRef = useRef( false );
 	const [ blockVisibility ] = useSettings( 'blockVisibility.allowEditing' );
-	const { canToggleBlockVisibility, areBlocksHiddenAnywhere } = useSelect(
-		( select ) => {
-			const { getBlocksByClientId, getBlockName, isBlockHiddenAnywhere } =
-				unlock( select( blockEditorStore ) );
-			const _blocks = getBlocksByClientId( clientIds );
-			return {
-				canToggleBlockVisibility: _blocks.every( ( { clientId } ) =>
-					hasBlockSupport(
-						getBlockName( clientId ),
-						'visibility',
-						true
-					)
-				),
-				areBlocksHiddenAnywhere: clientIds?.every( ( clientId ) =>
-					isBlockHiddenAnywhere( clientId )
-				),
-			};
-		},
+	const { canToggleBlockVisibility, areBlocksHiddenAnywhere, ghostReason } =
+		useSelect(
+			( select ) => {
+				const { getSettings, getBlockAttributes } =
+					select( blockEditorStore );
+				const {
+					getBlocksByClientId,
+					getBlockName,
+					isBlockHiddenAnywhere,
+					isBlockGhosted,
+				} = unlock( select( blockEditorStore ) );
+				const _blocks = getBlocksByClientId( clientIds );
 
-		[ clientIds ]
-	);
+				// While a single ghosted block is selected it renders at full
+				// opacity, so the toolbar states why it's hidden in the
+				// previewed context.
+				let _ghostReason = null;
+				if (
+					clientIds?.length === 1 &&
+					isBlockGhosted( clientIds[ 0 ] )
+				) {
+					const settings = getSettings();
+					_ghostReason = getBlockVisibilityCondition(
+						getBlockAttributes( clientIds[ 0 ] )?.metadata
+							?.blockVisibility,
+						settings[ deviceTypeKey ]?.toLowerCase() || 'desktop',
+						settings.__experimentalFeatures?.viewport
+					)?.label;
+				}
+
+				return {
+					canToggleBlockVisibility: _blocks.every( ( { clientId } ) =>
+						hasBlockSupport(
+							getBlockName( clientId ),
+							'visibility',
+							true
+						)
+					),
+					areBlocksHiddenAnywhere: clientIds?.every( ( clientId ) =>
+						isBlockHiddenAnywhere( clientId )
+					),
+					ghostReason: _ghostReason,
+				};
+			},
+
+			[ clientIds ]
+		);
 	const blockEditorDispatch = useDispatch( blockEditorStore );
 
 	/*
@@ -78,6 +106,11 @@ export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 				onClick={ () => showViewportModal( clientIds ) }
 				aria-haspopup="dialog"
 			/>
+			{ ghostReason && (
+				<span className="block-editor-block-visibility-toolbar__reason">
+					{ ghostReason }
+				</span>
+			) }
 		</ToolbarGroup>
 	);
 }

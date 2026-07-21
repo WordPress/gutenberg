@@ -122,6 +122,26 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		margin-right: 0 !important;
 	}
 
+	// Ghosted blocks.
+	// While responsive editing is on, blocks the previewed context would hide
+	// stay in the canvas dimmed but fully editable. Selecting a ghosted block
+	// (or one of its children) restores full opacity. The dashed outline is a
+	// redundant cue so the state doesn't rely on contrast alone; an outline
+	// (not a border) is used so layout is unaffected.
+	.block-editor-block-list__block.is-block-ghosted:not(.is-selected):not(.is-multi-selected):not(.has-child-selected) {
+		opacity: 0.4;
+		outline: $border-width dashed currentColor;
+		outline-offset: -$border-width;
+
+		// Blocks omitted from published content entirely, rather than hidden
+		// at the previewed viewport, render nowhere; a hatch pattern and a
+		// stronger dim set them apart from viewport-conditional ghosts.
+		&.is-block-ghosted-always {
+			opacity: 0.3;
+			background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba($black, 0.08) 5px, rgba($black, 0.08) 6px);
+		}
+	}
+
 	// Re-enable it on components inside.
 	[class^="components-"] {
 		user-select: text;

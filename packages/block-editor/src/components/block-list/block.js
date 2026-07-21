@@ -592,6 +592,7 @@ function BlockListBlockProvider( props ) {
 				isDragging,
 				__unstableHasActiveBlockOverlayActive,
 				getSelectedBlocksInitialCaretPosition,
+				isResponsiveEditing,
 			} = unlock( select( blockEditorStore ) );
 			const blockWithoutAttributes =
 				getBlockWithoutAttributes( clientId );
@@ -739,6 +740,7 @@ function BlockListBlockProvider( props ) {
 				blockVisibility,
 				deviceType,
 				viewportSettings,
+				isResponsiveEditing: isResponsiveEditing(),
 			};
 		},
 		[ clientId, rootClientId ]
@@ -822,6 +824,7 @@ function BlockListBlockProvider( props ) {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
+		isResponsiveEditing = false,
 	} = selectedProps;
 
 	const privateContext = {
@@ -862,10 +865,15 @@ function BlockListBlockProvider( props ) {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
+		isResponsiveEditing,
 	};
 
+	// While responsive editing is off, hidden blocks stay out of the canvas
+	// so editing matches the front end. When it's on, they render ghosted
+	// instead (see useBlockProps) so authors can find and edit them.
 	if (
 		isBlockCurrentlyHidden &&
+		! isResponsiveEditing &&
 		! isSelected &&
 		! isMultiSelected &&
 		! hasChildSelected
