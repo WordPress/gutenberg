@@ -644,8 +644,7 @@ export default function Image( {
 		canEditImage &&
 		!! openImageMediaEditorModal &&
 		! isContentOnlyMode &&
-		! isUploading &&
-		! isSwappingMedia;
+		! isUploading;
 
 	function switchToCover() {
 		replaceBlocks(
@@ -931,6 +930,10 @@ export default function Image( {
 							aria-haspopup="dialog"
 							icon={ crop }
 							label={ __( 'Crop' ) }
+							// Disable rather than hide while the edited image
+							// loads, so the button keeps focus when the modal
+							// closes instead of dropping it to the canvas.
+							disabled={ isSwappingMedia }
 						/>
 					) }
 					{ showCoverControls && (

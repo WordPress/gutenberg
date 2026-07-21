@@ -349,8 +349,7 @@ const SiteLogo = ( {
 			</InspectorControls>
 			{ canEditImage &&
 				openMediaEditorModal &&
-				shouldShowCropAndDimensions &&
-				! isSwappingMedia && (
+				shouldShowCropAndDimensions && (
 					<BlockControls group="block">
 						<ToolbarButton
 							ref={ cropButtonRef }
@@ -365,6 +364,10 @@ const SiteLogo = ( {
 							aria-haspopup="dialog"
 							icon={ crop }
 							label={ __( 'Crop' ) }
+							// Disable rather than hide while the edited logo
+							// loads, so the button keeps focus when the modal
+							// closes instead of dropping it to the canvas.
+							disabled={ isSwappingMedia }
 						/>
 					</BlockControls>
 				) }
