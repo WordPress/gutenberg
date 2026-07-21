@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
+-   Synced Pattern (`core/block`): Cap the number of pattern expansions per top-level render to prevent memory exhaustion when a pattern references others in a dense, repeated, or "diamond" graph that expands exponentially. A new `block_core_block_render_budget` filter controls the limit (default 10000; return -1 to remove it).
 
 ### Internal
 
@@ -18,10 +19,6 @@
 -   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 -   Make the Tabs, Tab List, Tab Panels, and Tab Panel blocks stable ([#80163](https://github.com/WordPress/gutenberg/pull/80163)).
-
-### Bug Fixes
-
--   Synced Pattern (`core/block`): Cap the number of pattern expansions per top-level render to prevent memory exhaustion when a pattern references others in a dense, repeated, or "diamond" graph that expands exponentially. A new `block_core_block_render_budget` filter controls the limit (default 10000; return -1 to remove it).
 
 ## 10.1.0 (2026-07-01)
 
