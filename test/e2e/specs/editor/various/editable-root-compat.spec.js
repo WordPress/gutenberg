@@ -254,12 +254,14 @@ test.describe( 'Editable root block event handler compatibility', () => {
 			.toContain( 'x' );
 	} );
 
-	test( 'calls a block wrapperProps handler once per event', async ( {
+	test( 'does not double up an event React already delivers', async ( {
 		editor,
 		page,
 	} ) => {
-		// The block sits below the host, so React never delivers the event to
-		// it; only the host bridge should, exactly once.
+		// A heading does not support editableRoot, so it is edited in its own
+		// contentEditable and React delivers the event to the block as usual.
+		// The host bridge must recognise the event isn't on the host and stay
+		// out of the way, so the handler runs once, not twice.
 		await page.evaluate( () => {
 			window.__extCount = 0;
 			const { createElement } = window.wp.element;
@@ -278,20 +280,15 @@ test.describe( 'Editable root block event handler compatibility', () => {
 		} );
 
 		await editor.insertBlock( {
-			name: 'core/paragraph',
+			name: 'core/heading',
 			attributes: { content: 'a' },
 		} );
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'b' },
-		} );
 
-		await page.keyboard.press( 'ArrowUp' );
 		await page.evaluate( () => ( window.__extCount = 0 ) );
 		await page.keyboard.press( 'x' );
 
-		// One keydown, one call. A second would mean React and the bridge both
-		// delivered it.
+		// One keydown, one call. A second would mean the bridge fired on top of
+		// React's delivery.
 		await expect
 			.poll( () => page.evaluate( () => window.__extCount ) )
 			.toBe( 1 );
