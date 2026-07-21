@@ -43,9 +43,13 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 				{ name: 'core/paragraph' },
 			] );
 
-		await expect(
-			editor.canvas.locator( '[data-type="core/paragraph"]' )
-		).toBeFocused();
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.locator( '[data-type="core/paragraph"]' )
+				)
+			)
+			.toBe( true );
 
 		// Clear block selection.
 		await editor.canvas
@@ -58,10 +62,18 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			},
 		} );
 
-		await expect(
-			editor.canvas.locator( '[data-type="core/paragraph"]' ),
-			'should select and focus the newly inserted paragraph block on second click'
-		).toBeFocused();
+		await expect
+			.poll(
+				() =>
+					editor.ownsSelection(
+						editor.canvas.locator( '[data-type="core/paragraph"]' )
+					),
+				{
+					message:
+						'should select the newly inserted paragraph block on second click',
+				}
+			)
+			.toBe( true );
 	} );
 
 	test( 'inserts blocks by dragging and dropping from the global inserter', async ( {

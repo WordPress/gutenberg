@@ -82,6 +82,15 @@ describe( 'getSpacingPresetCssVar', () => {
 			'var(--wp--preset--spacing--20)'
 		);
 	} );
+	it( 'should return undefined for a malformed non-string value such as an array', () => {
+		// Malformed blockGap data, e.g. `{ top: [ '1rem' ] }`, would otherwise
+		// throw when `.match()` is called on the array.
+		expect( getSpacingPresetCssVar( [ '1rem' ] ) ).toBe( undefined );
+	} );
+	it( 'should return undefined for other non-string values', () => {
+		expect( getSpacingPresetCssVar( { top: '1rem' } ) ).toBe( undefined );
+		expect( getSpacingPresetCssVar( 20 ) ).toBe( undefined );
+	} );
 } );
 
 describe( 'getSpacingPresetSlug', () => {

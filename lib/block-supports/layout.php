@@ -290,7 +290,7 @@ function gutenberg_get_layout_container_values( $layout ) {
 function gutenberg_sanitize_block_gap_value( $gap_value ) {
 	if ( is_array( $gap_value ) ) {
 		foreach ( $gap_value as $key => $value ) {
-			$gap_value[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
+			$gap_value[ $key ] = ! is_scalar( $value ) || ( $value && preg_match( '%[\\\(&=}]|/\*%', (string) $value ) ) ? null : $value;
 		}
 		return $gap_value;
 	}
@@ -1159,7 +1159,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		// Check if the block has an active style variation with a blockGap value.
 		// Only check the registry if the className contains a variation class to avoid unnecessary lookups.
 		$variation_block_gap_value = null;
-		$block_class_name          = $block['attrs']['className'] ?? '';
+		$block_class_name          = is_string( $block['attrs']['className'] ?? null )
+			? $block['attrs']['className']
+			: '';
 		if ( $block_class_name && str_contains( $block_class_name, 'is-style-' ) && $block_name ) {
 			$styles_registry   = WP_Block_Styles_Registry::get_instance();
 			$registered_styles = $styles_registry->get_registered_styles_for_block( $block_name );
