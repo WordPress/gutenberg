@@ -8,6 +8,8 @@ import clsx from 'clsx';
  */
 import {
 	Button,
+	Rect,
+	SVG,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -63,6 +65,49 @@ export function getInheritanceProps(
 }
 
 /**
+ * The inheritance symbol: filled means the value is defined here, outline means
+ * it comes from somewhere else.
+ *
+ * @param {Object}  props
+ * @param {boolean} props.isFilled Render the solid diamond instead of the outline.
+ *
+ * @return {Element} The diamond.
+ */
+function Diamond( { isFilled } ) {
+	return (
+		<SVG
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			{ isFilled ? (
+				<Rect
+					x="7.75736"
+					y="12"
+					width="6"
+					height="6"
+					rx="1"
+					transform="rotate(-45 7.75736 12)"
+					fill="currentColor"
+				/>
+			) : (
+				<Rect
+					x="8.46443"
+					y="12"
+					width="5"
+					height="5"
+					rx="0.5"
+					transform="rotate(-45 8.46443 12)"
+					fill="none"
+					stroke="currentColor"
+				/>
+			) }
+		</SVG>
+	);
+}
+
+/**
  * Renders the small always-visible affordance shown next to a control that
  * either inherits its value from Global Styles or locally overrides one. Used
  * by `<InheritanceToolsPanelItem>` and the color/gradient controls.
@@ -70,18 +115,18 @@ export function getInheritanceProps(
  * It is deliberately a *single* button across both states rather than two that
  * swap places: activating the reset in the override state leaves the control
  * inheriting again, and a second button taking over the slot would unmount the
- * one the user just activated and drop focus. Only the shape, the accessible
+ * one the user just activated and drop focus. Only the fill, the accessible
  * name and the click behaviour change.
  *
- * - Inheriting: a purple rhombus with an "Inherited from Global Styles"
+ * - Inheriting: an outline diamond with an "Inherited from Global Styles"
  *   tooltip. It carries no action; it is a button so the explanation is
  *   reachable by hover *and* keyboard focus, which a cue attached to the
  *   control label could not offer without stealing the label's own focus
  *   behaviour.
- * - Local override: a blue dot that morphs into the `reset` (dash) icon on
- *   hover/focus, with a "Reset to inherited value" tooltip. Activating it
- *   clears the override — the same action the `ToolsPanel` menu performs via
- *   `onDeselect` — and the button becomes the inherited rhombus in place.
+ * - Local override: the same diamond filled, with a "Reset to inherited value"
+ *   tooltip. Activating it clears the override — the same action the
+ *   `ToolsPanel` menu performs via `onDeselect` — and the diamond returns to
+ *   its outline state in place.
  *
  * @param {Object}    props
  * @param {boolean}   [props.hasLocalOverride]   Render the reset state instead of the inherited one.
@@ -103,7 +148,7 @@ export function InheritanceIndicatorButton( {
 		<Tooltip.Root>
 			<Tooltip.Trigger
 				render={
-					// Intentionally small (14×14) control; exempt from the
+					// Intentionally small (16×16) control; exempt from the
 					// 40px default-size enforcement rule.
 					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
 					<Button
@@ -113,9 +158,6 @@ export function InheritanceIndicatorButton( {
 						accessibleWhenDisabled
 						className={ clsx(
 							'global-styles-inheritance-indicator',
-							{
-								'has-local-override': hasLocalOverride,
-							},
 							className
 						) }
 						onClick={ ( event ) => {
@@ -128,7 +170,9 @@ export function InheritanceIndicatorButton( {
 								onResetToInherited?.();
 							}
 						} }
-					/>
+					>
+						<Diamond isFilled={ hasLocalOverride } />
+					</Button>
 				}
 			/>
 			<Tooltip.Popup>{ label }</Tooltip.Popup>
