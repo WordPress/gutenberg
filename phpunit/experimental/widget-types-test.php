@@ -209,7 +209,7 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 		$this->assertSame( 'download-lyrics', $actions[0]['id'] );
 		$this->assertSame( 'hello-dolly-lyrics.txt', $actions[0]['download'] );
 		$this->assertMatchesRegularExpression(
-			'#/(?:build/)?widgets/hello-dolly/hello-dolly-lyrics\.txt$#',
+			'#/widgets/hello-dolly/hello-dolly-lyrics\.txt$#',
 			$actions[0]['href']
 		);
 		$this->assertSame(

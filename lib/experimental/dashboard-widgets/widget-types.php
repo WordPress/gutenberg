@@ -113,10 +113,9 @@ function gutenberg_sanitize_widget_help( $help ) {
 /**
  * Resolves a widget-local file href to a plugin URL.
  *
- * Looks under `build/widgets/{dir}/` (release) then `widgets/{dir}/` (dev).
  * Leaves absolute, root-relative, and admin `.php` hrefs unchanged.
- * Returns '' for `..` paths and for relative hrefs that are not a shipped file
- * (so `esc_url_raw()` cannot invent `http://filename`).
+ * Returns '' for `..` paths and for relative hrefs that are not a file under
+ * `widgets/{dir}/` (so `esc_url_raw()` cannot invent `http://filename`).
  *
  * @param string $href     Action href.
  * @param string $dir_name Widget directory name.
@@ -148,16 +147,10 @@ function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
 	}
 
 	$relative = ltrim( $href, '/' );
-	// Prefer built assets (plugin zip); fall back to source (dev checkout).
-	$candidates = array(
-		'build/widgets/' . $dir_name . '/' . $relative,
-		'widgets/' . $dir_name . '/' . $relative,
-	);
+	$candidate = 'widgets/' . $dir_name . '/' . $relative;
 
-	foreach ( $candidates as $candidate ) {
-		if ( is_file( gutenberg_dir_path() . $candidate ) ) {
-			return gutenberg_url( $candidate );
-		}
+	if ( is_file( gutenberg_dir_path() . $candidate ) ) {
+		return gutenberg_url( $candidate );
 	}
 
 	return '';
