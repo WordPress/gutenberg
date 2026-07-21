@@ -9,11 +9,31 @@ import { useStyleOverride } from '@wordpress/block-editor';
  */
 import { getAvatarBorderColor, getNoteMarkerSelector } from './utils';
 
-// Hex alpha suffixes for the rest / active states. Kept low so the marker
-// reads as a soft tint at rest and gets noticeably stronger when focused or
-// hovered. (0x40 ≈ 25%, 0x80 ≈ 50%.)
-const REST_ALPHA = '40';
-const ACTIVE_ALPHA = '80';
+/*
+ * Hex alpha suffix for the tint painted behind the marker's text. One low value
+ * for every state, on purpose: the tint sits behind the glyphs, so raising it
+ * eats into whatever text/background contrast the theme already provides, and
+ * the canvas background comes from `theme.json`, so the composited result
+ * cannot be measured from CSS. (0x40 ≈ 25%.)
+ */
+const TINT_ALPHA = '40';
+
+/**
+ * Emphasis for hover / focus / the selected note. Carried by an opaque
+ * underline in the author's color rather than a stronger tint, so the marker
+ * reads more strongly without changing what sits behind the text.
+ *
+ * @param {string} color The author's `#RRGGBB` color.
+ * @return {string} Declarations for the emphasized state.
+ */
+function emphasis( color ) {
+	return (
+		'text-decoration-line:underline;' +
+		`text-decoration-color:${ color };` +
+		'text-decoration-thickness:0.125em;' +
+		'text-underline-offset:0.15em;'
+	);
+}
 
 // Reset the browser's default `<mark>` styling so the per-author rules below
 // are what readers actually see (without it, `mark` ships with a bright yellow
@@ -24,6 +44,10 @@ const BASE_RESET = 'mark.wp-note{background-color:transparent;color:inherit;}';
 /**
  * Build the CSS rule set that tints each inline-note marker with its author's
  * avatar color. Pure helper extracted so it can be unit-tested without React.
+ *
+ * The tint stays at a single low alpha in every state and emphasis is expressed
+ * as an underline, so marking a note can only cost the theme's text contrast
+ * the one fixed amount, never more when the note is hovered or selected.
  *
  * @param {Array}       threads    Unresolved note threads (each with `id` and `author`).
  * @param {string|null} selectedId ID of the currently selected note, if any.
@@ -39,14 +63,12 @@ export function buildHighlightCss( threads, selectedId = null ) {
 		// The `core/note` format serializes the id into `data-id`, so the marker
 		// can be targeted directly without a separate annotation layer.
 		const sel = getNoteMarkerSelector( thread.id );
-		rules.push( `${ sel }{background-color:${ color }${ REST_ALPHA };}` );
+		rules.push( `${ sel }{background-color:${ color }${ TINT_ALPHA };}` );
 		rules.push(
-			`${ sel }:hover,${ sel }:focus-within{background-color:${ color }${ ACTIVE_ALPHA };}`
+			`${ sel }:hover,${ sel }:focus-within{${ emphasis( color ) }}`
 		);
 		if ( selectedId && String( selectedId ) === String( thread.id ) ) {
-			rules.push(
-				`${ sel }{background-color:${ color }${ ACTIVE_ALPHA };}`
-			);
+			rules.push( `${ sel }{${ emphasis( color ) }}` );
 		}
 	}
 	return rules.join( '' );
@@ -63,11 +85,17 @@ export function buildHighlightCss( threads, selectedId = null ) {
  * scoped to text without any block-type checks: non-text blocks get an overlay
  * of their own in a separate iteration.
  *
- * @param {Array}       blockHighlights Block-level notes (each with `clientId`, `id` and `author`).
- * @param {string|null} selectedId      ID of the currently selected note, if any.
+ * The tint is flat: one alpha, no hover or selected variant. It covers a whole
+ * paragraph rather than a few words, so both of the emphasis treatments the
+ * inline markers use would be wrong here - a deeper wash costs the theme's text
+ * contrast across the entire block, and an underline spanning every line reads
+ * as formatting. Hovering or selecting the note draws the block's own outline
+ * instead, which is what already signals "this block" everywhere else.
+ *
+ * @param {Array} blockHighlights Block-level notes (each with `clientId`, `id` and `author`).
  * @return {string} A serialized CSS string targeting the blocks' editable elements.
  */
-export function buildBlockHighlightCss( blockHighlights, selectedId = null ) {
+export function buildBlockHighlightCss( blockHighlights ) {
 	const rules = [];
 	for ( const highlight of blockHighlights ?? [] ) {
 		if ( ! highlight?.clientId ) {
@@ -81,15 +109,7 @@ export function buildBlockHighlightCss( blockHighlights, selectedId = null ) {
 			'\\$&'
 		);
 		const sel = `[data-block="${ escapedClientId }"].block-editor-rich-text__editable`;
-		rules.push( `${ sel }{background-color:${ color }${ REST_ALPHA };}` );
-		rules.push(
-			`${ sel }:hover{background-color:${ color }${ ACTIVE_ALPHA };}`
-		);
-		if ( selectedId && String( selectedId ) === String( highlight.id ) ) {
-			rules.push(
-				`${ sel }{background-color:${ color }${ ACTIVE_ALPHA };}`
-			);
-		}
+		rules.push( `${ sel }{background-color:${ color }${ TINT_ALPHA };}` );
 	}
 	return rules.join( '' );
 }
@@ -104,8 +124,9 @@ export function buildBlockHighlightCss( blockHighlights, selectedId = null ) {
  * Uses `useStyleOverride` so the styles reach the iframed canvas; a plain
  * `<style>` element rendered in the sidebar would only affect the parent doc.
  *
- * Opacity boosts on `:hover`, `:focus-within`, and when the matching thread is
- * the editor's selected note.
+ * An author-colored underline is added to inline markers on `:hover`,
+ * `:focus-within`, and when the matching thread is the editor's selected note.
+ * Block-level tints stay flat; the block outline carries that state for them.
  *
  * @param {Object}      props
  * @param {Array}       props.threads           Unresolved note threads.
@@ -121,7 +142,7 @@ export function NoteHighlightStyles( {
 	const css = useMemo(
 		() =>
 			buildHighlightCss( threads, selectedId ) +
-			buildBlockHighlightCss( blockHighlights, selectedId ),
+			buildBlockHighlightCss( blockHighlights ),
 		[ threads, blockHighlights, selectedId ]
 	);
 	useStyleOverride( { id: 'core-note-highlights', css } );

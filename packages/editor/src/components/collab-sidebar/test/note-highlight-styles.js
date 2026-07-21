@@ -14,7 +14,7 @@ describe( 'buildHighlightCss', () => {
 		);
 	} );
 
-	it( 'tints each thread with its author color at the rest alpha (0x40)', () => {
+	it( 'tints each thread with its author color at the tint alpha (0x40)', () => {
 		const css = buildHighlightCss( [
 			{ id: 7, author: 1 },
 			{ id: 12, author: 3 },
@@ -31,15 +31,15 @@ describe( 'buildHighlightCss', () => {
 		);
 	} );
 
-	it( 'emits a higher-alpha (0x80) rule on hover and focus-within for each thread', () => {
+	it( 'emphasizes hover and focus-within with an author-colored underline', () => {
 		const css = buildHighlightCss( [ { id: 7, author: 1 } ] );
 		const color = getAvatarBorderColor( 1 );
 		expect( css ).toContain(
-			`mark.wp-note[data-id="7"]:hover,mark.wp-note[data-id="7"]:focus-within{background-color:${ color }80;}`
+			`mark.wp-note[data-id="7"]:hover,mark.wp-note[data-id="7"]:focus-within{text-decoration-line:underline;text-decoration-color:${ color };`
 		);
 	} );
 
-	it( 'boosts opacity for the selected thread by appending a second rule', () => {
+	it( 'emphasizes the selected thread by appending a second rule', () => {
 		const css = buildHighlightCss(
 			[ { id: 7, author: 1 } ],
 			'7' // selected
@@ -49,14 +49,38 @@ describe( 'buildHighlightCss', () => {
 		expect( css ).toContain(
 			`mark.wp-note[data-id="7"]{background-color:${ color }40;}`
 		);
-		// Active rule appended later, so the cascade picks it.
+		// Emphasis rule appended later, so the cascade picks it.
 		const restIndex = css.indexOf(
 			`mark.wp-note[data-id="7"]{background-color:${ color }40;}`
 		);
 		const activeIndex = css.lastIndexOf(
-			`mark.wp-note[data-id="7"]{background-color:${ color }80;}`
+			`mark.wp-note[data-id="7"]{text-decoration-line:underline;`
 		);
 		expect( activeIndex ).toBeGreaterThan( restIndex );
+	} );
+
+	/*
+	 * The tint sits behind the glyphs, so every increment of it is subtracted
+	 * from whatever text/background contrast the theme provides, and CSS cannot
+	 * measure the composited result because the canvas background comes from
+	 * `theme.json`. Emphasis therefore has to come from somewhere other than a
+	 * stronger wash. Guards against reintroducing a per-state alpha.
+	 */
+	it( 'never paints a stronger tint behind the text than the single tint alpha', () => {
+		const css = buildHighlightCss(
+			[
+				{ id: 7, author: 1 },
+				{ id: 12, author: 3 },
+			],
+			'7'
+		);
+		const alphas = [
+			...css.matchAll( /background-color:#[0-9a-f]{6}([0-9a-f]{2})?/gi ),
+		]
+			.map( ( [ , alpha ] ) => alpha )
+			.filter( Boolean );
+		expect( alphas.length ).toBeGreaterThan( 0 );
+		expect( alphas.every( ( alpha ) => alpha === '40' ) ).toBe( true );
 	} );
 
 	it( 'matches numeric and string selectedId variants', () => {
@@ -114,7 +138,7 @@ describe( 'buildBlockHighlightCss', () => {
 	const selectorFor = ( clientId ) =>
 		`[data-block="${ clientId }"].block-editor-rich-text__editable`;
 
-	it( 'tints each block with its author color at the rest alpha (0x40)', () => {
+	it( 'tints each block with its author color at the tint alpha (0x40)', () => {
 		const css = buildBlockHighlightCss( [
 			{ clientId: 'abc-1', id: 7, author: 1 },
 			{ clientId: 'abc-2', id: 12, author: 3 },
@@ -131,53 +155,27 @@ describe( 'buildBlockHighlightCss', () => {
 		);
 	} );
 
-	it( 'emits a higher-alpha (0x80) rule on hover for each block', () => {
+	/*
+	 * The tint covers a whole paragraph, so neither emphasis treatment used for
+	 * inline markers applies: a deeper wash would cost the theme's text contrast
+	 * across the entire block, and an underline on every line reads as
+	 * formatting. Hover and selection are carried by the block outline instead,
+	 * so the CSS here has to stay a single flat rule per block.
+	 */
+	it( 'emits exactly one flat rule per block, with no state variants', () => {
 		const css = buildBlockHighlightCss( [
 			{ clientId: 'abc-1', id: 7, author: 1 },
+			{ clientId: 'abc-2', id: 12, author: 3 },
 		] );
-		expect( css ).toContain(
-			`${ selectorFor(
-				'abc-1'
-			) }:hover{background-color:${ getAvatarBorderColor( 1 ) }80;}`
-		);
-	} );
-
-	it( 'boosts opacity for the selected note by appending a second rule', () => {
-		const color = getAvatarBorderColor( 1 );
-		const css = buildBlockHighlightCss(
-			[ { clientId: 'abc-1', id: 7, author: 1 } ],
-			'7' // selected
-		);
-		const restIndex = css.indexOf(
-			`${ selectorFor( 'abc-1' ) }{background-color:${ color }40;}`
-		);
-		const activeIndex = css.lastIndexOf(
-			`${ selectorFor( 'abc-1' ) }{background-color:${ color }80;}`
-		);
-		// Rest rule still present, active rule appended later so it wins.
-		expect( restIndex ).toBeGreaterThanOrEqual( 0 );
-		expect( activeIndex ).toBeGreaterThan( restIndex );
-	} );
-
-	it( 'leaves other blocks at the rest alpha when one note is selected', () => {
-		const css = buildBlockHighlightCss(
-			[
-				{ clientId: 'abc-1', id: 7, author: 1 },
-				{ clientId: 'abc-2', id: 12, author: 1 },
-			],
-			7
-		);
-		const color = getAvatarBorderColor( 1 );
-		expect( css ).not.toContain(
-			`${ selectorFor( 'abc-2' ) }{background-color:${ color }80;}`
-		);
-	} );
-
-	it( 'matches numeric and string selectedId variants', () => {
-		const entry = [ { clientId: 'abc-1', id: 7, author: 1 } ];
-		expect( buildBlockHighlightCss( entry, 7 ) ).toEqual(
-			buildBlockHighlightCss( entry, '7' )
-		);
+		expect( css.match( /\{/g ) ).toHaveLength( 2 );
+		expect( css ).not.toContain( ':hover' );
+		expect( css ).not.toContain( 'text-decoration' );
+		const alphas = [
+			...css.matchAll( /background-color:#[0-9a-f]{6}([0-9a-f]{2})?/gi ),
+		]
+			.map( ( [ , alpha ] ) => alpha )
+			.filter( Boolean );
+		expect( alphas ).toEqual( [ '40', '40' ] );
 	} );
 
 	it( 'escapes quotes and backslashes in the client id', () => {
