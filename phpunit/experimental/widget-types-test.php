@@ -7,6 +7,7 @@
  * @covers ::gutenberg_translate_widget_metadata
  * @covers ::gutenberg_get_widget_metadata_i18n_schema
  * @covers ::gutenberg_sanitize_widget_help
+ * @covers ::gutenberg_sanitize_widget_actions
  */
 class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 
@@ -108,6 +109,71 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	public function test_sanitize_widget_help_requires_content() {
 		$this->assertNull( gutenberg_sanitize_widget_help( null ) );
 		$this->assertNull( gutenberg_sanitize_widget_help( array( 'links' => array() ) ) );
+	}
+
+	/**
+	 * Actions keep their shape, drop malformed entries, reject unsafe href
+	 * protocols, and allow `data:` only when `download` is set.
+	 */
+	public function test_sanitize_widget_actions_constrains_hrefs() {
+		$csv = 'data:text/csv;charset=utf-8,metric,value';
+
+		$actions = gutenberg_sanitize_widget_actions(
+			array(
+				array(
+					'id'           => 'view',
+					'label'        => 'View details',
+					'href'         => 'https://wordpress.org/',
+					'openInNewTab' => true,
+				),
+				array(
+					'id'       => 'export',
+					'label'    => 'Export CSV',
+					'href'     => $csv,
+					'download' => 'report.csv',
+				),
+				array(
+					'id'    => 'unsafe',
+					'label' => 'Unsafe protocol',
+					'href'  => 'javascript:alert(1)',
+				),
+				array(
+					'id'    => 'data-without-download',
+					'label' => 'Data without download',
+					'href'  => $csv,
+				),
+				array(
+					'id'    => 'missing-href',
+					'label' => 'Missing href',
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'id'           => 'view',
+					'label'        => 'View details',
+					'href'         => 'https://wordpress.org/',
+					'openInNewTab' => true,
+				),
+				array(
+					'id'       => 'export',
+					'label'    => 'Export CSV',
+					'href'     => $csv,
+					'download' => 'report.csv',
+				),
+			),
+			$actions
+		);
+	}
+
+	/**
+	 * An empty or non-array actions list normalizes to null.
+	 */
+	public function test_sanitize_widget_actions_requires_entries() {
+		$this->assertNull( gutenberg_sanitize_widget_actions( null ) );
+		$this->assertNull( gutenberg_sanitize_widget_actions( array() ) );
 	}
 
 	/**

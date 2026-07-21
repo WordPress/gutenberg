@@ -112,8 +112,11 @@ function gutenberg_sanitize_widget_help( $help ) {
 
 /**
  * Constrains a widget's actions to their allowed shape: each entry keeps
- * `id`, `label`, and `href`; entries missing any of those are dropped.
- * Optional `download` and `openInNewTab` are copied when present.
+ * `id`, `label`, and an `href` that survives `esc_url_raw()`; entries that
+ * fail those checks are dropped. Optional `download` and `openInNewTab`
+ * are copied when present. `data:` hrefs are allowed only when `download`
+ * is set, so client-side file exports keep working without opening a
+ * navigation XSS path.
  *
  * @param array|null $actions Actions from the build manifest.
  * @return array|null Sanitized actions, or null when there are none.
@@ -134,10 +137,20 @@ function gutenberg_sanitize_widget_actions( $actions ) {
 			continue;
 		}
 
+		$protocols = wp_allowed_protocols();
+		if ( ! empty( $action['download'] ) ) {
+			$protocols[] = 'data';
+		}
+
+		$href = esc_url_raw( $action['href'], $protocols );
+		if ( ! $href ) {
+			continue;
+		}
+
 		$entry = array(
 			'id'    => $action['id'],
 			'label' => $action['label'],
-			'href'  => $action['href'],
+			'href'  => $href,
 		);
 
 		if ( isset( $action['download'] ) ) {
