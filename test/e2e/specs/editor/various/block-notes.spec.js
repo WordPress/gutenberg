@@ -1356,18 +1356,96 @@ test.describe( 'Block Notes', () => {
 			);
 			await firstRepairStarted;
 			await firstNote;
-			const secondNote = blockNoteUtils.addNote(
-				'Second overlapping note'
-			);
-			await expect(
-				page
-					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'treeitem', {
-						name: 'Note: Second overlapping note',
-					} )
-			).toBeVisible();
+			const secondNoteId = await page.evaluate( async ( consent ) => {
+				const coreDispatch = window.wp.data.dispatch( 'core' );
+				const editorSelect = window.wp.data.select( 'core/editor' );
+				const blockEditorSelect =
+					window.wp.data.select( 'core/block-editor' );
+				const block = blockEditorSelect.getBlocks()[ 0 ];
+				const savedNote = await coreDispatch.saveEntityRecord(
+					'root',
+					'comment',
+					{
+						post: editorSelect.getCurrentPostId(),
+						content: 'Second overlapping note',
+						status: 'hold',
+						type: 'note',
+						parent: 0,
+					},
+					{ throwOnError: true }
+				);
+				const existingIds = Array.isArray(
+					block.attributes.metadata?.noteId
+				)
+					? block.attributes.metadata.noteId
+					: [ block.attributes.metadata?.noteId ].filter( Boolean );
+				const noteIds = [
+					...new Set( [ ...existingIds, savedNote.id ] ),
+				];
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.updateBlockAttributes( block.clientId, {
+						metadata: {
+							...block.attributes.metadata,
+							noteId: noteIds,
+						},
+					} );
+
+				const { unlock } =
+					window.wp.privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+						consent,
+						'@wordpress/core-data'
+					);
+				window.__secondOverlappingRepair = unlock(
+					window.wp.data.dispatch( 'core' )
+				).persistEntityBlockAttributes(
+					'postType',
+					editorSelect.getCurrentPostType(),
+					editorSelect.getCurrentPostId(),
+					{
+						record: editorSelect.getCurrentPost(),
+						blockPath: [ 0 ],
+						isMatch: ( candidate ) =>
+							candidate.name === block.name &&
+							candidate.attributes.content.toString() ===
+								block.attributes.content.toString(),
+						matchCount: 1,
+						matchIndex: 0,
+						blockCount: 1,
+						blockName: block.name,
+						attributes: ( savedAttributes ) => {
+							const savedIds = Array.isArray(
+								savedAttributes.metadata?.noteId
+							)
+								? savedAttributes.metadata.noteId
+								: [ savedAttributes.metadata?.noteId ].filter(
+										Boolean
+								  );
+							return {
+								metadata: {
+									...savedAttributes.metadata,
+									noteId: [
+										...new Set( [
+											...savedIds,
+											...noteIds,
+										] ),
+									],
+								},
+							};
+						},
+					}
+				);
+				return savedNote.id;
+			}, CORE_DATA_PRIVATE_APIS_CONSENT );
+			await expect
+				.poll( async () => {
+					const noteIds = ( await editor.getBlocks() )[ 0 ].attributes
+						.metadata.noteId;
+					return noteIds.includes( secondNoteId );
+				} )
+				.toBe( true );
 			releaseFirstRepair();
-			await secondNote;
+			await page.evaluate( () => window.__secondOverlappingRepair );
 			await expect.poll( () => repairCount ).toBe( 2 );
 			await expect.poll( () => successfulRepairCount ).toBe( 2 );
 
