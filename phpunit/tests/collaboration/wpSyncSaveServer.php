@@ -199,7 +199,12 @@ class Tests_Collaboration_WpSyncSaveServer extends WP_Test_REST_Controller_Testc
 
 	public function test_entity_save_rejects_stale_content_without_overwriting() {
 		wp_set_current_user( self::$editor_id );
-		wp_update_post( array( 'ID' => self::$post_id, 'post_content' => 'current content' ) );
+		wp_update_post(
+			array(
+				'ID'           => self::$post_id,
+				'post_content' => 'current content',
+			)
+		);
 
 		$response = $this->dispatch_entity_save( 'stale content', 'replacement content' );
 
@@ -209,7 +214,12 @@ class Tests_Collaboration_WpSyncSaveServer extends WP_Test_REST_Controller_Testc
 
 	public function test_entity_save_atomically_updates_expected_content_and_crdt_doc() {
 		wp_set_current_user( self::$editor_id );
-		wp_update_post( array( 'ID' => self::$post_id, 'post_content' => 'expected content' ) );
+		wp_update_post(
+			array(
+				'ID'           => self::$post_id,
+				'post_content' => 'expected content',
+			)
+		);
 
 		$response = $this->dispatch_entity_save( 'expected content', 'replacement content' );
 
