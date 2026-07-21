@@ -584,7 +584,6 @@ export function initWaveformPlayer(
 	if ( instance.artworkEl ) {
 		instance.artworkEl.alt = imageAlt || '';
 	}
-
 	applyWaveformPlayerStyles( container, {
 		backgroundColor,
 		backgroundGradient,
