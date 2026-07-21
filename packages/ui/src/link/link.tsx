@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { type LinkProps } from './types';
+import { ensureRelTokens } from './ensure-rel-tokens';
 import resetStyles from '../utils/css/resets.module.css';
 import focusStyles from '../utils/css/focus.module.css';
 import styles from './style.module.css';
@@ -28,17 +29,6 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 	},
 	ref
 ) {
-	let resolvedRel = rel;
-	if ( openInNewTab ) {
-		const tokens = new Set(
-			`${ rel ?? '' } noopener noreferrer`
-				.trim()
-				.split( /\s+/ )
-				.filter( Boolean )
-		);
-		resolvedRel = [ ...tokens ].join( ' ' );
-	}
-
 	const element = useRender( {
 		render,
 		defaultTagName: 'a',
@@ -54,7 +44,9 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 				className
 			),
 			target: openInNewTab ? '_blank' : undefined,
-			rel: resolvedRel,
+			rel: openInNewTab
+				? ensureRelTokens( rel, [ 'noopener', 'noreferrer' ] )
+				: rel,
 			children: (
 				<>
 					{ children }
