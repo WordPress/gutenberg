@@ -985,8 +985,8 @@ Display content in a scrolling slider.
 -	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Allowed Blocks:** core/slide
--	**Supports:** align, ariaLabel, interactivity, layout (allowOrientation, default, ~~allowJustification~~), spacing (margin), ~~html~~
--	**Attributes:** arrowIcon, arrowsPosition, indicatorStyle, indicatorsPosition, loop, navigationButtonType, slidesToShow
+-	**Supports:** align, ariaLabel, interactivity, spacing (margin), ~~html~~
+-	**Attributes:** arrowIcon, indicatorStyle, loop, navigationButtonType, navigationJustification, navigationPosition, showIndicators, slidesToShow
 
 ## Social Icon
 

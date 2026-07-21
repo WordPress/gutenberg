@@ -17,30 +17,34 @@
 			"type": "boolean",
 			"default": true
 		},
+		"navigationPosition": {
+			"type": "string",
+			"enum": [ "overlay", "top", "bottom" ],
+			"default": "overlay"
+		},
+		"navigationJustification": {
+			"type": "string",
+			"enum": [ "left", "center", "right", "space-between" ],
+			"default": "space-between"
+		},
 		"arrowIcon": {
 			"type": "string",
 			"enum": [ "chevron", "arrow" ],
 			"default": "chevron"
-		},
-		"indicatorStyle": {
-			"type": "string",
-			"enum": [ "dot", "line" ],
-			"default": "dot"
 		},
 		"navigationButtonType": {
 			"type": "string",
 			"enum": [ "icon", "text", "both" ],
 			"default": "icon"
 		},
-		"arrowsPosition": {
-			"type": "string",
-			"enum": [ "overlay", "sides", "top", "bottom", "none" ],
-			"default": "overlay"
+		"showIndicators": {
+			"type": "boolean",
+			"default": true
 		},
-		"indicatorsPosition": {
+		"indicatorStyle": {
 			"type": "string",
-			"enum": [ "overlay", "top", "bottom", "none" ],
-			"default": "overlay"
+			"enum": [ "dot", "line" ],
+			"default": "dot"
 		}
 	},
 	"supports": {
@@ -48,14 +52,6 @@
 		"ariaLabel": true,
 		"html": false,
 		"interactivity": true,
-		"layout": {
-			"default": {
-				"type": "flex",
-				"orientation": "vertical"
-			},
-			"allowOrientation": true,
-			"allowJustification": false
-		},
 		"spacing": {
 			"margin": true
 		}

@@ -1,9 +1,12 @@
-/*
- * Frontend layout for the slider track belongs to the slider block.
- *
- * The slider-track block was removed, but the rendered frontend markup still
- * uses the .wp-block-slider-track wrapper class inside core/slider.
- */
+// .wp-block-slider itself is position:relative (set via block wrapper attributes)
+// and serves as the positioning context for overlay arrows and indicators.
+// It is a flex column so the track and in-flow rows stack vertically.
+.wp-block-slider {
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+
 .wp-block-slider-track {
 	display: flex;
 	min-height: 0;
@@ -13,17 +16,11 @@
 	overflow-y: hidden;
 	scroll-snap-type: x mandatory;
 	scroll-behavior: smooth;
-	scrollbar-width: none; // Firefox
-	-ms-overflow-style: none; // IE and Edge
+	scrollbar-width: none;
 	gap: 0;
 	flex-wrap: nowrap;
 	outline: 1px solid transparent;
 	outline-offset: 1px;
-
-	// Hide scrollbar in Chrome, Safari and Opera
-	&::-webkit-scrollbar {
-		display: none;
-	}
 }
 
 .is-horizontal .wp-block-slider-track {
@@ -35,20 +32,7 @@
 	outline: 1px solid currentColor;
 }
 
-// .wp-block-slider itself is position:relative (set via block wrapper attributes)
-// and serves as the positioning context for overlay/sides arrows and indicators.
-// It is a flex column so the track and in-flow rows stack vertically.
-.wp-block-slider {
-	display: flex;
-	flex-direction: column;
-	position: relative;
-}
-
-// ---------------------------------------------------------------------------
-// Arrows
-// ---------------------------------------------------------------------------
 .wp-block-slider-arrows {
-	// In-flow (top/bottom) default layout.
 	width: 100%;
 	box-sizing: border-box;
 	display: flex;
@@ -78,32 +62,6 @@
 		}
 	}
 
-	// Sides: arrows pushed outside the slider bounds, one on each side.
-	&.is-position-sides {
-		position: absolute;
-		inset: 0;
-		width: auto;
-		pointer-events: none;
-		z-index: 2;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 0;
-
-		> .wp-block-slider-arrows-button {
-			pointer-events: auto;
-			background: rgb(255 255 255 / 85%);
-			border-radius: 999px;
-			backdrop-filter: blur(2px);
-			// Translate each button outward so it sits outside the slider.
-			&.is-type-previous {
-				transform: translateX(-100%);
-			}
-			&.is-type-next {
-				transform: translateX(100%);
-			}
-		}
-	}
 }
 
 .wp-block-slider-arrows-button {
@@ -141,9 +99,6 @@
 	}
 }
 
-// ---------------------------------------------------------------------------
-// Control bar: combined prev + indicators + next row (shared in-flow position).
-// ---------------------------------------------------------------------------
 .wp-block-slider-control-bar {
 	width: 100%;
 	box-sizing: border-box;
@@ -153,13 +108,29 @@
 	justify-content: space-between;
 	gap: 0.5rem;
 	padding: 0.25rem 0;
+
+	&.is-justify-left {
+		justify-content: flex-start;
+	}
+
+	&.is-justify-center {
+		justify-content: center;
+	}
+
+	&.is-justify-right {
+		justify-content: flex-end;
+	}
+
+	&.is-justify-space-between {
+		justify-content: space-between;
+	}
+
+	&:not(.is-justify-space-between) > .wp-block-slider-indicators__dots {
+		flex: 0 0 auto;
+	}
 }
 
-// ---------------------------------------------------------------------------
-// Indicators
-// ---------------------------------------------------------------------------
-
-// Standalone indicator container (when arrows are at a different position).
+// Standalone overlay indicator container.
 .wp-block-slider-indicators {
 	display: flex;
 	align-items: center;
@@ -192,7 +163,7 @@
 	list-style: none;
 	margin: 0;
 	color: currentColor;
-	// Inside the control bar the dots grow to fill the space between the buttons.
+	// In the space-between control bar, the dots fill the space between buttons.
 	flex: 1 1 0%;
 }
 

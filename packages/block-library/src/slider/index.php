@@ -55,30 +55,24 @@ function block_core_slider_build_attrs( $attributes ) {
  * @param string $navigation_button_type Button content: 'icon', 'text', or 'both'.
  * @param string $indicator_style        Style of the indicator dots: 'dot' or 'line'.
  * @param string $position               Shared position: 'top' or 'bottom'.
- * @param bool   $show_arrows            Whether to render the prev/next buttons.
  * @param bool   $show_indicators        Whether to render the indicator dots.
+ * @param string $arrows_justification   Justification of the nav buttons: 'left', 'center', 'right', or 'space-between'.
  * @return string HTML string for the control bar.
  */
-function block_core_slider_render_control_bar_markup( $arrow_icon, $navigation_button_type, $indicator_style, $position, $show_arrows, $show_indicators ) {
-	$content = '';
+function block_core_slider_render_control_bar_markup( $arrow_icon, $navigation_button_type, $indicator_style, $position, $show_indicators, $arrows_justification ) {
+	$indicators_html = $show_indicators
+		? '<div class="wp-block-slider-indicators__dots is-style-' . esc_attr( $indicator_style ) . '" data-wp-interactive="core/slider"><template data-wp-each="state.dots" data-wp-each-key="context.item"><button type="button" class="wp-block-slider-indicators__dot" data-wp-on--click="actions.goToSlide" data-wp-bind--aria-current="state.isDotActive" data-wp-bind--aria-label="state.dotLabel"></button></template></div>'
+		: '';
 
-	if ( $show_arrows ) {
-		$content .= block_core_slider_render_arrow_button_markup( $arrow_icon, $navigation_button_type, true );
-	}
+	$prev = block_core_slider_render_arrow_button_markup( $arrow_icon, $navigation_button_type, true );
+	$next = block_core_slider_render_arrow_button_markup( $arrow_icon, $navigation_button_type, false );
+	$content = $prev . $indicators_html . $next;
 
-	if ( $show_indicators ) {
-		$content .= '<div class="wp-block-slider-indicators__dots is-style-' . esc_attr( $indicator_style ) . '" data-wp-interactive="core/slider"><template data-wp-each="state.dots" data-wp-each-key="context.item"><button type="button" class="wp-block-slider-indicators__dot" data-wp-on--click="actions.goToSlide" data-wp-bind--aria-current="state.isDotActive" data-wp-bind--aria-label="state.dotLabel"></button></template></div>';
-	}
-
-	if ( $show_arrows ) {
-		$content .= block_core_slider_render_arrow_button_markup( $arrow_icon, $navigation_button_type, false );
-	}
-
-	return '<div class="wp-block-slider-control-bar is-position-' . esc_attr( $position ) . '">' . $content . '</div>';
+	return '<div class="wp-block-slider-control-bar is-position-' . esc_attr( $position ) . ' is-justify-' . esc_attr( $arrows_justification ) . '">' . $content . '</div>';
 }
 
 /**
- * Renders a single arrow button (previous or next).
+ * Renders a single previous/next button.
  *
  * @param string $arrow_icon             Icon style: 'chevron' or 'arrow'.
  * @param string $navigation_button_type Button content: 'icon', 'text', or 'both'.
@@ -123,39 +117,24 @@ function block_core_slider_render_arrow_button_markup( $arrow_icon, $navigation_
 }
 
 /**
- * Renders the arrows markup (previous/next buttons) for the slider.
+ * Renders a container and the previous/next buttons for the slider.
  *
  * @param string $arrow_icon             Icon style: 'chevron' or 'arrow'.
  * @param string $navigation_button_type Button content: 'icon', 'text', or 'both'.
  * @param string $arrows_position        Where arrows are placed.
+ * @param string $arrows_justification   Justification of the nav buttons: 'left', 'center', 'right', or 'space-between'. Ignored for overlay.
  * @return string HTML string for the arrows container, or empty string when hidden.
  */
-function block_core_slider_render_arrows_markup( $arrow_icon, $navigation_button_type, $arrows_position ) {
-	if ( 'none' === $arrows_position ) {
-		return '';
-	}
-
+function block_core_slider_render_arrows_markup( $arrow_icon, $navigation_button_type, $arrows_position, $arrows_justification ) {
 	$button_html  = block_core_slider_render_arrow_button_markup( $arrow_icon, $navigation_button_type, true );
 	$button_html .= block_core_slider_render_arrow_button_markup( $arrow_icon, $navigation_button_type, false );
 
-	return '<div class="wp-block-slider-arrows is-position-' . esc_attr( $arrows_position ) . '">' . $button_html . '</div>';
-}
-
-/**
- * Renders the indicators markup (dot/line buttons) for the slider.
- *
- * @param string $indicator_style     Style of the indicator dots: 'dot' or 'line'.
- * @param string $indicators_position Where indicators are placed.
- * @return string HTML string for the indicators container, or empty string when hidden.
- */
-function block_core_slider_render_indicators_markup( $indicator_style, $indicators_position ) {
-	if ( 'none' === $indicators_position ) {
-		return '';
+	$class = 'wp-block-slider-arrows is-position-' . esc_attr( $arrows_position );
+	if ( 'overlay' !== $arrows_position ) {
+		$class .= ' is-justify-' . esc_attr( $arrows_justification );
 	}
 
-	$dots_html = '<div class="wp-block-slider-indicators__dots is-style-' . esc_attr( $indicator_style ) . '" data-wp-interactive="core/slider"><template data-wp-each="state.dots" data-wp-each-key="context.item"><button type="button" class="wp-block-slider-indicators__dot" data-wp-on--click="actions.goToSlide" data-wp-bind--aria-current="state.isDotActive" data-wp-bind--aria-label="state.dotLabel"></button></template></div>';
-
-	return '<div class="wp-block-slider-indicators is-position-' . esc_attr( $indicators_position ) . '">' . $dots_html . '</div>';
+	return '<div class="' . $class . '">' . $button_html . '</div>';
 }
 
 /**
@@ -219,74 +198,43 @@ function render_block_core_slider( $attributes, $content, $block ) {
 		}
 	}
 
-	$track_markup = sprintf(
-		'<div class="wp-block-slider-track" data-wp-on--scroll="actions.handleScroll" data-wp-init="callbacks.initTrack" tabindex="0" aria-label="%1$s">%2$s</div>',
-		esc_attr__( 'Slides' ),
-		$p->get_updated_html()
-	);
-
 	$arrow_icon             = $attributes['arrowIcon'] ?? 'chevron';
 	$indicator_style        = $attributes['indicatorStyle'] ?? 'dot';
 	$navigation_button_type = $attributes['navigationButtonType'] ?? 'icon';
-	$arrows_position        = $attributes['arrowsPosition'] ?? 'overlay';
-	$indicators_position    = $attributes['indicatorsPosition'] ?? 'overlay';
+	$arrows_position        = $attributes['navigationPosition'] ?? 'overlay';
+	$arrows_justification   = $attributes['navigationJustification'] ?? 'space-between';
+	$show_indicators        = isset( $attributes['showIndicators'] ) ? (bool) $attributes['showIndicators'] : true;
 
-	$positioned_positions = array( 'overlay', 'sides' );
-	$flow_positions       = array( 'top', 'bottom' );
+	$slides_html = $p->get_updated_html();
 
-	$arrows_in_flow     = in_array( $arrows_position, $flow_positions, true );
-	$indicators_in_flow = in_array( $indicators_position, $flow_positions, true );
+	$overlay_indicator = '';
+	if ( 'overlay' === $arrows_position && $show_indicators ) {
+		$dots_html         = '<div class="wp-block-slider-indicators__dots is-style-' . esc_attr( $indicator_style ) . '" data-wp-interactive="core/slider"><template data-wp-each="state.dots" data-wp-each-key="context.item"><button type="button" class="wp-block-slider-indicators__dot" data-wp-on--click="actions.goToSlide" data-wp-bind--aria-current="state.isDotActive" data-wp-bind--aria-label="state.dotLabel"></button></template></div>';
+		$overlay_indicator = '<div class="wp-block-slider-indicators is-position-overlay">' . $dots_html . '</div>';
+	}
 
-	// When arrows and indicators share the same in-flow position, emit a single
-	// combined control bar: [prev] [indicators] [next].
-	$shared_in_flow_position = ( $arrows_in_flow && $indicators_in_flow && $arrows_position === $indicators_position )
-		? $arrows_position
-		: null;
+	$track_markup = sprintf(
+		'<div class="wp-block-slider-track" data-wp-on--scroll="actions.handleScroll" data-wp-init="callbacks.initTrack" tabindex="0" aria-label="%1$s">%2$s</div>',
+		esc_attr__( 'Slides' ),
+		$slides_html
+	);
 
-	if ( null !== $shared_in_flow_position ) {
-		$control_bar_markup = block_core_slider_render_control_bar_markup(
+	if ( 'overlay' === $arrows_position ) {
+		$arrows_markup    = block_core_slider_render_arrows_markup( $arrow_icon, $navigation_button_type, $arrows_position, $arrows_justification );
+		$rendered_content = $track_markup . $arrows_markup . $overlay_indicator . $other_content;
+	} else {
+		$control_bar = block_core_slider_render_control_bar_markup(
 			$arrow_icon,
 			$navigation_button_type,
 			$indicator_style,
-			$shared_in_flow_position,
-			'none' !== $arrows_position,
-			'none' !== $indicators_position
+			$arrows_position,
+			$show_indicators,
+			$arrows_justification
 		);
-		$before_track = 'top' === $shared_in_flow_position ? $control_bar_markup : '';
-		$after_track  = 'bottom' === $shared_in_flow_position ? $control_bar_markup : '';
-	} else {
-		$arrows_markup     = block_core_slider_render_arrows_markup( $arrow_icon, $navigation_button_type, $arrows_position );
-		$indicators_markup = block_core_slider_render_indicators_markup( $indicator_style, $indicators_position );
-
-		$before_track = '';
-		$after_track  = '';
-
-		if ( $arrows_in_flow ) {
-			if ( 'top' === $arrows_position ) {
-				$before_track .= $arrows_markup;
-			} else {
-				$after_track .= $arrows_markup;
-			}
-		}
-		if ( $indicators_in_flow ) {
-			if ( 'top' === $indicators_position ) {
-				$before_track .= $indicators_markup;
-			} else {
-				$after_track .= $indicators_markup;
-			}
-		}
+		$rendered_content = ( 'top' === $arrows_position )
+			? $control_bar . $track_markup . $other_content
+			: $track_markup . $control_bar . $other_content;
 	}
-
-	// Positioned (overlay/sides) elements are absolute siblings of the track.
-	$positioned_markup = '';
-	if ( in_array( $arrows_position, $positioned_positions, true ) ) {
-		$positioned_markup .= block_core_slider_render_arrows_markup( $arrow_icon, $navigation_button_type, $arrows_position );
-	}
-	if ( in_array( $indicators_position, $positioned_positions, true ) ) {
-		$positioned_markup .= block_core_slider_render_indicators_markup( $indicator_style, $indicators_position );
-	}
-
-	$rendered_content = $before_track . $track_markup . $positioned_markup . $after_track . $other_content;
 
 	$slides_to_show = isset( $attributes['slidesToShow'] ) ? (int) $attributes['slidesToShow'] : 1;
 	$slides_to_show = max( 1, min( $slides_to_show, $slide_count ) );
@@ -311,7 +259,7 @@ function render_block_core_slider( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class'                => 'is-arrows-position-' . sanitize_html_class( $arrows_position ) . ' is-indicators-position-' . sanitize_html_class( $indicators_position ),
+			'class'                => 'is-arrows-position-' . sanitize_html_class( $arrows_position ),
 			'data-wp-interactive'  => 'core/slider',
 			'data-wp-context'      => wp_json_encode( $context ),
 			'data-wp-on--focusin'  => 'actions.handleFocusIn',

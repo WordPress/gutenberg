@@ -23,11 +23,12 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 |-----------|------|---------|-------------|
 | `slidesToShow` | `integer` | `1` | — |
 | `loop` | `boolean` | `true` | — |
+| `navigationPosition` | `string` | `"overlay"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `overlay`, `top`, `bottom` |
+| `navigationJustification` | `string` | `"space-between"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `left`, `center`, `right`, `space-between` |
 | `arrowIcon` | `string` | `"chevron"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `chevron`, `arrow` |
-| `indicatorStyle` | `string` | `"dot"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `dot`, `line` |
 | `navigationButtonType` | `string` | `"icon"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `icon`, `text`, `both` |
-| `arrowsPosition` | `string` | `"overlay"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `overlay`, `sides`, `top`, `bottom`, `none` |
-| `indicatorsPosition` | `string` | `"overlay"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `overlay`, `top`, `bottom`, `none` |
+| `showIndicators` | `boolean` | `true` | — |
+| `indicatorStyle` | `string` | `"dot"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `dot`, `line` |
 
 ## Supports
 
@@ -37,10 +38,6 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`ariaLabel`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#arialabel): `true`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
-- [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout):
-  - [`default`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex","orientation":"vertical"}`
-  - [`allowOrientation`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-alloworientation): `true`
-  - [`allowJustification`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowjustification): `false`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
 
@@ -49,7 +46,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
 
 ```html
-<!-- wp:slider {"slidesToShow":1,"loop":true,"arrowIcon":"chevron","indicatorStyle":"dot","navigationButtonType":"icon","arrowsPosition":"overlay","indicatorsPosition":"overlay"} -->
+<!-- wp:slider {"slidesToShow":1,"loop":true,"navigationPosition":"overlay","navigationJustification":"space-between","arrowIcon":"chevron","navigationButtonType":"icon","showIndicators":true,"indicatorStyle":"dot"} -->
 <!-- Content... -->
 <!-- /wp:slider -->
 ```
