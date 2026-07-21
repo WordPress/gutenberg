@@ -128,6 +128,23 @@ class Gutenberg_Navigation_Menu_Caps_Test extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Denies Navigation Menu capabilities after the compatibility bridge runs.
+	 *
+	 * This models a permissions plugin that deliberately allows access to the
+	 * Site Editor while making shared Navigation Menu entities read-only.
+	 *
+	 * @param bool[] $allcaps All capabilities for the current user.
+	 * @return bool[] Filtered capabilities.
+	 */
+	public function deny_navigation_management_capabilities( $allcaps ) {
+		foreach ( gutenberg_get_wp_navigation_menu_capability_names() as $capability ) {
+			$allcaps[ $capability ] = false;
+		}
+
+		return $allcaps;
+	}
+
+	/**
 	 * Creates a published block Navigation Menu post.
 	 *
 	 * @param array $args Post arguments.
@@ -467,6 +484,124 @@ class Gutenberg_Navigation_Menu_Caps_Test extends WP_Test_REST_TestCase {
 
 		$this->assertSame( 403, $response->get_status() );
 		$this->assertSame( $before, wp_count_posts( 'wp_navigation' )->publish );
+	}
+
+	/**
+	 * @covers ::gutenberg_maybe_grant_wp_navigation_menu_caps
+	 * @covers ::gutenberg_get_navigation_fallback_permissions_check
+	 * @covers WP_REST_Posts_Controller::get_items
+	 * @covers WP_REST_Posts_Controller::get_item
+	 * @covers WP_REST_Posts_Controller::create_item_permissions_check
+	 * @covers WP_REST_Posts_Controller::update_item_permissions_check
+	 * @covers WP_REST_Posts_Controller::delete_item_permissions_check
+	 */
+	public function test_site_editor_capable_administrator_with_explicit_navigation_denials_has_read_only_rest_access() {
+		$published_navigation_id = $this->create_navigation_menu(
+			array( 'post_title' => 'Published Menu Visible To Site Editor User' )
+		);
+		$draft_navigation_id     = $this->create_navigation_menu(
+			array(
+				'post_status' => 'draft',
+				'post_title'  => 'Draft Menu Hidden From Site Editor User',
+			)
+		);
+
+		wp_set_current_user( self::$admin_id );
+		add_filter( 'user_has_cap', array( $this, 'deny_navigation_management_capabilities' ), 20 );
+
+		try {
+			$this->assertTrue(
+				current_user_can( 'edit_theme_options' ),
+				'Expected the user to retain the capability that gates access to the Site Editor.'
+			);
+
+			foreach ( gutenberg_get_wp_navigation_menu_capability_names() as $capability ) {
+				$this->assertFalse(
+					current_user_can( $capability ),
+					"Expected the custom permissions filter to deny {$capability}."
+				);
+			}
+
+			$view_collection_response = $this->dispatch_request(
+				'GET',
+				'/wp/v2/navigation',
+				array(
+					'context' => 'view',
+					'status'  => 'publish',
+				)
+			);
+			$this->assertSame( 200, $view_collection_response->get_status() );
+			$visible_navigation_ids = wp_list_pluck( $view_collection_response->get_data(), 'id' );
+			$this->assertContains( $published_navigation_id, $visible_navigation_ids );
+			$this->assertNotContains( $draft_navigation_id, $visible_navigation_ids );
+
+			$view_item_response = $this->dispatch_request(
+				'GET',
+				'/wp/v2/navigation/' . $published_navigation_id,
+				array( 'context' => 'view' )
+			);
+			$this->assertSame( 200, $view_item_response->get_status() );
+
+			$edit_item_response = $this->dispatch_request(
+				'GET',
+				'/wp/v2/navigation/' . $published_navigation_id,
+				array( 'context' => 'edit' )
+			);
+			$this->assertSame( 403, $edit_item_response->get_status() );
+
+			$draft_item_response = $this->dispatch_request(
+				'GET',
+				'/wp/v2/navigation/' . $draft_navigation_id,
+				array( 'context' => 'view' )
+			);
+			$this->assertSame( 403, $draft_item_response->get_status() );
+
+			$draft_collection_response = $this->dispatch_request(
+				'GET',
+				'/wp/v2/navigation',
+				array(
+					'context' => 'view',
+					'status'  => 'draft',
+				)
+			);
+			$this->assertSame( 400, $draft_collection_response->get_status() );
+
+			$create_response = $this->dispatch_request(
+				'POST',
+				'/wp/v2/navigation',
+				array(
+					'content' => '<!-- wp:navigation-link {"label":"Forbidden","url":"/forbidden"} /-->',
+					'status'  => 'publish',
+					'title'   => 'Forbidden REST Navigation Menu',
+				)
+			);
+			$this->assertSame( 403, $create_response->get_status() );
+
+			$update_response = $this->dispatch_request(
+				'PUT',
+				'/wp/v2/navigation/' . $published_navigation_id,
+				array( 'title' => 'Forbidden REST Navigation Menu Update' )
+			);
+			$this->assertSame( 403, $update_response->get_status() );
+
+			$delete_response = $this->dispatch_request(
+				'DELETE',
+				'/wp/v2/navigation/' . $published_navigation_id,
+				array( 'force' => true )
+			);
+			$this->assertSame( 403, $delete_response->get_status() );
+
+			$published_count_before_fallback = wp_count_posts( 'wp_navigation' )->publish;
+			$fallback_response               = $this->dispatch_request(
+				'GET',
+				'/wp-block-editor/v1/navigation-fallback',
+				array( '_embed' => true )
+			);
+			$this->assertSame( 403, $fallback_response->get_status() );
+			$this->assertSame( $published_count_before_fallback, wp_count_posts( 'wp_navigation' )->publish );
+		} finally {
+			remove_filter( 'user_has_cap', array( $this, 'deny_navigation_management_capabilities' ), 20 );
+		}
 	}
 
 	/**
