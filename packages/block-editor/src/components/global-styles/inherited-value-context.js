@@ -45,20 +45,33 @@ function useRawGlobalStyles() {
 }
 
 /**
- * Blocks whose canvas rendering is driven by root-level Global Styles
- * *element* styles rather than (or in addition to) the block's own class.
+ * Maps a block to the root-level Global Styles *element* layers that paint it
+ * on the canvas, in addition to (or instead of) the block's own class — e.g. a
+ * Button renders `.wp-element-button`, a level-2 Heading renders `<h2>`.
  *
- * Each entry returns the element keys that paint the block, ordered low to
- * high precedence, so a level-specific `h2` correctly wins over the generic
- * `heading`.
+ * Element keys are returned ordered low to high precedence, so a level-specific
+ * `h2` correctly wins over the generic `heading`. A level of `0` (e.g. a Site
+ * or Post Title rendered as a paragraph) renders no heading tag at all, so
+ * neither `heading` nor any `h1`-`h6` styles reach the block and no element
+ * layer applies.
  *
- * A level of `0` (e.g. Site Title or Post Title rendered as a paragraph)
- * renders no heading tag at all, so neither the generic `heading` nor any
- * `h1`-`h6` element styles reach the block and no element layer applies.
+ * This list is hand-maintained by necessity: the block-to-element relationship
+ * is not inferable from block metadata. `supports.color.link` and friends mark
+ * blocks that *contain* a stylable element, not blocks that *are* one (Button
+ * declares no `color.button`, Heading no `color.heading`), and the system only
+ * stores the inverse element-to-selector map (`__EXPERIMENTAL_ELEMENTS`); the
+ * correspondence otherwise lives only in each block's rendered markup.
+ * Standardizing it as a declarative block property is tracked in
+ * https://github.com/WordPress/gutenberg/issues/80438.
+ *
+ * The link-bearing heading blocks (Site Title, Post Title, Term Name) are
+ * deliberately not given a `link` layer here: their inner-link color control
+ * reads the `inheritedValue.elements.link` passthrough, so folding `link` into
+ * the block's own layers would bleed link color into the heading's text.
  *
  * @param {string}  blockName    Block name.
  * @param {?number} headingLevel Block's `level` attribute, when it has one.
- * @return {string[]} Ordered element keys.
+ * @return {string[]} Ordered element keys, low to high precedence.
  */
 function getElementLayers( blockName, headingLevel ) {
 	switch ( blockName ) {
