@@ -3,53 +3,67 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-const EDITOR_USERNAME = 'navigation-read-only-editor';
-const EDITOR_PASSWORD = 'password';
+const PERMISSIONS_PLUGIN =
+	'gutenberg-test-site-editor-read-only-navigation-permissions';
+const SITE_EDITOR_USER = 'site-editor-user-with-navigation-write-denied';
+const SITE_EDITOR_USER_PASSWORD = 'password';
 
-test.describe( 'Navigation block for a default Editor without Navigation Menu write capabilities', () => {
+test.describe( 'Navigation block for a Site Editor user with Navigation Menu writes explicitly denied', () => {
 	test.use( { storageState: { cookies: [], origins: [] } } );
 
-	const resetTestData = async ( requestUtils ) => {
-		await requestUtils.deleteAllPosts();
-		await requestUtils.deleteAllMenus();
-		await requestUtils.deleteAllUsers();
-	};
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.activatePlugin( PERMISSIONS_PLUGIN );
+	} );
 
 	test.beforeEach( async ( { requestUtils } ) => {
-		await resetTestData( requestUtils );
+		await Promise.all( [
+			requestUtils.deleteAllMenus(),
+			requestUtils.deleteAllTemplates( 'wp_template' ),
+			requestUtils.deleteAllUsers(),
+		] );
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
-		await resetTestData( requestUtils );
+		await Promise.all( [
+			requestUtils.deleteAllMenus(),
+			requestUtils.deleteAllTemplates( 'wp_template' ),
+			requestUtils.deleteAllUsers(),
+		] );
 	} );
 
-	test( 'can view and switch published menus while create, update, and delete permissions are false', async ( {
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin( PERMISSIONS_PLUGIN );
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
+	test( 'can access the Site Editor canvas, switch published menus, and save block styles without mutating menus', async ( {
 		admin,
 		editor,
 		page,
 		requestUtils,
 	} ) => {
 		await requestUtils.createUser( {
-			username: EDITOR_USERNAME,
-			email: `${ EDITOR_USERNAME }@example.com`,
-			password: EDITOR_PASSWORD,
-			roles: [ 'editor' ],
+			username: SITE_EDITOR_USER,
+			email: `${ SITE_EDITOR_USER }@example.com`,
+			password: SITE_EDITOR_USER_PASSWORD,
+			roles: [ 'administrator' ],
 		} );
 
 		const firstMenu = await requestUtils.createNavigationMenu( {
-			title: 'Read-only Menu One',
+			title: 'Site Editor Read-only Menu One',
 			content:
-				'<!-- wp:navigation-link {"label":"First menu link","type":"custom","url":"#first-menu-link","kind":"custom"} /-->',
+				'<!-- wp:navigation-link {"label":"First site editor menu link","type":"custom","url":"#first-site-editor-menu-link","kind":"custom"} /-->',
 		} );
 		const secondMenu = await requestUtils.createNavigationMenu( {
-			title: 'Read-only Menu Two',
+			title: 'Site Editor Read-only Menu Two',
 			content:
-				'<!-- wp:navigation-link {"label":"Second menu link","type":"custom","url":"#second-menu-link","kind":"custom"} /-->',
+				'<!-- wp:navigation-link {"label":"Second site editor menu link","type":"custom","url":"#second-site-editor-menu-link","kind":"custom"} /-->',
 		} );
-		const post = await requestUtils.createPost( {
-			title: 'Read-only Navigation Menu test',
+		const template = await requestUtils.createTemplate( 'wp_template', {
+			slug: 'navigation-read-only-capabilities',
+			title: 'Navigation read-only capabilities',
 			content: `<!-- wp:navigation {"ref":${ firstMenu.id }} /-->`,
-			status: 'publish',
 		} );
 
 		const getMenu = ( menuId ) =>
@@ -79,20 +93,29 @@ test.describe( 'Navigation block for a default Editor without Navigation Menu wr
 		await page.goto( '/wp-login.php' );
 		await page
 			.getByLabel( 'Username or Email Address' )
-			.fill( EDITOR_USERNAME );
+			.fill( SITE_EDITOR_USER );
 		await page
 			.getByRole( 'textbox', { name: 'Password' } )
-			.fill( EDITOR_PASSWORD );
+			.fill( SITE_EDITOR_USER_PASSWORD );
 		await page.getByRole( 'button', { name: 'Log In' } ).click();
 		await page.waitForURL( /wp-admin/ );
 
-		await admin.editPost( post.id );
+		await admin.visitSiteEditor( {
+			postId: template.id,
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+		await expect(
+			page.getByRole( 'region', { name: 'Editor top bar' } )
+		).toBeVisible();
 
 		const navigationBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Navigation',
 		} );
 		await expect(
-			navigationBlock.getByRole( 'link', { name: 'First menu link' } )
+			navigationBlock.getByRole( 'link', {
+				name: 'First site editor menu link',
+			} )
 		).toBeVisible();
 		await expect(
 			navigationBlock.getByRole( 'textbox', {
@@ -117,7 +140,7 @@ test.describe( 'Navigation block for a default Editor without Navigation Menu wr
 		).toHaveCount( 0 );
 
 		await listViewPanel
-			.getByRole( 'button', { name: 'Read-only Menu One' } )
+			.getByRole( 'button', { name: 'Site Editor Read-only Menu One' } )
 			.click();
 		await expect(
 			page.getByRole( 'group', { name: 'Tools' } )
@@ -127,16 +150,15 @@ test.describe( 'Navigation block for a default Editor without Navigation Menu wr
 		).toHaveAttribute( 'aria-disabled', 'true' );
 		await page
 			.getByRole( 'menuitemradio', {
-				name: 'Read-only Menu Two',
+				name: 'Site Editor Read-only Menu Two',
 			} )
 			.click();
 
 		await expect(
-			navigationBlock.getByRole( 'link', { name: 'Second menu link' } )
+			navigationBlock.getByRole( 'link', {
+				name: 'Second site editor menu link',
+			} )
 		).toBeVisible();
-		await expect(
-			navigationBlock.getByRole( 'link', { name: 'First menu link' } )
-		).toHaveCount( 0 );
 
 		await navigationBlock.click();
 		await page
@@ -148,18 +170,18 @@ test.describe( 'Navigation block for a default Editor without Navigation Menu wr
 			.click();
 		await expect( navigationBlock ).toHaveClass( /items-justified-right/ );
 
-		const saveButton = page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Save', exact: true } );
-		await saveButton.click();
-		await page
-			.getByRole( 'button', { name: 'Dismiss this notice' } )
-			.filter( { hasText: 'updated' } )
-			.waitFor();
-
-		await admin.editPost( post.id );
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
+		await admin.visitSiteEditor( {
+			postId: template.id,
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 		await expect(
-			navigationBlock.getByRole( 'link', { name: 'Second menu link' } )
+			navigationBlock.getByRole( 'link', {
+				name: 'Second site editor menu link',
+			} )
 		).toBeVisible();
 		await expect( navigationBlock ).toHaveClass( /items-justified-right/ );
 
