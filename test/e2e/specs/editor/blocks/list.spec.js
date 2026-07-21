@@ -2040,18 +2040,25 @@ test.describe( 'List (@firefox)', () => {
 
 		// The native selection is untouched (only hidden by the block
 		// overlay), so the gesture could still continue. It reaches from
-		// "ab" into the nested "cd" item. The selected text is not
-		// asserted because the line navigation lands at the start of the
-		// indented nested line, right before "cd".
+		// the middle of "ab" into the nested "cd" item. The selected
+		// text is not asserted because the line navigation lands at the
+		// start of the indented nested line, right before "cd".
 		expect(
 			await page.frame( { name: 'editor-canvas' } ).evaluate( () => {
 				const selection = document.getSelection();
 				return {
 					anchor: selection.anchorNode.textContent,
+					anchorOffset: selection.anchorOffset,
 					focus: selection.focusNode.textContent,
+					focusOffset: selection.focusOffset,
 				};
 			} )
-		).toMatchObject( { anchor: 'ab', focus: 'cd' } );
+		).toMatchObject( {
+			anchor: 'ab',
+			anchorOffset: 1,
+			focus: 'cd',
+			focusOffset: 0,
+		} );
 
 		// The press removes the fully selected item as a whole, together
 		// with its nested list; the unrelated sibling remains.
