@@ -215,20 +215,29 @@ function getRawContent( record ) {
 	return record?.content?.raw || record?.content || '';
 }
 
-function findBlockPath( blocks, isMatch ) {
+function findBlockPaths( blocks, isMatch ) {
+	const paths = [];
 	for ( let index = 0; index < blocks.length; index++ ) {
 		const block = blocks[ index ];
 		if ( isMatch( block ) ) {
-			return [ index ];
+			paths.push( [ index ] );
 		}
 
-		const childPath = findBlockPath( block.innerBlocks || [], isMatch );
-		if ( childPath ) {
-			return [ index, ...childPath ];
-		}
+		paths.push(
+			...findBlockPaths( block.innerBlocks || [], isMatch ).map(
+				( childPath ) => [ index, ...childPath ]
+			)
+		);
 	}
 
-	return null;
+	return paths;
+}
+
+function countBlocks( blocks ) {
+	return blocks.reduce(
+		( count, block ) => count + 1 + countBlocks( block.innerBlocks || [] ),
+		0
+	);
 }
 
 function getBlockAtPath( blocks, path ) {
@@ -296,10 +305,28 @@ function updateBlockAttributesAtPath( blocks, path, attributes ) {
  * @param {number[]}        options.blockPath  Path to the block in saved content.
  * @param {Object|Function} options.attributes Attribute changes or updater.
  * @param {Function}        options.isMatch    Optional block matcher for path validation.
+ * @param {number}          options.matchIndex Zero-based occurrence of the matched live block.
+ * @param {number}          options.matchCount Number of matching blocks in the live tree.
+ * @param {number}          options.blockCount Number of blocks in the live tree.
+ * @param {string}          options.blockName  Name of the live target block.
  * @return {Promise<boolean>} Whether block attributes were persisted.
  */
 export const persistEntityBlockAttributes =
-	( kind, name, recordId, { record, blockPath, attributes, isMatch } ) =>
+	(
+		kind,
+		name,
+		recordId,
+		{
+			record,
+			blockPath,
+			attributes,
+			isMatch,
+			matchIndex,
+			matchCount,
+			blockCount,
+			blockName,
+		}
+	) =>
 	async ( { select } ) => {
 		const entityConfig = select.getEntityConfig( kind, name );
 		if (
@@ -317,11 +344,29 @@ export const persistEntityBlockAttributes =
 
 		const parsedBlocks = parse( content );
 		let targetPath = blockPath;
-		if (
-			isMatch &&
-			! isMatch( getBlockAtPath( parsedBlocks, blockPath ) )
-		) {
-			targetPath = findBlockPath( parsedBlocks, isMatch ) || blockPath;
+		if ( isMatch ) {
+			const matchingPaths = findBlockPaths( parsedBlocks, isMatch );
+			if (
+				! Number.isInteger( matchIndex ) ||
+				! Number.isInteger( matchCount )
+			) {
+				return false;
+			}
+
+			if ( matchingPaths.length === matchCount ) {
+				targetPath = matchingPaths[ matchIndex ];
+			} else {
+				const pathBlock = getBlockAtPath( parsedBlocks, blockPath );
+				const canUseDirtyPath =
+					matchingPaths.length === 0 &&
+					matchCount === 1 &&
+					Number.isInteger( blockCount ) &&
+					countBlocks( parsedBlocks ) === blockCount &&
+					pathBlock?.name === blockName;
+				if ( ! canUseDirtyPath ) {
+					return false;
+				}
+			}
 		}
 
 		if ( ! targetPath ) {

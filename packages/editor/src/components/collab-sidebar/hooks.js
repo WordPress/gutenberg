@@ -78,6 +78,34 @@ function getBlockPath( blocks, clientId ) {
 	return null;
 }
 
+function getBlockMatchPosition( blocks, clientId, isMatch ) {
+	let matchCount = 0;
+	let matchIndex = null;
+
+	const visit = ( blockList ) => {
+		for ( const block of blockList ) {
+			if ( isMatch( block ) ) {
+				if ( block.clientId === clientId ) {
+					matchIndex = matchCount;
+				}
+				matchCount++;
+			}
+			visit( block.innerBlocks || [] );
+		}
+	};
+
+	visit( blocks );
+	return { matchCount, matchIndex };
+}
+
+function getBlockCount( blocks ) {
+	return blocks.reduce(
+		( count, block ) =>
+			count + 1 + getBlockCount( block.innerBlocks || [] ),
+		0
+	);
+}
+
 export function useNoteThreads( postId ) {
 	const queryArgs = {
 		post: postId,
@@ -408,7 +436,17 @@ export function useNoteActions() {
 
 				updateBlockAttributes( clientId, newAttributes );
 
-				const blockPath = getBlockPath( getBlocks(), clientId );
+				const blocks = getBlocks();
+				const blockPath = getBlockPath( blocks, clientId );
+				const isMatch = ( block ) =>
+					block?.name === selectedBlock?.name &&
+					getBlockAttributeText( block, 'content' ) ===
+						getBlockAttributeText( selectedBlock, 'content' );
+				const { matchCount, matchIndex } = getBlockMatchPosition(
+					blocks,
+					clientId,
+					isMatch
+				);
 				const didPersistBlockAttributes = persistEntityBlockAttributes
 					? await persistEntityBlockAttributes(
 							'postType',
@@ -417,24 +455,37 @@ export function useNoteActions() {
 							{
 								record: getCurrentPost(),
 								blockPath,
-								isMatch: ( block ) =>
-									block?.name === selectedBlock?.name &&
-									getBlockAttributeText(
-										block,
-										'content'
-									) ===
-										getBlockAttributeText(
-											selectedBlock,
-											'content'
+								isMatch,
+								matchCount,
+								matchIndex,
+								blockCount: getBlockCount( blocks ),
+								blockName: selectedBlock?.name,
+								attributes: ( blockAttributes ) => {
+									const repairedAttributes = {
+										metadata: cleanEmptyObject(
+											mergeNoteMetadata(
+												blockAttributes?.metadata,
+												updatedMetadata
+											)
 										),
-								attributes: ( blockAttributes ) => ( {
-									metadata: cleanEmptyObject(
-										mergeNoteMetadata(
-											blockAttributes?.metadata,
-											updatedMetadata
-										)
-									),
-								} ),
+									};
+									if ( inlineSelection ) {
+										const wrapped = wrapInlineNote(
+											blockAttributes?.[
+												inlineSelection.attributeKey
+											],
+											savedRecord.id,
+											inlineSelection.start,
+											inlineSelection.end
+										);
+										if ( wrapped ) {
+											repairedAttributes[
+												inlineSelection.attributeKey
+											] = wrapped;
+										}
+									}
+									return repairedAttributes;
+								},
 							}
 					  )
 					: false;
