@@ -66,8 +66,8 @@ function gutenberg_translate_widget_metadata( $widget ) {
 
 /**
  * Constrains a widget help note to its allowed shape: `content` keeps
- * only `em`/`strong` markup, and links missing a `label` or `href` are
- * dropped.
+ * only `em`/`strong` markup, and links are dropped unless they carry a
+ * `label` and an `href` that survives `esc_url_raw()`.
  *
  * @param array|null $help Help note from the build manifest.
  * @return array|null Sanitized help note, or null when there is no content.
@@ -91,10 +91,14 @@ function gutenberg_sanitize_widget_help( $help ) {
 		$links = array();
 		foreach ( $help['links'] as $link ) {
 			if ( is_array( $link ) && ! empty( $link['label'] ) && ! empty( $link['href'] ) ) {
-				$links[] = array(
-					'label' => $link['label'],
-					'href'  => $link['href'],
-				);
+				$href = esc_url_raw( $link['href'] );
+
+				if ( $href ) {
+					$links[] = array(
+						'label' => $link['label'],
+						'href'  => $href,
+					);
+				}
 			}
 		}
 

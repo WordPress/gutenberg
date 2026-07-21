@@ -55,10 +55,15 @@ function PullQuoteEdit( props ) {
 								} )
 							}
 							className="wp-block-pullquote__citation"
-							__unstableOnSplitAtEnd={ () =>
-								insertBlocksAfter(
-									createBlock( getDefaultBlockName() )
-								)
+							__unstableOnSplitAtEnd={
+								insertBlocksAfter
+									? () =>
+											insertBlocksAfter(
+												createBlock(
+													getDefaultBlockName()
+												)
+											)
+									: undefined
 							}
 						/>
 					) }
