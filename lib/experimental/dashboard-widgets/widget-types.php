@@ -124,15 +124,17 @@ function gutenberg_sanitize_widget_help( $help ) {
  * @return string Absolute plugin URL, the original href, or an empty string.
  */
 function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
+	// Bail early if the href is not a string or the dir_name is not a string.
 	if ( ! is_string( $href ) || '' === $href || ! is_string( $dir_name ) || '' === $dir_name ) {
 		return $href;
 	}
 
+	// Bail early if the href contains '..'. This is a security precaution to prevent path traversal attacks.
 	if ( str_contains( $href, '..' ) ) {
 		return '';
 	}
 
-	// Absolute, scheme-relative, or schemed URLs are already complete.
+	// Bail early if the href is an absolute, scheme-relative, or schemed URL.
 	if ( preg_match( '#^([a-z][a-z0-9+.-]*:)?//#i', $href ) || str_contains( $href, ':' ) ) {
 		return $href;
 	}
@@ -140,6 +142,7 @@ function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
 	$relative = ltrim( $href, '/' );
 	$path     = gutenberg_dir_path() . 'widgets/' . $dir_name . '/' . $relative;
 
+	// Bail early if the path is not a file.
 	if ( ! is_file( $path ) ) {
 		return $href;
 	}
