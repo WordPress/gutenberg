@@ -10,7 +10,7 @@ import type { ConnectionStatus } from '@wordpress/sync';
 import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
-import { getSyncManager } from './sync';
+import { getSyncManager, hasSyncProviders as syncHasProviders } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
@@ -28,6 +28,15 @@ const EMPTY_OBJECT = {};
 export function getUndoManager( state: State ) {
 	// undoManager is undefined until the first sync-enabled entity is loaded.
 	return getSyncManager()?.undoManager ?? state.undoManager;
+}
+
+/**
+ * Returns whether at least one sync provider is available.
+ *
+ * @return Whether a sync provider is available.
+ */
+export function hasSyncProviders(): boolean {
+	return syncHasProviders();
 }
 
 /**

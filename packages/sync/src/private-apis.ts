@@ -10,6 +10,7 @@ import {
 import { ConnectionErrorCode } from './errors';
 import { lock } from './lock-unlock';
 import { createSyncManager } from './manager';
+import { hasProviderCreators } from './providers';
 import { pollingManager } from './providers/http-polling/polling-manager';
 import { default as Delta } from './quill-delta/Delta';
 
@@ -18,6 +19,7 @@ export const privateApis = {};
 lock( privateApis, {
 	ConnectionErrorCode,
 	createSyncManager,
+	hasProviderCreators,
 	Delta,
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,

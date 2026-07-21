@@ -15,6 +15,7 @@ const {
 	ConnectionErrorCode,
 	createSyncManager,
 	Delta,
+	hasProviderCreators,
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,
 	LOCAL_EDITOR_ORIGIN,
@@ -32,11 +33,17 @@ export {
 	retrySyncConnection,
 };
 
+export { hasProviderCreators as hasSyncProviders };
+
 let syncManager: SyncManager;
 
 export function getSyncManager(): SyncManager | undefined {
 	if ( syncManager ) {
 		return syncManager;
+	}
+
+	if ( ! hasProviderCreators() ) {
+		return undefined;
 	}
 
 	syncManager = createSyncManager();

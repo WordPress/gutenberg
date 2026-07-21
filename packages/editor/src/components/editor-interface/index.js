@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -36,6 +37,7 @@ import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import StylesCanvas from '../styles-canvas';
+import useCollaborationProviderNotice from './use-collaboration-provider-notice';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -77,6 +79,7 @@ export default function EditorInterface( {
 	forceDisableBlockTools,
 	iframeProps,
 } ) {
+	const isCollaborationEnabled = Boolean( window._wpCollaborationEnabled );
 	const {
 		mode,
 		postId,
@@ -131,7 +134,17 @@ export default function EditorInterface( {
 			showDiff: isShowingRevisionDiff(),
 		};
 	}, [] );
+	const hasCollaborationProviders = useSelect(
+		( select ) =>
+			isCollaborationEnabled &&
+			unlock( select( coreStore ) ).hasSyncProviders(),
+		[ isCollaborationEnabled ]
+	);
 	const { setShowRevisionDiff } = unlock( useDispatch( editorStore ) );
+	useCollaborationProviderNotice( {
+		isCollaborationEnabled,
+		hasProviders: hasCollaborationProviders,
+	} );
 
 	// Runs unconditionally so join/leave/save notifications are dispatched
 	// regardless of viewport width or whether the header centre area is visible.

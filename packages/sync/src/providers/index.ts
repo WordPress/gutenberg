@@ -66,3 +66,12 @@ export function getProviderCreators(): ProviderCreator[] {
 
 	return providerCreators;
 }
+
+/**
+ * Returns whether at least one sync provider creator is available.
+ *
+ * @return Whether a provider creator is available.
+ */
+export function hasProviderCreators(): boolean {
+	return getProviderCreators().length > 0;
+}

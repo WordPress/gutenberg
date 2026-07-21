@@ -124,7 +124,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 				'type'              => 'boolean',
 				'description'       => __( 'Enable Real-Time Collaboration', 'gutenberg' ),
 				'sanitize_callback' => 'rest_sanitize_boolean',
-				'default'           => true,
+				'default'           => false,
 				'show_in_rest'      => true,
 			)
 		);
@@ -310,14 +310,11 @@ function gutenberg_inject_real_time_collaboration_setting() {
 add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );
 
 /**
- * Core adds an option with the default value, so we need to set the option to
- * our intended default when the Gutenberg plugin is activated, provided
- * collaboration is allowed.
+ * Ensures collaboration is disabled by default when Gutenberg is activated.
+ * Existing preferences are preserved when the plugin is reactivated.
  */
 function gutenberg_set_collaboration_option_on_activation() {
-	if ( wp_is_collaboration_allowed() ) {
-		update_option( 'wp_collaboration_enabled', '1' );
-	}
+	add_option( 'wp_collaboration_enabled', '0' );
 }
 add_action( 'activate_' . plugin_basename( dirname( __DIR__, 3 ) . '/gutenberg.php' ), 'gutenberg_set_collaboration_option_on_activation' );
 

@@ -663,8 +663,16 @@ export const getPreviousRevision = createRegistrySelector(
  */
 export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 	( select ) => ( state ) => {
-		// Return early, if collaboration is not supported.
-		if ( ! unlock( select( coreStore ) ).isCollaborationSupported() ) {
+		if ( ! window._wpCollaborationEnabled ) {
+			return false;
+		}
+
+		const { isCollaborationSupported, hasSyncProviders } = unlock(
+			select( coreStore )
+		);
+
+		// Return early if collaboration is unsupported or has no provider.
+		if ( ! isCollaborationSupported() || ! hasSyncProviders() ) {
 			return false;
 		}
 
@@ -679,7 +687,6 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		return Boolean(
 			syncConfig &&
 				syncConfig.supportsPersistence &&
-				window._wpCollaborationEnabled &&
 				false !==
 					syncConfig.shouldSync?.(
 						`postType/${ currentPostType }`,

@@ -7,6 +7,7 @@ jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../sync', () => ( {
 	...jest.requireActual( '../sync' ),
 	getSyncManager: jest.fn(),
+	hasSyncProviders: jest.fn(),
 } ) );
 jest.mock( '../utils/crdt', () => ( {
 	...jest.requireActual( '../utils/crdt' ),
@@ -22,7 +23,7 @@ import {
 	prePersistPostType,
 	additionalEntityConfigLoaders,
 } from '../entities';
-import { getSyncManager } from '../sync';
+import { getSyncManager, hasSyncProviders } from '../sync';
 import {
 	applyPostChangesToCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
@@ -141,6 +142,9 @@ describe( 'loadPostTypeEntities', () => {
 	beforeEach( () => {
 		apiFetch.mockReset();
 		applyPostChangesToCRDTDoc.mockReset();
+		hasSyncProviders.mockImplementation( () =>
+			Boolean( window._wpCollaborationEnabled )
+		);
 		originalCollaborationEnabled = window._wpCollaborationEnabled;
 		originalCollaborationDisabledPostTypes =
 			window._wpCollaborationDisabledPostTypes;
@@ -227,6 +231,27 @@ describe( 'loadPostTypeEntities', () => {
 		const syncedProperties = applyPostChangesToCRDTDoc.mock.calls[ 0 ][ 2 ];
 		expect( syncedProperties ).not.toContain( 'categories' );
 		expect( syncedProperties ).not.toContain( 'tags' );
+	} );
+
+	it( 'should not fetch taxonomies when no sync provider is available', async () => {
+		window._wpCollaborationEnabled = true;
+		hasSyncProviders.mockReturnValue( false );
+
+		apiFetch.mockResolvedValueOnce( {
+			post: {
+				name: 'Posts',
+				rest_base: 'posts',
+				rest_namespace: 'wp/v2',
+				taxonomies: [ 'category', 'post_tag' ],
+			},
+		} );
+
+		const postTypeLoader = additionalEntityConfigLoaders.find(
+			( loader ) => loader.kind === 'postType'
+		);
+		await postTypeLoader.loadEntities();
+
+		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should sync post type entities by default', async () => {

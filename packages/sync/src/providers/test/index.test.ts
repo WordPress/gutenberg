@@ -62,7 +62,16 @@ describe( 'sync providers', () => {
 		const { module, createHttpPollingProvider } = loadProviders();
 
 		expect( module.getDefaultProviderCreators() ).toEqual( [] );
+		expect( module.hasProviderCreators() ).toBe( false );
 		expect( createHttpPollingProvider ).not.toHaveBeenCalled();
+	} );
+
+	it( 'reports no providers when collaboration is enabled without polling', () => {
+		window._wpCollaborationEnabled = true;
+		const { module, applyFilters } = loadProviders();
+
+		expect( module.hasProviderCreators() ).toBe( false );
+		expect( applyFilters ).toHaveBeenCalledWith( 'sync.providers', [] );
 	} );
 
 	it( 'provides HTTP polling when its experiment is enabled', () => {
@@ -75,6 +84,7 @@ describe( 'sync providers', () => {
 			pollingProvider,
 		} = loadProviders();
 
+		expect( module.hasProviderCreators() ).toBe( true );
 		expect( module.getProviderCreators() ).toEqual( [ pollingProvider ] );
 		expect( createHttpPollingProvider ).toHaveBeenCalledTimes( 1 );
 		expect( applyFilters ).toHaveBeenCalledWith( 'sync.providers', [
@@ -90,6 +100,7 @@ describe( 'sync providers', () => {
 			customProvider,
 		] );
 
+		expect( module.hasProviderCreators() ).toBe( true );
 		expect( module.getProviderCreators() ).toEqual( [ customProvider ] );
 		expect( applyFilters ).toHaveBeenCalledWith( 'sync.providers', [] );
 	} );
