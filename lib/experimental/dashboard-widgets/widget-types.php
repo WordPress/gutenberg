@@ -113,31 +113,33 @@ function gutenberg_sanitize_widget_help( $help ) {
 /**
  * Resolves a widget-local file href to a plugin URL.
  *
- * Leaves absolute, root-relative, and admin `.php` hrefs unchanged.
- * Returns '' for `..` paths and for relative hrefs that are not a file under
- * `widgets/{dir}/` (so `esc_url_raw()` cannot invent `http://filename`).
+ * Leaves absolute, scheme-relative, root-relative, and admin `.php` hrefs
+ * unchanged. Returns '' for local path traversal and for relative hrefs that
+ * are not a file under `widgets/{dir}/` (so `esc_url_raw()` cannot invent
+ * `http://filename`). Query strings on local filenames are not stripped —
+ * `report.csv?v=2` will not resolve as a file.
  *
  * @param string $href     Action href.
  * @param string $dir_name Widget directory name.
  * @return string Plugin URL, original href, or ''.
  */
 function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
-	if ( ! is_string( $href ) || '' === $href || ! is_string( $dir_name ) || '' === $dir_name ) {
+	if ( ! is_string( $href ) || '' === $href ) {
+		return '';
+	}
+
+	// Absolute, scheme-relative, or schemed — including URLs with `..` in the path.
+	if ( preg_match( '#^([a-z][a-z0-9+.-]*:)?//#i', $href ) || str_contains( $href, ':' ) ) {
+		return $href;
+	}
+
+	// Root-relative paths (e.g. /wp-admin/…, /report.csv).
+	if ( str_starts_with( $href, '/' ) ) {
 		return $href;
 	}
 
 	if ( str_contains( $href, '..' ) ) {
 		return '';
-	}
-
-	// Absolute, scheme-relative, or schemed.
-	if ( preg_match( '#^([a-z][a-z0-9+.-]*:)?//#i', $href ) || str_contains( $href, ':' ) ) {
-		return $href;
-	}
-
-	// Root-relative paths (e.g. /wp-admin/…).
-	if ( str_starts_with( $href, '/' ) ) {
-		return $href;
 	}
 
 	$path_only = explode( '?', $href, 2 )[0];
@@ -146,8 +148,11 @@ function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
 		return $href;
 	}
 
-	$relative = ltrim( $href, '/' );
-	$candidate = 'widgets/' . $dir_name . '/' . $relative;
+	if ( ! is_string( $dir_name ) || '' === $dir_name ) {
+		return '';
+	}
+
+	$candidate = 'widgets/' . $dir_name . '/' . $href;
 
 	if ( is_file( gutenberg_dir_path() . $candidate ) ) {
 		return gutenberg_url( $candidate );
@@ -160,6 +165,10 @@ function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
  * Sanitizes widget actions to `id` / `label` / `href` (via `esc_url_raw()`),
  * plus optional `download` / `openInNewTab`. Drops incomplete or unsafe entries.
  * With `$dir_name`, resolves widget-local file hrefs first.
+ *
+ * This is the registration gate for manifest-sourced widget types. Definitions
+ * registered only on the client do not pass through it; any future CPT/API
+ * source should reuse this helper at that boundary.
  *
  * @param array|null $actions  Actions from the build manifest.
  * @param string     $dir_name Optional widget directory for local asset hrefs.
@@ -174,9 +183,13 @@ function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
 	foreach ( $actions as $action ) {
 		if (
 			! is_array( $action ) ||
-			empty( $action['id'] ) ||
-			empty( $action['label'] ) ||
-			empty( $action['href'] )
+			! isset( $action['id'], $action['label'], $action['href'] ) ||
+			! is_string( $action['id'] ) ||
+			! is_string( $action['label'] ) ||
+			! is_string( $action['href'] ) ||
+			'' === $action['id'] ||
+			'' === $action['label'] ||
+			'' === $action['href']
 		) {
 			continue;
 		}

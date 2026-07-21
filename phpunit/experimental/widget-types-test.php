@@ -131,9 +131,29 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 					'download' => 'report.csv',
 				),
 				array(
+					'id'    => 'dots-in-path',
+					'label' => 'Dots in absolute path',
+					'href'  => 'https://example.com/a..b/',
+				),
+				array(
+					'id'    => 'scheme-relative',
+					'label' => 'Scheme relative',
+					'href'  => '//example.com/x',
+				),
+				array(
+					'id'    => 'root-relative',
+					'label' => 'Root relative',
+					'href'  => '/report.csv',
+				),
+				array(
 					'id'    => 'unsafe',
 					'label' => 'Unsafe protocol',
 					'href'  => 'javascript:alert(1)',
+				),
+				array(
+					'id'    => 'obfuscated',
+					'label' => 'Obfuscated protocol',
+					'href'  => "jAvAsCrIpT:\talert(1)",
 				),
 				array(
 					'id'       => 'data-url',
@@ -144,6 +164,11 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 				array(
 					'id'    => 'missing-href',
 					'label' => 'Missing href',
+				),
+				array(
+					'id'    => 'non-string-href',
+					'label' => 'Non-string href',
+					'href'  => array( 'https://example.com/' ),
 				),
 				array(
 					'id'       => 'nasty-filename',
@@ -167,6 +192,21 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 					'label'    => 'Export CSV',
 					'href'     => 'admin.php?page=reports',
 					'download' => 'report.csv',
+				),
+				array(
+					'id'    => 'dots-in-path',
+					'label' => 'Dots in absolute path',
+					'href'  => 'https://example.com/a..b/',
+				),
+				array(
+					'id'    => 'scheme-relative',
+					'label' => 'Scheme relative',
+					'href'  => '//example.com/x',
+				),
+				array(
+					'id'    => 'root-relative',
+					'label' => 'Root relative',
+					'href'  => '/report.csv',
 				),
 				array(
 					'id'       => 'nasty-filename',
