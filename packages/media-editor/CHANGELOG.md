@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 0.14.0 (2026-07-14)
+
+### Enhancements
+
+-   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+-   `useAriaAnnouncer`: Update to use `speak` for screen reader announcements instead of an inline `aria-live` region. ([#79600](https://github.com/WordPress/gutenberg/pull/79600))
+
+## 0.13.0 (2026-07-01)
+
 ## 0.12.0 (2026-06-24)
 
 ## 0.11.1 (2026-06-16)

@@ -1,29 +1,277 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
-import { Spinner, SearchControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { useDebouncedInput } from '@wordpress/compose';
+import { Button, Modal, Spinner, SearchControl } from '@wordpress/components';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { useDebouncedInput, usePrevious } from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
+import { getScrollContainer } from '@wordpress/dom';
+import { store as noticesStore } from '@wordpress/notices';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import MediaList from './media-list';
-import { useMediaResults } from './hooks';
+import MediaUpload from '../../media-upload';
+import MediaUploadCheck from '../../media-upload/check';
+import { useMediaResults, useDelayedLoading } from './hooks';
 import InserterNoResults from '../no-results';
+import BlockPatternsPaging from '../../block-patterns-paging';
 
-const INITIAL_MEDIA_ITEMS_PER_PAGE = 10;
+const MEDIA_ITEMS_PER_PAGE = 20;
+
+// The attach flow is image-only, so the picker is constrained to images.
+const ATTACH_ALLOWED_TYPES = [ 'image' ];
+
+/**
+ * Opens the Media Library to attach images to the current post. Only rendered
+ * for media categories that expose an `attach` capability (i.e. the "Attached
+ * images" source); other sources render the panel exactly as before.
+ *
+ * The picker opens fresh each time with no pre-selected value, so it is purely
+ * additive: selecting images attaches them, and it does not imply that
+ * deselecting would detach. Detaching is a separate, explicit per-item action.
+ *
+ * @param {Object}   props
+ * @param {Function} props.onSelect Called with the selected media items.
+ */
+function AttachImagesButton( { onSelect } ) {
+	return (
+		<MediaUploadCheck>
+			<MediaUpload
+				multiple="add"
+				onSelect={ onSelect }
+				allowedTypes={ ATTACH_ALLOWED_TYPES }
+				title={ __( 'Attach images' ) }
+				render={ ( { open } ) => (
+					<Button
+						__next40pxDefaultSize
+						className="block-editor-inserter__media-panel-attach"
+						data-unstable-ignore-focus-outside-for-relatedtarget=".media-modal"
+						onClick={ ( event ) => {
+							event.target.focus();
+							open();
+						} }
+						variant="secondary"
+					>
+						{ __( 'Attach images' ) }
+					</Button>
+				) }
+			/>
+		</MediaUploadCheck>
+	);
+}
 
 export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();
-	const { mediaList, isLoading } = useMediaResults( category, {
-		per_page: !! debouncedSearch ? 20 : INITIAL_MEDIA_ITEMS_PER_PAGE,
-		search: debouncedSearch,
-	} );
+	const [ page, setPage ] = useState( 1 );
+	// The desktop panel persists across category switches (it's driven by the
+	// selected category, not remounted), so reset paging whenever the source
+	// category or the search term changes. Adjusting state during render (rather
+	// than in an effect) keeps the query on page 1 for the very next fetch,
+	// avoiding a wasted request for the previous page. Mirrors `usePatternsPaging`.
+	const previousCategory = usePrevious( category.name );
+	const previousSearch = usePrevious( debouncedSearch );
+	if (
+		( previousCategory !== category.name ||
+			previousSearch !== debouncedSearch ) &&
+		page !== 1
+	) {
+		setPage( 1 );
+	}
+	const query = useMemo(
+		() => ( {
+			per_page: MEDIA_ITEMS_PER_PAGE,
+			page,
+			search: debouncedSearch,
+		} ),
+		[ page, debouncedSearch ]
+	);
+	const [ refreshKey, setRefreshKey ] = useState( 0 );
+	const { mediaList, isLoading, totalItems, totalPages } = useMediaResults(
+		category,
+		query,
+		refreshKey
+	);
+	const numPages = totalPages || 1;
+	// If the current set shrinks below the active page (e.g. detaching images
+	// empties the last page), clamp back into range so the grid isn't left blank
+	// on a page that no longer exists.
+	if ( typeof totalPages === 'number' && page > numPages ) {
+		setPage( numPages );
+	}
+	// Private to core's media categories, these capabilities act on WordPress
+	// attachments:
+	// - `attach`/`detach`/`invalidate` manage the images attached to this post.
+	// - `subscribe` watches the attachment cache backing them.
+	// An external resource can never own a post's attachments, and every category
+	// registered by an extender through the public `registerInserterMediaCategory`
+	// API is flagged as one — so this guard stops such a category from opting into
+	// the workflow just by setting these props.
+	const supportsAttachments = ! category.isExternalResource;
+	const attach = supportsAttachments ? category.attach : undefined;
+	const detach = supportsAttachments ? category.detach : undefined;
+	const subscribe = supportsAttachments ? category.subscribe : undefined;
+
+	// Only show the pager for multi-page sources. Gating on the page count (not
+	// `mediaList.length`) keeps the footer mounted while paging, since the count
+	// persists across the fetch. It also skips the shared component's stray
+	// single-page item count, which reads oddly here.
+	const showPagination = numPages > 1;
+	// The footer holds the pager and/or the attach button; it exists when either
+	// is present so it can own their shared top/horizontal breathing room.
+	const hasFooter = showPagination || !! attach;
+	const scrollContainerRef = useRef();
+	const changePage = useCallback( ( nextPage ) => {
+		const scrollContainer = getScrollContainer(
+			scrollContainerRef.current
+		);
+		scrollContainer?.scrollTo( 0, 0 );
+		setPage( nextPage );
+	}, [] );
+	const { createErrorNotice, createSuccessNotice, createWarningNotice } =
+		useDispatch( noticesStore );
+
+	// Dim (rather than blank) the populated grid while a refetch is in flight,
+	// but only once it has run long enough to be worth signalling — quick
+	// attach/detach refetches resolve before this and show nothing.
+	const showRefreshing = useDelayedLoading( isLoading );
+
+	// Invalidate the cached results and force `useMediaResults` to refetch so
+	// the grid reflects images that were just attached or detached.
+	const refresh = useCallback( () => {
+		if ( supportsAttachments ) {
+			category.invalidate?.( query );
+		}
+		setRefreshKey( ( key ) => key + 1 );
+	}, [ category, query, supportsAttachments ] );
+
+	// A media modal opened anywhere in the editor (a canvas block, the featured
+	// image panel, the "Attach images" button) attaches its uploads to the current
+	// post, and invalidates the cached attachment queries when it closes. Refetch
+	// so the grid reflects the newly attached images.
+	useEffect( () => {
+		if ( ! subscribe ) {
+			return;
+		}
+		return subscribe( () => setRefreshKey( ( key ) => key + 1 ), query );
+	}, [ subscribe, query ] );
+
+	const handleAttach = useCallback(
+		async ( selectedMedia ) => {
+			try {
+				const attachedCount = await attach( selectedMedia );
+
+				if ( ! attachedCount ) {
+					// This source only attaches images (the picker's "Upload
+					// files" tab otherwise accepts any file type), so a selection
+					// with no images attaches nothing.
+					createWarningNotice( __( 'No images were attached.' ), {
+						type: 'snackbar',
+						id: 'inserter-notice',
+					} );
+					return;
+				}
+
+				refresh();
+				createSuccessNotice(
+					category.postTypeLabel
+						? sprintf(
+								/* translators: %1$d: Number of images attached. %2$s: Name of the post type e.g: "Page". */
+								_n(
+									'%1$d image attached to %2$s.',
+									'%1$d images attached to %2$s.',
+									attachedCount
+								),
+								attachedCount,
+								category.postTypeLabel
+						  )
+						: sprintf(
+								/* translators: %d: Number of images attached to the post. */
+								_n(
+									'%d image attached to post.',
+									'%d images attached to post.',
+									attachedCount
+								),
+								attachedCount
+						  ),
+					{ type: 'snackbar', id: 'inserter-notice' }
+				);
+			} catch {
+				createErrorNotice( __( 'Could not attach images.' ), {
+					type: 'snackbar',
+					id: 'inserter-notice',
+				} );
+			}
+		},
+		[
+			attach,
+			category,
+			refresh,
+			createErrorNotice,
+			createSuccessNotice,
+			createWarningNotice,
+		]
+	);
+
+	const handleDetach = useCallback(
+		async ( media ) => {
+			try {
+				await detach( media );
+				refresh();
+				createSuccessNotice(
+					category.postTypeLabel
+						? sprintf(
+								/* translators: %s: Name of the post type e.g: "Page". */
+								__( 'Image detached from %s.' ),
+								category.postTypeLabel
+						  )
+						: __( 'Image detached from post.' ),
+					{ type: 'snackbar', id: 'inserter-notice' }
+				);
+			} catch {
+				createErrorNotice( __( 'Could not detach image.' ), {
+					type: 'snackbar',
+					id: 'inserter-notice',
+				} );
+			}
+		},
+		[ detach, category, refresh, createErrorNotice, createSuccessNotice ]
+	);
+
+	// Detaching is confirmed first: the dropdown sets the pending item, which
+	// opens a modal, and only `confirmDetach` performs the detach.
+	const [ mediaPendingDetach, setMediaPendingDetach ] = useState();
+	const confirmDetach = useCallback( () => {
+		const media = mediaPendingDetach;
+		setMediaPendingDetach( undefined );
+		handleDetach( media );
+	}, [ handleDetach, mediaPendingDetach ] );
+
 	const baseCssClass = 'block-editor-inserter__media-panel';
 	const searchLabel = category.labels.search_items || __( 'Search' );
 	return (
-		<div className={ baseCssClass }>
+		<div
+			ref={ scrollContainerRef }
+			className={ clsx( baseCssClass, {
+				// The footer supplies the breathing room beneath the grid, so the
+				// list drops its own bottom padding (see styles).
+				'has-footer': hasFooter,
+			} ) }
+		>
 			<SearchControl
 				className={ `${ baseCssClass }-search` }
 				onChange={ setSearch }
@@ -31,19 +279,106 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 				label={ searchLabel }
 				placeholder={ searchLabel }
 			/>
-			{ isLoading && (
+			{ isLoading && ! mediaList?.length && (
 				<div className={ `${ baseCssClass }-spinner` }>
 					<Spinner />
 				</div>
 			) }
-			{ ! isLoading && ! mediaList?.length && <InserterNoResults /> }
-			{ ! isLoading && !! mediaList?.length && (
-				<MediaList
-					rootClientId={ rootClientId }
-					onClick={ onInsert }
-					mediaList={ mediaList }
-					category={ category }
-				/>
+			{ ! isLoading && ! mediaList?.length && (
+				<InserterNoResults>
+					{ category.emptyMessage && ! debouncedSearch
+						? // For a source with a custom empty message (e.g.
+						  // Attachments) and no active search, an empty result
+						  // means nothing is attached yet — clearer than the
+						  // generic "no results found".
+						  category.emptyMessage
+						: __( 'No results found.' ) }
+				</InserterNoResults>
+			) }
+			{ !! mediaList?.length && (
+				// Keep the existing items visible while a refetch is in flight,
+				// dimming (and gently pulsing) them rather than clearing the grid,
+				// so it doesn't flicker or pop.
+				<div
+					className={ clsx( `${ baseCssClass }-results`, {
+						'is-loading': showRefreshing,
+					} ) }
+					aria-busy={ showRefreshing }
+				>
+					<MediaList
+						rootClientId={ rootClientId }
+						onClick={ onInsert }
+						onDetach={ detach ? setMediaPendingDetach : undefined }
+						mediaList={ mediaList }
+						category={ category }
+					/>
+				</div>
+			) }
+			{ hasFooter && (
+				// A single footer wrapper owns the top and horizontal breathing
+				// room, so the pager and attach button don't span the full width
+				// and sit clear of the grid above (see styles).
+				<Stack
+					direction="column"
+					gap="sm"
+					className={ `${ baseCssClass }-footer` }
+				>
+					{ showPagination && (
+						// Reuse the Patterns tab pager (presentational only); only
+						// rendered for multi-page sources (see `showPagination`).
+						<BlockPatternsPaging
+							currentPage={ page }
+							numPages={ numPages }
+							changePage={ changePage }
+							totalItems={ totalItems }
+						/>
+					) }
+					{ attach && (
+						// Lines up with the "Open Media Library" button in the
+						// adjacent column.
+						<AttachImagesButton onSelect={ handleAttach } />
+					) }
+				</Stack>
+			) }
+			{ mediaPendingDetach && (
+				// A plain `Modal` (not `ConfirmDialog`) so we can pass
+				// `overlayClassName` and stack it above the options dropdown that
+				// opened it (see the z-index entry in `_z-index.scss`).
+				<Modal
+					title={ __( 'Detach image' ) }
+					onRequestClose={ () => setMediaPendingDetach( undefined ) }
+					overlayClassName={ `${ baseCssClass }-detach-modal` }
+				>
+					<p>
+						{ category.postTypeLabel
+							? sprintf(
+									/* translators: %s: Name of the post type e.g: "Page". */
+									__(
+										'Detach this image from the current %s? The image will remain in the Media Library.'
+									),
+									category.postTypeLabel
+							  )
+							: __(
+									'Detach this image from the current post? The image will remain in the Media Library.'
+							  ) }
+					</p>
+					<div className={ `${ baseCssClass }-detach-actions` }>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ () => setMediaPendingDetach( undefined ) }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							onClick={ confirmDetach }
+						>
+							{ __( 'Detach' ) }
+						</Button>
+					</div>
+				</Modal>
 			) }
 		</div>
 	);

@@ -10,11 +10,43 @@ A _host_ is any context that renders widgets: a dashboard, a sidebar, a plugin p
 
 ## What it exposes
 
-**Contract types** describe what a widget is: `WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`. They are the shapes a host reads to discover and render a widget, defined here and re-exported nowhere else. How a widget is authored (its folder, `widget.json`, `widget.ts`, `render.tsx`) is covered by **System Architecture**.
+### Contract types
 
-**Discovery** is `useWidgetTypes( records )`. It takes host-supplied widget-module records, imports each record's metadata module, and returns a `[ WidgetType[], isResolving ]` tuple, where `isResolving` is `true` while the records are still being imported. The hook reaches for no store or endpoint: the host fetches the records however it wants and passes them in.
+The shapes a host reads to discover and render a widget:
 
-**Rendering** is `<WidgetRender />`. It resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. Error handling and chrome stay with the host, and because the module is mounted lazily, the host must wrap it in a Suspense boundary.
+- `WidgetType`, `WidgetName`, `WidgetIcon`
+- `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`
+
+Defined here and re-exported nowhere else.
+
+### Authoring helper
+
+`WidgetAttributeField< Item >` is for widget authors, not hosts. It narrows a DataViews `Field.id` to the keys of the widget's attribute object, so a typo'd field `id` is caught while authoring.
+
+It also accepts an optional `relevance` hint (`'high' | 'low'`). The widget declares importance, not a surface. See **Anatomy** for how hosts may use it.
+
+How a widget is authored (its folder, `widget.json`, `widget.ts`, `render.tsx`) is covered in **System Architecture**.
+
+### Discovery
+
+`useWidgetTypes( records )` takes host-supplied widget-module records, imports each record's metadata module, and returns:
+
+- `WidgetType[]`
+- `isResolvingWidgetTypes`, which stays `true` before records are supplied (`null` or `undefined`) and while their metadata modules are still importing
+
+The hook reaches for no store or endpoint. The host fetches the records however it wants and passes them in.
+
+### Field types
+
+`registerFieldType( definition )` names a reusable field type that widget attributes can reference via `type` (for example `type: 'location'`), so an attribute ships a custom control without importing one. The consuming application owns the vocabulary; `useWidgetTypes` resolves the references into plain DataViews `Field` props while it assembles each `WidgetType`, and unregistered names degrade exactly as unknown types do in DataViews.
+
+See **Field Types** for the full pipeline.
+
+### Rendering
+
+`<WidgetRender />` resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract.
+
+Error handling and chrome stay with the host. Because the module is mounted lazily, the host must wrap it in a Suspense boundary.
 
 ## What it does not do
 

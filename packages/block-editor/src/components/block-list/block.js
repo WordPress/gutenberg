@@ -622,6 +622,7 @@ function BlockListBlockProvider( props ) {
 			const blockVisibility = attributes?.metadata?.blockVisibility;
 			const deviceType =
 				settings?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
+			const viewportSettings = settings?.__experimentalFeatures?.viewport;
 
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const isMultiSelected = isBlockMultiSelected( clientId );
@@ -645,6 +646,7 @@ function BlockListBlockProvider( props ) {
 				bindableAttributes,
 				blockVisibility,
 				deviceType,
+				viewportSettings,
 				isMultiSelected,
 				blockEditingMode,
 				isEditingDisabled: blockEditingMode === 'disabled',
@@ -736,6 +738,7 @@ function BlockListBlockProvider( props ) {
 					: false,
 				blockVisibility,
 				deviceType,
+				viewportSettings,
 			};
 		},
 		[ clientId, rootClientId ]
@@ -753,6 +756,7 @@ function BlockListBlockProvider( props ) {
 	const { isBlockCurrentlyHidden } = useBlockVisibility( {
 		blockVisibility: selectedProps?.blockVisibility,
 		deviceType: selectedProps?.deviceType,
+		viewportSettings: selectedProps?.viewportSettings,
 		view: defaultViewRef.current,
 	} );
 
@@ -817,6 +821,7 @@ function BlockListBlockProvider( props ) {
 		bindableAttributes,
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 	} = selectedProps;
 
 	const privateContext = {
@@ -856,6 +861,7 @@ function BlockListBlockProvider( props ) {
 		bindableAttributes,
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 	};
 
 	if (

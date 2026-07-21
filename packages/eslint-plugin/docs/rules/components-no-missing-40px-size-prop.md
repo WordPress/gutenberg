@@ -9,25 +9,13 @@ This is a temporary rule to help migrate components to the new default size. Onc
 The following components are checked by this rule:
 
 -   Button
--   ComboboxControl
--   CustomSelectControl
--   FontAppearanceControl
--   FormFileUpload (special case - see below)
--   FormTokenField
--   InputControl
--   NumberControl
--   RangeControl
--   SelectControl
--   ToggleGroupControl
--   UnitControl
 
 Examples of **incorrect** code for this rule:
 
 ```jsx
-import { Button, InputControl } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 
 <Button>Click me</Button>
-<InputControl value={value} onChange={onChange} />
 <Button __next40pxDefaultSize={false}>Click me</Button>
 <Button size="default">Click me</Button>
 ```
@@ -35,25 +23,12 @@ import { Button, InputControl } from '@wordpress/components';
 Examples of **correct** code for this rule:
 
 ```jsx
-import { Button, InputControl } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 
 <Button __next40pxDefaultSize>Click me</Button>
 <Button __next40pxDefaultSize={true}>Click me</Button>
-<InputControl __next40pxDefaultSize value={value} onChange={onChange} />
 <Button size="small">Click me</Button>
 <Button size="compact">Click me</Button>
-```
-
-## FormFileUpload special case
-
-`FormFileUpload` can use either the `__next40pxDefaultSize` prop or the `render` prop to be considered valid:
-
-```jsx
-import { FormFileUpload } from '@wordpress/components';
-
-// Both are valid:
-<FormFileUpload __next40pxDefaultSize />
-<FormFileUpload render={({ open }) => <button onClick={open}>Upload</button>} />
 ```
 
 ## Options

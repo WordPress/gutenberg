@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { __ } from '@wordpress/i18n';
 import {
+	InspectorControls,
 	useBlockProps,
 	store as blockEditorStore,
 	RichText,
@@ -15,57 +16,89 @@ import {
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import {
+	TextControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import TabToolbarControls from '../tab-panel/tab-toolbar-controls';
+import TabToolbarControls from '../tabs/tab-toolbar-controls';
+import TabMovers from './tab-movers';
+import useTabActions from '../tabs/use-tab-actions';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const EMPTY_ARRAY = [];
 
 function Edit( {
 	attributes,
 	clientId,
-	context,
+	setAttributes,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
-	const tabsList = context[ 'core/tabs-list' ] || EMPTY_ARRAY;
+	const { ariaLabel } = attributes;
 
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { tabsClientId, editorActiveTabIndex, activeTabIndex } = useSelect(
-		( select ) => {
-			const { getBlockRootClientId, getBlockAttributes } =
-				select( blockEditorStore );
+	const { tabsClientId, tabPanels, editorActiveTabIndex, activeTabIndex } =
+		useSelect(
+			( select ) => {
+				const { getBlockRootClientId, getBlockAttributes, getBlocks } =
+					select( blockEditorStore );
 
-			const _tabsClientId = getBlockRootClientId( clientId );
-			const tabsAttributes = _tabsClientId
-				? getBlockAttributes( _tabsClientId )
-				: {};
+				const rootClientId = getBlockRootClientId( clientId );
+				const tabsAttributes = getBlockAttributes( rootClientId );
+				const tabPanelsBlock = getBlocks( rootClientId )?.find(
+					( block ) => block.name === 'core/tab-panels'
+				);
 
-			return {
-				tabsClientId: _tabsClientId,
-				editorActiveTabIndex: tabsAttributes?.editorActiveTabIndex,
-				activeTabIndex: tabsAttributes?.activeTabIndex ?? 0,
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					tabsClientId: rootClientId,
+					tabPanels: tabPanelsBlock?.innerBlocks ?? EMPTY_ARRAY,
+					editorActiveTabIndex: tabsAttributes?.editorActiveTabIndex,
+					activeTabIndex: tabsAttributes?.activeTabIndex ?? 0,
+				};
+			},
+			[ clientId ]
+		);
+	const registry = useRegistry();
+	const { isBlockSelected, hasSelectedInnerBlock } =
+		useSelect( blockEditorStore );
+	const {
+		updateBlockAttributes,
+		selectBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
+	const { insertTab, removeTab } = useTabActions( tabsClientId );
 
 	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
-
-	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
-		useDispatch( blockEditorStore );
+	const tabsList = useMemo(
+		() =>
+			tabPanels.map( ( tab ) => ( {
+				label: tab.attributes.label || '',
+				clientId: tab.clientId,
+			} ) ),
+		[ tabPanels ]
+	);
 
 	function selectTabPanel( tabIndex ) {
 		if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( tabsClientId, {
-				editorActiveTabIndex: tabIndex,
+			// Batch the selection and index update so the sync effect in
+			// the tab-panel block can't revert the switch from a stale
+			// inner-block selection in the previously active panel.
+			registry.batch( () => {
+				selectBlock( clientId );
+				__unstableMarkNextChangeAsNotPersistent();
+				updateBlockAttributes( tabsClientId, {
+					editorActiveTabIndex: tabIndex,
+				} );
 			} );
 		}
 	}
@@ -89,24 +122,32 @@ function Edit( {
 			return;
 		}
 
+		// Only move focus during active editing, not external data changes.
+		if (
+			! isBlockSelected( tabsClientId ) &&
+			! hasSelectedInnerBlock( tabsClientId, true )
+		) {
+			return;
+		}
+
 		const focusButtonAt = ( index ) => {
 			window.requestAnimationFrame( () => {
-				const buttons = menuRef.current?.querySelectorAll( 'button' );
-				const target = buttons?.[ index ];
-				if ( ! target ) {
-					return;
-				}
-				const richText = target.querySelector( '[contenteditable]' );
-				if ( richText ) {
-					richText.focus();
-				} else {
-					target.focus();
-				}
+				const button =
+					menuRef.current?.querySelectorAll( 'button' )?.[ index ];
+				(
+					button?.querySelector( '[contenteditable]' ) ?? button
+				)?.focus();
 			} );
 		};
 
 		focusButtonAt( effectiveActiveIndex );
-	}, [ tabsList.length, effectiveActiveIndex ] );
+	}, [
+		effectiveActiveIndex,
+		hasSelectedInnerBlock,
+		isBlockSelected,
+		tabsClientId,
+		tabsList.length,
+	] );
 
 	const blockProps = useBlockProps( {
 		role: 'tablist',
@@ -126,6 +167,40 @@ function Edit( {
 
 	return (
 		<>
+			<InspectorControls group="settings">
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () =>
+						setAttributes( {
+							ariaLabel: undefined,
+						} )
+					}
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						label={ __( 'Label' ) }
+						isShownByDefault
+						hasValue={ () => !! ariaLabel }
+						onDeselect={ () =>
+							setAttributes( { ariaLabel: undefined } )
+						}
+					>
+						<TextControl
+							label={ __( 'Label' ) }
+							help={ __(
+								'Briefly describe this tab section for screen reader users. Examples: Event information, Product details, and Account settings.'
+							) }
+							value={ ariaLabel || '' }
+							onChange={ ( value ) =>
+								setAttributes( {
+									ariaLabel: value || undefined,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</InspectorControls>
+			<TabMovers tabsClientId={ tabsClientId } />
 			<TabToolbarControls tabsClientId={ tabsClientId } />
 			<div { ...blockProps }>
 				{ tabsList.map( ( tab, index ) => {
@@ -154,6 +229,10 @@ function Edit( {
 								onChange={ ( newLabel ) =>
 									handleLabelChange( index, newLabel )
 								}
+								__unstableOnSplitAtEnd={ () =>
+									insertTab( index + 1 )
+								}
+								onRemove={ () => removeTab( index ) }
 							/>
 						</button>
 					);

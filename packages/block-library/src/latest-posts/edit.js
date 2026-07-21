@@ -162,13 +162,10 @@ function Controls( { attributes, setAttributes } ) {
 			label: name,
 		} ) );
 	const categorySuggestions =
-		categoriesList?.reduce(
-			( accumulator, category ) => ( {
-				...accumulator,
-				[ category.name ]: category,
-			} ),
-			{}
-		) ?? {};
+		categoriesList?.reduce( ( accumulator, category ) => {
+			accumulator[ category.name ] = category;
+			return accumulator;
+		}, {} ) ?? {};
 	const selectCategories = ( tokens ) => {
 		const hasNoSuggestion = tokens.some(
 			( token ) =>
@@ -265,7 +262,6 @@ function Controls( { attributes, setAttributes } ) {
 							isShownByDefault
 						>
 							<RangeControl
-								__next40pxDefaultSize
 								label={ __( 'Max number of words' ) }
 								value={ excerptLength }
 								onChange={ ( value ) =>
@@ -411,7 +407,6 @@ function Controls( { attributes, setAttributes } ) {
 						>
 							<ToggleGroupControl
 								className="editor-latest-posts-image-alignment-control"
-								__next40pxDefaultSize
 								label={ __( 'Image alignment' ) }
 								value={ featuredImageAlign || 'none' }
 								onChange={ ( value ) =>
@@ -809,7 +804,7 @@ export default function LatestPostsEdit( {
 									<div
 										className="wp-block-latest-posts__post-full-content"
 										dangerouslySetInnerHTML={ {
-											__html: post.content.raw.trim(),
+											__html: post.content.rendered.trim(),
 										} }
 									/>
 								) }

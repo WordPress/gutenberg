@@ -35,7 +35,7 @@ const meta: Meta< typeof TextareaControl > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `TextareaControl` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`TextareaControl`](?path=/docs/design-system-components-form-primitives-textarea--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };

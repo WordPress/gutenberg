@@ -68,7 +68,6 @@ function ScreenTypographyElement( { element }: ScreenTypographyElementProps ) {
 							setHeadingLevel( value as string )
 						}
 						isBlock
-						size="__unstable-large"
 					>
 						<ToggleGroupControlOption
 							value="heading"

@@ -14,7 +14,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { View } from '@wordpress/primitives';
 import { Caption } from '../utils/caption';
 
 /**
@@ -199,9 +198,9 @@ const EmbedEdit = ( props ) => {
 
 	if ( fetching ) {
 		return (
-			<View { ...blockProps }>
+			<div { ...blockProps }>
 				<EmbedLoading />
-			</View>
+			</div>
 		);
 	}
 
@@ -213,7 +212,7 @@ const EmbedEdit = ( props ) => {
 
 	if ( showEmbedPlaceholder ) {
 		return (
-			<View { ...blockProps }>
+			<div { ...blockProps }>
 				<EmbedPlaceholder
 					icon={ icon }
 					label={ label }
@@ -245,7 +244,7 @@ const EmbedEdit = ( props ) => {
 						invalidateResolution( 'getEmbedPreview', [ url ] );
 					} }
 				/>
-			</View>
+			</div>
 		);
 	}
 
