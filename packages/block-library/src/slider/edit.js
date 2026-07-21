@@ -32,22 +32,11 @@ const SLIDER_TEMPLATE = [
 		{},
 		[
 			[
-				'core/cover',
+				'core/paragraph',
 				{
-					dimRatio: 100,
-					overlayColor: 'black',
-					minHeight: 300,
-					minHeightUnit: 'px',
+					content: __( 'Slide 1' ),
+					style: { typography: { textAlign: 'center' } },
 				},
-				[
-					[
-						'core/paragraph',
-						{
-							content: __( 'Slide 1' ),
-							style: { typography: { textAlign: 'center' } },
-						},
-					],
-				],
 			],
 		],
 	],
@@ -56,22 +45,11 @@ const SLIDER_TEMPLATE = [
 		{},
 		[
 			[
-				'core/cover',
+				'core/paragraph',
 				{
-					dimRatio: 100,
-					overlayColor: 'black',
-					minHeight: 300,
-					minHeightUnit: 'px',
+					content: __( 'Slide 2' ),
+					style: { typography: { textAlign: 'center' } },
 				},
-				[
-					[
-						'core/paragraph',
-						{
-							content: __( 'Slide 2' ),
-							style: { typography: { textAlign: 'center' } },
-						},
-					],
-				],
 			],
 		],
 	],

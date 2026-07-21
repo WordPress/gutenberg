@@ -28,26 +28,11 @@ export const settings = {
 				name: 'core/slide',
 				innerBlocks: [
 					{
-						name: 'core/cover',
+						name: 'core/paragraph',
 						attributes: {
-							dimRatio: 100,
-							overlayColor: 'black',
-							minHeight: 300,
-							minHeightUnit: 'px',
+							content: __( 'Slide 1' ),
+							style: { typography: { textAlign: 'center' } },
 						},
-						innerBlocks: [
-							{
-								name: 'core/paragraph',
-								attributes: {
-									content: __( 'Slide 1' ),
-									style: {
-										typography: {
-											textAlign: 'center',
-										},
-									},
-								},
-							},
-						],
 					},
 				],
 			},
@@ -55,26 +40,11 @@ export const settings = {
 				name: 'core/slide',
 				innerBlocks: [
 					{
-						name: 'core/cover',
+						name: 'core/paragraph',
 						attributes: {
-							dimRatio: 100,
-							overlayColor: 'black',
-							minHeight: 300,
-							minHeightUnit: 'px',
+							content: __( 'Slide 2' ),
+							style: { typography: { textAlign: 'center' } },
 						},
-						innerBlocks: [
-							{
-								name: 'core/paragraph',
-								attributes: {
-									content: __( 'Slide 2' ),
-									style: {
-										typography: {
-											textAlign: 'center',
-										},
-									},
-								},
-							},
-						],
 					},
 				],
 			},
