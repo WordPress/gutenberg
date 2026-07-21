@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
-import { ProgressBar } from '..';
-import { INDETERMINATE_TRACK_WIDTH } from '../styles';
+import { ProgressBar, INDETERMINATE_TRACK_WIDTH } from '..';
+import styles from '../style.module.scss';
 
 describe( 'ProgressBar', () => {
 	it( 'should render an indeterminate semantic progress bar element', () => {
@@ -9,7 +9,9 @@ describe( 'ProgressBar', () => {
 		const progressBar = screen.getByRole( 'progressbar' );
 
 		expect( progressBar ).toBeInTheDocument();
-		expect( progressBar ).not.toBeVisible();
+		// The `progress` element is visually hidden (via the SCSS module) and
+		// only exposed for semantics/assistive technology.
+		expect( progressBar ).toHaveClass( styles[ 'progress-element' ] );
 		expect( progressBar ).not.toHaveValue();
 	} );
 
@@ -19,7 +21,9 @@ describe( 'ProgressBar', () => {
 		const progressBar = screen.getByRole( 'progressbar' );
 
 		expect( progressBar ).toBeInTheDocument();
-		expect( progressBar ).not.toBeVisible();
+		// The `progress` element is visually hidden (via the SCSS module) and
+		// only exposed for semantics/assistive technology.
+		expect( progressBar ).toHaveClass( styles[ 'progress-element' ] );
 		expect( progressBar ).toHaveValue( 55 );
 	} );
 
