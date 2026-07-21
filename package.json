@@ -194,5 +194,8 @@
 		"test/*",
 		"tools/*",
 		"widgets/*"
-	]
+	],
+	"dependencies": {
+		"adm-zip": "^0.6.0"
+	}
 }
