@@ -1,5 +1,135 @@
 == Changelog ==
 
+= 23.6.0-rc.2 =
+
+
+## Changelog
+
+### Enhancements
+
+#### Post Editor
+- Device preview dropdown: Use active color for device icon when responsive styles are active. ([80346](https://github.com/WordPress/gutenberg/pull/80346))
+- Editor: Allow selecting which block styles to apply globally. ([79839](https://github.com/WordPress/gutenberg/pull/79839))
+- Notes: Add placeholders to the RichText fields. ([80296](https://github.com/WordPress/gutenberg/pull/80296))
+- Notes: Increase contrast between avatar border colors. ([80285](https://github.com/WordPress/gutenberg/pull/80285))
+
+#### Block Library
+- Icon block: Show text and background color controls by default. ([80251](https://github.com/WordPress/gutenberg/pull/80251))
+- Tab List: Add toolbar buttons to reorder tabs. ([80107](https://github.com/WordPress/gutenberg/pull/80107))
+
+#### Block Editor
+- Reflect inherited Global Styles values in block inspector controls. ([80481](https://github.com/WordPress/gutenberg/pull/80481))
+
+#### Data Layer
+- Client Side Media: Honor image_strip_meta and image_max_bit_depth on the client upload path. ([80218](https://github.com/WordPress/gutenberg/pull/80218))
+
+#### Components
+- DataViews: Add shift-click range selection. ([80046](https://github.com/WordPress/gutenberg/pull/80046))
+
+
+### Bug Fixes
+
+- Core Abilities: Restore the ready promise and lazy-load via dynamic import. ([79155](https://github.com/WordPress/gutenberg/pull/79155))
+
+#### Post Editor
+- Autocompleters: Don't pre-encode mention search terms. ([80377](https://github.com/WordPress/gutenberg/pull/80377))
+- Editor: Disable canvas resizing while zoomed out. ([80391](https://github.com/WordPress/gutenberg/pull/80391))
+- Fix upload snackbar stuck in uploading state on server-side uploads. ([80345](https://github.com/WordPress/gutenberg/pull/80345))
+- Notes: Finish WPDS treatment for mention chips. ([80300](https://github.com/WordPress/gutenberg/pull/80300))
+- Responsive styles: Open inspector sidebar when toggling. ([80307](https://github.com/WordPress/gutenberg/pull/80307))
+- Responsive styles: Use viewport dropdown to control states for in-editor global styles sidebar. ([80339](https://github.com/WordPress/gutenberg/pull/80339))
+- [7.1 Backport] -- Fix upload snackbar double-counting a single HEIC upload in Safari. ([80436](https://github.com/WordPress/gutenberg/pull/80436))
+- [WP 7.1] Editor: Restore fixed device preview height for mobile and tablet. ([80466](https://github.com/WordPress/gutenberg/pull/80466))
+
+#### Block Library
+- Fix default aspect ratio for lazy loaded Featured image. ([80386](https://github.com/WordPress/gutenberg/pull/80386))
+- Fix playlist block styling. ([80312](https://github.com/WordPress/gutenberg/pull/80312))
+- Fix: Allow icon labels to wrap with word breaks and no ellipsis. ([80256](https://github.com/WordPress/gutenberg/pull/80256))
+- Hide color controls for Navigation and Social Icons when viewport sta…. ([80289](https://github.com/WordPress/gutenberg/pull/80289))
+- Playlist: Fix track insertion. ([80200](https://github.com/WordPress/gutenberg/pull/80200))
+- Try fixing responsive layout in Nav block. ([80305](https://github.com/WordPress/gutenberg/pull/80305))
+- [7.1/Backport] Media: Remove the redundant __heicUploadSupport flag (#80452). ([80486](https://github.com/WordPress/gutenberg/pull/80486))
+
+#### Block Editor
+- Custom CSS: Fix cascade order against block style variations. ([80340](https://github.com/WordPress/gutenberg/pull/80340))
+- Guard against non-string spacing preset values. ([80467](https://github.com/WordPress/gutenberg/pull/80467))
+- Responsive Editing: Support editing pattern styles. ([80233](https://github.com/WordPress/gutenberg/pull/80233))
+- Rich Text: Restore the selection when focus returns to the editable. ([80396](https://github.com/WordPress/gutenberg/pull/80396))
+- State control - avoid tertiary variant on toggle to match style of other dropdown toggles. ([80505](https://github.com/WordPress/gutenberg/pull/80505))
+- Writing flow: Fully select the ancestor when a text selection crosses a nesting boundary. ([80462](https://github.com/WordPress/gutenberg/pull/80462))
+
+#### Components
+-  [7.1 Backport] --  ContentEditableControl: Fix invalid label association with contenteditable div. ([80441](https://github.com/WordPress/gutenberg/pull/80441))
+- Backport ColorPicker cursor shaking fix to WordPress 7.1. ([80435](https://github.com/WordPress/gutenberg/pull/80435))
+- DataViews: Fix the `list` layout ignoring some settings when `groupBy` is set. ([80255](https://github.com/WordPress/gutenberg/pull/80255))
+- DataViews: Fix the unintended gap between `list` layout items when `groupBy` is set. ([80254](https://github.com/WordPress/gutenberg/pull/80254))
+- UI: Backport compat overlay fixes to WordPress 7.1. ([80322](https://github.com/WordPress/gutenberg/pull/80322))
+- fix: Set dataviews popover hover text color. ([80105](https://github.com/WordPress/gutenberg/pull/80105))
+
+#### Client Side Media
+- Backport to 7.1: Fix upload hang when converting long animated GIFs (#80260). ([80342](https://github.com/WordPress/gutenberg/pull/80342))
+- Client-side media: Generate animated image sub-sizes from the first frame only, matching core. ([80268](https://github.com/WordPress/gutenberg/pull/80268))
+- Media REST API: Fix sideload and finalize for EXIF rotated images. ([80295](https://github.com/WordPress/gutenberg/pull/80295))
+- [7.1 Backport] -- Media: Add timeout and size guardrails to client-side GIF to video conversion. ([80420](https://github.com/WordPress/gutenberg/pull/80420))
+- [7.1 Backport] -- Worker threads: Reject pending RPC calls on worker failure or termination. ([80421](https://github.com/WordPress/gutenberg/pull/80421))
+
+#### Global Styles
+- Block Supports: Handle nested array block gap values properly. ([80464](https://github.com/WordPress/gutenberg/pull/80464))
+- Style Book: Restore live global styles updates on the styles route. ([80459](https://github.com/WordPress/gutenberg/pull/80459))
+
+#### Style States
+- Hide block style variations when state is enabled in global styles. ([80341](https://github.com/WordPress/gutenberg/pull/80341))
+
+#### Collaboration
+- Notes: Arm the mention kses allowance on REST note creation. ([80221](https://github.com/WordPress/gutenberg/pull/80221))
+
+
+### Code Quality
+
+- Release: Resolve commander from the test file in the release CLI test. ([80357](https://github.com/WordPress/gutenberg/pull/80357))
+
+#### Block Library
+- Misc fixes for WordPress-Develop 7.0 merges. ([80444](https://github.com/WordPress/gutenberg/pull/80444))
+- Playlist: Update @since tags to 7.1.0. ([80317](https://github.com/WordPress/gutenberg/pull/80317))
+
+#### Global Styles
+- Reject non-string custom CSS in the REST controller. ([80338](https://github.com/WordPress/gutenberg/pull/80338))
+
+#### Client Side Media
+- Vips/upload-media: Consolidate optional params into options objects. ([80330](https://github.com/WordPress/gutenberg/pull/80330))
+
+#### Components
+- RichTextControl: Replace DOM focus tracking with a single React-tree focus boundary. ([80324](https://github.com/WordPress/gutenberg/pull/80324))
+
+#### Plugin
+- Icons: Fix collection unregister not removing icons after core added its own registry. ([80292](https://github.com/WordPress/gutenberg/pull/80292))
+
+#### Post Editor
+- Notes: Replace blur-deselect bookkeeping with useFocusOutside. ([80222](https://github.com/WordPress/gutenberg/pull/80222))
+
+
+### Tools
+
+#### Build Tooling
+- Only include icon library SVGs listed as `public` in the Zip file published to GitHub Container Registry for `wordpress-develop`. ([79338](https://github.com/WordPress/gutenberg/pull/79338))
+- Release: Extract npm release lifecycle. ([80190](https://github.com/WordPress/gutenberg/pull/80190))
+
+
+## First-time contributors
+
+The following PRs were merged by first-time contributors:
+
+- @milindmore22: Fix: Allow icon labels to wrap with word breaks and no ellipsis. ([80256](https://github.com/WordPress/gutenberg/pull/80256))
+- @Pranjal1423: fix: Set dataviews popover hover text color. ([80105](https://github.com/WordPress/gutenberg/pull/80105))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@aaronrobertshaw @adamsilverstein @andrewserong @ciampo @desrosj @ellatrix @jorgefilipecosta @juanfra @Mamaduka @manzoorwanijk @milindmore22 @ntsekouras @Pranjal1423 @ramonjd @scruffian @shimotmk @t-hamano @talldan @tellthemachines @tyxla
+
+
 = 23.6.0-rc.1 =
 
 
