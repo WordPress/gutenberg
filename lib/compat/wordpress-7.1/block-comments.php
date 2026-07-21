@@ -161,27 +161,11 @@ function gutenberg_notes_sanitize_mention_classes( $content ) {
 	$processor = new WP_HTML_Tag_Processor( $unslashed );
 
 	while ( $processor->next_tag( 'SPAN' ) ) {
-		$class = $processor->get_attribute( 'class' );
-
-		if ( null === $class ) {
-			continue;
-		}
-
-		$kept = array();
-
-		if ( is_string( $class ) ) {
-			foreach ( preg_split( '/\s+/', trim( $class ), -1, PREG_SPLIT_NO_EMPTY ) as $token ) {
-				if ( 'wp-note-mention' === $token || preg_match( '/^user-[1-9][0-9]*$/', $token ) ) {
-					$kept[] = $token;
-				}
+		foreach ( $processor->class_list() as $token ) {
+			if ( 'wp-note-mention' !== $token && ! preg_match( '/^user-[1-9][0-9]*$/', $token ) ) {
+				// Removing the last class also removes the attribute itself.
+				$processor->remove_class( $token );
 			}
-			$kept = array_values( array_unique( $kept ) );
-		}
-
-		if ( empty( $kept ) ) {
-			$processor->remove_attribute( 'class' );
-		} else {
-			$processor->set_attribute( 'class', implode( ' ', $kept ) );
 		}
 	}
 
