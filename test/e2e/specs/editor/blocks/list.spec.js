@@ -2038,6 +2038,21 @@ test.describe( 'List (@firefox)', () => {
 			editor.canvas.locator( '.is-multi-selected' )
 		).toHaveText( 'abcd' );
 
+		// The native selection is untouched (only hidden by the block
+		// overlay), so the gesture could still continue. It reaches from
+		// "ab" into the nested "cd" item. The selected text is not
+		// asserted because the line navigation lands at the start of the
+		// indented nested line, right before "cd".
+		expect(
+			await page.frame( { name: 'editor-canvas' } ).evaluate( () => {
+				const selection = document.getSelection();
+				return {
+					anchor: selection.anchorNode.textContent,
+					focus: selection.focusNode.textContent,
+				};
+			} )
+		).toMatchObject( { anchor: 'ab', focus: 'cd' } );
+
 		// The press removes the fully selected item as a whole, together
 		// with its nested list; the unrelated sibling remains.
 		await page.keyboard.press( 'Backspace' );
