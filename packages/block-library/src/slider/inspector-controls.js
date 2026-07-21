@@ -4,10 +4,11 @@
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import {
-	PanelBody,
 	ToggleControl,
 	RangeControl,
 	SelectControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -22,6 +23,11 @@ import {
 	justifyRight,
 	justifySpaceBetween,
 } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ARROWS_POSITION_OPTIONS = [
 	{ label: __( 'Overlay' ), value: 'overlay' },
@@ -130,87 +136,191 @@ export function SliderInspectorControls( {
 	maxSlidesToShow,
 } ) {
 	const {
-		loop,
-		arrowIcon,
-		indicatorStyle,
+		loop = true,
+		arrowIcon = 'chevron',
+		indicatorStyle = 'dot',
 		navigationButtonType = 'icon',
 		navigationPosition = 'overlay',
 		navigationJustification = 'space-between',
 		showIndicators = true,
 	} = attributes;
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Slider settings' ) }>
-				<RangeControl
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ () =>
+					setAttributes( {
+						slidesToShow: 1,
+						loop: true,
+					} )
+				}
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
 					label={ __( 'Slides to show' ) }
-					help={ __( 'Number of slides visible at the same time.' ) }
-					value={ normalizedSlidesToShow }
-					min={ 1 }
-					max={ maxSlidesToShow }
-					step={ 1 }
-					withInputField
-					onChange={ ( value ) =>
-						setAttributes( {
-							slidesToShow: Math.min(
-								maxSlidesToShow,
-								Math.max( 1, Number.parseInt( value, 10 ) || 1 )
-							),
-						} )
-					}
-				/>
-				<ToggleControl
+					isShownByDefault
+					hasValue={ () => normalizedSlidesToShow !== 1 }
+					onDeselect={ () => setAttributes( { slidesToShow: 1 } ) }
+				>
+					<RangeControl
+						label={ __( 'Slides to show' ) }
+						help={ __(
+							'Number of slides visible at the same time.'
+						) }
+						value={ normalizedSlidesToShow }
+						min={ 1 }
+						max={ maxSlidesToShow }
+						step={ 1 }
+						withInputField
+						onChange={ ( value ) =>
+							setAttributes( {
+								slidesToShow: Math.min(
+									maxSlidesToShow,
+									Math.max(
+										1,
+										Number.parseInt( value, 10 ) || 1
+									)
+								),
+							} )
+						}
+					/>
+				</ToolsPanelItem>
+				<ToolsPanelItem
 					label={ __( 'Loop' ) }
-					help={ __( 'Loop back to the first or last slide.' ) }
-					checked={ !! loop }
-					onChange={ ( value ) => setAttributes( { loop: value } ) }
-				/>
-			</PanelBody>
-			<PanelBody title={ __( 'Pagination' ) }>
-				<SelectControl
+					isShownByDefault
+					hasValue={ () => ! loop }
+					onDeselect={ () => setAttributes( { loop: true } ) }
+				>
+					<ToggleControl
+						label={ __( 'Loop' ) }
+						help={ __( 'Loop back to the first or last slide.' ) }
+						checked={ !! loop }
+						onChange={ ( value ) =>
+							setAttributes( { loop: value } )
+						}
+					/>
+				</ToolsPanelItem>
+			</ToolsPanel>
+			<ToolsPanel
+				label={ __( 'Pagination' ) }
+				resetAll={ () =>
+					setAttributes( {
+						navigationPosition: 'overlay',
+						navigationJustification: 'space-between',
+						navigationButtonType: 'icon',
+						arrowIcon: 'chevron',
+						showIndicators: true,
+						indicatorStyle: 'dot',
+					} )
+				}
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
 					label={ __( 'Position' ) }
-					value={ navigationPosition }
-					options={ ARROWS_POSITION_OPTIONS }
-					onChange={ ( value ) =>
-						setAttributes( { navigationPosition: value } )
+					isShownByDefault
+					hasValue={ () => navigationPosition !== 'overlay' }
+					onDeselect={ () =>
+						setAttributes( { navigationPosition: 'overlay' } )
 					}
-				/>
+				>
+					<SelectControl
+						label={ __( 'Position' ) }
+						value={ navigationPosition }
+						options={ ARROWS_POSITION_OPTIONS }
+						onChange={ ( value ) =>
+							setAttributes( { navigationPosition: value } )
+						}
+					/>
+				</ToolsPanelItem>
 				{ navigationPosition !== 'overlay' && (
-					<NavigationJustificationControl
-						value={ navigationJustification }
+					<ToolsPanelItem
+						label={ __( 'Justification' ) }
+						isShownByDefault
+						hasValue={ () =>
+							navigationJustification !== 'space-between'
+						}
+						onDeselect={ () =>
+							setAttributes( {
+								navigationJustification: 'space-between',
+							} )
+						}
+					>
+						<NavigationJustificationControl
+							value={ navigationJustification }
+							onChange={ ( value ) =>
+								setAttributes( {
+									navigationJustification: value,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+				) }
+				<ToolsPanelItem
+					label={ __( 'Type' ) }
+					isShownByDefault
+					hasValue={ () => navigationButtonType !== 'icon' }
+					onDeselect={ () =>
+						setAttributes( { navigationButtonType: 'icon' } )
+					}
+				>
+					<NavigationButtonTypeControl
+						value={ navigationButtonType }
 						onChange={ ( value ) =>
-							setAttributes( { navigationJustification: value } )
+							setAttributes( { navigationButtonType: value } )
 						}
 					/>
-				) }
-				<NavigationButtonTypeControl
-					value={ navigationButtonType }
-					onChange={ ( value ) =>
-						setAttributes( { navigationButtonType: value } )
+				</ToolsPanelItem>
+				<ToolsPanelItem
+					label={ __( 'Button icon' ) }
+					isShownByDefault
+					hasValue={ () => arrowIcon !== 'chevron' }
+					onDeselect={ () =>
+						setAttributes( { arrowIcon: 'chevron' } )
 					}
-				/>
-				<NavigationButtonIconControl
-					value={ arrowIcon }
-					onChange={ ( value ) =>
-						setAttributes( { arrowIcon: value } )
-					}
-				/>
-				<ToggleControl
+				>
+					<NavigationButtonIconControl
+						value={ arrowIcon }
+						onChange={ ( value ) =>
+							setAttributes( { arrowIcon: value } )
+						}
+					/>
+				</ToolsPanelItem>
+				<ToolsPanelItem
 					label={ __( 'Show indicators' ) }
-					checked={ !! showIndicators }
-					onChange={ ( value ) =>
-						setAttributes( { showIndicators: value } )
+					isShownByDefault
+					hasValue={ () => ! showIndicators }
+					onDeselect={ () =>
+						setAttributes( { showIndicators: true } )
 					}
-				/>
-				{ showIndicators && (
-					<IndicatorStyleControl
-						value={ indicatorStyle }
+				>
+					<ToggleControl
+						label={ __( 'Show indicators' ) }
+						checked={ !! showIndicators }
 						onChange={ ( value ) =>
-							setAttributes( { indicatorStyle: value } )
+							setAttributes( { showIndicators: value } )
 						}
 					/>
+				</ToolsPanelItem>
+				{ showIndicators && (
+					<ToolsPanelItem
+						label={ __( 'Indicator icon' ) }
+						isShownByDefault
+						hasValue={ () => indicatorStyle !== 'dot' }
+						onDeselect={ () =>
+							setAttributes( { indicatorStyle: 'dot' } )
+						}
+					>
+						<IndicatorStyleControl
+							value={ indicatorStyle }
+							onChange={ ( value ) =>
+								setAttributes( { indicatorStyle: value } )
+							}
+						/>
+					</ToolsPanelItem>
 				) }
-			</PanelBody>
+			</ToolsPanel>
 		</InspectorControls>
 	);
 }
