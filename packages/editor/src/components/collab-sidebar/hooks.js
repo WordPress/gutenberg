@@ -375,6 +375,17 @@ export function useNoteActions() {
 			const inlineSelection = ! parent
 				? readInlineSelection( getSelectionStart, getSelectionEnd )
 				: null;
+			const inlineSelectionValue = inlineSelection
+				? getBlockAttributes( inlineSelection.clientId )?.[
+						inlineSelection.attributeKey
+				  ]
+				: null;
+			const inlineSelectionText =
+				inlineSelectionValue instanceof RichTextData
+					? inlineSelectionValue
+							.toString()
+							.slice( inlineSelection.start, inlineSelection.end )
+					: null;
 
 			const savedRecord = await saveEntityRecord(
 				'root',
@@ -404,6 +415,25 @@ export function useNoteActions() {
 					return savedRecord;
 				}
 				const attributes = getBlockAttributes( clientId );
+				if (
+					inlineSelection &&
+					( ! (
+						attributes?.[ inlineSelection.attributeKey ] instanceof
+						RichTextData
+					) ||
+						attributes[ inlineSelection.attributeKey ]
+							.toString()
+							.slice(
+								inlineSelection.start,
+								inlineSelection.end
+							) !== inlineSelectionText )
+				) {
+					throw new Error(
+						__(
+							'The note was added, but its selected text changed before the attachment could be saved.'
+						)
+					);
+				}
 				const metadata = attributes?.metadata;
 				const selectedBlock = getBlock( clientId );
 				const updatedMetadata = addNoteIdToMetadata(
@@ -442,8 +472,9 @@ export function useNoteActions() {
 
 				updateBlockAttributes( clientId, newAttributes );
 
-				if ( persistEntityBlockAttributes ) {
-					await persistEntityBlockAttributes(
+				if (
+					! persistEntityBlockAttributes ||
+					! ( await persistEntityBlockAttributes(
 						'postType',
 						getCurrentPostType(),
 						getCurrentPostId(),
@@ -482,6 +513,12 @@ export function useNoteActions() {
 								return repairedAttributes;
 							},
 						}
+					) )
+				) {
+					throw new Error(
+						__(
+							'The note was added, but its block attachment could not be saved.'
+						)
 					);
 				}
 			}

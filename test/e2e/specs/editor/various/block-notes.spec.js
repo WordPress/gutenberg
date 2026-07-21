@@ -14,6 +14,14 @@ function getRestPath( url ) {
 	);
 }
 
+function isTargetedRepairRequest( request ) {
+	return (
+		request.method() === 'POST' &&
+		/^\/wp\/v2\/posts\/\d+$/.test( getRestPath( request.url() ) ) &&
+		typeof request.postDataJSON()?.meta?._crdt_document === 'string'
+	);
+}
+
 test.use( {
 	blockNoteUtils: async ( { page, editor }, use ) => {
 		await use( new BlockNoteUtils( { page, editor } ) );
@@ -1222,6 +1230,232 @@ test.describe( 'Block Notes', () => {
 			await blockNoteUtils.addNote( 'No fallback save' );
 
 			expect( postUpdates ).toEqual( [] );
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( {
+						hasText:
+							'The note was added, but its block attachment could not be saved.',
+					} )
+			).toBeVisible();
+		} );
+
+		test( 'recovers a failed attachment when a later note repair succeeds', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Recover both note attachments.' },
+			} );
+			await editor.saveDraft();
+			await page.reload();
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			);
+
+			let repairCount = 0;
+			let successfulRepairCount = 0;
+			page.on( 'response', ( response ) => {
+				const request = response.request();
+				if ( response.ok() && isTargetedRepairRequest( request ) ) {
+					successfulRepairCount++;
+				}
+			} );
+			await page.route( '**/*', async ( route ) => {
+				const request = route.request();
+				if ( ! isTargetedRepairRequest( request ) ) {
+					await route.continue();
+					return;
+				}
+
+				repairCount++;
+				if ( repairCount === 1 ) {
+					await route.fulfill( {
+						status: 500,
+						contentType: 'application/json',
+						body: JSON.stringify( {
+							code: 'forced_attachment_failure',
+							message: 'Forced attachment repair failure.',
+						} ),
+					} );
+					return;
+				}
+				await route.continue();
+			} );
+
+			await blockNoteUtils.addNote( 'Repair failure note' );
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Forced attachment repair failure.' } )
+			).toBeVisible();
+			await blockNoteUtils.addNote( 'Repair recovery note' );
+			await expect.poll( () => repairCount ).toBe( 2 );
+			await expect.poll( () => successfulRepairCount ).toBe( 1 );
+
+			await page.reload();
+			expect(
+				( await editor.getBlocks() )[ 0 ].attributes.metadata.noteId
+			).toHaveLength( 2 );
+		} );
+
+		test( 'preserves both attachments when note repairs overlap', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Overlap both note attachments.' },
+			} );
+			await editor.saveDraft();
+			await page.reload();
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			);
+
+			let releaseFirstRepair;
+			const firstRepairReleased = new Promise( ( resolve ) => {
+				releaseFirstRepair = resolve;
+			} );
+			let markFirstRepairStarted;
+			const firstRepairStarted = new Promise( ( resolve ) => {
+				markFirstRepairStarted = resolve;
+			} );
+			let repairCount = 0;
+			let successfulRepairCount = 0;
+			page.on( 'response', ( response ) => {
+				const request = response.request();
+				if ( response.ok() && isTargetedRepairRequest( request ) ) {
+					successfulRepairCount++;
+				}
+			} );
+			await page.route( '**/*', async ( route ) => {
+				const request = route.request();
+				if ( ! isTargetedRepairRequest( request ) ) {
+					await route.continue();
+					return;
+				}
+
+				repairCount++;
+				if ( repairCount === 1 ) {
+					markFirstRepairStarted();
+					await firstRepairReleased;
+				}
+				await route.continue();
+			} );
+
+			const firstNote = blockNoteUtils.addNote(
+				'First overlapping note'
+			);
+			await firstRepairStarted;
+			await firstNote;
+			const secondNote = blockNoteUtils.addNote(
+				'Second overlapping note'
+			);
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'treeitem', {
+						name: 'Note: Second overlapping note',
+					} )
+			).toBeVisible();
+			releaseFirstRepair();
+			await secondNote;
+			await expect.poll( () => repairCount ).toBe( 2 );
+			await expect.poll( () => successfulRepairCount ).toBe( 2 );
+
+			await page.reload();
+			expect(
+				( await editor.getBlocks() )[ 0 ].attributes.metadata.noteId
+			).toHaveLength( 2 );
+		} );
+
+		test( 'refuses stale inline offsets when text changes during note creation', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Keep this saved inline range.' },
+			} );
+			await editor.saveDraft();
+			await page.reload();
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await page.keyboard.press( 'ControlOrMeta+a' );
+			await page
+				.getByRole( 'button', { name: 'More', exact: true } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Stale inline range note' );
+
+			let releaseComment;
+			const commentReleased = new Promise( ( resolve ) => {
+				releaseComment = resolve;
+			} );
+			let markCommentStarted;
+			const commentStarted = new Promise( ( resolve ) => {
+				markCommentStarted = resolve;
+			} );
+			await page.route( '**/*', async ( route ) => {
+				const request = route.request();
+				if (
+					request.method() === 'POST' &&
+					getRestPath( request.url() ) === '/wp/v2/comments'
+				) {
+					markCommentStarted();
+					await commentReleased;
+				}
+				await route.continue();
+			} );
+
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+			await commentStarted;
+			await page.evaluate( () => {
+				const block = window.wp.data
+					.select( 'core/block-editor' )
+					.getBlocks()[ 0 ];
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.updateBlockAttributes( block.clientId, {
+						content: 'Changed while the note comment was pending.',
+					} );
+			} );
+			releaseComment();
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( {
+						hasText:
+							'The note was added, but its selected text changed before the attachment could be saved.',
+					} )
+			).toBeVisible();
+			await page.reload();
+
+			const blocks = await editor.getBlocks();
+			expect( blocks[ 0 ].attributes.content ).toBe(
+				'Keep this saved inline range.'
+			);
+			expect( blocks[ 0 ].attributes.metadata?.noteId ).toBeUndefined();
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
 		} );
 
 		test( 'preserves persisted CRDT lineage without duplicating blocks after reload', async ( {
