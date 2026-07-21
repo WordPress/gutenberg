@@ -6,6 +6,10 @@
 
 - 	`format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
 
+### Documentation
+
+-   `start`: Document the Fast Refresh (`--hot`) setup — the separate `runtime.js` chunk that must be enqueued before the entry script, the `SCRIPT_DEBUG`-only requirement (the Gutenberg plugin is no longer required), and using `--allowed-hosts` for custom local domains ([#80354](https://github.com/WordPress/gutenberg/issues/80354)).
+
 ## 33.0.0 (2026-07-14)
 
 ### Breaking Changes
