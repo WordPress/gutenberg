@@ -57,10 +57,53 @@ export function buildHighlightCss( threads, selectedId = null ) {
 }
 
 /**
+ * Build the CSS rule set that tints a whole text block whose note is attached at
+ * the block level. Block-level notes carry no in-content `<mark>` to target, so
+ * the block is matched by its client id instead.
+ *
+ * The selector only matches when the block's own wrapper element *is* a
+ * rich-text editable, which is true for text-leaf blocks (paragraph, heading,
+ * list item) and false for containers and media. That keeps the treatment
+ * scoped to text without any block-type checks: non-text blocks get an overlay
+ * of their own in a separate iteration.
+ *
+ * @param {Array}       blockHighlights Block-level notes (each with `clientId`, `id` and `author`).
+ * @param {string|null} selectedId      ID of the currently selected note, if any.
+ * @return {string} A serialized CSS string targeting the blocks' editable elements.
+ */
+export function buildBlockHighlightCss( blockHighlights, selectedId = null ) {
+	const rules = [];
+	for ( const highlight of blockHighlights ?? [] ) {
+		if ( ! highlight?.clientId ) {
+			continue;
+		}
+		const color = getAvatarBorderColor( highlight.author ?? 0 );
+		// Client ids are generated UUIDs, but escape `"`/`\` defensively since
+		// this composes a quoted attribute value.
+		const escapedClientId = String( highlight.clientId ).replace(
+			/["\\]/g,
+			'\\$&'
+		);
+		const sel = `[data-block="${ escapedClientId }"].block-editor-rich-text__editable`;
+		rules.push( `${ sel }{background-color:${ color }${ REST_ALPHA };}` );
+		rules.push(
+			`${ sel }:hover{background-color:${ color }${ ACTIVE_ALPHA };}`
+		);
+		if ( selectedId && String( selectedId ) === String( highlight.id ) ) {
+			rules.push(
+				`${ sel }{background-color:${ color }${ ACTIVE_ALPHA };}`
+			);
+		}
+	}
+	return rules.join( '' );
+}
+
+/**
  * Injects per-note background rules into the editor canvas so inline-note
  * markers carry their author's avatar color. The `core/note` format serializes
  * each marker as `<mark class="wp-note" data-id="{noteId}">`, which we target
- * directly.
+ * directly. Notes attached at the block level have no marker, so the whole text
+ * block is tinted instead.
  *
  * Uses `useStyleOverride` so the styles reach the iframed canvas; a plain
  * `<style>` element rendered in the sidebar would only affect the parent doc.
@@ -69,14 +112,21 @@ export function buildHighlightCss( threads, selectedId = null ) {
  * the editor's selected note.
  *
  * @param {Object}      props
- * @param {Array}       props.threads      Unresolved note threads.
- * @param {string|null} [props.selectedId] ID of the currently selected note.
+ * @param {Array}       props.threads           Unresolved note threads.
+ * @param {Array}       [props.blockHighlights] Unresolved block-level notes to tint whole.
+ * @param {string|null} [props.selectedId]      ID of the currently selected note.
  * @return {null} Renders nothing; styles are applied via `useStyleOverride`.
  */
-export function NoteHighlightStyles( { threads, selectedId } ) {
+export function NoteHighlightStyles( {
+	threads,
+	blockHighlights,
+	selectedId,
+} ) {
 	const css = useMemo(
-		() => buildHighlightCss( threads, selectedId ),
-		[ threads, selectedId ]
+		() =>
+			buildHighlightCss( threads, selectedId ) +
+			buildBlockHighlightCss( blockHighlights, selectedId ),
+		[ threads, blockHighlights, selectedId ]
 	);
 	useStyleOverride( { id: 'core-note-highlights', css } );
 	return null;

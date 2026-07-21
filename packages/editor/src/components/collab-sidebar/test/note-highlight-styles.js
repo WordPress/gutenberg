@@ -1,7 +1,10 @@
 /**
  * Internal dependencies
  */
-import { buildHighlightCss } from '../note-highlight-styles';
+import {
+	buildBlockHighlightCss,
+	buildHighlightCss,
+} from '../note-highlight-styles';
 import { getAvatarBorderColor } from '../utils';
 
 describe( 'buildHighlightCss', () => {
@@ -102,5 +105,108 @@ describe( 'buildHighlightCss', () => {
 		expect( buildHighlightCss( null ) ).toBe(
 			'mark.wp-note{background-color:transparent;color:inherit;}'
 		);
+	} );
+} );
+
+describe( 'buildBlockHighlightCss', () => {
+	// The selector only matches when the block's own wrapper element is itself
+	// a rich-text editable, which is what scopes the treatment to text blocks.
+	const selectorFor = ( clientId ) =>
+		`[data-block="${ clientId }"].block-editor-rich-text__editable`;
+
+	it( 'tints each block with its author color at the rest alpha (0x40)', () => {
+		const css = buildBlockHighlightCss( [
+			{ clientId: 'abc-1', id: 7, author: 1 },
+			{ clientId: 'abc-2', id: 12, author: 3 },
+		] );
+		expect( css ).toContain(
+			`${ selectorFor(
+				'abc-1'
+			) }{background-color:${ getAvatarBorderColor( 1 ) }40;}`
+		);
+		expect( css ).toContain(
+			`${ selectorFor(
+				'abc-2'
+			) }{background-color:${ getAvatarBorderColor( 3 ) }40;}`
+		);
+	} );
+
+	it( 'emits a higher-alpha (0x80) rule on hover for each block', () => {
+		const css = buildBlockHighlightCss( [
+			{ clientId: 'abc-1', id: 7, author: 1 },
+		] );
+		expect( css ).toContain(
+			`${ selectorFor(
+				'abc-1'
+			) }:hover{background-color:${ getAvatarBorderColor( 1 ) }80;}`
+		);
+	} );
+
+	it( 'boosts opacity for the selected note by appending a second rule', () => {
+		const color = getAvatarBorderColor( 1 );
+		const css = buildBlockHighlightCss(
+			[ { clientId: 'abc-1', id: 7, author: 1 } ],
+			'7' // selected
+		);
+		const restIndex = css.indexOf(
+			`${ selectorFor( 'abc-1' ) }{background-color:${ color }40;}`
+		);
+		const activeIndex = css.lastIndexOf(
+			`${ selectorFor( 'abc-1' ) }{background-color:${ color }80;}`
+		);
+		// Rest rule still present, active rule appended later so it wins.
+		expect( restIndex ).toBeGreaterThanOrEqual( 0 );
+		expect( activeIndex ).toBeGreaterThan( restIndex );
+	} );
+
+	it( 'leaves other blocks at the rest alpha when one note is selected', () => {
+		const css = buildBlockHighlightCss(
+			[
+				{ clientId: 'abc-1', id: 7, author: 1 },
+				{ clientId: 'abc-2', id: 12, author: 1 },
+			],
+			7
+		);
+		const color = getAvatarBorderColor( 1 );
+		expect( css ).not.toContain(
+			`${ selectorFor( 'abc-2' ) }{background-color:${ color }80;}`
+		);
+	} );
+
+	it( 'matches numeric and string selectedId variants', () => {
+		const entry = [ { clientId: 'abc-1', id: 7, author: 1 } ];
+		expect( buildBlockHighlightCss( entry, 7 ) ).toEqual(
+			buildBlockHighlightCss( entry, '7' )
+		);
+	} );
+
+	it( 'escapes quotes and backslashes in the client id', () => {
+		const css = buildBlockHighlightCss( [
+			{ clientId: 'a"b\\c', id: 7, author: 1 },
+		] );
+		expect( css ).toContain( '[data-block="a\\"b\\\\c"]' );
+	} );
+
+	it( 'skips entries without a client id', () => {
+		const css = buildBlockHighlightCss( [
+			{ clientId: null, id: 7, author: 1 },
+			{ id: 8, author: 1 },
+		] );
+		expect( css ).not.toMatch( /data-block="(null|undefined)"/ );
+	} );
+
+	it( 'falls back to author 0 when the field is missing', () => {
+		const css = buildBlockHighlightCss( [ { clientId: 'abc-1', id: 7 } ] );
+		expect( css ).toContain(
+			`${ selectorFor(
+				'abc-1'
+			) }{background-color:${ getAvatarBorderColor( 0 ) }40;}`
+		);
+	} );
+
+	it( 'returns an empty string when there are no block-level notes', () => {
+		expect( buildBlockHighlightCss() ).toBe( '' );
+		expect( buildBlockHighlightCss( null ) ).toBe( '' );
+		expect( buildBlockHighlightCss( [] ) ).toBe( '' );
 	} );
 } );
