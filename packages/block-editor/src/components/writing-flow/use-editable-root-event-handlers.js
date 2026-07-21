@@ -9,7 +9,7 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { getSelectionEditableElement } from '../../utils/dom';
+import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { BlockRefs } from '../provider/block-refs-provider';
 import {
 	EVENT_TYPES,
@@ -121,44 +121,42 @@ export default function useEditableRootEventHandlers() {
 				}
 
 				const editable = getSelectionEditableElement( selection, node );
-				const clientId = editable
-					?.closest( '[data-block]' )
-					?.getAttribute( 'data-block' );
+				const clientId = getBlockClientId( editable );
 
 				if ( ! clientId ) {
 					return;
 				}
 
-				// The block that owns the selection and its block ancestors,
-				// innermost first, taking the hierarchy from the store and the
-				// elements from the block refs rather than walking the DOM.
-				// Only those with a handler for this event and a mounted
-				// element take part, like a bubbling event.
-				const targets = [
+				// Call the handler on the block that owns the selection and each
+				// of its block ancestors, innermost first, like a bubbling
+				// event. The hierarchy comes from the store rather than the DOM,
+				// and one synthetic event is reused for the whole chain, its
+				// currentTarget moved from block to block. The element is only
+				// resolved for the blocks that have a handler.
+				const clientIds = [
 					clientId,
 					...getBlockParents( clientId, true ),
-				]
-					.map( ( ancestorClientId ) => ( {
-						handler:
-							getBlockEventHandlers( ancestorClientId )?.[
-								event.type
-							],
-						element: refsMap.get( ancestorClientId ),
-					} ) )
-					.filter( ( { handler, element } ) => handler && element );
+				];
 
-				if ( ! targets.length ) {
-					return;
-				}
+				let syntheticEvent;
+				for ( const ancestorClientId of clientIds ) {
+					const handler =
+						getBlockEventHandlers( ancestorClientId )?.[
+							event.type
+						];
+					const element = handler && refsMap.get( ancestorClientId );
 
-				// One synthetic event for the whole chain, its currentTarget
-				// moved from block to block as it bubbles.
-				const syntheticEvent = createBlockSyntheticEvent(
-					new event.constructor( event.type, event ),
-					editable
-				);
+					if ( ! element ) {
+						continue;
+					}
 
-				for ( const { handler, element } of targets ) {
+					if ( ! syntheticEvent ) {
+						syntheticEvent = createBlockSyntheticEvent(
+							new event.constructor( event.type, event ),
+							editable
+						);
+					}
+
 					syntheticEvent.currentTarget = element;
 					handler( syntheticEvent );
 
@@ -167,7 +165,7 @@ export default function useEditableRootEventHandlers() {
 					}
 				}
 
-				if ( syntheticEvent.nativeEvent.defaultPrevented ) {
+				if ( syntheticEvent?.nativeEvent.defaultPrevented ) {
 					event.preventDefault();
 				}
 			}
