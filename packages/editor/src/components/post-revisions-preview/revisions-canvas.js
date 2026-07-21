@@ -81,6 +81,14 @@ const REVISION_DIFF_STYLES = `
 		background-color: color-mix(in srgb, currentColor 5%, #00a32a 15%);
 		text-decoration: none;
 	}
+	/* Reset UA <mark> styles so format markers keep the same look as before. */
+	mark.revision-diff-format-added,
+	mark.revision-diff-format-removed,
+	mark.revision-diff-format-changed {
+		background: transparent;
+		color: inherit;
+		padding: 0;
+	}
 	.revision-diff-format-added {
 		text-decoration: underline wavy color-mix(in srgb, currentColor 30%, #00a32a 70%);
 		text-decoration-thickness: 2px;
@@ -140,7 +148,7 @@ function DiffStyleOverrides( { showDiff } ) {
 }
 
 /**
- * Visually hidden descriptions that diff marks (<del>, <ins>, <span>)
+ * Visually hidden descriptions that diff marks (<del>, <ins>, <mark>)
  * reference via `aria-describedby`. They must be rendered inside the
  * canvas iframe because `aria-describedby` cannot reference an element
  * across a document/iframe boundary. This is more reliable than `title`,

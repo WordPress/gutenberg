@@ -1056,7 +1056,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Hello <strong><span aria-describedby="revision-diff-format-added-desc" class="revision-diff-format-added">world</span></strong>',
+							'Hello <strong><mark aria-describedby="revision-diff-format-added-desc" class="revision-diff-format-added">world</mark></strong>',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1136,7 +1136,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Visit <a href="https://new-site.com"><span aria-describedby="revision-diff-format-changed-desc" class="revision-diff-format-changed">our site</span></a> today',
+							'Visit <a href="https://new-site.com"><mark aria-describedby="revision-diff-format-changed-desc" class="revision-diff-format-changed">our site</mark></a> today',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1216,7 +1216,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'<span aria-describedby="revision-diff-format-removed-desc" class="revision-diff-format-removed">Bold</span> and <span aria-describedby="revision-diff-format-removed-desc" class="revision-diff-format-removed">italic</span> text',
+							'<mark aria-describedby="revision-diff-format-removed-desc" class="revision-diff-format-removed">Bold</mark> and <mark aria-describedby="revision-diff-format-removed-desc" class="revision-diff-format-removed">italic</mark> text',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1244,7 +1244,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Hello <em><span aria-describedby="revision-diff-format-changed-desc" class="revision-diff-format-changed">world</span></em>',
+							'Hello <em><mark aria-describedby="revision-diff-format-changed-desc" class="revision-diff-format-changed">world</mark></em>',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},

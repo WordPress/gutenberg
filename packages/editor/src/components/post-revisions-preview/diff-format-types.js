@@ -35,19 +35,19 @@ const DIFF_FORMAT_TYPES = [
 	{
 		name: 'revision/diff-format-added',
 		title: __( 'Format added' ),
-		tagName: 'span',
+		tagName: 'mark',
 		className: 'revision-diff-format-added',
 	},
 	{
 		name: 'revision/diff-format-removed',
 		title: __( 'Format removed' ),
-		tagName: 'span',
+		tagName: 'mark',
 		className: 'revision-diff-format-removed',
 	},
 	{
 		name: 'revision/diff-format-changed',
 		title: __( 'Format changed' ),
-		tagName: 'span',
+		tagName: 'mark',
 		className: 'revision-diff-format-changed',
 	},
 ];
