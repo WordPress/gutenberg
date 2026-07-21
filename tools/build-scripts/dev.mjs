@@ -160,7 +160,7 @@ async function dev() {
 		console.log( '\n🧹 Cleaning packages...' );
 		await exec(
 			'node',
-			[ path.join( __dirname, 'clean.mjs' ), '--packages' ],
+			[ `"${ path.join( __dirname, 'clean.mjs' ) }"`, '--packages' ],
 			{ silent: true }
 		);
 
@@ -174,7 +174,7 @@ async function dev() {
 		// This must happen before TypeScript compilation because some packages
 		// (like vips) have source files that import from generated worker-code.ts
 		await exec( 'node', [
-			path.join( __dirname, 'packages/generate-worker-placeholders.mjs' ),
+			`"${ path.join( __dirname, 'packages/generate-worker-placeholders.mjs' ) }"`,
 		] );
 
 		if ( ! skipTypes ) {
@@ -191,16 +191,16 @@ async function dev() {
 
 			console.log( '\n✅ Checking type declaration files...' );
 			await exec( 'node', [
-				path.join(
+				`"${ path.join(
 					__dirname,
 					'packages/check-build-type-declaration-files.cjs'
-				),
+				) }"`,
 			] );
 		}
 
 		console.log( '\n📦 Building vendor files...' );
 		await exec( 'node', [
-			path.join( __dirname, 'packages/build-vendors.mjs' ),
+			`"${ path.join( __dirname, 'packages/build-vendors.mjs' ) }"`,
 		] );
 
 		const setupTime = Date.now() - startTime;
