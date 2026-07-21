@@ -8,6 +8,8 @@ import styles from './style.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import focusStyles from '../utils/css/focus.module.scss';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
+import { resolveRecipeClasses } from '../utils/recipe';
+import buttonRecipe from './button.recipe.json';
 
 /**
  * A versatile button component with multiple variants, tones, and sizes.
@@ -36,9 +38,13 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
 			resetStyles[ 'box-sizing' ],
 			focusStyles[ 'outset-ring--focus-except-active' ],
 			variant !== 'unstyled' && styles.button,
-			styles[ `is-${ tone }` ],
-			styles[ `is-${ variant }` ],
-			styles[ `is-${ size }` ],
+			// The tone/variant/size matrix is described declaratively in
+			// button.recipe.json, the single source of truth shared with the
+			// PHP renderer. Structural (`button`) and boolean (`is-loading`)
+			// classes stay here as component logic.
+			resolveRecipeClasses( buttonRecipe, { tone, variant, size } ).map(
+				( key ) => styles[ key ]
+			),
 			loading && styles[ 'is-loading' ],
 			className
 		);

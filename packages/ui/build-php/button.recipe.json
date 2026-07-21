@@ -1,0 +1,24 @@
+{
+	"variants": {
+		"tone": {
+			"brand": [ "is-brand" ],
+			"neutral": [ "is-neutral" ]
+		},
+		"variant": {
+			"solid": [ "is-solid" ],
+			"outline": [ "is-outline" ],
+			"minimal": [ "is-minimal" ],
+			"unstyled": [ "is-unstyled" ]
+		},
+		"size": {
+			"default": [],
+			"small": [ "is-small" ],
+			"compact": [ "is-compact" ]
+		}
+	},
+	"defaultVariants": {
+		"tone": "brand",
+		"variant": "solid",
+		"size": "default"
+	}
+}

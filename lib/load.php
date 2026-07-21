@@ -91,6 +91,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 require_once __DIR__ . '/remove-core-enqueue-scripts.php';
 require_once __DIR__ . '/experimental/editor-settings.php';
 require_once __DIR__ . '/experimental/rest-api-overrides.php';
+require_once __DIR__ . '/experimental/ui-components.php';
 
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';

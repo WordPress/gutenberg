@@ -70,7 +70,10 @@
 		"@types/node": "^24.13.3",
 		"@types/react-dom": "^18.3.1",
 		"@wordpress/base-styles": "file:../base-styles",
+		"cssnano": "^6.0.1",
 		"fast-glob": "^3.2.7",
+		"postcss": "^8.4.38",
+		"postcss-modules": "^6.0.1",
 		"storybook": "^10.6.1",
 		"vitest": "^5.0.3",
 		"vitest-browser-react": "^2.3.0"
