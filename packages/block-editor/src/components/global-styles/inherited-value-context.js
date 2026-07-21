@@ -15,6 +15,7 @@ import {
 	globalStylesLinksDataKey,
 } from '../../store/private-keys';
 import { getVariationNameFromClass } from '../../hooks/block-style-variation';
+import { useBlockEditContext } from '../block-edit/context';
 import { unlock } from '../../lock-unlock';
 
 const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
@@ -44,31 +45,84 @@ function useRawGlobalStyles() {
 }
 
 /**
+ * Blocks whose canvas rendering is driven by root-level Global Styles
+ * *element* styles rather than (or in addition to) the block's own class.
+ *
+ * Each entry returns the element keys that paint the block, ordered low to
+ * high precedence, so a level-specific `h2` correctly wins over the generic
+ * `heading`.
+ *
+ * A level of `0` (e.g. Site Title or Post Title rendered as a paragraph)
+ * renders no heading tag at all, so neither the generic `heading` nor any
+ * `h1`-`h6` element styles reach the block and no element layer applies.
+ *
+ * @param {string}  blockName    Block name.
+ * @param {?number} headingLevel Block's `level` attribute, when it has one.
+ * @return {string[]} Ordered element keys.
+ */
+function getElementLayers( blockName, headingLevel ) {
+	switch ( blockName ) {
+		case 'core/button':
+			return [ 'button' ];
+		case 'core/heading':
+		case 'core/post-title':
+		case 'core/site-title':
+		case 'core/query-title':
+		case 'core/comments-title':
+		case 'core/term-name':
+		case 'core/site-tagline':
+			if ( headingLevel === 0 ) {
+				return [];
+			}
+			return headingLevel
+				? [ 'heading', `h${ headingLevel }` ]
+				: [ 'heading' ];
+		default:
+			return [];
+	}
+}
+
+/**
  * Internal hook that derives the active block-style-variation slug from a
  * block's `className` by matching registered styles via
- * `getVariationNameFromClass`. Returns `null` when no registered variation
- * class is present (the most common case).
+ * `getVariationNameFromClass`, together with the element layers that paint
+ * the block. Both come from a single store subscription.
  *
  * The lookup is scoped to a single `useSelect` subscription; the
  * `@wordpress/blocks` registered-styles slice changes only when a block's
  * styles are (un)registered, so this subscription is cold in steady-state
  * editor use.
  *
+ * The block's `clientId` comes from the block edit context rather than an
+ * argument: these panels always render inside `BlockEditContextProvider`, so
+ * the caller does not have to thread it through.
+ *
  * @param {?string} blockName Block name (e.g. `core/heading`).
  * @param {?string} className Space-separated class string from block attributes.
- * @return {?string} Variation slug (without the `is-style-` prefix) or `null`.
+ * @return {{ variationName: ?string, headingLevel: ?number }} Variation slug
+ * (without the `is-style-` prefix) and the block's heading level, if any.
  */
-function useOwnVariation( blockName, className ) {
+function useVariationAndElements( blockName, className ) {
+	const { clientId } = useBlockEditContext();
 	return useSelect(
 		( select ) => {
-			if ( ! blockName || ! className ) {
-				return null;
+			if ( ! blockName ) {
+				return { variationName: null, headingLevel: undefined };
 			}
 			const registeredStyles =
 				select( blocksStore ).getBlockStyles( blockName );
-			return getVariationNameFromClass( className, registeredStyles );
+			const { level } =
+				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			// Primitives only: `useSelect` shallow-compares this object, so
+			// returning a fresh array here would re-render on every action.
+			return {
+				variationName: className
+					? getVariationNameFromClass( className, registeredStyles )
+					: null,
+				headingLevel: level,
+			};
 		},
-		[ blockName, className ]
+		[ blockName, className, clientId ]
 	);
 }
 
@@ -93,7 +147,10 @@ function useOwnVariation( blockName, className ) {
  * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map.
  */
 export function useResolvedStyle( blockName, className, selectedState = null ) {
-	const variationName = useOwnVariation( blockName, className );
+	const { variationName, headingLevel } = useVariationAndElements(
+		blockName,
+		className
+	);
 	const globalStyles = useRawGlobalStyles();
 
 	return useMemo( () => {
@@ -103,8 +160,15 @@ export function useResolvedStyle( blockName, className, selectedState = null ) {
 		return resolveStyle( globalStyles, {
 			blockName,
 			variationName,
+			elements: getElementLayers( blockName, headingLevel ),
 			viewport: selectedState?.viewport ?? null,
 			pseudoState: selectedState?.pseudo ?? null,
 		} );
-	}, [ blockName, variationName, globalStyles, selectedState ] );
+	}, [
+		blockName,
+		variationName,
+		headingLevel,
+		globalStyles,
+		selectedState,
+	] );
 }
