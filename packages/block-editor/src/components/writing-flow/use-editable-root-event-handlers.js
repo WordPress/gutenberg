@@ -173,9 +173,11 @@ export default function useEditableRootEventHandlers() {
 				}
 			}
 
+			// Non-capture, so a block's handler fires in the bubbling phase,
+			// as its React `on*` handler would.
 			const unsubscribers = EVENT_TYPES.map( ( type ) => {
-				node.addEventListener( type, onEvent, true );
-				return () => node.removeEventListener( type, onEvent, true );
+				node.addEventListener( type, onEvent );
+				return () => node.removeEventListener( type, onEvent );
 			} );
 			return () =>
 				unsubscribers.forEach( ( unsubscribe ) => unsubscribe() );
