@@ -689,8 +689,8 @@ describe( 'Waveform utilities', () => {
 			// (and canvas work jsdom cannot perform) to a
 			// requestAnimationFrame callback. Fake timers keep that callback
 			// from running so the test only exercises the synchronous
-			// construction path — the same window in which the crossOrigin
-			// attribute must be cleared, before any request is made.
+			// construction path, where the crossOrigin behavior is decided
+			// before any request is made.
 			jest.useFakeTimers();
 
 			// jsdom does not implement canvas rendering or media playback;
@@ -715,7 +715,7 @@ describe( 'Waveform utilities', () => {
 			document.body.innerHTML = '';
 		} );
 
-		it( 'clears the crossOrigin attribute the library sets on its audio element', () => {
+		it( 'does not set the crossOrigin attribute on the audio element', () => {
 			const element = document.createElement( 'div' );
 			document.body.appendChild( element );
 
@@ -726,9 +726,11 @@ describe( 'Waveform utilities', () => {
 			} );
 
 			/*
-			 * The library hardcodes crossOrigin="anonymous", which forces a
-			 * CORS request and breaks playback of tracks served without CORS
-			 * headers (e.g. media offloaded to a CDN).
+			 * crossOrigin forces a CORS request and breaks playback of tracks
+			 * served without CORS headers (e.g. media offloaded to a CDN).
+			 * waveform-player < 1.23.0 hardcoded crossOrigin="anonymous";
+			 * 1.23.0 leaves it unset by default. Guard against a regression
+			 * (e.g. a dependency downgrade or a default flip upstream).
 			 * See https://core.trac.wordpress.org/ticket/65673.
 			 */
 			expect( player.instance.audio ).not.toBeNull();

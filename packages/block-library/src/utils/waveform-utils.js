@@ -585,20 +585,6 @@ export function initWaveformPlayer(
 		instance.artworkEl.alt = imageAlt || '';
 	}
 
-	/*
-	 * The WaveformPlayer library hardcodes crossOrigin="anonymous" on its
-	 * audio element, which forces a CORS request and breaks playback of
-	 * tracks served without CORS headers (e.g. media offloaded to a CDN).
-	 * The attribute isn't needed: the audio element is never wired into an
-	 * AudioContext, and waveform peak analysis uses a separate fetch() that
-	 * already falls back to placeholder peaks. The library defers assigning
-	 * the src to a requestAnimationFrame callback, so clearing the
-	 * attribute here is guaranteed to happen before any request is made.
-	 * See https://core.trac.wordpress.org/ticket/65673.
-	 */
-	if ( instance.audio ) {
-		instance.audio.crossOrigin = null;
-	}
 	applyWaveformPlayerStyles( container, {
 		backgroundColor,
 		backgroundGradient,
