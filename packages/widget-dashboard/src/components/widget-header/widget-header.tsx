@@ -17,7 +17,7 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  */
 import { WidgetInfotip } from './widget-header-infotip';
 import {
-	WIDGET_HEADER_IDENTITY_RESERVE,
+	WIDGET_HEADER_IDENTITY_GAP,
 	WIDGET_TOOLBAR_CHIP_RESERVE,
 	WidgetHeaderAvailableSizeProvider,
 } from './widget-header-size';
@@ -78,12 +78,20 @@ export function WidgetHeader( {
 		( [ entry ] ) => setHeaderWidth( entry.contentRect.width )
 	);
 
+	// Content-box width of the identity cluster. Measured rather than reserved
+	// at a fixed size, so the toolbar budget stays accurate however the
+	// identity grows — e.g. when a `help` note adds the info tooltip.
+	const [ identityWidth, setIdentityWidth ] = useState( 0 );
+	const identityMeasureRef = useResizeObserver< HTMLDivElement >(
+		( [ entry ] ) => setIdentityWidth( entry.contentRect.width )
+	);
+
 	const hasIdentity = showIdentity && !! widgetType?.title;
 	const availableSize =
 		headerWidth > 0
 			? headerWidth -
 			  WIDGET_TOOLBAR_CHIP_RESERVE -
-			  ( hasIdentity ? WIDGET_HEADER_IDENTITY_RESERVE : 0 )
+			  ( hasIdentity ? identityWidth + WIDGET_HEADER_IDENTITY_GAP : 0 )
 			: null;
 
 	return (
@@ -96,6 +104,7 @@ export function WidgetHeader( {
 		>
 			{ showIdentity && widgetType?.title && (
 				<Stack
+					ref={ identityMeasureRef }
 					direction="row"
 					align="center"
 					gap="sm"

@@ -4,11 +4,13 @@
 import { createContext, useContext } from '@wordpress/element';
 
 /**
- * Inline size (px) the header keeps for the identity cluster before the
- * toolbar may claim the rest: the identity's CSS truncation floor (see
- * `.identity` in the header styles) plus the identity/toolbar gap.
+ * Inline size (px) of the gap the header row places between the identity
+ * cluster and the toolbar (`--wpds-dimension-gap-sm`). Added to the measured
+ * identity width so the toolbar budget reflects the space the identity
+ * actually occupies, whatever it renders (icon, title, info tooltip, …),
+ * rather than a fixed reserve that assumes a single layout.
  */
-export const WIDGET_HEADER_IDENTITY_RESERVE = 128;
+export const WIDGET_HEADER_IDENTITY_GAP = 8;
 
 /**
  * Horizontal padding of the toolbar chip (`--wpds-dimension-padding-xs` per
