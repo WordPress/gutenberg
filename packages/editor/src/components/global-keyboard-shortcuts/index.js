@@ -11,6 +11,10 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { store as editorStore } from '../../store';
 
+function isKeyboardEventFromInputOrTextarea( event ) {
+	return [ 'INPUT', 'TEXTAREA' ].includes( event.target?.nodeName );
+}
+
 /**
  * Handles the keyboard shortcuts for the editor.
  *
@@ -61,11 +65,19 @@ export default function EditorKeyboardShortcuts() {
 	} );
 
 	useShortcut( 'core/editor/undo', ( event ) => {
+		if ( isKeyboardEventFromInputOrTextarea( event ) ) {
+			return;
+		}
+
 		undo();
 		event.preventDefault();
 	} );
 
 	useShortcut( 'core/editor/redo', ( event ) => {
+		if ( isKeyboardEventFromInputOrTextarea( event ) ) {
+			return;
+		}
+
 		redo();
 		event.preventDefault();
 	} );
