@@ -7770,6 +7770,69 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that block variation element styles are processed correctly.
+	 */
+	public function test_block_variation_element_styles_are_processed() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/button' => array(
+							'variations' => array(
+								'outline' => array(
+									'elements' => array(
+										'button' => array(
+											'color'  => array(
+												'text' => 'orange',
+											),
+											':hover' => array(
+												'color' => array(
+													'text' => 'red',
+												),
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$metadata = array(
+			'path'       => array(
+				'styles',
+				'blocks',
+				'core/button',
+			),
+			'selector'   => '.wp-block-button .wp-block-button__link',
+			'elements'   => array(
+				'button' => '.wp-element-button, .wp-block-button__link',
+			),
+			'variations' => array(
+				array(
+					'path'     => array(
+						'styles',
+						'blocks',
+						'core/button',
+						'variations',
+						'outline',
+					),
+					'selector' => '.wp-block-button.is-style-outline .wp-block-button__link',
+				),
+			),
+		);
+
+		$expected = ':root :where(.wp-element-button.is-style-outline, .wp-block-button__link.is-style-outline){color: orange;}:root :where(.wp-element-button.is-style-outline:hover, .wp-block-button__link.is-style-outline:hover){color: red;}';
+		$this->assertSameCSS(
+			$expected,
+			$theme_json->get_styles_for_block( $metadata )
+		);
+	}
+
+	/**
 	 * Test that non-whitelisted pseudo selectors are ignored for blocks.
 	 */
 	public function test_block_pseudo_selectors_ignores_non_whitelisted() {
@@ -7873,7 +7936,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = ':root :where(.wp-block-button .wp-block-button__link){background-color: blue;color: white;}:root :where(.wp-block-button .wp-block-button__link:hover){background-color: white;color: blue;}:root :where(.wp-block-button .wp-block-button__link .wp-element-button,.wp-block-button .wp-block-button__link  .wp-block-button__link){color: green;}:root :where(.wp-block-button .wp-block-button__link .wp-element-button:hover,.wp-block-button .wp-block-button__link  .wp-block-button__link:hover){color: orange;}';
+		$expected = ':root :where(.wp-block-button .wp-block-button__link){background-color: blue;color: white;}:root :where(.wp-block-button .wp-block-button__link:hover){background-color: white;color: blue;}:root :where(.wp-block-button .wp-block-button__link.wp-element-button, .wp-block-button .wp-block-button__link){color: green;}:root :where(.wp-block-button .wp-block-button__link.wp-element-button:hover, .wp-block-button .wp-block-button__link:hover){color: orange;}';
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 

@@ -2658,8 +2658,26 @@ class WP_Theme_JSON_Gutenberg {
 	 * </code>
 	 *
 	 * @since 5.9.0
+	 */
+
+	/**
+	 * Extracts the last compound selector from a selector string.
 	 *
-	 * @param string $scope    Selector to scope to.
+	 * @param string $selector The CSS selector.
+	 * @return string The last compound selector.
+	 */
+	protected static function get_last_compound_selector( $selector ) {
+		$trimmed = trim( $selector );
+		if ( preg_match( '/([^\s>+~]+)$/', $trimmed, $matches ) ) {
+			return $matches[1];
+		}
+		return '';
+	}
+
+	/**
+	 * Scopes a selector with a given scope.
+	 *
+	 * @param string $scope    Scope selector.
 	 * @param string $selector Original selector.
 	 * @return string Scoped selector.
 	 */
@@ -2673,13 +2691,48 @@ class WP_Theme_JSON_Gutenberg {
 
 		$selectors_scoped = array();
 		foreach ( $scopes as $outer ) {
+			$outer = trim( $outer );
+			if ( empty( $outer ) ) {
+				continue;
+			}
+
+			// Find the last compound selector of the outer scope.
+			$last = static::get_last_compound_selector( $outer );
+
+			// Determine if they target the same element.
+			$targets_same_element = false;
 			foreach ( $selectors as $inner ) {
-				if ( ! empty( $outer ) && ! empty( $inner ) ) {
+				$inner = trim( $inner );
+				if ( str_starts_with( $inner, '.' ) ) {
+					$parts      = preg_split( '/[:\s>+~]/', $inner );
+					$class_name = $parts[0];
+					$escaped    = preg_quote( $class_name, '/' );
+					if ( preg_match( '/' . $escaped . '(?![a-zA-Z0-9_-])/', $last ) ) {
+						$targets_same_element = true;
+						break;
+					}
+				}
+			}
+
+			foreach ( $selectors as $inner ) {
+				$inner = trim( $inner );
+				if ( empty( $inner ) ) {
+					continue;
+				}
+
+				$is_class  = str_starts_with( $inner, '.' );
+				$is_pseudo = str_starts_with( $inner, ':' );
+
+				if ( ( $targets_same_element && $is_class ) || $is_pseudo ) {
+					$escaped       = preg_quote( $inner, '/' );
+					$has_duplicate = preg_match( '/' . $escaped . '(?![a-zA-Z0-9_-])/', $last );
+					if ( $has_duplicate ) {
+						$selectors_scoped[] = $outer;
+					} else {
+						$selectors_scoped[] = $outer . $inner;
+					}
+				} else {
 					$selectors_scoped[] = $outer . ' ' . $inner;
-				} elseif ( empty( $outer ) ) {
-					$selectors_scoped[] = $inner;
-				} elseif ( empty( $inner ) ) {
-					$selectors_scoped[] = $outer;
 				}
 			}
 		}
@@ -3839,6 +3892,56 @@ class WP_Theme_JSON_Gutenberg {
 				$variation_pseudo_declarations = $this->process_pseudo_selectors( $style_variation_node, $style_variation['selector'], $settings, $block_name, $block_metadata, $style_variation );
 				$style_variation_declarations  = array_merge( $style_variation_declarations, $variation_pseudo_declarations );
 
+				// Process element styles for this variation.
+				if ( isset( $style_variation_node['elements'] ) && ! empty( $block_elements ) ) {
+					foreach ( $style_variation_node['elements'] as $element_name => $element_node ) {
+						if ( ! isset( $block_elements[ $element_name ] ) ) {
+							continue;
+						}
+
+						$variation_element_selector = static::get_block_style_variation_feature_selector(
+							$style_variation,
+							$block_elements[ $element_name ]
+						);
+
+						$element_declarations = static::compute_style_properties(
+							$element_node,
+							$settings,
+							null,
+							$this->theme_json
+						);
+
+						if ( ! empty( $element_declarations ) ) {
+							$style_variation_declarations[ $variation_element_selector ] = $element_declarations;
+						}
+
+						if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ] ) ) {
+							foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ] as $pseudo_selector ) {
+								if ( ! isset( $element_node[ $pseudo_selector ] ) ) {
+									continue;
+								}
+
+								$pseudo_declarations = static::compute_style_properties(
+									$element_node[ $pseudo_selector ],
+									$settings,
+									null,
+									$this->theme_json
+								);
+
+								if ( empty( $pseudo_declarations ) ) {
+									continue;
+								}
+
+								$combined_selector = static::append_to_selector(
+									$variation_element_selector,
+									$pseudo_selector
+								);
+
+								$style_variation_declarations[ $combined_selector ] = $pseudo_declarations;
+							}
+						}
+					}
+				}
 				// Store custom CSS for the style variation.
 				if ( isset( $style_variation_node['css'] ) ) {
 					$style_variation_custom_css[ $style_variation['selector'] ] = $this->process_blocks_custom_css( $style_variation_node['css'], $style_variation['selector'] );
@@ -5559,7 +5662,7 @@ class WP_Theme_JSON_Gutenberg {
 					$element_selector = array( $el_selector );
 					break;
 				}
-				$element_selector[] = static::prepend_to_selector( $el_selector, $selector . ' ' );
+				$element_selector[] = static::scope_selector( $selector, $el_selector );
 			}
 			$element_selectors[ $el_name ] = implode( ',', $element_selector );
 		}

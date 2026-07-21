@@ -176,6 +176,12 @@ export const STYLE_PATH_TO_CSS_VAR_INFIX: Record< string, string > = {
 	'typography.fontFamily': 'font-family',
 };
 
+function getLastCompoundSelector( selector: string ) {
+	const trimmed = selector.trim();
+	const match = trimmed.match( /([^\s>+~]+)$/ );
+	return match ? match[ 0 ] : '';
+}
+
 /**
  * Function that scopes a selector with another one. This works a bit like
  * SCSS nesting except the `&` operator isn't supported.
@@ -203,8 +209,57 @@ export function scopeSelector( scope: string | undefined, selector: string ) {
 
 	const selectorsScoped: string[] = [];
 	scopes.forEach( ( outer ) => {
+		const trimmedOuter = outer.trim();
+		if ( ! trimmedOuter ) {
+			return;
+		}
+
+		// Find the last compound selector of the outer scope.
+		const last = getLastCompoundSelector( trimmedOuter );
+
+		// Determine if the outer scope targets the same element as the element selectors.
+		// If the outer scope ends with any class in the element's selectors list, then
+		// the scope is already at the target element level.
+		const targetsSameElement = selectors.some( ( inner ) => {
+			const trimmedInner = inner.trim();
+			if ( trimmedInner.startsWith( '.' ) ) {
+				const className = trimmedInner.split( /[:\s>+~]/ )[ 0 ];
+				const escaped = className.replace(
+					/[-\/\\^$*+?.()|[\]{}]/g,
+					'\\$&'
+				);
+				return new RegExp( escaped + '(?![a-zA-Z0-9_-])' ).test( last );
+			}
+			return false;
+		} );
+
 		selectors.forEach( ( inner ) => {
-			selectorsScoped.push( `${ outer.trim() } ${ inner.trim() }` );
+			const trimmedInner = inner.trim();
+			if ( ! trimmedInner ) {
+				return;
+			}
+
+			const isClass = trimmedInner.startsWith( '.' );
+			const isPseudo = trimmedInner.startsWith( ':' );
+
+			if ( ( targetsSameElement && isClass ) || isPseudo ) {
+				const escapedInner = trimmedInner.replace(
+					/[-\/\\^$*+?.()|[\]{}]/g,
+					'\\$&'
+				);
+				const hasDuplicate = new RegExp(
+					escapedInner + '(?![a-zA-Z0-9_-])'
+				).test( last );
+				if ( hasDuplicate ) {
+					selectorsScoped.push( trimmedOuter );
+				} else {
+					selectorsScoped.push(
+						`${ trimmedOuter }${ trimmedInner }`
+					);
+				}
+			} else {
+				selectorsScoped.push( `${ trimmedOuter } ${ trimmedInner }` );
+			}
 		} );
 	} );
 
