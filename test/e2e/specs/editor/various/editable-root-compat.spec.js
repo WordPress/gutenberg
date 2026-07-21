@@ -213,4 +213,87 @@ test.describe( 'Editable root block event handler compatibility', () => {
 			.poll( () => page.evaluate( () => window.__extPath ) )
 			.toEqual( [ 'core/list-item' ] );
 	} );
+
+	test( 'delivers input events to a block wrapperProps handler', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.evaluate( () => {
+			window.__extInputData = [];
+			const { createElement } = window.wp.element;
+			window.wp.hooks.addFilter(
+				'editor.BlockListBlock',
+				'test/compat-events-input',
+				( BlockListBlock ) => ( props ) =>
+					createElement( BlockListBlock, {
+						...props,
+						wrapperProps: {
+							...props.wrapperProps,
+							onInput: ( event ) =>
+								window.__extInputData.push( event.data ),
+						},
+					} )
+			);
+		} );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'b' },
+		} );
+
+		await page.keyboard.press( 'ArrowUp' );
+		await page.evaluate( () => ( window.__extInputData = [] ) );
+		await page.keyboard.type( 'x' );
+
+		await expect
+			.poll( () => page.evaluate( () => window.__extInputData ) )
+			.toContain( 'x' );
+	} );
+
+	test( 'calls a block wrapperProps handler once per event', async ( {
+		editor,
+		page,
+	} ) => {
+		// The block sits below the host, so React never delivers the event to
+		// it; only the host bridge should, exactly once.
+		await page.evaluate( () => {
+			window.__extCount = 0;
+			const { createElement } = window.wp.element;
+			window.wp.hooks.addFilter(
+				'editor.BlockListBlock',
+				'test/compat-events-count',
+				( BlockListBlock ) => ( props ) =>
+					createElement( BlockListBlock, {
+						...props,
+						wrapperProps: {
+							...props.wrapperProps,
+							onKeyDown: () => ( window.__extCount += 1 ),
+						},
+					} )
+			);
+		} );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'b' },
+		} );
+
+		await page.keyboard.press( 'ArrowUp' );
+		await page.evaluate( () => ( window.__extCount = 0 ) );
+		await page.keyboard.press( 'x' );
+
+		// One keydown, one call. A second would mean React and the bridge both
+		// delivered it.
+		await expect
+			.poll( () => page.evaluate( () => window.__extCount ) )
+			.toBe( 1 );
+	} );
 } );

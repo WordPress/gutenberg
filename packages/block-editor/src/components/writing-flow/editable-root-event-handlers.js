@@ -8,7 +8,6 @@
 const SUPPORTED_EVENTS = {
 	onKeyDown: 'keydown',
 	onKeyUp: 'keyup',
-	onKeyPress: 'keypress',
 	onBeforeInput: 'beforeinput',
 	onInput: 'input',
 	onCompositionStart: 'compositionstart',

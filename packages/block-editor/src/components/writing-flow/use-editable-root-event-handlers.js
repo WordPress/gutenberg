@@ -53,7 +53,6 @@ const INPUT_EVENT_INTERFACE = [ ...EVENT_INTERFACE, 'data' ];
 const EVENT_INTERFACES = {
 	keydown: KEYBOARD_EVENT_INTERFACE,
 	keyup: KEYBOARD_EVENT_INTERFACE,
-	keypress: KEYBOARD_EVENT_INTERFACE,
 	beforeinput: INPUT_EVENT_INTERFACE,
 	input: INPUT_EVENT_INTERFACE,
 	compositionstart: INPUT_EVENT_INTERFACE,
@@ -107,9 +106,7 @@ function createBlockSyntheticEvent( nativeEvent, target ) {
 		},
 	};
 
-	const eventInterface =
-		EVENT_INTERFACES[ nativeEvent.type ] ?? EVENT_INTERFACE;
-	for ( const property of eventInterface ) {
+	for ( const property of EVENT_INTERFACES[ nativeEvent.type ] ) {
 		const value = nativeEvent[ property ];
 		syntheticEvent[ property ] =
 			typeof value === 'function' ? value.bind( nativeEvent ) : value;
