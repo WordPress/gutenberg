@@ -111,6 +111,13 @@ const popoverProps = {
 	placement: 'left-start',
 	offset: 36,
 	shift: true,
+	// Grow to fit the content instead of capping the height and scrolling.
+	// When the contrast-warning notice appears the popover gets taller, and
+	// with the default resize behaviour `shift` moves it up while the height
+	// is still capped to the space below its original anchor — leaving the
+	// notice behind a scrollbar. Disabling resize lets it use the room `shift`
+	// frees up, so the whole picker and its warning stay readable at once.
+	resize: false,
 };
 
 const LabeledColorIndicators = ( { indicators, label } ) => (
