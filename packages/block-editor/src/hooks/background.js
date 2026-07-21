@@ -24,13 +24,13 @@ import {
 	hasBackgroundImageValue,
 	hasBackgroundGradientValue,
 } from '../components/global-styles/background-panel';
-import { globalStylesDataKey } from '../store/private-keys';
 import {
 	getStyleForState,
 	isDefaultBlockStyleState,
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
+import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
@@ -179,24 +179,25 @@ export function BackgroundImagePanel( {
 	asWrapper,
 } ) {
 	const selectedState = useBlockStyleState();
-	const { style, className, backgroundColor, gradient, inheritedValue } =
-		useSelect(
-			( select ) => {
-				const { getBlockAttributes, getSettings } =
-					select( blockEditorStore );
-				const _settings = getSettings();
-				const blockAttributes = getBlockAttributes( clientId );
-				return {
-					style: blockAttributes?.style,
-					className: blockAttributes?.className,
-					backgroundColor: blockAttributes?.backgroundColor,
-					gradient: blockAttributes?.gradient,
-					inheritedValue:
-						_settings[ globalStylesDataKey ]?.blocks?.[ name ],
-				};
-			},
-			[ clientId, name ]
-		);
+	const { style, className, backgroundColor, gradient } = useSelect(
+		( select ) => {
+			const { getBlockAttributes } = select( blockEditorStore );
+			const blockAttributes = getBlockAttributes( clientId );
+			return {
+				style: blockAttributes?.style,
+				className: blockAttributes?.className,
+				backgroundColor: blockAttributes?.backgroundColor,
+				gradient: blockAttributes?.gradient,
+			};
+		},
+		[ clientId ]
+	);
+
+	const { value: inheritedValue } = useResolvedStyle(
+		name,
+		className,
+		selectedState
+	);
 
 	const backgroundGradientSupported = hasBackgroundSupport(
 		name,
@@ -234,13 +235,15 @@ export function BackgroundImagePanel( {
 			},
 		} ),
 	};
+	const value = isStateSelected
+		? getStyleForState( style, selectedState )
+		: styleValue;
 
 	// Skipped for gradients, which can't be reliably evaluated for contrast.
 	const enableContrastChecking =
-		! isStateSelected &&
-		! styleValue?.color?.gradient &&
-		! styleValue?.background?.gradient &&
-		!! styleValue?.color?.background &&
+		! value?.color?.gradient &&
+		! value?.background?.gradient &&
+		!! value?.color?.background &&
 		( settings?.color?.text || settings?.color?.link ) &&
 		false !== getBlockSupport( name, [ 'color', 'enableContrastChecker' ] );
 
@@ -379,7 +382,6 @@ export function BackgroundImagePanel( {
 
 	return (
 		<StylesBackgroundPanel
-			inheritedValue={ inheritedValue }
 			as={ Wrapper }
 			panelId={ clientId }
 			defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
@@ -392,6 +394,7 @@ export function BackgroundImagePanel( {
 					: styleValue
 			}
 			contrastWarning={ contrastWarning }
+			inheritedValue={ inheritedValue }
 		/>
 	);
 }

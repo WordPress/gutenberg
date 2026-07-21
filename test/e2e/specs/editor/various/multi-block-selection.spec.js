@@ -241,6 +241,64 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.toEqual( [ 1 ] );
 	} );
 
+	test( 'should keep the editing host semantics across a cross-block selection', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		// The wrapper hosts editing for the selected block: it must present
+		// as a named multiline textbox for as long as it is the editing
+		// host, including while a selection crosses blocks.
+		const host = editor.canvas.locator( 'body' );
+		await expect( host ).toHaveAttribute( 'contenteditable', 'true' );
+		await expect( host ).toHaveAttribute( 'role', 'textbox' );
+		await expect( host ).toHaveAttribute( 'aria-multiline', 'true' );
+		await expect( host ).toHaveAttribute( 'aria-label', 'Editor canvas' );
+
+		// Extend the selection across blocks: the host semantics remain.
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.hasMultiSelection()
+				)
+			)
+			.toBe( true );
+		await expect( host ).toHaveAttribute( 'contenteditable', 'true' );
+		await expect( host ).toHaveAttribute( 'role', 'textbox' );
+		await expect( host ).toHaveAttribute( 'aria-multiline', 'true' );
+		await expect( host ).toHaveAttribute(
+			'aria-label',
+			'Multiple selected blocks'
+		);
+
+		// Collapse into a block: the block still hosts, so the semantics
+		// remain and the generic host name returns.
+		await page.keyboard.press( 'ArrowLeft' );
+		await expect( host ).toHaveAttribute( 'contenteditable', 'true' );
+		await expect( host ).toHaveAttribute( 'role', 'textbox' );
+		await expect( host ).toHaveAttribute( 'aria-label', 'Editor canvas' );
+
+		// Move to the post title: the editability and the textbox semantics
+		// are removed together.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+		await expect( host ).toHaveAttribute( 'contenteditable', 'false' );
+		await expect( host ).not.toHaveAttribute( 'role' );
+		await expect( host ).not.toHaveAttribute( 'aria-multiline' );
+		await expect( host ).not.toHaveAttribute( 'aria-label' );
+	} );
+
 	test( 'should select with shift + click', async ( {
 		page,
 		editor,
@@ -874,6 +932,67 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			{ name: 'core/paragraph', attributes: { content: 'a' } },
 			{ name: 'core/paragraph', attributes: { content: 'Second' } },
 		] );
+	} );
+
+	test( 'should select the whole paragraph on triple click from the block edge', async ( {
+		page,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'One two three' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+
+		// Deselect the block so the rich text element is not focused and the
+		// selection observer, not the rich text, dispatches the selection.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		const box = await paragraph.boundingBox();
+
+		// Triple click just left of the paragraph text (on the canvas
+		// padding), so the paragraph selection is made without focusing the
+		// rich text element.
+		await page.mouse.click( box.x - 5, box.y + box.height / 2, {
+			clickCount: 3,
+		} );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'One two three' },
+				},
+			] );
+
+		// The store selection spans the whole paragraph, not collapsed and
+		// not extended into the next block (some browsers report the
+		// selection boundary in the next element at offset 0).
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectionStart, getSelectionEnd } =
+						window.wp.data.select( 'core/block-editor' );
+					return {
+						startOffset: getSelectionStart().offset,
+						endOffset: getSelectionEnd().offset,
+					};
+				} )
+			)
+			.toEqual( {
+				startOffset: 0,
+				endOffset: 'One two three'.length,
+			} );
 	} );
 
 	test( 'should gradually multi-select', async ( {

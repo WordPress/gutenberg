@@ -240,6 +240,7 @@ export default {
 		layout = {},
 		onChange,
 		layoutBlockSupport,
+		controlsGroup = 'block',
 	} ) {
 		const { allowVerticalAlignment = true, allowJustification = true } =
 			layoutBlockSupport;
@@ -249,7 +250,10 @@ export default {
 		}
 
 		return (
-			<BlockControls group="block" __experimentalShareWithChildBlocks>
+			<BlockControls
+				group={ controlsGroup }
+				__experimentalShareWithChildBlocks
+			>
 				{ allowJustification && (
 					<FlexLayoutJustifyContentControl
 						layout={ layout }

@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import { isUnsupportedConversionError } from '../video-conversion';
+import {
+	isUnsupportedConversionError,
+	isSizeLimitConversionError,
+	isConversionTimeoutError,
+} from '../video-conversion';
 
 describe( 'isUnsupportedConversionError', () => {
 	// These are the exact messages thrown by @wordpress/video-conversion's
@@ -13,6 +17,7 @@ describe( 'isUnsupportedConversionError', () => {
 	it.each( [
 		'Unsupported: WebCodecs unavailable',
 		'Unsupported: encoder codec not supported',
+		'Unsupported: GIF exceeds maximum conversion size (5000x5000 x 100 frames = 2500000000 pixels; limit is 300000000)',
 	] )( 'recognizes graceful outcome: %s', ( message ) => {
 		expect( isUnsupportedConversionError( new Error( message ) ) ).toBe(
 			true
@@ -30,6 +35,48 @@ describe( 'isUnsupportedConversionError', () => {
 	it( 'treats a non-Error value as non-graceful', () => {
 		expect( isUnsupportedConversionError( 'Unsupported' ) ).toBe( false );
 		expect( isUnsupportedConversionError( undefined ) ).toBe( false );
+	} );
+} );
+
+describe( 'isSizeLimitConversionError', () => {
+	it( 'recognizes the size-limit message thrown by the worker (contract)', () => {
+		// Exact wording thrown by @wordpress/video-conversion when the
+		// total-pixel budget is exceeded; duplicated here because the worker
+		// boundary only carries the message string.
+		const error = new Error(
+			'Unsupported: GIF exceeds maximum conversion size (5000x5000 x 100 frames = 2500000000 pixels; limit is 300000000)'
+		);
+		expect( isSizeLimitConversionError( error ) ).toBe( true );
+		// A size-limit skip is also a graceful "unsupported" outcome.
+		expect( isUnsupportedConversionError( error ) ).toBe( true );
+	} );
+
+	it( 'does not match other unsupported outcomes', () => {
+		expect(
+			isSizeLimitConversionError(
+				new Error( 'Unsupported: WebCodecs unavailable' )
+			)
+		).toBe( false );
+		expect( isSizeLimitConversionError( undefined ) ).toBe( false );
+	} );
+} );
+
+describe( 'isConversionTimeoutError', () => {
+	it( 'recognizes the timeout error thrown by convertGifToVideo', () => {
+		expect(
+			isConversionTimeoutError(
+				new Error( 'GIF to video conversion timed out after 30000ms' )
+			)
+		).toBe( true );
+	} );
+
+	it( 'does not match other errors', () => {
+		expect(
+			isConversionTimeoutError(
+				new Error( 'Unsupported: WebCodecs unavailable' )
+			)
+		).toBe( false );
+		expect( isConversionTimeoutError( 'timed out' ) ).toBe( false );
 	} );
 } );
 
@@ -58,12 +105,9 @@ describe( 'convertGifToVideo', () => {
 			}
 		);
 
-		const result = await convertGifToVideo(
-			'item-1',
-			gif,
-			'video/mp4',
-			720
-		);
+		const result = await convertGifToVideo( 'item-1', gif, 'video/mp4', {
+			maxDimensions: 720,
+		} );
 
 		/*
 		 * The original File (not an ArrayBuffer) is passed straight through so
@@ -73,7 +117,8 @@ describe( 'convertGifToVideo', () => {
 			'item-1',
 			gif,
 			'video/mp4',
-			720
+			720,
+			undefined
 		);
 		expect( result ).toBeInstanceOf( File );
 		expect( result.name ).toBe( 'my-anim.mp4' );
@@ -95,6 +140,7 @@ describe( 'convertGifToVideo', () => {
 			'item-2',
 			gif,
 			'video/webm',
+			undefined,
 			undefined
 		);
 		expect( result.name ).toBe( 'clip.webm' );
@@ -117,6 +163,108 @@ describe( 'convertGifToVideo', () => {
 		);
 
 		expect( result.name ).toBe( 'clip.mp4' );
+	} );
+} );
+
+describe( 'convertGifToVideo timeout', () => {
+	beforeEach( () => {
+		jest.resetModules();
+		jest.useFakeTimers();
+	} );
+
+	afterEach( () => {
+		jest.useRealTimers();
+	} );
+
+	function makeGif() {
+		return new File( [ new Uint8Array( [ 0 ] ) ], 'anim.gif', {
+			type: 'image/gif',
+		} );
+	}
+
+	it( 'abandons a conversion that exceeds the default 30s timeout and cancels the worker', async () => {
+		const worker = require( '@wordpress/video-conversion/worker' );
+		// A conversion that never settles, like a huge GIF churning away.
+		worker.convertGifToVideo.mockReturnValue( new Promise( () => {} ) );
+		worker.cancelGifToVideoOperations.mockResolvedValue( true );
+
+		const { convertGifToVideo } = require( '../video-conversion' );
+
+		const promise = convertGifToVideo( 'item-1', makeGif(), 'video/mp4' );
+		// Attach a handler before advancing time so the rejection is never
+		// reported as unhandled.
+		promise.catch( () => {} );
+
+		await jest.advanceTimersByTimeAsync( 30_000 );
+
+		// The exact message is the isConversionTimeoutError contract.
+		await expect( promise ).rejects.toThrow(
+			'GIF to video conversion timed out after 30000ms'
+		);
+		// The worker-side operation was cancelled so it stops churning at
+		// its next async boundary.
+		expect( worker.cancelGifToVideoOperations ).toHaveBeenCalledWith(
+			'item-1'
+		);
+	} );
+
+	it( 'does not time out a conversion that finishes in time', async () => {
+		const worker = require( '@wordpress/video-conversion/worker' );
+		worker.convertGifToVideo.mockResolvedValue( new ArrayBuffer( 4 ) );
+
+		const { convertGifToVideo } = require( '../video-conversion' );
+
+		const promise = convertGifToVideo( 'item-2', makeGif(), 'video/mp4' );
+		await jest.advanceTimersByTimeAsync( 0 );
+		const result = await promise;
+
+		expect( result ).toBeInstanceOf( File );
+		expect( worker.cancelGifToVideoOperations ).not.toHaveBeenCalled();
+		// The timeout timer was cleared; nothing left pending.
+		expect( jest.getTimerCount() ).toBe( 0 );
+	} );
+
+	it( 'honors a custom timeout', async () => {
+		const worker = require( '@wordpress/video-conversion/worker' );
+		worker.convertGifToVideo.mockReturnValue( new Promise( () => {} ) );
+		worker.cancelGifToVideoOperations.mockResolvedValue( true );
+
+		const { convertGifToVideo } = require( '../video-conversion' );
+
+		const promise = convertGifToVideo( 'item-3', makeGif(), 'video/mp4', {
+			timeout: 5_000,
+		} );
+		promise.catch( () => {} );
+
+		await jest.advanceTimersByTimeAsync( 5_000 );
+
+		await expect( promise ).rejects.toThrow( /timed out/i );
+	} );
+
+	it( 'treats a timeout of 0 as disabled', async () => {
+		const worker = require( '@wordpress/video-conversion/worker' );
+		let resolveConversion: ( buffer: ArrayBuffer ) => void = () => {};
+		worker.convertGifToVideo.mockReturnValue(
+			new Promise( ( resolve ) => {
+				resolveConversion = resolve;
+			} )
+		);
+
+		const { convertGifToVideo } = require( '../video-conversion' );
+
+		const promise = convertGifToVideo( 'item-4', makeGif(), 'video/mp4', {
+			timeout: 0,
+		} );
+
+		// Way past the default timeout: nothing should reject because no
+		// timer was ever set.
+		await jest.advanceTimersByTimeAsync( 120_000 );
+		expect( jest.getTimerCount() ).toBe( 0 );
+
+		resolveConversion( new ArrayBuffer( 4 ) );
+		const result = await promise;
+		expect( result ).toBeInstanceOf( File );
+		expect( worker.cancelGifToVideoOperations ).not.toHaveBeenCalled();
 	} );
 } );
 

@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { __ } from '@wordpress/i18n';
 import {
+	InspectorControls,
 	useBlockProps,
 	store as blockEditorStore,
 	RichText,
@@ -15,25 +16,36 @@ import {
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import {
+	TextControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import TabToolbarControls from '../tabs/tab-toolbar-controls';
+import TabMovers from './tab-movers';
 import useTabActions from '../tabs/use-tab-actions';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const EMPTY_ARRAY = [];
 
 function Edit( {
 	attributes,
 	clientId,
+	setAttributes,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
+	const { ariaLabel } = attributes;
+
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { tabsClientId, tabPanels, editorActiveTabIndex, activeTabIndex } =
 		useSelect(
@@ -56,10 +68,14 @@ function Edit( {
 			},
 			[ clientId ]
 		);
+	const registry = useRegistry();
 	const { isBlockSelected, hasSelectedInnerBlock } =
 		useSelect( blockEditorStore );
-	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const {
+		updateBlockAttributes,
+		selectBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 	const { insertTab, removeTab } = useTabActions( tabsClientId );
 
 	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
@@ -74,9 +90,15 @@ function Edit( {
 
 	function selectTabPanel( tabIndex ) {
 		if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( tabsClientId, {
-				editorActiveTabIndex: tabIndex,
+			// Batch the selection and index update so the sync effect in
+			// the tab-panel block can't revert the switch from a stale
+			// inner-block selection in the previously active panel.
+			registry.batch( () => {
+				selectBlock( clientId );
+				__unstableMarkNextChangeAsNotPersistent();
+				updateBlockAttributes( tabsClientId, {
+					editorActiveTabIndex: tabIndex,
+				} );
 			} );
 		}
 	}
@@ -145,6 +167,40 @@ function Edit( {
 
 	return (
 		<>
+			<InspectorControls group="settings">
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () =>
+						setAttributes( {
+							ariaLabel: undefined,
+						} )
+					}
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						label={ __( 'Label' ) }
+						isShownByDefault
+						hasValue={ () => !! ariaLabel }
+						onDeselect={ () =>
+							setAttributes( { ariaLabel: undefined } )
+						}
+					>
+						<TextControl
+							label={ __( 'Label' ) }
+							help={ __(
+								'Briefly describe this tab section for screen reader users. Examples: Event information, Product details, and Account settings.'
+							) }
+							value={ ariaLabel || '' }
+							onChange={ ( value ) =>
+								setAttributes( {
+									ariaLabel: value || undefined,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</InspectorControls>
+			<TabMovers tabsClientId={ tabsClientId } />
 			<TabToolbarControls tabsClientId={ tabsClientId } />
 			<div { ...blockProps }>
 				{ tabsList.map( ( tab, index ) => {
