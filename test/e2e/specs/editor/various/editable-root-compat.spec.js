@@ -258,10 +258,10 @@ test.describe( 'Editable root block event handler compatibility', () => {
 		editor,
 		page,
 	} ) => {
-		// A heading does not support editableRoot, so it is edited in its own
-		// contentEditable and React delivers the event to the block as usual.
-		// The host bridge must recognise the event isn't on the host and stay
-		// out of the way, so the handler runs once, not twice.
+		// The code block is plain text, not part of the rich-text writing flow,
+		// so it will never be an editableRoot host: React delivers the event to
+		// the block as usual. The host bridge must recognise the event isn't on
+		// the host and stay out of the way, so the handler runs once, not twice.
 		await page.evaluate( () => {
 			window.__extCount = 0;
 			const { createElement } = window.wp.element;
@@ -280,7 +280,7 @@ test.describe( 'Editable root block event handler compatibility', () => {
 		} );
 
 		await editor.insertBlock( {
-			name: 'core/heading',
+			name: 'core/code',
 			attributes: { content: 'a' },
 		} );
 
