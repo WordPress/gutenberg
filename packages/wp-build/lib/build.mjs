@@ -1980,6 +1980,21 @@ async function buildWidget( widgetName ) {
 		}
 	}
 
+	// Ship downloadable/static files next to the compiled modules so plugin
+	// zips (which omit widgets/) can resolve action hrefs from build/.
+	const staticFiles = await glob(
+		'*.{txt,csv,pdf,zip,png,jpg,jpeg,gif,svg,webp,ico}',
+		{
+			cwd: widgetDir,
+			absolute: true,
+		}
+	);
+	await Promise.all(
+		staticFiles.map( ( file ) =>
+			copyFile( file, path.join( outputDir, path.basename( file ) ) )
+		)
+	);
+
 	return Date.now() - startTime;
 }
 

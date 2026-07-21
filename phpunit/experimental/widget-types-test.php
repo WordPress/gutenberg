@@ -208,8 +208,8 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 		$this->assertCount( 2, $actions );
 		$this->assertSame( 'download-lyrics', $actions[0]['id'] );
 		$this->assertSame( 'hello-dolly-lyrics.txt', $actions[0]['download'] );
-		$this->assertStringEndsWith(
-			'/widgets/hello-dolly/hello-dolly-lyrics.txt',
+		$this->assertMatchesRegularExpression(
+			'#/(?:build/)?widgets/hello-dolly/hello-dolly-lyrics\.txt$#',
 			$actions[0]['href']
 		);
 		$this->assertSame(
@@ -219,6 +219,38 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 				'href'  => 'site-health.php',
 			),
 			$actions[1]
+		);
+	}
+
+	/**
+	 * Missing relative non-admin files are dropped (not rewritten to http://…).
+	 */
+	public function test_sanitize_widget_actions_drops_missing_local_assets() {
+		$actions = gutenberg_sanitize_widget_actions(
+			array(
+				array(
+					'id'    => 'missing',
+					'label' => 'Missing file',
+					'href'  => 'no-such-file.txt',
+				),
+				array(
+					'id'    => 'health',
+					'label' => 'Site Health',
+					'href'  => 'site-health.php',
+				),
+			),
+			'hello-dolly'
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'id'    => 'health',
+					'label' => 'Site Health',
+					'href'  => 'site-health.php',
+				),
+			),
+			$actions
 		);
 	}
 

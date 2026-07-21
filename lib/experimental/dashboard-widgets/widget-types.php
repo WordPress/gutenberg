@@ -113,7 +113,10 @@ function gutenberg_sanitize_widget_help( $help ) {
 /**
  * Resolves a widget-local file href to a plugin URL.
  *
- * Leaves absolute and admin-relative hrefs unchanged. Returns '' for `..` paths.
+ * Looks under `build/widgets/{dir}/` (release) then `widgets/{dir}/` (dev).
+ * Leaves absolute, root-relative, and admin `.php` hrefs unchanged.
+ * Returns '' for `..` paths and for relative hrefs that are not a shipped file
+ * (so `esc_url_raw()` cannot invent `http://filename`).
  *
  * @param string $href     Action href.
  * @param string $dir_name Widget directory name.
@@ -133,14 +136,31 @@ function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
 		return $href;
 	}
 
-	$relative = ltrim( $href, '/' );
-	$path     = gutenberg_dir_path() . 'widgets/' . $dir_name . '/' . $relative;
-
-	if ( ! is_file( $path ) ) {
+	// Root-relative paths (e.g. /wp-admin/…).
+	if ( str_starts_with( $href, '/' ) ) {
 		return $href;
 	}
 
-	return gutenberg_url( 'widgets/' . $dir_name . '/' . $relative );
+	$path_only = explode( '?', $href, 2 )[0];
+	// Admin-relative PHP entry points stay as-is.
+	if ( str_ends_with( strtolower( $path_only ), '.php' ) ) {
+		return $href;
+	}
+
+	$relative = ltrim( $href, '/' );
+	// Prefer built assets (plugin zip); fall back to source (dev checkout).
+	$candidates = array(
+		'build/widgets/' . $dir_name . '/' . $relative,
+		'widgets/' . $dir_name . '/' . $relative,
+	);
+
+	foreach ( $candidates as $candidate ) {
+		if ( is_file( gutenberg_dir_path() . $candidate ) ) {
+			return gutenberg_url( $candidate );
+		}
+	}
+
+	return '';
 }
 
 /**

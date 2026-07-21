@@ -693,6 +693,7 @@ The build system generates:
 - `build/widgets/{widget-name}/render.min.asset.php` — Asset metadata for render module
 - `build/widgets/{widget-name}/widget.min.js` + `widget.js` — Bundled metadata (ESM)
 - `build/widgets/{widget-name}/widget.min.asset.php` — Asset metadata for widget module
+- `build/widgets/{widget-name}/*.{txt,csv,…}` — Static action assets copied from the widget folder
 - `build/widgets/registry.php` — Widget registry data
 - `build/widgets.php` — Script module registration logic
 

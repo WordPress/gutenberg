@@ -26,14 +26,14 @@ widgets/hello-world/
 ├── widget.ts          metadata module: default-exports icon, attributes, example
 ├── render.tsx         render module: default-exports the React component
 ├── style.module.css   optional, injected at runtime by the build
-└── report.csv         optional static asset linked from an action `href`
+└── report.csv         optional static asset linked from an action `href` (copied into `build/widgets/{name}/`)
 ```
 
 The split between `widget.json` and `widget.ts` is deliberate. `widget.json` is build-time input: plain JSON the pipeline can read without executing code, including the translatable strings (`title`, `description`, `help`, `keywords`) the server localizes through `textdomain`.
 
 Unlike the other translatable strings, `help` is an object: `content` plus optional `links`, meant for compact surfaces such as tooltips.
 
-`actions`: declarative links (`id`, `label`, `href`, optional `download` / `openInNewTab`). Hosts place them; the dashboard uses a "More" menu. A relative `href` that exists in the widget folder becomes a plugin URL at registration — prefer that over `data:` URLs.
+`actions`: declarative links (`id`, `label`, `href`, optional `download` / `openInNewTab`). Hosts place them; the dashboard uses a "More" menu. A relative `href` that exists under `build/widgets/{name}/` or `widgets/{name}/` becomes a plugin URL at registration; missing relative non-admin files are dropped — prefer that over `data:` URLs.
 
 `widget.ts` is the live half of the metadata: values that only exist in JavaScript, such as the icon element or the `attributes` field schema (including optional `relevance` hints) that hosts feed into `DataForm`.
 
