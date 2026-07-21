@@ -291,3 +291,21 @@ mark.wp-note {
 .editor-collab-sidebar-panel__mention-suggestion .editor-autocompleters__user-avatar {
 	border-radius: $radius-round;
 }
+
+.editor-collab-sidebar__note-indicator-avatar {
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	border: none;
+	background: transparent;
+	line-height: 0;
+	cursor: var(--wpds-cursor-control);
+}
+
+.editor-collab-sidebar__note-indicator-avatar-image {
+	width: 20px;
+	height: 20px;
+	border-radius: $radius-round;
+	border: 2px solid $white;
+	object-fit: cover;
+}
