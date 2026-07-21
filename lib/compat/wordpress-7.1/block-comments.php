@@ -110,9 +110,9 @@ add_filter( 'render_block', 'gutenberg_strip_inline_note_markers' );
  * mention markup itself. Keeping it unconditional avoids per-comment-type
  * arming and disarming of kses state across the direct and REST write paths.
  *
-* @param array<string, array<string, bool> $allowed The allowed tags structure for the context.
-* @param string                            $context The kses context.
-* @return array<string, array<string, bool> Modified allowed tags structure.
+ * @param array<string, array<string, bool>> $allowed The allowed tags structure for the context.
+ * @param string                             $context The kses context.
+ * @return array<string, array<string, bool>> Modified allowed tags structure.
  */
 function gutenberg_notes_allow_mention_span( $allowed, string $context ): array {
 	if ( ! is_array( $allowed ) ) {
