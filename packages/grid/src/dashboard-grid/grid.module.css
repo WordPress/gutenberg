@@ -11,14 +11,25 @@
  * @dnd-kit’s drop translation matches the placeholder; scale lives on
  * `__lift` (see dnd-kit #398). Owns elevation, radius, cursor, and
  * pointer pass-through. Further chrome belongs to the consumer. Drag
- * elevation animates `xs` → `md` so it reads above edit tiles at `xs`.
+ * the shadow strengthens while dragging so it reads above edit tiles.
  */
 .drag-preview-frame {
+	--_wp-grid-elevation-xs:
+		0 1px 1px rgba(0, 0, 0, 0.03),
+		0 1px 2px rgba(0, 0, 0, 0.02),
+		0 3px 3px rgba(0, 0, 0, 0.02),
+		0 4px 4px rgba(0, 0, 0, 0.01);
+	--_wp-grid-elevation-md:
+		0 2px 3px rgba(0, 0, 0, 0.05),
+		0 4px 5px rgba(0, 0, 0, 0.04),
+		0 12px 12px rgba(0, 0, 0, 0.03),
+		0 16px 16px rgba(0, 0, 0, 0.02);
+
 	height: 100%;
 	border-radius: var(--wp-grid-drag-preview-radius, 0);
 	cursor: grabbing;
 	pointer-events: none;
-	box-shadow: var(--wpds-elevation-md);
+	box-shadow: var(--_wp-grid-elevation-md);
 }
 
 .drag-preview-frame__lift {
@@ -44,11 +55,11 @@
 @media not (prefers-reduced-motion: reduce) {
 	@keyframes wp-grid-drag-preview-shadow-enter {
 		from {
-			box-shadow: var(--wpds-elevation-xs);
+			box-shadow: var(--_wp-grid-elevation-xs);
 		}
 
 		to {
-			box-shadow: var(--wpds-elevation-md);
+			box-shadow: var(--_wp-grid-elevation-md);
 		}
 	}
 
@@ -87,11 +98,11 @@
 
 	@keyframes wp-grid-drag-preview-shadow-exit {
 		from {
-			box-shadow: var(--wpds-elevation-md);
+			box-shadow: var(--_wp-grid-elevation-md);
 		}
 
 		to {
-			box-shadow: var(--wpds-elevation-xs);
+			box-shadow: var(--_wp-grid-elevation-xs);
 		}
 	}
 
@@ -107,7 +118,7 @@
 }
 
 .drag-preview-frame.dragPreviewFrameExiting {
-	box-shadow: var(--wpds-elevation-xs);
+	box-shadow: var(--_wp-grid-elevation-xs);
 }
 
 .drag-preview-frame.dragPreviewFrameExiting .drag-preview-frame__lift {
@@ -116,7 +127,7 @@
 
 @media (prefers-reduced-motion: reduce) {
 	.drag-preview-frame {
-		box-shadow: var(--wpds-elevation-md);
+		box-shadow: var(--_wp-grid-elevation-md);
 	}
 
 	.drag-preview-frame__lift {
@@ -124,7 +135,7 @@
 	}
 
 	.drag-preview-frame.dragPreviewFrameExiting {
-		box-shadow: var(--wpds-elevation-xs);
+		box-shadow: var(--_wp-grid-elevation-xs);
 		transition: none;
 	}
 

@@ -40,8 +40,8 @@ function gutenberg_get_widget_metadata_i18n_schema() {
 /**
  * Translates a widget's user-facing metadata strings.
  *
- * Runs `title`, `description`, `help`, and `keywords` through the widget
- * i18n schema using the widget's `textdomain`, leaving every other key
+ * Runs `title`, `description`, `help`, `actions`, and `keywords` through the
+ * widget i18n schema using the widget's `textdomain`, leaving every other key
  * untouched. A no-op when the widget declares no `textdomain`.
  *
  * @param array $widget Widget data from the build manifest.
@@ -55,7 +55,7 @@ function gutenberg_translate_widget_metadata( $widget ) {
 
 	$i18n_schema = gutenberg_get_widget_metadata_i18n_schema();
 
-	foreach ( array( 'title', 'description', 'help', 'keywords' ) as $field ) {
+	foreach ( array( 'title', 'description', 'help', 'actions', 'keywords' ) as $field ) {
 		if ( isset( $widget[ $field ], $i18n_schema->$field ) ) {
 			$widget[ $field ] = translate_settings_using_i18n_schema( $i18n_schema->$field, $widget[ $field ], $textdomain );
 		}
@@ -107,6 +107,52 @@ function gutenberg_sanitize_widget_help( $help ) {
 }
 
 /**
+ * Constrains a widget's actions to their allowed shape: each entry keeps
+ * `id`, `label`, and `href`; entries missing any of those are dropped.
+ * Optional `download` and `openInNewTab` are copied when present.
+ *
+ * @param array|null $actions Actions from the build manifest.
+ * @return array|null Sanitized actions, or null when there are none.
+ */
+function gutenberg_sanitize_widget_actions( $actions ) {
+	if ( ! is_array( $actions ) ) {
+		return null;
+	}
+
+	$sanitized = array();
+	foreach ( $actions as $action ) {
+		if (
+			! is_array( $action ) ||
+			empty( $action['id'] ) ||
+			empty( $action['label'] ) ||
+			empty( $action['href'] )
+		) {
+			continue;
+		}
+
+		$entry = array(
+			'id'    => $action['id'],
+			'label' => $action['label'],
+			'href'  => $action['href'],
+		);
+
+		if ( isset( $action['download'] ) ) {
+			$entry['download'] = is_bool( $action['download'] )
+				? $action['download']
+				: (string) $action['download'];
+		}
+
+		if ( isset( $action['openInNewTab'] ) ) {
+			$entry['openInNewTab'] = (bool) $action['openInNewTab'];
+		}
+
+		$sanitized[] = $entry;
+	}
+
+	return $sanitized ? $sanitized : null;
+}
+
+/**
  * Hydrates the widget type registry from the build manifest.
  *
  * Iterates the widgets discovered by the build pipeline (via
@@ -139,6 +185,7 @@ function gutenberg_register_widget_types() {
 				'title'         => $widget['title'] ?? null,
 				'description'   => $widget['description'] ?? null,
 				'help'          => gutenberg_sanitize_widget_help( $widget['help'] ?? null ),
+				'actions'       => gutenberg_sanitize_widget_actions( $widget['actions'] ?? null ),
 				'keywords'      => $widget['keywords'] ?? null,
 			)
 		);

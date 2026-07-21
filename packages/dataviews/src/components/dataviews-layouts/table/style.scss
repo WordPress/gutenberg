@@ -154,7 +154,7 @@
 			padding-bottom: var(--wpds-dimension-padding-sm);
 			font-size: 11px;
 			text-transform: uppercase;
-			font-weight: var(--wpds-typography-font-weight-medium);
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 
 			&:has(.dataviews-view-table-header-button) {
 				padding-left: var(--wpds-dimension-padding-xs);
@@ -204,7 +204,7 @@
 		padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
 		font-size: 11px;
 		text-transform: uppercase;
-		font-weight: var(--wpds-typography-font-weight-medium);
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 
 		&:not(:hover) {
 			color: var(--wpds-color-foreground-interactive-neutral);
@@ -312,7 +312,7 @@
 
 .dataviews-view-table__group-header-row {
 	.dataviews-view-table__group-header-cell {
-		font-weight: var(--wpds-typography-font-weight-medium);
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-2xl);
 		color: var(--wpds-color-foreground-content-neutral);
 	}

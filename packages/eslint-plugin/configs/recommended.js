@@ -45,9 +45,10 @@ if ( isPackageInstalled( 'typescript' ) ) {
 		{
 			settings: {
 				'import/resolver': {
-					typescript: {
-						extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
-					},
+					[ require.resolve( 'eslint-import-resolver-typescript' ) ]:
+						{
+							extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
+						},
 				},
 			},
 			ignores: [ '**/*.d.ts' ],

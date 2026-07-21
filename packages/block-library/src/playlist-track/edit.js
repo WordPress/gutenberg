@@ -12,7 +12,7 @@ import {
 	useBlockProps,
 	BlockControls,
 	InspectorControls,
-	RichText,
+	PlainText,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -33,11 +33,11 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
  * Internal dependencies
  */
 import { PlaylistContext } from '../playlist/context';
-import { getAlbumCoverAttributes } from '../playlist/utils';
+import { getTrackAttributes, getTrackImageAttributes } from '../playlist/utils';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
-const ALBUM_COVER_ALLOWED_MEDIA_TYPES = [ 'image' ];
+const TRACK_IMAGE_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const PlaylistTrackEdit = ( {
 	attributes,
@@ -53,33 +53,41 @@ const PlaylistTrackEdit = ( {
 	const showImages = context?.showImages ?? true;
 	const imageButton = useRef();
 	const blockProps = useBlockProps();
-	const { currentTrackClientId, setCurrentTrackClientId } =
+	const { currentTrackClientId, setCurrentTrackClientId, addTracks } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
+	const hasTrackSource = !! src || !! temporaryURL;
 
 	useEffect( () => {
-		if ( isSelected && currentTrackClientId !== clientId ) {
+		if (
+			isSelected &&
+			hasTrackSource &&
+			currentTrackClientId !== clientId
+		) {
 			setCurrentTrackClientId( clientId );
 		}
 	}, [
 		isSelected,
+		hasTrackSource,
 		clientId,
 		currentTrackClientId,
 		setCurrentTrackClientId,
 	] );
 
 	useUploadMediaFromBlobURL( {
-		src: temporaryURL,
+		url: temporaryURL,
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectTrack,
 		onError: onUploadError,
 	} );
 
 	function onSelectTrack( media ) {
-		if ( ! media || ! media.url ) {
+		const mediaUrl = media?.url ?? media?.source_url;
+
+		if ( ! media || ! mediaUrl ) {
 			// In this case there was an error and we should continue in the editing state
 			// previous attributes should be removed because they may be temporary blob urls.
 			setAttributes( {
@@ -97,44 +105,30 @@ const PlaylistTrackEdit = ( {
 			return;
 		}
 
-		if ( isBlobURL( media.url ) ) {
-			setTemporaryURL( media.url );
+		if ( isBlobURL( mediaUrl ) ) {
+			setTemporaryURL( mediaUrl );
 			return;
 		}
 
 		setAttributes( {
 			blob: undefined,
-			id: media.id,
-			src: media.url,
-			artist:
-				media.artist ||
-				media?.meta?.artist ||
-				media?.media_details?.artist ||
-				__( 'Unknown artist' ),
-			album:
-				media.album ||
-				media?.meta?.album ||
-				media?.media_details?.album ||
-				__( 'Unknown album' ),
-			...getAlbumCoverAttributes( media?.image ),
-			length: media?.fileLength || media?.media_details?.length_formatted,
-			title: media.title,
+			...getTrackAttributes( media ),
 		} );
 		setTemporaryURL();
 	}
 
-	function onSelectAlbumCoverImage( coverImage ) {
-		setAttributes( getAlbumCoverAttributes( coverImage ) );
+	function onSelectTrackImage( trackImage ) {
+		setAttributes( getTrackImageAttributes( trackImage ) );
 	}
 
-	function onRemoveAlbumCoverImage() {
+	function onRemoveTrackImage() {
 		setAttributes( { image: undefined, imageAlt: undefined } );
 
 		// Move focus back to the Media Upload button.
 		imageButton.current.focus();
 	}
 
-	if ( ! src && ! temporaryURL ) {
+	if ( ! hasTrackSource ) {
 		return (
 			<div { ...blockProps }>
 				<MediaPlaceholder
@@ -166,8 +160,23 @@ const PlaylistTrackEdit = ( {
 					mediaURL={ src }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
+					variant="toolbar"
 				/>
 			</BlockControls>
+			{ !! addTracks && (
+				<BlockControls group="block">
+					<MediaReplaceFlow
+						name={ __( 'Add track' ) }
+						onSelect={ addTracks }
+						accept="audio/*"
+						multiple
+						handleUpload={ false }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						onError={ onUploadError }
+						variant="toolbar"
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
@@ -194,22 +203,22 @@ const PlaylistTrackEdit = ( {
 					<MediaUploadCheck>
 						<BaseControl>
 							<BaseControl.VisualLabel>
-								{ __( 'Album cover image' ) }
+								{ __( 'Track image' ) }
 							</BaseControl.VisualLabel>
 							<div className="editor-video-poster-control">
 								{ !! image && (
 									<img
 										src={ image }
 										alt={ __(
-											'Preview of the album cover image'
+											'Preview of the track image'
 										) }
 									/>
 								) }
 								<MediaUpload
 									title={ __( 'Select image' ) }
-									onSelect={ onSelectAlbumCoverImage }
+									onSelect={ onSelectTrackImage }
 									allowedTypes={
-										ALBUM_COVER_ALLOWED_MEDIA_TYPES
+										TRACK_IMAGE_ALLOWED_MEDIA_TYPES
 									}
 									render={ ( { open } ) => (
 										<Button
@@ -227,7 +236,7 @@ const PlaylistTrackEdit = ( {
 								{ !! image && (
 									<Button
 										__next40pxDefaultSize
-										onClick={ onRemoveAlbumCoverImage }
+										onClick={ onRemoveTrackImage }
 										variant="tertiary"
 									>
 										{ __( 'Remove' ) }
@@ -279,7 +288,7 @@ const PlaylistTrackEdit = ( {
 						/>
 					) }
 					<span className="wp-block-playlist-track__content">
-						<RichText
+						<PlainText
 							tagName="span"
 							className="wp-block-playlist-track__title"
 							value={ title }
@@ -287,11 +296,10 @@ const PlaylistTrackEdit = ( {
 							onChange={ ( value ) => {
 								setAttributes( { title: value } );
 							} }
-							allowedFormats={ [] }
-							withoutInteractiveFormatting
+							__experimentalVersion={ 2 }
 						/>
 						{ showArtists && (
-							<RichText
+							<PlainText
 								tagName="span"
 								className="wp-block-playlist-track__artist"
 								value={ artist }
@@ -299,8 +307,7 @@ const PlaylistTrackEdit = ( {
 								onChange={ ( value ) =>
 									setAttributes( { artist: value } )
 								}
-								allowedFormats={ [] }
-								withoutInteractiveFormatting
+								__experimentalVersion={ 2 }
 							/>
 						) }
 					</span>
@@ -308,16 +315,14 @@ const PlaylistTrackEdit = ( {
 						{ length && (
 							<span className="screen-reader-text">
 								{
-									/* translators: %s: Visually hidden label for the track length (screen reader text). */
-									__( 'Length:' )
+									/* translators: Visually hidden label for the track duration (screen reader text). */
+									__( 'Duration:' )
 								}
 							</span>
 						) }
 						{ length }
 					</span>
-					<span className="screen-reader-text">
-						{ __( 'Select to play this track' ) }
-					</span>
+					<span className="screen-reader-text">{ __( 'Play' ) }</span>
 				</button>
 			</li>
 		</>
