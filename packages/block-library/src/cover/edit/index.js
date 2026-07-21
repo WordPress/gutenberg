@@ -539,6 +539,16 @@ function CoverEdit( {
 
 	const mediaElement = useRef();
 	const editMediaButtonRef = useRef();
+
+	// Cover fetches the background file via getMediaColor before swapping it
+	// in, so by the time the <img> mounts the file can already be cached and
+	// `complete` — in which case its onLoad may never fire and leave the swap
+	// loading state stuck. Clear it once the element reports complete.
+	useEffect( () => {
+		if ( isSwappingMedia && mediaElement.current?.complete ) {
+			setIsSwappingMedia( false );
+		}
+	}, [ isSwappingMedia, url ] );
 	const currentSettings = {
 		isVideoBackground,
 		isImageBackground,
