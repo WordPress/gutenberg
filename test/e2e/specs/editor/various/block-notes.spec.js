@@ -6,6 +6,14 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 const CORE_DATA_PRIVATE_APIS_CONSENT =
 	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.';
 
+function getRestPath( url ) {
+	const parsedUrl = new URL( url );
+	return (
+		parsedUrl.searchParams.get( 'rest_route' ) ||
+		parsedUrl.pathname.replace( /^\/wp-json/, '' )
+	);
+}
+
 test.use( {
 	blockNoteUtils: async ( { page, editor }, use ) => {
 		await use( new BlockNoteUtils( { page, editor } ) );
@@ -1081,13 +1089,10 @@ test.describe( 'Block Notes', () => {
 			await editor.saveDraft();
 			await page.reload();
 
-			await page.evaluate( () => {
-				const blocks = window.wp.data
-					.select( 'core/block-editor' )
-					.getBlocks();
-				const target = blocks.find(
-					( block ) => block.attributes.content === 'Saved target'
-				);
+			const savedBlocks = await editor.getBlocks();
+			const targetClientId =
+				savedBlocks[ savedBlocks.length - 1 ].clientId;
+			await page.evaluate( ( clientId ) => {
 				window.wp.data.dispatch( 'core/block-editor' ).insertBlock(
 					window.wp.blocks.createBlock( 'core/paragraph', {
 						content: 'Dirty insertion',
@@ -1096,13 +1101,13 @@ test.describe( 'Block Notes', () => {
 				);
 				window.wp.data
 					.dispatch( 'core/block-editor' )
-					.updateBlockAttributes( target.clientId, {
+					.updateBlockAttributes( clientId, {
 						content: 'Dirty target',
 					} );
 				window.wp.data
 					.dispatch( 'core/block-editor' )
-					.selectBlock( target.clientId );
-			} );
+					.selectBlock( clientId );
+			}, targetClientId );
 
 			await blockNoteUtils.addNote( 'Do not attach to the sibling' );
 			await page.reload();
@@ -1177,28 +1182,49 @@ test.describe( 'Block Notes', () => {
 			);
 		} );
 
-		test( 'does not fall back to a full post save when an empty post cannot be repaired', async ( {
+		test( 'does not fall back to a full post save when a clean post cannot be repaired', async ( {
 			editor,
 			page,
 			blockNoteUtils,
 		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Clean fallback host.' },
+			} );
+			await editor.saveDraft();
+			await page.reload();
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			);
+
+			// Leave collaboration enabled but unload the current sync document so
+			// the targeted repair returns false without making the post dirty.
+			await page.evaluate( ( consent ) => {
+				const { unlock } =
+					window.wp.privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+						consent,
+						'@wordpress/core-data'
+					);
+				const dispatch = unlock( window.wp.data.dispatch( 'core' ) );
+				dispatch.setCollaborationSupported( false );
+				dispatch.setCollaborationSupported( true );
+			}, CORE_DATA_PRIVATE_APIS_CONSENT );
+
 			const postUpdates = [];
 			page.on( 'request', ( request ) => {
 				if (
 					request.method() === 'POST' &&
-					/^\/wp-json\/wp\/v2\/posts\/\d+$/.test(
-						new URL( request.url() ).pathname
+					/^\/wp\/v2\/posts\/\d+$/.test(
+						getRestPath( request.url() )
 					)
 				) {
 					postUpdates.push( request.postDataJSON() );
 				}
 			} );
 
-			const emptyParagraph = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} );
-			await emptyParagraph.click();
-			await blockNoteUtils.addNote( 'Empty post note' );
+			await blockNoteUtils.addNote( 'No fallback save' );
 
 			expect( postUpdates ).toEqual( [] );
 		} );
@@ -1252,17 +1278,20 @@ test.describe( 'Block Notes', () => {
 				markSyncSaveStarted = resolve;
 			} );
 			const persistenceRequests = [];
-			await page.route( '**/wp-sync/v1/save', async ( route ) => {
-				persistenceRequests.push( 'sync-save' );
-				markSyncSaveStarted();
-				await syncSaveReleased;
-				await route.continue();
-			} );
+			await page.route(
+				( url ) => getRestPath( url.href ) === '/wp-sync/v1/save',
+				async ( route ) => {
+					persistenceRequests.push( 'sync-save' );
+					markSyncSaveStarted();
+					await syncSaveReleased;
+					await route.continue();
+				}
+			);
 			page.on( 'request', ( request ) => {
 				if (
 					request.method() === 'POST' &&
-					/^\/wp-json\/wp\/v2\/posts\/\d+$/.test(
-						new URL( request.url() ).pathname
+					/^\/wp\/v2\/posts\/\d+$/.test(
+						getRestPath( request.url() )
 					)
 				) {
 					persistenceRequests.push( 'attachment-repair' );
@@ -1294,8 +1323,7 @@ test.describe( 'Block Notes', () => {
 			const commentSaved = page.waitForResponse(
 				( response ) =>
 					response.request().method() === 'POST' &&
-					new URL( response.url() ).pathname ===
-						'/wp-json/wp/v2/comments'
+					getRestPath( response.url() ) === '/wp/v2/comments'
 			);
 			const noteCreation = blockNoteUtils.addNote( 'Queued race note' );
 			await commentSaved;
