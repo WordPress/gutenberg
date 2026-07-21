@@ -22,6 +22,7 @@ import {
 	SIDEBARS,
 } from './constants';
 import { Notes } from './notes';
+import { NotesBlockIndicators } from './notes-block-indicators';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
@@ -74,6 +75,13 @@ function NotesSidebar( { postId } ) {
 	}, [] );
 	const selectedNoteId = useSelect(
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
+		[]
+	);
+	const isNotesSidebarOpen = useSelect(
+		( select ) =>
+			SIDEBARS.includes(
+				select( interfaceStore ).getActiveComplementaryArea( 'core' )
+			),
 		[]
 	);
 
@@ -177,6 +185,12 @@ function NotesSidebar( { postId } ) {
 				<NoteAvatarIndicator
 					note={ currentThread }
 					onClick={ () => openNoteForBlock( clientId ) }
+				/>
+			) }
+			{ isNotesSidebarOpen && (
+				<NotesBlockIndicators
+					notes={ unresolvedNotes }
+					onSelectBlockNote={ openNoteForBlock }
 				/>
 			) }
 			<AddNoteMenuItem
