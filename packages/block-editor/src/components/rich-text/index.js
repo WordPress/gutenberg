@@ -11,9 +11,9 @@ import {
 	useRef,
 	useState,
 	useCallback,
+	useEffect,
 	useMemo,
 	forwardRef,
-	createContext,
 	useContext,
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
@@ -39,15 +39,20 @@ import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
+import { useHasEditableRoot } from '../writing-flow/use-editable-root';
 import { unlock } from '../../lock-unlock';
 
-const { useRichText } = unlock( richTextPrivateApis );
-
-export const keyboardShortcutContext = createContext();
-keyboardShortcutContext.displayName = 'keyboardShortcutContext';
-
-export const inputEventContext = createContext();
-inputEventContext.displayName = 'inputEventContext';
+// `RichTextShortcut` and `RichTextInputEvent` now live in
+// `@wordpress/rich-text` so they share the shortcut and input-event contexts
+// with standalone rich text fields. Re-exported below for back-compat (e.g.
+// `@wordpress/format-library` imports them from `@wordpress/block-editor`).
+const {
+	useRichText,
+	KeyboardShortcutContext,
+	InputEventContext,
+	RichTextShortcut,
+	RichTextInputEvent,
+} = unlock( richTextPrivateApis );
 
 const instanceIdKey = Symbol( 'instanceId' );
 
@@ -238,6 +243,13 @@ export function RichTextWrapper(
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;
 
+	const hasEditableRoot = useHasEditableRoot();
+	const hasDefaultEditingMode = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockEditingMode( clientId ) ===
+			'default',
+		[ clientId ]
+	);
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
@@ -341,6 +353,61 @@ export function RichTextWrapper(
 		onChange,
 	} );
 
+	// While a focused editing host owns the selection (the block supports
+	// `editableRoot`), ARIA attributes describing the autocomplete state must
+	// be mirrored onto the host: assistive technology resolves them relative
+	// to the focused element.
+	const {
+		'aria-autocomplete': ariaAutocomplete,
+		'aria-haspopup': ariaHasPopup,
+		'aria-controls': ariaControls,
+		'aria-owns': ariaOwns,
+		'aria-activedescendant': ariaActiveDescendant,
+	} = autocompleteProps;
+	useEffect( () => {
+		if ( ! hasEditableRoot || ! isSelected ) {
+			return;
+		}
+
+		const host = anchorRef.current?.parentElement?.closest(
+			'[contenteditable="true"]'
+		);
+
+		if ( ! host ) {
+			return;
+		}
+
+		const attributes = {
+			'aria-autocomplete': ariaAutocomplete,
+			'aria-haspopup': ariaHasPopup,
+			'aria-controls': ariaControls,
+			'aria-owns': ariaOwns,
+			'aria-activedescendant': ariaActiveDescendant,
+		};
+
+		for ( const [ key, value_ ] of Object.entries( attributes ) ) {
+			if ( value_ === undefined ) {
+				host.removeAttribute( key );
+			} else {
+				host.setAttribute( key, value_ );
+			}
+		}
+
+		return () => {
+			for ( const key of Object.keys( attributes ) ) {
+				host.removeAttribute( key );
+			}
+		};
+	}, [
+		hasEditableRoot,
+		isSelected,
+		ariaAutocomplete,
+		ariaHasPopup,
+		ariaControls,
+		ariaOwns,
+		ariaActiveDescendant,
+	] );
+
 	useMarkPersistent( { html: adjustedValue, value } );
 
 	const keyboardShortcuts = useRef( new Set() );
@@ -350,12 +417,30 @@ export function RichTextWrapper(
 		anchorRef.current?.focus();
 	}
 
+	// Setting tabIndex to 0 is unnecessary, the element is already focusable
+	// because it's contentEditable. This also fixes a Safari bug where it's
+	// not possible to Shift+Click multi select blocks when Shift Clicking
+	// into an element with tabIndex because Safari will focus the element.
+	// However, Safari will correctly ignore nested contentEditable elements.
+	// While the writing flow wrapper is contentEditable (the selected block
+	// supports `editableRoot`), nested editable elements are no longer
+	// focusable areas on their own, so an explicit tabIndex restores their
+	// focusability.
+	let tabIndex = props.tabIndex;
+	if ( ! shouldDisableEditing ) {
+		if ( hasEditableRoot && hasDefaultEditingMode && isBlockSelected ) {
+			tabIndex = props.tabIndex ?? 0;
+		} else if ( hasEditableRoot && props.tabIndex === 0 ) {
+			tabIndex = null;
+		}
+	}
+
 	const TagName = tagName;
 	return (
 		<>
 			{ isSelected && (
-				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
-					<inputEventContext.Provider value={ inputEvents }>
+				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
+					<InputEventContext.Provider value={ inputEvents }>
 						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
 							{ children &&
 								children( { value, onChange, onFocus } ) }
@@ -368,8 +453,8 @@ export function RichTextWrapper(
 								forwardedRef={ anchorRef }
 							/>
 						</Popover.__unstableSlotNameProvider>
-					</inputEventContext.Provider>
-				</keyboardShortcutContext.Provider>
+					</InputEventContext.Provider>
+				</KeyboardShortcutContext.Provider>
 			) }
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
@@ -433,17 +518,7 @@ export function RichTextWrapper(
 					props.className,
 					'rich-text'
 				) }
-				// Setting tabIndex to 0 is unnecessary, the element is already
-				// focusable because it's contentEditable. This also fixes a
-				// Safari bug where it's not possible to Shift+Click multi
-				// select blocks when Shift Clicking into an element with
-				// tabIndex because Safari will focus the element. However,
-				// Safari will correctly ignore nested contentEditable elements.
-				tabIndex={
-					props.tabIndex === 0 && ! shouldDisableEditing
-						? null
-						: props.tabIndex
-				}
+				tabIndex={ tabIndex }
 				data-wp-block-attribute-key={ identifier }
 			/>
 		</>
@@ -521,6 +596,6 @@ PublicForwardedRichTextContainer.isEmpty = ( value ) => {
 };
 
 export default PublicForwardedRichTextContainer;
-export { RichTextShortcut } from './shortcut';
+export { RichTextShortcut };
 export { RichTextToolbarButton } from './toolbar-button';
-export { RichTextInputEvent as __unstableRichTextInputEvent } from './input-event';
+export { RichTextInputEvent as __unstableRichTextInputEvent };

@@ -26,6 +26,7 @@ import getInserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import mediaUploadOnSuccess from '../../utils/media-upload/on-success';
 import { default as mediaSideload } from '../../utils/media-sideload';
+import { default as mediaSideloadFromUrl } from '../../utils/media-sideload-from-url';
 import { default as mediaFinalize } from '../../utils/media-finalize';
 import { default as mediaDelete } from '../../utils/media-delete';
 import { store as editorStore } from '../../store';
@@ -117,6 +118,7 @@ const {
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
+	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
 } = unlock( privateApis );
 
@@ -135,6 +137,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const {
 		allImageSizes,
 		bigImageSizeThreshold,
+		imageStripMeta,
+		imageMaxBitDepth,
 		allowRightClickOverrides,
 		blockTypes,
 		focusMode,
@@ -211,6 +215,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			return {
 				allImageSizes: baseData?.image_sizes,
 				bigImageSizeThreshold: baseData?.image_size_threshold,
+				imageStripMeta: baseData?.image_strip_meta,
+				imageMaxBitDepth: baseData?.image_max_bit_depth,
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
@@ -367,6 +373,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
 			allImageSizes,
 			bigImageSizeThreshold,
+			imageStripMeta,
+			imageMaxBitDepth,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,
@@ -390,6 +398,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				? mediaUploadOnSuccess
 				: undefined,
 			mediaSideload: hasUploadPermissions ? mediaSideload : undefined,
+			[ mediaSideloadFromUrlKey ]: hasUploadPermissions
+				? mediaSideloadFromUrl
+				: undefined,
 			mediaFinalize: hasUploadPermissions ? mediaFinalize : undefined,
 			mediaDelete: hasUploadPermissions ? mediaDelete : undefined,
 			__experimentalBlockPatterns: blockPatterns,
@@ -488,6 +499,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		deviceType,
 		allImageSizes,
 		bigImageSizeThreshold,
+		imageStripMeta,
+		imageMaxBitDepth,
 		isNavigationOverlayContext,
 	] );
 }

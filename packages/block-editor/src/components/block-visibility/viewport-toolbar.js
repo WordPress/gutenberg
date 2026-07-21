@@ -13,9 +13,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { useSettings } from '../use-settings';
 
 export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 	const hasBlockVisibilityButtonShownRef = useRef( false );
+	const [ blockVisibility ] = useSettings( 'blockVisibility.allowEditing' );
 	const { canToggleBlockVisibility, areBlocksHiddenAnywhere } = useSelect(
 		( select ) => {
 			const { getBlocksByClientId, getBlockName, isBlockHiddenAnywhere } =
@@ -51,6 +53,10 @@ export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 			hasBlockVisibilityButtonShownRef.current = true;
 		}
 	}, [ areBlocksHiddenAnywhere ] );
+
+	if ( blockVisibility === false ) {
+		return null;
+	}
 
 	if (
 		! areBlocksHiddenAnywhere &&

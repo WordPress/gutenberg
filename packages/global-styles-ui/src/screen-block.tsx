@@ -97,11 +97,21 @@ const {
 interface ScreenBlockProps {
 	name: string;
 	variation?: string;
+	selectedViewport?: string;
+	showResponsiveStateControls?: boolean;
 }
 
-function ScreenBlock( { name, variation }: ScreenBlockProps ) {
-	const { user: userConfig, onChange: onChangeGlobalStyles } =
-		useContext( GlobalStylesContext );
+function ScreenBlock( {
+	name,
+	variation,
+	selectedViewport: controlledSelectedViewport,
+	showResponsiveStateControls = true,
+}: ScreenBlockProps ) {
+	const {
+		user: userConfig,
+		merged: mergedConfig,
+		onChange: onChangeGlobalStyles,
+	} = useContext( GlobalStylesContext );
 
 	let prefixParts: string[] = [];
 	if ( variation ) {
@@ -110,17 +120,30 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 	const prefix = prefixParts.join( '.' );
 
 	// State selector state
-	const [ selectedViewport, setSelectedViewport ] =
+	const [ localSelectedViewport, setSelectedViewport ] =
 		useState< string >( 'default' );
 	const [ selectedPseudoState, setSelectedPseudoState ] =
 		useState< string >( 'default' );
-	const validViewportStates = useMemo( () => getValidViewportStates(), [] );
+	const selectedViewport =
+		controlledSelectedViewport ?? localSelectedViewport;
+	const viewportSettings = mergedConfig.settings?.viewport;
+	const validViewportStates = useMemo(
+		() => getValidViewportStates( viewportSettings ),
+		[ viewportSettings ]
+	);
+	const effectiveSelectedViewport =
+		selectedViewport === 'default' ||
+		validViewportStates.some(
+			( state ) => state.value === selectedViewport
+		)
+			? selectedViewport
+			: 'default';
 	const validPseudoStates = useMemo(
 		() => getValidPseudoStates( name ),
 		[ name ]
 	);
 
-	const stateParam = [ selectedViewport, selectedPseudoState ]
+	const stateParam = [ effectiveSelectedViewport, selectedPseudoState ]
 		.filter( ( value ) => value !== 'default' )
 		.join( '.' );
 	const hasSelectedState = stateParam.length > 0;
@@ -194,13 +217,14 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasFiltersPanel = useHasFiltersPanel( settings );
 	const shouldShowFiltersPanel =
-		hasFiltersPanel && selectedViewport === 'default';
+		hasFiltersPanel && effectiveSelectedViewport === 'default';
 	const hasImageSettingsPanel = useHasImageSettingsPanel(
 		name,
 		userSettings,
 		settings
 	);
-	const hasVariationsPanel = !! blockVariations?.length && ! variation;
+	const hasVariationsPanel =
+		!! blockVariations?.length && ! variation && ! hasSelectedState;
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
 			select( coreStore );
@@ -344,17 +368,23 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 				}
 				viewportStates={ validViewportStates }
 				pseudoStates={ validPseudoStates }
-				selectedViewport={ selectedViewport }
+				selectedViewport={ effectiveSelectedViewport }
 				selectedPseudoState={ selectedPseudoState }
-				onChangeViewport={ setSelectedViewport }
+				onChangeViewport={
+					showResponsiveStateControls
+						? setSelectedViewport
+						: undefined
+				}
 				onChangePseudoState={ setSelectedPseudoState }
+				showResponsiveStateControls={ showResponsiveStateControls }
 			/>
 			<BlockPreviewPanel
 				name={ name }
 				variation={ variation }
-				selectedViewport={ selectedViewport }
+				selectedViewport={ effectiveSelectedViewport }
 				selectedState={ hasSelectedState ? stateParam : 'default' }
 				stateStyles={ hasSelectedState ? inheritedStyle : undefined }
+				viewportSettings={ viewportSettings }
 			/>
 			{ hasVariationsPanel && (
 				<div className="global-styles-ui-screen-variations">
@@ -374,6 +404,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					// paragraphs") when not editing a state-specific variation,
 					// because those settings are global and cannot be per-breakpoint.
 					isGlobalStyles={ ! hasSelectedState }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBackgroundPanel && (
@@ -383,6 +414,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					onChange={ setStyle }
 					settings={ settings }
 					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ shouldShowFiltersPanel && (
@@ -392,6 +424,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					onChange={ setStyle }
 					settings={ settings }
 					includeLayoutControls
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasDimensionsPanel && (
@@ -401,6 +434,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					onChange={ onChangeDimensions }
 					settings={ settings }
 					includeLayoutControls
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBorderPanel && (
@@ -409,6 +443,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					value={ style }
 					onChange={ onChangeBorders }
 					settings={ settings }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasColorPanel && (
@@ -417,6 +452,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasImageSettingsPanel && ! hasSelectedState && (

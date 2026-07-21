@@ -7,7 +7,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	Button,
 	Placeholder,
@@ -21,14 +21,13 @@ import { classic } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import MigrationNotice from './migration-notice';
+import ConvertToBlocksButton from './convert-to-blocks-button';
 import ModalEdit from './modal';
 
 export default function FreeformEdit( {
 	attributes,
 	setAttributes,
 	clientId,
-	onReplace,
 } ) {
 	const { content } = attributes;
 	const [ isOpen, setOpen ] = useState( false );
@@ -38,10 +37,16 @@ export default function FreeformEdit( {
 		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
 		[ clientId ]
 	);
-	const { removeBlock } = useDispatch( blockEditorStore );
 
 	return (
 		<>
+			{ canRemove && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ConvertToBlocksButton clientId={ clientId } />
+					</ToolbarGroup>
+				</BlockControls>
+			) }
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
@@ -53,12 +58,6 @@ export default function FreeformEdit( {
 				</ToolbarGroup>
 			</BlockControls>
 			<div { ...useBlockProps() }>
-				{ canRemove && content && (
-					<MigrationNotice
-						content={ content }
-						onReplace={ onReplace }
-					/>
-				) }
 				{ content ? (
 					<RawHTML>{ content }</RawHTML>
 				) : (
@@ -66,21 +65,12 @@ export default function FreeformEdit( {
 						icon={ <BlockIcon icon={ classic } /> }
 						label={ __( 'Classic' ) }
 						instructions={ __(
-							'The Classic block is being phased out. It’s recommended to use other blocks for the best editing experience.'
+							'Use the classic editor to add content.'
 						) }
 					>
-						{ canRemove && (
-							<Button
-								__next40pxDefaultSize
-								variant="primary"
-								onClick={ () => removeBlock( clientId ) }
-							>
-								{ __( 'Remove block' ) }
-							</Button>
-						) }
 						<Button
 							__next40pxDefaultSize
-							variant={ canRemove ? 'secondary' : 'primary' }
+							variant="primary"
 							onClick={ () => setOpen( true ) }
 						>
 							{ __( 'Edit contents' ) }

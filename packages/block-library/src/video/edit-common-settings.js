@@ -150,7 +150,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				} }
 			>
 				<SelectControl
-					__next40pxDefaultSize
 					label={ __( 'Preload' ) }
 					value={ preload }
 					onChange={ onChangePreload }

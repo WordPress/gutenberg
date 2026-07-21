@@ -1,0 +1,33 @@
+// `wp-block-image` class prefixes are used for back compat.
+// This component was previously in the block library package.
+.wp-block-image__crop-area {
+	position: relative;
+	max-width: 100%;
+	width: 100%;
+	overflow: hidden;
+
+	// stylelint-disable selector-class-pattern -- react-easy-crop library class names.
+	.reactEasyCrop_Container {
+		// The linked Image block has `pointer-events: none` applied. Override it
+		// here to enable the crop action.
+		pointer-events: auto;
+
+		// This removes the border from the img within the image cropper so it
+		// can be applied to the cropper itself. This then allows the image to be
+		// cropped within the visual border providing more accurate editing and
+		// smoother UX.
+		.reactEasyCrop_Image {
+			border: none;
+			border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
+		}
+	}
+
+	// stylelint-enable selector-class-pattern
+}
+
+.wp-block-image__zoom {
+	.components-popover__content {
+		min-width: 260px;
+		overflow: visible !important;
+	}
+}
