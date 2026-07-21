@@ -11,7 +11,7 @@ import { matchesPatterns } from '../embed/util';
 const DEFAULT_EMBED_BLOCK = 'core/embed';
 
 // List of supported video providers for cover block backgrounds
-const VIDEO_PROVIDERS = [
+const DEFAULT_VIDEO_PROVIDERS = [
 	'youtube',
 	'vimeo',
 	'videopress',
@@ -21,38 +21,63 @@ const VIDEO_PROVIDERS = [
 ];
 
 /**
- * Checks if a URL is a valid video embed URL from supported providers.
+ * Resolves the list of providers that are actually allowed.
  *
- * @param {string} url The URL to validate.
- * @return {boolean} True if the URL matches a supported video provider pattern.
+ * @param {string[]} [allowedVideoProviders] The providers configured via the block attribute.
+ * @return {string[]} The supported providers that remain allowed.
  */
-export function isValidVideoEmbedUrl( url ) {
+export function getAllowedVideoProviders( allowedVideoProviders ) {
+	if ( ! Array.isArray( allowedVideoProviders ) ) {
+		return [];
+	}
+
+	return DEFAULT_VIDEO_PROVIDERS.filter( ( provider ) =>
+		allowedVideoProviders.includes( provider )
+	);
+}
+
+/**
+ * Checks if a URL is a valid video embed URL from allowed providers.
+ *
+ * @param {string}   url                The URL to validate.
+ * @param {string[]} [allowedProviders] The allowed providers, Defaults to all
+ *                                      supported providers.
+ * @return {boolean} True if the URL matches an allowed video provider pattern.
+ */
+export function isValidVideoEmbedUrl( url, allowedProviders ) {
 	if ( ! url ) {
 		return false;
 	}
 
-	const embedBlock = findVideoEmbedProvider( url );
+	const embedBlock = findVideoEmbedProvider( url, allowedProviders );
 	return embedBlock !== null;
 }
 
 /**
- * Finds the embed provider for a given URL if it's a supported video provider.
+ * Finds the embed provider for a given URL if it's an allowed video provider.
  *
- * @param {string} url The URL to check.
+ * @param {string}   url                The URL to check.
+ * @param {string[]} [allowedProviders] The allowed providers, Defaults to all
+ *                                      supported providers.
  * @return {string|null} The provider name slug (e.g., 'youtube') or null if not found.
  */
-export function getVideoEmbedProvider( url ) {
-	const embedBlock = findVideoEmbedProvider( url );
+export function getVideoEmbedProvider( url, allowedProviders ) {
+	const embedBlock = findVideoEmbedProvider( url, allowedProviders );
 	return embedBlock ? embedBlock.name : null;
 }
 
 /**
  * Finds a matching video embed block variation for the given URL.
  *
- * @param {string} url The URL to match against provider patterns.
+ * @param {string}   url                The URL to match against provider patterns.
+ * @param {string[]} [allowedProviders] The allowed providers, Defaults to all
+ *                                      supported providers.
  * @return {Object|null} The matching block variation or null if not found.
  */
-function findVideoEmbedProvider( url ) {
+function findVideoEmbedProvider(
+	url,
+	allowedProviders = DEFAULT_VIDEO_PROVIDERS
+) {
 	const embedVariations = getBlockVariations( DEFAULT_EMBED_BLOCK );
 
 	if ( ! embedVariations ) {
@@ -65,7 +90,7 @@ function findVideoEmbedProvider( url ) {
 
 	if (
 		! matchingVariation ||
-		! VIDEO_PROVIDERS.includes( matchingVariation.name )
+		! allowedProviders.includes( matchingVariation.name )
 	) {
 		return null;
 	}

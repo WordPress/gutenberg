@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Inspector controls in the standard block-supports panels (Typography, Dimensions, Border, Color, Background, Filters) now reflect the value a block inherits from Global Styles when no local override is set. Inherited controls show that value at rest (as a placeholder, preselected option, or resolved value) and mark the label with a dotted underline; setting a local override reveals a reset affordance that clears the override back to the inherited value ([#77894](https://github.com/WordPress/gutenberg/pull/77894)).
+
+### Bug Fixes
+
+-   Gate the HEIC canvas conversion fallback on `window.__clientSideMediaProcessing` instead of the redundant `window.__heicUploadSupport` flag, fixing client-side HEIC conversion in Safari on core WordPress installs ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
+
+## 16.0.0 (2026-07-14)
+
 ### Internal
 
 -   Extract a shared `getBlockBindingsContext` helper for assembling the context handed to block-bindings sources; only entries present in the surrounding block context are copied ([#79855](https://github.com/WordPress/gutenberg/pull/79855)).
@@ -28,6 +38,7 @@
 
 ### Enhancements
 
+-   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 -   Inserter media categories support an optional `emptyMessage`, shown in place of the generic "No results found" notice, that also keeps a source listed when it has no items. The media panel additionally renders attach/detach affordances for attached images ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
 

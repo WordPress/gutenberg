@@ -20,7 +20,10 @@ import {
 /**
  * Internal dependencies
  */
+import { registerDashboardFieldTypes } from './field-types';
 import { useDashboardGridSettings, useDashboardLayout } from './hooks';
+
+registerDashboardFieldTypes();
 
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(

@@ -72,6 +72,24 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		return $this->theme_root;
 	}
 
+	/**
+	 * @covers ::gutenberg_sanitize_block_gap_value
+	 */
+	public function test_sanitize_block_gap_value_rejects_nested_array_values() {
+		$this->assertSame(
+			array(
+				'top'  => null,
+				'left' => '2rem',
+			),
+			gutenberg_sanitize_block_gap_value(
+				array(
+					'top'  => array( '1rem' ),
+					'left' => '2rem',
+				)
+			)
+		);
+	}
+
 	public function test_outer_container_not_restored_for_non_aligned_image_block_with_non_themejson_theme() {
 		// The "default" theme doesn't have theme.json support.
 		switch_theme( 'default' );
@@ -636,6 +654,32 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '<div class="wp-block-group is-layout-flow wp-block-group-is-layout-flow"></div>',
 			),
+			'single wrapper block layout with malformed axial block gap' => array(
+				'args'            => array(
+					'block_content' => '<div class="wp-block-group"></div>',
+					'block'         => array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(
+							'layout' => array(
+								'type' => 'default',
+							),
+							'style'  => array(
+								'spacing' => array(
+									'blockGap' => array(
+										'top' => array( '1rem' ),
+									),
+								),
+							),
+						),
+						'innerBlocks'  => array(),
+						'innerHTML'    => '<div class="wp-block-group"></div>',
+						'innerContent' => array(
+							'<div class="wp-block-group"></div>',
+						),
+					),
+				),
+				'expected_output' => '<div class="wp-block-group is-layout-flow wp-block-group-is-layout-flow"></div>',
+			),
 			'single wrapper block layout with constrained type' => array(
 				'args'            => array(
 					'block_content' => '<div class="wp-block-group"></div>',
@@ -1122,6 +1166,31 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_result'   => 'outlined',
 			),
+		);
+	}
+
+	/**
+	 * Tests that a non-string `className` attribute does not cause a fatal
+	 * when checking for style variation layout styles.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_layout_support_flag_with_non_string_class_name() {
+		$block_content = '<div class="wp-block-group 0 1"></div>';
+		$block         = array(
+			'blockName' => 'core/group',
+			'attrs'     => array(
+				'className' => array( '0', '1' ),
+				'layout'    => array(
+					'type' => 'constrained',
+				),
+			),
+		);
+
+		$this->assertSame(
+			'<div class="wp-block-group 0 1 is-layout-constrained wp-block-group-is-layout-constrained"></div>',
+			gutenberg_render_layout_support_flag( $block_content, $block ),
+			'Layout support should render the expected markup when className is not a string'
 		);
 	}
 }

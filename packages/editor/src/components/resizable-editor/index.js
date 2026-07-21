@@ -45,13 +45,18 @@ function isAtMaxWidth( currentWidth, containerWidth, tolerance = 0 ) {
 function ResizableEditor( { className, enableResizing, height, children } ) {
 	const [ isResizing, setIsResizing ] = useState( false );
 	const { setCanvasWidth } = unlock( useDispatch( editorStore ) );
-	const canvasWidth = useSelect(
+	const { canvasWidth, canvasHeight } = useSelect(
 		( select ) => {
 			if ( ! enableResizing ) {
-				return undefined;
+				return { canvasWidth: undefined, canvasHeight: undefined };
 			}
-			const { getCanvasWidth } = unlock( select( editorStore ) );
-			return getCanvasWidth();
+			const { getCanvasWidth, getCanvasHeight } = unlock(
+				select( editorStore )
+			);
+			return {
+				canvasWidth: getCanvasWidth(),
+				canvasHeight: getCanvasHeight(),
+			};
 		},
 		[ enableResizing ]
 	);
@@ -100,7 +105,10 @@ function ResizableEditor( { className, enableResizing, height, children } ) {
 			size={ {
 				width:
 					enableResizing && canvasWidth ? canvasWidth + 'px' : '100%',
-				height: enableResizing && height ? height : '100%',
+				height:
+					enableResizing && canvasHeight
+						? canvasHeight + 'px'
+						: height || '100%',
 			} }
 			onResizeStart={ () => {
 				setIsResizing( true );
