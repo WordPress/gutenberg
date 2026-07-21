@@ -52,3 +52,31 @@ export function getSyncManager(): SyncManager | undefined {
 export function hasSyncManager(): boolean {
 	return Boolean( syncManager );
 }
+
+/**
+ * Read the last recorded autosave time for a user from a synced entity's
+ * CRDT document. Returns undefined when the entity is not being synced or
+ * no marker exists.
+ *
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {string|number} recordId Record ID.
+ * @param {number}        authorId WordPress user ID of the autosave author.
+ * @return {number|undefined} Autosave modified time as epoch seconds (UTC).
+ */
+export function getEntityAutosavedAt(
+	kind: string,
+	name: string,
+	recordId: string | number,
+	authorId: number
+): number | undefined {
+	if ( ! hasSyncManager() ) {
+		return undefined;
+	}
+
+	return getSyncManager()?.getEntityAutosavedAt(
+		`${ kind }/${ name }`,
+		`${ recordId }`,
+		authorId
+	);
+}

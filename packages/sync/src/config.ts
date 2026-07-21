@@ -35,6 +35,13 @@ export const CRDT_STATE_MAP_SAVED_AT_KEY = 'savedAt';
 export const CRDT_STATE_MAP_SAVED_BY_KEY = 'savedBy';
 
 /**
+ * Prefix for Y.Map keys that record the last successful autosave for a
+ * WordPress user. The full key is `autosavedAt:<userId>` and the value is
+ * the autosave revision's modified time as epoch seconds (UTC).
+ */
+export const CRDT_STATE_MAP_AUTOSAVED_AT_KEY_PREFIX = 'autosavedAt:';
+
+/**
  * Y.Map key representing the version of the CRDT document schema.
  */
 export const CRDT_STATE_MAP_VERSION_KEY = 'version';
