@@ -35,14 +35,11 @@
 	padding-left: $icon-size * 2;
 }
 
-// Nested under .components-snackbar so the height override outranks the
+// Nested under .components-snackbar so the override outranks the
 // ProgressBar's own single-class emotion styles, which are injected later in
 // the document and would otherwise win the tie.
 .components-snackbar .editor-upload-progress-snackbar__progress-bar {
 	width: 100%;
-	// Thicker than the component's hairline default so the fill level reads
-	// at snackbar size.
-	height: $grid-unit-05;
 	// The ProgressBar derives both its track and indicator colors from the
 	// theme foreground, which is near-black and disappears on the snackbar's
 	// dark surface. Use the snackbar's white foreground instead.
