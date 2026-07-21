@@ -199,7 +199,7 @@ final class WP_Table_Of_Contents {
 			$context,
 			array(
 				'current_page'              => 1,
-					'is_paginated'              => str_contains( $content, '<!--nextpage-->' ),
+				'is_paginated'              => str_contains( $content, '<!--nextpage-->' ),
 				'only_include_current_page' => false,
 				'permalink'                 => '',
 				'target_page'               => 1,
