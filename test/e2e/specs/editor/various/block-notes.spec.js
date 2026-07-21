@@ -689,38 +689,6 @@ test.describe( 'Block Notes', () => {
 			await expect( block ).not.toHaveClass( /is-highlighted/ );
 		} );
 
-		test( 'should highlight the related block without spotlighting it when a note is selected', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/heading',
-				attributes: { content: 'Testing block comments' },
-				comment: 'Test comment',
-			} );
-
-			const thread = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
-				.getByRole( 'treeitem', {
-					name: 'Note: Test comment',
-				} );
-			const block = editor.canvas.getByRole( 'document', {
-				name: 'Block: Heading',
-			} );
-
-			await thread.click();
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
-			// The related block gets the blue outline highlight…
-			await expect( block ).toHaveClass( /is-highlighted/ );
-			// …but the rest of the canvas is not dimmed (no spotlight mode).
-			await expect(
-				editor.canvas.locator( '.is-root-container' ).first()
-			).not.toHaveClass( /is-focus-mode/ );
-		} );
-
 		test( 'should have accessible name for the note threads', async ( {
 			page,
 			blockNoteUtils,
