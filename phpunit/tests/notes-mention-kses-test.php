@@ -108,17 +108,11 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 
 		$content = 'Hi <span class="components-button is-destructive">there</span>!';
 
-		try {
-			$this->assertSame(
-				wp_slash( $content ),
-				gutenberg_notes_sanitize_mention_classes( wp_slash( $content ) ),
-				'Span classes should be left untouched when wp_filter_kses is not active.'
-			);
-		} finally {
-			if ( $had_filter ) {
-				add_filter( 'pre_comment_content', 'wp_filter_kses' );
-			}
-		}
+		$this->assertSame(
+			wp_slash( $content ),
+			gutenberg_notes_sanitize_mention_classes( wp_slash( $content ) ),
+			'Span classes should be left untouched when wp_filter_kses is not active.'
+		);
 	}
 
 	public function test_mention_markup_survives_note_insert_end_to_end() {
