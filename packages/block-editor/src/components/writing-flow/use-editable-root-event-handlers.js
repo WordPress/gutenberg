@@ -11,11 +11,7 @@ import { useContext } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { BlockRefs } from '../provider/block-refs-provider';
-import {
-	EVENT_TYPES,
-	getBlockEventHandlers,
-	hasBlockEventHandlers,
-} from './editable-root-event-handlers';
+import { EVENT_TYPES } from './editable-root-event-handlers';
 
 // The native properties React copies onto its SyntheticEvent for each event
 // type (the *EventInterface tables in react-dom), so the wrapper exposes exactly
@@ -139,7 +135,7 @@ function createBlockSyntheticEvent( nativeEvent, target ) {
 export default function useEditableRootEventHandlers() {
 	const { hasMultiSelection, getBlockParents } =
 		useSelect( blockEditorStore );
-	const { refsMap } = useContext( BlockRefs );
+	const { refsMap, eventHandlers } = useContext( BlockRefs );
 	return useRefEffect(
 		( node ) => {
 			function onEvent( event ) {
@@ -147,7 +143,7 @@ export default function useEditableRootEventHandlers() {
 				// is the editing host for a single block and some block has a
 				// handler to call.
 				if (
-					! hasBlockEventHandlers() ||
+					! eventHandlers.size ||
 					event.target !== node ||
 					! event.isTrusted ||
 					node.contentEditable !== 'true' ||
@@ -183,7 +179,7 @@ export default function useEditableRootEventHandlers() {
 				let syntheticEvent;
 				for ( const ancestorClientId of clientIds ) {
 					const handler =
-						getBlockEventHandlers( ancestorClientId )?.[
+						eventHandlers.get( ancestorClientId )?.current?.[
 							event.type
 						];
 					const element = handler && refsMap.get( ancestorClientId );
@@ -222,6 +218,6 @@ export default function useEditableRootEventHandlers() {
 			return () =>
 				unsubscribers.forEach( ( unsubscribe ) => unsubscribe() );
 		},
-		[ hasMultiSelection, getBlockParents, refsMap ]
+		[ hasMultiSelection, getBlockParents, refsMap, eventHandlers ]
 	);
 }

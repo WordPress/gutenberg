@@ -17,17 +17,11 @@ const SUPPORTED_EVENTS = {
 
 /**
  * The DOM event types the host listens for. Fixed, so the host attaches these
- * capture listeners once rather than tracking which types are in use.
+ * listeners once rather than tracking which types are in use.
  *
  * @type {string[]}
  */
 export const EVENT_TYPES = Object.values( SUPPORTED_EVENTS );
-
-// Block event handlers keyed by client ID, so the host can resolve them from
-// the block hierarchy (getBlockParents). A ref is stored, not the handlers
-// directly, so the host always calls the latest render's handlers. Only blocks
-// that actually have a bridged handler are registered.
-const handlersByClientId = new Map();
 
 /**
  * Collects the supported `on*` event handlers from a set of props, e.g. a
@@ -49,34 +43,4 @@ export function getEventHandlers( props ) {
 	}
 
 	return handlers;
-}
-
-/**
- * Stores a block's handlers, keyed by its client ID.
- *
- * @param {string} clientId    Block client ID.
- * @param {Object} handlersRef Ref holding the block's handlers by event type.
- *
- * @return {Function} Cleanup function that removes the block's handlers.
- */
-export function setBlockEventHandlers( clientId, handlersRef ) {
-	handlersByClientId.set( clientId, handlersRef );
-	return () => handlersByClientId.delete( clientId );
-}
-
-/**
- * @param {string} clientId Block client ID.
- *
- * @return {Object|undefined} The block's current handlers by event type.
- */
-export function getBlockEventHandlers( clientId ) {
-	return handlersByClientId.get( clientId )?.current;
-}
-
-/**
- * @return {boolean} Whether any block has a registered handler, so the host can
- *                   skip resolving the selection when there are none.
- */
-export function hasBlockEventHandlers() {
-	return handlersByClientId.size > 0;
 }
