@@ -22,7 +22,6 @@ import { UploadError } from './upload-error';
 declare global {
 	interface Window {
 		__clientSideMediaProcessing?: boolean;
-		__heicUploadSupport?: boolean;
 	}
 }
 
