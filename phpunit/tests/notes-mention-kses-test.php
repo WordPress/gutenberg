@@ -1,11 +1,14 @@
 <?php
 /**
- * Tests that the note mention kses allowance is scoped to `note` comments.
+ * Tests the note mention kses allowance for comment content.
  *
- * The `<a class="wp-note-mention user-N" href="…">` markup must survive
- * sanitization when a note is written by a user without `unfiltered_html`,
- * while the sanitization of every other comment type - which reaches back to
- * anonymous front-end comments - stays byte-identical to core's defaults.
+ * The `<a data-wp-note-mention-user="N" href="…">` markup must survive
+ * sanitization when a note is written by a user without `unfiltered_html`. The
+ * mention attribute is a single inert, purpose-specific data attribute, so the
+ * allowance is registered globally for the `pre_comment_content` context rather
+ * than armed per note write. Every other link attribute (`class`, event
+ * handlers, styles, other data attributes) still stays stripped as in core's
+ * defaults.
  *
  * @group notes
  */
@@ -17,9 +20,32 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 	 * any other comment - deterministically appends `rel="nofollow ugc"`
 	 * regardless of the test environment's home URL.
 	 */
-	const MENTION_CONTENT  = 'Hi <a class="wp-note-mention user-2" href="https://example.com/author/admin/">@admin</a>!';
-	const MENTION_FILTERED = 'Hi <a class="wp-note-mention user-2" href="https://example.com/author/admin/" rel="nofollow ugc">@admin</a>!';
+	const MENTION_CONTENT  = 'Hi <a data-wp-note-mention-user="2" href="https://example.com/author/admin/">@admin</a>!';
+	const MENTION_FILTERED = 'Hi <a data-wp-note-mention-user="2" href="https://example.com/author/admin/" rel="nofollow ugc">@admin</a>!';
 	const STRIPPED_CONTENT = 'Hi <a href="https://example.com/author/admin/" rel="nofollow ugc">@admin</a>!';
+
+	/**
+	 * Baseline: without the notes allowance, the comment kses context strips the
+	 * mention data attribute.
+	 *
+	 * This documents the load-bearing fact the allowance exists for: unlike the
+	 * `post` context, the `pre_comment_content` context does not allow `data-*`
+	 * attributes by default, so a mention would lose its user ID on save for any
+	 * user without `unfiltered_html`.
+	 */
+	public function test_comment_kses_strips_data_attribute_by_default() {
+		remove_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes' );
+
+		$filtered = wp_kses( self::MENTION_CONTENT, 'pre_comment_content' );
+
+		add_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes', 10, 2 );
+
+		$this->assertSame(
+			'Hi <a href="https://example.com/author/admin/">@admin</a>!',
+			$filtered,
+			'The comment kses context should strip the mention data attribute without the notes allowance.'
+		);
+	}
 
 	public function test_mention_markup_survives_note_content_filtering() {
 		$filtered = $this->filter_comment_with_kses( 'note' );
@@ -27,113 +53,28 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 		$this->assertSame( self::MENTION_FILTERED, wp_unslash( $filtered['comment_content'] ) );
 	}
 
-	public function test_mention_markup_stripped_from_regular_comment_content() {
+	/**
+	 * The mention attribute is inert and allowed globally in comment content, so
+	 * it also survives in a regular (non-note) comment. This documents the
+	 * intended behavior change from the previous per-note-armed `class`
+	 * allowance.
+	 */
+	public function test_mention_attribute_survives_regular_comment_content() {
 		$filtered = $this->filter_comment_with_kses( 'comment' );
 
-		$this->assertSame( self::STRIPPED_CONTENT, wp_unslash( $filtered['comment_content'] ) );
+		$this->assertSame( self::MENTION_FILTERED, wp_unslash( $filtered['comment_content'] ) );
 	}
 
-	public function test_only_default_link_attributes_and_class_are_allowed_on_note_links() {
+	public function test_only_the_mention_attribute_and_default_link_attributes_are_allowed() {
 		$filtered = $this->filter_comment_with_kses(
 			'note',
-			'Hi <a class="wp-note-mention user-2" href="https://example.com/author/admin/" data-user-id="2" onclick="alert(1)" style="color:red">@admin</a>!'
+			'Hi <a data-wp-note-mention-user="2" href="https://example.com/author/admin/" class="danger" data-user-id="2" onclick="alert(1)" style="color:red">@admin</a>!'
 		);
 
 		$this->assertSame(
 			self::MENTION_FILTERED,
 			wp_unslash( $filtered['comment_content'] ),
-			'Attributes beyond `class` and the default link attributes should be stripped from note links.'
-		);
-	}
-
-	public function test_mention_allowance_does_not_leak_after_note_filtering() {
-		$this->filter_comment_with_kses( 'note' );
-
-		// A regular comment filtered after a note still gets the default rules.
-		$filtered = $this->filter_comment_with_kses( 'comment' );
-		$this->assertSame(
-			self::STRIPPED_CONTENT,
-			wp_unslash( $filtered['comment_content'] ),
-			'The mention markup should be stripped from a regular comment filtered after a note.'
-		);
-
-		$this->assertFalse(
-			has_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes' ),
-			'The allowlist filter should not outlive the note write that armed it.'
-		);
-		$this->assertFalse(
-			has_filter( 'pre_comment_content', 'gutenberg_notes_disarm_mention_kses' ),
-			'The disarm filter should remove itself.'
-		);
-		$this->assertFalse(
-			has_filter( 'rest_request_after_callbacks', 'gutenberg_notes_disarm_mention_kses' ),
-			'The disarm backstop should remove itself.'
-		);
-	}
-
-	public function test_rest_prepare_arms_for_note_update() {
-		$post_id = self::factory()->post->create();
-		$note_id = self::factory()->comment->create(
-			array(
-				'comment_post_ID' => $post_id,
-				'comment_type'    => 'note',
-			)
-		);
-
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $note_id );
-		$request->set_param( 'id', $note_id );
-
-		// Updates do not carry the comment type in the prepared data.
-		gutenberg_notes_scope_mention_kses_rest( array(), $request );
-
-		$this->assertNotFalse(
-			has_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes' ),
-			'Updating a note should arm the mention allowance.'
-		);
-
-		gutenberg_notes_disarm_mention_kses();
-	}
-
-	public function test_rest_prepare_arms_for_note_creation() {
-		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$request->set_param( 'type', 'note' );
-
-		// On creation the prepared data does not carry the comment type either:
-		// the controller only copies the `type` param in after preparing.
-		gutenberg_notes_scope_mention_kses_rest( array(), $request );
-
-		$this->assertNotFalse(
-			has_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes' ),
-			'Creating a note should arm the mention allowance.'
-		);
-
-		gutenberg_notes_disarm_mention_kses();
-	}
-
-	public function test_rest_prepare_does_not_arm_for_regular_comment_creation() {
-		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$request->set_param( 'type', 'comment' );
-
-		gutenberg_notes_scope_mention_kses_rest( array(), $request );
-
-		$this->assertFalse(
-			has_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes' ),
-			'Creating a regular comment should not arm the mention allowance.'
-		);
-	}
-
-	public function test_rest_prepare_does_not_arm_for_regular_comment_update() {
-		$post_id    = self::factory()->post->create();
-		$comment_id = self::factory()->comment->create( array( 'comment_post_ID' => $post_id ) );
-
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
-		$request->set_param( 'id', $comment_id );
-
-		gutenberg_notes_scope_mention_kses_rest( array(), $request );
-
-		$this->assertFalse(
-			has_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes' ),
-			'Updating a regular comment should not arm the mention allowance.'
+			'Attributes beyond `data-wp-note-mention-user` and the default link attributes should be stripped from note links.'
 		);
 	}
 
@@ -178,12 +119,6 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertSame( 201, $response->get_status() );
 
-		/*
-		 * REST creation reaches kses through wp_filter_comment() directly, not
-		 * through wp_new_comment() and its 'preprocess_comment' filter, so the
-		 * REST-specific arming must cover it or mentions written by users
-		 * without `unfiltered_html` are silently stripped on save.
-		 */
 		$data = $response->get_data();
 		$this->assertSame(
 			self::MENTION_FILTERED,
@@ -194,9 +129,9 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 	/**
 	 * Runs commentdata of the given type through the insert-path sanitization.
 	 *
-	 * Mirrors wp_new_comment(): the 'preprocess_comment' filter (which arms the
-	 * allowance for notes) followed by wp_filter_comment() with kses attached as
-	 * it is for users without `unfiltered_html`.
+	 * Mirrors wp_new_comment(): the 'preprocess_comment' filter followed by
+	 * wp_filter_comment() with kses attached as it is for users without
+	 * `unfiltered_html`.
 	 *
 	 * @param string $comment_type The comment type to filter.
 	 * @param string $content      Optional. The comment content to filter.
