@@ -16,22 +16,31 @@ export function ownsSelection( element ) {
 		return true;
 	}
 
+	if ( ! activeElement ) {
+		return false;
+	}
+
+	// Test the selection before the editing host. When the host is the
+	// editable canvas wrapper it contains every instance, so the host checks
+	// pass for all of them and only the selection discriminates. Reading
+	// `isContentEditable` also forces a style and layout tree update, so it
+	// is kept off the path that every unrelated instance walks.
+	const selection = ownerDocument.defaultView?.getSelection();
+	const anchorNode = selection?.anchorNode;
+	const focusNode = selection?.focusNode;
+
 	if (
-		! activeElement ||
-		! activeElement.isContentEditable ||
-		! element.isContentEditable ||
-		! activeElement.contains( element )
+		! anchorNode ||
+		! focusNode ||
+		! element.contains( anchorNode ) ||
+		! element.contains( focusNode )
 	) {
 		return false;
 	}
 
-	const selection = ownerDocument.defaultView.getSelection();
-	const { anchorNode, focusNode } = selection;
-
 	return (
-		!! anchorNode &&
-		!! focusNode &&
-		element.contains( anchorNode ) &&
-		element.contains( focusNode )
+		activeElement.isContentEditable &&
+		element.isContentEditable &&
+		activeElement.contains( element )
 	);
 }

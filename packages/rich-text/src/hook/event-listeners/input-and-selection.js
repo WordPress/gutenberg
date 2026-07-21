@@ -348,8 +348,8 @@ export default ( props ) => ( element ) => {
 	// `handleSelectionChange` checks whether the element is focused itself,
 	// and the shared underlying delegated listener keeps the number of native
 	// listeners constant.
-	const unsubscribeSelectionChange = subscribeDelegatedListener(
-		ownerDocument,
+	const unsubscribeSelectionChange = subscribeOwnedListener(
+		element,
 		'selectionchange',
 		handleSelectionChange
 	);
@@ -362,7 +362,9 @@ export default ( props ) => ( element ) => {
 	// Synchronize on capture of the events that consume the record,
 	// the store selection, or a value rendered from them, before any other
 	// handler runs. The snapshot comparison in `handleSelectionChange` skips
-	// selections that have already been processed.
+	// selections that have already been processed. Subscribing as an owned
+	// listener keeps this ahead of the other owned listeners for the same
+	// element, which `useEventListeners` orders `inputAndSelection` first for.
 	const unsubscribeEnsureSelectionSync = [
 		'keydown',
 		'beforeinput',
@@ -370,8 +372,8 @@ export default ( props ) => ( element ) => {
 		'cut',
 		'paste',
 	].map( ( eventType ) =>
-		subscribeDelegatedListener(
-			ownerDocument,
+		subscribeOwnedListener(
+			element,
 			eventType,
 			handleSelectionChange,
 			true
