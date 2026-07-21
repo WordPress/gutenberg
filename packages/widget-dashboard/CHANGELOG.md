@@ -13,10 +13,11 @@
     trigger instead of `moreVertical` ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 -   Widget toolbar: when the tile header lacks room for the inline attribute
     controls, the promoted fields collapse into a dropdown; the settings
-    trigger stays in the toolbar ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+    trigger stays in the toolbar ([#80208](https://github.com/WordPress/gutenberg/pull/80208)) ([#80423](https://github.com/WordPress/gutenberg/pull/80423])).
 
 ### Documentation
 
+-   Add/improve default story and documentation ([#80423](https://github.com/WordPress/gutenberg/pull/80423])).
 -   Document how attribute `relevance` maps to surfaces: the prominent
     surface, the settings surface, and the measured collapse ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 
