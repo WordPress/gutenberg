@@ -324,4 +324,35 @@ describe( 'wordpressDockerFileContents', () => {
 		expect( dockerfile ).toContain( 'Listen 8889' );
 		expect( dockerfile ).not.toContain( 'Listen 8888' );
 	} );
+
+	it( 'uses pie to install xdebug on php versions higher than 8.1', () => {
+		const config = {
+			xdebug: 'debug',
+			spx: 'off',
+			env: {
+				development: { port: 8888, phpVersion: '8.2' },
+				tests: { port: 8889, phpVersion: '8.2' },
+			},
+		};
+		const dockerfile = wordpressDockerFileContents( 'development', config );
+
+		expect( dockerfile ).toContain( 'command -v pie' );
+		expect( dockerfile ).toContain( 'pie install xdebug/xdebug' );
+		expect( dockerfile ).not.toContain( 'pecl install xdebug' );
+	} );
+
+	it( 'uses pecl to install xdebug on php 8.1 and lower', () => {
+		const config = {
+			xdebug: 'debug',
+			spx: 'off',
+			env: {
+				development: { port: 8888, phpVersion: '8.1' },
+				tests: { port: 8889, phpVersion: '8.1' },
+			},
+		};
+		const dockerfile = wordpressDockerFileContents( 'development', config );
+
+		expect( dockerfile ).toContain( 'pecl install xdebug' );
+		expect( dockerfile ).not.toContain( 'pie install xdebug/xdebug' );
+	} );
 } );

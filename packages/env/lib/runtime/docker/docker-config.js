@@ -249,6 +249,7 @@ function getXdebugConfig( xdebugMode = 'off', phpVersion ) {
 	}
 
 	let xdebugVersion = 'xdebug';
+	let usePieForXdebug = false;
 
 	if ( phpVersion ) {
 		const versionTokens = phpVersion.split( '.' );
@@ -275,10 +276,22 @@ function getXdebugConfig( xdebugMode = 'off', phpVersion ) {
 		if ( majorVer === 7 ) {
 			xdebugVersion = 'xdebug-3.1.6';
 		}
+
+		// PECL installation fails on newer PHP versions where PIE is expected.
+		if ( majorVer > 8 || ( majorVer === 8 && minorVer > 1 ) ) {
+			usePieForXdebug = true;
+		}
 	}
 
+	const installCommand = usePieForXdebug
+		? `
+RUN if ! command -v pie > /dev/null 2>&1; then curl -fL --output /tmp/pie.phar https://github.com/php/pie/releases/latest/download/pie.phar && mv /tmp/pie.phar /usr/local/bin/pie && chmod +x /usr/local/bin/pie; fi
+RUN if ! php -m | grep -q xdebug; then pie install xdebug/xdebug; fi`
+		: `
+RUN if [ -z "$(pecl list | grep ${ xdebugVersion })" ] ; then pecl install ${ xdebugVersion } ; fi`;
+
 	return `
-RUN if [ -z "$(pecl list | grep ${ xdebugVersion })" ] ; then pecl install ${ xdebugVersion } ; fi
+${ installCommand }
 RUN docker-php-ext-enable xdebug
 RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
 RUN echo 'xdebug.mode=${ xdebugMode }' >> /usr/local/etc/php/php.ini
