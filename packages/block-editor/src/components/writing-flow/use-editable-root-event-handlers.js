@@ -173,7 +173,8 @@ function createBlockSyntheticEvent( nativeEvent, target ) {
  *
  * This does not cover handlers a filter puts on its own wrapping element rather
  * than the block's `wrapperProps`; the block element is the supported event
- * surface. It can be removed once input handling is lifted to the host.
+ * surface. It is a compatibility shim for those third-party handlers; nothing
+ * in core relies on editing events reaching the block through `wrapperProps`.
  */
 export default function useEditableRootEventHandlers() {
 	const { hasMultiSelection, getBlockParents } =
