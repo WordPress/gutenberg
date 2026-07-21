@@ -3,6 +3,7 @@
  */
 import fetch from 'node-fetch';
 import readline from 'readline';
+import { gte } from 'semver';
 
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
@@ -11,9 +12,15 @@ const REPO = 'WordPress/gutenberg';
 const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
 const BACKPORT_COMPLETED_LABEL = 'Backported to WP Core';
 const BRANCH = getCurrentBranch();
+// Earlier versions query the sunset Projects (classic) API and always fail on
+// `gh pr edit`.
+// See https://github.com/cli/cli/pull/10942.
+const MINIMUM_GH_VERSION = '2.73.0';
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
 	?.stdout?.toString()
 	.includes( '✓ Logged in to github.com' );
+const GITHUB_CLI_VERSION = getGhVersion();
+const GITHUB_CLI_SUPPORTED = isGhVersionSupported( GITHUB_CLI_VERSION );
 
 const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
 
@@ -32,6 +39,11 @@ const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
 async function main() {
 	if ( ! GITHUB_CLI_AVAILABLE ) {
 		await reportGhUnavailable();
+	} else if ( ! GITHUB_CLI_SUPPORTED ) {
+		console.error(
+			`GitHub CLI ${ GITHUB_CLI_VERSION } is too old. Upgrade to ${ MINIMUM_GH_VERSION } or newer.`
+		);
+		process.exit( 1 );
 	}
 
 	console.log( `You are on branch "${ BRANCH }".` );
@@ -518,6 +530,37 @@ function getMilestoneFromBranch() {
 }
 
 /**
+ * Extracts the version from the output of `gh --version`.
+ *
+ * @param {string} output Raw command output.
+ * @return {string|null} Version string such as "2.73.0", or null if not found.
+ */
+function parseGhVersion( output ) {
+	return output.match( /gh version (\d+\.\d+\.\d+)/ )?.[ 1 ] || null;
+}
+
+/**
+ * Returns the installed `gh` version.
+ *
+ * @return {string|null} Version string such as "2.73.0", or null if unavailable.
+ */
+function getGhVersion() {
+	return parseGhVersion(
+		spawnSync( 'gh', [ '--version' ] )?.stdout?.toString() || ''
+	);
+}
+
+/**
+ * Checks whether a `gh` version meets the minimum this script requires.
+ *
+ * @param {string|null} version The installed version.
+ * @return {boolean} Whether the version is supported.
+ */
+function isGhVersionSupported( version ) {
+	return !! version && gte( version, MINIMUM_GH_VERSION );
+}
+
+/**
  * Returns the current git branch.
  *
  * @return {string} Branch name.
@@ -585,4 +628,10 @@ if (
 	main();
 }
 
-export { cherryPickAll, cherryPickOne };
+export {
+	cherryPickAll,
+	cherryPickOne,
+	isGhVersionSupported,
+	parseGhVersion,
+	MINIMUM_GH_VERSION,
+};
