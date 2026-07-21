@@ -1860,15 +1860,15 @@ test.describe( 'Block Notes', () => {
 
 			/*
 			 * The completer inserts the mention as a chip: a link to the
-			 * user's author page whose `user-N` class carries the mentioned
-			 * user's ID.
+			 * user's author page whose `data-wp-note-mention-user` attribute
+			 * carries the mentioned user's ID.
 			 */
-			const mentionClasses = new RegExp(
-				`^wp-note-mention user-${ mentionedUserId }$`
-			);
-			const draftChip = textbox.locator( 'a.wp-note-mention' );
+			const draftChip = textbox.locator( 'a[data-wp-note-mention-user]' );
 			await expect( draftChip ).toHaveText( '@Mentionable Teammate' );
-			await expect( draftChip ).toHaveClass( mentionClasses );
+			await expect( draftChip ).toHaveAttribute(
+				'data-wp-note-mention-user',
+				String( mentionedUserId )
+			);
 			await expect( draftChip ).toHaveAttribute( 'href', /author/ );
 
 			await page.keyboard.type( 'please review' );
@@ -1885,9 +1885,12 @@ test.describe( 'Block Notes', () => {
 			const savedChip = page
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'treeitem' )
-				.locator( 'a.wp-note-mention' );
+				.locator( 'a[data-wp-note-mention-user]' );
 			await expect( savedChip ).toHaveText( '@Mentionable Teammate' );
-			await expect( savedChip ).toHaveClass( mentionClasses );
+			await expect( savedChip ).toHaveAttribute(
+				'data-wp-note-mention-user',
+				String( mentionedUserId )
+			);
 		} );
 
 		test( 'can cancel mentions popover', async ( { editor, page } ) => {
