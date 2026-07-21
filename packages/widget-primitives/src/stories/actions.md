@@ -23,7 +23,9 @@ Today, the only fulfillment is a `link`: a target the host renders as an anchor.
 }
 ```
 
-`href` is a complete URL or path; external URLs and admin entry points load a full page. Two optional flags refine it:
+`href` is a complete URL, an admin PHP entry point, or a file shipped beside
+the widget (resolved to a plugin URL on the server). External URLs and admin
+entry points load a full page. Two optional flags refine it:
 
 -   `download`: turns the target into a file download; a string names the file.
 -   `openInNewTab`: opens the target in a new browser tab.
@@ -32,10 +34,14 @@ Today, the only fulfillment is a `link`: a target the host renders as an anchor.
 {
 	id: 'export',
 	label: __( 'Export CSV' ),
-	href: reportCsvUrl,
+	href: 'report.csv', // file next to the widget under widgets/{name}/
 	download: 'report.csv',
 }
 ```
+
+Do not embed file contents in a `data:` href. Ship a static file with the
+widget, or have the host generate a download with `downloadBlob` for
+client-built content.
 
 ## Placement is the host's
 

@@ -111,17 +111,58 @@ function gutenberg_sanitize_widget_help( $help ) {
 }
 
 /**
+ * Resolves an action href that points at a file shipped beside the widget.
+ *
+ * Paths that exist under `widgets/{dir_name}/` become plugin URLs via
+ * `gutenberg_url()`. Absolute URLs, admin-relative targets like
+ * `site-health.php`, and anything that is not a file in that folder pass
+ * through unchanged. Path traversal attempts yield an empty string so the
+ * sanitizer can drop them.
+ *
+ * @param string $href     Action href from the build manifest.
+ * @param string $dir_name Widget directory name from the build manifest.
+ * @return string Absolute plugin URL, the original href, or an empty string.
+ */
+function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
+	if ( ! is_string( $href ) || '' === $href || ! is_string( $dir_name ) || '' === $dir_name ) {
+		return $href;
+	}
+
+	if ( str_contains( $href, '..' ) ) {
+		return '';
+	}
+
+	// Absolute, scheme-relative, or schemed URLs are already complete.
+	if ( preg_match( '#^([a-z][a-z0-9+.-]*:)?//#i', $href ) || str_contains( $href, ':' ) ) {
+		return $href;
+	}
+
+	$relative = ltrim( $href, '/' );
+	$path     = gutenberg_dir_path() . 'widgets/' . $dir_name . '/' . $relative;
+
+	if ( ! is_file( $path ) ) {
+		return $href;
+	}
+
+	return gutenberg_url( 'widgets/' . $dir_name . '/' . $relative );
+}
+
+/**
  * Constrains a widget's actions to their allowed shape: each entry keeps
  * `id`, `label`, and an `href` that survives `esc_url_raw()`; entries that
  * fail those checks are dropped. Optional `download` and `openInNewTab`
- * are copied when present. `data:` hrefs are allowed only when `download`
- * is set, so client-side file exports keep working without opening a
- * navigation XSS path.
+ * are copied when present. String `download` values are passed through
+ * `sanitize_file_name()`.
  *
- * @param array|null $actions Actions from the build manifest.
+ * When `$dir_name` is provided, hrefs that name a file under the widget's
+ * folder are rewritten to plugin URLs before sanitization.
+ *
+ * @param array|null $actions  Actions from the build manifest.
+ * @param string     $dir_name Optional. Widget directory name used to resolve
+ *                             widget-local asset hrefs.
  * @return array|null Sanitized actions, or null when there are none.
  */
-function gutenberg_sanitize_widget_actions( $actions ) {
+function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
 	if ( ! is_array( $actions ) ) {
 		return null;
 	}
@@ -137,12 +178,8 @@ function gutenberg_sanitize_widget_actions( $actions ) {
 			continue;
 		}
 
-		$protocols = wp_allowed_protocols();
-		if ( ! empty( $action['download'] ) ) {
-			$protocols[] = 'data';
-		}
-
-		$href = esc_url_raw( $action['href'], $protocols );
+		$href = gutenberg_resolve_widget_action_href( $action['href'], $dir_name );
+		$href = esc_url_raw( $href );
 		if ( ! $href ) {
 			continue;
 		}
@@ -154,9 +191,14 @@ function gutenberg_sanitize_widget_actions( $actions ) {
 		);
 
 		if ( isset( $action['download'] ) ) {
-			$entry['download'] = is_bool( $action['download'] )
-				? $action['download']
-				: (string) $action['download'];
+			if ( is_bool( $action['download'] ) ) {
+				$entry['download'] = $action['download'];
+			} else {
+				$filename = sanitize_file_name( (string) $action['download'] );
+				if ( $filename ) {
+					$entry['download'] = $filename;
+				}
+			}
 		}
 
 		if ( isset( $action['openInNewTab'] ) ) {
@@ -202,7 +244,10 @@ function gutenberg_register_widget_types() {
 				'title'         => $widget['title'] ?? null,
 				'description'   => $widget['description'] ?? null,
 				'help'          => gutenberg_sanitize_widget_help( $widget['help'] ?? null ),
-				'actions'       => gutenberg_sanitize_widget_actions( $widget['actions'] ?? null ),
+				'actions'       => gutenberg_sanitize_widget_actions(
+					$widget['actions'] ?? null,
+					$widget['dir_name'] ?? ''
+				),
 				'keywords'      => $widget['keywords'] ?? null,
 			)
 		);

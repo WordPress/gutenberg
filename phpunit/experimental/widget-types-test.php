@@ -8,6 +8,7 @@
  * @covers ::gutenberg_get_widget_metadata_i18n_schema
  * @covers ::gutenberg_sanitize_widget_help
  * @covers ::gutenberg_sanitize_widget_actions
+ * @covers ::gutenberg_resolve_widget_action_href
  */
 class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 
@@ -113,11 +114,9 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 
 	/**
 	 * Actions keep their shape, drop malformed entries, reject unsafe href
-	 * protocols, and allow `data:` only when `download` is set.
+	 * protocols, and sanitize download filenames.
 	 */
 	public function test_sanitize_widget_actions_constrains_hrefs() {
-		$csv = 'data:text/csv;charset=utf-8,metric,value';
-
 		$actions = gutenberg_sanitize_widget_actions(
 			array(
 				array(
@@ -129,7 +128,7 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 				array(
 					'id'       => 'export',
 					'label'    => 'Export CSV',
-					'href'     => $csv,
+					'href'     => 'admin.php?page=reports',
 					'download' => 'report.csv',
 				),
 				array(
@@ -138,13 +137,20 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 					'href'  => 'javascript:alert(1)',
 				),
 				array(
-					'id'    => 'data-without-download',
-					'label' => 'Data without download',
-					'href'  => $csv,
+					'id'       => 'data-url',
+					'label'    => 'Data URL',
+					'href'     => 'data:text/csv;charset=utf-8,metric,value',
+					'download' => 'report.csv',
 				),
 				array(
 					'id'    => 'missing-href',
 					'label' => 'Missing href',
+				),
+				array(
+					'id'       => 'nasty-filename',
+					'label'    => 'Nasty filename',
+					'href'     => 'https://wordpress.org/',
+					'download' => '../evil.csv',
 				),
 			)
 		);
@@ -160,11 +166,61 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 				array(
 					'id'       => 'export',
 					'label'    => 'Export CSV',
-					'href'     => $csv,
+					'href'     => 'admin.php?page=reports',
 					'download' => 'report.csv',
+				),
+				array(
+					'id'       => 'nasty-filename',
+					'label'    => 'Nasty filename',
+					'href'     => 'https://wordpress.org/',
+					'download' => 'evil.csv',
 				),
 			),
 			$actions
+		);
+	}
+
+	/**
+	 * Widget-local relative hrefs resolve to plugin URLs when the file exists
+	 * beside the widget; admin-relative targets are left alone.
+	 */
+	public function test_sanitize_widget_actions_resolves_local_assets() {
+		$actions = gutenberg_sanitize_widget_actions(
+			array(
+				array(
+					'id'       => 'download-lyrics',
+					'label'    => 'Download lyrics',
+					'href'     => 'hello-dolly-lyrics.txt',
+					'download' => 'hello-dolly-lyrics.txt',
+				),
+				array(
+					'id'    => 'health',
+					'label' => 'Site Health',
+					'href'  => 'site-health.php',
+				),
+				array(
+					'id'    => 'traversal',
+					'label' => 'Traversal',
+					'href'  => '../load.php',
+				),
+			),
+			'hello-dolly'
+		);
+
+		$this->assertCount( 2, $actions );
+		$this->assertSame( 'download-lyrics', $actions[0]['id'] );
+		$this->assertSame( 'hello-dolly-lyrics.txt', $actions[0]['download'] );
+		$this->assertStringEndsWith(
+			'/widgets/hello-dolly/hello-dolly-lyrics.txt',
+			$actions[0]['href']
+		);
+		$this->assertSame(
+			array(
+				'id'    => 'health',
+				'label' => 'Site Health',
+				'href'  => 'site-health.php',
+			),
+			$actions[1]
 		);
 	}
 

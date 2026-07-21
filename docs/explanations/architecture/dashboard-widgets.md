@@ -25,14 +25,15 @@ widgets/hello-world/
 ├── widget.json        static metadata (name, title, description, help, actions, keywords, category, presentation, textdomain)
 ├── widget.ts          metadata module: default-exports icon, attributes, example
 ├── render.tsx         render module: default-exports the React component
-└── style.module.css   optional, injected at runtime by the build
+├── style.module.css   optional, injected at runtime by the build
+└── report.csv         optional static asset linked from an action `href`
 ```
 
 The split between `widget.json` and `widget.ts` is deliberate. `widget.json` is build-time input: plain JSON the pipeline can read without executing code, including the translatable strings (`title`, `description`, `help`, `keywords`) the server localizes through `textdomain`.
 
 Unlike the other translatable strings, `help` is an object: `content` plus optional `links`, meant for compact surfaces such as tooltips.
 
-`actions` is a list of the declarative actions a widget exposes: each carries `id`, `label`, `href`, and optional `download` / `openInNewTab`, with the label translated. A host renders them as links and decides where; the dashboard surfaces them in a "More" menu. Because navigation and download are the browser's, the widget declares an intent and a target without knowing its surface.
+`actions` is a list of the declarative actions a widget exposes: each carries `id`, `label`, `href`, and optional `download` / `openInNewTab`, with the label translated. A host renders them as links and decides where; the dashboard surfaces them in a "More" menu. Because navigation and download are the browser's, the widget declares an intent and a target without knowing its surface. An `href` that names a file in the widget folder is rewritten to a plugin URL at registration; prefer that over embedding contents in a `data:` URL.
 
 `widget.ts` is the live half of the metadata: values that only exist in JavaScript, such as the icon element or the `attributes` field schema (including optional `relevance` hints) that hosts feed into `DataForm`.
 
