@@ -97,12 +97,26 @@ function block_core_slider_render_arrow_button_markup( $arrow_icon, $navigation_
 		$button_inner = $text_span . $icon_svg;
 	}
 
+	$button_classes = array(
+		'wp-block-slider-arrows-button',
+		'is-type-' . sanitize_html_class( $type ),
+		'is-icon-' . sanitize_html_class( $arrow_icon ),
+	);
+
+	if ( 'text' !== $navigation_button_type ) {
+		$button_classes[] = 'has-icon';
+	}
+
+	if ( 'icon' !== $navigation_button_type ) {
+		$button_classes[] = 'has-text';
+	}
+
+	if ( 'both' === $navigation_button_type && ! $is_previous ) {
+		$button_classes[] = 'has-icon-right';
+	}
+
 	$btn_attrs = array(
-		'class'                       => sprintf(
-			'wp-block-slider-arrows-button is-type-%s is-icon-%s',
-			sanitize_html_class( $type ),
-			sanitize_html_class( $arrow_icon )
-		),
+		'class'                       => implode( ' ', $button_classes ),
 		'type'                        => 'button',
 		'data-wp-interactive'         => 'core/slider',
 		'data-wp-on--click'           => $is_previous ? 'actions.prevSlide' : 'actions.nextSlide',

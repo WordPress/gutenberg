@@ -24,6 +24,18 @@ export function SliderNavigationButton( {
 	const isPrevious = type === 'previous';
 	const buttonLabel = isPrevious ? __( 'Previous' ) : __( 'Next' );
 	const icon = isPrevious ? icons.previous : icons.next;
+	const hasIcon = navigationButtonType !== 'text';
+	const hasText = navigationButtonType !== 'icon';
+	const buttonClasses = [
+		'wp-block-slider-arrows-button',
+		`is-type-${ type }`,
+		`is-icon-${ arrowIcon }`,
+		hasIcon && 'has-icon',
+		hasText && 'has-text',
+		hasIcon && hasText && ! isPrevious && 'has-icon-right',
+	]
+		.filter( Boolean )
+		.join( ' ' );
 	const iconElement = (
 		<WCIcon className="wp-block-slider-arrows-button__icon" icon={ icon } />
 	);
@@ -55,7 +67,7 @@ export function SliderNavigationButton( {
 	return (
 		<button
 			type="button"
-			className={ `wp-block-slider-arrows-button is-type-${ type } is-icon-${ arrowIcon }` }
+			className={ buttonClasses }
 			disabled
 			tabIndex={ -1 }
 		>
