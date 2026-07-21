@@ -13,29 +13,6 @@ import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
 /**
- * Returns true when the writing flow wrapper should be contentEditable: the
- * selected block supports `editableRoot`.
- *
- * @return {boolean} Whether the wrapper should be editable.
- */
-export function useHasEditableRoot() {
-	return useSelect( ( select ) => {
-		const { getSelectedBlockClientId, canHostEditableRoot } = unlock(
-			select( blockEditorStore )
-		);
-		return canHostEditableRoot( getSelectedBlockClientId() );
-	}, [] );
-}
-
-/**
- * Keeps the writing flow wrapper contentEditable while the selected block
- * supports `editableRoot`, so the native selection can extend across blocks.
- * While the wrapper is editable it must also hold focus: a nested editable
- * element cannot retain focus once an ancestor becomes an editing host (the
- * first DOM mutation moves focus to the host, inconsistently across
- * browsers).
- */
-/**
  * Keeps the writing flow wrapper contentEditable while the selected block
  * supports `editableRoot`, so the native selection can extend across blocks.
  * While the wrapper is editable it must also hold focus: a nested editable
@@ -45,11 +22,13 @@ export function useHasEditableRoot() {
  */
 export default function useEditableRoot() {
 	const registry = useRegistry();
-	const isZoomOut = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).isZoomOut(),
-		[]
-	);
-	const enabled = useHasEditableRoot() && ! isZoomOut;
+	const enabled = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, canHostEditableRoot, isZoomOut } =
+			unlock( select( blockEditorStore ) );
+		return (
+			! isZoomOut() && canHostEditableRoot( getSelectedBlockClientId() )
+		);
+	}, [] );
 
 	return useRefEffect(
 		( node ) => {
