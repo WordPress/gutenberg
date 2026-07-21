@@ -11,7 +11,7 @@ import {
 /**
  * Internal dependencies
  */
-import { getEventHandlers } from '../../writing-flow/editable-root-event-handlers';
+import { getEventHandlers } from '../../writing-flow/use-editable-root-event-handlers';
 import { BlockRefs } from '../../provider/block-refs-provider';
 
 /**
