@@ -1633,6 +1633,118 @@ describe( 'saveEntityRecord', () => {
 
 		expect( result ).toBe( postType );
 	} );
+
+	describe( 'autosave CRDT markers', () => {
+		const persistedRecord = {
+			id: 10,
+			title: 'Test post',
+			content: 'Test content',
+		};
+		let select;
+		let resolveSelect;
+		let syncManager;
+
+		beforeEach( () => {
+			dispatch.receiveAutosaves = jest.fn();
+			select = {
+				getRawEntityRecord: () => persistedRecord,
+			};
+			syncManager = {
+				markEntityAutosaved: jest.fn(),
+				update: jest.fn(),
+			};
+			getSyncManager.mockReturnValue( syncManager );
+		} );
+
+		afterEach( () => {
+			getSyncManager.mockReset();
+		} );
+
+		function makeResolveSelect( entityConfig ) {
+			return {
+				getEntitiesConfig: jest.fn( () => [ entityConfig ] ),
+			};
+		}
+
+		it( 'records an author-keyed autosave marker after an autosave revision is created', async () => {
+			resolveSelect = makeResolveSelect( {
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+			} );
+
+			const autosaveResponse = {
+				id: 20,
+				parent: 10,
+				author: 2,
+				modified_gmt: '2026-07-21T10:00:00',
+			};
+			apiFetch.mockImplementation( () => autosaveResponse );
+
+			await saveEntityRecord( 'postType', 'post', persistedRecord, {
+				isAutosave: true,
+			} )( { select, dispatch, resolveSelect } );
+
+			expect( dispatch.receiveAutosaves ).toHaveBeenCalledWith(
+				10,
+				autosaveResponse
+			);
+			expect( syncManager.markEntityAutosaved ).toHaveBeenCalledWith(
+				'postType/post',
+				10,
+				2,
+				Date.parse( '2026-07-21T10:00:00Z' ) / 1000
+			);
+		} );
+
+		it( 'does not record a marker when the server processed the autosave as a regular save', async () => {
+			resolveSelect = makeResolveSelect( {
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+			} );
+
+			// Same ID as the parent post, e.g. a promoted draft or a
+			// redundant no-op autosave.
+			const autosaveResponse = {
+				id: 10,
+				author: 2,
+				modified_gmt: '2026-07-21T10:00:00',
+			};
+			apiFetch.mockImplementation( () => autosaveResponse );
+
+			await saveEntityRecord( 'postType', 'post', persistedRecord, {
+				isAutosave: true,
+			} )( { select, dispatch, resolveSelect } );
+
+			expect( syncManager.markEntityAutosaved ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does not record a marker for entities without a sync config', async () => {
+			resolveSelect = makeResolveSelect( {
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+			} );
+
+			const autosaveResponse = {
+				id: 20,
+				parent: 10,
+				author: 2,
+				modified_gmt: '2026-07-21T10:00:00',
+			};
+			apiFetch.mockImplementation( () => autosaveResponse );
+
+			await saveEntityRecord( 'postType', 'post', persistedRecord, {
+				isAutosave: true,
+			} )( { select, dispatch, resolveSelect } );
+
+			expect( dispatch.receiveAutosaves ).toHaveBeenCalled();
+			expect( syncManager.markEntityAutosaved ).not.toHaveBeenCalled();
+		} );
+	} );
 } );
 
 describe( 'receiveUserPermission', () => {

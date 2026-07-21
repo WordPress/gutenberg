@@ -858,6 +858,53 @@ describe( 'SyncManager', () => {
 		} );
 	} );
 
+	describe( 'autosave markers', () => {
+		it( 'records and reads an author-keyed autosave marker', async () => {
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			manager.markEntityAutosaved( 'post', '123', 42, 1000 );
+
+			expect( manager.getEntityAutosavedAt( 'post', '123', 42 ) ).toBe(
+				1000
+			);
+			expect(
+				manager.getEntityAutosavedAt( 'post', '123', 7 )
+			).toBeUndefined();
+
+			// The marker lives in the state map, not the record map, so it
+			// does not touch the entity data or the undo scope.
+			const ydoc = capturedDoc as unknown as Y.Doc;
+			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+			expect( stateMap.get( `autosavedAt:42` ) ).toBe( 1000 );
+			expect( manager.undoManager?.hasUndo() ).toBe( false );
+		} );
+
+		it( 'no-ops for entities that are not loaded', async () => {
+			const manager = createSyncManager();
+
+			expect( () =>
+				manager.markEntityAutosaved( 'post', '456', 42, 1000 )
+			).not.toThrow();
+			expect(
+				manager.getEntityAutosavedAt( 'post', '456', 42 )
+			).toBeUndefined();
+		} );
+	} );
+
 	describe( 'shouldSync', () => {
 		it( 'skips loading entity when shouldSync returns false', async () => {
 			const manager = createSyncManager();
