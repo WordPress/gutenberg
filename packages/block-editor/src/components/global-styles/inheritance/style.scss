@@ -69,14 +69,18 @@
 	cursor: var(--wpds-cursor-control);
 
 	// Styles for when there is a Global Styles value to inherit.
-	&:not(.has-local-override)::before {
-		content: "";
-		display: block;
-		width: 6px;
-		height: 6px;
-		background-color: var(--wp-block-synced-color, #7a00df);
-		border-color: var(--wp-block-synced-color, #7a00df);
-		transform: rotate(45deg);
+	&:not(.has-local-override) {
+		&::before {
+			content: "";
+			display: block;
+			width: 6px;
+			height: 6px;
+			background-color: var(--wp-block-synced-color, #7a00df);
+			transform: rotate(45deg);
+		}
+		&:focus {
+			outline-color: var(--wp-block-synced-color, #7a00df);
+		}
 	}
 
 	// Styles for when that inherited value is overridden locally.
@@ -89,7 +93,6 @@
 			background-color: var(--wp-admin-theme-color, #007cba);
 			border-radius: 50%;
 		}
-
 		&:hover::before,
 		&:focus::before {
 			height: 2px;
