@@ -39,16 +39,12 @@ export function getEventHandlers( props ) {
  *
  * @param {string} clientId    Block client ID.
  * @param {Object} handlersRef Ref holding the block's handlers by event type.
+ *
+ * @return {Function} Cleanup function that removes the block's handlers.
  */
 export function setBlockEventHandlers( clientId, handlersRef ) {
 	handlersByClientId.set( clientId, handlersRef );
-}
-
-/**
- * @param {string} clientId Block client ID.
- */
-export function deleteBlockEventHandlers( clientId ) {
-	handlersByClientId.delete( clientId );
+	return () => handlersByClientId.delete( clientId );
 }
 
 /**

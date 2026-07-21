@@ -136,30 +136,33 @@ export default function useEditableRootEventHandlers() {
 				// The block that owns the selection and its block ancestors,
 				// innermost first, taking the hierarchy from the store and the
 				// elements from the block refs rather than walking the DOM.
-				const clientIds = [
+				// Only those with a handler for this event and a mounted
+				// element take part, like a bubbling event.
+				const targets = [
 					clientId,
 					...getBlockParents( clientId, true ),
-				];
+				]
+					.map( ( ancestorClientId ) => ( {
+						handler:
+							getBlockEventHandlers( ancestorClientId )?.[
+								event.type
+							],
+						element: refsMap.get( ancestorClientId ),
+					} ) )
+					.filter( ( { handler, element } ) => handler && element );
 
-				let syntheticEvent;
-				for ( const ancestorClientId of clientIds ) {
-					const handler =
-						getBlockEventHandlers( ancestorClientId )?.[
-							event.type
-						];
-					const element = refsMap.get( ancestorClientId );
+				if ( ! targets.length ) {
+					return;
+				}
 
-					if ( ! handler || ! element ) {
-						continue;
-					}
+				// One synthetic event for the whole chain, its currentTarget
+				// moved from block to block as it bubbles.
+				const syntheticEvent = createBlockSyntheticEvent(
+					new event.constructor( event.type, event ),
+					editable
+				);
 
-					if ( ! syntheticEvent ) {
-						syntheticEvent = createBlockSyntheticEvent(
-							new event.constructor( event.type, event ),
-							editable
-						);
-					}
-
+				for ( const { handler, element } of targets ) {
 					syntheticEvent.currentTarget = element;
 					handler( syntheticEvent );
 
@@ -168,7 +171,7 @@ export default function useEditableRootEventHandlers() {
 					}
 				}
 
-				if ( syntheticEvent?.nativeEvent.defaultPrevented ) {
+				if ( syntheticEvent.nativeEvent.defaultPrevented ) {
 					event.preventDefault();
 				}
 			}

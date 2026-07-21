@@ -9,7 +9,6 @@ import { useEffect, useInsertionEffect, useRef } from '@wordpress/element';
 import {
 	getEventHandlers,
 	setBlockEventHandlers,
-	deleteBlockEventHandlers,
 	noteEventTypes,
 } from '../../writing-flow/editable-root-event-handlers';
 
@@ -35,8 +34,8 @@ export function useRegisterBlockEventHandlers( clientId, wrapperProps ) {
 		}
 	} );
 
-	useEffect( () => {
-		setBlockEventHandlers( clientId, handlersRef );
-		return () => deleteBlockEventHandlers( clientId );
-	}, [ clientId ] );
+	useEffect(
+		() => setBlockEventHandlers( clientId, handlersRef ),
+		[ clientId ]
+	);
 }
