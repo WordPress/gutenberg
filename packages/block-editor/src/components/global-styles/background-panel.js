@@ -401,7 +401,7 @@ export default function BackgroundImagePanel( {
 							label: __( 'Color' ),
 							inheritedValue: backgroundColor,
 							// The picker matches selection by slug, following
-							// whichever value is displayed: `localSlug` once a
+							// whichever value is displayed: `userSlug` once a
 							// value is set, `inheritedSlug` at rest. Without
 							// the slugs it falls back to hex matching, which
 							// marks two same-hex presets as both selected.
@@ -409,7 +409,7 @@ export default function BackgroundImagePanel( {
 								inheritedValue?.color?.background,
 								'color'
 							),
-							localSlug: extractPresetSlug(
+							userSlug: extractPresetSlug(
 								value?.color?.background,
 								'color'
 							),

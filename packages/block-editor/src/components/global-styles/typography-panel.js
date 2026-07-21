@@ -826,7 +826,7 @@ export default function TypographyPanel( {
 								inheritedValue?.color?.text,
 								'color'
 							),
-							localSlug: extractPresetSlug(
+							userSlug: extractPresetSlug(
 								value?.color?.text,
 								'color'
 							),

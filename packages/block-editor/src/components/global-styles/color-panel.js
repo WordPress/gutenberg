@@ -324,7 +324,7 @@ export default function ColorPanel( {
 						inheritedValue?.elements?.link?.color?.text,
 						'color'
 					),
-					localSlug: extractPresetSlug(
+					userSlug: extractPresetSlug(
 						value?.elements?.link?.color?.text,
 						'color'
 					),
@@ -342,7 +342,7 @@ export default function ColorPanel( {
 							?.text,
 						'color'
 					),
-					localSlug: extractPresetSlug(
+					userSlug: extractPresetSlug(
 						value?.elements?.link?.[ ':hover' ]?.color?.text,
 						'color'
 					),
@@ -484,7 +484,7 @@ export default function ColorPanel( {
 						inheritedValue?.elements?.[ name ]?.color?.text,
 						'color'
 					),
-					localSlug: extractPresetSlug(
+					userSlug: extractPresetSlug(
 						value?.elements?.[ name ]?.color?.text,
 						'color'
 					),
@@ -502,7 +502,7 @@ export default function ColorPanel( {
 								?.background,
 							'color'
 						),
-						localSlug: extractPresetSlug(
+						userSlug: extractPresetSlug(
 							value?.elements?.[ name ]?.color?.background,
 							'color'
 						),
