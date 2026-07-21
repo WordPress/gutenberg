@@ -379,6 +379,23 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should register an icon with its `content` sanitized.
+	 */
+	public function test_register_icon_sanitizes_content() {
+		$name     = 'test-collection/unsafe-content';
+		$settings = array(
+			'label'   => 'Icon',
+			'content' => '<svg viewbox="0 0 24 24" onload="alert(1)"><path d="M0 0" /></svg>',
+		);
+
+		$result = $this->register( $name, $settings );
+		$this->assertTrue( $result );
+
+		$icon = $this->registry->get_registered_icon( $name );
+		$this->assertSame( '<svg viewbox="0 0 24 24"><path d="M0 0" /></svg>', $icon['content'] );
+	}
+
+	/**
 	 * Should fail to register an icon that provides both `content` and `file_path`.
 	 *
 	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register

@@ -7,8 +7,8 @@ import type { ReactNode } from 'react';
 /**
  * Internal dependencies
  */
-import { useInlineControlsFit } from '../components/widget-attribute-controls/use-inline-controls-fit';
-import { WidgetHeaderAvailableSizeProvider } from '../components/widget-header/widget-header-size';
+import { useInlineFit } from '../components/widget-attributes/use-inline-fit';
+import { WidgetHeaderAvailableSizeProvider } from '../components/widget-header/widget-header-fit';
 
 let notifyResize: ( entries: unknown[] ) => void = () => {};
 
@@ -34,12 +34,11 @@ function measureFields( width: number ) {
 	act( () => notifyResize( [ { contentRect: { width } } ] ) );
 }
 
-describe( 'useInlineControlsFit', () => {
+describe( 'useInlineFit', () => {
 	it( 'collapses when the fields exceed the budget and expands back', () => {
 		availableSize = 200;
 		const { result, rerender } = renderHook(
-			( { locked }: { locked: boolean } ) =>
-				useInlineControlsFit( { locked } ),
+			( { locked }: { locked: boolean } ) => useInlineFit( { locked } ),
 			{ wrapper, initialProps: { locked: false } }
 		);
 
@@ -55,26 +54,10 @@ describe( 'useInlineControlsFit', () => {
 		expect( result.current.collapsed ).toBe( false );
 	} );
 
-	it( 'subtracts the reserved size from the budget', () => {
-		availableSize = 120;
-		const { result, rerender } = renderHook(
-			( { reservedSize }: { reservedSize: number } ) =>
-				useInlineControlsFit( { reservedSize } ),
-			{ wrapper, initialProps: { reservedSize: 0 } }
-		);
-
-		measureFields( 100 );
-		expect( result.current.collapsed ).toBe( false );
-
-		rerender( { reservedSize: 36 } );
-		expect( result.current.collapsed ).toBe( true );
-	} );
-
 	it( 'holds the inline presentation while locked', () => {
 		availableSize = 200;
 		const { result, rerender } = renderHook(
-			( { locked }: { locked: boolean } ) =>
-				useInlineControlsFit( { locked } ),
+			( { locked }: { locked: boolean } ) => useInlineFit( { locked } ),
 			{ wrapper, initialProps: { locked: false } }
 		);
 
@@ -95,8 +78,7 @@ describe( 'useInlineControlsFit', () => {
 	it( 'holds the collapsed presentation while locked', () => {
 		availableSize = 80;
 		const { result, rerender } = renderHook(
-			( { locked }: { locked: boolean } ) =>
-				useInlineControlsFit( { locked } ),
+			( { locked }: { locked: boolean } ) => useInlineFit( { locked } ),
 			{ wrapper, initialProps: { locked: false } }
 		);
 

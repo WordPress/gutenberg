@@ -3,7 +3,8 @@
 /**
  * External dependencies
  */
-import { execSync, spawn } from 'child_process';
+import { execSync } from 'child_process';
+import spawn from 'cross-spawn';
 import { fileURLToPath } from 'url';
 import { parseArgs } from 'util';
 import path from 'path';
@@ -29,7 +30,6 @@ function exec( command, args = [], options = {} ) {
 		const childOptions = {
 			cwd: ROOT_DIR,
 			stdio: silent ? 'pipe' : 'inherit',
-			shell: true,
 			...spawnOptions,
 		};
 
@@ -90,7 +90,6 @@ function execAsync( command, args = [], options = {} ) {
 	return spawn( command, args, {
 		cwd: ROOT_DIR,
 		stdio: 'inherit',
-		shell: true,
 		...options,
 	} );
 }
@@ -231,7 +230,6 @@ async function dev() {
 		const buildWatch = spawn( 'wp-build', [ '--watch' ], {
 			cwd: ROOT_DIR,
 			stdio: [ 'inherit', 'pipe', 'inherit' ],
-			shell: true,
 			env: { ...process.env, NODE_ENV: 'development' },
 		} );
 
