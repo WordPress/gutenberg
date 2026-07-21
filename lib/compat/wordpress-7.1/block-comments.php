@@ -110,12 +110,15 @@ add_filter( 'render_block', 'gutenberg_strip_inline_note_markers' );
  * mention markup itself. Keeping it unconditional avoids per-comment-type
  * arming and disarming of kses state across the direct and REST write paths.
  *
- * @param array|string $allowed The allowed tags structure for the context.
- * @param string       $context The kses context.
- * @return array|string Modified allowed tags structure.
+* @param array<string, array<string, bool> $allowed The allowed tags structure for the context.
+* @param string                            $context The kses context.
+* @return array<string, array<string, bool> Modified allowed tags structure.
  */
-function gutenberg_notes_allow_mention_span( $allowed, $context ) {
-	if ( 'pre_comment_content' !== $context || ! is_array( $allowed ) ) {
+function gutenberg_notes_allow_mention_span( $allowed, string $context ): array {
+	if ( ! is_array( $allowed ) ) {
+		$allowed = array();
+	}
+	if ( 'pre_comment_content' !== $context ) {
 		return $allowed;
 	}
 
@@ -147,8 +150,11 @@ function gutenberg_notes_allow_mention_span( $allowed, $context ) {
  * @param string $content Slashed comment content, already filtered by kses.
  * @return string Slashed comment content with span classes reduced.
  */
-function gutenberg_notes_sanitize_mention_classes( $content ) {
-	if ( ! is_string( $content ) || false === has_filter( 'pre_comment_content', 'wp_filter_kses' ) ) {
+function gutenberg_notes_sanitize_mention_classes( $content ): string {
+	if ( ! is_string( $content ) ) {
+		$content = '';
+	}
+	if ( false === has_filter( 'pre_comment_content', 'wp_filter_kses' ) ) {
 		return $content;
 	}
 

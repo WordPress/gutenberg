@@ -34,11 +34,7 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 		// notes filter, the comment kses context strips `span` entirely.
 		remove_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_span' );
 
-		try {
-			$stripped = wp_kses( self::MENTION_CONTENT, 'pre_comment_content' );
-		} finally {
-			add_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_span', 10, 2 );
-		}
+		$stripped = wp_kses( self::MENTION_CONTENT, 'pre_comment_content' );
 
 		$this->assertSame( 'Hi @admin!', $stripped );
 	}
@@ -104,7 +100,7 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 		// must not narrow what core allows them to post. kses_init() hooks
 		// wp_filter_kses by default in the test environment, so detach it to
 		// simulate the unfiltered_html configuration.
-		$had_filter = remove_filter( 'pre_comment_content', 'wp_filter_kses' );
+		remove_filter( 'pre_comment_content', 'wp_filter_kses' );
 
 		$content = 'Hi <span class="components-button is-destructive">there</span>!';
 
