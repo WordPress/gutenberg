@@ -6,16 +6,12 @@ import {
 	useEffect,
 	useLayoutEffect,
 	useMemo,
-	useRef,
-	useState,
 } from '@wordpress/element';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 import {
 	EntityProvider,
 	useEntityBlockEditor,
 	store as coreStore,
-	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
@@ -25,13 +21,13 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { createBlock } from '@wordpress/blocks';
-import { getQueryArg } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
+import useAutosaveNotice from './use-autosave-notice';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
@@ -53,18 +49,8 @@ import MediaEditorModalMount from '../media/media-editor-modal';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
-const { getEntityAutosavedAt } = unlock( coreDataPrivateApis );
 
 const noop = () => {};
-
-/**
- * How long the deferred autosave notice waits for the author's autosave
- * marker to arrive from the sync backend before failing open and showing
- * the notice. Sync providers report 'connected' at different points relative
- * to the initial document sync, so a missing marker is not treated as
- * definitive until this wait expires.
- */
-const AUTOSAVE_NOTICE_SYNC_WAIT_MS = 3000;
 
 /**
  * These are global entities that are only there to split blocks into logical units
@@ -153,56 +139,6 @@ function useBlockEditorProps( post, template, mode ) {
 		rootLevelPost === 'post' ? onInput : onInputTemplate,
 		rootLevelPost === 'post' ? onChange : onChangeTemplate,
 	];
-}
-
-/**
- * Creates the warning notice about a more recent autosave.
- *
- * @param {Object}   props                      Function props.
- * @param {Object}   props.autosave             The `autosave` editor setting.
- * @param {Function} props.createWarningNotice  Action that creates the notice.
- * @param {Object}   props.registry             The data registry.
- * @param {Function} props.setCurrentRevisionId Action that opens a revision.
- */
-function showAutosaveExistsNotice( {
-	autosave,
-	createWarningNotice,
-	registry,
-	setCurrentRevisionId,
-} ) {
-	// The only place core exposes the autosave ID is the edit
-	// link, always `revision.php?revision=<autosave ID>`.
-	const autosaveId = Number( getQueryArg( autosave.editLink, 'revision' ) );
-	createWarningNotice(
-		__(
-			'There is an autosave of this post that is more recent than the version below.'
-		),
-		{
-			id: 'autosave-exists',
-			actions: [
-				{
-					label: __( 'View the autosave' ),
-					...( autosaveId
-						? {
-								onClick: () => {
-									// `disableVisualRevisions` is only set
-									// after mount, so read it at click time.
-									const { disableVisualRevisions } = registry
-										.select( editorStore )
-										.getEditorSettings();
-									if ( disableVisualRevisions ) {
-										window.location.href =
-											autosave.editLink;
-										return;
-									}
-									setCurrentRevisionId( autosaveId );
-								},
-						  }
-						: { url: autosave.editLink } ),
-				},
-			],
-		}
-	);
 }
 
 /**
@@ -373,7 +309,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setCurrentTemplateId,
 			setEditedPost,
 			setRenderingMode,
-			setCurrentRevisionId,
 		} = unlock( useDispatch( editorStore ) );
 		const { editEntityRecord } = useDispatch( coreStore );
 		const registry = useRegistry();
@@ -390,46 +325,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			},
 			[ editEntityRecord, post.type, post.id ]
 		);
-		const { createWarningNotice, removeNotice } =
-			useDispatch( noticesStore );
-
-		// Whether the "more recent autosave" notice decision is pending a
-		// signal from the shared document. Only set for collaborative posts.
-		const isAutosaveNoticeDeferredRef = useRef( false );
-
-		// Whether the deferred autosave notice has waited long enough for the
-		// autosave marker to arrive from the sync backend.
-		const [
-			hasAutosaveNoticeWaitExpired,
-			setHasAutosaveNoticeWaitExpired,
-		] = useState( false );
-
-		// Selected values used to run the deferred autosave notice effect
-		// below. The effect reads fresh store values when it runs.
-		const { autosaveSyncStatus, isCollaborationEnabledForPost } = useSelect(
-			( select ) => {
-				if ( ! settings.autosave?.authorId ) {
-					return {
-						autosaveSyncStatus: undefined,
-						isCollaborationEnabledForPost: false,
-					};
-				}
-
-				return {
-					autosaveSyncStatus: unlock(
-						select( coreStore )
-					).getEntitySyncConnectionStatus(
-						'postType',
-						post.type,
-						post.id
-					)?.status,
-					isCollaborationEnabledForPost: unlock(
-						select( editorStore )
-					).isCollaborationEnabledForCurrentPost(),
-				};
-			},
-			[ post.type, post.id, settings.autosave?.authorId ]
-		);
+		const { removeNotice } = useDispatch( noticesStore );
 
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
@@ -446,126 +342,16 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			if ( ! registry.select( editorStore ).__unstableIsEditorReady() ) {
 				setupEditor( post, initialEdits, settings.template );
 			}
-			if ( settings.autosave ) {
-				const canDeferAutosaveNotice =
-					settings.autosave.authorId &&
-					settings.autosave.modified &&
-					unlock(
-						registry.select( editorStore )
-					).isCollaborationEnabledForCurrentPost();
-
-				if ( canDeferAutosaveNotice ) {
-					// Under real-time collaboration the autosave content is
-					// usually already part of the shared document, making
-					// the notice redundant. Defer the decision until the
-					// shared document confirms the autosave, sync fails, or
-					// the wait expires (see the effects below).
-					isAutosaveNoticeDeferredRef.current = true;
-				} else {
-					showAutosaveExistsNotice( {
-						autosave: settings.autosave,
-						createWarningNotice,
-						registry,
-						setCurrentRevisionId,
-					} );
-				}
-			}
 
 			// The dependencies of the hook are omitted deliberately
 			// We only want to run setupEditor (with initialEdits) only once per post.
 			// A better solution in the future would be to split this effect into multiple ones.
 		}, [] );
 
-		// Backstop timer for the deferred autosave notice decision below.
-		useEffect( () => {
-			if ( ! isAutosaveNoticeDeferredRef.current ) {
-				return;
-			}
-
-			const timeoutId = setTimeout( () => {
-				setHasAutosaveNoticeWaitExpired( true );
-			}, AUTOSAVE_NOTICE_SYNC_WAIT_MS );
-
-			return () => clearTimeout( timeoutId );
-			// The wait starts once, on mount, alongside the deferral above.
-		}, [] );
-
-		// Deferred autosave notice decision for collaborative posts. Decides
-		// at most once. The notice is suppressed as soon as the author's
-		// autosave marker in the CRDT document confirms that the autosave
-		// content is already part of the shared document; the marker is the
-		// only positive signal, so the decision holds for any sync provider
-		// regardless of what its connection status implies about the initial
-		// document sync. Without that signal, the notice is shown (fail open)
-		// once sync fails, collaboration is disabled, or the wait expires,
-		// because the autosave may then be the only copy of the content.
-		useEffect( () => {
-			if ( ! isAutosaveNoticeDeferredRef.current ) {
-				return;
-			}
-
-			const autosavedAt = getEntityAutosavedAt(
-				'postType',
-				post.type,
-				post.id,
-				settings.autosave.authorId
-			);
-			const isAutosaveInSharedDocument =
-				!! autosavedAt && autosavedAt >= settings.autosave.modified;
-
-			const isCollaborationEnabled = unlock(
-				registry.select( editorStore )
-			).isCollaborationEnabledForCurrentPost();
-			const syncStatus = unlock(
-				registry.select( coreStore )
-			).getEntitySyncConnectionStatus(
-				'postType',
-				post.type,
-				post.id
-			)?.status;
-
-			let shouldShowNotice;
-
-			if ( isAutosaveInSharedDocument ) {
-				shouldShowNotice = false;
-			} else if ( ! isCollaborationEnabled ) {
-				// Collaboration was disabled after mount (e.g. incompatible
-				// metaboxes were detected). Sync will never connect.
-				shouldShowNotice = true;
-			} else if ( 'disconnected' === syncStatus ) {
-				// The connection failed before it was established, so the
-				// shared document may be missing the autosaved content.
-				shouldShowNotice = true;
-			} else if ( hasAutosaveNoticeWaitExpired ) {
-				// The marker did not arrive in time. Treat the autosave as
-				// missing from the shared document.
-				shouldShowNotice = true;
-			} else {
-				// Keep waiting for a definitive signal.
-				return;
-			}
-
-			isAutosaveNoticeDeferredRef.current = false;
-
-			if ( shouldShowNotice ) {
-				showAutosaveExistsNotice( {
-					autosave: settings.autosave,
-					createWarningNotice,
-					registry,
-					setCurrentRevisionId,
-				} );
-			}
-			// The decision must run at most once. `settings.autosave` and the
-			// notice actions are stable for the lifetime of the provider; the
-			// selected values only trigger re-evaluation.
-			// eslint-disable-next-line react-hooks/exhaustive-deps
-		}, [
-			autosaveSyncStatus,
-			hasAutosaveNoticeWaitExpired,
-			isCollaborationEnabledForPost,
-			post.type,
-			post.id,
-		] );
+		// Manages the "more recent autosave" notice. Called after the mount
+		// effect above so that its own mount effect runs once `setupEditor`
+		// has populated the current post.
+		useAutosaveNotice( { post, recovery, settings } );
 
 		// Synchronizes the active post with the state
 		useEffect( () => {
