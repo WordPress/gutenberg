@@ -1,9 +1,9 @@
 /**
  * Merges space-separated `rel` tokens into an existing value, deduplicating.
  *
- * @param rel    Existing `rel` attribute value, if any.
- * @param tokens Tokens to ensure are present.
- * @return Deduplicated `rel` string.
+ * @param {string | undefined}    rel    - Existing `rel` attribute value, if any.
+ * @param {ReadonlyArray<string>} tokens - Tokens to ensure are present.
+ * @return {string} Deduplicated `rel` string.
  */
 export function ensureRelTokens(
 	rel: string | undefined,
