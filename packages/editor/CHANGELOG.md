@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Notes: Stop deepening an inline note marker's tint on hover, focus, and selection. The tint sits behind the text and is subtracted from whatever contrast the theme provides, so emphasis is now an author-colored underline instead ([#80543](https://github.com/WordPress/gutenberg/issues/80543)).
 -   `mediaUpload`: Add an `isTransportOnly` parameter, set by the `@wordpress/upload-media` queue, which owns progress tracking and save locking for its own items and uses this function only as its server transport. Fixes the progress snackbar showing "1 of 2" for a single HEIC upload in Safari ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
 
 ## 14.51.0 (2026-07-14)

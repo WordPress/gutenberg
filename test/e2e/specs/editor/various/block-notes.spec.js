@@ -1327,9 +1327,9 @@ test.describe( 'Block Notes', () => {
 			const mark = editor.canvas.locator( 'mark.wp-note' ).first();
 			await expect( mark ).toBeVisible();
 
-			// Creating a note auto-selects it, which renders the marker at the
-			// active opacity. Move focus to the title to deselect so the marker
-			// settles back to its rest tint.
+			// Creating a note auto-selects it, which emphasizes the marker with
+			// an underline. Move focus to the title to deselect so only the
+			// tint is left to assert on.
 			await editor.canvas
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.click();
@@ -1594,10 +1594,16 @@ test.describe( 'Block Notes', () => {
 			await expect( paragraph ).toHaveText( 'Hello brave new world.' );
 		} );
 
-		test( 'boosts the marker opacity when its note is selected', async ( {
+		test( 'underlines the marker when its note is selected, without deepening the tint', async ( {
 			editor,
 			page,
+			requestUtils,
 		} ) => {
+			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
+			const expectedColor =
+				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ];
+			const { r, g, b } = hexToRgb( expectedColor );
+
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 				attributes: { content: 'Select my note.' },
@@ -1633,22 +1639,36 @@ test.describe( 'Block Notes', () => {
 				);
 				return match && match[ 4 ] ? Number( match[ 4 ] ) : 1;
 			};
+			const underlineOf = async () =>
+				mark.evaluate( ( el ) => {
+					const style = window.getComputedStyle( el );
+					return `${ style.textDecorationLine } ${ style.textDecorationColor }`;
+				} );
 
 			// Deselect the freshly added note (focus the title) so the marker
-			// drops to its rest tint (≈0x40/255).
+			// settles into its unemphasized state.
 			await editor.canvas
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.click();
-			await expect.poll( alphaOf ).toBeLessThan( 0.35 );
+			await expect.poll( underlineOf ).toContain( 'none' );
 
-			// Selecting the note from the sidebar promotes its marker to the
-			// stronger active alpha (≈0x80/255) via the selected-note rule.
+			// Selecting the note from the sidebar emphasizes its marker with an
+			// underline in the author's color.
 			await page
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'treeitem', { name: 'Note: Pick me' } )
 				.click();
 
-			await expect.poll( alphaOf ).toBeGreaterThan( 0.4 );
+			await expect
+				.poll( underlineOf )
+				.toBe( `underline rgb(${ r }, ${ g }, ${ b })` );
+
+			/*
+			 * The tint behind the text must not deepen with the emphasis: it is
+			 * subtracted from whatever contrast the theme already provides, and
+			 * CSS cannot measure the composited result. See #80543.
+			 */
+			expect( await alphaOf() ).toBeLessThan( 0.35 );
 		} );
 	} );
 
