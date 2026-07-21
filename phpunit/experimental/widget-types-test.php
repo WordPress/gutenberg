@@ -113,8 +113,7 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Actions keep their shape, drop malformed entries, reject unsafe href
-	 * protocols, and sanitize download filenames.
+	 * Drops unsafe or malformed actions; sanitizes download filenames.
 	 */
 	public function test_sanitize_widget_actions_constrains_hrefs() {
 		$actions = gutenberg_sanitize_widget_actions(
@@ -181,8 +180,7 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Widget-local relative hrefs resolve to plugin URLs when the file exists
-	 * beside the widget; admin-relative targets are left alone.
+	 * Resolves widget-local files; leaves admin-relative hrefs alone.
 	 */
 	public function test_sanitize_widget_actions_resolves_local_assets() {
 		$actions = gutenberg_sanitize_widget_actions(
