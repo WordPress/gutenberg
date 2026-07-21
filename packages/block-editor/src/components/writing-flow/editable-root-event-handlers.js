@@ -54,15 +54,12 @@ export function setBlockEventHandlers( clientId, handlersRef ) {
  * @param {Object} handlers Handlers by event type.
  */
 export function noteEventTypes( handlers ) {
-	let grew = false;
+	const size = eventTypes.size;
 	for ( const type in handlers ) {
-		if ( ! eventTypes.has( type ) ) {
-			eventTypes.add( type );
-			grew = true;
-		}
+		eventTypes.add( type );
 	}
 
-	if ( grew ) {
+	if ( eventTypes.size > size ) {
 		eventTypesSnapshot = [ ...eventTypes ];
 		subscribers.forEach( ( callback ) => callback() );
 	}
