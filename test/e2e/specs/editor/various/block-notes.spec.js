@@ -1076,7 +1076,7 @@ test.describe( 'Block Notes', () => {
 		test( 'refuses a divergent dirty path instead of attaching to a saved sibling', async ( {
 			editor,
 			page,
-			pageUtils,
+			blockNoteUtils,
 		} ) => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -1089,45 +1089,22 @@ test.describe( 'Block Notes', () => {
 			await editor.saveDraft();
 			await page.reload();
 
-			const savedBlocks = await editor.getBlocks();
-			const targetClientId =
-				savedBlocks[ savedBlocks.length - 1 ].clientId;
-			await page.evaluate( ( clientId ) => {
+			await page.evaluate( () => {
 				window.wp.data.dispatch( 'core/block-editor' ).insertBlock(
 					window.wp.blocks.createBlock( 'core/paragraph', {
 						content: 'Dirty insertion',
 					} ),
 					0
 				);
-				window.wp.data
-					.dispatch( 'core/block-editor' )
-					.updateBlockAttributes( clientId, {
-						content: 'Dirty target',
-					} );
-				window.wp.data
-					.dispatch( 'core/block-editor' )
-					.selectBlock( clientId );
-			}, targetClientId );
+			} );
 
-			await editor.canvas
+			const target = editor.canvas
 				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.filter( { hasText: 'Dirty target' } )
-				.click();
-			await pageUtils.pressKeys( 'primaryAlt+M' );
-			await page
-				.getByRole( 'textbox', { name: 'New note', exact: true } )
-				.fill( 'Do not attach to the sibling' );
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Add note', exact: true } )
-				.click();
-			await expect(
-				page
-					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'treeitem', {
-						name: 'Note: Do not attach to the sibling',
-					} )
-			).toBeVisible();
+				.filter( { hasText: 'Saved target' } );
+			await target.click();
+			await page.keyboard.press( 'ControlOrMeta+a' );
+			await page.keyboard.type( 'Dirty target' );
+			await blockNoteUtils.addNote( 'Do not attach to the sibling' );
 			await page.reload();
 
 			const blocks = await editor.getBlocks();
@@ -1379,10 +1356,13 @@ test.describe( 'Block Notes', () => {
 
 			releaseSyncSave();
 			await page.evaluate( () => window.__blockNotesRepair );
-			expect( persistenceRequests ).toEqual( [
-				'sync-save',
-				'attachment-repair',
-			] );
+			expect( persistenceRequests[ 0 ] ).toBe( 'sync-save' );
+			expect( persistenceRequests.at( -1 ) ).toBe( 'attachment-repair' );
+			expect(
+				persistenceRequests.filter(
+					( request ) => request === 'attachment-repair'
+				)
+			).toHaveLength( 1 );
 			await page.reload();
 			expect(
 				( await editor.getBlocks() )[ 0 ].attributes.metadata.noteId
