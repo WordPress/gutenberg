@@ -808,9 +808,25 @@ class WP_Navigation_Block_Renderer {
 				data-wp-bind--aria-label="state.ariaLabel"
 				data-wp-bind--role="state.roleAttribute"
 			';
-			$close_button_directives                 = '
+			/**
+			 * Filters whether the default overlay close button's position
+			 * should be synced at runtime to match the toggle button's
+			 * on-screen position.
+			 *
+			 * @since 6.9.0
+			 *
+			 * @param bool $sync_close_button_position Whether to sync the close button's position. Default true.
+			 */
+			$sync_close_button_position = apply_filters(
+				'block_core_navigation_sync_close_button_position',
+				true
+			);
+
+			$close_button_directives                 = $sync_close_button_position ? '
 				data-wp-on--click="actions.closeMenuOnClick"
 				data-wp-watch="callbacks.positionCloseButton"
+			' : '
+				data-wp-on--click="actions.closeMenuOnClick"
 			';
 			$responsive_container_content_directives = '
 				data-wp-watch="callbacks.focusFirstElement"
