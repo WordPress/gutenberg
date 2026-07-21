@@ -363,4 +363,129 @@ test.describe( 'Autosave', () => {
 			await page.evaluate( () => window.sessionStorage.length )
 		).toBe( 0 );
 	} );
+
+	test( 'should be able to undo local autosave restore', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.keyboard.type( ' after save' );
+
+		// Trigger local autosave.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+		// Reload without saving on the server.
+		await page.reload();
+
+		await expect(
+			page.locator( '.components-notice__content' )
+		).toContainText(
+			'The backup of this post in your browser is different from the version below.'
+		);
+
+		await page
+			.getByRole( 'button', { name: 'Restore the backup' } )
+			.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save after save' },
+			},
+		] );
+
+		await page
+			.locator( '.components-snackbar' )
+			.getByRole( 'button', { name: 'Undo' } )
+			.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save' },
+			},
+		] );
+	} );
+
+	test( 'should be able to undo remote autosave restore', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await editor.publishPost();
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.click();
+		// Type slowly to ensure that autosave happens more than 1s after publish.
+		await page.keyboard.type( ' after save', { delay: 100 } );
+
+		// Trigger remote autosave.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+
+		await expect
+			.poll( async () => {
+				return await page.evaluate( () => {
+					const postId = window.wp.data
+						.select( 'core/editor' )
+						.getCurrentPostId();
+					const autosaves = window.wp.data
+						.select( 'core' )
+						.getAutosaves( 'post', postId );
+
+					return autosaves?.length ?? 0;
+				} );
+			} )
+			.toBeGreaterThanOrEqual( 1 );
+
+		// Force conflicting local autosave.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+
+		await page.reload();
+		await page.waitForFunction( () => window?.wp?.data );
+
+		// Only remote autosave notice should be applied.
+		await expect(
+			page.locator( '.components-notice__content' )
+		).toContainText(
+			'There is an autosave of this post that is more recent than the version below.'
+		);
+
+		await page
+			.getByRole( 'button', { name: 'Restore the autosave' } )
+			.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save after save' },
+			},
+		] );
+
+		await page
+			.locator( '.components-snackbar' )
+			.getByRole( 'button', { name: 'Undo' } )
+			.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save' },
+			},
+		] );
+	} );
 } );
