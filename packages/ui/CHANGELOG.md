@@ -9,7 +9,7 @@
 
 ### Bug Fixes
 
--   `Link`: Set `rel="noopener noreferrer"` when `openInNewTab` is enabled ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   `Link`: Set `rel="noopener noreferrer"` when `openInNewTab` is enabled ([#80513](https://github.com/WordPress/gutenberg/pull/80513)).
 -   Keep overlays in the compat overlay slot available to assistive technologies when used alongside `@wordpress/components` Modal ([#80310](https://github.com/WordPress/gutenberg/pull/80310)).
 
 ### Code Quality
