@@ -39,36 +39,42 @@ export function getContrast(
 }
 
 /**
- * Assert that a seed-color string is sRGB-parseable (hex, `rgb()`/`rgba()`, or
- * a CSS named color), throwing otherwise.
+ * Assert that a seed-color string is sRGB-parseable and fully opaque (hex,
+ * `rgb()`/`rgba()`, or a CSS named color), throwing otherwise.
  *
  * Rejection is deterministic regardless of which `ColorSpace`s are globally
- * registered: `clampToGamut` registers `OKLCH`, which would otherwise make
- * `oklch()` strings parse, but their space id is `oklch` (not `srgb`) so they
- * are still rejected.
+ * registered.
  *
  * @param seed The seed-color string to validate.
- * @throws If `seed` is not an sRGB-parseable string.
+ * @throws If `seed` is not an sRGB-parseable, fully opaque string.
  */
 export function assertValidSeedColor( seed: string ): void {
 	ALLOWED_SEED_COLOR_SPACES.forEach( ( space ) =>
 		ColorSpace.register( space )
 	);
 
-	let spaceId: string;
+	let parsedColor: ReturnType< typeof parse >;
 	try {
-		( { spaceId } = parse( seed ) );
+		parsedColor = parse( seed );
 	} catch {
 		throw new Error(
-			`Unsupported seed color "${ seed }": expected a hex value, an \`rgb()\`/\`rgba()\` string, or a CSS named color.`
+			`Unsupported seed color "${ seed }": expected a fully opaque hex value, an \`rgb()\`/\`rgba()\` string, or a CSS named color.`
 		);
 	}
+
+	const { alpha = 1, spaceId } = parsedColor;
 
 	if (
 		! ALLOWED_SEED_COLOR_SPACES.some( ( space ) => space.id === spaceId )
 	) {
 		throw new Error(
-			`Unsupported seed color "${ seed }": expected a hex value, an \`rgb()\`/\`rgba()\` string, or a CSS named color, but received a \`${ spaceId }\` color.`
+			`Unsupported seed color "${ seed }": expected a fully opaque hex value, an \`rgb()\`/\`rgba()\` string, or a CSS named color, but received a \`${ spaceId }\` color.`
+		);
+	}
+
+	if ( alpha !== 1 ) {
+		throw new Error(
+			`Unsupported seed color "${ seed }": expected a fully opaque color.`
 		);
 	}
 }
@@ -79,8 +85,5 @@ export function assertValidSeedColor( seed: string ): void {
  */
 export function clampToGamut( c: string | PlainColorObject ) {
 	ColorSpace.register( sRGB );
-	// Workaround for upstream toGamut(method:'css') bug.
-	// https://github.com/color-js/color.js/pull/734
-	ColorSpace.register( OKLCH );
 	return to( toGamut( c, { space: sRGB, method: 'css' } ), OKLCH );
 }

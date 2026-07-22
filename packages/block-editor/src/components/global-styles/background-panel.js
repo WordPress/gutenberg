@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -21,6 +18,11 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
+import {
+	getInheritanceProps,
+	InheritanceToolsPanelItem,
+	ENABLE_GLOBAL_STYLES_INHERITANCE,
+} from './inheritance';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
@@ -168,6 +170,7 @@ export default function BackgroundImagePanel( {
 	defaultValues = {},
 	headerLabel = __( 'Background' ),
 	contrastWarning,
+	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
 } ) {
 	const {
 		colors,
@@ -259,6 +262,9 @@ export default function BackgroundImagePanel( {
 		onChange( newValue );
 	};
 
+	// Non-cascading root values are already dropped from `inheritedValue` by
+	// the builder, so inherited reads below are direct.
+
 	// Background color (written to `color.background`).
 	const backgroundColor = decodeValue( inheritedValue?.color?.background );
 	const userBackgroundColor = decodeValue( value?.color?.background );
@@ -327,6 +333,21 @@ export default function BackgroundImagePanel( {
 		onChange( newValue );
 	};
 
+	const inheritanceProps = ( isInherited, hasLocalOverride, classNames ) =>
+		showInheritanceLabelIndicators
+			? getInheritanceProps( isInherited, hasLocalOverride, classNames )
+			: { className: classNames };
+
+	// The inherited value arrives already resolved (refs + theme-file pointers)
+	// with non-cascading root values dropped, so a presence check drives the
+	// label affordance and matches what `BackgroundImageControl` renders.
+	const inheritedBackgroundImage = hasBackgroundImageValue( {
+		background: {
+			backgroundImage: inheritedValue?.background?.backgroundImage,
+		},
+	} );
+	const hasLocalBackgroundImage = hasBackgroundImageValue( value );
+
 	return (
 		<Wrapper
 			resetAllFilter={ resetAllFilter }
@@ -336,8 +357,13 @@ export default function BackgroundImagePanel( {
 			headerLabel={ headerLabel }
 		>
 			{ showBackgroundImageControl && (
-				<ToolsPanelItem
-					className="block-editor-color-gradient-item"
+				<InheritanceToolsPanelItem
+					{ ...inheritanceProps(
+						inheritedBackgroundImage && ! hasLocalBackgroundImage,
+						hasLocalBackgroundImage && inheritedBackgroundImage,
+						'block-editor-color-gradient-item'
+					) }
+					showLocalOverrideActionsInLabel={ false }
 					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
 					onDeselect={ resetBackground }
@@ -351,8 +377,11 @@ export default function BackgroundImagePanel( {
 						inheritedValue={ inheritedValue }
 						defaultControls={ defaultControls }
 						defaultValues={ defaultValues }
+						showInheritanceLabelIndicators={
+							showInheritanceLabelIndicators
+						}
 					/>
-				</ToolsPanelItem>
+				</InheritanceToolsPanelItem>
 			) }
 			{ showBackgroundColorControl && (
 				<ColorGradientDropdownItem
@@ -362,30 +391,36 @@ export default function BackgroundImagePanel( {
 					isShownByDefault={ defaultControls.backgroundColor }
 					indicators={ [ userBackgroundColor ?? backgroundColor ] }
 					contrastWarning={ contrastWarning }
+					showInheritanceLabelIndicators={
+						showInheritanceLabelIndicators
+					}
+					isPlaceholder={
+						userBackgroundColor === undefined &&
+						backgroundColor !== undefined
+					}
+					hasInheritedValue={ backgroundColor !== undefined }
 					tabs={ [
 						{
 							key: 'background',
 							label: __( 'Color' ),
-							inheritedValue:
-								userBackgroundColor ?? backgroundColor,
-							// Resolve the slug from the same source as the
-							// displayed value (user value first, then the
-							// inherited fallback). For a block instance the
-							// selection lives in `value` while `inheritedValue`
-							// only holds the global styles fallback, so reading
-							// the slug from `inheritedValue` alone would miss it
-							// and two same-hex presets would both appear selected.
-							inheritedSlug:
-								extractPresetSlug(
-									value?.color?.background,
-									'color'
-								) ??
-								extractPresetSlug(
-									inheritedValue?.color?.background,
-									'color'
-								),
+							inheritedValue: backgroundColor,
+							// The picker selects by slug: `userSlug` when the
+							// block has its own value, otherwise
+							// `inheritedSlug`. Hex matching would mark two
+							// same-hex presets as both selected.
+							inheritedSlug: extractPresetSlug(
+								inheritedValue?.color?.background,
+								'color'
+							),
+							userSlug: extractPresetSlug(
+								value?.color?.background,
+								'color'
+							),
 							setValue: setBackgroundColor,
 							userValue: userBackgroundColor,
+							isPlaceholder:
+								userBackgroundColor === undefined &&
+								backgroundColor !== undefined,
 						},
 					] }
 					colorGradientControlSettings={ {
@@ -401,16 +436,26 @@ export default function BackgroundImagePanel( {
 					hasValue={ () => hasBackgroundGradientValue( value ) }
 					resetValue={ resetGradient }
 					isShownByDefault={ defaultControls.gradient }
-					indicators={ [ currentGradient ] }
+					indicators={ [ currentGradient ?? inheritedGradient ] }
+					showInheritanceLabelIndicators={
+						showInheritanceLabelIndicators
+					}
+					isPlaceholder={
+						currentGradient === undefined &&
+						inheritedGradient !== undefined
+					}
+					hasInheritedValue={ inheritedGradient !== undefined }
 					tabs={ [
 						{
 							key: 'gradient',
 							label: __( 'Gradient' ),
-							inheritedValue:
-								currentGradient ?? inheritedGradient,
+							inheritedValue: inheritedGradient,
 							setValue: setGradient,
 							userValue: currentGradient,
 							isGradient: true,
+							isPlaceholder:
+								currentGradient === undefined &&
+								inheritedGradient !== undefined,
 						},
 					] }
 					colorGradientControlSettings={ {
@@ -429,15 +474,25 @@ export default function BackgroundImagePanel( {
 					indicators={ [
 						userLegacyColorGradient ?? legacyColorGradient,
 					] }
+					showInheritanceLabelIndicators={
+						showInheritanceLabelIndicators
+					}
+					isPlaceholder={
+						userLegacyColorGradient === undefined &&
+						legacyColorGradient !== undefined
+					}
+					hasInheritedValue={ legacyColorGradient !== undefined }
 					tabs={ [
 						{
 							key: 'gradient',
 							label: __( 'Gradient' ),
-							inheritedValue:
-								userLegacyColorGradient ?? legacyColorGradient,
+							inheritedValue: legacyColorGradient,
 							setValue: setLegacyColorGradient,
 							userValue: userLegacyColorGradient,
 							isGradient: true,
+							isPlaceholder:
+								userLegacyColorGradient === undefined &&
+								legacyColorGradient !== undefined,
 						},
 					] }
 					colorGradientControlSettings={ {

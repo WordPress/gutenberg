@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove the `window.__heicUploadSupport` type declaration, following the removal of the redundant flag ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
+
+## 5.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 5.50.0 (2026-07-01)
+
 ## 5.49.0 (2026-06-24)
 
 ## 5.48.1 (2026-06-16)

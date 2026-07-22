@@ -21,10 +21,11 @@ import type { WidgetName } from '@wordpress/widget-primitives';
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardContainerColumnCount } from '../../hooks/use-dashboard-container-column-count';
+import { WidgetActions } from '../widget-actions';
+import { WidgetAttributes } from '../widget-attributes';
 import { WidgetChrome } from '../widget-chrome';
 import { WidgetHeader } from '../widget-header';
 import { WidgetLayoutControls } from '../widget-layout-controls';
-import { WidgetSettingsTrigger } from '../widget-settings';
 import { WidgetToolbar } from '../widget-toolbar';
 import { WidgetResizeHandle } from './widget-resize-handle';
 import styles from './widgets.module.css';
@@ -134,28 +135,50 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				( type ) => type.name === widget.type
 			);
 			const hasSettings = !! widgetType?.attributes?.length;
+			const hasActions = !! widgetType?.actions?.length;
 
-			// Grid-slot overlay (outside the card's `inert`) with the active
-			// mode's controls: layout while customizing, the gear otherwise.
+			const isFullBleed = widgetType?.presentation === 'full-bleed';
+
+			// The active mode's controls: layout while customizing, the
+			// attribute controls (high-relevance fields on the prominent
+			// surface, plus a settings entry point when needed) and the
+			// declared actions otherwise.
 			let controls: React.ReactNode;
 			if ( editMode ) {
 				controls = <WidgetLayoutControls widget={ widget } />;
-			} else if ( hasSettings && widgetType ) {
+			} else if ( ( hasSettings || hasActions ) && widgetType ) {
 				controls = (
-					<WidgetSettingsTrigger
-						widget={ widget }
-						widgetType={ widgetType }
-					/>
+					<>
+						{ hasSettings && (
+							<WidgetAttributes
+								widget={ widget }
+								widgetType={ widgetType }
+							/>
+						) }
+
+						{ hasActions && (
+							<WidgetActions widgetType={ widgetType } />
+						) }
+					</>
 				);
 			}
 
-			const actionableArea = controls ? (
-				<WidgetHeader overlay>
-					<WidgetToolbar revealOnHover={ ! editMode }>
-						{ controls }
-					</WidgetToolbar>
-				</WidgetHeader>
+			const toolbar = controls ? (
+				<WidgetToolbar editMode={ editMode }>
+					{ controls }
+				</WidgetToolbar>
 			) : undefined;
+
+			// Normal mode hosts the toolbar in the in-card header, beside the
+			// identity. Customize controls and full-bleed widgets need it in
+			// the grid's actionable-area slot instead: the slot sits outside
+			// the draggable card, so the controls stay clickable (in-card they
+			// would be captured by the drag listeners).
+			const inSlot = editMode || isFullBleed;
+			const actionableArea =
+				inSlot && toolbar ? (
+					<WidgetHeader overlay>{ toolbar }</WidgetHeader>
+				) : undefined;
 
 			return (
 				<WidgetChrome
@@ -163,16 +186,17 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 					widget={ widget }
 					index={ index }
 					className={ clsx( styles.tile, {
-						[ styles.tileEditMode ]: editMode,
+						[ styles[ 'tile-edit-mode' ] ]: editMode,
 					} ) }
 					actionableArea={ actionableArea }
+					headerToolbar={ ! inSlot ? toolbar : undefined }
 				/>
 			);
 		} );
 
 		const renderDragPreview = useCallback(
 			( { children: clone }: DragPreviewRenderProps ) => (
-				<div className={ styles.dragPreview }>{ clone }</div>
+				<div className={ styles[ 'drag-preview' ] }>{ clone }</div>
 			),
 			[]
 		);

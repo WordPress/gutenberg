@@ -12,6 +12,7 @@ import { Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
+import { useReserveHeaderPadding } from '../widget-header/widget-header-fit';
 import styles from './widget-toolbar.module.css';
 
 export interface WidgetToolbarProps {
@@ -21,29 +22,33 @@ export interface WidgetToolbarProps {
 	children: ReactNode;
 
 	/**
-	 * Subtle hover-revealed surface (normal) vs solid always-visible (customize).
+	 * Lift the toolbar with a shadow while customizing.
 	 */
-	revealOnHover?: boolean;
+	editMode?: boolean;
 }
 
 /**
- * The per-tile toolbar chip holding the active mode's controls. Solid and always
- * visible while customizing; subtle and revealed on hover in normal mode.
+ * The per-tile toolbar chip holding the active mode's controls.
+ * Always visible; lifted with a shadow only while customizing.
  *
  * @param {WidgetToolbarProps} props Component props.
  */
 export function WidgetToolbar( {
 	children,
-	revealOnHover = false,
+	editMode = false,
 }: WidgetToolbarProps ): React.ReactNode {
+	const paddingReserveRef =
+		useReserveHeaderPadding< HTMLDivElement >( 'chip' );
+
 	return (
 		<Stack
+			ref={ paddingReserveRef }
 			direction="row"
 			align="center"
 			gap="xs"
 			className={ clsx(
-				styles.widgetToolbar,
-				revealOnHover ? styles.subtle : styles.solid
+				styles[ 'widget-toolbar' ],
+				editMode && styles.elevated
 			) }
 		>
 			{ children }

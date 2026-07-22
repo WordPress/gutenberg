@@ -115,7 +115,6 @@ export default {
 							panelId={ clientId }
 						>
 							<UnitControl
-								__next40pxDefaultSize
 								label={ __( 'Content width' ) }
 								labelPosition="top"
 								value={
@@ -151,7 +150,6 @@ export default {
 							panelId={ clientId }
 						>
 							<UnitControl
-								__next40pxDefaultSize
 								label={ __( 'Wide width' ) }
 								labelPosition="top"
 								value={
@@ -221,6 +219,7 @@ export default {
 		layout = {},
 		onChange,
 		layoutBlockSupport,
+		controlsGroup = 'block',
 	} ) {
 		const { allowJustification = true } = layoutBlockSupport;
 
@@ -228,7 +227,10 @@ export default {
 			return null;
 		}
 		return (
-			<BlockControls group="block" __experimentalShareWithChildBlocks>
+			<BlockControls
+				group={ controlsGroup }
+				__experimentalShareWithChildBlocks
+			>
 				<DefaultLayoutJustifyContentControl
 					layout={ layout }
 					onChange={ onChange }

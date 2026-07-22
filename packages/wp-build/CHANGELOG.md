@@ -2,6 +2,35 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widgets: carry a widget's declarative `actions` from `widget.json` into
+    the generated PHP registry ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+
+### Bug Fixes
+
+-   Ignore generated `src/worker-code.ts` in watch mode to stop rebuild loops for worker packages like `@wordpress/vips` ([#80361](https://github.com/WordPress/gutenberg/pull/80361)).
+-   Pass the current `$hook_suffix` to the `admin_footer` action in the generated single-page admin template instead of an empty string ([#75985](https://github.com/WordPress/gutenberg/pull/75985)).
+
+## 0.19.0 (2026-07-14)
+
+### Enhancements
+
+-   Align the generated single-page admin font-family stack with the `@wordpress/theme` body token ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Widgets: carry the optional metadata fields from `widget.json` into
+    the generated PHP registry: `title`, `description`, `category`,
+    `keywords`, `textdomain`, and the `help` note, so hosts can translate
+    the user-facing fields server-side
+    ([#79638](https://github.com/WordPress/gutenberg/pull/79638),
+    [#79701](https://github.com/WordPress/gutenberg/pull/79701),
+    [#79830](https://github.com/WordPress/gutenberg/pull/79830)).
+
+### Bug Fixes
+
+-   Widen the optional `@wordpress/theme` peer dependency range to allow 1.x releases and preserve automatic design token fallback plugin loading ([#80089](https://github.com/WordPress/gutenberg/pull/80089)).
+
+## 0.18.0 (2026-07-01)
+
 ## 0.17.0 (2026-06-24)
 
 ### Documentation

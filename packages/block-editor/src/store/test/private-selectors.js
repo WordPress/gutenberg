@@ -29,6 +29,7 @@ import {
 	hasSelectedStyleState,
 	isSelectedBlockStyleStateShownOnCanvas,
 	shouldRenderBlockListView,
+	getStyleOverrides,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -1349,6 +1350,27 @@ describe( 'private selectors', () => {
 		} );
 	} );
 
+	describe( 'getStyleOverrides', () => {
+		it( 'sorts overrides by the order of the blocks they belong to', () => {
+			const state = {
+				blocks: {
+					order: new Map( [ [ '', [ 'block-1', 'block-2' ] ] ] ),
+				},
+				styleOverrides: new Map( [
+					[ 'override-2', { clientId: 'block-2', css: '.b{}' } ],
+					[ 'override-1', { clientId: 'block-1', css: '.a{}' } ],
+					[ 'override-global', { css: '.global{}' } ],
+				] ),
+			};
+
+			expect( getStyleOverrides( state ) ).toEqual( [
+				[ 'override-global', { css: '.global{}' } ],
+				[ 'override-1', { clientId: 'block-1', css: '.a{}' } ],
+				[ 'override-2', { clientId: 'block-2', css: '.b{}' } ],
+			] );
+		} );
+	} );
+
 	describe( 'getBlockStyles', () => {
 		it( 'should return an empty object when no client IDs are provided', () => {
 			const state = {
@@ -1882,6 +1904,79 @@ describe( 'private selectors', () => {
 			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
 		} );
 
+		it( 'should ignore viewport visibility for unavailable breakpoints', () => {
+			const state = {
+				settings: {
+					__experimentalFeatures: {
+						viewport: {
+							mobile: '480px',
+						},
+					},
+				},
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: {
+										viewport: {
+											tablet: false,
+										},
+									},
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should use tablet visibility for a single tablet breakpoint', () => {
+			const state = {
+				settings: {
+					__experimentalFeatures: {
+						viewport: {
+							tablet: '64rem',
+						},
+					},
+				},
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: {
+										viewport: {
+											mobile: false,
+											tablet: false,
+										},
+									},
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( true );
+		} );
+
 		it( 'should handle non-existent block gracefully', () => {
 			const state = {
 				blocks: {
@@ -1972,6 +2067,44 @@ describe( 'private selectors', () => {
 			expect(
 				isBlockHiddenAtViewport( state, 'block-1', 'Mobile' )
 			).toBe( true );
+			expect(
+				isBlockHiddenAtViewport( state, 'block-1', 'Tablet' )
+			).toBe( false );
+		} );
+
+		it( 'ignores viewport visibility for unavailable breakpoints', () => {
+			const state = {
+				settings: {
+					__experimentalFeatures: {
+						viewport: {
+							mobile: '480px',
+						},
+					},
+				},
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: {
+										viewport: {
+											tablet: false,
+										},
+									},
+								},
+							},
+						],
+					] ),
+				},
+			};
+
 			expect(
 				isBlockHiddenAtViewport( state, 'block-1', 'Tablet' )
 			).toBe( false );

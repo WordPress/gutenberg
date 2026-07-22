@@ -243,7 +243,6 @@ export default function ShadowsEditPanel() {
 						} }
 					>
 						<InputControl
-							__next40pxDefaultSize
 							autoComplete="off"
 							label={ __( 'Name' ) }
 							placeholder={ __( 'Shadow name' ) }
@@ -550,7 +549,6 @@ function ShadowInputControl( {
 	return (
 		<UnitControl
 			label={ label }
-			__next40pxDefaultSize
 			value={ value }
 			onChange={ onValueChange }
 		/>

@@ -174,6 +174,9 @@ interface UploadMediaArgs {
 	wpAllowedMimeTypes?: Record< string, string > | null;
 	// Abort signal.
 	signal?: AbortSignal;
+	// Whether the caller owns the upload lifecycle UX (progress tracking,
+	// save locking) and uses the handler only as its server transport.
+	isTransportOnly?: boolean;
 }
 
 /**
@@ -219,6 +222,12 @@ export interface Settings {
 	// Default image quality (0-1) for resize/crop operations.
 	// Default is 0.82 if not set.
 	imageQuality?: number;
+	// Whether to strip image metadata (except color profiles) when encoding,
+	// from the `image_strip_meta` filter. Default is true (matching WordPress core).
+	imageStripMeta?: boolean;
+	// Maximum output bit depth for generated images, from the
+	// `image_max_bit_depth` filter. Default is 16 (no cap).
+	imageMaxBitDepth?: number;
 	// Function for finalizing an upload after all client-side processing is complete.
 	// May return the up-to-date attachment so the queue and block markup can pick
 	// up the post-finalize URL (the scaled file), which is required for `srcset`.
@@ -280,6 +289,15 @@ export interface Attachment {
 	image_output_format?: string | null;
 	/** Whether to use progressive/interlaced encoding. */
 	image_save_progressive?: boolean;
+	/**
+	 * Encode quality (1-100) from the `wp_editor_set_quality` filter.
+	 * `default` applies to the full-size image; `sizes` holds per-registered-size
+	 * overrides keyed by size name, present only where they differ from `default`.
+	 */
+	image_quality?: {
+		default: number;
+		sizes: Record< string, number >;
+	};
 }
 
 export type OnChangeHandler = ( attachments: Partial< Attachment >[] ) => void;
@@ -338,6 +356,12 @@ export interface OperationArgs {
 		 * If true, uses '-scaled' suffix instead of dimension suffix.
 		 */
 		isThresholdResize?: boolean;
+		/**
+		 * Re-encode quality (0-1) for the resized image, derived from the
+		 * `wp_editor_set_quality` filter. Falls back to the vips default
+		 * when omitted.
+		 */
+		quality?: number;
 	};
 	[ OperationType.Rotate ]: {
 		/**
@@ -357,6 +381,18 @@ export interface OperationArgs {
 	[ OperationType.TranscodeGif ]: {
 		/** Video output format: 'mp4' or 'webm'. */
 		outputFormat: 'mp4' | 'webm';
+		/**
+		 * Time in milliseconds before the conversion is abandoned and only
+		 * the original GIF is kept. `0` disables the timeout. Defaults to
+		 * 30 seconds.
+		 */
+		timeout?: number;
+		/**
+		 * Budget for total decoded pixels (width × height × frame count)
+		 * beyond which conversion is not attempted. `0` disables the check.
+		 * Defaults to the `@wordpress/video-conversion` package default.
+		 */
+		maxTotalPixels?: number;
 	};
 }
 

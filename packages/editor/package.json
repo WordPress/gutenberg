@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "14.49.1",
+	"version": "14.51.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -97,6 +97,7 @@
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
+		"@wordpress/theme": "file:../theme",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/upload-media": "file:../upload-media",
 		"@wordpress/url": "file:../url",
@@ -121,12 +122,13 @@
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1",
+		"@wordpress/block-library": "file:../block-library",
 		"deep-freeze": "^0.0.1"
 	},
 	"peerDependencies": {
-		"@types/react": "^18.3.27",
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {

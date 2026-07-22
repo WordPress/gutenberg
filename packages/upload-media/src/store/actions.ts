@@ -201,14 +201,28 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 
 		item.abortController?.abort();
 
-		// Cancel any ongoing vips operations for this item.
-		await vipsCancelOperations( id );
+		/*
+		 * Cancel any ongoing vips operations for this item. This is
+		 * best-effort cleanup: when the worker has crashed, the cancel call
+		 * itself rejects, and that must not abort the cancellation flow —
+		 * onError, item removal, and worker teardown below still need to run.
+		 *
+		 * Deliberately NOT awaited: a busy worker is synchronously blocked
+		 * inside a wasm call and cannot answer the cancellation RPC until
+		 * the current operation — and every operation already queued behind
+		 * it — finishes. For a large animated GIF that is minutes, and
+		 * awaiting here would leave the cancelled item in the queue (gating
+		 * the parent's finalization) that whole time. Nothing below depends
+		 * on the result.
+		 */
+		vipsCancelOperations( id ).catch( () => {} );
 
 		/*
 		 * Cancel any ongoing GIF-to-video conversion for this item so a
 		 * cancelled upload does not leave the encoder running off-thread.
+		 * Best-effort and fire-and-forget for the same reasons as above.
 		 */
-		await cancelGifToVideoOperations( id );
+		cancelGifToVideoOperations( id ).catch( () => {} );
 
 		if ( ! silent ) {
 			const { onError } = item;
@@ -282,8 +296,8 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 				 * even when the companion is the only child sideload.
 				 */
 				const isOptionalCompanion =
-					item.additionalData?.image_size === 'animated-video' ||
-					item.additionalData?.image_size === 'animated-video-poster';
+					item.additionalData?.image_size === 'animated_video' ||
+					item.additionalData?.image_size === 'animated_video_poster';
 
 				if ( select.hasPendingItemsByParentId( parentId ) ) {
 					// Other children remain — just notify the parent so

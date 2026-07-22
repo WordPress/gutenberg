@@ -2,8 +2,31 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Inspector controls in the standard block-supports panels (Typography, Dimensions, Border, Color, Background, Filters) now reflect the value a block inherits from Global Styles when no local override is set. Inherited controls show that value at rest (as a placeholder, preselected option, or resolved value) and mark the label with a dotted underline; setting a local override reveals a reset affordance that clears the override back to the inherited value ([#77894](https://github.com/WordPress/gutenberg/pull/77894)).
+-   Inherited Global Styles now resolve per-level heading element styles for the heading-family blocks (`core/heading`, `core/site-title`, `core/post-title`, `core/query-title`, `core/comments-title`, `core/term-name`, `core/site-tagline`, `core/accordion-heading`), so inspector controls reflect values set on a specific heading level (`styles.elements.h1`–`h6`) in addition to the shared `heading` element. A block rendered at level 0 (a paragraph) folds no heading element styles; `core/accordion-heading` has no level-0 state and takes its level from the parent Accordion's block context ([#80495](https://github.com/WordPress/gutenberg/pull/80495)).
+
+### Internal
+
+-   Gate the inherited Global Styles treatment in the block inspector on `IS_GUTENBERG_PLUGIN`, so `useResolvedStyle` resolves nothing and the block-supports panels render without the inheritance affordances in WordPress Core builds ([#80555](https://github.com/WordPress/gutenberg/pull/80555)).
+
 ### Bug Fixes
 
+-   Gate the HEIC canvas conversion fallback on `window.__clientSideMediaProcessing` instead of the redundant `window.__heicUploadSupport` flag, fixing client-side HEIC conversion in Safari on core WordPress installs ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
+
+## 16.0.0 (2026-07-14)
+
+### Internal
+
+-   Extract a shared `getBlockBindingsContext` helper for assembling the context handed to block-bindings sources; only entries present in the surrounding block context are copied ([#79855](https://github.com/WordPress/gutenberg/pull/79855)).
+
+### Bug Fixes
+
+-   Writing flow: Only pull a forward selection ending at the next element's offset 0 back into the previous block for triple clicks, and clamp the dispatched selection end offset to the rich text content length so an overshooting selection no longer collapses to its start ([#80126](https://github.com/WordPress/gutenberg/pull/80126)).
+-   `ListView`: Use the DS focus color token for the row focus ring so it adapts to themed surfaces such as the site editor navigation sidebar, and remove the duplicate focus ring on the row's Options (three-dot) button, which already draws the standard `Button` focus ring. ([#80087](https://github.com/WordPress/gutenberg/pull/80087)).
+-   `DimensionControl`: Include component styles in the block editor stylesheet so the fieldset reset is applied in Storybook and other contexts without WordPress core styles ([#79916](https://github.com/WordPress/gutenberg/pull/79916)).
+-   `InnerContent`: Render the selected inner block synchronously so its rich text selection stays current while typing; otherwise a stale selection offset could place a typed character at the wrong position in editable static inner blocks ([#79726](https://github.com/WordPress/gutenberg/pull/79726)).
 -   `useTypingObserver`: Capture the window reference at mount and reuse it during cleanup so the ref cleanup no longer reads `node.ownerDocument.defaultView` (which is `null` once the iframe-hosted editor has been detached from its window) and throws, which was also leaking the `removeEventListener` calls that follow it ([#78772](https://github.com/WordPress/gutenberg/pull/78772)).
 
 ### Breaking Changes
@@ -20,7 +43,11 @@
 
 ### Enhancements
 
+-   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 -   Inserter media categories support an optional `emptyMessage`, shown in place of the generic "No results found" notice, that also keeps a source listed when it has no items. The media panel additionally renders attach/detach affordances for attached images ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
+
+## 15.23.0 (2026-07-01)
 
 ## 15.22.0 (2026-06-24)
 

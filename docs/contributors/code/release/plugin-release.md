@@ -295,9 +295,9 @@ If the cherry-picked fixes deserve another release candidate before the stable v
 
 Only once you’re happy with the shape of the changelog in the release draft, press the “Publish release” button.
 
-Note that you do not need to change the checkboxes above the button. If you are publishing an RC, the “Set as a pre-release” will automatically be selected, and “Set as the latest release” will be selected if you are publishing the stable version.
+Note that you do not need to change the “Release label” option above the button. If you are publishing an RC, “Pre-release” will automatically be selected, and “Latest” will be selected if you are publishing the stable version.
 
-![Publishing the release checkboxes for an RC](https://developer.wordpress.org/files/2023/07/image.png)
+![Release label options in the GitHub release form](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/github-release-label.png)
 
 Publishing the release will create a `git` tag for the version, publish the release, and trigger [another GHA workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) with a twofold purpose:
 
@@ -320,27 +320,31 @@ It's important to check that:
 
 -   the plugin from the directory works as expected
 -   the ZIP contents (see [Downloads](https://plugins.trac.wordpress.org/browser/gutenberg/)) looks correct (doesn't have anything obvious missing)
--   the [Gutenberg SVN repo](https://plugins.trac.wordpress.org/browser/gutenberg/) has two new commits (see [the log](https://plugins.trac.wordpress.org/browser/gutenberg/)):
-    -   the `trunk` folder should have "Committing version X.Y.Z"
-    -   there is a new `tags/X.Y.Z` folder with the same contents as `trunk` whose latest commit is "Tagging version X.Y.Z"
+-   the [Gutenberg SVN repo](https://plugins.trac.wordpress.org/browser/gutenberg/) has the expected `trunk` contents and a matching `tags/X.Y.Z` folder (see [the log](https://plugins.trac.wordpress.org/browser/gutenberg/))
 
-Most likely, the tag folder couldn't be created. This is a [known issue](https://github.com/WordPress/gutenberg/issues/55295) that [can be fixed manually](https://github.com/WordPress/gutenberg/issues/55295#issuecomment-1759292978).
+The current WordPress.org upload workflow replaces SVN `trunk`, copies that local `trunk` checkout to `tags/$VERSION`, then commits `trunk` and `tags/$VERSION` together. Before rerunning the workflow or any mutating SVN command, inspect the existing SVN state and avoid creating a second tag for the same version.
 
 Either substitute `SVN_USERNAME`, `SVN_PASSWORD`, and `VERSION` for the proper values or set them as global environment variables first:
 
 ```sh
-# CHECKOUT THE REPOSITORY
-svn checkout https://plugins.svn.wordpress.org/gutenberg/trunk --username "$SVN_USERNAME" --password "$SVN_PASSWORD" gutenberg-svn
+# CHECK WHETHER THE SVN TAG ALREADY EXISTS
+# A file listing means YES.
+# An error mentioning a "non-existent" path (W160013/E200009) means NO,
+# and means you can safely create the tag.
+svn list https://plugins.svn.wordpress.org/gutenberg/tags/$VERSION --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
 
-# MOVE TO THE LOCAL FOLDER
-cd gutenberg-svn
+# CHECK WHETHER SVN TRUNK ALREADY CONTAINS THE INTENDED RELEASE
+svn cat https://plugins.svn.wordpress.org/gutenberg/trunk/readme.txt | grep "Stable tag: $VERSION"
+svn cat https://plugins.svn.wordpress.org/gutenberg/trunk/gutenberg.php | grep "Version: $VERSION"
+```
 
-# IF YOU HAPPEN TO HAVE ALREADY THE REPO LOCALLY
-# AND DIDN'T CHECKOUT, MAKE SURE IT IS UPDATED
-svn up .
+Also confirm the matching GitHub release and `v$VERSION` tag still exist. If either is missing, stop and restore the GitHub release state before running SVN recovery commands; the SVN commands below only repair WordPress.org plugin repository state.
 
+If SVN `trunk` already contains the intended release but `tags/$VERSION` is missing, create the tag from the current SVN `trunk`:
+
+```sh
 # COPY CURRENT TRUNK INTO THE NEW TAGS FOLDER
-svn copy https://plugins.svn.wordpress.org/gutenberg/trunk https://plugins.svn.wordpress.org/gutenberg/tags/$VERSION -m 'Tagging version $VERSION' --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+svn copy https://plugins.svn.wordpress.org/gutenberg/trunk https://plugins.svn.wordpress.org/gutenberg/tags/$VERSION -m "Tagging version $VERSION" --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
 ```
 
 Ask around if you need help with any of this.
@@ -421,6 +425,8 @@ You must also ensure that all PRs being included are assigned to the GitHub Mile
 
 For example, if you are releasing version `12.5.4`, then all PRs picked for that release must be unassigned from the `12.6` Milestone and instead assigned to the `12.5` Milestone.
 
+If release-note generation reports that the milestone has no unreleased pull requests, verify that every cherry-picked PR is assigned to the release milestone before rerunning the workflow. Do not generate the notes from a different milestone.
+
 Once cherry picking is complete, you can also remove the `Backport to Gutenberg Minor Release` label from the PRs.
 
 Once you have the stable release branch in order and the correct Milestone assigned to your PRs you can _push the branch to GitHub_ and continue with the release process using the GitHub website GUI.
@@ -457,15 +463,13 @@ The process is identical to the one documented above when an RC is already out: 
 
 ### Troubleshooting
 
-> The release draft was created but it was empty/contained an error message
+> Release-note generation failed because no unreleased pull requests were found
 
-If you forget to assign the correct Milestone to your cherry picked PR(s) then the changelog may not be generated as you would expect.
+The workflow fails before creating a release draft. Verify that every cherry-picked PR is assigned to the release milestone, then rerun the workflow. Do not manually create the release notes or use a different milestone.
 
-It is important to always manually verify that the PRs shown in the changelog match up with those cherry picked to the release branch.
+If the milestone has been closed, you may reopen it for the release.
 
-Moreover, if the release includes only a single PR, then failing to assign the PR to the correct Milestone will cause an error to be displayed when generating the changelog. In this case you can edit the release notes to include details of the missing PR (manually copying the format from a previous release).
-
-If for any reason the Milestone has been closed, you may reopen it for the purposes of the release.
+After rerunning the workflow, manually verify that the PRs shown in the changelog match those cherry-picked to the release branch.
 
 > The draft release only contains 1 asset file. Other releases have x3.
 

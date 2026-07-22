@@ -29,6 +29,8 @@ import { useSettings } from '../../components/use-settings';
  * @param {boolean}                 props.withSlider           Whether to show the slider control.
  * @param {boolean}                 props.hasBottomMargin      Whether to add bottom margin below the control.
  * @param {string}                  props.help                 Help text to display below the control.
+ * @param {string}                  props.className            Class name to add to the inner UnitControl.
+ * @param {string}                  props.placeholder          Placeholder for the inner UnitControl.
  *
  * @return {Element} Text indent control.
  */
@@ -39,6 +41,8 @@ export default function TextIndentControl( {
 	withSlider = false,
 	hasBottomMargin = false,
 	help,
+	className,
+	placeholder,
 	...otherProps
 } ) {
 	const [ availableUnits ] = useSettings( 'spacing.units' );
@@ -67,13 +71,14 @@ export default function TextIndentControl( {
 		return (
 			<UnitControl
 				{ ...otherProps }
-				__next40pxDefaultSize
 				label={ __( 'Line indent' ) }
 				value={ value }
 				__unstableInputWidth={ __unstableInputWidth }
 				units={ units }
 				onChange={ onChange }
 				help={ help }
+				className={ className }
+				placeholder={ placeholder }
 			/>
 		);
 	}
@@ -86,7 +91,6 @@ export default function TextIndentControl( {
 			<Flex>
 				<FlexItem isBlock>
 					<UnitControl
-						__next40pxDefaultSize
 						label={ __( 'Line indent' ) }
 						labelPosition="top"
 						hideLabelFromVision
@@ -95,6 +99,8 @@ export default function TextIndentControl( {
 						units={ units }
 						__unstableInputWidth={ __unstableInputWidth }
 						min={ 0 }
+						className={ className }
+						placeholder={ placeholder }
 					/>
 				</FlexItem>
 				{ withSlider && (

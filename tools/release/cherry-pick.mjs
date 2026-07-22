@@ -3,18 +3,24 @@
  */
 import fetch from 'node-fetch';
 import readline from 'readline';
+import { gte } from 'semver';
 
 import { spawnSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 
 const REPO = 'WordPress/gutenberg';
 const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
 const BACKPORT_COMPLETED_LABEL = 'Backported to WP Core';
 const BRANCH = getCurrentBranch();
+// Earlier versions query the sunset Projects (classic) API and always fail on
+// `gh pr edit`.
+// See https://github.com/cli/cli/pull/10942.
+const MINIMUM_GH_VERSION = '2.73.0';
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
 	?.stdout?.toString()
 	.includes( '✓ Logged in to github.com' );
-
-const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
+const GITHUB_CLI_VERSION = getGhVersion();
+const GITHUB_CLI_SUPPORTED = isGhVersionSupported( GITHUB_CLI_VERSION );
 
 /**
  * The main function of this script. It:
@@ -25,12 +31,22 @@ const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
  * * It keeps track of the failed cherry-picks and then retries them
  * * Retrying keeps going as long as at least one cherry-pick succeeds
  * * Pushes the local branch to `origin`
- * * (optional) Uses the [`gh` console utility](https://cli.github.com/) to comment on the remote PRs and remove the labels
+ * * Uses the [`gh` console utility](https://cli.github.com/) to comment on the remote PRs and remove the labels
  * * Reports the results
  */
 async function main() {
 	if ( ! GITHUB_CLI_AVAILABLE ) {
-		await reportGhUnavailable();
+		console.error(
+			'GitHub CLI is not setup. Install the `gh` utility from https://cli.github.com/ ' +
+				'and log in with `gh auth login`.'
+		);
+		process.exit( 1 );
+	}
+	if ( ! GITHUB_CLI_SUPPORTED ) {
+		console.error(
+			`GitHub CLI ${ GITHUB_CLI_VERSION } is too old. Upgrade to ${ MINIMUM_GH_VERSION } or newer.`
+		);
+		process.exit( 1 );
 	}
 
 	console.log( `You are on branch "${ BRANCH }".` );
@@ -62,17 +78,12 @@ async function main() {
 	reportSummaryNextSteps( successes, failures );
 
 	if ( successes.length ) {
-		if ( AUTO_PROPAGATE_RESULTS_TO_GITHUB ) {
-			console.log( `About to push to origin/${ BRANCH }` );
-			await promptDoYouWantToProceed();
-			cli( 'git', [ 'push', 'origin', BRANCH ] );
+		console.log( `About to push to origin/${ BRANCH }` );
+		await promptDoYouWantToProceed();
+		cli( 'git', [ 'push', 'origin', BRANCH ] );
 
-			console.log( `Commenting and removing labels...` );
-			successes.forEach( GHcommentAndRemoveLabel );
-		} else {
-			console.log( 'Cherry-picked PRs with copy-able comments:' );
-			successes.forEach( reportSuccessManual );
-		}
+		console.log( `Commenting and removing labels...` );
+		successes.forEach( GHcommentAndRemoveLabel );
 	}
 	if ( failures.length ) {
 		console.log( 'PRs that could not be cherry-picked automatically:' );
@@ -197,15 +208,16 @@ function getGitHubAuthToken() {
  * success since the last attempt.
  *
  * @param {Object[]} PRs The list of PRs to cherry-pick.
+ * @param {string}   cwd The repository directory.
  * @return {Array} A two-tuple containing a list of successful cherry-picks and a list of failed ones.
  */
-function cherryPickAll( PRs ) {
+function cherryPickAll( PRs, cwd = process.cwd() ) {
 	let remainingPRs = [ ...PRs ];
 	let i = 1;
 	let allSuccesses = [];
 	while ( remainingPRs.length ) {
 		console.log( `Cherry-picking round ${ i++ }: ` );
-		const [ successes, failures ] = cherryPickRound( remainingPRs );
+		const [ successes, failures ] = cherryPickRound( remainingPRs, cwd );
 		allSuccesses = [ ...allSuccesses, ...successes ];
 		remainingPRs = failures;
 		if ( ! successes.length ) {
@@ -224,16 +236,17 @@ function cherryPickAll( PRs ) {
  * Processes every PR once.
  *
  * @param {Object[]} PRs The list of PRs to cherry-pick.
+ * @param {string}   cwd The repository directory.
  * @return {Array} A two-tuple containing a list of successful cherry-picks and a list of failed ones.
  */
-function cherryPickRound( PRs ) {
+function cherryPickRound( PRs, cwd ) {
 	const stack = [ ...PRs ];
 	const successes = [];
 	const failures = [];
 	while ( stack.length ) {
 		const PR = stack.shift();
 		try {
-			const cherryPickHash = cherryPickOne( PR.mergeCommitHash );
+			const cherryPickHash = cherryPickOne( PR.mergeCommitHash, cwd );
 			successes.push( {
 				...PR,
 				cherryPickHash,
@@ -307,20 +320,47 @@ function indent( text, width = 3 ) {
  * Attempts to cherry-pick a given commit into the current branch,
  *
  * @param {string} commit A commit hash.
+ * @param {string} cwd    The repository directory.
  * @return {string} Branch name.
  */
-function cherryPickOne( commit ) {
-	const result = spawnSync( 'git', [ 'cherry-pick', commit ] );
-	const message = result.stdout.toString().trim();
-	if ( result.status !== 0 || ! message.includes( 'Author: ' ) ) {
-		spawnSync( 'git', [ 'reset', '--hard' ] );
+function cherryPickOne( commit, cwd = process.cwd() ) {
+	const headBeforeCherryPick = spawnSync( 'git', [ 'rev-parse', 'HEAD' ], {
+		cwd,
+	} )
+		.stdout.toString()
+		.trim();
+	const result = spawnSync( 'git', [ 'cherry-pick', commit ], { cwd } );
+	if ( result.status !== 0 ) {
+		spawnSync( 'git', [ 'cherry-pick', '--abort' ], { cwd } );
+
+		const headAfterCleanup = spawnSync( 'git', [ 'rev-parse', 'HEAD' ], {
+			cwd,
+		} )
+			.stdout.toString()
+			.trim();
+		const cherryPickState = spawnSync(
+			'git',
+			[ 'rev-parse', '--verify', '--quiet', 'CHERRY_PICK_HEAD' ],
+			{ cwd }
+		);
+		if (
+			headAfterCleanup !== headBeforeCherryPick ||
+			cherryPickState.status === 0
+		) {
+			console.error(
+				`Failed to restore the repository after cherry-picking ${ commit }. ` +
+					'Nothing was pushed. Restore the repository before running this script again.'
+			);
+			process.exit( 1 );
+		}
+
 		throw new Error( result.stderr.toString().trim() );
 	}
-	const commitHashOutput = spawnSync( 'git', [
-		'rev-parse',
-		'--short',
-		'HEAD',
-	] );
+	const commitHashOutput = spawnSync(
+		'git',
+		[ 'rev-parse', '--short', 'HEAD' ],
+		{ cwd }
+	);
 	return commitHashOutput.stdout.toString().trim();
 }
 
@@ -346,18 +386,6 @@ function reportSummaryNextSteps( successes, failures ) {
 	console.log( '' );
 
 	const nextSteps = [];
-	if ( successes.length && ! AUTO_PROPAGATE_RESULTS_TO_GITHUB ) {
-		nextSteps.push( 'Push this branch' );
-		nextSteps.push( 'Go to each of the cherry-picked Pull Requests' );
-		nextSteps.push( `Remove the ${ LABEL } label` );
-
-		if ( LABEL === 'Backport to WP Beta/RC' ) {
-			nextSteps.push( `Add the "${ BACKPORT_COMPLETED_LABEL }" label` );
-		}
-
-		nextSteps.push( 'Request a backport to wordpress-develop if required' );
-		nextSteps.push( 'Comment, say that PR just got cherry-picked' );
-	}
 	if ( failures.length ) {
 		nextSteps.push( 'Manually cherry-pick the PRs that failed' );
 	}
@@ -488,6 +516,37 @@ function getMilestoneFromBranch() {
 }
 
 /**
+ * Extracts the version from the output of `gh --version`.
+ *
+ * @param {string} output Raw command output.
+ * @return {string|null} Version string such as "2.73.0", or null if not found.
+ */
+function parseGhVersion( output ) {
+	return output.match( /gh version (\d+\.\d+\.\d+)/ )?.[ 1 ] || null;
+}
+
+/**
+ * Returns the installed `gh` version.
+ *
+ * @return {string|null} Version string such as "2.73.0", or null if unavailable.
+ */
+function getGhVersion() {
+	return parseGhVersion(
+		spawnSync( 'gh', [ '--version' ] )?.stdout?.toString() || ''
+	);
+}
+
+/**
+ * Checks whether a `gh` version meets the minimum this script requires.
+ *
+ * @param {string|null} version The installed version.
+ * @return {boolean} Whether the version is supported.
+ */
+function isGhVersionSupported( version ) {
+	return !! version && gte( version, MINIMUM_GH_VERSION );
+}
+
+/**
  * Returns the current git branch.
  *
  * @return {string} Branch name.
@@ -496,30 +555,6 @@ function getCurrentBranch() {
 	return spawnSync( 'git', [ 'rev-parse', '--abbrev-ref', 'HEAD' ] )
 		.stdout.toString()
 		.trim();
-}
-
-/**
- * Reports when the gh CLI tool is missing, describes the consequences, asks
- * whether to proceed.
- *
- * @return {Promise<void>}
- */
-async function reportGhUnavailable() {
-	console.log(
-		'GitHub CLI is not setup. This script will not be able to automatically'
-	);
-	console.log(
-		'comment on the processed PRs and remove the backport label from them.'
-	);
-	console.log(
-		'Instead, you will see a detailed list of next steps to perform manually.'
-	);
-	console.log( '' );
-	console.log(
-		'To enable automatic handling, install the `gh` utility from https://cli.github.com/'
-	);
-	console.log( '' );
-	await promptDoYouWantToProceed();
 }
 
 /**
@@ -548,4 +583,17 @@ async function promptDoYouWantToProceed() {
 	rl.close();
 }
 
-main();
+if (
+	process.argv[ 1 ] &&
+	import.meta.url === pathToFileURL( process.argv[ 1 ] ).href
+) {
+	main();
+}
+
+export {
+	cherryPickAll,
+	cherryPickOne,
+	isGhVersionSupported,
+	parseGhVersion,
+	MINIMUM_GH_VERSION,
+};

@@ -36,7 +36,7 @@ export const WidgetResizeHandle = forwardRef<
 				ref={ ref }
 				className={ clsx(
 					styles.handle,
-					styles.handleHorizontal,
+					styles[ 'handle-horizontal' ],
 					isResizing && styles.resizing
 				) }
 				{ ...listeners }
@@ -50,7 +50,7 @@ export const WidgetResizeHandle = forwardRef<
 			ref={ ref }
 			className={ clsx(
 				styles.handle,
-				styles.handleCorner,
+				styles[ 'handle-corner' ],
 				isResizing && styles.resizing
 			) }
 			{ ...listeners }
