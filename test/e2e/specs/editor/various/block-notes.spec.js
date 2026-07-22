@@ -1214,6 +1214,38 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 		} );
 
+		test( 'picker lays out as a row and moves focus on both axes', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing picker layout' },
+				comment: 'Test comment for picker layout',
+			} );
+
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			const emojiPicker = page.locator(
+				'.editor-collab-sidebar-panel__emoji-picker'
+			);
+			await expect( emojiPicker ).toBeVisible();
+
+			// `.components-popover__content` is `width: min-content`,
+			// which used to squeeze the wrapping listbox into a single
+			// column one emoji wide.
+			const box = await emojiPicker.boundingBox();
+			expect( box.width ).toBeGreaterThan( box.height );
+
+			// The roving tab index moves on both axes, so the picker is
+			// navigable however the emoji set happens to wrap.
+			const options = emojiPicker.getByRole( 'option' );
+			await options.first().focus();
+			await page.keyboard.press( 'ArrowDown' );
+			await expect( options.nth( 1 ) ).toBeFocused();
+			await page.keyboard.press( 'ArrowUp' );
+			await expect( options.first() ).toBeFocused();
+		} );
+
 		test( 'can add multiple different reactions to same note', async ( {
 			page,
 			blockNoteUtils,

@@ -99,7 +99,11 @@ export default function ReactionEmojiPicker( {
 	return (
 		<Composite
 			role="listbox"
-			orientation="horizontal"
+			/*
+			 * No `orientation`: the list wraps into rows once the emoji set is
+			 * extended past a single row, and a narrow popover can stack it
+			 * into a column, so both axes need to move the roving tab index.
+			 */
 			aria-label={ __( 'Select an emoji reaction' ) }
 			className="editor-collab-sidebar-panel__emoji-picker"
 		>
