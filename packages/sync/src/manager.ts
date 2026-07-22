@@ -56,6 +56,8 @@ interface CollectionState {
 interface EntityState {
 	awareness?: Awareness;
 	handlers: RecordHandlers;
+	// Whether the document has received its initial state from the sync backend
+	hasInitialSync: boolean;
 	objectId: ObjectID;
 	objectType: ObjectType;
 	syncConfig: SyncConfig;
@@ -87,6 +89,10 @@ export function createSyncManager( debug = false ): SyncManager {
 	const debugWrap = debug ? logPerformanceTiming : passThru;
 	const collectionStates: Map< ObjectType, CollectionState > = new Map();
 	const entityStates: Map< EntityID, EntityState > = new Map();
+	// Listeners waiting for an entity's initial sync, keyed by entity ID.
+	// Held at the manager level (not on entity state) so a consumer can
+	// subscribe before the entity is loaded. See `subscribeHasInitialSync`.
+	const syncedListeners: Map< EntityID, Set< () => void > > = new Map();
 
 	/**
 	 * A "sync-aware" undo manager for all synced entities. It is lazily created
@@ -229,6 +235,12 @@ export function createSyncManager( debug = false ): SyncManager {
 			_events: Y.YEvent< any >[],
 			transaction: Y.Transaction
 		): void => {
+			// A non-local transaction carries remote document state (the
+			// initial sync or a peer edit), as opposed to a local undo/redo.
+			if ( ! transaction.local ) {
+				markEntitySynced( entityId );
+			}
+
 			if (
 				transaction.local &&
 				! ( transaction.origin instanceof Y.UndoManager )
@@ -246,6 +258,8 @@ export function createSyncManager( debug = false ): SyncManager {
 			if ( transaction.local ) {
 				return;
 			}
+
+			markEntitySynced( entityId );
 
 			event.keysChanged.forEach( ( key ) => {
 				switch ( key ) {
@@ -282,6 +296,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		const entityState: EntityState = {
 			awareness,
 			handlers,
+			hasInitialSync: false,
 			objectId,
 			objectType,
 			syncConfig,
@@ -495,6 +510,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			entityState.unload();
 		}
 		entityStates.clear();
+		syncedListeners.clear();
 		undoManager = undefined;
 
 		for ( const [ , collectionState ] of [ ...collectionStates ] ) {
@@ -762,6 +778,70 @@ export function createSyncManager( debug = false ): SyncManager {
 	}
 
 	/**
+	 * Mark an entity's document as synced and notify any pending
+	 * `subscribeHasInitialSync` listeners. The flag is one-shot: the first
+	 * remote transaction flips it and clears the pending listeners; later
+	 * subscribers fire immediately instead.
+	 *
+	 * @param {EntityID} entityId Entity ID.
+	 */
+	function markEntitySynced( entityId: EntityID ): void {
+		const entityState = entityStates.get( entityId );
+
+		if ( ! entityState || entityState.hasInitialSync ) {
+			return;
+		}
+
+		entityState.hasInitialSync = true;
+
+		const listeners = syncedListeners.get( entityId );
+		if ( ! listeners ) {
+			return;
+		}
+
+		syncedListeners.delete( entityId );
+		listeners.forEach( ( callback ) => callback() );
+	}
+
+	/**
+	 * Subscribe to the entity document's "synced" flag. See the `SyncManager`
+	 * interface for details.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 * @param {Function}   callback   Called once the document has synced.
+	 * @return {Function} Unsubscribe function.
+	 */
+	function subscribeHasInitialSync(
+		objectType: ObjectType,
+		objectId: ObjectID,
+		callback: () => void
+	): () => void {
+		const entityId = getEntityId( objectType, objectId );
+
+		// Fire immediately when the document has already synced.
+		if ( entityStates.get( entityId )?.hasInitialSync ) {
+			callback();
+			return () => {};
+		}
+
+		let listeners = syncedListeners.get( entityId );
+		if ( ! listeners ) {
+			listeners = new Set();
+			syncedListeners.set( entityId, listeners );
+		}
+
+		listeners.add( callback );
+
+		return () => {
+			listeners.delete( callback );
+			if ( 0 === listeners.size ) {
+				syncedListeners.delete( entityId );
+			}
+		};
+	}
+
+	/**
 	 * Update the entity record in the local store with changes from the CRDT
 	 * document.
 	 *
@@ -840,6 +920,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		load: debugWrap( loadEntity ),
 		loadCollection: debugWrap( loadCollection ),
 		markEntityAutosaved: debugWrap( markEntityAutosaved ),
+		subscribeHasInitialSync,
 		// Use getter to ensure we always return the current value of `undoManager`.
 		get undoManager(): SyncUndoManager | undefined {
 			return undoManager;

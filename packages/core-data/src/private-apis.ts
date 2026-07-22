@@ -11,7 +11,11 @@ import {
 	useOnPostSave,
 } from './hooks/use-post-editor-awareness-state';
 import { lock } from './lock-unlock';
-import { getEntityAutosavedAt, retrySyncConnection } from './sync';
+import {
+	getEntityAutosavedAt,
+	retrySyncConnection,
+	subscribeHasInitialSync,
+} from './sync';
 import {
 	SelectionType,
 	SelectionDirection,
@@ -21,6 +25,7 @@ const lockedApis = {
 	useEntityRecordsWithPermissions,
 	RECEIVE_INTERMEDIATE_RESULTS,
 	getEntityAutosavedAt,
+	subscribeHasInitialSync,
 	retrySyncConnection,
 	useActiveCollaborators,
 	useResolvedSelection,

@@ -706,11 +706,7 @@ function poll(): void {
 					return;
 				}
 
-				// `isSynced` is reported truthfully: this poll's stored
-				// updates are applied later in this same synchronous block,
-				// so they land before any (asynchronous) status consumer can
-				// observe this status change.
-				state.onStatusChange( { status: 'connected', isSynced: true } );
+				state.onStatusChange( { status: 'connected' } );
 			} );
 
 			// Reset before checking each room

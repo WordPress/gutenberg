@@ -22,16 +22,15 @@ import { getQueryArg } from '@wordpress/url';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { getEntityAutosavedAt } = unlock( coreDataPrivateApis );
+const { getEntityAutosavedAt, subscribeHasInitialSync } =
+	unlock( coreDataPrivateApis );
 
 /**
  * Backstop for the deferred autosave notice: how long to wait for the
- * author's autosave marker to arrive from the sync backend before failing
- * open and showing the notice. Providers that report the optional `isSynced`
- * connection status field resolve the decision as soon as the initial
- * document sync has been applied; this wait only decides for providers that
- * report 'connected' without indicating whether the document state has
- * landed.
+ * shared document to sync before failing open and showing the notice. The
+ * decision normally resolves as soon as the document syncs (see
+ * `subscribeHasInitialSync`); this wait only applies when that state never
+ * arrives, e.g. a provider that connects but whose initial sync stalls.
  */
 const AUTOSAVE_NOTICE_SYNC_WAIT_MS = 3000;
 
@@ -93,16 +92,14 @@ function showAutosaveExistsNotice( {
  *
  * Under real-time collaboration, the autosave content is usually already
  * part of the shared document, making the notice redundant. The decision is
- * deferred and made at most once. The notice is suppressed as soon as the
- * author's autosave marker in the CRDT document confirms that the autosave
- * content is part of the shared document; the marker is the only positive
- * signal, so the decision holds for any sync provider regardless of what its
- * connection status implies about the initial document sync. Without that
- * signal, the notice is shown (fail open) once sync fails, collaboration is
- * disabled, the provider confirms the initial document sync has been applied
- * without producing a marker (the optional `isSynced` connection status
- * field), or a backstop wait expires, because the autosave may then be the
- * only copy of the content.
+ * deferred and made at most once. It is resolved when the shared document
+ * syncs (via `subscribeHasInitialSync`). The author's autosave marker is read
+ * from the CRDT document, and because the initial sync is applied atomically,
+ * a missing marker at that point is definitive. The notice is suppressed when
+ * the marker confirms the autosave content is part of the shared document,
+ * and shown (fail open) when the marker is absent after sync, collaboration is
+ * disabled, the connection fails, or a backstop wait expires, because the
+ * autosave may then be the only copy of the content.
  *
  * IMPORTANT: Call this hook after the mount effect that dispatches
  * `setupEditor`, so that the collaboration check can read the current post.
@@ -121,23 +118,23 @@ export default function useAutosaveNotice( { post, recovery, settings } ) {
 	// document. Only set for collaborative posts.
 	const isAutosaveNoticeDeferredRef = useRef( false );
 
-	// Whether the deferred notice has waited long enough for the autosave
-	// marker to arrive from the sync backend.
+	// Whether the deferred notice has waited long enough for the shared
+	// document to sync.
 	const [ hasAutosaveNoticeWaitExpired, setHasAutosaveNoticeWaitExpired ] =
 		useState( false );
 
+	// Whether the shared document has received its initial sync state. Set
+	// once, via a single subscription, so the deferred decision effect below
+	// can early-evaluate without polling individual remote updates.
+	const [ isDocumentSynced, setIsDocumentSynced ] = useState( false );
+
 	// Selected values used to re-run the deferred decision effect below.
 	// The effect reads fresh store values when it runs.
-	const {
-		autosaveSyncStatus,
-		autosaveSyncIsSynced,
-		isCollaborationEnabledForPost,
-	} = useSelect(
+	const { autosaveSyncStatus, isCollaborationEnabledForPost } = useSelect(
 		( select ) => {
 			if ( ! settings.autosave?.authorId ) {
 				return {
 					autosaveSyncStatus: undefined,
-					autosaveSyncIsSynced: undefined,
 					isCollaborationEnabledForPost: false,
 				};
 			}
@@ -148,7 +145,6 @@ export default function useAutosaveNotice( { post, recovery, settings } ) {
 
 			return {
 				autosaveSyncStatus: connectionStatus?.status,
-				autosaveSyncIsSynced: connectionStatus?.isSynced,
 				isCollaborationEnabledForPost: unlock(
 					select( editorStore )
 				).isCollaborationEnabledForCurrentPost(),
@@ -197,6 +193,22 @@ export default function useAutosaveNotice( { post, recovery, settings } ) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
+	// Resolve the deferred decision as soon as the shared document syncs, so
+	// the marker resolves the notice without waiting for the backstop timer.
+	// The subscription fires once (immediately if the document already synced)
+	// and may be attached before the entity is loaded, so a single subscription
+	// keyed on the post is enough. No re-subscription or per-update polling is
+	// needed.
+	useEffect( () => {
+		if ( ! isAutosaveNoticeDeferredRef.current ) {
+			return;
+		}
+
+		return subscribeHasInitialSync( 'postType', post.type, post.id, () =>
+			setIsDocumentSynced( true )
+		);
+	}, [ post.type, post.id ] );
+
 	// Deferred autosave notice decision for collaborative posts. See the
 	// hook docblock for the full decision rules.
 	useEffect( () => {
@@ -232,16 +244,13 @@ export default function useAutosaveNotice( { post, recovery, settings } ) {
 			// The connection failed before it was established, so the
 			// shared document may be missing the autosaved content.
 			shouldShowNotice = true;
-		} else if (
-			'connected' === connectionStatus?.status &&
-			connectionStatus.isSynced
-		) {
-			// The provider confirmed that the server-stored document state
-			// has been applied, so the missing marker is definitive: the
-			// autosave content is not part of the shared document.
+		} else if ( isDocumentSynced ) {
+			// The shared document received the server state (the initial
+			// sync is applied atomically), yet contains no marker: the
+			// autosave content is definitively not part of the document.
 			shouldShowNotice = true;
 		} else if ( hasAutosaveNoticeWaitExpired ) {
-			// The marker did not arrive in time. Treat the autosave as
+			// The document did not sync in time. Treat the autosave as
 			// missing from the shared document.
 			shouldShowNotice = true;
 		} else {
@@ -261,13 +270,13 @@ export default function useAutosaveNotice( { post, recovery, settings } ) {
 		}
 		// The decision must run at most once. `settings.autosave` and the
 		// notice actions are stable for the lifetime of the provider; the
-		// selected values only trigger re-evaluation.
+		// values below only trigger re-evaluation.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		autosaveSyncStatus,
-		autosaveSyncIsSynced,
 		hasAutosaveNoticeWaitExpired,
 		isCollaborationEnabledForPost,
+		isDocumentSynced,
 		post.type,
 		post.id,
 	] );

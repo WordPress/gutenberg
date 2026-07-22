@@ -65,16 +65,6 @@ export interface ProviderCreatorResult {
  */
 export interface ConnectionStatusConnected {
 	status: 'connected';
-
-	/**
-	 * Whether the provider has applied the server-stored document state to
-	 * the local document. Optional: some transports (e.g. y-websocket)
-	 * report 'connected' before the initial document sync has landed, and
-	 * third party providers may not report this field at all. Consumers
-	 * that need the document state must treat an absent value as unknown
-	 * and fall back to their own safeguards (e.g. a timeout).
-	 */
-	isSynced?: boolean;
 }
 
 export interface ConnectionStatusConnecting {
@@ -188,6 +178,11 @@ export interface SyncManager {
 		objectId: ObjectID,
 		authorId: number
 	) => number | undefined;
+	subscribeHasInitialSync: (
+		objectType: ObjectType,
+		objectId: ObjectID,
+		callback: () => void
+	) => () => void;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,

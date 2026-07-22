@@ -905,6 +905,164 @@ describe( 'SyncManager', () => {
 		} );
 	} );
 
+	describe( 'entity synced flag', () => {
+		// Simulate remote document state (e.g. the initial sync, "sync step
+		// 2") landing on the entity's document from a peer. Applying an update
+		// sourced from a separate document produces a non-local Yjs
+		// transaction, which is how the manager recognizes remote state.
+		function applyRemoteUpdate(
+			doc: Y.Doc | null,
+			mutate: ( peerDoc: Y.Doc ) => void
+		): void {
+			if ( ! doc ) {
+				throw new Error( 'Expected a captured document' );
+			}
+
+			const peerDoc = new Y.Doc();
+			Y.applyUpdate( peerDoc, Y.encodeStateAsUpdate( doc ) );
+			mutate( peerDoc );
+			Y.applyUpdate(
+				doc,
+				Y.encodeStateAsUpdate( peerDoc, Y.encodeStateVector( doc ) )
+			);
+			peerDoc.destroy();
+		}
+
+		async function loadWithCapturedDoc() {
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
+
+			const manager = createSyncManager();
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			return { manager, getDoc: () => capturedDoc };
+		}
+
+		it( 'fires a subscriber once the initial remote state lands', async () => {
+			const { manager, getDoc } = await loadWithCapturedDoc();
+
+			const onSynced = jest.fn();
+			manager.subscribeHasInitialSync( 'post', '123', onSynced );
+
+			// No remote transaction has been applied yet.
+			expect( onSynced ).not.toHaveBeenCalled();
+
+			applyRemoteUpdate( getDoc(), ( peerDoc ) => {
+				peerDoc
+					.getMap( CRDT_RECORD_MAP_KEY )
+					.set( 'title', 'From peer' );
+			} );
+
+			expect( onSynced ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'fires immediately when the document has already synced', async () => {
+			const { manager, getDoc } = await loadWithCapturedDoc();
+
+			applyRemoteUpdate( getDoc(), ( peerDoc ) => {
+				peerDoc
+					.getMap( CRDT_RECORD_MAP_KEY )
+					.set( 'title', 'From peer' );
+			} );
+
+			const onSynced = jest.fn();
+			manager.subscribeHasInitialSync( 'post', '123', onSynced );
+
+			expect( onSynced ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'notifies at most once across multiple remote updates', async () => {
+			const { manager, getDoc } = await loadWithCapturedDoc();
+
+			const onSynced = jest.fn();
+			manager.subscribeHasInitialSync( 'post', '123', onSynced );
+
+			applyRemoteUpdate( getDoc(), ( peerDoc ) => {
+				peerDoc.getMap( CRDT_RECORD_MAP_KEY ).set( 'title', 'One' );
+			} );
+			applyRemoteUpdate( getDoc(), ( peerDoc ) => {
+				peerDoc.getMap( CRDT_RECORD_MAP_KEY ).set( 'title', 'Two' );
+			} );
+
+			expect( onSynced ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'fires a subscription registered before the entity is loaded', async () => {
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
+
+			const manager = createSyncManager();
+
+			const onSynced = jest.fn();
+			manager.subscribeHasInitialSync( 'post', '123', onSynced );
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			// Loading alone does not sync; the initial remote state must land.
+			expect( onSynced ).not.toHaveBeenCalled();
+
+			applyRemoteUpdate( capturedDoc, ( peerDoc ) => {
+				peerDoc
+					.getMap( CRDT_RECORD_MAP_KEY )
+					.set( 'title', 'From peer' );
+			} );
+
+			expect( onSynced ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'does not fire after unsubscribing', async () => {
+			const { manager, getDoc } = await loadWithCapturedDoc();
+
+			const onSynced = jest.fn();
+			const unsubscribe = manager.subscribeHasInitialSync(
+				'post',
+				'123',
+				onSynced
+			);
+			unsubscribe();
+
+			applyRemoteUpdate( getDoc(), ( peerDoc ) => {
+				peerDoc
+					.getMap( CRDT_RECORD_MAP_KEY )
+					.set( 'title', 'From peer' );
+			} );
+
+			expect( onSynced ).not.toHaveBeenCalled();
+		} );
+
+		it( 'no-ops for entities that are not loaded', () => {
+			const manager = createSyncManager();
+
+			const onSynced = jest.fn();
+			const unsubscribe = manager.subscribeHasInitialSync(
+				'post',
+				'456',
+				onSynced
+			);
+
+			expect( onSynced ).not.toHaveBeenCalled();
+			expect( () => unsubscribe() ).not.toThrow();
+		} );
+	} );
+
 	describe( 'shouldSync', () => {
 		it( 'skips loading entity when shouldSync returns false', async () => {
 			const manager = createSyncManager();

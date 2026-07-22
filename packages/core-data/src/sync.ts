@@ -80,3 +80,32 @@ export function getEntityAutosavedAt(
 		authorId
 	);
 }
+
+/**
+ * Subscribe to a synced entity's "synced" flag, which flips true once the
+ * entity's CRDT document has received its initial state from the sync backend.
+ * The callback fires once: immediately if the document has already synced,
+ * otherwise when it does. The subscription may be attached before the entity
+ * is loaded, so this bootstraps the sync manager rather than no-opping when
+ * none exists yet. Returns an unsubscribe function.
+ *
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {string|number} recordId Record ID.
+ * @param {Function}      callback Called once the document has synced.
+ * @return {Function} Unsubscribe function.
+ */
+export function subscribeHasInitialSync(
+	kind: string,
+	name: string,
+	recordId: string | number,
+	callback: () => void
+): () => void {
+	return (
+		getSyncManager()?.subscribeHasInitialSync(
+			`${ kind }/${ name }`,
+			`${ recordId }`,
+			callback
+		) ?? ( () => {} )
+	);
+}

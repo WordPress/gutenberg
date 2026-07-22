@@ -55,47 +55,27 @@ function createWebSocketProvider() {
 
 		const statusListeners = new Set();
 
-		// y-websocket distinguishes socket connection from sync completion.
-		// 'connected' means the WS is open; 'sync' fires once sync step 2 has
-		// landed and the doc reflects the server state. Tests that need real
-		// convergence should wait on `synced`, not just `status`. Reported
-		// statuses include the optional `isSynced` field so that consumers
-		// (e.g. the editor's autosave notice) can act as soon as the initial
-		// document sync has been applied.
-		let rawStatus = 'connecting';
-		let isSynced = false;
-
-		const notifyStatus = () => {
-			const status = { status: rawStatus };
-			if ( 'connected' === rawStatus ) {
-				status.isSynced = isSynced;
-			}
-
-			for ( const callback of statusListeners ) {
-				callback( status );
-			}
-		};
-
 		const onStatus = ( event ) => {
 			// A fresh socket means the previous sync handshake (if any) is
 			// no longer current. y-websocket re-fires 'sync' once sync step 2
 			// completes on the new connection.
-			rawStatus = event.status;
+			const patch = { status: event.status };
 			if ( event.status !== 'connected' ) {
-				isSynced = false;
+				patch.synced = false;
 			}
-			updateDebugState( room, {
-				status: event.status,
-				synced: isSynced,
-			} );
-			notifyStatus();
+			updateDebugState( room, patch );
+			for ( const callback of statusListeners ) {
+				callback( { status: event.status } );
+			}
 		};
 		provider.on( 'status', onStatus );
 
-		const onSync = ( synced ) => {
-			isSynced = !! synced;
-			updateDebugState( room, { synced: isSynced } );
-			notifyStatus();
+		// y-websocket distinguishes socket connection from sync completion.
+		// 'connected' means the WS is open; 'sync' fires once sync step 2 has
+		// landed and the doc reflects the server state. Tests that need real
+		// convergence should wait on `synced`, not just `status`.
+		const onSync = ( isSynced ) => {
+			updateDebugState( room, { synced: !! isSynced } );
 		};
 		provider.on( 'sync', onSync );
 
