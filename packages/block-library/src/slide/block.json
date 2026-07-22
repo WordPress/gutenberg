@@ -37,6 +37,5 @@
 		}
 	},
 	"editorScript": "file:./index.js",
-	"editorStyle": "wp-block-slide-editor",
 	"style": "wp-block-slide"
 }
