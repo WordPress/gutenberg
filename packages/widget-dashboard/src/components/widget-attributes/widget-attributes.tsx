@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useResizeObserver } from '@wordpress/compose';
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
@@ -12,13 +11,14 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
+import { useReserveHeaderSpace } from '../widget-header/widget-header-fit';
 import { WidgetSettingsTrigger } from '../widget-settings';
-import { AttributeControlsDropdown } from './attribute-controls-dropdown';
-import { useInlineControlsFit } from './use-inline-controls-fit';
-import styles from './widget-attribute-controls.module.css';
-import type { DashboardWidget, WidgetAttributes } from '../../types';
+import { AttributesDropdown } from './attributes-dropdown';
+import { useInlineFit } from './use-inline-fit';
+import styles from './widget-attributes.module.css';
+import type { DashboardWidget, WidgetAttributeValues } from '../../types';
 
-type WidgetAttributeControlsProps = {
+type WidgetAttributesProps = {
 	/**
 	 * The instance whose attributes these controls edit.
 	 */
@@ -45,12 +45,12 @@ type WidgetAttributeControlsProps = {
  * expand back; remounting re-measures and re-collapses if the retained
  * value went stale.
  *
- * @param {WidgetAttributeControlsProps} props Component props.
+ * @param {WidgetAttributesProps} props Component props.
  */
-export function WidgetAttributeControls( {
+export function WidgetAttributes( {
 	widget,
 	widgetType,
-}: WidgetAttributeControlsProps ): React.ReactNode {
+}: WidgetAttributesProps ): React.ReactNode {
 	const { layout, onLayoutChange, scheduleAutoSave } =
 		useDashboardInternalContext();
 
@@ -58,32 +58,10 @@ export function WidgetAttributeControls( {
 		( attribute ) => attribute.relevance !== 'high'
 	);
 
-	// Trigger reserve size.
-	//
-	// The settings trigger remains in the toolbar in both presentations,
-	// so its actual footprint (button width plus the chip gap)
-	// is reserved from the fit budget.
-	//
-	// The control's size is determined by design tokens.
-	const [ triggerReserve, setTriggerReserve ] = useState( 0 );
-
-	const triggerReserveRef = useResizeObserver< HTMLElement >(
-		( [ entry ] ) => {
-			const { columnGap } = getComputedStyle(
-				entry.target.parentElement as HTMLElement
-			);
-
-			setTriggerReserve(
-				entry.contentRect.width + ( parseFloat( columnGap ) || 0 )
-			);
-		}
-	);
-
-	useEffect( () => {
-		if ( ! hasSettingsSurface ) {
-			setTriggerReserve( 0 );
-		}
-	}, [ hasSettingsSurface ] );
+	// The settings trigger stays in the toolbar in both presentations, so it
+	// reserves its own footprint from the header's fit budget.
+	const settingsReserveRef =
+		useReserveHeaderSpace< HTMLSpanElement >( 'settings' );
 
 	// While the user interacts with a presentation, the fit holds it in
 	// place; replacing it mid-interaction would drop focus on the floor.
@@ -96,8 +74,7 @@ export function WidgetAttributeControls( {
 	const [ dropdownTriggerHasFocus, setDropdownTriggerHasFocus ] =
 		useState( false );
 
-	const { measureRef, collapsed } = useInlineControlsFit( {
-		reservedSize: triggerReserve,
+	const { measureRef, collapsed } = useInlineFit( {
 		locked: dropdownOpen || inlineHasFocus || dropdownTriggerHasFocus,
 	} );
 
@@ -111,11 +88,11 @@ export function WidgetAttributeControls( {
 		}
 	}, [ collapsed ] );
 
-	const fields = useMemo< Field< WidgetAttributes >[] >(
+	const fields = useMemo< Field< WidgetAttributeValues >[] >(
 		() =>
 			( widgetType.attributes ?? [] ).filter(
 				( attribute ) => attribute.relevance === 'high'
-			) as Field< WidgetAttributes >[],
+			) as Field< WidgetAttributeValues >[],
 		[ widgetType.attributes ]
 	);
 
@@ -155,7 +132,7 @@ export function WidgetAttributeControls( {
 
 	const data = ( widget.attributes ??
 		widgetType.example?.attributes ??
-		{} ) as WidgetAttributes;
+		{} ) as WidgetAttributeValues;
 
 	return (
 		<>
@@ -178,7 +155,7 @@ export function WidgetAttributeControls( {
 							}
 						} }
 					>
-						<DataForm< WidgetAttributes >
+						<DataForm< WidgetAttributeValues >
 							data={ data }
 							fields={ fields }
 							form={ form }
@@ -200,7 +177,7 @@ export function WidgetAttributeControls( {
 						}
 					} }
 				>
-					<AttributeControlsDropdown
+					<AttributesDropdown
 						fields={ fields }
 						data={ data }
 						onChange={ handleChange }
@@ -211,7 +188,7 @@ export function WidgetAttributeControls( {
 
 			{ hasSettingsSurface && (
 				<span
-					ref={ triggerReserveRef }
+					ref={ settingsReserveRef }
 					className={ styles[ 'persistent-controls' ] }
 				>
 					<WidgetSettingsTrigger
