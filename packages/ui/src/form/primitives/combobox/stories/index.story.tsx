@@ -1,7 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useState } from '@wordpress/element';
 import * as Combobox from '../index';
-import { ITEMS, type FixtureItem } from './fixtures';
+import {
+	ITEMS,
+	GROUPED_ITEMS,
+	type FixtureGroup,
+	type FixtureItem,
+} from './fixtures';
 
 const meta: Meta< typeof Combobox.Root > = {
 	title: 'Design System/Components/Form/Primitives/Combobox',
@@ -16,6 +21,8 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.ListBody': Combobox.ListBody,
 		'Combobox.ListFooter': Combobox.ListFooter,
 		'Combobox.Collection': Combobox.Collection,
+		'Combobox.Group': Combobox.Group,
+		'Combobox.GroupLabel': Combobox.GroupLabel,
 		'Combobox.Item': Combobox.Item,
 		'Combobox.Value': Combobox.Value,
 		'Combobox.Chips': Combobox.Chips,
@@ -325,6 +332,51 @@ export const WithCustomTriggerAndItem: Story = {
 										</span>
 									</div>
 								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
+				</Combobox.List>
+			</Combobox.Popup>,
+		],
+	},
+};
+
+/**
+ * Options can be organized into labeled groups with `Combobox.Group`
+ * and `Combobox.GroupLabel`.
+ */
+export const Grouped: Story = {
+	args: {
+		items: GROUPED_ITEMS,
+		children: [
+			<Combobox.Trigger key="trigger" />,
+			<Combobox.Popup key="popup">
+				<div style={ inputWrapperStyle }>
+					<Combobox.Input placeholder="Search" />
+				</div>
+				<Combobox.Empty>No results found.</Combobox.Empty>
+				<Combobox.List>
+					<Combobox.ListBody>
+						<Combobox.Collection>
+							{ ( group: FixtureGroup ) => (
+								<Combobox.Group
+									key={ group.label }
+									items={ group.items }
+								>
+									<Combobox.GroupLabel>
+										{ group.label }
+									</Combobox.GroupLabel>
+									<Combobox.Collection>
+										{ ( item: FixtureItem ) => (
+											<Combobox.Item
+												key={ item.value }
+												value={ item }
+											>
+												{ item.label }
+											</Combobox.Item>
+										) }
+									</Combobox.Collection>
+								</Combobox.Group>
 							) }
 						</Combobox.Collection>
 					</Combobox.ListBody>

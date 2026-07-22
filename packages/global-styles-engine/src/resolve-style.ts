@@ -29,6 +29,11 @@ interface ResolveStyleContext {
 	// Slug of the active block style variation, if any. Its styles are resolved
 	// against `globalStyles` internally and folded in as the highest layer.
 	variationName?: string | null;
+	// Root-level `styles.elements.*` keys whose styles paint this block on the
+	// canvas, ordered low to high precedence (e.g. `[ 'heading', 'h2' ]` for a
+	// level-2 Heading). Folded in above the root defaults and below the block's
+	// own styles. The caller owns this mapping; the engine stays block-agnostic.
+	elements?: string[] | null;
 	// Responsive breakpoint (e.g. `@mobile`), or null for the default viewport.
 	viewport?: string | null;
 	// CSS pseudo-state (e.g. `:hover`), or null for the default state. Matches
@@ -81,15 +86,6 @@ const SOURCE_DESCRIPTORS: Record< string, SourceDescriptor > = {
 	element: { layer: 'element' },
 	block: { layer: 'block' },
 	blockVariation: { layer: 'blockVariation' },
-};
-
-// Blocks whose canvas rendering is driven by a Global Styles *element*
-// selector (e.g. `.wp-element-button`, `h1`–`h6`) rather than the block's own
-// class. For these, the matching root-level `styles.elements[ element ]` layer
-// is folded in as its own inheritance layer.
-const BLOCK_TO_ROOT_ELEMENT: Record< string, string > = {
-	'core/button': 'button',
-	'core/heading': 'heading',
 };
 
 function createSourceDescriptor( type: string ): SourceDescriptor | null {
@@ -401,6 +397,7 @@ function resolveThemeFileBackgroundImage(
  * @param context               Which slice to resolve.
  * @param context.blockName     Block name (e.g. `core/heading`).
  * @param context.variationName Slug of the active block style variation, or null.
+ * @param context.elements      Root-level `styles.elements.*` keys that paint this block, ordered low to high precedence.
  * @param context.viewport      Responsive breakpoint, or null for the default viewport.
  * @param context.pseudoState   CSS pseudo-state, or null for the default state.
  * @return Merged panel-scoped payload and source map.
@@ -410,6 +407,7 @@ function computeResolvedStyle(
 	{
 		blockName,
 		variationName = null,
+		elements = null,
 		viewport = null,
 		pseudoState = null,
 	}: ResolveStyleContext = {}
@@ -429,13 +427,14 @@ function computeResolvedStyle(
 
 	const root = styles;
 	const block = styles.blocks?.[ blockName ] ?? null;
-	// For element-based blocks (e.g. `core/button`), the root-level element
-	// styles paint the block on the canvas, so fold them in as a layer just
-	// above the root defaults but below the block's own styles.
-	const rootElement = BLOCK_TO_ROOT_ELEMENT[ blockName ] ?? null;
-	const element = rootElement
-		? styles.elements?.[ rootElement ] ?? null
-		: null;
+	// For element-based blocks (e.g. `core/button`, or a Heading at a given
+	// level), the root-level element styles paint the block on the canvas, so
+	// fold them in as layers just above the root defaults but below the
+	// block's own styles. `elements` is ordered low to high precedence, so a
+	// level-specific `h2` correctly wins over the generic `heading`.
+	const elementLayers = ( elements ?? [] )
+		.map( ( elementName ) => styles.elements?.[ elementName ] ?? null )
+		.filter( ( layer ): layer is StyleTree => !! layer );
 	// Resolve the active block style variation's styles (with `{ ref }`
 	// values resolved) against the Global Styles tree.
 	const variation = variationName
@@ -452,12 +451,12 @@ function computeResolvedStyle(
 			pickLayerRootContribution( root ),
 			createSourceDescriptor( 'root' )
 		),
-		element
-			? createContribution(
-					pickLayerRootContribution( element ),
-					createSourceDescriptor( 'element' )
-			  )
-			: null,
+		...elementLayers.map( ( layer ) =>
+			createContribution(
+				pickLayerRootContribution( layer ),
+				createSourceDescriptor( 'element' )
+			)
+		),
 		block
 			? createContribution(
 					pickLayerRootContribution( block ),
@@ -485,14 +484,14 @@ function computeResolvedStyle(
 				),
 				createSourceDescriptor( 'root' )
 			),
-			element
-				? createContribution(
-						pickLayerRootContribution(
-							getStateSlice( element, selectedState )
-						),
-						createSourceDescriptor( 'element' )
-				  )
-				: null,
+			...elementLayers.map( ( layer ) =>
+				createContribution(
+					pickLayerRootContribution(
+						getStateSlice( layer, selectedState )
+					),
+					createSourceDescriptor( 'element' )
+				)
+			),
 			block
 				? createContribution(
 						pickLayerRootContribution(
@@ -588,15 +587,17 @@ export function resolveStyle(
 		inner = new Map();
 		byLinks.set( linksKey, inner );
 	}
-	const stateKey = `${ context.viewport ?? '' }:${
-		context.pseudoState ?? ''
-	}`;
+	// Element layers vary per block instance (e.g. a Heading's level), so they
+	// must take part in the cache key alongside the state slice.
+	const sliceKey = `${ context.elements?.join( ',' ) ?? '' }:${
+		context.viewport ?? ''
+	}:${ context.pseudoState ?? '' }`;
 	const key =
 		( context.blockName || '' ) +
 		'\u0001' +
 		( context.variationName || '' ) +
 		'\u0001' +
-		stateKey;
+		sliceKey;
 	if ( inner.has( key ) ) {
 		return inner.get( key ) as ResolvedStyle;
 	}

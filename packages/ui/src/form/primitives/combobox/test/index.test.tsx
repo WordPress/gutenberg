@@ -507,6 +507,81 @@ describe( 'Combobox', () => {
 	} );
 	/* eslint-enable testing-library/no-node-access */
 
+	describe( 'grouped items', () => {
+		const GROUPED_ITEMS = [
+			{
+				label: 'Group 1',
+				items: [
+					{ id: '1', value: 'Item 1' },
+					{ id: '2', value: 'Item 2' },
+				],
+			},
+			{
+				label: 'Group 2',
+				items: [ { id: '3', value: 'Item 3' } ],
+			},
+		];
+
+		it( 'forwards refs', async () => {
+			const user = userEvent.setup();
+			const groupRef = createRef< HTMLDivElement >();
+			const groupLabelRef = createRef< HTMLDivElement >();
+
+			render(
+				<Combobox.Root items={ GROUPED_ITEMS }>
+					<Combobox.Trigger />
+					<Combobox.Popup>
+						<Combobox.Input placeholder="Search" />
+						<Combobox.List>
+							<Combobox.ListBody>
+								<Combobox.Collection>
+									{ ( group ) => (
+										<Combobox.Group
+											key={ group.label }
+											ref={
+												group.label === 'Group 1'
+													? groupRef
+													: undefined
+											}
+											items={ group.items }
+										>
+											<Combobox.GroupLabel
+												ref={
+													group.label === 'Group 1'
+														? groupLabelRef
+														: undefined
+												}
+											>
+												{ group.label }
+											</Combobox.GroupLabel>
+											<Combobox.Collection>
+												{ ( item ) => (
+													<Combobox.Item
+														key={ item.id }
+														value={ item }
+													>
+														{ item.value }
+													</Combobox.Item>
+												) }
+											</Combobox.Collection>
+										</Combobox.Group>
+									) }
+								</Combobox.Collection>
+							</Combobox.ListBody>
+						</Combobox.List>
+					</Combobox.Popup>
+				</Combobox.Root>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			await waitFor( () => {
+				expect( groupRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+			expect( groupLabelRef.current ).toBeInstanceOf( HTMLDivElement );
+		} );
+	} );
+
 	describe( 'when disabled', () => {
 		it( 'hides the chip remove button from screen readers', () => {
 			renderDisabledMultiSelect();
