@@ -46,3 +46,39 @@ export function stripRemoved( tree ) {
 				: block
 		);
 }
+
+/**
+ * Builds one entry per revision (oldest-first) where every entry's block tree
+ * shares consistent clientIds across the chain, using the same two primitives
+ * the rest of the revisions UI already relies on:
+ * - `diffRevisionContent()` — the LCS + similarity-based diff.
+ * - `preserveClientIds()` — clientId threading used by `useRevisionBlocks`.
+ *
+ * @param {Array} revisions Oldest-first revisions, each with `content.raw`.
+ * @return {Array} `{ tree, changedClientIds }` entry per revision.
+ */
+export function buildRevisionChain( revisions ) {
+	const chain = [];
+	let previousTree = null;
+
+	for ( let i = 0; i < revisions.length; i++ ) {
+		const content = revisions[ i ]?.content?.raw ?? '';
+		const changedClientIds = new Set();
+		let tree;
+
+		if ( i === 0 || ! previousTree ) {
+			tree = parse( content );
+		} else {
+			const previousContent = revisions[ i - 1 ]?.content?.raw ?? '';
+			const diffed = diffRevisionContent( content, previousContent );
+			const threaded = preserveClientIds( diffed, previousTree );
+			collectChangedClientIds( threaded, changedClientIds );
+			tree = stripRemoved( threaded );
+		}
+
+		chain.push( { tree, changedClientIds } );
+		previousTree = tree;
+	}
+
+	return chain;
+}
