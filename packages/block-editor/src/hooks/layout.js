@@ -308,12 +308,12 @@ function LayoutPanelPure( {
 		isResponsiveEditing,
 	} = useSelect(
 		( select ) => {
-			const blockEditorSelect = select( blockEditorStore );
-			const { getBlockAttributes, getSettings } = blockEditorSelect;
 			const {
+				getBlockAttributes,
+				getSettings,
 				getSelectedBlockStyleState,
 				isResponsiveEditing: getIsResponsiveEditing,
-			} = unlock( blockEditorSelect );
+			} = unlock( select( blockEditorStore ) );
 			return {
 				activeBlockVariation: select(
 					blocksStore

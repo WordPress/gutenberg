@@ -4,6 +4,7 @@
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { getCSSValueFromRawStyle } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
@@ -148,6 +149,7 @@ export default function ColorPanel( {
 	label,
 	children,
 	contrastWarning,
+	showInheritanceLabelIndicators = true,
 } ) {
 	const {
 		colors,
@@ -163,9 +165,15 @@ export default function ColorPanel( {
 
 	const colorEditing = useColorEditing();
 
+	// When an inherited preset isn't in the panel's palette, `decodeValue`
+	// returns the raw `var:preset|…` token rather than a paintable colour.
+	// Fall back to its CSS custom property so the swatch still renders.
+	const decodeInheritedColor = ( rawValue ) =>
+		getCSSValueFromRawStyle( decodeValue( rawValue ) );
+
 	// Links
 	const showLinkPanel = useHasLinkPanel( settings );
-	const linkColor = decodeValue(
+	const linkColor = decodeInheritedColor(
 		inheritedValue?.elements?.link?.color?.text
 	);
 	const userLinkColor = decodeValue( value?.elements?.link?.color?.text );
@@ -178,7 +186,7 @@ export default function ColorPanel( {
 			)
 		);
 	};
-	const hoverLinkColor = decodeValue(
+	const hoverLinkColor = decodeInheritedColor(
 		inheritedValue?.elements?.link?.[ ':hover' ]?.color?.text
 	);
 	const userHoverLinkColor = decodeValue(
@@ -299,7 +307,16 @@ export default function ColorPanel( {
 			hasValue: hasLink,
 			resetValue: resetLink,
 			isShownByDefault: defaultControls.link,
-			indicators: [ linkColor, hoverLinkColor ],
+			indicators: [
+				userLinkColor ?? linkColor,
+				userHoverLinkColor ?? hoverLinkColor,
+			],
+			isPlaceholder:
+				userLinkColor === undefined &&
+				userHoverLinkColor === undefined &&
+				( linkColor !== undefined || hoverLinkColor !== undefined ),
+			hasInheritedValue:
+				linkColor !== undefined || hoverLinkColor !== undefined,
 			contrastWarning,
 			tabs: [
 				{
@@ -312,6 +329,8 @@ export default function ColorPanel( {
 					),
 					setValue: setLinkColor,
 					userValue: userLinkColor,
+					isPlaceholder:
+						userLinkColor === undefined && linkColor !== undefined,
 				},
 				{
 					key: 'hover',
@@ -324,6 +343,9 @@ export default function ColorPanel( {
 					),
 					setValue: setHoverLinkColor,
 					userValue: userHoverLinkColor,
+					isPlaceholder:
+						userHoverLinkColor === undefined &&
+						hoverLinkColor !== undefined,
 				},
 			],
 		},
@@ -334,13 +356,13 @@ export default function ColorPanel( {
 			return;
 		}
 
-		const elementBackgroundColor = decodeValue(
+		const elementBackgroundColor = decodeInheritedColor(
 			inheritedValue?.elements?.[ name ]?.color?.background
 		);
-		const elementGradient = decodeValue(
+		const elementGradient = decodeInheritedColor(
 			inheritedValue?.elements?.[ name ]?.color?.gradient
 		);
-		const elementTextColor = decodeValue(
+		const elementTextColor = decodeInheritedColor(
 			inheritedValue?.elements?.[ name ]?.color?.text
 		);
 		const elementBackgroundUserColor = decodeValue(
@@ -408,6 +430,29 @@ export default function ColorPanel( {
 		// as there isn't yet a way to set padding for the element.
 		const supportsBackground = name !== 'caption';
 
+		// Per-tab placeholder flags. The item-level placeholder is active when
+		// there is no local color on any axis and at least one inherited color.
+		const isElementTextPlaceholder =
+			elementTextUserColor === undefined &&
+			elementTextColor !== undefined;
+		const isElementBackgroundPlaceholder =
+			elementBackgroundUserColor === undefined &&
+			elementBackgroundColor !== undefined;
+		const isElementGradientPlaceholder =
+			elementGradientUserColor === undefined &&
+			elementGradient !== undefined;
+		const isElementPlaceholder =
+			elementTextUserColor === undefined &&
+			elementBackgroundUserColor === undefined &&
+			elementGradientUserColor === undefined &&
+			( elementTextColor !== undefined ||
+				elementBackgroundColor !== undefined ||
+				elementGradient !== undefined );
+		const hasElementInheritedValue =
+			elementTextColor !== undefined ||
+			elementBackgroundColor !== undefined ||
+			elementGradient !== undefined;
+
 		items.push( {
 			key: name,
 			label: elementLabel,
@@ -416,10 +461,15 @@ export default function ColorPanel( {
 			isShownByDefault: defaultControls[ name ],
 			indicators: supportsBackground
 				? [
-						elementTextColor,
-						elementGradient ?? elementBackgroundColor,
+						elementTextUserColor ?? elementTextColor,
+						elementGradientUserColor ??
+							elementGradient ??
+							elementBackgroundUserColor ??
+							elementBackgroundColor,
 				  ]
-				: [ elementTextColor ],
+				: [ elementTextUserColor ?? elementTextColor ],
+			isPlaceholder: isElementPlaceholder,
+			hasInheritedValue: hasElementInheritedValue,
 			tabs: [
 				hasSolidColors && {
 					key: 'text',
@@ -431,6 +481,7 @@ export default function ColorPanel( {
 					),
 					setValue: setElementTextColor,
 					userValue: elementTextUserColor,
+					isPlaceholder: isElementTextPlaceholder,
 				},
 				hasSolidColors &&
 					supportsBackground && {
@@ -444,6 +495,7 @@ export default function ColorPanel( {
 						),
 						setValue: setElementBackgroundColor,
 						userValue: elementBackgroundUserColor,
+						isPlaceholder: isElementBackgroundPlaceholder,
 					},
 				hasGradientColors &&
 					supportsBackground && {
@@ -453,6 +505,7 @@ export default function ColorPanel( {
 						setValue: setElementGradient,
 						userValue: elementGradientUserColor,
 						isGradient: true,
+						isPlaceholder: isElementGradientPlaceholder,
 					},
 			].filter( Boolean ),
 		} );
@@ -472,6 +525,9 @@ export default function ColorPanel( {
 					<ColorGradientDropdownItem
 						key={ key }
 						{ ...restItem }
+						showInheritanceLabelIndicators={
+							showInheritanceLabelIndicators
+						}
 						colorGradientControlSettings={ {
 							colors,
 							disableCustomColors: ! areCustomSolidsEnabled,

@@ -1,13 +1,15 @@
 {
 	"name": "@wordpress/theme",
-	"version": "0.17.0",
+	"version": "1.0.0",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
 		"gutenberg",
-		"components"
+		"design-system",
+		"design-tokens",
+		"theme"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/theme/README.md",
 	"repository": {
@@ -23,10 +25,15 @@
 		"npm": ">=10.2.3"
 	},
 	"files": [
-		"src",
 		"build-module",
 		"build-types",
-		"*.md"
+		"*-plugins/**",
+		"prebuilt",
+		"*.md",
+		"!build-types/**/*.d.mts.map",
+		"!build-types/**/*.d.ts.map",
+		"!**/stories/**",
+		"!**/test/**"
 	],
 	"type": "module",
 	"module": "build-module/index.mjs",
@@ -35,41 +42,40 @@
 			"types": "./build-types/index.d.ts",
 			"default": "./build-module/index.mjs"
 		},
-		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
+		"./design-tokens.css": "./prebuilt/css/design-tokens.css",
 		"./design-tokens.js": {
 			"types": "./build-types/prebuilt/js/design-tokens.d.mts",
-			"default": "./src/prebuilt/js/design-tokens.mjs"
+			"default": "./prebuilt/js/design-tokens.mjs"
 		},
 		"./postcss-plugins/postcss-ds-token-fallbacks": {
-			"types": "./src/postcss-plugins/postcss-ds-token-fallbacks.d.mts",
-			"default": "./src/postcss-plugins/postcss-ds-token-fallbacks.mjs"
+			"types": "./build-types/postcss-plugins/postcss-ds-token-fallbacks.d.mts",
+			"default": "./postcss-plugins/postcss-ds-token-fallbacks.mjs"
 		},
 		"./esbuild-plugins/esbuild-ds-token-fallbacks": {
-			"types": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.d.mts",
-			"default": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.mjs"
+			"types": "./build-types/esbuild-plugins/esbuild-ds-token-fallbacks.d.mts",
+			"default": "./esbuild-plugins/esbuild-ds-token-fallbacks.mjs"
 		},
 		"./vite-plugins/vite-ds-token-fallbacks": {
-			"types": "./src/vite-plugins/vite-ds-token-fallbacks.d.mts",
-			"default": "./src/vite-plugins/vite-ds-token-fallbacks.mjs"
+			"types": "./build-types/vite-plugins/vite-ds-token-fallbacks.d.mts",
+			"default": "./vite-plugins/vite-ds-token-fallbacks.mjs"
 		},
 		"./stylelint-plugins/no-unknown-ds-tokens": {
 			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.mts",
-			"default": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs"
+			"default": "./stylelint-plugins/no-unknown-ds-tokens.mjs"
 		},
 		"./stylelint-plugins/no-setting-wpds-custom-properties": {
 			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts",
-			"default": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs"
+			"default": "./stylelint-plugins/no-setting-wpds-custom-properties.mjs"
 		},
 		"./stylelint-plugins/no-token-fallback-values": {
 			"types": "./build-types/stylelint-plugins/no-token-fallback-values.d.mts",
-			"default": "./src/stylelint-plugins/no-token-fallback-values.mjs"
+			"default": "./stylelint-plugins/no-token-fallback-values.mjs"
 		},
 		"./package.json": "./package.json"
 	},
 	"wpScript": true,
-	"types": "build-types",
 	"sideEffects": [
-		"src/prebuilt/css/design-tokens.css"
+		"prebuilt/css/design-tokens.css"
 	],
 	"dependencies": {
 		"@wordpress/compose": "file:../compose",
@@ -77,7 +83,7 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
-		"colorjs.io": "^0.6.0",
+		"colorjs.io": "^0.7.0",
 		"memize": "^2.1.0"
 	},
 	"devDependencies": {
@@ -91,6 +97,7 @@
 		"@testing-library/user-event": "^14.6.1",
 		"@types/jest": "^29.5.14",
 		"@types/node": "^20.19.39",
+		"@wordpress/validation-tools": "file:../../tools/validation",
 		"esbuild": "^0.27.2",
 		"esbuild-esm-loader": "^0.3.3",
 		"prettier": "npm:wp-prettier@^3.0.3",
@@ -99,12 +106,12 @@
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
-		"esbuild": "^0.27.2",
+		"esbuild": ">=0.27.2 <1.0.0",
 		"postcss": "^8.0.0",
 		"react": "^18 || ^19",
 		"react-dom": "^18 || ^19",
-		"stylelint": "^16.8.2",
-		"vite": "^7.3.2"
+		"stylelint": "^16 || ^17",
+		"vite": "^7 || ^8"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {
@@ -130,6 +137,7 @@
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps",
-		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
+		"lint:package-contents": "wp-validate-package-contents . --disallow-path src",
+		"postbuild": "prettier --write tokens/color.json tokens/modes prebuilt src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
 	}
 }

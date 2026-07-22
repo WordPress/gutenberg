@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/global-styles-ui",
-	"version": "1.17.0",
+	"version": "1.18.0",
 	"description": "Global Styles UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -40,7 +40,7 @@
 			"default": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
-		"./build-style/": "./build-style/"
+		"./build-style/*": "./build-style/*"
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",

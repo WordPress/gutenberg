@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 740" width="1240" height="740" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="The six-step processing pipeline: prepare, transcode (optional), upload the original, generate thumbnails, sideload sub-sizes, and finalize.">
+  <defs>
+    <style>
+      .eyebrow { fill:#2d40e8; font-weight:700; font-size:13px; letter-spacing:1.5px; }
+      .title { fill:#101419; font-weight:800; font-size:34px; }
+      .subtitle { fill:#5c6470; font-size:19px; }
+      .st { fill:#101419; font-weight:700; font-size:22px; }
+      .body { fill:#3c434a; font-size:18px; }
+      .mono { font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; }
+      .num { fill:#ffffff; font-weight:700; font-size:19px; }
+    </style>
+  </defs>
+
+  <rect width="1240" height="740" fill="#ffffff"/>
+
+  <text class="eyebrow" x="40" y="52">CLIENT-SIDE MEDIA PROCESSING</text>
+  <text class="title" x="40" y="95">Processing pipeline</text>
+  <text class="subtitle" x="40" y="128">Operations chained sequentially per queue item by the <tspan class="mono" font-size="17">core/upload-media</tspan> store.</text>
+
+  <!-- connectors -->
+  <g stroke="#d0d5da" stroke-width="2">
+    <line x1="62" y1="226" x2="62" y2="288"/>
+    <line x1="62" y1="332" x2="62" y2="368"/>
+    <line x1="62" y1="412" x2="62" y2="448"/>
+    <line x1="62" y1="492" x2="62" y2="554"/>
+    <line x1="62" y1="598" x2="62" y2="634"/>
+  </g>
+
+  <!-- circles -->
+  <g>
+    <circle cx="62" cy="204" r="22" fill="#2d40e8"/><text class="num" x="62" y="211" text-anchor="middle">1</text>
+    <circle cx="62" cy="310" r="22" fill="#2d40e8"/><text class="num" x="62" y="317" text-anchor="middle">2</text>
+    <circle cx="62" cy="390" r="22" fill="#2d40e8"/><text class="num" x="62" y="397" text-anchor="middle">3</text>
+    <circle cx="62" cy="470" r="22" fill="#2d40e8"/><text class="num" x="62" y="477" text-anchor="middle">4</text>
+    <circle cx="62" cy="576" r="22" fill="#2d40e8"/><text class="num" x="62" y="583" text-anchor="middle">5</text>
+    <circle cx="62" cy="656" r="22" fill="#2d40e8"/><text class="num" x="62" y="663" text-anchor="middle">6</text>
+  </g>
+
+  <!-- 1 -->
+  <text class="st" x="105" y="200">Prepare</text>
+  <text class="body" x="105" y="230">Inspect the file type and pick a pipeline — supported images go through WASM; video, audio, and documents</text>
+  <text class="body" x="105" y="256">upload directly for server-side processing.</text>
+
+  <!-- 2 -->
+  <text class="st" x="105" y="306">Transcode</text>
+  <rect x="238" y="288" width="86" height="24" rx="5" fill="#fdf0d5"/>
+  <text x="281" y="305" text-anchor="middle" fill="#9a6700" font-weight="700" font-size="12" letter-spacing="1">OPTIONAL</text>
+  <text class="body" x="105" y="336">Convert formats per the <tspan class="mono">image_editor_output_format</tspan> filter (e.g. JPEG → WebP). Transparent PNGs are never converted to JPEG.</text>
+
+  <!-- 3 -->
+  <text class="st" x="105" y="386">Upload the original</text>
+  <text class="body" x="105" y="416"><tspan class="mono">POST /wp/v2/media</tspan> with <tspan class="mono">generate_sub_sizes: false</tspan> — the server skips thumbnail generation entirely.</text>
+
+  <!-- 4 -->
+  <text class="st" x="105" y="466">Generate thumbnails</text>
+  <text class="body" x="105" y="496">The server responds with <tspan class="mono">missing_image_sizes</tspan>; the client resizes each one, deduplicating sizes that share output dimensions. Scaled</text>
+  <text class="body" x="105" y="522">(<tspan class="mono">big_image_size_threshold</tspan>) and EXIF-rotated versions are generated here too.</text>
+
+  <!-- 5 -->
+  <text class="st" x="105" y="572">Sideload sub-sizes</text>
+  <text class="body" x="105" y="602">Each variant uploads via <tspan class="mono">POST /wp/v2/media/{id}/sideload</tspan>. Sideloads to the same post are serialized to avoid metadata races.</text>
+
+  <!-- 6 -->
+  <text class="st" x="105" y="652">Finalize</text>
+  <text class="body" x="105" y="682"><tspan class="mono">POST /wp/v2/media/{id}/finalize</tspan> fires <tspan class="mono">wp_generate_attachment_metadata</tspan> with context <tspan class="mono">'update'</tspan></text>
+  <text class="body" x="105" y="708">so server-side plugins see the complete sub-size metadata. Best-effort: a failure here never blocks the upload.</text>
+</svg>

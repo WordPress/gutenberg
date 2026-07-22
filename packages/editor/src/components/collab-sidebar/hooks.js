@@ -71,9 +71,11 @@ export function useNoteThreads( postId ) {
 			return { notes: [], unresolvedNotes: [] };
 		}
 
-		// Single pass over clientIds builds the forward map and reverse lookup
-		// together. getNoteIdsFromMetadata returns numeric ids, matching the
-		// types returned by the comments REST endpoint.
+		/*
+		 * Single pass over clientIds builds the forward map and reverse lookup
+		 * together. getNoteIdsFromMetadata returns numeric ids, matching the
+		 * types returned by the comments REST endpoint.
+		 */
 		const blocksWithNotes = {};
 		const clientIdByNoteId = new Map();
 		for ( const clientId of clientIds ) {
@@ -319,11 +321,14 @@ export function useNoteActions() {
 				{ throwOnError: true }
 			);
 
-			// If it's a top-level note, update the block attributes with the note id.
-			// Read-modify-write on metadata is racy under concurrent edits:
-			// two near-simultaneous adds against the same base will each write
-			// a 2-element array and the later write wins, dropping the other
-			// id. Tracking issue: https://github.com/WordPress/gutenberg/issues/74751.
+			/*
+			 * If it's a top-level note, update the block attributes with the
+			 * note id. Read-modify-write on metadata is racy under concurrent
+			 * edits: two near-simultaneous adds against the same base will each
+			 * write a 2-element array and the later write wins, dropping the
+			 * other id. Tracking issue:
+			 * https://github.com/WordPress/gutenberg/issues/74751.
+			 */
 			if ( ! parent && savedRecord?.id ) {
 				const clientId =
 					inlineSelection?.clientId || getSelectedBlockClientId();
