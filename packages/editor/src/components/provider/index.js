@@ -218,7 +218,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				const isRenderingModeReady = _defaultMode !== undefined;
 
 				// Read selection directly from entity edits using the post prop,
-				// bypassing getCurrentPostId() which is synchronized after render.
+				// bypassing getCurrentPostId() which lags behind in useEffect.
 				const entityEdits = getEntityRecordEdits(
 					'postType',
 					post.type,
@@ -394,7 +394,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		}, [] );
 
 		// Synchronizes the active post with the state
-		useLayoutEffect( () => {
+		useEffect( () => {
 			setEditedPost( post.type, post.id );
 			if (
 				typeof window !== 'undefined' &&

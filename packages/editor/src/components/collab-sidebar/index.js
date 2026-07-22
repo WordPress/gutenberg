@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useLayoutEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -34,7 +34,7 @@ import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
 function NotesSidebar( { postId } ) {
-	useLayoutEffect( () => {
+	useEffect( () => {
 		registerFormatType( NOTE_FORMAT_NAME, noteFormat );
 		return () => {
 			unregisterFormatType( NOTE_FORMAT_NAME );
