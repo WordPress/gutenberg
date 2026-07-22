@@ -490,44 +490,29 @@ export function useNoteActions() {
 					isMatch
 				);
 
-				let didPersist = false;
-				let localAttributes;
-				try {
-					if ( persistEntityBlockAttributes ) {
-						didPersist = await persistEntityBlockAttributes(
-							'postType',
-							getCurrentPostType(),
-							getCurrentPostId(),
-							{
-								record: getCurrentPost(),
-								blockPath,
-								isMatch,
-								matchCount,
-								matchIndex,
-								blockCount: getBlockCount( blocks ),
-								blockName: selectedBlock?.name,
-								attributes: getRepairedAttributes,
-							}
-						);
-					}
-				} finally {
-					localAttributes = getRepairedAttributes(
-						getBlockAttributes( clientId )
-					);
-					if ( localAttributes ) {
-						updateBlockAttributes( clientId, localAttributes );
-					}
-				}
+				updateBlockAttributes(
+					clientId,
+					getRepairedAttributes( attributes )
+				);
 
-				if ( ! localAttributes ) {
-					onError(
-						new Error(
-							__(
-								'The note was added, but its selected text changed before the attachment could be saved.'
-							)
-						)
-					);
-				} else if ( ! didPersist ) {
+				if (
+					! persistEntityBlockAttributes ||
+					! ( await persistEntityBlockAttributes(
+						'postType',
+						getCurrentPostType(),
+						getCurrentPostId(),
+						{
+							record: getCurrentPost(),
+							blockPath,
+							isMatch,
+							matchCount,
+							matchIndex,
+							blockCount: getBlockCount( blocks ),
+							blockName: selectedBlock?.name,
+							attributes: getRepairedAttributes,
+						}
+					) )
+				) {
 					onError(
 						new Error(
 							__(
