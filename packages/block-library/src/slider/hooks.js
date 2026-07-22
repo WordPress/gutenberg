@@ -8,18 +8,17 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 const SLIDE_BLOCK = 'core/slide';
 
 /**
- * Returns the child blocks of the slider, including the ordered list of all
- * children, the total slide count, and the client ID of the currently-selected slide.
+ * Returns the total slide count and the client ID of the currently-selected
+ * slide for the given slider block.
  *
  * @param {string} clientId The slider block's client ID.
- * @return {Object} An object with `childBlocks` (array of {clientId, name}),
- *                  `totalSlides` (number), and `selectedSlideClientId` (string|null).
+ * @return {Object} An object with `totalSlides` (number) and
+ *                  `selectedSlideClientId` (string|null).
  */
-function useSliderChildren( clientId ) {
+function useSliderEditorState( clientId ) {
 	return useSelect(
 		( select ) => {
 			const {
-				getBlocks,
 				getBlockOrder,
 				getBlockName,
 				getBlockParents,
@@ -27,14 +26,8 @@ function useSliderChildren( clientId ) {
 				getSelectedBlockClientId,
 			} = select( blockEditorStore );
 
-			const orderedClientIds = getBlockOrder( clientId );
-			const childBlocks = orderedClientIds.map( ( id ) => ( {
-				clientId: id,
-				name: getBlockName( id ),
-			} ) );
-
-			const totalSlides = getBlocks( clientId ).filter(
-				( b ) => b.name === SLIDE_BLOCK
+			const totalSlides = getBlockOrder( clientId ).filter(
+				( id ) => getBlockName( id ) === SLIDE_BLOCK
 			).length;
 
 			// Resolve the selected block back to a direct-child slide.
@@ -58,7 +51,7 @@ function useSliderChildren( clientId ) {
 				}
 			}
 
-			return { childBlocks, totalSlides, selectedSlideClientId };
+			return { totalSlides, selectedSlideClientId };
 		},
 		[ clientId ]
 	);
@@ -85,4 +78,4 @@ function useScrollToSelectedSlide( trackRef, selectedSlideClientId ) {
 	}, [ selectedSlideClientId, trackRef ] );
 }
 
-export { useSliderChildren, useScrollToSelectedSlide };
+export { useSliderEditorState, useScrollToSelectedSlide };

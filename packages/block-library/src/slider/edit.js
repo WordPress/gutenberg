@@ -16,7 +16,7 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { useSliderChildren, useScrollToSelectedSlide } from './hooks';
+import { useSliderEditorState, useScrollToSelectedSlide } from './hooks';
 import { SliderInspectorControls } from './inspector-controls';
 import {
 	SliderControlBar,
@@ -73,7 +73,7 @@ function SliderEdit( { attributes, setAttributes, clientId } ) {
 	);
 
 	const { totalSlides, selectedSlideClientId } =
-		useSliderChildren( clientId );
+		useSliderEditorState( clientId );
 
 	useScrollToSelectedSlide( trackRef, selectedSlideClientId );
 
