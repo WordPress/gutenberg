@@ -23,11 +23,14 @@ const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 import FieldsDropdownMenu from './fields-dropdown-menu';
 import { PrivateBlockContext } from '../../components/block-list/private-block-context';
 import InspectorControls from '../../components/inspector-controls/fill';
+import { getFieldsWithBindingsIndicators } from './bindings-indicator';
 
 // controls
 import RichText from './rich-text';
 import Media from './media';
 import Link from './link';
+
+const EMPTY_BINDINGS_INDICATOR_DATA = {};
 
 /**
  * Creates a configured control component that wraps a custom control
@@ -124,6 +127,47 @@ function BlockFields( {
 		},
 		[ blockContext, clientId, blockType?.name ]
 	);
+	/*
+	 * Data for the bindings indicator headers. Every returned value is a
+	 * stable reference (store state or a primitive), so the selector result
+	 * stays shallow-equal between unrelated store changes.
+	 */
+	const { bindableAttributes, rawBindings, hasCompatibleFields, sources } =
+		useSelect(
+			( select ) => {
+				const { __experimentalBlockBindingsSupportedAttributes } =
+					select( blockEditorStore ).getSettings();
+				const _bindableAttributes =
+					__experimentalBlockBindingsSupportedAttributes?.[
+						blockType?.name
+					];
+				if ( ! _bindableAttributes?.length ) {
+					return EMPTY_BINDINGS_INDICATOR_DATA;
+				}
+				const {
+					getAllBlockBindingsSources,
+					getBlockBindingsSourceFieldsList,
+				} = unlock( select( blocksStore ) );
+				const _sources = getAllBlockBindingsSources();
+				return {
+					bindableAttributes: _bindableAttributes,
+					rawBindings:
+						select( blockEditorStore ).getBlockAttributes(
+							clientId
+						)?.metadata?.bindings,
+					hasCompatibleFields: Object.values( _sources ).some(
+						( source ) =>
+							getBlockBindingsSourceFieldsList(
+								source,
+								blockContext
+							)?.length > 0
+					),
+					sources: _sources,
+				};
+			},
+			[ blockContext, clientId, blockType?.name ]
+		);
+
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
 
@@ -152,7 +196,7 @@ function BlockFields( {
 			return [];
 		}
 
-		return blockTypeFields.map( ( fieldDef ) => {
+		const fields = blockTypeFields.map( ( fieldDef ) => {
 			const field = {
 				...fieldDef,
 			};
@@ -185,7 +229,37 @@ function BlockFields( {
 
 			return field;
 		} );
-	}, [ blockTypeFields, clientId ] );
+
+		/*
+		 * Mirror the gating of the "Attributes" (Block Bindings) panel: only
+		 * show indicators when something is bound already or a compatible
+		 * source could be connected.
+		 */
+		if (
+			! bindableAttributes?.length ||
+			( rawBindings === undefined && ! hasCompatibleFields )
+		) {
+			return fields;
+		}
+
+		return getFieldsWithBindingsIndicators( fields, {
+			bindableAttributes,
+			bindings: rawBindings
+				? replacePatternOverridesDefaultBinding(
+						rawBindings,
+						bindableAttributes
+				  )
+				: undefined,
+			sources,
+		} );
+	}, [
+		blockTypeFields,
+		clientId,
+		bindableAttributes,
+		rawBindings,
+		hasCompatibleFields,
+		sources,
+	] );
 
 	if ( ! blockTypeFields?.length ) {
 		// TODO - we might still want to show a placeholder for blocks with no fields.

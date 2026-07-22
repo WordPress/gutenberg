@@ -75,7 +75,7 @@ export default function RichTextControl( {
 
 	const { baseControlProps, controlProps } = useBaseControlProps( {
 		hideLabelFromVision: hideLabelFromVision ?? field.hideLabelFromVision,
-		label: field.label,
+		label: field.header ?? field.label,
 	} );
 
 	return (
