@@ -136,13 +136,13 @@ export function SliderInspectorControls( {
 	maxSlidesToShow,
 } ) {
 	const {
-		loop = true,
-		arrowIcon = 'chevron',
-		indicatorStyle = 'dot',
-		navigationButtonType = 'icon',
-		navigationPosition = 'overlay',
-		navigationJustification = 'space-between',
-		showIndicators = true,
+		loop,
+		arrowIcon,
+		indicatorStyle,
+		navigationButtonType,
+		navigationPosition,
+		navigationJustification,
+		showIndicators,
 	} = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 

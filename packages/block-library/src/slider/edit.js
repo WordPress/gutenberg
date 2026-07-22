@@ -82,10 +82,10 @@ function SliderEdit( { attributes, setAttributes, clientId } ) {
 		slidesToShow,
 		arrowIcon,
 		indicatorStyle,
-		navigationButtonType = 'icon',
-		navigationPosition = 'overlay',
-		navigationJustification = 'space-between',
-		showIndicators = true,
+		navigationButtonType,
+		navigationPosition,
+		navigationJustification,
+		showIndicators,
 	} = attributes;
 	const normalizedSlidesToShow = normalizeSlidesToShow(
 		slidesToShow,
