@@ -324,7 +324,7 @@ export const persistEntityBlockAttributes =
 			blockName,
 		}
 	) =>
-	async ( { dispatch, select } ) => {
+	async ( { select } ) => {
 		const entityConfig = select.getEntityConfig( kind, name );
 		if (
 			! entityConfig?.baseURL ||
@@ -425,16 +425,6 @@ export const persistEntityBlockAttributes =
 					throw error;
 				}
 
-				const updatedRecord = await apiFetch( {
-					path: `${ entityConfig.baseURL }/${ recordId }?context=edit`,
-				} );
-				dispatch.receiveEntityRecords(
-					kind,
-					name,
-					updatedRecord,
-					undefined,
-					true
-				);
 				return true;
 			}
 

@@ -368,13 +368,7 @@ describe( 'persistEntityBlockAttributes', () => {
 				doc: 'serialized CRDT document',
 			},
 		} );
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
-			'postType',
-			'post',
-			expect.objectContaining( { id: 123 } ),
-			undefined,
-			true
-		);
+		expect( dispatch.receiveEntityRecords ).not.toHaveBeenCalled();
 		expect( didPersist ).toBe( true );
 	} );
 
@@ -598,8 +592,7 @@ describe( 'persistEntityBlockAttributes', () => {
 			.mockResolvedValueOnce( firstRecord )
 			.mockRejectedValueOnce( conflict )
 			.mockResolvedValueOnce( secondRecord )
-			.mockResolvedValueOnce( {} )
-			.mockResolvedValueOnce( { id: 123 } );
+			.mockResolvedValueOnce( {} );
 
 		const options = {
 			record: { content: 'stale content' },
