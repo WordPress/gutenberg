@@ -150,7 +150,10 @@ class Gutenberg_View_Config_Data {
 		 *   individual list members.
 		 *
 		 * A change that declares an unsupported schema version is rejected and does
-		 * not alter anything. Callbacks must return the very object they were given.
+		 * not alter anything. Callbacks mutate the container in place, so there is no
+		 * need to return it; any returned value is ignored. Callbacks must not replace
+		 * the container with a different value, as later callbacks receive whatever the
+		 * previous one returned.
 		 *
 		 * @param Gutenberg_View_Config_Data $data   The view configuration container
 		 *                                           for the entity, exposing the
@@ -163,7 +166,7 @@ class Gutenberg_View_Config_Data {
 		 *     @type string $name The entity name.
 		 * }
 		 */
-		$filtered = apply_filters(
+		apply_filters(
 			"get_entity_view_config_{$kind}_{$name}",
 			$this,
 			array(
@@ -171,21 +174,6 @@ class Gutenberg_View_Config_Data {
 				'name' => $name,
 			)
 		);
-
-		// A well-behaved callback returns the very object it was given. Fall back to
-		// the unfiltered config if a callback replaced it with something else.
-		if ( $filtered !== $this ) {
-			_doing_it_wrong(
-				__METHOD__,
-				sprintf(
-					/* translators: %s: the filter hook name. */
-					esc_html__( 'A "%s" filter callback must return the Gutenberg_View_Config_Data object it was given.', 'gutenberg' ),
-					esc_html( "get_entity_view_config_{$kind}_{$name}" )
-				),
-				'7.1.0'
-			);
-			return $config;
-		}
 
 		// Backfill any dropped keys with their defaults, then discard any keys the
 		// filter introduced that are not part of the documented configuration shape.
