@@ -14,6 +14,11 @@
 	gap: 0;
 }
 
+.editor-notices .components-notice {
+	border-top-width: 0;
+	border-inline-width: 0;
+}
+
 .editor-visual-editor {
 	flex: 1 0 auto;
 }
