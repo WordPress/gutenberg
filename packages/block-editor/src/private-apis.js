@@ -1,9 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+
+/**
  * Internal dependencies
  */
 import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
-import { lock } from './lock-unlock';
+import { lock, unlock } from './lock-unlock';
 import { getRichTextValues } from './components/rich-text/get-rich-text-values';
 import ResizableBoxPopover from './components/resizable-box-popover';
 import { default as PrivateQuickInserter } from './components/inserter/quick-inserter';
@@ -40,7 +45,6 @@ import {
 	ExperimentalBlockCanvas,
 	BlockCanvasCover,
 } from './components/block-canvas';
-import { getDuotoneFilter } from './components/duotone/utils';
 import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
 import {
 	selectBlockPatternsKey,
@@ -83,6 +87,8 @@ import {
 	isHashLink,
 	isRelativePath,
 } from './components/link-control/is-url-like';
+
+const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 
 /**
  * Private @wordpress/block-editor APIs.
