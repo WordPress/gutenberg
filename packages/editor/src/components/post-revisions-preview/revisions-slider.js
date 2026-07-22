@@ -106,6 +106,38 @@ function RevisionsSlider() {
 
 	const showPagination = totalPages > 1;
 
+	// Read the `left`/`right` offset that RangeControl already computed for
+	// each tick mark and reuse it verbatim, keeping our marks pixel-aligned
+	// with the track regardless of thumb-radius inset, RTL, or resize.
+	const sliderWrapperRef = useRef( null );
+	const [ markOffsets, setMarkOffsets ] = useState( [] );
+
+	useLayoutEffect( () => {
+		const wrapper = sliderWrapperRef.current;
+		if ( ! wrapper ) {
+			return;
+		}
+
+		const updateOffsets = () => {
+			const markEls = wrapper.querySelectorAll(
+				'.components-range-control__mark'
+			);
+			setMarkOffsets(
+				Array.from( markEls ).map( ( el ) => ( {
+					left: el.style.left || undefined,
+					right: el.style.right || undefined,
+				} ) )
+			);
+		};
+
+		updateOffsets();
+
+		const { defaultView } = wrapper.ownerDocument;
+		const resizeObserver = new defaultView.ResizeObserver( updateOffsets );
+		resizeObserver.observe( wrapper );
+		return () => resizeObserver.disconnect();
+	}, [ revisions?.length ] );
+
 	if ( isLoading && ! showPagination ) {
 		return <Spinner />;
 	}
