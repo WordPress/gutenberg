@@ -346,8 +346,10 @@ store( 'core/slider', {
 			return item === currentIndex;
 		},
 		get indicatorLabel() {
-			const { item, totalSlides } = getContext();
-			return getIndicatorLabel( item, totalSlides );
+			const { item, currentIndex, totalSlides } = getContext();
+			return item === currentIndex
+				? getSlideLabel( item, totalSlides )
+				: getIndicatorLabel( item, totalSlides );
 		},
 		get currentSlideLabel() {
 			const { currentIndex, totalSlides } = getContext();
@@ -380,6 +382,9 @@ store( 'core/slider', {
 		},
 		goToSlide() {
 			const { ref } = getElement();
+			if ( ref.getAttribute( 'aria-disabled' ) === 'true' ) {
+				return;
+			}
 			const context = getContext();
 			scrollToSlide( ref, context.item );
 		},

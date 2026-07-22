@@ -224,6 +224,10 @@
 		transition: background 0.2s ease, transform 0.2s ease;
 	}
 
+	&[aria-disabled="true"] {
+		cursor: default;
+	}
+
 	&[aria-current="true"],
 	&.is-active {
 		&::before {
