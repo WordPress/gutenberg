@@ -17,6 +17,7 @@
 
 ### Documentation
 
+-   Prefer a static CSV asset over a `data:` URL in the goal-progress story ([#80510](https://github.com/WordPress/gutenberg/pull/80510)).
 -   Add/improve default story and documentation ([#80423](https://github.com/WordPress/gutenberg/pull/80423])).
 -   Document how attribute `relevance` maps to surfaces: the prominent
     surface, the settings surface, and the measured collapse ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
