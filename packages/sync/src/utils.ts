@@ -66,10 +66,17 @@ export function markEntityAsSaved( ydoc: CRDTDoc ): void {
 
 /**
  * Record that a user successfully autosaved the entity. Keyed by WordPress
- * user ID because autosave revisions are stored per user. Because the marker
- * is written after the autosaved content entered the document, its presence
- * in a synced or persisted document demonstrates that the document contains
- * everything the autosave captured.
+ * user ID because autosave revisions are stored per user.
+ *
+ * The marker is written after the autosaved content entered the author's
+ * document, so a copy of the document that contains the marker also contains
+ * everything the autosave captured. This relies on two properties:
+ *
+ * 1. Yjs delivers a single client's updates in causal order, which covers
+ *    the content authored by the marker's author.
+ * 2. Content by other users can only have reached the author through the
+ *    sync backend, so any copy that received the marker from the backend
+ *    already contains that content too.
  *
  * @param {CRDTDoc} ydoc        CRDT document.
  * @param {number}  authorId    WordPress user ID of the autosave author.
