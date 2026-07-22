@@ -348,7 +348,7 @@ jobs:
             # OCI Registry As Storage (ORAS) provides a way to push and pull non-image, generic artifacts (.gz files,
             # for example) to container registries such as GitHub Container Registry.
             - name: Setup ORAS
-              uses: oras-project/setup-oras@38de303aac69abb66f3e6255b7198bff35f323e3 # v2.0.0
+              uses: oras-project/setup-oras@1d808f7d7f6995cc68b7bf507bfe5c5446e1dc9d # v2.0.1
 
             # The owner/repository is hard-coded because capital letters are not allowed when publishing to GitHub
             # Container Registry. The organization name is WordPress, so ${{ github.repository }} causes an error.
