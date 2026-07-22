@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `outset-ring__focus`: Allow overriding the focus ring color via the `--focus-color` custom property.
+-   `outset-ring__focus`: Allow overriding the focus ring color via the `--focus-color` custom property ([#80587](https://github.com/WordPress/gutenberg/pull/80587)).
 
 ### Internal
 
@@ -32,7 +32,7 @@
 ### Breaking Changes
 
 -   Remove the following entries from the `z-index()` helper ([#77773](https://github.com/WordPress/gutenberg/pull/77773)):
-   -   `.nux-dot-tip`
+    -   `.nux-dot-tip`
 
 ## 9.0.0 (2026-05-27)
 
