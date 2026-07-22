@@ -25,6 +25,10 @@ store( 'core/fit-text', {
 			const context = getContext< FitTextContext >();
 			const { ref } = getElement() as { ref: HTMLElement | null };
 
+			if ( ! ref ) {
+				return undefined;
+			}
+
 			const applyFontSize = ( fontSize: number ) => {
 				if ( ! ref ) {
 					return;
@@ -39,22 +43,30 @@ store( 'core/fit-text', {
 			// Initial fit text optimization.
 			context.fontSize = optimizeFitText( ref, applyFontSize );
 
+			// Reveal the element. It was hidden via CSS
+			// (.has-fit-text[data-wp-init---core-fit-text] { visibility: hidden })
+			// to prevent a flash of default-sized text while JS loads.
+			ref.style.visibility = 'visible';
+
 			// Starts ResizeObserver to handle dynamic resizing.
-			if ( window.ResizeObserver && ref?.parentElement ) {
-				const resizeObserver = new window.ResizeObserver( () => {
-					context.fontSize = optimizeFitText( ref, applyFontSize );
+			let resizeObserver: ResizeObserver | undefined;
+			if ( window.ResizeObserver && ref.parentElement ) {
+				resizeObserver = new window.ResizeObserver( () => {
+					context.fontSize = optimizeFitText(
+						ref,
+						applyFontSize
+					);
 				} );
 				resizeObserver.observe( ref.parentElement );
 				resizeObserver.observe( ref );
-
-				// Return cleanup function to be called when element is removed.
-				return () => {
-					if ( resizeObserver ) {
-						resizeObserver.disconnect();
-					}
-				};
 			}
-			return undefined;
+
+			// Return cleanup function to be called when element is removed.
+			return () => {
+				if ( resizeObserver ) {
+					resizeObserver.disconnect();
+				}
+			};
 		},
 	},
 } );

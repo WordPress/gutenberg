@@ -55,6 +55,14 @@
 	white-space: nowrap !important;
 }
 
+// On the frontend, hide fit-text elements until JavaScript calculates the
+// correct font size, preventing a flash of default-sized text on page load.
+// The data-wp-init attribute is only added on the frontend by PHP,
+// so this does not affect the editor.
+.has-fit-text[data-wp-init---core-fit-text] {
+	visibility: hidden;
+}
+
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {
 	display: none;
