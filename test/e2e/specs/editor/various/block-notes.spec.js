@@ -1611,7 +1611,7 @@ test.describe( 'Block Notes', () => {
 			await expect( paragraph ).toHaveText( 'Hello brave new world.' );
 		} );
 
-		test( 'underlines the marker when its note is selected, without deepening the tint', async ( {
+		test( 'underlines the marker at rest and thickens it on selection, without deepening the tint', async ( {
 			editor,
 			page,
 			requestUtils,
@@ -1665,27 +1665,29 @@ test.describe( 'Block Notes', () => {
 					};
 				} );
 
-			// Deselect the freshly added note (focus the title) so the marker
-			// settles into its unemphasized state.
+			/*
+			 * Deselect the freshly added note (focus the title). The underline
+			 * has to survive that: which text carries a note is meant to be
+			 * legible at rest, without hovering or selecting anything first.
+			 */
 			await editor.canvas
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.click();
 			await expect
-				.poll( async () => ( await decorationOf() ).line )
-				.toBe( 'none' );
+				.poll( async () => ( await decorationOf() ).thickness )
+				.toBe( '1.5px' );
+			const decoration = await decorationOf();
+			expect( decoration.line ).toBe( 'underline' );
 
-			// Selecting the note from the sidebar emphasizes its marker with an
-			// underline carrying the author's color.
+			// Selecting the note from the sidebar thickens that same underline
+			// rather than introducing a different treatment.
 			await page
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'treeitem', { name: 'Note: Pick me' } )
 				.click();
 			await expect
-				.poll( async () => ( await decorationOf() ).line )
-				.toBe( 'underline' );
-
-			const decoration = await decorationOf();
-			expect( decoration.thickness ).toBe( '1.5px' );
+				.poll( async () => ( await decorationOf() ).thickness )
+				.toBe( '3px' );
 
 			/*
 			 * The stroke is `color-mix(in srgb, <author color> 30%, currentColor)`:
@@ -1895,6 +1897,18 @@ test.describe( 'Block Notes', () => {
 				.poll( () => readTint( paragraph, rgb ) )
 				.toBe( 'tint' );
 			await expect( paragraph ).not.toHaveClass( /is-highlighted/ );
+
+			/*
+			 * Both halves of the marking survive deselection: an annotated block
+			 * has to be legible as one at rest, without clicking it first. The
+			 * rule is an inset shadow rather than a border so that adding it
+			 * cannot reflow the canvas.
+			 */
+			const shadow = await paragraph.evaluate(
+				( el ) => window.getComputedStyle( el ).boxShadow
+			);
+			expect( shadow ).toContain( 'inset' );
+			expect( shadow ).toContain( '-1.5px' );
 
 			// Selecting the note from the sidebar marks the block with its
 			// outline. The tint behind the text must not deepen with it: it

@@ -22,20 +22,32 @@ describe( 'buildHighlightCss', () => {
 		expect( css ).toContain(
 			`mark.wp-note[data-id="7"]{background-color:${ getAvatarBorderColor(
 				1
-			) }40;}`
+			) }40;`
 		);
 		expect( css ).toContain(
 			`mark.wp-note[data-id="12"]{background-color:${ getAvatarBorderColor(
 				3
-			) }40;}`
+			) }40;`
 		);
 	} );
 
-	it( 'emphasizes hover and focus-within with an author-tinted underline', () => {
+	/*
+	 * A reader has to be able to see which text carries a note without hovering
+	 * or selecting anything first, which is the whole point of the marking, so
+	 * the underline belongs on the resting rule and not only on a state variant.
+	 */
+	it( 'underlines each marker at rest, not only when emphasized', () => {
 		const css = buildHighlightCss( [ { id: 7, author: 1 } ] );
 		const color = getAvatarBorderColor( 1 );
 		expect( css ).toContain(
-			`mark.wp-note[data-id="7"]:hover,mark.wp-note[data-id="7"]:focus-within{text-decoration-line:underline;text-decoration-color:color-mix(in srgb, ${ color } 30%, currentColor);`
+			`mark.wp-note[data-id="7"]{background-color:${ color }40;text-decoration-line:underline;text-decoration-color:color-mix(in srgb, ${ color } 30%, currentColor);text-decoration-thickness:1.5px;`
+		);
+	} );
+
+	it( 'emphasizes hover and focus-within by thickening that same underline', () => {
+		const css = buildHighlightCss( [ { id: 7, author: 1 } ] );
+		expect( css ).toContain(
+			'mark.wp-note[data-id="7"]:hover,mark.wp-note[data-id="7"]:focus-within{text-decoration-thickness:3px;}'
 		);
 	} );
 
@@ -60,14 +72,14 @@ describe( 'buildHighlightCss', () => {
 		const color = getAvatarBorderColor( 1 );
 		// Rest rule still present.
 		expect( css ).toContain(
-			`mark.wp-note[data-id="7"]{background-color:${ color }40;}`
+			`mark.wp-note[data-id="7"]{background-color:${ color }40;`
 		);
 		// Emphasis rule appended later, so the cascade picks it.
 		const restIndex = css.indexOf(
-			`mark.wp-note[data-id="7"]{background-color:${ color }40;}`
+			`mark.wp-note[data-id="7"]{background-color:${ color }40;`
 		);
 		const activeIndex = css.lastIndexOf(
-			`mark.wp-note[data-id="7"]{text-decoration-line:underline;`
+			'mark.wp-note[data-id="7"]{text-decoration-thickness:3px;}'
 		);
 		expect( activeIndex ).toBeGreaterThan( restIndex );
 	} );
@@ -120,10 +132,10 @@ describe( 'buildHighlightCss', () => {
 		] );
 		const color = getAvatarBorderColor( 1 );
 		expect( css ).toContain(
-			`mark.wp-note[data-id="a"]{background-color:${ color }40;}`
+			`mark.wp-note[data-id="a"]{background-color:${ color }40;`
 		);
 		expect( css ).toContain(
-			`mark.wp-note[data-id="b"]{background-color:${ color }40;}`
+			`mark.wp-note[data-id="b"]{background-color:${ color }40;`
 		);
 	} );
 
@@ -131,7 +143,7 @@ describe( 'buildHighlightCss', () => {
 		const css = buildHighlightCss( [ { id: 'x' } ] );
 		const color = getAvatarBorderColor( 0 );
 		expect( css ).toContain(
-			`mark.wp-note[data-id="x"]{background-color:${ color }40;}`
+			`mark.wp-note[data-id="x"]{background-color:${ color }40;`
 		);
 	} );
 
@@ -159,23 +171,40 @@ describe( 'buildBlockHighlightCss', () => {
 		expect( css ).toContain(
 			`${ selectorFor(
 				'abc-1'
-			) }{background-color:${ getAvatarBorderColor( 1 ) }40;}`
+			) }{background-color:${ getAvatarBorderColor( 1 ) }40;`
 		);
 		expect( css ).toContain(
 			`${ selectorFor(
 				'abc-2'
-			) }{background-color:${ getAvatarBorderColor( 3 ) }40;}`
+			) }{background-color:${ getAvatarBorderColor( 3 ) }40;`
 		);
 	} );
 
 	/*
-	 * The tint covers a whole paragraph, so neither emphasis treatment used for
-	 * inline markers applies: a deeper wash would cost the theme's text contrast
-	 * across the entire block, and an underline on every line reads as
-	 * formatting. Hover and selection are carried by the block outline instead,
-	 * so the CSS here has to stay a single flat rule per block.
+	 * An annotated block has to be legible as one without clicking it, so the
+	 * rule along its bottom edge belongs on the resting declaration. Drawn as an
+	 * inset shadow rather than a border so that adding it cannot reflow the
+	 * canvas.
 	 */
-	it( 'emits exactly one flat rule per block, with no state variants', () => {
+	it( 'rules the bottom edge of each block at rest', () => {
+		const css = buildBlockHighlightCss( [
+			{ clientId: 'abc-1', id: 7, author: 1 },
+		] );
+		const color = getAvatarBorderColor( 1 );
+		expect( css ).toContain(
+			`box-shadow:inset 0 -1.5px 0 0 color-mix(in srgb, ${ color } 30%, currentColor);`
+		);
+		expect( css ).not.toContain( 'border' );
+	} );
+
+	/*
+	 * The tint covers a whole paragraph, so deepening it would cost the theme's
+	 * text contrast across all of that, and a wrapped paragraph striped on every
+	 * line would read as formatting where a single bottom edge reads as a
+	 * boundary. Hover and selection are carried by the block outline instead, so
+	 * the CSS here stays one rule per block.
+	 */
+	it( 'emits exactly one rule per block, with no state or per-line variants', () => {
 		const css = buildBlockHighlightCss( [
 			{ clientId: 'abc-1', id: 7, author: 1 },
 			{ clientId: 'abc-2', id: 12, author: 3 },
@@ -211,7 +240,7 @@ describe( 'buildBlockHighlightCss', () => {
 		expect( css ).toContain(
 			`${ selectorFor(
 				'abc-1'
-			) }{background-color:${ getAvatarBorderColor( 0 ) }40;}`
+			) }{background-color:${ getAvatarBorderColor( 0 ) }40;`
 		);
 	} );
 
