@@ -26,6 +26,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const [ error, setError ] = useState( null );
 	const [ latexToMathML, setLatexToMathML ] = useState();
 	const initialLatex = useRef( latex );
+	const formRef = useRef();
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -71,9 +72,16 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					offset={ 8 }
 					anchor={ blockRef }
 					focusOnMount={ false }
+					// Surface any parsing error before focus leaves the block.
+					// An invalid field is refocused, keeping the popover open.
+					onFocusOutside={ () => formRef.current?.reportValidity() }
 					__unstableSlotName="__unstable-block-tools-after"
 				>
-					<div style={ { padding: '4px', minWidth: '300px' } }>
+					<form
+						ref={ formRef }
+						style={ { padding: '4px', minWidth: '300px' } }
+						onSubmit={ ( event ) => event.preventDefault() }
+					>
 						<ValidatedTextareaControl
 							label={ __( 'LaTeX math syntax' ) }
 							hideLabelFromVision
@@ -105,7 +113,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 							} }
 							placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
 						/>
-					</div>
+					</form>
 				</Popover>
 			) }
 		</div>
