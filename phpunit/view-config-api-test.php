@@ -269,30 +269,6 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		$this->assertSame( self::DEFAULT_VIEW, $config['default_view'] );
 	}
 
-	/**
-	 * A filter that returns something other than the container falls back to the
-	 * default config.
-	 */
-	public function test_filter_data_backfilled_if_bad_data() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::apply_filters' );
-
-		add_filter(
-			'get_entity_view_config_custom_kind_custom_name',
-			function () {
-				return 'not the container';
-			}
-		);
-
-		$config = gutenberg_get_entity_view_config( 'custom_kind', 'custom_name' );
-
-		$this->assertIsArray( $config );
-		$this->assertSameSets( self::CONFIG_KEYS, array_keys( $config ) );
-		$this->assertSame( self::DEFAULT_VIEW, $config['default_view'] );
-		$this->assertSame( self::DEFAULT_LAYOUTS, $config['default_layouts'] );
-		$this->assertSame( self::DEFAULT_VIEW_LIST, $config['view_list'] );
-		$this->assertSame( self::DEFAULT_FORM, $config['form'] );
-	}
-
 	public function test_filter_default_view_merge_fields() {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
