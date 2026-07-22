@@ -1694,8 +1694,20 @@ test.describe( 'Block Notes', () => {
 			 * mix here rather than hard-coding it, since `currentColor` comes from
 			 * the theme.
 			 */
-			const parseRgb = ( value ) =>
-				value.match( /\d+/g ).slice( 0, 3 ).map( Number );
+			/*
+			 * Chrome serializes a resolved `color-mix()` as
+			 * `color(srgb 0.33 0.15 0.16)`, with 0-1 channels, while a plain
+			 * color comes back as `rgb(30, 30, 30)`. Normalize both to 0-255.
+			 */
+			const parseRgb = ( value ) => {
+				const channels = value
+					.match( /[\d.]+/g )
+					.slice( 0, 3 )
+					.map( Number );
+				return value.startsWith( 'color(' )
+					? channels.map( ( channel ) => channel * 255 )
+					: channels;
+			};
 			const textRgb = parseRgb( decoration.text );
 			const strokeRgb = parseRgb( decoration.color );
 			[ r, g, b ].forEach( ( channel, i ) => {
