@@ -204,6 +204,36 @@ function RevisionsSlider() {
 					value={ selectedIndex }
 					withInputField={ false }
 				/>
+				{ blockChangedMarkPositions.map( ( { index, offset } ) => (
+					<Tooltip.Root key={ index }>
+						<Tooltip.Trigger
+							render={
+								<button
+									type="button"
+									className="editor-revisions-header__block-changed-mark"
+									style={ offset }
+									onClick={ () =>
+										handleSliderChange( index )
+									}
+									aria-label={ sprintf(
+										/* translators: %s: revision date */
+										__(
+											'Selected block changed in revision from %s'
+										),
+										renderTooltipContent( index )
+									) }
+								/>
+							}
+						/>
+						<Tooltip.Popup>
+							{ sprintf(
+								/* translators: %s: revision date */
+								__( 'Selected block changed — %s' ),
+								renderTooltipContent( index )
+							) }
+						</Tooltip.Popup>
+					</Tooltip.Root>
+				) ) }
 			</span>
 		);
 
