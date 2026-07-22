@@ -1,11 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -47,7 +46,6 @@ export const useMetaBoxInitialization = ( enabled ) => {
 	const { setCollaborationSupported } = unlock( useDispatch( coreStore ) );
 	const { updateEditorSettings } = useDispatch( editorStore );
 	const { initializeMetaBoxes } = useDispatch( editPostStore );
-	const registry = useRegistry();
 
 	// The effect has to rerun when the editor is ready because initializeMetaBoxes
 	// will noop until then.
@@ -67,40 +65,6 @@ export const useMetaBoxInitialization = ( enabled ) => {
 			// admin screen instead.
 			if ( hasActiveMetaBoxes ) {
 				updateEditorSettings( { disableVisualRevisions: true } );
-
-				// Revision mode can open before this flag arrives. `revision.php`
-				// calls `wp_die()` for invalid IDs, so only redirect if the revision
-				// belongs to this post and is still selected after the request.
-				const revisionId = unlock(
-					registry.select( editorStore )
-				).getCurrentRevisionId();
-				if ( revisionId ) {
-					const { getCurrentPostType, getCurrentPostId } =
-						registry.select( editorStore );
-					registry
-						.resolveSelect( coreStore )
-						.getRevision(
-							'postType',
-							getCurrentPostType(),
-							getCurrentPostId(),
-							revisionId,
-							{ context: 'edit', _fields: 'id' }
-						)
-						.then( ( revision ) => {
-							if (
-								! revision ||
-								unlock(
-									registry.select( editorStore )
-								).getCurrentRevisionId() !== revisionId
-							) {
-								return;
-							}
-							window.location.href = addQueryArgs(
-								'revision.php',
-								{ revision: revisionId }
-							);
-						} );
-				}
 			}
 		}
 	}, [
@@ -111,6 +75,5 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		hasIncompatibleMetaBoxes,
 		hasActiveMetaBoxes,
 		updateEditorSettings,
-		registry,
 	] );
 };

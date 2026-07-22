@@ -56,7 +56,6 @@ function createMockStores( {
 				isCollaborationEnabledForCurrentPost: jest.fn(
 					() => isCollaborationEnabled
 				),
-				getCurrentRevisionId: () => null,
 			},
 		},
 		core: {
