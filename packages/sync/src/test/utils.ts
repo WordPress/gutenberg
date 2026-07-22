@@ -10,10 +10,10 @@ import { describe, expect, it, beforeEach } from '@jest/globals';
  */
 import {
 	createYjsDoc,
-	getEntityAutosavedAt,
 	initializeYjsDoc,
 	markEntityAsAutosaved,
 	markEntityAsSaved,
+	readAutosaveMarker,
 	serializeCrdtDoc,
 	deserializeCrdtDoc,
 } from '../utils';
@@ -148,8 +148,8 @@ describe( 'utils', () => {
 			markEntityAsAutosaved( ydoc, 42, 1000 );
 			markEntityAsAutosaved( ydoc, 7, 2000 );
 
-			expect( getEntityAutosavedAt( ydoc, 42 ) ).toBe( 1000 );
-			expect( getEntityAutosavedAt( ydoc, 7 ) ).toBe( 2000 );
+			expect( readAutosaveMarker( ydoc, 42 ) ).toBe( 1000 );
+			expect( readAutosaveMarker( ydoc, 7 ) ).toBe( 2000 );
 		} );
 
 		it( 'moves the marker forward for newer autosaves', () => {
@@ -158,7 +158,7 @@ describe( 'utils', () => {
 			markEntityAsAutosaved( ydoc, 42, 1000 );
 			markEntityAsAutosaved( ydoc, 42, 2000 );
 
-			expect( getEntityAutosavedAt( ydoc, 42 ) ).toBe( 2000 );
+			expect( readAutosaveMarker( ydoc, 42 ) ).toBe( 2000 );
 		} );
 
 		it( 'never moves the marker backwards', () => {
@@ -167,15 +167,15 @@ describe( 'utils', () => {
 			markEntityAsAutosaved( ydoc, 42, 2000 );
 			markEntityAsAutosaved( ydoc, 42, 1000 );
 
-			expect( getEntityAutosavedAt( ydoc, 42 ) ).toBe( 2000 );
+			expect( readAutosaveMarker( ydoc, 42 ) ).toBe( 2000 );
 		} );
 	} );
 
-	describe( 'getEntityAutosavedAt', () => {
+	describe( 'readAutosaveMarker', () => {
 		it( 'returns undefined when no marker exists', () => {
 			const ydoc = createYjsDoc();
 
-			expect( getEntityAutosavedAt( ydoc, 42 ) ).toBeUndefined();
+			expect( readAutosaveMarker( ydoc, 42 ) ).toBeUndefined();
 		} );
 
 		it( 'returns undefined for non-numeric marker values', () => {
@@ -183,7 +183,7 @@ describe( 'utils', () => {
 			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
 			stateMap.set( `${ AUTOSAVED_AT_KEY_PREFIX }42`, 'not-a-number' );
 
-			expect( getEntityAutosavedAt( ydoc, 42 ) ).toBeUndefined();
+			expect( readAutosaveMarker( ydoc, 42 ) ).toBeUndefined();
 		} );
 	} );
 

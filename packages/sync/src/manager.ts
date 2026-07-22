@@ -38,10 +38,10 @@ import { createUndoManager } from './undo-manager';
 import {
 	createYjsDoc,
 	deserializeCrdtDoc,
-	getEntityAutosavedAt,
 	initializeYjsDoc,
 	markEntityAsAutosaved,
 	markEntityAsSaved,
+	readAutosaveMarker,
 	serializeCrdtDoc,
 } from './utils';
 
@@ -746,7 +746,7 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * @param {number}     authorId   WordPress user ID of the autosave author.
 	 * @return {number|undefined} Autosave modified time as epoch seconds (UTC).
 	 */
-	function getEntityAutosavedAtForEntity(
+	function getEntityAutosavedAt(
 		objectType: ObjectType,
 		objectId: ObjectID,
 		authorId: number
@@ -758,7 +758,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			return undefined;
 		}
 
-		return getEntityAutosavedAt( entityState.ydoc, authorId );
+		return readAutosaveMarker( entityState.ydoc, authorId );
 	}
 
 	/**
@@ -836,7 +836,7 @@ export function createSyncManager( debug = false ): SyncManager {
 	return {
 		createPersistedCRDTDoc: debugWrap( createPersistedCRDTDoc ),
 		getAwareness,
-		getEntityAutosavedAt: getEntityAutosavedAtForEntity,
+		getEntityAutosavedAt,
 		load: debugWrap( loadEntity ),
 		loadCollection: debugWrap( loadCollection ),
 		markEntityAutosaved: debugWrap( markEntityAutosaved ),

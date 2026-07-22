@@ -100,13 +100,13 @@ export function markEntityAsAutosaved(
 }
 
 /**
- * Get the last recorded autosave time for a user, if any.
+ * Read a user's autosave marker written by `markEntityAsAutosaved`, if any.
  *
  * @param {CRDTDoc} ydoc     CRDT document.
  * @param {number}  authorId WordPress user ID of the autosave author.
  * @return {number|undefined} Autosave modified time as epoch seconds (UTC).
  */
-export function getEntityAutosavedAt(
+export function readAutosaveMarker(
 	ydoc: CRDTDoc,
 	authorId: number
 ): number | undefined {
