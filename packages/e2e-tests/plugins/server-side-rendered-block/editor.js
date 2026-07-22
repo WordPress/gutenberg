@@ -1,7 +1,12 @@
 ( function () {
 	const { createElement: el, Fragment } = wp.element;
 	const { registerBlockType } = wp.blocks;
-	const { InspectorControls, useBlockProps } = wp.blockEditor;
+	const {
+		InnerBlocks,
+		InspectorControls,
+		useBlockProps,
+		useInnerBlocksProps,
+	} = wp.blockEditor;
 	const ServerSideRender = wp.serverSideRender;
 	const { PanelBody, __experimentalNumberControl: NumberControl } =
 		wp.components;
@@ -43,6 +48,43 @@
 					} )
 				)
 			);
+		},
+	} );
+
+	registerBlockType( 'test/post-context-provider', {
+		apiVersion: 3,
+		title: 'Test Post Context Provider',
+		icon: 'list-view',
+		category: 'text',
+
+		// Redundant with the server-side registration, but required since it
+		// is not picked up in `get_block_editor_server_block_settings`.
+		providesContext: {
+			postId: 'postId',
+			postType: 'postType',
+		},
+
+		edit: function Edit( { attributes, setAttributes } ) {
+			const blockProps = useBlockProps();
+			const innerBlocksProps = useInnerBlocksProps( blockProps );
+			return el(
+				'div',
+				innerBlocksProps,
+				el( 'input', {
+					'aria-label': 'Context post ID',
+					value: attributes.postId,
+					onChange( event ) {
+						setAttributes( {
+							postId: Number( event.currentTarget.value ),
+						} );
+					},
+				} ),
+				innerBlocksProps.children
+			);
+		},
+
+		save() {
+			return el( InnerBlocks.Content );
 		},
 	} );
 } )();
