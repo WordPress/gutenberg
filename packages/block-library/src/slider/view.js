@@ -26,18 +26,7 @@ function debounce( func, wait ) {
 	return debounced;
 }
 
-function getScrollBehavior() {
-	return window.matchMedia( '(prefers-reduced-motion: no-preference)' )
-		.matches
-		? 'smooth'
-		: 'auto';
-}
-
 const debouncedUpdates = new WeakMap();
-
-// Store touch start data per track element to avoid cross-slider interference.
-const touchStartData = new WeakMap();
-const touchHandlers = new WeakMap();
 
 function normalizeSlidesToShow( slidesToShow, totalSlides ) {
 	const parsedSlidesToShow = Number.parseInt( slidesToShow, 10 );
@@ -161,23 +150,21 @@ function scrollToSlide( ref, index ) {
 	updateSlideInert( slides, nextIndex, visibleSlides );
 
 	/*
-	 * Use getBoundingClientRect() to compute the scrollTo target so the same
-	 * arithmetic works in both LTR and RTL without special-casing either one.
-	 *
-	 * slideRect.left - trackRect.left is the pixel offset of the slide's left
-	 * edge from the track's currently-visible left edge.  Adding that delta to
-	 * track.scrollLeft yields the exact scrollLeft value that places the slide
-	 * flush with the left of the viewport.  Because scrollLeft in RTL is 0 or
-	 * negative and getBoundingClientRect uses the same sign convention as the
-	 * viewport, the delta naturally comes out negative for slides that are to
-	 * the left of the viewport in RTL, producing the correct negative target.
+	 * Align the leading edge of the target slide to the leading edge of the
+	 * track. In LTR the leading edge is the left edge; in RTL it is the right
+	 * edge. getBoundingClientRect() always uses viewport coordinates
+	 * (left increases left-to-right) so the delta is direction-aware when we
+	 * choose the correct edge for each axis.
 	 */
+	const isRTL = window.getComputedStyle( track ).direction === 'rtl';
 	const targetSlide = slides[ nextIndex ];
 	const trackRect = track.getBoundingClientRect();
 	const slideRect = targetSlide.getBoundingClientRect();
+	const offset = isRTL
+		? slideRect.right - trackRect.right
+		: slideRect.left - trackRect.left;
 	track.scrollTo( {
-		left: track.scrollLeft + ( slideRect.left - trackRect.left ),
-		behavior: getScrollBehavior(),
+		left: track.scrollLeft + offset,
 	} );
 }
 
@@ -235,11 +222,10 @@ function moveSlide( ref, direction ) {
 /**
  * Determines the closest slide index based on the current scroll position.
  *
- * Uses getBoundingClientRect() instead of offsetLeft/scrollLeft arithmetic
- * so the result is correct in both LTR and RTL without any special-casing.
- * slideRect.left - trackRect.left is the distance of each slide's left edge
- * from the track's visible left edge regardless of scroll direction or writing
- * mode, because both rects are in the same viewport coordinate space.
+ * Compares leading edges in the current writing direction: the left edge in
+ * LTR and the right edge in RTL. This ensures the slide whose leading edge is
+ * flush with the track's leading edge is identified as the current slide,
+ * which is correct for both single and multi-slide configurations.
  *
  * @param {HTMLElement}   track  The track element containing the slides.
  * @param {HTMLElement[]} slides The array of slide elements.
@@ -247,12 +233,16 @@ function moveSlide( ref, direction ) {
  */
 function getClosestSlideIndex( track, slides ) {
 	const trackRect = track.getBoundingClientRect();
+	const isRTL = window.getComputedStyle( track ).direction === 'rtl';
 	let closestIndex = 0;
 	let closestDistance = Infinity;
 
 	slides.forEach( ( slide, index ) => {
+		const slideRect = slide.getBoundingClientRect();
 		const distance = Math.abs(
-			slide.getBoundingClientRect().left - trackRect.left
+			isRTL
+				? slideRect.right - trackRect.right
+				: slideRect.left - trackRect.left
 		);
 		if ( distance < closestDistance ) {
 			closestDistance = distance;
@@ -395,64 +385,6 @@ store( 'core/slider', {
 			// Apply the effective responsive value to the slider state.
 			updateSliderStateFromCSS( ref, context );
 
-			// Clean up previous touch listeners if initTrack runs again.
-			const prev = touchHandlers.get( ref );
-			if ( prev ) {
-				ref.removeEventListener( 'touchstart', prev.start );
-				ref.removeEventListener( 'touchend', prev.end );
-			}
-
-			// Touch start: store per-track touch data.
-			function onTouchStart( event ) {
-				const t = event.touches && event.touches[ 0 ];
-				if ( t ) {
-					touchStartData.set( ref, {
-						x: t.clientX,
-						y: t.clientY,
-						time: Date.now(),
-					} );
-				}
-			}
-
-			// Touch end: determine swipe direction using per-track data.
-			function onTouchEnd( event ) {
-				const startData = touchStartData.get( ref );
-				if ( ! startData ) {
-					return;
-				}
-
-				const touchEndEvent =
-					( event.changedTouches && event.changedTouches[ 0 ] ) ||
-					( event.touches && event.touches[ 0 ] );
-				if ( ! touchEndEvent ) {
-					return;
-				}
-
-				const deltaX = touchEndEvent.clientX - startData.x;
-				const deltaY = touchEndEvent.clientY - startData.y;
-				const absDeltaX = Math.abs( deltaX );
-				const absDeltaY = Math.abs( deltaY );
-				const elapsedMs = Date.now() - startData.time;
-				const isHorizontalSwipe =
-					absDeltaX > 50 &&
-					absDeltaX > absDeltaY * 1.5 &&
-					elapsedMs < 800;
-
-				if ( isHorizontalSwipe ) {
-					event.preventDefault();
-					moveSlide( ref, deltaX < 0 ? 1 : -1 );
-				}
-			}
-
-			touchHandlers.set( ref, { start: onTouchStart, end: onTouchEnd } );
-
-			ref.addEventListener( 'touchstart', onTouchStart, {
-				passive: true,
-			} );
-			ref.addEventListener( 'touchend', onTouchEnd, {
-				passive: false,
-			} );
-
 			const handleResize = debounce(
 				() => updateSliderStateFromCSS( ref, context ),
 				150
@@ -463,11 +395,6 @@ store( 'core/slider', {
 			return () => {
 				window.removeEventListener( 'resize', handleResize );
 				handleResize.cancel();
-				ref.removeEventListener( 'touchstart', onTouchStart );
-				ref.removeEventListener( 'touchend', onTouchEnd );
-				touchHandlers.delete( ref );
-				touchStartData.delete( ref );
-
 				// Cancel any pending debounced scroll update so the timer
 				// closure cannot fire after the track is torn down and
 				// mutate stale context or hold the ref in memory.
