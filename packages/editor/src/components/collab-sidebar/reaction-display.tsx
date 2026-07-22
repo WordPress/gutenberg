@@ -98,8 +98,9 @@ function prefetchFullPicker(): void {
 	}
 }
 
-// `Dropdown`'s popover is rendered in a portal anchored to <body>,
-// so it escapes the `overflow: hidden` chain on the collab sidebar
+// `Dropdown`'s popover renders through the active `Popover.Slot` when
+// one exists (falling back to a `<body>`-level container), so either
+// way it escapes the `overflow: hidden` chain on the collab sidebar
 // (`.interface-interface-skeleton__sidebar`,
 // `.editor-collab-sidebar`, `.editor-collab-sidebar-panel`).
 const POPOVER_PROPS = { placement: 'bottom-end' } as const;
@@ -226,7 +227,7 @@ function ReactionButton( {
 	emojiLabel,
 	onToggleReaction,
 }: ReactionButtonProps ) {
-	const [ tooltipText, setTooltipText ] = useState( '' );
+	const [ names, setNames ] = useState< string[] | null >( null );
 	const [ isFetching, setIsFetching ] = useState( false );
 	// Reactions picked from the full picker are stored as hex keys and
 	// carry no curated label; resolve their name from the Emojibase
@@ -234,13 +235,17 @@ function ReactionButton( {
 	// character. Falls back to the emoji character until resolved.
 	const resolvedLabel = useEmojiLabel( slug, ! emojiLabel );
 	const label = emojiLabel || resolvedLabel || emoji;
+	// Derive the tooltip from the fetched names and the *current* label
+	// rather than storing a formatted string: the names request and the
+	// Emojibase label request race, and a stored string would freeze
+	// whichever label happened to be resolved first.
+	const tooltipText =
+		names && names.length > 0 ? formatReactionTooltip( names, label ) : '';
 
 	const fetchReactionNames = useCallback( () => {
 		const cacheKey = `${ noteId }:${ slug }`;
 		if ( reactionNamesCache[ cacheKey ] ) {
-			setTooltipText(
-				formatReactionTooltip( reactionNamesCache[ cacheKey ], label )
-			);
+			setNames( reactionNamesCache[ cacheKey ] );
 			return;
 		}
 
@@ -259,7 +264,7 @@ function ReactionButton( {
 			} ),
 		} )
 			.then( ( reactions ) => {
-				const names = reactions
+				const fetchedNames = reactions
 					.filter( ( r ) => {
 						const content =
 							typeof r.content === 'object'
@@ -272,10 +277,8 @@ function ReactionButton( {
 					} )
 					.map( ( r ) => r.author_name );
 
-				reactionNamesCache[ cacheKey ] = names;
-				if ( names.length > 0 ) {
-					setTooltipText( formatReactionTooltip( names, label ) );
-				}
+				reactionNamesCache[ cacheKey ] = fetchedNames;
+				setNames( fetchedNames );
 			} )
 			.catch( () => {
 				// Silently fall back to count-based label.
@@ -283,7 +286,7 @@ function ReactionButton( {
 			.finally( () => {
 				setIsFetching( false );
 			} );
-	}, [ noteId, slug, label, isFetching ] );
+	}, [ noteId, slug, isFetching ] );
 
 	const defaultLabel = sprintf(
 		/* translators: 1: emoji label, 2: count of reactions */
@@ -311,6 +314,7 @@ function ReactionButton( {
 				}
 				// Invalidate cached names since the reaction set is changing.
 				delete reactionNamesCache[ `${ noteId }:${ slug }` ];
+				setNames( null );
 				onToggleReaction( slug );
 			} }
 			onMouseEnter={ fetchReactionNames }

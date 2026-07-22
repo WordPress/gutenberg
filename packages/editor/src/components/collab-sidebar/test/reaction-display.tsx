@@ -262,6 +262,89 @@ describe( 'ReactionDisplay', () => {
 		);
 	} );
 
+	it( 'updates the reactor tooltip when the emoji label resolves after the names', async () => {
+		// Pin the race between the two requests behind a hex-key pill's
+		// tooltip: when the reactor names resolve first, the tooltip is
+		// formatted with the emoji-character fallback label, and it must
+		// re-derive once the Emojibase dataset supplies the real label.
+		// A distinct base URL keeps the module-level dataset cache from
+		// earlier tests out of the way.
+		window.gutenbergEmojibaseUrl = 'https://example.test/emojibase-race';
+		const originalFetch = global.fetch;
+		let resolveDataset;
+		const datasetGate = new Promise( ( resolve ) => {
+			resolveDataset = resolve;
+		} );
+		global.fetch = jest.fn( ( url ) =>
+			datasetGate.then( () => ( {
+				ok: true,
+				json: () =>
+					Promise.resolve(
+						String( url ).includes( 'data.json' )
+							? [
+									{
+										hexcode: '1F44D',
+										emoji: '👍',
+										label: 'thumbs up',
+										group: 0,
+									},
+							  ]
+							: { groups: [] }
+					),
+			} ) )
+		);
+		apiFetch.mockResolvedValue( [
+			{ author_name: 'Alice', content: { raw: '1f44d' } },
+		] );
+
+		try {
+			const user = userEvent.setup();
+			render(
+				<ReactionDisplay
+					noteId={ uniqueNoteId }
+					reactions={ {
+						'1f44d': {
+							count: 1,
+							reacted: false,
+							my_reaction_id: 0,
+						},
+					} }
+					onToggleReaction={ () => {} }
+				/>
+			);
+
+			await user.hover(
+				screen.getByRole( 'button', { name: '👍, 1 reaction' } )
+			);
+			// Names resolved first: the tooltip uses the emoji-character
+			// fallback label while the dataset request is still pending.
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Alice reacted with 👍',
+					} )
+				).toBeVisible()
+			);
+
+			await act( async () => {
+				resolveDataset();
+			} );
+			// The dataset label arrived after the names: the already
+			// visible tooltip must pick it up, not stay frozen on the
+			// fallback.
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Alice reacted with thumbs up',
+					} )
+				).toBeVisible()
+			);
+		} finally {
+			global.fetch = originalFetch;
+			delete window.gutenbergEmojibaseUrl;
+		}
+	} );
+
 	it( 'keeps the count-based label when the names fetch fails', async () => {
 		const user = userEvent.setup();
 		apiFetch.mockRejectedValue( new Error( 'network down' ) );
