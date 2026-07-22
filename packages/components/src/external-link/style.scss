@@ -13,11 +13,14 @@
 		color: var(--wpds-color-foreground-interactive-brand-active);
 	}
 
-	&:focus:not(:active) {
+	&:focus {
 		// Override style from wp-admin common.css.
 		box-shadow: none;
 		border-radius: 0;
-		@include mixins.outset-ring__focus();
+
+		&:not(:active) {
+			@include mixins.outset-ring__focus();
+		}
 	}
 }
 
