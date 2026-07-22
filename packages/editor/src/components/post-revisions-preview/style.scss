@@ -9,6 +9,15 @@
 	}
 }
 
+// Positions block-changed marks relative to the slider track without
+// modifying the RangeControl component.
+.editor-revisions-header__slider-wrapper {
+	position: relative;
+	display: flex;
+	flex: 1;
+	min-width: 0;
+}
+
 .editor-revisions-header__no-revisions {
 	color: $gray-700;
 	font-size: $default-font-size;
