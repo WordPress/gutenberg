@@ -116,6 +116,8 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	 * Drops unsafe or malformed actions; sanitizes download filenames.
 	 */
 	public function test_sanitize_widget_actions_constrains_hrefs() {
+		$this->setExpectedIncorrectUsage( 'gutenberg_sanitize_widget_actions' );
+
 		$actions = gutenberg_sanitize_widget_actions(
 			array(
 				array(
@@ -238,6 +240,8 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	 * Resolves widget-local files; leaves admin-relative hrefs alone.
 	 */
 	public function test_sanitize_widget_actions_resolves_local_assets() {
+		$this->setExpectedIncorrectUsage( 'gutenberg_sanitize_widget_actions' );
+
 		$actions = gutenberg_sanitize_widget_actions(
 			array(
 				array(
@@ -281,6 +285,8 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	 * Missing relative non-admin files are dropped (not rewritten to http://…).
 	 */
 	public function test_sanitize_widget_actions_drops_missing_local_assets() {
+		$this->setExpectedIncorrectUsage( 'gutenberg_sanitize_widget_actions' );
+
 		$actions = gutenberg_sanitize_widget_actions(
 			array(
 				array(

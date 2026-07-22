@@ -165,8 +165,9 @@ function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
 
 /**
  * Sanitizes widget actions to `id` / `label` / `href` (via `esc_url_raw()`),
- * plus optional `download` / `openInNewTab`. Drops incomplete or unsafe entries.
- * With `$dir_name`, resolves widget-local file hrefs first.
+ * plus optional `download` / `openInNewTab`. Drops incomplete or unsafe
+ * entries; dropped hrefs are reported through `_doing_it_wrong()`. With
+ * `$dir_name`, resolves widget-local file hrefs first.
  *
  * This is the registration gate for manifest-sourced widget types. Definitions
  * registered only on the client do not pass through it; any future CPT/API
@@ -199,6 +200,16 @@ function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
 		$href = gutenberg_resolve_widget_action_href( $action['href'], $dir_name );
 		$href = esc_url_raw( $href );
 		if ( ! $href ) {
+			_doing_it_wrong(
+				__FUNCTION__,
+				sprintf(
+					/* translators: 1: Widget action id. 2: Declared action href. */
+					__( 'Dropped widget action "%1$s": href "%2$s" is neither an allowed URL nor an existing widget file.', 'gutenberg' ),
+					$action['id'],
+					$action['href']
+				),
+				'23.7.0'
+			);
 			continue;
 		}
 
