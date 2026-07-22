@@ -33,12 +33,13 @@
  *   merge.
  *
  * All three touch only the top-level keys the patch names — an omitted key
- * keeps whatever it had, and a `null` value drops the key it names, which
- * resets it to its default. They differ only in how deep the replacement
+ * keeps whatever it had, and a top-level `null` value drops the key it names,
+ * which resets it to its default. They differ only in how deep the replacement
  * reaches once a key is named: `merge()` and `replace()` merge the value in
  * key by key (an associative array merges member by member, a nested `null`
  * deletes just that leaf, a scalar replaces just that value), while `set()`
- * swaps the whole value. Each patch also declares the configuration schema
+ * swaps the whole value. A nested `null` deletes just the leaf it names in
+ * every case. Each patch also declares the configuration schema
  * version it was written against (currently 1), so a future WordPress release
  * that changes the configuration shape can migrate existing patches forward
  * instead of breaking them.
@@ -77,6 +78,14 @@ class Gutenberg_View_Config_Data {
 	private $config;
 
 	/**
+	 * The default configuration.
+	 *
+	 * @since 7.1.0
+	 * @var array
+	 */
+	private $defaults;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 7.1.0
@@ -84,7 +93,8 @@ class Gutenberg_View_Config_Data {
 	 * @param array $config The base configuration to contribute to.
 	 */
 	public function __construct( array $config ) {
-		$this->config = $config;
+		$this->config   = $config;
+		$this->defaults = $config;
 	}
 
 	/**
@@ -119,8 +129,6 @@ class Gutenberg_View_Config_Data {
 	 * @return array The filtered configuration, limited to the documented keys.
 	 */
 	public function apply_filters( $kind, $name ) {
-		$config = $this->get_data();
-
 		/**
 		 * Filters the view configuration for a given entity.
 		 *
@@ -175,9 +183,9 @@ class Gutenberg_View_Config_Data {
 			)
 		);
 
-		// Backfill any dropped keys with their defaults, then discard any keys the
-		// filter introduced that are not part of the documented configuration shape.
-		return array_intersect_key( array_merge( $config, $this->get_data() ), $config );
+		// Discard any keys the filter introduced that are not part of the
+		// documented configuration shape.
+		return array_intersect_key( $this->get_data(), array_flip( self::CONFIG_KEYS ) );
 	}
 
 	/**
@@ -188,7 +196,9 @@ class Gutenberg_View_Config_Data {
 	 * it had, and a `null` value drops the key it names (which resets it to its
 	 * default). The difference is depth — where merge() and replace() merge a
 	 * named key's value into the current one key by key, set() swaps the whole
-	 * value in wholesale, dropping whatever the key held before.
+	 * value in wholesale, dropping whatever the key held before. A `null` nested
+	 * within that value still drops the property it names, so set() honours
+	 * nulls at every depth just as merge() and replace() do.
 	 *
 	 * Use it when a callback owns a key outright and wants to pin it to an exact
 	 * shape, without the inherited default leaking through a key-by-key merge.
@@ -219,8 +229,12 @@ class Gutenberg_View_Config_Data {
 	 * - An associative array maps a name to a nested spec, recursing into that
 	 *   entry's value to delete from within it.
 	 *
-	 * So `array( 'default_view' )` drops the whole `default_view` key,
-	 * `array( 'default_view' => array( 'sort' ) )` drops just its `sort`
+	 * Naming a top-level configuration key is the one exception: like a `null`
+	 * value in a patch, it resets that key to its default rather than dropping it
+	 * outright, so top-level removal and top-level `null` compose the same way.
+	 *
+	 * So `array( 'default_view' )` resets the whole `default_view` key to its
+	 * default, `array( 'default_view' => array( 'sort' ) )` drops just its `sort`
 	 * property, and `array( 'default_view' => array( 'fields' => array( 'f2' ) ) )`
 	 * drops the `f2` member from its `fields` list. A name that is not present is
 	 * ignored, and a list is renumbered after a member is removed.
@@ -245,10 +259,12 @@ class Gutenberg_View_Config_Data {
 			return $this;
 		}
 
-		// The top-level keys named for removal are the spec's values when it is a
-		// flat list of key names, or its keys when it maps a key to a nested spec.
-		$named_keys = array_is_list( $spec ) ? $spec : array_keys( $spec );
-		foreach ( $named_keys as $key ) {
+		// A flat list names top-level keys to reset; a map recurses into each
+		// named key to prune from within its value.
+		$spec_is_list = array_is_list( $spec );
+		foreach ( $spec as $spec_key => $spec_value ) {
+			$key = $spec_is_list ? $spec_value : $spec_key;
+
 			if ( ! in_array( $key, self::CONFIG_KEYS, true ) ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -259,10 +275,17 @@ class Gutenberg_View_Config_Data {
 					),
 					'7.1.0'
 				);
+				continue;
+			}
+
+			if ( $spec_is_list ) {
+				// Removing a top-level key resets it to its default, just as a
+				// null patch value does.
+				$this->config[ $key ] = $this->defaults[ $key ] ?? array();
+			} elseif ( array_key_exists( $key, $this->config ) ) {
+				$this->config[ $key ] = $this->remove_properties( $this->config[ $key ], $spec_value );
 			}
 		}
-
-		$this->config = $this->remove_properties( $this->config, $spec );
 
 		return $this;
 	}
@@ -349,8 +372,9 @@ class Gutenberg_View_Config_Data {
 	 * - `replace` merges the value in the same way but swaps lists wholesale;
 	 * - `set`     swaps the whole value in wholesale, without merging.
 	 *
-	 * In every mode a `null` value drops the key it names and an omitted key is
-	 * left untouched, so all three compose the same way at the top level.
+	 * In every mode a top-level `null` resets the key it names to its default, a
+	 * nested `null` drops the property it names, and an omitted key is left
+	 * untouched, so all three treat nulls the same way at every depth.
 	 *
 	 * @since 7.1.0
 	 *
@@ -385,20 +409,55 @@ class Gutenberg_View_Config_Data {
 				continue;
 			}
 
-			// A null patch value drops the property.
+			// A null patch value makes the top-level property reset to defaults.
 			if ( null === $value ) {
-				unset( $this->config[ $key ] );
+				$this->config[ $key ] = $this->defaults[ $key ] ?? array();
 				continue;
 			}
 
 			// set() swaps the whole value in; merge()/replace() merge it into the
-			// current one, differing only in how they treat lists.
+			// current one, differing only in how they treat lists. In every mode a
+			// nested null still drops the property it names.
 			$this->config[ $key ] = 'set' === $mode
-				? $value
+				? $this->strip_nulls( $value )
 				: $this->merge_properties( $this->config[ $key ] ?? array(), $value, 'replace' === $mode );
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Recursively drops every property whose value is `null` from a value.
+	 *
+	 * set() swaps a named key's value in wholesale rather than merging it into
+	 * the current one, so it has no existing leaf for a nested `null` to delete
+	 * the way merge() and replace() do. Stripping nulls here gives a nested
+	 * `null` the same "drop the property it names" meaning under set() that it
+	 * carries everywhere else. A list is renumbered after a member is removed so
+	 * removed entries do not leave gaps.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param mixed $value The value to strip nulls from.
+	 * @return mixed The value with every `null` property removed, recursively.
+	 */
+	private function strip_nulls( $value ) {
+		if ( ! is_array( $value ) ) {
+			return $value;
+		}
+
+		$result = array();
+		foreach ( $value as $key => $item ) {
+			// A null value drops the property it names.
+			if ( null === $item ) {
+				continue;
+			}
+
+			$result[ $key ] = $this->strip_nulls( $item );
+		}
+
+		// Renumber a list so a removed member does not leave a gap.
+		return array_is_list( $value ) ? array_values( $result ) : $result;
 	}
 
 	/**

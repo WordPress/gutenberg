@@ -80,12 +80,19 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	 *
 	 * @covers ::set
 	 */
-	public function test_set_null_unsets_top_level_keys() {
-		$data = new Gutenberg_View_Config_Data(
+	public function test_set_null_resets_top_level_key_to_defaults() {
+		$defaults = array(
+			'default_view' => array( 'type' => 'table' ),
+			'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
+		);
+		$data = new Gutenberg_View_Config_Data( $defaults );
+		$data->set(
 			array(
-				'default_view' => array( 'type' => 'table' ),
-				'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
-			)
+				'default_view' => array(
+					'type' => 'grid',
+				),
+			),
+			1
 		);
 		$data->set(
 			array(
@@ -95,39 +102,99 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			array( 'form' => array( 'layout' => array( 'type' => 'panel' ) ) ),
+			$defaults,
 			self::read_config( $data )
 		);
 	}
 
-	public function test_remove_deletes_named_keys_and_leaves_the_rest() {
-		$data = new Gutenberg_View_Config_Data(
+	public function test_set_null_unsets_key() {
+		$defaults = array(
+			'default_view' => array( 'type' => 'table', 'perPage' => 20 ),
+			'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
+		);
+		$data = new Gutenberg_View_Config_Data( $defaults );
+		$data->set(
 			array(
 				'default_view' => array(
-					'type'       => 'table',
-					'perPage'    => 23,
-					'showLevels' => true,
-					'fields'     => array( 'f1', 'f2' ),
-					'sort'       => array(
-						'field'     => 'title',
-						'direction' => 'asc',
-					),
+					'type'    => 'grid',
+					'perPage' => null,
 				),
-				'form'         => array(
-					'fields' => array( 'f1', 'f2' ),
-				),
-			)
+			),
+			1
 		);
-		$data->remove( array( 'default_view' ), 1 );
 
 		$this->assertSame(
 			array(
-				'form' => array(
-					'fields' => array( 'f1', 'f2' ),
+				'default_view' => array( 'type' => 'grid' ),
+				'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
 				),
-			),
 			self::read_config( $data )
 		);
+	}
+
+	/**
+	 * set() rejects an undocumented top-level key and leaves the configuration
+	 * untouched.
+	 *
+	 * @covers ::set
+	 */
+	public function test_set_rejects_unknown_key() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
+
+		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
+		$before = self::read_config( $data );
+		$data->set( array( 'not_a_real_key' => 'nope' ), 1 );
+
+		$this->assertSame( $before, self::read_config( $data ) );
+	}
+
+	/**
+	 * set() rejects a patch with an unsupported version and leaves the
+	 * configuration untouched.
+	 *
+	 * @covers ::set
+	 */
+	public function test_set_rejects_updates_with_invalid_version() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
+
+		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
+		$before = self::read_config( $data );
+
+		$version = Gutenberg_View_Config_Data::LATEST_VERSION + 1;
+		$data->set( array( 'default_view' => array( 'type' => 'grid' ) ), $version );
+
+		$this->assertSame( $before, self::read_config( $data ) );
+	}
+
+	/**
+	 * remove() with a bare top-level key resets that key to its default — just
+	 * like a `null` value does — rather than dropping it, while a key the spec
+	 * omits (`form`) is left untouched.
+	 *
+	 * @covers ::remove
+	 */
+	public function test_remove_top_level_key_resets_to_defaults() {
+		$defaults = array(
+			'default_view' => array(
+				'type'       => 'table',
+				'perPage'    => 23,
+				'showLevels' => true,
+				'fields'     => array( 'f1', 'f2' ),
+				'sort'       => array(
+					'field'     => 'title',
+					'direction' => 'asc',
+				),
+			),
+			'form'         => array(
+				'fields' => array( 'f1', 'f2' ),
+			),
+		);
+		$data = new Gutenberg_View_Config_Data( $defaults );
+		// Mutate the key, then remove it: removal restores its default.
+		$data->merge( array( 'default_view' => array( 'type' => 'grid' ) ), 1 );
+		$data->remove( array( 'default_view' ), 1 );
+
+		$this->assertSame( $defaults, self::read_config( $data ) );
 	}
 
 	public function test_remove_deletes_scalar_properties() {
@@ -282,40 +349,6 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			),
 			self::read_config( $data )
 		);
-	}
-
-	/**
-	 * set() rejects an undocumented top-level key and leaves the configuration
-	 * untouched.
-	 *
-	 * @covers ::set
-	 */
-	public function test_set_rejects_unknown_key() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
-
-		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
-		$before = self::read_config( $data );
-		$data->set( array( 'not_a_real_key' => 'nope' ), 1 );
-
-		$this->assertSame( $before, self::read_config( $data ) );
-	}
-
-	/**
-	 * set() rejects a patch with an unsupported version and leaves the
-	 * configuration untouched.
-	 *
-	 * @covers ::set
-	 */
-	public function test_set_rejects_updates_with_invalid_version() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
-
-		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
-		$before = self::read_config( $data );
-
-		$version = Gutenberg_View_Config_Data::LATEST_VERSION + 1;
-		$data->set( array( 'default_view' => array( 'type' => 'grid' ) ), $version );
-
-		$this->assertSame( $before, self::read_config( $data ) );
 	}
 
 	/**
@@ -832,24 +865,31 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * replace() drops a whole top-level key when the patch value is null —
-	 * any documented key, including the identity-keyed view_list — rather than
-	 * storing a literal null.
+	 * replace() resets a whole top-level key to its default when the patch value
+	 * is null — any documented key, including the identity-keyed view_list —
+	 * rather than storing a literal null.
 	 *
 	 * @covers ::replace
 	 */
-	public function test_replace_null_unsets_top_level_keys() {
-		$data = new Gutenberg_View_Config_Data(
-			array(
-				'default_view' => array( 'type' => 'table' ),
-				'view_list'    => array(
-					array(
-						'title' => 'All',
-						'slug'  => 'all',
-					),
+	public function test_replace_null_resets_top_level_keys_to_defaults() {
+		$defaults = array(
+			'default_view' => array( 'type' => 'table' ),
+			'view_list'    => array(
+				array(
+					'title' => 'All',
+					'slug'  => 'all',
 				),
-				'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
-			)
+			),
+			'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
+		);
+		$data = new Gutenberg_View_Config_Data( $defaults );
+		// Mutate the keys, then null them: each resets to its default.
+		$data->replace(
+			array(
+				'default_view' => array( 'type' => 'grid' ),
+				'view_list'    => array( array( 'slug' => 'mine', 'title' => 'Mine' ) ),
+			),
+			1
 		);
 		$data->replace(
 			array(
@@ -859,10 +899,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			1
 		);
 
-		$this->assertSame(
-			array( 'form' => array( 'layout' => array( 'type' => 'panel' ) ) ),
-			self::read_config( $data )
-		);
+		$this->assertSame( $defaults, self::read_config( $data ) );
 	}
 
 	/**
@@ -1517,24 +1554,29 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	/**
 	 * merge() drops a whole top-level key when the patch value is
 	 * null — any documented key, including the identity-keyed view_list —
-	 * rather than storing a literal null. gutenberg_get_entity_view_config()
-	 * backfills a dropped documented key from the defaults, so that reads as
-	 * a reset.
+	 * resetting that key to its default rather than storing a literal null.
 	 *
 	 * @covers ::merge
 	 */
-	public function test_merge_null_unsets_top_level_keys() {
-		$data = new Gutenberg_View_Config_Data(
-			array(
-				'default_view' => array( 'type' => 'table' ),
-				'view_list'    => array(
-					array(
-						'title' => 'All',
-						'slug'  => 'all',
-					),
+	public function test_merge_null_resets_top_level_keys_to_defaults() {
+		$defaults = array(
+			'default_view' => array( 'type' => 'table' ),
+			'view_list'    => array(
+				array(
+					'title' => 'All',
+					'slug'  => 'all',
 				),
-				'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
-			)
+			),
+			'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
+		);
+		$data = new Gutenberg_View_Config_Data( $defaults );
+		// Mutate the keys, then null them: each resets to its default.
+		$data->merge(
+			array(
+				'default_view' => array( 'type' => 'grid' ),
+				'view_list'    => array( array( 'slug' => 'mine', 'title' => 'Mine' ) ),
+			),
+			1
 		);
 		$data->merge(
 			array(
@@ -1544,10 +1586,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			1
 		);
 
-		$this->assertSame(
-			array( 'form' => array( 'layout' => array( 'type' => 'panel' ) ) ),
-			self::read_config( $data )
-		);
+		$this->assertSame( $defaults, self::read_config( $data ) );
 	}
 
 	/**
@@ -1876,6 +1915,92 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 							),
 						),
 					),
+				),
+			),
+			self::read_config( $data )
+		);
+	}
+
+	/**
+	 * A `null` value drops a top-level key, which resets it to its default. When a
+	 * later filter then merges into that same key, it should merge onto the
+	 * restored default rather than onto an empty value, so the default's untouched
+	 * props (`type`, `fields`) survive alongside the overridden one (`perPage`).
+	 *
+	 * Exercised through apply_filters() because the reset-to-default only
+	 * materializes once the full filter chain is reconciled.
+	 *
+	 * @covers ::apply_filters
+	 * @covers ::merge
+	 */
+	public function test_merge_after_null_merges_onto_defaults() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'type'    => 'table',
+					'perPage' => 10,
+					'fields'  => array( 'title', 'author' ),
+				),
+				'form'         => array(
+					'fields' => array( 'title' ),
+				),
+			)
+		);
+
+		$data->merge( array( 'default_view' => null ), 1 );
+		$data->merge( array( 'default_view' => array( 'perPage' => 20 ) ), 1 );
+
+		$this->assertSame(
+			array(
+				'default_view' => array(
+					'type'    => 'table',
+					'perPage' => 20,
+					'fields'  => array( 'title', 'author' ),
+				),
+				'form'         => array(
+					'fields' => array( 'title' ),
+				),
+			),
+			self::read_config( $data )
+		);
+	}
+
+	/**
+	 * remove() drops a top-level key just like a `null` value does, which resets it
+	 * to its default. When a later filter then merges into that same key, it should
+	 * merge onto the restored default rather than onto an empty value, so the
+	 * default's untouched props (`type`, `fields`) survive alongside the overridden
+	 * one (`perPage`).
+	 *
+	 * @covers ::remove
+	 * @covers ::merge
+	 */
+	public function test_merge_after_remove_merges_onto_defaults() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'type'    => 'table',
+					'perPage' => 10,
+					'fields'  => array( 'title', 'author' ),
+				),
+				'form'         => array(
+					'fields' => array( 'title' ),
+				),
+			)
+		);
+
+		$data->remove( array( 'default_view' ), 1 );
+		$data->merge( array( 'default_view' => array( 'perPage' => 20 ) ), 1 );
+
+		$this->assertSame(
+			array(
+				'default_view' => array(
+					'type'    => 'table',
+					'perPage' => 20,
+					'fields'  => array( 'title', 'author' ),
+				),
+				'form'         => array(
+					'fields' => array( 'title' ),
 				),
 			),
 			self::read_config( $data )
