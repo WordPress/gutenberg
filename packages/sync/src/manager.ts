@@ -325,7 +325,7 @@ export function createSyncManager( debug = false ): SyncManager {
 				// observable document change (so no CRDT transaction fires the
 				// observers above). Optional; the backstop covers providers
 				// that never report it.
-				provider.on( 'hasInitialSync', () =>
+				provider.onInitialSync?.( () =>
 					markHasInitialSync( entityId )
 				);
 

@@ -1029,12 +1029,13 @@ describe( 'SyncManager', () => {
 		} );
 
 		it( 'marks synced when a provider reports its initial sync, without a document change', async () => {
-			// Capture the listeners the manager attaches to the provider so
-			// the 'hasInitialSync' event can be fired directly.
-			const providerOn = jest.fn();
+			// Capture the initial-sync subscriber the manager registers on the
+			// provider so it can be fired directly.
+			const onInitialSync = jest.fn();
 			mockProviderCreator.mockImplementation( async () => ( {
 				destroy: jest.fn(),
-				on: providerOn,
+				on: jest.fn(),
+				onInitialSync,
 			} ) );
 
 			const manager = createSyncManager();
@@ -1054,13 +1055,11 @@ describe( 'SyncManager', () => {
 			// The provider finished its initial sync but applied no document
 			// change (the local document already matched the server state), so
 			// there is no CRDT transaction to infer sync from.
-			const hasInitialSyncListener = providerOn.mock.calls.find(
-				( [ event ] ) => event === 'hasInitialSync'
-			)?.[ 1 ];
+			const fireInitialSync = onInitialSync.mock.calls[ 0 ]?.[ 0 ];
 
-			expect( typeof hasInitialSyncListener ).toBe( 'function' );
-			if ( typeof hasInitialSyncListener === 'function' ) {
-				hasInitialSyncListener();
+			expect( typeof fireInitialSync ).toBe( 'function' );
+			if ( typeof fireInitialSync === 'function' ) {
+				fireInitialSync();
 			}
 
 			expect( onSynced ).toHaveBeenCalledTimes( 1 );

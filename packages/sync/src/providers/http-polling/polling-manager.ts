@@ -74,7 +74,7 @@ interface RegisterRoomOptions {
 	awareness: Awareness;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
-	onSync: () => void;
+	onInitialSync: () => void;
 }
 
 interface RoomState {
@@ -85,6 +85,7 @@ interface RoomState {
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
+	onInitialSync: () => void;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
 	room: string;
@@ -351,14 +352,9 @@ function processAwarenessUpdate(
  *
  * @param update The typed update received
  * @param doc    The Yjs document
- * @param onSync Callback when sync is complete
  * @return A response update if needed (e.g., sync_step2 in response to sync_step1)
  */
-function processDocUpdate(
-	update: SyncUpdate,
-	doc: Y.Doc,
-	onSync: () => void
-): SyncUpdate | void {
+function processDocUpdate( update: SyncUpdate, doc: Y.Doc ): SyncUpdate | void {
 	const data = base64ToUint8Array( update.data );
 
 	switch ( update.type ) {
@@ -377,7 +373,6 @@ function processDocUpdate(
 				doc,
 				POLLING_MANAGER_ORIGIN
 			);
-			onSync();
 			return;
 		}
 
@@ -790,6 +785,14 @@ function poll(): void {
 						)
 					);
 				}
+
+				// A successful poll has delivered the server's authoritative
+				// state for this room (all updates after the initial cursor),
+				// so the initial sync is complete, even if it applied no
+				// document change or no sync step 2 was exchanged (e.g. a solo
+				// session whose outgoing queue, including sync step 1, is
+				// paused). onInitialSync is one-shot at the provider.
+				roomState.onInitialSync();
 			} );
 
 			// Recalculate polling interval.
@@ -953,7 +956,7 @@ function registerRoom( {
 	doc,
 	awareness,
 	log,
-	onSync,
+	onInitialSync,
 	onStatusChange,
 }: RegisterRoomOptions ): void {
 	if ( roomStates.has( room ) ) {
@@ -1051,10 +1054,11 @@ function registerRoom( {
 		localAwarenessState: awareness.getLocalState() ?? {},
 		log,
 		onStatusChange,
+		onInitialSync,
 		processAwarenessUpdate: ( state: AwarenessState ) =>
 			processAwarenessUpdate( state, awareness ),
 		processDocUpdate: ( update: SyncUpdate ) =>
-			processDocUpdate( update, doc, onSync ),
+			processDocUpdate( update, doc ),
 		room,
 		unregister,
 		updateQueue,

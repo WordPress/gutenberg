@@ -23,8 +23,11 @@ export interface ProviderOptions {
 }
 
 /**
- * Event types for HttpPollingProvider.
- * ObservableV2 expects event handlers as functions.
+ * Event types for HttpPollingProvider. ObservableV2 expects event handlers as
+ * functions. `status` mirrors the generic `ProviderEventMap`; `hasInitialSync`
+ * is a provider-internal, payload-less signal exposed to the sync manager via
+ * the `onInitialSync` method on the created result (see below), not through
+ * the generic `on` forwarder.
  */
 type HttpPollingEvents = {
 	status: ( status: ConnectionStatus ) => void;
@@ -60,7 +63,7 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 			awareness: this.awareness,
 			log: this.log,
 			onStatusChange: this.emitStatus,
-			onSync: this.onSync,
+			onInitialSync: this.handleInitialSync,
 		} );
 	}
 
@@ -137,15 +140,15 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 	};
 
 	/**
-	 * Handle synchronization events from the polling manager. Fires the
-	 * one-shot `hasInitialSync` event the first time the server's initial
-	 * document state (sync step 2) has been applied, so the sync manager can
-	 * mark the entity synced even when that sync produced no document change.
+	 * Handle the initial sync signal from the polling manager, sent once the
+	 * first successful poll has delivered the server's document state. Fires
+	 * the one-shot `hasInitialSync` event so the sync manager can mark the
+	 * entity synced even when that sync produced no document change.
 	 */
-	protected onSync = (): void => {
+	protected handleInitialSync = (): void => {
 		if ( ! this.hasInitialSync ) {
 			this.hasInitialSync = true;
-			this.log( 'Synced' );
+			this.log( 'Initial sync' );
 			this.emit( 'hasInitialSync', [] );
 		}
 	};
@@ -176,6 +179,9 @@ export function createHttpPollingProvider(): ProviderCreator {
 			// The callback receives data as the first parameter
 			on: ( event, callback ) => {
 				provider.on( event, callback );
+			},
+			onInitialSync: ( callback ) => {
+				provider.on( 'hasInitialSync', callback );
 			},
 		};
 	};
