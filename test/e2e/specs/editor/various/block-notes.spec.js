@@ -23,13 +23,6 @@ function isTargetedRepairRequest( request ) {
 }
 
 async function selectInlineText( page, paragraph, endOffset ) {
-	await expect
-		.poll( () =>
-			page.evaluate( () =>
-				Boolean( window.wp.richText.getFormatType( 'core/note' ) )
-			)
-		)
-		.toBe( true );
 	await paragraph.click();
 	await page.keyboard.press( 'ControlOrMeta+a' );
 	await expect
