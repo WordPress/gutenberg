@@ -18,7 +18,7 @@ collab-sidebar/
 ├── note.js                         Note - per-card state (edit/delete mode, menu, dialog)
 ├── note-card.js                    NoteCard - presentational shell (byline + actions slot + children)
 ├── note-byline.js                  NoteByline - avatar + name + relative date
-├── note-form.js                    NoteForm - autosizing textarea + submit/cancel
+├── note-form.js                    NoteForm - rich text input + submit/cancel
 ├── add-note.js                     AddNote - new-note surface (floating + template-locked cases)
 ├── add-note-menu-item.js           AddNoteMenuItem - block-toolbar "Add note" trigger
 ├── note-indicator-toolbar.js       NoteAvatarIndicator - toolbar participants avatars

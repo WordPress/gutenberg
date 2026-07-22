@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+## 7.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+### Internal
+
+-   Expose `shortcutsListener` and `inputEventsListener` helpers as private APIs, so rich text fields outside `@wordpress/block-editor` can dispatch the keyboard shortcut and input event callbacks format types register. [#78471](https://github.com/WordPress/gutenberg/pull/78471)
+
+## 7.50.0 (2026-07-01)
+
+## 7.49.0 (2026-06-24)
+
+## 7.48.1 (2026-06-16)
+
+## 7.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 7.47.0 (2026-05-27)
+
 ## 7.46.0 (2026-05-14)
 
 ## 7.45.0 (2026-04-29)

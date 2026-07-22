@@ -2,6 +2,36 @@
 
 ## Unreleased
 
+### Enhancements
+
+- 	`format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
+
+## 33.0.0 (2026-07-14)
+
+### Breaking Changes
+
+-   The `test-e2e` command now runs the Playwright-based end-to-end test runner instead of Puppeteer (`test-playwright` remains available as an alias). Removed the Puppeteer test environment and configuration (`jest-environment-puppeteer`, `jest-e2e.config.js`, `puppeteer.config.js`) along with the `puppeteer-core` and `expect-puppeteer` dependencies. Puppeteer-specific options (e.g. `--puppeteer-interactive`, `--puppeteer-devtools`) are no longer supported ([#60357](https://github.com/WordPress/gutenberg/issues/60357)).
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+-   Update `stylelint` to `^16.26.1` ([#79648](https://github.com/WordPress/gutenberg/pull/79648)).
+-   Widen the `@playwright/test` peer dependency to `>=1` and mark it optional, so consumers aren't forced to bump Playwright or satisfy it under strict peer deps ([#78632](https://github.com/WordPress/gutenberg/pull/78632)).
+
+## 32.6.0 (2026-07-01)
+
+## 32.5.0 (2026-06-24)
+
+### Enhancements
+
+-   `lint-style`: Detect .cjs and .mjs config files so the bundled default config is not used when one of these is present ([#79226](https://github.com/WordPress/gutenberg/pull/79226)).
+
+## 32.4.1 (2026-06-16)
+
+## 32.4.0 (2026-06-10)
+
+## 32.3.0 (2026-05-27)
+
 ## 32.2.0 (2026-05-14)
 
 ## 32.1.0 (2026-04-29)

@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+## 7.0.0 (2026-07-14)
+
+### Breaking Changes
+
+-   Raise the required Node.js version to `^20.19.0` or `>=22.13.0`. ([#80063](https://github.com/WordPress/gutenberg/pull/80063))
+
+### Enhancements
+
+-   Update template-selection labels from the legacy medium weight to the emphasis font-weight token ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 6.50.0 (2026-07-01)
+
+## 6.49.0 (2026-06-24)
+
+## 6.48.1 (2026-06-16)
+
+## 6.48.0 (2026-06-10)
+
+### Enhancements
+
+-   The Site Editor now follows the user's admin color scheme ([#78397](https://github.com/WordPress/gutenberg/pull/78397)).
+
+## 6.47.0 (2026-05-27)
+
 ## 6.46.0 (2026-05-14)
 
 ## 6.45.0 (2026-04-29)

@@ -6,13 +6,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	Platform,
-	useCallback,
-	useContext,
-	useEffect,
-	useRef,
-} from '@wordpress/element';
+import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { isRTL, __, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -26,6 +20,7 @@ import PatternOverridesPanel from '../pattern-overrides-panel';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebar from '../plugin-sidebar';
 import PostSummary from './post-summary';
+import DataFormPostSummary from './dataform-post-summary';
 import PostRevisionSummary from './post-revision-summary';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import PostTransformPanel from '../post-transform-panel';
@@ -33,31 +28,21 @@ import SidebarHeader from './header';
 import TemplateActionsPanel from '../template-actions-panel';
 import TemplateContentPanel from '../template-content-panel';
 import TemplatePartContentPanel from '../template-part-content-panel';
-import PostRevisionsPanel from '../post-revisions-panel';
 import RevisionBlockDiffPanel from '../revision-block-diff';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
 import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
-import {
-	NAVIGATION_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_POST_TYPE,
-} from '../../store/constants';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
-const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
-	web: true,
-	native: false,
-} );
+const SIDEBAR_ACTIVE_BY_DEFAULT = true;
 
 const SidebarContent = ( {
 	tabName,
 	keyboardShortcut,
 	onActionPerformed,
 	extraPanels,
-	postType,
 } ) => {
 	const tabListRef = useRef( null );
 	// Because `PluginSidebar` renders a `ComplementaryArea`, we
@@ -99,24 +84,20 @@ const SidebarContent = ( {
 	if ( isRevisionsMode ) {
 		tabContent = <PostRevisionSummary />;
 	} else {
+		const isDataFormInspectorEnabled =
+			window?.__experimentalDataFormInspector;
 		tabContent = (
 			<>
-				<PostSummary onActionPerformed={ onActionPerformed } />
+				{ isDataFormInspectorEnabled ? (
+					<DataFormPostSummary
+						onActionPerformed={ onActionPerformed }
+					/>
+				) : (
+					<PostSummary onActionPerformed={ onActionPerformed } />
+				) }
 				<PluginDocumentSettingPanel.Slot />
 				<TemplateContentPanel />
-				{ window?.__experimentalDataFormInspector &&
-					[
-						'post',
-						'page',
-						'wp_template',
-						'wp_template_part',
-						'wp_block',
-					].includes( postType ) && (
-						<>
-							<TemplateActionsPanel />
-							<PostRevisionsPanel />
-						</>
-					) }
+				{ isDataFormInspectorEnabled && <TemplateActionsPanel /> }
 				<TemplatePartContentPanel />
 				<PostTransformPanel />
 				<PostTaxonomiesPanel />
@@ -163,42 +144,29 @@ const SidebarContent = ( {
 
 const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 	useAutoSwitchEditorSidebars();
-	const { tabName, keyboardShortcut, showSummary, postType } = useSelect(
-		( select ) => {
-			const shortcut = select(
-				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/editor/toggle-sidebar' );
+	const { tabName, keyboardShortcut } = useSelect( ( select ) => {
+		const shortcut = select(
+			keyboardShortcutsStore
+		).getShortcutRepresentation( 'core/editor/toggle-sidebar' );
 
-			const sidebar =
-				select( interfaceStore ).getActiveComplementaryArea( 'core' );
-			const _isEditorSidebarOpened = [
-				sidebars.block,
-				sidebars.document,
-			].includes( sidebar );
-			let _tabName = sidebar;
-			if ( ! _isEditorSidebarOpened ) {
-				_tabName = !! select(
-					blockEditorStore
-				).getBlockSelectionStart()
-					? sidebars.block
-					: sidebars.document;
-			}
+		const sidebar =
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
+		const _isEditorSidebarOpened = [
+			sidebars.block,
+			sidebars.document,
+		].includes( sidebar );
+		let _tabName = sidebar;
+		if ( ! _isEditorSidebarOpened ) {
+			_tabName = !! select( blockEditorStore ).getBlockSelectionStart()
+				? sidebars.block
+				: sidebars.document;
+		}
 
-			const _postType = select( editorStore ).getCurrentPostType();
-
-			return {
-				tabName: _tabName,
-				keyboardShortcut: shortcut,
-				showSummary: ! [
-					TEMPLATE_POST_TYPE,
-					TEMPLATE_PART_POST_TYPE,
-					NAVIGATION_POST_TYPE,
-				].includes( _postType ),
-				postType: _postType,
-			};
-		},
-		[]
-	);
+		return {
+			tabName: _tabName,
+			keyboardShortcut: shortcut,
+		};
+	}, [] );
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
@@ -220,10 +188,8 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 			<SidebarContent
 				tabName={ tabName }
 				keyboardShortcut={ keyboardShortcut }
-				showSummary={ showSummary }
 				onActionPerformed={ onActionPerformed }
 				extraPanels={ extraPanels }
-				postType={ postType }
 			/>
 		</Tabs>
 	);

@@ -10,14 +10,12 @@ import type { ComponentProps, ReactElement, HTMLAttributes } from 'react';
 import {
 	Flex,
 	FlexItem,
-	Tooltip as WCTooltip,
 	Composite,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Tooltip } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { isAppleOS } from '@wordpress/keycodes';
 import {
 	useCallback,
 	useContext,
@@ -42,6 +40,7 @@ import type {
 	ViewGrid as ViewGridType,
 } from '../../../types';
 import type { SetSelection } from '../../../types/private';
+import type { SelectionProps } from '../utils/use-selection-props';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
 const { Badge: WCBadge } = unlock( componentsPrivateApis );
 import { useGridColumns } from './preview-size-picker';
@@ -185,23 +184,6 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 						'is-selected': hasBulkAction && isSelected,
 					}
 				) }
-				onClickCapture={ ( event ) => {
-					props.onClickCapture?.( event );
-					if ( isAppleOS() ? event.metaKey : event.ctrlKey ) {
-						event.stopPropagation();
-						event.preventDefault();
-						if ( ! hasBulkAction ) {
-							return;
-						}
-						onChangeSelection(
-							isSelected
-								? selection.filter(
-										( itemId ) => id !== itemId
-								  )
-								: [ ...selection, id ]
-						);
-					}
-				} }
 			>
 				<ItemClickWrapper
 					item={ item }
@@ -304,11 +286,18 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 										direction="row"
 									>
 										<>
-											<WCTooltip text={ field.label }>
-												<FlexItem className="dataviews-view-grid__field-name">
-													{ field.header }
-												</FlexItem>
-											</WCTooltip>
+											<Tooltip.Root>
+												<Tooltip.Trigger
+													render={
+														<FlexItem className="dataviews-view-grid__field-name">
+															{ field.header }
+														</FlexItem>
+													}
+												/>
+												<Tooltip.Popup>
+													{ field.label }
+												</Tooltip.Popup>
+											</Tooltip.Root>
 											<FlexItem
 												className="dataviews-view-grid__field-value"
 												style={ { maxHeight: 'none' } }
@@ -352,6 +341,7 @@ interface CompositeGridProps< Item > {
 	) => ReactElement;
 	getItemId: ( item: Item ) => string;
 	actions: Action< Item >[];
+	getSelectionProps: ( id: string ) => SelectionProps;
 }
 
 export default function CompositeGrid< Item >( {
@@ -369,6 +359,7 @@ export default function CompositeGrid< Item >( {
 	renderItemLink,
 	getItemId,
 	actions,
+	getSelectionProps,
 }: CompositeGridProps< Item > ) {
 	const { paginationInfo, resizeObserverRef } =
 		useContext( DataViewsContext );
@@ -470,6 +461,7 @@ export default function CompositeGrid< Item >( {
 						) }
 						{ data.map( ( item ) => {
 							const itemId = getItemId( item );
+							const selectionProps = getSelectionProps( itemId );
 							// Use position from item for infinite scroll
 							const stablePosition = ( item as any ).position;
 							return (
@@ -491,6 +483,18 @@ export default function CompositeGrid< Item >( {
 											getItemId={ getItemId }
 											item={ item }
 											actions={ actions }
+											onMouseDown={ ( event ) => {
+												props.onMouseDown?.( event );
+												selectionProps.onMouseDown(
+													event
+												);
+											} }
+											onClickCapture={ ( event ) => {
+												props.onClickCapture?.( event );
+												selectionProps.onClickCapture(
+													event
+												);
+											} }
 											mediaField={ mediaField }
 											titleField={ titleField }
 											descriptionField={
@@ -554,6 +558,8 @@ export default function CompositeGrid< Item >( {
 							>
 								{ row.map( ( item ) => {
 									const itemId = getItemId( item );
+									const selectionProps =
+										getSelectionProps( itemId );
 									return (
 										<Composite.Item
 											key={ itemId }
@@ -577,6 +583,24 @@ export default function CompositeGrid< Item >( {
 													getItemId={ getItemId }
 													item={ item }
 													actions={ actions }
+													onMouseDown={ ( event ) => {
+														props.onMouseDown?.(
+															event
+														);
+														selectionProps.onMouseDown(
+															event
+														);
+													} }
+													onClickCapture={ (
+														event
+													) => {
+														props.onClickCapture?.(
+															event
+														);
+														selectionProps.onClickCapture(
+															event
+														);
+													} }
 													mediaField={ mediaField }
 													titleField={ titleField }
 													descriptionField={

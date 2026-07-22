@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+## 9.16.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+-   Removed the stale `puppeteer-core` peer dependency; the package no longer ships Puppeteer-based tests ([#60357](https://github.com/WordPress/gutenberg/issues/60357)).
+
+## 9.15.0 (2026-07-01)
+
+## 9.14.0 (2026-06-24)
+
+## 9.13.1 (2026-06-16)
+
+## 9.13.0 (2026-06-10)
+
+## 9.12.0 (2026-05-27)
+
 ## 9.11.0 (2026-05-14)
 
 ## 9.10.0 (2026-04-29)

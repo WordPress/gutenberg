@@ -119,22 +119,17 @@ export type ToggleGroupControlProps = Pick<
 	/**
 	 * The size variant of the control.
 	 *
-	 * @default 'default'
+	 * @deprecated This prop no longer has any effect.
+	 * @ignore
 	 */
 	size?: 'default' | '__unstable-large';
 	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
-	 * @default false
-	 */
-	__next40pxDefaultSize?: boolean;
-	/**
-	 * Do not throw a warning for the deprecated 36px default size.
-	 * For internal components of other components that already throw the warning.
-	 *
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
 	 * @ignore
 	 */
-	__shouldNotWarnDeprecated36pxSize?: boolean;
+	__next40pxDefaultSize?: boolean;
 };
 
 export type ToggleGroupControlContextProps = {
@@ -142,7 +137,6 @@ export type ToggleGroupControlContextProps = {
 	isDeselectable?: boolean;
 	baseId: string;
 	isBlock: ToggleGroupControlProps[ 'isBlock' ];
-	size: ToggleGroupControlProps[ 'size' ];
 	value: ToggleGroupControlProps[ 'value' ];
 	setValue: ( newValue: string | number | undefined ) => void;
 	setSelectedElement: ( element: HTMLElement | undefined ) => void;
@@ -150,6 +144,6 @@ export type ToggleGroupControlContextProps = {
 
 export type ToggleGroupControlMainControlProps = Pick<
 	ToggleGroupControlProps,
-	'children' | 'isAdaptiveWidth' | 'label' | 'size' | 'onChange' | 'value'
+	'children' | 'isAdaptiveWidth' | 'label' | 'onChange' | 'value'
 > &
 	Pick< ToggleGroupControlContextProps, 'setSelectedElement' >;

@@ -95,17 +95,14 @@ function areCropperImagesEqual(
  * setters, undo/redo, gesture boundaries, and viewport reporting.
  */
 export interface MediaEditorController extends CropperController {
-	/** The cropOptions slice (preset key + freeform toggle). */
+	/** The cropOptions slice. */
 	cropOptions: CropOptionsSlice;
 	/** Set the aspect-ratio preset. Atomic with the cropRect reshape. */
 	setAspectRatioValue: ( presetKey: string ) => void;
-	/** Toggle the resize-handle (freeform) mode. */
-	setFreeformCrop: ( value: boolean ) => void;
-	/** Reset cropOptions to defaults (Free + freeform on). */
+	/** Reset cropOptions to defaults. */
 	resetCropOptions: () => void;
 	/**
 	 * Whether the cropper geometry differs from the initial baseline.
-	 * This excludes UI-only cropOptions such as the resize-handle toggle.
 	 */
 	isCropperDirty: boolean;
 	/** Whether there's an undoable change in history. */
@@ -224,8 +221,7 @@ export function useMediaEditorState(
 
 	// Core dispatch wrapper. Synchronously computes the post-state via
 	// the pure reducer so we can skip history pushes for no-op actions
-	// (e.g., setting a freeform toggle to its current value) and keep
-	// `stateRef` in lockstep with React's pending state.
+	// and keep `stateRef` in lockstep with React's pending state.
 	const dispatchWithHistory = useCallback(
 		( action: MediaEditorAction, recordHistory = true ) => {
 			const preState = stateRef.current;
@@ -346,16 +342,6 @@ export function useMediaEditorState(
 		[ dispatchWithHistory ]
 	);
 
-	const setFreeformCrop = useCallback(
-		( value: boolean ) => {
-			dispatchWithHistory( {
-				type: 'SET_FREEFORM_CROP',
-				payload: value,
-			} );
-		},
-		[ dispatchWithHistory ]
-	);
-
 	const resetCropOptions = useCallback( () => {
 		dispatchWithHistory( { type: 'RESET_CROP_OPTIONS' } );
 	}, [ dispatchWithHistory ] );
@@ -450,7 +436,6 @@ export function useMediaEditorState(
 			// Composite extensions
 			cropOptions: state.cropOptions,
 			setAspectRatioValue,
-			setFreeformCrop,
 			resetCropOptions,
 			isCropperDirty,
 			hasUndo,
@@ -471,7 +456,6 @@ export function useMediaEditorState(
 			getCroppedImage,
 			state.cropOptions,
 			setAspectRatioValue,
-			setFreeformCrop,
 			resetCropOptions,
 			isCropperDirty,
 			hasUndo,

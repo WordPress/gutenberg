@@ -16,7 +16,6 @@ import {
 } from '@wordpress/components';
 import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
 import { chevronLeftSmall, chevronRightSmall, layout } from '@wordpress/icons';
-import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
 import { useRef, useEffect } from '@wordpress/element';
@@ -267,9 +266,6 @@ export default function DocumentBar( props ) {
 								) }
 						</WCText>
 					</motion.div>
-					<span className="editor-document-bar__shortcut">
-						{ displayShortcut.primary( 'k' ) }
-					</span>
 				</Button>
 			) }
 		</div>

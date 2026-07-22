@@ -167,6 +167,33 @@ test.describe( 'Style Book', () => {
 		).toBeVisible();
 	} );
 
+	test( 'should reflect unsaved global styles edits', async ( { page } ) => {
+		const styleBookIframe = page.frameLocator(
+			'[name="style-book-canvas"]'
+		);
+		await expect(
+			styleBookIframe.getByRole( 'grid', { name: 'Examples of blocks' } )
+		).toBeVisible();
+
+		// Edit the user global styles without saving.
+		await page.evaluate( async () => {
+			const globalStylesId = await window.wp.data
+				.resolveSelect( 'core' )
+				.__experimentalGetCurrentGlobalStylesId();
+			window.wp.data
+				.dispatch( 'core' )
+				.editEntityRecord( 'root', 'globalStyles', globalStylesId, {
+					styles: { color: { background: '#ff0000' } },
+				} );
+		} );
+
+		// The Style Book should pick up the edit without a save or reload.
+		await expect( styleBookIframe.locator( 'body' ) ).toHaveCSS(
+			'background-color',
+			'rgb(255, 0, 0)'
+		);
+	} );
+
 	test( 'should allow opening the command menu from the header when open', async ( {
 		page,
 	} ) => {

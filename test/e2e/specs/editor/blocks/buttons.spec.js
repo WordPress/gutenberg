@@ -271,13 +271,24 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
-		);
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
 		await page.click( 'role=option[name="Cyan bluish gray"i]' );
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
-		);
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
 		await page.click( 'role=option[name="Vivid red"i]' );
 
 		// Check the content.
@@ -296,16 +307,30 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
-		);
-		await page.click( 'role=button[name="Custom color picker"i]' );
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		// Match by substring: when the control has a value (e.g. an inherited
+		// color), the button's accessible name gains a "The currently selected
+		// color is…" suffix, so an exact-name match no longer works.
+		await page.click( 'role=button[name=/Custom color picker/i]' );
 		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
 
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
-		);
-		await page.click( 'role=button[name="Custom color picker"i]' );
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page.click( 'role=button[name=/Custom color picker/i]' );
 		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
 
 		// Check the content.
@@ -327,10 +352,10 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
-		);
-		await page.click( 'role=tab[name="Gradient"i]' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Gradient', exact: true } )
+			.click();
 		await page.click( 'role=option[name="Gradient: Purple to yellow"i]' );
 
 		// Check the content.
@@ -352,10 +377,10 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
-		);
-		await page.click( 'role=tab[name="Gradient"i]' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Gradient', exact: true } )
+			.click();
 		await page.click(
 			'role=button[name=/^Gradient control point at position 0% with color code/]'
 		);
@@ -385,13 +410,26 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
-		// Apply named colors to the first button.
+		// Apply named colors to the first button. Text and background color
+		// controls now live in the Typography and Background panels.
 		const settings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		await settings.getByRole( 'button', { name: 'Text' } ).click();
+		await settings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
 		await page.getByRole( 'option', { name: 'Cyan bluish gray' } ).click();
-		await settings.getByRole( 'button', { name: 'Background' } ).click();
+		await settings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
 		await page.getByRole( 'option', { name: 'Vivid red' } ).click();
 
 		// Select the parent Buttons block so the appender is visible.
@@ -479,8 +517,12 @@ test.describe( 'Buttons', () => {
 				.getByLabel( 'Set custom value' )
 				.click();
 
-			// Change the unit from px to % using the combobox
+			// Change the unit from px to % using the combobox. Scope the
+			// lookup to the Width control's group: the block inspector now
+			// renders other unit selectors (e.g. Typography font size) above
+			// it, so a panel-wide `.first()` would match the wrong control.
 			await settingsPanel
+				.getByRole( 'group', { name: 'Width' } )
 				.getByRole( 'combobox', { name: 'Select unit' } )
 				.first()
 				.selectOption( '%' );

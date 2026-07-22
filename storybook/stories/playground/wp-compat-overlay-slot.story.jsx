@@ -1,16 +1,14 @@
-/**
- * WordPress dependencies
- */
-import { Modal, Popover, Button } from '@wordpress/components';
+import { Modal, Popover as WCPopover, Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import {
+	Autocomplete,
+	Combobox,
+	Popover,
+	Select,
+	SelectControl,
+	Tooltip,
+} from '@wordpress/ui';
 
-/**
- * Internal dependencies
- */
-import * as Tooltip from '../../../packages/ui/src/tooltip';
-import * as Select from '../../../packages/ui/src/form/primitives/select';
-import { SelectControl } from '../../../packages/ui/src/form/select-control';
-import * as Autocomplete from '../../../packages/ui/src/form/primitives/autocomplete';
 import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
 
 const selectItems = [
@@ -25,10 +23,59 @@ const autocompleteItems = [
 	{ id: '3', value: 'Item 3' },
 ];
 
-// Cross-library stacking: `@wordpress/ui` overlays (`Tooltip`, `Select`,
-// `SelectControl`, `Autocomplete`) inside a `@wordpress/components`
-// Modal / Popover should sit above the components-side overlay via the
-// compat overlay slot.
+const inputWrapperStyle = {
+	padding:
+		'var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-xs)',
+};
+
+function UiPopoverFixture() {
+	return (
+		<div style={ { marginTop: '1rem' } }>
+			<Popover.Root>
+				<Popover.Trigger>Open `@wordpress/ui` Popover</Popover.Trigger>
+				<Popover.Popup>
+					<Popover.Title>Popover from `@wordpress/ui`</Popover.Title>
+					<p>
+						The popover and its nested autocomplete should appear
+						above the host overlay.
+					</p>
+					<Autocomplete.Root items={ autocompleteItems }>
+						<Autocomplete.Input
+							placeholder="Search nested items"
+							aria-label="Autocomplete inside @wordpress/ui Popover"
+						/>
+						<Autocomplete.Popup>
+							<Autocomplete.Empty>
+								No matching items.
+							</Autocomplete.Empty>
+							<Autocomplete.List>
+								<Autocomplete.ListBody>
+									<Autocomplete.Collection>
+										{ ( item ) => (
+											<Autocomplete.Item
+												key={ item.id }
+												value={ item }
+											>
+												{ item.value }
+											</Autocomplete.Item>
+										) }
+									</Autocomplete.Collection>
+								</Autocomplete.ListBody>
+							</Autocomplete.List>
+						</Autocomplete.Popup>
+					</Autocomplete.Root>
+				</Popover.Popup>
+			</Popover.Root>
+		</div>
+	);
+}
+
+// Cross-library stacking: `@wordpress/ui` overlays (`Tooltip`, `Popover`,
+// `Select`, `Combobox`, `SelectControl`, `Autocomplete`) inside a
+// `@wordpress/components` Modal / Popover should sit above the
+// components-side overlay via the compat overlay slot. The Popover fixture uses
+// controlled `@wordpress/ui` content; arbitrary legacy descendants remain out
+// of scope.
 export default {
 	title: 'Playground/Debug fixtures/WP Compat Overlay Slot',
 	decorators: [ WithWpCompatOverlaySlot ],
@@ -67,6 +114,8 @@ export const InsideComponentsModal = {
 							</Tooltip.Root>
 						</Tooltip.Provider>
 
+						<UiPopoverFixture />
+
 						<div style={ { marginTop: '1rem' } }>
 							<Select.Root items={ selectItems }>
 								<Select.Trigger aria-label="Select primitive" />
@@ -81,6 +130,37 @@ export const InsideComponentsModal = {
 									) ) }
 								</Select.Popup>
 							</Select.Root>
+						</div>
+
+						<div style={ { marginTop: '1rem' } }>
+							<Combobox.Root
+								defaultValue={ selectItems[ 0 ] }
+								items={ selectItems }
+							>
+								<Combobox.Trigger aria-label="Combobox primitive" />
+								<Combobox.Popup>
+									<div style={ inputWrapperStyle }>
+										<Combobox.Input placeholder="Search" />
+									</div>
+									<Combobox.Empty>
+										No results found.
+									</Combobox.Empty>
+									<Combobox.List>
+										<Combobox.ListBody>
+											<Combobox.Collection>
+												{ ( item ) => (
+													<Combobox.Item
+														key={ item.value }
+														value={ item }
+													>
+														{ item.label }
+													</Combobox.Item>
+												) }
+											</Combobox.Collection>
+										</Combobox.ListBody>
+									</Combobox.List>
+								</Combobox.Popup>
+							</Combobox.Root>
 						</div>
 
 						<div style={ { marginTop: '1rem' } }>
@@ -140,7 +220,7 @@ export const InsideComponentsPopover = {
 					Toggle `@wordpress/components` Popover
 				</Button>
 				{ isOpen && anchor && (
-					<Popover
+					<WCPopover
 						anchor={ anchor }
 						onClose={ () => setIsOpen( false ) }
 					>
@@ -159,6 +239,8 @@ export const InsideComponentsPopover = {
 								</Tooltip.Root>
 							</Tooltip.Provider>
 
+							<UiPopoverFixture />
+
 							<div style={ { marginTop: '1rem' } }>
 								<Select.Root items={ selectItems }>
 									<Select.Trigger aria-label="Select primitive" />
@@ -173,6 +255,37 @@ export const InsideComponentsPopover = {
 										) ) }
 									</Select.Popup>
 								</Select.Root>
+							</div>
+
+							<div style={ { marginTop: '1rem' } }>
+								<Combobox.Root
+									defaultValue={ selectItems[ 0 ] }
+									items={ selectItems }
+								>
+									<Combobox.Trigger aria-label="Combobox primitive" />
+									<Combobox.Popup>
+										<div style={ inputWrapperStyle }>
+											<Combobox.Input placeholder="Search" />
+										</div>
+										<Combobox.Empty>
+											No results found.
+										</Combobox.Empty>
+										<Combobox.List>
+											<Combobox.ListBody>
+												<Combobox.Collection>
+													{ ( item ) => (
+														<Combobox.Item
+															key={ item.value }
+															value={ item }
+														>
+															{ item.label }
+														</Combobox.Item>
+													) }
+												</Combobox.Collection>
+											</Combobox.ListBody>
+										</Combobox.List>
+									</Combobox.Popup>
+								</Combobox.Root>
 							</div>
 
 							<div style={ { marginTop: '1rem' } }>
@@ -210,7 +323,7 @@ export const InsideComponentsPopover = {
 								</Autocomplete.Root>
 							</div>
 						</div>
-					</Popover>
+					</WCPopover>
 				) }
 			</>
 		);

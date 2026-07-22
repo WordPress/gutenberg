@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Y } from '@wordpress/sync';
-import { select } from '@wordpress/data';
+import { renderHook } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -11,22 +11,44 @@ import {
 	getBlockPathInYdoc,
 	getContainingBlockYMap,
 	resolveBlockClientIdByPath,
+	usePostContentBlocks,
 } from '../block-lookup';
 
-// Mock WordPress dependencies
+import type { EditorStoreBlock } from '../block-lookup';
+
+type MockBlock = EditorStoreBlock & {
+	name: string;
+	innerBlocks: MockBlock[];
+};
+
+let mockGetClientIdsTree: jest.Mock;
+
+function mockFlattenBlocks( blocks: MockBlock[] ): MockBlock[] {
+	return blocks.flatMap( ( b ) => [
+		b,
+		...mockFlattenBlocks( b.innerBlocks ),
+	] );
+}
+
+jest.mock( '../../lock-unlock', () => ( {
+	unlock: ( obj: any ) => obj,
+} ) );
+
 jest.mock( '@wordpress/data', () => ( {
-	select: jest.fn(),
+	useSelect: ( selector: Function ) =>
+		selector( () => ( {
+			getClientIdsTree: ( ...args: any[] ) =>
+				mockGetClientIdsTree( ...args ),
+			getBlocksByName: ( blockName: string ) =>
+				mockFlattenBlocks( mockGetClientIdsTree( '' ) )
+					.filter( ( b ) => b.name === blockName )
+					.map( ( b ) => b.clientId ),
+		} ) ),
 } ) );
 
 jest.mock( '@wordpress/block-editor', () => ( {
 	store: 'core/block-editor',
 } ) );
-
-type MockBlock = {
-	clientId: string;
-	name: string;
-	innerBlocks: MockBlock[];
-};
 
 /**
  * Create a Y.Map block with a clientId and empty innerBlocks, matching the
@@ -125,40 +147,6 @@ function createNestedYDoc( {
 	innerBlocksArray.push( yInnerBlocks );
 
 	return { ydoc, rootBlocks, innerBlocksArray };
-}
-
-/**
- * Mock the block-editor store's `getBlocks` selector.
- *
- * When called without an argument (or undefined), returns `rootBlocks`.
- * When called with a clientId, looks up the block by clientId and returns
- * its innerBlocks. This mimics how `getBlocks( clientId )` works in the
- * real store for controlled inner blocks.
- * @param rootBlocks
- */
-function mockBlockEditorStore( rootBlocks: MockBlock[] ) {
-	const allBlocks = new Map< string, MockBlock >();
-
-	function indexBlocks( blocks: MockBlock[] ) {
-		for ( const block of blocks ) {
-			allBlocks.set( block.clientId, block );
-			if ( block.innerBlocks?.length ) {
-				indexBlocks( block.innerBlocks );
-			}
-		}
-	}
-	indexBlocks( rootBlocks );
-
-	const getBlocks = jest.fn( ( rootClientId?: string ) => {
-		if ( rootClientId === undefined ) {
-			return rootBlocks;
-		}
-		const block = allBlocks.get( rootClientId );
-		return block ? block.innerBlocks : [];
-	} );
-
-	( select as jest.Mock ).mockReturnValue( { getBlocks } );
-	return { getBlocks };
 }
 
 describe( 'getBlockPathInYdoc', () => {
@@ -313,35 +301,30 @@ describe( 'getContainingBlockYMap', () => {
 } );
 
 describe( 'resolveBlockClientIdByPath', () => {
-	afterEach( () => {
-		jest.restoreAllMocks();
-	} );
-
 	it( 'should return null for an empty path', () => {
-		mockBlockEditorStore( [] );
-		expect( resolveBlockClientIdByPath( [] ) ).toBeNull();
+		expect( resolveBlockClientIdByPath( [], [] ) ).toBeNull();
 	} );
 
 	it( 'should resolve a root block by single-element path', () => {
-		mockBlockEditorStore( [
+		const blocks: MockBlock[] = [
 			{ clientId: 'a', name: 'core/paragraph', innerBlocks: [] },
 			{ clientId: 'b', name: 'core/heading', innerBlocks: [] },
-		] );
+		];
 
-		expect( resolveBlockClientIdByPath( [ 0 ] ) ).toBe( 'a' );
-		expect( resolveBlockClientIdByPath( [ 1 ] ) ).toBe( 'b' );
+		expect( resolveBlockClientIdByPath( [ 0 ], blocks ) ).toBe( 'a' );
+		expect( resolveBlockClientIdByPath( [ 1 ], blocks ) ).toBe( 'b' );
 	} );
 
 	it( 'should return null for an out-of-bounds index', () => {
-		mockBlockEditorStore( [
+		const blocks: MockBlock[] = [
 			{ clientId: 'a', name: 'core/paragraph', innerBlocks: [] },
-		] );
+		];
 
-		expect( resolveBlockClientIdByPath( [ 5 ] ) ).toBeNull();
+		expect( resolveBlockClientIdByPath( [ 5 ], blocks ) ).toBeNull();
 	} );
 
 	it( 'should resolve a nested inner block', () => {
-		mockBlockEditorStore( [
+		const blocks: MockBlock[] = [
 			{
 				clientId: 'parent',
 				name: 'core/group',
@@ -358,13 +341,15 @@ describe( 'resolveBlockClientIdByPath', () => {
 					},
 				],
 			},
-		] );
+		];
 
-		expect( resolveBlockClientIdByPath( [ 0, 1 ] ) ).toBe( 'child-1' );
+		expect( resolveBlockClientIdByPath( [ 0, 1 ], blocks ) ).toBe(
+			'child-1'
+		);
 	} );
 
 	it( 'should return null when inner path index is out of bounds', () => {
-		mockBlockEditorStore( [
+		const blocks: MockBlock[] = [
 			{
 				clientId: 'parent',
 				name: 'core/group',
@@ -376,12 +361,12 @@ describe( 'resolveBlockClientIdByPath', () => {
 					},
 				],
 			},
-		] );
+		];
 
-		expect( resolveBlockClientIdByPath( [ 0, 5 ] ) ).toBeNull();
+		expect( resolveBlockClientIdByPath( [ 0, 5 ], blocks ) ).toBeNull();
 	} );
 
-	describe( 'template mode (getPostContentBlocks behavior)', () => {
+	describe( 'template mode (usePostContentBlocks behavior)', () => {
 		it( 'should navigate through core/post-content in template mode', () => {
 			const postContentInnerBlocks: MockBlock[] = [
 				{
@@ -398,7 +383,7 @@ describe( 'resolveBlockClientIdByPath', () => {
 
 			// Template structure: header → post-content → footer.
 			// post-content's innerBlocks are empty in the tree (controlled
-			// inner blocks), so getBlocks( postContentClientId ) is used.
+			// inner blocks), so getClientIdsTree( postContentClientId ) is used.
 			const templateBlocks: MockBlock[] = [
 				{
 					clientId: 'header',
@@ -417,13 +402,11 @@ describe( 'resolveBlockClientIdByPath', () => {
 				},
 			];
 
-			const { getBlocks } = mockBlockEditorStore( templateBlocks );
-
-			// Override getBlocks to return post content blocks when called
-			// with the post-content clientId (mimicking controlled inner
-			// blocks behavior in useBlockSync).
-			getBlocks.mockImplementation( ( rootClientId?: string ) => {
-				if ( rootClientId === undefined ) {
+			// Override getClientIdsTree to return post content blocks when
+			// called with the post-content clientId (mimicking controlled
+			// inner blocks behavior in useBlockSync).
+			mockGetClientIdsTree = jest.fn( ( rootClientId: string = '' ) => {
+				if ( rootClientId === '' ) {
 					return templateBlocks;
 				}
 				if ( rootClientId === 'post-content' ) {
@@ -432,13 +415,18 @@ describe( 'resolveBlockClientIdByPath', () => {
 				return [];
 			} );
 
-			// Path [0] should resolve to the first post content block,
-			// not the first template block.
-			expect( resolveBlockClientIdByPath( [ 0 ] ) ).toBe( 'post-para-0' );
-			expect( resolveBlockClientIdByPath( [ 1 ] ) ).toBe( 'post-para-1' );
+			// The returned blocks should be post content blocks, not the template blocks.
+			const blocks = renderHook( () => usePostContentBlocks() ).result
+				.current;
+			expect( resolveBlockClientIdByPath( [ 0 ], blocks ) ).toBe(
+				'post-para-0'
+			);
+			expect( resolveBlockClientIdByPath( [ 1 ], blocks ) ).toBe(
+				'post-para-1'
+			);
 		} );
 
-		it( 'should call getBlocks with post-content clientId', () => {
+		it( 'should call getClientIdsTree with post-content clientId', () => {
 			const templateBlocks: MockBlock[] = [
 				{
 					clientId: 'header',
@@ -452,9 +440,8 @@ describe( 'resolveBlockClientIdByPath', () => {
 				},
 			];
 
-			const { getBlocks } = mockBlockEditorStore( templateBlocks );
-			getBlocks.mockImplementation( ( rootClientId?: string ) => {
-				if ( rootClientId === undefined ) {
+			mockGetClientIdsTree = jest.fn( ( rootClientId: string = '' ) => {
+				if ( rootClientId === '' ) {
 					return templateBlocks;
 				}
 				if ( rootClientId === 'pc' ) {
@@ -469,10 +456,10 @@ describe( 'resolveBlockClientIdByPath', () => {
 				return [];
 			} );
 
-			resolveBlockClientIdByPath( [ 0 ] );
+			renderHook( () => usePostContentBlocks() );
 
-			// Verify getBlocks was called with the post-content clientId.
-			expect( getBlocks ).toHaveBeenCalledWith( 'pc' );
+			// Verify getClientIdsTree was called with the post-content clientId.
+			expect( mockGetClientIdsTree ).toHaveBeenCalledWith( 'pc' );
 		} );
 
 		it( 'should find core/post-content nested inside template parts', () => {
@@ -500,9 +487,8 @@ describe( 'resolveBlockClientIdByPath', () => {
 				},
 			];
 
-			const { getBlocks } = mockBlockEditorStore( templateBlocks );
-			getBlocks.mockImplementation( ( rootClientId?: string ) => {
-				if ( rootClientId === undefined ) {
+			mockGetClientIdsTree = jest.fn( ( rootClientId: string = '' ) => {
+				if ( rootClientId === '' ) {
 					return templateBlocks;
 				}
 				if ( rootClientId === 'nested-pc' ) {
@@ -511,12 +497,16 @@ describe( 'resolveBlockClientIdByPath', () => {
 				return [];
 			} );
 
-			expect( resolveBlockClientIdByPath( [ 0 ] ) ).toBe( 'deep-para' );
+			const blocks = renderHook( () => usePostContentBlocks() ).result
+				.current;
+			expect( resolveBlockClientIdByPath( [ 0 ], blocks ) ).toBe(
+				'deep-para'
+			);
 		} );
 
 		it( 'should use root blocks directly when no core/post-content exists', () => {
 			// No template mode — plain post editing.
-			const blocks: MockBlock[] = [
+			const postContentBlocks: MockBlock[] = [
 				{
 					clientId: 'para-0',
 					name: 'core/paragraph',
@@ -529,10 +519,22 @@ describe( 'resolveBlockClientIdByPath', () => {
 				},
 			];
 
-			mockBlockEditorStore( blocks );
+			mockGetClientIdsTree = jest.fn( ( rootClientId: string = '' ) => {
+				if ( rootClientId === '' ) {
+					return postContentBlocks;
+				}
+				return [];
+			} );
 
-			expect( resolveBlockClientIdByPath( [ 0 ] ) ).toBe( 'para-0' );
-			expect( resolveBlockClientIdByPath( [ 1 ] ) ).toBe( 'para-1' );
+			const blocks = renderHook( () => usePostContentBlocks() ).result
+				.current;
+
+			expect( resolveBlockClientIdByPath( [ 0 ], blocks ) ).toBe(
+				'para-0'
+			);
+			expect( resolveBlockClientIdByPath( [ 1 ], blocks ) ).toBe(
+				'para-1'
+			);
 		} );
 
 		it( 'should return null for invalid path in template mode', () => {
@@ -549,9 +551,8 @@ describe( 'resolveBlockClientIdByPath', () => {
 				},
 			];
 
-			const { getBlocks } = mockBlockEditorStore( templateBlocks );
-			getBlocks.mockImplementation( ( rootClientId?: string ) => {
-				if ( rootClientId === undefined ) {
+			mockGetClientIdsTree = jest.fn( ( rootClientId: string = '' ) => {
+				if ( rootClientId === '' ) {
 					return templateBlocks;
 				}
 				if ( rootClientId === 'pc' ) {
@@ -567,8 +568,11 @@ describe( 'resolveBlockClientIdByPath', () => {
 				return [];
 			} );
 
+			const blocks = renderHook( () => usePostContentBlocks() ).result
+				.current;
+
 			// Index 1 is out of bounds for the post content blocks.
-			expect( resolveBlockClientIdByPath( [ 1 ] ) ).toBeNull();
+			expect( resolveBlockClientIdByPath( [ 1 ], blocks ) ).toBeNull();
 		} );
 	} );
 } );

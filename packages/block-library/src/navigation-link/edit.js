@@ -338,7 +338,6 @@ export default function NavigationLinkEdit( {
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			...blockProps,
 			className: 'remove-outline', // Remove the outline from the inner blocks container.
 		},
 		{
@@ -426,12 +425,15 @@ export default function NavigationLinkEdit( {
 										}
 										onMerge={ mergeBlocks }
 										onReplace={ onReplace }
-										__unstableOnSplitAtEnd={ () =>
-											insertBlocksAfter(
-												createBlock(
-													'core/navigation-link'
-												)
-											)
+										__unstableOnSplitAtEnd={
+											insertBlocksAfter
+												? () =>
+														insertBlocksAfter(
+															createBlock(
+																'core/navigation-link'
+															)
+														)
+												: undefined
 										}
 										aria-label={ __(
 											'Navigation link text'
@@ -471,7 +473,8 @@ export default function NavigationLinkEdit( {
 								// If there is no link and no binding, remove the auto-inserted block.
 								// This avoids empty blocks which can provided a poor UX.
 								// Don't remove if binding exists (even if entity is unavailable) so user can fix it.
-								if ( ! url && ! hasUrlBinding ) {
+								// `onReplace` is undefined when the block can't be removed.
+								if ( ! url && ! hasUrlBinding && onReplace ) {
 									onReplace( [] );
 									return;
 								}

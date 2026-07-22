@@ -71,24 +71,10 @@ export function mediaEditorReducer(
 				cropOptions: nextCropOptions,
 			};
 		}
-		case 'SET_FREEFORM_CROP': {
-			if ( state.cropOptions.freeformCrop === action.payload ) {
-				return state;
-			}
-			return {
-				...state,
-				cropOptions: {
-					...state.cropOptions,
-					freeformCrop: action.payload,
-				},
-			};
-		}
 		case 'RESET_CROP_OPTIONS': {
 			if (
 				state.cropOptions.aspectRatioValue ===
-					DEFAULT_CROP_OPTIONS.aspectRatioValue &&
-				state.cropOptions.freeformCrop ===
-					DEFAULT_CROP_OPTIONS.freeformCrop
+				DEFAULT_CROP_OPTIONS.aspectRatioValue
 			) {
 				return state;
 			}
@@ -129,8 +115,7 @@ export function areMediaEditorStatesEqual(
 	}
 	return (
 		areCropperStatesEqual( a.cropper, b.cropper ) &&
-		a.cropOptions.aspectRatioValue === b.cropOptions.aspectRatioValue &&
-		a.cropOptions.freeformCrop === b.cropOptions.freeformCrop
+		a.cropOptions.aspectRatioValue === b.cropOptions.aspectRatioValue
 	);
 }
 

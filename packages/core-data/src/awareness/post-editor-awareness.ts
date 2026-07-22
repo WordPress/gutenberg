@@ -37,6 +37,7 @@ import type {
 	WPBlockSelection,
 } from '../types';
 import type { YBlocks } from '../utils/crdt-blocks';
+import type { EditorStoreBlock } from './block-lookup';
 import type {
 	DebugCollaboratorData,
 	EditorState,
@@ -245,10 +246,12 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	 * clientIds (e.g. in "Show Template" mode where blocks are cloned).
 	 *
 	 * @param selection - The selection state.
+	 * @param blocks    - The tree of block-editor store post content blocks.
 	 * @return The rich-text offset and block client ID, or nulls if not resolvable.
 	 */
 	public convertSelectionStateToAbsolute(
-		selection: SelectionState
+		selection: SelectionState,
+		blocks: EditorStoreBlock[]
 	): ResolvedSelection {
 		if ( selection.type === SelectionType.None ) {
 			return {
@@ -273,7 +276,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				if ( block instanceof Y.Map ) {
 					const path = getBlockPathInYdoc( block );
 					localClientId = path
-						? resolveBlockClientIdByPath( path )
+						? resolveBlockClientIdByPath( path, blocks )
 						: null;
 				}
 			}
@@ -306,7 +309,9 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 
 		const yType = getContainingBlockYMap( absolutePosition.type );
 		const path = yType ? getBlockPathInYdoc( yType ) : null;
-		const localClientId = path ? resolveBlockClientIdByPath( path ) : null;
+		const localClientId = path
+			? resolveBlockClientIdByPath( path, blocks )
+			: null;
 
 		return {
 			richTextOffset: htmlIndexToRichTextOffset(

@@ -24,6 +24,7 @@ import {
 	useBlockEditContext,
 } from '../../block-edit/context';
 import { useFocusHandler } from './use-focus-handler';
+import { useRegisterBlockEventHandlers } from './use-register-block-event-handlers';
 import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
@@ -105,8 +106,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		canMove,
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 		ariaLabel,
 	} = useContext( PrivateBlockContext );
+
+	useRegisterBlockEventHandlers( clientId, wrapperProps );
 
 	const defaultViewRef = useRefEffect( ( element ) => {
 		if ( element ) {
@@ -154,6 +158,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const { isBlockCurrentlyHidden } = useBlockVisibility( {
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 		view: defaultViewRef.current,
 	} );
 

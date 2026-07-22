@@ -1,0 +1,43 @@
+// Give the revisions inspector a bounded height so the timeline scrolls
+// internally and the picker's pagination stays pinned to the bottom.
+//
+// The timeline only renders in revisions mode, so its ancestors are scoped
+// with `:has()` — keeping this layout out of the generic editor sidebar.
+.interface-complementary-area:has(.editor-post-revisions-timeline) {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+
+	// The tabs header keeps its natural height.
+	.editor-sidebar__panel-tabs {
+		flex-shrink: 0;
+	}
+}
+
+.editor-sidebar__panel:has(.editor-post-revisions-timeline) {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+
+	// The document tab panel hands its bounded height down to the timeline.
+	[role="tabpanel"]:has(.editor-post-revisions-timeline) {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+	}
+
+	// Cap only the post-meta diff content so a large
+	// diff (e.g. footnotes) can't dominate the column.
+	.editor-revision-meta-diff__content {
+		max-height: 80px;
+		overflow-y: auto;
+	}
+
+	// timeline grows to fill the leftover space and scrolls internally.
+	.editor-post-revisions-timeline {
+		flex: 1;
+		min-height: 0;
+	}
+}

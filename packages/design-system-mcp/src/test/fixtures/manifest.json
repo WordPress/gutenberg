@@ -12,12 +12,13 @@
 			"name": "Button",
 			"path": "../packages/components/src/button/stories/index.story.tsx",
 			"description": "A button.",
-			"reactDocgen": {
+			"reactComponentMeta": {
 				"props": {
 					"variant": {
 						"required": false,
-						"tsType": { "name": "string" },
-						"description": "The variant."
+						"type": { "name": "string" },
+						"description": "The variant.",
+						"defaultValue": null
 					}
 				}
 			},

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { select } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
 // @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -10,17 +10,17 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import type { AbsoluteBlockIndexPath } from '../types';
+import { unlock } from '../lock-unlock';
 
 /**
- * A block as represented in the block-editor store (from `getBlocks()`).
+ * A block as represented in the block-editor store's client ID tree.
  *
  * This is a minimal interface covering only the fields used by RTC awareness.
  */
-interface EditorStoreBlock {
+export type EditorStoreBlock = {
 	clientId: string;
-	name: string;
 	innerBlocks: EditorStoreBlock[];
-}
+};
 
 /**
  * Find the block Y.Map that contains a nested Yjs type.
@@ -112,25 +112,17 @@ export function getBlockPathInYdoc(
  * Navigate the block-editor store's block tree by an index path
  * and return the local block's clientId.
  *
- * In template mode, getBlocks() returns the full template tree, but Yjs
- * paths are relative to the post content. This method finds the
- * core/post-content block (if present) and uses its inner blocks as the
- * navigation root, so paths align with the Yjs document structure.
- *
- * @param path - The index path, e.g. [0, 1] for blocks[0].innerBlocks[1].
+ * @param path   - The index path, e.g. [0, 1] for blocks[0].innerBlocks[1].
+ * @param blocks - The tree of block-editor store post contentblocks.
  * @return The local block clientId, or null if the path is invalid.
  */
 export function resolveBlockClientIdByPath(
-	path: AbsoluteBlockIndexPath
+	path: AbsoluteBlockIndexPath,
+	blocks: EditorStoreBlock[]
 ): string | null {
 	if ( path.length === 0 ) {
 		return null;
 	}
-
-	const { getBlocks } = select( blockEditorStore );
-	const postContentBlocks = getPostContentBlocks( getBlocks(), getBlocks );
-
-	let blocks = postContentBlocks;
 
 	for ( let i = 0; i < path.length; i++ ) {
 		const block = blocks[ path[ i ] ];
@@ -151,53 +143,20 @@ export function resolveBlockClientIdByPath(
  * In template mode, the block tree contains template parts wrapping a
  * core/post-content block. The Yjs document only stores the post content
  * blocks, so we need to find the core/post-content block and use
- * getBlocks(clientId) to retrieve its inner blocks from the store.
+ * getClientIdsTree(clientId) to retrieve its inner blocks from the store.
  *
- * We must use getBlocks(clientId) rather than reading .innerBlocks from
- * the block object because useBlockSync() injects post content as
- * controlled inner blocks — they exist in the store's block order map
- * but are not populated in the .innerBlocks property of the tree
- * returned by getBlocks().
+ * Uses the private getClientIdsTree selector which depends only on
+ * state.blocks.order, avoiding unnecessary re-renders when block
+ * attributes change (which would happen with getBlocks()).
  *
- * @param rootBlocks - The root-level blocks from getBlocks().
- * @param getBlocks  - The getBlocks selector.
  * @return The blocks that correspond to the Yjs document root.
  */
-function getPostContentBlocks(
-	rootBlocks: EditorStoreBlock[],
-	getBlocks: ( rootClientId?: string ) => EditorStoreBlock[]
-): EditorStoreBlock[] {
-	const postContentBlock = findBlockByName( rootBlocks, 'core/post-content' );
-	if ( postContentBlock ) {
-		// Use getBlocks(clientId) to read controlled inner blocks from
-		// the store, since postContentBlock.innerBlocks is empty.
-		return getBlocks( postContentBlock.clientId );
-	}
-
-	return rootBlocks;
-}
-
-/**
- * Recursively search the block tree for a block with a given name.
- *
- * @param blocks - The blocks to search.
- * @param name   - The block name to find.
- * @return The first matching block, or null if not found.
- */
-function findBlockByName(
-	blocks: EditorStoreBlock[],
-	name: string
-): EditorStoreBlock | null {
-	for ( const block of blocks ) {
-		if ( block.name === name ) {
-			return block;
-		}
-		if ( block.innerBlocks?.length ) {
-			const found = findBlockByName( block.innerBlocks, name );
-			if ( found ) {
-				return found;
-			}
-		}
-	}
-	return null;
+export function usePostContentBlocks(): EditorStoreBlock[] {
+	return useSelect( ( select ) => {
+		const { getBlocksByName, getClientIdsTree } = unlock(
+			select( blockEditorStore )
+		);
+		const [ postContentClientId ] = getBlocksByName( 'core/post-content' );
+		return getClientIdsTree( postContentClientId ?? '' );
+	}, [] );
 }

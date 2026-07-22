@@ -8,9 +8,12 @@ import { useCallback, useLayoutEffect, useRef } from '@wordpress/element';
  */
 import { GRID_ITEM_DATA_KEY } from './grid-item-key';
 
-type RectSnapshot = {
+/* `left`/`top` are relative to the grid container, not the viewport. */
+export type RectSnapshot = {
 	left: number;
 	top: number;
+	width: number;
+	height: number;
 };
 
 type UseLayoutShiftAnimationOptions = {
@@ -42,11 +45,28 @@ type UseLayoutShiftAnimationResult = {
 	 * (call immediately before `setTemporaryLayout` / similar).
 	 */
 	captureLayoutSnapshot: () => void;
+
+	/**
+	 * Container-relative rects from the last committed paint (settled, no
+	 * FLIP invert transforms).
+	 */
+	getLastPositions: () => ReadonlyMap< string, RectSnapshot > | null;
+
+	/**
+	 * Tile positions immediately before the latest layout commit. Used
+	 * by item-exit animation when keys drop out of `layout`.
+	 */
+	getPositionsBeforeLastChange: () => ReadonlyMap<
+		string,
+		RectSnapshot
+	> | null;
 };
 
 function queryGridItems( container: HTMLElement ): HTMLElement[] {
 	return Array.from(
-		container.querySelectorAll< HTMLElement >( `[${ GRID_ITEM_DATA_KEY }]` )
+		container.querySelectorAll< HTMLElement >(
+			`[${ GRID_ITEM_DATA_KEY }]:not([data-wp-grid-item-exiting])`
+		)
 	);
 }
 
@@ -57,14 +77,23 @@ function readItemKey( element: HTMLElement ): string | null {
 function snapshotPositions(
 	container: HTMLElement
 ): Map< string, RectSnapshot > {
+	// Measure relative to the container so positions stay valid even if the
+	// page scroll shifts between capture and use (e.g. the document reflowing
+	// shorter after a tile is removed).
+	const base = container.getBoundingClientRect();
 	const positions = new Map< string, RectSnapshot >();
 	for ( const element of queryGridItems( container ) ) {
 		const key = readItemKey( element );
 		if ( ! key ) {
 			continue;
 		}
-		const { left, top } = element.getBoundingClientRect();
-		positions.set( key, { left, top } );
+		const { left, top, width, height } = element.getBoundingClientRect();
+		positions.set( key, {
+			left: left - base.left,
+			top: top - base.top,
+			width,
+			height,
+		} );
 	}
 	return positions;
 }
@@ -130,6 +159,10 @@ export function useLayoutShiftAnimation( {
 		string,
 		RectSnapshot
 	> | null >( null );
+	const positionsBeforeLastChangeRef = useRef< Map<
+		string,
+		RectSnapshot
+	> | null >( null );
 
 	const captureLayoutSnapshot = useCallback( () => {
 		if ( container ) {
@@ -141,6 +174,7 @@ export function useLayoutShiftAnimation( {
 		if ( ! container || ! enabled ) {
 			snapshotBeforeChangeRef.current = null;
 			lastRenderedPositionsRef.current = null;
+			positionsBeforeLastChangeRef.current = null;
 			if ( container ) {
 				for ( const element of queryGridItems( container ) ) {
 					clearLayoutShiftStyles( element );
@@ -149,11 +183,25 @@ export function useLayoutShiftAnimation( {
 			return;
 		}
 
+		for ( const element of queryGridItems( container ) ) {
+			clearLayoutShiftStyles( element );
+		}
+
 		const previous =
 			snapshotBeforeChangeRef.current ?? lastRenderedPositionsRef.current;
 		snapshotBeforeChangeRef.current = null;
 
+		positionsBeforeLastChangeRef.current = previous
+			? new Map( previous )
+			: null;
+
+		// Record settled grid positions for the next FLIP. Must run before
+		// invert transforms — measuring after `playLayoutShift` would bake
+		// translate offsets into the baseline and skew the next animation.
+		lastRenderedPositionsRef.current = snapshotPositions( container );
+
 		if ( previous ) {
+			const base = container.getBoundingClientRect();
 			for ( const element of queryGridItems( container ) ) {
 				const key = readItemKey( element );
 				if ( ! key || key === excludeItemKey ) {
@@ -164,17 +212,26 @@ export function useLayoutShiftAnimation( {
 					continue;
 				}
 				const { left, top } = element.getBoundingClientRect();
-				const deltaX = old.left - left;
-				const deltaY = old.top - top;
-				clearLayoutShiftStyles( element );
+				const deltaX = old.left - ( left - base.left );
+				const deltaY = old.top - ( top - base.top );
 				playLayoutShift( element, deltaX, deltaY );
 			}
 		}
-
-		lastRenderedPositionsRef.current = snapshotPositions( container );
 	}, [ container, enabled, layoutFingerprint, excludeItemKey ] );
 
-	return { captureLayoutSnapshot };
+	const getLastPositions = useCallback( () => {
+		return lastRenderedPositionsRef.current;
+	}, [] );
+
+	const getPositionsBeforeLastChange = useCallback( () => {
+		return positionsBeforeLastChangeRef.current;
+	}, [] );
+
+	return {
+		captureLayoutSnapshot,
+		getLastPositions,
+		getPositionsBeforeLastChange,
+	};
 }
 
 /**

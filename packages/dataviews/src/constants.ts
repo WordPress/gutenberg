@@ -54,5 +54,6 @@ export const LAYOUT_ACTIVITY = 'activity';
 // Picker view layouts.
 export const LAYOUT_PICKER_GRID = 'pickerGrid';
 export const LAYOUT_PICKER_TABLE = 'pickerTable';
+export const LAYOUT_PICKER_ACTIVITY = 'pickerActivity';
 
 export const DAYS_OF_WEEK: DayNumber[] = [ 0, 1, 2, 3, 4, 5, 6 ];

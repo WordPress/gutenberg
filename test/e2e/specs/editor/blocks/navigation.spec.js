@@ -450,7 +450,7 @@ test.describe( 'Navigation block', () => {
 			await test.step( 'focus returns to the submenu appender when exiting the submenu link creation without creating a link', async () => {
 				// Move focus to the submenu navigation appender
 				await pageUtils.pressKeys( 'ArrowDown' );
-				await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+				await pageUtils.pressKeys( 'ArrowRight' );
 
 				await pageUtils.pressKeys( 'ArrowDown' );
 
@@ -571,7 +571,7 @@ test.describe( 'Navigation block', () => {
 			 */
 			// Add a link back so we can delete the first submenu link.
 			await pageUtils.pressKeys( 'ArrowDown' );
-			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+			await pageUtils.pressKeys( 'ArrowRight' );
 			await navigation.useBlockInserter();
 			await navigation.addCustomURL( 'https://wordpress.org' );
 			await navigation.expectToHaveTextSelected( 'wordpress.org' );
@@ -1863,7 +1863,7 @@ test.describe( 'Navigation block', () => {
 
 				// Verify validation error is shown
 				await expect(
-					page.getByText( 'Please enter a valid URL.' )
+					linkPopover.getByText( 'Please enter a valid URL.' )
 				).toBeVisible();
 			} );
 
@@ -1884,7 +1884,7 @@ test.describe( 'Navigation block', () => {
 
 				// Verify validation error is gone now
 				await expect(
-					page.getByText( 'Please enter a valid URL.' )
+					linkPopover.getByText( 'Please enter a valid URL.' )
 				).toBeHidden();
 
 				await expect( linkInput ).toHaveValue(

@@ -264,7 +264,6 @@ export default function BreadcrumbEdit( {
 						}
 					>
 						<TextControl
-							__next40pxDefaultSize
 							autoComplete="off"
 							label={ __( 'Separator' ) }
 							value={ separator }

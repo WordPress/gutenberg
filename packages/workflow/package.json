@@ -40,9 +40,8 @@
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
-		"./build-style/": "./build-style/"
+		"./build-style/*": "./build-style/*"
 	},
-	"react-native": "src/index",
 	"wpScriptModuleExports": {
 		".": "./build-module/index.mjs"
 	},
@@ -61,8 +60,8 @@
 		"cmdk": "^1.0.0"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -16,7 +16,6 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	BaseControl,
-	Tooltip as WCTooltip,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
@@ -41,7 +40,8 @@ import {
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
-import { VisuallyHidden } from '@wordpress/ui';
+import { VisuallyHidden, Tooltip } from '@wordpress/ui';
+import { speak } from '@wordpress/a11y';
 import {
 	MediaUpload,
 	uploadMedia,
@@ -193,9 +193,10 @@ function MediaPickerButton( {
 		return mediaPickerButton;
 	}
 	return (
-		<WCTooltip text={ label } placement="top">
-			{ mediaPickerButton }
-		</WCTooltip>
+		<Tooltip.Root>
+			<Tooltip.Trigger render={ mediaPickerButton } />
+			<Tooltip.Popup>{ label }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
 
@@ -838,6 +839,13 @@ export default function MediaEdit< Item >( {
 			setCustomValidity( undefined );
 		}
 	}, [ isTouched, field.isValid, validity ] );
+
+	useEffect( () => {
+		if ( isTouched && customValidity?.message ) {
+			speak( customValidity.message );
+		}
+	}, [ isTouched, customValidity?.message ] );
+
 	const onBlur = useCallback(
 		( event: React.FocusEvent< HTMLElement > ) => {
 			if ( isTouched ) {
@@ -961,25 +969,23 @@ export default function MediaEdit< Item >( {
 				/>
 			</VisuallyHidden>
 			{ customValidity && (
-				<div aria-live="polite">
-					<p
-						className={ clsx(
-							'components-validated-control__indicator',
-							{
-								'is-invalid': customValidity.type === 'invalid',
-								'is-valid': customValidity.type === 'valid',
-							}
-						) }
-					>
-						<WCIcon
-							className="components-validated-control__indicator-icon"
-							icon={ errorIcon }
-							size={ 16 }
-							fill="currentColor"
-						/>
-						{ customValidity.message }
-					</p>
-				</div>
+				<p
+					className={ clsx(
+						'components-validated-control__indicator',
+						{
+							'is-invalid': customValidity.type === 'invalid',
+							'is-valid': customValidity.type === 'valid',
+						}
+					) }
+				>
+					<WCIcon
+						className="components-validated-control__indicator-icon"
+						icon={ errorIcon }
+						size={ 16 }
+						fill="currentColor"
+					/>
+					{ customValidity.message }
+				</p>
 			) }
 		</div>
 	);

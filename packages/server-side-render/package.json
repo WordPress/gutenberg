@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/server-side-render",
-	"version": "6.22.0",
+	"version": "6.27.0",
 	"description": "The component used with WordPress to server-side render a preview of dynamic blocks to display in the editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -34,14 +34,15 @@
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
+			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptDefaultExport": true,
+	"types": "build-types/index.d.ts",
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blocks": "file:../blocks",
@@ -53,9 +54,18 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/url": "file:../url"
 	},
+	"devDependencies": {
+		"@types/jest": "^29.5.14"
+	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

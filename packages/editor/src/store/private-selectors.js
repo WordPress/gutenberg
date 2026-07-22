@@ -25,6 +25,7 @@ import {
 	getRenderingMode,
 	getCurrentPost,
 	getCurrentPostType,
+	getCurrentPostId,
 	getEditorSettings,
 	getCurrentPostRevisionsCount,
 } from './selectors';
@@ -34,7 +35,21 @@ import {
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
 import { getTemplatePartIcon } from '../utils';
+import {
+	getDeviceTypeByCanvasWidth,
+	getCanvasWidthByDeviceType,
+} from '../utils/device-type';
 import { unlock } from '../lock-unlock';
+
+// Device preview aspect ratios (height / width). Used to give the editor
+// canvas a device-shaped frame in mobile and tablet previews. These are
+// display ratios for the preview frame, not responsive breakpoints. Mobile
+// and tablet are both portrait (taller than wide) to match the WordPress 7.0
+// preview behavior.
+const DEVICE_ASPECT_RATIO_BY_DEVICE_TYPE = {
+	Mobile: 8 / 5,
+	Tablet: 4 / 3,
+};
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
@@ -353,6 +368,61 @@ export function getShowStylebook( state ) {
 }
 
 /**
+ * Get the canvas width.
+ *
+ * @param {Object} state Global application state.
+ * @return {number} The canvas width in pixels.
+ */
+export const getCanvasWidth = createRegistrySelector(
+	( select ) => ( state ) => {
+		// Return undefined while zoomed out to disable canvas resizing.
+		if ( unlock( select( blockEditorStore ) ).isZoomOut() ) {
+			return undefined;
+		}
+		return state.canvasWidth;
+	}
+);
+
+/**
+ * Returns the device preview canvas height in pixels, derived from the canvas
+ * width using the device aspect ratio. Only applies when the canvas width
+ * matches the device preset (set via the Preview dropdown), so dragging away
+ * from the preset frees the frame to fill the editor. Returns `undefined` for
+ * desktop, zoom-out, or when no device height applies.
+ *
+ * @param {Object} state Global application state.
+ * @return {number|undefined} The canvas height in pixels, or undefined.
+ */
+export const getCanvasHeight = createRegistrySelector(
+	( select ) => ( state ) => {
+		const blockEditorSelect = unlock( select( blockEditorStore ) );
+		if ( blockEditorSelect.isZoomOut() ) {
+			return undefined;
+		}
+		const canvasWidth = state.canvasWidth;
+		const viewportSettings =
+			blockEditorSelect.getSettings().__experimentalFeatures?.viewport;
+		const deviceType = getDeviceTypeByCanvasWidth(
+			canvasWidth,
+			viewportSettings
+		);
+		// Only apply the device height at the preset width; a dragged width
+		// within a band frees the canvas to fill the editor.
+		if (
+			canvasWidth !==
+			getCanvasWidthByDeviceType( deviceType, viewportSettings )
+		) {
+			return undefined;
+		}
+		const ratio = DEVICE_ASPECT_RATIO_BY_DEVICE_TYPE[ deviceType ];
+		if ( ratio && canvasWidth > 0 ) {
+			return Math.round( canvasWidth * ratio );
+		}
+		return undefined;
+	}
+);
+
+/**
  * Returns the current revisions page number.
  *
  * @param {Object} state Global application state.
@@ -382,6 +452,7 @@ export function buildRevisionsPageQuery( revisionKey, page ) {
 				'date',
 				'modified',
 				'author',
+				'slug',
 				'meta',
 				'title.raw',
 				'excerpt.raw',
@@ -598,13 +669,22 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		}
 
 		const currentPostType = getCurrentPostType( state );
+		const currentPostId = getCurrentPostId( state );
 		const entityConfig = select( coreStore ).getEntityConfig(
 			'postType',
 			currentPostType
 		);
+		const syncConfig = entityConfig?.syncConfig;
 
 		return Boolean(
-			entityConfig?.syncConfig && window._wpCollaborationEnabled
+			syncConfig &&
+				syncConfig.supportsPersistence &&
+				window._wpCollaborationEnabled &&
+				false !==
+					syncConfig.shouldSync?.(
+						`postType/${ currentPostType }`,
+						currentPostId
+					)
 		);
 	}
 );

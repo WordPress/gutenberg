@@ -81,8 +81,8 @@ const provider = new HttpPollingProvider( {
 
 The polling manager runs continuously:
 
-- **Solo editing**: 1000ms interval, queue paused (no updates sent)
-- **With collaborators**: 250ms interval, queue active
+- **Solo editing**: 4000ms interval, queue paused (no updates sent)
+- **With collaborators**: 1000ms interval, queue active
 
 Each poll cycle:
 
@@ -93,6 +93,10 @@ Each poll cycle:
 5. **Process updates** and generate any required responses (e.g., sync_step2)
 6. **Apply to Y.Doc** using the appropriate Yjs method
 7. **Handle compaction request** if server nominates this client
+
+### Polling Interval Filters
+
+Hosts can use `sync.pollingManager.pollingInterval` and `sync.pollingManager.pollingIntervalWithCollaborators` to make active-tab polling more frequent than the defaults. Returned values greater than the defaults are ignored so hosts cannot slow collaboration below the standard user experience. Faster polling increases request volume, so only lower these intervals when the environment can absorb the extra traffic.
 
 ### 3. Sync Protocol
 
@@ -247,7 +251,7 @@ All CRDT operations happen in the browser via Yjs.
 
 ### Polling Latency
 
-Updates are not instant; there's inherent latency from the polling interval (250ms with collaborators). This is acceptable for document editing but may not suit real-time cursor tracking at high fidelity.
+Updates are not instant; there's inherent latency from the polling interval (1000ms with collaborators by default). This is acceptable for document editing but may not suit real-time cursor tracking at high fidelity.
 
 ### Single Compactor
 

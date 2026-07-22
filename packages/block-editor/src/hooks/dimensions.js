@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Platform, useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
@@ -19,6 +19,7 @@ import {
 	DimensionsPanel as StylesDimensionsPanel,
 	useHasDimensionsPanel,
 } from '../components/global-styles';
+import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -78,17 +79,28 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	const selectedState = useBlockStyleState();
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 	const isEnabled = useHasDimensionsPanel( settings, selectedState );
-	const style = useSelect(
+	const { style, className } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
-				return undefined;
+				return {};
 			}
-			return select( blockEditorStore ).getBlockAttributes( clientId )
-				?.style;
+			const attributes =
+				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			return {
+				style: attributes.style,
+				className: attributes.className,
+			};
 		},
 		[ clientId, isEnabled ]
 	);
+
+	const { value: inheritedValue } = useResolvedStyle(
+		name,
+		className,
+		selectedState
+	);
+
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const value = isStateSelected
 		? getStyleForState( style, selectedState )
@@ -139,6 +151,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				onVisualize={
 					isStateSelected ? undefined : setVisualizedProperty
 				}
+				inheritedValue={ inheritedValue }
 			/>
 			{ ! isStateSelected &&
 				!! settings?.spacing?.padding &&
@@ -171,10 +184,6 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
  * @return {boolean} Whether there is support.
  */
 export function hasDimensionsSupport( blockName, feature = 'any' ) {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const support = getBlockSupport( blockName, DIMENSIONS_SUPPORT_KEY );
 
 	if ( support === true ) {
@@ -194,6 +203,14 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 	return !! support?.[ feature ];
 }
 
+export function isExplicitAspectRatio( aspectRatio ) {
+	if ( ! aspectRatio ) {
+		return false;
+	}
+
+	return `${ aspectRatio }`.trim().toLowerCase() !== 'auto';
+}
+
 export default {
 	useBlockProps,
 	attributeKeys: [ 'height', 'minHeight', 'width', 'style' ],
@@ -210,8 +227,11 @@ function useBlockProps( { name, height, minHeight, style } ) {
 		return {};
 	}
 
+	const hasExplicitAspectRatio = isExplicitAspectRatio(
+		style?.dimensions?.aspectRatio
+	);
 	const className = clsx( {
-		'has-aspect-ratio': !! style?.dimensions?.aspectRatio,
+		'has-aspect-ratio': hasExplicitAspectRatio,
 	} );
 
 	// Allow dimensions-based inline style overrides to override any global styles rules that
@@ -219,12 +239,12 @@ function useBlockProps( { name, height, minHeight, style } ) {
 	const inlineStyleOverrides = {};
 
 	// Apply rules to unset incompatible styles.
-	// Note that a set `aspectRatio` will win out if both an aspect ratio and height-related properties are set.
+	// Note that an explicit `aspectRatio` will win out if both an aspect ratio and height-related properties are set.
 	// This is because the aspect ratio is a newer block support, so (in theory) any aspect ratio
 	// that is set should be intentional and should override any existing height properties. The Cover block
 	// and dimensions controls have logic that will manually clear the aspect ratio if height properties
 	// are set.
-	if ( style?.dimensions?.aspectRatio ) {
+	if ( hasExplicitAspectRatio ) {
 		// To ensure the aspect ratio does not get overridden by `minHeight` or `height` unset any existing rule.
 		inlineStyleOverrides.minHeight = 'unset';
 		inlineStyleOverrides.height = 'unset';

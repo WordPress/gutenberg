@@ -1,4 +1,6 @@
 export * as Autocomplete from './autocomplete';
+export { Checkbox } from './checkbox';
+export * as Combobox from './combobox';
 export * as Field from './field';
 export * as Fieldset from './fieldset';
 export { Input } from './input';

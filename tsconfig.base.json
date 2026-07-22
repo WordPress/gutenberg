@@ -36,13 +36,9 @@
 	},
 	"include": [ "${configDir}/src" ],
 	"exclude": [
-		"**/*.android.js",
-		"**/*.ios.js",
-		"**/*.native.js",
 		"**/benchmark",
 		"packages/*/build-*/**",
 		"packages/*/build/**",
-		"**/test/**",
-		"packages/**/react-native-*/**"
+		"**/test/**"
 	]
 }

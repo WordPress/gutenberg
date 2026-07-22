@@ -15,14 +15,15 @@
  * @package gutenberg
  */
 
-// Client-side media processing is currently plugin-only while the feature matures.
-if ( ! defined( 'IS_GUTENBERG_PLUGIN' ) || ! IS_GUTENBERG_PLUGIN ) {
-	return;
-}
-
 if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
 	return;
 }
+
+// Animated GIF → video: clean up the sideloaded companion video and
+// poster when their GIF attachment is deleted. The GIF→video swap itself
+// happens in the editor (the converted block is a real core/video), so no
+// render-time filtering is needed.
+require_once __DIR__ . '/animated-gif-to-video.php';
 
 // ── Tier 1: HEIC infrastructure (always loaded) ─────────────────────
 
@@ -168,12 +169,28 @@ function gutenberg_get_all_image_sizes(): array {
  * @param WP_REST_Response $response Response data.
  */
 function gutenberg_media_processing_filter_rest_index( WP_REST_Response $response ) {
-	/** This filter is documented in wp-admin/includes/images.php */
+	/** This filter is documented in wp-admin/includes/image.php */
 	$image_size_threshold = (int) apply_filters( 'big_image_size_threshold', 2560, array( 0, 0 ), '', 0 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+	/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
+	$image_strip_meta = (bool) apply_filters( 'image_strip_meta', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+	/*
+	 * On the server, this filter receives the decoded image's actual bit depth.
+	 * The client path never decodes the image on the server, so the filter is
+	 * applied with 16 (the maximum depth vips can produce) as both the value
+	 * and the current depth. The client caps its output bit depth at the
+	 * filtered value, so a plugin lowering it (e.g. to 8) takes effect on
+	 * client-generated images too.
+	 */
+	/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
+	$image_max_bit_depth = (int) apply_filters( 'image_max_bit_depth', 16, 16 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 	if ( current_user_can( 'upload_files' ) ) {
 		$response->data['image_sizes']          = gutenberg_get_all_image_sizes();
 		$response->data['image_size_threshold'] = $image_size_threshold;
+		$response->data['image_strip_meta']     = $image_strip_meta;
+		$response->data['image_max_bit_depth']  = $image_max_bit_depth;
 	}
 
 	return $response;
@@ -182,46 +199,62 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 add_filter( 'rest_index', 'gutenberg_media_processing_filter_rest_index' );
 
 /**
- * Sets a global JS variable to indicate that HEIC canvas-based upload support is available.
+ * Sets a global JS variable to indicate that client-side media processing is enabled.
  *
- * This flag is set whenever the media processing feature is enabled,
- * regardless of whether the browser supports full VIPS-based processing.
- * Browsers like Safari can use createImageBitmap() to decode HEIC images
- * and convert them to JPEG for server-side sub-size generation.
+ * The flag gates both processing modes: the full VIPS/WASM pipeline (browsers
+ * that pass feature detection) and the HEIC canvas fallback used by browsers
+ * such as Safari that can decode HEIC via createImageBitmap() but lack
+ * SharedArrayBuffer support. The browser-capability check happens client-side.
  */
-function gutenberg_set_heic_upload_support_flag() {
-	wp_add_inline_script( 'wp-block-editor', 'window.__heicUploadSupport = true', 'before' );
+function gutenberg_set_client_side_media_processing_flag() {
+	// Re-check the filter at action time, since other plugins (loaded after Gutenberg)
+	// may have added a filter to disable client-side media processing.
+	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
+		return;
+	}
+	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
 }
-add_action( 'admin_init', 'gutenberg_set_heic_upload_support_flag' );
+add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
 
 /**
- * Deletes the HEIC companion file when its attachment is deleted.
+ * Deletes the source-format companion file when its attachment is deleted.
  *
- * The HEIC is sideloaded alongside a JPEG derivative and recorded in
- * $metadata['original']. WordPress core's wp_delete_attachment_files()
- * only knows about 'original_image', so without this hook the HEIC
- * would linger on disk after the attachment is deleted.
+ * When the client-side media flow sideloads a source-format original (such as
+ * a HEIC file) alongside a web-viewable derivative, the original's filename is
+ * recorded in the 'source_image' metadata key. WordPress only tracks
+ * 'original_image' in wp_delete_attachment_files(), so without this hook the
+ * companion file would linger on disk after the attachment is deleted.
  *
  * @param int $post_id Attachment ID being deleted.
+ * @return bool Whether a companion file was deleted.
  */
-function gutenberg_delete_heic_companion_file( int $post_id ): void {
+function gutenberg_delete_heic_companion_file( int $post_id ): bool {
 	$metadata = wp_get_attachment_metadata( $post_id, true );
 
-	if ( empty( $metadata['original'] ) || ! is_string( $metadata['original'] ) ) {
-		return;
+	$source_image = $metadata['source_image'] ?? null;
+	if ( ! is_string( $source_image ) || '' === $source_image ) {
+		return false;
 	}
 
 	$attached_file = get_attached_file( $post_id, true );
 
 	if ( ! $attached_file ) {
-		return;
+		return false;
 	}
 
-	$heic_path = path_join( dirname( $attached_file ), $metadata['original'] );
+	$uploads = wp_get_upload_dir();
 
-	if ( file_exists( $heic_path ) ) {
-		wp_delete_file( $heic_path );
+	if ( empty( $uploads['basedir'] ) ) {
+		return false;
 	}
+
+	$companion_path = path_join( dirname( $attached_file ), wp_basename( $source_image ) );
+
+	if ( ! file_exists( $companion_path ) ) {
+		return false;
+	}
+
+	return wp_delete_file_from_directory( $companion_path, $uploads['basedir'] );
 }
 
 add_action( 'delete_attachment', 'gutenberg_delete_heic_companion_file' );
@@ -229,17 +262,6 @@ add_action( 'delete_attachment', 'gutenberg_delete_heic_companion_file' );
 // ── Tier 2: Full client-side processing (VIPS/WASM) ─────────────────
 // Everything below requires cross-origin isolation (Document-Isolation-Policy)
 // and SharedArrayBuffer support, which is only available in Chromium 137+.
-
-/**
- * Sets a global JS variable to indicate that client-side media processing is enabled.
- */
-function gutenberg_set_client_side_media_processing_flag() {
-	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
-		return;
-	}
-	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
-}
-add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
 
 /**
  * Filters the list of rewrite rules formatted for output to an .htaccess file.
@@ -297,6 +319,13 @@ function gutenberg_set_up_cross_origin_isolation() {
 	}
 
 	if ( ! $screen->is_block_editor() && 'site-editor' !== $screen->id && ! ( 'widgets' === $screen->id && wp_use_widgets_block_editor() ) ) {
+		return;
+	}
+
+	// Skip when rendering the classic-theme home route, which shows the site
+	// preview in an iframe and must reach its `contentDocument` to neutralize
+	// interactive elements — DIP would block that.
+	if ( 'site-editor' === $screen->id && ! wp_is_block_theme() && ( ! isset( $_GET['p'] ) || '/' === $_GET['p'] ) ) {
 		return;
 	}
 

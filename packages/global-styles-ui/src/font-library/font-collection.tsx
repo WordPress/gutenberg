@@ -76,6 +76,9 @@ function FontCollection( { slug }: { slug: string } ) {
 	const [ selectedFont, setSelectedFont ] = useState< FontFamily | null >(
 		null
 	);
+	const [ lastSelectedFontSlug, setLastSelectedFontSlug ] = useState<
+		string | undefined
+	>( undefined );
 	const [ notice, setNotice ] = useState< {
 		type: 'success' | 'error' | 'info';
 		message: string;
@@ -304,6 +307,7 @@ function FontCollection( { slug }: { slug: string } ) {
 							<Spacer margin={ 4 } />
 							<HStack spacing={ 4 } justify="space-between">
 								<SearchControl
+									className="font-library__search"
 									value={ filters.search }
 									placeholder={ __( 'Font name…' ) }
 									label={ __( 'Search' ) }
@@ -311,7 +315,6 @@ function FontCollection( { slug }: { slug: string } ) {
 									hideLabelFromVision={ false }
 								/>
 								<SelectControl
-									__next40pxDefaultSize
 									label={ __( 'Category' ) }
 									value={ filters.category }
 									onChange={ handleCategoryFilter }
@@ -361,6 +364,11 @@ function FontCollection( { slug }: { slug: string } ) {
 													font.font_family_settings
 												}
 												navigatorPath="/fontFamily"
+												shouldFocus={
+													font.font_family_settings
+														.slug ===
+													lastSelectedFontSlug
+												}
 												onClick={ () => {
 													setSelectedFont(
 														font.font_family_settings
@@ -382,6 +390,9 @@ function FontCollection( { slug }: { slug: string } ) {
 									}
 									size="small"
 									onClick={ () => {
+										setLastSelectedFontSlug(
+											selectedFont?.slug
+										);
 										setSelectedFont( null );
 										setNotice( null );
 									} }

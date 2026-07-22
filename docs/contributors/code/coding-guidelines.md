@@ -155,13 +155,13 @@ if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 }
 ```
 
-The public interface of such APIs is not yet finalized. Aside from references within the code, they APIs should neither be documented nor mentioned in any CHANGELOG. They should effectively be considered to not exist from an external perspective. In most cases, they should only be exposed to satisfy requirements between packages maintained in this repository.
+The public interface of such APIs is not yet finalized. Aside from references within the code, these APIs should neither be documented nor mentioned in any CHANGELOG. They should effectively be considered to not exist from an external perspective. In most cases, they should only be exposed to satisfy requirements between packages maintained in this repository.
 
 While a plugin-only API may often stabilize into a publicly-available API, there is no guarantee that it will.
 
 #### Private APIs
 
-Each `@wordpress` package wanting to privately access or expose a private APIs can
+Each `@wordpress` package wanting to privately access or expose private APIs can
 do so by opting-in to `@wordpress/private-apis`:
 
 ```js
@@ -407,7 +407,7 @@ export function MyComponent() {
 
 WordPress extenders cannot update the private block settings on their own. The `updateSettings()` actions of the `@wordpress/block-editor` store will filter out all the settings that are **not** a part of the public API. The only way to actually store them is via the private action `__experimentalUpdateSettings()`.
 
-To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/actions.js](/packages/block-editor/src/store/actions.js):
+To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/private-actions.js](/packages/block-editor/src/store/private-actions.js):
 
 ```js
 const privateSettings = [
@@ -797,3 +797,27 @@ We use
 The easiest way to use PHPCS is [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment). Once that's installed, you can check your PHP by running `npm run lint:php`.
 
 If you prefer to install PHPCS locally, you should use `composer`. [Install `composer`](https://getcomposer.org/download/) on your computer, then run `composer install`. This will install `phpcs` and `WordPress-Coding-Standards` which you can then run via `composer lint`.
+
+## GitHub Actions workflow files
+
+GitHub Actions workflows operate in a privileged software supply chain environment, therefore all workflow files must adhere to a high degree of quality and security standards.
+
+These files are statically scanned when modified using [Actionlint](https://github.com/rhysd/actionlint) and [Zizmor](https://github.com/zizmorcore/zizmor). Actionlint scans the YAML workflow files within the `.github/workflows` directory, while Zizmor additionally scans any action file (`action.yml`) located anywhere in the repository. It's recommended that you install both of these tools locally using a package manager to run prior to submitting changes to workflow or action files.
+
+- [GitHub Actions Workflow Standards for WordPress](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/github-actions/)
+- [Actionlint installations instructions](https://github.com/rhysd/actionlint/blob/main/docs/install.md)
+- [Zizmor installation instructions](https://docs.zizmor.sh/installation/)
+
+To run Actionlint:
+
+```
+actionlint
+```
+
+To run Zizmor for all workflow files (note the trailing period):
+
+```
+zizmor .
+```
+
+**Note:** A workflow run failure will not occur when issues are detected by Zizmor. Instead, the generated report is submitted to GitHub Code Scanning and surfaced through a status check and inline annotations contextually within a pull request. Some locally reported issues may be ignored based on the repository's configured Code Scanning settings.

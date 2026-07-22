@@ -506,21 +506,6 @@ const createOmitByLabel = ( labels ) => ( text, issue ) =>
 		: text;
 
 /**
- * Higher-order function which returns a normalization function to omit by issue
- * label starting with any of the given prefixes
- *
- * @param {string[]} prefixes Label prefixes from which to determine if given entry
- *                            should be omitted.
- *
- * @return {WPChangelogNormalization} Normalization function.
- */
-const createOmitByLabelPrefix = ( prefixes ) => ( text, issue ) =>
-	issue.labels.some( ( label ) =>
-		prefixes.some( ( prefix ) => label.name.startsWith( prefix ) )
-	)
-		? undefined
-		: text;
-/**
  * Given an issue title and issue, returns the title with redundant grouping
  * type details removed. The prefix is redundant since it would already be clear
  * enough by group assignment that the prefix would be inferred.
@@ -564,8 +549,6 @@ function removeFeaturePrefix( text ) {
  * @type {Array<WPChangelogNormalization>}
  */
 const TITLE_NORMALIZATIONS = [
-	createOmitByLabelPrefix( [ 'Mobile App' ] ),
-	createOmitByTitlePrefix( [ '[rnmobile]', '[mobile]', 'Mobile Release' ] ),
 	removeRedundantTypePrefix,
 	reword,
 	capitalizeAfterColonSeparatedPrefix,
@@ -727,19 +710,21 @@ async function fetchAllPullRequests( octokit, settings ) {
 		latestReleaseInSeries ? latestReleaseInSeries.published_at : undefined
 	);
 
-	if ( ! issues.length ) {
+	const pullRequests = issues.filter( ( issue ) => issue.pull_request );
+
+	if ( ! pullRequests.length ) {
 		if ( settings.unreleased ) {
 			throw new Error(
-				'There are no unreleased pull requests associated with the milestone.'
+				`There are no unreleased pull requests associated with milestone "${ milestoneTitle }". Release coordinator: verify that every cherry-picked pull request is assigned to this milestone before rerunning the release.`
 			);
 		} else {
 			throw new Error(
-				'There are no pull requests associated with the milestone.'
+				`There are no pull requests associated with milestone "${ milestoneTitle }".`
 			);
 		}
 	}
 
-	return issues.filter( ( issue ) => issue.pull_request );
+	return pullRequests;
 }
 
 /**
@@ -1036,25 +1021,13 @@ async function createChangelog( settings ) {
 		auth: settings.token,
 	} );
 
-	let releaselog = '';
+	const pullRequests = await fetchAllPullRequests( octokit, settings );
 
-	try {
-		const pullRequests = await fetchAllPullRequests( octokit, settings );
+	const changelog = getChangelog( pullRequests );
+	const contributorProps = getContributorProps( pullRequests );
+	const contributorsList = getContributorsList( pullRequests );
 
-		const changelog = getChangelog( pullRequests );
-		const contributorProps = getContributorProps( pullRequests );
-		const contributorsList = getContributorsList( pullRequests );
-
-		releaselog = releaselog.concat(
-			changelog,
-			contributorProps,
-			contributorsList
-		);
-	} catch ( error ) {
-		if ( error instanceof Error ) {
-			releaselog = formats.error( error.stack );
-		}
-	}
+	const releaselog = changelog.concat( contributorProps, contributorsList );
 
 	log( releaselog );
 }
@@ -1091,7 +1064,6 @@ module.exports = {
 	capitalizeAfterColonSeparatedPrefix,
 	createOmitByTitlePrefix,
 	createOmitByLabel,
-	createOmitByLabelPrefix,
 	addTrailingPeriod,
 	getNormalizedTitle,
 	getReleaseChangelog,
@@ -1107,4 +1079,6 @@ module.exports = {
 	getUniqueByUsername,
 	skipCreatedByBots,
 	mapLabelsToFeatures,
+	createChangelog,
+	fetchAllPullRequests,
 };

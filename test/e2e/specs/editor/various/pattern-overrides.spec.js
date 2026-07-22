@@ -65,10 +65,15 @@ test.describe( 'Pattern Overrides', () => {
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( "This one can't" );
 
+			// Select the paragraph by clicking it. Focusing it
+			// programmatically does not move focus while the second editable
+			// root paragraph is selected and its wrapper holds focus (a nested
+			// editable element cannot take focus from an editing host
+			// ancestor).
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Paragraph' } )
 				.filter( { hasText: 'This paragraph can be edited' } )
-				.focus();
+				.click();
 
 			await editor.clickBlockOptionsMenuItem( 'Rename' );
 			await page
@@ -466,21 +471,11 @@ test.describe( 'Pattern Overrides', () => {
 				// are inert due to the 'click-through' behavior, that requires the
 				// pattern block be selected first before its inner blocks are selectable.
 				await editor.selectBlocks( groupBlock );
-				await expect( patternBlock ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithOverrides ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithBindings ).toHaveAttribute(
-					'inert',
-					'true'
-				);
+				await expect( patternBlock ).not.toHaveAttribute( 'inert' );
+				await expect( blockWithOverrides ).toHaveAttribute( 'inert' );
+				await expect( blockWithBindings ).toHaveAttribute( 'inert' );
 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 			} );
 
@@ -491,16 +486,13 @@ test.describe( 'Pattern Overrides', () => {
 				// of the pattern with bindings are editable, but unbound
 				// blocks are inert.
 				await expect( blockWithOverrides ).not.toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 				await expect( blockWithBindings ).not.toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 			} );
 
@@ -615,11 +607,11 @@ test.describe( 'Pattern Overrides', () => {
 				name: 'Block: Paragraph',
 			} );
 			await expect( headingBlock ).toHaveText( 'Outer heading (edited)' );
-			await expect( headingBlock ).not.toHaveAttribute( 'inert', 'true' );
+			await expect( headingBlock ).not.toHaveAttribute( 'inert' );
 			await expect( paragraphBlock ).toHaveText(
 				'Inner paragraph (edited)'
 			);
-			await expect( paragraphBlock ).toHaveAttribute( 'inert', 'true' );
+			await expect( paragraphBlock ).toHaveAttribute( 'inert' );
 
 			// Edit the outer pattern.
 			await editor.selectBlocks(
@@ -644,7 +636,7 @@ test.describe( 'Pattern Overrides', () => {
 					name: 'Block: Paragraph',
 				} ),
 				'The inner paragraph should be editable'
-			).not.toHaveAttribute( 'inert', 'true' );
+			).not.toHaveAttribute( 'inert' );
 
 			// Visit the post on the frontend.
 			await page.goto( `/?p=${ postId }` );
