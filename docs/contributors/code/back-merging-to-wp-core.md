@@ -79,7 +79,7 @@ The destination sometimes lives in a subdirectory that isn't reflected in the Gu
 
 Strip the `-test` suffix. Class-based test files (`class-wp-<name>-test.php`) may land in a different subdirectory than their Gutenberg location; search WP Core by class name.
 
-### 3. Create a Trac ticket
+### 3. Find the appropriate Trac ticket
 
 Every WP Core PR must reference a [Trac ticket](https://core.trac.wordpress.org/). Reuse an existing ticket if one applies, or create one before opening the PR.
 
