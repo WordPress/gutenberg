@@ -186,20 +186,25 @@ function RevisionsSlider() {
 		isLoading || selectedIndex === -1 ? (
 			<Spinner />
 		) : (
-			<RangeControl
-				ref={ focusOnMountRef }
-				aria-valuetext={ renderTooltipContent( selectedIndex ) }
-				className="editor-revisions-header__slider"
-				hideLabelFromVision
-				label={ __( 'Revision' ) }
-				max={ revisions?.length - 1 }
-				min={ 0 }
-				marks
-				onChange={ handleSliderChange }
-				renderTooltipContent={ renderTooltipContent }
-				value={ selectedIndex }
-				withInputField={ false }
-			/>
+			<span
+				className="editor-revisions-header__slider-wrapper"
+				ref={ sliderWrapperRef }
+			>
+				<RangeControl
+					ref={ focusOnMountRef }
+					aria-valuetext={ renderTooltipContent( selectedIndex ) }
+					className="editor-revisions-header__slider"
+					hideLabelFromVision
+					label={ __( 'Revision' ) }
+					max={ revisions?.length - 1 }
+					min={ 0 }
+					marks
+					onChange={ handleSliderChange }
+					renderTooltipContent={ renderTooltipContent }
+					value={ selectedIndex }
+					withInputField={ false }
+				/>
+			</span>
 		);
 
 	if ( ! showPagination ) {
