@@ -12,6 +12,7 @@ import { Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
+import { useReserveHeaderPadding } from '../widget-header/widget-header-fit';
 import styles from './widget-toolbar.module.css';
 
 export interface WidgetToolbarProps {
@@ -36,8 +37,12 @@ export function WidgetToolbar( {
 	children,
 	editMode = false,
 }: WidgetToolbarProps ): React.ReactNode {
+	const paddingReserveRef =
+		useReserveHeaderPadding< HTMLDivElement >( 'chip' );
+
 	return (
 		<Stack
+			ref={ paddingReserveRef }
 			direction="row"
 			align="center"
 			gap="xs"

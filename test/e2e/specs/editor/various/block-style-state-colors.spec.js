@@ -21,7 +21,7 @@ test.describe( 'Relocated color controls with block style states', () => {
 
 		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Responsive editing' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
 		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
 		await page.keyboard.press( 'Escape' );
@@ -79,7 +79,7 @@ test.describe( 'Relocated color controls with block style states', () => {
 		// Switch the block's editing context to the Mobile viewport state.
 		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Responsive editing' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
 		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
 		await page.keyboard.press( 'Escape' );
@@ -147,7 +147,7 @@ test.describe( 'Relocated color controls with block style states', () => {
 
 		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Responsive editing' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
 		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
 		await page.keyboard.press( 'Escape' );

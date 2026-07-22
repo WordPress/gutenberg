@@ -12,7 +12,7 @@ import {
 	useBlockProps,
 	BlockControls,
 	InspectorControls,
-	RichText,
+	PlainText,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -53,7 +53,7 @@ const PlaylistTrackEdit = ( {
 	const showImages = context?.showImages ?? true;
 	const imageButton = useRef();
 	const blockProps = useBlockProps();
-	const { currentTrackClientId, setCurrentTrackClientId } =
+	const { currentTrackClientId, setCurrentTrackClientId, addTracks } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
@@ -78,14 +78,16 @@ const PlaylistTrackEdit = ( {
 	] );
 
 	useUploadMediaFromBlobURL( {
-		src: temporaryURL,
+		url: temporaryURL,
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectTrack,
 		onError: onUploadError,
 	} );
 
 	function onSelectTrack( media ) {
-		if ( ! media || ! media.url ) {
+		const mediaUrl = media?.url ?? media?.source_url;
+
+		if ( ! media || ! mediaUrl ) {
 			// In this case there was an error and we should continue in the editing state
 			// previous attributes should be removed because they may be temporary blob urls.
 			setAttributes( {
@@ -103,8 +105,8 @@ const PlaylistTrackEdit = ( {
 			return;
 		}
 
-		if ( isBlobURL( media.url ) ) {
-			setTemporaryURL( media.url );
+		if ( isBlobURL( mediaUrl ) ) {
+			setTemporaryURL( mediaUrl );
 			return;
 		}
 
@@ -158,8 +160,23 @@ const PlaylistTrackEdit = ( {
 					mediaURL={ src }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
+					variant="toolbar"
 				/>
 			</BlockControls>
+			{ !! addTracks && (
+				<BlockControls group="block">
+					<MediaReplaceFlow
+						name={ __( 'Add track' ) }
+						onSelect={ addTracks }
+						accept="audio/*"
+						multiple
+						handleUpload={ false }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						onError={ onUploadError }
+						variant="toolbar"
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
@@ -271,7 +288,7 @@ const PlaylistTrackEdit = ( {
 						/>
 					) }
 					<span className="wp-block-playlist-track__content">
-						<RichText
+						<PlainText
 							tagName="span"
 							className="wp-block-playlist-track__title"
 							value={ title }
@@ -279,11 +296,10 @@ const PlaylistTrackEdit = ( {
 							onChange={ ( value ) => {
 								setAttributes( { title: value } );
 							} }
-							allowedFormats={ [] }
-							withoutInteractiveFormatting
+							__experimentalVersion={ 2 }
 						/>
 						{ showArtists && (
-							<RichText
+							<PlainText
 								tagName="span"
 								className="wp-block-playlist-track__artist"
 								value={ artist }
@@ -291,8 +307,7 @@ const PlaylistTrackEdit = ( {
 								onChange={ ( value ) =>
 									setAttributes( { artist: value } )
 								}
-								allowedFormats={ [] }
-								withoutInteractiveFormatting
+								__experimentalVersion={ 2 }
 							/>
 						) }
 					</span>
@@ -307,9 +322,7 @@ const PlaylistTrackEdit = ( {
 						) }
 						{ length }
 					</span>
-					<span className="screen-reader-text">
-						{ __( 'Select to play this track' ) }
-					</span>
+					<span className="screen-reader-text">{ __( 'Play' ) }</span>
 				</button>
 			</li>
 		</>

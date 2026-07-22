@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -13,23 +13,31 @@ import { useDispatch } from '@wordpress/data';
  */
 import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
+import { useUploadMediaFromBlobURL } from '../../utils/hooks';
+
+let mockMediaReplaceFlowProps;
 
 jest.mock( '@wordpress/block-editor', () => ( {
-	BlockControls: ( { children } ) => <div>{ children }</div>,
+	BlockControls: ( { children, group = 'default' } ) => (
+		<div data-testid={ `block-controls-${ group }` }>{ children }</div>
+	),
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
 	MediaPlaceholder: () => <div />,
-	MediaReplaceFlow: () => <div />,
+	MediaReplaceFlow: ( props ) => {
+		mockMediaReplaceFlowProps = props;
+		const { name, onSelect } = props;
+		return <button onClick={ () => onSelect( {} ) }>{ name }</button>;
+	},
 	MediaUpload: ( { render: renderMediaUpload } ) =>
 		renderMediaUpload( { open: jest.fn() } ),
 	MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
-	RichText: ( {
-		allowedFormats,
+	PlainText: ( {
 		onChange,
 		placeholder,
 		tagName: TagName = 'div',
 		value,
-		withoutInteractiveFormatting,
+		__experimentalVersion,
 		...props
 	} ) => <TagName { ...props }>{ value || placeholder }</TagName>,
 	useBlockProps: jest.fn( () => ( {} ) ),
@@ -72,12 +80,14 @@ const defaultAttributes = {
 function renderEdit( props = {} ) {
 	const setAttributes = jest.fn();
 	const setCurrentTrackClientId = props.setCurrentTrackClientId || jest.fn();
+	const addTracks = props.addTracks;
 
 	render(
 		<PlaylistContext.Provider
 			value={ {
 				currentTrackClientId: props.currentTrackClientId ?? null,
 				setCurrentTrackClientId,
+				addTracks,
 			} }
 		>
 			<PlaylistTrackEdit
@@ -102,9 +112,11 @@ function renderEdit( props = {} ) {
 
 describe( 'PlaylistTrackEdit', () => {
 	beforeEach( () => {
+		mockMediaReplaceFlowProps = undefined;
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
 		} );
+		useUploadMediaFromBlobURL.mockClear();
 	} );
 
 	it( 'allows the track image alternative text to be edited', () => {
@@ -166,5 +178,76 @@ describe( 'PlaylistTrackEdit', () => {
 		} );
 
 		expect( setCurrentTrackClientId ).not.toHaveBeenCalled();
+	} );
+
+	it( 'uploads temporary blob tracks', () => {
+		renderEdit( {
+			attributes: {
+				blob: 'blob:https://example.com/temporary-track',
+				src: undefined,
+			},
+		} );
+
+		expect( useUploadMediaFromBlobURL ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: 'blob:https://example.com/temporary-track',
+			} )
+		);
+	} );
+
+	it( 'allows tracks to be added from the track toolbar', () => {
+		const addTracks = jest.fn();
+		renderEdit( { addTracks } );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Add track' } ) );
+
+		expect( addTracks ).toHaveBeenCalledWith( {} );
+	} );
+
+	it( 'renders the add track control in a different toolbar group from replace', () => {
+		renderEdit( { addTracks: jest.fn() } );
+
+		expect(
+			within( screen.getByTestId( 'block-controls-other' ) ).getByRole(
+				'button',
+				{ name: 'Replace' }
+			)
+		).toBeInTheDocument();
+		expect(
+			within( screen.getByTestId( 'block-controls-block' ) ).getByRole(
+				'button',
+				{ name: 'Add track' }
+			)
+		).toBeInTheDocument();
+	} );
+
+	it( 'preserves the current track source when a replacement upload fails', () => {
+		const { setAttributes } = renderEdit();
+
+		mockMediaReplaceFlowProps.onSelect();
+
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes.mock.calls[ 0 ][ 0 ] ).not.toHaveProperty(
+			'src'
+		);
+	} );
+
+	it( 'accepts raw uploaded attachment data when replacing a track', () => {
+		const { setAttributes } = renderEdit();
+
+		mockMediaReplaceFlowProps.onSelect( {
+			id: 2,
+			source_url: 'https://example.com/replacement.mp3',
+			title: { raw: 'Replacement &amp; Track' },
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				blob: undefined,
+				id: 2,
+				src: 'https://example.com/replacement.mp3',
+				title: 'Replacement & Track',
+			} )
+		);
 	} );
 } );

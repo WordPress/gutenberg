@@ -230,7 +230,7 @@ describe( 'diffRevisionContent', () => {
 				attributes: {
 					// Inline diff: "existing" → "modified"
 					content:
-						'This is some <del title="Removed" class="revision-diff-removed">existing</del><ins title="Added" class="revision-diff-added">modified</ins> content',
+						'This is some <del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">existing</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">modified</ins> content',
 					__revisionDiffStatus: {
 						status: 'modified',
 					},
@@ -427,7 +427,7 @@ describe( 'diffRevisionContent', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content:
-						'Second block content<ins title="Added" class="revision-diff-added"> modified</ins>',
+						'Second block content<ins aria-describedby="revision-diff-added-desc" class="revision-diff-added"> modified</ins>',
 					__revisionDiffStatus: {
 						status: 'modified',
 					},
@@ -523,7 +523,7 @@ describe( 'diffRevisionContent', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content:
-						'Original tail content sentence<ins title="Added" class="revision-diff-added"> rewritten</ins>',
+						'Original tail content sentence<ins aria-describedby="revision-diff-added-desc" class="revision-diff-added"> rewritten</ins>',
 					__revisionDiffStatus: { status: 'modified' },
 				},
 			},
@@ -800,7 +800,7 @@ describe( 'diffRevisionContent', () => {
 							attributes: {
 								// B→D modification with inline diff
 								content:
-									'<del title="Removed" class="revision-diff-removed">B</del><ins title="Added" class="revision-diff-added">D</ins>',
+									'<del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">B</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">D</ins>',
 								__revisionDiffStatus: {
 									status: 'modified',
 								},
@@ -859,7 +859,7 @@ describe( 'diffRevisionContent', () => {
 							attributes: {
 								// jumps→leaps modification with inline diff
 								content:
-									'The quick brown fox <del title="Removed" class="revision-diff-removed">jumps</del><ins title="Added" class="revision-diff-added">leaps</ins> over the lazy dog',
+									'The quick brown fox <del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">jumps</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">leaps</ins> over the lazy dog',
 								__revisionDiffStatus: {
 									status: 'modified',
 								},
@@ -1056,7 +1056,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Hello <strong><span title="1 format added" class="revision-diff-format-added">world</span></strong>',
+							'Hello <strong><mark aria-describedby="revision-diff-format-added-desc" class="revision-diff-format-added">world</mark></strong>',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1084,7 +1084,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Hello <strong><del title="Removed" class="revision-diff-removed">world</del><ins title="Added" class="revision-diff-added">everyone</ins></strong>',
+							'Hello <strong><del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">world</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">everyone</ins></strong>',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1136,7 +1136,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Visit <a href="https://new-site.com"><span title="1 format changed" class="revision-diff-format-changed">our site</span></a> today',
+							'Visit <a href="https://new-site.com"><mark aria-describedby="revision-diff-format-changed-desc" class="revision-diff-format-changed">our site</mark></a> today',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1166,7 +1166,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Visit <a href="https://example.com"><del title="Removed" class="revision-diff-removed">our</del><ins title="Added" class="revision-diff-added">the</ins> <del title="Removed" class="revision-diff-removed">site</del><ins title="Added" class="revision-diff-added">website</ins></a> today',
+							'Visit <a href="https://example.com"><del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">our</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">the</ins> <del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">site</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">website</ins></a> today',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1216,7 +1216,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'<span title="1 format removed" class="revision-diff-format-removed">Bold</span> and <span title="1 format removed" class="revision-diff-format-removed">italic</span> text',
+							'<mark aria-describedby="revision-diff-format-removed-desc" class="revision-diff-format-removed">Bold</mark> and <mark aria-describedby="revision-diff-format-removed-desc" class="revision-diff-format-removed">italic</mark> text',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1244,7 +1244,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Hello <em><span title="1 format added, 1 format removed" class="revision-diff-format-changed">world</span></em>',
+							'Hello <em><mark aria-describedby="revision-diff-format-changed-desc" class="revision-diff-format-changed">world</mark></em>',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1291,7 +1291,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'<del title="Removed" class="revision-diff-removed">Hello</del><ins title="Added" class="revision-diff-added">Goodbye</ins> <strong>world</strong>!',
+							'<del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">Hello</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">Goodbye</ins> <strong>world</strong>!',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1329,7 +1329,7 @@ describe( 'diffRevisionContent', () => {
 							name: 'core/paragraph',
 							attributes: {
 								content:
-									'<del title="Removed" class="revision-diff-removed">Hello</del><ins title="Added" class="revision-diff-added">Goodbye</ins> <strong><del title="Removed" class="revision-diff-removed">world</del><ins title="Added" class="revision-diff-added">everyone</ins></strong>',
+									'<del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">Hello</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">Goodbye</ins> <strong><del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">world</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">everyone</ins></strong>',
 								__revisionDiffStatus: {
 									status: 'modified',
 								},

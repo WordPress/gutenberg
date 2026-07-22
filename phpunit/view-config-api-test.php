@@ -165,8 +165,9 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Successive filters share the same container, so their patches compose and
-	 * a later null field patch reaches a member contributed by an earlier filter.
+	 * Successive filters share the same Gutenberg_View_Config_Data instance, so
+	 * their effects compose: a later filter can remove a form field that an
+	 * earlier one added.
 	 */
 	public function test_filters_compose_across_the_chain() {
 		add_filter(

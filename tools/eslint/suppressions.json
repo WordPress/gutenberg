@@ -137,11 +137,6 @@
 			"count": 3
 		}
 	},
-	"packages/block-editor/src/components/global-styles/filters-panel.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/block-editor/src/components/global-styles/shadow-panel-components.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -304,11 +299,6 @@
 		}
 	},
 	"packages/block-library/src/columns/edit.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/cover/edit/embed-video-url-input.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -631,11 +621,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/confirm-dialog/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/context/test/context-system-provider.js": {
 		"no-restricted-imports": {
 			"count": 1
@@ -718,11 +703,6 @@
 	},
 	"packages/components/src/form-file-upload/index.tsx": {
 		"react-hooks/refs": {
-			"count": 1
-		}
-	},
-	"packages/components/src/form-token-field/styles.ts": {
-		"no-restricted-imports": {
 			"count": 1
 		}
 	},
@@ -814,11 +794,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/search-control/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/select-control/styles/select-control-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
@@ -857,16 +832,6 @@
 	"packages/components/src/textarea-control/styles/textarea-control-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
-		}
-	},
-	"packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
-	"packages/components/src/toggle-group-control/toggle-group-control/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/components/src/toggle-group-control/toggle-group-control/utils.ts": {
@@ -1961,11 +1926,6 @@
 	"storybook/stories/playground/with-undo-redo/index.jsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
-		}
-	},
-	"widgets/events/components/location-picker/location-picker.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 5
 		}
 	},
 	"widgets/quick-draft/components/drafts-list/drafts-list.tsx": {

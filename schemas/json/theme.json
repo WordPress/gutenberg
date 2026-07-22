@@ -66,6 +66,23 @@
 				}
 			}
 		},
+		"settingsBlockVisibilityProperties": {
+			"type": "object",
+			"properties": {
+				"blockVisibility": {
+					"description": "Settings related to block visibility.",
+					"type": "object",
+					"properties": {
+						"allowEditing": {
+							"description": "Whether block visibility can be edited in the editor. Set to `false` to hide the block visibility controls. Saved block visibility attributes are always rendered regardless of this setting.",
+							"type": "boolean",
+							"default": true
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsBorderProperties": {
 			"type": "object",
 			"properties": {
@@ -907,6 +924,7 @@
 			"allOf": [
 				{ "$ref": "#/definitions/settingsAppearanceToolsProperties" },
 				{ "$ref": "#/definitions/settingsBackgroundProperties" },
+				{ "$ref": "#/definitions/settingsBlockVisibilityProperties" },
 				{ "$ref": "#/definitions/settingsBorderProperties" },
 				{ "$ref": "#/definitions/settingsColorProperties" },
 				{ "$ref": "#/definitions/settingsDimensionsProperties" },
@@ -940,6 +958,7 @@
 			"enum": [
 				"appearanceTools",
 				"background",
+				"blockVisibility",
 				"border",
 				"color",
 				"dimensions",
