@@ -3,10 +3,15 @@
 @use "../utils/theme-variables" as *;
 
 .components-validated-control {
+	%red-focus-ring {
+		--focus-color: #{ $alert-red };
+	}
+
 	// For components based on InputBase
 	&:has(:is(input, select):invalid[data-validity-visible])
 	.components-input-control__backdrop {
-		--wp-components-color-accent: #{$alert-red};
+		@extend %red-focus-ring;
+
 		border-color: $alert-red;
 	}
 
@@ -30,7 +35,8 @@
 
 	// For CustomSelectControl
 	&:has(select:invalid[data-validity-visible]) .components-input-control__backdrop {
-		--wp-components-color-accent: #{$alert-red};
+		@extend %red-focus-ring;
+
 		border-color: $alert-red;
 	}
 
