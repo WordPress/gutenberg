@@ -532,6 +532,69 @@ function describeFormatChange(
 }
 
 /**
+ * Merge adjacent removed/added diff parts into fewer del/ins pairs.
+ *
+ * `diffWordsWithSpace` can emit alternating removed/added tokens for a run of
+ * changed words, which produces one del/ins pair per word, making the output
+ * more verbose for screen readers. This merges such runs into a single removed part and a
+ * single added part.
+ *
+ * @param {Array<{ added?: boolean, removed?: boolean, value: string }>} parts
+ *     Output from `diffWordsWithSpace`.
+ * @return {Array<{ added?: boolean, removed?: boolean, value: string }>}
+ *     Merged parts.
+ */
+function mergeTextDiffParts( parts ) {
+	const result = [];
+	let index = 0;
+
+	while ( index < parts.length ) {
+		const part = parts[ index ];
+
+		if ( ! part.removed && ! part.added ) {
+			result.push( part );
+			index++;
+			continue;
+		}
+
+		let removed = '';
+		let added = '';
+
+		while ( index < parts.length ) {
+			const current = parts[ index ];
+
+			if ( current.removed ) {
+				removed += current.value;
+				index++;
+			} else if ( current.added ) {
+				added += current.value;
+				index++;
+			} else if (
+				current.value.trim() === '' &&
+				index + 1 < parts.length &&
+				( parts[ index + 1 ].removed || parts[ index + 1 ].added )
+			) {
+				// Whitespace between changed tokens — include in both sides.
+				removed += current.value;
+				added += current.value;
+				index++;
+			} else {
+				break;
+			}
+		}
+
+		if ( removed ) {
+			result.push( { removed: true, value: removed } );
+		}
+		if ( added ) {
+			result.push( { added: true, value: added } );
+		}
+	}
+
+	return result;
+}
+
+/**
  * Apply inline diff formatting comparing two RichTextData values.
  * - Text changes: apply revision/diff-removed and revision/diff-added formats
  * - Format-only changes (text unchanged): apply revision/diff-format-changed format
@@ -545,7 +608,9 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 	const previousText = previousRichText.toPlainText();
 
 	// Diff the plain text (words for cleaner output).
-	const textDiff = diffWordsWithSpace( previousText, currentText );
+	const textDiff = mergeTextDiffParts(
+		diffWordsWithSpace( previousText, currentText )
+	);
 
 	let result = create( { text: '' } );
 	let currentIdx = 0;
