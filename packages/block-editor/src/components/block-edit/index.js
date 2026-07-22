@@ -15,6 +15,7 @@ import {
 	mayDisplayParentControlsKey,
 	mayDisplayPatternEditingControlsKey,
 	blockEditingModeKey,
+	hasEditableRootKey,
 	blockBindingsKey,
 	isPreviewModeKey,
 	isInListViewBlockSupportTreeKey,
@@ -37,6 +38,7 @@ export default function BlockEdit( {
 	mayDisplayParentControls,
 	mayDisplayPatternEditingControls,
 	blockEditingMode,
+	hasEditableRoot,
 	isPreviewMode,
 	// The remaining props are passed through the BlockEdit filters and are thus
 	// public API!
@@ -81,6 +83,7 @@ export default function BlockEdit( {
 						mayDisplayPatternEditingControls &&
 						blockEditingMode !== 'disabled',
 					[ blockEditingModeKey ]: blockEditingMode,
+					[ hasEditableRootKey ]: hasEditableRoot,
 					[ blockBindingsKey ]: bindings,
 					[ isPreviewModeKey ]: isPreviewMode,
 					[ isInListViewBlockSupportTreeKey ]:
@@ -97,6 +100,7 @@ export default function BlockEdit( {
 					mayDisplayParentControls,
 					mayDisplayPatternEditingControls,
 					blockEditingMode,
+					hasEditableRoot,
 					bindings,
 					isPreviewMode,
 					isInListViewBlockSupportTree,

@@ -32,6 +32,7 @@ import { useBlockEditContext } from '../block-edit';
 import {
 	blockBindingsKey,
 	blockEditingModeKey,
+	hasEditableRootKey,
 	isPreviewModeKey,
 } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
@@ -105,6 +106,9 @@ export function RichTextWrapper(
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
 	const hasDefaultEditingMode = context[ blockEditingModeKey ] === 'default';
+	// Whether the writing flow wrapper is an editing host, which depends on
+	// the selected block, not necessarily this one.
+	const hasEditableRoot = context[ hasEditableRootKey ];
 	const blockContext = useContext( BlockContext );
 	const registry = useRegistry();
 	const selector = ( select ) => {
@@ -247,28 +251,6 @@ export function RichTextWrapper(
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;
 
-	// `hasEditableRoot` tracks the *selected* block, so it also affects
-	// unselected instances: the `tabIndex` branch below strips an explicit
-	// `tabIndex={ 0 }` (as set by `useBlockProps`) while the wrapper is the
-	// editing host. Instances without one are only affected while selected,
-	// so they can skip subscribing to the block editor store.
-	const needsEditableRoot = isBlockSelected || props.tabIndex === 0;
-	const hasEditableRoot = useSelect(
-		( select ) => {
-			if ( ! needsEditableRoot ) {
-				return false;
-			}
-
-			const { getSelectedBlockClientId, canHostEditableRoot } = unlock(
-				select( blockEditorStore )
-			);
-
-			// Whether the wrapper is an editing host, which depends on the
-			// selected block, not necessarily this one.
-			return canHostEditableRoot( getSelectedBlockClientId() );
-		},
-		[ needsEditableRoot ]
-	);
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );

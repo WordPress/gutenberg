@@ -139,6 +139,7 @@ function BlockListBlock( {
 			mayDisplayPatternEditingControls={ isSelectionWithinCurrentSection }
 			blockEditingMode={ context.blockEditingMode }
 			isPreviewMode={ context.isPreviewMode }
+			hasEditableRoot={ context.hasEditableRoot }
 		/>
 	);
 
@@ -592,6 +593,8 @@ function BlockListBlockProvider( props ) {
 				isDragging,
 				__unstableHasActiveBlockOverlayActive,
 				getSelectedBlocksInitialCaretPosition,
+				getSelectedBlockClientId,
+				canHostEditableRoot,
 			} = unlock( select( blockEditorStore ) );
 			const blockWithoutAttributes =
 				getBlockWithoutAttributes( clientId );
@@ -698,6 +701,11 @@ function BlockListBlockProvider( props ) {
 				isEditingContentOnlySection:
 					getEditedContentOnlySection() === clientId,
 				blockEditingMode,
+				// Whether the writing flow wrapper is an editing host, which
+				// depends on the selected block, not necessarily this one.
+				hasEditableRoot: canHostEditableRoot(
+					getSelectedBlockClientId()
+				),
 				mayDisplayControls:
 					_isSelected ||
 					( isFirstMultiSelectedBlock( clientId ) &&
@@ -795,6 +803,7 @@ function BlockListBlockProvider( props ) {
 		themeSupportsLayout,
 		isEditingContentOnlySection,
 		blockEditingMode,
+		hasEditableRoot,
 		mayDisplayControls,
 		mayDisplayParentControls,
 		index,
@@ -839,6 +848,7 @@ function BlockListBlockProvider( props ) {
 		hasOverlay,
 		initialPosition,
 		blockEditingMode,
+		hasEditableRoot,
 		isHighlighted,
 		isMultiSelected,
 		isPartiallySelected,
