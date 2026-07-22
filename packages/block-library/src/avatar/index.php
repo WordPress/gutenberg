@@ -59,8 +59,9 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 			)
 		);
 		if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
-			$label       = '';
-			$link_target = isset( $attributes['linkTarget'] ) && is_string( $attributes['linkTarget'] ) ? $attributes['linkTarget'] : '';
+			$label            = '';
+			$link_target_attr = $attributes['linkTarget'] ?? null;
+			$link_target      = is_string( $link_target_attr ) ? $link_target_attr : '';
 			if ( '_blank' === $link_target ) {
 				// translators: %s is the Author name.
 				$label = 'aria-label="' . esc_attr( sprintf( __( '(%s author archive, opens in a new tab)' ), $author_name ) ) . '"';
@@ -87,8 +88,9 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 		)
 	);
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] && isset( $comment->comment_author_url ) && '' !== $comment->comment_author_url ) {
-		$label       = '';
-		$link_target = isset( $attributes['linkTarget'] ) && is_string( $attributes['linkTarget'] ) ? $attributes['linkTarget'] : '';
+		$label            = '';
+		$link_target_attr = $attributes['linkTarget'] ?? null;
+		$link_target      = is_string( $link_target_attr ) ? $link_target_attr : '';
 		if ( '_blank' === $link_target ) {
 			// translators: %s: Comment author name.
 			$label = 'aria-label="' . esc_attr( sprintf( __( '(%s website link, opens in a new tab)' ), $comment->comment_author ) ) . '"';

@@ -22,8 +22,9 @@
  * @return string Updated HTML.
  */
 function block_core_tab_list_render_callback( array $attributes, string $content, \WP_Block $block ): string {
-	$tabs_list  = $block->context['core/tabs-list'] ?? array();
-	$aria_label = empty( $attributes['ariaLabel'] ) || ! is_string( $attributes['ariaLabel'] ) ? __( 'Tabbed content' ) : wp_strip_all_tags( $attributes['ariaLabel'] );
+	$tabs_list       = $block->context['core/tabs-list'] ?? array();
+	$aria_label_attr = $attributes['ariaLabel'] ?? null;
+	$aria_label      = empty( $aria_label_attr ) || ! is_string( $aria_label_attr ) ? __( 'Tabbed content' ) : wp_strip_all_tags( $aria_label_attr );
 
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 	if ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-tab-list' ) ) ) {

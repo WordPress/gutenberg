@@ -134,8 +134,9 @@ function render_block_core_cover( $attributes, $content ) {
 		return $content;
 	}
 
-	$object_position = isset( $attributes['focalPoint'] ) && is_array( $attributes['focalPoint'] )
-		? round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%'
+	$cover_focal_point = $attributes['focalPoint'] ?? null;
+	$object_position   = is_array( $cover_focal_point )
+		? round( $cover_focal_point['x'] * 100 ) . '% ' . round( $cover_focal_point['y'] * 100 ) . '%'
 		: null;
 
 	if ( ! ( $attributes['hasParallax'] || $attributes['isRepeated'] ) ) {

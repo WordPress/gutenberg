@@ -258,8 +258,9 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	static $block_id = 0;
 	++$block_id;
 
-	$parent_page_id = isset( $attributes['parentPageID'] ) && is_scalar( $attributes['parentPageID'] ) ? (int) $attributes['parentPageID'] : 0;
-	$is_nested      = ! empty( $block->context['core/isInsideSubmenu'] );
+	$parent_page_id_attr = isset( $attributes['parentPageID'] ) ? $attributes['parentPageID'] : null;
+	$parent_page_id      = is_scalar( $parent_page_id_attr ) ? (int) $parent_page_id_attr : 0;
+	$is_nested           = ! empty( $block->context['core/isInsideSubmenu'] );
 
 	$all_pages = get_pages(
 		array(

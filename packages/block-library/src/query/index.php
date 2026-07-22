@@ -26,7 +26,8 @@ function render_block_core_query( $attributes, $content, $block ) {
 	if ( $is_interactive ) {
 		wp_enqueue_script_module( '@wordpress/block-library/query/view' );
 
-		$query_id = is_scalar( $attributes['queryId'] ?? null ) ? (string) $attributes['queryId'] : '';
+		$query_id_attr = $attributes['queryId'] ?? null;
+		$query_id      = is_scalar( $query_id_attr ) ? (string) $query_id_attr : '';
 
 		$p = new WP_HTML_Tag_Processor( $content );
 		if ( $p->next_tag() ) {

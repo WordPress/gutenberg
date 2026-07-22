@@ -33,11 +33,11 @@ function register_block_core_pattern() {
 function render_block_core_pattern( $attributes ) {
 	static $seen_refs = array();
 
-	if ( empty( $attributes['slug'] ) || ! is_string( $attributes['slug'] ) ) {
+	$slug = $attributes['slug'] ?? null;
+	if ( empty( $slug ) || ! is_string( $slug ) ) {
 		return '';
 	}
 
-	$slug     = $attributes['slug'];
 	$registry = WP_Block_Patterns_Registry::get_instance();
 
 	if ( ! $registry->is_registered( $slug ) ) {

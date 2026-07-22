@@ -24,7 +24,8 @@ function block_core_table_of_contents_add_aria_label( $attributes, $content ) {
 	}
 
 	// Get the aria-label from block attributes, or fallback to localized default.
-	$aria_label = empty( $attributes['ariaLabel'] ) || ! is_string( $attributes['ariaLabel'] ) ? __( 'Table of Contents' ) : wp_strip_all_tags( $attributes['ariaLabel'] );
+	$aria_label_attr = $attributes['ariaLabel'] ?? null;
+	$aria_label      = empty( $aria_label_attr ) || ! is_string( $aria_label_attr ) ? __( 'Table of Contents' ) : wp_strip_all_tags( $aria_label_attr );
 
 	$p = new WP_HTML_Tag_Processor( $content );
 

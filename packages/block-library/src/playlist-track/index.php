@@ -27,11 +27,16 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 		$show_images = $block->context['showImages'];
 	}
 
-	$artist = is_string( $attributes['artist'] ?? null ) ? $attributes['artist'] : '';
-	$image  = is_string( $attributes['image'] ?? null ) ? $attributes['image'] : '';
-	$alt    = is_string( $attributes['imageAlt'] ?? null ) ? $attributes['imageAlt'] : '';
-	$length = is_string( $attributes['length'] ?? null ) ? $attributes['length'] : '';
-	$title  = isset( $attributes['title'] ) && ! empty( $attributes['title'] ) && is_string( $attributes['title'] ) ? $attributes['title'] : __( 'Unknown title' );
+	$track_artist = $attributes['artist'] ?? null;
+	$track_image  = $attributes['image'] ?? null;
+	$track_alt    = $attributes['imageAlt'] ?? null;
+	$track_length = $attributes['length'] ?? null;
+	$track_title  = $attributes['title'] ?? null;
+	$artist       = is_string( $track_artist ) ? $track_artist : '';
+	$image        = is_string( $track_image ) ? $track_image : '';
+	$alt          = is_string( $track_alt ) ? $track_alt : '';
+	$length       = is_string( $track_length ) ? $track_length : '';
+	$title        = ! empty( $track_title ) && is_string( $track_title ) ? $track_title : __( 'Unknown title' );
 
 	$html  = '<li ' . $wrapper_attributes . '>';
 	$html .= '<button data-wp-on--click="actions.changeTrack" data-wp-bind--aria-current="state.isCurrentTrack" class="wp-block-playlist-track__button">';
