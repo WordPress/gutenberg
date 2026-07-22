@@ -11,6 +11,7 @@ test.describe( 'Revision block diff aria-labels', () => {
 	test( 'should announce the diff status of added, removed and modified blocks', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -28,33 +29,37 @@ test.describe( 'Revision block diff aria-labels', () => {
 		// Save draft to create the first revision.
 		await editor.saveDraft();
 
-		// Remove the heading, modify the last paragraph, and add a new block.
-		await page.evaluate( () => {
-			const { select, dispatch } = window.wp.data;
-			const blocks = select( 'core/block-editor' ).getBlocks();
-			dispatch( 'core/block-editor' ).removeBlock( blocks[ 1 ].clientId );
-			dispatch( 'core/block-editor' ).updateBlockAttributes(
-				blocks[ 2 ].clientId,
-				{ content: 'Paragraph after modification' }
-			);
-			dispatch( 'core/block-editor' ).insertBlocks(
-				window.wp.blocks.createBlock( 'core/verse', {
-					content: 'Newly added verse',
-				} )
-			);
-			// A Group block matching the "Row" variation, to check that
-			// diff labels use the variation-aware title.
-			dispatch( 'core/block-editor' ).insertBlocks(
-				window.wp.blocks.createBlock(
-					'core/group',
-					{ layout: { type: 'flex', flexWrap: 'nowrap' } },
-					[
-						window.wp.blocks.createBlock( 'core/paragraph', {
-							content: 'Inside the row',
-						} ),
-					]
-				)
-			);
+		// Remove the heading.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.click();
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+
+		// Modify the last paragraph.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Paragraph before modification' } )
+			.click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.type( 'Paragraph after modification' );
+
+		// Add a block at the end of the post.
+		await editor.insertBlock( {
+			name: 'core/verse',
+			attributes: { content: 'Newly added verse' },
+		} );
+
+		// A Group block matching the "Row" variation, to check that diff
+		// labels use the variation-aware title.
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { layout: { type: 'flex', flexWrap: 'nowrap' } },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inside the row' },
+				},
+			],
 		} );
 
 		// Save draft again to create the second revision.
@@ -135,7 +140,32 @@ test.describe( 'Revision block diff aria-labels', () => {
 			'false'
 		);
 
-		// Disabling diff highlighting removes diff-specific labels.
+		// Disabling diff highlighting restores the default labels. Assert the
+		// restored labels first, so that the counts below can't pass simply
+		// because the canvas has yet to render.
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+					exact: true,
+				} )
+				.filter( { hasText: 'Paragraph after modification' } )
+		).toBeVisible();
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Poetry',
+				exact: true,
+			} )
+		).toBeVisible();
+		// "Group" rather than "Row": the default wrapper labels skip variation
+		// matching in preview mode.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Group',
+				exact: true,
+			} )
+		).toBeVisible();
+
 		await expect(
 			editor.canvas.getByRole( 'document', {
 				name: 'Modified block: Paragraph',
@@ -156,14 +186,5 @@ test.describe( 'Revision block diff aria-labels', () => {
 				name: 'Added block: Row',
 			} )
 		).toHaveCount( 0 );
-
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Paragraph',
-					exact: true,
-				} )
-				.filter( { hasText: 'Paragraph after modification' } )
-		).toBeVisible();
 	} );
 } );
