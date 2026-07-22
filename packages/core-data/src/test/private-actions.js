@@ -355,7 +355,16 @@ describe( 'persistEntityBlockAttributes', () => {
 
 		expect( syncManager.createPersistedCRDTDoc ).toHaveBeenCalledWith(
 			'postType/post',
-			123
+			123,
+			{
+				blocks: [
+					expect.objectContaining( {
+						attributes: {
+							metadata: { noteId: [ 456 ] },
+						},
+					} ),
+				],
+			}
 		);
 		expect( apiFetch ).toHaveBeenCalledWith( {
 			path: '/wp-sync/v1/save-entity',

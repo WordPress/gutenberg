@@ -401,7 +401,8 @@ export const persistEntityBlockAttributes =
 				const serializedDoc =
 					await getSyncManager()?.createPersistedCRDTDoc(
 						objectType,
-						recordId
+						recordId,
+						{ blocks }
 					);
 				if ( ! serializedDoc ) {
 					return false;

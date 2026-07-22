@@ -1303,7 +1303,7 @@ test.describe( 'Block Notes', () => {
 			).toHaveLength( 2 );
 		} );
 
-		test( 'preserves both attachments when note repairs overlap', async ( {
+		test( 'serializes overlapping note repairs and preserves both attachments', async ( {
 			editor,
 			page,
 			blockNoteUtils,
@@ -1453,9 +1453,9 @@ test.describe( 'Block Notes', () => {
 				.toBe( true );
 			releaseFirstRepair();
 			await page.evaluate( () => window.__secondOverlappingRepair );
-			await expect.poll( () => repairCount ).toBe( 3 );
+			await expect.poll( () => repairCount ).toBe( 2 );
 			await expect.poll( () => successfulRepairCount ).toBe( 2 );
-			await expect.poll( () => conflictCount ).toBe( 1 );
+			await expect.poll( () => conflictCount ).toBe( 0 );
 
 			await page.reload();
 			expect(
@@ -1602,12 +1602,7 @@ test.describe( 'Block Notes', () => {
 				}
 			);
 			page.on( 'request', ( request ) => {
-				if (
-					request.method() === 'POST' &&
-					/^\/wp\/v2\/posts\/\d+$/.test(
-						getRestPath( request.url() )
-					)
-				) {
+				if ( isTargetedRepairRequest( request ) ) {
 					persistenceRequests.push( 'attachment-repair' );
 				}
 			} );

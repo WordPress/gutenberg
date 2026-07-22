@@ -33,7 +33,7 @@ import type {
 	RecordHandlers,
 	SyncConfig,
 } from '../types';
-import { serializeCrdtDoc } from '../utils';
+import { deserializeCrdtDoc, serializeCrdtDoc } from '../utils';
 
 // Mock dependencies.
 jest.mock( '../providers', () => ( {
@@ -855,6 +855,50 @@ describe( 'SyncManager', () => {
 				now
 			);
 			expect( stateMap.get( SAVED_BY_KEY ) ).toBe( ydoc.clientID );
+		} );
+	} );
+
+	describe( 'createPersistedCRDTDoc', () => {
+		it( 'applies explicit changes to a cloned snapshot', async () => {
+			let liveDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				liveDoc = ydoc;
+				return mockProviderResult;
+			} );
+			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+				( ydoc, changes ) => {
+					const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+					Object.entries( changes ).forEach( ( [ key, value ] ) =>
+						recordMap.set( key, value )
+					);
+				}
+			);
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			const serialized = await manager.createPersistedCRDTDoc(
+				'post',
+				'123',
+				{ title: 'Repaired title' }
+			);
+			const snapshot = deserializeCrdtDoc( serialized ?? '' );
+
+			expect(
+				snapshot?.getMap( CRDT_RECORD_MAP_KEY ).get( 'title' )
+			).toBe( 'Repaired title' );
+			expect(
+				( liveDoc as unknown as Y.Doc )
+					.getMap( CRDT_RECORD_MAP_KEY )
+					.get( 'title' )
+			).toBe( 'Test Post' );
+			snapshot?.destroy();
 		} );
 	} );
 
