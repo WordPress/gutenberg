@@ -252,11 +252,16 @@ export function getSelectionRect( blockEl ) {
 		return null;
 	}
 	const range = selection.getRangeAt( 0 );
+	// `isCollapsed` can be false with a collapsed first range, and
+	// `getRectangleFromRange` measures those by inserting a temporary node.
+	if ( range.collapsed ) {
+		return null;
+	}
 	if ( ! blockEl.contains( range.commonAncestorContainer ) ) {
 		return null;
 	}
 	// `getRectangleFromRange` over `Range.getBoundingClientRect()`: it drops
-	// the zero-width rects a selection picks up at a line's edge, so a
+	// the hairline rects a selection picks up at a line's edge, so a
 	// selection starting at the end of one line aligns to the line that
 	// actually holds the text rather than to the line above it.
 	const rect = getRectangleFromRange( range );
@@ -452,7 +457,7 @@ export function removeNoteIdFromMetadata( metadata, noteId ) {
  * @param {Object}                  params
  * @param {Array}                   params.threads        Ordered list of thread objects.
  * @param {string|number|undefined} params.selectedNoteId ID of the currently selected thread.
- * @param {Object<string,DOMRect>}  params.blockRects     Pre-read bounding rects keyed by thread ID.
+ * @param {Object<string,DOMRect>}  params.blockRects     Pre-read anchor rects keyed by thread ID.
  * @param {Object<string,number>}   params.heights        Rendered heights keyed by thread ID.
  * @param {number}                  params.scrollTop      Current scroll offset of the editor content.
  * @return {{ positions: Object<string,number> }} Computed top positions.

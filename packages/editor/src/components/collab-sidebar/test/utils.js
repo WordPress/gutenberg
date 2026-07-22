@@ -1052,7 +1052,7 @@ describe( 'getNoteMarkerSelector / noteFormat', () => {
 		// The selector is hand-written rather than derived, so lock it to the
 		// format definition: a change to tagName/className/data-id there must
 		// fail here rather than silently degrade every thread to block-top
-		// alignment via getBlockRects' fallback.
+		// alignment via getAnchorRects' fallback.
 		const marker = document.createElement( noteFormat.tagName );
 		marker.className = noteFormat.className;
 		marker.setAttribute( noteFormat.attributes[ 'data-id' ], '7' );
