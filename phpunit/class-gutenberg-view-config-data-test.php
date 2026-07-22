@@ -1719,6 +1719,163 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$this->assertSame( array( 'default_view' => array( 'type' => 'table' ) ), self::read_config( $data ) );
 	}
 
+	/**
+	 * merge() rejects an associative patch value where a list lives: the shapes
+	 * do not line up, so merging would have to guess what the string keys mean.
+	 * The current list survives untouched instead of being discarded.
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_rejects_associative_patch_over_a_list() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge' );
+
+		$data   = new Gutenberg_View_Config_Data(
+			array(
+				'view_list' => array(
+					array(
+						'slug'  => 'all',
+						'title' => 'All items',
+					),
+				),
+			)
+		);
+		$before = self::read_config( $data );
+
+		// The pre-7.1 slug-keyed shape, not the documented list of members.
+		$data->merge(
+			array(
+				'view_list' => array(
+					'published' => array( 'title' => 'Live' ),
+				),
+			),
+			1
+		);
+
+		$this->assertSame( $before, self::read_config( $data ) );
+	}
+
+	/**
+	 * merge() rejects a non-empty list patch value where an associative value
+	 * lives, the mirror of the associative-over-list mismatch: the current map
+	 * survives untouched instead of being discarded.
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_rejects_list_patch_over_an_associative_value() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge' );
+
+		$data   = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'sort' => array(
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
+				),
+			)
+		);
+		$before = self::read_config( $data );
+
+		$data->merge(
+			array(
+				'default_view' => array(
+					'sort' => array( 'title', 'asc' ),
+				),
+			),
+			1
+		);
+
+		$this->assertSame( $before, self::read_config( $data ) );
+	}
+
+	/**
+	 * An empty array under merge() is a no-op for both shapes: it has no
+	 * members to merge, and being shape-ambiguous it must not reset the
+	 * current value either. Clearing a list is spelled replace() with an
+	 * empty list; resetting a key is spelled null.
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_empty_array_is_a_noop() {
+		$data   = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'filters' => array(
+						array(
+							'field'    => 'author',
+							'operator' => 'isAny',
+						),
+					),
+					'sort'    => array(
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
+				),
+			)
+		);
+		$before = self::read_config( $data );
+
+		$data->merge(
+			array(
+				'default_view' => array(
+					'filters' => array(),
+					'sort'    => array(),
+				),
+			),
+			1
+		);
+
+		$this->assertSame( $before, self::read_config( $data ) );
+	}
+
+	/**
+	 * A nested null deletes just the leaf it names in every case, including
+	 * inside a list member that did not exist yet: an appended member has no
+	 * existing leaf to delete, so its nulls are dropped rather than stored
+	 * (the same rationale as set() and the lists replace() swaps in).
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_appended_member_drops_nested_nulls() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'view_list' => array(
+					array(
+						'slug'  => 'all',
+						'title' => 'All items',
+					),
+				),
+			)
+		);
+		$data->merge(
+			array(
+				'view_list' => array(
+					array(
+						'slug' => 'mine',
+						'view' => array( 'filters' => null ),
+					),
+				),
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				'view_list' => array(
+					array(
+						'slug'  => 'all',
+						'title' => 'All items',
+					),
+					array(
+						'slug' => 'mine',
+						'view' => array(),
+					),
+				),
+			),
+			self::read_config( $data )
+		);
+	}
+
 
 	/**
 	 * merge() treats a scalar list member as its own identity: an incoming

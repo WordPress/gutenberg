@@ -39,7 +39,10 @@
  * key by key (an associative array merges member by member, a nested `null`
  * deletes just that leaf, a scalar replaces just that value), while `set()`
  * swaps the whole value. A nested `null` deletes just the leaf it names in
- * every case. Each patch also declares the configuration schema
+ * every case. A patch value whose shape does not match the current value —
+ * an associative array where a list lives, or the reverse — is rejected with
+ * a notice rather than merged, and an empty array under `merge()` is a
+ * no-op. Each patch also declares the configuration schema
  * version it was written against (currently 1), so a future WordPress release
  * that changes the configuration shape can migrate existing patches forward
  * instead of breaking them.
@@ -349,6 +352,13 @@ class Gutenberg_View_Config_Data {
 	 * - default_layouts will be updated so that newField is appended to the badgeFields.
 	 * - view_list will be updated so that the view with slug 'table' has its title changed to 'New title'.
 	 *
+	 * A patch value only merges into a current value of the same shape: an
+	 * associative array where a list lives, or a non-empty list where an
+	 * associative value lives, is rejected with a notice and leaves the current
+	 * value unchanged. An empty array merges nothing and is a no-op — clear a
+	 * list with replace() and an empty list, or reset a key to its default with
+	 * a top-level `null`.
+	 *
 	 * A patch that declares an unsupported schema version is rejected and does
 	 * not change anything.
 	 *
@@ -420,7 +430,7 @@ class Gutenberg_View_Config_Data {
 			// nested null still drops the property it names.
 			$this->config[ $key ] = 'set' === $mode
 				? $this->strip_nulls( $value )
-				: $this->merge_properties( $this->config[ $key ] ?? array(), $value, 'replace' === $mode );
+				: $this->merge_properties( $this->config[ $key ] ?? array(), $value, 'replace' === $mode, $method );
 		}
 
 		return $this;
@@ -472,15 +482,25 @@ class Gutenberg_View_Config_Data {
 	 * $replace_lists flag is carried down through associative nesting so that,
 	 * under replace(), every list reached along the way is swapped wholesale.
 	 *
+	 * An array in $incoming only merges into a current value of the same shape.
+	 * A non-empty mismatch — an associative array where a list lives, or a
+	 * non-empty list where an associative value lives — is reported with
+	 * _doing_it_wrong() and leaves the current value unchanged, so a malformed
+	 * patch cannot silently destroy configuration. An empty array is
+	 * shape-ambiguous and merges nothing, so it is a no-op: clearing a list is
+	 * spelled replace() with an empty list, and resetting a key is spelled
+	 * `null`.
+	 *
 	 * @since 7.1.0
 	 *
-	 * @param mixed $current       The current value.
-	 * @param mixed $incoming      The incoming value.
-	 * @param bool  $replace_lists Whether a list in $incoming replaces the current list
-	 *                             wholesale instead of merging into it by member identity.
+	 * @param mixed  $current       The current value.
+	 * @param mixed  $incoming      The incoming value.
+	 * @param bool   $replace_lists Whether a list in $incoming replaces the current list
+	 *                              wholesale instead of merging into it by member identity.
+	 * @param string $method        The public method the patch was passed to, for misuse reporting.
 	 * @return mixed The merged value.
 	 */
-	private function merge_properties( $current, $incoming, $replace_lists ) {
+	private function merge_properties( $current, $incoming, $replace_lists, $method ) {
 		// Scalar properties are merged as-is.
 		if ( ! is_array( $incoming ) ) {
 			return $incoming;
@@ -495,13 +515,39 @@ class Gutenberg_View_Config_Data {
 				// set()), so a null member is dropped rather than stored.
 				return $this->strip_nulls( $incoming );
 			}
+
+			// An empty list has no members to merge, and an empty array is
+			// shape-ambiguous, so merging one is a no-op rather than a reset.
+			if ( array() === $incoming ) {
+				return $current;
+			}
+
+			if ( is_array( $current ) && ! array_is_list( $current ) && array() !== $current ) {
+				_doing_it_wrong(
+					esc_html( $method ),
+					esc_html__( 'A list cannot be merged into an associative value; name the keys to change instead.', 'gutenberg' ),
+					'7.1.0'
+				);
+				return $current;
+			}
+
 			return $this->merge_list_by_identity(
 				is_array( $current ) && array_is_list( $current ) ? $current : array(),
-				$incoming
+				$incoming,
+				$method
 			);
 		}
 
 		// Consider any other array as associative (keys are strings).
+		if ( is_array( $current ) && array_is_list( $current ) && array() !== $current ) {
+			_doing_it_wrong(
+				esc_html( $method ),
+				esc_html__( 'An associative array cannot be merged into a list; address list members by their identity instead.', 'gutenberg' ),
+				'7.1.0'
+			);
+			return $current;
+		}
+
 		$result = is_array( $current ) && ! array_is_list( $current ) ? $current : array();
 		foreach ( $incoming as $key => $value ) {
 			// A null patch value deletes the property.
@@ -513,7 +559,8 @@ class Gutenberg_View_Config_Data {
 			$result[ $key ] = $this->merge_properties(
 				array_key_exists( $key, $result ) ? $result[ $key ] : array(),
 				$value,
-				$replace_lists
+				$replace_lists,
+				$method
 			);
 		}
 
@@ -598,7 +645,9 @@ class Gutenberg_View_Config_Data {
 	 * A member of the incoming list whose identity matches one already present
 	 * merges into it in place, keeping its position; an unmatched member is
 	 * appended to the end, except a literal `null`, which carries no identity
-	 * and holds nothing to merge and so is dropped. A matched member's contents
+	 * and holds nothing to merge and so is dropped. An appended member has no
+	 * existing leaf for a nested `null` to delete (the same rationale as set()),
+	 * so its nulls are stripped rather than stored. A matched member's contents
 	 * merge recursively with the same rules (merge_properties), so the
 	 * identity-aware merge applies at
 	 * any nesting level: each key named by the patch is substituted while the
@@ -607,11 +656,12 @@ class Gutenberg_View_Config_Data {
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param array $current  The current list.
-	 * @param array $incoming The incoming list.
+	 * @param array  $current  The current list.
+	 * @param array  $incoming The incoming list.
+	 * @param string $method   The public method the patch was passed to, for misuse reporting.
 	 * @return array The merged list.
 	 */
-	private function merge_list_by_identity( array $current, array $incoming ) {
+	private function merge_list_by_identity( array $current, array $incoming, $method ) {
 		$result = $current;
 		foreach ( $incoming as $item ) {
 			// A null member carries no identity and holds nothing to merge,
@@ -634,12 +684,14 @@ class Gutenberg_View_Config_Data {
 				}
 			}
 			if ( null === $index ) {
-				$result[] = $item;
+				// An appended member has no existing leaf for a nested null to
+				// delete, so nulls are dropped rather than stored.
+				$result[] = $this->strip_nulls( $item );
 				continue;
 			}
 
 			// Otherwise, merge the incoming member into the existing one in place.
-			$result[ $index ] = $this->merge_properties( $result[ $index ], $item, false );
+			$result[ $index ] = $this->merge_properties( $result[ $index ], $item, false, $method );
 		}
 
 		return $result;
