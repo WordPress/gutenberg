@@ -258,7 +258,7 @@ export function SliderInspectorControls( {
 					</ToolsPanelItem>
 				) }
 				<ToolsPanelItem
-					label={ __( 'Type' ) }
+					label={ __( 'Button type' ) }
 					isShownByDefault
 					hasValue={ () => navigationButtonType !== 'icon' }
 					onDeselect={ () =>
