@@ -61,7 +61,7 @@ function block_core_slider_build_attrs( $attributes ) {
  */
 function block_core_slider_render_control_bar_markup( $arrow_icon, $display_mode, $indicator_style, $position, $show_indicators, $arrows_justification ) {
 	$indicators_html = $show_indicators
-		? '<div class="wp-block-slider-indicators__dots is-style-' . esc_attr( $indicator_style ) . '" role="group" aria-label="' . esc_attr__( 'Choose slide to display' ) . '" data-wp-interactive="core/slider"><template data-wp-each="state.dots" data-wp-each-key="context.item"><button type="button" class="wp-block-slider-indicators__dot" data-wp-on--click="actions.goToSlide" data-wp-bind--aria-current="state.isDotActive" data-wp-bind--aria-label="state.indicatorLabel"></button></template></div>'
+		? '<div class="wp-block-slider-indicators__dots is-style-' . esc_attr( $indicator_style ) . '" role="group" aria-label="' . esc_attr__( 'Choose slide to display' ) . '" data-wp-interactive="core/slider"><template data-wp-each="state.indicators" data-wp-each-key="context.item"><button type="button" class="wp-block-slider-indicators__dot" data-wp-on--click="actions.goToSlide" data-wp-bind--aria-current="state.isIndicatorActive" data-wp-bind--aria-label="state.indicatorLabel"></button></template></div>'
 		: '';
 
 	$prev = block_core_slider_render_arrow_button_markup( $arrow_icon, $display_mode, true );
@@ -217,7 +217,7 @@ function render_block_core_slider( $attributes, $content, $block ) {
 
 	$overlay_indicator = '';
 	if ( 'overlay' === $arrows_position && $show_indicators ) {
-		$dots_html         = '<div class="wp-block-slider-indicators__dots is-style-' . esc_attr( $indicator_style ) . '" role="group" aria-label="' . esc_attr__( 'Choose slide to display' ) . '" data-wp-interactive="core/slider"><template data-wp-each="state.dots" data-wp-each-key="context.item"><button type="button" class="wp-block-slider-indicators__dot" data-wp-on--click="actions.goToSlide" data-wp-bind--aria-current="state.isDotActive" data-wp-bind--aria-label="state.indicatorLabel"></button></template></div>';
+		$dots_html         = '<div class="wp-block-slider-indicators__dots is-style-' . esc_attr( $indicator_style ) . '" role="group" aria-label="' . esc_attr__( 'Choose slide to display' ) . '" data-wp-interactive="core/slider"><template data-wp-each="state.indicators" data-wp-each-key="context.item"><button type="button" class="wp-block-slider-indicators__dot" data-wp-on--click="actions.goToSlide" data-wp-bind--aria-current="state.isIndicatorActive" data-wp-bind--aria-label="state.indicatorLabel"></button></template></div>';
 		$overlay_indicator = '<div class="wp-block-slider-indicators is-position-overlay">' . $dots_html . '</div>';
 	}
 

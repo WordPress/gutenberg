@@ -329,7 +329,7 @@ store( 'core/slider', {
 		get ariaLive() {
 			return getContext().hasFocus ? 'polite' : 'off';
 		},
-		get dots() {
+		get indicators() {
 			const { totalSlides, slidesToShow } = getContext();
 			const normalizedSlidesToShow = normalizeSlidesToShow(
 				slidesToShow,
@@ -341,7 +341,7 @@ store( 'core/slider', {
 			);
 			return Array.from( { length: maxStartIndex + 1 }, ( _, i ) => i );
 		},
-		get isDotActive() {
+		get isIndicatorActive() {
 			const { item, currentIndex } = getContext();
 			return item === currentIndex;
 		},
