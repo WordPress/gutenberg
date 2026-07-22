@@ -2,6 +2,9 @@
 // and serves as the positioning context for overlay arrows and indicators.
 // It is a flex column so the track and in-flow rows stack vertically.
 .wp-block-slider {
+	--wp--slider-navigation-color: #1e1e1e;
+	--wp--slider-navigation-background-color: #fff;
+
 	display: flex;
 	flex-direction: column;
 	position: relative;
@@ -58,9 +61,7 @@
 
 		> .wp-block-slider-arrows-button {
 			pointer-events: auto;
-			background: rgb(255 255 255 / 85%);
 			border-radius: 999px;
-			backdrop-filter: blur(2px);
 			margin: 0 0.5rem;
 		}
 	}
@@ -75,8 +76,8 @@
 	min-width: 32px;
 	height: 32px;
 	cursor: pointer;
-	background: none;
-	color: currentColor;
+	background: var(--wp--slider-navigation-background-color);
+	color: var(--wp--slider-navigation-color);
 	border: none;
 	border-radius: 2px;
 	padding: 4px 12px;
@@ -166,10 +167,7 @@
 		left: 50%;
 		bottom: 0.5rem;
 		transform: translateX(-50%);
-		padding: 0.35rem 0.5rem;
-		background: rgb(255 255 255 / 78%);
-		border-radius: 999px;
-		backdrop-filter: blur(2px);
+		padding: 0;
 		z-index: 2;
 
 		> .wp-block-slider-indicators__dots {
@@ -186,12 +184,13 @@
 	align-items: center;
 	justify-content: center;
 	gap: 0;
-	padding: 0.5rem 0;
+	padding: 0.35rem 0.5rem;
 	list-style: none;
 	margin: 0;
-	color: currentColor;
-	// In the space-between control bar, the dots fill the space between buttons.
-	flex: 1 1 0%;
+	color: var(--wp--slider-navigation-color);
+	background: var(--wp--slider-navigation-background-color);
+	border-radius: 999px;
+	flex: 0 0 auto;
 }
 
 .wp-block-slider-indicators__dot {

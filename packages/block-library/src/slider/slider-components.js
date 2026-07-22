@@ -15,17 +15,13 @@ export const iconMap = {
 	arrow: { previous: arrowLeft, next: arrowRight },
 };
 
-export function SliderNavigationButton( {
-	type,
-	arrowIcon,
-	navigationButtonType,
-} ) {
+export function SliderNavigationButton( { type, arrowIcon, displayMode } ) {
 	const icons = iconMap[ arrowIcon ] || iconMap.chevron;
 	const isPrevious = type === 'previous';
 	const buttonLabel = isPrevious ? __( 'Previous' ) : __( 'Next' );
 	const icon = isPrevious ? icons.previous : icons.next;
-	const hasIcon = navigationButtonType !== 'text';
-	const hasText = navigationButtonType !== 'icon';
+	const hasIcon = displayMode !== 'text';
+	const hasText = displayMode !== 'icon';
 	const buttonClasses = [
 		'wp-block-slider-arrows-button',
 		`is-type-${ type }`,
@@ -46,9 +42,9 @@ export function SliderNavigationButton( {
 	);
 
 	let content;
-	if ( navigationButtonType === 'icon' ) {
+	if ( displayMode === 'icon' ) {
 		content = iconElement;
-	} else if ( navigationButtonType === 'text' ) {
+	} else if ( displayMode === 'text' ) {
 		content = textElement;
 	} else {
 		content = isPrevious ? (
@@ -99,7 +95,7 @@ export function SliderIndicatorDots( { indicatorStyle } ) {
 export function SliderControlBar( {
 	navigationPosition,
 	arrowIcon,
-	navigationButtonType,
+	displayMode,
 	indicatorStyle,
 	showIndicators,
 	navigationJustification,
@@ -108,14 +104,14 @@ export function SliderControlBar( {
 		<SliderNavigationButton
 			type="previous"
 			arrowIcon={ arrowIcon }
-			navigationButtonType={ navigationButtonType }
+			displayMode={ displayMode }
 		/>
 	);
 	const nextButton = (
 		<SliderNavigationButton
 			type="next"
 			arrowIcon={ arrowIcon }
-			navigationButtonType={ navigationButtonType }
+			displayMode={ displayMode }
 		/>
 	);
 	const indicators = showIndicators && (
@@ -137,7 +133,7 @@ export function SliderControlBar( {
 
 export function SliderNavigationButtonsPreview( {
 	arrowIcon,
-	navigationButtonType,
+	displayMode,
 	navigationPosition,
 	navigationJustification,
 } ) {
@@ -152,12 +148,12 @@ export function SliderNavigationButtonsPreview( {
 			<SliderNavigationButton
 				type="previous"
 				arrowIcon={ arrowIcon }
-				navigationButtonType={ navigationButtonType }
+				displayMode={ displayMode }
 			/>
 			<SliderNavigationButton
 				type="next"
 				arrowIcon={ arrowIcon }
-				navigationButtonType={ navigationButtonType }
+				displayMode={ displayMode }
 			/>
 		</div>
 	);

@@ -26,9 +26,11 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `navigationPosition` | `string` | `"overlay"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `overlay`, `top`, `bottom` |
 | `navigationJustification` | `string` | `"space-between"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `left`, `center`, `right`, `space-between` |
 | `arrowIcon` | `string` | `"chevron"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `chevron`, `arrow` |
-| `navigationButtonType` | `string` | `"icon"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `icon`, `text`, `both` |
+| `displayMode` | `string` | `"icon"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `icon`, `text`, `both` |
 | `showIndicators` | `boolean` | `true` | — |
 | `indicatorStyle` | `string` | `"dot"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `dot`, `line` |
+| `navigationColor` | `string` | `"#1e1e1e"` | — |
+| `navigationBackgroundColor` | `string` | `"#fff"` | — |
 
 ## Supports
 
@@ -48,7 +50,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
 
 ```html
-<!-- wp:slider {"slidesToShow":1,"loop":true,"navigationPosition":"overlay","navigationJustification":"space-between","arrowIcon":"chevron","navigationButtonType":"icon","showIndicators":true,"indicatorStyle":"dot"} -->
+<!-- wp:slider {"slidesToShow":1,"loop":true,"navigationPosition":"overlay","navigationJustification":"space-between","arrowIcon":"chevron","displayMode":"icon","showIndicators":true,"indicatorStyle":"dot","navigationColor":"#1e1e1e","navigationBackgroundColor":"#fff"} -->
 <!-- Content... -->
 <!-- /wp:slider -->
 ```

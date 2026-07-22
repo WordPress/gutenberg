@@ -32,7 +32,7 @@
 			"enum": [ "chevron", "arrow" ],
 			"default": "chevron"
 		},
-		"navigationButtonType": {
+		"displayMode": {
 			"type": "string",
 			"enum": [ "icon", "text", "both" ],
 			"default": "icon"
@@ -45,6 +45,14 @@
 			"type": "string",
 			"enum": [ "dot", "line" ],
 			"default": "dot"
+		},
+		"navigationColor": {
+			"type": "string",
+			"default": "#1e1e1e"
+		},
+		"navigationBackgroundColor": {
+			"type": "string",
+			"default": "#fff"
 		}
 	},
 	"supports": {

@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	ContrastChecker,
+	InspectorControls,
+	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
+} from '@wordpress/block-editor';
 import {
 	ToggleControl,
 	RangeControl,
@@ -35,14 +40,13 @@ const ARROWS_POSITION_OPTIONS = [
 	{ label: __( 'Below' ), value: 'bottom' },
 ];
 
-function NavigationButtonTypeControl( { value, onChange } ) {
+function DisplayModeControl( { value, onChange } ) {
 	return (
 		<ToggleGroupControl
-			label={ __( 'Type' ) }
+			label={ __( 'Display Mode' ) }
 			value={ value }
 			onChange={ onChange }
 			isBlock
-			help={ __( 'Adjust the appearance of buttons in the slider.' ) }
 		>
 			<ToggleGroupControlOption value="icon" label={ __( 'Icon' ) } />
 			<ToggleGroupControlOption value="text" label={ __( 'Text' ) } />
@@ -139,7 +143,7 @@ export function SliderInspectorControls( {
 		loop,
 		arrowIcon,
 		indicatorStyle,
-		navigationButtonType,
+		displayMode,
 		navigationPosition,
 		navigationJustification,
 		showIndicators,
@@ -204,12 +208,12 @@ export function SliderInspectorControls( {
 				</ToolsPanelItem>
 			</ToolsPanel>
 			<ToolsPanel
-				label={ __( 'Pagination' ) }
+				label={ __( 'Navigation' ) }
 				resetAll={ () =>
 					setAttributes( {
 						navigationPosition: 'overlay',
 						navigationJustification: 'space-between',
-						navigationButtonType: 'icon',
+						displayMode: 'icon',
 						arrowIcon: 'chevron',
 						showIndicators: true,
 						indicatorStyle: 'dot',
@@ -258,17 +262,17 @@ export function SliderInspectorControls( {
 					</ToolsPanelItem>
 				) }
 				<ToolsPanelItem
-					label={ __( 'Button type' ) }
+					label={ __( 'Display Mode' ) }
 					isShownByDefault
-					hasValue={ () => navigationButtonType !== 'icon' }
+					hasValue={ () => displayMode !== 'icon' }
 					onDeselect={ () =>
-						setAttributes( { navigationButtonType: 'icon' } )
+						setAttributes( { displayMode: 'icon' } )
 					}
 				>
-					<NavigationButtonTypeControl
-						value={ navigationButtonType }
+					<DisplayModeControl
+						value={ displayMode }
 						onChange={ ( value ) =>
-							setAttributes( { navigationButtonType: value } )
+							setAttributes( { displayMode: value } )
 						}
 					/>
 				</ToolsPanelItem>
@@ -320,6 +324,67 @@ export function SliderInspectorControls( {
 						/>
 					</ToolsPanelItem>
 				) }
+			</ToolsPanel>
+		</InspectorControls>
+	);
+}
+
+export function SliderColorControls( { attributes, setAttributes, clientId } ) {
+	const { navigationColor, navigationBackgroundColor } = attributes;
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+	const controlsPanelId = clientId + '-controls';
+
+	return (
+		<InspectorControls group="styles">
+			<ToolsPanel
+				label={ __( 'Navigation colors' ) }
+				resetAll={ () =>
+					setAttributes( {
+						navigationColor: undefined,
+						navigationBackgroundColor: undefined,
+					} )
+				}
+				panelId={ controlsPanelId }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ColorGradientSettingsDropdown
+					__experimentalIsRenderedInSidebar
+					settings={ [
+						{
+							colorValue: navigationColor,
+							label: __( 'Text and icons' ),
+							onColorChange: ( value ) =>
+								setAttributes( { navigationColor: value } ),
+							isShownByDefault: true,
+							clearable: true,
+							resetAllFilter: () => ( {
+								navigationColor: undefined,
+							} ),
+						},
+						{
+							colorValue: navigationBackgroundColor,
+							label: __( 'Background' ),
+							onColorChange: ( value ) =>
+								setAttributes( {
+									navigationBackgroundColor: value,
+								} ),
+							isShownByDefault: true,
+							clearable: true,
+							resetAllFilter: () => ( {
+								navigationBackgroundColor: undefined,
+							} ),
+						},
+					] }
+					panelId={ controlsPanelId }
+					{ ...colorGradientSettings }
+					gradients={ [] }
+					disableCustomGradients
+				/>
+				<ContrastChecker
+					textColor={ navigationColor }
+					backgroundColor={ navigationBackgroundColor }
+				/>
 			</ToolsPanel>
 		</InspectorControls>
 	);

@@ -58,9 +58,7 @@
 		padding: 0;
 
 		> .wp-block-slider-arrows-button {
-			background: rgb(255 255 255 / 85%);
 			border-radius: 999px;
-			backdrop-filter: blur(2px);
 			margin: 0 0.5rem;
 		}
 	}
@@ -73,8 +71,6 @@
 		left: 50%;
 		transform: translateX(-50%);
 		display: flex;
-		padding: 0.35rem 0.5rem;
-		background: rgb(255 255 255 / 78%);
-		border-radius: 999px;
+		padding: 0;
 	}
 }

@@ -17,7 +17,10 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { useSliderEditorState, useScrollToSelectedSlide } from './hooks';
-import { SliderInspectorControls } from './inspector-controls';
+import {
+	SliderColorControls,
+	SliderInspectorControls,
+} from './inspector-controls';
 import {
 	SliderControlBar,
 	SliderNavigationButtonsPreview,
@@ -82,10 +85,12 @@ function SliderEdit( { attributes, setAttributes, clientId } ) {
 		slidesToShow,
 		arrowIcon,
 		indicatorStyle,
-		navigationButtonType,
+		displayMode,
 		navigationPosition,
 		navigationJustification,
 		showIndicators,
+		navigationColor,
+		navigationBackgroundColor,
 	} = attributes;
 	const normalizedSlidesToShow = normalizeSlidesToShow(
 		slidesToShow,
@@ -99,7 +104,12 @@ function SliderEdit( { attributes, setAttributes, clientId } ) {
 	// NOT scroll. This is the positioning context for overlay previews.
 	const blockProps = useBlockProps( {
 		className: `is-arrows-position-${ navigationPosition }`,
-		style: { '--wp--slider-slides-to-show': normalizedSlidesToShow },
+		style: {
+			'--wp--slider-slides-to-show': normalizedSlidesToShow,
+			'--wp--slider-navigation-color': navigationColor,
+			'--wp--slider-navigation-background-color':
+				navigationBackgroundColor,
+		},
 	} );
 
 	// innerBlocksProps go on the inner scroll container. The ref is on this
@@ -130,12 +140,17 @@ function SliderEdit( { attributes, setAttributes, clientId } ) {
 				normalizedSlidesToShow={ normalizedSlidesToShow }
 				maxSlidesToShow={ maxSlidesToShow }
 			/>
+			<SliderColorControls
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				clientId={ clientId }
+			/>
 			<div { ...blockProps }>
 				{ navigationPosition === 'top' && (
 					<SliderControlBar
 						navigationPosition="top"
 						arrowIcon={ arrowIcon }
-						navigationButtonType={ navigationButtonType }
+						displayMode={ displayMode }
 						indicatorStyle={ indicatorStyle }
 						showIndicators={ showIndicators }
 						navigationJustification={ navigationJustification }
@@ -148,7 +163,7 @@ function SliderEdit( { attributes, setAttributes, clientId } ) {
 						{ ! hasSelectedDescendant && (
 							<SliderNavigationButtonsPreview
 								arrowIcon={ arrowIcon }
-								navigationButtonType={ navigationButtonType }
+								displayMode={ displayMode }
 								navigationPosition={ navigationPosition }
 								navigationJustification={
 									navigationJustification
@@ -169,7 +184,7 @@ function SliderEdit( { attributes, setAttributes, clientId } ) {
 					<SliderControlBar
 						navigationPosition="bottom"
 						arrowIcon={ arrowIcon }
-						navigationButtonType={ navigationButtonType }
+						displayMode={ displayMode }
 						indicatorStyle={ indicatorStyle }
 						showIndicators={ showIndicators }
 						navigationJustification={ navigationJustification }
