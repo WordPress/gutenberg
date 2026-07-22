@@ -99,9 +99,9 @@ const Template = ( {
 		<GradientPicker
 			{ ...props }
 			value={ gradient }
-			onChange={ ( ...changeArgs ) => {
-				setGradient( ...changeArgs );
-				onChange?.( ...changeArgs );
+			onChange={ ( currentGradient, index, slug ) => {
+				setGradient( currentGradient );
+				onChange?.( currentGradient, index, slug );
 			} }
 		/>
 	);
