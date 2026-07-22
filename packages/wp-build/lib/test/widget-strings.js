@@ -43,8 +43,8 @@ describe( 'WIDGET_I18N_CONTEXTS stays in sync with widget-i18n.json', () => {
 	} );
 
 	it( 'covers every translatable field the schema declares', () => {
-		// A new schema field must gain a matching emitted context, or the
-		// build would silently ship an unextractable string.
+		// A new schema field must gain an emitted context, or its strings
+		// ship unextractable.
 		const schemaContexts = [
 			schema.title,
 			schema.description,

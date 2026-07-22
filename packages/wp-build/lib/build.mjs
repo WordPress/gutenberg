@@ -2230,12 +2230,10 @@ async function generateWidgetRegistry( widgets, replacements ) {
 }
 
 /**
- * Generate the widget metadata strings file.
- *
- * Emits one `_x()` call per translatable `widget.json` value so static
- * gettext extraction tooling can see strings the runtime only translates
- * from the hydrated registry. The file is never loaded at runtime. Widgets
- * without a `textdomain` are skipped, matching the runtime translation.
+ * Generate `build/widgets/widget-strings.php`: one `_x()` call per
+ * translatable `widget.json` value, for gettext extraction tooling.
+ * Never loaded at runtime. Widgets without a `textdomain` are skipped,
+ * matching the runtime translation no-op.
  *
  * @param {Array}                  widgets      Array of widget objects.
  * @param {Record<string, string>} replacements PHP template replacements.

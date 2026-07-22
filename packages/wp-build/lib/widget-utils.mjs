@@ -94,11 +94,8 @@ export function getWidgetMetadata( rootDir, widgetName ) {
 
 /**
  * Gettext context for each translatable `widget.json` metadata value.
- *
- * Must match the widget i18n schema the runtime translation uses on the
- * hydrated registry (`lib/experimental/dashboard-widgets/widget-i18n.json`):
- * the lookups are context-qualified, so a drifted context makes every one
- * of them miss. Covered by a sync test in `test/widget-strings.js`.
+ * Must match `lib/experimental/dashboard-widgets/widget-i18n.json`: runtime
+ * lookups are context-qualified, so a drifted context never matches.
  */
 export const WIDGET_I18N_CONTEXTS = {
 	title: 'widget title',
@@ -119,8 +116,7 @@ export const WIDGET_I18N_CONTEXTS = {
  */
 
 /**
- * Collect the translatable strings a widget declares, paired with the
- * gettext context the runtime translation resolves them under.
+ * Collect a widget's translatable strings with their gettext contexts.
  *
  * @param {WidgetTranslatableFields} metadata Widget metadata fields.
  * @return {Array<{ value: string, context: string }>} Translatable entries.

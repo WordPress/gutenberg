@@ -237,7 +237,7 @@ With this configuration:
 
 ### `wpPlugin.textdomain`
 
-The default gettext text domain for widget metadata. Stamped into the generated widget registry (and the widget strings file) for widgets whose `widget.json` does not declare its own `textdomain`; a widget-level `textdomain` always wins:
+The default gettext text domain for widget metadata, used when a `widget.json` does not declare its own `textdomain`:
 
 ```json
 {
@@ -626,7 +626,7 @@ Rule of thumb: anything the host needs before loading a widget's module — iden
 - **`keywords`** (optional): Search aliases. Translated server-side using `textdomain`.
 - **`category`** (optional): Grouping category for filtering
 - **`presentation`** (optional): Rendering intent (`framed`, `content-bleed`, `full-bleed`)
-- **`textdomain`** (optional): Gettext text domain for translating `title`, `description`, `help`, and `keywords`. Defaults to `wpPlugin.textdomain` from the root `package.json` when omitted.
+- **`textdomain`** (optional): Gettext text domain for translating `title`, `description`, `help`, and `keywords`. Defaults to `wpPlugin.textdomain`.
 
 ### `widget.ts` — runtime schema
 
@@ -706,7 +706,7 @@ The build system generates:
 - `build/widgets/{widget-name}/widget.min.js` + `widget.js` — Bundled metadata (ESM)
 - `build/widgets/{widget-name}/widget.min.asset.php` — Asset metadata for widget module
 - `build/widgets/registry.php` — Widget registry data
-- `build/widgets/widget-strings.php` — Gettext calls for the translatable `widget.json` metadata, for string extraction tooling; never loaded at runtime. Generated only when at least one widget declares a `textdomain`.
+- `build/widgets/widget-strings.php` — Gettext calls for the translatable `widget.json` metadata, for extraction tooling; never loaded at runtime. Generated when a widget declares a `textdomain`.
 - `build/widgets.php` — Script module registration logic
 
 ### PHP Registration
