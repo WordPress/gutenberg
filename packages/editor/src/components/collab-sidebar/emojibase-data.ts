@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Emojibase data loading shared between the full emoji picker (lazy
@@ -11,11 +14,45 @@ import { useEffect, useState } from '@wordpress/element';
  * JSON dataset — is only ever fetched on demand.
  */
 
-declare global {
-	interface Window {
-		gutenbergEmojibaseUrl?: string;
-		gutenbergEmojiLabelOverrides?: Record< string, string >;
-	}
+/**
+ * Emojibase configuration read from the block editor settings.
+ */
+export interface EmojibaseConfig {
+	/**
+	 * Same-origin base URL of the Emojibase dataset directory, or null
+	 * when the site doesn't provide one (the full picker is unavailable).
+	 */
+	baseUrl: string | null;
+	/**
+	 * Per-emoji label overrides keyed by Emojibase hexcode, or null.
+	 */
+	labelOverrides: Record< string, string > | null;
+}
+
+/**
+ * Read the Emojibase configuration from the block editor settings. The
+ * Gutenberg plugin populates the `noteEmojibaseUrl` and
+ * `noteEmojiLabelOverrides` settings server-side (via the
+ * `block_editor_settings_all` filter); npm consumers of the editor
+ * package opt in by providing the same settings, with the URL pointing
+ * at a self-hosted Emojibase dataset.
+ *
+ * @return The Emojibase base URL and label overrides.
+ */
+export function useEmojibaseConfig(): EmojibaseConfig {
+	return useSelect( ( select ) => {
+		const settings: Record< string, unknown > =
+			select( blockEditorStore ).getSettings();
+		const baseUrl = settings.noteEmojibaseUrl;
+		const labelOverrides = settings.noteEmojiLabelOverrides;
+		return {
+			baseUrl: typeof baseUrl === 'string' && baseUrl ? baseUrl : null,
+			labelOverrides:
+				labelOverrides && typeof labelOverrides === 'object'
+					? ( labelOverrides as Record< string, string > )
+					: null,
+		};
+	}, [] );
 }
 
 /**
@@ -300,25 +337,24 @@ const labelMapCache = new Map< string, Map< string, string > >();
 
 /**
  * Build (and cache) a Map from normalized hex key to user-facing emoji
- * label for a loaded dataset, applying any per-site label overrides
- * from `window.gutenbergEmojiLabelOverrides`.
+ * label for a loaded dataset, applying any per-site label overrides.
+ * The overrides are page-static (they come from the editor settings),
+ * so the cache is keyed by dataset alone.
  *
- * @param cacheKey `baseUrl|locale` cache key.
- * @param data     Emojibase emoji records.
+ * @param cacheKey  `baseUrl|locale` cache key.
+ * @param data      Emojibase emoji records.
+ * @param overrides Map of `hexcode => translated label`, or null.
  * @return Map from hex key to label.
  */
 function buildLabelMap(
 	cacheKey: string,
-	data: EmojibaseEntry[]
+	data: EmojibaseEntry[],
+	overrides: Record< string, string > | null
 ): Map< string, string > {
 	const existing = labelMapCache.get( cacheKey );
 	if ( existing ) {
 		return existing;
 	}
-	const overrides =
-		typeof window !== 'undefined' && window.gutenbergEmojiLabelOverrides
-			? window.gutenbergEmojiLabelOverrides
-			: null;
 	const map = new Map< string, string >();
 	for ( const entry of data ) {
 		if ( ! entry.hexcode || ! entry.label ) {
@@ -350,19 +386,27 @@ function buildLabelMap(
  * Look up the label for a stored hex-key reaction from the already
  * loaded dataset, without triggering a fetch.
  *
- * @param hexKey Normalized reaction hex key, e.g. `1f44d`.
+ * @param hexKey    Normalized reaction hex key, e.g. `1f44d`.
+ * @param baseUrl   Same-origin URL of the Emojibase dataset directory.
+ * @param overrides Map of `hexcode => translated label`, or null.
  * @return The label, or null when unknown/not loaded.
  */
-export function getCachedEmojiLabel( hexKey: string ): string | null {
-	if ( typeof window === 'undefined' || ! window.gutenbergEmojibaseUrl ) {
+export function getCachedEmojiLabel(
+	hexKey: string,
+	baseUrl: string | null,
+	overrides: Record< string, string > | null
+): string | null {
+	if ( ! baseUrl ) {
 		return null;
 	}
-	const cacheKey = `${ window.gutenbergEmojibaseUrl }|${ detectLocale() }`;
+	const cacheKey = `${ baseUrl }|${ detectLocale() }`;
 	const cached = dataCache.get( cacheKey );
 	if ( ! cached ) {
 		return null;
 	}
-	return buildLabelMap( cacheKey, cached.data ).get( hexKey ) || null;
+	return (
+		buildLabelMap( cacheKey, cached.data, overrides ).get( hexKey ) || null
+	);
 }
 
 /**
@@ -381,18 +425,15 @@ export function useEmojiLabel(
 	hexKey: string,
 	enabled: boolean
 ): string | null {
+	const { baseUrl, labelOverrides } = useEmojibaseConfig();
 	const [ label, setLabel ] = useState< string | null >( () =>
-		enabled ? getCachedEmojiLabel( hexKey ) : null
+		enabled ? getCachedEmojiLabel( hexKey, baseUrl, labelOverrides ) : null
 	);
 
 	useEffect( () => {
-		if ( ! enabled || label ) {
+		if ( ! enabled || label || ! baseUrl ) {
 			return;
 		}
-		if ( typeof window === 'undefined' || ! window.gutenbergEmojibaseUrl ) {
-			return;
-		}
-		const baseUrl = window.gutenbergEmojibaseUrl;
 		const locale = detectLocale();
 		let cancelled = false;
 		loadEmojibaseData( baseUrl, locale )
@@ -402,7 +443,8 @@ export function useEmojiLabel(
 				}
 				const resolved = buildLabelMap(
 					`${ baseUrl }|${ locale }`,
-					data
+					data,
+					labelOverrides
 				).get( hexKey );
 				if ( resolved ) {
 					setLabel( resolved );
@@ -414,7 +456,7 @@ export function useEmojiLabel(
 		return () => {
 			cancelled = true;
 		};
-	}, [ hexKey, enabled, label ] );
+	}, [ hexKey, enabled, label, baseUrl, labelOverrides ] );
 
 	return label;
 }

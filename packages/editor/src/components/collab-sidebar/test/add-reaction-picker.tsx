@@ -76,7 +76,6 @@ describe( 'AddReactionButton', () => {
 		// the full picker must store `thumbs-up`, not the raw hex key
 		// `1f44d`, so it aggregates into the same reaction_summary bucket
 		// as historical quick-row picks.
-		window.gutenbergEmojibaseUrl = 'https://example.test/emojibase';
 		const originalFetch = global.fetch;
 		global.fetch = jest.fn( ( url ) =>
 			Promise.resolve( {
@@ -97,6 +96,7 @@ describe( 'AddReactionButton', () => {
 			} )
 		);
 		dispatch( blockEditorStore ).updateSettings( {
+			noteEmojibaseUrl: 'https://example.test/emojibase',
 			noteReactionEmojis: [
 				{ emoji: '👍', label: 'Thumbs up', value: 'thumbs-up' },
 			],
@@ -139,9 +139,9 @@ describe( 'AddReactionButton', () => {
 			expect( onToggleReaction ).toHaveBeenCalledTimes( 1 );
 		} finally {
 			global.fetch = originalFetch;
-			delete window.gutenbergEmojibaseUrl;
 			act( () => {
 				dispatch( blockEditorStore ).updateSettings( {
+					noteEmojibaseUrl: undefined,
 					noteReactionEmojis: undefined,
 				} );
 			} );
@@ -152,7 +152,9 @@ describe( 'AddReactionButton', () => {
 		// A distinct base URL keeps the module-level dataset cache from
 		// other tests out of the way; rejected loads are never cached, so
 		// the retry below triggers a fresh fetch.
-		window.gutenbergEmojibaseUrl = 'https://example.test/emojibase-down';
+		dispatch( blockEditorStore ).updateSettings( {
+			noteEmojibaseUrl: 'https://example.test/emojibase-down',
+		} );
 		const originalFetch = global.fetch;
 		let failRequests = true;
 		global.fetch = jest.fn( ( url ) =>
@@ -233,7 +235,11 @@ describe( 'AddReactionButton', () => {
 			).not.toHaveLength( 0 );
 		} finally {
 			global.fetch = originalFetch;
-			delete window.gutenbergEmojibaseUrl;
+			act( () => {
+				dispatch( blockEditorStore ).updateSettings( {
+					noteEmojibaseUrl: undefined,
+				} );
+			} );
 		}
 	} );
 

@@ -28,7 +28,11 @@ import ReactionEmojiPicker, {
 	buildEmojiBySlugMap,
 	useReactionEmojis,
 } from './reaction-emoji-picker';
-import { detectLocale, loadEmojibaseData } from './emojibase-data';
+import {
+	detectLocale,
+	loadEmojibaseData,
+	useEmojibaseConfig,
+} from './emojibase-data';
 import { useFrequentEmojis } from './frequent-emojis';
 import { invalidateReactionNames } from './reaction-display';
 
@@ -70,13 +74,13 @@ const FullEmojiPicker = lazy( loadEmojiPicker );
  * chunk and the Emojibase dataset for the active locale. Both loaders
  * cache, so calling this repeatedly (every hover) is free after the
  * first invocation.
+ *
+ * @param baseUrl Same-origin URL of the Emojibase dataset directory.
  */
-function prefetchFullPicker(): void {
+function prefetchFullPicker( baseUrl: string | null ): void {
 	loadEmojiPicker().catch( () => {} );
-	if ( typeof window !== 'undefined' && window.gutenbergEmojibaseUrl ) {
-		loadEmojibaseData( window.gutenbergEmojibaseUrl, detectLocale() ).catch(
-			() => {}
-		);
+	if ( baseUrl ) {
+		loadEmojibaseData( baseUrl, detectLocale() ).catch( () => {} );
 	}
 }
 
@@ -144,12 +148,13 @@ interface AddReactionButtonProps {
  * curated reaction set, so the previous quick-row picks stay one click
  * away.
  *
- * The full picker only renders when `window.gutenbergEmojibaseUrl` is
- * set — the Gutenberg plugin sets it via PHP, but npm consumers of the
- * editor package must opt in by providing a URL pointing at a
- * self-hosted emojibase dataset. Without it — or when the picker
- * module or its dataset fails to load — the curated quick row is
- * offered instead, so adding a reaction keeps working.
+ * The full picker only renders when the `noteEmojibaseUrl` block
+ * editor setting is present — the Gutenberg plugin injects it via the
+ * `block_editor_settings_all` PHP filter, and npm consumers of the
+ * editor package opt in by passing the same setting with a URL
+ * pointing at a self-hosted emojibase dataset. Without it — or when
+ * the picker module or its dataset fails to load — the curated quick
+ * row is offered instead, so adding a reaction keeps working.
  *
  * @param props                  Component props.
  * @param props.noteId           The parent note comment ID.
@@ -168,8 +173,8 @@ export function AddReactionButton( {
 		() => buildEmojiBySlugMap( emojis ),
 		[ emojis ]
 	);
-	const hasFullPicker =
-		typeof window !== 'undefined' && !! window.gutenbergEmojibaseUrl;
+	const { baseUrl } = useEmojibaseConfig();
+	const hasFullPicker = !! baseUrl;
 	const [ pickerFailed, setPickerFailed ] = useState( false );
 	// A rejected `lazy()` memoizes its failure, so retrying needs a
 	// fresh lazy component. The module request itself is cached by the
@@ -232,9 +237,15 @@ export function AddReactionButton( {
 					// dataset, so the popover usually opens fully
 					// populated.
 					onMouseEnter={
-						hasFullPicker ? prefetchFullPicker : undefined
+						hasFullPicker
+							? () => prefetchFullPicker( baseUrl )
+							: undefined
 					}
-					onFocus={ hasFullPicker ? prefetchFullPicker : undefined }
+					onFocus={
+						hasFullPicker
+							? () => prefetchFullPicker( baseUrl )
+							: undefined
+					}
 				/>
 			) }
 			renderContent={ ( { onClose } ) => {

@@ -13,19 +13,25 @@
  */
 
 /**
- * Adds a global JS variable pointing at the bundled Emojibase data
- * directory, before any editor script runs. The picker in
- * @wordpress/editor consumes this URL.
+ * Injects the Emojibase dataset URL and per-emoji label overrides into
+ * the block editor settings, where the Notes emoji picker in
+ * `@wordpress/editor` reads them (`noteEmojibaseUrl` and
+ * `noteEmojiLabelOverrides`). Using the settings pipeline (rather than
+ * a page global) keeps the configuration scoped to the editor and
+ * gives npm consumers of the editor package the same documented
+ * boundary: provide the settings, get the full picker.
+ *
+ * @since 7.1.0
+ *
+ * @param array $settings Existing block editor settings.
+ * @return array Updated block editor settings.
  */
-function gutenberg_emojibase_data_register_inline_script() {
-	$url = gutenberg_url( 'build/emojibase-data' );
-	wp_add_inline_script(
-		'wp-editor',
-		'window.gutenbergEmojibaseUrl = ' . wp_json_encode( $url ) . ';',
-		'before'
-	);
+function gutenberg_add_emojibase_settings( $settings ) {
+	$settings['noteEmojibaseUrl']        = gutenberg_url( 'build/emojibase-data' );
+	$settings['noteEmojiLabelOverrides'] = gutenberg_get_emoji_picker_label_overrides();
+	return $settings;
 }
-add_action( 'init', 'gutenberg_emojibase_data_register_inline_script' );
+add_filter( 'block_editor_settings_all', 'gutenberg_add_emojibase_settings' );
 
 /**
  * Convert an emoji character to the uppercase hex code-point sequence
@@ -84,21 +90,24 @@ function gutenberg_emoji_to_hexcode( $emoji ) {
 }
 
 /**
- * Exposes a per-emoji label override map to the editor's emoji picker.
+ * Builds the per-emoji label override map exposed to the editor's
+ * emoji picker.
  *
  * Emojibase ships translated labels for 28 locales; for the long tail
- * of WordPress-supported locales, those labels stay in English. This
- * filter lets sites and plugins fill the gap on a per-emoji basis
- * (typically for the small set of emojis they care about most). The
- * map is keyed by uppercase Emojibase hex codes so it merges cleanly
- * over the per-locale `data.json`.
+ * of WordPress-supported locales, those labels stay in English. The
+ * filter below lets sites and plugins fill the gap on a per-emoji
+ * basis (typically for the small set of emojis they care about most).
+ * The map is keyed by uppercase Emojibase hex codes so it merges
+ * cleanly over the per-locale `data.json`.
  *
  * Seeded with the curated reaction emojis so the full picker shows
  * the same translated label as the curated quick-row.
  *
  * @since 7.1.0
+ *
+ * @return array Map of `hexcode => translated label`.
  */
-function gutenberg_emoji_picker_label_overrides_register_inline_script() {
+function gutenberg_get_emoji_picker_label_overrides() {
 	$defaults = array();
 	if ( function_exists( 'gutenberg_get_note_reaction_emojis' ) ) {
 		foreach ( gutenberg_get_note_reaction_emojis() as $entry ) {
@@ -134,12 +143,5 @@ function gutenberg_emoji_picker_label_overrides_register_inline_script() {
 	// non-string values would otherwise crash the picker's JS-side
 	// label handling (`label.toLowerCase()` in searchEmojis()).
 	$overrides = is_array( $overrides ) ? $overrides : array();
-	$overrides = array_filter( $overrides, 'is_string' );
-
-	wp_add_inline_script(
-		'wp-editor',
-		'window.gutenbergEmojiLabelOverrides = ' . wp_json_encode( (object) $overrides ) . ';',
-		'before'
-	);
+	return array_filter( $overrides, 'is_string' );
 }
-add_action( 'init', 'gutenberg_emoji_picker_label_overrides_register_inline_script' );

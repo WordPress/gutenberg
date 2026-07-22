@@ -8,6 +8,8 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { dispatch } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -103,7 +105,9 @@ describe( 'ReactionDisplay', () => {
 	} );
 
 	it( 'resolves the emoji name from the Emojibase dataset for hex-key reactions', async () => {
-		window.gutenbergEmojibaseUrl = 'https://example.test/emojibase';
+		dispatch( blockEditorStore ).updateSettings( {
+			noteEmojibaseUrl: 'https://example.test/emojibase',
+		} );
 		const originalFetch = global.fetch;
 		global.fetch = jest.fn( ( url ) =>
 			Promise.resolve( {
@@ -149,7 +153,11 @@ describe( 'ReactionDisplay', () => {
 			).toHaveTextContent( '👍' );
 		} finally {
 			global.fetch = originalFetch;
-			delete window.gutenbergEmojibaseUrl;
+			act( () => {
+				dispatch( blockEditorStore ).updateSettings( {
+					noteEmojibaseUrl: undefined,
+				} );
+			} );
 		}
 	} );
 
@@ -267,7 +275,9 @@ describe( 'ReactionDisplay', () => {
 		// re-derive once the Emojibase dataset supplies the real label.
 		// A distinct base URL keeps the module-level dataset cache from
 		// earlier tests out of the way.
-		window.gutenbergEmojibaseUrl = 'https://example.test/emojibase-race';
+		dispatch( blockEditorStore ).updateSettings( {
+			noteEmojibaseUrl: 'https://example.test/emojibase-race',
+		} );
 		const originalFetch = global.fetch;
 		let resolveDataset;
 		const datasetGate = new Promise( ( resolve ) => {
@@ -339,7 +349,11 @@ describe( 'ReactionDisplay', () => {
 			);
 		} finally {
 			global.fetch = originalFetch;
-			delete window.gutenbergEmojibaseUrl;
+			act( () => {
+				dispatch( blockEditorStore ).updateSettings( {
+					noteEmojibaseUrl: undefined,
+				} );
+			} );
 		}
 	} );
 

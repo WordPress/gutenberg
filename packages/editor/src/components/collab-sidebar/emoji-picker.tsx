@@ -15,6 +15,7 @@ import { useDebounce } from '@wordpress/compose';
 import {
 	detectLocale,
 	normalizeHexcode,
+	useEmojibaseConfig,
 	useEmojibaseData,
 } from './emojibase-data';
 import type { EmojibaseEntry } from './emojibase-data';
@@ -131,8 +132,9 @@ export function searchEmojis(
  * Full searchable emoji picker built from WPDS components
  * (`SearchControl`, `Composite`) and styled with WPDS tokens. Emoji
  * data and labels come from Emojibase per-locale files served
- * same-origin from `window.gutenbergEmojibaseUrl`; UI chrome strings
- * go through `@wordpress/i18n` so GlotPress can translate them.
+ * same-origin from the `noteEmojibaseUrl` block editor setting; UI
+ * chrome strings go through `@wordpress/i18n` so GlotPress can
+ * translate them.
  *
  * @param props          Component props.
  * @param props.onSelect Called with the selected emoji character.
@@ -140,14 +142,7 @@ export function searchEmojis(
  *                       so the parent can swap in a fallback picker.
  */
 export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
-	const baseUrl =
-		typeof window !== 'undefined'
-			? window.gutenbergEmojibaseUrl ?? null
-			: null;
-	const labelOverrides =
-		typeof window !== 'undefined' && window.gutenbergEmojiLabelOverrides
-			? window.gutenbergEmojiLabelOverrides
-			: null;
+	const { baseUrl, labelOverrides } = useEmojibaseConfig();
 	const [ locale ] = useState( detectLocale );
 	const { data, messages, isLoading, error } = useEmojibaseData(
 		baseUrl,

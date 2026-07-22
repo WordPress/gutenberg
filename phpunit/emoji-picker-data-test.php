@@ -91,31 +91,22 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 	 * The default override map seeds the curated reaction emojis so the
 	 * full picker shows the same translated label as the curated row.
 	 *
-	 * @covers ::gutenberg_emoji_picker_label_overrides_register_inline_script
+	 * @covers ::gutenberg_get_emoji_picker_label_overrides
 	 */
 	public function test_default_overrides_seeded_from_curated_reactions() {
-		gutenberg_emoji_picker_label_overrides_register_inline_script();
-
-		$inline = wp_scripts()->get_data( 'wp-editor', 'before' );
-		$this->assertNotEmpty( $inline, 'Expected inline script to be registered.' );
-
-		$payload = is_array( $inline ) ? implode( "\n", $inline ) : (string) $inline;
-		$this->assertStringContainsString(
-			'window.gutenbergEmojiLabelOverrides',
-			$payload
-		);
+		$overrides = gutenberg_get_emoji_picker_label_overrides();
 
 		// Heart, Celebration, Smile, Eyes, Rocket — the five curated
 		// reactions defined in gutenberg_get_note_reaction_emojis().
-		$this->assertStringContainsString( '"2764":', $payload );
-		$this->assertStringContainsString( '"1F389":', $payload );
-		$this->assertStringContainsString( '"1F604":', $payload );
-		$this->assertStringContainsString( '"1F440":', $payload );
-		$this->assertStringContainsString( '"1F680":', $payload );
+		$this->assertArrayHasKey( '2764', $overrides );
+		$this->assertArrayHasKey( '1F389', $overrides );
+		$this->assertArrayHasKey( '1F604', $overrides );
+		$this->assertArrayHasKey( '1F440', $overrides );
+		$this->assertArrayHasKey( '1F680', $overrides );
 	}
 
 	/**
-	 * @covers ::gutenberg_emoji_picker_label_overrides_register_inline_script
+	 * @covers ::gutenberg_get_emoji_picker_label_overrides
 	 */
 	public function test_filter_can_extend_overrides() {
 		$callback = static function ( $overrides ) {
@@ -124,18 +115,15 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 		};
 		add_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
 
-		gutenberg_emoji_picker_label_overrides_register_inline_script();
+		$overrides = gutenberg_get_emoji_picker_label_overrides();
 
-		$inline  = wp_scripts()->get_data( 'wp-editor', 'before' );
-		$payload = is_array( $inline ) ? implode( "\n", $inline ) : (string) $inline;
-
-		$this->assertStringContainsString( '"1F44D":"Custom thumbs up"', $payload );
+		$this->assertSame( 'Custom thumbs up', $overrides['1F44D'] );
 
 		remove_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
 	}
 
 	/**
-	 * @covers ::gutenberg_emoji_picker_label_overrides_register_inline_script
+	 * @covers ::gutenberg_get_emoji_picker_label_overrides
 	 */
 	public function test_filter_can_replace_overrides_entirely() {
 		$callback = static function () {
@@ -143,22 +131,16 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 		};
 		add_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
 
-		gutenberg_emoji_picker_label_overrides_register_inline_script();
-
-		$inline  = wp_scripts()->get_data( 'wp-editor', 'before' );
-		$payload = is_array( $inline ) ? implode( "\n", $inline ) : (string) $inline;
-
-		// The map serializes to {} (a JS object literal), not [].
-		$this->assertStringContainsString(
-			'window.gutenbergEmojiLabelOverrides = {};',
-			$payload
+		$this->assertSame(
+			array(),
+			gutenberg_get_emoji_picker_label_overrides()
 		);
 
 		remove_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
 	}
 
 	/**
-	 * @covers ::gutenberg_emoji_picker_label_overrides_register_inline_script
+	 * @covers ::gutenberg_get_emoji_picker_label_overrides
 	 */
 	public function test_filter_drops_non_string_values() {
 		$callback = static function () {
@@ -171,21 +153,19 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 		};
 		add_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
 
-		gutenberg_emoji_picker_label_overrides_register_inline_script();
-
-		$inline  = wp_scripts()->get_data( 'wp-editor', 'before' );
-		$payload = is_array( $inline ) ? implode( "\n", $inline ) : (string) $inline;
-
-		$this->assertStringContainsString( '"1F600":"Grin"', $payload );
-		$this->assertStringContainsString( '"1F680":"Rocket"', $payload );
-		$this->assertStringNotContainsString( '"1F44D"', $payload );
-		$this->assertStringNotContainsString( '"1F389":42', $payload );
+		$this->assertSame(
+			array(
+				'1F600' => 'Grin',
+				'1F680' => 'Rocket',
+			),
+			gutenberg_get_emoji_picker_label_overrides()
+		);
 
 		remove_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
 	}
 
 	/**
-	 * @covers ::gutenberg_emoji_picker_label_overrides_register_inline_script
+	 * @covers ::gutenberg_get_emoji_picker_label_overrides
 	 */
 	public function test_filter_returning_non_array_is_treated_as_empty() {
 		$callback = static function () {
@@ -193,23 +173,30 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 		};
 		add_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
 
-		gutenberg_emoji_picker_label_overrides_register_inline_script();
-
-		$inline  = wp_scripts()->get_data( 'wp-editor', 'before' );
-		$payload = is_array( $inline ) ? implode( "\n", $inline ) : (string) $inline;
-
-		$this->assertStringContainsString(
-			'window.gutenbergEmojiLabelOverrides = {};',
-			$payload
+		$this->assertSame(
+			array(),
+			gutenberg_get_emoji_picker_label_overrides()
 		);
 
 		remove_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
 	}
 
-	public function tear_down() {
-		// Reset inline script state between tests so the order in which
-		// the suite runs doesn't pollute the assertions.
-		wp_scripts()->add_data( 'wp-editor', 'before', array() );
-		parent::tear_down();
+	/**
+	 * The picker configuration rides on the block editor settings — no
+	 * page globals — so the editor package reads it through its normal
+	 * settings boundary.
+	 *
+	 * @covers ::gutenberg_add_emojibase_settings
+	 */
+	public function test_emojibase_settings_injected() {
+		$settings = gutenberg_add_emojibase_settings( array( 'existing' => true ) );
+
+		$this->assertTrue( $settings['existing'] );
+		$this->assertStringEndsWith(
+			'build/emojibase-data',
+			$settings['noteEmojibaseUrl']
+		);
+		$this->assertIsArray( $settings['noteEmojiLabelOverrides'] );
+		$this->assertArrayHasKey( '2764', $settings['noteEmojiLabelOverrides'] );
 	}
 }

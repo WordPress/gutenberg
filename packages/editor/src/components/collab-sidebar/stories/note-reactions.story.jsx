@@ -8,11 +8,14 @@ import { fn } from 'storybook/test';
  */
 import { useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
+import { dispatch } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import ReactionDisplay, { AddReactionButton } from '../reaction-display';
+import ReactionDisplay from '../reaction-display';
+import { AddReactionButton } from '../add-reaction-picker';
 
 /**
  * Sample reaction summary, keyed by reaction slug. Curated reactions are
@@ -85,7 +88,9 @@ const meta = {
 	component: ReactionDisplay,
 	decorators: [
 		( Story ) => {
-			window.gutenbergEmojibaseUrl = 'emojibase-data';
+			dispatch( blockEditorStore ).updateSettings( {
+				noteEmojibaseUrl: 'emojibase-data',
+			} );
 			document.documentElement.lang = 'en';
 			return <Story />;
 		},

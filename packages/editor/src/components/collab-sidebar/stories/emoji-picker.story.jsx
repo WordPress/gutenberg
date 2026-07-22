@@ -4,6 +4,12 @@
 import { fn } from 'storybook/test';
 
 /**
+ * WordPress dependencies
+ */
+import { dispatch } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+
+/**
  * Internal dependencies
  */
 import EmojiPicker from '../emoji-picker';
@@ -14,18 +20,20 @@ import EmojiPicker from '../emoji-picker';
  * grouped by category, with a search field filtering on labels and
  * tags.
  *
- * The component reads its dataset from
- * `window.gutenbergEmojibaseUrl` (set by the Gutenberg plugin via an
- * inline script). In Storybook the English dataset is served from a
- * static directory mapped in `storybook/main.ts`, and the document
- * language is pinned to `en` so locale detection is deterministic.
+ * The component reads its dataset from the `noteEmojibaseUrl` block
+ * editor setting (populated by the Gutenberg plugin server-side). In
+ * Storybook the English dataset is served from a static directory
+ * mapped in `storybook/main.ts`, and the document language is pinned
+ * to `en` so locale detection is deterministic.
  */
 const meta = {
 	title: 'Editor/EmojiPicker',
 	component: EmojiPicker,
 	decorators: [
 		( Story ) => {
-			window.gutenbergEmojibaseUrl = 'emojibase-data';
+			dispatch( blockEditorStore ).updateSettings( {
+				noteEmojibaseUrl: 'emojibase-data',
+			} );
 			document.documentElement.lang = 'en';
 			return <Story />;
 		},

@@ -3,13 +3,15 @@
  */
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
+import { dispatch } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -187,7 +189,9 @@ describe( 'EmojiPicker search announcements', () => {
 
 	beforeEach( () => {
 		speak.mockClear();
-		window.gutenbergEmojibaseUrl = 'https://example.test/emojibase';
+		dispatch( blockEditorStore ).updateSettings( {
+			noteEmojibaseUrl: 'https://example.test/emojibase',
+		} );
 		global.fetch = jest.fn( ( url ) =>
 			Promise.resolve( {
 				ok: true,
@@ -216,7 +220,13 @@ describe( 'EmojiPicker search announcements', () => {
 
 	afterEach( () => {
 		global.fetch = originalFetch;
-		delete window.gutenbergEmojibaseUrl;
+		// The picker may still be mounted here (RTL cleanup runs after
+		// this hook), so the settings-driven re-render needs act().
+		act( () => {
+			dispatch( blockEditorStore ).updateSettings( {
+				noteEmojibaseUrl: undefined,
+			} );
+		} );
 	} );
 
 	it( 'exposes categories as labelled rowgroups and flattens search results', async () => {
