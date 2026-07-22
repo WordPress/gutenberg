@@ -6,9 +6,9 @@ import { RangeControl, Spinner, Button } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
-import { useMemo } from '@wordpress/element';
+import { useLayoutEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
+import { Stack, Tooltip } from '@wordpress/ui';
 import { useFocusOnMount } from '@wordpress/compose';
 
 /**
@@ -16,6 +16,7 @@ import { useFocusOnMount } from '@wordpress/compose';
  */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { useBlockChangedRevisions } from './use-block-changed-revisions';
 
 /**
  * Slider component for navigating revisions with pagination.
