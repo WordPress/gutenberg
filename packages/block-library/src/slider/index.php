@@ -6,13 +6,13 @@
  */
 
 /**
- * Returns SVG path data for slider pagination button icons.
+ * Returns SVG path data for slider navigation button icons.
  *
  * @param string $arrow_icon  Icon style.
  * @param bool   $is_previous Whether this is previous button.
  * @return string
  */
-function block_core_slider_get_pagination_icon_path( $arrow_icon, $is_previous ) {
+function block_core_slider_get_navigation_icon_path( $arrow_icon, $is_previous ) {
 	$paths = array(
 		'chevron' => array(
 			'previous' => 'M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z',
@@ -63,9 +63,9 @@ function block_core_slider_render_indicators_markup( $indicator_style ) {
  *
  * @param string $arrow_icon             Icon style: 'chevron' or 'arrow'.
  * @param string $display_mode           Button content: 'icon', 'text', or 'both'.
- * @param string $indicator_style        Style of the indicator dots: 'dot' or 'line'.
+ * @param string $indicator_style        Style of the indicators: 'dot' or 'line'.
  * @param string $position               Shared position: 'top' or 'bottom'.
- * @param bool   $show_indicators        Whether to render the indicator dots.
+ * @param bool   $show_indicators        Whether to render the indicators.
  * @param string $arrows_justification   Justification of the nav buttons: 'left', 'center', 'right', or 'space-between'.
  * @return string HTML string for the control bar.
  */
@@ -94,7 +94,7 @@ function block_core_slider_render_arrow_button_markup( $arrow_icon, $display_mod
 	$button_text = $is_previous ? __( 'Previous' ) : __( 'Next' );
 	$label       = $is_previous ? __( 'Previous slide' ) : __( 'Next slide' );
 
-	$icon_svg  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" class="wp-block-slider-arrows-button__icon"><path d="' . esc_attr( block_core_slider_get_pagination_icon_path( $arrow_icon, $is_previous ) ) . '" /></svg>';
+	$icon_svg  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" class="wp-block-slider-arrows-button__icon"><path d="' . esc_attr( block_core_slider_get_navigation_icon_path( $arrow_icon, $is_previous ) ) . '" /></svg>';
 	$text_span = '<span class="wp-block-slider-arrows-button__text">' . esc_html( $button_text ) . '</span>';
 
 	if ( 'icon' === $display_mode ) {
@@ -158,7 +158,7 @@ function block_core_slider_render_overlay_arrows_markup( $arrow_icon, $display_m
  * Renders the `core/slider` block on the server.
  *
  * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
+ * @param string   $content    Block content.
  * @param WP_Block $block      Block instance.
  *
  * @return string Returns the block markup.

@@ -1,6 +1,3 @@
-// .wp-block-slider itself is position:relative (set via block wrapper attributes)
-// and serves as the positioning context for overlay arrows and indicators.
-// It is a flex column so the track and in-flow rows stack vertically.
 .wp-block-slider {
 	--wp--slider-navigation-color: #1e1e1e;
 	--wp--slider-navigation-background-color: #fff;
