@@ -167,7 +167,7 @@ export function SliderInspectorControls( {
 					<RangeControl
 						label={ __( 'Slides to show' ) }
 						help={ __(
-							'Number of slides visible at the same time.'
+							'Number of slides visible at the same time on larger screens. One slide is always shown on mobile.'
 						) }
 						value={ normalizedSlidesToShow }
 						min={ 1 }

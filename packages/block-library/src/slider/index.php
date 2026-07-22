@@ -204,12 +204,6 @@ function render_block_core_slider( $attributes, $content, $block ) {
 				$slide_count
 			)
 		);
-
-		if ( 1 === $slide_index ) {
-			$p->remove_attribute( 'inert' );
-		} else {
-			$p->set_attribute( 'inert', '' );
-		}
 	}
 
 	$arrow_icon             = $attributes['arrowIcon'] ?? 'chevron';

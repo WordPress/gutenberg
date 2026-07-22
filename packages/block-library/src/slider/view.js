@@ -84,6 +84,36 @@ function updateSlideInert( slides, currentIndex, slidesToShow ) {
 	} );
 }
 
+function updateSliderStateFromCSS( track, context ) {
+	const slider = track.closest( '.wp-block-slider' );
+	const slides = getSlides( track );
+
+	// CSS overrides the configured "slides to show" value to display one slide at a time on mobile.
+	// Read the actual number of visible slides so every slide remains accessible through pagination.
+	const computedSlidesToShow = slider
+		? Number.parseInt(
+				window
+					.getComputedStyle( slider )
+					.getPropertyValue( '--wp--slider-slides-to-show' ),
+				10
+		  )
+		: context.slidesToShow;
+	const slidesToShow = normalizeSlidesToShow(
+		computedSlidesToShow,
+		slides.length
+	);
+	const currentIndex = clampIndex(
+		context.currentIndex,
+		slides.length,
+		slidesToShow
+	);
+
+	context.totalSlides = slides.length;
+	context.slidesToShow = slidesToShow;
+	context.currentIndex = currentIndex;
+	updateSlideInert( slides, currentIndex, slidesToShow );
+}
+
 function getSliderElements( ref ) {
 	const slider = ref.closest( '.wp-block-slider' );
 	const track =
@@ -355,23 +385,8 @@ store( 'core/slider', {
 			const context = getContext();
 			const { ref } = getElement();
 
-			// Update totalSlides from actual DOM (in case it differs from PHP count)
-			const slides = getSlides( ref );
-			context.totalSlides = slides.length;
-			context.slidesToShow = normalizeSlidesToShow(
-				context.slidesToShow,
-				context.totalSlides
-			);
-			context.currentIndex = clampIndex(
-				context.currentIndex,
-				context.totalSlides,
-				context.slidesToShow
-			);
-			updateSlideInert(
-				slides,
-				context.currentIndex,
-				context.slidesToShow
-			);
+			// Apply the effective responsive value to the slider state.
+			updateSliderStateFromCSS( ref, context );
 
 			// Clean up previous touch listeners if initTrack runs again.
 			const prev = touchHandlers.get( ref );
@@ -431,8 +446,16 @@ store( 'core/slider', {
 				passive: false,
 			} );
 
+			const handleResize = debounce(
+				() => updateSliderStateFromCSS( ref, context ),
+				150
+			);
+			window.addEventListener( 'resize', handleResize );
+
 			// Return cleanup function for when the element is removed.
 			return () => {
+				window.removeEventListener( 'resize', handleResize );
+				handleResize.cancel();
 				ref.removeEventListener( 'touchstart', onTouchStart );
 				ref.removeEventListener( 'touchend', onTouchEnd );
 				touchHandlers.delete( ref );
