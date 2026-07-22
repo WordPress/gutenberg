@@ -74,8 +74,8 @@ function block_core_slider_render_control_bar_markup( $arrow_icon, $display_mode
 		? block_core_slider_render_indicators_markup( $indicator_style )
 		: '';
 
-	$prev = block_core_slider_render_arrow_button_markup( $arrow_icon, $display_mode, true );
-	$next = block_core_slider_render_arrow_button_markup( $arrow_icon, $display_mode, false );
+	$prev    = block_core_slider_render_arrow_button_markup( $arrow_icon, $display_mode, true );
+	$next    = block_core_slider_render_arrow_button_markup( $arrow_icon, $display_mode, false );
 	$content = $prev . $indicators_html . $next;
 
 	return '<div class="wp-block-slider-control-bar is-position-' . esc_attr( $position ) . ' is-justify-' . esc_attr( $arrows_justification ) . '">' . $content . '</div>';
@@ -209,12 +209,12 @@ function render_block_core_slider( $attributes, $content, $block ) {
 		);
 	}
 
-	$arrow_icon             = $attributes['arrowIcon'] ?? 'chevron';
-	$indicator_style        = $attributes['indicatorStyle'] ?? 'dot';
-	$display_mode           = $attributes['displayMode'] ?? 'icon';
-	$arrows_position        = $attributes['navigationPosition'] ?? 'overlay';
-	$arrows_justification   = $attributes['navigationJustification'] ?? 'space-between';
-	$show_indicators        = isset( $attributes['showIndicators'] ) ? (bool) $attributes['showIndicators'] : true;
+	$arrow_icon           = $attributes['arrowIcon'] ?? 'chevron';
+	$indicator_style      = $attributes['indicatorStyle'] ?? 'dot';
+	$display_mode         = $attributes['displayMode'] ?? 'icon';
+	$arrows_position      = $attributes['navigationPosition'] ?? 'overlay';
+	$arrows_justification = $attributes['navigationJustification'] ?? 'space-between';
+	$show_indicators      = isset( $attributes['showIndicators'] ) ? (bool) $attributes['showIndicators'] : true;
 
 	$slides_html = $p->get_updated_html();
 
@@ -233,7 +233,7 @@ function render_block_core_slider( $attributes, $content, $block ) {
 		$arrows_markup    = block_core_slider_render_overlay_arrows_markup( $arrow_icon, $display_mode );
 		$rendered_content = $track_markup . $arrows_markup . $overlay_indicators;
 	} else {
-		$control_bar = block_core_slider_render_control_bar_markup(
+		$control_bar      = block_core_slider_render_control_bar_markup(
 			$arrow_icon,
 			$display_mode,
 			$indicator_style,
