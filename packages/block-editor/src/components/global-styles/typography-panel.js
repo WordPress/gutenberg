@@ -260,6 +260,8 @@ export default function TypographyPanel( {
 } ) {
 	const { colors, allColors, areCustomSolidsEnabled, decodeValue } =
 		useColorGradientSettings( settings );
+	// Always keep the layout className (e.g. `single-column`); only the
+	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
 	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>
 		getInheritanceProps(
 			showInheritanceLabelIndicators && isInherited,
