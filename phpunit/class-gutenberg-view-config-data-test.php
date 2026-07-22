@@ -1727,7 +1727,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	 * @covers ::merge
 	 */
 	public function test_merge_rejects_associative_patch_over_a_list() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge' );
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge_properties' );
 
 		$data   = new Gutenberg_View_Config_Data(
 			array(
@@ -1762,7 +1762,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	 * @covers ::merge
 	 */
 	public function test_merge_rejects_list_patch_over_an_associative_value() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge' );
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::merge_properties' );
 
 		$data   = new Gutenberg_View_Config_Data(
 			array(

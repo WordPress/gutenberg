@@ -430,7 +430,7 @@ class Gutenberg_View_Config_Data {
 			// nested null still drops the property it names.
 			$this->config[ $key ] = 'set' === $mode
 				? $this->strip_nulls( $value )
-				: $this->merge_properties( $this->config[ $key ] ?? array(), $value, 'replace' === $mode, $method );
+				: $this->merge_properties( $this->config[ $key ] ?? array(), $value, 'replace' === $mode );
 		}
 
 		return $this;
@@ -493,14 +493,13 @@ class Gutenberg_View_Config_Data {
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param mixed  $current       The current value.
-	 * @param mixed  $incoming      The incoming value.
-	 * @param bool   $replace_lists Whether a list in $incoming replaces the current list
-	 *                              wholesale instead of merging into it by member identity.
-	 * @param string $method        The public method the patch was passed to, for misuse reporting.
+	 * @param mixed $current       The current value.
+	 * @param mixed $incoming      The incoming value.
+	 * @param bool  $replace_lists Whether a list in $incoming replaces the current list
+	 *                             wholesale instead of merging into it by member identity.
 	 * @return mixed The merged value.
 	 */
-	private function merge_properties( $current, $incoming, $replace_lists, $method ) {
+	private function merge_properties( $current, $incoming, $replace_lists ) {
 		// Scalar properties are merged as-is.
 		if ( ! is_array( $incoming ) ) {
 			return $incoming;
@@ -524,8 +523,8 @@ class Gutenberg_View_Config_Data {
 
 			if ( is_array( $current ) && ! array_is_list( $current ) && array() !== $current ) {
 				_doing_it_wrong(
-					esc_html( $method ),
-					esc_html__( 'A list cannot be merged into an associative value; name the keys to change instead.', 'gutenberg' ),
+					__METHOD__,
+					esc_html__( 'A view configuration patch value must match the shape of the value it patches: a list merges into a list, and an associative array into an associative array.', 'gutenberg' ),
 					'7.1.0'
 				);
 				return $current;
@@ -533,16 +532,15 @@ class Gutenberg_View_Config_Data {
 
 			return $this->merge_list_by_identity(
 				is_array( $current ) && array_is_list( $current ) ? $current : array(),
-				$incoming,
-				$method
+				$incoming
 			);
 		}
 
 		// Consider any other array as associative (keys are strings).
 		if ( is_array( $current ) && array_is_list( $current ) && array() !== $current ) {
 			_doing_it_wrong(
-				esc_html( $method ),
-				esc_html__( 'An associative array cannot be merged into a list; address list members by their identity instead.', 'gutenberg' ),
+				__METHOD__,
+				esc_html__( 'A view configuration patch value must match the shape of the value it patches: a list merges into a list, and an associative array into an associative array.', 'gutenberg' ),
 				'7.1.0'
 			);
 			return $current;
@@ -559,8 +557,7 @@ class Gutenberg_View_Config_Data {
 			$result[ $key ] = $this->merge_properties(
 				array_key_exists( $key, $result ) ? $result[ $key ] : array(),
 				$value,
-				$replace_lists,
-				$method
+				$replace_lists
 			);
 		}
 
@@ -656,12 +653,11 @@ class Gutenberg_View_Config_Data {
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param array  $current  The current list.
-	 * @param array  $incoming The incoming list.
-	 * @param string $method   The public method the patch was passed to, for misuse reporting.
+	 * @param array $current  The current list.
+	 * @param array $incoming The incoming list.
 	 * @return array The merged list.
 	 */
-	private function merge_list_by_identity( array $current, array $incoming, $method ) {
+	private function merge_list_by_identity( array $current, array $incoming ) {
 		$result = $current;
 		foreach ( $incoming as $item ) {
 			// A null member carries no identity and holds nothing to merge,
@@ -691,7 +687,7 @@ class Gutenberg_View_Config_Data {
 			}
 
 			// Otherwise, merge the incoming member into the existing one in place.
-			$result[ $index ] = $this->merge_properties( $result[ $index ], $item, false, $method );
+			$result[ $index ] = $this->merge_properties( $result[ $index ], $item, false );
 		}
 
 		return $result;
