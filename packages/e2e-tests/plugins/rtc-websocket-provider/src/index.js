@@ -55,6 +55,24 @@ function createWebSocketProvider() {
 
 		const statusListeners = new Set();
 
+		// One-shot "initial sync" signal for the sync manager. Latches true on
+		// the first completed sync (sync step 2), which lets the manager mark
+		// the entity synced even when that sync applied no document change
+		// (e.g. the local document already matched the server state).
+		const initialSyncListeners = new Set();
+		let hasInitialSync = false;
+
+		const notifyInitialSync = () => {
+			if ( hasInitialSync ) {
+				return;
+			}
+			hasInitialSync = true;
+			for ( const callback of initialSyncListeners ) {
+				callback();
+			}
+			initialSyncListeners.clear();
+		};
+
 		const onStatus = ( event ) => {
 			// A fresh socket means the previous sync handshake (if any) is
 			// no longer current. y-websocket re-fires 'sync' once sync step 2
@@ -76,6 +94,9 @@ function createWebSocketProvider() {
 		// convergence should wait on `synced`, not just `status`.
 		const onSync = ( isSynced ) => {
 			updateDebugState( room, { synced: !! isSynced } );
+			if ( isSynced ) {
+				notifyInitialSync();
+			}
 		};
 		provider.on( 'sync', onSync );
 
@@ -104,6 +125,13 @@ function createWebSocketProvider() {
 				if ( event === 'status' ) {
 					statusListeners.add( callback );
 				}
+			},
+			onInitialSync: ( callback ) => {
+				if ( hasInitialSync ) {
+					callback();
+					return;
+				}
+				initialSyncListeners.add( callback );
 			},
 		};
 	};
