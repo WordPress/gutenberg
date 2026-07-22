@@ -83,12 +83,21 @@ describe( 'SkinTonePicker', () => {
 		const user = userEvent.setup();
 		render( <SkinTonePicker value={ 0 } onChange={ () => {} } /> );
 
-		await user.click(
-			screen.getByRole( 'button', {
-				name: 'Skin tone: Default skin tone',
-			} )
-		);
+		const toggle = screen.getByRole( 'button', {
+			name: 'Skin tone: Default skin tone',
+		} );
+		// The trigger advertises the popup type it opens.
+		expect( toggle ).toHaveAttribute( 'aria-haspopup', 'dialog' );
+		await user.click( toggle );
 
+		// The popup is a non-modal dialog named by its visible heading, so
+		// screen readers announce entering it rather than a bare group of
+		// options appearing.
+		expect(
+			screen.getByRole( 'dialog', {
+				name: 'Choose your default skin tone',
+			} )
+		).toBeVisible();
 		expect(
 			screen.getByText( 'Choose your default skin tone' )
 		).toBeVisible();

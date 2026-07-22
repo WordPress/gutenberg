@@ -386,9 +386,22 @@ describe( 'AddReactionButton', () => {
 			/>
 		);
 
-		await user.click(
-			screen.getByRole( 'button', { name: 'Add reaction' } )
-		);
+		const trigger = screen.getByRole( 'button', { name: 'Add reaction' } );
+		// The trigger advertises the popup type it opens, and the popup
+		// itself is a named non-modal dialog so screen readers announce
+		// where focus landed.
+		expect( trigger ).toHaveAttribute( 'aria-haspopup', 'dialog' );
+		await user.click( trigger );
+		expect(
+			screen.getByRole( 'dialog', { name: 'Add reaction' } )
+		).toBeVisible();
+		// The curated options are laid out horizontally, so the listbox
+		// must report its orientation (the ARIA default is vertical).
+		expect(
+			screen.getByRole( 'listbox', {
+				name: 'Select an emoji reaction',
+			} )
+		).toHaveAttribute( 'aria-orientation', 'horizontal' );
 		await user.click(
 			await screen.findByRole( 'option', { name: 'Rocket' } )
 		);
@@ -443,6 +456,11 @@ describe( 'AddReactionButton', () => {
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add reaction' } )
 			);
+			// The popup is exposed as a named non-modal dialog in the
+			// full-picker branch too.
+			expect(
+				screen.getByRole( 'dialog', { name: 'Add reaction' } )
+			).toBeVisible();
 			// The full picker opens directly — no quick row, no
 			// intermediate "More emojis" step.
 			expect(

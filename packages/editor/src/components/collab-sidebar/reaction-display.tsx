@@ -429,7 +429,16 @@ export function AddReactionButton( {
 
 	return (
 		<Dropdown
-			popoverProps={ POPOVER_PROPS }
+			popoverProps={ {
+				...POPOVER_PROPS,
+				// The popup wraps a searchbox, a nested popup trigger, and
+				// a grid (full picker) or a listbox (curated fallback), and
+				// the popover constrains tabbing within it — expose it as a
+				// named non-modal dialog instead of an unnamed generic
+				// container so screen readers announce where focus landed.
+				role: 'dialog',
+				'aria-label': __( 'Add reaction' ),
+			} }
 			contentClassName={
 				hasFullPicker
 					? 'editor-collab-sidebar-panel__picker-popover'
@@ -441,6 +450,7 @@ export function AddReactionButton( {
 					className="editor-collab-sidebar-panel__add-reaction-button"
 					icon={ smileyIcon }
 					label={ __( 'Add reaction' ) }
+					aria-haspopup="dialog"
 					aria-expanded={ isOpen }
 					disabled={ disabled }
 					accessibleWhenDisabled

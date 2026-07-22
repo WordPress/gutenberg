@@ -163,7 +163,11 @@ export default function ReactionEmojiPicker( {
 	return (
 		<Composite
 			role="listbox"
+			// `orientation` only configures the composite store's arrow-key
+			// handling; render the ARIA attribute explicitly so assistive
+			// technology knows the options run horizontally.
 			orientation="horizontal"
+			aria-orientation="horizontal"
 			aria-label={ __( 'Select an emoji reaction' ) }
 			className="editor-collab-sidebar-panel__emoji-picker"
 		>

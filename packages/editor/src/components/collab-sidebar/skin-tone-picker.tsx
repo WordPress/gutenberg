@@ -174,13 +174,24 @@ export default function SkinTonePicker( {
 		SkinTonePicker,
 		'editor-collab-sidebar-panel__skin-tone'
 	);
+	// Mirrors the id `SkinToneMenu` assigns to its heading, so the popup
+	// container can take its accessible name from the visible heading.
+	const headingId = `${ baseId }-heading`;
 	const current =
 		SKIN_TONES.find( ( option ) => option.tone === value ) ||
 		SKIN_TONES[ 0 ];
 
 	return (
 		<Dropdown
-			popoverProps={ { placement: 'bottom-end' } }
+			popoverProps={ {
+				placement: 'bottom-end',
+				// The flyout wraps a visible heading plus the listbox (a
+				// heading can't live inside a listbox), so the popup
+				// container itself is exposed as a named non-modal dialog
+				// rather than an unnamed generic wrapper.
+				role: 'dialog',
+				'aria-labelledby': headingId,
+			} }
 			// The menu moves focus to the *selected* swatch on mount (per
 			// the APG listbox pattern); the popover's own first-element
 			// focus would land on the first swatch instead.
@@ -190,6 +201,7 @@ export default function SkinTonePicker( {
 					size="compact"
 					className="editor-collab-sidebar-panel__skin-tone-toggle"
 					onClick={ onToggle }
+					aria-haspopup="dialog"
 					aria-expanded={ isOpen }
 					label={ sprintf(
 						// translators: %s: the selected skin tone, e.g. "Medium skin tone".
