@@ -75,8 +75,8 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * set() drops a whole top-level key when the patch value is null, leaving the
-	 * keys it does not name in place.
+	 * set() resets a top-level key to its default when the patch value is null,
+	 * leaving the keys it does not name in place.
 	 *
 	 * @covers ::set
 	 */
@@ -107,6 +107,11 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * set() drops a property whose value in the patch is null.
+	 *
+	 * @covers ::set
+	 */
 	public function test_set_null_unsets_key() {
 		$defaults = array(
 			'default_view' => array(
@@ -200,6 +205,11 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$this->assertSame( $defaults, self::read_config( $data ) );
 	}
 
+	/**
+	 * remove() deletes a named scalar property from within a top-level key.
+	 *
+	 * @covers ::remove
+	 */
 	public function test_remove_deletes_scalar_properties() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
@@ -239,6 +249,12 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * remove() deletes a named associative-array property from within a
+	 * top-level key.
+	 *
+	 * @covers ::remove
+	 */
 	public function test_remove_deletes_associative_array_properties() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
@@ -275,6 +291,11 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * remove() deletes a named list property from within a top-level key.
+	 *
+	 * @covers ::remove
+	 */
 	public function test_remove_deletes_indexed_array_properties() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
@@ -314,6 +335,12 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * remove() deletes a single member from a list property and renumbers
+	 * the list.
+	 *
+	 * @covers ::remove
+	 */
 	public function test_remove_deletes_items_in_indexed_array_properties() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
@@ -1564,7 +1591,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * merge() unsets a deeply nested layout property when the value is null.
+	 * merge() unsets a deeply nested list property when the value is null.
 	 *
 	 * @covers ::merge
 	 */
@@ -1617,9 +1644,9 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * merge() drops a whole top-level key when the patch value is
-	 * null — any documented key, including the identity-keyed view_list —
-	 * resetting that key to its default rather than storing a literal null.
+	 * merge() resets a whole top-level key to its default when the patch value
+	 * is null — any documented key, including the identity-keyed view_list —
+	 * rather than storing a literal null.
 	 *
 	 * @covers ::merge
 	 */
@@ -2030,15 +2057,11 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A `null` value drops a top-level key, which resets it to its default. When a
-	 * later filter then merges into that same key, it should merge onto the
-	 * restored default rather than onto an empty value, so the default's untouched
-	 * props (`type`, `fields`) survive alongside the overridden one (`perPage`).
+	 * A `null` value resets a top-level key to its default. A later merge()
+	 * into that same key merges onto the restored default rather than onto an
+	 * empty value, so the default's untouched props (`type`, `fields`) survive
+	 * alongside the overridden one (`perPage`).
 	 *
-	 * Exercised through apply_filters() because the reset-to-default only
-	 * materializes once the full filter chain is reconciled.
-	 *
-	 * @covers ::apply_filters
 	 * @covers ::merge
 	 */
 	public function test_merge_after_null_merges_onto_defaults() {
@@ -2074,11 +2097,11 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * remove() drops a top-level key just like a `null` value does, which resets it
-	 * to its default. When a later filter then merges into that same key, it should
-	 * merge onto the restored default rather than onto an empty value, so the
-	 * default's untouched props (`type`, `fields`) survive alongside the overridden
-	 * one (`perPage`).
+	 * remove() with a bare top-level key resets it to its default, just like a
+	 * `null` value does. A later merge() into that same key merges onto the
+	 * restored default rather than onto an empty value, so the default's
+	 * untouched props (`type`, `fields`) survive alongside the overridden one
+	 * (`perPage`).
 	 *
 	 * @covers ::remove
 	 * @covers ::merge
