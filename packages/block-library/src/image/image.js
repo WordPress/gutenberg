@@ -491,7 +491,7 @@ export default function Image( {
 		// Check if there's an embed block that handles this URL, e.g., instagram URL.
 		// See: https://github.com/WordPress/gutenberg/pull/11472
 		const embedBlock = createUpgradedEmbedBlock( { attributes: { url } } );
-		if ( undefined !== embedBlock ) {
+		if ( undefined !== embedBlock && onReplace ) {
 			onReplace( embedBlock );
 		}
 	}
