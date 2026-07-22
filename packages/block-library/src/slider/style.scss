@@ -16,8 +16,11 @@
 	overflow-x: scroll;
 	overflow-y: hidden;
 	scroll-snap-type: x mandatory;
-	scroll-behavior: smooth;
 	scrollbar-width: none;
+
+	@media (prefers-reduced-motion: no-preference) {
+		scroll-behavior: smooth;
+	}
 	gap: 0;
 	flex-wrap: nowrap;
 	outline: 1px solid transparent;

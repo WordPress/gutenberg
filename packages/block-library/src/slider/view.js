@@ -26,6 +26,13 @@ function debounce( func, wait ) {
 	return debounced;
 }
 
+function getScrollBehavior() {
+	return window.matchMedia( '(prefers-reduced-motion: no-preference)' )
+		.matches
+		? 'smooth'
+		: 'auto';
+}
+
 const debouncedUpdates = new WeakMap();
 
 // Store touch start data per track element to avoid cross-slider interference.
@@ -170,7 +177,7 @@ function scrollToSlide( ref, index ) {
 	const slideRect = targetSlide.getBoundingClientRect();
 	track.scrollTo( {
 		left: track.scrollLeft + ( slideRect.left - trackRect.left ),
-		behavior: 'smooth',
+		behavior: getScrollBehavior(),
 	} );
 }
 

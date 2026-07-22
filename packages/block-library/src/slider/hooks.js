@@ -3,6 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useLayoutEffect } from '@wordpress/element';
+import { useReducedMotion } from '@wordpress/compose';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 const SLIDE_BLOCK = 'core/slide';
@@ -64,6 +65,8 @@ function useSliderEditorState( clientId ) {
  * @param {string|null} selectedSlideClientId The client ID of the active slide, or null.
  */
 function useScrollToSelectedSlide( trackRef, selectedSlideClientId ) {
+	const prefersReducedMotion = useReducedMotion();
+
 	useLayoutEffect( () => {
 		if ( ! selectedSlideClientId || ! trackRef.current ) {
 			return;
@@ -71,11 +74,11 @@ function useScrollToSelectedSlide( trackRef, selectedSlideClientId ) {
 		trackRef.current
 			.querySelector( `[data-block="${ selectedSlideClientId }"]` )
 			?.scrollIntoView( {
-				behavior: 'smooth',
+				behavior: prefersReducedMotion ? 'auto' : 'smooth',
 				inline: 'start',
 				block: 'nearest',
 			} );
-	}, [ selectedSlideClientId, trackRef ] );
+	}, [ prefersReducedMotion, selectedSlideClientId, trackRef ] );
 }
 
 export { useSliderEditorState, useScrollToSelectedSlide };
