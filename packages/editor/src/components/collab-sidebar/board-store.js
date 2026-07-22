@@ -33,31 +33,6 @@ export function createBoardStore() {
 		}
 	} );
 
-	// Anchors are read from the DOM, so a thread's position goes stale whenever
-	// the content moves under it: editing a block reflows its own marker onto a
-	// different line and shifts every block after it. Blocks are observed only
-	// to re-trigger the recompute; their sizes are never recorded.
-	const observedBlocks = new Set();
-	const blockObserver = new window.ResizeObserver( () => emit() );
-
-	function syncBlockObserver() {
-		const current = new Set(
-			Array.from( blockRefs.values() ).filter( Boolean )
-		);
-		for ( const el of observedBlocks ) {
-			if ( ! current.has( el ) ) {
-				blockObserver.unobserve( el );
-				observedBlocks.delete( el );
-			}
-		}
-		for ( const el of current ) {
-			if ( ! observedBlocks.has( el ) ) {
-				blockObserver.observe( el );
-				observedBlocks.add( el );
-			}
-		}
-	}
-
 	return {
 		subscribe( listener ) {
 			listeners.add( listener );
@@ -65,8 +40,6 @@ export function createBoardStore() {
 				listeners.delete( listener );
 				if ( listeners.size === 0 ) {
 					observer.disconnect();
-					blockObserver.disconnect();
-					observedBlocks.clear();
 				}
 			};
 		},
@@ -87,7 +60,6 @@ export function createBoardStore() {
 				idByElement.set( floatingEl, id );
 				observer.observe( floatingEl );
 			}
-			syncBlockObserver();
 			emit();
 		},
 
@@ -100,10 +72,9 @@ export function createBoardStore() {
 				floatingRefs.delete( id );
 			}
 			delete heights[ id ];
-			syncBlockObserver();
 		},
 
-		getBlockRects() {
+		getAnchorRects() {
 			// Batch all rect reads before any writes to avoid layout thrashing.
 			return Object.fromEntries(
 				Array.from( blockRefs ).flatMap( ( [ id, el ] ) => {

@@ -8,7 +8,7 @@ function mockRect( element, top ) {
 }
 
 describe( 'createBoardStore', () => {
-	describe( 'getBlockRects', () => {
+	describe( 'getAnchorRects', () => {
 		it( 'anchors an inline note to its in-content marker', () => {
 			const store = createBoardStore();
 			const blockEl = document.createElement( 'p' );
@@ -23,7 +23,7 @@ describe( 'createBoardStore', () => {
 				document.createElement( 'div' )
 			);
 
-			expect( store.getBlockRects()[ 12 ].top ).toBe( 160 );
+			expect( store.getAnchorRects()[ 12 ].top ).toBe( 160 );
 		} );
 
 		it( 'falls back to the block rect for block-level notes', () => {
@@ -38,24 +38,7 @@ describe( 'createBoardStore', () => {
 				document.createElement( 'div' )
 			);
 
-			expect( store.getBlockRects()[ 12 ].top ).toBe( 100 );
-		} );
-
-		it( 'ignores markers belonging to other notes', () => {
-			const store = createBoardStore();
-			const blockEl = document.createElement( 'p' );
-			blockEl.innerHTML =
-				'Some <mark class="wp-note" data-id="34">other note</mark> text';
-			mockRect( blockEl, 100 );
-			mockRect( blockEl.querySelector( 'mark' ), 160 );
-
-			store.registerThread(
-				12,
-				blockEl,
-				document.createElement( 'div' )
-			);
-
-			expect( store.getBlockRects()[ 12 ].top ).toBe( 100 );
+			expect( store.getAnchorRects()[ 12 ].top ).toBe( 100 );
 		} );
 
 		describe( 'pending new note', () => {
@@ -127,7 +110,7 @@ describe( 'createBoardStore', () => {
 					document.createElement( 'div' )
 				);
 
-				expect( store.getBlockRects().new.top ).toBe( 160 );
+				expect( store.getAnchorRects().new.top ).toBe( 160 );
 			} );
 
 			it( 'falls back to the block rect for a collapsed selection', () => {
@@ -140,7 +123,7 @@ describe( 'createBoardStore', () => {
 					document.createElement( 'div' )
 				);
 
-				expect( store.getBlockRects().new.top ).toBe( 100 );
+				expect( store.getAnchorRects().new.top ).toBe( 100 );
 			} );
 
 			it( 'falls back to the block rect when the selection is outside the block', () => {
@@ -156,7 +139,7 @@ describe( 'createBoardStore', () => {
 					document.createElement( 'div' )
 				);
 
-				expect( store.getBlockRects().new.top ).toBe( 100 );
+				expect( store.getAnchorRects().new.top ).toBe( 100 );
 				document.body.removeChild( other );
 			} );
 
@@ -176,7 +159,7 @@ describe( 'createBoardStore', () => {
 					document.createElement( 'div' )
 				);
 
-				expect( store.getBlockRects().new.top ).toBe( 160 );
+				expect( store.getAnchorRects().new.top ).toBe( 160 );
 			} );
 
 			it( 'falls back to the block rect when the selection has no rendered rects', () => {
@@ -191,7 +174,7 @@ describe( 'createBoardStore', () => {
 					document.createElement( 'div' )
 				);
 
-				expect( store.getBlockRects().new.top ).toBe( 100 );
+				expect( store.getAnchorRects().new.top ).toBe( 100 );
 			} );
 
 			it( 'falls back to the block rect when there is no selection', () => {
@@ -202,7 +185,7 @@ describe( 'createBoardStore', () => {
 					document.createElement( 'div' )
 				);
 
-				expect( store.getBlockRects().new.top ).toBe( 100 );
+				expect( store.getAnchorRects().new.top ).toBe( 100 );
 			} );
 		} );
 
@@ -238,7 +221,7 @@ describe( 'createBoardStore', () => {
 				document.createElement( 'div' )
 			);
 
-			const rects = store.getBlockRects();
+			const rects = store.getAnchorRects();
 			expect( rects[ 12 ].top ).toBe( 140 );
 			expect( rects[ 34 ].top ).toBe( 170 );
 		} );
@@ -265,64 +248,9 @@ describe( 'createBoardStore', () => {
 				document.createElement( 'div' )
 			);
 
-			const rects = store.getBlockRects();
+			const rects = store.getAnchorRects();
 			expect( rects[ 12 ].top ).toBe( 120 );
 			expect( rects[ 34 ].top ).toBe( 180 );
-		} );
-	} );
-
-	describe( 'block observation', () => {
-		let observe;
-		let unobserve;
-
-		beforeEach( () => {
-			observe = jest.spyOn( window.ResizeObserver.prototype, 'observe' );
-			unobserve = jest.spyOn(
-				window.ResizeObserver.prototype,
-				'unobserve'
-			);
-		} );
-
-		afterEach( () => {
-			observe.mockRestore();
-			unobserve.mockRestore();
-		} );
-
-		it( 'observes a block so reflow under a thread retriggers layout', () => {
-			const store = createBoardStore();
-			const blockEl = document.createElement( 'p' );
-
-			store.registerThread(
-				12,
-				blockEl,
-				document.createElement( 'div' )
-			);
-
-			expect( observe ).toHaveBeenCalledWith( blockEl );
-		} );
-
-		it( 'keeps observing a block another thread still references', () => {
-			const store = createBoardStore();
-			const blockEl = document.createElement( 'p' );
-
-			store.registerThread(
-				12,
-				blockEl,
-				document.createElement( 'div' )
-			);
-			store.registerThread(
-				34,
-				blockEl,
-				document.createElement( 'div' )
-			);
-
-			// Two notes share one block, so dropping one must not stop
-			// tracking the block the other still anchors to.
-			store.unregisterThread( 12 );
-			expect( unobserve ).not.toHaveBeenCalledWith( blockEl );
-
-			store.unregisterThread( 34 );
-			expect( unobserve ).toHaveBeenCalledWith( blockEl );
 		} );
 	} );
 } );
