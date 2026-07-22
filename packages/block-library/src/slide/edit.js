@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -23,11 +18,7 @@ function SlideEdit( { clientId, isSelected } ) {
 
 	const isActiveSlide = isSelected || hasInnerBlocksSelected;
 
-	const blockProps = useBlockProps( {
-		className: clsx( 'wp-block-slide', {
-			'is-selected-slide': isActiveSlide,
-		} ),
-	} );
+	const blockProps = useBlockProps();
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		renderAppender: isActiveSlide ? InnerBlocks.ButtonBlockAppender : false,
