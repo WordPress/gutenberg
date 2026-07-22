@@ -183,9 +183,10 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$separator          = is_string( $attributes['separator'] ?? null ) ? addcslashes( $attributes['separator'], '\\"' ) : '';
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'style'      => '--separator: "' . addcslashes( $attributes['separator'], '\\"' ) . '";',
+			'style'      => '--separator: "' . $separator . '";',
 			'aria-label' => __( 'Breadcrumbs' ),
 		)
 	);

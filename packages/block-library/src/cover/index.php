@@ -134,7 +134,7 @@ function render_block_core_cover( $attributes, $content ) {
 		return $content;
 	}
 
-	$object_position = isset( $attributes['focalPoint'] )
+	$object_position = isset( $attributes['focalPoint'] ) && is_array( $attributes['focalPoint'] )
 		? round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%'
 		: null;
 

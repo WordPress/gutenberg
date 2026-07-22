@@ -27,11 +27,11 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 		$show_images = $block->context['showImages'];
 	}
 
-	$artist = $attributes['artist'] ?? '';
-	$image  = $attributes['image'] ?? '';
-	$alt    = $attributes['imageAlt'] ?? '';
-	$length = $attributes['length'] ?? '';
-	$title  = isset( $attributes['title'] ) && ! empty( $attributes['title'] ) ? $attributes['title'] : __( 'Unknown title' );
+	$artist = is_string( $attributes['artist'] ?? null ) ? $attributes['artist'] : '';
+	$image  = is_string( $attributes['image'] ?? null ) ? $attributes['image'] : '';
+	$alt    = is_string( $attributes['imageAlt'] ?? null ) ? $attributes['imageAlt'] : '';
+	$length = is_string( $attributes['length'] ?? null ) ? $attributes['length'] : '';
+	$title  = isset( $attributes['title'] ) && ! empty( $attributes['title'] ) && is_string( $attributes['title'] ) ? $attributes['title'] : __( 'Unknown title' );
 
 	$html  = '<li ' . $wrapper_attributes . '>';
 	$html .= '<button data-wp-on--click="actions.changeTrack" data-wp-bind--aria-current="state.isCurrentTrack" class="wp-block-playlist-track__button">';

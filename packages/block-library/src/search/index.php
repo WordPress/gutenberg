@@ -148,7 +148,7 @@ function render_block_core_search( $attributes ) {
 				$button->set_attribute( 'aria-expanded', 'false' );
 				$button->set_attribute( 'type', 'button' );
 			} else {
-				$button->set_attribute( 'aria-label', wp_strip_all_tags( $attributes['buttonText'] ) );
+				$button->set_attribute( 'aria-label', is_string( $attributes['buttonText'] ) ? wp_strip_all_tags( $attributes['buttonText'] ) : __( 'Search' ) );
 			}
 		}
 	}

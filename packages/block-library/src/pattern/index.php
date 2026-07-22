@@ -33,7 +33,7 @@ function register_block_core_pattern() {
 function render_block_core_pattern( $attributes ) {
 	static $seen_refs = array();
 
-	if ( empty( $attributes['slug'] ) ) {
+	if ( empty( $attributes['slug'] ) || ! is_string( $attributes['slug'] ) ) {
 		return '';
 	}
 

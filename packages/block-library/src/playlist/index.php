@@ -37,12 +37,12 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				$playlist_tracks[] = $track_id;
 
 				// Extract track metadata from block attributes.
-				$title      = isset( $track_attributes['title'] ) && ! empty( $track_attributes['title'] ) ? $track_attributes['title'] : __( 'Unknown title' );
-				$artist     = $track_attributes['artist'] ?? '';
-				$album      = $track_attributes['album'] ?? '';
-				$image      = $track_attributes['image'] ?? '';
-				$image_alt  = $track_attributes['imageAlt'] ?? '';
-				$url        = $track_attributes['src'] ?? '';
+				$title      = isset( $track_attributes['title'] ) && ! empty( $track_attributes['title'] ) && is_string( $track_attributes['title'] ) ? $track_attributes['title'] : __( 'Unknown title' );
+				$artist     = is_string( $track_attributes['artist'] ?? null ) ? $track_attributes['artist'] : '';
+				$album      = is_string( $track_attributes['album'] ?? null ) ? $track_attributes['album'] : '';
+				$image      = is_string( $track_attributes['image'] ?? null ) ? $track_attributes['image'] : '';
+				$image_alt  = is_string( $track_attributes['imageAlt'] ?? null ) ? $track_attributes['imageAlt'] : '';
+				$url        = is_string( $track_attributes['src'] ?? null ) ? $track_attributes['src'] : '';
 				$aria_label = $title;
 
 				if ( $title && $artist && $album ) {

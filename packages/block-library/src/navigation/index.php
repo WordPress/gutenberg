@@ -618,6 +618,7 @@ class WP_Navigation_Block_Renderer {
 		$layout_class = '';
 		if (
 			isset( $attributes['layout']['justifyContent'] ) &&
+			is_string( $attributes['layout']['justifyContent'] ) &&
 			isset( $layout_justification[ $attributes['layout']['justifyContent'] ] )
 		) {
 			$layout_class .= $layout_justification[ $attributes['layout']['justifyContent'] ];

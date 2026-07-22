@@ -32,6 +32,10 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 		return '';
 	}
 
+	if ( ! is_string( $url ) ) {
+		return '';
+	}
+
 	/**
 	 * Prepend emails with `mailto:` if not set.
 	 * The `is_email` returns false for emails with schema.
@@ -100,7 +104,7 @@ add_action( 'init', 'register_block_core_social_link' );
  */
 function block_core_social_link_get_icon( $service ) {
 	$services = block_core_social_link_services();
-	if ( isset( $services[ $service ] ) && isset( $services[ $service ]['icon'] ) ) {
+	if ( is_string( $service ) && isset( $services[ $service ] ) && isset( $services[ $service ]['icon'] ) ) {
 		return $services[ $service ]['icon'];
 	}
 
@@ -118,7 +122,7 @@ function block_core_social_link_get_icon( $service ) {
  */
 function block_core_social_link_get_name( $service ) {
 	$services = block_core_social_link_services();
-	if ( isset( $services[ $service ] ) && isset( $services[ $service ]['name'] ) ) {
+	if ( is_string( $service ) && isset( $services[ $service ] ) && isset( $services[ $service ]['name'] ) ) {
 		return $services[ $service ]['name'];
 	}
 
@@ -136,6 +140,9 @@ function block_core_social_link_get_name( $service ) {
  * @return array|string
  */
 function block_core_social_link_services( $service = '', $field = '' ) {
+	if ( ! is_string( $service ) || ! is_string( $field ) ) {
+		return array();
+	}
 	$services_data = array(
 		'fivehundredpx' => array(
 			'name' => _x( '500px', 'social link block variation name' ),
