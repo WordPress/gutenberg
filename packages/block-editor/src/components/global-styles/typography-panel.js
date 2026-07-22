@@ -822,15 +822,14 @@ export default function TypographyPanel( {
 							key: 'text',
 							label: __( 'Color' ),
 							inheritedValue: textColor,
-							inheritedSlug:
-								extractPresetSlug(
-									value?.color?.text,
-									'color'
-								) ??
-								extractPresetSlug(
-									inheritedValue?.color?.text,
-									'color'
-								),
+							inheritedSlug: extractPresetSlug(
+								inheritedValue?.color?.text,
+								'color'
+							),
+							userSlug: extractPresetSlug(
+								value?.color?.text,
+								'color'
+							),
 							setValue: setTextColor,
 							userValue: userTextColor,
 							isPlaceholder:
