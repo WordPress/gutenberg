@@ -521,6 +521,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'constrained' === $layout_type ) {
+		// The schemas and editor UI only produce strings here, so treat a non-string
+		// value as absent rather than casting it — it couldn't render as valid CSS anyway.
 		$content_size_attr    = $layout_for_styles['contentSize'] ?? null;
 		$content_size         = is_string( $content_size_attr ) ? $content_size_attr : '';
 		$wide_size_attr       = $layout_for_styles['wideSize'] ?? null;
