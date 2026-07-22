@@ -18,6 +18,42 @@
 	min-width: 0;
 }
 
+// Focusable marker on the slider rail at each revision where the selected
+// block changed. Matches the accessibility pattern established for
+// `.revision-diff-marker`: non-color indicator, 24×24 px hit target, focus ring.
+.editor-revisions-header__block-changed-mark {
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: 10px;
+	height: 10px;
+	padding: 0;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	background: var(--wp-admin-theme-color, #3858e9);
+	cursor: var(--wpds-cursor-control);
+	z-index: 1;
+	opacity: 0.85;
+	box-shadow: 0 0 0 4px var(--wp-admin-theme-color, #3858e9);
+	transition: opacity 0.15s ease;
+
+	// Expand hit target to 24×24 px (WCAG 2.5.8) without growing the visible dot.
+	&::before {
+		content: "";
+		position: absolute;
+		inset: -9px;
+	}
+
+	&:hover {
+		opacity: 1;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $gray-900;
+		outline-offset: 3px;
+	}
+}
+
 .editor-revisions-header__no-revisions {
 	color: $gray-700;
 	font-size: $default-font-size;
