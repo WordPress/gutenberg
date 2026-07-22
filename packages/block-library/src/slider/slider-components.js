@@ -76,6 +76,8 @@ export function SliderIndicatorDots( { indicatorStyle } ) {
 	return (
 		<div
 			className={ `wp-block-slider-indicators__dots is-style-${ indicatorStyle }` }
+			role="group"
+			aria-label={ __( 'Choose slide to display' ) }
 		>
 			{ [ 0, 1, 2 ].map( ( index ) => (
 				<button

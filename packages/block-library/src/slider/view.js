@@ -55,11 +55,24 @@ function clampIndex( index, totalSlides, slidesToShow ) {
 	return Math.max( 0, Math.min( index, maxStartIndex ) );
 }
 
+function formatSlideLabel( template, index, totalSlides ) {
+	return template.replace( '%1$d', index + 1 ).replace( '%2$d', totalSlides );
+}
+
 function getSlideLabel( index, totalSlides ) {
-	const { slideLabelTemplate } = getConfig();
-	return slideLabelTemplate
-		.replace( '%1$d', index + 1 )
-		.replace( '%2$d', totalSlides );
+	return formatSlideLabel(
+		getConfig().slideLabelTemplate,
+		index,
+		totalSlides
+	);
+}
+
+function getIndicatorLabel( index, totalSlides ) {
+	return formatSlideLabel(
+		getConfig().indicatorLabelTemplate,
+		index,
+		totalSlides
+	);
 }
 
 function getSlides( track ) {
@@ -332,9 +345,9 @@ store( 'core/slider', {
 			const { item, currentIndex } = getContext();
 			return item === currentIndex;
 		},
-		get dotLabel() {
+		get indicatorLabel() {
 			const { item, totalSlides } = getContext();
-			return getSlideLabel( item, totalSlides );
+			return getIndicatorLabel( item, totalSlides );
 		},
 		get currentSlideLabel() {
 			const { currentIndex, totalSlides } = getContext();
