@@ -82,3 +82,38 @@ export function buildRevisionChain( revisions ) {
 
 	return chain;
 }
+
+/**
+ * Translates a clientId from the live block-editor tree into the revision
+ * chain's clientId space so it can be looked up in each chain entry's
+ * `changedClientIds`. Uses `preserveClientIds()` to map `liveTree` against
+ * `chainTree`, then walks both trees in lockstep to find the translation.
+ *
+ * @param {Array}  liveTree       Live block-editor tree (`getBlocks()`).
+ * @param {Array}  chainTree      Chain tree at the displayed revision.
+ * @param {string} targetClientId The selected block's live clientId.
+ * @return {string|null} The corresponding chain clientId, or null.
+ */
+export function translateToChainClientId(
+	liveTree,
+	chainTree,
+	targetClientId
+) {
+	const remapped = preserveClientIds( liveTree, chainTree );
+
+	function search( liveNodes, remappedNodes ) {
+		for ( let i = 0; i < liveNodes.length; i++ ) {
+			if ( liveNodes[ i ].clientId === targetClientId ) {
+				return remappedNodes[ i ]?.clientId ?? null;
+			}
+			if ( liveNodes[ i ].innerBlocks?.length ) {
+				const found = search(
+					liveNodes[ i ].innerBlocks,
+					remappedNodes[ i ]?.innerBlocks || []
+				);
+				if ( found ) {
+					return found;
+				}
+			}
+		}
+		return null;
