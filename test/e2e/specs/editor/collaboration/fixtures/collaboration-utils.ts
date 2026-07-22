@@ -52,8 +52,7 @@ export const SECOND_USER: UserCredentials = {
 
 const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
 const USE_TEST_WS_PROVIDER = process.env.GUTENBERG_RTC_TEST_WS_PROVIDER === '1';
-const POLLING_PROVIDER_EXPERIMENT =
-	'gutenberg-real-time-collaboration-polling-provider';
+const COLLABORATION_EXPERIMENT = 'gutenberg-real-time-collaboration';
 
 export default class CollaborationUtils {
 	private admin: Admin;
@@ -265,7 +264,7 @@ export default class CollaborationUtils {
 	 *
 	 * @param page                           The Playwright page to wait on.
 	 * @param [options]                      Optional settings.
-	 * @param [options.requireCollaboration] Whether to require _wpCollaborationEnabled (default true).
+	 * @param [options.requireCollaboration] Whether to require __experimentalEnableRealTimeCollaboration (default true).
 	 * @param [options.timeout]              Maximum wait time in ms (default 10000).
 	 */
 	async waitForEntityReady(
@@ -285,7 +284,8 @@ export default class CollaborationUtils {
 				}
 				if (
 					requireCollab &&
-					( window as any )._wpCollaborationEnabled !== true
+					( window as any )
+						.__experimentalEnableRealTimeCollaboration !== true
 				) {
 					return false;
 				}
@@ -323,7 +323,10 @@ export default class CollaborationUtils {
 				if ( ! postId ) {
 					return false;
 				}
-				if ( ( window as any )._wpCollaborationEnabled !== true ) {
+				if (
+					( window as any )
+						.__experimentalEnableRealTimeCollaboration !== true
+				) {
 					return false;
 				}
 				if (
@@ -367,7 +370,7 @@ export default class CollaborationUtils {
 
 	/**
 	 * Wait for the collaboration runtime to be ready on a page.
-	 * Checks that `window._wpCollaborationEnabled` is true and wp.data is loaded.
+	 * Checks that `window.__experimentalEnableRealTimeCollaboration` is true and wp.data is loaded.
 	 *
 	 * @param page              The Playwright page to wait on.
 	 * @param [options]         Optional settings.
@@ -379,7 +382,8 @@ export default class CollaborationUtils {
 	) {
 		await page.waitForFunction(
 			() =>
-				( window as any )._wpCollaborationEnabled === true &&
+				( window as any ).__experimentalEnableRealTimeCollaboration ===
+					true &&
 				window?.wp?.data &&
 				window?.wp?.blocks,
 			undefined,
@@ -633,13 +637,13 @@ export default class CollaborationUtils {
 }
 
 /**
- * Set the HTTP polling provider experiment for collaboration tests. The
- * WebSocket suite always leaves polling disabled.
+ * Set the real-time collaboration experiment without changing other
+ * experiments.
  *
  * @param requestUtils An instance of RequestUtils for making HTTP requests.
- * @param enabled      Whether to enable or disable the polling experiment.
+ * @param enabled      Whether to enable or disable collaboration.
  */
-async function setPollingProviderExperiment(
+export async function setCollaboration(
 	requestUtils: RequestUtils,
 	enabled: boolean
 ): Promise< void > {
@@ -653,63 +657,15 @@ async function setPollingProviderExperiment(
 		...( settings[ 'gutenberg-experiments' ] || {} ),
 	};
 
-	if ( enabled && ! USE_TEST_WS_PROVIDER ) {
-		experiments[ POLLING_PROVIDER_EXPERIMENT ] = true;
+	if ( enabled ) {
+		experiments[ COLLABORATION_EXPERIMENT ] = true;
 	} else {
-		delete experiments[ POLLING_PROVIDER_EXPERIMENT ];
+		delete experiments[ COLLABORATION_EXPERIMENT ];
 	}
 
 	await requestUtils.rest( {
 		path: '/wp/v2/settings',
 		method: 'POST',
-		data: {
-			'gutenberg-experiments': experiments,
-		},
-	} );
-}
-
-/**
- * Set the real-time collaboration WordPress setting.
- *
- * Uses the form-based approach (similar to setGutenbergExperiments)
- * because this setting is registered on admin_init in the "writing"
- * group and is not exposed via /wp/v2/settings. The HTTP polling experiment
- * is kept in sync, while the WebSocket suite leaves polling disabled.
- *
- * @param requestUtils An instance of RequestUtils for making HTTP requests.
- * @param enabled      Whether to enable or disable collaboration.
- */
-export async function setCollaboration(
-	requestUtils: RequestUtils,
-	enabled: boolean
-): Promise< void > {
-	await setPollingProviderExperiment( requestUtils, enabled );
-
-	// Relative path: a leading slash would resolve against the origin and
-	// break on subdirectory installs.
-	const response = await requestUtils.request.get(
-		'wp-admin/options-writing.php'
-	);
-	const html = await response.text();
-	const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
-
-	const optionName = 'wp_collaboration_enabled';
-	const optionValue = enabled ? 1 : 0;
-
-	const formData: Record< string, string | number > = {
-		option_page: 'writing',
-		action: 'update',
-		_wpnonce: nonce,
-		_wp_http_referer: '/wp-admin/options-writing.php',
-		submit: 'Save Changes',
-		default_category: 1,
-		default_post_format: 0,
-	};
-
-	formData[ optionName ] = optionValue;
-
-	await requestUtils.request.post( 'wp-admin/options.php', {
-		form: formData,
-		failOnStatusCode: true,
+		data: { 'gutenberg-experiments': experiments },
 	} );
 }

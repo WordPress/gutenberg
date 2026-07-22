@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { PostEditorAwareness } from './awareness/post-editor-awareness';
-import { getSyncManager, hasSyncProviders } from './sync';
+import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
 	defaultCollectionSyncConfig,
@@ -348,7 +348,7 @@ export const prePersistPostType = async (
  */
 async function loadPostTypeEntities() {
 	const postTypesPromise = apiFetch( { path: '/wp/v2/types?context=view' } );
-	const taxonomiesPromise = hasSyncProviders()
+	const taxonomiesPromise = window.__experimentalEnableRealTimeCollaboration
 		? apiFetch( { path: '/wp/v2/taxonomies?context=view' } )
 		: Promise.resolve( {} );
 	const [ postTypes, taxonomies ] = await Promise.all( [

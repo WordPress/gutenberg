@@ -7,7 +7,6 @@ jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../sync', () => ( {
 	...jest.requireActual( '../sync' ),
 	getSyncManager: jest.fn(),
-	hasSyncProviders: jest.fn(),
 } ) );
 jest.mock( '../utils/crdt', () => ( {
 	...jest.requireActual( '../utils/crdt' ),
@@ -23,7 +22,7 @@ import {
 	prePersistPostType,
 	additionalEntityConfigLoaders,
 } from '../entities';
-import { getSyncManager, hasSyncProviders } from '../sync';
+import { getSyncManager } from '../sync';
 import {
 	applyPostChangesToCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
@@ -142,22 +141,21 @@ describe( 'loadPostTypeEntities', () => {
 	beforeEach( () => {
 		apiFetch.mockReset();
 		applyPostChangesToCRDTDoc.mockReset();
-		hasSyncProviders.mockImplementation( () =>
-			Boolean( window._wpCollaborationEnabled )
-		);
-		originalCollaborationEnabled = window._wpCollaborationEnabled;
+		originalCollaborationEnabled =
+			window.__experimentalEnableRealTimeCollaboration;
 		originalCollaborationDisabledPostTypes =
 			window._wpCollaborationDisabledPostTypes;
 	} );
 
 	afterEach( () => {
-		window._wpCollaborationEnabled = originalCollaborationEnabled;
+		window.__experimentalEnableRealTimeCollaboration =
+			originalCollaborationEnabled;
 		window._wpCollaborationDisabledPostTypes =
 			originalCollaborationDisabledPostTypes;
 	} );
 
 	it( 'should include custom taxonomy rest_bases in synced properties when collaboration is enabled', async () => {
-		window._wpCollaborationEnabled = true;
+		window.__experimentalEnableRealTimeCollaboration = true;
 
 		const mockPostTypes = {
 			book: {
@@ -204,7 +202,7 @@ describe( 'loadPostTypeEntities', () => {
 	} );
 
 	it( 'should not fetch taxonomies when collaboration is disabled', async () => {
-		window._wpCollaborationEnabled = false;
+		window.__experimentalEnableRealTimeCollaboration = false;
 
 		const mockPostTypes = {
 			post: {
@@ -233,29 +231,8 @@ describe( 'loadPostTypeEntities', () => {
 		expect( syncedProperties ).not.toContain( 'tags' );
 	} );
 
-	it( 'should not fetch taxonomies when no sync provider is available', async () => {
-		window._wpCollaborationEnabled = true;
-		hasSyncProviders.mockReturnValue( false );
-
-		apiFetch.mockResolvedValueOnce( {
-			post: {
-				name: 'Posts',
-				rest_base: 'posts',
-				rest_namespace: 'wp/v2',
-				taxonomies: [ 'category', 'post_tag' ],
-			},
-		} );
-
-		const postTypeLoader = additionalEntityConfigLoaders.find(
-			( loader ) => loader.kind === 'postType'
-		);
-		await postTypeLoader.loadEntities();
-
-		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
-	} );
-
 	it( 'should sync post type entities by default', async () => {
-		window._wpCollaborationEnabled = false;
+		window.__experimentalEnableRealTimeCollaboration = false;
 		window._wpCollaborationDisabledPostTypes = undefined;
 
 		const mockPostTypes = {
@@ -278,7 +255,7 @@ describe( 'loadPostTypeEntities', () => {
 	} );
 
 	it( 'should not sync post type entities disabled for collaboration', async () => {
-		window._wpCollaborationEnabled = false;
+		window.__experimentalEnableRealTimeCollaboration = false;
 		window._wpCollaborationDisabledPostTypes = [ 'book' ];
 
 		const mockPostTypes = {
@@ -301,7 +278,7 @@ describe( 'loadPostTypeEntities', () => {
 	} );
 
 	it( 'should skip taxonomy rest_base when taxonomy is not found in fetched taxonomies', async () => {
-		window._wpCollaborationEnabled = true;
+		window.__experimentalEnableRealTimeCollaboration = true;
 
 		const mockPostTypes = {
 			book: {
@@ -339,7 +316,7 @@ describe( 'loadPostTypeEntities', () => {
 	} );
 
 	it( 'should include base synced properties regardless of taxonomies', async () => {
-		window._wpCollaborationEnabled = true;
+		window.__experimentalEnableRealTimeCollaboration = true;
 
 		const mockPostTypes = {
 			page: {

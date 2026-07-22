@@ -1,27 +1,12 @@
 /**
  * Internal dependencies
  */
-import {
-	getUndoManager,
-	hasSyncProviders as selectHasSyncProviders,
-} from '../private-selectors';
-import { getSyncManager, hasSyncProviders } from '../sync';
+import { getUndoManager } from '../private-selectors';
+import { getSyncManager } from '../sync';
 
 jest.mock( '../sync', () => ( {
 	getSyncManager: jest.fn(),
-	hasSyncProviders: jest.fn(),
 } ) );
-
-describe( 'hasSyncProviders', () => {
-	it.each( [ true, false ] )(
-		'returns provider availability when it is %s',
-		( isAvailable ) => {
-			hasSyncProviders.mockReturnValue( isAvailable );
-
-			expect( selectHasSyncProviders() ).toBe( isAvailable );
-		}
-	);
-} );
 
 describe( 'getUndoManager', () => {
 	afterEach( () => {

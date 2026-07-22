@@ -215,8 +215,11 @@ async function runWebSocketsMode() {
 	await runWpCli( [ 'plugin', 'activate', PLUGIN_SLUG ] );
 	process.stdout.write( 'done\n' );
 
-	process.stdout.write( 'Enabling collaboration option... ' );
-	await runWpCli( [ 'option', 'update', 'wp_collaboration_enabled', '1' ] );
+	process.stdout.write( 'Enabling collaboration experiment... ' );
+	await runWpCli( [
+		'eval',
+		"$experiments = get_option( 'gutenberg-experiments', array() ); $experiments['gutenberg-real-time-collaboration'] = true; update_option( 'gutenberg-experiments', $experiments );",
+	] );
 	process.stdout.write( 'done\n' );
 
 	const server = spawn(

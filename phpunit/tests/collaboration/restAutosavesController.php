@@ -23,13 +23,17 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$author_id );
 		self::delete_user( self::$editor_id );
-		delete_option( 'wp_collaboration_enabled' );
 	}
 
 	public function set_up() {
+		remove_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
 		parent::set_up();
-		update_option( 'wp_collaboration_enabled', 1 );
 		wp_set_current_user( self::$author_id );
+	}
+
+	public function tear_down() {
+		remove_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
+		parent::tear_down();
 	}
 
 	/**
@@ -117,7 +121,7 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 	}
 
 	public function test_auto_draft_autosave_promotes_parent_post_when_collaboration_is_disabled() {
-		update_option( 'wp_collaboration_enabled', 0 );
+		add_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
 
 		$post_id = $this->create_auto_draft();
 		$title   = 'No RTC autosaved title';
@@ -240,7 +244,7 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 	}
 
 	public function test_autosave_compares_against_parent_not_latest_revision_without_collaboration() {
-		update_option( 'wp_collaboration_enabled', 0 );
+		add_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
 
 		$published_title   = 'Published title';
 		$published_content = '<!-- wp:paragraph --><p>Published content</p><!-- /wp:paragraph -->';

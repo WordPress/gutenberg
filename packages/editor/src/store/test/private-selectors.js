@@ -94,17 +94,18 @@ describe( 'isCollaborationEnabledForCurrentPost', () => {
 	let originalCollaborationEnabled;
 
 	beforeEach( () => {
-		originalCollaborationEnabled = window._wpCollaborationEnabled;
-		window._wpCollaborationEnabled = true;
+		originalCollaborationEnabled =
+			window.__experimentalEnableRealTimeCollaboration;
+		window.__experimentalEnableRealTimeCollaboration = true;
 	} );
 
 	afterEach( () => {
-		window._wpCollaborationEnabled = originalCollaborationEnabled;
+		window.__experimentalEnableRealTimeCollaboration =
+			originalCollaborationEnabled;
 	} );
 
 	function setupRegistry( {
 		collaborationSupported = true,
-		hasProviders = true,
 		syncConfig = {},
 	} = {} ) {
 		isCollaborationEnabledForCurrentPost.registry = {
@@ -115,7 +116,6 @@ describe( 'isCollaborationEnabledForCurrentPost', () => {
 					};
 					lock( selectors, {
 						isCollaborationSupported: () => collaborationSupported,
-						hasSyncProviders: () => hasProviders,
 					} );
 					return selectors;
 				}
@@ -143,34 +143,6 @@ describe( 'isCollaborationEnabledForCurrentPost', () => {
 
 		expect( isCollaborationEnabledForCurrentPost( state ) ).toBe( false );
 		expect( shouldSync ).not.toHaveBeenCalled();
-	} );
-
-	it( 'returns false when collaboration is disabled', () => {
-		window._wpCollaborationEnabled = false;
-		setupRegistry( {
-			syncConfig: { supportsPersistence: true },
-		} );
-
-		expect(
-			isCollaborationEnabledForCurrentPost( {
-				postType: 'book',
-				postId: 123,
-			} )
-		).toBe( false );
-	} );
-
-	it( 'returns false when no sync provider is available', () => {
-		setupRegistry( {
-			hasProviders: false,
-			syncConfig: { supportsPersistence: true },
-		} );
-
-		expect(
-			isCollaborationEnabledForCurrentPost( {
-				postType: 'book',
-				postId: 123,
-			} )
-		).toBe( false );
 	} );
 
 	it( 'returns false when the current post type sync config should not sync', () => {
