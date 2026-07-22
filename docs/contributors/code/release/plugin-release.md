@@ -295,9 +295,9 @@ If the cherry-picked fixes deserve another release candidate before the stable v
 
 Only once you’re happy with the shape of the changelog in the release draft, press the “Publish release” button.
 
-Note that you do not need to change the checkboxes above the button. If you are publishing an RC, the “Set as a pre-release” will automatically be selected, and “Set as the latest release” will be selected if you are publishing the stable version.
+Note that you do not need to change the “Release label” option above the button. If you are publishing an RC, “Pre-release” will automatically be selected, and “Latest” will be selected if you are publishing the stable version.
 
-![Publishing the release checkboxes for an RC](https://developer.wordpress.org/files/2023/07/image.png)
+![Release label options in the GitHub release form](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/github-release-label.png)
 
 Publishing the release will create a `git` tag for the version, publish the release, and trigger [another GHA workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) with a twofold purpose:
 
