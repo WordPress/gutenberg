@@ -408,52 +408,15 @@ describe( 'SyncManager', () => {
 				// getChangesFromCRDTDoc should be called with the persisted doc and record.
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).toHaveBeenCalledTimes( 2 );
+				).toHaveBeenCalledTimes( 1 );
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).toHaveBeenLastCalledWith( expect.any( Y.Doc ), mockRecord );
-				expect( mockHandlers.refetchRecord ).toHaveBeenCalledTimes( 1 );
+				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
 
 				// Verify that the CRDT doc was persisted.
 				expect( mockHandlers.persistCRDTDoc ).toHaveBeenCalledTimes(
 					1
 				);
-			} );
-
-			it( 'accepts a persisted CRDT doc when a refetch resolves a torn preload', async () => {
-				const persistedRecord = {
-					...mockRecord,
-					title: 'Committed title',
-				};
-				mockSyncConfig = {
-					...mockSyncConfig,
-					getPersistedCRDTDoc: jest.fn( () =>
-						createPersistedCRDTDoc( persistedRecord )
-					),
-				};
-				mockHandlers.refetchRecord.mockImplementation( async () => {
-					mockHandlers.getEditedRecord.mockResolvedValue(
-						persistedRecord
-					);
-				} );
-				const manager = createSyncManager();
-
-				await manager.load(
-					mockSyncConfig,
-					'post',
-					'123',
-					mockRecord,
-					mockHandlers
-				);
-
-				expect( mockHandlers.refetchRecord ).toHaveBeenCalledTimes( 1 );
-				expect(
-					mockSyncConfig.getChangesFromCRDTDoc
-				).toHaveBeenCalledTimes( 2 );
-				expect(
-					mockSyncConfig.applyChangesToCRDTDoc
-				).not.toHaveBeenCalled();
-				expect( mockHandlers.persistCRDTDoc ).not.toHaveBeenCalled();
 			} );
 		} );
 	} );

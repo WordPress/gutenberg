@@ -1151,6 +1151,15 @@ test.describe( 'Block Notes', () => {
 			editor,
 			page,
 		} ) => {
+			let repairCompleted = false;
+			page.on( 'response', ( response ) => {
+				if (
+					response.ok() &&
+					isTargetedRepairRequest( response.request() )
+				) {
+					repairCompleted = true;
+				}
+			} );
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 				attributes: { content: 'Persist this inline note.' },
@@ -1177,6 +1186,7 @@ test.describe( 'Block Notes', () => {
 			await expect(
 				editor.canvas.locator( 'mark.wp-note' )
 			).toBeVisible();
+			expect( repairCompleted ).toBe( true );
 
 			await page.reload();
 

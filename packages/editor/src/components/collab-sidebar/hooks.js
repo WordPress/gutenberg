@@ -440,23 +440,43 @@ export function useNoteActions() {
 					metadata,
 					savedRecord.id
 				);
-				const newAttributes = {
-					metadata: cleanEmptyObject( updatedMetadata ),
-				};
+				const getRepairedAttributes = ( blockAttributes ) => {
+					const repairedAttributes = {
+						metadata: cleanEmptyObject(
+							mergeNoteMetadata(
+								blockAttributes?.metadata,
+								updatedMetadata
+							)
+						),
+					};
+					if ( inlineSelection ) {
+						const inlineContent =
+							blockAttributes?.[ inlineSelection.attributeKey ];
+						if (
+							! ( inlineContent instanceof RichTextData ) ||
+							inlineContent
+								.toString()
+								.slice(
+									inlineSelection.start,
+									inlineSelection.end
+								) !== inlineSelectionText
+						) {
+							return null;
+						}
 
-				// Inline path: also wrap the selected text with a core/note
-				// marker so the anchor survives later edits.
-				if ( inlineSelection ) {
-					const wrapped = wrapInlineNote(
-						attributes?.[ inlineSelection.attributeKey ],
-						savedRecord.id,
-						inlineSelection.start,
-						inlineSelection.end
-					);
-					if ( wrapped ) {
-						newAttributes[ inlineSelection.attributeKey ] = wrapped;
+						const wrapped = wrapInlineNote(
+							inlineContent,
+							savedRecord.id,
+							inlineSelection.start,
+							inlineSelection.end
+						);
+						if ( wrapped ) {
+							repairedAttributes[ inlineSelection.attributeKey ] =
+								wrapped;
+						}
 					}
-				}
+					return repairedAttributes;
+				};
 
 				const blocks = getBlocks();
 				const blockPath = getBlockPath( blocks, clientId );
@@ -470,51 +490,44 @@ export function useNoteActions() {
 					isMatch
 				);
 
-				updateBlockAttributes( clientId, newAttributes );
+				let didPersist = false;
+				let localAttributes;
+				try {
+					if ( persistEntityBlockAttributes ) {
+						didPersist = await persistEntityBlockAttributes(
+							'postType',
+							getCurrentPostType(),
+							getCurrentPostId(),
+							{
+								record: getCurrentPost(),
+								blockPath,
+								isMatch,
+								matchCount,
+								matchIndex,
+								blockCount: getBlockCount( blocks ),
+								blockName: selectedBlock?.name,
+								attributes: getRepairedAttributes,
+							}
+						);
+					}
+				} finally {
+					localAttributes = getRepairedAttributes(
+						getBlockAttributes( clientId )
+					);
+					if ( localAttributes ) {
+						updateBlockAttributes( clientId, localAttributes );
+					}
+				}
 
-				if (
-					! persistEntityBlockAttributes ||
-					! ( await persistEntityBlockAttributes(
-						'postType',
-						getCurrentPostType(),
-						getCurrentPostId(),
-						{
-							record: getCurrentPost(),
-							blockPath,
-							isMatch,
-							matchCount,
-							matchIndex,
-							blockCount: getBlockCount( blocks ),
-							blockName: selectedBlock?.name,
-							attributes: ( blockAttributes ) => {
-								const repairedAttributes = {
-									metadata: cleanEmptyObject(
-										mergeNoteMetadata(
-											blockAttributes?.metadata,
-											updatedMetadata
-										)
-									),
-								};
-								if ( inlineSelection ) {
-									const wrapped = wrapInlineNote(
-										blockAttributes?.[
-											inlineSelection.attributeKey
-										],
-										savedRecord.id,
-										inlineSelection.start,
-										inlineSelection.end
-									);
-									if ( wrapped ) {
-										repairedAttributes[
-											inlineSelection.attributeKey
-										] = wrapped;
-									}
-								}
-								return repairedAttributes;
-							},
-						}
-					) )
-				) {
+				if ( ! localAttributes ) {
+					onError(
+						new Error(
+							__(
+								'The note was added, but its selected text changed before the attachment could be saved.'
+							)
+						)
+					);
+				} else if ( ! didPersist ) {
 					onError(
 						new Error(
 							__(
