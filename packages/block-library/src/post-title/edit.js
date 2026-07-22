@@ -63,9 +63,11 @@ export default function PostTitleEdit( {
 		postId
 	);
 	const [ link ] = useEntityProp( 'postType', postType, 'link', postId );
-	const onSplitAtEnd = () => {
-		insertBlocksAfter( createBlock( getDefaultBlockName() ) );
-	};
+	const onSplitAtEnd = insertBlocksAfter
+		? () => {
+				insertBlocksAfter( createBlock( getDefaultBlockName() ) );
+		  }
+		: undefined;
 	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();

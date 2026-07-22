@@ -19,18 +19,15 @@ import type {
 /**
  * Internal dependencies
  */
-import { useInlineControlsFit } from '../components/widget-attribute-controls/use-inline-controls-fit';
+import { useInlineFit } from '../components/widget-attributes/use-inline-fit';
 import { WidgetDashboard } from '../widget-dashboard';
 import type { DashboardWidget } from '../types';
 
-jest.mock(
-	'../components/widget-attribute-controls/use-inline-controls-fit',
-	() => ( {
-		useInlineControlsFit: jest.fn(),
-	} )
-);
+jest.mock( '../components/widget-attributes/use-inline-fit', () => ( {
+	useInlineFit: jest.fn(),
+} ) );
 
-const mockedUseInlineControlsFit = jest.mocked( useInlineControlsFit );
+const mockedUseInlineFit = jest.mocked( useInlineFit );
 
 function TestWidget( {
 	attributes,
@@ -97,9 +94,9 @@ function Harness() {
 	);
 }
 
-describe( 'WidgetAttributeControls fit', () => {
+describe( 'WidgetAttributes fit', () => {
 	beforeEach( () => {
-		mockedUseInlineControlsFit.mockReturnValue( {
+		mockedUseInlineFit.mockReturnValue( {
 			measureRef: () => {},
 			collapsed: false,
 		} );
@@ -125,7 +122,7 @@ describe( 'WidgetAttributeControls fit', () => {
 	} );
 
 	it( 'collapses the fields into a dropdown when space runs out', async () => {
-		mockedUseInlineControlsFit.mockReturnValue( {
+		mockedUseInlineFit.mockReturnValue( {
 			measureRef: () => {},
 			collapsed: true,
 		} );
@@ -164,7 +161,7 @@ describe( 'WidgetAttributeControls fit', () => {
 	} );
 
 	it( 'stages edits made from the dropdown form', async () => {
-		mockedUseInlineControlsFit.mockReturnValue( {
+		mockedUseInlineFit.mockReturnValue( {
 			measureRef: () => {},
 			collapsed: true,
 		} );
@@ -188,7 +185,7 @@ describe( 'WidgetAttributeControls fit', () => {
 	} );
 
 	it( 'dismisses the dropdown with Escape and restores focus', async () => {
-		mockedUseInlineControlsFit.mockReturnValue( {
+		mockedUseInlineFit.mockReturnValue( {
 			measureRef: () => {},
 			collapsed: true,
 		} );
@@ -215,7 +212,7 @@ describe( 'WidgetAttributeControls fit', () => {
 	} );
 
 	it( 'locks the fit while the dropdown is open', async () => {
-		mockedUseInlineControlsFit.mockReturnValue( {
+		mockedUseInlineFit.mockReturnValue( {
 			measureRef: () => {},
 			collapsed: true,
 		} );
@@ -223,7 +220,7 @@ describe( 'WidgetAttributeControls fit', () => {
 		render( <Harness /> );
 		await screen.findByTestId( 'metric' );
 
-		expect( mockedUseInlineControlsFit ).toHaveBeenLastCalledWith(
+		expect( mockedUseInlineFit ).toHaveBeenLastCalledWith(
 			expect.objectContaining( { locked: false } )
 		);
 
@@ -232,7 +229,7 @@ describe( 'WidgetAttributeControls fit', () => {
 		);
 		await screen.findByRole( 'dialog', { name: 'Widget controls' } );
 
-		expect( mockedUseInlineControlsFit ).toHaveBeenLastCalledWith(
+		expect( mockedUseInlineFit ).toHaveBeenLastCalledWith(
 			expect.objectContaining( { locked: true } )
 		);
 
@@ -244,14 +241,14 @@ describe( 'WidgetAttributeControls fit', () => {
 		);
 
 		// Escape restores focus to the trigger, which keeps the hold.
-		expect( mockedUseInlineControlsFit ).toHaveBeenLastCalledWith(
+		expect( mockedUseInlineFit ).toHaveBeenLastCalledWith(
 			expect.objectContaining( { locked: true } )
 		);
 
 		// The hold releases once focus moves on.
 		await user.tab();
 		await waitFor( () =>
-			expect( mockedUseInlineControlsFit ).toHaveBeenLastCalledWith(
+			expect( mockedUseInlineFit ).toHaveBeenLastCalledWith(
 				expect.objectContaining( { locked: false } )
 			)
 		);
@@ -264,7 +261,7 @@ describe( 'WidgetAttributeControls fit', () => {
 
 		await user.click( screen.getAllByRole( 'combobox' )[ 0 ] );
 
-		expect( mockedUseInlineControlsFit ).toHaveBeenLastCalledWith(
+		expect( mockedUseInlineFit ).toHaveBeenLastCalledWith(
 			expect.objectContaining( { locked: true } )
 		);
 
@@ -272,14 +269,14 @@ describe( 'WidgetAttributeControls fit', () => {
 		await user.click( screen.getByTestId( 'metric' ) );
 
 		await waitFor( () =>
-			expect( mockedUseInlineControlsFit ).toHaveBeenLastCalledWith(
+			expect( mockedUseInlineFit ).toHaveBeenLastCalledWith(
 				expect.objectContaining( { locked: false } )
 			)
 		);
 	} );
 
 	it( 'keeps the settings surface reachable while collapsed', async () => {
-		mockedUseInlineControlsFit.mockReturnValue( {
+		mockedUseInlineFit.mockReturnValue( {
 			measureRef: () => {},
 			collapsed: true,
 		} );

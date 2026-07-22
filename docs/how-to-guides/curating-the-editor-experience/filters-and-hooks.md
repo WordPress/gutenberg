@@ -83,75 +83,119 @@ The filter receives an instance of the `WP_Theme_JSON_Data class` with the data 
 
 DataViews-powered screens (such as the Pages list and its Quick Edit form) build their configuration on the server. A dynamic filter, `get_entity_view_config_{$kind}_{$name}`, lets you customize that configuration for a specific entity, where the dynamic portions are the entity kind (e.g. `postType`) and name (e.g. `page`).
 
-The configuration has four keys: `default_view`, `default_layouts`, `view_list` (the saved views shown in the list), and `form` (the DataForm used by consumers like Quick Edit).
+The configuration has four top-level keys: `default_view`, `default_layouts`, `view_list` (the saved views shown in the list), and `form` (the DataForm used by consumers like Quick Edit).
 
-The filter receives an object holding the entity's view configuration. Change the configuration by calling its methods and return the object. Each method merges a partial change (a patch) into one part of the configuration, and patches follow three shared rules: an associative array merges key by key, a numerically indexed array replaces the current value wholesale, and `null` deletes what it names.
+The filter receives a `Gutenberg_View_Config_Data` object holding the entity's view configuration. Change the configuration by calling its methods and **return the object** (a callback that returns anything else is ignored and the unfiltered configuration is used). Only the four documented top-level keys are accepted; a patch that names any other key, or that declares an unsupported `$version`, is rejected with a `_doing_it_wrong()` notice.
 
--   `update_properties( $patch, $version )` merges into `default_view`, `default_layouts`, and the `form` properties other than its `fields`. Passing `null` for a whole top-level key resets it to its default.
--   `update_view_list_items( $items, $version )` adds, updates, or removes views in the `view_list`, keyed by `slug`: a matching view merges in place, an unknown slug appends a new view to the end, and `null` removes the view.
--   `update_form_fields( $fields, $version )` adds, updates, or removes `form` fields, keyed by `id`. A field is found wherever it lives — at the top level or nested inside a group's `children` — so a patch only needs the id: a matching field merges in place, an unknown id appends a new field, and `null` removes the field. Within a field patch, `children` follows the shared rules: an associative array merges into the group's children by `id` (unknown ids append to the group), a numerically indexed array replaces the children wholesale, and `null` deletes the key.
+### Merging a patch
 
-For form fields, the id always lives in the patch key and the value only carries overrides, so a new field with no overrides is expressed as `'my_field' => array()` — not `array( 'my_field' )`, which is a numerically indexed array and would replace the group's children with just that field. Patch entries apply in order and `null` removes every occurrence of an id, so to move a field into a group, remove it first and append it to the group's `children` later in the same patch.
+`merge( $patch, $version )` merges a partial change (a *patch*) into the configuration. The patch is applied recursively, and each value is handled according to its shape:
+
+-   A **scalar** replaces the current value.
+-   An **associative array** (map) merges key by key, recursing into each key.
+-   A **list** (a sequential, zero-indexed array) merges member by member *by identity*: a member whose identity matches one already present merges into it in place and keeps its position, and an unmatched member is appended to the end. A member's identity is the value of the first identity key (`id`, `slug`, or `field`) it carries, or, for a bare scalar member, the scalar itself. Because only the value matters, a bare string like `'my_field'` matches a map carrying that same value under any identity key.
+-   `null` deletes the property it names. Passing `null` for a whole top-level key drops it, which reads as a reset: `gutenberg_get_entity_view_config()` backfills any missing top-level key from the defaults.
+
+These rules apply at every nesting level. In `view_list`, entries merge by `slug`. Within a `form`, `fields` is a list whose members merge by their `id`; a group's `children` is an identity-merged list too, so listing a field in a group's `children` appends it there. Because `merge()` only adds to or updates lists, it never removes an existing list member — to drop members, replace the list with `replace()`.
+
+### Replacing lists
+
+`replace( $patch, $version )` applies a patch exactly like `merge()` — scalars replace, maps merge key by key, and `null` deletes — with one difference: any **list** the patch names replaces the current list wholesale instead of merging into it by identity. Use it to pin a list to an exact set of members, for example to remove saved views by giving a shorter `view_list`, or to drop form fields by giving a shorter `form.fields`.
+
+`replace()` does *not* replace a whole top-level key wholesale: because a map still merges key by key, keys the patch omits from an associative value (such as `default_view` or `form`) are preserved. To fully swap an associative top-level key, drop it first with a `null` patch and then apply the new value.
+
+Prefer `merge()`: a callback that replaces a list stops inheriting core's future additions to it.
+
+### Removing entries
+
+`remove( $spec, $version )` deletes entries without touching the rest. Where the other methods take a patch of *values* to write, `remove()` takes a *spec of names* to delete, and its shape mirrors the configuration it prunes:
+
+-   A **list** of names deletes each named entry at that level: a key from a map, or the member with a matching identity (`id`, `slug`, `field`, or a bare scalar) from a list.
+-   An **associative array** maps a name to a nested spec, recursing into that entry's value to prune from within it.
+
+For example, `array( 'default_view' )` drops the whole `default_view` key, `array( 'default_view' => array( 'sort' ) )` drops just its `sort` property, and `array( 'view_list' => array( 'drafts' ) )` drops the saved view whose `slug` is `drafts` while leaving every other view in place. A name that is not present is ignored, and a list is renumbered after a member is removed.
+
+This is the targeted counterpart to `replace()`: to drop a single saved view or form field, name it with `remove()` instead of pinning the whole `view_list` or `form.fields` to a shorter list — so the callback keeps inheriting core's future additions to the entries it does not touch.
+
+### The version argument
 
 The `$version` argument declares the configuration schema version the patch was written against (currently `1`), so that a future release that changes the configuration shape can migrate existing patches forward instead of breaking them.
 
-In the following example, a custom saved view is added to the `page` list, the existing Drafts view is retitled, the Trash view is removed, the `grid` layout option is unset, and `slug` and `author` fields are removed from the form.
+### Example
+
+In the following example, `merge()` adds a custom saved view to the `page` list, retitles the existing Drafts view, unsets the `grid` layout option, changes the post content info field's label position, and appends a new field to the discussion group. Then `replace()` swaps the whole set of form fields for an exact list, and `remove()` drops the Pending saved view by slug.
 
 ```php
 function example_filter_page_view_config( $data ) {
-    // Patch the view list by slug: add a saved view, retitle the existing
-    // Drafts view — only the given keys change — and remove the Trash view
-    // with null.
-    $data->update_view_list_items(
+    // merge(): patch the view list by slug — add a saved view and retitle the
+    // existing Drafts view. Only the given keys change; every other view is
+    // left in place.
+    $data->merge(
         array(
-            'my-drafts' => array(
-                'title' => __( 'My drafts', 'example' ),
-                'view'  => array(
-                    'filters' => array(
-                        array(
-                            'field'    => 'status',
-                            'operator' => 'isAny',
-                            'value'    => 'draft',
-                            'isLocked' => true,
+            'view_list' => array(
+                array(
+                    'slug'  => 'my-drafts',
+                    'title' => __( 'My drafts', 'example' ),
+                    'view'  => array(
+                        'filters' => array(
+                            array(
+                                'field'    => 'status',
+                                'operator' => 'isAny',
+                                'value'    => 'draft',
+                                'isLocked' => true,
+                            ),
                         ),
                     ),
                 ),
-            ),
-            'drafts'    => array(
-                'title' => __( 'In progress', 'example' ),
-            ),
-            'trash'     => null,
-        ),
-        1
-    );
-
-    // Patch form fields by id, wherever they live in the form: update the
-    // label position of the post content info field, remove the slug and
-    // author fields with null, and append a new field to the discussion
-    // group's children ( array() carries no overrides ).
-    $data->update_form_fields(
-        array(
-            'post-content-info' => array(
-                'layout' => array( 'labelPosition' => 'side' ),
-            ),
-            'slug'              => null,
-            'author'            => null,
-            'discussion'        => array(
-                'children' => array( 'my_field' => array() ),
+                array(
+                    'slug'  => 'drafts',
+                    'title' => __( 'In progress', 'example' ),
+                ),
             ),
         ),
         1
     );
 
-    // Unset a nested value with null: drop the grid layout option. Form
-    // properties other than `fields` also merge here.
-    $data->update_properties(
+    // merge(): patch properties — unset a nested value with null to drop the
+    // grid layout option, change a form property, update the label position of
+    // the post content info field by id, and append a new field ( a bare
+    // string ) to the discussion group's children.
+    $data->merge(
         array(
             'default_layouts' => array( 'grid' => null ),
-            'form'            => array( 'layout' => array( 'type' => 'regular' ) ),
+            'form'            => array(
+                'layout' => array( 'type' => 'regular' ),
+                'fields' => array(
+                    array(
+                        'id'     => 'post-content-info',
+                        'layout' => array( 'labelPosition' => 'side' ),
+                    ),
+                    array(
+                        'id'       => 'discussion',
+                        'children' => array( 'my_field' ),
+                    ),
+                ),
+            ),
         ),
         1
     );
+
+    // replace(): swap the form field list wholesale. Because `fields` is a
+    // list, replace() drops every field not listed here rather than merging;
+    // the surrounding `form` map still merges, so `layout` is untouched.
+    $data->replace(
+        array(
+            'form' => array(
+                'fields' => array( 'title', 'status', 'author' ),
+            ),
+        ),
+        1
+    );
+
+    // remove(): drop the "Pending" saved view by slug, without touching the
+    // rest of the list. Naming the one member keeps inheriting core's future
+    // additions to view_list — unlike replacing it with a shorter list.
+    $data->remove( array( 'view_list' => array( 'pending' ) ), 1 );
 
     return $data;
 }

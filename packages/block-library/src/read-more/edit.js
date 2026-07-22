@@ -64,8 +64,13 @@ export default function ReadMore( {
 				onChange={ ( newValue ) =>
 					setAttributes( { content: newValue } )
 				}
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+				__unstableOnSplitAtEnd={
+					insertBlocksAfter
+						? () =>
+								insertBlocksAfter(
+									createBlock( getDefaultBlockName() )
+								)
+						: undefined
 				}
 				withoutInteractiveFormatting
 				{ ...blockProps }
