@@ -54,11 +54,11 @@ Most files fall into one of these patterns:
 
 For example, `lib/block-supports/layout.php` maps to `src/wp-includes/block-supports/layout.php`.
 
-**Compat shim files** — files under `lib/compat/wordpress-X.Y/` are addition-only shims wrapped in `if ( ! function_exists() )` guards. Do not copy the whole file. Instead, apply just the additions to the equivalent WP Core file with the versioned prefix stripped:
+**Compat shim files** — files under `lib/compat/wordpress-X.Y/` contain compatibility shims for older WordPress versions. Do not copy the whole file. Instead, port the relevant change into the equivalent WP Core file (often under `src/wp-includes/`):
 
 |  Gutenberg | wordpress-develop |
 | --- | --- |
-| `lib/compat/wordpress-X.Y/<filename>` | `src/wp-includes/<filename>` |
+| `lib/compat/wordpress-X.Y/<filename>` | `src/wp-includes/<filename>` (common case) |
 
 The destination sometimes lives in a subdirectory that isn't reflected in the Gutenberg path (for example, `lib/compat/wordpress-7.0/class-wp-http-polling-sync-server.php` lands in `src/wp-includes/collaboration/`). Search WP Core for the file or class name to locate it.
 
