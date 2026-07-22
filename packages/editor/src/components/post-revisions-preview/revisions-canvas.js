@@ -8,10 +8,10 @@ import clsx from 'clsx';
  */
 import { Spinner } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { select as globalSelect, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useContext, useEffect } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
-import { getBlockType, store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import { sprintf, __ } from '@wordpress/i18n';
 
 /**
@@ -123,16 +123,38 @@ function getDiffStatusLabel( status, blockTitle ) {
  * Only the block itself is affected: nested blocks set up their own private
  * context, so they don't inherit an ancestor's diff label.
  *
- * @param {Object}      props          Component props.
- * @param {string}      props.label    The diff status label.
- * @param {JSX.Element} props.children The block to label.
+ * @param {Object}      props            Component props.
+ * @param {string}      props.status     The diff status.
+ * @param {string}      props.name       The block name.
+ * @param {Object}      props.attributes The block attributes.
+ * @param {JSX.Element} props.children   The block to label.
  * @return {JSX.Element} The labelled block.
  */
-function BlockDiffLabelProvider( { label, children } ) {
+function BlockDiffLabelProvider( { status, name, attributes, children } ) {
 	const context = useContext( PrivateBlockContext );
+	// Resolve the variation-aware title (e.g. "Row" instead of "Group") so
+	// blocks are announced by the name users know them as. The canvas's
+	// default wrapper labels can't be reused here: in preview mode they
+	// intentionally skip variation matching.
+	const blockTitle = useSelect(
+		( select ) => {
+			const { getActiveBlockVariation, getBlockType } =
+				select( blocksStore );
+			return (
+				getActiveBlockVariation( name, attributes )?.title ??
+				getBlockType( name )?.title
+			);
+		},
+		[ name, attributes ]
+	);
 	return (
 		<PrivateBlockContext.Provider
-			value={ { ...context, ariaLabel: label } }
+			value={ {
+				...context,
+				ariaLabel: blockTitle
+					? getDiffStatusLabel( status, blockTitle )
+					: undefined,
+			} }
 		>
 			{ children }
 		</PrivateBlockContext.Provider>
@@ -150,22 +172,6 @@ function withRevisionDiffClasses( BlockListBlock ) {
 		const { block, className, name, attributes } = props;
 		const diffStatus = block?.__revisionDiffStatus?.status;
 
-		let diffLabel;
-		if ( diffStatus ) {
-			// Resolve the variation-aware title (e.g. "Row" instead of
-			// "Group") so blocks are announced by the name users know them
-			// as. The canvas's default wrapper labels can't be reused here:
-			// in preview mode they intentionally skip variation matching.
-			const blockTitle =
-				globalSelect( blocksStore ).getActiveBlockVariation(
-					name,
-					attributes
-				)?.title ?? getBlockType( name )?.title;
-			if ( blockTitle ) {
-				diffLabel = getDiffStatusLabel( diffStatus, blockTitle );
-			}
-		}
-
 		const enhancedClassName = clsx( className, {
 			'is-revision-added': diffStatus === 'added',
 			'is-revision-removed': diffStatus === 'removed',
@@ -173,15 +179,19 @@ function withRevisionDiffClasses( BlockListBlock ) {
 		} );
 
 		// This filter runs for every block in every editor, so the private
-		// context is only overridden where a diff label actually applies.
-		if ( ! diffLabel ) {
+		// context is only overridden where a diff status actually applies.
+		if ( ! diffStatus ) {
 			return (
 				<BlockListBlock { ...props } className={ enhancedClassName } />
 			);
 		}
 
 		return (
-			<BlockDiffLabelProvider label={ diffLabel }>
+			<BlockDiffLabelProvider
+				status={ diffStatus }
+				name={ name }
+				attributes={ attributes }
+			>
 				<BlockListBlock { ...props } className={ enhancedClassName } />
 			</BlockDiffLabelProvider>
 		);
