@@ -1,14 +1,16 @@
 ---
 name: design-system-ui-composition
-description: Build a Gutenberg feature, plugin interface, or standalone application with public `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme` APIs. Use for consumer implementation work; do not use to change package source or depend on package-private implementation details.
+description: Build or change any Gutenberg feature, plugin interface, or standalone application UI with public `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme` APIs when they fit the user need. Use for UI/UX implementation work, including when the code does not yet use the Design System; do not use to change package source or depend on package-private implementation details.
 ---
 
 # Compose a WordPress Design System interface
 
 ## Authority and scope
 
-- Use this skill for application work that consumes `@wordpress/components`,
-  `@wordpress/ui`, or `@wordpress/theme` through public APIs only.
+- Use this skill for application UI/UX work, including code that does not yet
+  consume `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme`.
+- Prefer public Design System composition when it meets the concrete user need;
+  retain custom UI when the public surface is unsuitable and state why.
 - Keep the target checkout or installed package version as the compatibility
   boundary. Do not infer package-change, commit, push, or pull-request
   authority.
@@ -20,6 +22,10 @@ description: Build a Gutenberg feature, plugin interface, or standalone applicat
 Identify the target checkout or installed package versions, the runtime
 (standard WordPress screen, separate application, iframe, or portal), and the
 user-facing behaviour. Treat that local target as the compatibility boundary.
+
+Before writing custom UI, determine whether an existing public component, token,
+or composition already meets the need. The absence of an existing Design System
+import does not establish that a custom control is necessary.
 
 If a WordPress Design System MCP server is available, use it to discover the
 current vocabulary and components. Then verify the recommendation against the
