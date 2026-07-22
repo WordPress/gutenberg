@@ -6,6 +6,11 @@
 
 -   Widgets: carry a widget's declarative `actions` from `widget.json` into
     the generated PHP registry ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+-   Widgets: emit a generated `build/widgets/widget-strings.php` with one
+    `_x()` call per translatable `widget.json` metadata value, so gettext
+    extraction tooling sees the strings the runtime translates from the
+    hydrated registry; `wpPlugin.textdomain` sets a project-level default
+    `textdomain` ([#80564](https://github.com/WordPress/gutenberg/pull/80564)).
 
 ### Bug Fixes
 
