@@ -336,6 +336,7 @@ describe( 'resolveStyle – merged output', () => {
 			};
 			const { value, sources } = resolveStyle( gs, {
 				blockName: 'core/button',
+				elements: [ 'button' ],
 			} );
 			// Element styles surface as the block's own inherited values, so
 			// the Typography/Background/Border controls reflect the canvas.
@@ -363,6 +364,7 @@ describe( 'resolveStyle – merged output', () => {
 			};
 			const { value, sources } = resolveStyle( gs, {
 				blockName: 'core/button',
+				elements: [ 'button' ],
 			} );
 			expect( value.color.text ).toBe( 'blockText' );
 			expect( sources[ 'color.text' ]?.layer ).toBe( 'block' );
@@ -378,6 +380,7 @@ describe( 'resolveStyle – merged output', () => {
 			};
 			const { value } = resolveStyle( gs, {
 				blockName: 'core/heading',
+				elements: [ 'heading' ],
 			} );
 			expect( value.typography.fontWeight ).toBe( '700' );
 		} );
@@ -409,9 +412,78 @@ describe( 'resolveStyle – merged output', () => {
 			};
 			const { value } = resolveStyle( gs, {
 				blockName: 'core/button',
+				elements: [ 'button' ],
 				...HOVER_STATE,
 			} );
 			expect( value.color.background ).toBe( 'elementHover' );
+		} );
+
+		test( 'level-specific `h2` element wins over the generic `heading` element', () => {
+			const gs = {
+				styles: {
+					elements: {
+						heading: {
+							typography: {
+								fontWeight: '700',
+								lineHeight: '1.4',
+							},
+						},
+						h2: { typography: { fontWeight: '900' } },
+					},
+				},
+			};
+			// `elements` is ordered low to high precedence, so the level layer
+			// (`h2`) overrides the shared `heading` layer for the leaves it
+			// sets, while `heading`-only leaves still surface.
+			const { value, sources } = resolveStyle( gs, {
+				blockName: 'core/heading',
+				elements: [ 'heading', 'h2' ],
+			} );
+			expect( value.typography.fontWeight ).toBe( '900' );
+			expect( value.typography.lineHeight ).toBe( '1.4' );
+			expect( sources[ 'typography.fontWeight' ]?.layer ).toBe(
+				'element'
+			);
+		} );
+
+		test( 'no element layer folds when the caller passes an empty array (level 0)', () => {
+			// A Site/Post Title at level 0 renders `<p>`, so the caller maps it
+			// to no element keys and neither `heading` nor `hN` should fold.
+			const gs = {
+				styles: {
+					elements: {
+						heading: { typography: { fontWeight: '700' } },
+						h2: { typography: { fontWeight: '900' } },
+					},
+				},
+			};
+			const { value } = resolveStyle( gs, {
+				blockName: 'core/post-title',
+				elements: [],
+			} );
+			expect( value.typography?.fontWeight ).toBeUndefined();
+		} );
+
+		test( 'block-type styles still override the folded element layers', () => {
+			const gs = {
+				styles: {
+					elements: {
+						heading: { typography: { fontWeight: '700' } },
+						h2: { typography: { fontWeight: '900' } },
+					},
+					blocks: {
+						'core/heading': {
+							typography: { fontWeight: '400' },
+						},
+					},
+				},
+			};
+			const { value, sources } = resolveStyle( gs, {
+				blockName: 'core/heading',
+				elements: [ 'heading', 'h2' ],
+			} );
+			expect( value.typography.fontWeight ).toBe( '400' );
+			expect( sources[ 'typography.fontWeight' ]?.layer ).toBe( 'block' );
 		} );
 	} );
 
@@ -687,6 +759,38 @@ describe( 'resolveStyle – memoization', () => {
 			blockName: 'core/paragraph',
 		} );
 		expect( a ).toEqual( {} );
+	} );
+
+	test( 'different `elements` arrays key distinct cache entries', () => {
+		// Two heading levels share a block name and payload, so the element
+		// list must take part in the cache key or they would collide.
+		const gs = {
+			styles: {
+				elements: {
+					heading: { typography: { fontWeight: '700' } },
+					h1: { typography: { fontWeight: '900' } },
+					h2: { typography: { fontWeight: '400' } },
+				},
+			},
+		};
+		const h1 = resolveStyle( gs, {
+			blockName: 'core/heading',
+			elements: [ 'heading', 'h1' ],
+		} );
+		const h2 = resolveStyle( gs, {
+			blockName: 'core/heading',
+			elements: [ 'heading', 'h2' ],
+		} );
+		expect( h1 ).not.toBe( h2 );
+		expect( h1.value.typography.fontWeight ).toBe( '900' );
+		expect( h2.value.typography.fontWeight ).toBe( '400' );
+
+		// Identical element lists still return the memoized identity.
+		const h2Again = resolveStyle( gs, {
+			blockName: 'core/heading',
+			elements: [ 'heading', 'h2' ],
+		} );
+		expect( h2Again ).toBe( h2 );
 	} );
 } );
 
