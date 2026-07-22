@@ -76,6 +76,8 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
 - **shadow**: `.wp-block-navigation-submenu > .wp-block-navigation__submenu-container`
+- **states**:
+  - -current: `.wp-block-navigation .wp-block-navigation-submenu .current-menu-item`
 
 ## Block Markup
 
