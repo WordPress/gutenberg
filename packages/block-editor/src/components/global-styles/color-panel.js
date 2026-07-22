@@ -22,6 +22,7 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
+import { ENABLE_GLOBAL_STYLES_INHERITANCE } from './inheritance';
 
 // Despite the "ColorPanel" name, this gates only the element-level color
 // controls (link, heading, button, caption, h1–h6) — surfaced as the
@@ -149,7 +150,7 @@ export default function ColorPanel( {
 	label,
 	children,
 	contrastWarning,
-	showInheritanceLabelIndicators = true,
+	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
 } ) {
 	const {
 		colors,
@@ -327,6 +328,10 @@ export default function ColorPanel( {
 						inheritedValue?.elements?.link?.color?.text,
 						'color'
 					),
+					userSlug: extractPresetSlug(
+						value?.elements?.link?.color?.text,
+						'color'
+					),
 					setValue: setLinkColor,
 					userValue: userLinkColor,
 					isPlaceholder:
@@ -339,6 +344,10 @@ export default function ColorPanel( {
 					inheritedSlug: extractPresetSlug(
 						inheritedValue?.elements?.link?.[ ':hover' ]?.color
 							?.text,
+						'color'
+					),
+					userSlug: extractPresetSlug(
+						value?.elements?.link?.[ ':hover' ]?.color?.text,
 						'color'
 					),
 					setValue: setHoverLinkColor,
@@ -479,6 +488,10 @@ export default function ColorPanel( {
 						inheritedValue?.elements?.[ name ]?.color?.text,
 						'color'
 					),
+					userSlug: extractPresetSlug(
+						value?.elements?.[ name ]?.color?.text,
+						'color'
+					),
 					setValue: setElementTextColor,
 					userValue: elementTextUserColor,
 					isPlaceholder: isElementTextPlaceholder,
@@ -491,6 +504,10 @@ export default function ColorPanel( {
 						inheritedSlug: extractPresetSlug(
 							inheritedValue?.elements?.[ name ]?.color
 								?.background,
+							'color'
+						),
+						userSlug: extractPresetSlug(
+							value?.elements?.[ name ]?.color?.background,
 							'color'
 						),
 						setValue: setElementBackgroundColor,

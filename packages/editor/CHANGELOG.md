@@ -6,6 +6,10 @@
 
 -   Edit palette colors from the block inspector: Change values for theme and default swatches. Add, rename, and delete for custom colors. Changes are saved to global styles ([#79266](https://github.com/WordPress/gutenberg/pull/79266)).
 
+### Enhancements
+
+-   Notes: Remove "Add note" from the rich-text formatting toolbar's "More" (inline styles) dropdown. Adding a note is not an inline style, the item duplicated the block options entry, and the dropdown's chevron rendered as pressed whenever the caret sat inside a note ([#80531](https://github.com/WordPress/gutenberg/pull/80531)).
+
 ### New Features
 
 -   The "Apply globally" control now opens a review modal so you can choose which of a block's modified styles are pushed to Global Styles, showing each style's current and new value ([#79839](https://github.com/WordPress/gutenberg/pull/79839)).

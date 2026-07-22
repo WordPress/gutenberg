@@ -39,7 +39,11 @@ import {
 	findNearestStyleAndWeight,
 } from './typography-utils';
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
-import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
+import {
+	getInheritanceProps,
+	InheritanceToolsPanelItem,
+	ENABLE_GLOBAL_STYLES_INHERITANCE,
+} from './inheritance';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -252,7 +256,7 @@ export default function TypographyPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	isGlobalStyles = false,
-	showInheritanceLabelIndicators = true,
+	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
 	contrastWarning,
 } ) {
 	const { colors, allColors, areCustomSolidsEnabled, decodeValue } =
@@ -282,7 +286,12 @@ export default function TypographyPanel( {
 			newSlug
 		);
 		let changedObject = setImmutably( value, [ 'color', 'text' ], encoded );
-		if ( shouldSyncLinkColor( value, inheritedValue ) ) {
+		// Core keeps the pre-inheritance comparison on `inheritedValue`.
+		const syncLinkColor = ENABLE_GLOBAL_STYLES_INHERITANCE
+			? shouldSyncLinkColor( value, inheritedValue )
+			: inheritedValue?.color?.text ===
+			  inheritedValue?.elements?.link?.color?.text;
+		if ( syncLinkColor ) {
 			changedObject = setImmutably(
 				changedObject,
 				[ 'elements', 'link', 'color', 'text' ],
@@ -825,15 +834,14 @@ export default function TypographyPanel( {
 							key: 'text',
 							label: __( 'Color' ),
 							inheritedValue: textColor,
-							inheritedSlug:
-								extractPresetSlug(
-									value?.color?.text,
-									'color'
-								) ??
-								extractPresetSlug(
-									inheritedValue?.color?.text,
-									'color'
-								),
+							inheritedSlug: extractPresetSlug(
+								inheritedValue?.color?.text,
+								'color'
+							),
+							userSlug: extractPresetSlug(
+								value?.color?.text,
+								'color'
+							),
 							setValue: setTextColor,
 							userValue: userTextColor,
 							isPlaceholder:

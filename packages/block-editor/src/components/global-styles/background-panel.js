@@ -19,7 +19,11 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
-import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
+import {
+	getInheritanceProps,
+	InheritanceToolsPanelItem,
+	ENABLE_GLOBAL_STYLES_INHERITANCE,
+} from './inheritance';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
@@ -167,7 +171,7 @@ export default function BackgroundImagePanel( {
 	defaultValues = {},
 	headerLabel = __( 'Background' ),
 	contrastWarning,
-	showInheritanceLabelIndicators = true,
+	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
 } ) {
 	const {
 		colors,
@@ -402,22 +406,18 @@ export default function BackgroundImagePanel( {
 							key: 'background',
 							label: __( 'Color' ),
 							inheritedValue: backgroundColor,
-							// Resolve the slug from the same source as the
-							// displayed value (user value first, then the
-							// inherited fallback). For a block instance the
-							// selection lives in `value` while `inheritedValue`
-							// only holds the global styles fallback, so reading
-							// the slug from `inheritedValue` alone would miss it
-							// and two same-hex presets would both appear selected.
-							inheritedSlug:
-								extractPresetSlug(
-									value?.color?.background,
-									'color'
-								) ??
-								extractPresetSlug(
-									inheritedValue?.color?.background,
-									'color'
-								),
+							// The picker selects by slug: `userSlug` when the
+							// block has its own value, otherwise
+							// `inheritedSlug`. Hex matching would mark two
+							// same-hex presets as both selected.
+							inheritedSlug: extractPresetSlug(
+								inheritedValue?.color?.background,
+								'color'
+							),
+							userSlug: extractPresetSlug(
+								value?.color?.background,
+								'color'
+							),
 							setValue: setBackgroundColor,
 							userValue: userBackgroundColor,
 							isPlaceholder:
