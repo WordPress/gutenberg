@@ -44,7 +44,6 @@ store( 'core/fit-text', {
 			context.fontSize = optimizeFitText( ref, applyFontSize );
 
 			// Reveal the element. It was hidden via CSS
-			// (.has-fit-text[data-wp-init---core-fit-text] { visibility: hidden })
 			// to prevent a flash of default-sized text while JS loads.
 			ref.style.visibility = 'visible';
 
@@ -52,10 +51,7 @@ store( 'core/fit-text', {
 			let resizeObserver: ResizeObserver | undefined;
 			if ( window.ResizeObserver && ref.parentElement ) {
 				resizeObserver = new window.ResizeObserver( () => {
-					context.fontSize = optimizeFitText(
-						ref,
-						applyFontSize
-					);
+					context.fontSize = optimizeFitText( ref, applyFontSize );
 				} );
 				resizeObserver.observe( ref.parentElement );
 				resizeObserver.observe( ref );
