@@ -8,13 +8,11 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { dispatch } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import ReactionDisplay, { AddReactionButton } from '../reaction-display';
+import ReactionDisplay from '../reaction-display';
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
@@ -366,145 +364,5 @@ describe( 'ReactionDisplay', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Heart, 1 reaction' } )
 		).toBeVisible();
-	} );
-} );
-
-describe( 'AddReactionButton', () => {
-	beforeEach( () => {
-		uniqueNoteId += 1;
-		apiFetch.mockReset();
-		apiFetch.mockRejectedValue( new Error( 'not mocked' ) );
-	} );
-
-	it( 'falls back to the curated quick row when no Emojibase URL is set', async () => {
-		const user = userEvent.setup();
-		const onToggleReaction = jest.fn();
-		render(
-			<AddReactionButton
-				noteId={ uniqueNoteId }
-				onToggleReaction={ onToggleReaction }
-			/>
-		);
-
-		const trigger = screen.getByRole( 'button', { name: 'Add reaction' } );
-		// The trigger advertises the popup type it opens, and the popup
-		// itself is a named non-modal dialog so screen readers announce
-		// where focus landed.
-		expect( trigger ).toHaveAttribute( 'aria-haspopup', 'dialog' );
-		await user.click( trigger );
-		expect(
-			screen.getByRole( 'dialog', { name: 'Add reaction' } )
-		).toBeVisible();
-		// The curated options are laid out horizontally, so the listbox
-		// must report its orientation (the ARIA default is vertical).
-		expect(
-			screen.getByRole( 'listbox', {
-				name: 'Select an emoji reaction',
-			} )
-		).toHaveAttribute( 'aria-orientation', 'horizontal' );
-		await user.click(
-			await screen.findByRole( 'option', { name: 'Rocket' } )
-		);
-
-		expect( onToggleReaction ).toHaveBeenCalledTimes( 1 );
-		expect( onToggleReaction ).toHaveBeenCalledWith( 'rocket' );
-	} );
-
-	it( 'opens the full picker directly and stores a filter-provided emoji under its slug', async () => {
-		// With an Emojibase URL configured, "Add reaction" opens the full
-		// searchable picker straight away (no intermediate quick row).
-		// A site filter adds 👍 with the slug `thumbs-up`; picking it from
-		// the full picker must store `thumbs-up`, not the raw hex key
-		// `1f44d`, so it aggregates into the same reaction_summary bucket
-		// as historical quick-row picks.
-		window.gutenbergEmojibaseUrl = 'https://example.test/emojibase';
-		const originalFetch = global.fetch;
-		global.fetch = jest.fn( ( url ) =>
-			Promise.resolve( {
-				ok: true,
-				json: () =>
-					Promise.resolve(
-						String( url ).includes( 'data.json' )
-							? [
-									{
-										hexcode: '1F44D',
-										emoji: '👍',
-										label: 'thumbs up',
-										group: 0,
-									},
-							  ]
-							: { groups: [ { order: 0, message: 'Smileys' } ] }
-					),
-			} )
-		);
-		dispatch( blockEditorStore ).updateSettings( {
-			noteReactionEmojis: [
-				{ emoji: '👍', label: 'Thumbs up', value: 'thumbs-up' },
-			],
-		} );
-
-		try {
-			const user = userEvent.setup();
-			const onToggleReaction = jest.fn();
-			render(
-				<AddReactionButton
-					noteId={ uniqueNoteId }
-					onToggleReaction={ onToggleReaction }
-				/>
-			);
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Add reaction' } )
-			);
-			// The popup is exposed as a named non-modal dialog in the
-			// full-picker branch too.
-			expect(
-				screen.getByRole( 'dialog', { name: 'Add reaction' } )
-			).toBeVisible();
-			// The full picker opens directly — no quick row, no
-			// intermediate "More emojis" step.
-			expect(
-				screen.queryByRole( 'option', { name: 'Thumbs up' } )
-			).not.toBeInTheDocument();
-			// The filter-provided emoji is seeded into "Frequently used"
-			// and also appears in its Emojibase category; either cell
-			// exercises the same selection path.
-			await user.click(
-				(
-					await screen.findAllByRole( 'gridcell', {
-						name: 'thumbs up',
-					} )
-				)[ 0 ]
-			);
-			expect( onToggleReaction ).toHaveBeenLastCalledWith( 'thumbs-up' );
-			expect( onToggleReaction ).toHaveBeenCalledTimes( 1 );
-		} finally {
-			global.fetch = originalFetch;
-			delete window.gutenbergEmojibaseUrl;
-			act( () => {
-				dispatch( blockEditorStore ).updateSettings( {
-					noteReactionEmojis: undefined,
-				} );
-			} );
-		}
-	} );
-
-	it( 'stays focusable but inert when disabled', async () => {
-		const user = userEvent.setup();
-		render(
-			<AddReactionButton
-				noteId={ uniqueNoteId }
-				disabled
-				onToggleReaction={ () => {} }
-			/>
-		);
-
-		const button = screen.getByRole( 'button', { name: 'Add reaction' } );
-		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
-
-		await user.click( button );
-		expect(
-			screen.queryByRole( 'option', { name: 'Rocket' } )
-		).not.toBeInTheDocument();
 	} );
 } );

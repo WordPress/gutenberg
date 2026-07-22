@@ -22,7 +22,8 @@ import { moreVertical, published } from '@wordpress/icons';
  */
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
-import ReactionDisplay, { AddReactionButton } from './reaction-display';
+import ReactionDisplay from './reaction-display';
+import { AddReactionButton } from './add-reaction-picker';
 import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );

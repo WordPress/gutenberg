@@ -7,52 +7,21 @@ import type { MouseEvent } from 'react';
  * WordPress dependencies
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { Button, Dropdown } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import { SVG, Path } from '@wordpress/primitives';
-import {
-	useState,
-	useCallback,
-	useMemo,
-	lazy,
-	Suspense,
-} from '@wordpress/element';
+import { useState, useCallback, useMemo } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-
-// Inlined while reactions remain experimental in scope. If/when this
-// icon is needed elsewhere it can be promoted to `@wordpress/icons`.
-const smileyIcon = (
-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path
-			fill="currentColor"
-			d="M14.438 14.15a.75.75 0 0 1 1.124.993A4.742 4.742 0 0 1 12 16.75a4.742 4.742 0 0 1-3.563-1.608.75.75 0 0 1 1.126-.993A3.24 3.24 0 0 0 12 15.251c.97 0 1.84-.425 2.438-1.1ZM9.5 9.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM14.5 9.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z"
-		/>
-		<Path
-			fill="currentColor"
-			fillRule="evenodd"
-			d="M12 4a8 8 0 1 1 .001 16.001A8 8 0 0 1 12 4Zm0 1.5a6.5 6.5 0 1 0-.001 13.001A6.5 6.5 0 0 0 12 5.5Z"
-			clipRule="evenodd"
-		/>
-	</SVG>
-);
 
 /**
  * Internal dependencies
  */
-import ReactionEmojiPicker, {
-	emojiToHexKey,
-	emojiToStorageKey,
+import {
 	hexKeyToEmoji,
 	buildEmojiBySlugMap,
 	useReactionEmojis,
 } from './reaction-emoji-picker';
-import {
-	detectLocale,
-	loadEmojibaseData,
-	useEmojiLabel,
-} from './emojibase-data';
-import { useFrequentEmojis } from './frequent-emojis';
+import { useEmojiLabel } from './emojibase-data';
 
 /**
  * A single slug's entry in the reaction summary: how many reactions it
@@ -75,35 +44,6 @@ interface ReactionComment {
 	author_name: string;
 	content: string | { raw?: string; rendered?: string };
 }
-
-/**
- * Lazy-load the full emoji picker. Its bundle is only fetched the first
- * time a user opens (or hovers) the add-reaction trigger in a session;
- * the Emojibase JSON dataset is fetched separately on first open.
- */
-const FullEmojiPicker = lazy( () => import( './emoji-picker' ) );
-
-/**
- * Warm the full picker before it opens: start fetching the lazy picker
- * chunk and the Emojibase dataset for the active locale. Both loaders
- * cache, so calling this repeatedly (every hover) is free after the
- * first invocation.
- */
-function prefetchFullPicker(): void {
-	import( './emoji-picker' ).catch( () => {} );
-	if ( typeof window !== 'undefined' && window.gutenbergEmojibaseUrl ) {
-		loadEmojibaseData( window.gutenbergEmojibaseUrl, detectLocale() ).catch(
-			() => {}
-		);
-	}
-}
-
-// `Dropdown`'s popover renders through the active `Popover.Slot` when
-// one exists (falling back to a `<body>`-level container), so either
-// way it escapes the `overflow: hidden` chain on the collab sidebar
-// (`.interface-interface-skeleton__sidebar`,
-// `.editor-collab-sidebar`, `.editor-collab-sidebar-panel`).
-const POPOVER_PROPS = { placement: 'bottom-end' } as const;
 
 /**
  * Get the count of reactions for a specific slug.
@@ -194,6 +134,18 @@ function formatReactionTooltip( names: string[], emojiLabel: string ): string {
 
 // Module-level cache for reaction details: { "noteId:slug": string[] }
 const reactionNamesCache: Record< string, string[] > = {};
+
+/**
+ * Drop the cached reactor names for a note/slug pair. Called whenever a
+ * reaction is added or removed, since that changes the set of users the
+ * tooltip lists.
+ *
+ * @param noteId The parent note comment ID.
+ * @param slug   The reaction slug.
+ */
+export function invalidateReactionNames( noteId: number, slug: string ): void {
+	delete reactionNamesCache[ `${ noteId }:${ slug }` ];
+}
 
 interface ReactionButtonProps {
 	noteId: number;
@@ -313,7 +265,7 @@ function ReactionButton( {
 						?.focus();
 				}
 				// Invalidate cached names since the reaction set is changing.
-				delete reactionNamesCache[ `${ noteId }:${ slug }` ];
+				invalidateReactionNames( noteId, slug );
 				setNames( null );
 				onToggleReaction( slug );
 			} }
@@ -386,142 +338,5 @@ export default function ReactionDisplay( {
 				);
 			} ) }
 		</Stack>
-	);
-}
-
-interface AddReactionButtonProps {
-	noteId: number;
-	disabled?: boolean;
-	onToggleReaction: ( slug: string ) => void;
-}
-
-/**
- * Standalone add-reaction button. Opens the full searchable emoji
- * picker directly; its "Frequently used" section is seeded with the
- * curated reaction set, so the previous quick-row picks stay one click
- * away.
- *
- * The full picker only renders when `window.gutenbergEmojibaseUrl` is
- * set — the Gutenberg plugin sets it via PHP, but npm consumers of the
- * editor package must opt in by providing a URL pointing at a
- * self-hosted emojibase dataset. Without it, the curated quick row is
- * offered instead.
- *
- * @param props                  Component props.
- * @param props.noteId           The parent note comment ID.
- * @param props.disabled         Whether the button is disabled (e.g. on a
- *                               resolved note thread).
- * @param props.onToggleReaction Callback to toggle a reaction.
- */
-export function AddReactionButton( {
-	noteId,
-	disabled = false,
-	onToggleReaction,
-}: AddReactionButtonProps ) {
-	const { recordUse } = useFrequentEmojis();
-	const emojis = useReactionEmojis();
-	const emojiBySlug = useMemo(
-		() => buildEmojiBySlugMap( emojis ),
-		[ emojis ]
-	);
-	const hasFullPicker =
-		typeof window !== 'undefined' && !! window.gutenbergEmojibaseUrl;
-
-	return (
-		<Dropdown
-			popoverProps={ {
-				...POPOVER_PROPS,
-				// The popup wraps a searchbox, a nested popup trigger, and
-				// a grid (full picker) or a listbox (curated fallback), and
-				// the popover constrains tabbing within it — expose it as a
-				// named non-modal dialog instead of an unnamed generic
-				// container so screen readers announce where focus landed.
-				role: 'dialog',
-				'aria-label': __( 'Add reaction' ),
-			} }
-			contentClassName={
-				hasFullPicker
-					? 'editor-collab-sidebar-panel__picker-popover'
-					: 'editor-collab-sidebar-panel__add-reaction-popover'
-			}
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
-					size="small"
-					className="editor-collab-sidebar-panel__add-reaction-button"
-					icon={ smileyIcon }
-					label={ __( 'Add reaction' ) }
-					aria-haspopup="dialog"
-					aria-expanded={ isOpen }
-					disabled={ disabled }
-					accessibleWhenDisabled
-					onClick={ onToggle }
-					// Warm up the picker while the user is still
-					// deciding: hovering or focusing the trigger starts
-					// loading the lazy picker module and the Emojibase
-					// dataset, so the popover usually opens fully
-					// populated.
-					onMouseEnter={
-						hasFullPicker ? prefetchFullPicker : undefined
-					}
-					onFocus={ hasFullPicker ? prefetchFullPicker : undefined }
-				/>
-			) }
-			renderContent={ ( { onClose } ) => {
-				const pickReaction = ( slug: string ) => {
-					onClose();
-					// Invalidate cached tooltip names since adding this
-					// reaction changes the set of users for the slug.
-					delete reactionNamesCache[ `${ noteId }:${ slug }` ];
-					onToggleReaction( slug );
-				};
-
-				if ( hasFullPicker ) {
-					return (
-						<Suspense
-							fallback={
-								<div className="editor-collab-sidebar-panel__picker">
-									<div
-										className="editor-collab-sidebar-panel__picker-status"
-										role="status"
-									>
-										{ __( 'Loading…' ) }
-									</div>
-								</div>
-							}
-						>
-							<FullEmojiPicker
-								onSelect={ ( emoji ) =>
-									// Match against the filtered curated
-									// list, not just the defaults, so a
-									// filter-provided emoji picked here
-									// stores under the same slug as a
-									// quick-row pick.
-									pickReaction(
-										emojiToStorageKey( emoji, emojis )
-									)
-								}
-							/>
-						</Suspense>
-					);
-				}
-
-				return (
-					<ReactionEmojiPicker
-						onSelect={ ( slug ) => {
-							// Keep counting picks toward the full picker's
-							// "Frequently used" section so the history is
-							// warm if the site later provides an Emojibase
-							// URL.
-							recordUse(
-								emojiToHexKey(
-									emojiBySlug.get( slug )?.emoji ?? ''
-								)
-							);
-							pickReaction( slug );
-						} }
-					/>
-				);
-			} }
-		/>
 	);
 }

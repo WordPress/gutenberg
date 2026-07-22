@@ -31,6 +31,7 @@ interface EmojiGroup {
 
 interface EmojiPickerProps {
 	onSelect: ( emoji: string ) => void;
+	onError?: () => void;
 }
 
 /**
@@ -135,8 +136,10 @@ export function searchEmojis(
  *
  * @param props          Component props.
  * @param props.onSelect Called with the selected emoji character.
+ * @param props.onError  Called when the Emojibase dataset fails to load,
+ *                       so the parent can swap in a fallback picker.
  */
-export default function EmojiPicker( { onSelect }: EmojiPickerProps ) {
+export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	const baseUrl =
 		typeof window !== 'undefined'
 			? window.gutenbergEmojibaseUrl ?? null
@@ -270,6 +273,25 @@ export default function EmojiPicker( { onSelect }: EmojiPickerProps ) {
 		);
 	}, [ frequentKeys, recordByHexKey, query ] );
 
+	// Transient states are announced through the `@wordpress/a11y`
+	// announcer — its live regions exist before these messages — because
+	// a live region mounted together with its content is not reliably
+	// announced. The visible status nodes below intentionally carry no
+	// live-region roles for the same reason.
+	useEffect( () => {
+		if ( isLoading ) {
+			speak( __( 'Loading…' ) );
+		}
+	}, [ isLoading ] );
+
+	// Dataset failures bubble to the parent, which swaps in the curated
+	// fallback picker so adding a reaction keeps working.
+	useEffect( () => {
+		if ( error ) {
+			onError?.();
+		}
+	}, [ error, onError ] );
+
 	// Announce result counts during search so screen readers stay in sync
 	// with the visible grid as the user types. Debounced (matching the
 	// block-inserter search pattern) so fast typing announces only the
@@ -361,26 +383,17 @@ export default function EmojiPicker( { onSelect }: EmojiPickerProps ) {
 				className="editor-collab-sidebar-panel__picker-viewport"
 			>
 				{ isLoading && (
-					<div
-						className="editor-collab-sidebar-panel__picker-status"
-						role="status"
-					>
+					<div className="editor-collab-sidebar-panel__picker-status">
 						{ __( 'Loading…' ) }
 					</div>
 				) }
 				{ error && ! isLoading && (
-					<div
-						className="editor-collab-sidebar-panel__picker-status"
-						role="alert"
-					>
+					<div className="editor-collab-sidebar-panel__picker-status">
 						{ __( 'Couldn’t load emojis.' ) }
 					</div>
 				) }
 				{ ! isLoading && ! error && matchCount === 0 && (
-					<div
-						className="editor-collab-sidebar-panel__picker-status"
-						role="status"
-					>
+					<div className="editor-collab-sidebar-panel__picker-status">
 						{ __( 'No emoji found.' ) }
 					</div>
 				) }

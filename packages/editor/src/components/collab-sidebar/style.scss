@@ -305,6 +305,17 @@ mark.wp-note {
 	justify-content: center;
 }
 
+// Curated fallback shown when the full picker's module or dataset
+// fails to load: the quick row stays usable, with a retry affordance.
+.editor-collab-sidebar-panel__picker-fallback-note {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs);
+	padding-top: var(--wpds-dimension-padding-xs);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	font-size: var(--wpds-typography-font-size-xs);
+}
+
 // Full picker popover: width is driven by the picker itself (below) so
 // the popover wrapper fits its content via Popover's default
 // `width: min-content`. Setting width on the wrapper instead leaves
