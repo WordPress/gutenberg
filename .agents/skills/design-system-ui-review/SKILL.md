@@ -53,5 +53,6 @@ Start with a short scope assessment. Give each material finding the affected
 user-facing behaviour, target-version evidence, concrete impact, and smallest
 coherent direction. Separate verification gaps from findings and report no
 findings when the evidence exposes none. Escalate a missing public component,
-token, or API to `design-system-contribution`; do not prescribe internal
-package changes in a consumer-only review.
+token, or API by documenting an upstream Design System request. Route it to
+`design-system-contribution` only in a local Gutenberg checkout; do not
+prescribe internal package changes in a consumer-only review.

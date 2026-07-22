@@ -14,8 +14,9 @@ description: Build or change any Gutenberg feature, plugin interface, or standal
 - Keep the target checkout or installed package version as the compatibility
   boundary. Do not infer package-change, commit, push, or pull-request
   authority.
-- Route a missing public component, token, or API to
-  `design-system-contribution` rather than importing package internals.
+- In a local Gutenberg checkout, route a missing public component, token, or
+  API to `design-system-contribution`. Otherwise, document the gap for an
+  upstream Design System request rather than importing package internals.
 
 ## Start with the target
 
@@ -72,4 +73,6 @@ Run the application's relevant checks and manually verify the changed UI:
 When public components or tokens cannot meet the need, do not use internal
 implementation details as a workaround. Record the user need, attempted
 composition, proposed public behaviour, target versions, and affected
-consumers. Route the request to `design-system-contribution`.
+consumers. In a local Gutenberg checkout, route the request to
+`design-system-contribution`; otherwise, use that record to request an
+upstream Design System change.
