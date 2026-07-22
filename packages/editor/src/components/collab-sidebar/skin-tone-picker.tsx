@@ -120,7 +120,12 @@ function SkinToneMenu( {
 			</div>
 			<Composite
 				role="listbox"
+				// `orientation` only configures the composite store's
+				// arrow-key handling; it is not rendered to the DOM, so
+				// the ARIA attribute must be set explicitly for assistive
+				// technology to know the options run horizontally.
 				orientation="horizontal"
+				aria-orientation="horizontal"
 				aria-labelledby={ headingId }
 				defaultActiveId={ selectedOptionId }
 				className="editor-collab-sidebar-panel__skin-tone-options"

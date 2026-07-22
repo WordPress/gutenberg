@@ -92,6 +92,12 @@ describe( 'SkinTonePicker', () => {
 		expect(
 			screen.getByText( 'Choose your default skin tone' )
 		).toBeVisible();
+		// The options are laid out horizontally, so the listbox must
+		// report its orientation (the ARIA default is vertical).
+		expect( screen.getByRole( 'listbox' ) ).toHaveAttribute(
+			'aria-orientation',
+			'horizontal'
+		);
 		const options = screen.getAllByRole( 'option' );
 		expect( options ).toHaveLength( 6 );
 		expect( options[ 0 ] ).toHaveAccessibleName( 'Default skin tone' );
