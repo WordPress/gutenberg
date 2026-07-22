@@ -81,6 +81,12 @@ function RevisionsSlider() {
 		( r ) => r[ revisionKey ] === currentRevisionId
 	);
 
+	// Indices of revisions where the currently selected block changed.
+	const blockChangedIndices = useBlockChangedRevisions(
+		revisions,
+		selectedIndex
+	);
+
 	const handleSliderChange = ( index ) => {
 		const revision = revisions?.[ index ];
 		if ( revision ) {
