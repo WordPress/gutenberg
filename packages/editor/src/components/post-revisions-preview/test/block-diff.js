@@ -1163,7 +1163,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'<del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">one two three four</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">alpha beta gamma delta</ins>',
+							'<del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">one two three</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">alpha beta gamma</ins>',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1357,7 +1357,7 @@ describe( 'diffRevisionContent', () => {
 							name: 'core/paragraph',
 							attributes: {
 								content:
-									'<del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">Hello</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">Goodbye</ins> <strong><del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">world</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">everyone</ins></strong>',
+									'<del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">Hello <strong>world</strong></del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">Goodbye <strong>everyone</strong></ins>',
 								__revisionDiffStatus: {
 									status: 'modified',
 								},
