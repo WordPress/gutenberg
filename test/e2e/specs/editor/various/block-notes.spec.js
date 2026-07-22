@@ -31,10 +31,7 @@ async function selectInlineText( page, paragraph, endOffset ) {
 		)
 		.toBe( true );
 	await paragraph.click();
-	await paragraph.selectText();
-	await paragraph.evaluate( ( element ) => {
-		element.ownerDocument.dispatchEvent( new Event( 'selectionchange' ) );
-	} );
+	await page.keyboard.press( 'ControlOrMeta+a' );
 	await expect
 		.poll( () =>
 			page.evaluate( () => {
