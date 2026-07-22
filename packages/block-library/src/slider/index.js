@@ -26,6 +26,7 @@ export const settings = {
 		innerBlocks: [
 			{
 				name: 'core/slide',
+				attributes: { style: { color: { background: '#f0f0f0' } } },
 				innerBlocks: [
 					{
 						name: 'core/paragraph',
@@ -38,6 +39,7 @@ export const settings = {
 			},
 			{
 				name: 'core/slide',
+				attributes: { style: { color: { background: '#f0f0f0' } } },
 				innerBlocks: [
 					{
 						name: 'core/paragraph',

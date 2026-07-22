@@ -29,7 +29,7 @@ const SLIDE_BLOCK = 'core/slide';
 const SLIDER_TEMPLATE = [
 	[
 		SLIDE_BLOCK,
-		{},
+		{ style: { color: { background: '#f0f0f0' } } },
 		[
 			[
 				'core/paragraph',
@@ -42,7 +42,7 @@ const SLIDER_TEMPLATE = [
 	],
 	[
 		SLIDE_BLOCK,
-		{},
+		{ style: { color: { background: '#f0f0f0' } } },
 		[
 			[
 				'core/paragraph',
