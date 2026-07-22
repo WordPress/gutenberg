@@ -43,6 +43,14 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 		const MAX_DOC_LENGTH = 16 * MB_IN_BYTES;
 
 		/**
+		 * Whether an entity save is already running in this request.
+		 *
+		 * @since 7.1.0
+		 * @var bool
+		 */
+		private static $entity_save_in_progress = false;
+
+		/**
 		 * Registers REST API routes.
 		 *
 		 * @since 7.1.0
@@ -178,51 +186,99 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 		public function handle_entity_request( WP_REST_Request $request ) {
 			global $wpdb;
 
-			$parsed_room = WP_Sync_Config::parse_room( $request['room'] );
-			$post_id     = WP_Sync_Config::get_crdt_doc_persistence_post_id(
-				$parsed_room['entity_kind'],
-				$parsed_room['entity_name'],
-				$parsed_room['object_id']
-			);
-			$content     = $request['content'];
-			$expected    = $request['expected_content'];
-
-			$updated = $wpdb->query(
-				$wpdb->prepare(
-					"UPDATE $wpdb->posts SET post_content = %s WHERE ID = %d AND post_content = %s",
-					$content,
-					$post_id,
-					$expected
-				)
-			);
-
-			if ( false === $updated ) {
-				return new WP_Error(
-					'rest_sync_content_save_failed',
-					__( 'Failed to save synchronized content.', 'gutenberg' ),
-					array( 'status' => 500 )
-				);
-			}
-
-			if ( 0 === $updated && get_post_field( 'post_content', $post_id, 'raw' ) !== $content ) {
+			if ( self::$entity_save_in_progress ) {
 				return new WP_Error(
 					'rest_sync_content_conflict',
-					__( 'The synchronized content changed before it could be saved.', 'gutenberg' ),
+					__( 'Another synchronized content save is already in progress.', 'gutenberg' ),
 					array( 'status' => 409 )
 				);
 			}
 
-			$doc_updated = update_post_meta( $post_id, self::CRDT_DOC_META_KEY, $request['doc'] );
-			if ( false === $doc_updated && get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) !== $request['doc'] ) {
-				return new WP_Error(
-					'rest_crdt_save_failed',
-					__( 'Failed to save CRDT document.', 'gutenberg' ),
-					array( 'status' => 500 )
-				);
-			}
+			self::$entity_save_in_progress = true;
+			$transaction_open              = false;
 
-			clean_post_cache( $post_id );
-			return array();
+			try {
+				// A stale writer must not leave post content paired with another writer's CRDT snapshot.
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- The two-table conditional save requires one transaction.
+				if ( false === $wpdb->query( 'START TRANSACTION' ) ) {
+					return new WP_Error(
+						'rest_sync_transaction_failed',
+						__( 'Failed to start synchronized content transaction.', 'gutenberg' ),
+						array( 'status' => 500 )
+					);
+				}
+				$transaction_open = true;
+
+				$parsed_room = WP_Sync_Config::parse_room( $request['room'] );
+				$post_id     = WP_Sync_Config::get_crdt_doc_persistence_post_id(
+					$parsed_room['entity_kind'],
+					$parsed_room['entity_name'],
+					$parsed_room['object_id']
+				);
+				$content     = $request['content'];
+				$expected    = $request['expected_content'];
+
+				$updated = $wpdb->query(
+					$wpdb->prepare(
+						"UPDATE $wpdb->posts SET post_content = %s WHERE ID = %d AND post_content = %s",
+						$content,
+						$post_id,
+						$expected
+					)
+				);
+
+				if ( false === $updated ) {
+					return new WP_Error(
+						'rest_sync_content_save_failed',
+						__( 'Failed to save synchronized content.', 'gutenberg' ),
+						array( 'status' => 500 )
+					);
+				}
+
+				if ( 0 === $updated ) {
+					$current = $wpdb->get_var(
+						$wpdb->prepare(
+							"SELECT post_content FROM $wpdb->posts WHERE ID = %d",
+							$post_id
+						)
+					);
+					if ( $current !== $expected ) {
+						return new WP_Error(
+							'rest_sync_content_conflict',
+							__( 'The synchronized content changed before it could be saved.', 'gutenberg' ),
+							array( 'status' => 409 )
+						);
+					}
+				}
+
+				$doc_updated = update_post_meta( $post_id, self::CRDT_DOC_META_KEY, $request['doc'] );
+				if ( false === $doc_updated && get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) !== $request['doc'] ) {
+					return new WP_Error(
+						'rest_crdt_save_failed',
+						__( 'Failed to save CRDT document.', 'gutenberg' ),
+						array( 'status' => 500 )
+					);
+				}
+
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Completes the transaction started above.
+				if ( false === $wpdb->query( 'COMMIT' ) ) {
+					return new WP_Error(
+						'rest_sync_transaction_failed',
+						__( 'Failed to commit synchronized content transaction.', 'gutenberg' ),
+						array( 'status' => 500 )
+					);
+				}
+				$transaction_open = false;
+
+				clean_post_cache( $post_id );
+				return array();
+			} finally {
+				if ( $transaction_open ) {
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Prevents either half of a failed conditional save from persisting.
+					$wpdb->query( 'ROLLBACK' );
+				}
+				self::$entity_save_in_progress = false;
+			}
 		}
 
 		/**

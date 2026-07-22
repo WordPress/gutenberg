@@ -228,6 +228,56 @@ class Tests_Collaboration_WpSyncSaveServer extends WP_Test_REST_Controller_Testc
 		$this->assertSame( 'serialized-entity-crdt-doc', get_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, true ) );
 	}
 
+	public function test_entity_save_rejects_reentrant_writer_without_tearing_content_and_crdt_doc() {
+		wp_set_current_user( self::$editor_id );
+		wp_update_post(
+			array(
+				'ID'           => self::$post_id,
+				'post_content' => 'expected content',
+			)
+		);
+		update_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, 'initial-crdt-doc' );
+
+		$nested_response = null;
+		$interleave      = function ( $check, $object_id, $meta_key ) use ( &$nested_response ) {
+			if ( WP_Sync_Save_Server::CRDT_DOC_META_KEY === $meta_key ) {
+				$nested_response = $this->dispatch_entity_save( 'replacement content', 'nested content' );
+			}
+			return $check;
+		};
+		add_filter( 'update_post_metadata', $interleave, 10, 3 );
+
+		$response = $this->dispatch_entity_save( 'expected content', 'replacement content' );
+
+		remove_filter( 'update_post_metadata', $interleave, 10 );
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertErrorResponse( 'rest_sync_content_conflict', $nested_response, 409 );
+		$this->assertSame( 'replacement content', get_post_field( 'post_content', self::$post_id, 'raw' ) );
+		$this->assertSame( 'serialized-entity-crdt-doc', get_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, true ) );
+	}
+
+	public function test_entity_save_rolls_back_content_when_crdt_doc_save_fails() {
+		wp_set_current_user( self::$editor_id );
+		wp_update_post(
+			array(
+				'ID'           => self::$post_id,
+				'post_content' => 'expected content',
+			)
+		);
+		update_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, 'initial-crdt-doc' );
+		$reject_meta = static function ( $check, $object_id, $meta_key ) {
+			return WP_Sync_Save_Server::CRDT_DOC_META_KEY === $meta_key ? false : $check;
+		};
+		add_filter( 'update_post_metadata', $reject_meta, 10, 3 );
+
+		$response = $this->dispatch_entity_save( 'expected content', 'replacement content' );
+
+		remove_filter( 'update_post_metadata', $reject_meta, 10 );
+		$this->assertErrorResponse( 'rest_crdt_save_failed', $response, 500 );
+		$this->assertSame( 'expected content', get_post_field( 'post_content', self::$post_id, 'raw' ) );
+		$this->assertSame( 'initial-crdt-doc', get_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, true ) );
+	}
+
 	public function test_save_allows_unchanged_crdt_doc_meta() {
 		wp_set_current_user( self::$editor_id );
 		update_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, 'serialized-crdt-doc' );
