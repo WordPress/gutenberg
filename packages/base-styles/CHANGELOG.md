@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the `$accent-color` parameter from `input-control` and `input-style__focus`. Focus styling now uses `--wpds-*` design tokens internally ([#80595](https://github.com/WordPress/gutenberg/pull/80595)).
+
 ### Internal
 
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
