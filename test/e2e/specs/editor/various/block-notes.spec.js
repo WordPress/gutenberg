@@ -1298,21 +1298,16 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Select me for a note.' },
 			} );
 
-			// Select all of the paragraph text so the inline path is taken
-			// (the "Add note" rich-text toolbar entry only renders for a
-			// non-collapsed selection).
+			// Select all of the paragraph text so the inline path is taken:
+			// "Add note" creates an inline note whenever a non-collapsed
+			// rich-text selection is active, and a block-level note otherwise.
 			const paragraph = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} );
 			await paragraph.click();
 			await page.keyboard.press( 'ControlOrMeta+a' );
 
-			// "Add note" lives in the rich-text "More" dropdown alongside
-			// Footnote / Inline image.
-			await page
-				.getByRole( 'button', { name: 'More', exact: true } )
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
 
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
@@ -1379,10 +1374,7 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await page.keyboard.press( 'ControlOrMeta+a' );
 
-			await page
-				.getByRole( 'button', { name: 'More', exact: true } )
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Survive the toggle' );
@@ -1424,10 +1416,7 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await page.keyboard.press( 'ControlOrMeta+a' );
 
-			await page
-				.getByRole( 'button', { name: 'More', exact: true } )
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Anchored to text' );
@@ -1476,10 +1465,7 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await page.keyboard.press( 'ControlOrMeta+a' );
 
-			await page
-				.getByRole( 'button', { name: 'More', exact: true } )
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Remove my marker on delete' );
@@ -1521,10 +1507,7 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await page.keyboard.press( 'ControlOrMeta+a' );
 
-			await page
-				.getByRole( 'button', { name: 'More', exact: true } )
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Resolve removes my marker' );
@@ -1574,10 +1557,7 @@ test.describe( 'Block Notes', () => {
 				await page.keyboard.press( 'Shift+ArrowRight' );
 			}
 
-			await page
-				.getByRole( 'button', { name: 'More', exact: true } )
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Just this word' );
@@ -1609,10 +1589,7 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await page.keyboard.press( 'ControlOrMeta+a' );
 
-			await page
-				.getByRole( 'button', { name: 'More', exact: true } )
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Pick me' );
