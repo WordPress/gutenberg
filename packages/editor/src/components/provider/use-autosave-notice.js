@@ -183,25 +183,18 @@ export default function useAutosaveNotice( { post, recovery, settings } ) {
 		}
 
 		// Defer the decision until the shared document confirms the
-		// autosave, sync fails, or the wait expires (see the effects below).
+		// autosave, sync fails, or the backstop timer below expires (see
+		// the decision effect below).
 		isAutosaveNoticeDeferredRef.current = true;
-
-		// The notice decision is initiated once, on mount.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [] );
-
-	// Backstop timer for the deferred autosave notice decision below.
-	useEffect( () => {
-		if ( ! isAutosaveNoticeDeferredRef.current ) {
-			return;
-		}
 
 		const timeoutId = setTimeout( () => {
 			setHasAutosaveNoticeWaitExpired( true );
 		}, AUTOSAVE_NOTICE_SYNC_WAIT_MS );
 
 		return () => clearTimeout( timeoutId );
-		// The wait starts once, on mount, alongside the deferral above.
+
+		// The notice decision is initiated once, on mount.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	// Deferred autosave notice decision for collaborative posts. See the
