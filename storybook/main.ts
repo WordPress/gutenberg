@@ -42,6 +42,7 @@ const stories = [
 	'../packages/grid/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/widget-primitives/src/**/stories/*.mdx',
 	'../packages/widget-primitives/src/**/stories/*.story.@(ts|tsx)',
+	'../packages/widget-dashboard/src/**/stories/*.mdx',
 	'../packages/widget-dashboard/src/**/stories/*.story.@(ts|tsx)',
 	'../routes/dashboard/**/stories/*.story.@(ts|tsx)',
 	'../packages/ui/src/**/stories/*.mdx',

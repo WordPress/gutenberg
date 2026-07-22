@@ -16,6 +16,16 @@ import { __ } from '@wordpress/i18n';
 import { Tooltip } from '@wordpress/ui';
 
 /**
+ * Whether the inspector surfaces inherited Global Styles values.
+ * Plugin-only, so Core builds show locally-set values alone.
+ *
+ * @type {boolean}
+ */
+export const ENABLE_GLOBAL_STYLES_INHERITANCE = globalThis.IS_GUTENBERG_PLUGIN
+	? true
+	: false;
+
+/**
  * Returns props to spread onto a wrapping `<InheritanceToolsPanelItem>`
  * so the item renders the matching inherited-from-Global-Styles affordance.
  *
