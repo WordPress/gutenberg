@@ -300,7 +300,7 @@ mark.wp-note {
 // target of 2.5.5 (Enhanced) — at 44px an 8-column grid would exceed
 // the sidebar-anchored popover's practical width.
 .editor-collab-sidebar-panel__emoji-option {
-	width: 32px;
+	width: var(--wpds-dimension-size-md);
 	font-size: 18px;
 	justify-content: center;
 }
@@ -335,16 +335,26 @@ mark.wp-note {
 }
 
 .editor-collab-sidebar-panel__picker {
+	// Shared grid geometry, derived once from the WPDS tokens so the
+	// width calculation below can never disagree with the rendered
+	// cells, gaps, and padding. The scrollbar allowance is a deliberate,
+	// isolated estimate: `scrollbar-gutter: stable` reserves the real
+	// scrollbar width at layout time, but that width isn't readable
+	// from CSS, so the popover budgets ~17px (the common classic
+	// scrollbar; overlay-scrollbar platforms reserve nothing and simply
+	// get a slightly roomier viewport).
+	--emoji-picker-cell-size: var(--wpds-dimension-size-md);
+	--emoji-picker-gap: var(--wpds-dimension-gap-xs);
+	--emoji-picker-viewport-padding: var(--wpds-dimension-padding-xs);
+	--emoji-picker-scrollbar-allowance: 17px;
+
 	display: flex;
 	flex-direction: column;
 	// Width sized to the 8-column emoji grid plus the viewport's
 	// reserved scrollbar gutter, so the popover wraps the visible
 	// emoji area without buttons shrinking under flex pressure when
 	// the scrollbar is present.
-	// (8 buttons × 32px) + (7 gaps × 4px) + (2 viewport padding × 4px)
-	// + scrollbar gutter (reserved via `scrollbar-gutter: stable` on
-	// the viewport below; ~17px on most platforms).
-	width: calc(8 * 32px + 7 * 4px + 2 * 4px + 17px);
+	width: calc(8 * var(--emoji-picker-cell-size) + 7 * var(--emoji-picker-gap) + 2 * var(--emoji-picker-viewport-padding) + var(--emoji-picker-scrollbar-allowance));
 	height: 320px;
 	font-family: var(--wpds-typography-font-family-body);
 	font-size: var(--wpds-typography-font-size-sm);
@@ -368,10 +378,10 @@ mark.wp-note {
 
 .editor-collab-sidebar-panel__skin-tone-toggle {
 	flex-shrink: 0;
-	// A fixed 32px square so the toggle matches the compact icon-button
-	// footprint (and the 32px emoji grid cells) instead of growing with
-	// its emoji text content.
-	width: $grid-unit-40;
+	// A fixed square matching the emoji grid cells, so the toggle keeps
+	// the compact icon-button footprint instead of growing with its
+	// emoji text content.
+	width: var(--emoji-picker-cell-size);
 	padding: 0;
 	font-size: 18px;
 	justify-content: center;
@@ -395,7 +405,9 @@ mark.wp-note {
 }
 
 .editor-collab-sidebar-panel__skin-tone-option {
-	width: 32px;
+	// Rendered in its own flyout popover, outside the picker's scope,
+	// so this reads the WPDS size token directly.
+	width: var(--wpds-dimension-size-md);
 	font-size: 18px;
 	justify-content: center;
 
@@ -411,7 +423,7 @@ mark.wp-note {
 	// or shrink when content height crosses the scroll threshold.
 	scrollbar-gutter: stable;
 	position: relative;
-	padding-inline: var(--wpds-dimension-padding-xs);
+	padding-inline: var(--emoji-picker-viewport-padding);
 }
 
 .editor-collab-sidebar-panel__picker-status {
@@ -429,8 +441,11 @@ mark.wp-note {
 	position: sticky;
 	top: 0;
 	padding: var(--wpds-dimension-padding-sm);
-	// Match the popover's default surface so rows scrolling underneath
-	// stay hidden.
+	// Match the popover's surface: `.components-popover` paints `$white`
+	// (not a WPDS token), and rows scrolling underneath must disappear
+	// behind exactly that color — a token here could drift from the
+	// actual popover background. Swap both together if the popover
+	// surface ever moves to a token.
 	background-color: $white;
 	color: var(--wpds-color-foreground-content-neutral-weak);
 	font-size: var(--wpds-typography-font-size-xs);
@@ -440,20 +455,20 @@ mark.wp-note {
 
 .editor-collab-sidebar-panel__picker-row {
 	display: flex;
-	gap: var(--wpds-dimension-gap-xs);
+	gap: var(--emoji-picker-gap);
 	// Skip rendering offscreen rows so the full ~250-row list mounts
 	// quickly. The intrinsic-size hint matches the actual button row
 	// height so scroll geometry stays accurate.
 	content-visibility: auto;
-	contain-intrinsic-size: auto 32px;
+	contain-intrinsic-size: auto var(--emoji-picker-cell-size);
 }
 
 .editor-collab-sidebar-panel__picker-emoji {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 32px;
-	height: 32px;
+	width: var(--emoji-picker-cell-size);
+	height: var(--emoji-picker-cell-size);
 	padding: 0;
 	border: 0;
 	border-radius: var(--wpds-border-radius-sm);
