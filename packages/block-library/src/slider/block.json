@@ -47,12 +47,10 @@
 			"default": "dot"
 		},
 		"navigationColor": {
-			"type": "string",
-			"default": "#1e1e1e"
+			"type": "string"
 		},
 		"navigationBackgroundColor": {
-			"type": "string",
-			"default": "#fff"
+			"type": "string"
 		}
 	},
 	"supports": {

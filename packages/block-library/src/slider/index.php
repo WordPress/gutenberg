@@ -267,12 +267,22 @@ function render_block_core_slider( $attributes, $content, $block ) {
 
 	$aria_label = ! empty( $attributes['ariaLabel'] ) ? $attributes['ariaLabel'] : __( 'Slider' );
 
-	$navigation_color            = $attributes['navigationColor'] ?? '#1e1e1e';
-	$navigation_background_color = $attributes['navigationBackgroundColor'] ?? '#fff';
-	$wrapper_style             = "--wp--slider-slides-to-show: {$slides_to_show}; ";
-	$wrapper_style            .= "--wp--slider-navigation-color: {$navigation_color}; ";
-	$wrapper_style            .= "--wp--slider-navigation-background-color: {$navigation_background_color}";
-	$wrapper_style             = safecss_filter_attr( $wrapper_style );
+	$wrapper_style = "--wp--slider-slides-to-show: {$slides_to_show};";
+
+	if ( isset( $attributes['navigationColor'] ) ) {
+		$navigation_color = $attributes['navigationColor'];
+		$wrapper_style   .= " --wp--slider-navigation-color: {$navigation_color};";
+	}
+
+	if ( isset( $attributes['navigationBackgroundColor'] ) ) {
+		$navigation_background_color = $attributes['navigationBackgroundColor'];
+		$wrapper_style              .= sprintf(
+			' --wp--slider-navigation-background-color: %s;',
+			$navigation_background_color
+		);
+	}
+
+	$wrapper_style = safecss_filter_attr( $wrapper_style );
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
