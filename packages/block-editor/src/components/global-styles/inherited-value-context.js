@@ -224,6 +224,7 @@ export function useResolvedStyle( blockName, className, selectedState = null ) {
 	const globalStyles = useRawGlobalStyles();
 
 	return useMemo( () => {
+		// Skip the cascade merge entirely when the feature is off.
 		if ( ! ENABLE_GLOBAL_STYLES_INHERITANCE ) {
 			return NO_RESOLVED_STYLE;
 		}
