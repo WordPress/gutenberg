@@ -22,6 +22,26 @@ function isTargetedRepairRequest( request ) {
 	);
 }
 
+async function selectInlineText( page, paragraph, endOffset ) {
+	await paragraph.click();
+	await paragraph.selectText();
+	await paragraph.evaluate( ( element ) => {
+		element.ownerDocument.dispatchEvent( new Event( 'selectionchange' ) );
+	} );
+	await expect
+		.poll( () =>
+			page.evaluate( () => {
+				const { getSelectionStart, getSelectionEnd } =
+					window.wp.data.select( 'core/block-editor' );
+				return [
+					getSelectionStart()?.offset,
+					getSelectionEnd()?.offset,
+				];
+			} )
+		)
+		.toEqual( [ 0, endOffset ] );
+}
+
 test.use( {
 	blockNoteUtils: async ( { page, editor }, use ) => {
 		await use( new BlockNoteUtils( { page, editor } ) );
@@ -1159,8 +1179,11 @@ test.describe( 'Block Notes', () => {
 			const paragraph = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} );
-			await paragraph.click();
-			await paragraph.selectText();
+			await selectInlineText(
+				page,
+				paragraph,
+				'Persist this inline note.'.length
+			);
 			await page
 				.getByRole( 'button', { name: 'More', exact: true } )
 				.click();
@@ -1481,8 +1504,11 @@ test.describe( 'Block Notes', () => {
 			const paragraph = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} );
-			await paragraph.click();
-			await paragraph.selectText();
+			await selectInlineText(
+				page,
+				paragraph,
+				'Keep this saved inline range.'.length
+			);
 			await page
 				.getByRole( 'button', { name: 'More', exact: true } )
 				.click();
