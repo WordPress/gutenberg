@@ -18,7 +18,11 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
-import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
+import {
+	getInheritanceProps,
+	InheritanceToolsPanelItem,
+	ENABLE_GLOBAL_STYLES_INHERITANCE,
+} from './inheritance';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
@@ -166,7 +170,7 @@ export default function BackgroundImagePanel( {
 	defaultValues = {},
 	headerLabel = __( 'Background' ),
 	contrastWarning,
-	showInheritanceLabelIndicators = true,
+	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
 } ) {
 	const {
 		colors,
