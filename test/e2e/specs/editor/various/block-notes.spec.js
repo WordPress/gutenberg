@@ -1167,14 +1167,17 @@ test.describe( 'Block Notes', () => {
 		} );
 
 		test( 'keeps an inline note marker after reloading without a post save', async ( {
+			admin,
 			editor,
 			page,
+			requestUtils,
 		} ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Persist this inline note.' },
+			const post = await requestUtils.createPost( {
+				content:
+					'<!-- wp:paragraph --><p>Persist this inline note.</p><!-- /wp:paragraph -->',
+				status: 'draft',
 			} );
-			await editor.saveDraft();
+			await admin.editPost( post.id );
 
 			const paragraph = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
@@ -1492,14 +1495,17 @@ test.describe( 'Block Notes', () => {
 		} );
 
 		test( 'refuses stale inline offsets when text changes during note creation', async ( {
+			admin,
 			editor,
 			page,
+			requestUtils,
 		} ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Keep this saved inline range.' },
+			const post = await requestUtils.createPost( {
+				content:
+					'<!-- wp:paragraph --><p>Keep this saved inline range.</p><!-- /wp:paragraph -->',
+				status: 'draft',
 			} );
-			await editor.saveDraft();
+			await admin.editPost( post.id );
 
 			const paragraph = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
