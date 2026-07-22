@@ -9,6 +9,7 @@
 -   `ContentEditableControl`: Associate the label with the `contentEditable` field via `aria-labelledby` instead of an invalid `label[for]`, which triggered Chrome console errors ([#80344](https://github.com/WordPress/gutenberg/pull/80344)).
 -   `SearchControl`: Render suffix only if there is one. ([#80356](https://github.com/WordPress/gutenberg/pull/80356), [#80406](https://github.com/WordPress/gutenberg/pull/80406)).
 -   `ColorPicker`: Keep the visual picker in native HSVA so gradient/controlled HSLA echoes no longer jitter the saturation pointer, and preserve the black-edge saturation coordinate without leaving white at a chromatic position ([#80205](https://github.com/WordPress/gutenberg/pull/80205)).
+-   `ExternalLink`: Use the shared `outset-ring__focus` mixin for the focus ring ([#80573](https://github.com/WordPress/gutenberg/pull/80573)).
 
 ### TypeScript
 
