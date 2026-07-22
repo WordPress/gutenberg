@@ -28,6 +28,7 @@ export interface ProviderOptions {
  */
 type HttpPollingEvents = {
 	status: ( status: ConnectionStatus ) => void;
+	hasInitialSync: () => void;
 };
 
 /**
@@ -37,7 +38,7 @@ type HttpPollingEvents = {
 class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 	protected awareness: Awareness;
 	protected status: ConnectionStatus[ 'status' ] = 'disconnected';
-	protected synced = false;
+	protected hasInitialSync = false;
 
 	public constructor( protected options: ProviderOptions ) {
 		super();
@@ -136,12 +137,16 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 	};
 
 	/**
-	 * Handle synchronization events from the polling manager.
+	 * Handle synchronization events from the polling manager. Fires the
+	 * one-shot `hasInitialSync` event the first time the server's initial
+	 * document state (sync step 2) has been applied, so the sync manager can
+	 * mark the entity synced even when that sync produced no document change.
 	 */
 	protected onSync = (): void => {
-		if ( ! this.synced ) {
-			this.synced = true;
+		if ( ! this.hasInitialSync ) {
+			this.hasInitialSync = true;
 			this.log( 'Synced' );
+			this.emit( 'hasInitialSync', [] );
 		}
 	};
 }

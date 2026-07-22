@@ -43,6 +43,13 @@ export type ObjectData = Record< string, unknown >;
  */
 export interface ProviderEventMap {
 	status: ConnectionStatus;
+
+	// Fired once when the provider has applied its initial document state from
+	// the sync backend (sync step 2). Carries no data. This lets the sync
+	// manager mark an entity synced even when the initial sync produced no
+	// observable document change, e.g. the local document already matched the
+	// server state. See `subscribeHasInitialSync`.
+	hasInitialSync: void;
 }
 
 /**

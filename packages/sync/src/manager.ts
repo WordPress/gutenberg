@@ -238,7 +238,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			// A non-local transaction carries remote document state (the
 			// initial sync or a peer edit), as opposed to a local undo/redo.
 			if ( ! transaction.local ) {
-				markEntitySynced( entityId );
+				markHasInitialSync( entityId );
 			}
 
 			if (
@@ -259,7 +259,7 @@ export function createSyncManager( debug = false ): SyncManager {
 				return;
 			}
 
-			markEntitySynced( entityId );
+			markHasInitialSync( entityId );
 
 			event.keysChanged.forEach( ( key ) => {
 				switch ( key ) {
@@ -317,8 +317,17 @@ export function createSyncManager( debug = false ): SyncManager {
 					awareness,
 				} );
 
-				// Attach status listener after provider creation.
+				// Attach listeners after provider creation.
 				provider.on( 'status', handlers.onStatusChange );
+
+				// Providers that report completing their initial sync let the
+				// entity be marked synced even when that sync applied no
+				// observable document change (so no CRDT transaction fires the
+				// observers above). Optional; the backstop covers providers
+				// that never report it.
+				provider.on( 'hasInitialSync', () =>
+					markHasInitialSync( entityId )
+				);
 
 				return provider;
 			} )
@@ -785,7 +794,7 @@ export function createSyncManager( debug = false ): SyncManager {
 	 *
 	 * @param {EntityID} entityId Entity ID.
 	 */
-	function markEntitySynced( entityId: EntityID ): void {
+	function markHasInitialSync( entityId: EntityID ): void {
 		const entityState = entityStates.get( entityId );
 
 		if ( ! entityState || entityState.hasInitialSync ) {
