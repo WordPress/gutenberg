@@ -9,7 +9,7 @@
 
 ### Internal
 
--   Gate the inherited Global Styles treatment in the block inspector on `IS_GUTENBERG_PLUGIN`, so `useResolvedStyle` resolves nothing and the block-supports panels render without the inheritance affordances in WordPress Core builds ([#TODO](https://github.com/WordPress/gutenberg/pull/TODO)).
+-   Gate the inherited Global Styles treatment in the block inspector on `IS_GUTENBERG_PLUGIN`, so `useResolvedStyle` resolves nothing and the block-supports panels render without the inheritance affordances in WordPress Core builds ([#80555](https://github.com/WordPress/gutenberg/pull/80555)).
 
 ### Bug Fixes
 
