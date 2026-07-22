@@ -1093,6 +1093,63 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
+	 * replace() drops a null member from an incoming list rather than storing
+	 * it: a list still replaces the current one wholesale, but a literal null
+	 * member carries no meaning and must not be persisted — at the top level
+	 * (`view_list`) or nested (`default_view.filters`) alike.
+	 *
+	 * @covers ::replace
+	 */
+	public function test_replace_ignores_null_list_members() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'view_list'    => array(
+					array(
+						'slug'  => 'all',
+						'title' => 'All',
+					),
+				),
+				'default_view' => array(
+					'filters' => array(
+						array(
+							'field'    => 'id1',
+							'operator' => 'op1',
+						),
+					),
+				),
+			)
+		);
+		$data->replace(
+			array(
+				'view_list'    => array(
+					null,
+					array(
+						'slug'  => 'mine',
+						'title' => 'Mine',
+					),
+				),
+				'default_view' => array( 'filters' => array( null ) ),
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				'view_list'    => array(
+					array(
+						'slug'  => 'mine',
+						'title' => 'Mine',
+					),
+				),
+				'default_view' => array(
+					'filters' => array(),
+				),
+			),
+			self::read_config( $data )
+		);
+	}
+
+	/**
 	 * merge() updates scalar property values
 	 *
 	 * @covers ::merge
@@ -1826,6 +1883,44 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			),
 			self::read_config( $data )
 		);
+	}
+
+	/**
+	 * merge() ignores a null member in an incoming list: null carries no
+	 * identity and holds nothing to merge, so it is dropped rather than
+	 * appended as a literal null member — `view_list => array( null )` leaves
+	 * the existing list untouched. The same applies to lists at any nesting
+	 * level, such as `default_view.filters`.
+	 *
+	 * @covers ::merge
+	 */
+	public function test_merge_ignores_null_list_members() {
+		$existing = array(
+			'view_list'    => array(
+				array(
+					'slug'  => 'all',
+					'title' => 'All',
+				),
+			),
+			'default_view' => array(
+				'filters' => array(
+					array(
+						'field'    => 'id1',
+						'operator' => 'op1',
+					),
+				),
+			),
+		);
+		$data     = new Gutenberg_View_Config_Data( $existing );
+		$data->merge(
+			array(
+				'view_list'    => array( null ),
+				'default_view' => array( 'filters' => array( null ) ),
+			),
+			1
+		);
+
+		$this->assertSame( $existing, self::read_config( $data ) );
 	}
 
 	/**

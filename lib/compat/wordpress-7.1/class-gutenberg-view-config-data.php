@@ -433,8 +433,9 @@ class Gutenberg_View_Config_Data {
 	 * the current one, so it has no existing leaf for a nested `null` to delete
 	 * the way merge() and replace() do. Stripping nulls here gives a nested
 	 * `null` the same "drop the property it names" meaning under set() that it
-	 * carries everywhere else. A list is renumbered after a member is removed so
-	 * removed entries do not leave gaps.
+	 * carries everywhere else. The same applies to a list replace() swaps in
+	 * wholesale. A list is renumbered after a member is removed so removed
+	 * entries do not leave gaps.
 	 *
 	 * @since 7.1.0
 	 *
@@ -489,7 +490,10 @@ class Gutenberg_View_Config_Data {
 		if ( array_is_list( $incoming ) ) {
 			// replace() takes an incoming list as-is; merge() merges it by member identity.
 			if ( $replace_lists ) {
-				return $incoming;
+				// As-is except for nulls: a list swapped in wholesale has no
+				// existing leaf for a null to delete (the same rationale as
+				// set()), so a null member is dropped rather than stored.
+				return $this->strip_nulls( $incoming );
 			}
 			return $this->merge_list_by_identity(
 				is_array( $current ) && array_is_list( $current ) ? $current : array(),
@@ -593,8 +597,10 @@ class Gutenberg_View_Config_Data {
 	 *
 	 * A member of the incoming list whose identity matches one already present
 	 * merges into it in place, keeping its position; an unmatched member is
-	 * appended to the end. A matched member's contents merge recursively with
-	 * the same rules (merge_properties), so the identity-aware merge applies at
+	 * appended to the end, except a literal `null`, which carries no identity
+	 * and holds nothing to merge and so is dropped. A matched member's contents
+	 * merge recursively with the same rules (merge_properties), so the
+	 * identity-aware merge applies at
 	 * any nesting level: each key named by the patch is substituted while the
 	 * others are left intact, and a list nested inside a member merges by
 	 * identity just like the list it lives in.
@@ -608,6 +614,12 @@ class Gutenberg_View_Config_Data {
 	private function merge_list_by_identity( array $current, array $incoming ) {
 		$result = $current;
 		foreach ( $incoming as $item ) {
+			// A null member carries no identity and holds nothing to merge,
+			// so it is dropped rather than appended as a literal null.
+			if ( null === $item ) {
+				continue;
+			}
+
 			$identity = $this->list_item_identity( $item );
 
 			// Find the index of the existing member with the same identity, if any.
