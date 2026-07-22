@@ -31,12 +31,25 @@ describe( 'buildHighlightCss', () => {
 		);
 	} );
 
-	it( 'emphasizes hover and focus-within with an author-colored underline', () => {
+	it( 'emphasizes hover and focus-within with an author-tinted underline', () => {
 		const css = buildHighlightCss( [ { id: 7, author: 1 } ] );
 		const color = getAvatarBorderColor( 1 );
 		expect( css ).toContain(
-			`mark.wp-note[data-id="7"]:hover,mark.wp-note[data-id="7"]:focus-within{text-decoration-line:underline;text-decoration-color:${ color };`
+			`mark.wp-note[data-id="7"]:hover,mark.wp-note[data-id="7"]:focus-within{text-decoration-line:underline;text-decoration-color:color-mix(in srgb, ${ color } 30%, currentColor);`
 		);
+	} );
+
+	/*
+	 * The canvas can be light or dark and the author palette is fixed, so a
+	 * pure-palette stroke would fall under the 3:1 non-text contrast minimum on
+	 * one of them. Anchoring the mix to `currentColor` is what keeps it above
+	 * that floor in both.
+	 */
+	it( 'anchors the underline color to currentColor rather than the raw palette', () => {
+		const css = buildHighlightCss( [ { id: 7, author: 1 } ], '7' );
+		const color = getAvatarBorderColor( 1 );
+		expect( css ).not.toContain( `text-decoration-color:${ color };` );
+		expect( css ).toContain( 'currentColor)' );
 	} );
 
 	it( 'emphasizes the selected thread by appending a second rule', () => {

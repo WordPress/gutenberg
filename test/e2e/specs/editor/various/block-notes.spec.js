@@ -1653,10 +1653,16 @@ test.describe( 'Block Notes', () => {
 				);
 				return match && match[ 4 ] ? Number( match[ 4 ] ) : 1;
 			};
-			const underlineOf = async () =>
+			const decorationOf = async () =>
 				mark.evaluate( ( el ) => {
 					const style = window.getComputedStyle( el );
-					return `${ style.textDecorationLine } ${ style.textDecorationColor }`;
+					return {
+						line: style.textDecorationLine,
+						color: style.textDecorationColor,
+						thickness: style.textDecorationThickness,
+						// `currentColor`, the other half of the mix below.
+						text: style.color,
+					};
 				} );
 
 			// Deselect the freshly added note (focus the title) so the marker
@@ -1664,18 +1670,41 @@ test.describe( 'Block Notes', () => {
 			await editor.canvas
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.click();
-			await expect.poll( underlineOf ).toContain( 'none' );
+			await expect
+				.poll( async () => ( await decorationOf() ).line )
+				.toBe( 'none' );
 
 			// Selecting the note from the sidebar emphasizes its marker with an
-			// underline in the author's color.
+			// underline carrying the author's color.
 			await page
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'treeitem', { name: 'Note: Pick me' } )
 				.click();
-
 			await expect
-				.poll( underlineOf )
-				.toBe( `underline rgb(${ r }, ${ g }, ${ b })` );
+				.poll( async () => ( await decorationOf() ).line )
+				.toBe( 'underline' );
+
+			const decoration = await decorationOf();
+			expect( decoration.thickness ).toBe( '1.5px' );
+
+			/*
+			 * The stroke is `color-mix(in srgb, <author color> 30%, currentColor)`:
+			 * mostly the text color so it clears 3:1 on a light or a dark canvas,
+			 * with enough author hue to read as that person's note. Recompute the
+			 * mix here rather than hard-coding it, since `currentColor` comes from
+			 * the theme.
+			 */
+			const parseRgb = ( value ) =>
+				value.match( /\d+/g ).slice( 0, 3 ).map( Number );
+			const textRgb = parseRgb( decoration.text );
+			const strokeRgb = parseRgb( decoration.color );
+			[ r, g, b ].forEach( ( channel, i ) => {
+				const expected = 0.3 * channel + 0.7 * textRgb[ i ];
+				// Tolerance covers the browser's rounding of the mix.
+				expect( Math.abs( strokeRgb[ i ] - expected ) ).toBeLessThan(
+					2
+				);
+			} );
 
 			/*
 			 * The tint behind the text must not deepen with the emphasis: it is

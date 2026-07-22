@@ -20,8 +20,19 @@ const TINT_ALPHA = '40';
 
 /**
  * Emphasis for hover / focus / the selected note. Carried by an opaque
- * underline in the author's color rather than a stronger tint, so the marker
- * reads more strongly without changing what sits behind the text.
+ * underline rather than a stronger tint, so the marker reads more strongly
+ * without changing what sits behind the text.
+ *
+ * The stroke is mostly `currentColor` with the author's color mixed in. Pure
+ * author color would be the clearest signal, but the canvas can be light or
+ * dark and the palette is fixed, so some of the seven colors would land under
+ * the 3:1 non-text contrast minimum on one of them. Anchoring to the text color
+ * keeps the underline above that floor in both, and 30% is about as much hue as
+ * fits underneath it.
+ *
+ * Thickness is a fixed `1.5px` rather than an em value: it has to stay distinct
+ * from a hyperlink's underline at body size without turning into a bar under a
+ * heading.
  *
  * @param {string} color The author's `#RRGGBB` color.
  * @return {string} Declarations for the emphasized state.
@@ -29,8 +40,8 @@ const TINT_ALPHA = '40';
 function emphasis( color ) {
 	return (
 		'text-decoration-line:underline;' +
-		`text-decoration-color:${ color };` +
-		'text-decoration-thickness:0.125em;' +
+		`text-decoration-color:color-mix(in srgb, ${ color } 30%, currentColor);` +
+		'text-decoration-thickness:1.5px;' +
 		'text-underline-offset:0.15em;'
 	);
 }
