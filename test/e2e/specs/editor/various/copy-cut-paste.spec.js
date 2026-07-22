@@ -928,4 +928,84 @@ test.describe( 'Copy/cut/paste', () => {
 			},
 		] );
 	} );
+
+	// See https://github.com/WordPress/gutenberg/issues/68941.
+	test( 'should copy blocks via the options menu with the same clipboard data as the keyboard shortcut', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'Copy ' );
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.type( 'bold' );
+
+		// Record the clipboard data written by the keyboard shortcut. The
+		// bubble phase listener runs after the editor's copy handler, so it
+		// can read the data the editor set.
+		await editor.canvas.locator( ':root' ).evaluate( () => {
+			document.addEventListener( 'copy', ( event ) => {
+				window.__copiedFlavors = {
+					plainText: event.clipboardData.getData( 'text/plain' ),
+					html: event.clipboardData.getData( 'text/html' ),
+				};
+			} );
+		} );
+		await pageUtils.pressKeys( 'primary+c' );
+		const keyboardCopyData = await editor.canvas
+			.locator( ':root' )
+			.evaluate( () => window.__copiedFlavors );
+		expect( keyboardCopyData.html ).toContain( '<!-- wp:paragraph -->' );
+
+		// The options menu lives in the top-level document, where its copy
+		// event is dispatched.
+		await page.evaluate( () => {
+			document.addEventListener( 'copy', ( event ) => {
+				window.__copiedFlavors = {
+					plainText: event.clipboardData.getData( 'text/plain' ),
+					html: event.clipboardData.getData( 'text/html' ),
+				};
+			} );
+		} );
+		await editor.clickBlockToolbarButton( 'Options' );
+		await page
+			.getByRole( 'menu', { name: 'Options' } )
+			.getByRole( 'menuitem', { name: /^Copy(?! styles)/ } )
+			.click();
+		await expect
+			.poll( () =>
+				page.evaluate( () => Boolean( window.__copiedFlavors ) )
+			)
+			.toBe( true );
+		const menuCopyData = await page.evaluate(
+			() => window.__copiedFlavors
+		);
+
+		// Both copy methods must write the same `text/plain` and `text/html`
+		// clipboard data.
+		expect( menuCopyData ).toEqual( keyboardCopyData );
+
+		// Pasting the copied data back recreates the same block.
+		await page.keyboard.press( 'Escape' );
+		pageUtils.setClipboardData( {
+			plainText: menuCopyData.plainText,
+			html: menuCopyData.html,
+		} );
+		await editor.canvas.locator( 'text=Copy bold' ).click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Enter' );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Copy <strong>bold</strong>' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Copy <strong>bold</strong>' },
+			},
+		] );
+	} );
 } );
