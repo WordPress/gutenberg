@@ -119,10 +119,10 @@ describe( 'TypographyPanel — core build setTextColor link sync', () => {
 	}
 
 	it( 'leaves an unset link color alone when a text color is already set', async () => {
-		// The plugin consults the inherited text and link colors here and syncs.
-		// Core has no inherited pair to consult, so only a link color that
-		// already matches the text color keeps tracking it. This is the
-		// behaviour core had before the inheritance treatment landed.
+		// The plugin falls back to the inherited link color here and syncs.
+		// Core compares the inherited text and link colors directly, which on
+		// this path is the block's own pair, so a link color that was never
+		// set does not start tracking.
 		const result = await pickRed( {
 			color: { text: 'var:preset|color|blue' },
 		} );

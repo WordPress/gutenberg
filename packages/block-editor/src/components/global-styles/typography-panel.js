@@ -283,11 +283,11 @@ export default function TypographyPanel( {
 			newSlug
 		);
 		let changedObject = setImmutably( value, [ 'color', 'text' ], encoded );
-		// Letting an unset link color follow the text color relies on the
-		// inherited pair; without it, only an already-matching pair tracks.
+		// Core keeps the pre-inheritance comparison on `inheritedValue`.
 		const syncLinkColor = ENABLE_GLOBAL_STYLES_INHERITANCE
 			? shouldSyncLinkColor( value, inheritedValue )
-			: value?.color?.text === value?.elements?.link?.color?.text;
+			: inheritedValue?.color?.text ===
+			  inheritedValue?.elements?.link?.color?.text;
 		if ( syncLinkColor ) {
 			changedObject = setImmutably(
 				changedObject,
