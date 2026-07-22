@@ -115,6 +115,7 @@ const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
 const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
+const DEFAULT_TEXTDOMAIN = WP_PLUGIN_CONFIG.textdomain || null;
 
 /**
  * Interprets a configuration value as a boolean, where `"true"` and `"1"`
@@ -2045,7 +2046,7 @@ function collectWidgets() {
 				presentation: metadata.presentation ?? null,
 				category: metadata.category ?? null,
 				keywords: metadata.keywords ?? null,
-				textdomain: metadata.textdomain ?? null,
+				textdomain: metadata.textdomain ?? DEFAULT_TEXTDOMAIN,
 			},
 		];
 	} );

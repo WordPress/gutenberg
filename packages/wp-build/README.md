@@ -235,6 +235,18 @@ With this configuration:
 - `@my-plugin/editor` → `window.myPlugin.editor` with handle `mp-editor`
 - `@my-plugin/data` → `window.myPlugin.data` with handle `mp-data`
 
+### `wpPlugin.textdomain`
+
+The default gettext text domain for widget metadata. Stamped into the generated widget registry (and the widget strings file) for widgets whose `widget.json` does not declare its own `textdomain`; a widget-level `textdomain` always wins:
+
+```json
+{
+	"wpPlugin": {
+		"textdomain": "my-plugin"
+	}
+}
+```
+
 ### `wpPlugin.externalNamespaces`
 
 Additional package namespaces to externalize (consume as externals, not expose). Each namespace must be an object with `global` and optional `handlePrefix`:
@@ -614,7 +626,7 @@ Rule of thumb: anything the host needs before loading a widget's module — iden
 - **`keywords`** (optional): Search aliases. Translated server-side using `textdomain`.
 - **`category`** (optional): Grouping category for filtering
 - **`presentation`** (optional): Rendering intent (`framed`, `content-bleed`, `full-bleed`)
-- **`textdomain`** (optional): Gettext text domain for translating `title`, `description`, `help`, and `keywords`
+- **`textdomain`** (optional): Gettext text domain for translating `title`, `description`, `help`, and `keywords`. Defaults to `wpPlugin.textdomain` from the root `package.json` when omitted.
 
 ### `widget.ts` — runtime schema
 
