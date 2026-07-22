@@ -21,3 +21,5 @@ export const ListBody = forwardRef< HTMLDivElement, ComboboxListBodyProps >(
 		return element;
 	}
 );
+
+ListBody.displayName = 'Combobox.ListBody';

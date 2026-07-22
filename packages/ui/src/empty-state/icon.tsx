@@ -22,3 +22,5 @@ export const Icon = forwardRef< HTMLDivElement, EmptyStateIconProps >(
 		);
 	}
 );
+
+Icon.displayName = 'EmptyState.Icon';

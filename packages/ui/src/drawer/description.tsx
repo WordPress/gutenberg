@@ -22,4 +22,6 @@ const Description = forwardRef< HTMLParagraphElement, DescriptionProps >(
 	}
 );
 
+Description.displayName = 'Drawer.Description';
+
 export { Description };

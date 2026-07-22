@@ -44,3 +44,5 @@ export const FieldsetDetails = forwardRef<
 		</>
 	);
 } );
+
+FieldsetDetails.displayName = 'Fieldset.Details';

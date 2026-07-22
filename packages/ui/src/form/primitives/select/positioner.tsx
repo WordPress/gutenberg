@@ -30,4 +30,6 @@ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 	}
 );
 
+Positioner.displayName = 'Select.Positioner';
+
 export { Positioner };

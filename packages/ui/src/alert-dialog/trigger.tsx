@@ -12,4 +12,6 @@ const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
 	}
 );
 
+Trigger.displayName = 'AlertDialog.Trigger';
+
 export { Trigger };

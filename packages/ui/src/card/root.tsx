@@ -40,3 +40,5 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Card(
 
 	return element;
 } );
+
+Root.displayName = 'Card.Root';

@@ -18,3 +18,5 @@ export const Input = forwardRef< HTMLInputElement, AutocompleteInputProps >(
 		);
 	}
 );
+
+Input.displayName = 'Autocomplete.Input';

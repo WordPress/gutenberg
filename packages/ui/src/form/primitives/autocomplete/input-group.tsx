@@ -14,3 +14,5 @@ export const InputGroup = forwardRef<
 >( function InputGroup( props, ref ) {
 	return <_Autocomplete.InputGroup ref={ ref } { ...props } />;
 } );
+
+InputGroup.displayName = 'Autocomplete.InputGroup';

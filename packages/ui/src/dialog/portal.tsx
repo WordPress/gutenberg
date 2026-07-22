@@ -11,4 +11,6 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >(
 	}
 );
 
+Portal.displayName = 'Dialog.Portal';
+
 export { Portal };

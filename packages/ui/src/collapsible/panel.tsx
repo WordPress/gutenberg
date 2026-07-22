@@ -14,3 +14,5 @@ export const Panel = forwardRef< HTMLDivElement, PanelProps >(
 		return <_Collapsible.Panel ref={ forwardedRef } { ...props } />;
 	}
 );
+
+Panel.displayName = 'Collapsible.Panel';

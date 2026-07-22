@@ -40,3 +40,5 @@ export const FieldsetRoot = forwardRef<
 		</FieldsetContext.Provider>
 	);
 } );
+
+FieldsetRoot.displayName = 'Fieldset.Root';

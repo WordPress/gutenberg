@@ -170,4 +170,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 	}
 );
 
+Popup.displayName = 'AlertDialog.Popup';
+
 export { Popup };

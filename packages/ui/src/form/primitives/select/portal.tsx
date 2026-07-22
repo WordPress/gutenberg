@@ -20,4 +20,6 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >( function SelectPortal(
 	);
 } );
 
+Portal.displayName = 'Select.Portal';
+
 export { Portal };

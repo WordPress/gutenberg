@@ -46,4 +46,6 @@ const Arrow = forwardRef< HTMLDivElement, ArrowProps >( function PopoverArrow(
 	);
 } );
 
+Arrow.displayName = 'Popover.Arrow';
+
 export { Arrow };

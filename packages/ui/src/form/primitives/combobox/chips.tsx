@@ -7,3 +7,5 @@ export const Chips = forwardRef< HTMLDivElement, ComboboxChipsProps >(
 		return <_Combobox.Chips ref={ ref } { ...props } />;
 	}
 );
+
+Chips.displayName = 'Combobox.Chips';

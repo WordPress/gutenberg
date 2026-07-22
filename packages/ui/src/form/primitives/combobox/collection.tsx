@@ -11,3 +11,5 @@ export function Collection( {
 		</_Combobox.Collection>
 	);
 }
+
+Collection.displayName = 'Combobox.Collection';

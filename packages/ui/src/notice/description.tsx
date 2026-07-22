@@ -19,3 +19,5 @@ export const Description = forwardRef< HTMLSpanElement, DescriptionProps >(
 		);
 	}
 );
+
+Description.displayName = 'Notice.Description';

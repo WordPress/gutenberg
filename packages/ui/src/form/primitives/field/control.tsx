@@ -7,3 +7,5 @@ export const Control = forwardRef< HTMLInputElement, FieldControlProps >(
 		return <_Field.Control ref={ ref } { ...props } />;
 	}
 );
+
+Control.displayName = 'Field.Control';

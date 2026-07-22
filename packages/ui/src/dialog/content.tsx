@@ -44,4 +44,6 @@ const Content = forwardRef< HTMLDivElement, ContentProps >(
 	}
 );
 
+Content.displayName = 'Dialog.Content';
+
 export { Content };

@@ -18,3 +18,5 @@ export const Content = forwardRef< HTMLDivElement, ContentProps >(
 		return element;
 	}
 );
+
+Content.displayName = 'Card.Content';

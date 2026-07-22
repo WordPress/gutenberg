@@ -22,3 +22,5 @@ export const ListFooter = forwardRef< HTMLDivElement, ComboboxListFooterProps >(
 		return element;
 	}
 );
+
+ListFooter.displayName = 'Combobox.ListFooter';

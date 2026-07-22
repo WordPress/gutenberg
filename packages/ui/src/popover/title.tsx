@@ -48,4 +48,6 @@ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
 	}
 );
 
+Title.displayName = 'Popover.Title';
+
 export { Title };

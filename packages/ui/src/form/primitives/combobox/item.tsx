@@ -43,3 +43,5 @@ export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 		);
 	}
 );
+
+Item.displayName = 'Combobox.Item';

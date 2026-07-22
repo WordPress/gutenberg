@@ -19,3 +19,5 @@ export const Title = forwardRef< HTMLSpanElement, TitleProps >(
 		);
 	}
 );
+
+Title.displayName = 'Notice.Title';

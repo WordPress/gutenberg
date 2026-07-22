@@ -7,3 +7,5 @@ export const Item: React.ForwardRefExoticComponent<
 > = forwardRef( function Item( props, ref ) {
 	return <_Field.Item ref={ ref } { ...props } />;
 } );
+
+Item.displayName = 'Field.Item';

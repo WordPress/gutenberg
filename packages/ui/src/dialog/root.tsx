@@ -28,4 +28,6 @@ function Root( { modal = true, children, ...props }: RootProps ) {
 	);
 }
 
+Root.displayName = 'Dialog.Root';
+
 export { Root };

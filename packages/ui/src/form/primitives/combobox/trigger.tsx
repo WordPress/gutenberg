@@ -55,3 +55,5 @@ export const Trigger = forwardRef< HTMLButtonElement, ComboboxTriggerProps >(
 		);
 	}
 );
+
+Trigger.displayName = 'Combobox.Trigger';

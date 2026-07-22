@@ -15,3 +15,5 @@ export const Empty = forwardRef< HTMLDivElement, ComboboxEmptyProps >(
 		);
 	}
 );
+
+Empty.displayName = 'Combobox.Empty';

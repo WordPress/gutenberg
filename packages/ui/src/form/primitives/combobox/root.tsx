@@ -12,3 +12,5 @@ export function Root< Value, Multiple extends boolean | undefined = false >(
 ) {
 	return <_Combobox.Root { ...props } />;
 }
+
+Root.displayName = 'Combobox.Root';

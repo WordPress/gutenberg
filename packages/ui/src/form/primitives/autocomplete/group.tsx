@@ -22,3 +22,5 @@ export const Group = forwardRef< HTMLDivElement, AutocompleteGroupProps >(
 		);
 	}
 );
+
+Group.displayName = 'Autocomplete.Group';

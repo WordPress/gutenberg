@@ -62,4 +62,6 @@ const Content = forwardRef< HTMLDivElement, ContentProps >(
 	}
 );
 
+Content.displayName = 'Drawer.Content';
+
 export { Content };

@@ -41,3 +41,5 @@ export const HeaderDescription = forwardRef<
 		</div>
 	);
 } );
+
+HeaderDescription.displayName = 'CollapsibleCard.HeaderDescription';

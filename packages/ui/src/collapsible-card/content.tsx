@@ -42,3 +42,5 @@ export const Content = forwardRef< HTMLDivElement, ContentProps >(
 		);
 	}
 );
+
+Content.displayName = 'CollapsibleCard.Content';

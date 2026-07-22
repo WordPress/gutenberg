@@ -25,4 +25,6 @@ const Action = forwardRef< HTMLButtonElement, ActionProps >(
 	}
 );
 
+Action.displayName = 'Drawer.Action';
+
 export { Action };

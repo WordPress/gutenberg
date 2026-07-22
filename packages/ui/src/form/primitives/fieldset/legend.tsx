@@ -27,3 +27,5 @@ export const FieldsetLegend = forwardRef< HTMLDivElement, FieldsetLegendProps >(
 		return legend;
 	}
 );
+
+FieldsetLegend.displayName = 'Fieldset.Legend';

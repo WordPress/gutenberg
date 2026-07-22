@@ -42,3 +42,5 @@ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 		return renderSlotWithChildren( portal, <Portal />, positionedPopup );
 	}
 );
+
+Popup.displayName = 'Select.Popup';

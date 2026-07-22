@@ -5,4 +5,6 @@ function Provider( { ...props }: ProviderProps ) {
 	return <_Tooltip.Provider { ...props } />;
 }
 
+Provider.displayName = 'Tooltip.Provider';
+
 export { Provider };

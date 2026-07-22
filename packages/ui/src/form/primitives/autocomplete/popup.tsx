@@ -29,3 +29,5 @@ export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
 		return renderSlotWithChildren( portal, <Portal />, positionedPopup );
 	}
 );
+
+Popup.displayName = 'Autocomplete.Popup';

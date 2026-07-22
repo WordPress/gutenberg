@@ -15,3 +15,5 @@ export const List = forwardRef< HTMLDivElement, AutocompleteListProps >(
 		);
 	}
 );
+
+List.displayName = 'Autocomplete.List';

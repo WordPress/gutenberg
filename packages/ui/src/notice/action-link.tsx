@@ -23,3 +23,5 @@ export const ActionLink = forwardRef< HTMLAnchorElement, ActionLinkProps >(
 		);
 	}
 );
+
+ActionLink.displayName = 'Notice.ActionLink';

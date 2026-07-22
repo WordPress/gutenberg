@@ -21,3 +21,5 @@ export const Description = forwardRef<
 		/>
 	);
 } );
+
+Description.displayName = 'Field.Description';

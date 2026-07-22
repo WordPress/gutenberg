@@ -21,3 +21,5 @@ export const ListBody = forwardRef< HTMLDivElement, AutocompleteListBodyProps >(
 		return element;
 	}
 );
+
+ListBody.displayName = 'Autocomplete.ListBody';

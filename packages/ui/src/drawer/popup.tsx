@@ -89,4 +89,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 	return renderSlotWithChildren( portal, <Portal />, portalChildren );
 } );
 
+Popup.displayName = 'Drawer.Popup';
+
 export { Popup };

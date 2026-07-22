@@ -18,4 +18,6 @@ function Root( props: RootProps ) {
 	return <_Tooltip.Root { ...props } />;
 }
 
+Root.displayName = 'Tooltip.Root';
+
 export { Root };

@@ -1,16 +1,35 @@
-export { Chips } from './chips';
-export { ChipWithRemove } from './chip-with-remove';
-export { Clear } from './clear';
-export { Collection } from './collection';
-export { Empty } from './empty';
-export { Input } from './input';
-export { Item } from './item';
-export { List } from './list';
-export { ListBody } from './list-body';
-export { ListFooter } from './list-footer';
-export { Portal } from './portal';
-export { Positioner } from './positioner';
-export { Popup } from './popup';
-export { Root } from './root';
-export { Trigger } from './trigger';
-export { Value } from './value';
+import { Chips } from './chips';
+import { ChipWithRemove } from './chip-with-remove';
+import { Clear } from './clear';
+import { Collection } from './collection';
+import { Empty } from './empty';
+import { Input } from './input';
+import { Item } from './item';
+import { List } from './list';
+import { ListBody } from './list-body';
+import { ListFooter } from './list-footer';
+import { Portal } from './portal';
+import { Positioner } from './positioner';
+import { Popup } from './popup';
+import { Root } from './root';
+import { Trigger } from './trigger';
+import { Value } from './value';
+
+export {
+	Chips,
+	ChipWithRemove,
+	Clear,
+	Collection,
+	Empty,
+	Input,
+	Item,
+	List,
+	ListBody,
+	ListFooter,
+	Portal,
+	Positioner,
+	Popup,
+	Root,
+	Trigger,
+	Value,
+};

@@ -22,3 +22,5 @@ export const Item = forwardRef< HTMLDivElement, AutocompleteItemProps >(
 		);
 	}
 );
+
+Item.displayName = 'Autocomplete.Item';

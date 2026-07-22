@@ -24,3 +24,5 @@ export const Input = forwardRef< HTMLInputElement, ComboboxInputProps >(
 		);
 	}
 );
+
+Input.displayName = 'Combobox.Input';

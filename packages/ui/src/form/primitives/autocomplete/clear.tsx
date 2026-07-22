@@ -39,3 +39,5 @@ export const Clear = forwardRef< HTMLButtonElement, AutocompleteClearProps >(
 		);
 	}
 );
+
+Clear.displayName = 'Autocomplete.Clear';

@@ -31,4 +31,6 @@ const Header = forwardRef< HTMLElement, HeaderProps >( function DialogHeader(
 	return element;
 } );
 
+Header.displayName = 'Dialog.Header';
+
 export { Header };

@@ -18,3 +18,5 @@ export const Root = forwardRef< HTMLDivElement, TabRootProps >(
 		);
 	}
 );
+
+Root.displayName = 'Tabs.Root';

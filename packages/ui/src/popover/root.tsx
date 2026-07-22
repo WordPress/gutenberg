@@ -41,4 +41,6 @@ function Root( props: RootProps ) {
 	return <_Popover.Root { ...props } />;
 }
 
+Root.displayName = 'Popover.Root';
+
 export { Root };

@@ -31,3 +31,5 @@ export const Label = forwardRef< HTMLLabelElement, FieldLabelProps >(
 		return label;
 	}
 );
+
+Label.displayName = 'Field.Label';

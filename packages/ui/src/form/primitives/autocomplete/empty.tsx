@@ -15,3 +15,5 @@ export const Empty = forwardRef< HTMLDivElement, AutocompleteEmptyProps >(
 		);
 	}
 );
+
+Empty.displayName = 'Autocomplete.Empty';

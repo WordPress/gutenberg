@@ -130,3 +130,5 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
 
 	return element;
 } );
+
+Root.displayName = 'Notice.Root';

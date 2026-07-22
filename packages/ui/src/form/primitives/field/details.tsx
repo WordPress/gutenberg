@@ -36,3 +36,5 @@ export const Details = forwardRef< HTMLDivElement, FieldDetailsProps >(
 		);
 	}
 );
+
+Details.displayName = 'Field.Details';
