@@ -515,9 +515,11 @@ export function useNoteActions() {
 						}
 					) )
 				) {
-					throw new Error(
-						__(
-							'The note was added, but its block attachment could not be saved.'
+					onError(
+						new Error(
+							__(
+								'The note was added, but its block attachment could not be saved.'
+							)
 						)
 					);
 				}
