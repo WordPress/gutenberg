@@ -1159,6 +1159,7 @@ test.describe( 'Block Notes', () => {
 			const paragraph = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} );
+			await paragraph.click();
 			await paragraph.selectText();
 			await page
 				.getByRole( 'button', { name: 'More', exact: true } )
@@ -1480,6 +1481,7 @@ test.describe( 'Block Notes', () => {
 			const paragraph = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} );
+			await paragraph.click();
 			await paragraph.selectText();
 			await page
 				.getByRole( 'button', { name: 'More', exact: true } )
