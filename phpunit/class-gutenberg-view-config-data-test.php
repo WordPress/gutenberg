@@ -85,7 +85,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			'default_view' => array( 'type' => 'table' ),
 			'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
 		);
-		$data = new Gutenberg_View_Config_Data( $defaults );
+		$data     = new Gutenberg_View_Config_Data( $defaults );
 		$data->set(
 			array(
 				'default_view' => array(
@@ -109,10 +109,13 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 
 	public function test_set_null_unsets_key() {
 		$defaults = array(
-			'default_view' => array( 'type' => 'table', 'perPage' => 20 ),
+			'default_view' => array(
+				'type'    => 'table',
+				'perPage' => 20,
+			),
 			'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
 		);
-		$data = new Gutenberg_View_Config_Data( $defaults );
+		$data     = new Gutenberg_View_Config_Data( $defaults );
 		$data->set(
 			array(
 				'default_view' => array(
@@ -127,7 +130,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			array(
 				'default_view' => array( 'type' => 'grid' ),
 				'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
-				),
+			),
 			self::read_config( $data )
 		);
 	}
@@ -189,7 +192,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'fields' => array( 'f1', 'f2' ),
 			),
 		);
-		$data = new Gutenberg_View_Config_Data( $defaults );
+		$data     = new Gutenberg_View_Config_Data( $defaults );
 		// Mutate the key, then remove it: removal restores its default.
 		$data->merge( array( 'default_view' => array( 'type' => 'grid' ) ), 1 );
 		$data->remove( array( 'default_view' ), 1 );
@@ -882,12 +885,17 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			),
 			'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
 		);
-		$data = new Gutenberg_View_Config_Data( $defaults );
+		$data     = new Gutenberg_View_Config_Data( $defaults );
 		// Mutate the keys, then null them: each resets to its default.
 		$data->replace(
 			array(
 				'default_view' => array( 'type' => 'grid' ),
-				'view_list'    => array( array( 'slug' => 'mine', 'title' => 'Mine' ) ),
+				'view_list'    => array(
+					array(
+						'slug'  => 'mine',
+						'title' => 'Mine',
+					),
+				),
 			),
 			1
 		);
@@ -1569,12 +1577,17 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			),
 			'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
 		);
-		$data = new Gutenberg_View_Config_Data( $defaults );
+		$data     = new Gutenberg_View_Config_Data( $defaults );
 		// Mutate the keys, then null them: each resets to its default.
 		$data->merge(
 			array(
 				'default_view' => array( 'type' => 'grid' ),
-				'view_list'    => array( array( 'slug' => 'mine', 'title' => 'Mine' ) ),
+				'view_list'    => array(
+					array(
+						'slug'  => 'mine',
+						'title' => 'Mine',
+					),
+				),
 			),
 			1
 		);
