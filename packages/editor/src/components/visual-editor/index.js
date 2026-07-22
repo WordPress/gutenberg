@@ -14,7 +14,7 @@ import {
 	RecursionProvider,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useEffect, useRef, useMemo } from '@wordpress/element';
+import { useEffect, useRef, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
@@ -110,6 +110,8 @@ function VisualEditor( {
 		isPreview,
 		styles,
 		hasCanvasWidth,
+		canvasWidth,
+		canvasHeight,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -119,6 +121,7 @@ function VisualEditor( {
 			getRenderingMode,
 			getDeviceType,
 			getCanvasWidth,
+			getCanvasHeight,
 		} = unlock( select( editorStore ) );
 		const { getPostType, getEditedEntityRecord } = select( coreStore );
 		const postTypeSlug = getCurrentPostType();
@@ -135,6 +138,7 @@ function VisualEditor( {
 		const supportsTemplateMode = editorSettings.supportsTemplateMode;
 		const postTypeObject = getPostType( postTypeSlug );
 		const currentTemplateId = getCurrentTemplateId();
+		const _canvasWidth = getCanvasWidth();
 		const template = currentTemplateId
 			? getEditedEntityRecord(
 					'postType',
@@ -160,7 +164,9 @@ function VisualEditor( {
 			postType: postTypeSlug,
 			isPreview: editorSettings.isPreviewMode,
 			styles: editorSettings.styles,
-			hasCanvasWidth: getCanvasWidth() !== undefined,
+			hasCanvasWidth: _canvasWidth !== undefined,
+			canvasWidth: _canvasWidth,
+			canvasHeight: getCanvasHeight(),
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -185,6 +191,7 @@ function VisualEditor( {
 	}, [] );
 
 	const localRef = useRef();
+	const [ isResizingCanvas, setIsResizingCanvas ] = useState( false );
 	const [ globalLayoutSettings ] = useSettings( 'layout' );
 
 	// fallbackLayout is used if there is no Post Content,
@@ -316,12 +323,14 @@ function VisualEditor( {
 		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
 		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
+	const isResizablePostType = [
+		NAVIGATION_POST_TYPE,
+		TEMPLATE_PART_POST_TYPE,
+		PATTERN_POST_TYPE,
+	].includes( postType );
+
 	const enableResizing =
-		( [
-			NAVIGATION_POST_TYPE,
-			TEMPLATE_PART_POST_TYPE,
-			PATTERN_POST_TYPE,
-		].includes( postType ) &&
+		( isResizablePostType &&
 			// Disable in previews / view mode.
 			! isPreview &&
 			// Disable resizing in mobile viewport.
@@ -338,6 +347,13 @@ function VisualEditor( {
 	);
 
 	const centerContentCSS = `display:flex;align-items:center;justify-content:center;`;
+	const shouldExpandIframeBody =
+		canvasHeight !== undefined &&
+		! isResizablePostType &&
+		! isResizingCanvas;
+	const iframeBodyMinHeightCSS = shouldExpandIframeBody
+		? 'min-height:100vh;'
+		: '';
 
 	const iframeStyles = useMemo( () => {
 		return [
@@ -356,7 +372,7 @@ function VisualEditor( {
 				${ paddingStyle ? paddingStyle : '' }
 				${
 					enableResizing
-						? `.block-editor-iframe__html{background:var(--wp-editor-canvas-background);min-height:100vh;${ centerContentCSS }}.block-editor-iframe__body{width:100%;}`
+						? `.block-editor-iframe__html{background:var(--wp-editor-canvas-background);min-height:100vh;${ centerContentCSS }}.block-editor-iframe__body{width:100%;${ iframeBodyMinHeightCSS }}`
 						: ''
 				}${
 					isNavigationPreview
@@ -368,7 +384,14 @@ function VisualEditor( {
 				// The CSS for isNavigationPreview centers the body content vertically and horizontally when the navigation is in preview mode.
 			},
 		];
-	}, [ styles, enableResizing, isNavigationPreview, paddingStyle ] );
+	}, [
+		styles,
+		enableResizing,
+		centerContentCSS,
+		iframeBodyMinHeightCSS,
+		isNavigationPreview,
+		paddingStyle,
+	] );
 
 	const typewriterRef = useTypewriter();
 	contentRef = useMergeRefs( [
@@ -404,7 +427,19 @@ function VisualEditor( {
 			) }
 		>
 			<SyncConnectionErrorModal />
-			<ResizableEditor enableResizing={ enableResizing } height="100%">
+			<ResizableEditor
+				enableResizing={ enableResizing }
+				width={
+					enableResizing && canvasWidth ? canvasWidth + 'px' : '100%'
+				}
+				height={
+					enableResizing && canvasHeight && ! isResizingCanvas
+						? canvasHeight + 'px'
+						: '100%'
+				}
+				onResizeStart={ () => setIsResizingCanvas( true ) }
+				onResizeStop={ () => setIsResizingCanvas( false ) }
+			>
 				<BlockCanvas
 					shouldIframe
 					contentRef={ contentRef }
