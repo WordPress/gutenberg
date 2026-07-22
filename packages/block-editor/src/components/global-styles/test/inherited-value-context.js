@@ -179,6 +179,29 @@ describe( 'useResolvedStyle hook', () => {
 		expect( parsed.value.typography.fontSize ).toBe( '24px' );
 	} );
 
+	// A title block at level 0 renders a paragraph, so no heading element styles
+	// reach it. `0` is the one falsy level, and an `||` anywhere on the path
+	// from the `level` attribute to `getElementLayers` would silently turn it
+	// into "no level given" and wrongly fold the generic `heading` layer.
+	test( 'a title block at level 0 folds no heading element styles', () => {
+		mockStores(
+			{
+				typography: { lineHeight: '1.6' },
+				elements: {
+					heading: { typography: { fontSize: '30px' } },
+					h2: { typography: { fontSize: '24px' } },
+				},
+			},
+			{ attributes: { level: 0 } }
+		);
+		render( <Probe blockName="core/site-title" /> );
+		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
+		expect( parsed.value.typography.fontSize ).toBeUndefined();
+		// Root styles still resolve, so the assertion above means "no heading
+		// layer", not "nothing resolved at all".
+		expect( parsed.value.typography.lineHeight ).toBe( '1.6' );
+	} );
+
 	test( 'returns empty value and sources when no block name is given', () => {
 		mockStores( { typography: { fontSize: '16px' } } );
 		render( <Probe /> );
