@@ -18,8 +18,12 @@ import { getVariationNameFromClass } from '../../hooks/block-style-variation';
 import { useBlockEditContext } from '../block-edit/context';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
+import { ENABLE_GLOBAL_STYLES_INHERITANCE } from './inheritance';
 
 const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
+
+// Undefined so the panels fall back to their `inheritedValue = value` default.
+const NO_RESOLVED_STYLE = { value: undefined, sources: undefined };
 
 /**
  * Reads the Global Styles payload and returns it as a `GlobalStylesConfig`
@@ -220,6 +224,10 @@ export function useResolvedStyle( blockName, className, selectedState = null ) {
 	const globalStyles = useRawGlobalStyles();
 
 	return useMemo( () => {
+		// Skip the cascade merge entirely when the feature is off.
+		if ( ! ENABLE_GLOBAL_STYLES_INHERITANCE ) {
+			return NO_RESOLVED_STYLE;
+		}
 		if ( ! blockName ) {
 			return { value: {}, sources: {} };
 		}
