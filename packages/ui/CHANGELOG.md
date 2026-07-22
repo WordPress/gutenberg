@@ -4,9 +4,7 @@
 
 ### Enhancements
 
--   `Combobox`: Add `Combobox.Group` and `Combobox.GroupLabel` subcomponents.
--   `Select`: Add `Select.Group` and `Select.GroupLabel` subcomponents.
--   `SelectControl`: Add `SelectControl.Group` and `SelectControl.GroupLabel` subcomponents.
+-   `Combobox`, `Select`, `SelectControl`: Add `Group` and `GroupLabel` subcomponents ([#80574](https://github.com/WordPress/gutenberg/pull/80574)).
 -   `Popover`: Default the popup's portal container to the `@wordpress/ui` compat overlay slot when present, so popovers stack reliably above other overlays in mixed-library compositions. A caller-supplied `Popover.Portal` `container` prop continues to take precedence ([#80278](https://github.com/WordPress/gutenberg/pull/80278)).
 -   `Button`: Add Storybook example demonstrating manual keyboard shortcut composition with `Tooltip`, `aria-keyshortcuts`, and an accessible description ([#80353](https://github.com/WordPress/gutenberg/pull/80353)).
 
