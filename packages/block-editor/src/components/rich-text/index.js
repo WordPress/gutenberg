@@ -29,7 +29,11 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
-import { blockBindingsKey, isPreviewModeKey } from '../block-edit/context';
+import {
+	blockBindingsKey,
+	blockEditingModeKey,
+	isPreviewModeKey,
+} from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useMarkPersistent } from './use-mark-persistent';
@@ -100,6 +104,7 @@ export function RichTextWrapper(
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
+	const hasDefaultEditingMode = context[ blockEditingModeKey ] === 'default';
 	const blockContext = useContext( BlockContext );
 	const registry = useRegistry();
 	const selector = ( select ) => {
@@ -242,36 +247,27 @@ export function RichTextWrapper(
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;
 
-	// The editing host state only adjusts this instance when the block is
-	// selected, or to strip an explicit tabIndex while the wrapper is the
-	// editing host. Otherwise avoid subscribing to the block editor store.
+	// `hasEditableRoot` tracks the *selected* block, so it also affects
+	// unselected instances: the `tabIndex` branch below strips an explicit
+	// `tabIndex={ 0 }` (as set by `useBlockProps`) while the wrapper is the
+	// editing host. Instances without one are only affected while selected,
+	// so they can skip subscribing to the block editor store.
 	const needsEditableRoot = isBlockSelected || props.tabIndex === 0;
-	const { hasEditableRoot, hasDefaultEditingMode } = useSelect(
+	const hasEditableRoot = useSelect(
 		( select ) => {
 			if ( ! needsEditableRoot ) {
-				return { hasEditableRoot: false, hasDefaultEditingMode: false };
+				return false;
 			}
 
-			const {
-				getSelectedBlockClientId,
-				canHostEditableRoot,
-				getBlockEditingMode,
-			} = unlock( select( blockEditorStore ) );
+			const { getSelectedBlockClientId, canHostEditableRoot } = unlock(
+				select( blockEditorStore )
+			);
 
-			return {
-				// Whether the wrapper is an editing host, which depends on the
-				// selected block. That is this block when it is selected, but
-				// not on the `tabIndex` path below, which also runs while
-				// another block is selected.
-				hasEditableRoot: canHostEditableRoot(
-					getSelectedBlockClientId()
-				),
-				hasDefaultEditingMode:
-					isBlockSelected &&
-					getBlockEditingMode( clientId ) === 'default',
-			};
+			// Whether the wrapper is an editing host, which depends on the
+			// selected block, not necessarily this one.
+			return canHostEditableRoot( getSelectedBlockClientId() );
 		},
-		[ needsEditableRoot, isBlockSelected, clientId ]
+		[ needsEditableRoot ]
 	);
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
