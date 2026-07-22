@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   DataViews: Add Shift+Click range selection through a shared `useSelectionProps` hook that layouts can adopt, wired up in the table and grid layouts.[#80046](https://github.com/WordPress/gutenberg/pull/80046)
+-   DataForm: Use the field's `header` (which may be a React element and falls back to `label`) as the control label in the text, number, textarea, select, combobox, toggle, radio, and color controls, matching the table and grid layouts.
 
 ### Bug Fix
 

@@ -21,7 +21,7 @@ export default function Combobox< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, description, placeholder, getValue, setValue, isValid } =
+	const { header, description, placeholder, getValue, setValue, isValid } =
 		field;
 	const value = getValue( { item: data } ) ?? '';
 
@@ -44,7 +44,7 @@ export default function Combobox< Item >( {
 		<ValidatedComboboxControl
 			required={ !! field.isValid?.required }
 			customValidity={ getCustomValidity( isValid, validity ) }
-			label={ label }
+			label={ header }
 			value={ value }
 			help={ description }
 			placeholder={ placeholder }

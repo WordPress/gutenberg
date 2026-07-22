@@ -73,7 +73,7 @@ export default function Color< Item >( {
 	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, placeholder, description, setValue, isValid } = field;
+	const { header, placeholder, description, setValue, isValid } = field;
 	const disabled = field.isDisabled( { item: data, field } );
 	const value = field.getValue( { item: data } ) || '';
 
@@ -96,7 +96,7 @@ export default function Color< Item >( {
 			required={ !! field.isValid?.required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
-			label={ label }
+			label={ header }
 			placeholder={ placeholder }
 			value={ value }
 			help={ description }

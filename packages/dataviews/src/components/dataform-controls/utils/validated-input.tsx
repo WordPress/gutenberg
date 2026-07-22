@@ -40,7 +40,7 @@ export default function ValidatedText< Item >( {
 	suffix,
 	validity,
 }: DataFormValidatedTextControlProps< Item > ) {
-	const { label, placeholder, description, getValue, setValue, isValid } =
+	const { header, placeholder, description, getValue, setValue, isValid } =
 		field;
 	const value = getValue( { item: data } );
 	const disabled = field.isDisabled( { item: data, field } );
@@ -61,7 +61,7 @@ export default function ValidatedText< Item >( {
 			required={ !! isValid.required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
-			label={ label }
+			label={ header }
 			placeholder={ placeholder }
 			value={ value ?? '' }
 			help={ description }

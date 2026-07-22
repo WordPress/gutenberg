@@ -22,7 +22,7 @@ export default function Select< Item >( {
 	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { type, label, description, getValue, setValue, isValid } = field;
+	const { type, header, description, getValue, setValue, isValid } = field;
 	const disabled = field.isDisabled( { item: data, field } );
 
 	const isMultiple = type === 'array';
@@ -48,7 +48,7 @@ export default function Select< Item >( {
 			required={ !! field.isValid?.required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
-			label={ label }
+			label={ header }
 			value={ value }
 			help={ description }
 			options={ elements }

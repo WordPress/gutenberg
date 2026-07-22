@@ -92,7 +92,7 @@ export default function ValidatedNumber< Item >( {
 }: DataFormControlProps< Item > ) {
 	const decimals = ( field.format as FormatNumber )?.decimals ?? 0;
 	const step = Math.pow( 10, Math.abs( decimals ) * -1 );
-	const { label, description, getValue, setValue, isValid } = field;
+	const { header, description, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } ) ?? '';
 	const disabled = field.isDisabled( { item: data, field } );
 
@@ -151,7 +151,7 @@ export default function ValidatedNumber< Item >( {
 			required={ !! isValid.required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
-			label={ label }
+			label={ header }
 			help={ description }
 			value={ value }
 			onChange={ onChangeControl }

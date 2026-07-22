@@ -24,7 +24,7 @@ export default function Textarea< Item >( {
 }: DataFormControlProps< Item > ) {
 	const { rows = 4 } = config || {};
 	const disabled = field.isDisabled( { item: data, field } );
-	const { label, placeholder, description, setValue, isValid } = field;
+	const { header, placeholder, description, setValue, isValid } = field;
 	const value = field.getValue( { item: data } );
 
 	const onChangeControl = useCallback(
@@ -38,7 +38,7 @@ export default function Textarea< Item >( {
 			required={ !! isValid.required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
-			label={ label }
+			label={ header }
 			placeholder={ placeholder }
 			value={ value ?? '' }
 			help={ description }
