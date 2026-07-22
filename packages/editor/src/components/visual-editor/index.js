@@ -14,7 +14,7 @@ import {
 	RecursionProvider,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useEffect, useRef, useMemo } from '@wordpress/element';
+import { useEffect, useRef, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
@@ -191,6 +191,7 @@ function VisualEditor( {
 	}, [] );
 
 	const localRef = useRef();
+	const [ isResizingCanvas, setIsResizingCanvas ] = useState( false );
 	const [ globalLayoutSettings ] = useSettings( 'layout' );
 
 	// fallbackLayout is used if there is no Post Content,
@@ -345,7 +346,7 @@ function VisualEditor( {
 
 	const centerContentCSS = `display:flex;align-items:center;justify-content:center;`;
 	const shouldExpandIframeBody =
-		canvasHeight !== undefined && ! isDesignPostType;
+		canvasHeight !== undefined && ! isDesignPostType && ! isResizingCanvas;
 	const iframeBodyMinHeightCSS = shouldExpandIframeBody
 		? 'min-height:100vh;'
 		: '';
@@ -426,7 +427,9 @@ function VisualEditor( {
 				enableResizing={ enableResizing }
 				height="100%"
 				canvasWidth={ canvasWidth }
-				canvasHeight={ canvasHeight }
+				canvasHeight={ isResizingCanvas ? undefined : canvasHeight }
+				onResizeStart={ () => setIsResizingCanvas( true ) }
+				onResizeStop={ () => setIsResizingCanvas( false ) }
 			>
 				<BlockCanvas
 					shouldIframe
