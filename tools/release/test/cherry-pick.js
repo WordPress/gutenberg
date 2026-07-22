@@ -9,7 +9,13 @@ const { spawnSync } = require( 'node:child_process' );
 /**
  * Internal dependencies
  */
-const { cherryPickAll, cherryPickOne } = require( '../cherry-pick.mjs' );
+const {
+	cherryPickAll,
+	cherryPickOne,
+	isGhVersionSupported,
+	parseGhVersion,
+	MINIMUM_GH_VERSION,
+} = require( '../cherry-pick.mjs' );
 
 const LOCAL_AUTHOR = {
 	name: 'Marco Ciampini',
@@ -61,6 +67,36 @@ function initializeRepository() {
 	git( [ 'config', 'user.email', LOCAL_AUTHOR.email ] );
 	commitFile( 'base.txt', 'base\n', 'Base' );
 }
+
+describe( 'GitHub CLI version requirement', () => {
+	it( 'extracts the version from the `gh --version` output', () => {
+		expect(
+			parseGhVersion(
+				'gh version 2.96.0 (2026-07-02)\nhttps://github.com/cli/cli/releases/tag/v2.96.0\n'
+			)
+		).toBe( '2.96.0' );
+	} );
+
+	it( 'returns null when the output carries no version', () => {
+		expect( parseGhVersion( '' ) ).toBeNull();
+	} );
+
+	it( 'rejects versions that predate the `gh pr edit` fix', () => {
+		// 2.54.0 queries the sunset Projects (classic) API and always fails.
+		expect( isGhVersionSupported( '2.54.0' ) ).toBe( false );
+	} );
+
+	it( 'accepts the minimum version and newer ones', () => {
+		expect( isGhVersionSupported( MINIMUM_GH_VERSION ) ).toBe( true );
+		expect( isGhVersionSupported( '2.96.0' ) ).toBe( true );
+		// A lexical comparison would rank this below "2.73.0".
+		expect( isGhVersionSupported( '2.100.0' ) ).toBe( true );
+	} );
+
+	it( 'rejects a missing version', () => {
+		expect( isGhVersionSupported( null ) ).toBe( false );
+	} );
+} );
 
 describe( 'release cherry-picks', () => {
 	beforeEach( initializeRepository );
