@@ -107,6 +107,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
+		ariaLabel,
 	} = useContext( PrivateBlockContext );
 
 	useRegisterBlockEventHandlers( clientId, wrapperProps );
@@ -186,7 +187,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
 		role: 'document',
-		'aria-label': blockLabel,
+		'aria-label': ariaLabel ?? blockLabel,
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
