@@ -22,10 +22,21 @@ import {
 } from '../../components/spacing-sizes-control/utils';
 
 import {
-	getCustomValueFromPreset as getCustomRadiusValue,
-	getPresetValueFromCustomValue as getRadiusPresetFromCustom,
-	isValuePreset as isValueRadiusPreset,
-} from '../../components/border-radius-control/utils';
+	getCustomValueFromPreset,
+	getPresetValueFromCustomValue,
+	isValuePreset,
+} from '../../components/preset-input-control/utils';
+
+// Border-radius equivalents of the spacing helpers above. The per-domain
+// implementations were consolidated into the generic preset-input-control
+// helpers, which take the preset type as an extra argument.
+const BORDER_RADIUS_PRESET_TYPE = 'border-radius';
+const getCustomRadiusValue = ( value, presets ) =>
+	getCustomValueFromPreset( value, presets, BORDER_RADIUS_PRESET_TYPE );
+const getRadiusPresetFromCustom = ( value, presets ) =>
+	getPresetValueFromCustomValue( value, presets, BORDER_RADIUS_PRESET_TYPE );
+const isValueRadiusPreset = ( value ) =>
+	isValuePreset( value, BORDER_RADIUS_PRESET_TYPE );
 
 // Fixture: a minimal merged GlobalStylesConfig sized just large enough
 // to exercise every (form × domain) cell. Mirrors the two-branch shape
@@ -35,7 +46,7 @@ import {
 // presets by origin in priority order [ 'custom', 'theme', 'default' ].
 // A flat array does NOT match. Real GS payloads are origin-keyed; the
 // fixture mirrors that exactly. The per-domain block-editor helpers
-// (spacing-sizes-control, border-radius-control) take the FLAT preset
+// (spacing-sizes-control, preset-input-control) take the FLAT preset
 // list, so we keep both shapes (RAW_PRESETS for the helpers,
 // origin-keyed wrappers for the engine).
 const RAW_PRESETS = {
@@ -311,9 +322,10 @@ describe( 'spacing preset round-trip', () => {
 } );
 
 // ---------------------------------------------------------------------------
-// BORDER-RADIUS — NOT in STYLE_PATH_TO_CSS_VAR_INFIX. Uses the per-domain
-// helpers in border-radius-control/utils.js. No slug attribute exists;
-// border-radius lives only in style.border.radius.
+// BORDER-RADIUS — NOT in STYLE_PATH_TO_CSS_VAR_INFIX. Uses the generic
+// helpers in preset-input-control/utils.js with the 'border-radius' preset
+// type. No slug attribute exists; border-radius lives only in
+// style.border.radius.
 // ---------------------------------------------------------------------------
 describe( 'border-radius preset round-trip', () => {
 	const stylePath = 'border.radius';
