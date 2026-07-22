@@ -202,6 +202,7 @@
 	height: 24px;
 	padding: 0;
 	border: none;
+	border-radius: 50%;
 	background: transparent;
 	cursor: pointer;
 	flex-shrink: 0;
@@ -241,6 +242,7 @@
 .wp-block-slider-indicators__dots.is-style-line .wp-block-slider-indicators__dot {
 	width: 26px;
 	height: 24px;
+	border-radius: 2px;
 
 	&::before {
 		width: 26px;
