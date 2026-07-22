@@ -34,8 +34,17 @@
 		img {
 			opacity: 0.3;
 		}
+	}
 
-		// Shown while image is being uploaded.
+	// While loading, this wraps just the image so it acts as an image-sized
+	// positioning context: the spinner then centres on the logo rather than
+	// the whole (potentially much larger) block area.
+	.wp-block-site-logo__loading {
+		position: relative;
+		display: inline-block;
+		line-height: 0;
+		max-width: 100%;
+
 		.components-spinner {
 			position: absolute;
 			top: 50%;

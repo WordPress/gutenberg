@@ -133,23 +133,31 @@ const SiteLogo = ( {
 		toggleSelection( true );
 	}
 
-	const img = (
-		<>
-			<img
-				className="custom-logo"
-				src={ logoUrl }
-				alt={ alt }
-				onLoad={ ( event ) => {
-					setIsSwappingMedia( false );
-					setNaturalSize( {
-						naturalWidth: event.target.naturalWidth,
-						naturalHeight: event.target.naturalHeight,
-					} );
-				} }
-				onError={ () => setIsSwappingMedia( false ) }
-			/>
-			{ ( isBlobURL( logoUrl ) || isSwappingMedia ) && <Spinner /> }
-		</>
+	const isLoading = isBlobURL( logoUrl ) || isSwappingMedia;
+	const logo = (
+		<img
+			className="custom-logo"
+			src={ logoUrl }
+			alt={ alt }
+			onLoad={ ( event ) => {
+				setIsSwappingMedia( false );
+				setNaturalSize( {
+					naturalWidth: event.target.naturalWidth,
+					naturalHeight: event.target.naturalHeight,
+				} );
+			} }
+			onError={ () => setIsSwappingMedia( false ) }
+		/>
+	);
+	// Only wrap while loading: the wrapper is an image-sized positioning
+	// context so the spinner centres on the logo rather than the whole block.
+	const img = isLoading ? (
+		<span className="wp-block-site-logo__loading">
+			{ logo }
+			<Spinner />
+		</span>
+	) : (
+		logo
 	);
 
 	let imgWrapper = img;
