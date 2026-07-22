@@ -254,16 +254,6 @@ HTML;
 
 		$this->assertStringContainsString( '<audio crossorigin="anonymous"', $output );
 		$this->assertStringContainsString( '<video crossorigin="anonymous"', $output );
-		$this->assertMatchesRegularExpression(
-			'/<img\b/i',
-			$output,
-			'Expected the media templates to contain IMG tags.'
-		);
-		$this->assertDoesNotMatchRegularExpression(
-			'/<img\b[^>]*\bcrossorigin/i',
-			$output,
-			'IMG tags in the media templates must not receive a crossorigin attribute, as it breaks previews of media served without CORS headers. See https://core.trac.wordpress.org/ticket/65673.'
-		);
 		$this->assertStringNotContainsString(
 			'crossorigin="anonymous" crossorigin=',
 			$output,
@@ -273,9 +263,9 @@ HTML;
 
 	/**
 	 * Tests that the media template processing adds crossorigin to AUDIO and
-	 * VIDEO tags, skips tags that already have it, and removes it from IMG
-	 * tags (WordPress 7.1 betas added it, breaking previews of media served
-	 * without CORS headers).
+	 * VIDEO tags, skips tags that already have it, and leaves IMG tags
+	 * untouched (adding it breaks previews of media served without CORS
+	 * headers).
 	 *
 	 * @covers ::gutenberg_update_media_template_crossorigin_attributes
 	 */
@@ -283,7 +273,6 @@ HTML;
 		$html = <<<HTML
 <script type="text/html" id="tmpl-test-media">
 	<img src="{{ data.url }}" draggable="false" alt="" />
-	<img crossorigin="anonymous" src="{{ data.url }}" draggable="false" alt="" />
 	<audio controls src="{{ data.url }}"></audio>
 	<audio crossorigin="anonymous" controls src="{{ data.url }}"></audio>
 	<video controls src="{{ data.url }}"></video>
@@ -303,7 +292,7 @@ HTML;
 		$this->assertDoesNotMatchRegularExpression(
 			'/<img\b[^>]*\bcrossorigin/i',
 			$actual,
-			'IMG tags must not carry a crossorigin attribute, including ones that already had it.'
+			'IMG tags must not receive a crossorigin attribute.'
 		);
 		$this->assertStringContainsString(
 			"var notATemplate = '<img src=\"test.jpg\" />';",

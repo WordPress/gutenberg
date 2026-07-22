@@ -471,8 +471,7 @@ function gutenberg_add_crossorigin_attributes( string $html ): string {
  * that already have the attribute are left untouched so the output does
  * not gain duplicates on WordPress versions where Core adds it itself.
  *
- * IMG is intentionally excluded, and any crossorigin attribute Core added
- * to IMG tags (WordPress 7.1 betas) is removed: under
+ * IMG is intentionally excluded: under
  * `Document-Isolation-Policy: isolate-and-credentialless` the browser
  * already loads cross-origin images in credentialless mode, so forcing
  * `crossorigin="anonymous"` triggers a CORS request that breaks previews
@@ -497,17 +496,11 @@ function gutenberg_update_media_template_crossorigin_attributes( string $html ):
 		}
 		$template_processor = new WP_HTML_Tag_Processor( $script_processor->get_modifiable_text() );
 		while ( $template_processor->next_tag() ) {
-			$tag = $template_processor->get_tag();
 			if (
-				in_array( $tag, array( 'AUDIO', 'VIDEO' ), true )
+				in_array( $template_processor->get_tag(), array( 'AUDIO', 'VIDEO' ), true )
 				&& ! is_string( $template_processor->get_attribute( 'crossorigin' ) )
 			) {
 				$template_processor->set_attribute( 'crossorigin', 'anonymous' );
-			} elseif (
-				'IMG' === $tag
-				&& null !== $template_processor->get_attribute( 'crossorigin' )
-			) {
-				$template_processor->remove_attribute( 'crossorigin' );
 			}
 		}
 		$script_processor->set_modifiable_text( $template_processor->get_updated_html() );
