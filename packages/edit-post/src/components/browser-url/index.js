@@ -65,25 +65,19 @@ export default function BrowserURL() {
 	}, [] );
 	const { openRevision } = unlock( useDispatch( editorStore ) );
 
-	useEffect( () => {
-		if (
-			! initialRevisionId ||
-			hasHandledInitialRevisionRef.current ||
-			! postId
-		) {
-			return;
-		}
-		hasHandledInitialRevisionRef.current = true;
-		openRevision( initialRevisionId );
-	}, [ initialRevisionId, postId, openRevision ] );
-
-	// On revision deep links, delay the first write so `openRevision()` can
-	// update the store first.
 	const lastURLWriteTimeRef = useRef( null );
 	const lastPostIdRef = useRef( null );
 
 	useEffect( () => {
-		if ( ! postId || postStatus === 'auto-draft' ) {
+		if ( ! postId ) {
+			return;
+		}
+		if ( initialRevisionId && ! hasHandledInitialRevisionRef.current ) {
+			hasHandledInitialRevisionRef.current = true;
+			openRevision( initialRevisionId );
+			return;
+		}
+		if ( postStatus === 'auto-draft' ) {
 			return;
 		}
 		const previousPostId = lastPostIdRef.current;
@@ -107,11 +101,8 @@ export default function BrowserURL() {
 			return;
 		}
 		if ( lastURLWriteTimeRef.current === null ) {
-			if ( ! initialRevisionId ) {
-				write();
-				return;
-			}
-			lastURLWriteTimeRef.current = Date.now();
+			write();
+			return;
 		}
 		if (
 			Date.now() - lastURLWriteTimeRef.current >=
@@ -122,7 +113,13 @@ export default function BrowserURL() {
 		}
 		const timeoutId = setTimeout( write, URL_WRITE_DEBOUNCE_MS );
 		return () => clearTimeout( timeoutId );
-	}, [ postId, postStatus, currentRevisionId, initialRevisionId ] );
+	}, [
+		postId,
+		postStatus,
+		currentRevisionId,
+		initialRevisionId,
+		openRevision,
+	] );
 
 	return null;
 }
