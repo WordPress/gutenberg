@@ -118,6 +118,28 @@ function getDiffStatusLabel( status, blockTitle ) {
 }
 
 /**
+ * Overrides the wrapped block's aria-label with its diff status label.
+ *
+ * Only the block itself is affected: nested blocks set up their own private
+ * context, so they don't inherit an ancestor's diff label.
+ *
+ * @param {Object}      props          Component props.
+ * @param {string}      props.label    The diff status label.
+ * @param {JSX.Element} props.children The block to label.
+ * @return {JSX.Element} The labelled block.
+ */
+function BlockDiffLabelProvider( { label, children } ) {
+	const context = useContext( PrivateBlockContext );
+	return (
+		<PrivateBlockContext.Provider
+			value={ { ...context, ariaLabel: label } }
+		>
+			{ children }
+		</PrivateBlockContext.Provider>
+	);
+}
+
+/**
  * Filter to add diff status CSS classes to blocks.
  *
  * @param {Object} BlockListBlock The original block list block component.
@@ -126,23 +148,19 @@ function getDiffStatusLabel( status, blockTitle ) {
 function withRevisionDiffClasses( BlockListBlock ) {
 	return function WithRevisionDiffClasses( props ) {
 		const { block, className, name, attributes } = props;
-		const context = useContext( PrivateBlockContext );
 		const diffStatus = block?.__revisionDiffStatus?.status;
 
 		let diffLabel;
 		if ( diffStatus ) {
-			const blockName = name ?? block.name;
-			const blockAttributes = attributes ?? block.attributes;
-
 			// Resolve the variation-aware title (e.g. "Row" instead of
 			// "Group") so blocks are announced by the name users know them
 			// as. The canvas's default wrapper labels can't be reused here:
 			// in preview mode they intentionally skip variation matching.
 			const blockTitle =
 				globalSelect( blocksStore ).getActiveBlockVariation(
-					blockName,
-					blockAttributes
-				)?.title ?? getBlockType( blockName )?.title;
+					name,
+					attributes
+				)?.title ?? getBlockType( name )?.title;
 			if ( blockTitle ) {
 				diffLabel = getDiffStatusLabel( diffStatus, blockTitle );
 			}
@@ -154,15 +172,18 @@ function withRevisionDiffClasses( BlockListBlock ) {
 			'is-revision-modified': diffStatus === 'modified',
 		} );
 
-		return (
-			<PrivateBlockContext.Provider
-				value={ {
-					...context,
-					ariaLabel: diffLabel,
-				} }
-			>
+		// This filter runs for every block in every editor, so the private
+		// context is only overridden where a diff label actually applies.
+		if ( ! diffLabel ) {
+			return (
 				<BlockListBlock { ...props } className={ enhancedClassName } />
-			</PrivateBlockContext.Provider>
+			);
+		}
+
+		return (
+			<BlockDiffLabelProvider label={ diffLabel }>
+				<BlockListBlock { ...props } className={ enhancedClassName } />
+			</BlockDiffLabelProvider>
 		);
 	};
 }
