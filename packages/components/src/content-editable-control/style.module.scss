@@ -6,7 +6,7 @@
 	width: 100%;
 	background: $components-color-background;
 	color: $components-color-foreground;
-	@include input-control( $components-color-accent );
+	@include input-control;
 	border-color: $components-color-border;
 
 	// `::placeholder` only applies to native form fields, so draw the text

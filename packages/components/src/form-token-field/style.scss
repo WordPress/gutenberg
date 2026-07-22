@@ -5,7 +5,7 @@
 @use "../utils/theme-variables" as *;
 
 .components-form-token-field__input-container {
-	@include input-control($components-color-accent);
+	@include input-control;
 	width: 100%;
 	padding: 0;
 	cursor: text;
@@ -17,7 +17,7 @@
 	}
 
 	&.is-active {
-		@include input-style__focus($components-color-accent);
+		@include input-style__focus;
 	}
 
 	// Token input
