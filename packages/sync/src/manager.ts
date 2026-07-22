@@ -324,7 +324,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		// _applyPersistedCrdtDoc does not trigger _updateEntityRecord with the
 		// just-loaded state, which would dispatch a redundant editRecord whose
 		// blocks already match the editor's parsed content.
-		internal.applyPersistedCrdtDoc( objectType, objectId, record );
+		await internal.applyPersistedCrdtDoc( objectType, objectId, record );
 
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
@@ -532,11 +532,11 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * @param {ObjectID}   objectId   Object ID.
 	 * @param {ObjectData} record     Entity record representing this object type.
 	 */
-	function _applyPersistedCrdtDoc(
+	async function _applyPersistedCrdtDoc(
 		objectType: ObjectType,
 		objectId: ObjectID,
 		record: ObjectData
-	): void {
+	): Promise< void > {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
@@ -593,8 +593,23 @@ export function createSyncManager( debug = false ): SyncManager {
 		// 3. Unsaved changes are synced from a peer _before_ this code runs. We
 		//    can't control when (or if) remote changes are synced, so this is a
 		//    race condition.
-		const invalidations = getChangesFromCRDTDoc( tempDoc, record );
-		const invalidatedKeys = Object.keys( invalidations );
+		let currentRecord = record;
+		let invalidations = getChangesFromCRDTDoc( tempDoc, currentRecord );
+		let invalidatedKeys = Object.keys( invalidations );
+
+		if ( invalidatedKeys.length ) {
+			// A preloaded record can straddle an atomic content/meta commit because
+			// WordPress reads the post and its metadata in separate queries. Refetch
+			// once before treating a mismatch as an out-of-band entity update.
+			try {
+				await handlers.refetchRecord();
+				currentRecord = await handlers.getEditedRecord();
+				invalidations = getChangesFromCRDTDoc( tempDoc, currentRecord );
+				invalidatedKeys = Object.keys( invalidations );
+			} catch {
+				// Fall back to the original record if the refresh is unavailable.
+			}
+		}
 
 		// Destroy the temporary document to prevent leaks.
 		tempDoc.destroy();
@@ -613,7 +628,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		const changes = invalidatedKeys.reduce(
 			( acc, key ) =>
 				Object.assign( acc, {
-					[ key ]: record[ key ],
+					[ key ]: currentRecord[ key ],
 				} ),
 			{}
 		);
