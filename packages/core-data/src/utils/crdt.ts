@@ -577,7 +577,7 @@ export const defaultCollectionSyncConfig: SyncConfig = {
  * @param {unknown} value The value to extract from.
  * @return {string|undefined} The raw string value, or undefined if it could not be determined.
  */
-function getRawValue( value?: unknown ): string | undefined {
+export function getRawValue( value?: unknown ): string | undefined {
 	// Value may be a string property or a nested object with a `raw` property.
 	if ( 'string' === typeof value ) {
 		return value;

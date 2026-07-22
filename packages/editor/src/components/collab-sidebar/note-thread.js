@@ -9,9 +9,12 @@ import clsx from 'clsx';
 import { useEffect, useRef } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import { useDebounce } from '@wordpress/compose';
+import {
+	useDebounce,
+	__experimentalUseFocusOutside as useFocusOutside,
+} from '@wordpress/compose';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	store as blockEditorStore,
@@ -53,6 +56,7 @@ export function NoteThread( {
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const relatedBlockElement = useBlockElement( note.blockClientId );
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
@@ -83,58 +87,52 @@ export function NoteThread( {
 		scrollNoteThreadIntoView( note.id, sidebarRef.current );
 	}, [ isSelected, floating?.y, note.id, sidebarRef ] );
 
-	const onMouseEnter = () => {
-		debouncedToggleBlockHighlight( note.blockClientId, true );
-	};
-
-	const onMouseLeave = () => {
-		debouncedToggleBlockHighlight( note.blockClientId, false );
-	};
-
-	const onFocus = () => {
-		toggleBlockHighlight( note.blockClientId, true );
-	};
-
-	const onBlur = ( event ) => {
-		// Don't deselect notes when the browser window/tab loses focus.
-		if ( ! document.hasFocus() ) {
-			return;
-		}
-
+	/*
+	 * Deselect the thread once focus leaves it. `useFocusOutside` keeps the
+	 * thread selected while focus stays in UI it owns: the delete dialog, the
+	 * note actions menu and format popovers (e.g. the Cmd+K link UI) portal out
+	 * of the thread's DOM, but their focus events still bubble here through the
+	 * React tree. It also ignores window/tab blur.
+	 */
+	const focusOutside = useFocusOutside( ( event ) => {
+		// When another note is clicked, do nothing because the current note is automatically closed.
 		const isNoteFocused = event.relatedTarget?.closest(
 			'.editor-collab-sidebar-panel__thread'
 		);
-		// Keep the note open when focus moves into a dialog (e.g. delete
-		// confirmation) or popover (e.g. Cmd+K link UI, emoji reaction
-		// pickers) that portals out of the thread.
-		const isDialogOrPopoverFocused = event.relatedTarget?.closest(
-			'[role="dialog"], .components-popover'
-		);
-		const isTabbing = isKeyboardTabbingRef.current;
-
-		// When another note is clicked, do nothing because the current note is automatically closed.
-		if ( isNoteFocused && ! isTabbing ) {
-			return;
-		}
-		if ( isDialogOrPopoverFocused ) {
-			return;
-		}
-		// When tabbing, do nothing if the focus is within the current note.
-		if (
-			isTabbing &&
-			event.currentTarget.contains( event.relatedTarget )
-		) {
+		if ( isNoteFocused && ! isKeyboardTabbingRef.current ) {
 			return;
 		}
 
-		// Closes a note that has lost focus when any of the following conditions are met:
-		// - An element other than a note is clicked.
-		// - Focus was lost by tabbing.
-		toggleBlockHighlight( note.blockClientId, false );
-		onDeselectNote();
-	};
+		// Drop the highlight, unless another note (possibly on the same block) now owns it.
+		if ( ! isNoteFocused ) {
+			toggleBlockHighlight( note.blockClientId, false );
+		}
 
-	const onSelectNote = () => {
+		/*
+		 * Selection may have moved on before this deferred callback runs; only
+		 * clear it while this still owns the selection, or it would wipe out the
+		 * newly selected note.
+		 */
+		if ( getSelectedNote() === note.id ) {
+			onDeselectNote();
+		}
+	} );
+
+	function onMouseEnter() {
+		debouncedToggleBlockHighlight( note.blockClientId, true );
+	}
+
+	function onMouseLeave() {
+		debouncedToggleBlockHighlight( note.blockClientId, false );
+	}
+
+	function onFocus( event ) {
+		// Cancel any pending deselect and highlight the related block.
+		focusOutside.onFocus( event );
+		toggleBlockHighlight( note.blockClientId, true );
+	}
+
+	function onSelectNote() {
 		if ( isSelected ) {
 			return;
 		}
@@ -146,14 +144,14 @@ export function NoteThread( {
 			// Pass `null` as the second parameter to prevent focusing the block.
 			selectBlock( note.blockClientId, null );
 		}
-	};
+	}
 
-	const onDeselectNote = () => {
+	function onDeselectNote() {
 		selectNote( undefined );
 		toggleBlockSpotlight( note.blockClientId, false );
-	};
+	}
 
-	const handleResolve = () => {
+	function handleResolve() {
 		onEditNote( { id: note.id, status: 'approved' } );
 		onDeselectNote();
 		if ( isFloating ) {
@@ -161,7 +159,7 @@ export function NoteThread( {
 		} else {
 			focusNoteThread( note.id, sidebarRef.current );
 		}
-	};
+	}
 
 	const allReplies = note?.reply || [];
 	const lastReply =
@@ -207,8 +205,8 @@ export function NoteThread( {
 			onClick={ onSelectNote }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
+			{ ...focusOutside }
 			onFocus={ onFocus }
-			onBlur={ onBlur }
 			onKeyUp={ ( event ) => {
 				if ( event.key === 'Tab' ) {
 					isKeyboardTabbingRef.current = false;
@@ -341,6 +339,7 @@ export function NoteThread( {
 								note.id,
 								note.author_name
 							),
+							placeholder: __( 'Reply or @ mention' ),
 						} }
 					/>
 				</NoteCard>

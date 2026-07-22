@@ -54,13 +54,13 @@ class Tests_Blocks_RenderPostTemplateBlock extends WP_UnitTestCase {
 	<li class="wp-block-post post-$other_post_id post type-post status-publish format-standard hentry category-uncategorized">
 		<h2 class="wp-block-post-title">Ceiling Cat</h2>
 		<div class="wp-block-post-excerpt">
-			<p class="wp-block-post-excerpt__excerpt">Ceiling Cat </p>
+			<p class="wp-block-post-excerpt__excerpt">Ceiling Cat</p>
 		</div>
 	</li>
 	<li class="wp-block-post post-$post_id post type-post status-publish format-standard hentry category-uncategorized">
 		<h2 class="wp-block-post-title">Metal Dog</h2>
 		<div class="wp-block-post-excerpt">
-			<p class="wp-block-post-excerpt__excerpt">Metal Dog </p>
+			<p class="wp-block-post-excerpt__excerpt">Metal Dog</p>
 		</div>
 	</li>
 </ul>

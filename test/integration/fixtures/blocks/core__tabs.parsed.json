@@ -1,0 +1,81 @@
+[
+	{
+		"blockName": "core/tabs",
+		"attrs": {},
+		"innerBlocks": [
+			{
+				"blockName": "core/tab-list",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<div role=\"tablist\" class=\"wp-block-tab-list\"><button type=\"button\" role=\"tab\">Tab 1</button><button type=\"button\" role=\"tab\">Tab 2</button></div>\n",
+				"innerContent": [
+					"\n<div role=\"tablist\" class=\"wp-block-tab-list\"><button type=\"button\" role=\"tab\">Tab 1</button><button type=\"button\" role=\"tab\">Tab 2</button></div>\n"
+				]
+			},
+			{
+				"blockName": "core/tab-panels",
+				"attrs": {},
+				"innerBlocks": [
+					{
+						"blockName": "core/tab-panel",
+						"attrs": {
+							"label": "Tab 1"
+						},
+						"innerBlocks": [
+							{
+								"blockName": "core/paragraph",
+								"attrs": {},
+								"innerBlocks": [],
+								"innerHTML": "\n<p>Panel 1</p>\n",
+								"innerContent": [ "\n<p>Panel 1</p>\n" ]
+							}
+						],
+						"innerHTML": "\n<section role=\"tabpanel\" tabindex=\"0\" class=\"wp-block-tab-panel\"></section>\n",
+						"innerContent": [
+							"\n<section role=\"tabpanel\" tabindex=\"0\" class=\"wp-block-tab-panel\">",
+							null,
+							"</section>\n"
+						]
+					},
+					{
+						"blockName": "core/tab-panel",
+						"attrs": {
+							"label": "Tab 2"
+						},
+						"innerBlocks": [
+							{
+								"blockName": "core/paragraph",
+								"attrs": {},
+								"innerBlocks": [],
+								"innerHTML": "\n<p>Panel 2</p>\n",
+								"innerContent": [ "\n<p>Panel 2</p>\n" ]
+							}
+						],
+						"innerHTML": "\n<section role=\"tabpanel\" tabindex=\"0\" class=\"wp-block-tab-panel\"></section>\n",
+						"innerContent": [
+							"\n<section role=\"tabpanel\" tabindex=\"0\" class=\"wp-block-tab-panel\">",
+							null,
+							"</section>\n"
+						]
+					}
+				],
+				"innerHTML": "\n<div class=\"wp-block-tab-panels\">\n\n</div>\n",
+				"innerContent": [
+					"\n<div class=\"wp-block-tab-panels\">",
+					null,
+					"\n\n",
+					null,
+					"</div>\n"
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-tabs\">\n\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-tabs\">",
+			null,
+			"\n\n",
+			null,
+			"</div>\n"
+		]
+	}
+]

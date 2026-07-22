@@ -13,12 +13,12 @@
 
 @mixin _text-heading() {
 	font-family: variables.$font-family-headings;
-	font-weight: variables.$font-weight-medium;
+	font-weight: wpds.var("--wpds-typography-font-weight-emphasis");
 }
 
 @mixin _text-body() {
 	font-family: variables.$font-family-body;
-	font-weight: variables.$font-weight-regular;
+	font-weight: wpds.var("--wpds-typography-font-weight-default");
 }
 
 @mixin heading-small() {

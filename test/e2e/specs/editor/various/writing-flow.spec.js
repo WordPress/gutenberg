@@ -32,14 +32,18 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/18928
 		await writingFlowUtils.addDemoContent();
 
-		const activeElementLocator = editor.canvas.locator( ':focus' );
+		// The element owning the caret: the focused element, or the selected
+		// block while a focused editing host owns the selection.
+		const activeElementLocator = editor.canvas.locator(
+			'body:not(:focus) :focus, body:focus .is-selected'
+		);
 
 		// Arrow up into nested context focuses last text input.
 		await page.keyboard.press( 'ArrowUp' );
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
-		await expect( activeElementLocator ).toBeFocused();
+		await expect( activeElementLocator ).toHaveCount( 1 );
 		await expect( activeElementLocator ).toHaveText( '2nd col' );
 
 		// Arrow up skips non-empty blocks and column/columns wrappers,
@@ -50,7 +54,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
-		await expect( activeElementLocator ).toBeFocused();
+		await expect( activeElementLocator ).toHaveCount( 1 );
 		await expect( activeElementLocator ).toHaveText( 'First paragraph' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
@@ -115,8 +119,10 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
 
-		// Verify the focused element has the paragraph content.
-		const activeElementLocator = editor.canvas.locator( ':focus' );
+		// Verify the element owning the caret has the paragraph content.
+		const activeElementLocator = editor.canvas.locator(
+			'body:not(:focus) :focus, body:focus .is-selected'
+		);
 		await expect( activeElementLocator ).toHaveText( 'First paragraph' );
 	} );
 
@@ -827,6 +833,34 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 	} );
 
+	test( 'should place the caret at the click position when clicking a block that is not selected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'First' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Second' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
+
+		// Click the first paragraph. The click lands at the center of the
+		// paragraph element, past the end of the short text, so the caret
+		// must be placed at the end of the text.
+		await editor.canvas.locator( 'p:text("First")' ).click();
+		await page.keyboard.type( '!' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First!' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
+	} );
+
 	test( 'should not have a dead zone between blocks (lower)', async ( {
 		editor,
 		page,
@@ -1264,8 +1298,11 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		// not skip over it to the third.
 		await page.keyboard.press( 'ArrowDown' );
 
-		// The focused element should be the second paragraph, which contains a link.
-		const focusedElement = editor.canvas.locator( ':focus' );
+		// The element owning the caret should be the second paragraph, which
+		// contains a link.
+		const focusedElement = editor.canvas.locator(
+			'body:not(:focus) :focus, body:focus .is-selected'
+		);
 		await expect( focusedElement.locator( 'a[href="#"]' ) ).toBeVisible();
 	} );
 } );

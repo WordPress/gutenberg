@@ -246,6 +246,11 @@ jobs:
                   node-version-file: '.nvmrc'
                   check-latest: true
 
+            - name: Pin npm version for consistency
+              run: |
+                  npm install --global npm@10
+                  npm --version
+
             - name: Configure build for wordpress-develop
               if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
               run: jq --tab '.wpPlugin.name = "wp"' package.json > package.json.tmp && mv package.json.tmp package.json
@@ -270,8 +275,14 @@ jobs:
               run: |
                   IFS='.' read -r -a VERSION_ARRAY <<< "${VERSION}"
                   MILESTONE="Gutenberg ${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
-                  npm run other:changelog -- --milestone="$MILESTONE" --unreleased > release-notes.txt
-                  sed -ie '1,6d' release-notes.txt
+                  RELEASE_NOTES_TMP="$(mktemp)"
+                  trap 'rm -f "$RELEASE_NOTES_TMP"' EXIT
+                  npm run other:changelog -- --milestone="$MILESTONE" --unreleased > "$RELEASE_NOTES_TMP"
+                  sed '1,6d' "$RELEASE_NOTES_TMP" > release-notes.txt
+                  if [[ ! -s release-notes.txt ]]; then
+                    echo "Release notes are empty for milestone \"$MILESTONE\"." >&2
+                    exit 1
+                  fi
                   if [[ "${VERSION}" != *"rc"* ]]; then
                     # Include previous RCs' release notes, if any
                     CHANGELOG_REGEX="=\s[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?\s="
@@ -557,6 +568,11 @@ jobs:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
+
+            - name: Pin npm version for consistency
+              run: |
+                  npm install --global npm@10
+                  npm --version
 
             - name: Publish packages to npm ("latest" dist-tag)
               run: |

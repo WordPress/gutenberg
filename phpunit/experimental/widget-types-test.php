@@ -69,7 +69,8 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 
 	/**
 	 * The help content keeps minimal emphasis, everything else is stripped,
-	 * and malformed links are dropped.
+	 * and links are dropped when malformed or when their href does not
+	 * survive esc_url_raw().
 	 */
 	public function test_sanitize_widget_help_constrains_markup_and_links() {
 		$help = gutenberg_sanitize_widget_help(
@@ -81,6 +82,10 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 						'href'  => 'site-health.php',
 					),
 					array( 'label' => 'Missing href' ),
+					array(
+						'label' => 'Unsafe protocol',
+						'href'  => 'javascript:alert(1)',
+					),
 				),
 			)
 		);
