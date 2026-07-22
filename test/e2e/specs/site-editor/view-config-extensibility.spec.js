@@ -9,46 +9,60 @@ const NONMATCHING_PAGE_TITLE = 'Published in 2020';
 
 test.describe( 'View config extensibility', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'emptytheme' );
-		await requestUtils.activatePlugin( PLUGIN_SLUG );
-		await requestUtils.resetPreferences();
-		await requestUtils.deleteAllPages();
+		await Promise.all( [
+			requestUtils.activateTheme( 'emptytheme' ),
+			requestUtils.activatePlugin( PLUGIN_SLUG ),
+			requestUtils.resetPreferences(),
+			requestUtils.deleteAllPages(),
+		] );
 
-		await requestUtils.createPage( {
-			title: NONMATCHING_PAGE_TITLE,
-			status: 'publish',
-			date: '2020-01-01T12:00:00',
-		} );
-		await requestUtils.createPage( {
-			title: MATCHING_PAGE_TITLE,
-			status: 'publish',
-			date: '2021-01-01T12:00:00',
-		} );
-		await requestUtils.createPage( {
-			title: 'Draft Included',
-			status: 'draft',
-			date: '2019-01-01T12:00:00',
-		} );
-		await requestUtils.createPage( {
-			title: 'Draft Excluded',
-			status: 'draft',
-			date: '2017-01-01T12:00:00',
-		} );
+		await Promise.all( [
+			requestUtils.createPage( {
+				title: NONMATCHING_PAGE_TITLE,
+				status: 'publish',
+				date: '2020-01-01T12:00:00',
+			} ),
+			requestUtils.createPage( {
+				title: MATCHING_PAGE_TITLE,
+				status: 'publish',
+				date: '2021-01-01T12:00:00',
+			} ),
+			requestUtils.createPage( {
+				title: 'Draft Included',
+				status: 'draft',
+				date: '2019-01-01T12:00:00',
+			} ),
+			requestUtils.createPage( {
+				title: 'Draft Excluded',
+				status: 'draft',
+				date: '2017-01-01T12:00:00',
+			} ),
+			// Excluded from "Published after 2020" solely by its status, so
+			// it proves that view's status filter is applied. Its date must
+			// pass the view's after-2020 filter yet predate the newest
+			// published fixture, which the default view expects first.
+			requestUtils.createPage( {
+				title: 'Draft After 2020',
+				status: 'draft',
+				date: '2021-01-01T06:00:00',
+			} ),
+		] );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deactivatePlugin( PLUGIN_SLUG );
-		await requestUtils.resetPreferences();
-		await requestUtils.deleteAllPages();
-		await requestUtils.activateTheme( 'twentytwentyone' );
+		await Promise.all( [
+			requestUtils.deactivatePlugin( PLUGIN_SLUG ),
+			requestUtils.resetPreferences(),
+			requestUtils.deleteAllPages(),
+			requestUtils.activateTheme( 'twentytwentyone' ),
+		] );
 	} );
 
 	test( 'applies the filtered configuration throughout the Pages UI', async ( {
 		admin,
 		page,
 	} ) => {
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
+		await admin.visitSiteEditor( { postType: 'page' } );
 
 		// The filtered view list reaches the Site Editor sidebar.
 		await expect(
@@ -124,6 +138,11 @@ test.describe( 'View config extensibility', () => {
 		).toHaveCount( 0 );
 		await expect(
 			table.getByRole( 'row', { name: /Draft Excluded/ } )
+		).toHaveCount( 0 );
+		// This page passes the date filter, so only the status filter
+		// excludes it.
+		await expect(
+			table.getByRole( 'row', { name: /Draft After 2020/ } )
 		).toHaveCount( 0 );
 
 		// The existing Drafts view keeps its status filter and gains the date filter.
