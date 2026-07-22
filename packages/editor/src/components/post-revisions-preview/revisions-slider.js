@@ -138,6 +138,19 @@ function RevisionsSlider() {
 		return () => resizeObserver.disconnect();
 	}, [ revisions?.length ] );
 
+	// Must be before any early returns to satisfy Rules of Hooks.
+	const blockChangedMarkPositions = useMemo( () => {
+		if ( ! revisions?.length || blockChangedIndices.size === 0 ) {
+			return [];
+		}
+		return [ ...blockChangedIndices ]
+			.filter( ( index ) => markOffsets[ index ] )
+			.map( ( index ) => ( {
+				index,
+				offset: markOffsets[ index ],
+			} ) );
+	}, [ revisions, blockChangedIndices, markOffsets ] );
+
 	if ( isLoading && ! showPagination ) {
 		return <Spinner />;
 	}
