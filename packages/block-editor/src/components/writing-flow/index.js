@@ -23,6 +23,7 @@ import { usePreviewModeNav } from './use-preview-mode-nav';
 import useSelectAll from './use-select-all';
 import useDragSelection from './use-drag-selection';
 import useSelectionObserver from './use-selection-observer';
+import useEditableRootEventHandlers from './use-editable-root-event-handlers';
 import useClickSelection from './use-click-selection';
 import useInput from './use-input';
 import useClipboardHandler from './use-clipboard-handler';
@@ -39,6 +40,7 @@ export function useWritingFlow() {
 		before,
 		useMergeRefs( [
 			ref,
+			useEditableRootEventHandlers(),
 			useClipboardHandler(),
 			useInput(),
 			useEditableRoot(),

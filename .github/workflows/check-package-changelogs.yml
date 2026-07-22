@@ -71,8 +71,8 @@ jobs:
                   fetch-depth: ${{ env.PR_COMMIT_COUNT }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
-            - name: 'Fetch relevant history from origin'
-              run: git fetch origin "$GITHUB_BASE_REF"
+            - name: 'Fetch relevant history from base repository'
+              run: git fetch "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$GITHUB_BASE_REF"
             - name: Determine if package has relevant changes
               id: filter
               env:

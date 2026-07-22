@@ -40,8 +40,13 @@ export default function VerseEdit( props ) {
 			onMerge={ mergeBlocks }
 			{ ...blockProps }
 			__unstablePastePlainText
-			__unstableOnSplitAtDoubleLineEnd={ () =>
-				insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+			__unstableOnSplitAtDoubleLineEnd={
+				insertBlocksAfter
+					? () =>
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
+					: undefined
 			}
 		/>
 	);
