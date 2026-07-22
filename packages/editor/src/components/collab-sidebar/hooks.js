@@ -276,9 +276,23 @@ function readInlineSelection( getSelectionStart, getSelectionEnd ) {
 }
 
 /**
- * Wrap a rich-text range with a core/note marker. Returns a new
- * RichTextData ready to write back into block attributes, or null when the
- * incoming value isn't a rich-text instance (legacy/string attributes).
+ * Convert live or serialized rich text into the representation used by the
+ * block editor.
+ *
+ * @param {*} value Block attribute value.
+ * @return {?RichTextData} Rich text value, or null for unsupported attributes.
+ */
+function toRichTextData( value ) {
+	if ( value instanceof RichTextData ) {
+		return value;
+	}
+	return typeof value === 'string'
+		? RichTextData.fromHTMLString( value )
+		: null;
+}
+
+/**
+ * Wrap a rich-text range with a core/note marker.
  *
  * @param {*}      value Existing block attribute value.
  * @param {number} id    New note id to embed as `data-id`.
@@ -287,11 +301,12 @@ function readInlineSelection( getSelectionStart, getSelectionEnd ) {
  * @return {?RichTextData} Wrapped value or null when the attribute isn't rich text.
  */
 function wrapInlineNote( value, id, start, end ) {
-	if ( ! ( value instanceof RichTextData ) ) {
+	const richTextValue = toRichTextData( value );
+	if ( ! richTextValue ) {
 		return null;
 	}
 	const record = applyNoteFormat(
-		create( { html: value.toHTMLString() } ),
+		create( { html: richTextValue.toHTMLString() } ),
 		{ type: NOTE_FORMAT_NAME, attributes: { 'data-id': String( id ) } },
 		start,
 		end
@@ -450,10 +465,11 @@ export function useNoteActions() {
 						),
 					};
 					if ( inlineSelection ) {
-						const inlineContent =
-							blockAttributes?.[ inlineSelection.attributeKey ];
+						const inlineContent = toRichTextData(
+							blockAttributes?.[ inlineSelection.attributeKey ]
+						);
 						if (
-							! ( inlineContent instanceof RichTextData ) ||
+							! inlineContent ||
 							inlineContent
 								.toString()
 								.slice(

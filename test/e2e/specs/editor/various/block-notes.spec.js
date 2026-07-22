@@ -22,25 +22,6 @@ function isTargetedRepairRequest( request ) {
 	);
 }
 
-async function waitForSyncConnection( page ) {
-	await page.waitForFunction(
-		( consent ) => {
-			const { unlock } =
-				window.wp.privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-					consent,
-					'@wordpress/core-data'
-				);
-			return (
-				unlock(
-					window.wp.data.select( 'core' )
-				).getSyncConnectionStatus()?.status === 'connected'
-			);
-		},
-		CORE_DATA_PRIVATE_APIS_CONSENT,
-		{ timeout: 15000 }
-	);
-}
-
 test.use( {
 	blockNoteUtils: async ( { page, editor }, use ) => {
 		await use( new BlockNoteUtils( { page, editor } ) );
@@ -1114,8 +1095,6 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Saved target' },
 			} );
 			await editor.saveDraft();
-			await page.reload();
-			await waitForSyncConnection( page );
 
 			await page.evaluate( () => {
 				window.wp.data.dispatch( 'core/block-editor' ).insertBlock(
@@ -1176,8 +1155,6 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Persist this inline note.' },
 			} );
 			await editor.saveDraft();
-			await page.reload();
-			await waitForSyncConnection( page );
 
 			const paragraph = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
@@ -1500,8 +1477,6 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Keep this saved inline range.' },
 			} );
 			await editor.saveDraft();
-			await page.reload();
-			await waitForSyncConnection( page );
 
 			const paragraph = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
