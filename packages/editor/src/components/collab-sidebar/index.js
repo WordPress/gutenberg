@@ -212,26 +212,6 @@ function NotesSidebar( { postId } ) {
 	);
 }
 
-function NotesSidebarWithFormat( { postId, editorMode, revisionsMode } ) {
-	useEffect( () => {
-		registerFormatType( NOTE_FORMAT_NAME, noteFormat );
-		return () => {
-			unregisterFormatType( NOTE_FORMAT_NAME );
-		};
-	}, [] );
-
-	if (
-		! postId ||
-		typeof postId !== 'number' ||
-		editorMode === 'text' ||
-		revisionsMode
-	) {
-		return null;
-	}
-
-	return <NotesSidebar postId={ postId } />;
-}
-
 export default function NotesSidebarContainer() {
 	const { postId, editorMode, revisionsMode } = useSelect( ( select ) => {
 		const { getCurrentPostId, getEditorMode, isRevisionsMode } = unlock(
@@ -244,13 +224,18 @@ export default function NotesSidebarContainer() {
 		};
 	}, [] );
 
+	if ( ! postId || typeof postId !== 'number' ) {
+		return null;
+	}
+
+	// Hide Notes sidebar for Code Editor and in-editor revision mode.
+	if ( editorMode === 'text' || revisionsMode ) {
+		return null;
+	}
+
 	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">
-			<NotesSidebarWithFormat
-				postId={ postId }
-				editorMode={ editorMode }
-				revisionsMode={ revisionsMode }
-			/>
+			<NotesSidebar postId={ postId } />
 		</PostTypeSupportCheck>
 	);
 }

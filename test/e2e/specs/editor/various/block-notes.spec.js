@@ -1187,10 +1187,7 @@ test.describe( 'Block Notes', () => {
 				paragraph,
 				'Persist this inline note.'.length
 			);
-			await page
-				.getByRole( 'button', { name: 'More', exact: true } )
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Persistent inline note' );
@@ -1515,10 +1512,7 @@ test.describe( 'Block Notes', () => {
 				paragraph,
 				'Keep this saved inline range.'.length
 			);
-			await page
-				.getByRole( 'button', { name: 'More', exact: true } )
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Stale inline range note' );
