@@ -1470,6 +1470,55 @@ test.describe( 'Block Notes', () => {
 			await expect(
 				page.getByPlaceholder( 'Search emoji' )
 			).toBeHidden();
+			// Focus returns to the trigger rather than dropping to the
+			// document body.
+			await expect(
+				page.getByRole( 'button', { name: 'Add reaction' } )
+			).toBeFocused();
+		} );
+
+		test( 'Escape in the skin-tone flyout closes only that popup', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Nested overlay dismissal' },
+				comment: 'Escape unwinds one layer at a time',
+			} );
+
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await blockNoteUtils.waitForFullPicker();
+
+			// Open the nested skin-tone flyout; focus moves into its
+			// listbox (onto the selected swatch).
+			const skinToneToggle = page.getByRole( 'button', {
+				name: /^Skin tone:/,
+			} );
+			await skinToneToggle.click();
+			const skinToneListbox = page.getByRole( 'listbox', {
+				name: 'Choose your default skin tone',
+			} );
+			await expect( skinToneListbox ).toBeVisible();
+
+			// The first Escape closes only the flyout, returns focus to
+			// its toggle, and leaves the full picker open.
+			await page.keyboard.press( 'Escape' );
+			await expect( skinToneListbox ).toBeHidden();
+			await expect( skinToneToggle ).toBeFocused();
+			await expect(
+				page.getByPlaceholder( 'Search emoji' )
+			).toBeVisible();
+
+			// The second Escape closes the full picker and returns focus
+			// to the add-reaction trigger.
+			await page.keyboard.press( 'Escape' );
+			await expect(
+				page.getByPlaceholder( 'Search emoji' )
+			).toBeHidden();
+			await expect(
+				page.getByRole( 'button', { name: 'Add reaction' } )
+			).toBeFocused();
 		} );
 
 		test( 'full picker shows the empty state when search has no matches', async ( {
