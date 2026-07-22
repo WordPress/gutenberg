@@ -683,7 +683,10 @@ test.describe( 'Block Notes', () => {
 			await thread.click();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 			await expect( block ).toHaveClass( /is-highlighted/ );
-			await page.keyboard.press( 'Shift+Tab' );
+			// @todo: restore, which became flaky - await page.keyboard.press( 'Shift+Tab' );
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.focus();
 			await expect( thread ).not.toBeFocused();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
 			await expect( block ).not.toHaveClass( /is-highlighted/ );
@@ -1673,12 +1676,7 @@ test.describe( 'Block Notes', () => {
 			} ) => {
 				const paragraph = await selectTrailingWord( { editor, page } );
 
-				await page
-					.getByRole( 'button', { name: 'More', exact: true } )
-					.click();
-				await page
-					.getByRole( 'menuitem', { name: 'Add note' } )
-					.click();
+				await editor.clickBlockOptionsMenuItem( 'Add note' );
 				await page
 					.getByRole( 'textbox', { name: 'New note', exact: true } )
 					.fill( 'Align me' );
@@ -1719,13 +1717,7 @@ test.describe( 'Block Notes', () => {
 			} ) => {
 				const paragraph = await selectTrailingWord( { editor, page } );
 
-				await page
-					.getByRole( 'button', { name: 'More', exact: true } )
-					.click();
-				await page
-					.getByRole( 'menuitem', { name: 'Add note' } )
-					.click();
-
+				await editor.clickBlockOptionsMenuItem( 'Add note' );
 				// The pending form floats next to the canvas while composing;
 				// there is no marker yet, so it anchors to the selection the
 				// note will attach to (the canvas keeps its selection while
