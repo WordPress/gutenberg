@@ -95,14 +95,12 @@ describe( 'TypographyPanel — core build defaults', () => {
 } );
 
 describe( 'TypographyPanel — core build setTextColor link sync', () => {
-	// These tests pass no `inheritedValue` on purpose. In core `useResolvedStyle`
-	// resolves to undefined, so the prop falls back to `value`. That is the shape
-	// the panel actually receives there.
-	async function pickRed( value ) {
+	async function pickRed( value, inheritedValue ) {
 		const onChange = jest.fn();
 		await renderAriakit(
 			<TypographyPanel
 				value={ value }
+				inheritedValue={ inheritedValue }
 				settings={ PALETTE_SETTINGS }
 				panelId="test"
 				onChange={ onChange }
@@ -140,5 +138,21 @@ describe( 'TypographyPanel — core build setTextColor link sync', () => {
 		expect( result?.elements?.link?.color?.text ).toBe(
 			'var:preset|color|red'
 		);
+	} );
+
+	// In Global Styles `value` is the user config and `inheritedValue` the
+	// merged one. Comparing `value` would find undefined on both sides.
+	it( 'reads the merged config, not the user config, in Global Styles', async () => {
+		const result = await pickRed(
+			{},
+			{
+				color: { text: 'var:preset|color|blue' },
+				elements: { link: { color: { text: 'var:preset|color|red' } } },
+			}
+		);
+
+		expect( result?.color?.text ).toBe( 'var:preset|color|red' );
+		// The theme's text and link colors differ, so the link does not track.
+		expect( result?.elements?.link?.color?.text ).toBeUndefined();
 	} );
 } );
