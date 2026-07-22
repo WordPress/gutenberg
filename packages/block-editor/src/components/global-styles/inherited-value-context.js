@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
@@ -16,6 +16,7 @@ import {
 } from '../../store/private-keys';
 import { getVariationNameFromClass } from '../../hooks/block-style-variation';
 import { useBlockEditContext } from '../block-edit/context';
+import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
 
 const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
@@ -45,38 +46,85 @@ function useRawGlobalStyles() {
 }
 
 /**
+ * Blocks whose heading level is handed down by a parent through block context
+ * rather than held in their own `level` attribute, mapped to that context key
+ * and the level they fall back to.
+ *
+ * Accordion Heading is the only one: the parent Accordion owns the level, and
+ * the child's `level` attribute has no default and is absent on pattern-,
+ * template- and paste-inserted blocks.
+ */
+const CONTEXT_HEADING_LEVEL_BLOCKS = {
+	'core/accordion-heading': {
+		contextKey: 'core/accordion-heading-level',
+		fallbackLevel: 3,
+	},
+};
+
+/**
+ * Resolves the heading level that selects a block's `h1`-`h6` element layer.
+ *
+ * @param {string}  blockName      Block name.
+ * @param {?number} levelAttribute The block's own `level` attribute, if it has one.
+ * @param {?number} contextLevel   Level supplied by a parent through block context.
+ * @return {?number} Resolved heading level, or `undefined` when the block has none.
+ */
+function getHeadingLevel( blockName, levelAttribute, contextLevel ) {
+	const contextOwned = CONTEXT_HEADING_LEVEL_BLOCKS[ blockName ];
+	if ( ! contextOwned ) {
+		return levelAttribute;
+	}
+	// Mirrors the block's own chain (Accordion Heading saves `h${ level || 3 }`),
+	// so `0` coerces to the fallback instead of reading as a level-0 state.
+	return levelAttribute || contextLevel || contextOwned.fallbackLevel;
+}
+
+/**
+ * Reads the heading level a parent supplies through block context.
+ *
+ * Only the blocks in `CONTEXT_HEADING_LEVEL_BLOCKS` read a key: the value
+ * reaches every descendant, so an ordinary Heading inside an Accordion Panel
+ * must not pick it up. Returns a primitive so callers can use it as a
+ * `useSelect` dependency.
+ *
+ * @param {?string} blockName Block name.
+ * @return {?number} Level from block context, or `undefined`.
+ */
+function useContextHeadingLevel( blockName ) {
+	const blockContext = useContext( BlockContext );
+	const contextKey = CONTEXT_HEADING_LEVEL_BLOCKS[ blockName ]?.contextKey;
+	return contextKey ? blockContext[ contextKey ] : undefined;
+}
+
+/**
  * Maps a block to the root-level Global Styles *element* layers that paint it
  * on the canvas, in addition to (or instead of) the block's own class — e.g. a
  * Button renders `.wp-element-button`, a level-2 Heading renders `<h2>`.
  *
- * Element keys are returned ordered low to high precedence, so a level-specific
- * `h2` correctly wins over the generic `heading`. A level of `0` (e.g. a Site
- * or Post Title rendered as a paragraph) renders no heading tag at all, so
- * neither `heading` nor any `h1`-`h6` styles reach the block and no element
- * layer applies.
+ * Keys are ordered low to high precedence, so a level-specific `h2` wins over
+ * the generic `heading`. A level of `0` (e.g. a Site or Post Title rendered as
+ * a paragraph) renders no heading tag, so no element layer applies.
  *
- * This list is hand-maintained by necessity: the block-to-element relationship
- * is not inferable from block metadata. `supports.color.link` and friends mark
- * blocks that *contain* a stylable element, not blocks that *are* one (Button
- * declares no `color.button`, Heading no `color.heading`), and the system only
- * stores the inverse element-to-selector map (`__EXPERIMENTAL_ELEMENTS`); the
- * correspondence otherwise lives only in each block's rendered markup.
- * Standardizing it as a declarative block property is tracked in
+ * Hand-maintained by necessity: the block-to-element relationship is not
+ * inferable from block metadata. `supports.color.link` and friends mark blocks
+ * that *contain* an element, not blocks that *are* one, and only the inverse
+ * element-to-selector map exists (`__EXPERIMENTAL_ELEMENTS`). Standardizing it
+ * as a block property is tracked in
  * https://github.com/WordPress/gutenberg/issues/80438.
  *
- * The link-bearing heading blocks (Site Title, Post Title, Term Name) are
- * deliberately not given a `link` layer here: their inner-link color control
- * reads the `inheritedValue.elements.link` passthrough, so folding `link` into
- * the block's own layers would bleed link color into the heading's text.
+ * The link-bearing heading blocks get no `link` layer: their inner-link control
+ * reads the `inheritedValue.elements.link` passthrough, so folding `link` in
+ * would bleed link color into the heading's own text.
  *
  * @param {string}  blockName    Block name.
- * @param {?number} headingLevel Block's `level` attribute, when it has one.
+ * @param {?number} headingLevel Resolved heading level, from `getHeadingLevel`.
  * @return {string[]} Ordered element keys, low to high precedence.
  */
 function getElementLayers( blockName, headingLevel ) {
 	switch ( blockName ) {
 		case 'core/button':
 			return [ 'button' ];
+		case 'core/accordion-heading':
 		case 'core/heading':
 		case 'core/post-title':
 		case 'core/site-title':
@@ -117,6 +165,7 @@ function getElementLayers( blockName, headingLevel ) {
  */
 function useVariationAndElements( blockName, className ) {
 	const { clientId } = useBlockEditContext();
+	const contextHeadingLevel = useContextHeadingLevel( blockName );
 	return useSelect(
 		( select ) => {
 			if ( ! blockName ) {
@@ -132,10 +181,14 @@ function useVariationAndElements( blockName, className ) {
 				variationName: className
 					? getVariationNameFromClass( className, registeredStyles )
 					: null,
-				headingLevel: level,
+				headingLevel: getHeadingLevel(
+					blockName,
+					level,
+					contextHeadingLevel
+				),
 			};
 		},
-		[ blockName, className, clientId ]
+		[ blockName, className, clientId, contextHeadingLevel ]
 	);
 }
 
