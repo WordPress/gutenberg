@@ -8,7 +8,7 @@ import {
 	getConfig,
 } from '@wordpress/interactivity';
 
-// Debounce utility for scroll handling
+// Debounce utility.
 function debounce( func, wait ) {
 	let timeout;
 	function debounced( ...args ) {
@@ -55,20 +55,16 @@ function clampIndex( index, totalSlides, slidesToShow ) {
 	return Math.max( 0, Math.min( index, maxStartIndex ) );
 }
 
-function formatSlideLabel( template, index, totalSlides ) {
+function formatLabel( template, index, totalSlides ) {
 	return template.replace( '%1$d', index + 1 ).replace( '%2$d', totalSlides );
 }
 
 function getSlideLabel( index, totalSlides ) {
-	return formatSlideLabel(
-		getConfig().slideLabelTemplate,
-		index,
-		totalSlides
-	);
+	return formatLabel( getConfig().slideLabelTemplate, index, totalSlides );
 }
 
 function getIndicatorLabel( index, totalSlides ) {
-	return formatSlideLabel(
+	return formatLabel(
 		getConfig().indicatorLabelTemplate,
 		index,
 		totalSlides
@@ -98,7 +94,7 @@ function updateSliderStateFromCSS( track, context ) {
 	const slides = getSlides( track );
 
 	// CSS overrides the configured "slides to show" value to display one slide at a time on mobile.
-	// Read the actual number of visible slides so every slide remains accessible through pagination.
+	// Read the actual number of visible slides so navigation and inert state match the layout.
 	const computedSlidesToShow = slider
 		? Number.parseInt(
 				window
@@ -242,7 +238,7 @@ function moveSlide( ref, direction ) {
  *
  * @param {HTMLElement}   track  The track element containing the slides.
  * @param {HTMLElement[]} slides The array of slide elements.
- * @return {number} Zero-based index of the slide closest to the viewport.
+ * @return {number} Zero-based index of the slide closest to the track's leading edge.
  */
 function getClosestSlideIndex( track, slides ) {
 	const trackRect = track.getBoundingClientRect();
