@@ -336,6 +336,101 @@ describe( 'URLInput', () => {
 		} );
 	} );
 
+	describe( 'IME composition', () => {
+		it( 'should fetch suggestions when typing without a composition', async () => {
+			const { input } = renderURLInput();
+
+			fireEvent.change( input, { target: { value: 'Hello' } } );
+
+			await flushDebounce();
+
+			expect( fetchLinkSuggestions ).toHaveBeenCalledTimes( 1 );
+			expect( fetchLinkSuggestions ).toHaveBeenCalledWith(
+				'Hello',
+				expect.anything()
+			);
+		} );
+
+		it( 'should not fetch suggestions while a composition is in progress', async () => {
+			const { input } = renderURLInput();
+
+			fireEvent.compositionStart( input );
+			fireEvent.change( input, { target: { value: 'ほん' } } );
+			fireEvent.change( input, { target: { value: 'ほんだ' } } );
+
+			await flushDebounce();
+
+			// The typed value still propagates while composing.
+			expect( input ).toHaveValue( 'ほんだ' );
+			// But no requests fire until the composition is confirmed.
+			expect( fetchLinkSuggestions ).not.toHaveBeenCalled();
+
+			fireEvent.compositionEnd( input, { data: 'ほんだ' } );
+
+			await flushDebounce();
+
+			expect( fetchLinkSuggestions ).toHaveBeenCalledTimes( 1 );
+			expect( fetchLinkSuggestions ).toHaveBeenCalledWith(
+				'ほんだ',
+				expect.anything()
+			);
+		} );
+
+		it( 'should fetch suggestions once when the final change event arrives after the composition ends', async () => {
+			const { input } = renderURLInput();
+
+			fireEvent.compositionStart( input );
+			fireEvent.change( input, { target: { value: 'ほん' } } );
+			// Some browsers (e.g. Safari) emit the final input event after
+			// `compositionend`.
+			fireEvent.compositionEnd( input, { data: 'ほんだ' } );
+			fireEvent.change( input, { target: { value: 'ほんだ' } } );
+
+			await flushDebounce();
+
+			expect( fetchLinkSuggestions ).toHaveBeenCalledTimes( 1 );
+			expect( fetchLinkSuggestions ).toHaveBeenCalledWith(
+				'ほんだ',
+				expect.anything()
+			);
+		} );
+
+		it( 'should cancel an update scheduled before the composition started', async () => {
+			const { input } = renderURLInput();
+
+			// Schedule a debounced update, then start composing before it runs.
+			fireEvent.change( input, { target: { value: 'He' } } );
+			fireEvent.compositionStart( input );
+			fireEvent.change( input, { target: { value: 'Heほ' } } );
+
+			await flushDebounce();
+
+			expect( fetchLinkSuggestions ).not.toHaveBeenCalled();
+
+			fireEvent.compositionEnd( input, { data: 'ほ' } );
+
+			await flushDebounce();
+
+			expect( fetchLinkSuggestions ).toHaveBeenCalledTimes( 1 );
+			expect( fetchLinkSuggestions ).toHaveBeenCalledWith(
+				'Heほ',
+				expect.anything()
+			);
+		} );
+
+		it( 'should not fetch suggestions on composition end when suggestions are disabled', async () => {
+			const { input } = renderURLInput( { disableSuggestions: true } );
+
+			fireEvent.compositionStart( input );
+			fireEvent.change( input, { target: { value: 'ほん' } } );
+			fireEvent.compositionEnd( input, { data: 'ほん' } );
+
+			await flushDebounce();
+
+			expect( fetchLinkSuggestions ).not.toHaveBeenCalled();
+		} );
+	} );
+
 	describe( 'announcements', () => {
 		it( 'should announce the number of results', async () => {
 			await renderWithSuggestions();

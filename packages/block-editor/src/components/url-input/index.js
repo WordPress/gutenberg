@@ -93,6 +93,11 @@ export default function URLInput( props ) {
 	// A fetch Promise can't be aborted. It's mimicked by holding on to the
 	// pending request so that responses of superseded requests can be ignored.
 	const suggestionsRequestRef = useRef( null );
+	// Whether characters are currently being composed with an IME. Composition
+	// state is tracked with explicit `compositionstart` and `compositionend`
+	// listeners because the `isComposing` property of native events is not
+	// reliable across browsers (e.g. Safari).
+	const isComposingRef = useRef( false );
 
 	const controlInputRef = inputRef ?? fallbackInputRef;
 
@@ -198,10 +203,15 @@ export default function URLInput( props ) {
 	const debouncedUpdateSuggestions = useDebounce( updateSuggestions, 200 );
 
 	// Keep the suggestions in sync with the value being searched for. An empty
-	// value requests the initial suggestions, when those are enabled.
+	// value requests the initial suggestions, when those are enabled. The sync
+	// is skipped while characters are being composed with an IME: intermediate
+	// composition updates must not fire search requests.
+	// `handleCompositionEnd` updates the suggestions once the composed value
+	// is confirmed.
 	useEffect( () => {
 		if (
 			! disableSuggestions &&
+			! isComposingRef.current &&
 			( value.length || showInitialSuggestions )
 		) {
 			debouncedUpdateSuggestions( value );
@@ -254,6 +264,32 @@ export default function URLInput( props ) {
 		// `InputControl` passes an `{ event }` object as its second argument,
 		// which callers would mistake for a selected suggestion.
 		onChange( newValue );
+	}
+
+	function handleCompositionStart() {
+		isComposingRef.current = true;
+		// Cancel any debounced suggestions update scheduled before the
+		// composition started so no request fires while composing.
+		debouncedUpdateSuggestions.cancel();
+	}
+
+	function handleCompositionEnd( event ) {
+		isComposingRef.current = false;
+
+		if ( disableSuggestions ) {
+			return;
+		}
+
+		// Update the suggestions with the confirmed composition value,
+		// mirroring the sync skipped while composing. Some browsers
+		// (e.g. Safari) emit a final `input` event after `compositionend`;
+		// the debounce coalesces the update from that value sync with this
+		// one.
+		const composedValue = event.target.value;
+
+		if ( composedValue.length || showInitialSuggestions ) {
+			debouncedUpdateSuggestions( composedValue );
+		}
 	}
 
 	function handleFocus() {
@@ -358,6 +394,8 @@ export default function URLInput( props ) {
 		name: inputId,
 		autoComplete: 'off',
 		onChange: disabled ? noop : handleChange,
+		onCompositionStart: disabled ? noop : handleCompositionStart,
+		onCompositionEnd: disabled ? noop : handleCompositionEnd,
 		onFocus: disabled ? noop : handleFocus,
 		onKeyDown: disabled ? noop : handleKeyDown,
 		placeholder,
