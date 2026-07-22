@@ -60,7 +60,7 @@ For example, `lib/block-supports/layout.php` maps to `src/wp-includes/block-supp
 | --- | --- |
 | `lib/compat/wordpress-X.Y/<filename>` | `src/wp-includes/<filename>` (common case) |
 
-The destination sometimes lives in a subdirectory that isn't reflected in the Gutenberg path (for example, `lib/compat/wordpress-7.0/class-wp-http-polling-sync-server.php` lands in `src/wp-includes/collaboration/`). Search WP Core for the file or class name to locate it.
+The destination sometimes lives in a subdirectory that isn't reflected in the Gutenberg path. Search WP Core for the file or class name to locate it.
 
 **Class files with `-gutenberg` in the name** — strip the Gutenberg-specific naming when translating:
 
