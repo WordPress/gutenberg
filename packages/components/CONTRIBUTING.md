@@ -4,6 +4,9 @@ Thank you for taking the time to contribute.
 
 The following is a set of guidelines for contributing to the `@wordpress/components` package to be considered in addition to the general ones described in our [Contributing Policy](https://github.com/WordPress/gutenberg/blob/HEAD/CONTRIBUTING.md).
 
+For public-package boundaries and guidance that applies across the WordPress
+Design System packages, see [Working with WordPress Design System packages](../../docs/contributors/design/design-system-packages.md).
+
 This set of guidelines should apply especially to newly introduced components. In fact, while these guidelines should also be retroactively applied to existing components, it is sometimes impossible to do so for legacy/compatibility reasons.
 
 -   [Introducing new components](#introducing-new-components)
