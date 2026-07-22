@@ -694,6 +694,7 @@ The build system generates:
 - `build/widgets/{widget-name}/widget.min.js` + `widget.js` — Bundled metadata (ESM)
 - `build/widgets/{widget-name}/widget.min.asset.php` — Asset metadata for widget module
 - `build/widgets/registry.php` — Widget registry data
+- `build/widgets/widget-strings.php` — Gettext calls for the translatable `widget.json` metadata, for string extraction tooling; never loaded at runtime. Generated only when at least one widget declares a `textdomain`.
 - `build/widgets.php` — Script module registration logic
 
 ### PHP Registration

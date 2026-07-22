@@ -67,6 +67,7 @@ import {
 	getAllWidgets,
 	getWidgetMetadata,
 	getWidgetFiles,
+	collectWidgetTranslatableStrings,
 } from './widget-utils.mjs';
 import {
 	generateWorkerPlaceholder,
@@ -2223,6 +2224,56 @@ async function generateWidgetRegistry( widgets, replacements ) {
 }
 
 /**
+ * Generate the widget metadata strings file.
+ *
+ * Emits one `_x()` call per translatable `widget.json` value so static
+ * gettext extraction tooling can see strings the runtime only translates
+ * from the hydrated registry. The file is never loaded at runtime. Widgets
+ * without a `textdomain` are skipped, matching the runtime translation.
+ *
+ * @param {Array}                  widgets      Array of widget objects.
+ * @param {Record<string, string>} replacements PHP template replacements.
+ */
+async function generateWidgetStrings( widgets, replacements ) {
+	const seen = new Set();
+	const calls = [ ...widgets ]
+		.filter( ( widget ) => widget.textdomain )
+		.sort( ( a, b ) => a.dirName.localeCompare( b.dirName ) )
+		.flatMap( ( widget ) =>
+			collectWidgetTranslatableStrings( widget ).flatMap(
+				( { value, context } ) => {
+					const key = JSON.stringify( [
+						widget.textdomain,
+						context,
+						value,
+					] );
+					if ( seen.has( key ) ) {
+						return [];
+					}
+					seen.add( key );
+
+					const valueStr = toPhpStringLiteral( value );
+					const contextStr = toPhpStringLiteral( context );
+					const domainStr = toPhpStringLiteral( widget.textdomain );
+					return [
+						`_x( ${ valueStr }, ${ contextStr }, ${ domainStr } );`,
+					];
+				}
+			)
+		);
+
+	if ( calls.length === 0 ) {
+		return;
+	}
+
+	await generatePhpFromTemplate(
+		'widget-strings.php.template',
+		path.join( BUILD_DIR, 'widgets', 'widget-strings.php' ),
+		{ ...replacements, '{{WIDGET_STRINGS}}': calls.join( '\n' ) }
+	);
+}
+
+/**
  * Generate widgets.php file with widget registration logic.
  * Uses registry pattern with loop-based registration on the init hook.
  *
@@ -2400,6 +2451,7 @@ async function buildAll( baseUrlExpression ) {
 		generateRoutesRegistry( activeRoutes, phpReplacements ),
 		generateRoutesPhp( activeRoutes, phpReplacements ),
 		generateWidgetRegistry( widgets, phpReplacements ),
+		generateWidgetStrings( widgets, phpReplacements ),
 		generateWidgetsPhp( widgets, phpReplacements ),
 		generatePagesPhp( pageData, phpReplacements ),
 	] );
@@ -2415,6 +2467,14 @@ async function buildAll( baseUrlExpression ) {
 	if ( widgets.length > 0 ) {
 		console.log( '   ✔ Generated build/widgets.php' );
 		console.log( '   ✔ Generated build/widgets/registry.php' );
+		const hasWidgetStrings = widgets.some(
+			( widget ) =>
+				widget.textdomain &&
+				collectWidgetTranslatableStrings( widget ).length > 0
+		);
+		if ( hasWidgetStrings ) {
+			console.log( '   ✔ Generated build/widgets/widget-strings.php' );
+		}
 	}
 	if ( pageData.length > 0 ) {
 		console.log( '   ✔ Generated build/pages.php' );

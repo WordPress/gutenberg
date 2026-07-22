@@ -93,6 +93,69 @@ export function getWidgetMetadata( rootDir, widgetName ) {
 }
 
 /**
+ * Gettext context for each translatable `widget.json` metadata value.
+ *
+ * Must match the widget i18n schema the runtime translation uses on the
+ * hydrated registry (`lib/experimental/dashboard-widgets/widget-i18n.json`):
+ * the lookups are context-qualified, so a drifted context makes every one
+ * of them miss. Covered by a sync test in `test/widget-strings.js`.
+ */
+export const WIDGET_I18N_CONTEXTS = {
+	title: 'widget title',
+	description: 'widget description',
+	helpContent: 'widget help content',
+	helpLinkLabel: 'widget help link label',
+	actionLabel: 'widget action label',
+	keyword: 'widget keyword',
+};
+
+/**
+ * @typedef {Object} WidgetTranslatableFields
+ * @property {string|null}                 [title]       Human-readable title.
+ * @property {string|null}                 [description] Short description.
+ * @property {WidgetHelpMetadata|null}     [help]        Contextual help note.
+ * @property {WidgetActionMetadata[]|null} [actions]     Declarative actions.
+ * @property {string[]|null}               [keywords]    Search aliases.
+ */
+
+/**
+ * Collect the translatable strings a widget declares, paired with the
+ * gettext context the runtime translation resolves them under.
+ *
+ * @param {WidgetTranslatableFields} metadata Widget metadata fields.
+ * @return {Array<{ value: string, context: string }>} Translatable entries.
+ */
+export function collectWidgetTranslatableStrings( metadata ) {
+	/** @type {Array<{ value: string, context: string }>} */
+	const entries = [];
+
+	/**
+	 * @param {unknown} value   Candidate value.
+	 * @param {string}  context Gettext context.
+	 */
+	const add = ( value, context ) => {
+		if ( typeof value === 'string' && value !== '' ) {
+			entries.push( { value, context } );
+		}
+	};
+
+	add( metadata.title, WIDGET_I18N_CONTEXTS.title );
+	add( metadata.description, WIDGET_I18N_CONTEXTS.description );
+	add( metadata.help?.content, WIDGET_I18N_CONTEXTS.helpContent );
+	for ( const link of metadata.help?.links ?? [] ) {
+		add( link?.label, WIDGET_I18N_CONTEXTS.helpLinkLabel );
+	}
+	for ( const action of metadata.actions ?? [] ) {
+		add( action?.label, WIDGET_I18N_CONTEXTS.actionLabel );
+	}
+	for ( const keyword of metadata.keywords ?? [] ) {
+		add( keyword, WIDGET_I18N_CONTEXTS.keyword );
+	}
+
+	return entries;
+}
+
+/**
  * Supported source extensions for widget entry files, in priority order.
  * Must stay aligned with SOURCE_EXTENSIONS in build.mjs.
  */
