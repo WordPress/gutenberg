@@ -323,12 +323,14 @@ function VisualEditor( {
 		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
 		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
+	const isResizablePostType = [
+		NAVIGATION_POST_TYPE,
+		TEMPLATE_PART_POST_TYPE,
+		PATTERN_POST_TYPE,
+	].includes( postType );
+
 	const enableResizing =
-		( [
-			NAVIGATION_POST_TYPE,
-			TEMPLATE_PART_POST_TYPE,
-			PATTERN_POST_TYPE,
-		].includes( postType ) &&
+		( isResizablePostType &&
 			// Disable in previews / view mode.
 			! isPreview &&
 			// Disable resizing in mobile viewport.
@@ -346,7 +348,9 @@ function VisualEditor( {
 
 	const centerContentCSS = `display:flex;align-items:center;justify-content:center;`;
 	const shouldExpandIframeBody =
-		canvasHeight !== undefined && ! isDesignPostType && ! isResizingCanvas;
+		canvasHeight !== undefined &&
+		! isResizablePostType &&
+		! isResizingCanvas;
 	const iframeBodyMinHeightCSS = shouldExpandIframeBody
 		? 'min-height:100vh;'
 		: '';
@@ -425,9 +429,14 @@ function VisualEditor( {
 			<SyncConnectionErrorModal />
 			<ResizableEditor
 				enableResizing={ enableResizing }
-				height="100%"
-				canvasWidth={ canvasWidth }
-				canvasHeight={ isResizingCanvas ? undefined : canvasHeight }
+				width={
+					enableResizing && canvasWidth ? canvasWidth + 'px' : '100%'
+				}
+				height={
+					enableResizing && canvasHeight && ! isResizingCanvas
+						? canvasHeight + 'px'
+						: '100%'
+				}
 				onResizeStart={ () => setIsResizingCanvas( true ) }
 				onResizeStop={ () => setIsResizingCanvas( false ) }
 			>

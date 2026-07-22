@@ -45,9 +45,8 @@ function isAtMaxWidth( currentWidth, containerWidth, tolerance = 0 ) {
 function ResizableEditor( {
 	className,
 	enableResizing,
-	height,
-	canvasWidth,
-	canvasHeight,
+	width = '100%',
+	height = '100%',
 	onResizeStart,
 	onResizeStop,
 	children,
@@ -97,12 +96,8 @@ function ResizableEditor( {
 				resizableRef.current = api?.resizable;
 			} }
 			size={ {
-				width:
-					enableResizing && canvasWidth ? canvasWidth + 'px' : '100%',
-				height:
-					enableResizing && canvasHeight
-						? canvasHeight + 'px'
-						: height || '100%',
+				width,
+				height,
 			} }
 			onResizeStart={ () => {
 				setIsResizing( true );
