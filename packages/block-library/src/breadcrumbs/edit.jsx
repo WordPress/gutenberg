@@ -33,6 +33,7 @@ export default function BreadcrumbEdit( {
 	} = attributes;
 	const {
 		post,
+		canEditPost,
 		isPostTypeHierarchical,
 		postTypeHasTaxonomies,
 		hasTermsAssigned,
@@ -47,6 +48,13 @@ export default function BreadcrumbEdit( {
 				postType,
 				postId
 			);
+			const _canEditPost = postId
+				? select( coreStore ).canUser( 'update', {
+						kind: 'postType',
+						name: postType,
+						id: postId,
+				  } )
+				: undefined;
 			const postTypeObject = select( coreStore ).getPostType( postType );
 			const _postTypeHasTaxonomies =
 				postTypeObject && postTypeObject.taxonomies.length;
@@ -59,6 +67,7 @@ export default function BreadcrumbEdit( {
 			}
 			return {
 				post: _post,
+				canEditPost: _canEditPost,
 				isPostTypeHierarchical: postTypeObject?.hierarchical,
 				postTypeHasTaxonomies: _postTypeHasTaxonomies,
 				hasTermsAssigned:
@@ -71,7 +80,12 @@ export default function BreadcrumbEdit( {
 							return !! _post[ taxonomy.rest_base ]?.length;
 						} ),
 				isLoading:
-					( postId && ! _post ) ||
+					// When the user can't edit the post, its record may not be
+					// readable either (the REST request can fail), so don't
+					// wait for it: the placeholder is shown instead.
+					( postId &&
+						_canEditPost !== false &&
+						( ! _post || _canEditPost === undefined ) ) ||
 					! postTypeObject ||
 					( _postTypeHasTaxonomies && ! taxonomies ),
 			};
@@ -100,7 +114,15 @@ export default function BreadcrumbEdit( {
 		attributes,
 		skipBlockSupportAttributes: true,
 		block: name,
-		urlQueryArgs: { post_id: postId, invalidationKey },
+		urlQueryArgs: {
+			// The block-renderer endpoint requires `edit_post` permissions
+			// for the post referenced by `post_id`, and the `postId` block
+			// context can reference a post the current user can't edit (e.g.
+			// another author's post in a query-like block), so only forward
+			// it when the user can edit it, to avoid a 403 error.
+			post_id: canEditPost ? postId : undefined,
+			invalidationKey,
+		},
 	} );
 	const prevContentRef = useRef( '' );
 	useEffect( () => {
@@ -151,6 +173,9 @@ export default function BreadcrumbEdit( {
 	const showPlaceholder =
 		! postId ||
 		! postType ||
+		// Without `post_id`, the server can't render the real breadcrumbs,
+		// so show the placeholder for posts the user can't edit.
+		canEditPost === false ||
 		// When `templateSlug` is set only show placeholder if the post type is not.
 		// This is needed because when we are showing the template in post editor we
 		// want to show the real breadcrumbs if we have the post type.

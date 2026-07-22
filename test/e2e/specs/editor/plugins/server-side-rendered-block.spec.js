@@ -1,4 +1,10 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	test,
+	expect,
+	Editor,
+} = require( '@wordpress/e2e-test-utils-playwright' );
+
+const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
 
 const ENDPOINT = [
 	'/wp/v2/block-renderer',
@@ -328,5 +334,104 @@ test.describe( 'PHP-only auto-register blocks', () => {
 			await expect( page.getByLabel( 'Spacing' ) ).toHaveValue( '0.5' );
 			await expect( page.getByLabel( 'Show Emojis' ) ).toBeChecked();
 		} );
+	} );
+} );
+
+test.describe( 'Server-side render with a non-editable post_id', () => {
+	const AUTHOR = {
+		username: 'ssrpermissionauthor',
+		password: 'ssrpermissionauthorpassword',
+	};
+	let adminPostId;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-server-side-rendered-block'
+		);
+		await requestUtils.createUser( {
+			username: AUTHOR.username,
+			email: 'ssrpermissionauthor@example.com',
+			roles: [ 'author' ],
+			password: AUTHOR.password,
+		} );
+		const post = await requestUtils.createPost( {
+			title: 'Admin owned post',
+			status: 'publish',
+		} );
+		adminPostId = post.id;
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-server-side-rendered-block'
+		);
+		await requestUtils.deleteAllPosts();
+		await requestUtils.deleteAllUsers();
+	} );
+
+	// The block-renderer endpoint requires `edit_post` permissions for the
+	// post referenced by `post_id`, so server-side rendered previews used to
+	// fail when the `postId` block context referenced a post the current
+	// user can't edit. See https://github.com/WordPress/gutenberg/issues/79949.
+	test( 'renders without post context instead of erroring when the user cannot edit the post', async ( {
+		browser,
+	} ) => {
+		// Log in as an author: the bug only reproduces for users who can't
+		// edit the post referenced by the `postId` context.
+		const context = await browser.newContext( { baseURL: BASE_URL } );
+		const page = await context.newPage();
+		await page.goto( '/wp-login.php' );
+		await page.locator( '#user_login' ).fill( AUTHOR.username );
+		await page.locator( '#user_pass' ).fill( AUTHOR.password );
+		await page.getByRole( 'button', { name: 'Log In' } ).click();
+		await page.waitForURL( '**/wp-admin/**' );
+
+		await page.goto( '/wp-admin/post-new.php' );
+		await page.waitForFunction(
+			() => window?.wp?.data && window?.wp?.blocks
+		);
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-post', 'welcomeGuide', false );
+		} );
+
+		const editor = new Editor( { page } );
+
+		// Wait until the editor is initialized before inserting blocks, so
+		// they aren't wiped out by the initial content reset.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.waitFor( { timeout: 15000 } );
+
+		await editor.insertBlock( {
+			name: 'test/post-context-provider',
+			attributes: { postId: adminPostId, postType: 'post' },
+			innerBlocks: [
+				{ name: 'test/auto-register-block' },
+				{ name: 'core/breadcrumbs' },
+			],
+		} );
+
+		// The auto-registered PHP-only block renders without post context
+		// instead of showing "Error loading block: Sorry, you are not
+		// allowed to read blocks of this post."
+		await expect(
+			editor.canvas.getByText( 'Auto-register block content' )
+		).toBeVisible();
+
+		// The Breadcrumbs block falls back to its placeholder instead of
+		// loading indefinitely or showing an error.
+		await expect(
+			editor.canvas
+				.locator( '[data-type="core/breadcrumbs"]' )
+				.locator( 'ol' )
+		).toBeVisible();
+
+		await expect(
+			editor.canvas.getByText( /Error loading block/ )
+		).toHaveCount( 0 );
+
+		await context.close();
 	} );
 } );
