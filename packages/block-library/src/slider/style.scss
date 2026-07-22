@@ -61,7 +61,6 @@
 
 		> .wp-block-slider-arrows-button {
 			pointer-events: auto;
-			border-radius: 999px;
 			margin: 0 0.5rem;
 		}
 	}
@@ -79,7 +78,7 @@
 	background: var(--wp--slider-navigation-background-color);
 	color: var(--wp--slider-navigation-color);
 	border: none;
-	border-radius: 2px;
+	border-radius: 999px;
 	padding: 4px 12px;
 	line-height: 1;
 	white-space: nowrap;
