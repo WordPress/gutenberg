@@ -117,3 +117,68 @@ export function translateToChainClientId(
 			}
 		}
 		return null;
+	}
+
+	return search( liveTree, remapped );
+}
+
+/**
+ * Returns the set of revision indices (0-based, into the oldest-first
+ * `revisions` array) where the currently selected block changed.
+ *
+ * The chain (one diff per adjacent revision pair) is only rebuilt when
+ * `revisions` changes — not on every block selection. Selecting a different
+ * block only re-runs a cheap clientId translation and Set lookups.
+ *
+ * @param {Array|null} revisions      Oldest-first revisions, each with `content.raw`.
+ * @param {number}     displayedIndex Index of the revision currently shown.
+ * @return {Set<number>} 0-based indices into `revisions` where the selected block changed.
+ */
+export function useBlockChangedRevisions( revisions, displayedIndex ) {
+	const { blocks, selectedBlockClientId } = useSelect( ( select ) => {
+		const { getBlocks, getSelectedBlockClientId } =
+			select( blockEditorStore );
+		return {
+			blocks: getBlocks(),
+			selectedBlockClientId: getSelectedBlockClientId(),
+		};
+	}, [] );
+
+	const chain = useMemo(
+		() => ( revisions?.length ? buildRevisionChain( revisions ) : [] ),
+		[ revisions ]
+	);
+
+	return useMemo( () => {
+		const changedIndices = new Set();
+
+		if (
+			! selectedBlockClientId ||
+			! blocks?.length ||
+			displayedIndex === null ||
+			displayedIndex === undefined ||
+			displayedIndex < 0 ||
+			! chain[ displayedIndex ]
+		) {
+			return changedIndices;
+		}
+
+		const chainClientId = translateToChainClientId(
+			blocks,
+			chain[ displayedIndex ].tree,
+			selectedBlockClientId
+		);
+
+		if ( ! chainClientId ) {
+			return changedIndices;
+		}
+
+		chain.forEach( ( entry, index ) => {
+			if ( entry.changedClientIds.has( chainClientId ) ) {
+				changedIndices.add( index );
+			}
+		} );
+
+		return changedIndices;
+	}, [ chain, selectedBlockClientId, blocks, displayedIndex ] );
+}
