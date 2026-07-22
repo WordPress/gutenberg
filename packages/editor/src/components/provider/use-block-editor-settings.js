@@ -140,6 +140,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const {
 		allImageSizes,
 		bigImageSizeThreshold,
+		imageStripMeta,
+		imageMaxBitDepth,
 		allowRightClickOverrides,
 		blockTypes,
 		focusMode,
@@ -216,6 +218,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			return {
 				allImageSizes: baseData?.image_sizes,
 				bigImageSizeThreshold: baseData?.image_size_threshold,
+				imageStripMeta: baseData?.image_strip_meta,
+				imageMaxBitDepth: baseData?.image_max_bit_depth,
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
@@ -372,6 +376,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
 			allImageSizes,
 			bigImageSizeThreshold,
+			imageStripMeta,
+			imageMaxBitDepth,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,
@@ -496,6 +502,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		deviceType,
 		allImageSizes,
 		bigImageSizeThreshold,
+		imageStripMeta,
+		imageMaxBitDepth,
 		isNavigationOverlayContext,
 	] );
 }

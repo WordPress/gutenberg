@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
+import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	store as blockEditorStore,
@@ -35,7 +36,39 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 	const blockElement = useBlockElement( clientId );
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const isSubmittingRef = useRef( false );
+
+	/*
+	 * Dismiss the form once focus leaves it. `useFocusOutside` keeps the form
+	 * open while focus stays in UI it owns: format popovers (e.g. the Cmd+K
+	 * link UI) portal out of the form's DOM, but their focus events still
+	 * bubble here through the React tree. It also ignores window/tab blur.
+	 */
+	const focusOutside = useFocusOutside( ( event ) => {
+		// Keep the form open when focus returns to it, e.g. on link popover Escape.
+		if (
+			event.relatedTarget?.closest(
+				'.editor-collab-sidebar-panel__add-note'
+			)
+		) {
+			return;
+		}
+		// Never dismiss mid-submit; clicking "Add note" blurs before it settles.
+		if ( isSubmittingRef.current ) {
+			return;
+		}
+
+		/*
+		 * Selection may have moved on before this deferred callback runs; only
+		 * clear it while this still owns the selection, or it would wipe out the
+		 * newly selected note.
+		 */
+		if ( getSelectedNote() === 'new' ) {
+			toggleBlockSpotlight( clientId, false );
+			selectNote( undefined );
+		}
+	} );
 
 	const unselectNote = () => {
 		selectNote( undefined );
@@ -50,7 +83,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 	return (
 		<FloatingContainer
 			floating={ floating }
-			className="editor-collab-sidebar-panel__thread is-selected"
+			className="editor-collab-sidebar-panel__add-note is-selected"
 			gap="md"
 			tabIndex={ 0 }
 			aria-label={ __( 'New note' ) }
@@ -58,73 +91,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 			style={
 				floating ? { opacity: ! floating.y ? 0 : undefined } : undefined
 			}
-			onBlur={ ( event ) => {
-				// Don't deselect notes when the browser window/tab loses focus.
-				if ( ! document.hasFocus() ) {
-					return;
-				}
-				/*
-				 * Prevent blur from closing the form while the async submit
-				 * is in progress. Clicking "Add note" moves focus away,
-				 * triggering blur before onSubmit completes.
-				 */
-				if ( isSubmittingRef.current ) {
-					return;
-				}
-				const container = event.currentTarget;
-				const dismiss = () => {
-					toggleBlockSpotlight( clientId, false );
-					selectNote( undefined );
-				};
-				/*
-				 * A known target outside the form closes it, except a format
-				 * popover (e.g. the Cmd+K link UI) which portals out of the
-				 * form container and so reports a related target inside
-				 * `.components-popover` rather than `currentTarget`.
-				 */
-				if ( event.relatedTarget ) {
-					if ( container.contains( event.relatedTarget ) ) {
-						return;
-					}
-					if (
-						event.relatedTarget.closest( '.components-popover' )
-					) {
-						return;
-					}
-					dismiss();
-					return;
-				}
-				/*
-				 * With no relatedTarget the blur is ambiguous: rich-text
-				 * re-renders briefly drop focus to the body while typing, but a
-				 * click on the empty document body also lands here. Re-check on
-				 * the next frame where focus actually settled and dismiss only
-				 * when it has truly left the form.
-				 */
-				container.ownerDocument.defaultView.requestAnimationFrame(
-					() => {
-						/*
-						 * A submit may have started between the blur and this
-						 * frame (e.g. Safari fires button-click blurs with no
-						 * relatedTarget); never dismiss mid-submit.
-						 */
-						if ( isSubmittingRef.current ) {
-							return;
-						}
-						const active = container.ownerDocument.activeElement;
-						if ( active && container.contains( active ) ) {
-							return;
-						}
-						if (
-							active &&
-							active.closest( '.components-popover' )
-						) {
-							return;
-						}
-						dismiss();
-					}
-				);
-			} }
+			{ ...focusOutside }
 		>
 			<NoteCard>
 				<NoteForm
@@ -152,7 +119,10 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 						}
 					} }
 					onCancel={ unselectNote }
-					labels={ { input: __( 'New note' ) } }
+					labels={ {
+						input: __( 'New note' ),
+						placeholder: __( 'Add a note or @ mention' ),
+					} }
 				/>
 			</NoteCard>
 		</FloatingContainer>

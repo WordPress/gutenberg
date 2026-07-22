@@ -22,7 +22,8 @@
 	overflow: hidden;
 }
 
-.editor-collab-sidebar-panel__thread {
+.editor-collab-sidebar-panel__thread,
+.editor-collab-sidebar-panel__add-note {
 	position: relative;
 	padding: $grid-unit-20;
 	border-radius: $radius-large;
@@ -138,11 +139,11 @@
 }
 
 .editor-collab-sidebar-panel__more-reply-button {
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 .editor-collab-sidebar-panel__deleted-block-notice {
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	color: $gray-700;
 }
 
@@ -171,7 +172,7 @@
 		border-radius: 2px;
 	}
 
-	a {
+	a:not(.wp-note-mention) {
 		color: var(--wp-admin-theme-color);
 		text-decoration: underline;
 	}
@@ -219,7 +220,7 @@
 }
 
 .editor-note-indicator__overflow {
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 .show-icon-labels {
@@ -396,7 +397,7 @@ mark.wp-note {
 	padding-bottom: var(--wpds-dimension-padding-sm);
 	color: var(--wpds-color-foreground-content-neutral-weak);
 	font-size: var(--wpds-typography-font-size-xs);
-	font-weight: var(--wpds-typography-font-weight-medium);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 .editor-collab-sidebar-panel__skin-tone-options {
@@ -449,7 +450,7 @@ mark.wp-note {
 	background-color: $white;
 	color: var(--wpds-color-foreground-content-neutral-weak);
 	font-size: var(--wpds-typography-font-size-xs);
-	font-weight: var(--wpds-typography-font-weight-medium);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	z-index: 1;
 }
 
@@ -499,4 +500,51 @@ mark.wp-note {
 		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
 		outline-offset: calc(-1 * var(--wpds-border-width-focus));
 	}
+}
+
+// Mention chips, both in the note input and the rendered note content. A
+// mention is a link to the mentioned user's author page, styled as a chip
+// rather than an underlined link.
+.wp-note-mention {
+	display: inline;
+	padding: 0 var(--wpds-dimension-padding-xs);
+	border-radius: var(--wpds-border-radius-sm);
+	background: var(--wpds-color-background-surface-brand);
+	color: var(--wpds-color-foreground-interactive-brand);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	white-space: nowrap;
+	text-decoration: none;
+
+	// Focus ring matching `ExternalLink`/`Link`; 0-width at rest avoids a stray forced-colors outline.
+	outline: 0 solid transparent;
+	outline-offset: 1px;
+
+	// Also clears the wp-admin common.css `a:focus` shadow/color/radius, which outrank the base rule.
+	&:focus {
+		outline:
+			var(--wpds-border-width-focus) solid
+			var(--wpds-color-stroke-focus);
+		box-shadow: none;
+		border-radius: var(--wpds-border-radius-sm);
+		color: var(--wpds-color-foreground-interactive-brand);
+	}
+
+	// Interactive states, since the chip look drops the link underline. After `:focus` so hover wins when both apply.
+	&:hover,
+	&:active {
+		background: var(--wpds-color-background-interactive-brand-weak-active);
+		color: var(--wpds-color-foreground-interactive-brand-active);
+	}
+
+	// Restore the underline when forced-colors drops the background tint.
+	@media (forced-colors: active) {
+		text-decoration: underline;
+	}
+}
+
+// Match the rounded avatars used for note bylines and the block toolbar
+// indicator in the mention suggestions popover (the shared completer style
+// leaves them square).
+.editor-collab-sidebar-panel__mention-suggestion .editor-autocompleters__user-avatar {
+	border-radius: $radius-round;
 }
