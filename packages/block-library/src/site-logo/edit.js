@@ -67,8 +67,6 @@ const SiteLogo = ( {
 	iconId,
 	setIcon,
 	canUserEdit,
-	isSwappingMedia,
-	setIsSwappingMedia,
 } ) => {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = [ 'wide', 'full' ].includes( align );
@@ -116,13 +114,9 @@ const SiteLogo = ( {
 
 	// Always apply modal updates as snackbar Undo may restore the original id.
 	const handleMediaUpdate = ( { id: newId } ) => {
-		if ( typeof newId !== 'number' ) {
-			return;
+		if ( typeof newId === 'number' ) {
+			setLogo( newId );
 		}
-		if ( newId !== logoId ) {
-			setIsSwappingMedia( true );
-		}
-		setLogo( newId );
 	};
 
 	function onResizeStart() {
@@ -133,31 +127,21 @@ const SiteLogo = ( {
 		toggleSelection( true );
 	}
 
-	const isLoading = isBlobURL( logoUrl ) || isSwappingMedia;
-	const logo = (
-		<img
-			className="custom-logo"
-			src={ logoUrl }
-			alt={ alt }
-			onLoad={ ( event ) => {
-				setIsSwappingMedia( false );
-				setNaturalSize( {
-					naturalWidth: event.target.naturalWidth,
-					naturalHeight: event.target.naturalHeight,
-				} );
-			} }
-			onError={ () => setIsSwappingMedia( false ) }
-		/>
-	);
-	// Only wrap while loading: the wrapper is an image-sized positioning
-	// context so the spinner centres on the logo rather than the whole block.
-	const img = isLoading ? (
-		<span className="wp-block-site-logo__loading">
-			{ logo }
-			<Spinner />
-		</span>
-	) : (
-		logo
+	const img = (
+		<>
+			<img
+				className="custom-logo"
+				src={ logoUrl }
+				alt={ alt }
+				onLoad={ ( event ) => {
+					setNaturalSize( {
+						naturalWidth: event.target.naturalWidth,
+						naturalHeight: event.target.naturalHeight,
+					} );
+				} }
+			/>
+			{ isBlobURL( logoUrl ) && <Spinner /> }
+		</>
 	);
 
 	let imgWrapper = img;
@@ -372,10 +356,6 @@ const SiteLogo = ( {
 							aria-haspopup="dialog"
 							icon={ crop }
 							label={ __( 'Crop' ) }
-							// Disable rather than hide while the edited logo
-							// loads, so the button keeps focus when the modal
-							// closes instead of dropping it to the canvas.
-							disabled={ isSwappingMedia }
 						/>
 					</BlockControls>
 				) }
@@ -471,12 +451,6 @@ export default function LogoEdit( {
 	}, [] );
 	const { getSettings } = useSelect( blockEditorStore );
 	const [ temporaryURL, setTemporaryURL ] = useState();
-	// Set while the media editor has pointed the logo at a new attachment
-	// whose record and file are still loading; cleared by the <img>
-	// load/error handlers. Also hides the Crop action while pending.
-	// Lives here rather than in SiteLogo because SiteLogo unmounts while
-	// the new attachment record resolves (logoUrl is briefly undefined).
-	const [ isSwappingMedia, setIsSwappingMedia ] = useState( false );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { editEntityRecord } = useDispatch( coreStore );
@@ -605,8 +579,6 @@ export default function LogoEdit( {
 					setIcon={ setIcon }
 					iconId={ siteIconId }
 					canUserEdit={ canUserEdit }
-					isSwappingMedia={ isSwappingMedia }
-					setIsSwappingMedia={ setIsSwappingMedia }
 				/>
 				{ canUserEdit && <DropZone onFilesDrop={ onFilesDrop } /> }
 			</>
@@ -634,10 +606,7 @@ export default function LogoEdit( {
 
 	const classes = clsx( className, {
 		'is-default-size': ! width,
-		// While swapping in a media-editor edit, `is-transient` dims the old
-		// logo and centres the spinner as an overlay (see editor.scss), matching
-		// the upload treatment.
-		'is-transient': temporaryURL || isSwappingMedia,
+		'is-transient': temporaryURL,
 	} );
 
 	const blockProps = useBlockProps( { className: classes } );
