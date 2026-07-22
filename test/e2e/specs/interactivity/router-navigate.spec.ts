@@ -123,10 +123,23 @@ test.describe( 'Router navigate', () => {
 		await expect( navigations ).toHaveText( '0' );
 		await expect( status ).toHaveText( 'idle' );
 
-		const resolvers: Function[] = [];
+		const resolvers: Array< () => void > = [];
+
+		// Both navigations target the same page path (they only differ in the
+		// URL fragment, which is stripped when building the cache key), so both
+		// requests reach this single route handler.
+		let resolveBothRequests: () => void;
+		const bothRequests = new Promise< void >( ( resolve ) => {
+			resolveBothRequests = resolve;
+		} );
 
 		await page.route( link1, async ( route ) => {
-			await new Promise( ( r ) => resolvers.push( r ) );
+			await new Promise< void >( ( resolve ) => {
+				resolvers.push( resolve );
+				if ( resolvers.length === 2 ) {
+					resolveBothRequests();
+				}
+			} );
 			await route.continue();
 		} );
 
@@ -141,14 +154,28 @@ test.describe( 'Router navigate', () => {
 		await expect( status ).toHaveText( 'busy' );
 		await expect( title ).toHaveText( 'Main' );
 
-		resolvers.pop()!();
+		// Wait until both requests have reached the route handler before
+		// releasing any of them. The navigations counter above only tracks that
+		// both navigate actions have started; the actual fetches happen later
+		// (after a dynamic import), so without this barrier `resolvers.pop()`
+		// could release the first navigation's request instead of the last
+		// one's. That earlier navigation bails out (its destination is no longer
+		// the current one), leaving the title as "Main" and making this test
+		// flaky.
+		await bothRequests;
+
+		// Release the last navigation (the one with the hash) first. It should
+		// win and update both the title and the URL.
+		await Promise.resolve().then( () => resolvers.pop()!() );
 
 		await expect( navigations ).toHaveText( '1' );
 		await expect( status ).toHaveText( 'busy' );
 		await expect( title ).toHaveText( 'Link 1' );
 		await expect( page ).toHaveURL( href );
 
-		resolvers.pop()!();
+		// Release the earlier navigation. It must not replace the HTML from the
+		// last navigation.
+		await Promise.resolve().then( () => resolvers.pop()!() );
 
 		await expect( navigations ).toHaveText( '0' );
 		await expect( status ).toHaveText( 'idle' );
