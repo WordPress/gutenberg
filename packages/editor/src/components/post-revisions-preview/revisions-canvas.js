@@ -30,7 +30,7 @@ const { usePrivateStyleOverride, PrivateBlockContext } = unlock(
 	blockEditorPrivateApis
 );
 
-// SVG filter for removed blocks: grayscale + red tint
+// SVG filter for Removed blocks: grayscale + red tint
 const REVISION_REMOVED_FILTER_SVG = `
 <svg
 	xmlns="http://www.w3.org/2000/svg"
@@ -107,13 +107,13 @@ function getDiffStatusLabel( status, blockTitle ) {
 	switch ( status ) {
 		case 'added':
 			// translators: %s: block type name e.g. "Paragraph"
-			return sprintf( __( 'Added Block: %s' ), blockTitle );
+			return sprintf( __( 'Added block: %s' ), blockTitle );
 		case 'removed':
 			// translators: %s: block type name e.g. "Paragraph"
-			return sprintf( __( 'Removed Block: %s' ), blockTitle );
+			return sprintf( __( 'Removed block: %s' ), blockTitle );
 		case 'modified':
 			// translators: %s: block type name e.g. "Paragraph"
-			return sprintf( __( 'Modified Block: %s' ), blockTitle );
+			return sprintf( __( 'Modified block: %s' ), blockTitle );
 	}
 }
 

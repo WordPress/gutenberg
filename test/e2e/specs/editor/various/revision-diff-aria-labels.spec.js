@@ -80,24 +80,24 @@ test.describe( 'Revision block diff aria-labels', () => {
 		// Blocks announce their diff status via the accessible name.
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Modified Block: Paragraph',
+				name: 'Modified block: Paragraph',
 			} )
 		).toBeVisible();
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Removed Block: Heading',
+				name: 'Removed block: Heading',
 			} )
 		).toBeVisible();
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Added Block: Poetry',
+				name: 'Added block: Poetry',
 			} )
 		).toBeVisible();
 
 		// Diff labels use the variation-aware block title.
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Added Block: Row',
+				name: 'Added block: Row',
 			} )
 		).toBeVisible();
 
@@ -138,22 +138,22 @@ test.describe( 'Revision block diff aria-labels', () => {
 		// Disabling diff highlighting removes diff-specific labels.
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Modified Block: Paragraph',
+				name: 'Modified block: Paragraph',
 			} )
 		).toHaveCount( 0 );
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Removed Block: Heading',
+				name: 'Removed block: Heading',
 			} )
 		).toHaveCount( 0 );
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Added Block: Poetry',
+				name: 'Added block: Poetry',
 			} )
 		).toHaveCount( 0 );
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Added Block: Row',
+				name: 'Added block: Row',
 			} )
 		).toHaveCount( 0 );
 
