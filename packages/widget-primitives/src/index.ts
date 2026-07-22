@@ -20,6 +20,7 @@ export type {
 	WidgetName,
 	WidgetIcon,
 	WidgetType,
+	WidgetAction,
 	WidgetAttributeField,
 	WidgetRenderProps,
 	ResolveWidgetModule,

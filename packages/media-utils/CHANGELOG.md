@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove the `window.__heicUploadSupport` type declaration, following the removal of the redundant flag ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
+
+## 5.51.0 (2026-07-14)
+
 ### Enhancements
 
 -   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).

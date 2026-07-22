@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
+
+## 11.0.0 (2026-07-14)
+
 ### Breaking Changes
 
 -   Remove `$font-weight-regular` and `$font-weight-medium`. Use `var(--wpds-typography-font-weight-default)` or `var(--wpds-typography-font-weight-emphasis)` based on the intended emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).

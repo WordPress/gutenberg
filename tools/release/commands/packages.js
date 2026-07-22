@@ -27,7 +27,7 @@ const {
 } = require( './common' );
 const pluginConfig = require( '../config' );
 
-const NPM_RELEASE_GIT_PUSH_ATTEMPTS = 3;
+const NPM_RELEASE_PHASE_ATTEMPTS = 3;
 // Keep tag pushes small enough that GitHub ruleset validation handles each phase predictably.
 const NPM_RELEASE_TAG_PUSH_BATCH_SIZE = 25;
 
@@ -480,14 +480,14 @@ function getNpmReleaseGitRecoveryCommands( {
 }
 
 /**
- * Runs a release metadata push phase with retry.
+ * Runs a release phase with retry.
  *
  * @param {string}   label     Phase label.
  * @param {Function} task      Task to retry.
  * @param {Object}   deps      Dependencies.
  * @param {Function} deps.wait Wait function.
  */
-async function runNpmReleaseGitPushPhase( label, task, deps = {} ) {
+async function runNpmReleasePhase( label, task, deps = {} ) {
 	const {
 		wait = ( delay ) =>
 			new Promise( ( resolve ) => setTimeout( resolve, delay ) ),
@@ -497,11 +497,11 @@ async function runNpmReleaseGitPushPhase( label, task, deps = {} ) {
 			await task();
 			return;
 		} catch ( err ) {
-			if ( attempt >= NPM_RELEASE_GIT_PUSH_ATTEMPTS ) {
+			if ( attempt >= NPM_RELEASE_PHASE_ATTEMPTS ) {
 				throw err;
 			}
 			log(
-				`>> ${ label } failed (attempt ${ attempt }/${ NPM_RELEASE_GIT_PUSH_ATTEMPTS }): ${
+				`>> ${ label } failed (attempt ${ attempt }/${ NPM_RELEASE_PHASE_ATTEMPTS }): ${
 					err.message
 				}, retrying in ${ attempt * 5 }s...`
 			);
@@ -660,16 +660,38 @@ function isNpmPackageVersionMissing( error ) {
 }
 
 /**
+ * Parses npm JSON command output.
+ *
+ * @param {string} output      Command stdout.
+ * @param {string} description Output description for error messages.
+ *
+ * @return {*} Parsed JSON output.
+ */
+function parseNpmJsonOutput( output, description ) {
+	try {
+		return JSON.parse( output );
+	} catch {
+		throw new Error(
+			`Unable to parse npm registry ${ description }: ${ output }`
+		);
+	}
+}
+
+/**
  * Runs a pragmatic npm preflight before publishing.
  *
  * @param {Object}   options                         Options.
+ * @param {string}   options.distTag                 The dist-tag used for npm publishing.
  * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
+ * @param {string}   options.publishCommit           Release commit SHA.
  * @param {Array}    options.releasePackages         Packages to publish.
  * @param {Object}   deps                            Dependencies.
  * @param {Function} deps.commandFn                  Command runner.
+ *
+ * @return {Promise<string[]>} Correctly published package names.
  */
 async function runNpmPublishPreflight(
-	{ gitWorkingDirectoryPath, releasePackages },
+	{ distTag, gitWorkingDirectoryPath, publishCommit, releasePackages },
 	deps = {}
 ) {
 	const { commandFn = command } = deps;
@@ -679,25 +701,60 @@ async function runNpmPublishPreflight(
 		stdio: 'pipe',
 	} );
 
-	log( '>> Verifying target package versions are not already published.' );
+	log( '>> Verifying target package versions and dist-tags.' );
+	const publishedPackageNames = [];
 	// TODO: Consider bounded concurrency here if this preflight becomes too slow.
-	// Keep the first hardening pass sequential so registry errors stay easy to read.
+	// Keep registry checks sequential so errors stay easy to read.
 	for ( const { name, version } of releasePackages ) {
+		let registryPackage;
 		try {
-			await commandFn( `npm view ${ name }@${ version } version --json`, {
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'pipe',
-			} );
+			const { stdout } = await commandFn(
+				`npm view ${ name }@${ version } version gitHead dist-tags --json`,
+				{
+					cwd: gitWorkingDirectoryPath,
+					stdio: 'pipe',
+				}
+			);
+			registryPackage = parseNpmJsonOutput(
+				stdout,
+				`${ name }@${ version } metadata`
+			);
 		} catch ( error ) {
 			if ( isNpmPackageVersionMissing( error ) ) {
 				continue;
 			}
 			throw error;
 		}
-		throw new Error(
-			`${ name }@${ version } already exists in the npm registry.`
-		);
+
+		const {
+			version: registryVersion,
+			gitHead: registryGitHead,
+			'dist-tags': distTags = {},
+		} = registryPackage;
+		if ( registryVersion !== version ) {
+			throw new Error(
+				`Expected npm registry lookup for ${ name }@${ version } to return version ${ version }, got ${ registryVersion }.`
+			);
+		}
+
+		if ( registryGitHead !== publishCommit ) {
+			throw new Error(
+				`${ name }@${ version } exists in the npm registry with gitHead ${
+					registryGitHead || 'nothing'
+				}, expected ${ publishCommit }.`
+			);
+		}
+
+		if ( distTags[ distTag ] !== version ) {
+			throw new Error(
+				`${ name }@${ version } exists in the npm registry, but dist-tag "${ distTag }" points to ${
+					distTags[ distTag ] || 'nothing'
+				}. If another release moved the dist-tag, this prepared release is not safe to resume.`
+			);
+		}
+		publishedPackageNames.push( name );
 	}
+	return publishedPackageNames;
 }
 
 /**
@@ -720,7 +777,7 @@ async function pushNpmReleaseGitMetadata(
 ) {
 	const {
 		git = SimpleGit( gitWorkingDirectoryPath ),
-		runPhase = runNpmReleaseGitPushPhase,
+		runPhase = runNpmReleasePhase,
 		verifyRemoteNpmReleaseBranchFn = verifyRemoteNpmReleaseBranch,
 		verifyRemotePackageTagsFn = verifyRemotePackageTags,
 	} = deps;
@@ -791,6 +848,7 @@ async function pushNpmReleaseGitMetadata(
  * @param {Function} deps.getNpmReleasePackagesFn     Gets release package metadata.
  * @param {Function} deps.pushNpmReleaseGitMetadataFn Pushes Git metadata.
  * @param {Function} deps.runNpmPublishPreflightFn    Runs npm preflight.
+ * @param {Function} deps.runPhase                    Runs a retryable phase.
  */
 async function publishVersionedPackagesToNpm(
 	{
@@ -808,24 +866,35 @@ async function publishVersionedPackagesToNpm(
 		getNpmReleasePackagesFn = getNpmReleasePackages,
 		pushNpmReleaseGitMetadataFn = pushNpmReleaseGitMetadata,
 		runNpmPublishPreflightFn = runNpmPublishPreflight,
+		runPhase = runNpmReleasePhase,
 	} = deps;
 	const releasePackages = await getNpmReleasePackagesFn(
 		gitWorkingDirectoryPath
 	);
-	await runNpmPublishPreflightFn( {
-		gitWorkingDirectoryPath,
-		releasePackages,
-	} );
+	const publishCommit = await git.revparse( [ 'HEAD' ] );
+	const publishCommand = `npx lerna publish from-package --dist-tag ${ distTag } --git-head ${ publishCommit } ${ yesFlag } ${ noVerifyAccessFlag }`;
+	const getPublishedPackageNames = () =>
+		runNpmPublishPreflightFn( {
+			distTag,
+			gitWorkingDirectoryPath,
+			publishCommit,
+			releasePackages,
+		} );
+	const publishRemainingPackages = async ( publishedPackageNames ) => {
+		if ( publishedPackageNames.length === releasePackages.length ) {
+			log( '>> All target package versions are already published.' );
+			return;
+		}
+		log( '>> Publishing modified packages to npm.' );
+		await commandFn( publishCommand, {
+			cwd: gitWorkingDirectoryPath,
+			stdio: 'inherit',
+		} );
+	};
 
-	log( '>> Publishing modified packages to npm.' );
+	const publishedPackageNames = await getPublishedPackageNames();
 	try {
-		await commandFn(
-			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
-			{
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'inherit',
-			}
-		);
+		await publishRemainingPackages( publishedPackageNames );
 	} catch {
 		log(
 			'>> Trying to finish failed publishing of modified npm packages.'
@@ -833,16 +902,27 @@ async function publishVersionedPackagesToNpm(
 		// A failed Lerna publish can leave temporary `gitHead` manifest changes.
 		// Reset to the version commit so `from-package` sees a clean tree on retry.
 		await git.reset( 'hard' );
-		await commandFn(
-			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
-			{
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'inherit',
-			}
-		);
+		await publishRemainingPackages( await getPublishedPackageNames() );
 	}
 
-	const publishCommit = await git.revparse( [ 'HEAD' ] );
+	// Lerna treats publish conflicts as successful "already published" results,
+	// so verify registry identity again before attaching Git metadata.
+	await runPhase( 'npm publication verification', async () => {
+		const finalPublishedPackageNames = new Set(
+			await getPublishedPackageNames()
+		);
+		const unpublishedPackageVersions = releasePackages
+			.filter( ( { name } ) => ! finalPublishedPackageNames.has( name ) )
+			.map( ( { name, version } ) => `${ name }@${ version }` );
+		if ( unpublishedPackageVersions.length ) {
+			throw new Error(
+				`npm publication verification failed for ${ unpublishedPackageVersions.join(
+					', '
+				) }.`
+			);
+		}
+	} );
+
 	await pushNpmReleaseGitMetadataFn( {
 		gitWorkingDirectoryPath,
 		npmReleaseBranch,
@@ -904,7 +984,7 @@ async function publishPackagesToNpm(
 		);
 
 		await commandFn(
-			`npx lerna version pre${ minimumVersionBump } --preid next.v.${ timestamp } --build-metadata ${ beforeCommitHash } --no-private --no-push ${ yesFlag }`,
+			`npx lerna version pre${ minimumVersionBump } --preid next.v.${ timestamp } --no-private --no-push ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -937,6 +1017,80 @@ async function publishPackagesToNpm(
 	}
 
 	return afterCommitHash;
+}
+
+/**
+ * Prepares the npm release branch and changelog updates.
+ *
+ * @param {WPPackagesConfig} config Command config.
+ * @param {Object}           deps   Dependencies.
+ *
+ * @return {Promise<Object>} Release state needed by finalization.
+ */
+async function prepareNpmRelease( config, deps = {} ) {
+	const {
+		checkoutNpmReleaseBranchFn = checkoutNpmReleaseBranch,
+		findPluginReleaseBranchNameFn = findPluginReleaseBranchName,
+		runNpmReleaseBranchSyncStepFn = runNpmReleaseBranchSyncStep,
+		updatePackagesFn = updatePackages,
+	} = deps;
+	let pluginReleaseBranch;
+	if ( [ 'latest', 'next' ].includes( config.releaseType ) ) {
+		pluginReleaseBranch =
+			config.releaseType === 'next'
+				? 'trunk'
+				: await findPluginReleaseBranchNameFn(
+						config.gitWorkingDirectoryPath
+				  );
+		await runNpmReleaseBranchSyncStepFn( pluginReleaseBranch, config );
+	} else {
+		await checkoutNpmReleaseBranchFn( config );
+	}
+
+	return {
+		changelogCommit: await updatePackagesFn( config ),
+		pluginReleaseBranch,
+	};
+}
+
+/**
+ * Publishes the packages prepared in the current checkout.
+ *
+ * @param {WPPackagesConfig} config Command config.
+ * @param {Object}           deps   Dependencies.
+ *
+ * @return {Promise<?string>} The npm version commit hash.
+ */
+async function publishPreparedPackagesToNpm( config, deps = {} ) {
+	const { publishPackagesToNpmFn = publishPackagesToNpm } = deps;
+	return publishPackagesToNpmFn( config );
+}
+
+/**
+ * Backports the prepared release commits after publication.
+ *
+ * @param {WPPackagesConfig} config                           Command config.
+ * @param {Object}           releaseState                     Prepared release state.
+ * @param {?string}          releaseState.changelogCommit     Changelog commit.
+ * @param {?string}          releaseState.pluginReleaseBranch Plugin release branch.
+ * @param {?string}          releaseState.publishCommit       Version commit.
+ * @param {Object}           deps                             Dependencies.
+ */
+async function finalizePreparedNpmRelease(
+	config,
+	{ changelogCommit, pluginReleaseBranch, publishCommit },
+	deps = {}
+) {
+	const { backportCommitsToBranchFn = backportCommitsToBranch } = deps;
+	if ( ! [ 'latest', 'bugfix' ].includes( config.releaseType ) ) {
+		return;
+	}
+
+	const commits = [ changelogCommit, publishCommit ].filter( Boolean );
+	await backportCommitsToBranchFn( 'trunk', commits, config );
+	if ( config.releaseType === 'latest' && pluginReleaseBranch ) {
+		await backportCommitsToBranchFn( pluginReleaseBranch, commits, config );
+	}
 }
 
 /**
@@ -991,10 +1145,16 @@ async function backportCommitsToBranch(
  *
  * @param {WPPackagesConfig} config         Command config.
  * @param {string[]}         customMessages Custom messages to print in the terminal.
+ * @param {Object}           deps           Dependencies.
  *
- * @return {Promise<Object>} GitHub release object.
+ * @return {Promise<void>}
  */
-async function runPackagesRelease( config, customMessages ) {
+async function runPackagesRelease( config, customMessages, deps = {} ) {
+	const {
+		finalizePreparedNpmReleaseFn = finalizePreparedNpmRelease,
+		prepareNpmReleaseFn = prepareNpmRelease,
+		publishPreparedPackagesToNpmFn = publishPreparedPackagesToNpm,
+	} = deps;
 	log(
 		formats.title(
 			'\n💃 Time to publish WordPress packages to npm 🕺\n\n'
@@ -1029,38 +1189,9 @@ async function runPackagesRelease( config, customMessages ) {
 		);
 	}
 
-	let pluginReleaseBranch;
-	if ( [ 'latest', 'next' ].includes( config.releaseType ) ) {
-		pluginReleaseBranch =
-			config.releaseType === 'next'
-				? 'trunk'
-				: await findPluginReleaseBranchName(
-						config.gitWorkingDirectoryPath
-				  );
-		await runNpmReleaseBranchSyncStep( pluginReleaseBranch, config );
-	} else {
-		await checkoutNpmReleaseBranch( config );
-	}
-
-	const commitHashChangelogUpdates = await updatePackages( config );
-
-	const commitHashNpmPublish = await publishPackagesToNpm( config );
-
-	if ( [ 'latest', 'bugfix' ].includes( config.releaseType ) ) {
-		const commits = [
-			commitHashChangelogUpdates,
-			commitHashNpmPublish,
-		].filter( Boolean );
-		await backportCommitsToBranch( 'trunk', commits, config );
-
-		if ( config.releaseType === 'latest' && pluginReleaseBranch ) {
-			await backportCommitsToBranch(
-				pluginReleaseBranch,
-				commits,
-				config
-			);
-		}
-	}
+	const releaseState = await prepareNpmReleaseFn( config );
+	releaseState.publishCommit = await publishPreparedPackagesToNpmFn( config );
+	await finalizePreparedNpmReleaseFn( config, releaseState );
 
 	await runStep(
 		'Cleaning the temporary folders',
@@ -1160,13 +1291,16 @@ async function publishNpmNext( options ) {
 }
 
 module.exports = {
+	finalizePreparedNpmRelease,
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
 	getRemoteBranchSha,
 	getRemoteTagShas,
 	getTagPushCommands,
 	getTagRefspec,
+	prepareNpmRelease,
 	publishPackagesToNpm,
+	publishPreparedPackagesToNpm,
 	publishVersionedPackagesToNpm,
 	pushNpmReleaseGitMetadata,
 	publishNpmGutenbergPlugin,
@@ -1174,6 +1308,7 @@ module.exports = {
 	publishNpmBugfixWordPressCore,
 	publishNpmNext,
 	runNpmPublishPreflight,
-	runNpmReleaseGitPushPhase,
+	runNpmReleasePhase,
+	runPackagesRelease,
 	verifyRemotePackageTags,
 };

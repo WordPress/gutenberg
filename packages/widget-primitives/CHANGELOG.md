@@ -4,6 +4,30 @@
 
 ### New Features
 
+-   `WidgetTypeMetadata`: add optional `actions`, a declarative list of
+    user-triggerable links a widget exposes ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+
+### Enhancements
+
+-   Ship the package as a WordPress script module
+    (`wpScriptModuleExports`) ([#80149](https://github.com/WordPress/gutenberg/pull/80149)).
+
+### Documentation
+
+-   Add an Actions doc page and a `WithActions` story, and cover `actions`
+    in the widget anatomy doc ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+-   Spell out the accepted field-type name syntax: lowercase kebab-case
+    segments, with at most one namespace level ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+
+### Internal
+
+-   Add an integration test covering named field-type resolution in
+    `useWidgetTypes` ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+
+## 0.3.0 (2026-07-14)
+
+### New Features
+
 -   `WidgetAttributeField< Item >`: authoring helper narrowing a DataViews
     `Field.id` to the widget's attribute keys.
 -   Field type registry: `registerFieldType` names a reusable field type,

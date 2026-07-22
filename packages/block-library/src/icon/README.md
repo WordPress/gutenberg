@@ -28,9 +28,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`ariaLabel`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#arialabel): `true`
 - [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `"left"`, `"center"`, `"right"`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
-  - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
-  - [`text`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
+- [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
