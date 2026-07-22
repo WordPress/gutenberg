@@ -11,6 +11,8 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { __ } from '@wordpress/i18n';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -21,6 +23,7 @@ import VisualEditor from '../visual-editor';
 import {
 	registerDiffFormatTypes,
 	unregisterDiffFormatTypes,
+	DIFF_DESCRIPTION_IDS,
 } from './diff-format-types';
 import { useDiffMarkers } from './diff-markers';
 
@@ -77,6 +80,14 @@ const REVISION_DIFF_STYLES = `
 	.revision-diff-added {
 		background-color: color-mix(in srgb, currentColor 5%, #00a32a 15%);
 		text-decoration: none;
+	}
+	/* Reset UA <mark> styles so format markers keep the same look as before. */
+	mark.revision-diff-format-added,
+	mark.revision-diff-format-removed,
+	mark.revision-diff-format-changed {
+		background: transparent;
+		color: inherit;
+		padding: 0;
 	}
 	.revision-diff-format-added {
 		text-decoration: underline wavy color-mix(in srgb, currentColor 30%, #00a32a 70%);
@@ -136,10 +147,36 @@ function DiffStyleOverrides( { showDiff } ) {
 	return null;
 }
 
+/**
+ * Visually hidden descriptions that diff marks (<del>, <ins>, <mark>)
+ * reference via `aria-describedby`. They must be rendered inside the
+ * canvas iframe because `aria-describedby` cannot reference an element
+ * across a document/iframe boundary. This is more reliable than `title`,
+ * which some screen readers ignore in low-verbosity modes.
+ */
+function DiffDescriptions() {
+	return (
+		<VisuallyHidden>
+			<span id={ DIFF_DESCRIPTION_IDS.removed }>{ __( 'Removed' ) }</span>
+			<span id={ DIFF_DESCRIPTION_IDS.added }>{ __( 'Added' ) }</span>
+			<span id={ DIFF_DESCRIPTION_IDS.formatAdded }>
+				{ __( 'Format added' ) }
+			</span>
+			<span id={ DIFF_DESCRIPTION_IDS.formatRemoved }>
+				{ __( 'Format removed' ) }
+			</span>
+			<span id={ DIFF_DESCRIPTION_IDS.formatChanged }>
+				{ __( 'Format changed' ) }
+			</span>
+		</VisuallyHidden>
+	);
+}
+
 function CanvasContent( { showDiff } ) {
 	const [ contentRef, diffMarkers ] = useDiffMarkers();
 	return (
 		<>
+			{ showDiff && <DiffDescriptions /> }
 			<VisualEditor contentRef={ contentRef } />
 			{ showDiff && diffMarkers }
 		</>
