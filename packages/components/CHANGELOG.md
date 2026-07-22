@@ -88,7 +88,6 @@
 -   `Button`: Remove a flash of the WordPress core focus ring while a button rendered as a link is pressed ([#80082](https://github.com/WordPress/gutenberg/pull/80082)).
 -   `BorderBoxControl`: Fix the unlink button positioning by restoring the linked control's right-hand margin, which was overridden by `BorderControl`'s base `margin: 0` after `View` stopped rendering styles through Emotion ([#79967](https://github.com/WordPress/gutenberg/pull/79967)).
 -   `Panel`: Fix the body toggle focus style ([#80064](https://github.com/WordPress/gutenberg/pull/80064)).
--   `ColorPicker`: Fix value flicker when changing colors rapidly, most noticeable in Firefox ([#79266](https://github.com/WordPress/gutenberg/pull/79266)).
 
 ### Internal
 
