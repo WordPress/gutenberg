@@ -46,8 +46,12 @@ export default function useNavigationMenu( ref ) {
 		VIEW_NAVIGATION_MENUS_QUERY
 	);
 
+	// Creation-capable users still need the editable collection before a menu
+	// is selected so drafts remain available and unsaved inner blocks can be
+	// saved as a new Navigation Menu.
 	const canUseEditContext =
-		!! ref && hasResolvedPermissions && canUpdateNavigationMenu;
+		hasResolvedPermissions &&
+		( canUpdateNavigationMenu || ( ! ref && canCreateNavigationMenus ) );
 
 	const {
 		records: editableNavigationMenus,

@@ -211,6 +211,27 @@ describe( 'useNavigationMenus', () => {
 		);
 	} );
 
+	it( 'lists editable menus when no ref is selected and the user can create menus', () => {
+		resolveRecords( registry, publishedMenus );
+		resolveRecords(
+			registry,
+			[ ...publishedMenus, draftMenu ],
+			EDIT_QUERY
+		);
+		resolveCreatePermission( registry, true );
+		resolveReadPermission( registry, true );
+
+		expect( useNavigationMenu() ).toEqual(
+			expect.objectContaining( {
+				navigationMenus: [ ...publishedMenus, draftMenu ],
+				publishedNavigationMenus: publishedMenus,
+				canSwitchNavigationMenu: true,
+				canUserCreateNavigationMenus: true,
+				hasResolvedNavigationMenus: true,
+			} )
+		);
+	} );
+
 	it( 'normalizes a published menu for a user without update permission', () => {
 		resolveRecords( registry, publishedMenus );
 		resolveRecord( registry, publishedMenu.id );
