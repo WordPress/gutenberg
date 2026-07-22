@@ -1,21 +1,31 @@
 ---
 name: design-system-code-review
-description: Review a Gutenberg contribution that changes a WordPress Design System package or its public contract.
+description: Perform a read-only, evidence-based review of a Gutenberg change to a WordPress Design System package or its public contract. Use for review requests affecting `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme`; do not use to implement the change or review a consumer-only application.
 ---
 
 # Review a WordPress Design System contribution
 
-Use this skill to review a diff changing `packages/components`, `packages/ui`,
-or `packages/theme`. It requires the target Gutenberg checkout or a complete
-diff; it is not a consumer-code-review checklist.
+## Authority and scope
 
-## Gather evidence
+- Keep the review read-only. Do not modify source or generated files, commit,
+  push, post review comments, or update pull-request metadata.
+- Review a diff that changes `packages/components`, `packages/ui`, or
+  `packages/theme`. Require the target Gutenberg checkout or a complete diff.
+- Treat the target checkout's code, package documentation, and compatibility
+  policy as authoritative. Do not apply package-private conventions to an
+  external consumer.
 
-Inspect the diff, package source, tests, stories, generated outputs, and public
-exports. Read [Working with WordPress Design System packages](../../docs/contributors/design/design-system-packages.md)
-and the relevant package contribution guide. Use an available MCP server only
-as supplementary current-design context, not as proof of a target branch's
-contract.
+## Review method
+
+1. Define the changed public surface and the user-visible behaviour in scope.
+2. Inspect the diff, package source, exports, types, tests, stories, generated
+   output, and meaningful Gutenberg and external consumers.
+3. Read [Working with WordPress Design System packages](../../docs/contributors/design/design-system-packages.md)
+   and the applicable package contribution guide.
+4. Use an available MCP server only as supplementary current-design context;
+   verify the target branch's contract from the checkout.
+5. Resolve uncertainty through source, consumers, browser behaviour, and tests
+   before reporting it.
 
 ## Assess the change
 
@@ -29,9 +39,11 @@ checklist. Cover, as applicable:
 - package conventions, tests, stories, documentation, generated output, and
   release impact.
 
-## Report findings
+## Output contract
 
-For each finding, state the affected contract or behaviour, evidence from the
-target source or consumer, and the concrete impact. Keep severity proportional
-to the demonstrated risk. Distinguish a required change from an optional
-precedent or follow-up.
+Start with a short scope assessment. For each material finding, state the
+affected contract or behaviour, target-source or consumer evidence, concrete
+impact, and smallest coherent direction. Keep severity proportional to the
+demonstrated risk. Separate verification gaps from findings, distinguish a
+required change from an optional precedent or follow-up, and report no findings
+when the evidence exposes none.

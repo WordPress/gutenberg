@@ -4,8 +4,6 @@ A guide on how to get started contributing design to the Gutenberg project.
 
 For guidance on consuming or maintaining the WordPress Design System packages,
 see [Working with WordPress Design System packages](design-system-packages.md).
-The related [agent skills](agent-skills.md) provide task-specific procedural
-guidance without replacing the contributor documentation.
 
 ## Discussions
 

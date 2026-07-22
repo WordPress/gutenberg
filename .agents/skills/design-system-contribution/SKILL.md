@@ -1,12 +1,18 @@
 ---
 name: design-system-contribution
-description: Plan and implement a safe change to the WordPress Design System packages in a local Gutenberg checkout.
+description: Plan and implement a safe change to `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme` in a local Gutenberg checkout. Use for package maintenance and public-contract work; do not use for consumer-only application changes or infer commit, push, or pull-request authority.
 ---
 
 # Contribute to the WordPress Design System
 
-Use this skill only in a local Gutenberg checkout when changing
-`packages/components`, `packages/ui`, or `packages/theme`.
+## Authority and scope
+
+- Use this skill only in a local Gutenberg checkout when changing
+  `packages/components`, `packages/ui`, or `packages/theme`.
+- Follow the target repository's package conventions and release policy. A
+  change request does not authorize commits, pushes, or pull-request writes.
+- Keep package internals distinct from the published contract and assess
+  external consumers as well as Gutenberg call sites.
 
 ## Establish the problem and public boundary
 

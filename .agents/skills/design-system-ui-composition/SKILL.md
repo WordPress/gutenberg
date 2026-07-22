@@ -1,13 +1,19 @@
 ---
 name: design-system-ui-composition
-description: Build a Gutenberg feature, plugin interface, or standalone application with the public WordPress Design System APIs.
+description: Build a Gutenberg feature, plugin interface, or standalone application with public `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme` APIs. Use for consumer implementation work; do not use to change package source or depend on package-private implementation details.
 ---
 
 # Compose a WordPress Design System interface
 
-Use this skill for application work that consumes `@wordpress/components`,
-`@wordpress/ui`, or `@wordpress/theme`. It is for public APIs only; do not use
-it to change those packages.
+## Authority and scope
+
+- Use this skill for application work that consumes `@wordpress/components`,
+  `@wordpress/ui`, or `@wordpress/theme` through public APIs only.
+- Keep the target checkout or installed package version as the compatibility
+  boundary. Do not infer package-change, commit, push, or pull-request
+  authority.
+- Route a missing public component, token, or API to
+  `design-system-contribution` rather than importing package internals.
 
 ## Start with the target
 

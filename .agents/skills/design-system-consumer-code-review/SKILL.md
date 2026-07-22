@@ -1,26 +1,32 @@
 ---
 name: design-system-consumer-code-review
-description: Review an application or plugin change that consumes public WordPress Design System APIs without changing the design-system packages.
+description: Perform a read-only review of an application, plugin, or Gutenberg feature that consumes public WordPress Design System APIs without changing the packages. Use for consumer-only review requests involving `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme`; do not use to implement a change or review package source.
 ---
 
 # Review WordPress Design System consumption
 
-Use this skill for an application, plugin, or Gutenberg feature diff that
-consumes `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme`. It
-complements, rather than replaces, a general code review.
+## Authority and scope
 
-## Establish the contract
+- Keep the review read-only. Do not modify source, commit, push, post review
+  comments, or update pull-request metadata.
+- Review an application, plugin, or Gutenberg feature diff that consumes
+  `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme`.
+- Assess documented public contracts and user-facing behaviour. Do not judge a
+  consumer against package-private source conventions.
 
-Inspect the actual diff, affected call sites, runtime documents, and target
-package versions. Use an available WordPress Design System MCP server for
-discovery, then verify imports, types, setup, and token usage against the
-target's local public documentation and exports.
+## Review method
 
-Use [Working with WordPress Design System packages](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/design/design-system-packages.md)
-to select the relevant package documentation. Do not judge a consumer against
-package-private source conventions.
+1. Inspect the diff, affected call sites, runtime documents, and target package
+   versions.
+2. Use an available WordPress Design System MCP server for discovery, then
+   verify imports, types, setup, and token usage against target public
+   documentation and exports.
+3. Use [Working with WordPress Design System packages](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/design/design-system-packages.md)
+   to select the relevant package documentation.
+4. Resolve uncertainty through the application, documented setup, and browser
+   behaviour before reporting it.
 
-## Review the user-facing result
+## Assess the user-facing result
 
 Check that the change:
 
@@ -34,9 +40,11 @@ Check that the change:
   and compatibility parity instead of assuming that a newer package is a drop-in
   replacement.
 
-## Report and hand off
+## Output contract
 
-Give findings with the affected public contract, concrete user impact, and
-target-version evidence. Escalate a missing component, token, or public API to
+Start with a short scope assessment. Give each material finding the affected
+public contract, concrete user impact, and target-version evidence. Separate
+verification gaps from findings and report no findings when the evidence
+exposes none. Escalate a missing component, token, or public API to
 `design-system-contribution`; do not prescribe internal package changes in a
 consumer-only review.

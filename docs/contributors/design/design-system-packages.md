@@ -3,8 +3,7 @@
 The WordPress Design System is available through the public
 `@wordpress/components`, `@wordpress/ui`, and `@wordpress/theme` packages.
 This guide helps contributors choose the right boundary when building with, or
-changing, those packages. It is written for people first and is also the shared
-reference for the design-system agent skills.
+changing, those packages.
 
 ## Choose the work boundary
 
@@ -22,19 +21,12 @@ If the public surface cannot meet a product need, document the behaviour,
 affected consumers, attempted composition, and proposed public contract. Do
 not bypass that decision with a package-private import.
 
-## Resolve APIs for the target
-
-The WordPress Design System MCP server, when available, is useful for
-discovering current components, tokens, and guidance. It is not a compatibility
-authority for an older branch or installed release.
+## Check the target version
 
 1. Identify the target: a Gutenberg checkout/PR head, or the application’s
    installed package versions.
-2. Use MCP discovery if available.
-3. Verify the relevant public contract in the target’s package README,
+2. Verify the relevant public contract in the target’s package README,
    generated token reference, exports, and types.
-4. When MCP and the target disagree, constrain the implementation to the local
-   target and state the mismatch.
 
 Use the package documentation as the source of durable facts:
 
