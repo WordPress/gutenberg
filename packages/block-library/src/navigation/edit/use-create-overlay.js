@@ -15,14 +15,167 @@ import { getUniqueTemplatePartTitle, getCleanTemplatePartSlug } from './utils';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 import { unlock } from '../../lock-unlock';
 
+const TEXT_COLOR_ATTRIBUTES = [ 'textColor', 'customTextColor' ];
+const FONT_SIZE_ATTRIBUTES = [ 'fontSize', 'customFontSize' ];
+const TYPOGRAPHY_ATTRIBUTES = [
+	'fontStyle',
+	'fontWeight',
+	'lineHeight',
+	'textTransform',
+	'letterSpacing',
+	'textDecoration',
+];
+
+const hasOwn = ( object, key ) =>
+	!! object && Object.prototype.hasOwnProperty.call( object, key );
+
+function getInheritedNavigationAttributes( attributes = {} ) {
+	const inheritedAttributes = {};
+
+	for ( const attribute of [
+		...TEXT_COLOR_ATTRIBUTES,
+		...FONT_SIZE_ATTRIBUTES,
+		'fontFamily',
+	] ) {
+		if ( hasOwn( attributes, attribute ) ) {
+			inheritedAttributes[ attribute ] = attributes[ attribute ];
+		}
+	}
+
+	const typography = attributes.style?.typography;
+	const inheritedTypography = {};
+	for ( const attribute of [
+		'fontFamily',
+		'fontSize',
+		...TYPOGRAPHY_ATTRIBUTES,
+	] ) {
+		if ( hasOwn( typography, attribute ) ) {
+			inheritedTypography[ attribute ] = typography[ attribute ];
+		}
+	}
+
+	if ( Object.keys( inheritedTypography ).length ) {
+		inheritedAttributes.style = {
+			typography: inheritedTypography,
+		};
+	}
+
+	return inheritedAttributes;
+}
+
+function inheritNavigationBlockAttributes(
+	blockAttributes = {},
+	inheritedAttributes
+) {
+	const nextAttributes = { ...blockAttributes };
+
+	const hasTextColor =
+		TEXT_COLOR_ATTRIBUTES.some( ( attribute ) =>
+			hasOwn( nextAttributes, attribute )
+		) || hasOwn( nextAttributes.style?.color, 'text' );
+
+	if ( ! hasTextColor ) {
+		for ( const attribute of TEXT_COLOR_ATTRIBUTES ) {
+			if ( hasOwn( inheritedAttributes, attribute ) ) {
+				nextAttributes[ attribute ] = inheritedAttributes[ attribute ];
+			}
+		}
+	}
+
+	const hasFontSize =
+		FONT_SIZE_ATTRIBUTES.some( ( attribute ) =>
+			hasOwn( nextAttributes, attribute )
+		) || hasOwn( nextAttributes.style?.typography, 'fontSize' );
+
+	if ( ! hasFontSize ) {
+		for ( const attribute of FONT_SIZE_ATTRIBUTES ) {
+			if ( hasOwn( inheritedAttributes, attribute ) ) {
+				nextAttributes[ attribute ] = inheritedAttributes[ attribute ];
+			}
+		}
+
+		const inheritedTypography = inheritedAttributes.style?.typography;
+		if ( hasOwn( inheritedTypography, 'fontSize' ) ) {
+			nextAttributes.style = {
+				...nextAttributes.style,
+				typography: {
+					...nextAttributes.style?.typography,
+					fontSize: inheritedTypography.fontSize,
+				},
+			};
+		}
+	}
+
+	const hasFontFamily =
+		hasOwn( nextAttributes, 'fontFamily' ) ||
+		hasOwn( nextAttributes.style?.typography, 'fontFamily' );
+
+	if ( ! hasFontFamily ) {
+		if ( hasOwn( inheritedAttributes, 'fontFamily' ) ) {
+			nextAttributes.fontFamily = inheritedAttributes.fontFamily;
+		} else if (
+			hasOwn( inheritedAttributes.style?.typography, 'fontFamily' )
+		) {
+			nextAttributes.style = {
+				...nextAttributes.style,
+				typography: {
+					...nextAttributes.style?.typography,
+					fontFamily: inheritedAttributes.style.typography.fontFamily,
+				},
+			};
+		}
+	}
+
+	for ( const attribute of TYPOGRAPHY_ATTRIBUTES ) {
+		if (
+			hasOwn( inheritedAttributes.style?.typography, attribute ) &&
+			! hasOwn( nextAttributes.style?.typography, attribute )
+		) {
+			nextAttributes.style = {
+				...nextAttributes.style,
+				typography: {
+					...nextAttributes.style?.typography,
+					[ attribute ]:
+						inheritedAttributes.style.typography[ attribute ],
+				},
+			};
+		}
+	}
+
+	return nextAttributes;
+}
+
+function inheritNavigationStyles( blocks, inheritedAttributes ) {
+	if ( ! Object.keys( inheritedAttributes ).length ) {
+		return blocks;
+	}
+
+	return blocks.map( ( block ) => ( {
+		...block,
+		attributes:
+			block.name === 'core/navigation'
+				? inheritNavigationBlockAttributes(
+						block.attributes,
+						inheritedAttributes
+				  )
+				: block.attributes,
+		innerBlocks: block.innerBlocks
+			? inheritNavigationStyles( block.innerBlocks, inheritedAttributes )
+			: block.innerBlocks,
+	} ) );
+}
+
 /**
  * Hook to create a new overlay template part.
  *
- * @param {Array} overlayTemplateParts Array of existing overlay template parts.
- * @return {function(): Promise<Object>} Function to create a new overlay template part.
- *                                      The function returns a Promise that resolves to the created template part object.
+ * @param {Array}  overlayTemplateParts Array of existing overlay template parts.
+ * @param {Object} navigationAttributes Parent Navigation block attributes.
+ * @return {Function} Function that creates a new overlay template part.
  */
-export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
+export default function useCreateOverlayTemplatePart(
+	overlayTemplateParts,
+	navigationAttributes = {}
+) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const pattern = useSelect(
 		( select ) =>
@@ -51,7 +204,12 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 			const blocks = parse( pattern.content, {
 				__unstableSkipMigrationLogs: true,
 			} );
-			initialContent = serialize( blocks );
+			initialContent = serialize(
+				inheritNavigationStyles(
+					blocks,
+					getInheritedNavigationAttributes( navigationAttributes )
+				)
+			);
 		} else {
 			// Fallback to empty paragraph if pattern is not found
 			initialContent = serialize( [ createBlock( 'core/paragraph' ) ] );
@@ -71,7 +229,12 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 		);
 
 		return templatePart;
-	}, [ overlayTemplateParts, saveEntityRecord, pattern ] );
+	}, [
+		overlayTemplateParts,
+		saveEntityRecord,
+		pattern,
+		navigationAttributes,
+	] );
 
 	return createOverlayTemplatePart;
 }
