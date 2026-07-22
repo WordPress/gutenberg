@@ -63,6 +63,20 @@ function getSlideLabel( index, totalSlides ) {
 	return formatLabel( getConfig().slideLabelTemplate, index, totalSlides );
 }
 
+function getVisibleSlidesLabel( index, totalSlides, slidesToShow ) {
+	if ( slidesToShow === 1 ) {
+		return getSlideLabel( index, totalSlides );
+	}
+
+	const firstSlide = index + 1;
+	const lastSlide = Math.min( index + slidesToShow, totalSlides );
+
+	return getConfig()
+		.slidesLabelTemplate.replace( '%1$d', firstSlide )
+		.replace( '%2$d', lastSlide )
+		.replace( '%3$d', totalSlides );
+}
+
 function getIndicatorLabel( index, totalSlides ) {
 	return formatLabel(
 		getConfig().indicatorLabelTemplate,
@@ -342,14 +356,19 @@ store( 'core/slider', {
 			return item === currentIndex;
 		},
 		get indicatorLabel() {
-			const { item, currentIndex, totalSlides } = getContext();
+			const { item, currentIndex, totalSlides, slidesToShow } =
+				getContext();
 			return item === currentIndex
-				? getSlideLabel( item, totalSlides )
+				? getVisibleSlidesLabel( item, totalSlides, slidesToShow )
 				: getIndicatorLabel( item, totalSlides );
 		},
 		get currentSlideLabel() {
-			const { currentIndex, totalSlides } = getContext();
-			return getSlideLabel( currentIndex, totalSlides );
+			const { currentIndex, totalSlides, slidesToShow } = getContext();
+			return getVisibleSlidesLabel(
+				currentIndex,
+				totalSlides,
+				slidesToShow
+			);
 		},
 	},
 	actions: {

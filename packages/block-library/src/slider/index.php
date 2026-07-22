@@ -266,6 +266,8 @@ function render_block_core_slider( $attributes, $content, $block ) {
 			'indicatorLabelTemplate' => __( 'Go to slide %1$d of %2$d' ),
 			/* translators: 1: Current slide number, 2: Total number of slides. */
 			'slideLabelTemplate'     => __( 'Slide %1$d of %2$d' ),
+			/* translators: 1: First visible slide number, 2: Last visible slide number, 3: Total number of slides. */
+			'slidesLabelTemplate'    => __( 'Slides %1$d–%2$d of %3$d' ),
 		)
 	);
 
