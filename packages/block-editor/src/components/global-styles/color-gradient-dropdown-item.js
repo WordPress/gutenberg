@@ -143,10 +143,9 @@ function ColorGradientTab( {
 	// back to the inherited value so the at-rest preselection is visible
 	// inside the picker.
 	const displayed = userValue ?? inheritedValue;
-	// Selection inside the picker follows the slug of whichever value is
-	// displayed: the user slug once a value is set, the inherited slug at
-	// rest. Matching by slug keeps two same-hex presets apart; a slug-less
-	// (custom) value falls back to the picker's own hex matching.
+	// Slug of the displayed value: the block's own when it has one, otherwise
+	// the inherited one. Slug matching keeps two same-hex presets apart; a
+	// slug-less (custom) value falls back to hex matching.
 	const displayedSlug = userValue !== undefined ? userSlug : inheritedSlug;
 	// Display-without-commit interceptor. `ColorPalette` and `GradientPicker`
 	// fire `onChange( undefined )` when the user clicks the currently-selected

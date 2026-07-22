@@ -400,11 +400,10 @@ export default function BackgroundImagePanel( {
 							key: 'background',
 							label: __( 'Color' ),
 							inheritedValue: backgroundColor,
-							// The picker matches selection by slug, following
-							// whichever value is displayed: `userSlug` once a
-							// value is set, `inheritedSlug` at rest. Without
-							// the slugs it falls back to hex matching, which
-							// marks two same-hex presets as both selected.
+							// The picker selects by slug: `userSlug` when the
+							// block has its own value, otherwise
+							// `inheritedSlug`. Hex matching would mark two
+							// same-hex presets as both selected.
 							inheritedSlug: extractPresetSlug(
 								inheritedValue?.color?.background,
 								'color'
