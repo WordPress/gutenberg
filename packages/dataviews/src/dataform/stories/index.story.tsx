@@ -10,6 +10,7 @@ import LayoutRowComponent from './layout-row';
 import LayoutPanelComponent from './layout-panel';
 import DataAdapterComponent from './data-adapter';
 import ValidationComponent from './validation';
+import CrossFieldValidationComponent from './cross-field-validation';
 import VisibilityComponent from './visibility';
 
 const meta = {
@@ -172,6 +173,10 @@ export const Validation = {
 		pattern: false,
 		minMax: false,
 	},
+};
+
+export const CrossFieldValidation = {
+	render: CrossFieldValidationComponent,
 };
 
 export const Visibility = {
