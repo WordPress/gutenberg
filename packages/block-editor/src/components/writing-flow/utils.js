@@ -56,6 +56,57 @@ export function setClipboardBlocks( event, blocks, registry ) {
 }
 
 /**
+ * Copies the given blocks to the clipboard with the same `text/plain` and
+ * `text/html` data as `setClipboardBlocks()` writes for the keyboard
+ * shortcuts, by triggering a native copy event and populating its clipboard
+ * data. Unlike `setClipboardBlocks()` it can be called outside a clipboard
+ * event handler, e.g. from a menu item click.
+ *
+ * @param {Document}  ownerDocument Document of the element that triggered the
+ *                                  copy.
+ * @param {WPBlock[]} blocks        Blocks to copy.
+ * @param {Object}    registry      The registry to select from.
+ *
+ * @return {boolean} Whether the blocks were written to the clipboard.
+ */
+export function copyBlocksToClipboard( ownerDocument, blocks, registry ) {
+	let didSetData = false;
+
+	function onCopy( event ) {
+		setClipboardBlocks( event, blocks, registry );
+		event.preventDefault();
+		didSetData = true;
+	}
+
+	// WebKit before Safari 18.4 only dispatches the copy event when there is
+	// a selection (https://bugs.webkit.org/show_bug.cgi?id=156529), so select
+	// a hidden textarea holding the serialized blocks. Engines that ignore
+	// the clipboard data set in the listener then still copy the markup as
+	// plain text.
+	const { activeElement } = ownerDocument;
+	const textarea = ownerDocument.createElement( 'textarea' );
+	textarea.value = serialize( blocks );
+	textarea.setAttribute( 'readonly', '' );
+	textarea.style.position = 'fixed';
+	textarea.style.left = '-9999px';
+	textarea.style.top = '-9999px';
+	ownerDocument.body.appendChild( textarea );
+	textarea.select();
+
+	ownerDocument.addEventListener( 'copy', onCopy, true );
+	let hasCopied = false;
+	try {
+		hasCopied = ownerDocument.execCommand( 'copy' );
+	} finally {
+		ownerDocument.removeEventListener( 'copy', onCopy, true );
+		textarea.remove();
+		activeElement?.focus();
+	}
+
+	return hasCopied && didSetData;
+}
+
+/**
  * Returns the blocks to be pasted from the clipboard event.
  *
  * @param {ClipboardEvent} event                    The clipboard event.

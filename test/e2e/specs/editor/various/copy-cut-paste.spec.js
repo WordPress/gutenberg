@@ -969,22 +969,21 @@ test.describe( 'Copy/cut/paste', () => {
 				};
 			} );
 		} );
-		await editor.clickBlockToolbarButton( 'Options' );
-		await page
-			.getByRole( 'menu', { name: 'Options' } )
-			.getByRole( 'menuitem', { name: /^Copy(?! styles)/ } )
-			.click();
-		await expect
-			.poll( () =>
-				page.evaluate( () => Boolean( window.__copiedFlavors ) )
-			)
-			.toBe( true );
-		const menuCopyData = await page.evaluate(
-			() => window.__copiedFlavors
-		);
+		// The name matcher must exclude the "Copy styles" item; role name
+		// matching is substring based.
+		await editor.clickBlockOptionsMenuItem( /^Copy(?! styles)/ );
+
+		// The success snackbar pins that `execCommand( 'copy' )` actually
+		// succeeded, not just that the copy event carried the right data.
+		await expect(
+			page.locator( '.components-snackbar-list' )
+		).toContainText( 'Copied "Paragraph" to clipboard.' );
 
 		// Both copy methods must write the same `text/plain` and `text/html`
 		// clipboard data.
+		const menuCopyData = await page.evaluate(
+			() => window.__copiedFlavors
+		);
 		expect( menuCopyData ).toEqual( keyboardCopyData );
 
 		// Pasting the copied data back recreates the same block.
@@ -1005,6 +1004,72 @@ test.describe( 'Copy/cut/paste', () => {
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'Copy <strong>bold</strong>' },
+			},
+		] );
+	} );
+
+	// See https://github.com/WordPress/gutenberg/issues/68941.
+	test( 'should cut blocks via the options menu, removing them and writing the same clipboard data as the keyboard shortcut', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'First' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Cut ' );
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.type( 'bold' );
+
+		// The options menu lives in the top-level document, where its copy
+		// event is dispatched.
+		await page.evaluate( () => {
+			document.addEventListener( 'copy', ( event ) => {
+				window.__copiedFlavors = {
+					plainText: event.clipboardData.getData( 'text/plain' ),
+					html: event.clipboardData.getData( 'text/html' ),
+				};
+			} );
+		} );
+		await editor.clickBlockOptionsMenuItem( 'Cut' );
+
+		// The success snackbar pins that `execCommand( 'copy' )` actually
+		// succeeded; the blocks must only be removed after a successful copy.
+		await expect(
+			page.locator( '.components-snackbar-list' )
+		).toContainText( 'Moved "Paragraph" to clipboard.' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First' },
+			},
+		] );
+
+		const menuCutData = await page.evaluate( () => window.__copiedFlavors );
+		expect( menuCutData.plainText ).toBe( 'Cut bold' );
+		expect( menuCutData.html ).toContain( '<!-- wp:paragraph -->' );
+		expect( menuCutData.html ).toContain( '<strong>bold</strong>' );
+
+		// Pasting the cut data back recreates the same block.
+		await page.keyboard.press( 'Escape' );
+		pageUtils.setClipboardData( {
+			plainText: menuCutData.plainText,
+			html: menuCutData.html,
+		} );
+		await editor.canvas.locator( 'text=First' ).click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Enter' );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Cut <strong>bold</strong>' },
 			},
 		] );
 	} );
