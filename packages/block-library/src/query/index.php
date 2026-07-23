@@ -26,16 +26,13 @@ function render_block_core_query( $attributes, $content, $block ) {
 	if ( $is_interactive ) {
 		wp_enqueue_script_module( '@wordpress/block-library/query/view' );
 
-		$query_id_attr = $attributes['queryId'] ?? null;
-		$query_id      = is_scalar( $query_id_attr ) ? (string) $query_id_attr : '';
-
 		$p = new WP_HTML_Tag_Processor( $content );
 		if ( $p->next_tag() ) {
 			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-interactive', 'core/query' );
-			$p->set_attribute( 'data-wp-router-region', 'query-' . $query_id );
+			$p->set_attribute( 'data-wp-router-region', 'query-' . $attributes['queryId'] );
 			$p->set_attribute( 'data-wp-context', '{}' );
-			$p->set_attribute( 'data-wp-key', $query_id );
+			$p->set_attribute( 'data-wp-key', $attributes['queryId'] );
 			$content = $p->get_updated_html();
 		}
 	}
