@@ -18,10 +18,10 @@ const registries = new WeakMap();
  * Fires the callbacks of every subscribed element that owns the event.
  *
  * These are editing and selection events, so the element that owns the event is
- * the one that owns the selection: it contains the selection anchor, or it is
- * the focused element (when the selection sits elsewhere). `ownsSelection` can
- * only be true for an ancestor of the anchor or the focused element, so only
- * those two chains are walked, rather than testing every subscriber.
+ * the one that owns the selection, and it contains the selection anchor. The
+ * owner is found by walking up from the anchor, testing `ownsSelection`, rather
+ * than testing every subscriber. When there is no selection, an editable can
+ * still be focused, so the walk starts from the focused element instead.
  *
  * @param {WeakMap}  elements      Subscribed elements mapped to their callbacks.
  * @param {Document} ownerDocument Document the listener is attached to.
@@ -29,16 +29,16 @@ const registries = new WeakMap();
  */
 function dispatch( elements, ownerDocument, event ) {
 	const anchorNode = ownerDocument.defaultView?.getSelection()?.anchorNode;
-	const fired = new Set();
 
-	for ( const start of [ anchorNode, ownerDocument.activeElement ] ) {
-		for ( let node = start; node; node = node.parentNode ) {
-			const callbacks = elements.get( node );
-			if ( callbacks && ! fired.has( node ) && ownsSelection( node ) ) {
-				fired.add( node );
-				for ( const callback of callbacks ) {
-					callback( event );
-				}
+	for (
+		let node = anchorNode ?? ownerDocument.activeElement;
+		node;
+		node = node.parentNode
+	) {
+		const callbacks = elements.get( node );
+		if ( callbacks && ownsSelection( node ) ) {
+			for ( const callback of callbacks ) {
+				callback( event );
 			}
 		}
 	}
