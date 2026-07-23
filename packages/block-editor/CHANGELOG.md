@@ -10,7 +10,7 @@
 
 ### Bug Fixes
 
--   `ContrastChecker`: Show the transparency warning when a text or link color is both semi-transparent and low-contrast, instead of showing no warning at all.
+-   `ContrastChecker`: Show the transparency warning when a text or link color is both semi-transparent and low-contrast, instead of showing no warning at all ([#80612](https://github.com/WordPress/gutenberg/pull/80612)).
 
 ### Internal
 
