@@ -35,6 +35,7 @@ export default function CoverBlockControls( {
 	onEditMedia,
 	editMediaButtonRef,
 	showEditMediaButton,
+	isEditMediaDisabled,
 	blockEditingMode,
 } ) {
 	const {
@@ -123,6 +124,10 @@ export default function CoverBlockControls( {
 							label={ __( 'Crop background image' ) }
 							onClick={ onEditMedia }
 							aria-haspopup="dialog"
+							// Disable rather than hide while the edited image
+							// loads, so the button keeps focus when the modal
+							// closes instead of dropping it to the canvas.
+							disabled={ isEditMediaDisabled }
 						/>
 					) }
 				</BlockControls>
