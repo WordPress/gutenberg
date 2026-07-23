@@ -79,10 +79,7 @@ Unlike `fetch`, the `Promise` return value of `apiFetch` will resolve to the par
 
 #### `data` (`object`)
 
-Sent on `POST` or `PUT` requests only. Shorthand to be used in place of
-`body`, accepts an object value to be stringified to JSON. To send another
-format, use the standard `body` and `headers` fetch options and set the
-appropriate `Content-Type`.
+Sent on `POST` or `PUT` requests only. Shorthand to be used in place of `body`, accepts an object value to be stringified to JSON. To send another format, use the standard `body` and `headers` fetch options and set the appropriate `Content-Type`.
 
 ### Aborting a request
 
