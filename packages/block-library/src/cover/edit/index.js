@@ -13,6 +13,7 @@ import {
 	useLayoutEffect,
 	useMemo,
 	useRef,
+	useState,
 } from '@wordpress/element';
 import { Placeholder, SandBox, Spinner } from '@wordpress/components';
 import { compose, useResizeObserver } from '@wordpress/compose';
@@ -424,6 +425,12 @@ function CoverEdit( {
 		return getBackgroundEmbedHtml( embedPreview.html );
 	}, [ embedPreview, backgroundType ] );
 
+	// Set while the media editor has pointed the cover at a freshly
+	// generated file the browser hasn't finished loading; cleared by the
+	// background <img> load/error handlers (or immediately after
+	// setAttributes for CSS backgrounds, which never fire load events).
+	const [ isSwappingMedia, setIsSwappingMedia ] = useState( false );
+
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
@@ -526,6 +533,10 @@ function CoverEdit( {
 					return;
 				}
 
+				if ( newId !== id && newUrl ) {
+					setIsSwappingMedia( true );
+				}
+
 				const nextAttributes = {
 					id: newId,
 					backgroundType: IMAGE_BACKGROUND_TYPE,
@@ -563,6 +574,17 @@ function CoverEdit( {
 				}
 
 				setAttributes( nextAttributes );
+
+				// A CSS background (parallax/repeated) renders as a div and
+				// never fires a load event; getMediaColor already fetched
+				// the file, so the swap is done once attributes are set.
+				const {
+					hasParallax: currentHasParallax,
+					isRepeated: currentIsRepeated,
+				} = propsRef.current.attributes;
+				if ( currentHasParallax || currentIsRepeated ) {
+					setIsSwappingMedia( false );
+				}
 			},
 		} );
 	}, [
@@ -640,6 +662,7 @@ function CoverEdit( {
 			onEditMedia={ openCoverMediaEditorModal }
 			editMediaButtonRef={ editMediaButtonRef }
 			showEditMediaButton={ showEditMediaButton }
+			isEditMediaDisabled={ isSwappingMedia }
 		/>
 	);
 
@@ -722,7 +745,7 @@ function CoverEdit( {
 		{
 			'is-dark-theme': isDark,
 			'is-light': ! isDark,
-			'is-transient': isUploadingMedia,
+			'is-transient': isUploadingMedia || isSwappingMedia,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
 			'has-custom-content-position':
@@ -762,6 +785,8 @@ function CoverEdit( {
 							alt={ alt }
 							src={ url }
 							style={ mediaStyle }
+							onLoad={ () => setIsSwappingMedia( false ) }
+							onError={ () => setIsSwappingMedia( false ) }
 						/>
 					) : (
 						<div
@@ -829,7 +854,7 @@ function CoverEdit( {
 					/>
 				) }
 
-				{ isUploadingMedia && <Spinner /> }
+				{ ( isUploadingMedia || isSwappingMedia ) && <Spinner /> }
 
 				<CoverPlaceholder
 					disableMediaButtons
