@@ -475,7 +475,54 @@ export default function useSelectionObserver() {
 				'selectionchange',
 				onSelectionChange
 			);
+			// Returns the caret position at the given point, like the
+			// standard `caretPositionFromPoint`, with a fallback to the
+			// WebKit-only `caretRangeFromPoint`.
+			function caretPositionFromPoint( x, y ) {
+				if ( ownerDocument.caretPositionFromPoint ) {
+					return ownerDocument.caretPositionFromPoint( x, y );
+				}
+				const range = ownerDocument.caretRangeFromPoint?.( x, y );
+				return (
+					range && {
+						offsetNode: range.startContainer,
+						offset: range.startOffset,
+					}
+				);
+			}
+
 			function onMouseUp( event ) {
+				// Browsers may fail to extend the selection to the
+				// clicked position in another block, even within a
+				// common editing host (Firefox leaves it where it was).
+				// Complete the extension at the clicked caret position
+				// before the selection is recorded.
+				if ( event.shiftKey ) {
+					const selection = defaultView.getSelection();
+					const clickedClientId = getBlockClientId( event.target );
+					if (
+						selection.anchorNode &&
+						clickedClientId &&
+						getBlockClientId( selection.focusNode ) !==
+							clickedClientId
+					) {
+						const position = caretPositionFromPoint(
+							event.clientX,
+							event.clientY
+						);
+						if (
+							position &&
+							getBlockClientId( position.offsetNode ) ===
+								clickedClientId
+						) {
+							selection.extend(
+								position.offsetNode,
+								position.offset
+							);
+						}
+					}
+				}
+
 				onSelectionChange( event );
 				stopMultiSelect();
 			}
