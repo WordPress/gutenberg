@@ -3,6 +3,8 @@ export { ChipWithRemove } from './chip-with-remove';
 export { Clear } from './clear';
 export { Collection } from './collection';
 export { Empty } from './empty';
+export { Group } from './group';
+export { GroupLabel } from './group-label';
 export { Input } from './input';
 export { Item } from './item';
 export { List } from './list';
