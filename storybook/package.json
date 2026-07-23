@@ -32,6 +32,7 @@
 		"@storybook/addon-docs": "^10.4.3",
 		"@storybook/icons": "^2.0.1",
 		"@storybook/react-vite": "^10.4.3",
+		"@types/js-yaml": "^4.0.9",
 		"@types/react": "^18.3.27",
 		"@vitejs/plugin-react": "^5.1.2",
 		"@wordpress/admin-ui": "file:../packages/admin-ui",

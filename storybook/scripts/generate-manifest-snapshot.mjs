@@ -34,14 +34,62 @@ const ALLOWLIST_PATH = path.join(
 );
 
 /**
+ * A prop as it appears in the manifest.
+ *
+ * @typedef WPPropInfo
+ *
+ * @property {string} [description] The prop's description.
+ */
+
+/**
+ * A component's extracted metadata in the manifest.
+ *
+ * @typedef WPReactComponentMeta
+ *
+ * @property {Record<string,WPPropInfo>} [props] The component's props by name.
+ */
+
+/**
+ * A component or subcomponent in the manifest.
+ *
+ * @typedef WPManifestNode
+ *
+ * @property {string}                        name                 The component name.
+ * @property {string}                        [description]        Its description.
+ * @property {WPReactComponentMeta}          [reactComponentMeta] Extracted metadata.
+ * @property {Record<string,WPManifestNode>} [subcomponents]      Subcomponents by name.
+ */
+
+/**
+ * A component built up from one or more manifest entries that share a name.
+ *
+ * @typedef WPCombinedComponent
+ *
+ * @property {string}                          name          The component name.
+ * @property {Set<string>}                     props         Visible prop names.
+ * @property {Map<string,WPCombinedComponent>} subcomponents Subcomponents by name.
+ */
+
+/**
+ * A component as written to the snapshot file.
+ *
+ * @typedef WPSnapshotEntry
+ *
+ * @property {string}            name            The component name.
+ * @property {string[]}          props           Sorted visible prop names.
+ * @property {WPSnapshotEntry[]} [subcomponents] Sorted subcomponents.
+ */
+
+/**
  * Returns the props that show up in a component's documentation, leaving out
  * any hidden with `@ignore` or `@deprecated` (the same way Storybook and other
  * tools hide them).
  *
- * @param {Object} node A component or subcomponent from the manifest.
- * @return {Array<[string, Object]>} Pairs of prop name and its info.
+ * @param {WPManifestNode} node A component or subcomponent from the manifest.
+ * @return {Array<[string,WPPropInfo]>} Pairs of prop name and its info.
  */
 function visibleProps( node ) {
+	/** @type {Record<string,WPPropInfo>} */
 	const props = node.reactComponentMeta?.props ?? {};
 	return Object.entries( props ).filter( ( [ , info ] ) => {
 		const description = ( info.description || '' ).toLowerCase();
@@ -59,11 +107,9 @@ function visibleProps( node ) {
  * into a single entry. Any component or prop with no description is added to
  * `missing`.
  *
- * @param {Object}      node    A component or subcomponent from the manifest.
- * @param {Map}         target  Map of component name to its combined props and
- *                              subcomponents.
- * @param {Set<string>} missing Collects the components and props that have no
- *                              description.
+ * @param {WPManifestNode}                  node    Component or subcomponent.
+ * @param {Map<string,WPCombinedComponent>} target  Map of name to combined entry.
+ * @param {Set<string>}                     missing Collects undocumented names.
  */
 function mergeNode( node, target, missing ) {
 	let combined = target.get( node.name );
@@ -99,10 +145,11 @@ function mergeNode( node, target, missing ) {
  * the snapshot file, sorting its props and subcomponents by name so the file
  * stays stable and easy to diff.
  *
- * @param {Object} combined A combined component from `mergeNode`.
- * @return {Object} The component as it appears in the snapshot.
+ * @param {WPCombinedComponent} combined A combined component from `mergeNode`.
+ * @return {WPSnapshotEntry} The component as it appears in the snapshot.
  */
 function toEntry( combined ) {
+	/** @type {WPSnapshotEntry} */
 	const entry = {
 		name: combined.name,
 		props: [ ...combined.props ].sort( ( a, b ) => a.localeCompare( b ) ),
@@ -118,7 +165,8 @@ function toEntry( combined ) {
 }
 
 const raw = await readFile( MANIFEST_PATH, 'utf8' );
-const { components } = JSON.parse( raw );
+/** @type {Record<string,WPManifestNode>} */
+const components = JSON.parse( raw ).components;
 
 assert(
 	components && Object.keys( components ).length > 0,
@@ -136,11 +184,12 @@ const entries = [ ...componentsByName.values() ]
 	.map( toEntry )
 	.sort( ( a, b ) => a.name.localeCompare( b.name ) );
 
+/** @type {string[]} */
 let allowlist = [];
 try {
 	allowlist = JSON.parse( await readFile( ALLOWLIST_PATH, 'utf8' ) );
 } catch ( error ) {
-	if ( error.code !== 'ENOENT' ) {
+	if ( /** @type {NodeJS.ErrnoException} */ ( error ).code !== 'ENOENT' ) {
 		throw error;
 	}
 }
