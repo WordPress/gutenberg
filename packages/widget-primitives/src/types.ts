@@ -88,8 +88,7 @@ export interface WidgetAction {
 	label: string;
 
 	/**
-	 * Destination the action points at. External URLs and admin PHP entry
-	 * points load a full page.
+	 * Destination: URL, admin path, or widget-local file.
 	 */
 	href: string;
 

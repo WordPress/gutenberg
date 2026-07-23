@@ -17,7 +17,9 @@ type EventType =
 	| 'keypress'
 	| 'keyup'
 	| 'mouseout'
-	| 'mouseover';
+	| 'mouseover'
+	| 'pointerup'
+	| 'selectionchange';
 
 interface TraceEvent {
 	cat: string;
@@ -299,13 +301,21 @@ export class Metrics {
 	}
 
 	/**
-	 * @return Durations of all traced `focus` and `focusin` events.
+	 * Selecting a block within an editing host moves only the native
+	 * selection, so `focus`/`focusin` do not fire for those clicks. Event
+	 * types that did not fire are left out: callers sum the durations, and an
+	 * empty list sums to `undefined`, which would poison the total.
+	 *
+	 * @return Durations of the traced `focus`, `focusin`, `pointerup`, and
+	 * `selectionchange` events that fired.
 	 */
 	getSelectionEventDurations() {
 		return [
 			this.getEventDurations( 'focus' ),
 			this.getEventDurations( 'focusin' ),
-		];
+			this.getEventDurations( 'pointerup' ),
+			this.getEventDurations( 'selectionchange' ),
+		].filter( ( durations ) => durations.length );
 	}
 
 	/**

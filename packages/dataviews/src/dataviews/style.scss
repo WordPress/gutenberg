@@ -39,6 +39,10 @@
 	}
 }
 
+.dataviews__search {
+	flex-grow: 1;
+}
+
 .dataviews-no-results,
 .dataviews-loading {
 	padding: 0 var(--wpds-dimension-padding-2xl);
