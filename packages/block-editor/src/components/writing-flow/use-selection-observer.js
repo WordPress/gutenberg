@@ -134,6 +134,18 @@ export default function useSelectionObserver() {
 				// The selection is built on mouseup.
 				if ( event.shiftKey ) {
 					startMultiSelect();
+
+					// The browser can only extend the selection to the
+					// clicked position when a common editing host contains
+					// both it and the selection to extend. Blocks are
+					// separate editing hosts, so before the browser acts
+					// on the click, the wrapper must become the editing
+					// host, like it does for shift+arrow in use-arrow-nav.
+					// Without it, the selection collapses to a caret in
+					// the clicked block (extending forward) or stops at
+					// the edge of the block it started in (extending
+					// backward). Focus is left alone: the click moves it.
+					setContentEditableWrapper( node, true, { focus: false } );
 				}
 			}
 

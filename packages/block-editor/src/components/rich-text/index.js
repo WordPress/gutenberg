@@ -250,8 +250,12 @@ export function RichTextWrapper(
 			'default',
 		[ clientId ]
 	);
-	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
-		useSelect( blockEditorStore );
+	const {
+		getSelectionStart,
+		getSelectionEnd,
+		getBlockRootClientId,
+		isMultiSelecting,
+	} = useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -262,6 +266,15 @@ export function RichTextWrapper(
 
 	const onSelectionChange = useCallback(
 		( start, end ) => {
+			// During a multi-block selection gesture (e.g. a
+			// shift+click), focusing the clicked block must not sync a
+			// selection for it: it would overwrite the selection the
+			// gesture is building. The selection observer records it on
+			// mouseup.
+			if ( isMultiSelecting() ) {
+				return;
+			}
+
 			const selection = {};
 			const unset = start === undefined && end === undefined;
 
@@ -316,6 +329,7 @@ export function RichTextWrapper(
 			identifier,
 			instanceId,
 			selectionChange,
+			isMultiSelecting,
 		]
 	);
 

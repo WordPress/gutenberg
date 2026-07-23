@@ -1483,6 +1483,69 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				] );
 		} );
 
+		test( 'should partially select text from block to block in either direction', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/heading',
+				attributes: { content: 'heading text' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'paragraph text' },
+			} );
+
+			const getSelection = () =>
+				page.evaluate( () => {
+					const sel = window.wp.data.select( 'core/block-editor' );
+					const start = sel.getSelectionStart();
+					const end = sel.getSelectionEnd();
+					return {
+						blocks: sel.getSelectedBlockClientIds().length,
+						startKey: start.attributeKey,
+						endKey: end.attributeKey,
+						isFullySelected: sel.__unstableIsFullySelected(),
+					};
+				} );
+
+			// Down: from the heading into the paragraph. The selection
+			// must extend to the clicked position, like it does within a
+			// single block, resulting in a partial selection of both
+			// blocks.
+			await editor.canvas
+				.getByText( 'heading text', { exact: true } )
+				.click();
+			await editor.canvas
+				.getByText( 'paragraph text', { exact: true } )
+				.click( { modifiers: [ 'Shift' ] } );
+			await expect.poll( getSelection ).toEqual( {
+				blocks: 2,
+				startKey: 'content',
+				endKey: 'content',
+				isFullySelected: false,
+			} );
+
+			// Deselect: click in the paragraph again.
+			await editor.canvas
+				.getByText( 'paragraph text', { exact: true } )
+				.click();
+			await expect
+				.poll( () => getSelection().then( ( s ) => s.blocks ) )
+				.toBe( 1 );
+
+			// Up: from the paragraph into the heading.
+			await editor.canvas
+				.getByText( 'heading text', { exact: true } )
+				.click( { modifiers: [ 'Shift' ] } );
+			await expect.poll( getSelection ).toEqual( {
+				blocks: 2,
+				startKey: 'content',
+				endKey: 'content',
+				isFullySelected: false,
+			} );
+		} );
+
 		test( 'should multi-select blocks without text selection', async ( {
 			editor,
 			multiBlockSelectionUtils,
