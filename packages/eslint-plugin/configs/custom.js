@@ -16,18 +16,11 @@ module.exports = [
 			'@wordpress/no-unguarded-get-range-at': 'error',
 			'@wordpress/no-global-active-element': 'error',
 			'@wordpress/no-global-get-selection': 'error',
+			'@wordpress/no-unsafe-render-order': 'error',
 			'@wordpress/no-setting-ds-tokens': 'error',
 			'@wordpress/no-unknown-ds-tokens': 'error',
 			'@wordpress/no-unsafe-wp-apis': 'error',
 			'@wordpress/no-wp-process-env': 'error',
-		},
-	},
-	{
-		files: [ '**/*.native.js' ],
-		rules: {
-			'@wordpress/no-base-control-with-label-without-id': 'off',
-			'@wordpress/i18n-no-flanking-whitespace': 'error',
-			'@wordpress/i18n-hyphenated-range': 'error',
 		},
 	},
 	{

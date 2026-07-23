@@ -125,6 +125,14 @@ export function WorkflowMenu() {
 		}
 	);
 
+	useEffect( () => {
+		if ( isOpen ) {
+			// Load @wordpress/core-abilities on demand. Importing it fetches
+			// and registers all server abilities and categories.
+			import( '@wordpress/core-abilities' );
+		}
+	}, [ isOpen ] );
+
 	const closeAndReset = () => {
 		setSearch( '' );
 		setIsOpen( false );

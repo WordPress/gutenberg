@@ -10,14 +10,16 @@ import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
 import { chevronLeftSmall, chevronRightSmall, layout } from '@wordpress/icons';
-import { displayShortcut } from '@wordpress/keycodes';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
 import { useRef, useEffect } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
@@ -30,13 +32,13 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { TEMPLATE_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import usePageTypeBadge from '../../utils/pageTypeBadge';
-import { getTemplateInfo } from '../../utils/get-template-info';
 import { getStylesCanvasTitle } from '../styles-canvas';
 import { unlock } from '../../lock-unlock';
 import useEditedSectionDetails from './useEditedSectionDetails';
 
 /** @typedef {import("@wordpress/components").IconType} IconType */
 
+const { getTemplateInfo } = unlock( coreDataPrivateApis );
 const MotionButton = motion.create( Button );
 
 /**
@@ -206,7 +208,7 @@ export default function DocumentBar( props ) {
 				/>
 			) }
 			{ isNotFound ? (
-				<Text>{ __( 'Document not found' ) }</Text>
+				<WCText>{ __( 'Document not found' ) }</WCText>
 			) : (
 				<Button
 					className="editor-document-bar__command"
@@ -236,7 +238,7 @@ export default function DocumentBar( props ) {
 						}
 					>
 						{ icon && <BlockIcon icon={ icon } /> }
-						<Text size="body" as="h1">
+						<WCText size="body" as="h1">
 							<span className="editor-document-bar__post-title">
 								{ title
 									? stripHTML( title )
@@ -265,11 +267,8 @@ export default function DocumentBar( props ) {
 										) }` }
 									</span>
 								) }
-						</Text>
+						</WCText>
 					</motion.div>
-					<span className="editor-document-bar__shortcut">
-						{ displayShortcut.primary( 'k' ) }
-					</span>
 				</Button>
 			) }
 		</div>

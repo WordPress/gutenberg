@@ -1,19 +1,11 @@
-/**
- * External dependencies
- */
 import {
 	get,
-	toGamut,
+	toGamutCSS,
 	OKLCH,
 	sRGB,
-	type PlainColorObject,
 	type ColorSpace,
+	type PlainColorObject,
 } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
-import './register-color-spaces';
 
 export interface TaperChromaOptions {
 	gamut?: ColorSpace; // target gamut (default `sRGB`)
@@ -217,7 +209,7 @@ function maxInGamutChromaAtLH(
 	};
 
 	// Let `toGamut` reduce the chroma to the gamut maximum.
-	const clamped = toGamut( probe, { space: gamutSpace, method: 'css' } );
+	const clamped = toGamutCSS( probe, { space: gamutSpace } );
 
 	return get( clamped, [ OKLCH, 'c' ] );
 }

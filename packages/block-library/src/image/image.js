@@ -1,7 +1,11 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
-import { isBlobURL } from '@wordpress/blob';
 import {
 	ExternalLink,
 	FocalPointPicker,
@@ -9,6 +13,7 @@ import {
 	Spinner,
 	TextareaControl,
 	TextControl,
+	CheckboxControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
@@ -33,7 +38,6 @@ import {
 	MediaReplaceFlow,
 	store as blockEditorStore,
 	useSettings,
-	__experimentalImageEditor as ImageEditor,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	privateApis as blockEditorPrivateApis,
@@ -44,6 +48,7 @@ import {
 	useCallback,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
@@ -63,6 +68,13 @@ import { Caption } from '../utils/caption';
 import { MediaControl } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import {
+	getActiveDimensionValue,
+	getDimensionResetAttributes,
+	getDimensionUpdateAttributes,
+	getStyleStateKey,
+} from '../utils/style-state';
+import { useOpenImageMediaEditorModal } from './use-open-image-media-editor-modal';
+import {
 	MIN_SIZE,
 	ALLOWED_MEDIA_TYPES,
 	SIZED_LAYOUTS,
@@ -70,9 +82,13 @@ import {
 } from './constants';
 import { evalAspectRatio, mediaPosition } from './utils';
 
-const { DimensionsTool, ResolutionTool, mediaEditKey } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	DimensionsTool,
+	isDefaultBlockStyleState,
+	ResolutionTool,
+	mediaEditKey,
+	mediaSideloadFromUrlKey,
+} = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
 	{
@@ -224,7 +240,6 @@ function ContentOnlyControls( {
 				>
 					<div className="wp-block-image__toolbar_content_textarea__container">
 						<TextControl
-							__next40pxDefaultSize
 							className="wp-block-image__toolbar_content_textarea"
 							label={ __( 'Title attribute' ) }
 							value={ attributes.title || '' }
@@ -294,6 +309,7 @@ export default function Image( {
 		sizeSlug,
 		lightbox,
 		metadata,
+		isDecorative,
 	} = attributes;
 	const [ imageElement, setImageElement ] = useState();
 	const [ resizeDelta, setResizeDelta ] = useState( null );
@@ -313,7 +329,7 @@ export default function Image( {
 	const setRefs = useMergeRefs( [ setImageElement, setResizeObserved ] );
 	const { allowResize = true } = context;
 
-	const { image, canUserEdit } = useSelect(
+	const { image, attachmentResolutionError } = useSelect(
 		( select ) => {
 			const imageRecord =
 				id && isSingleSelected
@@ -325,20 +341,26 @@ export default function Image( {
 					  )
 					: null;
 
-			// Check edit permissions when the media editor experiment is enabled.
-			// Only check when imageRecord is available to avoid unnecessary API requests.
-			let canEdit = false;
-			if ( imageRecord && window?.__experimentalMediaEditor ) {
-				canEdit = !! select( coreStore ).canUser( 'update', {
-					kind: 'postType',
-					name: 'attachment',
-					id,
-				} );
-			}
+			// Check if the attachment resolution failed with a specific error.
+			// We use getResolutionError instead of hasFinishedResolution so we
+			// can distinguish 404 (attachment doesn't exist) from transient
+			// errors (500, 403, network) that shouldn't clear the id.
+			const resolutionError =
+				id && isSingleSelected
+					? select( coreStore ).getResolutionError(
+							'getEntityRecord',
+							[
+								'postType',
+								'attachment',
+								id,
+								{ context: 'view' },
+							]
+					  )
+					: null;
 
 			return {
 				image: imageRecord,
-				canUserEdit: canEdit,
+				attachmentResolutionError: resolutionError,
 			};
 		},
 		[ id, isSingleSelected ]
@@ -372,9 +394,29 @@ export default function Image( {
 		[ clientId ]
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
-	const onNavigateToEntityRecord = getSettings().onNavigateToEntityRecord;
+	const cropButtonRef = useRef();
+	// URL of a freshly generated file (crop/rotate result) from the media
+	// editor that the browser may not have finished loading; cleared by the
+	// <img> load/error handlers, or by the settle effect below when the
+	// rendered image already shows it.
+	const [ pendingSwapUrl, setPendingSwapUrl ] = useState();
+	const isSwappingMedia = !! pendingSwapUrl;
+	const handleMediaEditorModalClose = useCallback(
+		() => cropButtonRef.current?.focus(),
+		[]
+	);
+	const openImageMediaEditorModal = useOpenImageMediaEditorModal( {
+		attributes,
+		setAttributes,
+		onClose: handleMediaEditorModalClose,
+		onUrlChange: setPendingSwapUrl,
+	} );
 
-	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
+	const {
+		replaceBlocks,
+		toggleSelection,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const { editEntityRecord } = useDispatch( coreStore );
@@ -385,8 +427,6 @@ export default function Image( {
 		{ loadedNaturalWidth, loadedNaturalHeight },
 		setLoadedNaturalSize,
 	] = useState( {} );
-	const [ isEditingImage, setIsEditingImage ] = useState( false );
-	const [ externalBlob, setExternalBlob ] = useState();
 	const [ hasImageErrored, setHasImageErrored ] = useState( false );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
@@ -405,31 +445,44 @@ export default function Image( {
 		)
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
-	// If an image is externally hosted, try to fetch the image data. This may
-	// fail if the image host doesn't allow CORS with the domain. If it works,
-	// we can enable a button in the toolbar to upload the image.
+	// If the image has an id but the attachment doesn't exist on this site,
+	// clear the id so Gutenberg treats the image as external.
+	// This handles content copied between WordPress sites.
+	//
+	// Known limitation: if a different attachment with the same id happens to
+	// exist on the destination site, the lookup will succeed and the wrong
+	// local image will be used. URL matching could address this in a follow-up.
+	// See: https://github.com/WordPress/gutenberg/issues/74156
 	useEffect( () => {
-		if (
-			! isExternalImage( id, url ) ||
-			! isSingleSelected ||
-			! getSettings().mediaUpload
-		) {
-			setExternalBlob();
+		if ( ! id || ! isSingleSelected ) {
 			return;
 		}
-
-		if ( externalBlob ) {
-			return;
+		// Only clear for confirmed 404s. apiFetch throws the Response object
+		// for HTTP errors, so checking .status === 404 avoids incorrectly
+		// clearing the id on 403, 500, or network failures, which would
+		// cause data loss for valid local attachments.
+		if ( attachmentResolutionError?.status === 404 ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { id: undefined } );
 		}
+	}, [
+		id,
+		isSingleSelected,
+		attachmentResolutionError,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
-		window
-			// Avoid cache, which seems to help avoid CORS problems.
-			.fetch( url.includes( '?' ) ? url : url + '?' )
-			.then( ( response ) => response.blob() )
-			.then( ( blob ) => setExternalBlob( blob ) )
-			// Do nothing, cannot upload.
-			.catch( () => {} );
-	}, [ id, url, isSingleSelected, externalBlob, getSettings ] );
+	/*
+	 * Externally hosted images can be uploaded to the media library. The
+	 * server sideloads the URL (see mediaSideloadFromUrl), so this works even
+	 * when the editor is cross-origin isolated and the browser cannot read the
+	 * cross-origin image's bytes itself.
+	 */
+	const canUploadExternalImage =
+		isSingleSelected &&
+		isExternalImage( id, url ) &&
+		!! getSettings()[ mediaSideloadFromUrlKey ];
 
 	// Get naturalWidth and naturalHeight from image, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
@@ -444,18 +497,34 @@ export default function Image( {
 		};
 	}, [ loadedNaturalWidth, loadedNaturalHeight, imageElement?.complete ] );
 
+	// A media editor update can be undone or superseded before its
+	// attributes land, leaving the rendered image untouched. No load event
+	// fires in that case, so clear the pending swap whenever the rendered
+	// image already shows the pending URL.
+	useEffect( () => {
+		if (
+			pendingSwapUrl &&
+			pendingSwapUrl === url &&
+			imageElement?.complete
+		) {
+			setPendingSwapUrl( undefined );
+		}
+	}, [ pendingSwapUrl, url, imageElement ] );
+
 	function onImageError() {
+		setPendingSwapUrl( undefined );
 		setHasImageErrored( true );
 
 		// Check if there's an embed block that handles this URL, e.g., instagram URL.
 		// See: https://github.com/WordPress/gutenberg/pull/11472
 		const embedBlock = createUpgradedEmbedBlock( { attributes: { url } } );
-		if ( undefined !== embedBlock ) {
+		if ( undefined !== embedBlock && onReplace ) {
 			onReplace( embedBlock );
 		}
 	}
 
 	function onImageLoad( event ) {
+		setPendingSwapUrl( undefined );
 		setHasImageErrored( false );
 		setLoadedNaturalSize( {
 			loadedNaturalWidth: event.target?.naturalWidth,
@@ -471,6 +540,7 @@ export default function Image( {
 		if ( enable && ! lightboxSetting?.enabled ) {
 			setAttributes( {
 				lightbox: { enabled: true },
+				isDecorative: false,
 			} );
 		} else if ( ! enable && lightboxSetting?.enabled ) {
 			setAttributes( {
@@ -509,6 +579,20 @@ export default function Image( {
 		setAttributes( { alt: newAlt } );
 	}
 
+	function updateIsDecorative( value ) {
+		setAttributes( {
+			isDecorative: value || undefined,
+			...( value && {
+				alt: '',
+				caption: undefined,
+				href: undefined,
+				linkDestination: undefined,
+				linkTarget: undefined,
+				rel: undefined,
+			} ),
+		} );
+	}
+
 	const imperativeFocalPointPreview = ( value ) => {
 		if ( imageElement ) {
 			imageElement.style.setProperty(
@@ -531,42 +615,23 @@ export default function Image( {
 	}
 
 	function uploadExternal() {
-		const { mediaUpload } = getSettings();
-		if ( ! mediaUpload ) {
+		const mediaSideloadFromUrl = getSettings()[ mediaSideloadFromUrlKey ];
+		if ( ! mediaSideloadFromUrl ) {
 			return;
 		}
-		let notified = false;
-		mediaUpload( {
-			filesList: [ externalBlob ],
-			onFileChange( [ img ] ) {
+		mediaSideloadFromUrl( {
+			url,
+			onSuccess( img ) {
 				onSelectImage( img );
-
-				if ( isBlobURL( img.url ) ) {
-					return;
-				}
-
-				// With client-side media processing, onFileChange fires
-				// for each generated sub-size. Only show the notice once.
-				if ( ! notified ) {
-					notified = true;
-					setExternalBlob();
-					createSuccessNotice( __( 'Image uploaded.' ), {
-						type: 'snackbar',
-					} );
-				}
+				createSuccessNotice( __( 'Image uploaded.' ), {
+					type: 'snackbar',
+				} );
 			},
-			allowedTypes: ALLOWED_MEDIA_TYPES,
 			onError( message ) {
 				createErrorNotice( message, { type: 'snackbar' } );
 			},
 		} );
 	}
-
-	useEffect( () => {
-		if ( ! isSingleSelected ) {
-			setIsEditingImage( false );
-		}
-	}, [ isSingleSelected ] );
 
 	const canEditImage =
 		id &&
@@ -577,8 +642,9 @@ export default function Image( {
 	const allowCrop =
 		isSingleSelected &&
 		canEditImage &&
-		! isEditingImage &&
-		! isContentOnlyMode;
+		!! openImageMediaEditorModal &&
+		! isContentOnlyMode &&
+		! isUploading;
 
 	function switchToCover() {
 		replaceBlocks(
@@ -588,8 +654,8 @@ export default function Image( {
 	}
 
 	// TODO: Can allow more units after figuring out how they should interact
-	// with the ResizableBox and ImageEditor components. Calculations later on
-	// for those components are currently assuming px units.
+	// with the ResizableBox component. Calculations later on for that
+	// component are currently assuming px units.
 	const dimensionsUnitsOptions = useCustomUnits( {
 		availableUnits: [ 'px' ],
 	} );
@@ -607,14 +673,67 @@ export default function Image( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	const selectedStyleState = useSelect(
+		( select ) => {
+			if ( ! isSingleSelected ) {
+				return undefined;
+			}
+			const { getSelectedBlockStyleState } = unlock(
+				select( blockEditorStore )
+			);
+			return getSelectedBlockStyleState( clientId );
+		},
+		[ clientId, isSingleSelected ]
+	);
+	const hasSelectedStyleState =
+		! isDefaultBlockStyleState( selectedStyleState );
+	const selectedStyleStateKey = getStyleStateKey( selectedStyleState );
+	const activeWidth = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'width',
+	} );
+	const activeHeight = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'height',
+	} );
+	const activeAspectRatio = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'aspectRatio',
+	} );
+	const activeScale = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'scale',
+		styleKey: 'objectFit',
+	} );
+	const setDimensionAttributes = ( nextDimensions ) => {
+		setAttributes(
+			getDimensionUpdateAttributes( {
+				style: attributes.style,
+				selectedState: selectedStyleState,
+				hasSelectedStyleState,
+				nextDimensions,
+				dimensionKeyMap: { scale: 'objectFit' },
+			} )
+		);
+	};
+
 	const dimensionsControl =
 		showDimensionsControls &&
 		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
 			<DimensionsTool
+				key={ selectedStyleStateKey }
 				panelId={ clientId }
-				value={ { aspectRatio } }
+				value={ { aspectRatio: activeAspectRatio, scale: activeScale } }
 				onChange={ ( { aspectRatio: newAspectRatio } ) => {
-					setAttributes( {
+					setDimensionAttributes( {
 						aspectRatio: newAspectRatio,
 						scale: 'cover',
 					} );
@@ -624,26 +743,29 @@ export default function Image( {
 			/>
 		) : (
 			<DimensionsTool
+				key={ selectedStyleStateKey }
 				panelId={ clientId }
-				value={ { width, height, scale, aspectRatio } }
+				value={ {
+					width: activeWidth,
+					height: activeHeight,
+					scale: activeScale,
+					aspectRatio: activeAspectRatio,
+				} }
 				onChange={ ( {
 					width: newWidth,
 					height: newHeight,
 					scale: newScale,
 					aspectRatio: newAspectRatio,
 				} ) => {
-					// Rebuilding the object forces setting `undefined`
-					// for values that are removed since setAttributes
-					// doesn't do anything with keys that aren't set.
-					setAttributes( {
+					setDimensionAttributes( {
 						// CSS includes `height: auto`, but we need
 						// `width: auto` to fix the aspect ratio when
 						// only height is set due to the width and
 						// height attributes set via the server.
 						width: ! newWidth && newHeight ? 'auto' : newWidth,
 						height: newHeight,
-						scale: newScale,
 						aspectRatio: newAspectRatio,
+						scale: newScale,
 					} );
 				} }
 				defaultScale="cover"
@@ -750,19 +872,18 @@ export default function Image( {
 
 	const showUrlInput =
 		isSingleSelected &&
-		! isEditingImage &&
 		! lockHrefControls &&
-		! lockUrlControls;
+		! lockUrlControls &&
+		! isDecorative;
 
 	const showCoverControls =
 		isSingleSelected && canInsertCover && ! isContentOnlyMode;
 
 	const showBlockControls = showUrlInput || allowCrop || showCoverControls;
 
-	const mediaReplaceFlow = isSingleSelected &&
-		! isEditingImage &&
-		! lockUrlControls && (
-			// For contentOnly mode, put this button in its own area so it has borders around it.
+	const mediaControls = isSingleSelected && ! lockUrlControls && (
+		<>
+			{ /* For contentOnly mode, put this button in its own area so it has borders around it. */ }
 			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
 				<MediaReplaceFlow
 					mediaId={ id }
@@ -776,32 +897,11 @@ export default function Image( {
 					variant="toolbar"
 				/>
 			</BlockControls>
-		);
+		</>
+	);
 
 	const hasDataFormBlockFields =
 		window?.__experimentalContentOnlyInspectorFields;
-
-	const editMediaButton = window?.__experimentalMediaEditor &&
-		id &&
-		isSingleSelected &&
-		canUserEdit &&
-		!! editMediaEntity &&
-		! isExternalImage( id, url ) &&
-		! isEditingImage &&
-		onNavigateToEntityRecord && (
-			<BlockControls group="other">
-				<ToolbarButton
-					onClick={ () => {
-						onNavigateToEntityRecord( {
-							postId: id,
-							postType: 'attachment',
-						} );
-					} }
-				>
-					{ __( 'Edit media' ) }
-				</ToolbarButton>
-			</BlockControls>
-		);
 
 	const controls = (
 		<>
@@ -825,9 +925,15 @@ export default function Image( {
 					) }
 					{ allowCrop && (
 						<ToolbarButton
-							onClick={ () => setIsEditingImage( true ) }
+							ref={ cropButtonRef }
+							onClick={ openImageMediaEditorModal }
+							aria-haspopup="dialog"
 							icon={ crop }
 							label={ __( 'Crop' ) }
+							// Disable rather than hide while the edited image
+							// loads, so the button keeps focus when the modal
+							// closes instead of dropping it to the canvas.
+							disabled={ isSwappingMedia }
 						/>
 					) }
 					{ showCoverControls && (
@@ -839,7 +945,7 @@ export default function Image( {
 					) }
 				</BlockControls>
 			) }
-			{ isSingleSelected && externalBlob && (
+			{ canUploadExternalImage && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
@@ -869,7 +975,10 @@ export default function Image( {
 				<InspectorControls group="content">
 					<ToolsPanel
 						label={ __( 'Media' ) }
-						resetAll={ () => onSelectImage( undefined ) }
+						resetAll={ () => {
+							onSelectImage( undefined );
+							setAttributes( { isDecorative: false } );
+						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
 						{ ! lockUrlControls && (
@@ -899,24 +1008,24 @@ export default function Image( {
 								/>
 							</ToolsPanelItem>
 						) }
-						<ToolsPanelItem
-							label={ __( 'Alternative text' ) }
-							isShownByDefault
-							hasValue={ () => !! alt }
-							onDeselect={ () =>
-								setAttributes( { alt: undefined } )
-							}
-						>
-							<TextareaControl
+						{ ! isDecorative && (
+							<ToolsPanelItem
 								label={ __( 'Alternative text' ) }
-								value={ alt || '' }
-								onChange={ updateAlt }
-								readOnly={ lockAltControls }
-								help={
-									lockAltControls ? (
-										<>{ lockAltControlsMessage }</>
-									) : (
-										<>
+								isShownByDefault
+								hasValue={ () => !! alt }
+								onDeselect={ () =>
+									setAttributes( { alt: undefined } )
+								}
+							>
+								<TextareaControl
+									label={ __( 'Alternative text' ) }
+									value={ alt || '' }
+									onChange={ updateAlt }
+									readOnly={ lockAltControls }
+									help={
+										lockAltControls ? (
+											<>{ lockAltControlsMessage }</>
+										) : (
 											<ExternalLink
 												href={
 													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
@@ -929,31 +1038,54 @@ export default function Image( {
 													'Describe the purpose of the image.'
 												) }
 											</ExternalLink>
-											<br />
-											{ __(
-												'Leave empty if decorative.'
-											) }
-										</>
-									)
+										)
+									}
+								/>
+							</ToolsPanelItem>
+						) }
+
+						{ ! lockAltControls && ! lightboxChecked && (
+							<ToolsPanelItem
+								label={ __( 'Mark as decorative' ) }
+								isShownByDefault
+								hasValue={ () => !! isDecorative }
+								onDeselect={ () =>
+									setAttributes( { isDecorative: false } )
 								}
-							/>
-						</ToolsPanelItem>
+							>
+								<CheckboxControl
+									label={ __( 'Mark as decorative' ) }
+									checked={ !! isDecorative }
+									onChange={ updateIsDecorative }
+									help={ __(
+										'Hidden from assistive technologies.'
+									) }
+								/>
+							</ToolsPanelItem>
+						) }
 					</ToolsPanel>
 				</InspectorControls>
 			) }
 			<InspectorControls
 				group="dimensions"
-				resetAllFilter={ ( attrs ) => ( {
-					...attrs,
-					aspectRatio: undefined,
-					width: undefined,
-					height: undefined,
-					scale: undefined,
-					focalPoint: undefined,
-				} ) }
+				resetAllFilter={ ( attrs ) => {
+					return getDimensionResetAttributes( {
+						attributes: attrs,
+						selectedState: selectedStyleState,
+						hasSelectedStyleState,
+						keys: [ 'aspectRatio', 'height', 'objectFit', 'width' ],
+						defaultAttributes: {
+							aspectRatio: undefined,
+							width: undefined,
+							height: undefined,
+							scale: undefined,
+							focalPoint: undefined,
+						},
+					} );
+				} }
 			>
 				{ dimensionsControl }
-				{ url && scale && (
+				{ ! hasSelectedStyleState && url && scale && (
 					<ToolsPanelItem
 						label={ __( 'Focal point' ) }
 						isShownByDefault
@@ -998,7 +1130,6 @@ export default function Image( {
 			) }
 			<InspectorControls group="advanced">
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }
@@ -1027,7 +1158,17 @@ export default function Image( {
 	const filename = getFilename( url );
 	let defaultedAlt;
 
-	if ( alt ) {
+	if ( isDecorative ) {
+		defaultedAlt = filename
+			? sprintf(
+					/* translators: %s: file name */
+					__(
+						'This image has been marked as decorative; its file name is %s'
+					),
+					filename
+			  )
+			: __( 'This image has been marked as decorative.' );
+	} else if ( alt ) {
 		defaultedAlt = alt;
 	} else if ( filename ) {
 		defaultedAlt = sprintf(
@@ -1041,82 +1182,90 @@ export default function Image( {
 
 	const borderProps = useBorderProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
-	const isRounded = attributes.className?.includes( 'is-style-rounded' );
 
 	const { postType, postId, queryId } = context;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 
-	let img =
-		temporaryURL && hasImageErrored ? (
-			// Show a placeholder during upload when the blob URL can't be loaded. This can
-			// happen when the user uploads a HEIC image in a browser that doesn't support them.
-			<Placeholder
-				className="wp-block-image__placeholder"
-				withIllustration
-			>
-				<Spinner />
-			</Placeholder>
-		) : (
-			<>
-				<img
-					src={ temporaryURL || url }
-					alt={ defaultedAlt }
-					onError={ onImageError }
-					onLoad={ onImageLoad }
-					ref={ setRefs }
-					className={ borderProps.className }
-					width={ naturalWidth }
-					height={ naturalHeight }
-					style={ {
-						aspectRatio,
-						...( resizeDelta
-							? {
-									width: pixelSize.width + resizeDelta.width,
-									height:
-										pixelSize.height + resizeDelta.height,
-							  }
-							: { width, height } ),
-						objectFit: scale,
-						objectPosition:
-							focalPoint && scale
-								? mediaPosition( focalPoint )
-								: undefined,
-						...borderProps.style,
-						...shadowProps.style,
-					} }
-				/>
-				{ isUploading && <Spinner /> }
-			</>
-		);
-
-	if ( canEditImage && isEditingImage ) {
-		img = (
-			<ImageWrapper href={ href }>
-				<ImageEditor
-					id={ id }
-					url={ url }
-					{ ...pixelSize }
-					naturalHeight={ naturalHeight }
-					naturalWidth={ naturalWidth }
-					onSaveImage={ ( imageAttributes ) =>
-						setAttributes( imageAttributes )
-					}
-					onFinishEditing={ () => {
-						setIsEditingImage( false );
-					} }
-					borderProps={ isRounded ? undefined : borderProps }
-				/>
-			</ImageWrapper>
-		);
-	} else {
-		img = <ImageWrapper href={ href }>{ img }</ImageWrapper>;
-	}
+	const img = (
+		<ImageWrapper href={ href }>
+			{ temporaryURL && hasImageErrored ? (
+				// Show a placeholder during upload when the blob URL can't be loaded. This can
+				// happen when the user uploads a HEIC image in a browser that doesn't support them.
+				<Placeholder
+					className="wp-block-image__placeholder"
+					withIllustration
+				>
+					<Spinner />
+				</Placeholder>
+			) : (
+				<>
+					<img
+						src={ temporaryURL || url }
+						alt={ defaultedAlt }
+						onError={ onImageError }
+						onLoad={ onImageLoad }
+						ref={ setRefs }
+						className={ clsx( borderProps.className, {
+							'is-swapping-media': isSwappingMedia,
+						} ) }
+						width={ naturalWidth }
+						height={ naturalHeight }
+						style={ {
+							aspectRatio,
+							...( resizeDelta
+								? {
+										width:
+											pixelSize.width + resizeDelta.width,
+										height:
+											pixelSize.height +
+											resizeDelta.height,
+								  }
+								: ( () => {
+										const style = {};
+										if ( width === 'auto' ) {
+											style.width = 'auto';
+										} else if (
+											width !== undefined &&
+											width !== null
+										) {
+											style.width =
+												typeof width === 'number'
+													? `${ width }px`
+													: width;
+										}
+										if (
+											height === 'auto' ||
+											height === undefined ||
+											height === null
+										) {
+											style.height = 'auto';
+										} else {
+											style.height =
+												typeof height === 'number'
+													? `${ height }px`
+													: height;
+										}
+										return style;
+								  } )() ),
+							objectFit: scale,
+							objectPosition:
+								focalPoint && scale
+									? mediaPosition( focalPoint )
+									: undefined,
+							...borderProps.style,
+							...shadowProps.style,
+						} }
+					/>
+					{ ( isUploading || isSwappingMedia ) && <Spinner /> }
+				</>
+			) }
+		</ImageWrapper>
+	);
 
 	let resizableBox;
 	if (
 		isResizable &&
 		isSingleSelected &&
-		! isEditingImage &&
 		! isUploading &&
 		! SIZED_LAYOUTS.includes( parentLayoutType )
 	) {
@@ -1241,7 +1390,7 @@ export default function Image( {
 	if ( ! url && ! temporaryURL ) {
 		return (
 			<>
-				{ mediaReplaceFlow }
+				{ mediaControls }
 				{ controls }
 			</>
 		);
@@ -1276,25 +1425,26 @@ export default function Image( {
 
 	return (
 		<>
-			{ editMediaButton }
-			{ mediaReplaceFlow }
+			{ mediaControls }
 			{ controls }
 			{ featuredImageControl }
 			{ img }
 			{ resizableBox }
 
-			<Caption
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				isSelected={ isSingleSelected }
-				insertBlocksAfter={ insertBlocksAfter }
-				label={ __( 'Image caption text' ) }
-				showToolbarButton={
-					isSingleSelected &&
-					( hasNonContentControls || isContentOnlyMode ) &&
-					! hideCaptionControls
-				}
-			/>
+			{ ! isDecorative && (
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Image caption text' ) }
+					showToolbarButton={
+						isSingleSelected &&
+						( hasNonContentControls || isContentOnlyMode ) &&
+						! hideCaptionControls
+					}
+				/>
+			) }
 		</>
 	);
 }

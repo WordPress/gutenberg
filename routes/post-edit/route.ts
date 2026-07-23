@@ -7,21 +7,38 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { notFound } from '@wordpress/route';
 
+const TEMPLATE_POST_TYPES = [ 'wp_template', 'wp_template_part' ];
+
+type PostEditParams = {
+	type: string;
+	'*'?: string;
+};
+
+function getPostId( params: PostEditParams ) {
+	const id = params[ '*' ];
+
+	if ( ! id ) {
+		throw notFound();
+	}
+
+	try {
+		return decodeURIComponent( id );
+	} catch {
+		return id;
+	}
+}
+
 /**
  * Route configuration for post edit.
  */
 export const route = {
-	beforeLoad: async ( {
-		params,
-	}: {
-		params: {
-			type: string;
-			id: string;
-		};
-	} ) => {
-		const postId = parseInt( params.id, 10 );
+	beforeLoad: async ( { params }: { params: PostEditParams } ) => {
+		const postId = getPostId( params );
 
-		if ( Number.isNaN( postId ) ) {
+		if (
+			! TEMPLATE_POST_TYPES.includes( params.type ) &&
+			! /^\d+$/.test( postId )
+		) {
 			throw notFound();
 		}
 
@@ -42,18 +59,12 @@ export const route = {
 			throw notFound();
 		}
 	},
-	title: async ( {
-		params,
-	}: {
-		params: {
-			type: string;
-			id: string;
-		};
-	} ) => {
+	title: async ( { params }: { params: PostEditParams } ) => {
+		const postId = getPostId( params );
 		const post = await resolveSelect( coreStore ).getEntityRecord(
 			'postType',
 			params.type,
-			params.id
+			postId
 		);
 
 		if ( post?.title?.rendered ) {
@@ -65,17 +76,13 @@ export const route = {
 		);
 		return postType?.labels?.edit_item || __( 'Edit' );
 	},
-	async canvas( context: {
-		params: {
-			type: string;
-			id: string;
-		};
-	} ) {
+	async canvas( context: { params: PostEditParams } ) {
 		const { params } = context;
+		const postId = getPostId( params );
 
 		return {
 			postType: params.type,
-			postId: params.id,
+			postId,
 		};
 	},
 };

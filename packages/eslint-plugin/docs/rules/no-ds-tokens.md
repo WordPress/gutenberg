@@ -9,7 +9,7 @@ This is useful in contexts where Design System tokens should not be referenced d
 Examples of **incorrect** code for this rule:
 
 ```js
-const style = 'color: var(--wpds-color-fg-content-neutral)';
+const style = 'color: var(--wpds-color-foreground-content-neutral)';
 ```
 
 ```js
@@ -17,7 +17,7 @@ const style = `border: 1px solid var(--wpds-color-stroke-surface-neutral)`;
 ```
 
 ```jsx
-<div style={ { color: 'var(--wpds-color-fg-content-neutral)' } } />
+<div style={ { color: 'var(--wpds-color-foreground-content-neutral)' } } />
 ```
 
 Examples of **correct** code for this rule:

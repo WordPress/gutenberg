@@ -110,9 +110,13 @@ test.describe( 'Draggable block', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
+		// Select the first paragraph by clicking it. Focusing it
+		// programmatically does not move focus while the second, editable
+		// root paragraph is selected and its wrapper holds focus (a nested
+		// editable element cannot take focus from an editing host ancestor).
 		await editor.canvas
 			.locator( 'role=document[name="Block: Paragraph"i] >> text=1' )
-			.focus();
+			.click();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -452,6 +456,47 @@ test.describe( 'Draggable block', () => {
 				},
 			] );
 		}
+	} );
+
+	test( 'renders the drag chip inside the wp compat overlay slot', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=2' )
+			.focus();
+		await editor.showBlockToolbar();
+
+		const dragHandle = page.locator(
+			'role=toolbar[name="Block tools"i] >> role=button[name="Drag"i][include-hidden]'
+		);
+		await dragHandle.hover();
+		await page.mouse.down();
+
+		const firstParagraph = editor.canvas.locator(
+			'role=document[name="Block: Paragraph"i] >> text=1'
+		);
+		const firstParagraphBound = await firstParagraph.boundingBox();
+		await dragTo( page, firstParagraphBound.x, firstParagraphBound.y );
+
+		const chip = page.locator(
+			'data-testid=block-draggable-chip >> visible=true'
+		);
+		await expect( chip ).toBeVisible();
+
+		// Living in the compat overlay slot is what keeps the chip above
+		// any `@wordpress/components` overlays opened mid-drag.
+		const chipIsInsideCompatSlot = await chip.evaluate(
+			( el ) => el.closest( '[data-wp-compat-overlay-slot]' ) !== null
+		);
+		expect( chipIsInsideCompatSlot ).toBe( true );
+
+		await page.mouse.up();
 	} );
 
 	test( 'can directly drag an image', async ( { page, editor } ) => {

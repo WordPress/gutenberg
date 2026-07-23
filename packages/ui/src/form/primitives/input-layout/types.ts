@@ -7,6 +7,8 @@ export interface InputLayoutProps
 	/**
 	 * The size of the field.
 	 *
+	 * The 'small' size is reserved for rare use cases. Most components should not support it.
+	 *
 	 * @default 'default'
 	 */
 	size?: 'default' | 'compact' | 'small';

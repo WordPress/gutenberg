@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __unstableMotion as motion } from '@wordpress/components';
@@ -8,6 +13,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { useLayoutEffect, useState } from '@wordpress/element';
+import { Skeleton } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -96,9 +102,20 @@ function PreviewWrapper( {
 			<div style={ { position: 'relative' } }>
 				{ containerResizeListener }
 			</div>
+			{ ! isReady && (
+				// Match the preview aspect ratio so layout doesn't jump once width is measured.
+				<Skeleton
+					className="global-styles-ui-preview__wrapper"
+					style={ {
+						aspectRatio: normalizedWidth / normalizedHeight,
+					} }
+				/>
+			) }
 			{ isReady && (
 				<div
-					className="global-styles-ui-preview__wrapper"
+					className={ clsx( 'global-styles-ui-preview__wrapper', {
+						'is-hoverable': withHoverView,
+					} ) }
 					style={ {
 						height: normalizedHeight * ratio,
 					} }
@@ -111,7 +128,6 @@ function PreviewWrapper( {
 							height: normalizedHeight * ratio,
 							width: '100%',
 							background: gradientValue ?? backgroundColor,
-							cursor: withHoverView ? 'pointer' : undefined,
 						} }
 						initial="start"
 						animate={

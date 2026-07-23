@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import { useBlockProps } from '@wordpress/block-editor';
-import { VisuallyHidden } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies

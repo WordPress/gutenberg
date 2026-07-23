@@ -13,6 +13,12 @@
 	margin-bottom: 0; // Cancel out margins added by common.css
 }
 
+.layout-block-support-panel {
+	.block-editor-hooks__flex-layout-controls {
+		grid-column: 1 / -1;
+	}
+}
+
 .block-editor-hooks__flex-layout-justification-controls,
 .block-editor-hooks__flex-layout-orientation-controls {
 	margin-bottom: $grid-unit-15;

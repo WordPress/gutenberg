@@ -3,10 +3,6 @@
  */
 import clsx from 'clsx';
 
-/**
- * WordPress dependencies
- */
-import { Tooltip } from '@wordpress/components';
 import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import { _x, sprintf } from '@wordpress/i18n';
@@ -14,11 +10,13 @@ import {
 	areGlobalStylesEqual,
 	mergeGlobalStyles,
 } from '@wordpress/global-styles-engine';
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import { GlobalStylesContext } from '../context';
+
 import { filterObjectByProperties } from '../utils';
 
 interface VariationProps {
@@ -107,7 +105,10 @@ export default function Variation( {
 	return (
 		<GlobalStylesContext.Provider value={ context }>
 			{ showTooltip ? (
-				<Tooltip text={ variation?.title }>{ content }</Tooltip>
+				<Tooltip.Root>
+					<Tooltip.Trigger render={ content } />
+					<Tooltip.Popup>{ variation?.title }</Tooltip.Popup>
+				</Tooltip.Root>
 			) : (
 				content
 			) }

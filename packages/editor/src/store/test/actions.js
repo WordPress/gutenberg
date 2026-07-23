@@ -12,8 +12,9 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 
-import * as actions from '../actions';
 import { store as editorStore } from '..';
+import * as actions from '../actions';
+import { unlock } from '../../lock-unlock';
 
 const postId = 44;
 
@@ -63,6 +64,131 @@ const getMethod = ( options ) =>
 	options.headers?.[ 'X-HTTP-Method-Override' ] || options.method || 'GET';
 
 describe( 'Post actions', () => {
+	describe( 'setCanvasWidth', () => {
+		it( 'syncs the viewport style state while Responsive editing is enabled', () => {
+			const registry = createRegistryWithStores();
+			const getViewport = () =>
+				unlock(
+					registry.select( blockEditorStore )
+				).getStyleStateViewport();
+			const setCanvasWidth = ( width ) =>
+				unlock( registry.dispatch( editorStore ) ).setCanvasWidth(
+					width
+				);
+
+			unlock(
+				registry.dispatch( blockEditorStore )
+			).setResponsiveEditing( true );
+
+			// A tablet-sized canvas selects the tablet viewport.
+			setCanvasWidth( 600 );
+			expect( getViewport() ).toBe( '@tablet' );
+
+			// A mobile-sized canvas selects the mobile viewport.
+			setCanvasWidth( 400 );
+			expect( getViewport() ).toBe( '@mobile' );
+
+			// A full-width (desktop) canvas resets to the default viewport.
+			setCanvasWidth( undefined );
+			expect( getViewport() ).toBe( 'default' );
+		} );
+
+		it( 'syncs the viewport style state using custom viewport settings', () => {
+			const registry = createRegistryWithStores();
+			const getViewport = () =>
+				unlock(
+					registry.select( blockEditorStore )
+				).getStyleStateViewport();
+			const setCanvasWidth = ( width ) =>
+				unlock( registry.dispatch( editorStore ) ).setCanvasWidth(
+					width
+				);
+
+			registry.dispatch( blockEditorStore ).updateSettings( {
+				__experimentalFeatures: {
+					viewport: {
+						mobile: '640px',
+						tablet: '1024px',
+					},
+				},
+			} );
+			unlock(
+				registry.dispatch( blockEditorStore )
+			).setResponsiveEditing( true );
+
+			setCanvasWidth( 600 );
+			expect( getViewport() ).toBe( '@mobile' );
+
+			setCanvasWidth( 800 );
+			expect( getViewport() ).toBe( '@tablet' );
+
+			setCanvasWidth( 1200 );
+			expect( getViewport() ).toBe( 'default' );
+		} );
+
+		it( 'leaves the viewport style state untouched while Responsive editing is disabled', () => {
+			const registry = createRegistryWithStores();
+			const getViewport = () =>
+				unlock(
+					registry.select( blockEditorStore )
+				).getStyleStateViewport();
+
+			unlock( registry.dispatch( editorStore ) ).setCanvasWidth( 400 );
+
+			expect( getViewport() ).toBe( 'default' );
+		} );
+	} );
+
+	describe( 'setDeviceType', () => {
+		it( 'sets the canvas width using custom rem viewport settings', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( blockEditorStore ).updateSettings( {
+				__experimentalFeatures: {
+					viewport: {
+						mobile: '40rem',
+						tablet: '64rem',
+					},
+				},
+			} );
+
+			unlock( registry.dispatch( editorStore ) ).setDeviceType(
+				'Tablet'
+			);
+
+			expect(
+				unlock( registry.select( editorStore ) ).getCanvasWidth()
+			).toBe( 1024 );
+			expect( registry.select( editorStore ).getDeviceType() ).toBe(
+				'Tablet'
+			);
+		} );
+
+		it( 'does not set a tablet canvas width when the tablet breakpoint is not larger than mobile', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( blockEditorStore ).updateSettings( {
+				__experimentalFeatures: {
+					viewport: {
+						mobile: '64rem',
+						tablet: '40rem',
+					},
+				},
+			} );
+
+			unlock( registry.dispatch( editorStore ) ).setDeviceType(
+				'Tablet'
+			);
+
+			expect(
+				unlock( registry.select( editorStore ) ).getCanvasWidth()
+			).toBe( undefined );
+			expect( registry.select( editorStore ).getDeviceType() ).toBe(
+				'Desktop'
+			);
+		} );
+	} );
+
 	describe( 'savePost()', () => {
 		it( 'saves a modified post', async () => {
 			const post = {

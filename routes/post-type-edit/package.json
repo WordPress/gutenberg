@@ -1,0 +1,20 @@
+{
+	"name": "@wordpress/post-type-edit-route",
+	"version": "1.0.0",
+	"private": true,
+	"route": {
+		"path": "/post-types/$id",
+		"page": [
+			"content-types"
+		]
+	},
+	"dependencies": {
+		"@wordpress/base-styles": "file:../../packages/base-styles",
+		"@wordpress/content-types": "file:../../packages/content-types",
+		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/notices": "file:../../packages/notices",
+		"@wordpress/route": "file:../../packages/route"
+	}
+}

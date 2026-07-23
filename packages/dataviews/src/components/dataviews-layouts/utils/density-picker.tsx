@@ -29,7 +29,6 @@ export default function DensityPicker() {
 		| ViewPickerGrid;
 	return (
 		<ToggleGroupControl
-			size="__unstable-large"
 			label={ __( 'Density' ) }
 			value={ view.layout?.density || 'balanced' }
 			onChange={ ( value ) => {

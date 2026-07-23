@@ -9,19 +9,13 @@ import clsx from 'clsx';
 import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
-	Tooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import {
-	Icon,
-	lockSmall as lock,
-	pinSmall,
-	unseen,
-	symbol,
-} from '@wordpress/icons';
+import { Icon, lockSmall as lock, pinSmall, unseen } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
-import { useSelect } from '@wordpress/data';
+
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -32,11 +26,9 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
-import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { getBlockVisibilityLabel } from '../block-visibility';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 function ListViewBlockSelectButton(
 	{
@@ -53,6 +45,8 @@ function ListViewBlockSelectButton(
 		draggable,
 		isExpanded,
 		ariaDescribedBy,
+		visibilityLabel,
+		isDisabled = false,
 	},
 	ref
 ) {
@@ -62,24 +56,10 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { hasPatternName, blockVisibility } = useSelect(
-		( select ) => {
-			const { getBlockAttributes } = unlock( select( blockEditorStore ) );
-			const attributes = getBlockAttributes( clientId );
-			return {
-				hasPatternName: !! attributes?.metadata?.patternName,
-				blockVisibility: attributes?.metadata?.blockVisibility,
-			};
-		},
-		[ clientId ]
-	);
 
 	const shouldShowLockIcon = isLocked;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
-
-	// Determine visibility label from blockVisibility metadata
-	const visibilityLabel = getBlockVisibilityLabel( blockVisibility );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -100,6 +80,8 @@ function ListViewBlockSelectButton(
 	}
 
 	return (
+		// Disabled list view items intentionally omit href so TreeGrid skips them.
+		// eslint-disable-next-line jsx-a11y/anchor-is-valid
 		<a
 			className={ clsx(
 				'block-editor-list-view-block-select-button',
@@ -115,13 +97,14 @@ function ListViewBlockSelectButton(
 			onDragStart={ onDragStartHandler }
 			onDragEnd={ onDragEnd }
 			draggable={ draggable }
-			href={ `#block-${ clientId }` }
+			href={ isDisabled ? undefined : `#block-${ clientId }` }
+			aria-disabled={ isDisabled ? true : undefined }
 			aria-describedby={ ariaDescribedBy }
 			aria-expanded={ isExpanded }
 		>
 			<ListViewExpander onClick={ onToggleExpanded } />
 			<BlockIcon
-				icon={ hasPatternName ? symbol : blockInformation?.icon }
+				icon={ blockInformation?.icon }
 				showColors
 				context="list-view"
 			/>
@@ -136,9 +119,9 @@ function ListViewBlockSelectButton(
 				</span>
 				{ blockInformation?.anchor && (
 					<span className="block-editor-list-view-block-select-button__anchor-wrapper">
-						<Badge className="block-editor-list-view-block-select-button__anchor">
+						<WCBadge className="block-editor-list-view-block-select-button__anchor">
 							{ blockInformation.anchor }
-						</Badge>
+						</WCBadge>
 					</span>
 				) }
 				{ isSticky && (
@@ -164,14 +147,25 @@ function ListViewBlockSelectButton(
 					</span>
 				) : null }
 				{ !! visibilityLabel && (
-					<Tooltip text={ visibilityLabel }>
-						<span
-							className="block-editor-list-view-block-select-button__block-visibility"
-							aria-hidden="true"
-						>
-							<Icon icon={ unseen } />
-						</span>
-					</Tooltip>
+					// The tooltip below is a sighted-hover affordance for
+					// the (decorative) visibility icon. The same
+					// `visibilityLabel` is exposed to assistive technology
+					// via the row's `aria-describedby`, which references the
+					// hidden `AriaReferencedText` rendered by the parent
+					// `ListViewBlock`.
+					<Tooltip.Root>
+						<Tooltip.Trigger
+							render={
+								<span
+									className="block-editor-list-view-block-select-button__block-visibility"
+									aria-hidden="true"
+								>
+									<Icon icon={ unseen } />
+								</span>
+							}
+						/>
+						<Tooltip.Popup>{ visibilityLabel }</Tooltip.Popup>
+					</Tooltip.Root>
 				) }
 				{ shouldShowLockIcon && (
 					<span className="block-editor-list-view-block-select-button__lock">

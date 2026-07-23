@@ -11,7 +11,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import SandBox from '..';
+import SandBox, { VIEWPORT_UNIT_VALUE_REGEX, buildSandBoxDocument } from '..';
 
 describe( 'SandBox', () => {
 	const TestWrapper = () => {
@@ -91,6 +91,47 @@ describe( 'SandBox', () => {
 		);
 	} );
 
+	it( 'places the resize script in the head, before the user content', () => {
+		// The resize script must parse before the (possibly malformed) user
+		// content in the body. Otherwise an unclosed attribute quote in that
+		// content swallows the <script> tag and its source leaks into the
+		// preview as visible text.
+		render( <SandBox html="<p>User content</p>" title="Head Script" /> );
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Head Script' );
+		const srcDoc = iframe.getAttribute( 'srcdoc' ) ?? '';
+
+		const resizeScriptIndex = srcDoc.indexOf( 'MutationObserver' );
+		const bodyIndex = srcDoc.indexOf( '<body' );
+		const userContentIndex = srcDoc.indexOf( '<p>User content</p>' );
+
+		expect( resizeScriptIndex ).toBeGreaterThan( -1 );
+		expect( resizeScriptIndex ).toBeLessThan( bodyIndex );
+		expect( resizeScriptIndex ).toBeLessThan( userContentIndex );
+	} );
+
+	it( 'builds a document with the resize script in the head, before the body', () => {
+		// Both sandboxes render this document: the isolated one as `srcdoc`,
+		// the same-origin one via `contentDocument.write()`. Testing the shared
+		// builder covers the write path too, so a future change cannot move the
+		// resize helper back into the body on either path.
+		const doc = buildSandBoxDocument( {
+			html: '<p>User content</p>',
+			title: 'Doc',
+			styles: [],
+			scripts: [],
+			lang: 'en',
+		} );
+
+		const resizeScriptIndex = doc.indexOf( 'MutationObserver' );
+		const bodyIndex = doc.indexOf( '<body' );
+		const userContentIndex = doc.indexOf( '<p>User content</p>' );
+
+		expect( resizeScriptIndex ).toBeGreaterThan( -1 );
+		expect( resizeScriptIndex ).toBeLessThan( bodyIndex );
+		expect( resizeScriptIndex ).toBeLessThan( userContentIndex );
+	} );
+
 	it( 'should update srcdoc when html prop changes', () => {
 		render( <TestWrapper /> );
 
@@ -108,5 +149,48 @@ describe( 'SandBox', () => {
 			'srcdoc',
 			expect.stringContaining( 'https://another.super.embed' )
 		);
+	} );
+
+	describe( 'VIEWPORT_UNIT_VALUE_REGEX', () => {
+		it.each( [
+			'100vh',
+			'50vw',
+			'0vh',
+			'50.5vh',
+			'.5vh',
+			'100dvh',
+			'50svw',
+			'1lvi',
+			'100vmin',
+			'100vmax',
+		] )( 'matches viewport unit value %s', ( value ) => {
+			expect( VIEWPORT_UNIT_VALUE_REGEX.test( value ) ).toBe( true );
+		} );
+
+		it.each( [
+			'100px',
+			'50%',
+			'100',
+			'vh',
+			'.vh',
+			'calc(100vh - 10px)',
+			'100 vh',
+			'',
+		] )( 'does not match %s', ( value ) => {
+			expect( VIEWPORT_UNIT_VALUE_REGEX.test( value ) ).toBe( false );
+		} );
+
+		it( 'is embedded in the sandbox iframe srcdoc', () => {
+			// Guards against drift between the exported constant and
+			// the copy inlined into `observeAndResizeJS`, which is
+			// serialized via `.toString()` into the iframe srcdoc and
+			// cannot reference module-scope values at runtime.
+			render( <SandBox html="<p>x</p>" title="Regex Sync Test" /> );
+			const iframe =
+				screen.getByTitle< HTMLIFrameElement >( 'Regex Sync Test' );
+			const srcDoc = iframe.getAttribute( 'srcdoc' ) ?? '';
+
+			expect( srcDoc ).toContain( VIEWPORT_UNIT_VALUE_REGEX.source );
+		} );
 	} );
 } );

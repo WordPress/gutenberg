@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import { version as reactVersion } from 'react';
 
 /**
  * WordPress dependencies
@@ -102,6 +103,12 @@ function getIframeSrc( resolvedAssets ) {
 		return src;
 	}
 
+	let body = '';
+	if ( reactVersion.split( '.' )[ 0 ] === '18' ) {
+		body =
+			'<body><script>document.currentScript.parentElement.remove()</script></body>';
+	}
+
 	// Correct doctype is required to enable rendering in standards mode.
 	// Also preload the styles to avoid a flash of unstyled content.
 	const html = `<!doctype html>
@@ -125,9 +132,7 @@ function getIframeSrc( resolvedAssets ) {
 		${ resolvedAssets.styles ?? '' }
 		${ resolvedAssets.scripts ?? '' }
 	</head>
-	<body>
-		<script>document.currentScript.parentElement.remove()</script>
-	</body>
+	${ body }
 </html>`;
 
 	src = URL.createObjectURL( new Blob( [ html ], { type: 'text/html' } ) );

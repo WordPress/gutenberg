@@ -5,6 +5,7 @@ import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -166,14 +167,16 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		[ 'aspectRatio', 'height', 'minHeight', 'width' ].forEach( ( key ) => {
-			if ( ! supportedStyles.includes( key ) ) {
-				updatedSettings.dimensions = {
-					...updatedSettings.dimensions,
-					[ key ]: false,
-				};
+		[ 'aspectRatio', 'height', 'minHeight', 'minWidth', 'width' ].forEach(
+			( key ) => {
+				if ( ! supportedStyles.includes( key ) ) {
+					updatedSettings.dimensions = {
+						...updatedSettings.dimensions,
+						[ key ]: false,
+					};
+				}
 			}
-		} );
+		);
 
 		[ 'radius', 'color', 'style', 'width' ].forEach( ( key ) => {
 			if (
@@ -303,4 +306,55 @@ export function useGradientsPerOrigin( settings ) {
 		defaultGradients,
 		shouldDisplayDefaultGradients,
 	] );
+}
+
+/**
+ * Derives the color/gradient palette data and encode/decode helpers shared by
+ * the Color, Background, and Typography style panels, so the common preamble
+ * is defined once rather than repeated in each panel.
+ *
+ * @param {Object} settings Style settings object.
+ *
+ * @return {Object} Shared color/gradient palette data and helpers.
+ */
+export function useColorGradientSettings( settings ) {
+	const colors = useColorsPerOrigin( settings );
+	const gradients = useGradientsPerOrigin( settings );
+	const areCustomSolidsEnabled = settings?.color?.custom;
+	const areCustomGradientsEnabled = settings?.color?.customGradient;
+	const allColors = useMemo(
+		() => colors.flatMap( ( { colors: originColors } ) => originColors ),
+		[ colors ]
+	);
+	const decodeValue = ( rawValue ) =>
+		getValueFromVariable( { settings }, '', rawValue );
+	// When a slug is provided it is used directly: two presets can share the
+	// same gradient string, and matching by string alone would collapse them
+	// onto whichever entry appears first. Without a slug, fall back to
+	// matching the gradient string against the presets.
+	const encodeGradientValue = ( gradientValue, slug ) => {
+		if ( slug ) {
+			return 'var:preset|gradient|' + slug;
+		}
+		const allGradients = gradients.flatMap(
+			( { gradients: originGradients } ) => originGradients
+		);
+		const gradientObject = allGradients.find(
+			( { gradient } ) => gradient === gradientValue
+		);
+		return gradientObject
+			? 'var:preset|gradient|' + gradientObject.slug
+			: gradientValue;
+	};
+	return {
+		colors,
+		gradients,
+		allColors,
+		areCustomSolidsEnabled,
+		areCustomGradientsEnabled,
+		hasSolidColors: colors.length > 0 || areCustomSolidsEnabled,
+		hasGradientColors: gradients.length > 0 || areCustomGradientsEnabled,
+		decodeValue,
+		encodeGradientValue,
+	};
 }

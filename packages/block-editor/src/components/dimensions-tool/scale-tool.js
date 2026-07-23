@@ -86,8 +86,7 @@ export default function ScaleTool( {
 	defaultValue = DEFAULT_SCALE_OPTIONS[ 0 ].value,
 	isShownByDefault = true,
 } ) {
-	// Match the CSS default so if the value is used directly in CSS it will look correct in the control.
-	const displayValue = value ?? 'fill';
+	const displayValue = value ?? defaultValue;
 
 	const scaleHelp = useMemo( () => {
 		return options.reduce( ( acc, option ) => {
@@ -98,19 +97,18 @@ export default function ScaleTool( {
 
 	return (
 		<ToolsPanelItem
-			label={ __( 'Scale' ) }
+			label={ _x( 'Scale', 'Image scaling options' ) }
 			isShownByDefault={ isShownByDefault }
 			hasValue={ () => displayValue !== defaultValue }
 			onDeselect={ () => onChange( defaultValue ) }
 			panelId={ panelId }
 		>
 			<ToggleGroupControl
-				label={ __( 'Scale' ) }
+				label={ _x( 'Scale', 'Image scaling options' ) }
 				isBlock
 				help={ scaleHelp[ displayValue ] }
 				value={ displayValue }
 				onChange={ onChange }
-				size="__unstable-large"
 			>
 				{ options.map( ( option ) => (
 					<ToggleGroupControlOption

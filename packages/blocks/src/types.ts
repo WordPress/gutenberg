@@ -94,6 +94,12 @@ export interface BlockVariation<
 	 */
 	innerBlocks?: Array< unknown[] >;
 	/**
+	 * Static HTML fragments interleaved with inner blocks, where `null`
+	 * entries mark inner block positions. Only applies to the Custom HTML
+	 * block.
+	 */
+	innerContent?: Array< string | null >;
+	/**
 	 * Example provides structured data for
 	 * the block preview. You can set to
 	 * `undefined` to disable the preview shown
@@ -135,7 +141,7 @@ export interface BlockVariation<
  * Block attribute definition.
  */
 export interface BlockAttribute {
-	type?: string;
+	type?: string | string[];
 	source?: string;
 	selector?: string;
 	attribute?: string;
@@ -156,6 +162,11 @@ export interface BlockTransform<
 > {
 	type: 'block' | 'enter' | 'files' | 'prefix' | 'raw' | 'shortcode';
 	blocks?: string[];
+	/**
+	 * The target block variation name for block transforms that produce a
+	 * variation of the transformed block type.
+	 */
+	variationName?: string;
 	priority?: number;
 	isMultiBlock?: boolean;
 	isMatch?: (
@@ -222,14 +233,14 @@ export interface BlockType<
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-script
 	 */
-	editorScript?: string;
+	editorScript?: string | string[];
 	/**
 	 * Block type editor style definition.
 	 * It will only be enqueued in the context of the editor.
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style
 	 */
-	editorStyle?: string;
+	editorStyle?: string | string[];
 	/**
 	 * Example provides structured data for the block preview.
 	 * When not defined then no preview is shown.
@@ -238,6 +249,12 @@ export interface BlockType<
 	 */
 	example?: Partial< BlockType > & {
 		innerBlocks?: BlockExampleInnerBlock[];
+		/**
+		 * Static HTML fragments interleaved with inner blocks, where `null`
+		 * entries mark inner block positions. Only applies to the Custom HTML
+		 * block.
+		 */
+		innerContent?: Array< string | null >;
 		/**
 		 * The width of the preview container in pixels.
 		 */
@@ -295,7 +312,7 @@ export interface BlockType<
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#script
 	 */
-	script?: string;
+	script?: string | string[];
 	/**
 	 * Block type frontend style definition.
 	 * It will be enqueued both in the editor and when viewing
@@ -303,7 +320,7 @@ export interface BlockType<
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style
 	 */
-	style?: string;
+	style?: string | string[];
 	/**
 	 * Block type frontend script definition.
 	 * It will only be enqueued when viewing the content on
@@ -311,7 +328,7 @@ export interface BlockType<
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script
 	 */
-	viewScript?: string;
+	viewScript?: string | string[];
 	/**
 	 * Block type frontend module script definition.
 	 * It will only be enqueued when viewing the content on
@@ -319,7 +336,7 @@ export interface BlockType<
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script-module
 	 */
-	viewScriptModule?: string;
+	viewScriptModule?: string | string[];
 	/**
 	 * Block type view style definition.
 	 * It will only be enqueued when viewing the content on
@@ -327,7 +344,7 @@ export interface BlockType<
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-style
 	 */
-	viewStyle?: string;
+	viewStyle?: string | string[];
 	/**
 	 * PHP file to use when rendering the block type on the server
 	 * to show on the front end.
@@ -482,6 +499,14 @@ export interface Block<
 	 * Inner blocks.
 	 */
 	innerBlocks: Block[];
+	/**
+	 * Static HTML fragments interleaved with inner blocks, for the Custom HTML
+	 * block. `null` entries mark the positions of the inner blocks within the
+	 * static markup. When present, this is the canonical source of the block's
+	 * own markup and is used for serialization instead of the `save`
+	 * implementation.
+	 */
+	innerContent?: Array< string | null >;
 	/**
 	 * Original content of the block before validation fixes.
 	 */
@@ -1205,8 +1230,11 @@ export interface BlockEditProps<
  */
 export type BlockConfiguration<
 	Attributes extends Record< string, unknown > = Record< string, unknown >,
-> = Partial< Omit< BlockType< Attributes >, 'icon' > > &
-	Pick< BlockType< Attributes >, 'attributes' | 'category' | 'title' > & {
+> = Partial< Omit< BlockType< Attributes >, 'icon' | 'name' > > &
+	Pick<
+		BlockType< Attributes >,
+		'attributes' | 'category' | 'title' | 'name'
+	> & {
 		icon?: BlockTypeIcon;
 	};
 

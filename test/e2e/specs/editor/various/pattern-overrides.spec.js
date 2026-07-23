@@ -65,10 +65,15 @@ test.describe( 'Pattern Overrides', () => {
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( "This one can't" );
 
+			// Select the paragraph by clicking it. Focusing it
+			// programmatically does not move focus while the second editable
+			// root paragraph is selected and its wrapper holds focus (a nested
+			// editable element cannot take focus from an editing host
+			// ancestor).
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Paragraph' } )
 				.filter( { hasText: 'This paragraph can be edited' } )
-				.focus();
+				.click();
 
 			await editor.clickBlockOptionsMenuItem( 'Rename' );
 			await page
@@ -466,21 +471,11 @@ test.describe( 'Pattern Overrides', () => {
 				// are inert due to the 'click-through' behavior, that requires the
 				// pattern block be selected first before its inner blocks are selectable.
 				await editor.selectBlocks( groupBlock );
-				await expect( patternBlock ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithOverrides ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithBindings ).toHaveAttribute(
-					'inert',
-					'true'
-				);
+				await expect( patternBlock ).not.toHaveAttribute( 'inert' );
+				await expect( blockWithOverrides ).toHaveAttribute( 'inert' );
+				await expect( blockWithBindings ).toHaveAttribute( 'inert' );
 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 			} );
 
@@ -491,16 +486,13 @@ test.describe( 'Pattern Overrides', () => {
 				// of the pattern with bindings are editable, but unbound
 				// blocks are inert.
 				await expect( blockWithOverrides ).not.toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 				await expect( blockWithBindings ).not.toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 			} );
 
@@ -615,11 +607,11 @@ test.describe( 'Pattern Overrides', () => {
 				name: 'Block: Paragraph',
 			} );
 			await expect( headingBlock ).toHaveText( 'Outer heading (edited)' );
-			await expect( headingBlock ).not.toHaveAttribute( 'inert', 'true' );
+			await expect( headingBlock ).not.toHaveAttribute( 'inert' );
 			await expect( paragraphBlock ).toHaveText(
 				'Inner paragraph (edited)'
 			);
-			await expect( paragraphBlock ).toHaveAttribute( 'inert', 'true' );
+			await expect( paragraphBlock ).toHaveAttribute( 'inert' );
 
 			// Edit the outer pattern.
 			await editor.selectBlocks(
@@ -644,7 +636,7 @@ test.describe( 'Pattern Overrides', () => {
 					name: 'Block: Paragraph',
 				} ),
 				'The inner paragraph should be editable'
-			).not.toHaveAttribute( 'inert', 'true' );
+			).not.toHaveAttribute( 'inert' );
 
 			// Visit the post on the frontend.
 			await page.goto( `/?p=${ postId }` );
@@ -691,10 +683,10 @@ test.describe( 'Pattern Overrides', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
 		await editor.showBlockToolbar();
-		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Disconnect' } )
+			.getByRole( 'button', { name: 'Detach' } )
 			.click();
 
 		// Check that the overrides remain.
@@ -737,10 +729,10 @@ test.describe( 'Pattern Overrides', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
 		await editor.showBlockToolbar();
-		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Disconnect' } )
+			.getByRole( 'button', { name: 'Detach' } )
 			.click();
 
 		// Check that the overrides remain.
@@ -767,7 +759,7 @@ test.describe( 'Pattern Overrides', () => {
 			title: 'Button with target',
 			content: `<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button {"metadata":{"name":"${ buttonName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noreferrer noopener nofollow">Button</a></div>
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noopener nofollow">Button</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`,
 			status: 'publish',
@@ -831,10 +823,7 @@ test.describe( 'Pattern Overrides', () => {
 		const buttonLink = previewPage.getByRole( 'link', { name: 'Button' } );
 
 		await expect( buttonLink ).toHaveAttribute( 'target', '_blank' );
-		await expect( buttonLink ).toHaveAttribute(
-			'rel',
-			'noreferrer noopener'
-		);
+		await expect( buttonLink ).toHaveAttribute( 'rel', 'noopener' );
 
 		// Uncheck both checkboxes.
 		await editLinkButton.click();
