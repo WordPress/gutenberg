@@ -159,21 +159,28 @@ const SiteLogo = ( {
 		);
 	}
 
-	if ( ! isResizable || ! naturalWidth || ! naturalHeight ) {
+	if ( ! isResizable ) {
 		return <div style={ { width, height } }>{ imgWrapper }</div>;
 	}
 
 	// Set the default width to a responsible size.
 	// Note that this width is also set in the attached frontend CSS file.
 	const defaultWidth = 120;
+	// SVGs may not report intrinsic dimensions; fall back so resizing still works.
+	const effectiveNaturalWidth = naturalWidth || defaultWidth;
+	const effectiveNaturalHeight = naturalHeight || defaultWidth;
 
 	const currentWidth = width || defaultWidth;
-	const ratio = naturalWidth / naturalHeight;
+	const ratio = effectiveNaturalWidth / effectiveNaturalHeight;
 	const currentHeight = currentWidth / ratio;
 	const minWidth =
-		naturalWidth < naturalHeight ? MIN_SIZE : Math.ceil( MIN_SIZE * ratio );
+		effectiveNaturalWidth < effectiveNaturalHeight
+			? MIN_SIZE
+			: Math.ceil( MIN_SIZE * ratio );
 	const minHeight =
-		naturalHeight < naturalWidth ? MIN_SIZE : Math.ceil( MIN_SIZE / ratio );
+		effectiveNaturalHeight < effectiveNaturalWidth
+			? MIN_SIZE
+			: Math.ceil( MIN_SIZE / ratio );
 
 	// With the current implementation of ResizableBox, an image needs an
 	// explicit pixel value for the max-width. In absence of being able to
@@ -217,8 +224,8 @@ const SiteLogo = ( {
 
 	const canEditImage =
 		logoId &&
-		naturalWidth &&
-		naturalHeight &&
+		effectiveNaturalWidth &&
+		effectiveNaturalHeight &&
 		imageEditing &&
 		!! editMediaEntity;
 
