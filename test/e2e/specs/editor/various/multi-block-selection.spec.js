@@ -1487,9 +1487,19 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			editor,
 			page,
 		} ) => {
+			// One block without `editableRoot` support (verse) and one
+			// with it (paragraph). Starting from the verse, the blocks
+			// are separate editing hosts at click time, which is the
+			// case under test; starting from the paragraph covers a
+			// block that already keeps the wrapper as the editing host.
 			await editor.insertBlock( {
-				name: 'core/heading',
-				attributes: { content: 'heading text' },
+				name: 'core/verse',
+				attributes: {
+					// Several lines, so the block is taller than the
+					// floating toolbar of the block below, which hovers
+					// over the bottom of this one.
+					content: 'verse one<br>verse two<br>verse three',
+				},
 			} );
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -1509,15 +1519,15 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 					};
 				} );
 
-			// Down: from the heading into the paragraph. The selection
+			// Down: from the verse into the paragraph. The selection
 			// must extend to the clicked position, like it does within a
 			// single block, resulting in a partial selection of both
 			// blocks.
 			await editor.canvas
-				.getByText( 'heading text', { exact: true } )
+				.locator( '[data-type="core/verse"]' )
 				.click();
 			await editor.canvas
-				.getByText( 'paragraph text', { exact: true } )
+				.locator( '[data-type="core/paragraph"]' )
 				.click( { modifiers: [ 'Shift' ] } );
 			await expect.poll( getSelection ).toEqual( {
 				blocks: 2,
@@ -1528,15 +1538,15 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 
 			// Deselect: click in the paragraph again.
 			await editor.canvas
-				.getByText( 'paragraph text', { exact: true } )
+				.locator( '[data-type="core/paragraph"]' )
 				.click();
 			await expect
 				.poll( () => getSelection().then( ( s ) => s.blocks ) )
 				.toBe( 1 );
 
-			// Up: from the paragraph into the heading.
+			// Up: from the paragraph into the verse.
 			await editor.canvas
-				.getByText( 'heading text', { exact: true } )
+				.locator( '[data-type="core/verse"]' )
 				.click( { modifiers: [ 'Shift' ] } );
 			await expect.poll( getSelection ).toEqual( {
 				blocks: 2,
