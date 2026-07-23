@@ -42,19 +42,28 @@ const { Tabs } = unlock( componentsPrivateApis );
  * }
  * ```
  *
- * @param {Object}   props                  Component props.
- * @param {string}   [props.defaultTabId]   The ID of the tab to be selected by default when the component renders.
- * @param {Function} props.onClose          Function called when the close button is clicked.
- * @param {Function} props.onSelect         Function called when a tab is selected. Receives the selected tab's ID as an argument.
- * @param {string}   props.selectedTab      The ID of the currently selected tab.
- * @param {Array}    props.tabs             Array of tab objects. Each tab should have: name (string), title (string),
- *                                          panel (React.Node), and optionally panelRef (React.Ref).
- * @param {string}   props.closeButtonLabel Accessibility label for the close button.
- * @param {Object}   ref                    Forward ref to the tabs list element.
+ * @param {Object}     props                  Component props.
+ * @param {string}     [props.defaultTabId]   The ID of the tab to be selected by default when the component renders.
+ * @param {React.Node} [props.headerActions]  Actions rendered before the close button.
+ * @param {Function}   props.onClose          Function called when the close button is clicked.
+ * @param {Function}   props.onSelect         Function called when a tab is selected. Receives the selected tab's ID as an argument.
+ * @param {string}     props.selectedTab      The ID of the currently selected tab.
+ * @param {Array}      props.tabs             Array of tab objects. Each tab should have: name (string), title (string),
+ *                                            panel (React.Node), and optionally panelRef (React.Ref).
+ * @param {string}     props.closeButtonLabel Accessibility label for the close button.
+ * @param {Object}     ref                    Forward ref to the tabs list element.
  * @return {Element} The tabbed sidebar component.
  */
 function TabbedSidebar(
-	{ defaultTabId, onClose, onSelect, selectedTab, tabs, closeButtonLabel },
+	{
+		defaultTabId,
+		headerActions,
+		onClose,
+		onSelect,
+		selectedTab,
+		tabs,
+		closeButtonLabel,
+	},
 	ref
 ) {
 	return (
@@ -66,6 +75,7 @@ function TabbedSidebar(
 				selectedTabId={ selectedTab }
 			>
 				<div className="block-editor-tabbed-sidebar__tablist-and-close-button">
+					{ headerActions }
 					<Button
 						className="block-editor-tabbed-sidebar__close-button"
 						icon={ closeSmall }

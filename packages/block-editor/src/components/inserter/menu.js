@@ -51,6 +51,7 @@ function InserterMenu(
 		shouldFocusBlock = true,
 		onPatternCategorySelection,
 		onClose,
+		headerActions,
 		__experimentalInitialTab,
 		__experimentalInitialCategory,
 	},
@@ -364,6 +365,7 @@ function InserterMenu(
 			<div className="block-editor-inserter__main-area">
 				<TabbedSidebar
 					ref={ tabsRef }
+					headerActions={ headerActions }
 					onSelect={ handleSetSelectedTab }
 					onClose={ onClose }
 					selectedTab={ selectedTab }

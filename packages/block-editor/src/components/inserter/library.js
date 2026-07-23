@@ -24,6 +24,7 @@ function InserterLibrary(
 		__experimentalInitialCategory,
 		__experimentalFilterValue,
 		onPatternCategorySelection,
+		headerActions,
 		onSelect = noop,
 		shouldFocusBlock = false,
 		onClose,
@@ -53,6 +54,7 @@ function InserterLibrary(
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
 			__experimentalFilterValue={ __experimentalFilterValue }
 			onPatternCategorySelection={ onPatternCategorySelection }
+			headerActions={ headerActions }
 			__experimentalInitialTab={ __experimentalInitialTab }
 			__experimentalInitialCategory={ __experimentalInitialCategory }
 			shouldFocusBlock={ shouldFocusBlock }

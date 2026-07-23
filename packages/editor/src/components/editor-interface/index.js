@@ -16,7 +16,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { useState, useCallback } from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { InlineNotices } from '@wordpress/notices';
 
@@ -48,6 +48,20 @@ const interfaceLabels = {
 	actions: __( 'Editor publish' ),
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
+};
+
+const getStoredBoolean = ( key ) => {
+	try {
+		return window.localStorage.getItem( key ) === 'true';
+	} catch {
+		return false;
+	}
+};
+
+const setStoredValue = ( key, value ) => {
+	try {
+		window.localStorage.setItem( key, value );
+	} catch {}
 };
 
 function Notices() {
@@ -132,6 +146,68 @@ export default function EditorInterface( {
 		};
 	}, [] );
 	const { setShowRevisionDiff } = unlock( useDispatch( editorStore ) );
+	const { setIsInserterOpened, setIsListViewOpened } =
+		useDispatch( editorStore );
+	const [ isInserterPinned, setIsInserterPinned ] = useState( () =>
+		getStoredBoolean( 'bec_inserter_pinned' )
+	);
+	const [ isListViewPinned, setIsListViewPinned ] = useState( () =>
+		getStoredBoolean( 'bec_list_view_pinned' )
+	);
+	const [ sidebarPosition, setSidebarPosition ] = useState( () => {
+		try {
+			return (
+				window.localStorage.getItem( 'bec_sidebar_position' ) || 'left'
+			);
+		} catch {
+			return 'left';
+		}
+	} );
+
+	useEffect( () => {
+		document.body.classList.toggle(
+			'bec-position-left',
+			sidebarPosition === 'left'
+		);
+		document.body.classList.toggle(
+			'bec-position-right',
+			sidebarPosition === 'right'
+		);
+		return () => {
+			document.body.classList.remove( 'bec-position-left' );
+			document.body.classList.remove( 'bec-position-right' );
+		};
+	}, [ sidebarPosition ] );
+
+	useEffect( () => {
+		if ( isInserterPinned ) {
+			setIsInserterOpened( true );
+		}
+		if ( isListViewPinned ) {
+			setIsListViewOpened( true );
+		}
+	}, [
+		isInserterPinned,
+		isListViewPinned,
+		setIsInserterOpened,
+		setIsListViewOpened,
+	] );
+
+	const toggleSidebarPosition = () => {
+		const nextPosition = sidebarPosition === 'right' ? 'left' : 'right';
+		setSidebarPosition( nextPosition );
+		setStoredValue( 'bec_sidebar_position', nextPosition );
+	};
+	const toggleInserterPin = () => {
+		const nextPinned = ! isInserterPinned;
+		setIsInserterPinned( nextPinned );
+		setStoredValue( 'bec_inserter_pinned', String( nextPinned ) );
+	};
+	const toggleListViewPin = () => {
+		const nextPinned = ! isListViewPinned;
+		setIsListViewPinned( nextPinned );
+		setStoredValue( 'bec_list_view_pinned', String( nextPinned ) );
+	};
 
 	// Runs unconditionally so join/leave/save notifications are dispatched
 	// regardless of viewport width or whether the header centre area is visible.
@@ -204,8 +280,22 @@ export default function EditorInterface( {
 			secondarySidebar={
 				! isPreviewMode &&
 				mode === 'visual' &&
-				( ( isInserterOpened && <InserterSidebar /> ) ||
-					( isListViewOpened && <ListViewSidebar /> ) )
+				( ( isInserterOpened && (
+					<InserterSidebar
+						isPinned={ isInserterPinned }
+						onTogglePin={ toggleInserterPin }
+						position={ sidebarPosition }
+						onTogglePosition={ toggleSidebarPosition }
+					/>
+				) ) ||
+					( isListViewOpened && (
+						<ListViewSidebar
+							isPinned={ isListViewPinned }
+							onTogglePin={ toggleListViewPin }
+							position={ sidebarPosition }
+							onTogglePosition={ toggleSidebarPosition }
+						/>
+					) ) )
 			}
 			sidebar={
 				! isPreviewMode &&

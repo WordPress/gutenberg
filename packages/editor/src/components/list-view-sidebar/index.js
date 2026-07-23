@@ -3,6 +3,7 @@
  */
 import {
 	__experimentalListView as ListView,
+	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
@@ -19,12 +20,22 @@ import { ESCAPE } from '@wordpress/keycodes';
 import ListViewOutline from './list-view-outline';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import SidebarHeaderActions from '../sidebar-header-actions';
 
 const { TabbedSidebar } = unlock( blockEditorPrivateApis );
 
-export default function ListViewSidebar() {
+export default function ListViewSidebar( {
+	isPinned,
+	onTogglePin,
+	position,
+	onTogglePosition,
+} ) {
 	const { setIsListViewOpened } = useDispatch( editorStore );
 	const { getListViewToggleRef } = unlock( useSelect( editorStore ) );
+	const blocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks(),
+		[]
+	);
 
 	// This hook handles focus when the sidebar first renders.
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
@@ -50,6 +61,7 @@ export default function ListViewSidebar() {
 	const [ dropZoneElement, setDropZoneElement ] = useState( null );
 	// Tracks our current tab.
 	const [ tab, setTab ] = useState( 'list-view' );
+	const [ isExpanded, setIsExpanded ] = useState( false );
 
 	// This ref refers to the sidebar as a whole.
 	const sidebarRef = useRef();
@@ -107,6 +119,69 @@ export default function ListViewSidebar() {
 		}
 	}, [ closeListView, tab ] );
 
+	const invokeExpander = useCallback( ( expander ) => {
+		const propsKey = Object.keys( expander ).find( ( key ) =>
+			key.startsWith( '__reactProps$' )
+		);
+		const onClick = propsKey && expander[ propsKey ]?.onClick;
+		if ( ! onClick ) {
+			return;
+		}
+		let cancelled = false;
+		const event = {
+			currentTarget: expander,
+			target: expander,
+			defaultPrevented: false,
+			preventDefault: () => {
+				cancelled = true;
+				event.defaultPrevented = true;
+			},
+			stopPropagation: () => {
+				cancelled = true;
+			},
+			stopImmediatePropagation: () => {
+				cancelled = true;
+			},
+		};
+		onClick( event, { forceToggle: true } );
+		return cancelled;
+	}, [] );
+
+	const hasNestedBlocks = blocks.some(
+		( block ) => block.innerBlocks?.length > 0
+	);
+	const toggleAllBlocks = useCallback( () => {
+		if ( ! hasNestedBlocks ) {
+			return;
+		}
+		const expanders = () => [
+			...document.querySelectorAll( '.block-editor-list-view__expander' ),
+		];
+		const collapsedRows = () => [
+			...document.querySelectorAll(
+				'[role="row"][aria-expanded="false"]'
+			),
+		];
+		const shouldExpand = collapsedRows().length > 0;
+		setIsExpanded( shouldExpand );
+		let pass = 0;
+		const runPass = () => {
+			const nodes = shouldExpand
+				? expanders()
+				: [
+						...document.querySelectorAll(
+							'[role="row"][aria-expanded="true"] .block-editor-list-view__expander'
+						),
+				  ];
+			nodes.forEach( invokeExpander );
+			pass += 1;
+			if ( shouldExpand && pass < 8 ) {
+				window.requestAnimationFrame( runPass );
+			}
+		};
+		runPass();
+	}, [ hasNestedBlocks, invokeExpander ] );
+
 	// This only fires when the sidebar is open because of the conditional rendering.
 	// It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
 	useShortcut( 'core/editor/toggle-list-view', handleToggleListViewShortcut );
@@ -119,6 +194,16 @@ export default function ListViewSidebar() {
 			ref={ sidebarRef }
 		>
 			<TabbedSidebar
+				headerActions={
+					<SidebarHeaderActions
+						isPinned={ isPinned }
+						onTogglePin={ onTogglePin }
+						position={ position }
+						onTogglePosition={ onTogglePosition }
+						onToggleExpand={ toggleAllBlocks }
+						isExpanded={ isExpanded }
+					/>
+				}
 				tabs={ [
 					{
 						name: 'list-view',

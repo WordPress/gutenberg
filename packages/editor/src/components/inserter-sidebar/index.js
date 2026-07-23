@@ -17,10 +17,16 @@ import { store as interfaceStore } from '@wordpress/interface';
  */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import SidebarHeaderActions from '../sidebar-header-actions';
 
 const { PrivateInserterLibrary } = unlock( blockEditorPrivateApis );
 
-export default function InserterSidebar() {
+export default function InserterSidebar( {
+	isPinned,
+	onTogglePin,
+	position,
+	onTogglePosition,
+} ) {
 	const {
 		blockSectionRootClientId,
 		inserterSidebarToggleRef,
@@ -99,6 +105,14 @@ export default function InserterSidebar() {
 						: undefined
 				}
 				ref={ libraryRef }
+				headerActions={
+					<SidebarHeaderActions
+						isPinned={ isPinned }
+						onTogglePin={ onTogglePin }
+						position={ position }
+						onTogglePosition={ onTogglePosition }
+					/>
+				}
 				onClose={ closeInserterSidebar }
 			/>
 		</div>

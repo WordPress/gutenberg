@@ -9,6 +9,25 @@
 	isolation: isolate;
 }
 
+body.bec-position-left {
+	.interface-interface-skeleton__secondary-sidebar {
+		left: 0;
+		right: auto;
+	}
+}
+
+body.bec-position-right {
+	.interface-interface-skeleton__secondary-sidebar {
+		left: auto;
+		right: 0;
+	}
+}
+
+.editor-sidebar-header-actions {
+	display: flex;
+	align-items: center;
+}
+
 .editor-editor-interface .editor-notices {
 	padding: var(--wpds-dimension-padding-md);
 }
