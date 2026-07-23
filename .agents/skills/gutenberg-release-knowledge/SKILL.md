@@ -9,7 +9,7 @@ Turn one named Gutenberg release into a traceable, human-reviewed documentation 
 
 ## Inputs and scope
 
-- Require an explicit Gutenberg release number such as `23.6`.
+- Require an explicit Gutenberg release number such as `23.6`, or a requested count of recent stable releases or resulting PRs.
 - Ask where the draft PR should live if the user has not specified the repository, base branch, and fork.
 - Keep collection deterministic and analysis interpretive.
 - Treat “no useful durable guidance found” as a valid result.
@@ -24,6 +24,8 @@ Turn one named Gutenberg release into a traceable, human-reviewed documentation 
 5. Create a dedicated topic branch from the requested base.
 
 ## Establish the release set
+
+When selecting recent releases, read the repository's published Releases list from newest to oldest. Exclude drafts, GitHub prereleases, and tags containing `rc`, `beta`, or `alpha`, case-insensitively. If the user requests a number of resulting PRs, continue through older stable releases until that many worthwhile PRs exist; do not count releases that yield no durable guidance.
 
 1. Resolve the stable tag `v<release>.0` and the preceding stable Gutenberg tag.
 2. Extract commits and pull request numbers from the tag range.
