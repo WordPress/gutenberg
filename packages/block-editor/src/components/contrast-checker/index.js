@@ -97,12 +97,16 @@ export function getContrastWarning( {
 		);
 		const textHasTransparency = colordTextColor.alpha() < 1;
 
+		// The contrast check above ignores alpha, so a "not readable" result
+		// isn't trustworthy when either color is transparent. Only show the
+		// contrast message when both colors are opaque, and let transparent
+		// colors fall through to the transparency warning below instead of
+		// being silently skipped.
+		const canCheckContrast =
+			! backgroundColorHasTransparency && ! textHasTransparency;
+
 		// If the contrast is not readable.
-		if ( ! isColordTextReadable ) {
-			// Don't show the message if the background or text is transparent.
-			if ( backgroundColorHasTransparency || textHasTransparency ) {
-				continue;
-			}
+		if ( canCheckContrast && ! isColordTextReadable ) {
 			// A caller can provide panel-specific copy that is clearer and
 			// more concise than the generic brighter/darker guidance.
 			if ( messageOverride ) {

@@ -491,6 +491,26 @@ describe( 'ContrastChecker', () => {
 		).toBeVisible();
 	} );
 
+	test( 'should render transparency warning when the text color is both transparent and low contrast with alpha checker enabled.', () => {
+		render(
+			<ContrastChecker
+				backgroundColor="#f7f7f7"
+				textColor="rgba(247,247,247,0.36)"
+				isLargeText={ isLargeText }
+				enableAlphaChecker
+			/>
+		);
+
+		expect( speak ).toHaveBeenCalledWith(
+			'Transparent text may be hard for people to read.'
+		);
+		expect(
+			screen.getByText(
+				'Transparent text may be hard for people to read.'
+			)
+		).toBeVisible();
+	} );
+
 	test( 'should render component when the colors meet AA WCAG guidelines but all colors have alpha transparency with alpha checker enabled.', () => {
 		render(
 			<ContrastChecker
