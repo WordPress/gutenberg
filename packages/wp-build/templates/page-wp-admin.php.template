@@ -314,7 +314,32 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 			}
 		}
 	</style>
-	<div id="{{PAGE_SLUG}}-wp-admin-app" class="boot-layout-container"></div>
+	<div id="{{PAGE_SLUG}}-wp-admin-app" class="boot-layout-container">
+		<?php
+		/**
+		 * No-JavaScript fallback.
+		 *
+		 * This markup is rendered inside the application mount point, so the
+		 * JavaScript application replaces it when it boots. It is also marked
+		 * hide-if-js so it is hidden as soon as JavaScript is available, even
+		 * before the app mounts. When JavaScript is disabled it stays as the
+		 * page content, providing a main heading and an explanatory notice
+		 * instead of a completely blank screen.
+		 *
+		 * It lives inside .boot-layout-container on purpose: the critical styles
+		 * above hide every other direct child of #wpbody-content, so a sibling
+		 * fallback would be hidden even when JavaScript is disabled.
+		 */
+		$no_js_heading     = ! empty( $GLOBALS['title'] ) ? $GLOBALS['title'] : __( 'This screen requires JavaScript' );
+		$no_js_description = ! empty( $GLOBALS['description'] ) ? $GLOBALS['description'] : __( 'This page requires JavaScript. Please enable JavaScript in your browser to use this screen.' );
+		?>
+		<div class="wrap hide-if-js">
+			<h1><?php echo esc_html( $no_js_heading ); ?></h1>
+			<div class="notice notice-error">
+				<p><?php esc_html( $no_js_description ); ?></p>
+			</div>
+		</div>
+	</div>
 	<?php
 }
 
