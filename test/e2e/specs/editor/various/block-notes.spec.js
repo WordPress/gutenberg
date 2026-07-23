@@ -1631,6 +1631,101 @@ test.describe( 'Block Notes', () => {
 			await expect.poll( alphaOf ).toBeGreaterThan( 0.4 );
 		} );
 
+		test( 'clicking between inline markers selects the matching note', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha bravo charlie delta.' },
+			} );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+
+			// Two inline notes on the same paragraph. Collapse a select-all to
+			// the start with ArrowLeft (cross-platform; `Home` does not move the
+			// caret on macOS), then walk to each word and extend the selection.
+			async function addInlineNote( { skip, length, content } ) {
+				await paragraph.click();
+				await page.keyboard.press( 'ControlOrMeta+a' );
+				await page.keyboard.press( 'ArrowLeft' );
+				for ( let i = 0; i < skip; i++ ) {
+					await page.keyboard.press( 'ArrowRight' );
+				}
+				for ( let i = 0; i < length; i++ ) {
+					await page.keyboard.press( 'Shift+ArrowRight' );
+				}
+				await editor.clickBlockOptionsMenuItem( 'Add note' );
+				await page
+					.getByRole( 'textbox', { name: 'New note', exact: true } )
+					.fill( content );
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Add note', exact: true } )
+					.click();
+			}
+
+			// "Alpha" (offsets 0-5) and "charlie" (offsets 12-19). Wrap the
+			// later word first so neither selection has to move the caret across
+			// an existing marker's boundary, which adds an extra caret stop.
+			await addInlineNote( {
+				skip: 12,
+				length: 7,
+				content: 'Charlie note',
+			} );
+			await addInlineNote( {
+				skip: 0,
+				length: 5,
+				content: 'Alpha note',
+			} );
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const alphaThread = settings.getByRole( 'treeitem', {
+				name: 'Note: Alpha note',
+			} );
+			const charlieThread = settings.getByRole( 'treeitem', {
+				name: 'Note: Charlie note',
+			} );
+			const alphaMark = editor.canvas
+				.locator( 'mark.wp-note' )
+				.filter( { hasText: 'Alpha' } );
+			const charlieMark = editor.canvas
+				.locator( 'mark.wp-note' )
+				.filter( { hasText: 'charlie' } );
+
+			// Creating a note selects it, so the last-added note starts selected.
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+
+			// Placing the caret inside a marker syncs the open sidebar to that
+			// note; clicking between the two markers flips the selection.
+			await charlieMark.click();
+			await expect( charlieThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+
+			await alphaMark.click();
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect( charlieThread ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+		} );
+
 		test.describe( 'Floating alignment', () => {
 			// Tall enough that the floating form/thread anchored at the last
 			// line still fits fully within the viewport: a thread extending
