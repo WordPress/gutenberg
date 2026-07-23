@@ -539,10 +539,8 @@ function describeFormatChange(
  * more verbose for screen readers. This merges such runs into a single removed part and a
  * single added part.
  *
- * @param {Array<{ added?: boolean, removed?: boolean, value: string }>} parts
- *     Output from `diffWordsWithSpace`.
- * @return {Array<{ added?: boolean, removed?: boolean, value: string }>}
- *     Merged parts.
+ * @param {Array<{ added?: boolean, removed?: boolean, value: string }>} parts Output from `diffWordsWithSpace`.
+ * @return {Array<{ added?: boolean, removed?: boolean, value: string }>} Merged parts.
  */
 function mergeTextDiffParts( parts ) {
 	const result = [];
