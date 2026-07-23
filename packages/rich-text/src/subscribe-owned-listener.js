@@ -7,42 +7,12 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
 // ownerDocument -> eventTypeKey -> WeakMap< element, Set< callback > >.
 //
 // Subscribers share one delegated listener per document, event type and phase.
-// `dispatch` works out which elements own the event and fires their callbacks,
+// Its callback works out which element owns the event and fires its callbacks,
 // rather than every subscriber checking whether it owns the event: bound to the
 // document, all of them run on every event, which with an editable element per
 // block is O(blocks) per keystroke. The element map is weak so a detached
 // element (or the iframe holding it) can be garbage-collected.
 const registries = new WeakMap();
-
-/**
- * Fires the callbacks of every subscribed element that owns the event.
- *
- * These are editing and selection events, so the element that owns the event is
- * the one that owns the selection, and it contains the selection anchor. The
- * owner is found by walking up from the anchor, testing `ownsSelection`, rather
- * than testing every subscriber. When there is no selection, an editable can
- * still be focused, so the walk starts from the focused element instead.
- *
- * @param {WeakMap}  elements      Subscribed elements mapped to their callbacks.
- * @param {Document} ownerDocument Document the listener is attached to.
- * @param {Event}    event         The event to dispatch.
- */
-function dispatch( elements, ownerDocument, event ) {
-	const anchorNode = ownerDocument.defaultView?.getSelection()?.anchorNode;
-
-	for (
-		let node = anchorNode ?? ownerDocument.activeElement;
-		node;
-		node = node.parentNode
-	) {
-		const callbacks = elements.get( node );
-		if ( callbacks && ownsSelection( node ) ) {
-			for ( const callback of callbacks ) {
-				callback( event );
-			}
-		}
-	}
-}
 
 /**
  * Subscribes a callback for editing and selection events the given editable
@@ -78,25 +48,46 @@ export function subscribeOwnedListener(
 		elements = new WeakMap();
 		byEvent.set( key, elements );
 		// One delegated listener per document, event type and phase, bound to
-		// the document so it is reached for every event and lets `dispatch`
-		// pick the owners. Riding the delegated listener keeps owned and
-		// element-bound subscribers in DOM order relative to each other.
+		// the document so it is reached for every event. Riding the delegated
+		// listener keeps owned and element-bound subscribers in DOM order
+		// relative to each other.
 		subscribeDelegatedListener(
 			ownerDocument,
 			eventType,
-			( event ) => dispatch( elements, ownerDocument, event ),
+			( event ) => {
+				// These are editing and selection events, so the element that
+				// owns the event owns the selection, and it contains the
+				// selection anchor. Walk up from the anchor, testing
+				// `ownsSelection`, rather than testing every subscriber. When
+				// there is no selection an editable can still be focused, so
+				// start from the focused element instead.
+				const { defaultView, activeElement } = ownerDocument;
+				const anchorNode = defaultView?.getSelection()?.anchorNode;
+				for (
+					let node = anchorNode ?? activeElement;
+					node;
+					node = node.parentNode
+				) {
+					const callbacks = elements.get( node );
+					if ( callbacks && ownsSelection( node ) ) {
+						for ( const cb of callbacks ) {
+							cb( event );
+						}
+					}
+				}
+			},
 			capture
 		);
 	}
 
-	let callbacks = elements.get( element );
-	if ( ! callbacks ) {
-		callbacks = new Set();
-		elements.set( element, callbacks );
+	let set = elements.get( element );
+	if ( ! set ) {
+		set = new Set();
+		elements.set( element, set );
 	}
-	callbacks.add( callback );
+	set.add( callback );
 
 	return () => {
-		callbacks.delete( callback );
+		set.delete( callback );
 	};
 }
