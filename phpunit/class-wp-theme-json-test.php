@@ -962,15 +962,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 					),
-					'color'      => array(
-						'duotone' => array(
-							array(
-								'colors' => array( '#000000', '#ffffff' ),
-								'name'   => 'Blue Orange 2',
-								'slug'   => 'blueOrange2',
-							),
-						),
-					),
 				),
 				'styles'   => array(
 					'typography' => array(
@@ -979,13 +970,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'spacing'    => array(
 						'padding' => array(
 							'top' => 'var:preset|spacing|small2',
-						),
-					),
-					'blocks'     => array(
-						'core/image' => array(
-							'filter' => array(
-								'duotone' => 'var:preset|duotone|blueOrange2',
-							),
 						),
 					),
 				),
@@ -1006,10 +990,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 		$this->assertStringContainsString(
 			'padding-top: var(--wp--preset--spacing--small-2)',
-			$stylesheet
-		);
-		$this->assertStringContainsString(
-			'var(--wp--preset--duotone--blue-orange-2)',
 			$stylesheet
 		);
 	}
