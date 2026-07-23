@@ -15,8 +15,8 @@ export interface ThemeProviderSettings {
 		 * (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and throw an
 		 * error.
 		 *
-		 * When omitted, inherits from the parent `ThemeProvider`, otherwise
-		 * the prebuilt default applies.
+		 * When omitted, inherits from the parent `ThemeProvider`. If there is
+		 * no parent, the prebuilt default applies.
 		 */
 		primary?: string;
 		/**
@@ -27,8 +27,8 @@ export interface ThemeProviderSettings {
 		 * (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and throw an
 		 * error.
 		 *
-		 * When omitted, inherits from the parent `ThemeProvider`, otherwise
-		 * the prebuilt default applies.
+		 * When omitted, inherits from the parent `ThemeProvider`. If there is
+		 * no parent, the prebuilt default applies.
 		 */
 		background?: string;
 	};
@@ -41,8 +41,8 @@ export interface ThemeProviderSettings {
 		 * The cursor style for interactive controls that are not links
 		 * (e.g. buttons, checkboxes, and toggles).
 		 *
-		 * When omitted, inherits from the parent `ThemeProvider`, otherwise
-		 * the prebuilt default applies (`pointer`).
+		 * When omitted, inherits from the parent `ThemeProvider`. If there is
+		 * no parent, the prebuilt default applies (`pointer`).
 		 */
 		control?: 'default' | 'pointer';
 	};
@@ -55,8 +55,8 @@ export interface ThemeProviderSettings {
 	 * subtree; it sets the overall amount of roundness, not a single token
 	 * size.
 	 *
-	 * When omitted, inherits from the parent `ThemeProvider`, otherwise
-	 * the prebuilt default applies (`subtle`).
+	 * When omitted, inherits from the parent `ThemeProvider`. If there is no
+	 * parent, the prebuilt default applies (`subtle`).
 	 */
 	cornerRadius?: CornerRadiusPreset;
 }
