@@ -259,6 +259,13 @@ function proceed( conversionMap: Record< string, ReactElement > ): boolean {
 				return true;
 			}
 
+			// A closing tag with no matching opening tag on the stack is
+			// invalid. Bail and return the string as-is.
+			if ( 0 === stackDepth ) {
+				addText();
+				return false;
+			}
+
 			// Otherwise we're nested and we have to close out the current
 			// block and add it as a innerBlock to the parent.
 			const stackTop = stack.pop();

@@ -73,6 +73,13 @@ describe( 'createInterpolateElement', () => {
 			createInterpolateElement( testString, { 'spaced token': <em /> } )
 		).toEqual( expectedElement );
 	} );
+	it( 'returns same string when there is an unmatched closing tag', () => {
+		const testString = 'This is a </item> string';
+		const expectedElement = <>{ testString }</>;
+		expect(
+			createInterpolateElement( testString, { item: <em /> } )
+		).toEqual( expectedElement );
+	} );
 	it( 'returns expected react element for non nested components', () => {
 		const testString = 'This is a string with <a>a link</a>.';
 		const expectedElement = createElement(
