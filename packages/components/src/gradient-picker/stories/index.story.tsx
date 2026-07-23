@@ -31,6 +31,7 @@ const meta: Meta< typeof GradientPicker > = {
 		onChange: fn(),
 	},
 	argTypes: {
+		selectedSlug: { control: false },
 		value: { control: false },
 	},
 };
@@ -91,17 +92,23 @@ const GRADIENTS = [
 
 const Template = ( {
 	onChange,
+	value,
+	selectedSlug,
 	...props
 }: React.ComponentProps< typeof GradientPicker > ) => {
-	const [ gradient, setGradient ] =
-		useState< ( typeof props )[ 'value' ] >( null );
+	const [ gradient, setGradient ] = useState<
+		React.ComponentProps< typeof GradientPicker >[ 'value' ]
+	>( value ?? null );
+	const [ slug, setSlug ] = useState< string | undefined >( selectedSlug );
 	return (
 		<GradientPicker
 			{ ...props }
 			value={ gradient }
-			onChange={ ( ...changeArgs ) => {
-				setGradient( ...changeArgs );
-				onChange?.( ...changeArgs );
+			selectedSlug={ slug }
+			onChange={ ( currentGradient, index, newSlug ) => {
+				setGradient( currentGradient );
+				setSlug( newSlug );
+				onChange?.( currentGradient, index, newSlug );
 			} }
 		/>
 	);
@@ -118,6 +125,35 @@ export const WithNoExistingGradients: GradientPickerStory = {
 	render: Template,
 	args: {
 		gradients: [],
+	},
+};
+
+export const DuplicateGradients: GradientPickerStory = {
+	render: Template,
+	args: {
+		gradients: [
+			{
+				name: 'Dark Background',
+				slug: 'dark-background',
+				gradient:
+					'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)',
+			},
+			{
+				name: 'Dark Text',
+				slug: 'dark-text',
+				gradient:
+					'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)',
+			},
+			{
+				name: 'Brand',
+				slug: 'brand',
+				gradient:
+					'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)',
+			},
+		],
+		value: 'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)',
+		selectedSlug: 'dark-text',
+		disableCustomGradients: true,
 	},
 };
 

@@ -23,16 +23,20 @@ Today, the only fulfillment is a `link`: a target the host renders as an anchor.
 }
 ```
 
-`href` is a complete URL or path; external URLs and admin entry points load a full page. Two optional flags refine it:
+`href`: absolute URL, admin `.php` entry point, root-relative path, or a file
+next to the widget (resolved to a plugin URL on the server). `data:` and
+`javascript:` hrefs are rejected at registration. Use `downloadBlob` for client-generated
+files. Query strings on local filenames (e.g. `report.csv?v=2`) are not
+resolved as widget files.
 
--   `download`: turns the target into a file download; a string names the file.
--   `openInNewTab`: opens the target in a new browser tab.
+-   `download`: download instead of navigate; a string sets the filename.
+-   `openInNewTab`: open in a new tab.
 
 ```ts
 {
 	id: 'export',
 	label: __( 'Export CSV' ),
-	href: reportCsvUrl,
+	href: 'report.csv', // widgets/{name}/report.csv
 	download: 'report.csv',
 }
 ```

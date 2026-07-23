@@ -1,6 +1,12 @@
 /**
+ * WordPress dependencies
+ */
+import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
+
+/**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import EditorKeyboardShortcuts from './global-keyboard-shortcuts';
 
 // Block Creation Components.
@@ -17,8 +23,6 @@ export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
 export { default as EditorNotices } from './editor-notices';
 export { default as EditorSnackbars } from './editor-snackbars';
-export { default as EntitiesSavedStates } from './entities-saved-states';
-export { useIsDirty as useEntitiesSavedStatesIsDirty } from './entities-saved-states/hooks/use-is-dirty';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as LocalAutosaveMonitor } from './local-autosave-monitor';
 export { default as PageAttributesCheck } from './page-attributes/check';
@@ -122,3 +126,8 @@ export const VisualEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
  * and toggling the sidebar.
  */
 export const TextEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
+
+const { EntitiesSavedStates, useEntitiesSavedStatesIsDirty } =
+	unlock( coreDataPrivateApis );
+
+export { EntitiesSavedStates, useEntitiesSavedStatesIsDirty };
