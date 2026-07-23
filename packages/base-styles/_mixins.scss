@@ -157,9 +157,9 @@
 
 
 @mixin input-style__focus() {
-	border-color: wpds.var("--wpds-color-stroke-interactive-brand");
+	border-color: wpds.var("--wpds-color-stroke-focus");
 	// Expand the default border focus style by .5px to be a total of 1.5px.
-	box-shadow: 0 0 0 0.5px wpds.var("--wpds-color-stroke-interactive-brand");
+	box-shadow: 0 0 0 0.5px wpds.var("--wpds-color-stroke-focus");
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
 }
