@@ -12,6 +12,13 @@ import {
 	sidesVertical,
 } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { getPresetSlug, isValuePreset } from '../preset-input-control/utils';
+
+const SPACING_PRESET_TYPE = 'spacing';
+
 export const RANGE_CONTROL_MAX_SIZE = 8;
 
 export const ALL_SIDES = [ 'top', 'bottom', 'left', 'right' ];
@@ -64,10 +71,7 @@ export const VIEWS = {
  * @return {boolean} Return true if value is string in format var:preset|spacing|.
  */
 export function isValueSpacingPreset( value ) {
-	if ( ! value?.includes ) {
-		return false;
-	}
-	return value === '0' || value.includes( 'var:preset|spacing|' );
+	return isValuePreset( value, SPACING_PRESET_TYPE );
 }
 
 /**
@@ -83,7 +87,7 @@ export function getCustomValueFromPreset( value, spacingSizes ) {
 		return value;
 	}
 
-	const slug = getSpacingPresetSlug( value );
+	const slug = getPresetSlug( value, SPACING_PRESET_TYPE );
 	const spacingSize = spacingSizes.find(
 		( size ) => String( size.slug ) === slug
 	);
@@ -140,27 +144,6 @@ export function getSpacingPresetCssVar( value ) {
 }
 
 /**
- * Returns the slug section of the given spacing preset string.
- *
- * @param {string} value Value to extract slug from.
- *
- * @return {string|undefined} The int value of the slug from given spacing preset.
- */
-export function getSpacingPresetSlug( value ) {
-	if ( ! value ) {
-		return;
-	}
-
-	if ( value === '0' || value === 'default' ) {
-		return value;
-	}
-
-	const slug = value.match( /var:preset\|spacing\|(.+)/ );
-
-	return slug ? slug[ 1 ] : undefined;
-}
-
-/**
  * Converts spacing preset value into a Range component value .
  *
  * @param {string} presetValue  Value to convert to Range value.
@@ -175,7 +158,7 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 	const slug =
 		parseFloat( presetValue, 10 ) === 0
 			? '0'
-			: getSpacingPresetSlug( presetValue );
+			: getPresetSlug( presetValue, SPACING_PRESET_TYPE );
 	const sliderValue = spacingSizes.findIndex( ( spacingSize ) => {
 		return String( spacingSize.slug ) === slug;
 	} );
