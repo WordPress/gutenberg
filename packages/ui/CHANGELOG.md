@@ -18,6 +18,7 @@
 
 ### Internal
 
+-   Refactor shared focus utilities to use the `outset-ring__focus()` mixin from `@wordpress/base-styles` ([#80635](https://github.com/WordPress/gutenberg/pull/80635)).
 -   Use keyed children arrays instead of Fragments in Storybook stories so Show code examples omit `Fragment` wrappers ([#80352](https://github.com/WordPress/gutenberg/pull/80352)).
 
 ## 0.18.0 (2026-07-14)
