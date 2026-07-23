@@ -5675,7 +5675,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * For example, `var:preset|color|vivid-green-cyan` becomes `var(--wp--preset--color--vivid-green-cyan)`.
 	 *
 	 * @since 6.3.0
-	 * @since 7.0.0 Preset reference slugs are kebab-cased to match the generated custom properties.
+	 * @since 7.1.0 Preset reference slugs are kebab-cased to match the generated custom properties.
 	 * @param string $value The variable such as var:preset|color|vivid-green-cyan to convert.
 	 * @return string The converted variable.
 	 */
