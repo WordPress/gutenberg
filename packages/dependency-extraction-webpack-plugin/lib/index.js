@@ -131,12 +131,16 @@ class DependencyExtractionWebpackPlugin {
 	}
 
 	/**
-	 * @param {any} asset Asset Data
+	 * @param {any}     asset  Asset Data
+	 * @param {boolean} pretty Whether to pretty-print the PHP output.
 	 * @return {string} Stringified asset data suitable for output
 	 */
-	stringify( asset ) {
+	stringify( asset, pretty = false ) {
 		if ( this.options.outputFormat === 'php' ) {
-			return `<?php return ${ json2php(
+			const printer = pretty
+				? json2php.make( { linebreak: '\n', indent: '\t' } )
+				: json2php;
+			return `<?php return ${ printer(
 				JSON.parse( JSON.stringify( asset ) )
 			) };\n`;
 		}
@@ -462,9 +466,13 @@ class DependencyExtractionWebpackPlugin {
 					.replace( /\.m?js$/i, suffix );
 			}
 
+			// Pretty-print the development (non-minified) asset file for
+			// readability; keep the `.min` counterpart compact.
+			const isMinified = /\.min\.m?js$/i.test( chunkJSFile );
+
 			// Add source and file into compilation for webpack to output.
 			compilation.assets[ assetFilename ] = new RawSource(
-				this.stringify( assetData )
+				this.stringify( assetData, ! isMinified )
 			);
 			chunk.files.add( assetFilename );
 		}
@@ -482,9 +490,13 @@ class DependencyExtractionWebpackPlugin {
 				assetsFilePath
 			);
 
+			// Pretty-print the development (non-minified) combined asset
+			// file for readability; keep the `.min` counterpart compact.
+			const isMinified = /\.min\.\w+$/i.test( assetsFilename );
+
 			// Add source into compilation for webpack to output.
 			compilation.assets[ assetsFilename ] = new RawSource(
-				this.stringify( combinedAssetsData )
+				this.stringify( combinedAssetsData, ! isMinified )
 			);
 		}
 	}

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Pretty-print the development (non-minified) PHP asset files for readability, while keeping `.min` asset files compact ([#48106](https://github.com/WordPress/gutenberg/issues/48106)).
+
 ## 6.51.0 (2026-07-14)
 
 ### Bug Fixes
