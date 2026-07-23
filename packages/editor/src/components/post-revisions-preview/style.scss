@@ -9,8 +9,6 @@
 	}
 }
 
-// Positions block-changed marks relative to the slider track without
-// modifying the RangeControl component.
 .editor-revisions-header__slider-wrapper {
 	position: relative;
 	display: flex;
@@ -18,9 +16,6 @@
 	min-width: 0;
 }
 
-// Focusable marker on the slider rail at each revision where the selected
-// block changed. Matches the accessibility pattern established for
-// `.revision-diff-marker`: non-color indicator, 24×24 px hit target, focus ring.
 .editor-revisions-header__block-changed-mark {
 	position: absolute;
 	top: 50%;
