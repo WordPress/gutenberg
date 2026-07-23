@@ -98,6 +98,8 @@ Before proposing text:
 
 Keep the change small and reviewable. Prefer one coherent topic over a release-wide grab bag.
 
+Match the destination file's existing source formatting. In Markdown files that keep prose paragraphs or list items on one source line, do the same for added text; do not hard-wrap prose at an arbitrary column. Never reflow unchanged prose solely to satisfy a preferred line length, and inspect the final diff for avoidable mid-sentence line breaks.
+
 Use a concise PR description:
 
 ```markdown
