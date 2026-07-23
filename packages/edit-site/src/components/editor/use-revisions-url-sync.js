@@ -19,38 +19,72 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
  */
 const URL_WRITE_DEBOUNCE_MS = 300;
 
-export default function useRevisionsURLSync( enabled ) {
+export default function useRevisionsURLSync( enabled, postType, postId ) {
 	const location = useLocation();
 	const history = useHistory();
-	const { postId, currentRevisionId } = useSelect( ( select ) => {
-		return {
-			postId: select( editorStore ).getCurrentPostId(),
-			currentRevisionId: unlock(
-				select( editorStore )
-			).getCurrentRevisionId(),
-		};
-	}, [] );
-	const { openRevision } = unlock( useDispatch( editorStore ) );
+	const { currentPostType, currentPostId, currentRevisionId } = useSelect(
+		( select ) => {
+			const editor = select( editorStore );
+			return {
+				currentPostType: editor.getCurrentPostType(),
+				currentPostId: editor.getCurrentPostId(),
+				currentRevisionId: unlock( editor ).getCurrentRevisionId(),
+			};
+		},
+		[]
+	);
+	const { openRevision, setCurrentRevisionId } = unlock(
+		useDispatch( editorStore )
+	);
+	const entityKey = postType && postId ? `${ postType }:${ postId }` : null;
+	const isCurrentEntity =
+		!! entityKey &&
+		currentPostType === postType &&
+		String( currentPostId ) === String( postId );
 
-	const hasOpenedInitialRevisionRef = useRef( false );
-	useEffect( () => {
-		if ( ! enabled || hasOpenedInitialRevisionRef.current || ! postId ) {
-			return;
-		}
-		hasOpenedInitialRevisionRef.current = true;
-		const revision = Number( location.query.revision );
-		if ( ! Number.isInteger( revision ) || revision <= 0 ) {
-			return;
-		}
-		openRevision( revision );
-	}, [ enabled, postId, location.query.revision, openRevision ] );
-
-	// On deep links, delay the first write so `openRevision()` can update
-	// the store first.
+	// The route can change before the editor store. Wait until both point to the
+	// same entity so a revision from the previous entity is not copied into the
+	// new URL.
+	const handledEntityKeyRef = useRef( null );
 	const lastURLWriteTimeRef = useRef( null );
+	useEffect( () => {
+		if ( ! enabled ) {
+			handledEntityKeyRef.current = null;
+			return;
+		}
+		if (
+			! isCurrentEntity ||
+			! entityKey ||
+			handledEntityKeyRef.current === entityKey
+		) {
+			return;
+		}
+
+		lastURLWriteTimeRef.current = null;
+		handledEntityKeyRef.current = entityKey;
+		const revision = Number( location.query.revision );
+		if ( Number.isInteger( revision ) && revision > 0 ) {
+			openRevision( revision );
+		} else if ( currentRevisionId ) {
+			setCurrentRevisionId( null );
+		}
+	}, [
+		enabled,
+		isCurrentEntity,
+		entityKey,
+		location.query.revision,
+		currentRevisionId,
+		openRevision,
+		setCurrentRevisionId,
+	] );
 
 	useEffect( () => {
-		if ( ! enabled || ! postId ) {
+		if (
+			! enabled ||
+			! isCurrentEntity ||
+			! entityKey ||
+			handledEntityKeyRef.current !== entityKey
+		) {
 			return;
 		}
 		if ( lastURLWriteTimeRef.current === null ) {
@@ -94,5 +128,12 @@ export default function useRevisionsURLSync( enabled ) {
 		}
 		const timeoutId = setTimeout( write, URL_WRITE_DEBOUNCE_MS );
 		return () => clearTimeout( timeoutId );
-	}, [ enabled, postId, currentRevisionId, location, history ] );
+	}, [
+		enabled,
+		isCurrentEntity,
+		entityKey,
+		currentRevisionId,
+		location,
+		history,
+	] );
 }

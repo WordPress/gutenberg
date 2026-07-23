@@ -90,4 +90,81 @@ test.describe( 'Site editor revisions shareable URLs', () => {
 			'edit'
 		);
 	} );
+
+	test( 'should not carry a revision to another page', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		const source = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/pages',
+			data: {
+				title: 'Revision source page',
+				content:
+					'<!-- wp:paragraph --><p>Original source content</p><!-- /wp:paragraph -->',
+				status: 'publish',
+			},
+		} );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/pages/${ source.id }`,
+			data: {
+				content:
+					'<!-- wp:paragraph --><p>Revised source content</p><!-- /wp:paragraph -->',
+			},
+		} );
+		const revisions = await requestUtils.rest( {
+			path: `/wp/v2/pages/${ source.id }/revisions`,
+		} );
+		const sourceRevisionId = revisions[ revisions.length - 1 ].id;
+		const target = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/pages',
+			data: {
+				title: 'Revision target page',
+				content:
+					'<!-- wp:paragraph --><p>Target page content</p><!-- /wp:paragraph -->',
+				status: 'publish',
+			},
+		} );
+
+		await admin.visitSiteEditor();
+		await admin.visitAdminPage(
+			'site-editor.php',
+			`p=${ encodeURIComponent(
+				`/page/${ source.id }`
+			) }&canvas=edit&revision=${ sourceRevisionId }`
+		);
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+k' );
+		await page
+			.getByRole( 'combobox', {
+				name: 'Search commands and settings',
+			} )
+			.fill( 'Revision target page' );
+		await page
+			.getByRole( 'option', {
+				name: 'Revision target page',
+			} )
+			.click();
+
+		await expect
+			.poll( () => new URL( page.url() ).searchParams.get( 'p' ) )
+			.toBe( `/page/${ target.id }` );
+		await expect(
+			editor.canvas.getByText( 'Target page content' )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeHidden();
+		expect( new URL( page.url() ).searchParams.get( 'revision' ) ).toBe(
+			null
+		);
+	} );
 } );

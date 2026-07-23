@@ -98,14 +98,13 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 		[]
 	);
 	const postWithTemplate = !! context?.postId;
-	useEditorTitle(
-		postWithTemplate ? context.postType : postType,
-		postWithTemplate ? context.postId : postId
-	);
+	const editorPostType = postWithTemplate ? context.postType : postType;
+	const editorPostId = postWithTemplate ? context.postId : postId;
+	useEditorTitle( editorPostType, editorPostId );
 	const _isPreviewingTheme = isPreviewingTheme();
 	const iframeProps = useEditorIframeProps();
 	const isEditMode = canvas === 'edit';
-	useRevisionsURLSync( isEditMode );
+	useRevisionsURLSync( isEditMode, editorPostType, editorPostId );
 	const loadingProgressId = useInstanceId(
 		CanvasLoader,
 		'edit-site-editor__loading-progress'
