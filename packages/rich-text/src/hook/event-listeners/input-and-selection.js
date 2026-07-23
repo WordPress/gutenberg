@@ -153,6 +153,19 @@ export default ( props ) => ( element ) => {
 
 		const selection = defaultView.getSelection();
 
+		// A selection reaching beyond the element is not this element's
+		// selection to sync, regardless of focus: the element may keep
+		// focus while the browser extends the selection across blocks
+		// through a common editing host (e.g. a shift+click). Syncing
+		// would clamp the selection to the part within the element and
+		// misrepresent it; the block editor records it whole instead.
+		if (
+			! element.contains( selection.anchorNode ) ||
+			! element.contains( selection.focusNode )
+		) {
+			return;
+		}
+
 		// Skip selections that have already been processed into the current
 		// record, such as the `selectionchange` event for a selection that
 		// was synchronized on capture of a consuming event, or coalesced
