@@ -125,6 +125,8 @@ export default function useSelectionObserver() {
 
 			let isTripleClick = false;
 
+			let shiftClickAnchor = null;
+
 			function onMouseDown( event ) {
 				isTripleClick = event.detail === 3;
 				// A shift+click makes a multi-selection: mark the gesture as
@@ -134,6 +136,18 @@ export default function useSelectionObserver() {
 				// The selection is built on mouseup.
 				if ( event.shiftKey ) {
 					startMultiSelect();
+
+					// The selection anchor is correct at this point.
+					// Browsers may lose it while handling the click
+					// (Safari moves the whole selection to the clicked
+					// position); remember it so the selection can be
+					// rebuilt on mouseup.
+					const { anchorNode, anchorOffset } =
+						defaultView.getSelection();
+					shiftClickAnchor = anchorNode && {
+						node: anchorNode,
+						offset: anchorOffset,
+					};
 
 					// The browser can only extend the selection to the
 					// clicked position when a common editing host contains
@@ -508,28 +522,52 @@ export default function useSelectionObserver() {
 			function onMouseUp( event ) {
 				// Browsers may fail to extend the selection to the
 				// clicked position in another block, even within a
-				// common editing host (Firefox leaves it where it was).
-				// Complete the extension at the clicked caret position
-				// before the selection is recorded.
+				// common editing host. Complete the selection between
+				// the anchor of the gesture and the clicked caret
+				// position before it is recorded. Firefox leaves the
+				// selection where it was, so only the focus needs to be
+				// extended; Safari moves the whole selection to the
+				// clicked position, losing the anchor, which is restored
+				// from the position remembered on mousedown.
 				if ( event.shiftKey ) {
 					const selection = defaultView.getSelection();
 					const clickedClientId = getClickedBlockClientId( event );
-					if (
-						selection.anchorNode &&
+					const position =
 						clickedClientId &&
-						getBlockClientId( selection.focusNode ) !==
-							clickedClientId
-					) {
-						const position = caretPositionFromPoint(
+						caretPositionFromPoint(
 							event.clientX,
 							event.clientY
 						);
-						if (
-							position &&
-							getBlockClientId( position.offsetNode ) ===
+
+					if (
+						position &&
+						getBlockClientId( position.offsetNode ) ===
+							clickedClientId
+					) {
+						const anchorIsElsewhere =
+							selection.anchorNode &&
+							getBlockClientId( selection.anchorNode ) !==
+								clickedClientId;
+
+						if ( anchorIsElsewhere ) {
+							if (
+								getBlockClientId( selection.focusNode ) !==
+								clickedClientId
+							) {
+								selection.extend(
+									position.offsetNode,
+									position.offset
+								);
+							}
+						} else if (
+							shiftClickAnchor?.node.isConnected &&
+							getBlockClientId( shiftClickAnchor.node ) &&
+							getBlockClientId( shiftClickAnchor.node ) !==
 								clickedClientId
 						) {
-							selection.extend(
+							selection.setBaseAndExtent(
+								shiftClickAnchor.node,
+								shiftClickAnchor.offset,
 								position.offsetNode,
 								position.offset
 							);
@@ -537,6 +575,7 @@ export default function useSelectionObserver() {
 					}
 				}
 
+				shiftClickAnchor = null;
 				onSelectionChange( event );
 				stopMultiSelect();
 			}
