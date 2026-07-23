@@ -61,8 +61,15 @@ export function NoteThread( {
 	const floatingRef = useRef( null );
 	const isKeyboardTabbingRef = useRef( false );
 	const blurDeselectTimeoutRef = useRef();
+	const markViewedTimeoutRef = useRef();
 
-	useEffect( () => () => clearTimeout( blurDeselectTimeoutRef.current ), [] );
+	useEffect(
+		() => () => {
+			clearTimeout( blurDeselectTimeoutRef.current );
+			clearTimeout( markViewedTimeoutRef.current );
+		},
+		[]
+	);
 
 	const allReplies = note?.reply || [];
 	const lastReply =
@@ -334,6 +341,17 @@ export function NoteThread( {
 						onClick={ ( event ) => {
 							event.stopPropagation();
 							onSelectNote();
+							/*
+							 * Revealing the hidden replies counts as viewing the
+							 * thread. Defer the mark briefly so the replies first
+							 * render with their unread dots, then clear —
+							 * otherwise they'd appear already read and the user
+							 * never sees which were new.
+							 */
+							clearTimeout( markViewedTimeoutRef.current );
+							markViewedTimeoutRef.current = setTimeout( () => {
+								viewedNotes?.markNotesViewed( allNoteIds );
+							}, 1500 );
 						} }
 					>
 						{ sprintf(
