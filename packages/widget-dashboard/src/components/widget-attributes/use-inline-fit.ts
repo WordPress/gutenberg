@@ -12,15 +12,9 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useWidgetHeaderAvailableSize } from '../widget-header/widget-header-size';
+import { useWidgetHeaderAvailableSize } from '../widget-header/widget-header-fit';
 
-interface InlineControlsFitOptions {
-	/**
-	 * Inline size (px) already claimed by fixed toolbar controls that are
-	 * not part of the collapse.
-	 */
-	reservedSize?: number;
-
+interface InlineFitOptions {
 	/**
 	 * Holds the current presentation while the user interacts with it (an
 	 * open dropdown, focus inside the inline form). Measurements keep
@@ -29,7 +23,7 @@ interface InlineControlsFitOptions {
 	locked?: boolean;
 }
 
-interface InlineControlsFit {
+interface InlineFit {
 	/**
 	 * Ref for the element wrapping the inline controls at their natural
 	 * width. While mounted, the measurement tracks it live; when the caller
@@ -49,12 +43,10 @@ interface InlineControlsFit {
  * Decides whether the inline attribute controls fit the space the header
  * row can grant its toolbar.
  *
- * @param {InlineControlsFitOptions} [options] Fit options.
+ * @param {InlineFitOptions} [options] Fit options.
  */
-export function useInlineControlsFit(
-	options: InlineControlsFitOptions = {}
-): InlineControlsFit {
-	const { reservedSize = 0, locked = false } = options;
+export function useInlineFit( options: InlineFitOptions = {} ): InlineFit {
+	const { locked = false } = options;
 
 	const availableSize = useWidgetHeaderAvailableSize();
 	const [ naturalSize, setNaturalSize ] = useState( 0 );
@@ -68,7 +60,7 @@ export function useInlineControlsFit(
 	const computed =
 		availableSize !== null &&
 		naturalSize > 0 &&
-		naturalSize > availableSize - reservedSize;
+		naturalSize > availableSize;
 
 	// The latch: while locked, the surface the user is interacting with
 	// must not be replaced under them, so the last unlocked decision holds.

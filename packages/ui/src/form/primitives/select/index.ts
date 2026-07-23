@@ -1,3 +1,5 @@
+export { Group } from './group';
+export { GroupLabel } from './group-label';
 export { Item } from './item';
 export { Popup } from './popup';
 export { Portal } from './portal';

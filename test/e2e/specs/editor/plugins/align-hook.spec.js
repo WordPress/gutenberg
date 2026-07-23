@@ -36,7 +36,7 @@ test.describe( 'Align Hook Works as Expected', () => {
 			await expect(
 				page
 					.getByRole( 'toolbar', { name: 'Block tools' } )
-					.getByRole( 'button', { name: 'Align', exact: true } )
+					.getByRole( 'button', { name: 'Align block', exact: true } )
 			).toBeHidden();
 		} );
 
@@ -57,11 +57,11 @@ test.describe( 'Align Hook Works as Expected', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( { name: 'test/test-align-true' } );
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 
 			await expect(
 				page
-					.getByRole( 'menu', { name: 'Align' } )
+					.getByRole( 'menu', { name: 'Align block' } )
 					.getByRole( 'menuitemradio' )
 			).toHaveText( Object.values( alignLabels ) );
 		} );
@@ -71,11 +71,11 @@ test.describe( 'Align Hook Works as Expected', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( { name: 'test/test-align-true' } );
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 
 			await expect(
 				page
-					.getByRole( 'menu', { name: 'Align' } )
+					.getByRole( 'menu', { name: 'Align block' } )
 					.getByRole( 'menuitemradio', { name: 'None' } )
 			).toHaveAttribute( 'aria-checked', 'true' );
 		} );
@@ -85,10 +85,10 @@ test.describe( 'Align Hook Works as Expected', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( { name: 'test/test-align-true' } );
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 
 			const dropdown = page.getByRole( 'menu', {
-				name: 'Align',
+				name: 'Align block',
 			} );
 
 			await dropdown
@@ -96,7 +96,7 @@ test.describe( 'Align Hook Works as Expected', () => {
 				.click();
 
 			// Verify the button of the specified alignment is pressed.
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 			await expect(
 				dropdown.getByRole( 'menuitemradio', { name: 'Align right' } )
 			).toHaveAttribute( 'aria-checked', 'true' );
@@ -112,7 +112,7 @@ test.describe( 'Align Hook Works as Expected', () => {
 				.click();
 
 			// Verify 'none' alignment button is in pressed state.
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 			await expect(
 				dropdown.getByRole( 'menuitemradio', { name: 'None' } )
 			).toHaveAttribute( 'aria-checked', 'true' );
@@ -130,11 +130,11 @@ test.describe( 'Align Hook Works as Expected', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( { name: 'test/test-align-array' } );
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 
 			await expect(
 				page
-					.getByRole( 'menu', { name: 'Align' } )
+					.getByRole( 'menu', { name: 'Align block' } )
 					.getByRole( 'menuitemradio' )
 			).toHaveText( [
 				alignLabels.none,
@@ -148,11 +148,11 @@ test.describe( 'Align Hook Works as Expected', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( { name: 'test/test-align-array' } );
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 
 			await expect(
 				page
-					.getByRole( 'menu', { name: 'Align' } )
+					.getByRole( 'menu', { name: 'Align block' } )
 					.getByRole( 'menuitemradio', { name: 'None' } )
 			).toHaveAttribute( 'aria-checked', 'true' );
 		} );
@@ -162,10 +162,10 @@ test.describe( 'Align Hook Works as Expected', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( { name: 'test/test-align-array' } );
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 
 			const dropdown = page.getByRole( 'menu', {
-				name: 'Align',
+				name: 'Align block',
 			} );
 
 			await dropdown
@@ -173,7 +173,7 @@ test.describe( 'Align Hook Works as Expected', () => {
 				.click();
 
 			// Verify the button of the specified alignment is pressed.
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 			await expect(
 				dropdown.getByRole( 'menuitemradio', { name: 'Center' } )
 			).toHaveAttribute( 'aria-checked', 'true' );
@@ -189,7 +189,7 @@ test.describe( 'Align Hook Works as Expected', () => {
 				.click();
 
 			// Verify 'none' alignment button is in pressed state.
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 			await expect(
 				dropdown.getByRole( 'menuitemradio', { name: 'None' } )
 			).toHaveAttribute( 'aria-checked', 'true' );
@@ -207,11 +207,11 @@ test.describe( 'Align Hook Works as Expected', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( { name: 'test/test-default-align' } );
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 
 			await expect(
 				page
-					.getByRole( 'menu', { name: 'Align' } )
+					.getByRole( 'menu', { name: 'Align block' } )
 					.getByRole( 'menuitemradio' )
 			).toHaveText( Object.values( alignLabels ) );
 		} );
@@ -221,11 +221,11 @@ test.describe( 'Align Hook Works as Expected', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( { name: 'test/test-default-align' } );
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 
 			await expect(
 				page
-					.getByRole( 'menu', { name: 'Align' } )
+					.getByRole( 'menu', { name: 'Align block' } )
 					.getByRole( 'menuitemradio', { name: 'Align right' } )
 			).toHaveAttribute( 'aria-checked', 'true' );
 		} );
@@ -245,11 +245,11 @@ test.describe( 'Align Hook Works as Expected', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( { name: 'test/test-default-align' } );
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 
 			// Remove the alignment.
 			await page
-				.getByRole( 'menu', { name: 'Align' } )
+				.getByRole( 'menu', { name: 'Align block' } )
 				.getByRole( 'menuitemradio', { name: 'Align right' } )
 				.click();
 
@@ -263,10 +263,10 @@ test.describe( 'Align Hook Works as Expected', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( { name: 'test/test-default-align' } );
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 
 			const dropdown = page.getByRole( 'menu', {
-				name: 'Align',
+				name: 'Align block',
 			} );
 
 			await dropdown
@@ -274,7 +274,7 @@ test.describe( 'Align Hook Works as Expected', () => {
 				.click();
 
 			// Verify the button of the specified alignment is pressed.
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 			await expect(
 				dropdown.getByRole( 'menuitemradio', { name: 'Align center' } )
 			).toHaveAttribute( 'aria-checked', 'true' );
@@ -290,7 +290,7 @@ test.describe( 'Align Hook Works as Expected', () => {
 				.click();
 
 			// Verify 'none' alignment button is in pressed state.
-			await editor.clickBlockToolbarButton( 'Align' );
+			await editor.clickBlockToolbarButton( 'Align block' );
 			await expect(
 				dropdown.getByRole( 'menuitemradio', { name: 'None' } )
 			).toHaveAttribute( 'aria-checked', 'true' );
