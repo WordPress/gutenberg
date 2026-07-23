@@ -1,11 +1,12 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 
 /**
  * WordPress dependencies
  */
+import { BlockControls, MediaReplaceFlow } from '@wordpress/block-editor';
 import { useDispatch } from '@wordpress/data';
 
 /**
@@ -18,8 +19,20 @@ import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 let mockMediaReplaceFlowProps;
 
 jest.mock( '@wordpress/block-editor', () => ( {
-	BlockControls: ( { children, group = 'default' } ) => (
-		<div data-testid={ `block-controls-${ group }` }>{ children }</div>
+	BlockControls: ( {
+		children,
+		group = 'default',
+		__experimentalShareWithChildBlocks,
+	} ) => (
+		<div
+			data-testid={ `block-controls-${
+				__experimentalShareWithChildBlocks
+					? 'shared-with-child-blocks'
+					: group
+			}` }
+		>
+			{ children }
+		</div>
 	),
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
@@ -88,6 +101,11 @@ function renderEdit( props = {} ) {
 				setCurrentTrackClientId,
 			} }
 		>
+			{ props.sharedControls && (
+				<BlockControls __experimentalShareWithChildBlocks>
+					{ props.sharedControls }
+				</BlockControls>
+			) }
 			<PlaylistTrackEdit
 				attributes={ {
 					...defaultAttributes,
@@ -191,6 +209,32 @@ describe( 'PlaylistTrackEdit', () => {
 				url: 'blob:https://example.com/temporary-track',
 			} )
 		);
+	} );
+
+	it( 'renders the shared add track control in a different toolbar group from replace', () => {
+		renderEdit( {
+			sharedControls: (
+				<MediaReplaceFlow
+					name="Add track"
+					onSelect={ jest.fn() }
+					accept="audio/*"
+					multiple
+					handleUpload={ false }
+				/>
+			),
+		} );
+
+		expect(
+			within( screen.getByTestId( 'block-controls-other' ) ).getByRole(
+				'button',
+				{ name: 'Replace' }
+			)
+		).toBeInTheDocument();
+		expect(
+			within(
+				screen.getByTestId( 'block-controls-shared-with-child-blocks' )
+			).getByRole( 'button', { name: 'Add track' } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'preserves the current track source when a replacement upload fails', () => {
