@@ -301,6 +301,10 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 			border-inline-end-color: #fff;
 		}
 
+		.wrap.hide-if-js {
+			padding-inline-start: 20px;
+		}
+
 		/* Media frame fix */
 		.media-frame select.attachment-filters:last-of-type {
 			width: auto;
