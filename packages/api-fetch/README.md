@@ -46,6 +46,19 @@ apiFetch( {
 } );
 ```
 
+### Sending a non-JSON body
+
+```js
+apiFetch( {
+	path: '/my-plugin/v1/resource',
+	method: 'PUT',
+	body: 'Plain text content',
+	headers: {
+		'Content-Type': 'text/plain',
+	},
+} );
+```
+
 ### Options
 
 `apiFetch` supports and passes through all [options of the `fetch` global](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch).
@@ -66,7 +79,10 @@ Unlike `fetch`, the `Promise` return value of `apiFetch` will resolve to the par
 
 #### `data` (`object`)
 
-Sent on `POST` or `PUT` requests only. Shorthand to be used in place of `body`, accepts an object value to be stringified to JSON.
+Sent on `POST` or `PUT` requests only. Shorthand to be used in place of
+`body`, accepts an object value to be stringified to JSON. To send another
+format, use the standard `body` and `headers` fetch options and set the
+appropriate `Content-Type`.
 
 ### Aborting a request
 
