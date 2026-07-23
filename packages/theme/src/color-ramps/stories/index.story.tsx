@@ -203,6 +203,11 @@ export const SampleCombinations: StoryObj< typeof ColorGen > = {
 				background: '#5f787f',
 				primary: '#567958',
 			},
+			// WP Midnight
+			{
+				background: '#3d4042',
+				primary: '#cf4339',
+			},
 			// Sunrise
 			{
 				background: '#cc4541',
