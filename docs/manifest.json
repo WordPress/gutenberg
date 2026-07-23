@@ -3228,6 +3228,12 @@
 		"parent": "code"
 	},
 	{
+		"title": "Agents and Skills",
+		"slug": "agents-and-skills",
+		"markdown_source": "../docs/contributors/code/agents-and-skills.md",
+		"parent": "code"
+	},
+	{
 		"title": "Gutenberg Release Process",
 		"slug": "release",
 		"markdown_source": "../docs/contributors/code/release/README.md",
