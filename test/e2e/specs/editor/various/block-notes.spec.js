@@ -1901,14 +1901,18 @@ test.describe( 'Block Notes', () => {
 			/*
 			 * Both halves of the marking survive deselection: an annotated block
 			 * has to be legible as one at rest, without clicking it first. The
-			 * rule is an inset shadow rather than a border so that adding it
-			 * cannot reflow the canvas.
+			 * rule is a text underline, so every line of a wrapped paragraph
+			 * carries it, matching the inline-marker treatment.
 			 */
-			const shadow = await paragraph.evaluate(
-				( el ) => window.getComputedStyle( el ).boxShadow
-			);
-			expect( shadow ).toContain( 'inset' );
-			expect( shadow ).toContain( '-1.5px' );
+			const decoration = await paragraph.evaluate( ( el ) => {
+				const style = window.getComputedStyle( el );
+				return {
+					line: style.textDecorationLine,
+					thickness: style.textDecorationThickness,
+				};
+			} );
+			expect( decoration.line ).toBe( 'underline' );
+			expect( decoration.thickness ).toBe( '1.5px' );
 
 			// Selecting the note from the sidebar marks the block with its
 			// outline. The tint behind the text must not deepen with it: it
@@ -1922,6 +1926,58 @@ test.describe( 'Block Notes', () => {
 			expect( await readTint( paragraph, rgb ) ).toBe( 'tint' );
 		} );
 
+		test( 'tints and underlines each list item of an annotated list', async ( {
+			editor,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
+			const rgb = hexToRgb(
+				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
+			);
+
+			// A list's wrapper is not a rich-text editable, but its direct
+			// children are block wrappers, so the treatment lands on each
+			// rich-text leaf: every list item tinted and underlined.
+			await editor.insertBlock( {
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'First item' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'Second item' },
+					},
+				],
+			} );
+			await blockNoteUtils.addNote( 'Whole list note' );
+
+			// Move focus to the title so the freshly added note is deselected:
+			// the marking has to be legible at rest.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+
+			const items = editor.canvas.getByRole( 'textbox', {
+				name: 'List text',
+			} );
+			await expect( items ).toHaveCount( 2 );
+			for ( const item of await items.all() ) {
+				await expect.poll( () => readTint( item, rgb ) ).toBe( 'tint' );
+				const decoration = await item.evaluate( ( el ) => {
+					const style = window.getComputedStyle( el );
+					return {
+						line: style.textDecorationLine,
+						thickness: style.textDecorationThickness,
+					};
+				} );
+				expect( decoration.line ).toBe( 'underline' );
+				expect( decoration.thickness ).toBe( '1.5px' );
+			}
+		} );
+
 		test( 'overlays a non-text block with the tint and an all-around rule at rest', async ( {
 			editor,
 			requestUtils,
@@ -1932,23 +1988,15 @@ test.describe( 'Block Notes', () => {
 				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
 			);
 
-			// A group's wrapper is not a rich-text editable, so it takes the
-			// overlay path: a background behind a non-text block is hidden by
-			// the block's own content (e.g. an image), so the tint is painted
+			// An image's editables (its caption) are nested inside non-block
+			// containers, so it takes the overlay path: a background behind it
+			// would be hidden by the image itself, so the tint is painted
 			// above the block instead, with the rule drawn all the way around.
-			await editor.insertBlock( {
-				name: 'core/group',
-				innerBlocks: [
-					{
-						name: 'core/paragraph',
-						attributes: { content: 'Inside the group.' },
-					},
-				],
-			} );
-			await blockNoteUtils.addNote( 'Whole group note' );
+			await editor.insertBlock( { name: 'core/image' } );
+			await blockNoteUtils.addNote( 'Whole image note' );
 
-			const group = editor.canvas.getByRole( 'document', {
-				name: 'Block: Group',
+			const image = editor.canvas.getByRole( 'document', {
+				name: 'Block: Image',
 			} );
 
 			// Move focus to the title so the freshly added note is deselected:
@@ -1958,7 +2006,7 @@ test.describe( 'Block Notes', () => {
 				.click();
 
 			const readOverlay = () =>
-				group.evaluate( ( el ) => {
+				image.evaluate( ( el ) => {
 					const style = window.getComputedStyle( el, '::after' );
 					return {
 						background: style.backgroundColor,

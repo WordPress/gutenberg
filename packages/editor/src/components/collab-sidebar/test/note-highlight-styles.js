@@ -281,13 +281,16 @@ describe( 'getBlockLevelHighlights', () => {
 } );
 
 describe( 'buildBlockHighlightCss', () => {
-	// The tint-behind-the-text rule only matches when the block's own wrapper
-	// element is itself a rich-text editable, which is what scopes that
-	// treatment to text blocks; every other block gets the overlay rule.
+	// The tint-behind-the-text rule matches when the block's own wrapper
+	// element is itself a rich-text editable (paragraph, heading), or, for
+	// containers whose direct children are block wrappers (list, quote,
+	// group), each rich-text leaf inside; every other block gets the overlay.
 	const textSelectorFor = ( clientId ) =>
 		`[data-block="${ clientId }"].block-editor-rich-text__editable`;
+	const leafSelectorFor = ( clientId ) =>
+		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):has(> [data-block]) .block-editor-rich-text__editable`;
 	const overlaySelectorFor = ( clientId ) =>
-		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable)::after`;
+		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):not(:has(> [data-block]))::after`;
 
 	it( 'tints each text block with its author color at the tint alpha (0x40)', () => {
 		const css = buildBlockHighlightCss( [
@@ -308,19 +311,39 @@ describe( 'buildBlockHighlightCss', () => {
 
 	/*
 	 * An annotated block has to be legible as one without clicking it, so the
-	 * rule along its bottom edge belongs on the resting declaration. Drawn as an
-	 * inset shadow rather than a border so that adding it cannot reflow the
-	 * canvas.
+	 * underline belongs on the resting declaration - and it is a text
+	 * underline, not a bottom-edge rule, so every line of a wrapped paragraph
+	 * carries it, matching the inline-marker treatment.
 	 */
-	it( 'rules the bottom edge of each text block at rest', () => {
+	it( 'underlines every line of each text block at rest', () => {
 		const css = buildBlockHighlightCss( [
 			{ clientId: 'abc-1', id: 7, author: 1 },
 		] );
 		const color = getAvatarBorderColor( 1 );
 		expect( css ).toContain(
-			`box-shadow:inset 0 -1.5px 0 0 color-mix(in srgb, currentColor 30%, ${ color });`
+			`${ textSelectorFor( 'abc-1' ) }{background-color:${ color }40;` +
+				'text-decoration-line:underline;' +
+				`text-decoration-color:color-mix(in srgb, currentColor 30%, ${ color });` +
+				'text-decoration-thickness:1.5px;'
 		);
 		expect( css ).not.toContain( 'border' );
+	} );
+
+	/*
+	 * A container whose direct children are block wrappers (list, quote,
+	 * group) has no text of its own to tint, so the same treatment lands on
+	 * each rich-text leaf inside it - every list item tinted and underlined
+	 * individually.
+	 */
+	it( 'tints and underlines each rich-text leaf of a block container', () => {
+		const css = buildBlockHighlightCss( [
+			{ clientId: 'abc-1', id: 7, author: 1 },
+		] );
+		const color = getAvatarBorderColor( 1 );
+		expect( css ).toContain(
+			`${ leafSelectorFor( 'abc-1' ) }{background-color:${ color }40;` +
+				'text-decoration-line:underline;'
+		);
 	} );
 
 	/*
@@ -360,26 +383,25 @@ describe( 'buildBlockHighlightCss', () => {
 
 	/*
 	 * The tint covers a whole block, so deepening it would cost the theme's
-	 * text contrast across all of that, and a wrapped paragraph striped on
-	 * every line would read as formatting where a single bottom edge reads as a
-	 * boundary. Hover and selection are carried by the block outline instead,
-	 * so the CSS here stays flat: one resting rule per treatment and no state
-	 * or per-line variants.
+	 * text contrast across all of that. Hover and selection are carried by the
+	 * block outline instead, so the CSS here stays flat: resting rules only,
+	 * no state variants, and every tint at the one fixed alpha.
 	 */
-	it( 'emits only resting rules, with no state or per-line variants', () => {
+	it( 'emits only resting rules, with no state variants', () => {
 		const css = buildBlockHighlightCss( [
 			{ clientId: 'abc-1', id: 7, author: 1 },
 			{ clientId: 'abc-2', id: 12, author: 3 },
 		] );
 		expect( css ).not.toContain( ':hover' );
-		expect( css ).not.toContain( 'text-decoration' );
+		expect( css ).not.toContain( ':focus' );
 		const alphas = [
 			...css.matchAll( /background-color:#[0-9a-f]{6}([0-9a-f]{2})?/gi ),
 		]
 			.map( ( [ , alpha ] ) => alpha )
 			.filter( Boolean );
-		// One tint per treatment (text + overlay) per block, all at 0x40.
-		expect( alphas ).toEqual( [ '40', '40', '40', '40' ] );
+		// One tint per treatment (text root + container leaves + overlay) per
+		// block, all at 0x40.
+		expect( alphas ).toEqual( [ '40', '40', '40', '40', '40', '40' ] );
 	} );
 
 	it( 'escapes quotes and backslashes in the client id', () => {

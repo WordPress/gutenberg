@@ -180,17 +180,20 @@ export function buildHighlightCss( threads, selectedId = null ) {
  * the block is matched by its client id instead.
  *
  * Text blocks - those whose own wrapper element *is* a rich-text editable
- * (paragraph, heading, list item) - get a tint behind the text and a rule along
- * their bottom edge. The rule is an inset shadow rather than a border so adding
- * it cannot reflow the canvas, and it sits under the block rather than under
- * each line: a wrapped paragraph striped on every line would read as
- * formatting, where a single edge reads as a boundary.
+ * (paragraph, heading) - get the same treatment as an inline marker, applied
+ * to all of their text: a tint behind the glyphs and an underline on every
+ * line, so a block-level note reads as "all of this text is annotated".
  *
- * Every other block (media, containers) paints the same treatment onto an
- * `::after` overlay instead - a tinted veil with the rule drawn all the way
- * around - because a background behind e.g. an image is hidden by the image
- * itself. The overlay ignores pointer events, so the block stays editable
- * through it.
+ * Blocks that *contain* other blocks directly (list, quote, group - their
+ * wrapper's direct children are block wrappers) apply that same treatment to
+ * each rich-text leaf inside them, so e.g. every list item is tinted and
+ * underlined individually.
+ *
+ * Every other block (images, covers, other media whose editables are nested
+ * inside non-block containers) paints the tint onto an `::after` overlay
+ * instead - a tinted veil with the rule drawn all the way around - because a
+ * background behind e.g. an image is hidden by the image itself. The overlay
+ * ignores pointer events, so the block stays editable through it.
  *
  * Both are present at rest, with no hover or selected variant, so an annotated
  * block is legible as one without clicking anything. The tint covers a whole
@@ -222,15 +225,23 @@ export function buildBlockHighlightCss( blockHighlights ) {
 		);
 		const blockSel = `[data-block="${ escapedClientId }"]`;
 		blockSelectors.push( blockSel );
+		const textDeclarations = `background-color:${ color }${ TINT_ALPHA };${ underline(
+			color,
+			RULE_THICKNESS
+		) }`;
 		rules.push(
-			`${ blockSel }.block-editor-rich-text__editable{background-color:${ color }${ TINT_ALPHA };box-shadow:inset 0 -${ RULE_THICKNESS } 0 0 ${ ruleColor(
-				color
-			) };}`
+			`${ blockSel }.block-editor-rich-text__editable{${ textDeclarations }}`
+		);
+		// Containers whose direct children are block wrappers (list, quote,
+		// group) mark each of their rich-text leaves; a cover or image nests
+		// its editables inside non-block containers, so it won't match.
+		rules.push(
+			`${ blockSel }:not(.block-editor-rich-text__editable):has(> [data-block]) .block-editor-rich-text__editable{${ textDeclarations }}`
 		);
 		// Block wrappers are position:relative and the overlay sits above the
 		// content, so `inset:0` hugs the block exactly with no reflow.
 		rules.push(
-			`${ blockSel }:not(.block-editor-rich-text__editable)::after{content:"";position:absolute;inset:0;pointer-events:none;background-color:${ color }${ TINT_ALPHA };box-shadow:inset 0 0 0 ${ RULE_THICKNESS } ${ ruleColor(
+			`${ blockSel }:not(.block-editor-rich-text__editable):not(:has(> [data-block]))::after{content:"";position:absolute;inset:0;pointer-events:none;background-color:${ color }${ TINT_ALPHA };box-shadow:inset 0 0 0 ${ RULE_THICKNESS } ${ ruleColor(
 				color
 			) };}`
 		);
