@@ -1158,9 +1158,7 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 		return false;
 	}
 
-	const selectionStart = anchorBeforeFocus
-		? selectionAnchor
-		: selectionFocus;
+	const selectionStart = anchorBeforeFocus ? selectionAnchor : selectionFocus;
 	const selectionEnd = anchorBeforeFocus ? selectionFocus : selectionAnchor;
 
 	// Nested (ancestor/descendant) merges always land in the ancestor,
