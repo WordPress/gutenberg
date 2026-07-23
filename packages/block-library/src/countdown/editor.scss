@@ -1,0 +1,46 @@
+.countdown {
+	display: flex;
+	gap: 16px;
+	justify-content: center;
+	margin: 16px 0;
+}
+
+.countdown-settings {
+	.components-datetime__time-field-hours-input,
+	.components-datetime__time-field-day {
+		margin-bottom: 0 !important;
+	}
+}
+
+.countdown-box {
+	display: flex;
+	flex-direction: column;
+	border-radius: 8px;
+	padding: 16px;
+	min-width: 80px;
+	text-align: center;
+	@media screen and ( max-width: 780px ) {
+		min-width: 10vw;
+	}
+}
+
+.evergreen-duration-controls {
+	display: flex;
+	gap: 10px;
+	margin-top: 15px;
+}
+
+.countdown-end-message {
+	text-align: center;
+	margin-top: 20px;
+}
+
+.countdown-sidebar-link-control .block-editor-link-control {
+	min-width: 100%;
+}
+
+.countdown-sidebar-link-control .block-editor-url-input {
+	min-width: 0 !important;
+	margin-left: 0 !important;
+	width: 100% !important;
+}

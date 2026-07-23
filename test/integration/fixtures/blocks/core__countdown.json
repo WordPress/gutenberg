@@ -1,0 +1,17 @@
+[
+	{
+		"name": "core/countdown",
+		"isValid": true,
+		"attributes": {
+			"showDays": true,
+			"showHours": true,
+			"showMinutes": true,
+			"showSeconds": true,
+			"actionOnEnd": "hide",
+			"actionValue": "",
+			"bgColor": "#ffffff",
+			"borderColor": "#000000"
+		},
+		"innerBlocks": []
+	}
+]

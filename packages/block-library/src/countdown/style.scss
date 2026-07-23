@@ -1,0 +1,23 @@
+.countdown {
+	display: flex;
+	gap: 16px;
+	justify-content: center;
+	margin: 16px 0;
+}
+
+.countdown-box {
+	display: flex;
+	flex-direction: column;
+	border-radius: 8px;
+	padding: 16px;
+	min-width: 80px;
+	text-align: center;
+	@media screen and ( max-width: 780px ) {
+		min-width: 10vw;
+	}
+}
+
+.countdown-end-message {
+	text-align: center;
+	margin-top: 20px;
+}

@@ -1,0 +1,106 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/countdown",
+	"title": "Countdown",
+	"category": "widgets",
+	"description": "A countdown timer block with customizable options.",
+	"keywords": [ "timer", "clock", "date", "schedule" ],
+	"textdomain": "default",
+	"attributes": {
+		"endTime": {
+			"type": "string"
+		},
+		"showDays": {
+			"type": "boolean",
+			"default": true
+		},
+		"showHours": {
+			"type": "boolean",
+			"default": true
+		},
+		"showMinutes": {
+			"type": "boolean",
+			"default": true
+		},
+		"showSeconds": {
+			"type": "boolean",
+			"default": true
+		},
+		"actionOnEnd": {
+			"type": "string",
+			"default": "none"
+		},
+		"actionValue": {
+			"type": "string",
+			"default": ""
+		},
+		"bgColor": {
+			"type": "string",
+			"default": "#ffffff"
+		},
+		"borderColor": {
+			"type": "string",
+			"default": "#000000"
+		},
+		"innerBlocksBehavior": {
+			"type": "string",
+			"default": "revealOnEnd"
+		},
+		"isEvergreen": {
+			"type": "boolean",
+			"default": false
+		},
+		"evergreenDays": {
+			"type": "number",
+			"default": 0
+		},
+		"evergreenHours": {
+			"type": "number",
+			"default": 0
+		},
+		"evergreenMinutes": {
+			"type": "number",
+			"default": 15
+		}
+	},
+	"supports": {
+		"align": [ "wide", "full" ],
+		"anchor": true,
+		"ariaLabel": true,
+		"shadow": true,
+		"html": false,
+		"layout": true,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"color": {
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"__experimentalDefaultControls": {
+				"radius": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		}
+	},
+	"style": "wp-block-countdown",
+	"editorStyle": "wp-block-countdown-editor",
+	"viewScriptModule": "@wordpress/block-library/countdown/view"
+}
