@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Wrap block-level preset class selectors in `:where()` so they keep the same `0-1-0` specificity as root-level presets, preventing block-level palettes (e.g. via the `wp_theme_json_data_theme` filter) from overriding responsive state styles ([#80580](https://github.com/WordPress/gutenberg/issues/80580)).
+
 ### New Features
 
 -   Added a private `resolveStyle` API that resolves the merged Global Styles cascade (root, block type, and applied block style variation) for a block, returning the inherited value and a per-leaf source map.
