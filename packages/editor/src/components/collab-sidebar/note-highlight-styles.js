@@ -80,6 +80,16 @@ function underline( color, thickness ) {
 // `<mark>` and would otherwise inherit the yellow default in the editor canvas.
 const BASE_RESET = 'mark.wp-note{background-color:transparent;color:inherit;}';
 
+// Forced-colors (e.g. Windows High Contrast) replaces the per-author tints
+// with system colors, and browsers force a `mark` background without touching
+// an author-specified `color:inherit` - which composes an unreadable pairing
+// when the canvas text color contrasts with the forced `Mark` background.
+// Opting into the `Mark`/`MarkText` pair keeps the two halves consistent.
+const FORCED_COLORS_RESET =
+	'@media (forced-colors: active){' +
+	'mark.wp-note{background-color:Mark;color:MarkText;}' +
+	'}';
+
 /**
  * Derive the block-level highlights from the note threads: a thread marks its
  * whole block when no in-content `core/note` marker carries its id (an inline
@@ -137,7 +147,7 @@ export function getBlockLevelHighlights( threads, getBlockAttributes ) {
  * @return {string} A serialized CSS string targeting the in-content note markers.
  */
 export function buildHighlightCss( threads, selectedId = null ) {
-	const rules = [ BASE_RESET ];
+	const rules = [ BASE_RESET, FORCED_COLORS_RESET ];
 	for ( const thread of threads ?? [] ) {
 		if ( ! thread?.id ) {
 			continue;
@@ -189,11 +199,16 @@ export function buildHighlightCss( threads, selectedId = null ) {
  * draws the block's own outline instead, which is what already signals "this
  * block" everywhere else in the editor.
  *
+ * Under forced colors both tints and shadows are stripped by the browser, so
+ * each annotated block falls back to a dashed outline - dashed so it cannot be
+ * mistaken for the solid outline the editor draws on the selected block.
+ *
  * @param {Array} blockHighlights Block-level notes (each with `clientId`, `id` and `author`).
  * @return {string} A serialized CSS string targeting the blocks' wrapper elements.
  */
 export function buildBlockHighlightCss( blockHighlights ) {
 	const rules = [];
+	const blockSelectors = [];
 	for ( const highlight of blockHighlights ?? [] ) {
 		if ( ! highlight?.clientId ) {
 			continue;
@@ -206,6 +221,7 @@ export function buildBlockHighlightCss( blockHighlights ) {
 			'\\$&'
 		);
 		const blockSel = `[data-block="${ escapedClientId }"]`;
+		blockSelectors.push( blockSel );
 		rules.push(
 			`${ blockSel }.block-editor-rich-text__editable{background-color:${ color }${ TINT_ALPHA };box-shadow:inset 0 -${ RULE_THICKNESS } 0 0 ${ ruleColor(
 				color
@@ -217,6 +233,13 @@ export function buildBlockHighlightCss( blockHighlights ) {
 			`${ blockSel }:not(.block-editor-rich-text__editable)::after{content:"";position:absolute;inset:0;pointer-events:none;background-color:${ color }${ TINT_ALPHA };box-shadow:inset 0 0 0 ${ RULE_THICKNESS } ${ ruleColor(
 				color
 			) };}`
+		);
+	}
+	if ( blockSelectors.length > 0 ) {
+		rules.push(
+			`@media (forced-colors: active){${ blockSelectors.join(
+				','
+			) }{outline:${ RULE_THICKNESS } dashed;outline-offset:2px;}}`
 		);
 	}
 	return rules.join( '' );

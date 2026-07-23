@@ -19,10 +19,22 @@ import {
 import { getAvatarBorderColor } from '../utils';
 
 const MARK_RESET = 'mark.wp-note{background-color:transparent;color:inherit;}';
+const FORCED_COLORS_RESET =
+	'@media (forced-colors: active){mark.wp-note{background-color:Mark;color:MarkText;}}';
 
 describe( 'buildHighlightCss', () => {
 	it( 'always emits the mark reset so the browser default yellow does not bleed through', () => {
 		expect( buildHighlightCss( [] ) ).toContain( MARK_RESET );
+	} );
+
+	/*
+	 * Forced colors (e.g. Windows High Contrast) forces a `mark` background
+	 * while an author-specified `color:inherit` keeps the canvas text color,
+	 * which can compose an unreadable pairing. Opting into the system
+	 * `Mark`/`MarkText` pair keeps the two halves consistent.
+	 */
+	it( 'pairs Mark with MarkText under forced colors', () => {
+		expect( buildHighlightCss( [] ) ).toContain( FORCED_COLORS_RESET );
 	} );
 
 	it( 'tints each thread with its author color at the tint alpha (0x40)', () => {
@@ -160,9 +172,11 @@ describe( 'buildHighlightCss', () => {
 		);
 	} );
 
-	it( 'returns just the reset when no threads are provided', () => {
-		expect( buildHighlightCss() ).toBe( MARK_RESET );
-		expect( buildHighlightCss( null ) ).toBe( MARK_RESET );
+	it( 'returns just the resets when no threads are provided', () => {
+		expect( buildHighlightCss() ).toBe( MARK_RESET + FORCED_COLORS_RESET );
+		expect( buildHighlightCss( null ) ).toBe(
+			MARK_RESET + FORCED_COLORS_RESET
+		);
 	} );
 } );
 
@@ -325,6 +339,22 @@ describe( 'buildBlockHighlightCss', () => {
 			`${ overlaySelectorFor(
 				'abc-1'
 			) }{content:"";position:absolute;inset:0;pointer-events:none;background-color:${ color }40;box-shadow:inset 0 0 0 1.5px color-mix(in srgb, currentColor 30%, ${ color });}`
+		);
+	} );
+
+	/*
+	 * Forced colors strips background tints and box-shadows, which would leave
+	 * an annotated block with no marking at all. The dashed outline fallback
+	 * survives (its color is forced to the system text color), and dashed keeps
+	 * it distinct from the solid outline the editor draws on selection.
+	 */
+	it( 'falls back to a dashed outline under forced colors', () => {
+		const css = buildBlockHighlightCss( [
+			{ clientId: 'abc-1', id: 7, author: 1 },
+			{ clientId: 'abc-2', id: 12, author: 3 },
+		] );
+		expect( css ).toContain(
+			'@media (forced-colors: active){[data-block="abc-1"],[data-block="abc-2"]{outline:1.5px dashed;outline-offset:2px;}}'
 		);
 	} );
 
