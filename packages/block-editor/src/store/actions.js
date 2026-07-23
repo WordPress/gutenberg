@@ -63,7 +63,7 @@ function blockHasClientId( block, clientId ) {
  * list-items, unwrap a sole nested list so the structure stays valid.
  *
  * @param {Object[]} innerBlocks Children of the selection-end block.
- * @param {Object[]} siblings    Blocks at the selection-end block's level.
+ * @param {Object[]} siblings    Blocks at the selection-end block level.
  * @return {Object[]} Blocks to insert in place of the selection-end block.
  */
 function childrenInPlaceOfEndBlock( innerBlocks, siblings ) {
