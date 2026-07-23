@@ -87,6 +87,19 @@ This is all you need to make your plugin JavaScript code translatable.
 
 When you set script translations for a handle WordPress will automatically figure out if a translations file exists on translate.wordpress.org, and if so ensure that it's loaded into `wp.i18n` before your script runs. With translate.wordpress.org, plugin authors also do not need to worry about setting up their own infrastructure for translations and can rely on a global community with dozens of active locales. Read more about [WordPress Translations](https://make.wordpress.org/meta/handbook/documentation/translations/).
 
+### Script modules
+
+Since WordPress 7.0, translations are detected automatically for enqueued script
+modules and their dependencies. Use
+[`wp_set_script_module_translations()`](https://developer.wordpress.org/reference/functions/wp_set_script_module_translations/)
+only when you need to override the default text domain or translation path.
+
+The Gutenberg plugin provides automatic detection on earlier supported
+WordPress versions, but it does not polyfill the override function. Script
+module translations also still use the classic `wp-i18n` runtime. Translation
+data for dynamically imported modules may therefore be loaded before those
+modules are needed.
+
 ## Provide your own translations
 
 You can create and ship your own translations with your plugin, if you have sufficient knowledge of the language(s) you can ensure the translations are available.
